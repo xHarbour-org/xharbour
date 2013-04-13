@@ -62,7 +62,7 @@
 
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
-CLASS DataGrid INHERIT Control
+CLASS DataGrid INHERIT TitleControl
    DATA ItemHeight              PUBLISHED INIT 19
    DATA FullRowSelect           PUBLISHED INIT FALSE
    DATA ShadowRow               PUBLISHED INIT TRUE
@@ -300,7 +300,6 @@ METHOD Init( oParent ) CLASS DataGrid
       ::__ClassInst:xStaticEdge := .T.
    ENDIF
 
-   ::SmallCaption            := TRUE
    ::EmptyLeft               := 0
    ::__IsStandard            := .F.
    ::IsContainer             := .F.
@@ -632,7 +631,7 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
          ENDIF
          IF ::__SelCol > 0
             n := x - ::__SelLeft - ::Children[::__SelCol]:Width + 1
-            ImageListDragMove( n, IIF( !EMPTY( ::xText ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
+            ImageListDragMove( n, IIF( !EMPTY( ::xText ), ::__nCaptionHeight, 0 )+1 )
          ENDIF
       ENDIF
    ENDIF
@@ -1341,7 +1340,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                ::__lMoveMouseDown := .T.
                ::__hDragImageList := ::Children[ nClickCol ]:CreateDragImage( ::__SelWidth - ::Children[nClickCol]:Width )
                ImageListBeginDrag( ::__hDragImageList, 0, 0, 0 )
-               ImageListDragEnter( ::hWnd, ::__SelWidth-::Children[nClickCol]:Width+1, IIF( !EMPTY( ::xText ) .AND. ::SmallCaption, ::CaptionHeight, 0 )+1 )
+               ImageListDragEnter( ::hWnd, ::__SelWidth-::Children[nClickCol]:Width+1, IIF( !EMPTY( ::xText ), ::__nCaptionHeight, 0 )+1 )
             ENDIF
 
          ENDIF

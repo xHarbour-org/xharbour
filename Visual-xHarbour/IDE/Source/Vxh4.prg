@@ -111,7 +111,6 @@ METHOD Init( oParent ) CLASS ObjManager
 
    DEFAULT ::__xCtrlName  TO "ObjManager"
    ::Super:Init( oParent )
-   ::SmallCaption := .F.
 
    ::Colors := {}
    FOR EACH cColor IN ::System:Color:Keys
@@ -940,9 +939,6 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
             oActiveObject:MoveWindow()
             oActiveObject:Parent:InvalidateRect()
          ENDIF
-      ENDIF
-      IF cProp == "Caption" .AND. __ObjHasMsg( oActiveObject, "SmallCaption" ) .AND. oActiveObject:SmallCaption
-         oActiveObject:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
       ENDIF
 
       IF oItem:Owner:Caption == "Colors"
@@ -2867,8 +2863,6 @@ ENDCLASS
 METHOD Init( oParent ) CLASS EventManager
    ::__xCtrlName  := "EvtManager"
    ::Super:Init( oParent )
-   //::Caption    := "Events"
-   ::SmallCaption := .F.
    ::Action     := NIL
 RETURN Self
 
@@ -3724,7 +3718,6 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
                    { "SelOnlyRep",              "Behavior" },;
                    { "ShowGrid",                "Appearance" },;
                    { "ShortCutText",            "Appearance" },;
-                   { "SmallCaption",            "Appearance" },;
                    { "Smooth",                  "Appearance" },;
                    { "ShadowRow",               "Appearance" },;
                    { "ShowChevron",             "Appearance" },;
@@ -3762,6 +3755,7 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
    
 __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "ThickFrame",              "Style" },;
+                   { "TitleHeight",             "Size" },;
                    { "Transparent",             "Style" },;
                    { "ToolWindow",              "Style" },;
                    { "TopMost",                 "Style" },;

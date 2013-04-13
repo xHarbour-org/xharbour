@@ -1993,12 +1993,10 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ::Application:DebugWindow := DebugTab( Self )
-      :AllowClose    := .T.
       :Width         := 680
       :Height        := ( 200 * 4 ) / LOWORD( GetDialogBaseUnits() )
       :Multiline     := .T.
       :TabPosition   := 4
-      :AllowUndock   := .T.
       :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::StatusBar1
       :Dock:Right    := ::Panel1
@@ -2105,7 +2103,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:MainTab := TabStrip( Self )
       :Width     := 680
       :Height    := 300
-      :Multiline := .F.
+      :Multiline := .T.
       
       :Dock:BottomMargin := 3
       :Dock:Left   := ::Application:ToolBox

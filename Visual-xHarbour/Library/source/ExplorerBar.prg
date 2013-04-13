@@ -153,7 +153,6 @@ METHOD Init( oParent ) CLASS ExplorerBar
    ::__IsStandard  := .F.
    ::__IsControl   := .T.
    ::IsContainer   := .T.
-   ::CaptionHeight := 0
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle       := WS_EX_CONTROLPARENT
    ::VertScroll    := .T.

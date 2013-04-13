@@ -17,7 +17,7 @@
 
 //-----------------------------------------------------------------------------------------------
 // 150 = Shell Move File Flying papers
-CLASS Animation INHERIT Control
+CLASS Animation INHERIT TitleControl
 
    PROPERTY ImageName                         READ xImageName   WRITE __SetImageName INVERT
    PROPERTY Centered    INDEX ACS_CENTER      READ xCentered    WRITE SetStyle DEFAULT .F. PROTECTED

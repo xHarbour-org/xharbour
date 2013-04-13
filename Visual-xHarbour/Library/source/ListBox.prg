@@ -20,7 +20,7 @@
 
 //--------------------------------------------------------------------------------------------------------------
 
-CLASS ListBox FROM Control
+CLASS ListBox FROM TitleControl
 
    ACCESS CurSel       INLINE    ::GetCurSel()
 
@@ -384,7 +384,6 @@ METHOD Init( oParent ) CLASS ListBox
    ::Super:Init( oParent )
    ::Width        := 80
    ::Height       := 80
-   ::SmallCaption := .T.
    ::DeferRedraw  := .F.
    ::BackSysColor := GetSysColor( COLOR_WINDOW )
    IF !EMPTY( ::Events )

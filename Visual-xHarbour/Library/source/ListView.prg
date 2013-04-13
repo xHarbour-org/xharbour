@@ -55,7 +55,7 @@
 #define LVTVIM_LABELMARGIN      0x00000004
 
 
-CLASS ListView INHERIT Control
+CLASS ListView INHERIT TitleControl
    DATA LvExStyle             EXPORTED INIT 0
    DATA Items
    DATA CurPos                EXPORTED INIT 0
@@ -143,7 +143,6 @@ METHOD Init( oParent ) CLASS ListView
    ENDIF
    ::ClipSiblings := .T.
    ::TabStop      := .T.
-   ::SmallCaption := .T.
 
    __DeleteEvents( ::Events,{ "OnLButtonDown",;
                               "OnLButtonUp",;

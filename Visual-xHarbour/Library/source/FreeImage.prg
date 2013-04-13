@@ -20,14 +20,12 @@ CLASS FreeImage INHERIT FreeImageRenderer, Panel
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnDestroy()          INLINE Super:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
-   METHOD OnGetDlgCode()       INLINE DLGC_WANTMESSAGE
+   METHOD OnDestroy()           INLINE Super:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
+   METHOD OnGetDlgCode()        INLINE DLGC_WANTMESSAGE
    METHOD OnPaint()
-   METHOD OnEraseBkGnd()       INLINE 1
-   //METHOD OnSize()             INLINE ::Update(), NIL
-   //METHOD OnMove()             INLINE ::Update(), NIL
-   METHOD SetBackColor(n)      INLINE ::Panel:SetBackColor(n), ::Update()
-   METHOD __SetSmallCaption(l) INLINE ::Panel:__SetSmallCaption(l), ::Update()
+   METHOD OnEraseBkGnd()        INLINE 1
+   METHOD SetBackColor(n)       INLINE ::Panel:SetBackColor(n), ::Update()
+   METHOD __SetCaptionHeight(n) INLINE ::Panel:__SetCaptionHeight(n), ::Update()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -90,7 +88,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
              ENDIF
              DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
              hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:__nCaptionHeight, SRCCOPY )
              oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
              SelectObject( hMemDC1,  hOldBitmap1 )
           ENDIF

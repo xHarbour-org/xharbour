@@ -46,7 +46,6 @@ CLASS ToolStripContainer INHERIT Control
    DATA Dock             EXPORTED
    DATA Anchor           EXPORTED
    DATA Cursor           EXPORTED
-   DATA SmallCaption     EXPORTED INIT .F.
    DATA XPTheming        EXPORTED INIT .T.
    DATA AllowMaximize    EXPORTED INIT .F.
    DATA ContextMenu      EXPORTED
@@ -346,7 +345,6 @@ CLASS ToolStrip INHERIT Control
    DATA Border         EXPORTED INIT .T.
    //DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
-   DATA SmallCaption   EXPORTED INIT .F.
    DATA XPTheming      EXPORTED INIT .T.
    DATA AllowMaximize  EXPORTED INIT .F.
    DATA ContextMenu    EXPORTED
@@ -1424,7 +1422,6 @@ CLASS ToolStripItem INHERIT Control
    DATA Border             EXPORTED  INIT .T.
    DATA Dock               EXPORTED
    DATA Anchor             EXPORTED
-   DATA SmallCaption       EXPORTED  INIT .F.
    DATA XPTheming          EXPORTED  INIT .T.
    DATA AllowMaximize      EXPORTED  INIT .F.
    DATA ContextMenu        EXPORTED

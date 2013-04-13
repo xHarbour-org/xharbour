@@ -48,7 +48,6 @@ CLASS StatusBar INHERIT Control
       DATA Left          INIT 0
       DATA Top           INIT 0
       DATA Border        INIT .F.
-      DATA SmallCaption  INIT .F.
       DATA AllowClose    INIT .F.
       DATA AllowUndock   INIT .F.
       DATA Dock
@@ -227,7 +226,6 @@ CLASS StatusBarPanel INHERIT Control
    EXPORTED:
       DATA Border        INIT .F.
       DATA Font
-      DATA SmallCaption  INIT .F.
       DATA ToolTip
       DATA Theming     INIT .F.
       DATA AllowClose    INIT .F.

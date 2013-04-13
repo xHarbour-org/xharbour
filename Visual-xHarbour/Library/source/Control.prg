@@ -18,18 +18,13 @@
 
 CLASS Control INHERIT Window
 
-   DATA AllowUnDock       PUBLISHED INIT FALSE
    DATA Dock              PUBLISHED
    DATA Anchor            PUBLISHED
-   DATA AllowClose        PUBLISHED INIT FALSE
-   DATA MenuArrow         PUBLISHED INIT FALSE
-   DATA HighlightCaption  PUBLISHED INIT .T.
    DATA Transparent       EXPORTED INIT .F.
 
    PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
 
    PROPERTY TabStop INDEX WS_TABSTOP READ xTabStop      WRITE SetStyle          DEFAULT .T. PROTECTED
-   PROPERTY SmallCaption             READ xSmallCaption WRITE __SetSmallCaption DEFAULT .F.
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
 
    ACCESS xCaption       INLINE ::xText
@@ -40,14 +35,10 @@ CLASS Control INHERIT Window
 
    DATA xText                  EXPORTED  INIT ""
    ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
-   ASSIGN Text(c)              INLINE    ::SetWindowText( c ),;
-                                         ::xText := c,;
-                                         IIF( ::SmallCaption,;
-                                             ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN ), )
+   ASSIGN Text(c)              INLINE    ::SetWindowText( c ), ::xText := c
 
    DATA AllowMaximize     PUBLISHED INIT .F.
-   
-   DATA FlatBorder        EXPORTED INIT .F.
+
    DATA IsContainer       EXPORTED INIT .F.
    DATA Value             EXPORTED
    DATA Options           EXPORTED
@@ -55,8 +46,6 @@ CLASS Control INHERIT Window
    DATA Action            EXPORTED
    DATA Validating        EXPORTED INIT FALSE
    DATA IsValid           EXPORTED INIT TRUE
-   DATA CaptionHeight     EXPORTED INIT 0
-   DATA CaptionWidth      EXPORTED
    DATA EmptyLeft         EXPORTED INIT 0
    DATA ToolBarPos        EXPORTED INIT 1
    DATA KeepActiveCaption EXPORTED INIT .F.
@@ -70,21 +59,9 @@ CLASS Control INHERIT Window
    DATA OnWMReDock        EXPORTED
 
    DATA __hParBrush       PROTECTED
-   DATA CaptionRect       PROTECTED
-   DATA PinPushed         PROTECTED INIT .F.
-   DATA PinHover          PROTECTED INIT .F.
-   DATA PinRect           PROTECTED
-   DATA ClosePushed       PROTECTED INIT .F.
-   DATA CloseHover        PROTECTED INIT .F.
-   DATA CloseRect         PROTECTED
-   DATA ArrowRect         PROTECTED
    DATA BackInfo          PROTECTED
    DATA Center            PROTECTED INIT .F.
    DATA __DockParent      PROTECTED
-   Data FlatCaption       EXPORTED INIT .F. //backward compatibility
-   DATA __hBorderBtnPen   PROTECTED
-   DATA __hSelectBtnBrush PROTECTED
-   DATA __hPushedBtnBrush PROTECTED
 
    ACCESS Child           INLINE ::Style & WS_CHILD != 0
    ACCESS ControlParent   INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
@@ -97,34 +74,20 @@ CLASS Control INHERIT Window
    METHOD Create()
 
    METHOD OnMouseActivate()
-//   METHOD OnNCLButtonDblClk() INLINE IIF( ::AllowMaximize, NIL, 0 )
    METHOD Disable()             INLINE ::Enabled := .F.
    METHOD Enable()              INLINE ::Enabled := .T.
    METHOD OnSize()
    METHOD OnMove()
-   METHOD OnNCCalcSize()
-   METHOD OnNCPaint()
-   METHOD OnNCHitTest()
-   METHOD OnNCLButtonDown()
-   METHOD OnNCLButtonUp()
-   METHOD OnNCMouseleave()
    METHOD OnSysKeyDown()
-   METHOD DrawClose()
-   METHOD DrawPin()
-   METHOD DrawArrow()
-   METHOD OnKillFocus()
-   METHOD OnSetFocus()
-   METHOD Undock()
-   METHOD Redock()
    METHOD Redraw() INLINE /*::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),*/;
                           ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD IsComponent( oComp ) INLINE ::HasMessage( oComp:__xCtrlName ) .AND. &("HB_QSELF():"+oComp:__xCtrlName) == oComp
    METHOD Hide() INLINE IIF( ::__DockParent != NIL, ::__DockParent:Hide(), ::Super:Hide() )
    METHOD Show() INLINE IIF( ::__DockParent != NIL, ::__DockParent:Show(), ::Super:Show( SW_SHOW ) )
    METHOD __Enable( lEnable )
-   METHOD __SetSmallCaption()
    METHOD GetBkBrush()
    METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
+   METHOD DrawArrow()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS Control
@@ -137,14 +100,10 @@ RETURN lEnable
 //---------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS Control
-   DEFAULT ::xSmallCaption TO FALSE
    ::__IsControl  := .T.
    ::__IsStandard := .T.
    ::Super:Init( oParent )
    ::Id := ::Form:GetNextControlId()
-   //IF ::__ClassInst != NIL
-   //   __AddEvent( ::Events, "Command", "OnArrowClick" )
-   //ENDIF
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -213,14 +172,43 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
+METHOD DrawArrow( hDC, aRect ) CLASS Control
+   LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, n, x, y, nArrow := 1, nH := 5, nBackColor
+   
+   nBackColor := GetSysColor( COLOR_ACTIVECAPTION )
+
+   nColor  := LightenColor( nBackColor, 100 )
+   nShadow := DarkenColor( nBackColor, 100 )
+
+   hPenShadow := CreatePen( PS_SOLID, 0, nShadow )
+   hPenLight  := CreatePen( PS_SOLID, 0, nColor )
+
+   hOldPen := SelectObject( hDC, hPenLight )
+   z := 1
+   FOR i := 1 TO 2
+       FOR n := 1 TO nH
+           x := IIF( nArrow == 1,n,nH-n+1)
+           y := (aRect[4]-nH)/2
+
+           MoveTo( hDC, aRect[3] - (15-x), y+n+z )
+           LineTo( hDC, aRect[3] - ( 4+x), y+n+z )
+       NEXT
+       SelectObject( hDC, hPenShadow )
+       z := 0
+       aRect[3]--
+   NEXT
+   SelectObject( hDC, hOldPen )
+   DeleteObject( hPenShadow )
+   DeleteObject( hPenLight )
+RETURN Self
+
+//---------------------------------------------------------------------------------------------------
+
 METHOD OnSize( nwParam, nlParam ) CLASS Control
    LOCAL x, y
    IF ::Super:OnSize( nwParam, nlParam ) == NIL
       x := LOWORD( nlParam )
       y := HIWORD( nlParam )
-      IF !EMPTY( ::xText ) .AND. ::Style & WS_CHILD == 0 .AND. ::xSmallCaption
-         ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
-      ENDIF
       IF ::LeftSplitter != NIL
          ::LeftSplitter:__OnParentSize( x, y )
       ENDIF
@@ -255,29 +243,6 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnKillFocus() CLASS Control
-   IF ::Super:OnKillFocus() == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
-      ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
-   ENDIF
-RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD __SetSmallCaption() CLASS Control
-   IF ::hWnd != NIL
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
-      ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
-   ENDIF
-RETURN Self
-
-METHOD OnSetFocus() CLASS Control
-   IF ::Super:OnSetFocus() == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
-      ::RedrawWindow( , , RDW_FRAME | RDW_NOERASE | RDW_NOINTERNALPAINT | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN )
-   ENDIF
-RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
 METHOD OnMouseActivate( hWnd, nHit, nMsg ) CLASS Control
    LOCAL oChild
    IF nHit == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
@@ -291,48 +256,159 @@ METHOD OnMouseActivate( hWnd, nHit, nMsg ) CLASS Control
 RETURN ::Super:OnMouseActivate( hWnd, nHit, nMsg )
 
 //---------------------------------------------------------------------------------------------------
+METHOD OnSysKeyDown( nwParam, nlParam ) CLASS Control
+   LOCAL oCtrl, n
+   IF nwParam != 18 .AND. LoWord( nlParam )== MOD_ALT .AND. ::Super:OnSysKeyDown( nwParam, nlParam ) == NIL
+      FOR EACH oCtrl IN ::Parent:Children
+          IF VALTYPE( oCtrl:Caption ) == "C" .AND. AT( "&"+UPPER( CHR( nwParam ) ), UPPER( oCtrl:Caption ) ) > 0
+             RETURN NIL
+          ENDIF
+      NEXT
+      IF ::Parent:Parent != NIL .AND. ::Parent:Parent:ClsName == "SysTabControl32"
+         ::Parent:Parent:PostMessage( WM_SYSKEYDOWN, nwParam, nlParam )
+       ELSE
+         IF ( n:=ASCAN( ::Parent:Children, {|o|o:ClsName == "SysTabControl32" } ) ) > 0
+            IF ! (::Parent:Children[n] == Self)
+               ::Parent:Children[n]:PostMessage( WM_SYSKEYDOWN, nwParam, nlParam )
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN NIL
 
-METHOD OnNCCalcSize( nwParam, nlParam ) CLASS Control
+METHOD GetBkBrush() CLASS Control
+   LOCAL hDC, nColor, hBkGnd := ::__hBrush
+   DEFAULT hBkGnd TO ::BkBrush
+   DEFAULT hBkGnd TO ::Parent:BkBrush
+
+   IF hBkGnd == NIL
+      hDC := GetDC( ::Parent:hWnd )
+      nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
+      IF nColor > 0
+         IF ::__hParBrush != NIL
+            DeleteObject( ::__hParBrush )
+         ENDIF
+         ::__hParBrush := CreateSolidBrush( nColor )
+         hBkGnd := ::__hParBrush
+      ENDIF
+      ReleaseDC( ::Parent:hWnd, hDC )
+   ENDIF
+RETURN hBkGnd
+
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+
+CLASS CommonControls INHERIT Control
+   PROPERTY CCS_Adjustable    INDEX CCS_ADJUSTABLE    READ xCCS_Adjustable    WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_NoDevider     INDEX CCS_NODIVIDER     READ xCCS_NoDevider     WRITE SetProperty DEFAULT .F. PROTECTED
+
+   PROPERTY CCS_Left          INDEX CCS_LEFT          READ xCCS_Left          WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_Top           INDEX CCS_TOP           READ xCCS_Top           WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_Right         INDEX CCS_RIGHT         READ xCCS_Right         WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_Bottom        INDEX CCS_BOTTOM        READ xCCS_Bottom        WRITE SetProperty DEFAULT .F. PROTECTED
+
+   PROPERTY CCS_NoMoveX       INDEX CCS_NOMOVEX       READ xCCS_NoMoveX       WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_NoMoveY       INDEX CCS_NOMOVEY       READ xCCS_NoMoveY       WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_NoResize      INDEX CCS_NORESIZE      READ xCCS_NoResize      WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_NoParentAlign INDEX CCS_NOPARENTALIGN READ xCCS_NoParentAlign WRITE SetProperty DEFAULT .F. PROTECTED
+
+   PROPERTY CCS_Vert          INDEX CCS_VERT          READ xCCS_Vert          WRITE SetProperty DEFAULT .F. PROTECTED
+
+   METHOD SetProperty( nProp, lSet ) INLINE  ::Style := IIF( lSet, ::Style | nProp, ::Style & NOT( nProp ) )
+
+ENDCLASS
+
+CLASS UserControl INHERIT Control
+   METHOD Init() CONSTRUCTOR
+ENDCLASS
+
+METHOD Init( oParent ) CLASS UserControl
+   DEFAULT ::__xCtrlName TO "UserControl"
+   DEFAULT ::ClsName     TO "UserControl"
+   ::Style := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::xLeft   TO 0
+   DEFAULT ::xTop    TO 0
+   DEFAULT ::xWidth  TO 200
+   DEFAULT ::xHeight TO 200
+   ::Super:Init( oParent )
+   ::__IsStandard := .F.
+RETURN Self
+
+
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+
+CLASS TitleControl INHERIT Control
+   DATA FlatBorder           EXPORTED INIT .F.
+
+   DATA AllowUnDock          PUBLISHED INIT FALSE
+   DATA AllowClose           PUBLISHED INIT FALSE
+   DATA MenuArrow            PUBLISHED INIT .F.
+
+   DATA __aCaptionRect       PROTECTED
+   DATA __lPinPushed         PROTECTED INIT .F.
+   DATA __lPinHover          PROTECTED INIT .F.
+   DATA __aPinRect           PROTECTED
+   DATA __lClosePushed       PROTECTED INIT .F.
+   DATA __lCloseHover        PROTECTED INIT .F.
+   DATA __aCloseRect         PROTECTED
+   DATA __aArrowRect         PROTECTED
+
+   PROPERTY TitleHeight READ xTitleHeight WRITE Reset DEFAULT 20
+   PROPERTY Text        READ xText        WRITE Reset DEFAULT ""
+
+   ACCESS SmallCaption INLINE ! Empty( ::xText )
+
+
+   METHOD OnNCCalcSize()
+   METHOD OnNCMouseleave()
+   METHOD OnNCPaint()
+   METHOD OnNCHitTest()
+   METHOD OnNCLButtonDown()
+   METHOD OnNCLButtonUp()
+   METHOD Undock()
+   METHOD Redock()
+   METHOD DrawClose()
+   METHOD DrawPin()
+
+   METHOD Reset() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
+                         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+ENDCLASS
+
+METHOD OnNCCalcSize( nwParam, nlParam ) CLASS TitleControl
    LOCAL nccs
    (nwParam)
-   ::CaptionHeight := 0
-   IF ( !EMPTY( ::xText ) .AND. ::xSmallCaption ) .OR. ::FlatBorder
-      IF ::Style & WS_DLGFRAME != 0 .AND. ::Style & WS_BORDER != 0
-         ::xSmallCaption := FALSE
-         RETURN NIL
-      ENDIF
-
+   ::__nCaptionHeight := IIF( EMPTY( ::xText ), 0, ::xTitleHeight )
+   IF ::__nCaptionHeight > 0 .OR. ::FlatBorder
       nccs := (struct NCCALCSIZE_PARAMS)
       nccs:Pointer( nlParam )
       
-      IF ( !EMPTY( ::xText ) .AND. ::xSmallCaption )
-         ::CaptionHeight := IIF( ::Font != NIL, ABS( ::Font:Height ), ABS( ::Form:Font:Height ) ) + 8
-
+      IF ! EMPTY( ::xText )
          nccs:rgrc[1]:Left += ::EmptyLeft
-         nccs:rgrc[1]:Top  += ::CaptionHeight
+         nccs:rgrc[1]:Top  += ::__nCaptionHeight
       ENDIF      
-      IF ::FlatBorder .AND. ::__xCtrlName != "ToolBox"
+
+      IF ::FlatBorder
          nccs:rgrc[1]:Left   += 1
-         IF ! ( !EMPTY( ::xText ) .AND. ::xSmallCaption )
-            nccs:rgrc[1]:Top    += 1
+         IF EMPTY( ::xText )
+            nccs:rgrc[1]:Top += 1
          ENDIF
          nccs:rgrc[1]:Right  -= 1
          nccs:rgrc[1]:Bottom -= 1
       ENDIF
-      
       nccs:CopyTo( nlParam )
-
-      ::CaptionWidth := nccs:rgrc[1]:Right
    ENDIF
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCMouseLeave() CLASS Control
+METHOD OnNCMouseLeave() CLASS TitleControl
    ::Super:OnNCMouseLeave()
-   IF !EMPTY( ::xText ) .AND. ::xSmallCaption .AND. ::AllowClose
-      ::CloseHover  := .F.
-      ::PinHover    := .F.
+   IF ::__nCaptionHeight > 0 .AND. ::AllowClose
+      ::__lCloseHover  := .F.
+      ::__lPinHover    := .F.
       ::Redraw()
       RETURN 0
    ENDIF
@@ -340,31 +416,27 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
-   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, hRegion, hBrush, n:=0
+METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
+   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, hRegion, n:=0
    ::CallWindowProc()
-   IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption
-      ::CaptionWidth := ::xWidth
-
-      //hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
-      hdc := GetWindowDC( ::hWnd ) //GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
-
+   IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. ::__nCaptionHeight > 0
+      hdc := GetWindowDC( ::hWnd )
       IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
          n += 2
       ENDIF
       IF ::ExStyle & WS_EX_STATICEDGE == WS_EX_STATICEDGE
          n += 1
       ENDIF
-      ::CaptionRect := { n, n, ::CaptionWidth - n, ::CaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
+      ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
       hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hBrush    := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-      hOldBrush := SelectObject( hDC, hBrush )
-      Rectangle( hDC, ::CaptionRect[1], ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] )
-      DeleteObject( SelectObject( hDC, hOldBrush ) )
+      hOldBrush := SelectObject( hDC, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
+      
+      Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
+      SelectObject( hDC, hOldBrush )
       SelectObject( hDC, hOldPen )
       
-      SetTextColor( hDC, GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_CAPTIONTEXT, COLOR_INACTIVECAPTIONTEXT) ) )
+      SetTextColor( hDC, GetSysColor( COLOR_CAPTIONTEXT ) )
 
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
@@ -375,25 +447,24 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS Control
       ENDIF
 
       IF ::MenuArrow
-         ::ArrowRect := { 0, ::CaptionRect[2]+n+1, 20, ::CaptionRect[4]-2 }
-         ::DrawArrow( hDC, ::ArrowRect )
+         ::__aArrowRect := { 0, ::__aCaptionRect[2]+n+1, 20, ::__aCaptionRect[4]-2 }
+         ::DrawArrow( hDC, ::__aArrowRect )
       ENDIF
 
-      _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::ArrowRect != NIL, ::ArrowRect[3]+2, ::CaptionRect[1]+5 ), ::CaptionRect[2], ::CaptionRect[3], ::CaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
+      _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::__aArrowRect != NIL, ::__aArrowRect[3]+2, ::__aCaptionRect[1]+5 ), ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
 
       nWidth := 0
       IF ::AllowClose
-         ::CloseRect := { ::CaptionRect[3]-::CaptionRect[4]+n+1, ::CaptionRect[2]+n+1, ::CaptionRect[3]-2, ::CaptionRect[4]-2 }
+         ::__aCloseRect := { ::__aCaptionRect[3]-::__aCaptionRect[4]+n+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2, ::__aCaptionRect[4]-2 }
          ::DrawClose( hDC, n )
-         nWidth := ::CloseRect[3]-::CloseRect[1]+1
+         nWidth := ::__aCloseRect[3]-::__aCloseRect[1]+1
       ENDIF
       IF ::AllowUnDock
-         ::PinRect := { (::CaptionRect[3]-::CaptionRect[4])+n-nWidth+1, ::CaptionRect[2]+n+1, ::CaptionRect[3]-2-nWidth, ::CaptionRect[4]-2 }
+         ::__aPinRect := { (::__aCaptionRect[3]-::__aCaptionRect[4])+n-nWidth+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2-nWidth, ::__aCaptionRect[4]-2 }
          ::DrawPin( hDC, n )
       ENDIF
       SelectObject( hDC, hOldFont )
       ReleaseDC(::hWnd, hdc)
-      //DeleteObject( hRegion )
    ENDIF
 
    IF ::FlatBorder
@@ -414,36 +485,96 @@ RETURN 0
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCLButtonDown( nwParam ) CLASS Control
+METHOD OnNCHitTest( x, y ) CLASS TitleControl
+   LOCAL nRes, aPt, hRegion, hdc, n
+   IF !EMPTY(::__aCaptionRect) .AND. !EMPTY( ::xText ) .AND. ::Super:OnNCHitTest( x, y ) == NIL
+      aPt := { x, y }
+      _ScreenToClient( ::hWnd, @aPt )
+      aPt[2]+=::__aCaptionRect[4]
+      IF ::ClsName == "DLGEDT"
+         aPt[1] += ::RullerWeight
+         aPt[2] += ::RullerWeight
+      ENDIF
+
+      n := 0
+      IF !::IsChild
+         n := 1
+      ENDIF
+      IF ::AllowClose
+         // Check the close button
+         IF _PtInRect( ::__aCloseRect, aPt )
+            nRes := HTCLOSE
+            ::__lCloseHover  := .T.
+          ELSE
+            ::__lCloseHover  := .F.
+            IF ::__lClosePushed
+               nRes := HTCLOSE
+            ENDIF
+         ENDIF
+         hRegion := CreateRectRgn( ::__aCloseRect[1], ::__aCloseRect[2], ::__aCloseRect[3], ::__aCloseRect[4] )
+         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
+         ::DrawClose( hDC, n )
+         ReleaseDC(::hWnd, hdc)
+         DeleteObject( hRegion )
+      ENDIF
+      IF ::AllowUnDock
+         // Check the pin button
+         IF _PtInRect( ::__aPinRect, aPt )
+            nRes := HTBORDER
+            ::__lPinHover  := .T.
+          ELSE
+            ::__lPinHover  := .F.
+            IF ::__lPinPushed
+               nRes := HTBORDER
+            ENDIF
+         ENDIF
+         hRegion := CreateRectRgn( ::__aPinRect[1], ::__aPinRect[2], ::__aPinRect[3], ::__aPinRect[4] )
+         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
+         ::DrawPin( hDC, n )
+         ReleaseDC(::hWnd, hdc)
+         DeleteObject( hRegion )
+      ENDIF
+      IF ::MenuArrow
+         IF _PtInRect( ::__aArrowRect, aPt )
+            nRes := HTMENU
+         ENDIF
+      ENDIF
+      IF !::AllowUnDock .AND. !::AllowClose .AND. !::AllowMaximize .AND. nRes == NIL .AND. _PtInRect( ::__aCaptionRect, aPt )
+         RETURN HTNOWHERE
+      ENDIF
+      
+   ENDIF
+RETURN nRes
+
+//---------------------------------------------------------------------------------------------------
+
+METHOD OnNCLButtonDown( nwParam ) CLASS TitleControl
    LOCAL hRegion, hdc, aRect, n
    IF nwParam == HTCAPTION
-      IF !::HasFocus //.AND. ::ClsName != "PanelBox"
-         ::SetFocus()
-      ENDIF
       IF ::Style & WS_CHILD == WS_CHILD
          RETURN 0
       ENDIF
    ENDIF
    IF nwParam == HTCLOSE .OR. nwParam == HTBORDER
-      IF ::CloseHover .AND. ::CloseRect != NIL
-         ::ClosePushed := .T.
-         ::PinPushed   := .F.
-         aRect := ACLONE( ::CloseRect )
-       ELSEIF ::PinHover .AND. ::PinRect != NIL
-         ::PinPushed := .T.
-         ::ClosePushed := .F.
-         aRect := ACLONE( ::PinRect )
+      IF ::__lCloseHover .AND. ::__aCloseRect != NIL
+         ::__lClosePushed := .T.
+         ::__lPinPushed   := .F.
+         aRect := ACLONE( ::__aCloseRect )
+       ELSEIF ::__lPinHover .AND. ::__aPinRect != NIL
+         ::__lPinPushed := .T.
+         ::__lClosePushed := .F.
+         aRect := ACLONE( ::__aPinRect )
       ENDIF
       IF aRect != NIL
          hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
+         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
          n := 0
          IF !::IsChild
             n := 1
          ENDIF
-         IF ::CloseHover
+         IF ::__lCloseHover
             ::DrawClose( hDC, n )
-          ELSEIF ::PinHover
+          ELSEIF ::__lPinHover
             ::DrawPin( hDC, n )
          ENDIF
          ReleaseDC(::hWnd, hdc)
@@ -455,54 +586,46 @@ RETURN NIL //nwParam
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCLButtonUp( nwParam, x, y ) CLASS Control
+METHOD OnNCLButtonUp( nwParam, x, y ) CLASS TitleControl
    LOCAL pt, aPt := {x,y}
-   IF ::xSmallCaption
-      ::CloseHover  := .F.
-      ::PinHover    := .F.
-      IF nwParam == HTCLOSE .OR. nwParam == HTBORDER .AND. !EMPTY( ::CaptionRect )
-         _ScreenToClient( ::hWnd, @aPt )
-         aPt[2]+=::CaptionRect[4]
-         IF ::ClsName == "DLGEDT"
-            aPt[1] += ::RullerWeight
-            aPt[2] += ::RullerWeight
-         ENDIF
-         IF ::CloseRect != NIL .AND. _PtInRect( ::CloseRect, aPt ) .AND. ::ClosePushed
-            ::PostMessage( WM_CLOSE )
-          ELSEIF ::PinRect != NIL .AND. _PtInRect( ::PinRect, aPt ) .AND. ::PinPushed
-            ::Undock()
-         ENDIF
-       ELSEIF nwParam == HTMENU
-         _ScreenToClient( ::hWnd, @aPt )
-         aPt[2]+=::CaptionRect[4]
-         IF ::ArrowRect != NIL .AND. _PtInRect( ::ArrowRect, aPt )
-            IF ::ContextMenu != NIL
-               pt := (struct POINT)
-               pt:x := ::Left
-               pt:y := ::Top+::CaptionHeight
-               ClientToScreen( ::Parent:hWnd, @pt )
-               ::ContextMenu:Show( pt:x, pt:y )
-            // ELSE
-            //   RETURN ExecuteEvent( "OnArrowClick", Self )
-            ENDIF
+   ::__lCloseHover  := .F.
+   ::__lPinHover    := .F.
+   IF nwParam == HTCLOSE .OR. nwParam == HTBORDER .AND. !EMPTY( ::__aCaptionRect )
+      _ScreenToClient( ::hWnd, @aPt )
+      aPt[2]+=::__aCaptionRect[4]
+      IF ::ClsName == "DLGEDT"
+         aPt[1] += ::RullerWeight
+         aPt[2] += ::RullerWeight
+      ENDIF
+      IF ::__aCloseRect != NIL .AND. _PtInRect( ::__aCloseRect, aPt ) .AND. ::__lClosePushed
+         ::PostMessage( WM_CLOSE )
+       ELSEIF ::__aPinRect != NIL .AND. _PtInRect( ::__aPinRect, aPt ) .AND. ::__lPinPushed
+         ::Undock()
+      ENDIF
+    ELSEIF nwParam == HTMENU
+      _ScreenToClient( ::hWnd, @aPt )
+      aPt[2]+=::__aCaptionRect[4]
+      IF ::__aArrowRect != NIL .AND. _PtInRect( ::__aArrowRect, aPt )
+         IF ::ContextMenu != NIL
+            pt := (struct POINT)
+            pt:x := ::Left
+            pt:y := ::Top+::__nCaptionHeight
+            ClientToScreen( ::Parent:hWnd, @pt )
+            ::ContextMenu:Show( pt:x, pt:y )
          ENDIF
       ENDIF
-      ::ClosePushed := .F.
-      ::PinPushed := .F.
    ENDIF
+   ::__lClosePushed := .F.
+   ::__lPinPushed := .F.
 RETURN nwParam
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD Redock() CLASS Control
+METHOD Redock() CLASS TitleControl
    LOCAL oControl, hDef, o
-   IF __Evaluate( ::OnWMRedock,  Self ) == NIL .AND. ::AllowUnDock //.AND. ::Style & WS_CHILD == 0
+   IF __Evaluate( ::OnWMRedock,  Self ) == NIL .AND. ::AllowUnDock
       ::__Docked := .T.
-      ::xSmallCaption := .T.
-      //::Style       := ::BackInfo[11]
-      //::ExStyle     := ::BackInfo[12]
-      //::SetWindowLong( GWL_STYLE, ::Style )
-      //::SetWindowLong( GWL_EXSTYLE, ::ExStyle )
+      ::__nCaptionHeight := ::xTitleHeight
       ::Hide()
 
       SetParent( ::hWnd, ::BackInfo[13] )
@@ -575,7 +698,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD Undock() CLASS Control
+METHOD Undock() CLASS TitleControl
    LOCAL hDef, oChild, pt
    
    IF __Evaluate( ::OnWMUnDock,  Self ) == NIL .AND. ::AllowUnDock
@@ -584,7 +707,7 @@ METHOD Undock() CLASS Control
                       ::xLeft, ::xTop, ::xWidth, ::xHeight, ::ClientWidth, ::ClientHeight,;
                       ::Style, ::ExStyle, ::Parent:hWnd,,,,}
 
-      ::xSmallCaption := .F.
+      ::__nCaptionHeight := 0
 
       IF ::Parent:MDIContainer .AND. ::Parent:MDIClient != NIL
          ::BackInfo[14] := { ::Parent:MDIClient:AlignLeft, ::Parent:MDIClient:AlignTop, ::Parent:MDIClient:AlignRight, ::Parent:MDIClient:AlignBottom }
@@ -657,109 +780,16 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCHitTest( x, y ) CLASS Control
-   LOCAL nRes, aPt, hRegion, hdc, n
-   IF !EMPTY(::CaptionRect) .AND. !EMPTY( ::xText ) .AND. ::xSmallCaption .AND. ::Super:OnNCHitTest( x, y ) == NIL
-      aPt := { x, y }
-      _ScreenToClient( ::hWnd, @aPt )
-      aPt[2]+=::CaptionRect[4]
-      IF ::ClsName == "DLGEDT"
-         aPt[1] += ::RullerWeight
-         aPt[2] += ::RullerWeight
-      ENDIF
-
-      n := 0
-      IF !::IsChild
-         n := 1
-      ENDIF
-      IF ::AllowClose
-         // Check the close button
-         IF _PtInRect( ::CloseRect, aPt )
-            nRes := HTCLOSE
-            ::CloseHover  := .T.
-          ELSE
-            ::CloseHover  := .F.
-            IF ::ClosePushed
-               nRes := HTCLOSE
-            ENDIF
-         ENDIF
-         hRegion := CreateRectRgn( ::CloseRect[1], ::CloseRect[2], ::CloseRect[3], ::CloseRect[4] )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
-         ::DrawClose( hDC, n )
-         ReleaseDC(::hWnd, hdc)
-         DeleteObject( hRegion )
-      ENDIF
-      IF ::AllowUnDock
-         // Check the pin button
-         IF _PtInRect( ::PinRect, aPt )
-            nRes := HTBORDER
-            ::PinHover  := .T.
-          ELSE
-            ::PinHover  := .F.
-            IF ::PinPushed
-               nRes := HTBORDER
-            ENDIF
-         ENDIF
-         hRegion := CreateRectRgn( ::PinRect[1], ::PinRect[2], ::PinRect[3], ::PinRect[4] )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
-         ::DrawPin( hDC, n )
-         ReleaseDC(::hWnd, hdc)
-         DeleteObject( hRegion )
-      ENDIF
-      IF ::MenuArrow
-         IF _PtInRect( ::ArrowRect, aPt )
-            nRes := HTMENU
-         ENDIF
-      ENDIF
-      IF !::AllowUnDock .AND. !::AllowClose .AND. !::AllowMaximize .AND. nRes == NIL .AND. _PtInRect( ::CaptionRect, aPt )
-         RETURN HTNOWHERE
-      ENDIF
-      
-   ENDIF
-RETURN nRes
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD OnSysKeyDown( nwParam, nlParam ) CLASS Control
-   LOCAL oCtrl, n
-   IF nwParam != 18 .AND. LoWord( nlParam )== MOD_ALT .AND. ::Super:OnSysKeyDown( nwParam, nlParam ) == NIL
-
-//       IF ( n := MapVirtualKey( nwParam, 2 ) ) != nwParam .AND. nwParam >= 96 .AND. nwParam <= 105
-//          ::PostMessage( WM_SYSCHAR, n, nlParam )
-//          SetWindowLong( ::hWnd, DWL_MSGRESULT, 0 )
-//          RETURN 0
-//       ENDIF
-      FOR EACH oCtrl IN ::Parent:Children
-          IF VALTYPE( oCtrl:Caption ) == "C" .AND. AT( "&"+UPPER( CHR( nwParam ) ), UPPER( oCtrl:Caption ) ) > 0
-             RETURN NIL
-          ENDIF
-      NEXT
-      IF ::Parent:Parent != NIL .AND. ::Parent:Parent:ClsName == "SysTabControl32"
-         ::Parent:Parent:PostMessage( WM_SYSKEYDOWN, nwParam, nlParam )
-       ELSE
-         IF ( n:=ASCAN( ::Parent:Children, {|o|o:ClsName == "SysTabControl32" } ) ) > 0
-            IF ! (::Parent:Children[n] == Self)
-               ::Parent:Children[n]:PostMessage( WM_SYSKEYDOWN, nwParam, nlParam )
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD DrawClose( hDC ) CLASS Control
-   LOCAL hBrush, hOld
-   LOCAL aRect  := ::CloseRect
+METHOD DrawClose( hDC ) CLASS TitleControl
+   LOCAL hOld
+   LOCAL aRect  := ::__aCloseRect
 
    hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
-   IF ::CloseHover
-      SelectObject( hDC, IIF( !::ClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+   IF ::__lCloseHover
+      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-      _FillRect( hDC, aRect, hBrush )
-      DeleteObject( hBrush )
+      _FillRect( hDC, aRect, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
    ENDIF
    SelectObject( hDC, hOld )
 
@@ -785,48 +815,16 @@ METHOD DrawClose( hDC ) CLASS Control
 
 RETURN Self
 
-METHOD DrawArrow( hDC, aRect ) CLASS Control
-   LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, n, x, y, nArrow := 1, nH := 5, nBackColor
-   
-   nBackColor := GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_BTNFACE ) )
-
-   nColor  := LightenColor( nBackColor, 100 )
-   nShadow := DarkenColor( nBackColor, 100 )
-
-   hPenShadow := CreatePen( PS_SOLID, 0, nShadow )
-   hPenLight  := CreatePen( PS_SOLID, 0, nColor )
-
-   hOldPen := SelectObject( hDC, hPenLight )
-   z := 1
-   FOR i := 1 TO 2
-       FOR n := 1 TO nH
-           x := IIF( nArrow == 1,n,nH-n+1)
-           y := (aRect[4]-nH)/2
-
-           MoveTo( hDC, aRect[3] - (15-x), y+n+z )
-           LineTo( hDC, aRect[3] - ( 4+x), y+n+z )
-       NEXT
-       SelectObject( hDC, hPenShadow )
-       z := 0
-       aRect[3]--
-   NEXT
-   SelectObject( hDC, hOldPen )
-   DeleteObject( hPenShadow )
-   DeleteObject( hPenLight )
-RETURN Self
-
-METHOD DrawPin( hDC, n ) CLASS Control
-   LOCAL hBrush, hOld, nLeft, nRight, nBottom
-   LOCAL aRect  := ::PinRect
+METHOD DrawPin( hDC, n ) CLASS TitleControl
+   LOCAL hOld, nLeft, nRight, nBottom
+   LOCAL aRect  := ::__aPinRect
 
    hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
-   IF ::PinHover
-      SelectObject( hDC, IIF( !::PinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+   IF ::__lPinHover
+      SelectObject( hDC, IIF( !::__lPinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      hBrush := CreateSolidBrush( GetSysColor( IIF( ( ::HasFocus .OR. ::KeepActiveCaption ) .AND. ::HighlightCaption, COLOR_ACTIVECAPTION, COLOR_INACTIVECAPTION ) ) )
-      _FillRect( hDC, aRect, hBrush )
-      DeleteObject( hBrush )
+      _FillRect( hDC, aRect, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
    ENDIF
    SelectObject( hDC, hOld )
    
@@ -854,59 +852,3 @@ METHOD DrawPin( hDC, n ) CLASS Control
    aRect[4]+=4
 
 RETURN Self
-
-METHOD GetBkBrush() CLASS Control
-   LOCAL hDC, nColor, hBkGnd := ::__hBrush
-   DEFAULT hBkGnd TO ::BkBrush
-   DEFAULT hBkGnd TO ::Parent:BkBrush
-
-   IF hBkGnd == NIL
-      hDC := GetDC( ::Parent:hWnd )
-      nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
-      IF nColor > 0
-         IF ::__hParBrush != NIL
-            DeleteObject( ::__hParBrush )
-         ENDIF
-         ::__hParBrush := CreateSolidBrush( nColor )
-         hBkGnd := ::__hParBrush
-      ENDIF
-      ReleaseDC( ::Parent:hWnd, hDC )
-   ENDIF
-RETURN hBkGnd
-
-CLASS CommonControls INHERIT Control
-   PROPERTY CCS_Adjustable    INDEX CCS_ADJUSTABLE    READ xCCS_Adjustable    WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoDevider     INDEX CCS_NODIVIDER     READ xCCS_NoDevider     WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_Left          INDEX CCS_LEFT          READ xCCS_Left          WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Top           INDEX CCS_TOP           READ xCCS_Top           WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Right         INDEX CCS_RIGHT         READ xCCS_Right         WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Bottom        INDEX CCS_BOTTOM        READ xCCS_Bottom        WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_NoMoveX       INDEX CCS_NOMOVEX       READ xCCS_NoMoveX       WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoMoveY       INDEX CCS_NOMOVEY       READ xCCS_NoMoveY       WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoResize      INDEX CCS_NORESIZE      READ xCCS_NoResize      WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoParentAlign INDEX CCS_NOPARENTALIGN READ xCCS_NoParentAlign WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_Vert          INDEX CCS_VERT          READ xCCS_Vert          WRITE SetProperty DEFAULT .F. PROTECTED
-
-   METHOD SetProperty( nProp, lSet ) INLINE  ::Style := IIF( lSet, ::Style | nProp, ::Style & NOT( nProp ) )
-
-ENDCLASS
-
-CLASS UserControl INHERIT Control
-   METHOD Init() CONSTRUCTOR
-ENDCLASS
-
-METHOD Init( oParent ) CLASS UserControl
-   DEFAULT ::__xCtrlName TO "UserControl"
-   DEFAULT ::ClsName     TO "UserControl"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   DEFAULT ::xLeft   TO 0
-   DEFAULT ::xTop    TO 0
-   DEFAULT ::xWidth  TO 200
-   DEFAULT ::xHeight TO 200
-   ::Super:Init( oParent )
-   ::__IsStandard := .F.
-RETURN Self
-

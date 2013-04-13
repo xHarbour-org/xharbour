@@ -30,6 +30,7 @@
 //-----------------------------------------------------------------------------------------------
 CLASS EditBox INHERIT Control
    DATA FullSelectOnClick PUBLISHED INIT .F.
+   DATA MenuArrow         PUBLISHED INIT .F.
    DATA EnterNext  PUBLISHED INIT .F.
    DATA EnumLayout                     EXPORTED INIT { { "None",;
                                                          "Text, Image, Arrow",;
@@ -212,7 +213,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
 
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
       ::Events := ;
              { ;
                {"Object",      {;

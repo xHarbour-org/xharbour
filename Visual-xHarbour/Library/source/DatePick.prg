@@ -38,7 +38,6 @@ CLASS DateTimePicker INHERIT Control
    DATA MaxDate               EXPORTED
    DATA MaxTime               EXPORTED
 
-   DATA SmallCaption          PROTECTED INIT .F.
    ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
 
    DATA xDate                 EXPORTED  INIT DATE()

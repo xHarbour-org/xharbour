@@ -22,6 +22,8 @@ CLASS ImageManager INHERIT Dialog
    METHOD AddImage()
    METHOD DeleteImage()
    METHOD OnOk()
+   METHOD ImageListView_ColChanged()
+   METHOD ImageList_RowChanged()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -30,15 +32,26 @@ METHOD Init( oList ) CLASS ImageManager
    ::ImageList  := oList
    DEFAULT ::__xCtrlName  TO "ImageManager"
 
-   ::Super:Init( /*::Application:MainForm*/NIL )
-
-   ::Template   := "IMGMAN"
+   ::Super:Init( ::Application:MainForm )
+   ::Width  := 400
+   ::height := 500
    ::Modal      := .T.
    ::Create()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
+METHOD ImageListView_ColChanged() CLASS ImageManager
+   ::DataGrid1:DataSource:Goto( ::DataGrid2:ColPos )
+   ::DataGrid1:Update()
+RETURN Self
 
+//------------------------------------------------------------------------------------------
+METHOD ImageList_RowChanged() CLASS ImageManager
+   ::DataGrid2:ColPos := ::DataGrid1:DataSource:Recno()
+   ::DataGrid2:Update()
+RETURN Self
+
+//------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS ImageManager
    LOCAL n
    ToolBar( Self )
@@ -60,14 +73,12 @@ METHOD OnInitDialog() CLASS ImageManager
          :Action     := {|o| o:Parent:Parent:DeleteImage()}
          :Create()
       END
-
    END
 
    WITH OBJECT CoolBar( Self )
       :DockToParent()
       :Dock:Bottom := NIL
       :Create()
-
       WITH OBJECT CoolBarBand( :this )
          :MinWidth    := 140
          :MinHeight   := 22
@@ -76,20 +87,30 @@ METHOD OnInitDialog() CLASS ImageManager
          :BandChild   := ::ToolBar1
          :Create()
       END
-
    END
 
-   ::Button1:Dock:Right  := Self
-   ::Button2:Dock:Right  := ::Button1
-   
-   ::Button1:Dock:Bottom := Self
-   ::Button2:Dock:Bottom := Self
-   
+   WITH OBJECT Button( Self )
+      :Text        := "&Cancel"
+      :ID          := IDCANCEL
+      :Dock:Right  := Self
+      :Dock:Bottom := Self
+      :Create()
+   END
+
+   WITH OBJECT Button( Self )
+      :Text        := "&OK"
+      :ID          := IDOK
+      :Dock:Right  := ::Button1
+      :Dock:Bottom := Self
+      :Create()
+   END
+
    WITH OBJECT DataGrid( Self )
-      :Left                 := 5
-      :Top                  := 5
-      :Width                := 250
-      :Height               := 250
+      :Left    := 5
+      :Top     := 5
+      :Width   := 250
+      :Height  := 250
+      :EventHandler[ "OnRowChanged" ] := "ImageList_RowChanged"
 
       WITH OBJECT :ImageList := ImageList( :this )
          :IconWidth  := ::ImageList:IconWidth
@@ -97,25 +118,20 @@ METHOD OnInitDialog() CLASS ImageManager
          :Images     := ACLONE( ::ImageList:Images )
          :Create()
       END
-      //:ImageList            := ::ImageList
 
-      :ItemHeight           := ::ImageList:IconHeight+2
+      :ItemHeight    := ::ImageList:IconHeight+2
+      :Dock:Margin   := 2
+      :Dock:Left     := :Parent
+      :Dock:Top      := :Parent:Coolbar1
+      :Dock:Right    := :Parent
 
-      :Dock:Margin          := 2
-      :Dock:Left            := :Parent
-      :Dock:Top             := :Parent:Coolbar1
-      :Dock:Right           := :Parent
-//      :Dock:Bottom          := :Parent:Button1
-
-      :OnWMSize             := {|o| IIF( !EMPTY( o:Children ), o:Children[1]:Width := o:ClientWidth, ) }
+      :OnWMSize      := {|o| IIF( !EMPTY( o:Children ), o:Children[1]:Width := o:ClientWidth, ) }
       WITH OBJECT :DataSource := MemoryTable( ::Parent )
          :Structure := { {"Resource", "C", 247 } }
          :Table     := {}
-
          FOR n := 1 TO LEN( ::ImageList:Images )
              AADD( :Table, { ::ImageList:Images[n][1] } )
          NEXT
-
          :Create()
       END
 
@@ -127,27 +143,27 @@ METHOD OnInitDialog() CLASS ImageManager
          :AllowSize  := .T.
          :Create()
       END
-
       :Create()
       :Home()
    END
 
    WITH OBJECT DataGrid( Self )
-      :Caption        := "ImageList View"
+      :Text           := "ImageList View"
       :Left           := 5
       :Top            := 0
-      :Width          := 250
       :AutoHorzScroll := .F.
       :ShadowRow      := .F.
       :ShowHeaders    := .F.
       :ShowGrid       := .F.
       :HeaderHeight   := 0
-      :BackColor      := GetSysColor(COLOR_BTNFACE)
-      :Height         := ::ImageList:IconHeight + 9 + :CaptionHeight
+      //:BackColor      := GetSysColor(COLOR_BTNFACE)
       :ItemHeight     := ::ImageList:IconHeight + 2
+
+      :Height         := ::ImageList:IconHeight + 5 + :TitleHeight
       :Dock:Left      := :Parent
       :Dock:Right     := :Parent
-      :Dock:Bottom    := :Parent:Button1
+      :Dock:Bottom    := ::Button1
+      :EventHandler[ "OnColChanged" ] := "ImageListView_ColChanged"
 
       WITH OBJECT :ImageList := ImageList( :this )
          :IconWidth  := ::ImageList:IconWidth
@@ -159,15 +175,13 @@ METHOD OnInitDialog() CLASS ImageManager
       WITH OBJECT :DataSource := MemoryTable( ::Parent )
          :Structure := {}
          :Table     := {}
-
          FOR n := 1 TO ::ImageList:Count
              AADD( :Structure, {"Image_"+XStr(n), "N", ::ImageList:IconWidth } )
          NEXT
-
          :Create()
          :Append()
          FOR n := 1 TO ::ImageList:Count
-             :Table[1][n] := n//-1
+             :Table[1][n] := n //-1
          NEXT
       END
       :Create()
@@ -179,6 +193,7 @@ METHOD OnInitDialog() CLASS ImageManager
       NEXT
       :Update()
    END
+
    ::DataGrid1:Dock:Bottom := ::DataGrid2
    ::DataGrid1:DockIt()
 

@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------------------------
 
-CLASS MonthCalendar INHERIT Control
+CLASS MonthCalendar INHERIT TitleControl
 
    PROPERTY DayState          INDEX MCS_DAYSTATE      READ xDayState          WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY MultiSelect       INDEX MCS_MULTISELECT   READ xMultiSelect       WRITE SetStyle         DEFAULT .F. PROTECTED

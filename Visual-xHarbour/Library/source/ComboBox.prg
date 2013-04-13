@@ -614,7 +614,7 @@ METHOD Init( oParent ) CLASS DriveCombobox
        n += 3
    NEXT
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
    ENDIF
 RETURN Self
 

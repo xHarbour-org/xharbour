@@ -103,7 +103,7 @@ RETURN
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 
-CLASS ActiveX INHERIT ToleAuto, UserControl
+CLASS ActiveX INHERIT ToleAuto, TitleControl
 
    DATA BackColor     EXPORTED
    DATA ForeColor     EXPORTED
@@ -128,8 +128,6 @@ CLASS ActiveX INHERIT ToleAuto, UserControl
 
    PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren  WRITE SetStyle   DEFAULT .T.
    PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings  WRITE SetStyle   DEFAULT .T.
-
-   PROPERTY SmallCaption  READ  xSmallCaption WRITE SetSmallCaption DEFAULT .F.
 
    DATA AllowUnDock       INIT FALSE
    DATA AllowClose        INIT FALSE
@@ -218,11 +216,11 @@ METHOD Create() CLASS ActiveX
 
    DEFAULT ::__xCtrlName TO cId
 
-   ::UserControl:Init( ::Parent )
+   ::TitleControl:Init( ::Parent )
    ExecuteEvent( "OnInit", Self )
 
    ::Caption    := ::ClsID
-   ::UserControl:Create()
+   ::TitleControl:Create()
 
    ::__IUnknown := __AxGetUnknown( ::hWnd )
    ::hObj       := __AxGetDispatch( ::__IUnknown, ::hWnd, ::OleVerb )
@@ -268,7 +266,8 @@ METHOD Create() CLASS ActiveX
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
-   ::UserControl:OnDestroy()
+   ::TitleControl:OnDestroy()
+ 
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
    ENDIF
@@ -311,7 +310,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
    WITH OBJECT oObj
       FOR EACH Property IN :Properties
           cProp := Property:Name
-          IF cProp != "Picture" .AND. cProp != "XMLData" .AND. cProp != "HTMLData" .AND. !__objHasMsg( ::UserControl, UPPER( cProp ) )
+          IF cProp != "Picture" .AND. cProp != "XMLData" .AND. cProp != "HTMLData" .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
              lReadOnly := Property:ReadOnly

@@ -103,7 +103,6 @@ METHOD Init( oParent ) CLASS OptionBar
    ::xHeight      := 400
    ::Super:Init( oParent )
    ::__IsStandard := .F.
-   ::SmallCaption := .T.
 RETURN Self
 
 

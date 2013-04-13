@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------//
 
-CLASS TreeView FROM Control
+CLASS TreeView FROM TitleControl
    DATA AutoDragDrop     PUBLISHED INIT .F.   
    DATA Items            EXPORTED INIT {}
    DATA Header

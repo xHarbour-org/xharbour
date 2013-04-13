@@ -29,6 +29,8 @@
 CLASS Button INHERIT Control
 
    DATA ImageAlign        PUBLISHED INIT __GetSystem():TextAlignment:Center
+   DATA MenuArrow         PUBLISHED INIT .F.
+
    PROPERTY Group         INDEX WS_GROUP         READ xGroup         WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY OwnerDraw     INDEX BS_OWNERDRAW     READ xOwnerDraw     WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY ImageIndex                           READ xImageIndex    WRITE SetImageIndex    DEFAULT  0  PROTECTED
@@ -86,7 +88,7 @@ METHOD Init( oParent ) CLASS Button
    ::ThemeName := "button"
    ::OpenThemeData()
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "SMALLCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
    ENDIF
    ::ShortCutKey   := __MenuStripItemShortCut( Self )
 RETURN Self
@@ -244,7 +246,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    ENDIF
    IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::ForeSysColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::BackSysColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
-      nLeft := 3
+      nLeft := 6
       
       aRect := { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }
 
@@ -274,10 +276,8 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
                  n := _GetTextExtentPoint32( dis:hDC, ::xText )[2]
                  nTop  := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 ) - ( n / 2 )
 
-
                  aTextRect[2] += ::Parent:ImageList:IconHeight
                  nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
-
          ENDCASE
          IF EMPTY( ::xText )
             nTop := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 )

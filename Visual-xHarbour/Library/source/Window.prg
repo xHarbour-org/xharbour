@@ -240,7 +240,6 @@ CLASS Window INHERIT Object
    DATA Active                 EXPORTED  INIT .F.
    DATA DeferRedraw            EXPORTED  INIT .T.
    DATA HelpId                 EXPORTED
-   DATA SmallCaptionFont       EXPORTED
    DATA IsContainer            EXPORTED  INIT .T.
    DATA TabValidate            EXPORTED  INIT .T.
 
@@ -249,6 +248,7 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
+   DATA __nCaptionHeight         EXPORTED  INIT 0
    DATA __lRegTrans              EXPORTED  INIT .F.
    DATA __aValues                EXPORTED  INIT {}
    DATA __hCursor                EXPORTED
@@ -1163,14 +1163,7 @@ METHOD Create( oParent ) CLASS Window
    ENDIF
    ::Font:Set( Self )
 
-   TRY
-      IF !EMPTY( ::Caption ) .AND. ::SmallCaption
-         ::OriginalRect[4] -= MAX( ::CaptionHeight, IIF( ::Font != NIL, ABS( ::Font:Height ), ABS( ::Form:Font:Height ) ) + 8 )
-      ENDIF
-   CATCH
-   END
-
-   IF ::Parent != NIL /*.AND. ::__xCtrlName != "Splitter"*/ .AND. ::ClsName != TOOLTIPS_CLASS .AND. ::__xCtrlName != "CtrlMask" .AND. ::ClsName != "MDIClient"// .AND. ::ClsName != "Dialog"
+   IF ::Parent != NIL .AND. ::ClsName != TOOLTIPS_CLASS .AND. ::__xCtrlName != "CtrlMask" .AND. ::ClsName != "MDIClient"
       IF ::DisableParent .AND. ::__ClassInst == NIL
          ::Parent:Disable()
       ENDIF
@@ -1184,7 +1177,6 @@ METHOD Create( oParent ) CLASS Window
    IF ::__ClassInst == NIL .AND. ::__hRegion != NIL
       SetWindowRgn( ::hWnd, ::__hRegion, .T. )
       DeleteObject( ::__hBmpRgn )
-      //DeleteObject( ::__hRegion )
    ENDIF
 
    IF ::ToolTip != NIL .AND. !EMPTY( ::ToolTip:Text )
@@ -1194,7 +1186,6 @@ METHOD Create( oParent ) CLASS Window
    IF ::__ClassInst != NIL .AND. ::ClsName != TOOLTIPS_CLASS
       ::__ClassInst:hWnd      := ::hWnd
       ::__ClassInst:ClsName   := ::ClsName
-      //::__ClassInst:Visible   := ::Visible
       ::__ClassInst:Style     := ::Style
       ::__ClassInst:ExStyle   := ::ExStyle
       ::__ClassInst:Autoclose := ::Autoclose
@@ -2735,9 +2726,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnSetFocus", Self )
               ODEFAULT nRet TO ::OnSetFocus( nwParam )
               ODEFAULT nRet TO __Evaluate( ::OnWMSetFocus, Self, nwParam, nlParam, nRet )
-              IF ::Parent != NIL .AND. ::Parent:ClsName == "PanelBox"
-                 ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-              ENDIF
 
               IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
                  aRect := ::GetRectangle()
@@ -3402,11 +3390,6 @@ METHOD __WindowDestroy() CLASS Window
 
    IF ::SelBkBrush != NIL
       DeleteObject( ::SelBkBrush )
-   ENDIF
-
-   IF ::SmallCaptionFont != NIL .AND. VALTYPE( ::SmallCaptionFont ) == "O"
-      ::SmallCaptionFont:Delete()
-      ::SmallCaptionFont := NIL
    ENDIF
 
    IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
@@ -5375,7 +5358,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
              DEFAULT oChild:__BackMargin TO 0
              DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
              hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:CaptionHeight, SRCCOPY )
+             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:__nCaptionHeight, SRCCOPY )
              oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
              SelectObject( hMemDC1,  hOldBitmap1 )
           ENDIF

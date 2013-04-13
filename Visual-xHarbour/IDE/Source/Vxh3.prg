@@ -76,7 +76,6 @@ METHOD Init( oParent ) CLASS FormEditor
    ::ClsName       := "DLGEDT"
    ::__IsStandard  := .F.
    ::__IsControl   := .F.
-   ::CaptionHeight := 0
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle       := WS_EX_NOACTIVATE
    ::VertScroll    := .T.
@@ -183,7 +182,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS FormEditor
                     ::RulerVertFont,;
                     ::RulerBorder,;
                     ::RulerBkBrush,;
-                    ::CaptionHeight,;
+                    ::__nCaptionHeight,;
                     IIF( ::Application:RulerType == 1, 1, 0.39 ),;
                     ::RulerBrush )
    ENDIF

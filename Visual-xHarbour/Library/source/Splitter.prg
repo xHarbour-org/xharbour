@@ -44,7 +44,6 @@ CLASS Splitter INHERIT Control
       DATA Font
       DATA Border
       DATA Caption
-      DATA SmallCaption   INIT .F.
       DATA Theming        INIT .T.
       DATA HorzScroll     INIT .F.
       DATA VertScroll     INIT .F.

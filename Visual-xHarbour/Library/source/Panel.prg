@@ -14,7 +14,7 @@
 #include "vxh.ch"
 #include "debug.ch"
 
-CLASS Panel FROM Control
+CLASS Panel FROM TitleControl
    DATA xImageList     EXPORTED
    ACCESS ImageList    INLINE ::xImageList PERSISTENT
    ASSIGN ImageList(o) INLINE ::xImageList := __ChkComponent( Self, o )
@@ -23,8 +23,6 @@ CLASS Panel FROM Control
    DATA oLastFocus EXPORTED
    //DATA Border     EXPORTED INIT .F.
    DATA Transparent PUBLISHED INIT .F.
-
-   PROPERTY SmallCaption                         READ xSmallCaption WRITE __SetSmallCaption DEFAULT .T. PROTECTED
 
    DATA VertScroll              INIT .F. PUBLISHED
    DATA HorzScroll              INIT .F. PUBLISHED
@@ -80,9 +78,6 @@ METHOD Create() CLASS Panel
    ::ControlParent := .T.
    ::Super:Create()
    ::IsContainer  := .T.
-   IF !EMPTY( ::Caption ) .AND. ::SmallCaption
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-   ENDIF
 RETURN Self
 
 METHOD OnSetFocus( nwParam ) CLASS Panel
