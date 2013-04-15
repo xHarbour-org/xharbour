@@ -86,7 +86,7 @@ CLASS ProgressBar FROM Control
    METHOD OnDestroy()
    METHOD __SetMarqueeSeconds()
    METHOD OnUserMsg()
-
+   METHOD SetMarquee( l )   INLINE ::Marquee := l, ::SendMessage( PBM_SETMARQUEE, l, ::xMarqueeSeconds ), ::Redraw()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

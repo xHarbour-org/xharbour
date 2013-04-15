@@ -838,7 +838,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       IF oCmpBtn != NIL .AND. lSelect
          oCmpBtn:Select()
       ENDIF
-      ::Application:MainForm:StatusBarPanel7:Caption := ""
+      ::Application:Props:StatusBarPos:Caption := ""
       IF ::Application:Props[ "PointerBttn" ]:Checked
          ::Application:Project:CurrentForm:CtrlMask:SetMouseShape( 0 )
       ENDIF

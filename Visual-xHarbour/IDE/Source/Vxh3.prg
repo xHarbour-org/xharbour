@@ -529,7 +529,7 @@ METHOD OnLButtonDown(n,x,y) CLASS ControlMask
          WITH OBJECT ::CurForm:CurObj
             :TabOrder := :Parent:__CurrentPos
             :Parent:__CurrentPos++
-            ::Application:MainForm:StatusBarPanel7:Caption := "Next Tab " + XSTR( :Parent:__CurrentPos )
+            ::Application:Props:StatusBarPos:Caption := "Next Tab " + XSTR( :Parent:__CurrentPos )
             ::DrawOrder( ::CurForm, "", :Parent )
             ::InvalidateRect()
             ::UpdateWindow()

@@ -550,9 +550,9 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
 
       aRect := ::GetSelRect(.T.)
       IF LEN( ::Selected ) == 1
-         ::Application:MainForm:StatusBarPanel7:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
+         ::Application:Props:StatusBarPos:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
        ELSE
-         ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
+         ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
       ENDIF
    ENDIF
    hb_gcall()
@@ -607,9 +607,9 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
 
          aRect := ::GetSelRect(.T.)
          IF LEN( ::Selected ) == 1
-            ::Application:MainForm:StatusBarPanel7:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
+            ::Application:Props:StatusBarPos:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
           ELSE
-            ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
+            ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
          ENDIF
 
          RETURN NIL
@@ -830,9 +830,9 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
       IF LEN( ::Selected ) > 0
          aRect := ::GetSelRect(.T.)
          IF LEN( ::Selected ) == 1
-            ::Application:MainForm:StatusBarPanel7:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
+            ::Application:Props:StatusBarPos:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
           ELSE
-            ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
+            ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
          ENDIF
       ENDIF
     ELSEIF LEN( ::Selected ) >= ::CtrlHover
@@ -849,7 +849,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
       ENDIF
       ::MouseDown := .T.
 
-      ::Application:MainForm:StatusBarPanel7:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
+      ::Application:Props:StatusBarPos:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
    ENDIF
    ::CtrlMask:SetFocus()
 
@@ -994,16 +994,16 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                ::CtrlMask:UpdateWindow()
                ::UpdateSelection()
 
-               ::Application:MainForm:StatusBarPanel7:Caption := oControl:Name
+               ::Application:Props:StatusBarPos:Caption := oControl:Name
             ENDIF
           ELSE
-            IF !::Application:MainForm:StatusBarPanel7:Caption == ::Name
-               ::Application:MainForm:StatusBarPanel7:Caption := ::Name
+            IF !::Application:Props:StatusBarPos:Caption == ::Name
+               ::Application:Props:StatusBarPos:Caption := ::Name
             ENDIF
             ::CtrlParent := Self
          ENDIF
        ELSEIF !( ::CurObj == oControl ) .AND. !( oControl == Self )
-         ::Application:MainForm:StatusBarPanel7:Caption := "Next Tab " + XSTR( oControl:Parent:__CurrentPos )
+         ::Application:Props:StatusBarPos:Caption := "Next Tab " + XSTR( oControl:Parent:__CurrentPos )
          ::CurObj := oControl
          ::__lModified := .T.
          ::UpdateSelection()
@@ -1016,7 +1016,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          ::CtrlMask:UpdateWindow()
          ::UpdateSelection()
        ELSEIF lOrderMode .AND. ( oControl == Self )
-         ::Application:MainForm:StatusBarPanel7:Caption := "No Order for " + oControl:Name
+         ::Application:Props:StatusBarPos:Caption := "No Order for " + oControl:Name
       ENDIF
       RETURN 0
    ENDIF
@@ -1147,10 +1147,10 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       ::OldParent := NIL
 
    ENDIF
-   IF !::MouseDown .AND. !( ::Application:MainForm:StatusBarPanel7:Caption == "Ready" )
-      ::Application:MainForm:StatusBarPanel7:Caption := "Ready"
+   IF !::MouseDown .AND. !( ::Application:Props:StatusBarPos:Caption == "Ready" )
+      ::Application:Props:StatusBarPos:Caption := "Ready"
    ENDIF
-//   ::Application:MainForm:StatusBarPanel7:Caption := ""
+//   ::Application:Props:StatusBarPos:Caption := ""
 
    IF LEN( ::Selected ) > 0 .AND. !::MouseDown .AND. !::Application:Project:PasteOn
       IF lRealUp
@@ -1540,7 +1540,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                        nLeft := pt:x
                        nTop  := pt:y
                        
-                       ::Application:MainForm:StatusBarPanel7:Caption := XSTR(nLeft)+", "+XSTR(nTop)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
+                       ::Application:Props:StatusBarPos:Caption := XSTR(nLeft)+", "+XSTR(nTop)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
                      ELSE
                        IF ::NewParent != NIL
                           pt:x := aRect[1]
@@ -1550,7 +1550,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                           aRect[1] := pt:x
                           aRect[2] := pt:y
                        ENDIF
-                       ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
+                       ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
                     ENDIF
 
                CASE ::InRect == 1 // left top
@@ -1610,7 +1610,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
             ENDCASE
 
             IF ::InRect >= 1
-               ::Application:MainForm:StatusBarPanel7:Caption := XSTR(aSelected[1][1]:Left)+", "+XSTR(aSelected[1][1]:Top)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
+               ::Application:Props:StatusBarPos:Caption := XSTR(aSelected[1][1]:Left)+", "+XSTR(aSelected[1][1]:Top)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
                aSelected[1][1]:SetWindowPos(, aSelected[1][1]:xLeft,;
                                               aSelected[1][1]:xTop,;
                                               aSelected[1][1]:xWidth,;

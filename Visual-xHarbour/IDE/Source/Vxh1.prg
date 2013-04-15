@@ -172,11 +172,11 @@ METHOD SetEditorPos( nLine, nColumn ) CLASS IDE
    cLine := STR( nLine )
    cCol  := STR( nColumn )
 
-   WITH OBJECT ::Application:MainForm
-      :StatusBarPanel3:Width   := :Drawing:GetTextExtentPoint32( cLine )[1] + 10
-      :StatusBarPanel3:Caption := cLine
-      :StatusBarPanel4:Width   := :Drawing:GetTextExtentPoint32( cCol )[1] + 10
-      :StatusBarPanel4:Caption := cCol
+   WITH OBJECT ::Props
+      :StatusBarRow:Width := ::MainForm:Drawing:GetTextExtentPoint32( cLine )[1] + 10
+      :StatusBarRow:Text  := cLine
+      :StatusBarCol:Width := ::MainForm:Drawing:GetTextExtentPoint32( cCol )[1] + 10
+      :StatusBarCol:Text  := cCol
    END
 RETURN Self
 
@@ -609,7 +609,7 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
 
 
-      WITH OBJECT StatusBarPanel( :this )//::StatusBarPanel1
+      WITH OBJECT ::Application:Props[ "StatusBarCopy" ] := StatusBarPanel( :this )
          :ImageIndex := 1
 
          cVersion := "Demo"
@@ -629,31 +629,39 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
       END
 
-      WITH OBJECT StatusBarPanel( :this )
+      WITH OBJECT ::Application:Props[ "StatusBarLog" ] := StatusBarPanel( :this )
          :Width      := -1
          :Create()
       END
       WITH OBJECT StatusBarPanel( :this )
+         :Width      := 100
+         :Create()
+         WITH OBJECT ::Application:Props[ "StatusBarProg" ] := ProgressBar( :this )
+            :Create()
+         END
+      END
+
+      WITH OBJECT ::Application:Props[ "StatusBarRow" ] := StatusBarPanel( :this )
          :Width      := 60
          :Create()
       END
-      WITH OBJECT StatusBarPanel( :this )
+      WITH OBJECT ::Application:Props[ "StatusBarCol" ] := StatusBarPanel( :this )
          :Width      := 60
          :Create()
       END
-      WITH OBJECT StatusBarPanel( :this )
+      WITH OBJECT ::Application:Props[ "StatusBarCaps" ] := StatusBarPanel( :this )
          IF GetKeyState( VK_CAPITAL ) == 1
             :Caption := PADC( "Caps", 6 )
          ENDIF
          :Width      := 40
          :Create()
       END
-      WITH OBJECT StatusBarPanel( :this )
+      WITH OBJECT ::Application:Props[ "StatusBarIns" ] := StatusBarPanel( :this )
          :Caption := PADC( IIF( ::Application:InsKey, "Ins", "Ovr" ), 5 )
          :Width   := 30
          :Create()
       END
-      WITH OBJECT StatusBarPanel( :this )
+      WITH OBJECT ::Application:Props[ "StatusBarPos" ] := StatusBarPanel( :this )
          :Width      := 140
          :Create()
       END
@@ -2383,9 +2391,9 @@ METHOD SetKeyStatus( nKey ) CLASS IDE_MainForm
       IF GetKeyState( nKey ) + 128 == 1 .OR. GetKeyState( nKey ) == 1
          cText := PADC( "Caps", 6 )
       ENDIF
-      ::StatusBarPanel5:Caption := cText
+      ::Application:Props:StatusBarCaps:Text := cText
     ELSEIF nKey == VK_INSERT
-      ::StatusBarPanel6:Caption := PADC( IIF( ::Application:InsKey, "Ins", "Ovr" ), 5 )
+      ::Application:Props:StatusBarIns:Text := PADC( IIF( ::Application:InsKey, "Ins", "Ovr" ), 5 )
    ENDIF
 RETURN NIL
 
@@ -4141,8 +4149,8 @@ METHOD Open( cProject ) CLASS Project
 
    EXTERN MDIChildWindow
 
-   LOCAL n, Xfm, aChildren
-   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath, oWait
+   LOCAL n, Xfm, aChildren, oWait
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -4192,8 +4200,10 @@ METHOD Open( cProject ) CLASS Project
       ENDIF
 
    ENDIF
-   
-   oWait := ::Application:MainForm:MessageWait( ::ProjectFile:Path + "\" + ::ProjectFile:Name, "Loading project", .T. )
+
+   //::Application:Props:StatusBarProg:SetMarquee( .T. )
+
+   oWait := ::Application:Props:StatusBarProg //::Application:MainForm:MessageWait( ::ProjectFile:Path + "\" + ::ProjectFile:Name, "Loading project", .T. )
    
    ::Application:Cursor := ::System:Cursor:Busy
    SetCursor( ::Application:Cursor )
@@ -4225,7 +4235,10 @@ METHOD Open( cProject ) CLASS Project
       n := ::Application:MainForm:MessageBox( "Mising main file " + cSourcePath +"\" + ::Properties:Name +"_Main.prg", "Open Project", MB_ICONQUESTION | MB_OKCANCEL )
       IF n == IDCANCEL
          ::Close()
-         oWait:Close()
+         //oWait:Close()
+         oWait:Position := 0
+
+         ::Application:Props:StatusBarProg:SetMarquee( .F. )
          RETURN .F.
       ENDIF
    ENDIF
@@ -4254,7 +4267,7 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Props[ "SaveBttn"          ]:Enabled := .T.
    ::Application:Props[ "ForceBuildItem"    ]:Enabled := .T.
 
-   ::Application:MainForm:StatusBarPanel2:Caption := "Loading " + ::Properties:Path + "\" + ::Properties:Name
+   ::Application:Props:StatusBarLog:Text := "Loading " + ::Properties:Path + "\" + ::Properties:Name
 
    aErrors     := {}
 
@@ -4285,7 +4298,9 @@ METHOD Open( cProject ) CLASS Project
        IF ! ::LoadForm( Xfm, @aErrors, @aEditors, HB_EnumIndex()==1 )
           MessageBox( GetActiveWindow(), "The File " + Xfm + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
           ::Application:Cursor := NIL
-          oWait:Close()
+          //oWait:Close()
+          oWait:Position := 0
+          //::Application:Props:StatusBarProg:SetMarquee( .F. )
           RETURN ::Close()
        ENDIF
    NEXT
@@ -4320,7 +4335,9 @@ METHOD Open( cProject ) CLASS Project
       ::Application:Yield()
       ::Application:Cursor := NIL
       //::Application:MainForm:MessageBox( "Error(s) loading " + cProject + CHR(13) + "See errors log", "Project closed", MB_ICONSTOP )
-      oWait:Close()
+      //::Application:Props:StatusBarProg:SetMarquee( .F. )
+      //oWait:Close()
+      oWait:Position := 0
       RETURN ::Close(.F.)
    ENDIF
 
@@ -4389,7 +4406,7 @@ METHOD Open( cProject ) CLASS Project
          ::EditReset(1)
       ENDIF
 
-      ::Application:MainForm:StatusBarPanel2:Caption := ""
+      ::Application:Props:StatusBarLog:Text := ""
       IF ::CurrentForm == NIL
          MessageBox( GetActiveWindow(), "The project file "+::ProjectFile:Name+" appears to be corrupted or it's not a Visual xHarbour project file", "Visual xHarbour - Open Project", MB_ICONERROR )
          ::Application:Cursor := NIL
@@ -4427,7 +4444,9 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )
    ::Built := .F.
-   oWait:Close()
+   //oWait:Close()
+   //::Application:Props:StatusBarProg:SetMarquee( .F. )
+   oWait:Position := 0
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -6042,7 +6061,7 @@ METHOD Build( lForce ) CLASS Project
 
       bProgress := {|Module| ::Application:MainForm:DebugBuild1:AddItem( IIF( Module:nType != ::Properties:TargetType + 9, "Compiling "+Module:cFile+"...", "Linking "+Module:cFile ), .T. ),;
                              ::Application:MainForm:DebugBuild1:SetHorizontalExtent( 1000 ),;
-                             ::Application:MainForm:StatusBarPanel2:Caption := "Building: "+::Properties:Name+" - "+Module:cFile,;
+                             ::Application:Props:StatusBarLog:Text := "Building: "+::Properties:Name+" - "+Module:cFile,;
                              ::Application:MainForm:DebugBuild1:UpdateWindow(),;
                              ::Application:Yield() }
 
@@ -6060,7 +6079,7 @@ METHOD Build( lForce ) CLASS Project
 
    CATCH oErr
       OutputDebugString(ValToPrg(oErr))
-      ::Application:MainForm:StatusBarPanel2:Caption := "ERRORS!"
+      ::Application:Props:StatusBarLog:Text := "ERRORS!"
       ::Application:MainForm:DebugBuild1:AddItem( "ERRORS!", .T. )
       ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
       ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
@@ -6076,7 +6095,7 @@ METHOD Build( lForce ) CLASS Project
 
    ::Application:MainForm:DebugBuild1:AddItem( STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built", .T. )
 
-   ::Application:MainForm:StatusBarPanel2:Caption := STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built"
+   ::Application:Props:StatusBarLog:Text := STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built"
    ::Built := .T.
 
 RETURN .T.
@@ -7240,7 +7259,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Width          := 90
          :Height         := 15
          :FocusRect      := .F.
-         :Caption        := ::Application:MainForm:StatusBarPanel1:Caption
+         :Caption        := ::Application:Props:StatusBarCopy:Text
          :Font:Underline := .T.
          :EventHandler[ "OnClick" ] := "LinkLabel1_OnClick"
          :Create()
