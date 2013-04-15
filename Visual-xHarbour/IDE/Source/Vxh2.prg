@@ -908,6 +908,7 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
 
    IF __ObjHasMsg( oControl, "Owner" ) .AND. oControl:Owner != NIL .AND. oControl:__xCtrlName != "Splitter"
       rc := oControl:Owner:GetRectangle()
+      DEFAULT aRect TO ACLONE( oControl:GetRectangle() )
       aRect[1] := rc[1]
       aRect[2] := rc[2]
    ENDIF

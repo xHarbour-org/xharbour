@@ -30,10 +30,8 @@ CLASS Panel FROM TitleControl
    DATA ScrollOnChildFocus      PUBLISHED INIT .F.
 
    METHOD Init() CONSTRUCTOR
-   METHOD Create()
    METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
 
-   METHOD OnSetFocus()// INLINE IIF( !EMPTY( ::Children ), (::Children[1]:SetFocus(),0), NIL )
    METHOD OnEraseBkGnd()
 ENDCLASS
 
@@ -51,47 +49,27 @@ RETURN NIL
 METHOD Init( oParent ) CLASS Panel
    DEFAULT ::__xCtrlName TO "Panel"
    ::ClsName      := "PanelBox"
-   ::StaticEdge   := .F.
    ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::ExStyle      := WS_EX_CONTROLPARENT
    ::Super:Init( oParent )
    ::Width        := 80
    ::Height       := 80
    ::__IsStandard   := .F.
-   __DeleteEvents( ::Events,{ /*"OnClick",*/;
-                              "OnCtlColorBtn",;
-                              "OnCtlColorEdit",;
-                              "OnCtlColorListBox",;
-                              "OnCtlColorScrollBar",;
-                              "OnCtlColorStatic",;
-                              "OnSysColorChange",;
-                              "OnClear",;
-                              "OnCopy",;
-                              "OnCut",;
-                              "OnPaste",;
-                              "OnUndo" } )
-
-RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-
-METHOD Create() CLASS Panel
-   ::ControlParent := .T.
-   ::Super:Create()
+   IF ! ::__ClassInst != NIL
+      __DeleteEvents( ::Events,{ /*"OnClick",*/;
+                                 "OnCtlColorBtn",;
+                                 "OnCtlColorEdit",;
+                                 "OnCtlColorListBox",;
+                                 "OnCtlColorScrollBar",;
+                                 "OnCtlColorStatic",;
+                                 "OnSysColorChange",;
+                                 "OnClear",;
+                                 "OnCopy",;
+                                 "OnCut",;
+                                 "OnPaste",;
+                                 "OnUndo" } )
+   ENDIF
    ::IsContainer  := .T.
 RETURN Self
 
-METHOD OnSetFocus( nwParam ) CLASS Panel
-   LOCAL n
-   IF ::__Docked .AND. !EMPTY( ::Children )
-      IF ::oLastFocus != NIL
-         ::oLastFocus:SetFocus()
-       ELSE
-         IF ( n := ASCAN( ::Children, {|o| o:hWnd == nwParam} ) ) == 0
-            n := 1
-         ENDIF
-         ::Children[n]:SetFocus()
-      ENDIF
-      RETURN 0
-   ENDIF
-RETURN NIL
-
+//-----------------------------------------------------------------------------------------------

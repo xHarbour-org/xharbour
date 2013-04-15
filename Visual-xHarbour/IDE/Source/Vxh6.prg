@@ -65,7 +65,6 @@ METHOD Init( oParent ) CLASS ToolBox
    LOCAL lPro
    DEFAULT ::__xCtrlName  TO "ToolBox"
    ::Super:Init( oParent )
-   ::Caption       := "ToolBox"
    ::ShowSelAlways := .T.
    ::TrackSelect   := .T.
 

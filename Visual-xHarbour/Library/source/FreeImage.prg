@@ -12,20 +12,17 @@
 
 #ifdef VXH_PROFESSIONAL
 
-CLASS FreeImage INHERIT FreeImageRenderer, Panel
-
+CLASS FreeImage INHERIT Panel, FreeImageRenderer
    PROPERTY Transparent                 READ xTransparent WRITE Update   DEFAULT .F.
    PROPERTY Alignment                   READ xAlignment   WRITE Update   DEFAULT 1
    PROPERTY Border      INDEX WS_BORDER READ xBorder      WRITE SetStyle DEFAULT .F.       PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnDestroy()           INLINE Super:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
+   METHOD OnDestroy()           INLINE ::Panel:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
    METHOD OnGetDlgCode()        INLINE DLGC_WANTMESSAGE
    METHOD OnPaint()
    METHOD OnEraseBkGnd()        INLINE 1
-   METHOD SetBackColor(n)       INLINE ::Panel:SetBackColor(n), ::Update()
-   METHOD __SetCaptionHeight(n) INLINE ::Panel:__SetCaptionHeight(n), ::Update()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -49,6 +46,7 @@ METHOD Create() CLASS FreeImage
    ::FreeImageRenderer:Create()
    ::Panel:Create()
    ::__SetImageName( ::xImageName )
+   ::Panel:TitleHeight := ::TitleHeight
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------

@@ -5017,9 +5017,11 @@ CLASS WinForm INHERIT Window
    PROPERTY DlgModalFrame INDEX WS_EX_DLGMODALFRAME READ xDlgModalFrame   WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY Icon                                    READ xIcon            WRITE SetFormIcon                 PROTECTED INVERT
    PROPERTY Opacity                                 READ xOpacity         WRITE SetOpacity      DEFAULT 100 PROTECTED
-   PROPERTY ImageList                               READ xImageList       WRITE SetImageList                PROTECTED
+
    PROPERTY BitmapMask                              READ xBitmapMask      WRITE __SetBitmapMask             PROTECTED INVERT
    PROPERTY BitmapMaskColor                         READ xBitmapMaskColor WRITE __SetBitmapMaskColor        PROTECTED
+
+   PROPERTY ImageList     GET __ChkComponent( Self, ::xImageList )    SET SetImageList                PROTECTED
 
    // backward compatibility
    ACCESS TopMost    INLINE ::xAlwaysOnTop
@@ -5046,6 +5048,8 @@ CLASS WinForm INHERIT Window
    DATA __Show_Modes           EXPORTED  INIT { "Normal", "Minimized", "Maximized", "NoActivate" }
    DATA Ole                    EXPORTED
    DATA AppParam               EXPORTED
+
+   DATA __lLoading             EXPORTED INIT .F.
    
    ACCESS Form                 INLINE Self
 
@@ -5890,23 +5894,33 @@ FUNCTION __ChkComponent( oObj, ocCompo )
 RETURN ocCompo
 */
 
-FUNCTION __ChkComponent( oObj, ocCompo )
-   LOCAL oForm
-   IF VALTYPE( ocCompo ) == "C" 
+FUNCTION __ChkComponent( oObj, cComp )
+   LOCAL oForm//, cType, n
+   IF VALTYPE( cComp ) == "C" 
       oForm := oObj:Form
       IF oForm:Property != NIL 
-         IF ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) == 0
+         IF ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) == 0
             IF oObj:__ClassInst == NIL 
                oForm := oObj:Application:MainForm
              ELSE
                oForm := oObj:Application:Project:Forms[1]
             ENDIF
+            IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) > 0
+               cComp       := oForm:Property[ cComp ]
+               //cType       := cComp:ComponentType
+               //oObj:&cType := cComp
+            ENDIF
           ELSE
-            ocCompo := oForm:Property[ ocCompo ]
+            cComp       := oForm:Property[ cComp ]
+            //cType       := cComp:ComponentType
+            //oObj:&cType := cComp
          ENDIF
       ENDIF
    ENDIF
-RETURN ocCompo
+   IF VALTYPE( cComp ) != "O"
+      cComp := NIL
+   ENDIF
+RETURN cComp
 
 FUNCTION KeyCountRaw( xOrder, cBag )
 RETURN dbOrderInfo( DBOI_KEYCOUNTRAW, cBag, xOrder )

@@ -78,10 +78,10 @@ CLASS DataGrid INHERIT TitleControl
    DATA ConvertOem              PUBLISHED INIT .F.
    DATA HighlightBorderColor    PUBLISHED
    DATA HighlightColor          PUBLISHED
-   DATA HoverBorderColor        PUBLISHED
    DATA HighlightTextColor      PUBLISHED
-   DATA HoverBackColor          PUBLISHED
-   DATA HoverForeColor          PUBLISHED
+
+   DATA HoverRow                PUBLISHED INIT .T.
+
    DATA Columns                 PUBLISHED
    DATA AllowDragRecords        PUBLISHED INIT .F.
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
@@ -110,6 +110,11 @@ CLASS DataGrid INHERIT TitleControl
    DATA CurPos                  EXPORTED INIT 1
    DATA CurTag                  EXPORTED
 
+   // backward compatibility
+   DATA HoverBackColor          EXPORTED
+   DATA HoverForeColor          EXPORTED
+   DATA HoverBorderColor        EXPORTED
+
    ACCESS RowCount              INLINE LEN( ::__DisplayArray )
    ACCESS ColCount              INLINE LEN( ::Children )
    ACCESS HorzScrollPos         INLINE ABS( ::__HorzScrolled )
@@ -121,7 +126,9 @@ CLASS DataGrid INHERIT TitleControl
 
    ACCESS HitTop                INLINE ::DataSource:Bof()
    ACCESS HitBottom             INLINE ::DataSource:eof()
-   
+
+   DATA __HoverBackColor        PROTECTED
+
    DATA __HScrollUnits          PROTECTED INIT 15
    DATA __HorzScroll            PROTECTED INIT FALSE
    DATA __VertScroll            PROTECTED INIT FALSE
@@ -262,7 +269,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
    METHOD OnHeaderClick()
-   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(), IIF( ::HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
+   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(), IIF( ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
 
    METHOD __DrawRepresentation()
    METHOD OnMouseMove()
@@ -337,8 +344,10 @@ METHOD Create() CLASS DataGrid
    IF ::HighlightBorderColor != NIL
       ::__SelBorderPen := CreatePen( PS_SOLID, 0, ::HighlightBorderColor )
    ENDIF
-   IF ::HoverBorderColor != NIL
-      ::__HoverBorderPen := CreatePen( PS_SOLID, 0, ::HoverBorderColor )
+
+   IF ::HoverRow
+      ::__HoverBackColor := LightenColor( ::HighlightColor, 180 )
+      ::__HoverBorderPen := CreatePen( PS_SOLID, 0, IIF( ::HighlightBorderColor != NIL, LightenColor( ::HighlightBorderColor, 180 ), ::__HoverBackColor ) )
    ENDIF
    
    ::__hDragBrush   := CreateSolidBrush( DarkenColor( ::BackColor, 10 ) )
@@ -349,9 +358,9 @@ METHOD Create() CLASS DataGrid
    Super:Create()
    ::__DataWidth := 0
    FOR EACH oColumn IN ::Children
-      IF oColumn:ClsName == "GridColumn" .AND. oColumn:Visible
-         ::__DataWidth += oColumn:Width
-      ENDIF
+       IF oColumn:ClsName == "GridColumn" .AND. oColumn:Visible
+          ::__DataWidth += oColumn:Width
+       ENDIF
    NEXT
 
    ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
@@ -464,7 +473,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
             ENDIF
          ENDIF
       ENDIF
-      ::OnMouseMove( 0, MAKELPARAM(pt:x,pt:y) )
+      ::OnMouseMove( 0, MAKELPARAM(pt:x,pt:y), .F. )
    ENDIF
 RETURN 0
 
@@ -478,10 +487,13 @@ METHOD CreateDragImage(y) CLASS DataGrid
    ::__nDragTop := y-nTop
 RETURN hImageList
 
-METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
+METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
    LOCAL n, nRow, nCol, nWidth, nDrag, nTop, nDragPos, nDragRec, x, y
+   DEFAULT lSuper TO .T.
 
-   ::Super:OnMouseMove( wParam, lParam )
+   IF lSuper
+      ::Super:OnMouseMove( wParam, lParam )
+   ENDIF
 
    x := LOWORD( lParam )
    y := HIWORD( lParam )
@@ -493,7 +505,7 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
    IF ::ShowHeaders 
       IF !::__lSizeMouseDown .AND. !::__lMoveMouseDown
          IF ( nRow := Int( Ceiling( (y-::__GetHeaderHeight() ) / ::ItemHeight ) ) ) <= 0
-            IF ::HoverBackColor != NIL .AND. ::__aLastHover[1] > 0
+            IF ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0
                ::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] )
                ::__aLastHover[1] := 0
             ENDIF
@@ -528,7 +540,7 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
                   ::Cursor := NIL
                ENDIF
              ELSE
-               ::Cursor := NIL//::System:Cursor:LinkSelect
+               ::Cursor := NIL
             ENDIF
             IF ::Cursor == NIL
                IF n+1 > 0 .AND. n+1 <= LEN(::Children)
@@ -565,14 +577,14 @@ METHOD OnMouseMove( wParam, lParam ) CLASS DataGrid
 
                ImageListDragMove( 0, nTop )
 
-            ELSEIF wParam != MK_LBUTTON .AND. ::HoverBackColor != NIL
+            ELSEIF wParam != MK_LBUTTON .AND. ::__HoverBackColor != NIL
 
                nCol := ::ColFromPos(x)
                IF ::__aLastHover[1] <> nRow .OR. ( ! ::FullRowSelect .AND. ::__aLastHover[2] <> nCol )
                   IF ::__aLastHover[1] > 0
                      ::__DisplayData( ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],), ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],) )
                   ENDIF
-                  ::__DisplayData( nRow, IIF( ! ::FullRowSelect, nCol,), nRow, IIF( ! ::FullRowSelect, nCol,),, .T. )
+                  ::__DisplayData( nRow, IIF( ! ::FullRowSelect, nCol,), nRow, IIF( ! ::FullRowSelect, nCol,),, nRow <= ::RowCountUsable )
                   ::__aLastHover[1] := nRow
                   ::__aLastHover[2] := nCol
                ENDIF
@@ -1933,12 +1945,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  nAlign := ::__DisplayArray[nPos][1][i][ 4]
                  nHImg  := ::__DisplayArray[nPos][1][i][ 5]
 
-                 nBkCol := IIF( lHover, ::HoverBackColor, ::__DisplayArray[nPos][1][i][ 7] )
+                 nBkCol := IIF( lHover, ::__HoverBackColor, ::__DisplayArray[nPos][1][i][ 7] )
 
                  IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                     nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
-                 nTxCol   := IIF( lHover .AND. ::HoverForeColor != NIL, ::HoverForeColor, ::__DisplayArray[nPos][1][i][ 8] )
+                 nTxCol   := ::__DisplayArray[nPos][1][i][ 8]
 
                  nStatus  := ::__DisplayArray[nPos][1][i][10]
                  nRep     := ::__DisplayArray[nPos][1][i][11]

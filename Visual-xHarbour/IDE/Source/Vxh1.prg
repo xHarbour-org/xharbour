@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "5"
-#define VXH_BuildVersion "5.1.0"
+#define VXH_BuildVersion "5.2.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -1734,7 +1734,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 */
    WITH OBJECT ::Application:ToolBox := ToolBox( Self )
-      :Caption          := "ToolBox"
+      :Text             := "ToolBox"
 
       :StaticEdge       := .F.
       :Border           := .T.
@@ -1771,7 +1771,7 @@ METHOD Init() CLASS IDE_MainForm
 
    // Panel
    WITH OBJECT ::Application:Props[ "ObjectManagerPanel" ] := Panel( Self )
-      :Caption          := "Object Manager"
+      :Text             := "Object Manager"
       :AllowUndock      := .T.
       :AllowClose       := .T.
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewObjectManagerItem" ]:Checked := .F. ), o:Redock() ) }
@@ -1781,9 +1781,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Top         := ::Application:Props[ "MainToolBar" ]
       :Dock:Bottom      := ::StatusBar1
       :Dock:Right       := :Parent
-
       :Create()
-
       WITH OBJECT ::Application:Props[ "ComboSelect" ] := FormComboBox( :this )
          :ItemToolTips:= .T.
          :Dock:Left   := :Parent
@@ -4467,6 +4465,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    IF hFile == -1
       RETURN .F.
    ENDIF
+
    nLine       := 1
    aChildren   := {}
    cObjectName := Token( cFile, ".", 1 )
@@ -4493,6 +4492,8 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg", cBkMk )
    ENDIF
 
+   oForm:__lLoading := .T.
+
    IF lLoadProps
       nLine := 1
       DEFAULT aErrors  TO {}
@@ -4508,6 +4509,8 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       ::Application:FormsTabs:InsertTab( cObjectName,,, .F. )
    ENDIF
    FClose( hFile )
+
+   oForm:__lLoading := .F.
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
@@ -7190,26 +7193,28 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Width          := 300
          :Height         := 62
          :Caption        := VXH_Version
+         :Transparent    := .T.
          :Font:FaceName  := "Times New Roman"
          :Font:Bold      := .F.
          :Font:PointSize := 48
          :ForeColor      := C_GREY
          :Create()
       END
-      /*
+
       WITH OBJECT ( LABEL( :this ) )
-         :Left           := 363
+         :Left           := 165
          :Top            := 61
          :Width          := 300
          :Height         := 20
-         :Caption        := "Build: " + VXH_BuildVersion
+         :Text           := "Build: " + VXH_BuildVersion
          :Font:FaceName  := "Tahoma"
          :Font:Bold      := .T.
          :Font:PointSize := 10
+         :Transparent    := .T.
          :ForeColor      := C_DARKBLUE
          :Create()
       END
-      */
+
    END
 
    WITH OBJECT ( oBtn := Button( Self ) )

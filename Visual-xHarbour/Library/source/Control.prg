@@ -167,7 +167,7 @@ METHOD Create( hParent ) CLASS Control
          EnableWindow( ::hWnd, .F.  )
       ENDIF
    ENDIF
-   
+
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -341,8 +341,6 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 CLASS TitleControl INHERIT Control
-   DATA FlatBorder           EXPORTED INIT .F.
-
    DATA AllowUnDock          PUBLISHED INIT FALSE
    DATA AllowClose           PUBLISHED INIT FALSE
    DATA MenuArrow            PUBLISHED INIT .F.
@@ -356,12 +354,10 @@ CLASS TitleControl INHERIT Control
    DATA __aCloseRect         PROTECTED
    DATA __aArrowRect         PROTECTED
 
-   PROPERTY TitleHeight READ xTitleHeight WRITE Reset DEFAULT 20
-   PROPERTY Text        READ xText        WRITE Reset DEFAULT ""
+   PROPERTY TitleHeight READ xTitleHeight WRITE ResetFrame DEFAULT 20
+   PROPERTY Text        READ xText        WRITE ResetFrame DEFAULT ""
 
-   ACCESS SmallCaption INLINE ! Empty( ::xText )
-
-
+   METHOD Create()
    METHOD OnNCCalcSize()
    METHOD OnNCMouseleave()
    METHOD OnNCPaint()
@@ -373,31 +369,27 @@ CLASS TitleControl INHERIT Control
    METHOD DrawClose()
    METHOD DrawPin()
 
-   METHOD Reset() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
-                         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
+                              ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),;
+                              ::UpdateWindow()
 ENDCLASS
+
+METHOD Create() CLASS TitleControl
+   ::Super:Create()
+   IF ::__nCaptionHeight == 0 .AND. ! EMPTY( ::xText ) .AND. ::xTitleHeight > 0
+      ::ResetFrame()
+   ENDIF
+RETURN Self
 
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS TitleControl
    LOCAL nccs
    (nwParam)
    ::__nCaptionHeight := IIF( EMPTY( ::xText ), 0, ::xTitleHeight )
-   IF ::__nCaptionHeight > 0 .OR. ::FlatBorder
+   IF ::__nCaptionHeight > 0
       nccs := (struct NCCALCSIZE_PARAMS)
       nccs:Pointer( nlParam )
-      
-      IF ! EMPTY( ::xText )
-         nccs:rgrc[1]:Left += ::EmptyLeft
-         nccs:rgrc[1]:Top  += ::__nCaptionHeight
-      ENDIF      
-
-      IF ::FlatBorder
-         nccs:rgrc[1]:Left   += 1
-         IF EMPTY( ::xText )
-            nccs:rgrc[1]:Top += 1
-         ENDIF
-         nccs:rgrc[1]:Right  -= 1
-         nccs:rgrc[1]:Bottom -= 1
-      ENDIF
+      nccs:rgrc[1]:Left += ::EmptyLeft
+      nccs:rgrc[1]:Top  += ::__nCaptionHeight
       nccs:CopyTo( nlParam )
    ENDIF
 RETURN NIL
@@ -417,9 +409,10 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
-   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, hRegion, n:=0
+   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, n:=0
    ::CallWindowProc()
-   IF ::Super:OnNCPaint( nwParam, nlParam ) == NIL .AND. ::__nCaptionHeight > 0
+   ::Super:OnNCPaint( nwParam, nlParam )
+   IF ::__nCaptionHeight > 0
       hdc := GetWindowDC( ::hWnd )
       IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
          n += 2
@@ -427,10 +420,10 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       IF ::ExStyle & WS_EX_STATICEDGE == WS_EX_STATICEDGE
          n += 1
       ENDIF
-      ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
+      ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 0, 0 ) }
 
       hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hOldBrush := SelectObject( hDC, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
+      hOldBrush := SelectObject( hDC, ::System:CurrentScheme:Brush:MenuItemSelected )
       
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
       SelectObject( hDC, hOldBrush )
@@ -441,10 +434,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
 
-      n := 0
-      IF !::IsChild
-         n := 1
-      ENDIF
+      n := IIF( ! ::IsChild, 1, 0 )
 
       IF ::MenuArrow
          ::__aArrowRect := { 0, ::__aCaptionRect[2]+n+1, 20, ::__aCaptionRect[4]-2 }
@@ -455,7 +445,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
 
       nWidth := 0
       IF ::AllowClose
-         ::__aCloseRect := { ::__aCaptionRect[3]-::__aCaptionRect[4]+n+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2, ::__aCaptionRect[4]-2 }
+         ::__aCloseRect := { ::__aCaptionRect[3]-::__aCaptionRect[4]+n+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2, ::__aCaptionRect[4]-3 }
          ::DrawClose( hDC, n )
          nWidth := ::__aCloseRect[3]-::__aCloseRect[1]+1
       ENDIF
@@ -467,27 +457,13 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ReleaseDC(::hWnd, hdc)
    ENDIF
 
-   IF ::FlatBorder
-      hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
-      hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW + DCX_PARENTCLIP + DCX_CLIPSIBLINGS + DCX_VALIDATE )
-
-      hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-      Rectangle( hDC, 0, 0, ::Width, ::Height )
-      SelectObject( hDC, hOldBrush )
-      SelectObject( hDC, hOldPen )
-
-      ReleaseDC(::hWnd, hdc)
-      DeleteObject( hRegion )
-   ENDIF
-
 RETURN 0
 
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCHitTest( x, y ) CLASS TitleControl
    LOCAL nRes, aPt, hRegion, hdc, n
-   IF !EMPTY(::__aCaptionRect) .AND. !EMPTY( ::xText ) .AND. ::Super:OnNCHitTest( x, y ) == NIL
+   IF !EMPTY(::__aCaptionRect) .AND. ::__nCaptionHeight > 0 .AND. ::Super:OnNCHitTest( x, y ) == NIL
       aPt := { x, y }
       _ScreenToClient( ::hWnd, @aPt )
       aPt[2]+=::__aCaptionRect[4]
@@ -625,7 +601,9 @@ METHOD Redock() CLASS TitleControl
    LOCAL oControl, hDef, o
    IF __Evaluate( ::OnWMRedock,  Self ) == NIL .AND. ::AllowUnDock
       ::__Docked := .T.
-      ::__nCaptionHeight := ::xTitleHeight
+
+      ::xText := ::BackInfo[15]
+
       ::Hide()
 
       SetParent( ::hWnd, ::BackInfo[13] )
@@ -690,8 +668,6 @@ METHOD Redock() CLASS TitleControl
        CATCH
       END
       ::Show()
-      
-
       ExecuteEvent( "OnRedock", Self )
    ENDIF
 RETURN Self
@@ -705,10 +681,10 @@ METHOD Undock() CLASS TitleControl
       ::__Docked := .F.
       ::BackInfo := { ::LeftSplitter, ::TopSplitter, ::RightSplitter, ::BottomSplitter,;
                       ::xLeft, ::xTop, ::xWidth, ::xHeight, ::ClientWidth, ::ClientHeight,;
-                      ::Style, ::ExStyle, ::Parent:hWnd,,,,}
+                      ::Style, ::ExStyle, ::Parent:hWnd,, ::xText }
 
-      ::__nCaptionHeight := 0
-
+      ::xText := ""
+      ::ResetFrame()
       IF ::Parent:MDIContainer .AND. ::Parent:MDIClient != NIL
          ::BackInfo[14] := { ::Parent:MDIClient:AlignLeft, ::Parent:MDIClient:AlignTop, ::Parent:MDIClient:AlignRight, ::Parent:MDIClient:AlignBottom }
          IF ::Parent:MDIClient:AlignLeft == Self
@@ -773,6 +749,7 @@ METHOD Undock() CLASS TitleControl
          NEXT
          EndDeferWindowPos( hDef )
       ENDIF
+      ::ResetFrame()
       ExecuteEvent( "OnUndock", Self )
    ENDIF
   
@@ -789,7 +766,7 @@ METHOD DrawClose( hDC ) CLASS TitleControl
       SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
+      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:MenuItemSelected )
    ENDIF
    SelectObject( hDC, hOld )
 
@@ -824,7 +801,7 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
       SelectObject( hDC, IIF( !::__lPinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, GetSysColorBrush( COLOR_ACTIVECAPTION ) )
+      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:MenuItemSelected )
    ENDIF
    SelectObject( hDC, hOld )
    

@@ -1513,7 +1513,7 @@ CLASS TabStrip INHERIT TabControl
    METHOD DrawTabStripItem()
    METHOD __SetColorScheme()
    METHOD __GetGradienBrush()
-   METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd() INLINE 1
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -1528,17 +1528,6 @@ METHOD Create() CLASS TabStrip
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,::ItemHeight) )
    ENDIF
 RETURN Self
-//-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( /*hDC*/ ) CLASS TabStrip
-//   LOCAL hBrush := ::BkBrush
-//   DEFAULT hBrush TO ::__hBrush
-//   DEFAULT hBrush TO ::Parent:BkBrush
-//   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-//   IF hBrush != NIL
-//      _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
-//   ENDIF
-RETURN 1
-
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabStrip
    LOCAL hOldPen, aRect, nSel, aItem, nItems, n, nColor

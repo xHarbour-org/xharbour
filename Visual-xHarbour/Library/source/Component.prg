@@ -14,6 +14,7 @@
 #include "vxh.ch"
 #include "debug.ch"
 
+static lLoading := .F.
 //-----------------------------------------------------------------------------------------------
 
 CLASS Component INHERIT Object
@@ -40,6 +41,7 @@ CLASS Component INHERIT Object
    METHOD Destroy()
    METHOD __SetCtrlName()
    METHOD __GetInstance()
+   METHOD RenameComponents()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -119,9 +121,47 @@ METHOD Destroy() CLASS Component
    ENDIF
 RETURN .F.
 
-METHOD __SetCtrlName(c) CLASS Component
-   Super:__SetCtrlName(c)
+METHOD RenameComponents( oForm, cName, cOldName )
+   LOCAL oWait, oObj, cCtrl, cType := ::ComponentType
+   DEFAULT oForm TO ::Owner
+
+      IF oForm:Cargo != NIL
+         oWait := ::Application:MainForm:MessageWait( "Loading form " + oForm:Cargo )
+         ::Application:Project:LoadForm( oForm:Cargo,,, .T., oForm )
+         oForm:Cargo := NIL
+         oWait:Close()
+      ENDIF
+
+      IF __ObjHasMsg( oForm, cType ) .AND. VALTYPE( oForm:&cType ) == "C" .AND. oForm:&cType == cOldName
+         __objSendMsg( oForm, "_" + cType, cName )
+      ENDIF
+      FOR EACH cCtrl IN oForm:Property:Keys
+          oObj := oForm:Property[ cCtrl ]
+          IF __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "C" .AND. oObj:&cType == cOldName
+             __objSendMsg( oObj, "_" + cType, cName )
+          ENDIF
+      NEXT
+RETURN .T.
+
+
+METHOD __SetCtrlName( cName ) CLASS Component
+   LOCAL n, cOldName := ::xName
+
+   Super:__SetCtrlName( cName )
+
+   IF ! ::Owner:__lLoading
+      IF ::__ClassInst != NIL .AND. ! Empty( cOldName ) .AND. UPPER(cName) != UPPER(cOldName)
+         ::RenameComponents( ::Owner, cName, cOldName )
+
+         IF ::Owner == ::Application:Project:Forms[1]
+            FOR n := 2 TO LEN( ::Application:Project:Forms )
+                ::RenameComponents( ::Application:Project:Forms[n], cName, cOldName )
+            NEXT
+         ENDIF
+      ENDIF
+   ENDIF
+
    IF !EMPTY( ::Button )
       ::Button:Parent:Reset()
    ENDIF
-RETURN c
+RETURN cName

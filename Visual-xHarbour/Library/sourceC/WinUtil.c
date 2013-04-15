@@ -1274,11 +1274,11 @@ COLORREF _MidColor(COLORREF colorA,COLORREF colorB)
   return RGB( min(red,0xff),min(green,0xff), min(blue,0xff));
 }
 
-COLORREF _LightenColor( COLORREF lColor, long lScale )
+COLORREF _LightenColor( COLORREF lColor, int iScale )
 {
-  long R = MulDiv(255-GetRValue(lColor),lScale,255)+GetRValue(lColor);
-  long G = MulDiv(255-GetGValue(lColor),lScale,255)+GetGValue(lColor);
-  long B = MulDiv(255-GetBValue(lColor),lScale,255)+GetBValue(lColor);
+  long R = MulDiv(255-GetRValue(lColor),iScale,255)+GetRValue(lColor);
+  long G = MulDiv(255-GetGValue(lColor),iScale,255)+GetGValue(lColor);
+  long B = MulDiv(255-GetBValue(lColor),iScale,255)+GetBValue(lColor);
   return RGB(R, G, B);
 }
 
@@ -1328,8 +1328,24 @@ HB_FUNC( MIDCOLOR )
 
 HB_FUNC( LIGHTENCOLOR )
 {
-  hb_retnl( (long) _LightenColor( (COLORREF) hb_parnl(1), hb_parnl(2) ) );
+  hb_retnl( (long) _LightenColor( (COLORREF) hb_parnl(1), hb_parni(2) ) );
 }
+
+HB_FUNC( __COLORLIGHTEN )
+{
+  COLORREF cColor = (COLORREF) hb_parnl(1);
+  int iPerc  = hb_parni(2);
+  int iRed   = GetRValue( cColor );
+  int iGreen = GetGValue( cColor );
+  int iBlue  = GetBValue( cColor );
+
+  iRed   = ( 255 - iRed   ) * iPerc + iRed;
+  iGreen = ( 255 - iGreen ) * iPerc + iGreen;
+  iBlue  = ( 255 - iBlue  ) * iPerc + iBlue;
+
+  hb_retnl( (long) RGB( iRed, iGreen, iBlue ) );
+}
+
 
 HB_FUNC( DARKENCOLOR )
 {
