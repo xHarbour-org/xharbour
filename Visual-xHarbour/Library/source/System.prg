@@ -37,6 +37,8 @@ RETURN
 EXIT PROCEDURE __SystemCleanup
    oSystem:ImageList[ "StdSmall" ]:Destroy()
    DeleteObject( oSystem:FocusPen )
+   DeleteObject( oSystem:TitleBackBrush )
+   DeleteObject( oSystem:TitleBorderPen )
 RETURN
 
 FUNCTION __GetSystem(); RETURN oSystem
@@ -73,6 +75,8 @@ CLASS System
    DATA PageSetup              EXPORTED
    DATA PaperSize              EXPORTED
    DATA FocusPen               EXPORTED
+   DATA TitleBackBrush         EXPORTED
+   DATA TitleBorderPen         EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -698,7 +702,9 @@ METHOD Init() CLASS System
    ExplorerBarInfo( @cBuffer )
    ::ExplorerBar:Buffer( cBuffer )
 
-   ::FocusPen := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
+   ::FocusPen       := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
+   ::TitleBackBrush := CreateSolidBrush( RGB( 69, 89, 124 ) )
+   ::TitleBorderPen := CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
 RETURN Self
 
 METHOD GetRunningProcs() CLASS System

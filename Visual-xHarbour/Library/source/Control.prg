@@ -355,8 +355,9 @@ CLASS TitleControl INHERIT Control
    DATA __lCloseHover        PROTECTED INIT .F.
    DATA __aCloseRect         PROTECTED
    DATA __aArrowRect         PROTECTED
+   DATA __nBtnHeight         PROTECTED INIT 17
 
-   PROPERTY TitleHeight READ xTitleHeight WRITE ResetFrame DEFAULT 20
+   PROPERTY TitleHeight READ xTitleHeight WRITE ResetFrame DEFAULT 21
    PROPERTY Text        READ xText        WRITE ResetFrame DEFAULT ""
 
    METHOD Create()
@@ -412,7 +413,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
-   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, n:=0
+   LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, n:=0, nLeft, nTop
    ::CallWindowProc()
    ::Super:OnNCPaint( nwParam, nlParam )
    IF ::__nCaptionHeight > 0
@@ -437,6 +438,25 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
 
+      _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::__aArrowRect != NIL, ::__aArrowRect[3]+2, ::__aCaptionRect[1]+5 ), ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
+
+      nWidth := 0
+      IF ::AllowClose
+         nTop  := Int( ( ::__aCaptionRect[4]-::__aCaptionRect[2]-::__nBtnHeight ) / 2 ) + n
+         nLeft := Int( ( ::__aCaptionRect[3]-(::__nBtnHeight+2) ) )
+         ::__aCloseRect := { nLeft, nTop, nLeft + ::__nBtnHeight + 1, nTop + ::__nBtnHeight }
+
+         ::DrawClose( hDC, n )
+         nWidth := ::__aCloseRect[3]-::__aCloseRect[1]+1
+      ENDIF
+      IF ::AllowUnDock
+         nTop  := Int( ( ::__aCaptionRect[4]-::__aCaptionRect[2]-::__nBtnHeight ) / 2 ) + n
+         nLeft := Int( ( ::__aCaptionRect[3]-(::__nBtnHeight+2)-(::__nBtnHeight+2) ) )
+         ::__aPinRect := { nLeft, nTop, nLeft + ::__nBtnHeight + 1, nTop + ::__nBtnHeight }
+
+         ::DrawPin( hDC, n )
+      ENDIF
+
       n := IIF( ! ::IsChild, 1, 0 )
 
       IF ::MenuArrow
@@ -444,18 +464,6 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
          ::DrawArrow( hDC, ::__aArrowRect )
       ENDIF
 
-      _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::__aArrowRect != NIL, ::__aArrowRect[3]+2, ::__aCaptionRect[1]+5 ), ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )
-
-      nWidth := 0
-      IF ::AllowClose
-         ::__aCloseRect := { ::__aCaptionRect[3]-::__aCaptionRect[4]+n+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2, ::__aCaptionRect[4]-3 }
-         ::DrawClose( hDC, n )
-         nWidth := ::__aCloseRect[3]-::__aCloseRect[1]+1
-      ENDIF
-      IF ::AllowUnDock
-         ::__aPinRect := { (::__aCaptionRect[3]-::__aCaptionRect[4])+n-nWidth+1, ::__aCaptionRect[2]+n+1, ::__aCaptionRect[3]-2-nWidth, ::__aCaptionRect[4]-2 }
-         ::DrawPin( hDC, n )
-      ENDIF
       SelectObject( hDC, hOldFont )
       ReleaseDC(::hWnd, hdc)
    ENDIF

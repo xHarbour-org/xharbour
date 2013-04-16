@@ -33,6 +33,7 @@ CLASS Panel FROM TitleControl
    METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
 
    METHOD OnEraseBkGnd()
+   METHOD OnGetDlgCode()  INLINE dview("OnGetDlgCode")
 ENDCLASS
 
 METHOD OnEraseBkGnd( hDC ) CLASS Panel
