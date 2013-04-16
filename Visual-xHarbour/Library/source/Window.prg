@@ -5026,6 +5026,7 @@ CLASS WinForm INHERIT Window
    // backward compatibility
    ACCESS TopMost    INLINE ::xAlwaysOnTop
    ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
+   DATA SmallCaption           EXPORTED INIT .T.
 
    //compatibility ONLY, forms do not set "Border" property
    DATA Border                 EXPORTED INIT .F.
