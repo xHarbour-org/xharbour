@@ -4295,6 +4295,7 @@ METHOD Open( cProject ) CLASS Project
    aEditors := {}
 
    FOR EACH Xfm IN ::Properties:Files
+       oWait:Position ++
        IF ! ::LoadForm( Xfm, @aErrors, @aEditors, HB_EnumIndex()==1 )
           MessageBox( GetActiveWindow(), "The File " + Xfm + " is missing, the project will now close", "Visual xHarbour - Open Project", MB_ICONERROR )
           ::Application:Cursor := NIL

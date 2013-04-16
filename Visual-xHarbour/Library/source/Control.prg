@@ -423,7 +423,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 0, 0 ) }
 
       hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hOldBrush := SelectObject( hDC, ::System:CurrentScheme:Brush:MenuItemSelected )
+      hOldBrush := SelectObject( hDC, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
       
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
       SelectObject( hDC, hOldBrush )
@@ -763,10 +763,10 @@ METHOD DrawClose( hDC ) CLASS TitleControl
 
    hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
    IF ::__lCloseHover
-      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:MenuItemSelected )
+      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
    ENDIF
    SelectObject( hDC, hOld )
 
@@ -798,10 +798,10 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
 
    hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
    IF ::__lPinHover
-      SelectObject( hDC, IIF( !::__lPinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+      SelectObject( hDC, IIF( !::__lPinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:MenuItemSelected )
+      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
    ENDIF
    SelectObject( hDC, hOld )
    
