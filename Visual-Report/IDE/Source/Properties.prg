@@ -102,7 +102,6 @@ METHOD Init( oParent ) CLASS PropEditor
    ::ReleaseEditSelection := .F.
    DEFAULT ::__xCtrlName  TO "PropEditor"
    ::Super:Init( oParent )
-   ::SmallCaption := .F.
 RETURN Self
 //------------------------------------------------------------------------------------------
 

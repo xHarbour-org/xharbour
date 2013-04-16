@@ -514,7 +514,7 @@ METHOD Init() CLASS MainForm
       :Dock:Margins   := "2,2,2,2"
 
       :FullRowSelect    := .T.
-      :FlatBorder       := .T.
+      :Border           := .T.
 
       :NoHScroll        := .T.
       :HasButtons       := .T.
@@ -542,7 +542,7 @@ METHOD Init() CLASS MainForm
       :Dock:Margins   := "2,2,2,2"
 
       :FullRowSelect  := .T.
-      :FlatBorder     := .T.
+      :Border         := .T.
 
       :NoHScroll      := .T.
       :HasButtons     := .T.
@@ -569,8 +569,8 @@ METHOD Init() CLASS MainForm
       :Top            := 300
       :Height         := 50
       :StaticEdge     := .F.
-      :FlatCaption    := .T.
-      :FlatBorder     := .T.
+      //:FlatCaption    := .T.
+      :Border         := .T.
       :GenerateMember := .F.
       :Dock:Margins   := "0,2,0,2"
       :BackColor        := ::System:CurrentScheme:ToolStripGradientBegin

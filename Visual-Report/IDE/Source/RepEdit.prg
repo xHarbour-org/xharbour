@@ -17,7 +17,7 @@ CLASS RepEdit INHERIT Panel
    CLASSDATA aCursor EXPORTED
    DATA Objects      EXPORTED INIT {}
    DATA FlatCaption  EXPORTED INIT .T.
-   DATA FlatBorder   EXPORTED INIT .T.
+   //DATA FlatBorder   EXPORTED INIT .T.
    DATA xGrid        EXPORTED INIT 8
    DATA yGrid        EXPORTED INIT 8
    DATA hBmpGrid     EXPORTED 
