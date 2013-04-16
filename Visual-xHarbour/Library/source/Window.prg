@@ -5026,7 +5026,6 @@ CLASS WinForm INHERIT Window
    // backward compatibility
    ACCESS TopMost    INLINE ::xAlwaysOnTop
    ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
-   DATA SmallCaption           EXPORTED INIT .T.
 
    //compatibility ONLY, forms do not set "Border" property
    DATA Border                 EXPORTED INIT .F.
@@ -5875,28 +5874,8 @@ FUNCTION GetDesktopRect()
    aDesktopRect[4] := aDesktopRect[2] + GetSystemMetrics( SM_CYVIRTUALSCREEN )
 RETURN aDesktopRect
 
-/*
-FUNCTION __ChkComponent( oObj, ocCompo )
-   IF VALTYPE( ocCompo ) == "C" 
-      IF oObj:Form != NIL .AND. oObj:Form:Property != NIL .AND. ASCAN( oObj:Form:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) > 0
-         ocCompo := oObj:Form:Property[ ocCompo ]
-       ELSE
-         IF oObj:__ClassInst != NIL
-            IF oObj:Application:Project:Forms[1]:Property != NIL .AND. ASCAN( oObj:Application:Project:Forms[1]:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) > 0
-               ocCompo := oObj:Application:Project:Forms[1]:Property[ ocCompo ]
-            ENDIF
-          ELSE
-            IF oObj:Application:MainForm:Property != NIL .AND. ASCAN( oObj:Application:MainForm:Property:Keys, {|c| UPPER(c) == UPPER( ocCompo ) } ) > 0
-              ocCompo := oObj:Application:MainForm:Property[ ocCompo ]
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-RETURN ocCompo
-*/
-
 FUNCTION __ChkComponent( oObj, cComp )
-   LOCAL oForm//, cType, n
+   LOCAL oForm
    IF VALTYPE( cComp ) == "C" 
       oForm := oObj:Form
       IF oForm:Property != NIL 
@@ -5907,14 +5886,10 @@ FUNCTION __ChkComponent( oObj, cComp )
                oForm := oObj:Application:Project:Forms[1]
             ENDIF
             IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) > 0
-               cComp       := oForm:Property[ cComp ]
-               //cType       := cComp:ComponentType
-               //oObj:&cType := cComp
+               cComp := oForm:Property[ cComp ]
             ENDIF
           ELSE
-            cComp       := oForm:Property[ cComp ]
-            //cType       := cComp:ComponentType
-            //oObj:&cType := cComp
+            cComp := oForm:Property[ cComp ]
          ENDIF
       ENDIF
    ENDIF

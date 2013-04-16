@@ -58,6 +58,8 @@ CLASS Control INHERIT Window
    DATA OnWMUnDock        EXPORTED
    DATA OnWMReDock        EXPORTED
 
+   DATA SmallCaption      EXPORTED INIT .T.
+
    DATA __hParBrush       PROTECTED
    DATA BackInfo          PROTECTED
    DATA Center            PROTECTED INIT .F.
