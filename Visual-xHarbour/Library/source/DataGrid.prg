@@ -115,6 +115,8 @@ CLASS DataGrid INHERIT TitleControl
    DATA HoverForeColor          EXPORTED
    DATA HoverBorderColor        EXPORTED
 
+   DATA SmallCaption            EXPORTED INIT .T.
+
    ACCESS RowCount              INLINE LEN( ::__DisplayArray )
    ACCESS ColCount              INLINE LEN( ::Children )
    ACCESS HorzScrollPos         INLINE ABS( ::__HorzScrolled )
