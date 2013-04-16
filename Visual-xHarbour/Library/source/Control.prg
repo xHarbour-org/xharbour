@@ -353,9 +353,13 @@ CLASS TitleControl INHERIT Control
    DATA __lCloseHover        PROTECTED INIT .F.
    DATA __aCloseRect         PROTECTED
    DATA __aArrowRect         PROTECTED
+   DATA __hBkBrush           PROTECTED INIT CreateSolidBrush( RGB( 69, 89, 124 ) )
+   DATA __hBkPen             PROTECTED INIT CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
 
    PROPERTY TitleHeight READ xTitleHeight WRITE ResetFrame DEFAULT 20
    PROPERTY Text        READ xText        WRITE ResetFrame DEFAULT ""
+
+   DATA SmallCaption         EXPORTED INIT .T.
 
    METHOD Create()
    METHOD OnNCCalcSize()
@@ -368,7 +372,7 @@ CLASS TitleControl INHERIT Control
    METHOD Redock()
    METHOD DrawClose()
    METHOD DrawPin()
-
+   METHOD OnDestroy()  INLINE Super:OnDestroy(), DeleteObject( ::__hBkBrush ), DeleteObject( ::__hBkPen )
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
                               ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),;
                               ::UpdateWindow()
@@ -400,7 +404,9 @@ METHOD OnNCMouseLeave() CLASS TitleControl
    ::Super:OnNCMouseLeave()
    IF ::__nCaptionHeight > 0 .AND. ::AllowClose
       ::__lCloseHover  := .F.
+      ::__lClosePushed := .F.
       ::__lPinHover    := .F.
+      ::__lPinPushed   := .F.
       ::Redraw()
       RETURN 0
    ENDIF
@@ -422,14 +428,14 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ENDIF
       ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 0, 0 ) }
 
-      hOldPen   := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuBorder )
-      hOldBrush := SelectObject( hDC, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
+      hOldPen   := SelectObject( hDC, ::__hBkPen )
+      hOldBrush := SelectObject( hDC, ::__hBkBrush )
       
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
       SelectObject( hDC, hOldBrush )
       SelectObject( hDC, hOldPen )
       
-      SetTextColor( hDC, GetSysColor( COLOR_CAPTIONTEXT ) )
+      SetTextColor( hDC, ::System:Color:White )
 
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
@@ -761,15 +767,15 @@ METHOD DrawClose( hDC ) CLASS TitleControl
    LOCAL hOld
    LOCAL aRect  := ::__aCloseRect
 
-   hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
+   hOld := SelectObject( hDC, ::__hBkPen )
    IF ::__lCloseHover
-      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin ) )
+      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
+      _FillRect( hDC, aRect, ::__hBkBrush )
+      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
    ENDIF
-   SelectObject( hDC, hOld )
-
+   
    aRect[1]+=4
    aRect[2]+=4
    aRect[3]-=4
@@ -789,6 +795,7 @@ METHOD DrawClose( hDC ) CLASS TitleControl
    aRect[2]-=4
    aRect[3]+=4
    aRect[4]+=4
+   SelectObject( hDC, hOld )
 
 RETURN Self
 
@@ -796,15 +803,16 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
    LOCAL hOld, nLeft, nRight, nBottom
    LOCAL aRect  := ::__aPinRect
 
-   hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
+   hOld := SelectObject( hDC, ::__hBkPen )
    IF ::__lPinHover
-      SelectObject( hDC, IIF( !::__lPinPushed, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin ) )
+      SelectObject( hDC, IIF( ! ::__lPinPushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin )
+      SelectObject( hDC, ::__hBkBrush )
+      _FillRect( hDC, aRect, ::__hBkBrush )
+      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
    ENDIF
-   SelectObject( hDC, hOld )
-   
+
    aRect[1] += 4
    aRect[2] += (3-n)
    aRect[3] -= 4
@@ -827,5 +835,6 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
    aRect[2]-=(3-n)
    aRect[3]+=4
    aRect[4]+=4
+   SelectObject( hDC, hOld )
 
 RETURN Self
