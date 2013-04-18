@@ -295,7 +295,7 @@ METHOD OnTimer( nId ) CLASS SourceEditor
 RETURN 0
 
 METHOD CheckChanges() CLASS SourceEditor
-   IF ::Source != NIL .AND. ::Source:FileTime != FileTime( ::Source:File )
+   IF ::Source != NIL .AND. ! EMPTY( ::Source:FileTime ) .AND. ::Source:FileTime != FileTime( ::Source:File )
       IF ::MessageBox( "Another application has updated file " + ::Source:File + ". Reload it?", "Visual xHarbour", MB_YESNO | MB_ICONQUESTION ) == IDYES
          ::Source:Reload()
       ENDIF
