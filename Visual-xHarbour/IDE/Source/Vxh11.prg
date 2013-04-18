@@ -110,7 +110,6 @@ CLASS SourceEditor INHERIT Control
    METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()
    METHOD OnParentNotify()
-   METHOD OnSetFocus()                    INLINE ::SendMessage( SCI_SETFOCUS, 1, 0 )
 
    METHOD Colorise( nStart, nEnd )        INLINE ::SendMessage( SCI_COLOURISE, nStart, nEnd )
 
@@ -127,8 +126,8 @@ CLASS SourceEditor INHERIT Control
 
    METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
    METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
-   METHOD OnTimer()                       INLINE ::CallWindowProc(), 0
-
+   METHOD OnTimer()
+   METHOD CheckChanges()
    METHOD InvertCase()
    METHOD UpperCase()
    METHOD LowerCase()
@@ -149,7 +148,7 @@ CLASS SourceEditor INHERIT Control
    METHOD ToggleRectSel()
    METHOD GetWithObject()
    METHOD SetColors()
-   METHOD OnSetFocus()                    INLINE ::Application:MainForm:EnableSearchMenu( .T. ), NIL
+   METHOD OnSetFocus()                    INLINE ::Application:MainForm:EnableSearchMenu( .T. ), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
 ENDCLASS
 
 METHOD GetEditor( cFile ) CLASS SourceEditor
@@ -284,7 +283,23 @@ METHOD Create() CLASS SourceEditor
          :Create()
       END
    END
+RETURN Self
 
+METHOD OnTimer( nId ) CLASS SourceEditor
+   ::CallWindowProc()
+   IF nId == 1001
+      ::KillTimer( nId )
+      ::CheckChanges()
+      ::SetTimer( nId, 2000 )
+   ENDIF
+RETURN 0
+
+METHOD CheckChanges() CLASS SourceEditor
+   IF ::Source != NIL .AND. ::Source:FileTime != FileTime( ::Source:File )
+      IF ::MessageBox( "Another application has updated file " + ::Source:File + ". Reload it?", "Visual xHarbour", MB_YESNO | MB_ICONQUESTION ) == IDYES
+         ::Source:Reload()
+      ENDIF
+   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -520,6 +535,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
+      view "xxx"
            scn := (struct SCNOTIFICATION*) nlParam
            n := ::Source:GetCurrentPos()
            ::Application:SetEditorPos( ::Source:LineFromPosition(n)+1, ::Source:GetColumn(n)+1 )
@@ -895,6 +911,7 @@ CLASS Source
    DATA Owner     EXPORTED
    DATA Path      EXPORTED
    DATA FileName  EXPORTED
+   DATA FileTime  EXPORTED
    DATA File      EXPORTED INIT ""
    DATA Modified  EXPORTED INIT .F.
    DATA FirstOpen EXPORTED INIT .T.
@@ -924,6 +941,7 @@ CLASS Source
    METHOD Init( oOwner, cFile ) CONSTRUCTOR
    METHOD SendEditor()
    METHOD Open()
+   METHOD Reload()
    METHOD Close()
    METHOD Save()
    METHOD GetText()
@@ -1084,6 +1102,25 @@ METHOD Close() CLASS Source
 RETURN .F.
 
 //------------------------------------------------------------------------------------------------------------------------------------
+METHOD Reload() CLASS Source
+   LOCAL nPos, nVisLine
+   nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+   nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   ::FirstOpen := .T.
+   ::SetText( MemoRead( ::File, .F. ) )
+   ::FileTime := FileTime( ::File )
+   ::EmptyUndoBuffer()
+   ::Modified  := .F.
+   ::FirstOpen := .F.
+   ::GotoPosition( nPos )
+
+   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+
+   ::SetSavePoint()
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------------------------------------
 METHOD Open( cFile, cBookmarks ) CLASS Source
    LOCAL n, aBookmarks
    ::SetText( MemoRead( cFile, .F. ) )
@@ -1103,6 +1140,7 @@ METHOD Open( cFile, cBookmarks ) CLASS Source
    ::FileName := SUBSTR( cFile, n+1 )
    ::Path     := SUBSTR( cFile, 1, n-1 )
    ::File     := cFile
+   ::FileTime := FileTime( cFile )
    ::SetSavePoint()
 RETURN Self
 
@@ -1154,6 +1192,7 @@ METHOD Save( cFile ) CLASS Source
          cText := ::GetText()
          fWrite( hFile, cText, Len(cText) )
          fClose( hFile )
+         ::FileTime := FileTime( ::File )
          ::Modified := .F.
       ENDIF
       ::Owner:SelectDocument( pPrev )

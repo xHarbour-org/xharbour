@@ -2131,6 +2131,11 @@ METHOD Init() CLASS IDE_MainForm
                            ::Application:FileTree:Parent:Select()
                         ENDIF
                         ::EnableSearchMenu( y == 3 )
+                        IF y == 3
+                           ::Application:SourceEditor:SetTimer( 1001, 2000 )
+                         ELSEIF x == 3
+                           ::Application:SourceEditor:KillTimer( 1001 )
+                        ENDIF
                        >
       :Create()
 
