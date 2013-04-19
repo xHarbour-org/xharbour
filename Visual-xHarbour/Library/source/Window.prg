@@ -5025,6 +5025,8 @@ CLASS WinForm INHERIT Window
 
    // backward compatibility
    DATA HighLightCaption   EXPORTED  INIT .F.
+   DATA _HighLightCaption   EXPORTED  INIT .F.
+
    ACCESS TopMost    INLINE ::xAlwaysOnTop
    ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
 
