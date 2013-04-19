@@ -5024,6 +5024,7 @@ CLASS WinForm INHERIT Window
    PROPERTY ImageList     GET __ChkComponent( Self, ::xImageList )    SET SetImageList                PROTECTED
 
    // backward compatibility
+   DATA HighLightCaption   EXPORTED  INIT .F.
    ACCESS TopMost    INLINE ::xAlwaysOnTop
    ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
 

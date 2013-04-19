@@ -213,7 +213,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
 
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "ALLOWMAXIMIZE" }
       ::Events := ;
              { ;
                {"Object",      {;

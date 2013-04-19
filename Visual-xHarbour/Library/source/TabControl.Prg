@@ -1503,7 +1503,7 @@ CLASS TabStrip INHERIT TabControl
    PROPERTY ColorScheme  READ xColorScheme WRITE __SetColorScheme DEFAULT 1
    DATA EnumColorScheme  EXPORTED INIT { { "System Default", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7} }
       
-   DATA Border, AllowMaximize, HighlightCaption, Theming, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
+   DATA Border, AllowMaximize, Theming, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19

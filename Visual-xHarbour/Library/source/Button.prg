@@ -88,7 +88,7 @@ METHOD Init( oParent ) CLASS Button
    ::ThemeName := "button"
    ::OpenThemeData()
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
    ::ShortCutKey   := __MenuStripItemShortCut( Self )
 RETURN Self

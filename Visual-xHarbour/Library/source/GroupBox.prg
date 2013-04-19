@@ -80,7 +80,7 @@ METHOD Init( oParent ) CLASS GroupBox
    ::ThemeName     := "button"
    ::OpenThemeData()
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE", "ALLOWCLOSE", "ALLOWUNDOCK" }
+      ::__PropFilter := { "ALLOWMAXIMIZE", "ALLOWCLOSE", "ALLOWUNDOCK" }
    ENDIF
 RETURN Self
 

@@ -89,7 +89,7 @@ METHOD Init( oParent ) CLASS CheckBox
    ::Height := 15
    ::OpenThemeData()
    IF ::__ClassInst != NIL
-      ::__PropFilter := { "HIGHLIGHTCAPTION", "ALLOWMAXIMIZE" }
+      ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
 RETURN Self
 

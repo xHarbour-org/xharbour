@@ -59,7 +59,6 @@ CLASS ToolStripContainer INHERIT Control
    DATA TabStop          EXPORTED
    DATA Transparent      EXPORTED INIT .F.
    DATA Visible          EXPORTED INIT .T.
-   DATA HighLightCaption EXPORTED INIT .F.
    DATA __aStrips        EXPORTED INIT {}
    
    DATA __aVertex        PROTECTED
@@ -358,7 +357,6 @@ CLASS ToolStrip INHERIT Control
    DATA TabStop        EXPORTED
    DATA Transparent    EXPORTED INIT .F.
    DATA Visible        EXPORTED INIT .T.
-   DATA HighLightCaption EXPORTED INIT .F.
    
    DATA __lIsMenu      EXPORTED INIT .F.
    DATA __nLeft        EXPORTED
@@ -1435,7 +1433,6 @@ CLASS ToolStripItem INHERIT Control
    DATA TabStop            EXPORTED
    DATA Transparent        EXPORTED  INIT .F.
    DATA Visible            EXPORTED  INIT .T.
-   DATA HighLightCaption   EXPORTED  INIT .F.
 
    // PRIVATE METHODS - DO NOT PUBLISH
    METHOD Init() CONSTRUCTOR
