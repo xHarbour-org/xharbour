@@ -451,7 +451,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ENDIF
       IF ::AllowUnDock
          nTop  := Int( ( ::__aCaptionRect[4]-::__aCaptionRect[2]-::__nBtnHeight ) / 2 ) + n
-         nLeft := Int( ( ::__aCaptionRect[3]-(::__nBtnHeight+2)-(::__nBtnHeight+2) ) )
+         nLeft := Int( ( ::__aCaptionRect[3]-(::__nBtnHeight+2)-IIF( ::AllowClose, (::__nBtnHeight+2), 0) ) )
          ::__aPinRect := { nLeft, nTop, nLeft + ::__nBtnHeight + 1, nTop + ::__nBtnHeight }
 
          ::DrawPin( hDC, n )
