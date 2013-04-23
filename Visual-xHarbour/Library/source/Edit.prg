@@ -547,9 +547,6 @@ METHOD OnCtlColorStatic( nwParam ) CLASS EditBox
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
-      IF ::ReadOnly
-         SetBkMode( nwParam, TRANSPARENT )
-      ENDIF
       RETURN hBkGnd
     ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
       SetBkMode( nwParam, TRANSPARENT )

@@ -53,6 +53,7 @@ CLASS CheckBox INHERIT Control
    PROPERTY CheckStyle                 READ xCheckStyle WRITE SetCheckStyle PROTECTED DEFAULT 1
    PROPERTY State                      READ xState      WRITE SetState      PROTECTED DEFAULT BST_UNCHECKED
    PROPERTY Border     INDEX WS_BORDER READ xBorder     WRITE SetStyle      PROTECTED DEFAULT .F. 
+   PROPERTY AutoSize                   READ xAutoSize   WRITE __SetSize     PROTECTED DEFAULT .F.
 
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.
@@ -62,10 +63,9 @@ CLASS CheckBox INHERIT Control
 
    METHOD Init()           CONSTRUCTOR
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), ::Super:Create(), ::SetState( ::xState )
+   METHOD Create()
 
    METHOD OnDestroy()          INLINE ::CloseThemeData(), Super:OnDestroy()
-
    METHOD DrawFrame()
    METHOD SetCheckStyle()
    METHOD OnCtlColorStatic()
@@ -77,6 +77,8 @@ CLASS CheckBox INHERIT Control
    METHOD Check()         INLINE ::State := BST_CHECKED
    METHOD UnCheck()       INLINE ::State := BST_UNCHECKED
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
+
+   METHOD __SetSize()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CheckBox
@@ -91,6 +93,31 @@ METHOD Init( oParent ) CLASS CheckBox
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
+RETURN Self
+
+METHOD __SetSize() CLASS CheckBox
+   LOCAL aSize
+   IF ::AutoSize
+      aSize := ::Drawing:GetTextExtentPoint32( ::Text )
+      ::xWidth := aSize[1]+18
+      ::MoveWindow()
+      ::Redraw()
+   ENDIF
+RETURN Self
+
+METHOD Create() CLASS CheckBox
+   LOCAL aSize
+   IF ::Transparent
+      ::Parent:__RegisterTransparentControl( Self )
+   ENDIF
+   ::Super:Create()
+   IF ::AutoSize
+      aSize := ::Drawing:GetTextExtentPoint32( ::Text )
+      ::xWidth := aSize[1]+18
+      ::MoveWindow()
+      ::Redraw()
+   ENDIF
+   ::SetState( ::xState )
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
@@ -159,7 +186,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    ENDIF
                    cd:rc:left += 16
 
-                   DrawText( cd:hDC, ::Caption, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+                   DrawText( cd:hDC, ::Text, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
                    IF nColor != NIL
                       SetTextColor( cd:hDC, nColor )
                    ENDIF
@@ -169,7 +196,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                       SetTextColor( cd:hdc, RGB(255,255,255))
 
                       sz := (struct SIZE)
-                      GetTextExtentPoint32( cd:hDC, ::Caption, @sz )
+                      GetTextExtentPoint32( cd:hDC, ::Text, @sz )
 
                       cd:rc:left -= 2
                       cd:rc:right  := sz:cx + cd:rc:left + 4

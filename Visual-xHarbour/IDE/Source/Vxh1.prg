@@ -2087,14 +2087,16 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:DebuggerPanel := Panel( Self )
       :Width          := 680
       :Height         := 200
-      :StaticEdge     := .T.
+      :Text           := "Debugger"
+      :Border         := .T.
       :Dock:Left      := ::Application:ToolBox
       :Dock:Bottom    := ::Application:DebugWindow //::TabControl1
+      :Dock:BottomMargin := 3
       :Dock:Right     := ::Panel1
-      :AllowClose     := .T.
-      :AllowUndock    := .T.
+      //:AllowClose     := .T.
+      //:AllowUndock    := .T.
       //:OnWMSysCommand := {|o,n| If( n == SC_CLOSE, ( o:Hide(), 0 ), ) }
-      //:BackColor      := ::System:CurrentScheme:ToolStripPanelGradientEnd
+      :BackColor      := ::System:CurrentScheme:ToolStripPanelGradientEnd
       :OnWMClose      := {|o| o:Hide() }
       :Visible        := .F.
       :Create()

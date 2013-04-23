@@ -535,7 +535,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == SCN_UPDATEUI
-      view "xxx"
            scn := (struct SCNOTIFICATION*) nlParam
            n := ::Source:GetCurrentPos()
            ::Application:SetEditorPos( ::Source:LineFromPosition(n)+1, ::Source:GetColumn(n)+1 )
@@ -927,13 +926,13 @@ CLASS Source
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
-   ACCESS nLine             INLINE ::GetCurLine()
+   ACCESS nLine             INLINE ::GetCurLine()+1
    ACCESS lReadOnly         INLINE ::GetReadOnly()
    ASSIGN lReadOnly(lSet)   INLINE ::SetReadOnly(lSet)
    DATA HighlightedLine     EXPORTED
    DATA oDisplay            EXPORTED INIT EditorDisplay()
    METHOD Load(cFile,cText) INLINE IIF( ! EMPTY(cFile), ::Open(cFile), ::SetText(cText) )
-   METHOD GoLine(n)         INLINE ::GoToLine(n)
+   METHOD GoLine(n)         INLINE ::GoToLine(n-1)
    METHOD Highlight()       INLINE ::HighlightedLine := ::GetCurLine()
    METHOD SetDisplay()      INLINE ::Select()
    // --------------------------------------------------------------------------------------
