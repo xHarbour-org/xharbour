@@ -329,7 +329,7 @@ CLASS Application
    DATA TreeItem                       EXPORTED
    DATA oCurMenu                       EXPORTED
    DATA Components                     EXPORTED  INIT {}
-   DATA Property                       EXPORTED
+   DATA __hObjects                     EXPORTED
    DATA Children                       EXPORTED  INIT {}
    DATA UserVariables                  EXPORTED
    DATA Modal                          EXPORTED  INIT .F.
@@ -430,9 +430,9 @@ METHOD OnError( ... ) CLASS Application
    LOCAL cMsg, uRet, aParams := HB_AParams()
    cMsg := __GetMessage()
    
-   IF PCount() == 0 .AND. ::Property != NIL
-      IF hGetPos( ::Property, cMsg ) > 0
-         uRet := ::Property[ cMsg ]
+   IF PCount() == 0 .AND. ::__hObjects != NIL
+      IF hGetPos( ::__hObjects, cMsg ) > 0
+         uRet := ::__hObjects[ cMsg ]
        ELSE
          uRet := ::__InvalidMember( cMsg )
       ENDIF
@@ -465,8 +465,8 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
    ::DllInstance := __hDllInstance
    ::Params      := __aParams
 
-   ::Property    := Hash()
-   HSetCaseMatch( ::Property, .F. )
+   ::__hObjects    := Hash()
+   HSetCaseMatch( ::__hObjects, .F. )
 
    ::__InstMsg := RegisterWindowMessage( GetModuleFileName(::DllInstance) )
 
@@ -513,17 +513,17 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetAsProperty( cName, oObj ) CLASS Application
    LOCAL n
-   IF ::Property == NIL .OR. ! ::GenerateMembers
+   IF ::__hObjects == NIL .OR. ! ::GenerateMembers
       RETURN Self
    ENDIF
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName )
       cName := oObj:xName
    ENDIF
    IF !( oObj == Self ) 
-      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::Property, oObj:xName ) ) > 0
-         HDelAt( ::Property, n )
+      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
+         HDelAt( ::__hObjects, n )
       ENDIF
-      ::Property[ cName ] := oObj
+      ::__hObjects[ cName ] := oObj
    ENDIF
    oObj:xName := cName
 RETURN Self

@@ -341,7 +341,7 @@ METHOD Delete() CLASS CMenuItem
       aDel( ::Parent:Children, n, .T. )
    ENDIF
    IF ::Name != NIL .AND. ::GenerateMember
-      HDel( ::Form:Property, ::Name )
+      HDel( ::Form:__hObjects, ::Name )
    ENDIF
    IF ::MenuItemInfo:dwItemData != NIL
       ReleaseArrayPointer( ::MenuItemInfo:dwItemData )

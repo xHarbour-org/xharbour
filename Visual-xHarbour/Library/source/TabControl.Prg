@@ -938,7 +938,7 @@ METHOD Init( oParent, acResource ) CLASS TabPage
    DEFAULT ::__xCtrlName TO "TabPage"
    
    ::Super:Init( oParent, acResource )
-   ::Property      := NIL
+   ::__hObjects    := NIL
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle       := WS_EX_CONTROLPARENT
    ::ClsName       := "TabPage"

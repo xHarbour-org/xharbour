@@ -95,7 +95,7 @@ METHOD Destroy() CLASS Component
    LOCAL n, cCtrl, oObj, cType := ::ComponentType
    IF ::Name != NIL
       TRY
-         HDel( ::Form:Property, ::xName )
+         HDel( ::Form:__hObjects, ::xName )
       CATCH
       END
 
@@ -104,9 +104,9 @@ METHOD Destroy() CLASS Component
       ENDIF
       IF ::__ClassInst != NIL
          // Clear referenced property
-         FOR EACH cCtrl IN ::Form:Property:Keys
+         FOR EACH cCtrl IN ::Form:__hObjects:Keys
              TRY
-                oObj := ::Form:Property[ cCtrl ]
+                oObj := ::Form:__hObjects[ cCtrl ]
                 IF VALTYPE( oObj ) == "O" 
                    IF __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "O" .AND. oObj:&cType == Self
                       __objSendMsg( oObj, "_" + cType, NIL )
@@ -135,8 +135,8 @@ METHOD RenameComponents( oForm, cName, cOldName )
       IF __ObjHasMsg( oForm, cType ) .AND. VALTYPE( oForm:&cType ) == "C" .AND. oForm:&cType == cOldName
          __objSendMsg( oForm, "_" + cType, cName )
       ENDIF
-      FOR EACH cCtrl IN oForm:Property:Keys
-          oObj := oForm:Property[ cCtrl ]
+      FOR EACH cCtrl IN oForm:__hObjects:Keys
+          oObj := oForm:__hObjects[ cCtrl ]
           IF __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "C" .AND. oObj:&cType == cOldName
              __objSendMsg( oObj, "_" + cType, cName )
           ENDIF

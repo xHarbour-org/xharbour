@@ -663,10 +663,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         AADD( aList, __Proper( aMethods[n] )+"?7" )
                     NEXT
 
-                    IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:Property != NIL
-                       FOR EACH cCtrl IN oObj:Property:Keys
-                           IF oObj:Property[ cCtrl ]:Name != NIL
-                              AADD( aList, oObj:Property[ cCtrl ]:Name+"?8" )
+                    IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:__hObjects != NIL
+                       FOR EACH cCtrl IN oObj:__hObjects:Keys
+                           IF oObj:__hObjects[ cCtrl ]:Name != NIL
+                              AADD( aList, oObj:__hObjects[ cCtrl ]:Name+"?8" )
                            ENDIF
                        NEXT
                     ENDIF

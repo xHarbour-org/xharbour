@@ -564,8 +564,8 @@ METHOD Destroy() CLASS ListViewGroup
    LOCAL n
    ADEL( ::Parent:Children, ::Id+1, .T. )
    ::Parent:SendMessage( LVM_REMOVEGROUP, ::Id, NIL )
-   IF ( n := hScan( ::Form:Property, Self ) ) > 0
-      HDelAt( ::Form:Property, n, .T. )
+   IF ( n := hScan( ::Form:__hObjects, Self ) ) > 0
+      HDelAt( ::Form:__hObjects, n, .T. )
    ENDIF
 RETURN NIL
 

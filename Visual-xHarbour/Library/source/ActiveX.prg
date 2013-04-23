@@ -105,14 +105,15 @@ RETURN
 
 CLASS ActiveX INHERIT ToleAuto, TitleControl
 
+   DATA ProgID        PUBLISHED
+   DATA ClsID         PUBLISHED
+   DATA OleVerb       PUBLISHED INIT __GetSystem():OleVerb:Show
+
    DATA BackColor     EXPORTED
    DATA ForeColor     EXPORTED
    DATA Font          EXPORTED
    DATA ToolTip       EXPORTED
    DATA Cursor        EXPORTED
-   DATA ProgID        PUBLISHED
-   DATA ClsID         PUBLISHED
-   DATA OleVerb       PUBLISHED INIT __GetSystem():OleVerb:Show
    DATA hEventHandler PROTECTED
    DATA __IUnknown    EXPORTED
    DATA oTypeLib      EXPORTED
@@ -129,8 +130,6 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren  WRITE SetStyle   DEFAULT .T.
    PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings  WRITE SetStyle   DEFAULT .T.
 
-   DATA AllowUnDock       INIT FALSE
-   DATA AllowClose        INIT FALSE
    DATA xCaption               EXPORTED  INIT ""
    ACCESS Caption              INLINE    ::xCaption
    ASSIGN Caption(c)           INLINE    ::xCaption := c
@@ -145,19 +144,21 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD __OpExactEqual()
-   METHOD OnDestroy()
-   METHOD __GetEventList()
    METHOD ShowPropertiesDialog()
    METHOD SetStyle()
    METHOD Configure()
-   METHOD __GetObjProp()
    METHOD AxSet( cName, xValue ) INLINE __AxSetProperty( ::hObj, cName, xValue )
    METHOD AxGet( cName )         INLINE __AxGetProperty( ::hObj, cName )
    METHOD Translate( pMsg )      INLINE __AxTranslateMessage( ::__IUnknown, pMsg:Value )
    METHOD Destroy()
-   METHOD OnGetDlgCode()
    METHOD IsRegistered()
+
+   METHOD __OpExactEqual()
+   METHOD __GetEventList()
+   METHOD __GetObjProp()
+
+   METHOD OnDestroy()
+   METHOD OnGetDlgCode()
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -174,8 +175,8 @@ METHOD Init( oParent ) CLASS ActiveX
    ::Anchor       := __AnchorSet( Self )
    ::EventHandler := {=>}
    ::Constants    := {=>}
-   DEFAULT ::xWidth  TO 32
-   DEFAULT ::xHeight TO 32
+   DEFAULT ::xWidth  TO 200
+   DEFAULT ::xHeight TO 200
 
 RETURN Self
 
@@ -189,11 +190,6 @@ METHOD Create() CLASS ActiveX
    LOCAL nStatus, cId, oServer, cHandle, cEvent, hEventHandler := {=>}
 
    DEFAULT ::ClsID TO ::ProgID
-
-   //IF !::IsRegistered()
-   //   ::Form:MessageBox( 'Object "' + ::ProgID + '" is not registered or one of its components failed to load', "COM Error", MB_ICONEXCLAMATION )
-   //   RETURN Self
-   //ENDIF
 
    TRY
       DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
@@ -218,6 +214,7 @@ METHOD Create() CLASS ActiveX
 
    ::TitleControl:Init( ::Parent )
    ExecuteEvent( "OnInit", Self )
+   ::__IsStandard := .F.
 
    ::Caption    := ::ClsID
    ::TitleControl:Create()

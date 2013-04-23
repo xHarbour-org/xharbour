@@ -351,7 +351,7 @@ METHOD Destroy() CLASS StatusBarPanel
    ::Parent:SendMessage( SB_SIMPLE, LEN( ::Parent:Children ) == 0, 0 )
    ::Parent:Caption := ::Parent:xCaption
    TRY
-      HDel( ::Form:Property, ::xName )
+      HDel( ::Form:__hObjects, ::xName )
    CATCH
    END
 RETURN Self

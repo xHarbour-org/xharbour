@@ -1850,9 +1850,9 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
       nId := nwParam
    ENDIF
    IF nId == IDOK
-      IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-         nId := HGetValueAt( ::Form:Property, n ):Id
-         nlParam := HGetValueAt( ::Form:Property, n ):hWnd
+      IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+         nId := HGetValueAt( ::Form:__hObjects, n ):Id
+         nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd
       ENDIF
    ENDIF
 
@@ -2389,9 +2389,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  nId := nwParam
               ENDIF
               IF nId == IDOK
-                 IF ( n := HSCAN( ::Form:Property, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-                    nId := HGetValueAt( ::Form:Property, n ):Id
-                    nlParam := HGetValueAt( ::Form:Property, n ):hWnd
+                 IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+                    nId := HGetValueAt( ::Form:__hObjects, n ):Id
+                    nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd
                  ENDIF
               ENDIF
 
@@ -3406,13 +3406,13 @@ METHOD __WindowDestroy() CLASS Window
    ENDIF
    IF ::Form != NIL .AND. ::Name != NIL
       TRY
-         HDel( ::Form:Property, ::xName )
+         HDel( ::Form:__hObjects, ::xName )
       CATCH
       END
    ENDIF
    IF ::Form:hWnd == ::hWnd
       TRY
-         HDel( ::Application:Property, ::xName )
+         HDel( ::Application:__hObjects, ::xName )
       CATCH
       END
    ENDIF
@@ -3458,7 +3458,7 @@ METHOD __WindowDestroy() CLASS Window
    ENDIF
 
    ::__ClassInst := NIL
-   ::Property := NIL
+   ::__hObjects := NIL
    ::Children := NIL
    IF UPPER( ::ClassName ) IN { "WINFORM", "TABPAGE", "WINDOWEDIT" } .AND. ::BackgroundImage != NIL
       ::BackgroundImage:Destroy()
@@ -3780,22 +3780,22 @@ RETURN Self
 
 METHOD __FixDocking() CLASS Window
    LOCAL oObj, cObj
-   IF ::Property != NIL
-      FOR EACH cObj IN ::Property:Keys
-          oObj := ::Property[ cObj ]
+   IF ::__hObjects != NIL
+      FOR EACH cObj IN ::__hObjects:Keys
+          oObj := ::__hObjects[ cObj ]
           IF oObj:HasMessage( "Dock" ) .AND. oObj:Dock != NIL
              IF VALTYPE( oObj:Dock:Left ) == "C"
-                oObj:Dock:Left   := IIF( oObj:Dock:Left == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Left ] )
+                oObj:Dock:Left   := IIF( oObj:Dock:Left == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Left ] )
              ENDIF
              IF VALTYPE( oObj:Dock:Top ) == "C"
-                oObj:Dock:Top    := IIF( oObj:Dock:Top == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Top ] )
+                oObj:Dock:Top    := IIF( oObj:Dock:Top == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Top ] )
              ENDIF
              IF VALTYPE( oObj:Dock:Right ) == "C"
-                oObj:Dock:Right  := IIF( oObj:Dock:Right == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Right ] )
+                oObj:Dock:Right  := IIF( oObj:Dock:Right == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Right ] )
              ENDIF
              IF VALTYPE( oObj:Dock:Bottom ) == "C"
                 TRY
-                  oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::Property[ oObj:Dock:Bottom ] )
+                  oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Bottom ] )
                 CATCH
                 END
              ENDIF
@@ -5030,7 +5030,7 @@ CLASS WinForm INHERIT Window
 
    //compatibility ONLY, forms do not set "Border" property
    DATA Border                 EXPORTED INIT .F.
-   DATA Property               EXPORTED
+   DATA __hObjects             EXPORTED
    DATA xMDIChild              EXPORTED INIT .F.
    ACCESS MDIChild             INLINE IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild ) PERSISTENT
    ASSIGN MDIChild(l)          INLINE IIF( ::__ClassInst != NIL .AND. l .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := l, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, l ), )
@@ -5134,8 +5134,8 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
    DEFAULT ::ClsName     TO "Vxh_Form"
 
    ::Params   := aParameters
-   ::Property := Hash()
-   HSetCaseMatch( ::Property, .F. )
+   ::__hObjects := Hash()
+   HSetCaseMatch( ::__hObjects, .F. )
 
    Super:Init( oParent )
 
@@ -5879,18 +5879,18 @@ FUNCTION __ChkComponent( oObj, cComp )
    LOCAL oForm
    IF VALTYPE( cComp ) == "C" 
       oForm := oObj:Form
-      IF oForm:Property != NIL 
-         IF ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) == 0
+      IF oForm:__hObjects != NIL 
+         IF ASCAN( oForm:__hObjects:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) == 0
             IF oObj:__ClassInst == NIL 
                oForm := oObj:Application:MainForm
              ELSE
                oForm := oObj:Application:Project:Forms[1]
             ENDIF
-            IF oForm:Property != NIL .AND. ASCAN( oForm:Property:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) > 0
-               cComp := oForm:Property[ cComp ]
+            IF oForm:__hObjects != NIL .AND. ASCAN( oForm:__hObjects:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) > 0
+               cComp := oForm:__hObjects[ cComp ]
             ENDIF
           ELSE
-            cComp := oForm:Property[ cComp ]
+            cComp := oForm:__hObjects[ cComp ]
          ENDIF
       ENDIF
    ENDIF

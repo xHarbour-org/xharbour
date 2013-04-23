@@ -1148,11 +1148,11 @@ METHOD Reset( oControl ) CLASS FormComboBox
          ::AddItem( oForm:Name + CHR(9) + IIF( !oForm:lCustom, "Forms", "Custom Controls" ) )
          AADD( ::aItems, ::Application:Project:CurrentForm )
 
-         IF oForm:Property != NIL
-            FOR EACH cCtrl IN oForm:Property:Keys
-                cText := oForm:Property[ cCtrl ]:ClassName
+         IF oForm:__hObjects != NIL
+            FOR EACH cCtrl IN oForm:__hObjects:Keys
+                cText := oForm:__hObjects[ cCtrl ]:ClassName
                 ::AddItem( cCtrl + CHR(9) + Upper( cText[1] ) + SubStr( Lower( cText ), 2 ) )
-                AADD( ::aItems, oForm:Property[ cCtrl ] )
+                AADD( ::aItems, oForm:__hObjects[ cCtrl ] )
             NEXT
          ENDIF
       ENDIF

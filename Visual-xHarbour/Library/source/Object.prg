@@ -52,7 +52,7 @@ CLASS Object
    
    DATA Owner                  EXPORTED
    DATA Components             EXPORTED INIT {}
-   DATA Property               EXPORTED
+   DATA __hObjects             EXPORTED
 
    DATA EventHandler           EXPORTED
    DATA lComponent             EXPORTED INIT .F.
@@ -95,10 +95,10 @@ METHOD OnError( ... ) CLASS Object
    LOCAL cMsg, uRet, aParams := HB_AParams()
    cMsg := __GetMessage()
    
-   IF PCount() == 0 .AND. ::Property != NIL
-      IF hGetPos( ::Property, cMsg ) > 0
-         uRet := ::Property[ cMsg ]
-         //uRet := __aObjects[ ::Property[ cMsg ] ]
+   IF PCount() == 0 .AND. ::__hObjects != NIL
+      IF hGetPos( ::__hObjects, UPPER( cMsg ) ) > 0
+         uRet := ::__hObjects[ UPPER( cMsg ) ]
+         //uRet := __aObjects[ ::__hObjects[ cMsg ] ]
        ELSE
          uRet := ::__InvalidMember( cMsg )
       ENDIF
@@ -106,7 +106,7 @@ METHOD OnError( ... ) CLASS Object
       IF PCount() == 0
 
          IF ( __clsParent( ::ClassH, "CUSTOMCONTROL" ) .OR. __clsParent( ::Parent:ClassH, "CUSTOMCONTROL" ) )
-            RETURN ::Form:&cMsg //::Form:Property[ cMsg ]
+            RETURN ::Form:&cMsg //::Form:__hObjects[ cMsg ]
          ENDIF
       ENDIF
 
@@ -115,7 +115,7 @@ METHOD OnError( ... ) CLASS Object
 RETURN uRet
 
 METHOD HasProperty( cName ) 
-RETURN ::Property != NIL .AND. hGetPos( ::Property, cName ) > 0
+RETURN ::__hObjects != NIL .AND. hGetPos( ::__hObjects, cName ) > 0
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __InvalidMember( cMsg ) CLASS Object
@@ -161,7 +161,7 @@ METHOD __CreateProperty( cBaseName ) CLASS Object
    LOCAL n
 
    DEFAULT cBaseName TO ::__xCtrlName
-   IF ::Form != NIL .AND. ::__xCtrlName != "ToolTip" .AND. ::GenerateMember
+   IF EMPTY( ::xName ) .AND. ::Form != NIL  .AND. ::__xCtrlName != "ToolTip" .AND. ::GenerateMember
       IF !( ::Caption == "[ Add New Item ]" )
          n := ::GetControlName( cBaseName )
          ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
@@ -176,9 +176,9 @@ RETURN SELF
 METHOD GetControlName( cName ) CLASS Object
    LOCAL cProp, n := 1, lComp := .T., oForm := ::Form
    IF ::Application:GenerateMembers
-      WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:Property != NIL
+      WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:__hObjects != NIL
          cProp := cName + XSTR( n )
-         IF hGetPos( oForm:Property, cProp ) == 0
+         IF hGetPos( oForm:__hObjects, cProp ) == 0
             EXIT
          ENDIF
          n ++
@@ -190,22 +190,23 @@ RETURN n
 METHOD __SetAsProperty( cName, oObj ) CLASS Object
    LOCAL n
 
-   IF oObj:ClsName == TOOLTIPS_CLASS .OR. ::Property == NIL .OR. (::Application != NIL .AND. !::Application:GenerateMembers)
+   IF oObj:ClsName == TOOLTIPS_CLASS .OR. ::__hObjects == NIL .OR. (::Application != NIL .AND. !::Application:GenerateMembers)
       RETURN Self
    ENDIF
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"
       cName := oObj:xName
    ENDIF
    IF !( oObj == Self ) 
-      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::Property, oObj:xName ) ) > 0
-         HDelAt( ::Property, n )
+      IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
+         HDelAt( ::__hObjects, n )
       ENDIF
-      ::Property[ cName ] := oObj
 
-      //::Property[ cName ] := ASCAN( __aObjects, oObj,,,.T. )
-      //IF ::Property[ cName ] == 0
+      ::__hObjects[ cName ] := oObj
+
+      //::__hObjects[ cName ] := ASCAN( __aObjects, oObj,,,.T. )
+      //IF ::__hObjects[ cName ] == 0
       //   AADD( __aObjects, oObj )
-      //   ::Property[ cName ] := LEN( __aObjects )
+      //   ::__hObjects[ cName ] := LEN( __aObjects )
       //ENDIF
    ENDIF
    oObj:xName := cName
@@ -229,8 +230,8 @@ RETURN Self
 
 METHOD RemoveProperty() CLASS Object
    LOCAL n
-   IF !EMPTY( ::xName ) .AND. ( n := hGetPos( ::Form:Property, ::xName ) ) > 0
-      RETURN HDelAt( ::Form:Property, n )
+   IF !EMPTY( ::xName ) .AND. ( n := hGetPos( ::Form:__hObjects, ::xName ) ) > 0
+      RETURN HDelAt( ::Form:__hObjects, n )
    ENDIF
 RETURN NIL
 

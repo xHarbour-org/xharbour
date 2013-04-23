@@ -2655,7 +2655,7 @@ FUNCTION GetCurrentForm( oCombo )
    IF !EMPTY( cText )
       n := AT( CHR(9), cText )
       cText := SUBSTR( cText, n+1, LEN( cText )-n+1 )
-      RETURN __objSendMsg( oApp:MainForm:Property[ cText ] )
+      RETURN __objSendMsg( oApp:MainForm:__hObjects[ cText ] )
    ENDIF
 RETURN oApp:Project:CurrentForm
 
@@ -4680,11 +4680,11 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
                IF UPPER( LEFT( cValue, 23 ) ) == "APPLICATION:MAINWINDOW:"
                   cValue := STRTRAN( cValue, "Application:MainWindow:" )
-                  xValue := ::Forms[1]:Property[ cValue ]
+                  xValue := ::Forms[1]:__hObjects[ cValue ]
 
                 ELSEIF UPPER( LEFT( cValue, 21 ) ) == "APPLICATION:MAINFORM:"
                   cValue := STRTRAN( cValue, "Application:MainForm:" )
-                  xValue := ::Forms[1]:Property[ cValue ]
+                  xValue := ::Forms[1]:__hObjects[ cValue ]
 
                 ELSEIF UPPER( LEFT( cValue, 17 ) ) == "SYSTEM:IMAGELIST:"
                   cValue := SUBSTR( cValue, 18 )
@@ -4694,11 +4694,11 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
                 ELSEIF UPPER( LEFT( cValue, 25 ) ) == "::APPLICATION:MAINWINDOW:"
                   cValue := STRTRAN( cValue, "::Application:MainWindow:" )
-                  xValue := ::Forms[1]:Property[ cValue ]
+                  xValue := ::Forms[1]:__hObjects[ cValue ]
 
                 ELSEIF UPPER( LEFT( cValue, 23 ) ) == "::APPLICATION:MAINFORM:"
                   cValue := STRTRAN( cValue, "::Application:MainForm:" )
-                  xValue := ::Forms[1]:Property[ cValue ]
+                  xValue := ::Forms[1]:__hObjects[ cValue ]
 
                 ELSEIF UPPER( LEFT( cValue, 19 ) ) == "::SYSTEM:IMAGELIST:"
                   cValue := SUBSTR( cValue, 20 )
@@ -4706,7 +4706,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
                 ELSEIF LEFT( cValue, 2 ) == "::"
                   cValue := SUBSTR( cValue, 3 )
-                  xValue := oObj:Property[ cValue ]
+                  xValue := oObj:__hObjects[ cValue ]
 
                 ELSE
                   xValue := &cValue
@@ -4725,7 +4725,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                   oObj := oObj:&cPropertyObject
                 ELSE
                   oPrev := oObj
-                  oObj  := oForm:Property[ cPropertyObject ]
+                  oObj  := oForm:__hObjects[ cPropertyObject ]
                ENDIF
 
             ELSEIF cLine HAS "(?i)^END"
@@ -4843,16 +4843,16 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
                 ELSEIF UPPER( LEFT( cWithValue, 25 ) ) == "::APPLICATION:MAINWINDOW:"
                   cWithValue := STRTRAN( cWithValue, "::Application:MainWindow:" )
-                  xValue := ::Forms[1]:Property[ cWithValue ]
+                  xValue := ::Forms[1]:__hObjects[ cWithValue ]
 
                 ELSEIF UPPER( LEFT( cWithValue, 23 ) ) == "::APPLICATION:MAINFORM:"
                   cWithValue := STRTRAN( cWithValue, "::Application:MainForm:" )
-                  xValue := ::Forms[1]:Property[ cWithValue ]
+                  xValue := ::Forms[1]:__hObjects[ cWithValue ]
 
                 ELSEIF UPPER( LEFT( cWithValue, 6 ) ) == ":FORM:"
                   cWithValue := STRTRAN( cWithValue, ":Form:" )
-                  IF HGetPos( oObj:Form:Property, cWithValue ) > 0
-                     xValue := oObj:Form:Property[ cWithValue ]
+                  IF HGetPos( oObj:Form:__hObjects, cWithValue ) > 0
+                     xValue := oObj:Form:__hObjects[ cWithValue ]
                    ELSE
                      xValue := cWithValue
                   ENDIF
@@ -4867,8 +4867,8 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                    CATCH
                   END
                   IF xValue == NIL
-                     IF HGetPos( oObj:Form:Property, cWithValue ) > 0
-                        xValue := oObj:Form:Property[ cWithValue ]
+                     IF HGetPos( oObj:Form:__hObjects, cWithValue ) > 0
+                        xValue := oObj:Form:__hObjects[ cWithValue ]
                      ENDIF
                   ENDIF
                   DEFAULT xValue TO cWithValue

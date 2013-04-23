@@ -73,8 +73,8 @@ METHOD Init( oParent ) CLASS Menu
    ::Children := {}
    ::aItems:= {}
    ::Parent:= oParent
-   ::Property     := Hash()
-   HSetCaseMatch( ::Property, .F. )
+   ::__hObjects     := Hash()
+   HSetCaseMatch( ::__hObjects, .F. )
 
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
@@ -309,8 +309,8 @@ METHOD Init( oParent ) CLASS MenuPopup
    ::Children := {}
    ::aItems:= {}
    ::Parent:= oParent
-   ::Property     := Hash()
-   HSetCaseMatch( ::Property, .F. )
+   ::__hObjects     := Hash()
+   HSetCaseMatch( ::__hObjects, .F. )
 
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
@@ -365,8 +365,8 @@ CLASS ContextMenu INHERIT Component
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextMenu
-   ::Property     := Hash()
-   HSetCaseMatch( ::Property, .F. )
+   ::__hObjects     := Hash()
+   HSetCaseMatch( ::__hObjects, .F. )
 
    DEFAULT ::__xCtrlName   TO "ContextMenu"
    DEFAULT ::ComponentType TO "ContextMenu"

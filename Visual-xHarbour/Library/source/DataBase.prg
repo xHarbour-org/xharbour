@@ -284,8 +284,8 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
    LOCAL lChanged, n, cFileName, cPath, nServer, cMemo
-   IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:Property:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
-      ::Socket := ::Form:Property[ ::Socket ]
+   IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
+      ::Socket := ::Form:__hObjects[ ::Socket ]
       IF ::__ClassInst == NIL
          ::Connector := SocketRdd( Self )
       ENDIF

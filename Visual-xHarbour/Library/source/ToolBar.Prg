@@ -241,13 +241,13 @@ METHOD __ChkImageList(n,oImg) CLASS ToolBar
       DEFAULT oImg TO ::xHotImageList
    ENDIF
    IF VALTYPE( oImg ) == "C"
-      IF ASCAN( ::Form:Property:Keys, {|c| UPPER(c) == UPPER(oImg) } ) > 0
-         oImg := ::Form:Property[ oImg ]
+      IF ASCAN( ::Form:__hObjects:Keys, {|c| UPPER(c) == UPPER(oImg) } ) > 0
+         oImg := ::Form:__hObjects[ oImg ]
        ELSE
          IF ::__ClassInst != NIL
-            oImg := ::Application:Project:Forms[1]:Property[ oImg ]
+            oImg := ::Application:Project:Forms[1]:__hObjects[ oImg ]
           ELSE
-            oImg := ::Application:MainForm:Property[ oImg ]
+            oImg := ::Application:MainForm:__hObjects[ oImg ]
          ENDIF
       ENDIF
    ENDIF
@@ -1912,7 +1912,7 @@ METHOD Delete( lChildren, lDelProp ) CLASS ToolButton
    NEXT
    IF lDelProp .AND. ::Name != NIL
       TRY
-         HDel( ::Form:Property, ::Name )
+         HDel( ::Form:__hObjects, ::Name )
       CATCH
       END
    ENDIF
