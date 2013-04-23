@@ -47,7 +47,7 @@ METHOD OnInitDialog() CLASS ColumnManager
    
    WITH OBJECT Image( Self )
       :Height  := 77
-      :BackColor     := C_WHITE
+//      :BackColor     := C_WHITE
       :ImageName     := "Banner"
       :Dock:Margin   := 0
       :Dock:Left     := :Parent
@@ -120,8 +120,8 @@ METHOD OnInitDialog() CLASS ColumnManager
          :Dock:Right    := :Parent
 
          :Create()
-         :InsertTab( "  Properties ", 0 )
-         :InsertTab( "  Events ", 1 )
+         :InsertTab( "Properties ", 0 )
+         :InsertTab( "Events ", 1 )
          :OnSelChanged := {|o,x,y|o:Parent:Parent:TabSelection( x,y ) }
          :DockIt()
       END

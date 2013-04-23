@@ -4058,7 +4058,7 @@ METHOD OpenSource( cSource ) CLASS Project
    IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| lower(o:File) == lower(oFile:Path+"\"+oFile:Name) } ) ) > 0
       // File is open, just re-show
 
-      ::Application:SourceTabs:SetCurSel( n )
+      //::Application:SourceTabs:SetCurSel( n )
       ::SourceTabChanged( n )
 
       IF !::Application:SourceEditor:IsWindowVisible()
@@ -4071,9 +4071,9 @@ METHOD OpenSource( cSource ) CLASS Project
 
    oEditor := Source( ::Application:SourceEditor, oFile:Path+"\"+oFile:Name )
 
-   ::Application:SourceTabs:Visible := .T.
-   ::Application:SourceTabs:InsertTab( oFile:Name )
-   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+   //::Application:SourceTabs:Visible := .T.
+   //::Application:SourceTabs:InsertTab( oFile:Name )
+   //::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()

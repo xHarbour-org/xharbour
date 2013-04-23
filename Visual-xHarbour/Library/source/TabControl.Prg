@@ -506,7 +506,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabControl
-   LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
+   LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart, nColor
    LOCAL aItem, oPage, hWnd, hTmpBrush, hParDC, rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
 
@@ -552,9 +552,12 @@ METHOD OnPaint() CLASS TabControl
    DEFAULT hBrush TO ::Parent:bkBrush
    IF hBrush == NIL
       hParDC := GetDC( ::Parent:hWnd )
-      hTmpBrush := CreateSolidBrush( GetPixel( hParDC, 1, 1 ) )
+      nColor := GetPixel( hParDC, ::xLeft-1, ::xTop-1 )
+      IF nColor >= 0
+         hTmpBrush := CreateSolidBrush( nColor )
+         hBrush := hTmpBrush
+      ENDIF
       ReleaseDC( ::Parent:hWnd, hParDC )
-      hBrush := hTmpBrush
    ENDIF
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    
@@ -583,7 +586,7 @@ METHOD OnPaint() CLASS TabControl
 
              aItem  := ::GetItemRect( n )
 
-             SetTextColor( hMemDC, oPage:ForeColor )
+             SetTextColor( hMemDC, IIF( oPage != NIL, oPage:ForeColor, ::ForeColor ) )
 
              nState := TIS_NORMAL
              aItem[2]+=1
@@ -593,7 +596,7 @@ METHOD OnPaint() CLASS TabControl
 
              IF ::ShowTabs
                 DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
-                IF ::ImageList != NIL .AND. oPage:ImageIndex > 0
+                IF ::ImageList != NIL .AND. oPage != NIL .AND. oPage:ImageIndex > 0
                    ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
                    aItem[1]+=::ImageList:IconWidth + 6
                 ENDIF
@@ -630,7 +633,7 @@ METHOD OnPaint() CLASS TabControl
       n := nSel
       oPage := ::GetItemObject(n)
 
-      IF ::ShowTabs .AND. ::ImageList != NIL .AND. oPage:ImageIndex > 0
+      IF ::ShowTabs .AND. ::ImageList != NIL .AND. oPage != NIL .AND. oPage:ImageIndex > 0
          ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
          aItem[1]+=::ImageList:IconWidth + 3
       ENDIF
@@ -641,7 +644,7 @@ METHOD OnPaint() CLASS TabControl
       SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 
       IF !EMPTY( tci:pszText )
-         SetTextColor( hMemDC, oPage:ForeColor )
+         SetTextColor( hMemDC, IIF( oPage != NIL, oPage:ForeColor, ::ForeColor ) )
          SetBkMode( hMemDC, TRANSPARENT )
          hOldFont := SelectObject( hMemDC, ::Font:Handle )
          _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
