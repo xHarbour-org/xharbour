@@ -35,6 +35,9 @@ CLASS TreeView FROM TitleControl
    DATA PreviousItem     EXPORTED
    DATA DragImage        EXPORTED
    DATA ClickedItem      EXPORTED   
+
+   DATA HighLightCaption   EXPORTED  INIT .F.
+
    DATA __lResetting     PROTECTED INIT .F.
    DATA __oDragItem      PROTECTED
    DATA __oTargetItem    PROTECTED
