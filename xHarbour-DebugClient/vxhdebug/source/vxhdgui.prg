@@ -41,7 +41,7 @@ ENDCLASS
 
 
 METHOD New() CLASS XHDebuggerGUI
-  LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
+  //LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
   ::oEditor := ::oApp:SourceEditor:oEditor
 
   WITH OBJECT ::oToolBar := ToolStrip( ::oApp:DebuggerPanel )
@@ -116,8 +116,7 @@ METHOD New() CLASS XHDebuggerGUI
     :Dock:Left   := :Parent
     :Dock:Right  := :Parent
     :Dock:Bottom := :Parent
-    :Flat := .T.
-    :BoldSelection := .T.
+    :Dock:Margin := 3
     :Create()
     :DockIt()
 
@@ -138,7 +137,7 @@ METHOD New() CLASS XHDebuggerGUI
 
     ::oSets := XHDebugSet( :this, Self )
     ::oSets:Create()
-
+/*
     IF lSysColor
        :BackColor   := :System:CurrentScheme:ToolStripPanelGradientBegin
        ::oConsole:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
@@ -148,7 +147,7 @@ METHOD New() CLASS XHDebuggerGUI
        ::oWorkArea:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
        ::oSets:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
     ENDIF
-
+*/
     ::aTabs := { ::oConsole, ::oMonitor, ::oCallStack, ::oWatch, ::oWorkArea, ::oSets }
     
     :OnSelChanged := {| , , new| IIF( ::socket != NIL .OR. new $ { 1, 3 }, ;

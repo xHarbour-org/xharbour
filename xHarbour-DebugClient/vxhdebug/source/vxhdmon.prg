@@ -89,7 +89,8 @@ METHOD Create() CLASS XHDebugMonitor
   END
 
   WITH OBJECT oAllGlobals := CheckBox( Self )
-    :Caption := "Show all GLOBALs " /* the endspace is needed to bypass docking bug */
+    :Caption := "Show all GLOBALs"
+    :AutoSize := .T.
     :Dock:Margin := 2
     :Dock:Top := :Parent
     :Dock:Right := :Parent
