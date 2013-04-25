@@ -359,6 +359,7 @@ CLASS Window INHERIT Object
 
    DATA OnWMSysCommand         EXPORTED
    DATA OnWMSize               EXPORTED
+   DATA OnWMDestroy            EXPORTED
    DATA OnWMShowWindow         EXPORTED
    DATA OnWMSysColorChange     EXPORTED
    DATA OnWMThemeChanged       EXPORTED
@@ -2071,7 +2072,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
-   LOCAL oChild, oItem, x, y
+   LOCAL oChild, oItem, x, y, cBlock
    LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, msg, lHandled, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
@@ -2099,6 +2100,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
       nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
       IF VALTYPE(nRet) $ "OU"
          ExecuteEvent( aMessages[nMess][2], Self )
+      ENDIF
+      cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
+      IF nRet == NIL .AND. __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
+         nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
       ENDIF
       IF nMsg == WM_INITDIALOG
          ::PostInitDialog()
