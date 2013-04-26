@@ -586,9 +586,13 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
                   IF ::__aLastHover[1] > 0
                      ::__DisplayData( ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],), ::__aLastHover[1], IIF( ! ::FullRowSelect, ::__aLastHover[2],) )
                   ENDIF
-                  ::__DisplayData( nRow, IIF( ! ::FullRowSelect, nCol,), nRow, IIF( ! ::FullRowSelect, nCol,),, nRow <= ::RowCountUsable )
-                  ::__aLastHover[1] := nRow
-                  ::__aLastHover[2] := nCol
+                  IF nRow <= ::RowCountUsable
+                     ::__DisplayData( nRow, IIF( ! ::FullRowSelect, nCol,), nRow, IIF( ! ::FullRowSelect, nCol,),, nRow <= ::RowCountUsable )
+                     ::__aLastHover[1] := nRow
+                     ::__aLastHover[2] := nCol
+                  ELSE
+                     ::__aLastHover := {0,0}
+                  ENDIF
                ENDIF
             ENDIF
             ::Cursor := ::__hPrevCursor
@@ -2051,6 +2055,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     ENDIF
                   ELSE
                     SetTextColor( hMemDC, ::System:Color:Gray )
+                    IF ::Striping
+                       SetBkColor( hMemDC, nBkCol )
+                    ENDIF
                  ENDIF
 
                  nHeaderRight := nRight-1
