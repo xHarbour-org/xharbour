@@ -131,6 +131,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[2][2], { "Button", .T. } )
    AADD( ::aButtons[2][2], { "EditBox", .T. } )
    AADD( ::aButtons[2][2], { "Label", .T. } )
+   AADD( ::aButtons[2][2], { "Line", .T. } )
    AADD( ::aButtons[2][2], { "LinkLabel", .T. } )
    AADD( ::aButtons[2][2], { "ListBox", .T. } )
    AADD( ::aButtons[2][2], { "ComboBox", .T. } )
@@ -576,6 +577,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    EXTERN Button, UpDown
    EXTERN EditBox
    EXTERN Label
+   EXTERN Line
    EXTERN LinkLabel
    EXTERN ListBox
    EXTERN ComboBox//, FontComboBox

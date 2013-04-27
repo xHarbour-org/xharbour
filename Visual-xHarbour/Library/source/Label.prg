@@ -110,3 +110,62 @@ METHOD OnCtlColorStatic( nwParam ) CLASS Label
    ENDIF
 RETURN NIL
 
+
+CLASS Line INHERIT CONTROL
+   PROPERTY Sunken  READ xSunken     WRITE __SetSunken  DEFAULT .T. PROTECTED
+   DATA xText      EXPORTED INIT ""
+   DATA Text       EXPORTED INIT ""
+   DATA xHeight    EXPORTED INIT 2
+
+   DATA Border             EXPORTED
+   DATA IndexOrder         EXPORTED  INIT 0
+
+   DATA Font               EXPORTED
+   DATA ToolTip            EXPORTED
+   DATA Id                 EXPORTED
+   DATA BackColor          EXPORTED
+   DATA ForeColor          EXPORTED
+   DATA AllowClose         EXPORTED
+   DATA AllowUndock        EXPORTED
+   DATA Dock               EXPORTED
+   DATA Width              EXPORTED
+   DATA Height             EXPORTED
+   DATA ClientEdge         EXPORTED
+   DATA ClipChildren       EXPORTED
+   DATA ClipSiblings       EXPORTED
+   DATA OwnerDraw          EXPORTED  INIT .F.
+   DATA StaticEdge         EXPORTED
+   DATA Transparent        EXPORTED
+   DATA Visible            EXPORTED
+
+   ACCESS Height  INLINE ::xHeight
+   
+   METHOD Init() CONSTRUCTOR
+   METHOD __SetSunken(l) INLINE ::SetStyle( WS_BORDER, ! l ),;
+                                ::SetStyle( SS_SUNKEN, l ),;
+                                ::xHeight := IIF( l, 2, 1 ),;
+                                ::MoveWindow(),;
+                                ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
+                                ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ),;
+                                ::UpdateWindow()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS Line
+   DEFAULT ::__xCtrlName TO "Label"
+   ::ClsName    := "static"
+   ::Style      := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_SUNKEN
+   ::__lResizeable := {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
+   ::Super:Init( oParent )
+   ::Width      := 150
+   ::Events     := ;
+          { ;
+            {"Layout",      { ;
+                            { "OnEnterSizeMove"    , "", "" },;
+                            { "OnExitSizeMove"     , "", "" },;
+                            { "OnMove"             , "", "" },;
+                            { "OnSize"             , "", "" } } },;
+            {"Control",     {;
+                            { "OnCreate"           , "", "" },;
+                            { "OnDestroy"          , "", "" },;
+                            { "OnEnable"           , "", "" } } } }
+RETURN Self
