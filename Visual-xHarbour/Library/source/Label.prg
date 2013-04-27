@@ -128,8 +128,6 @@ CLASS Line INHERIT CONTROL
    DATA AllowClose         EXPORTED
    DATA AllowUndock        EXPORTED
    DATA Dock               EXPORTED
-   DATA Width              EXPORTED
-   DATA Height             EXPORTED
    DATA ClientEdge         EXPORTED
    DATA ClipChildren       EXPORTED
    DATA ClipSiblings       EXPORTED

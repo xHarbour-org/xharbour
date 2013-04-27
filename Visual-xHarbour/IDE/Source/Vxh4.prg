@@ -3753,6 +3753,7 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
                    { "SelectionHeight",         "Size" } }
    
 __aProps["T"] := { { "TabStop",                 "Style" },;
+                   { "TabOrder",                "Position" },;
                    { "ThickFrame",              "Style" },;
                    { "TitleHeight",             "Size" },;
                    { "Transparent",             "Style" },;
