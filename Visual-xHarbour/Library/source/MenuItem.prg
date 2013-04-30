@@ -202,7 +202,7 @@ METHOD Create() CLASS CMenuItem
 
    ::MenuItemInfo:hSubMenu      := IIF( LEN( ::aItems ) > 0, ::hMenu, 0 )
    ::MenuItemInfo:cbSize        := ::MenuItemInfo:SizeOf()
-   ::MenuItemInfo:fMask         := MIIM_CHECKMARKS | MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
+   ::MenuItemInfo:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
    ::MenuItemInfo:wID           := ::Id
    IF ::Caption == "-"
       ::MenuItemInfo:fType      := MFT_SEPARATOR
@@ -343,7 +343,7 @@ METHOD Delete() CLASS CMenuItem
    IF ::Name != NIL .AND. ::GenerateMember
       HDel( ::Form:__hObjects, ::Name )
    ENDIF
-   IF ::MenuItemInfo:dwItemData != NIL
+   IF ::MenuItemInfo:dwItemData != NIL .AND. ::MenuItemInfo:dwItemData <> 0
       ReleaseArrayPointer( ::MenuItemInfo:dwItemData )
    ENDIF
 

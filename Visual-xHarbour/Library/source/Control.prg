@@ -424,7 +424,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       IF ::ExStyle & WS_EX_STATICEDGE == WS_EX_STATICEDGE
          n += 1
       ENDIF
-      ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 0, 0 ) }
+      ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
       hOldPen   := SelectObject( hDC, ::System:TitleBorderPen )
       hOldBrush := SelectObject( hDC, ::System:TitleBackBrush )

@@ -63,7 +63,7 @@ CLASS Menu INHERIT Object
    METHOD GetItem()
 
    METHOD Set()             INLINE SetMenu( ::Parent:hWnd, ::hMenu )
-   METHOD Destroy()         INLINE DestroyMenu( ::hMenu )
+   METHOD Destroy()         INLINE /*DestroyMenu( ::hMenu )*/ ::Parent:PostMessage( WM_USER+3026, 0, ::hMenu )
    METHOD DisableItem(nId ) INLINE ::EnableItem( nId, .F. )
 ENDCLASS
 
@@ -427,7 +427,8 @@ METHOD Show( x, y ) CLASS ContextMenu
       ::Menu:Top  := y
       nRes := ::Menu:Context()
    ENDIF
-   DestroyMenu( ::Menu:hMenu )
+   ::Parent:PostMessage( WM_USER+3026, 0, ::Menu:hMenu )
+   //DestroyMenu( ::Menu:hMenu )
 
 RETURN nRes
 

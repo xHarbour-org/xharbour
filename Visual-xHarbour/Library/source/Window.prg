@@ -2072,7 +2072,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
-   LOCAL oChild, oItem, x, y, cBlock
+   LOCAL oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, msg, lHandled, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
@@ -2754,7 +2754,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
               IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. ::MeasureItemStruct:itemData != NIL .AND. ::MeasureItemStruct:itemData <> 0
                  IF ( oCtrl := ArrayFromPointer( ::MeasureItemStruct:itemData ) ) != NIL
-                    nRet := oCtrl:OnMeasureItem( nwParam, nlParam, ::MeasureItemStruct )
+                    IF __objHasMsg( oCtrl, "OnMeasureItem" )
+                       nRet := oCtrl:OnMeasureItem( nwParam, nlParam, ::MeasureItemStruct )
+                     ELSE
+                       nRet := ::OnMeasureItem( nwParam, nlParam )
+                    ENDIF
                  ENDIF
                ELSE
                  nRet := ExecuteEvent( "OnMeasureItem", Self )
@@ -2797,7 +2801,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               */
               IF ::DrawItemStruct:CtlType == ODT_MENU .AND. ::DrawItemStruct:itemData != NIL .AND. ::DrawItemStruct:itemData <> 0
                  IF ( oCtrl := ArrayFromPointer( ::DrawItemStruct:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
-                    nRet := oCtrl:OnDrawItem( nwParam, nlParam, ::DrawItemStruct )
+                    IF __objHasMsg( oCtrl, "OnMeasureItem" )
+                       nRet := oCtrl:OnDrawItem( nwParam, nlParam, ::DrawItemStruct )
+                     ELSE
+                       nRet := ::OnDrawItem( nwParam, nlParam )
+                    ENDIF
                  ENDIF
                ELSE
 
@@ -3189,25 +3197,37 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_MENUCOMMAND
               nRet := ExecuteEvent( "OnMenuCommand", Self )
               ODEFAULT nRet TO ::OnMenuCommand( nwParam, nlParam )
-              IF ::Application != NIL .AND. ::Application:OsVersion:dwMajorVersion < 5
-                 oItem := ::Application:oCurMenu:GetMenuById( LOWORD( nwParam ) )
-               ELSEIF ::Application != NIL
+              IF ::Application != NIL
 
-                 TRY
-                    mii := (struct MENUITEMINFO)
-                    mii:cbSize := mii:SizeOf()
-                    mii:fMask  := MIIM_DATA
-                    _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
+                 mii := (struct MENUITEMINFO)
+                 mii:cbSize := mii:SizeOf()
+                 mii:fMask  := MIIM_DATA | MIIM_ID
+
+                 IF _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
                     mii:Devalue()
                     IF mii:dwItemData != NIL .AND. mii:dwItemData <> 0
                        oItem := ArrayFromPointer( mii:dwItemData )
                     ENDIF
-                  CATCH
-                 END
+                 ENDIF
+
                  IF oItem == NIL
                     TRY
                        IF ( oMenu := ::Application:oCurMenu:GetMenuByHandle( nlParam ) ) != NIL
-                          oItem := oMenu:aItems[ nwParam + 1 ]
+                          IF mii:wID != NIL .AND. mii:wID > 0 .AND. ( i := ASCAN( oMenu:aItems, {|o| o:ID == mii:wID } ) ) > 0
+                             oItem := oMenu:aItems[ i ]
+                           ELSE
+                             n := nwParam + 1
+                             FOR i := nwParam TO 1 STEP -1
+                                 oItem := oMenu:aItems[ i ]
+                                 IF ! oItem:Visible
+                                    n++
+                                 ENDIF
+                             NEXT
+                             oItem := oMenu:aItems[ n ]
+                             WHILE ! oItem:Visible .AND. n+1 <= LEN( oMenu:aItems ) // non-visible menuitems ARE in the array but do not exist as a menuitem
+                                oItem := oMenu:aItems[ n++ ]
+                             ENDDO
+                          ENDIF
                        ENDIF
                      CATCH
                     END
@@ -3299,6 +3319,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               IF nMsg >= WM_USER
                  IF nMsg == WM_USER + 3025
                     ::ShowMode := ::__GetShowMode()
+                  ELSEIF nMsg == WM_USER + 3026
+                     IF IsMenu( nlParam )
+                        DestroyMenu( nlParam )
+                     ENDIF
+
                   ELSEIF LOWORD( nlParam ) == WM_RBUTTONDOWN
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"

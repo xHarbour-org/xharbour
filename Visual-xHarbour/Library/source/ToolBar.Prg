@@ -333,10 +333,8 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD SetBanner( hInst, cName, cPath, nMask ) CLASS ToolBar
-
    ::Banner := Bitmap( hInst, cName, cPath, nMask, .T. )
    ::Height := MAX( ::ClientHeight, ::Banner:height )
-
 RETURN SELF
 
 
@@ -917,7 +915,9 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
 
 
          SendMessage( hWnd, TB_PRESSBUTTON, oBtn:Id, MAKELONG(0,0) )
-         DestroyMenu( ::oMenu:hMenu )
+         
+         ::Parent:PostMessage( WM_USER+3026, 0, ::oMenu:hMenu )
+         //DestroyMenu( ::oMenu:hMenu )
 
          oBtn:Menu:Destroy()
 

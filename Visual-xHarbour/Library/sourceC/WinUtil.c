@@ -3904,6 +3904,17 @@ HB_FUNC( MENUITEMINFOITEMDATA )
    }
 }
 
+HB_FUNC( MENUITEMINFOITEMID )
+{
+   LPMENUITEMINFO mii = NULL;
+   mii->cbSize = sizeof( MENUITEMINFO );
+   mii->fMask  = MIIM_ID;
+   if( GetMenuItemInfo( (HMENU) hb_parnl(1), hb_parni(2), TRUE, mii ) )
+   {
+      hb_retni( (int) mii->wID );
+   }
+}
+
 HB_FUNC( __INSERTMENUSTRIPITEM )
 {
    MENUITEMINFOA mii;
