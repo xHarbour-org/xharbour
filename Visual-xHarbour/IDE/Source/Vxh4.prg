@@ -3403,6 +3403,7 @@ __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "ClipChildren",            "Style" },;
                    { "ClipSiblings",            "Style" },;
                    { "ControlParent",           "Style" },;
+                   { "Color",                   "Colors" },;
                    { "Cargo",                   "" },;
                    { "CloseButton",             "" },;
                    { "CloseOnClick",            "" },;
@@ -3506,10 +3507,10 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "HoverForeColor",          "Colors" },;
                    { "HighlightTextColor",      "Colors" },;
                    { "Height",                  "Size" },;
-                   { "HeaderBackColor",         "Header" },;
-                   { "HeaderForeColor",         "Header" },;
-                   { "HeaderImageIndex",        "Header" },;
-                   { "HeaderHeight",            "Header" } }
+                   { "HeaderBackColor",         "Colors" },;
+                   { "HeaderForeColor",         "Colors" },;
+                   { "HeaderImageIndex",        "Colors" },;
+                   { "HeaderHeight",            "Size" } }
 
 __aProps["I"] := { { "Icons",                   "Style" },;
                    { "Italic",                  "" },;

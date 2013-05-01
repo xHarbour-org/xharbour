@@ -109,7 +109,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA aTagged                 EXPORTED  INIT {}
    DATA CurPos                  EXPORTED INIT 1
    DATA CurTag                  EXPORTED
-
+   DATA bSearchKey              EXPORTED
    // backward compatibility
    DATA HoverBackColor          EXPORTED
    DATA HoverForeColor          EXPORTED
@@ -326,10 +326,12 @@ METHOD Init( oParent ) CLASS DataGrid
    ::DeferRedraw             := FALSE
    IF ::__ClassInst != NIL
       AINS( ::Events, 1, {"Navigation", {;
-                                          { "OnRowChanging", "", "" },;
-                                          { "OnRowChanged",  "", "" },;
-                                          { "OnColChanging", "", "" },;
-                                          { "OnColChanged",  "", "" } } }, .T. )
+                                          { "OnRowChanging",    "", "" },;
+                                          { "OnRowChanged",     "", "" },;
+                                          { "OnSearchNotFound", "", "" },;
+                                          { "OnColChanging",    "", "" },;
+                                          { "OnColChanged",     "", "" } } }, .T. )
+
       AADD( ::Events[3][2], { "OnQueryBackColor", "", "" } )
       AADD( ::Events[3][2], { "OnQueryForeColor", "", "" } )
       //AADD( ::Events[3][2], { "GetItemHeight", "", "" } )
@@ -1676,7 +1678,7 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
-   LOCAL nRec, nKey, h, nCount, lShift, x, nPos, lVUpdate := FALSE
+   LOCAL nRec, nKey, h, nCount, lShift, x, nPos, cSearch, lVUpdate := FALSE
 
    IF ( x := ::Super:OnKeyDown( nwParam, nlParam ) ) != NIL .OR. ::DataSource == NIL
       IF ::DataSource == NIL .AND. nwParam == VK_TAB
@@ -1778,13 +1780,18 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
               IF EMPTY( ::__cSearch )
                  ::KillTimer( 10 )
                ELSE
-                 nRec := ::DataSource:recno()
-                 IF ::DataSource:Seek( ::__cSearch )
+                 nRec    := ::DataSource:recno()
+                 cSearch := ""
+                 IF ::bSearchKey != NIL
+                    cSearch := EVAL( ::bSearchKey, Self )
+                 ENDIF
+                 IF ::DataSource:Seek( cSearch + ::__cSearch )
                     ::Update()
                     ::OnRowChanged()
                     ExecuteEvent( "OnRowChanged", Self )
                   ELSE
                     ::DataSource:Goto( nRec )
+                    ExecuteEvent( "OnSearchNotFound", Self )
                  ENDIF
                  ::SetTimer( 10, 2000 )
               ENDIF
@@ -3311,13 +3318,13 @@ METHOD Down() CLASS DataGrid
          EVAL( ::__bGoBottom )
        ELSE
          ADEL( ::__DisplayArray, 1 )
+         IF ::RowCountVisible > 0 .AND. LEN( ::__DisplayArray ) >= ::RowCountVisible
+            ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() }
+            ::__FillRow( ::RowCountVisible )
 
-         ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() }
-
-         ::__FillRow( ::RowCountVisible )
-
-         IF ::RowCountUsable != ::RowCountVisible
-            ::__SkipRecords( -1 )
+            IF ::RowCountUsable != ::RowCountVisible
+               ::__SkipRecords( -1 )
+            ENDIF
          ENDIF
       ENDIF
 

@@ -343,9 +343,9 @@ METHOD Delete() CLASS CMenuItem
    IF ::Name != NIL .AND. ::GenerateMember
       HDel( ::Form:__hObjects, ::Name )
    ENDIF
-   IF ::MenuItemInfo:dwItemData != NIL .AND. ::MenuItemInfo:dwItemData <> 0
-      ReleaseArrayPointer( ::MenuItemInfo:dwItemData )
-   ENDIF
+   //IF ::MenuItemInfo:dwItemData != NIL .AND. ::MenuItemInfo:dwItemData <> 0
+      //ReleaseArrayPointer( ::MenuItemInfo:dwItemData )
+   //ENDIF
 
 RETURN SELF
 

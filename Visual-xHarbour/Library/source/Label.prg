@@ -112,50 +112,47 @@ RETURN NIL
 
 
 CLASS Line INHERIT CONTROL
-   PROPERTY Sunken  READ xSunken     WRITE __SetSunken  DEFAULT .T. PROTECTED
-   DATA xText      EXPORTED INIT ""
-   DATA Text       EXPORTED INIT ""
-   DATA xHeight    EXPORTED INIT 2
+   DATA Sunken             PUBLISHED INIT .T.
+   PROPERTY Vertical       READ xVertical WRITE __SetVertical DEFAULT .F. INVERT
 
+   DATA xText              EXPORTED  INIT ""
+   DATA Text               EXPORTED  INIT ""
+
+   DATA Weight             EXPORTED  INIT 2
    DATA Border             EXPORTED
    DATA IndexOrder         EXPORTED  INIT 0
 
    DATA Font               EXPORTED
-   DATA ToolTip            EXPORTED
-   DATA Id                 EXPORTED
+   DATA TabStop            EXPORTED
    DATA BackColor          EXPORTED
    DATA ForeColor          EXPORTED
    DATA AllowClose         EXPORTED
    DATA AllowUndock        EXPORTED
-   DATA Dock               EXPORTED
    DATA ClientEdge         EXPORTED
    DATA ClipChildren       EXPORTED
    DATA ClipSiblings       EXPORTED
    DATA OwnerDraw          EXPORTED  INIT .F.
    DATA StaticEdge         EXPORTED
    DATA Transparent        EXPORTED
-   DATA Visible            EXPORTED
 
-   ACCESS Height  INLINE ::xHeight
-   
+   DATA Color              PUBLISHED INIT GetSysColor( COLOR_BTNSHADOW )
+
    METHOD Init() CONSTRUCTOR
-   METHOD __SetSunken(l) INLINE ::SetStyle( WS_BORDER, ! l ),;
-                                ::SetStyle( SS_SUNKEN, l ),;
-                                ::xHeight := IIF( l, 2, 1 ),;
-                                ::MoveWindow(),;
-                                ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
-                                ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ),;
-                                ::UpdateWindow()
+   METHOD OnEraseBkGnd()
+   METHOD __SetVertical()
+   METHOD Create()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS Line
-   DEFAULT ::__xCtrlName TO "Label"
-   ::ClsName    := "static"
-   ::Style      := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_SUNKEN
+   DEFAULT ::__xCtrlName TO "Line"
+   ::ClsName       := "VxhLine"
+   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::__lResizeable := {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::Super:Init( oParent )
-   ::Width      := 150
-   ::Events     := ;
+   ::__IsStandard  := .F.
+   ::Width         := 150
+   ::Height        := ::Weight
+   ::Events        := ;
           { ;
             {"Layout",      { ;
                             { "OnEnterSizeMove"    , "", "" },;
@@ -167,3 +164,27 @@ METHOD Init( oParent ) CLASS Line
                             { "OnDestroy"          , "", "" },;
                             { "OnEnable"           , "", "" } } } }
 RETURN Self
+
+METHOD Create() CLASS Line
+   Super:Create()
+   ::__SetVertical( ::Vertical )
+RETURN Self
+   
+METHOD __SetVertical( lSet ) CLASS Line
+   LOCAL nSize
+   IF ::xVertical != lSet
+      ::__lResizeable := {.F.,!lSet,.F.,lSet,.F.,!lSet,.F.,lSet}
+      nSize     := IIF( ::xVertical, ::xHeight, ::xWidth )
+      ::xWidth  := IIF( lSet, ::Weight, nSize )
+      ::xHeight := IIF( lSet, nSize, ::Weight )
+      ::MoveWindow()
+   ENDIF
+RETURN NIL
+
+
+METHOD OnEraseBkGnd( hDC ) CLASS Line
+   LOCAL lVert := ::xVertical, hBrush := CreateSolidBrush( ::Color )
+   _FillRect( hDC, { 0, 0, IIF( lVert, 1, ::Width ), IIF( lVert, ::Height, 1 ) }, hBrush )
+   DeleteObject( hBrush )
+   _FillRect( hDC, { IIF( lVert, 1, 0 ), IIF( lVert, 0, 1 ), IIF( lVert, 2, ::Width ), IIF( lVert, ::Height, 2 ) }, GetStockObject( WHITE_BRUSH ) )
+RETURN 1

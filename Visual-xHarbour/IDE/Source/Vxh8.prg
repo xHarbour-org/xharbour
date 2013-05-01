@@ -20,7 +20,7 @@ CLASS ColumnManager INHERIT Dialog
    DATA ItemEventManager EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
-   METHOD TabSelection()
+   METHOD OnUserMsg()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -31,181 +31,135 @@ METHOD Init( oGrid ) CLASS ColumnManager
 
    ::Super:Init( ::Application:MainForm )
 
+   ::Text       := "DataGrid Column Manager"
    ::Modal      := .T.
    ::Top        := 400
    ::Width      := 500
    ::Height     := 600
    ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::DlgModalFrame := .T.
+   ::ExStyle    := WS_EX_DLGMODALFRAME
    ::Create()
 RETURN Self
 
 //------------------------------------------------------------------------------------------
+METHOD OnUserMsg( hWnd, nMsg ) CLASS ColumnManager
+   (hWnd)
+   IF nMsg == WM_USER + 3027
+      ::UpdateWindow()
+      ::Application:DoEvents()
+      ::ListBox1:ResetList()
+   ENDIF
+RETURN NIL
+
+//------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ColumnManager
-   ::Caption    := "DataGrid Column Manager"
-   
+  
    WITH OBJECT Image( Self )
-      :Height  := 77
-//      :BackColor     := C_WHITE
-      :ImageName     := "Banner"
-      :Dock:Margin   := 0
-      :Dock:Left     := :Parent
-      :Dock:Top      := :Parent
-      :Dock:Right    := :Parent
+      :Height      := 77
+      :ImageName   := "Banner"
+      :Dock:Margin := 0
+      :Dock:Left   := :Parent
+      :Dock:Top    := :Parent
+      :Dock:Right  := :Parent
       :Create()
    END
    
-   WITH OBJECT ToolBar( Self )
+   WITH OBJECT ToolStrip( Self )
+      :ImageList := ImageList( :this, 16, 16 ):Create()
+      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
+      :Showgrip    := .F.
+      :ShowChevron := .F.
+      :Width       := ::Width
+      :Dock:Margin := 0
+      :Dock:Left   := :Parent
+      :Dock:Top    := ::Image1
+      :Dock:Right  := :Parent
       :Create()
-      :AddBitmap( -1, IDB_STD_SMALL_COLOR )
-      :DrawArrows()
 
-      WITH OBJECT ToolButton( :this )
-         :ImageIndex := ::System:StdIcons:FileNew
-         :ToolTip    := "New"
-         :Action     := {|o| o:Form:ListBox1:NewColumn() }
+      WITH OBJECT ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:FileNew
+         :ToolTip:Text := "New"
+         :Action       := {|o| o:Form:ListBox1:NewColumn() }
          :Create()
       END
       
-      WITH OBJECT ToolButton( :this )
-         :ImageIndex := ::System:StdIcons:Delete
-         :ToolTip    := "Delete"
-         :Action     := {|o| o:Form:ListBox1:DelColumn() }
+      WITH OBJECT ToolStripButton( :this )
+         :ImageIndex   := ::System:StdIcons:Delete
+         :ToolTip:Text := "Delete"
+         :Action       := {|o| o:Form:ListBox1:DelColumn() }
          :Create()
-      END
-   END
-
-   WITH OBJECT CoolBar( Self )
-      :Dock:TopMargin := 0
-      :Dock:Top := ::Image1
-      :Create()
-
-      CoolBarBand( :this )
-      WITH OBJECT ::Band1
-         :MinWidth  := 140
-         :MinHeight := 22
-         :Break     := .T.
-         :Chevron   := .T.
-         :BandChild := ::ToolBar1
-         :Create()
-      END
-   END
-
-   WITH OBJECT StatusBar( Self )
-      StatusBarPanel( ::StatusBar1, , 120 )
-      StatusBarPanel( ::StatusBar1, ,  -1 )
-      StatusBarPanel( ::StatusBar1, , 250 )
-      :Create()
-      :DockIt()
-   END
-
-   WITH OBJECT Panel( Self )
-      :Width         := 332
-      :Dock:Margin   := 2
-      :Dock:Top      := ::CoolBar1
-      :Dock:Bottom   := ::StatusBar1
-      :Dock:Right    := :Parent
-      :Create()
-      :DockIt()
-   
-      WITH OBJECT TabControl( :this )
-         :Width         := 252
-         :Height        := 22
-         :BoldSelection := .T.
-         :Flat          := TRUE
-         :Frame         := FALSE
-         :Dock:Top      := :Parent
-         :Dock:Left     := :Parent
-         :Dock:Right    := :Parent
-
-         :Create()
-         :InsertTab( "Properties ", 0 )
-         :InsertTab( "Events ", 1 )
-         :OnSelChanged := {|o,x,y|o:Parent:Parent:TabSelection( x,y ) }
-         :DockIt()
-      END
-
-      WITH OBJECT ( ::ItemManager := ColObjManager( :this ) )
-         :Width         := 332
-         :Height        := 500
-         :Dock:TopMargin:= 2
-         :Caption       := NIL
-         :Dock:Left     := :Parent
-         :Dock:Top      := ::TabControl1
-         :Dock:Bottom   := :Parent
-         :Dock:Right    := :Parent
-
-         :FullRowSelect := .T.
-
-         :NoHScroll     := .T.
-         :HasButtons    := .T.
-         :LinesAtRoot   := .T.
-         :ShowSelAlways := .T.
-
-         :Columns := { {100,C_WHITE}, {200,C_WHITE} }
-         :Create()
-         //:DockIt()
-         :BackColor := GetSysColor( COLOR_BTNFACE )
-      END
-
-      WITH OBJECT ( ::ItemEventManager := EventManager( :this ) )
-         :Width         := 252
-         :Height        := 500
-         :Dock:TopMargin:= 2
-         :Caption       := NIL
-         :Dock:Top      := ::TabControl1
-         :Dock:Bottom   := :Parent
-         :Dock:Left     := :Parent
-         :Dock:Right    := :Parent
-
-         :FullRowSelect := .T.
-
-         :NoHScroll     := .T.
-         :HasButtons    := .T.
-         :LinesAtRoot   := .T.
-         :ShowSelAlways := .T.
-
-         :Columns := { {100,C_LIGHTYELLOW}, {120,C_WHITE} }
-         :Create()
-         //:DockIt()
-         :BackColor := GetSysColor( COLOR_BTNFACE )
-         :ExpandAll()
-         :Hide()
       END
    END
 
    WITH OBJECT ColManager( Self )
-      :Width         := 500
+      :Width         := 160
       :Height        := 500
-      :Dock:Margin   := 4
-      :Dock:Left     := :Parent
-      :Dock:Top      := ::CoolBar1
-      :Dock:Right    := ::Panel1
-      :Dock:Bottom   := ::StatusBar1
+      :Dock:Left     := Self
+      :Dock:Top      := ::ToolStrip1
+      :Dock:Bottom   := Self
       :VertScroll    := .T.
       :OwnerDraw     := ::System:ListBox:OwnerDrawVariable
       :Create()
-      :ResetList()
-
-      :SetFocus()
    END
+
+   WITH OBJECT TabControl( Self )
+      :Width           := 252
+      :Height          := 22
+      :Dock:LeftMargin := 3
+      :BoldSelection   := .T.
+      :Dock:Left       := ::ListBox1
+      :Dock:Top        := ::ToolStrip1
+      :Dock:Bottom     := Self
+      :Dock:Right      := Self
+      :Create()
+      
+      WITH OBJECT TabPage( :this )
+         :Text := "Properties"
+         :Create()
+         WITH OBJECT ( ::ItemManager := ColObjManager( :this ) )
+            :Dock:Left     := :Parent
+            :Dock:Top      := :Parent
+            :Dock:Bottom   := :Parent
+            :Dock:Right    := :Parent
+
+            :FullRowSelect := .T.
+
+            :NoHScroll     := .T.
+            :HasButtons    := .T.
+            :LinesAtRoot   := .T.
+            :ShowSelAlways := .T.
+
+            :Columns := { {100,C_WHITE}, {200,C_WHITE} }
+            :Create()
+         END
+      END
+      WITH OBJECT TabPage( :this )
+         :Text := "Events"
+         :Create()
+         WITH OBJECT ( ::ItemEventManager := EventManager( :this ) )
+            :Dock:Left     := :Parent
+            :Dock:Top      := :Parent
+            :Dock:Bottom   := :Parent
+            :Dock:Right    := :Parent
+
+            :FullRowSelect := .T.
+
+            :NoHScroll     := .T.
+            :HasButtons    := .T.
+            :LinesAtRoot   := .T.
+            :ShowSelAlways := .T.
+
+            :Columns := { {100,C_LIGHTYELLOW}, {120,C_WHITE} }
+            :Create()
+         END
+      END
+   END
+   ::PostMessage( WM_USER + 3027, 0, 0 )
    ::CenterWindow( .T. )
+   ::UpdateWindow()
 RETURN NIL
 
-
-//------------------------------------------------------------------------------------------
-
-METHOD TabSelection( nPrev, nCur ) CLASS ColumnManager
-   ( nPrev )
-   IF nCur == 1
-      ::ItemEventManager:Hide()
-      ::ItemManager:Show()
-    ELSE
-      ::ItemEventManager:Show()
-      ::ItemManager:Hide()
-   ENDIF
-RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------
@@ -309,7 +263,7 @@ METHOD OnSelChange() CLASS ColManager
    IF nSel <= 0
       nSel := ::GetCaretIndex()
    ENDIF
-   IF nSel > 0
+   IF nSel > 0 .AND. ::Parent:ItemManager != NIL
       ::Parent:ItemManager:ResetProperties( {{ ::Parent:Grid:Children[::CurSel]  }} )
       ::Parent:ItemEventManager:ResetEvents( {{ ::Parent:Grid:Children[::CurSel]  }} )
    ENDIF

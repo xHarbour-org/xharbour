@@ -2073,7 +2073,7 @@ RETURN NIL
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, nCode, nId, n, cBuffer, oObj
    LOCAL oChild, oItem, x, y, cBlock, i
-   LOCAL lShow, hParent, pPtr, oCtrl, aRect, aPt, mii, msg, lHandled, oMenu, mmi, oForm
+   LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, lHandled, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    local aParent
    
@@ -2474,10 +2474,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  IF nRet == NIL
                     nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
                  ENDIF
-               ELSEIF pPtr != NIL .AND. pPtr != 0
 
-                 oCtrl := ArrayFromPointer( pPtr )
-                 nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
                  IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
                     ExecuteEvent( "OnCBNSelEndOk", oCtrl )
                  ENDIF
@@ -3588,12 +3585,9 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD GetClientRect() CLASS Window
-
    LOCAL aRect:=_GetClientRect( ::hWnd )
-
    ::ClientWidth  := aRect[3]
    ::ClientHeight := aRect[4]
-
 RETURN {aRect[3],aRect[4]}
 
 //-----------------------------------------------------------------------------------------------

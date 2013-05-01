@@ -1361,16 +1361,18 @@ RETURN NIL
 
 METHOD __UpdateWidth() CLASS ToolStrip
    LOCAL nWidth
-   IF LEN( ::Children ) > 0
-      AEVAL( ::Children, {|o| nWidth := o:Left + o:Width } )
-      ::xWidth := nWidth + IIF( ::xShowChevron, ::__ChevronWidth, 2 ) + 4
-      //::xWidth := ATAIL( ::Children ):Left + ATAIL( ::Children ):Width + IIF( ::xShowChevron, ::__ChevronWidth, 2 )
-    ELSE
-      ::xWidth := 20
+
+   IF UPPER( ::Parent:ClsName ) == "TOOLSTRIPCONTAINER" .OR. ::Dock:Right == NIL
+      IF LEN( ::Children ) > 0
+         AEVAL( ::Children, {|o| nWidth := o:Left + o:Width } )
+         ::xWidth := nWidth + IIF( ::xShowChevron, ::__ChevronWidth, 2 ) + 4
+       ELSE
+         ::xWidth := 20
+      ENDIF
+
+      ::MoveWindow()
+      ::__nWidth := ::Width
    ENDIF
-   
-   ::MoveWindow()
-   ::__nWidth := ::Width
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
@@ -2080,7 +2082,7 @@ RETURN Self
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __SetSubMenu( Self, hMenu )
    LOCAL n, mii, oItem
-   
+
    IF ::__ClassInst != NIL 
       IF ( n := ASCAN( ::Children, {|o| o:Caption == "[ Add New Item ]"} ) ) > 0
          oItem := ::Children[n]
@@ -2088,7 +2090,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
          AADD( ::Children, oItem )
       ENDIF
    ENDIF
-   
+
    FOR EACH oItem IN ::Children
        IF oItem:__pObjPtr != NIL
           EXIT
@@ -2105,6 +2107,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
              :Create()
           END
        ENDIF
+
        IF LEN( oItem:Children ) > 0
           oItem:__hMenu := CreateMenu()
        ENDIF
