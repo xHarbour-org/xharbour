@@ -5929,6 +5929,9 @@ RETURN dbOrderInfo( DBOI_KEYCOUNTRAW, cBag, xOrder )
 FUNCTION aEvents()
 RETURN { ;
                   {"Clipboard",   {;
+                                  { "OnCut"              , "", "" },;
+                                  { "OnCopy"             , "", "" },;
+                                  { "OnPaste"            , "", "" },;
                                   { "OnChangeCbChain"    , "", "" },;
                                   { "OnDrawClipboard"    , "", "" } } },;
                   {"Command",     {;
@@ -5959,9 +5962,6 @@ RETURN { ;
                                   { "OnPaint"            , "", "" } } },;
                   {"Editing",     {;
                                   { "OnClear"            , "", "" },;
-                                  { "OnCopy"             , "", "" },;
-                                  { "OnCut"              , "", "" },;
-                                  { "OnPaste"            , "", "" },;
                                   { "OnUndo"             , "", "" } } },;
                   {"Keyboard",    {;
                                   { "OnChar"             , "", "" },;

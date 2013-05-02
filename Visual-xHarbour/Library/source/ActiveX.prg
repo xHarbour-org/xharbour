@@ -369,6 +369,10 @@ METHOD __GetEventList( lVars ) CLASS ActiveX
 
       IF ::__LoadEvents
          ::Events := {;
+            {"Clipboard",   {;
+                            { "OnCut"              , "", "" },;
+                            { "OnCopy"             , "", "" },;
+                            { "OnPaste"            , "", "" } } },;
             {"Interface",   {;
                             { "OnCreate"           , "", "" },;
                             { "OnInit"             , "", "" } } },;

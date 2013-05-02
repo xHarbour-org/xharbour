@@ -112,8 +112,12 @@ RETURN NIL
 
 
 CLASS Line INHERIT CONTROL
-   DATA Sunken             PUBLISHED INIT .T.
-   PROPERTY Vertical       READ xVertical WRITE __SetVertical DEFAULT .F. INVERT
+   PROPERTY Lenght         READ xLenght   WRITE __SetLenght   DEFAULT 150 INVERT
+   PROPERTY Sunken         READ xSunken   WRITE __SetSunken   DEFAULT .T. INVERT
+   PROPERTY Vertical       READ xVertical WRITE __SetVertical DEFAULT .F.
+
+   ACCESS Width            INLINE ::xWidth
+   ACCESS Height           INLINE ::xHeight
 
    DATA xText              EXPORTED  INIT ""
    DATA Text               EXPORTED  INIT ""
@@ -135,12 +139,28 @@ CLASS Line INHERIT CONTROL
    DATA StaticEdge         EXPORTED
    DATA Transparent        EXPORTED
 
+   DATA HorzScrollSize     EXPORTED  INIT 0
+   DATA VertScrollSize     EXPORTED  INIT 0
+   DATA AcceptFiles        EXPORTED  INIT .F.
+   DATA AnimationStyle     EXPORTED  INIT 0
+   DATA ContextMenu        EXPORTED
+   DATA AllowMaximize      EXPORTED  INIT .F.
+   DATA Enabled            EXPORTED  INIT .T.
+   DATA TabOrder           EXPORTED  INIT 0  
+   DATA NoActivate         EXPORTED  INIT .F.
+   DATA Theming            EXPORTED  INIT .F.
+
    DATA Color              PUBLISHED INIT GetSysColor( COLOR_BTNSHADOW )
 
    METHOD Init() CONSTRUCTOR
-   METHOD OnEraseBkGnd()
-   METHOD __SetVertical()
    METHOD Create()
+
+   METHOD OnEraseBkGnd()
+   METHOD OnSize()
+
+   METHOD __SetVertical()
+   METHOD __SetSunken()
+   METHOD __SetLenght()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS Line
@@ -150,7 +170,7 @@ METHOD Init( oParent ) CLASS Line
    ::__lResizeable := {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::Super:Init( oParent )
    ::__IsStandard  := .F.
-   ::Width         := 150
+   ::Width         := ::Lenght
    ::Height        := ::Weight
    ::Events        := ;
           { ;
@@ -167,24 +187,59 @@ RETURN Self
 
 METHOD Create() CLASS Line
    Super:Create()
-   ::__SetVertical( ::Vertical )
 RETURN Self
-   
+
 METHOD __SetVertical( lSet ) CLASS Line
-   LOCAL nSize
-   IF ::xVertical != lSet
-      ::__lResizeable := {.F.,!lSet,.F.,lSet,.F.,!lSet,.F.,lSet}
-      nSize     := IIF( ::xVertical, ::xHeight, ::xWidth )
-      ::xWidth  := IIF( lSet, ::Weight, nSize )
-      ::xHeight := IIF( lSet, nSize, ::Weight )
+   ::__lResizeable := {.F.,!lSet,.F.,lSet,.F.,!lSet,.F.,lSet}
+   IF lSet
+      ::xHeight := ::xLenght
+      ::xWidth  := ::Weight
+    ELSE
+      ::xWidth  := ::xLenght
+      ::xHeight := ::Weight
+   ENDIF
+   IF ::hWnd != NIL
       ::MoveWindow()
    ENDIF
 RETURN NIL
 
+METHOD __SetSunken( lSet ) CLASS Line
+   IF ::hWnd != NIL .AND. ::xSunken != lSet
+      ::Weight := IIF( lSet, 2, 1 )
+      IF ::xVertical
+         ::Width := ::Weight
+       ELSE
+         ::Height := ::Weight
+      ENDIF
+      ::MoveWindow()
+   ENDIF
+RETURN NIL
 
+METHOD __SetLenght( nLen ) CLASS Line
+   IF ::xLenght != nLen
+      IF ::xVertical
+         ::xHeight := nLen
+       ELSE
+         ::xWidth  := nLen
+      ENDIF
+      IF ::hWnd != NIL
+         ::MoveWindow()
+      ENDIF
+   ENDIF
+RETURN NIL
+
+METHOD OnSize( nwParam, nlParam ) CLASS Line
+   Super:OnSize( nwParam, nlParam )
+   IF ::__ClassInst != NIL
+      ::xLenght := IIF( ::xVertical, ::Height, ::Width )
+   ENDIF
+RETURN NIL
+   
 METHOD OnEraseBkGnd( hDC ) CLASS Line
    LOCAL lVert := ::xVertical, hBrush := CreateSolidBrush( ::Color )
    _FillRect( hDC, { 0, 0, IIF( lVert, 1, ::Width ), IIF( lVert, ::Height, 1 ) }, hBrush )
    DeleteObject( hBrush )
-   _FillRect( hDC, { IIF( lVert, 1, 0 ), IIF( lVert, 0, 1 ), IIF( lVert, 2, ::Width ), IIF( lVert, ::Height, 2 ) }, GetStockObject( WHITE_BRUSH ) )
+   IF ::Sunken
+      _FillRect( hDC, { IIF( lVert, 1, 0 ), IIF( lVert, 0, 1 ), IIF( lVert, 2, ::Width ), IIF( lVert, ::Height, 2 ) }, GetStockObject( WHITE_BRUSH ) )
+   ENDIF
 RETURN 1
