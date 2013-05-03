@@ -638,7 +638,7 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
-//   LOCAL msg, cClass
+   LOCAL msg, cClass
 
    IF oWnd != NIL
       ::MainForm := oWnd
@@ -646,10 +646,10 @@ METHOD Run( oWnd ) CLASS Application
    ::MainForm:__InstMsg := ::__InstMsg
    
    IF !::MainForm:Modal
-  //    VXH_MainLoop()
-
+//      VXH_MainLoop()
+ 
       DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
-         IF !::AxTranslate( Msg, cClass )
+         IF !::AxTranslate( Msg, @cClass )
             IF !::TranslateAccelerator( Msg )
                IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
                   IF ! (cClass == "AfxFrameOrView42s") 

@@ -4846,20 +4846,22 @@ HB_FUNC( TASKBARPROGRESSSTATE )
 HB_FUNC( VXH_MAINLOOP )
 {
    MSG Msg;
-   IUnknown *pUnk;
-   BOOL bUnk;
    while( GetMessage( &Msg, NULL, 0, 0 ) )
    {
-      bUnk = FALSE;
+      BOOL bUnk = FALSE;
+
       if( Msg.message == WM_KEYDOWN )
       {
          char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
          GetClassName( Msg.hwnd, (LPSTR) cClass, MAX_PATH );
 
-         if( Msg.wParam == VK_RETURN || ( (Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE) && strcmp( cClass, "Internet Explorer_Server" )) )
+         if( Msg.wParam == VK_RETURN || ( (Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE) && strcmp( cClass, "Internet Explorer_Server" ) == 0 ) )
          {
-            pUnk = AxGetUnknown( Msg.hwnd );
-            bUnk = AxTranslateMessage( pUnk, &Msg );
+            IUnknown* pUnk = AxGetUnknown( Msg.hwnd );
+            if( pUnk )
+            {
+               bUnk = AxTranslateMessage( pUnk, &Msg );
+            }
          }
          hb_xfree( cClass );
       }
