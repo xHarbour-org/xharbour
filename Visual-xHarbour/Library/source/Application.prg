@@ -608,9 +608,10 @@ RETURN NIL
 METHOD AxTranslate( pMsg, cClass ) CLASS Application
    LOCAL hParent, pUnk, lRet := .F., hWnd := pMsg:hwnd
 
-   DEFAULT cClass TO GetClassName( hWnd )
-
    IF pMsg:message == WM_KEYDOWN
+
+      DEFAULT cClass TO GetClassName( hWnd )
+
       IF pMsg:wParam == VK_RETURN .OR. ( (pMsg:wParam == VK_TAB .OR. pMsg:wParam == VK_DELETE) .AND. cClass == "Internet Explorer_Server" )
 
          WHILE GetClassName( hWnd ) != "AtlAxWin"
@@ -637,7 +638,7 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
-   LOCAL msg, cClass
+//   LOCAL msg, cClass
 
    IF oWnd != NIL
       ::MainForm := oWnd
@@ -645,8 +646,9 @@ METHOD Run( oWnd ) CLASS Application
    ::MainForm:__InstMsg := ::__InstMsg
    
    IF !::MainForm:Modal
+  //    VXH_MainLoop()
+
       DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
-         cClass := GetClassName( Msg:hWnd )
          IF !::AxTranslate( Msg, cClass )
             IF !::TranslateAccelerator( Msg )
                IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
@@ -659,8 +661,8 @@ METHOD Run( oWnd ) CLASS Application
                ENDIF
             ENDIF
          ENDIF
-
       ENDDO
+
    ENDIF
 
    #ifdef VXH_PROFESSIONAL

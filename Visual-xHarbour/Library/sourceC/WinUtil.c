@@ -1739,39 +1739,43 @@ HB_FUNC( __AXTRANSLATEBYHANDLE )
    }
 }
 
-HB_FUNC( __AXGETUNKNOWN )
+IUnknown* AxGetUnknown( HWND hWnd )
 {
    IUnknown *pUnk = NULL;
    ATLAXGETCONTROL pAtlAxGetControl = (ATLAXGETCONTROL) GetProcAddress( hLib, "AtlAxGetControl" );
    if (pAtlAxGetControl)
    {
-      pAtlAxGetControl( (HWND) hb_parnl(1), &pUnk );
-      hb_retnl( (long) pUnk );
+      pAtlAxGetControl( hWnd, &pUnk );
    }
-   else
-   {
-      hb_retnl(0);
-   }
+   return pUnk;
+}
+
+HB_FUNC( __AXGETUNKNOWN )
+{
+   hb_retnl( (long) AxGetUnknown( (HWND) hb_parnl(1) ) );
 }
 
 
 //AtlAdvise(m_ipConnectedView, this->GetUnknown(), IID_IActiveViewEvents, &m_dwViewCookie);
 
 //------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( __AXTRANSLATEMESSAGE )
-{
-   IOleInPlaceActiveObject *pIOIPAO = NULL;
-   IUnknown *pUnk = (IUnknown*) hb_parnl(1);
-   MSG *pMsg = (MSG*) hb_param( 2, HB_IT_STRING )->item.asString.value;
-   BOOL bRet = FALSE;
 
+BOOL AxTranslateMessage( IUnknown *pUnk, MSG *pMsg )
+{
+   BOOL bRet = FALSE;
+   IOleInPlaceActiveObject *pIOIPAO = NULL;
    if (SUCCEEDED( pUnk->lpVtbl->QueryInterface( pUnk, &IID_IOleInPlaceActiveObject, (void**) &pIOIPAO ) ) );
    {
       HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
       pIOIPAO->lpVtbl->Release(pIOIPAO);
       bRet = ( S_OK == hr );
    }
-   hb_retl( bRet );
+   return bRet;
+}
+
+HB_FUNC( __AXTRANSLATEMESSAGE )
+{
+   hb_retl( AxTranslateMessage( (IUnknown*) hb_parnl(1), (MSG*) hb_param( 2, HB_IT_STRING )->item.asString.value ) );
 }
 
 /*
@@ -4838,3 +4842,32 @@ HB_FUNC( TASKBARPROGRESSSTATE )
    CoUninitialize();
    hb_retl( bRet );
 }
+
+HB_FUNC( VXH_MAINLOOP )
+{
+   MSG Msg;
+   IUnknown *pUnk;
+   BOOL bUnk;
+   while( GetMessage( &Msg, NULL, 0, 0 ) )
+   {
+      bUnk = FALSE;
+      if( Msg.message == WM_KEYDOWN )
+      {
+         char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
+         GetClassName( Msg.hwnd, (LPSTR) cClass, MAX_PATH );
+
+         if( Msg.wParam == VK_RETURN || ( (Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE) && strcmp( cClass, "Internet Explorer_Server" )) )
+         {
+            pUnk = AxGetUnknown( Msg.hwnd );
+            bUnk = AxTranslateMessage( pUnk, &Msg );
+         }
+         hb_xfree( cClass );
+      }
+      if( ! bUnk )
+      {
+         TranslateMessage( &Msg );
+         DispatchMessage( &Msg );
+      }
+   }
+}
+
