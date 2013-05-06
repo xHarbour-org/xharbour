@@ -649,9 +649,11 @@ METHOD Run( oWnd ) CLASS Application
 //      VXH_MainLoop()
  
       DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
+         cClass := NIL
          IF !::AxTranslate( Msg, @cClass )
             IF !::TranslateAccelerator( Msg )
                IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
+                  DEFAULT cClass TO GetClassName( Msg:hWnd )
                   IF ! (cClass == "AfxFrameOrView42s") 
                      IF !IsDialogMessage( GetActiveWindow(), Msg )
                         TranslateMessage( Msg )

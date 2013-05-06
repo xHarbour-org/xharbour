@@ -204,13 +204,15 @@ METHOD __SetVertical( lSet ) CLASS Line
 RETURN NIL
 
 METHOD __SetSunken( lSet ) CLASS Line
-   IF ::hWnd != NIL .AND. ::xSunken != lSet
+   IF ::xSunken != lSet
       ::Weight := IIF( lSet, 2, 1 )
       IF ::xVertical
-         ::Width := ::Weight
+         ::xWidth := ::Weight
        ELSE
-         ::Height := ::Weight
+         ::xHeight := ::Weight
       ENDIF
+   ENDIF
+   IF ::hWnd != NIL
       ::MoveWindow()
    ENDIF
 RETURN NIL
