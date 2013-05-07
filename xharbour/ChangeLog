@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-05 12:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/ct/files.c
+    ! fixed hidden memory leaks on functions FILEDATE & FILETIME
+
 2013-01-29 21:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/hbxml.c
     ! fixed memory leaks reported by Reinaldo

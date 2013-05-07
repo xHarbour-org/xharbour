@@ -127,8 +127,8 @@ static struct ffblk fsOldFiles;
 #if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
 static HANDLE           hLastFind;
 static WIN32_FIND_DATA  Lastff32;
-LPTSTR GetDate( FILETIME * rTime );
-LPTSTR GetTime( FILETIME * rTime );
+static LPTSTR GetDate( FILETIME * rTime );
+static LPTSTR GetTime( FILETIME * rTime );
 
 #if ! defined( _MSC_VER ) && ! defined( __RSXNT__ ) && ! defined( __WATCOMC__ )
    #include <dir.h>
@@ -660,10 +660,24 @@ HB_FUNC( FILEDATE )
 
          if( hFind != INVALID_HANDLE_VALUE )
          {
+#if 0
             if( dwFlags & hFilesFind.dwFileAttributes )
                hb_retds( GetDate( &hFilesFind.ftLastWriteTime ) );
             else
                hb_retds( GetDate( &hFilesFind.ftLastWriteTime ) );
+#else
+            LPTSTR szDateString = GetDate( &hFilesFind.ftLastWriteTime );
+
+            HB_SYMBOL_UNUSED( dwFlags );
+
+            if( szDateString )
+            {
+               hb_retds( szDateString );
+               hb_xfree( szDateString );
+            }
+            else
+               hb_retds( "        " );
+#endif
             FindClose( hFind );
          }
          else
@@ -672,10 +686,15 @@ HB_FUNC( FILEDATE )
       }
       else
       {
-         LPTSTR szDateString;
-         szDateString = GetDate( &Lastff32.ftLastWriteTime );
-         hb_retds( szDateString );
+         LPTSTR szDateString = GetDate( &Lastff32.ftLastWriteTime );
 
+         if( szDateString )
+         {
+            hb_retds( szDateString );
+            hb_xfree( szDateString );
+         }
+         else
+            hb_retds( "        " );
       }
    }
 #elif defined( HB_OS_DOS ) && ! defined( __WATCOMC__ )
@@ -758,8 +777,8 @@ HB_FUNC( FILETIME )
       DWORD             dwFlags = FILE_ATTRIBUTE_ARCHIVE;
       HANDLE            hFind;
       WIN32_FIND_DATA   hFilesFind;
-
       int               iAttr;
+
       if( hb_pcount() >= 1 )
       {
          szFile = hb_parcx( 1 );
@@ -789,10 +808,23 @@ HB_FUNC( FILETIME )
 
          if( hFind != INVALID_HANDLE_VALUE )
          {
+#if 0
             if( dwFlags & hFilesFind.dwFileAttributes )
                hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );
             else
                hb_retc( GetTime( &hFilesFind.ftLastWriteTime ) );
+#else
+            HB_SYMBOL_UNUSED( dwFlags );
+
+            szDateString = GetTime( &hFilesFind.ftLastWriteTime );
+            if( szDateString )
+            {
+               hb_retc( szDateString );
+               hb_xfree( szDateString );
+            }
+            else
+               hb_retc( "" );
+#endif
             FindClose( hFind );
          }
          else
@@ -802,9 +834,14 @@ HB_FUNC( FILETIME )
       else
       {
          szDateString = GetTime( &Lastff32.ftLastWriteTime );
-         hb_retc( szDateString );
+         if( szDateString )
+         {
+            hb_retc( szDateString );
+            hb_xfree( szDateString );
+         }
+         else
+            hb_retc( "" );
       }
-
    }
 
 #elif defined( HB_OS_DOS ) && ! defined( __WATCOMC__ )
@@ -878,7 +915,7 @@ HB_FUNC( FILETIME )
 
 #include <tchar.h>
 
-LPTSTR GetDate( FILETIME * rTime )
+static LPTSTR GetDate( FILETIME * rTime )
 {
    static const LPTSTR  tszFormat = "yyyyMMdd";
    FILETIME             ft;
@@ -892,11 +929,12 @@ LPTSTR GetDate( FILETIME * rTime )
          if( ( iSize = GetDateFormat( 0, 0, &time, tszFormat, NULL, 0 ) ) != 0 )
          {
             LPTSTR tszDateString;
-            if( ( tszDateString = ( LPTSTR ) malloc( iSize + sizeof( TCHAR ) ) ) != NULL )
+            if( ( tszDateString = ( LPTSTR ) hb_xgrab( iSize + sizeof( TCHAR ) ) ) != NULL )
             {
                if( GetDateFormat( 0, 0, &time, tszFormat, tszDateString, iSize ) )
                   return tszDateString;
-               free( tszDateString );
+
+               hb_xfree( tszDateString );
             }
          }
       }
@@ -905,7 +943,7 @@ LPTSTR GetDate( FILETIME * rTime )
    return NULL;
 }
 
-LPTSTR GetTime( FILETIME * rTime )
+static LPTSTR GetTime( FILETIME * rTime )
 {
    static const LPTSTR  tszFormat = "HH':'mm':'ss"; /*_T( "MM'\\'dd'\\'yyyy" );*/
    FILETIME             ft;
@@ -919,11 +957,12 @@ LPTSTR GetTime( FILETIME * rTime )
          if( ( iSize = GetTimeFormat( 0, 0, &time, tszFormat, NULL, 0 ) ) != 0 )
          {
             LPTSTR tszDateString;
-            if( ( tszDateString = ( LPTSTR ) malloc( iSize + sizeof( TCHAR ) ) ) != NULL )
+            if( ( tszDateString = ( LPTSTR ) hb_xgrab( iSize + sizeof( TCHAR ) ) ) != NULL )
             {
                if( GetTimeFormat( 0, 0, &time, tszFormat, tszDateString, iSize ) )
                   return tszDateString;
-               free( tszDateString );
+
+               hb_xfree( tszDateString );
             }
          }
       }
