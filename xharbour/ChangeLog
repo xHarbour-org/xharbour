@@ -11,6 +11,12 @@
 2013-02-24 09:19 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * include/hbvmpub.h
     ! Fixed typo.
+  * source/odbc/todbc.prg
+    ! Don't continue ::Open() when SQLExecDir() have error.
+
+2013-02-24 09:19 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * include/hbvmpub.h
+    ! Fixed typo.
 
 2013-02-16 21:37 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * winmake/makefile.pc
