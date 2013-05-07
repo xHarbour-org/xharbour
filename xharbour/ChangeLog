@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-17 15:40 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source\compiler\harbour.c
+  * source\compiler\harbour.sly
+    ! fix more memory leaks on failure
+
 2013-01-17 14:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * utils/misc/hbrm.c
     + include <io.h> to satisfy MSVC

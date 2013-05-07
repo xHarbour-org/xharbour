@@ -4364,44 +4364,8 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
 
    if( asExpr )
    {
-      switch( asExpr->ExprType )
-      {
-         case HB_ET_WITHSEND:
-         case HB_ET_VARIABLE:
-            hb_xfree( asExpr );
-            asExpr = NULL;
-            break;
-
-         case HB_ET_CODEBLOCK:
-         {
-            PHB_CBVAR pDel, pVar = (PHB_CBVAR) asExpr->value.asList.pIndex;
-
-            while( pVar )
-            {
-               pDel = pVar;
-               pVar = pVar->pNext;
-               hb_xfree( (void *) pDel );
-            }
-            hb_xfree( asExpr );
-            asExpr = NULL;
-            break;
-         }
-
-         case HB_ET_ARGLIST:
-         {
-            HB_EXPR_PTR pDel, pVar = asExpr->value.asList.pExprList;
-
-            while( pVar )
-            {
-               pDel = pVar;
-               pVar = pVar->pNext;
-               hb_xfree( (void *) pDel );
-            }
-            hb_xfree( asExpr );
-            asExpr = NULL;
-            break;
-         }
-      }
+      hb_compExprDelete( asExpr );
+      asExpr = NULL;
    }
 
    while( hb_comp_BlocksList )
