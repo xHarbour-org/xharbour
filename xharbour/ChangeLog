@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-25 09:05 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>  
+  * source/rtl/memoedit.prg
+    ! now handling ME_PASTE return by calling  hb_gtinfo( HB_GTI_CLIPBOARDPAST )    
+
 2013-03-25 18:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake/common3.mak
   * winmake/makefile.gc

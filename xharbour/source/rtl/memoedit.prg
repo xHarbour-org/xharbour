@@ -54,7 +54,7 @@
 #include "hbclass.ch"
 #include "memoedit.ch"
 #include "inkey.ch"
-
+#include "hbgtinfo.ch"
 //-------------------------------------------------------------------//
 //
 // A specialized HBEditor which can simulate MemoEdit() behaviour
@@ -370,6 +370,7 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
 
    CASE ME_PASTE        // (110)
       // see inkey.ch
+      HB_GTINFO( HB_GTI_CLIPBOARDPAST )
       EXIT
 
       DEFAULT   // ME_UNKEY (1 TO 31)
