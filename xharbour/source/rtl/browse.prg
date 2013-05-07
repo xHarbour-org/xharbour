@@ -67,7 +67,6 @@ function Browse( nTop, nLeft, nBottom, nRight )
    local n, nOldCursor
    local nKey := 0
    local lExit := .f.
-   local lGotKey := .f.
    Local lRefresh
    Local bAction
    Local lKeyPressed
@@ -375,7 +374,6 @@ static function DOGET( oBrowse, lShared )
 
    oBrowse:hittop := .F.
    oBrowse:hitbottom := .F.
-   lMemo := .f.
 
    statline( oBrowse )
 

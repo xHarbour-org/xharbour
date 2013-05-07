@@ -178,7 +178,6 @@ ENDCLASS
 METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
 
    LOCAL nCurrent, cMsg := NIL
-   LOCAL cSaveColor := SetColor()
    LOCAL mlOldState := MSetCursor( .F. )
 
    IF ( ValType( oMenu:lOldMsgFlag ) == "L" .AND. oMenu:lOldMsgFlag )

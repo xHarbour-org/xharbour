@@ -218,7 +218,7 @@ local bExact
 
 FUNCTION daysInmonth ( nMonth, lLeap )
 
-local nday := 0
+local nday
 
   do case
      case nMonth == 2
@@ -284,7 +284,7 @@ FUNCTION dmy ( ddate, lmode )
 //local nYear   :=  year (dDate)
 local nMonth, nDay, nYear 
 
-local cPeriod := ""
+local cPeriod
 local cDate
 local cMonth 
 
@@ -314,10 +314,10 @@ local lSetCentury := __SETCENTURY()
 
 FUNCTION doy ( dDate )
 
-local lleap   := .F.
+local lleap
 local nMonth  := month (dDate)
 local nDay    := day (dDate)
-local numdays := 0
+local numdays
 
    if valtype ( dDate ) != "D"
       dDate := date()
@@ -505,7 +505,6 @@ FUNCTION week ( dDate, lSWN )
 local nMonth
 local nDays
 local nDay
-local nYear
 local nWeek
 local nPart
 local dDate2
@@ -529,7 +528,6 @@ local dDate2
 
      nMonth  := month (dDate)
      nDay    :=   day (dDate)
-     nYear   :=  year (dDate)
 
      if valtype (lSWN) != "L"
 	lSWN := .F.
@@ -555,9 +553,3 @@ local dDate2
      endif
 
      return nWeek
-
-
-
-
-
-

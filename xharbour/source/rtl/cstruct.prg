@@ -376,16 +376,14 @@ STATIC PROCEDURE AllocateMembers( oStructure )
 
 FUNCTION HB_CStructureFromID( nID, nAlign )
 
-   LOCAL hClass, oStructure, lInplace
+   LOCAL hClass, oStructure
    LOCAL oErr
 
 //TraceLog( nId, s_aClasses )
 
    IF nID > CTYPE_STRUCTURE_PTR
-      lInplace := .F.
       nID -= CTYPE_STRUCTURE_PTR
    ELSEIF nID > CTYPE_STRUCTURE
-      lInplace := .T.
       nID -= CTYPE_STRUCTURE
    ELSE
       oErr := ErrorNew()
@@ -601,7 +599,7 @@ STATIC FUNCTION Value()
 STATIC FUNCTION DeValue( lAdopt )
 
 //LOCAL aValues := {}
-   LOCAL nLen := Len( QSelf() ) - CLASS_PROPERTIES
+//LOCAL nLen := Len( QSelf() ) - CLASS_PROPERTIES
    LOCAL Buffer := QSelf():InternalBuffer
 
 //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ), lAdopt )

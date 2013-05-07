@@ -267,11 +267,8 @@ METHOD SetCaption( xData ) CLASS HBListBox
 
 METHOD SetBottom( xData ) CLASS HBListBox
 
-   LOCAL nBottom
-
    IF !( ISNIL( xData ) .AND. ISNUMBER( xData ) ) .AND. ;
          ISNUMBER( ( ::xBottom := xData ) ) .AND. ISOBJECT( ( ::vScroll ) )
-      nBottom       := ::xBottom
       ::vScroll:end := xData - 1
    ENDIF
 
@@ -599,7 +596,6 @@ METHOD _SCROLL( nMethod ) CLASS HBListBox
 
    CASE HTSCROLLBLOCKDEC
       nPos     := ::bottom - ::top - iif( ::bitmap, 2, 1 )
-      nCount   := ::itemCount
       nTopItem := ::topitem - nPos
       IF ::topitem > 1
          IF nTopItem < 1
@@ -895,13 +891,12 @@ METHOD InsItem( nPosition, cText, xExp )
 METHOD HitTest( nMouseRow, nMouseCol ) CLASS HBListBox
 
    LOCAL Local1
-   LOCAL Local2 := 0
    LOCAL cColor
 
    IF ! ::isopen
    ELSEIF ! ISOBJECT( ::vScroll )
-   ELSEIF ( Local2 := ::vScroll:HitTest( nMouseRow, nMouseCol ) ) != 0
-      RETURN Local2
+   ELSEIF ( Local1 := ::vScroll:HitTest( nMouseRow, nMouseCol ) ) != 0
+      RETURN Local1
    ENDIF
 
    IF ! ::isopen .OR. Empty( ::hotbox + ::coldbox )

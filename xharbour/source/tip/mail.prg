@@ -616,16 +616,16 @@ METHOD attachFile( cFileName ) CLASS TipMail
 
    LOCAL cContent := MemoRead( cFileName )
    LOCAL cFname, cFext
-   LOCAL xDummy := hb_FNameSplit( cFileName, , @cFname, @cFext )
-
-   LOCAL cMimeType := HB_SetMimeType( cFileName, cFname, cFext )
+   LOCAL cMimeType
    LOCAL cDelim   := hb_osPathSeparator()
-
    LOCAL oAttach
 
    IF Empty( cContent )
       RETURN .F.
    ENDIF
+
+   hb_FNameSplit( cFileName, , @cFname, @cFext )
+   cMimeType := HB_SetMimeType( cFileName, cFname, cFext )
 
    IF ".html" in Lower( cFext ) .OR. ".htm" in Lower( cFext )
       cMimeType += "; charset=ISO-8859-1"
@@ -705,7 +705,7 @@ METHOD detachFile( cPath ) CLASS TipMail
 
 METHOD getFileName() CLASS TipMail
 
-   LOCAL cName := ''
+   LOCAL cName
 
    IF "attachment" $ Lower( ::getFieldPart( "Content-Disposition" ) )
       cName := ::getFieldOption( "Content-Disposition", "filename" )

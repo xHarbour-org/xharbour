@@ -8,6 +8,68 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-21 10:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/cgi/hjwindow.prg
+  * source/cgi/hterrsys.prg
+  * source/cgi/htjlist.prg
+  * source/cgi/htmutil.prg
+  * source/cgi/tcgi.prg
+  * source/cgi/tedit.prg
+  * source/cgi/thtm.prg
+  * source/ct/alt/ctwin.prg
+  * source/ct/alt/dattime2.prg
+  * source/ct/diskutil.prg
+  * source/ct/getinfo.prg
+  * source/ct/getsecrt.prg
+  * source/ct/setkeys.prg
+  * source/ct/trapkey.prg
+  * source/ct/util.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtmenu.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/debugger.prg
+  * source/odbc/browodbc.prg
+  * source/odbc/todbc.prg
+  * source/rdd/dbstrux.prg
+  * source/rdd/usrrdd/rdds/adordd.prg
+  * source/rdd/usrrdd/rdds/hscdx.prg
+  * source/rtl/achoice.prg
+  * source/rtl/browse.prg
+  * source/rtl/checkbox.prg
+  * source/rtl/cstruct.prg
+  * source/rtl/dbedit.prg
+  * source/rtl/dumpvar.prg
+  * source/rtl/errorsys.prg
+  * source/rtl/hblog.prg
+  * source/rtl/listbox.prg
+  * source/rtl/mssgline.prg
+  * source/rtl/pushbtn.prg
+  * source/rtl/regexrpl.prg
+  * source/rtl/scrollbr.prg
+  * source/rtl/tbrowse.prg
+  * source/rtl/teditor.prg
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/tlabel.prg
+  * source/rtl/tpopup.prg
+  * source/rtl/treport.prg
+  * source/rtl/trpccli.prg
+  * source/rtl/ttable.prg
+  * source/rtl/ttopbar.prg
+  * source/rtl/txml.prg
+  * source/rtl/win32prn.prg
+  * source/rtl/winreg.prg
+  * source/tip/cgi.prg
+  * source/tip/client.prg
+  * source/tip/ftpcln.prg
+  * source/tip/httpcln.prg
+  * source/tip/mail.prg
+  * source/tip/popcln.prg
+  * source/tip/sendmail.prg
+  * source/tip/smtpcln.prg
+    ! fixed assigned but not used variable
+
 2013-03-21 09:xx UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/harbour.c
   * source/compiler/hbgenerr.c

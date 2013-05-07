@@ -197,7 +197,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
    @ Row(), Col() GET cValue ;
        VALID iif( Type( cValue ) == "UE", ( __dbgAlert( "Expression error" ), .F. ), .T. )
 
-   READ
+   READ SAVE
 
    SetCursor( SC_NONE )
    Set( _SET_SCOREBOARD, lScoreSave )
@@ -227,7 +227,6 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbObject
 METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, aArray ) CLASS HBDbObject
 
    LOCAL nSet := oBrwSets:Cargo
-   LOCAL cOldname := ::objname
 
    HB_SYMBOL_UNUSED( oWnd )
    HB_SYMBOL_UNUSED( cName )

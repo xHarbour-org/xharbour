@@ -64,7 +64,8 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
    LOCAL aMatches, aMatch
    LOCAL cReturn
    LOCAL nOffSet := 0
-   LOCAL cSearch, nStart, nEnd, nLenSearch, nLenReplace
+   LOCAL cSearch, nStart, nLenSearch, nLenReplace
+// LOCAL nEnd
 
    IF HB_ISREGEXSTRING( cRegex )
       pRegex := cRegEx
@@ -83,7 +84,7 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
          IF Len( aMatch ) == 1 .AND. Len( aMatch[1] ) == 3 // if regex matches I must have an array of 3 elements
             cSearch := aMatch[1][ MATCH_STRING ]
             nStart  := aMatch[1][ MATCH_START ]
-            nEnd    := aMatch[1][ MATCH_END ]
+            //nEnd    := aMatch[1][ MATCH_END ]
 
             nLenSearch  := Len( cSearch ) //nEnd - nStart + 1
             nLenReplace := Len( cReplace )
@@ -136,7 +137,7 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
 FUNCTION hb_RegExStrTran( cString, cpSearch, cReplace, nStart, nCount, lCase, lNewLine )
 
    LOCAL aMatch, nFind := 0, cRet := ""
-   LOCAL cRep := "", cRep0, pos, xG1, xG2, lAll
+   LOCAL cRep, cRep0, pos, xG1, xG2, lAll
 
    IF !ValType( cString ) $ "CM"
       // do error ???

@@ -135,7 +135,7 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
 
    ELSE
       /* NOTE: CA-Cl*pper does an RTrim() on the filename here,
-               but in Harbour we're using _SET_TRIMFILENAME. [vszakats] */
+               but in Harbour we're using _SET_TRIMFILENAME */
       IF Set( _SET_DEFEXTENSIONS )
          hb_FNameSplit( cLBLName, NIL, NIL, @cExt )
          IF Empty( cExt )
@@ -356,18 +356,16 @@ METHOD SampleLabels() CLASS HBLabelForm
    RETURN Self
 
 METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
-   LOCAL i, j       := 0                  // Counters
+   LOCAL i                                // Counters
    LOCAL cBuff      := SPACE(BUFFSIZE)    // File buffer
-   LOCAL nHandle    := 0                  // File handle
-   LOCAL nReadCount := 0                  // Bytes read from file
-   LOCAL lStatus    := .F.                // Status
+   LOCAL nHandle                          // File handle
+   LOCAL nReadCount                       // Bytes read from file
    LOCAL nOffset    := FILEOFFSET         // Offset into file
-   LOCAL nFileError := F_OK               // File error
-   LOCAL cFieldText := ""                 // Text expression container
+   LOCAL nFileError                       // File error
+   LOCAL cFieldText                       // Text expression container
    LOCAL err                              // error object
 
    LOCAL cDefPath          // contents of SET DEFAULT string
-   LOCAL nPathIndex := 0   // iteration counter
    LOCAL cPath
 
    // Create and initialize default label array
@@ -398,7 +396,7 @@ METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
 
          ENDIF
 
-      NEXT nPathIndex
+      NEXT
 
    ENDIF
 
@@ -464,8 +462,6 @@ METHOD LoadLabel( cLblFile ) CLASS HBLabelForm
 
       // Close file
       FCLOSE( nHandle )
-      nFileError := FERROR()
-
    ENDIF
    RETURN aLabel
 

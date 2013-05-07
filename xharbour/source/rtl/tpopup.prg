@@ -222,7 +222,7 @@ METHOD DelItem( nPos ) CLASS PopUpMenu
 
 METHOD GetAccel( nKey ) CLASS PopUpMenu
 
-   LOCAL nAt   := 0
+   LOCAL nAt
    LOCAL cKey  := Upper( Chr( nKey ) )
    LOCAL oItems
 
@@ -444,8 +444,8 @@ METHOD SetItem( nPos, oItem ) CLASS PopUpMenu
 METHOD DISPLAY() CLASS PopUpMenu
 
    LOCAL nTop     := ::top
-   LOCAL nAt      := 0
-   LOCAL lPopup   := FALSE
+   LOCAL nAt
+   LOCAL lPopup
    LOCAL cPrompt
    LOCAL oItems
 

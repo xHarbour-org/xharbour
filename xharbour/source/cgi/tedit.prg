@@ -198,7 +198,7 @@ ENDCLASS
 METHOD Put() CLASS THtmlControl
 
    LOCAL i
-   LOCAL cStr := ""
+   LOCAL cStr
 
    ::nH   := HtmlPageHandle()
    ::form := HtmlFormName()

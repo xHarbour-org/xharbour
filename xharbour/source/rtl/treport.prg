@@ -198,7 +198,7 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
       Eval(ErrorBlock(), err)
    ELSE
       /* NOTE: CA-Cl*pper does an RTrim() on the filename here, 
-               but in Harbour we're using _SET_TRIMFILENAME. [vszakats] */
+               but in Harbour we're using _SET_TRIMFILENAME */
       IF Set( _SET_DEFEXTENSIONS )
          hb_FNameSplit( cFRMName, NIL, NIL, @cExt )
          IF Empty( cExt )
@@ -461,7 +461,7 @@ METHOD EjectPage() CLASS HBReportForm
 
 METHOD ReportHeader() CLASS HBReportForm
 
-   LOCAL nLinesInHeader := 0
+   LOCAL nLinesInHeader
    LOCAL aPageHeader    := {}
    LOCAL nHeadingLength := ::aReportData[RPT_WIDTH] - ::aReportData[RPT_LMARGIN] -30
    LOCAL nLine, nMaxColLength, cHeader
@@ -482,7 +482,7 @@ METHOD ReportHeader() CLASS HBReportForm
             Occurs(";",::aReportData[RPT_HEADING]) +1 )
 
          FOR EACH cTempPgHeader IN aTempPgHeader
-            nLinesInHeader:=MAX( XMLCOUNT( LTRIM( cTempPgHeader ) , ;
+            nLinesInHeader := MAX( XMLCOUNT( LTRIM( cTempPgHeader ) , ;
                nHeadingLength),1)
 
             FOR nHeadLine := 1 to nLinesInHeader
@@ -565,11 +565,7 @@ METHOD ExecuteReport() CLASS HBReportForm
 
    LOCAL aRecordHeader  := {}          // Header for the current record
    LOCAL aRecordToPrint := {}          // Current record to print
-   
-   // 2004-02-14 Piemonte Gianluca
-   // nCol should be initialized
-   LOCAL nCol := 0                     // Counter for the column work
-   
+   LOCAL nCol                          // Counter for the column work
    LOCAL nGroup                        // Counter for the group work
    LOCAL lGroupChanged  := .F.         // Has any group changed?
    LOCAL lEjectGrp := .F.              // Group eject indicator
@@ -581,7 +577,7 @@ METHOD ExecuteReport() CLASS HBReportForm
    LOCAL lAnySubTotals
 
    // Add to the main column totals
-   nCol := 1
+// nCol := 1
    FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
       IF aReport[RCT_TOTAL]
 
@@ -595,7 +591,7 @@ METHOD ExecuteReport() CLASS HBReportForm
          ::aReportTotals[ 1 ,HB_EnumIndex()] += ;
                   EVAL( aReport[RCT_EXP] )
       ENDIF
-      nCol++
+//    nCol++
    NEXT
 
    // Determine if any of the groups have changed.  If so, add the appropriate
@@ -712,7 +708,7 @@ METHOD ExecuteReport() CLASS HBReportForm
 
          //  put CRFF after group
          IF HB_EnumIndex() == 1 .AND. !::lFirstPass .AND. !lAnySubTotals
-            IF lEjectGrp := aReport[ RGT_AEJECT ]
+            IF aReport[ RGT_AEJECT ]
                ::nLinesLeft  := 0
             ENDIF
          ENDIF
@@ -842,7 +838,7 @@ METHOD ExecuteReport() CLASS HBReportForm
             ENDIF        
             aRecordToPrint[ nLine ] += cLine
          NEXT
-         nCol ++
+         nCol++
       NEXT
 
       // Determine if aRecordToPrint will fit on the current page
@@ -912,13 +908,13 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
    LOCAL cParamsBuff
    LOCAL nFieldOffset   := 0
    LOCAL cFileBuff      := SPACE(SIZE_FILE_BUFF)
-   LOCAL cGroupExp      := SPACE(200)
-   LOCAL cSubGroupExp   := SPACE(200)
-   LOCAL nColCount      := 0        // Number of columns in report
+   LOCAL cGroupExp
+   LOCAL cSubGroupExp
+   LOCAL nColCount                  // Number of columns in report
    LOCAL nCount
    LOCAL nFrmHandle                 // (.frm) file handle
    LOCAL nBytesRead                 // Read/write and content record counter
-   LOCAL nPointer       := 0        // Points to an offset into EXPR_BUFF string
+   LOCAL nPointer                   // Points to an offset into EXPR_BUFF string
    LOCAL nFileError                 // Contains current file error
    LOCAL cOptionByte                // Contains option byte
 
@@ -1077,7 +1073,7 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
 
       IF INT(cOptionByte / 1) == 1
          aReport[ RPT_BEJECT ] := .F.         // Page eject before report
-         cOptionByte -= 1
+         //cOptionByte -= 1
       ENDIF
 
       // Page heading, report title
@@ -1179,8 +1175,8 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
 */
 
 METHOD GetExpr( nPointer ) CLASS HBReportForm
-   LOCAL nExprOffset   := 0
-   LOCAL nExprLength   := 0
+   LOCAL nExprOffset
+   LOCAL nExprLength
    LOCAL nOffsetOffset := 0
    LOCAL cString := ""
 
@@ -1311,7 +1307,7 @@ STATIC FUNCTION ParseHeader( cHeaderString, nFields )
 *
 */
 METHOD GetColumn( cFieldsBuffer, nOffset ) CLASS HBReportForm
-   LOCAL nPointer := 0, nNumber := 0, aColumn[ RCT_COUNT ], cType,cExpr
+   LOCAL nPointer, aColumn[ RCT_COUNT ], cType,cExpr
 
    // Column width
    aColumn[ RCT_WIDTH ] := BIN2W(SUBSTR(cFieldsBuffer, nOffset + ;

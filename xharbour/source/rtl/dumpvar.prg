@@ -85,8 +85,6 @@ PROCEDURE __OutDebug( ... )
 
 FUNCTION HB_DumpVar( xVar, lRecursive, nMaxRecursionLevel )
 
-   LOCAL cType := ValType( xVar )
-   LOCAL cString := ""
    LOCAL nRecursionLevel := 1
    LOCAL nIndent         := 0
 

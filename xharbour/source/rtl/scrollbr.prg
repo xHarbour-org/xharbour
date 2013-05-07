@@ -425,7 +425,7 @@ STATIC FUNCTION ThumbPos( oScroll )
 FUNCTION ScrollBar( nStart, nEnd, nOffSet, bsBlock, nOrient )
 
    LOCAL oScroll
-   LOCAL cStyle
+   //LOCAL cStyle
 
    IF !( ISNUMBER( nStart ) ) .OR. !( ISNUMBER( nEnd ) ) .OR. !( ISNUMBER( nOffSet ) )
       RETURN Nil
@@ -436,9 +436,9 @@ FUNCTION ScrollBar( nStart, nEnd, nOffSet, bsBlock, nOrient )
    ENDIF
 
    IF nOrient == 1
-      cStyle := "°²"
+      //cStyle := "°²"
    ELSEIF nOrient == 2
-      cStyle := "°²" + Chr( 26 )
+      //cStyle := "°²" + Chr( 26 )
    ELSE
       RETURN Nil
    ENDIF

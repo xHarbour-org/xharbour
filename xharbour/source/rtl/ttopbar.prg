@@ -293,7 +293,7 @@ RETURN 0
 */
 METHOD GetAccel( nKey ) CLASS TopBarMenu
 
-   LOCAL nAt   := 0
+   LOCAL nAt
    LOCAL cKey  := Upper( ::__AltToKey( nKey ) ) /* By now */
    LOCAL aItems
 
@@ -811,13 +811,13 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
             ::oMenu      := ::aMenuList[ ::nMenuLevel ]
 
             nMenuItem := ::oMenu:Current
-            oMenuItem := ::oMenu:GetItem( nMenuItem )
+            //oMenuItem := ::oMenu:GetItem( nMenuItem )
             IF ( ( oMenuItem := ::oMenu:GetItem( ::oMenu:Current ) ):IsPopUp() )
                oMenuItem:Data:Close()
             ENDIF
 
             IF !( nMenuItem == nNewItem )
-               nMenuItem := nNewItem
+               //nMenuItem := nNewItem
                ::oMenu:Select( nNewItem )
                ::oMenu:Display()
                ::PushMenu( .T. )

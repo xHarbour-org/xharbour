@@ -869,7 +869,7 @@ METHOD Settle( nPos ) CLASS HBGetList
 
 #endif
 
-   LOCAL nExitState := 0
+   LOCAL nExitState
 
    IF nPos == NIL
       nPos := ::nPos
@@ -1687,7 +1687,7 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
       ENDIF
 
       IF ( nButton != 0 )
-      ELSEIF ( nButton := oTB:HitTest( nMouseRow, nMouseColumn ) ) == HTNOWHERE // Changed test:
+      ELSEIF oTB:HitTest( nMouseRow, nMouseColumn ) == HTNOWHERE // Changed test:
          if ::HitTest(  nMouseRow, nMouseColumn, oGetMsg ) != 0
             oGet:ExitState := GE_MOUSEHIT
             ::nLastExitState := GE_MOUSEHIT

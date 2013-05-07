@@ -214,7 +214,6 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
 METHOD AUTH( cUser, cPass ) CLASS tIPClientSMTP
 
-   LOCAL cs := ''
    LOCAL cEncodedUser
    LOCAL cEncodedPAss
 

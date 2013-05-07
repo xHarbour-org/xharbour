@@ -829,7 +829,7 @@ METHOD SAY( str, font, size, type, color, style ) CLASS THtml
 
 METHOD Paragraph( lStart, cAlign, cStyle ) CLASS THtml
 
-   LOCAL cStr := "<P"
+   LOCAL cStr
 
    DEFAULT( lStart, .T. )
    DEFAULT( cAlign, "LEFT" )
@@ -1908,8 +1908,6 @@ METHOD Marquee( cText, cFont, cFntColor, nFntSize, ;
       nScrollAmt, nScrollDelay, LOOP, ;
       onMsOver, onMsOut, onClick, onStart, onFinish ) CLASS THtml
 
-   LOCAL cStr := ""
-
    DEFAULT cFont TO "Verdana"
    DEFAULT cFntColor TO "white"
    DEFAULT nFntSize TO 3
@@ -2329,7 +2327,7 @@ PROCEDURE HtmlJsCmd( nH, cCmd )
 FUNCTION HtmlLinkStyle( cHoverStyle, cHoverClr, cHoverBG, ;
       cLinkStyle, cLinkClr, cLinkBG )
 
-   LOCAL cStr := ""
+   LOCAL cStr
 
    DEFAULT cHoverStyle TO "normal"
    DEFAULT cLinkStyle TO "normal"
@@ -2351,15 +2349,13 @@ FUNCTION HtmlLinkStyle( cHoverStyle, cHoverClr, cHoverBG, ;
 
 FUNCTION HtmlPadL( cStr, n )
 
-   LOCAL cRet    := ""
-   LOCAL nStrLen
+   LOCAL cRet
    LOCAL nSpaces
 
    IF n == NIL
       RETURN cStr
    ENDIF
 
-   nStrLen := Len( cStr )
    nSpaces := n - Len( cStr )
 
    IF n <= 0
@@ -2378,15 +2374,13 @@ FUNCTION HtmlPadL( cStr, n )
 
 FUNCTION HtmlPadR( cStr, n )
 
-   LOCAL cRet    := ""
-   LOCAL nStrLen
+   LOCAL cRet
    LOCAL nSpaces
 
    IF n == NIL
       RETURN cStr
    ENDIF
 
-   nStrLen := Len( cStr )
    nSpaces := n - Len( cStr )
 
    IF n <= 0

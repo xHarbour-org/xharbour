@@ -180,7 +180,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbArray
    @ Row(), oBrowse:nLeft + oBrowse:GetColumn( 1 ):width + 1 GET cValue ;
       VALID iif( Type( cValue ) == "UE", ( __dbgAlert( "Expression error" ), .F. ), .T. )
 
-   READ
+   READ SAVE
 
    IF LastKey() == K_ENTER
       bErrorBlock := {|oErr| break( oErr ) }

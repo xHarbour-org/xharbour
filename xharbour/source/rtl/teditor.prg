@@ -1636,7 +1636,7 @@ METHOD K_Del() CLASS HBEditor
 
 METHOD K_Tab() CLASS HBEditor
 
-   LOCAL lHardCR := .F. , i
+   LOCAL lHardCR, i
 
    IF !::lEditAllow
       RETURN Self
@@ -1944,7 +1944,7 @@ METHOD ReformParagraph() CLASS HBEditor
    LOCAL nRow, i, j
    LOCAL cHardCR := hb_osNewLine()
    LOCAL cSoftCR := Chr( 141 ) + Chr( 10 )
-   LOCAL lInit := .F.
+   //LOCAL lInit := .F.
    LOCAL cText := "", aTemp := {}, lFound := .F., lBegin := .F.
 
    IF !::lEditAllow
@@ -2323,10 +2323,10 @@ METHOD SplitLine( nRow ) CLASS HBEditor
 //
    IF nStartRow + 1 <= ::LastRow()
       IF ::LineLen( nStartRow + 1 ) == 0 .OR. Len( AllTrim( cLine ) ) > 0
-         ::InsertLine( Trim( cLine ), .F. , nStartRow++ )
+         ::InsertLine( Trim( cLine ), .F. , nStartRow )
       ENDIF
    ELSE
-      ::InsertLine( Trim( cLine ), .F. , nStartRow++ )
+      ::InsertLine( Trim( cLine ), .F. , nStartRow )
    ENDIF
 
 // re-count words and see where current word has gone.
@@ -2906,9 +2906,9 @@ METHOD DelTextSelection() CLASS HBEditor
       ELSE
 
          if ::nColSelStart > 0 .AND. ::nColSelEnd > 0
-            IF Empty( nRowSelStart )
-               nRowSelStart := ::nColSelRow
-            ENDIF
+            //IF Empty( nRowSelStart )
+            //   nRowSelStart := ::nColSelRow
+            //ENDIF
             cText := ::aText[::nRow]:cText
             ::aText[::nRow]:cText := Stuff( cText, ::nColSelStart, ::nColSelEnd - ::nColSelStart + 1, "" )
             ::RefreshLine()
@@ -3094,7 +3094,6 @@ STATIC FUNCTION WhichEOL( cString )
 STATIC FUNCTION Text2Array( cString, nWordWrapCol )
 
    LOCAL cLine
-   LOCAL nTokNum
    LOCAL aArray
    LOCAL cEOL
    LOCAL nEOLLen
@@ -3112,8 +3111,6 @@ STATIC FUNCTION Text2Array( cString, nWordWrapCol )
       cString := StrTran( cString, cSoftCR, "" )
    ENDIF
 
-
-   nTokNum := 1
    aArray  := {}
 
    cEOL    := WhichEOL( cString )

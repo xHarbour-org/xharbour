@@ -103,7 +103,7 @@ Return the ammout of times that c1 occurs into c2
       RETURN ( 0 )
    ENDIF
 
-   nPos := nRet := 0
+   nRet := 0
 
    WHILE !Empty( c2 )
       nPos := At( c1, c2 )

@@ -79,7 +79,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cData, oUrl1
 
    LOCAL cTmp          := ""
-   LOCAL cMimeText     := ""
+   LOCAL cMimeText
    LOCAL cTo           := ""
    LOCAL cCC           := ""
    LOCAL cBCC          := ""
@@ -90,7 +90,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lAuthPlain    := .F.
    LOCAL lConnect      := .T.
    LOCAL oPop
-   LOCAL adata := {}, nCount, nSize, nSent
+   LOCAL adata := {}, nCount
    LOCAL cTemp
 
    DEFAULT cUser       TO ""
@@ -294,7 +294,6 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
 
       IF !oInMail:Open()
-         lConnect := .F.
          oInmail:Close()
          RETURN .F.
       ENDIF
@@ -338,15 +337,12 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
 //   oInmail:Write( oMail:ToString() )
    cData := oMail:ToString()
-   nSize := Len( cData )
    FOR nCount := 1 TO Len( cData ) STEP 1024
       AAdd( aData, SubStr( cData,nCount,1024 ) )
    NEXT
-   nSent := 0
-
 
    FOR nCount := 1 TO Len( aData )
-      nSent += oInmail:Write( aData[nCount], Len( aData[nCount] ) )
+      oInmail:Write( aData[nCount], Len( aData[nCount] ) )
    NEXT
 
    lReturn := oInMail:Commit()

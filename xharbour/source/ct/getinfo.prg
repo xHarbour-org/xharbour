@@ -136,7 +136,7 @@ FUNCTION GetInput( xDefault, nRow, nCol, lSay, cPrompt )
       nCol := Col()
    ENDIF
    @ nRow, nCol GET xDefault
-   READ
+   READ SAVE
 
    IF lSay # nil .AND. lSay
       SetPos( nRow, nCol )

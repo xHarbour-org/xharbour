@@ -355,10 +355,10 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
    LOCAL lRet  := .T.
    LOCAL cName := ""
    LOCAL cExt  := ""
-   LOCAL i     := 0
+   LOCAL i
    LOCAL cInvalid := ""
-   LOCAL nDecimalPoint := 0
-   LOCAL nFileLen := 0
+   LOCAL nDecimalPoint
+   LOCAL nFileLen
  
    DEFAULT cFileName TO ""
    DEFAULT nMaxName  TO 8      // max file name len.
@@ -498,7 +498,7 @@ FUNCTION FloppyType( cDrive )
       RETURN ( 0 )
    ENDIF
 
-   nTotalBytes := nFloppyType := 0
+   nFloppyType := 0
 
    nTotalBytes := DiskTotal ( cDrive )
 

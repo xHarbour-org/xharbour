@@ -103,7 +103,7 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
 
    LOCAL i
    LOCAL cStr    := ""
-   LOCAL cLetter := ""
+   LOCAL cLetter
 
    DEFAULT oHtm TO HtmlPageObject()
    DEFAULT nNumber TO 0
@@ -510,7 +510,7 @@ METHOD SetFeatures( alwaysRaised, alwaysLowered, ;
 
 METHOD SetSize( x, y, h, w ) CLASS JWindow
 
-   LOCAL cStr := ""
+   LOCAL cStr
 
    DEFAULT x to ::ScreenX, ;
       y to ::ScreenY, ;

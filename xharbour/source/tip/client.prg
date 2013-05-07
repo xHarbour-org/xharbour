@@ -650,12 +650,12 @@ METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWor
 //Local pSocket
    LOCAL cLine
    LOCAL cRequest := ""
-   LOCAL cPass := ""
-   LOCAL cEncoded := ''
+   LOCAL cPass
+   LOCAL cEncoded
    LOCAL lRet := .T.
-
-   LOCAL pEx, nResponseCode
+   LOCAL nResponseCode
    LOCAL sResponseCode, nFirstSpace
+
    ::InetConnect( cProxy, nProxyPort, ::SocketCon )
    IF ::InetErrorCode( ::SocketCon ) == 0
       Try
@@ -683,7 +683,7 @@ METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWor
                Throw( ErrorNew( "INETCONNECTPROXY", 0, 4000, ProcName(), "Connection refused" ) )
             ENDIF
          ENDIF
-      catch pEx
+      catch
          ::close( )
          lRet := .F.
       END

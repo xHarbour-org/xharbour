@@ -77,13 +77,12 @@ RETURN
 * DefError()
 */
 
+/*
 STATIC FUNC DefError( e )
    
    LOCAL i
    LOCAL cMessage   := ""
-   LOCAL cErrString := ""
-   LOCAL nDispCount := DispCount()
-   LOCAL aError     := {}
+   LOCAL cErrString
    LOCAL nH         := IF( HtmlPageHandle() == NIL, 0, HtmlPageHandle() )
 
 // by default, division by zero yields zero
@@ -192,6 +191,7 @@ STATIC FUNC DefError( e )
    QUIT
 
    RETURN ( .F. )
+*/
 
 FUNCTION SetCorruptFunc( bFunc )
    
@@ -209,6 +209,7 @@ FUNCTION SetErrorFooter()
 * ErrorMessage()
 */
 
+/*
 STATIC FUNC ErrorMessage( e )
    
    LOCAL cMessage := ""
@@ -246,5 +247,4 @@ STATIC FUNC ErrorMessage( e )
    cMessage += CRLF()
 
    RETURN ( cMessage )
-
-
+*/

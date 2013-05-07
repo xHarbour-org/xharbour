@@ -102,7 +102,7 @@ FUNCTION SetRegistry()
 
 FUNCTION QueryRegistry( nHKEYHandle, cKeyName, cEntryName, xValue, lSetIt )
 
-   LOCAL rVal := .F. , xKey := GetRegistry( nHKEYHandle, cKeyName, cEntryName )
+   LOCAL rVal, xKey := GetRegistry( nHKEYHandle, cKeyName, cEntryName )
    LOCAL cValType := ValType( xValue )
 
    IF lSetIt == NIL

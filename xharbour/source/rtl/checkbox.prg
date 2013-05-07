@@ -87,7 +87,7 @@ ENDCLASS
 
 METHOD New( nRow, nCol, cCaption )
 
-   LOCAL cColor := ''
+   LOCAL cColor
 
    ::Buffer  := .F.
    ::Caption := cCaption

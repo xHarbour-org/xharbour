@@ -604,7 +604,7 @@ METHOD DISPLAY( lForced ) CLASS Get
    LOCAL cCaption
    LOCAL cClrCap := hb_ColorIndex( ::ColorSpec, GET_CLR_CAPTION )
    LOCAL cClrAcc := hb_ColorIndex( ::ColorSpec, GET_CLR_ACCEL )
-   LOCAL lIsIntense := Set( _SET_INTENSITY )
+   //LOCAL lIsIntense := Set( _SET_INTENSITY )
    LOCAL nCol, cDisplay
    LOCAL nDispReduce := 0
    LOCAL cChar
@@ -1137,7 +1137,7 @@ METHOD VarGet() CLASS Get
 
 METHOD Untransform( cBuffer ) CLASS Get
 
-   LOCAL xValue, lUntransform := .T.
+   LOCAL xValue, lUntransform
    LOCAL cChar
    LOCAL nFor, nPad := 0
    LOCAL cMaskDel := ""

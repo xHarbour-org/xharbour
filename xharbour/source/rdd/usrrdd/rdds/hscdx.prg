@@ -182,7 +182,7 @@ FUNCTION HSX_CREATE( cFile, cExpr, nKeySize, nBufSize, lCase, nFiltSet )
 
 FUNCTION HSX_OPEN( cFile, nBufSize )
 
-   LOCAL aWData, nHsx := - 1, nOpenMode
+   LOCAL aWData, nHsx, nOpenMode
 
    IF !Used()
    ELSEIF !rddName() == "HSCDX"

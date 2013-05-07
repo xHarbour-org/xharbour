@@ -256,7 +256,7 @@ METHOD SetFeatures( alwaysRaised, alwaysLowered, ;
 
 METHOD SetSize( x, y, h, w ) CLASS TJsWindow
 
-   LOCAL cStr := ""
+   LOCAL cStr
 
    DEFAULT x TO ::ScreenX, ;
       y TO ::ScreenY, ;

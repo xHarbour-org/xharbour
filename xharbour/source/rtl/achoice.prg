@@ -526,7 +526,6 @@ METHOD MoveCursor( nMove, nDirection, nMoveScreen ) CLASS TAChoice
    LOCAL nBounce := 0
    LOCAL nLastFirstRow := ::nFirstRow
    LOCAL nBottom
-   LOCAL nDiff := 0
 
    IF ::nItems == 0
       RETURN .F.

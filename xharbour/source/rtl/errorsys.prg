@@ -178,9 +178,9 @@ STATIC FUNCTION DefError( oError )
       ENDIF
    ELSE
       IF Empty( oError:osCode )
-         nChoice := Alert( cMessage + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
+         Alert( cMessage + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
       ELSE
-         nChoice := Alert( cMessage + ";" + cDOSError + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
+         Alert( cMessage + ";" + cDOSError + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
       ENDIF
    ENDIF
 
@@ -211,7 +211,6 @@ STATIC FUNCTION DefError( oError )
 
    RETURN .F.
 
-// [vszakats]
 
 STATIC FUNCTION ErrorMessage( oError )
 
@@ -273,7 +272,7 @@ STATIC FUNCTION LogError( oerr )
    LOCAL nHandle2   := - 1
    LOCAL cLogFile2  := "_error.log"
    LOCAL cBuff      := ""
-   LOCAL nRead      := 0
+   LOCAL nRead
 
    nCols := MaxCol()
    IF nCols > 0

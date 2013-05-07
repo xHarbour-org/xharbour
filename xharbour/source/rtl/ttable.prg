@@ -82,7 +82,7 @@
 FUNCTION NetDbUse( cDataBase, cAlias, nSeconds, cDriver, ;
       lNew, lOpenMode, lReadOnly )
 
-   LOCAL nKey       := 0
+   LOCAL nKey
    LOCAL lForever
    LOCAL cOldScreen := SaveScreen( MaxRow(), 0, MaxRow(), MaxCol() + 1 )
    LOCAL lFirstPass := .T.
@@ -149,7 +149,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
    LOCAL nWaitTime
    LOCAL bOperation
    LOCAL xIdentifier
-   LOCAL nKey        := 0
+   LOCAL nKey
    LOCAL nCh
    LOCAL cWord
 
@@ -182,7 +182,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
 
    slNetOk := .F.
 
-   WHILE lContinue == .T.
+   WHILE lContinue
 
    /*
    IF (nKey := INKEY()) == K_ESC
@@ -222,7 +222,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
          ENDIF
       ENDDO
 
-      IF ( nKey := LastKey() ) == K_ESC
+      IF LastKey() == K_ESC
          RestScreen( MaxRow(), 0, MaxRow(), MaxCol() + 1, cSave )
          EXIT
       ENDIF
@@ -372,7 +372,7 @@ FUNCTION NetFileLock( nSeconds )
 
 FUNCTION NetAppend( nSeconds, lReleaseLocks )
 
-   LOCAL nOrd := 0
+   LOCAL nOrd
 
    DEFAULT lReleaseLocks := .T.
    DEFAULT nSeconds := snNetDelay
@@ -847,7 +847,7 @@ METHOD OPEN() CLASS HBTable
 
 PROCEDURE DBMove( nDirection ) CLASS HBTable
 
-   LOCAL nRec := ( ::Alias )->( RecNo() )
+   //LOCAL nRec := ( ::Alias )->( RecNo() )
 
    DEFAULT nDirection TO 0
 
@@ -881,7 +881,7 @@ METHOD FldInit() CLASS HBTable
    LOCAL i
 
 
-   LOCAL nCount    := ( ::Alias )->( FCount() )
+   //LOCAL nCount := ( ::Alias )->( FCount() )
    LOCAL aDb
 
 
@@ -1054,7 +1054,7 @@ METHOD Write( lKeepBuffer ) CLASS HBTable
 
 METHOD BUFWrite( aBuffer ) CLASS HBTable
 
-   LOCAL aOldBuffer := Array( ( ::Alias )->( FCount() ) )
+   //LOCAL aOldBuffer := Array( ( ::Alias )->( FCount() ) )
    LOCAL nSel       := Select( ::Alias )
    LOCAL nOrd       := ( ::Alias )->( ordSetFocus() )
    LOCAL Buffer
@@ -1278,10 +1278,8 @@ METHOD AddOrder( cTag, cKey, cLabel, ;
 
 METHOD REINDEX() CLASS HBTable
 
-   LOCAL lRet := .F.
    LOCAL nSel := Select( ::Alias )
    LOCAL nOrd := ( ::Alias )->( ordSetFocus( 0 ) )
-   LOCAL nRec := ( ::Alias )->( RecNo() )
 
    IF Len( ::aOrders ) > 0
 
@@ -1298,8 +1296,7 @@ METHOD REINDEX() CLASS HBTable
       ENDIF
 
       IF !::Open()
-         lRet := .F.
-         RETURN ( lRet )
+         RETURN .F.
       ENDIF
 
       AEval( ::aOrders, { | o | o:Create() } )
@@ -1308,27 +1305,24 @@ METHOD REINDEX() CLASS HBTable
       ::IsNet := .T.
 
       IF !::Open()
-         lRet := .F.
-         RETURN ( lRet )
+         RETURN .F.
       ENDIF
 
    ENDIF
 
-   lRet := .T.
    ( ::Alias )->( dbSetIndex( ::cOrderBag ) )
    ( ::Alias )->( ordSetFocus( nOrd ) )
    ( ::Alias )->( dbGoTop() )
    ( ::Alias )->( dbUnlock() )
    SELECT( nSel )
 
-   RETURN ( lRet )
+   RETURN .T.
 
 METHOD FastReindex() CLASS HBTable
 
-   LOCAL lRet := .F.
    LOCAL nSel := Select( ::Alias )
    LOCAL nOrd := ( ::Alias )->( ordSetFocus( 0 ) )
-   LOCAL nRec := ( ::Alias )->( RecNo() )
+   //LOCAL nRec := ( ::Alias )->( RecNo() )
 
    IF Len( ::aOrders ) > 0
 
@@ -1342,8 +1336,7 @@ METHOD FastReindex() CLASS HBTable
       ENDIF
 
       IF !::Open()
-         lRet := .F.
-         RETURN ( lRet )
+         RETURN .F.
       ENDIF
 
       ( ::Alias )->( ordListRebuild() )
@@ -1352,20 +1345,18 @@ METHOD FastReindex() CLASS HBTable
       ::IsNet := .T.
 
       IF !::Open()
-         lRet := .F.
-         RETURN ( lRet )
+         RETURN .F.
       ENDIF
 
    ENDIF
 
-   lRet := .T.
    ( ::Alias )->( dbSetIndex( ::cOrderBag ) )
    ( ::Alias )->( ordSetFocus( nOrd ) )
    ( ::Alias )->( dbGoTop() )
    ( ::Alias )->( dbUnlock() )
    SELECT( nSel )
 
-   RETURN ( lRet )
+   RETURN .T.
 
 METHOD GetOrder( xOrder ) CLASS HBTable
 
@@ -1376,8 +1367,6 @@ METHOD GetOrder( xOrder ) CLASS HBTable
       nPos := AScan( ::aOrders, { | e | e:Tag == xOrder } )
    ELSEIF xType == "N" .AND. xOrder > 0
       nPos := xOrder
-   ELSE
-      nPos := 0
    ENDIF
 
    IF nPos == 0

@@ -117,7 +117,7 @@ RETURN Nil
 *********************************************
 Function ctw_memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
    nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
-   local cRet := ''
+   local cRet
 
    IF ctw_CURRENT == 0
       cRet := memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
@@ -825,7 +825,7 @@ Method ColorShadow( nTop, nLeft, nBottom, nRight, xAtt) CLASS TctWin
    local cEven := CharEven( cScr)
    local xAtt2 := chr(colorton('n/n'))
    local cBuff := ''
-   local n     := 0
+   local n
 
    // change colors from String to Numeric
    xAtt     := chr( colorton( alltrim( xAtt)))

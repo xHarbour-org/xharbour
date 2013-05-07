@@ -52,7 +52,7 @@
 
 /* NOTE: Don't use SAY/DevOut()/DevPos() for screen output, otherwise
          the debugger output may interfere with the applications output
-         redirection, and is also slower. [vszakats] */
+         redirection, and is also slower */
 
 #include "hbclass.ch"
 
@@ -106,8 +106,6 @@ CREATE CLASS HBDbMenu
 ENDCLASS
 
 METHOD New() CLASS HBDbMenu
-
-   LOCAL nCol := 0
 
    IF ::aMenus == NIL
       ::aMenus := {}

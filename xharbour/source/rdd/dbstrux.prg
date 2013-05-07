@@ -307,7 +307,7 @@ FUNCTION dbMerge( xSource, lAppend )
    LOCAL nArea, nSource, nRecNo
    LOCAL aFields
    LOCAL cField, xField
-   LOCAL nSourcePos, aTranslate := {}, aTranslation, oErr
+   LOCAL nSourcePos, aTranslate := {}, aTranslation //, oErr
    LOCAL cTargetType
 
    // Safety
@@ -361,7 +361,7 @@ FUNCTION dbMerge( xSource, lAppend )
 
             // Ok to process
             aAdd( aTranslate, { HB_EnumIndex(), nSourcePos, {|xSource| xSource } } )
-         CATCH oErr
+         CATCH
             cTargetType := ValType( FieldGet( HB_EnumIndex() ) )
 
             TRY
@@ -373,7 +373,7 @@ FUNCTION dbMerge( xSource, lAppend )
 
                // Ok to process
                aAdd( aTranslate, { HB_EnumIndex(), nSourcePos, {|xSource| ValToType( xSource, cTargetType ) } } )
-            CATCH oErr
+            CATCH //oErr
                //TraceLog( oErr:Description, oErr:Operation )
             END
          END

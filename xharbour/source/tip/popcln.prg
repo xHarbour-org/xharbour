@@ -311,7 +311,6 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
 
    cRet := ""
    nRetLen := 0
-   nRead := 0
 
    /* 04/05/2004 - <maurilio.longo@libero.it>
       Instead of receiving a single char at a time until after we have the full mail, let's receive as

@@ -1685,7 +1685,7 @@ Return nHowMany
 METHOD SetColumnWidth( oCol ) CLASS TBrowse
 *------------------------------------------------------*
 LOCAL xRes, cType, nTokenPos := 0, nL, cHeading, cFooting
-LOCAL nWidth := 0, nHeadWidth := 0, nFootWidth := 0, nLen := 0
+LOCAL nWidth, nHeadWidth := 0, nFootWidth := 0, nLen := 0
 
    // if oCol has :Width property set I use it
    if oCol:Width <> nil
@@ -2060,10 +2060,9 @@ Return Min( Min(nCol, ::nRightVisible), ::nColCount )
 *------------------------------------------------------*
 METHOD HowManyCol() CLASS TBrowse
 *------------------------------------------------------*
-LOCAL colPos, nToAdd, nColsVisible, nColsWidth
+LOCAL nToAdd, nColsVisible, nColsWidth
 LOCAL nLeftCol, tryLeftVisible, saveColsWidth 
 
-   colPos       := ::nColPos
    nToAdd       := 0
    nColsWidth   := 0
    nColsVisible := 0
@@ -2386,7 +2385,7 @@ Return Self
 *------------------------------------------------------*
 METHOD ColorRect( aRect, aColors ) CLASS TBrowse
 *------------------------------------------------------*
-Local nRow, aColorRect, lfullArea := .f.
+Local nRow, aColorRect, lfullArea
 
    if ::lStable .and. ( ! empty( ::aPendingMovements ) .or. nextkey() != 0 )
       return Self
@@ -3233,7 +3232,7 @@ RETURN SELF
 *---------------------------------------------------*
 METHOD SetMoveBlock( nType, bBlock ) CLASS TBrowse
 *---------------------------------------------------*
-Local b := bBlock
+Local b
 
   if ! hb_IsBlock(bBlock) .and. nType=2  // Skipblock
      b := {|| 0}
@@ -3443,7 +3442,7 @@ Return bReturn
 METHOD TApplyKey( nKey, oBrowse ) CLASS TBrowse
 *---------------------------------------------------*
 LOCAL bBlock := oBrowse:setkey( nKey )
-LOCAL nReturn := TBR_CONTINUE  // 0
+LOCAL nReturn //:= TBR_CONTINUE  // 0
 
    DEFAULT bBlock TO oBrowse:setkey( 0 )
 
@@ -3715,7 +3714,7 @@ STATIC FUNCTION CacheOK( a, n, n2, t )
 *---------------------------------------------------*
 * Test the validity of the cache array before assess/assign value for it.
 * This test avoid error if array is empty or element is out of bound or nil.
-LOCAL lRet := .F.
+LOCAL lRet
 
 lRet := ( hb_IsArray(a) .AND.;
          Len(a)>0 .AND.;

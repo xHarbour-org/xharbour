@@ -281,7 +281,7 @@ METHOD CheckServer( cRemote )
       IF InetErrorCode( skRemote ) == 0
          cData2 := Space( 256 )
          nLen := HB_GetLen8( SubStr( cData, 8, 8 ) )
-         nLen := InetRecvAll( skRemote, @cData2, nLen )
+         InetRecvAll( skRemote, @cData2, nLen )
          IF InetErrorCode( skRemote ) == 0
             cData := SubStr( cData + cData2, 7 )
             cData2 := hb_Deserialize( cData )
@@ -770,7 +770,7 @@ METHOD SendCall( cFunction, aParams ) CLASS tRPCClient
 METHOD TCPAccept() CLASS tRPCClient
 
    LOCAL nTime := 0
-   LOCAL cCode, bContinue
+   LOCAL cCode //, bContinue
    LOCAL nTimeLimit
 
 // TcpAccept can also be called standalone, without the
@@ -779,7 +779,7 @@ METHOD TCPAccept() CLASS tRPCClient
 
    ::nErrorCode := 0
    ::nStatus := RPC_STATUS_WAITING
-   bContinue := iif( ::caPerCall != NIL, .T. , .F. )
+   //bContinue := iif( ::caPerCall != NIL, .T. , .F. )
 
    hb_mutexUnlock( ::mtxBusy )
 

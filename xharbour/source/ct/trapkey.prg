@@ -57,8 +57,6 @@ STATIC bTrap := {|| Trap() }
 
 FUNCTION TrapInput( cProc, lParam )
 
-   LOCAL cOldProc := s_Proc1
-
    DEFAULT lParam TO .F.
 
    s_Proc1 := cProc
@@ -69,8 +67,6 @@ FUNCTION TrapInput( cProc, lParam )
    RETURN s_Proc1
 
 FUNCTION TrapShift( cProc, nBitmap )
-
-   LOCAL cOldProc := s_Proc2
 
    s_Proc2 := cProc
    s_Bitmap := nBitmap

@@ -263,7 +263,6 @@ PROCEDURE CLOSE() CLASS HB_Logger
 PROCEDURE Log( cMessage, nPriority ) CLASS HB_Logger
 
    LOCAL oChannel
-   LOCAL cPrefix := ""
 
    IF nPriority == NIL
       nPriority := ::nDefaultPriority

@@ -502,7 +502,7 @@ METHOD New( uXml, nStyle ) CLASS TXmlDocument
    ::cSignature := ""
    ::nStyle := nStyle
    
-   nAt := nAt2 := 0
+   nAt2 := 0
 
    lNew := .F.
 
@@ -608,7 +608,7 @@ METHOD GetContext() CLASS TXmlDocument
 METHOD Write( xFile, nStyle ) CLASS TXmlDocument
 
 //-----------------------------------------------------------------------------*
-   LOCAL fHandle, cHeader, lOK := .F. , cFileName
+   LOCAL fHandle, cHeader, lOK, cFileName
 
    IF Empty( xFile ) .OR. ::nStatus != HBXML_STATUS_OK
       RETURN .F.

@@ -88,8 +88,8 @@ ENDCLASS
 METHOD New( cInBuffer ) CLASS TCgi
 
    LOCAL i
-   LOCAL aTemp := {}
-   LOCAL aVar  := {}
+   LOCAL aTemp
+   LOCAL aVar
 
    ::nH := HtmlPageHandle()
 
@@ -231,7 +231,6 @@ FUNCTION ParseString( cString, cDelim, nRet )
    aElem := Array( nSize )
 
    cBuf := cString
-   i    := 1
    FOR i := 1 TO nSize
       nPosFim := At( cDelim, cBuf )
 

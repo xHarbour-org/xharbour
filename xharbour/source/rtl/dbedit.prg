@@ -123,9 +123,6 @@ FUNCTION dbEdit( nTop, ;
       lAppend, ;
       lExcept
 
-   nRet := DE_CONT
-   lAppend := .F.
-
    IF ! Used()
 #ifdef HB_C52_STRICT
       dbGoBottom() /* Clipper compliance: call dbgobotom() to forces error message. */
@@ -252,7 +249,7 @@ FUNCTION dbEdit( nTop, ;
 // Save previous cursor shape and position.
    nCursor := SetCursor( SC_NONE )
 
-   iif( HB_ISNIL( acFootingSep ) .AND. !Empty( acColumnFootings ), acFootingSep := Chr( 196 ) + Chr( 193 ) + Chr( 196 ), .T. )
+   iif( HB_ISNIL( acFootingSep ) .AND. !Empty( acColumnFootings ), acFootingSep := Chr( 196 ) + Chr( 193 ) + Chr( 196 ), )
 
    /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
    DispBegin()
@@ -389,6 +386,8 @@ FUNCTION dbEdit( nTop, ;
 #ifdef HB_EXTENSION
 // xHarbour extension: call UDF with DE_INIT mode.
    nRet := dbe_CallUDF( bFunc, DE_INIT, oTBR:colPos, oTBR )
+#else
+   nRet := DE_CONT
 #endif
 
    oTBR:ForceStable()
@@ -811,9 +810,9 @@ STATIC FUNCTION dbe_syncpos( oTb )
 
 //--------------------------------*
    LOCAL nRec := RecNo()
-   LOCAL nKeyNo := 0
+   LOCAL nKeyNo
    LOCAL nDel := 0
-   LOCAL lDeleted := .F.
+   LOCAL lDeleted
 
    IF IndexOrd() != 0
 

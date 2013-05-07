@@ -60,7 +60,7 @@
 
 /* NOTE: Don't use SAY/DevOut()/DevPos() for screen output, otherwise
          the debugger output may interfere with the applications output
-         redirection, and is also slower. [vszakats] */
+         redirection, and is also slower */
 
 #include "hbclass.ch"
 
@@ -1184,7 +1184,7 @@ METHOD EditColor( nColor, oBrwColors ) CLASS HBDebugger
    @ Row(), Col() + 15 GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cColor ) != "C", ( __dbgAlert( "Must be string" ), .F. ), .T. )
 
-   READ
+   READ SAVE
    SetCursor( SC_NONE )
 #else
    cColor := getdbginput( Row(), Col() + 15, cColor, { | cColor | iif( Type( cColor ) != "C", ( __dbgAlert( "Must be string" ), .F. ), .T. ) }, SubStr( ::ClrModal(), 5 ) )
@@ -1218,7 +1218,7 @@ METHOD EditSet( nSet, oBrwSets ) CLASS HBDebugger
    @ Row(), Col() + 13 GET cSet COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cSet ) != cType, ( __dbgAlert( "Must be of type '" + cType + "'" ), .F. ), .T. )
 
-   READ
+   READ SAVE
    SetCursor( SC_NONE )
 #else
    cSet := getdbginput( Row(), Col() + 13, cSet, { | cSet | iif( Type( cSet ) != cType, ( __dbgAlert( "Must be of type '" + cType + "'" ), .F. ), .T. ) }, SubStr( ::ClrModal(), 5 ) )
@@ -1240,8 +1240,7 @@ METHOD EditSet( nSet, oBrwSets ) CLASS HBDebugger
 METHOD EditVar( nVar ) CLASS HBDebugger
 
    LOCAL cVarName   := ::aVars[ nVar ][ 1 ]
-   LOCAL uVarValue  := ::aVars[ nVar ][ 2 ]
-   LOCAL cVarType   := ::aVars[ nVar ][ 3 ]
+   LOCAL uVarValue
    LOCAL cVarStr
    LOCAL oErr, bErrorBlock
 
@@ -1701,7 +1700,7 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS HBDebugger
 
 #ifndef HB_NO_READDBG
    nOldCursor := SetCursor( SC_NORMAL )
-   READ
+   READ SAVE
    SetCursor( nOldCursor )
 #endif
 
@@ -1751,7 +1750,6 @@ METHOD ListBox( cCaption, aItems ) CLASS HBDebugger
    LOCAL nBottom
    LOCAL nRight
    LOCAL oWndList
-   LOCAL cSelected := ""
    LOCAL aColors
    LOCAL n
 
@@ -2059,7 +2057,7 @@ METHOD Open() CLASS HBDebugger
 
 METHOD OpenPPO() CLASS HBDebugger
 
-   LOCAL lSuccess := .F.
+   LOCAL lSuccess
    LOCAL cDir
    LOCAL cName
    LOCAL cExt
@@ -2689,13 +2687,11 @@ METHOD ShowHelp( nTopic ) CLASS HBDebugger
 
 METHOD ShowVars() CLASS HBDebugger
 
-   LOCAL nWidth
    LOCAL oCol
    LOCAL lRepaint := .F.
    LOCAL nTop
    LOCAL nBottom
    LOCAL lWindowCreated := .F.
-   LOCAL aColors
 
    IF ::lGo
       RETURN NIL
@@ -2765,7 +2761,6 @@ METHOD ShowVars() CLASS HBDebugger
       ::oBrwVars := HBDbBrowser():New( nTop + 1, 1, nBottom - 1, ;
                                        ::nMaxCol - iif( ::oWndStack != NIL, ::oWndStack:nWidth(), 0 ) - 1 )
       
-      aColors := __DbgColors()
       ::oBrwVars:Cargo := { 1, {} } // Actual highlighted row
       ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
       ::oBrwVars:goTopBlock := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
@@ -2780,7 +2775,6 @@ METHOD ShowVars() CLASS HBDebugger
       ::oBrwVars:Cargo[1] := 1 // Actual highligthed row
                                
 
-      nWidth := ::oWndVars:nWidth() - 1
       oCol := TBColumnNew( "", ;
            { || PadR( LTrim( Str( ::oBrwVars:Cargo[ 1 ] - 1 ) ) + ") " + ;
                       ::VarGetInfo( ::aVars[ Max( ::oBrwVars:Cargo[ 1 ], 1 ) ] ), ;
@@ -3197,7 +3191,6 @@ METHOD WatchpointsHide() CLASS HBDebugger
 
 METHOD WatchpointsShow() CLASS HBDebugger
 
-   LOCAL nWidth
    LOCAL oCol
    LOCAL lRepaint := .F.
    LOCAL nTop
@@ -3246,7 +3239,6 @@ METHOD WatchpointsShow() CLASS HBDebugger
                                                              Len( ::aWatch ) ),;
                                iif( Len(::aWatch) > 0, ::oBrwPnt:Cargo[ 1 ] - nOld, 0 ) }
 
-      nWidth := ::oWndPnt:nWidth() - 1
       oCol := TBColumnNew( "", ;
          { || PadR( iif( Len( ::aWatch ) > 0, ;
                        hb_NToS( ::oBrwPnt:Cargo[ 1 ] - 1 ) + ") " + ;

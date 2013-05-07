@@ -130,7 +130,6 @@ FUNCTION GetSecret( cDef, nRow, nCol, lSay, lPrompt )
    LOCAL OldRow := Row()
    LOCAL OldCol := Col()
    LOCAL GetList := {}
-   LOCAL cColor := SetColor()
    LOCAL cVar   := Space( Len( cDef ) )
 
    DEFAULT nRow TO Row(), nCol TO Col(), lSay TO .F.
@@ -141,7 +140,7 @@ FUNCTION GetSecret( cDef, nRow, nCol, lSay, lPrompt )
       @ nRow, nCol GET cVar PASSWORD
    ENDIF
 
-   READ
+   READ SAVE
    SetPos( OldRow, OldCol )
 
    RETURN cVar

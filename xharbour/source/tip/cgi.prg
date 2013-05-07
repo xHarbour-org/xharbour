@@ -105,8 +105,8 @@ ENDCLASS
 
 METHOD New() CLASS TIpCgi
 
-   LOCAL aTemp := {}
-   LOCAL aVar := {}
+   LOCAL aTemp
+   LOCAL aVar
    LOCAL lPost
    LOCAL nCount
    LOCAL nLen
@@ -593,11 +593,12 @@ STATIC FUNCTION GenerateSID( cCRCKey )
    next
    cRet := cSID + cSIDCRC
    RETURN cRet
+
 STATIC FUNCTION CheckSID( cSID, cCRCKey )
+
    local nSIDCRC, cSIDCRC, n, cTemp
    local nLenSID     := SID_LENGTH
    local cBaseKeys   := BASE_KEY_STRING
-   local nLenKeys    := Len( cBaseKeys )
    local nRand, nKey := 0
    DEFAULT cCRCKey  TO CRC_KEY_STRING
    cCRCKey := Left( cCRCKey, 10 )      // Max Lenght must to be of 10 chars
@@ -618,7 +619,7 @@ STATIC FUNCTION CheckSID( cSID, cCRCKey )
 
 STATIC FUNCTION DateToGMT( dDate, cTime )
 
-   LOCAL cStr := ""
+   LOCAL cStr
    LOCAL cOldDateFormat := Set( _SET_DATEFORMAT, "dd-mm-yy" )
    LOCAL nDay, nMonth, nYear, nDoW
    LOCAL aDays   := { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" }

@@ -210,7 +210,7 @@ METHOD SetFont( name, font, fntColor, fntSize ) CLASS TJsList
 METHOD AddItem( name, url, bgColor ) CLASS TJsList
 
    LOCAL cStr := ""
-   LOCAL cUrl := ""
+   LOCAL cUrl
 
    DEFAULT name TO "o"
    DEFAULT url TO ""
@@ -230,7 +230,7 @@ METHOD AddItem( name, url, bgColor ) CLASS TJsList
 METHOD AddLink( name, url, img, bgColor ) CLASS TJsList
 
    LOCAL cStr := ""
-   LOCAL cUrl := ""
+   LOCAL cUrl
 
    DEFAULT name TO "o"
    DEFAULT url TO ""
@@ -256,7 +256,7 @@ METHOD EndNode( name, caption ) CLASS TJsList
 
 METHOD Build( xPos, yPos ) CLASS TJsList
 
-   LOCAL i    := 0
+   LOCAL i
    LOCAL cStr := ""
 
    DEFAULT xPos TO 5

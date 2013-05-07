@@ -68,7 +68,6 @@ FUNCTION BrowseODBC( nTop, nLeft, nBottom, nRight, oDataSource )
    LOCAL n, nOldCursor
    LOCAL nKey := 0
    LOCAL lExit := .F.
-   LOCAL lGotKey := .F.
    LOCAL bAction
    LOCAL oColumn
 

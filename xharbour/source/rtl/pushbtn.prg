@@ -245,8 +245,6 @@ METHOD DISPLAY() CLASS HBPushButton
    LOCAL nCurRow
    LOCAL nAmpPos
    LOCAL cColor4
-   LOCAL nColorNum
-   LOCAL nBuffer
 
    cStyle := ::Style
 
@@ -256,32 +254,13 @@ METHOD DISPLAY() CLASS HBPushButton
       SET COLOR TO ( __GUIColor( ::ColorSpec, 3 ) )
       cColor4 := __GUIColor( ::ColorSpec, 4 )
 
-      IF Len( cColor4 ) == 0
-         nColorNum := 0
-      ELSE
-         nColorNum := _GETNUMCOL( cColor4 )
-      ENDIF
-
    ELSEIF ::HasFocus
       SET COLOR TO ( __GUIColor( ::ColorSpec, 2 ) )
       cColor4 := __GUIColor( ::ColorSpec, 4 )
 
-      IF Len( cColor4 ) == 0
-         nColorNum := 0
-      ELSE
-         nColorNum := _GETNUMCOL( cColor4 )
-      ENDIF
-
    ELSE
       SET COLOR TO ( __GUIColor( ::ColorSpec, 1 ) )
       cColor4 := __GUIColor( ::ColorSpec, 4 )
-
-      IF Len( cColor4 ) == 0
-         nColorNum := 0
-      ELSE
-         nColorNum := _GETNUMCOL( cColor4 )
-      ENDIF
-
    ENDIF
 
    nCurRow  := ::Row
@@ -308,12 +287,6 @@ METHOD DISPLAY() CLASS HBPushButton
          DispBox( ::Row, ::Col, ::Row + 2, ::Col + Len( cCaption ) + 1, cStyle )
       ENDIF
 
-   ENDIF
-
-   IF ::Buffer
-      nBuffer := 1
-   ELSE
-      nBuffer := 0
    ENDIF
 
    IF !Empty( cCaption )
