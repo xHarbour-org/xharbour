@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-16 21:37 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * winmake/makefile.pc
+    ! Added missing ACE_DLL and ACE_LIB declarations.
+
 2013-02-11 21:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c
