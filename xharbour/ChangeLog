@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-15 17:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/str.c
+    ! fixed bug reported by Enrico Maria Giordano
+
 2013-03-14 14:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/simplex.c
     ! prevent accessing acNewLine with negative index

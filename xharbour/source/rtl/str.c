@@ -83,6 +83,9 @@ HB_FUNC( STR )
 
          if( ! pDec && iParams < 4 )
             bValid = FALSE;
+
+         if( pDec && pDec->item.asInteger.value == 0 )
+            pDec = NULL;
       }
 
       if( bValid && iParams >= 4 )
@@ -109,7 +112,7 @@ HB_FUNC( STR )
       hb_itemPutL( &pSet, bLogical );
       hb_setSetItem( HB_SET_FIXED, &pSet );
 
-      if( ( szResult ) && ( bLtrim ) )
+      if( szResult && bLtrim )
       {
          int iLen = 0;
 
@@ -122,12 +125,12 @@ HB_FUNC( STR )
          hb_retcAdopt( szResult );
          return;
       }
-      else if( ( pWidth ) && ( pDec ) && ( pWidth->item.asInteger.value - ( pDec->item.asInteger.value + 1 ) == 0 ) )
+      else if( pWidth && pDec && pWidth->item.asInteger.value == pDec->item.asInteger.value + 1 )
       {
-         char *   szTemp   = ( char * ) hb_xgrab( pWidth->item.asInteger.value + 1  );
+         char * szTemp = ( char * ) hb_xgrab( pWidth->item.asInteger.value + 1 );
 
          hb_xmemset( szTemp, '*', pWidth->item.asInteger.value );
-         szTemp[ pWidth->item.asInteger.value + 1 ] = '\0';
+         szTemp[ pWidth->item.asInteger.value ] = '\0';
 
          if( szResult )
             hb_xfree( szResult );
