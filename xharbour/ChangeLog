@@ -13,41 +13,41 @@
   * winmake/makefile.gc
     ! set harbour warning to the highest level, -w3
 
-  * utils\hbmake\hbmake.prg
-  * utils\xbscript\xbscript.prg
+  * utils/hbmake/hbmake.prg
+  * utils/xbscript/xbscript.prg
     ! fixed assigned but not used variable, hidden with #pragma w2
 
   * source/rtl/tclass.prg
   * source/rtl/treport.prg
-  * source\rdd\usrrdd\rdds\adordd.prg
-  * contrib\misc\nconvert.prg
-  * contrib\misc\fileread.prg
-  * contrib\pdflite\pdf1.prg
-  * utils\hbdoc\hbdoc.prg
-  * utils\hbdoc\genasc.prg
-  * utils\hbdoc\genhpc.prg
-  * utils\hbdoc\genhtm.prg
-  * utils\hbdoc\genchm.prg
-  * utils\hbdoc\genng.prg
-  * utils\hbdoc\genos2.prg
-  * utils\hbdoc\genrtf.prg
-  * utils\hbdoc\gentrf.prg
-  * utils\hbdoc\html.prg
-  * utils\hbdoc\os2.prg
-  * utils\hbdoc\rtf.prg
-  * utils\hbdoc\ffile1.prg
-  * utils\hbdoc\genpdf1.prg
-  * utils\hbmake\tmake.prg
-  * utils\hbmake\hbmutils.prg
-  * utils\hbmake\checks.prg
-  * utils\hbmake\pickarry.prg
-  * utils\hbmake\pickfile.prg
+  * source/rdd/usrrdd/rdds/adordd.prg
+  * contrib/misc/nconvert.prg
+  * contrib/misc/fileread.prg
+  * contrib/pdflite/pdf1.prg
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbdoc/genasc.prg
+  * utils/hbdoc/genhpc.prg
+  * utils/hbdoc/genhtm.prg
+  * utils/hbdoc/genchm.prg
+  * utils/hbdoc/genng.prg
+  * utils/hbdoc/genos2.prg
+  * utils/hbdoc/genrtf.prg
+  * utils/hbdoc/gentrf.prg
+  * utils/hbdoc/html.prg
+  * utils/hbdoc/os2.prg
+  * utils/hbdoc/rtf.prg
+  * utils/hbdoc/ffile1.prg
+  * utils/hbdoc/genpdf1.prg
+  * utils/hbmake/tmake.prg
+  * utils/hbmake/hbmutils.prg
+  * utils/hbmake/checks.prg
+  * utils/hbmake/pickarry.prg
+  * utils/hbmake/pickfile.prg
     ! fixed assigned but not used variable
 
 2013-03-24 22:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/hbgtcore.c
     ! added missing HB_GTI_CLIPBOARDPAST
-
+    
 2013-03-24 20:14 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/gd/source/gdbar.prg
   * contrib/gd/source/gdbarcode.prg
@@ -65,10 +65,10 @@
   * contrib/libnf/tbwhile.prg
   * contrib/libnf/xbox.prg
   * contrib/libnf/dfile.prg
-  * contrib\xwt\src\hex.prg
-  * contrib\xwt\src\widget.prg
-  * contrib\gtwvg\wvtclass.prg
-  * contrib\gtwvg\wvtpaint.prg
+  * contrib/xwt/src/hex.prg
+  * contrib/xwt/src/widget.prg
+  * contrib/gtwvg/wvtclass.prg
+  * contrib/gtwvg/wvtpaint.prg
     ! fixed assigned but not used variable
 
 2013-03-24 19:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
@@ -154,7 +154,7 @@
   * source/tip/smtpcln.prg
     ! fixed assigned but not used variable
 
-2013-03-21 09:xx UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+2013-03-21 09:40 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/harbour.c
   * source/compiler/hbgenerr.c
     + new -w3 warning messages for assigned but not used and never
@@ -219,10 +219,6 @@
   * source/odbc/todbc.prg
     ! Don't continue ::Open() when SQLExecDir() have error.
 
-2013-02-24 09:19 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
-  * include/hbvmpub.h
-    ! Fixed typo.
-
 2013-02-16 21:37 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * winmake/makefile.pc
     ! Added missing ACE_DLL and ACE_LIB declarations.
@@ -285,20 +281,20 @@
     - pacify warnings on unused and lacked variables
 
 2013-01-23 19:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-   * source/common/hbver.c
-     - Deleting my own name in "Credit", I do not deserve it!
+  * source/common/hbver.c
+    - Deleting my own name in "Credit", I do not deserve it!
 
 2013-01-17 21:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * ChangeLog
     ! fixed log entry which was unintentionally bad dated (forward)
 
 2013-01-17 21:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source\compiler\harbour.c
+  * source/compiler/harbour.c
     ! fix one memory leak on method duplicate declaration
 
 2013-01-17 15:40 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source\compiler\harbour.c
-  * source\compiler\harbour.sly
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
     ! fix more memory leaks on failure
 
 2013-01-17 14:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -403,7 +399,7 @@
     ! fixed file that got corrupted due to my first commit :(
 
 2013-01-11 15:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source\compiler\harbour.c
+  * source/compiler/harbour.c
     ! fix many memory leaks, work in progress
 
 2013-01-11 06:40 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -12900,6 +12896,7 @@
     * Added HB_LEGACY_LEVEL2 by default to admit HB_OS_WIN_32_USED, _WIN64 and HB_WINCE changed by
       HB_OS_WIN_USED, HB_OS_WIN_64, HB_OS_WIN_CE on previous commit. Please don't use it any more.
 
+
 2009-11-18 10:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * utils/hbmake/hbmutils.prg
   * utils/hbmake/hbmake.prg
@@ -13102,6 +13099,7 @@
      ! fixed bug reported by Jaroslav Janik (many thanks) - if index FOR
        expression excluded all records from non empty table then root page
        was not initialized and DBFNSX generated corruption RTE. ( from harbour Przemyslaw Czerpak )
+
 
 2009-11-08 23:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * include/Makefile
@@ -13486,6 +13484,7 @@
      * filebuf was developed by Przemyslaw Czerpak, borrowed from Harbour, and modified by me to add
        especific xharbour features to remote conections.
      * Changed rdd structures to do more easy 3rd party developers job in the future.
+
 
 2009-09-29 12:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/tbrowse.prg
