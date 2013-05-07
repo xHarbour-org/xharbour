@@ -137,7 +137,7 @@ HB_BOOL hb_setenv( const char * szName, const char * szValue, HB_BOOL fSys )
       {
          HB_BOOL fRet = RegQueryValueEx( hKey, szName, NULL, NULL, NULL, NULL );
 
-         if( fRet == ERROR_SUCCESS || fRet == ERROR_FILE_NOT_FOUND && szValue )
+         if( fRet == ERROR_SUCCESS || ( fRet == ERROR_FILE_NOT_FOUND && szValue ) )
          {
             if( szValue )
                RegSetValueEx( hKey, szName, 0, REG_SZ, ( LPBYTE ) szValue, strlen( szValue ) + 1 );

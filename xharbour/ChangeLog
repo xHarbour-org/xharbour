@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-04-09 22:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/common/hbgete.c
+    ! pacify warning for MINGW32 build
+
+  * source/rtl/gete.c
+    + add abbreviated function SETE for SETENV
+
 2013-04-09 21:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbapi.h
   * source/common/hbgete.c

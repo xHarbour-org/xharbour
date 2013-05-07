@@ -133,3 +133,8 @@ HB_FUNC( SETENV )
 
    hb_retl( fResult );
 }
+
+HB_FUNC( SETE )
+{
+   HB_FUNCNAME( SETENV ) ();
+}
