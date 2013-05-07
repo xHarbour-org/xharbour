@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-27 11:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/harbour.c
+    ! fix memory leak on compiler failure in hb_comp_UsedNamespaces
+    - suppress message "0 error"
+
 2013-02-24 09:19 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * include/hbvmpub.h
     ! Fixed typo.

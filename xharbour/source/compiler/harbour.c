@@ -5728,16 +5728,23 @@ static int hb_compCompile( char * szPrg )
              */
             if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
             {
-
-               if( hb_comp_iErrorCount || ( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET ) )
+               if( hb_comp_iErrorCount )
                {
                   iStatus  = EXIT_FAILURE;
                   bSkipGen = TRUE;
-                  hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\r%i error%s\n\nNo code generated\n", hb_comp_iErrorCount, ( hb_comp_iErrorCount > 1 ? "s" : "" ) );
-                  hb_compOutErr( hb_comp_szMsgBuf );
+                  hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\r%i error%c\n", hb_comp_iErrorCount,
+                               hb_comp_iErrorCount > 1 ? 's' : ' ' );
+                  hb_compOutStd( hb_comp_szMsgBuf );
                }
                else if( hb_comp_iExitLevel == HB_EXITLEVEL_SETEXIT )
                   iStatus = EXIT_FAILURE;
+               else if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+               {
+                  iStatus  = EXIT_FAILURE;
+                  bSkipGen = TRUE;
+               }
+               if( bSkipGen )
+                  hb_compOutStd( "\nNo code generated\n" );
             }
 
             if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
@@ -6085,10 +6092,19 @@ static int hb_compCompile( char * szPrg )
       do
       {
          pDelete     = pNamespace;
+         if( pDelete == hb_comp_UsedNamespaces.pCurrent )
+            hb_comp_UsedNamespaces.pCurrent = NULL;
          pNamespace  = pNamespace->pNext;
          hb_xfree( pDelete );
       }
       while( pNamespace );
+
+      /* on syntax error */
+      if( hb_comp_UsedNamespaces.pCurrent )
+      {
+         hb_xfree( hb_comp_UsedNamespaces.pCurrent );
+         hb_comp_UsedNamespaces.pCurrent = NULL;
+      }
    }
 
    /* have we got i18n file ? */
@@ -6219,8 +6235,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
                {
                   iStatus     = EXIT_FAILURE;
                   *pbSkipGen  = TRUE;
-                  hb_snprintf( hb_comp_szMsgBuf, SIZE_OF_SZMSGBUF, "\nNo code generated.\n" );
-                  hb_compOutErr( hb_comp_szMsgBuf );
+                  hb_compOutStd( "\nNo code generated.\n" );
                }
             }
          }
