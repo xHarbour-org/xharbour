@@ -16,13 +16,16 @@ static __pPicture
 static __hText
 
 static aSize
-static nSecs, __aCenter, s_lProgress, s_cCancel, s_hFont, s_cText, s_hProgress
+static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress
 
 #define SHOWDEBUG
 
 #include "vxh.ch"
 #include "debug.ch"
 #include "uxTheme.ch"
+
+#define PBS_MARQUEE        0x08
+#define PBM_SETMARQUEE WM_USER + 10
 
 FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    LOCAL nTop, nWidth, nHeight, nStyle, dt, nLeft
@@ -113,12 +116,13 @@ RETURN 0
 
 CLASS MessageWait
    DATA hWnd            EXPORTED
+   DATA Marquee         EXPORTED INIT .F.
    DATA xPosition       PROTECTED INIT 0
    DATA pCallBackPtr    PROTECTED
    DATA __nListProc     PROTECTED
 
    ACCESS Text          INLINE GetWindowText( __hText )
-   ASSIGN Text(cText)   INLINE SetWindowText( __hText, cText ), UpdateWindow( ::hWnd )
+   ASSIGN Text(cText)   INLINE SetWindowText( __hText, cText ), UpdateWindow( __hText )
 
    ACCESS Position      INLINE ::xPosition PERSISTENT
    ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
@@ -131,13 +135,14 @@ CLASS MessageWait
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD Init( cText, cTitle, lProgress, cCancel ) CLASS MessageWait
-   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel )
+METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee ) CLASS MessageWait
+   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetText( cText ) CLASS MessageWait
    SetWindowText( __hText, cText )
+   __GetApplication():DoEvents()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -147,11 +152,12 @@ METHOD SetPosition() CLASS MessageWait
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
+FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
    LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd, hFont
 
    DEFAULT cText  TO ""
    DEFAULT lProgress TO .F.
+   DEFAULT lMarquee TO .T.
 
    s_hFont   := __GetMessageFont()
 
@@ -164,9 +170,10 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel )
 
    s_cCancel   := cCancel
    s_lProgress := lProgress
+   s_lMarquee  := lMarquee
    s_cText     := cText
    
-   nStyle := WS_POPUP | WS_DLGFRAME
+   nStyle := WS_POPUP | WS_DLGFRAME | WS_CLIPCHILDREN
 
    IF cTitle != NIL
       nStyle := nStyle | WS_CAPTION | WS_THICKFRAME
@@ -234,7 +241,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            __hText := CreateWindowEx( 0, "static", s_cText,;
                               WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER,;
                               aRect[1], aRect[2], aRect[3], aRect[4],;
-                              hWnd, 4002, __GetApplication():Instance, NIL )
+                              hWnd, 4002, GetModuleHandle(), NIL )
 
            SendMessage( __hText, WM_SETFONT, s_hFont )
 
@@ -253,15 +260,18 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               hBtn  := CreateWindowEx( 0, "Button", s_cCancel,;
                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
                               nLeft, aRect[4]-26, aSize[1], 22,;
-                              hWnd, 4000, __GetApplication():Instance, NIL )
+                              hWnd, 4000, GetModuleHandle(), NIL )
               SendMessage( hBtn, WM_SETFONT, s_hFont )
            ENDIF
            IF s_lProgress
               aRect := _GetClientRect( hWnd )
               s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, ,;
-                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
+                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | IIF( s_lMarquee, PBS_MARQUEE, 0 ),;
                               6, aRect[4]-23, aRect[3]-aSize[1]-14, 16,;
-                              hWnd, 4001, __GetApplication():Instance, NIL )
+                              hWnd, 4001, GetModuleHandle(), NIL )
+              IF s_lMarquee
+                 SendMessage( s_hProgress, PBM_SETMARQUEE, .T., 30 )
+              ENDIF
            ENDIF
            SelectObject( hDC, hFont )
            ReleaseDC( hWnd, hDC )
@@ -271,6 +281,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            IF nwParam == 4000
               DestroyWindow( hWnd )
            ENDIF
+           EXIT
 
       CASE WM_NCDESTROY
            DeleteObject( s_hFont )
