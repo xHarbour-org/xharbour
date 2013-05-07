@@ -361,6 +361,9 @@ METHOD Open() CLASS TODBC
       SQLAllocSt( ::hDbc, @xBuf )
       ::hStmt := xBuf
       nRet    := SQLExecDir( ::hStmt, ::cSQL )
+      IF ! nRet == SQL_SUCCESS
+         RETURN .F.
+      ENDIF
 
       // Get result information about fields and stores it
       // on Fields collection

@@ -394,7 +394,7 @@
       HB_SIZE   ulTime;       /* profiler support */
       HB_SIZE   ulRecurse;    /* profiler support */
 #endif
-   } HB_DYNS, * PHB_DYNS, * PHB_DYNS;
+   } HB_DYNS, * PHB_DYNS;
 #endif
 #if defined( HB_LEGACY_LEVEL ) || !defined( HB_NO_PROFILER )
    #define HB_DYNS_INIT { 0, 0, NULL, NULL, 0, 0, 0 }
