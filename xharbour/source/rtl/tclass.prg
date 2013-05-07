@@ -598,16 +598,19 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
 
    RETURN Self
 
+#pragma -w2
+
 STATIC PROCEDURE DivertConstructorCall( ... )
 
 // From DIVERT parent!
    LOCAL oClassInstance
+   LOCAL nScope
 // End
 
    LOCAL aConstrMethods
    LOCAL lOldScope, nPos
 
-   DEFAULT oClassInstance TO NIL
+   ( nScope )
 
    IF __SetClassAutoInit() //.AND. PCount() > 0
       // Set class scoping off
