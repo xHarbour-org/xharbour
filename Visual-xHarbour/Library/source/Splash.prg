@@ -17,6 +17,7 @@ static __pPicture
 
 static aSize
 static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect
+static s_lAutoClose
 
 #define SHOWDEBUG
 
@@ -116,27 +117,82 @@ RETURN 0
 
 CLASS MessageWait
    DATA hWnd            EXPORTED
-   DATA Marquee         EXPORTED INIT .F.
    DATA xPosition       PROTECTED INIT 0
    DATA pCallBackPtr    PROTECTED
    DATA __nListProc     PROTECTED
 
-   ACCESS Text          INLINE s_cText //GetWindowText( __hText )
+   ACCESS IsWindow      INLINE IsWindow( ::hWnd )
+   ACCESS Text          INLINE s_cText
    ASSIGN Text(cText)   INLINE ::SetText( cText ), UpdateWindow( ::hWnd )
 
-   ACCESS Position      INLINE ::xPosition PERSISTENT
+   ACCESS Position      INLINE ::xPosition
    ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
+
+   ACCESS AutoClose     INLINE s_lAutoClose
+   ASSIGN AutoClose(l)  INLINE s_lAutoClose := l
+
+   ACCESS Marquee       INLINE s_lMarquee
+   ASSIGN Marquee(l)    INLINE ::__SetMarquee(l)
 
    METHOD SetText()
    METHOD Init() CONSTRUCTOR
    METHOD SetPosition()
-   METHOD Close()    INLINE DestroyWindow( ::hWnd )
    METHOD Destroy()  INLINE DestroyWindow( ::hWnd )
+   METHOD Close()    INLINE ::Destroy()
+   METHOD __SetMarquee()
+   METHOD AdjustSize()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee ) CLASS MessageWait
+   DEFAULT lMarquee TO .F.
+   s_lAutoClose := .F.
    ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+METHOD AdjustSize() CLASS MessageWait
+   LOCAL nBorder, aClient, hFont, aRect, hDC, rc := (struct RECT)
+
+   aRect   := _GetWindowRect( ::hWnd )
+   aClient := _GetClientRect( ::hWnd )
+   nBorder := aRect[4]-aRect[2]-aClient[4]
+   hDC     := GetDC( ::hWnd )
+   hFont   := SelectObject( hDC, s_hFont )
+
+   s_aRect := aClone(aRect)
+
+   DrawText( hDC, s_cText, @rc, DT_CALCRECT )
+
+   SelectObject( hDC, hFont )
+   ReleaseDC( ::hWnd, hDC )
+
+   IF s_lProgress
+      rc:bottom += 25
+   ENDIF
+   IF s_cCancel != NIL
+      rc:bottom += 20
+   ENDIF
+   MoveWindow( ::hWnd, aRect[1], aRect[2], rc:right, rc:bottom+nBorder )
+
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+METHOD __SetMarquee( lSet ) CLASS MessageWait
+   LOCAL nStyle
+   IF s_lMarquee != lSet
+      nStyle := GetWindowLong( s_hProgress, GWL_STYLE )
+      IF lSet
+         nStyle := nStyle | PBS_MARQUEE
+       ELSE
+         nStyle := nStyle & NOT( PBS_MARQUEE )
+      ENDIF
+      SetWindowLong( s_hProgress, GWL_STYLE, nStyle )
+      SetWindowPos( s_hProgress, ,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+      RedrawWindow( s_hProgress, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      SendMessage( s_hProgress, PBM_SETMARQUEE, lSet, 30 )
+      s_lMarquee := lSet
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -149,8 +205,10 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetPosition() CLASS MessageWait
-   SendMessage( s_hProgress, PBM_SETPOS, ::xPosition, 0 )
-   __GetApplication():DoEvents()
+   IF ! s_lMarquee
+      SendMessage( s_hProgress, PBM_SETPOS, ::xPosition, 0 )
+      __GetApplication():DoEvents()
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -204,7 +262,7 @@ RETURN hWnd
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
    LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hFont, rc := (struct RECT)
-   LOCAL nBorder, aCenter, hOldFont, cPaint
+   LOCAL nBorder, aCenter, hOldFont, cPaint, nStyle
 
    SWITCH nMsg
       CASE WM_INITDIALOG
@@ -261,18 +319,17 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               IF s_lProgress
                  nLeft := ( aRect[3] - aSize[1] ) - 4
               ENDIF
-              hBtn  := CreateWindowEx( 0, "Button", s_cCancel,;
-                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
-                              nLeft, aRect[4]-26, aSize[1], 22,;
-                              hWnd, 4000, GetModuleHandle(), NIL )
+              hBtn  := CreateWindowEx( 0, "Button", s_cCancel, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
+                                       nLeft, aRect[4]-26, aSize[1], 22, hWnd, 4000, GetModuleHandle(), NIL )
               SendMessage( hBtn, WM_SETFONT, s_hFont )
            ENDIF
            IF s_lProgress
               aRect := _GetClientRect( hWnd )
-              s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, ,;
-                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | IIF( s_lMarquee, PBS_MARQUEE, 0 ),;
-                              6, aRect[4]-23, aRect[3]-aSize[1]-14, 16,;
-                              hWnd, 4001, GetModuleHandle(), NIL )
+              nStyle := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+              IF s_lMarquee
+                 nStyle := nStyle | PBS_MARQUEE
+              ENDIF
+              s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, , nStyle, 6, aRect[4]-23, aRect[3]-aSize[1]-14, 16, hWnd, 4001, GetModuleHandle(), NIL )
               IF s_lMarquee
                  SendMessage( s_hProgress, PBM_SETMARQUEE, .T., 30 )
               ENDIF
@@ -291,8 +348,17 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            SelectObject( hDC, hOldFont )
            _EndPaint( hWnd, cPaint)
+
+           IF s_lAutoClose .AND. IsKeyDown( VK_ESCAPE )
+              DestroyWindow( hWnd )
+           ENDIF
            EXIT
 
+      CASE WM_KEYDOWN
+           IF s_lAutoClose .AND. nwParam == VK_ESCAPE
+              DestroyWindow( hWnd )
+           ENDIF
+           EXIT
       CASE WM_COMMAND
            IF nwParam == 4000
               DestroyWindow( hWnd )
