@@ -13,10 +13,10 @@
 
 static __pCallBackPtr
 static __pPicture
-static __hText
+//static __hText
 
 static aSize
-static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress
+static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect
 
 #define SHOWDEBUG
 
@@ -121,8 +121,8 @@ CLASS MessageWait
    DATA pCallBackPtr    PROTECTED
    DATA __nListProc     PROTECTED
 
-   ACCESS Text          INLINE GetWindowText( __hText )
-   ASSIGN Text(cText)   INLINE SetWindowText( __hText, cText ), UpdateWindow( __hText )
+   ACCESS Text          INLINE s_cText //GetWindowText( __hText )
+   ASSIGN Text(cText)   INLINE ::SetText( cText ), UpdateWindow( ::hWnd )
 
    ACCESS Position      INLINE ::xPosition PERSISTENT
    ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
@@ -141,7 +141,9 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetText( cText ) CLASS MessageWait
-   SetWindowText( __hText, cText )
+   s_cText := cText
+   //SetWindowText( __hText, cText )
+   RedrawWindow( ::hWnd, , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    __GetApplication():DoEvents()
 RETURN Self
 
@@ -157,7 +159,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
 
    DEFAULT cText  TO ""
    DEFAULT lProgress TO .F.
-   DEFAULT lMarquee TO .T.
+   DEFAULT lMarquee TO .F.
 
    s_hFont   := __GetMessageFont()
 
@@ -202,7 +204,7 @@ RETURN hWnd
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
    LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hFont, rc := (struct RECT)
-   LOCAL nBorder, aCenter
+   LOCAL nBorder, aCenter, hOldFont, cPaint
 
    SWITCH nMsg
       CASE WM_INITDIALOG
@@ -236,14 +238,16 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
 
            aRect[2] := (aRect[4]-rc:bottom)/2
-           aRect[4] := rc:bottom
 
+           s_aRect := aClone( aRect )
+/*
            __hText := CreateWindowEx( 0, "static", s_cText,;
                               WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER,;
                               aRect[1], aRect[2], aRect[3], aRect[4],;
                               hWnd, 4002, GetModuleHandle(), NIL )
-
            SendMessage( __hText, WM_SETFONT, s_hFont )
+*/
+           aRect[4] := rc:bottom
 
            aSize := {0,0}
 
@@ -276,6 +280,18 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            SelectObject( hDC, hFont )
            ReleaseDC( hWnd, hDC )
            RETURN 1
+
+      CASE WM_PAINT
+           hDC := _BeginPaint( hWnd, @cPaint )
+
+           SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
+           hOldFont := SelectObject( hDC, s_hFont )
+
+           _DrawText( hDC, s_cText, s_aRect, DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+
+           SelectObject( hDC, hOldFont )
+           _EndPaint( hWnd, cPaint)
+           EXIT
 
       CASE WM_COMMAND
            IF nwParam == 4000
