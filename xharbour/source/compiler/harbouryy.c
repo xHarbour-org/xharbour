@@ -11635,4 +11635,6 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
       hb_comp_LocalParams = hb_comp_LocalParams->pNext;
       hb_xfree( (void *) pDelete );
    }
+
+   hb_compReleaseLoops();
 }
