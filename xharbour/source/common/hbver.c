@@ -1228,4 +1228,3 @@ char * hb_credits( void )
 
    return szCredits;
 }
-
