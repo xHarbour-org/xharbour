@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-21 09:xx UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/harbour.c
+  * source/compiler/hbgenerr.c
+    + new -w3 warning messages for assigned but not used and never
+      assigned variables:
+        Variable '...' is assigned but not used in function '...'
+        Variable '...' is never assigned in function '...'
+      Idea and code skeleton from Harbour
+      Many thanks to Mindaugas Kavaliauskas
+    ; NOTE: if you are using -w3 in makefiles, you'll need to fix
+            your redundant code to compile the project
+
+  * include/hberrors.h
+    + add new warning messages identifiers
+
+  * winmake/common3.mak
+  * winmake/makefile.gc
+    ; temporary change harbour warning flag from -w3 to -w2 for
+      .prg files succesfully compilation
+
 2013-03-15 17:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/str.c
     ! fixed bug reported by Enrico Maria Giordano

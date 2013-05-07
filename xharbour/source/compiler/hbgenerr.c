@@ -146,7 +146,9 @@ const char * hb_comp_szWarnings[] =
    "2Unreachable code",
    "1Redundant \'ANNOUNCE %s\' statement ignored",
    "1STATIC Function \'%s\' defined but never used",
-   "1Variable \'%s\' is a reserved word"
+   "1Variable \'%s\' is a reserved word",
+   "3Variable '%s' is assigned but not used in function '%s'",
+   "3Variable '%s' is never assigned in function '%s'"
 };
 
 void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
