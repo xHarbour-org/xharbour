@@ -197,28 +197,28 @@ typedef union YYSTYPE
 {
 
 
-   char *  string;      /* to hold a string returned by lex */
-   int     iNumber;     /* to hold a temporary integer number */
-   HB_LONG lNumber;     /* to hold a temporary long number */
+   char *      string;     /* to hold a string returned by lex */
+   int         iNumber;    /* to hold a temporary integer number */
+   HB_LONG     lNumber;    /* to hold a temporary long number */
    HB_EXPR_PTR asExpr;
-   void * pVoid;        /* to hold any memory structure we may need */
+   void * pVoid;           /* to hold any memory structure we may need */
    struct
    {
-      int    iNumber;      /* to hold a number returned by lex */
-      char * szValue;
+      int      iNumber;    /* to hold a number returned by lex */
+      char *   szValue;
    } valInteger;
    struct
    {
-      HB_LONG   lNumber;   /* to hold a long number returned by lex */
-      char *    szValue;
+      HB_LONG  lNumber;    /* to hold a long number returned by lex */
+      char *   szValue;
    } valLong;
    struct
    {
       double   dNumber;    /* to hold a double number returned by lex */
-      /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
+                           /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
       UCHAR    bWidth;     /* to hold the width of the value */
       UCHAR    bDec;       /* to hold the number of decimal points in the value */
-      char * szValue;
+      char *   szValue;
    } valDouble;
    struct
    {

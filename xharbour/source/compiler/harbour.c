@@ -169,6 +169,7 @@ int            hb_comp_iLanguage          = LANG_C;         /* default Harbour g
 int            hb_comp_iJumpOptimize      = 1;
 char *         hb_comp_szDeclaredFun      = NULL;
 char *         hb_Command_Line;  /* Switches to be documented in generated C file */
+PHB_EXPR_LIST  hb_comp_exprs              = NULL;           /* expressions list */
 
 /* FILE *      hb_comp_errFile            = NULL;
  */
@@ -387,7 +388,28 @@ int hb_compMain( int argc, char * argv[] )
    }
 
    if( hb_comp_iErrorCount > 0 )
+   {
+      if( hb_comp_exprs )
+      {
+         PHB_EXPR_LIST pList, pExp;
+
+         pList = pExp = hb_comp_exprs;
+         hb_comp_exprs = NULL;
+         while( pExp )
+         {
+            hb_compExprDelete( &pExp->Expr );
+            pExp = pExp->pNext;
+         }
+         while( pList )
+         {
+            pExp  = pList;
+            pList = pList->pNext;
+            hb_xfree( pExp );
+         }
+      }
+
       iStatus = EXIT_FAILURE;
+   }
 
    if( hb_comp_VariableList != NULL )
       fclose( hb_comp_VariableList );
@@ -5056,6 +5078,7 @@ static void hb_compInitVars( void )
    hb_comp_ulLastOffsetPos          = 0;
    hb_comp_iStaticCnt               = 0;
    hb_comp_iVarScope                = VS_LOCAL;
+   hb_comp_exprs                    = NULL;
 
    hb_comp_inlines.iCount           = 0;
    hb_comp_inlines.pFirst           = NULL;
@@ -5916,10 +5939,16 @@ static int hb_compCompile( char * szPrg )
 
       do
       {
+         if( pFunc == hb_comp_functions.pLast )
+            hb_comp_functions.pLast = NULL;
+
          pFunc = hb_compFunctionKill( pFunc );
       }
       while( pFunc );
    }
+
+   if( hb_comp_functions.pLast )
+      hb_compFunctionKill( hb_comp_functions.pLast );
 
    if( bKillGlobalsFunc )
       hb_compFunctionKill( hb_comp_pGlobalsFunc );

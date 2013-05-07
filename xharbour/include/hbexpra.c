@@ -202,7 +202,26 @@ void hb_compExprDelete( HB_EXPR_PTR pExpr )
    if( --pExpr->Counter == 0 )
    {
       HB_EXPR_USE( pExpr, HB_EA_DELETE );
+
+#ifndef HB_MACRO_SUPPORT
+      if( hb_comp_exprs )
+      {
+         PHB_EXPR_LIST pExpItm = ( PHB_EXPR_LIST ) pExpr;
+
+         if( hb_comp_exprs == pExpItm )
+            hb_comp_exprs = pExpItm->pNext;
+         else
+            pExpItm->pPrev->pNext = pExpItm->pNext;
+         if( pExpItm->pNext )
+            pExpItm->pNext->pPrev = pExpItm->pPrev;
+
+         HB_XFREE( pExpr );
+      }
+      else
+         pExpr->ExprType = HB_ET_NONE;
+#else
       HB_XFREE( pExpr );
+#endif
    }
 }
 
@@ -211,12 +230,13 @@ void hb_compExprDelete( HB_EXPR_PTR pExpr )
 void hb_compExprFree( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprFree()"));
-   if( --pExpr->Counter == 0 )
-   {
-      HB_EXPR_USE( pExpr, HB_EA_DELETE );
-      HB_XFREE( pExpr );
-   }
+
+#ifdef HB_MACRO_SUPPORT
+   hb_compExprDelete( pExpr, HB_MACRO_VARNAME );
+#else
    HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
+   hb_compExprDelete( pExpr );
+#endif
 }
 
 void hb_compExprErrorType( HB_EXPR_PTR pExpr, HB_MACRO_DECL )

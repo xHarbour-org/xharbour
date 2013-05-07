@@ -295,6 +295,13 @@ typedef struct _HB_LABEL_INFO
    ULONG *  pulLabels;
 } HB_LABEL_INFO, * PHB_LABEL_INFO;
 
+typedef struct _HB_EXPR_LIST
+{
+   HB_EXPR Expr;
+   struct _HB_EXPR_LIST * pPrev;
+   struct _HB_EXPR_LIST * pNext;
+} HB_EXPR_LIST, * PHB_EXPR_LIST;
+
 typedef struct
 {
    char * __INITLINES__;
@@ -717,6 +724,7 @@ extern int            hb_comp_iVarScope;
 extern BOOL           hb_comp_bDontGenLineNum;
 extern int            hb_comp_iStaticCnt;
 extern int            hb_comp_iErrorCount;
+extern PHB_EXPR_LIST  hb_comp_exprs;
 
 extern char *         hb_comp_szAnnounce;
 

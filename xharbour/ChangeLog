@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-11 17:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/harboury.h
+  * include/hbcomp.h
+  * include/hbexpra.c
+  * source/compiler/harbour.sly
+  * source/compiler/harbour.c
+  * source/compiler/harbouryy.c
+  * source/common/expropt1.c
+    ! created garbage collector for expressions in compiler mode,
+      activated on syntax errors only.
+      Idea from Harbour, many thanks to Przemyslaw Czerpak.
+
 2013-02-07 13:02 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/hbsrlraw.c
     ! fixed timestamp/datetime serialization

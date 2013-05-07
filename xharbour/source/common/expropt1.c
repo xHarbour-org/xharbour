@@ -153,7 +153,21 @@ HB_EXPR_PTR hb_compExprNew( int iType )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_compExprNew(%i)", iType ) );
 
+#if defined( __HB_COMPILER__ )
+   {
+      PHB_EXPR_LIST pExprItm = ( PHB_EXPR_LIST ) hb_xgrab( sizeof( HB_EXPR_LIST ) );
+
+      if( hb_comp_exprs )
+         hb_comp_exprs->pPrev = pExprItm;
+      pExprItm->pNext = hb_comp_exprs;
+      pExprItm->pPrev = NULL;
+      hb_comp_exprs   = pExprItm;
+
+      pExpr           = &pExprItm->Expr;
+   }
+#else
    pExpr             = ( HB_EXPR_PTR ) HB_XGRAB( sizeof( HB_EXPR ) );
+#endif
 
    pExpr->ExprType   = ( unsigned char ) iType;
    pExpr->pNext      = NULL;
@@ -168,7 +182,23 @@ HB_EXPR_PTR hb_compExprNew( int iType )
 void hb_compExprClear( HB_EXPR_PTR pExpr )
 {
    if( --pExpr->Counter == 0 )
+   {
+
+#if defined( __HB_COMPILER__ )
+      {
+         PHB_EXPR_LIST pExpItm = ( PHB_EXPR_LIST ) pExpr;
+
+         if( hb_comp_exprs == pExpItm )
+            hb_comp_exprs = pExpItm->pNext;
+         else
+            pExpItm->pPrev->pNext = pExpItm->pNext;
+         if( pExpItm->pNext )
+            pExpItm->pNext->pPrev = pExpItm->pPrev;
+      }
+#endif
+
       HB_XFREE( pExpr );
+   }
 }
 
 /* Increase a reference counter (this allows to share the same expression
@@ -465,7 +495,7 @@ HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR pArrList )
     */
    if( pExpr->ExprType == HB_ET_NONE && pExpr->pNext == NULL )
    {
-      HB_XFREE( pExpr );
+      hb_compExprClear( pExpr );
       pArrList->value.asList.pExprList = NULL;
    }
    else
@@ -628,7 +658,7 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
       pExpr->value.asMessage.pMacroMessage   = NULL;
 
       pMessage->value.asSymbol.szName        = NULL;
-      HB_XFREE( pMessage );
+      hb_compExprClear( pMessage );
    }
    else
    {
@@ -670,7 +700,7 @@ HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR pMessage )
       pExpr->value.asMessage.pMacroMessage   = NULL;
 
       pMessage->value.asSymbol.szName        = NULL;
-      HB_XFREE( pMessage );
+      hb_compExprClear( pMessage );
    }
    else
    {
