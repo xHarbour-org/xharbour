@@ -1836,7 +1836,7 @@ RETURN 0
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign, lDC
+   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign, lDC, lData
    LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
@@ -1906,17 +1906,21 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
        nFocRow := 99999
        
 
-       IF nLine <= LEN( ::__DisplayArray )
+       IF .T. //nLine <= LEN( ::__DisplayArray )
+
+          lData := nLine <= LEN( ::__DisplayArray )
+
+          IF lData
+             nRec := ::__DisplayArray[nLine][2]
+          ENDIF
           
-          nRec    := ::__DisplayArray[nLine][2]
-          
-          IF ::Striping
+          IF ::Striping .AND. lData
              ::DataSource:Goto( nRec )
              nRecPos := ::DataSource:OrdKeyNo()
              ::DataSource:Goto( nRecno )
           ENDIF
           
-          IF ::ShowSelection
+          IF lData .AND. ::ShowSelection
              IF nRec == nRecno
                 lSelected := .T.
              ENDIF
@@ -1927,7 +1931,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                 lSelected := lSelected .OR. ASCAN( ::aTagged, nRec ) > 0
              ENDIF
           ENDIF
-          IF nRec == ::__nDragRec
+          IF lData .AND. nRec == ::__nDragRec
              _FillRect( hMemDC, { nLeft, nTop, ::Width, nBottom }, ::__hDragBrush )
              LOOP
           ENDIF
@@ -1947,28 +1951,29 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
           ENDIF
 
           FOR i := nCol TO nColEnd
-              IF nLeft > ::ClientWidth .OR. LEN(::__DisplayArray[nLine][1])<i // avoid painting non-visible columns
+              IF nLeft > ::ClientWidth .OR. ( lData .AND. LEN(::__DisplayArray[nLine][1])<i ) // avoid painting non-visible columns
                  EXIT
               ENDIF
               IF ::Children[ i ]:Visible
+                 cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
+                 nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
+                 nWImg  := IIF( lData, IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 ), 0 )
+                 nAlign := IIF( lData, ::__DisplayArray[nPos][1][i][ 4], 1 )
+                 nHImg  := IIF( lData, ::__DisplayArray[nPos][1][i][ 5], 0 )
 
-                 cData  := ::__DisplayArray[nPos][1][i][ 1]
-                 nInd   := ::__DisplayArray[nPos][1][i][ 2]
-                 nWImg  := IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 )
-                 nAlign := ::__DisplayArray[nPos][1][i][ 4]
-                 nHImg  := ::__DisplayArray[nPos][1][i][ 5]
+                 nBkCol := IIF( lHover, ::__HoverBackColor, IIF( lData, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, ::BackColor )) )
 
-                 nBkCol := IIF( lHover, ::__HoverBackColor, ::__DisplayArray[nPos][1][i][ 7] )
-
-                 IF ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
+                 IF lData .AND. ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                     nBkCol := DarkenColor( nBkCol, 25 )
                  ENDIF
-                 nTxCol   := ::__DisplayArray[nPos][1][i][ 8]
+                 nTxCol   := IIF( lData, ::__DisplayArray[nPos][1][i][ 8], 0 )
 
-                 nStatus  := ::__DisplayArray[nPos][1][i][10]
-                 nRep     := ::__DisplayArray[nPos][1][i][11]
-                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][12] )
-                 lDeleted := ::__DisplayArray[nPos][1][i][13]
+                 nStatus  := IIF( lData, ::__DisplayArray[nPos][1][i][10], 0 )
+                 nRep     := IIF( lData, ::__DisplayArray[nPos][1][i][11], 1 )
+                 IF lData
+                    hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][12] )
+                 ENDIF
+                 lDeleted := IIF( lData, ::__DisplayArray[nPos][1][i][13], .F. )
 
                  zLeft := nLeft
                  IF lFreeze .AND. i <= ::FreezeColumn

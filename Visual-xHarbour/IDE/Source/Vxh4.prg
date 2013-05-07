@@ -3466,6 +3466,7 @@ __aProps["F"] := { { "FullRow",                 "Style" },;
                    { "FaceName",                "" },;
                    { "Filter",                  "" },;
                    { "FirstChild",              "" },;
+                   { "FreezeColumn",            "Behavior" },;
                    { "Flat",                    "Appearance" },;
                    { "Font",                    "Appearance" },;
                    { "FrameStyle",              "Appearance" },;
