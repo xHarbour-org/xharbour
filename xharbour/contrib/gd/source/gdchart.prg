@@ -247,6 +247,7 @@ METHOD PieChart() CLASS GDChart
             textcolor := ::SetColor( 255 - ::Red( colorp ), 255 - ::Green( colorp ), 255 - ::Blue( colorp ) )
          ENDIF
          //cTitle := LTrim( Str( nVal ) )
+hFont = NIL
          IF hFont == NIL
             ::Say( nPosX, nPosY, cLabel, textcolor, gdAlignCenter )
          ELSE
@@ -259,9 +260,8 @@ METHOD PieChart() CLASS GDChart
 RETURN Self
 
 METHOD VerticalBarChart() CLASS GDChart
-  LOCAL hElement, nTot := 0
-  LOCAL nDegree := 0
-  LOCAL lFilled, lExtruded, nExtrude, pTile
+  LOCAL hElement
+  LOCAL lFilled, pTile
   LOCAL colorp
   LOCAL nVal, nDim
   LOCAL nPosX, nPosY
@@ -339,7 +339,6 @@ METHOD VerticalBarChart() CLASS GDChart
       ENDIF
       cLabel    := HGetValue( hElement, "LABEL" )
       nMaxLabel := Max( nMaxLabel, Len( IIF( cLabel <> NIL, cLabel, "" ) ) )
-      nTot      += hElement["VALUE"]
   NEXT
 
   //__OutDebug( "Len( LTrim( Str( nMax ) ) )", Len( LTrim( cStr( nMax ) ) ), Str( nMax ) )
@@ -410,19 +409,12 @@ METHOD VerticalBarChart() CLASS GDChart
   FOR EACH hElement IN aDataOfHash
       cLabel    := HGetValue( hElement, "LABEL" )
       lFilled   := HGetValue( hElement, "FILLED" )
-      nExtrude  := HGetValue( hElement, "EXTRUDE" )
       pTile     := HGetValue( hElement, "TILE" )
-      IF nExtrude <> NIL
-         lExtruded := TRUE
-      ELSE
-         lExtruded := FALSE
-      ENDIF
       colorp    := HGetValue( hElement, "COLOR" )
       nVal      := hElement["VALUE"]
       nDim      := ( nVal / nMaxValue ) * nHeight
 
       DEFAULT lFilled  TO FALSE
-      DEFAULT nExtrude TO 0
       DEFAULT colorp   TO ::SetColor( 0, 0, 0 )
 
       nPosX   := x + ( nSize * ( HB_EnumIndex() - 1 ) )
@@ -448,9 +440,8 @@ METHOD VerticalBarChart() CLASS GDChart
 RETURN Self
 
 METHOD HorizontalBarChart() CLASS GDChart
-  LOCAL hElement, nTot := 0
-  LOCAL nDegree := 0
-  LOCAL lFilled, lExtruded, nExtrude, pTile
+  LOCAL hElement
+  LOCAL lFilled, pTile
   LOCAL colorp
   LOCAL nVal, nDim
   LOCAL nPosX, nPosY
@@ -526,7 +517,6 @@ METHOD HorizontalBarChart() CLASS GDChart
       ENDIF
       cLabel    := HGetValue( hElement, "LABEL" )
       nMaxLabel := Max( nMaxLabel, Len( IIF( cLabel <> NIL, cLabel, "" ) ) )
-      nTot      += hElement["VALUE"]
   NEXT
   DEFAULT nLeftLabelSpace    TO nBorder + nMaxLabel * ::GetFontWidth() + nBorder
   DEFAULT nRightLabelSpace   TO nBorder + ( Len( LTrim( Transform( nMax, cAxisPict ) ) ) * ::GetFontWidth() / 2 )
@@ -594,19 +584,12 @@ METHOD HorizontalBarChart() CLASS GDChart
   FOR EACH hElement IN aDataOfHash
       cLabel    := HGetValue( hElement, "LABEL" )
       lFilled   := HGetValue( hElement, "FILLED" )
-      nExtrude  := HGetValue( hElement, "EXTRUDE" )
       pTile     := HGetValue( hElement, "TILE" )
-      IF nExtrude <> NIL
-         lExtruded := TRUE
-      ELSE
-         lExtruded := FALSE
-      ENDIF
       colorp    := HGetValue( hElement, "COLOR" )
       nVal      := hElement["VALUE"]
       nDim      := ( nVal / nMaxValue ) * nWidth
       //__OutDebug( "nDim", nDim )
       DEFAULT lFilled  TO FALSE
-      DEFAULT nExtrude TO 0
       DEFAULT colorp   TO ::SetColor( 0, 0, 0 )
 
       nPosX   := x
@@ -634,9 +617,8 @@ RETURN Self
 
 METHOD LineChart() CLASS GDChart
   LOCAL hElement
-  LOCAL nDegree := 0
-  LOCAL lFilled, lExtruded, nExtrude, pTile
-  LOCAL colorp
+  LOCAL pTile
+//  LOCAL colorp
   LOCAL nVal, nDim
   LOCAL nPosX, nPosY
   LOCAL cLabel
@@ -815,31 +797,24 @@ METHOD LineChart() CLASS GDChart
   aPoints := {}
   FOR EACH hElement IN aDataOfHash
       cLabel    := HGetValue( hElement, "LABEL" )
-      lFilled   := HGetValue( hElement, "FILLED" )
-      nExtrude  := HGetValue( hElement, "EXTRUDE" )
+//      lFilled   := HGetValue( hElement, "FILLED" )
       pTile     := HGetValue( hElement, "TILE" )
-      IF nExtrude <> NIL
-         lExtruded := TRUE
-      ELSE
-         lExtruded := FALSE
-      ENDIF
-      colorp    := HGetValue( hElement, "COLOR" )
+//      colorp    := HGetValue( hElement, "COLOR" )
       nVal      := hElement["VALUE"]
       nDim      := ( ( nVal + abs( nMinValue ) ) / nTotRange ) * nHeight
 
-      DEFAULT lFilled  TO FALSE
-      DEFAULT nExtrude TO 0
-      DEFAULT colorp   TO ::SetColor( 0, 0, 0 )
+//      DEFAULT lFilled  TO FALSE
+//      DEFAULT colorp   TO ::SetColor( 0, 0, 0 )
 
       nPosX   := x + ( nSize * ( HB_EnumIndex() - 1 ) )
       nPosY   := y
       IF pTile <> NIL
          ::SetTile( pTile )
-         colorp := gdTiled
+//         colorp := gdTiled
       ELSE
-         if ISARRAY( colorp )
-            colorp := ::SetColor( colorp[1], colorp[2], colorp[3] )
-         endif
+//         if ISARRAY( colorp )
+//            colorp := ::SetColor( colorp[1], colorp[2], colorp[3] )
+//         endif
       ENDIF
       //::Rectangle( nPosX + nBorder, ::Height() - ( nPosY + nDim ), nPosX + nSize - nBorder, ::Height() - nPosY, lFilled, colorp )
       aAdd( aPoints, { nPosX, ::Height() - ( nPosY + nDim ) } )

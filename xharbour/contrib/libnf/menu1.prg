@@ -311,7 +311,7 @@ STATIC NHPOS, NVPOS, NMAXROW, NMAXCOL
 
 
 FUNCTION FT_MENU1( aBar, aOptions, aColors, nTopRow, lShadow )
-   LOCAL nTtlWid, nTtlUsed
+   LOCAL nTtlUsed
    LOCAL sMainScrn, lCancMode, lLooping := .t.
 
    // column position for each item on the menu bar
@@ -352,7 +352,6 @@ FUNCTION FT_MENU1( aBar, aOptions, aColors, nTopRow, lShadow )
 
    // this is the routine that calculates the position of each item
    // on the menu bar.
-   nTtlWid := 0
    aBarCol[1] := 0
    nTtlUsed := LEN( aBar[1] ) + 1
    AEVAL( aBar, ;

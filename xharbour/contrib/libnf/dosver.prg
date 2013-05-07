@@ -78,7 +78,7 @@ FUNCTION MAIN()
 FUNCTION FT_DOSVER()
 
    /*  local aRegs[ INT86_MAX_REGS ] */
-   LOCAL cResult := ""
+   LOCAL cResult
 
 /*  aRegs[ AX ] = MAKEHI( DOSVER )
   if FT_INT86( DOS, aRegs )

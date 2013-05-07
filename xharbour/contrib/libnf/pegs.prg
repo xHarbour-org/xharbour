@@ -110,7 +110,6 @@ FUNCTION FT_PEGS
 
    scanblock := { | a | a[2] == move2 }
    cls
-   xx := 1
    SetColor( 'w/r' )
    SINGLEBOX( 22, 31, 24, 48 )
    @ 23, 33 SAY "Your move:"

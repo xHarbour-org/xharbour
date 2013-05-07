@@ -229,7 +229,7 @@ FUNCTION FT_MMICKEYS( nX, nY ) // read mouse motion counters
    FT_INT86( 51, aReg )        // execute mouse interrupt
    */
 
-   LOCAL areturn := {}
+   LOCAL areturn
 
    areturn := _mget_mics()
    nX := areturn[1]               // store horizontal motion units
@@ -301,9 +301,9 @@ FUNCTION FT_MMICKEYS( nX, nY ) // read mouse motion counters
 FUNCTION FT_MDBLCLK( nClick, nButton, nInterval, nRow, nCol, nStart )
 
    LOCAL nVert, nHorz  // local row and col coordinates
-   LOCAL lDouble := .F.  // double click actually occurred
-   LOCAL lDone          // loop flag
-   LOCAL nPrs           // number of presses which occurred
+   LOCAL lDouble       // double click actually occurred
+   LOCAL lDone         // loop flag
+   LOCAL nPrs          // number of presses which occurred
 
 // Initialize any empty arguments
 
@@ -652,7 +652,7 @@ FT_INT86( 51, aReg )        // execute mouse interrupt
 
 FUNCTION FT_MVERSION( nMinor, nType, nIRQ )
 
-   LOCAL aReturn := {}
+   LOCAL aReturn
 
 // Set up register
 /*
@@ -1002,7 +1002,7 @@ FUNCTION FT_MHIDECRS()   // decrement internal cursor flag and hide cursor
 
 FUNCTION FT_MGETPOS( nX, nY )
 
-   LOCAL amse := {}
+   LOCAL amse
 
    nX := if( nX == NIL, 0, nX )
    nY := if( nY == NIL, 0, nY )
@@ -1350,7 +1350,7 @@ FUNCTION FT_MBUTPRS( nButton, nButPrs, nX, nY ) // get button press information
 
 FUNCTION FT_MBUTREL( nButton, nButRel, nX, nY ) // get button release information
 
-   LOCAL areg := {}
+   LOCAL areg
    LOCAL iButton
 
    areg := _m_MBUTREL( nButton )
@@ -1479,7 +1479,7 @@ FUNCTION FT_MDEFCRS( nCurType, nScrMask, nCurMask )   // define text cursor type
 FUNCTION FT_MGETCOORD( nX, nY )
 
 // Duplicated code from FT_MGETPOS() for speed reasons
-   LOCAL aReg := {}
+   LOCAL aReg
    LOCAL iButton
    nX := if( nX == NIL, 0, nX )
    nY := if( nY == NIL, 0, nY )

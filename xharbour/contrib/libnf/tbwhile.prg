@@ -334,7 +334,7 @@ FUNCTION FT_BRWSWHL(aFields, bWhileCond, cKey, nFreeze, lSaveScrn, ;
    ENDIF
    cColorSave := SetColor()
 
-   /* Background Color Is Based On First Color In Passed cColorList
+   /* Background Color Is Based On First Color In Passed cColorList */
    cColorBack := IF(',' $ cColorList, ;
       SUBSTR(cColorList, 1, AT(',', cColorList) - 1), cColorList )
 

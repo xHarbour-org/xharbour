@@ -116,7 +116,7 @@ FUNCTION ft_sqzn( nValue, nSize, nDecimals )
 
 FUNCTION ft_unsqzn( cCompressed, nSize, nDecimals )
 
-   LOCAL tmp := "", k, cValue, multi := 1
+   LOCAL tmp, k, cValue, multi := 1
 
    nSize       := if( nSize    == NIL, 10, nSize )
    nDecimals   := if( nDecimals == NIL, 0, nDecimals )

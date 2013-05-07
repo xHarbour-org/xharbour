@@ -254,7 +254,7 @@ METHOD IsSensible() CLASS XWTWidget
 RETURN bSense
 
 METHOD SetColor( cColor, nTypeColor ) CLASS XWTWidget
-   LOCAL cColorText  := ""
+   LOCAL cColorText
    Local aColor
    Local c
 

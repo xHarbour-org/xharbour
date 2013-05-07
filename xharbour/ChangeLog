@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-24 20:14 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/gd/source/gdbar.prg
+  * contrib/gd/source/gdbarcode.prg
+  * contrib/gd/source/gdchart.prg
+  * contrib/libnf/aredit.prg
+  * contrib/libnf/clrsel.prg
+  * contrib/libnf/dispmsg.prg
+  * contrib/libnf/dosver.prg
+  * contrib/libnf/menu1.prg
+  * contrib/libnf/menuto.prg
+  * contrib/libnf/mouse1.prg
+  * contrib/libnf/pegs.prg
+  * contrib/libnf/popadder.prg
+  * contrib/libnf/sqzn.prg
+  * contrib/libnf/tbwhile.prg
+  * contrib/libnf/xbox.prg
+  * contrib/libnf/dfile.prg
+  * contrib\xwt\src\hex.prg
+  * contrib\xwt\src\widget.prg
+  * contrib\gtwvg\wvtclass.prg
+  * contrib\gtwvg\wvtpaint.prg
+    ! fixed assigned but not used variable
+
 2013-03-24 19:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * xharbour/include/hbclass.ch
     ! more nScope hiddings

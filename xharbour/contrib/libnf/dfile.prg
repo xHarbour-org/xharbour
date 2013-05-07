@@ -142,7 +142,7 @@ FUNCTION FT_DFSETUP( cInFile, nTop, nLeft, nBottom, nRight, ;
       nStart, nCNormal, nCHighlight, cExitKeys, ;
       lBrowse, nColSkip, nRMargin, nBuffSize )
 
-   LOCAL rval := 0
+   LOCAL rval
 
    IF File( cInFile )
       nTop    := if( ValType( nTop )    == "N", nTop,           0 )

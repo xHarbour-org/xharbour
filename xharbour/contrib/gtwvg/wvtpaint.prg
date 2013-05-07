@@ -391,7 +391,6 @@ Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu
       cbDlgProc := upper( cbDlgProc )
    endif
 
-   hDlg     := 0
    cType    := Valtype( acnDlg )
    nDlgMode := if( cType == 'C', 0, if( cType == 'N', 1, 2 ) )
 

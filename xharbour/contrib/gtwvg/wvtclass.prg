@@ -255,7 +255,7 @@ METHOD New( nRows, nCols, cTitle, cFont, nFontHeight, nFontWidth,nFontBold,nFont
 //-------------------------------------------------------------------//
 
 METHOD Create() CLASS wvtDialog
-   LOCAL aPalette, n, i, j  // , cScr, cQry
+   LOCAL aPalette, i, j  // , cScr, cQry
 
    ::oldToolTipActive := Wvt_SetToolTipActive( .t. )
    if ::nTooltipWidth <> nil
@@ -309,7 +309,7 @@ METHOD Create() CLASS wvtDialog
    next
    WvtSetPaint( GetPaint( ::cPaintBlockID ) )
 
-   if ( n := ascan( ::aObjects, {|o| o:lTabStop } ) ) > 0
+   if ( ascan( ::aObjects, {|o| o:lTabStop } ) ) > 0
       ::lTabStops := .t.
    endif
 
@@ -2361,7 +2361,7 @@ METHOD Read() CLASS WvtGets
 //-------------------------------------------------------------------//
 
 METHOD GetData() CLASS WvtGets
-   LOCAL aData
+   LOCAL aData := NIL
 
    RETURN aData
 
@@ -2609,7 +2609,7 @@ METHOD SetPos( nTotal, nCurrent ) CLASS WvtScrollBar
 //-------------------------------------------------------------------//
 
 METHOD ThumbPos() CLASS WvtScrollBar
-   LOCAL  nNewPos     := ::nThumbPos
+   LOCAL  nNewPos
    LOCAL  nRecPerUnit, nCurUnit
 
    if ::nBarType == WVT_SCROLLBAR_VERT

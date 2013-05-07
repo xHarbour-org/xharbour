@@ -296,7 +296,6 @@ FUNCTION FT_Adder()
    cTapeScr     := ''
    nTotal       := nNumTotal := nSavTotal := nDecDigit := 0
    lDone        := .F.                   // Loop flag
-   nKey         := 0
    nMaxDeci     := 2                     // Initial # of decimals
    nSavSubTot   := 0
    lNewNum      := .F.
@@ -761,19 +760,16 @@ STATIC FUNCTION _ftProcessNumb( aAdder, nKey )
 
 STATIC FUNCTION _ftAddTotal( aAdder )
 
-   LOCAL cTOT, cSTOT, cAdv
+   LOCAL cSTOT, cAdv
 
    IF cMyLanguage == "ES"
       cSTOT := '<SUBTOTAL>'
-      cTOT  := '   <TOTAL>'
       cAdv  := "no se puede dividir por CERO!"
    ELSEIF cMyLanguage == "IT"
       cSTOT := '<SUBTOTALE>'
-      cTOT  := '  <TOTALE>'
       cAdv  := "non si puo dividere per ZERO!"
    ELSE
       cSTOT := '<SUBTOTAL>'
-      cTOT  := '   <TOTAL>'
       cAdv  := "you can't divide by ZERO!"
    ENDIF
 
@@ -1524,9 +1520,8 @@ STATIC FUNCTION _ftQuest( cMessage, xVarVal, cPict, bValid, lNoESC, nWinColor, n
       IF( cVarType = 'L', 1, IF( cVarType = 'N',IF(cPict = NIL,9,     ;
       Len( cPict ) ), 0 ) ) ) )
    LOCAL nOldLastKey := LastKey()
-   LOCAL GETLIST := {},                                                       ;
-      cOldDevice  := Set( _SET_DEVICE, 'SCREEN' ),                           ;
-      lOldPrint   := Set( _SET_PRINTER, .F. )
+   LOCAL cOldDevice  := Set( _SET_DEVICE, 'SCREEN' ),                           ;
+         lOldPrint   := Set( _SET_PRINTER, .F. )
    LOCAL cAdv
 
    IF cMyLanguage == "ES"
@@ -1753,8 +1748,7 @@ STATIC FUNCTION _ftError( cMessage, xDontReset )
 
 STATIC FUNCTION _ftStuffComma( cStrToStuff, lTrimStuffedStr )
 
-   LOCAL nDecPosit, x,                                                        ;
-      nOrLen := Len( cStrToStuff )
+   LOCAL nDecPosit, x
 
    lTrimStuffedStr := IF( lTrimStuffedStr = NIL, .F. , lTrimStuffedStr )
    IF !( '.' $ cStrToStuff )

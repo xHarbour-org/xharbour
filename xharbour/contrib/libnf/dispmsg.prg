@@ -205,7 +205,7 @@ FUNCTION FT_DispMsg( aInfo, cKey, nBoxTop, nBoxLeft, cnBoxString, lShadow )
       y,                ;
       aPos := {},       ;
       nLeft,            ;
-      nTop,             ;
+;//      nTop,             ;
       aLeft
 
    FOR i := 1 TO Len( aInfo[1] )
@@ -234,7 +234,7 @@ FUNCTION FT_DispMsg( aInfo, cKey, nBoxTop, nBoxLeft, cnBoxString, lShadow )
    ENDIF
 
    IF nBoxTop == NIL
-      nTop := ( MaxRow() - Len( aInfo[1] ) - 2 ) / 2 + 2
+//      nTop := ( MaxRow() - Len( aInfo[1] ) - 2 ) / 2 + 2
    ENDIF
 
 
