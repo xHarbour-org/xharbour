@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 /* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison interface for Yacc-like parsers in C
@@ -30,8 +34,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_OBJ_B32_HARBOURY_H_INCLUDED
-# define YY_YY_OBJ_B32_HARBOURY_H_INCLUDED
+#ifndef YY_YY_HARBOURY_H_INCLUDED
+# define YY_YY_HARBOURY_H_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -247,4 +251,4 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_OBJ_B32_HARBOURY_H_INCLUDED  */
+#endif /* !YY_YY_HARBOURY_H_INCLUDED  */
