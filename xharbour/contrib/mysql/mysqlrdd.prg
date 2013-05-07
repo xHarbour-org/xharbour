@@ -83,7 +83,6 @@ FUNCTION DBMYSQLCONNECTION( cConnString )
    LOCAL cDatabase
    LOCAL cUser
    LOCAL cPassword
-   LOCAL cPort
 
    aParams := HB_ATOKENS( cConnString, ";" )
 
@@ -93,7 +92,6 @@ FUNCTION DBMYSQLCONNECTION( cConnString )
    cDatabase := aParams[2]
    cUser     := aParams[3]
    cPassword := aParams[4]
-   cPort     := aParams[5]
 
    oServer := TMySQLServer():New( cHost, cUser, cPassword)
 
@@ -148,8 +146,6 @@ STATIC FUNCTION MYSQL_OPEN( nWA, aOpenInfo )
    LOCAL aField, oError, lError, cError, nResult
    LOCAL oServer, oQuery, aStruct, aFieldStruct
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
-
-   lError := .F.
 
    if !empty( aOpenInfo[ UR_OI_CONNECT ] ) .and. aOpenInfo[ UR_OI_CONNECT ] <= len( s_aConnections )
       oServer := s_aConnections[ aOpenInfo[ UR_OI_CONNECT ] ]
