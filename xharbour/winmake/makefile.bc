@@ -87,7 +87,7 @@ COMPILERLIBS   =\
 !endif
 
 !if ("$(WARNINGFLAGS)"=="")
-WARNINGFLAGS =-w -w-8071 -w-8061 -w-8080
+WARNINGFLAGS =-w -w-8071 -w-8121
 !endif
 
 !include winmake\common3.mak

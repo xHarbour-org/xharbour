@@ -449,7 +449,7 @@ _mxml_vstrdupf(const char *format,	/* I - Printf-style format string */
   va_copy(apcopy, ap);
   bytes = vsnprintf(temp, sizeof(temp), format, apcopy);
 
-  if (bytes < sizeof(temp))
+  if (bytes < (int) sizeof(temp))
   {
    /*
     * Hey, the formatted string fits in the tiny buffer, so just dup that...

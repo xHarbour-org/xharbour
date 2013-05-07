@@ -3207,7 +3207,7 @@ static enum TIFFReadDirEntryErr TIFFReadDirEntryCheckRangeLongSlong(int32 value)
 static enum TIFFReadDirEntryErr
 TIFFReadDirEntryCheckRangeLongLong8(uint64 value)
 {
-	if (value > TIFF_UINT32_MAX)
+	if (value > (uint64) TIFF_UINT32_MAX)
 		return(TIFFReadDirEntryErrRange);
 	else
 		return(TIFFReadDirEntryErrOk);
@@ -3216,7 +3216,7 @@ TIFFReadDirEntryCheckRangeLongLong8(uint64 value)
 static enum TIFFReadDirEntryErr
 TIFFReadDirEntryCheckRangeLongSlong8(int64 value)
 {
-	if ((value<0) || (value > TIFF_UINT32_MAX))
+	if ((value<0) || (value > (int64) TIFF_UINT32_MAX))
 		return(TIFFReadDirEntryErrRange);
 	else
 		return(TIFFReadDirEntryErrOk);
@@ -3303,7 +3303,7 @@ TIFFReadDirEntryCheckRangeLong8Slong8(int64 value)
 static enum TIFFReadDirEntryErr
 TIFFReadDirEntryCheckRangeSlong8Long8(uint64 value)
 {
-	if (value > TIFF_INT64_MAX)
+	if (value > (uint64) TIFF_INT64_MAX)
 		return(TIFFReadDirEntryErrRange);
 	else
 		return(TIFFReadDirEntryErrOk);

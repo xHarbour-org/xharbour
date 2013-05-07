@@ -4157,8 +4157,7 @@ static void hb_compPCodeEnumAssignedUnused( PFUNCTION pFunc, PHB_OPT_LOCAL pLoca
 {
    HB_BYTE * pMap;
    HB_SIZE   nPos = 0, nPredPos = 0;
-   SHORT     isLocal;
-   HB_SIZE   ulBase = 0, ulLine = 0;
+   SHORT     nLocal, nBase = 0, nLine = 0;
    HB_BOOL   fCheck;
 
    pMap = ( HB_BYTE * ) hb_xgrab( pFunc->lPCodePos );
@@ -4178,33 +4177,33 @@ static void hb_compPCodeEnumAssignedUnused( PFUNCTION pFunc, PHB_OPT_LOCAL pLoca
                         pFunc->pCode[ nPos ] == HB_P_LOCALNEARDEC ) )
          fCheck = HB_TRUE;
 
-      if( fCheck && ( isLocal = hb_compLocalGetNumber( &pFunc->pCode[ nPos ] ) ) > ( SHORT ) pFunc->wParamCount )
+      if( fCheck && ( nLocal = hb_compLocalGetNumber( &pFunc->pCode[ nPos ] ) ) > ( SHORT ) pFunc->wParamCount )
       {
-         if( ( pLocals[ isLocal - 1 ].bFlags & ( OPT_LOCAL_FLAG_BLOCK | OPT_LOCAL_FLAG_PUSHREF ) ) == 0 &&
-             pLocals[ isLocal - 1 ].bFlags != OPT_LOCAL_FLAG_POPSELF &&
-             pLocals[ isLocal - 1 ].bFlags != ( OPT_LOCAL_FLAG_PUSH | OPT_LOCAL_FLAG_POPSELF ) )
+         if( ( pLocals[ nLocal - 1 ].bFlags & ( OPT_LOCAL_FLAG_BLOCK | OPT_LOCAL_FLAG_PUSHREF ) ) == 0 &&
+             pLocals[ nLocal - 1 ].bFlags != OPT_LOCAL_FLAG_POPSELF &&
+             pLocals[ nLocal - 1 ].bFlags != ( OPT_LOCAL_FLAG_PUSH | OPT_LOCAL_FLAG_POPSELF ) )
          {
             memset( pMap, 0, pFunc->lPCodePos );
             pMap[ nPos ] = 1;
 
-            if( ! hb_compPCodeTraceAssignedUnused( pFunc, nPos + hb_compPCodeSize( pFunc, nPos ), pMap, isLocal ) )
+            if( ! hb_compPCodeTraceAssignedUnused( pFunc, nPos + hb_compPCodeSize( pFunc, nPos ), pMap, nLocal ) )
             {
                SHORT is;
                PVAR  pVar = pFunc->pLocals;
                char  szFun[ 256 ];
 
-               for( is = 1; is < isLocal; is++ )
+               for( is = 1; is < nLocal; is++ )
                   pVar = pVar->pNext;
 
-               hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, ulLine );
+               hb_snprintf( szFun, sizeof( szFun ), "%s(%i)", pFunc->szName, nLine );
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_ASSIGNED_UNUSED, pVar->szName, szFun );
             }
          }
       }
       else if( pFunc->pCode[ nPos ] == HB_P_BASELINE )
-         ulLine = ulBase = HB_PCODE_MKUSHORT( &pFunc->pCode[ nPos + 1 ] );
+         nLine = nBase = HB_PCODE_MKUSHORT( &pFunc->pCode[ nPos + 1 ] );
       else if( pFunc->pCode[ nPos ] == HB_P_LINEOFFSET )
-         ulLine = ulBase + pFunc->pCode[ nPos + 1 ];
+         nLine = nBase + pFunc->pCode[ nPos + 1 ];
 
       nPredPos = nPos;
       nPos += hb_compPCodeSize( pFunc, nPos );

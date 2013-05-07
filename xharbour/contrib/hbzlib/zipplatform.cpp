@@ -104,7 +104,7 @@ CZipString ZipPlatform::GetTmpFileName( LPCTSTR lpszPath, DWORD iSizeNeeded )
    }
    if( bCheckTemp )
    {
-      DWORD size = GetTempPath( NULL, NULL );
+      DWORD size = GetTempPath( 0, NULL );
       if( size == 0 )
          return empty;
 

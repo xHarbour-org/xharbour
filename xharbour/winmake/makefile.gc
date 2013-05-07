@@ -16,7 +16,7 @@ CC    =GCC
 CCP   =G++
 ifeq ($(HB_ARCHITECTURE),w32)
 TYPE  =type
-DEL   =del
+DEL   =$(HBRM_EXE)
 COPY  =copy
 else
 TYPE  =cat

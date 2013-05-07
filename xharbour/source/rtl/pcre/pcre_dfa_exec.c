@@ -2250,6 +2250,8 @@ for (;;)
           {
 #ifdef SUPPORT_UCP
           otherd = UCD_OTHERCASE(d);
+#else
+          otherd = NOTACHAR;
 #endif  /* SUPPORT_UCP */
           }
         else

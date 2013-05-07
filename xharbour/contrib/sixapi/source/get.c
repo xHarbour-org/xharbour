@@ -85,7 +85,7 @@ HB_FUNC( SX_GETBITMAP )
                           hWnd /* Window Handle */
                           ) );
 
-   hb_stornl( ( long ) ( HB_LONG ) hWnd, 2 );
+   hb_stornl( ( ULONG ) hWnd, 2 );
 
    if( iWorkArea != SX_DUMMY_NUMBER )
       sx_Select( iWorkArea );
