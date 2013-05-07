@@ -1151,6 +1151,8 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName, BOOL bFree
       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUP_DECLARATION, "Method", szMethodName );
 
       /* Last Declaration override previous declarations */
+      if( bFree )
+         hb_xfree( szMethodName );
       if( pMethod->cParamTypes )
          hb_xfree( pMethod->cParamTypes );
       pMethod->cParamTypes = NULL;
