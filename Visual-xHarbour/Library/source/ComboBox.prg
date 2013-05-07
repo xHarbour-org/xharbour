@@ -166,6 +166,7 @@ CLASS ComboBox FROM Control
    METHOD __SetItemToolTips()
    METHOD __ComboBoxEditProc()
    METHOD __ResetEdit()
+   METHOD __SetSizePos()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -183,6 +184,13 @@ METHOD Init( oParent ) CLASS ComboBox
       AADD( ::Events[3][2], { "OnSelChange" , "", "" } )
    ENDIF
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------------------
+METHOD __SetSizePos( nPos, nVal ) CLASS ComboBox
+   IF nPos == 4 .AND. ::hWnd != NIL .AND. ::__ClassInst == NIL
+      ::SendMessage( CB_SETMINVISIBLE, nVal/::xItemHeight )
+   ENDIF
+RETURN Super:__SetSizePos( nPos, nVal )
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD GetEditText() CLASS ComboBox
