@@ -2796,7 +2796,11 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
 
       case HB_EA_ARRAY_AT:
       case HB_EA_ARRAY_INDEX:
+         break;
+
       case HB_EA_LVALUE:
+         if( pSelf->value.asMessage.pParms )
+            hb_compErrorLValue( pSelf );
          break;
 
       case HB_EA_PUSH_PCODE:
