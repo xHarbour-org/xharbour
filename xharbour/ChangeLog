@@ -8,17 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2013-03-25 18:18 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2013-03-25 18:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake/common3.mak
   * winmake/makefile.gc
     ! set harbour warning to the highest level, -w3
 
-2013-03-25 18:18 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * utils\hbmake\hbmake.prg
   * utils\xbscript\xbscript.prg
     ! fixed assigned but not used variable, hidden with #pragma w2
 
-2013-03-25 18:18 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/tclass.prg
   * source/rtl/treport.prg
   * source\rdd\usrrdd\rdds\adordd.prg
