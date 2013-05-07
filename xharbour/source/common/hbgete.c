@@ -68,7 +68,7 @@
 /* NOTE: Warning, this function _may_ return NULL as a result if
          the environment variable reading fails form some reason.
          If the return value is not NULL, the caller must free
-         the pointer. [vszakats] */
+         the pointer. */
 
 char * hb_getenv( const char * szName )
 {
@@ -132,6 +132,8 @@ HB_BOOL hb_setenv( const char * szName, const char * szValue, HB_BOOL fSys )
       HKEY hKey;
 
       fSuccess = HB_FALSE;
+      if( szValue && szValue[ 0 ] == '\0' )
+         szValue = NULL;
 
       if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, SYS_ENVVARS, 0, KEY_READ | KEY_WRITE, &hKey ) == ERROR_SUCCESS )
       {
@@ -144,7 +146,7 @@ HB_BOOL hb_setenv( const char * szName, const char * szValue, HB_BOOL fSys )
             else
                RegDeleteValue( hKey, szName );
 
-            PostMessage( HWND_BROADCAST, WM_SETTINGCHANGE, 0, ( LONG ) USER_ENV_SUBKEY );
+            SendMessage( HWND_BROADCAST, WM_SETTINGCHANGE, (WPARAM) NULL, (LPARAM) USER_ENV_SUBKEY );
             fSuccess = HB_TRUE;
          }
          RegCloseKey( hKey );
