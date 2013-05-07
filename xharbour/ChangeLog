@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-01-15 06:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! pplib.c, pplib2.c and pplib3.c are not required when building harbour.exe,
+    hence removed as compiler.lib dependencies.
+
 2013-01-13 12:20 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * include/hbcomp.h
   * source/compiler/harbour.c
@@ -12564,7 +12570,6 @@
     * Added HB_LEGACY_LEVEL2 by default to admit HB_OS_WIN_32_USED, _WIN64 and HB_WINCE changed by
       HB_OS_WIN_USED, HB_OS_WIN_64, HB_OS_WIN_CE on previous commit. Please don't use it any more.
 
-
 2009-11-18 10:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * utils/hbmake/hbmutils.prg
   * utils/hbmake/hbmake.prg
@@ -12767,7 +12772,6 @@
      ! fixed bug reported by Jaroslav Janik (many thanks) - if index FOR
        expression excluded all records from non empty table then root page
        was not initialized and DBFNSX generated corruption RTE. ( from harbour Przemyslaw Czerpak )
-
 
 2009-11-08 23:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
    * include/Makefile
@@ -13152,7 +13156,6 @@
      * filebuf was developed by Przemyslaw Czerpak, borrowed from Harbour, and modified by me to add
        especific xharbour features to remote conections.
      * Changed rdd structures to do more easy 3rd party developers job in the future.
-
 
 2009-09-29 12:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/rtl/tbrowse.prg
@@ -13791,7 +13794,6 @@
     makefile.bc
     ! minor adjust to compile tipssl
 
-
 2009-08-10 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   ! makefile.vc
     ! minor adjust
@@ -13807,7 +13809,6 @@
   ! contrib/tipssl/sendmail.prg
   ! contrib/tipssl/smtpcln.prg
     ! minor change
-
 
 2009-08-10 10:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg
@@ -13869,18 +13870,3 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

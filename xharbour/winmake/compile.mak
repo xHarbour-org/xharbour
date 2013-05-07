@@ -1651,15 +1651,6 @@ $(OBJ_DIR)$(DIR_SEP)harbour_hbver$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)hbver.c
 $(OBJ_DIR)$(DIR_SEP)harbour_reserved$(OBJEXT) : $(COMMON_DIR)$(DIR_SEP)reserved.c
 	$(CC_CMD_HARBOUR)
 
-$(OBJ_DIR)$(DIR_SEP)harbour_pplib$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib.c
-	$(CC_CMD_HARBOUR)
-
-$(OBJ_DIR)$(DIR_SEP)harbour_pplib2$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib2.c
-	$(CC_CMD_HARBOUR)
-
-$(OBJ_DIR)$(DIR_SEP)harbour_pplib3$(OBJEXT) : $(PP_DIR)$(DIR_SEP)pplib3.c
-	$(CC_CMD_HARBOUR)
-
 $(OBJ_DIR)$(DIR_SEP)harbour_ppcore$(OBJEXT) : $(PP_DIR)$(DIR_SEP)ppcore.c
 	$(CC_CMD_HARBOUR)
 
