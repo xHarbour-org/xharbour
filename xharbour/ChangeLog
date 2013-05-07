@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-24 19:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * xharbour/include/hbclass.ch
+    ! more nScope hiddings
+
 2013-03-24 14:56 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/sendmail.prg
     ! fixed assigned but not used variable

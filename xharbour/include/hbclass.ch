@@ -1099,16 +1099,16 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | Self, <Code> }, HBCLSCHOICE( .F.
 
 
 #ifdef HB_CLS_CSY
-   #xcommand    EXPORTED:       =>      nScope := HB_OO_CLSTP_EXPORTED
-   #xcommand    EXPORT:         =>      nScope := HB_OO_CLSTP_EXPORTED
-   #xcommand    VISIBLE:        =>      nScope := HB_OO_CLSTP_EXPORTED
-   #xcommand    PUBLIC:         =>      nScope := HB_OO_CLSTP_EXPORTED
+   #xcommand    EXPORTED:       =>      nScope := HB_OO_CLSTP_EXPORTED ; ( nScope )
+   #xcommand    EXPORT:         =>      nScope := HB_OO_CLSTP_EXPORTED ; ( nScope )
+   #xcommand    VISIBLE:        =>      nScope := HB_OO_CLSTP_EXPORTED ; ( nScope )
+   #xcommand    PUBLIC:         =>      nScope := HB_OO_CLSTP_EXPORTED ; ( nScope )
 
-   #xcommand    HIDDEN:         =>      nScope := HB_OO_CLSTP_HIDDEN
-   #xcommand    PRIVATE:        =>      nScope := HB_OO_CLSTP_HIDDEN
+   #xcommand    HIDDEN:         =>      nScope := HB_OO_CLSTP_HIDDEN ; ( nScope )
+   #xcommand    PRIVATE:        =>      nScope := HB_OO_CLSTP_HIDDEN ; ( nScope )
 
-   #xcommand    PROTECTED:      =>      nScope := HB_OO_CLSTP_PROTECTED
-   #xcommand    PUBLISHED:      =>      nScope := HB_OO_CLSTP_PUBLISHED
+   #xcommand    PROTECTED:      =>      nScope := HB_OO_CLSTP_PROTECTED ; ( nScope )
+   #xcommand    PUBLISHED:      =>      nScope := HB_OO_CLSTP_PUBLISHED ; ( nScope )
 #endif
 
 #endif /* HB_CLASS_CH_ */
