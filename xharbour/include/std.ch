@@ -555,9 +555,9 @@
 
 #command RESET [IN <ualias>] => [( <ualias> )->](DbInfo( DBI_TTS_INCOMPLETE, .F. ))
 
-#command READ           => ReadModal(GetList) ; GetList := {}
+#command READ           => ReadModal(GetList) ; GetList := {} ; ( GetList )
 #command READ SAVE      => ReadModal(GetList)
-#command CLEAR GETS     => ReadKill(.T.) ; GetList := {}
+#command CLEAR GETS     => ReadKill(.T.) ; GetList := {} ; ( GetList )
 
 #xcommand @ [<exp,...>] COLOUR [<nextexp,...>] => @ [ <exp>] COLOR [ <nextexp>]
 
@@ -577,7 +577,7 @@
    #command READ [MENU <oMenu>] ;
                  [MSG AT <row>, <left>, <right> [MSG COLOR <color>]] => ;
          ReadModal( GetList, NIL, <oMenu>, <row>, <left>, <right>, <color> ) ;;
-         GetList := {}
+         GetList := {} ; ( GetList )
 
    #command READ SAVE [MENU <oMenu>] ;
                       [MSG AT <row>, <left>, <right> [MSG COLOR <color>]] => ;

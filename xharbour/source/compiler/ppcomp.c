@@ -300,13 +300,14 @@ void hb_compInitPP( int argc, char * argv[] )
       else if( hb_pp_STD_CH[ 0 ] > ' ' )
       {
          if( hb_pp_STD_CH_ADDITIVE )
-         {
             hb_pp_setStdRules( hb_comp_PP );
-         }
 
          hb_pp_initDynDefines( hb_comp_PP );
 
          hb_pp_readRules( hb_comp_PP, hb_pp_STD_CH );
+
+         hb_xfree( hb_pp_STD_CH );
+         hb_pp_STD_CH = NULL;
       }
       else if( ! hb_comp_bQuiet )
       {

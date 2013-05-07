@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-21 12:45 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/ppcomp.c
+    ! fixed memory leak on using -u switch
+
+  * include/std.ch
+    ! hide GetList assigning but not using
+
+  * xharbour/include/hbclass.ch
+    ! hide nScope assigning but not using
+
+  * source/rtl/tbcolumn.prg
+    ! fixed assigned but not used variable, hidden with #pragma w2
+
 2013-03-21 10:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/cgi/hjwindow.prg
   * source/cgi/hterrsys.prg

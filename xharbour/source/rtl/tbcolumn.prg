@@ -247,7 +247,7 @@ METHOD SetDefColor( aDef ) CLASS TBColumn
 
 METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
 
-   LOCAL lRet := .F.
+   LOCAL lRet
 
    IF nMode > Len( ::aSetStyle )
       RETURN .F.
@@ -265,7 +265,7 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
 
 METHOD AddStyle( nMode, lSetting ) CLASS TBColumn
 
-   LOCAL lRet := .F.
+   LOCAL lRet
    LOCAL nLen := Len( ::aSetStyle )
 
    IF nMode != nLen + 1
