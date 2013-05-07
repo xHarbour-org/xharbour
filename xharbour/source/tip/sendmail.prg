@@ -287,7 +287,6 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       TRY
          oInmail := tIPClientsmtp():New( oUrl, lTrace )
       CATCH
-         lReturn := .F.
       END
 
       oInmail:nConnTimeout := nTimeOut
@@ -315,12 +314,10 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
       IF ValType( aThisFile ) == "C"
          cFile := aThisFile
-         cData := MemoRead( cFile ) + Chr( 13 ) + Chr( 10 )
+         MemoRead( cFile )
       ELSEIF ValType( aThisFile ) == "A" .AND. Len( aThisFile ) >= 2
          cFile := aThisFile[ 1 ]
-         cData := aThisFile[ 2 ] + Chr( 13 ) + Chr( 10 )
       ELSE
-         lReturn := .F.
          EXIT
       ENDIF
 
