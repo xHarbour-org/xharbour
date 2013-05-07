@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-02-07 13:02 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/hbsrlraw.c
+    ! fixed timestamp/datetime serialization
+    ! add workaround for bug in serialization code - now xHarbour can
+      deserialize its own LONGLONG items
+
+  * xharbour/source/rtl/fstemp.c
+    ! fixed *nix builds
+
+  * xharbour/source/vm/inet.c
+    ! fixed non MS-Windows builds
+
+  * xharbour/source/compiler/harbour.c
+    ! fixed function and class declarations to initialize new _DECL member
+      added recently
+
+  * xharbour/source/compiler/comptool.c
+    ! fixed *nix builds - simple workaround for missing new FM module
+      in GNU make builds. It should also fix all other builds which
+      do not force new FM module in compiler mode or do not have separate
+      common libs for compiler and VM.
+    ; Now xHarbour can be compiled in *nixes though with many warnings.
+
 2013-02-05 12:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/ct/files.c
     ! fixed hidden memory leaks on functions FILEDATE & FILETIME

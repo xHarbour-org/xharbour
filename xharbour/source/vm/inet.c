@@ -621,7 +621,7 @@ HB_FUNC( INETFD )
       hb_retnint( socket->com );
 
       if( hb_parl( 2 ) )
-         socket->com = ( SOCKET ) -1;
+         socket->com = ( HB_SOCKET_T ) -1;
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETFD", 1, hb_paramError( 1 ) );

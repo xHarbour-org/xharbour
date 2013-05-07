@@ -198,6 +198,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          break;
 
       case HB_IT_DATE:
+      case HB_IT_TIMEFLAG:
          if( pItem->item.asDate.time == 0 )
          {
             ulRet       = 9;
@@ -314,6 +315,8 @@ ULONG hb_serialNextRaw( const char * cBuf )
          return 2;
 
       case 'N':
+         if( cBuf[ 1 ] == 'X' ) /* workaround for bug in serialization code */
+            return 20;
          if( cBuf[ 1 ] == 'I' || cBuf[ 1 ] == 'X' || cBuf[ 1 ] == 'L' )
             return 10;
 

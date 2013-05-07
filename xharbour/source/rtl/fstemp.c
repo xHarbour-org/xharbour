@@ -327,13 +327,13 @@ HB_ERRCODE hb_fsTempDir( char * pszTempDir )
    {
       char * pszTempDirEnv = hb_getenv( "TMPDIR" );
 
-      if( fsGetTempDirByCase( pszTempDir, pszTempDirEnv ) )
+      if( fsGetTempDirByCase( pszTempDir, pszTempDirEnv, HB_FALSE ) )
          nResult = 0;
 #ifdef P_tmpdir
-      else if( fsGetTempDirByCase( pszTempDir, P_tmpdir ) )
+      else if( fsGetTempDirByCase( pszTempDir, P_tmpdir, HB_TRUE ) )
          nResult = 0;
 #endif
-      else if( fsGetTempDirByCase( pszTempDir, "/tmp" ) )
+      else if( fsGetTempDirByCase( pszTempDir, "/tmp", HB_TRUE ) )
          nResult = 0;
 
       if( pszTempDirEnv )
