@@ -122,3 +122,14 @@ HB_FUNC( GETE )
 {
    HB_FUNCNAME( GETENV ) ();
 }
+
+HB_FUNC( SETENV )
+{
+   const char * pszName = hb_parc( 1 );
+   HB_BOOL fResult = HB_FALSE;
+
+   if( pszName )
+      fResult = hb_setenv( pszName, hb_parc( 2 ), hb_parl( 3 ) );
+
+   hb_retl( fResult );
+}

@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-04-09 21:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbapi.h
+  * source/common/hbgete.c
+  * source/rtl/gete.c
+    + new function (only MS-Windows builds):
+      SETENV(<cEnvironmentVariable>,[<cNewValue>][,<lSystem>]) -> lSuccess
+      Show <lSystem> == .T. when you need modify system environment variable.
+      This allows other applications to pick up your updates.
+
 2013-03-21 10:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/tclass.prg
     ! assigned but not used variable logic is not suitable for 

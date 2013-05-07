@@ -114,3 +114,53 @@ char * hb_getenv( const char * szName )
 
    return pszBuffer;
 }
+
+
+#define SYS_ENVVARS      TEXT( "System\\CurrentControlSet\\Control\\Session Manager\\Environment" )
+#define USER_ENV_SUBKEY  TEXT( "Environment" )
+
+/* Sets the contents of the specified environment variable for the current process/system
+*/
+HB_BOOL hb_setenv( const char * szName, const char * szValue, HB_BOOL fSys )
+{
+
+#if defined( HB_OS_WIN )
+   HB_BOOL fSuccess = SetEnvironmentVariable( szName, szValue );
+
+   if( fSuccess && fSys )
+   {
+      HKEY hKey;
+
+      fSuccess = HB_FALSE;
+
+      if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, SYS_ENVVARS, 0, KEY_READ | KEY_WRITE, &hKey ) == ERROR_SUCCESS )
+      {
+         HB_BOOL fRet = RegQueryValueEx( hKey, szName, NULL, NULL, NULL, NULL );
+
+         if( fRet == ERROR_SUCCESS || fRet == ERROR_FILE_NOT_FOUND && szValue )
+         {
+            if( szValue )
+               RegSetValueEx( hKey, szName, 0, REG_SZ, ( LPBYTE ) szValue, strlen( szValue ) + 1 );
+            else
+               RegDeleteValue( hKey, szName );
+
+            PostMessage( HWND_BROADCAST, WM_SETTINGCHANGE, 0, ( LONG ) USER_ENV_SUBKEY );
+            fSuccess = HB_TRUE;
+         }
+         RegCloseKey( hKey );
+      }
+   }
+
+   return fSuccess;
+
+#else
+
+   HB_SYMBOL_UNUSED( szName );
+   HB_SYMBOL_UNUSED( szValue );
+   HB_SYMBOL_UNUSED( fSys );
+
+   return HB_FALSE;
+
+#endif
+
+}

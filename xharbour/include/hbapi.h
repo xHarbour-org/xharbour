@@ -998,6 +998,7 @@ extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );
 /* environment variables access */
 /* WARNING: This returned pointer must be freed if not NULL using hb_xfree( ( void * ) ptr ); */
 extern HB_EXPORT char * hb_getenv( const char * name );
+extern HB_EXPORT BOOL hb_setenv( const char * name, const char * value, BOOL bSys );
 
 /* Version tracking related things */
 #ifdef HB_FILE_VER_STATIC
