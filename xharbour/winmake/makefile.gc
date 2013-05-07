@@ -14,9 +14,15 @@ RESEXT=.o
 RC    =windres
 CC    =GCC
 CCP   =G++
+ifeq ($(HB_ARCHITECTURE),w32)
+TYPE  =type
+DEL   =del
+COPY  =copy
+else
 TYPE  =cat
 DEL   =RM -f
 COPY  =cp
+endif
 
 ifneq ($(NO_CYGWIN),1)
 NOCYGWIN  =-mno-cygwin
@@ -292,7 +298,7 @@ ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
 
 RC_CMD          =$(RC) --input=$^ --output=$@
-LIB_CMD         =RM -f $@ && AR cru $@ $^
+LIB_CMD         =$(DEL) $@ && AR cru $@ $^
 LIB_CMD_1       =$(LIB_CMD)
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)

@@ -84,7 +84,11 @@
 #if defined(__MINGW__)
 #   include <comctl32.h>
 #endif
-#include <shlobj.h>
+
+#if ! defined(__WATCOMC__)
+  #include <shlobj.h>
+#endif
+
 
 #include <time.h>
 #include <ctype.h>
