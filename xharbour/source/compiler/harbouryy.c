@@ -11622,44 +11622,17 @@ static void hb_compYYError( char cPrefix, int iError, const char * szError1, con
 
    while( hb_comp_BlocksList )
    {
-      PBLOCKSLIST pDel = hb_comp_BlocksList;
+      PBLOCKSLIST pDelete = hb_comp_BlocksList;
 
       hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
-      hb_xfree( (void *) pDel );
+      hb_xfree( (void *) pDelete );
    }
 
-
-#if 0
-
-   if ( asExpr && asExpr->value.asList.pIndex )
+   while( hb_comp_LocalParams )
    {
-      hb_xfree( asExpr->value.asList.pIndex );
-      asExpr->value.asList.pIndex = NULL;
+      PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+      hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+      hb_xfree( (void *) pDelete );
    }
-
-   if ( asExpr )
-   {
-      hb_xfree( asExpr );
-      asExpr = NULL;
-   }
-
-   if( hb_comp_LocalParams )
-   {
-      while( hb_comp_LocalParams )
-      {
-         PLOCALPARAM pDelete = hb_comp_LocalParams;
-
-         hb_comp_LocalParams = hb_comp_LocalParams->pNext;
-         hb_xfree( (void *) pDelete );
-      }
-      hb_comp_LocalParams = NULL;
-   }
-
-   if( hb_comp_BlocksList )
-   {
-      hb_xfree( hb_comp_BlocksList );
-      hb_comp_BlocksList = NULL;
-   }
-
-#endif
 }
