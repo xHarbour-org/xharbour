@@ -443,8 +443,8 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL * ref, PHB_ITEM pDoc, PHB_ITE
    iLenName       = buf_name->length;
    iLenAttrib     = buf_attrib->length;
 
-   pDest->pName   = hb_itemPutCL( pDest->pName, mxml_sgs_extract( buf_name ), iLenName );
-   pDest->pValue  = hb_itemPutCL( pDest->pValue, mxml_sgs_extract( buf_attrib ), iLenAttrib );
+   pDest->pName   = hb_itemPutCPtr( pDest->pName, mxml_sgs_extract( buf_name ), iLenName );
+   pDest->pValue  = hb_itemPutCPtr( pDest->pValue, mxml_sgs_extract( buf_attrib ), iLenAttrib );
 
    return MXML_STATUS_OK;
 }
@@ -894,7 +894,7 @@ static void mxml_node_read_data( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM doc,
       buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
    }
 
-   hb_itemPutCL( pItem, buf, iPos );
+   hb_itemPutCPtr( pItem, buf, iPos );
    hb_objSendMsg( pNode, "_CDATA", 1, pItem );
    hb_itemRelease( pItem );
 }
@@ -981,7 +981,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL * ref, PHB_ITEM pNode, PHB_IT
    {
       buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
    }
-   pItem = hb_itemPutCL( NULL, buf, iPos );
+   pItem = hb_itemPutCPtr( NULL, buf, iPos );
    hb_objSendMsg( pNode, "_CNAME", 1, pItem );
    hb_itemRelease( pItem );
 
@@ -1062,7 +1062,7 @@ static void mxml_node_read_directive( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM
          {
             buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
          }
-         hb_itemPutCL( pItem, buf, iPos );
+         hb_itemPutCPtr( pItem, buf, iPos );
          hb_objSendMsg( pNode, "_CDATA", 1, pItem );
          hb_itemRelease( pItem );
       }
@@ -1150,7 +1150,7 @@ static void mxml_node_read_pi( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM doc )
       {
          buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
       }
-      hb_itemPutCL( pItem, buf, iPos );
+      hb_itemPutCPtr( pItem, buf, iPos );
       hb_objSendMsg( pNode, "_CDATA", 1, pItem );
       hb_itemRelease( pItem );
    }
@@ -1274,7 +1274,7 @@ static void mxml_node_read_comment( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM d
       {
          buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
       }
-      hb_itemPutCL( pItem, buf, iPos );
+      hb_itemPutCPtr( pItem, buf, iPos );
       hb_objSendMsg( pNode, "_CDATA", 1, pItem );
    }
    else
@@ -1459,7 +1459,7 @@ static void mxml_node_read_cdata( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM pDo
          {
             buf = ( char * ) MXML_REALLOCATOR( buf, iPos + 1 );
          }
-         hb_itemPutCL( pItem, buf, iPos );
+         hb_itemPutCPtr( pItem, buf, iPos );
          hb_objSendMsg( pNode, "_CDATA", 1, pItem );
       }
       else

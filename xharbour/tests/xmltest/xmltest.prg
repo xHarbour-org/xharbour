@@ -19,8 +19,8 @@
 #include "hbxml.ch"
 
 PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
-   LOCAL hFile, cXml
-   LOCAL xmlDoc, xmlNode, lFind := .f.
+   LOCAL cXml, oDoc, oNode
+   LOCAL lFind
 
    SET EXACT OFF
    CLS

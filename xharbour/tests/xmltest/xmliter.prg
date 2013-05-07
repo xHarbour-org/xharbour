@@ -21,7 +21,7 @@
 
 PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
 
-   LOCAL hFile, cXml
+   LOCAL cXml
    LOCAL oDoc, oNode, oIter, lFind
 
    SET EXACT OFF
