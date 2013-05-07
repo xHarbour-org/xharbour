@@ -17,7 +17,7 @@ LINKEXE   =LINK386
 LIBEXE    =LIB386
 IMPLIBEXE =WLIB
 
-ACE_DLL   =$(HB_DIR_ADS)\ace32.dll
+ACE_DLL   ="$(HB_DIR_ADS)\ace32.dll"
 ACE_LIB   =$(ACE32_LIB)
 
 !if !("$(HB_DIR_ADS)"=="")

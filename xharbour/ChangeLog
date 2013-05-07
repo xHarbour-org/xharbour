@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-03-11 09:11 UTC-0800 Luis Krause <kaddath at shaw dot ca>
+  * winmake/makefile.bc
+  * winmake/makefile.dc
+  * winmake/makefile.pc
+  * winmake/makefile.wc
+    ! added quotes around HB_DIR_ADS when used with ace32.dll
+      in case the path to ADS has spaces
+
 2013-03-06 22:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * winmake/makefile.gc
   * winmake/mdir.bat

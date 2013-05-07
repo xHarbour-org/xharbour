@@ -33,7 +33,7 @@ LIBEXE    =POLIB
 OLDFLAG   =-Go
 !endif
 
-ACE_DLL   =$(HB_DIR_ADS)\ace32.dll
+ACE_DLL   ="$(HB_DIR_ADS)\ace32.dll"
 ACE_LIB   =$(ACE32_LIB)
 
 !if ("$(HB_ARCH)"=="64")

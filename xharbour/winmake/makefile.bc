@@ -53,9 +53,9 @@ OPTFLAGS              =-O2 -OS -Ov -Oi -Oc $(OPTFLAGS)
 
 !if !("$(HB_DIR_ADS)"=="")
 !if ("$(HB_ARCH)"=="64")
-ACE_DLL=$(HB_DIR_ADS)\ace64.dll
+ACE_DLL="$(HB_DIR_ADS)\ace64.dll"
 !else
-ACE_DLL=$(HB_DIR_ADS)\ace32.dll
+ACE_DLL="$(HB_DIR_ADS)\ace32.dll"
 !endif
 !if !("$(HB_ADS_IMPLIB)"=="no") && !("$(HB_ADS_IMPLIB)"=="0")
 HB_ADS_CREATEIMPLIB=1
