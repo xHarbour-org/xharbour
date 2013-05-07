@@ -157,28 +157,21 @@ return self
 METHOD ReadMakefile(cFile) CLASS THbMake
 *---------------------------------------
 
-    LOCAL cBuffer     := {}
+    LOCAL cBuffer
     LOCAL cMacro      := ::cMacro
-    LOCAL cDep        := "#DEPENDS"
-    LOCAL cOpt        := "#OPTS"
     LOCAL cCom        := "#COMMANDS"
     LOCAL cBuild      := "#BUILD"
-    LOCAL cTemp       := ""
-    LOCAL cTemp1      := ''
+    LOCAL cTemp
     LOCAL aTemp       := {}
-    LOCAL lMacrosec   := .f.
-    LOCAL lBuildSec   := .f.
-    LOCAL lComSec     := .f.
-    LOCAL aTemp1      := {}
-    LOCAL cCfg        := ""
-    LOCAL lCfgFound   := .F.
-    LOCAL aTempCFiles := {}
+    LOCAL lMacrosec
+    LOCAL lBuildSec
+    LOCAL lComSec
+    LOCAL aTemp1
+    LOCAL aTempCFiles
     Local nHandle
     Local cObjitem
-    Local cRes        := ""
     Local cItem
-    LOCAL lLinux      := At( 'linux', Lower( Os() ) ) > 0
-    Local lExtended   := .T., szProject
+    Local lExtended   := .T.
     LOCAL lPrgObjRule := .F.
 
     nHandle := FT_FUSE( cFile )
@@ -494,7 +487,6 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
         IF lbuildSec
 
-            szProject   := cTemp
             ::aBuildOrder := Listasarray2( cTemp, ":" )
 
 
@@ -532,8 +524,7 @@ RETURN self
 METHOD ReplaceMacros( cMacros ) CLass THBMAKE
 *--------------------------------------------
 
-    LOCAL nCount       := 0
-    LOCAL aTempMacros  := {}
+    LOCAL aTempMacros
     LOCAL aLocalMacros := {}
 
     aTempMacros := Listasarray2( cMacros, " " )
@@ -551,7 +542,6 @@ METHOD FindMacro( cMacro, cRead ) CLASS THBMAKE
 
     LOCAL nPos
     LOCAL cTemp
-    LOCAL aLocalMacros := {}
 
     cMacro := Substr( cMacro, 1, At( ")", cMacro ) )
 

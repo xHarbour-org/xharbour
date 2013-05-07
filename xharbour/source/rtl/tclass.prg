@@ -601,8 +601,8 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
 STATIC PROCEDURE DivertConstructorCall( ... )
 
 // From DIVERT parent!
-   LOCAL oClassInstance
-   LOCAL nScope
+   LOCAL oClassInstance := NIL
+   LOCAL nScope := NIL
 // End
 
    LOCAL aConstrMethods

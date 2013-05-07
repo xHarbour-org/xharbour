@@ -119,7 +119,6 @@ FUNCTION ProcessTroff
    LOCAL nEnd
    LOCAL nCount
 
-   LOCAL cBar        := "컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�"
    LOCAL nMode
    LOCAL cFuncName
    LOCAL cOneLine
@@ -153,7 +152,6 @@ FUNCTION ProcessTroff
    LOCAL cPlat       := DELIM + 'PLATFORMS' + DELIM
    LOCAL cFiles      := DELIM + 'FILES' + DELIM
    LOCAL cSubCode    := DELIM + 'SUBCODE' + DELIM
-   LOCAL cFunction   := DELIM + 'FUNCTION' + DELIM
 
    //
    //  Entry Point

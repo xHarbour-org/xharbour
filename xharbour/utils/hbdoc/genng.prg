@@ -116,10 +116,10 @@ FUNCTION ProcessiNg()
    LOCAL nCount
    LOCAL nAlso
 
-   LOCAL lData         := .F.
-   LOCAL lMethod       := .F.
-   LOCAL lIsDataLink   := .F.
-   LOCAL lIsMethodLink := .F.
+   LOCAL lData
+   LOCAL lMethod
+   LOCAL lIsDataLink
+   LOCAL lIsMethodLink
 
    LOCAL cBar           := "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ"
    LOCAL nMode
@@ -130,10 +130,8 @@ FUNCTION ProcessiNg()
    LOCAL nLineCnt
    LOCAL cSeeAlso
    LOCAL cTemp
-   LOCAL lPar
    LOCAL cChar
    LOCAL lBlankLine     := .F.             // Blank line enCountered and sent out
-   LOCAL lAddBlank      := .F.             // Need to add a blank line if next line is not blank
    LOCAL oNgi
    LOCAL nReadHandle
    LOCAL cDoc           := DELIM + "DOC" + DELIM               // DOC keyword
@@ -170,7 +168,6 @@ FUNCTION ProcessiNg()
    lIsDataLink   := .F.
    lIsMethodLink := .F.
 
-   lPar := .T.
    //
    //  Entry Point
    //
@@ -389,7 +386,6 @@ FUNCTION ProcessiNg()
                      oNgi:WriteParBold( " Syntax" )
 
                      nMode     := D_SYNTAX
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cConstruct, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -397,7 +393,6 @@ FUNCTION ProcessiNg()
                      oNgi:WriteParBold( " Constructor syntax" )
 
                      nMode     := D_SYNTAX
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cArg, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -409,7 +404,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_ARG
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cRet, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -421,7 +415,6 @@ FUNCTION ProcessiNg()
                      oNgi:WriteParBold( " Returns" )
 
                      nMode     := D_ARG
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cDesc, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -429,8 +422,6 @@ FUNCTION ProcessiNg()
                      oNgi:WriteParBold( " Description" )
 
                      nMode     := D_DESCRIPTION
-                     lAddBlank := .T.
-                     lPar      := .T.
                   ENDIF
                ELSEIF AT( cdatalink, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -440,7 +431,6 @@ FUNCTION ProcessiNg()
 
                      oNgi:WriteParBold( " Data" )
                      nMode     := D_DATALINK
-                     lAddBlank := .T.
 
                      lIsDataLink := .T.
                   ENDIF
@@ -451,16 +441,13 @@ FUNCTION ProcessiNg()
 
                      ENDIF
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
 
-                     lPar := .T.
                   ENDIF
                ELSEIF AT( cMethodslink, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
 
                      oNgi:WriteParBold( " Method" )
                      nMode     := D_METHODLINK
-                     lAddBlank := .T.
 
                      lIsMethodLink := .T.
                   ENDIF
@@ -471,8 +458,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .T.
                   ENDIF
 
                ELSEIF AT( cExam, cBuffer ) > 0
@@ -484,7 +469,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_EXAMPLE
-                     lAddBlank := .T.
                   ENDIF
 
                ELSEIF AT( cTest, cBuffer ) > 0
@@ -496,8 +480,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_EXAMPLE
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cStatus, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -513,8 +495,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_COMPLIANCE
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cPlat, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -524,8 +504,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cFiles, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -535,8 +513,6 @@ FUNCTION ProcessiNg()
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cFunction, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -546,9 +522,7 @@ FUNCTION ProcessiNg()
                      //                  ENDIF
                      oNgi:WriteParBold( " Functions" )
 
-                     lPar      := .t.
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cSee, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -675,7 +649,7 @@ RETURN aAlso
 *+
 FUNCTION ProcNgiInput()
 
-   LOCAL aFiles   := {}
+   LOCAL aFiles
    LOCAL aFuncs   := {}
    LOCAL aFuncsam := {}
    LOCAL aFuncsn_ := {}
@@ -744,8 +718,8 @@ FUNCTION ProcNgiInput()
          cBuffer := STRTRAN( cbuffer, CHR( 10 ), '' )
          cT      := LEFT( cBuffer, 7 )
          IF xY == cT
-            cName := SUBSTR( cBuffer, 9 )
-            cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
+//            cName := SUBSTR( cBuffer, 9 )
+//            cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
          ENDIF
          cTs := SUBSTR( cBuffer, 1, 9 )
 
@@ -785,8 +759,8 @@ FUNCTION ProcNgiInput()
          cBuffer := STRTRAN( cbuffer, CHR( 10 ), '' )
          cT      := LEFT( cBuffer, 7 )
          IF xY == cT
-            cName := SUBSTR( cBuffer, 9 )
-            cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
+//            cName := SUBSTR( cBuffer, 9 )
+//            cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
          ENDIF
          //         if at(chr(10),cBuffer)>0
          //            cBuffer:=Strtran(cbuffer,chr(10),'')
@@ -844,8 +818,8 @@ FUNCTION ProcNgiInput()
             cT      := LEFT( cBuffer, 7 )
             cBuffer := STRTRAN( cbuffer, CHR( 10 ), '' )
             IF xY == cT
-               cName := SUBSTR( cBuffer, 9 )
-               cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
+//               cName := SUBSTR( cBuffer, 9 )
+//               cName := SUBSTR( cName, 1, AT( ' ', cName ) - 1 )
             ENDIF
             cTs := SUBSTR( cBuffer, 1, 9 )
             //             if at(chr(10),cBuffer)>0
@@ -892,10 +866,10 @@ RETURN NIL
 FUNCTION procngialso2( cSeealso )
 
    LOCAL nPos
-   LOCAL aAlso := {}
-   LOCAL cTemp := ''
-   LOCAL xAlso := {}
-   LOCAL hPos  := 0
+   LOCAL aAlso
+   LOCAL cTemp
+   LOCAL xAlso
+   LOCAL hPos
    aAlso := {}
    xAlso := ListAsArray2( cSeeAlso )
    FOR hPos := 1 TO LEN( xAlso )
@@ -953,7 +927,6 @@ FUNCTION GenNgTable( oNgi )
    LOCAL x
    LOCAL nMax
    LOCAL nSpace
-   LOCAL lCar        := .f.
    LOCAL nMax2
    LOCAL nSpace2
    LOCAL nPos1
@@ -1144,7 +1117,7 @@ RETURN Nil
 FUNCTION ProcNgTable( cBuffer, nNum )
 
    LOCAL nPos
-   LOCAL cItem     := ''
+   LOCAL cItem
    LOCAL cItem2    := ''
    LOCAL cItem3    := ''
    LOCAL cItem4    := ''
@@ -1272,12 +1245,11 @@ RETURN Nil
 *+
 FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
 
-   LOCAL cLine       := ''
+   LOCAL cLine
    LOCAL nPos
    LOCAL CurPos      := 0
    LOCAL nColorPos
-   LOCAL ccolor      := ''
-   LOCAL cReturn     := ''
+   LOCAL cReturn
    LOCAL nIdentLevel
    LOCAL cOldLine
    LOCAL lEndPar     := .F.
@@ -1285,7 +1257,7 @@ FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
    LOCAL lEndFixed     := .F.
    LOCAL lEndTable     := .F.
    LOCAL LFstTableItem := .T.
-   LOCAL lArgBold      := .F.
+   LOCAL lArgBold
    DEFAULT cStyle TO "Default"
 
    IF AT( '<par>', cBuffer ) == 0 .AND. !EMPTY( cBuffer ) .AND. cstyle <> "Example"
@@ -1509,7 +1481,7 @@ FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
             cLine     := STRTRAN( cLine, "</fixed>", "" )
          ENDIF
          IF AT( DELIM, cLine ) = 0
-            cReturn += ALLTRIM( cLine ) + ' '
+//            cReturn += ALLTRIM( cLine ) + ' '
          ENDIF
          IF AT( DELIM, cLine ) > 0
             FT_FSKIP( - 1 )
@@ -1540,7 +1512,6 @@ FUNCTION ProcNGDesc( cBuffer, oNgi, cStyle )
       ENDDO
       IF lEndTable
          GenNgTable( oNgi )
-         LFstTableItem:=.T.
       ENDIF
    ENDIF
    //      If cStyle=="Description" .or. cStyle=="Compliance"
@@ -1596,9 +1567,7 @@ FUNC maxelem( a )
 
    LOCAL nSize   := LEN( a )
    LOCAL max     := 0
-   LOCAL tam     := 0
-   LOCAL nMax2   := 0
-   LOCAL nPos    := 1
+   LOCAL tam
 
    LOCAL nCount
    FOR nCount := 1 TO nSize
@@ -1606,7 +1575,6 @@ FUNC maxelem( a )
       tam := LEN( a[ nCount ] )
       max := IF( tam > max, tam, max )
    NEXT
-   nPos := ASCAN( a, { | x | LEN( x ) == max } )
 RETURN max
 
 *+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -1622,15 +1590,13 @@ RETURN max
 *+
 FUNCTION FormatNgBuff( cBuffer, cStyle )
 
-   LOCAL cReturn       := ''
-   LOCAL cLine         := ''
+   LOCAL cReturn
+   LOCAL cLine
    LOCAL cOldLine      := ''
-   LOCAL cBuffEnd      := ''
    LOCAL lEndBuffer    := .f.
    LOCAL nPos
 
    LOCAL lArgBold      := .f.
-   LOCAL LFstTableItem := .t.
    cReturn := cBuffer + ' '
    IF AT( '</par>', cReturn ) > 0 .OR. EMPTY( cBuffer )
       IF EMPTY( cbuffer )
@@ -1669,7 +1635,6 @@ FUNCTION FormatNgBuff( cBuffer, cStyle )
 
    ELSEIF cStyle == 'Arguments' .OR. cStyle == "Return"
 
-      nPos    := 0
       cReturn := '<par>' + cReturn
       IF AT( "<par>", cReturn ) > 0
          cReturn  := STRTRAN( cReturn, "<par>", "" )
@@ -1710,7 +1675,6 @@ FUNCTION FormatNgBuff( cBuffer, cStyle )
          cReturn := '       <par>' + cOldLine + ' ' + cReturn + '    </par>'
       ENDIF
    ENDIF
-   lArgBold := .F.
    //   endif
 RETURN cReturn
 
@@ -1724,9 +1688,7 @@ RETURN cReturn
 *+
 STATIC FUNCTION ReadFromTop( nh )
 
-   LOCAL cDoc      := DELIM + "DOC" + DELIM                    // DOC keyword
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
-   LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
@@ -1753,13 +1715,11 @@ RETURN nil
 STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    LOCAL nPos
-   LOCAL cCuritem
    LOCAL lReturn
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
-      cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0
          lReturn := .f.
       ELSE

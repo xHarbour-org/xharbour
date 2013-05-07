@@ -1382,7 +1382,7 @@ return SUCCESS
 
 FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
-   LOCAL cSuperRDD   /* NO SUPER RDD */
+   LOCAL cSuperRDD := NIL   /* NO SUPER RDD */
    LOCAL aADOFunc[ UR_METHODCOUNT ]
 
    aADOFunc[ UR_INIT ]         := ( @ADO_INIT() )

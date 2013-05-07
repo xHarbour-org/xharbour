@@ -553,7 +553,7 @@ RETURN NIL
 FUNCTION Proccalso( nWriteHandle, cSeeAlso )
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
    LOCAL xTemp
    LOCAL nLen
    LOCAL xPos

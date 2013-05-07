@@ -117,8 +117,8 @@ METHOD WritePar( cPar ) CLASS TOs2
 RETURN Self
 
 METHOD WritePar2( cBuffer,cTag,cStyle ) CLASS TOs2
-   Local aLines:={} 
-   LOCAL nPos,cLine:=''
+   Local aLines
+   LOCAL nPos,cLine
    Default cStyle to "Default"
 if at("-",cBuffer)>0
 
@@ -246,7 +246,6 @@ METHOD WriteTitle( cTopic, cTitle ,cCategory) CLASS TOs2
    elseIF     niItem>0 .AND.       !lHead
       FWRITE( Self:nHandle, ':h2 id='+ ::aIndRef[niItem] + ' res=' + ALLTRIM( STR( nItem ) ) + '.' + cTopic  + CRLF  )
    Endif
-         lHead:=.F.
    If Self:ScanRef(cRefCateg)==0
       nrItem := ASCAN( Self:aHeadRef, { | a | upper(a) == upper(cRefCateg )} )
       FWRITE( Self:nHandle, ':i1 id=' + ::aHeadRef[nrItem] + "."+ UPPER( cCategory ) + CRLF)
@@ -362,10 +361,9 @@ RETURN cReturn
 
 METHOD WriteJumpTitle( cTitle, cTopic ) CLASS TOs2
 
-   LOCAL nPos
    LOCAL cWrite
 
-   nPos := AT( "()", cTitle )
+cTitle = cTitle
 
    cTopic := ALLTRIM( HB_OEMTOANSI( cTopic ) )
 
@@ -395,7 +393,7 @@ Return cReturn
 
 Static FUNCTION FormatStringBuffer(cBuffer)
 Local nLen,nPos,aLine:={}
-Local cLine:=''
+Local cLine
 nLen:=Len(cBuffer)
 
 WHILE nLen>230

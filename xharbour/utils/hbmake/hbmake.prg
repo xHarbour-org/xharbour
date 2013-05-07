@@ -55,6 +55,8 @@
   *
   */
 
+#pragma w2
+
 #include "fileio.ch"
 #include "common.ch"
 #include "radios.ch"

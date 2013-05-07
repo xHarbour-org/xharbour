@@ -66,7 +66,7 @@ Default bblock to {||.t.}
   DevOut("[ ]")
 
   // Create an empty get object and initialize its cargo
-  oGet := GetNew()
+//  oGet := GetNew()
   oGet := GetNew(nRow,ncol+4,{|| cStr },cvar)
 
   oGet:cargo := Array(CHECK_NUM_IVARS)

@@ -123,7 +123,6 @@ STATIC FUNCTION f_read()
          ELSE
             // Add what was read to the readahead buffer.
             oSelf:cBuffer += cLine
-            cLine := ""
          ENDIF
          // Is there a whole line in the readahead buffer yet?
          nPos := f_EOL_pos( oSelf )

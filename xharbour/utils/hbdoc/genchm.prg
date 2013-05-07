@@ -127,7 +127,6 @@ FUNCTION ProcessChm()
    LOCAL nEnd
    LOCAL nCount
 
-   LOCAL cBar          := REPLICATE( "-", 80 ) + CRLF
    LOCAL nMode
    LOCAL cFuncName
    LOCAL cOneLine
@@ -138,20 +137,14 @@ FUNCTION ProcessChm()
    LOCAL cTemp
    LOCAL cChar
    LOCAL nPos
-   LOCAL lFirstSintax  := .T.
-   LOCAL lAddEndPreTag := .F.
    LOCAL lEndDesc      := .F.
    LOCAL lEndArgs      := .F.
-   LOCAL lEndSyntax    := .F.
    LOCAL lEndReturns   := .F.
-   LOCAL lEndData      := .F.
    LOCAL lBlankLine     := .F.             // Blank line encountered and sent out
    LOCAL lAddBlank      := .F.             // Need to add a blank line if next line is not blank
    LOCAL oChm
    LOCAL nReadHandle
-   LOCAL lEndConstru    := .F.
-   LOCAL lFirstPass     := .T.
-   LOCAL lFirstArg      := .T.
+   LOCAL lFirstPass
    LOCAL lData          := .F.
    LOCAL lIsDataLink    := .F.
    LOCAL lIsMethodLink  := .F.
@@ -191,9 +184,7 @@ FUNCTION ProcessChm()
    @ INFILELINE, 20 SAY "Extracting: "
    @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
-   lFirstArg    := .T.
    lFirstPass   := .T.
-   lFirstSintax := .T.
    FOR i := 1 TO nFiles
 
       //  Open file for input
@@ -448,7 +439,6 @@ FUNCTION ProcessChm()
                   AADD( aWWW, { cFuncName, LEFT( cFileName, AT( ".", cFileName ) - 1 ) } )
                   oChm:WriteText( "<p>" + cOneline + "</p>" + hb_osnewline() )
                ENDIF
-               lFirstSintax := .T.
                //  4) all other stuff
 
             ELSE
@@ -459,7 +449,6 @@ FUNCTION ProcessChm()
                   oChm:WriteText( '<DD><P>' )
                   nMode      := D_SYNTAX
                   lAddBlank  := .T.
-                  lEndSyntax := .T.
 end
                ELSEIF AT( cConstruct, cBuffer ) > 0
                if GetItem( cBuffer, nCurdoc )
@@ -467,7 +456,6 @@ end
                   oChm:WriteText( '<DD><P>' )
                   nMode      := D_SYNTAX
                   lAddBlank  := .T.
-                  lEndSyntax := .T.
                end
                ELSEIF AT( cArg, cBuffer ) > 0
                   if GetItem( cBuffer, nCurdoc )
@@ -560,7 +548,6 @@ oChm:writeText("<br>")  //:endpar()
                   oChm:WriteText( "<PRE>" )
                   nMode         := D_EXAMPLE
                   lAddBlank     := .T.
-                  lAddEndPreTag := .T.
                   lWasTestExamples:=.t.
                   end
                ELSEIF AT( cTest, cBuffer ) > 0
@@ -802,7 +789,6 @@ RETURN nil
 
 
 FUNCTION ProcessChm2()
-   LOCAL aTempArray := {}         // Temporary array used for storing list of methods and properties
    LOCAL cTempString              // Temporary string used for storing random strings
    LOCAL cTempString2              // Temporary string used for storing random strings
    LOCAL cTemp
@@ -810,12 +796,11 @@ FUNCTION ProcessChm2()
    LOCAL j
    LOCAL cChar
    LOCAL nCount
-   LOCAL cDocType := ""
+   LOCAL cDocType
    LOCAL nClassNamePos            // Stores the position in the array where the classname can be found
    LOCAL nFunctionNamePos         // Stores the position in the array where the functionname can be found
    LOCAL nReadHandle              // Stores the text file's workarea
-   LOCAL nSubArrayItem := 1       // Index used to loop through the items of the array of the array
-   LOCAL nTemp1 := 1              // Used to scroll through the DirList array
+   LOCAL nTemp1                   // Used to scroll through the DirList array
    LOCAL nTemp2 := 1              // Used to scroll through the aFunctionItems array
    LOCAL nPropertyListAnker       // Used to add an html-anker in the page
    LOCAL nMethodListAnker         // Used to add an html-anker in the page
@@ -913,8 +898,6 @@ FUNCTION ProcessChm2()
 
             // Loop through the first array (list with arrays)
             DO WHILE nArrayItem <= LEN(aCurDoc)
-               nSubArrayItem := 1
-
                IF cDocType = "Class"
                   // Loop through the second array (list with methods, properties, ...)
 
@@ -1163,7 +1146,7 @@ FUNCTION WriteClassDataMethod3(cItem, cTitle, nArrayItem, nArrayItemLine)
    LOCAL nPrevArrayItem := nArrayItem
    LOCAL nPrevArrayItemLine := nArrayItemLine
    LOCAL aTmpArray := {}
-   LOCAL nTmpCount := 1
+   LOCAL nTmpCount
 
    nArrayItem ++
    cTempString := ""
@@ -1171,7 +1154,6 @@ FUNCTION WriteClassDataMethod3(cItem, cTitle, nArrayItem, nArrayItemLine)
       nArrayItemLine := ASCAN(aCurDoc[nArrayItem], {|a| "$" + UPPER(cItem) + "$" $ UPPER(a)}) + 1
       IF nArrayItemLine -1 <> 0
          AADD(aTmpArray, {"&bull; <a href='" + LOWER(LEFT(cFileName, LEN(cFileName) - 4)) + "_content.htm#" + aCurDoc[nArrayItem][nArrayItemLine] + "' target=_self>" + aCurDoc[nArrayItem][nArrayItemLine] + "</a><br>", aCurDoc[nArrayItem][nArrayItemLine]})
-         nTmpCount ++
       ENDIF
       nArrayItem ++
    ENDDO
@@ -1263,7 +1245,7 @@ RETURN NIL
 FUNCTION HTMFormat3(cTempString)
    LOCAL cTmpString1 := cTempString
    LOCAL cTmpString2 := ""
-   LOCAL cTmpChar := ""
+   LOCAL cTmpChar
    LOCAL nTmpCount := 1
 
    DO WHILE nTmpCount <= LEN(cTmpString1)
@@ -1314,7 +1296,7 @@ RETURN cPar
 FUNCTION ProcChmAlso( nWriteHandle, cSeeAlso )
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
    LOCAL xTemp
    LOCAL nLen
    LOCAL xPos
@@ -1412,10 +1394,9 @@ RETURN nil
 *+
 FUNCTION FormatChmBuff( cBuffer, cStyle )
 
-   LOCAL creturn    := ''
-   LOCAL cline      := ''
+   LOCAL creturn
+   LOCAL cline
    LOCAL cOldLine   := ''
-   LOCAL cBuffend   := ''
    LOCAL lEndBuffer := .f.
    LOCAL lArgBold   := .f.
    LOCAL npos
@@ -1461,7 +1442,6 @@ FUNCTION FormatChmBuff( cBuffer, cStyle )
       creturn := '<par><b>' + creturn + ' </b></par>'
    ELSEIF cStyle == 'Arguments'
 
-      nPos := 0
       IF AT( "<par>", cReturn ) > 0 .and. at('<b>',cReturn)=0
          cReturn  := STRTRAN( cReturn, "<par>", "" )
          cReturn  := STRTRAN( cReturn, "</par>", "" )
@@ -1526,7 +1506,6 @@ FUNCTION FormatChmBuff( cBuffer, cStyle )
          cReturn := '       <par>' + cOldLine + ' ' + cReturn + '    </par>'
       ENDIF
       //   ENDIF
-      lArgBold := .F.
 
    ENDIF
 
@@ -1577,21 +1556,16 @@ RETURN cbuffer
 *+
 FUNCTION ProcChmDesc( cBuffer, oChm, cStyle )
 
-   LOCAL cOldLine      := ''
+   LOCAL cOldLine
    LOCAL npos
-   LOCAL CurPos        := 0
    LOCAL nColorPos
-   LOCAL ccolor        := ''
-   LOCAL creturn       := ''
-   LOCAL nIdentLevel
-   LOCAL lHasFixed     := .F.
-   LOCAL lEndPar       := .F.
-   LOCAL cLine         := ''
+   LOCAL creturn
+   LOCAL lHasFixed
+   LOCAL cLine
    LOCAL lEndFixed     := .F.
    LOCAL lArgBold      := .f.
    LOCAL LFstTableItem := .T.
    LOCAL lEndTable     := .F.
-   LOCAL lEndBuffer    := .f.
    DEFAULT cStyle TO "Default"
 
    IF AT( '<par>', cBuffer ) == 0 .AND. !EMPTY( cBuffer ) .AND. cstyle <> "Example"
@@ -1645,8 +1619,6 @@ FUNCTION ProcChmDesc( cBuffer, oChm, cStyle )
       ENDIF
       //      Alltrim(cBuffer)
       IF cStyle == "Description" .OR. cStyle == "Compliance"
-         nIdentLevel := 6
-         nPos        := 0
          IF AT( '</par>', cBuffer ) > 0
             cBuffer := STRTRAN( cBuffer, "</par>", "" )
          ENDIF
@@ -1718,7 +1690,7 @@ FUNCTION ProcChmDesc( cBuffer, oChm, cStyle )
             cOldLine  := ALLTRIM(STRTRAN( cOldLine, "</fixed>", "" ))
          ENDIF
          IF AT( DELIM, cOldLine ) = 0
-            cReturn += ALLTRIM( cOldLine ) + ' '
+//            cReturn += ALLTRIM( cOldLine ) + ' '
          ENDIF
          IF AT( DELIM, cOldLine ) > 0
             FT_FSKIP( - 1 )
@@ -1751,7 +1723,6 @@ FUNCTION ProcChmDesc( cBuffer, oChm, cStyle )
 
       IF lEndTable
          GenChmTable( oChm )
-        LFstTableItem := .T.
       ENDIF
    ENDIF
 RETURN nil
@@ -1881,11 +1852,8 @@ RETURN Nil
 *+ EOF: GENChm.PRG
 STATIC FUNCTION ReadFromTop( nh )
 
-   LOCAL cDoc      := DELIM + "DOC" + DELIM                    // DOC keyword
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
-   LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1911,13 +1879,11 @@ RETURN nil
 STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    LOCAL nPos
-   LOCAL cCuritem
    LOCAL lReturn
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
-      cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0
          lReturn := .f.
       ELSE

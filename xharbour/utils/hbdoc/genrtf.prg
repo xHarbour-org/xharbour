@@ -110,10 +110,7 @@ FUNCTION ProcessRtf()
    LOCAL cBuffer
    LOCAL nEnd
    LOCAL nCount
-   LOCAL xAddBlank
-   LOCAL nNumTopics     := 0
-   LOCAL nCurTopics     := 1
-   LOCAL cBar           := " " + replicate( ')', 80 )
+//   LOCAL cBar           := " " + replicate( ')', 80 )
    LOCAL nMode
    LOCAL cFuncName
    LOCAL cOneLine
@@ -122,21 +119,15 @@ FUNCTION ProcessRtf()
    LOCAL nLineCnt
    LOCAL cSeeAlso
    LOCAL cTemp
-   LOCAL cTempx
    LOCAL cChar
    LOCAL lBlankLine     := .F.             // Blank line encountered and sent out
    LOCAL lAddBlank      := .F.             // Need to add a blank line if next line is not blank
-   LOCAL lFirstArg      := .T.
-   LOCAL lData          := .F.
-   LOCAL lMethod        := .F.
+   LOCAL lData
+   LOCAL lMethod
    LOCAL oRtf
    LOCAL nReadHandle
-   LOCAL lPar
-   LOCAL lWrite         := .f.
-   LOCAL lWasLine       := .F.
-   LOCAL lIsDataLink    := .F.
-   LOCAL lIsMethodLink  := .F.
-   LOCAL cName
+   LOCAL lIsDataLink
+   LOCAL lIsMethodLink
    LOCAL cDoc           := DELIM + "DOC" + DELIM               // DOC keyword
    LOCAL cEnd           := DELIM + "END" + DELIM               // END keyword
    LOCAL cFunc          := DELIM + "FUNCNAME" + DELIM          // FUNCNAME keyword
@@ -166,15 +157,10 @@ FUNCTION ProcessRtf()
    LOCAL cMethod        := DELIM + 'METHOD' + DELIM
    LOCAL cClassDoc      := DELIM + "CLASSDOC" + DELIM
    LOCAL cTable         := DELIM + "TABLE" + DELIM
-   Local aAlso:={}
-   lFirstArg     := .T.
-   lData         := .F.
-   lMethod       := .F.
+   Local aAlso
    lIsDataLink   := .F.
    lIsMethodLink := .F.
 
-   lWrite := .f.
-   cTempx := ''
    //
    //  Entry Point
    //
@@ -206,7 +192,6 @@ FUNCTION ProcessRtf()
       lDoc    := .F.
       lData   := .F.
       lMethod := .F.
-      lPar    := .T.
       //  First find the author
       ReadFromTop( nReadHandle )
       DO WHILE .NOT. lEof
@@ -425,7 +410,6 @@ FUNCTION ProcessRtf()
                      oRtf:WritePar( '' )                    //:endpar()
                      nMode     := D_ARG
                      lAddBlank := .T.
-                     lPar      := .t.
                   END
                ELSEIF AT( cRet, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -437,7 +421,6 @@ FUNCTION ProcessRtf()
                      oRtf:WritePar( "" )                    //:endpar()
                      nMode     := D_RETURN
                      lAddBlank := .T.
-                     lPar      := .t.
                   END
                ELSEIF AT( cDesc, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -446,7 +429,6 @@ FUNCTION ProcessRtf()
                      oRtf:WritePar( '' )                    //:endpar()
                      nMode     := D_DESCRIPTION
                      lAddBlank := .T.
-                     lPar      := .T.
                   END
                ELSEIF AT( cTable, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -477,7 +459,6 @@ FUNCTION ProcessRtf()
                      nMode     := D_NORMAL
                      lAddBlank := .T.
 
-                     lPar := .T.
                   END
                ELSEIF AT( cMethodslink, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -499,7 +480,6 @@ oRtf:WritePar( "" )                 //:endpar()
                         oRtf:WritePar( "" )                 //:endpar()
                      nMode     := D_NORMAL
                      lAddBlank := .T.
-                     lPar      := .T.
 
                   END
                ELSEIF AT( cExam, cBuffer ) > 0
@@ -524,7 +504,6 @@ oRtf:WritePar( "" )                 //:endpar()
 
                      nMode     := D_EXAMPLE
                      lAddBlank := .T.
-                     lPar      := .T.
                   END
                ELSEIF AT( cStatus, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -541,7 +520,6 @@ oRtf:WritePar( "" )                 //:endpar()
 
                      nMode     := D_COMPLIANCE
                      lAddBlank := .T.
-                     lPar      := .T.
                   END
                ELSEIF AT( cPlat, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -554,7 +532,6 @@ oRtf:WritePar( "" )                 //:endpar()
 
                      nMode     := D_NORMAL
                      lAddBlank := .T.
-                     lPar      := .T.
                   END
                ELSEIF AT( cFiles, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -564,7 +541,6 @@ oRtf:WritePar( "" )                 //:endpar()
                         oRtf:WritePar( '' )                 //:endpar()
                      ENDIF
 
-                     lPar      := .T.
                      nMode     := D_NORMAL
                      lAddBlank := .T.
                   END
@@ -578,7 +554,6 @@ oRtf:WritePar( "" )                 //:endpar()
 
                      nMode     := D_NORMAL
                      lAddBlank := .T.
-                     lPar      := .T.
                   END
                ELSEIF AT( cSee, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -648,7 +623,6 @@ oRtf:WritePar( "" )                 //:endpar()
                         lAddBlank := .F.
                      ENDIF
                      cTemp   := SUBSTR( cBuffer, 1, AT( "()", cBuffer ) + 1 )
-                     cName   := SUBSTR( cBuffer, 1, AT( "()", cBuffer ) - 1 )
                      cBuffer := SUBSTR( cBuffer, AT( "()", cBuffer ) + 2 )
                      oRtf:WriteJumpLink( LEFT( cfilename, AT( '.', cFilename ) - 1 ) + ALLTRIM( cTemp ),ALLTRIM( cTemp ), cBuffer )
 
@@ -704,10 +678,8 @@ oRtf:WritePar( "" )                 //:endpar()
                         oRtf:WritePar( '' )                 //:endpar()
                         oRtf:WriteParBold( "Status" )
                         oRtf:WritePar( '' )                 //:endpar()
-                        xaddblank := .T.
                      ELSE
                         oRtf:WritePar( "" )                 //:endpar()
-                        xAddBlank := .T.
                      ENDIF
                      procrtfstatus( oRtf, cBuffer )
                   ELSE
@@ -747,7 +719,7 @@ RETURN oRtf:aIdh
 FUNCTION ProcRtfAlso( nWriteHandle, cSeeAlso )
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
    LOCAL nLen
    LOCAL xPos
    LOCAL xTemp
@@ -840,19 +812,15 @@ RETURN nil
 *+
 FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
 
-   LOCAL cLine       := ''
+   LOCAL cLine
    LOCAL npos
-   LOCAL CurPos      := 0
    LOCAL nColorPos
-   LOCAL ccolor      := ''
-   LOCAL creturn     := ''
-   LOCAL NIDENTLEVEL
+   LOCAL creturn
    LOCAL coline
-   LOCAL lEndPar     := .F.
 
    LOCAL lEndFixed := .F.
    LOCAL lEndTable := .F.
-   LOCAL lArgBold  := .f.
+   LOCAL lArgBold
    DEFAULT cStyle TO "Default"
    IF AT( '<par>', cBuffer ) == 0 .AND. !EMPTY( cBuffer ) .AND. cstyle <> "Example"
       cBuffer := '<par>' + cBuffer
@@ -922,8 +890,6 @@ FUNCTION ProcRTFDesc( cBuffer, oRtf, cStyle )
       ENDIF
 
       IF cStyle == "Description" .OR. cStyle == "Compliance"
-         nIdentLevel := 6
-         nPos        := 0
          IF AT( '</par>', cBuffer ) > 0
             cBuffer := STRTRAN( cBuffer, "</par>", "" )
          ENDIF
@@ -1059,12 +1025,10 @@ RETURN Nil
 FUNCTION GenRtfTable( oRtf )
 
    LOCAL x
-   LOCAL lCar       := .f.
-   LOCAL nMax2
-   LOCAL nPos2
-   LOCAL nPos
+//   LOCAL nMax2
+//   LOCAL nPos2
+//   LOCAL nPos
    LOCAL aLensFItem := {}
-   LOCAL aLensSItem := {}
 
    FOR X := 1 TO LEN( afitable )
       IF AT( "\cf", afitable[ x ] ) > 0
@@ -1077,9 +1041,9 @@ FUNCTION GenRtfTable( oRtf )
 
 //   oRtf:WritePar( "" )
    //  nMax2:=checkcar(aTable,1)+1
-   nMax2 := alensfitem[ 1 ]
-   nPos  := maxrtfelem( afitable )
-   nPos2 := ASCAN( alensfitem, { | x | x == nPos } )
+   //  nMax2 := alensfitem[ 1 ]
+   //  nPos  := maxrtfelem( afitable )
+   //  nPos2 := ASCAN( alensfitem, { | x | x == nPos } )
 
    oRtf:WriteParBox( "       " + replicate( CHR( 196 ), 80 ) )
    FOR x := 1 TO LEN( afiTable )
@@ -1136,9 +1100,7 @@ FUNC maxrtfelem( a )
 
    LOCAL nsize   := LEN( a )
    LOCAL max     := 0
-   LOCAL tam     := 0
-   LOCAL max2    := 0
-   LOCAL nPos    := 1
+   LOCAL tam
    LOCAL cString
    LOCAL ncount
    FOR ncount := 1 TO nsize
@@ -1150,7 +1112,6 @@ FUNC maxrtfelem( a )
       ENDIF
       max := IF( tam > max, tam, max )
    NEXT
-   nPos := ASCAN( a, { | x | LEN( x ) == max } )
 RETURN max
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -1163,9 +1124,8 @@ RETURN max
 *+
 FUNCTION FormatrtfBuff( cBuffer, cStyle )
 
-   LOCAL cReturn  := ''
-   LOCAL cLine    := ''
-   LOCAL cBuffend := ''
+   LOCAL cReturn
+   LOCAL cLine
    LOCAL coline   := ''
    LOCAL lEndBuff := .f.
    LOCAL nPos
@@ -1208,7 +1168,6 @@ FUNCTION FormatrtfBuff( cBuffer, cStyle )
 
    ELSEIF cStyle == 'Arguments' .OR. cStyle == "Return"
 
-      nPos    := 0
       cReturn := '<par>' + creturn
       IF AT( "<par>", cReturn ) > 0
          cReturn := STRTRAN( cReturn, "<par>", "" )
@@ -1251,7 +1210,6 @@ FUNCTION FormatrtfBuff( cBuffer, cStyle )
       ELSE
          cReturn := '       <par>' + cOLine + ' ' + cReturn + '    </par>'
       ENDIF
-      lArgBold := .F.
    ENDIF
 
 RETURN cReturn
@@ -1266,11 +1224,8 @@ RETURN cReturn
 *+
 STATIC FUNCTION ReadFromTop( nh )
 
-   LOCAL cDoc      := DELIM + "DOC" + DELIM                    // DOC keyword
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
-   LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1296,13 +1251,11 @@ RETURN nil
 STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    LOCAL nPos
-   LOCAL cCuritem
    LOCAL lReturn
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
-      cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0
          lReturn := .f.
       ELSE

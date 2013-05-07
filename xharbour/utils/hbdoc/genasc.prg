@@ -122,7 +122,7 @@ FUNCTION ASCIIFiles()
    LOCAL cBuffer
    LOCAL nEnd
    LOCAL nCount
-   LOCAL cAuthor
+   LOCAL cAuthor     := NIL
    LOCAL cBar        := "컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴" + CRLF
    LOCAL nMode
    LOCAL cFuncName
@@ -156,8 +156,8 @@ FUNCTION ASCIIFiles()
    LOCAL cStatus     := DELIM + 'STATUS' + DELIM
    LOCAL cPlat       := DELIM + 'PLATFORMS' + DELIM
    LOCAL cFiles      := DELIM + 'FILES' + DELIM
-   LOCAL cSubCode    := DELIM + 'SUBCODE' + DELIM
-   LOCAL cFunction   := DELIM + 'FUNCTION' + DELIM
+//   LOCAL cSubCode    := DELIM + 'SUBCODE' + DELIM
+//   LOCAL cFunction   := DELIM + 'FUNCTION' + DELIM
 
 #define D_NORMAL     1
 #define D_ARG        2
@@ -245,7 +245,6 @@ FUNCTION ASCIIFiles()
                lDoc := .F.
                IF nDocCnt > 60 .AND. .NOT. lContinuous
                   FWRITE( nWriteHandle, CHR( K_CTRL_L ) + CRLF )
-                  nDocCnt := 0
                ENDIF
                FWRITE( nWriteHandle, CRLF )
                FWRITE( nWriteHandle, " Source: " + aDirList[ i, F_NAME ] + CRLF + CRLF )

@@ -65,8 +65,8 @@ LOCAL NEW_ARRAY  := {}
 LOCAL NUM_ELEMS  := Len( IN_ARRAY )
 LOCAL PAD_LEN    := ( r - 1 ) - ( L + 1 )
 LOCAL lIsChecked := .f.
-LOCAL aItems     := IN_ARRAY
-LOCAL aTemp
+//LOCAL aItems     := IN_ARRAY
+LOCAL aTemp      := {}
 LOCAL cItem
 LOCAL cOldColor  := Setcolor()
 

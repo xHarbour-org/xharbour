@@ -123,7 +123,7 @@ return cRetVal
 function pickafile( afiles )
 
 local cOldString := savescreen( 8, 19, 16, 61 )
-local aPickList  := {}
+//local aPickList  := {}
 local cRetVal    := ''
 local sel
 

@@ -154,7 +154,7 @@ RETURN Self
 METHOD WriteLink( cLink, cName ) CLASS THTML
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
 
    nPos := AT( "()", cLink )
    IF nPos > 0
@@ -183,7 +183,7 @@ RETURN Self
 METHOD WriteLinkTable( cLink, cName,cInfo ) CLASS THTML
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
 
    nPos := AT( "()", cLink )
    IF nPos > 0
@@ -273,7 +273,7 @@ RETURN SELF
 METHOD WriteChmLink( cLink, cName ) CLASS THTML
 
    LOCAL nPos
-   LOCAL cTemp := ''
+   LOCAL cTemp
 
    nPos := AT( "()", cLink )
    IF nPos > 0

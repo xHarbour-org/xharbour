@@ -604,7 +604,6 @@ METHOD BufferGet( lForward ) CLASS FileBase
    LOCAL cBuffer       // as char
    LOCAL nLocation     // as int
    LOCAL nRead         // as int
-   LOCAL lWithCRLF := pFALSE               // as logical
 
    DEFAULT lForward TO pTRUE
 
@@ -621,7 +620,6 @@ METHOD BufferGet( lForward ) CLASS FileBase
 
       IF RIGHT( cBuffer, 2 ) == pCRLF   // with line already
          cBuffer   := LEFT( cBuffer, LEN( cBuffer ) - 2 )
-         lWithCRLF := pTRUE
       ENDIF
       nLocation := LEN( cBuffer ) - ( RAT( pCRLF, cBuffer ) )
 

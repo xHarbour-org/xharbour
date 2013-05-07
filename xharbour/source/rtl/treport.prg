@@ -468,7 +468,7 @@ METHOD ReportHeader() CLASS HBReportForm
    LOCAL nHeadline
    LOCAL nRPageSize
    LOCAL aTempPgHeader
-   LOCAL nHeadSize
+   LOCAL nHeadSize := NIL
    LOCAL cTempPgHeader, cLine, aReport
 
    nRPageSize := ::aReportData[RPT_WIDTH] - ::aReportData[RPT_RMARGIN]

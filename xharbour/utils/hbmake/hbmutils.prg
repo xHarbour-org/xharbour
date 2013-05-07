@@ -87,7 +87,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    LOCAL cDrive
    LOCAL nPos
    LOCAL xItem
-   LOCAL nLen
    LOCAL cFile
    LOCAL nPadr
 
@@ -100,8 +99,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
       ENDIF
 
    ENDDO
-
-   aDirs := {}
 
    ASort( aStru )
    nArrayLen := LEN( aStru )
@@ -125,8 +122,6 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
             IF AT( '.PRG', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.C', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.CPP', UPPER( aData[ y, 1 ] ) ) > 0
 
                IF lSubDir
-
-                  nLen := AT( " ", aData[ y, 1 ] ) + 1
 
                   AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) +;
                         PadR(aData[ y,1 ] ,nPadr) + ;         // prg name
@@ -239,7 +234,7 @@ FUNCTION GetHarbourDir()
     LOCAL aEnv     
     LOCAL cCurEnv := ""
     LOCAL cBar    := iif( lLinux .or. lUnix, "/" , "\" )
-    LOCAL HBSTRG  := ""
+    LOCAL HBSTRG
     LOCAL cPathUni:= GETE( "PATH_XHARBOUR" )
 
     hbstrg := IIF ( lLinux .or. lUnix,  "harbour" , "harbour.exe" )
@@ -367,7 +362,7 @@ RETURN cTemp
 FUNCTION GetMakeDir()
 *--------------------
 
-   LOCAL cPath := ""
+   LOCAL cPath
    LOCAL cExe  := HB_ARGV( 0 )
 
    cExe  := STRTRAN( cExe, "/", "\" )
@@ -524,7 +519,7 @@ RETURN MAX( ( MAXCOL() / 2 ) - INT( LEN( CSTRING ) / 2 ), 0 )
 FUNCTION ReadLN( lEof )
 *----------------------
 
-   LOCAL cBuffer := ""
+   LOCAL cBuffer
    cBuffer := FT_FREADLN()
    cBuffer := STRTRAN( cBuffer, CHR( 13 ), '' )
    cBuffer := STRTRAN( cBuffer, CHR( 10 ), '' )
@@ -632,7 +627,6 @@ FUNCTION GetLibs( lGcc, cDir )
 *-----------------------------
 
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
-   LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
    LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
    LOCAL cExt := iif(lGcc,".a",".lib")
 

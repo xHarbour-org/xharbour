@@ -119,15 +119,12 @@ FUNCTION ProcessPdf(lMemory)
    LOCAL nCount
    LOCAL nAlso
 
-   LOCAL lData         := .F.
-   LOCAL lMethod       := .F.
    // LOCAL cBuffEnd
    LOCAL nPos
    // LOCAL nPosEND
-   LOCAL lIsDataLink   := .F.
-   LOCAL lIsMethodLink := .F.
+   LOCAL lIsDataLink
+   LOCAL lIsMethodLink
 
-   LOCAL cBar           := "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ"
    LOCAL nMode
    LOCAL cFuncName
    LOCAL cOneLine
@@ -136,11 +133,9 @@ FUNCTION ProcessPdf(lMemory)
    LOCAL nLineCnt
    LOCAL cSeeAlso
    LOCAL cTemp
-   LOCAL lPar
    LOCAL cChar
    LOCAL lBlankLine     := .F.             // Blank line enCountered and sent out
-   LOCAL lAddBlank      := .F.             // Need to add a blank line if next line is not blank
-   LOCAL oPdf
+//   LOCAL oPdf
    LOCAL nReadHandle
    LOCAL cDoc           := DELIM + "DOC" + DELIM               // DOC keyword
    LOCAL cEnd           := DELIM + "END" + DELIM               // END keyword
@@ -172,14 +167,11 @@ FUNCTION ProcessPdf(lMemory)
    LOCAL cClassDoc      := DELIM + "CLASSDOC" + DELIM
 local hhh
    DEFAULT lMemory to .F.
-   lData         := .F.
-   lMethod       := .F.
    lIsDataLink   := .F.
    lIsMethodLink := .F.
    if lMemory
       aadd(aResult,"Document")
    endif
-   lPar := .T.
    //
    //  Entry Point
    //
@@ -391,11 +383,7 @@ local hhh
                //  2) Category
             ELSEIF ( AT( cdata, cBuffer ) > 0 .AND. GetItem( cBuffer, nCurdoc ) ) .OR. ( AT( cmethod, cBuffer ) > 0 .AND. GetItem( cBuffer, nCurdoc ) )
                IF AT( cdata, cBuffer ) > 0
-                  lData   := .T.
-                  lMethod := .F.
                ELSEIF AT( cmethod, cBuffer ) > 0
-                  lMethod := .T.
-                  lData   := .F.
                ENDIF
                cBuffer := ReadLN( @lEof )
                nLineCnt ++
@@ -449,7 +437,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Syntax" )
                      hb_pdfWritetext( " " )
                      nMode     := D_SYNTAX
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cConstruct, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -457,7 +444,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Constructor syntax" )
                      hb_pdfWritetext( " " )
                      nMode     := D_SYNTAX
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cArg, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -469,7 +455,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_ARG
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cRet, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -481,7 +466,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Returns" )
                      hb_pdfWritetext( " " )
                      nMode     := D_ARG
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cDesc, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -489,8 +473,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Description" )
                      hb_pdfWritetext( " " )
                      nMode     := D_DESCRIPTION
-                     lAddBlank := .T.
-                     lPar      := .T.
                   ENDIF
                ELSEIF AT( cdatalink, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -501,7 +483,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Data")
                      hb_pdfWritetext( " " )
                      nMode     := D_DATALINK
-                     lAddBlank := .T.
 
                      lIsDataLink := .T.
                   ENDIF
@@ -513,9 +494,7 @@ local hhh
                                           hb_pdfWritetext( " " )
                      ENDIF
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
 
-                     lPar := .T.
                   ENDIF
                ELSEIF AT( cMethodslink, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -523,7 +502,6 @@ local hhh
                      hb_pdfwriteBoldtext1( " Method" )
                                           hb_pdfWritetext( " " )
                      nMode     := D_METHODLINK
-                     lAddBlank := .T.
 
                      lIsMethodLink := .T.
                   ENDIF
@@ -536,8 +514,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .T.
                   ENDIF
 
                ELSEIF AT( cExam, cBuffer ) > 0
@@ -550,7 +526,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_EXAMPLE
-                     lAddBlank := .T.
                   ENDIF
 
                ELSEIF AT( cTest, cBuffer ) > 0
@@ -563,8 +538,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_EXAMPLE
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cStatus, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -582,8 +555,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_COMPLIANCE
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cPlat, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -595,8 +566,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cFiles, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -608,8 +577,6 @@ local hhh
                      ENDIF
 
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
-                     lPar      := .t.
                   ENDIF
                ELSEIF AT( cFunction, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -620,9 +587,7 @@ local hhh
                      hb_pdfwriteBoldtext1( " Functions" )
                      hb_pdfWritetext( " " )
 
-                     lPar      := .t.
                      nMode     := D_NORMAL
-                     lAddBlank := .T.
                   ENDIF
                ELSEIF AT( cSee, cBuffer ) > 0
                   IF GetItem( cBuffer, nCurdoc )
@@ -646,10 +611,10 @@ local hhh
                      IF AT( "<par>", cBuffer ) > 0
                         STRTRAN( cBuffer, "<par>", '' )
                         STRTRAN( cBuffer, "</par>", '' )
-                        cBuffer := STRTRAN( cBuffer, SPACE( 6 ), "" )
-                        cbuFfer := '<par><b>' + cBuffer + '</b></par>'
+//                        cBuffer := STRTRAN( cBuffer, SPACE( 6 ), "" )
+//                        cbuFfer := '<par><b>' + cBuffer + '</b></par>'
                      ENDIF
-                     ProcPdfDesc( cbuffer, oPdf, "Syntax" )
+//                     ProcPdfDesc( cbuffer, oPdf, "Syntax" )
                   ELSEIF nMode = D_ARG
                      IF LEN( cBuffer ) > LONGLINE
                         WRITE_ERROR( "Arguments", cBuffer, nLineCnt, ;
@@ -657,21 +622,21 @@ local hhh
                      ENDIF
                      lBlankLine := EMPTY( cBuffer )
 
-                     ProcPdfDesc( cbuffer, oPdf, "Arguments" )
+//                     ProcPdfDesc( cbuffer, oPdf, "Arguments" )
                   ELSEIF nMode = D_EXAMPLE
                      IF LEN( cBuffer ) > LONGLINE
                         WRITE_ERROR( "General", cBuffer, nLineCnt, ;
                                      LONGLINE, aDirList[ i, F_NAME ] )
                      ENDIF
                      lBlankLine := EMPTY( cBuffer )
-                     ProcPdfDesc( cBuffer, oPdf, "Example" )
+//                     ProcPdfDesc( cBuffer, oPdf, "Example" )
                   ELSEIF nMode = D_DESCRIPTION
                      IF LEN( cBuffer ) > LONGLINE
                         WRITE_ERROR( "General", cBuffer, nLineCnt, ;
                                      LONGLINE, aDirList[ i, F_NAME ] )
                      ENDIF
                      lBlankLine := EMPTY( cBuffer )
-                     ProcPdfDesc( cBuffer, oPdf, "Description" )
+//                     ProcPdfDesc( cBuffer, oPdf, "Description" )
 
                   ELSEIF nMode = D_NORMAL
                      IF LEN( cBuffer ) > LONGLINE
@@ -679,14 +644,14 @@ local hhh
                                      LONGLINE, aDirList[ i, F_NAME ] )
                      ENDIF
                      lBlankLine := EMPTY( cBuffer )
-                     ProcPdfDesc( cBuffer, oPdf )
+//                     ProcPdfDesc( cBuffer, oPdf )
                   ELSEIF nMode = D_COMPLIANCE
                      IF LEN( cBuffer ) > LONGLINE
                         WRITE_ERROR( "General", cBuffer, nLineCnt, ;
                                      LONGLINE, aDirList[ i, F_NAME ] )
                      ENDIF
                      lBlankLine := EMPTY( cBuffer )
-                     ProcPdfDesc( cBuffer, oPdf, "Compliance" )
+//                     ProcPdfDesc( cBuffer, oPdf, "Compliance" )
 
                   ELSEIF nMode = D_SEEALSO
                      IF .NOT. EMPTY( cBuffer )
@@ -700,7 +665,7 @@ local hhh
                         hb_pdfwriteBoldtext1( " Status" )
                         hb_pdfwritetext('')
                      ENDIF
-                     ProcStatusPdf( oPdf, cBuffer )
+//                     ProcStatusPdf( oPdf, cBuffer )
 
                   ELSE
 
@@ -819,7 +784,7 @@ RETURN Nil
 FUNCTION ProcPdfTable( cBuffer, nNum )
 
    LOCAL nPos
-   LOCAL cItem     := ''
+   LOCAL cItem
    LOCAL cItem2    := ''
    LOCAL cItem3    := ''
    LOCAL cItem4    := ''
@@ -897,14 +862,13 @@ RETURN Nil
 *+
 FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
 
-   LOCAL cLine       := ''
+   LOCAL cLine
    LOCAL nPos
-   LOCAL cBold       := ''
-   LOCAL cRemove     := ''
+   LOCAL cBold
+   LOCAL cRemove
    LOCAL CurPos      := 0
    LOCAL nColorPos
-   LOCAL ccolor      := ''
-   LOCAL cReturn     := ''
+   LOCAL cReturn
    // LOCAL ncolorend
    LOCAL nIdentLevel
    LOCAL cOldLine
@@ -913,7 +877,7 @@ FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
    LOCAL lEndFixed     := .F.
    LOCAL lEndTable     := .F.
    LOCAL LFstTableItem := .T.
-   LOCAL lArgBold      := .F.
+   LOCAL lArgBold
    DEFAULT cStyle TO "Default"
 
    IF AT( '<par>', cBuffer ) == 0 .AND. !EMPTY( cBuffer ) .AND. cstyle <> "Example"
@@ -1151,7 +1115,7 @@ FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
             cLine     := STRTRAN( cLine, "</fixed>", "" )
          ENDIF
          IF AT( DELIM, cLine ) = 0
-            cReturn += ALLTRIM( cLine ) + ' '
+//            cReturn += ALLTRIM( cLine ) + ' '
          ENDIF
          IF AT( DELIM, cLine ) > 0
             FT_FSKIP( - 1 )
@@ -1182,7 +1146,6 @@ FUNCTION ProcPdfDesc( cBuffer, oPdf, cStyle )
       ENDDO
       IF lEndTable
          GenPdfTable( oPdf ,nNumTableItems)
-         LFstTableItem:=.T.
       ENDIF
    ENDIF
 RETURN nil
@@ -1235,9 +1198,7 @@ FUNC MaxElemPdf( a )
 
    LOCAL nSize   := LEN( a )
    LOCAL max     := 0
-   LOCAL tam     := 0
-   LOCAL nMax2   := 0
-   LOCAL nPos    := 1
+   LOCAL tam
    // LOCAL cString
 
    LOCAL nCount
@@ -1246,7 +1207,6 @@ FUNC MaxElemPdf( a )
       tam := LEN( a[ nCount ] )
       max := IF( tam > max, tam, max )
    NEXT
-   nPos := ASCAN( a, { | x | LEN( x ) == max } )
 RETURN max
 
 *+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -1262,15 +1222,13 @@ RETURN max
 *+
 FUNCTION FormatPdfBuff( cBuffer, cStyle, oPdf )
 
-   LOCAL cReturn       := ''
-   LOCAL cLine         := ''
+   LOCAL cReturn
+   LOCAL cLine
    LOCAL cOldLine      := ''
-   LOCAL cBuffEnd      := ''
    LOCAL lEndBuffer    := .f.
    LOCAL nPos
    // LOCAL nPosend
    LOCAL lArgBold      := .f.
-   LOCAL LFstTableItem := .t.
 
    oPdf    := oPdf
    cReturn := cBuffer + ' '
@@ -1311,7 +1269,6 @@ FUNCTION FormatPdfBuff( cBuffer, cStyle, oPdf )
 
    ELSEIF cStyle == 'Arguments' .OR. cStyle == "Return"
 
-      nPos    := 0
       cReturn := '<par>' + cReturn
       IF AT( "<par>", cReturn ) > 0
          cReturn  := STRTRAN( cReturn, "<par>", "" )
@@ -1352,7 +1309,6 @@ FUNCTION FormatPdfBuff( cBuffer, cStyle, oPdf )
          cReturn := '<par>' + cOldLine + ' ' + cReturn + '    </par>'
       ENDIF
    ENDIF
-   lArgBold := .F.
    //   endif
 RETURN cReturn
 
@@ -1366,11 +1322,8 @@ RETURN cReturn
 *+
 STATIC FUNCTION ReadFromTop( nh )
 
-   LOCAL cDoc      := DELIM + "DOC" + DELIM                    // DOC keyword
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
-   LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
    // LOCAL nlenpos
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
@@ -1397,14 +1350,12 @@ RETURN nil
 STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    LOCAL nPos
-   LOCAL cCuritem
    LOCAL lReturn
    // LOCAL x
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
-      cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0
          lReturn := .f.
       ELSE
@@ -1441,7 +1392,7 @@ aadd(aFoiTable,aItems4)
 
 return nil
 static function getArray(aItems,aItems2,Aitems3,aItems4)
-local nSize := 0
+local nSize
 nSize:=Len(aItems)
 if nSize<Len(aitems2)
 nSize:=Len(aItems2)   

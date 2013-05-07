@@ -29,6 +29,8 @@
  *
  */
 
+#pragma w2
+
 #include "error.ch"
 
 #ifdef PP_QUIET

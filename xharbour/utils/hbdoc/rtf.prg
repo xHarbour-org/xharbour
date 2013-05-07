@@ -315,7 +315,7 @@ RETURN Self
 
 METHOD WritekLink( aLink ,lAlink) CLASS TRTF
 Local cItem:=' '
-Local nPos:=0
+Local nPos
 Local nSize:=Len(aLink)
 
 (lAlink)

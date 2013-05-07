@@ -120,9 +120,7 @@ FUNCTION ProcessOs2()
    LOCAL nCount
    LOCAL nAlso
 
-   LOCAL cBar          := "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ"
    LOCAL nMode
-   LOCAL cname
    LOCAL cFuncName
    LOCAL cOneLine
    LOCAL cCategory
@@ -132,10 +130,10 @@ FUNCTION ProcessOs2()
    LOCAL cTemp
    LOCAL cChar
    LOCAL oOs2
-   LOCAL lData         := .F.
-   LOCAL lMethod       := .F.
-   LOCAL lIsDataLink   := .F.
-   LOCAL lIsMethodLink := .F.
+   LOCAL lData
+   LOCAL lMethod
+   LOCAL lIsDataLink
+   LOCAL lIsMethodLink
 
    LOCAL lBlankLine     := .F.             // Blank line encountered and sent out
    LOCAL lAddBlank      := .F.             // Need to add a blank line if next line is not blank
@@ -168,7 +166,6 @@ FUNCTION ProcessOs2()
    LOCAL cData          := DELIM + "DATA" + DELIM
    LOCAL cMethod        := DELIM + 'METHOD' + DELIM
    LOCAL cClassDoc      := DELIM + "CLASSDOC" + DELIM
-   LOCAL cTable         := DELIM + "TABLE" + DELIM
 
    lData         := .F.
    lMethod       := .F.
@@ -612,7 +609,6 @@ end
                         lAddBlank := .F.
                      ENDIF
                      cTemp   := SUBSTR( cBuffer, 1, AT( "()", cBuffer ) + 1 )
-                     cName   := SUBSTR( cBuffer, 1, AT( "()", cBuffer ) - 1 )
                      cBuffer := SUBSTR( cBuffer, AT( "()", cBuffer ) + 2 )
                      oOs2:WriteJumpLink( LEFT( cfilename, AT( '.', cFilename ) - 1 ) + ALLTRIM( cTemp ), cTemp, cBuffer )
 
@@ -734,9 +730,8 @@ RETURN aAlso
 *+
 FUNCTION Formatos2Buff( cBuffer, cStyle )
 
-   LOCAL cReturn  := ''
-   LOCAL cLine    := ''
-   LOCAL cBuffend := ''
+   LOCAL cReturn
+   LOCAL cLine
    LOCAL coline   := ''
    LOCAL lEndBuff := .f.
 
@@ -779,9 +774,6 @@ FUNCTION Formatos2Buff( cBuffer, cStyle )
       cReturn := '<par>' + Alltrim(cReturn) + '</par>'
 
    ELSEIF cStyle == 'Arguments'
-      nPos := 0
-
-
       IF AT( "<par>", cReturn ) > 0
          cReturn := STRTRAN( cReturn, "<par>", "" )
          cReturn := STRTRAN( cReturn, "</par>", "" )
@@ -820,7 +812,6 @@ FUNCTION Formatos2Buff( cBuffer, cStyle )
       ELSE
          cReturn := '<par>' + cOLine + ' ' + cReturn + '    </par>'
       ENDIF
-      lArgBold := .F.
 
    ENDIF
 RETURN cReturn
@@ -944,15 +935,12 @@ FUNC maxos2elem( a )
 
    LOCAL nsize   := LEN( a )
    LOCAL max     := 0
-   LOCAL tam     := 0
-   LOCAL max2    := 0
-   LOCAL nPos    := 1
+   LOCAL tam
    LOCAL ncount
    FOR ncount := 1 TO nsize
       tam := LEN( a[ ncount ] )
       max := IF( tam > max, tam, max )
    NEXT
-   nPos := ASCAN( a, { | x | LEN( x ) == max } )
 RETURN max
 
 *+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -1025,19 +1013,18 @@ RETURN Nil
 *+
 FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
 
-   LOCAL cLine       := ''
-   LOCAL lArgBold    := .F.
+   LOCAL cLine
+   LOCAL lArgBold
    LOCAL lHasFixed   := .F.
    LOCAL npos
-   LOCAL CurPos      := 0
+//   LOCAL CurPos      := 0
    LOCAL nColorPos
-   LOCAL ccolor      := ''
-   LOCAL creturn     := ''
-   LOCAL NIDENTLEVEL
+   LOCAL creturn
+//   LOCAL NIDENTLEVEL
    LOCAL coline
-   LOCAL lEndPar     := .F.
+//   LOCAL lEndPar     := .F.
    LOCAL LFstTableItem := .T.
-   LOCAL lEndFixed := .F.
+   LOCAL lEndFixed
    LOCAL lEndTable := .F.
 
    DEFAULT cStyle TO "Default"
@@ -1146,8 +1133,6 @@ FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
             curPos += nPos
          ENDDO
 */
-         nIdentLevel := 6
-         nPos        := 0
 /*         IF AT( '</par>', cBuffer ) > 0
             cBuffer := STRTRAN( cBuffer, "</par>", "" )
          ENDIF*/
@@ -1231,7 +1216,7 @@ FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
             cLine     := STRTRAN( cLine, "</fixed>", "" )
          ENDIF
          IF AT( DELIM, cLine ) = 0
-            cReturn += ALLTRIM( cLine ) + ' '
+//            cReturn += ALLTRIM( cLine ) + ' '
          ENDIF
          IF AT( DELIM, cLine ) > 0
             FT_FSKIP( - 1 )
@@ -1263,7 +1248,6 @@ FUNCTION Procos2Desc( cBuffer, oOs2, cStyle )
       ENDDO
       IF lEndTable
          Genos2Table( oOs2 )
-         LFstTableItem := .T.
       ENDIF
    ENDIF
 
@@ -1271,11 +1255,8 @@ RETURN nil
 
 STATIC FUNCTION ReadFromTop( nh )
 
-   LOCAL cDoc      := DELIM + "DOC" + DELIM                    // DOC keyword
    LOCAL cEnd      := DELIM + "END" + DELIM                    // END keyword
-   LOCAL cClassDoc := DELIM + "CLASSDOC" + DELIM
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
    LOCAL aLocDoc   := {}
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, nCommentLen ) )
@@ -1301,13 +1282,11 @@ RETURN nil
 STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    LOCAL nPos
-   LOCAL cCuritem
    LOCAL lReturn
    LOCAL xPos
    xPos := aCurdoc[ nCurdoc ]
    nPos := ASCAN( xPos, { | x | UPPER( ALLTRIM( x ) ) == UPPER( ALLTRIM( cItem ) ) } )
    IF nPos > 0
-      cCuritem := xPos[ nPos ]
       IF AT( "$", xPos[ nPos + 1 ] ) > 0
          lReturn := .f.
       ELSE

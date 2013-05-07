@@ -212,7 +212,6 @@ RETURN SELF
 
 METHOD Pdfnewpage( _cPageSize, _cPageOrient, _nLpi, _cFontName, _nFontType, _nFontSize ) CLASS TPdf
 
-LOCAL nAdd   := 76.2
    DEFAULT _cPageSize TO ::aReport[ PAGESIZE ]
    DEFAULT _cPageOrient TO ::aReport[ PAGEORIENT ]
    DEFAULT _nLpi TO ::aReport[ LPI ]
@@ -253,8 +252,6 @@ LOCAL k
 LOCAL nImage
 LOCAL nFont
 LOCAL nImageHandle
-LOCAL Row          := 0
-LOCAL rowsperstrip
 LOCAL res
 
    Aadd( ::aReport[ REFS ], ::aReport[ DOCLEN ] )
@@ -344,7 +341,6 @@ LOCAL res
          " " + LTrim(Str( ::aReport[ PAGEY ] - ::aReport[ PAGEIMAGES ][ nI ][ 2 ] - ;
          IIF( ::aReport[ PAGEIMAGES ][ nI ][ 4 ] == 0, pdfM2X( ::aReport[ IMAGES ][ nImage ][ 3 ][ IMAGE_HEIGHT ] / ::aReport[ IMAGES ][ nImage ][ 3 ][ IMAGE_YRES ] * 25.4 ), ::aReport[ PAGEIMAGES ][ nI ][ 4 ]))) + " cm"
          */
-         rowsperstrip := ::aReport[ PAGEIMAGES, nI, 5 ]
          res          := calcdata( ::aReport[ PAGEIMAGES, nI, 5 ], ::aReport[ PAGEIMAGES, nI, 2 ], ::aReport[ PAGEIMAGES, nI, 5 ] )
 
          cTemp += " " + Ltrim( Str( res ) ) + " cm"
@@ -622,7 +618,7 @@ RETURN aTemp
 METHOD Pdftiffinfo( cFile ) CLASS TPdf
 
 LOCAL c40        := Chr( 0 ) + Chr( 0 ) + Chr( 0 ) + Chr( 0 )
-LOCAL aType      := { "BYTE", "ASCII", "SHORT", "LONG", "RATIONAL", "SBYTE", "UNDEFINED", "SSHORT", "SLONG", "SRATIONAL", "FLOAT", "DOUBLE" }
+//LOCAL aType      := { "BYTE", "ASCII", "SHORT", "LONG", "RATIONAL", "SBYTE", "UNDEFINED", "SSHORT", "SLONG", "SRATIONAL", "FLOAT", "DOUBLE" }
 LOCAL aCount     := { 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8 }
 LOCAL nTemp
 LOCAL nHandle
@@ -638,8 +634,8 @@ LOCAL cTemp
 LOCAL cIFDNext
 LOCAL nIFD
 LOCAL nFields
-LOCAL cTag
-LOCAL nPages
+//LOCAL cTag
+//LOCAL nPages
 LOCAL nn
 
 LOCAL nWidth  := 0
@@ -671,7 +667,7 @@ ENDIF
    Fread( nHandle, @cIFDNext, 4 )
 
    cTemp  := Space( 12 )
-   nPages := 0
+//   nPages := 0
 
    WHILE cIFDNext <> c40                //read IFD's
 
@@ -729,7 +725,7 @@ ENDIF
          ENDIF
          //?'Tag'
          //??' ' + Padr( nTag, 10 )
-         cTag := ''
+//         cTag := ''
          DO CASE
             CASE nTag == 256
                /*
@@ -739,7 +735,7 @@ ENDIF
                The number of columns in the image, i.e., the number of pixels per scanline.
                */
                //??'ImageWidth'
-               cTag := 'ImageWidth'
+//               cTag := 'ImageWidth'
                /*
                IF nFieldType <> SHORT .and. nFieldType <> LONG
                   alert('Wrong Type FOR ImageWidth')
@@ -759,7 +755,7 @@ ENDIF
                The number of rows (sometimes described as scanlines) in the image.
                */
                //??'ImageLength'
-               cTag := 'ImageLength'
+//               cTag := 'ImageLength'
                /*
                IF nFieldType <> SHORT .and. nFieldType <> LONG
                   alert('Wrong Type FOR ImageLength')
@@ -781,7 +777,7 @@ ENDIF
                16 or 256 distinct shades of gray.
                */
                //??'BitsPerSample'
-               cTag  := 'BitsPerSample'
+//               cTag  := 'BitsPerSample'
                nTemp := 0
                IF nFieldType == SHORT
                   nTemp := Bin2w( cValues )
@@ -810,16 +806,16 @@ ENDIF
                Baseline TIFF readers must handle all three compression schemes.
                */
                //??'Compression'
-               cTag  := 'Compression'
+//               cTag  := 'Compression'
                nTemp := 0
                IF nFieldType == SHORT
                   nTemp := Bin2w( cValues )
                ELSE
                   //alert('Wrong Type for Compression')
                ENDIF
-               //IF nTemp <> 1 .and. nTemp <> 2 .and. nTemp <> 32773
+               IF nTemp <> 1 .and. nTemp <> 2 .and. nTemp <> 32773
                //   alert('Wrong Value for Compression')
-               //ENDIF
+               ENDIF
             CASE nTag == 262
                /*
                PhotometricInterpretation
@@ -833,7 +829,7 @@ ENDIF
                image should display and print reversed.
                */
                //??'PhotometricInterpretation'
-               cTag  := 'PhotometricInterpretation'
+//               cTag  := 'PhotometricInterpretation'
                nTemp := - 1
                IF nFieldType == SHORT
                   nTemp := Bin2w( cValues )
@@ -853,7 +849,7 @@ ENDIF
                No default. See also Threshholding.
                */
                //??'CellWidth'
-               cTag := 'CellWidth'
+//               cTag := 'CellWidth'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for CellWidth')
                ENDIF
@@ -869,7 +865,7 @@ ENDIF
                No default. See also Threshholding.
                */
                //??'CellLength'
-               cTag := 'CellLength'
+//               cTag := 'CellLength'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for CellLength')
                ENDIF
@@ -882,7 +878,7 @@ ENDIF
                N = 1
                */
                //??'FillOrder'
-               cTag := 'FillOrder'
+//               cTag := 'FillOrder'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for FillOrder')
                ENDIF
@@ -894,7 +890,7 @@ ENDIF
                For each strip, the byte offset of that strip.
                */
                //??'StripOffsets'
-               cTag := 'StripOffsets'
+//               cTag := 'StripOffsets'
                IF nFieldType <> SHORT .AND. nFieldType <> LONG
                   //alert('Wrong Type for StripOffsets')
                ENDIF
@@ -914,7 +910,7 @@ ENDIF
                extra samples are present. See the ExtraSamples field for further information.
                */
                //??'SamplesPerPixel'
-               cTag := 'SamplesPerPixel'
+//               cTag := 'SamplesPerPixel'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for SamplesPerPixel')
                ENDIF
@@ -930,7 +926,7 @@ ENDIF
                data.)
                */
                //??'RowsPerStrip'
-               cTag := 'RowsPerStrip'
+//               cTag := 'RowsPerStrip'
                IF nFieldType <> SHORT .AND. nFieldType <> LONG
                   //alert('Wrong Type for RowsPerStrip')
                ENDIF
@@ -942,7 +938,7 @@ ENDIF
                For each strip, the number of bytes in that strip after any compression.
                */
                //??'StripByteCounts'
-               cTag := 'StripByteCounts'
+//               cTag := 'StripByteCounts'
                IF nFieldType <> SHORT .AND. nFieldType <> LONG
                   //alert('Wrong Type for StripByteCounts')
                ENDIF
@@ -964,7 +960,7 @@ ENDIF
                - see Orientation) direction.
                */
                //??'XResolution'
-               cTag := 'XResolution'
+//               cTag := 'XResolution'
                IF nFieldType <> RATIONAL
                   //alert('Wrong Type for XResolution')
                ENDIF
@@ -978,14 +974,14 @@ ENDIF
                direction.
                */
                //??'YResolution'
-               cTag := 'YResolution'
+//               cTag := 'YResolution'
                IF nFieldType <> RATIONAL
                   //alert('Wrong Type for YResolution')
                ENDIF
                yRes := Bin2l( Substr( cValues, 1, 4 ) )
             CASE nTag == 284
                //??'PlanarConfiguration'
-               cTag := 'PlanarConfiguration'
+//               cTag := 'PlanarConfiguration'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for PlanarConfiguration')
                ENDIF
@@ -1000,7 +996,7 @@ ENDIF
                See also FreeByteCounts.
                */
                //??'FreeOffsets'
-               cTag := 'FreeOffsets'
+//               cTag := 'FreeOffsets'
                IF nFieldType <> LONG
                   //alert('Wrong Type FOR FreeOffsets')
                ENDIF
@@ -1015,7 +1011,7 @@ ENDIF
                See also FreeOffsets.
                */
                //??'FreeByteCounts'
-               cTag := 'FreeByteCounts'
+//               cTag := 'FreeByteCounts'
                IF nFieldType <> LONG
                   //alert('Wrong Type for FreeByteCounts')
                ENDIF
@@ -1032,7 +1028,7 @@ ENDIF
                Default = 2 (inch).
                */
                //??'ResolutionUnit'
-               cTag  := 'ResolutionUnit'
+//               cTag  := 'ResolutionUnit'
                nTemp := 0
                IF nFieldType == SHORT
                   nTemp := Bin2w( cValues )
@@ -1044,7 +1040,7 @@ ENDIF
                ENDIF
             CASE nTag == 305
                //??'Software'
-               cTag := 'Software'
+//               cTag := 'Software'
                IF nFieldType <> ASCII
                   //alert('Wrong Type for Software')
                ENDIF
@@ -1060,7 +1056,7 @@ ENDIF
                string, including the terminating NUL, is 20 bytes.
                */
                //??'DateTime'
-               cTag := 'DateTime'
+//               cTag := 'DateTime'
                IF nFieldType <> ASCII
                   //alert('Wrong Type for DateTime')
                ENDIF
@@ -1073,7 +1069,7 @@ ENDIF
                Note: some older TIFF files used this tag FOR storing Copyright information.
                */
                //??'Artist'
-               cTag := 'Artist'
+//               cTag := 'Artist'
                IF nFieldType <> ASCII
                   //alert('Wrong Type for Artist')
                ENDIF
@@ -1092,7 +1088,7 @@ ENDIF
                represented by 65535, 65535, 65535.
                */
                //??'ColorMap'
-               cTag := 'ColorMap'
+//               cTag := 'ColorMap'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for ColorMap')
                ENDIF
@@ -1105,7 +1101,7 @@ ENDIF
                N = m
                */
                //??'ExtraSamples'
-               cTag := 'ExtraSamples'
+//               cTag := 'ExtraSamples'
                IF nFieldType <> SHORT
                   //alert('Wrong Type for ExtraSamples')
                ENDIF
@@ -1121,13 +1117,13 @@ ENDIF
                All rights reserved.
                */
                //??'Copyright'
-               cTag := 'Copyright'
+//               cTag := 'Copyright'
                IF nFieldType <> ASCII
                   //alert('Wrong Type for Copyright')
                ENDIF
             OTHERWISE
                //??'Unknown'
-               cTag := 'Unknown'
+//               cTag := 'Unknown'
          ENDCASE
          /*
       ??Padr( cTag, 30 )
@@ -1205,13 +1201,13 @@ METHOD Pdfjpeginfo( cFile ) CLASS TPdf
 LOCAL c255
 LOCAL nAt
 LOCAL nHandle
-LOCAL nWidth  := 0
-LOCAL nHeight := 0
+LOCAL nWidth
+LOCAL nHeight
 LOCAL nBits   := 8
 LOCAL nFrom   := 0
-LOCAL nLength := 0
-LOCAL xRes    := 0
-LOCAL yRes    := 0
+LOCAL nLength
+LOCAL xRes
+LOCAL yRes
 LOCAL aTemp   := {}
 
    nHandle := Fopen( cFile )
@@ -1543,30 +1539,29 @@ RETURN nil
 
 METHOD Pdfunder( Text, Len, X, Y ) CLASS TPdf
 
-LOCAL xScale     := 1
-LOCAL yScale     := 1
+//LOCAL xScale     := 1
+//LOCAL yScale     := 1
 LOCAL length
-LOCAL nWidth     := 0.00
-LOCAL nLineWidth
-LOCAL Delta_y
+//LOCAL nLineWidth
+//LOCAL Delta_y
 
    IF Right( Text, 1 ) == Chr( 255 ) .OR. Right( Text, 1 ) == Chr( 254 )        // reverse or underline
       -- len
    ENDIF
 
-   nLineWidth := ::aReport[ FONTSIZE ] * 50 / 1000 * ;
-           ( 1 / 100 ) * Iif( xScale > yScale, xScale, yScale )
+//   nLineWidth := ::aReport[ FONTSIZE ] * 50 / 1000 * ;
+//           ( 1 / 100 ) * Iif( xScale > yScale, xScale, yScale )
 
    /* the font size may be negative, resulting in bad line width */
-   nLineWidth := Abs( nLineWidth )
+//   nLineWidth := Abs( nLineWidth )
    length     :=::Pdf_Str_Width( text, len, 0, ::aReport[ FONTSIZE ] )
 
    IF ( length == 0 )
       RETURN nil
    ENDIF
 
-   Delta_y := ( ::aReport[ FONTSIZE ] * - 100 / 1000 + 0 ) * ;
-                Abs( 1 ) / 100 * Iif( xScale > yScale, xScale, yScale )
+//   Delta_y := ( ::aReport[ FONTSIZE ] * - 100 / 1000 + 0 ) * ;
+//                Abs( 1 ) / 100 * Iif( xScale > yScale, xScale, yScale )
 
    ::Pdfsave()
    ::PDFSetLineWidth( 1 )
@@ -1585,17 +1580,16 @@ LOCAL xScale     := 1
 LOCAL yScale     := 1
 LOCAL length
 LOCAL Delta_y
-LOCAL nWidth     := 0.00
-LOCAL nLineWidth
+//LOCAL nLineWidth
 
    IF Right( Text, 1 ) == Chr( 255 ) .OR. Right( Text, 1 ) == Chr( 254 )        // reverse or underline
       -- Len
    ENDIF
-   nLineWidth := ::aReport[ FONTSIZE ] * 50 / 1000 * ;
-           ( 1 / 100 ) * Iif( xScale > yScale, xScale, yScale )
+//   nLineWidth := ::aReport[ FONTSIZE ] * 50 / 1000 * ;
+//           ( 1 / 100 ) * Iif( xScale > yScale, xScale, yScale )
 
    /* the font size may be negative, resulting in bad line width */
-   nLineWidth := Abs( nLineWidth )
+//   nLineWidth := Abs( nLineWidth )
 
    length :=::pdf_str_width( text, len, 0, ::aReport[ FONTSIZE ] )
 
@@ -1621,7 +1615,6 @@ METHOD Pdf_Str_Width( Text, Len, Font, Size ) CLASS TPdf
 LOCAL cp
 LOCAL i
 LOCAL width  := 0.0
-LOCAL nWidth := 0.00
 LOCAL nArr
 LOCAL nAdd   := ( ::aReport[ FONTNAME ] - 1 ) % 4
 
@@ -1699,21 +1692,20 @@ METHOD Pdfpnginfo( cFile ) CLASS TPdf
 
 LOCAL c255
 LOCAL nHandle
-LOCAL nWidth       := 0
-LOCAL nHeight      := 0
-LOCAL nBits        := 8
+//LOCAL nWidth       := 0
+//LOCAL nHeight      := 0
+LOCAL nBits
 LOCAL nFrom        := 135
 LOCAL nPLTEPos
 LOCAL nDistTonPhys := 0
-LOCAL nPhys
-LOCAL nLength      := filesize( cFile )
-LOCAL xRes         := 0
+//LOCAL nPhys
+LOCAL nLength
+LOCAL xRes
 LOCAL cPalletData  := ""
-LOCAL yRes         := 0
+LOCAL yRes
 LOCAL aTemp        := {}
-LOCAL nIendPos     := nLength - 16
-LOCAL nb
-LOCAL cData        := ""
+//LOCAL nb
+//LOCAL cData
 LOCAL nColor
 
    nHandle := Fopen( cFile )
@@ -1730,7 +1722,7 @@ LOCAL nColor
    nPLTEPos := At( "PLTE", c255 )
 
    IF nPLTEPos > 0
-      nPhys := At( 'pHYs', c255 )
+//      nPhys := At( 'pHYs', c255 )
       nFrom := At( "IDAT", c255 ) + 3
 
       nPLTEPos     += 4
@@ -1743,8 +1735,8 @@ LOCAL nColor
    yRes   := ( Asc( Substr( c255, 21, 1 ) ) ) + ( Asc( Substr( c255, 22, 1 ) ) ) + ( Asc( Substr( c255, 23, 1 ) ) ) + ( Asc( Substr( c255, 24, 1 ) ) )
    nBits  := ( Asc( Substr( c255, 25, 1 ) ) )
    nColor := ( Asc( Substr( c255, 26, 1 ) ) )
-   cData  := Substr( c255, At( "IDAT", c255 ) + 4 )
-   nb     := At( "IDAT", c255 )
+//   cData  := Substr( c255, At( "IDAT", c255 ) + 4 )
+//   nb     := At( "IDAT", c255 )
 
    Fclose( nHandle )
 

@@ -170,7 +170,7 @@ FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
    LOCAL cLast
    LOCAL nItem
    LOCAL nHpj
-   LOCAL cItem:=''
+   LOCAL cItem
    LOCAL cFName
    LOCAL cLName
    LOCAL aName
@@ -180,19 +180,17 @@ FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
    LOCAL oHtmIndex
    LOCAL cFileName
 
-   LOCAL cCompiler     // Compiler type
+//   LOCAL cCompiler     // Compiler type
    LOCAL oHtm
    LOCAL oHtm1
 
    LOCAL nPos
    LOCAL ppp
    LOCAL aMetaContents:={}
-   Local aTemp:={}
-   LOCAL lAdded:=.f.
    Local aRtfid
 
-   LOCAL nCount_1 := 1
-   LOCAL nCount_2 := 1
+   LOCAL nCount_1
+   LOCAL nCount_2
 
    PUBLIC theHandle
    PUBLIC aDirList
@@ -372,7 +370,7 @@ FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
       ENDIF
    ENDIF
    if lNgi .or. lRtf
-   cCompiler := fill_Link_info( cLinkName )
+//   cCompiler := fill_Link_info( cLinkName )
    endif
 
    IF cAtFile = NIL                     // use all files in directory
@@ -1374,7 +1372,6 @@ FUNCTION StripNgControls( cString )
    nPos := AT( "^a1f", cString )
    IF nPos > 0
       cString  := SUBSTR( cString, nPos + 5 )
-      lStriped := .t.
    ELSE
       IF !lStriped
          cString := cString
@@ -1463,7 +1460,6 @@ FUNCTION FirstNB( cString )
    //  Notes: None
    // -
    //  LOCAL variables:
-   LOCAL nLen    := LEN( cString )
    LOCAL nReturn := 0
    LOCAL i
 
@@ -1556,7 +1552,7 @@ RETURN aList        // Return the array
 *+
 FUNCTION ReadLN( leof )
 
-   LOCAL cBuffer := ""
+   LOCAL cBuffer
 
    cBuffer := FT_FREADLN()
    FT_FSKIP( 1 )
@@ -1703,14 +1699,13 @@ FUNCTION fill_link_info( cLinkName )
    LOCAL cSpace
    LOCAL cCategory
    LOCAL cFile
-   LOCAL nReadHandle
    LOCAL lMenuMode   := .F.                // Menu infomation being read
    LOCAL lGetType    := .T.                // Get the compiled file type to determine complier
    LOCAL cCompiler     // Compiler Type
    //
    //  Entry Point
    //
-   nReadHandle := FT_FUSE( cLinkName )
+   FT_FUSE( cLinkName )
    lEof        := .F.
 
    DO WHILE .NOT. lEof
@@ -1759,9 +1754,9 @@ RETURN cCompiler
 STATIC FUNCTION ReadLinkFile( cFile )
 
    LOCAL cBuffer   := ''
-   LOCAL NPOS      := 0
+   LOCAL NPOS
    Local cLine
-   Local cVer:=''
+   Local cVer
    LOCAL aLocDoc   := {}
    Local nH:=FT_FUSE(cFile) 
    DO WHILE FREADline( nH, @cBuffer, 4096 )
@@ -1791,13 +1786,13 @@ RETURN nil
 
 FUNCTION DocVer()
 local cVersion:=version()
-local cReturn:=''
+local cReturn
 cReturn:=substr(cVersion,9,4)
 
 RETURN cReturn
 
 Function WriteContentFile(aTop,cCat,nFile)
-Local nCount:=0
+Local nCount
 
 Local aTemp:={}
 asort(aWww,,,{|x,y|x[3]+x[1]<y[3]+y[1]})
@@ -1824,7 +1819,7 @@ tracelog(cReturn)
 return cReturn
 
 Function WriteChmContentFile(aTop,cCat,oHtm)
-Local nCount:=0
+Local nCount
 
 Local aTemp:={}
 asort(aTop,,,{|x,y|x[1]+x[2]<y[1]+y[2]})
