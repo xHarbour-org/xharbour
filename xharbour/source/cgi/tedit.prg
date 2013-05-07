@@ -111,7 +111,6 @@ CLASS THtmlControl
    DATA onKeyPress
    DATA onKeyDown
    DATA onKeyUp
-   DATA onSelect
    DATA cLink
    DATA cImage
 
@@ -172,8 +171,6 @@ CLASS THtmlControl
    METHOD SetOnKDown( c ) INLINE ::onKeyDown := c
 
    METHOD SetOnKUp( c ) INLINE ::onKeyUp := c
-
-   METHOD SetOnSelect( c ) INLINE ::onSelect := c
 
    METHOD SetLabel( l ) INLINE ::lLabel := l
    METHOD SetLink( l )  INLINE ::cLink := l

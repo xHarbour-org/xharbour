@@ -13,6 +13,10 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 	$(HBRM_EXE) $@
 	$(LIB_CMD)
 
+$(HBCGI_LIB) : $(HBCGI_LIB_OBJS)
+	$(HBRM_EXE) $@
+	$(LIB_CMD)
+
 $(COMPILER_LIB) : $(COMPILER_LIB_OBJS)
 	$(HBRM_EXE) $@
 	$(LIB_CMD)

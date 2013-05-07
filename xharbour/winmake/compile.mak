@@ -182,6 +182,63 @@ $(HARBOUR_DLL_RC) : ChangeLog
 	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
 
 #===============================================================================
+# HBCGI.LIB
+#===============================================================================
+$(OBJ_DIR)$(DIR_SEP)CGILIB_hjwindow$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_hjwindow.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_hterrsys$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_hterrsys.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_htjlist$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_htjlist.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_htmutil$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_htmutil.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tcgi$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_tcgi.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tedit$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_tedit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tfile$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_tfile.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tframe$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_tframe.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_thtm$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)CGILIB_thtm.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_hjwindow.c : $(CGI_DIR)$(DIR_SEP)hjwindow.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_hterrsys.c : $(CGI_DIR)$(DIR_SEP)hterrsys.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_htjlist.c : $(CGI_DIR)$(DIR_SEP)htjlist.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_htmutil.c : $(CGI_DIR)$(DIR_SEP)htmutil.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tcgi.c : $(CGI_DIR)$(DIR_SEP)tcgi.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tedit.c : $(CGI_DIR)$(DIR_SEP)tedit.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tfile.c : $(CGI_DIR)$(DIR_SEP)tfile.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_tframe.c : $(CGI_DIR)$(DIR_SEP)tframe.prg
+	$(HB_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)CGILIB_thtm.c : $(CGI_DIR)$(DIR_SEP)thtm.prg
+	$(HB_CMD)
+
+#===============================================================================
 # HBSSL.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)bio$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)bio.c

@@ -21,6 +21,7 @@ BIN_DIR       =bin$(DIR_SEP)$(SUB_DIR)
 LIB_DIR       =lib$(DIR_SEP)$(SUB_DIR)
 OBJ_DIR       =obj$(DIR_SEP)$(SUB_DIR)$(HB_MT_DIR)
 
+CGI_DIR       =source$(DIR_SEP)cgi
 COMMON_DIR    =source$(DIR_SEP)common
 COMPILER_DIR  =source$(DIR_SEP)compiler
 DEBUG_DIR     =source$(DIR_SEP)debug
@@ -105,6 +106,7 @@ INCLUDE_DIR2  =include
 # Macros For Standard Libraries
 #===============================================================================
 COMPILER_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)compiler$(LIBEXT)
+HBCGI_LIB   =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)hbcgi$(LIBEXT)
 COMMON_LIB  =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)common$(LIBEXT)
 CODEPAGE_LIB=$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)codepage$(LIBEXT)
 CT_LIB      =$(LIB_DIR)$(DIR_SEP)$(LIBPREFIX)ct$(LIBEXT)
@@ -299,6 +301,20 @@ HARBOUR_LIBS=\
 #===============================================================================
 # List Of Library and Executable Dependencies
 #===============================================================================
+
+#===============================================================================
+# HBCGI.LIB
+#===============================================================================
+HBCGI_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_hjwindow$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_hterrsys$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_htjlist$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_htmutil$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_tcgi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_tedit$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_tfile$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_tframe$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)CGILIB_thtm$(OBJEXT)
 
 #===============================================================================
 # HBSSL.LIB
@@ -2499,6 +2515,7 @@ ST_PROJECT=\
 	$(USE_DLL_LIB)\
 	$(ODBC_LIB)\
 	$(MISC_LIB)\
+	$(HBCGI_LIB)\
 	$(JPEG_LIB)\
 	$(TIFF_LIB)\
 	$(PDFLITE_LIB)\
