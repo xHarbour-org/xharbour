@@ -1060,7 +1060,7 @@ static int Reduce( int iToken )
                 iHold--;
                 iToken = aiHold[ iHold ];
                 bIgnoreWords = FALSE;
-                if( iToken < 256 )
+                if( iToken > 0 && iToken < 256 )
                    if( acNewLine[iToken] ) bNewLine = TRUE;
             }
             else
