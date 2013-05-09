@@ -7,7 +7,7 @@
 #endif
 
 STATIC lSplash := .F.
-
+static cFindText := ""
 static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 
 //  Link ALL xHarbour functions!!!
@@ -1292,10 +1292,10 @@ METHOD Init() CLASS IDE_MainForm
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
       //:ShowChevron := .F.
-       IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
          :Showgrip := .F.
          :ShowChevron := .F.
-       ENDIF
+      ENDIF
       :Caption := "Standard"
       :Row     := 2
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -3521,6 +3521,7 @@ METHOD SetEditMenuItems() CLASS Project
 RETURN Self
 
 METHOD Find() CLASS Project
+   LOCAL cSel
    IF ::Application:SourceEditor:IsWindowVisible()
       IF ::ReplaceDialog != NIL
          ::ReplaceDialog:Close()
@@ -3531,7 +3532,11 @@ METHOD Find() CLASS Project
 
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
-      ::FindDialog:Show(, ::Application:SourceEditor:Source:GetSelText() )
+      cSel := ::Application:SourceEditor:Source:GetSelText()
+      IF ! EMPTY( cSel )
+         cFindText := cSel
+      ENDIF
+      ::FindDialog:Show(, cFindText )
    ENDIF
 RETURN 0
 

@@ -470,7 +470,9 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
       ENDIF
-      ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
+      IF ! ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
+         ::MessageBox( "Cannot find literal text: " + ::cFindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
+      ENDIF
 
     ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
 /*
