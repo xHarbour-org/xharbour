@@ -566,6 +566,16 @@ double hb_numDecConv( double dNum, int iDec )
       return hb_numRound( dNum, 0 );
 }
 
+double hb_numExpConv( double dNum, int iExp )
+{
+   if( iExp > 0 )
+      return dNum / hb_numPow10( iExp );
+   else if( iExp < 0 )
+      return dNum * hb_numPow10( -iExp );
+   else
+      return dNum;
+}
+
 static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth, BOOL * pbError )
 {
    BOOL  fDbl  = FALSE, fDec = FALSE, fNeg, fHex = FALSE;

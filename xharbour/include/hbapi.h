@@ -731,7 +731,7 @@ extern HB_EXPORT char *    hb_strRemEscSeq( char * szText, HB_SIZE * ulLen ); /*
 extern HB_EXPORT double    hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 extern HB_EXPORT double    hb_numInt( double dNum ); /* take the integer part of the number */
 extern HB_EXPORT double    hb_numDecConv( double dNum, int iDec );
-
+extern HB_EXPORT double    hb_numExpConv( double dNum, int iDec );
 
 /* architecture dependent number conversions */
 extern HB_EXPORT void      hb_put_ieee754( BYTE * ptr, double d );

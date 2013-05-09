@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-05-09 20:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + added new C function hb_numExpConv, borrowed from Harbour
+
 2013-05-07 14:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbmxml/mxml_sea.c
   * contrib/hbmxml/mxml_str.c
