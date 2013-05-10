@@ -638,7 +638,7 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
 
       IF lProject
          cNewName := ::Application:Project:properties:Name
-         ::Application:SourceTabs:SetCurSel( 1 )
+         oEditor:TreeItem:Select()
        ELSE
          IF ::ActiveObject:lCustom
             ::ActiveObject:__NewName := cNewName
@@ -659,9 +659,6 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
             oEditor:TreeItem:Text := cNewName +".prg *"
-            //IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==oEditor} ) ) > 0
-            //   ::Application:SourceTabs:SetItemText( n, cNewName +".prg *", .F. )
-            //ENDIF
             IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
                IF ( n := aScan( ::Application:Project:Forms, ::ActiveObject, , , .T. ) ) > 0
                   ::Application:FormsTabs:SetItemText( n, cNewName+" *", .F. )

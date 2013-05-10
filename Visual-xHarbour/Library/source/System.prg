@@ -754,13 +754,16 @@ RETURN ALLTRIM(STR(l_nRed))+","+ALLTRIM(STR(l_nGreen))+","+ALLTRIM(STR(l_nBlue))
 
 
 METHOD Update() CLASS System
-   LOCAL cBuffer
    
-   FreeExplorerBarInfo()
-   GetExplorerBarInfo()
-   cBuffer := ::ExplorerBar:Value()
-   ExplorerBarInfo( @cBuffer )
-   ::ExplorerBar:Buffer( cBuffer )
+   #ifdef VXH_PROFESSIONAL
+      LOCAL cBuffer
+      FreeExplorerBarInfo()
+      GetExplorerBarInfo()
+      cBuffer := ::ExplorerBar:Value()
+      ExplorerBarInfo( @cBuffer )
+      ::ExplorerBar:Buffer( cBuffer )
+   #endif
+
 RETURN Self
 
 CLASS __SysTime

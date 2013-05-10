@@ -670,20 +670,18 @@ METHOD Run( oWnd ) CLASS Application
    #ifdef VXH_PROFESSIONAL
       FreeExplorerBarInfo()
    #endif
-   TRY
-      FreeLibrary( ::hRich20 )
-      ::OnExit()
+
+   FreeLibrary( ::hRich20 )
+   ::OnExit()
    
-      IF ::__hMenuHook != NIL
-         UnhookWindowsHookEx( ::__hMenuHook )
-      ENDIF
-      IF ::__SocketInit
-         InetCleanUp()
-      ENDIF
-      ::MainForm := NIL
-      AEVAL( ::ImageLists, {|o|o:Destroy()} )
-   CATCH
-   END
+   IF ::__hMenuHook != NIL
+      UnhookWindowsHookEx( ::__hMenuHook )
+   ENDIF
+   IF ::__SocketInit
+      InetCleanUp()
+   ENDIF
+   ::MainForm := NIL
+   AEVAL( ::ImageLists, {|o|o:Destroy()} )
 RETURN 0
 
 //------------------------------------------------------------------------------------------------

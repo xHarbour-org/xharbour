@@ -561,7 +561,8 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS FileTreeView INHERIT TreeView
-   DATA Changing  EXPORTED INIT .F.
+   DATA Changing   EXPORTED INIT .F.
+   DATA ExtSource  EXPORTED
    METHOD UpdateView()
    METHOD OnSelChanged()
    METHOD OnDropFiles()
@@ -590,28 +591,29 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD UpdateView() CLASS FileTreeView
-   LOCAL Form, MainItem, SubItem, Item, cFile := ::Application:Project:Properties:Name
+   LOCAL Form, MainItem, oEditor, SubItem, Item, cFile := ::Application:Project:Properties:Name
    DEFAULT cFile TO "Untitled"
    ::ResetContent()
 
    MainItem := ::AddItem( cFile+".vxh", 6 )
    MainItem:Bold := .T.
    
-   Item := MainItem:AddItem( cFile+"_Main.prg", 16 )
+   Item := MainItem:AddItem( cFile+"_Main.prg"+IIF( ::Application:ProjectPrgEditor:Modified, " *", ""), 16 )
    Item:Cargo := ::Application:ProjectPrgEditor
    ::Application:ProjectPrgEditor:TreeItem := Item
 
    FOR EACH Form IN ::Application:Project:Forms
-       SubItem := MainItem:AddItem( Form:Name + ".prg", 16 )
+       SubItem := MainItem:AddItem( Form:Name + ".prg"+IIF( Form:Editor:Modified, " *", ""), 16 )
        SubItem:Cargo := Form:Editor
        SubItem:Cargo:TreeItem := SubItem
    NEXT
+   ::ExtSource := MainItem:AddItem( "External Source Files", 20 )
+   ::ExtSource:Bold := .T.
    IF !EMPTY( ::Application:Project:Properties:Sources )
-      Item := MainItem:AddItem( "External Source Files", 20 )
-      Item:Bold := .T.
       FOR EACH cFile IN ::Application:Project:Properties:Sources
-          SubItem := Item:AddItem( cFile, 20 )
-          SubItem:Cargo := ::Application:SourceEditor:GetEditor( cFile )
+          oEditor := ::Application:SourceEditor:GetEditor( cFile )
+          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), 20 )
+          SubItem:Cargo := oEditor
           SubItem:Cargo:TreeItem := SubItem
       NEXT
    ENDIF

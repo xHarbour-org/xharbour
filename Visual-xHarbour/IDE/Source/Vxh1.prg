@@ -2888,13 +2888,6 @@ METHOD NewProject() CLASS Project
    ::Application:ProjectPrgEditor:EmptyUndoBuffer()
    ::Application:ProjectPrgEditor:Modified := .T.
 
-   //::Application:SourceSelect:Visible := .T.
-   //::Application:SourceSelect:AddItem( ::Properties:Name +"_Main.prg *" )
-
-   //::Application:SourceTabs:Visible := .T.
-   //::Application:SourceTabs:InsertTab( "  " + ::Properties:Name +"_Main.prg * ",,, .T. )
-
-
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
    ::Application:Props[ "NewFormItem"       ]:Enabled := .T.
@@ -2918,6 +2911,7 @@ METHOD NewProject() CLASS Project
    ::Application:ObjectManager:ResetProperties( {{::AppObject}} )
    ::Application:EventManager:ResetEvents( {{::AppObject}} )
 
+   ::Application:ProjectPrgEditor:TreeItem:Select()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -3642,17 +3636,12 @@ RETURN 0
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SelectBuffer(lSel) CLASS Project
-   LOCAL n
    ::CurrentForm:Editor:Select()
-   IF ( n := aScan( ::Application:SourceEditor:aDocs, {|o| o==::CurrentForm:Editor} ) ) > 0
-      DEFAULT lSel TO ::Application:SourceEditor:IsWindowVisible()
-      //::Application:SourceTabs:SetCurSel( n )
-      //::Application:SourceSelect:SetCurSel( n )
-      IF lSel
-         ::Application:FileTree:Parent:Select()
-      ENDIF
-      ::Application:SourceEditor:aDocs[n]:TreeItem:EnsureVisible():Select()
+   DEFAULT lSel TO ::Application:SourceEditor:IsWindowVisible()
+   IF lSel
+      ::Application:FileTree:Parent:Select()
    ENDIF
+   ::CurrentForm:Editor:TreeItem:EnsureVisible():Select()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -3787,12 +3776,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
           ENDIF
        ENDIF
        ::Application:SourceEditor:aDocs[n]:Close()
-       //::Application:SourceTabs:DeleteTab(n)
-       //::Application:SourceSelect:DeleteItem( n )
        n--
    NEXT
-   //::Application:SourceTabs:Visible := .F.
-   //::Application:SourceSelect:Visible := .F.
 
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
@@ -3960,8 +3945,7 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
          ENDIF
          oEditor:Save( cFile )
          IF lSetTabName
-            //::Application:SourceTabs:SetItem( n, oEditor:FileName )
-            //::Application:SourceSelect:SetItemText( n, oEditor:FileName )
+            oEditor:TreeItem:Text := oEditor:FileName
          ENDIF
       ENDIF
       EXIT
@@ -3970,7 +3954,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CloseSource() CLASS Project
-   LOCAL nRes, n := 0 //::Application:SourceSelect:GetCurSel() //::Application:SourceTabs:GetCurSel()
+   LOCAL nRes, n := 0
    nRes := IDNO
    IF ::Application:SourceEditor:Source:Modified
       nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:Source:FileName, MB_YESNOCANCEL | MB_ICONQUESTION )
@@ -3978,8 +3962,6 @@ METHOD CloseSource() CLASS Project
          RETURN Self
       ENDIF
    ENDIF
-   //::Application:SourceTabs:DeleteTab( n )
-   //::Application:SourceSelect:DeleteItem( n )
 
    IF nRes == IDYES
       ::SaveSource()
@@ -3987,9 +3969,6 @@ METHOD CloseSource() CLASS Project
    ::Application:SourceEditor:Source:Close()
    n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
-      //::Application:SourceTabs:SetCurSel( n )
-      //::Application:SourceSelect:SetCurSel( n )
-
       ::SourceTabChanged( n )
     ELSE
       ::Application:SourceEditor:Caption := ""
@@ -4014,15 +3993,17 @@ METHOD NewSource() CLASS Project
    LOCAL oEditor
    ::Application:SourceEditor:Show()
    ::Application:SourceEditor:Enable()
-   oEditor := Source( ::Application:SourceEditor )
 
-   //::Application:SourceTabs:Visible := .T.
-   //::Application:SourceTabs:InsertTab( "  Untitled Source * ",,,.T. )
-   //::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+   oEditor := Source( ::Application:SourceEditor )
+   oEditor:FileName  := "Untitled Source"
+   oEditor:TreeItem  := ::Application:FileTree:ExtSource:AddItem( oEditor:FileName, 16 )
+   oEditor:TreeItem:Cargo := oEditor
+   oEditor:TreeItem:Select()
+   ::Application:FileTree:Parent:Select()
+
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
-   IF !::Application:SourceEditor:IsWindowVisible()
-      ::Application:EditorPage:Select()
-   ENDIF
+   ::Application:EditorPage:Select()
+
    ::Application:SourceEditor:SetFocus()
    ::Application:CloseMenu:Enable()
    OnShowEditors()
@@ -5123,6 +5104,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
+          //IF EMPTY( :Path ) .AND. EMPTY( :File )
+          //   ::SaveSourceAs( aEditors[n], .T. )
+          //ENDIF
           IF (:Modified .OR. lForce) .AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
              :Save()
              IF :PrevFile != NIL
@@ -7106,7 +7090,7 @@ METHOD Init( oParent, cText, cCaption, nIcon ) CLASS MsgBoxEx
    ::nIcon    := nIcon
    ::Template := "MSGBOXEX"
    ::Modal    := .T.
-   ::Caption  := cCaption
+   ::Text     := cCaption
    ::Center   := .T.
    ::BodyText := cText
    ::Create()

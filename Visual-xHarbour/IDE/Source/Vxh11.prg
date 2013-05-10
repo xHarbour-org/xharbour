@@ -544,6 +544,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
       CASE hdr:code == SCN_MODIFIED
            scn := (struct SCNOTIFICATION*) nlParam
            IF ( scn:modificationType & SC_MOD_CHANGEFOLD ) == 0
+              VIEW ::Source:FirstOpen
               IF ! ::Source:FirstOpen
                  IF ! ::Source:Modified
                     ::Source:Modified := .T.
@@ -1071,10 +1072,14 @@ RETURN xReturn
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner, cFile ) CLASS Source
    ::Owner   := oOwner
+   ::Owner:xSource := Self
+   
    ::pSource := ::CreateDocument()
    
    IF cFile != NIL .AND. File( cFile )
       ::Open( cFile )
+   ELSE
+      ::FirstOpen := .F.
    ENDIF
 
    AADD( ::Owner:aDocs, Self )
