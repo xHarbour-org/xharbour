@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-05-11 14:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/tip/client.prg
+  * source/tip/ftpcln.prg
+    ! fixed tIPClientFtp(tIPClient) for use in EXTEND CLASS ...
+      (reported by Fabio Nery)
+
 2013-05-09 20:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbapi.h
   * source/common/hbstr.c
@@ -59,16 +65,16 @@
 
 2013-03-21 10:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/tclass.prg
-    ! assigned but not used variable logic is not suitable for 
+    ! assigned but not used variable logic is not suitable for
       DivertConstructorCall( ... ). Restored and added #pragma -w2
 
 2013-03-28 16:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/tclass.prg
     ! fixed a bug introduced in my last commit
 
-2013-03-25 09:05 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>  
+2013-03-25 09:05 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/memoedit.prg
-    ! now handling ME_PASTE return by calling  hb_gtinfo( HB_GTI_CLIPBOARDPAST )    
+    ! now handling ME_PASTE return by calling  hb_gtinfo( HB_GTI_CLIPBOARDPAST )
 
 2013-03-25 18:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake/common3.mak
@@ -109,7 +115,7 @@
 2013-03-24 22:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/hbgtcore.c
     ! added missing HB_GTI_CLIPBOARDPAST
-    
+
 2013-03-24 20:14 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/gd/source/gdbar.prg
   * contrib/gd/source/gdbarcode.prg
@@ -563,7 +569,7 @@
     ! missing -MT or -MD flag when compiling hbzip.lib
 
   * source/vm/maindllp.c
-    ! change hb_xinit()	type: int -> void
+    ! change hb_xinit() type: int -> void
 
   - tests/pdll55.bat
     ! remove version specific batch file
@@ -744,8 +750,8 @@
 
 2012-12-09 23:00 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/rdd_ads/adsfunc.c
-    ! added new function provided by Reinaldo Crespo <Reinaldo.Crespo@gmail.com> 
-    
+    ! added new function provided by Reinaldo Crespo <Reinaldo.Crespo@gmail.com>
+
 2012-12-09 09:08 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/compiler/comptool.c
     ! Harbour Compiler now uses dlmalloc -> hopefully, compiling PRG files
@@ -1050,17 +1056,17 @@
     ! added hbhpdf and hbmxml folder
 
 2012-12-02 11:40 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
-  * source/rtl/fstemp.c 
+  * source/rtl/fstemp.c
     ! Fixed compilation under *nix
-  * source/rtl/hbip.c     
+  * source/rtl/hbip.c
     ! Fixed compilation under linux by applying correct cast in place of SOCKET
   * include/inet.h
-    ! protected stucture HB_PINGREPLY with !defined(HB_OS_UNIX)  
-  + contrib/hbhpdf/Makefile 
+    ! protected stucture HB_PINGREPLY with !defined(HB_OS_UNIX)
+  + contrib/hbhpdf/Makefile
     ! Added makefile to build hbhpdf under *nix
-  + contrib/hbmxml/Makefile 
+  + contrib/hbmxml/Makefile
     ! Added makefile to build hbmxml under *nix
-    
+
 2012-12-02 08:33 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/ttable.prg
     * METHOD ordkeycount() was doubly defined, fixed.
@@ -1157,20 +1163,20 @@
     ! pacify BCC warnings when HB_NO_VM_ALL is defined
 
   * include/thread.h
-  * source/rtl/arc4.c          
-  * source/rtl/console.c        
-  * source/rtl/hbsocket.c      
-  * source/rtl/hbserv.c        
-  * source/rtl/filenet.c       
-  * source/rtl/trace.c         
-  * source/rtl/filebuf.c       
-  * source/rdd/hsx/hsx.c       
-  * source/macro/macro.y       
-  * source/macro/macroyy.c     
-  * source/vm/thread.c         
-  + source/vm/consmt.c         
-  + source/vm/hbservmt.c       
-  + source/vm/rddmt.c          
+  * source/rtl/arc4.c
+  * source/rtl/console.c
+  * source/rtl/hbsocket.c
+  * source/rtl/hbserv.c
+  * source/rtl/filenet.c
+  * source/rtl/trace.c
+  * source/rtl/filebuf.c
+  * source/rdd/hsx/hsx.c
+  * source/macro/macro.y
+  * source/macro/macroyy.c
+  * source/vm/thread.c
+  + source/vm/consmt.c
+  + source/vm/hbservmt.c
+  + source/vm/rddmt.c
     ! reorganize MT lock and unlock functions by moving them to more appropriate
     files.
 
@@ -3501,7 +3507,7 @@
 
 2012-08-21 01:00  UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * thread.c
-    ! protected _TlsSetValue and 	_TlsGetValue under HB_OS_WIN
+    ! protected _TlsSetValue and _TlsGetValue under HB_OS_WIN
 
 2012-08-20 03:57 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * contrib/what32/source/_wintree.c
@@ -11982,7 +11988,7 @@
 
   * compile.mak
     * Modified to compile win32ole.prg, gtwvt.c gtwvg.c, and wvtcore.c
-	  using new $(CCC_CMD) instead of $(CC_CMD) to allow forcing C mode instead of CPP
+      using new $(CCC_CMD) instead of $(CC_CMD) to allow forcing C mode instead of CPP
   * makefile.vc
     + Added CCC_CMD macro which forces C mode by means of -TC switch
 
@@ -11992,7 +11998,7 @@
   * makefile.pc
   * makefile.wc
     + Added CCC_CMD set to mirror $(CC_CMD)
-	/* Not tested!!! */
+      /* Not tested!!! */
 
   * contrib/libnf/descend.c
     ! Remove superfluous auto storage qualifier
