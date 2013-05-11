@@ -608,7 +608,7 @@ RETURN NIL
 METHOD AxTranslate( pMsg, cClass ) CLASS Application
    LOCAL hParent, pUnk, lRet := .F., hWnd := pMsg:hwnd
 
-   IF pMsg:message == WM_KEYDOWN
+   IF .F. //pMsg:message == WM_KEYDOWN
 
       DEFAULT cClass TO GetClassName( hWnd )
 

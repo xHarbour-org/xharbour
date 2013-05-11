@@ -89,6 +89,33 @@ HB_EXTERN_END
 
 static IDispatch *pDispPtr;
 
+static HMODULE hLib = NULL;
+
+typedef BOOL (WINAPI *ATLAXWININIT)(void);
+typedef BOOL (WINAPI *ATLAXWINTERM)(void);
+typedef HRESULT (WINAPI *ATLAXGETCONTROL)(HWND, IUnknown**);
+typedef HRESULT (WINAPI *ATLAXCREATECONTROL)(LPCOLESTR, HWND, IStream*, IUnknown**);
+typedef HRESULT (WINAPI *ATLAXCREATECONTROLLIC)(LPCOLESTR, HWND, IStream*, IUnknown**, BSTR);
+typedef HRESULT (WINAPI *ATLAXGETHOST)(HWND, IUnknown**);
+
+
+void LoadAtlAx( void )
+{
+   if( hLib == NULL )
+   {
+      ATLAXWININIT pAtlAxWinInit;
+
+      hLib = LoadLibrary( "atl.dll" );
+      pAtlAxWinInit = (ATLAXWININIT) GetProcAddress( hLib, "AtlAxWinInit" );
+
+      if ( pAtlAxWinInit )
+      {
+         pAtlAxWinInit();
+      }
+   }
+}
+
+
 HB_FUNC( BITMAPTOREGION )
 {
    HBITMAP hBmp = (HBITMAP) hb_parnl(1);
@@ -1669,15 +1696,6 @@ HB_FUNC( GETMACADDRESS )
    hb_retc( GetMacAddress( szBuffer ) );
 }
 
-static HMODULE hLib;
-
-typedef BOOL (WINAPI *ATLAXWININIT)(void);
-typedef BOOL (WINAPI *ATLAXWINTERM)(void);
-typedef HRESULT (WINAPI *ATLAXGETCONTROL)(HWND, IUnknown**);
-typedef HRESULT (WINAPI *ATLAXCREATECONTROL)(LPCOLESTR, HWND, IStream*, IUnknown**);
-typedef HRESULT (WINAPI *ATLAXCREATECONTROLLIC)(LPCOLESTR, HWND, IStream*, IUnknown**, BSTR);
-typedef HRESULT (WINAPI *ATLAXGETHOST)(HWND, IUnknown**);
-
 HB_FUNC( __ATLAXCREATECONTROL )
 {
    IStream  *pStr = NULL;
@@ -1760,11 +1778,44 @@ HB_FUNC( __AXGETUNKNOWN )
 
 //------------------------------------------------------------------------------------------------------------------------------------
 
+BOOL AxTranslateMessageEx( MSG *pMsg )
+{
+   BOOL bRet = FALSE;
+   HWND hWnd = pMsg->hwnd;
+   LPUNKNOWN pUnk;
+
+   char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
+   GetClassName( hWnd, (LPSTR) cClass, MAX_PATH );
+
+   while( strcmp( cClass, "AtlAxWin" ) == 0 )
+   {
+      HWND hParent = GetParent( hWnd );
+      if( hParent == 0 )
+      {
+         break;
+      }
+      hWnd = hParent;
+      GetClassName( hWnd, (LPSTR) cClass, MAX_PATH );
+   }
+   hb_xfree( cClass );
+
+   pUnk = AxGetUnknown( hWnd );
+
+      IOleInPlaceActiveObject* pIOIPAO;
+      if( SUCCEEDED(pUnk->lpVtbl->QueryInterface( pUnk,&IID_IOleInPlaceActiveObject, (void**)&pIOIPAO ) ) )
+      {
+         HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
+         pIOIPAO->lpVtbl->Release( pIOIPAO );
+         bRet = ( S_OK == hr );
+      }
+   return bRet;
+}
+
 BOOL AxTranslateMessage( IUnknown *pUnk, MSG *pMsg )
 {
    BOOL bRet = FALSE;
    IOleInPlaceActiveObject *pIOIPAO = NULL;
-   if (SUCCEEDED( pUnk->lpVtbl->QueryInterface( pUnk, &IID_IOleInPlaceActiveObject, (void**) &pIOIPAO ) ) );
+   if( SUCCEEDED( pUnk->lpVtbl->QueryInterface( pUnk, &IID_IOleInPlaceActiveObject, (void**) &pIOIPAO ) ) )
    {
       HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
       pIOIPAO->lpVtbl->Release(pIOIPAO);
@@ -2197,17 +2248,10 @@ HB_FUNC( __AXRELEASEDISPATCH )
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+
 HB_FUNC( __LOADATLAX )
 {
-   ATLAXWININIT pAtlAxWinInit;
-
-   hLib = LoadLibrary( "atl.dll" );
-   pAtlAxWinInit = (ATLAXWININIT) GetProcAddress( hLib, "AtlAxWinInit" );
-
-   if ( pAtlAxWinInit )
-   {
-      pAtlAxWinInit();
-   }
+   LoadAtlAx();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -4849,21 +4893,19 @@ HB_FUNC( VXH_MAINLOOP )
    while( GetMessage( &Msg, NULL, 0, 0 ) )
    {
       BOOL bUnk = FALSE;
-
       if( Msg.message == WM_KEYDOWN )
       {
-         char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
-         GetClassName( Msg.hwnd, (LPSTR) cClass, MAX_PATH );
-
-         if( Msg.wParam == VK_RETURN || ( (Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE) && strcmp( cClass, "Internet Explorer_Server" ) == 0 ) )
+         if( Msg.wParam == VK_RETURN || Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE )
          {
-            IUnknown* pUnk = AxGetUnknown( Msg.hwnd );
-            if( pUnk )
+            char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
+            GetClassName( Msg.hwnd, (LPSTR) cClass, MAX_PATH );
+
+            if( strcmp( cClass, "Internet Explorer_Server" ) == 0 )
             {
-               bUnk = AxTranslateMessage( pUnk, &Msg );
+               bUnk = AxTranslateMessageEx( &Msg );
             }
+            hb_xfree( cClass );
          }
-         hb_xfree( cClass );
       }
       if( ! bUnk )
       {
