@@ -141,14 +141,13 @@ METHOD OnSize( nwParam, nlParam ) CLASS ObjManager
    Super:OnSize( nwParam, nlParam )
    ::Columns[1][1] := Int(::ClientWidth/2)-11
    ::Columns[2][1] := Int(::ClientWidth/2)-7
-   ::InvalidateRect(,.f.)
+   //::InvalidateRect(,.f.)
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnEraseBkGnd( hDC ) CLASS ObjManager
    LOCAL nTop, rc, hItem := ::GetLastVisibleItem()
-   nTop := ::GetExpandedCount() * ::GetItemHeight()
    nTop := 0
    IF !EMPTY( hItem )
       rc := ::GetItemRect( hItem )
@@ -157,7 +156,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS ObjManager
          RETURN 1
       ENDIF
    ENDIF
-   _FillRect( hDC, {0,nTop,::Width, ::Height}, ::Parent:BkBrush )//::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
+   _FillRect( hDC, {0,nTop,::Width, ::Height}, ::Parent:BkBrush )
 RETURN 1
 
 //---------------------------------------------------------------------------------------------------

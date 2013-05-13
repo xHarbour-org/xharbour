@@ -60,6 +60,9 @@ RETURN Self
 
 METHOD Create() CLASS RichTextBox
    LOCAL es := (struct EDITSTREAM)
+
+   ::System:LoadRichEd()
+
    ::Super:Create()
    IF !::xClientEdge
       ::ClientEdge := .F.

@@ -1778,39 +1778,6 @@ HB_FUNC( __AXGETUNKNOWN )
 
 //------------------------------------------------------------------------------------------------------------------------------------
 
-BOOL AxTranslateMessageEx( MSG *pMsg )
-{
-   BOOL bRet = FALSE;
-   HWND hWnd = pMsg->hwnd;
-   LPUNKNOWN pUnk;
-
-   char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
-   GetClassName( hWnd, (LPSTR) cClass, MAX_PATH );
-
-   while( strcmp( cClass, "AtlAxWin" ) == 0 )
-   {
-      HWND hParent = GetParent( hWnd );
-      if( hParent == 0 )
-      {
-         break;
-      }
-      hWnd = hParent;
-      GetClassName( hWnd, (LPSTR) cClass, MAX_PATH );
-   }
-   hb_xfree( cClass );
-
-   pUnk = AxGetUnknown( hWnd );
-
-      IOleInPlaceActiveObject* pIOIPAO;
-      if( SUCCEEDED(pUnk->lpVtbl->QueryInterface( pUnk,&IID_IOleInPlaceActiveObject, (void**)&pIOIPAO ) ) )
-      {
-         HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
-         pIOIPAO->lpVtbl->Release( pIOIPAO );
-         bRet = ( S_OK == hr );
-      }
-   return bRet;
-}
-
 BOOL AxTranslateMessage( IUnknown *pUnk, MSG *pMsg )
 {
    BOOL bRet = FALSE;
@@ -4028,24 +3995,6 @@ HB_FUNC( __DOEVENTS )
    while( sts );
 }
 
-HB_FUNC( __MAINLOOP )
-{
-   BOOL bRet;
-   MSG msg;
-
-   while( (bRet = GetMessage( &msg, (HWND) NULL, 0, 0 )) != 0)
-   {
-       if (bRet != -1)
-       {
-           if( !IsDialogMessage( GetActiveWindow(), &msg ) )
-           {
-              TranslateMessage(&msg);
-              DispatchMessage(&msg);
-           }
-       }
-   }
-}
-
 HB_FUNC( EDITGETSEL )
 {
    HRESULT lResult;
@@ -4887,30 +4836,110 @@ HB_FUNC( TASKBARPROGRESSSTATE )
    hb_retl( bRet );
 }
 
-HB_FUNC( VXH_MAINLOOP )
+//-----------------------------------------------------------------------------------------------------------------------------------------
+BOOL AxTranslateMessageEx( MSG *pMsg )
 {
-   MSG Msg;
-   while( GetMessage( &Msg, NULL, 0, 0 ) )
+   BOOL bRet = FALSE;
+   if( pMsg->message == WM_KEYDOWN )
    {
-      BOOL bUnk = FALSE;
-      if( Msg.message == WM_KEYDOWN )
+      if( pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE )
       {
-         if( Msg.wParam == VK_RETURN || Msg.wParam == VK_TAB || Msg.wParam == VK_DELETE )
+         HWND hWnd = pMsg->hwnd;
+         LPUNKNOWN pUnk = (LPUNKNOWN) GetWindowLong( hWnd, GWL_USERDATA );
+         if( pUnk )
          {
-            char *cClass = (char*) hb_xgrab( MAX_PATH+1 );
-            GetClassName( Msg.hwnd, (LPSTR) cClass, MAX_PATH );
-
-            if( strcmp( cClass, "Internet Explorer_Server" ) == 0 )
+            IOleInPlaceActiveObject* pIOIPAO;
+            if( SUCCEEDED(pUnk->lpVtbl->QueryInterface( pUnk,&IID_IOleInPlaceActiveObject, (void**)&pIOIPAO ) ) )
             {
-               bUnk = AxTranslateMessageEx( &Msg );
+               HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
+               pIOIPAO->lpVtbl->Release( pIOIPAO );
+               bRet = ( S_OK == hr );
             }
-            hb_xfree( cClass );
          }
       }
-      if( ! bUnk )
+   }
+   return bRet;
+}
+
+BOOL TranslateVXHAccel( PHB_ITEM aAccel, MSG msg, BOOL bAccEnabled )
+{
+   BOOL bRet = FALSE;
+   if( msg.message == WM_KEYDOWN && bAccEnabled )
+   {
+      int i;
+      int iCount = aAccel->item.asArray.value->ulLen;
+      HWND hActive = GetActiveWindow();
+      HWND hPrev;
+
+      for ( i = 0; i < iCount; i++ )
       {
-         TranslateMessage( &Msg );
-         DispatchMessage( &Msg );
+         PHB_ITEM pItem = hb_itemArrayGet( aAccel, i+1 );
+         HWND hWnd = (HWND) hb_arrayGetNL( pItem, 1 );
+         HACCEL hAccel = (HACCEL) hb_arrayGetNL( pItem, 2 );
+         hb_itemRelease( pItem );
+
+         if( hWnd != 0 && hAccel != 0 )
+         {
+            hPrev = hActive;
+            if( ! hWnd == hActive )
+            {
+               while( hActive != 0 && ( ! IsChild( hWnd, hActive ) ) )
+               {
+                  hActive = GetParent( hActive );
+               }
+            }
+            if( hWnd == hPrev || IsChild( hWnd, hActive ) )
+            {
+               if( TranslateAccelerator( hWnd, hAccel, &msg ) )
+               {
+                  bRet = TRUE;
+                  break;
+               }
+            }
+            hActive = hPrev;
+         }
+      }
+   }
+   return bRet;
+}
+
+HB_FUNC( __VXHYIELD )
+{
+   MSG msg;
+   if( PeekMessage(&msg, (HWND) NULL, 0, 0, PM_REMOVE ) )
+   {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+   }
+}
+
+HB_FUNC( VXH_MAINLOOP )
+{
+   MSG msg;
+   BOOL bRet;
+   HWND hMain = (HWND) hb_parnl(1);
+   HWND hMDI  = (HWND) hb_parnl(2);
+   PHB_ITEM aAccel = (PHB_ITEM) hb_param( 3, HB_IT_ARRAY );
+   BOOL bAccEnabled = (BOOL) hb_parl(4);
+
+   while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0)
+   {
+      if (bRet != -1)
+      {
+         if( ! AxTranslateMessageEx( &msg ) )
+         {
+            if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
+            {
+               if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
+               {
+                  if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
+                  {
+                     TranslateMessage( &msg );
+                     DispatchMessage( &msg );
+                  }
+               }
+            }
+         }
       }
    }
 }

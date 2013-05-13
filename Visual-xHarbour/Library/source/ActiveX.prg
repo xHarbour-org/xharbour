@@ -220,6 +220,8 @@ METHOD Create() CLASS ActiveX
    ::TitleControl:Create()
 
    ::__IUnknown := __AxGetUnknown( ::hWnd )
+   SetWindowLong( ::hWnd, GWL_USERDATA, ::__IUnknown )
+
    ::hObj       := __AxGetDispatch( ::__IUnknown, ::hWnd, ::OleVerb )
 
    ::cClassName := ::ClsID
@@ -263,6 +265,7 @@ METHOD Create() CLASS ActiveX
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
+   SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
    ::TitleControl:OnDestroy()
  
    IF ::oServer != NIL
@@ -283,7 +286,6 @@ METHOD Destroy() CLASS ActiveX
    DEFAULT nRet TO ::OnNcDestroy()
 
    __AxReleaseDispatch( ::hObj )
-//   __AxReleaseUnknown( ::__IUnknown )
 
 RETURN Self
 

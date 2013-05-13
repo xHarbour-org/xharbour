@@ -27,6 +27,7 @@ static __hErrorFontBold
 static __aParams
 static __cGpfError
 static __nGpfHeight
+
 static nButWidth
 
 #ifdef VXH_ENTERPRISE
@@ -315,7 +316,6 @@ CLASS Application
    ACCESS AppIniFile                   INLINE ::IniFile
    
    DATA Params                         EXPORTED
-   DATA hRich20                        PROTECTED
    DATA IdeActive                      EXPORTED  INIT .F.
    DATA Running                        EXPORTED
    DATA ClsName                        EXPORTED  INIT "Application"
@@ -400,16 +400,15 @@ CLASS Application
    METHOD AddAccelerators()
    METHOD DelAccelerators()
    METHOD Exit()
-   METHOD Yield()
+
+   METHOD Yield()                      INLINE __VxhYield()
    METHOD DoEvents()                   INLINE __DoEvents()
+
    METHOD OnExit()                     VIRTUAL
    METHOD LoadIcon( cIcon )            INLINE LoadIcon( ::Instance, cIcon )
    METHOD RestorePrevInstance(nNotify) INLINE SendMessage( HWND_BROADCAST, ::__InstMsg, nNotify, 0 )
-   //----------------------------------------------------------------------------------------------------
    METHOD IsThemeActive()              INLINE IsThemeActive()
-   METHOD TranslateAccelerator()
    METHOD Set( nIndex, lSet )          INLINE IIF( ::__ClassInst == NIL, IIF( nIndex == -1, __SetCentury(lSet), Set( nIndex, lSet ) ), )
-   METHOD AxTranslate()
    METHOD MessageBox()
    METHOD HasMessage( cMsg )           INLINE __ObjHasMsg( Self, cMsg )
 
@@ -495,8 +494,6 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
          CloseHandle( hPrevInstance )
       ENDIF
       
-      ::hRich20   := LoadLibrary( "riched20.dll" )
-
       Set( _SET_INSERT, .T. )
 
       ::IniFile          := IniFile( ::Path + "\" + ::Name + ".ini" )
@@ -558,13 +555,9 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Quit() CLASS Application
-   FreeLibrary( ::hRich20 )
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
-      #ifdef VXH_PROFESSIONAL
-         FreeExplorerBarInfo()
-      #endif
       AEVAL( ::ImageLists, {|o|o:Destroy()} )
       IF ::__hMenuHook != NIL
          UnhookWindowsHookEx( ::__hMenuHook )
@@ -583,16 +576,13 @@ METHOD Exit() CLASS Application
          ::MainForm:Close()
        ELSE
          ::MainForm:Destroy()
+         RETURN NIL
       ENDIF
    ENDIF
    ::MainForm := NIL
-   FreeLibrary( ::hRich20 )
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
-      #ifdef VXH_PROFESSIONAL
-         FreeExplorerBarInfo()
-      #endif
       AEVAL( ::ImageLists, {|o|o:Destroy()} )
       ::OnExit()
       IF ::__hMenuHook != NIL
@@ -605,102 +595,27 @@ METHOD Exit() CLASS Application
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
-METHOD AxTranslate( pMsg, cClass ) CLASS Application
-   LOCAL hParent, pUnk, lRet := .F., hWnd := pMsg:hwnd
-
-   IF .F. //pMsg:message == WM_KEYDOWN
-
-      DEFAULT cClass TO GetClassName( hWnd )
-
-      IF pMsg:wParam == VK_RETURN .OR. ( (pMsg:wParam == VK_TAB .OR. pMsg:wParam == VK_DELETE) .AND. cClass == "Internet Explorer_Server" )
-
-         WHILE GetClassName( hWnd ) != "AtlAxWin"
-            hParent := GetParent( hWnd )
-            IF hParent == 0
-               EXIT
-            ENDIF
-            hWnd := hParent
-         ENDDO
-
-         IF ( pUnk := __AXGETUNKNOWN( hWnd ) ) != 0
-            lRet := __AxTranslateMessage( pUnk, pMsg:Value )
-            IF !lRet .AND. cClass != "Edit"
-               TranslateMessage( pMsg )
-               pMsg:message := WM_NULL
-               DispatchMessage( pMsg )
-               lRet := .T.
-            ENDIF
-         ENDIF
-      ENDIF
-
-   ENDIF
-RETURN lRet
-
-//------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
-   LOCAL msg, cClass
-
    IF oWnd != NIL
       ::MainForm := oWnd
    ENDIF
    ::MainForm:__InstMsg := ::__InstMsg
    
-   IF !::MainForm:Modal
-//      VXH_MainLoop()
- 
-      DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
-         cClass := NIL
-         IF !::AxTranslate( Msg, @cClass )
-            IF !::TranslateAccelerator( Msg )
-               IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
-                  DEFAULT cClass TO GetClassName( Msg:hWnd )
-                  IF ! (cClass == "AfxFrameOrView42s") 
-                     IF !IsDialogMessage( GetActiveWindow(), Msg )
-                        TranslateMessage( Msg )
-                        DispatchMessage( Msg )
-                     ENDIF
-                  ENDIF
-               ENDIF
-            ENDIF
-         ENDIF
-      ENDDO
+   IF ! ::MainForm:Modal
+      VXH_MainLoop( ::MainForm:hWnd, IIF( ::MDIClient == NIL, 0, ::MDIClient ), ::__Accelerators, ::AccelEnabled )
 
-   ENDIF
+      ::OnExit()
 
-   #ifdef VXH_PROFESSIONAL
-      FreeExplorerBarInfo()
-   #endif
-
-   FreeLibrary( ::hRich20 )
-   ::OnExit()
-   
-   IF ::__hMenuHook != NIL
-      UnhookWindowsHookEx( ::__hMenuHook )
-   ENDIF
-   IF ::__SocketInit
-      InetCleanUp()
-   ENDIF
-   ::MainForm := NIL
-   AEVAL( ::ImageLists, {|o|o:Destroy()} )
-RETURN 0
-
-//------------------------------------------------------------------------------------------------
-
-METHOD Yield() CLASS Application
-   LOCAL msg
-   IF PeekMessage( @Msg, NIL, 0, 0, PM_REMOVE)
-      IF !::AxTranslate( Msg )
-         IF !::TranslateAccelerator( Msg )
-            IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
-               IF !IsDialogMessage( GetActiveWindow(), Msg )
-                  TranslateMessage( Msg )
-                  DispatchMessage( Msg )
-               ENDIF
-            ENDIF
-         ENDIF
+      IF ::__hMenuHook != NIL
+         UnhookWindowsHookEx( ::__hMenuHook )
       ENDIF
+      IF ::__SocketInit
+         InetCleanUp()
+      ENDIF
+      ::MainForm := NIL
+      AEVAL( ::ImageLists, {|o|o:Destroy()} )
    ENDIF
-RETURN NIL
+RETURN 0
 
 //------------------------------------------------------------------------------------------------
 
@@ -781,28 +696,6 @@ METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
    ENDIF
 RETURN NIL
    
-
-//------------------------------------------------------------------------------------------------
-
-METHOD TranslateAccelerator( Msg ) CLASS Application
-   LOCAL lRet := .F., n, hWnd
-   IF Msg:message == WM_KEYDOWN .AND. ::AccelEnabled
-      FOR n := 1 TO LEN( ::__Accelerators )
-          IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
-             hWnd := GetActiveWindow()
-             WHILE hWnd != 0 .AND. ! IsChild( ::__Accelerators[n][1], hWnd )
-                hWnd := GetParent( hWnd )
-             ENDDO
-             IF IsChild( ::__Accelerators[n][1], hWnd ) .OR. ::__Accelerators[n][1] == GetActiveWindow()
-                IF !TranslateAccelerator( ::__Accelerators[n][1], ::__Accelerators[n][2], Msg ) == 0
-                   lRet := .T.
-                   EXIT
-                ENDIF
-             ENDIF
-          ENDIF
-      NEXT
-   ENDIF
-RETURN lRet
 
 #define BTTNGAP 3
 

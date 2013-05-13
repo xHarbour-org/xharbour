@@ -250,8 +250,6 @@ CLASS Expando INHERIT Button
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
-   DATA Text                  EXPORTED INIT ""
-
    DATA Special               PUBLISHED INIT .F.
 
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )

@@ -39,6 +39,12 @@ EXIT PROCEDURE __SystemCleanup
    DeleteObject( oSystem:FocusPen )
    DeleteObject( oSystem:TitleBackBrush )
    DeleteObject( oSystem:TitleBorderPen )
+   #ifdef VXH_PROFESSIONAL
+      FreeExplorerBarInfo()
+   #endif
+   IF oSystem:hRich20 != NIL
+      FreeLibrary( oSystem:hRich20 )
+   ENDIF
 RETURN
 
 FUNCTION __GetSystem(); RETURN oSystem
@@ -78,13 +84,17 @@ CLASS System
    DATA TitleBackBrush         EXPORTED
    DATA TitleBorderPen         EXPORTED
 
+   DATA hRich20                EXPORTED
+
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
    ACCESS LastError     INLINE STRTRAN( FormatMessage( , , GetLastError() ), CRLF )
    
    METHOD Init() CONSTRUCTOR
    METHOD Update()
-   
+
+   METHOD LoadRichEd()         INLINE IIF( ::hRich20 == NIL, ::hRich20 := LoadLibrary( "riched20.dll" ),)
+
    METHOD GetPathFromFolder()
    METHOD GetLocalTime()
    METHOD GetRunningProcs()
@@ -698,6 +708,8 @@ METHOD Init() CLASS System
    ::ImageList[ "StdSmall" ]:xName := "::System:ImageList:StdSmall"
 
    ::ExplorerBar := (struct EXPBARINFO)
+
+   GetExplorerBarInfo()
    cBuffer := ::ExplorerBar:Value()
    ExplorerBarInfo( @cBuffer )
    ::ExplorerBar:Buffer( cBuffer )
