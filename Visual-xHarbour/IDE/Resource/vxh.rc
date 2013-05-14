@@ -13,13 +13,13 @@ FILESUBTYPE       0
       BLOCK "040904E4"
       {
          VALUE "CompanyName",      "xHarbour.com, Inc"
-         VALUE "FileDescription",  "Integrated development environment"
-         VALUE "FileVersion",      "4.0"
+         VALUE "FileDescription",  "Visual xHarbour"
+         VALUE "FileVersion",      "5.3"
          VALUE "InternalName",     "vxh"
-         VALUE "LegalCopyright",   "2012 xHarbour.com, Inc"
+         VALUE "LegalCopyright",   "2013 xHarbour.com, Inc"
          VALUE "OriginalFilename", "vxh.exe"
          VALUE "ProductName",      "Visual xHarbour"
-         VALUE "ProductVersion",   "4.0"
+         VALUE "ProductVersion",   "5.0"
       }
    }
    BLOCK "VarFileInfo"
