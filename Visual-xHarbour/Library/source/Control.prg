@@ -347,6 +347,8 @@ CLASS TitleControl INHERIT Control
    DATA AllowClose           PUBLISHED INIT FALSE
    DATA MenuArrow            PUBLISHED INIT .F.
 
+   DATA __lActive            EXPORTED  INIT .F.
+
    DATA __aCaptionRect       PROTECTED
    DATA __lPinPushed         PROTECTED INIT .F.
    DATA __lPinHover          PROTECTED INIT .F.
@@ -371,12 +373,19 @@ CLASS TitleControl INHERIT Control
    METHOD Redock()
    METHOD DrawClose()
    METHOD DrawPin()
+   METHOD SetActive( l ) INLINE IIF( ::__lActive != l, ( ::__lActive := l, ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), ::UpdateWindow() ), )
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
                               ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),;
                               ::UpdateWindow()
 ENDCLASS
 
 METHOD Create() CLASS TitleControl
+
+   DEFAULT ::Application:TitleBackColorInactive  TO ::Application:TitleBackSysColorInactive
+   DEFAULT ::Application:TitleBackColorActive    TO ::Application:TitleBackSysColorActive
+
+   DEFAULT ::Application:hTitleBackBrushInactive TO CreateSolidBrush( ::Application:TitleBackColorInactive )
+   DEFAULT ::Application:hTitleBackBrushActive   TO CreateSolidBrush( ::Application:TitleBackColorActive )
    ::Super:Create()
    IF ::__nCaptionHeight == 0 .AND. ! EMPTY( ::xText ) .AND. ::xTitleHeight > 0
       ::ResetFrame()
@@ -427,13 +436,13 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
       hOldPen   := SelectObject( hDC, ::System:TitleBorderPen )
-      hOldBrush := SelectObject( hDC, ::System:TitleBackBrush )
+      hOldBrush := SelectObject( hDC, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )
       
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
       SelectObject( hDC, hOldBrush )
       SelectObject( hDC, hOldPen )
       
-      SetTextColor( hDC, ::System:Color:White )
+      SetTextColor( hDC, IIF( ! ::__lActive, ::System:Color:White, ::System:Color:Black ) )
 
       hOldFont := SelectObject( hDC, ::Font:handle )
       SetBkMode( hDC, TRANSPARENT )
@@ -777,8 +786,8 @@ METHOD DrawClose( hDC ) CLASS TitleControl
       SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      _FillRect( hDC, aRect, ::System:TitleBackBrush )
-      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
+      _FillRect( hDC, aRect, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )
+      SelectObject( hDC, GetStockObject( IIF( ! ::__lActive, WHITE_PEN, BLACK_PEN ) ) )
    ENDIF
    
    aRect[1]+=4
@@ -813,9 +822,9 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
       SelectObject( hDC, IIF( ! ::__lPinPushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
-      SelectObject( hDC, ::System:TitleBackBrush )
-      _FillRect( hDC, aRect, ::System:TitleBackBrush )
-      SelectObject( hDC, GetStockObject( WHITE_PEN ) )
+      SelectObject( hDC, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )
+      _FillRect( hDC, aRect, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )
+      SelectObject( hDC, GetStockObject( IIF( ! ::__lActive, WHITE_PEN, BLACK_PEN ) ) )
    ENDIF
 
    aRect[1] += 4

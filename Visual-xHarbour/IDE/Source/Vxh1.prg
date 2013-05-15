@@ -33,7 +33,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 
 #define VXH_Version      "5"
-#define VXH_BuildVersion "5.2.0"
+#define VXH_BuildVersion "5.3.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -3725,6 +3725,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       SWITCH nRes
          CASE IDYES
               ::Save(.T.)
+              ::Application:DoEvents()
               EXIT
 
          CASE IDCANCEL

@@ -50,41 +50,43 @@ RETURN
 FUNCTION __GetSystem(); RETURN oSystem
 
 CLASS System
-   DATA OsVersion              EXPORTED
-   DATA StdIcons               EXPORTED
-   DATA ListBox                EXPORTED
-   DATA Cursor                 EXPORTED
-   DATA ImageList              EXPORTED
-   DATA ExplorerBar            EXPORTED
-   DATA DateTimeFormat         EXPORTED
-   DATA TextAlignment          EXPORTED
-   DATA ListViewGroupAlign     EXPORTED
-   DATA DropDownStyle          EXPORTED
-   DATA DataDrivers            EXPORTED
-   DATA AdsDataDrivers         EXPORTED
-   DATA Folders                EXPORTED
-   DATA OleVerb                EXPORTED
-   DATA Color                  EXPORTED
-   DATA Colors                 EXPORTED
-   DATA SockProtocol           EXPORTED
-   DATA HandShake              EXPORTED
-   DATA Parity                 EXPORTED
-   DATA StopBits               EXPORTED
-   DATA ProfessionalColorTable EXPORTED
-   DATA KeyboardList           EXPORTED
-   DATA WindowAnimation        EXPORTED
-   DATA FreeImageFormats       EXPORTED
-   DATA __ToolStripFlags       EXPORTED
-   DATA CurrentScheme          EXPORTED
-   DATA Time                   EXPORTED
-   DATA xLocalTime             PROTECTED
-   DATA PageSetup              EXPORTED
-   DATA PaperSize              EXPORTED
-   DATA FocusPen               EXPORTED
-   DATA TitleBackBrush         EXPORTED
-   DATA TitleBorderPen         EXPORTED
+   DATA OsVersion               EXPORTED
+   DATA StdIcons                EXPORTED
+   DATA ListBox                 EXPORTED
+   DATA Cursor                  EXPORTED
+   DATA ImageList               EXPORTED
+   DATA ExplorerBar             EXPORTED
+   DATA DateTimeFormat          EXPORTED
+   DATA TextAlignment           EXPORTED
+   DATA ListViewGroupAlign      EXPORTED
+   DATA DropDownStyle           EXPORTED
+   DATA DataDrivers             EXPORTED
+   DATA AdsDataDrivers          EXPORTED
+   DATA Folders                 EXPORTED
+   DATA OleVerb                 EXPORTED
+   DATA Color                   EXPORTED
+   DATA Colors                  EXPORTED
+   DATA SockProtocol            EXPORTED
+   DATA HandShake               EXPORTED
+   DATA Parity                  EXPORTED
+   DATA StopBits                EXPORTED
+   DATA ProfessionalColorTable  EXPORTED
+   DATA KeyboardList            EXPORTED
+   DATA WindowAnimation         EXPORTED
+   DATA FreeImageFormats        EXPORTED
+   DATA __ToolStripFlags        EXPORTED
+   DATA CurrentScheme           EXPORTED
+   DATA Time                    EXPORTED
+   DATA xLocalTime              PROTECTED
+   DATA PageSetup               EXPORTED
+   DATA PaperSize               EXPORTED
+   DATA FocusPen                EXPORTED
+   
+   DATA TitleBackBrush          EXPORTED
+   
+   DATA TitleBorderPen          EXPORTED
 
-   DATA hRich20                EXPORTED
+   DATA hRich20                 EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders

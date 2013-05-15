@@ -3759,6 +3759,8 @@ __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "TopMost",                 "Style" },;
                    { "Text",                    "Appearance" },;
                    { "Title",                   "" },;
+                   { "TitleBackColorActive",    "Colors" },;
+                   { "TitleBackColorInactive",  "Colors" },;
                    { "TopMargin",               "" },;
                    { "TextBody",                "" },;
                    { "TargetName",              "Build" },;

@@ -85,6 +85,10 @@ RETURN
 
 EXIT PROCEDURE __CleanUp
    SetUnhandledExceptionFilter( NIL )
+   IF Application:hTitleBackBrushInactive != NIL
+      DeleteObject( Application:hTitleBackBrushInactive )
+      DeleteObject( Application:hTitleBackBrushActive )
+   ENDIF
    EndUxTheme()
    OleUninitialize()
    Application := NIL
@@ -229,7 +233,17 @@ CLASS Application
    DATA Description   PUBLISHED INIT ""
 
    DATA Resources     PUBLISHED INIT {}
+
+   DATA TitleBackSysColorActive   EXPORTED INIT RGB( 255, 230, 151 )
+   DATA TitleBackSysColorInactive EXPORTED INIT RGB(  69,  89, 124 )
+
+   DATA hTitleBackBrushActive   EXPORTED
+   DATA hTitleBackBrushInactive EXPORTED
+
+   DATA TitleBackColorActive   PUBLISHED INIT RGB( 255, 230, 151 )
+   DATA TitleBackColorInactive PUBLISHED INIT RGB(  69,  89, 124 )
    
+
    PROPERTY SetCentury         INDEX -1                   READ xSetCentury         WRITE Set PROTECTED DEFAULT .F.
    PROPERTY SetDeleted         INDEX _SET_DELETED         READ xSetDeleted         WRITE Set PROTECTED DEFAULT SET( _SET_DELETED         )
    PROPERTY SetDefault         INDEX _SET_DEFAULT         READ xSetDefault         WRITE Set PROTECTED DEFAULT SET( _SET_DEFAULT         )
@@ -394,7 +408,8 @@ CLASS Application
    
    ACCESS aPath INLINE ::Path
    METHOD Init() CONSTRUCTOR
-   METHOD Create() INLINE NIL
+   METHOD Create()                     VIRTUAL
+   
    METHOD Run()
    METHOD Close()                      INLINE PostQuitMessage(0)
    METHOD AddAccelerators()
@@ -600,7 +615,7 @@ METHOD Run( oWnd ) CLASS Application
       ::MainForm := oWnd
    ENDIF
    ::MainForm:__InstMsg := ::__InstMsg
-   
+
    IF ! ::MainForm:Modal
       VXH_MainLoop( ::MainForm:hWnd, IIF( ::MDIClient == NIL, 0, ::MDIClient ), ::__Accelerators, ::AccelEnabled )
 

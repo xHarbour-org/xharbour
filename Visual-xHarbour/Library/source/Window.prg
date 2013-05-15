@@ -2533,6 +2533,15 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ::Parent:oLastFocus := Self
                  ::Parent:SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
               ENDIF
+              IF .F. //::Parent != NIL
+                 oCtrl := Self
+                 WHILE oCtrl != NIL
+                    IF __objHasMsg( oCtrl, "SetActive" )
+                       oCtrl:SetActive(.F.)
+                    ENDIF
+                    oCtrl := oCtrl:Parent
+                 ENDDO
+              ENDIF
               EXIT
 
          CASE WM_SETFOCUS
@@ -2582,6 +2591,16 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  aRect[3] += 3 + ::Parent:HorzScrollPos
                  aRect[4] += 3 + ::Parent:VertScrollPos
                  _InvalidateRect( ::Parent:hWnd, aRect )
+              ENDIF
+              
+              IF .F. //::Parent != NIL
+                 oCtrl := Self
+                 WHILE oCtrl != NIL
+                    IF __objHasMsg( oCtrl, "SetActive" )
+                       oCtrl:SetActive(.T.)
+                    ENDIF
+                    oCtrl := oCtrl:Parent
+                 ENDDO
               ENDIF
               EXIT
 
