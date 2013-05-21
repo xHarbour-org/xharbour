@@ -101,6 +101,7 @@ CLASS System
    METHOD GetLocalTime()
    METHOD GetRunningProcs()
    METHOD IsProcRunning()
+   METHOD GetProcMemory()
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
    ACCESS Services             INLINE __ENUMSERVICES()
    METHOD GetFocus()           INLINE ObjFromHandle( GetFocus() )
@@ -737,6 +738,21 @@ METHOD GetRunningProcs() CLASS System
       NEXT
    CATCH
    END
+RETURN aProcess
+
+METHOD GetProcMemory( cProcName ) CLASS System
+   LOCAL oLocator, oProcess, aProcessList, oWMIService, aProcess := {}
+   TRY
+      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
+    CATCH
+      oLocator := CreateObject("WbemScripting.SWbemLocator") 
+   END
+   oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
+   aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
+      
+   FOR EACH oProcess IN aProcessList
+       view oProcess:Capacity / 1024000
+   NEXT
 RETURN aProcess
 
 METHOD IsProcRunning( cProcName, lTerminate ) CLASS System

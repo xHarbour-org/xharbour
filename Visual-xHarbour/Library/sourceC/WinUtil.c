@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <olectl.h>
 #include <pshpack8.h>
+#include <Psapi.h>
 //#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
@@ -4944,3 +4945,12 @@ HB_FUNC( VXH_MAINLOOP )
    }
 }
 
+HB_FUNC( GETPROCESSMEMORYINFO )
+{
+   PPROCESS_MEMORY_COUNTERS ppsmemCounters;
+   DWORD cb = sizeof(PROCESS_MEMORY_COUNTERS);
+   ppsmemCounters->cb = cb;
+   
+   GetProcessMemoryInfo( (HANDLE) hb_parnl(1), ppsmemCounters, cb );
+   hb_retnl( (long) ppsmemCounters->WorkingSetSize );
+}

@@ -278,8 +278,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabControl
-   ::Enabled := ::ShowTabs
-
    IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
       ::Style := ::Style & NOT( TCS_OWNERDRAWFIXED )
    ENDIF

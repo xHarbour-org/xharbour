@@ -31,11 +31,14 @@ CLASS Label INHERIT Control
    PROPERTY Noprefix     INDEX SS_NOPREFIX    READ xNoprefix   WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F. PROTECTED
 
+   PROPERTY SunkenText   INDEX SS_OWNERDRAW   READ xSunkenText WRITE SetStyle  DEFAULT .F. PROTECTED
+
    METHOD Init()  CONSTRUCTOR
    METHOD OnCtlColorStatic()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
    METHOD Create()     INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
+   METHOD OnParentDrawItem()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -84,6 +87,9 @@ METHOD Init( oParent ) CLASS Label
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Label
+   ( nwParam, nlParam, dis )
+RETURN Self
 
 METHOD OnCtlColorStatic( nwParam ) CLASS Label
    LOCAL hBkGnd := ::GetBkBrush()
