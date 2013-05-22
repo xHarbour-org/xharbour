@@ -699,9 +699,13 @@ METHOD OnNCPaint() CLASS EditBox
             aRect := { ::__aImagePos[1], 1, ::__aImagePos[1] + ::__aImagePos[2], ::Height-1 }
             hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
             hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
-            nTop  := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
+            IF ::Parent:ImageList != NIL
+               nTop  := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
+            ENDIF
             _FillRect( hDC, aRect, hBrush )
-            ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, ::__aImagePos[1], nTop )
+            IF ::Parent:ImageList != NIL
+               ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, ::__aImagePos[1], nTop )
+            ENDIF
             ReleaseDC(::hWnd, hdc)
             DeleteObject( hRegion )
          ENDIF
