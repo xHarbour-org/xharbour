@@ -544,7 +544,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
       CASE hdr:code == SCN_MODIFIED
            scn := (struct SCNOTIFICATION*) nlParam
            IF ( scn:modificationType & SC_MOD_CHANGEFOLD ) == 0
-              VIEW ::Source:FirstOpen
               IF ! ::Source:FirstOpen
                  IF ! ::Source:Modified
                     ::Source:Modified := .T.
@@ -556,14 +555,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                           ::Source:TreeItem:Text := cText + " *"
                        ENDIF
                     ENDIF
-                    //cText := ::Application:SourceTabs:GetItemText(n)
-                    //::Application:SourceTabs:SetItemText( n, " " + cText + " * ", .T. )
-
-                    //cText := ::Application:SourceSelect:GetString(n)
-                    //IF cText != NIL
-                    //   cText := ALLTRIM( STRTRAN( cText, "*" ) )
-                    //   ::Application:SourceSelect:SetItemText( n, cText + " *" )
-                    //ENDIF
                     IF ! ::Application:Project:Modified
                        ::Application:Project:Modified := .T.
                     ENDIF
@@ -593,9 +584,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               ENDIF
 
             ELSEIF scn:ch == 58
-              //IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
-                 //::SendMessage( SCI_AUTOCCANCEL )
-              //ENDIF
               nPosEnd   := ::Source:GetCurrentPos()-1
               nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
               cObj := ""
@@ -688,29 +676,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
                     NEXT
                     ::SendMessage( SCI_AUTOCSETCANCELATSTART, 0 )
-                    //::SendMessage( SCI_AUTOCSETAUTOHIDE, 0 )
                     ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
                     ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
                     ::SendMessage( SCI_AUTOCSHOW, 0, cList )
                  ENDIF
               ENDIF
-//             ELSE
-//               IF ::SendMessage( SCI_AUTOCACTIVE ) > 0
-//                  cFind := ""
-//                  nPosEnd   := ::Source:GetCurrentPos()-1
-//                  nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
-//                  FOR n := nPosEnd TO nPosStart STEP -1
-//                      nChar := ::Source:GetCharAt(n)
-//                      IF nChar IN {32,58}
-//                         EXIT
-//                      ENDIF
-//                      cFind := CHR(nChar) + cFind
-//                      IF ::Source:GetColumn(n)==0
-//                         EXIT
-//                      ENDIF
-//                  NEXT
-//                  SendEditorString( ::hWnd, SCI_AUTOCSELECT, 0, cFind )
-//               ENDIF
            ENDIF
    ENDCASE
 RETURN NIL
