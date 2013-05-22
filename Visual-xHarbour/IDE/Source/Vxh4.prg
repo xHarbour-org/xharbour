@@ -1052,7 +1052,7 @@ RETURN Self
 
 METHOD SetPropDesc( oItem ) CLASS ObjManager
    LOCAL cHelp
-   IF ::Form:HasProperty( "Label1" )
+   IF oItem != NIL .AND. __ObjHasMsg( oItem, "ColItems" ) .AND. ::Form:HasProperty( "Label1" )
       WITH OBJECT ::Form
          IF !EMPTY( oItem:ColItems )
             IF :Label1:Visible
