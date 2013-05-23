@@ -39,6 +39,7 @@ CLASS Label INHERIT Control
    METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
    METHOD Create()     INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
    METHOD OnParentDrawItem()
+   METHOD OnEraseBkGnd() INLINE 1
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -88,8 +89,27 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Label
-   ( nwParam, nlParam, dis )
-RETURN Self
+   LOCAL hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   ( nwParam, nlParam )
+   IF dis:CtlType == ODT_STATIC .AND. (dis:itemAction & ODA_DRAWENTIRE) == ODA_DRAWENTIRE
+      _FillRect( dis:hDC, aRect, hBkGnd  )
+      IF ::Sunken
+         __Draw3dRect( dis:hDC, aRect, GetSysColor(COLOR_3DLIGHT), GetSysColor(COLOR_3DDKSHADOW) )
+      ENDIF
+      SetBkMode( dis:hDC, TRANSPARENT )
+      
+      IF ::SunkenText
+         aRect[1] += 2
+         aRect[2] += 2
+         SetTextColor( dis:hDC, ::System:Color:White )
+         _DrawText( dis:hDC, ::xText, aRect, DT_LEFT )
+         aRect[1] -= 2
+         aRect[2] -= 2
+      ENDIF
+      SetTextColor( dis:hDC, ::ForeColor )
+      _DrawText( dis:hDC, ::xText, aRect, DT_LEFT  )
+   ENDIF
+RETURN NIL
 
 METHOD OnCtlColorStatic( nwParam ) CLASS Label
    LOCAL hBkGnd := ::GetBkBrush()

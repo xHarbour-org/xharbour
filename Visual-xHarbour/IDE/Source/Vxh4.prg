@@ -3713,6 +3713,7 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
                    { "SendPassword",            "" },;
                    { "Stretch",                 "Image" },;
                    { "SelOnlyRep",              "Behavior" },;
+                   { "SunkenText",              "Appearance" },;
                    { "ShowGrid",                "Appearance" },;
                    { "ShortCutText",            "Appearance" },;
                    { "Smooth",                  "Appearance" },;
