@@ -3795,6 +3795,7 @@ __aProps["U"] := { { "UpperCase",               "Style" },;
 __aProps["V"] := { { "Vertical",                "Style" },;
                    { "Visible",                 "Style" },;
                    { "VertPadding",             "Appearance" },;
+                   { "VertCenter",              "Appearance" },;
                    { "VertScrollSize",          "Behavior" },;
                    { "VertScroll",              "Behavior" },;
                    { "VisitedColor",            "Colors" },;

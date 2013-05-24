@@ -40,7 +40,7 @@
 #include <stdio.h>
 #include <olectl.h>
 #include <pshpack8.h>
-#include <Psapi.h>
+#include <psapi.h>
 //#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
@@ -4945,12 +4945,53 @@ HB_FUNC( VXH_MAINLOOP )
    }
 }
 
+#ifndef _PROCESS_MEMORY_COUNTERS_EX
+   typedef struct _PROCESS_MEMORY_COUNTERS_EX {
+     DWORD  cb;
+     DWORD  PageFaultCount;
+     SIZE_T PeakWorkingSetSize;
+     SIZE_T WorkingSetSize;
+     SIZE_T QuotaPeakPagedPoolUsage;
+     SIZE_T QuotaPagedPoolUsage;
+     SIZE_T QuotaPeakNonPagedPoolUsage;
+     SIZE_T QuotaNonPagedPoolUsage;
+     SIZE_T PagefileUsage;
+     SIZE_T PeakPagefileUsage;
+     SIZE_T PrivateUsage;
+   } PROCESS_MEMORY_COUNTERS_EX, *PPROCESS_MEMORY_COUNTERS_EX;
+#endif
+
 HB_FUNC( GETPROCESSMEMORYINFO )
 {
-   PPROCESS_MEMORY_COUNTERS ppsmemCounters;
-   DWORD cb = sizeof(PROCESS_MEMORY_COUNTERS);
-   ppsmemCounters->cb = cb;
-   
-   GetProcessMemoryInfo( (HANDLE) hb_parnl(1), ppsmemCounters, cb );
-   hb_retnl( (long) ppsmemCounters->WorkingSetSize );
+   DWORD processID;
+   HANDLE hProcess;
+   PROCESS_MEMORY_COUNTERS pmc;
+   HINSTANCE hProcHandle = GetModuleHandle( ISNIL(1)?NULL:hb_parc(1) );
+
+
+   hProcess = OpenProcess(  PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
+
+
+   GetProcessMemoryInfo( hProcHandle, &pmc, sizeof(pmc) );
+   hb_retnl( (long) pmc.WorkingSetSize );
+
+   CloseHandle( hProcess );
 }
+
+
+
+/*
+MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+
+Note: The name "TotalPageFile" is a bit misleading here. In reality this parameter gives the "Virtual Memory Size", which is size of swap file plus installed RAM.
+
+    Virtual Memory currently used:
+
+Same code as in "Total Virtual Memory" and then
+
+
+    DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile
+*/

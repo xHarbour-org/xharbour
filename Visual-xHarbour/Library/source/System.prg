@@ -723,49 +723,26 @@ METHOD Init() CLASS System
 RETURN Self
 
 METHOD GetRunningProcs() CLASS System
-   LOCAL oLocator, oProcess, aProcessList, oWMIService, aProcess := {}
-   TRY
-      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
-    CATCH
-      oLocator := CreateObject("WbemScripting.SWbemLocator") 
-   END
-   TRY
-      oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
-      aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process")
-      
-      FOR EACH oProcess IN aProcessList
-          AADD( aProcess, { oProcess:Name, oProcess:CommandLine, IIF( !EMPTY(oProcess:CreationDate), STOD( LEFT( oProcess:CreationDate, 8 ) ),"") } )
-      NEXT
-   CATCH
-   END
-RETURN aProcess
-
-METHOD GetProcMemory( cProcName ) CLASS System
-   LOCAL oLocator, oProcess, aProcessList, oWMIService, aProcess := {}
-   TRY
-      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
-    CATCH
-      oLocator := CreateObject("WbemScripting.SWbemLocator") 
-   END
-   oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
-   aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
-      
+   LOCAL aProcessList, oProcess, aProcess := {}
+   aProcessList := GetWin32Proc( "SELECT * FROM Win32_Process" )
    FOR EACH oProcess IN aProcessList
-       view oProcess:Capacity / 1024000
+       AADD( aProcess, { oProcess:Name, oProcess:CommandLine, IIF( !EMPTY(oProcess:CreationDate), STOD( LEFT( oProcess:CreationDate, 8 ) ),"") } )
    NEXT
 RETURN aProcess
 
+METHOD GetProcMemory( cProcName ) CLASS System
+   LOCAL nMemory := 0, oProcess, aProcessList, aProcess := {}
+   DEFAULT cProcName TO __GetApplication():FileName
+   aProcessList := GetWin32Proc("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
+   FOR EACH oProcess IN aProcessList
+       nMemory := Int( VAL(oProcess:WorkingSetSize) )//VirtualSize
+   NEXT
+RETURN nMemory
+
 METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
-   LOCAL oLocator, oProcess, aProcessList, oWMIService
+   LOCAL oProcess, aProcessList
    DEFAULT lTerminate TO .F.
-   TRY
-      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
-    CATCH
-      oLocator := CreateObject("WbemScripting.SWbemLocator") 
-   END
-   oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
-   aProcessList := oWMIService:ExecQuery("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
-      
+   aProcessList := GetWin32Proc("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
    IF lTerminate
       FOR EACH oProcess IN aProcessList
           oProcess:Terminate()
@@ -865,3 +842,18 @@ METHOD __SetSysTime(n,x) CLASS __SysTime
 
    SetSystemTime( st )
 RETURN st:Array[n]
+
+STATIC FUNCTION GetWin32Proc( cQuery )
+   LOCAL oLocator, aProcessList, oWMIService
+   TRY
+      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
+    CATCH
+      oLocator := CreateObject("WbemScripting.SWbemLocator") 
+   END
+   TRY
+      oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
+      aProcessList := oWMIService:ExecQuery( cQuery )
+   CATCH
+   END
+RETURN aProcessList
+

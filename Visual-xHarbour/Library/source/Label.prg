@@ -24,22 +24,34 @@ CLASS Label INHERIT Control
    DATA AllowUnDock  EXPORTED INIT .F.
    DATA AllowClose   EXPORTED INIT .F.
 
-   PROPERTY CenterText   INDEX SS_CENTER      READ xCenterText WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY RightAlign   INDEX SS_RIGHT       READ xRightAlign WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Sunken       INDEX SS_SUNKEN      READ xSunken     WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Simple       INDEX SS_SIMPLE      READ xSimple     WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Noprefix     INDEX SS_NOPREFIX    READ xNoprefix   WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F. PROTECTED
+   DATA EnumAlignment   EXPORTED INIT { {"Left", "Center", "Right"}, {SS_LEFT,SS_CENTER,SS_RIGHT} }
 
-   PROPERTY SunkenText   INDEX SS_OWNERDRAW   READ xSunkenText WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY Alignment                         READ xAlignment  WRITE SetAlign  DEFAULT SS_LEFT PROTECTED INVERT
+
+   PROPERTY Sunken       INDEX SS_SUNKEN      READ xSunken     WRITE SetStyle  DEFAULT .F.     PROTECTED
+   PROPERTY Simple       INDEX SS_SIMPLE      READ xSimple     WRITE SetStyle  DEFAULT .F.     PROTECTED
+   PROPERTY Noprefix     INDEX SS_NOPREFIX    READ xNoprefix   WRITE SetStyle  DEFAULT .F.     PROTECTED
+   PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F.     PROTECTED
+   PROPERTY SunkenText                        READ xSunkenText WRITE SetSText  DEFAULT .F.     PROTECTED
+   PROPERTY VertCenter                        READ xVertCenter WRITE SetVCent  DEFAULT .F.     PROTECTED
+
+   // Backward compatibility
+   ACCESS CenterText    INLINE ::Alignment == SS_CENTER
+   ASSIGN CenterText(l) INLINE ::Alignment := IIF( l, SS_CENTER, SS_LEFT )
+
+   ACCESS RightAlign    INLINE ::Alignment == SS_RIGHT
+   ASSIGN RightAlign(l) INLINE ::Alignment := IIF( l, SS_RIGHT, SS_LEFT )
 
    METHOD Init()  CONSTRUCTOR
    METHOD OnCtlColorStatic()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
-   METHOD Create()     INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
+   METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
+   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
    METHOD OnParentDrawItem()
-   METHOD OnEraseBkGnd() INLINE 1
+   METHOD OnEraseBkGnd()       INLINE 1
+   METHOD SetVCent(l)          INLINE ::SetStyle( SS_OWNERDRAW, IIF( ! l .AND. ::SunkenText, .T., l ) )
+   METHOD SetStext(l)          INLINE ::SetStyle( SS_OWNERDRAW, IIF( ! l .AND. ::VertCenter, .T., l ) )
+   METHOD SetAlign(n)          INLINE IIF( ::hWnd != NIL, ( ::SetStyle( SS_LEFT, .F. ), ::SetStyle( SS_RIGHT, .F. ), ::SetStyle( SS_CENTER, .F. ) ),), ::SetStyle( n, .T. )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -47,7 +59,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS Label
    DEFAULT ::__xCtrlName TO "Label"
    ::ClsName    := "static"
-   ::Style      := WS_CHILD | WS_VISIBLE | SS_NOTIFY | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style      := WS_CHILD | WS_VISIBLE | SS_NOTIFY | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_LEFT
    ::Super:Init( oParent )
    ::Width      := 80
    ::Height     := 16
@@ -89,7 +101,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Label
-   LOCAL hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL nAlign, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
    ( nwParam, nlParam )
    IF dis:CtlType == ODT_STATIC .AND. (dis:itemAction & ODA_DRAWENTIRE) == ODA_DRAWENTIRE
       _FillRect( dis:hDC, aRect, hBkGnd  )
@@ -99,15 +111,19 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Label
       SetBkMode( dis:hDC, TRANSPARENT )
       
       IF ::SunkenText
-         aRect[1] += 2
-         aRect[2] += 2
+         nAlign := ::xAlignment | DT_WORDBREAK
+         IF ::xVertCenter
+            nAlign := nAlign | DT_VCENTER | DT_SINGLELINE
+         ENDIF
+         aRect[1] += 1
+         aRect[2] += 1
          SetTextColor( dis:hDC, ::System:Color:White )
-         _DrawText( dis:hDC, ::xText, aRect, DT_LEFT )
-         aRect[1] -= 2
-         aRect[2] -= 2
+         _DrawText( dis:hDC, ::xText, aRect, nAlign )
+         aRect[1] -= 1
+         aRect[2] -= 1
       ENDIF
       SetTextColor( dis:hDC, ::ForeColor )
-      _DrawText( dis:hDC, ::xText, aRect, DT_LEFT  )
+      _DrawText( dis:hDC, ::xText, aRect, nAlign )
    ENDIF
 RETURN NIL
 
