@@ -137,7 +137,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                    IF ::Theming .AND. ::Application:IsThemedXP
                       IF lDisabled
                          nState := IIF( lChecked, RBS_CHECKEDDISABLED, RBS_UNCHECKEDDISABLED )
-                        ELSE
+                       ELSE
                          IF lHot
                             nState := IIF( lChecked, RBS_CHECKEDHOT, RBS_UNCHECKEDHOT )
                           ELSEIF !lPressed
@@ -162,10 +162,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                    ENDIF
 
                    nColor := NIL
-                   IF ::ForeColor != NIL .AND. !lDisabled
-                      nColor := SetTextColor( cd:hDC, ::ForeColor )
-                    ELSEIF lDisabled
+                   IF lDisabled
                       nColor := SetTextColor( cd:hDC, GetSysColor( COLOR_GRAYTEXT ) )
+                    ELSEIF ::ForeColor != NIL .AND. !lDisabled
+                      nColor := SetTextColor( cd:hDC, ::ForeColor )
                    ENDIF
 
                    cd:rc:left += 17

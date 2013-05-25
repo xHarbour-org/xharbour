@@ -17,81 +17,68 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS Label INHERIT Control
-   DATA Transparent  PUBLISHED INIT .F.
+   DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
+   PROPERTY Alignment    SET Redraw  DEFAULT DT_LEFT PROTECTED
 
-   DATA ImageList    EXPORTED
-   DATA ImageIndex   PROTECTED
-   DATA AllowUnDock  EXPORTED INIT .F.
-   DATA AllowClose   EXPORTED INIT .F.
+   DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
+   PROPERTY Border       SET Redraw  DEFAULT 0       PROTECTED
 
-   DATA EnumAlignment   EXPORTED INIT { {"Left", "Center", "Right"}, {SS_LEFT,SS_CENTER,SS_RIGHT} }
+   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
 
-   PROPERTY Alignment                         READ xAlignment  WRITE SetAlign  DEFAULT SS_LEFT PROTECTED INVERT
+   PROPERTY NoPrefix     SET Redraw  DEFAULT .F.     PROTECTED
+   PROPERTY SunkenText   SET Redraw  DEFAULT .F.     PROTECTED
+   PROPERTY VertCenter   SET Redraw  DEFAULT .F.     PROTECTED
 
-   PROPERTY Sunken       INDEX SS_SUNKEN      READ xSunken     WRITE SetStyle  DEFAULT .F.     PROTECTED
-   PROPERTY Simple       INDEX SS_SIMPLE      READ xSimple     WRITE SetStyle  DEFAULT .F.     PROTECTED
-   PROPERTY Noprefix     INDEX SS_NOPREFIX    READ xNoprefix   WRITE SetStyle  DEFAULT .F.     PROTECTED
-   PROPERTY Border       INDEX WS_BORDER      READ xBorder     WRITE SetStyle  DEFAULT .F.     PROTECTED
-   PROPERTY SunkenText                        READ xSunkenText WRITE SetSText  DEFAULT .F.     PROTECTED
-   PROPERTY VertCenter                        READ xVertCenter WRITE SetVCent  DEFAULT .F.     PROTECTED
 
    // Backward compatibility
-   ACCESS CenterText    INLINE ::Alignment == SS_CENTER
-   ASSIGN CenterText(l) INLINE ::Alignment := IIF( l, SS_CENTER, SS_LEFT )
+   ACCESS CenterText    INLINE ::Alignment == DT_CENTER
+   ASSIGN CenterText(l) INLINE ::Alignment := IIF( l, DT_CENTER, DT_LEFT )
 
-   ACCESS RightAlign    INLINE ::Alignment == SS_RIGHT
-   ASSIGN RightAlign(l) INLINE ::Alignment := IIF( l, SS_RIGHT, SS_LEFT )
+   ACCESS RightAlign    INLINE ::Alignment == DT_RIGHT
+   ASSIGN RightAlign(l) INLINE ::Alignment := IIF( l, DT_RIGHT, DT_LEFT )
+
+   ACCESS Sunken        INLINE ::Border == BDR_SUNKENINNER
+   ASSIGN Sunken(l)     INLINE ::Border := IIF( l, BDR_SUNKENINNER, 0 )
 
    METHOD Init()  CONSTRUCTOR
-   METHOD OnCtlColorStatic()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD OnEraseBkGnd()
+   METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
+   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
-   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
-   METHOD OnParentDrawItem()
-   METHOD OnEraseBkGnd()       INLINE 1
-   METHOD SetVCent(l)          INLINE ::SetStyle( SS_OWNERDRAW, IIF( ! l .AND. ::SunkenText, .T., l ) )
-   METHOD SetStext(l)          INLINE ::SetStyle( SS_OWNERDRAW, IIF( ! l .AND. ::VertCenter, .T., l ) )
-   METHOD SetAlign(n)          INLINE IIF( ::hWnd != NIL, ( ::SetStyle( SS_LEFT, .F. ), ::SetStyle( SS_RIGHT, .F. ), ::SetStyle( SS_CENTER, .F. ) ),), ::SetStyle( n, .T. )
+   METHOD OnLButtonUp()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS Label
    DEFAULT ::__xCtrlName TO "Label"
-   ::ClsName    := "static"
-   ::Style      := WS_CHILD | WS_VISIBLE | SS_NOTIFY | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_LEFT
+   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::ClsName := "Label"
    ::Super:Init( oParent )
+   ::__IsStandard := .F.
    ::Width      := 80
    ::Height     := 16
    ::Events     := ;
           { ;
             {"Command",     {;
                             { "OnClick"            , "", "" } } },;
-            {"Color",       {;
-                            { "OnCtlColorStatic"   , "", "" } } },;
-            {"Drawing",     {;
-                            { "OnEraseBkGnd"       , "", "" },;
-                            { "OnPaint"            , "", "" } } },;
             {"Layout",      { ;
                             { "OnEnterSizeMove"    , "", "" },;
                             { "OnExitSizeMove"     , "", "" },;
                             { "OnMove"             , "", "" },;
                             { "OnSize"             , "", "" } } },;
-            {"Parent",      {;
-                            { "OnParentDrawItem"   , "", "" } } },;
             {"Mouse",       {;
                             { "OnLButtonDblClk"    , "", "" },;
                             { "OnLButtonDown"      , "", "" },;
                             { "OnLButtonUp"        , "", "" },;
                             { "OnMButtonDown"      , "", "" },;
                             { "OnMButtonUp"        , "", "" },;
-                            { "OnMouseActivate"    , "", "" },;
                             { "OnMouseHover"       , "", "" },;
                             { "OnMouseLeave"       , "", "" },;
                             { "OnMouseMove"        , "", "" },;
                             { "OnRButtonDown"      , "", "" },;
-                            { "OnRButtonUp"        , "", "" },;
-                            { "OnMouseWheel"       , "", "" } } },;
+                            { "OnRButtonUp"        , "", "" } } },;
             {"Control",     {;
                             { "OnCreate"           , "", "" },;
                             { "OnDestroy"          , "", "" },;
@@ -100,57 +87,62 @@ METHOD Init( oParent ) CLASS Label
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Label
-   LOCAL nAlign, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
-   ( nwParam, nlParam )
-   IF dis:CtlType == ODT_STATIC .AND. (dis:itemAction & ODA_DRAWENTIRE) == ODA_DRAWENTIRE
-      _FillRect( dis:hDC, aRect, hBkGnd  )
-      IF ::Sunken
-         __Draw3dRect( dis:hDC, aRect, GetSysColor(COLOR_3DLIGHT), GetSysColor(COLOR_3DDKSHADOW) )
+METHOD OnLButtonUp() CLASS Label
+   LOCAL nRet
+   nRet := ::OnClick( Self )
+   nRet := __Evaluate( ::Action, Self,,, nRet )
+   nRet := ::Form:&( ::EventHandler[ "OnClick" ] )( Self )
+RETURN nRet
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkGnd( hDC ) CLASS Label
+   LOCAL nFlags, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+
+   _FillRect( hDC, aRect, hBkGnd )
+
+   IF ::Border > 0
+      IF ::Border == -1
+         hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+         Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+         SelectObject( hDC, hBrush )
+       ELSE
+         _DrawEdge( hDC, aRect, ::Border, BF_RECT )
       ENDIF
-      SetBkMode( dis:hDC, TRANSPARENT )
-      
-      IF ::SunkenText
-         nAlign := ::xAlignment | DT_WORDBREAK
-         IF ::xVertCenter
-            nAlign := nAlign | DT_VCENTER | DT_SINGLELINE
-         ENDIF
-         aRect[1] += 1
-         aRect[2] += 1
-         SetTextColor( dis:hDC, ::System:Color:White )
-         _DrawText( dis:hDC, ::xText, aRect, nAlign )
-         aRect[1] -= 1
-         aRect[2] -= 1
-      ENDIF
-      SetTextColor( dis:hDC, ::ForeColor )
-      _DrawText( dis:hDC, ::xText, aRect, nAlign )
-   ENDIF
-RETURN NIL
-
-METHOD OnCtlColorStatic( nwParam ) CLASS Label
-   LOCAL hBkGnd := ::GetBkBrush()
-
-   IF ::ForeColor != NIL
-      SetTextColor( nwParam, ::ForeColor )
+      aRect := {1,1,::xWidth-1,::xHeight-1}
    ENDIF
 
-   IF hBkGnd != NIL
-      SetBkMode( nwParam, TRANSPARENT )
-      RETURN hBkGnd
+   SetBkMode( hDC, TRANSPARENT )
+   hFont  := SelectObject( hDC, ::Font:Handle )
+   nFlags := ::Alignment | DT_WORDBREAK
 
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
-      SetBkMode( nwParam, TRANSPARENT )
-      IF ::BackColor == ::BackSysColor
-         RETURN GetSysColorBrush( COLOR_BTNFACE )
-      ENDIF
-      RETURN GetStockObject( NULL_BRUSH )
+   IF ::NoPrefix
+      nFlags := nFlags | DT_NOPREFIX
    ENDIF
 
-   IF ::Parent:ClsName == "ToolBarWindow32" .OR. ::Transparent
-      SetBkMode( nwParam, TRANSPARENT )
-      RETURN GetStockObject( NULL_BRUSH )
+   IF ::VertCenter
+      nFlags := nFlags | DT_VCENTER
+      aText  := ACLONE( aRect )
+      _DrawText( hDC, ::xText, @aText, nFlags | DT_CALCRECT )
+      aRect[2] := ( aRect[4]-aText[4] ) / 2
+      aRect[4] := aRect[2] + aText[4]
    ENDIF
-RETURN NIL
+   IF ::SunkenText
+      aRect[1] += 1
+      aRect[2] += 1
+      aRect[3] += 1
+      aRect[4] += 1
+      SetTextColor( hDC, ::System:Color:White )
+      _DrawText( hDC, ::xText, aRect, nFlags )
+      aRect[1] -= 1
+      aRect[2] -= 1
+      aRect[3] -= 1
+      aRect[4] -= 1
+   ENDIF
+   SetTextColor( hDC, ::ForeColor )
+   _DrawText( hDC, ::xText, aRect, nFlags )
+   SelectObject( hDC, hFont )
+RETURN 1
+
 
 
 CLASS Line INHERIT CONTROL

@@ -283,7 +283,7 @@ METHOD GetBkBrush() CLASS Control
    DEFAULT hBkGnd TO ::BkBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
 
-   IF hBkGnd == NIL
+   IF hBkGnd == NIL .AND. ::Parent:__PixelBk
       hDC := GetDC( ::Parent:hWnd )
       nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
       IF nColor > 0
@@ -295,6 +295,7 @@ METHOD GetBkBrush() CLASS Control
       ENDIF
       ReleaseDC( ::Parent:hWnd, hDC )
    ENDIF
+   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
 RETURN hBkGnd
 
 //---------------------------------------------------------------------------------------------------

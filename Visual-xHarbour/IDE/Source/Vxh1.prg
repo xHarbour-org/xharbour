@@ -1944,7 +1944,7 @@ METHOD Init() CLASS IDE_MainForm
 
 
          WITH OBJECT TabPage( :this )
-            :Caption   := "Object View"
+            :Caption   := "Object Explorer"
             :Create()
 
 
@@ -1966,7 +1966,7 @@ METHOD Init() CLASS IDE_MainForm
          END
 
          WITH OBJECT TabPage( :this )
-            :Caption   := "File View"
+            :Caption   := "File Explorer"
             :Create()
             WITH OBJECT ::Application:FileTree := FileTreeView( :this )
                :ExStyle       := 0
@@ -4057,6 +4057,10 @@ METHOD OpenSource( cSource ) CLASS Project
    ::Application:SourceEditor:Show()
 
    oEditor := Source( ::Application:SourceEditor, oFile:Path+"\"+oFile:Name )
+   oEditor:TreeItem  := ::Application:FileTree:ExtSource:AddItem( oEditor:File, 16 )
+   oEditor:TreeItem:Cargo := oEditor
+   oEditor:TreeItem:Select()
+   ::Application:FileTree:Parent:Select()
 
    //::Application:SourceTabs:Visible := .T.
    //::Application:SourceTabs:InsertTab( oFile:Name )

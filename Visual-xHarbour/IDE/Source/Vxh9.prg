@@ -612,7 +612,7 @@ METHOD UpdateView() CLASS FileTreeView
    IF !EMPTY( ::Application:Project:Properties:Sources )
       FOR EACH cFile IN ::Application:Project:Properties:Sources
           oEditor := ::Application:SourceEditor:GetEditor( cFile )
-          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), 20 )
+          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), 16 )
           SubItem:Cargo := oEditor
           SubItem:Cargo:TreeItem := SubItem
       NEXT

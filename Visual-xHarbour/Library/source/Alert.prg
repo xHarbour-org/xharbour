@@ -79,7 +79,7 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
 
    n := Len( aChoices )
 
-   nMsgHeight := Len( aMsg ) * aSize[2]
+   nMsgHeight := ( Len( aMsg ) * aSize[2] ) + 20
    FOR i = 1 To n
        nButWidth := MAX( nButWidth, _GetTextExtentPoint32( hDC, aChoices[i] )[1]+4 )
    NEXT i
@@ -88,7 +88,7 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
    DeleteObject( hFont )
    ReleaseDC( 0, hDC )
 
-   IF !lVert
+   IF ! lVert
       nWidth  := Max( nWidth, (nButWidth*n)+5  )
    ENDIF
 
@@ -119,9 +119,11 @@ METHOD OnInitDialog() CLASS AlertDialog
    LOCAL n, i, o, nLeft, nWidth, nTop, aMsg, aSize, oButton
 
    o := Label( Self )
-   o:Font:Bold := .T.
-   o:Style   := SS_CENTER | WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   o:ExStyle := WS_EX_STATICEDGE
+   o:Font:Bold  := .T.
+   o:Alignment  := DT_CENTER
+   o:Border     := BDR_SUNKENINNER   
+   o:VertCenter := .T.
+
    IF ::_Back != NIL
       o:BackColor := ::_Back
    ENDIF

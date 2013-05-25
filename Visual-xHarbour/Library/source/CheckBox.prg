@@ -136,54 +136,49 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    lSelected := cd:uItemState & CDIS_SELECTED != 0
                    lFocus    := cd:uItemState & CDIS_FOCUS != 0
 
-                   IF lDisabled
-                      SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_DODEFAULT )
-                      RETURN CDRF_DODEFAULT
-                   ENDIF
                    nColor := NIL
-                   IF ::ForeColor != NIL .AND. !( ::ForeColor == ::ForeSysColor )
+                   IF lDisabled
+                      nColor := SetTextColor( cd:hDC, GetSysColor( COLOR_GRAYTEXT ) )
+                    ELSEIF ::ForeColor != NIL .AND. !( ::ForeColor == ::ForeSysColor )
                       nColor := SetTextColor( cd:hDC, ::ForeColor )
                    ENDIF
+
                    SetBkMode( cd:hdc, TRANSPARENT )
                    
-                   IF ::Parent:ClsName == "GroupBox"
-                      hBkGnd := ::BkBrush
-                      DEFAULT hBkGnd TO ::__hBrush
-                      DEFAULT hBkGnd TO ::Parent:BkBrush
-                      FillRect( cd:hDC, cd:rc, hBkGnd )
+                   hBkGnd := ::GetBkBrush()
+                   FillRect( cd:hDC, cd:rc, hBkGnd )
 
-                      aRect := {0,0,15,15}
+                   aRect := {0,0,15,15}
 
-                      nStatus := ::SendMessage( BM_GETCHECK, 0, 0 )
+                   nStatus := ::SendMessage( BM_GETCHECK, 0, 0 )
 
-                      DO CASE
-                         CASE nStatus == BST_UNCHECKED
-                              nStatus := 0
-                              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                                 nStatus := CBS_UNCHECKEDNORMAL
-                              ENDIF
+                   DO CASE
+                      CASE nStatus == BST_UNCHECKED
+                           nStatus := IIF( lDisabled, DFCS_INACTIVE, 0 )
+                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                              nStatus := IIF( lDisabled, CBS_UNCHECKEDDISABLED, CBS_UNCHECKEDNORMAL )
+                           ENDIF
 
-                         CASE nStatus == BST_CHECKED
-                              nStatus := DFCS_CHECKED
-                              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                                 nStatus := CBS_CHECKEDNORMAL
-                              ENDIF
+                      CASE nStatus == BST_CHECKED
+                           nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_CHECKED, DFCS_CHECKED )
+                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                              nStatus := IIF( lDisabled, CBS_CHECKEDDISABLED, CBS_CHECKEDNORMAL )
+                           ENDIF
 
-                         CASE nStatus == BST_INDETERMINATE
-                              nStatus := DFCS_BUTTON3STATE+DFCS_CHECKED
-                              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                                 nStatus := CBS_MIXEDNORMAL
-                              ENDIF
+                      CASE nStatus == BST_INDETERMINATE
+                           nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_BUTTON3STATE | DFCS_CHECKED, DFCS_BUTTON3STATE | DFCS_CHECKED )
+                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                              nStatus := IIF( lDisabled, CBS_MIXEDDISABLED, CBS_MIXEDNORMAL )
+                           ENDIF
+                   ENDCASE
+                   nFlags := nFlags | nStatus
 
-                      ENDCASE
-                      nFlags := nFlags | nStatus
-
-                      IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                         DrawThemeBackground( ::hTheme, cd:hDC, BP_CHECKBOX, nStatus, aRect, aRect )
-                       ELSE
-                         _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
-                      ENDIF
+                   IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                      DrawThemeBackground( ::hTheme, cd:hDC, BP_CHECKBOX, nStatus, aRect, aRect )
+                    ELSE
+                      _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
                    ENDIF
+
                    cd:rc:left += 16
 
                    DrawText( cd:hDC, ::Text, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
