@@ -283,7 +283,7 @@ METHOD GetBkBrush() CLASS Control
    DEFAULT hBkGnd TO ::BkBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
 
-   IF hBkGnd == NIL .AND. ::Parent:__PixelBk
+   IF hBkGnd == NIL //.AND. ::Parent:__PixelBk
       hDC := GetDC( ::Parent:hWnd )
       nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
       IF nColor > 0
