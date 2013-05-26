@@ -92,7 +92,7 @@ RETURN Self
 METHOD OnLButtonUp() CLASS Label
    LOCAL nRet
    nRet := __Evaluate( ::Action, Self,,, nRet )
-   nRet := ::Form:&( ::EventHandler[ "OnClick" ] )( Self )
+   ExecuteEvent( "OnClick", Self )
 RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
