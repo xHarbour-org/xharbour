@@ -59,8 +59,8 @@ METHOD Init( oParent ) CLASS Label
    ::ClsName := "Label"
    ::Super:Init( oParent )
    ::__IsStandard := .F.
-   ::Width      := 80
-   ::Height     := 16
+   ::xWidth      := 80
+   ::xHeight     := 16
    ::Events     := ;
           { ;
             {"Command",     {;
@@ -97,13 +97,13 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL nFlags, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
 
    hDC := ::BeginPaint()
 
    _FillRect( hDC, aRect, hBkGnd )
 
-   IF ::Border > 0
+   IF ::Border <> 0
       IF ::Border == -1
          hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
          Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
@@ -129,20 +129,24 @@ METHOD OnPaint() CLASS Label
       aRect[2] := ( aRect[4]-aText[4] ) / 2
       aRect[4] := aRect[2] + aText[4]
    ENDIF
+   
+   cText := ::xText
+   DEFAULT cText TO ""
+
    IF ::SunkenText
       aRect[1] += 1
       aRect[2] += 1
       aRect[3] += 1
       aRect[4] += 1
       SetTextColor( hDC, ::System:Color:White )
-      _DrawText( hDC, ::xText, aRect, nFlags )
+      _DrawText( hDC, cText, aRect, nFlags )
       aRect[1] -= 1
       aRect[2] -= 1
       aRect[3] -= 1
       aRect[4] -= 1
    ENDIF
    SetTextColor( hDC, ::ForeColor )
-   _DrawText( hDC, ::xText, aRect, nFlags )
+   _DrawText( hDC, cText, aRect, nFlags )
    SelectObject( hDC, hFont )
    
    ::EndPaint()
