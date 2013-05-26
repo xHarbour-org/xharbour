@@ -333,7 +333,7 @@ METHOD OnSize(w,l) CLASS TabControl
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
       ENDIF
    ENDIF
-RETURN 0
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg ) CLASS TabControl

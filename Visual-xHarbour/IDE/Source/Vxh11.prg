@@ -1046,10 +1046,10 @@ METHOD Init( oOwner, cFile ) CLASS Source
    
    ::pSource := ::CreateDocument()
    
+   ::FirstOpen := .T.
+
    IF cFile != NIL .AND. File( cFile )
       ::Open( cFile )
-   ELSE
-      ::FirstOpen := .F.
    ENDIF
 
    AADD( ::Owner:aDocs, Self )
@@ -1454,7 +1454,8 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Default"
-               :Rightalign           := .T.
+               :Transparent          := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1502,7 +1503,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 101
                :Height               := 16
                :Caption              := "Current Line"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1537,7 +1538,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Numbers"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1572,7 +1573,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Strings"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1607,7 +1608,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Comments"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1642,7 +1643,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Operators"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1677,7 +1678,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Preprocessor"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1712,7 +1713,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 1"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1747,7 +1748,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 2"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1782,7 +1783,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 3"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1817,7 +1818,7 @@ METHOD OnInitDialog() CLASS Settings
                :Width                := 96
                :Height               := 16
                :Caption              := "Keywords 4"
-               :Rightalign           := .T.
+               :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
 
