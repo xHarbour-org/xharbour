@@ -44,16 +44,15 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS CheckBox INHERIT Control
-   DATA Transparent PUBLISHED INIT .F.
-
    DATA ImageList   EXPORTED
    DATA ImageIndex  PROTECTED
 
-   PROPERTY Group      INDEX WS_GROUP  READ xGroup      WRITE SetStyle      PROTECTED DEFAULT .F.
-   PROPERTY CheckStyle                 READ xCheckStyle WRITE SetCheckStyle PROTECTED DEFAULT 1
-   PROPERTY State                      READ xState      WRITE SetState      PROTECTED DEFAULT BST_UNCHECKED
-   PROPERTY Border     INDEX WS_BORDER READ xBorder     WRITE SetStyle      PROTECTED DEFAULT .F. 
-   PROPERTY AutoSize                   READ xAutoSize   WRITE __SetSize     PROTECTED DEFAULT .F.
+   PROPERTY Transparent                READ xTransparent WRITE __SetTransp             DEFAULT .F.
+   PROPERTY Group      INDEX WS_GROUP  READ xGroup       WRITE SetStyle      PROTECTED DEFAULT .F.
+   PROPERTY CheckStyle                 READ xCheckStyle  WRITE SetCheckStyle PROTECTED DEFAULT 1
+   PROPERTY State                      READ xState       WRITE SetState      PROTECTED DEFAULT BST_UNCHECKED
+   PROPERTY Border     INDEX WS_BORDER READ xBorder      WRITE SetStyle      PROTECTED DEFAULT .F. 
+   PROPERTY AutoSize                   READ xAutoSize    WRITE __SetSize     PROTECTED DEFAULT .F.
 
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.
@@ -79,6 +78,7 @@ CLASS CheckBox INHERIT Control
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
 
    METHOD __SetSize()
+   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CheckBox
@@ -107,8 +107,8 @@ RETURN Self
 
 METHOD Create() CLASS CheckBox
    LOCAL aSize
-   IF ::Transparent
-      ::Parent:__RegisterTransparentControl( Self )
+   IF ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor
+      ::__SetTransp(.T.)
    ENDIF
    ::Super:Create()
    IF ::AutoSize
@@ -121,7 +121,7 @@ METHOD Create() CLASS CheckBox
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
-   LOCAL nRet, cd, aRect, lDisabled, lSelected, lFocus, nColor
+   LOCAL nRet, cd, aRect, lDisabled, lSelected, lFocus, nColor, lHot
    LOCAL sz, nStatus, hBkGnd, nFlags := DFCS_BUTTONCHECK
    (nwParam)
    DO CASE
@@ -134,7 +134,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
               CASE cd:dwDrawStage == CDDS_PREPAINT
                    lDisabled := cd:uItemState & CDIS_DISABLED != 0
                    lSelected := cd:uItemState & CDIS_SELECTED != 0
-                   lFocus    := cd:uItemState & CDIS_FOCUS != 0
+                   lFocus    := cd:uItemState & CDIS_FOCUS    != 0
+                   lHot      := cd:uItemState & CDIS_HOT      != 0
 
                    nColor := NIL
                    IF lDisabled
@@ -156,19 +157,19 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                       CASE nStatus == BST_UNCHECKED
                            nStatus := IIF( lDisabled, DFCS_INACTIVE, 0 )
                            IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                              nStatus := IIF( lDisabled, CBS_UNCHECKEDDISABLED, CBS_UNCHECKEDNORMAL )
+                              nStatus := IIF( lDisabled, CBS_UNCHECKEDDISABLED, IIF( lHot, CBS_UNCHECKEDHOT, CBS_UNCHECKEDNORMAL ) )
                            ENDIF
 
                       CASE nStatus == BST_CHECKED
                            nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_CHECKED, DFCS_CHECKED )
                            IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                              nStatus := IIF( lDisabled, CBS_CHECKEDDISABLED, CBS_CHECKEDNORMAL )
+                              nStatus := IIF( lDisabled, CBS_CHECKEDDISABLED, IIF( lHot, CBS_CHECKEDHOT, CBS_CHECKEDNORMAL ) )
                            ENDIF
 
                       CASE nStatus == BST_INDETERMINATE
                            nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_BUTTON3STATE | DFCS_CHECKED, DFCS_BUTTON3STATE | DFCS_CHECKED )
                            IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                              nStatus := IIF( lDisabled, CBS_MIXEDDISABLED, CBS_MIXEDNORMAL )
+                              nStatus := IIF( lDisabled, CBS_MIXEDDISABLED, IIF( lHot, CBS_MIXEDHOT, CBS_MIXEDNORMAL ) )
                            ENDIF
                    ENDCASE
                    nFlags := nFlags | nStatus

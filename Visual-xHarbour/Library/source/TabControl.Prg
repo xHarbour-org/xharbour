@@ -41,6 +41,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabControl INHERIT Control
+   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
 
    PROPERTY MultiLine           INDEX TCS_MULTILINE      READ xMultiline           WRITE SetPos         DEFAULT .F. PROTECTED
    PROPERTY ImageList                                    READ xImageList           WRITE SetImageList               
@@ -160,7 +161,7 @@ CLASS TabControl INHERIT Control
                                             IIF( ::VertFocusFont != NIL, ::VertFocusFont:Delete(), NIL ),;
                                             NIL
    METHOD OnPaint()
-   METHOD OnMove(x,y)                INLINE IIF( ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel .AND. VALTYPE(::GetItemObject())=="O", ::GetItemObject():__OnParentSize(x,y), ), NIL
+   METHOD OnMove(x,y)                INLINE IIF( ::IsWindow() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel .AND. VALTYPE(::GetItemObject())=="O", ::GetItemObject():__OnParentSize(x,y), ), NIL
    METHOD OnSize()
 
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
@@ -180,6 +181,7 @@ CLASS TabControl INHERIT Control
    //METHOD __SetTheming()
    METHOD __SetTabPosition()
    METHOD SelectPage()
+   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -325,7 +327,7 @@ RETURN Self
 METHOD OnSize(w,l) CLASS TabControl
    LOCAL oPage
    Super:OnSize(w,l)
-   IF ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel 
+   IF ::IsWindow() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel 
       oPage := ::GetItemObject()
       IF oPage != NIL
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
@@ -504,8 +506,8 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabControl
-   LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart, nColor
-   LOCAL aItem, oPage, hWnd, hTmpBrush, hParDC, rc, tci, hDC
+   LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
+   LOCAL aItem, oPage, hWnd, rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
 
    IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
@@ -546,23 +548,9 @@ METHOD OnPaint() CLASS TabControl
       aRect[2] += 2
       aRect[4] -= ( aRect[4]-aItem[2]-2 )
    ENDIF
-   hBrush := ::bkBrush
-   DEFAULT hBrush TO ::Parent:bkBrush
-   IF hBrush == NIL
-      hParDC := GetDC( ::Parent:hWnd )
-      nColor := GetPixel( hParDC, ::xLeft-1, ::xTop-1 )
-      IF nColor >= 0
-         hTmpBrush := CreateSolidBrush( nColor )
-         hBrush := hTmpBrush
-      ENDIF
-      ReleaseDC( ::Parent:hWnd, hParDC )
-   ENDIF
+   hBrush := ::GetbkBrush()
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    
-   IF hTmpBrush != NIL
-      DeleteObject( hTmpBrush )
-   ENDIF
-
    IF IsThemeActive()
       DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
     ELSE
@@ -655,6 +643,9 @@ METHOD OnPaint() CLASS TabControl
 
    ENDIF
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   ::__SetTransparentChildren( hDC, hMemDC )
+
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
@@ -928,6 +919,7 @@ CLASS TabPage INHERIT Dialog
    METHOD __GetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
+   METHOD OnPaint()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
 ENDCLASS
 
@@ -1115,6 +1107,32 @@ METHOD Create() CLASS TabPage
       ::Parent:InvalidateRect(,.f.)
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnPaint() CLASS TabPage
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hDC
+   IF ! EMPTY( ::__aTransparent ) .AND. ( EMPTY( ::BackgroundImage ) .OR. EMPTY( ::BackgroundImage:ImageName ) ) .AND. ::BkBrush == NIL
+      hDC := ::BeginPaint()
+      IF ::System:OS:Version < 6
+         hMemDC     := CreateCompatibleDC( hDC )
+         hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+         hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+         SendMessage( ::hWnd, WM_PRINT, hMemDC, PRF_CLIENT )
+
+         BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+
+         ::__SetTransparentChildren( hDC, hMemDC )
+
+         SelectObject( hMemDC,  hOldBitmap )
+         DeleteObject( hMemBitmap )
+         DeleteDC( hMemDC )
+      ELSE
+         ::BkBrush := CreateSolidBrush( GetPixel( hDC, 1, 1 ) )
+      ENDIF
+      ::EndPaint()
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
@@ -1531,7 +1549,7 @@ METHOD Create() CLASS TabStrip
 RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabStrip
-   LOCAL hOldPen, aRect, nSel, aItem, nItems, n, nColor
+   LOCAL hOldPen, aRect, nSel, aItem, nItems, n
    LOCAL hDC, hMemDC, hMemBitmap, hOldBitmap, hBrush//, hMemDC1, hOldBitmap1
 
    aRect := _GetClientRect( ::hWnd )
@@ -1547,19 +1565,8 @@ METHOD OnPaint() CLASS TabStrip
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    //---------------------------------------------------------------------------
-   hBrush := ::BkBrush
-   //DEFAULT hBrush TO ::__hBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
-   IF hBrush == NIL
-      nColor := GetPixel( ::Parent:Drawing:hDC, 2,2 )
-      IF nColor == CLR_INVALID
-         ::BkBrush := CreateSolidBrush( nColor )
-         hBrush := ::BkBrush
-      ENDIF
-   ENDIF
-   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-
-   
+   hBrush := ::GetBkBrush()
+  
    IF hBrush != NIL
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    ENDIF

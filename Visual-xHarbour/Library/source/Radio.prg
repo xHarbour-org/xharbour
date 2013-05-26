@@ -41,12 +41,12 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS RadioButton INHERIT Control
-   DATA Transparent  PUBLISHED INIT .F.
-
    DATA DefaultButton INIT .F.
    DATA States       INIT { "Unchecked", "Checked" }
    DATA State     EXPORTED
-   
+
+   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
+
    PROPERTY Group         INDEX WS_GROUP         READ xGroup        WRITE SetStyle          PROTECTED DEFAULT .F.
    PROPERTY OwnerDraw     INDEX BS_OWNERDRAW     READ xOwnerDraw    WRITE SetStyle          PROTECTED DEFAULT .F.           
    PROPERTY Border        INDEX WS_BORDER        READ xBorder       WRITE SetStyle          PROTECTED DEFAULT .F.           
@@ -58,7 +58,7 @@ CLASS RadioButton INHERIT Control
    DATA ImageIndex EXPORTED
 
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
+   METHOD Create()             INLINE IIF( ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor, ::__SetTransp(.T.), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
    
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE 1
@@ -68,6 +68,7 @@ CLASS RadioButton INHERIT Control
    METHOD SetState(nState)     INLINE ::SendMessage( BM_SETCHECK, nState, 0 )
    METHOD __SetInitialState()
    METHOD OnCtlColorStatic()
+   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS RadioButton

@@ -41,8 +41,10 @@ CLASS Label INHERIT Control
    ASSIGN Sunken(l)     INLINE ::Border := IIF( l, BDR_SUNKENINNER, 0 )
 
    METHOD Init()  CONSTRUCTOR
+   METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor, ::__SetTransp(.T.), ), Super:Create()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd()       INLINE 1
+   METHOD OnPaint()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
    METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
@@ -89,14 +91,15 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnLButtonUp() CLASS Label
    LOCAL nRet
-   nRet := ::OnClick( Self )
    nRet := __Evaluate( ::Action, Self,,, nRet )
    nRet := ::Form:&( ::EventHandler[ "OnClick" ] )( Self )
 RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( hDC ) CLASS Label
-   LOCAL nFlags, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+METHOD OnPaint() CLASS Label
+   LOCAL nFlags, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+
+   hDC := ::BeginPaint()
 
    _FillRect( hDC, aRect, hBkGnd )
 
@@ -141,7 +144,9 @@ METHOD OnEraseBkGnd( hDC ) CLASS Label
    SetTextColor( hDC, ::ForeColor )
    _DrawText( hDC, ::xText, aRect, nFlags )
    SelectObject( hDC, hFont )
-RETURN 1
+   
+   ::EndPaint()
+RETURN 0
 
 
 

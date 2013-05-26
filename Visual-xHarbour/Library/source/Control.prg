@@ -279,22 +279,9 @@ METHOD OnSysKeyDown( nwParam, nlParam ) CLASS Control
 RETURN NIL
 
 METHOD GetBkBrush() CLASS Control
-   LOCAL hDC, nColor, hBkGnd := ::__hBrush
+   LOCAL hBkGnd := ::__hBrush
    DEFAULT hBkGnd TO ::BkBrush
    DEFAULT hBkGnd TO ::Parent:BkBrush
-
-   IF hBkGnd == NIL //.AND. ::Parent:__PixelBk
-      hDC := GetDC( ::Parent:hWnd )
-      nColor := GetPixel( hDC, ::xLeft-1, ::xTop-1 )
-      IF nColor > 0
-         IF ::__hParBrush != NIL
-            DeleteObject( ::__hParBrush )
-         ENDIF
-         ::__hParBrush := CreateSolidBrush( nColor )
-         hBkGnd := ::__hParBrush
-      ENDIF
-      ReleaseDC( ::Parent:hWnd, hDC )
-   ENDIF
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
 RETURN hBkGnd
 

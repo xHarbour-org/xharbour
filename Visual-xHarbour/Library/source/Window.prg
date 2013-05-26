@@ -248,6 +248,11 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
+   DATA __lReqBrush              PROTECTED INIT .F.
+   DATA __lShown                 PROTECTED INIT .F.
+   DATA __hMemBitmap             PROTECTED
+   DATA __hBrush                 PROTECTED
+
    DATA __nCaptionHeight         EXPORTED  INIT 0
    DATA __lRegTrans              EXPORTED  INIT .F.
    DATA __aValues                EXPORTED  INIT {}
@@ -256,8 +261,6 @@ CLASS Window INHERIT Object
    DATA __MenuBar                EXPORTED  INIT .F.
    DATA __Splitting              EXPORTED  INIT .F.
    DATA __lPopTip                EXPORTED  INIT .F.
-   DATA __lReqBrush              PROTECTED INIT .F.
-   DATA __lShown                 PROTECTED INIT .F.
    DATA __KeyPressed             EXPORTED  INIT 0
    DATA __CurrentPos             EXPORTED  INIT 1
    DATA __Timers                 EXPORTED  INIT 1
@@ -268,8 +271,6 @@ CLASS Window INHERIT Object
    DATA __lOnPaint               EXPORTED  INIT .F.
    DATA __hAccelTable            EXPORTED
    DATA __lMouseHover            EXPORTED  INIT .F.
-   DATA __hMemBitmap             PROTECTED
-   DATA __hBrush                 PROTECTED
    DATA __IsInstance             EXPORTED  INIT .F.
    DATA __pCallBackPtr           EXPORTED
    DATA __lCreateAfterChildren   EXPORTED  INIT .F.
@@ -424,7 +425,8 @@ CLASS Window INHERIT Object
    METHOD __GetBrush()         VIRTUAL
    METHOD __PaintBakgndImage() VIRTUAL
    METHOD __GC()               VIRTUAL
-   
+   METHOD __SetTransparentChildren()
+
    METHOD EnableThemeDialogTexture( nFlags ) INLINE EnableThemeDialogTexture( ::hWnd, nFlags )
    METHOD __SetInvStyle( n, l )   INLINE ::SetStyle( n, !l )
    METHOD DragAcceptFiles(l)      INLINE IIF( ::hWnd != NIL, DragAcceptFiles( ::hWnd, l ), NIL )
@@ -1418,6 +1420,13 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS Window
          ::InValidateRect()
       ENDIF
    ENDIF
+   IF ::Parent != NIL
+      IF ::BkBrush != NIL
+         ::Parent:__UnregisterTransparentControl( Self )
+       ELSEIF ::HasMessage( "Transparent" ) .AND. ::Transparent
+         ::Parent:__RegisterTransparentControl( Self )
+      ENDIF
+   ENDIF
 RETURN SELF
 
 METHOD SetForeColor( nColor, lRepaint ) CLASS Window
@@ -1644,7 +1653,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, nlParam ) CLASS Window
    LOCAL nRet
-   IF !::__lMouseHover
+   IF ! ::__lMouseHover
       IF ::ToolTip != NIL .AND. ::__lPopTip
          ::__lPopTip := .F.
          ::ToolTip:SetTimer( 25, 1000 )
@@ -4236,6 +4245,32 @@ METHOD __SetWindowCursor( nCursor ) CLASS Window
    ENDIF
 RETURN Self
 
+METHOD __SetTransparentChildren( hDC, hMDC ) CLASS Window
+   LOCAL oChild, hMemDC, hOldBitmap, lDC := hDC == NIL
+   
+   IF ! EMPTY( ::__aTransparent )
+      DEFAULT hDC TO GetDC( ::hWnd )
+      hMemDC := CreateCompatibleDC( hDC )
+
+      FOR EACH oChild IN ::__aTransparent
+          IF GetParent( oChild:hWnd ) == ::hWnd
+             IF oChild:__hBrush != NIL
+                DeleteObject( oChild:__hBrush )
+             ENDIF
+             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+             hOldBitmap  := SelectObject( hMemDC, oChild:__hMemBitmap )
+             BitBlt( hMemDC, 0, 0, oChild:Width, oChild:Height, hMDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
+             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+             SelectObject( hMemDC,  hOldBitmap )
+          ENDIF
+      NEXT
+      DeleteDC( hMemDC )
+      IF lDC
+         ReleaseDC( ::hWnd, hDC )
+      ENDIF
+   ENDIF
+RETURN NIL
+
 //---------------------------------------------------------------------------------------------
 
 FUNCTION __Evaluate( iVar, Param1, Param2, Param3, nRet )
@@ -5217,7 +5252,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __PaintBakgndImage( hDC ) CLASS WinForm
-   LOCAL hBrush, hMemDC1, hOldBitmap1, oChild
+   LOCAL hBrush
    LOCAL hMemBitmap, hOldBitmap, hMemDC
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
       DEFAULT hDC TO ::Drawing:hDC
@@ -5243,21 +5278,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
 
       BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
-      hMemDC1 := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::__aTransparent
-          IF GetParent( oChild:hWnd ) == ::hWnd
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             DEFAULT oChild:__BackMargin TO 0
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:__nCaptionHeight, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC1,  hOldBitmap1 )
-          ENDIF
-      NEXT
-      DeleteDC( hMemDC1 )
+      ::__SetTransparentChildren( hDC, hMemDC )
 
       SelectObject( hMemDC,  hOldBitmap )
       DeleteObject( hMemBitmap )
@@ -5268,7 +5289,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
 RETURN NIL
 
 METHOD Show( nShow ) CLASS WinForm
-   LOCAL oChild, nRet, hDC, hMemDC, hMemDC1, hOldBitmap1, hOldBitmap, hMemBitmap, hBrush
+   LOCAL nRet, hDC, hMemDC, hOldBitmap, hMemBitmap, hBrush
    DEFAULT nShow TO ::ShowMode
    IF ::__OnInitCanceled
       RETURN NIL
@@ -5297,21 +5318,7 @@ METHOD Show( nShow ) CLASS WinForm
 
             BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
-            hMemDC1      := CreateCompatibleDC( hDC )
-            FOR EACH oChild IN ::__aTransparent
-                IF GetParent( oChild:hWnd ) == ::hWnd
-                   IF oChild:__hBrush != NIL
-                      DeleteObject( oChild:__hBrush )
-                   ENDIF
-                   DEFAULT oChild:__BackMargin TO 0
-                   DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-                   hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-                   BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-                   oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-                   SelectObject( hMemDC1,  hOldBitmap1 )
-                ENDIF
-            NEXT
-            DeleteDC( hMemDC1 )
+            ::__SetTransparentChildren( hDC, hMemDC )
 
             SelectObject( hMemDC,  hOldBitmap )
             DeleteObject( hMemBitmap )

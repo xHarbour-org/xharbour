@@ -56,7 +56,7 @@ CLASS GroupBox INHERIT Control
    PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
    
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Transparent, ::Parent:__RegisterTransparentControl( Self ), ), Super:Create()
+   METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent, ::__SetTransp(.T.), ), Super:Create()
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), NIL
    METHOD OnEraseBkGnd()       INLINE IIF( LEN( ::Children ) == 0, ::SetWindowPos( HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE ), ), 1
    METHOD OnPaint()
@@ -94,7 +94,7 @@ METHOD GetSysColor() CLASS GroupBox
 RETURN nColor
 
 METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
-   LOCAL lDC, oChild, hFont, hMemDC1, hOldBitmap1, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
+   LOCAL lDC, hFont, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
    IF !::IsWindow()
       RETURN 0
    ENDIF
@@ -144,25 +144,10 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
       DrawText( hMemDC, ::Text, rc, DT_LEFT | DT_SINGLELINE )
    ENDIF
    SelectObject( hMemDC, hFont )
-
-   IF hMemBitmap != NIL
-      hMemDC1 := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::__aTransparent
-          IF GetParent( oChild:hWnd ) == ::hWnd
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC1,  hOldBitmap1 )
-          ENDIF
-      NEXT
-      DeleteDC( hMemDC1 )
-   ENDIF
-
+  
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   ::__SetTransparentChildren( hDC, hMemDC )
 
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
