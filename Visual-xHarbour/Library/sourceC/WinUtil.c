@@ -98,6 +98,7 @@ typedef HRESULT (WINAPI *ATLAXGETCONTROL)(HWND, IUnknown**);
 typedef HRESULT (WINAPI *ATLAXCREATECONTROL)(LPCOLESTR, HWND, IStream*, IUnknown**);
 typedef HRESULT (WINAPI *ATLAXCREATECONTROLLIC)(LPCOLESTR, HWND, IStream*, IUnknown**, BSTR);
 typedef HRESULT (WINAPI *ATLAXGETHOST)(HWND, IUnknown**);
+typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
 
 void LoadAtlAx( void )
@@ -4978,6 +4979,19 @@ HB_FUNC( GETPROCESSMEMORYINFO )
    CloseHandle( hProcess );
 }
 
+HB_FUNC( ISWOW64 )
+{
+    BOOL bIsWow64 = FALSE;
+    LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress( GetModuleHandle( TEXT("kernel32") ), "IsWow64Process");
+    if (NULL != fnIsWow64Process)
+    {
+        if( !fnIsWow64Process( GetCurrentProcess(), &bIsWow64 ) )
+        {
+            bIsWow64 = FALSE;
+        }
+    }
+    hb_retl( bIsWow64 );
+}
 
 
 /*
