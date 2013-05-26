@@ -50,7 +50,7 @@ RETURN
 FUNCTION __GetSystem(); RETURN oSystem
 
 CLASS System
-   DATA OsVersion               EXPORTED
+   DATA OS                      EXPORTED
    DATA StdIcons                EXPORTED
    DATA ListBox                 EXPORTED
    DATA Cursor                  EXPORTED
@@ -100,6 +100,7 @@ CLASS System
    METHOD GetPathFromFolder()
    METHOD GetLocalTime()
    METHOD GetRunningProcs()
+   METHOD GetOSName()
    METHOD IsProcRunning()
    METHOD GetProcMemory()
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
@@ -132,7 +133,7 @@ RETURN ::xLocalTime
 
 METHOD Init() CLASS System
    LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""
-   LOCAL cSupp := ""
+   LOCAL osvi, cSupp := ""
    ::FreeImageFormats := {;
                    { "Windows or OS/2 Bitmap (*.bmp)",                   "*.bmp;" },;
                    { "Dr. Halo (*.cut)",                                 "*.cut;" },;
@@ -171,8 +172,15 @@ METHOD Init() CLASS System
    AEVAL( ::FreeImageFormats, {|a| cSupp += a[2]} )
    AINS( ::FreeImageFormats, 1, { "All Supported Graphics", cSupp }, .T. )
 
-   ::OsVersion        := (struct OSVERSIONINFOEX)
-   GetVersionEx( @::OsVersion )
+   osvi := (struct OSVERSIONINFOEX)
+   GetVersionEx( @osvi )
+
+   ::OS := {=>}
+   HSetCaseMatch( ::OS, .F. )
+   ::OS:Version      := VAL( xStr(osvi:dwMajorVersion)+"."+xStr(osvi:dwMinorVersion) )
+   ::OS:BuildNumber  := osvi:dwBuildNumber
+   ::OS:Bitness      := IIF( IsWow64(), "x64", "x86" )
+   ::OS:ServicePack  := osvi:szCSDVersion:AsString()
 
    ::CurrentScheme := ProfessionalColorTable( NIL )
    ::CurrentScheme:Load()
@@ -729,6 +737,18 @@ METHOD GetRunningProcs() CLASS System
        AADD( aProcess, { oProcess:Name, oProcess:CommandLine, IIF( !EMPTY(oProcess:CreationDate), STOD( LEFT( oProcess:CreationDate, 8 ) ),"") } )
    NEXT
 RETURN aProcess
+
+METHOD GetOSName( cProcName ) CLASS System
+   LOCAL aName, oProcess, aProcessList, aProcess := {}
+   DEFAULT cProcName TO __GetApplication():FileName
+   aProcessList := GetWin32Proc("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
+   FOR EACH oProcess IN aProcessList
+       aName := hb_aTokens( oProcess:OSName, "|" )
+       IF .T.
+          EXIT
+       ENDIF
+   NEXT
+RETURN aName
 
 METHOD GetProcMemory( cProcName ) CLASS System
    LOCAL nMemory := 0, oProcess, aProcessList, aProcess := {}

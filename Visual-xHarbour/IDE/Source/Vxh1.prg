@@ -2111,7 +2111,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:MainTab := TabStrip( Self )
       :Width     := 680
       :Height    := 300
-      :Multiline := .T.
+      :Multiline := .F.
       
       :Dock:BottomMargin := 3
       :Dock:Left   := ::Application:ToolBox
