@@ -664,7 +664,7 @@ METHOD attachFile( cFileName ) CLASS TipMail
          
       oAttach   := TIPMail():new( cContent, "base64" )
    ELSE
-      oAttach   := TIPMail():new( cContent, "7-bit" )
+      oAttach   := TIPMail():new( cContent, "7bit" )
    ENDIF
 
    cFileName := SubStr( cFileName, RAt( cFileName, cDelim ) + 1 )

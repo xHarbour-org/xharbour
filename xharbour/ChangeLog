@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-05-27 11:32 UTC-200 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/tip/mail.prg
+  * source/tip/sendmail.prg
+    ! minor fix 7-bit to 7bit
+  
 2013-05-11 14:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/client.prg
   * source/tip/ftpcln.prg

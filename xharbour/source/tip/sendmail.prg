@@ -197,7 +197,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
    oMail   := tipMail():new()
    oAttach := tipMail():new()
-   oAttach:SetEncoder( "7-bit" )
+   oAttach:SetEncoder( "7bit" )
 
    IF ( ".htm" IN Lower( cBody ) .OR. ".html" IN Lower( cBody ) ) .AND. File( cBody )
       cMimeText := "text/html ; charset=ISO-8859-1"
@@ -206,7 +206,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       cBody     := MemoRead( cBodyTemp ) + Chr( 13 ) + Chr( 10 )
 
    ELSE
-      oMail:hHeaders[ "Content-Type" ] := "text/plain; charset=iso8851"
+      oMail:hHeaders[ "Content-Type" ] := "text/plain; charset=iso-8859-1"
    ENDIF
 
    oAttach:SetBody( cBody )
