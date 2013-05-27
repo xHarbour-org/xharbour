@@ -56,6 +56,7 @@
 #include "hbdefs.h"
 
 #if defined( HB_OS_WIN )
+#  define _WINSOCKAPI_   /* Prevents inclusion of Winsock.h in Windows.h */
 #  include <windows.h>
 #elif defined( HB_OS_DARWIN )
 #  include <libkern/OSAtomic.h>

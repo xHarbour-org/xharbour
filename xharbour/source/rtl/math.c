@@ -360,7 +360,6 @@ HB_FUNC( MATHERRMODE )  /* ([<nNewMode>]) -> <nOldMode> */
 /* Harbour default math error handling routine */
 int hb_matherr( HB_MATH_EXCEPTION * pexc )
 {
-
    int mode = hb_mathGetErrMode();
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_matherr(%p)", pexc ) );
@@ -563,7 +562,7 @@ static int hb_matherrblock( HB_MATH_EXCEPTION * pexc )
          // Handled = hb_itemArrayGet (Array, 2);
          hb_arrayGet( &Array, 2, &Handled );
 
-         if( &Handled != NULL )
+         if( HB_IS_LOGICAL( &Handled ) )
          {
             pexc->handled = hb_itemGetL( &Handled );
             //hb_itemClear( &Handled );
@@ -624,7 +623,6 @@ static int hb_matherrblock( HB_MATH_EXCEPTION * pexc )
 /* set/get math error block */
 HB_FUNC( MATHERRORBLOCK )  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
 {
-
    /* immediately install hb_matherrblock and keep it permanently installed !
       This is not dangerous because hb_matherrorblock will always call the previous error handler */
    if( sPrevMathHandler == NULL )

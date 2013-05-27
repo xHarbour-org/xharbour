@@ -357,9 +357,6 @@ pdc_getenv_filename(pdc_core *pdc, const char *envname)
     int flags = PDC_CONV_TMPALLOC;
 
 #if defined(WIN32)
-    #if defined( __GNUC__ ) || defined(__POCC__) || defined(__WATCOMC__) || defined(__DMC__)
-       typedef unsigned long DWORD;
-    #endif
     size_t len = strlen(envname), wlen;
     #if defined(UNICODE)
        const wchar_t *wenvvalue;
@@ -368,8 +365,6 @@ pdc_getenv_filename(pdc_core *pdc, const char *envname)
        const char *wenvvalue;
        char       *wenvname;
     #endif
-
-    /* DWORD nSize = PDC_FILENAMELEN; */
 
     wlen = 2 * (len + 1);
     #if defined(UNICODE)
@@ -3221,4 +3216,3 @@ pdc_srand(pdc_core *pdc, pdc_uint seed)
 {
     pdc->last_rand = seed;
 } /* pdc_srand */
-
