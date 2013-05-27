@@ -4766,7 +4766,7 @@ typedef interface ITaskbarList3 ITaskbarList3;
 
 
 typedef enum TBPFLAG
-{ 
+{
    TBPF_NOPROGRESS    = 0x00000000,
    TBPF_INDETERMINATE = 0x00000001,
    TBPF_NORMAL        = 0x00000002,
@@ -4831,7 +4831,7 @@ HB_FUNC( TASKBARPROGRESSSTATE )
    CoInitialize( NULL );
    if( SUCCEEDED( CoCreateInstance( &CLSID_TaskbarList, NULL, CLSCTX_ALL, &IID_ITaskbarList3, (void**)&pTL) ) )
    {
-      bRet = SUCCEEDED( pTL->lpVtbl->SetProgressState(pTL, (HWND) hb_parnl(1), hb_parni(2) ) );
+      bRet = SUCCEEDED( pTL->lpVtbl->SetProgressState( pTL, (HWND) hb_parnl(1), (TBPFLAG) hb_parni(2) ) );
       pTL->lpVtbl->Release( pTL );
    }
    CoUninitialize();
@@ -4883,7 +4883,7 @@ BOOL TranslateVXHAccel( PHB_ITEM aAccel, MSG msg, BOOL bAccEnabled )
          if( hWnd != 0 && hAccel != 0 )
          {
             hPrev = hActive;
-            if( ! hWnd == hActive )
+            if( ! ( hWnd == hActive ) )
             {
                while( hActive != 0 && ( ! IsChild( hWnd, hActive ) ) )
                {
