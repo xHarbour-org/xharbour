@@ -90,8 +90,8 @@
 #define WINVER 0x0500
 #define _WIN32_WINNT 0x0500
 
-  #ifndef _WIN32_IE
-    #define _WIN32_IE 0x0400
+#ifndef _WIN32_IE
+   #define _WIN32_IE 0x0400
 #endif
 
 #include "hbgtwvw.h"
@@ -837,33 +837,30 @@ HB_FUNC( WVW_STCREATE )
        (LPVOID) NULL
    );
 
-   if(hWndCB)
+   if( hWndCB )
    {
-     RECT rXB = { 0 }, rOffXB = { 0 };
+      //RECT rXB, rOffXB;
 
-//     WNDPROC OldProc;
+      //rXB.top    = usTop;    rXB.left  = usLeft;
+      //rXB.bottom = usBottom; rXB.right = usRight;
+      //rOffXB.top    = iOffTop;    rOffXB.left  = iOffLeft;
+      //rOffXB.bottom = iOffBottom; rOffXB.right = iOffRight;
 
-     rXB.top = usTop;     rXB.left= usLeft;
-     rXB.bottom=usBottom; rXB.right =usRight;
-     rOffXB.top = iOffTop;     rOffXB.left= iOffLeft;
-     rOffXB.bottom=iOffBottom; rOffXB.right =iOffRight;
+      if( ISCHAR( 5 ) )
+      {
+         SendMessage( hWndCB, WM_SETTEXT, 0, ( LPARAM ) hb_parc( 5 ) );
+      }
+      if( hFont )
+         SendMessage( hWndCB, WM_SETFONT, ( WPARAM ) hFont, ( LPARAM ) TRUE );
+      else
+         SendMessage( hWndCB, WM_SETFONT, ( WPARAM ) pWindowData->hSTfont, ( LPARAM ) TRUE );
 
-
-     if( ISCHAR(5))
-     {
-        SendMessage( hWndCB, WM_SETTEXT, 0, (LPARAM) hb_parc(5) );
-     }
-     if (hFont)
-        SendMessage( hWndCB, WM_SETFONT, (WPARAM) hFont, (LPARAM) TRUE);
-     else
-        SendMessage( hWndCB, WM_SETFONT, (WPARAM) pWindowData->hSTfont, (LPARAM) TRUE);
-     hb_retnl( (LONG) uiCBid );
-     HB_STOREHANDLE( hWndCB ,9);
+      hb_retnl( ( LONG ) uiCBid );
+      HB_STOREHANDLE( hWndCB, 9 );
    }
    else
    {
-
-     hb_retnl( (LONG) 0 );
+      hb_retnl( ( LONG ) 0 );
    }
 }
 
@@ -925,7 +922,6 @@ HB_FUNC( WVW_STSETFONT )
               )
            {
               SendMessage( pcd->hWndCtrl, WM_SETFONT, (WPARAM) hFont, (LPARAM) TRUE);
-
            }
 
            pcd = pcd->pNext;
@@ -933,7 +929,6 @@ HB_FUNC( WVW_STSETFONT )
 
          pWindowData->hSTfont = hFont;
          DeleteObject( (HFONT) hOldFont );
-
       }
       else
       {
