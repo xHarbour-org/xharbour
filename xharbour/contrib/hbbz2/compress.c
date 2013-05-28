@@ -267,9 +267,11 @@ void sendMTFValues ( EState* s )
                 s->nblock, s->nMTF, s->nInUse );
 
    alphaSize = s->nInUse+2;
-   for (t = 0; t < BZ_N_GROUPS; t++)
+   for (t = 0; t < BZ_N_GROUPS; t++) {
       for (v = 0; v < alphaSize; v++)
          s->len[t][v] = BZ_GREATER_ICOST;
+      cost[t] = 0;
+   }
 
    /*--- Decide how many coding tables to use ---*/
    AssertH ( s->nMTF > 0, 3001 );

@@ -80,11 +80,10 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cData, oUrl1
 
    LOCAL cTmp          :=""
-   LOCAL cMimeText     := ""
+   LOCAL cMimeText
    LOCAL cTo           := ""
    LOCAL cCC           := ""
    LOCAL cBCC          := ""
-   Local E
 
    LOCAL lConnectPlain := .F.
    LOCAL lReturn       := .T.
@@ -92,7 +91,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lAuthPlain    := .F.
    LOCAL lConnect      := .T.
    LOCAL oPop
-   LOCAL adata:={},nCount,nSize,nSent
+   LOCAL aData := {}, nCount
    LOCAL cTemp
 
    DEFAULT cUser       TO ""
@@ -177,7 +176,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          IF oPop:Open()
             oPop:Close()
          ENDIF
-      CATCH e
+      CATCH
          lReturn := .F.
       END
 
@@ -267,7 +266,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
             IF !oInMail:Auth( cUser, cPass )
                lConnect := .F.
             ELSE
-               lConnectPlain  := .T.
+               lConnectPlain := .T.
             ENDIF
          ENDIF
 
@@ -307,7 +306,6 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
 
       IF !oInMail:Open()
-         lConnect := .F.
          oInmail:Close()
          RETURN .F.
       ENDIF
@@ -329,10 +327,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
       IF Valtype( aThisFile ) == "C"
          cFile := aThisFile
-         cData := Memoread( cFile ) + chr( 13 ) + chr( 10 )
+         Memoread( cFile )
       ELSEIF Valtype( aThisFile ) == "A" .AND. Len( aThisFile ) >= 2
          cFile := aThisFile[ 1 ]
-         cData := aThisFile[ 2 ] + chr( 13 ) + chr( 10 )
       ELSE
          lReturn := .F.
          EXIT
@@ -352,13 +349,11 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
 //   oInmail:Write( oMail:ToString() )
    cData := oMail:ToString()
-   nSize := Len(cData)
    for nCount := 1 to len(cData) step 1024
-       aadd(aData, substr( cData,nCount,1024))
+       aadd(aData, substr( cData, nCount, 1024))
    next
-   nSent :=0
    for nCount :=1 to len(aData)
-      nSent += oInmail:Write( aData[nCount],len(aData[nCount]))
+      oInMail:Write( aData[nCount], len(aData[nCount]))
    next
    oInMail:Commit()
    oInMail:Close()

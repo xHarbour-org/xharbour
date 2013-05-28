@@ -364,8 +364,8 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
    IF ::bEof .and. ::bChunked
       ::bEof := .F.
       ::nLength := -1
-     //chunked data is followed by a blank line
-      cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
+      //chunked data is followed by a blank line
+      ::InetRecvLine( ::SocketCon, @nPos, 1024 )
 
    ENDIF
 
@@ -588,7 +588,7 @@ METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
       nFile:=fopen(cFile)
       nbuf:=8192
       nRead:=nBuf
-      cBuf:=space(nBuf)
+      //cBuf:=space(nBuf)
       while nRead=nBuf
          //nRead=FRead( nFile,@cBuf,nBuf)
          cBuf:=FReadstr( nFile,nBuf)

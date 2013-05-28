@@ -68,7 +68,6 @@
 #include "thread.h"
 
 #if defined( HB_OS_WIN )
-#define _WINSOCKAPI_    /* Prevents inclusion of Winsock.h in Windows.h */
 #include <windows.h>    /* for CRITICAL_SECTION */
 #endif
 

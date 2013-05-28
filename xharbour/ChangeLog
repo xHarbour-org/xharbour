@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-05-28 14:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbstack.h
+    ! enable inclusion Winsock.h in Windows.h, prevented in my previous commit
+
+  * contrib/hbbz2/compress.c
+    ! pacify some GCC warning
+
+  * contrib/tipssl/client.prg
+  * contrib/tipssl/httpcln.prg
+  * contrib/tipssl/mail.prg
+  * contrib/tipssl/popcln.prg
+  * contrib/tipssl/sendmail.prg
+  * contrib/tipssl/smtpcln.prg
+    ! fixed assigned but not used variables
+
 2013-05-27 22:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbatomic.h
   * include/hbstack.h

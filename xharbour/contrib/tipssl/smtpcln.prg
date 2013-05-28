@@ -128,7 +128,6 @@ RETURN ::GetOk()
 
 METHOD GetOk() CLASS tIPClientSMTP
    LOCAL nLen
-   Local lRet := .f.
 
    ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 512 )
    IF ::InetErrorCode( ::SocketCon ) != 0 .or. Substr( ::cReply, 1, 1 ) == '5'
@@ -185,7 +184,6 @@ RETURN ::GetOk()
 METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
 
    Local cUser
-   Local cTemp :=""
 
    IF .not. ::super:Open( cUrl )
       RETURN .F.
@@ -213,7 +211,6 @@ RETURN ::getOk()
 
 METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
 
-   Local cs:=''
    Local cEncodedUser
    Local cEncodedPAss
 

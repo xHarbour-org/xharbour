@@ -725,11 +725,11 @@ METHOD Openproxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWor
 //Local pSocket
 Local cLine
 Local cRequest := ""
-Local cPass := ""
-Local cEncoded := ''
+Local cPass
+Local cEncoded
 Local lRet := .T.
 
-Local pEx,nResponseCode
+Local nResponseCode
 Local sResponseCode,nFirstSpace
 ::InetConnect( cProxy, nProxyPort, ::SocketCon )
 IF ::InetErrorCode( ::SocketCon ) == 0
@@ -758,7 +758,7 @@ IF ::InetErrorCode( ::SocketCon ) == 0
             Throw( Errornew( "INETCONNECTPROXY", 0, 4000, Procname(), "Connection refused" ) )
          ENDIF
       ENDIF
-   catch pEx 
+   catch
       ::close( )
       lRet := .F.
    END

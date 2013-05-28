@@ -611,12 +611,12 @@ RETURN .T.
 
 METHOD attachFile( cFileName ) CLASS TipMail
    LOCAL cContent := MemoRead( cFileName )
-   Local cFname, cFext 
-   Local xDummy := HB_FNameSplit( cFileName,, @cFname, @cFext )
-   LOCAL cMimeType:= HB_SetMimeType( cFileName, cFname, cFext )
-   LOCAL cDelim   := HB_OsPathSeparator()
-
+   Local cFname, cFext, cMimeType
+   LOCAL cDelim := HB_OsPathSeparator()
    LOCAL oAttach
+
+   HB_FNameSplit( cFileName,, @cFname, @cFext )
+   cMimeType := HB_SetMimeType( cFileName, cFname, cFext )
 
    IF Empty( cContent )
       RETURN .F.
