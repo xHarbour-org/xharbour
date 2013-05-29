@@ -308,6 +308,8 @@ METHOD OnPaint() CLASS RepEdit
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
+
+   ::EndPaint()
    
    IF lMarkers
       hDC := GetDCEx( ::hWnd )
@@ -318,7 +320,6 @@ METHOD OnPaint() CLASS RepEdit
       ::oLast:InvalidateRect()
       ::oLast := NIL
    ENDIF
-   ::EndPaint()
 RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------------
