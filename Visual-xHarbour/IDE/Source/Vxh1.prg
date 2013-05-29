@@ -1801,7 +1801,6 @@ METHOD Init() CLASS IDE_MainForm
       END
 
       WITH OBJECT ::Application:ObjectTab := TabStrip( :this )
-         :Multiline   := .F.
          :Dock:Margin := 1
          :Dock:Left   := :Parent
          :Dock:Top    := ::Application:Props[ "ComboSelect" ]
@@ -2001,7 +2000,6 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:DebugWindow := DebugTab( Self )
       :Width         := 680
       :Height        := ( 200 * 4 ) / LOWORD( GetDialogBaseUnits() )
-      :Multiline     := .T.
       :TabPosition   := 4
       :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::StatusBar1
@@ -2111,7 +2109,6 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:MainTab := TabStrip( Self )
       :Width     := 680
       :Height    := 300
-      :Multiline := .F.
       
       :Dock:BottomMargin := 3
       :Dock:Left   := ::Application:ToolBox

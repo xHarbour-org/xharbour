@@ -27,6 +27,7 @@ CLASS eMail INHERIT Component
    DATA HTMLBody          EXPORTED  INIT ""
    DATA TextBody          EXPORTED  INIT ""
    DATA EnumSendUsing     EXPORTED  INIT {{"Pickup","Port"},{1,2}}
+
    DATA SendUsing         PUBLISHED INIT 2
    DATA SMTPServer        PUBLISHED INIT ""
    DATA MimeFormatted     PUBLISHED INIT .T.
@@ -37,6 +38,7 @@ CLASS eMail INHERIT Component
    DATA SendUserName      PUBLISHED INIT ""
    DATA SendPassword      PUBLISHED INIT ""
    DATA Attachments       PUBLISHED
+
    METHOD Init() CONSTRUCTOR
    METHOD Send()
 ENDCLASS
@@ -49,7 +51,23 @@ METHOD Init( oOwner ) CLASS eMail
 RETURN Self
 
 METHOD Send() CLASS eMail
-   LOCAL oMsg, oConf, oFlds, cSchema, aFiles, cFile, lReturn := .T.
+/*
+   HB_SendMail( ::SMTPServer,;
+                ::SMTPServerPort,;
+                ::From,;
+                hb_aTokens( ::To, ";" ),;
+                hb_aTokens( ::CC, ";" ),;
+                hb_aTokens( ::BCC, ";" ),;
+                ::TextBody,;
+                ::Subject,;
+                hb_aTokens( ::Attachments, ";" ),;
+                ::SendUserName,;
+                ::SendPassword,;
+                "", , , , .T., .T., , ::ReplyTo, ::SMTPUseSSL, ,  )
+
+*/
+   LOCAL oMsg, e, oConf, oFlds, cSchema, aFiles, cFile, lReturn := .T.
+   LOCAL hEventHandler := {=>}
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
     CATCH
@@ -73,13 +91,14 @@ METHOD Send() CLASS eMail
    oFlds := oConf:Fields
 
    cSchema := "http://schemas.microsoft.com/cdo/configuration/"
-   oFlds:Item( cSchema + "sendusing",        ::SendUsing )
-   oFlds:Item( cSchema + "smtpserver",       ::SMTPServer )
-   oFlds:Item( cSchema + "smtpserverport",   ::SMTPServerPort )
-   oFlds:Item( cSchema + "smtpauthenticate", ::SMTPAuthenticate )
-   oFlds:Item( cSchema + "sendusername",     ::SendUserName )
-   oFlds:Item( cSchema + "sendpassword",     ::SendPassword )
-   oFlds:Item( cSchema + "smtpusessl",       ::SMTPUseSSL )
+
+   oFlds:Item( cSchema + "sendusing" ):Value        := ::SendUsing
+   oFlds:Item( cSchema + "smtpserver" ):Value       := ::SMTPServer
+   oFlds:Item( cSchema + "smtpserverport" ):Value   := ::SMTPServerPort
+   oFlds:Item( cSchema + "smtpauthenticate" ):Value := IIF( ::SMTPAuthenticate, 1, 0 )
+   oFlds:Item( cSchema + "sendusername" ):Value     := ::SendUserName
+   oFlds:Item( cSchema + "sendpassword" ):Value     := ::SendPassword
+   oFlds:Item( cSchema + "smtpusessl" ):Value       := ::SMTPUseSSL
 
    oFlds:Update()
 
@@ -113,7 +132,7 @@ METHOD Send() CLASS eMail
       ENDIF
       TRY
          :Send()
-      CATCH
+      CATCH e
          lReturn := .F.
       END
    END
@@ -248,3 +267,59 @@ RETURN MAPISendMail( 0, 0, pMsg, ::__Flags, 0, IIF( LEN( aAttach ) > 1, aAttach,
 #define MAPI_E_NOT_SUPPORTED  26
 */
 
+/*
+0×80040201  Exception %1 was generated at address %2.
+0×80040202  No data source has been opened for the object.
+0×80040203  The object does not support this type of data source.
+0×80040204  The object does not support the requested property name or namespace.
+0×80040205  The object does not support the requested property.
+0×80040206  The object is not active. It may have been deleted or it may not have been opened.
+0×80040207  The object does not support storing persistent state information for objects.
+0×80040208  The requested property or feature, while supported, is not available at this time or in this context.
+0×80040209  No default drop directory has been configured for this server.
+0x8004020A  The SMTP server name is required, and was not found in the configuration source.
+0x8004020B  The NNTP server name is required, and was not found in the configuration source.
+0x8004020C  At least one recipient is required, but none were found.
+0x8004020D  At least one of the From or Sender fields is required, and neither was found.
+0x8004020E  The server rejected the sender address. The server response was: %1
+0x8004020F  The server rejected one or more recipient addresses. The server response was: %1
+0×80040210  The message could not be posted to the NNTP server. The transport error code was %2. The server response was %1
+0×80040211  The message could not be sent to the SMTP server. The transport error code was %2. The server response was %1
+0×80040212  The transport lost its connection to the server.
+0×80040213  The transport failed to connect to the server.
+0×80040214  The Subject, From, and Newsgroup fields are all required, and one or more was not found.
+0×80040215  The server rejected the logon attempt due to authentication failure. The server response was: %1
+0×80040216  The content type was not valid in this context. For example, the root of an MHTML message must be an HTML document.
+0×80040217  The transport was unable to log on to the server.
+0×80040218  The requested resource could not be found. The server response was: %1.
+0×80040219  Access to the requested resource is denied. The server response was: %1.
+0x8004021A  The HTTP request failed.  The server response was: %1.
+0x8004021B  This is a multipart body part. It has no content other than the body parts contained within it.
+0x8004021C  Multipart body parts must be encoded as 7bit, 8bit, or binary.
+0x8004021E  The requested property was not found.
+0×80040220  The "SendUsing" configuration value is invalid.
+0×80040221  The "PostUsing" configuration value is invalid.
+0×80040222  The pickup directory path is required and was not specified.
+0×80040223  One or more messages could not be deleted.
+0×80040227  The property is read-only.
+0×80040228  The property cannot be deleted.
+0×80040229  Data  written to the object are inconsistent or invalid.
+0x8004022A  The requested property is not in the mail header namespace.
+0x8004022B  The requested character set is not installed on the computer.
+0x8004022C  The ADO stream has not been opened.
+0x8004022D  The content properties are missing.
+0x8004022E  Content properties XML must be encoded using UTF-8.
+0x8004022F  Failed to parse content properties XML.
+0×80040230  Failed to convert a property from XML to a requested type.
+0×80040231  No directories were specified for resolution.
+0×80040232  Failed to resolve against one or more of the specified directories.
+0×80040233  Could not find the Sender’s mailbox.
+0×80040234  Binding to self is not allowed.
+0×80044000  The first argument is invalid.
+0×80044001  The second argument is invalid.
+0×80044002  The third argument is invalid.
+0×80044003  The fourth argument is invalid.
+0×80044004  The fifth argument is invalid.
+0x800CCE05  The requested body part was not found in this message.
+0x800CCE1D  The content encoding type is invalid.
+*/

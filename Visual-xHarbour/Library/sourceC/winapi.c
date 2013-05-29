@@ -6221,6 +6221,23 @@ HB_FUNC( DLLREGISTERSERVER )
 }
 
 //-------------------------------------------------------------------------------------------------
+HB_FUNC( DLLUNREGISTERSERVER )
+{
+   HRESULT hRes;
+   HMODULE hLib;
+   HRESULT (WINAPI *pProc)( void );
+   hLib = LoadLibrary( hb_parc(1) );
+
+   if( hLib )
+   {
+      pProc = (HRESULT (WINAPI *)(void)) GetProcAddress( hLib, "DllUnregisterServer" );
+      hRes = pProc();
+      FreeLibrary(hLib);
+   }
+   hb_retl( hRes == S_OK );
+}
+
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( ANIMATEWINDOW )
 {
    hb_retl( AnimateWindow( (HWND) hb_parnl(1), (DWORD) hb_parnl(2), (DWORD) hb_parnl(3) ) );
