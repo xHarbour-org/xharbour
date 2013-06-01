@@ -112,10 +112,8 @@ void process_exports(void)
 
             if (!options.no_export_object)
                 write_and_process_export_object();
-            /* Ron Pinkas
             if (!options.no_import_archive)
                 write_import_archive();
-            */
         }
     }
 }
@@ -465,11 +463,7 @@ static void *write_export_object_file(void *ip)
         nameptr_table[i] = ((char *)ip - (char *)export);
         ordinal_table[i] = idx;
 
-        /* Ron Pinkas Aug 13 2012
         strcpy(ip, exp->name);
-        */
-        strcpy(ip, exp->sym ? exp->sym->name : exp->name);
-
         ip = (char *)ip + strlen(ip)+1;
     }
 
@@ -782,16 +776,8 @@ static void *process_archive_module(void *ip, void *vp, void *(__stdcall *write_
     {
         char *impname = (char *)(ni+1);
         EXPENTRY *exp;
-        /* Ron Pinkas Aug 13 2012 */
-        char expname[MAX_PATH];
 
-        symbol_from_export_name(expname, impname, ni->ni_flags);
-        exp = lookup_export(expname, impname);
-        /* END Ron Pinkas Aug 13 2012 */
-
-        /* Ron Pinkas Aug 13 2012
         exp = lookup_export(impname, NULL);
-        */
         exp->offset = offset;
 
         sprintf(name, "__imp_%s", impname);
@@ -1608,22 +1594,10 @@ static void *write_new_import_member(void *ip, void *vp)
     ni->ni_hint = 0;
     ni->ni_flags = (exp->sym->flags.function ? COFF_I_CODE : COFF_I_DATA)|COFF_I_NAME;
 
-    /* Ron Pinkas Aug 13 2012 added support for COFF_I_NAME_NOPREF as per xLib sources */
-    if( exp->sym->flags.function && exp->name[0] != exp->sym->name[0] )
-    {
-       ni->ni_dsize = strlen(exp->sym->name)+1 + strlen(member_name)+1;
-       ni->ni_flags = (ushort_t)( COFF_I_CODE | COFF_I_NAME_NOPREF );
-       strcpy(ip, exp->sym->name);
-    }
-    /* END - Ron Pinkas Aug 13 2012 */
-    else
-    {
-       /*
-        * Write the symbol name.
-        */
-        strcpy(ip, exp->name);
-    }
-
+    /*
+     * Write the symbol name.
+     */
+    strcpy(ip, exp->name);
     ip = (char *)ip + strlen(ip)+1;
 
     /*
@@ -2106,9 +2080,7 @@ static size_t sizeof_first_linker_member(void)
     size = sizeof(long) + export_count * sizeof(long);
 
     for (i = 0; i < export_count; i++)
-        /* Ron Pinkas Aug 13 2012
         size += strlen(export_list[i]->name) + 1;  /* include '\0' */
-        size += strlen(export_list[i]->sym ? export_list[i]->sym->name : export_list[i]->name) + 1;  /* include '\0' */
 
     return size;
 }
@@ -2141,10 +2113,7 @@ static void *write_first_linker_member(void *ip, size_t size)
 
     for (i = 0; i < export_count; i++)
     {
-        /* Ron Pinkas Aug 13 2012
         strcpy(ip, export_list[i]->name);
-        */
-        strcpy(ip, export_list[i]->sym ? export_list[i]->sym->name : export_list[i]->name);
         ip = (char *)ip + strlen(ip)+1;
     }
 
@@ -2171,9 +2140,7 @@ static size_t sizeof_second_linker_member(void)
            sizeof(long) + export_count * sizeof(short);
 
     for (i = 0; i < export_count; i++)
-       /* Ron Pinkas Aug 13 2012
-       size += strlen(export_list[i]->name) + 1;  /* include '\0' */
-       size += strlen(export_list[i]->sym ? export_list[i]->sym->name : export_list[i]->name) + 1;  /* include '\0' */
+        size += strlen(export_list[i]->name) + 1;  /* include '\0' */
 
     return size;
 }
@@ -2221,10 +2188,7 @@ static void *write_second_linker_member(void *ip, size_t size)
 
     for (i = 0; i < export_count; i++)
     {
-        /* Ron Pinkas Aug 13 2012
         strcpy(ip, export_list[i]->name);
-        */
-        strcpy(ip, export_list[i]->sym ? export_list[i]->sym->name : export_list[i]->name);
         ip = (char *)ip + strlen(ip)+1;
     }
 

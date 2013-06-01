@@ -2,6 +2,24 @@
  * $Id:
  */
 
+2013-06-01 00:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * crt\include\math.h
+     ! Fixed typo missing #endif
+     ! Reverted to not guard_exception constants with #ifdef _MSC_EXTENSIONS
+
+   * crt\src\g.bat
+     ! Use xcc to compile the CRT instead of Pelles C
+     ! Fix output to the Log file
+   * crt\src\makefile
+     ! Use xcc include files instead of Pelles C
+
+   * xlink\export.c
+     ! Reverted to original version
+
+   * xrc\g.bat
+     * Minor cleanup
+     ! Fixed output to the Log file
+
 2012-09-17 19:00 UTC-0800 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * xcc\cc\cpp.h
     * Increased INPUT BUFFER SIZE to 65536

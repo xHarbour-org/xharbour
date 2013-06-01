@@ -313,7 +313,7 @@ long double __cdecl __sinhl(long double, long double);
 short __cdecl __fptestl(long double *);
 short __expl(long double *, long double, short);
 
-#ifdef _MSC_EXTENSIONS
+//#ifdef _MSC_EXTENSIONS
 /* values for _exception type */
 #define _DOMAIN     1   /* argument domain error */
 #define _SING       2   /* argument singularity */
@@ -324,6 +324,7 @@ short __expl(long double *, long double, short);
 
 #define EDOM        33
 #define ERANGE      34
+//#endif /* _MSC_EXTENSIONS */
 
 /* compatibility names */
 #ifdef __POCC__OLDNAMES
@@ -345,7 +346,7 @@ struct _exception {
 };
 int __cdecl _matherr(struct _exception *);
 #define _EXCEPTION_DEFINED
-#endif /* _MSC_EXTENSIONS */
+#endif /* _EXCEPTION_DEFINED */
 
 #endif /* _MATH_H */
 

@@ -38,32 +38,29 @@ SET _PRESET_LFLAGS=%LFLAGS%
 :READY
 
 SET PELLESCDIR=%ProgramFiles%\PellesC
-SET PATH=%PATH%;"%PELLESCDIR%\bin"
+SET XCCDIR=\xhb\bin
+SET PATH=%PATH%;"%XCCDIR%"
 
-SET _PRESET_CFLAGS=%CFLAGS%
-SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
-
-SET _PRESET_LFLAGS=%LFLAGS%
-SET LFLAGS=-DEBUG -DEBUGTYPE:CV
+REM SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
+REM SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 
 IF NOT EXIST Objs MD Objs
 IF NOT EXIST mtObjs MD mtObjs
 
-echo single-thread >log
-nmake -a -s > log
+echo single-thread > log
+nmake >> log
 if errorlevel 1 goto q
 
 echo multi-thread >>log
-nmake -a -s __MT__=1 >> log
+nmake __MT__=1 >> log
 if errorlevel 1 goto q
 
 echo wince
 ..\utils\narmw -o wince\xdiv.obj -f win32 wince\xdiv.asm
 @if errorlevel 1 goto Q
-"%PELLESCDIR%\bin\polib.exe" -out:crtce.lib wince\xdiv.obj
+xlib.exe -out:crtce.lib wince\xdiv.obj
 
 :q
-
 IF ERRORLEVEL 0 xcopy crt.lib \xhb\c_lib /d /r /y
 IF ERRORLEVEL 0 xcopy crtmt.lib \xhb\c_lib /d /r /y
 xcopy "%PELLESCDIR%\lib\win" \xhb\c_lib\win /d /y 

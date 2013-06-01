@@ -16,7 +16,8 @@ OUT = mtobjs
 OUT = objs
 !ENDIF
 
-crtbase = ..
+xccbase = \xharbour.com\xharbour-xcc
+crtbase = $(xccbase)\crt
 
 !IFDEF __CE__
 cflags = -D_WINCE -TARM-COFF
@@ -29,11 +30,11 @@ cflags =
 aflags =
 !ENDIF
 
-cflags = $(cflags) -DNDEBUG -Zl -Ot -W1 -X -I$(crtbase)\include -I"$(PELLESCDIR)\INCLUDE\WIN"
+cflags = $(cflags) -DNDEBUG -Zl -Ot -W1 -X -I$(crtbase)\include -I"$(xccbase)\INCLUDE\WIN"
 aflags = $(aflags) -format:coff
 
-cc = pocc $(cflags)
-lib = polib
+cc = xcc $(cflags)
+lib = xlib
 as = $(crtbase)\utils\poasm $(aflags)
 
 .SUFFIXES: .c .asm .obj
