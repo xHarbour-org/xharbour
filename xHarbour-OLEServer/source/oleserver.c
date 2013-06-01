@@ -10,6 +10,18 @@
 #pragma comment( lib, "oleAut32.lib" )
 #pragma comment( lib, "AdvApi32.lib" )
 
+#ifndef AX
+  #if defined( _MSC_VER )
+     #ifndef NODLLMAIN
+        #pragma comment( linker, "-export:DllRegisterServer=_DllRegisterServer@0,@1" )
+        #pragma comment( linker, "-export:DllUnregisterServer=_DllUnregisterServer@0,@2" )
+     #endif
+
+     #pragma comment( linker, "-export:DllCanUnloadNow=_DllCanUnloadNow@0,@3" )
+     #pragma comment( linker, "-export:DllGetClassObject=_DllGetClassObject@12,@4" )
+  #endif
+#endif
+
 #define CINTERFACE 1
 #define NONAMELESSUNION
 
@@ -49,16 +61,6 @@
 
   #define DllGetClassObject OleServerGetClassObject
 #else
-  #ifdef _MSC_VER
-     #ifndef NODLLMAIN
-        #pragma comment( linker, "-export:DllRegisterServer=_DllRegisterServer@0,@1" )
-        #pragma comment( linker, "-export:DllUnregisterServer=_DllUnregisterServer@0,@2" )
-     #endif
-
-     #pragma comment( linker, "-export:DllCanUnloadNow=_DllCanUnloadNow@0,@3" )
-     #pragma comment( linker, "-export:DllGetClassObject=_DllGetClassObject@12,@4" )
-  #endif
-
   extern BOOL IsExportedSymbol( PHB_DYNS pDyn );
   extern PHB_SYMB OleServerSymbols( USHORT *puiSymbols );
 #endif

@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-01 01:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source\oleserver.c
+    ! Moved #pragma comment section to top, to fix linker export directives generation under xcc
+
+  * xcc\oleserver.lib.xbp
+    * Upgraded to latest structure and added -Ze switch to oleserver.c
+
 2012-08-14 13:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * bc5\ole.lib.xbp
   * vc8\ole.lib.xbp
