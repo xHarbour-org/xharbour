@@ -2853,6 +2853,11 @@ FUNCTION LoadProject( cFile, Parent, cIniFile )
          :DLL_Startup        := Parent:DLL_Startup
 
          :GUI_Flag           := Parent:GUI_Flag
+
+         :hC_EnvVars         := Parent:hC_EnvVars
+         :hPRG_EnvVars       := Parent:hPRG_EnvVars
+         :hRC_EnvVars        := Parent:hRC_EnvVars
+         :hSLY_EnvVars       := Parent:hSLY_EnvVars
       END WITH
    ENDIF
 

@@ -6,45 +6,6 @@
   You may NOT forward or share this file under any conditions!
 */
 
-#include "hbclass.ch"
-
-STATIC s_hEnvVars := { => }
-
-STATIC s_sProgramsFolder
-
-// No Actions.
-#define TYPE_SOURCE_LIB -5
-#define TYPE_SOURCE_OBJ -4
-#define TYPE_SOURCE_RES -3
-#define TYPE_RC         -2
-#define TYPE_INCLUDE    -1
-#define TYPE_NO_ACTION   0
-
-// Actions generating
-#define TYPE_FROM_PRG    1
-#define TYPE_FROM_C      2
-#define TYPE_FROM_SLY    3
-#define TYPE_FROM_RC     4
-
-// Targets
-#define TYPE_EXE        10
-#define TYPE_LIB        11
-#define TYPE_DLL        12
-#define TYPE_HRB        13
-
-#ifdef __PLATFORM__Windows
-  #define DRIVE_SEPARATOR ':'
-  #define DIR_SEPARATOR '\'
-  #define EOL Chr(13) + Chr(10)
-  #define EXACT_CASE .F.
-#else
-  #define DRIVE_SEPARATOR ''
-  #define DIR_SEPARATOR '/'
-  #define EOL Chr(10)
-  #define EXACT_CASE .T.
-#endif
-
-
 #pragma BEGINDUMP
 
 #include <stdlib.h>
@@ -276,6 +237,11 @@ HB_FUNC( FINDINCLUDES )
      s_bWaitContinue = bWaitContinue;
   }
 
+   HB_FUNC( OUTPUTDEBUGSTRING )
+   {
+      OutputDebugString( hb_parc(1) );
+   }
+
   HB_FUNC( CREATEPROCESSWAIT )
   {
     STARTUPINFO si;
@@ -340,6 +306,7 @@ HB_FUNC( FINDINCLUDES )
     si.cb          = sizeof(si);
     si.dwFlags     |= STARTF_USESHOWWINDOW;
     si.wShowWindow |= SW_HIDE;
+
     if( hOutput != NULL )
     {
        si.dwFlags    |= STARTF_USESTDHANDLES;
@@ -352,6 +319,7 @@ HB_FUNC( FINDINCLUDES )
     ZeroMemory( &pi, sizeof(pi) );
 
     pEnv = hb_param( 4, HB_IT_STRING );
+
     if( pEnv )
     {
        sEnv = pEnv->item.asString.value;
@@ -359,17 +327,17 @@ HB_FUNC( FINDINCLUDES )
 
     // Start the child process.
     if( CreateProcess(
-                             hb_parc(1),             //App name.
-                             (char *) hb_parc(2),             // Command line.
-                             NULL,                     // Process handle not inheritable.
-                             NULL,                     // Thread handle not inheritable.
-                             ( hOutput != NULL ), // Set handle inheritance .
-                             0,                          // No creation flags.
-                             sEnv,                     // Use parent's environment block.
-                             NULL,                     // Use parent's starting directory.
-                             &si,                       // Pointer to STARTUPINFO structure.
-                             &pi                        // Pointer to PROCESS_INFORMATION structure.
-                          )
+                         hb_parc(1),             //App name.
+                         (char *) hb_parc(2),             // Command line.
+                         NULL,                     // Process handle not inheritable.
+                         NULL,                     // Thread handle not inheritable.
+                         ( hOutput != NULL ), // Set handle inheritance .
+                         0,                          // No creation flags.
+                         sEnv,                     // Use parent's environment block.
+                         NULL,                     // Use parent's starting directory.
+                         &si,                       // Pointer to STARTUPINFO structure.
+                         &pi                        // Pointer to PROCESS_INFORMATION structure.
+                      )
       )
     {
        s_bWaitContinue = TRUE;

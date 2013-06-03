@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-02 20:29 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+  * tproject-c.c
+    - Removed redundant code copy/pasted from tproject.prg
+
+  * tproject.prg
+    * Added missining support for copying :h[*]EnvVars Hashes of parent to sub project
+
 2013-06-01 01:16 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
   * tproject.prg
     * Commented workaround of using xLib to generate implib instead of xLink
