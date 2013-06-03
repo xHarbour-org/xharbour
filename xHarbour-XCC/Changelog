@@ -2,6 +2,10 @@
  * $Id:
  */
 
+2013-06-02 20:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xcc\lburg\x86.md
+     ! Fixed typo which caused exported symbols in Dlls to "lose" the underscore prefix
+
 2013-06-01 00:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * crt\include\math.h
      ! Fixed typo missing #endif
