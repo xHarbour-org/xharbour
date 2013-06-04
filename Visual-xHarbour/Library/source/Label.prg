@@ -101,6 +101,7 @@ METHOD OnPaint() CLASS Label
 
    hDC := ::BeginPaint()
 
+   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
    _FillRect( hDC, aRect, hBkGnd )
 
    IF ::Border <> 0

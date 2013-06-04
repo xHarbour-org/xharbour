@@ -3289,6 +3289,10 @@ METHOD __WindowDestroy() CLASS Window
       DeleteObject( ::BkBrush )
    ENDIF
 
+   IF ::__hBrush != NIL
+      DeleteObject( ::__hBrush )
+   ENDIF
+
    IF ::SelBkBrush != NIL
       DeleteObject( ::SelBkBrush )
    ENDIF

@@ -342,6 +342,8 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            hDC := _BeginPaint( hWnd, @cPaint )
 
            SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
+           _FillRect( hDC, s_aRect, GetSysColorBrush( COLOR_BTNFACE ) )
+           
            hOldFont := SelectObject( hDC, s_hFont )
 
            _DrawText( hDC, s_cText, s_aRect, DT_CENTER|DT_VCENTER|DT_NOPREFIX )
