@@ -2,6 +2,10 @@
  * $Id:
  */
 
+2013-06-03 22:51 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   % xcc\cc\init.c
+     % Optimized find_elem() by creating optimized add_elem_find_elem() and get_elem_find_elem()
+
 2013-06-02 20:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * xcc\lburg\x86.md
      ! Fixed typo which caused exported symbols in Dlls to "lose" the underscore prefix

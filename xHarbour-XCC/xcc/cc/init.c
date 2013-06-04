@@ -53,7 +53,9 @@ static int constant_elems(LIST *);
 static int assignment_elems(TYPE *);
 static LIST *add_elem(int, TREE *, LIST *);
 static TREE *get_elem(int, TYPE *, LIST *);
-static ELEM *find_elem(int, LIST *);
+//static ELEM *find_elem(int, LIST *);
+static ELEM *get_elem_find_elem(int, LIST *); /* 2013-06-03 Ron Pinkas optimized find_elem() for get_elem() */
+static ELEM *add_elem_find_elem(int, LIST *); /* 2013-06-03 Ron Pinkas optimized */
 
 /****************************************************************************
  *                                                                          *
@@ -1129,7 +1131,7 @@ static LIST *add_elem(int offset, TREE *e, LIST *list)
 {
     ELEM *p;
 
-    p = find_elem(offset, list);
+    p = add_elem_find_elem(offset, list);
     if (p)
     {
         apperror(RCWARNING1(ERROR_DUPLICATE_INITIALIZERS), offset);
@@ -1162,7 +1164,7 @@ static TREE *get_elem(int offset, TYPE *ty, LIST *list)
 
     assert(!ty || isscalar(ty));
 
-    p = find_elem(offset, list);
+    p = get_elem_find_elem(offset, list);
     if (p)
         return p->e;
     else if (ty)
@@ -1182,8 +1184,57 @@ static TREE *get_elem(int offset, TYPE *ty, LIST *list)
  *                                                                          *
  ****************************************************************************/
 
-static ELEM *find_elem(int offset, LIST *list)
+static ELEM *get_elem_find_elem(int offset, LIST *list)
 {
+   /* 2013-06-03 Ron Pinkas optimize the common case of sequencial search from get_elem() */
+   static LIST *lp = NULL, *lastlist = NULL;
+
+   if (lastlist == list)
+    {
+       ELEM *p;
+
+       lp = lp->link;
+       p  = lp->data;
+       if (p->offset == offset) return p;
+    }
+    else
+       lastlist = list;
+    /* End */
+
+    if (list != NULL)
+    {
+        lp = list;
+        do
+        {
+            ELEM *p = lp->data;
+            if (p->offset == offset) return p;
+        } while ((lp = lp->link) != list);
+    }
+
+    return NULL;
+}
+
+static ELEM *add_elem_find_elem(int offset, LIST *list)
+{
+   /* 2013-06-03 Ron Pinkas: Optimize the common case of sequencial addition from add_elem() */
+   static LIST *lastlist = NULL;
+   static int maxoffset = 0;
+
+   if (list && lastlist == list->link)
+    {
+       if (offset > maxoffset)
+       {
+          maxoffset = offset;
+          return NULL;
+       }
+    }
+    else
+    {
+       lastlist = list;
+       maxoffset = offset;
+    }   
+    /* End */
+
     if (list != NULL)
     {
         LIST *lp = list;
