@@ -32,8 +32,8 @@ REM  ===============================================
 REM  ===============================================
 
       IF NOT "%_XB_Compiler%"=="xcc" GOTO No_xLink
-        CD \xHarbour.com\xHarbour-XCC\xlink
-        CALL g.bat
+        CD \xHarbour.com\xHarbour-XCC
+        CALL build_xcc.bat
      :No_xLink
 
 

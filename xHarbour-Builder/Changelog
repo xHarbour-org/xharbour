@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-04 08:15 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xbldfull2.bat
+    + Call \xharbour.com\xharbour-xcc\build_xcc.bat
+
 2013-03-16 12:20 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * Visual-xHarbour\Library\sourceC\ExplorBar.c
     * Minor corrections
