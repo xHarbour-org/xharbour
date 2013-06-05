@@ -51,56 +51,12 @@
  *
  */
 
-/* 2007-04-19, Hannes Ziegler <hz AT knowlexbase.com>
-   Added method :RMD()
-   Added method :listFiles()
-   Added method :MPut()
-   Changed method :DownLoadFile() to enable display of progress
-   Changed method :UpLoadFile() to enable display of progress
-*/
-
-/* 2007-06-01, Toninho@fwi
-   Added method UserCommand( cCommand, lPasv, lReadPort, lGetReply )
-*/
-
-/* 2007-07-12, miguelangel@marchuet.net
-   Added method :NoOp()
-   Added method :Rest( nPos )
-   Changed method :LS( cSpec )
-   Changed method :List( cSpec )
-   Changed method :TransferStart()
-   Changed method :Stor( cFile )
-   Changed method :UpLoadFile( cLocalFile, cRemoteFile )
-   Changed method :DownLoadFile( cLocalFile, cRemoteFile )
-
-   Added support to Port transfer mode
-   Added method :Port()
-   Added method :SendPort()
-
-   Cleaned unused variables.
-*/
-
-/* 2007-09-08 21:34 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
-   * source\tip\ftpcln.prg
-     * Formatting
-   + METHOD StartCleanLogFile()
-     Starts a clean log file, overwriting current logfile.
-   + METHOD fileSize( cFileSpec )
-     Calculates the filesize of the given files specifications.
-   + DATA cLogFile
-     Holds the filename of the current logfile.
-   ! Fixed logfilename in New(), now its not limited to 9999 log files anymore
-   ! Fixed MGet() due to changes in HB_aTokens()
-   ! Fixed listFiles() due to changes in HB_aTokens()
-   ! listFiles() is still buggy. Needs to be fixed.
-*/
-
 #include "directry.ch"
 #include "hbclass.ch"
 #include "tip.ch"
 #include "common.ch"
 
-STATIC nPort := 16000
+STATIC s_nPort := 16000
 
 /**
 * Inet service manager: ftp
@@ -115,14 +71,14 @@ CLASS tIPClientFTP FROM tIPClient
    DATA RegPasv                       //
    DATA SocketControl                 // Socket opened in response to a port command
    DATA SocketPortServer              //
-   DATA cLogFile                      //
-   DATA lInUser                       // Culik new data to verify if we finish user command
+   DATA cLogFile                      // Holds the filename of the current logfile
+   DATA lInUser                       // To verify if we finish user command
 
    METHOD New( oUrl, lTrace, oCredentials )
-   METHOD Open()
+   METHOD Open( cUrl )
 
    METHOD READ( nLen )
-   METHOD Write( nLen )
+   METHOD Write( cData, nLen )
    METHOD CLOSE()
    METHOD TransferStart()
    METHOD COMMIT()
@@ -144,26 +100,26 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD Stor( cFile )
    METHOD Quit()
    METHOD ScanLength()
-   METHOD ReadAuxPort()
-   METHOD MGet()
+   METHOD ReadAuxPort( cLocalFile )
+   METHOD MGet( cSpec, cLocalPath )
 
    METHOD LS( cSpec )
    METHOD RENAME( cFrom, cTo )
-   METHOD UpLoadFile( cLocalFile, cRemoteFile )     // File upload
-   METHOD DownLoadFile( cLocalFile, cRemoteFile )   // Download file
-   METHOD MKD( cPath )                              // Create an directory on ftp server
-   METHOD RMD( cPath )                              // Delete an existing folder
-   METHOD listFiles( cList )
-   METHOD MPut()
-   METHOD StartCleanLogFile()
-   METHOD fileSize( cFileSpec )
+   METHOD UpLoadFile( cLocalFile, cRemoteFile )    // File upload
+   METHOD DownLoadFile( cLocalFile, cRemoteFile )  // Download file
+   METHOD MKD( cPath )                             // Create an directory on ftp server
+   METHOD RMD( cPath )                             // Delete an existing folder
+   METHOD listFiles( cFileSpec )
+   METHOD MPut( cFileSpec, cAttr )
+   METHOD StartCleanLogFile()                      // Starts a clean log file, overwriting current logfile
+   METHOD fileSize( cFileSpec )                    // Calculates the filesize of the given files specifications
    METHOD CDUP()
 
-   DESTRUCTOR FtpClnDesTructor
+   DESTRUCTOR FtpClnDestructor()
 
 ENDCLASS
 
-PROCEDURE FtpClnDesTructor CLASS  tIPClientftp
+PROCEDURE FtpClnDestructor() CLASS tIPClientFTP
 
    IF ::lTrace .AND. ::nHandle > 0
       FClose( ::nHandle )
@@ -182,7 +138,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientFTP
    ::nDefaultPort := 21
    ::nConnTimeout := 3000
    ::bUsePasv     := .T.
-   ::nAccessMode  := TIP_RW  // a read-write protocol
+   ::nAccessMode  := TIP_RW       // a read-write protocol
    ::nDefaultSndBuffSize := 65536
    ::nDefaultRcvBuffSize := 65536
 
@@ -194,7 +150,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientFTP
             n++
          ENDDO
          ::cLogFile := cFile + LTrim( Str( Int(n ) ) ) + ".log"
-         ::nHandle := FCreate( ::cLogFile )
+         ::nHandle  := FCreate( ::cLogFile )
       ENDIF
    ENDIF
 
@@ -219,7 +175,7 @@ METHOD Open( cUrl ) CLASS tIPClientFTP
       ::oUrl := tUrl():New( cUrl )
    ENDIF
 
-   IF Len( ::oUrl:cUserid ) == 0 .OR. Len( ::oUrl:cPassword ) == 0
+   IF Len( ::oUrl:cUserId ) == 0 .OR. Len( ::oUrl:cPassword ) == 0
       RETURN .F.
    ENDIF
 
@@ -229,7 +185,7 @@ METHOD Open( cUrl ) CLASS tIPClientFTP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetReply()
-      ::InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
+      ::InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserId + ::cCRLF )
       IF ::GetReply()
          ::InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          // set binary by default
@@ -291,7 +247,7 @@ METHOD Pasv() CLASS tIPClientFTP
    ENDIF
 
    ::cDataServer := aRep[2] + "." + aRep[3] + "." + aRep[4] + "." + aRep[5]
-   ::nDataPort := Val( aRep[6] ) * 256 + Val( aRep[7] )
+   ::nDataPort   := Val( aRep[6] ) * 256 + Val( aRep[7] )
 
    RETURN .T.
 
@@ -412,7 +368,7 @@ METHOD TransferStart() CLASS tIPClientFTP
       ::SocketCon := InetAccept( ::SocketPortServer )
       IF Empty( ::SocketCon )
          ::bInitialized := .F.
-         ::SocketCon := ::SocketControl
+         ::SocketCon    := ::SocketControl
          ::GetReply()
          RETURN .F.
       ENDIF
@@ -425,7 +381,7 @@ METHOD TransferStart() CLASS tIPClientFTP
 METHOD COMMIT() CLASS tIPClientFTP
 
    InetClose( ::SocketCon )
-   ::SocketCon := ::SocketControl
+   ::SocketCon    := ::SocketControl
    ::bInitialized := .F.
 
    IF .NOT. ::GetReply()
@@ -544,13 +500,13 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
 METHOD Port() CLASS tIPClientFTP
 
    ::SocketPortServer := InetCreate( ::nConnTimeout )
-   nPort ++
-   DO WHILE nPort < 24000
-      InetServer( nPort, ::SocketPortServer )
+   s_nPort++
+   DO WHILE s_nPort < 24000
+      InetServer( s_nPort, ::SocketPortServer )
       IF ::InetErrorCode( ::SocketPortServer ) == 0
          RETURN ::SendPort()
       ENDIF
-      nPort ++
+      s_nPort++
    ENDDO
 
    RETURN .F.
@@ -710,7 +666,7 @@ METHOD MPut( cFileSpec, cAttr ) CLASS tIPClientFTP
       RETURN 0
    ENDIF
 
-   hb_FNameSplit( cFileSpec, @cPath, @cFile, @cExt  )
+   hb_FNameSplit( cFileSpec, @cPath, @cFile, @cExt )
 
    aFiles := Directory( cPath + cFile + cExt, cAttr )
 
@@ -728,7 +684,7 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    LOCAL cFile := ""
    LOCAL cExt  := ""
 
-   hb_FNameSplit( cLocalFile, @cPath, @cFile, @cExt  )
+   hb_FNameSplit( cLocalFile, @cPath, @cFile, @cExt )
 
    DEFAULT cRemoteFile TO cFile + cExt
 
@@ -812,7 +768,7 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    LOCAL cFile := ""
    LOCAL cExt  := ""
 
-   hb_FNameSplit( cLocalFile, @cPath, @cFile, @cExt  )
+   hb_FNameSplit( cLocalFile, @cPath, @cFile, @cExt )
 
 
    DEFAULT cRemoteFile TO cFile + cExt
@@ -841,7 +797,7 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
 
    ENDIF
 
-   RETURN ::ReadToFile( cLocalFile, , ::nLength )
+   RETURN ::ReadToFile( cLocalFile,, ::nLength )
 
 // Create a new folder
 

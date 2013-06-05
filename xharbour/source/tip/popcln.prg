@@ -51,11 +51,6 @@
  *
  */
 
-/* 2007-04-10, Hannes Ziegler <hz AT knowlexbase.com>
-   Added method :countMail()
-   Added method :retrieveAll()
-*/
-
 #include "hbclass.ch"
 
 /**
@@ -65,25 +60,25 @@
 CLASS tIPClientPOP FROM tIPClient
 
    METHOD New( oUrl, lTrace, oCredentials )
-   METHOD Open()
+   METHOD Open( cUrl )
    METHOD CLOSE()
-   METHOD READ( iLen )
+   METHOD READ( nLen )
    METHOD STAT()
    METHOD LIST()
    METHOD Retrieve( nId, nLen )
-   METHOD DELETE()
+   METHOD DELETE( nId )
    METHOD QUIT()
-   METHOD Noop()                 // Can be called repeatedly to keep-alive the connection
+   METHOD NoOp()                 // Can be called repeatedly to keep-alive the connection
    METHOD Top( nMsgId )          // Get Headers of mail (no body) to be able to quickly handle a message
    METHOD UIDL( nMsgId )         // Returns Unique ID of message n or list of unique IDs of all message inside maildrop
    METHOD GetOK()
    METHOD countMail()
-   METHOD retrieveAll()
-   DESTRUCTOR PopClnDesTructor
+   METHOD retrieveAll( lDelete )
+   DESTRUCTOR PopClnDestructor()
 
 ENDCLASS
 
-PROCEDURE PopClnDesTructor CLASS  tIPClientPOP
+PROCEDURE PopClnDestructor() CLASS tIPClientPOP
 
    IF ::lTrace .AND. ::nHandle > 0
       FClose( ::nHandle )
@@ -102,7 +97,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
    ::nDefaultPort := 110
    ::nConnTimeout := 10000
 
-   if ::ltrace
+   if ::lTrace
       IF !File( "pop3.log" )
          ::nHandle := FCreate( "pop3.log" )
       ELSE
@@ -121,13 +116,13 @@ METHOD Open( cUrl ) CLASS tIPClientPOP
       RETURN .F.
    ENDIF
 
-   IF Empty ( ::oUrl:cUserid ) .OR. Empty ( ::oUrl:cPassword )
+   IF Empty ( ::oUrl:cUserId ) .OR. Empty ( ::oUrl:cPassword )
       RETURN .F.
    ENDIF
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetOK()
-      ::InetSendall( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
+      ::InetSendall( ::SocketCon, "USER " + ::oUrl:cUserId + ::cCRLF )
       IF ::GetOK()
          ::InetSendall( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          IF ::GetOK()
@@ -150,7 +145,7 @@ METHOD GetOK() CLASS tIPClientPOP
 
    RETURN .T.
 
-METHOD Noop() CLASS tIPClientPOP
+METHOD NoOp() CLASS tIPClientPOP
 
    ::InetSendall( ::SocketCon, "NOOP" + ::cCRLF )
 
@@ -159,14 +154,14 @@ METHOD Noop() CLASS tIPClientPOP
 METHOD CLOSE() CLASS tIPClientPOP
 
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
-   if ::ltrace
+   if ::lTrace
       FClose( ::nHandle )
-      ::nhandle := - 1
+      ::nHandle := - 1
    ENDIF
 
    ::QUIT()
 
-   RETURN ::super:Close()
+   RETURN ::super:CLOSE()
 
 METHOD QUIT() CLASS tIPClientPOP
 
@@ -309,7 +304,7 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
       ::bInitialized := .T.
    ENDIF
 
-   cRet := ""
+   cRet    := ""
    nRetLen := 0
 
    /* 04/05/2004 - <maurilio.longo@libero.it>
@@ -319,8 +314,7 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
 
       cBuffer := Space( 1024 )
-
-      nRead := ::InetRecv( ::SocketCon, @cBuffer, 1024 )
+      nRead   := ::InetRecv( ::SocketCon, @cBuffer, 1024 )
 
       cRet += Left( cBuffer, nRead )
 
@@ -331,7 +325,7 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
       */
       IF ( nPos := At( cEOM, cRet, Max( nRetLen - Len( cEOM ), 1 ) ) ) <> 0
          // Remove ".CRLF"
-         cRet := Left( cRet, nPos + 1 )
+         cRet   := Left( cRet, nPos + 1 )
          ::bEof := .T.
 
       ELSEIF ! Empty( nLen ) .AND. nLen < Len( cRet )
@@ -358,19 +352,19 @@ METHOD DELETE( nId ) CLASS tIPClientPOP
 
    RETURN ::GetOK()
 
-METHOD countMail CLASS TIpClientPop
+METHOD countMail() CLASS tIPClientPop
 
    LOCAL aMails
 
    IF ::isOpen
-      ::reset()
+      ::Reset()
       aMails := hb_ATokens( StrTran( ::LIST(), Chr(13 ),'' ), Chr( 10 ) )
       RETURN Len( aMails )
    ENDIF
 
    RETURN - 1
 
-METHOD retrieveAll( lDelete )
+METHOD retrieveAll( lDelete ) CLASS tIPClientPop
 
    LOCAL aMails, i, imax, cMail
 
@@ -382,20 +376,19 @@ METHOD retrieveAll( lDelete )
       RETURN NIL
    ENDIF
 
-   imax := ::countMail()
+   imax   := ::countMail()
    aMails := Array( imax )
 
    FOR i := 1 TO imax
-      ::reset()
-      cMail := ::Retrieve( i )
-      aMails[i] := TIpMail():new()
+      ::Reset()
+      cMail     := ::Retrieve( i )
+      aMails[i] := TipMail():New()
       aMails[i]:fromString( cMail )
 
       IF lDelete
-         ::reset()
+         ::Reset()
          ::DELETE( i )
       ENDIF
    NEXT
 
    RETURN aMails
-

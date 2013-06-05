@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-05 15:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/tip/client.prg
+  * source/tip/ftpcln.prg
+  * source/tip/httpcln.prg
+  * source/tip/mail.prg
+  * source/tip/popcln.prg
+  * source/tip/smtpcln.prg
+  * source/tip/url.prg
+    ! code clean-ups and formatting
+
 2013-06-03 11:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/popcln.prg
     ! very old method naming 'Retreive' -> 'Retrieve' bug
