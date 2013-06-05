@@ -121,6 +121,10 @@ static aMessages := {;
                     { WM_INITDIALOG,    "OnInitDialog"    },;
                     { WM_DESTROY,       "OnDestroy"       },;
                     { WM_ENTERSIZEMOVE, "OnEnterSizeMove" },;
+                    { WM_NCACTIVATE,    "OnNCActivate"    },;
+                    { WM_NCCREATE,      "OnNCCreate"      },;
+                    { WM_NCCALCSIZE,    "OnNCCalcSize"    },;
+                    { WM_NCDESTROY,     "OnNCDestroy"     },;
                     { WM_EXITSIZEMOVE,  "OnExitSizeMove"  };
                     }
 
@@ -196,8 +200,6 @@ CLASS Window INHERIT Object
    DATA ShowMode               EXPORTED  INIT 1
    DATA Id                     EXPORTED
    DATA Drawing                EXPORTED
-   DATA KeepParentActive       EXPORTED  INIT .F.
-   DATA KeepActive             EXPORTED  INIT .F.
 
    DATA StatusBar              EXPORTED
 
@@ -401,9 +403,9 @@ CLASS Window INHERIT Object
 
 
    METHOD Init( oParent ) CONSTRUCTOR
-   METHOD Create()
+   DESTRUCTOR __WinDestruct
 
-   //DESTRUCTOR __WinDestruct
+   METHOD Create()
    METHOD __RegisterTransparentControl()
    METHOD __UnregisterTransparentControl()
    METHOD __Register()
@@ -411,7 +413,6 @@ CLASS Window INHERIT Object
    METHOD __CreateMDI()
    METHOD __OnParentSize()
    METHOD __ResetHandle()       INLINE ::hWnd := NIL, ::__nProc := NIL
-   METHOD __WindowDestroy()
    METHOD __WinProc(hWnd, nMsg, nwParam, nlParam) INLINE DefWindowProc(hWnd, nMsg, nwParam, nlParam )
    METHOD __SetScrollBars()
    METHOD __SubClass()
@@ -525,7 +526,6 @@ CLASS Window INHERIT Object
 
    METHOD RegisterDocking()
 
-   METHOD OnNCDestroy()         VIRTUAL
    METHOD OnChildChar()         VIRTUAL
    METHOD OnChildGetDlgCode()   VIRTUAL
    METHOD OnChildKeyDown()      VIRTUAL
@@ -672,6 +672,7 @@ CLASS Window INHERIT Object
    METHOD BeginPaint()
    METHOD EndPaint()
    METHOD GetControl()
+   METHOD OnNCDestroy()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -852,16 +853,11 @@ METHOD Init( oParent ) CLASS Window
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
-/*
+
 PROCEDURE __WinDestruct CLASS Window
-   LOCAL pCallBack
-   IF ::__pCallBackPtr != NIL
-      FreeCallBackPointer( ::__pCallBackPtr )
-      ::__pCallBackPtr := NIL
-   ENDIF
    HB_GCALL(.T.)
 RETURN
-*/
+
 
 //-----------------------------------------------------------------------------------------------
 
@@ -1000,8 +996,6 @@ METHOD Create( oParent ) CLASS Window
          ::__OriginalName := ::Name
       ENDIF
    ENDIF
-
-
 
    IF ::hWnd != NIL
       RETURN Self
@@ -2076,13 +2070,137 @@ METHOD OnDestroy() CLASS Window
        ENDIF
    NEXT
    AEVAL( aComp, {|o| o:Destroy(.F.) } )
-
    ::Components := {}
 
-   IF ::Parent != NIL .AND. ( ::Parent:__xCtrlName == "ObjManager" .OR. ::Parent:__xCtrlName == "EvtManager" )
-      ::Parent:KeepActiveCaption := .F.
-      ::Parent:Redraw()
+   IF ::Drawing != NIL
+      ::Drawing:Destroy()
    ENDIF
+
+   IF ::__hMemBitmap != NIL
+      DeleteObject( ::__hMemBitmap )
+   ENDIF
+
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
+   ENDIF
+
+   IF ::__hBrush != NIL
+      DeleteObject( ::__hBrush )
+   ENDIF
+
+   IF ::SelBkBrush != NIL
+      DeleteObject( ::SelBkBrush )
+   ENDIF
+   IF ::HasMessage( "BackgroundImage" ) .AND. ::BackgroundImage != NIL
+      ::BackgroundImage:Destroy()
+      ::BackgroundImage := NIL
+   ENDif
+   IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
+      IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
+         ADEL( ::Parent:Children, n, .T. )
+      ENDIF
+      ::Parent:__UnregisterTransparentControl( Self )
+   ENDIF
+   IF !EMPTY( ::__hIcon )
+      DestroyIcon( ::__hIcon )
+   ENDIF
+   IF ::ToolTip != NIL
+      ::ToolTip:Destroy()
+      ::ToolTip := NIL
+   ENDIF
+   IF VALTYPE( ::Font ) == "O" .AND. !::Font:Shared
+      ::Font:Delete()
+      IF ::Font:FileName != NIL
+         RemoveFontResource( ::Font:FileName )//, FR_PRIVATE | FR_NOT_ENUM )
+      ENDIF
+      ::Font:ncm := NIL
+      ::Font := NIL
+   ENDIF
+   IF ::__ClassInst != NIL .AND. ::Parent != NIL
+      TRY
+         FOR n := 1 TO LEN( ::Parent:Children )
+             ::Parent:Children[n]:xTabOrder := n
+             ::Parent:Children[n]:__ClassInst:xTabOrder := n
+         NEXT
+      CATCH
+      END
+   ENDIF
+   IF ::Application != NIL .AND. ::__hAccelTable != NIL
+      ::Application:DelAccelerators( ::hWnd, ::__hAccelTable )
+      DestroyAcceleratorTable( ::__hAccelTable )
+      ::__hAccelTable := NIL
+   ENDIF
+   IF ::Form != NIL .AND. ::xName != NIL .AND. ::Form:__hObjects != NIL .AND. ::xName != NIL .AND. HHasKey( ::Form:__hObjects, ::xName )
+      HDel( ::Form:__hObjects, ::xName )
+   ENDIF
+   IF ::Form:hWnd == ::hWnd .AND. ::Application:__hObjects != NIL .AND. ::xName != NIL .AND. HHasKey( ::Application:__hObjects, ::xName )
+      HDel( ::Application:__hObjects, ::xName )
+   ENDIF
+   IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
+      IF ( n := ASCAN( ::Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
+         IF ::Parent:Children[n]:aItems[1]:Id == IDM_MDI_ICON
+            ::Parent:Children[n]:aItems[1]:Delete()
+            ATAIL(::Parent:Children[n]:aItems):Delete()
+            ATAIL(::Parent:Children[n]:aItems):Delete()
+            ATAIL(::Parent:Children[n]:aItems):Delete()
+            ATAIL(::Parent:Children[n]:aItems):Delete()
+            ::Parent:Children[n]:InvalidateRect()
+         ENDIF
+      ENDIF
+   ENDIF
+
+RETURN NIL
+
+METHOD OnNCDestroy() CLASS Window
+   ObjFromHandle( ::hWnd, .T. )
+   ::__UnSubClass()
+
+   ::siv               := NIL
+   ::sih               := NIL
+   ::DrawItemStruct    := NIL
+   ::MeasureItemStruct := NIL
+   ::ScrollInfo        := NIL
+   ::hdr               := NIL
+   ::WindowPos         := NIL
+
+   ::Msg               := NIL
+   ::wParam            := NIL
+   ::lParam            := NIL
+   ::Drawing           := NIL
+   IF ::__ClassInst != NIL
+      ::Events := NIL
+   ENDIF
+
+   ::__ClassInst := NIL
+   ::__hObjects := NIL
+   ::Children := NIL
+   ::Dock := NIL
+   ::Anchor := NIL
+
+   ::__lInitialized := .F.
+   IF ::DisableParent .AND. ::__ClassInst == NIL
+      ::Parent:Enable()
+      ::Parent:BringWindowToTop()
+   ENDIF
+
+   IF ::Application != NIL
+      IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
+         CloseHandle( ::Application:__hMutex )
+      ENDIF
+
+      IF !::IsChild .AND.;
+         ::Application:MainForm != NIL .AND.;
+         ::Application:MainForm:hWnd == ::hWnd .AND.;
+         ::__InstMsg != NIL .AND.;
+         ( ::__WindowStyle != 0 .OR. ::Parent == NIL .OR. ::Parent:ClsName == "DeskTop" )
+         PostQuitMessage(0)
+      ENDIF
+   ENDIF
+   IF ::__TaskBarParent != NIL
+      DestroyWindow( ::__TaskBarParent )
+   ENDIF
+   ::Parent := NIL
+   ::hWnd := NIL
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -2291,72 +2409,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          CASE WM_NCXBUTTONUP
               EXIT
-
-         CASE WM_NCCREATE
-              nRet := ExecuteEvent( "OnNcCreate", Self )
-              ODEFAULT nRet TO ::OnNcCreate( nwParam, nlParam )
-              EXIT
-
-         CASE WM_NCACTIVATE
-              nRet := ExecuteEvent( "OnNcActivate", Self )
-              ODEFAULT nRet TO ::OnNcActivate( nwParam,nlParam )
-
-              ::Active := nwParam != 0
-
-              IF nRet == NIL .AND. nwParam == 0 .AND. ::ClsName != "DataGrid"
-                 IF ::KeepActive .OR. ( n := ASCAN( ::Children, {|o|o:KeepParentActive .AND. o:hWnd == nlParam } ) ) > 0
-                    RETURN 1
-                 ENDIF
-              ENDIF
-              EXIT
-
-         CASE WM_NCCALCSIZE
-              nRet := ExecuteEvent( "OnNcCalcSize", Self )
-              ODEFAULT nRet TO ::OnNcCalcSize( nwParam, nlParam )
-              EXIT
-
-         CASE WM_NCDESTROY
-              ::__WindowDestroy()
-
-              nRet := ExecuteEvent( "OnNcDestroy", Self )
-              ODEFAULT nRet TO ::OnNcDestroy( nwParam, nlParam )
-              ::__lInitialized := .F.
-              IF ::DisableParent .AND. ::__ClassInst == NIL
-                 ::Parent:Enable()
-                 ::Parent:BringWindowToTop()
-              ENDIF
-
-              IF ::__nProc != NIL
-                 SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
-                 ::__nProc := NIL
-              ENDIF
-
-              ObjFromHandle( ::hWnd, .T. )
-
-              IF ::__pCallBackPtr != NIL
-                 FreeCallBackPointer( ::__pCallBackPtr )
-                 ::__pCallBackPtr := NIL
-              ENDIF
-
-              IF ::Application != NIL
-                 IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
-                    CloseHandle( ::Application:__hMutex )
-                 ENDIF
-
-                 IF !::IsChild .AND.;
-                    ::Application:MainForm != NIL .AND.;
-                    ::Application:MainForm:hWnd == ::hWnd .AND.;
-                    ::__InstMsg != NIL .AND.;
-                    ( ::__WindowStyle != 0 .OR. ::Parent == NIL .OR. ::Parent:ClsName == "DeskTop" )
-                    PostQuitMessage(0)
-                 ENDIF
-              ENDIF
-              IF ::__TaskBarParent != NIL
-                 DestroyWindow( ::__TaskBarParent )
-              ENDIF
-              ::hWnd := NIL
-              EXIT
-
 
          CASE WM_CHAR
               IF ::Parent != NIL
@@ -3267,115 +3319,6 @@ RETURN ::__WinProc(hWnd, nMsg, nwParam, nlParam)
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD __WindowDestroy() CLASS Window
-   LOCAL n, lRedraw := .F.
-
-   IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
-      IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
-         ADEL( ::Parent:Children, n, .T. )
-      ENDIF
-      ::Parent:__UnregisterTransparentControl( Self )
-   ENDIF
-
-   IF ::Drawing != NIL
-      ::Drawing:Destroy()
-   ENDIF
-
-   IF ::__hMemBitmap != NIL
-      DeleteObject( ::__hMemBitmap )
-   ENDIF
-
-   IF ::BkBrush != NIL
-      DeleteObject( ::BkBrush )
-   ENDIF
-
-   IF ::__hBrush != NIL
-      DeleteObject( ::__hBrush )
-   ENDIF
-
-   IF ::SelBkBrush != NIL
-      DeleteObject( ::SelBkBrush )
-   ENDIF
-
-   IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
-      IF ( n := ASCAN( ::Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
-         IF ::Parent:Children[n]:aItems[1]:Id == IDM_MDI_ICON
-            ::Parent:Children[n]:aItems[1]:Delete()
-            ATAIL(::Parent:Children[n]:aItems):Delete()
-            ATAIL(::Parent:Children[n]:aItems):Delete()
-            ATAIL(::Parent:Children[n]:aItems):Delete()
-            ATAIL(::Parent:Children[n]:aItems):Delete()
-            ::Parent:Children[n]:InvalidateRect()
-         ENDIF
-      ENDIF
-   ENDIF
-   IF ::Form != NIL .AND. ::Name != NIL
-      TRY
-         HDel( ::Form:__hObjects, ::xName )
-      CATCH
-      END
-   ENDIF
-   IF ::Form:hWnd == ::hWnd
-      TRY
-         HDel( ::Application:__hObjects, ::xName )
-      CATCH
-      END
-   ENDIF
-   IF !EMPTY( ::__hIcon )
-      DestroyIcon( ::__hIcon )
-   ENDIF
-   IF ::ToolTip != NIL
-      ::ToolTip:Destroy()
-      ::ToolTip := NIL
-   ENDIF
-   IF VALTYPE( ::Font ) == "O" .AND. !::Font:Shared
-      ::Font:Delete()
-      IF ::Font:FileName != NIL
-         RemoveFontResource( ::Font:FileName )//, FR_PRIVATE | FR_NOT_ENUM )
-      ENDIF
-      ::Font:ncm := NIL
-      ::Font := NIL
-   ENDIF
-
-   ::siv               := NIL
-   ::sih               := NIL
-   ::DrawItemStruct    := NIL
-   ::MeasureItemStruct := NIL
-   ::ScrollInfo        := NIL
-   ::hdr               := NIL
-   ::WindowPos         := NIL
-
-   ::Msg               := NIL
-   ::wParam            := NIL
-   ::lParam            := NIL
-   ::Drawing           := NIL
-   IF ::__ClassInst != NIL
-      ::Events := NIL
-   ENDIF
-   IF ::__ClassInst != NIL .AND. ::Parent != NIL
-      TRY
-         FOR n := 1 TO LEN( ::Parent:Children )
-             ::Parent:Children[n]:xTabOrder := n
-             ::Parent:Children[n]:__ClassInst:xTabOrder := n
-         NEXT
-      CATCH
-      END
-   ENDIF
-
-   ::__ClassInst := NIL
-   ::__hObjects := NIL
-   ::Children := NIL
-   IF UPPER( ::ClassName ) IN { "WINFORM", "TABPAGE", "WINDOWEDIT" } .AND. ::BackgroundImage != NIL
-      ::BackgroundImage:Destroy()
-      ::BackgroundImage := NIL
-   ENDif
-   ::Dock := NIL
-   ::Anchor := NIL
-
-RETURN 0
-
-//----------------------------------------------------------------------------------------------------
-
 METHOD CenterWindow( lDesk ) CLASS Window
    LOCAL oWin, aRect
    DEFAULT lDesk TO .F.
@@ -3712,10 +3655,12 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
 
    DEFAULT lMoveNow TO FALSE
    DEFAULT lNoMove TO FALSE
-   DEFAULT x TO ::Parent:Width
-   DEFAULT y TO ::Parent:Height
-   DEFAULT nParX TO ::Parent:__aCltRect[3]
-   DEFAULT nParY TO ::Parent:__aCltRect[4]
+   IF ::Parent != NIL
+      DEFAULT x TO ::Parent:Width
+      DEFAULT y TO ::Parent:Height
+      DEFAULT nParX TO ::Parent:__aCltRect[3]
+      DEFAULT nParY TO ::Parent:__aCltRect[4]
+   ENDIF
 
    IF ::__HideResized .OR. !::IsChild .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == NIL .OR. !::__Docked
       RETURN Self
@@ -5015,7 +4960,7 @@ CLASS WinForm INHERIT Window
    METHOD SaveLayout()
    METHOD RestoreLayout()
    METHOD OnSize()
-
+   METHOD OnNCDestroy()         INLINE Super:OnNCDestroy(), hb_gcAll(.T.)
    ACCESS ActiveForm            INLINE ObjFromHandle( GetActiveWindow() )
 
    METHOD __RefreshPosNo() INLINE NIL // Compatibility

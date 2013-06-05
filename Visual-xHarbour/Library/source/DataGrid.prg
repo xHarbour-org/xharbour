@@ -257,7 +257,6 @@ CLASS DataGrid INHERIT TitleControl
    METHOD RestoreLayout()
 
    METHOD OnDestroy()
-   METHOD OnNCDestroy()
    METHOD OnKeyDown()
    METHOD OnLButtonDown()
    METHOD OnLButtonUp()
@@ -947,7 +946,6 @@ METHOD __ResetControl() CLASS DataGrid
       IF ::Children[ ::ColPos ]:ControlValid != NIL
          ::__CurControl:IsValid := FALSE
       ENDIF
-      ::KeepActiveCaption  := .F.
       ::__CurControl:Destroy()
       ::DataSource:UnLock()
       ::__CurControl:= NIL
@@ -1583,7 +1581,6 @@ METHOD __OnParentSysCommand()
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::KeepActiveCaption := .F.
       ::__CurControl:Destroy()
       ::DataSource:UnLock()
       ::__CurControl:=NIL
@@ -1601,7 +1598,6 @@ METHOD OnKillFocus() CLASS DataGrid
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::KeepActiveCaption := .F.
       ::__CurControl:Destroy()
       ::DataSource:UnLock()
       ::__CurControl:=NIL
@@ -3372,10 +3368,6 @@ METHOD OnDestroy() CLASS DataGrid
    WHILE LEN( ::Children ) > 0
        ATAIL( ::Children ):Destroy()
    ENDDO
-RETURN NIL
-
-METHOD OnNCDestroy() CLASS DataGrid
-   Super:OnNCDestroy()
    IF ::__LinePen != NIL
       DeleteObject( ::__LinePen )
    ENDIF
@@ -3757,7 +3749,6 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
 
       IF ::__CurControl != NIL .AND. ::DataSource:RecLock()
          ::__CurControl:OnWMKillFocus  := {|o|o:Parent:__ControlSaveData(.T.),;
-                                              o:Parent:KeepActiveCaption := .F.,;
                                               o:Destroy(),;
                                               o:Parent:DataSource:UnLock(),;
                                               o:Parent:__CurControl := NIL,;

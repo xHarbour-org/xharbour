@@ -54,7 +54,7 @@ CLASS CoolMenu INHERIT ToolBar
    METHOD OnParentSysCommand()
    METHOD OnSysKeyDown()
    METHOD OnSysKeyUp()
-   METHOD OnNCDestroy() INLINE AEVAL( ::aItems, {|o| IIF( o != NIL, o:Delete(), ) } ), ::Super:OnNCDestroy(), Self
+   METHOD OnDestroy() INLINE AEVAL( ::aItems, {|o| IIF( o != NIL, o:Delete(), ) } ), ::Super:OnDestroy(), Self
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------

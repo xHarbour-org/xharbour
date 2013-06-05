@@ -7026,6 +7026,7 @@ METHOD Init( oParent ) CLASS RegOle
 RETURN Self
 
 METHOD OnDestroy() CLASS RegOle
+   ::Super:OnDestroy()
    ::DataSource:GoTop()
    WHILE ! ::DataSource:Eof()
       IF VALTYPE( ::Form:aOle[ ::DataSource:Recno() ][4] ) == "N"

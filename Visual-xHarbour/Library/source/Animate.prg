@@ -47,7 +47,7 @@ CLASS Animation INHERIT TitleControl
    METHOD Stop()             INLINE SendMessage( ::hWnd, ACM_STOP, 0, 0 )
    METHOD Seek( n )          INLINE ::FromFrame := n, ::ToFrame := n, ::Play()
    METHOD Close()            INLINE ::ImageName := NIL
-   METHOD __WindowDestroy()  INLINE IIF( ::ImageName != NIL, ::ImageName := NIL,), ::Super:__WindowDestroy()
+   METHOD OnDestroy()        INLINE IIF( ::ImageName != NIL, ::ImageName := NIL,), ::Super:OnDestroy()
    METHOD OnCtlColorStatic()
    METHOD OnEraseBkGnd()
    METHOD Create()

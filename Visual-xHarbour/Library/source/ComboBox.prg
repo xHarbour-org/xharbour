@@ -596,7 +596,7 @@ CLASS DriveCombobox INHERIT ComboBox
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnParentDrawItem()
-   METHOD __WindowDestroy()
+   METHOD OnDestroy()   INLINE AEVAL( ::Drives, {|a|DestroyIcon( a[3] )} ), Super:OnDestroy()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS DriveCombobox
@@ -685,14 +685,6 @@ METHOD OnParentDrawItem() CLASS DriveCombobox
       ENDIF
    ENDIF
 RETURN Self
-
-METHOD __WindowDestroy() CLASS DriveCombobox
-   LOCAL aItem
-   ::Super:__WindowDestroy()
-   FOR EACH aItem IN ::Drives
-       DestroyIcon( aItem[3] )
-   NEXT
-RETURN NIL
 
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------

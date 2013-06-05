@@ -1562,7 +1562,6 @@ CLASS ToolButton INHERIT Object
       DATA nHScrollPos            INIT 0
       DATA VertScrollPos          INIT 0
       DATA Font
-      DATA KeepParentActive       INIT .F.
       DATA ShortCut
    PROPERTY WholeDropDown INDEX BTNS_WHOLEDROPDOWN  READ xWholeDropDown WRITE SetStyle DEFAULT .F.
    PROPERTY DropDown      INDEX BTNS_DROPDOWN       READ xDropDown      WRITE SetStyle DEFAULT .F.

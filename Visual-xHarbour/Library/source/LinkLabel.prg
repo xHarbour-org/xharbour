@@ -61,7 +61,6 @@ CLASS LinkLabel INHERIT Control
    METHOD OnEraseBkGnd() //INLINE 1
 
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::__lReqBrush := .T., ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   METHOD OnNCDestroy()        INLINE IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), ), NIL
    METHOD SetImageIndex()
 ENDCLASS
 

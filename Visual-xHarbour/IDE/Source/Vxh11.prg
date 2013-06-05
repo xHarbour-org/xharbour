@@ -723,6 +723,7 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS SourceEditor
+   ::Super:OnDestroy()
    aEval( ::aDocs, {|oDoc| oDoc:Close() } )
 
    ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )

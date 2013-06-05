@@ -56,7 +56,7 @@ CLASS Button INHERIT Control
    METHOD OnParentDrawItem()
    METHOD OnLButtonDblClk( nwParam, x, y ) INLINE ::SendMessage( WM_LBUTTONDOWN, nwParam, MAKELONG( x,y ) )
    METHOD DrawFrame()
-   METHOD __WindowDestroy()   INLINE ::Super:__WindowDestroy(), ::CloseThemeData(), Self
+   METHOD OnDestroy()         INLINE ::CloseThemeData(), ::Super:OnDestroy()
    METHOD Click()             INLINE SetActiveWindow( ::Parent:hWnd ), ::SendMessage( BM_CLICK, 0, 0 )
    METHOD Push()              INLINE ::SendMessage( BM_SETSTATE, .T., 0 )
    METHOD Release()           INLINE ::SendMessage( BM_SETSTATE, .F., 0 )

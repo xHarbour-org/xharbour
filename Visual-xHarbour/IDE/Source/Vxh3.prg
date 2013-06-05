@@ -49,7 +49,8 @@ CLASS FormEditor INHERIT Control
    DATA CtrlMask      EXPORTED
    
    METHOD Init() CONSTRUCTOR
-   METHOD OnNCDestroy() INLINE DeleteObject( ::RulerFont ),;
+   METHOD OnDestroy() INLINE   ::Super:OnDestroy(),;
+                               DeleteObject( ::RulerFont ),;
                                DeleteObject( ::RulerVertFont ), NIL
    METHOD OnLButtonDown() INLINE ::SetFocus(), 0
    METHOD Create()
@@ -271,7 +272,8 @@ CLASS ControlMask INHERIT Window
    METHOD OnPaint()
    METHOD OnUserMsg()
    METHOD OnTimer()
-   METHOD OnNCDestroy()     INLINE  DeleteObject( ::RubberBrush ),;
+   METHOD OnDestroy()       INLINE  ::Super:OnDestroy(),;
+                                    DeleteObject( ::RubberBrush ),;
                                     DeleteObject( ::hBmpGrid ),;
                                     DeleteObject( ::hOrderFont ),;
                                     NIL

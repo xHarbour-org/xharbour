@@ -66,7 +66,7 @@ CLASS ObjManager INHERIT TreeView
    METHOD ResetProperties()
    METHOD Create()
    METHOD OnHScroll( n)        INLINE ::nScroll := n
-   METHOD OnDestroy()          INLINE ::LevelFont:Delete(), CloseThemeData( ::hChkTheme ), NIL
+   METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::LevelFont:Delete(), CloseThemeData( ::hChkTheme ), NIL
    METHOD OnKeyDown()
    METHOD OnUserMsg()
    METHOD OnLButtonDown()

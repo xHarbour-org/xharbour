@@ -48,7 +48,6 @@ CLASS Control INHERIT Window
    DATA IsValid           EXPORTED INIT TRUE
    DATA EmptyLeft         EXPORTED INIT 0
    DATA ToolBarPos        EXPORTED INIT 1
-   DATA KeepActiveCaption EXPORTED INIT .F.
    DATA AutoClose         EXPORTED INIT .T.
    DATA DisableParent     EXPORTED INIT .F.
    DATA ShowMode          EXPORTED INIT 1

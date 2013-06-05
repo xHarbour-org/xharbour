@@ -40,7 +40,7 @@ CLASS ToolBox INHERIT TreeView
    //METHOD ShowStandard()       INLINE ::Expand( ::GetFirstVisibleItem() )
 
    METHOD OnHScroll( n )       INLINE ::nScroll := n
-   METHOD OnNCDestroy()        INLINE ::LevelFont:Delete(), DeleteObject( ::hPen ), DeleteObject( ::hPenShadow )
+   METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::LevelFont:Delete(), DeleteObject( ::hPen ), DeleteObject( ::hPenShadow )
    METHOD OnEraseBkGnd()
    METHOD OnParentNotify()
    METHOD DrawItem()

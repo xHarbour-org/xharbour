@@ -150,7 +150,6 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    METHOD AxSet( cName, xValue ) INLINE __AxSetProperty( ::hObj, cName, xValue )
    METHOD AxGet( cName )         INLINE __AxGetProperty( ::hObj, cName )
    METHOD Translate( pMsg )      INLINE __AxTranslateMessage( ::__IUnknown, pMsg:Value )
-   METHOD Destroy()
    METHOD IsRegistered()
 
    METHOD __OpExactEqual()
@@ -272,22 +271,11 @@ METHOD OnDestroy() CLASS ActiveX
       ::oServer:DisconnectEvents()
    ENDIF
 
+   __AxReleaseDispatch( ::hObj )
    IF ::__IUnknown != NIL
       __AxReleaseUnknown( ::__IUnknown )
    ENDIF
 RETURN NIL
-
-METHOD Destroy() CLASS ActiveX
-   LOCAL nRet
-   DestroyWindow( ::hWnd )
-   ::__WindowDestroy()
-
-   nRet := ExecuteEvent( "OnNcDestroy", Self )
-   DEFAULT nRet TO ::OnNcDestroy()
-
-   __AxReleaseDispatch( ::hObj )
-
-RETURN Self
 
 METHOD Configure() CLASS ActiveX
    ::OnCreate()

@@ -63,7 +63,7 @@ CLASS CoolBar FROM Control
    METHOD Create()
    METHOD OnMouseMove()
    METHOD BandFromhWnd()
-   METHOD OnNCDestroy()
+   METHOD OnDestroy()
    METHOD UpdateSize()
    METHOD __SetTheming()
    METHOD FindRemoveBand()
@@ -127,8 +127,8 @@ METHOD FindRemoveBand( aPt ) CLASS CoolBar
 RETURN Self
 
 
-METHOD OnNCDestroy() CLASS CoolBar
-   ::Super:OnNCDestroy()
+METHOD OnDestroy() CLASS CoolBar
+   ::Super:OnDestroy()
    AEVAL( ::Bands, {|o|IIF( o:Image != NIL, o:Image:Delete(), NIL )} )
    ::Parent:TopMargin := 0
 RETURN SELF
@@ -875,9 +875,6 @@ METHOD Init( oParent, oBand ) CLASS FloatingToolBar
    ::ClsName    := "FloatBar"
    ::ExStyle := WS_EX_TOOLWINDOW
    ::BandBuffer := oBand
-   ::KeepParentActive := .T.
-   ::KeepActive       := .T.
-
 RETURN SELF
 
 

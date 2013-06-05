@@ -1439,7 +1439,7 @@ CLASS ToolStripItem INHERIT Control
    // PRIVATE METHODS - DO NOT PUBLISH
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnNCDestroy()        INLINE ::CallWindowProc(), ::Parent:__UpdateWidth(), NIL
+   METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::CallWindowProc(), ::Parent:__UpdateWidth(), NIL
    METHOD OnMouseHover()
    METHOD OnMouseLeave()
    METHOD OnMouseMove()

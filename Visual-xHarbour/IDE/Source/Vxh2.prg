@@ -106,7 +106,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
-   METHOD OnDestroy()            INLINE ::CloseThemeData()
+   METHOD OnDestroy()            INLINE ::CloseThemeData(), ::Super:OnDestroy()
 ENDCLASS
 
 METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit

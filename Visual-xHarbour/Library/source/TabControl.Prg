@@ -155,7 +155,9 @@ CLASS TabControl INHERIT Control
                                             ::__OnParentSize( ::ClientWidth, ::ClientHeight ) ),)
 
    METHOD Refresh()                  INLINE ::Super:Refresh(), ::OnNcCalcSize()
-   METHOD OnNCDestroy()              INLINE IIF( ::FocusFont     != NIL, ::FocusFont:Delete(),     NIL ),;
+   METHOD OnDestroy()                INLINE ::Super:OnDestroy(),;
+                                            ::CloseThemeData(),;
+                                            IIF( ::FocusFont     != NIL, ::FocusFont:Delete(),     NIL ),;
                                             IIF( ::VertFont      != NIL, ::VertFont:Delete(),      NIL ),;
                                             IIF( ::BoldFont      != NIL, ::BoldFont:Delete(),      NIL ),;
                                             IIF( ::VertFocusFont != NIL, ::VertFocusFont:Delete(), NIL ),;
@@ -168,7 +170,6 @@ CLASS TabControl INHERIT Control
    METHOD Hide()
    METHOD Show()
    
-   METHOD OnDestroy()                INLINE Super:OnDestroy(), ::CloseThemeData()
    METHOD OnMouseMove()
    METHOD OnMouseLeave()             INLINE ::OnMouseMove(0,0,0), NIL
    METHOD OnUserMsg(n)

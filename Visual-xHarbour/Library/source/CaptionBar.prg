@@ -32,7 +32,7 @@ CLASS CaptionBar INHERIT Control
    METHOD OnLButtonUp()
    METHOD PaintText()
    METHOD OnNCHitTest()
-   METHOD __WindowDestroy()
+   METHOD OnDestroy()   INLINE IIF( ::Icon != NIL,  DeleteObject( ::Icon ),), ::Super:OnDestroy()
    METHOD OnTimer()
    METHOD OnMove()  INLINE ::InvalidateRect(, .F.),0
 ENDCLASS
@@ -177,15 +177,3 @@ RETURN NIL
 METHOD OnLButtonUp() CLASS CaptionBar
    ::InvalidateRect( {0, 0, ::LeftMargin+::TextWidth+20,::ClientHeight}, .F. )
 RETURN NIL
-
-//-----------------------------------------------------------------------------------------------------
-
-METHOD __WindowDestroy() CLASS CaptionBar
-  ::Super:__WindowDestroy()
-   IF ::Icon != NIL
-      DeleteObject( ::Icon )
-   ENDIF
-RETURN NIL
-
-//-----------------------------------------------------------------------------------------------------
-
