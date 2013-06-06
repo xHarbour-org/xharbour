@@ -341,13 +341,13 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnDestroy() CLASS ToolBar
-   ::Super:OnDestroy()
    IF ::Banner != NIL
       ::Banner:Delete()
    ENDIF
    IF ::__hDesList != NIL
       ImageListDestroy( ::__hDesList )
    ENDIF
+   ::Super:OnDestroy()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------

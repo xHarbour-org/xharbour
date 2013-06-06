@@ -128,9 +128,9 @@ RETURN Self
 
 
 METHOD OnDestroy() CLASS CoolBar
-   ::Super:OnDestroy()
    AEVAL( ::Bands, {|o|IIF( o:Image != NIL, o:Image:Delete(), NIL )} )
    ::Parent:TopMargin := 0
+   ::Super:OnDestroy()
 RETURN SELF
 
 

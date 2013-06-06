@@ -161,10 +161,10 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnDestroy() CLASS ProgressBar
-   Super:OnDestroy()
    IF ::__ClassInst == NIL .AND. ::TaskBarProgress
       TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_NOPROGRESS )
    ENDIF
+   Super:OnDestroy()
 RETURN NIL
 
 METHOD OnUserMsg( hWnd, nMsg ) CLASS ProgressBar

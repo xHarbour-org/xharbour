@@ -265,7 +265,6 @@ RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
    SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
-   ::TitleControl:OnDestroy()
  
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
@@ -275,6 +274,7 @@ METHOD OnDestroy() CLASS ActiveX
    IF ::__IUnknown != NIL
       __AxReleaseUnknown( ::__IUnknown )
    ENDIF
+   ::TitleControl:OnDestroy()
 RETURN NIL
 
 METHOD Configure() CLASS ActiveX

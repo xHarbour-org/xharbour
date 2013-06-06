@@ -855,7 +855,9 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 PROCEDURE __WinDestruct CLASS Window
-   HB_GCALL(.T.)
+   ::Parent := NIL
+   ::hWnd   := NIL
+   hb_gcStep()
 RETURN
 
 
@@ -2060,8 +2062,8 @@ METHOD OnDestroy() CLASS Window
          ::BottomSplitter := NIL
       ENDIF
    ENDIF
-   ::HorzScroll := .F.
-   ::VertScroll := .F.
+   //::xHorzScroll := .F.
+   //::xVertScroll := .F.
 
    aComp := {}
    FOR n := 1 TO LEN( ::Components )
@@ -2076,21 +2078,6 @@ METHOD OnDestroy() CLASS Window
       ::Drawing:Destroy()
    ENDIF
 
-   IF ::__hMemBitmap != NIL
-      DeleteObject( ::__hMemBitmap )
-   ENDIF
-
-   IF ::BkBrush != NIL
-      DeleteObject( ::BkBrush )
-   ENDIF
-
-   IF ::__hBrush != NIL
-      DeleteObject( ::__hBrush )
-   ENDIF
-
-   IF ::SelBkBrush != NIL
-      DeleteObject( ::SelBkBrush )
-   ENDIF
    IF ::HasMessage( "BackgroundImage" ) .AND. ::BackgroundImage != NIL
       ::BackgroundImage:Destroy()
       ::BackgroundImage := NIL
@@ -2101,20 +2088,9 @@ METHOD OnDestroy() CLASS Window
       ENDIF
       ::Parent:__UnregisterTransparentControl( Self )
    ENDIF
-   IF !EMPTY( ::__hIcon )
-      DestroyIcon( ::__hIcon )
-   ENDIF
    IF ::ToolTip != NIL
       ::ToolTip:Destroy()
       ::ToolTip := NIL
-   ENDIF
-   IF VALTYPE( ::Font ) == "O" .AND. !::Font:Shared
-      ::Font:Delete()
-      IF ::Font:FileName != NIL
-         RemoveFontResource( ::Font:FileName )//, FR_PRIVATE | FR_NOT_ENUM )
-      ENDIF
-      ::Font:ncm := NIL
-      ::Font := NIL
    ENDIF
    IF ::__ClassInst != NIL .AND. ::Parent != NIL
       TRY
@@ -2129,12 +2105,6 @@ METHOD OnDestroy() CLASS Window
       ::Application:DelAccelerators( ::hWnd, ::__hAccelTable )
       DestroyAcceleratorTable( ::__hAccelTable )
       ::__hAccelTable := NIL
-   ENDIF
-   IF ::Form != NIL .AND. ::xName != NIL .AND. ::Form:__hObjects != NIL .AND. ::xName != NIL .AND. HHasKey( ::Form:__hObjects, ::xName )
-      HDel( ::Form:__hObjects, ::xName )
-   ENDIF
-   IF ::Form:hWnd == ::hWnd .AND. ::Application:__hObjects != NIL .AND. ::xName != NIL .AND. HHasKey( ::Application:__hObjects, ::xName )
-      HDel( ::Application:__hObjects, ::xName )
    ENDIF
    IF ::Parent != NIL .AND. ::ClsName == "MDIChild"
       IF ( n := ASCAN( ::Parent:Children, {|o|o:__xCtrlName == "CoolMenu"} ) ) > 0
@@ -2152,6 +2122,34 @@ METHOD OnDestroy() CLASS Window
 RETURN NIL
 
 METHOD OnNCDestroy() CLASS Window
+   IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
+      ::Font:Delete()
+      IF ::Font:FileName != NIL
+         RemoveFontResource( ::Font:FileName )//, FR_PRIVATE | FR_NOT_ENUM )
+      ENDIF
+      ::Font:ncm := NIL
+   ENDIF
+
+   IF !EMPTY( ::__hIcon )
+      DestroyIcon( ::__hIcon )
+   ENDIF
+
+   IF ::__hMemBitmap != NIL
+      DeleteObject( ::__hMemBitmap )
+   ENDIF
+
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
+   ENDIF
+
+   IF ::__hBrush != NIL
+      DeleteObject( ::__hBrush )
+   ENDIF
+
+   IF ::SelBkBrush != NIL
+      DeleteObject( ::SelBkBrush )
+   ENDIF
+
    ObjFromHandle( ::hWnd, .T. )
    ::__UnSubClass()
 
@@ -2163,21 +2161,22 @@ METHOD OnNCDestroy() CLASS Window
    ::hdr               := NIL
    ::WindowPos         := NIL
 
+   ::Font              := NIL
    ::Msg               := NIL
    ::wParam            := NIL
    ::lParam            := NIL
    ::Drawing           := NIL
+   ::__ClassInst       := NIL
+   ::__hObjects        := NIL
+   ::Children          := NIL
+   ::Dock              := NIL
+   ::Anchor            := NIL
+   ::__lInitialized    := .F.
+
    IF ::__ClassInst != NIL
       ::Events := NIL
    ENDIF
 
-   ::__ClassInst := NIL
-   ::__hObjects := NIL
-   ::Children := NIL
-   ::Dock := NIL
-   ::Anchor := NIL
-
-   ::__lInitialized := .F.
    IF ::DisableParent .AND. ::__ClassInst == NIL
       ::Parent:Enable()
       ::Parent:BringWindowToTop()
@@ -2199,8 +2198,7 @@ METHOD OnNCDestroy() CLASS Window
    IF ::__TaskBarParent != NIL
       DestroyWindow( ::__TaskBarParent )
    ENDIF
-   ::Parent := NIL
-   ::hWnd := NIL
+   hb_gcStep()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------

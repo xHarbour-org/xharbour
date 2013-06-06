@@ -3364,7 +3364,6 @@ RETURN Self
 
 //----------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS DataGrid
-   Super:OnDestroy()
    WHILE LEN( ::Children ) > 0
        ATAIL( ::Children ):Destroy()
    ENDDO
@@ -3379,6 +3378,7 @@ METHOD OnDestroy() CLASS DataGrid
    ENDIF
    
    DeleteObject( ::__hDragBrush )
+   Super:OnDestroy()
 RETURN NIL
 
 //----------------------------------------------------------------------------------

@@ -523,7 +523,6 @@ RETURN nRet
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ToolStrip
-   Super:OnDestroy()
    IF s_CurrentObject != NIL
       __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
       s_CurrentObject := NIL
@@ -536,6 +535,7 @@ METHOD OnDestroy() CLASS ToolStrip
       UnhookWindowsHookEx( s_hMenuDialogHook )
       s_hMenuDialogHook := NIL
    ENDIF
+   Super:OnDestroy()
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
@@ -1362,7 +1362,7 @@ RETURN NIL
 METHOD __UpdateWidth() CLASS ToolStrip
    LOCAL nWidth
 
-   IF UPPER( ::Parent:ClsName ) == "TOOLSTRIPCONTAINER" .OR. ::Dock:Right == NIL
+   IF ::Children != NIL .AND. ( UPPER( ::Parent:ClsName ) == "TOOLSTRIPCONTAINER" .OR. ::Dock:Right == NIL )
       IF LEN( ::Children ) > 0
          AEVAL( ::Children, {|o| nWidth := o:Left + o:Width } )
          ::xWidth := nWidth + IIF( ::xShowChevron, ::__ChevronWidth, 2 ) + 4
@@ -1530,12 +1530,12 @@ RETURN Self
 METHOD Destroy() CLASS ToolStripItem
    LOCAL nWidth, n, nPos := ASCAN( ::Parent:Children, Self,,, .T. )
    nWidth := ::Width
-   Super:Destroy()
    FOR n := nPos TO LEN( ::Parent:Children )
        ::Parent:Children[n]:xLeft -= nWidth
        ::Parent:Children[n]:MoveWindow()
    NEXT
    ::Parent:__UpdateWidth()
+   Super:Destroy()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------
