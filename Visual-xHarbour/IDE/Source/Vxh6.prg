@@ -257,10 +257,10 @@ METHOD Create() CLASS ToolBox
        n := 0
        WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
           IF RegOpenKeyEx( hKey, cName, 0, KEY_ALL_ACCESS, @hSub ) == 0
-             RegQueryValueEx( hSub,"ProgID",,,@cProgID )
-             RegQueryValueEx( hSub,"ClsID",,,@cClsID )
+             RegQueryValueEx( hSub,"ProgID",@cProgID )
+             RegQueryValueEx( hSub,"ClsID",@cClsID )
              IF cProgID == NIL
-                RegQueryValueEx( hSub,,,,@cProgID )
+                RegQueryValueEx( hSub,,@cProgID )
              ENDIF
              DEFAULT cClsID TO cProgID
              TRY

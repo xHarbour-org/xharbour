@@ -31,6 +31,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE           (0x80000002)
+#define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "5"
 #define VXH_BuildVersion "5.3.0"
@@ -53,14 +54,14 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 
 #define __GENVERSIONINFO__
 INIT PROCEDURE __VXH_Start
-   LOCAL hKey, cRunning, cIni, aRect
+   LOCAL cRunning, cIni, aRect, oReg
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
-      //RegDisableReflectionKey( hKey )
-      RegQueryValueEx( hKey, "Running",,,@cRunning )
+   oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour" )
+   IF oReg:Create()
+      cRunning := oReg:Running
       DEFAULT cRunning TO "0"
       IF cRunning == "0"
-         RegSetValueEx( hKey, "Running",, 1, "1" )
+         oReg:Running := "1"
          cIni     := GetModuleFileName()
          cIni     := STRTRAN( cIni, ".exe", ".ini" )
          IF FILE( cIni )
@@ -75,7 +76,7 @@ INIT PROCEDURE __VXH_Start
          ENDIF
          Splash( GetModuleHandle( "vxh.exe" ), "SPLASH", "BMP",,  )
       ENDIF
-      RegCloseKey( hKey )
+      oReg:Close()
    ENDIF
 RETURN
 
@@ -399,7 +400,7 @@ METHOD OnTimer( nId ) CLASS IDE_MainForm
 RETURN NIL
 
 METHOD OnClose() CLASS IDE_MainForm
-   LOCAL aSize, pWp, hKey, cName, cType, xData, n, aVal, hSub
+   LOCAL aSize, pWp, cName, cType, xData, n, aVal, oReg
    ::Application:Yield()
    IF ! ::Application:Project:Close(,.T.)
       RETURN 0
@@ -444,33 +445,32 @@ METHOD OnClose() CLASS IDE_MainForm
 
    UnhookWindowsHookEx( ::hHook )
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", @hKey ) == 0
-      //RegDisableReflectionKey( hKey )
-      RegSetValueEx( hKey, "Running",, 1, "0" )
-      RegCloseKey( hKey )
+   oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour" )
+
+   IF oReg:Create()
+      oReg:Running := "0"
+      oReg:Close()
    ENDIF
 
    ::Application:SaveCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
-   IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", @hKey ) == 0
-      //RegDisableReflectionKey( hKey )
+   IF oReg:Create( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects" )
       aVal := {}
       n := 0
-      WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
+      WHILE RegEnumKey( oReg:hKey, n, @cName, @cType, @xData ) == 0
          AADD( aVal, cName )
          n++
       ENDDO
-      AEVAL( aVal, {|c| RegDeleteKey( hKey, c )} )
+      AEVAL( aVal, {|c| oReg:Delete( c )} )
 
       FOR n := 1 TO LEN( ::Application:ToolBox:ComObjects )
-          IF RegCreateKey( hKey, ::Application:ToolBox:ComObjects[n][2], @hSub ) == 0
-             //RegDisableReflectionKey( hSub )
-             RegSetValueEx( hSub, "ProgID",, 1, ::Application:ToolBox:ComObjects[n][3] )
-             RegSetValueEx( hSub, "ClsID",, 1, ::Application:ToolBox:ComObjects[n][4] )
-             RegCloseKey( hSub )
+          IF oReg:Create( ::Application:ToolBox:ComObjects[n][2] )
+             oReg:Set( "ProgID", ::Application:ToolBox:ComObjects[n][3] )
+             oReg:Set( "ClsID", ::Application:ToolBox:ComObjects[n][4] )
+             oReg:Close()
           ENDIF
       NEXT
-      RegCloseKey( hKey )
+      oReg:Close()
    ENDIF
 
 RETURN NIL
@@ -5869,8 +5869,8 @@ RETURN 0
 
 METHOD Build( lForce ) CLASS Project
    LOCAL n, cProject, cExe, cResPath
-   LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp
-   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir
+   LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp, oReg, cVar, cInc, aInc
+   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude
 
    DEFAULT lForce TO .F.
 
@@ -5940,7 +5940,28 @@ METHOD Build( lForce ) CLASS Project
          :SetDefines( "__VXH__" + ::Properties:Definitions )
 
          :lClean := ::Properties:CleanBuild
-         :SetIncludeFolders( ::Properties:IncludePath )
+
+         cInc := ""
+         aInc := hb_aTokens( ::Properties:IncludePath, ";" )
+
+         IF ! EMPTY( aInc )
+            oReg := Registry( HKEY_LOCAL_MACHINE, "System\CurrentControlSet\Control\Session Manager\Environment" )
+            FOR n := 1 TO LEN( aInc )
+                cInclude := aInc[n]
+                i := AT( "%", cInclude )
+                IF i > 0
+                   IF oReg:Open()
+                      x := RAT("%",cInclude)-2
+                      cVar     := SUBSTR( cInclude, i+1, x )
+                      cInclude := oReg:&cVar + SubStr( cInclude, x+3 )
+                      oReg:Close()
+                   ENDIF
+                ENDIF
+                cInc += cInclude+";"
+            NEXT
+         ENDIF
+
+         :SetIncludeFolders( cInc )
 
          oHrb := NIL
          IF ::Properties:TargetType == 4 //HRB only

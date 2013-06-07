@@ -81,7 +81,8 @@ CLASS System
    DATA PageSetup               EXPORTED
    DATA PaperSize               EXPORTED
    DATA FocusPen                EXPORTED
-   
+   DATA OsVersion               EXPORTED
+
    DATA TitleBackBrush          EXPORTED
    
    DATA TitleBorderPen          EXPORTED
@@ -174,6 +175,8 @@ METHOD Init() CLASS System
 
    osvi := (struct OSVERSIONINFOEX)
    GetVersionEx( @osvi )
+
+   ::OsVersion := osvi
 
    ::OS := {=>}
    HSetCaseMatch( ::OS, .F. )

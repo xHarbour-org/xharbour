@@ -855,7 +855,7 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------
 
 PROCEDURE __WinDestruct CLASS Window
-   ::Parent := NIL
+   //::Parent := NIL
    ::hWnd   := NIL
    hb_gcStep()
 RETURN

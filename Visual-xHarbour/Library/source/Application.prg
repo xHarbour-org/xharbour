@@ -702,7 +702,7 @@ METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
    LOCAL cCust, hKey
    IF RegCreateKey( nKey, cNode, @hKey ) == 0
       //RegDisableReflectionKey( hKey ) 
-      RegQueryValueEx( hKey, cValue,,,@cCust )
+      RegQueryValueEx( hKey, cValue,@cCust )
       DEFAULT cCust TO ""
       ::CustomColors := hb_aTokens( cCust, "," )
       ASIZE( ::CustomColors, 16 )
@@ -1386,7 +1386,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            
            cOpt := NIL
            IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", 0, KEY_ALL_ACCESS, @hKey ) == 0
-              RegQueryValueEx( hKey, "ErrorShowStack",,,@cOpt )
+              RegQueryValueEx( hKey, "ErrorShowStack",@cOpt )
               RegCloseKey( hKey )
            ENDIF
 

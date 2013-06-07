@@ -6374,7 +6374,7 @@ HB_FUNC( REGOPENKEYEX )
 
    if( ( lRet = RegOpenKeyEx( (HKEY) hb_parnl(1), (LPCTSTR) hb_parc(2), (DWORD) hb_parnl(3), (REGSAM) hb_parnl(4), &hKey ) ) == ERROR_SUCCESS )
    {
-      hb_stornl( (LONG) hKey, 5 );
+      hb_stornl( PtrToLong(hKey), 5 );
    }
 
    hb_retnl( lRet );
@@ -6860,28 +6860,37 @@ HB_FUNC( GETDCBRUSHCOLOR )
 HB_FUNC( REGQUERYVALUEEX )
 {
    LONG lError;
-   DWORD lpType=hb_parnl(4);
+   DWORD dwType;
 
    DWORD lpcbData = 0;
-   lError = RegQueryValueEx( (HKEY) hb_parnl(1), (LPTSTR) hb_parc(2), NULL, &lpType, NULL, &lpcbData );
+   lError = RegQueryValueEx( (HKEY) hb_parnl(1), (LPTSTR) hb_parc(2), NULL, &dwType, NULL, &lpcbData );
 
    if ( lError == ERROR_SUCCESS && lpcbData )
    {
-      BYTE *lpData;
-
-      lpData = (BYTE *) hb_xgrab( ( int ) ( lpcbData + 1 ) );
-      lError= RegQueryValueEx( (HKEY) hb_parnl(1), (LPTSTR) hb_parc(2), NULL, &lpType, (BYTE*) lpData, &lpcbData );
-
-      if ( lError == ERROR_SUCCESS )
+      if( dwType == REG_SZ )
       {
-         hb_storclenAdopt( (char *) lpData, strlen( (const char *) lpData ), 5 );
+         BYTE *lpData = (BYTE *) hb_xgrab( ( int ) ( lpcbData + 1 ) );
+         lError = RegQueryValueEx( (HKEY) hb_parnl(1), (LPTSTR) hb_parc(2), NULL, &dwType, (BYTE*) lpData, &lpcbData );
+
+         if ( lError == ERROR_SUCCESS )
+         {
+            hb_storclenAdopt( (char *) lpData, strlen( (const char *) lpData ), 3 );
+         }
+         else
+         {
+            hb_xfree( (void *) lpData );
+         }
       }
       else
       {
-         hb_xfree( (void *) lpData );
+         BYTE *dwData;
+         lError = RegQueryValueEx( (HKEY) hb_parnl(1), (LPTSTR) hb_parc(2), NULL, &dwType, (BYTE*) dwData, &lpcbData );
+         if ( lError == ERROR_SUCCESS )
+         {
+            hb_stornl( (long) dwData, 3 );
+         }
       }
    }
-
    hb_retnl( lError );
 }
 
@@ -6952,7 +6961,7 @@ HB_FUNC( REGSETVALUEEX )
 {
    if( (DWORD) hb_parnl(4) == REG_SZ )
    {
-      hb_retnl( (long) RegSetValueEx( (HKEY) hb_parnl(1), hb_parc(2), 0, hb_parnl(4), ( BYTE * const ) hb_parc(5), ( strlen( hb_parc(5) ) + 1 ) )  );
+      hb_retnl( (long) RegSetValueEx( (HKEY) hb_parnl(1), hb_parc(2), 0, REG_SZ, ( BYTE * const ) hb_parc(5), ( strlen( hb_parc(5) ) + 1 ) )  );
    }
    else
    {
@@ -6976,6 +6985,7 @@ HB_FUNC( REGCREATEKEY )
 }
 
 //------------------------------------------------------------------------------------------------
+/*
 HB_FUNC( REGCREATEKEYEX )
 {
    HKEY hkResult;
@@ -7003,6 +7013,18 @@ HB_FUNC( REGCREATEKEYEX )
    {
       hb_errRT_BASE( EG_ARG, 6001, NULL, "REGCREATEKEYEX", 1, hb_paramError(1) );
    }
+}
+*/
+HB_FUNC( REGCREATEKEYEX )
+{
+   LONG nErr;
+   HKEY hKey;
+   nErr = RegCreateKeyEx( (HKEY) hb_parnl(1), (LPCSTR) hb_parc(2), 0, NULL, REG_OPTION_NON_VOLATILE, (DWORD) hb_parnl(3), NULL, &hKey, NULL );
+   if ( nErr == ERROR_SUCCESS )
+   {
+      hb_stornl( (long) hKey, 4 );
+   }
+   hb_retnl( nErr );
 }
 
 //------------------------------------------------------------------------------------------------
@@ -10629,4 +10651,14 @@ HB_FUNC( _REGCREATEKEYEX )
      hb_stornl( (LONG) dwDisposition, 9 ) ;
   }
   hb_retnl( nErr ) ;
+}
+
+HB_FUNC( GETENVIRONMENTVARIABLE )
+{
+   DWORD buff_size = GetEnvironmentVariable( hb_parc(1), NULL, 0);
+
+   char *szBuffer = (char *) hb_xgrab( buff_size + 1 );
+   szBuffer[0] = '\0';
+   GetEnvironmentVariable( hb_parc(1), szBuffer, buff_size + 1 );
+   hb_retcAdopt( szBuffer );
 }

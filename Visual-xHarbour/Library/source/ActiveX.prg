@@ -518,11 +518,11 @@ RETURN Self
 METHOD IsRegistered() CLASS ActiveX
    LOCAL hKey, cKey, lReg := .F.
    RegOpenKeyEx( HKEY_CLASSES_ROOT, ::ProgID + "\Clsid", 0, SECURITY_ACCESS_MASK, @hKey )
-   RegQueryValueEx( hKey, NIL,,, @cKey )
+   RegQueryValueEx( hKey, NIL, @cKey )
    RegCloseKey( hKey )
    IF !EMPTY( cKey )
       RegOpenKeyEx( HKEY_CLASSES_ROOT, "CLSID\" + cKey + "\InprocServer32", 0, SECURITY_ACCESS_MASK, @hKey )
-      RegQueryValueEx( hKey, NIL,,, @cKey )
+      RegQueryValueEx( hKey, NIL, @cKey )
       RegCloseKey( hKey )
       lReg := !EMPTY(cKey) .AND. FILE(cKey)
    ENDIF
@@ -550,7 +550,7 @@ FUNCTION IsDotNet( cFrameworkPath, cVersion )
    cVersion       := ""
 /*
    IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Microsoft\ASP.NET", 0, KEY_ALL_ACCESS, @hKey ) == 0
-      RegQueryValueEx( hKey, "RootVer",,, @cVersion )
+      RegQueryValueEx( hKey, "RootVer", @cVersion )
       RegCloseKey( hKey )
    ENDIF
 
@@ -563,7 +563,7 @@ FUNCTION IsDotNet( cFrameworkPath, cVersion )
    ENDIF
 
    IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Microsoft\ASP.NET\" + cVersion, 0, KEY_ALL_ACCESS, @hKey ) == 0
-      RegQueryValueEx( hKey, "PATH",,, @cFrameworkPath )
+      RegQueryValueEx( hKey, "PATH", @cFrameworkPath )
       RegCloseKey( hKey )
    ENDIF
 */
