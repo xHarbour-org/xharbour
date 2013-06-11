@@ -615,7 +615,8 @@ pngwutil
 gtwin
 
 ; GTWVT_LIB_OBJS
-gtwvt
+; Error: Unresolved external '_hb_stack_ready'
+;gtwvt
 
 ; GTGUI_LIB_OJS
 gtgui

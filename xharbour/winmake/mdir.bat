@@ -424,6 +424,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%usrrdd%LIBEXT%     del lib\%SUB_DIR%\%LIBPREFI
 if exist lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%use_dll%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%         del lib\%SUB_DIR%\%LIBPREFIX%vm%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%vmmt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT%   del lib\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%zlib%LIBEXT%
 
 if exist obj\%SUB_DIR%\*%OBJEXT%                     del obj\%SUB_DIR%\*%OBJEXT%
@@ -473,6 +474,7 @@ if exist bin\%SUB_DIR%\xbscript%LIBEXT%              del bin\%SUB_DIR%\xbscript%
 ECHO Removing DLL and Object Files ...
 if exist obj\%SUB_DIR%\dll\*%OBJEXT%                 del obj\%SUB_DIR%\dll\*%OBJEXT%
 if exist obj\%SUB_DIR%\dll\*.c                       del obj\%SUB_DIR%\dll\*.c
+if exist obj\%SUB_DIR%\dll\*.cxx                     del obj\%SUB_DIR%\dll\*.cxx
 if exist obj\%SUB_DIR%\dll\*.rc                      del obj\%SUB_DIR%\dll\*.rc
 if exist obj\%SUB_DIR%\dll\*.res                     del obj\%SUB_DIR%\dll\*.res
 if exist obj\%SUB_DIR%\dll\*.ppo                     del obj\%SUB_DIR%\dll\*.ppo
