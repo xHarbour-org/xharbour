@@ -154,6 +154,9 @@ METHOD __SetCtrlName(c) CLASS Object
       ENDIF
       ::xName := c
    ENDIF
+   IF ::__ClassInst != NIL
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
 RETURN c
 
 //-----------------------------------------------------------------------------------------------------------------------------

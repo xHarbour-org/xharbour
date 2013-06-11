@@ -23,6 +23,8 @@ static oSystem
 #define LVGA_HEADER_CENTER      0x00000002
 #define LVGA_HEADER_RIGHT       0x00000004
 
+#define HKEY_LOCAL_MACHINE           (0x80000002)
+
 #define CSIDL_MYMUSIC           0x000d
 #define CSIDL_MYVIDEO           0x000e
 
@@ -107,6 +109,7 @@ CLASS System
    METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
    ACCESS Services             INLINE __ENUMSERVICES()
    METHOD GetFocus()           INLINE ObjFromHandle( GetFocus() )
+   METHOD GetEnvironment()
 ENDCLASS
 
 METHOD GetPathFromFolder( nId, lCreate ) CLASS System
@@ -118,6 +121,13 @@ METHOD GetPathFromFolder( nId, lCreate ) CLASS System
    SHGetFolderPath( 0, nId, 0, SHGFP_TYPE_CURRENT, @cPath )
 RETURN cPath
 
+METHOD GetEnvironment( cVar ) CLASS System
+   LOCAL cEnv, oReg := Registry( HKEY_LOCAL_MACHINE, "System\CurrentControlSet\Control\Session Manager\Environment" )
+   IF oReg:Open()
+      cEnv := oReg:GetValue( cVar )
+      oReg:Close()
+   ENDIF
+RETURN cEnv
 
 METHOD GetLocalTime() CLASS System
    LOCAL st

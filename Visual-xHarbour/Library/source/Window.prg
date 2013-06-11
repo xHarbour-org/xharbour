@@ -403,7 +403,6 @@ CLASS Window INHERIT Object
 
 
    METHOD Init( oParent ) CONSTRUCTOR
-   DESTRUCTOR __WinDestruct
 
    METHOD Create()
    METHOD __RegisterTransparentControl()
@@ -676,6 +675,73 @@ CLASS Window INHERIT Object
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
+METHOD Init( oParent ) CLASS Window
+   LOCAL Topic
+   DEFAULT ::__lInitialized  TO .F.
+   DEFAULT ::DisableParent TO .F.
+   IF ::__lInitialized
+      MessageBox( GetActiveWindow(), ::Name+" has already been initialized returning previous instance." + CHR(13)+;
+                                                "Use the prevously created instance to avoid this Message", ::Name, MB_ICONEXCLAMATION )
+      RETURN Self
+   ENDIF
+   Super:Init()
+   ::__lInitialized := .T.
+   ::hdr               := {=>}
+   ::WindowPos         := {=>}
+   //::MeasureItemStruct := {=>}
+
+   DEFAULT ::ThemeName    TO "window"
+   DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::xLeft        TO 0
+   DEFAULT ::xTop         TO 0
+   DEFAULT ::xWidth       TO CW_USEDEFAULT
+   DEFAULT ::xHeight      TO CW_USEDEFAULT
+   DEFAULT ::__xCtrlName  TO "Window"
+   DEFAULT ::ClsName      TO "Window"
+
+   ::Parent       := oParent
+
+   IF ::__ClassInst == NIL .AND. ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
+      ::__ClassInst := __ClsInst( ::ClassH )
+      ::__ClassInst:__IsInstance := .T.
+   ENDIF
+
+   ::Font := Font()
+   ::Font:Parent := Self
+   IF ::__ClassInst != NIL
+      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
+      ::Font:__ClassInst:__IsInstance := .T.
+   ENDIF
+
+   ::Font:Create()
+
+   IF ! ( ::ClsName == TOOLTIPS_CLASS )
+      ::ToolTip := ToolTip( Self )
+      ::Drawing := Drawing( Self )
+      IF VALTYPE( oParent ) == "O"
+         ::__CreateProperty()
+         DEFAULT ::Dock   TO __WindowDock( Self )
+         DEFAULT ::Anchor TO __AnchorSet( Self )
+         ::xTabOrder    := LEN( ::Parent:Children )+1
+         IF ::__ClassInst != NIL
+            ::__ClassInst:xTabOrder := ::xTabOrder
+         ENDIF
+      ENDIF
+   ENDIF
+   DEFAULT ::EventHandler TO Hash()
+
+   IF oParent != NIL .AND. oParent:__ClassInst != NIL .OR. ::ClsName IN { "VXH_FORM_IDE", "CCTL" }
+      DEFAULT ::Events TO aEvents()
+      aSort( ::Events,,,{|x, y| x[1] < y[1]})
+      FOR EACH Topic IN ::Events
+          aSort( Topic[2],,,{|x, y| x[1] < y[1]})
+      NEXT
+   ENDIF
+
+RETURN SELF
+
+//-----------------------------------------------------------------------------------------------
+
 METHOD GetControl( cName ) CLASS Window
    LOCAL n := ASCAN( ::Children, {|o| o:Name == cName } )
 RETURN IIF( n > 0, ::Children[n], NIL )
@@ -785,81 +851,6 @@ METHOD __RegisterTransparentControl( oCtrl ) CLASS Window
       RETURN .T.
    ENDIF
 RETURN .F.
-
-//-----------------------------------------------------------------------------------------------
-
-METHOD Init( oParent ) CLASS Window
-   LOCAL Topic
-   DEFAULT ::__lInitialized  TO .F.
-   DEFAULT ::DisableParent TO .F.
-   IF ::__lInitialized
-      MessageBox( GetActiveWindow(), ::Name+" has already been initialized returning previous instance." + CHR(13)+;
-                                                "Use the prevously created instance to avoid this Message", ::Name, MB_ICONEXCLAMATION )
-      RETURN Self
-   ENDIF
-   ::__lInitialized := .T.
-   ::hdr               := {=>}
-   ::WindowPos         := {=>}
-   //::MeasureItemStruct := {=>}
-
-   DEFAULT ::ThemeName    TO "window"
-   DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   DEFAULT ::xLeft        TO 0
-   DEFAULT ::xTop         TO 0
-   DEFAULT ::xWidth       TO CW_USEDEFAULT
-   DEFAULT ::xHeight      TO CW_USEDEFAULT
-   DEFAULT ::__xCtrlName  TO "Window"
-   DEFAULT ::ClsName      TO "Window"
-
-   ::Parent       := oParent
-
-   IF ::__ClassInst == NIL .AND. ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance := .T.
-   ENDIF
-
-   ::Font := Font()
-   ::Font:Parent := Self
-   IF ::__ClassInst != NIL
-      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
-      ::Font:__ClassInst:__IsInstance := .T.
-   ENDIF
-
-   ::Font:Create()
-
-   IF ! ( ::ClsName == TOOLTIPS_CLASS )
-      ::ToolTip := ToolTip( Self )
-      ::Drawing := Drawing( Self )
-      IF VALTYPE( oParent ) == "O"
-         ::__CreateProperty()
-         DEFAULT ::Dock   TO __WindowDock( Self )
-         DEFAULT ::Anchor TO __AnchorSet( Self )
-         ::xTabOrder    := LEN( ::Parent:Children )+1
-         IF ::__ClassInst != NIL
-            ::__ClassInst:xTabOrder := ::xTabOrder
-         ENDIF
-      ENDIF
-   ENDIF
-   DEFAULT ::EventHandler TO Hash()
-
-   IF oParent != NIL .AND. oParent:__ClassInst != NIL .OR. ::ClsName IN { "VXH_FORM_IDE", "CCTL" }
-      DEFAULT ::Events TO aEvents()
-      aSort( ::Events,,,{|x, y| x[1] < y[1]})
-      FOR EACH Topic IN ::Events
-          aSort( Topic[2],,,{|x, y| x[1] < y[1]})
-      NEXT
-   ENDIF
-
-RETURN SELF
-
-//-----------------------------------------------------------------------------------------------
-
-PROCEDURE __WinDestruct CLASS Window
-   //::Parent := NIL
-   ::hWnd   := NIL
-   hb_gcStep()
-RETURN
-
 
 //-----------------------------------------------------------------------------------------------
 
@@ -3872,7 +3863,14 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
           ELSEIF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
             IF oBottom:hWnd == ::Parent:hWnd
-               ::xHeight := oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin
+               //IF oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin < ::MinHeight
+               //   IF oTop != NIL
+               //      oTop:Height -= ( ::MinHeight )//- ( oBottom:Height - ::xTop - ::Dock:BottomMargin ) )
+               //      RETURN NIL
+               //   ENDIF
+               // ELSE
+                  ::xHeight := oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin
+               //ENDIF
              ELSEIF oBottom:IsChild
                ::xHeight := oBottom:Top  - ::xTop - ::Dock:BottomMargin - IIF( oBottom:TopSplitter != NIL, oBottom:TopSplitter:Weight, 0 )
             ENDIF

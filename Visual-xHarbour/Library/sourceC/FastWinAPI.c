@@ -26,6 +26,10 @@
 //---------------------------- INTERNAL API -----------------------------------
 //-----------------------------------------------------------------------------
 
+extern void Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect );
+extern void Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize );
+extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
+
 PHB_ITEM Rect2Array( RECT *rc  )
 {
    PHB_ITEM aRect = hb_itemArrayNew(4);
@@ -37,18 +41,6 @@ PHB_ITEM Rect2Array( RECT *rc  )
    hb_arraySet(aRect, 4, hb_itemPutNL(element, rc->bottom));
    hb_itemRelease(element);
    return aRect;
-}
-
-BOOL Array2Rect(PHB_ITEM aRect, RECT *rc )
-{
-   if (HB_IS_ARRAY(aRect) && hb_arrayLen(aRect) == 4) {
-      rc->left   = hb_arrayGetNL(aRect,1);
-      rc->top    = hb_arrayGetNL(aRect,2);
-      rc->right  = hb_arrayGetNL(aRect,3);
-      rc->bottom = hb_arrayGetNL(aRect,4);
-      return TRUE ;
-   }
-   return FALSE;
 }
 
 BOOL Array2Point(PHB_ITEM aPoint, POINT *pt )
@@ -93,17 +85,6 @@ PHB_ITEM Size2Array( SIZE *siz  )
    return aSize;
 }
 
-void  Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
-{
-   PHB_ITEM element = hb_itemNew(NULL);
-
-   hb_arraySet(aRect, 1, hb_itemPutNL(element, rc->left));
-   hb_arraySet(aRect, 2, hb_itemPutNL(element, rc->top));
-   hb_arraySet(aRect, 3, hb_itemPutNL(element, rc->right));
-   hb_arraySet(aRect, 4, hb_itemPutNL(element, rc->bottom));
-   hb_itemRelease(element);
-}
-
 void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint)
 {
 
@@ -115,37 +96,10 @@ void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint)
 
 }
 
-void Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize )
-{
-   PHB_ITEM element = hb_itemNew(NULL);
-
-   hb_arraySet(aSize, 1, hb_itemPutNL(element, siz->cx));
-   hb_arraySet(aSize, 2, hb_itemPutNL(element, siz->cy));
-   hb_itemRelease(element);
-
-}
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-HB_FUNC( _COPYRECT )
-{
-   RECT   lprcDst ;
-   RECT   lprcSrc ;
-   if ( Array2Rect(hb_param( 1, HB_IT_ARRAY ) , &lprcSrc ))
-      {
-      if ( CopyRect( &lprcDst, &lprcSrc ) ){
-          hb_itemRelease(hb_itemReturnForward(Rect2Array( &lprcDst)));
-
-      }
-      else
-         hb_ret();
-      }
-   else
-     hb_ret();
-
-}
 
 //-----------------------------------------------------------------------------
 HB_FUNC( _INFLATERECT )

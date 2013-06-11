@@ -382,6 +382,7 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA Width                 EXPORTED
    DATA ImageIndex            EXPORTED INIT -2
    DATA __Temprect            EXPORTED
+   DATA TreeItem              EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 ENDCLASS
@@ -394,12 +395,12 @@ METHOD Init( oParent ) CLASS CoolMenuItem
       oSubItem:Init( oParent )
       RETURN oSubItem
    ENDIF
-   ::IsMenuItem := .T.
+   ::IsMenuItem   := .T.
    ::__IsControl  := .F.
    ::__xCtrlName  := "CoolMenuItem"
    ::Super:Init( oParent )
-   ::Index      := LEN( ::Parent:aItems ) + 1
-   ::ImageIndex := 0
+   ::Index        := LEN( ::Parent:aItems ) + 1
+   ::ImageIndex   := 0
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance   := .T.

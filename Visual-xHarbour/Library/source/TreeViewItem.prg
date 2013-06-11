@@ -184,7 +184,7 @@ METHOD AddItem( cPrompt, nImage, aColItems ) CLASS TreeViewItem
 
    DEFAULT nImage TO 0
    oItem := TreeViewItem( ::Parent )
-   oItem:Caption     := cPrompt
+   oItem:Text        := cPrompt
    oItem:xImageIndex := nImage
    oItem:Owner       := Self
    oItem:Create()

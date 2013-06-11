@@ -26,16 +26,18 @@ CLASS Component INHERIT Object
    DATA EventHandler           EXPORTED
    DATA ComponentType          EXPORTED
    DATA lCreated               EXPORTED INIT .F.
-   DATA Parent                 EXPORTED
 
    DATA __lCreateAfterChildren EXPORTED INIT .F.
    DATA __IdeImageIndex        EXPORTED INIT 7
    DATA __PropFilter           EXPORTED INIT {}
    DATA Caption                EXPORTED INIT ""
+   DATA Text                   EXPORTED INIT ""
    DATA lComponent             EXPORTED INIT .T.
 
    ACCESS Form                 INLINE IIF( ::Owner != NIL, ::Owner:Form, NIL )
    ACCESS AppInstance          INLINE ::__GetInstance()
+
+   ACCESS Parent               INLINE ::Owner
 
    METHOD Init()               CONSTRUCTOR
    METHOD Destroy()
@@ -85,6 +87,9 @@ METHOD Init( oOwner ) CLASS Component
 
    IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
+      IF oOwner:TreeItem == NIL
+         ::Application:ObjectTree:Set( oOwner )
+      ENDIF
       ::Application:ObjectTree:Set( Self )
    ENDIF
 RETURN SELF

@@ -683,31 +683,29 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 METHOD SaveCustomColors( nKey, cNode, cValue ) CLASS Application
-   LOCAL cCust, hKey, n
-   IF RegCreateKey( nKey, cNode, @hKey ) == 0
-      //RegDisableReflectionKey( hKey ) 
+   LOCAL cCust, n, oReg := Registry( nKey, cNode )
+   IF oReg:Create()
       cCust := ""
       FOR n := 1 TO LEN( ::CustomColors )-1
          cCust += IIF( ::CustomColors[n] != NIL, xStr( ::CustomColors[n] ), "" ) + ","
       NEXT
       cCust += IIF( ::CustomColors[-1] != NIL, xStr( ::CustomColors[-1] ),"" )
-      RegSetValueEx( hKey, cValue,, 1, cCust )
-      RegCloseKey( hKey )
+      oReg:SetValue( cValue, cCust )
+      oReg:Close()
    ENDIF
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
 
 METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
-   LOCAL cCust, hKey
-   IF RegCreateKey( nKey, cNode, @hKey ) == 0
-      //RegDisableReflectionKey( hKey ) 
-      RegQueryValueEx( hKey, cValue,@cCust )
+   LOCAL cCust, oReg := Registry( nKey, cNode )
+   IF oReg:Create()
+      cCust := oReg:GetValue( cValue )
       DEFAULT cCust TO ""
       ::CustomColors := hb_aTokens( cCust, "," )
       ASIZE( ::CustomColors, 16 )
       aEval( ::CustomColors, {|c,i| IIF( c != NIL, ::CustomColors[i] := VAL(c),) } )
-      RegCloseKey( hKey )
+      oReg:Close()
    ENDIF
 RETURN NIL
    
@@ -1286,7 +1284,7 @@ FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
 RETURN n
 
 FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
-   LOCAL cText, hKey, rc, nWidth, nHeight, cCaption, hStk, hLst, aRect, hDC, nColor
+   LOCAL cText, rc, nWidth, nHeight, cCaption, hStk, hLst, aRect, hDC, nColor, oReg
    LOCAL nLeft, cOpt, aLabels, aCaptions, nTop, n, hCtrl, dis, lSelected, aPar, __nWidth
    static hGpf, hBrush
    
@@ -1385,9 +1383,10 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            NEXT
            
            cOpt := NIL
-           IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", 0, KEY_ALL_ACCESS, @hKey ) == 0
-              RegQueryValueEx( hKey, "ErrorShowStack",@cOpt )
-              RegCloseKey( hKey )
+           oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+           IF oReg:Open()
+              cOpt := oReg:ErrorShowStack
+              oReg:Close()
            ENDIF
 
            IF cOpt != NIL .AND. cOpt == "1"
@@ -1472,10 +1471,10 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
-                 //RegDisableReflectionKey( hKey ) 
-                 RegSetValueEx( hKey, "ErrorShowStack",, 1, "1" )
-                 RegCloseKey( hKey )
+              oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+              IF oReg:Create()
+                 oReg:SetValue( "ErrorShowStack", "1" )
+                 oReg:Close()
               ENDIF
               RETURN 0
            ENDIF
@@ -1494,10 +1493,10 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              IF RegCreateKey( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings", @hKey ) == 0
-                 //RegDisableReflectionKey( hKey )
-                 RegSetValueEx( hKey, "ErrorShowStack",, 1, "0" )
-                 RegCloseKey( hKey )
+              oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+              IF oReg:Create()
+                 oReg:SetValue( "ErrorShowStack", "0" )
+                 oReg:Close()
               ENDIF
               RETURN 0
            ENDIF

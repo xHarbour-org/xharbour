@@ -99,7 +99,7 @@ METHOD Create() CLASS ToolBox
    LOCAL nIndex, nIcon, o, oPtr, oItem, n, x, lPro
 
    #ifdef VXH_PROFESSIONAL
-    LOCAL hKey, cName, cType, xData, hSub, oTypeLib, cId, cProgID, cClsID
+    LOCAL oReg, oTypeLib, cId, cProgID, cClsID, aKeys
    #endif
 
    ::VertScroll := .F.
@@ -253,15 +253,19 @@ METHOD Create() CLASS ToolBox
 
    #ifdef VXH_PROFESSIONAL
     ::ComObjects    := {}
-    IF RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects", 0, KEY_ALL_ACCESS, @hKey ) == 0
+    oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects" )
+    IF oReg:Open()
        n := 0
-       WHILE RegEnumKey( hKey, n, @cName, @cType, @xData ) == 0
-          IF RegOpenKeyEx( hKey, cName, 0, KEY_ALL_ACCESS, @hSub ) == 0
-             RegQueryValueEx( hSub,"ProgID",@cProgID )
-             RegQueryValueEx( hSub,"ClsID",@cClsID )
+       aKeys := oReg:GetKeys()
+       
+       FOR n := 1 TO LEN( aKeys )
+          IF oReg:Open( aKeys[n][1] )
+             cProgID := oReg:ProgID
+             cClsID  := oReg:ClsID
              IF cProgID == NIL
-                RegQueryValueEx( hSub,,@cProgID )
+                cProgID := oReg:GetValue()
              ENDIF
+
              DEFAULT cClsID TO cProgID
              TRY
                 oTypeLib := LoadTypeLib( cClsID, .F. )
@@ -269,12 +273,11 @@ METHOD Create() CLASS ToolBox
               CATCH
                 cId := STRTRAN( cProgID, "." )
              END
-             AADD( ::ComObjects, { cId, cName, cProgID, cClsID } )
-             RegCloseKey( hSub )
+             AADD( ::ComObjects, { cId, aKeys[n][1], cProgID, cClsID } )
+             oReg:Close()
           ENDIF
-          n++
-       ENDDO
-       RegCloseKey( hKey )
+       NEXT
+       oReg:Close()
        ::UpdateComObjects()
     ENDIF
     ::UpdateCustomControls(lPro,.T.)
@@ -808,7 +811,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
          oControl:InvalidateRect()
 
        ELSE
-         ::Application:Components:Show()
+         //::Application:Components:Show()
          IF cName == "ImageList" .AND. oControl:Handle == NIL
             IF !EMPTY( aProps )
                SetCtrlProps( oControl, aProps )
@@ -818,7 +821,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
             oControl:Create()
          ENDIF
 
-         oCmpBtn := ::Application:Components:AddButton( oControl )
+         //oCmpBtn := ::Application:Components:AddButton( oControl )
       ENDIF
 
       // Restore Mouse Pointer

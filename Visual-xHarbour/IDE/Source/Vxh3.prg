@@ -49,28 +49,25 @@ CLASS FormEditor INHERIT Control
    DATA CtrlMask      EXPORTED
    
    METHOD Init() CONSTRUCTOR
-   METHOD OnDestroy() INLINE   ::Super:OnDestroy(),;
-                               DeleteObject( ::RulerFont ),;
-                               DeleteObject( ::RulerVertFont ), NIL
-   METHOD OnLButtonDown() INLINE ::SetFocus(), 0
+   METHOD OnDestroy()                INLINE   ::Super:OnDestroy(),;
+                                              DeleteObject( ::RulerFont ),;
+                                              DeleteObject( ::RulerVertFont ), NIL
+   METHOD OnLButtonDown()            INLINE ::SetFocus(), 0
    METHOD Create()
-   METHOD OnSetFocus()  INLINE ::CtrlMask:SetFocus()
-   METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD OnSetFocus()               INLINE ::CtrlMask:SetFocus()
+   METHOD Refresh()                  INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD OnNCCalcSize()
    METHOD OnNCPaint()
    METHOD OnNCRButtonDown()
    METHOD OnNCHitTest()
-   METHOD OnSize( nwParam, nlParam ) INLINE Super:OnSize( nwParam, nlParam ), ::UpdateScroll()
    METHOD OnVertScroll()
-   METHOD OnHorzScroll(n) INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
-   METHOD ResetScroll()
+   METHOD OnHorzScroll(n)            INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD UpdateScroll()
 ENDCLASS
 
 //---------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS FormEditor
-
    ::__xCtrlName   := "FormEditor"
    ::ClassBrush    := GetStockObject( WHITE_BRUSH )
    ::Super:Init( oParent )
@@ -84,8 +81,6 @@ METHOD Init( oParent ) CLASS FormEditor
    ::Dock:Margin   := 0
    ::xLeft         := 10
    ::xTop          := 10
-   //::Width         := GetSystemMetrics( SM_CXSCREEN ) * 2
-   //::Height        := GetSystemMetrics( SM_CYSCREEN ) * 2
    ::RulerFont     := __FontCreate( "Tahoma", 8 )
    ::RulerVertFont := __FontCreate( "Tahoma", 8,,, .T. )
    ::RulerBrush    := ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd
@@ -103,16 +98,13 @@ METHOD Create() CLASS FormEditor
 RETURN Self
 
 METHOD UpdateScroll() CLASS FormEditor
-   LOCAL pt := (struct POINT)
    IF ::CtrlMask:CurForm != NIL .AND. IsWindow( ::CtrlMask:CurForm:hWnd )
-      GetWindowRect( ::CtrlMask:CurForm:hWnd, @pt )
-      ScreenToClient( ::CtrlMask:CurForm:Parent:hWnd, @pt )
-      ::OriginalRect[3] := MAX( ::ClientWidth,  pt:x+::CtrlMask:CurForm:Width+20 )
-      ::OriginalRect[4] := MAX( ::ClientHeight, pt:y+::CtrlMask:CurForm:Height+20 )
+      ::OriginalRect[3] := ::CtrlMask:CurForm:Width  + 30
+      ::OriginalRect[4] := ::CtrlMask:CurForm:Height + 30
 
-      ::CtrlMask:Width  := ::OriginalRect[3]
-      ::CtrlMask:Height := ::OriginalRect[4]
-
+      ::CtrlMask:xWidth  := MAX( ::OriginalRect[3], ::Width )
+      ::CtrlMask:xHeight := MAX( ::OriginalRect[4], ::Height )
+      ::CtrlMask:MoveWindow()
       ::__SetScrollBars()
    ENDIF
 RETURN NIL
@@ -127,17 +119,6 @@ METHOD OnVertScroll(n) CLASS FormEditor
       ENDIF
    ENDIF
 RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD ResetScroll() CLASS FormEditor
-//   ::OnVScroll( SB_THUMBTRACK, -(::Application:MainForm:FormEditor1:VertScrollPos), 0 )
-//   ::OnHScroll( SB_THUMBTRACK, -(::Application:MainForm:FormEditor1:HorzScrollPos), 0 )
-//   ::VertScrollPos := 0
-//   ::HorzScrollPos := 0
-//   ::CtrlMask:Top  := 0
-//   ::CtrlMask:Left := 0
-RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
@@ -574,7 +555,7 @@ METHOD OnPaint() CLASS ControlMask
       RETURN NIL
    ENDIF
 
-   IF ( ::CurForm == NIL .OR. !::DrawBand ) .AND. !::lOrderMode
+   IF ( ::CurForm == NIL .OR. !::DrawBand  .OR. ! ::CurForm:IsWindow() ) .AND. !::lOrderMode
       ::aPrevRect := NIL
       RETURN NIL
    ENDIF

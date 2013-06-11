@@ -34,7 +34,6 @@ CLASS MemoryTable INHERIT Component
    DATA Table              PUBLISHED INIT {}
    DATA Alias              EXPORTED
    DATA Fields             EXPORTED
-   DATA Parent             EXPORTED
    DATA Tag                EXPORTED
    DATA Record             EXPORTED INIT 1
    DATA bOnFileNameChanged EXPORTED

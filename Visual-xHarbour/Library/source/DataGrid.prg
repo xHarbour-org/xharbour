@@ -4406,6 +4406,12 @@ METHOD Create() CLASS GridColumn
       ENDIF
       ::xText := cText
    ENDIF
+   IF ::__ClassInst != NIL
+      IF ::Parent:TreeItem == NIL
+         ::Application:ObjectTree:Set( ::Parent )
+      ENDIF
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
 
    IF VALTYPE( ::xImageIndex ) == "N"
       ::xImageIndex := MAX( 0, ::xImageIndex )

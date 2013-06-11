@@ -50,7 +50,6 @@ CLASS NotifyIcon INHERIT Component
    DATA ID              EXPORTED
    DATA Flags           EXPORTED
    DATA Message         EXPORTED
-   DATA Parent          EXPORTED
    DATA Events          EXPORTED  INIT {;
                                        {"Mouse", {;
                                                  { "OnLButtonDown"     , "", "" },;
@@ -77,7 +76,6 @@ METHOD Init( oOwner ) CLASS NotifyIcon
    DEFAULT nMess TO 1
    ::Message       := WM_USER + nMess
    ::hWnd          := ::Owner:hWnd
-   ::Parent        := ::Owner
    nMess++
 RETURN Self
 

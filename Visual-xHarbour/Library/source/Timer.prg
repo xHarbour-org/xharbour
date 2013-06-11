@@ -27,7 +27,6 @@ CLASS Timer INHERIT Component
    DATA Events        EXPORTED  INIT {  {"General", { { "OnTimeOut"       , "", "" } } } }
 
    DATA hProc         PROTECTED
-   ACCESS Parent      INLINE ::Owner
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

@@ -86,7 +86,6 @@ CLASS WindowEdit INHERIT WinForm
    METHOD OnEraseBkGnd()
    METHOD OnUserMsg()
    METHOD OnSize()
-   METHOD OnMove()
    METHOD OnNCPaint()
 
    METHOD ControlSelect()
@@ -110,14 +109,13 @@ CLASS WindowEdit INHERIT WinForm
 ENDCLASS
 
 METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
-  ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
   Super:OnSize( nwParam, nlParam )
-RETURN 0
-
-METHOD OnMove() CLASS WindowEdit
-  ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
-RETURN 0
-
+  IF ::IsWindowVisible()
+     ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
+     ::Parent:UpdateScroll()
+  ENDIF
+RETURN NIL
+  
 FUNCTION CntChildren( oObj )
    LOCAL n, nCnt := LEN( oObj:Children )
    FOR n := 1 TO LEN( oObj:Children )
@@ -210,8 +208,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ENDIF
 
    ::Selected := {{Self}}
-
-   ::Application:ObjectTree:Set( Self, lNew )
+   ::Parent:UpdateScroll()
 
 RETURN Self
 
@@ -230,13 +227,6 @@ METHOD Create() CLASS WindowEdit
    IF !::__lModified
       ::Hide()
    ENDIF
-   IF ::Cargo == NIL
-      ::Application:FormsTabs:InsertTab( ::Name,,, .F. )
-      ::Application:FormsTabs:SetCurSel( ::Application:FormsTabs:GetItemCount() )
-      ::Application:FormsTabs:Redraw()
-      ::Application:ObjectTree:Set( Self )
-   ENDIF
-
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -335,9 +325,6 @@ METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
       ::Application:EventManager:ResetEvents( {{oControl}} )
 
       ::CtrlMask:SetMouseShape( MCS_NONE )
-      IF lComponent .AND. oControl:Button != NIL //.AND. lFocus
-         oControl:Button:Select()
-      ENDIF
 
       IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
          oControl:Show()
@@ -437,7 +424,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
 
            IF __clsParent( ::Application:ObjectManager:ActiveObject:ClassH, "COMPONENT" )
               WITH OBJECT ::Application:ObjectManager:ActiveObject
-                 ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., :Owner, :__xCtrlName, hb_qWith(), , 1, , ::Application:Components:Current } }, ::Application:Project:aUndo )
+                 ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., :Owner, :__xCtrlName, hb_qWith(), , 1, , /*::Application:Components:Current*/ } }, ::Application:Project:aUndo )
               END
               RETURN 0
            ENDIF
@@ -1972,7 +1959,7 @@ RETURN Self
 
 METHOD OnNCPaint() CLASS WindowEdit
    LOCAL hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
-   IF ::Application:ThemeActive .AND. ::Theming
+   IF ::Application:ThemeActive .AND. ::Theming .AND. ::IsWindowVisible()
       IF ( !::CaptionBar .AND. ::FrameStyle == 2 ) .OR. ::lCustom
          RETURN NIL
       ENDIF

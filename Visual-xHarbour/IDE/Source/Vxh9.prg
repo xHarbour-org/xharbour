@@ -136,7 +136,7 @@ METHOD OnInitDialog() CLASS ImageManager
       END
 
       WITH OBJECT GridColumn( :this )
-         :Caption    := "Resource Name"
+         :Text       := "Resource Name"
          :Data       := "hb_QSelf():DataSource:Fields:Resource"
          :Width      := :Parent:Parent:ClientWidth-6
          :ImageIndex := {|o| o:Record }
@@ -345,14 +345,13 @@ RETURN NIL
 CLASS ObjectTreeView INHERIT TreeView
    DATA aImages  EXPORTED INIT {}
    DATA CurObj   EXPORTED
-   DATA lSetting EXPORTED INIT .F.
    DATA oList
+   DATA oApp, oPrj
    METHOD InitProject()
    METHOD Set()
    METHOD OnKeyDown()
    METHOD OnSelChanged()
    METHOD GetImage()
-   //METHOD OnParentNotify()
    METHOD ResetContent() INLINE Super:ResetContent(),;
                                 ::aImages := {},;
                                 ::ImageList := NIL,;
@@ -366,27 +365,9 @@ METHOD OnKeyDown( nKey ) CLASS ObjectTreeView
    ENDIF
 RETURN Self
 
-/*
-METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjectTreeView
-   LOCAL tvdi, nPos, hItem, oItem
-   DO CASE
-      CASE hdr:code == TVN_GETDISPINFO
-           hItem := TvDispInfoGethItem( nlParam )
-           oItem := FindTreeItem( ::Items, hItem )
-           
-           TvDispInfoImage( nlParam, 6 )
-
-           //tvdi = (struct NMTVDISPINFO*) ::Parent:lParam 
-           //tvdi:item:iImage := 8
-           //tvdi:CopyTo( nlParam )
-
-   ENDCASE   
-RETURN NIL
-*/
-
 //-------------------------------------------------------------------------------------------------------
 METHOD InitProject() CLASS ObjectTreeView
-   LOCAL o, oItem, cProject
+   LOCAL cProject
    
    ::oList := ImageList( Self, 16, 16 ):Create()
    ::oList:MaskColor := C_LIGHTCYAN
@@ -398,16 +379,16 @@ METHOD InitProject() CLASS ObjectTreeView
    IF EMPTY( cProject )
       cProject := "Untitled"
    ENDIF
-   oItem := ::AddItem( cProject, 6 )
-   oItem:Cargo := ::Application:Project:Properties
-   ::Application:Project:Properties:TreeItem := oItem
+   ::oPrj := ::AddItem( cProject, 6 )
+   ::oPrj:Cargo := ::Application:Project:Properties
+   ::Application:Project:Properties:TreeItem := ::oPrj
 
 
-   o := oItem:AddItem( "Application", 9 )
-   o:Cargo := ::Application:Project:AppObject
-   ::Application:Project:AppObject:TreeItem := o
+   ::oApp := ::oPrj:AddItem( "Application", 9 )
+   ::oApp:Cargo := ::Application:Project:AppObject
+   ::Application:Project:AppObject:TreeItem := ::oApp
 
-   ::Application:MainForm:FormEditor1:TreeItem := o
+   ::Application:MainForm:FormEditor1:TreeItem := ::oApp
 
 RETURN Self
 
@@ -464,96 +445,39 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
 RETURN n
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Set( oObj, lSelect, lChange ) CLASS ObjectTreeView
-   LOCAL n, cTab
-   DEFAULT lChange TO .F.
-   DEFAULT lSelect TO .T.
-   TRY
-      IF !::lSetting .AND. oObj != NIL .AND. oObj:Caption != "[ Add New Item ]" //.AND. !oObj:__CustomOwner
-         IF oObj:TreeItem == NIL
-            IF ! __clsParent( oObj:ClassH, "COMPONENT" )
-
-               DEFAULT oObj:Parent TO ::Application:Project:CurrentForm
-               DEFAULT oObj:Parent:TreeItem TO ::Set( oObj:Parent )
-
-               n := ::GetImage( oObj, lChange )
-               cTab := ""
-               //IF oObj:HasMessage( "TabOrder" )
-               //   cTab := IIF( oObj:TabOrder != NIL .AND. oObj:Style & WS_TABSTOP != 0, " #", "" )
-               //ENDIF
-               oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name + cTab, n )
-               IF oObj:HasMessage( "Components" )
-                  FOR n := 1 TO LEN( oObj:Components )
-                      ::Set( oObj:Components[n], .F. )
-                  NEXT
-               ENDIF
-               FOR n := 1 TO LEN( oObj:Children )
-                   ::Set( oObj:Children[n], .T. )
-               NEXT
-             ELSE
-               n := ::GetImage( oObj, lChange )
-               oObj:TreeItem := oObj:Form:TreeItem:AddItem( oObj:Name, n )
-            ENDIF
+METHOD Set( oObj ) CLASS ObjectTreeView
+   IF oObj:Text != "[ Add New Item ]"
+      IF oObj:TreeItem == NIL
+         TRY
+            oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name, ::GetImage( oObj ) )
             oObj:TreeItem:Cargo := oObj
-            IF oObj:Children != NIL
-               FOR n := 1 TO LEN( oObj:Children )
-                   ::Set( oObj:Children[n], .F. )
-               NEXT
-            ENDIF
-          ELSE
-            IF !EMPTY( oObj:Name )
-               cTab := ""
-               //IF oObj:HasMessage( "TabOrder" )
-               //   cTab := IIF( oObj:TabOrder != NIL .AND. oObj:Style & WS_TABSTOP != 0, " #", "" )
-               //ENDIF
-               oObj:TreeItem:Caption := oObj:Name + cTab
-            ENDIF
-            oObj:TreeItem:ImageIndex := ::GetImage( oObj, lChange )
-            IF lChange
-               IF oObj:HasMessage( "Components" )
-                  FOR n := 1 TO LEN( oObj:Components )
-                      ::Set( oObj:Components[n], .F. )
-                  NEXT
-               ENDIF
-               FOR n := 1 TO LEN( oObj:Children )
-                   ::Set( oObj:Children[n], .T. )
-               NEXT
-            ENDIF
-         ENDIF
-         IF lSelect
-            oObj:TreeItem:Select()
-         ENDIF
+         CATCH
+            VIEW oObj:Name
+         END
+       ELSE
+         oObj:TreeItem:Text := oObj:Name
+         oObj:TreeItem:ImageIndex := ::GetImage( oObj )
       ENDIF
-   CATCH
-   END
-RETURN oObj:TreeItem
+   ENDIF
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
    IF EMPTY( procname(10) )
-      ::lSetting := .T.
       
-      TRY
-         IF ::PreviousItem:Cargo:Form:hWnd != oItem:Cargo:Form:hWnd
+      IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
+         IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
             ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
          ENDIF
-         
-         IF oItem:Cargo:Parent:__xCtrlName == "TabPage"
-            oItem:Cargo:Parent:Select()
-         ENDIF
-         IF oItem:Cargo:__xCtrlName == "TabPage"
-            oItem:Cargo:Select()
-         ENDIF
+      ENDIF
+      IF oItem:Cargo:Parent != NIL .AND. oItem:Cargo:Parent:__xCtrlName == "TabPage"
+         oItem:Cargo:Parent:Select()
+      ENDIF
+      IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
+         oItem:Cargo:Select()
+      ENDIF
 
-      CATCH
-      END
-      TRY
-         ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .F. )
-      CATCH
-         ::Application:ObjectManager:ResetProperties( {{oItem:Cargo}} )
-         ::Application:EventManager:ResetEvents( {{oItem:Cargo}} )
-      END
-      ::lSetting := .F.
+      ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .F. )
    ENDIF
 RETURN NIL
 
@@ -633,11 +557,11 @@ METHOD OnSelChanged( oItem ) CLASS FileTreeView
    ::Application:Project:cSourceRemove := NIL
    ::Application:RemoveSourceMenu:Disable()
    IF oItem:Owner != NIL
-      IF oItem:Owner:Caption == "External Binary Files" 
-         ::Application:Project:cFileRemove := oItem:Caption
+      IF oItem:Owner:Text == "External Binary Files" 
+         ::Application:Project:cFileRemove := oItem:Text
          ::Application:RemoveSourceMenu:Enable()
-       ELSEIF oItem:Owner:Caption == "External Source Files" 
-         ::Application:Project:cSourceRemove := oItem:Caption
+       ELSEIF oItem:Owner:Text == "External Source Files" 
+         ::Application:Project:cSourceRemove := oItem:Text
          ::Application:RemoveSourceMenu:Enable()
       ENDIF
    ENDIF   

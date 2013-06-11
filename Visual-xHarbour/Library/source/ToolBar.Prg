@@ -1570,7 +1570,7 @@ CLASS ToolButton INHERIT Object
    PROPERTY ShowText      INDEX BTNS_SHOWTEXT       READ xShowText      WRITE SetStyle DEFAULT .F.
 
    PROPERTY Width                                   READ xWidth         WRITE SetWidth DEFAULT 24
-   PROPERTY Caption                                 READ xCaption       WRITE SetText
+   PROPERTY Text                                    READ xText          WRITE SetText
 
    PROPERTY ImageIndex                              READ xImageIndex    WRITE SetImageIndex DEFAULT 0
 
@@ -1590,6 +1590,12 @@ CLASS ToolButton INHERIT Object
    DATA xPosition          EXPORTED
    ACCESS Position         INLINE ::xPosition PERSISTENT
    ASSIGN Position(n)      INLINE ::SetPosition(n)
+
+   ACCESS xCaption    INLINE ::xText
+   ASSIGN xCaption(c) INLINE ::xText := c
+
+   ACCESS Caption     INLINE ::Text
+   ASSIGN Caption(c)  INLINE ::Text := c
 
    DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable            EXPORTED INIT .F.

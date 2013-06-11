@@ -55,7 +55,6 @@ CLASS DataTable INHERIT Component
    DATA Structure          PUBLISHED
 
    DATA IDEButton          EXPORTED
-   DATA Parent             EXPORTED
    DATA Fields             EXPORTED
    DATA IndexOrder         EXPORTED  INIT 0
 

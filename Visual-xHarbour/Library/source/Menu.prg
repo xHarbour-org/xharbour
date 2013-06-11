@@ -371,6 +371,7 @@ METHOD Init( oParent ) CLASS ContextMenu
    DEFAULT ::__xCtrlName   TO "ContextMenu"
    DEFAULT ::ComponentType TO "ContextMenu"
    DEFAULT ::ClsName       TO "ContextMenu"
+   ::Parent := oParent
    Super:Init( oParent )
    ::Parent := oParent
    ::Menu := MenuPopup( ::Owner )

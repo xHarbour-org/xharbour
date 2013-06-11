@@ -3183,7 +3183,6 @@ METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::ComponentType TO "ContextMenu"
    DEFAULT ::ClsName       TO "ContextStrip"
    Super:Init( oParent )
-   ::Parent := oParent
 RETURN Self
 
 METHOD Create() CLASS ContextStrip

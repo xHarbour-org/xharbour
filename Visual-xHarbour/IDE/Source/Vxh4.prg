@@ -625,7 +625,7 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
-   LOCAL n, oEditor
+   LOCAL /*n,*/ oEditor
 
    IF !( cOldName == cNewName )
       
@@ -658,11 +658,11 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
             oEditor:TreeItem:Text := cNewName +".prg *"
-            IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
-               IF ( n := aScan( ::Application:Project:Forms, ::ActiveObject, , , .T. ) ) > 0
-                  ::Application:FormsTabs:SetItemText( n, cNewName+" *", .F. )
-               ENDIF
-            ENDIF
+            //IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
+            //   IF ( n := aScan( ::Application:Project:Forms, ::ActiveObject, , , .T. ) ) > 0
+            //      ::Application:FormsTabs:SetItemText( n, cNewName+" *", .F. )
+            //   ENDIF
+            //ENDIF
           catch
          END
       ENDIF
@@ -1130,13 +1130,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       RETURN Self
    ENDIF
 
-   IF ::ActiveObject != NIL
-      IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
-         ::Application:Components:InvalidateRect()
-       ELSE
-         //::Application:MainForm:FormEditor1:InvalidateRect()
-      ENDIF
-   ENDIF
+   //IF ::ActiveObject != NIL
+   //   IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
+   //      ::Application:Components:InvalidateRect()
+   //   ENDIF
+   //ENDIF
 
    ::ActiveObject := aSel[1][1]
 
@@ -1147,9 +1145,9 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    
    ::Application:Props[ "ComboSelect" ]:SelectControl( ::ActiveObject )
 
-   IF lRefreshComp
-      ::Application:Components:Refresh()
-   ENDIF
+   //IF lRefreshComp
+   //   ::Application:Components:Refresh()
+   //ENDIF
    
    ::lPaint := .F.
    ::SetRedraw( .F. )
@@ -1769,8 +1767,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    IF ::ActiveObject:TreeItem != NIL
       ::ActiveObject:TreeItem:Select()
-    ELSE
-      ::Application:ObjectTree:Set( ::ActiveObject )
+   // ELSE
+   //   ::Application:ObjectTree:Set( ::ActiveObject )
    ENDIF
 
    hb_gcall()

@@ -324,6 +324,10 @@ METHOD Init( oParent ) CLASS StatusBarPanel
 RETURN Self
 
 METHOD Create() CLASS StatusBarPanel
+   ::hWnd := Seconds()
+   IF ::Parent:__ClassInst != NIL
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
    ::Parent:SendMessage( SB_SIMPLE, .F., 0 )
    AADD( ::Parent:Children, Self )
    ::Parent:SetPanels()
@@ -333,7 +337,6 @@ METHOD Create() CLASS StatusBarPanel
    ::__aCltRect  := { ::Left, ::Top, ::Width, ::Height }
    ::__ClientRect   := { ::Left, ::Top, ::Width, ::Height }
    ::OriginalRect := { ::Left, ::Top, ::Width, ::Height }
-   ::hWnd := Seconds()
 RETURN Self
 
 METHOD Destroy() CLASS StatusBarPanel
