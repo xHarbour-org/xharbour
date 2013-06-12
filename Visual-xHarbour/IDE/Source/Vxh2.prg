@@ -208,7 +208,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ENDIF
 
    ::Selected := {{Self}}
-   ::Parent:UpdateScroll()
 
 RETURN Self
 
@@ -227,6 +226,8 @@ METHOD Create() CLASS WindowEdit
    IF !::__lModified
       ::Hide()
    ENDIF
+   ::Parent:UpdateScroll()
+   ::Parent:UpdateWindow()
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -1606,7 +1607,6 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                ::CtrlOldPt := { x, y }
                IF aSelected[1][1]:hWnd == ::hWnd
                   SetCapture( ::CtrlMask:hWnd )
-                  ::Parent:UpdateScroll()
                ENDIF
             ENDIF
             ::UpdateWindow()
@@ -1984,7 +1984,7 @@ METHOD OnNCPaint() CLASS WindowEdit
       DrawThemeBackground( ::hTheme, hdc, aStyle[3], nState, { ::Width-nBorder, nCaption, ::Width, ::Height } )
       DrawThemeBackground( ::hTheme, hdc, aStyle[4], nState, { 0, ::Height-nBorder, ::Width, ::Height } )
       
-      GetThemePartSize( ::hTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE, aSize )
+      aSize := GetThemePartSize( ::hTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE )
       
       aRect[1] := ::Width - aSize[1] - 6
       aRect[2] := ( ( nCaption - aSize[2] ) / 2 ) + 1

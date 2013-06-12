@@ -38,7 +38,6 @@ HB_EXTERN_END
 
 BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 void Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect );
-void Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize );
 
 typedef HTHEME   (WINAPI* fnOpenThemeData)( HWND hwnd, LPCWSTR pszClassList);
 typedef HRESULT  (WINAPI* fnCloseThemeData)(HTHEME hTheme);
@@ -97,16 +96,6 @@ void  Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
    hb_arraySet(aRect, 3, hb_itemPutNL(element, rc->right));
    hb_arraySet(aRect, 4, hb_itemPutNL(element, rc->bottom));
    hb_itemRelease(element);
-}
-
-void Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize )
-{
-   PHB_ITEM element = hb_itemNew(NULL);
-
-   hb_arraySet(aSize, 1, hb_itemPutNL(element, siz->cx));
-   hb_arraySet(aSize, 2, hb_itemPutNL(element, siz->cy));
-   hb_itemRelease(element);
-
 }
 
 //-------------------------------------------------------------------------------------------
@@ -490,7 +479,7 @@ HB_FUNC( GETTHEMERECT )
    int iStateId = hb_parni(3);
    int iPropId  = hb_parni(4);
    PHB_ITEM pArray = hb_param( 5, HB_IT_ARRAY );
-   RECT Rect = { 0 };
+   RECT rc = { 0 };
 
    if( hUxTheme == NULL )
    {
@@ -503,8 +492,8 @@ HB_FUNC( GETTHEMERECT )
 
        if( pfn )
        {
-           nRet = (HRESULT) pfn( hTheme, iPartId, iStateId, iPropId, &Rect );
-           Rect2ArrayEx( &Rect, pArray );
+           nRet = (HRESULT) pfn( hTheme, iPartId, iStateId, iPropId, &rc );
+           Rect2ArrayEx( &rc, pArray );
        }
    }
 
@@ -527,6 +516,10 @@ HB_FUNC( GETTHEMEPARTSIZE )
       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
    }
 
+   hb_reta( 2 );
+   hb_storni( 0, -1, 1 );
+   hb_storni( 0, -1, 2 );
+
    if( hUxTheme )
    {
       fnGetThemePartSize pfn = (fnGetThemePartSize) GetProcAddress( hUxTheme, "GetThemePartSize") ;
@@ -541,11 +534,13 @@ HB_FUNC( GETTHEMEPARTSIZE )
          }
 
          nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, ( ISARRAY(5) ? &pRect : NULL ), (enum THEMESIZE) hb_parni(6), &pSize );
-         Size2ArrayEx( &pSize, pArray );
+         if( nRet == S_OK )
+         {
+            hb_storni( pSize.cx, -1, 1 );
+            hb_storni( pSize.cy, -1, 2 );
+         }
       }
    }
-
-   hb_retl( (nRet==S_OK) );
 }
 
 

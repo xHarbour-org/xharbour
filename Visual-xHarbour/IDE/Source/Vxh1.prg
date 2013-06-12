@@ -2293,23 +2293,18 @@ CLASS StartTabPage INHERIT TabPage
    METHOD Create()  INLINE    ::Super:Create(), ::__lOnPaint := .F., Self
 ENDCLASS
 
-METHOD OnPaint( hDC, hMemDC ) CLASS StartTabPage
-   hDC := IIF( hMemDC == NIL, ::BeginPaint(), NIL )
-   ::OnEraseBkGnd( hDC, hMemDC )
-   IF hMemDC == NIL
-      ::EndPaint()
-   ENDIF
+METHOD OnPaint( hDC ) CLASS StartTabPage
+   hDC := ::BeginPaint()
+   ::OnEraseBkGnd( hDC )
+   ::EndPaint()
 RETURN 0
 
-METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartTabPage
-   LOCAL hMemBitmap, hOldBitmap
-   ( hDC )
+METHOD OnEraseBkGnd( hDC ) CLASS StartTabPage
+   LOCAL hMemBitmap, hOldBitmap, hMemDC
 
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   ENDIF
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    _FillRect( hMemDC, { -::HorzScrollPos, 0, ::ClientWidth, ::ClientHeight}, GetStockObject( WHITE_BRUSH ) )
    _FillRect( hMemDC, { -::HorzScrollPos, 0, MAX(::ClientWidth,::OriginalRect[3]), ::Application:StartPageBrushes:HeaderBkGnd[3]}, ::Application:StartPageBrushes:HeaderBkGnd[1] )
@@ -2319,13 +2314,11 @@ METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartTabPage
                                                             MAX(::ClientWidth,::OriginalRect[3])-::Application:StartPageBrushes:BodyBkGnd[2] - ::HorzScrollPos,;
                                                             MAX(::ClientHeight,::OriginalRect[4])-::Application:StartPageBrushes:BodyBkGnd[3] - ::VertScrollPos )
 
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
 RETURN 1
 
 //-------------------------------------------------------------------------------------------------------

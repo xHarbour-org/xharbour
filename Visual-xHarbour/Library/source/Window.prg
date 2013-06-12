@@ -5076,16 +5076,14 @@ METHOD OnSize( nwParam, nlParam ) CLASS WinForm
       ::CallWindowProc()
       ::InvalidateRect()
       ::RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
-      //AEVAL( ::Children, {|o| o:InvalidateRect()} )
       RETURN 0
    ENDIF
 RETURN Self
 
 METHOD OnSysCommand( nwParam ) CLASS WinForm
    LOCAL oChild, hDef
-   IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2}
+   IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2} .AND. ! EMPTY( ::__aDock )
       ::CallWindowProc()
-
       hDef := BeginDeferWindowPos( LEN( ::__aDock ) )
       FOR EACH oChild IN ::__aDock
           IF oChild != NIL //.AND. oChild:hWnd != ::hWnd
