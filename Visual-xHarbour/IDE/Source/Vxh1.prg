@@ -7,7 +7,6 @@
 #endif
 
 STATIC lSplash := .F.
-static cFindText := ""
 static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 
 #ifndef HB_CDP_SUPPORT_ON
@@ -2571,7 +2570,9 @@ CLASS Project
    
    DATA FindDialog       EXPORTED
    DATA ReplaceDialog    EXPORTED
-   
+
+   DATA __cFindText      EXPORTED INIT ""
+
    ASSIGN Modified(lMod) INLINE ::SetCaption( lMod )
    ACCESS Modified       INLINE ::lModified
 
@@ -3392,9 +3393,9 @@ METHOD Find() CLASS Project
       ::FindDialog:Owner := ::Application:SourceEditor
       cSel := ::Application:SourceEditor:Source:GetSelText()
       IF ! EMPTY( cSel )
-         cFindText := cSel
+         ::__cFindText := cSel
       ENDIF
-      ::FindDialog:Show(, cFindText )
+      ::FindDialog:Show(, ::__cFindText )
    ENDIF
 RETURN 0
 

@@ -728,6 +728,7 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
            UpdateWindow( hWnd )
            SendMessage( GetDlgItem(hWnd,1056), BM_SETCHECK, BST_UNCHECKED, 0 )
            SendMessage( GetDlgItem(hWnd,1057), BM_SETCHECK, BST_CHECKED, 0 )
+           SendMessage( GetDlgItem(hWnd,1152), EM_SETSEL, 0, -1 )
            ::Direction := 1
 
       CASE nMsg == WM_COMMAND

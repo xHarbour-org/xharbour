@@ -39,7 +39,7 @@ ENDCLASS
 METHOD OnError( xValue ) CLASS Registry
    LOCAL cKey := __GetMessage()
    IF xValue == NIL
-      RETURN ::GetValue( cKey )
+      RETURN ::GetValue( IIF( lower(cKey) == "default", "", cKey ) )
     ELSE
       ::SetValue( SUBSTR(cKey,2), xValue )
    ENDIF

@@ -352,6 +352,7 @@ CLASS ObjectTreeView INHERIT TreeView
    METHOD OnKeyDown()
    METHOD OnSelChanged()
    METHOD GetImage()
+   METHOD OnRightClick()
    METHOD ResetContent() INLINE Super:ResetContent(),;
                                 ::aImages := {},;
                                 ::ImageList := NIL,;
@@ -478,6 +479,31 @@ METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
       ENDIF
 
       ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .F. )
+   ENDIF
+RETURN NIL
+
+METHOD OnRightClick() CLASS ObjectTreeView
+   LOCAL pt := (struct POINT), oItem, Item, oMenu, oSel
+   
+   GetCursorPos( @pt )
+   ScreenToClient( ::hWnd, @pt )
+   oSel := ::HitTest( pt:x, pt:y )
+
+   IF oSel != NIL .AND. __ObjHasMsg( oSel:Cargo, "__IdeContextMenuItems" ) .AND. !EMPTY( oSel:Cargo:__IdeContextMenuItems )
+      oMenu := MenuPopup( Self )
+      oMenu:Style := TPM_LEFTALIGN+TPM_TOPALIGN
+      GetCursorPos( @pt )
+      oMenu:Left  := pt:x
+      oMenu:Top   := pt:y
+
+      oMenu:Create()
+      FOR EACH Item IN oSel:Cargo:__IdeContextMenuItems
+          oItem := CMenuItem( oMenu )
+          oItem:Caption := Item[1]
+          oItem:Action  := Item[2]
+          oItem:Create()
+      NEXT
+      oMenu:Context()
    ENDIF
 RETURN NIL
 

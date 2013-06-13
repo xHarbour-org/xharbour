@@ -769,6 +769,8 @@ METHOD OnFindNext( oFind ) CLASS SourceEditor
    ::cFindWhat  := oFind:FindWhat
    ::nDirection := oFind:Direction
 
+   ::Application:Project:__cFindText := oFind:FindWhat
+
    ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
    IF ! ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
       ::MessageBox( "Cannot find literal text: " + oFind:FindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
