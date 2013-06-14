@@ -307,7 +307,7 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Width         := 30
    ::__lMoveable   := .F.
    ::__lCopyCut    := .F.
-   ::ClsName       := "StatusBarPanel"
+   ::ClsName       := ::__xCtrlName := "StatusBarPanel"
    ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::IsContainer   := .T.
    //::Form          := oParent:Form 
@@ -316,9 +316,9 @@ METHOD Init( oParent ) CLASS StatusBarPanel
       ::__ClassInst  := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance   := .T.
    ENDIF
-   ::Style    := WS_VISIBLE
-   ::Events   := {}
-   ::Index := LEN( ::Parent:Children )
+   ::Style  := WS_VISIBLE
+   ::Events := {}
+   ::Index  := LEN( ::Parent:Children )
 
    __SetObjPtr( Self )
 RETURN Self
@@ -334,8 +334,8 @@ METHOD Create() CLASS StatusBarPanel
    ::SetImageIndex( ::xImageIndex )
    ::SetText( ::xCaption )
    ::GetRectangle()
-   ::__aCltRect  := { ::Left, ::Top, ::Width, ::Height }
-   ::__ClientRect   := { ::Left, ::Top, ::Width, ::Height }
+   ::__aCltRect   := { ::Left, ::Top, ::Width, ::Height }
+   ::__ClientRect := { ::Left, ::Top, ::Width, ::Height }
    ::OriginalRect := { ::Left, ::Top, ::Width, ::Height }
 RETURN Self
 

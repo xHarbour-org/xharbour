@@ -55,7 +55,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS Label
    DEFAULT ::__xCtrlName TO "Label"
-   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ClsName := "Label"
    ::Super:Init( oParent )
    ::__IsStandard := .F.

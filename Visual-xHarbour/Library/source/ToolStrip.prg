@@ -493,16 +493,16 @@ METHOD Create() CLASS ToolStrip
 
    ::__nWidth := ::Width
 
-   IF ::__ClassInst != NIL
-      WITH OBJECT ::__DesignAddNew := IIF( !::__lIsMenu, ToolStripButton(), MenuStripItem() )
-         :Caption     := "[ Add New Item ]"
-         :Init( Self )
-         :Events      := {}
-         :Font:Bold   := .T.
-         :Action      := {|o| o:Parent:__AddToolStripItem( IIF( !::__lIsMenu, "ToolStripButton", "MenuStripItem" ) ) }
-         :Create()
-      END
-   ENDIF
+   //IF ::__ClassInst != NIL
+   //   WITH OBJECT ::__DesignAddNew := IIF( !::__lIsMenu, ToolStripButton(), MenuStripItem() )
+   //      :Caption     := "[ Add New Item ]"
+   //      :Init( Self )
+   //      :Events      := {}
+   //      :Font:Bold   := .T.
+   //      :Action      := {|o| o:Parent:__AddToolStripItem( IIF( !::__lIsMenu, "ToolStripButton", "MenuStripItem" ) ) }
+   //      :Create()
+   //   END
+   //ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -1513,17 +1513,16 @@ METHOD Create() CLASS ToolStripItem
    IF ::__xCtrlName != "ToolStripComboBox"
       ::ShortCutKey:SetAccel()
    ENDIF  
-   IF ::__ClassInst != NIL .AND. ::Parent:__DesignAddNew == NIL
-
-      WITH OBJECT ::Parent:__DesignAddNew := ToolStripButton()
-         :Caption     := "[ Add New Item ]"
-         :Init( ::Parent )
-         :Font:Bold   := .T.
-         :Events      := {}
-         :Action      := {|o| o:Parent:__AddToolStripItem( ::ClsName ) }
-         :Create()
-      END
-   ENDIF
+   //IF ::__ClassInst != NIL .AND. ::Parent:__DesignAddNew == NIL
+   //   WITH OBJECT ::Parent:__DesignAddNew := ToolStripButton()
+   //      :Caption     := "[ Add New Item ]"
+   //      :Init( ::Parent )
+   //      :Font:Bold   := .T.
+   //      :Events      := {}
+   //      :Action      := {|o| o:Parent:__AddToolStripItem( ::ClsName ) }
+   //      :Create()
+   //   END
+   //ENDIF
 
 RETURN Self
 

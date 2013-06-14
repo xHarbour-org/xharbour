@@ -17,7 +17,6 @@ static __aProps := {=>}
 #include "xEditConstants.ch"
 
 #define DG_ADDCONTROL      1
-#define DG_DELCONTROL      2
 #define DG_PROPERTYCHANGED 3
 #define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
@@ -3435,6 +3434,7 @@ __aProps["D"] := { { "DisableNoScroll",         "Style" },;
                    { "DataBits",                "" },;
                    { "Definitions",             "Build" },;
                    { "DefaultExt",              "Behavior" },;
+                   { "DragItems",               "Behavior" },;
                    { "DeferenceLinks",          "Behavior" },;
                    { "DropDownStyle",           "Behavior" },;
                    { "DropDown",                "Behavior" },;

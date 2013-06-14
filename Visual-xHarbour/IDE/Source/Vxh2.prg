@@ -33,7 +33,6 @@
 #define TS_DRAW   3
 
 #define DG_ADDCONTROL      1
-#define DG_DELCONTROL      2
 #define DG_PROPERTYCHANGED 3
 #define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
@@ -264,13 +263,14 @@ RETURN Self
 
 //----------------------------------------------------------------------------
 
-METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
-   LOCAL aRect:={,,,}, lComponent := __clsParent( oControl:ClassH, "COMPONENT" )
+METHOD SelectControl( oControl, lFocus ) CLASS WindowEdit
+   LOCAL aRect
+
    DEFAULT lFocus TO .T.
 
    ::InRect    := -1
-   IF !lComponent
-      IF !oControl:ClsName == "Application"
+
+      IF __ObjHasMsg( oControl, "GetRectangle" )
          aRect := oControl:GetRectangle()
          aRect[1] -= 4
          aRect[2] -= 4
@@ -289,10 +289,6 @@ METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
       IF lFocus
          ::CtrlMask:SetFocus()
       ENDIF
-      IF !oControl:ClsName == "CMenuItem"
-         ::UpdateSelection()
-         ::CtrlMask:ValidateRect()
-      ENDIF
       
       ::Application:ObjectManager:ResetProperties( ::Selected )
       ::Application:EventManager:ResetEvents( ::Selected )
@@ -306,31 +302,9 @@ METHOD SelectControl( oControl, lFocus, lRefreshComp ) CLASS WindowEdit
          ::SelEndPoint  := NIL
       ENDIF
 
-    ELSE
-      ::CtrlOldPt := NIL
-      ::InvalidateRect()
-      ::MouseDown := .F.
-
-      ::Selected := {}
-
-      ::CtrlMask:InvalidateRect()
-      ::CtrlMask:UpdateWindow()
-      IF lFocus
-         ::CtrlMask:SetFocus()
-      ENDIF
-      ::SelInitPoint := NIL
-      ::SelEndPoint  := NIL
-      ::UpdateWindow()
-      ::Application:Yield()
-      ::Application:ObjectManager:ResetProperties( {{oControl}},,,,lRefreshComp  )
-      ::Application:EventManager:ResetEvents( {{oControl}} )
-
-      ::CtrlMask:SetMouseShape( MCS_NONE )
-
       IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
          oControl:Show()
       ENDIF
-   ENDIF
 
 RETURN Self
 
@@ -380,8 +354,7 @@ RETURN 0
 //----------------------------------------------------------------------------
 
 METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
-   LOCAL nLen, x, aControl, aRect, lCtrl, lShift, n := 1, lCheck := .T.
-   LOCAL aAction
+   LOCAL aControl, aRect, lCtrl, lShift, n := 1, lCheck := .T.
    ( o )
    lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
    lCtrl  := CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
@@ -422,42 +395,11 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
 
       CASE nKey == VK_DELETE
            lCheck := .F.
-
-           IF __clsParent( ::Application:ObjectManager:ActiveObject:ClassH, "COMPONENT" )
-              WITH OBJECT ::Application:ObjectManager:ActiveObject
-                 ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, 0, 0, .F., :Owner, :__xCtrlName, hb_qWith(), , 1, , /*::Application:Components:Current*/ } }, ::Application:Project:aUndo )
-              END
-              RETURN 0
+           IF LEN( ::Selected ) > 0
+              ::Application:Project:DelControl( ::Selected )
            ENDIF
-
-           IF LEN( ::Selected ) == 1
-              IF ::Selected[1][1]:hWnd == ::hWnd
-                 IF ::Parent:Children[1] == Self
-                    MessageBox( GetActiveWindow(), "Cannot delete "+::Name+" because it's designed to be Main Window", "Delete Form", MB_ICONEXCLAMATION )
-                    RETURN 0
-                 ENDIF
-                 IF MessageBox( GetActiveWindow(), "This WILL DELETE "+::Name+" and its children from the project" + CHR(13) +;
-                                                   "Changes to " + ::Name + ".prg **WILL BE LOST** " + CHR(13) +;
-                                                   "are you sure ?", "Delete Form", MB_YESNO ) == IDNO
-                    RETURN 0
-                 ENDIF
-              ENDIF
-              ::Application:Project:Modified := .T.
-              ::__lModified := .T.
-           ENDIF
-
-           nLen := LEN( ::Selected )
-
-           aAction := {}
-           FOR x := 1 TO LEN( ::Selected )
-               AADD( aAction, { DG_DELCONTROL, NIL, ::Selected[x][1]:Left, ::Selected[x][1]:Top, .F., IIF( ::Selected[x][1]:__xCtrlName == "Splitter", ::Selected[x][1]:Owner, ::Selected[x][1]:Parent), ::Selected[x][1]:__xCtrlName, ::Selected[x][1], , nLen,, } )
-           NEXT
-           
-           ::Application:Project:SetAction( aAction, ::Application:Project:aUndo )
-           
-           ::Selected := {}
-           
            RETURN 0
+
       CASE nKey == VK_DOWN
            // Move selected controls
 

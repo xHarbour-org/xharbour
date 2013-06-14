@@ -33,6 +33,7 @@ CLASS Component INHERIT Object
    DATA Caption                EXPORTED INIT ""
    DATA Text                   EXPORTED INIT ""
    DATA lComponent             EXPORTED INIT .T.
+   DATA Left, Top
 
    ACCESS Form                 INLINE IIF( ::Owner != NIL, ::Owner:Form, NIL )
    ACCESS AppInstance          INLINE ::__GetInstance()
