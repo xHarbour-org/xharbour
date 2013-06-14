@@ -2289,6 +2289,17 @@ METHOD OnInitDialog() CLASS GotoDialog
    
    DEFAULT ::Application:SourceEditor:Source:nPrevLine TO ::Application:SourceEditor:Source:GetCurLine()+1
 
+   WITH OBJECT ( UPDOWN( Self ) )
+      :Name                 := "UpDown1"
+      :Left                 := 142
+      :Top                  := 15
+      :Width                := 18
+      :Height               := 22
+      :Caption              := ""
+      :Buddy                := "LineNum"
+      :Create()
+   END //UPDOWN
+
    WITH OBJECT ( EDITBOX( Self ) )
       :Name                 := "LineNum"
       :Left                 := 90
@@ -2300,17 +2311,6 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Caption              := xStr(::Application:SourceEditor:Source:nPrevLine)
       :Create()
    END //EDITBOX
-
-   WITH OBJECT ( UPDOWN( Self ) )
-      :Name                 := "UpDown1"
-      :Left                 := 143
-      :Top                  := 15
-      :Width                := 18
-      :Height               := 22
-      :Caption              := ""
-      :Buddy                := "LineNum"
-      :Create()
-   END //UPDOWN
 
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Go"
@@ -2340,7 +2340,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Dock:Margin          := 3
       :Create()
    END //BUTTON
-RETURN Self
+RETURN 1
 
 METHOD Go_OnClick() CLASS GotoDialog
    ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Caption )-1 )

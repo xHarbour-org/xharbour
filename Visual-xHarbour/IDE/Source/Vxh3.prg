@@ -26,7 +26,6 @@ static s_oParent
 #define MCS_NO       13
 
 #define DG_ADDCONTROL      1
-#define DG_DELCONTROL      2
 #define DG_PROPERTYCHANGED 3
 #define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
@@ -551,7 +550,7 @@ METHOD OnPaint() CLASS ControlMask
    LOCAL i := 0
    LOCAL j := 0
 
-   IF ::CurForm:InActive
+   IF ::CurForm:InActive .OR. __clsParent( ::CurForm:Selected[1][1]:ClassH, "COMPONENT" )
       RETURN NIL
    ENDIF
 

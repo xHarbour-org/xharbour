@@ -20,12 +20,11 @@
 //----------------------------------------------------------------------------//
 
 CLASS TreeView FROM TitleControl
-   DATA AutoDragDrop     PUBLISHED INIT .F.   
+   DATA DragItems        PUBLISHED INIT .F.   
    DATA Items            EXPORTED INIT {}
    DATA Header
    DATA OnSelDelete      EXPORTED
    DATA OnBeginLabelEdit EXPORTED
-   DATA OnBeginDrag      EXPORTED
    DATA OnBeginRDrag     EXPORTED
    DATA OnLabelEdit      EXPORTED
    DATA OnEndLabelEdit   EXPORTED
@@ -33,15 +32,10 @@ CLASS TreeView FROM TitleControl
    DATA Level            EXPORTED INIT -1
    DATA SelectedItem     EXPORTED
    DATA PreviousItem     EXPORTED
-   DATA DragImage        EXPORTED
    DATA ClickedItem      EXPORTED   
 
-   DATA HighLightCaption   EXPORTED  INIT .F.
-
    DATA __lResetting     PROTECTED INIT .F.
-   DATA __oDragItem      PROTECTED
-   DATA __oTargetItem    PROTECTED
-   DATA __hAfter         PROTECTED
+   DATA __oDrag          PROTECTED
 
    PROPERTY HasLines        INDEX TVS_HASLINES        READ xHasLines        WRITE SetStyle   DEFAULT .T. PROTECTED
    PROPERTY HasButtons      INDEX TVS_HASBUTTONS      READ xHasButtons      WRITE SetStyle   DEFAULT .T. PROTECTED
@@ -93,9 +87,6 @@ CLASS TreeView FROM TitleControl
    METHOD GetChild( hItem )           INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_CHILD, IIF( hItem==NIL, ::hWnd, hItem ) )
    METHOD SetItemHeight( nHeight )    INLINE _SendMessage( ::hWnd, TVM_SETITEMHEIGHT, nHeight, 0 )
    METHOD GetItemHeight()             INLINE _SendMessage( ::hWnd, TVM_GETITEMHEIGHT, 0, 0 )
-   METHOD CreateDragImage( hItem )    INLINE ::DragImage := ImageList( Self,,, ILC_COLORDDB, .F.),;
-                                             ::DragImage:Handle := _SendMessage( ::hWnd, ,TVM_CREATEDRAGIMAGE, 0, hItem )
-                              //FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    METHOD GetItemState()
    METHOD SetImageList()
    METHOD OnParentNotify()
@@ -107,14 +98,18 @@ CLASS TreeView FROM TitleControl
    METHOD TvnKeyDown()           VIRTUAL
    METHOD SearchString()
 
-   METHOD OnSelChanged()  VIRTUAL
-   METHOD OnSelChanging() VIRTUAL
+   METHOD OnBeginDrag()          VIRTUAL
+   METHOD OnEndDrag()            VIRTUAL
+   METHOD OnSelChanged()         VIRTUAL
+   METHOD OnSelChanging()        VIRTUAL
+
    METHOD __SetScrollBars() INLINE NIL
    METHOD GetExpandedCount()
 
    METHOD OnMouseMove()
-   METHOD OnLButtonDown()
    METHOD OnLButtonUp()
+
+   METHOD DropItem()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -178,8 +173,8 @@ METHOD Init( oParent ) CLASS TreeView
                             { "KeyDown"          , "", "" },;
                             { "AfterSelect"      , "", "" },;
                             { "BeforeSelect"     , "", "" },;
-                            { "DragEnter"        , "", "" },;
-                            { "BeginDrag"        , "", "" },;
+                            { "OnBeginDrag"      , "", "" },;
+                            { "OnEndDrag"        , "", "" },;
                             { "BeginRDrag"       , "", "" },;
                             { "DeleteItem"       , "", "" },;
                             { "AfterLabelEdit"   , "", "" },;
@@ -189,6 +184,9 @@ METHOD Init( oParent ) CLASS TreeView
 RETURN Self
 
 METHOD Create() CLASS TreeView
+   IF ! ::DragItems
+      ::Style := ::Style | TVS_DISABLEDRAGDROP
+   ENDIF
    ::Super:Create()
    IF !EMPTY( ::Caption )
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
@@ -347,7 +345,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
 
       CASE hdr:code == NM_CLICK
            ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
-
            tvht := (struct TVHITTESTINFO)
            tvht:flags := TVHT_ONITEM | TVHT_ONITEMICON
            GetCursorPos( @tvht:pt )
@@ -371,22 +368,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
            lRet := ExecuteEvent( "Click", Self )
 
       CASE hdr:code == TVN_BEGINDRAG
-           IF ( ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) ) ) != NIL
-              __Evaluate( ::OnBeginDrag, ::SelectedItem )
-           ENDIF
-           lRet := ExecuteEvent( "BeginDrag", Self )
-
-           IF ::DragImage != NIL
-              ::DragImage:Destroy()
-           ENDIF
-
-           IF lRet == NIL .AND. ::SelectedItem != NIL
-              ::SelectedItem:Select()
-              ::SelectedItem:CreateDragImage()
-              ::__oDragItem := ::SelectedItem
-              ::DragImage:BeginDrag(0,0,0)
-              ImageListDragShowNolock(.T.)
-              ::SetCapture()
+           IF ::DragItems
+              ::__oDrag := FindTreeItem( ::Items, __GetTreeViewNewItem( nlParam ) )
+              ::__oDrag:Select()
+              ::OnBeginDrag( ::__oDrag )
+              lRet := ExecuteEvent( "OnBeginDrag", Self, ::__oDrag )
            ENDIF
 
       CASE hdr:code == TVN_BEGINRDRAG
@@ -423,7 +409,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
            IF nState != NIL
               lRet := ExecuteEvent( IIF( nState & TVIS_EXPANDED == TVIS_EXPANDED, "AfterExpand", "AfterCollapse" ), Self )
            ENDIF
-           
+
       CASE hdr:code == TVN_ITEMEXPANDING
            IF ( ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) ) ) != NIL
               nState := ::SelectedItem:GetItemState( TVIF_STATE )
@@ -448,10 +434,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
               __Evaluate( ::SelectedItem:Action, ::SelectedItem )
               ::OnSelChanged( ::SelectedItem )
            ENDIF
-           //IF ::SelectedItem == NIL .OR. ::__xCtrlName == "FolderTree"
-              lRet := ExecuteEvent( "AfterSelect", Self )
-              ODEFAULT lRet TO .F.
-           //ENDIF
+           lRet := ExecuteEvent( "AfterSelect", Self )
+           ODEFAULT lRet TO .F.
 
       CASE hdr:code == TVN_SELCHANGING
            IF ( ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) ) ) != NIL
@@ -485,75 +469,47 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS TreeView
 
    ::Super:OnMouseMove( nwParam, nlParam )
 
-   IF ::AutoDragDrop .AND. ::DragImage != NIL .AND. ::__oDragItem != NIL
+   IF nwParam == MK_LBUTTON .AND. ::DragItems .AND. ::__oDrag != NIL
       pt := (struct POINT)
       pt:x := LOWORD( nlParam )
-      pt:y := LOWORD( nlParam )
+      pt:y := HIWORD( nlParam )
 
-      ImageListDragShowNolock(.F.)
-      
-      IF ( oItem := ::HitTest( pt:x, pt:y ) ) != NIL .AND. ::__oDragItem != NIL .AND. oItem:Level <= ::__oDragItem:Level
-         oItem:Select()
-         ::__oTargetItem := oItem
+      IF ( oItem := ::HitTest( pt:x, pt:y ) ) != NIL .AND. ::__oDrag:hItem != oItem:hItem
+         SendMessage( ::hWnd, TVM_SETINSERTMARK, .T., oItem:hItem )
       ENDIF
-      ::Application:Yield()
-      ::ClientToScreen( @pt )
-      ImageListDragShowNolock(.T.)
-      IF ::DragImage != NIL
-         ::DragImage:DragMove( pt:x, pt:y )
-      ENDIF
+
    ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------
-
-METHOD OnLButtonUp() CLASS TreeView
-   LOCAL oItem, oColumn, oSubItem
-
-   IF ::AutoDragDrop .AND. ::DragImage != NIL
-      ::DragImage:EndDrag()
-      ::DragImage:Destroy()
-      ::DragImage := NIL
-      ::ReleaseCapture()
-      
-      IF ::__oTargetItem != NIL .AND. !( ::__oTargetItem == ::__oDragItem )
-         ::__hAfter := IIF( ::__oTargetItem:Level == ::__oDragItem:Level, ::__oTargetItem:hItem, TVI_FIRST )
-
-         oItem  := TreeViewItem( Self )
-         oItem:Owner       := IIF( ::__oTargetItem:Level < ::__oDragItem:Level, ::__oTargetItem, ::__oTargetItem:Owner )
-         oItem:Caption     := ::__oDragItem:Caption
-         oItem:InsertAfter := ::__hAfter
-         oItem:ImageIndex  := ::__oDragItem:ImageIndex
-         oItem:Create()
-         
-         oItem:Cargo := ACLONE( ::__oDragItem:Cargo )
-         FOR EACH oColumn IN ::__oDragItem:Items
-             oSubItem := oItem:AddItem( oColumn:Caption, 2 )
-             oSubItem:Cargo := ACLONE( oColumn:Cargo )
-         NEXT
-         //IF ::__oDragItem:Owner:hItem == oItem:Owner:hItem 
-            ::__oDragItem:Delete()
-         //ENDIF
-         oItem:Select()
-         ::__oTargetItem := NIL
-         ::__oDragItem   := NIL
-      ENDIF
-      ::__oTargetItem := NIL
-      ::__oDragItem   := NIL
-      ::InvalidateRect()
-   ENDIF
-RETURN Self
-
-//----------------------------------------------------------------------------------------------------------
-METHOD OnLButtonDown( n,x,y ) CLASS TreeView
+METHOD OnLButtonUp( w, x, y ) CLASS TreeView
    LOCAL oItem
-   (n)
-   IF ::AutoDragDrop
-      ::__oTargetItem := NIL
-      ::SetFocus()
-      IF ( oItem := ::HitTest( x, y ) ) != NIL
-         oItem:Select()
+   (w)
+   IF ::DragItems .AND. ::__oDrag != NIL
+      SendMessage( ::hWnd, TVM_SETINSERTMARK, .F., NIL )      
+      IF ( oItem := ::HitTest( x, y ) ) != NIL .AND. ::__oDrag:hItem != oItem:hItem
+         ::OnEndDrag( oItem )
+         ExecuteEvent( "OnEndDrag", Self, oItem )
+         ::__oDrag := NIL
       ENDIF
-      ::Application:Yield()
+      ::InvalidateRect()
+      oItem:Select()
+   ENDIF
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------------
+METHOD DropItem( oDrag, oTarget ) CLASS TreeView      
+   LOCAL oItem
+   IF oDrag != NIL .AND. oTarget != NIL
+      oItem             := TreeViewItem( Self )
+      oItem:Text        := oDrag:Text
+      oItem:ImageIndex  := oDrag:ImageIndex
+      oItem:Cargo       := IIF( VALTYPE(oDrag:Cargo) == "A", ACLONE( oDrag:Cargo ), oDrag:Cargo )
+
+      oItem:InsertAfter := oTarget:hItem
+      oItem:Owner       := oTarget:Owner
+      oItem:Create()
+
+      oDrag:Delete()
    ENDIF
 RETURN Self

@@ -3646,6 +3646,12 @@ HB_FUNC( __GETTREEVIEWOLDITEM )
    hb_retnl( (long) tv->itemOld.hItem );
 }
 
+HB_FUNC( __GETTREEVIEWNEWITEM )
+{
+   NMTREEVIEW* tv = (NMTREEVIEW*) hb_parnl(1);
+   hb_retnl( (long) tv->itemNew.hItem );
+}
+
 HB_FUNC( __FINDPIXELCOLOR )
 {
    int x, y;

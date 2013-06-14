@@ -1781,6 +1781,7 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
          :Dock:Margin   := 1
          :AllowUndock   := .T.
+         //:DragItems     := .T.
          :Text          := "Object Explorer"
          :Height        := 300
          :Dock:Left     := :Parent
@@ -2646,6 +2647,7 @@ CLASS Project
    METHOD AddImage()
    METHOD RemoveImage()
    METHOD AddControl()
+   METHOD DelControl()
    METHOD FixPath( cPath, cSubDir ) INLINE IIF( AT(":",cSubDir)>0 .OR. AT("\\",cSubDir)>0, cSubDir, cPath + "\" + cSubDir )
    METHOD SetEditMenuItems()
 ENDCLASS
@@ -2664,6 +2666,40 @@ METHOD AddControl( cCtrl, oParent ) CLASS Project
    ENDIF
    ::Modified := .T.
 RETURN oCtrl
+
+METHOD DelControl( oCtrl ) CLASS Project
+   LOCAL aAction, x, aDel, nLen, oSelect
+   IF VALTYPE( oCtrl ) == "A"
+      aDel := oCtrl
+    ELSE
+      aDel := {{oCtrl}}
+   ENDIF
+
+   oSelect := aDel[1][1]:Parent
+
+   IF aDel[1][1]:hWnd == ::CurrentForm:hWnd
+      IF aDel[1][1]:hWnd == ::Forms[1]:hWnd
+         MessageBox( GetActiveWindow(), "Cannot delete "+::Forms[1]:Name+" because it's designed to be Main Window", "Delete Form", MB_ICONEXCLAMATION )
+         RETURN .F.
+      ENDIF
+      IF MessageBox( GetActiveWindow(), "This WILL DELETE "+aDel[1][1]:Name+" and its children from the project" + CHR(13) +;
+                                        "Changes to " + aDel[1][1]:Name + ".prg **WILL BE LOST** " + CHR(13) +;
+                                        "are you sure ?", "Delete Form", MB_YESNO ) == IDNO
+         RETURN .F.
+      ENDIF
+   ENDIF
+   ::Application:Project:Modified := .T.
+   ::CurrentForm:__lModified := .T.
+
+   aAction := {}
+   nLen := LEN( aDel )
+
+   FOR x := 1 TO LEN( aDel )
+       AADD( aAction, { DG_DELCONTROL, NIL, aDel[x][1]:Left, aDel[x][1]:Top, .F., IIF( aDel[x][1]:__xCtrlName == "Splitter" .OR. __clsParent( aDel[x][1]:ClassH, "COMPONENT" ), aDel[x][1]:Owner, aDel[x][1]:Parent), aDel[x][1]:__xCtrlName, aDel[x][1], , nLen,, } )
+   NEXT
+   ::SetAction( aAction, ::aUndo )
+   ::CurrentForm:SelectControl( oSelect )
+RETURN .T.
 
 METHOD EditReset(n) CLASS Project
    LOCAL lCopied, lSelected, lEnabled, i
@@ -3339,7 +3375,8 @@ METHOD EditDelete() CLASS Project
       RETURN 0
    ENDIF
    IF ::Application:DesignPage:IsWindowVisible()
-      ::CurrentForm:MaskKeyDown(, VK_DELETE )
+      ::DelControl( ::CurrentForm:Selected )
+
     ELSEIF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:SendMessage( WM_KEYDOWN, VK_DELETE )
       ::Application:SourceEditor:Source:Modified := .T.
@@ -6348,14 +6385,8 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                CATCH
                  o := ::CurrentForm
               END
-            ELSE
-              o := ::Forms[1]
            ENDIF
            ::Application:Props[ "ComboSelect" ]:Reset()
-           TRY
-              o:SelectControl( o )
-            CATCH
-           END
            ::Application:Project:Modified := .T.
            RETURN Self
 

@@ -347,22 +347,45 @@ CLASS ObjectTreeView INHERIT TreeView
    DATA CurObj   EXPORTED
    DATA oList
    DATA oApp, oPrj
+   DATA oDrag
    METHOD InitProject()
    METHOD Set()
    METHOD OnKeyDown()
    METHOD OnSelChanged()
    METHOD GetImage()
    METHOD OnRightClick()
+   METHOD OnBeginDrag()
+   METHOD OnEndDrag()
    METHOD ResetContent() INLINE Super:ResetContent(),;
                                 ::aImages := {},;
                                 ::ImageList := NIL,;
                                 IIF( ::oList != NIL, ::oList:Destroy(), )
 ENDCLASS
 
+METHOD OnBeginDrag( oDrag ) CLASS ObjectTreeView
+   ::oDrag := oDrag
+RETURN Self
+
+METHOD OnEndDrag( oTarget ) CLASS ObjectTreeView
+   LOCAL nPos, oObj
+   IF ::oDrag != NIL .AND. oTarget != NIL
+      oObj := ::oDrag:Cargo
+      nPos := ASCAN( oTarget:Cargo:Parent:Children, {|o| o==oTarget:Cargo} )
+      IF nPos > 0
+         VIEW oTarget:Text
+         IF ! ( ::oDrag:Cargo:Parent == oTarget:Cargo:Parent )
+            ::oDrag:Cargo:SetParent( oTarget:Cargo:Parent )
+         ENDIF
+         ::oDrag:Cargo:TabOrder := nPos + 1
+      ENDIF
+      ::DropItem( ::oDrag, oTarget )
+   ENDIF
+RETURN Self
+
 //-------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS ObjectTreeView
    IF nKey == VK_DELETE
-      ::Application:Project:CurrentForm:MaskKeyDown(, VK_DELETE )
+      ::Application:Project:DelControl( ::SelectedItem:Cargo )
    ENDIF
 RETURN Self
 
@@ -404,7 +427,6 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
          RETURN ::aImages[n][2]
 
        ELSEIF oObj:ClsName == "VXH_FORM_IDE" .AND. ::oList:GetImage( ::aImages[n][2]-1 ) != NIL
-         //::oList:RemoveImage( ::aImages[n][2]-1 )
          ADEL( ::aImages, ::aImages[n][2]-1 )
          RETURN -1
        
@@ -420,7 +442,7 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
       n := ::aImages[n][2]
     ELSEIF cName != NIL
       hIcon := ::oList:AddImage( "ICO_" + UPPER( cName ) )
-      
+
       IF hIcon != NIL
          AADD( ::aImages, { cName, ::oList:Count } )
          n := ::oList:Count
@@ -457,15 +479,14 @@ METHOD Set( oObj ) CLASS ObjectTreeView
          END
        ELSE
          oObj:TreeItem:Text := oObj:Name
-         oObj:TreeItem:ImageIndex := ::GetImage( oObj )
+         oObj:TreeItem:ImageIndex := ::GetImage( oObj, .T. )
       ENDIF
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
-   IF EMPTY( procname(10) )
-      
+   IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN" 
       IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
          IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
             ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
@@ -483,28 +504,36 @@ METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
 RETURN NIL
 
 METHOD OnRightClick() CLASS ObjectTreeView
-   LOCAL pt := (struct POINT), oItem, Item, oMenu, oSel
+   LOCAL pt := (struct POINT), oItem, Item, oMenu, oSel, lGroup := .F.
    
    GetCursorPos( @pt )
    ScreenToClient( ::hWnd, @pt )
    oSel := ::HitTest( pt:x, pt:y )
 
+   oMenu := ContextStrip( Self )
+   oMenu:Create()
+   oMenu:ImageList := ImageList( Self, 16, 16 ):Create()
+   oMenu:ImageList:AddImage( IDB_STD_SMALL_COLOR )
+   
    IF oSel != NIL .AND. __ObjHasMsg( oSel:Cargo, "__IdeContextMenuItems" ) .AND. !EMPTY( oSel:Cargo:__IdeContextMenuItems )
-      oMenu := MenuPopup( Self )
-      oMenu:Style := TPM_LEFTALIGN+TPM_TOPALIGN
-      GetCursorPos( @pt )
-      oMenu:Left  := pt:x
-      oMenu:Top   := pt:y
-
-      oMenu:Create()
       FOR EACH Item IN oSel:Cargo:__IdeContextMenuItems
-          oItem := CMenuItem( oMenu )
-          oItem:Caption := Item[1]
-          oItem:Action  := Item[2]
+          oItem := MenuStripItem( oMenu )
+          oItem:Text   := Item[1]
+          oItem:Action := Item[2]
           oItem:Create()
       NEXT
-      oMenu:Context()
+      lGroup := .T.
    ENDIF
+
+   oItem := MenuStripItem( oMenu )
+   oItem:Text       := "&Delete"
+   oItem:ImageIndex := ::System:StdIcons:Delete
+   oItem:BeginGroup := lGroup
+   oItem:Action     := {|| ::Application:Project:DelControl( oSel:Cargo ) }
+   oItem:Create()
+
+   GetCursorPos( @pt )
+   oMenu:Show( pt:x, pt:y )
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------

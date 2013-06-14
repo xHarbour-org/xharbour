@@ -8,7 +8,6 @@
 #include "commdlg.ch"
 
 #define DG_ADDCONTROL      1
-#define DG_DELCONTROL      2
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -288,20 +287,8 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD DelColumn() CLASS ColManager
-    LOCAL oItem
     IF LEN( ::Parent:Grid:Children ) > 0 .AND. ::CurSel > 0
-       oItem := ::Parent:Grid:Children[ MAX( ::CurSel, 1 ) ]
-
-       ::Application:Project:SetAction( { { DG_DELCONTROL, NIL, oItem:Left,;
-                                                  oItem:Top,;
-                                                  ::Form,;
-                                                  oItem:Parent,; //oParent,;
-                                                  oItem:__xCtrlName,;
-                                                  oItem,,;
-                                                  1,,, } }, ::Application:Project:aUndo )
-       
-       //::Parent:Grid:DeleteColumn( ::CurSel, .T. )
-       
+       ::Application:Project:DelControl( ::Parent:Grid:Children[ MAX( ::CurSel, 1 ) ] )
        ::ResetList()
     ENDIF
     IF ::GetCount() == 0
