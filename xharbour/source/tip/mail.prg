@@ -106,7 +106,7 @@ METHOD New( cBody, oEncoder ) CLASS TipMail
    ::hHeaders     := HSetCaseMatch( { => }, .F. )
    ::aAttachments := {}
 
-   IF ValType( oEncoder ) $ "CO"
+   IF HB_ISSTRING( oEncoder ) .OR. HB_ISOBJECT( oEncoder )
       ::SetEncoder( oEncoder )
    ENDIF
 
@@ -136,12 +136,12 @@ METHOD SetEncoder( cEnc ) CLASS TipMail
 METHOD SetBody( cBody ) CLASS TipMail
 
    IF ::oEncoder != NIL
-      ::cBody := ::oEncoder:Encode( cBody )
-      ::lBodyEncoded := .T.  //GD needed to prevent an extra crlf from being appended
+      ::cBody        := ::oEncoder:Encode( cBody )
+      ::lBodyEncoded := .T.                 // GD needed to prevent an extra crlf from being appended
    ELSE
       ::cBody := cBody
    ENDIF
-   //::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )  //GD -not needed
+   // ::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )  // GD -not needed
 
    RETURN .T.
 
@@ -278,7 +278,7 @@ METHOD ToString() CLASS TipMail
    ENDIF
 
    IF Len( ::aAttachments ) > 0
-      //Reset failing content type
+      // Reset failing content type
       IF At( "multipart/", Lower( ::GetFieldPart( "Content-Type" ) ) ) == 0
          ::hHeaders[ "Content-Type" ] := "multipart/mixed"
       ENDIF
@@ -287,7 +287,7 @@ METHOD ToString() CLASS TipMail
       cBoundary := ::GetFieldOption( "Content-Type", "Boundary" )
       IF Empty( cBoundary )
          cBoundary := ::MakeBoundary()
-         IF .NOT. ::SetFieldOption( "Content-Type", "Boundary", cBoundary )
+         IF ! ::SetFieldOption( "Content-Type", "Boundary", cBoundary )
             ::hHeaders[ "Content-Type" ] := ;
                'multipart/mixed; boundary="' + cBoundary + '"'
          ENDIF
@@ -338,13 +338,13 @@ METHOD ToString() CLASS TipMail
    // end of Header
    cRet += e"\r\n"
 
-   //Body
-   IF .NOT. Empty( ::cBody )
+   // Body
+   IF ! Empty( ::cBody )
       IF Empty( ::aAttachments )
-         //cRet += ::cBody + if(lAttachment,'', e"\r\n")
+         // cRet += ::cBody + if(lAttachment,'', e"\r\n")
          cRet += ::cBody + if( ::lBodyEncoded, '', e"\r\n" )
       ELSE
-         //GD - if there are attachements the body of the message has to be treated as an attachment.
+         // if there are attachements the body of the message has to be treated as an attachment
          cRet += "--" + cBoundary + e"\r\n"
          cRet += "Content-Type: text/plain; charset=ISO-8859-1; format=flowed" + e"\r\n"
          cRet += "Content-Transfer-Encoding: 7bit" + e"\r\n"
@@ -354,8 +354,8 @@ METHOD ToString() CLASS TipMail
 
    ENDIF
 
-   IF .NOT. Empty( ::aAttachments )
-      //Eventually go with mime multipart
+   IF ! Empty( ::aAttachments )
+      // Eventually go with mime multipart
       FOR i := 1 TO Len( ::aAttachments )
          cRet += "--" + cBoundary + e"\r\n"
          cRet += ::aAttachments[ i ]:ToString()
@@ -383,7 +383,7 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
       ::aReceived := {}
    ENDIF
 
-// Part 1: parsing header
+   // Part 1: parsing header
    IF nPos == NIL
       nPos := 1
    ENDIF
@@ -417,16 +417,15 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
 
       nPos := nLinePos + 2
       nLinePos := At( e"\r\n", cMail, nPos )
-      //Prevents malformed body to affect us
+      // Prevents malformed body to affect us
       IF cBoundary != NIL .AND. At( "--" + cBoundary, cMail, nPos ) == 1
          RETURN 0
       ENDIF
    ENDDO
 
-// now we may have a body or a multipart message; multipart
-// messages may also have a "fake" body, that is usually not
-// displayed, between their headers and the first multipart
-// boundary.
+   // now we may have a body or a multipart message; multipart messages may
+   // also have a "fake" body, that is usually not displayed, between their
+   // headers and the first multipart boundary.
 
    IF "Content-Transfer-Encoding" IN ::hHeaders
       ::oEncoder := TIp_GetEncoder( ::hHeaders[ "Content-Transfer-Encoding" ] )
@@ -435,7 +434,7 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
    // se if we have subparts:
    IF At( "multipart/", Lower( ::GetFieldPart( "Content-Type" ) ) ) > 0
       cSubBoundary := ::GetFieldOption( "Content-Type", "Boundary" )
-      //strip " on boundary
+      // strip " on boundary
       IF cSubBoundary[1] == '"'
          cSubBoundary := SubStr( cSubBoundary, 2, Len( cSubBoundary ) - 2 )
       ENDIF
@@ -453,16 +452,16 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
          LOOP
       ENDIF
 
-      //have we met the boundary?
+      // have we met the boundary?
       IF cBoundary != NIL .AND. At( "--" + cBoundary, cMail, nPos ) == nPos
          EXIT
       ENDIF
 
-      //Have we met a section?
+      // Have we met a section?
       IF cSubBoundary != NIL .AND. ;
             At( "--" + cSubBoundary, cMail, nPos ) == nPos
 
-         //is it the last subsection?
+         // is it the last subsection?
          IF At( "--", cMail, nPos + Len( cSubBoundary ) + 2, nLinePos ) > 0
             EXIT
          ENDIF
@@ -486,12 +485,13 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
          // enter in this part of the loop again.
 
       ELSE
-         //nPos := nLinePos + 2
+         // nPos := nLinePos + 2
          /* 04/05/2004 - <maurilio.longo@libero.it>
             Instead of testing every single line of mail until we find next boundary, if there is a boundary we
             jump to it immediatly, this saves thousands of EOL test and makes splitting of a string fast
          */
-         nPos := iif( ! Empty( cSubBoundary ), At( "--" + cSubBoundary, cMail, nPos ), iif( ! Empty(cBoundary ), At("--" + cBoundary, cMail, nPos ), nLinePos + 2 ) )
+         nPos := iif( ! Empty( cSubBoundary ), At( "--" + cSubBoundary, cMail, nPos ), ;
+                      iif( ! Empty(cBoundary ), At( "--" + cBoundary, cMail, nPos ), nLinePos + 2 ) )
       ENDIF
 
       nLinePos := At( e"\r\n", cMail, nPos )
@@ -513,8 +513,7 @@ METHOD MakeBoundary() CLASS TipMail
       cBound[i] := Chr( hb_Random( 0, 25 ) + Asc( "A" ) )
    NEXT
 
-   cBound += "_TIP_" + StrTran( DToC( Date() ), "/", "" ) + ;
-      "_" + StrTran( Time(), ":", "" )
+   cBound += "_TIP_" + StrTran( DToC( Date() ), "/", "" ) + "_" + StrTran( Time(), ":", "" )
 
    RETURN cBound
 
@@ -522,29 +521,29 @@ METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) CLASS TipMail
 
    LOCAL aTo, aCC, aBCC, i, imax
 
-   IF ValType( csubject ) <> "C"
+   IF ! HB_ISSTRING( cSubject )
       cSubject := ""
    ENDIF
 
-   IF ValType( cFrom ) <> "C"
+   IF ! HB_ISSTRING( cFrom )
       RETURN .F.
    ENDIF
 
-   IF ValType( cTo ) == "C"
+   IF HB_ISSTRING( cTo )
       aTo := { cTo }
-   ELSEIF ValType( cTo ) == "A"
+   ELSEIF HB_ISARRAY( cTo )
       aTo := cTo
    ENDIF
 
-   IF ValType( cCC ) == "C"
+   IF HB_ISSTRING( cCC )
       aCC := { cCC }
-   ELSEIF ValType( cCC ) == "A"
+   ELSEIF HB_ISARRAY( cCC )
       aCC := cCC
    ENDIF
 
-   IF ValType( cBCC ) == "C"
+   IF HB_ISSTRING( cBCC )
       aBCC := { cBCC }
-   ELSEIF ValType( cBCC ) == "A"
+   ELSEIF HB_ISARRAY( cBCC )
       aBCC := cBCC
    ENDIF
 
@@ -552,21 +551,21 @@ METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) CLASS TipMail
       RETURN .F.
    ENDIF
 
-   IF .NOT. ::SetFieldPart( "Subject", cSubject )
+   IF ! ::SetFieldPart( "Subject", cSubject )
       RETURN .F.
    ENDIF
 
-   IF .NOT. ::SetFieldPart( "From", cFrom )
+   IF ! ::SetFieldPart( "From", cFrom )
       RETURN .F.
    ENDIF
 
    cTo  := aTO[1]
    imax := Len( aTO )
    FOR i := 2 TO imax
-      cTo += "," + InetCrlf() + Chr( 9 ) + aTo[i]
+      cTo += "," + InetCrLf() + Chr( 9 ) + aTo[i]
    NEXT
 
-   IF .NOT. ::SetFieldPart( "To", cTo )
+   IF ! ::SetFieldPart( "To", cTo )
       RETURN .F.
    ENDIF
 
@@ -577,19 +576,19 @@ METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) CLASS TipMail
          cCC += "," + InetCrlf() + Chr( 9 ) + aCC[i]
       NEXT
 
-      IF .NOT. ::SetFieldPart( "Cc", cCC )
+      IF ! ::SetFieldPart( "Cc", cCC )
          RETURN .F.
       ENDIF
    ENDIF
 
    IF aBCC != NIL
-      cBCC  := aBCC[1]
-      imax  := Len( aBCC )
+      cBCC := aBCC[1]
+      imax := Len( aBCC )
       FOR i := 2 TO imax
          cBCC += "," + InetCrlf() + Chr( 9 ) + aBCC[i]
       NEXT
 
-      IF .NOT. ::SetFieldPart( "Bcc", cBCC )
+      IF ! ::SetFieldPart( "Bcc", cBCC )
          RETURN .F.
       ENDIF
    ENDIF
@@ -672,7 +671,7 @@ METHOD detachFile( cPath ) CLASS TipMail
       RETURN .F.
    ENDIF
 
-   IF ValType( cPath ) == "C"
+   IF HB_ISSTRING( cPath )
       cFileName := StrTran( cPath + cDelim + cFileName, cDelim + cDelim, cDelim )
    ENDIF
 

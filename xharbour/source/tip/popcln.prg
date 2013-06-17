@@ -57,7 +57,7 @@
 * Inet service manager: pop3
 */
 
-CLASS tIPClientPOP FROM tIPClient
+CLASS TIPClientPOP FROM TIPClient
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open( cUrl )
@@ -78,7 +78,7 @@ CLASS tIPClientPOP FROM tIPClient
 
 ENDCLASS
 
-PROCEDURE PopClnDestructor() CLASS tIPClientPOP
+PROCEDURE PopClnDestructor() CLASS TIPClientPOP
 
    IF ::lTrace .AND. ::nHandle > 0
       FClose( ::nHandle )
@@ -87,7 +87,7 @@ PROCEDURE PopClnDestructor() CLASS tIPClientPOP
 
    RETURN
 
-METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
+METHOD New( oUrl, lTrace, oCredentials ) CLASS TIPClientPOP
 
    LOCAL cFile := "pop3"
    LOCAL n := 0
@@ -98,7 +98,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
    ::nConnTimeout := 10000
 
    if ::lTrace
-      IF !File( "pop3.log" )
+      IF ! File( "pop3.log" )
          ::nHandle := FCreate( "pop3.log" )
       ELSE
          WHILE File( cFile + AllTrim( Str(n,4 ) ) + ".log" )
@@ -110,9 +110,9 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
 
    RETURN Self
 
-METHOD Open( cUrl ) CLASS tIPClientPOP
+METHOD Open( cUrl ) CLASS TIPClientPOP
 
-   IF .NOT. ::super:Open( cUrl )
+   IF ! ::super:Open( cUrl )
       RETURN .F.
    ENDIF
 
@@ -122,9 +122,9 @@ METHOD Open( cUrl ) CLASS tIPClientPOP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetOK()
-      ::InetSendall( ::SocketCon, "USER " + ::oUrl:cUserId + ::cCRLF )
+      ::InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserId + ::cCRLF )
       IF ::GetOK()
-         ::InetSendall( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
+         ::InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          IF ::GetOK()
             ::isOpen := .T.
             RETURN .T.
@@ -134,7 +134,7 @@ METHOD Open( cUrl ) CLASS tIPClientPOP
 
    RETURN .F.
 
-METHOD GetOK() CLASS tIPClientPOP
+METHOD GetOK() CLASS TIPClientPOP
 
    LOCAL nLen
 
@@ -145,15 +145,15 @@ METHOD GetOK() CLASS tIPClientPOP
 
    RETURN .T.
 
-METHOD NoOp() CLASS tIPClientPOP
+METHOD NoOp() CLASS TIPClientPOP
 
-   ::InetSendall( ::SocketCon, "NOOP" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "NOOP" + ::cCRLF )
 
    RETURN ::GetOK()
 
-METHOD CLOSE() CLASS tIPClientPOP
+METHOD CLOSE() CLASS TIPClientPOP
 
-   InetSetTimeOut( ::SocketCon, ::nConnTimeout )
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
    if ::lTrace
       FClose( ::nHandle )
       ::nHandle := - 1
@@ -163,23 +163,23 @@ METHOD CLOSE() CLASS tIPClientPOP
 
    RETURN ::super:CLOSE()
 
-METHOD QUIT() CLASS tIPClientPOP
+METHOD QUIT() CLASS TIPClientPOP
 
-   ::InetSendall( ::SocketCon, "QUIT" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "QUIT" + ::cCRLF )
 
    RETURN ::GetOK()
 
-METHOD STAT() CLASS tIPClientPOP
+METHOD STAT() CLASS TIPClientPOP
 
    LOCAL nRead
 
-   ::InetSendall( ::SocketCon, "STAT" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "STAT" + ::cCRLF )
 
    RETURN ::InetRecvLine( ::SocketCon, @nRead, 128 )
 
-METHOD READ( nLen ) CLASS tIPClientPOP
+METHOD READ( nLen ) CLASS TIPClientPOP
 
-   /** Set what to read for */
+   // Set what to read for
    IF Empty( ::oUrl:cFile )
       RETURN ::LIST()
    ENDIF
@@ -194,13 +194,13 @@ METHOD READ( nLen ) CLASS tIPClientPOP
 
    RETURN ::Retrieve( Val ( ::oUrl:cFile ), nLen )
 
-METHOD Top( nMsgId ) CLASS tIPClientPOP
+METHOD Top( nMsgId ) CLASS TIPClientPOP
 
    LOCAL nPos
    LOCAL cStr, cRet
 
-   ::InetSendall( ::SocketCon, "TOP " + Str( nMsgId ) + " 0 " + ::cCRLF )
-   IF .NOT. ::GetOK()
+   ::InetSendAll( ::SocketCon, "TOP " + Str( nMsgId ) + " 0 " + ::cCRLF )
+   IF ! ::GetOK()
       RETURN NIL
    ENDIF
 
@@ -221,13 +221,13 @@ METHOD Top( nMsgId ) CLASS tIPClientPOP
 
    RETURN cRet
 
-METHOD LIST() CLASS tIPClientPOP
+METHOD LIST() CLASS TIPClientPOP
 
    LOCAL nPos
    LOCAL cStr, cRet
 
-   ::InetSendall( ::SocketCon, "LIST" + ::cCRLF )
-   IF .NOT. ::GetOK()
+   ::InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
+   IF ! ::GetOK()
       RETURN NIL
    ENDIF
 
@@ -248,18 +248,18 @@ METHOD LIST() CLASS tIPClientPOP
 
    RETURN cRet
 
-METHOD UIDL( nMsgId ) CLASS tIPClientPOP
+METHOD UIDL( nMsgId ) CLASS TIPClientPOP
 
    LOCAL nPos
    LOCAL cStr, cRet
 
    IF ! Empty( nMsgId )
-      ::InetSendall( ::SocketCon, "UIDL " + Str( nMsgId ) + ::cCRLF )
+      ::InetSendAll( ::SocketCon, "UIDL " + Str( nMsgId ) + ::cCRLF )
    ELSE
-      ::InetSendall( ::SocketCon, "UIDL" + ::cCRLF )
+      ::InetSendAll( ::SocketCon, "UIDL" + ::cCRLF )
    ENDIF
 
-   IF .NOT. ::GetOK()
+   IF ! ::GetOK()
       RETURN NIL
    ENDIF
 
@@ -289,15 +289,15 @@ METHOD UIDL( nMsgId ) CLASS tIPClientPOP
 
    RETURN cRet
 
-METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
+METHOD Retrieve( nId, nLen ) CLASS TIPClientPOP
 
    LOCAL nPos
    LOCAL cRet, nRetLen, cBuffer, nRead
    LOCAL cEOM := ::cCRLF + "." + ::cCRLF        // End Of Mail
 
-   IF .NOT. ::bInitialized
-      ::InetSendall( ::SocketCon, "RETR " + Str( nId ) + ::cCRLF )
-      IF .NOT. ::GetOK()
+   IF ! ::bInitialized
+      ::InetSendAll( ::SocketCon, "RETR " + Str( nId ) + ::cCRLF )
+      IF ! ::GetOK()
          ::bEof := .T.
          RETURN NIL
       ENDIF
@@ -319,9 +319,8 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
       cRet += Left( cBuffer, nRead )
 
       /* 24/11/2005 - <maurilio.longo@libero.it>
-                      "- Len( cEOM )" to be sure to always find a full EOM,
-                      otherwise if response breaks EOM in two, it will never
-                      be found
+         "- Len( cEOM )" to be sure to always find a full EOM,
+         otherwise if response breaks EOM in two, it will never be found
       */
       IF ( nPos := At( cEOM, cRet, Max( nRetLen - Len( cEOM ), 1 ) ) ) <> 0
          // Remove ".CRLF"
@@ -342,17 +341,16 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
       RETURN NIL
    ENDIF
 
-// Remove byte-stuffed termination octet(s) if any
-
+   // Remove byte-stuffed termination octet(s) if any
    RETURN StrTran( cRet, ::cCRLF + "..", ::cCRLF + "." )
 
-METHOD DELETE( nId ) CLASS tIPClientPOP
+METHOD DELETE( nId ) CLASS TIPClientPOP
 
-   ::InetSendall( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  ::cCRLF )
+   ::InetSendAll( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  ::cCRLF )
 
    RETURN ::GetOK()
 
-METHOD countMail() CLASS tIPClientPop
+METHOD countMail() CLASS TIPClientPop
 
    LOCAL aMails
 
@@ -364,15 +362,15 @@ METHOD countMail() CLASS tIPClientPop
 
    RETURN - 1
 
-METHOD retrieveAll( lDelete ) CLASS tIPClientPop
+METHOD retrieveAll( lDelete ) CLASS TIPClientPop
 
    LOCAL aMails, i, imax, cMail
 
-   IF ValType( lDelete ) <> "L"
+   IF ! HB_ISLOGICAL( lDelete )
       lDelete := .F.
    ENDIF
 
-   IF .NOT. ::isOpen
+   IF ! ::isOpen
       RETURN NIL
    ENDIF
 

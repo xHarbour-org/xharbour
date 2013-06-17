@@ -62,10 +62,10 @@
 
 /**
 * Inet Client class
-* Abstract super class for tIPClientFTP, tIPClientHTTP, tIPClientPOP and tIPClientSMTP
+* Abstract super class for TIPClientFTP, TIPClientHTTP, TIPClientPOP and TIPClientSMTP
 */
 
-CLASS tIPClient
+CLASS TIPClient
 
    CLASSDATA bInitSocks INIT .F.             //
    CLASSDATA cCRLF      INIT InetCRLF()      //
@@ -74,7 +74,7 @@ CLASS tIPClient
    DATA oCredentials                         // credential needed to access the service
    DATA nStatus                              // basic status
    DATA SocketCon                            //
-   DATA lTrace    INIT .f.                   //
+   DATA lTrace    INIT .F.                   //
    DATA nHandle   INIT - 1                   //
 
    DATA nDefaultRcvBuffSize                  //
@@ -143,7 +143,7 @@ CLASS tIPClient
 
 ENDCLASS
 
-METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
+METHOD New( oUrl, lTrace, oCredentials ) CLASS TIPClient
 
    LOCAL oErr
 
@@ -151,7 +151,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
 
    ::lTrace := lTrace
 
-   IF .NOT. ::bInitSocks
+   IF ! ::bInitSocks
       InetInit()
       ::bInitSocks := .T.
    ENDIF
@@ -160,7 +160,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
       oUrl := tUrl():New( oUrl )
    ENDIF
 
-   IF .NOT. oUrl:cProto IN "ftp,http,pop,smtp"
+   IF ! oUrl:cProto IN "ftp,http,pop,smtp"
       oErr := ErrorNew()
       oErr:Args          := { Self, oUrl:cProto }
       oErr:CanDefault    := .F.
@@ -188,7 +188,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
 
    RETURN self
 
-METHOD Open( cUrl ) CLASS tIPClient
+METHOD Open( cUrl ) CLASS TIPClient
 
    LOCAL nPort
    LOCAL cResp := ""
@@ -219,11 +219,11 @@ METHOD Open( cUrl ) CLASS tIPClient
 
    RETURN .T.
 
-METHOD CLOSE() CLASS tIPClient
+METHOD CLOSE() CLASS TIPClient
 
    LOCAL nRet := - 1
 
-   IF .NOT. Empty( ::SocketCon )
+   IF ! Empty( ::SocketCon )
 
       nRet := InetClose( ::SocketCon )
 
@@ -233,18 +233,18 @@ METHOD CLOSE() CLASS tIPClient
 
    RETURN( nRet )
 
-METHOD Reset() CLASS tIPClient
+METHOD Reset() CLASS TIPClient
 
    ::bInitialized := .F.
    ::bEof         := .F.
 
    RETURN .T.
 
-METHOD COMMIT() CLASS tIPClient
+METHOD COMMIT() CLASS TIPClient
 
    RETURN .T.
 
-METHOD READ( nLen ) CLASS tIPClient
+METHOD READ( nLen ) CLASS TIPClient
 
    LOCAL cStr0, cStr1
 
@@ -271,8 +271,8 @@ METHOD READ( nLen ) CLASS tIPClient
       // read an amount of data
       cStr0 := Space( nLen )
 
-      // S.R. if len of file is less than RCV_BUF_SIZE InetRecvAll return 0
-      //      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
+      // if len of file is less than RCV_BUF_SIZE InetRecvAll return 0
+      // ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
 
       ::InetRecvAll( ::SocketCon, @cStr0, nLen )
       ::nLastRead := ::InetCount( ::SocketCon )
@@ -281,7 +281,7 @@ METHOD READ( nLen ) CLASS tIPClient
       IF ::nLastRead != nLen
          ::bEof := .T.
          cStr0 := SubStr( cStr0, 1, ::nLastRead )
-         // S.R.         RETURN NIL
+         // RETURN NIL
       ENDIF
 
       IF ::nRead == ::nLength
@@ -292,7 +292,7 @@ METHOD READ( nLen ) CLASS tIPClient
 
    RETURN cStr0
 
-METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
+METHOD ReadToFile( cFile, nMode, nSize ) CLASS TIPClient
 
    LOCAL nFout
    LOCAL cData
@@ -311,7 +311,7 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    ::nRead   := 0
    ::nStatus := 1
 
-   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. .NOT. ::bEof
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
       cData := ::READ( RCV_BUF_SIZE )
       IF cData == NIL
          IF nFout != NIL
@@ -352,7 +352,7 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
 
    RETURN .T.
 
-METHOD WriteFromFile( cFile ) CLASS tIPClient
+METHOD WriteFromFile( cFile ) CLASS TIPClient
 
    LOCAL nFin
    LOCAL cData
@@ -370,7 +370,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 
    nBufSize := SND_BUF_SIZE
 
-// allow initialization of the gauge
+   // allow initialization of the gauge
    nSent := 0
    IF ! Empty( ::exGauge )
       hb_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
@@ -391,7 +391,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
       nLen := FRead( nFin, @cData, nBufSize )
    ENDDO
 
-// it may happen that the file has lenght 0
+   // it may happen that the file has lenght 0
    IF nSent > 0
       ::COMMIT()
    ENDIF
@@ -401,7 +401,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 
    RETURN .T.
 
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
+METHOD Write( cData, nLen, bCommit ) CLASS TIPClient
 
    IF Empty( nLen )
       nLen := Len( cData )
@@ -409,7 +409,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    ::nLastWrite := ::InetSendAll( ::SocketCon, cData, nLen )
 
-   IF .NOT. Empty( bCommit )
+   IF ! Empty( bCommit )
       ::COMMIT()
    ENDIF
 
@@ -417,7 +417,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    RETURN ::nLastWrite
 
-METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
+METHOD InetSendAll( SocketCon, cData, nLen ) CLASS TIPClient
 
    LOCAL nRet
 
@@ -433,7 +433,7 @@ METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
 
    RETURN nRet
 
-METHOD InetCount( SocketCon ) CLASS tIPClient
+METHOD InetCount( SocketCon ) CLASS TIPClient
 
    LOCAL nRet
 
@@ -445,7 +445,7 @@ METHOD InetCount( SocketCon ) CLASS tIPClient
 
    RETURN nRet
 
-METHOD InetRecv( SocketCon, cStr1, len ) CLASS tIPClient
+METHOD InetRecv( SocketCon, cStr1, len ) CLASS TIPClient
 
    LOCAL nRet
 
@@ -457,7 +457,7 @@ METHOD InetRecv( SocketCon, cStr1, len ) CLASS tIPClient
 
    RETURN nRet
 
-METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
+METHOD InetRecvLine( SocketCon, nLen, size ) CLASS TIPClient
 
    LOCAL cRet
 
@@ -469,7 +469,7 @@ METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
 
    RETURN cRet
 
-METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS tIPClient
+METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS TIPClient
 
    LOCAL nRet
 
@@ -481,7 +481,7 @@ METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS tIPClient
 
    RETURN nRet
 
-METHOD InetErrorCode( SocketCon ) CLASS tIPClient
+METHOD InetErrorCode( SocketCon ) CLASS TIPClient
 
    LOCAL nRet
 
@@ -493,13 +493,13 @@ METHOD InetErrorCode( SocketCon ) CLASS tIPClient
 
    RETURN nRet
 
-METHOD InetErrorDesc( SocketCon ) CLASS tIPClient
+METHOD InetErrorDesc( SocketCon ) CLASS TIPClient
 
    LOCAL cMsg := ""
 
    DEFAULT SocketCon TO ::SocketCon
 
-   IF .NOT. Empty( SocketCon )
+   IF ! Empty( SocketCon )
 
       cMsg := InetErrorDesc( SocketCon )
 
@@ -509,7 +509,7 @@ METHOD InetErrorDesc( SocketCon ) CLASS tIPClient
 
    /* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
 
-METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
+METHOD InetConnect( cServer, nPort, SocketCon ) CLASS TIPClient
 
    InetConnect( cServer, nPort, SocketCon )
 
@@ -529,7 +529,7 @@ METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
    /* Methods to manage buffers */
 
-METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS TIPClient
 
    IF ! Empty( nSizeBuff )
       InetSetRcvBufSize( SocketCon, nSizeBuff )
@@ -537,7 +537,7 @@ METHOD InetRcvBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
 
    RETURN InetGetRcvBufSize( SocketCon )
 
-METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
+METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS TIPClient
 
    IF ! Empty( nSizeBuff )
       InetSetSndBufSize( SocketCon, nSizeBuff )
@@ -551,7 +551,7 @@ METHOD InetSndBufSize( SocketCon, nSizeBuff ) CLASS tIPClient
             ::Log( a, b, c, m )
 */
 
-METHOD Log( ... ) CLASS tIPClient
+METHOD Log( ... ) CLASS TIPClient
 
    LOCAL xVar
    LOCAL cMsg := DToS( Date() ) + "-" + Time() + Space( 2 ) + ;
@@ -582,7 +582,7 @@ METHOD Log( ... ) CLASS tIPClient
 
    RETURN Self
 
-METHOD SetProxy( cProxyHost, nProxyPort, cProxyUser, cProxyPassword ) CLASS tIPClient
+METHOD SetProxy( cProxyHost, nProxyPort, cProxyUser, cProxyPassword ) CLASS TIPClient
 
    ::cProxyHost     := cProxyHost
    ::nProxyPort     := nProxyPort
@@ -592,7 +592,7 @@ METHOD SetProxy( cProxyHost, nProxyPort, cProxyUser, cProxyPassword ) CLASS tIPC
    RETURN Self
 
 METHOD OpenProxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWord, nTimeOut, cUserAgent ) ;
-       CLASS tIPClient
+       CLASS TIPClient
 
    LOCAL cLine
    LOCAL cRequest := ""
@@ -638,7 +638,7 @@ METHOD OpenProxy( cServer, nPort, cProxy, nProxyPort, cResp, cUserName, cPassWor
 
    RETURN lRet
 
-METHOD ReadHTTPProxyResponse( dwTimeout, sResponse ) CLASS tIPClient
+METHOD ReadHTTPProxyResponse( dwTimeout, sResponse ) CLASS TIPClient
 
    LOCAL bMoreDataToRead := .T.
    LOCAL nLength, nData

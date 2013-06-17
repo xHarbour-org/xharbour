@@ -116,7 +116,7 @@ METHOD SetAddress( cUrl ) CLASS tURL
    // TOPLEVEL url parsing
    aMatch := hb_regex( ::cREuri, cUrl )
 
-   //May fail
+   // May fail
    IF Empty( aMatch )
       RETURN .F.
    ENDIF
@@ -153,7 +153,7 @@ METHOD BuildAddress() CLASS tURL
       ::cProto := Lower( ::cProto )
    ENDIF
 
-   IF .NOT. Empty( ::cProto ) .AND. .NOT. Empty( ::cServer )
+   IF ! Empty( ::cProto ) .AND. ! Empty( ::cServer )
       cRet := ::cProto + "://"
    ENDIF
 
@@ -177,7 +177,7 @@ METHOD BuildAddress() CLASS tURL
    ENDIF
 
    cRet += ::cPath + ::cFile
-   IF .NOT. Empty( ::cQuery )
+   IF ! Empty( ::cQuery )
       cRet += "?" + ::cQuery
    ENDIF
 
@@ -198,7 +198,7 @@ METHOD BuildQuery() CLASS tURL
    ENDIF
 
    cLine := ::cPath + ::cFile
-   IF .NOT. Empty( ::cQuery )
+   IF ! Empty( ::cQuery )
       cLine += "?" + ::cQuery
    ENDIF
 
@@ -244,7 +244,7 @@ METHOD AddGetForm( cPostData ) CLASS tURL
       cData := cPostData
    ENDIF
 
-   IF !Empty( cData )
+   IF ! Empty( cData )
       cRet := ::cQuery += if( Empty( ::cQuery ), '', '&' ) + cData
    ENDIF
 
