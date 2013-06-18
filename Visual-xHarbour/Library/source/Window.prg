@@ -1297,25 +1297,27 @@ METHOD SetTabOrder( nTabOrder ) CLASS Window
           ELSE
             hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
          ENDIF
-         IF ::__ClassInst != NIL
-            ADEL( ::Parent:Children, ::xTabOrder, .T. )
-            IF nTabOrder > LEN( ::Parent:Children )
-               AADD( ::Parent:Children, Self )
-             ELSE
-               AINS( ::Parent:Children, nTabOrder, Self, .T. )
-            ENDIF
-            FOR n := 1 TO LEN( ::Parent:Children )
-                ::Parent:Children[n]:xTabOrder := n
-                IF ::Parent:Children[n]:__ClassInst != NIL
-                   ::Parent:Children[n]:__ClassInst:xTabOrder := n
-                ENDIF
-            NEXT
-         ENDIF
-         IF ::hWnd != NIL
-            SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE )
-         ENDIF
       CATCH
       END
+      IF ::__ClassInst != NIL
+         ::Application:ObjectTree:MoveItem( ::TreeItem, nTabOrder, ::Parent:TreeItem )
+
+         ADEL( ::Parent:Children, ::xTabOrder, .T. )
+         IF nTabOrder > LEN( ::Parent:Children )
+            AADD( ::Parent:Children, Self )
+          ELSE
+            AINS( ::Parent:Children, nTabOrder, Self, .T. )
+         ENDIF
+         FOR n := 1 TO LEN( ::Parent:Children )
+             ::Parent:Children[n]:xTabOrder := n
+             IF ::Parent:Children[n]:__ClassInst != NIL
+                ::Parent:Children[n]:__ClassInst:xTabOrder := n
+             ENDIF
+         NEXT
+      ENDIF
+      IF ::hWnd != NIL
+         SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE )
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -1475,6 +1477,10 @@ METHOD SetParent( oParent ) CLASS Window
       ::Parent:__UnregisterTransparentControl( Self )
       oParent:__RegisterTransparentControl( Self )
    ENDIF
+   ::Dock:Left   := NIL
+   ::Dock:Top    := NIL
+   ::Dock:Right  := NIL
+   ::Dock:Bottom := NIL
    ::Parent := oParent
    AADD( oParent:Children, Self )
    SetParent( ::hWnd, oParent:hWnd )
@@ -3618,20 +3624,17 @@ METHOD __FixDocking() CLASS Window
       FOR EACH cObj IN ::__hObjects:Keys
           oObj := ::__hObjects[ cObj ]
           IF oObj:HasMessage( "Dock" ) .AND. oObj:Dock != NIL
-             IF VALTYPE( oObj:Dock:Left ) == "C"
+             IF VALTYPE( oObj:Dock:Left ) == "C" .AND. HGetPos( ::__hObjects, oObj:Dock:Left ) > 0
                 oObj:Dock:Left   := IIF( oObj:Dock:Left == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Left ] )
              ENDIF
-             IF VALTYPE( oObj:Dock:Top ) == "C"
+             IF VALTYPE( oObj:Dock:Top ) == "C" .AND. HGetPos( ::__hObjects, oObj:Dock:Top ) > 0
                 oObj:Dock:Top    := IIF( oObj:Dock:Top == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Top ] )
              ENDIF
-             IF VALTYPE( oObj:Dock:Right ) == "C"
+             IF VALTYPE( oObj:Dock:Right ) == "C" .AND. HGetPos( ::__hObjects, oObj:Dock:Right ) > 0
                 oObj:Dock:Right  := IIF( oObj:Dock:Right == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Right ] )
              ENDIF
-             IF VALTYPE( oObj:Dock:Bottom ) == "C"
-                TRY
-                  oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Bottom ] )
-                CATCH
-                END
+             IF VALTYPE( oObj:Dock:Bottom ) == "C" .AND. HGetPos( ::__hObjects, oObj:Dock:Bottom ) > 0
+                oObj:Dock:Bottom := IIF( oObj:Dock:Bottom == oObj:Parent:Name, oObj:Parent, ::__hObjects[ oObj:Dock:Bottom ] )
              ENDIF
           ENDIF
       NEXT

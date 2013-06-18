@@ -550,14 +550,15 @@ METHOD OnPaint() CLASS ControlMask
    LOCAL i := 0
    LOCAL j := 0
 
-   IF ::CurForm:InActive .OR. __clsParent( ::CurForm:Selected[1][1]:ClassH, "COMPONENT" )
-      RETURN NIL
-   ENDIF
-
    IF ( ::CurForm == NIL .OR. !::DrawBand  .OR. ! ::CurForm:IsWindow() ) .AND. !::lOrderMode
       ::aPrevRect := NIL
       RETURN NIL
    ENDIF
+
+   IF ::CurForm:InActive .OR. Empty( ::CurForm:Selected ) .OR. __clsParent( ::CurForm:Selected[1][1]:ClassH, "COMPONENT" )
+      RETURN NIL
+   ENDIF
+
 
    aRect := ::CurForm:GetSelRect()
 

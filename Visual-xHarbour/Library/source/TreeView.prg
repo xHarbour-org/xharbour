@@ -109,7 +109,7 @@ CLASS TreeView FROM TitleControl
    METHOD OnMouseMove()
    METHOD OnLButtonUp()
 
-   METHOD DropItem()
+   METHOD MoveItem()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -498,18 +498,19 @@ METHOD OnLButtonUp( w, x, y ) CLASS TreeView
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------
-METHOD DropItem( oDrag, oTarget ) CLASS TreeView      
+METHOD MoveItem( oDrag, nPos, oOwner ) CLASS TreeView      
    LOCAL oItem
-   IF oDrag != NIL .AND. oTarget != NIL
+   IF oDrag != NIL .AND. oOwner != NIL
       oItem             := TreeViewItem( Self )
       oItem:Text        := oDrag:Text
       oItem:ImageIndex  := oDrag:ImageIndex
       oItem:Cargo       := IIF( VALTYPE(oDrag:Cargo) == "A", ACLONE( oDrag:Cargo ), oDrag:Cargo )
 
-      oItem:InsertAfter := oTarget:hItem
-      oItem:Owner       := oTarget:Owner
-      oItem:Create()
-
       oDrag:Delete()
+
+      oItem:InsertAfter := IIF( nPos == 1, TVI_FIRST, oOwner:Items[nPos-1]:hItem )
+      oItem:Owner       := oOwner
+
+      oItem:Create()
    ENDIF
 RETURN Self

@@ -791,7 +791,7 @@ METHOD GetSelRect( lPure, lMask, lConvert ) CLASS WindowEdit
    LOCAL aControl, aRect, nLeft, nTop, nRight, nBottom, aPoints
 
    FOR EACH aControl IN ::Selected
-       IF aControl[1]:Parent != NIL .AND. ! aControl[1]:ClassName IN {"CMENUITEM", "MENUSTRIPITEM"}
+       IF aControl[1]:Parent != NIL .AND. ! aControl[1]:ClassName IN {"CMENUITEM", "MENUSTRIPITEM"} .AND. ! aControl[1]:lComponent
           aPoints := ::GetPoints( aControl[1], lPure, lMask, lConvert )
 
           DEFAULT nLeft   TO aPoints[1][1]
