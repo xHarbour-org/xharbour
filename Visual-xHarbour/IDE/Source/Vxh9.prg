@@ -502,7 +502,7 @@ METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
          oItem:Cargo:Select()
       ENDIF
 
-      ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .F. )
+      ::Application:Project:CurrentForm:SelectControl( oItem:Cargo )
    ENDIF
 RETURN NIL
 

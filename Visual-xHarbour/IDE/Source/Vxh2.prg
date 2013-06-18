@@ -263,48 +263,42 @@ RETURN Self
 
 //----------------------------------------------------------------------------
 
-METHOD SelectControl( oControl, lFocus ) CLASS WindowEdit
+METHOD SelectControl( oControl ) CLASS WindowEdit
    LOCAL aRect
-
-   DEFAULT lFocus TO .T.
 
    ::InRect    := -1
 
-      IF __ObjHasMsg( oControl, "GetRectangle" )
-         aRect := oControl:GetRectangle()
-         aRect[1] -= 4
-         aRect[2] -= 4
-         aRect[3] += 4
-         aRect[4] += 4
-      ENDIF
-      ::Selected    := { { oControl, aRect, NIL } }
+   IF __ObjHasMsg( oControl, "GetRectangle" )
+      aRect := oControl:GetRectangle()
+      aRect[1] -= 4
+      aRect[2] -= 4
+      aRect[3] += 4
+      aRect[4] += 4
+   ENDIF
+   ::Selected    := { { oControl, aRect, NIL } }
 
-      ::CtrlOldPt := NIL
-      ::InvalidateRect()
-      ::MouseDown := .F.
+   ::CtrlOldPt := NIL
+   ::InvalidateRect()
+   ::MouseDown := .F.
 
-      ::CtrlMask:InvalidateRect()
-      ::CtrlMask:UpdateWindow()
+   ::CtrlMask:InvalidateRect()
+   ::CtrlMask:UpdateWindow()
 
-      IF lFocus
-         ::CtrlMask:SetFocus()
-      ENDIF
-      
-      ::Application:ObjectManager:ResetProperties( ::Selected )
-      ::Application:EventManager:ResetEvents( ::Selected )
+   ::Application:ObjectManager:ResetProperties( ::Selected )
+   ::Application:EventManager:ResetEvents( ::Selected )
 
-      IF !oControl:ClsName == "CMenuItem"
-         ::UpdateSelection()
-      ENDIF
+   IF !oControl:ClsName == "CMenuItem"
+      ::UpdateSelection()
+   ENDIF
 
-      IF oControl:ClsName == "VXH_FORM_IDE"
-         ::SelInitPoint := NIL
-         ::SelEndPoint  := NIL
-      ENDIF
+   IF oControl:ClsName == "VXH_FORM_IDE"
+      ::SelInitPoint := NIL
+      ::SelEndPoint  := NIL
+   ENDIF
 
-      IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
-         oControl:Show()
-      ENDIF
+   IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
+      oControl:Show()
+   ENDIF
 
 RETURN Self
 
