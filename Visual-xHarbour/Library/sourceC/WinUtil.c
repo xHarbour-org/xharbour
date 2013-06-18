@@ -4845,23 +4845,36 @@ HB_FUNC( TASKBARPROGRESSSTATE )
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
-BOOL AxTranslateMessageEx( MSG *pMsg )
+BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
 {
    BOOL bRet = FALSE;
    if( pMsg->message == WM_KEYDOWN )
    {
-      if( pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE )
+      if( pMsg->wParam == VK_RETURN || ( ( pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE ) && strcmp( cClass, TEXT("Internet Explorer_Server") ) == 0 ) )
       {
+         LPUNKNOWN pUnk;
+         HWND hParent;
          HWND hWnd = pMsg->hwnd;
-         LPUNKNOWN pUnk = (LPUNKNOWN) GetWindowLong( hWnd, GWL_USERDATA );
+
+         while( ! ( pUnk = (LPUNKNOWN) GetWindowLong( hWnd, GWL_USERDATA ) ) )
+         {
+            hParent = GetParent( hWnd );
+            if( ! hParent )
+            {
+               break;
+            }
+            hWnd = hParent;
+         }
+
          if( pUnk )
          {
-            IOleInPlaceActiveObject* pIOIPAO;
-            if( SUCCEEDED(pUnk->lpVtbl->QueryInterface( pUnk,&IID_IOleInPlaceActiveObject, (void**)&pIOIPAO ) ) )
+            bRet = AxTranslateMessage( pUnk, pMsg );
+            if( ! bRet )
             {
-               HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
-               pIOIPAO->lpVtbl->Release( pIOIPAO );
-               bRet = ( S_OK == hr );
+               TranslateMessage( pMsg );
+               pMsg->message = WM_NULL;
+               DispatchMessage( pMsg );
+               bRet = TRUE;
             }
          }
       }
@@ -4934,16 +4947,22 @@ HB_FUNC( VXH_MAINLOOP )
    {
       if (bRet != -1)
       {
-         if( ! AxTranslateMessageEx( &msg ) )
+         TCHAR cClass[ MAX_PATH ];
+         GetClassName( msg.hwnd, cClass, MAX_PATH ) ;
+         
+         if( ! AxTranslateMessageEx( &msg, cClass ) )
          {
             if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
             {
                if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
                {
-                  if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
+                  if( strcmp( cClass, TEXT("AfxFrameOrView42s") ) > 0 )
                   {
-                     TranslateMessage( &msg );
-                     DispatchMessage( &msg );
+                     if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
+                     {
+                        TranslateMessage( &msg );
+                        DispatchMessage( &msg );
+                     }
                   }
                }
             }

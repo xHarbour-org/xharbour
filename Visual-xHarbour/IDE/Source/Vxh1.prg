@@ -341,7 +341,7 @@ CLASS IDE_MainForm FROM WinForm
    METHOD OnTimer()
    METHOD SetKeyStatus()
    METHOD KeyHook()
-   //METHOD OnSetFocus()
+   METHOD OnSetFocus()
    METHOD OnNCActivate(n) INLINE IIF( ::Application:Project:CurrentForm != NIL, (::CallWindowProc(), ::Application:Project:CurrentForm:InActive := n==0, IIF( n <> 0, ::Application:Project:CurrentForm:UpdateSelection(),), ::Application:Project:CurrentForm:RedrawWindow(,, RDW_FRAME|RDW_INVALIDATE|RDW_UPDATENOW ) ), ),  ::SetKeyStatus( VK_CAPITAL ), NIL
    METHOD OnNavigateError()
    METHOD EnableSearchMenu()
@@ -370,18 +370,18 @@ METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLA
 RETURN NIL
 
 
-//METHOD OnSetFocus() CLASS IDE_MainForm
-//   IF ::Application:SourceEditor != NIL .AND. ::Application:SourceEditor:IsWindowVisible()
-//      ::Application:SourceEditor:SetFocus()
-//    ELSE
-//      TRY
-//         IF ::Application:MainForm:FormEditor1:CtrlMask != NIL
-//            ::Application:MainForm:FormEditor1:CtrlMask:SetFocus()
-//         ENDIF
-//      CATCH
-//      END
-//   ENDIF
-//RETURN NIL
+METHOD OnSetFocus() CLASS IDE_MainForm
+   IF ::Application:SourceEditor != NIL .AND. ::Application:SourceEditor:IsWindowVisible()
+      ::Application:SourceEditor:SetFocus()
+    ELSE
+      TRY
+         IF ::Application:MainForm:FormEditor1:CtrlMask != NIL
+            ::Application:MainForm:FormEditor1:CtrlMask:SetFocus()
+         ENDIF
+      CATCH
+      END
+   ENDIF
+RETURN NIL
 
 METHOD OnTimer( nId ) CLASS IDE_MainForm
    SWITCH nId

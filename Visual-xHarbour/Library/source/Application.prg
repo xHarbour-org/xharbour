@@ -423,7 +423,9 @@ CLASS Application
    METHOD LoadIcon( cIcon )            INLINE LoadIcon( ::Instance, cIcon )
    METHOD RestorePrevInstance(nNotify) INLINE SendMessage( HWND_BROADCAST, ::__InstMsg, nNotify, 0 )
    METHOD IsThemeActive()              INLINE IsThemeActive()
+   METHOD TranslateAccelerator()
    METHOD Set( nIndex, lSet )          INLINE IIF( ::__ClassInst == NIL, IIF( nIndex == -1, __SetCentury(lSet), Set( nIndex, lSet ) ), )
+   METHOD AxTranslate()
    METHOD MessageBox()
    METHOD HasMessage( cMsg )           INLINE __ObjHasMsg( Self, cMsg )
 
@@ -610,6 +612,37 @@ METHOD Exit() CLASS Application
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
+METHOD AxTranslate( pMsg, cClass ) CLASS Application
+   LOCAL hParent, pUnk, lRet := .F., hWnd := pMsg:hwnd
+
+   DEFAULT cClass TO GetClassName( hWnd )
+
+   IF pMsg:message == WM_KEYDOWN
+      IF pMsg:wParam == VK_RETURN .OR. ( (pMsg:wParam == VK_TAB .OR. pMsg:wParam == VK_DELETE) .AND. cClass == "Internet Explorer_Server" )
+
+         WHILE GetClassName( hWnd ) != "AtlAxWin"
+            hParent := GetParent( hWnd )
+            IF hParent == 0
+               EXIT
+            ENDIF
+            hWnd := hParent
+         ENDDO
+
+         IF ( pUnk := __AXGETUNKNOWN( hWnd ) ) != 0
+            lRet := __AxTranslateMessage( pUnk, pMsg:Value )
+            IF !lRet .AND. cClass != "Edit"
+               TranslateMessage( pMsg )
+               pMsg:message := WM_NULL
+               DispatchMessage( pMsg )
+               lRet := .T.
+            ENDIF
+         ENDIF
+      ENDIF
+
+   ENDIF
+RETURN lRet
+
+//------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
    IF oWnd != NIL
       ::MainForm := oWnd
@@ -709,6 +742,28 @@ METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
    ENDIF
 RETURN NIL
    
+
+//------------------------------------------------------------------------------------------------
+
+METHOD TranslateAccelerator( Msg ) CLASS Application
+   LOCAL lRet := .F., n, hWnd
+   IF Msg:message == WM_KEYDOWN .AND. ::AccelEnabled
+      FOR n := 1 TO LEN( ::__Accelerators )
+          IF ::__Accelerators[n][1] != 0 .AND. ::__Accelerators[n][2] != 0
+             hWnd := GetActiveWindow()
+             WHILE hWnd != 0 .AND. ! IsChild( ::__Accelerators[n][1], hWnd )
+                hWnd := GetParent( hWnd )
+             ENDDO
+             IF IsChild( ::__Accelerators[n][1], hWnd ) .OR. ::__Accelerators[n][1] == GetActiveWindow()
+                IF !TranslateAccelerator( ::__Accelerators[n][1], ::__Accelerators[n][2], Msg ) == 0
+                   lRet := .T.
+                   EXIT
+                ENDIF
+             ENDIF
+          ENDIF
+      NEXT
+   ENDIF
+RETURN lRet
 
 #define BTTNGAP 3
 
