@@ -1,7 +1,7 @@
 CINI = ..\xbuild.bc5.ini
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = ..\..\include;\xHb\include\w32;..\..\..\xedit
+INCLUDEFOLDERS = ..\..\include;\xHb\include\w32
 LAUTORUN = .F.
 LDEBUG = .F.
 LGUI = .T.
@@ -42,7 +42,7 @@ MYRC_FLAGS =
 
 [\xhb\lib\bc5\demo\vxh.lib]
 
-[xEditVXH.lib]
+[Editor.lib]
 
 [vxhd.lib]
 

@@ -1,7 +1,7 @@
 CINI = ..\xbuild.vc9.ini
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = ..\..\library\include;\xHb\include\w32;..\..\..\xedit
+INCLUDEFOLDERS = ..\..\library\include;\xHb\include\w32
 LAUTORUN = .T.
 LDEBUG = .F.
 LGUI = .T.
@@ -44,7 +44,7 @@ MYRC_FLAGS =
 
 [\xhb\lib\vc8\vxh.lib]
 
-[\xhb\lib\vc8\xEditVXH.lib]
+[\xhb\lib\vc8\Editor.lib]
 
 [\xhb\lib\vc8\vxhd.lib]
 

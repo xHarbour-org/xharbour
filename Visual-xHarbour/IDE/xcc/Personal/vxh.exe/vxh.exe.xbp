@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\..\..\include;\xHb\include\w32;..\..\..\..\xedit
+INCLUDEFOLDERS = ..\..\..\include;\xHb\include\w32
 LAUTORUN = .T.
 LDEBUG = .F.
 LGUI = .T.
@@ -42,7 +42,7 @@ MYRC_FLAGS =
 
 [\xhb\lib\professional\vxh.lib]
 
-[xEditVXH.lib]
+[Editor.lib]
 
 [vxhd.lib]
 
@@ -67,4 +67,3 @@ MYRC_FLAGS =
 [libpq.lib]
 
 [oci.lib]
-
