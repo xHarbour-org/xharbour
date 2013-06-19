@@ -4956,7 +4956,7 @@ HB_FUNC( VXH_MAINLOOP )
             {
                if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
                {
-                  if( strcmp( cClass, TEXT("AfxFrameOrView42s") ) > 0 )
+                  if( !( strcmp( cClass, TEXT("AfxFrameOrView42s") ) == 0) )
                   {
                      if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
                      {

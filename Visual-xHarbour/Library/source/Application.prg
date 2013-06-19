@@ -644,6 +644,7 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Run( oWnd ) CLASS Application
+//   LOCAL msg, cClass
    IF oWnd != NIL
       ::MainForm := oWnd
    ENDIF
@@ -651,7 +652,23 @@ METHOD Run( oWnd ) CLASS Application
 
    IF ! ::MainForm:Modal
       VXH_MainLoop( ::MainForm:hWnd, IIF( ::MDIClient == NIL, 0, ::MDIClient ), ::__Accelerators, ::AccelEnabled )
-
+/*
+      DO WHILE GetMessage( @Msg, 0, 0, 0 ) .AND. ! s_lExit .AND. VALTYPE( Self ) == "O" .AND. ::MainForm:IsWindow()
+         cClass := GetClassName( Msg:hWnd )
+         IF !::AxTranslate( Msg, cClass )
+            IF !::TranslateAccelerator( Msg )
+               IF ::MDIClient == NIL .OR. TranslateMDISysAccel( ::MDIClient, Msg ) == 0
+                  IF ! (cClass == "AfxFrameOrView42s") 
+                     IF !IsDialogMessage( GetActiveWindow(), Msg )
+                        TranslateMessage( Msg )
+                        DispatchMessage( Msg )
+                     ENDIF
+                  ENDIF
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDDO
+*/
       ::OnExit()
 
       IF ::__hMenuHook != NIL

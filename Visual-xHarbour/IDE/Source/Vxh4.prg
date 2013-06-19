@@ -14,7 +14,7 @@ static __aProps := {=>}
 #include "commdlg.ch"
 #include "scintilla.ch"
 
-#include "xEditConstants.ch"
+//#include "xEditConstants.ch"
 
 #define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
