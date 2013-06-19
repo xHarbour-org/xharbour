@@ -42,7 +42,7 @@ MYRC_FLAGS =
 
 [vxh.lib]
 
-[Editor.lib]
+[..\..\..\Editor\xcc\Editor.lib.xbp]
 
 [vxhd.lib]
 
