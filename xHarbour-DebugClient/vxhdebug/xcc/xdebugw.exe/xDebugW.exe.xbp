@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\..\..\..\Visual-xHarbour\library\include;..\..\..\..\Visual-xHarbour\xedit;\xhb\include\w32
+INCLUDEFOLDERS = ..\..\..\..\Visual-xHarbour\library\include;\xhb\include\w32
 LAUTORUN = .T.
 LDEBUG = .F.
 LGUI = .T.
@@ -40,7 +40,7 @@ MYRC_FLAGS =
 
 [tproject.lib]
 
-[xEditVXH.lib]
+[Editor.lib]
 
 [ActiveX.lib]
 
