@@ -13,7 +13,7 @@ STATIC cCurFolder
 #include "inkey.ch"
 #include "commdlg.ch"
 #include "fileio.ch"
-#include "xEditConstants.ch"
+//#include "xEditConstants.ch"
 
 //#define VXH
 
@@ -479,6 +479,7 @@ METHOD Init() CLASS MainWindow
             :Dock:Bottom := ::StatusBar1
 
             :Create()
+            :Show()
             :DockIt()
             //:Disable()
          END
@@ -493,7 +494,7 @@ METHOD Init() CLASS MainWindow
    //::Show()
 
 RETURN Self
-
+/*
 CLASS SourceEditor FROM Control
   VAR oEditor
   METHOD Init( oParent ) CONSTRUCTOR
@@ -519,7 +520,7 @@ METHOD Create() CLASS SourceEditor
     ENDIF
   ENDIF
 RETURN Self
-
+*/
 CLASS Project
    ACCESS Application    INLINE __GetApplication()
    ACCESS System         INLINE __GetSystem()
@@ -808,7 +809,7 @@ METHOD CloseSource() CLASS Project
    LOCAL nRes, n := ::Application:SourceTabs:GetCurSel()
 
    nRes := IDNO
-   IF ::Application:SourceEditor:oEditor:lModified
+   IF ::Application:SourceEditor:Source:Modified
       nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:oEditor:cFile, MB_YESNOCANCEL | MB_ICONQUESTION )
       IF nRes == IDCANCEL
          RETURN Self
@@ -820,9 +821,9 @@ METHOD CloseSource() CLASS Project
       ::SaveSource()
    ENDIF
 
-   ::Application:SourceEditor:oEditor:Close()
+   ::Application:SourceEditor:Source:Close()
 
-   n := MIN( n, LEN( xEdit_GetEditors() ) )
+   n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
       ::Application:SourceTabs:SetCurSel( n )
       ::SourceTabChanged(, n )
@@ -911,14 +912,11 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
    ::Application:SourceEditor:Show()
 
-   //Alert( "Open: " + cPath + "->" + cName )
-
-   oEditor := Editor():New( ,,,, cPath + cName, ::Application:SourceEditor:oEditor:oDisplay )
-   oEditor:SetExtension( "prg" )
+   oEditor := Source( ::Application:SourceEditor, cPath + cName )
 
    ::Application:SourceTabs:InsertTab( cName )
-   ::Application:SourceTabs:SetCurSel( LEN( xEdit_GetEditors() ) )
-   ::SourceTabChanged(, LEN( xEdit_GetEditors() ) )
+   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+   ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
 
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
@@ -1043,3 +1041,27 @@ RETURN 0
 
 FUNCTION HB_ResetWith()
 RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION xBuild_GUI_ONERROR()
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION xBuild_GUI_SETERROR()
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION GETLOGERRORS()
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION POPUPEDITOR()
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION XEDITLISTVIEW()
+RETURN .T.
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION __GETPROPERCASE()
+RETURN .T.

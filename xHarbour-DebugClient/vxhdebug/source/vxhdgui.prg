@@ -379,12 +379,12 @@ RETURN Self
 
 METHOD Stop() CLASS XHDebuggerGUI
   ::Super:Stop()
-
-  WITH OBJECT ::oEditor
-    :HighlightedLine := NIL
-    :oDisplay:Display()
-  END
-
+  IF ::oEditor != NIL
+     WITH OBJECT ::oEditor
+       :HighlightedLine := NIL
+       :oDisplay:Display()
+     END
+  ENDIF
   IF ::oApp:ClassName != "DEBUGGER"
      ::oApp:DebuggerPanel:Hide()
      IF ::oApp:IdeActive

@@ -769,11 +769,11 @@ RETURN { "host" => cHost, ;
          "args" => cArgs, ;
          "startpath" => cStartPath }
 
-FUNCTION xBuild_GUI_ONERROR()
-RETURN .T.
+//FUNCTION xBuild_GUI_ONERROR()
+//RETURN .T.
 
-FUNCTION xBuild_GUI_SETERROR()
-RETURN .T.
+//FUNCTION xBuild_GUI_SETERROR()
+//RETURN .T.
 
 FUNCTION xBuild_GUI_RESULTSWINDOW()
 RETURN -1
