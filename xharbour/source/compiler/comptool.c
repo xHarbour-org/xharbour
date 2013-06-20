@@ -804,7 +804,7 @@ void hb_compOutErr( char * szMessage )
 }
 
 
-#ifndef __HB_COMPILER__
+//#ifndef __HB_COMPILER__
 #ifndef hb_xgrab
 void * hb_xgrab( HB_SIZE ulSize )        /* allocates fixed memory, exits on failure */
 {
@@ -948,6 +948,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 }
 #endif
 
+#ifndef hb_xexit
 void hb_xexit( void )
 {
 #ifdef __HB_COMP_TRACE__
@@ -1016,3 +1017,4 @@ void hb_xexit( void )
 #endif
 }
 #endif
+//#endif

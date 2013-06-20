@@ -144,14 +144,36 @@ void * hb_xgrab( HB_SIZE ulSize )
 }
 #endif
 
+#ifndef hb_xgrabEx
+void * hb_xgrabEx( HB_SIZE ulSize, const char *szSource, int iLine, const char *szFunc )
+{
+   return malloc( ( size_t ) ulSize );
+}
+#endif
+
 #ifndef hb_xrealloc
 void * hb_xrealloc( void * pMem, HB_SIZE ulSize )
 {
    return realloc( pMem, ( size_t ) ulSize );
 }
 #endif
+
+#ifndef hb_xreallocEx
+void * hb_xreallocEx( void * pMem, HB_SIZE ulSize, const char *szSource, int iLine, const char *szFunc )
+{
+   return realloc( pMem, ( size_t ) ulSize );
+}
+#endif
+
 #ifndef hb_xfree
 void hb_xfree( void * pMem )
+{
+   free( pMem );
+}
+#endif
+
+#ifndef hb_xfreebEx
+void hb_xfreeEx( void *pMem, const char *szSource, int iLine, const char *szFunc )
 {
    free( pMem );
 }
