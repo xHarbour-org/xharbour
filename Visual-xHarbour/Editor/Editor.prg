@@ -148,7 +148,7 @@ CLASS SourceEditor INHERIT Control
    METHOD ToggleRectSel()
    METHOD GetWithObject()
    METHOD SetColors()
-   METHOD OnSetFocus()                    INLINE ::Application:MainForm:EnableSearchMenu( .T. ), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
+   METHOD OnSetFocus()                    INLINE IIF( ::Application:MainForm:HasMessage("EnableSearchMenu"),::Application:MainForm:EnableSearchMenu( .T. ),), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
 ENDCLASS
 
 METHOD GetEditor( cFile ) CLASS SourceEditor
@@ -517,16 +517,20 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyUp() CLASS SourceEditor
-   LOCAL lSel := ::Source:GetSelLen() > 0
+   LOCAL lSel
+   
+   IF ::Source != NIL
+      lSel := ::Source:GetSelLen() > 0
 
-   ::Application:Project:EditReset()
-   IF ::Application:Props:EditCopyItem:Enabled
+      ::Application:Project:EditReset()
+      IF ::Application:Props:EditCopyItem:Enabled
 
-      ::Application:Props:EditCopyItem:Enabled := lSel
-      ::Application:Props:EditCopyBttn:Enabled := lSel
-      ::Application:Props:EditCutItem:Enabled  := lSel
-      ::Application:Props:EditCutBttn:Enabled  := lSel
-      ::Application:Props:EditDelBttn:Enabled  := lSel
+         ::Application:Props:EditCopyItem:Enabled := lSel
+         ::Application:Props:EditCopyBttn:Enabled := lSel
+         ::Application:Props:EditCutItem:Enabled  := lSel
+         ::Application:Props:EditCutBttn:Enabled  := lSel
+         ::Application:Props:EditDelBttn:Enabled  := lSel
+      ENDIF
    ENDIF
 RETURN NIL
 
@@ -535,154 +539,158 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
    LOCAL nWrap, cCtrl, nVisLine
    (nwParam, nlParam)
-   DO CASE
-      CASE hdr:code == SCN_UPDATEUI
-           scn := (struct SCNOTIFICATION*) nlParam
-           n := ::Source:GetCurrentPos()
-           ::Application:SetEditorPos( ::Source:LineFromPosition(n)+1, ::Source:GetColumn(n)+1 )
+   IF ::Source != NIL
+      DO CASE
+         CASE hdr:code == SCN_UPDATEUI
+              scn := (struct SCNOTIFICATION*) nlParam
+              n := ::Source:GetCurrentPos()
+              ::Application:SetEditorPos( ::Source:LineFromPosition(n)+1, ::Source:GetColumn(n)+1 )
 
-      CASE hdr:code == SCN_MODIFIED
-           scn := (struct SCNOTIFICATION*) nlParam
-           IF ( scn:modificationType & SC_MOD_CHANGEFOLD ) == 0
-              IF ! ::Source:FirstOpen
-                 IF ! ::Source:Modified
-                    ::Source:Modified := .T.
-                    n := aScan( ::aDocs, ::Source,,, .T. )
-                    IF ::Source:TreeItem != NIL
-                       cText := ::Source:TreeItem:Text
-                       IF cText != NIL
-                          cText := ALLTRIM( STRTRAN( cText, "*" ) )
-                          ::Source:TreeItem:Text := cText + " *"
+         CASE hdr:code == SCN_MODIFIED
+              scn := (struct SCNOTIFICATION*) nlParam
+              IF ( scn:modificationType & SC_MOD_CHANGEFOLD ) == 0
+                 IF ! ::Source:FirstOpen
+                    IF ! ::Source:Modified
+                       ::Source:Modified := .T.
+                       n := aScan( ::aDocs, ::Source,,, .T. )
+                       IF ::Source:TreeItem != NIL
+                          cText := ::Source:TreeItem:Text
+                          IF cText != NIL
+                             cText := ALLTRIM( STRTRAN( cText, "*" ) )
+                             ::Source:TreeItem:Text := cText + " *"
+                          ENDIF
+                       ENDIF
+                       IF ! ::Application:Project:Modified
+                          ::Application:Project:Modified := .T.
                        ENDIF
                     ENDIF
-                    IF ! ::Application:Project:Modified
-                       ::Application:Project:Modified := .T.
-                    ENDIF
+                 ENDIF
+                 IF __ObjHasMsg( ::Application:Project, "SetEditMenuItems" )
+                    ::Application:Project:SetEditMenuItems()
                  ENDIF
               ENDIF
-              ::Application:Project:SetEditMenuItems()
-           ENDIF
 
-      CASE hdr:code == SCN_MARGINCLICK
-           scn := (struct SCNOTIFICATION*) nlParam
-           IF scn:margin == MARGIN_SCRIPT_FOLD_INDEX
-              nLine := ::Source:LineFromPosition( scn:position )
-              ::SendMessage( SCI_TOGGLEFOLD, nLine, 0 )
-              ::SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine )
-              ::SendMessage( SCI_GOTOLINE, nLine )
-           ENDIF
-
-      CASE hdr:code == SCN_CHARADDED
-           IF s_CurrentObject != NIL
-              ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
-           ENDIF
-
-           scn := (struct SCNOTIFICATION*) nlParam
-           IF scn:ch == 13 // indent
-              IF ::AutoIndent == 1
-                 ::AutoIndentText()
+         CASE hdr:code == SCN_MARGINCLICK
+              scn := (struct SCNOTIFICATION*) nlParam
+              IF scn:margin == MARGIN_SCRIPT_FOLD_INDEX
+                 nLine := ::Source:LineFromPosition( scn:position )
+                 ::SendMessage( SCI_TOGGLEFOLD, nLine, 0 )
+                 ::SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine )
+                 ::SendMessage( SCI_GOTOLINE, nLine )
               ENDIF
 
-            ELSEIF scn:ch == 58
-              nPosEnd   := ::Source:GetCurrentPos()-1
-              nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
-              cObj := ""
-              FOR n := nPosEnd TO nPosStart STEP -1
-                  nChar := ::Source:GetCharAt(n)
-                  IF nChar == 32
-                     EXIT
-                  ENDIF
-                  cObj := CHR(nChar) + cObj
-                  IF ::Source:GetColumn(n)==0
-                     EXIT
-                  ENDIF
-              NEXT
-              IF cObj == ":" 
-                 nWrap := ::Application:EditorProps:WrapSearch
-                 ::Application:EditorProps:WrapSearch := 0
-                 nPos     := ::SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-                 nVisLine := ::SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
-
-                 cObj := ::GetWithObject()
-
-                 ::Application:EditorProps:WrapSearch := nWrap
-
-                 ::SendMessage( SCI_GOTOPOS, nPos, 0 )
-                 ::SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+         CASE hdr:code == SCN_CHARADDED
+              IF s_CurrentObject != NIL
+                 ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
               ENDIF
-              IF LEN( cObj ) >= 2
-                 IF LEFT(cObj,2) == "::"
-                    IF LEN(cObj) > 2
-                       cObj := "WinForm:"+SUBSTR(cObj,3)
-                     ELSE
-                       cObj := "WinForm"
-                    ENDIF
+
+              scn := (struct SCNOTIFICATION*) nlParam
+              IF scn:ch == 13 // indent
+                 IF ::AutoIndent == 1
+                    ::AutoIndentText()
                  ENDIF
-                 IF cObj[-1] == ":"
-                    cObj := LEFT( cObj, LEN(cObj)-1 )
-                 ENDIF
-                 aObj := hb_aTokens( cObj, ":" )
-                 IF aObj[1] == "WinForm"
-                    oObj := ::Source:Form
-                  ELSE
-                    TRY
-                       oObj := &(aObj[1])
-                    CATCH
-                    END
-                 ENDIF
-                 FOR n := 2 TO LEN( aObj )
-                     TRY
-                        oObj := oObj:&(aObj[n])
-                     CATCH
-                     END
+
+               ELSEIF scn:ch == 58
+                 nPosEnd   := ::Source:GetCurrentPos()-1
+                 nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
+                 cObj := ""
+                 FOR n := nPosEnd TO nPosStart STEP -1
+                     nChar := ::Source:GetCharAt(n)
+                     IF nChar == 32
+                        EXIT
+                     ENDIF
+                     cObj := CHR(nChar) + cObj
+                     IF ::Source:GetColumn(n)==0
+                        EXIT
+                     ENDIF
                  NEXT
-                 
-                 IF VALTYPE(oObj) == "O"
-                    aList := {}
-                      
-                    aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
-                    FOR n := 1 TO LEN( aProperties )
-                        IF ! aProperties[n][1][1] $ "_X"
-                           aProp := __GetProperCase( __Proper( aProperties[n] ) )
-                           AADD( aList, aProp[1]+"?8" )
-                        ENDIF
+                 IF cObj == ":" 
+                    nWrap := ::Application:EditorProps:WrapSearch
+                    ::Application:EditorProps:WrapSearch := 0
+                    nPos     := ::SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+                    nVisLine := ::SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+
+                    cObj := ::GetWithObject()
+
+                    ::Application:EditorProps:WrapSearch := nWrap
+
+                    ::SendMessage( SCI_GOTOPOS, nPos, 0 )
+                    ::SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+                 ENDIF
+                 IF LEN( cObj ) >= 2
+                    IF LEFT(cObj,2) == "::"
+                       IF LEN(cObj) > 2
+                          cObj := "WinForm:"+SUBSTR(cObj,3)
+                        ELSE
+                          cObj := "WinForm"
+                       ENDIF
+                    ENDIF
+                    IF cObj[-1] == ":"
+                       cObj := LEFT( cObj, LEN(cObj)-1 )
+                    ENDIF
+                    aObj := hb_aTokens( cObj, ":" )
+                    IF aObj[1] == "WinForm"
+                       oObj := ::Source:Form
+                     ELSE
+                       TRY
+                          oObj := &(aObj[1])
+                       CATCH
+                       END
+                    ENDIF
+                    FOR n := 2 TO LEN( aObj )
+                        TRY
+                           oObj := oObj:&(aObj[n])
+                        CATCH
+                        END
                     NEXT
 
-                    aMethods := __objGetMethodList( oObj )
-                    //aMethods := __GetMembers( oObj,,HB_OO_CLSTP_SYMBOL, HB_OO_MSG_METHOD )
-                    FOR n := 1 TO LEN( aMethods )
-                        AADD( aList, __Proper( aMethods[n] )+"?7" )
-                    NEXT
+                    IF VALTYPE(oObj) == "O"
+                       aList := {}
 
-                    IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:__hObjects != NIL
-                       FOR EACH cCtrl IN oObj:__hObjects:Keys
-                           IF oObj:__hObjects[ cCtrl ]:Name != NIL
-                              AADD( aList, oObj:__hObjects[ cCtrl ]:Name+"?8" )
+                       aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
+                       FOR n := 1 TO LEN( aProperties )
+                           IF ! aProperties[n][1][1] $ "_X"
+                              aProp := __GetProperCase( __Proper( aProperties[n] ) )
+                              AADD( aList, aProp[1]+"?8" )
                            ENDIF
                        NEXT
-                    ENDIF
 
-                    IF __ObjHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
-                       FOR EACH Topic IN oObj:Events
-                           FOR EACH Event IN Topic[2]
-                               AADD( aList, Event[1]+"?6" )
-                           NEXT
+                       aMethods := __objGetMethodList( oObj )
+                       //aMethods := __GetMembers( oObj,,HB_OO_CLSTP_SYMBOL, HB_OO_MSG_METHOD )
+                       FOR n := 1 TO LEN( aMethods )
+                           AADD( aList, __Proper( aMethods[n] )+"?7" )
                        NEXT
-                    ENDIF
 
-                    aSort( aList,,,{|x, y| x < y})
-                    cList := ""
-                    FOR n := 1 TO LEN( aList )
-                        cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
-                    NEXT
-                    ::SendMessage( SCI_AUTOCSETCANCELATSTART, 0 )
-                    ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
-                    ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
-                    ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+                       IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:__hObjects != NIL
+                          FOR EACH cCtrl IN oObj:__hObjects:Keys
+                              IF oObj:__hObjects[ cCtrl ]:Name != NIL
+                                 AADD( aList, oObj:__hObjects[ cCtrl ]:Name+"?8" )
+                              ENDIF
+                          NEXT
+                       ENDIF
+
+                       IF __ObjHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
+                          FOR EACH Topic IN oObj:Events
+                              FOR EACH Event IN Topic[2]
+                                  AADD( aList, Event[1]+"?6" )
+                              NEXT
+                          NEXT
+                       ENDIF
+
+                       aSort( aList,,,{|x, y| x < y})
+                       cList := ""
+                       FOR n := 1 TO LEN( aList )
+                           cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
+                       NEXT
+                       ::SendMessage( SCI_AUTOCSETCANCELATSTART, 0 )
+                       ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
+                       ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
+                       ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+                    ENDIF
                  ENDIF
               ENDIF
-           ENDIF
-   ENDCASE
+      ENDCASE
+   ENDIF
 RETURN NIL
 
 METHOD GetWithObject() CLASS SourceEditor
