@@ -147,6 +147,10 @@ void * hb_xgrab( HB_SIZE ulSize )
 #ifndef hb_xgrabEx
 void * hb_xgrabEx( HB_SIZE ulSize, const char *szSource, int iLine, const char *szFunc )
 {
+   HB_SYMBOL_UNUSED( szSource );
+   HB_SYMBOL_UNUSED( iLine );
+   HB_SYMBOL_UNUSED( szFunc );
+   
    return malloc( ( size_t ) ulSize );
 }
 #endif
@@ -161,6 +165,10 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )
 #ifndef hb_xreallocEx
 void * hb_xreallocEx( void * pMem, HB_SIZE ulSize, const char *szSource, int iLine, const char *szFunc )
 {
+   HB_SYMBOL_UNUSED( szSource );
+   HB_SYMBOL_UNUSED( iLine );
+   HB_SYMBOL_UNUSED( szFunc );
+
    return realloc( pMem, ( size_t ) ulSize );
 }
 #endif
@@ -175,6 +183,10 @@ void hb_xfree( void * pMem )
 #ifndef hb_xfreebEx
 void hb_xfreeEx( void *pMem, const char *szSource, int iLine, const char *szFunc )
 {
+   HB_SYMBOL_UNUSED( szSource );
+   HB_SYMBOL_UNUSED( iLine );
+   HB_SYMBOL_UNUSED( szFunc );
+
    free( pMem );
 }
 #endif

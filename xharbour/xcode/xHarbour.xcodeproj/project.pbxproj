@@ -201,6 +201,7 @@
 /* Begin PBXFileReference section */
 		6943B11F177291BC0044379C /* gencobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gencobj.c; path = ../source/compiler/gencobj.c; sourceTree = SOURCE_ROOT; };
 		6943B1211772945D0044379C /* pptable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pptable.c; path = ../source/pp/pptable.c; sourceTree = SOURCE_ROOT; };
+		695C26B91774C24D00DD909B /* ChangeLog */ = {isa = PBXFileReference; lastKnownFileType = text; name = ChangeLog; path = ../ChangeLog; sourceTree = "<group>"; };
 		69636DEE177169B600C08CAF /* libCommon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		69636DF617716D4700C08CAF /* expropt1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = expropt1.c; path = ../source/common/expropt1.c; sourceTree = SOURCE_ROOT; };
 		69636DF717716D4700C08CAF /* expropt2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = expropt2.c; path = ../source/common/expropt2.c; sourceTree = SOURCE_ROOT; };
@@ -354,6 +355,7 @@
 		69636DAB177157E200C08CAF = {
 			isa = PBXGroup;
 			children = (
+				695C26B91774C24D00DD909B /* ChangeLog */,
 				69B7887017723B3B005B88B4 /* PP */,
 				69636E1D177171F700C08CAF /* VM */,
 				69636DF517716D1900C08CAF /* Common */,

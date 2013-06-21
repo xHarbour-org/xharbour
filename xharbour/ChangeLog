@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-21 12:57 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/pp/ppgen.c
+    * Unused variables warning
+    
 2013-06-20 12:26 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/compiler/comptool.c
     * Commented an #ifndef __HB_COMPILER__ (I am not yet sure about this :-)
