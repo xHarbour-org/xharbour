@@ -868,26 +868,6 @@ RETURN 0
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
-// Compatibility with xedit for debugger ------------------------------------------------
-FUNCTION xEdit_GetEditors(); RETURN __GetApplication():SourceEditor:aDocs
-
-CLASS Editor 
-   METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay )
-ENDCLASS
-
-METHOD New( nTop, nLeft, nLines, nColumns, cFile, oDisplay ) CLASS Editor 
-   LOCAL oSource := Source( __GetApplication():SourceEditor )
-   (nTop, nLeft, nLines, nColumns, oDisplay)
-   IF ! EMPTY( cFile )
-      oSource:Open( cFile )
-   ENDIF
-RETURN oSource
-
-CLASS EditorDisplay
-   METHOD Display() INLINE NIL
-ENDCLASS
-// --------------------------------------------------------------------------------------
-
 CLASS Source
    ACCESS Application INLINE ::Owner:Application
    DATA pSource   EXPORTED
@@ -914,7 +894,7 @@ CLASS Source
    ACCESS lReadOnly         INLINE ::GetReadOnly()
    ASSIGN lReadOnly(lSet)   INLINE ::SetReadOnly(lSet)
    DATA HighlightedLine     EXPORTED
-   DATA oDisplay            EXPORTED INIT EditorDisplay()
+
    METHOD Load(cFile,cText) INLINE IIF( ! EMPTY(cFile), ::Open(cFile), ::SetText(cText) )
    METHOD GoLine(n)         INLINE ::GoToLine(n-1)
    METHOD Highlight()       INLINE ::HighlightedLine := ::GetCurLine()
