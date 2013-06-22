@@ -635,8 +635,7 @@ RETURN NIL
 
 METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
    (nPrev)
-   ::Application:SourceEditor:oEditor := xEdit_GetEditors()[ nCur ]
-   ::Application:SourceEditor:oEditor:SetDisplay( ::Application:SourceEditor:oEditor:oDisplay, .T. )
+   ::Application:SourceEditor:aDocs[ nCur ]:Select()
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -691,10 +690,10 @@ METHOD Close() CLASS Project
   ENDIF
 
   lRem := .F.
-   FOR n := 1 TO LEN( xEdit_GetEditors() )
-       IF xEdit_GetEditors()[n]:lModified
+   FOR n := 1 TO ::Application:SourceEditor:DocCount
+       IF ::Application:SourceEditor:aDocs[n]:Modified
           IF nRes == NIL
-             oMsg := MsgBoxEx( ::Application:MainWindow, "Save changes to "+xEdit_GetEditors()[n]:cPath+xEdit_GetEditors()[n]:cFile+" before closing?", "Source File", IDI_QUESTION )
+             oMsg := MsgBoxEx( ::Application:MainWindow, "Save changes to "+::Application:SourceEditor:aDocs[n]:cPath+::Application:SourceEditor:aDocs[n]:cFile+" before closing?", "Source File", IDI_QUESTION )
              nRes := oMsg:Result
              IF nRes == 4002 // No to All
                 lRem := .T.
@@ -705,10 +704,10 @@ METHOD Close() CLASS Project
           ENDIF
           SWITCH nRes
              CASE IDYES
-                  IF EMPTY( xEdit_GetEditors()[n]:cFile )
-                     ::SaveSourceAs( xEdit_GetEditors()[n] )
+                  IF EMPTY( ::Application:SourceEditor:aDocs[n]:cFile )
+                     ::SaveSourceAs( ::Application:SourceEditor:aDocs[n] )
                    ELSE
-                     xEdit_GetEditors()[n]:Save()
+                     ::Application:SourceEditor:aDocs[n]:Save()
                   ENDIF
                   EXIT
 
@@ -720,10 +719,10 @@ METHOD Close() CLASS Project
           ENDIF
        ENDIF
 
-       xEdit_GetEditors()[n]:lModified := .F.
+       ::Application:SourceEditor:aDocs[n]:lModified := .F.
        ::Application:SourceTabs:DeleteTab(n)
 
-       xEdit_GetEditors()[n]:Close()
+       ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
 
@@ -788,8 +787,8 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
 
       IF GetSaveFileName( @ofn )
          cFile := Left( ofn:lpstrFile, At( Chr(0), ofn:lpstrFile ) - 1 )
-         n := ASCAN( xEdit_GetEditors(), {|o| o == oEditor} )
-         IF ( x := ASCAN( xEdit_GetEditors(), {|o| o:cPath+o:cFile == cFile } ) ) > 0 .AND. x != n
+         n := ASCAN( ::Application:SourceEditor:aDocs, {|o| o == oEditor} )
+         IF ( x := ASCAN( ::Application:SourceEditor:aDocs, {|o| o:cPath+o:cFile == cFile } ) ) > 0 .AND. x != n
             MessageBox( 0, cFile +" cannot be overwritten because it's being edited, please select another path and / or name", "Save As", MB_ICONEXCLAMATION )
             ::Application:Yield()
             LOOP
@@ -897,7 +896,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
    //Alert( cPath + "->" + cName )
 
-   IF ( n := ASCAN( xEdit_GetEditors(), {|o| o:cPath == cPath .AND. o:cFile == cName } ) ) > 0
+   IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| o:cPath == cPath .AND. o:cFile == cName } ) ) > 0
       // File is open, just re-show
 
       ::Application:SourceTabs:SetCurSel( n )

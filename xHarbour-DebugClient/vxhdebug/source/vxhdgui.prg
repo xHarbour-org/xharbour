@@ -174,17 +174,15 @@ RETURN Self
 
 
 METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
-  LOCAL n := AScan( xEdit_GetEditors(), {|o| Empty( o:cFile ) } )
+  LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|o| Empty( o:cFile ) } )
   IF n == 0
-    ::oEditor := Editor():New( , , , , /*cFile*/, ::oApp:SourceEditor:oEditor:oDisplay )
-    
+    ::oEditor := Source( ::oApp:SourceEditor )
     ::oEditor:TreeItem := ::oApp:FileTree:AddItem( "Unavailable code" )
     ::oEditor:TreeItem:Select()
 
     //::oApp:SourceTabs:InsertTab( "Unavailable code" )
-    //n := Len( xEdit_GetEditors() )
   ENDIF
-  ::oEditor := xEdit_GetEditors()[ n ]
+  ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
   ::oEditor:TreeItem:Select()
 
   //::oApp:SourceTabs:SetCurSel( n )
@@ -449,15 +447,17 @@ METHOD Sync() CLASS XHDebuggerGUI
   //SetActiveWindow( ::oApp:MainWindow:hWnd )
   //SetFocus( ::oApp:MainWindow:hWnd )
 
-  nDocs := Len( xEdit_GetEditors() )
-  IF ( n := AScan( xEdit_GetEditors(), ;
+  nDocs := ::oApp:SourceEditor:DocCount
+
+  IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
                    {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
                         == Lower( cFile ) } ) ) > 0
-    ::oEditor := xEdit_GetEditors()[ n ]
+    ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
 
     //::oApp:SourceTabs:SetCurSel( n )
-    ::oEditor:TreeItem:Select()
-    //::oApp:Project:SourceTabChanged( , n )
+    //::oEditor:TreeItem:Select()
+
+    ::oApp:Project:SourceTabChanged( , n )
 
     IF !::oApp:SourceEditor:IsWindowVisible()
       ::oApp:EditorPage:Select()
@@ -472,7 +472,7 @@ METHOD Sync() CLASS XHDebuggerGUI
     ENDIF
 
     IF File( cFile )
-      ::oEditor := Editor():New( , , , , cFile, ::oApp:SourceEditor:oEditor:oDisplay )
+      ::oEditor := Source( ::oApp:SourceEditor, cFile )
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
@@ -496,11 +496,11 @@ METHOD Sync() CLASS XHDebuggerGUI
         ::oApp:Project:OpenSource( cFile )
 
 
-        nDocs := Len( xEdit_GetEditors() )
-        IF ( n := AScan( xEdit_GetEditors(), ;
+        nDocs := ::oApp:SourceEditor:DocCount
+        IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
                          {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
                               == Lower( cFile ) } ) ) > 0
-          ::oEditor := xEdit_GetEditors()[ n ]
+          ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
 
           IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
             ::oEditor:lReadOnly := .T.
