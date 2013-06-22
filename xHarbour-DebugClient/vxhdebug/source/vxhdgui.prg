@@ -380,7 +380,6 @@ METHOD Stop() CLASS XHDebuggerGUI
   IF ::oEditor != NIL
      WITH OBJECT ::oEditor
        :HighlightedLine := NIL
-       :oDisplay:Display()
      END
   ENDIF
   IF ::oApp:ClassName != "DEBUGGER"
@@ -457,7 +456,7 @@ METHOD Sync() CLASS XHDebuggerGUI
     //::oApp:SourceTabs:SetCurSel( n )
     //::oEditor:TreeItem:Select()
 
-    ::oApp:Project:SourceTabChanged( , n )
+    ::oApp:Project:SourceTabChanged( n )
 
     IF !::oApp:SourceEditor:IsWindowVisible()
       ::oApp:EditorPage:Select()

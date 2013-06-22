@@ -433,7 +433,7 @@ METHOD Init() CLASS MainWindow
             :Dock:Left    := :Parent
             :Dock:Top     := :Parent
             :Dock:Right   := :Parent
-            :OnSelChanged := {|,x,y| ::Application:Project:SourceTabChanged( x,y ) }
+            :OnSelChanged := {|,x,y| ::Application:Project:SourceTabChanged( y ) }
             :Create()
          END
 
@@ -900,7 +900,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
       // File is open, just re-show
 
       ::Application:SourceTabs:SetCurSel( n )
-      ::SourceTabChanged(, n )
+      ::SourceTabChanged( n )
 
       IF !::Application:SourceEditor:IsWindowVisible()
          ::Application:EditorPage:Select()
@@ -915,7 +915,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
    ::Application:SourceTabs:InsertTab( cName )
    ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-   ::SourceTabChanged(, ::Application:SourceEditor:DocCount )
+   ::SourceTabChanged( ::Application:SourceEditor:DocCount )
 
    IF !::Application:SourceEditor:IsWindowVisible()
       ::Application:EditorPage:Select()
