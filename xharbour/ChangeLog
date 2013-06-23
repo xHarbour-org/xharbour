@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-23 01:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/tip/mail.prg
+  * source/tip/sendmail.prg
+  * contrib/tipssl/mail.prg
+  * contrib/tipssl/sendmail.prg
+   ! added new mime types to list of encoding
+
 2013-06-21 12:57 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/pp/ppgen.c
     * Unused variables warning
