@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-06-23 21:50 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/sendmail.prg
+    ! fixed wrong variable name
+
 2013-06-23 01:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/mail.prg
   * source/tip/sendmail.prg

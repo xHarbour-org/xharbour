@@ -419,15 +419,15 @@ ELSEIF cFile LIKE ".+\.talk"
 ELSEIF cFile LIKE ".+\.tbk" 
    RETURN "application/toolbook =" + cFname + cFext
 ELSEIF cFile LIKE ".+\.vmd" 
-   RETURN "application/vocaltec-media-desc=" + cFname + cFex
+   RETURN "application/vocaltec-media-desc=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.vmf" 
-   RETURN "application/vocaltec-media-file=" + cFname + cFex
+   RETURN "application/vocaltec-media-file=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.wri" 
    RETURN "application/write=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.wid" 
    RETURN "application/x-DemoShield =" + cFname + cFext
 ELSEIF cFile LIKE ".+\.rrf" 
-   RETURN "application/x-InstallFromTheWeb=" + cFname + cFex
+   RETURN "application/x-InstallFromTheWeb=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.wis" 
    RETURN "application/x-InstallShield=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.ins" 
@@ -439,9 +439,9 @@ ELSEIF cFile LIKE ".+\.arj"
 ELSEIF cFile LIKE ".+\.asp" 
    RETURN "application/x-asap=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.aab" 
-   RETURN "application/x-authorware-bin =" + cFname + cFex
+   RETURN "application/x-authorware-bin =" + cFname + cFext
 ELSEIF cFile LIKE ".+\.(aam|aas)" 
-   RETURN "application/x-authorware-map =" + cFname + cFex
+   RETURN "application/x-authorware-map =" + cFname + cFext
 ELSEIF cFile LIKE ".+\.bcpio" 
    RETURN "application/x-bcpio=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.vcd" 
@@ -517,7 +517,7 @@ ELSEIF cFile LIKE ".+\.sh"
 ELSEIF cFile LIKE ".+\.shar" 
    RETURN "application/x-shar=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.swf" 
-   RETURN "application/x-shockwave-flash=" + cFname + cFex
+   RETURN "application/x-shockwave-flash=" + cFname + cFext
 ELSEIF cFile LIKE ".+\.spr" 
    RETURN "application/x-sprite =" + cFname + cFext
 ELSEIF cFile LIKE ".+\.sprite" 
