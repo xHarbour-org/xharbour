@@ -73,6 +73,7 @@ METHOD Create() CLASS VrLabel
 
       IF ::lUI
          WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
+            :Transparent := .T.
             :Cargo   := Self
             :Caption := ::Text
             :Left    := ::Left

@@ -43,6 +43,7 @@ METHOD Create() CLASS VrLine
    ENDIF
    #ifndef VRDLL
       WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
+         :Transparent := .T.
          :Cargo     := Self
          :Left      := ::Left
          :Top       := ::Top
