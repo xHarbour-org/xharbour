@@ -134,7 +134,6 @@ CLASS ToolBar INHERIT Control
    METHOD Create()
    METHOD Disableall()
    METHOD Enableall()
-   METHOD __AddNewItemMenuItem()
    METHOD __ChkImageList()
    
    METHOD GetImageList()                     INLINE ::SendMessage( TB_GETIMAGELIST, 0, 0 )
@@ -824,7 +823,7 @@ RETURN nRet
 
 METHOD OpenPopup( hWnd ) CLASS ToolBar
 
-   LOCAL n, oBtn, nAdd, nHeight, hMonitor, mix
+   LOCAL n, oBtn, nHeight, hMonitor, mix
    LOCAL rc := (struct RECT)
    LOCAL pt := (struct POINT)
    LOCAL oItem
@@ -834,22 +833,6 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
       oBtn  := ::aItems[n]
 
       IF oBtn:Menu != NIL .AND. !EMPTY( oBtn:Menu:aItems )
-/*
-         SendMessage( hWnd, TB_GETRECT, oBtn:ID, @rc )
-         pt:x := rc:Left
-         pt:y := rc:Bottom
-         ClientToScreen( hWnd, @pt )
-
-         rcWorkArea := (struct RECT)
-         cBuff := rcWorkArea:Value
-         SystemParametersInfo( SPI_GETWORKAREA, 0, @cBuff, 0 )
-         rcWorkArea:Buffer( cBuff )
-         IF rcWorkArea:right - pt:x < 150
-            pt:x := rc:right
-            pt:y := rc:bottom
-            ClientToScreen( hWnd, @pt )
-         ENDIF
-*/
          SendMessage( hWnd, TB_GETITEMRECT, oBtn:xPosition, @rc )
          pt:x := rc:Left
          pt:y := rc:Bottom
@@ -867,16 +850,6 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
          ENDIF
          oBtn:Menu:Left  := pt:x
          oBtn:Menu:Top   := pt:y
-
-         IF ( nAdd := ASCAN( oBtn:Menu:aItems, {|o| o:Caption == "[ Add New Item ]" } ) ) > 0
-            FOR EACH oItem IN oBtn:Menu:aItems
-                // SUBMENUS [ Add New Item ]
-                IF oItem:Caption != "[ Add New Item ]"
-                   oItem:CheckForDefaultItem()
-                ENDIF
-            NEXT
-         ENDIF
-
 
          oBtn:Menu:Create()
 
@@ -924,11 +897,11 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
          ::oMenu     := NIL
          ::MenuWnd   := NIL
 
-         IF ::lKeyboard .AND. ::__ClassInst != NIL .AND. oBtn:Caption != "[ Add New Item ]"
+         IF ::__ClassInst != NIL
             ::Application:Project:CurrentForm:SelectControl( oBtn, .F. )
             ::Application:ObjectTree:Set( oBtn )
-            SendMessage( ::hWnd, TB_SETHOTITEM, ::nPressed, 0 )
          ENDIF
+         SendMessage( ::hWnd, TB_SETHOTITEM, ::nPressed, 0 )
       ENDIF
    ENDIF
 
@@ -1004,30 +977,6 @@ METHOD MoveMenu( hWnd, lChevron ) CLASS ToolBar
    ENDIF
 
 RETURN 0
-
-//-----------------------------------------------------------------------------------------------
-
-METHOD __AddNewItemMenuItem( oParent ) CLASS ToolBar
-   LOCAL oItem, oSubItem
-
-   oItem := CMenuItem( oParent )
-   oItem:Position := LEN( oItem:Menu:aItems )-2
-   oItem:Caption  := oItem:Name
-
-   oSubItem := CMenuItem()
-   oSubItem:GenerateMember := .F.
-   oSubItem:Init( oItem, .T. )
-
-   oSubItem:Caption   := "[ Add New Item ]"
-   oSubItem:Font:Bold := .T.
-   oSubItem:Default   := .T.
-   oSubItem:Create()
-
-   oItem:Create()
-
-   ::Application:Project:CurrentForm:SelectControl( oItem, .F. )
-   ::Application:Project:Modified := .T.
-RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
@@ -2119,7 +2068,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                ELSEIF oBar:Parent:StatusBar != NIL
                  oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
               ENDIF
-              IF oBar:__ClassInst != NIL .AND. s_oItem != NIL .AND. s_oItem:Caption != "[ Add New Item ]"
+              IF s_oItem != NIL
                  oApp:Project:CurrentForm:SelectControl( s_oItem, .F. )
                  oApp:ObjectTree:Set( s_oItem )
               ENDIF
@@ -2162,12 +2111,6 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
       CASE ms:message == WM_LBUTTONUP
            IF oBar:Chevron == NIL
-              IF oBar:__ClassInst != NIL /*.AND. oBar:nPressed >= 0*/ .AND. s_oItem != NIL
-                 IF s_oItem:Caption == "[ Add New Item ]"
-                    oBar:__AddNewItemMenuItem( s_oItem:Parent )
-                    RETURN 1
-                 ENDIF
-              ENDIF
               oBar:nPressed := -1
             ELSE
               pt:x := LoWord(ms:lparam)
@@ -2215,14 +2158,9 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                     CASE ms:wParam == VK_RETURN
                          IF oBar:hWndHook != NIL .AND. s_oItem != NIL
                             oBar:nPressed := -1
-                            IF s_oItem:Caption != "[ Add New Item ]"
-                               oApp:Project:CurrentForm:SelectControl( s_oItem, .F. )
-                             ELSE
-                               oBar:__AddNewItemMenuItem( s_oItem:Parent )
-                            ENDIF
+                            oApp:Project:CurrentForm:SelectControl( s_oItem, .F. )
                             RETURN 1
                          ENDIF
-
                  ENDCASE
               ENDIF
               DO CASE

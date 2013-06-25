@@ -220,6 +220,7 @@ METHOD ReadArray( cSection ) CLASS IniFile
    ENDIF
 
    IF ! Empty( cEntry )
+      cEntry := STRTRAN( cEntry, chr(0)+chr(0), chr(0) )
       aEntry := hb_aTokens( cEntry, chr(0) )
    ENDIF
 RETURN aEntry

@@ -472,13 +472,12 @@ METHOD Set( oObj ) CLASS ObjectTreeView
    IF oObj:ClsName == "Application"
       //oObj:TreeItem:ImageIndex := ::GetImage( oObj, .T. )
       
-    ELSEIF oObj:Text != "[ Add New Item ]"
+    ELSE
       IF oObj:TreeItem == NIL
          TRY
             oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name, ::GetImage( oObj ) )
             oObj:TreeItem:Cargo := oObj
          CATCH
-            VIEW oObj:Name
          END
        ELSE
          oObj:TreeItem:Text := oObj:Name

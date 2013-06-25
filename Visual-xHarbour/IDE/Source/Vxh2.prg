@@ -95,7 +95,6 @@ CLASS WindowEdit INHERIT WinForm
    METHOD UpdateSelection()
    METHOD EditClickEvent()
    METHOD SelectControl()
-   METHOD AddDefaultMenuItem()
    METHOD StickLeft()
    METHOD StickTop()
    METHOD StickRight()
@@ -254,7 +253,9 @@ METHOD UpdateSelection( nKey, lDes ) CLASS WindowEdit
    DEFAULT lDes TO .T.
    DEFAULT nKey TO -1
    
+   ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
    ::CtrlMask:Clean( , .F., lDes )
+
    IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:hWnd == ::hWnd
     ELSE
       RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
@@ -268,38 +269,34 @@ METHOD SelectControl( oControl ) CLASS WindowEdit
 
    ::InRect    := -1
 
-   IF __ObjHasMsg( oControl, "GetRectangle" )
-      aRect := oControl:GetRectangle()
-      aRect[1] -= 4
-      aRect[2] -= 4
-      aRect[3] += 4
-      aRect[4] += 4
+   IF oControl != NIL
+      IF __ObjHasMsg( oControl, "GetRectangle" )
+         aRect := oControl:GetRectangle()
+         aRect[1] -= 4
+         aRect[2] -= 4
+         aRect[3] += 4
+         aRect[4] += 4
+      ENDIF
+      ::Selected    := { { oControl, aRect, NIL } }
+
+      ::CtrlOldPt := NIL
+      ::InvalidateRect()
+      ::MouseDown := .F.
+
+      ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+
+      ::Application:ObjectManager:ResetProperties( ::Selected )
+      ::Application:EventManager:ResetEvents( ::Selected )
+
+      IF !oControl:ClsName == "CMenuItem"
+         ::UpdateSelection()
+      ENDIF
+
+      IF oControl:ClsName == "VXH_FORM_IDE"
+         ::SelInitPoint := NIL
+         ::SelEndPoint  := NIL
+      ENDIF
    ENDIF
-   ::Selected    := { { oControl, aRect, NIL } }
-
-   ::CtrlOldPt := NIL
-   ::InvalidateRect()
-   ::MouseDown := .F.
-
-   ::CtrlMask:InvalidateRect()
-   ::CtrlMask:UpdateWindow()
-
-   ::Application:ObjectManager:ResetProperties( ::Selected )
-   ::Application:EventManager:ResetEvents( ::Selected )
-
-   IF !oControl:ClsName == "CMenuItem"
-      ::UpdateSelection()
-   ENDIF
-
-   IF oControl:ClsName == "VXH_FORM_IDE"
-      ::SelInitPoint := NIL
-      ::SelEndPoint  := NIL
-   ENDIF
-
-   IF oControl:__xCtrlName IN { "ContextMenu", "ContextStrip" }
-      oControl:Show()
-   ENDIF
-
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -581,39 +578,25 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                oControl := oControl:aItems[n+1]
              ELSE
                oControl:lKeyboard := .T.
-               IF oControl:aItems[n+1]:Caption != "[ Add New Item ]"
-                  IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:__xCtrlName == "CoolMenuItem" 
-                     
-                     IF ::Selected[1][1]:Id==oControl:aItems[n+1]:Id
-                     
-                        oControl:OpenPopup( oControl:hWnd )
-                        RETURN 0
-                      ELSE
-                        SendMessage( oControl:hWnd, TB_SETHOTITEM, -1, 0 )
-                        SendMessage( oControl:hWnd, TB_SETHOTITEM, n, 0 )
-                        oControl := oControl:aItems[n+1]
-                     ENDIF
+               IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:__xCtrlName == "CoolMenuItem" 
+                  
+                  IF ::Selected[1][1]:Id==oControl:aItems[n+1]:Id
+                  
+                     oControl:OpenPopup( oControl:hWnd )
+                     RETURN 0
                    ELSE
+                     SendMessage( oControl:hWnd, TB_SETHOTITEM, -1, 0 )
                      SendMessage( oControl:hWnd, TB_SETHOTITEM, n, 0 )
                      oControl := oControl:aItems[n+1]
                   ENDIF
                 ELSE
-                  ::AddDefaultMenuItem( oControl:aItems[n+1]:Parent )
+                  SendMessage( oControl:hWnd, TB_SETHOTITEM, n, 0 )
+                  oControl := oControl:aItems[n+1]
                ENDIF
             ENDIF
          ENDIF
        ELSEIF oControl:ClsName == "MenuStripItem" .OR. ( oControl:ClsName == "ToolStripButton" .AND. oControl:DropDown > 1 )
          IF oControl:GenerateMember
-            IF ASCAN( oControl:Children, {|o|o:Caption == "[ Add New Item ]" } ) == 0
-               WITH OBJECT MenuStripItem()
-                  :GenerateMember := .F.
-                  :Init( oControl )
-                  :Caption   := "[ Add New Item ]"
-                  :Font:Bold := .T.
-                  :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
-                  :Create()
-               END
-            ENDIF
             ::Selected := { { oControl, aRect, NIL } }
             ::Application:ObjectManager:ResetProperties( ::Selected )
             ::Application:EventManager:ResetEvents( ::Selected )
@@ -621,9 +604,6 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
           ELSE
             EVAL( oControl:Action, oControl )
          ENDIF
-         RETURN 0
-       ELSEIF oControl:ClsName == "ToolStripButton" .AND. oControl:Caption == "[ Add New Item ]" .AND. oControl:Action != NIL
-         EVAL( oControl:Action, oControl )
          RETURN 0
       ENDIF
 
@@ -1331,7 +1311,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
                aSel := ::GetSelRect(.F.,.F.)
 
-               IF aSel[3] >= ::ClientWidth .OR. aSel[1] <= 0 .OR. aSel[4] >= ::ClientHeight .OR. aSel[2] <= 0
+               IF aSel != NIL .AND. ( aSel[3] >= ::ClientWidth .OR. aSel[1] <= 0 .OR. aSel[4] >= ::ClientHeight .OR. aSel[2] <= 0 )
                   ::RedrawWindow( aSel, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
                ENDIF
 
@@ -1867,28 +1847,6 @@ METHOD EditClickEvent() CLASS WindowEdit
    IF LEN( ::Selected ) > 0 .AND. !::CtrlMask:lOrderMode
       ::Application:EventManager:EditEvent( IIF( ::Selected[1][1]:hWnd==::hWnd, "OnLoad", "OnClick" ) )
    ENDIF
-RETURN Self
-
-//----------------------------------------------------------------------------
-
-METHOD AddDefaultMenuItem( oParent ) CLASS WindowEdit
-
-   LOCAL oSubItem, oItem := CoolMenuItem( oParent )
-   oItem:Create( LEN(oParent:Children) )
-
-   ::SelectControl( oItem )
-
-   oSubItem := CMenuItem()
-   oSubItem:GenerateMember := .F.
-   oSubItem:Init( oItem, .T. )
-   
-   oSubItem:Caption   := "[ Add New Item ]"
-   oSubItem:Font:Bold := .T.
-   oSubItem:Default   := .T.
-   oSubItem:Create()
-
-   ::Application:Project:Modified := .T.
-   ::__lModified := .T.
 RETURN Self
 
 //----------------------------------------------------------------------------

@@ -91,6 +91,7 @@ METHOD Init( oOwner ) CLASS Component
       IF oOwner:TreeItem == NIL
          ::Application:ObjectTree:Set( oOwner )
       ENDIF
+      view ::Parent:Name
       ::Application:ObjectTree:Set( Self )
    ENDIF
 RETURN SELF

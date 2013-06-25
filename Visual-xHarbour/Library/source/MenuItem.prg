@@ -17,6 +17,70 @@
 #define MENU_POPUPITEM 14
 //-------------------------------------------------------------------------------------------------------
 
+CLASS MenuItem INHERIT Object
+   DATA hMenu                    EXPORTED
+   DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
+   DATA __lMoveable              EXPORTED INIT .F.
+   DATA __lCopyCut               EXPORTED INIT .F.
+   DATA __IsControl              EXPORTED INIT .T.
+   DATA __lCreateAfterChildren   EXPORTED INIT .F.
+   DATA __IdeImageIndex          EXPORTED INIT 8
+   DATA __TempRect               EXPORTED
+
+   DATA Text                     PUBLISHED
+
+   DATA ID                       EXPORTED
+   DATA Left                     EXPORTED INIT 0
+   DATA Top                      EXPORTED INIT 0
+   DATA Width                    EXPORTED INIT 0
+   DATA Height                   EXPORTED INIT 0
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS MenuItem
+   Super:Init( oParent )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+
+METHOD Create() CLASS MenuItem
+   LOCAL mii := (struct MENUITEMINFO)
+
+   IF IsMenu( ::hMenu )
+      DestroyMenu( ::hMenu )
+   ENDIF
+
+   ::hMenu := CreateMenu()
+view ::Parent:Name
+   DEFAULT ::Id TO ::Form:GetNextControlId()
+
+   DEFAULT ::Text to "-"
+
+   mii:hSubMenu      := ::hMenu
+   mii:cbSize        := mii:SizeOf()
+   mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
+   mii:wID           := ::Id
+   IF ::Caption == "-"
+      mii:fType      := MFT_SEPARATOR
+    ELSE
+      mii:fType      := MFT_STRING
+   ENDIF
+
+   mii:dwTypeData    := ::Text
+
+   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+
+   IF ::__ClassInst != NIL
+      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
+
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 CLASS CMenuItem INHERIT Object
 
    DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
@@ -109,6 +173,7 @@ CLASS CMenuItem INHERIT Object
    METHOD __OnParentSize()       INLINE 0
    METHOD InvalidateRect()       INLINE 0
 
+   METHOD __AddCoolMenuItem()
    METHOD SetSubMenu()
    METHOD SetText()
    METHOD IsMenuItem()
@@ -125,14 +190,14 @@ CLASS CMenuItem INHERIT Object
    METHOD DrawItem()
    METHOD DrawItemText()
    METHOD OnClick()  VIRTUAL
-   METHOD CheckForDefaultItem()
    METHOD Cancel()
+   METHOD __AddMenuItem()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
-   LOCAL n, x
+   LOCAL n
 
    DEFAULT lAdd TO .F.
    DEFAULT nPos TO -1
@@ -168,9 +233,6 @@ METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
          aIns( oParent:Children, ::Position, Self, .T. )
       ENDIF
       n := ::Position
-      IF ( x := ASCAN( ::Menu:aItems, {|o|o:Caption == "[ Add New Item ]"} ) ) > 0
-         n++
-      ENDIF
       aIns( ::Menu:aItems, n, Self, .T. )
      ELSE
       IF !lAdd
@@ -184,7 +246,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS CMenuItem
-   LOCAL oSubMenu, x, n
+   LOCAL oSubMenu, n
 
    IF IsMenu( ::hMenu )
       DestroyMenu( ::hMenu )
@@ -220,20 +282,10 @@ METHOD Create() CLASS CMenuItem
    ::MenuItemInfo:dwTypeData    := ::Caption
    ::MenuItemInfo:hBmpItem      := ::BmpItem
 
-   //::MenuItemInfo:dwItemData   := ARRAYPOINTER( Self ) //::Menu:hMenu
+   n := -1
 
-   n := -1//::Position
-   IF n < 0
-      IF ::__ClassInst != NIL .AND. ::Caption != "[ Add New Item ]"
-         x := ASCAN( ::Menu:aItems, {|o| o:Caption == "[ Add New Item ]" } )
-         n := GetMenuItemCount( ::Menu:hMenu )
-         IF x <= n
-            n--
-         ENDIF
-      ENDIF
-   ENDIF
    InsertMenuItem( ::Menu:hMenu, n, .T., ::MenuItemInfo )
-   //::Position := -1
+
    ::lInserted := .T.
    IF ::Default
       ::SetDefaultItem()
@@ -253,10 +305,15 @@ METHOD Create() CLASS CMenuItem
    NEXT
 
    IF ::__ClassInst != NIL
+      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
 
 RETURN NIL
+
+METHOD __AddMenuItem() CLASS CMenuItem
+   ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "CMenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
@@ -380,29 +437,6 @@ RETURN .F.
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD CheckForDefaultItem() CLASS CMenuItem
-   LOCAL oItem, Item
-
-   FOR EACH Item IN ::aItems
-       IF Item:Caption != "[ Add New Item ]"
-          Item:CheckForDefaultItem()
-       ENDIF
-   NEXT
-   IF ASCAN( ::aItems, {|o| o:Caption == "[ Add New Item ]" } ) == 0
-      oItem := CMenuItem()
-      oItem:GenerateMember := .F.
-      oItem:Init( Self, .T. )
-
-      oItem:Caption := "[ Add New Item ]"
-      oItem:Font:Bold   := .T.
-      oItem:Default := .T.
-      oItem:Create()
-   ENDIF
-
-RETURN NIL
-
-//-----------------------------------------------------------------------------------------------------
-
 METHOD GetMenuById( nId ) CLASS CMenuItem
 
    LOCAL oSubMenu
@@ -452,6 +486,9 @@ METHOD GetMenuByKey( nKey ) CLASS CMenuItem
 
 RETURN NIL
 
+METHOD __AddCoolMenuItem() CLASS CMenuItem
+   ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "CoolMenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------------
 

@@ -492,17 +492,6 @@ METHOD Create() CLASS ToolStrip
    ::Form:SendMessage( WM_SIZE, 0, MAKELONG( ::Form:ClientWidth, ::Form:ClientHeight ) )
 
    ::__nWidth := ::Width
-
-   //IF ::__ClassInst != NIL
-   //   WITH OBJECT ::__DesignAddNew := IIF( !::__lIsMenu, ToolStripButton(), MenuStripItem() )
-   //      :Caption     := "[ Add New Item ]"
-   //      :Init( Self )
-   //      :Events      := {}
-   //      :Font:Bold   := .T.
-   //      :Action      := {|o| o:Parent:__AddToolStripItem( IIF( !::__lIsMenu, "ToolStripButton", "MenuStripItem" ) ) }
-   //      :Create()
-   //   END
-   //ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -1481,7 +1470,7 @@ RETURN Self
 METHOD Create() CLASS ToolStripItem
    LOCAL nLeft
 
-   IF ::__ClassInst != NIL .AND. ::Caption != "[ Add New Item ]" .AND. ::Parent:__DesignAddNew != NIL
+   IF ::__ClassInst != NIL .AND. ::Parent:__DesignAddNew != NIL
       ::Parent:__DesignAddNew:Destroy()
       ::Parent:__DesignAddNew := NIL
    ENDIF
@@ -1505,7 +1494,6 @@ METHOD Create() CLASS ToolStripItem
    Super:Create()
    
    IF ::__xCtrlName == "ToolStripComboBox"
-      //::SelectionHeight := ::Parent:Height - 10
       ::Top := ((::Parent:Height-5) - ::SelectionHeight)/2
    ENDIF
 
@@ -1513,16 +1501,6 @@ METHOD Create() CLASS ToolStripItem
    IF ::__xCtrlName != "ToolStripComboBox"
       ::ShortCutKey:SetAccel()
    ENDIF  
-   //IF ::__ClassInst != NIL .AND. ::Parent:__DesignAddNew == NIL
-   //   WITH OBJECT ::Parent:__DesignAddNew := ToolStripButton()
-   //      :Caption     := "[ Add New Item ]"
-   //      :Init( ::Parent )
-   //      :Font:Bold   := .T.
-   //      :Events      := {}
-   //      :Action      := {|o| o:Parent:__AddToolStripItem( ::ClsName ) }
-   //      :Create()
-   //   END
-   //ENDIF
 
 RETURN Self
 
@@ -2080,31 +2058,11 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __SetSubMenu( Self, hMenu )
-   LOCAL n, mii, oItem
-
-   IF ::__ClassInst != NIL 
-      IF ( n := ASCAN( ::Children, {|o| o:Caption == "[ Add New Item ]"} ) ) > 0
-         oItem := ::Children[n]
-         ADEL( ::Children, n, .T. )
-         AADD( ::Children, oItem )
-      ENDIF
-   ENDIF
+   LOCAL mii, oItem
 
    FOR EACH oItem IN ::Children
        IF oItem:__pObjPtr != NIL
           EXIT
-       ENDIF
-
-       IF ::__ClassInst != NIL .AND. oItem:Caption != "[ Add New Item ]" .AND. ASCAN( oItem:Children, {|o| o:Caption == "[ Add New Item ]"} ) == 0
-          WITH OBJECT MenuStripItem()
-             :Caption   := "[ Add New Item ]"
-             :GenerateMember := .F.
-             :Init( oItem )
-             :Font:Bold := .T.
-             :Events    := {}
-             //:Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
-             :Create()
-          END
        ENDIF
 
        IF LEN( oItem:Children ) > 0
@@ -2471,11 +2429,6 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            EXIT
 
       CASE WM_LBUTTONUP
-           IF s_oCurrMenuItem != NIL .AND. s_oCurrMenuItem:Caption == "[ Add New Item ]"
-              __AddNewMenuItem( s_CurrentObject, s_oCurrMenuItem:Parent )
-              RedrawWindow( hWnd, , , RDW_FRAME | RDW_UPDATENOW | RDW_INTERNALPAINT )
-              RETURN 1
-           ENDIF
            EXIT
 
       CASE WM_SYSKEYDOWN
@@ -2969,13 +2922,6 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
 
    SetBkMode( dis:hDC, TRANSPARENT )
 
-   IF ::__ClassInst != NIL .AND. !::GenerateMember .AND. cText == "[ Add New Item ]"
-      hOldBrush := SelectObject( dis:hDC, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin )
-      Rectangle( dis:hDC, dis:rcItem:Left+24, dis:rcItem:Top+2, dis:rcItem:Right-4, dis:rcItem:Bottom-2 )
-      SelectObject( dis:hDC, hOldBrush )
-      cText := "Add New Item"
-   ENDIF
-   
    dis:rcItem:Left += xIcon
 
    hFont := SelectObject( dis:hDC, ::Font:handle )
@@ -3166,17 +3112,20 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ContextStrip INHERIT Component
-   DATA __hMenu   EXPORTED
-   DATA Left, Top, Width EXPORTED INIT 0
+   DATA __IdeContextMenuItems EXPORTED
+   DATA __hMenu               EXPORTED
+   DATA Left, Top, Width      EXPORTED INIT 0
    DATA ImageList PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
-   METHOD __UpdateWidth()     INLINE NIL // Dummy
    METHOD Create()
-   METHOD __DrawShadow() INLINE NIL
-   METHOD Destroy() INLINE __ReleaseMenu( Self, ::__hMenu ), DestroyMenu( ::__hMenu )
+   METHOD __AddToolStripItem()
+   METHOD __UpdateWidth()     INLINE NIL // Dummy
+   METHOD __DrawShadow()      INLINE NIL
+   METHOD Destroy()           INLINE __ReleaseMenu( Self, ::__hMenu ), DestroyMenu( ::__hMenu )
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::__xCtrlName   TO "ContextStrip"
    DEFAULT ::ComponentType TO "ContextMenu"
@@ -3184,6 +3133,7 @@ METHOD Init( oParent ) CLASS ContextStrip
    Super:Init( oParent )
 RETURN Self
 
+//-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ContextStrip
    LOCAL lpMenuInfo := (struct MENUINFO)
    Super:Create()
@@ -3193,19 +3143,18 @@ METHOD Create() CLASS ContextStrip
    lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::__hMenu, lpMenuInfo )
    ::lCreated := .T.
-   IF ::__ClassInst != NIL
-      WITH OBJECT MenuStripItem()
-         :GenerateMember := .F.
-         :Caption     := "[ Add New Item ]"
-         :Init( Self )
-         :Events      := {}
-         :Font:Bold   := .T.
-         :Create()
-      END
-   ENDIF
    ::hWnd := ::Form:hWnd
+   IF ::__ClassInst != NIL
+      ::__IdeContextMenuItems := { { "&Add MenuStripItem", {|| ::__AddToolStripItem( "MenuStripItem" ) } } }
+   ENDIF
 RETURN Self
 
+//-------------------------------------------------------------------------------------------------------
+METHOD __AddToolStripItem( cType ) CLASS ContextStrip
+   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, cType,,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
 METHOD Show( x, y ) CLASS ContextStrip
    LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
    LOCAL lpMenuInfo := (struct MENUINFO)
@@ -3260,22 +3209,6 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
 
    __InsertMenuStripItem( oParent:__hMenu, oItem:Position-1, .T., mii:fMask, mii:hSubMenu, mii:wID, oItem:Caption, mii:dwItemData, mii:fState )
-
-   WITH OBJECT MenuStripItem()
-      :Caption   := "[ Add New Item ]"
-      :GenerateMember := .F.
-      :Init( oItem )
-      :Font:Bold := .T.
-      :Events    := {}
-      :Create()
-
-      mii := {=>}
-      mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
-      mii:wID           := :Id
-      mii:fState        := MFS_ENABLED
-
-      __InsertMenuStripItem( :__hMenu, -1, .T., mii:fMask, NIL, mii:wID, :Caption, NIL, mii:fState )
-   END
    
    ::Application:Project:Modified := .T.
    ::Form:__lModified := .T.

@@ -165,12 +165,10 @@ METHOD __CreateProperty( cBaseName ) CLASS Object
 
    DEFAULT cBaseName TO ::__xCtrlName
    IF EMPTY( ::xName ) .AND. ::Form != NIL  .AND. ::__xCtrlName != "ToolTip" .AND. ::GenerateMember
-      IF !( ::Caption == "[ Add New Item ]" )
-         n := ::GetControlName( cBaseName )
-         ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
-         IF ::Form:hWnd == ::hWnd
-            ::Application:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
-         ENDIF
+      n := ::GetControlName( cBaseName )
+      ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
+      IF ::Form:hWnd == ::hWnd
+         ::Application:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
       ENDIF
    ENDIF
 RETURN SELF

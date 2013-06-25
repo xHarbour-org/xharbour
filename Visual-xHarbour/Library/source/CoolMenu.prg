@@ -26,6 +26,7 @@
 #define MBM_POPUPMENU  (WM_USER + 1801)
 
 #define SM_CXSHADOW 4
+#define DG_ADDCONTROL             1
 //-------------------------------------------------------------------------------------------------------
 
 CLASS CoolMenu INHERIT ToolBar
@@ -89,23 +90,9 @@ METHOD Create() CLASS CoolMenu
    ENDIF
 
    IF ::__ClassInst != NIL
-      ::__IdeContextMenuItems := { { "&Delete", {|| ::Application:ObjectManager:ActiveObject:Destroy(),;
-                                                    ::Application:Project:Modified := .T. } }}
-
-      // Loading CoolMenu BAR we need the [ Add New Item ] option for bar level Items
-      WITH OBJECT CoolMenuItem()
-         :GenerateMember := .F.
-         :Init( Self,,.F. )
-         :Cargo   := ::Parent
-         :Caption := "[ Add New Item ]"
-         :Action  := {|o| o:Cargo:AddDefaultMenuItem( o:Parent ) }
-         :Create()
-      END
-   ENDIF
-   IF ::__ClassInst != NIL
       ::Application:ObjectTree:Set( Self )
+      ::__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "CoolMenuItem",,,1, {}, } }, ::Application:Project:aUndo ) } } }
    ENDIF
-
 RETURN SELF
 
 //-------------------------------------------------------------------------------------------------------
@@ -152,38 +139,6 @@ METHOD OnSysKeyUp( nwParam, nlParam ) CLASS Coolmenu
    ENDIF
 RETURN NIL
 
-//-----------------------------------------------------------------------------------------------
-/*
-METHOD OnKeyDown( nwParam, nlParam ) CLASS CoolMenu
-   LOCAL n
-
-   DO CASE
-      CASE nwParam == 13
-           ::PostMessage( WM_KEYDOWN, VK_DOWN )
-           RETURN 0
-
-      CASE nwParam == VK_DOWN
-           ::nPressed := ::SendMessage( TB_GETHOTITEM )
-           ::lKeyboard := .T.
-           ::OpenPopup( ::hWnd )
-           RETURN 0
-
-      CASE nwParam == 27
-           SetFocus( IIF( ::PrevFoc!=NIL, ::PrevFoc, ::Parent:hWnd ) )
-           RETURN 0
-
-      CASE nwParam == VK_DELETE
-           IF ::__ClassInst != NIL .AND. ( n := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1 ) > 0
-              IF ::aItems[ n ]:Caption != "[ Add New Item ]"
-                 ::aItems[ n ]:Delete()
-                 ::Application:Project:CurrentForm:SelectControl( ::Application:Project:CurrentForm )
-                 ::Application:Project:Modified := .T.
-              ENDIF
-           ENDIF
-
-   ENDCASE
-RETURN NIL
-*/
 //-------------------------------------------------------------------------------------------------------
 
 METHOD OnMenuChar( nwParam, nlParam ) CLASS CoolMenu
@@ -385,14 +340,15 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA TreeItem              EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Create()
+   METHOD __AddCoolMenuItem()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CoolMenuItem
    LOCAL oSubItem
    IF oParent:__ClassInst != NIL .AND. oParent:__xCtrlName == "CoolMenuItem"
-      oSubItem:CMenuItem()
-      oSubItem:GenerateMember := .F.
-      oSubItem:Init( oParent )
+      oSubItem := CMenuItem( oParent )
+      oSubItem:Caption := oSubItem:Name
+      oSubItem:__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| oSubItem:__AddCoolMenuItem() } } }
       RETURN oSubItem
    ENDIF
    ::IsMenuItem   := .T.
@@ -410,47 +366,29 @@ METHOD Init( oParent ) CLASS CoolMenuItem
 RETURN Self
 
 METHOD Create( nPos ) CLASS CoolMenuItem
-   LOCAL oSubItem, lAddDefault := .F.
-
    DEFAULT ::xCaption TO ::Name
-
-   IF nPos == NIL .AND. ( ASCAN( ::Parent:aItems, {|o|o:Caption == "[ Add New Item ]"} ) ) > 0
-      nPos := LEN( ::Parent:aItems )-1
-      lAddDefault := .T.
-   ENDIF
-
    DEFAULT nPos TO -1
+
    ::Super:Create(nPos)
 
-   IF ::Caption != "[ Add New Item ]"
-      IF ::__ClassInst != NIL
-         ::__IdeContextMenuItems := { { "&Delete", {|| ::Application:ObjectManager:ActiveObject:Destroy(),;
-                                                       ::Application:Project:Modified := .T. } }}
+   IF ::SetChildren
+      IF nPos < 0
+         AADD( ::Parent:Children, Self )
+       ELSE
+         AINS( ::Parent:Children, nPos+1, Self, .T. )
       ENDIF
-      IF ::SetChildren
-         IF nPos < 0
-            AADD( ::Parent:Children, Self )
-          ELSE
-            AINS( ::Parent:Children, nPos+1, Self, .T. )
-         ENDIF
-      ENDIF
-
-      IF lAddDefault
-         oSubItem := CMenuItem()
-         oSubItem:GenerateMember := .F.
-         oSubItem:Init( Self, .T. )
-         oSubItem:Caption   := "[ Add New Item ]"
-         oSubItem:Font:Bold := .T.
-         oSubItem:Default   := .T.
-         oSubItem:Create()
-      ENDIF
-
    ENDIF
+
    IF ::Parent:Owner != NIL
       ::Parent:Owner:SetChevron()
    ENDIF
    IF ::__ClassInst != NIL
       ::Application:ObjectTree:Set( Self )
+      ::__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| ::__AddCoolMenuItem() } } }
    ENDIF
 RETURN Self
 
+//-------------------------------------------------------------------------------------------------------
+METHOD __AddCoolMenuItem() CLASS CoolMenuItem
+   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "CoolMenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self

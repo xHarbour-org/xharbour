@@ -72,8 +72,6 @@ METHOD Create() CLASS MDIChildWindow
       ::__oCoolMenu := ::Parent:Parent:Children[n]
       IF ASCAN( ::__oCoolMenu:aItems, {|o| o:MDIMenu == .T. } ) == 0
          
-         //( ASCAN( ::Parent:aItems, {|o|o:Caption == "[ Add New Item ]"} ) ) > 0
-         
          FOR n := 1 TO len( ::__oCoolMenu:aItems )
              cText := UPPER( ::__oCoolMenu:aItems[n]:Caption )
              IF "HELP" IN cText

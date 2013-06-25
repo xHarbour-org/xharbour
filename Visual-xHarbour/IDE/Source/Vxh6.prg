@@ -75,16 +75,16 @@ METHOD Init( oParent ) CLASS ToolBox
       WITH OBJECT ::ContextMenu := ContextMenu( Self )
          :Create()
          WITH OBJECT CMenuItem( :this )
-            :Caption := "Add Custom Control"
+            :Text := "Add Custom Control"
             :Action  := {|| ::AddCustomControls(lPro) }
             :Create()
          END
          WITH OBJECT CMenuItem( :this )
-            :Caption := "-"
+            :Text := "-"
             :Create()
          END
          WITH OBJECT CMenuItem( :this )
-            :Caption := "Delete Custom Control"
+            :Text := "Delete Custom Control"
             :Action  := {|| ::DeleteCustomControls(lPro) }
             :Create()
          END
@@ -184,6 +184,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[4][2], { "NotifyIcon", .T. } )
    AADD( ::aButtons[4][2], { "ContextStrip", lPro } )
    AADD( ::aButtons[4][2], { "SerialPort", lPro } )
+   AADD( ::aButtons[4][2], { "MenuBar", .T. } )
    AADD( ::aButtons[4][2], { "MemoryTable", lPro } )
    AADD( ::aButtons[4][2], { "FtpClient", lPro } )
    AADD( ::aButtons[4][2], { "ServiceController", lPro } )
@@ -295,7 +296,7 @@ METHOD FindItem( cText ) CLASS ToolBox
    LOCAL n, i
    FOR n := 2 TO LEN( ::Items )
        FOR i := 1 TO LEN( ::Items[n]:Items )
-           IF ::Items[n]:Items[i]:Caption == cText
+           IF ::Items[n]:Items[i]:Text == cText
               RETURN ::Items[n]:Items[i]
            ENDIF
        NEXT
@@ -318,7 +319,7 @@ RETURN Self
 
 METHOD DeleteCustomControls() CLASS ToolBox
    LOCAL n, oPtr
-   IF ( n := ASCAN( ::Application:CControls, {|c| UPPER( STRTRAN( SplitFile(c)[2], ".xfm" ) ) == UPPER( ::SelectedItem:Caption ) } ) ) > 0
+   IF ( n := ASCAN( ::Application:CControls, {|c| UPPER( STRTRAN( SplitFile(c)[2], ".xfm" ) ) == UPPER( ::SelectedItem:Text ) } ) ) > 0
       ADEL( ::Application:CControls, n, .T. )
       oPtr := ::SelectedItem:PointerItem
       ::SelectedItem:Delete()
@@ -478,7 +479,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
       nBack := ::System:CurrentScheme:MenuItemSelected
    ENDIF
 
-   cText := oItem:Caption
+   cText := oItem:Text
    SetBkColor( hDC, nBack )
    SetTextColor( hDC, nFore )
 
@@ -564,7 +565,7 @@ RETURN 0
 METHOD OnSelChanged( oItem ) CLASS ToolBox
    IF ::Enabled .AND. LEN( oItem:Items ) == 0
       IF !oItem:Cargo
-         ::Form:MessageBox( oItem:Caption + " is reserved for versions Professional and Enterprise", "Version", MB_ICONINFORMATION )
+         ::Form:MessageBox( oItem:Text + " is reserved for versions Professional and Enterprise", "Version", MB_ICONINFORMATION )
          IF ::PreviousItem != NIL
             ::PreviousItem:Select()
           ELSE
@@ -740,7 +741,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
          oControl:Top     := y
 
          IF aProps == NIL
-            oControl:Caption := oControl:Name
+            oControl:Text := oControl:Name
          ENDIF
          TRY
             oControl:ToolTip := NIL
@@ -765,7 +766,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
                  oBand:Create()
 
             CASE cName == "ListView"
-                 oControl:Caption := NIL
+                 oControl:Text := NIL
                  IF !EMPTY( aProps )
                     SetCtrlProps( oControl, aProps )
                  ENDIF
@@ -793,25 +794,10 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
                  ENDIF
                  oControl:Create()
 
-                 IF oControl:ClsName == "MenuStripItem"
-                    WITH OBJECT MenuStripItem()
-                       :GenerateMember := .F.
-                       :Init( oControl )
-                       :Caption   := "[ Add New Item ]"
-                       :Font:Bold := .T.
-                       :Action    := {|o| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., o:Parent, "MenuStripItem",,,1, {}, } }, ::Application:Project:aUndo ) }
-                       :Create()
-                    END
-                 ENDIF
          ENDCASE
-         //TRY
-         //   SetParent( oControl:hWnd, oParent:hWnd )
-         // catch
-         //END
          oControl:InvalidateRect()
 
        ELSE
-         //::Application:Components:Show()
          IF cName == "ImageList" .AND. oControl:Handle == NIL
             IF !EMPTY( aProps )
                SetCtrlProps( oControl, aProps )
@@ -820,8 +806,6 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
           ELSEIF cName == "ContextStrip"
             oControl:Create()
          ENDIF
-
-         //oCmpBtn := ::Application:Components:AddButton( oControl )
       ENDIF
 
       // Restore Mouse Pointer
@@ -843,7 +827,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       IF oCmpBtn != NIL .AND. lSelect
          oCmpBtn:Select()
       ENDIF
-      ::Application:Props:StatusBarPos:Caption := ""
+      ::Application:Props:StatusBarPos:Text := ""
       IF ::Application:Props[ "PointerBttn" ]:Checked
          ::Application:Project:CurrentForm:CtrlMask:SetMouseShape( 0 )
       ENDIF

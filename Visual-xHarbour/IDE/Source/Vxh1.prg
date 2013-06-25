@@ -208,8 +208,8 @@ METHOD Init( ... ) CLASS IDE
 
    IF ::Running
       IF cFile != NIL
-         aEntries := ::IniFile:GetEntries( "Recent" )
-         AEVAL( aEntries, {|c| ::Application:IniFile:DelEntry( "Recent", c ) } )
+         aEntries := ::IniFile:GetSectionEntries( "Recent", .T. )
+
          IF ( n := ASCAN( aEntries, {|c| c == cFile } ) ) > 0
             ADEL( aEntries, n, .T. )
          ENDIF
@@ -217,7 +217,7 @@ METHOD Init( ... ) CLASS IDE
          IF LEN( aEntries )>=20
             ASIZE( aEntries, 20 )
          ENDIF
-         AEVAL( aEntries, {|c| ::Application:IniFile:WriteString( "Recent", c, "" ) } )
+         ::Application:IniFile:Write( "Recent", aEntries )
 
          // RestorePrevInstance parameter is a message to be posted to the main window
          // of the previous instance. I pass WM_USER + 3003 to compare previous attempt
@@ -268,7 +268,7 @@ METHOD Init( ... ) CLASS IDE
    ::CControls := {}
 
    #ifdef VXH_ENTERPRISE
-      ::CControls := ::IniFile:GetEntries( "CustomControls" )
+      ::CControls := ::IniFile:GetSectionEntries( "CustomControls", .T. )
       FOR n := 1 TO LEN( ::CControls )
           IF !FILE( ::CControls[n] )
              ADEL( ::CControls, n, .T. )
@@ -429,10 +429,7 @@ METHOD OnClose() CLASS IDE_MainForm
 
       ::Application:IniFile:WriteNumber( "General", "DisableWhenRunning", IIF( ::Application:DisableWhenRunning, 1, 0 ) )
 
-      ::Application:IniFile:DelSection( "CustomControls" )
-      FOR n := 1 TO LEN( ::Application:CControls )
-          ::Application:IniFile:WriteString( "CustomControls", ::Application:CControls[n], "" )
-      NEXT
+      ::Application:IniFile:Write( "CustomControls", ::Application:CControls )
    CATCH
    END
 
@@ -495,7 +492,7 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS IDE_MainForm
 
       CASE nMsg == WM_USER + 3003
            // From BROADCAST message in ::Application:RestorePrevInstance()
-           aEntries := ::Application:IniFile:GetEntries( "Recent" )
+           aEntries := ::Application:IniFile:GetSectionEntries( "Recent", .T. )
            IF LEN( aEntries ) > 0
               ::Application:Project:Open( aEntries[1] )
            ENDIF
@@ -3526,6 +3523,8 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
 
    ::CurrentForm:Parent:UpdateScroll()
 
+   ::CurrentForm:CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+
    ::Application:MainForm:PostMessage( WM_USER + 3001, hTree )
 
 RETURN 0
@@ -5286,102 +5285,99 @@ FUNCTION AddResources( cExe, aResources )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent, nID ) CLASS Project
+METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
    LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
    ( cColon )
-   ( nID )
-   IF oCtrl:Caption != "[ Add New Item ]"
-      IF !oCtrl:__CustomOwner
-         cText := SPACE( nTab ) + "WITH OBJECT ( " + IIF( oCtrl:ClassName == "CUSTOMCONTROL", UPPER( oCtrl:__xCtrlName ), oCtrl:ClassName ) + "( " + cParent + " ) )" + CRLF
+   IF !oCtrl:__CustomOwner
+      cText := SPACE( nTab ) + "WITH OBJECT ( " + IIF( oCtrl:ClassName == "CUSTOMCONTROL", UPPER( oCtrl:__xCtrlName ), oCtrl:ClassName ) + "( " + cParent + " ) )" + CRLF
 
-         cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
+      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
 
-         IF !Empty( oCtrl:Events )
-            FOR EACH Topic IN oCtrl:Events
-                FOR EACH Event IN Topic[2]
-                    IF ! EMPTY( Event[2] )
-                       AADD( aChildEvents, Event[2] )
-                       cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
-                    ENDIF
-                NEXT
-            NEXT
-         ENDIF
-
-         IF !oCtrl:__lCreateAfterChildren
-            cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
-            IF oCtrl:ClsName == "AtlAxWin"
-               ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
-               cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
-            ENDIF
-         ENDIF
-
-         n := 1
-         cChild := ""
-         FOR EACH oChild IN oCtrl:Children
-             IF oChild:__xCtrlName != "DataGridHeader"
-                cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":", ":this", n )
-             ENDIF
-             n++
+      IF !Empty( oCtrl:Events )
+         FOR EACH Topic IN oCtrl:Events
+             FOR EACH Event IN Topic[2]
+                 IF ! EMPTY( Event[2] )
+                    AADD( aChildEvents, Event[2] )
+                    cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
+                 ENDIF
+             NEXT
          NEXT
-
-         IF !oCtrl:ClassName == "CUSTOMCONTROL"
-            cProp += cChild
-         ENDIF
-
-         IF oCtrl:__lCreateAfterChildren
-            cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
-            IF oCtrl:ClsName == "AtlAxWin"
-               ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
-               cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
-            ENDIF
-         ENDIF
-
-         cText += cProp + SPACE( nTab ) + "END //" + oCtrl:ClassName + CRLF + CRLF
-
-         IF oCtrl:ClassName == "CUSTOMCONTROL"
-            cText += cChild
-         ENDIF
-
-       ELSE
-         cText := SPACE( nTab ) + "WITH OBJECT ::" + IIF( oCtrl:__OriginalName == NIL, oCtrl:Name, oCtrl:__OriginalName ) + CRLF
-         cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
-
-         IF !Empty( oCtrl:Events )
-            FOR EACH Topic IN oCtrl:Events
-                FOR EACH Event IN Topic[2]
-                    IF ! EMPTY( Event[2] )
-                        AADD( aChildEvents, Event[2] )
-                        cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
-                    ENDIF
-                NEXT
-            NEXT
-         ENDIF
-
-         IF EMPTY( cProp )
-            cText := ""
-          ELSE
-            cText += cProp
-            n := 1
-
-            FOR EACH oChild IN oCtrl:Children
-                IF oChild:__xCtrlName != "DataGridHeader" .AND. !oChild:__CustomOwner
-                   cText += ::GenerateChild( oChild, nTab+3, @aChildEvents, ":", ":this", n )
-                ENDIF
-                n++
-            NEXT
-
-            cText += SPACE( nTab ) + "END //" + oCtrl:ClassName + CRLF + CRLF
-         ENDIF
-
-         n := 1
-         FOR EACH oChild IN oCtrl:Children
-             IF oChild:__xCtrlName != "DataGridHeader" .AND. oChild:__CustomOwner
-                cText += ::GenerateChild( oChild, nTab, @aChildEvents, ":", ":this", n )
-             ENDIF
-             n++
-         NEXT
-
       ENDIF
+
+      IF !oCtrl:__lCreateAfterChildren
+         cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
+         IF oCtrl:ClsName == "AtlAxWin"
+            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
+            cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
+         ENDIF
+      ENDIF
+
+      n := 1
+      cChild := ""
+      FOR EACH oChild IN oCtrl:Children
+          IF oChild:__xCtrlName != "DataGridHeader"
+             cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":", ":this", n )
+          ENDIF
+          n++
+      NEXT
+
+      IF !oCtrl:ClassName == "CUSTOMCONTROL"
+         cProp += cChild
+      ENDIF
+
+      IF oCtrl:__lCreateAfterChildren
+         cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
+         IF oCtrl:ClsName == "AtlAxWin"
+            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
+            cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
+         ENDIF
+      ENDIF
+
+      cText += cProp + SPACE( nTab ) + "END //" + oCtrl:ClassName + CRLF + CRLF
+
+      IF oCtrl:ClassName == "CUSTOMCONTROL"
+         cText += cChild
+      ENDIF
+
+    ELSE
+      cText := SPACE( nTab ) + "WITH OBJECT ::" + IIF( oCtrl:__OriginalName == NIL, oCtrl:Name, oCtrl:__OriginalName ) + CRLF
+      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
+
+      IF !Empty( oCtrl:Events )
+         FOR EACH Topic IN oCtrl:Events
+             FOR EACH Event IN Topic[2]
+                 IF ! EMPTY( Event[2] )
+                     AADD( aChildEvents, Event[2] )
+                     cProp += SPACE( nTab+3 ) + ":EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
+                 ENDIF
+             NEXT
+         NEXT
+      ENDIF
+
+      IF EMPTY( cProp )
+         cText := ""
+       ELSE
+         cText += cProp
+         n := 1
+
+         FOR EACH oChild IN oCtrl:Children
+             IF oChild:__xCtrlName != "DataGridHeader" .AND. !oChild:__CustomOwner
+                cText += ::GenerateChild( oChild, nTab+3, @aChildEvents, ":", ":this", n )
+             ENDIF
+             n++
+         NEXT
+
+         cText += SPACE( nTab ) + "END //" + oCtrl:ClassName + CRLF + CRLF
+      ENDIF
+
+      n := 1
+      FOR EACH oChild IN oCtrl:Children
+          IF oChild:__xCtrlName != "DataGridHeader" .AND. oChild:__CustomOwner
+             cText += ::GenerateChild( oChild, nTab, @aChildEvents, ":", ":this", n )
+          ENDIF
+          n++
+      NEXT
+
    ENDIF
 RETURN cText
 
@@ -5564,7 +5560,8 @@ RETURN cText
 METHOD ResetQuickOpen( cFile ) CLASS Project
    LOCAL lMems, aEntries, n, oItem, nBkHeight, oLink, x, lLink := .T.
 
-   aEntries := ::Application:IniFile:GetEntries( "Recent" )
+   aEntries := ::Application:IniFile:GetSectionEntries( "Recent", .T. )
+
    IF ! EMPTY( aEntries ) .AND. cFile != NIL .AND. aEntries[1] == cFile
       RETURN NIL
    ENDIF
@@ -5591,7 +5588,6 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
    // Reset StartPage and Open Dropdown menu
 
    FOR n := 1 TO LEN( aEntries )
-       ::Application:IniFile:WriteString( "Recent", aEntries[n], "" )
 
        WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
           IF :Children == NIL .OR. LEN( :Children ) < n
@@ -5629,6 +5625,8 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
           lLink := .F.  
        ENDIF
    NEXT
+
+   ::Application:IniFile:Write( "Recent", aEntries )
 
    ::Application:GenerateMembers := lMems
 
