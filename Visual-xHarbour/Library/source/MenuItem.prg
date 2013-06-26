@@ -36,9 +36,13 @@ CLASS MenuItem INHERIT Object
    DATA Height                   EXPORTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
+   METHOD InvalidateRect() INLINE NIL
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuItem
+   ::Parent      := oParent
+   ::ClsName     := "MenuItem"
+   ::__xCtrlName := "MenuItem"
    Super:Init( oParent )
 RETURN Self
 
@@ -52,7 +56,7 @@ METHOD Create() CLASS MenuItem
    ENDIF
 
    ::hMenu := CreateMenu()
-view ::Parent:Name
+
    DEFAULT ::Id TO ::Form:GetNextControlId()
 
    DEFAULT ::Text to "-"
@@ -61,7 +65,7 @@ view ::Parent:Name
    mii:cbSize        := mii:SizeOf()
    mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
    mii:wID           := ::Id
-   IF ::Caption == "-"
+   IF ::Text == "-"
       mii:fType      := MFT_SEPARATOR
     ELSE
       mii:fType      := MFT_STRING
@@ -69,7 +73,7 @@ view ::Parent:Name
 
    mii:dwTypeData    := ::Text
 
-   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+   view InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
 
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }

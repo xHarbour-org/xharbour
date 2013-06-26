@@ -212,12 +212,13 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDown( nwParam,x,y,hWnd) CLASS CoolMenu
+METHOD OnLButtonDown( nwParam,x,y ) CLASS CoolMenu
    LOCAL n
    (x)
    (y)
    IF nwParam != -1
-      n := SendMessage( hWnd, TB_GETHOTITEM, 0, 0 )
+      SetFocus( ::hWnd )
+      n := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )
      ELSE
       n := 0
       ::nPressed := -1
@@ -230,7 +231,7 @@ METHOD OnLButtonDown( nwParam,x,y,hWnd) CLASS CoolMenu
          ::nPressed := n
          ::lKeyboard:= .F.
          ::SelPopup := .F.
-         ::OpenPopup( hWnd )
+         ::OpenPopup( ::hWnd )
          RETURN 0
       ENDIF
    ENDIF

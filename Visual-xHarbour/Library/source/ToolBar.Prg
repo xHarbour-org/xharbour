@@ -889,7 +889,7 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
 
          SendMessage( hWnd, TB_PRESSBUTTON, oBtn:Id, MAKELONG(0,0) )
          
-         ::Parent:PostMessage( WM_USER+3026, 0, ::oMenu:hMenu )
+//         ::Parent:PostMessage( WM_USER+3026, 0, ::oMenu:hMenu )
          //DestroyMenu( ::oMenu:hMenu )
 
          oBtn:Menu:Destroy()
@@ -897,10 +897,6 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
          ::oMenu     := NIL
          ::MenuWnd   := NIL
 
-         IF ::__ClassInst != NIL
-            ::Application:Project:CurrentForm:SelectControl( oBtn, .F. )
-            ::Application:ObjectTree:Set( oBtn )
-         ENDIF
          SendMessage( ::hWnd, TB_SETHOTITEM, ::nPressed, 0 )
       ENDIF
    ENDIF
@@ -1244,7 +1240,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                  ::Form:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
               ENDIF
            ENDIF
-
+view ::nPressed
            IF ::__MenuBar .AND. ::nPressed < 0
 
               IF Nmtb:dwFlags & HICF_ACCELERATOR != 0
@@ -2068,10 +2064,6 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                ELSEIF oBar:Parent:StatusBar != NIL
                  oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
               ENDIF
-              IF s_oItem != NIL
-                 oApp:Project:CurrentForm:SelectControl( s_oItem, .F. )
-                 oApp:ObjectTree:Set( s_oItem )
-              ENDIF
             ELSE
               IF oBar:Parent:StatusBar != NIL
                  n := ASCAN( oBar:Chevron:aItems, {|o|o:Id == LoWord( ms:wParam ) } )
@@ -2143,9 +2135,6 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                           RETURN 1
                        ENDIF
                     ENDIF
-      //            ELSEIF oBar:nPressed >= 0
-      //              oBar:nPressed := -1
-      //              oApp:__CurCoolMenu := NIL
                  ENDIF
               ENDIF
            ENDIF
@@ -2158,7 +2147,6 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                     CASE ms:wParam == VK_RETURN
                          IF oBar:hWndHook != NIL .AND. s_oItem != NIL
                             oBar:nPressed := -1
-                            oApp:Project:CurrentForm:SelectControl( s_oItem, .F. )
                             RETURN 1
                          ENDIF
                  ENDCASE

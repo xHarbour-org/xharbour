@@ -579,7 +579,7 @@ METHOD OnPaint() CLASS ControlMask
    IF !::lOrderMode .AND. ::Application:CurCursor == NIL
       SelectObject( hDC, GetStockObject( WHITE_BRUSH ) )
       FOR EACH aControl IN ::CurForm:Selected
-          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"CMENUITEM", "MENUSTRIPITEM"}
+          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"}
              aPoints := ::CurForm:GetPoints( aControl[1] )
 
              FOR x := 1 TO LEN( aPoints )

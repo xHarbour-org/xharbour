@@ -288,7 +288,7 @@ METHOD SelectControl( oControl ) CLASS WindowEdit
       ::Application:ObjectManager:ResetProperties( ::Selected )
       ::Application:EventManager:ResetEvents( ::Selected )
 
-      IF !oControl:ClsName == "CMenuItem"
+      IF ! UPPER(oControl:ClsName) IN {"MENUITEM", "CMENUITEM" }
          ::UpdateSelection()
       ENDIF
 
@@ -765,7 +765,7 @@ METHOD GetSelRect( lPure, lMask, lConvert ) CLASS WindowEdit
    LOCAL aControl, aRect, nLeft, nTop, nRight, nBottom, aPoints
 
    FOR EACH aControl IN ::Selected
-       IF aControl[1]:Parent != NIL .AND. ! aControl[1]:ClassName IN {"CMENUITEM", "MENUSTRIPITEM"} .AND. ! aControl[1]:lComponent
+       IF aControl[1]:Parent != NIL .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"} .AND. ! aControl[1]:lComponent
           aPoints := ::GetPoints( aControl[1], lPure, lMask, lConvert )
 
           DEFAULT nLeft   TO aPoints[1][1]
@@ -1069,7 +1069,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       
       nFor := 1
       FOR EACH aControl IN ::Selected
-          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"CMENUITEM", "MENUSTRIPITEM"}
+          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"}
              aPoints := ::GetPoints( aControl[1] )
              FOR x := 1 TO LEN( aPoints )
 
