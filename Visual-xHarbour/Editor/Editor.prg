@@ -34,7 +34,7 @@ RETURN
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS SourceEditor INHERIT Control
+CLASS SourceEditor INHERIT TitleControl
    DATA nLastTabTime  PROTECTED
    DATA nLastTabPos   PROTECTED
    DATA xTabWidth     PROTECTED INIT 3
