@@ -1240,7 +1240,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                  ::Form:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
               ENDIF
            ENDIF
-view ::nPressed
+
            IF ::__MenuBar .AND. ::nPressed < 0
 
               IF Nmtb:dwFlags & HICF_ACCELERATOR != 0

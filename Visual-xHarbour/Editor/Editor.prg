@@ -177,7 +177,7 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::__xCtrlName := "SourceEditor"
    ::ClsName := "Scintilla"
    ::Super:Init( oParent )
-   ::Style := WS_CHILD | WS_TABSTOP | WS_CLIPCHILDREN
+   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN
    ::EventHandler[ "OnFindNext" ]   := "OnFindNext"
    ::EventHandler[ "OnReplace" ]    := "OnReplace"
    ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
@@ -523,8 +523,8 @@ METHOD OnKeyUp() CLASS SourceEditor
       lSel := ::Source:GetSelLen() > 0
 
       ::Application:Project:EditReset()
-      IF ::Application:Props:EditCopyItem:Enabled
 
+      IF __ObjHasMsg( ::Application, "Props" ) .AND. ::Application:Props:EditCopyItem:Enabled
          ::Application:Props:EditCopyItem:Enabled := lSel
          ::Application:Props:EditCopyBttn:Enabled := lSel
          ::Application:Props:EditCutItem:Enabled  := lSel
@@ -734,7 +734,9 @@ METHOD OnDestroy() CLASS SourceEditor
    ::Super:OnDestroy()
    aEval( ::aDocs, {|oDoc| oDoc:Close() } )
 
-   ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
+   IF __ObjHasMsg( ::Application, "EditorProps" )
+      ::Application:IniFile:WriteInteger( "Settings", "WrapSearch", ::Application:EditorProps:WrapSearch )
+   ENDIF
 
    ::Application:IniFile:WriteColor( "Colors", "NormalText",   ::ColorNormalText )
    ::Application:IniFile:WriteColor( "Colors", "BackGround",   ::ColorBackground )
