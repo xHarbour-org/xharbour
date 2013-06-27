@@ -54,6 +54,7 @@ CLASS Debugger FROM Application
   DATA aPath
   DATA cStartPath
   DATA aSources
+  DATA FileExplorer
 
   METHOD Init( hParam ) CONSTRUCTOR
   METHOD Open( cExe, aSources )
@@ -374,11 +375,10 @@ METHOD Init() CLASS MainWindow
    // Panel EXCLUSIVE for vxh-debugger
    WITH OBJECT ::Application:DebuggerPanel := Panel( Self )
       :Caption        := "Debugger"
-      :Left           := 0
-      :Top            := 0
       :Width          := 680
       :Height         := 200
-      :StaticEdge     := .T.
+      :Border         := .T.
+      :Dock:Margin    := 2
       :Dock:Left      := :Parent
       :Dock:Bottom    := ::StatusBar1
       :Dock:Right     := :Parent
@@ -394,11 +394,24 @@ METHOD Init() CLASS MainWindow
       :Hide()
    END
 
+   WITH OBJECT ::Application:FileExplorer := TreeView( Self )
+      :Text        := "File Explorer"
+      :Width       := 150
+      :Border      := .T.
+      :Dock:Margin := 2
+      :StaticEdge  := .F.
+      :Dock:Right  := :Parent
+      :Dock:Top    := ::Application:CoolBar
+      :Dock:Bottom := ::Application:DebuggerPanel
+      :Create()
+   END
+
    WITH OBJECT ::Application:SourceEditor := SourceEditor( Self )
+      :Border      := .T.
       :Dock:Margin := 2
       :Dock:Left   := :Parent
       :Dock:Top    := ::Application:CoolBar
-      :Dock:Right  := :Parent
+      :Dock:Right  := ::Application:FileExplorer
       :Dock:Bottom := ::Application:DebuggerPanel
 
       :Create()
@@ -803,6 +816,8 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
 //   ::Application:SourceTabs:InsertTab( cName )
 //   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+
+   ::Application:SourceEditor:Text := cName
 
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
 
