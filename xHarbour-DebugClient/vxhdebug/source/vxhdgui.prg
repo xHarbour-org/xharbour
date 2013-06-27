@@ -186,7 +186,7 @@ METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
   ::oEditor:TreeItem:Select()
 
   //::oApp:SourceTabs:SetCurSel( n )
-  //::oApp:Project:SourceTabChanged( , n )
+  //::oApp:Project:SourceTabChanged( n )
   
   ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
   ::oEditor:lReadOnly := .T.
@@ -479,7 +479,7 @@ METHOD Sync() CLASS XHDebuggerGUI
       ::oEditor:TreeItem:Select()
       //::oApp:SourceTabs:InsertTab( ::cModule )
       //::oApp:SourceTabs:SetCurSel( nDocs )
-      //::oApp:Project:SourceTabChanged( , nDocs )
+      //::oApp:Project:SourceTabChanged( nDocs )
 
       IF !::oApp:SourceEditor:IsWindowVisible()
         ::oApp:EditorPage:Select()

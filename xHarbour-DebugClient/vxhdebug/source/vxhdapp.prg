@@ -200,11 +200,6 @@ METHOD Init() CLASS MainWindow
 
    ::Create()
 
-   //::Show()
-   ::Cursor  := IDC_ARROW
-
-   //::Maximize()
-
    // StatusBar section ----------------------
    StatusBar( Self )
    WITH OBJECT ::StatusBar1
@@ -399,128 +394,22 @@ METHOD Init() CLASS MainWindow
       :Hide()
    END
 
-   //Alert( "3" )
-
-   // TabControl
-   
-   WITH OBJECT TabControl( Self )
-      :Flat      := TRUE
-      :Width     := 680
-      :Height    := 300
-      :Multiline := .T.
-
-      //:AllowClose  := .T.
-      :BoldSelection := .T.
-      :AutoDock := .T.
-
-      :Dock:Margin := 0
+   WITH OBJECT ::Application:SourceEditor := SourceEditor( Self )
+      :Dock:Margin := 2
       :Dock:Left   := :Parent
-      :Dock:Top    := ::CoolBar1
+      :Dock:Top    := ::Application:CoolBar
       :Dock:Right  := :Parent
       :Dock:Bottom := ::Application:DebuggerPanel
 
       :Create()
-
-      WITH OBJECT ::Application:EditorPage := TabPage( :this )
-         :Caption := "   Source Code Editor  "
-         :OnWMShowWindow := {|| OnShowEditors() }
-         :Create()
-
-         WITH OBJECT ::Application:SourceTabs := TabControl( :this )
-            :Height       := 22
-            :Frame        := .F.
-            :Flat         := .T.
-            :Dock:Left    := :Parent
-            :Dock:Top     := :Parent
-            :Dock:Right   := :Parent
-            :OnSelChanged := {|,x,y| ::Application:Project:SourceTabChanged( y ) }
-            :Create()
-         END
-
-         WITH OBJECT StatusBar( :this )
-            :Create()
-
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := 320
-               :Create()
-            END
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := -1
-               :Create()
-            END
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := 35
-               :Create()
-            END
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := 30
-               :Create()
-            END
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := 100
-               :Create()
-            END
-            WITH OBJECT StatusBarPanel( :this )
-               :Width      := 50
-               :Create()
-            END
-         END
-
-         WITH OBJECT ::Application:SourceEditor := SourceEditor( :this )
-            :Left        := 400
-            :Top         := 100
-            :Width       := 200
-            :Height      := 600
-
-            :Dock:Margin := 2
-            :Dock:Left   := :Parent
-            :Dock:Top    := ::Application:SourceTabs
-            :Dock:Right  := :Parent
-            :Dock:Bottom := ::StatusBar1
-
-            :Create()
-            :Show()
-            :DockIt()
-            //:Disable()
-         END
-
-      END
+      :DockIt()
    END
 
    //Alert( "4" )
 
-   ::Maximize()
-
-   //::Show()
-
-RETURN Self
-/*
-CLASS SourceEditor FROM Control
-  VAR oEditor
-  METHOD Init( oParent ) CONSTRUCTOR
-  METHOD Create()
-ENDCLASS
-
-METHOD Init( oParent ) CLASS SourceEditor
-  ::ClsName := "xEdit"
-  ::Super:Init( oParent )
-  ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_WANTRETURN | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE
-  ::ExStyle := WS_EX_CLIENTEDGE
+   ::Show()
 RETURN Self
 
-
-METHOD Create() CLASS SourceEditor
-   LOCAL nPointer
-
-  ::Super:Create()
-  IF ::hWnd != NIL
-    nPointer := SendMessage( ::hWnd, EN_GETEDITOR )
-    IF nPointer != 0
-      ::oEditor := ArrayFromPointer( nPointer )
-    ENDIF
-  ENDIF
-RETURN Self
-*/
 CLASS Project
    ACCESS Application    INLINE __GetApplication()
    ACCESS System         INLINE __GetSystem()
@@ -633,8 +522,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SourceTabChanged( nPrev, nCur ) CLASS Project
-   (nPrev)
+METHOD SourceTabChanged( nCur ) CLASS Project
    ::Application:SourceEditor:aDocs[ nCur ]:Select()
 RETURN Self
 
@@ -825,7 +713,7 @@ METHOD CloseSource() CLASS Project
    n := MIN( n, ::Application:SourceEditor:DocCount )
    IF n > 0
       ::Application:SourceTabs:SetCurSel( n )
-      ::SourceTabChanged(, n )
+      ::SourceTabChanged( n )
     ELSE
       ::Application:SourceEditor:Caption := ""
       ::Application:SourceEditor:Hide()
@@ -913,8 +801,9 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
    oEditor := Source( ::Application:SourceEditor, cPath + cName )
 
-   ::Application:SourceTabs:InsertTab( cName )
-   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+//   ::Application:SourceTabs:InsertTab( cName )
+//   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
+
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
 
    IF !::Application:SourceEditor:IsWindowVisible()
