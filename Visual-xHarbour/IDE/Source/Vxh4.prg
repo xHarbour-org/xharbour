@@ -961,7 +961,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          IF cProp == "Name"
             ::RenameForm( cVal, xValue,, oActiveObject )
             IF oActiveObject:ClsName == "VXH_FORM_IDE"
-               ::Application:FileTree:UpdateView()
+               ::Application:FileExplorer:UpdateView()
                //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg" )
                //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg",;
                //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".prg" )

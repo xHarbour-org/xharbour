@@ -102,7 +102,7 @@ CLASS IDE INHERIT Application
 
    DATA MainTab          EXPORTED
    DATA ObjectTree       EXPORTED
-   DATA FileTree         EXPORTED
+   DATA FileExplorer     EXPORTED
 
    DATA Project          EXPORTED
    DATA SourceEditor     EXPORTED
@@ -1938,7 +1938,7 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT TabPage( :this )
             :Caption   := "File Explorer"
             :Create()
-            WITH OBJECT ::Application:FileTree := FileTreeView( :this )
+            WITH OBJECT ::Application:FileExplorer := FileExplorer( :this )
                :ExStyle       := 0
                :AcceptFiles   := .T.
                :ShowSelAlways := .T.
@@ -2091,7 +2091,7 @@ METHOD Init() CLASS IDE_MainForm
                               ::Application:ObjectManager:Parent:Select()
                            ENDIF
                          ELSEIF y == 3
-                           ::Application:FileTree:Parent:Select()
+                           ::Application:FileExplorer:Parent:Select()
                         ENDIF
                         ::EnableSearchMenu( y == 3 )
                         IF y == 3
@@ -2796,7 +2796,7 @@ METHOD NewProject() CLASS Project
    ::Application:Props[ "ResourceManager"   ]:Enabled := .T.
 
    ::Application:QuickForm:Enable()
-   ::Application:FileTree:UpdateView()
+   ::Application:FileExplorer:UpdateView()
 
    ::Modified := .T.
 
@@ -3126,8 +3126,8 @@ METHOD TabOrder( oBtn ) CLASS Project
    ::Application:ObjectTab:Enabled         := !oBtn:Checked
    ::Application:EventManager:Enabled      := !oBtn:Checked
    ::Application:ObjectTree:Enabled        := !oBtn:Checked
-   ::Application:FileTree:Enabled          := !oBtn:Checked
-   ::Application:FileTree:InvalidateRect()
+   ::Application:FileExplorer:Enabled          := !oBtn:Checked
+   ::Application:FileExplorer:InvalidateRect()
    ::Application:EnableBars( !oBtn:Checked, .T. )
 
    IF ::CurrentForm:CtrlMask:lOrderMode
@@ -3535,7 +3535,7 @@ METHOD SelectBuffer(lSel) CLASS Project
    ::CurrentForm:Editor:Select()
    DEFAULT lSel TO ::Application:SourceEditor:IsWindowVisible()
    IF lSel
-      ::Application:FileTree:Parent:Select()
+      ::Application:FileExplorer:Parent:Select()
    ENDIF
    ::CurrentForm:Editor:TreeItem:EnsureVisible():Select()
 RETURN Self
@@ -3568,7 +3568,7 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
       AADD( ::Forms, oWin )
    ENDIF
    IF lReset // New Window button
-      ::Application:FileTree:UpdateView()
+      ::Application:FileExplorer:UpdateView()
    ENDIF
 
    WITH OBJECT oWin
@@ -3702,7 +3702,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:EventManager:SetRedraw( .T. )
 
    ::Application:ObjectTree:ResetContent()
-   ::Application:FileTree:ResetContent()
+   ::Application:FileExplorer:ResetContent()
 
    ::Application:Props[ "CloseBttn"         ]:Enabled := .F.
    ::Application:Props[ "SaveBttn"          ]:Enabled := .F.
@@ -3888,10 +3888,10 @@ METHOD NewSource() CLASS Project
 
    oEditor := Source( ::Application:SourceEditor )
    oEditor:FileName  := "Untitled Source"
-   oEditor:TreeItem  := ::Application:FileTree:ExtSource:AddItem( oEditor:FileName, 16 )
+   oEditor:TreeItem  := ::Application:FileExplorer:ExtSource:AddItem( oEditor:FileName, 16 )
    oEditor:TreeItem:Cargo := oEditor
    oEditor:TreeItem:Select()
-   ::Application:FileTree:Parent:Select()
+   ::Application:FileExplorer:Parent:Select()
 
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    ::Application:EditorPage:Select()
@@ -3947,10 +3947,10 @@ METHOD OpenSource( cSource ) CLASS Project
    ::Application:SourceEditor:Show()
 
    oEditor := Source( ::Application:SourceEditor, oFile:Path+"\"+oFile:Name )
-   oEditor:TreeItem  := ::Application:FileTree:ExtSource:AddItem( oEditor:File, 16 )
+   oEditor:TreeItem  := ::Application:FileExplorer:ExtSource:AddItem( oEditor:File, 16 )
    oEditor:TreeItem:Cargo := oEditor
    oEditor:TreeItem:Select()
-   ::Application:FileTree:Parent:Select()
+   ::Application:FileExplorer:Parent:Select()
 
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    IF !::Application:SourceEditor:IsWindowVisible()
@@ -3969,7 +3969,7 @@ METHOD AddSource( cFile ) CLASS Project
    AADD( ::Properties:Sources, cFile )
    ::Application:RemoveSourceMenu:Enable()
    ::Application:AddSourceMenu:Disable()
-   ::Application:FileTree:UpdateView()
+   ::Application:FileExplorer:UpdateView()
    ::Modified := .T.
 RETURN Self
 
@@ -3987,7 +3987,7 @@ METHOD RemoveSource() CLASS Project
    ::cFileRemove   := NIL
    ::cSourceRemove := NIL
    ::Application:RemoveSourceMenu:Disable()
-   ::Application:FileTree:UpdateView()
+   ::Application:FileExplorer:UpdateView()
    ::Modified := .T.
 RETURN Self
 
@@ -4023,9 +4023,9 @@ METHOD AddBinary( cFile ) CLASS Project
    ENDIF
 
    AADD( ::Properties:Binaries, cFile )
-   ::Application:FileTree:UpdateView()
+   ::Application:FileExplorer:UpdateView()
    ::Modified := .T.
-   ::Application:FileTree:ExpandAll()
+   ::Application:FileExplorer:ExpandAll()
 
 RETURN Self
 
@@ -4204,7 +4204,7 @@ METHOD Open( cProject ) CLASS Project
       RETURN ::Close(.F.)
    ENDIF
 
-   ::Application:FileTree:UpdateView()
+   ::Application:FileExplorer:UpdateView()
 
    // Initialize everything !!!!!
    IF LEN( ::Forms ) > 0

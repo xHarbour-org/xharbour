@@ -541,7 +541,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
-CLASS FileTreeView INHERIT TreeView
+CLASS FileExplorer INHERIT TreeView
    DATA Changing   EXPORTED INIT .F.
    DATA ExtSource  EXPORTED
    METHOD UpdateView()
@@ -551,7 +551,7 @@ CLASS FileTreeView INHERIT TreeView
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnUserMsg( hWnd, nMsg ) CLASS FileTreeView
+METHOD OnUserMsg( hWnd, nMsg ) CLASS FileExplorer
    (hWnd)
    IF nMsg == WM_USER + 555
       ::Application:SourceEditor:SetFocus()
@@ -559,7 +559,7 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS FileTreeView
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnDropFiles() CLASS FileTreeView
+METHOD OnDropFiles() CLASS FileExplorer
    LOCAL cFile
    FOR EACH cFile IN ::FilesDroped
        IF RIGHT( lower( cFile ), 4 ) $ ".lib.obj"
@@ -571,7 +571,7 @@ METHOD OnDropFiles() CLASS FileTreeView
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD UpdateView() CLASS FileTreeView
+METHOD UpdateView() CLASS FileExplorer
    LOCAL Form, MainItem, oEditor, SubItem, Item, cFile := ::Application:Project:Properties:Name
    DEFAULT cFile TO "Untitled"
    ::ResetContent()
@@ -609,7 +609,7 @@ METHOD UpdateView() CLASS FileTreeView
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnSelChanged( oItem ) CLASS FileTreeView
+METHOD OnSelChanged( oItem ) CLASS FileExplorer
    ::Application:Project:cFileRemove   := NIL
    ::Application:Project:cSourceRemove := NIL
    ::Application:RemoveSourceMenu:Disable()
