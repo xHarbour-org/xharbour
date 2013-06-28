@@ -34,6 +34,7 @@
    #include "release.h"
    #include "tokens.h"
    #include "symbol.h"
+   #include "Iterator.h"
 
    #ifdef __DEBUG__
       #define ASSERT( x ) ( (x) ? 0 : ( printf( #x ", ASSERT Failed line %i in: " __FILE__,  __LINE__ ), exit(1), 0 ) )
@@ -59,7 +60,13 @@
    #endif
 
    char * ClipNet_strdup( const char *pString );
-   char * ClipNet_LineKind( LINE_KIND Kind );
+
+   extern const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Parser_pContext );
+   extern const char * ClipNet_LValueKind( const LVALUE *pLValue, PARSER_CONTEXT *Parser_pContext );
+   extern const char * ClipNet_LineKind( const LINE *pLine, PARSER_CONTEXT *Parser_pContext );
+   extern const char * ClipNet_ValueKind( const VALUE *pValue, PARSER_CONTEXT *Parser_pContext );
+   extern const char * ClipNet_BinaryKind( const BINARY *pBinar, PARSER_CONTEXT *Parser_pContext );
+   extern const char * ClipNet_UnarKind( const UNARY *pUnary, PARSER_CONTEXT *Parser_pContext );
 
    #if defined(__cplusplus)
       }

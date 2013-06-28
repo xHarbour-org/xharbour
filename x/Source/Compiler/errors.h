@@ -122,16 +122,12 @@
    #define PP_WARN_DEFINE_REDEF                 1
    #define PP_WARN_NO_DIRECTIVES                2
 
-   extern int   Parser_iLine, Parser_iErrors, Parser_iWarnings;
-   extern BOOL  Parser_bError, Parser_bAnyWarning;
-   extern PARSED_FILES Parser_Files;
-
    #if defined(__cplusplus)
       extern "C" {
    #endif
 
-   void Parser_GenError( char * asErrors[], char cPrefix, PARSER_ERROR iError, const char * sError1, const char * sError2 );
-   void Parser_GenWarning( char * asWarnings[], char cPrefix, int iWarning, const char * sWarning1, const char * sWarning2 );
+   void Parser_GenError( char * asErrors[], char cPrefix, PARSER_ERROR iError, const char * sError1, const char * sError2, PARSER_CONTEXT *Parser_pContext );
+   void Parser_GenWarning( char * asWarnings[], char cPrefix, int iWarning, const char * sWarning1, const char * sWarning2, PARSER_CONTEXT *Parser_pContext );
 
    #if defined(__cplusplus)
       }

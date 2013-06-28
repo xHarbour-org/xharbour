@@ -11,4 +11,9 @@
 
    #define LEXER_DEFINED
 
+   #define USING_CARGO TRUE
+   #define CARGO Parser_pContext
+   #define DEF_CARGO PARSER_CONTEXT * CARGO
+
+   extern int yylex( DEF_CARGO );
 #endif

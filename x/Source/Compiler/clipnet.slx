@@ -48,7 +48,7 @@
                       x == TOKEN_EXPEQ     || \
                       x == TOKEN_BITXOR    || \
                       x == TOKEN_MODEQ     || \
-                      strchr( "+-*/^<>=#!ут~?", x ) || \
+                      strchr( "+-*/^<>=#!\242\243~?", x ) || \
                       x == /* TOKEN_LIKE || TOKEN_MATCH || */ TOKEN_STEP || x == TOKEN_TO || x == TOKEN_IN \
                    )
 
@@ -61,11 +61,11 @@ static char *sTextFunction, *sTextReset;
 
 char * SLX_LastBlock( BOOL bReset );
 
-static long SLX_Hex2L( char* sHex );
-static int  SLX_ElementToken( char* szToken, unsigned int iTokenLen );
-static int  SLX_InterceptAction( int iRet );
-static int  SLX_CustomAction( int x );
-static void SLX_CheckIllegalChar( char * szName );
+static long SLX_Hex2L( char* sHex, DEF_CARGO );
+static int  SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO );
+static int  SLX_InterceptAction( int iRet, DEF_CARGO );
+static int  SLX_CustomAction( int x, DEF_CARGO );
+static void SLX_CheckIllegalChar( char * szName, DEF_CARGO );
 
 char *SLX_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
                              "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
@@ -154,9 +154,9 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( "=="    ) AS_TOKEN( TOKEN_EQ         + DONT_REDUCE ),
                            LEX_WORD( "=>"    ) AS_TOKEN( TOKEN_HASH       + DONT_REDUCE ),
                            LEX_WORD( "<<"    ) AS_TOKEN( TOKEN_BITSHIFTL  + DONT_REDUCE ),
-                           LEX_WORD( "<="    ) AS_TOKEN( 'у'              + DONT_REDUCE ),
+                           LEX_WORD( "<="    ) AS_TOKEN( '\243'              + DONT_REDUCE ),
                            LEX_WORD( "<>"    ) AS_TOKEN( TOKEN_NE         + DONT_REDUCE ),
-                           LEX_WORD( ">="    ) AS_TOKEN( 'т'              + DONT_REDUCE ),
+                           LEX_WORD( ">="    ) AS_TOKEN( '\242'              + DONT_REDUCE ),
                            LEX_WORD( ">>"    ) AS_TOKEN( TOKEN_BITSHIFTR  + DONT_REDUCE ),
                            LEX_WORD( "!="    ) AS_TOKEN( TOKEN_NE         + DONT_REDUCE ),
                            LEX_WORD( "++"    ) AS_TOKEN( TOKEN_INC        ),
@@ -386,8 +386,8 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( WANTS_VAR      , '&'         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
 
-                    IF_SEQUENCE_IS( TOKEN_FOREACH        , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( TOKEN_FOREACH        , 0           , 0      , 0          ) REDUCE_TO( TOKEN_FOR, SLX_IDENTIFIER ),
+                    IF_SEQUENCE_IS( TOKEN_FOREACH  , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_FOREACH  , 0           , 0      , 0          ) REDUCE_TO( TOKEN_FOR, SLX_IDENTIFIER ),
 
                     /* Wants TOKEN_IDENTIFIER. */
                     IF_SEQUENCE_IS( WANTS_ID       , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
@@ -508,18 +508,20 @@ LANGUAGE_RULES_ARE {
    #define LEX_CASE(x) ( (  ( iRet = (x) ) > 96 && iRet < 123 ) ? iRet - 32 : iRet )
 
 #undef INTERCEPT_ACTION
-   #define INTERCEPT_ACTION(x) x = SLX_InterceptAction( x )
+   #define INTERCEPT_ACTION(x) x = SLX_InterceptAction( x, CARGO )
 
 #undef ELEMENT_TOKEN
-  #define ELEMENT_TOKEN(x,y) SLX_ElementToken(x,y)
+  #define ELEMENT_TOKEN(x,y) SLX_ElementToken( x, y, CARGO )
+
+#undef YY_DECL
+#define YY_DECL int yylex( DEF_CARGO )
 
 #undef YY_INPUT      /* to implement our own YY_INPUT function to manage PRGs without \n at the end */
-   extern FILE * yyin;  /* currently yacc parsed file */
-   int yy_lex_input( char *, int );
-   #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( buf, max_size );
+   int yy_lex_input( char *, int, DEF_CARGO );
+   #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( buf, max_size, CARGO );
 
 #undef CUSTOM_ACTION
-   #define CUSTOM_ACTION(x) SLX_CustomAction( x )
+   #define CUSTOM_ACTION(x) SLX_CustomAction( x, CARGO )
 
 #undef STREAM_EXCEPTION
 
@@ -606,7 +608,7 @@ LANGUAGE_RULES_ARE {
             \
             szBuffer--; iSize++; \
             \
-            iLen = sClose - szBuffer; \
+            iLen = (int) ( sClose - szBuffer ); \
             \
             if( iLen > iPairAllocated )\
             { \
@@ -629,7 +631,7 @@ LANGUAGE_RULES_ARE {
          { \
             szBuffer--; \
             szBuffer[strlen(szBuffer)-1] = '\0'; \
-            Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
+            Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_STRING_TERMINATOR, szBuffer, NULL, CARGO ); \
             yylval.Constant.Kind = CONSTANT_KIND_STRING; \
             yylval.Constant.Value.sString = ClipNet_IdentifierNew( (char *) sPair, TRUE ); \
             iSize = 0; \
@@ -645,7 +647,7 @@ LANGUAGE_RULES_ARE {
                                    iLastToken == TOKEN_IIF || iLastToken == TOKEN_PROCREQ || iLastToken == TOKEN_OPTIONAL || iLastToken == SLX_TEXT )
 
 /* Support Functions. */
-static int SLX_InterceptAction( int iRet )
+static int SLX_InterceptAction( int iRet, DEF_CARGO )
 {
    if( iRet < 256 )
    {
@@ -665,13 +667,13 @@ static int SLX_InterceptAction( int iRet )
       else if( yylval.sText == NULL )
       {
          //yytext = sToken;
-         yyleng = strlen( yytext );
+         yyleng = (int) strlen( yytext );
       }
    }
    else
    {
       //yytext = sToken;
-      yyleng = strlen( yytext );
+      yyleng = (int) strlen( yytext );
 
       if( iRet == WANTS_EXP )
          { iRet = iWantsEXP; }
@@ -684,7 +686,7 @@ static int SLX_InterceptAction( int iRet )
       else if( iRet == REJECT_OP )
          { yylval.sText = ClipNet_IdentifierNew( (char*) yytext, TRUE ); iRet = TOKEN_IDENTIFIER; }
       else
-         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, Parser_iLine - 1 ); Parser_iErrors++; }
+         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, Parser_pContext->Parser_iLine - 1 ); Parser_pContext->Parser_iErrors++; }
    }
 
    #ifdef SHOW_LEX_TOKENS
@@ -731,7 +733,7 @@ static int SLX_InterceptAction( int iRet )
    return iRet;
 }
 
-static int SLX_ElementToken( char* szToken, unsigned int iTokenLen )
+static int SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO )
 {
    extern char *yytext;
    extern int yyleng;
@@ -836,7 +838,7 @@ static int SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       /* Hex Number */
       if( yytext[0] == '0' && yytext[1] == 'X' )
       {
-         long lNumber = SLX_Hex2L( yytext + 2 );
+         long lNumber = SLX_Hex2L( yytext + 2, CARGO );
 
          if( ( long ) SHRT_MIN <= lNumber && lNumber <= ( long ) SHRT_MAX )
          {
@@ -891,13 +893,13 @@ static int SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iElement;
 }
 
-static long SLX_Hex2L( char* sHex )
+static long SLX_Hex2L( char* sHex, DEF_CARGO )
 {
    int i = 0;
    long lVal = 0;
    char cChar;
 
-   while( cChar = sHex[i++] )
+   while( ( cChar = sHex[i++] ) )
    {
       if( cChar >= '0' && cChar <= '0' )
       {
@@ -918,7 +920,7 @@ static long SLX_Hex2L( char* sHex )
    return lVal;
 }
 
-static int SLX_CustomAction( int x )
+static int SLX_CustomAction( int x, DEF_CARGO )
 {
    extern BOOL PP_bInline;
    char *pTmp;
@@ -1232,7 +1234,7 @@ static int SLX_CustomAction( int x )
          return TOKEN_DO + DONT_REDUCE;
 
       case SLX_MACRO_ERR :
-         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_SYNTAX, "&", NULL );
+         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_SYNTAX, "&", NULL, CARGO );
          return  0;
 
       case SLX_ID_ON_HOLD :
@@ -1245,9 +1247,9 @@ static int SLX_CustomAction( int x )
 
          /* NOTE: ClipNet_iLineINLINE is being RESET in ppcomp.c - SLX_pp_Internal() */
 
-         if( Parser_iLineINLINE )
+         if( Parser_pContext->Parser_iLineINLINE )
          {
-            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, "on the same line", NULL );
+            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, "on the same line", NULL, CARGO );
             iIdentifier++;
             return TOKEN_IDENTIFIER + DONT_REDUCE;
          }
@@ -1264,29 +1266,29 @@ static int SLX_CustomAction( int x )
             char szID[6];
             INLINE *pInline;
 
-            Parser_iLineINLINE = Parser_iLine;
+            Parser_pContext->Parser_iLineINLINE = Parser_pContext->Parser_iLine;
             PP_bInline = TRUE;
 
             strncpy( sInlineSym, "SLX_INLINE_", 16 );
 
-            Parser_iInlineID++;
-            sprintf( szID, "%03d", Parser_iInlineID );
+            Parser_pContext->Parser_iInlineID++;
+            sprintf( szID, "%03d",  Parser_pContext->Parser_iInlineID );
             strncpy( sInlineSym + 11, szID, 4 );
 
-            if( Parser_iInlineID > SLX_INLINE_MAX )
+            if( Parser_pContext->Parser_iInlineID > SLX_INLINE_MAX )
             {
-               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, NULL, NULL );
+               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, NULL, NULL, CARGO );
                break;
             }
 
-            pInline = Parser_InlineAdd( ClipNet_IdentifierNew( sInlineSym, TRUE ) );
+            pInline = Parser_InlineAdd( ClipNet_IdentifierNew( sInlineSym, TRUE ), CARGO );
 
           DigestInline :
 
             YY_INPUT( (char*) sBuffer, iSize, YY_BUF_SIZE );
             if( iSize == 0 )
             {
-               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_INVALID_INLINE, Parser_Functions.pLast->pName->Name, NULL );
+               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_INVALID_INLINE, Parser_pContext->Parser_Functions.pLast->pName->Name, NULL, CARGO );
                PP_bInline = FALSE;
                return '\n' + DONT_REDUCE;
             }
@@ -1367,12 +1369,12 @@ static int SLX_CustomAction( int x )
 
             if( pInline->pCode == NULL )
             {
-               pInline->pCode = (unsigned char *) ClipNet_alloc( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               pInline->pCode = (unsigned char *) ClipNet_alloc( ( iSize = (int) strlen( (char*) sBuffer ) ) + 1 );
                strncpy( (char *) pInline->pCode, (char*) sBuffer, iSize );
             }
             else
             {
-               pInline->pCode = (unsigned char *) ClipNet_realloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               pInline->pCode = (unsigned char *) ClipNet_realloc( pInline->pCode, pInline->lPCodeSize + ( iSize = (int) strlen( (char*) sBuffer ) ) + 1 );
                strncpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer, iSize );
             }
             pInline->lPCodeSize += iSize;
@@ -1383,16 +1385,16 @@ static int SLX_CustomAction( int x )
             }
             else
             {
-               if( Parser_iBackend != LANG_C && Parser_iBackend != LANG_OBJ_MODULE )
+               if( Parser_pContext->Parser_iBackend != LANG_C && Parser_pContext->Parser_iBackend != LANG_OBJ_MODULE )
                {
-                  Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_REQUIRES_C, NULL, NULL );
+                  Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_REQUIRES_C, NULL, NULL, CARGO );
                   ClipNet_free( (void *) pInline->pCode );
                   ClipNet_free( (void *) pInline->sFileName );
                   ClipNet_free( (void *) pInline );  /* NOTE: szName will be released by ClipNet_SymbolKill() */
                }
 
-               Parser_iLinePRG = Parser_iLine;
-               Parser_iLine = Parser_iLineINLINE;
+               Parser_pContext->Parser_iLinePRG = Parser_pContext->Parser_iLine;
+               Parser_pContext->Parser_iLine = Parser_pContext->Parser_iLineINLINE;
 
                yylval.sText = ClipNet_IdentifierNew( sInlineSym, TRUE );
                ClipNet_free( sInlineSym ) ;
@@ -1432,7 +1434,7 @@ static int SLX_CustomAction( int x )
 
          if( iSize == 0 )
          {
-            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_MISSING_ENDTEXT, Parser_Functions.pLast->pName->Name, NULL );
+            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_MISSING_ENDTEXT, Parser_pContext->Parser_Functions.pLast->pName->Name, NULL, CARGO );
             return '\n' + DONT_REDUCE;
          }
          else
@@ -1500,18 +1502,18 @@ static int SLX_CustomAction( int x )
          return TOKEN_IIF;
 
       default:
-         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, Parser_iLine - 1 );
-         Parser_iErrors++;
+         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, Parser_pContext->Parser_iLine - 1 );
+         Parser_pContext->Parser_iErrors++;
    }
 
    return x;
 }
 
-int yy_lex_input( char *pBuffer, int iBufferSize )
+int yy_lex_input( char *pBuffer, int iBufferSize, DEF_CARGO )
 {
    SYMBOL_UNUSED( iBufferSize );
 
-   return PP_NextLine( Parser_bPPO ? pParser_PPO : NULL, pBuffer );
+   return PP_NextLine( Parser_pContext->Parser_pPPO, pBuffer, CARGO );
 }
 
 char * SLX_LastBlock( BOOL bReset )
@@ -1549,7 +1551,7 @@ char * SLX_LastBlock( BOOL bReset )
    return s_sLastBlock;
 }
 
-static void SLX_CheckIllegalChar( char *szName )
+static void SLX_CheckIllegalChar( char *szName, DEF_CARGO )
 {
    char *pTmp = szName;
 
@@ -1557,7 +1559,7 @@ static void SLX_CheckIllegalChar( char *szName )
    {
       if( ! isalnum( (BYTE) *pTmp ) && *pTmp != '_' )
       {
-         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_ILLEGAL_CHARACTER, SLX_acAscii[ (int)(unsigned char) *pTmp ], NULL );
+         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_ILLEGAL_CHARACTER, SLX_acAscii[ (int)(unsigned char) *pTmp ], NULL, CARGO );
       }
 
       pTmp++;

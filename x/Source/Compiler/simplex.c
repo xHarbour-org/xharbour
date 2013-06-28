@@ -52,6 +52,12 @@
 #include <string.h>
 #include <limits.h>
 
+#ifndef BOOL
+   #define BOOL int
+   #define TRUE 1
+   #define FALSE 0
+#endif
+
 /* NOT overidable (yet). */
 #define MAX_MATCH 4
 
@@ -205,7 +211,13 @@ int yyleng;
 #define STREAM_OPEN(x)
 #define STREAM_APPEND(x) sPair[ iPairLen++ ] = x
 
-void SimpLex_CheckWords( void );
+#ifndef USING_CARGO
+   #define USING_CARGO 0
+   #define CARGO
+   #define DEF_CARGO
+#endif
+
+void SimpLex_CheckWords( DEF_CARGO );
 
 #include SLX_RULES
 
@@ -219,15 +231,6 @@ extern void yyerror( char * ); /* parsing error management function */
    extern "C" int yywrap( void );
 #else
    extern int yywrap( void );     /* manages the EOF of current processed file */
-#endif
-
-/* Use prototypes in function declarations. */
-#define YY_USE_PROTOS
-
-#ifdef YY_USE_PROTOS
-   #define YY_PROTO(proto) proto
-#else
-   #define YY_PROTO(proto) ()
 #endif
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -264,9 +267,13 @@ static TREE_NODE aPairNodes[256], aSelfNodes[256], aKeyNodes[256], aWordNodes[25
 static char acOmmit[256], acNewLine[256];
 static int acReturn[256];
 
-static int Reduce( int iToken );
-int SimpLex_GetNextToken( void );
-int SimpLex_CheckToken( void );
+#if USING_CARGO
+   static int Reduce( int iToken, DEF_CARGO );
+#else
+   static int Reduce( int iToken );
+#endif
+int SimpLex_GetNextToken( DEF_CARGO );
+int SimpLex_CheckToken( DEF_CARGO );
 
 /* Indexing System. */
 static void GenTrees( void );
@@ -282,7 +289,12 @@ static int rulecmp( const void * pLeft, const void * pRight );
 #define LEX_PAIR_SIZE ( sizeof( LEX_PAIR ) )
 #define IF_TOKEN_READY()  if( iReturn )
 #define IF_TOKEN_ON_HOLD()  if( iHold )
-#define FORCE_REDUCE() Reduce( 0 )
+
+#if USING_CARGO
+   #define FORCE_REDUCE() Reduce( 0, CARGO )
+#else
+   #define FORCE_REDUCE() Reduce( 0 )
+#endif
 
 #define HOLD_TOKEN(x) PUSH_TOKEN(x)
 
@@ -411,7 +423,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                      /* Last charcter read. */\
                      chr = chrSelf;\
                      \
-                     return SimpLex_CheckToken(); \
+                     return SimpLex_CheckToken( CARGO ); \
                   } \
                   else \
                   { \
@@ -486,7 +498,8 @@ static int rulecmp( const void * pLeft, const void * pRight );
             } \
             \
             DEBUG_INFO( printf(  "Reducing Held: %i Pos: %i\n", iRet, iHold ) ); \
-            LEX_RETURN( Reduce( iRet ) );
+            \
+            LEX_RETURN( Reduce( iRet, CARGO ) ); \
 
 #define LEX_RETURN(x) \
         \
@@ -517,7 +530,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
 }
 
 #ifndef YY_DECL
-   #define YY_DECL int yylex YY_PROTO(( void ))
+   #define YY_DECL int yylex( void )
 #endif
 
 YY_DECL
@@ -561,10 +574,14 @@ YY_DECL
        }
     }
 
-    LEX_RETURN( Reduce( SimpLex_GetNextToken() ) )
+    #if USING_CARGO
+       LEX_RETURN( Reduce( SimpLex_GetNextToken(CARGO), CARGO ) )
+    #else
+       LEX_RETURN( Reduce( SimpLex_GetNextToken() ) )
+    #endif
 }
 
-int SimpLex_GetNextToken( void )
+int SimpLex_GetNextToken( DEF_CARGO )
 {
     register char * szBuffer = s_szBuffer;
 
@@ -603,7 +620,7 @@ int SimpLex_GetNextToken( void )
                   s_szBuffer = szBuffer;
 
                   DEBUG_INFO( printf(  "Token: \"%s\" Ommited: \'%c\'\n", sToken, chr ) );
-                  return SimpLex_CheckToken();
+                  return SimpLex_CheckToken( CARGO );
                }
                else
                {
@@ -628,7 +645,7 @@ int SimpLex_GetNextToken( void )
                   s_szBuffer = szBuffer;
 
                   DEBUG_INFO( printf(  "Token: \"%s\" before New Pair at: \'%c\'\n", sToken, chr ) );
-                  return SimpLex_CheckToken();
+                  return SimpLex_CheckToken( CARGO );
                }
 
                ProcessStream :
@@ -639,7 +656,7 @@ int SimpLex_GetNextToken( void )
                {
                   IF_BELONG_LEFT( chr )
                   {
-                     int iStartLen = strlen( sStart );
+                     int iStartLen = (int) strlen( sStart );
 
                      /* Resetting. */
                      iPairToken = 0;
@@ -801,7 +818,7 @@ int SimpLex_GetNextToken( void )
                    sToken[ iLen ] = '\0';
 
                    DEBUG_INFO( printf(  "Token: \"%s\" at <NewLine> Holding: \'%c\'\n", sToken, chr ) );
-                   return SimpLex_CheckToken();
+                   return SimpLex_CheckToken( CARGO );
                }
                else
                {
@@ -845,7 +862,7 @@ int SimpLex_GetNextToken( void )
                     sToken[ iLen ] = '\0';
 
                     DEBUG_INFO( printf(  "Token: \"%s\" Holding: \'%c\' As: %i \n", sToken, chr, iRet ) );
-                    return SimpLex_CheckToken();
+                    return SimpLex_CheckToken( CARGO );
                 }
                 else
                 {
@@ -890,7 +907,7 @@ int SimpLex_GetNextToken( void )
                    s_szBuffer = szBuffer;
 
                    DEBUG_INFO( printf(  "Token: \"%s\" at: \'<EOF>\'\n", sToken ) );
-                   return SimpLex_CheckToken();
+                   return SimpLex_CheckToken( CARGO );
                 }
                 else
                 {
@@ -908,7 +925,7 @@ int SimpLex_GetNextToken( void )
 #endif
 }
 
-int SimpLex_CheckToken( void )
+int SimpLex_CheckToken( DEF_CARGO )
 {
     if( bRecursive )
     {
@@ -926,7 +943,7 @@ int SimpLex_CheckToken( void )
        NEW_LINE_ACTION();
 
        #ifdef USE_KEYWORDS
-          SimpLex_CheckWords();
+          SimpLex_CheckWords( CARGO );
           if( iRet )
           {
               bRecursive = FALSE;
@@ -943,7 +960,7 @@ int SimpLex_CheckToken( void )
     }
     else
     {
-       SimpLex_CheckWords();
+       SimpLex_CheckWords( CARGO );
        if( iRet )
        {
           bRecursive = FALSE;
@@ -960,7 +977,11 @@ int SimpLex_CheckToken( void )
     return iRet;
 }
 
+#if USING_CARGO
+static int Reduce( int iToken, DEF_CARGO )
+#else
 static int Reduce( int iToken )
+#endif
 {
   BeginReduce :
 
@@ -1025,7 +1046,7 @@ static int Reduce( int iToken )
             }
             else
             {
-               iToken = SimpLex_GetNextToken();
+               iToken = SimpLex_GetNextToken( CARGO );
             }
 
             if( iToken < LEX_CUSTOM_ACTION )
@@ -1150,7 +1171,7 @@ static int Reduce( int iToken )
    }
 }
 
-void SimpLex_CheckWords( void )
+void SimpLex_CheckWords( DEF_CARGO )
 {
    int iTentative = -1, iCompare;
    unsigned int i, iMax, iLenMatched, iBaseSize = 0, iKeyLen, iSavedLen = 0;
@@ -1253,7 +1274,7 @@ void SimpLex_CheckWords( void )
       {
          DEBUG_INFO( printf( "Skip... %s [%s] < [%s]\n", sDesc, sKeys2Match, sWord2Check ) );
          i++;
-         if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
+         if( ( iLenMatched = (int) ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
          {
             sKeys2Match = NULL;
             DEBUG_INFO( printf( "Continue with larger: [%s]\n", aCheck[i].sWord ) );
@@ -1283,7 +1304,7 @@ void SimpLex_CheckWords( void )
             DEBUG_INFO( printf( "Skip... Pattern [%s] requires {WS}, cSpacer: %c\n", sKeys2Match, cSpacer ) );
 
             i++;
-            if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
+            if( ( iLenMatched = (int) ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
             {
                sKeys2Match = NULL;
                DEBUG_INFO( printf( "Continue with: [%s]\n", aCheck[i].sWord ) );
@@ -1305,11 +1326,11 @@ void SimpLex_CheckWords( void )
             }
          }
 
-         iKeyLen = pNextSpacer - sKeys2Match;
+         iKeyLen = (int) ( pNextSpacer - sKeys2Match );
       }
       else
       {
-         iKeyLen = strlen( sKeys2Match );
+         iKeyLen = (int) strlen( sKeys2Match );
       }
 
      #ifdef LEX_ABBREVIATE
@@ -1327,7 +1348,7 @@ void SimpLex_CheckWords( void )
          DEBUG_INFO( printf( "Trying Next... length mismatch - iKeyLen: %i iLen2Match: %i comparing: [%s] with: [%s]\n", iKeyLen, iLen2Match, sWord2Check, sKeys2Match ) );
          i++;
 
-         if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
+         if( ( iLenMatched = (int) ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
          {
             sKeys2Match = NULL;
             DEBUG_INFO( printf( "Continue with: [%s]\n", aCheck[i].sWord ) );
@@ -1363,7 +1384,7 @@ void SimpLex_CheckWords( void )
             DEBUG_INFO( printf( "Saving Tentative %s [%s] == [%s]\n", sDesc, sWord2Check, sKeys2Match ) );
 
             iTentative  = i;
-            iLenMatched = strlen( aCheck[i].sWord );
+            iLenMatched = (int) strlen( aCheck[i].sWord );
 
             /* Saving this pointer of the input stream, we might have to get here again. */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
@@ -1448,7 +1469,7 @@ void SimpLex_CheckWords( void )
 
             DEBUG_INFO( printf( "Getting next Token...\n" ) );
 
-            iNextToken = SimpLex_GetNextToken();
+            iNextToken = SimpLex_GetNextToken( CARGO );
 
             if( iNextToken == 0 )
             {
@@ -1475,7 +1496,7 @@ void SimpLex_CheckWords( void )
          DEBUG_INFO( printf( "Trying Next %s Pattern... [%s] > [%s]\n", sDesc, sWord2Check, sKeys2Match ) );
          i++;
 
-         if( ( iLenMatched = ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
+         if( ( iLenMatched =  (int) ( sKeys2Match - aCheck[i - 1].sWord ) ) == 0 )
          {
             sKeys2Match = NULL;
             DEBUG_INFO( printf( "Continue with: [%s]\n", aCheck[i].sWord ) );
@@ -1548,9 +1569,17 @@ void SimpLex_CheckWords( void )
 }
 
 #ifdef __cplusplus
-   void yy_switch_to_buffer( YY_BUFFER_STATE pBuffer )
+   #if USING_CARGO
+      void yy_switch_to_buffer( YY_BUFFER_STATE pBuffer, DEF_CARGO )
+   #else
+      void yy_switch_to_buffer( YY_BUFFER_STATE pBuffer )
+   #endif
 #else
-   void yy_switch_to_buffer( void * pBuffer )
+   #if USING_CARGO
+       void yy_switch_to_buffer( void * pBuffer, DEF_CARGO )
+   #else
+       void yy_switch_to_buffer( void * pBuffer )
+   #endif
 #endif
 {
    /* Avoid warning of unused symbols. */
@@ -1560,9 +1589,17 @@ void SimpLex_CheckWords( void )
 }
 
 #ifdef __cplusplus
-   void yy_delete_buffer( YY_BUFFER_STATE pBuffer )
+   #if USING_CARGO
+      void yy_delete_buffer( YY_BUFFER_STATE pBuffer, DEF_CARGO )
+   #else
+      void yy_delete_buffer( YY_BUFFER_STATE pBuffer )
+   #endif
 #else
-   void yy_delete_buffer( void * pBuffer )
+   #if USING_CARGO
+      void yy_delete_buffer( void * pBuffer, DEF_CARGO )
+   #else
+      void yy_delete_buffer( void * pBuffer )
+   #endif
 #endif
 {
    /* Avoid warning of unused symbols. */

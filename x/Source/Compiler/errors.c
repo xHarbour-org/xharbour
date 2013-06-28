@@ -95,18 +95,18 @@ char *Parser_asWarnings[] =
    "1Redundant \'ANNOUNCE %s\' statement ignored"
 };
 
-void Parser_GenError( char *asErrors[], char cPrefix, PARSER_ERROR iError, const char * sError1, const char *sError2 )
+void Parser_GenError( char *asErrors[], char cPrefix, PARSER_ERROR iError, const char * sError1, const char *sError2, PARSER_CONTEXT *Parser_pContext )
 {
-   int iLine = Parser_iLine;
+   int iLine = Parser_pContext->Parser_iLine;
 
    //if( cPrefix != 'F' && Parser_bError )
    //   return;
 
    printf( "\r" );
 
-   if( Parser_Files.pLast && Parser_Files.pLast->sName )
+   if( Parser_pContext->Parser_Files.pLast && Parser_pContext->Parser_Files.pLast->sName )
    {
-      printf( "%s(%i) ", Parser_Files.pLast->sName, iLine );
+      printf( "%s(%i) ", Parser_pContext->Parser_Files.pLast->sName, iLine );
    }
 
    if( sError1 && sError1[0] ==  '\n' ) 
@@ -118,8 +118,8 @@ void Parser_GenError( char *asErrors[], char cPrefix, PARSER_ERROR iError, const
    printf( asErrors[ iError ], sError1, sError2 );
    printf( "\n" );
 
-   Parser_iErrors++;
-   Parser_bError = TRUE;
+   Parser_pContext->Parser_iErrors++;
+   Parser_pContext->Parser_bError = TRUE;
 
    if( cPrefix == 'F' )
    { 
@@ -127,22 +127,22 @@ void Parser_GenError( char *asErrors[], char cPrefix, PARSER_ERROR iError, const
    } 
 }
 
-void Parser_GenWarning( char *asWarnings[], char cPrefix, int iWarning, const char *sWarning1, const char *sWarning2 )
+void Parser_GenWarning( char *asWarnings[], char cPrefix, int iWarning, const char *sWarning1, const char *sWarning2, PARSER_CONTEXT *Parser_pContext )
 {
    char *sWarning = asWarnings[ iWarning - 1 ];
-   int iLine = Parser_iLine;
+   int iLine = Parser_pContext->Parser_iLine;
 
-   if( ( sWarning[ 0 ] - '0' ) <= Parser_iWarnings )
+   if( ( sWarning[ 0 ] - '0' ) <= Parser_pContext->Parser_iWarnings )
    {
-      if( Parser_Files.pLast && Parser_Files.pLast->sName )
+      if( Parser_pContext->Parser_Files.pLast && Parser_pContext->Parser_Files.pLast->sName )
       { 
-         printf( "\r%s(%i) ", Parser_Files.pLast->sName, iLine );
+         printf( "\r%s(%i) ", Parser_pContext->Parser_Files.pLast->sName, iLine );
       } 
 
       printf( "Warning %c%04i  ", cPrefix, iWarning );
       printf( sWarning + 1, sWarning1, sWarning2 );
       printf( "\n" );
 
-      Parser_bAnyWarning = TRUE;    /* report warnings at exit */
+      Parser_pContext->Parser_bAnyWarning = TRUE;    /* report warnings at exit */
    }
 }

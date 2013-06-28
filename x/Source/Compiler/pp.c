@@ -6,19 +6,19 @@ char PP_LineBuffer[ LINE_MAX_LEN];
 
 int PP_iLineLen;
  
-int PP_NextLine( FILE *pPPO, char *sLine )
+int PP_NextLine( FILE *pPPO, char *sLine, PARSER_CONTEXT *Parser_pContext )
 {
-   char cChar, cLastChar; 
+   char cChar, cLastChar = 0;
    char *pSemiColon = NULL;
    char cTerminator = 0;
 
    PP_iLineLen = 0 ;
  
-   while( ( cChar = getc( Parser_Files.pLast->hFile ) ) != EOF )
+   while( ( cChar = getc( Parser_pContext->Parser_Files.pLast->hFile ) ) != EOF )
    {  
-      if( Parser_iLine && ( Parser_iLine % 100 ) == 0 && Parser_bMute == FALSE )
+      if( Parser_pContext->Parser_iLine && ( Parser_pContext->Parser_iLine % 100 ) == 0 && Parser_pContext->Parser_bMute == FALSE )
       {
-         printf( "\r%i", Parser_iLine );
+         printf( "\r%i", Parser_pContext->Parser_iLine );
          fflush( stdout );
       }
 
@@ -26,7 +26,7 @@ int PP_NextLine( FILE *pPPO, char *sLine )
 
       if( cChar == '\n' )
       {  
-         Parser_iLine = ++Parser_Files.pLast->iLine;
+         Parser_pContext->Parser_iLine = ++Parser_pContext->Parser_Files.pLast->iLine;
 
          while( PP_iLineLen && isspace( PP_LineBuffer[ --PP_iLineLen ] ) )
          {
@@ -57,11 +57,11 @@ int PP_NextLine( FILE *pPPO, char *sLine )
       }
       else if( cTerminator == 0 && pSemiColon && ! isspace( cChar ) )
       {     
-         ungetc( cChar, Parser_Files.pLast->hFile );
+         ungetc( cChar, Parser_pContext->Parser_Files.pLast->hFile );
     
          while( PP_LineBuffer[ --PP_iLineLen ] != ';' )
          {
-            ungetc( PP_LineBuffer[ PP_iLineLen ], Parser_Files.pLast->hFile );
+            ungetc( PP_LineBuffer[ PP_iLineLen ], Parser_pContext->Parser_Files.pLast->hFile );
          }    
 
          PP_LineBuffer[ PP_iLineLen++ ] = '\n'; 

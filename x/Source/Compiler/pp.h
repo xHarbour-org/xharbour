@@ -13,6 +13,6 @@
  
    #define LINE_MAX_LEN 16384
   
-   int PP_NextLine( FILE *pPPO, char *sLine );
+   int PP_NextLine( FILE *pPPO, char *sLine, PARSER_CONTEXT *Parser_pContext );
 
 #endif

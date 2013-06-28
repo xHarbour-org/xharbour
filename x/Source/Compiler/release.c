@@ -51,6 +51,11 @@ void Release_MethodCall( METHOD_CALL *pMethodCall )
    ClipNet_free( (void *) pMethodCall );
 }
 
+void Release_ByRef( VALUE *pByRef )
+{
+   ClipNet_free( (void *) pByRef );
+}
+
 void Release_Value( VALUE *pValue )
 {
    switch( pValue->Kind )
@@ -105,7 +110,84 @@ void Release_Value( VALUE *pValue )
       case VALUE_KIND_LIST : 
          Release_List( pValue->Value.pList );
          break;
+         
+      case VALUE_KIND_BYREF :
+         //Release_ByRef( pValue->Value.pByRef );
+         break;
    }
 
    ClipNet_free( (void *) pValue );
+}
+
+void Relese_Line( LINE *pLine, PARSER_CONTEXT *Parser_pContext )
+{
+   switch( pLine->Kind )
+   {
+      case LINE_KIND_ASSIGNMENT:
+         Release_Value( pLine->Value.pAssignment );
+         break;
+
+      case LINE_KIND_CASE:
+         break;
+      case LINE_KIND_OTHERWISE:
+         break;
+   
+      case LINE_KIND_FOR:
+         break;
+      case LINE_KIND_WHILE:
+         break;
+      case LINE_KIND_FLOW:
+         break;
+   
+      case LINE_KIND_FUNC_CALL:
+         break;
+      case LINE_KIND_IIF:
+         break;
+      case LINE_KIND_METHOD_CALL:
+         break;
+   
+      case LINE_KIND_IF:
+         break;
+      case LINE_KIND_ELSEIF:
+         break;
+      case LINE_KIND_ELSE:
+   
+      case LINE_KIND_PARAMETERS:
+         break;
+      case LINE_KIND_PRIVATES:
+         break;
+      case LINE_KIND_PUBLICS:
+         break;
+   
+      case LINE_KIND_RETURN:
+         break;
+   
+      case LINE_KIND_SEQUENCE:
+         break;
+      case LINE_KIND_RECOVER:
+         break;
+   
+      case LINE_KIND_SWITCH:
+         break;
+      case LINE_KIND_SWITCHCASE:
+         break;
+      case LINE_KIND_SWITCHDEAFULT:
+         break;
+   
+      case LINE_KIND_TRY:
+         break;
+      case LINE_KIND_CATCH:
+         break;
+      case LINE_KIND_FINALLY:
+         break;
+   
+      case LINE_KIND_UNARY:
+         break;
+   
+      case LINE_KIND_LIST:
+         break;
+
+      default:
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: LineKind()" );                  
+   }
 }

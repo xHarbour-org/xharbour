@@ -14,4 +14,5 @@
    void Release_MethodCall( METHOD_CALL *pMethodCall );
    void Release_Value( VALUE *pValue );
 
+   void Release_Line( LINE *pLine );
 #endif

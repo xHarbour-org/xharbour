@@ -42,7 +42,7 @@
    /* Initialize the hash table which makes up the symbol table. */   
    SYMBOLTABLE * Symbol_InitTable();   
       
-   SYMBOL * Symbol_Put( SYMBOLTABLE *SymbolTable, char *Name, SYMBOL_KIND Kind );         
-   SYMBOL * Symbol_Get( SYMBOLTABLE *SymbolTable, char *Name);
+   SYMBOL * Symbol_Put( SYMBOLTABLE *SymbolTable, char *Name, SYMBOL_KIND Kind, PARSER_CONTEXT *Parser_pContext );
+   SYMBOL * Symbol_Get( SYMBOLTABLE *SymbolTable, char *Name, PARSER_CONTEXT *Parser_pContext );
 
 #endif

@@ -26,7 +26,7 @@ SYMBOLTABLE *Symbol_InitTable()
    return pSymbolTable;
 }
 
-SYMBOL * Symbol_Put( SYMBOLTABLE *pSymbolTable, char *Name, SYMBOL_KIND Kind )
+SYMBOL * Symbol_Put( SYMBOLTABLE *pSymbolTable, char *Name, SYMBOL_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 { 
    int iHash;
    SYMBOL *pSymbol = pSymbolTable->Buckets[ ( iHash = Hash( Name ) ) ];
@@ -43,7 +43,7 @@ SYMBOL * Symbol_Put( SYMBOLTABLE *pSymbolTable, char *Name, SYMBOL_KIND Kind )
    pSymbol = NEW( SYMBOL );
 
    pSymbol->Kind  = Kind;
-   pSymbol->pID   = New_ID( Name ); 
+   pSymbol->pID   = New_ID( Name, Parser_pContext );
    pSymbol->pNext = pSymbolTable->Buckets[ iHash ];
 
    pSymbolTable->Buckets[ iHash ] = pSymbol;
@@ -51,7 +51,7 @@ SYMBOL * Symbol_Put( SYMBOLTABLE *pSymbolTable, char *Name, SYMBOL_KIND Kind )
    return pSymbol;
 }
   
-SYMBOL *Symbol_Get( SYMBOLTABLE *pSymbolTable, char *Name )
+SYMBOL *Symbol_Get( SYMBOLTABLE *pSymbolTable, char *Name, PARSER_CONTEXT *Parser_pContext )
 {
    int iHash;
    SYMBOL *pSymbol = pSymbolTable->Buckets[ ( iHash = Hash( Name ) ) ];

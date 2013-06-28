@@ -10,8 +10,6 @@
 #ifndef PARSER_DEFINED
    #include "tokens.h"
 
-   int yylex( void );
-
    #define ID_MAX_LEN 32
 
    #define PARSER_DEFINED
@@ -19,36 +17,48 @@
    #define LANG_C          0
    #define LANG_OBJ_MODULE 1
 
-   #define LAST_TOKEN()   Parser_iToken
 
-   #define NEXT_TOKEN()   ( Parser_iToken = ( Parser_iNextToken ? Parser_iNextToken : yylex() ), Parser_iNextToken = 0, Parser_iToken )
-   #define PUSH_BACK()    ( Parser_iNextToken = Parser_iToken )
+   #define LOOK_AHEAD_TOKEN() ( \
+                                Parser_pContext->Parser_iNextToken ? \
+                                  Parser_pContext->Parser_iNextToken : \
+                                  ( Parser_pContext->Parser_iNextToken = yylex( CARGO )  ) \
+                              )
+
+   #define DROP_AHEAD_TOKEN() ( Parser_pContext->Parser_iNextToken = yylex( CARGO ) )
+
+   #define LAST_TOKEN()       Parser_pContext->Parser_iToken
+
+   #define NEXT_TOKEN()       ( \
+                                Parser_pContext->Parser_iToken = \
+                                  ( Parser_pContext->Parser_iNextToken ? Parser_pContext->Parser_iNextToken : yylex( CARGO ) ), \
+                                Parser_pContext->Parser_iNextToken = 0, \
+                                Parser_pContext->Parser_iToken \
+                              )
 
    #define PARSE_ERROR( i, text1, text2 ) \
-              Parser_GenError( Parser_asErrors, 'E', i, text1, text2 ); \
+              Parser_GenError( Parser_asErrors, 'E', i, text1, text2, Parser_pContext ); \
               \
-              if( text1 == NULL || text1[0] != '\n' ) \
+              if( Parser_pContext->Parser_iToken != '\n' && Parser_pContext->Parser_iToken != -1 ) \
               { \
-                 while( ( Parser_iToken = yylex() ) > 0 && Parser_iToken != '\n' ) \
+                 while( LOOK_AHEAD_TOKEN() != -1 && LOOK_AHEAD_TOKEN() != '\n' ) \
                  { \
-                    ; \
+                    DROP_AHEAD_TOKEN(); \
                  } \
-                 PUSH_BACK(); \
               }
 
-   #define ACCEPT_EOS( iToken )  if( NEXT_TOKEN() != iToken && Parser_iToken != TOKEN_END ) \
+   #define ACCEPT_EOS( iToken )  if( NEXT_TOKEN() != iToken && Parser_pContext->Parser_iToken != TOKEN_END ) \
                                  { \
                                     PARSE_ERROR( PARSER_ERR_UNCLOSED_STRU, yytext, NULL ); \
                                  }
 
-   #define ACCEPT_EOL()  if( NEXT_TOKEN() != '\n' && Parser_iToken != -1 ) \
+   #define ACCEPT_EOL()  if( NEXT_TOKEN() != '\n' && Parser_pContext->Parser_iToken != -1 ) \
                          { \
-                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL." ); \
+                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL(1)." ); \
                          }
 
-   #define EXPECTED_EOL()  if( Parser_iToken != '\n' && Parser_iToken != -1  ) \
+   #define EXPECTED_EOL()  if( Parser_pContext->Parser_iToken != '\n' && Parser_pContext->Parser_iToken != -1  ) \
                            { \
-                              PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL." ); \
+                              PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL(2)." ); \
                            }
 
    #define ACCEPT_TOKEN( iToken )  if( NEXT_TOKEN() != iToken ) \
@@ -56,24 +66,26 @@
                             PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken ); \
                          }
 
-   #define EXPECTED_TOKEN( iToken )  if( Parser_iToken != iToken ) \
+   #define EXPECTED_TOKEN( iToken )  if( Parser_pContext->Parser_iToken != iToken ) \
                            { \
                               PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken ); \
                            }
 
-   #define EOB( iToken ) ( ( iToken >= TOKEN_FUNC && iToken <= TOKEN_CRITICAL_STATIC_PROC ) || \
-                             iToken == TOKEN_ELSE    || \
-                             iToken == TOKEN_ELSEIF  || \
-                             iToken == TOKEN_ENDIF   || \
-                             iToken == TOKEN_END     || \
-                             iToken == TOKEN_ENDCASE || \
-                             iToken == TOKEN_ENDDO   || \
-                             iToken == TOKEN_NEXT    || \
-                             iToken == -1               \
+   #define EOB( iToken ) ( \
+                           ( iToken >= FUNC_KIND_MIN && iToken <= FUNC_KIND_MAX ) || \
+                           iToken == TOKEN_ELSE    || \
+                           iToken == TOKEN_ELSEIF  || \
+                           iToken == TOKEN_ENDIF   || \
+                           iToken == TOKEN_END     || \
+                           iToken == TOKEN_ENDCASE || \
+                           iToken == TOKEN_ENDDO   || \
+                           iToken == TOKEN_NEXT    || \
+                           iToken == -1               \
                          )
 
    typedef enum
    {
+      FUNC_KIND_MIN                 = TOKEN_FUNC,
       FUNC_KIND_FUNC                = TOKEN_FUNC,
       FUNC_KIND_FUNC_STATIC         = TOKEN_STATIC_FUNC,
       FUNC_KIND_FUNC_INIT           = TOKEN_INIT_FUNC,
@@ -85,23 +97,25 @@
       FUNC_KIND_PROC_INIT           = TOKEN_INIT_PROC,
       FUNC_KIND_PROC_EXIT           = TOKEN_EXIT_PROC,
       FUNC_KIND_PROC_CRITICAL       = TOKEN_CRITICAL_PROC,
-      FUNC_KIND_PROC_STATICCRITICAL = TOKEN_CRITICAL_STATIC_PROC
+      FUNC_KIND_PROC_STATICCRITICAL = TOKEN_CRITICAL_STATIC_PROC,
+      FUNC_KIND_MAX                 = TOKEN_CRITICAL_STATIC_PROC
    } FUNC_KIND;
 
    typedef enum
    {
-      PRG_TYPE_UNDEF   = 0x000,
-      PRG_TYPE_NIL     = 0x001,
-      PRG_TYPE_STRING  = 0x002,
-      PRG_TYPE_CHAR    = 0x003,
-      PRG_TYPE_LOGICAL = 0x004,
-      PRG_TYPE_NUMERIC = 0x008,
-      PRG_TYPE_DECIMAL = 0x009,
-      PRG_TYPE_DATE    = 0x00A,
-      PRG_TYPE_ARRAY   = 0x010,
-      PRG_TYPE_BLOCK   = 0x020,
-      PRG_TYPE_OBJECT  = 0x040,  
-      PRG_TYPE_CLASS   = 0x080
+      PRG_TYPE_UNDEF    = 0x000,
+      PRG_TYPE_NIL      = 0x001,
+      PRG_TYPE_STRING   = 0x002,
+      PRG_TYPE_CHAR     = 0x003,
+      PRG_TYPE_LOGICAL  = 0x004,
+      PRG_TYPE_NUMERIC  = 0x008,
+      PRG_TYPE_DECIMAL  = 0x009,
+      PRG_TYPE_DATE     = 0x00A,
+      PRG_TYPE_DATETIME = 0x00B,
+      PRG_TYPE_ARRAY    = 0x010,
+      PRG_TYPE_BLOCK    = 0x020,
+      PRG_TYPE_OBJECT   = 0x040,
+      PRG_TYPE_CLASS    = 0x080
    } PRG_TYPE;
 
    typedef enum
@@ -110,37 +124,25 @@
       MACRO_KIND_COMPLEX
    } MACRO_KIND;
 
-#if 0
    typedef enum
    {
-      SYMBOL_KIND_ID,
-      SYMBOL_KIND_MACRO
-   } SYMBOL_KIND;
-#endif
-
-   typedef enum
-   {
-      DECLARED_KIND_NONE,
-      DECLARED_KIND_LOCAL_PARAM,
-      DECLARED_KIND_LOCAL,
-      DECLARED_KIND_STATIC,
-      DECLARED_KIND_MEMVAR,
-      DECLARED_KIND_FIELD
+      DECLARED_KIND_NONE = 0,
+      DECLARED_KIND_LOCAL_PARAMETER,
+      
+      DECLARED_KIND_LOCAL     = TOKEN_LOCAL,
+      DECLARED_KIND_STATIC    = TOKEN_STATIC,
+      DECLARED_KIND_FIELD     = TOKEN_FIELD,
+      DECLARED_KIND_MEMVAR    = TOKEN_MEMVAR,
+      
+      DECLARED_KIND_PARAMETER = TOKEN_PARAMETERS,
+      DECLARED_KIND_PRIVATE   = TOKEN_PRIVATE,
+      DECLARED_KIND_PUBLIC    = TOKEN_PUBLIC
    } DECLARED_KIND;
 
    typedef enum
    {
-      EXECUTABLE_MEMVAR_KIND_PARAMETER,
-      EXECUTABLE_MEMVAR_KIND_PRIVATE,
-      EXECUTABLE_MEMVAR_KIND_PUBLIC
-   } EXECUTABLE_MEMVAR_KIND;
-
-   typedef enum
-   {
-      LVALUE_KIND_ID,
-      LVALUE_KIND_MEMVAR,
+      LVALUE_KIND_VARIABLE,
       LVALUE_KIND_MACRO,
-
       LVALUE_KIND_ARRAY_ELEMENT,
       LVALUE_KIND_OBJ_PROPERTY,
       LVALUE_KIND_ALIASED_FIELD
@@ -153,7 +155,8 @@
       CONSTANT_KIND_DOUBLE,
       CONSTANT_KIND_STRING,
       CONSTANT_KIND_BOOL,
-      CONSTANT_KIND_DATE
+      CONSTANT_KIND_DATE,
+      CONSTANT_KIND_DATETIME
    } CONSTANT_KIND;
 
    typedef enum
@@ -203,8 +206,8 @@
       BINARY_KIND_IN           = '$',
       BINARY_KIND_LIKE         = '~',
       BINARY_KIND_HAS          = '?',
-      BINARY_KIND_GREATEREQUAL = 'ò',
-      BINARY_KIND_LESSEREQUAL  = 'ó',
+      BINARY_KIND_GREATEREQUAL = (unsigned char) '\242',
+      BINARY_KIND_LESSEREQUAL  = (unsigned char) '\243',
       BINARY_KIND_GREATER      = '>',
       BINARY_KIND_LESSER       = '<',
 
@@ -224,7 +227,8 @@
    {
       FLOW_KIND_LOOP,
       FLOW_KIND_EXIT,
-      FLOW_KIND_BREAK
+      FLOW_KIND_BREAK,
+      FLOW_KIND_AGAIN // New AGAIN statement
    } FLOW_KIND;
 
    typedef enum
@@ -263,7 +267,9 @@
       LINE_KIND_CATCH,
       LINE_KIND_FINALLY,
 
-      LINE_KIND_UNARY
+      LINE_KIND_UNARY,
+      
+      LINE_KIND_LIST // REVIEW and TODO
 
    } LINE_KIND;
     
@@ -309,6 +315,11 @@
             char   cDec;
          } Double;
 
+         struct
+         {
+            double dDouble;
+         } DateTime;
+
          char *sString;
          BOOL bLogical;
       } Value;
@@ -339,34 +350,11 @@
    {
        DECLARED_KIND Kind;
 
-       ID *           pName;
-       struct _VALUE *pInit;
+       ID *           pID;
+       struct _VALUE  *pInit;
 
        struct _DECLARED *pNext; 
    } DECLARED;
-
-#if 0
-   typedef struct _SYMBOL 
-   { 
-      SYMBOL_KIND Kind;
- 
-      union
-      { 
-         ID * pID;
-         MACRO * pMacro;
-     } Value;  
-   } SYMBOL; 
-#endif
-
-   typedef struct _EXECUTABLE_MEMVAR 
-   {
-       EXECUTABLE_MEMVAR_KIND Kind;
-
-       struct _VALUE *pName;
-       struct _VALUE *pInit;
-
-       struct _EXECUTABLE_MEMVAR *pNext; 
-   } EXECUTABLE_MEMVAR;
 
    /* Forward Declarations. */
    struct _ARRAY_ELEMENT;
@@ -381,8 +369,7 @@
 
       union
       {
-         ID *                    pID;
-         ID *                    pMemvar;
+         DECLARED *              pVariable;
          MACRO *                 pMacro;
 
          struct _ARRAY_ELEMENT *pArrayElement;
@@ -423,7 +410,8 @@
          struct _FUNC_CALL     *pFuncCall;
          struct _IIF           *pIIF;
          struct _METHOD_CALL   *pMethodCall;
-         struct _LIST          *pList; 
+         struct _LIST          *pList;
+         struct _VALUE         *pByRef;
       } Value;
  
    } VALUE;
@@ -659,9 +647,11 @@
          VALUE               *pIIF;
          VALUE               *pMethodCall;
 
-         EXECUTABLE_MEMVAR   *pParamters;
-         EXECUTABLE_MEMVAR   *pPrivates;
-         EXECUTABLE_MEMVAR   *pPublics;
+         DECLARED            *pLocals;
+         DECLARED            *pStatics;
+         DECLARED            *pParamters;
+         DECLARED            *pPrivates;
+         DECLARED            *pPublics;
 
          SEQUENCE            *pSequence;
          RECOVER             *pRecover;
@@ -676,7 +666,8 @@
          CATCH               *pCatch;
          BODY                *pFinally;
 
-         VALUE               *pUnary; 
+         VALUE               *pUnary;
+         VALUE               *pList;
       } Value;
 
       struct _LINE *pNext;
@@ -688,22 +679,22 @@
       BOOL               bProcedure;
 
       ID *                pName;
-      DECLARED *          pLocalParams;
-      int                iLocalParams;
+      DECLARED *          pLocalParameters;
+      int                 iLocalParameters;
       DECLARED *          pLocals;
-      int                iLocals;
+      int                 iLocals;
       DECLARED *          pStatics;
-      int                iStatics;
+      int                 iStatics;
       DECLARED *          pMemvars;
-      int                iMemvars;
+      int                 iMemvars;
       DECLARED *          pFields;
-      int                iFields;
-      EXECUTABLE_MEMVAR * pParams;
-      int                iParams;
-      EXECUTABLE_MEMVAR * pPrivates;
-      int                iPrivates;
-      EXECUTABLE_MEMVAR * pPublics;
-      int                iPublics;
+      int                 iFields;
+      DECLARED *          pParameters;
+      int                 iParameters;
+      DECLARED *          pPrivates;
+      int                 iPrivates;
+      DECLARED *          pPublics;
+      int                 iPublics;
       BODY *              pBody;
 
       struct _FUNCTION *pNext;
@@ -762,24 +753,35 @@
       int   iFiles;
    } PARSED_FILES;
 
-   extern int Parser_iBackend;
-   extern int Parser_iInlineID;
+   typedef struct
+   {
+      int Parser_iBackend;
+      int Parser_iInlineID;
 
-   extern int Parser_iLine, Parser_iErrors, Parser_iWarnings;
-   extern int Parser_iLinePRG, Parser_iLineINLINE;
-   extern int Parser_iNextToken;
-   extern int Parser_iToken;
+      int Parser_iLine;
+      int Parser_iErrors;
+      int Parser_iWarnings;
+      int Parser_iLinePRG;
+      int Parser_iLineINLINE;
+      int Parser_iNextToken;
+      int Parser_iToken;
    
-   extern BOOL Parser_bError, Parser_bAnyWarning, Parser_bMute, Parser_bPPO;
+      BOOL Parser_bError;
+      BOOL Parser_bAnyWarning;
+      BOOL Parser_bMute;
+      BOOL Parser_bPPO;
    
-   extern FUNCTIONS    Parser_Functions;
-   extern PARSED_FILES Parser_Files;
-   extern INLINES      Parser_Inlines;
-   extern FILE         *pParser_PPO;
-   
+      FUNCTIONS    Parser_Functions;
+      PARSED_FILES Parser_Files;
+      INLINES      Parser_Inlines;
+      
+      FILE *       Parser_pPPO;
+
+   } PARSER_CONTEXT;
+
+   extern char *  Parser_asErrors[];
+
    extern YYSTYPE   yylval;
-   
-   extern char *Parser_asErrors[];
    extern char *yytext;
 
    #if defined(__cplusplus)
@@ -788,9 +790,9 @@
 
    void Parser_Init( void );
 
-   INLINE * Parser_InlineAdd( char * szFunName );
+   INLINE * Parser_InlineAdd( char * szFunName, PARSER_CONTEXT *Parser_pContext );
 
-   void DumpLine( LINE *pLine, int *piSpaces );
+   void DumpLine( LINE *pLine, int *piSpaces, PARSER_CONTEXT *Parser_pContext );
 
    #if defined(__cplusplus)
       }
