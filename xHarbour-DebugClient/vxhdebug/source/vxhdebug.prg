@@ -4,6 +4,8 @@
 #include "dbstruct.ch"
 #include "hbclass.ch"
 
+#include "debug.ch"
+
 #include "vxhdebug.ch"
 
 #define TAB Chr( 9 )
@@ -169,6 +171,7 @@ RETURN {}
 
 METHOD IsValidStopLine( cFile, nLine ) CLASS XHDebugger
   IF ::socket != NIL
+  VIEW ".valid " + cFile + ":" + LTrim( Str( nLine ) )
     ::Do( ".valid " + cFile + ":" + LTrim( Str( nLine ) ) )
     RETURN Left( ::RecvUntil( ">" ), 3 ) == ".T."
   ENDIF
@@ -547,12 +550,18 @@ METHOD RecvUntil( cEndBlock ) CLASS XHDebugger
   LOCAL n, s := Space( 1 ), cString := ""
 
   DO WHILE ::socket != NIL .AND. InetErrorCode( ::socket ) == 0
-    n := InetRecv( ::socket, @s )
-    cString += Left( s, n )
-    IF Right( cString, Len( cEndBlock ) ) == cEndBlock
-      cString := Left( cString, Len( cString ) - Len( cEndBlock ) )
-      EXIT
-    ENDIF
+     n := InetRecv( ::socket, @s )
+     IF n > 0
+        cString += Left( s, n )
+     ENDIF
+     IF Right( cString, Len( cEndBlock ) ) == cEndBlock
+        cString := StrTran( cString, chr(10) )
+        cString := StrTran( cString, chr(13) )
+        view cString, cEndBlock
+        cString := Left( cString, Len( cString ) - Len( cEndBlock ) )
+        view cString
+        EXIT
+     ENDIF
   ENDDO
 RETURN cString
 

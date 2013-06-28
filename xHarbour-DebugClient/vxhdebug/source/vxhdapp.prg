@@ -36,7 +36,6 @@ CLASS Debugger FROM Application
 
   DATA DefaultFolder INIT ""
   DATA Project
-  DATA SourceTabs
   DATA EditorPage
   DATA FileMenu
   DATA CloseMenu
@@ -394,15 +393,18 @@ METHOD Init() CLASS MainWindow
       :Hide()
    END
 
-   WITH OBJECT ::Application:FileExplorer := TreeView( Self )
-      :Text        := "File Explorer"
-      :Width       := 150
-      :Border      := .T.
-      :Dock:Margin := 2
-      :StaticEdge  := .F.
-      :Dock:Right  := :Parent
-      :Dock:Top    := ::Application:CoolBar
-      :Dock:Bottom := ::Application:DebuggerPanel
+   WITH OBJECT ::Application:FileExplorer := FileExplorer( Self )
+      :Text          := "File Explorer"
+      :Width         := 150
+      :Border        := .T.
+      :LinesAtRoot   := .F.
+      :HasLines      := .F.
+      :ShowSelAlways := .T.
+      :Dock:Margin   := 2
+      :StaticEdge    := .F.
+      :Dock:Right    := :Parent
+      :Dock:Top      := ::Application:CoolBar
+      :Dock:Bottom   := ::Application:DebuggerPanel
       :Create()
    END
 
@@ -422,6 +424,16 @@ METHOD Init() CLASS MainWindow
 
    ::Show()
 RETURN Self
+
+CLASS FileExplorer INHERIT TreeView
+   METHOD SetFile()
+ENDCLASS
+
+METHOD SetFile( oObj ) CLASS FileExplorer
+   oObj:TreeItem := ::AddItem( oObj:FileName, 1 )
+   oObj:TreeItem:Cargo := oObj
+RETURN Self
+
 
 CLASS Project
    ACCESS Application    INLINE __GetApplication()
@@ -449,16 +461,13 @@ CLASS Project
    METHOD Close()
    METHOD Open()
    METHOD ResetQuickOpen()
-   METHOD EditCopy()
-   METHOD EditCut()
-   METHOD EditPaste()
    METHOD EditReset()
 
    METHOD OpenSource( cSource, lNoDialog )
    METHOD CloseSource()
    METHOD SaveSource()
    METHOD SaveSourceAs()
-
+   METHOD OpenFile()
    METHOD SourceTabChanged()
 ENDCLASS
 
@@ -537,36 +546,9 @@ RETURN NIL
 
 METHOD SourceTabChanged( nCur ) CLASS Project
    ::Application:SourceEditor:aDocs[ nCur ]:Select()
+   ::Application:SourceEditor:Text := ::Application:SourceEditor:aDocs[ nCur ]:File
+   ::Application:SourceEditor:aDocs[ nCur ]:TreeItem:Select()
 RETURN Self
-
-//-------------------------------------------------------------------------------------------------------
-
-METHOD EditCopy() CLASS Project
-      // Simulate keystrokes for xEdit
-      keybd_event( VK_CONTROL )
-      keybd_event( ASC("C") )
-      keybd_event( ASC("C"), KEYEVENTF_KEYUP )
-      keybd_event( VK_CONTROL, KEYEVENTF_KEYUP )
-RETURN Self
-
-//-------------------------------------------------------------------------------------------------------
-
-METHOD EditCut() CLASS Project
-   
-      // Simulate keystrokes for xEdit
-      keybd_event( VK_CONTROL )
-      keybd_event( ASC("X") )
-      keybd_event( ASC("X"), KEYEVENTF_KEYUP )
-      keybd_event( VK_CONTROL, KEYEVENTF_KEYUP )
-
-RETURN NIL
-
-METHOD EditPaste() CLASS Project
-      keybd_event( VK_CONTROL )
-      keybd_event( ASC("V") )
-      keybd_event( ASC("V"), KEYEVENTF_KEYUP )
-      keybd_event( VK_CONTROL, KEYEVENTF_KEYUP )
-RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -591,7 +573,7 @@ METHOD Close() CLASS Project
   ENDIF
 
   lRem := .F.
-   FOR n := 1 TO ::Application:SourceEditor:DocCount
+   FOR n := 1 TO LEN( ::Application:SourceEditor:aDocs )
        IF ::Application:SourceEditor:aDocs[n]:Modified
           IF nRes == NIL
              oMsg := MsgBoxEx( ::Application:MainWindow, "Save changes to "+::Application:SourceEditor:aDocs[n]:cPath+::Application:SourceEditor:aDocs[n]:cFile+" before closing?", "Source File", IDI_QUESTION )
@@ -620,9 +602,7 @@ METHOD Close() CLASS Project
           ENDIF
        ENDIF
 
-       ::Application:SourceEditor:aDocs[n]:lModified := .F.
-       ::Application:SourceTabs:DeleteTab(n)
-
+       ::Application:SourceEditor:aDocs[n]:Modified := .F.
        ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
@@ -670,7 +650,7 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
       ofn := (struct OPENFILENAME)
 
       ofn:lStructSize     := 76
-      ofn :hwndOwner      := ::Application:MainWindow:hWnd
+      ofn:hwndOwner      := ::Application:MainWindow:hWnd
       ofn:hInstance       := GetModuleHandle()
       ofn:nMaxFile        := MAX_PATH + 1
 
@@ -696,7 +676,10 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
          ENDIF
          oEditor:Save( cFile )
          IF lSetTabName
-            ::Application:SourceTabs:SetItem( n, oEditor:cFile )
+            oEditor:TreeItem:Text := oEditor:FileName
+            IF ::Application:SourceEditor:Source == oEditor
+               ::Application:SourceEditor:Text := oEditor:File
+            ENDIF
          ENDIF
       ENDIF
       EXIT
@@ -814,10 +797,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
    oEditor := Source( ::Application:SourceEditor, cPath + cName )
 
-//   ::Application:SourceTabs:InsertTab( cName )
-//   ::Application:SourceTabs:SetCurSel( ::Application:SourceEditor:DocCount )
-
-   ::Application:SourceEditor:Text := cName
+   ::Application:FileExplorer:SetFile( oEditor )
 
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
 
@@ -829,6 +809,21 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
    OnShowEditors()
 
 RETURN Self
+
+METHOD OpenFile( cFile ) CLASS Project
+   LOCAL n, lRet := .F.
+   IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| UPPER(o:File) == UPPER(cFile) } ) ) > 0
+      ::Application:SourceEditor:aDocs[n]:TreeItem:Select()
+      ::SourceTabChanged( n )
+      ::Application:SourceEditor:Text := ::Application:SourceEditor:aDocs[n]:File
+
+      IF !::Application:SourceEditor:IsWindowVisible()
+         ::Application:EditorPage:Select()
+      ENDIF
+      ::Application:SourceEditor:SetFocus()
+      lRet := .T.
+   ENDIF
+RETURN lRet
 
 //-------------------------------------------------------------------------------------------------------
 

@@ -174,22 +174,17 @@ RETURN Self
 
 
 METHOD GetUnavailableEditor( cFile ) CLASS XHDebuggerGUI
-  LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|o| Empty( o:cFile ) } )
-  IF n == 0
-    ::oEditor := Source( ::oApp:SourceEditor )
-    ::oEditor:TreeItem := ::oApp:FileTree:AddItem( "Unavailable code" )
-    ::oEditor:TreeItem:Select()
-
-    //::oApp:SourceTabs:InsertTab( "Unavailable code" )
-  ENDIF
-  ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
-  ::oEditor:TreeItem:Select()
-
-  //::oApp:SourceTabs:SetCurSel( n )
-  //::oApp:Project:SourceTabChanged( n )
-  
-  ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
-  ::oEditor:lReadOnly := .T.
+   LOCAL n := AScan( ::oApp:SourceEditor:aDocs, {|o| Empty( o:cFile ) } )
+   IF n == 0
+      ::oEditor := Source( ::oApp:SourceEditor )
+      ::oEditor:TreeItem := ::oApp:FileExplorer:AddItem( "Unavailable code" )
+      ::oEditor:TreeItem:Select()
+   ELSE
+      ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
+   ENDIF
+   ::oEditor:TreeItem:Select()
+   ::oEditor:Load( , "CODE NOT AVAILABLE FOR " + cFile, .T. )
+   ::oEditor:lReadOnly := .T.
 RETURN n
 
 
@@ -367,11 +362,13 @@ RETURN CallNextHookEx( ::hHook, nCode, nwParam, nlParam)
 
 
 METHOD RunToCursor() CLASS XHDebuggerGUI
-  WITH OBJECT ::oApp:SourceEditor:oEditor
-    IF ::IsValidStopLine( :cFile, :nLine )
-      ::Super:Until( :cFile, :nLine )
-    ENDIF
-  END
+   local cFile, nLine
+   cFile := ::oApp:SourceEditor:Source:File
+   nLine := ::oApp:SourceEditor:Source:GetCurLine()+1
+
+   IF ::IsValidStopLine( cFile, nLine )
+      ::Super:Until( cFile, nLine )
+   ENDIF
 RETURN Self
 
 
@@ -452,17 +449,13 @@ METHOD Sync() CLASS XHDebuggerGUI
                    {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
                         == Lower( cFile ) } ) ) > 0
     ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
-
-    //::oApp:SourceTabs:SetCurSel( n )
-    //::oEditor:TreeItem:Select()
-
     ::oApp:Project:SourceTabChanged( n )
 
     IF !::oApp:SourceEditor:IsWindowVisible()
       ::oApp:EditorPage:Select()
     ENDIF
 
-    //::oApp:SourceEditor:SetFocus()
+    ::oApp:SourceEditor:SetFocus()
   ELSE
     ::oApp:SourceEditor:Show()
     
@@ -475,8 +468,9 @@ METHOD Sync() CLASS XHDebuggerGUI
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
-      ::oEditor:TreeItem := ::oApp:FileTree:AddItem( ::cModule )
+      ::oApp:FileExplorer:SetFile( ::oEditor )
       ::oEditor:TreeItem:Select()
+
       //::oApp:SourceTabs:InsertTab( ::cModule )
       //::oApp:SourceTabs:SetCurSel( nDocs )
       //::oApp:Project:SourceTabChanged( nDocs )
