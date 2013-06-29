@@ -2,19 +2,19 @@
 
 static VALUE * ( *ReduceValue[] )( VALUE *, PARSER_CONTEXT * ) =
    {
-      Reduce_NIL,           //VALUE_KIND_NIL,
-      Reduce_Constant,      //VALUE_KIND_CONSTANT,
-      Reduce_LValue,        //VALUE_KIND_LVALUE,
-      Reduce_Array,         //VALUE_KIND_ARRAY,
-      Reduce_Block,         //VALUE_KIND_BLOCK,
-      Reduce_Unary,         //VALUE_KIND_UNARY,
-      Reduce_Binary,        //VALUE_KIND_BINARY,
-      Reduce_Aliased,       //VALUE_KIND_ALIASED,
-      Reduce_Assignment,    //VALUE_KIND_ASSIGNMENT,
-      Reduce_FuncCall,      //VALUE_KIND_FUNC_CALL,
-      Reduce_IIF,           //VALUE_KIND_IIF,
-      Reduce_MethodCall,    //VALUE_KIND_METHOD_CALL,
-      Reduce_List           //VALUE_KIND_LIST
+      Reduce_NILValue,           //VALUE_KIND_NIL,
+      Reduce_ConstantValue,      //VALUE_KIND_CONSTANT,
+      Reduce_LValueValue,        //VALUE_KIND_LVALUE,
+      Reduce_ArrayValue,         //VALUE_KIND_ARRAY,
+      Reduce_BlockValue,         //VALUE_KIND_BLOCK,
+      Reduce_UnaryValue,         //VALUE_KIND_UNARY,
+      Reduce_BinaryValue,        //VALUE_KIND_BINARY,
+      Reduce_AliasedValue,       //VALUE_KIND_ALIASED,
+      Reduce_AssignmentValue,    //VALUE_KIND_ASSIGNMENT,
+      Reduce_FuncCallValue,      //VALUE_KIND_FUNC_CALL,
+      Reduce_IIFValue,           //VALUE_KIND_IIF,
+      Reduce_MethodCallValue,    //VALUE_KIND_METHOD_CALL,
+      Reduce_ListValue           //VALUE_KIND_LIST
    };
 
 int BinaryPrecedence[ TOKEN_MAX_TOKENS ] = {1};
@@ -54,17 +54,17 @@ void Reducer_Init( void )
    BinaryPrecedence[ BINARY_KIND_OR ]           = 1;
 }
 
-VALUE * Reduce_NIL( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_NILValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    return pValue;
 }
 
-VALUE * Reduce_Constant( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_ConstantValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    return pValue;
 }
 
-VALUE * Reduce_LValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_LValueValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    switch( pValue->Value.pLValue->Kind )
    {
@@ -86,6 +86,8 @@ VALUE * Reduce_LValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
          break;
 
       case LVALUE_KIND_ARRAY_ELEMENT :
+         pValue->Value.pLValue->Value.pArrayElement->pArray = ReduceValue[ pValue->Value.pLValue->Value.pArrayElement->pArray->Kind ](pValue->Value.pLValue->Value.pArrayElement->pArray, Parser_pContext );
+         pValue->Value.pLValue->Value.pArrayElement->pIndexList = Reduce_List( pValue->Value.pLValue->Value.pArrayElement->pIndexList , Parser_pContext );
         break;
 
       case LVALUE_KIND_OBJ_PROPERTY :
@@ -102,47 +104,20 @@ VALUE * Reduce_LValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_Array( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_ArrayValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
-   LIST_NODE *pNode = pValue->Value.pArray->pFirst;
-   VALUE * pElement;
-
-   while( pNode )
-   {
-      pElement = pNode->pValue;
-
-      if( pElement )
-      {
-         pNode->pValue = ReduceValue[ pElement->Kind ]( pElement, Parser_pContext );
-      }
-
-      pNode = pNode->pNext;
-   }
+   pValue->Value.pArray = Reduce_List( pValue->Value.pArray, Parser_pContext );
 
    return pValue;
 }
 
-VALUE * Reduce_Block( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_BlockValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
-   LIST_NODE *pNode = pValue->Value.pBlock->pList->Value.pList->pFirst;
-   VALUE * pElement;
-
-   while( pNode )
-   {
-      pElement = pNode->pValue;
-
-      if( pElement )
-      {
-         pNode->pValue = ReduceValue[ pElement->Kind ]( pElement, Parser_pContext );
-      }
-
-      pNode = pNode->pNext;
-   }
-
+   pValue->Value.pBlock->pList = Reduce_List( pValue->Value.pArray, Parser_pContext );
    return pValue;
 }
 
-VALUE * Reduce_Unary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_UnaryValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pUnary->pLValue )
    {
@@ -152,7 +127,7 @@ VALUE * Reduce_Unary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_Binary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_BinaryValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pBinary->pLeft && pValue->Value.pBinary->pRight )
    {
@@ -172,7 +147,7 @@ VALUE * Reduce_Binary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_Aliased( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_AliasedValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pAliased->pArea && pValue->Value.pAliased->pValue )
    {
@@ -183,7 +158,7 @@ VALUE * Reduce_Aliased( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_Assignment( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_AssignmentValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pAssignment->pLValue && pValue->Value.pAssignment->pValue )
    {
@@ -195,22 +170,22 @@ VALUE * Reduce_Assignment( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_FuncCall( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_FuncCallValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
-   if( pValue->Value.pFuncCall->pSymbol )
+   if( pValue->Value.pFunctionCall->pSymbol )
    {
-      pValue->Value.pFuncCall->pSymbol = ReduceValue[ pValue->Value.pFuncCall->pSymbol->Kind ]( pValue->Value.pFuncCall->pSymbol, Parser_pContext );
+      pValue->Value.pFunctionCall->pSymbol = ReduceValue[ pValue->Value.pFunctionCall->pSymbol->Kind ]( pValue->Value.pFunctionCall->pSymbol, Parser_pContext );
 
-      if( pValue->Value.pFuncCall->pArguments )
+      if( pValue->Value.pFunctionCall->pArguments )
       {
-         pValue->Value.pFuncCall->pArguments = ReduceValue[ pValue->Value.pFuncCall->pArguments->Kind ]( pValue->Value.pFuncCall->pArguments, Parser_pContext );
+         pValue->Value.pFunctionCall->pArguments = ReduceValue[ pValue->Value.pFunctionCall->pArguments->Kind ]( pValue->Value.pFunctionCall->pArguments, Parser_pContext );
       }
    }
 
    return pValue;
 }
 
-VALUE * Reduce_IIF( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_IIFValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pIIF->pCond && pValue->Value.pIIF->pTrue && pValue->Value.pIIF->pFalse )
    {
@@ -227,7 +202,7 @@ VALUE * Reduce_IIF( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_MethodCall( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * Reduce_MethodCallValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    if( pValue->Value.pMethodCall->pObject && pValue->Value.pMethodCall->pMethod )
    {
@@ -238,23 +213,31 @@ VALUE * Reduce_MethodCall( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    return pValue;
 }
 
-VALUE * Reduce_List( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+// Worker of Reduce_ListValue()
+LIST * Reduce_List( LIST * pList, PARSER_CONTEXT *Parser_pContext )
 {
-   LIST_NODE *pNode = pValue->Value.pArray->pFirst;
+   LIST_NODE *pNode = pList->pFirst;
    VALUE * pElement;
-
+   
    while( pNode )
    {
       pElement = pNode->pValue;
-
+      
       if( pElement )
       {
          pNode->pValue = ReduceValue[ pElement->Kind ]( pElement, Parser_pContext );
       }
-
+      
       pNode = pNode->pNext;
    }
+   
+   return pList;
+}
 
+VALUE * Reduce_ListValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+{
+   pValue->Value.pList = Reduce_List( pValue->Value.pArray, Parser_pContext );
+   
    return pValue;
 }
 
@@ -278,7 +261,7 @@ VALUE * LeftLeaf( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
          break;
  
       case VALUE_KIND_ASSIGNMENT : 
-         return pValue->Value.pAssignment->pLValue;
+         return LeftLeaf( )pValue->Value.pAssignment->pLValue );
          break;
  
       case VALUE_KIND_FUNC_CALL : 

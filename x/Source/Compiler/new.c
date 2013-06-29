@@ -28,6 +28,28 @@ ID * New_ID( char *sName, PARSER_CONTEXT *Parser_pContext )
    return pID; 
 }
 
+DECLARED * New_Declared( PARSER_CONTEXT *Parser_pContext )
+{
+   DECLARED *pDeclared = NEW( DECLARED );
+   
+   pDeclared->Kind  = DECLARED_KIND_NONE;
+   pDeclared->pID   = NULL;
+   pDeclared->pInit = NULL;
+   
+   return pDeclared;
+}
+
+DECLARED * New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+{
+   DECLARED *pDeclared = NEW( DECLARED );
+   
+   pDeclared->Kind  = Kind;
+   pDeclared->pID   = New_ID( sName, Parser_pContext );
+   pDeclared->pInit = NULL;
+   
+   return pDeclared;
+}
+
 FUNCTION * New_Function( char *sFunc, FUNC_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    ID *pID = New_ID( sFunc, Parser_pContext );
@@ -101,7 +123,7 @@ LINE * New_Line( void *x, LINE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
          break;
 
 
-      case LINE_KIND_FUNC_CALL : 
+      case LINE_KIND_FUNCTION_CALL : 
          //pLine->Value.pAssignment = ReduceValue[ ( (VALUE *) x )->Kind ]( (VALUE *) x, Parser_pContext );
          pLine->Value.pAssignment = (VALUE *) x;
          break;
@@ -215,7 +237,7 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 
    pValue->Kind = Kind;
 
-   switch( Kind )
+   switch( Kind & 0x00FF ) // Unmask ERROR attribute
    {
       case VALUE_KIND_NIL : 
          pValue->Type = PRG_TYPE_NIL;
@@ -261,9 +283,9 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
          pValue->Type = pValue->Value.pAssignment->Type;
          break;
  
-      case VALUE_KIND_FUNC_CALL : 
-         pValue->Value.pFuncCall = (FUNC_CALL *) x;   
-         pValue->Type = pValue->Value.pFuncCall->Type;
+      case VALUE_KIND_FUNCTION_CALL :
+         pValue->Value.pFunctionCall = (FUNCTION_CALL *) x;
+         pValue->Type = pValue->Value.pFunctionCall->Type;
          break;
  
       case VALUE_KIND_IIF : 
@@ -291,12 +313,12 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
    return pValue;    
 }
 
-VALUE * New_NIL( PARSER_CONTEXT *Parser_pContext )
+VALUE * New_NILValue( PARSER_CONTEXT *Parser_pContext )
 {
    return New_Value( NULL, VALUE_KIND_NIL, Parser_pContext );
 }
 
-VALUE * New_Constant( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_ConstantValue( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext )
 {
    CONSTANT *pCopy = NEW( CONSTANT);
 
@@ -330,7 +352,7 @@ VALUE * New_Constant( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext )
    return New_Value( (void *) pCopy, VALUE_KIND_CONSTANT, Parser_pContext );
 }
 
-VALUE * New_Block( PARSER_CONTEXT *Parser_pContext )
+VALUE * New_BlockValue( PARSER_CONTEXT *Parser_pContext )
 { 
    BLOCK *pBlock = NEW( BLOCK );
     
@@ -341,14 +363,18 @@ VALUE * New_Block( PARSER_CONTEXT *Parser_pContext )
    return New_Value( (void *) pBlock, VALUE_KIND_BLOCK, Parser_pContext );
 } 
 
-VALUE * New_Unary( VALUE * pValue, UNARY_KIND Kind, UNARY_WHEN When, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_UnaryValue( VALUE * pValue, UNARY_KIND Kind, UNARY_WHEN When, PARSER_CONTEXT *Parser_pContext )
 {
    UNARY *pUnary;
-
+   VALUE_KIND ValueKind = VALUE_KIND_UNARY;
+   
    if( pValue == NULL || pValue->Kind != VALUE_KIND_LVALUE )
    {
-      PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, yytext, "unary operation." );
-      return NULL;
+      // REVIEW: Better to try to continue parsing offensive line!
+      //PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, yytext, "unary operation." );
+      Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_INVALID_LVALUE, "Unary operator", yytext, Parser_pContext );
+      ValueKind |= VALUE_KIND_ERROR;
+      //return NULL;
    }
 
    pUnary = NEW( UNARY );
@@ -357,10 +383,10 @@ VALUE * New_Unary( VALUE * pValue, UNARY_KIND Kind, UNARY_WHEN When, PARSER_CONT
    pUnary->When = When;
    pUnary->pLValue = pValue;
 
-   return New_Value( (void *) pUnary, VALUE_KIND_UNARY, Parser_pContext );
+   return New_Value( (void *) pUnary, ValueKind , Parser_pContext );
 }
 
-VALUE * New_LValue( void *x, LVALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_LValueValue( void *x, LVALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    LVALUE *pLValue = NEW( LVALUE );
 
@@ -396,14 +422,14 @@ VALUE * New_LValue( void *x, LVALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
    return New_Value( (void *) pLValue, VALUE_KIND_LVALUE, Parser_pContext );
 }
 
-VALUE * New_LValueID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_LValueIDValue( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    DECLARED *pDeclared = New_DeclaredID( sName, Kind ,Parser_pContext );
    
-   return New_LValue( (void *) pDeclared, LVALUE_KIND_VARIABLE, Parser_pContext );
+   return New_LValueValue( (void *) pDeclared, LVALUE_KIND_VARIABLE, Parser_pContext );
 }
 
-VALUE * New_Binary( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_BinaryValue( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    BINARY *pBinary = NEW( BINARY );
    VALUE  *pValue;
@@ -440,7 +466,7 @@ VALUE * New_Binary( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_CONTEX
    return pValue;
 }
 
-VALUE * New_Macro( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    MACRO *pMacro = NEW( MACRO );
 
@@ -460,10 +486,10 @@ VALUE * New_Macro( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext )
          PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected type in: " __SOURCE__ );
    }
 
-   return New_LValue( (void *) pMacro, LVALUE_KIND_MACRO, Parser_pContext );
+   return New_LValueValue( (void *) pMacro, LVALUE_KIND_MACRO, Parser_pContext );
 }
 
-VALUE * New_Aliased( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    ALIASED *pAliased = NEW( ALIASED );
 
@@ -473,7 +499,7 @@ VALUE * New_Aliased( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_pCont
    return New_Value( (void *) pAliased, VALUE_KIND_ALIASED, Parser_pContext );
 }
 
-VALUE * New_IIF( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_IIFValue( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *Parser_pContext )
 {
    IIF *pIIF = NEW( IIF );
 
@@ -484,7 +510,7 @@ VALUE * New_IIF( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *P
    return New_Value( (void *) pIIF, VALUE_KIND_IIF, Parser_pContext );
 } 
 
-VALUE * New_Assignment( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_AssignmentValue( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 { 
    ASSIGNMENT *pAssignment = NEW( ASSIGNMENT );
     
@@ -505,29 +531,36 @@ VALUE * New_Assignment( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, P
    }
 
    return New_Value( (void *) pAssignment, VALUE_KIND_ASSIGNMENT, Parser_pContext );
-} 
- 
-DECLARED * New_Declared( PARSER_CONTEXT *Parser_pContext ) 
-{ 
-   DECLARED *pDeclared = NEW( DECLARED );
-
-   pDeclared->Kind  = DECLARED_KIND_NONE;
-   pDeclared->pID   = NULL;
-   pDeclared->pInit = NULL;
- 
-   return pDeclared; 
 }
 
-DECLARED * New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
-{ 
-   DECLARED *pDeclared = NEW( DECLARED );
-
-   pDeclared->Kind  = Kind;
-   pDeclared->pID   = New_ID( sName, Parser_pContext );
-   pDeclared->pInit = NULL;
- 
-   return pDeclared; 
+VALUE * New_FunctionCallValue( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT *Parser_pContext )
+{
+   FUNCTION_CALL *pFunctionCall = NEW( FUNCTION_CALL );
+   
+   pFunctionCall->pSymbol = pSymVal ;
+   pFunctionCall->pArguments = pArgList;
+   pFunctionCall->Type = PRG_TYPE_UNDEF;
+   
+   return New_Value( (void *) pFunctionCall, VALUE_KIND_FUNCTION_CALL, Parser_pContext );
 }
+
+VALUE * New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT *Parser_pContext )
+{
+   ARRAY_ELEMENT *pArrayElement = NEW( ARRAY_ELEMENT );
+   
+   if( pIndexList == NULL )
+   {
+      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "invalid array index." );
+   }
+   
+   pArrayElement->pArray = pArray;
+   pArrayElement->pIndexList = pIndexList;
+   
+   return New_LValueValue( (void *) pArrayElement, LVALUE_KIND_ARRAY_ELEMENT, Parser_pContext );
+}
+
+ 
+// Begin Source units
 
 LINE * New_If( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContext )
 {
@@ -603,30 +636,4 @@ LIST * New_List( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
    }
 
    return pList;
-}
-
-VALUE * New_FuncCall( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT *Parser_pContext )
-{
-   FUNC_CALL *pFuncCall = NEW( FUNC_CALL );
-
-   pFuncCall->pSymbol = pSymVal ;
-   pFuncCall->pArguments = pArgList;
-   pFuncCall->Type = PRG_TYPE_UNDEF;
-
-   return New_Value( (void *) pFuncCall, VALUE_KIND_FUNC_CALL, Parser_pContext );
-}
-
-VALUE * New_ArrayElement( VALUE * pArray, VALUE * pIndexList, PARSER_CONTEXT *Parser_pContext )
-{
-   ARRAY_ELEMENT *pArrayElement = NEW( ARRAY_ELEMENT );
-
-   if( pIndexList == NULL )
-   {
-      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "invalid array index." );
-   }
-
-   pArrayElement->pArray = pArray;
-   pArrayElement->pIndexList = pIndexList;
-
-   return New_LValue( (void *) pArrayElement, LVALUE_KIND_ARRAY_ELEMENT, Parser_pContext );
 }

@@ -6,19 +6,22 @@
 
    void Reducer_Init( void );
 
-   VALUE * Reduce_NIL( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Constant( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_LValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Array( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Block( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Unary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Binary( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Aliased( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_Assignment( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_FuncCall( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_IIF( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_MethodCall( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
-   VALUE * Reduce_List( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   // Worker
+   LIST  * Reduce_List( LIST * pList, PARSER_CONTEXT *Parser_pContext );
+
+   VALUE * Reduce_NILValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_ConstantValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_LValueValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_ArrayValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_BlockValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_UnaryValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_BinaryValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_AliasedValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_AssignmentValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_FuncCallValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_IIFValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_MethodCallValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+   VALUE * Reduce_ListValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
 
    VALUE * Get_LValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
 

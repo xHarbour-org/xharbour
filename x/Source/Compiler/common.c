@@ -20,6 +20,22 @@ char * ClipNet_strdup( const char *pString )
    return pCopy;
 }
 
+const char * ClipNet_MacroKind( const MACRO *pMacro, PARSER_CONTEXT *Parser_pContext )
+{
+   switch( pMacro->Kind )
+   {
+      CASE_STRING( MACRO_KIND_COMPLEX )
+         break;
+      CASE_STRING( MACRO_KIND_SIMPLE )
+         break;
+         
+      default:
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_MacroKind()" );
+   }
+   
+   return __SOURCE__;
+}
+
 const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Parser_pContext )
 {
    switch( pDeclared->Kind )
@@ -44,7 +60,7 @@ const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Pa
          break;
          
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_LValueKind()" );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_DeclaredKind()" );
    }
    
    return __SOURCE__;
@@ -103,7 +119,7 @@ const char * ClipNet_ValueKind( const VALUE *pValue, PARSER_CONTEXT *Parser_pCon
       CASE_STRING( VALUE_KIND_ASSIGNMENT )
          break;
          
-      CASE_STRING( VALUE_KIND_FUNC_CALL )
+      CASE_STRING( VALUE_KIND_FUNCTION_CALL )
          break;
          
       CASE_STRING( VALUE_KIND_IIF )
@@ -150,7 +166,7 @@ const char * ClipNet_LineKind( const LINE *pLine, PARSER_CONTEXT *Parser_pContex
          break;
 
          
-      CASE_STRING( LINE_KIND_FUNC_CALL );
+      CASE_STRING( LINE_KIND_FUNCTION_CALL );
          break;
          
       CASE_STRING( LINE_KIND_IIF );

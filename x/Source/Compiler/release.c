@@ -13,7 +13,20 @@ void Release_List( LIST *pList )
 
 void Release_Block( BLOCK *pBlock )
 {
-   ClipNet_free( (void *) pBlock );
+   if( pBlock->pBlockLocals )
+   {
+      ClipNet_free( pBlock->pBlockLocals );
+      pBlock->pBlockLocals = NULL;
+   }
+   
+   if( pBlock->pList )
+   {
+      ClipNet_free( pBlock->pList );
+      pBlock->pList = NULL;
+   }
+   
+   ClipNet_free( pBlock );
+   pBlock = NULL;
 }
 
 void Release_Unary( UNARY *pUnary )
@@ -36,9 +49,9 @@ void Release_Assignment( ASSIGNMENT *pAssignment )
    ClipNet_free( (void *) pAssignment );
 }
 
-void Release_FuncCall( FUNC_CALL *pFuncCall )
+void Release_FunctionCall( FUNCTION_CALL *pFunctionCall )
 {
-   ClipNet_free( (void *) pFuncCall );
+   ClipNet_free( (void *) pFunctionCall );
 }
 
 void Release_IIF( IIF *pIIF )
@@ -58,7 +71,7 @@ void Release_ByRef( VALUE *pByRef )
 
 void Release_Value( VALUE *pValue )
 {
-   switch( pValue->Kind )
+   switch( pValue->Kind & 0x00FF ) // Unmask ERROR attribute
    {
       case VALUE_KIND_NIL : 
          break;
@@ -95,8 +108,8 @@ void Release_Value( VALUE *pValue )
          Release_Assignment( pValue->Value.pAssignment );
          break;
  
-      case VALUE_KIND_FUNC_CALL : 
-         Release_FuncCall( pValue->Value.pFuncCall );
+      case VALUE_KIND_FUNCTION_CALL :
+         Release_FunctionCall( pValue->Value.pFunctionCall );
          break;
  
       case VALUE_KIND_IIF : 
@@ -139,7 +152,7 @@ void Relese_Line( LINE *pLine, PARSER_CONTEXT *Parser_pContext )
       case LINE_KIND_FLOW:
          break;
    
-      case LINE_KIND_FUNC_CALL:
+      case LINE_KIND_FUNCTION_CALL:
          break;
       case LINE_KIND_IIF:
          break;

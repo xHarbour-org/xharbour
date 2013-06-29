@@ -10,6 +10,32 @@
 
 static char sPad[2048] = { 0 } ;
 
+int IterateMacro( MACRO * pMacro, PARSER_CONTEXT *Parser_pContext, int iNestingLevel )
+{
+   int iResult = 0;
+
+   sPad[iNestingLevel++] = ' ';
+   sPad[iNestingLevel] = '\0';
+   
+   printf( "%s %i Iterating Macro Kind: %s\n", sPad, iNestingLevel, ClipNet_MacroKind( pMacro, Parser_pContext ) );
+   
+   switch( pMacro->Kind )
+   {
+      case  MACRO_KIND_SIMPLE:
+         printf( "%s %i Simple Macro: %s\n", sPad, iNestingLevel, pMacro->Value.pID->Name );
+         break;
+        
+      case  MACRO_KIND_COMPLEX:
+         iResult = IterateValue( pMacro->Value.pComplex, Parser_pContext, iNestingLevel );
+         break;
+        
+      default:
+        iResult = 1;
+   }
+   
+   return iResult;
+}
+
 int IterateLValue( LVALUE *pLValue, PARSER_CONTEXT *Parser_pContext, int iNestingLevel )
 {
    int iResult = 0;
@@ -27,6 +53,10 @@ int IterateLValue( LVALUE *pLValue, PARSER_CONTEXT *Parser_pContext, int iNestin
          
       case LVALUE_KIND_ALIASED_FIELD:
          printf( "%s %i Variable: %s\n", sPad, iNestingLevel, pLValue->Value.pVariable->pID->Name );
+         break;
+
+      case LVALUE_KIND_MACRO:
+         IterateMacro( pLValue->Value.pMacro, Parser_pContext, iNestingLevel );
          break;
          
        default:
@@ -77,12 +107,13 @@ int IterateValue( VALUE *pValue, PARSER_CONTEXT *Parser_pContext, int iNestingLe
          
       case VALUE_KIND_ALIASED:
          break;
+         
       case VALUE_KIND_ASSIGNMENT:
          iResult = IterateValue( pValue->Value.pAssignment->pLValue, Parser_pContext, iNestingLevel );
          iResult = iResult || IterateValue( pValue->Value.pAssignment->pValue, Parser_pContext, iNestingLevel );
          break;
          
-      case VALUE_KIND_FUNC_CALL:
+      case VALUE_KIND_FUNCTION_CALL:
          break;
       case VALUE_KIND_IIF:
          break;
@@ -131,7 +162,7 @@ int IterateLine( LINE *pLine, PARSER_CONTEXT *Parser_pContext, int iNestingLevel
          break;
       case LINE_KIND_FLOW:
    
-      case LINE_KIND_FUNC_CALL:
+      case LINE_KIND_FUNCTION_CALL:
          break;
       case LINE_KIND_IIF:
          break;
@@ -218,7 +249,7 @@ int IterateBody( BODY *pBody, PARSER_CONTEXT *Parser_pContext, int iNestingLevel
    
    printf( "%s %i Iterating Body\n", sPad, iNestingLevel );
    
-   while( pLine && iResult == 0 )
+   while( pLine )
    {
       iResult = IterateLine( pLine, Parser_pContext, iNestingLevel );
       
@@ -252,7 +283,7 @@ int IterateAST( PARSER_CONTEXT *Parser_pContext )
       sPad[iNestingLevel--] = '\0';
       sPad[iNestingLevel] = ' ';
 
-      printf( "%s %i DONE Iterating Function: %s\n", sPad, iNestingLevel, pFunc->pName->Name );
+      printf( "%s %i DONE Iterating Function: %s\n", sPad, iNestingLevel + 1, pFunc->pName->Name );
 
       pFunc = pFunc->pNext;
    }

@@ -59,8 +59,9 @@
       extern "C" {
    #endif
 
-   char * ClipNet_strdup( const char *pString );
+   extern char * ClipNet_strdup( const char *pString );
 
+   extern const char * ClipNet_MacroKind( const MACRO *pMacro, PARSER_CONTEXT *Parser_pContext );
    extern const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Parser_pContext );
    extern const char * ClipNet_LValueKind( const LVALUE *pLValue, PARSER_CONTEXT *Parser_pContext );
    extern const char * ClipNet_LineKind( const LINE *pLine, PARSER_CONTEXT *Parser_pContext );

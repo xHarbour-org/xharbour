@@ -26,50 +26,61 @@
 
    #define DROP_AHEAD_TOKEN() ( Parser_pContext->Parser_iNextToken = yylex( CARGO ) )
 
-   #define LAST_TOKEN()       Parser_pContext->Parser_iToken
-
-   #define NEXT_TOKEN()       ( \
-                                Parser_pContext->Parser_iToken = \
-                                  ( Parser_pContext->Parser_iNextToken ? Parser_pContext->Parser_iNextToken : yylex( CARGO ) ), \
-                                Parser_pContext->Parser_iNextToken = 0, \
-                                Parser_pContext->Parser_iToken \
+   #define USE_AHEAD_TOKEN()  ( \
+                                Parser_pContext->Parser_iToken = Parser_pContext->Parser_iNextToken, \
+                                Parser_pContext->Parser_iNextToken = yylex( CARGO ) \
                               )
+
+   #define LAST_TOKEN()       ( Parser_pContext->Parser_iToken )
 
    #define PARSE_ERROR( i, text1, text2 ) \
               Parser_GenError( Parser_asErrors, 'E', i, text1, text2, Parser_pContext ); \
               \
-              if( Parser_pContext->Parser_iToken != '\n' && Parser_pContext->Parser_iToken != -1 ) \
+              if( LAST_TOKEN() != '\n' && LAST_TOKEN() != -1 ) \
               { \
                  while( LOOK_AHEAD_TOKEN() != -1 && LOOK_AHEAD_TOKEN() != '\n' ) \
                  { \
+                    printf( __SOURCE__"\n" ); \
                     DROP_AHEAD_TOKEN(); \
                  } \
               }
 
-   #define ACCEPT_EOS( iToken )  if( NEXT_TOKEN() != iToken && Parser_pContext->Parser_iToken != TOKEN_END ) \
+   #define ACCEPT_END( iToken )  if( LOOK_AHEAD_TOKEN() == iToken || LOOK_AHEAD_TOKEN() == TOKEN_END ) \
+                                 { \
+                                    USE_AHEAD_TOKEN(); \
+                                 } \
+                                 else \
                                  { \
                                     PARSE_ERROR( PARSER_ERR_UNCLOSED_STRU, yytext, NULL ); \
                                  }
 
-   #define ACCEPT_EOL()  if( NEXT_TOKEN() != '\n' && Parser_pContext->Parser_iToken != -1 ) \
+   #define ACCEPT_EOL()  if( LOOK_AHEAD_TOKEN() == '\n' || LOOK_AHEAD_TOKEN() == -1 ) \
                          { \
-                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL(1)." ); \
+                            USE_AHEAD_TOKEN(); \
+                         } \
+                         else \
+                         { \
+                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL." " Source: "__SOURCE__ ); \
                          }
 
-   #define EXPECTED_EOL()  if( Parser_pContext->Parser_iToken != '\n' && Parser_pContext->Parser_iToken != -1  ) \
-                           { \
-                              PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL(2)." ); \
-                           }
+   #define ACCEPT_TOKEN_AND_BREAK( iToken )  if( LOOK_AHEAD_TOKEN() == iToken ) \
+                                   { \
+                                      USE_AHEAD_TOKEN(); \
+                                      break; \
+                                    } \
+                                    else \
+                                    { \
+                                       PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__ ); \
+                                    }
 
-   #define ACCEPT_TOKEN( iToken )  if( NEXT_TOKEN() != iToken ) \
-                         { \
-                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken ); \
-                         }
-
-   #define EXPECTED_TOKEN( iToken )  if( Parser_pContext->Parser_iToken != iToken ) \
-                           { \
-                              PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken ); \
-                           }
+   #define ACCEPT_TOKEN( iToken )  if( LOOK_AHEAD_TOKEN() == iToken ) \
+                                   { \
+                                      USE_AHEAD_TOKEN(); \
+                                   } \
+                                   else \
+                                   { \
+                                      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__ ); \
+                                   }
 
    #define EOB( iToken ) ( \
                            ( iToken >= FUNC_KIND_MIN && iToken <= FUNC_KIND_MAX ) || \
@@ -103,19 +114,20 @@
 
    typedef enum
    {
-      PRG_TYPE_UNDEF    = 0x000,
-      PRG_TYPE_NIL      = 0x001,
-      PRG_TYPE_STRING   = 0x002,
-      PRG_TYPE_CHAR     = 0x003,
-      PRG_TYPE_LOGICAL  = 0x004,
-      PRG_TYPE_NUMERIC  = 0x008,
-      PRG_TYPE_DECIMAL  = 0x009,
-      PRG_TYPE_DATE     = 0x00A,
-      PRG_TYPE_DATETIME = 0x00B,
-      PRG_TYPE_ARRAY    = 0x010,
-      PRG_TYPE_BLOCK    = 0x020,
-      PRG_TYPE_OBJECT   = 0x040,
-      PRG_TYPE_CLASS    = 0x080
+      PRG_TYPE_UNDEF    = 0x0000,
+      PRG_TYPE_NIL      = 0x0001,
+      PRG_TYPE_STRING   = 0x0002,
+      PRG_TYPE_CHAR     = 0x0003,
+      PRG_TYPE_LOGICAL  = 0x0004,
+      PRG_TYPE_NUMERIC  = 0x0008,
+      PRG_TYPE_DECIMAL  = 0x0009,
+      PRG_TYPE_DATE     = 0x000A,
+      PRG_TYPE_DATETIME = 0x000B,
+      PRG_TYPE_ARRAY    = 0x0010,
+      PRG_TYPE_BLOCK    = 0x0020,
+      PRG_TYPE_OBJECT   = 0x0040,
+      PRG_TYPE_CLASS    = 0x0080,
+      PRG_TYPE_ANY      = 0xFFFF
    } PRG_TYPE;
 
    typedef enum
@@ -126,13 +138,21 @@
 
    typedef enum
    {
-      DECLARED_KIND_NONE = 0,
-      DECLARED_KIND_LOCAL_PARAMETER,
+      MACRO_RESOLUTION_UNKNOWN = 0,
       
-      DECLARED_KIND_LOCAL     = TOKEN_LOCAL,
-      DECLARED_KIND_STATIC    = TOKEN_STATIC,
-      DECLARED_KIND_FIELD     = TOKEN_FIELD,
-      DECLARED_KIND_MEMVAR    = TOKEN_MEMVAR,
+      MACRO_RESOLUTION_MEMVAR  = TOKEN_MEMVAR,
+      MACRO_RESOLUTION_FIELD   = TOKEN_FIELD,
+   } MACRO_RESOLUTION;
+
+   typedef enum
+   {
+      DECLARED_KIND_NONE            = 0,
+      DECLARED_KIND_LOCAL_PARAMETER = 1,
+      
+      DECLARED_KIND_LOCAL           = TOKEN_LOCAL,
+      DECLARED_KIND_STATIC          = TOKEN_STATIC,
+      DECLARED_KIND_FIELD           = TOKEN_FIELD,
+      DECLARED_KIND_MEMVAR          = TOKEN_MEMVAR,
       
       DECLARED_KIND_PARAMETER = TOKEN_PARAMETERS,
       DECLARED_KIND_PRIVATE   = TOKEN_PRIVATE,
@@ -182,11 +202,12 @@
       VALUE_KIND_BINARY,
       VALUE_KIND_ALIASED,
       VALUE_KIND_ASSIGNMENT,
-      VALUE_KIND_FUNC_CALL,
+      VALUE_KIND_FUNCTION_CALL,
       VALUE_KIND_IIF,
       VALUE_KIND_METHOD_CALL,
       VALUE_KIND_LIST,
-      VALUE_KIND_BYREF
+      VALUE_KIND_BYREF,
+      VALUE_KIND_ERROR = 0xFF00
    } VALUE_KIND;
 
    typedef enum
@@ -242,7 +263,7 @@
       LINE_KIND_WHILE,
       LINE_KIND_FLOW,
 
-      LINE_KIND_FUNC_CALL,
+      LINE_KIND_FUNCTION_CALL,
       LINE_KIND_IIF,
       LINE_KIND_METHOD_CALL,
 
@@ -336,24 +357,25 @@
 
    typedef struct _MACRO
    {
-       MACRO_KIND Kind;
+      MACRO_KIND Kind;
+      MACRO_RESOLUTION Resolution;
 
-       union
-       {
-          ID *           pID;
-          struct _VALUE *pComplex;
-       } Value;
+      union
+      {
+         ID *           pID;
+         struct _VALUE *pComplex;
+      } Value;
 
    } MACRO;
   
    typedef struct _DECLARED
    {
-       DECLARED_KIND Kind;
+      DECLARED_KIND Kind;
 
-       ID *           pID;
-       struct _VALUE  *pInit;
+      ID *           pID;
+      struct _VALUE  *pInit;
 
-       struct _DECLARED *pNext; 
+      struct _DECLARED *pNext;
    } DECLARED;
 
    /* Forward Declarations. */
@@ -385,7 +407,7 @@
    struct _UNARY;
    struct _BINARY;
    struct _ALIASED;
-   struct _FUNC_CALL;
+   struct _FUNCTION_CALL;
    struct _IIF;
    struct _METHOD_CALL;
 
@@ -407,7 +429,7 @@
          struct _UNARY         *pUnary;
          struct _BINARY        *pBinary;
          struct _ALIASED       *pAliased;
-         struct _FUNC_CALL     *pFuncCall;
+         struct _FUNCTION_CALL *pFunctionCall;
          struct _IIF           *pIIF;
          struct _METHOD_CALL   *pMethodCall;
          struct _LIST          *pList;
@@ -421,8 +443,8 @@
    {
       PRG_TYPE Type;
 
-      VALUE * pArray;
-      VALUE * pIndexList;
+      VALUE *        pArray;
+      struct _LIST * pIndexList;
    } ARRAY_ELEMENT;
 
    typedef struct _UNARY
@@ -460,13 +482,13 @@
       VALUE * pValue;
    } ALIASED;
  
-   typedef struct _FUNC_CALL
+   typedef struct _FUNCTION_CALL
    {
       PRG_TYPE Type;
 
       VALUE *  pSymbol;
       VALUE *  pArguments;
-   } FUNC_CALL;
+   } FUNCTION_CALL;
 
    typedef struct _IIF
    {
@@ -503,8 +525,8 @@
 
    typedef struct _LIST_NODE
    {
-      VALUE *pValue;
-      struct _LIST_NODE *pNext;
+      VALUE *             pValue;
+      struct _LIST_NODE * pNext;
    } LIST_NODE;
 
    typedef struct _LIST
@@ -643,7 +665,7 @@
          ELSEIF              *pElseIf;
          ELSE                *pElse;
 
-         VALUE               *pFuncCall; 
+         VALUE               *pFuncttionCall;
          VALUE               *pIIF;
          VALUE               *pMethodCall;
 
@@ -667,7 +689,7 @@
          BODY                *pFinally;
 
          VALUE               *pUnary;
-         VALUE               *pList;
+         struct _LIST        *pList;
       } Value;
 
       struct _LINE *pNext;
@@ -709,9 +731,9 @@
 
    typedef struct _BLOCK
    {
-      DECLARED * pBlockLocals;
-      int    iBlockLocals;
-      VALUE * pList;
+      DECLARED *     pBlockLocals;
+      int            iBlockLocals;
+      struct _LIST * pList;
    } BLOCK;
 
    typedef struct _INLINE
