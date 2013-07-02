@@ -4915,7 +4915,7 @@ CLASS WinForm INHERIT Window
 
 
 
-   DATA Visible                EXPORTED  INIT .T.
+   //DATA Visible                EXPORTED  INIT .T.
    DATA MaskBitmap             EXPORTED
    DATA __Frame_Styles         EXPORTED  INIT {"Overlapped", "PopUp"}
    DATA __Show_Modes           EXPORTED  INIT { "Normal", "Minimized", "Maximized", "NoActivate" }
@@ -5283,7 +5283,7 @@ METHOD Show( nShow ) CLASS WinForm
          ::UpdateChildren()
          ::Animate( 1000, ::AnimationStyle )
          ::UpdateChildren()
-       ELSE
+       ELSEIF ::Visible
          ShowWindow( ::hWnd, IIF( ::__ClassInst == NIL, nShow, SW_SHOW ) )
          
          IF ::MDIContainer
