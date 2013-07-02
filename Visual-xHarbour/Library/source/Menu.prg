@@ -302,14 +302,14 @@ RETURN Self
 METHOD Create() CLASS MenuBar
    LOCAL lpMenuInfo := (struct MENUINFO)
 
-   ::hMenu := CreatePopupMenu()
+   ::hMenu := CreateMenu()
 
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::hMenu, lpMenuInfo )
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::hMenu, lpMenuInfo )
 
-   SetMenu( ::Parent:hWnd, ::hMenu )
+   //SetMenu( ::Parent:hWnd, ::hMenu )
 RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuBar
