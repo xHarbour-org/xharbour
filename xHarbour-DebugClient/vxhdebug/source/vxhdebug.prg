@@ -555,11 +555,7 @@ METHOD RecvUntil( cEndBlock ) CLASS XHDebugger
         cString += Left( s, n )
      ENDIF
      IF Right( cString, Len( cEndBlock ) ) == cEndBlock
-        cString := StrTran( cString, chr(10) )
-        cString := StrTran( cString, chr(13) )
-        view cString, cEndBlock
         cString := Left( cString, Len( cString ) - Len( cEndBlock ) )
-        view cString
         EXIT
      ENDIF
   ENDDO

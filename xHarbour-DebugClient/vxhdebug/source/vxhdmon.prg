@@ -4,6 +4,7 @@
 
 #include "colors.ch"
 #include "vxh.ch"
+#include "debug.ch"
 
 #include "vxhdebug.ch"
 
@@ -45,6 +46,7 @@ METHOD Create() CLASS XHDebugMonitor
 
   WITH OBJECT CheckBox( Self )
     :Caption := "Global"
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Left := :Parent
     :Dock:Top := :Parent
@@ -54,6 +56,7 @@ METHOD Create() CLASS XHDebugMonitor
 
   WITH OBJECT CheckBox( Self )
     :Caption := "Local"
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Left := :Form:CheckBox1
     :Dock:Top := :Parent
@@ -63,6 +66,7 @@ METHOD Create() CLASS XHDebugMonitor
 
   WITH OBJECT CheckBox( Self )
     :Caption := "Private"
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Left := :Form:CheckBox2
     :Dock:Top := :Parent
@@ -72,6 +76,7 @@ METHOD Create() CLASS XHDebugMonitor
 
   WITH OBJECT CheckBox( Self )
     :Caption := "Public" 
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Left := :Form:CheckBox3
     :Dock:Top := :Parent
@@ -81,6 +86,7 @@ METHOD Create() CLASS XHDebugMonitor
 
   WITH OBJECT CheckBox( Self )
     :Caption := "Static"
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Left := :Form:CheckBox4
     :Dock:Top := :Parent
@@ -91,6 +97,7 @@ METHOD Create() CLASS XHDebugMonitor
   WITH OBJECT oAllGlobals := CheckBox( Self )
     :Caption := "Show all GLOBALs"
     :AutoSize := .T.
+    :Transparent := .T.
     :Dock:Margin := 2
     :Dock:Top := :Parent
     :Dock:Right := :Parent
@@ -105,7 +112,6 @@ METHOD Create() CLASS XHDebugMonitor
     :DataSource := MemoryTable( ::Parent )
     WITH OBJECT :DataSource
       :Structure := { { "Scope", 'C', 8 }, { "Name", 'C', 30 }, { "Type", 'C', 1 }, { "Value", 'C', 55 } }
-      :Table := ::aTable
       :Create()
     END
     
@@ -114,7 +120,7 @@ METHOD Create() CLASS XHDebugMonitor
     :AutoAddColumns( .F. )
     WITH OBJECT ATail( :Children )
       :Picture := "@k"
-      :Control := {|o, n| If( ::aTable[ n ][ 3 ] $ "AHO", NIL, MaskEdit( o ) ) }
+      :Control := {|o, n| If( ::oGrid:DataSource:Table[ n ][ 3 ] $ "AHO", NIL, MaskEdit( o ) ) }
       //:Control := {|o, n| If( ::Inspect( n ), NIL, /*Mask*/Edit( o ) ) }
       :ControlAccessKey := GRID_LCLICK
       :OnSave := {| , oGrid, xData| ::Save( oGrid:DataSource:Record, xData ) }
@@ -135,17 +141,17 @@ RETURN Self
 
 
 METHOD Inspect( nRecord ) CLASS XHDebugMonitor
-  IF ::aTable[ nRecord ][ 3 ] $ "AHO"
-    ::oDebugger:Inspect( ::aTable[ nRecord ][ 2 ] )
+  IF ::oGrid:DataSource:Table[ nRecord ][ 3 ] $ "AHO"
+    ::oDebugger:Inspect( ::oGrid:DataSource:Table[ nRecord ][ 2 ] )
     RETURN .T.
   ENDIF
 RETURN .F.
 
 
 METHOD Save( nRecord, xData ) CLASS XHDebugMonitor
-  LOCAL cValue := ::oDebugger:ReadExpressionValue( ::aTable[ nRecord ][ 2 ] + ":=" + xData )
+  LOCAL cValue := ::oDebugger:ReadExpressionValue( ::oGrid:DataSource:Table[ nRecord ][ 2 ] + ":=" + xData )
 
-  ::aTable[ nRecord ] := { ::aTable[ nRecord ][ 1 ], ::aTable[ nRecord ][ 2 ], cValue[ 1 ], SubStr( cValue, 2 ) }
+  ::oGrid:DataSource:Table[ nRecord ] := { ::oGrid:DataSource:Table[ nRecord ][ 1 ], ::oGrid:DataSource:Table[ nRecord ][ 2 ], cValue[ 1 ], SubStr( cValue, 2 ) }
 RETURN .T.
 
 
@@ -153,10 +159,11 @@ METHOD SetVars( aVars ) CLASS XHDebugMonitor
   LOCAL aVar, cValue
   
   ::aVars := aVars
-  ASize( ::aTable, 0 )
+  ASize( ::oGrid:DataSource:Table, 0 )
   FOR EACH aVar IN ::aVars
-    cValue := ::oDebugger:ReadVarValue( aVar )
-    AAdd( ::aTable, { aVar[ _SCOPE ], aVar[ _NAME ], cValue[ 1 ], PadR( SubStr( cValue, 2 ), 256 ) } )
+      cValue := ::oDebugger:ReadVarValue( aVar )
+      view aVar[ _NAME ]
+      AAdd( ::oGrid:DataSource:Table, { aVar[ _SCOPE ], aVar[ _NAME ], cValue[ 1 ], PadR( SubStr( cValue, 2 ), 256 ) } )
   NEXT
   ::oGrid:Update():Refresh()
 RETURN Self
