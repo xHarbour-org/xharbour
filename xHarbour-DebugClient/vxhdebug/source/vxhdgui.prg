@@ -406,7 +406,7 @@ RETURN Self
 
 
 METHOD Sync() CLASS XHDebuggerGUI
-  LOCAL n, cPath, cSource, nDocs
+  LOCAL n, cPath, nDocs//, cSource
   LOCAL cFile := "", lAutoFind:=.F.
 
   ::oMonitor:lDirty := .T.
@@ -419,13 +419,13 @@ METHOD Sync() CLASS XHDebuggerGUI
     cFile := ::cModule
     IF ::aSources == NIL
       ::aSources := ASort( ::GetSourceFiles() )
-      WITH OBJECT ::oApp:MainWindow:oButtonOpenSrc
-        :Menu:Destroy()
-        :Menu := MenuPopup( :Parent )
-        FOR EACH cSource IN ::aSources
-          :AddMenuItem( cSource ):Action := {|o| ::oApp:Project:OpenSource( o:Caption, .T. ) }
-        NEXT
-      END
+//       WITH OBJECT ::oApp:MainWindow:oButtonOpenSrc
+//         :Menu:Destroy()
+//         :Menu := MenuPopup( :Parent )
+//         FOR EACH cSource IN ::aSources
+//           :AddMenuItem( cSource ):Action := {|o| ::oApp:Project:OpenSource( o:Caption, .T. ) }
+//         NEXT
+//       END
     ENDIF
   ELSE
     IF ::oApp:Project:Properties == NIL

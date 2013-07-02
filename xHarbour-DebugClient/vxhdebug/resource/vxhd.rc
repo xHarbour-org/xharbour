@@ -1,4 +1,5 @@
-#include "..\..\..\Visual-xHarbour\xedit\xedit.rc"
 
 1 MANIFEST "vxhd.XML"
 
+ICO_OPEN  ICON "Open.ico"
+ICO_CLOSE ICON "Close.ico"

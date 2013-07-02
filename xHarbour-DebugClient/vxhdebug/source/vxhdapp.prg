@@ -34,6 +34,8 @@ RETURN
 
 CLASS Debugger FROM Application
 
+  DATA Props            EXPORTED INIT {=>}
+
   DATA DefaultFolder INIT ""
   DATA Project
   DATA EditorPage
@@ -42,7 +44,6 @@ CLASS Debugger FROM Application
   DATA DebuggerPanel
   DATA SourceEditor
   DATA oDebugger
-  DATA CoolBar
   DATA DebugWindow
   DATA MainWindow
   DATA Exe           INIT ""
@@ -77,9 +78,9 @@ METHOD Init( hParam ) CLASS Debugger
                                   ,"Visual xDebugger Demo", MB_OK | MB_ICONINFORMATION )
    #endif
 
-  ::System:CurrentScheme:AutoScheme := .F.
-  ::System:CurrentScheme:ColorScheme := "Classic"
-  ::System:CurrentScheme:Load()
+  //::System:CurrentScheme:AutoScheme := .F.
+  //::System:CurrentScheme:ColorScheme := "Classic"
+  //::System:CurrentScheme:Load()
   
   ::MainWindow := MainWindow():Init()
 
@@ -230,146 +231,38 @@ METHOD Init() CLASS MainWindow
    //Alert( "0" )
 
    // CoolMenu section --------
-   
-   WITH OBJECT CoolMenu( Self )
-      :ImageList := ImageList( :this, 16, 16 ):Create()
-      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
-      :ImageList:MaskColor := C_LIGHTCYAN
-      :ImageList:AddBitmap( "TBEXTRA" )
+
+   WITH OBJECT ::Application:Props[ "ToolStripContainer" ] := ToolStripContainer( Self )
       :Create()
-
-      ::Application:FileMenu := CoolMenuItem( :this )
-      WITH OBJECT ::Application:FileMenu
-         :Caption := "&File"/*, :ImageList */
+      WITH OBJECT ToolStrip( :this )
+         :Caption      := "Open"
+         :Row          := 1
+         :Height       := 58
+         :ShowChevron  := .F.
+         :ShowGrip     := .F.
+         :ImageList    := ImageList( :this, 32, 32 ):Create()
+         :ImageList:AddIcon( "ICO_OPEN" )
+         :ImageList:AddIcon( "ICO_CLOSE" )
          :Create()
-         //---------------------------------------------------------------
-         
-         WITH OBJECT :AddMenuItem( "&Open" )
-            :ImageList    := ::CoolMenu1:ImageList
-            :ImageIndex   := STD_FILEOPEN
-            :Create()
 
-            WITH OBJECT :AddMenuItem( "&Application" )
-               :ImageIndex   := 22
-               :ShortCutText := "Ctrl+Shift+O"
-               :ShortCut     := { FVIRTKEY | FCONTROL | FSHIFT, ASC( "O" ) }
-               :Action       := {|| ::Application:Project:Open() }
-               :Create()
-            END
-
-            WITH OBJECT :AddMenuItem( "&File" )
-               :ImageIndex   := STD_FILEOPEN
-               :ShortCutText := "Ctrl+O"
-               :ShortCut     := { FVIRTKEY | FCONTROL, ASC( "O" ) }
-               :Action       := {|| ::Application:Project:OpenSource() }
-               :Create()
-            END
-         END
-
-         WITH OBJECT ::Application:CloseMenu := :AddMenuItem( "&Close Application" )
-            :ImageIndex   := 99
-            :Action := {|| ::Application:Project:Close() }
-            //:Disable()
+         WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
+            :ImageIndex := 1
+            :Text       := "Open"
+            :ImageAlign := DT_CENTER            
+            :Action     := {||::Application:Project:Open() }
+            :DropDown   := 2
             :Create()
          END
 
-         WITH OBJECT ::Application:CloseMenu := :AddMenuItem( "Close &Source file" )
-            :ImageIndex   := 99
-            :Action := {|| ::Application:Project:CloseSource() }
-            //:Disable()
-            :Create()
-         END
-
-         :AddMenuItem( "-" )
-
-         WITH OBJECT :AddMenuItem( "&Exit  " )
-            :ImageIndex   := 99
-            :Action := {|| ::Application:MainWindow:Close() }
+         WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
+            :ImageIndex := 2
+            :ImageAlign := DT_CENTER            
+            :Text       := "Close"
+            :Action     := {||::Application:Project:Close() }
             :Create()
          END
       END
    END
-
-   // ToolBar section: Standard Project Commands -----
-   
-   WITH OBJECT ToolBar( Self )
-      :Create()
-
-      :ImageList := ImageList( :this, 16, 16 ):Create()
-      :ImageList:AddImage( IDB_STD_SMALL_COLOR )
-      :ImageList:MaskColor := C_LIGHTCYAN
-      :ImageList:AddBitmap( "TBEXTRA" )
-      :SetImageList( :ImageList )
-      :DrawArrows()
-
-      WITH OBJECT ::oButtonOpen := ToolButton( :this )
-         :ImageIndex := STD_FILEOPEN
-         :ToolTip    := "Open"
-         :Action     := {|| ::Application:Project:Open() }
-         :DropDown   := .T.
-         :Create()
-         aEntries := ::Application:AppIniFile:GetEntries( "Recent" )
-
-         :Menu := MenuPopup( :Parent )
-         FOR EACH cProject IN aEntries
-             oItem := :AddMenuItem( cProject )
-             oItem:Action := {|o| ::Application:Project:Open( o:Caption ) }
-         NEXT
-      END
-
-      WITH OBJECT ToolButton( :this )
-         :ImageIndex := 15
-         :ToolTip    := "Close"
-         :Action     := {|| ::Application:Project:Close() }
-         :Create()
-         :Disable()
-      END
-
-      WITH OBJECT ToolButton( :this )
-         :ImageIndex := STD_FILESAVE
-         :ToolTip    := "Save"
-         :Action     := {|| ::Application:Project:Save() }
-         :Create()
-         :Disable()
-      END
-
-      WITH OBJECT ::oButtonOpenSrc := ToolButton( :this )
-         :ImageIndex := STD_FILEOPEN
-         :ToolTip    := "Open source"
-         :Action     := {|| ::Application:Project:OpenSource() }
-         :DropDown := .T.
-         :Create()
-         :Menu := MenuPopup( :Parent )
-      END
-   END
-
-   //Alert( "1" )
-
-   ::Application:CoolBar := CoolBar( Self )
-   ::CoolBar1:Create()
-
-   WITH OBJECT ::CoolBar1
-      
-      WITH OBJECT CoolBarBand( :this )
-         :MinHeight := 22
-         :BandChild := ::CoolMenu1
-         :Chevron   := .T.
-         :Create()
-      END
-
-      // CollBarBand 1 Standard command
-      WITH OBJECT CoolBarBand( :this )
-         :MinWidth    := 200
-         :MinHeight   := 22
-         :BandChild   := ::ToolBar1
-         :Break       := .T.
-         :Chevron     := .T.
-         :AllowUndock := .T.
-         :Create()
-      END
-   END
-
-   //Alert( "2" )
 
    // Panel EXCLUSIVE for vxh-debugger
    WITH OBJECT ::Application:DebuggerPanel := Panel( Self )
@@ -403,7 +296,7 @@ METHOD Init() CLASS MainWindow
       :Dock:Margin   := 2
       :StaticEdge    := .F.
       :Dock:Right    := :Parent
-      :Dock:Top      := ::Application:CoolBar
+      :Dock:Top      := ::Application:Props[ "ToolStripContainer" ]
       :Dock:Bottom   := ::Application:DebuggerPanel
       :Create()
    END
@@ -412,7 +305,7 @@ METHOD Init() CLASS MainWindow
       :Border      := .T.
       :Dock:Margin := 2
       :Dock:Left   := :Parent
-      :Dock:Top    := ::Application:CoolBar
+      :Dock:Top    := ::Application:Props[ "ToolStripContainer" ]
       :Dock:Right  := ::Application:FileExplorer
       :Dock:Bottom := ::Application:DebuggerPanel
 
