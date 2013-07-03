@@ -1028,11 +1028,11 @@ RETURN cMarks
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
-   IF ! ( pSource == ::pSource )
+   IF pSource != ::pSource
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
    xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
-   IF ! ( pSource == ::pSource )
+   IF pSource != ::pSource
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
 RETURN xReturn
