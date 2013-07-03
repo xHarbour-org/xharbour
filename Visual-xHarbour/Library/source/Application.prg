@@ -85,7 +85,7 @@ RETURN
 
 EXIT PROCEDURE __CleanUp
    SetUnhandledExceptionFilter( NIL )
-   IF Application:hTitleBackBrushInactive != NIL
+   IF Application != NIL .AND. Application:hTitleBackBrushInactive != NIL
       DeleteObject( Application:hTitleBackBrushInactive )
       DeleteObject( Application:hTitleBackBrushActive )
    ENDIF

@@ -133,6 +133,7 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD LowerCase()
    METHOD Capitalize()
    METHOD GotoDialog()                    INLINE GotoDialog( Self )
+   METHOD OnSetFocus()                    INLINE IIF( ::Application:MainForm:HasMessage("EnableSearchMenu"),::Application:MainForm:EnableSearchMenu( .T. ),), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
@@ -148,8 +149,12 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD ToggleRectSel()
    METHOD GetWithObject()
    METHOD SetColors()
-   METHOD OnSetFocus()                    INLINE IIF( ::Application:MainForm:HasMessage("EnableSearchMenu"),::Application:MainForm:EnableSearchMenu( .T. ),), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
+   METHOD Clean()
 ENDCLASS
+
+METHOD Clean() CLASS SourceEditor
+   ::SendMessage( SCI_SETTEXT, 0, "" )
+RETURN NIL
 
 METHOD GetEditor( cFile ) CLASS SourceEditor
    LOCAL n := ASCAN( ::aDocs, {|o| o:File == cFile} )
@@ -524,7 +529,7 @@ METHOD OnKeyUp() CLASS SourceEditor
 
       ::Application:Project:EditReset()
 
-      IF __ObjHasMsg( ::Application, "Props" ) .AND. ::Application:Props:EditCopyItem:Enabled
+      IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0 .AND. ::Application:Props[ "EditCopyItem" ]:Enabled
          ::Application:Props:EditCopyItem:Enabled := lSel
          ::Application:Props:EditCopyBttn:Enabled := lSel
          ::Application:Props:EditCutItem:Enabled  := lSel
@@ -1023,11 +1028,11 @@ RETURN cMarks
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
-   IF pSource != ::pSource
+   IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
    xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
-   IF pSource != ::pSource
+   IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
 RETURN xReturn
