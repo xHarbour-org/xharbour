@@ -82,9 +82,9 @@ METHOD Init( hParam ) CLASS Debugger
   //::System:CurrentScheme:ColorScheme := "Classic"
   //::System:CurrentScheme:Load()
   
-  ::MainWindow := MainWindow():Init()
-
   ::Project := Project( NIL )
+
+  ::MainWindow := MainWindow():Init()
 
   ::cHost      := hParam[ "host" ]
   ::cPort      := hParam[ "port" ]
@@ -100,63 +100,61 @@ RETURN Self
 
 
 METHOD Open( cArgs, aSources ) CLASS Debugger
+   LOCAL nAt, cExe, cStartPath
 
-  LOCAL nAt, cExe, cStartPath
+   IF ::oDebugger == NIL
+      ::oDebugger := XHDebuggerGUI():new( __GetApplication() )
+    ELSE
+      ::oDebugger:lStopped := .F.
+   ENDIF
 
-  IF ::oDebugger == NIL
-    ::oDebugger := XHDebuggerGUI():new( __GetApplication() )
-  ELSE
-    ::oDebugger:lStopped := .F.
-  ENDIF
-
-  IF Empty( ::cHost )
-    IF Empty( cArgs )
-       RETURN Self
-    ENDIF
-
-    nAt := At( ".exe", Lower( cArgs ) )
-    IF nAt > 0
-      cExe  := Left( cArgs, nAt + 3 )
-      ::Exe := cExe
-      cArgs := SubStr( cArgs, nAt + 4 )
-      ::Args := cArgs
-
-      IF !Empty( cExe ) .AND. File( cExe )
-        #if 0
-            IF !Empty( aSources )
-               AEval( aSources, {|x| ::Project:OpenSource( x, .T., ::aPath ) } )
-            ENDIF
-        #else
-           (aSources)
-        #endif
-
-        IF ! Empty( ::cStartPath )
-           cExe := RelativeToAbsolutePath( cExe, DiskName() + ':\' + CurDir() )
-
-           cStartPath := ::cStartPath
-
-           IF cStartPath[2] == ':'
-             DiskChange( ::cStartPath[1] )
-             cStartPath := SubStr( cStartPath, 3 )
-           ENDIF
-
-           IF ! Empty( cStartPath )
-             IF DirChange( cStartPath ) != 0
-                Throw( ErrorNew( "xDebug", 0, 1001, ProcName(), "Could not switch to folder: " + cStartPath, HB_aParams() ) )
-             ENDIF
-           ENDIF
-        ENDIF
-
-        ShellExecute( GetActiveWindow(), "open", '"' + cExe + '"', ;
-                      cArgs + " //debug" + If( !Empty( ::cPort ), " //debugport:" + ::cPort, "" ), ;
-                      , SW_SHOW )
-
-        ::oDebugger:Start( , If( !Empty( ::cPort ), Val( ::cPort ), ) )
+   IF Empty( ::cHost )
+      IF Empty( cArgs )
+         RETURN Self
       ENDIF
-    ENDIF
-  ELSE
-    ::oDebugger:Start( ::cHost, If( !Empty( ::cPort ), Val( ::cPort ), ) )
-  ENDIF
+
+      nAt := At( ".exe", Lower( cArgs ) )
+      IF nAt > 0
+         cExe  := Left( cArgs, nAt + 3 )
+         ::Exe := cExe
+         cArgs := SubStr( cArgs, nAt + 4 )
+         ::Args := cArgs
+
+         IF !Empty( cExe ) .AND. File( cExe )
+            #if 0
+                IF !Empty( aSources )
+                   AEval( aSources, {|x| ::Project:OpenSource( x, .T., ::aPath ) } )
+                ENDIF
+            #else
+               (aSources)
+            #endif
+
+            IF ! Empty( ::cStartPath )
+               cExe := RelativeToAbsolutePath( cExe, DiskName() + ':\' + CurDir() )
+               cStartPath := ::cStartPath
+
+               IF cStartPath[2] == ':'
+                  DiskChange( ::cStartPath[1] )
+                  cStartPath := SubStr( cStartPath, 3 )
+               ENDIF
+
+               IF ! Empty( cStartPath )
+                  IF DirChange( cStartPath ) != 0
+                     Throw( ErrorNew( "xDebug", 0, 1001, ProcName(), "Could not switch to folder: " + cStartPath, HB_aParams() ) )
+                  ENDIF
+               ENDIF
+            ENDIF
+
+            ShellExecute( GetActiveWindow(), "open", '"' + cExe + '"', ;
+                          cArgs + " //debug" + If( !Empty( ::cPort ), " //debugport:" + ::cPort, "" ), ;
+                          , SW_SHOW )
+
+            ::oDebugger:Start( , If( !Empty( ::cPort ), Val( ::cPort ), ) )
+         ENDIF
+      ENDIF
+    ELSE
+      ::oDebugger:Start( ::cHost, If( !Empty( ::cPort ), Val( ::cPort ), ) )
+   ENDIF
 
 RETURN Self
 
@@ -181,23 +179,26 @@ RETURN Self
 
 
 CLASS MainWindow FROM WinForm
-  METHOD Init() CONSTRUCTOR
-  DATA oButtonOpenSrc
-  DATA oButtonOpen
+   METHOD Init() CONSTRUCTOR
+   METHOD OnClose()  INLINE Super:OnClose(), ::SaveLayout()
+   DATA oButtonOpenSrc
+   DATA oButtonOpen
 ENDCLASS
 
 METHOD Init() CLASS MainWindow
-
    LOCAL aEntries, cProject, oItem
 
    ::Super:Init()
 
    ::Caption := "Visual xHarbour Debugger"
    ::Left    := 0
+   ::Name    := "Main"
    ::Top     := 0
    ::Width   := 800
    ::Height  := 600
    ::Icon    := ::Application:LoadIcon( "VXHDICON" )
+
+   ::RestoreLayout()
 
    ::Create()
 
@@ -252,6 +253,7 @@ METHOD Init() CLASS MainWindow
             :Action     := {||::Application:Project:Open() }
             :DropDown   := 2
             :Create()
+            ::Application:Project:ResetQuickOpen()
          END
 
          WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
@@ -274,9 +276,6 @@ METHOD Init() CLASS MainWindow
       :Dock:Left      := :Parent
       :Dock:Bottom    := ::StatusBar1
       :Dock:Right     := :Parent
-      :AllowClose     := .T.
-      :AllowUndock    := .T.
-      :OnWMSysCommand := {|o,n| If( n == SC_CLOSE, ( o:Hide(), 0 ), ) }
 
       Splitter( :Parent )
       ::Splitter1:Owner := :this
@@ -308,14 +307,10 @@ METHOD Init() CLASS MainWindow
       :Dock:Top    := ::Application:Props[ "ToolStripContainer" ]
       :Dock:Right  := ::Application:FileExplorer
       :Dock:Bottom := ::Application:DebuggerPanel
-
       :Create()
-      :DockIt()
    END
-
-   //Alert( "4" )
-
    ::Show()
+
 RETURN Self
 
 CLASS FileExplorer INHERIT TreeView
@@ -461,12 +456,12 @@ METHOD Close() CLASS Project
       END
    ENDIF
 
-  IF ::lDebugging
-     ::DebugStop()
-  ENDIF
+   IF ::lDebugging
+      ::DebugStop()
+   ENDIF
 
-  lRem := .F.
-   FOR n := 1 TO LEN( ::Application:SourceEditor:aDocs )
+   lRem := .F.
+   FOR n := 1 TO ::Application:SourceEditor:DocCount
        IF ::Application:SourceEditor:aDocs[n]:Modified
           IF nRes == NIL
              oMsg := MsgBoxEx( ::Application:MainWindow, "Save changes to "+::Application:SourceEditor:aDocs[n]:cPath+::Application:SourceEditor:aDocs[n]:cFile+" before closing?", "Source File", IDI_QUESTION )
@@ -500,16 +495,8 @@ METHOD Close() CLASS Project
        n--
    NEXT
 
-   ::Application:MainWindow:ToolBar1:ToolButton1:Disable()   // Close Button
-   ::Application:MainWindow:ToolBar1:ToolButton2:Disable()   // Save Button
-
-
+   ::Application:SourceEditor:Clean()
    ::Application:MainWindow:Caption := "Visual Debugger"
-
-   ::Application:SourceEditor:Disable()
-   ::Application:SourceEditor:Hide()
-
-   ::Application:EditorPage:Select()
 
    ::CopyBuffer := {}
    ::PasteOn := .F.
@@ -520,9 +507,8 @@ METHOD Close() CLASS Project
    ::Properties        := NIL
    ::Modified          := .F.
 
-   ::EditReset(1)
-
-   ::Application:SourceEditor:Caption := ""
+   ::Application:SourceEditor:Text := ""
+   ::Application:DebuggerPanel:Hide()
 
    HB_GCALL()
 RETURN .T.
@@ -720,36 +706,35 @@ RETURN lRet
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD Open( cProject ) CLASS Project
-
+METHOD Open( cFile ) CLASS Project
    LOCAL oFile
-
-   (cProject)
    
-   oFile := CFile( "" )
+   IF ! FILE( cFile )
+      oFile := CFile( "" )
 
-   //oFile:Flags := OFN_NOCHANGEDIR
-   oFile:AddFilter( "Application File (*.exe)", "*.exe" )
-   oFile:Path := ::Application:DefaultFolder
+      oFile:AddFilter( "Application File (*.exe)", "*.exe" )
+      oFile:Path := ::Application:DefaultFolder
 
-   WHILE .T.
-      oFile:OpenDialog()
+      WHILE .T.
+         oFile:OpenDialog()
 
-      IF oFile:Result == IDCANCEL
-         RETURN Self
-      ENDIF
+         IF oFile:Result == IDCANCEL
+            RETURN Self
+         ENDIF
 
-      IF lower( Right( oFile:Name, 4 ) ) == ".exe"
-         EXIT
-      ENDIF
-
-      Tone()
-   END
+         IF lower( Right( oFile:Name, 4 ) ) == ".exe"
+            EXIT
+         ENDIF
+      ENDDO
+      cFile := oFile:Path + "\" + oFile:Name
+   ENDIF
 
    ::Application:MainWindow:UpdateWindow()
 
+   ::ResetQuickOpen( cFile )
+
    ::Modified := .F.
-   ::Application:Open( oFile:Path + "\" + oFile:Name + " " + ::Application:Args )
+   ::Application:Open( cFile + " " + ::Application:Args )
 
 RETURN Self
 
@@ -763,40 +748,39 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL aEntries, n, cProject, oItem
+   LOCAL lMems, aEntries, n, oItem, oLink, x, lLink := .T.
 
-   // IniFile Recently open projects
-   aEntries := ::Application:AppIniFile:GetEntries( "Recent" )
-   AEVAL( aEntries, {|c| ::Application:AppIniFile:DelEntry( "Recent", c ) } )
-
-   IF ( n := ASCAN( aEntries, {|c| c == cFile } ) ) > 0
+   aEntries := ::Application:IniFile:GetSectionEntries( "Recent", .T. )
+   IF cFile != NIL .AND. ( n := ASCAN( aEntries, {|c| lower(c) == lower(cFile) } ) ) > 0
       ADEL( aEntries, n, .T. )
    ENDIF
-   IF FILE( cFile )
-      aIns( aEntries, 1, cFile, .T. )
+   IF cFile != NIL .AND. FILE( cFile )
+      AINS( aEntries, 1, cFile, .T. )
       IF LEN( aEntries )>=20
          ASIZE( aEntries, 20 )
       ENDIF
    ENDIF
 
-   AEVAL( aEntries, {|c| ::Application:AppIniFile:WriteString( "Recent", c, "" ) } )
+   lMems := ::Application:GenerateMembers
+   ::Application:GenerateMembers := .F.
 
-   // Reset Open Dropdown menu
-   WITH OBJECT ::Application:MainWindow:oButtonOpen   // Open Button
-      :Menu:Destroy()
-      :Menu := MenuPopup( :Parent )
-      FOR EACH cProject IN aEntries
-
-          oItem := :AddMenuItem( cProject )
-
-          //nId := VAL( LEFT( ALLTRIM( STR( oItem:hMenu ) ), 4 ) )
-          //DO WHILE oItem:Menu:GetItem( nId ) <> NIL
-          //   nId++
-          //ENDDO
-          //oItem:Id := nId
-          oItem:Action := {|o| ::Application:Project:Open( o:Caption ) }
+   WITH OBJECT ::Application:Props[ "OpenBttn" ]   // Open Button
+      FOR n := 1 TO LEN( aEntries )
+          IF ! EMPTY( aEntries[n] )
+             IF :Children == NIL .OR. LEN( :Children ) < n
+                oItem := MenuStripItem( :this )
+                oItem:Create()
+              ELSE
+                oItem := :Children[n]
+             ENDIF
+             oItem:Text   := aEntries[n]
+             oItem:Action := {|o| ::Application:Project:Open( o:Text ) }
+          ENDIF
       NEXT
    END
+
+   ::Application:IniFile:Write( "Recent", aEntries )
+   ::Application:GenerateMembers := lMems
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------

@@ -396,10 +396,6 @@ METHOD Stop() CLASS XHDebuggerGUI
     AEval( { ::btnBreak, ::btnStop, ::btnInto, ::btnOver, ::btnOut, ::btnCursor, ::btnToggle }, {|o| o:Disable() } )
 
     ::aSources := NIL
-    WITH OBJECT ::oApp:MainWindow:oButtonOpenSrc
-      :Menu:Destroy()
-      :Menu := MenuPopup( :Parent )
-    END
   ENDIF
 
 RETURN Self
