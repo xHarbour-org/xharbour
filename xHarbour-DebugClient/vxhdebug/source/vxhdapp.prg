@@ -17,7 +17,7 @@ STATIC cCurFolder
 
 //#define VXH
 
-#define VXHD_Version "1.71"
+#define VXHD_Version "2.0"
 
 ANNOUNCE GTSys
 
