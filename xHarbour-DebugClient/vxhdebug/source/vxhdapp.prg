@@ -456,8 +456,8 @@ METHOD Close() CLASS Project
       END
    ENDIF
 
-   IF ::lDebugging
-      ::DebugStop()
+   IF ! ::Application:oDebugger:lStopped
+      ::Application:oDebugger:Stop()
    ENDIF
 
    lRem := .F.
