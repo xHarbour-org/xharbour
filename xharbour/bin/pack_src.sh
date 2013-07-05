@@ -279,11 +279,11 @@ $hb_collect source/cgi/*.prg
 $hb_collect source/cgi/include/Makefile
 $hb_collect source/cgi/include/*.ch
 
-# SOURCE\misc
-$hb_collect source/misc/Makefile
-$hb_collect source/misc/*.c
-$hb_collect source/misc/*.ch
-$hb_collect source/misc/*.prg
+# contrib\misc
+$hb_collect contrib/misc/Makefile
+$hb_collect contrib/misc/*.c
+$hb_collect contrib/misc/*.ch
+$hb_collect contrib/misc/*.prg
 
 # TESTS
 $hb_collect tests/*.bat

@@ -76,7 +76,7 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
-%define hb_ctrb  %{!?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
+%define hb_ctrb  %{!?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql} %{!?_without_libmisc:misc}
 %define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln}  ;%{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} 
 
 %define hb_host  www.xharbour.org
@@ -591,13 +591,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libpcre*.a
 %{_libdir}/%{name}/libvm*.a
 %{_libdir}/%{name}/libcgi*.a
-%{_libdir}/%{name}/libmisc*.a
+#%{_libdir}/%{name}/libmisc*.a
 
 %files contrib
 %defattr(-,root,root,755)
 %dir %{_libdir}/%{name}
 %{!?_without_nf: %{_libdir}/%{name}/libnf*.a}
 %{!?_without_adsrdd: %{_libdir}/%{name}/librddads*.a}
+%{!?_without_libmisc:%{_libdir}/%{name}/libmisc*.a}
 %{?_with_mysql: %{_libdir}/%{name}/libmysql*.a}
 %{?_with_pgsql: %{_libdir}/%{name}/libhbpg*.a}
 
