@@ -48,8 +48,8 @@ CLASS TreeView FROM TitleControl
    PROPERTY SingleExpand    INDEX TVS_SINGLEEXPAND    READ xSingleExpand    WRITE SetStyle   DEFAULT .F. PROTECTED
    PROPERTY TrackSelect     INDEX TVS_TRACKSELECT     READ xTrackSelect     WRITE SetStyle   DEFAULT .F. PROTECTED
    PROPERTY DisableDragDrop INDEX TVS_DISABLEDRAGDROP READ xDisableDragDrop WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY StaticEdge      INDEX WS_EX_STATICEDGE    READ xStaticEdge      WRITE SetExStyle DEFAULT .T. PROTECTED
-   PROPERTY Border          INDEX WS_BORDER           READ xBorder          WRITE SetStyle   DEFAULT .F. PROTECTED
+   //PROPERTY StaticEdge      INDEX WS_EX_STATICEDGE    READ xStaticEdge      WRITE SetExStyle DEFAULT .F. PROTECTED
+   //PROPERTY Border          INDEX WS_BORDER           READ xBorder          WRITE SetStyle   DEFAULT .F. PROTECTED
 
    DATA xBackColor          EXPORTED INIT GetSysColor( COLOR_WINDOW )
    ACCESS BackColor         INLINE ::xBackColor PERSISTENT
@@ -115,18 +115,17 @@ ENDCLASS
 //----------------------------------------------------------------------------//
 
 METHOD Init( oParent ) CLASS TreeView
-   ::ClsName      := "SysTreeView32"
-   ::Level        := -1
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ExStyle      := WS_EX_STATICEDGE
+   ::ClsName := "SysTreeView32"
+   ::Level   := -1
+   ::Style   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    
    DEFAULT ::__xCtrlName TO "TreeView"
 
    ::Super:Init( oParent )
-   ::xWidth         := 160
-   ::xHeight        := 160
+   ::xWidth  := 160
+   ::xHeight := 160
 
-   ::Events := ;
+   ::Events  := ;
             { ;
             {"Mouse",       {;
                             { "OnLButtonDblClk"  , "", "" },;
@@ -188,9 +187,6 @@ METHOD Create() CLASS TreeView
       ::Style := ::Style | TVS_DISABLEDRAGDROP
    ENDIF
    ::Super:Create()
-   IF !EMPTY( ::Caption )
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-   ENDIF
    IF ::xImageList != NIL
       ::SetImageList( ::xImageList )
    ENDIF
