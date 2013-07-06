@@ -441,9 +441,7 @@ METHOD Sync() CLASS XHDebuggerGUI
 
   nDocs := ::oApp:SourceEditor:DocCount
 
-  IF ( n := AScan( ::oApp:SourceEditor:aDocs, ;
-                   {|o| Lower( IIF( '\' IN cFile, o:cPath, "" ) + o:cFile ) ;
-                        == Lower( cFile ) } ) ) > 0
+  IF ( n := AScan( ::oApp:SourceEditor:aDocs, {|o| Lower( IIF( '\' IN cFile, o:File, o:FileName ) ) == Lower( cFile ) } ) ) > 0
     ::oEditor := ::oApp:SourceEditor:aDocs[ n ]
     ::oApp:Project:SourceTabChanged( n )
 
@@ -464,8 +462,12 @@ METHOD Sync() CLASS XHDebuggerGUI
       IF RIGHT( UPPER( cFile ), 4 ) == ".XFM"
          ::oEditor:lReadOnly := .T.
       ENDIF
-      ::oApp:FileExplorer:SetFile( ::oEditor )
-      ::oEditor:TreeItem:Select()
+      IF __objhasMsg( ::oApp:FileExplorer, "SetFile" )
+         ::oApp:FileExplorer:SetFile( ::oEditor )
+      ENDIF
+      IF ::oEditor:TreeItem != NIL
+         ::oEditor:TreeItem:Select()
+      ENDIF
 
       //::oApp:SourceTabs:InsertTab( ::cModule )
       //::oApp:SourceTabs:SetCurSel( nDocs )
