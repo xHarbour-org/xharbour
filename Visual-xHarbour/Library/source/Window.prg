@@ -1854,11 +1854,15 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    ENDIF
    IF nId == IDOK
       oCtrl := ObjFromHandle( GetFocus() )
+
       IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit"
          oCtrl := ObjFromHandle( GetNextDlgTabItem( ::hWnd, GetFocus(), IsKeyDown( VK_SHIFT ) ) )
       ENDIF               
          
       IF oCtrl != NIL .AND. oCtrl:__xCtrlName != "MaskEdit"
+         if ! ::Form:Modal
+            return 0
+         endif
          IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
             nId := HGetValueAt( ::Form:__hObjects, n ):Id
             nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd

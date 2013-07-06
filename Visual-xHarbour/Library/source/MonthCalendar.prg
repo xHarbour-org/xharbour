@@ -41,14 +41,6 @@ CLASS MonthCalendar INHERIT TitleControl
    PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
    PROPERTY Border            INDEX WS_BORDER         READ xBorder            WRITE SetStyle         DEFAULT .F. PROTECTED
 
-   DATA xCaption               EXPORTED  INIT ""
-   ACCESS Caption              INLINE    ::xCaption
-   ASSIGN Caption(c)           INLINE    ::xCaption := c, IIF( ::IsWindow(), ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),)
-
-   DATA xText                  EXPORTED  INIT ""
-   ACCESS Text                 INLINE    ::xText
-   ASSIGN Text(c)              INLINE    ::xText := c, IIF( ::IsWindow(), ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),)
-
    DATA NmDayState   EXPORTED
    DATA NmSelChange  EXPORTED
    
@@ -115,7 +107,6 @@ METHOD Create() CLASS MonthCalendar
    IF !EMPTY( ::Caption )
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    ENDIF
-
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS MonthCalendar

@@ -59,6 +59,12 @@ CLASS DateTimePicker INHERIT Control
 
    PROPERTY BlankDate                          READ xBlankDate WRITE __SetBlankDate DEFAULT .F.  PROTECTED
 
+   PROPERTY BackColor         INDEX MCSC_MONTHBK      READ xBackColor         WRITE SetCalendarColor PROTECTED
+   PROPERTY ForeColor         INDEX MCSC_TEXT         READ xForeColor         WRITE SetCalendarColor PROTECTED
+   PROPERTY TitleBackColor    INDEX MCSC_TITLEBK      READ xTitleBackColor    WRITE SetCalendarColor PROTECTED
+   PROPERTY TitleForeColor    INDEX MCSC_TITLETEXT    READ xTitleForeColor    WRITE SetCalendarColor PROTECTED
+   PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
+
    DATA     PUBLISHED INIT .F.
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
@@ -174,6 +180,18 @@ METHOD Create() CLASS DateTimePicker
    IF ::BlankDate
       ::Sendmessage( DTM_SETFORMAT, 0, " " )
    ENDIF
+
+   DEFAULT ::xBackColor         TO ::GetCalendarColor( MCSC_MONTHBK      )
+   DEFAULT ::xForeColor         TO ::GetCalendarColor( MCSC_TEXT         )
+   DEFAULT ::xTitleBackColor    TO ::GetCalendarColor( MCSC_TITLEBK      )
+   DEFAULT ::xTitleForeColor    TO ::GetCalendarColor( MCSC_TITLETEXT    )
+   DEFAULT ::xTrailingTextColor TO ::GetCalendarColor( MCSC_TRAILINGTEXT )
+
+   ::BackColor         := ::xBackColor
+   ::ForeColor         := ::xForeColor
+   ::TitleBackColor    := ::xTitleBackColor
+   ::TitleForeColor    := ::xTitleForeColor
+   ::TrailingTextColor := ::xTrailingTextColor
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
