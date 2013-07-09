@@ -117,7 +117,6 @@ CLASS CMenuItem INHERIT Object
 
    DATA Id                       EXPORTED
    DATA Cargo                    EXPORTED
-   DATA Action                   EXPORTED AS CODEBLOCK
    DATA Parent                   EXPORTED
    DATA Position                 EXPORTED INIT -1
    DATA Menu                     EXPORTED

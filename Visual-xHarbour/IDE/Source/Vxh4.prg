@@ -3364,6 +3364,7 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
 
 __aProps["B"] := { { "BandChild",               ""           },;
                    { "BaudRate",                ""           },;
+                   { "BlinkColor",              "Colors"     },;
                    { "ButtonMenu",              "Behavior"   },;
                    { "ButtonText",              "Appearance" },;
                    { "BoldSelection",           "Appearance" },;
@@ -3758,6 +3759,7 @@ __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "TopMost",                 "Style" },;
                    { "Text",                    "Appearance" },;
                    { "Title",                   "" },;
+                   { "TextShadowColor",         "Colors" },;
                    { "TitleBackColorActive",    "Colors" },;
                    { "TitleBackColorInactive",  "Colors" },;
                    { "TopMargin",               "" },;

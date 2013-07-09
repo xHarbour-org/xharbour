@@ -848,7 +848,6 @@ CLASS TabPage INHERIT Dialog
    DATA ItemSize           EXPORTED
    DATA LastFocus          EXPORTED
    DATA __xCtrlName        EXPORTED
-   DATA Action             EXPORTED
 
    DATA MinWidth           EXPORTED  INIT 0
    DATA MinHeight          EXPORTED  INIT 0

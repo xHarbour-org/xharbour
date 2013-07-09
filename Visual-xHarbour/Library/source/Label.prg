@@ -26,9 +26,10 @@ CLASS Label INHERIT Control
    PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
 
    PROPERTY NoPrefix     SET Redraw  DEFAULT .F.     PROTECTED
-   PROPERTY SunkenText   SET Redraw  DEFAULT .F.     PROTECTED
    PROPERTY VertCenter   SET Redraw  DEFAULT .F.     PROTECTED
 
+   PROPERTY TextShadowColor READ xTextShadowColor WRITE InvalidateRect
+   PROPERTY BlinkColor      READ xBlinkColor      WRITE __SetBlinkColor
 
    // Backward compatibility
    ACCESS CenterText    INLINE ::Alignment == DT_CENTER
@@ -40,15 +41,25 @@ CLASS Label INHERIT Control
    ACCESS Sunken        INLINE ::Border == BDR_SUNKENINNER
    ASSIGN Sunken(l)     INLINE ::Border := IIF( l, BDR_SUNKENINNER, 0 )
 
+   ASSIGN SunkenText(l)  INLINE IIF( l, ::xTextShadowColor := RGB( 255, 255, 255 ),)
+
+   DATA ClientEdge     EXPORTED INIT .F.
+   DATA StaticEdge     EXPORTED INIT .F.
+
+   DATA __CurColor     PROTECTED
+
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor, ::__SetTransp(.T.), ), Super:Create()
+   METHOD Create()
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
    METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   METHOD __SetBlinkColor()
    METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
    METHOD OnLButtonUp()
+   METHOD OnTimer()
+   METHOD SetForeColor()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -89,6 +100,56 @@ METHOD Init( oParent ) CLASS Label
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD Create()  CLASS Label
+   IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor
+      ::__SetTransp(.T.)
+   ENDIF
+   Super:Create()
+   ::__SetBlinkColor()
+RETURN Self
+//-----------------------------------------------------------------------------------------------
+
+METHOD SetForeColor( nColor, lRepaint ) CLASS Label
+   DEFAULT lRepaint TO .T.
+   ::xForeColor := nColor
+   ::__CurColor := nColor
+   IF lRepaint .AND. ::IsWindowVisible()
+      ::Refresh()
+   ENDIF
+   IF ::IsWindowVisible()
+      ::InValidateRect()
+   ENDIF
+RETURN SELF
+
+//-----------------------------------------------------------------------------------------------
+METHOD __SetBlinkColor() CLASS Label
+   IF ::__ClassInst == NIL
+      IF ::BlinkColor != NIL
+         ::SetTimer( 512, 500 )
+       ELSE
+         ::KillTimer( 512 )
+         ::__CurColor := ::ForeColor
+         ::RedrawWindow( , , RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE )
+      ENDIF
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnTimer( nID ) CLASS Label
+   IF nID == 512
+      ::KillTimer( 512 )
+      DEFAULT ::__CurColor TO ::ForeColor
+      IF ::__CurColor == ::ForeColor
+         ::__CurColor := ::BlinkColor
+      ELSE
+         ::__CurColor := ::ForeColor
+      ENDIF
+      ::RedrawWindow( , , RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE )
+      ::SetTimer( 512, 500 )
+   ENDIF
+RETURN 0
+
+//-----------------------------------------------------------------------------------------------
 METHOD OnLButtonUp() CLASS Label
    LOCAL nRet
    nRet := __Evaluate( ::Action, Self,,, nRet )
@@ -101,9 +162,14 @@ METHOD OnPaint() CLASS Label
 
    hDC := ::BeginPaint()
 
+   DEFAULT ::__CurColor TO ::ForeColor
+
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
    _FillRect( hDC, aRect, hBkGnd )
 
+   IF VALTYPE( ::Border ) == "L"
+      ::Border := -1
+   ENDIF
    IF ::Border <> 0
       IF ::Border == -1
          hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
@@ -134,19 +200,19 @@ METHOD OnPaint() CLASS Label
    cText := ::xText
    DEFAULT cText TO ""
 
-   IF ::SunkenText
+   IF ::xTextShadowColor != NIL
       aRect[1] += 1
       aRect[2] += 1
       aRect[3] += 1
       aRect[4] += 1
-      SetTextColor( hDC, ::System:Color:White )
+      SetTextColor( hDC, ::xTextShadowColor )
       _DrawText( hDC, cText, aRect, nFlags )
       aRect[1] -= 1
       aRect[2] -= 1
       aRect[3] -= 1
       aRect[4] -= 1
    ENDIF
-   SetTextColor( hDC, ::ForeColor )
+   SetTextColor( hDC, ::__CurColor )
    _DrawText( hDC, cText, aRect, nFlags )
    SelectObject( hDC, hFont )
    

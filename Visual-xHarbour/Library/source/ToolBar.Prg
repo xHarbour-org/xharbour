@@ -1484,7 +1484,6 @@ CLASS ToolButton INHERIT Object
       DATA AllowUnDock            INIT FALSE
       DATA AllowClose             INIT FALSE
       DATA Active                 INIT .F.
-      DATA Action
       DATA State                  INIT TBSTATE_ENABLED
       DATA Cargo
       DATA Parent

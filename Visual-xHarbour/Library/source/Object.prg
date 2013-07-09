@@ -30,6 +30,8 @@ CLASS Object
    DATA ThemeName              EXPORTED
    DATA hTheme                 EXPORTED
 
+   DATA Action                 EXPORTED
+
    DATA __xCtrlName            EXPORTED
 
    DATA __ForceSysColor        EXPORTED INIT .F.

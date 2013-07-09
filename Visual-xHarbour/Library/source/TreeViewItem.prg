@@ -24,11 +24,9 @@ CLASS TreeViewItem INHERIT Object
    DATA tvi            PROTECTED
    DATA ColItems
    DATA Level          EXPORTED
-   DATA Action         EXPORTED
    DATA HotImageIndex  EXPORTED
    DATA PointerItem    EXPORTED
    DATA InsertAfter    EXPORTED INIT TVI_LAST
-
    PROPERTY Bold    INDEX TVIS_BOLD READ xBold       WRITE SetItemState PROTECTED
    PROPERTY Text                    READ xText       WRITE SetItemText
    PROPERTY ImageIndex              READ xImageIndex WRITE SetImageIndex DEFAULT 0

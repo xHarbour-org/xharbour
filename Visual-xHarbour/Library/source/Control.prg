@@ -43,7 +43,6 @@ CLASS Control INHERIT Window
    DATA Value             EXPORTED
    DATA Options           EXPORTED
    DATA Data              EXPORTED
-   DATA Action            EXPORTED
    DATA Validating        EXPORTED INIT FALSE
    DATA IsValid           EXPORTED INIT TRUE
    DATA EmptyLeft         EXPORTED INIT 0

@@ -1404,7 +1404,6 @@ CLASS ToolStripItem INHERIT Control
    DATA __hKeyMenuHook     PROTECTED
    DATA __nSeparator       EXPORTED  INIT 0
    DATA __Roles            EXPORTED  INIT { "Button", "CkeckButton", "GroupCheck" }
-   DATA Action             EXPORTED
    
    // REMOVED PROPERTIES
    DATA Cursor             EXPORTED
