@@ -177,14 +177,19 @@ RETURN Self
 
 //----------------------------------------------------------------------------//
 
-METHOD AddItem( cPrompt, nImage, aColItems ) CLASS TreeViewItem
+METHOD AddItem( cPrompt, nImage, aColItems, lFirst ) CLASS TreeViewItem
    LOCAL oItem
 
    DEFAULT nImage TO 0
+   DEFAULT lFirst TO .F.
+
    oItem := TreeViewItem( ::Parent )
    oItem:Text        := cPrompt
    oItem:xImageIndex := nImage
    oItem:Owner       := Self
+   IF lFirst
+      oItem:InsertAfter := TVI_FIRST
+   ENDIF
    oItem:Create()
 
    DEFAULT aColItems TO {}

@@ -2084,7 +2084,7 @@ METHOD Init() CLASS IDE_MainForm
                         (n)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:ToolBox:Enabled    := y > 3
-                        ::Application:ObjectTree:Enabled := y > 3
+                        //::Application:ObjectTree:Enabled := y > 3
                         IF y > 3
                            ::Application:Project:CurrentForm:Redraw()
                            IF x == 3 .AND. y == 4
@@ -3121,12 +3121,12 @@ RETURN Self
 
 
 METHOD TabOrder( oBtn ) CLASS Project
-   ::CurrentForm:CtrlMask:lOrderMode       := oBtn:Checked
-   ::Application:ToolBox:Enabled := !oBtn:Checked
-   ::Application:ObjectTab:Enabled         := !oBtn:Checked
-   ::Application:EventManager:Enabled      := !oBtn:Checked
-   ::Application:ObjectTree:Enabled        := !oBtn:Checked
-   ::Application:FileExplorer:Enabled          := !oBtn:Checked
+   ::CurrentForm:CtrlMask:lOrderMode  := oBtn:Checked
+   ::Application:ToolBox:Enabled      := !oBtn:Checked
+   ::Application:ObjectTab:Enabled    := !oBtn:Checked
+   ::Application:EventManager:Enabled := !oBtn:Checked
+   ::Application:ObjectTree:Enabled   := !oBtn:Checked
+   ::Application:FileExplorer:Enabled := !oBtn:Checked
    ::Application:FileExplorer:InvalidateRect()
    ::Application:EnableBars( !oBtn:Checked, .T. )
 
@@ -4386,7 +4386,13 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       oForm:Cargo := cFile
    ENDIF
    FClose( hFile )
+
    ::Application:ObjectTree:Set( oForm )
+   IF oForm:Editor:TreeItem == NIL
+      oForm:Editor:TreeItem := oForm:TreeItem:AddItem( oForm:Editor:FileName, ::Application:ObjectTree:nPrgImg,, .T. )
+      oForm:Editor:TreeItem:Cargo := oForm:Editor
+   ENDIF
+
    oForm:__lLoading := .F.
 RETURN .T.
 

@@ -8,6 +8,11 @@
 #include "debug.ch"
 #include "commdlg.ch"
 
+#define FILE_ATTRIBUTE_NORMAL   0x00000080
+#define SHGFI_SMALLICON         0x000000001
+#define SHGFI_SHELLICONSIZE     0x000000004
+#define SHGFI_USEFILEATTRIBUTES 0x000000010
+#define SHGFI_ICON              0x000000100
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -347,7 +352,7 @@ CLASS ObjectTreeView INHERIT TreeView
    DATA CurObj   EXPORTED
    DATA oList
    DATA oApp, oPrj
-   DATA oDrag
+   DATA oDrag, nPrgImg, nCImg, nXfmImg
    METHOD InitProject()
    METHOD Set()
    METHOD OnKeyDown()
@@ -356,6 +361,7 @@ CLASS ObjectTreeView INHERIT TreeView
    METHOD OnRightClick()
    METHOD OnBeginDrag()
    METHOD OnEndDrag()
+   METHOD OnUserMsg()
    METHOD ResetContent() INLINE Super:ResetContent(),;
                                 ::aImages := {},;
                                 ::ImageList := NIL,;
@@ -391,11 +397,23 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD InitProject() CLASS ObjectTreeView
-   LOCAL cProject
+   LOCAL cProject, shfi := (struct SHFILEINFO)
    
    ::oList := ImageList( Self, 16, 16 ):Create()
    ::oList:MaskColor := C_LIGHTCYAN
    ::oList:AddBitmap( "TREE" )
+
+   SHGetFileInfo( ".prg", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+   ::oList:AddIcon( shfi:hIcon )
+   ::nPrgImg := ::oList:Count
+
+   SHGetFileInfo( ".c", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+   ::oList:AddIcon( shfi:hIcon )
+   ::nCImg := ::oList:Count
+
+   SHGetFileInfo( ".xfm", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+   ::oList:AddIcon( shfi:hIcon )
+   ::nXfmImg := ::oList:Count
 
    ::ImageList := ::oList
 
@@ -468,40 +486,59 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
 RETURN n
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Set( oObj ) CLASS ObjectTreeView
+METHOD Set( oObj, nImg ) CLASS ObjectTreeView
    IF oObj:ClsName == "Application"
       //oObj:TreeItem:ImageIndex := ::GetImage( oObj, .T. )
       
     ELSE
       IF oObj:TreeItem == NIL
+         DEFAULT nImg TO ::GetImage( oObj )
          TRY
-            oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name, ::GetImage( oObj ) )
+            oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name, nImg )
             oObj:TreeItem:Cargo := oObj
          CATCH
          END
        ELSE
+         DEFAULT nImg TO ::GetImage( oObj, .T. )
          oObj:TreeItem:Text := oObj:Name
-         oObj:TreeItem:ImageIndex := ::GetImage( oObj, .T. )
+         oObj:TreeItem:ImageIndex := nImg
       ENDIF
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
+METHOD OnUserMsg( hWnd, nMsg ) CLASS ObjectTreeView
+   (hWnd)
+   IF nMsg == WM_USER + 555
+      ::Application:SourceEditor:SetFocus()
+   ENDIF
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
    IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN" 
-      IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
-         IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
-            ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
+      IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "Source"
+         ::Application:SourceEditor:Source := oItem:Cargo
+         ::Application:Project:EditReset()
+         ::Application:SourceEditor:Parent:Select()
+         IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
+            ::PostMessage( WM_USER + 555 )
          ENDIF
-      ENDIF
-      IF oItem:Cargo:Parent != NIL .AND. oItem:Cargo:Parent:__xCtrlName == "TabPage"
-         oItem:Cargo:Parent:Select()
-      ENDIF
-      IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
-         oItem:Cargo:Select()
-      ENDIF
+       ELSE
+         IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
+            IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
+               ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
+            ENDIF
+         ENDIF
+         IF oItem:Cargo:Parent != NIL .AND. oItem:Cargo:Parent:__xCtrlName == "TabPage"
+            oItem:Cargo:Parent:Select()
+         ENDIF
+         IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
+            oItem:Cargo:Select()
+         ENDIF
 
-      ::Application:Project:CurrentForm:SelectControl( oItem:Cargo )
+         ::Application:Project:CurrentForm:SelectControl( oItem:Cargo )
+      ENDIF
    ENDIF
 RETURN NIL
 
@@ -544,6 +581,7 @@ RETURN NIL
 CLASS FileExplorer INHERIT TreeView
    DATA Changing   EXPORTED INIT .F.
    DATA ExtSource  EXPORTED
+   DATA nPrgImg    EXPORTED INIT -1
    METHOD UpdateView()
    METHOD OnSelChanged()
    METHOD OnDropFiles()
@@ -572,7 +610,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD UpdateView() CLASS FileExplorer
-   LOCAL Form, MainItem, oEditor, SubItem, Item, cFile := ::Application:Project:Properties:Name
+   LOCAL shfi := (struct SHFILEINFO), Form, MainItem, oEditor, SubItem, Item, cFile := ::Application:Project:Properties:Name
    DEFAULT cFile TO "Untitled"
    ::ResetContent()
 
@@ -583,8 +621,15 @@ METHOD UpdateView() CLASS FileExplorer
    Item:Cargo := ::Application:ProjectPrgEditor
    ::Application:ProjectPrgEditor:TreeItem := Item
 
+   IF ::nPrgImg == -1
+      SHGetFileInfo( ".prg", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+      view shfi:hIcon
+      ::ImageList:AddIcon( shfi:hIcon )
+      ::nPrgImg := ::ImageList:Count
+   ENDIF
+
    FOR EACH Form IN ::Application:Project:Forms
-       SubItem := MainItem:AddItem( Form:Name + ".prg"+IIF( Form:Editor:Modified, " *", ""), 16 )
+       SubItem := MainItem:AddItem( Form:Name + ".prg"+IIF( Form:Editor:Modified, " *", ""), ::nPrgImg )
        SubItem:Cargo := Form:Editor
        SubItem:Cargo:TreeItem := SubItem
    NEXT
@@ -593,7 +638,7 @@ METHOD UpdateView() CLASS FileExplorer
    IF !EMPTY( ::Application:Project:Properties:Sources )
       FOR EACH cFile IN ::Application:Project:Properties:Sources
           oEditor := ::Application:SourceEditor:GetEditor( cFile )
-          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), 16 )
+          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), ::nPrgImg )
           SubItem:Cargo := oEditor
           SubItem:Cargo:TreeItem := SubItem
       NEXT

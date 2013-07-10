@@ -400,6 +400,10 @@ RETURN .F.
 CLASS FontDialog INHERIT CommonDialogs
    //DATA cf   EXPORTED
    DATA Font PUBLISHED
+   DATA ForeColor EXPORTED
+
+   ACCESS Color INLINE ::ForeColor
+   
    METHOD Init() CONSTRUCTOR
    METHOD Show()
 ENDCLASS

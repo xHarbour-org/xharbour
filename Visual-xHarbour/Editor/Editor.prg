@@ -894,6 +894,7 @@ CLASS Source
    DATA nPrevLine EXPORTED
    DATA PrevFile  EXPORTED
    DATA TreeItem  EXPORTED
+   DATA __xCtrlName EXPORTED INIT "Source"
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )

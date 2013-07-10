@@ -593,7 +593,6 @@ METHOD Exit() CLASS Application
          ::MainForm:Close()
        ELSE
          ::MainForm:Destroy()
-         RETURN NIL
       ENDIF
    ENDIF
    ::MainForm := NIL
@@ -608,6 +607,7 @@ METHOD Exit() CLASS Application
       IF ::__SocketInit
          InetCleanUp()
       ENDIF
+      QUIT
    ENDIF
 RETURN NIL
 

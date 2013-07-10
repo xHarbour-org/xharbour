@@ -1100,7 +1100,7 @@ METHOD Create() CLASS TabPage
       ::__OnParentSize()
       
       IF ::__ClassInst != NIL
-         ::Application:ObjectTree:Set( Self, .F. )
+         ::Application:ObjectTree:Set( Self )
          ::Application:Props[ "ComboSelect" ]:Reset()
       ENDIF
       RedrawWindow( ::Parent:hWnd,,, RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
