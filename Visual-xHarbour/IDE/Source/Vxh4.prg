@@ -785,7 +785,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
 
    IF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margin", cProp ) == 0
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
-    ELSEIF cProp IN {"Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ActiveMenuBar","Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
    ENDIF
 
@@ -861,7 +861,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
 
-    ELSEIF cProp IN {"Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ActiveMenuBar","Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       TRY
          IF VALTYPE( xValue ) == "O" .AND. xValue:ComponentType == "DataSource" .AND. !xValue:IsOpen
             xValue:Create()
@@ -1409,6 +1409,22 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   ENDIF
 
                   aCol[1]:ColType  := "BANDCHILD"
+                  xValue := NIL
+
+             CASE cProp == "ActiveMenuBar"
+                  aCol[1]:Value := { "", { NIL } }
+
+                  FOR EACH Child IN ::ActiveObject:Form:Components
+                      IF Child:ClsName == "MenuBar"
+                         AADD( aCol[1]:Value[2], Child )
+                      ENDIF
+                  NEXT
+
+                  IF xValue != NIL
+                     aCol[1]:Value[1] := xValue:Name
+                  ENDIF
+
+                  aCol[1]:ColType  := "ACTIVEMENUBAR"
                   xValue := NIL
 
              CASE cProp == "BandChild"
@@ -2247,7 +2263,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN { "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
+               CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -3323,6 +3339,7 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
                    { "Alias",                   ""          },;
                    { "Animate",                 ""          },;
                    { "AutoRun",                 ""          },;
+                   { "ActiveMenuBar",           ""          },;
                    { "AlwaysOnTop",             "Behavior"  },;
                    { "AnchorColumn",            "Behavior"  },;
                    { "AllowDragRecords",        "Behavior"  },;

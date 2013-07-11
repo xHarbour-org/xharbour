@@ -22,7 +22,7 @@ CLASS Control INHERIT Window
    DATA Anchor            PUBLISHED
    DATA Transparent       EXPORTED INIT .F.
 
-   PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
 
    PROPERTY TabStop INDEX WS_TABSTOP READ xTabStop      WRITE SetStyle          DEFAULT .T. PROTECTED
    PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.

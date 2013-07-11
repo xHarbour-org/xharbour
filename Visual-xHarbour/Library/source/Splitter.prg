@@ -37,7 +37,7 @@ CLASS Splitter INHERIT Control
    PROPERTY Width   INDEX 3 READ xWidth  WRITE __SetSizePos HIDDEN
    PROPERTY Height  INDEX 4 READ xHeight WRITE __SetSizePos HIDDEN
    
-   PROPERTY Owner GET __ChkComponent( Self, ::xOwner )
+   PROPERTY Owner GET __ChkComponent( Self, @::xOwner )
 
    EXPORTED:
       DATA ToolTip

@@ -1012,7 +1012,7 @@ RETURN 0
 //----------------------------------------------------------------------------------------------------------------
 
 CLASS ComboBoxEx INHERIT ComboBox
-   PROPERTY ImageList GET __ChkComponent( Self, ::xImageList ) SET SetImageList
+   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList ) SET SetImageList
 
    DATA ClientEdge EXPORTED INIT .F.
    DATA hControl   EXPORTED

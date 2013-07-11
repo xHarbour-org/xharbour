@@ -306,7 +306,7 @@ METHOD GetImages() CLASS ImageList
 RETURN SELF
 
 CLASS __ImageListComboBox INHERIT ComboBox
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

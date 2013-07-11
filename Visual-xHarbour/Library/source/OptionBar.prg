@@ -49,11 +49,11 @@ CLASS OptionBar INHERIT Control
    ASSIGN CheckGroup(l) INLINE ::xCheckGroup := l
 
    DATA xImageList  PROTECTED
-   ACCESS ImageList    INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
+   ACCESS ImageList    INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
    ASSIGN ImageList(o) INLINE ::xImageList := o, IIF( ::__ToolBar != NIL, ::__ToolBar:ImageList := o,)
 
    DATA xHotImageList      EXPORTED
-   ACCESS HotImageList     INLINE __ChkComponent( Self, ::xHotImageList ) PERSISTENT
+   ACCESS HotImageList     INLINE __ChkComponent( Self, @::xHotImageList ) PERSISTENT
    ASSIGN HotImageList(o)  INLINE ::xHotImageList := o
 
 

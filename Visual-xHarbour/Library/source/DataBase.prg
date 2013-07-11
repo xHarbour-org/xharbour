@@ -41,7 +41,7 @@ CLASS DataTable INHERIT Component
    DATA AutoOpen           PUBLISHED INIT .T.
    
    DATA xSqlConnector      EXPORTED
-   ACCESS SqlConnector     INLINE __ChkComponent( Self, ::xSqlConnector ) PERSISTENT
+   ACCESS SqlConnector     INLINE __ChkComponent( Self, @::xSqlConnector ) PERSISTENT
    ASSIGN SqlConnector(o)  INLINE ::xSqlConnector := o
    
    DATA Path               PUBLISHED INIT ""

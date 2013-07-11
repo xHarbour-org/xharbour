@@ -133,7 +133,7 @@ static aMessages := {;
 CLASS Window INHERIT Object
    // IDE Published properties
 
-   PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
 
    PROPERTY Left          INDEX 1                   READ xLeft           WRITE __SetSizePos
    PROPERTY Top           INDEX 2                   READ xTop            WRITE __SetSizePos
@@ -268,7 +268,6 @@ CLASS Window INHERIT Object
    DATA __Timers                 EXPORTED  INIT 1
    DATA __lAllowCopy             EXPORTED  INIT .T.
    DATA __lInitialized           EXPORTED  INIT .F.
-   DATA __IdeContextMenuItems    EXPORTED  INIT {}
    DATA __nProc                  EXPORTED
    DATA __lOnPaint               EXPORTED  INIT .F.
    DATA __hAccelTable            EXPORTED
@@ -4897,7 +4896,10 @@ CLASS WinForm INHERIT Window
    PROPERTY BitmapMask                              READ xBitmapMask      WRITE __SetBitmapMask             PROTECTED INVERT
    PROPERTY BitmapMaskColor                         READ xBitmapMaskColor WRITE __SetBitmapMaskColor        PROTECTED
 
-   PROPERTY ImageList     GET __ChkComponent( Self, ::xImageList )    SET SetImageList                PROTECTED
+   PROPERTY ImageList     GET __ChkComponent( Self, @::xImageList )     SET SetImageList                PROTECTED
+
+   PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET __SetActiveMenuBar
+
 
    // backward compatibility
 
@@ -4971,6 +4973,7 @@ CLASS WinForm INHERIT Window
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
+   METHOD __SetActiveMenuBar()  INLINE IIF( ::hWnd != NIL, SetMenu( ::hWnd, IIF( ::xActiveMenuBar != NIL, ::xActiveMenuBar:hMenu, NIL ) ), )
 
    METHOD SetImageList()
 
@@ -5068,13 +5071,9 @@ METHOD Create( hoParent ) CLASS WinForm
       ::BackgroundImage:Create()
    ENDIF
 
-   #ifdef VXH_ENTERPRISE
-   //IF VALTYPE( ::Application:Params ) == "A" .AND. LEN( ::Application:Params ) == 3 .AND. ::Application:Params[1] == "REMOTE"
-   //   ::Application:RemoteSocket := WinSock( Self, .F. )
-   //   ::Application:RemoteSocket:LocalPort := VAL( ::Application:Params[3] )
-   //   ::Application:RemoteSocket:Listen()
-   //ENDIF
-   #endif
+   IF ::ActiveMenuBar != NIL
+      ::__SetActiveMenuBar()
+   ENDIF
 RETURN Self
 
 METHOD OnSize( nwParam, nlParam ) CLASS WinForm
@@ -5726,17 +5725,17 @@ FUNCTION __ChkComponent( oObj, cComp )
    IF VALTYPE( cComp ) == "C" 
       oForm := oObj:Form
       IF oForm:__hObjects != NIL 
-         IF ASCAN( oForm:__hObjects:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) == 0
+         IF HGetPos( oForm:__hObjects, cComp ) > 0
+            cComp := oForm:__hObjects[ cComp ]
+          ELSE
             IF oObj:__ClassInst == NIL 
                oForm := oObj:Application:MainForm
              ELSE
                oForm := oObj:Application:Project:Forms[1]
             ENDIF
-            IF oForm:__hObjects != NIL .AND. ASCAN( oForm:__hObjects:Keys, {|c| UPPER(c) == UPPER( cComp ) } ) > 0
+            IF oForm:__hObjects != NIL .AND. HGetPos( oForm:__hObjects, cComp ) > 0
                cComp := oForm:__hObjects[ cComp ]
             ENDIF
-          ELSE
-            cComp := oForm:__hObjects[ cComp ]
          ENDIF
       ENDIF
    ENDIF

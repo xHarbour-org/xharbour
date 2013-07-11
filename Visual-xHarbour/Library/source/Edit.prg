@@ -57,12 +57,12 @@ CLASS EditBox INHERIT Control
 
    PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle   DEFAULT .T. PROTECTED
 
-   PROPERTY ContextMenu                                 GET __ChkComponent( Self, ::xContextMenu ) SET __SetContextMenu
+   PROPERTY ContextMenu                                 GET __ChkComponent( Self, @::xContextMenu ) SET __SetContextMenu
    PROPERTY CueBanner                                   READ xCueBanner        WRITE SetCueBanner
    PROPERTY ContextArrow                                READ xContextArrow     WRITE __SetContextMenu DEFAULT .F. PROTECTED
    PROPERTY ImageIndex                                  READ xImageIndex       WRITE __SetImageIndex  DEFAULT 0   PROTECTED
 
-   PROPERTY DataSource    GET __ChkComponent( Self, ::xDataSource )
+   PROPERTY DataSource    GET __ChkComponent( Self, @::xDataSource )
 
    DATA Transparent                    PUBLISHED INIT .F.
    DATA ImageIndex                     PUBLISHED INIT 0

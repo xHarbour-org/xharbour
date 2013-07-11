@@ -53,7 +53,7 @@ CLASS GroupBox INHERIT Control
 
    ACCESS ForeSysColor INLINE ::GetSysColor()
 
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
    
    METHOD Init()  CONSTRUCTOR
    METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent, ::__SetTransp(.T.), ), Super:Create()

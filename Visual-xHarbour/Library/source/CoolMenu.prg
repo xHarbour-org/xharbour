@@ -37,7 +37,7 @@ CLASS CoolMenu INHERIT ToolBar
    DATA HotImageList    PUBLISHED
    DATA hBackupColor    EXPORTED
 
-   PROPERTY ImageList GET __ChkComponent( Self, ::xImageList )
+   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
 
    METHOD Init( oParent ) CONSTRUCTOR
    METHOD Create()
@@ -322,7 +322,6 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA ForeColor             EXPORTED
    DATA Menu                  EXPORTED
    DATA Index                 EXPORTED
-   DATA __IdeContextMenuItems EXPORTED
    DATA Item                  EXPORTED
    DATA DropDown              EXPORTED
    DATA WholeDropDown         EXPORTED

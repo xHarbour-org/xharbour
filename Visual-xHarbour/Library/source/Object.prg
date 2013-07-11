@@ -44,6 +44,8 @@ CLASS Object
    DATA __DockChildren         EXPORTED
    DATA __CustomOwner          EXPORTED INIT .F.
    DATA __OriginalName         EXPORTED
+   DATA __IdeContextMenuItems  EXPORTED INIT {}
+
    DATA InvisibleAtRuntime     EXPORTED INIT .F.
 
    DATA ClsName                EXPORTED

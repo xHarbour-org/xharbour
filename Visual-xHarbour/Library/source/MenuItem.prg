@@ -17,30 +17,24 @@
 #define MENU_POPUPITEM 14
 //-------------------------------------------------------------------------------------------------------
 
-CLASS MenuItem INHERIT Object
+CLASS MenuItem INHERIT Control
    DATA hMenu                    EXPORTED
    DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable              EXPORTED INIT .F.
    DATA __lCopyCut               EXPORTED INIT .F.
-   DATA __IsControl              EXPORTED INIT .T.
-   DATA __lCreateAfterChildren   EXPORTED INIT .F.
-   DATA __IdeImageIndex          EXPORTED INIT 8
    DATA __TempRect               EXPORTED
 
-   DATA Text                     PUBLISHED
-
-   DATA ID                       EXPORTED
    DATA Left                     EXPORTED INIT 0
    DATA Top                      EXPORTED INIT 0
    DATA Width                    EXPORTED INIT 0
    DATA Height                   EXPORTED INIT 0
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD InvalidateRect() INLINE NIL
+   METHOD __AddMenuItem()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuItem
-   ::Parent      := oParent
    ::ClsName     := "MenuItem"
    ::__xCtrlName := "MenuItem"
    Super:Init( oParent )
@@ -51,36 +45,34 @@ RETURN Self
 METHOD Create() CLASS MenuItem
    LOCAL mii := (struct MENUITEMINFO)
 
-   IF IsMenu( ::hMenu )
-      DestroyMenu( ::hMenu )
+   IF ::Parent:ClsName == "MenuItem" .AND. ::Parent:hMenu == NIL
+      ::Parent:hMenu := CreateMenu()
+      mii:cbSize     := mii:SizeOf()
+      mii:hSubMenu   := ::Parent:hMenu
+      mii:fMask      := MIIM_SUBMENU
+      SetMenuItemInfo( ::Parent:Parent:hMenu, ::Parent:Id, .F., mii )
    ENDIF
 
-   ::hMenu := CreateMenu()
+   mii := (struct MENUITEMINFO)
+   mii:cbSize     := mii:SizeOf()
+   mii:fMask      := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
+   mii:wID        := ::Id
+   mii:fType      := MFT_STRING
+   mii:dwTypeData := ::Text
 
-   DEFAULT ::Id TO ::Form:GetNextControlId()
-
-   DEFAULT ::Text to "-"
-
-   mii:hSubMenu      := ::hMenu
-   mii:cbSize        := mii:SizeOf()
-   mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
-   mii:wID           := ::Id
-   IF ::Text == "-"
-      mii:fType      := MFT_SEPARATOR
-    ELSE
-      mii:fType      := MFT_STRING
-   ENDIF
-
-   mii:dwTypeData    := ::Text
-
-   view InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
 
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
 
+   AADD( ::Parent:Children, Self )
 RETURN NIL
+
+METHOD __AddMenuItem() CLASS MenuItem
+   ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "MenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -108,7 +100,7 @@ CLASS CMenuItem INHERIT Object
    DATA ShortCutKey              PUBLISHED
 
    DATA xImageList      EXPORTED
-   ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
+   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
 
    DATA Visible                  PUBLISHED INIT .T.
@@ -142,7 +134,6 @@ CLASS CMenuItem INHERIT Object
    DATA Height                   EXPORTED INIT 0
    DATA Events                   EXPORTED INIT {  {"General", { { "OnClick"       , "", "" } } } }
 
-   DATA __IdeContextMenuItems    EXPORTED INIT {}
    DATA __PropFilter             EXPORTED INIT {}
    DATA Components               EXPORTED INIT {}
    DATA SetChildren              EXPORTED INIT .T.

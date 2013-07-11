@@ -79,7 +79,7 @@ CLASS ToolBar INHERIT Control
    PROPERTY BitmapWidth                                            READ xBitmapWidth        WRITE _SetBitmapSize DEFAULT -1
    PROPERTY BitmapHeight                                           READ xBitmapHeight       WRITE _SetBitmapSize DEFAULT -1
 
-   ACCESS ImageList        INLINE __ChkComponent( Self, ::xImageList )     PERSISTENT
+   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
    EXPORTED:
       DATA Caption
@@ -1477,7 +1477,7 @@ CLASS ToolButton INHERIT Object
    ACCESS HotImageList   INLINE ::Parent:HotImageList
 
 
-   PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
 
    EXPORTED:
       DATA Id

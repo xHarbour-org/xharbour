@@ -44,7 +44,7 @@ CLASS NotifyIcon INHERIT Component
    PROPERTY Visible        READ xVisible        WRITE SetVisible        DEFAULT .T.
    PROPERTY Icon           READ xIcon           WRITE __SetIcon         INVERT
    PROPERTY Text           READ xText           WRITE __SetText         INVERT
-   PROPERTY ContextMenu    GET __ChkComponent( Self, ::xContextMenu )
+   PROPERTY ContextMenu    GET __ChkComponent( Self, @::xContextMenu )
 
    DATA Balloon_Icons   EXPORTED  INIT { "None", "Info", "Warning", "Error" }
    DATA ID              EXPORTED

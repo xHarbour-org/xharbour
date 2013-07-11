@@ -338,7 +338,7 @@ CLASS ToolStrip INHERIT Control
                              (::Parent:__RefreshPosNo(), ::Parent:__RefreshLayout(), ::MoveWindow()),)
 
    ACCESS __lMoveable INLINE ::Parent:ClsName != "ToolStripContainer"
-   ACCESS ImageList   INLINE __ChkComponent( Self, ::xImageList )     PERSISTENT
+   ACCESS ImageList   INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
    
    PROPERTY Cursor    READ xCursor WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED HIDDEN
    DATA Border         EXPORTED INIT .T.
@@ -1704,7 +1704,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
    PROPERTY DropDown   READ xDropDown      WRITE __SetDropDown   DEFAULT  1  PROTECTED
    PROPERTY Checked    READ xChecked                             DEFAULT .F.
 
-   ACCESS ImageList        INLINE __ChkComponent( Self, ::xImageList )     PERSISTENT
+   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
    
    DATA __DropDown          EXPORTED INIT { "None", "Partial", "Full" }
 
@@ -3111,7 +3111,6 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ContextStrip INHERIT Component
-   DATA __IdeContextMenuItems EXPORTED
    DATA __hMenu               EXPORTED
    DATA Left, Top, Width      EXPORTED INIT 0
    DATA ImageList PUBLISHED

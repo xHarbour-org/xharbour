@@ -37,7 +37,7 @@ CLASS CoolBar FROM Control
    DATA nmr                  PROTECTED
    
    DATA xImageList           PROTECTED
-   ACCESS ImageList          INLINE    __ChkComponent( Self, ::xImageList )
+   ACCESS ImageList          INLINE    __ChkComponent( Self, @::xImageList )
    ASSIGN ImageList( oImg )  INLINE    ::SetImageList( oImg )
 
    DATA xBackColor           EXPORTED INIT GetSysColor( COLOR_BTNFACE )
@@ -369,7 +369,7 @@ CLASS CoolBarBand INHERIT Control
    DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
    
-   PROPERTY BandChild  GET __ChkComponent( Self, ::xBandChild ) SET SetChild
+   PROPERTY BandChild  GET __ChkComponent( Self, @::xBandChild ) SET SetChild
    
    PROPERTY Caption                          READ xCaption   WRITE SetCaption
    PROPERTY MinWidth                         READ xMinWidth  WRITE SetMinWidth    DEFAULT 200

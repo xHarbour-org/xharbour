@@ -90,8 +90,8 @@ CLASS DataGrid INHERIT TitleControl
    DATA ClearColumns            PUBLISHED INIT .T.
    DATA GradientHeader          PUBLISHED INIT .F.
 
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
-   PROPERTY DataSource GET __ChkComponent( Self, ::xDataSource ) SET __SetDataSource 
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
+   PROPERTY DataSource GET __ChkComponent( Self, @::xDataSource ) SET __SetDataSource 
 
    PROPERTY ShowGrid      READ xShowGrid    WRITE InvalidateRect    DEFAULT .T.
    PROPERTY Striping      READ xStriping    WRITE InvalidateRect    DEFAULT .F.
@@ -3922,9 +3922,9 @@ CLASS GridColumn INHERIT Object
 
    DATA ButtonText                   PUBLISHED
 
-   PROPERTY ContextMenu GET __ChkComponent( Self, ::xContextMenu )
-   PROPERTY ButtonMenu  GET __ChkComponent( Self, ::xButtonMenu )
-   PROPERTY HeaderMenu  GET __ChkComponent( Self, ::xHeaderMenu )
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
+   PROPERTY ButtonMenu  GET __ChkComponent( Self, @::xButtonMenu )
+   PROPERTY HeaderMenu  GET __ChkComponent( Self, @::xHeaderMenu )
 
    PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
    PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1

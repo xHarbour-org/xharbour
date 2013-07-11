@@ -493,11 +493,11 @@ METHOD Set( oObj, nImg ) CLASS ObjectTreeView
     ELSE
       IF oObj:TreeItem == NIL
          DEFAULT nImg TO ::GetImage( oObj )
-         TRY
+         //TRY
             oObj:TreeItem := oObj:Parent:TreeItem:AddItem( oObj:Name, nImg )
             oObj:TreeItem:Cargo := oObj
-         CATCH
-         END
+         //CATCH
+         //END
        ELSE
          DEFAULT nImg TO ::GetImage( oObj, .T. )
          oObj:TreeItem:Text := oObj:Name

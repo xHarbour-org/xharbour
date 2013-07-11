@@ -49,7 +49,7 @@ CLASS TabControl INHERIT Control
    PROPERTY FixedWidth          INDEX TCS_FIXEDWIDTH     READ xFixedWidth          WRITE SetStyle       DEFAULT .F. PROTECTED
    PROPERTY ColorInactiveHeader                          READ xColorInactiveHeader WRITE InvalidateRect DEFAULT .F. PROTECTED
 
-   ACCESS ImageList        INLINE __ChkComponent( Self, ::xImageList )     PERSISTENT
+   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.

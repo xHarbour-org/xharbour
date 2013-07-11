@@ -739,7 +739,6 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       IF ! __clsParent( oControl:ClassH, "COMPONENT" )
          oControl:Left    := x
          oControl:Top     := y
-
          IF aProps == NIL
             oControl:Text := oControl:Name
          ENDIF

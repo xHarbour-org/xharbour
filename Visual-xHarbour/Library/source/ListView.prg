@@ -64,10 +64,10 @@ CLASS ListView INHERIT TitleControl
    DATA __pSortProc PROTECTED
    DATA OnSelChanged          EXPORTED
 
-   PROPERTY ImageList      GET __ChkComponent( Self, ::xImageList )      SET SetImageList
-   PROPERTY ImageListSmall GET __ChkComponent( Self, ::xImageListSmall ) SET SetImageListSmall
+   PROPERTY ImageList      GET __ChkComponent( Self, @::xImageList )      SET SetImageList
+   PROPERTY ImageListSmall GET __ChkComponent( Self, @::xImageListSmall ) SET SetImageListSmall
 
-   PROPERTY DataSource  GET __ChkComponent( Self, ::xDataSource ) SET SetDataSource
+   PROPERTY DataSource  GET __ChkComponent( Self, @::xDataSource ) SET SetDataSource
 
    PROPERTY Gradient       INDEX LVS_EX_GRADIENT      READ xGradient       WRITE SetLVExStyle DEFAULT .F. PROTECTED
    PROPERTY FlatScrollBar  INDEX LVS_EX_FLATSB        READ xFlatScrollBar  WRITE SetLVExStyle DEFAULT .F. PROTECTED

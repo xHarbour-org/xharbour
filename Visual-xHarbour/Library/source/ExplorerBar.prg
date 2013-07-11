@@ -129,7 +129,7 @@ CLASS ExplorerBar INHERIT Control
    DATA __hImageListTitle  EXPORTED
    DATA __hImageListButton EXPORTED
 
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -252,7 +252,7 @@ CLASS Expando INHERIT Button
 
    DATA Special               PUBLISHED INIT .F.
 
-   PROPERTY ImageList  GET __ChkComponent( Self, ::xImageList )
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
 
    DATA HeaderHeight          EXPORTED
    DATA PaneHeight            PUBLISHED INIT 0

@@ -282,8 +282,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS MenuBar INHERIT Component
-   DATA hMenu                  EXPORTED
-   DATA __IdeContextMenuItems EXPORTED
+   DATA hMenu                 EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()   
@@ -294,9 +293,6 @@ METHOD Init( oParent ) CLASS MenuBar
    DEFAULT ::ComponentType TO "MenuBar"
    DEFAULT ::ClsName       TO "MenuBar"
    Super:Init( oParent )
-   IF ::__ClassInst != NIL
-      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
-   ENDIF
 RETURN Self
 
 METHOD Create() CLASS MenuBar
@@ -304,12 +300,15 @@ METHOD Create() CLASS MenuBar
 
    ::hMenu := CreateMenu()
 
-   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   //lpMenuInfo:fMask  := MIM_STYLE
-   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   //SetMenuInfo( ::hMenu, lpMenuInfo )
+   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   lpMenuInfo:fMask  := MIM_STYLE
+   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   SetMenuInfo( ::hMenu, lpMenuInfo )
 
-   //SetMenu( ::Parent:hWnd, ::hMenu )
+   IF ::__ClassInst != NIL
+      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
 RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuBar
@@ -324,9 +323,8 @@ CLASS ContextMenu INHERIT Component
    DATA Menu            EXPORTED
    DATA Text            EXPORTED INIT "ContextMenu"
    DATA xImageList      EXPORTED
-   DATA __IdeContextMenuItems EXPORTED
    
-   ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
+   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
    
    ACCESS Caption     INLINE ::Text
