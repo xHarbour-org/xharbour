@@ -686,7 +686,7 @@ static int SLX_InterceptAction( int iRet, DEF_CARGO )
       else if( iRet == REJECT_OP )
          { yylval.sText = ClipNet_IdentifierNew( (char*) yytext, TRUE ); iRet = TOKEN_IDENTIFIER; }
       else
-         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, Parser_pContext->Parser_iLine - 1 ); Parser_pContext->Parser_iErrors++; }
+         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, Parser_pContext->iLine - 1 ); Parser_pContext->iErrors++; }
    }
 
    #ifdef SHOW_LEX_TOKENS
@@ -1247,7 +1247,7 @@ static int SLX_CustomAction( int x, DEF_CARGO )
 
          /* NOTE: ClipNet_iLineINLINE is being RESET in ppcomp.c - SLX_pp_Internal() */
 
-         if( Parser_pContext->Parser_iLineINLINE )
+         if( Parser_pContext->iLineINLINE )
          {
             Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, "on the same line", NULL, CARGO );
             iIdentifier++;
@@ -1266,16 +1266,16 @@ static int SLX_CustomAction( int x, DEF_CARGO )
             char szID[6];
             INLINE *pInline;
 
-            Parser_pContext->Parser_iLineINLINE = Parser_pContext->Parser_iLine;
+            Parser_pContext->iLineINLINE = Parser_pContext->iLine;
             PP_bInline = TRUE;
 
             strncpy( sInlineSym, "SLX_INLINE_", 16 );
 
-            Parser_pContext->Parser_iInlineID++;
-            sprintf( szID, "%03d",  Parser_pContext->Parser_iInlineID );
+            Parser_pContext->iInlineID++;
+            sprintf( szID, "%03d",  Parser_pContext->iInlineID );
             strncpy( sInlineSym + 11, szID, 4 );
 
-            if( Parser_pContext->Parser_iInlineID > SLX_INLINE_MAX )
+            if( Parser_pContext->iInlineID > SLX_INLINE_MAX )
             {
                Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, NULL, NULL, CARGO );
                break;
@@ -1288,7 +1288,7 @@ static int SLX_CustomAction( int x, DEF_CARGO )
             YY_INPUT( (char*) sBuffer, iSize, YY_BUF_SIZE );
             if( iSize == 0 )
             {
-               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_INVALID_INLINE, Parser_pContext->Parser_Functions.pLast->pName->Name, NULL, CARGO );
+               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_INVALID_INLINE, Parser_pContext->Functions.pLast->pName->Name, NULL, CARGO );
                PP_bInline = FALSE;
                return '\n' + DONT_REDUCE;
             }
@@ -1385,7 +1385,7 @@ static int SLX_CustomAction( int x, DEF_CARGO )
             }
             else
             {
-               if( Parser_pContext->Parser_iBackend != LANG_C && Parser_pContext->Parser_iBackend != LANG_OBJ_MODULE )
+               if( Parser_pContext->iBackend != LANG_C && Parser_pContext->iBackend != LANG_OBJ_MODULE )
                {
                   Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_REQUIRES_C, NULL, NULL, CARGO );
                   ClipNet_free( (void *) pInline->pCode );
@@ -1393,8 +1393,8 @@ static int SLX_CustomAction( int x, DEF_CARGO )
                   ClipNet_free( (void *) pInline );  /* NOTE: szName will be released by ClipNet_SymbolKill() */
                }
 
-               Parser_pContext->Parser_iLinePRG = Parser_pContext->Parser_iLine;
-               Parser_pContext->Parser_iLine = Parser_pContext->Parser_iLineINLINE;
+               Parser_pContext->iLinePRG = Parser_pContext->iLine;
+               Parser_pContext->iLine = Parser_pContext->iLineINLINE;
 
                yylval.sText = ClipNet_IdentifierNew( sInlineSym, TRUE );
                ClipNet_free( sInlineSym ) ;
@@ -1434,7 +1434,7 @@ static int SLX_CustomAction( int x, DEF_CARGO )
 
          if( iSize == 0 )
          {
-            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_MISSING_ENDTEXT, Parser_pContext->Parser_Functions.pLast->pName->Name, NULL, CARGO );
+            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_MISSING_ENDTEXT, Parser_pContext->Functions.pLast->pName->Name, NULL, CARGO );
             return '\n' + DONT_REDUCE;
          }
          else
@@ -1502,8 +1502,8 @@ static int SLX_CustomAction( int x, DEF_CARGO )
          return TOKEN_IIF;
 
       default:
-         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, Parser_pContext->Parser_iLine - 1 );
-         Parser_pContext->Parser_iErrors++;
+         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, Parser_pContext->iLine - 1 );
+         Parser_pContext->iErrors++;
    }
 
    return x;
@@ -1513,7 +1513,7 @@ int yy_lex_input( char *pBuffer, int iBufferSize, DEF_CARGO )
 {
    SYMBOL_UNUSED( iBufferSize );
 
-   return PP_NextLine( Parser_pContext->Parser_pPPO, pBuffer, CARGO );
+   return PP_NextLine( Parser_pContext->pPPO, pBuffer, CARGO );
 }
 
 char * SLX_LastBlock( BOOL bReset )

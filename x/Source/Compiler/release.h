@@ -2,7 +2,6 @@
 
    #define RELEASE_DEFINED
 
-   void Release_LValue( LVALUE *pLValue );
    void Release_List( LIST *pList );
    void Release_Block( BLOCK *pBlock );
    void Release_Unary( UNARY *pUnary );

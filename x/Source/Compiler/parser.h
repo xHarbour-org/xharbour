@@ -8,6 +8,8 @@
  */
 
 #ifndef PARSER_DEFINED
+   #include <setjmp.h>
+
    #include "tokens.h"
 
    #define ID_MAX_LEN 32
@@ -19,28 +21,28 @@
 
 
    #define LOOK_AHEAD_TOKEN() ( \
-                                Parser_pContext->Parser_iNextToken ? \
-                                  Parser_pContext->Parser_iNextToken : \
-                                  ( Parser_pContext->Parser_iNextToken = yylex( CARGO )  ) \
+                                Parser_pContext->iNextToken ? \
+                                  Parser_pContext->iNextToken : \
+                                  ( Parser_pContext->iNextToken = yylex( CARGO )  ) \
                               )
 
-   #define DROP_AHEAD_TOKEN() ( Parser_pContext->Parser_iNextToken = yylex( CARGO ) )
+   #define DROP_AHEAD_TOKEN() ( Parser_pContext->iNextToken = yylex( CARGO ) )
 
    #define USE_AHEAD_TOKEN()  ( \
-                                Parser_pContext->Parser_iToken = Parser_pContext->Parser_iNextToken, \
-                                Parser_pContext->Parser_iNextToken = yylex( CARGO ) \
+                                Parser_pContext->iToken = Parser_pContext->iNextToken, \
+                                Parser_pContext->iNextToken = yylex( CARGO ) \
                               )
 
-   #define LAST_TOKEN()       ( Parser_pContext->Parser_iToken )
+   #define LAST_TOKEN()       ( Parser_pContext->iToken )
 
    #define PARSE_ERROR( i, text1, text2 ) \
               Parser_GenError( Parser_asErrors, 'E', i, text1, text2, Parser_pContext ); \
+              printf( __SOURCE__"\n" ); \
               \
               if( LAST_TOKEN() != '\n' && LAST_TOKEN() != -1 ) \
               { \
                  while( LOOK_AHEAD_TOKEN() != -1 && LOOK_AHEAD_TOKEN() != '\n' ) \
                  { \
-                    printf( __SOURCE__"\n" ); \
                     DROP_AHEAD_TOKEN(); \
                  } \
               }
@@ -120,13 +122,15 @@
       PRG_TYPE_CHAR     = 0x0003,
       PRG_TYPE_LOGICAL  = 0x0004,
       PRG_TYPE_NUMERIC  = 0x0008,
-      PRG_TYPE_DECIMAL  = 0x0009,
-      PRG_TYPE_DATE     = 0x000A,
-      PRG_TYPE_DATETIME = 0x000B,
-      PRG_TYPE_ARRAY    = 0x0010,
-      PRG_TYPE_BLOCK    = 0x0020,
-      PRG_TYPE_OBJECT   = 0x0040,
-      PRG_TYPE_CLASS    = 0x0080,
+      PRG_TYPE_DECIMAL  = 0x0010,
+      PRG_TYPE_DATE     = 0x0020,
+      PRG_TYPE_DATETIME = 0x0021,
+      PRG_TYPE_BLOCK    = 0x0040,
+      PRG_TYPE_OBJECT   = 0x0080,
+      PRG_TYPE_CLASS    = 0x0081,
+      PRG_TYPE_ARRAY    = 0x0100,
+      PRG_TYPE_POINTER  = 0x0200,
+      PRG_TYPE_NONE     = 0xF000,
       PRG_TYPE_ANY      = 0xFFFF
    } PRG_TYPE;
 
@@ -149,6 +153,8 @@
       DECLARED_KIND_NONE            = 0,
       DECLARED_KIND_LOCAL_PARAMETER = 1,
       
+      DECLARED_KIND_GLOBAL          = TOKEN_GLOBAL,
+      DECLARED_KIND_EXTERNALGLOBAL  = TOKEN_EXTERNGLOBAL,
       DECLARED_KIND_LOCAL           = TOKEN_LOCAL,
       DECLARED_KIND_STATIC          = TOKEN_STATIC,
       DECLARED_KIND_FIELD           = TOKEN_FIELD,
@@ -161,15 +167,7 @@
 
    typedef enum
    {
-      LVALUE_KIND_VARIABLE,
-      LVALUE_KIND_MACRO,
-      LVALUE_KIND_ARRAY_ELEMENT,
-      LVALUE_KIND_OBJ_PROPERTY,
-      LVALUE_KIND_ALIASED_FIELD
-   } LVALUE_KIND;
-
-   typedef enum
-   {
+      CONSTANT_KIND_NIL,      
       CONSTANT_KIND_INTEGER,
       CONSTANT_KIND_LONG,
       CONSTANT_KIND_DOUBLE,
@@ -193,21 +191,37 @@
 
    typedef enum
    {
-      VALUE_KIND_NIL,
-      VALUE_KIND_CONSTANT,
-      VALUE_KIND_LVALUE,
-      VALUE_KIND_ARRAY,
-      VALUE_KIND_BLOCK,
-      VALUE_KIND_UNARY,
-      VALUE_KIND_BINARY,
-      VALUE_KIND_ALIASED,
-      VALUE_KIND_ASSIGNMENT,
-      VALUE_KIND_FUNCTION_CALL,
-      VALUE_KIND_IIF,
-      VALUE_KIND_METHOD_CALL,
-      VALUE_KIND_LIST,
-      VALUE_KIND_BYREF,
-      VALUE_KIND_ERROR = 0xFF00
+      VALUE_KIND_NONE            = 0x000,
+      VALUE_KIND_CONSTANT        = 0x001,
+
+      VALUE_KIND_ARRAY           = 0x002,
+      VALUE_KIND_BLOCK           = 0x003,
+      VALUE_KIND_BYREF           = 0x004,
+      VALUE_KIND_LIST            = 0x005,
+
+      
+      VALUE_KIND_IIF             = 0x006,
+      
+      VALUE_KIND_UNARY           = 0x007,
+
+      VALUE_KIND_ALIASED         = 0x008,
+      VALUE_KIND_BINARY          = 0x009,
+      VALUE_KIND_ASSIGNMENT      = 0x00A,
+  
+      VALUE_KIND_FUNCTION_CALL   = 0x00B,
+      VALUE_KIND_METHOD_CALL     = 0x00C,
+
+      VALUE_KIND_ASSIGNABLE_MASK = 0x100,
+
+      VALUE_KIND_VARIABLE        = 0x00D | VALUE_KIND_ASSIGNABLE_MASK,
+      VALUE_KIND_MACRO           = 0x00E | VALUE_KIND_ASSIGNABLE_MASK,
+      VALUE_KIND_ARRAY_ELEMENT   = 0x00F | VALUE_KIND_ASSIGNABLE_MASK,
+      VALUE_KIND_OBJECT_PROPERTY = 0x010 | VALUE_KIND_ASSIGNABLE_MASK,
+      VALUE_KIND_ALIASED_FIELD   = 0x011 | VALUE_KIND_ASSIGNABLE_MASK,
+
+      VALUE_KIND_ASSIGNED_MASK   = 0x200,
+
+      VALUE_KIND_ERROR_MASK      = 0x800
    } VALUE_KIND;
 
    typedef enum
@@ -254,18 +268,12 @@
 
    typedef enum
    {
-      LINE_KIND_ASSIGNMENT,
-
       LINE_KIND_CASE,
       LINE_KIND_OTHERWISE,
 
       LINE_KIND_FOR,
       LINE_KIND_WHILE,
       LINE_KIND_FLOW,
-
-      LINE_KIND_FUNCTION_CALL,
-      LINE_KIND_IIF,
-      LINE_KIND_METHOD_CALL,
 
       LINE_KIND_IF,
       LINE_KIND_ELSEIF,
@@ -289,6 +297,10 @@
       LINE_KIND_FINALLY,
 
       LINE_KIND_UNARY,
+      LINE_KIND_ASSIGNMENT,
+      LINE_KIND_IIF,
+      LINE_KIND_FUNCTION_CALL,
+      LINE_KIND_METHOD_CALL,
       
       LINE_KIND_LIST // REVIEW and TODO
 
@@ -308,10 +320,19 @@
    } 
    UNARY_KIND;
 
+   typedef enum
+   {
+      PARSING_STATE_GLOBAL_DECLARATIONS,
+      PARSING_STATE_DECLARAIONS,
+      PARSING_STATE_EXECUTABLE
+   }
+   PARSING_STATE;
+
    typedef struct _CONSTANT
    {
       CONSTANT_KIND Kind;
       PRG_TYPE Type;
+ 
       union
       {
          struct
@@ -353,12 +374,14 @@
    typedef struct _ID 
    {
       char Name[ ID_MAX_LEN ];
+      struct _ID *pNext;
    } ID; 
 
    typedef struct _MACRO
    {
       MACRO_KIND Kind;
       MACRO_RESOLUTION Resolution;
+      PRG_TYPE Type;
 
       union
       {
@@ -371,35 +394,26 @@
    typedef struct _DECLARED
    {
       DECLARED_KIND Kind;
+      PRG_TYPE      Type;
 
-      ID *           pID;
-      struct _VALUE  *pInit;
+      ID *             pID;
+      
+      union
+      {
+         struct _VALUE  *pInit;
+         struct _ID     *pAlias;
+      } Attribute;
+      
+      int              iLine;
 
       struct _DECLARED *pNext;
    } DECLARED;
 
    /* Forward Declarations. */
    struct _ARRAY_ELEMENT;
-   struct _OBJ_PROPERTY;
+   struct _OBJECT_PROPERTY;
    struct _ALIASED_FIELD;
    struct _ID;
-  
-   typedef struct _LVALUE
-   {
-      LVALUE_KIND Kind;
-      PRG_TYPE Type;
-
-      union
-      {
-         DECLARED *              pVariable;
-         MACRO *                 pMacro;
-
-         struct _ARRAY_ELEMENT *pArrayElement;
-         struct _OBJ_PROPERTY  *pProperty;
-         struct _ALIASED_FIELD *pAliasedField;
-      } Value;
-
-   } LVALUE;
 
    /* Forward Declarations. */
    struct _BLOCK;
@@ -420,20 +434,29 @@
 
       union
       {
-         CONSTANT *             pConstant;
-         LVALUE *               pLValue; 
+         DECLARED                *pVariable;
+         MACRO                   *pMacro;
+         struct _ARRAY_ELEMENT   *pArrayElement;
+         struct _OBJECT_PROPERTY *pObjectProperty;
+         struct _ALIASED_FIELD   *pAliasedField;
 
-         struct _LIST          *pArray;
-         struct _BLOCK         *pBlock;
-         struct _ASSIGNMENT    *pAssignment;
-         struct _UNARY         *pUnary;
-         struct _BINARY        *pBinary;
-         struct _ALIASED       *pAliased;
-         struct _FUNCTION_CALL *pFunctionCall;
-         struct _IIF           *pIIF;
-         struct _METHOD_CALL   *pMethodCall;
-         struct _LIST          *pList;
-         struct _VALUE         *pByRef;
+         CONSTANT                *pConstant;
+         
+         struct _LIST            *pArray;
+         struct _BLOCK           *pBlock;
+         ID                      *pByRef;
+         struct _LIST            *pList;
+
+         struct _UNARY           *pUnary;
+
+         struct _ASSIGNMENT      *pAssignment;
+         struct _BINARY          *pBinary;
+         struct _ALIASED         *pAliased;
+
+         struct _IIF             *pIIF;
+
+         struct _FUNCTION_CALL   *pFunctionCall;
+         struct _METHOD_CALL     *pMethodCall;
       } Value;
  
    } VALUE;
@@ -499,7 +522,7 @@
       VALUE * pFalse;
    } IIF;
 
-   typedef struct _OBJ_PROPERTY
+   typedef struct _OBJECT_PROPERTY
    {
       PRG_TYPE Type;
 
@@ -652,7 +675,7 @@
 
       union
       { 
-         VALUE               *pAssignment; 
+         ASSIGNMENT          *pAssignment;
 
          CASE                *pCase;
          OTHERWISE           *pOtherwise;
@@ -664,10 +687,6 @@
          IF                  *pIf;
          ELSEIF              *pElseIf;
          ELSE                *pElse;
-
-         VALUE               *pFuncttionCall;
-         VALUE               *pIIF;
-         VALUE               *pMethodCall;
 
          DECLARED            *pLocals;
          DECLARED            *pStatics;
@@ -688,8 +707,12 @@
          CATCH               *pCatch;
          BODY                *pFinally;
 
-         VALUE               *pUnary;
-         struct _LIST        *pList;
+         //Side Effect only
+         FUNCTION_CALL       *pFuncttionCall;
+         IIF                 *pIIF;
+         METHOD_CALL         *pMethodCall;
+         UNARY               *pUnary;
+         LIST                *pList;
       } Value;
 
       struct _LINE *pNext;
@@ -698,7 +721,7 @@
    typedef struct _FUNCTION
    {
       FUNC_KIND          Kind;
-      BOOL               bProcedure;
+      PRG_TYPE           Type;
 
       ID *                pName;
       DECLARED *          pLocalParameters;
@@ -777,27 +800,40 @@
 
    typedef struct
    {
-      int Parser_iBackend;
-      int Parser_iInlineID;
+      int iBackend;
+      int iInlineID;
 
-      int Parser_iLine;
-      int Parser_iErrors;
-      int Parser_iWarnings;
-      int Parser_iLinePRG;
-      int Parser_iLineINLINE;
-      int Parser_iNextToken;
-      int Parser_iToken;
+      int iLine;
+      int iErrors;
+      int iWarnings;
+      int iLinePRG;
+      int iLineINLINE;
+      int iNextToken;
+      int iToken;
    
-      BOOL Parser_bError;
-      BOOL Parser_bAnyWarning;
-      BOOL Parser_bMute;
-      BOOL Parser_bPPO;
+      BOOL bError;
+      BOOL bAnyWarning;
+      BOOL bMute;
+      BOOL bPPO;
    
-      FUNCTIONS    Parser_Functions;
-      PARSED_FILES Parser_Files;
-      INLINES      Parser_Inlines;
+      jmp_buf JumpBuffer;
       
-      FILE *       Parser_pPPO;
+      DECLARED *   pExternGlobals;
+      int          iExternGlobals;
+      DECLARED *   pGlobals;
+      int          iGlobals;
+      DECLARED *   pStatics;
+      int          iStatics;
+      DECLARED *   pMemvars;
+      int          iMemvars;
+      DECLARED *   pFields;
+      int          iFields;
+      
+      FUNCTIONS    Functions;
+      PARSED_FILES Files;
+      INLINES      Inlines;
+      
+      FILE *       pPPO;
 
    } PARSER_CONTEXT;
 

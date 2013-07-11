@@ -17,22 +17,32 @@
    BODY *              New_Body( PARSER_CONTEXT *Parser_pContext );
    LINE *              New_Line( void *x, LINE_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    INLINE *            New_Inline( char *sName, PARSER_CONTEXT *Parser_pContext );
-                      
+
+   ASSIGNMENT *        New_Assignment( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, PARSER_CONTEXT *Parser_pContext );
+   UNARY *             New_Unary( VALUE * pValue, UNARY_KIND Kind, UNARY_WHEN When, PARSER_CONTEXT *Parser_pContext );
+   IIF *               New_IIF( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *Parser_pContext );
+   FUNCTION_CALL *     New_FunctionCall( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT *Parser_pContext );
+
+
+
    VALUE *             New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext );
-   VALUE *             New_NILValue( PARSER_CONTEXT *Parser_pContext );
+
    VALUE *             New_ConstantValue( CONSTANT *pConstant, PARSER_CONTEXT *Parser_pContext );
+   VALUE *             New_NILValue( PARSER_CONTEXT *Parser_pContext );
+
+   VALUE *             New_IDValue( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext );
+   VALUE *             New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext );
+   VALUE *             New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT *Parser_pContext );
+
    VALUE *             New_BlockValue( PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_UnaryValue( VALUE * pValue, UNARY_KIND Kind, UNARY_WHEN When, PARSER_CONTEXT *Parser_pContext );
-   VALUE *             New_LValueValue( void *x, LVALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext );
-   VALUE *             New_LValueIDValue( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_BinaryValue( VALUE * pLeft, VALUE * pRight, BINARY_KIND Kind, PARSER_CONTEXT *Parser_pContext );
-   VALUE *             New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_pContext );
+
    VALUE *             New_IIFValue( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_AssignmentValue( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_FunctionCallValue( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT *Parser_pContext );
-   VALUE *             New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT *Parser_pContext );
-                                            
+
    LINE *              New_If( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContext );
    LINE *              New_ElseIf( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContext );
    LINE *              New_Else( BODY *pBody, PARSER_CONTEXT *Parser_pContext );

@@ -20,7 +20,7 @@ char * ClipNet_strdup( const char *pString )
    return pCopy;
 }
 
-const char * ClipNet_MacroKind( const MACRO *pMacro, PARSER_CONTEXT *Parser_pContext )
+const char * ClipNet_MacroKind( const MACRO *pMacro )
 {
    switch( pMacro->Kind )
    {
@@ -30,13 +30,13 @@ const char * ClipNet_MacroKind( const MACRO *pMacro, PARSER_CONTEXT *Parser_pCon
          break;
          
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_MacroKind()" );
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
    }
    
    return __SOURCE__;
 }
 
-const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Parser_pContext )
+const char * ClipNet_DeclaredKind( const DECLARED *pDeclared )
 {
    switch( pDeclared->Kind )
    {
@@ -60,45 +60,39 @@ const char * ClipNet_DeclaredKind( const DECLARED *pDeclared, PARSER_CONTEXT *Pa
          break;
          
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_DeclaredKind()" );
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
    }
    
    return __SOURCE__;
 }
 
-const char * ClipNet_LValueKind( const LVALUE *pLValue, PARSER_CONTEXT *Parser_pContext )
+const char * ClipNet_LValueKind( const VALUE *pLValue)
 {
-   switch( pLValue->Kind )
+   switch( pLValue->Kind & ~( VALUE_KIND_ERROR_MASK | VALUE_KIND_ASSIGNED_MASK ) )
    {
-      CASE_STRING( LVALUE_KIND_VARIABLE )
+      CASE_STRING( VALUE_KIND_VARIABLE )
          break;
-      CASE_STRING( LVALUE_KIND_MACRO )
+      CASE_STRING( VALUE_KIND_MACRO )
          break;
-      CASE_STRING( LVALUE_KIND_ARRAY_ELEMENT )
+      CASE_STRING( VALUE_KIND_ARRAY_ELEMENT )
          break;
-      CASE_STRING( LVALUE_KIND_OBJ_PROPERTY )
+      CASE_STRING( VALUE_KIND_OBJECT_PROPERTY )
          break;
-      CASE_STRING( LVALUE_KIND_ALIASED_FIELD )
+      CASE_STRING( VALUE_KIND_ALIASED_FIELD )
          break;
          
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_LValueKind()" );
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
    }
    
    return __SOURCE__;
 }
 
-const char * ClipNet_ValueKind( const VALUE *pValue, PARSER_CONTEXT *Parser_pContext )
+const char * ClipNet_ValueKind( const VALUE *pValue )
 {
-   switch( pValue->Kind )
+   switch( pValue->Kind & ~( VALUE_KIND_ERROR_MASK | VALUE_KIND_ASSIGNED_MASK ) )
    {
-      CASE_STRING( VALUE_KIND_NIL )
-         break;
-         
       CASE_STRING( VALUE_KIND_CONSTANT )
-         break;
-         
-      CASE_STRING( VALUE_KIND_LVALUE )
          break;
          
       CASE_STRING( VALUE_KIND_ARRAY )
@@ -134,14 +128,29 @@ const char * ClipNet_ValueKind( const VALUE *pValue, PARSER_CONTEXT *Parser_pCon
       CASE_STRING( VALUE_KIND_BYREF )
          break;
          
+      CASE_STRING(VALUE_KIND_VARIABLE)
+         break;
+         
+      CASE_STRING(VALUE_KIND_MACRO )
+         break;
+         
+      CASE_STRING(VALUE_KIND_ARRAY_ELEMENT )
+         break;
+         
+      CASE_STRING(VALUE_KIND_ALIASED_FIELD )
+         break;
+         
+      CASE_STRING(VALUE_KIND_OBJECT_PROPERTY )
+         break;
+         
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_ValueKind()" );
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
    }
    
    return __SOURCE__;
 }
 
-const char * ClipNet_LineKind( const LINE *pLine, PARSER_CONTEXT *Parser_pContext )
+const char * ClipNet_LineKind( const LINE *pLine )
 {
    switch( pLine->Kind )
    {
@@ -234,8 +243,105 @@ const char * ClipNet_LineKind( const LINE *pLine, PARSER_CONTEXT *Parser_pContex
          break;
 
        default:
-        PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: ClipNet_LineKind()" );
-   } 
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
+   }
 
+   return __SOURCE__;
+}
+
+const char * ClipNet_BinaryKind( const BINARY *pBinary )
+{
+   switch( pBinary->Kind )
+   {
+      CASE_STRING( BINARY_KIND_AND );
+         break;
+
+      CASE_STRING( BINARY_KIND_BITAND );
+         break;
+         
+      CASE_STRING( BINARY_KIND_BITLEFT );
+         break;
+         
+      CASE_STRING( BINARY_KIND_BITOR );
+         break;
+         
+      CASE_STRING( BINARY_KIND_BITRIGHT );
+         break;
+         
+      CASE_STRING( BINARY_KIND_BITXOR );
+         break;
+         
+      CASE_STRING( BINARY_KIND_DIVIDE );
+         break;
+         
+      CASE_STRING( BINARY_KIND_EQUAL );
+         break;
+         
+      CASE_STRING( BINARY_KIND_EXACTEQUAL );
+         break;
+         
+      CASE_STRING( BINARY_KIND_GREATER );
+         break;
+         
+      CASE_STRING( BINARY_KIND_GREATEREQUAL );
+         break;
+         
+      CASE_STRING( BINARY_KIND_HAS );
+         break;
+         
+      CASE_STRING( BINARY_KIND_IN );
+         break;
+         
+      CASE_STRING( BINARY_KIND_LESSER );
+         break;
+         
+      CASE_STRING( BINARY_KIND_LESSEREQUAL );
+         break;
+         
+      CASE_STRING( BINARY_KIND_LIKE );
+         break;
+         
+      CASE_STRING( BINARY_KIND_MINUS );
+         break;
+         
+      CASE_STRING( BINARY_KIND_MODULUS );
+         break;
+         
+      CASE_STRING( BINARY_KIND_MULTIPLY );
+         break;
+         
+      CASE_STRING( BINARY_KIND_NOTEQUAL);
+         break;
+         
+      CASE_STRING( BINARY_KIND_OR );
+         break;
+         
+      CASE_STRING( BINARY_KIND_PLUS );
+         break;
+         
+      CASE_STRING( BINARY_KIND_POWER );
+         break;
+         
+      default:
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
+   }
+   
+   return __SOURCE__;
+}
+
+const char * ClipNet_UnaryKind( const UNARY *pUnary )
+{
+   switch( pUnary->Kind )
+   {
+         CASE_STRING( UNARY_KIND_DEC );
+         break;
+         
+         CASE_STRING( UNARY_KIND_INC );
+         break;
+         
+      default:
+         printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
+   }
+   
    return __SOURCE__;
 }

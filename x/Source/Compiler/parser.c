@@ -13,35 +13,23 @@
 #include "common.h"
 
 //extern char *Parser_asErrors[];
-
+void       ParseSource( PARSER_CONTEXT *Parser_pContext );
 void       ParseFunction( PARSER_CONTEXT *Parser_pContext );
 DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piParams, PARSER_CONTEXT *Parser_pContext );
+void       ParseGlobalDeclarations( PARSER_CONTEXT *Parser_pContext );
 void       ParseDeclarations( PARSER_CONTEXT *Parser_pContext );
-BODY *     ParseBody( BODY *Body, PARSER_CONTEXT *Parser_pContext );
+BODY *     ParseBody( PARSER_CONTEXT *Parser_pContext );
 LINE *     ParseIf( PARSER_CONTEXT *Parser_pContext );
 VALUE *    ParseValue( PARSER_CONTEXT *Parser_pContext );
 LIST *     ParseList( PRG_TYPE Type, PARSER_CONTEXT *Parser_pContext );
 VALUE *    ParseListAsValue( PRG_TYPE Type, PARSER_CONTEXT *Parser_pContext );
 
 YYSTYPE   yylval;
-extern char *yytext;
-
-#if 1
-#else
-void DumpBody( BODY * pBody, int *piSpaces, PARSER_CONTEXT *Parser_pContext );
-void DumpLine( LINE * pLine, int *piSpaces, PARSER_CONTEXT *Parser_pContext );
-#endif
 
 int main( int argc, char *argv[] )
 {
    PARSER_CONTEXT *Parser_pContext = New_Context();
    FILE *hSource;
-
-#if 1
-#else
-   FUNCTION *pFunc;
-   int iSpaces = 0;
-#endif
    
    if( argc >= 2 )
    { 
@@ -63,34 +51,14 @@ int main( int argc, char *argv[] )
       pSource->pPrev = NULL;
       pSource->iLine = 0;
 
-      Parser_pContext->Parser_Files.iFiles = 1;
-      Parser_pContext->Parser_Files.pLast = pSource;
+      Parser_pContext->Files.iFiles = 1;
+      Parser_pContext->Files.pLast = pSource;
  
-      Reducer_Init();
-
-      while( LOOK_AHEAD_TOKEN() > 0 )
-      {
-         ParseFunction( Parser_pContext );
-      }
-    
-#if 1
-      IterateAST( Parser_pContext );
-#else
-      pFunc = Parser_pContext->Parser_Functions.pFirst;
-    
-      while( pFunc )
-      {         
-         printf( "\nFunction: %s LocalParams: %i Locals %i, Statics %i, Memvars %i, Fields %i, Params: %i Privates: %i Publics: %i\n", pFunc->pName->Name, pFunc->iLocalParams, pFunc->iLocals, pFunc->iStatics, pFunc->iMemvars, pFunc->iFields, pFunc->iParams, pFunc->iPrivates, pFunc->iPublics );
-
-         DumpBody( pFunc->pBody, &iSpaces, Parser_pContext );
-
-         pFunc = pFunc->pNext;
-      }
-#endif
+      ParseSource( Parser_pContext );
       
-      fclose( hSource );
- 
-      pSource = Parser_pContext->Parser_Files.pLast;
+      IterateAST( Parser_pContext );
+       
+      pSource = Parser_pContext->Files.pLast;
  
       while( pSource ) 
       {
@@ -108,96 +76,17 @@ int main( int argc, char *argv[] )
    } 
 }
 
-#if 1
-#else
-void DumpBody( BODY * pBody, int *piSpaces, PARSER_CONTEXT *Parser_pContext )
+void ParseSource( PARSER_CONTEXT *Parser_pContext )
 {
-   if( pBody && pBody->pLines )
+   ParseGlobalDeclarations( Parser_pContext );
+   
+   while( LOOK_AHEAD_TOKEN() > 0 )
    {
-      LINE * pLine = pBody->pLines;
-
-      do
-      {
-         DumpLine( pLine, piSpaces, Parser_pContext );
-
-         pLine = pLine->pNext;
-      }
-      while( pLine );
+      ParseFunction( Parser_pContext );
    }
+   
+   fclose( Parser_pContext->Files.pLast->hFile );
 }
-
-void DumpLine( LINE * pLine, int *piSpaces, PARSER_CONTEXT *Parser_pContext )
-{
-   char *sSpacer;
-
-   sSpacer = (char *) malloc( *piSpaces + 1 );
-   memset( (void *) sSpacer, ' ', *piSpaces );
-   sSpacer[ *piSpaces ] = '\0';
-
-   printf( "%sLine kind: %s\n", sSpacer, ClipNet_LineKind( pLine, Parser_pContext ) );
-
-   if( pLine->Kind == LINE_KIND_IF )
-   {
-      LINE *pIF = pLine;
-
-      *piSpaces += 3;
-
-      DumpBody( pLine->Value.pIf->pBody, piSpaces, Parser_pContext );
-
-      pLine = pLine->Value.pIf->pElseIf;
-      while( pLine )
-      {
-         printf( "%sLine kind: %s\n", sSpacer, ClipNet_LineKind( pLine, Parser_pContext ) );
-         DumpBody( pLine->Value.pElseIf->pBody, piSpaces, Parser_pContext );
-         pLine = pLine->pNext;
-      }
-
-      pLine = pIF->Value.pIf->pElse;
-      if( pLine )
-      {
-         printf( "%sLine kind: %s\n", sSpacer, ClipNet_LineKind( pLine, Parser_pContext ) );
-         DumpBody( pLine->Value.pElse->pBody, piSpaces, Parser_pContext );
-      }
-
-      printf( "%sLine kind: %s\n", sSpacer, "ENDIF" );
-
-      *piSpaces -= 3;
-   }
-
-   free( (void *) sSpacer );
-}
-#endif
-
-#if 0
-VALUE * Flag_AsMemvar( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
-{
-   if( pValue->Kind == VALUE_KIND_LVALUE )
-   {
-      LVALUE *pLValue = pValue->Value.pLValue;
-      
-      switch( pLValue->Kind )
-      {
-         case LVALUE_KIND_VARIABLE :
-            pLValue->Value.pVariable->Kind = DECLARED_KIND_MEMVAR;
-            break;
-
-         case LVALUE_KIND_MACRO :
-            // Macro Identifier may also refer to FIELD.
-            pLValue->Value.pMacro->Resolution = MACRO_RESOLUTION_MEMVAR;
-            break;
-
-         default :
-            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", invalid MEMVAR expression. (how come???)" );      
-      }
-   }
-   else
-   {
-      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", invalid MEMVAR expression." );
-   }
-
-   return pValue;
-}
-#endif
 
 void ParseFunction( PARSER_CONTEXT *Parser_pContext )
 {
@@ -234,8 +123,7 @@ void ParseFunction( PARSER_CONTEXT *Parser_pContext )
 
          ParseDeclarations( Parser_pContext );
 
-         pFunc->pBody = New_Body( Parser_pContext );
-         ParseBody( pFunc->pBody, Parser_pContext );
+         pFunc->pBody = ParseBody( Parser_pContext );
 
          return;
       }
@@ -248,38 +136,64 @@ void ParseFunction( PARSER_CONTEXT *Parser_pContext )
    return;
 }
   
-DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piParams, PARSER_CONTEXT *Parser_pContext )
+DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piDeclares, PARSER_CONTEXT *Parser_pContext )
 {
    DECLARED *pFirst = NULL, *pLast = NULL;
 
    while( LOOK_AHEAD_TOKEN() == TOKEN_IDENTIFIER )
    {
-      DECLARED * pParameter = New_DeclaredID( yylval.sText, Kind, Parser_pContext );
+      DECLARED * pDeclared = New_DeclaredID( yylval.sText, Kind, Parser_pContext );
 
       DROP_AHEAD_TOKEN();
 
       if( pLast )
       {
-         pLast->pNext = pParameter;
-         pLast = pParameter;
+         pLast->pNext = pDeclared;
+         pLast = pDeclared;
       }
       else
       {
-         pFirst = pParameter;
-         pLast  = pParameter;
+         pFirst = pDeclared;
+         pLast  = pDeclared;
       }
-      (*piParams)++;
+      
+      (*piDeclares)++;
 
 
-      if( LOOK_AHEAD_TOKEN() == TOKEN_INASSIGN )
+      if( Kind == DECLARED_KIND_GLOBAL  ||
+          Kind == DECLARED_KIND_LOCAL   || Kind == DECLARED_KIND_STATIC ||
+          Kind == DECLARED_KIND_PRIVATE || Kind == DECLARED_KIND_PUBLIC ||
+          Kind == DECLARED_KIND_LOCAL_PARAMETER )
       {
-         DROP_AHEAD_TOKEN();
-         pParameter->pInit = ParseValue( Parser_pContext );
+         if( LOOK_AHEAD_TOKEN() == TOKEN_INASSIGN )
+         {
+            DROP_AHEAD_TOKEN();
+            pDeclared->Attribute.pInit = ParseValue( Parser_pContext );
+         }
       }
       
       if( LOOK_AHEAD_TOKEN() == ',' )
       {
          DROP_AHEAD_TOKEN();
+      }
+      else if( LOOK_AHEAD_TOKEN() == TOKEN_IN && Kind == DECLARED_KIND_FIELD )
+      {
+         ID *pID;
+         
+         DROP_AHEAD_TOKEN();
+         
+         pID = New_ID( yylval.sText, Parser_pContext );
+         
+         if( LOOK_AHEAD_TOKEN() == TOKEN_IDENTIFIER )
+         {
+            pDeclared = pFirst;
+            
+            while( pDeclared )
+            {
+               pDeclared->Attribute.pAlias = pID;
+               pDeclared = pDeclared->pNext;
+            }
+         }
       }
       else
       {
@@ -290,46 +204,112 @@ DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piParams, PARSER_CONTEXT 
    return pFirst;
 }
 
-void ParseDeclarations( PARSER_CONTEXT *Parser_pContext )
+void ParseGlobalDeclarations( PARSER_CONTEXT *Parser_pContext )
 {
-   FUNCTION *pFunction = Parser_pContext->Parser_Functions.pLast;
    DECLARED **ppDeclared;
    int      *piDeclared;
-
-   Again:
-  
-      #ifdef GETTING_EMPTY_LINES
-         while( LOOK_AHEAD_TOKEN() == '\n' )
-         {
-            DROP_AHEAD_TOKEN();
-         }
-      #endif
    
-      switch( LOOK_AHEAD_TOKEN() )
-      {
-         case TOKEN_LOCAL :
-            ppDeclared = &( pFunction->pLocals );
-            piDeclared = &( pFunction->iLocals );
-         case TOKEN_STATIC :
-            ppDeclared = &( pFunction->pStatics );
-            piDeclared = &( pFunction->iStatics );
-         case TOKEN_MEMVAR :
-            ppDeclared = &( pFunction->pMemvars );
-            piDeclared = &( pFunction->iMemvars );
-         case TOKEN_FIELD :
-            ppDeclared = &( pFunction->pFields );
-            piDeclared = &( pFunction->iFields );
+Again:
+   
+#ifdef GETTING_EMPTY_LINES
+   while( LOOK_AHEAD_TOKEN() == '\n' )
+   {
+      DROP_AHEAD_TOKEN();
+   }
+#endif
+   
+   switch( LOOK_AHEAD_TOKEN() )
+   {
+      case TOKEN_GLOBAL :
+         ppDeclared = &( Parser_pContext->pGlobals );
+         piDeclared = &( Parser_pContext->iGlobals );
+         break;
          
-            USE_AHEAD_TOKEN();
-            *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
-            
-            ACCEPT_EOL()
-            if( LAST_TOKEN() == '\n' )
-            {
-               goto Again;
-            }
-            break;            
-      }
+      case TOKEN_EXTERNGLOBAL :
+         ppDeclared = &( Parser_pContext->pExternGlobals );
+         piDeclared = &( Parser_pContext->iExternGlobals );
+         break;
+         
+      case TOKEN_STATIC :
+         ppDeclared = &( Parser_pContext->pStatics );
+         piDeclared = &( Parser_pContext->iStatics );
+         break;
+         
+      case TOKEN_MEMVAR :
+         ppDeclared = &( Parser_pContext->pMemvars );
+         piDeclared = &( Parser_pContext->iMemvars );
+         break;
+         
+      case TOKEN_FIELD :
+         ppDeclared = &( Parser_pContext->pFields );
+         piDeclared = &( Parser_pContext->iFields );
+         break;
+         
+      default:
+         return;
+   }
+   
+   USE_AHEAD_TOKEN();
+   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
+   
+   ACCEPT_EOL()
+   
+   if( LAST_TOKEN() == '\n' )
+   {
+      goto Again;
+   }
+}
+
+void ParseDeclarations( PARSER_CONTEXT *Parser_pContext )
+{
+   FUNCTION *pFunction = Parser_pContext->Functions.pLast;
+   DECLARED **ppDeclared;
+   int      *piDeclared;
+   
+Again:
+   
+#ifdef GETTING_EMPTY_LINES
+   while( LOOK_AHEAD_TOKEN() == '\n' )
+   {
+      DROP_AHEAD_TOKEN();
+   }
+#endif
+   
+   switch( LOOK_AHEAD_TOKEN() )
+   {
+      case TOKEN_LOCAL :
+         ppDeclared = &( pFunction->pLocals );
+         piDeclared = &( pFunction->iLocals );
+         break;
+         
+      case TOKEN_STATIC :
+         ppDeclared = &( pFunction->pStatics );
+         piDeclared = &( pFunction->iStatics );
+         break;
+         
+      case TOKEN_MEMVAR :
+         ppDeclared = &( pFunction->pMemvars );
+         piDeclared = &( pFunction->iMemvars );
+         break;
+         
+      case TOKEN_FIELD :
+         ppDeclared = &( pFunction->pFields );
+         piDeclared = &( pFunction->iFields );
+         break;
+
+      default:
+         return;
+   }
+   
+   USE_AHEAD_TOKEN();
+   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
+         
+   ACCEPT_EOL()
+         
+   if( LAST_TOKEN() == '\n' )
+   {
+      goto Again;
+   }
 }
 
 LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
@@ -371,45 +351,68 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
          {
             switch( pValue->Kind )
             {
-               case VALUE_KIND_ASSIGNMENT:
-                  pLine = New_Line( (void *) pValue, LINE_KIND_ASSIGNMENT, Parser_pContext );
-                  break;
-                  
                case VALUE_KIND_BINARY:
-                  if( pValue->Value.pBinary->Kind == BINARY_KIND_EQUAL && pValue->Value.pBinary->pLeft->Kind == VALUE_KIND_LVALUE )
+                  if( pValue->Value.pBinary->Kind == BINARY_KIND_EQUAL &&
+                      ( pValue->Value.pBinary->pLeft->Kind & VALUE_KIND_ASSIGNABLE_MASK ) == VALUE_KIND_ASSIGNABLE_MASK )
                   {
+                     ASSIGNMENT *pAssignment = New_Assignment( pValue->Value.pBinary->pLeft, pValue->Value.pBinary->pRight , ASSIGNMENT_KIND_NORMAL, Parser_pContext );
+                     
+                     pValue->Value.pBinary->pLeft = NULL;
+                     pValue->Value.pBinary->pRight = NULL;
+                     ClipNet_free( pValue->Value.pAssignment );
+                     pValue->Value.pAssignment = NULL;
+                     pValue->Kind = VALUE_KIND_NONE;
+                     
                      //printf( "Binary EQUAL used as assignment\n" );
-                     pLine = New_Line( (void *) pValue, LINE_KIND_ASSIGNMENT, Parser_pContext );
+                     pLine = New_Line( (void *) pAssignment, LINE_KIND_ASSIGNMENT, Parser_pContext );
                   }
                   else
                   {
-                     PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", Value Kind: " TOSTRING( Kind ) " can't be used as a statement." );
-                     Release_Value( pValue );
-                     pValue = NULL;
+                     PARSE_ERROR( PARSER_ERR_SYNTAX, ClipNet_BinaryKind( pValue->Value.pBinary ), "Binary Kind can't be used as a statement." );
                   }
                   break;
                   
                case VALUE_KIND_UNARY:
-                  pLine = New_Line( (void *) pValue, LINE_KIND_UNARY, Parser_pContext );
-                  break;
+                  pLine = New_Line( (void *) pValue->Value.pUnary, LINE_KIND_UNARY, Parser_pContext );
                   
-               case VALUE_KIND_FUNCTION_CALL:
-                  pLine = New_Line( (void *) pValue, LINE_KIND_FUNCTION_CALL, Parser_pContext );
+                  pValue->Value.pUnary = NULL;
+                  pValue->Kind = VALUE_KIND_NONE;
+                  break;
+
+               case VALUE_KIND_ASSIGNMENT:
+                  pLine = New_Line( (void *) pValue->Value.pAssignment, LINE_KIND_ASSIGNMENT, Parser_pContext );
+
+                  pValue->Value.pAssignment = NULL;
+                  pValue->Kind = VALUE_KIND_NONE;
                   break;
                   
                case VALUE_KIND_IIF:
-                  pLine = New_Line( (void *) pValue, LINE_KIND_IIF, Parser_pContext );
+                  pLine = New_Line( (void *) pValue->Value.pIIF, LINE_KIND_IIF, Parser_pContext );
+
+                  pValue->Value.pIIF = NULL;
+                  pValue->Kind = VALUE_KIND_NONE;
+                  break;
+                                    
+               case VALUE_KIND_FUNCTION_CALL:
+                  pLine = New_Line( (void *) pValue->Value.pFunctionCall, LINE_KIND_FUNCTION_CALL, Parser_pContext );
+
+                  pValue->Value.pFunctionCall = NULL;
+                  pValue->Kind = VALUE_KIND_NONE;
                   break;
                   
                case VALUE_KIND_METHOD_CALL:
-                  pLine = New_Line( (void *) pValue, LINE_KIND_METHOD_CALL, Parser_pContext );
+                  pLine = New_Line( (void *) pValue->Value.pMethodCall, LINE_KIND_METHOD_CALL, Parser_pContext );
+                  
+                  pValue->Value.pMethodCall = NULL;
+                  pValue->Kind = VALUE_KIND_NONE;
                   break;
   
                default :
-                  PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", Value Kind: " TOSTRING( Kind ) " can't be used as a statement." );
-                  Release_Value( pValue );
-                  pValue = NULL;
+                  PARSE_ERROR( PARSER_ERR_SYNTAX, "Not a valid statement", ClipNet_ValueKind( pValue ) );
             }
+            
+            Release_Value( pValue );
+            pValue = NULL;
          }
    }
    
@@ -418,10 +421,11 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
    return pLine;
 }
 
-BODY * ParseBody( BODY *pBody, PARSER_CONTEXT *Parser_pContext )
+BODY * ParseBody( PARSER_CONTEXT *Parser_pContext )
 {
    LINE *pLine = NULL;
-  
+   BODY *pBody = New_Body( Parser_pContext );
+   
    //pBody->pLines = NULL;
 
    do
@@ -441,7 +445,8 @@ BODY * ParseBody( BODY *pBody, PARSER_CONTEXT *Parser_pContext )
          }
          else
          {
-            printf( "No line: %i\n", Parser_pContext->Parser_iLine );
+            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid line", yytext );
+            DROP_AHEAD_TOKEN();
          }
       }
       else
@@ -468,8 +473,7 @@ LINE * ParseIf( PARSER_CONTEXT *Parser_pContext )
    pValue = ParseValue( Parser_pContext );
    ACCEPT_EOL();
 
-   pBody = New_Body( Parser_pContext );
-   ParseBody( pBody, Parser_pContext );
+   pBody = ParseBody( Parser_pContext );
 
    pLine = New_If( pValue, pBody, Parser_pContext );
 
@@ -480,8 +484,7 @@ LINE * ParseIf( PARSER_CONTEXT *Parser_pContext )
       pValue = ParseValue( Parser_pContext );
       ACCEPT_EOL();
 
-      pBody = New_Body( Parser_pContext );
-      ParseBody( pBody, Parser_pContext );
+      pBody = ParseBody( Parser_pContext );
 
       pLine2 = New_ElseIf( pValue, pBody, Parser_pContext );
 
@@ -494,8 +497,7 @@ LINE * ParseIf( PARSER_CONTEXT *Parser_pContext )
          pValue = ParseValue( Parser_pContext );
          ACCEPT_EOL();
 
-         pBody = New_Body( Parser_pContext );
-         ParseBody( pBody, Parser_pContext );
+         pBody = ParseBody( Parser_pContext );
 
          pLine3 = New_ElseIf( pValue, pBody, Parser_pContext );
 
@@ -510,8 +512,7 @@ LINE * ParseIf( PARSER_CONTEXT *Parser_pContext )
       
       ACCEPT_EOL();
 
-      pBody = New_Body( Parser_pContext );
-      ParseBody( pBody, Parser_pContext );
+      pBody = ParseBody( Parser_pContext );
       pLine->Value.pIf->pElse = New_Else( pBody, Parser_pContext );
    }
 
@@ -564,7 +565,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
       case TOKEN_IDENTIFIER:
          DROP_AHEAD_TOKEN();
          
-         pValue = New_LValueIDValue( yylval.sText, DECLARED_KIND_NONE, Parser_pContext );
+         pValue = New_IDValue( yylval.sText, DECLARED_KIND_NONE, Parser_pContext );
          
          break;
 
@@ -777,29 +778,26 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
       case TOKEN_ALIAS :
          DROP_AHEAD_TOKEN();
          
-         if(
-             pValue->Kind == VALUE_KIND_LVALUE && pValue->Value.pLValue->Kind == LVALUE_KIND_VARIABLE &&
-                             (
-                               (
-                                  pValue->Value.pLValue->Value.pVariable->pID->Name[0] == 'M' &&
-                                  pValue->Value.pLValue->Value.pVariable->pID->Name[1] == '\0'
-                               )
-                               ||
-                               (
-                                  strncmp( pValue->Value.pLValue->Value.pVariable->pID->Name, "MEMVAR", 4 ) == 0 &&
-                                  strncmp( pValue->Value.pLValue->Value.pVariable->pID->Name, "MEMVAR", strlen( pValue->Value.pLValue->Value.pVariable->pID->Name ) ) == 0
-                               )
-                              ||
-                              (
-                               strncmp( pValue->Value.pLValue->Value.pVariable->pID->Name, "FIELD", 4 ) == 0 &&
-                               strncmp( pValue->Value.pLValue->Value.pVariable->pID->Name, "FIELD", strlen( pValue->Value.pLValue->Value.pVariable->pID->Name ) ) == 0
-                               )
-                            )
+         if( 
+             pValue->Kind == VALUE_KIND_VARIABLE &&
+             (
+                ( pValue->Value.pVariable->pID->Name[0] == 'M' && pValue->Value.pVariable->pID->Name[1] == '\0' )
+                ||
+                (
+                   strncmp( pValue->Value.pVariable->pID->Name, "MEMVAR", 4 ) == 0 &&
+                   strncmp( pValue->Value.pVariable->pID->Name, "MEMVAR", strlen( pValue->Value.pVariable->pID->Name ) ) == 0
+                )
+                ||
+                (
+                   strncmp( pValue->Value.pVariable->pID->Name, "FIELD", 4 ) == 0 &&
+                   strncmp( pValue->Value.pVariable->pID->Name, "FIELD", strlen( pValue->Value.pVariable->pID->Name ) ) == 0
+                )
+             )
            )
          {
             DECLARED_KIND Kind;
             
-            if( pValue->Value.pLValue->Value.pVariable->pID->Name[0] == 'M' )
+            if( pValue->Value.pVariable->pID->Name[0] == 'M' )
             {
                Kind = DECLARED_KIND_MEMVAR;
             }
@@ -814,7 +812,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   DROP_AHEAD_TOKEN();
                   
                   Release_Value( pValue );
-                  pValue = New_LValueIDValue( yytext, DECLARED_KIND_MEMVAR, Parser_pContext ) ;
+                  pValue = New_IDValue( yylval.sText, DECLARED_KIND_MEMVAR, Parser_pContext ) ;
                   break;
 
                case TOKEN_MACROVAR:
@@ -824,7 +822,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   Release_Value( pValue );
             
                   pValue = New_MacroValue( (void *)( yylval.sText ), MACRO_KIND_SIMPLE, Parser_pContext );
-                  pValue->Value.pLValue->Value.pMacro->Resolution = (MACRO_RESOLUTION) Kind;
+                  pValue->Value.pMacro->Resolution = (MACRO_RESOLUTION) Kind;
                   break;
                   
                case '&':
@@ -836,7 +834,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   if( LOOK_AHEAD_TOKEN() == '(' )
                   {
                      pValue = New_MacroValue( (void *) ParseValue( Parser_pContext ), MACRO_KIND_COMPLEX, Parser_pContext );
-                     pValue->Value.pLValue->Value.pMacro->Resolution = (MACRO_RESOLUTION) Kind;
+                     pValue->Value.pMacro->Resolution = (MACRO_RESOLUTION) Kind;
                   }
                   else
                   {
@@ -920,7 +918,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
             pValue = New_AssignmentValue( pValue, pValue2, Kind, Parser_pContext );
 
             #ifdef DEBUG_INASSIGN
-               printf( "LValue Kind: %i ASSIGNED %p\n", pValue->Value.pAssignment->pLValue->Value.pLValue->Kind, pValue->Value.pAssignment->pValue );
+               printf( "Assignee Kind: %i ASSIGNED %p\n", pValue->Value.pAssignment->pLValue->Kind, pValue->Value.pAssignment->pValue );
             #endif
          }
          else
@@ -1049,18 +1047,18 @@ INLINE * Parser_InlineAdd( char *sName, PARSER_CONTEXT *Parser_pContext )
 
    pInline = New_Inline( sName, Parser_pContext );
 
-   if( Parser_pContext->Parser_Inlines.iCount == 0 )
+   if( Parser_pContext->Inlines.iCount == 0 )
    {
-      Parser_pContext->Parser_Inlines.pFirst = pInline;
-      Parser_pContext->Parser_Inlines.pLast  = pInline;
+      Parser_pContext->Inlines.pFirst = pInline;
+      Parser_pContext->Inlines.pLast  = pInline;
    }
    else
    {
-      Parser_pContext->Parser_Inlines.pLast->pNext = pInline;
-      Parser_pContext->Parser_Inlines.pLast = pInline;
+      Parser_pContext->Inlines.pLast->pNext = pInline;
+      Parser_pContext->Inlines.pLast = pInline;
    }
 
-   Parser_pContext->Parser_Inlines.iCount++;
+   Parser_pContext->Inlines.iCount++;
 
    return pInline;
 }
