@@ -313,7 +313,11 @@ METHOD Create() CLASS MenuBar
 RETURN Self
 
 METHOD Destroy() CLASS MenuBar
-   AEVAL( ::Children, {|o| o:Destroy()} )
+   LOCAL n
+   FOR n := 1 TO LEN( ::Children )
+       ::Children[n]:Destroy()
+       n--
+   NEXT
    DestroyMenu( ::hMenu )
 RETURN Self
 
