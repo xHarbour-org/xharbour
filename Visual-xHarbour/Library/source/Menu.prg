@@ -285,7 +285,8 @@ CLASS MenuBar INHERIT Component
    DATA hMenu                 EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD __AddMenuItem()   
+   METHOD __AddMenuItem()
+   METHOD Destroy()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuBar
@@ -309,6 +310,11 @@ METHOD Create() CLASS MenuBar
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
+RETURN Self
+
+METHOD Destroy() CLASS MenuBar
+   AEVAL( ::Children, {|o| o:Destroy()} )
+   DestroyMenu( ::hMenu )
 RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuBar

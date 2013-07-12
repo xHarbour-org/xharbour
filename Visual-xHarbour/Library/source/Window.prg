@@ -160,10 +160,7 @@ CLASS Window INHERIT Object
    PROPERTY VertScrollSize                          READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
    PROPERTY HorzScrollSize                          READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
-//   DATA xText                  EXPORTED  INIT ""
-//   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
-//   ASSIGN Text(c)              INLINE    ::SetWindowText( c )
-
+   PROPERTY Theming READ xTheming WRITE __SetTheming DEFAULT .T. PROTECTED
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
@@ -274,7 +271,6 @@ CLASS Window INHERIT Object
    DATA __lMouseHover            EXPORTED  INIT .F.
    DATA __IsInstance             EXPORTED  INIT .F.
    DATA __pCallBackPtr           EXPORTED
-   DATA __lCreateAfterChildren   EXPORTED  INIT .F.
    DATA __MDIFrame               EXPORTED
    DATA __lResizeable            EXPORTED  INIT {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}
    DATA __lMoveable              EXPORTED  INIT .T.
@@ -425,6 +421,7 @@ CLASS Window INHERIT Object
    METHOD __PaintBakgndImage() VIRTUAL
    METHOD __GC()               VIRTUAL
    METHOD __SetTransparentChildren()
+   METHOD __SetTheming()
 
    METHOD EnableThemeDialogTexture( nFlags ) INLINE EnableThemeDialogTexture( ::hWnd, nFlags )
    METHOD __SetInvStyle( n, l )   INLINE ::SetStyle( n, !l )
@@ -744,6 +741,18 @@ RETURN SELF
 METHOD GetControl( cName ) CLASS Window
    LOCAL n := ASCAN( ::Children, {|o| o:Name == cName } )
 RETURN IIF( n > 0, ::Children[n], NIL )
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD __SetTheming( lSet ) CLASS Window
+   IF ::hWnd != NIL
+      IF !lSet
+         ::RemoveWindowTheme()
+       ELSEIF ::ThemeName != NIL
+         ::SetWindowTheme()
+      ENDIF
+   ENDIF
+   AEVAL( ::Children, {|o|o:Theming := lSet } )
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD SaveValues() CLASS Window
@@ -3173,9 +3182,13 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     EVAL( oItem:Action, oItem )
                   ELSE
                     ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
-                    oItem:OnClick( oItem )
+                    IF __objHasMsg( oItem, "OnClick" )
+                       oItem:OnClick( oItem )
+                    ENDIF
                  ENDIF
-                 oItem:Cancel()
+                 IF __objHasMsg( oItem, "Cancel" )
+                    oItem:Cancel()
+                 ENDIF
               ENDIF
               oItem := NIL
               EXIT

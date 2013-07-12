@@ -2665,7 +2665,7 @@ METHOD AddControl( cCtrl, oParent ) CLASS Project
 RETURN oCtrl
 
 METHOD DelControl( oCtrl ) CLASS Project
-   LOCAL aAction, x, aDel, nLen, oSelect
+   LOCAL aAction, x, aDel, nLen, oSelect, nLeft, nTop
    IF VALTYPE( oCtrl ) == "A"
       aDel := oCtrl
     ELSE
@@ -2692,7 +2692,12 @@ METHOD DelControl( oCtrl ) CLASS Project
    nLen := LEN( aDel )
 
    FOR x := 1 TO LEN( aDel )
-       AADD( aAction, { DG_DELCONTROL, NIL, aDel[x][1]:Left, aDel[x][1]:Top, .F., IIF( aDel[x][1]:__xCtrlName == "Splitter" .OR. __clsParent( aDel[x][1]:ClassH, "COMPONENT" ), aDel[x][1]:Owner, aDel[x][1]:Parent), aDel[x][1]:__xCtrlName, aDel[x][1], , nLen,, } )
+       nLeft := nTop := NIL
+       IF __objHasMsg( aDel[x][1], "Left" )
+          nLeft   := aDel[x][1]:Left
+          nTop    := aDel[x][1]:Top
+       ENDIF
+       AADD( aAction, { DG_DELCONTROL, NIL, nLeft, nTop, .F., IIF( aDel[x][1]:__xCtrlName == "Splitter" .OR. __clsParent( aDel[x][1]:ClassH, "COMPONENT" ), aDel[x][1]:Owner, aDel[x][1]:Parent), aDel[x][1]:__xCtrlName, aDel[x][1], , nLen,, } )
    NEXT
    ::SetAction( aAction, ::aUndo )
    ::CurrentForm:SelectControl( oSelect )
@@ -4621,26 +4626,25 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                   oObj:__xCtrlName := cWithClassName
                   oObj:Init( oParent )
                 ELSE
-                  TRY
+                  //TRY
                      oObj := &cWithClassName( oObj )
                      oObj:__CustomOwner := lCustomOwner
-                  CATCH
-                     WITH OBJECT OpenFileDialog( ::Application:MainForm )
-                        :CheckFileExists := .T.
-                        :Multiselect     := .F.
-                        :DefaultExt      := "xfm"
-                        :Title           := "Missing File " + cWithClassName
-                        :Filter := "Visual xHarbour Form (*.xfm)|*.xfm"
-                        IF :Show()
-                           cWithClassName := STRTRAN( SplitFile( :FileName )[2], ".xfm" )
-
-                           oParent := oObj
-                           oObj := CustomControl()
-                           oObj:__xCtrlName := cWithClassName
-                           oObj:Init( oParent, :FileName )
-                        ENDIF
-                     END
-                  END
+                  //CATCH
+                  //   WITH OBJECT OpenFileDialog( ::Application:MainForm )
+                  //      :CheckFileExists := .T.
+                  //      :Multiselect     := .F.
+                  //      :DefaultExt      := "xfm"
+                  //      :Title           := "Missing File " + cWithClassName
+                  //      :Filter := "Visual xHarbour Form (*.xfm)|*.xfm"
+                  //      IF :Show()
+                  //         cWithClassName := STRTRAN( SplitFile( :FileName )[2], ".xfm" )
+                  //         oParent := oObj
+                  //         oObj := CustomControl()
+                  //         oObj:__xCtrlName := cWithClassName
+                  //         oObj:Init( oParent, :FileName )
+                  //      ENDIF
+                  //   END
+                  //END
                ENDIF
 
                IF UPPER( cWithClassName ) == "TABPAGE"

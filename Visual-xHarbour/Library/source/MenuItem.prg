@@ -17,26 +17,41 @@
 #define MENU_POPUPITEM 14
 //-------------------------------------------------------------------------------------------------------
 
-CLASS MenuItem INHERIT Control
-   DATA hMenu                    EXPORTED
-   DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
-   DATA __lMoveable              EXPORTED INIT .F.
-   DATA __lCopyCut               EXPORTED INIT .F.
-   DATA __TempRect               EXPORTED
+CLASS MenuItem INHERIT Object
+   DATA hMenu          EXPORTED
+   DATA __lResizeable  EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
+   DATA __lMoveable    EXPORTED INIT .F.
+   DATA __lCopyCut     EXPORTED INIT .F.
+   DATA __TempRect     EXPORTED
+   DATA Id             EXPORTED
 
-   DATA Left                     EXPORTED INIT 0
-   DATA Top                      EXPORTED INIT 0
-   DATA Width                    EXPORTED INIT 0
-   DATA Height                   EXPORTED INIT 0
+   PROPERTY Text READ xText WRITE __ModifyMenu
+ 
+   DATA __pObjPtr      PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()
+   METHOD __ModifyMenu()  INLINE NIL
+   METHOD Destroy()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuItem
    ::ClsName     := "MenuItem"
    ::__xCtrlName := "MenuItem"
+
+   ::__IsControl  := .T.
+   ::__IsStandard := .T.
+   ::Parent       := oParent
+   ::Id           := ::Form:GetNextControlId()
+   IF ::__ClassInst == NIL .AND. ::Parent:__ClassInst != NIL
+      ::__ClassInst := __ClsInst( ::ClassH )
+   ENDIF
+   ::Events       := { ;
+                        {"Mouse",     {;
+                                      { "OnClick"     , "", "" } } } }
+   DEFAULT ::EventHandler TO Hash()
+   ::__CreateProperty()
    Super:Init( oParent )
 RETURN Self
 
@@ -59,6 +74,7 @@ METHOD Create() CLASS MenuItem
    mii:wID        := ::Id
    mii:fType      := MFT_STRING
    mii:dwTypeData := ::Text
+   mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
 
    InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
 
@@ -69,6 +85,24 @@ METHOD Create() CLASS MenuItem
 
    AADD( ::Parent:Children, Self )
 RETURN NIL
+
+METHOD Destroy() CLASS MenuItem
+   LOCAL n
+   FOR n := 1 TO LEN( ::Children )
+       ::Children[n]:Destroy()
+       n--
+   NEXT
+   IF IsMenu( ::hMenu )
+      DestroyMenu( ::hMenu )
+   ENDIF
+   n := ASCAN( ::Parent:Children, {|o| o:__pObjPtr == ::__pObjPtr } )
+   IF n > 0
+      ADEL( ::Parent:Children, n, .T. )
+   ENDIF
+   IF ::__pObjPtr != NIL
+      ReleaseArrayPointer( ::__pObjPtr )
+   ENDIF
+RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuItem
    ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "MenuItem",,,1, {}, } }, ::Application:Project:aUndo )

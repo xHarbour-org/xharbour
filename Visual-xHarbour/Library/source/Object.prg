@@ -20,8 +20,6 @@ static __aObjects := {}
 CLASS Object
    ACCESS Instance             INLINE   IIF( __GetApplication() != NIL, __GetApplication():Instance, GetModuleHandle() )
 
-   PROPERTY Theming READ xTheming WRITE __SetTheming DEFAULT .T. PROTECTED
-
    DATA hWnd                   EXPORTED
    
    DATA Error                  EXPORTED
@@ -33,6 +31,7 @@ CLASS Object
    DATA Action                 EXPORTED
 
    DATA __xCtrlName            EXPORTED
+   DATA __lCreateAfterChildren EXPORTED  INIT .F.
 
    DATA __ForceSysColor        EXPORTED INIT .F.
    DATA __ClassInst            EXPORTED
@@ -81,7 +80,6 @@ CLASS Object
    METHOD GetControlName()
    METHOD __CreateProperty()
    METHOD __SetAsProperty()
-   METHOD __SetTheming()
 
    METHOD SetWindowTheme( cSubAppName, cSubIdList ) INLINE SetWindowTheme( ::hWnd, cSubAppName, cSubIdList )
    METHOD RemoveWindowTheme()                       INLINE SetWindowTheme( ::hWnd, "", "" )
@@ -136,18 +134,6 @@ METHOD __InvalidMember( cMsg ) CLASS Object
    oErr:SubSystem     := ::classname
    uRet := Eval( ErrorBlock(), oErr )
 RETURN uRet
-
-//-----------------------------------------------------------------------------------------------------------------------------
-METHOD __SetTheming( lSet ) CLASS Object
-   IF ::hWnd != NIL
-      IF !lSet
-         ::RemoveWindowTheme()
-       ELSEIF ::ThemeName != NIL
-         ::SetWindowTheme()
-      ENDIF
-   ENDIF
-   AEVAL( ::Children, {|o|o:Theming := lSet } )
-RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetCtrlName(c) CLASS Object
