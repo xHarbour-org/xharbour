@@ -1947,7 +1947,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
            IF nLeft > ::ClientWidth .OR. ( lData .AND. LEN(::__DisplayArray[nLine][1])<i ) // avoid painting non-visible columns
               EXIT
            ENDIF
-           IF ::Children[ i ]:Visible
+           IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
               nWImg  := IIF( lData, IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 ), 0 )
@@ -2295,14 +2295,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
       _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, { x, y, ::ClientWidth, ::ClientHeight }," ")
    ENDIF
-/*
-   IF !::ClientEdge .AND. !::StaticEdge .AND. !::Border
-      hOldPen := SelectObject( hMemDC, ::__LinePen )
-      hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
-      Rectangle( hMemDC, 0, 0, ::Width, ::Height )
-      SelectObject( hMemDC, hBrush )
-   ENDIF
-*/   
+
    SelectObject( hMemDC, hOldFont )
    SelectObject( hMemDC, hOldPen )
 
@@ -4165,7 +4158,6 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       ::__HeaderRight := nRight
       ::__HeaderX     := x
 
-      hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
       hBrush   := CreateSolidBrush( nBackColor )
       hOldBrush := SelectObject( hDC, hBrush )
 
@@ -4360,6 +4352,7 @@ METHOD Init( oParent ) CLASS GridColumn
    ::__aVertex[2]:Alpha := 0
 
    ::Font:Create()
+
    ::HeaderFont:Create()
  
    ::EventHandler := Hash()
@@ -4385,6 +4378,12 @@ METHOD Init( oParent ) CLASS GridColumn
                                   { "OnCellFont"        , "", "" },;
                                   { "OnHeaderClick"     , "", "" } } } }
    ENDIF
+   ::Font:FaceName  := oParent:Font:FaceName
+   ::Font:Bold      := oParent:Font:Bold
+   ::Font:Italic    := oParent:Font:Italic
+   ::Font:Underline := oParent:Font:Underline
+   ::Font:PointSize := oParent:Font:PointSize
+   ::Font:FileName  := oParent:Font:FileName
 RETURN Self
 
 //----------------------------------------------------------------------------------

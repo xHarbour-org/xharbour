@@ -737,8 +737,10 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       ENDIF
 
       IF ! __clsParent( oControl:ClassH, "COMPONENT" )
-         oControl:Left    := x
-         oControl:Top     := y
+         IF __objHasMsg( oControl, "Left" )
+            oControl:Left    := x
+            oControl:Top     := y
+         ENDIF
          IF aProps == NIL
             oControl:Text := oControl:Name
          ENDIF
@@ -794,8 +796,9 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
                  oControl:Create()
 
          ENDCASE
-         oControl:InvalidateRect()
-
+         IF __objHasMsg( oControl, "InvalidateRect" )
+            oControl:InvalidateRect()
+         ENDIF
        ELSE
          IF cName == "ImageList" .AND. oControl:Handle == NIL
             IF !EMPTY( aProps )

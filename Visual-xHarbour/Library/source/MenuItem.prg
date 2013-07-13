@@ -26,7 +26,10 @@ CLASS MenuItem INHERIT Object
    DATA Id             EXPORTED
 
    PROPERTY Text READ xText WRITE __ModifyMenu
- 
+
+   DATA Separator      PUBLISHED INIT .F.
+   DATA RightJustified PUBLISHED INIT .F.
+
    DATA __pObjPtr      PROTECTED
 
    METHOD Init() CONSTRUCTOR
@@ -70,18 +73,24 @@ METHOD Create() CLASS MenuItem
 
    mii := (struct MENUITEMINFO)
    mii:cbSize     := mii:SizeOf()
-   mii:fMask      := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
    mii:wID        := ::Id
+   mii:fMask      := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
    mii:fType      := MFT_STRING
-   mii:dwTypeData := ::Text
-   mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
-
-   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
-
-   IF ::__ClassInst != NIL
-      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
-      ::Application:ObjectTree:Set( Self )
+   IF ::RightJustified
+      mii:fType := mii:fType | MFT_RIGHTJUSTIFY
    ENDIF
+   IF ::Separator
+      mii:fMask   := MIIM_ID | MIIM_STATE | MIIM_TYPE
+      mii:fType   := MFT_SEPARATOR
+    ELSE
+      IF ::__ClassInst != NIL
+         ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
+         ::Application:ObjectTree:Set( Self )
+      ENDIF
+      mii:dwTypeData := ::Text
+      mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
+   ENDIF
+   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
 
    AADD( ::Parent:Children, Self )
 RETURN NIL

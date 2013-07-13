@@ -1296,9 +1296,9 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    ENDIF
 
    IF hDef == NIL
-      ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
+      ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
     ELSE
-      ::DeferWindowPos( hDef, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
+      ::DeferWindowPos( hDef, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
    ENDIF
 
 RETURN hDef

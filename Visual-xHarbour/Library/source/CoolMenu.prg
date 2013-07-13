@@ -85,7 +85,7 @@ METHOD Create() CLASS CoolMenu
 
    ::Border          := .F.
    ::SetBitmapSize( 0, ::Height-6)
-   IF ( ::OsVer:dwMajorVersion >= 5 .AND. ::Theming )
+   IF ( ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Theming )
       SetWindowTheme( ::hWnd, NIL, NIL )
    ENDIF
 

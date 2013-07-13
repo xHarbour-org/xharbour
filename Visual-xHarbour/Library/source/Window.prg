@@ -316,7 +316,6 @@ CLASS Window INHERIT Object
                                                  IDC_HAND          }
 
    DATA Hidden                 EXPORTED  INIT .F.
-   ACCESS OsVer                INLINE    IIF( ::Application != NIL, ::Application:OsVersion, __GetOsVersion() )
 
    DATA xAlignment             EXPORTED  INIT 1
    ACCESS Alignment            INLINE    ::xAlignment
@@ -3958,7 +3957,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
             SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, n )
           ELSE
-            DeferWindowPos( hDef, ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER ) //| IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
+            DeferWindowPos( hDef, ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER ) //| IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
          ENDIF
          //::UpdateWindow()
       ENDIF
@@ -4688,18 +4687,6 @@ FUNCTION __Proper(cStr)
    NEXT
 RETURN(c)
 
-FUNCTION __GetMessageFont( nWeight )
-   LOCAL ncm := (struct NONCLIENTMETRICS)
-   ncm:cbSize := ncm:Sizeof()
-
-   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:Sizeof(), @ncm, 0 )
-
-   IF nWeight != NIL
-      ncm:lfMessageFont:lfWeight := nWeight
-   ENDIF
-
-RETURN CreateFontIndirect( ncm:lfMessageFont )
-
 FUNCTION __DrawSpecialChar( hDC, aRect, nSign, lBold, nPoint )
    //  48 Min
    //  49 Max
@@ -4760,16 +4747,6 @@ FUNCTION OffSet( aArray, x, y )
    NEXT
 RETURN NIL
 
-FUNCTION ToUnicode( cString )
-   local i, cTemp := ""
-   IF cString == NIL
-      RETURN NIL
-   ENDIF
-   FOR i = 1 to LEN(cString)
-       cTemp += SUBSTR( cString, i, 1 ) + chr( 0 )
-   NEXT
-RETURN cTemp + chr( 0 )
-
 FUNCTION isChildOfActiveWindow(hWnd)
    LOCAL hNowActive := GetActiveWindow()
    LOCAL lRet       := isChild( hNowActive, hWnd )
@@ -4787,56 +4764,6 @@ FUNCTION isChildOfActiveWindow(hWnd)
       ENDIF
    ENDDO
 RETURN lRet
-
-FUNCTION __GetOsVersion()
-   LOCAL OsVersion := (struct OSVERSIONINFOEX)
-   GetVersionEx( @OsVersion )
-RETURN OsVersion
-
-STATIC FUNCTION cTypes2aTypes(cTypes)
-   LOCAL aTypes:={}
-   LOCAL cType
-   LOCAL i,j
-
-   ctypes:=strtran(ctypes," ","")
-   cTypes:=substr(cTypes,2)
-   DO While !EMPTY(cTypes)
-      IF LEFT(ctypes,1)=="{"
-         AADD(atypes,ctypes2atypes(@ctypes))
-         cTypes:=SUBSTR(ctypes,1)
-      ELSE
-         if (i :=AT( ",", cTypes )) > 0
-            ctype:=Left( cTypes, i - 1 )
-         else
-            ctype:=ctypes
-         endif
-         IF (j:=AT("}",ctype)) > 0
-
-            // TBD: add multiple arrays!!
-
-             ctype:=LEFT(ctype,j-1)
-             IF !EMPTY(ctype)
-               AADD(atypes,ctype)
-             endif
-             cTypes := SubStr( cTypes, j + 1 )
-             exit
-         Endif
-         if !EMPTY(cType)
-            AADD(atypes,ctype)
-         endif
-         cTypes := SubStr( cTypes, i + 1 )
-      Endif
-   enddo
-RETURN(aTypes)
-
-FUNCTION __AddEvent( aEvents, cNode, cEvent )
-   LOCAL n := ASCAN( aEvents, {|a|a[1]==cNode} )
-   IF n > 0
-      AADD( aEvents[n][2], { cEvent, "", "" } )
-    ELSE
-      AADD( aEvents, { cNode, { cEvent, "", "" } } )
-   ENDIF
-RETURN aEvents
 
 FUNCTION __DeleteEvents( aEvents, aDelEvents )
    LOCAL n, x, cEvent

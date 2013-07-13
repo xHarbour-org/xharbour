@@ -484,7 +484,7 @@ METHOD OnDrawItem() CLASS ToolBar
 
          IF lSelected .AND. !lDisabled
             // for chevron bar use only
-            IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE .AND. ::OsVer:dwMajorVersion <= 4
+            IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE .AND. ::Application:OsVersion:dwMajorVersion <= 4
                hBrush:= GetSysColorBrush( COLOR_MENU )
                FillRect( hDC, rc, hBrush )
             ENDIF
@@ -1052,7 +1052,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                                  RETURN CDRF_SKIPDEFAULT
 
                             CASE tbcd:nmcd:dwItemSpec == IDM_MDI_GAP
-                                 IF ::OsVer:dwMajorVersion < 5 .OR. !::Application:ThemeActive .OR. !::Theming
+                                 IF ::Application:OsVersion:dwMajorVersion < 5 .OR. !::Application:ThemeActive .OR. !::Theming
                                     FillRect( tbcd:nmcd:hdc, tbcd:nmcd:rc, GetSysColorBrush( COLOR_BTNFACE ) )
                                  ENDIF
                                  SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )

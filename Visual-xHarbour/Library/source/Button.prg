@@ -284,7 +284,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          ENDIF
       ENDIF
 
-      IF ::Theming .AND. ::OsVer:dwMajorVersion > 4 .AND. ::DrawTheme .AND. IsThemeActive()
+      IF ::Theming  .AND. ::Application:OsVersion:dwMajorVersion > 4 .AND. ::DrawTheme .AND. IsThemeActive()
          nStyle := PBS_NORMAL
          IF lDefault .OR. lFocus
             nStyle := nStyle | PBS_DEFAULTED

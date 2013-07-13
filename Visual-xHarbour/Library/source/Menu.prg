@@ -294,6 +294,9 @@ METHOD Init( oParent ) CLASS MenuBar
    DEFAULT ::ComponentType TO "MenuBar"
    DEFAULT ::ClsName       TO "MenuBar"
    Super:Init( oParent )
+   IF ::__ClassInst == NIL .AND. oParent:__ClassInst != NIL
+      ::__ClassInst := __ClsInst( ::ClassH )
+   ENDIF
 RETURN Self
 
 METHOD Create() CLASS MenuBar

@@ -430,7 +430,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       
       SetTextColor( hDC, IIF( ! ::__lActive, ::System:Color:White, ::System:Color:Black ) )
 
-      hOldFont := SelectObject( hDC, ::Font:handle )
+      hOldFont := SelectObject( hDC, ::System:hFont )
       SetBkMode( hDC, TRANSPARENT )
 
       _DrawText( hDC, ::xText, { IIF( ::MenuArrow .AND. ::__aArrowRect != NIL, ::__aArrowRect[3]+2, ::__aCaptionRect[1]+5 ), ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] }, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS )

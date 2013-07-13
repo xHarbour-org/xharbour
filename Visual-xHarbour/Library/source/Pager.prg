@@ -86,7 +86,7 @@ METHOD __OnParentSize() CLASS PageScroller
    ::xTop    := 0
    ::xWidth  := ::Parent:ClientWidth
    ::xHeight := ::Parent:ClientHeight
-   SetWindowPos( ::hWnd, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER + IIF( ::OsVer:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
+   SetWindowPos( ::hWnd, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER + IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
 RETURN(self)
 
 

@@ -250,7 +250,7 @@ METHOD DrawFrame( hDC, aRect, nStatus, lDraw ) CLASS HeaderStrip
    DEFAULT lDraw TO .T.
 
    IF lDraw
-      IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+      IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
 
          IF nStatus == DFCS_PUSHED
             nStatus := HILS_PRESSED

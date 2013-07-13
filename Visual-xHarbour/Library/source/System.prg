@@ -41,6 +41,7 @@ EXIT PROCEDURE __SystemCleanup
    DeleteObject( oSystem:FocusPen )
    DeleteObject( oSystem:TitleBackBrush )
    DeleteObject( oSystem:TitleBorderPen )
+   DeleteObject( oSystem:hFont )
    #ifdef VXH_PROFESSIONAL
       FreeExplorerBarInfo()
    #endif
@@ -90,6 +91,8 @@ CLASS System
    DATA TitleBorderPen          EXPORTED
 
    DATA hRich20                 EXPORTED
+
+   DATA hFont                   EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -741,6 +744,8 @@ METHOD Init() CLASS System
    ::FocusPen       := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
    ::TitleBackBrush := CreateSolidBrush( RGB( 69, 89, 124 ) )
    ::TitleBorderPen := CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
+   
+   ::hFont          := __GetMessageFont()
 RETURN Self
 
 METHOD GetRunningProcs() CLASS System
@@ -889,4 +894,16 @@ STATIC FUNCTION GetWin32Proc( cQuery )
    CATCH
    END
 RETURN aProcessList
+
+FUNCTION __GetMessageFont( nWeight )
+   LOCAL ncm := (struct NONCLIENTMETRICS)
+   ncm:cbSize := ncm:Sizeof()
+
+   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:Sizeof(), @ncm, 0 )
+
+   IF nWeight != NIL
+      ncm:lfMessageFont:lfWeight := nWeight
+   ENDIF
+
+RETURN CreateFontIndirect( ncm:lfMessageFont )
 

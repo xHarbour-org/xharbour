@@ -156,25 +156,25 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    DO CASE
                       CASE nStatus == BST_UNCHECKED
                            nStatus := IIF( lDisabled, DFCS_INACTIVE, 0 )
-                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                           IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                               nStatus := IIF( lDisabled, CBS_UNCHECKEDDISABLED, IIF( lHot, CBS_UNCHECKEDHOT, CBS_UNCHECKEDNORMAL ) )
                            ENDIF
 
                       CASE nStatus == BST_CHECKED
                            nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_CHECKED, DFCS_CHECKED )
-                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                           IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                               nStatus := IIF( lDisabled, CBS_CHECKEDDISABLED, IIF( lHot, CBS_CHECKEDHOT, CBS_CHECKEDNORMAL ) )
                            ENDIF
 
                       CASE nStatus == BST_INDETERMINATE
                            nStatus := IIF( lDisabled, DFCS_INACTIVE | DFCS_BUTTON3STATE | DFCS_CHECKED, DFCS_BUTTON3STATE | DFCS_CHECKED )
-                           IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                           IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                               nStatus := IIF( lDisabled, CBS_MIXEDDISABLED, IIF( lHot, CBS_MIXEDHOT, CBS_MIXEDNORMAL ) )
                            ENDIF
                    ENDCASE
                    nFlags := nFlags | nStatus
 
-                   IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+                   IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                       DrawThemeBackground( ::hTheme, cd:hDC, BP_CHECKBOX, nStatus, aRect, aRect )
                     ELSE
                       _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
@@ -216,19 +216,19 @@ METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS Ch
       DO CASE
          CASE nStatus == BST_UNCHECKED
               nStatus := 0
-              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+              IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                  nStatus := CBS_UNCHECKEDNORMAL
               ENDIF
 
          CASE nStatus == BST_CHECKED
               nStatus := DFCS_CHECKED
-              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+              IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                  nStatus := CBS_CHECKEDNORMAL
               ENDIF
 
          CASE nStatus == BST_INDETERMINATE
               nStatus := DFCS_BUTTON3STATE+DFCS_CHECKED
-              IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+              IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
                  nStatus := CBS_MIXEDNORMAL
               ENDIF
 
@@ -248,7 +248,7 @@ METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS Ch
    aRect[2] := aRect[2] + (( aRect[4]-aRect[2]-nHeight )/2)//-1
    aRect[4] := aRect[2] + nHeight -1
    IF lDraw
-      IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
+      IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
          DrawThemeBackground( ::hTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
        ELSE
          DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
