@@ -137,10 +137,13 @@ CLASS ListBox FROM TitleControl
 ENDCLASS
 
 METHOD GetText( nItem ) CLASS ListBox
-   LOCAL cBuffer
+   LOCAL cBuffer := ""
    IF ::hWnd != NIL
-      cBuffer := SPACE( ::GetTextLen( nItem )+1 )
-      ::SendMessage( LB_GETTEXT, nItem-1, @cBuffer )
+      DEFAULT nItem TO ::GetCurSel()
+      IF nItem > 0
+         cBuffer := SPACE( ::GetTextLen( nItem ) )
+         ::SendMessage( LB_GETTEXT, nItem-1, @cBuffer )
+      ENDIF
    ENDIF
 RETURN cBuffer
 
