@@ -617,6 +617,7 @@ METHOD Init() CLASS IDE_MainForm
          :Width      := 100
          :Create()
          WITH OBJECT ::Application:Props[ "StatusBarProg" ] := ProgressBar( :this )
+            :Visible := .F.
             :Create()
          END
       END
@@ -3130,7 +3131,7 @@ METHOD TabOrder( oBtn ) CLASS Project
    ::Application:ToolBox:Enabled      := !oBtn:Checked
    ::Application:ObjectTab:Enabled    := !oBtn:Checked
    ::Application:EventManager:Enabled := !oBtn:Checked
-   ::Application:ObjectTree:Enabled   := !oBtn:Checked
+   //::Application:ObjectTree:Enabled   := !oBtn:Checked
    ::Application:FileExplorer:Enabled := !oBtn:Checked
    ::Application:FileExplorer:InvalidateRect()
    ::Application:EnableBars( !oBtn:Checked, .T. )
@@ -4092,6 +4093,7 @@ METHOD Open( cProject ) CLASS Project
    ENDIF
 
    oWait := ::Application:Props:StatusBarProg
+   oWait:Visible := .T.
    
    ::Application:Cursor := ::System:Cursor:Busy
    SetCursor( ::Application:Cursor )
@@ -4311,6 +4313,7 @@ METHOD Open( cProject ) CLASS Project
    SetCursor( ::System:Cursor:Arrow )
    ::Built := .F.
    oWait:Position := 0
+   oWait:Visible := .F.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

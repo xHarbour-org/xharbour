@@ -2966,7 +2966,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
    
    ::Application:MainForm:ToolBox1:Enabled := .F.
-   ::Application:ObjectTree:Enabled        := .F.
+   //::Application:ObjectTree:Enabled        := .F.
 RETURN Self
 
 //------------------------------------------------------------------------------------------
