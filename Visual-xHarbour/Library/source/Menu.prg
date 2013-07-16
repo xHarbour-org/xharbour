@@ -294,7 +294,7 @@ METHOD Init( oParent ) CLASS MenuBar
    DEFAULT ::ComponentType TO "MenuBar"
    DEFAULT ::ClsName       TO "MenuBar"
    Super:Init( oParent )
-   IF ::__ClassInst == NIL .AND. oParent:__ClassInst != NIL
+   IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
    ENDIF
 RETURN Self
@@ -309,6 +309,7 @@ METHOD Create() CLASS MenuBar
    lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::hMenu, lpMenuInfo )
 
+   view valtype( ::__ClassInst )
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )

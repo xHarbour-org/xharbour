@@ -805,7 +805,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
                SetCtrlProps( oControl, aProps )
             ENDIF
             oControl:Create()
-          ELSEIF cName == "ContextStrip"
+          ELSEIF cName IN { "MenuBar", "ContextStrip" }
             oControl:Create()
          ENDIF
       ENDIF

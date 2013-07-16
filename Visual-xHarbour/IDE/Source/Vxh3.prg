@@ -705,7 +705,7 @@ RETURN NIL
 
 METHOD OnContextMenu( x, y ) CLASS ControlMask
    LOCAL aRect, aPt, oMenu, Item, oItem, n
-   IF ::CurForm != NIL .AND. LEN( ::CurForm:Selected )==1
+   IF ::CurForm != NIL .AND. LEN( ::CurForm:Selected )==1 .AND. __ObjhasMsg( ::CurForm:Selected[1][1], "GetRectangle" )
       aRect := ::CurForm:Selected[1][1]:GetRectangle()
 
       aPt := {x,y}
