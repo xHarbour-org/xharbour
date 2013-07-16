@@ -35,17 +35,19 @@
 
    #define LAST_TOKEN()       ( Parser_pContext->iToken )
 
-   #define PARSE_ERROR( i, text1, text2 ) \
-              Parser_GenError( Parser_asErrors, 'E', i, text1, text2, Parser_pContext ); \
-              printf( __SOURCE__"\n" ); \
-              \
-              if( LAST_TOKEN() != '\n' && LAST_TOKEN() != -1 ) \
-              { \
-                 while( LOOK_AHEAD_TOKEN() != -1 && LOOK_AHEAD_TOKEN() != '\n' ) \
-                 { \
-                    DROP_AHEAD_TOKEN(); \
-                 } \
-              }
+#ifndef PARSE_ERROR_FUNCTION
+   #define PARSE_ERROR( i, text1, text2, Parser_pContext ) \
+          Parser_pContext->sErrorSource = __SOURCE__; \
+          Parser_pContext->sError1 = text1; \
+          Parser_pContext->sError2 = text2; \
+          \
+          ASSERT( Parser_pContext->bCanJump ); \
+          \
+          if( Parser_pContext->bCanJump ) \
+          { \
+             longjmp( Parser_pContext->JumpBuffer, i ); \
+          }
+#endif
 
    #define ACCEPT_END( iToken )  if( LOOK_AHEAD_TOKEN() == iToken || LOOK_AHEAD_TOKEN() == TOKEN_END ) \
                                  { \
@@ -53,7 +55,7 @@
                                  } \
                                  else \
                                  { \
-                                    PARSE_ERROR( PARSER_ERR_UNCLOSED_STRU, yytext, NULL ); \
+                                    PARSE_ERROR( PARSER_ERR_UNCLOSED_STRU, yytext, NULL, Parser_pContext ); \
                                  }
 
    #define ACCEPT_EOL()  if( LOOK_AHEAD_TOKEN() == '\n' || LOOK_AHEAD_TOKEN() == -1 ) \
@@ -62,7 +64,7 @@
                          } \
                          else \
                          { \
-                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL." " Source: "__SOURCE__ ); \
+                            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected EOL." " Source: "__SOURCE__, Parser_pContext); \
                          }
 
    #define ACCEPT_TOKEN_AND_BREAK( iToken )  if( LOOK_AHEAD_TOKEN() == iToken ) \
@@ -72,7 +74,7 @@
                                     } \
                                     else \
                                     { \
-                                       PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__ ); \
+                                       PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__, Parser_pContext ); \
                                     }
 
    #define ACCEPT_TOKEN( iToken )  if( LOOK_AHEAD_TOKEN() == iToken ) \
@@ -81,19 +83,21 @@
                                    } \
                                    else \
                                    { \
-                                      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__ ); \
+                                      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected " #iToken " Source: "__SOURCE__, Parser_pContext ); \
                                    }
 
+   #define NEW_DEFINITION( iToken ) ( iToken >= FUNC_KIND_MIN && iToken <= FUNC_KIND_MAX )
+
    #define EOB( iToken ) ( \
-                           ( iToken >= FUNC_KIND_MIN && iToken <= FUNC_KIND_MAX ) || \
-                           iToken == TOKEN_ELSE    || \
-                           iToken == TOKEN_ELSEIF  || \
-                           iToken == TOKEN_ENDIF   || \
-                           iToken == TOKEN_END     || \
-                           iToken == TOKEN_ENDCASE || \
-                           iToken == TOKEN_ENDDO   || \
-                           iToken == TOKEN_NEXT    || \
-                           iToken == -1               \
+                           NEW_DEFINITION( iToken ) || \
+                           iToken == TOKEN_ELSE     || \
+                           iToken == TOKEN_ELSEIF   || \
+                           iToken == TOKEN_ENDIF    || \
+                           iToken == TOKEN_END      || \
+                           iToken == TOKEN_ENDCASE  || \
+                           iToken == TOKEN_ENDDO    || \
+                           iToken == TOKEN_NEXT     || \
+                           iToken == -1                \
                          )
 
    typedef enum
@@ -162,7 +166,9 @@
       
       DECLARED_KIND_PARAMETER = TOKEN_PARAMETERS,
       DECLARED_KIND_PRIVATE   = TOKEN_PRIVATE,
-      DECLARED_KIND_PUBLIC    = TOKEN_PUBLIC
+      DECLARED_KIND_PUBLIC    = TOKEN_PUBLIC,
+
+      DECLARE_KIND_DETACHED   = 0x0F00
    } DECLARED_KIND;
 
    typedef enum
@@ -324,6 +330,7 @@
    {
       PARSING_STATE_GLOBAL_DECLARATIONS,
       PARSING_STATE_DECLARAIONS,
+      PARSING_STATE_DEFINITION,
       PARSING_STATE_EXECUTABLE
    }
    PARSING_STATE;
@@ -335,20 +342,11 @@
  
       union
       {
-         struct
-         {
-            int iInteger;
-         } Integer;
+         long lLong;
 
-         struct 
-         {
-            long lLong;
-         } Long;
+         long lDate;
 
-         struct  
-         {
-            long lDate;
-         } Date;
+         double dDateTime;
 
          struct
          {
@@ -357,12 +355,8 @@
             char   cDec;
          } Double;
 
-         struct
-         {
-            double dDouble;
-         } DateTime;
-
          char *sString;
+
          BOOL bLogical;
       } Value;
 
@@ -430,7 +424,8 @@
       VALUE_KIND Kind;
       PRG_TYPE   Type;
 
-      BOOL       bNegate;
+      char       bNegate;
+      char       bNot;
 
       union
       {
@@ -755,6 +750,7 @@
    typedef struct _BLOCK
    {
       DECLARED *     pBlockLocals;
+      DECLARED *     pDetached;
       int            iBlockLocals;
       struct _LIST * pList;
    } BLOCK;
@@ -811,11 +807,13 @@
       int iNextToken;
       int iToken;
    
-      BOOL bError;
+      const char *sErrorSource, *sError1, *sError2;
+      
       BOOL bAnyWarning;
       BOOL bMute;
       BOOL bPPO;
    
+      BOOL    bCanJump;
       jmp_buf JumpBuffer;
       
       DECLARED *   pExternGlobals;
@@ -852,6 +850,10 @@
 
    void DumpLine( LINE *pLine, int *piSpaces, PARSER_CONTEXT *Parser_pContext );
 
+#ifdef PARSE_ERROR_FUNCTION
+   void PARSE_ERROR( int iError, const char *sError1, const char *sError2, PARSER_CONTEXT *Parser_pContext );
+#endif
+         
    #if defined(__cplusplus)
       }
    #endif

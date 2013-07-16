@@ -15,14 +15,20 @@
 //extern char *Parser_asErrors[];
 void       ParseSource( PARSER_CONTEXT *Parser_pContext );
 void       ParseFunction( PARSER_CONTEXT *Parser_pContext );
+
 DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piParams, PARSER_CONTEXT *Parser_pContext );
+
+DECLARED * ParseGlobalDeclarationLine( PARSER_CONTEXT *Parser_pContext );
 void       ParseGlobalDeclarations( PARSER_CONTEXT *Parser_pContext );
+DECLARED * ParseDeclarationLine( PARSER_CONTEXT *Parser_pContext );
 void       ParseDeclarations( PARSER_CONTEXT *Parser_pContext );
+
 BODY *     ParseBody( PARSER_CONTEXT *Parser_pContext );
 LINE *     ParseIf( PARSER_CONTEXT *Parser_pContext );
 VALUE *    ParseValue( PARSER_CONTEXT *Parser_pContext );
 LIST *     ParseList( PRG_TYPE Type, PARSER_CONTEXT *Parser_pContext );
 VALUE *    ParseListAsValue( PRG_TYPE Type, PARSER_CONTEXT *Parser_pContext );
+void *     ParseLine( PARSING_STATE State, PARSER_CONTEXT *Parser_pContext );
 
 YYSTYPE   yylval;
 
@@ -76,6 +82,24 @@ int main( int argc, char *argv[] )
    } 
 }
 
+#ifdef PARSE_ERROR_FUNCTION
+void PARSE_ERROR( int iError, const char *sError1, const char *sError2, PARSER_CONTEXT *Parser_pContext )
+{
+   Parser_pContext->sErrorSource = __SOURCE__;
+   Parser_pContext->sError1 = sError1;
+   Parser_pContext->sError2 = sError2;
+   
+   ASSERT( Parser_pContext->bCanJump );
+   
+   if( Parser_pContext->bCanJump )
+   {
+      longjmp( Parser_pContext->JumpBuffer, iError );
+   }
+   
+   return;
+}
+#endif
+
 void ParseSource( PARSER_CONTEXT *Parser_pContext )
 {
    ParseGlobalDeclarations( Parser_pContext );
@@ -88,11 +112,88 @@ void ParseSource( PARSER_CONTEXT *Parser_pContext )
    fclose( Parser_pContext->Files.pLast->hFile );
 }
 
-void ParseFunction( PARSER_CONTEXT *Parser_pContext )
+DECLARED * ParseGlobalDeclarationLine( PARSER_CONTEXT *Parser_pContext )
+{
+   DECLARED **ppDeclared;
+   int      *piDeclared;
+   
+   switch( LOOK_AHEAD_TOKEN() )
+   {
+      case TOKEN_GLOBAL :
+         ppDeclared = &( Parser_pContext->pGlobals );
+         piDeclared = &( Parser_pContext->iGlobals );
+         break;
+         
+      case TOKEN_EXTERNGLOBAL :
+         ppDeclared = &( Parser_pContext->pExternGlobals );
+         piDeclared = &( Parser_pContext->iExternGlobals );
+         break;
+         
+      case TOKEN_STATIC :
+         ppDeclared = &( Parser_pContext->pStatics );
+         piDeclared = &( Parser_pContext->iStatics );
+         break;
+         
+      case TOKEN_MEMVAR :
+         ppDeclared = &( Parser_pContext->pMemvars );
+         piDeclared = &( Parser_pContext->iMemvars );
+         break;
+         
+      case TOKEN_FIELD :
+         ppDeclared = &( Parser_pContext->pFields );
+         piDeclared = &( Parser_pContext->iFields );
+         break;
+         
+      case TOKEN_DECLARE :
+         //TODO:
+         return NULL;
+         
+      default:
+         return NULL;
+   }
+   
+   USE_AHEAD_TOKEN();
+   
+   while( *ppDeclared )
+   {
+      ppDeclared = &( ( *ppDeclared )->pNext );
+   }
+   
+   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
+   
+   ACCEPT_EOL()
+   
+   return *ppDeclared;
+}
+
+void ParseGlobalDeclarations( PARSER_CONTEXT *Parser_pContext )
+{
+   do
+   {
+#ifdef GETTING_EMPTY_LINES
+      while( LOOK_AHEAD_TOKEN() == '\n' )
+      {
+         DROP_AHEAD_TOKEN();
+      }
+#endif
+      
+      if( NEW_DEFINITION( LOOK_AHEAD_TOKEN() ) )
+      {
+         return;
+      }
+
+      ParseLine( PARSING_STATE_GLOBAL_DECLARATIONS, Parser_pContext );      
+   }
+   while( LAST_TOKEN() == '\n' );
+   
+   return;
+}
+
+FUNCTION * ParseFunctionDefinitionLine( PARSER_CONTEXT *Parser_pContext )
 {
    FUNCTION * pFunc;
    FUNC_KIND FuncKind = (FUNC_KIND) LOOK_AHEAD_TOKEN();
-
+   
    if( FuncKind >= FUNC_KIND_MIN && FuncKind <= FUNC_KIND_MAX )
    {
       DROP_AHEAD_TOKEN();
@@ -102,7 +203,7 @@ void ParseFunction( PARSER_CONTEXT *Parser_pContext )
          DROP_AHEAD_TOKEN();
          
          pFunc = New_Function( yylval.sText, FuncKind, Parser_pContext );
-
+         
          if( LOOK_AHEAD_TOKEN() == '(' )
          {
             DROP_AHEAD_TOKEN();
@@ -115,23 +216,32 @@ void ParseFunction( PARSER_CONTEXT *Parser_pContext )
             }
             else
             {
-               PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected ')'." );
+               PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected ')'.", Parser_pContext );
             }
          }
-
+         
          ACCEPT_EOL();
-
-         ParseDeclarations( Parser_pContext );
-
-         pFunc->pBody = ParseBody( Parser_pContext );
-
-         return;
+         
+         return pFunc;
       }
    }
+   
+   PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected entity definition.", Parser_pContext );
+   
+   return NULL;
+}
 
-   Error:
+void ParseFunction( PARSER_CONTEXT *Parser_pContext )
+{
 
-      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", expected entity definition." );
+   FUNCTION * pFunc = ParseLine( PARSING_STATE_DEFINITION, Parser_pContext );
+   
+   if( pFunc)
+   {
+       ParseDeclarations( Parser_pContext );
+
+       pFunc->pBody = ParseBody( Parser_pContext );
+   }
 
    return;
 }
@@ -204,77 +314,12 @@ DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piDeclares, PARSER_CONTEX
    return pFirst;
 }
 
-void ParseGlobalDeclarations( PARSER_CONTEXT *Parser_pContext )
-{
-   DECLARED **ppDeclared;
-   int      *piDeclared;
-   
-Again:
-   
-#ifdef GETTING_EMPTY_LINES
-   while( LOOK_AHEAD_TOKEN() == '\n' )
-   {
-      DROP_AHEAD_TOKEN();
-   }
-#endif
-   
-   switch( LOOK_AHEAD_TOKEN() )
-   {
-      case TOKEN_GLOBAL :
-         ppDeclared = &( Parser_pContext->pGlobals );
-         piDeclared = &( Parser_pContext->iGlobals );
-         break;
-         
-      case TOKEN_EXTERNGLOBAL :
-         ppDeclared = &( Parser_pContext->pExternGlobals );
-         piDeclared = &( Parser_pContext->iExternGlobals );
-         break;
-         
-      case TOKEN_STATIC :
-         ppDeclared = &( Parser_pContext->pStatics );
-         piDeclared = &( Parser_pContext->iStatics );
-         break;
-         
-      case TOKEN_MEMVAR :
-         ppDeclared = &( Parser_pContext->pMemvars );
-         piDeclared = &( Parser_pContext->iMemvars );
-         break;
-         
-      case TOKEN_FIELD :
-         ppDeclared = &( Parser_pContext->pFields );
-         piDeclared = &( Parser_pContext->iFields );
-         break;
-         
-      default:
-         return;
-   }
-   
-   USE_AHEAD_TOKEN();
-   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
-   
-   ACCEPT_EOL()
-   
-   if( LAST_TOKEN() == '\n' )
-   {
-      goto Again;
-   }
-}
-
-void ParseDeclarations( PARSER_CONTEXT *Parser_pContext )
+DECLARED * ParseDeclarationLine( PARSER_CONTEXT *Parser_pContext )
 {
    FUNCTION *pFunction = Parser_pContext->Functions.pLast;
    DECLARED **ppDeclared;
    int      *piDeclared;
-   
-Again:
-   
-#ifdef GETTING_EMPTY_LINES
-   while( LOOK_AHEAD_TOKEN() == '\n' )
-   {
-      DROP_AHEAD_TOKEN();
-   }
-#endif
-   
+ 
    switch( LOOK_AHEAD_TOKEN() )
    {
       case TOKEN_LOCAL :
@@ -296,23 +341,45 @@ Again:
          ppDeclared = &( pFunction->pFields );
          piDeclared = &( pFunction->iFields );
          break;
-
+         
       default:
-         return;
+         return NULL;
    }
    
    USE_AHEAD_TOKEN();
-   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
-         
-   ACCEPT_EOL()
-         
-   if( LAST_TOKEN() == '\n' )
+   
+   while( *ppDeclared )
    {
-      goto Again;
+      ppDeclared = &( ( *ppDeclared )->pNext );
    }
+   
+   *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
+   
+   ACCEPT_EOL()
+   
+   return *ppDeclared;
 }
 
-LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
+void ParseDeclarations( PARSER_CONTEXT *Parser_pContext )
+{
+   do
+   {
+       #ifdef GETTING_EMPTY_LINES
+         while( LOOK_AHEAD_TOKEN() == '\n' )
+         {
+            DROP_AHEAD_TOKEN();
+         }
+       #endif
+   
+      if( ParseLine( PARSING_STATE_DECLARAIONS, Parser_pContext ) == NULL )
+      {
+         break;
+      }
+   }
+   while( LOOK_AHEAD_TOKEN() == '\n' );
+}
+
+LINE * ParseExecutableLine( PARSER_CONTEXT *Parser_pContext )
 {
    LINE * pLine = NULL;
    VALUE * pValue = NULL;
@@ -341,7 +408,7 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
       case TOKEN_PUBLIC :
       case TOKEN_PARAMETERS :
          DROP_AHEAD_TOKEN();
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", TODO: Parse MEM Declares!" );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", TODO: Parse MEM Declares!" , Parser_pContext);
          break;
          
       default :
@@ -368,7 +435,7 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
                   }
                   else
                   {
-                     PARSE_ERROR( PARSER_ERR_SYNTAX, ClipNet_BinaryKind( pValue->Value.pBinary ), "Binary Kind can't be used as a statement." );
+                     PARSE_ERROR( PARSER_ERR_SYNTAX, ClipNet_BinaryKind( pValue->Value.pBinary ), "Binary Kind can't be used as a statement.", Parser_pContext );
                   }
                   break;
                   
@@ -408,7 +475,7 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
                   break;
   
                default :
-                  PARSE_ERROR( PARSER_ERR_SYNTAX, "Not a valid statement", ClipNet_ValueKind( pValue ) );
+                  PARSE_ERROR( PARSER_ERR_SYNTAX, "Not a valid statement", ClipNet_ValueKind( pValue ), Parser_pContext );
             }
             
             Release_Value( pValue );
@@ -419,6 +486,64 @@ LINE * ParseLine( PARSER_CONTEXT *Parser_pContext )
    ACCEPT_EOL();
    
    return pLine;
+}
+
+void * ParseLine( PARSING_STATE State, PARSER_CONTEXT *Parser_pContext )
+{
+   void *pResult;   
+   int iError;
+   
+   Parser_pContext->sErrorSource = NULL;
+   Parser_pContext->sError1 = NULL;
+   Parser_pContext->sError2 = NULL;
+  
+   iError = setjmp( Parser_pContext->JumpBuffer );
+   Parser_pContext->bCanJump = TRUE;
+   
+   if( iError == 0 )
+   {
+      switch( State )
+      {
+         case PARSING_STATE_EXECUTABLE:
+            pResult = (void *) ParseExecutableLine( Parser_pContext );
+            break;
+            
+         case PARSING_STATE_DEFINITION:
+            pResult = ParseFunctionDefinitionLine( Parser_pContext );
+            break;
+            
+         case PARSING_STATE_DECLARAIONS:
+            pResult = (void *) ParseDeclarationLine( Parser_pContext );
+            break;
+            
+         case PARSING_STATE_GLOBAL_DECLARATIONS:
+            pResult = (void *) ParseGlobalDeclarationLine( Parser_pContext );
+            break;
+      }
+   }
+   else
+   {
+      // Must have arrived from longjump() in PARSE_ERROR()!!!
+      Line_ParseError:
+   
+      Parser_GenError( Parser_asErrors, 'E', iError, Parser_pContext->sError1, Parser_pContext->sError2 , Parser_pContext );   
+      printf( "%s\n", Parser_pContext->sErrorSource );
+   
+      while( LOOK_AHEAD_TOKEN() != -1 && LOOK_AHEAD_TOKEN() != '\n' )
+      {
+         DROP_AHEAD_TOKEN();
+      }
+      while( LOOK_AHEAD_TOKEN() == '\n' )
+      {
+         USE_AHEAD_TOKEN();
+      }
+      
+      pResult = NULL;
+   }
+   
+   Parser_pContext->bCanJump = FALSE;
+   
+   return pResult;
 }
 
 BODY * ParseBody( PARSER_CONTEXT *Parser_pContext )
@@ -437,7 +562,7 @@ BODY * ParseBody( PARSER_CONTEXT *Parser_pContext )
       
       if( pLine )
       {
-         pLine->pNext = ParseLine( Parser_pContext );
+         pLine->pNext = ParseLine( PARSING_STATE_EXECUTABLE, Parser_pContext );
          
          if( pLine->pNext )
          {
@@ -445,17 +570,24 @@ BODY * ParseBody( PARSER_CONTEXT *Parser_pContext )
          }
          else
          {
-            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid line", yytext );
-            DROP_AHEAD_TOKEN();
+            // We silently skip over the offensive line
          }
       }
       else
       {
-         pLine = ParseLine( Parser_pContext );
-         pBody->pLines = pLine;
+         pLine = ParseLine( PARSING_STATE_EXECUTABLE, Parser_pContext );
+         
+         if( pLine )
+         {
+            pBody->pLines = pLine;
+         }
+         else
+         {
+            // We silently skip over the offensive line
+         }
       }
    }
-   while( TRUE );
+   while( LAST_TOKEN() == '\n' );
 
    #ifdef DEBUG_BODY
       printf( "\nBody ended with: %i\n", LOOL_AHEAD_TOKEN() );
@@ -524,7 +656,7 @@ LINE * ParseIf( PARSER_CONTEXT *Parser_pContext )
 VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
 {
    VALUE *pValue = NULL, *pValue2 = NULL;
-   BOOL bNegate = FALSE;
+   BOOL bNegate = FALSE, bNot = FALSE;
 
   NextValue:
 
@@ -541,6 +673,12 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
          bNegate = ! bNegate;
          goto NextValue;
 
+      case TOKEN_NOT:
+         DROP_AHEAD_TOKEN();
+         
+         bNot = ! bNot;
+         goto NextValue;
+         
       case TOKEN_INC:         
       case TOKEN_DEC:
          USE_AHEAD_TOKEN();
@@ -624,7 +762,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
             }
          }
 
-         PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid IIF()syntax", yytext );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid IIF()syntax", yytext, Parser_pContext );
          
          break;
          
@@ -637,7 +775,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
             ACCEPT_TOKEN_AND_BREAK( ')' );
          }
          
-         PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid List syntax", yytext );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid List syntax", yytext, Parser_pContext );
 
          if( pValue )
          {
@@ -670,7 +808,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   Release_Value( pValue );
                   pValue = NULL;
                   
-                  PARSE_ERROR( PARSER_ERR_BLOCK, "Invalid Codeblock Parametrs", yytext );
+                  PARSE_ERROR( PARSER_ERR_BLOCK, "Invalid Codeblock Parametrs", yytext, Parser_pContext );
                   break;
                }
             }
@@ -685,7 +823,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
             }
             else
             {
-               PARSE_ERROR( PARSER_ERR_BLOCK, "Invalid Codeblock expression", yytext );
+               PARSE_ERROR( PARSER_ERR_BLOCK, "Invalid Codeblock expression", yytext, Parser_pContext );
             }
          }
          else
@@ -695,7 +833,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                ACCEPT_TOKEN_AND_BREAK( '}' );
             }
             
-            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid Array syntax", yytext );
+            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid Array syntax", yytext, Parser_pContext );
          }
          
          Release_Value( pValue );
@@ -711,7 +849,12 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
          goto ParseValue_Done;
    }
 
-   if( pValue == NULL )
+   if( pValue )
+   {
+      pValue->bNegate = bNegate;
+      pValue->bNot    = bNot;
+   }
+   else
    {
       goto ParseValue_Done;
    }
@@ -769,7 +912,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
          }
          else
          {
-            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid Right Side Expression", yytext );
+            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid Right Side Expression", yytext, Parser_pContext );
          }
          
          break;
@@ -838,7 +981,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   }
                   else
                   {
-                     PARSE_ERROR( PARSER_ERR_BAD_MACRO, "& Followed by invalid expression", yytext );
+                     PARSE_ERROR( PARSER_ERR_BAD_MACRO, "& Followed by invalid expression", yytext, Parser_pContext );
                   }
                   
                default:
@@ -855,7 +998,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
             }
             else
             {
-               PARSE_ERROR( PARSER_ERR_INVALID_ALIAS, "Invalid Aliased expression", yytext );
+               PARSE_ERROR( PARSER_ERR_INVALID_ALIAS, "Invalid Aliased expression", yytext, Parser_pContext );
             }
          }
          
@@ -923,7 +1066,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
          }
          else
          {
-            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid assignment value", yytext );
+            PARSE_ERROR( PARSER_ERR_SYNTAX, "Invalid assignment value", yytext, Parser_pContext );
          }
          
          //goto TryExtendedValue; //Right side will consume all!
@@ -996,7 +1139,7 @@ LIST * ParseList( PRG_TYPE Type, PARSER_CONTEXT *Parser_pContext )
          }
 
          printf( "Wanted Type: %i Got Kind: %i Type: %i\n", Type, pValue->Kind, pValue->Type );
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", invalid type of list member." );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", invalid type of list member.", Parser_pContext );
          return NULL;
          //goto ParseList_Next;
       }

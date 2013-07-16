@@ -840,15 +840,10 @@ static int SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO )
       {
          long lNumber = SLX_Hex2L( yytext + 2, CARGO );
 
-         if( ( long ) SHRT_MIN <= lNumber && lNumber <= ( long ) SHRT_MAX )
-         {
-            yylval.Constant.Kind = CONSTANT_KIND_INTEGER;
-            yylval.Constant.Value.Integer.iInteger = (int) lNumber;
-         }
-         else if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
+         if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
          {
             yylval.Constant.Kind = CONSTANT_KIND_LONG;
-            yylval.Constant.Value.Long.lLong = lNumber;
+            yylval.Constant.Value.lLong = lNumber;
          }
       }
       else
@@ -872,15 +867,10 @@ static int SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO )
          {
             long lNumber = strtol( yytext, NULL, 10 );
 
-            if( ( long ) SHRT_MIN <= lNumber && lNumber <= ( long ) SHRT_MAX )
-            {
-               yylval.Constant.Kind = CONSTANT_KIND_INTEGER;
-               yylval.Constant.Value.Integer.iInteger = (int) lNumber;
-            }
-            else if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
+            if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
             {
                yylval.Constant.Kind = CONSTANT_KIND_LONG;
-               yylval.Constant.Value.Long.lLong = lNumber;
+               yylval.Constant.Value.lLong = lNumber;
             }
          }
       }

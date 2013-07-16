@@ -270,6 +270,6 @@ void Relese_Line( LINE *pLine, PARSER_CONTEXT *Parser_pContext )
          break;
 
       default:
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: LineKind()" );                  
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: LineKind()", Parser_pContext );                  
    }
 }

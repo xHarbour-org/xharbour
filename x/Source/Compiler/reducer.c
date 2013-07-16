@@ -224,7 +224,7 @@ VALUE * Reduce_MacroValue( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
          pValue->Value.pMacro->Value.pComplex =  ReduceValue[ pValue->Value.pMacro->Value.pComplex->Kind ]( pValue->Value.pMacro->Value.pComplex, Parser_pContext );
          
       default :
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in Reduce_Macro." );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: " __SOURCE__, Parser_pContext );
    }
    
    return pValue;

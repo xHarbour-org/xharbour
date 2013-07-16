@@ -211,7 +211,7 @@ LINE * New_Line( void *x, LINE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 
       default:
          printf( "Kind: %i\n", Kind );
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in New_Line(): " __SOURCE__ );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: " __SOURCE__, Parser_pContext );
    } 
 
    return pLine;
@@ -325,7 +325,7 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
          break;
       
        default:
-           PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in New_Value()." );
+           PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: " __SOURCE__, Parser_pContext );
    }
 
    return pValue;    
@@ -373,7 +373,7 @@ VALUE * New_ConstantValue( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext
 
       default :
         printf( "Kind: %i\n", pCopy->Kind );
-        PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in NewConstant()."  __SOURCE__ );
+        PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: "  __SOURCE__, Parser_pContext );
    }
 
    return New_Value( (void *) pCopy, VALUE_KIND_CONSTANT, Parser_pContext );
@@ -397,13 +397,13 @@ VALUE * New_UnaryValue( VALUE * pLValue, UNARY_KIND Kind, UNARY_WHEN When, PARSE
    
    if( pLValue == NULL )
    {
-      Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_INVALID_LVALUE, "Missing", yytext, Parser_pContext );
+      PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, "Missing", yytext, Parser_pContext );
       return NULL;
    }
    else if( ( pLValue->Kind & VALUE_KIND_ASSIGNABLE_MASK ) != VALUE_KIND_ASSIGNABLE_MASK )
    {
-      Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_INVALID_LVALUE, ClipNet_ValueKind( pLValue ), "", Parser_pContext );
-      ValueKind |= VALUE_KIND_ERROR_MASK;
+      PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, ClipNet_ValueKind( pLValue ), yytext, Parser_pContext );
+      return NULL;
    }
 
    pLValue->Kind |= VALUE_KIND_ASSIGNED_MASK;
@@ -413,6 +413,7 @@ VALUE * New_UnaryValue( VALUE * pLValue, UNARY_KIND Kind, UNARY_WHEN When, PARSE
    pUnary->Kind = Kind;
    pUnary->When = When;
    pUnary->pLValue = pLValue;
+   pUnary->Type = pLValue->Type;
 
    return New_Value( (void *) pUnary, ValueKind , Parser_pContext );
 }
@@ -432,6 +433,7 @@ VALUE * New_BinaryValue( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_C
    //printf( "Binary: %i, Left: %i Right: %i\n", Kind, pLeft->Kind, pRight->Kind );
 
    pBinary->Kind = Kind;
+   pBinary->Type = pLeft->Type;
    pBinary->pLeft = pLeft;
    pBinary->pRight = pRight;
 
@@ -466,7 +468,8 @@ VALUE * New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContex
    MACRO *pMacro = NEW( MACRO );
 
    pMacro->Kind = Kind;
-
+   pMacro->Type = PRG_TYPE_NONE;
+   
    switch( Kind )
    {
       case MACRO_KIND_SIMPLE:
@@ -478,7 +481,7 @@ VALUE * New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContex
          break;
 
       default :
-         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected type in: " __SOURCE__ );
+         PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected type in: " __SOURCE__, Parser_pContext );
    }
 
    return New_Value( (void *) pMacro, VALUE_KIND_MACRO, Parser_pContext );
@@ -490,6 +493,7 @@ VALUE * New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_
 
    pAliased->pArea  = pArea;
    pAliased->pValue = pValue;
+   pAliased->Type   = PRG_TYPE_NONE;
 
    return New_Value( (void *) pAliased, VALUE_KIND_ALIASED, Parser_pContext );
 }
@@ -498,6 +502,7 @@ VALUE * New_IIFValue( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTE
 {
    IIF *pIIF = NEW( IIF );
 
+   pIIF->Type =  pTrue->Type | pFalse->Type;
    pIIF->pCond = pCond;
    pIIF->pTrue = pTrue;
    pIIF->pFalse = pFalse;
@@ -521,7 +526,7 @@ ASSIGNMENT * New_Assignment(  VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND K
    
    if( ( pLValue->Kind & VALUE_KIND_ASSIGNABLE_MASK ) != VALUE_KIND_ASSIGNABLE_MASK )
    {
-      PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, yytext, "invalid assignment receiver." );
+      PARSE_ERROR( PARSER_ERR_INVALID_LVALUE, yytext, "invalid assignment receiver.", Parser_pContext );
       
    }
    else
@@ -555,7 +560,7 @@ VALUE * New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT
    
    if( pIndexList == NULL )
    {
-      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "invalid array index." );
+      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "invalid array index.", Parser_pContext );
    }
    
    pArrayElement->pArray = pArray;
@@ -605,7 +610,7 @@ LIST * New_ListNode( LIST * pList, VALUE * pValue, PARSER_CONTEXT *Parser_pConte
 
    if( pValue == NULL )
    {
-      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "NULL Node in:" __SOURCE__ );
+      PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "NULL Node in:" __SOURCE__, Parser_pContext );
    }
 
    pListNode->pValue = pValue;

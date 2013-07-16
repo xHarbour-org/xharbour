@@ -119,7 +119,6 @@ void Parser_GenError( char *asErrors[], char cPrefix, PARSER_ERROR iError, const
    printf( "\n" );
 
    Parser_pContext->iErrors++;
-   Parser_pContext->bError = TRUE;
 
    if( cPrefix == 'F' )
    { 
