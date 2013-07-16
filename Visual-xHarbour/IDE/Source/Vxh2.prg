@@ -57,7 +57,10 @@ CLASS WindowEdit INHERIT WinForm
    DATA OldParent           EXPORTED
    DATA CtrlSizedMoved      EXPORTED INIT .F.
    DATA CurObj              EXPORTED
+
    DATA Editor              EXPORTED
+   DATA XFMEditor           EXPORTED
+
    DATA lCustom             EXPORTED
    DATA __SelMoved          EXPORTED INIT .F.
    DATA __PrevSelRect       EXPORTED
@@ -164,7 +167,8 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
 
    ::BackgroundImage := FreeImageRenderer( Self ):Create()
 
-   ::Editor := Source( ::Application:SourceEditor )
+   ::XFMEditor   := Source( ::Application:SourceEditor )
+   ::Editor      := Source( ::Application:SourceEditor )
    ::Editor:Form := Self // Will be needed in IntelliSense
 
    IF cFileName != NIL

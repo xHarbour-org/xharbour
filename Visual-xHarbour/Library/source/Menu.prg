@@ -309,7 +309,6 @@ METHOD Create() CLASS MenuBar
    lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::hMenu, lpMenuInfo )
 
-   view valtype( ::__ClassInst )
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )

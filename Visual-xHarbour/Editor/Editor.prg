@@ -1077,13 +1077,17 @@ METHOD Close() CLASS Source
 RETURN .F.
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD Reload() CLASS Source
-   LOCAL nPos, nVisLine
-   nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+METHOD Reload( cText ) CLASS Source
+   LOCAL nPos, nVisLine, lReadOnly
+   nPos        := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+   nVisLine    := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   lReadOnly   := ::lReadOnly
    ::FirstOpen := .T.
-   ::SetText( MemoRead( ::File, .F. ) )
-   ::FileTime := FileTime( ::File )
+   DEFAULT cText TO MemoRead( ::File, .F. )
+   ::lReadOnly := .F.
+   ::SetText( cText )
+   ::lReadOnly := lReadOnly
+   ::FileTime  := FileTime( ::File )
    ::EmptyUndoBuffer()
    ::Modified  := .F.
    ::FirstOpen := .F.
