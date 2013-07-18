@@ -1378,7 +1378,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      xProp := NIL
                   ENDIF
 
-             CASE cProp == "Buddy"
+             CASE cProp IN { "Buddy", "PageChild" }
                   aCol[1]:Value := { "", { NIL } }
 
                   FOR EACH Child IN ::ActiveObject:Parent:Children
@@ -1391,14 +1391,14 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      aCol[1]:Value[1] := xValue:Name
                   ENDIF
 
-                  aCol[1]:ColType  := "BUDDY"
+                  aCol[1]:ColType  := UPPER( cProp )
                   xValue := NIL
 
-             CASE cProp == "PageChild"
+             CASE cProp == "BandChild"
 
                   aCol[1]:Value := { "", { NIL } }
 
-                  FOR EACH Child IN ::ActiveObject:Parent:Children
+                  FOR EACH Child IN ::ActiveObject:Parent:Parent:Children
                       IF Child:ClsName != REBARCLASSNAME
                          AADD( aCol[1]:Value[2], Child )
                       ENDIF
@@ -1427,22 +1427,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := "ACTIVEMENUBAR"
                   xValue := NIL
 
-             CASE cProp == "BandChild"
-
-                  aCol[1]:Value := { "", { NIL } }
-
-                  FOR EACH Child IN ::ActiveObject:Parent:Parent:Children
-                      IF Child:ClsName != REBARCLASSNAME
-                         AADD( aCol[1]:Value[2], Child )
-                      ENDIF
-                  NEXT
-
-                  IF xValue != NIL
-                     aCol[1]:Value[1] := xValue:Name
-                  ENDIF
-
-                  aCol[1]:ColType  := "BANDCHILD"
-                  xValue := NIL
 
              CASE cProp == "Icon"
                   IF xValue != NIL
@@ -2263,7 +2247,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
+               CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","PAGECHILD","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
