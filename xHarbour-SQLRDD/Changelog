@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-07-21 09:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/oraedit.prg
+    source/oraclip.prg
+    ! some fixes to oraclip functions
+  * source/sqlsrodbc.c  
+    ! fix to odbcFieldGet () to return date when sr_lsql2008newTypes() for older version of sqlserver ( sqlserver 2005 and older, sqlserver 2008 and newer use the sr_lsql2008newTypes )
+
 2013-04-07 18:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/mysql.c
     ! fix to mysql_library_end() only when connection counter come to 0, otherwise in multiple connections, close one, close all other

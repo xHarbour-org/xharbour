@@ -96,7 +96,7 @@
 #define DE_APPEND  3
 #endif
 #define 	HB_COMPAT_C53
-
+static nAliasTmp := 0
      
 FUNCTION OraEdit(nCursors, cTable, cWhere, aVarSust, nTop,;
                  nLeft,;               
@@ -130,6 +130,8 @@ Local n,cBind,nAt
 Local cFile
 Local nPosOrderBY
 Local cCols :=""
+Local nOldArea := Select()
+Local cAlias
 
  IF Empty(axColumns) .OR. ! HB_ISARRAY( axColumns )
     cCols := ' * '
@@ -169,8 +171,14 @@ endif
   nRet := DE_CONT
   lAppend := .f.
   
-  
-refreshFullData(csql,'tmpedit',cfile)   
+if nAliasTmp ==0 
+   cAlias := 'tmpedit'
+   nAliasTmp++
+else
+   cAlias := 'tmpedit'+strzero(nAliasTmp,3)
+   nAliasTmp++
+endif   
+refreshFullData(csql,cAlias,cfile)   
 
   if ! Used()
 #ifdef HB_C52_STRICT
@@ -434,7 +442,7 @@ refreshFullData(csql,'tmpedit',cfile)
 
 #ifdef HB_EXTENSION
   // xHarbour extension: call UDF with DE_INIT mode.
-  nRet := dbe_CallUDF(bFunc, DE_INIT, oTBR:colPos, ,oTBR,csql,cCount,cfile)
+  nRet := dbe_CallUDF(bFunc, DE_INIT, oTBR:colPos, ,oTBR,csql,cCount,cfile,calias)
 #endif
 
  oTBR:ForceStable()
@@ -481,21 +489,21 @@ refreshFullData(csql,'tmpedit',cfile)
        if ! lExcept
 
           if dbe_emptydb()
-             nRet := dbe_CallUDF(bFunc, DE_EMPTY, oTBR:colPos,GetCurValue(), oTBR,csql,cCount,cfile)
+             nRet := dbe_CallUDF(bFunc, DE_EMPTY, oTBR:colPos,GetCurValue(calias), oTBR,csql,cCount,cfile,calias)
 
           elseif oTBR:HitTop
              oTBR:HitTop := .f.
-             nRet := dbe_CallUDF(bFunc, DE_HITTOP, oTBR:colPos,GetCurValue(), oTBR,csql,cCount,cfile)
+             nRet := dbe_CallUDF(bFunc, DE_HITTOP, oTBR:colPos,GetCurValue(calias), oTBR,csql,cCount,cfile,calias)
 
           elseif oTBR:HitBottom
              oTBR:HitBottom := .f.
-             nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, GetCurValue(), oTBR,csql,cCount,cfile)
+             nRet := dbe_CallUDF(bFunc, DE_HITBOTTOM, oTBR:colPos, GetCurValue(calias), oTBR,csql,cCount,cfile,calias)
 
           endif
 
        else
 
- //         nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, GetCurValue(), oTBR)
+ //         nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, GetCurValue(calias), oTBR)
           lExcept := .f.
           if lastkey() == K_ENTER
              oTBR:RefreshCurrent()
@@ -504,7 +512,7 @@ refreshFullData(csql,'tmpedit',cfile)
 
        // No keystrokes pending...
        if NextKey() = 0
-          dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, GetCurValue(), oTBR,csql,cCount,cfile)
+          dbe_CallUDF(bFunc, DE_IDLE, oTBR:colPos, GetCurValue(calias), oTBR,csql,cCount,cfile,calias)
           // force dbedit DE_CONT state after IDLE mode.
           nRet := DE_CONT
        endif
@@ -543,7 +551,7 @@ refreshFullData(csql,'tmpedit',cfile)
 
     if nKey != 0
 
-       nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, GetCurValue(), oTBR,csql,cCount,cfile)
+       nRet := dbe_CallUDF(bFunc, DE_EXCEPT, oTBR:colPos, GetCurValue(calias), oTBR,csql,cCount,cfile,calias)
 
        if nRet == DE_ABORT
           EXIT
@@ -565,8 +573,14 @@ refreshFullData(csql,'tmpedit',cfile)
 
  SetCursor( nCursor )
  SetPos( row(),0 )
-if select('tmpedit') > 0
-tmpedit->(dbclosearea())
+if select(cAlias )> 0
+(cAlias)->(dbclosearea())
+endif
+if nOldArea > 0
+   select( nOldArea ) 
+endif   
+if nAliasTmp >0
+nAliasTmp--
 endif
 /* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
 RETURN .T.
@@ -574,7 +588,7 @@ RETURN .T.
 
 
 *------------------------------------------------------*
-STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR,csql,cCount,cfile)
+STATIC FUNCTION dbe_CallUDF(bFunc, nMode, nColPos, avalue, oTBR, csql, cCount, cfile,calias)
 *------------------------------------------------------*
 LOCAL nRet, nRec, nKey, nLastRec, lDeleted, lChanged,aret :={}
 
@@ -594,11 +608,11 @@ Local aValues :={}
      while nKey != 0
         inkey()
         dbe_ProcessKey( nKey, oTBR )
-        nRet := dbe_return( Eval(bFunc, DE_EXCEPT, nColPos, GetCurValue()) )
+        nRet := dbe_return( Eval(bFunc, DE_EXCEPT, nColPos, GetCurValue(calias)) )
         if nRet = DE_ABORT
            EXIT
         elseif nRet = DE_REFRESH
-           refreshFullData(csql,'tmpedit')
+           refreshFullData(csql,calias)
            oTBR:RefreshAll()
            oTBR:ForceStable()
         elseif nRet = DE_CONT
@@ -631,7 +645,7 @@ Local aValues :={}
   nLastRec := LastRec()
 
   // Call UDF
-  nRet := dbe_return( Eval(bFunc, nMode, nColPos,  GetCurValue(),oTBR) )
+  nRet := dbe_return( Eval(bFunc, nMode, nColPos,  GetCurValue(calias),oTBR) )
 
 
   if nRet == DE_REFRESH
@@ -652,14 +666,14 @@ Local aValues :={}
 
   // The UDF has changed db/record, so dbedit need to be refreshed.
   if nRet == DE_REFRESH
-     refreshFullData(csql,'tmpedit',cfile)
+     refreshFullData(csql,calias,cfile)
   endif
   if lChanged 
 
      if LastRec() > nLastRec   // append.
 
         nKey := nextkey()
-        refreshFullData(csql,'tmpedit')
+        refreshFullData(csql,calias)
 
         if ( nKey != 0 .and. ! dbe_CursorKey(nKey) ) .or.;
            ordkeyno() < oTBR:RowPos
@@ -896,11 +910,11 @@ local lDeleted := .f.
 RETURN NIL
 
 
-function GetCurValue()
+function GetCurValue(calias)
 Local n
 Local aTemp := {}
-for n:=1 to tmpedit->(fcount())
-aadd(aTemp,tmpedit->(fieldget(n)))
+for n:=1 to (cAlias)->(fcount())
+   aadd(aTemp,(cAlias)->(fieldget(n)))
 next
 return aTemp
 
