@@ -60,10 +60,15 @@ int main( int argc, char *argv[] )
       Parser_pContext->Files.iFiles = 1;
       Parser_pContext->Files.pLast = pSource;
  
+      Parser_pContext->pIDs = NewMap( 2039 );
+      
       ParseSource( Parser_pContext );
       
       IterateAST( Parser_pContext );
-       
+      
+      ListMapEntries( Parser_pContext->pIDs );
+      DeleteMap(Parser_pContext->pIDs );
+      
       pSource = Parser_pContext->Files.pLast;
  
       while( pSource ) 
@@ -89,7 +94,7 @@ void PARSE_ERROR( int iError, const char *sError1, const char *sError2, PARSER_C
    Parser_pContext->sError1 = sError1;
    Parser_pContext->sError2 = sError2;
    
-   ASSERT( Parser_pContext->bCanJump );
+   assert( Parser_pContext->bCanJump );
    
    if( Parser_pContext->bCanJump )
    {
@@ -268,7 +273,6 @@ DECLARED * ParseDeclaredList( DECLARED_KIND Kind, int *piDeclares, PARSER_CONTEX
       }
       
       (*piDeclares)++;
-
 
       if( Kind == DECLARED_KIND_GLOBAL  ||
           Kind == DECLARED_KIND_LOCAL   || Kind == DECLARED_KIND_STATIC ||
@@ -955,7 +959,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
                   DROP_AHEAD_TOKEN();
                   
                   Release_Value( pValue );
-                  pValue = New_IDValue( yylval.sText, DECLARED_KIND_MEMVAR, Parser_pContext ) ;
+                  pValue = New_IDValue( yylval.sText, Kind, Parser_pContext ) ;
                   break;
 
                case TOKEN_MACROVAR:

@@ -44,6 +44,8 @@ const char * ClipNet_DeclaredKind( const DECLARED *pDeclared )
          break;
       CASE_STRING( DECLARED_KIND_FIELD )
          break;
+      CASE_STRING( DECLARED_KIND_GLOBAL )
+         break;
       CASE_STRING( DECLARED_KIND_LOCAL )
          break;
       CASE_STRING( DECLARED_KIND_LOCAL_PARAMETER )

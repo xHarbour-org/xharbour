@@ -1,12 +1,12 @@
 #include "common.h"
 
-int Hash( char *Name )
+static int Hash( char *Name )
 { 
-   unsigned int uiHash = 0;
+   unsigned int uiHash = 5381;
 
    while( *Name )
    {
-      uiHash = ( uiHash << 1 ) + *Name;
+      uiHash = ( ( uiHash << 5 ) + uiHash ) + *Name; // uiHash *= 33 + Char
       Name++;
    }
 
@@ -38,12 +38,14 @@ SYMBOL * Symbol_Put( SYMBOLTABLE *pSymbolTable, char *Name, SYMBOL_KIND Kind, PA
          pSymbol->Kind = (SYMBOL_KIND) ( pSymbol->Kind | Kind );
          return pSymbol;
       }
+      
+      pSymbol = pSymbol->pNext;
    }
 
    pSymbol = NEW( SYMBOL );
 
-   pSymbol->Kind  = Kind;
    pSymbol->pID   = New_ID( Name, Parser_pContext );
+   pSymbol->Kind  = Kind;
    pSymbol->pNext = pSymbolTable->Buckets[ iHash ];
 
    pSymbolTable->Buckets[ iHash ] = pSymbol;
@@ -62,6 +64,8 @@ SYMBOL *Symbol_Get( SYMBOLTABLE *pSymbolTable, char *Name, PARSER_CONTEXT *Parse
       {
          return pSymbol;
       }
+      
+      pSymbol = pSymbol->pNext;
    }
 
    return NULL;

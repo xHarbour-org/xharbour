@@ -11,32 +11,32 @@
 
    #define SYMBOL_DEFINED
 
-   #define HASHSIZE 317
+   #define HASHSIZE 2039
 
    typedef enum 
    {
-      SYMBOL_KIND_FUNCTION  = 0x0001, 
-      SYMBOL_KIND_FUNC_CALL = 0x0002,
+      SYMBOL_KIND_VAR       = 0x0010,
+      SYMBOL_KIND_STATIC    = SYMBOL_KIND_VAR | 0x01,
+      SYMBOL_KIND_LOCAL     = SYMBOL_KIND_VAR | 0x02,
+      SYMBOL_KIND_MEMVAR    = SYMBOL_KIND_VAR | 0x03,
+      SYMBOL_KIND_FIELD     = SYMBOL_KIND_VAR | 0x04,
+      SYMBOL_KIND_GLOBAL    = SYMBOL_KIND_VAR | 0x05,
 
-      SYMBOL_KIND_VAR       = 0x0064,
-      SYMBOL_KIND_STATIC    = 0x0065,
-      SYMBOL_KIND_LOCAL     = 0x0066,
-      SYMBOL_KIND_MEMVAR    = 0x0067,
-      SYMBOL_KIND_FIELD     = 0x0066,
-      SYMBOL_KIND_GLOBAL    = 0x0068,
+      SYMBOL_KIND_FUNCTION  = 0x0100,
+      SYMBOL_KIND_FUNC_CALL = 0x0200,
    } 
    SYMBOL_KIND;
 
    typedef struct _SYMBOL
    {  
-       SYMBOL_KIND Kind;
-       ID *pID;
-       struct _SYMBOL *pNext;   
+      ID *pID;
+      SYMBOL_KIND Kind;
+      struct _SYMBOL *pNext;
    } SYMBOL;
 
    typedef struct _SYMBOLTABLE
    {  
-       SYMBOL *Buckets[ HASHSIZE ];   
+      SYMBOL *Buckets[ HASHSIZE ];
    } SYMBOLTABLE;
         
    /* Initialize the hash table which makes up the symbol table. */   

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6901570E1799ACC80091F7B9 /* emitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 6901570D1799ACC80091F7B9 /* emitter.c */; };
+		69015711179AF9E40091F7B9 /* map.c in Sources */ = {isa = PBXBuildFile; fileRef = 69015710179AF9E40091F7B9 /* map.c */; };
 		694E768C17795B4C00417D9C /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E767617795B4C00417D9C /* common.c */; };
 		694E768D17795B4C00417D9C /* errors.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E767817795B4C00417D9C /* errors.c */; };
 		694E768E17795B4C00417D9C /* lexer.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E767A17795B4C00417D9C /* lexer.c */; };
@@ -15,7 +17,6 @@
 		694E769217795B4C00417D9C /* pp.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E768217795B4C00417D9C /* pp.c */; };
 		694E769317795B4C00417D9C /* reducer.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E768417795B4C00417D9C /* reducer.c */; };
 		694E769417795B4C00417D9C /* release.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E768617795B4C00417D9C /* release.c */; };
-		694E769617795B4C00417D9C /* symbol.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E768917795B4C00417D9C /* symbol.c */; };
 		694E769B177BCB8B00417D9C /* Iterator.c in Sources */ = {isa = PBXBuildFile; fileRef = 694E769A177BCB8B00417D9C /* Iterator.c */; };
 /* End PBXBuildFile section */
 
@@ -32,11 +33,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6901570D1799ACC80091F7B9 /* emitter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = emitter.c; path = Source/Compiler/emitter.c; sourceTree = SOURCE_ROOT; };
+		6901570F1799BBAC0091F7B9 /* emitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = emitter.h; path = Source/Compiler/emitter.h; sourceTree = SOURCE_ROOT; };
+		69015710179AF9E40091F7B9 /* map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = map.c; path = Source/Compiler/map.c; sourceTree = SOURCE_ROOT; };
+		69015712179AF9F10091F7B9 /* map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = map.h; path = Source/Compiler/map.h; sourceTree = SOURCE_ROOT; };
 		694E7647177956EB00417D9C /* x */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = x; sourceTree = BUILT_PRODUCTS_DIR; };
-		694E767517795B4C00417D9C /* clipnet.slx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = clipnet.slx; path = Source/Compiler/clipnet.slx; sourceTree = SOURCE_ROOT; };
+		694E767517795B4C00417D9C /* clipnet.slx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = clipnet.slx; path = Source/Compiler/clipnet.slx; sourceTree = SOURCE_ROOT; };
 		694E767617795B4C00417D9C /* common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = common.c; path = Source/Compiler/common.c; sourceTree = SOURCE_ROOT; };
 		694E767717795B4C00417D9C /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = Source/Compiler/common.h; sourceTree = SOURCE_ROOT; };
-		694E767817795B4C00417D9C /* errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = errors.c; path = Source/Compiler/errors.c; sourceTree = SOURCE_ROOT; };
+		694E767817795B4C00417D9C /* errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = errors.c; path = Source/Compiler/errors.c; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		694E767917795B4C00417D9C /* errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errors.h; path = Source/Compiler/errors.h; sourceTree = SOURCE_ROOT; };
 		694E767A17795B4C00417D9C /* lexer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lexer.c; path = Source/Compiler/lexer.c; sourceTree = SOURCE_ROOT; };
 		694E767B17795B4C00417D9C /* lexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lexer.h; path = Source/Compiler/lexer.h; sourceTree = SOURCE_ROOT; };
@@ -51,12 +56,10 @@
 		694E768617795B4C00417D9C /* release.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = release.c; path = Source/Compiler/release.c; sourceTree = SOURCE_ROOT; };
 		694E768717795B4C00417D9C /* release.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = release.h; path = Source/Compiler/release.h; sourceTree = SOURCE_ROOT; };
 		694E768817795B4C00417D9C /* simplex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = simplex.c; path = Source/Compiler/simplex.c; sourceTree = SOURCE_ROOT; };
-		694E768917795B4C00417D9C /* symbol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = symbol.c; path = Source/Compiler/symbol.c; sourceTree = SOURCE_ROOT; };
-		694E768A17795B4C00417D9C /* symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symbol.h; path = Source/Compiler/symbol.h; sourceTree = SOURCE_ROOT; };
 		694E768B17795B4C00417D9C /* tokens.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tokens.h; path = Source/Compiler/tokens.h; sourceTree = SOURCE_ROOT; };
 		694E769817796C0B00417D9C /* t.prg */ = {isa = PBXFileReference; lastKnownFileType = text; name = t.prg; path = Tests/t.prg; sourceTree = "<group>"; };
 		694E769917796C0B00417D9C /* test.prg */ = {isa = PBXFileReference; lastKnownFileType = text; name = test.prg; path = Tests/test.prg; sourceTree = "<group>"; };
-		694E769A177BCB8B00417D9C /* Iterator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Iterator.c; path = Source/Compiler/Iterator.c; sourceTree = SOURCE_ROOT; };
+		694E769A177BCB8B00417D9C /* Iterator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Iterator.c; path = Source/Compiler/Iterator.c; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		694E769C177BCBF800417D9C /* Iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Iterator.h; path = Source/Compiler/Iterator.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -96,10 +99,14 @@
 				694E767717795B4C00417D9C /* common.h */,
 				694E767817795B4C00417D9C /* errors.c */,
 				694E767917795B4C00417D9C /* errors.h */,
+				6901570D1799ACC80091F7B9 /* emitter.c */,
+				6901570F1799BBAC0091F7B9 /* emitter.h */,
 				694E769A177BCB8B00417D9C /* Iterator.c */,
 				694E769C177BCBF800417D9C /* Iterator.h */,
 				694E767A17795B4C00417D9C /* lexer.c */,
 				694E767B17795B4C00417D9C /* lexer.h */,
+				69015712179AF9F10091F7B9 /* map.h */,
+				69015710179AF9E40091F7B9 /* map.c */,
 				694E767E17795B4C00417D9C /* new.c */,
 				694E767F17795B4C00417D9C /* new.h */,
 				694E768017795B4C00417D9C /* parser.c */,
@@ -111,8 +118,6 @@
 				694E768617795B4C00417D9C /* release.c */,
 				694E768717795B4C00417D9C /* release.h */,
 				694E768817795B4C00417D9C /* simplex.c */,
-				694E768917795B4C00417D9C /* symbol.c */,
-				694E768A17795B4C00417D9C /* symbol.h */,
 				694E768B17795B4C00417D9C /* tokens.h */,
 			);
 			name = Compiler;
@@ -187,8 +192,9 @@
 				694E769217795B4C00417D9C /* pp.c in Sources */,
 				694E769317795B4C00417D9C /* reducer.c in Sources */,
 				694E769417795B4C00417D9C /* release.c in Sources */,
-				694E769617795B4C00417D9C /* symbol.c in Sources */,
 				694E769B177BCB8B00417D9C /* Iterator.c in Sources */,
+				6901570E1799ACC80091F7B9 /* emitter.c in Sources */,
+				69015711179AF9E40091F7B9 /* map.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

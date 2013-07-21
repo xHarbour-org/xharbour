@@ -16,6 +16,7 @@
    #include <string.h>
    #include <limits.h>
    #include <ctype.h>
+   #include <assert.h>
 
    // Types
    #define BOOL int
@@ -25,22 +26,18 @@
    #define LONG long
    #define ULONG unsigned long
 
+   #include "tokens.h"
+   #include "parser.h"
    #include "errors.h"
    #include "new.h"
-   #include "parser.h"
    #include "lexer.h"
    #include "pp.h"
    #include "reducer.h"
    #include "release.h"
-   #include "tokens.h"
    #include "symbol.h"
-   #include "Iterator.h"
-
-   #ifdef __DEBUG__
-      #define ASSERT( x ) ( (x) ? 0 : ( printf( #x ", ASSERT Failed line %i in: " __FILE__,  __LINE__ ), exit(1), 0 ) )
-   #else
-      #define ASSERT( x )
-   #endif
+   #include "iterator.h"
+   #include "emitter.h"
+   #include "map.h"
 
    #define SYMBOL_UNUSED(x) (void) (x)
 

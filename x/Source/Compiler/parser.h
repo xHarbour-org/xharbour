@@ -10,8 +10,6 @@
 #ifndef PARSER_DEFINED
    #include <setjmp.h>
 
-   #include "tokens.h"
-
    #define ID_MAX_LEN 32
 
    #define PARSER_DEFINED
@@ -35,13 +33,15 @@
 
    #define LAST_TOKEN()       ( Parser_pContext->iToken )
 
-#ifndef PARSE_ERROR_FUNCTION
+#ifdef PARSE_ERROR_FUNCTION
+   void PARSE_ERROR( int iError, const char *sError1, const char *sError2, PARSER_CONTEXT *Parser_pContext );
+#else
    #define PARSE_ERROR( i, text1, text2, Parser_pContext ) \
           Parser_pContext->sErrorSource = __SOURCE__; \
           Parser_pContext->sError1 = text1; \
           Parser_pContext->sError2 = text2; \
           \
-          ASSERT( Parser_pContext->bCanJump ); \
+          assert( Parser_pContext->bCanJump ); \
           \
           if( Parser_pContext->bCanJump ) \
           { \
@@ -126,7 +126,8 @@
       PRG_TYPE_CHAR     = 0x0003,
       PRG_TYPE_LOGICAL  = 0x0004,
       PRG_TYPE_NUMERIC  = 0x0008,
-      PRG_TYPE_DECIMAL  = 0x0010,
+      PRG_TYPE_LONG     = PRG_TYPE_NUMERIC | 0x01,
+      PRG_TYPE_DECIMAL  = PRG_TYPE_NUMERIC | 0x02,
       PRG_TYPE_DATE     = 0x0020,
       PRG_TYPE_DATETIME = 0x0021,
       PRG_TYPE_BLOCK    = 0x0040,
@@ -735,6 +736,9 @@
       int                 iPrivates;
       DECLARED *          pPublics;
       int                 iPublics;
+      
+      struct _MAP *       pDeclares;
+      
       BODY *              pBody;
 
       struct _FUNCTION *pNext;
@@ -831,7 +835,10 @@
       PARSED_FILES Files;
       INLINES      Inlines;
       
-      FILE *       pPPO;
+      FILE *        pPPO;
+      
+      struct _MAP * pIDs;
+      struct _MAP * pDeclares;
 
    } PARSER_CONTEXT;
 

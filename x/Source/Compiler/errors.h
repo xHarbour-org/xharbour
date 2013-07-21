@@ -11,8 +11,6 @@
 
    #define ERRORS_DEFINED
 
-   #include "parser.h"
-
    #define PARSER_FAILURE      1
 
    typedef enum

@@ -18,13 +18,22 @@ PARSER_CONTEXT * New_Context()
    return pContext;
 }
 
-ID * New_ID( char *sName, PARSER_CONTEXT *Parser_pContext )
+ID * New_ID( const char *sName, PARSER_CONTEXT *Parser_pContext )
 { 
-   // TODO add search and reuse logic. 
-   ID *pID = NEW( ID ); 
+   ID *pID = GetMapValue( Parser_pContext->pIDs, sName );
+   
+   // TODO add search and reuse logic.
+   if( pID )
+   {
+      return pID;
+   }
+   
+   pID = NEW( ID ); 
    pID->pNext = NULL;
    strcpy( pID->Name, sName );
 
+   AddMapValue( Parser_pContext->pIDs, sName, pID );
+   
    return pID; 
 }
 
@@ -42,13 +51,48 @@ DECLARED * New_Declared( PARSER_CONTEXT *Parser_pContext )
 
 DECLARED * New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
-   DECLARED *pDeclared = NEW( DECLARED );
+   DECLARED *pDeclared = NULL;
+   MAP **pDeclares;
+   
+   if ( Parser_pContext->Functions.pLast )
+   {
+      pDeclares = &Parser_pContext->Functions.pLast->pDeclares;
+   }
+   else
+   {
+      pDeclares = &Parser_pContext->pDeclares;
+   }
+
+   if( *pDeclares )
+   {
+      pDeclared = GetMapValue( *pDeclares, sName );
+   
+      if ( pDeclared )
+      {
+         if ( Kind == DECLARED_KIND_NONE )
+         {
+            return pDeclared;
+         }
+         else
+         {
+            PARSE_ERROR( PARSER_ERR_VAR_DUPL, sName, ClipNet_DeclaredKind( pDeclared ), Parser_pContext );
+         }
+      }
+   }
+   else
+   {
+      *pDeclares = NewMap( 1021 );
+   }
+
+   pDeclared = NEW( DECLARED );
    
    pDeclared->Kind  = Kind;
    pDeclared->Type  = PRG_TYPE_UNDEF;
    pDeclared->pID   = New_ID( sName, Parser_pContext );
    pDeclared->Attribute.pInit = NULL;
    pDeclared->iLine = Parser_pContext->iLine;
+   
+   AddMapValue( *pDeclares, sName, pDeclared );
    
    return pDeclared;
 }
@@ -468,7 +512,7 @@ VALUE * New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContex
    MACRO *pMacro = NEW( MACRO );
 
    pMacro->Kind = Kind;
-   pMacro->Type = PRG_TYPE_NONE;
+   pMacro->Type = PRG_TYPE_UNDEF;
    
    switch( Kind )
    {
@@ -493,7 +537,7 @@ VALUE * New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_
 
    pAliased->pArea  = pArea;
    pAliased->pValue = pValue;
-   pAliased->Type   = PRG_TYPE_NONE;
+   pAliased->Type   = PRG_TYPE_UNDEF;
 
    return New_Value( (void *) pAliased, VALUE_KIND_ALIASED, Parser_pContext );
 }
@@ -514,8 +558,8 @@ ASSIGNMENT * New_Assignment(  VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND K
 {
    ASSIGNMENT *pAssignment = NEW( ASSIGNMENT );
    
-   ASSERT( pLValue );
-   ASSERT( pValue );
+   assert( pLValue );
+   assert( pValue );
    
    pAssignment->Kind = Kind;
    
