@@ -412,7 +412,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              END
           ENDIF
 
-          IF oItem:ColItems[n]:ColType IN {"SERVERTYPE","TARGETTYPE","REPRESENTATION","ALIGNMENT"}
+          IF oItem:ColItems[n]:ColType IN {"FIELDPOS","SERVERTYPE","TARGETTYPE","REPRESENTATION","ALIGNMENT"}
              cText := cText[ oItem:ColItems[n]:SetValue ]
           ENDIF
 
@@ -1268,11 +1268,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           xValue := NIL
         ELSE
           DO CASE
-//             CASE cProp == "Left" .AND. ::ActiveObject:Parent != NIL .AND. __ObjHasMsg( ::ActiveObject:Parent, "HorzScrollPos" )
-//                  aCol[1]:Value += ::ActiveObject:Parent:HorzScrollPos
-
-//             CASE cProp == "Top" .AND. ::ActiveObject:Parent != NIL .AND. __ObjHasMsg( ::ActiveObject:Parent, "VertScrollPos" )
-//                  aCol[1]:Value += ::ActiveObject:Parent:VertScrollPos
+             CASE cProp == "FieldPos"
+                  aCol[1]:Value    := ::ActiveObject:Parent:DataSource:Structure
+                  aCol[1]:ColType  := "FIELDPOS"
+                  aCol[1]:SetValue := ::ActiveObject:FieldPos
+                  xValue := NIL
 
              CASE cProp == "TargetType"
                   aCol[1]:Value    := ::ActiveObject:__TargetTypes
@@ -1942,7 +1942,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType == "ALIGNMENT" .OR. cType == "REPRESENTATION" .OR. cType == "SERVERTYPE"  .OR. cType == "TARGETTYPE"
+               CASE cType IN {"FIELDPOS","ALIGNMENT","REPRESENTATION","SERVERTYPE","TARGETTYPE"}
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -1956,7 +1956,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Create()
 
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
-                           :AddItem( oItem:ColItems[nCol-1]:Value[n] )
+                           :AddItem( IIF( cType == "FIELDPOS", oItem:ColItems[nCol-1]:Value[n][1], oItem:ColItems[nCol-1]:Value[n] ) )
                        NEXT
 
                        :SetCurSel( oItem:ColItems[nCol-1]:SetValue )
@@ -2262,7 +2262,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Create()
 
                        :AddItem( "" )
-
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value[2] )
                            IF oItem:ColItems[nCol-1]:Value[2][n] != NIL
                               :AddItem( oItem:ColItems[nCol-1]:Value[2][n]:Name )
@@ -3462,6 +3461,7 @@ __aProps["F"] := { { "FullRow",                 "Style" },;
                    { "FaceName",                "" },;
                    { "Filter",                  "" },;
                    { "FirstChild",              "" },;
+                   { "FieldPos",                "Behavior" },;
                    { "FreezeColumn",            "Behavior" },;
                    { "Flat",                    "Appearance" },;
                    { "Font",                    "Appearance" },;

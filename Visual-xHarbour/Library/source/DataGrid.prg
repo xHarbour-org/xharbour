@@ -2997,17 +2997,20 @@ METHOD __FillRow( nPos ) CLASS DataGrid
           nStatus := EVAL( ::Children[x]:ControlStatus, Self, ::DataSource:Recno() )
        ENDIF
 
-       cData := ::Children[x]:Data
-
-       IF VALTYPE( cData ) == "B"
-          cData := EVAL( cData, Self )
+       IF ! EMPTY( ::Children[x]:Data )
+          cData := ::Children[x]:Data
+          IF VALTYPE( cData ) == "B"
+             cData := EVAL( cData, Self )
+          ENDIF
+          DEFAULT cData TO "' '"
+          TRY
+             cData := &cData
+          catch
+             cData := ""
+          END
+       ELSE
+          cData := ::DataSource:FieldGet( ::Children[x]:FieldPos )
        ENDIF
-       DEFAULT cData TO "' '"
-       TRY
-          cData := &cData
-       catch
-          cData := ""
-       END
 
        IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
           cData := OemToChar( cData )
@@ -3664,23 +3667,26 @@ RETURN Self
 //----------------------------------------------------------------------------------
 
 METHOD AutoAddColumns( lEdit ) CLASS DataGrid
-   LOCAL aField, oCol, lCol := .F.
+   LOCAL aField, n, oCol, lCol := .F.
    DEFAULT lEdit TO .F.
    
    IF VALTYPE( ::DataSource )=="O" .AND. ::DataSource:IsOpen
       ::__SetBlocks()
 
-      FOR EACH aField IN ::DataSource:Structure
+      FOR n := 1 TO LEN( ::DataSource:Structure )
+          aField := ::DataSource:Structure[n]
 
           oCol := GridColumn( Self )
-          oCol:xText  := __Proper( aField[1] )
+          oCol:xText     := __Proper( aField[1] )
 
-          oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
+          oCol:FieldPos  := n
+
+          //oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
 
           oCol:AllowSize := .T.
           oCol:AllowDrag := .T.
           oCol:Create()
-          oCol:Width    := MAX( aField[3], LEN(oCol:xText)+2 )*7
+          oCol:Width     := MAX( aField[3], LEN(oCol:xText)+2 )*7
 
           DO CASE
              CASE aField[2]=="C"
@@ -3938,6 +3944,7 @@ CLASS GridColumn INHERIT Object
    DATA HeaderAlignment              PUBLISHED INIT 0
    DATA Font                         PUBLISHED
    DATA Type                         PUBLISHED INIT "C"
+   DATA FieldPos                     PUBLISHED INIT 0
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
    DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
