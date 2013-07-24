@@ -413,7 +413,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           ENDIF
 
           IF oItem:ColItems[n]:ColType IN {"FIELDPOS","SERVERTYPE","TARGETTYPE","REPRESENTATION","ALIGNMENT"}
-             cText := cText[ oItem:ColItems[n]:SetValue ]
+             cText := IIF( oItem:ColItems[n]:SetValue > 0, cText[ oItem:ColItems[n]:SetValue ], "None" )
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "SHOWMODE"
@@ -1268,7 +1268,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           xValue := NIL
         ELSE
           DO CASE
-             CASE cProp == "FieldPos"
+             CASE cProp == "FieldPos" .AND. ::ActiveObject:Parent:DataSource != NIL .AND. ::ActiveObject:Parent:DataSource:Structure != NIL
                   aCol[1]:Value    := ::ActiveObject:Parent:DataSource:Structure
                   aCol[1]:ColType  := "FIELDPOS"
                   aCol[1]:SetValue := ::ActiveObject:FieldPos
@@ -1942,7 +1942,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN {"FIELDPOS","ALIGNMENT","REPRESENTATION","SERVERTYPE","TARGETTYPE"}
+               CASE cType IN {"FIELDPOS","ALIGNMENT","REPRESENTATION","SERVERTYPE","TARGETTYPE"} .AND. oItem:ColItems[nCol-1]:Value != NIL
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1

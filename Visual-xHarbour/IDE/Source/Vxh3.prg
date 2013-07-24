@@ -152,20 +152,21 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS FormEditor
    ENDIF
    IF ::Application:ShowRulers
       PaintRulers( ::hWnd,;
-                    nwParam,;
-                    ::RulerWeight,;
-                    ::Originalrect[3],;
-                    ::Originalrect[4],;
-                    rc:Value(),;
-                    ::HorzScrollPos,;
-                    ::VertScrollPos,;
-                    ::RulerFont,;
-                    ::RulerVertFont,;
-                    ::RulerBorder,;
-                    ::RulerBkBrush,;
-                    ::__nCaptionHeight,;
-                    IIF( ::Application:RulerType == 1, 1, 0.39 ),;
-                    ::RulerBrush )
+                   nwParam,;
+                   ::RulerWeight,;
+                   ::Width,;
+                   ::Height,;
+                   rc:Value(),;
+                   ::HorzScrollPos,;
+                   ::VertScrollPos,;
+                   ::RulerFont,;
+                   ::RulerVertFont,;
+                   ::RulerBorder,;
+                   ::RulerBkBrush,;
+                   ::__nCaptionHeight,;
+                   IIF( ::Application:RulerType == 1, 1, 0.39 ),;
+                   ::RulerBrush,;
+                   IIF( IsThemeActive(), 0, 1 ) )
    ENDIF
 RETURN NIL
 
@@ -794,7 +795,7 @@ HB_FUNC( PAINTRULERS )
    float  nPxI;
    float  n10;
    int    n, y, p;
-   int    nGap = 1;
+   int    nGap = hb_parni(16);
    float  x, z, i;
    HBRUSH  hFace  = (HBRUSH) hb_parnl(15);//GetSysColorBrush( COLOR_BTNFACE );
    HBRUSH  hWhite = (HBRUSH) hb_parnl(12);

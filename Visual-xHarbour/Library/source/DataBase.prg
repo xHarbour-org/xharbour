@@ -756,18 +756,22 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             ::Owner:xAlias := cAlias + XSTR( nAlias )
 
          ENDIF
-         dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
-         IF !::Owner:__lMemory .AND. n != NIL
-            ::Owner:AdsSetServerType(n)
-         ENDIF
+         TRY
+            dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
+            IF !::Owner:__lMemory .AND. n != NIL
+               ::Owner:AdsSetServerType(n)
+            ENDIF
+         CATCH
+            RETURN .F.
+         END
       END
-      IF !::Owner:__lMemory .AND. NETERR()
+      IF ! ::Owner:__lMemory .AND. NETERR()
          ::Owner:Error := oErr
          ExecuteEvent( "OnError", ::Owner )
          RETURN .F.
       ENDIF
 
-     IF !::Owner:__lMemory .AND. nServer != NIL
+      IF ! ::Owner:__lMemory .AND. nServer != NIL
          ::Owner:AdsSetServerType( nServer )
       ENDIF
 

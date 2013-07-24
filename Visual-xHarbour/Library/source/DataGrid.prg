@@ -126,8 +126,8 @@ CLASS DataGrid INHERIT TitleControl
    ACCESS Record                INLINE ::__GetPosition()
    ACCESS IsDelIndexOn          INLINE !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
 
-   ACCESS HitTop                INLINE ::DataSource:Bof()
-   ACCESS HitBottom             INLINE ::DataSource:eof()
+   ACCESS HitTop                INLINE ::DataSource == NIL .OR. ::DataSource:Bof()
+   ACCESS HitBottom             INLINE ::DataSource == NIL .OR. ::DataSource:eof()
 
    DATA __HoverBackColor        PROTECTED
 
@@ -2464,7 +2464,7 @@ METHOD __Update( lDisplay, lFillData ) CLASS DataGrid
    ::__SetBlocks()
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
-   ::__DisplayArray    := {}
+   ::__DisplayArray  := {}
    nRec              := ::DataSource:Recno()
    DEFAULT nRec TO 1
    ::__SkipRecords( -(::RowPos-1) )
@@ -3008,8 +3008,10 @@ METHOD __FillRow( nPos ) CLASS DataGrid
           catch
              cData := ""
           END
-       ELSE
+        ELSEIF ::Children[x]:FieldPos > 0 .AND. ::DataSource:Structure != NIL
           cData := ::DataSource:FieldGet( ::Children[x]:FieldPos )
+        ELSE
+          cData := ""
        ENDIF
 
        IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
