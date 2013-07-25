@@ -187,6 +187,9 @@ CLASS DataGrid INHERIT TitleControl
    DATA __cSearch               PROTECTED INIT ""
    DATA __aLastHover            PROTECTED INIT {0,0}
 
+   DATA __nFirstVis             PROTECTED
+   DATA __nLastVis              PROTECTED
+   
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Update()
@@ -242,7 +245,8 @@ CLASS DataGrid INHERIT TitleControl
    METHOD __SetColWidth()
    METHOD __GetDataValue(n)  INLINE &( ::Children[n]:Data )
    METHOD __CheckData()
-
+   METHOD __GetDataWidth()
+   
    METHOD Refresh() INLINE ::InvalidateRect()
    METHOD ColFromPos()
    
@@ -359,13 +363,7 @@ METHOD Create() CLASS DataGrid
    ::xHeight := MIN( ::xHeight, ::Parent:ClientHeight - ::Top - 5 )
 
    Super:Create()
-   ::__DataWidth := 0
-   FOR EACH oColumn IN ::Children
-       IF oColumn:ClsName == "GridColumn" .AND. oColumn:Visible
-          ::__DataWidth += oColumn:Width
-       ENDIF
-   NEXT
-
+   ::__GetDataWidth()
    ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
 
    ::RowCountVisible := Ceil( ::__DataHeight/::ItemHeight )
@@ -382,6 +380,23 @@ METHOD Create() CLASS DataGrid
    ::__UpdateVScrollBar()
    ::__hPrevCursor := ::Cursor
 RETURN Self
+
+METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
+   LOCAL n, nLeft := , nPos := 1
+   DEFAULT lSetPos TO .F.
+   ::__DataWidth := 0
+
+   FOR n := 1 TO LEN( ::Children )
+       nLeft += ::Children[n]:Width
+       
+       IF lSetPos
+          ::Children[n]:xPosition := nPos++
+       ENDIF
+       IF ::Children[n]:Visible
+          ::__DataWidth += ::Children[n]:Width
+       ENDIF
+   NEXT
+RETURN ::__DataWidth
 
 METHOD __GetPosition() CLASS DataGrid
    LOCAL nRec, lDeleted, nKeyNo, nDel := 0, nPos := 0
@@ -868,8 +883,7 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
 
    aDel( ::Children, nCol, .T. )
 
-   ::__DataWidth := 0
-   AEVAL( ::Children, {|o|o:xPosition := n++, ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
+   ::__GetDataWidth(.T.)
    
    IF ::IsWindow()
       TRY
@@ -935,8 +949,6 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
       ::__UpdateHScrollBar(.T.)
    ENDIF
-   ::__DataWidth := 0
-   AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
 RETURN 1
 
 //---------------------------------------------------------------------------------
@@ -964,8 +976,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
 
    IF ::AnchorColumn > 0 .AND. LEN( ::Children ) >= ::AnchorColumn .AND. ( ::__DataWidth <> ::ClientWidth )
       ::Children[ ::AnchorColumn ]:xWidth := ( ::ClientWidth - ::__DataWidth ) + ::Children[ ::AnchorColumn ]:xWidth
-      ::__DataWidth := 0
-      AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
+      ::__GetDataWidth()
       ::__DisplayData()
    ENDIF
 
@@ -2494,14 +2505,14 @@ METHOD __Update( lDisplay, lFillData ) CLASS DataGrid
       ENDIF
    ENDIF
    ::CurPos := ::Record
+   
 RETURN Self
 
 //----------------------------------------------------------------------------------
 METHOD Update() CLASS DataGrid
    LOCAL n, nRec, nUse, nIns
 
-   ::__DataWidth := 0
-   AEVAL( ::Children, {|o| ::__DataWidth += IIF( o:Visible, o:Width, 0 ) } )
+   ::__GetDataWidth()
 
    IF ::DataSource == NIL .OR. ! ::DataSource:IsOpen
       ::__DisplayData()
@@ -2935,7 +2946,7 @@ RETURN 0
 METHOD __FillRow( nPos ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL nBack, nFore, hFont, oFont
+   LOCAL nBack, nFore, hFont, oFont, nFirst, nLast
 
    ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos
@@ -3038,9 +3049,9 @@ METHOD __FillRow( nPos ) CLASS DataGrid
                                            ::Children[x]:Representation,;
                                            hFont,;
                                            ::DataSource:Deleted() }
-       IF ::Children[x]:Visible
-          ::__DataWidth += ::Children[x]:Width
-       ENDIF
+       //IF ::Children[x]:Visible
+       //   ::__DataWidth += ::Children[x]:Width
+       //ENDIF
    NEXT
 
 RETURN Self

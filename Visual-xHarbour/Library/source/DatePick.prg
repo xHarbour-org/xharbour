@@ -107,7 +107,7 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE, DLGC_WANTMESSAGE, NIL )
 
    METHOD OnKeyDown()
-   METHOD __SetBlankDate() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::BlankDate, " ", NIL ) )
+   METHOD __SetBlankDate() INLINE ::Sendmessage( DTM_SETFORMAT, 0, IIF( ::BlankDate, IIF( __SetCentury(), "  /  /    ", "  /  /  " ), NIL ) )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ METHOD Create() CLASS DateTimePicker
 
    ::SetSystemTime()
    IF ::BlankDate
-      ::Sendmessage( DTM_SETFORMAT, 0, " " )
+      ::Sendmessage( DTM_SETFORMAT, 0, IIF( __SetCentury(), "  /  /    ", "  /  /  " ) )
    ENDIF
 
    DEFAULT ::xBackColor         TO ::GetCalendarColor( MCSC_MONTHBK      )
