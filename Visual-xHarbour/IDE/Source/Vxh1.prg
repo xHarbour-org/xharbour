@@ -113,7 +113,7 @@ CLASS IDE INHERIT Application
    DATA ShowGrid         EXPORTED
    DATA ShowRulers       EXPORTED INIT .T.
    DATA ShowDocking      EXPORTED INIT .F.
-   DATA ShowObjExplorerPanel EXPORTED INIT .F.
+   DATA ShowObjExplorerPanel EXPORTED INIT .T.
 
    DATA RulerType        EXPORTED INIT 1
    DATA ShowTip          EXPORTED
@@ -233,39 +233,27 @@ METHOD Init( ... ) CLASS IDE
       RETURN NIL
    ENDIF
 
-   ::ShowTip          := .T.
-   ::ShowRulers       := .T.
-   ::ShowDocking      := .F.
-   ::ShowObjExplorerPanel := .F.
+   ::ShowTip := .T.
    
    ::Sizes       := Hash()
    ::Sizes["ObjectManagerWidth"] := 23
    ::Sizes["ToolBoxWidth"]       := 18
 
-   IF( n := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) ) == 0
-      ::ShowRulers := .F.
-   ENDIF
-
-   IF( n := ::IniFile:ReadInteger( "General", "ShowDocking", 0 ) ) == 1
-      ::ShowDocking := .T.
-   ENDIF
-   IF( n := ::IniFile:ReadInteger( "General", "ShowObjExplorerPanel", 0 ) ) == 1
-      ::ShowObjExplorerPanel := .T.
-   ENDIF
+   ::ShowRulers           := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) == 1
+   ::ShowDocking          := ::IniFile:ReadInteger( "General", "ShowDocking", 0 ) == 1
+   ::ShowObjExplorerPanel := ::IniFile:ReadInteger( "General", "ShowObjExplorerPanel", 1 )== 1
+   ::ShowGrid             := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
+   ::RulerType            := ::IniFile:ReadInteger( "General", "RulerType", 1 )
+   ::DisableWhenRunning   := ::IniFile:ReadLogical( "General", "DisableWhenRunning", .F. )
 
    ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Settings", "WrapSearch", 0 )
    ::EditorProps[ "SaveBAK" ]    := ::IniFile:ReadInteger( "Settings", "SaveBAK", 1 )
 
-   ::ShowGrid   := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
-   ::RulerType  := ::IniFile:ReadInteger( "General", "RulerType", 1 )
-   ::DisableWhenRunning := ::IniFile:ReadLogical( "General", "DisableWhenRunning", .F. )
-
    ::Application:LoadCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
 
-   IF( n := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) ) == 0
-      ::ShowTip := .F.
-   ENDIF
+   ::ShowTip := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) == 0
    ::RunMode := ::IniFile:ReadInteger( "General", "RunMode", 1 )
+
    IF ::RunMode == 2
       ::RunMode := 1
    ENDIF
@@ -1189,9 +1177,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption      := "Show Object Explorer Panel"
             :Action       := <|o|
                                o:Checked := ( ::Application:ShowObjExplorerPanel := ! ::Application:ShowObjExplorerPanel )
-                               IF ::Application:Project:CurrentForm != NIL
-                                  ::Application:Project:CurrentForm:UpdateLayout()
-                               ENDIF
+                               ::Application:MainForm:MessageBox( "Changes will be applied the next time you run Visual xHarbour", "Object Explorer", MB_ICONEXCLAMATION )
                                ::Application:IniFile:WriteInteger( "General", "ShowObjExplorerPanel", IIF( ::Application:ShowObjExplorerPanel, 1, 0 ) )
                              >
 
@@ -1806,7 +1792,7 @@ METHOD Init() CLASS IDE_MainForm
             :AllowUndock   := .T.
             //:DragItems     := .T.
             :Text          := "Object Explorer"
-            :Height        := 300
+            :Height        := 200
             :Dock:Left     := :Parent
             :Dock:Bottom   := :Parent
             :Dock:Right    := :Parent
