@@ -344,8 +344,6 @@ RETURN Self
 //--------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS DataGrid
-   LOCAL oColumn
-
    ::__SetBlocks()
    ::__LinePen      := CreatePen( PS_SOLID, 0, ::GridColor )
    IF ::HighlightBorderColor != NIL
@@ -382,7 +380,7 @@ METHOD Create() CLASS DataGrid
 RETURN Self
 
 METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
-   LOCAL n, nLeft := , nPos := 1
+   LOCAL n, nLeft := 0, nPos := 1
    DEFAULT lSetPos TO .F.
    ::__DataWidth := 0
 
@@ -2946,7 +2944,7 @@ RETURN 0
 METHOD __FillRow( nPos ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL nBack, nFore, hFont, oFont, nFirst, nLast
+   LOCAL nBack, nFore, hFont, oFont //, nFirst, nLast
 
    ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos

@@ -298,7 +298,7 @@ METHOD OnChar( nKey ) CLASS DateTimePicker
 RETURN Self
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
-   LOCAL nRet, nmd
+   LOCAL nRet, nmd, pt := (struct POINT)
    (nwParam)
    DO CASE
       CASE ::Parent:hdr:code == DTN_CLOSEUP
@@ -357,6 +357,8 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
            nRet := ::OnSetFocus( ::Parent:hdr, nlParam )
            nRet := __Evaluate( ::OnDTNSetFocus, Self, ::Parent:hdr, nlParam, nRet )
 
+           GetCaretPos( @pt )
+           VIEW pt:x
    ENDCASE
 RETURN NIL
 

@@ -113,6 +113,7 @@ CLASS IDE INHERIT Application
    DATA ShowGrid         EXPORTED
    DATA ShowRulers       EXPORTED INIT .T.
    DATA ShowDocking      EXPORTED INIT .F.
+   DATA ShowObjExplorerPanel EXPORTED INIT .F.
 
    DATA RulerType        EXPORTED INIT 1
    DATA ShowTip          EXPORTED
@@ -232,9 +233,11 @@ METHOD Init( ... ) CLASS IDE
       RETURN NIL
    ENDIF
 
-   ::ShowTip     := .T.
-   ::ShowRulers  := .T.
-   ::ShowDocking := .F.
+   ::ShowTip          := .T.
+   ::ShowRulers       := .T.
+   ::ShowDocking      := .F.
+   ::ShowObjExplorerPanel := .F.
+   
    ::Sizes       := Hash()
    ::Sizes["ObjectManagerWidth"] := 23
    ::Sizes["ToolBoxWidth"]       := 18
@@ -245,6 +248,9 @@ METHOD Init( ... ) CLASS IDE
 
    IF( n := ::IniFile:ReadInteger( "General", "ShowDocking", 0 ) ) == 1
       ::ShowDocking := .T.
+   ENDIF
+   IF( n := ::IniFile:ReadInteger( "General", "ShowObjExplorerPanel", 0 ) ) == 1
+      ::ShowObjExplorerPanel := .T.
    ENDIF
 
    ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Settings", "WrapSearch", 0 )
@@ -1178,6 +1184,23 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
+         WITH OBJECT ::Application:Props[ "ViewObjExplorer" ] := MenuStripItem( :this )
+            :Checked      := ::Application:ShowObjExplorerPanel
+            :Caption      := "Show Object Explorer Panel"
+            :Action       := <|o|
+                               o:Checked := ( ::Application:ShowObjExplorerPanel := ! ::Application:ShowObjExplorerPanel )
+                               IF ::Application:Project:CurrentForm != NIL
+                                  ::Application:Project:CurrentForm:UpdateLayout()
+                               ENDIF
+                               ::Application:IniFile:WriteInteger( "General", "ShowObjExplorerPanel", IIF( ::Application:ShowObjExplorerPanel, 1, 0 ) )
+                             >
+
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Shift := .T.
+            :ShortCutKey:Key   := ASC( "D" )
+            :Create()
+         END
+
          WITH OBJECT MenuStripItem( :this )
             :ImageIndex   := IIF( :Parent:ImageList != NIL, :Parent:ImageList:Count, 0 )
             :BeginGroup   := .T.
@@ -1755,55 +1778,58 @@ METHOD Init() CLASS IDE_MainForm
 
    // Panel
    WITH OBJECT ::Application:Props[ "ObjectManagerPanel" ] := Panel( Self )
-      :Text             := "Object Manager"
-      :AllowUndock      := .T.
-      :AllowClose       := .T.
-      :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewObjectManagerItem" ]:Checked := .F. ), o:Redock() ) }
-      :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ObjectManagerWidth"])/100,0)
-      :Height           := 300
-      :Dock:Margin      := 2
-      :Dock:Top         := ::Application:Props[ "MainToolBar" ]
-      :Dock:Bottom      := ::StatusBar1
-      :Dock:Right       := :Parent
+      :Text         := "Object Manager"
+      :AllowUndock  := .T.
+      :AllowClose   := .T.
+      :OnWMClose    := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewObjectManagerItem" ]:Checked := .F. ), o:Redock() ) }
+      :Width        := Round( ( :Parent:ClientWidth*::Application:Sizes["ObjectManagerWidth"])/100,0)
+      :Height       := 300
+      :Dock:Margin  := 2
+      :Dock:Top     := ::Application:Props[ "MainToolBar" ]
+      :Dock:Bottom  := ::StatusBar1
+      :Dock:Right   := :Parent
       :Create()
+
       WITH OBJECT ::Application:Props[ "ComboSelect" ] := FormComboBox( :this )
-         :ItemToolTips:= .T.
-         :Dock:Left   := :Parent
-         :Dock:Top    := :Parent
-         :Dock:Right  := :Parent
-         :Height      := 500
-         :Sort        := .T.
-         :Create()
-      END
-
-      WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
-         :Dock:Margin   := 1
-         :AllowUndock   := .T.
-         //:DragItems     := .T.
-         :Text          := "Object Explorer"
-         :Height        := 300
+         :ItemToolTips  := .T.
          :Dock:Left     := :Parent
-         :Dock:Bottom   := :Parent
+         :Dock:Top      := :Parent
          :Dock:Right    := :Parent
-         :Border        := .T.
-         :ExStyle       := 0
-         :HasButtons    := .T.
-         :ShowSelAlways := .T.
+         :Height        := 500
+         :Sort          := .T.
          :Create()
       END
 
-      WITH OBJECT Splitter( :this )
-         :Owner := ::Application:ObjectTree
-         :Position := 2
-         :Create()
-      END
+      IF ::Application:ShowObjExplorerPanel
+         WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
+            :Dock:Margin   := 1
+            :AllowUndock   := .T.
+            //:DragItems     := .T.
+            :Text          := "Object Explorer"
+            :Height        := 300
+            :Dock:Left     := :Parent
+            :Dock:Bottom   := :Parent
+            :Dock:Right    := :Parent
+            :Border        := .T.
+            :ExStyle       := 0
+            :HasButtons    := .T.
+            :ShowSelAlways := .T.
+            :Create()
+         END
+
+         WITH OBJECT Splitter( :this )
+            :Owner := ::Application:ObjectTree
+            :Position := 2
+            :Create()
+         END
+      ENDIF
 
       WITH OBJECT ::Application:ObjectTab := TabStrip( :this )
          :Dock:Margin := 1
          :Dock:Left   := :Parent
          :Dock:Top    := ::Application:Props[ "ComboSelect" ]
          :Dock:Right  := :Parent
-         :Dock:Bottom := ::Application:ObjectTree
+         :Dock:Bottom := IIF( ::Application:ShowObjExplorerPanel, ::Application:ObjectTree, :Parent )
          :Height      := 400
          :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
          :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
@@ -1871,12 +1897,12 @@ METHOD Init() CLASS IDE_MainForm
                END
 
                WITH OBJECT Label( :this )
-                  :Dock:Left  := :Parent
-                  :Dock:Top   := ::Label5
-                  :Dock:Right := :Parent
-                  :Dock:Bottom:= :Parent
-                  :Font:Bold  := .F.
-                  :Visible    := .F.
+                  :Dock:Left   := :Parent
+                  :Dock:Top    := ::Label5
+                  :Dock:Right  := :Parent
+                  :Dock:Bottom := :Parent
+                  :Font:Bold   := .F.
+                  :Visible     := .F.
                   :Create()
                END
             END
@@ -1890,19 +1916,19 @@ METHOD Init() CLASS IDE_MainForm
 
             // Object manager -------------
             WITH OBJECT ::Application:ObjectManager := ObjManager( :this )
-               :Width             := 200
-               :Height            := 300
-               :Dock:Top          := :Parent
-               :Dock:Left         := :Parent
-               :Dock:Bottom       := ::Panel2
-               :Dock:Right        := :Parent
+               :Width         := 200
+               :Height        := 300
+               :Dock:Top      := :Parent
+               :Dock:Left     := :Parent
+               :Dock:Bottom   := ::Panel2
+               :Dock:Right    := :Parent
 
-               :FullRowSelect     := .T.
+               :FullRowSelect := .T.
 
-               :NoHScroll         := .T.
-               :HasButtons        := .T.
-               :LinesAtRoot       := .T.
-               :ShowSelAlways     := .T.
+               :NoHScroll     := .T.
+               :HasButtons    := .T.
+               :LinesAtRoot   := .T.
+               :ShowSelAlways := .T.
 
                :Columns := { {120,C_WHITE}, {120,C_WHITE} }
                :Create()
@@ -1935,6 +1961,25 @@ METHOD Init() CLASS IDE_MainForm
                :ExpandAll()
             END
          END
+
+         IF ! ::Application:ShowObjExplorerPanel
+            WITH OBJECT TabPage( :this )
+               :Caption   := "Object Explorer"
+               :Create()
+               WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
+                  :Dock:Margin   := 1
+                  :Height        := 300
+                  :Dock:Left     := :Parent
+                  :Dock:Top      := :Parent
+                  :Dock:Bottom   := :Parent
+                  :Dock:Right    := :Parent
+                  :ExStyle       := 0
+                  :HasButtons    := .T.
+                  :ShowSelAlways := .T.
+                  :Create()
+               END
+            END
+         ENDIF
 
          WITH OBJECT TabPage( :this )
             :Caption   := "File Explorer"
@@ -2085,7 +2130,6 @@ METHOD Init() CLASS IDE_MainForm
                         (n)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:ToolBox:Enabled    := y > 3
-                        //::Application:ObjectTree:Enabled := y > 3
                         IF y > 3
                            ::Application:Project:CurrentForm:Redraw()
                            IF x == 3 .AND. y == 4
@@ -3131,7 +3175,6 @@ METHOD TabOrder( oBtn ) CLASS Project
    ::Application:ToolBox:Enabled      := !oBtn:Checked
    ::Application:ObjectTab:Enabled    := !oBtn:Checked
    ::Application:EventManager:Enabled := !oBtn:Checked
-   //::Application:ObjectTree:Enabled   := !oBtn:Checked
    ::Application:FileExplorer:Enabled := !oBtn:Checked
    ::Application:FileExplorer:InvalidateRect()
    ::Application:EnableBars( !oBtn:Checked, .T. )
@@ -5813,9 +5856,9 @@ METHOD Build( lForce ) CLASS Project
                 i := AT( "%", cInclude )
                 IF i > 0
                    x := RAT("%",cInclude)-2
-                   cVar     := ::System:GetEnvironment( SUBSTR( cInclude, i+1, x ) )
+                   cVar := ::System:GetEnvironment( SUBSTR( cInclude, i+1, x ) )
                    IF cVar != NIL
-                      cInclude :=  cVar + SubStr( cInclude, x+3 )
+                      cInclude := cVar + SubStr( cInclude, x+3 )
                    ENDIF
                 ENDIF
                 cInc += cInclude+";"
