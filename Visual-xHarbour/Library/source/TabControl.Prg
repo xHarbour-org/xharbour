@@ -1048,6 +1048,8 @@ METHOD Create() CLASS TabPage
 
    IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 
+      ::xPosition := SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT )
+
       rc := (struct RECT)
       rc:Left  := 0
       rc:Top   := 0
@@ -1171,6 +1173,20 @@ METHOD __SetPosition(n) CLASS TabPage
    SendMessage( ::Parent:hWnd, TCM_INSERTITEM, n-1, tci )
 
    ::Parent:Cursel := TabCtrl_GetCurSel( ::Parent:hWnd ) + 1
+
+   ADEL( ::Parent:Children, ::xPosition, .T. )
+   IF n > LEN( ::Parent:Children )
+      AADD( ::Parent:Children, Self )
+    ELSE
+      AINS( ::Parent:Children, n, Self, .T. )
+   ENDIF
+   FOR n := 1 TO LEN( ::Parent:Children )
+       ::Parent:Children[n]:xPosition := n
+       IF ::Parent:Children[n]:__ClassInst != NIL
+          ::Parent:Children[n]:__ClassInst:xPosition := n
+       ENDIF
+   NEXT
+   
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
