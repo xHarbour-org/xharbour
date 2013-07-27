@@ -380,7 +380,7 @@ METHOD Create() CLASS DataGrid
 RETURN Self
 
 METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
-   LOCAL n, nLeft := 0, nPos := 1
+   LOCAL n, nLeft := 0
    DEFAULT lSetPos TO .F.
    ::__DataWidth := 0
 
@@ -388,7 +388,7 @@ METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
        nLeft += ::Children[n]:Width
        
        IF lSetPos
-          ::Children[n]:xPosition := nPos++
+          ::Children[n]:xPosition := n
        ENDIF
        IF ::Children[n]:Visible
           ::__DataWidth += ::Children[n]:Width
@@ -947,6 +947,7 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
       ::__UpdateHScrollBar(.T.)
    ENDIF
+   ::__GetDataWidth()
 RETURN 1
 
 //---------------------------------------------------------------------------------
@@ -2503,7 +2504,6 @@ METHOD __Update( lDisplay, lFillData ) CLASS DataGrid
       ENDIF
    ENDIF
    ::CurPos := ::Record
-   
 RETURN Self
 
 //----------------------------------------------------------------------------------
@@ -2946,7 +2946,6 @@ METHOD __FillRow( nPos ) CLASS DataGrid
    LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
    LOCAL nBack, nFore, hFont, oFont //, nFirst, nLast
 
-   ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos
 
    nBack := ExecuteEvent( "OnQueryBackColor", Self )
@@ -3047,9 +3046,6 @@ METHOD __FillRow( nPos ) CLASS DataGrid
                                            ::Children[x]:Representation,;
                                            hFont,;
                                            ::DataSource:Deleted() }
-       //IF ::Children[x]:Visible
-       //   ::__DataWidth += ::Children[x]:Width
-       //ENDIF
    NEXT
 
 RETURN Self
