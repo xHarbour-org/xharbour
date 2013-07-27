@@ -798,17 +798,13 @@ FUNCTION GC2RGB( p_nColor )
 RETURN ALLTRIM(STR(l_nRed))+","+ALLTRIM(STR(l_nGreen))+","+ALLTRIM(STR(l_nBlue)) 
 
 
-METHOD Update() CLASS System
-   
-   #ifdef VXH_PROFESSIONAL
-      LOCAL cBuffer
-      FreeExplorerBarInfo()
-      GetExplorerBarInfo()
-      cBuffer := ::ExplorerBar:Value()
-      ExplorerBarInfo( @cBuffer )
-      ::ExplorerBar:Buffer( cBuffer )
-   #endif
-
+METHOD Update() CLASS System   
+   LOCAL cBuffer
+   FreeExplorerBarInfo()
+   GetExplorerBarInfo()
+   cBuffer := ::ExplorerBar:Value()
+   ExplorerBarInfo( @cBuffer )
+   ::ExplorerBar:Buffer( cBuffer )
 RETURN Self
 
 CLASS __SysTime

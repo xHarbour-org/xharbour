@@ -3989,7 +3989,9 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
    DEFAULT y    TO ::xTop
    DEFAULT w    TO ::xWidth
    DEFAULT h    TO ::xHeight
+
    DEFAULT lRep TO ::IsWindowVisible()
+
    ::xLeft  := x
    ::xTop   := y
    ::xWidth := w
@@ -4000,7 +4002,7 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
       y := 10-::Parent:VertScrollPos
    ENDIF
 
-   MoveWindow( ::hWnd, x, y, ::xWidth, ::xHeight, lRep )
+   MoveWindow( ::hWnd, x, y, w, h, lRep )
 RETURN Self
 //---------------------------------------------------------------------------------------------
 

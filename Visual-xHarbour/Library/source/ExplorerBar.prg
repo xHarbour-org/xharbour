@@ -215,11 +215,10 @@ RETURN Self
 METHOD OnPaint( hDC, hMemDC ) CLASS ExplorerBar
    LOCAL hMemBitmap, hOldBitmap, rc := (struct RECT)
    hDC := ::BeginPaint()
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   ENDIF
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    rc:left   := 0
    rc:top    := 0
@@ -231,13 +230,13 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ExplorerBar
     ELSE
       FillRect( hMemDC, rc, GetSysColorBrush( COLOR_WINDOW ) )
    ENDIF
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
    ::EndPaint()
 RETURN 0
 
@@ -289,7 +288,6 @@ CLASS Expando INHERIT Button
    METHOD __OnParentSize()
    METHOD OnEraseBkGnd()   INLINE 1
    METHOD OnPaint()
-   METHOD OnParentDrawItem()
    METHOD OnMouseMove()
    METHOD OnMouseLeave()
    METHOD Expand()
@@ -417,24 +415,14 @@ METHOD __OnParentSize( x ) CLASS Expando
    IF ::__ClassInst == NIL .AND. ::Parent:Height < ::Parent:OriginalRect[4] .AND. ( x - GetSystemMetrics( SM_CXVSCROLL ) ) < ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:right + ::System:ExplorerBar:headernormal:rcTLPadding:left
       ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth - GetSystemMetrics( SM_CXVSCROLL )
    ENDIF
-   ::MoveWindow()
-RETURN 0
-
-METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Expando
-   LOCAL lDisabled, lSelected, lFocus
-   (nwParam, nlParam)
-   lDisabled := dis:itemState & ODS_DISABLED != 0
-   lSelected := dis:itemState & ODS_SELECTED != 0
-   lFocus    := dis:itemState & ODS_FOCUS != 0
+   ::MoveWindow( , ::OriginalRect[2] - ::Parent:VertScrollPos )
+   ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
 RETURN 0
 
 METHOD OnMouseMove( nwParam, nlParam ) CLASS Expando
    LOCAL y, nHeight := IIF( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 .AND. ::Parent:ImageList:IconHeight > ::HeaderHeight, ::Parent:ImageList:IconHeight, ::HeaderHeight )
-
    ::Super:OnMouseMove( nwParam, nlParam )
-
    y := HIWORD( nlParam )
-
    IF !::__MouseIn .AND. y <= nHeight
       ::Cursor := ::System:Cursor:LinkSelect
       ::__MouseIn := .T.
@@ -484,15 +472,13 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    cx := ::Left + ::Width
    cy := ::Top + ::Height
 
-   IF hMemDC == NIL
-      x := ::Left
-      y := ::Top
+   x := ::Left
+   y := ::Top
 
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::Parent:ClientWidth, ::Parent:ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-      SendMessage( ::Parent:hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
-   ENDIF
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Parent:Width, ::Parent:Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   SendMessage( ::Parent:hWnd, WM_PRINT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
 
    nIconX := 0
    nIconY := 0
@@ -523,7 +509,6 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
       DestroyIcon( hButton )
 
     ELSE
-
       hPen   := CreatePen( PS_SOLID, 1, oHeader:crTLBorder )
       hBrush := CreateSolidBrush( oHeader:crTLbackground )
 
@@ -577,22 +562,20 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
       ::Parent:ImageList:DrawImage( hMemDC, ::ImageIndex, x, y-nIconY, ILD_TRANSPARENT )
    ENDIF
 
-   IF hMemBitmap != NIL
-      hMemDC1 := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::__aTransparent
-          IF GetParent( oChild:hWnd ) == ::hWnd
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, x + oChild:Left+oChild:__BackMargin, y-nIconY + oChild:Top+oChild:__BackMargin, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC1,  hOldBitmap1 )
+   hMemDC1 := CreateCompatibleDC( hDC )
+   FOR EACH oChild IN ::__aTransparent
+       IF GetParent( oChild:hWnd ) == ::hWnd
+          IF oChild:__hBrush != NIL
+             DeleteObject( oChild:__hBrush )
           ENDIF
-      NEXT
-      DeleteDC( hMemDC1 )
-   ENDIF
+          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
+          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
+          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, x + oChild:Left+oChild:__BackMargin, y-nIconY + oChild:Top+oChild:__BackMargin, SRCCOPY )
+          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
+          SelectObject( hMemDC1,  hOldBitmap1 )
+       ENDIF
+   NEXT
+   DeleteDC( hMemDC1 )
 
    SelectObject( hMemDC, hFont )
    SelectObject( hMemDC, hOldPen )
@@ -600,13 +583,12 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    DeleteObject( hPen )
    DeleteObject( hBrush )
 
-   IF hMemBitmap != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, x, y-nIconY, SRCCOPY )
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, x, y-nIconY, SRCCOPY )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
    ::EndPaint()
 RETURN 0
 
