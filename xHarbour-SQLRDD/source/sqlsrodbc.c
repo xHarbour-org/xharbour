@@ -421,7 +421,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 	        
             char dt[9];
             
-            if (( ulSystemID == SYSTEMID_OTERRO ) ||   (  ulSystemID ==SYSTEMID_MSSQL7  && !sr_lsql2008newTypes() ) ) 
+            if (( ulSystemID == SYSTEMID_OTERRO ) ) 
             {
                dt[0] = bBuffer[6];
                dt[1] = bBuffer[7];

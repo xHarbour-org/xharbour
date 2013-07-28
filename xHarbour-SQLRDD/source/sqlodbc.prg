@@ -294,6 +294,10 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          if  ::nSystemID == SYSTEMID_ORACLE  .and. nLen == 19 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME)
              nType := SQL_DATE
          ENDIF    
+         
+         if ::nsystemId ==  SYSTEMID_MSSQL7 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES()
+            nType := SQL_DATE
+         endif   
 
          cName     := upper(alltrim( cName ))
          cType     := ::SQLType( nType, cName, nLen )

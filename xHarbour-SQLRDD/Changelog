@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-07-28 10:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlodbc.prg 
+  * source/sqlsrodbc.c  
+    ! fix to return date type and correct date values on old sqlserverversion ( sqlserver 2005 and older)
+
 2013-07-21 09:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/oraedit.prg
     source/oraclip.prg
