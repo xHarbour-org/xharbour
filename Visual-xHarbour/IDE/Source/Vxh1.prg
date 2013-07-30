@@ -3712,8 +3712,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
        IF ::Forms[n]:Editor != NIL
           ::Forms[n]:Editor:Close()
           ::Forms[n]:Editor := NIL
-          ::Forms[n]:XFMEditor:Close()
-          ::Forms[n]:XFMEditor := NIL
+          //::Forms[n]:XFMEditor:Close()
+          //::Forms[n]:XFMEditor := NIL
           ::Forms[n]:Destroy()
        ENDIF
    NEXT
@@ -4408,8 +4408,8 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
 
       ::Application:SourceEditor:Source := oForm:Editor
       oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg", cBkMk )
-      oForm:XFMEditor:Open( cSourcePath + "\" + cObjectName + ".xfm" )
-      oForm:XFMEditor:lReadOnly := .T.
+      //oForm:XFMEditor:Open( cSourcePath + "\" + cObjectName + ".xfm" )
+      //oForm:XFMEditor:lReadOnly := .T.
    ENDIF
 
    oForm:__lLoading := .T.
@@ -4429,7 +4429,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    ENDIF
    FClose( hFile )
 
-   oForm:__IdeContextMenuItems := { { "View XFM", {|| oForm:XFMEditor:Owner:Parent:Select(), oForm:XFMEditor:Select() } } }
+   //oForm:__IdeContextMenuItems := { { "View XFM", {|| oForm:XFMEditor:Owner:Parent:Select(), oForm:XFMEditor:Select() } } }
 
    ::Application:ObjectTree:Set( oForm )
    IF oForm:Editor:TreeItem == NIL
@@ -5134,7 +5134,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           oFile:FileBuffer := cWindow
           oFile:Save()
 
-          ::Forms[n]:XFMEditor:Reload( cWindow )
+          //::Forms[n]:XFMEditor:Reload( cWindow )
 
           IF ::Forms[n]:Editor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
              xPath := cSourcePath
@@ -6379,7 +6379,7 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                IF VALTYPE( aAction[7] ) == "C" .AND. UPPER( aAction[7] ) == "FORM"
                   IF ( x := ASCAN( ::Application:Project:Forms, {|o| o:hWnd == aAction[8]:hWnd } ) ) > 0
                      ::Application:Project:Forms[x]:Editor:Close()
-                     ::Application:Project:Forms[x]:XFMEditor:Close()
+                     //::Application:Project:Forms[x]:XFMEditor:Close()
 
                      ADEL( ::Application:Project:Forms, x, .T. )
                      IF x > LEN( ::Application:Project:Forms )

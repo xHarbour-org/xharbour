@@ -23,6 +23,7 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
    METHOD OnGetDlgCode()        INLINE DLGC_WANTMESSAGE
    METHOD OnPaint()
    METHOD OnEraseBkGnd()        INLINE 1
+   METHOD Destroy()             INLINE ::Panel:Destroy()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------

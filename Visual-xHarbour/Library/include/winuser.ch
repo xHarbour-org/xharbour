@@ -1730,7 +1730,7 @@
     //#endif // WINVER >= 0x0500
     //
     //#if(_WIN32_WINNT >=   1280)
-    #define WS_EX_NOACTIVATE          134217728
+    #define WS_EX_NOACTIVATE          0x08000000
     //#endif // _WIN32_WINNT >= 0x0500
 
 

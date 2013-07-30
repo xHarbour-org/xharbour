@@ -971,7 +971,7 @@ METHOD Create( oParent ) CLASS Window
    LOCAL oObj, nError, cError, aSize
    LOCAL cBmpMask, cText
 
-   IF ! ::MDIContainer
+   IF __ObjHasMsg( Self, "MDIContainer" ) .AND. ! ::MDIContainer
       ::MDIClient := NIL
    ENDIF
    
@@ -1099,6 +1099,9 @@ METHOD Create( oParent ) CLASS Window
          nLeft := 10-::Parent:HorzScrollPos
          nTop  := 10-::Parent:VertScrollPos
       ENDIF
+      //IF ::ClsName == "#32768"
+      //   hParent := NIL
+      //ENDIF
       ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, nLeft, nTop, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
     ELSE
       ::hWnd := capCreateCaptureWindow( "CaptureWindow", WS_CHILD | WS_VISIBLE, ::Left, ::Top, ::Width, ::Height, hParent, 0 )

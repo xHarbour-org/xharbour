@@ -109,7 +109,8 @@ CLASS EditBox INHERIT Control
    DATA __oDataGrid                    PROTECTED
 
    DATA __BkCursor                     PROTECTED
-   
+   DATA __oCalendar                    PROTECTED
+
    DATA nImageSize INIT 0
    DATA nArrowSize INIT 0
 
@@ -307,6 +308,16 @@ METHOD Create() CLASS EditBox
    ENDIF
    ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
    ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
+
+   IF .F. //::__ClassInst == NIL
+      WITH OBJECT FloatCalendar( ::Parent )
+         :Left   := ::Left + 14
+         :Top    := ::Top + ::Height + 36
+         :Width  := 200
+         :Height := 200
+         :Create()
+      END
+   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -796,7 +807,7 @@ RETURN nwParam
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
-   LOCAL nStyle, hRegion, hdc, n := 3
+   LOCAL xRet, nStyle, hRegion, hdc, n := 3
    LOCAL aPt := {x,y}
 
    _ScreenToClient( ::hWnd, @aPt )
@@ -824,7 +835,10 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
          ENDIF
       ENDIF
     ELSEIF ::__aImagePos[2] > 0
-      ExecuteEvent( "OnImageClick", Self )
+      xRet := ExecuteEvent( "OnImageClick", Self )
+      IF VALTYPE( xRet ) $ "OU"
+         
+      ENDIF
    ENDIF
 RETURN nwParam
 
@@ -918,7 +932,7 @@ METHOD GetSel( nStart, nEnd ) CLASS EditBox
    cStart := L2Bin( nStart)
    cEnd   := L2Bin( nEnd )
 
-   nRet := SendMessage( ::hWnd, EM_GETSEL, @cStart, @cEnd )
+   nRet   := SendMessage( ::hWnd, EM_GETSEL, @cStart, @cEnd )
 
    nStart := Bin2L( cStart )
    nEnd   := Bin2L( cEnd )
@@ -1070,3 +1084,38 @@ RETURN NIL
 
 CLASS Edit INHERIT EditBox
 ENDCLASS
+
+
+CLASS FloatCalendar INHERIT Window
+   DATA Calendar  EXPORTED
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS FloatCalendar
+   ::__IsControl  := .F.
+   ::__IsStandard := .T.
+   
+   ::Super:Init( oParent )
+   ::Style   := WS_POPUP
+   ::ExStyle := WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE
+    
+   ::ClsName := "#32768"
+   ::ClassStyle := CS_GLOBALCLASS | CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+
+   ::Calendar := MonthCalendar( Self )
+   ::Calendar:xHeight := 0
+   ::Calendar:xWidth  := 0
+RETURN Self
+
+METHOD Create()
+   Super:Create()
+   
+   ::Calendar:Create()
+
+   ::xWidth  := ::Calendar:xWidth
+   ::xHeight := ::Calendar:xHeight
+
+   ::MoveWindow()
+   ::Show()
+RETURN Self
