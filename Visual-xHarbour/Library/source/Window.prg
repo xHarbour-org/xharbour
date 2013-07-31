@@ -2916,7 +2916,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     ENDIF
                  ENDIF
 
-                 IF nRet == NIL .AND. ::hdr:code == TTN_NEEDTEXT
+                 IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
                     IF ::ClsName != "DataGrid"
                        FOR EACH oChild IN ::Children
                            IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0

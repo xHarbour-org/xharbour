@@ -309,15 +309,6 @@ METHOD Create() CLASS EditBox
    ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
    ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
 
-   IF .F. //::__ClassInst == NIL
-      WITH OBJECT FloatCalendar( ::Parent )
-         :Left   := ::Left + 14
-         :Top    := ::Top + ::Height + 36
-         :Width  := 200
-         :Height := 200
-         :Create()
-      END
-   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -837,6 +828,16 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
     ELSEIF ::__aImagePos[2] > 0
       xRet := ExecuteEvent( "OnImageClick", Self )
       IF VALTYPE( xRet ) $ "OU"
+
+         WITH OBJECT ::__oCalendar := FloatCalendar( ::Parent )
+            :Left   := ::Left + 14
+            :Top    := ::Top + ::Height + 36
+            :Width  := 200
+            :Height := 200
+            :Cargo  := Self
+            
+            :Create()
+         END
          
       ENDIF
    ENDIF
@@ -1090,6 +1091,7 @@ CLASS FloatCalendar INHERIT Window
    DATA Calendar  EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Create()
+   METHOD FloatOnSelect()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FloatCalendar
@@ -1104,18 +1106,27 @@ METHOD Init( oParent ) CLASS FloatCalendar
    ::ClassStyle := CS_GLOBALCLASS | CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
 
    ::Calendar := MonthCalendar( Self )
+   ::Calendar:ControlParent := .T.
    ::Calendar:xHeight := 0
    ::Calendar:xWidth  := 0
+   
+   ::Calendar:EventHandler[ "OnSelect" ] := "FloatOnSelect"
 RETURN Self
 
-METHOD Create()
+METHOD Create() CLASS FloatCalendar
    Super:Create()
    
    ::Calendar:Create()
+   ::Calendar:SetFocus()
 
    ::xWidth  := ::Calendar:xWidth
    ::xHeight := ::Calendar:xHeight
 
    ::MoveWindow()
    ::Show()
+RETURN Self
+
+METHOD FloatOnSelect() CLASS FloatCalendar
+   ::Cargo:Text := DTOC( ::Calendar:Date )
+   ::Close()
 RETURN Self
