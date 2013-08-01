@@ -567,7 +567,8 @@ CLASS Window INHERIT Object
    METHOD OnMessage()           VIRTUAL
    METHOD OnSetFont()           VIRTUAL
    METHOD OnNCCreate()          VIRTUAL
-   METHOD OnNCActivate()        VIRTUAL
+   METHOD OnNCActivate()
+ 
    METHOD OnNCHitTest()         VIRTUAL
    METHOD OnNCPaint()           VIRTUAL
    METHOD OnWindowPosChanged()  VIRTUAL
@@ -1791,6 +1792,17 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
    END
    IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
       ::__SetScrollBars()
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnNCActivate( nwParam, nlParam ) CLASS Window
+   LOCAL oWnd
+   IF nwParam == 0 .AND. IsWindow( nlParam )
+      oWnd := ObjFromHandle( nlParam )
+      IF oWnd != NIL .AND. oWnd:ClsName == "FloatShadow"
+         RETURN .T.
+      ENDIF
    ENDIF
 RETURN NIL
 

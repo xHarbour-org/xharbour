@@ -23,12 +23,17 @@
 #Define EM_SHOWBALLOONTIP  (ECM_FIRST + 3)
 #Define EM_HIDEBALLOONTIP  (ECM_FIRST + 4)
 
+#define CS_DROPSHADOW 0x00020000
+
 
 #Define WM_INVALID WM_USER + 50
 #Define WM_CARET   WM_USER + 51
 
+static s_hFloatCalendar
+
 //-----------------------------------------------------------------------------------------------
 CLASS EditBox INHERIT Control
+   DATA DropCalendar      PUBLISHED INIT .F.
    DATA FullSelectOnClick PUBLISHED INIT .F.
    DATA MenuArrow         PUBLISHED INIT .F.
    DATA EnterNext  PUBLISHED INIT .F.
@@ -109,7 +114,6 @@ CLASS EditBox INHERIT Control
    DATA __oDataGrid                    PROTECTED
 
    DATA __BkCursor                     PROTECTED
-   DATA __oCalendar                    PROTECTED
 
    DATA nImageSize INIT 0
    DATA nArrowSize INIT 0
@@ -189,7 +193,7 @@ CLASS EditBox INHERIT Control
    METHOD OnSetFocus()                 INLINE ::Redraw(), NIL
    METHOD OnLButtonDown()
    METHOD OnChar()
-   METHOD OnContextMenu                INLINE IIF( ::ContextArrow, ( ::CallWindowProc(), 0 ), NIL )
+   METHOD OnContextMenu()              INLINE IIF( ::ContextArrow, ( ::CallWindowProc(), 0 ), NIL )
    METHOD __SetLayout()
    METHOD __SetImageIndex()
    METHOD __UpdateDataGrid()
@@ -590,7 +594,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
    ::nArrowSize := 0
 
    IF ::xLayout > 1 .OR. ::Button
-      IF ::Button .OR. ( ::ContextArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
+      IF ::Button .OR. ::DropCalendar .OR. ( ::ContextArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
          nccs := (struct NCCALCSIZE_PARAMS)
          nccs:Pointer( nlParam )
 
@@ -601,7 +605,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
             IF valtype( ::Parent:ImageList ) == "O" .AND. ::ImageIndex > 0
                ::nImageSize := ::Parent:ImageList:IconWidth
             ENDIF
-            IF ::ContextArrow .AND. ::ContextMenu != NIL
+            IF ::DropCalendar .OR. ( ::ContextArrow .AND. ::ContextMenu != NIL )
                ::nArrowSize := 13
             ENDIF
             DO CASE 
@@ -748,6 +752,27 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
          ReleaseDC(::hWnd, hdc)
          DeleteObject( hRegion )
 
+       ELSEIF ::DropCalendar
+         IF s_hFloatCalendar != NIL
+            s_hFloatCalendar:Destroy()
+            s_hFloatCalendar := NIL
+            ::Application:DoEvents()
+          ELSE
+            pt := (struct POINT)
+            pt:x := ::Left
+            pt:y := ::Top + ::Height
+            ClientToScreen( ::Parent:hWnd, @pt )
+            WITH OBJECT ( s_hFloatCalendar := FloatCalendar( ::Parent ) )
+               :Left   := pt:x
+               :Top    := pt:y
+               :Width  := 200
+               :Height := 200
+               :Cargo  := Self
+               :Create()
+            END
+         ENDIF         
+         RETURN 0
+
        ELSEIF ::__aArrowPos[2] > 0
          DO CASE 
 
@@ -793,6 +818,7 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
             RETURN 0
          ENDIF
       ENDIF
+
    ENDIF
 RETURN nwParam
 
@@ -827,19 +853,6 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
       ENDIF
     ELSEIF ::__aImagePos[2] > 0
       xRet := ExecuteEvent( "OnImageClick", Self )
-      IF VALTYPE( xRet ) $ "OU"
-
-         WITH OBJECT ::__oCalendar := FloatCalendar( ::Parent )
-            :Left   := ::Left + 14
-            :Top    := ::Top + ::Height + 36
-            :Width  := 200
-            :Height := 200
-            :Cargo  := Self
-            
-            :Create()
-         END
-         
-      ENDIF
    ENDIF
 RETURN nwParam
 
@@ -1092,25 +1105,31 @@ CLASS FloatCalendar INHERIT Window
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD FloatOnSelect()
+   METHOD FloatClose() INLINE ::Close(), s_hFloatCalendar := NIL
+   METHOD FloatGetDlgCode() INLINE DLGC_WANTMESSAGE
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FloatCalendar
    ::__IsControl  := .F.
-   ::__IsStandard := .T.
+   ::__IsStandard := .F.
    
    ::Super:Init( oParent )
-   ::Style   := WS_POPUP
-   ::ExStyle := WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE
-    
-   ::ClsName := "#32768"
-   ::ClassStyle := CS_GLOBALCLASS | CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+
+   ::Style   := WS_POPUP | WS_CLIPSIBLINGS
+   ::ExStyle := WS_EX_NOACTIVATE | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_CONTROLPARENT
+
+   ::ClassStyle := CS_DROPSHADOW | CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+
+   ::ClsName := "FloatShadow"
 
    ::Calendar := MonthCalendar( Self )
    ::Calendar:ControlParent := .T.
    ::Calendar:xHeight := 0
    ::Calendar:xWidth  := 0
    
-   ::Calendar:EventHandler[ "OnSelect" ] := "FloatOnSelect"
+   ::Calendar:EventHandler[ "OnSelect" ]     := "FloatOnSelect"
+   ::Calendar:EventHandler[ "OnKillFocus" ]  := "FloatClose"
+   ::Calendar:EventHandler[ "OnGetDlgCode" ] := "FloatGetDlgCode"
 RETURN Self
 
 METHOD Create() CLASS FloatCalendar
@@ -1128,5 +1147,7 @@ RETURN Self
 
 METHOD FloatOnSelect() CLASS FloatCalendar
    ::Cargo:Text := DTOC( ::Calendar:Date )
+   s_hFloatCalendar := NIL
    ::Close()
+   ::Cargo:SetFocus()
 RETURN Self

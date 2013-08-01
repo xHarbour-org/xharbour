@@ -3438,6 +3438,7 @@ __aProps["D"] := { { "DisableNoScroll",         "Style" },;
                    { "DragItems",               "Behavior" },;
                    { "DeferenceLinks",          "Behavior" },;
                    { "DropDownStyle",           "Behavior" },;
+                   { "DropCalendar",            "Behavior" },;
                    { "DropDown",                "Behavior" },;
                    { "DisableParent",           "Behavior" },;
                    { "DefaultButton",           "Behavior" },;
