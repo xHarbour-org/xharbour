@@ -29,6 +29,10 @@
 #Define WM_INVALID WM_USER + 50
 #Define WM_CARET   WM_USER + 51
 
+#ifdef VXH_ENTERPRISE
+   #define VXH_PROFESSIONAL
+#endif
+
 static s_hFloatCalendar
 
 //-----------------------------------------------------------------------------------------------
@@ -752,6 +756,8 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
          ReleaseDC(::hWnd, hdc)
          DeleteObject( hRegion )
 
+#ifdef VXH_PROFESSIONAL
+
        ELSEIF ::DropCalendar
          IF s_hFloatCalendar != NIL
             s_hFloatCalendar:Destroy()
@@ -772,6 +778,7 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
             END
          ENDIF         
          RETURN 0
+#endif
 
        ELSEIF ::__aArrowPos[2] > 0
          DO CASE 
@@ -1100,6 +1107,8 @@ CLASS Edit INHERIT EditBox
 ENDCLASS
 
 
+#ifdef VXH_PROFESSIONAL
+
 CLASS FloatCalendar INHERIT Window
    DATA Calendar  EXPORTED
    METHOD Init() CONSTRUCTOR
@@ -1126,7 +1135,6 @@ METHOD Init( oParent ) CLASS FloatCalendar
    ::Calendar:ControlParent := .T.
    ::Calendar:xHeight := 0
    ::Calendar:xWidth  := 0
-   
    ::Calendar:EventHandler[ "OnSelect" ]     := "FloatOnSelect"
    ::Calendar:EventHandler[ "OnKillFocus" ]  := "FloatClose"
    ::Calendar:EventHandler[ "OnGetDlgCode" ] := "FloatGetDlgCode"
@@ -1135,6 +1143,7 @@ RETURN Self
 METHOD Create() CLASS FloatCalendar
    Super:Create()
    
+   ::Calendar:Date    := CTOD( xStr( ::Cargo:Text ) )   
    ::Calendar:Create()
    ::Calendar:SetFocus()
 
@@ -1151,3 +1160,5 @@ METHOD FloatOnSelect() CLASS FloatCalendar
    ::Close()
    ::Cargo:SetFocus()
 RETURN Self
+
+#endif
