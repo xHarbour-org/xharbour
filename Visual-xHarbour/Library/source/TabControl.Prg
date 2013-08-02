@@ -64,7 +64,6 @@ CLASS TabControl INHERIT Control
 
    DATA OnSelChanged     EXPORTED
    DATA TabBrush         EXPORTED
-   DATA __Tabs           EXPORTED  INIT {}
 
    DATA CloseBtn         PROTECTED
    DATA PinBtn           PROTECTED
@@ -1092,7 +1091,7 @@ METHOD Create() CLASS TabPage
          ENDIF
       ENDIF
 
-      AADD( ::Parent:__Tabs, NIL )
+      SetWindowLong( ::hWnd, GWL_USERDATA, 1 )
      
       IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
          ::HideTab()
@@ -1142,6 +1141,7 @@ RETURN NIL
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
+      view lVisible
       IF !lVisible
          ::__Hide()
        ELSE
@@ -1333,12 +1333,13 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Hide() CLASS TabPage
-   LOCAL nPos := ::__GetPosition()
-   DEFAULT ::Parent:__Tabs TO ARRAY( ::Parent:GetItemCount()  )
-   IF ::Parent:__Tabs[ nPos ] == NIL
-      
+   LOCAL lVisible, nPos
+
+   lVisible := GetWindowLong( ::hWnd, GWL_USERDATA ) == 1
+   IF lVisible
+      nPos := ::__GetPosition()
       ::Parent:SendMessage( TCM_DELETEITEM, nPos - 1, 0 )
-      ::Parent:__Tabs[ nPos ] := ::hWnd
+      SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
 
       IF ::Parent:CurSel == nPos
          Super:Hide()
@@ -1354,10 +1355,12 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Show() CLASS TabPage
-   LOCAL tci, nPos, n := 0
-   nPos := ASCAN( ::Parent:__Tabs, ::hWnd,,, .T. )
-   
-   IF nPos > 0
+   LOCAL lVisible, tci, nPos, n := 0
+
+   lVisible := GetWindowLong( ::hWnd, GWL_USERDATA ) == 1
+   IF ! lVisible
+      nPos := ::__GetPosition()   
+
       tci := (struct TCITEM)
       tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
       tci:pszText := ::Text
@@ -1369,7 +1372,6 @@ METHOD __Show() CLASS TabPage
          ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
       ENDIF
       ::Parent:GetItemObject():ShowTab()
-      ::Parent:__Tabs[ nPos ] := NIL
    ENDIF
 RETURN Self
 
