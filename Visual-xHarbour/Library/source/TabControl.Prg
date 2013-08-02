@@ -48,9 +48,10 @@ CLASS TabControl INHERIT Control
    PROPERTY FocusNever          INDEX TCS_FOCUSNEVER     READ xFocusNever          WRITE SetStyle       DEFAULT .F. PROTECTED
    PROPERTY FixedWidth          INDEX TCS_FIXEDWIDTH     READ xFixedWidth          WRITE SetStyle       DEFAULT .F. PROTECTED
    PROPERTY ColorInactiveHeader                          READ xColorInactiveHeader WRITE InvalidateRect DEFAULT .F. PROTECTED
-
+   
    ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
+   DATA MinTabWidth      PUBLISHED INIT -1
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.
    
@@ -294,6 +295,7 @@ METHOD Create() CLASS TabControl
    IF ! ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
    ENDIF
+   SendMessage( ::hWnd, TCM_SETMINTABWIDTH, 0, ::MinTabWidth )
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "Add TabPage", {|o| o:=::Application:Project:AddControl( "TabPage", Self ) } }}
    ENDIF

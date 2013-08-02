@@ -291,6 +291,7 @@ METHOD SelectControl( oControl ) CLASS WindowEdit
 
       ::Application:ObjectManager:ResetProperties( ::Selected )
       ::Application:EventManager:ResetEvents( ::Selected )
+      ::Application:ObjectManager:Parent:Select()
 
       IF ! UPPER(oControl:ClsName) IN {"MENUITEM", "CMENUITEM" }
          ::UpdateSelection()
@@ -725,6 +726,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                IF ::MouseDown
                   ::CheckMouse( x, y )
                ENDIF
+               ::Application:ObjectManager:Parent:Select()
             ENDIF
 
          ENDIF
@@ -1193,6 +1195,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          IF LEN( ::Selected ) == 1 //.AND. ::Selected[1][1]:__xCtrlName == "GroupBox"
             ::Application:ObjectManager:ResetProperties( ::Selected )
             ::Application:EventManager:ResetEvents( ::Selected )
+            ::Application:ObjectManager:Parent:Select()
          ENDIF
          IF EMPTY( ::Selected )
             ::Selected := { { Self } }

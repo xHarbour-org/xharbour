@@ -3554,6 +3554,7 @@ __aProps["M"] := { { "MaximizeBox",             "Style" },;
                    { "MimeFormatted",           "" },;
                    { "MixedButtons",            "Style" },;
                    { "MaskType",                "" },;
+                   { "MinTabWidth",             "Appearance" },;
                    { "MenuArrow",               "Appearance" },;
                    { "Message",                 "Appearance" },;
                    { "MultiColumn",             "Appearance" },;
