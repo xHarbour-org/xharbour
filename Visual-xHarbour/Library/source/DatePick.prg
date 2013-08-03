@@ -358,7 +358,6 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
            nRet := __Evaluate( ::OnDTNSetFocus, Self, ::Parent:hdr, nlParam, nRet )
 
            GetCaretPos( @pt )
-           VIEW pt:x
    ENDCASE
 RETURN NIL
 

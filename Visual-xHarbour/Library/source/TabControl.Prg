@@ -901,7 +901,8 @@ CLASS TabPage INHERIT Dialog
    ACCESS Form             INLINE ::Parent:Form
    
    DATA __aRect            PROTECTED
-   
+   DATA __nPos             PROTECTED INIT 0
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnGetDlgCode()   INLINE DLGC_WANTMESSAGE
@@ -1090,8 +1091,6 @@ METHOD Create() CLASS TabPage
             RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( cText[n+1] ) )
          ENDIF
       ENDIF
-
-      SetWindowLong( ::hWnd, GWL_USERDATA, 1 )
      
       IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
          ::HideTab()
@@ -1141,7 +1140,6 @@ RETURN NIL
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
-      view lVisible
       IF !lVisible
          ::__Hide()
        ELSE
@@ -1333,21 +1331,18 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Hide() CLASS TabPage
-   LOCAL lVisible, nPos
+   IF ::__nPos == 0
+      ::__nPos := ::__GetPosition()
+      ::Parent:SendMessage( TCM_DELETEITEM, ::__nPos - 1, 0 )
+      SetProp( ::hWnd, "TabPageVisible", 0 )
 
-   lVisible := GetWindowLong( ::hWnd, GWL_USERDATA ) == 1
-   IF lVisible
-      nPos := ::__GetPosition()
-      ::Parent:SendMessage( TCM_DELETEITEM, nPos - 1, 0 )
-      SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
-
-      IF ::Parent:CurSel == nPos
+      IF ::Parent:CurSel == ::__nPos
          Super:Hide()
          IF ::Parent:GetItemCount() > 0
             ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
             ::Parent:GetItemObject():ShowTab()
          ENDIF
-       ELSEIF ::Parent:CurSel > nPos
+       ELSEIF ::Parent:CurSel > ::__nPos
          ::Parent:CurSel--
       ENDIF
    ENDIF
@@ -1355,23 +1350,20 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Show() CLASS TabPage
-   LOCAL lVisible, tci, nPos, n := 0
-
-   lVisible := GetWindowLong( ::hWnd, GWL_USERDATA ) == 1
-   IF ! lVisible
-      nPos := ::__GetPosition()   
-
+   LOCAL tci, n := 0
+   IF ::__nPos > 0
       tci := (struct TCITEM)
       tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
       tci:pszText := ::Text
       tci:lParam  := ::hWnd
       tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
-      SendMessage( ::Parent:hWnd, TCM_INSERTITEM, nPos-1, tci )
+      SendMessage( ::Parent:hWnd, TCM_INSERTITEM, ::__nPos-1, tci )
 
-      IF ::Parent:CurSel >= nPos
+      IF ::Parent:CurSel >= ::__nPos
          ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
       ENDIF
       ::Parent:GetItemObject():ShowTab()
+      ::__nPos := 0
    ENDIF
 RETURN Self
 

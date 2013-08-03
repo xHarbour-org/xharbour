@@ -67,7 +67,7 @@ CLASS ListBox FROM TitleControl
    METHOD SetCurSel(nLine)                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETCURSEL, nLine-1, 0), NIL )
    METHOD SetSel(nLine,lSel)               INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETSEL, IIF(lSel,1,0), MAKELPARAM(nLine, 0)), NIL )
    METHOD FindString(nStart,cStr)          INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr)+1, NIL )
-   METHOD FindExact(nStart,cStr)           INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRINGEXACT, IFNIL(nStart,-1,nStart), cStr), NIL )
+   METHOD FindStringExact(nStart,cStr)     INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_FINDSTRINGEXACT, IFNIL(nStart,-1,nStart), cStr), NIL )
    METHOD GetCount()                       INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETCOUNT, 0, 0), NIL )
    METHOD GetCurSel()                      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETCURSEL, 0, 0)+1, NIL )
    METHOD Dir(nAttr, cFileSpec)            INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_DIR, nAttr, cFileSpec), NIL )

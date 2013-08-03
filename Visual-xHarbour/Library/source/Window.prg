@@ -756,11 +756,22 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD SaveValues() CLASS Window
-   LOCAL n
+   LOCAL n, xValue
    ::__aValues := {}
    FOR n := 1 TO LEN( ::Children )
-       IF __objHasMsg( ::Children[n], "Text" )
-          AADD( ::__aValues, { ::Children[n]:Name, ::Children[n]:Text } )
+       xValue := NIL
+       DO CASE
+          CASE ::Children[n]:__xCtrlName IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" }
+               xValue := ::Children[n]:Text
+
+          CASE ::Children[n]:__xCtrlName == "ComboBox"
+               xValue := ::Children[n]:GetSelString()
+
+          CASE ::Children[n]:__xCtrlName == "ListBox"
+               xValue := ::Children[n]:GetText()
+       ENDCASE
+       IF xValue != NIL
+          AADD( ::__aValues, { ::Children[n]:Name, xValue, ::Children[n]:__xCtrlName } )
        ENDIF
    NEXT
 RETURN ::__aValues
@@ -772,7 +783,13 @@ METHOD RestoreValues( aValues ) CLASS Window
    FOR n := 1 TO LEN( aValues )
        oCtrl := ::GetControl( aValues[n][1] )
        IF oCtrl != NIL
-          oCtrl:Text := aValues[n][2]
+          DO CASE
+             CASE aValues[n][3] IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" }
+                  oCtrl:Text := aValues[n][2]
+
+             CASE aValues[n][3] IN { "ComboBox", "ListBox" }
+                  oCtrl:SetCurSel( oCtrl:FindStringExact( -1, aValues[n][2] ) )
+          ENDCASE
        ENDIF
    NEXT
 RETURN Self

@@ -378,7 +378,6 @@ METHOD OnEndDrag( oTarget ) CLASS ObjectTreeView
       oObj := ::oDrag:Cargo
       nPos := ASCAN( oTarget:Cargo:Parent:Children, {|o| o==oTarget:Cargo} )
       IF nPos > 0
-         VIEW oTarget:Text
          IF ! ( ::oDrag:Cargo:Parent == oTarget:Cargo:Parent )
             ::oDrag:Cargo:SetParent( oTarget:Cargo:Parent )
          ENDIF
@@ -601,7 +600,7 @@ METHOD OnDropFiles() CLASS FileExplorer
           ::Application:Project:AddBinary( cFile )
         ELSE
           ::Application:Project:AddSource( cFile )
-      ENDIF
+       ENDIF
    NEXT
 RETURN Self
 
@@ -620,7 +619,6 @@ METHOD UpdateView() CLASS FileExplorer
 
    IF ::nPrgImg == -1
       SHGetFileInfo( ".prg", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
-      view shfi:hIcon
       ::ImageList:AddIcon( shfi:hIcon )
       ::nPrgImg := ::ImageList:Count
    ENDIF
