@@ -5796,7 +5796,7 @@ METHOD Build( lForce ) CLASS Project
    ::Application:ErrorView:ResetContent()
 
    ::Application:MainForm:DebugBuild1:ResetContent()
-   ::Application:MainForm:TabPage4:Select()
+   ::Application:MainForm:DebugBuild1:Parent:Select()
    ::Application:MainForm:DebugBuild1:SetFocus()
    ::Application:MainForm:DebugBuild1:AddItem( "Building: "+::Properties:Name )
    ::Application:MainForm:DebugBuild1:Redraw()

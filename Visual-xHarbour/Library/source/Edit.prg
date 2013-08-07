@@ -39,7 +39,6 @@ static s_hFloatCalendar
 CLASS EditBox INHERIT Control
    DATA DropCalendar      PUBLISHED INIT .F.
    DATA FullSelectOnClick PUBLISHED INIT .F.
-   DATA MenuArrow         PUBLISHED INIT .F.
    DATA EnterNext  PUBLISHED INIT .F.
    DATA EnumLayout                     EXPORTED INIT { { "None",;
                                                          "Text, Image, Arrow",;
@@ -49,26 +48,26 @@ CLASS EditBox INHERIT Control
                                                          "Arrow, Text, Image",; 
                                                          "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
  
-   PROPERTY Layout                                      READ xLayout           WRITE __SetLayout  DEFAULT 1   PROTECTED
+   PROPERTY MenuArrow                                   READ xMenuArrow        WRITE __SetMenuArrow  DEFAULT .F.
+   PROPERTY Layout                                      READ xLayout           WRITE __SetLayout     DEFAULT 1   PROTECTED
    PROPERTY AutoVScroll   INDEX ES_AUTOVSCROLL          READ xAutoVScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
    PROPERTY AutoHScroll   INDEX ES_AUTOHSCROLL          READ xAutoHScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
-   PROPERTY MultiLine     INDEX ES_MULTILINE            READ xMultiLine        WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY Password      INDEX ES_PASSWORD             READ xPassword         WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY NoHideSel     INDEX ES_NOHIDESEL            READ xNoHideSel        WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY OemConvert    INDEX ES_OEMCONVERT           READ xOemConvert       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY ReadOnly                                    READ xReadOnly         WRITE SetReadOnly  DEFAULT .F. PROTECTED
-   PROPERTY WantReturn    INDEX ES_WANTRETURN           READ xWantReturn       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY HorzScroll    INDEX WS_HSCROLL              READ xHorzScroll       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY VertScroll    INDEX WS_VSCROLL              READ xVertScroll       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY Case                                        READ xCase             WRITE SetCase      DEFAULT 1   PROTECTED
-   PROPERTY Border        INDEX WS_BORDER               READ xBorder           WRITE SetStyle     DEFAULT !__GetApplication():IsThemedXP PROTECTED
-   PROPERTY Number        INDEX ES_NUMBER               READ xNumber           WRITE SetStyle     DEFAULT .F.
+   PROPERTY MultiLine     INDEX ES_MULTILINE            READ xMultiLine        WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY Password      INDEX ES_PASSWORD             READ xPassword         WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY NoHideSel     INDEX ES_NOHIDESEL            READ xNoHideSel        WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY OemConvert    INDEX ES_OEMCONVERT           READ xOemConvert       WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY ReadOnly                                    READ xReadOnly         WRITE SetReadOnly     DEFAULT .F. PROTECTED
+   PROPERTY WantReturn    INDEX ES_WANTRETURN           READ xWantReturn       WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY HorzScroll    INDEX WS_HSCROLL              READ xHorzScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY VertScroll    INDEX WS_VSCROLL              READ xVertScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY Case                                        READ xCase             WRITE SetCase         DEFAULT 1   PROTECTED
+   PROPERTY Border        INDEX WS_BORDER               READ xBorder           WRITE SetStyle        DEFAULT !__GetApplication():IsThemedXP PROTECTED
+   PROPERTY Number        INDEX ES_NUMBER               READ xNumber           WRITE SetStyle        DEFAULT .F.
 
-   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle   DEFAULT .T. PROTECTED
+   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle      DEFAULT .T. PROTECTED
 
    PROPERTY ContextMenu                                 GET __ChkComponent( Self, @::xContextMenu ) SET __SetContextMenu
    PROPERTY CueBanner                                   READ xCueBanner        WRITE SetCueBanner
-   PROPERTY ContextArrow                                READ xContextArrow     WRITE __SetContextMenu DEFAULT .F. PROTECTED
    PROPERTY ImageIndex                                  READ xImageIndex       WRITE __SetImageIndex  DEFAULT 0   PROTECTED
 
    PROPERTY DataSource    GET __ChkComponent( Self, @::xDataSource )
@@ -79,18 +78,15 @@ CLASS EditBox INHERIT Control
    DATA DataSearchField                PUBLISHED INIT 1
    DATA DataSearchWidth                PUBLISHED INIT 0
    DATA DataSearchRecords              PUBLISHED INIT 0
-   //--------------------------------------------------------------------------
 
    DATA ImageList                      EXPORTED
    DATA AllowUnDock                    EXPORTED INIT FALSE
    DATA AllowClose                     EXPORTED INIT FALSE
-
-   DATA Button                         EXPORTED  INIT .F.
-   DATA ButtonPushed                   PROTECTED INIT .F.
+   DATA Button                         EXPORTED INIT .F.
    DATA ButtonAction                   EXPORTED
-
    DATA BackSysColor                   EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA ForeSysColor                   EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
+   DATA LastKey                        EXPORTED INIT 0
 
    DATA xSelForeColor                  EXPORTED
    ACCESS SelForeColor                 INLINE ::xSelForeColor PERSISTENT //IIF( ::xSelForeColor == NIL, ::ForeSysColor, ::xSelForeColor ) PERSISTENT
@@ -111,16 +107,14 @@ CLASS EditBox INHERIT Control
    ACCESS Modified                     INLINE ::SendMessage( EM_GETMODIFY, 0, 0 ) == 1
    ASSIGN Modified(l)                  INLINE ::SendMessage( EM_SETMODIFY, l, 0 )
 
-   DATA LastKey                        EXPORTED INIT 0
-
+   DATA __ButtonPushed                 PROTECTED INIT .F.
    DATA __aArrowPos                    PROTECTED INIT {0,0}
    DATA __aImagePos                    PROTECTED INIT {0,0}
    DATA __oDataGrid                    PROTECTED
-
    DATA __BkCursor                     PROTECTED
 
-   DATA nImageSize INIT 0
-   DATA nArrowSize INIT 0
+   DATA __nImageSize                   PROTECTED INIT 0
+   DATA __nArrowSize                   PROTECTED INIT 0
 
    METHOD Init()     CONSTRUCTOR
    METHOD Create()
@@ -197,7 +191,7 @@ CLASS EditBox INHERIT Control
    METHOD OnSetFocus()                 INLINE ::Redraw(), NIL
    METHOD OnLButtonDown()
    METHOD OnChar()
-   METHOD OnContextMenu()              INLINE IIF( ::ContextArrow, ( ::CallWindowProc(), 0 ), NIL )
+   METHOD OnContextMenu()              INLINE IIF( ::MenuArrow, ( ::CallWindowProc(), 0 ), NIL )
    METHOD __SetLayout()
    METHOD __SetImageIndex()
    METHOD __UpdateDataGrid()
@@ -205,6 +199,7 @@ CLASS EditBox INHERIT Control
    METHOD OnNCMouseMove()
    METHOD OnMouseMove()
    METHOD __SetAutoScroll()
+   METHOD __SetMenuArrow()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -293,6 +288,17 @@ METHOD Init( oParent ) CLASS EditBox
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD __SetMenuArrow() CLASS EditBox
+   IF ::xLayout == 0 .AND. ::xMenuArrow
+      ::xLayout := 1
+   ENDIF
+   IF ::IsWindow()
+      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS EditBox
    LOCAL pWi, n
    IF ::Transparent
@@ -302,7 +308,6 @@ METHOD Create() CLASS EditBox
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
    ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-   //::__UnSubclass()
    IF ::__ClassInst == NIL 
       IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:Buddy)=="C" .AND. o:Buddy == ::Name } ) ) > 0
          ::Parent:Children[n]:xBuddy := Self
@@ -316,7 +321,6 @@ METHOD Create() CLASS EditBox
    ENDIF
    ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
    ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
-
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -566,7 +570,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD __SetContextMenu() CLASS EditBox
-   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER )
+   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER )
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
@@ -594,11 +598,11 @@ RETURN NIL
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
    LOCAL n, nccs
    (nwParam)
-   ::nImageSize := 0
-   ::nArrowSize := 0
+   ::__nImageSize := 0
+   ::__nArrowSize := 0
 
    IF ::xLayout > 1 .OR. ::Button
-      IF ::Button .OR. ::DropCalendar .OR. ( ::ContextArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
+      IF ::Button .OR. ::DropCalendar .OR. ::MenuArrow .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
          nccs := (struct NCCALCSIZE_PARAMS)
          nccs:Pointer( nlParam )
 
@@ -607,43 +611,43 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
           ELSE      
             n := 2
             IF valtype( ::Parent:ImageList ) == "O" .AND. ::ImageIndex > 0
-               ::nImageSize := ::Parent:ImageList:IconWidth
+               ::__nImageSize := ::Parent:ImageList:IconWidth
             ENDIF
-            IF ::DropCalendar .OR. ( ::ContextArrow .AND. ::ContextMenu != NIL )
-               ::nArrowSize := 13
+            IF ::DropCalendar .OR. ::MenuArrow
+               ::__nArrowSize := 13
             ENDIF
             DO CASE 
                CASE ::xLayout == 2 // "Text, Image, Arrow"
-                    nccs:rgrc[1]:right -= ( ::nArrowSize + ::nImageSize )
-                    ::__aImagePos := { ::Width - ( ::nImageSize + ::nArrowSize ) - n, ::nImageSize }
-                    ::__aArrowPos := { ::Width - ::nArrowSize - n, ::nArrowSize }
+                    nccs:rgrc[1]:right -= ( ::__nArrowSize + ::__nImageSize )
+                    ::__aImagePos := { ::Width - ( ::__nImageSize + ::__nArrowSize ) - n, ::__nImageSize }
+                    ::__aArrowPos := { ::Width - ::__nArrowSize - n, ::__nArrowSize }
 
                CASE ::xLayout == 3 // "Text, Arrow, Image"
-                    nccs:rgrc[1]:right -= ( ::nArrowSize + ::nImageSize )
-                    ::__aArrowPos := { ::Width - ( ::nArrowSize + ::nImageSize ) - n, ::nArrowSize }
-                    ::__aImagePos := { ::Width - ::nImageSize - n, ::nImageSize }
+                    nccs:rgrc[1]:right -= ( ::__nArrowSize + ::__nImageSize )
+                    ::__aArrowPos := { ::Width - ( ::__nArrowSize + ::__nImageSize ) - n, ::__nArrowSize }
+                    ::__aImagePos := { ::Width - ::__nImageSize - n, ::__nImageSize }
 
                CASE ::xLayout == 4 // "Image, Text, Arrow"
-                    nccs:rgrc[1]:left  += ::nImageSize
-                    nccs:rgrc[1]:right -= ::nArrowSize
-                    ::__aImagePos := { n, ::nImageSize }
-                    ::__aArrowPos := { ::Width - ::nArrowSize - n, ::nArrowSize }
+                    nccs:rgrc[1]:left  += ::__nImageSize
+                    nccs:rgrc[1]:right -= ::__nArrowSize
+                    ::__aImagePos := { n, ::__nImageSize }
+                    ::__aArrowPos := { ::Width - ::__nArrowSize - n, ::__nArrowSize }
 
                CASE ::xLayout == 5 // "Image, Arrow, Text"
-                    nccs:rgrc[1]:left  += ( ::nArrowSize + ::nImageSize )
-                    ::__aImagePos := { n, ::nImageSize }
-                    ::__aArrowPos := { n + ::nImageSize, ::nArrowSize }
+                    nccs:rgrc[1]:left  += ( ::__nArrowSize + ::__nImageSize )
+                    ::__aImagePos := { n, ::__nImageSize }
+                    ::__aArrowPos := { n + ::__nImageSize, ::__nArrowSize }
 
                CASE ::xLayout == 6 // "Arrow, Text, Image"
-                    nccs:rgrc[1]:left  += ::nArrowSize
-                    nccs:rgrc[1]:right -= ::nImageSize
-                    ::__aArrowPos := { n, ::nArrowSize }
-                    ::__aImagePos := { ::Width - ::nImageSize - n, ::nImageSize }
+                    nccs:rgrc[1]:left  += ::__nArrowSize
+                    nccs:rgrc[1]:right -= ::__nImageSize
+                    ::__aArrowPos := { n, ::__nArrowSize }
+                    ::__aImagePos := { ::Width - ::__nImageSize - n, ::__nImageSize }
 
                CASE ::xLayout == 7 // "Arrow, Image, Text"
-                    nccs:rgrc[1]:left  += ( ::nArrowSize + ::nImageSize )
-                    ::__aArrowPos := { n, ::nArrowSize, -( ::nArrowSize + ::nImageSize ) }
-                    ::__aImagePos := { n + ::nArrowSize, ::nImageSize }
+                    nccs:rgrc[1]:left  += ( ::__nArrowSize + ::__nImageSize )
+                    ::__aArrowPos := { n, ::__nArrowSize, -( ::__nArrowSize + ::__nImageSize ) }
+                    ::__aImagePos := { n + ::__nArrowSize, ::__nImageSize }
             ENDCASE
          ENDIF 
          nccs:CopyTo( nlParam )
@@ -784,45 +788,47 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
          DO CASE 
 
             CASE ::xLayout == 3 // "Image, Text, Arrow"
-                 x += ::nImageSize
+                 x += ::__nImageSize
 
             CASE ::xLayout == 4 // "Image, Arrow, Text"
-                 x += ( ::nImageSize + ::nArrowSize )
+                 x += ( ::__nImageSize + ::__nArrowSize )
 
             CASE ::xLayout == 5 // "Arrow, Text, Image"
-                 x += ::nArrowSize
+                 x += ::__nArrowSize
 
             CASE ::xLayout == 6 // "Arrow, Image, Text"
-                 x += ( ::nImageSize + ::nArrowSize )
+                 x += ( ::__nImageSize + ::__nArrowSize )
          ENDCASE
 
-         rc := (struct RECT)
-         rc:left   := ::__aArrowPos[1]
-         rc:top    := 0
-         rc:right  := ::__aArrowPos[1] + ::__aArrowPos[2]
-         rc:bottom := ::Height 
-         
-         pt := (struct POINT)
-         pt:x := x
-         pt:y := y
-         
-         ScreenToClient( ::hWnd, @pt )
-
-         IF PtInRect( rc, pt )
+         IF ::ContextMenu != NIL
+            rc := (struct RECT)
+            rc:left   := ::__aArrowPos[1]
+            rc:top    := 0
+            rc:right  := ::__aArrowPos[1] + ::__aArrowPos[2]
+            rc:bottom := ::Height 
 
             pt := (struct POINT)
-            pt:x := ::left
-            pt:y := ::top
-            
-            IF ::xLayout < 4
-               ::ContextMenu:Menu:Style := TPM_RIGHTALIGN | TPM_TOPALIGN
-               pt:x := ::left + ::Width
+            pt:x := x
+            pt:y := y
+
+            ScreenToClient( ::hWnd, @pt )
+
+            IF PtInRect( rc, pt )
+
+               pt := (struct POINT)
+               pt:x := ::left
+               pt:y := ::top
+
+               IF ::xLayout < 4
+                  ::ContextMenu:Menu:Style := TPM_RIGHTALIGN | TPM_TOPALIGN
+                  pt:x := ::left + ::Width
+               ENDIF
+
+               ClientToScreen( ::Parent:hWnd, @pt )
+
+               ::ContextMenu:Show( pt:x, pt:y + ::Height - 1)
+               RETURN 0
             ENDIF
-            
-            ClientToScreen( ::Parent:hWnd, @pt )
-            
-            ::ContextMenu:Show( pt:x, pt:y + ::Height - 1)
-            RETURN 0
          ENDIF
       ENDIF
 

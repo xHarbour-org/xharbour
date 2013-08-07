@@ -44,14 +44,14 @@ CLASS TabControl INHERIT Control
    PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
 
    PROPERTY MultiLine           INDEX TCS_MULTILINE      READ xMultiline           WRITE SetPos         DEFAULT .F. PROTECTED
-   PROPERTY ImageList                                    READ xImageList           WRITE SetImageList               
+   PROPERTY ImageList                                    READ xImageList           WRITE SetImageList   
    PROPERTY FocusNever          INDEX TCS_FOCUSNEVER     READ xFocusNever          WRITE SetStyle       DEFAULT .F. PROTECTED
    PROPERTY FixedWidth          INDEX TCS_FIXEDWIDTH     READ xFixedWidth          WRITE SetStyle       DEFAULT .F. PROTECTED
    PROPERTY ColorInactiveHeader                          READ xColorInactiveHeader WRITE InvalidateRect DEFAULT .F. PROTECTED
-   
+   PROPERTY MinTabWidth                                  READ xMinTabWidth         WRITE SetMinTabWidth DEFAULT 0
+
    ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
-   DATA MinTabWidth      PUBLISHED INIT -1
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.
    
@@ -109,7 +109,7 @@ CLASS TabControl INHERIT Control
                                             Self
 
    METHOD AdjustRect(lDisplay,aRect) INLINE TabCtrl_AdjustRect( ::hWnd, lDisplay, @aRect), aRect
-   METHOD SetMinTabWidth( dx )       INLINE TabCtrl_SetMinTabWidth( ::hWnd, dx )
+   METHOD SetMinTabWidth( dx )       INLINE TabCtrl_SetMinTabWidth( ::hWnd, IIF( dx == 0, -1, dx ) )
    METHOD GetCurFocus()              INLINE TabCtrl_GetCurFocus(::hWnd )+1
    METHOD GetCurSel()                INLINE ::CurSel := TabCtrl_GetCurSel(::hWnd)+1, ::CurSel
    METHOD GetExtendedStyle()         INLINE TabCtrl_GetExtendedStyle(::hWnd)
@@ -294,7 +294,7 @@ METHOD Create() CLASS TabControl
    IF ! ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
    ENDIF
-   SendMessage( ::hWnd, TCM_SETMINTABWIDTH, 0, ::MinTabWidth )
+   ::SetMinTabWidth( ::MinTabWidth )
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "Add TabPage", {|o| o:=::Application:Project:AddControl( "TabPage", Self ) } }}
    ENDIF
