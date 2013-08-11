@@ -383,8 +383,17 @@ METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
    LOCAL n, nLeft := 0
    DEFAULT lSetPos TO .F.
    ::__DataWidth := 0
-
+   ::__nFirstVis := NIL
+   ::__nLastVis  := NIL
    FOR n := 1 TO LEN( ::Children )
+       ::Children[n]:__lHidden := ::Children[n]:Width < ::__HorzScrolled .OR. nLeft > ::ClientWidth
+
+       IF ! ::Children[n]:__lHidden
+          DEFAULT ::__nFirstVis TO n
+        ELSEIF ::__nFirstVis != NIL .AND. ::__nLastVis == NIL
+          ::__nLastVis := n-1
+       ENDIF
+
        nLeft += ::Children[n]:Width
        
        IF lSetPos
@@ -394,6 +403,8 @@ METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
           ::__DataWidth += ::Children[n]:Width
        ENDIF
    NEXT
+   DEFAULT ::__nFirstVis TO 1
+   DEFAULT ::__nFirstVis TO LEN( ::Children )
 RETURN ::__DataWidth
 
 METHOD __GetPosition() CLASS DataGrid
@@ -754,7 +765,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
    ENDIF
    ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
    IF oSource == NIL
-      ::__DataWidth := 0
+      //::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
    ENDIF
    //::__ResetRecordPos(.F.)
@@ -1432,7 +1443,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
    nClickCol := 1
    FOR n := 1 TO LEN( ::__DisplayArray[1][1] )
-       IF ::__DisplayArray[1][1][n][6] <= xPos-::__HorzScrolled
+       IF ::__DisplayArray[1][1][n][6] != NIL .AND. ::__DisplayArray[1][1][n][6] <= xPos-::__HorzScrolled
           nClickCol := n
        ENDIF
    NEXT
@@ -2941,111 +2952,121 @@ RETURN 0
 
 //----------------------------------------------------------------------------------
 
-METHOD __FillRow( nPos ) CLASS DataGrid
+METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    EXTERN hb_QSelf
-   LOCAL nImageWidth, nImageHeight, nImageIndex, x, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL nBack, nFore, hFont, oFont //, nFirst, nLast
+   LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
+   LOCAL nBack, nFore, hFont, oFont
 
+   ::__DataWidth := 0
    DEFAULT nPos TO ::RowPos
 
    nBack := ExecuteEvent( "OnQueryBackColor", Self )
    nFore := ExecuteEvent( "OnQueryForeColor", Self )
 
-   FOR x := 1 TO LEN( ::Children )
-       nImageWidth := 0
-       nImageHeight:= 0
-       nImageIndex := IIF( VALTYPE( ::Children[x]:ImageIndex ) == "B", EVAL( ::Children[x]:ImageIndex, Self, EVAL( ::__bRecNo ) ), ::Children[x]:ImageIndex )
-       nRet := ExecuteEvent( "OnQueryImageIndex", ::Children[x] )
+   FOR n := 1 TO LEN( ::Children )
+       IF nCol == NIL .OR. nCol == n // Loading new column?
+          IF ::Children[n]:__lHidden // Column is not into VIEW
+             ::__DisplayArray[ nPos ][1][n] := ARRAY( 13 )
+           ELSE
+             nImageWidth := 0
+             nImageHeight:= 0
+             nImageIndex := IIF( VALTYPE( ::Children[n]:ImageIndex ) == "B", EVAL( ::Children[n]:ImageIndex, Self, EVAL( ::__bRecNo ) ), ::Children[n]:ImageIndex )
+             nRet := ExecuteEvent( "OnQueryImageIndex", ::Children[n] )
 
-       IF VALTYPE( nRet ) == "N"
-          nImageIndex := nRet
-       ENDIF
+             IF VALTYPE( nRet ) == "N"
+                nImageIndex := nRet
+             ENDIF
 
-       IF nImageIndex > 0 .AND. ::ImageList != NIL
-          nImageWidth := ::ImageList:IconWidth
-          nImageHeight:= ::ImageList:IconHeight
-       ENDIF
+             IF nImageIndex > 0 .AND. ::ImageList != NIL
+                nImageWidth := ::ImageList:IconWidth
+                nImageHeight:= ::ImageList:IconHeight
+             ENDIF
 
-       nColBkColor := ::Children[x]:BackColor
-       nColTxColor := ::Children[x]:ForeColor
+             nColBkColor := ::Children[n]:BackColor
+             nColTxColor := ::Children[n]:ForeColor
 
-       DEFAULT nColBkColor TO nBack
+             DEFAULT nColBkColor TO nBack
 
-       nRet := ExecuteEvent( "OnQueryBackColor", ::Children[x] )
-       IF VALTYPE( nRet ) == "N"
-          nColBkColor :=  nRet
-       ENDIF
+             nRet := ExecuteEvent( "OnQueryBackColor", ::Children[n] )
+             IF VALTYPE( nRet ) == "N"
+                nColBkColor :=  nRet
+             ENDIF
 
-       DEFAULT nColTxColor TO nFore
-       nRet := ExecuteEvent( "OnQueryForeColor", ::Children[x] )
-       IF VALTYPE( nRet ) == "N"
-          nColTxColor :=  nRet
-       ENDIF
+             DEFAULT nColTxColor TO nFore
+             nRet := ExecuteEvent( "OnQueryForeColor", ::Children[n] )
+             IF VALTYPE( nRet ) == "N"
+                nColTxColor :=  nRet
+             ENDIF
 
-       nAlign := ::Children[x]:Alignment
+             nAlign := ::Children[n]:Alignment
 
-       IF VALTYPE( nColBkColor ) == "B"
-          nColBkColor := EVAL( nColBkColor, Self, ::Children[x] )
-       ENDIF
+             IF VALTYPE( nColBkColor ) == "B"
+                nColBkColor := EVAL( nColBkColor, Self, ::Children[n] )
+             ENDIF
 
-       IF VALTYPE( nColTxColor ) == "B"
-          nColTxColor := EVAL( nColTxColor, Self, ::Children[x] )
-       ENDIF
+             IF VALTYPE( nColTxColor ) == "B"
+                nColTxColor := EVAL( nColTxColor, Self, ::Children[n] )
+             ENDIF
 
-       IF VALTYPE( nAlign ) == "B"
-          nAlign := EVAL( nAlign, Self, ::Children[x] )
-       ENDIF
+             IF VALTYPE( nAlign ) == "B"
+                nAlign := EVAL( nAlign, Self, ::Children[n] )
+             ENDIF
 
-       DEFAULT nColBkColor TO ::BackColor
-       DEFAULT nColTxColor TO ::ForeColor
+             DEFAULT nColBkColor TO ::BackColor
+             DEFAULT nColTxColor TO ::ForeColor
 
-       nStatus := ::Children[x]:ControlStatus
+             nStatus := ::Children[n]:ControlStatus
 
-       IF VALTYPE( ::Children[x]:ControlStatus )=="B"
-          nStatus := EVAL( ::Children[x]:ControlStatus, Self, ::DataSource:Recno() )
-       ENDIF
+             IF VALTYPE( ::Children[n]:ControlStatus )=="B"
+                nStatus := EVAL( ::Children[n]:ControlStatus, Self, ::DataSource:Recno() )
+             ENDIF
 
-       IF ! EMPTY( ::Children[x]:Data )
-          cData := ::Children[x]:Data
-          IF VALTYPE( cData ) == "B"
-             cData := EVAL( cData, Self )
+             IF ! EMPTY( ::Children[n]:Data )
+                cData := ::Children[n]:Data
+                IF VALTYPE( cData ) == "B"
+                   cData := EVAL( cData, Self )
+                ENDIF
+                DEFAULT cData TO "' '"
+                TRY
+                   cData := &cData
+                catch
+                   cData := ""
+                END
+              ELSEIF ::Children[n]:FieldPos > 0 .AND. ::DataSource:Structure != NIL
+                cData := ::DataSource:FieldGet( ::Children[n]:FieldPos )
+              ELSE
+                cData := ""
+             ENDIF
+
+             IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
+                cData := OemToChar( cData )
+             ENDIF
+
+             hFont := ::Children[n]:Font:Handle
+             oFont := ExecuteEvent( "OnCellFont", ::Children[n] )
+
+             IF VALTYPE(oFont) == "O" .AND. UPPER( oFont:ClassName ) == "FONT"
+                hFont := oFont:Handle
+             ENDIF
+
+             ::__DisplayArray[ nPos ][1][n] := { cData,;
+                                                 nImageIndex,;
+                                                 nImageWidth + 2,;
+                                                 nAlign,;
+                                                 nImageHeight,;
+                                                 ::__DataWidth,;
+                                                 nColBkColor,;
+                                                 nColTxColor,;
+                                                 ::Children[n]:Width,;
+                                                 nStatus,;
+                                                 ::Children[n]:Representation,;
+                                                 hFont,;
+                                                 ::DataSource:Deleted() }
           ENDIF
-          DEFAULT cData TO "' '"
-          TRY
-             cData := &cData
-          catch
-             cData := ""
-          END
-        ELSEIF ::Children[x]:FieldPos > 0 .AND. ::DataSource:Structure != NIL
-          cData := ::DataSource:FieldGet( ::Children[x]:FieldPos )
-        ELSE
-          cData := ""
        ENDIF
-
-       IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
-          cData := OemToChar( cData )
+       IF ::Children[n]:Visible
+          ::__DataWidth += ::Children[n]:Width
        ENDIF
-      
-       hFont := ::Children[x]:Font:Handle
-       oFont := ExecuteEvent( "OnCellFont", ::Children[x] )
-
-       IF VALTYPE(oFont) == "O" .AND. UPPER( oFont:ClassName ) == "FONT"
-          hFont := oFont:Handle
-       ENDIF
-
-       ::__DisplayArray[ nPos ][1][x] := { cData,;
-                                           nImageIndex,;
-                                           nImageWidth + 2,;
-                                           nAlign,;
-                                           nImageHeight,;
-                                           ::__DataWidth,;
-                                           nColBkColor,;
-                                           nColTxColor,;
-                                           ::Children[x]:Width,;
-                                           nStatus,;
-                                           ::Children[x]:Representation,;
-                                           hFont,;
-                                           ::DataSource:Deleted() }
    NEXT
 
 RETURN Self
@@ -3112,7 +3133,7 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 METHOD ArrowRight( lMove ) CLASS DataGrid
-   LOCAL nScroll, nCol, nCur, nPos := 0, lREs
+   LOCAL nScroll, nRow, nRec, nCol, nCur, nPos := 0, lREs
 
    DEFAULT lMove TO .T.
 
@@ -3130,6 +3151,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
          RETURN .F.
       ENDIF
    ENDIF
+
    IF ::ColPos+1 <= LEN( ::Children ) .OR. !lMove
       nCur := ::ColPos
       IF lMove
@@ -3142,11 +3164,24 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
          ENDIF
          ::ColPos := nCol
       ENDIF
+
+      IF ::Children[ ::ColPos ]:__lHidden
+         // column not in view we need to load data
+         ::Children[ ::ColPos ]:__lHidden := .F.
+         nRec := ::DataSource:Recno()
+         FOR nRow := 1 TO LEN( ::__DisplayArray )
+             ::__GoToRec( ::__DisplayArray[nRow][2] )
+             ::__FillRow( nRow, ::ColPos )
+         NEXT
+         ::__GoToRec( nRec )
+      ENDIF
+
       nScroll := ( ::__DisplayArray[1][1][::ColPos][6] + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
 
       IF ::Children[ ::ColPos ]:Width > ::ClientWidth
          nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
       ENDIF
+
       IF nScroll > 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
          IF ::IsCovered( ::__GetHeaderHeight() )
@@ -3157,8 +3192,8 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
        ELSE
          ::__DisplayData( ::RowPos, nCur, ::RowPos, ::ColPos )
       ENDIF
-
    ENDIF
+
    ::OnColChanged()
    ExecuteEvent( "OnColChanged", Self )
 RETURN .T.
@@ -3966,17 +4001,17 @@ CLASS GridColumn INHERIT Object
 
 
 
-   DATA __lResizeable                EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
-   DATA __lMoveable                  EXPORTED INIT .F.
-   DATA __lCopyCut                   EXPORTED INIT .F.
-   DATA __lAllowCopy                 EXPORTED INIT .F.
-   DATA __lCreateAfterChildren       EXPORTED INIT .F.
-   DATA __IdeImageIndex              EXPORTED INIT 3
+   DATA __lResizeable                EXPORTED  INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
+   DATA __lMoveable                  EXPORTED  INIT .F.
+   DATA __lCopyCut                   EXPORTED  INIT .F.
+   DATA __lAllowCopy                 EXPORTED  INIT .F.
+   DATA __lCreateAfterChildren       EXPORTED  INIT .F.
+   DATA __IdeImageIndex              EXPORTED  INIT 3
    DATA __TempRect                   EXPORTED
-   DATA __IsControl                  EXPORTED INIT .F.
-   DATA __PropFilter                 EXPORTED INIT {}
+   DATA __IsControl                  EXPORTED  INIT .F.
+   DATA __PropFilter                 EXPORTED  INIT {}
    DATA __Representation             EXPORTED  INIT { "Normal", "ProgressBar", "CheckBox", "Button" }
-
+   DATA __lHidden                    EXPORTED  INIT .F.
    DATA __Alignments                 EXPORTED  INIT { "Left", "Right", "Center" }
    DATA Parent                       EXPORTED
    DATA ClsName                      EXPORTED  INIT "GridColumn"

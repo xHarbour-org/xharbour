@@ -116,6 +116,9 @@ CLASS EditBox INHERIT Control
    DATA __nImageSize                   PROTECTED INIT 0
    DATA __nArrowSize                   PROTECTED INIT 0
 
+   ACCESS ContextArrow                 INLINE ::xMenuArrow
+   ASSIGN ContextArrow(l)              INLINE ::MenuArrow(l)
+
    METHOD Init()     CONSTRUCTOR
    METHOD Create()
 
