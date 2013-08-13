@@ -61,6 +61,8 @@ CLASS ImageList INHERIT Component
    METHOD ComboBox( oParent ) INLINE __ImageListComboBox( oParent, Self )
    METHOD DrawIndirect()
    METHOD SaveImage(n, cFile) INLINE ImageListSaveImage( ::Handle, n-1, cFile )
+   
+   METHOD InvalidateRect()    INLINE NIL
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------

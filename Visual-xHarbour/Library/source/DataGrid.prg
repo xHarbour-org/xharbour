@@ -765,7 +765,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
    ENDIF
    ::__DataHeight   := ::ClientHeight - ::__GetHeaderHeight()
    IF oSource == NIL
-      //::__DataWidth := 0
+      ::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
    ENDIF
    //::__ResetRecordPos(.F.)

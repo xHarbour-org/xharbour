@@ -747,7 +747,7 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
       _ScreenToClient( ::hWnd, @aPt )
       
       IF ::Button 
-         ::ButtonPushed := .T.
+         ::__ButtonPushed := .T.
          nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
          IF nStyle & WS_EX_CLIENTEDGE == 0
             n := 0
@@ -846,8 +846,8 @@ METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
    _ScreenToClient( ::hWnd, @aPt )
    IF ::Button
 
-      IF ::ButtonPushed .AND. _PtInRect( {::ClientWidth, 0, ::ClientWidth+16, ::ClientHeight}, aPt )
-         ::ButtonPushed := .F.
+      IF ::__ButtonPushed .AND. _PtInRect( {::ClientWidth, 0, ::ClientWidth+16, ::ClientHeight}, aPt )
+         ::__ButtonPushed := .F.
          nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
          IF nStyle & WS_EX_CLIENTEDGE == 0
             n := 0
