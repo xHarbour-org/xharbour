@@ -120,19 +120,19 @@ RETURN Self
 
 
 METHOD Do( cCommand ) CLASS XHDebugger
-  IF ::socket != NIL
-    ::lDone := .F.
-    InetSend( ::socket, cCommand + Chr( 13 ) + EOL )
+   IF ::socket != NIL
+      ::lDone := .F.
+      InetSend( ::socket, cCommand + Chr( 13 ) + EOL )
 
-    // This is a patch to prevent ::aTabs[ new ]:ShowUp in vxhdgui.prg line 165 to be fired after continue is clicked
-    // this not an actual FIX must be checked by debugger team
-    // Augusto
+      // This is a patch to prevent ::aTabs[ new ]:ShowUp in vxhdgui.prg line 165 to be fired after continue is clicked
+      // this not an actual FIX must be checked by debugger team
+      // Augusto
 
-    //IF cCommand == "continue"
-    //   ::socket := NIL
-    //ENDIF
+      //IF cCommand == "continue"
+      //   ::socket := NIL
+      //ENDIF
 
-  ENDIF
+   ENDIF
 RETURN Self
 
 
@@ -163,17 +163,16 @@ RETURN Self
 
 METHOD GetSourceFiles() CLASS XHDebugger
   IF ::socket != NIL
-    ::Do( ".sources" )
-    RETURN &( ::RecvUntil( ">" ) )
+     ::Do( ".sources" )
+     RETURN &( ::RecvUntil( ">" ) )
   ENDIF
 RETURN {}
 
 
 METHOD IsValidStopLine( cFile, nLine ) CLASS XHDebugger
   IF ::socket != NIL
-  VIEW ".valid " + cFile + ":" + LTrim( Str( nLine ) )
-    ::Do( ".valid " + cFile + ":" + LTrim( Str( nLine ) ) )
-    RETURN Left( ::RecvUntil( ">" ), 3 ) == ".T."
+     ::Do( ".valid " + cFile + ":" + LTrim( Str( nLine ) ) )
+     RETURN Left( ::RecvUntil( ">" ), 3 ) == ".F."
   ENDIF
 RETURN .F.
 
@@ -189,41 +188,44 @@ RETURN Self
 
 
 METHOD ProcessOutput() CLASS XHDebugger
-  LOCAL cString := "", s, n, socket := ::socket
-  LOCAL cMessage
+   LOCAL cString := "", s, n, socket := ::socket
+   LOCAL cMessage
 
-  IF socket != NIL .AND. InetErrorCode( socket ) == 0
-    s := Space( 32 )
-    DO WHILE InetErrorCode( socket ) == 0 .AND. InetDataReady( socket, 100 ) > 0
-      n := InetRecv( socket, @s )
-      cString += Left( s, n )
-    ENDDO
-    IF Len( cString ) > 0
-      cString += EOL
-      DO WHILE ( n := At( EOL, cString ) ) > 0
-        cMessage := Left( cString, n - 1 )
-        cString := SubStr( cString, n + 1 )
-        ::oConsole:Out( StrTran( cMessage, TAB, " " ) )
-        DO CASE
-          CASE Left( cMessage, 5 ) == "line" + TAB
-            ::nLine := Val( SubStr( cMessage, 6 ) )
-          CASE Left( cMessage, 7 ) == "module" + TAB
-            cMessage := SubStr( cMessage, 8 )
-            n := RAt( ':', cMessage )
-            ::cModule := Left( cMessage, n - 1 )
-            ::cFunction := SubStr( cMessage, n + 1 )
-          CASE cMessage == ">"
-            IF ::lListening
-              ::Listen( .F. )
-            ENDIF
-            ::lDone := .T.
-            ::Sync()
-        ENDCASE
+   IF socket != NIL .AND. InetErrorCode( socket ) == 0
+      s := Space( 32 )
+      DO WHILE InetErrorCode( socket ) == 0 .AND. InetDataReady( socket, 100 ) > 0
+         n := InetRecv( socket, @s )
+         cString += Left( s, n )
       ENDDO
-    ENDIF
-  ELSE
-    ::ConnectionError()
-  ENDIF
+      IF Len( cString ) > 0
+         VIEW cString
+         cString += EOL
+         DO WHILE ( n := At( EOL, cString ) ) > 0
+            cMessage := Left( cString, n - 1 )
+            cString := SubStr( cString, n + 1 )
+            ::oConsole:Out( StrTran( cMessage, TAB, " " ) )
+            DO CASE
+               CASE Left( cMessage, 5 ) == "line" + TAB
+                    ::nLine := Val( SubStr( cMessage, 6 ) )
+
+               CASE Left( cMessage, 7 ) == "module" + TAB
+                    cMessage := SubStr( cMessage, 8 )
+                    n := RAt( ':', cMessage )
+                    ::cModule := Left( cMessage, n - 1 )
+                    ::cFunction := SubStr( cMessage, n + 1 )
+
+               CASE cMessage == ">"
+                    IF ::lListening
+                       ::Listen( .F. )
+                    ENDIF
+                    ::lDone := .T.
+                    ::Sync()
+            ENDCASE
+         ENDDO
+      ENDIF
+   ELSE
+      ::ConnectionError()
+   ENDIF
 RETURN Self
 
 
@@ -232,22 +234,22 @@ METHOD ReadAreas() CLASS XHDebugger
   LOCAL cMessage, n, n1, aAreas := {}
 
   IF ::socket == NIL
-    RETURN Self
+     RETURN Self
   ENDIF
   cString := ::RecvUntil( ">" )
   IF InetErrorCode( ::socket ) != 0
-    ::ConnectionError()
-    RETURN Self
+     ::ConnectionError()
+     RETURN Self
   ENDIF
   IF Len( cString ) > 0
-    DO WHILE ( n := At( EOL, cString ) ) > 0
-      cMessage := Left( cString, n - 1 )
-      cString := SubStr( cString, n + 1 )
-      n := At( TAB, cMessage )
-      n1 := At( TAB, cMessage, n + 1 )
-      AAdd( aAreas, { /* _NUMBER */ Val( SubStr( cMessage, n + 1 ) ), ;
+     DO WHILE ( n := At( EOL, cString ) ) > 0
+        cMessage := Left( cString, n - 1 )
+        cString := SubStr( cString, n + 1 )
+        n := At( TAB, cMessage )
+        n1 := At( TAB, cMessage, n + 1 )
+        AAdd( aAreas, { /* _NUMBER */ Val( SubStr( cMessage, n + 1 ) ), ;
                       /* _ALIAS */  SubStr( cMessage, n1 + 1 ) } )
-    ENDDO
+     ENDDO
   ENDIF
 RETURN aAreas
 
@@ -257,26 +259,26 @@ METHOD ReadBreak() CLASS XHDebugger
   LOCAL cMessage
 
   IF ::socket == NIL
-    RETURN Self
+     RETURN Self
   ENDIF
   cString := ::RecvUntil( EOL )
   IF InetErrorCode( ::socket ) != 0
-    ::ConnectionError()
-    RETURN Self
+     ::ConnectionError()
+     RETURN Self
   ENDIF
   IF Len( cString ) > 0
-    cMessage := cString
-    DO CASE
-      CASE Left( cMessage, 6 ) == "break" + TAB
-        nBreak := Val( SubStr( cMessage, 7 ) )
-        cBreak := StrTran( SubStr( cMessage, At( TAB, cMessage, 7 ) + 1 ), TAB, ":" )
-        IF ( n := AScan( ::aBreak, {|x| x[1] == nBreak } ) ) > 0
-          ::aBreak[n][2] := cBreak
-        ELSE
-          AAdd( ::aBreak, { nBreak, cBreak } )
-        ENDIF
-    ENDCASE
-  ENDIF
+     cMessage := cString
+     DO CASE
+        CASE Left( cMessage, 6 ) == "break" + TAB
+             nBreak := Val( SubStr( cMessage, 7 ) )
+             cBreak := StrTran( SubStr( cMessage, At( TAB, cMessage, 7 ) + 1 ), TAB, ":" )
+             IF ( n := AScan( ::aBreak, {|x| x[1] == nBreak } ) ) > 0
+                ::aBreak[n][2] := cBreak
+             ELSE
+                AAdd( ::aBreak, { nBreak, cBreak } )
+             ENDIF
+      ENDCASE
+   ENDIF
 RETURN Self
 
 
@@ -285,7 +287,7 @@ METHOD ReadCalls() CLASS XHDebugger
   LOCAL cMessage, n, n1, aCall
 
   IF ::socket == NIL
-    RETURN Self
+     RETURN Self
   ENDIF
   cString := ::RecvUntil( ">" )
   IF InetErrorCode( ::socket ) != 0

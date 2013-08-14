@@ -363,9 +363,8 @@ RETURN CallNextHookEx( ::hHook, nCode, nwParam, nlParam)
 
 METHOD RunToCursor() CLASS XHDebuggerGUI
    local cFile, nLine
-   cFile := ::oApp:SourceEditor:Source:File
+   cFile := ::oApp:SourceEditor:Source:FileName
    nLine := ::oApp:SourceEditor:Source:GetCurLine()+1
-
    IF ::IsValidStopLine( cFile, nLine )
       ::Super:Until( cFile, nLine )
    ENDIF
@@ -510,10 +509,11 @@ RETURN Self
 
 
 METHOD ToggleBreak() CLASS XHDebuggerGUI
-  WITH OBJECT ::oApp:SourceEditor:oEditor
-    IF ::IsValidStopLine( :cFile, :nLine )
-      :ToggleBookmark()
-      ::Super:ToggleBreak( :cFile, :nLine )
-    ENDIF
-  END
+   local cFile, nLine
+   cFile := ::oApp:SourceEditor:Source:FileName
+   nLine := ::oApp:SourceEditor:Source:GetCurLine()+1
+   IF ::IsValidStopLine( cFile, nLine )
+      ::oApp:SourceEditor:Source:ToggleBookmark()
+      ::Super:ToggleBreak( cFile, nLine )
+   ENDIF
 RETURN Self
