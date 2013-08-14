@@ -589,6 +589,7 @@ METHOD Init() CLASS MainForm
          :Caption    := "Report Page"
          :HorzScroll := .T.
          :BackColor  := ::System:Color:Gray
+         :ForeColor  := ::System:Color:LtGray
          :Create()
 
          WITH OBJECT ::Application:Props[ "RepHeader" ] := RepHeaderEdit( :this )
@@ -688,6 +689,7 @@ METHOD Init() CLASS MainForm
          :HorzScroll := .T.
          :VertScroll := .T.
          :BackColor  := ::System:Color:Gray
+         :ForeColor  := ::System:Color:LtGray
          :Create()
          WITH OBJECT ::Application:Props[ "ExtraPage" ] := ExtraPageEdit( :this )
             :BackColor := ::System:Color:White
