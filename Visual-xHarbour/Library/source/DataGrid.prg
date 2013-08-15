@@ -1968,7 +1968,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
            IF nLeft > ::ClientWidth .OR. ( lData .AND. LEN(::__DisplayArray[nLine][1])<i ) // avoid painting non-visible columns
               EXIT
            ENDIF
-           IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible
+           IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible .AND. ! ::Children[ i ]:__lHidden
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
               nWImg  := IIF( lData, IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 ), 0 )
@@ -2040,7 +2040,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               END
 
               IF VALTYPE( cData ) != "A"
-                 aData := __str2a( cData, CHR(13)+CHR(10) )
+                 aData := hb_aTokens( cData, CHR(13)+CHR(10) )
                ELSE
                  aData := cData
               ENDIF

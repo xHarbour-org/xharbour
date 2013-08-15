@@ -268,12 +268,13 @@ RETURN Self
 
 //----------------------------------------------------------------------------
 
-METHOD SelectControl( oControl ) CLASS WindowEdit
+METHOD SelectControl( oControl, lTree ) CLASS WindowEdit
    LOCAL aRect
 
    ::InRect    := -1
 
    IF oControl != NIL
+      DEFAULT lTree TO .F.
       IF __ObjHasMsg( oControl, "GetRectangle" )
          aRect := oControl:GetRectangle()
          aRect[1] -= 4
@@ -291,8 +292,9 @@ METHOD SelectControl( oControl ) CLASS WindowEdit
 
       ::Application:ObjectManager:ResetProperties( ::Selected )
       ::Application:EventManager:ResetEvents( ::Selected )
-      ::Application:ObjectManager:Parent:Select()
-
+      IF ! lTree
+         ::Application:ObjectManager:Parent:Select()
+      ENDIF
       IF ! UPPER(oControl:ClsName) IN {"MENUITEM", "CMENUITEM" }
          ::UpdateSelection()
       ENDIF

@@ -1790,7 +1790,7 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
             :Dock:Margin   := 1
             :AllowUndock   := .T.
-            //:DragItems     := .T.
+            :DragItems     := .T.
             :Text          := "Object Explorer"
             :Height        := 200
             :Dock:Left     := :Parent

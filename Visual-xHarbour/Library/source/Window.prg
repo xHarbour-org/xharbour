@@ -107,25 +107,30 @@
           [; IF <vN> == nil ; <vN> := <xN> ; END]
 
 static aMessages := {;
-                    { WM_SIZE,          "OnSize"          },;
-                    { WM_DROPFILES,     "OnDropFiles"     },;
-                    { WM_MOUSEMOVE,     "OnMouseMove"     },;
-                    { WM_NCMOUSEMOVE,   "OnNCMouseMove"   },;
-                    { WM_NCMOUSELEAVE,  "OnNCMouseLeave"  },;
-                    { WM_NCMOUSEHOVER,  "OnNCMouseHover"  },;
-                    { WM_MOUSEWHEEL,    "OnMouseWheel"    },;
-                    { WM_SETCURSOR,     "OnSetCursor"     },;
-                    { WM_COMMAND,       "OnCommand"       },;
-                    { WM_PAINT,         "OnPaint"         },;
-                    { WM_NCPAINT,       "OnNCPaint"       },;
-                    { WM_INITDIALOG,    "OnInitDialog"    },;
-                    { WM_DESTROY,       "OnDestroy"       },;
-                    { WM_ENTERSIZEMOVE, "OnEnterSizeMove" },;
-                    { WM_NCACTIVATE,    "OnNCActivate"    },;
-                    { WM_NCCREATE,      "OnNCCreate"      },;
-                    { WM_NCCALCSIZE,    "OnNCCalcSize"    },;
-                    { WM_NCDESTROY,     "OnNCDestroy"     },;
-                    { WM_EXITSIZEMOVE,  "OnExitSizeMove"  };
+                    { WM_SIZE,            "OnSize"            },;
+                    { WM_DROPFILES,       "OnDropFiles"       },;
+                    { WM_MOUSEMOVE,       "OnMouseMove"       },;
+                    { WM_NCMOUSEMOVE,     "OnNCMouseMove"     },;
+                    { WM_NCMOUSELEAVE,    "OnNCMouseLeave"    },;
+                    { WM_NCMOUSEHOVER,    "OnNCMouseHover"    },;
+                    { WM_MOUSEWHEEL,      "OnMouseWheel"      },;
+                    { WM_SETCURSOR,       "OnSetCursor"       },;
+                    { WM_COMMAND,         "OnCommand"         },;
+                    { WM_PAINT,           "OnPaint"           },;
+                    { WM_NCPAINT,         "OnNCPaint"         },;
+                    { WM_INITDIALOG,      "OnInitDialog"      },;
+                    { WM_DESTROY,         "OnDestroy"         },;
+                    { WM_ENTERSIZEMOVE,   "OnEnterSizeMove"   },;
+                    { WM_NCACTIVATE,      "OnNCActivate"      },;
+                    { WM_NCCREATE,        "OnNCCreate"        },;
+                    { WM_NCCALCSIZE,      "OnNCCalcSize"      },;
+                    { WM_NCDESTROY,       "OnNCDestroy"       },;
+                    { WM_EXITSIZEMOVE,    "OnExitSizeMove"    },;
+                    { WM_MOUSELEAVE,      "OnMouseLeave"      },;
+                    { WM_MOUSEACTIVATE,   "OnMouseActivate"   },;
+                    { WM_NCLBUTTONUP,     "OnNCLButtonUp"     },;
+                    { WM_NCLBUTTONDOWN,   "OnNCLButtonDown"   },;
+                    { WM_NCLBUTTONDBLCLK, "OnNCLButtonDblClk" };
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -2280,35 +2285,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
       ENDIF
    ELSE
       SWITCH nMsg
-         CASE WM_UPDATEUISTATE
-              EXIT
-
-         CASE WM_MOUSELEAVE
-              nRet := ExecuteEvent( "OnMouseLeave", Self )
-              ODEFAULT nRet TO ::OnMouseleave( nwParam, LoWord(nlParam), Hiword(nlparam) )
-              ::__lMouseHover := .F.
-              EXIT
-
-         CASE WM_MOUSEACTIVATE
-              nRet := ExecuteEvent( "OnMouseActivate", Self )
-              ODEFAULT nRet TO ::OnMouseActivate( nwParam, LoWord(nlParam), HiWord(nlParam) )
-              EXIT
-
-         CASE WM_NCLBUTTONUP
-              nRet := ExecuteEvent( "OnNCLButtonUp", Self )
-              ODEFAULT nRet TO ::OnNCLButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )
-              EXIT
-
-         CASE WM_NCLBUTTONDOWN
-              nRet := ExecuteEvent( "OnNCLButtonDown", Self )
-              ODEFAULT nRet TO ::OnNCLButtonDown( nwParam, LoWord(nlParam), HiWord(nlParam) )
-              EXIT
-
-         CASE WM_NCLBUTTONDBLCLK
-              nRet := ExecuteEvent( "OnNCLButtonDblClk", Self )
-              ODEFAULT nRet TO ::OnNCLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
-              EXIT
-
          CASE WM_NCRBUTTONUP
               nRet := ExecuteEvent( "OnNCRButtonUp", Self )
               ODEFAULT nRet TO ::OnNCRButtonUp( nwParam, LoWord(nlParam), HiWord(nlParam) )

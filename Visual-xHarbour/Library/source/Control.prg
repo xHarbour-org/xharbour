@@ -243,9 +243,11 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnMouseActivate( hWnd, nHit, nMsg ) CLASS Control
+METHOD OnMouseActivate( nwParam, nlParam ) CLASS Control
    LOCAL oChild
-   IF nHit == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
+   ::Super:OnMouseActivate( nwParam, nlParam )
+      
+   IF LoWord(nlParam) == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
       FOR EACH oChild IN ::Parent:Children
           IF oChild:Active
              oChild:Active := FALSE
@@ -253,7 +255,7 @@ METHOD OnMouseActivate( hWnd, nHit, nMsg ) CLASS Control
           ENDIF
       NEXT
    ENDIF
-RETURN ::Super:OnMouseActivate( hWnd, nHit, nMsg )
+RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnSysKeyDown( nwParam, nlParam ) CLASS Control
@@ -530,8 +532,11 @@ RETURN nRes
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCLButtonDown( nwParam ) CLASS TitleControl
+METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS TitleControl
    LOCAL hRegion, hdc, aRect, n
+
+   ::Super:OnNCLButtonDown( nwParam, nlParam )
+
    IF nwParam == HTCAPTION
       IF ::Style & WS_CHILD == WS_CHILD
          RETURN 0
@@ -568,8 +573,11 @@ RETURN NIL //nwParam
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCLButtonUp( nwParam, x, y ) CLASS TitleControl
-   LOCAL pt, aPt := {x,y}
+METHOD OnNCLButtonUp( nwParam, nlParam ) CLASS TitleControl
+   LOCAL pt, aPt := {LOWORD( nlParam ),HIWORD( nlParam )}
+
+   ::Super:OnNCLButtonUp( nwParam, nlParam )
+
    ::__lCloseHover  := .F.
    ::__lPinHover    := .F.
    IF nwParam == HTCLOSE .OR. nwParam == HTBORDER .AND. !EMPTY( ::__aCaptionRect )

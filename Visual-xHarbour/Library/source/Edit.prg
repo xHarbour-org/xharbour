@@ -735,9 +735,14 @@ METHOD OnNCPaint() CLASS EditBox
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
+METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
    LOCAL nStyle, hRegion, hdc, n := 3
-   LOCAL rc, pt, aPt := {x,y}
+   LOCAL rc, pt, x, y, aPt := {LOWORD( nlParam ),HIWORD( nlParam )}
+
+   x := aPt[1]
+   y := aPt[1]
+
+   ::Super:OnNCLButtonDown( nwParam, nlParam )
 
    IF ::xLayout == 1 .AND. !::Button
       RETURN NIL
@@ -839,9 +844,11 @@ METHOD OnNCLButtonDown( nwParam, x, y ) CLASS EditBox
 RETURN nwParam
 
 //---------------------------------------------------------------------------------------------------
-METHOD OnNCLButtonUp( nwParam, x, y ) CLASS EditBox
+METHOD OnNCLButtonUp( nwParam, nlParam ) CLASS EditBox
    LOCAL xRet, nStyle, hRegion, hdc, n := 3
-   LOCAL aPt := {x,y}
+   LOCAL aPt := {LOWORD( nlParam ),HIWORD( nlParam )}
+
+   ::Super:OnNCLButtonUp( nwParam, nlParam )
 
    _ScreenToClient( ::hWnd, @aPt )
    IF ::Button

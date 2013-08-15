@@ -171,7 +171,6 @@ CLASS TabControl INHERIT Control
    METHOD Show()
    
    METHOD OnMouseMove()
-   METHOD OnMouseLeave()             INLINE ::OnMouseMove(0,0,0), NIL
    METHOD OnUserMsg(n)
    
    //METHOD RestoreTabPos()
@@ -1382,7 +1381,7 @@ CLASS TabCloseButton INHERIT Button
                                        ::InvalidateRect(, .F. ),;
                                        NIL
 
-   METHOD OnMouseLeave(n,x,y)   INLINE ::Super:OnMouseLeave(n,x,y), ::CloseHover := .F., ::InvalidateRect(, .F. ), NIL
+   METHOD OnMouseLeave(n,l)     INLINE ::Super:OnMouseLeave(n,l), ::CloseHover := .F., ::InvalidateRect(, .F. ), NIL
    METHOD OnParentDrawItem()
    METHOD OnLButtonDown(n,x,y)  INLINE ::Super:OnLButtonDown(n,x,y),;
                                        ::ClosePushed:= .T.,;
@@ -1459,7 +1458,7 @@ CLASS TabPinButton INHERIT Button
                                        ::InvalidateRect(, .F. ),;
                                        NIL
 
-   METHOD OnMouseLeave(n,x,y)   INLINE ::Super:OnMouseLeave(n,x,y), ::CloseHover := .F., ::InvalidateRect(, .F. ), NIL
+   METHOD OnMouseLeave(n,l)     INLINE ::Super:OnMouseLeave(n,l), ::CloseHover := .F., ::InvalidateRect(, .F. ), NIL
    METHOD OnParentDrawItem()
    METHOD OnLButtonDown(n,x,y)  INLINE ::Super:OnLButtonDown(n,x,y),;
                                        ::ClosePushed:= .T.,;
