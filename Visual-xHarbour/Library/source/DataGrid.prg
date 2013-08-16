@@ -237,6 +237,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD __UpdateHeight()
    METHOD __ControlSaveData()
    METHOD __Edit()
+   METHOD __FillCol()
    METHOD __FillRow()
    METHOD __GoToRec()
    METHOD __SkipRecords()
@@ -372,7 +373,7 @@ METHOD Create() CLASS DataGrid
    ::AutoUpdate := ::__nUpdtTimer
    ::__lCreated := .T.
    IF !EMPTY( ::xText )
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
    ENDIF
    ::__UpdateHScrollBar()
    ::__UpdateVScrollBar()
@@ -936,11 +937,18 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       IF ::Children[ nCol ]:MinWidth > 0
          nWidth := MAX( nWidth, ::Children[ nCol ]:MinWidth )
       ENDIF
-      
+
       nDiff := nWidth - ::Children[ nCol ]:xWidth
       ::Children[ nCol ]:xWidth += nDiff
       ::__DataWidth += nDiff
+
       FOR i := nCol+1 TO ::ColCount
+          IF ::Children[i]:__lHidden
+             ::Children[i]:__lHidden := ::Children[i]:Width < ::__HorzScrolled .OR. (::__DisplayArray[1][1][i][6]-::Children[i]:Width) > ::ClientWidth
+             IF ! ::Children[i]:__lHidden
+                ::__FillCol(i)
+             ENDIF
+          ENDIF
           FOR n := 1 TO MIN( ::RowCount, ::RowCountVisible )
               ::__DisplayArray[n][1][i][6] += nDiff
           NEXT
@@ -2950,8 +2958,18 @@ METHOD OnVertScroll( nCode, nPos ) CLASS DataGrid
    ::AutoUpdate := ::__nUpdtTimer
 RETURN 0
 
-//----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------
+METHOD __FillCol( nCol ) CLASS DataGrid
+   LOCAL nRow, nRec := ::DataSource:Recno()
+   ::Children[ nCol ]:__lHidden := .F.
+   FOR nRow := 1 TO LEN( ::__DisplayArray )
+       ::__GoToRec( ::__DisplayArray[nRow][2] )
+       ::__FillRow( nRow, nCol )
+   NEXT
+   ::__GoToRec( nRec )
+RETURN NIL
 
+//-----------------------------------------------------------------------------------------------------------------------------------
 METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
@@ -2966,7 +2984,11 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
           IF ::Children[n]:__lHidden // Column is not into VIEW
+
              ::__DisplayArray[ nPos ][1][n] := ARRAY( 13 )
+             ::__DisplayArray[ nPos ][1][n][1] := ""
+             ::__DisplayArray[ nPos ][1][n][6] := ::__DataWidth
+
            ELSE
              nImageWidth := 0
              nImageHeight:= 0
@@ -3133,7 +3155,7 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 METHOD ArrowRight( lMove ) CLASS DataGrid
-   LOCAL nScroll, nRow, nRec, nCol, nCur, nPos := 0, lREs
+   LOCAL nScroll, nCol, nCur, nPos := 0, lREs
 
    DEFAULT lMove TO .T.
 
@@ -3166,14 +3188,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
       ENDIF
 
       IF ::Children[ ::ColPos ]:__lHidden
-         // column not in view we need to load data
-         ::Children[ ::ColPos ]:__lHidden := .F.
-         nRec := ::DataSource:Recno()
-         FOR nRow := 1 TO LEN( ::__DisplayArray )
-             ::__GoToRec( ::__DisplayArray[nRow][2] )
-             ::__FillRow( nRow, ::ColPos )
-         NEXT
-         ::__GoToRec( nRec )
+         ::__FillCol( ::ColPos )
       ENDIF
 
       nScroll := ( ::__DisplayArray[1][1][::ColPos][6] + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
