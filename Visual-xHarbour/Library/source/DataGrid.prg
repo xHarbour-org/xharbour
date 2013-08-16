@@ -187,9 +187,6 @@ CLASS DataGrid INHERIT TitleControl
    DATA __cSearch               PROTECTED INIT ""
    DATA __aLastHover            PROTECTED INIT {0,0}
 
-   DATA __nFirstVis             PROTECTED
-   DATA __nLastVis              PROTECTED
-   
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Update()
@@ -380,23 +377,21 @@ METHOD Create() CLASS DataGrid
    ::__hPrevCursor := ::Cursor
 RETURN Self
 
-METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
-   LOCAL n, nLeft := 0
+METHOD __GetDataWidth( lSetPos, lFixCol ) CLASS DataGrid
+   LOCAL n, lHidden, nLeft := 0
    DEFAULT lSetPos TO .F.
+   DEFAULT lFixCol TO .F.
    ::__DataWidth := 0
-   ::__nFirstVis := NIL
-   ::__nLastVis  := NIL
    FOR n := 1 TO LEN( ::Children )
-       ::Children[n]:__lHidden := ::Children[n]:Width < ::__HorzScrolled .OR. nLeft > ::ClientWidth
-
-       IF ! ::Children[n]:__lHidden
-          DEFAULT ::__nFirstVis TO n
-        ELSEIF ::__nFirstVis != NIL .AND. ::__nLastVis == NIL
-          ::__nLastVis := n-1
+       lHidden := ::Children[n]:Width < ::__HorzScrolled .OR. nLeft > ::ClientWidth-::__HorzScrolled
+       IF lFixCol .AND. ::Children[n]:__lHidden
+          IF ! lHidden
+             ::__FillCol(n)
+          ENDIF
        ENDIF
+       ::Children[n]:__lHidden := lHidden
 
        nLeft += ::Children[n]:Width
-       
        IF lSetPos
           ::Children[n]:xPosition := n
        ENDIF
@@ -404,8 +399,6 @@ METHOD __GetDataWidth( lSetPos ) CLASS DataGrid
           ::__DataWidth += ::Children[n]:Width
        ENDIF
    NEXT
-   DEFAULT ::__nFirstVis TO 1
-   DEFAULT ::__nFirstVis TO LEN( ::Children )
 RETURN ::__DataWidth
 
 METHOD __GetPosition() CLASS DataGrid
@@ -926,7 +919,7 @@ RETURN Self
 //---------------------------------------------------------------------------------
 
 METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
-   LOCAL n, i, nDiff, lPrev := .F.
+   LOCAL i, nDiff, lPrev := .F.
    IF nCol != NIL .AND. LEN( ::Children ) >= nCol
       IF ::Children[ nCol ]:xWidth == 0 .AND. nCol > 1
          lPrev := .T.
@@ -944,14 +937,12 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
 
       FOR i := nCol+1 TO ::ColCount
           IF ::Children[i]:__lHidden
-             ::Children[i]:__lHidden := ::Children[i]:Width < ::__HorzScrolled .OR. (::__DisplayArray[1][1][i][6]-::Children[i]:Width) > ::ClientWidth
+             ::Children[i]:__lHidden := ::Children[i]:Width < ::__HorzScrolled .OR. (::Children[i]:__nRight-::Children[i]:Width) > ::ClientWidth
              IF ! ::Children[i]:__lHidden
                 ::__FillCol(i)
              ENDIF
           ENDIF
-          FOR n := 1 TO MIN( ::RowCount, ::RowCountVisible )
-              ::__DisplayArray[n][1][i][6] += nDiff
-          NEXT
+          ::Children[i]:__nRight += nDiff
       NEXT
       
       IF ( nCol > ::FreezeColumn )
@@ -1450,8 +1441,8 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
 
    nClickCol := 1
-   FOR n := 1 TO LEN( ::__DisplayArray[1][1] )
-       IF ::__DisplayArray[1][1][n][6] != NIL .AND. ::__DisplayArray[1][1][n][6] <= xPos-::__HorzScrolled
+   FOR n := 1 TO LEN( ::Children )
+       IF ::Children[n]:__nRight <= xPos-::__HorzScrolled
           nClickCol := n
        ENDIF
    NEXT
@@ -2295,7 +2286,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
        IF ::FullRowSelect .AND. ( nLine == nFocRow .OR. lHover )
           TRY
-             nLeft   := nHScroll + ::__DisplayArray[::RowPos][1][nCol][6]
+             nLeft   := nHScroll + ::Children[nCol]:__nRight
              nTop    := ::__GetHeaderHeight() + ( ( nLine-1 ) * ::ItemHeight ) + IIF( ::xShowGrid, 0, 1 )
              nBottom := nTop + ::ItemHeight - 1
 
@@ -2830,6 +2821,7 @@ METHOD OnHorzScroll( nCode, nPos, nlParam, lDraw ) CLASS DataGrid
       CASE SB_RIGHT
            nPos := ::__DataWidth - ::ClientWidth
            ::__HorzScrolled := -nPos
+           ::__GetDataWidth(,.T.)
            ::__DisplayData()
            ::__UpdateHScrollBar()
            EXIT
@@ -2869,6 +2861,8 @@ METHOD OnHorzScroll( nCode, nPos, nlParam, lDraw ) CLASS DataGrid
            ENDIF
            ::__HorzScrolled := -nPos
            ::__UpdateHScrollBar()
+
+           ::__GetDataWidth(,.T.)
 
            IF ::FreezeColumn > 0
               nRight := 0
@@ -2983,11 +2977,10 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
 
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
+          ::Children[n]:__nRight := ::__DataWidth
           IF ::Children[n]:__lHidden // Column is not into VIEW
-
              ::__DisplayArray[ nPos ][1][n] := ARRAY( 13 )
              ::__DisplayArray[ nPos ][1][n][1] := ""
-             ::__DisplayArray[ nPos ][1][n][6] := ::__DataWidth
 
            ELSE
              nImageWidth := 0
@@ -3076,7 +3069,7 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                                                  nImageWidth + 2,;
                                                  nAlign,;
                                                  nImageHeight,;
-                                                 ::__DataWidth,;
+                                                 NIL,;
                                                  nColBkColor,;
                                                  nColTxColor,;
                                                  ::Children[n]:Width,;
@@ -3136,7 +3129,7 @@ METHOD ArrowLeft( lMove ) CLASS DataGrid
          ENDIF
       ENDIF
 
-      nScroll := ::__DisplayArray[1][1][::ColPos][6] - ABS(::__HorzScrolled)
+      nScroll := ::Children[::ColPos]:__nRight - ABS(::__HorzScrolled)
       IF nScroll < 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) - ABS(nScroll),, FALSE )
          IF ::IsCovered( ::__GetHeaderHeight() )
@@ -3191,7 +3184,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
          ::__FillCol( ::ColPos )
       ENDIF
 
-      nScroll := ( ::__DisplayArray[1][1][::ColPos][6] + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
+      nScroll := ( ::Children[::ColPos]:__nRight + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
 
       IF ::Children[ ::ColPos ]:Width > ::ClientWidth
          nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
@@ -3878,7 +3871,7 @@ RETURN Self
 METHOD GetItemRect() CLASS DataGrid
    LOCAL aRect, nLeft, nTop, nBottom, nRight
    IF ::RowPos> 0 .AND. ::RowPos<=::RowCountUsable
-      nLeft   := ::__HorzScrolled + ::__DisplayArray[ ::RowPos ][ 1 ][ ::ColPos ][ 6 ]
+      nLeft   := ::__HorzScrolled + ::Children[::ColPos]:__nRight
       nTop    := ::__GetHeaderHeight() + ( ( ::RowPos-1 ) * ::ItemHeight )
       nBottom := nTop + ::ItemHeight - 1
       nRight  := nLeft + ::Children[ ::ColPos ]:Width - 1
@@ -4062,12 +4055,14 @@ CLASS GridColumn INHERIT Object
    DATA EventHandler                 EXPORTED
    DATA MDIContainer                 EXPORTED  INIT .F.
 
+   DATA __nRight                     EXPORTED  INIT 0
+
    DATA __HeaderLeft                 PROTECTED INIT 0
    DATA __HeaderRight                PROTECTED INIT 0
    DATA __HeaderX                    PROTECTED INIT 0
    DATA __aVertex                    PROTECTED
    DATA __aMesh                      PROTECTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD SetColor()
    METHOD Create()
