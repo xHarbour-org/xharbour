@@ -887,7 +887,6 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
    aDel( ::Children, nCol, .T. )
 
    ::__GetDataWidth(.T.)
-   
    IF ::IsWindow()
       TRY
          ::__Update( lDisplay )
@@ -2846,6 +2845,8 @@ METHOD OnHorzScroll( nCode, nPos, nlParam, lDraw ) CLASS DataGrid
            nPos := MIN( nPos, ::__DataWidth - ABS( ::__HorzScrolled ) - nPos  )
            ::__HorzScrolled -= nPos
 
+           ::__GetDataWidth(,.T.)
+
            ::ScrollWindow( -nPos, 0 )
            ::ValidateRect()
 
@@ -2860,18 +2861,18 @@ METHOD OnHorzScroll( nCode, nPos, nlParam, lDraw ) CLASS DataGrid
               RETURN 0
            ENDIF
            ::__HorzScrolled := -nPos
-           ::__UpdateHScrollBar()
-
            ::__GetDataWidth(,.T.)
+           ::__UpdateHScrollBar()
 
            IF ::FreezeColumn > 0
               nRight := 0
               FOR n := 1 TO ::FreezeColumn
                   nRight += ::Children[n]:xWidth
               NEXT
-              aClip   := { nRight, 0, ::Width, ::__GetHeaderHeight() }
+              aClip := { nRight, 0, ::Width, ::__GetHeaderHeight() }
               lDraw := .T.
            ENDIF
+
            ::ScrollWindow( ::__nScrolled-nPos, 0, aScroll, aClip )
            ::ValidateRect()
 
@@ -2969,7 +2970,10 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
    LOCAL nBack, nFore, hFont, oFont
 
-   ::__DataWidth := 0
+   IF nCol == NIL
+      ::__DataWidth := 0
+   ENDIF
+
    DEFAULT nPos TO ::RowPos
 
    nBack := ExecuteEvent( "OnQueryBackColor", Self )
@@ -3079,7 +3083,7 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                                                  ::DataSource:Deleted() }
           ENDIF
        ENDIF
-       IF ::Children[n]:Visible
+       IF nCol == NIL .AND. ::Children[n]:Visible
           ::__DataWidth += ::Children[n]:Width
        ENDIF
    NEXT
