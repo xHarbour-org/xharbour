@@ -74,6 +74,8 @@ CLASS Object
    ACCESS This                 INLINE Self
 
    ACCESS Siblings             INLINE ::Parent:Children
+   PROPERTY TabOrder                                READ xTabOrder       WRITE SetTabOrder                         INVERT
+
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
    METHOD HasProperty()
    METHOD __SetCtrlName()
@@ -88,6 +90,8 @@ CLASS Object
    METHOD __InvalidMember()
    METHOD RemoveProperty()
    METHOD ObjFromHandle()
+   METHOD SetTabOrder()
+
    error HANDLER OnError()
 
 ENDCLASS
@@ -225,6 +229,41 @@ METHOD RemoveProperty() CLASS Object
       RETURN HDelAt( ::Form:__hObjects, n )
    ENDIF
 RETURN NIL
+
+METHOD SetTabOrder( nTabOrder ) CLASS Object
+   LOCAL n, hAfter
+   IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
+      TRY
+         IF nTabOrder == 1
+            hAfter := HWND_TOP
+          ELSE
+            hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
+         ENDIF
+      CATCH
+      END
+      IF ::__ClassInst != NIL
+         ::Application:ObjectTree:MoveItem( ::TreeItem, nTabOrder, ::Parent:TreeItem )
+
+         ADEL( ::Parent:Children, ::xTabOrder, .T. )
+         IF nTabOrder > LEN( ::Parent:Children )
+            AADD( ::Parent:Children, Self )
+          ELSE
+            AINS( ::Parent:Children, nTabOrder, Self, .T. )
+         ENDIF
+         FOR n := 1 TO LEN( ::Parent:Children )
+             ::Parent:Children[n]:xTabOrder := n
+             IF ::Parent:Children[n]:__ClassInst != NIL
+                ::Parent:Children[n]:__ClassInst:xTabOrder := n
+             ENDIF
+         NEXT
+      ENDIF
+      IF ::hWnd != NIL
+         SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE )
+      ENDIF
+   ENDIF
+RETURN Self
+
+
 
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------

@@ -469,7 +469,6 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS TreeView
       pt := (struct POINT)
       pt:x := LOWORD( nlParam )
       pt:y := HIWORD( nlParam )
-
       IF ( oItem := ::HitTest( pt:x, pt:y ) ) != NIL .AND. ::__oDrag:hItem != oItem:hItem
          SendMessage( ::hWnd, TVM_SETINSERTMARK, .T., oItem:hItem )
       ENDIF
@@ -509,4 +508,4 @@ METHOD MoveItem( oDrag, nPos, oOwner ) CLASS TreeView
 
       oItem:Create()
    ENDIF
-RETURN Self
+RETURN oItem

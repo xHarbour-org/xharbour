@@ -157,7 +157,6 @@ CLASS Window INHERIT Object
    PROPERTY Center                                  READ xCenter         WRITE CenterWindow      DEFAULT .F.       PROTECTED
    PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren   WRITE SetStyle          DEFAULT .T.       PROTECTED
    PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings   WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY TabOrder                                READ xTabOrder       WRITE SetTabOrder                         INVERT
    PROPERTY AcceptFiles   INDEX WS_EX_ACCEPTFILES   READ xAcceptFiles    WRITE SetExStyle        DEFAULT .F.       PROTECTED
    PROPERTY AnimationStyle                          READ xAnimationStyle                         DEFAULT 0
    PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate     WRITE SetExStyle        DEFAULT .F.       PROTECTED
@@ -508,7 +507,6 @@ CLASS Window INHERIT Object
    METHOD IsChildren()
    METHOD DockIt()
    METHOD UpdateLayout()          INLINE ::PostMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
-   METHOD SetTabOrder()
 
    //METHOD DefControlProc()
    METHOD PaintFocusRect()
@@ -1320,40 +1318,6 @@ METHOD RegisterDocking() CLASS Window
    ENDIF
 #endif
 RETURN Self
-
-METHOD SetTabOrder( nTabOrder ) CLASS Window
-   LOCAL n, hAfter
-   IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
-      TRY
-         IF nTabOrder == 1
-            hAfter := HWND_TOP
-          ELSE
-            hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
-         ENDIF
-      CATCH
-      END
-      IF ::__ClassInst != NIL
-         ::Application:ObjectTree:MoveItem( ::TreeItem, nTabOrder, ::Parent:TreeItem )
-
-         ADEL( ::Parent:Children, ::xTabOrder, .T. )
-         IF nTabOrder > LEN( ::Parent:Children )
-            AADD( ::Parent:Children, Self )
-          ELSE
-            AINS( ::Parent:Children, nTabOrder, Self, .T. )
-         ENDIF
-         FOR n := 1 TO LEN( ::Parent:Children )
-             ::Parent:Children[n]:xTabOrder := n
-             IF ::Parent:Children[n]:__ClassInst != NIL
-                ::Parent:Children[n]:__ClassInst:xTabOrder := n
-             ENDIF
-         NEXT
-      ENDIF
-      IF ::hWnd != NIL
-         SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE )
-      ENDIF
-   ENDIF
-RETURN Self
-
 
 FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
    LOCAL oWnd

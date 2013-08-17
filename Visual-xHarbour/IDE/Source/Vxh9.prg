@@ -373,17 +373,23 @@ METHOD OnBeginDrag( oDrag ) CLASS ObjectTreeView
 RETURN Self
 
 METHOD OnEndDrag( oTarget ) CLASS ObjectTreeView
-   LOCAL nPos, oObj
+   LOCAL nPos, oObj, nPre//, oItem
    IF ::oDrag != NIL .AND. oTarget != NIL
       oObj := ::oDrag:Cargo
+
+      nPre := ASCAN( ::oDrag:Cargo:Parent:Children, {|o| o==oObj} )
       nPos := ASCAN( oTarget:Cargo:Parent:Children, {|o| o==oTarget:Cargo} )
       IF nPos > 0
          IF ! ( ::oDrag:Cargo:Parent == oTarget:Cargo:Parent )
-            ::oDrag:Cargo:SetParent( oTarget:Cargo:Parent )
+            //::oDrag:Cargo:SetParent( oTarget:Cargo:Parent )
+            RETURN NIL
          ENDIF
-         ::oDrag:Cargo:TabOrder := nPos + 1
+         ::oDrag:Cargo:TabOrder := nPos
+         //ADEL( oTarget:Cargo:Parent:Children, nPre, .T. )
+         //AINS( oTarget:Cargo:Parent:Children, nPos, oObj, .T. )
+         //oItem := ::MoveItem( ::oDrag, nPos, oTarget:Owner )
+         //oItem:Select()
       ENDIF
-      ::DropItem( ::oDrag, oTarget )
    ENDIF
 RETURN Self
 

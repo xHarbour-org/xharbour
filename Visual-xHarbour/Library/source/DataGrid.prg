@@ -378,15 +378,17 @@ METHOD Create() CLASS DataGrid
 RETURN Self
 
 METHOD __GetDataWidth( lSetPos, lFixCol ) CLASS DataGrid
-   LOCAL n, lHidden, nLeft := 0
+   LOCAL n, lHidden := .F., nLeft := 0
    DEFAULT lSetPos TO .F.
    DEFAULT lFixCol TO .F.
    ::__DataWidth := 0
    FOR n := 1 TO LEN( ::Children )
-       lHidden := ::Children[n]:Width < ::__HorzScrolled .OR. nLeft > ::ClientWidth-::__HorzScrolled
-       IF lFixCol .AND. ::Children[n]:__lHidden
-          IF ! lHidden
-             ::__FillCol(n)
+       IF ! lHidden
+          lHidden := ::Children[n]:Width < ::__HorzScrolled .OR. nLeft > ::ClientWidth-::__HorzScrolled
+          IF lFixCol .AND. ::Children[n]:__lHidden
+             IF ! lHidden
+                ::__FillCol(n)
+             ENDIF
           ENDIF
        ENDIF
        ::Children[n]:__lHidden := lHidden

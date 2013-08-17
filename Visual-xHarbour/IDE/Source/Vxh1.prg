@@ -1955,6 +1955,7 @@ METHOD Init() CLASS IDE_MainForm
                WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
                   :Dock:Margin   := 1
                   :Height        := 300
+                  :DragItems     := .T.
                   :Dock:Left     := :Parent
                   :Dock:Top      := :Parent
                   :Dock:Bottom   := :Parent
