@@ -379,7 +379,16 @@ HB_FUNC( IMAGELISTSETCOLORTABLE )
    hb_retni( ImageList_SetColorTable((HIMAGELIST) hb_parnl(1), hb_parni(2), hb_parni(3), prgb ) );
 }
 */
-HB_FUNC( _IMAGELISTGETIMAGEINFO )
+HB_FUNC( IMAGELISTGETBITMAPS )
+{
+   IMAGEINFO ImageInfo;
+   ImageList_GetImageInfo( (HIMAGELIST) hb_parnl(1), hb_parni(2), &ImageInfo );
+   hb_reta( 2 );
+   hb_stornl( ImageInfo.hbmImage, -1, 1 );
+   hb_stornl( ImageInfo.hbmMask,  -1, 2 );
+}
+
+HB_FUNC( IMAGELISTGETIMAGEINFO )
 {
    LPIMAGEINFO pImageInfo = (LPIMAGEINFO) hb_param( 3, HB_IT_STRING )->item.asString.value;
    hb_retl( ImageList_GetImageInfo((HIMAGELIST) hb_parnl(1), hb_parni(2), (struct _IMAGEINFO*) pImageInfo ) );

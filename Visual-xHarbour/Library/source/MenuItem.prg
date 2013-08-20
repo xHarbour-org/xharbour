@@ -25,6 +25,9 @@ CLASS MenuItem INHERIT Object
    DATA __TempRect     EXPORTED
    DATA Id             EXPORTED
 
+   DATA ImageList      PUBLISHED
+   DATA ImageIndex     PUBLISHED INIT 0
+
    PROPERTY Text READ xText WRITE __ModifyMenu
 
    DATA Separator      PUBLISHED INIT .F.
@@ -61,7 +64,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MenuItem
-   LOCAL mii := (struct MENUITEMINFO)
+   LOCAL hMenu, mii := (struct MENUITEMINFO)
 
    IF ::Parent:ClsName == "MenuItem" .AND. ::Parent:hMenu == NIL
       ::Parent:hMenu := CreateMenu()
@@ -71,7 +74,7 @@ METHOD Create() CLASS MenuItem
       SetMenuItemInfo( ::Parent:Parent:hMenu, ::Parent:Id, .F., mii )
    ENDIF
 
-   mii := (struct MENUITEMINFO)
+   mii := (struct MENUITEMINFO )
    mii:cbSize     := mii:SizeOf()
    mii:wID        := ::Id
    mii:fMask      := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
@@ -90,7 +93,13 @@ METHOD Create() CLASS MenuItem
       mii:dwTypeData := ::Text
       mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
    ENDIF
-   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+   hMenu := InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+   
+   IF ::ImageIndex > 0
+      mii:fMask := mii:fMask | MIIM_BITMAP
+      mii:hbmpItem := ::Parent:ImageList:GetBitmap( ::ImageIndex )[1]
+      SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
+   ENDIF
 
    AADD( ::Parent:Children, Self )
 RETURN NIL

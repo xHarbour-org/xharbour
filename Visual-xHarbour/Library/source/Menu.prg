@@ -282,7 +282,9 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS MenuBar INHERIT Component
-   DATA hMenu                 EXPORTED
+   DATA hMenu          EXPORTED
+   DATA ImageList      PUBLISHED
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()

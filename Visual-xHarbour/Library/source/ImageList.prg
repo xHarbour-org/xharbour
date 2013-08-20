@@ -47,7 +47,7 @@ CLASS ImageList INHERIT Component
    METHOD FromToolBar( oBar ) INLINE ImageListDestroy( ::Handle ), ::Handle := oBar:SendMessage( TB_GETIMAGELIST, 0, 0 )
 
    METHOD GetImage( nIndex )  INLINE ImageListGetIcon( ::Handle, nIndex-1, ILD_NORMAL )
-
+   METHOD GetBitmap( nIndex )
    METHOD __RefreshHandle()
    METHOD GetImages()
    
@@ -112,12 +112,19 @@ METHOD Create() CLASS ImageList
    ENDIF
 RETURN Self
 
+//----------------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS ImageList
    ImageListDestroy( ::Handle )
    IF ::__lAdd
       ::Super:Destroy()
    ENDIF
 RETURN NIL
+
+//----------------------------------------------------------------------------------------------------
+METHOD GetBitmap( nIndex ) CLASS ImageList
+   LOCAL aBmps
+   aBmps := ImageListGetBitmaps( ::Handle, nIndex-1 )
+RETURN aBmps
 
 //----------------------------------------------------------------------------------------------------
 
@@ -181,13 +188,7 @@ METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLAS
 
    IF ::Handle != NIL
       IF VALTYPE( cImage ) == "N"
-
-         //IF ::Form != NIL .AND. ::Form:hWnd == NIL
-         //   ::Form:Create()
-         //ENDIF
-
          hTool := CreateWindowEx( WS_EX_TOOLWINDOW, "ToolBarWindow32", "", WS_CHILD, 0, 0, 1500, ::IconHeight, IIF( ::Owner != NIL, IIF( ::Owner:Parent != NIL, ::Owner:Parent:hWnd, ::Owner:hWnd ), GetDesktopWindow()), 0, ::AppInstance )
-         //hTool := CreateWindowEx( WS_EX_TOOLWINDOW, "ToolBarWindow32", "", WS_CHILD, 0, 0, 1500, ::IconHeight, ::Form:hWnd, 0, ::AppInstance )
 
          tbb := (struct TBBUTTON)
          SendMessage( hTool, TB_BUTTONSTRUCTSIZE, tbb:SizeOf(), 0 )
@@ -212,10 +213,6 @@ METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLAS
                ImageListReplaceIcon(::Handle, -1, hImage )
                DestroyIcon( hImage )
              ELSE
-               //IF nMask == NIL
-               //   nMask := __GetPixelFromBMP( hImage )
-               //ENDIF
-               //::xMaskColor := nMask
                IF ::MaskColor != NIL
                   ImageListAddMasked( ::Handle, hImage, ::MaskColor )
                  ELSE
@@ -235,10 +232,6 @@ METHOD AddBitmap( cImage, nMask, hInst, nLoad ) CLASS ImageList
    hInst := ::AppInstance
    hBmp := LoadImage( hInst, cImage, IMAGE_BITMAP,,, nLoad )
    DEFAULT nMask TO ::MaskColor
-   //IF nMask == NIL
-   //   nMask := __GetPixelFromBMP( hBmp )
-   //ENDIF
-   //::xMaskColor := nMask
    IF ::MaskColor != NIL
       ImageListAddMasked( ::Handle, hBmp, ::MaskColor )
      ELSE
@@ -253,7 +246,6 @@ METHOD AddIcon( hIcon, hInst ) CLASS ImageList
    IF VALTYPE( hIcon ) == "C"
       hInst := ::AppInstance
       hIcon := LoadIcon( hInst, hIcon )
-      //hIcon := LoadImage( hInst, hIcon, IMAGE_ICON, 0, 0, LR_CREATEDIBSECTION | LR_LOADTRANSPARENT )
    ENDIF
    ImageListAddIcon(::Handle, hIcon)
 RETURN SELF
@@ -352,7 +344,6 @@ METHOD OnParentDrawItem() CLASS __ImageListComboBox
          IF n > 0
             ExtTextOut( ::Parent:DrawItemStruct:hDC, ::ImageList:IconWidth+20, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
             IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
-               //::ImageList:DrawImage( ::Parent:DrawItemStruct:hDC, n-1, 3, ::Parent:DrawItemStruct:rcItem:Top, ILD_TRANSPARENT )
                DrawIconEx( ::Parent:DrawItemStruct:hDC, 3, ::Parent:DrawItemStruct:rcItem:Top, ::ImageList:GetImage(n), ::ImageList:IconWidth, ::ImageList:IconHeight, 0, NIL,  DI_NORMAL )
             ENDIF
           ELSE

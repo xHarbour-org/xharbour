@@ -4986,7 +4986,7 @@ METHOD Create( hoParent ) CLASS WinForm
    ENDIF
 
    IF ::ActiveMenuBar != NIL
-      ::__SetActiveMenuBar()
+      ::__SetActiveMenuBar( ::ActiveMenuBar )
    ENDIF
 RETURN Self
 
