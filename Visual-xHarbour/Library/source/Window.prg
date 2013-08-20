@@ -4887,7 +4887,7 @@ CLASS WinForm INHERIT Window
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
-   METHOD __SetActiveMenuBar()  INLINE IIF( ::hWnd != NIL, SetMenu( ::hWnd, IIF( ::xActiveMenuBar != NIL, ::xActiveMenuBar:hMenu, NIL ) ), )
+   METHOD __SetActiveMenuBar(oMenu)  INLINE IIF( ::hWnd != NIL, SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) ), )
 
    METHOD SetImageList()
 

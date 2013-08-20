@@ -1000,6 +1000,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
          ::__DisplayData()
       ENDIF
     ELSE
+      ::__GetDataWidth(,.T.)
       ::__SizeUpdate()
       IF ::__DataWidth < ::ClientWidth
          ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
