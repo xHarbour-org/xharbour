@@ -24,8 +24,10 @@ CLASS MenuItem INHERIT Object
    DATA __lCopyCut     EXPORTED INIT .F.
    DATA __TempRect     EXPORTED
    DATA Id             EXPORTED
+   DATA xImageList     EXPORTED
 
-   DATA ImageList      PUBLISHED
+   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
+   ASSIGN ImageList(o)  INLINE ::xImageList := o
    DATA ImageIndex     PUBLISHED INIT 0
 
    PROPERTY Text READ xText WRITE __ModifyMenu
@@ -96,8 +98,10 @@ METHOD Create() CLASS MenuItem
    hMenu := InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
    
    IF ::ImageIndex > 0
-      mii:fMask := mii:fMask | MIIM_BITMAP
-      mii:hbmpItem := ::Parent:ImageList:GetBitmap( ::ImageIndex )[1]
+      mii := (struct MENUITEMINFO)
+      mii:cbSize   := mii:SizeOf()
+      mii:fMask    := MIIM_BITMAP
+      mii:hbmpItem := ::Parent:ImageList:GetImage( ::ImageIndex )
       SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
    ENDIF
 
