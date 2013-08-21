@@ -219,9 +219,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    IF !Empty( cCC )
       oMail:hHeaders[ "Cc" ] := cCC
    ENDIF
-   IF !Empty( cBCC )
-      oMail:hHeaders[ "Bcc" ] := cBCC
-   ENDIF
+   //IF !Empty( cBCC )
+      //oMail:hHeaders[ "Bcc" ] := cBCC
+   //ENDIF
    IF !Empty( cReplyTo )
       oMail:hHeaders[ "Reply-To" ] := cReplyTo
    ENDIF
@@ -244,7 +244,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
          WHILE .T.
             oInMail:GetOk()
-            IF oInMail:cReply == NIL
+            IF oInMail:cReply == NIL .or. SUBSTR(oInMail:cReply,1,4) == "250 " // culik Last return from EHLO  return code + 1 space
                EXIT
             ELSEIF "LOGIN" IN oInMail:cReply
                lAuthLogin := .T.
@@ -299,7 +299,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
       WHILE .T.
          oInMail:GetOk()
-         IF oInMail:cReply == NIL
+         IF oInMail:cReply == NIL  .or. Left( oInMail:cReply, 3 ) == '250'  // culik HELO return only 250 from server 
             EXIT
          ENDIF
       ENDDO
