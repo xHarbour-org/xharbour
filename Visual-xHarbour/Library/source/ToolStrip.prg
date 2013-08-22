@@ -1613,7 +1613,6 @@ METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
    IF !s_lKey
       ::__lPushed   := ::__lSelected .AND. nwParam == MK_LBUTTON .AND. !::Parent:__lIsMenu .AND. ::DropDown == 1
       ::__lSelected := .T.
-
       IF s_CurrFocus != NIL
          s_CurrFocus:__lSelected := .F.
          s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -1645,6 +1644,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnMouseLeave() CLASS ToolStripItem
+   ::Super:OnMouseLeave()
    IF !s_lKey .AND. ( !s_lExecuting .OR. ( !::Parent:__lIsMenu .OR. EMPTY( ::Children ) ) ) .AND. s_hMenuDialogHook == NIL
       ::__lSelected := ::__lPushed
       ::__lPushed   := .F.

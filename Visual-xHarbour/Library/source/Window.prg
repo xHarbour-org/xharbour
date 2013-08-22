@@ -590,7 +590,6 @@ CLASS Window INHERIT Object
    METHOD OnNCCalcSize()        VIRTUAL
    METHOD OnCancelMode()        VIRTUAL
    METHOD OnMouseHover()        VIRTUAL
-   METHOD OnMouseleave()        VIRTUAL
    METHOD OnNCLButtonUp()       VIRTUAL
    METHOD OnNCLButtonDown()     VIRTUAL
    METHOD OnNCLButtonDblClk()   VIRTUAL
@@ -659,6 +658,7 @@ CLASS Window INHERIT Object
 
    METHOD OnDropFiles()
    METHOD OnMouseMove()
+   METHOD OnMouseLeave()
    METHOD OnNcMouseMove()
    METHOD OnNCMouseHover()
    METHOD OnNCMouseLeave()
@@ -1638,6 +1638,11 @@ METHOD OnDropFiles( nwParam, nlParam ) CLASS Window
        DragQueryFile( nwParam, n, @cFile, MAX_PATH )
        AADD( ::FilesDroped, cFile )
    NEXT
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnMouseLeave() CLASS Window
+   ::__lMouseHover := .F.
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
