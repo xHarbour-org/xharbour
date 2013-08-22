@@ -388,11 +388,11 @@ HB_FUNC( IMAGELISTGETBITMAPS )
    hb_stornl( ImageInfo.hbmMask,  -1, 2 );
 }
 
-HB_FUNC( IMAGELISTGETIMAGEINFO )
-{
-   LPIMAGEINFO pImageInfo = (LPIMAGEINFO) hb_param( 3, HB_IT_STRING )->item.asString.value;
-   hb_retl( ImageList_GetImageInfo((HIMAGELIST) hb_parnl(1), hb_parni(2), (struct _IMAGEINFO*) pImageInfo ) );
-}
+//HB_FUNC( IMAGELISTGETIMAGEINFO )
+//{
+//   LPIMAGEINFO pImageInfo = (LPIMAGEINFO) hb_param( 3, HB_IT_STRING )->item.asString.value;
+//   hb_retl( ImageList_GetImageInfo((HIMAGELIST) hb_parnl(1), hb_parni(2), (struct _IMAGEINFO*) pImageInfo ) );
+//}
 
 HB_FUNC( IMAGELISTDESTROY )
 {

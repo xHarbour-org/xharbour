@@ -35,6 +35,7 @@ CLASS MenuItem INHERIT Object
    DATA Separator      PUBLISHED INIT .F.
    DATA RightJustified PUBLISHED INIT .F.
 
+   DATA __hBitmap      PROTECTED
    DATA __pObjPtr      PROTECTED
 
    METHOD Init() CONSTRUCTOR
@@ -66,7 +67,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MenuItem
-   LOCAL hMenu, mii := (struct MENUITEMINFO)
+   LOCAL mii := (struct MENUITEMINFO)
 
    IF ::Parent:ClsName == "MenuItem" .AND. ::Parent:hMenu == NIL
       ::Parent:hMenu := CreateMenu()
@@ -95,13 +96,13 @@ METHOD Create() CLASS MenuItem
       mii:dwTypeData := ::Text
       mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
    ENDIF
-   hMenu := InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
+   InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
    
    IF ::ImageIndex > 0
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
       mii:fMask    := MIIM_BITMAP
-      mii:hbmpItem := ::Parent:ImageList:GetImage( ::ImageIndex )
+      mii:hbmpItem := ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
       SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
    ENDIF
 
@@ -120,6 +121,9 @@ METHOD Destroy() CLASS MenuItem
    n := ASCAN( ::Parent:Children, {|o| o:__pObjPtr == ::__pObjPtr } )
    IF n > 0
       ADEL( ::Parent:Children, n, .T. )
+   ENDIF
+   IF ::__hBitmap != NIL
+      DeleteObject( ::__hBitmap )
    ENDIF
    IF ::__pObjPtr != NIL
       ReleaseArrayPointer( ::__pObjPtr )

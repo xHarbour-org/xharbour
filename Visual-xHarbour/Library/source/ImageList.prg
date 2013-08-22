@@ -122,9 +122,22 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
 METHOD GetBitmap( nIndex ) CLASS ImageList
-   LOCAL aBmps
-   aBmps := ImageListGetBitmaps( ::Handle, nIndex-1 )
-RETURN aBmps
+   LOCAL hDibBmp, hMemDC, hMemBitmap, hOldBitmap, hDC := GetDC( 0 )
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::IconWidth, ::IconHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   DrawIconEx( hMemDC, 0, 0, ::GetImage( nIndex ), ::IconWidth, ::IconHeight, 0, NIL,  DI_NORMAL )
+
+   hDibBmp    := CopyImage( hMemBitmap, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_CREATEDIBSECTION )
+
+   SelectObject( hMemDC, hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
+   ReleaseDC( 0, hDC )
+RETURN hDibBmp
 
 //----------------------------------------------------------------------------------------------------
 
