@@ -32,7 +32,7 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "5"
-#define VXH_BuildVersion "5.4.0"
+#define VXH_BuildVersion "5.5.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11

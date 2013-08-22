@@ -2028,6 +2028,11 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
          ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
       ENDIF
    ENDIF
+   IF nRet == NIL .AND. nCode == 1 .AND. __objHasMsg( Self, "ActiveMenuBar" ) .AND. ::ActiveMenuBar != NIL
+      IF ( oItem := ::ActiveMenuBar:GetMenuById( nId ) ) != NIL
+         ExecuteEvent( "OnClick", oItem )
+      ENDIF
+   ENDIF
 RETURN NIL
 
 METHOD OnPaint( nwParam ) CLASS Window

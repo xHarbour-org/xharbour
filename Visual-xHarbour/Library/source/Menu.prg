@@ -289,6 +289,7 @@ CLASS MenuBar INHERIT Component
    METHOD Create()
    METHOD __AddMenuItem()
    METHOD Destroy()
+   METHOD GetMenuById()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuBar
@@ -329,6 +330,18 @@ RETURN Self
 METHOD __AddMenuItem() CLASS MenuBar
    ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "MenuItem",,,1, {}, } }, ::Application:Project:aUndo )
 RETURN Self
+
+METHOD GetMenuById( nId ) CLASS MenuBar
+   LOCAL oSubMenu, oMenu
+   FOR EACH oSubMenu IN ::Children
+       IF oSubMenu:Id == nId
+          oMenu := oSubMenu
+          EXIT
+        ELSEIF ( oMenu := oSubMenu:GetMenuById( nId ) ) != NIL
+          EXIT
+       ENDIF
+   NEXT
+RETURN oMenu
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------

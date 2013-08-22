@@ -28,17 +28,18 @@ CLASS MenuItem INHERIT Object
 
    ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
+
    DATA ImageIndex     PUBLISHED INIT 0
+   DATA ShortCutKey    PUBLISHED
 
-   PROPERTY Text READ xText WRITE __ModifyMenu
-
+   PROPERTY Text       READ xText    WRITE __ModifyMenu
    PROPERTY Enabled    READ xEnabled WRITE __SetEnabled DEFAULT .T.
    
    DATA Separator      PUBLISHED INIT .F.
    DATA RightJustified PUBLISHED INIT .F.
 
    DATA __hBitmap      PROTECTED
-   DATA __pObjPtr      PROTECTED
+   DATA __pObjPtr      EXPORTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -46,6 +47,7 @@ CLASS MenuItem INHERIT Object
    METHOD __SetEnabled()
    METHOD __ModifyMenu()  INLINE NIL
    METHOD Destroy()
+   METHOD GetMenuById()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuItem
@@ -65,12 +67,26 @@ METHOD Init( oParent ) CLASS MenuItem
    DEFAULT ::EventHandler TO Hash()
    ::__CreateProperty()
    Super:Init( oParent )
+   ::ShortCutKey  := __MenuStripItemShortCut( Self )
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD GetMenuById( nId ) CLASS MenuItem
+   LOCAL oSubMenu, oMenu
+   FOR EACH oSubMenu IN ::Children
+       IF oSubMenu:Id == nId
+          oMenu := oSubMenu
+          EXIT
+        ELSEIF ( oMenu := oSubMenu:GetMenuById( nId ) ) != NIL
+          EXIT
+       ENDIF
+   NEXT
+RETURN oMenu
 
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MenuItem
-   LOCAL mii := (struct MENUITEMINFO)
+   LOCAL cShort, cText, mii := (struct MENUITEMINFO)
 
    IF ::Parent:ClsName == "MenuItem" .AND. ::Parent:hMenu == NIL
       ::Parent:hMenu := CreateMenu()
@@ -97,7 +113,10 @@ METHOD Create() CLASS MenuItem
          ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
          ::Application:ObjectTree:Set( Self )
       ENDIF
-      mii:dwTypeData := ::Text
+      cText  := ::Text
+      cShort := ::ShortCutKey:GetShortcutText()
+      
+      mii:dwTypeData := cText + IIF( ! EMPTY(cShort), CHR(9) + cShort, "" )
       mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
    ENDIF
    InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
@@ -109,7 +128,7 @@ METHOD Create() CLASS MenuItem
       mii:hbmpItem := ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
       SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
    ENDIF
-
+   ::ShortCutKey:SetAccel()
    AADD( ::Parent:Children, Self )
 RETURN NIL
 

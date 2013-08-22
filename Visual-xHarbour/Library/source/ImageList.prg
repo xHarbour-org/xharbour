@@ -128,7 +128,9 @@ METHOD GetBitmap( nIndex ) CLASS ImageList
    hMemBitmap := CreateCompatibleBitmap( hDC, ::IconWidth, ::IconHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   DrawIconEx( hMemDC, 0, 0, ::GetImage( nIndex ), ::IconWidth, ::IconHeight, 0, NIL,  DI_NORMAL )
+   //DrawIconEx( hMemDC, 0, 0, ::GetImage( nIndex ), ::IconWidth, ::IconHeight, 0, NIL,  DI_NORMAL )
+
+   ::DrawImage( hMemDC, nIndex, 0, 0, ILD_TRANSPARENT )
 
    hDibBmp    := CopyImage( hMemBitmap, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_CREATEDIBSECTION )
 
