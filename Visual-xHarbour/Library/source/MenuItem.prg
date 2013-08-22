@@ -32,6 +32,8 @@ CLASS MenuItem INHERIT Object
 
    PROPERTY Text READ xText WRITE __ModifyMenu
 
+   PROPERTY Enabled    READ xEnabled WRITE __SetEnabled DEFAULT .T.
+   
    DATA Separator      PUBLISHED INIT .F.
    DATA RightJustified PUBLISHED INIT .F.
 
@@ -41,6 +43,7 @@ CLASS MenuItem INHERIT Object
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()
+   METHOD __SetEnabled()
    METHOD __ModifyMenu()  INLINE NIL
    METHOD Destroy()
 ENDCLASS
@@ -78,10 +81,11 @@ METHOD Create() CLASS MenuItem
    ENDIF
 
    mii := (struct MENUITEMINFO )
-   mii:cbSize     := mii:SizeOf()
-   mii:wID        := ::Id
-   mii:fMask      := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
-   mii:fType      := MFT_STRING
+   mii:cbSize  := mii:SizeOf()
+   mii:wID     := ::Id
+   mii:fMask   := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
+   mii:fType   := MFT_STRING
+   mii:fState  := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED )
    IF ::RightJustified
       mii:fType := mii:fType | MFT_RIGHTJUSTIFY
    ENDIF
@@ -107,6 +111,17 @@ METHOD Create() CLASS MenuItem
    ENDIF
 
    AADD( ::Parent:Children, Self )
+RETURN NIL
+
+METHOD __SetEnabled() CLASS MenuItem
+   LOCAL mii
+   IF ::__pObjPtr != NIL
+      mii := (struct MENUITEMINFO)
+      mii:cbSize   := mii:SizeOf()
+      mii:fMask    := MIIM_STATE
+      mii:fState   := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED )
+      SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
+   ENDIF
 RETURN NIL
 
 METHOD Destroy() CLASS MenuItem
