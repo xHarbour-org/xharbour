@@ -129,11 +129,14 @@ METHOD Create() CLASS MenuItem
    InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
    
    IF ::ImageIndex > 0
-      mii := (struct MENUITEMINFO)
-      mii:cbSize   := mii:SizeOf()
-      mii:fMask    := MIIM_BITMAP
-      mii:hbmpItem := ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
-      SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
+      ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
+      IF ! ::xChecked
+         mii := (struct MENUITEMINFO)
+         mii:cbSize   := mii:SizeOf()
+         mii:fMask    := MIIM_BITMAP
+         mii:hbmpItem := ::__hBitmap
+         SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
+      ENDIF
    ENDIF
    ::ShortCutKey:SetAccel()
    AADD( ::Parent:Children, Self )
@@ -144,7 +147,8 @@ METHOD __SetChecked() CLASS MenuItem
    IF ::__pObjPtr != NIL
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
-      mii:fMask    := MIIM_STATE
+      mii:fMask    := MIIM_STATE | MIIM_BITMAP
+      mii:hbmpItem := IIF( ::xChecked, NIL, ::__hBitmap )
       mii:fState   := IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
