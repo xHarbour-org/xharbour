@@ -32,9 +32,11 @@ CLASS MenuItem INHERIT Object
    DATA ImageIndex     PUBLISHED INIT 0
    DATA ShortCutKey    PUBLISHED
 
-   PROPERTY Text       READ xText    WRITE __ModifyMenu
-   PROPERTY Enabled    READ xEnabled WRITE __SetEnabled DEFAULT .T.
-   
+   PROPERTY Text       READ xText       WRITE __ModifyMenu
+   PROPERTY Enabled    READ xEnabled    WRITE __SetEnabled DEFAULT .T.
+   PROPERTY Checked    READ xChecked    WRITE __SetChecked DEFAULT .F.
+
+   DATA RadioCheck     PUBLISHED INIT .F.
    DATA Separator      PUBLISHED INIT .F.
    DATA RightJustified PUBLISHED INIT .F.
 
@@ -45,6 +47,7 @@ CLASS MenuItem INHERIT Object
    METHOD Create()
    METHOD __AddMenuItem()
    METHOD __SetEnabled()
+   METHOD __SetChecked()
    METHOD __ModifyMenu()  INLINE NIL
    METHOD Destroy()
    METHOD GetMenuById()
@@ -101,7 +104,11 @@ METHOD Create() CLASS MenuItem
    mii:wID     := ::Id
    mii:fMask   := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
    mii:fType   := MFT_STRING
-   mii:fState  := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED )
+   mii:fState  := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
+
+   IF ::RadioCheck
+      mii:fType := mii:fType | MFT_RADIOCHECK
+   ENDIF
    IF ::RightJustified
       mii:fType := mii:fType | MFT_RIGHTJUSTIFY
    ENDIF
@@ -130,6 +137,17 @@ METHOD Create() CLASS MenuItem
    ENDIF
    ::ShortCutKey:SetAccel()
    AADD( ::Parent:Children, Self )
+RETURN NIL
+
+METHOD __SetChecked() CLASS MenuItem
+   LOCAL mii
+   IF ::__pObjPtr != NIL
+      mii := (struct MENUITEMINFO)
+      mii:cbSize   := mii:SizeOf()
+      mii:fMask    := MIIM_STATE
+      mii:fState   := IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
+      SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
+   ENDIF
 RETURN NIL
 
 METHOD __SetEnabled() CLASS MenuItem
