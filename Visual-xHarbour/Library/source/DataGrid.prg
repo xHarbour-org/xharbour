@@ -1079,7 +1079,7 @@ METHOD __SizeUpdate( x, y ) CLASS DataGrid
                 EXIT
              ENDIF
              nSkiped++
-             AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+             AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
              ::__FillRow( ::RowCount )
          NEXT
 
@@ -1099,7 +1099,7 @@ METHOD __SizeUpdate( x, y ) CLASS DataGrid
                    EXIT
                 ENDIF
 
-                AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() }, TRUE )
+                AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() }, TRUE )
                 ::RowPos++
                 ::__VertScrolled--
                 ::__FillRow( 1 )
@@ -1678,7 +1678,7 @@ METHOD __ResetRecordPos( lRefresh ) CLASS DataGrid
 
          ::__DisplayArray := {}
          FOR n := 1 TO ::RowCountVisible
-             AADD( ::__DisplayArray,{ ARRAY( nColumns ), ::DataSource:Recno(), ::ItemHeight } )
+             AADD( ::__DisplayArray,{ ARRAY( nColumns ), ::DataSource:Recno(), ::DataSource:Deleted(), ::ItemHeight } )
              ::__FillRow( n )
              ::__SkipRecords( 1 )
              IF ::HitBottom
@@ -1854,9 +1854,12 @@ RETURN 0
 METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
-   LOCAL nBkCol, nTxCol, xLeft, nStatus, lDeleted, nPos, iAlign, lDC, lData
-   LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lDis := !::IsWindowEnabled()
+   LOCAL xLeft, nStatus, lDeleted, nPos, iAlign, lDC, lData
+   LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lEnabled := ::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
+   LOCAL nForeColor, nBackColor, lFocus := GetFocus() != ::hWnd
+
+
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
       RETURN .F.
    ENDIF
@@ -1965,6 +1968,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
           lSelected := .F.
        ENDIF
 
+       lDeleted := IIF( lData, ::__DisplayArray[nPos][3], .F. )
+
        FOR i := nCol TO nColEnd
            IF nLeft > ::ClientWidth .OR. ( lData .AND. LEN(::__DisplayArray[nLine][1])<i ) // avoid painting non-visible columns
               EXIT
@@ -1976,19 +1981,19 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               nAlign := IIF( lData, ::__DisplayArray[nPos][1][i][ 4], 1 )
               nHImg  := IIF( lData, ::__DisplayArray[nPos][1][i][ 5], 0 )
 
-              nBkCol := IIF( lHover, ::__HoverBackColor, IIF( lData, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, ::BackColor )) )
+              nBackColor := IIF( lHover, ::__HoverBackColor, IIF( lData, ::__DisplayArray[nPos][1][i][ 6], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, ::BackColor )) )
 
               IF lData .AND. ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
-                 nBkCol := DarkenColor( nBkCol, 25 )
+                 nBackColor := DarkenColor( nBackColor, 25 )
               ENDIF
-              nTxCol   := IIF( lData, ::__DisplayArray[nPos][1][i][ 8], 0 )
+              nForeColor := IIF( lData, ::__DisplayArray[nPos][1][i][ 7], 0 )
+              nStatus    := IIF( lData, ::__DisplayArray[nPos][1][i][ 8], 0 )
 
-              nStatus  := IIF( lData, ::__DisplayArray[nPos][1][i][10], 0 )
-              nRep     := IIF( lData, ::__DisplayArray[nPos][1][i][11], 1 )
+              nRep       := IIF( lData, ::Children[i]:Representation, 1 )
+              
               IF lData
-                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][12] )
+                 hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][9] )
               ENDIF
-              lDeleted := IIF( lData, ::__DisplayArray[nPos][1][i][13], .F. )
 
               zLeft := nLeft
               IF lFreeze .AND. i <= ::FreezeColumn
@@ -2049,43 +2054,50 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  AADD( aData, "" )
               ENDIF
 
-              lHighLight := .F.
+              lHighLight := lFocus .OR. ::__CurControl != NIL
+
               IF lDeleted
                  IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
-
-                    lHighLight := ::HasFocus .OR. ::__CurControl != NIL
-
-                    SetBkColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightColor, nBkCol ) )
-                    SetTextColor( hMemDC, IIF( ::HasFocus .OR. ::__CurControl != NIL, ::HighlightTextColor, nTxCol ) )
-                  ELSE
-                    SetBkColor( hMemDC, nBkCol )
-                    SetTextColor( hMemDC, nTxCol )
+                    IF ( lHighLight := lFocus .OR. ::__CurControl != NIL )
+                       nBackColor := ::HighlightColor
+                       nForeColor := ::HighlightTextColor
+                    ENDIF
                  ENDIF
-               ELSEIF ! lDis
-                 IF ( GetFocus() != ::hWnd .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
-                    SetBkColor( hMemDC, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) )
-                    SetTextColor( hMemDC, nTxCol /*::__InactiveHighlightText*/ )
+
+               ELSEIF lEnabled
+
+                 IF ( ! lFocus .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
+                    IF ::ShadowRow
+                       nBackColor := ::__InactiveHighlight
+                    ENDIF
                   ELSE
-                    IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect ) //.AND. nRecno == nRec
-                       lHighLight := ::HasFocus .OR. ::__CurControl != NIL
-                       SetBkColor( hMemDC, IIF( (::HasFocus .OR. ::__CurControl != NIL).AND.nRep<>4, ::HighlightColor, IIF( ::ShadowRow, ::__InactiveHighlight, nBkCol ) ) )
-                       SetTextColor( hMemDC, IIF( (::HasFocus .OR. ::__CurControl != NIL).AND.nRep<>4, ::HighlightTextColor, IIF( ::ShadowRow, ::__InactiveHighlightText, nTxCol ) ) )
+                    IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
+                       IF lHighLight .AND. nRep <> 4
+                          nBackColor := ::HighlightColor
+                          nForeColor := ::HighlightTextColor
+                        ELSEIF ::ShadowRow
+                          nBackColor := ::__InactiveHighlight
+                          nForeColor := ::__InactiveHighlightText
+                       ENDIF
                      ELSE
                        IF lSelected .AND. !::FullRowSelect .AND. i != ::ColPos .AND. ::ShadowRow
                           SetBkColor( hMemDC, ::__InactiveHighlight )
                           SetTextColor( hMemDC, ::__InactiveHighlightText )
                         ELSE
-                          SetBkColor( hMemDC, nBkCol )
-                          SetTextColor( hMemDC, nTxCol )
+                          SetBkColor( hMemDC, nBackColor )
+                          SetTextColor( hMemDC, nForeColor )
                        ENDIF
                     ENDIF
                  ENDIF
                ELSE
                  SetTextColor( hMemDC, ::System:Color:Gray )
                  IF ::Striping
-                    SetBkColor( hMemDC, nBkCol )
+                    SetBkColor( hMemDC, nBackColor )
                  ENDIF
               ENDIF
+
+              SetBkColor( hMemDC, nBackColor )
+              SetTextColor( hMemDC, nForeColor )
 
               nHeaderRight := nRight-1
               aText := { zLeft, nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) }
@@ -2228,7 +2240,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  IF nRep == 3
                     aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
                  ENDIF
-                 ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBkCol, nTxCol, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
+                 ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
 
               ENDIF
 
@@ -2496,7 +2508,7 @@ METHOD __Update( lDisplay, lFillData ) CLASS DataGrid
    ENDIF
    IF !::HitTop .AND. !::HitBottom
       FOR n := 1 TO ::RowCountVisible
-          AADD( ::__DisplayArray,{ ARRAY( ::ColCount ), ::DataSource:Recno() } )
+          AADD( ::__DisplayArray,{ ARRAY( ::ColCount ), ::DataSource:Recno(), ::DataSource:Deleted() } )
           IF lFillData
              ::__FillRow( n )
           ENDIF
@@ -2566,7 +2578,7 @@ METHOD Update() CLASS DataGrid
       nIns := 0
 
       FOR n := 1 TO ::RowCountVisible
-          AADD( ::__DisplayArray,{ ARRAY( ::ColCount ), ::DataSource:Recno(), ::ItemHeight } )
+          AADD( ::__DisplayArray,{ ARRAY( ::ColCount ), ::DataSource:Recno(), ::DataSource:Deleted(), ::ItemHeight } )
           ::__FillRow( n )
           ::__SkipRecords( 1 )
           IF ::HitBottom .AND. ::__bGoBottom != NIL
@@ -2583,7 +2595,7 @@ METHOD Update() CLASS DataGrid
             IF ::HitTop
                EXIT
             ENDIF
-            AINS( ::__DisplayArray, 1, { ARRAY( ::ColCount ), ::DataSource:Recno(), ::ItemHeight }, .T. )
+            AINS( ::__DisplayArray, 1, { ARRAY( ::ColCount ), ::DataSource:Recno(), ::DataSource:Deleted(), ::ItemHeight }, .T. )
             ::__FillRow( 1 )
             ::RowPos++
             ::__VertScrolled++
@@ -2636,10 +2648,10 @@ METHOD __ScrollUp( nScroll ) CLASS DataGrid
 
              // Retrieve next Record
           TRY
-            ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() /*::Record*/ }
+            ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() }
             ::__FillRow( ::RowCountVisible )
            CATCH
-            ::__DisplayArray[ ::RowCountUsable ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() /*::Record*/ }
+            ::__DisplayArray[ ::RowCountUsable ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() }
             ::__FillRow( ::RowCountUsable )
           END
       NEXT
@@ -2689,11 +2701,11 @@ METHOD __ScrollDown( nScroll ) CLASS DataGrid
       ::__SkipRecords( nPos - ::Record )
 
       WHILE LEN( ::__DisplayArray ) < ::RowCountVisible
-         AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+         AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
       ENDDO
 
       FOR n := 1 TO MIN( ::RowCountVisible, nNew )
-          AINS( ::__DisplayArray, n, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+          AINS( ::__DisplayArray, n, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
           ::__FillRow( n )
           ::__SkipRecords( 1 )
           IF ::Hittop
@@ -2986,7 +2998,7 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
        IF nCol == NIL .OR. nCol == n // Loading new column?
           ::Children[n]:__nRight := ::__DataWidth
           IF ::Children[n]:__lHidden // Column is not into VIEW
-             ::__DisplayArray[ nPos ][1][n] := ARRAY( 13 )
+             ::__DisplayArray[ nPos ][1][n] := ARRAY( 9 )
              ::__DisplayArray[ nPos ][1][n][1] := ""
 
            ELSE
@@ -3076,14 +3088,10 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                                                  nImageWidth + 2,;
                                                  nAlign,;
                                                  nImageHeight,;
-                                                 NIL,;
                                                  nColBkColor,;
                                                  nColTxColor,;
-                                                 ::Children[n]:Width,;
                                                  nStatus,;
-                                                 ::Children[n]:Representation,;
-                                                 hFont,;
-                                                 ::DataSource:Deleted() }
+                                                 hFont }
           ENDIF
        ENDIF
        IF nCol == NIL .AND. ::Children[n]:Visible
@@ -3285,7 +3293,7 @@ METHOD Down() CLASS DataGrid
        ELSE
          ADEL( ::__DisplayArray, 1 )
          IF ::RowCountVisible > 0 .AND. LEN( ::__DisplayArray ) >= ::RowCountVisible
-            ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() }
+            ::__DisplayArray[ ::RowCountVisible ] := { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() }
             ::__FillRow( ::RowCountVisible )
 
             IF ::RowCountUsable != ::RowCountVisible
@@ -3382,11 +3390,11 @@ METHOD Up() CLASS DataGrid
       ::RowPos := 1
 
       IF ::RowCount < ::RowCountVisible
-         AADD( ::__DisplayArray, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+         AADD( ::__DisplayArray, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
       ENDIF
 
       // Insert next first visible Record
-      AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )//, TRUE )
+      AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )//, TRUE )
 
       ::__FillRow( 1 )
 
@@ -3496,7 +3504,7 @@ METHOD PageDown( nCount ) CLASS DataGrid
           EVAL( ::__bGoBottom )
           EXIT
        ENDIF
-       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
        ::__FillRow( n )
    NEXT
    n--
@@ -3517,7 +3525,7 @@ METHOD PageDown( nCount ) CLASS DataGrid
              EVAL( ::__bGoTop )
              EXIT
           ENDIF
-          AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() }, TRUE )
+          AINS( ::__DisplayArray, 1, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() }, TRUE )
           ::__FillRow( 1 )
       NEXT
       ::__GoToRec( nRec )
@@ -3587,7 +3595,7 @@ METHOD PageUp() CLASS DataGrid
    ENDIF
 
    FOR n := 1 TO ::RowCountVisible
-       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
        ::__FillRow( n )
        ::__SkipRecords( 1 )
        IF ::HitBottom
@@ -3642,7 +3650,7 @@ METHOD Home() CLASS DataGrid
 
    EVAL( ::__bGoTop )
    FOR n := 1 TO ::RowCountVisible
-       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+       AADD( ::__DisplayArray,{ ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
        ::__FillRow( n )
        ::__SkipRecords( 1 )
        IF ::HitBottom
@@ -3697,7 +3705,7 @@ METHOD End( lVUpdate ) CLASS DataGrid
       EVAL( ::__bGoTop )
    ENDIF
    FOR n := 1 TO ::RowCountUsable
-       AADD( ::__DisplayArray, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno() } )
+       AADD( ::__DisplayArray, { ARRAY( LEN( ::Children ) ), ::DataSource:Recno(), ::DataSource:Deleted() } )
        ::__FillRow( n )
        ::__SkipRecords( 1 )
        IF ::HitBottom
@@ -4570,11 +4578,6 @@ RETURN Self
 
 METHOD SetRepresentation(n) CLASS GridColumn
    ::xRepresentation := n
-   FOR n := 1 TO LEN( ::Parent:__DisplayArray )
-       //IF !EMPTY( ::Parent:__DisplayArray[n][1] )
-          ::Parent:__DisplayArray[n][1][::xPosition][11] := ::xRepresentation
-       //ENDIF
-   NEXT
    ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
 RETURN Self
 
