@@ -5762,6 +5762,62 @@ HB_FUNC( MONITORFROMRECT )
    }
 }
 
+HB_FUNC( GETMENUITEMRECT )
+{
+   PHB_ITEM pStructure = hb_param( 4, HB_IT_BYREF );
+
+   if( pStructure )
+   {
+      RECT *pRect = (RECT *) hb_xgrab( sizeof( RECT ) );
+
+      if( GetMenuItemRect( (HWND) hb_parnl(1), (HMENU) hb_parnl(2), (UINT) hb_parni(3), pRect ) )
+      {
+         PHB_ITEM pByRef;
+
+         if( HB_IS_OBJECT( pStructure ) )
+         {
+            pByRef = NULL;
+         }
+         else
+         {
+            //HB_CStructure( "MSG" )
+            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
+            hb_vmPushNil();
+            hb_itemPushStaticString( "RECT", 4 );
+            hb_vmDo(1);
+
+            pByRef = pStructure;
+            pStructure = hb_stackReturnItem();
+         }
+
+         //::InternalBuffer := pmsg
+         hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pRect, sizeof( RECT ) );
+
+         //::DeValue()
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+
+         if( pByRef )
+         {
+            hb_itemForwardValue( pByRef, pStructure );
+         }
+
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_xfree( (void *) pRect );
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "GETMENUITEMRECT", 1, hb_paramError(1) );
+   }
+}
+
+
 //-----------------------------------------------------------------------------
 HB_FUNC( GETMONITORINFO )
 {

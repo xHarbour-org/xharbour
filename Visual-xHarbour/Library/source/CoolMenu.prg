@@ -28,6 +28,20 @@
 #define SM_CXSHADOW 4
 #define DG_ADDCONTROL             1
 //-------------------------------------------------------------------------------------------------------
+CLASS xCoolMenu INHERIT MenuBar
+   DATA Width  INIT 0
+   DATA Height INIT 0
+   DATA VertScrollSize INIT 0
+   DATA HorzScrollSize INIT 0
+   DATA List
+   DATA ToolTips
+   DATA HideClippedButtons INIT .F.
+   DATA BandChild
+ENDCLASS
+
+CLASS xCoolMenuItem INHERIT MenuItem
+   DATA Position INIT 0
+ENDCLASS
 
 CLASS CoolMenu INHERIT ToolBar
    DATA BackColor       EXPORTED

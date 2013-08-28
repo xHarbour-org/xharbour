@@ -43,6 +43,8 @@ CLASS MenuItem INHERIT Object
    DATA __hBitmap      PROTECTED
    DATA __pObjPtr      EXPORTED
 
+   DATA Visible        PUBLISHED INIT .T.
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()
@@ -193,8 +195,12 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
-CLASS CMenuItem INHERIT Object
 
+//CLASS CMenuItem INHERIT MenuItem
+//   DATA ShortCutText
+//ENDCLASS
+
+CLASS CMenuItem INHERIT Object
    DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable              EXPORTED INIT .F.
    DATA __lCopyCut               EXPORTED INIT .F.

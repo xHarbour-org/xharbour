@@ -1976,9 +1976,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
            ENDIF
            IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible .AND. ! ::Children[ i ]:__lHidden
 
-              lHighLight := ::ShowSelection .AND. lFocus .AND. lData .AND. ( ::RowPos == nLine .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
-              //lFocusRect := lHighLight .AND. ::ShowSelectionBorder .AND. ! ::FullRowSelect
-              lShadow    := ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( ::RowPos == nLine .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+              lHighLight := ::ShowSelection .AND. lFocus .AND. lData .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+              lShadow    := ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
  
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
@@ -2263,10 +2262,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     _DrawFocusRect( hMemDC, aText )
                  ENDIF
               ENDIF
-
-              //IF lFocusRect
-                 //_DrawFocusRect( hMemDC, aText )
-              //ENDIF
 
               nLeft += ::Children[i]:Width
               IF lFreeze .AND. i <= ::FreezeColumn
