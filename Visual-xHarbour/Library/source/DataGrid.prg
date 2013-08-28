@@ -1857,7 +1857,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    LOCAL xLeft, nStatus, lDeleted, nPos, iAlign, lDC, lData
    LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lEnabled := ::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
-   LOCAL nForeColor, nBackColor, lFocus := GetFocus() != ::hWnd
+   LOCAL nForeColor, nBackColor, lFocus := GetFocus() == ::hWnd, /*lFocusRect,*/ lShadow
 
 
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
@@ -1968,13 +1968,18 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
           lSelected := .F.
        ENDIF
 
-       lDeleted := IIF( lData, ::__DisplayArray[nPos][3], .F. )
+       lDeleted   := IIF( lData, ::__DisplayArray[nPos][3], .F. )
 
        FOR i := nCol TO nColEnd
            IF nLeft > ::ClientWidth .OR. ( lData .AND. LEN(::__DisplayArray[nLine][1])<i ) // avoid painting non-visible columns
               EXIT
            ENDIF
            IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible .AND. ! ::Children[ i ]:__lHidden
+
+              lHighLight := ::ShowSelection .AND. lFocus .AND. lData .AND. ( ::RowPos == nLine .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+              //lFocusRect := lHighLight .AND. ::ShowSelectionBorder .AND. ! ::FullRowSelect
+              lShadow    := ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( ::RowPos == nLine .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+ 
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
               nWImg  := IIF( lData, IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 ), 0 )
@@ -2054,46 +2059,14 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  AADD( aData, "" )
               ENDIF
 
-              lHighLight := lFocus .OR. ::__CurControl != NIL
-
-              IF lDeleted
-                 IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
-                    IF ( lHighLight := lFocus .OR. ::__CurControl != NIL )
-                       nBackColor := ::HighlightColor
-                       nForeColor := ::HighlightTextColor
-                    ENDIF
-                 ENDIF
-
-               ELSEIF lEnabled
-
-                 IF ( ! lFocus .AND. ::FullRowSelect .AND. lSelected ) .OR. ( lSelected .AND. nRec <> nRecno )
-                    IF ::ShadowRow
-                       nBackColor := ::__InactiveHighlight
-                    ENDIF
-                  ELSE
-                    IF lSelected .AND. ( i == ::ColPos .OR. ::FullRowSelect )
-                       IF lHighLight .AND. nRep <> 4
-                          nBackColor := ::HighlightColor
-                          nForeColor := ::HighlightTextColor
-                        ELSEIF ::ShadowRow
-                          nBackColor := ::__InactiveHighlight
-                          nForeColor := ::__InactiveHighlightText
-                       ENDIF
-                     ELSE
-                       IF lSelected .AND. !::FullRowSelect .AND. i != ::ColPos .AND. ::ShadowRow
-                          SetBkColor( hMemDC, ::__InactiveHighlight )
-                          SetTextColor( hMemDC, ::__InactiveHighlightText )
-                        ELSE
-                          SetBkColor( hMemDC, nBackColor )
-                          SetTextColor( hMemDC, nForeColor )
-                       ENDIF
-                    ENDIF
-                 ENDIF
-               ELSE
-                 SetTextColor( hMemDC, ::System:Color:Gray )
-                 IF ::Striping
-                    SetBkColor( hMemDC, nBackColor )
-                 ENDIF
+              IF ! lEnabled
+                 nForeColor := ::System:Color:Gray
+               ELSEIF lHighLight
+                 nBackColor := ::HighlightColor
+                 nForeColor := ::HighlightTextColor
+               ELSEIF lShadow
+                 nBackColor := ::__InactiveHighlight
+                 nForeColor := ::__InactiveHighlightText
               ENDIF
 
               SetBkColor( hMemDC, nBackColor )
@@ -2290,6 +2263,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     _DrawFocusRect( hMemDC, aText )
                  ENDIF
               ENDIF
+
+              //IF lFocusRect
+                 //_DrawFocusRect( hMemDC, aText )
+              //ENDIF
 
               nLeft += ::Children[i]:Width
               IF lFreeze .AND. i <= ::FreezeColumn
