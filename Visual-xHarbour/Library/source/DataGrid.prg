@@ -4042,6 +4042,7 @@ CLASS GridColumn INHERIT Object
    DATA EventHandler                 EXPORTED
    DATA MDIContainer                 EXPORTED  INIT .F.
 
+   DATA Theming                      EXPORTED INIT .F.
    DATA __nRight                     EXPORTED  INIT 0
 
    DATA __HeaderLeft                 PROTECTED INIT 0
