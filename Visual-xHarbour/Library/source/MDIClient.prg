@@ -209,7 +209,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
 
       CASE WM_ERASEBKGND
            ::Parent:__PaintBakgndImage( nwParam, ::BkBrush )
-           RETURN 1
+           EXIT
 
       CASE WM_SIZE
            IF ::Parent:BackgroundImage != NIL .AND. !EMPTY( ::Parent:BackgroundImage:ImageName )

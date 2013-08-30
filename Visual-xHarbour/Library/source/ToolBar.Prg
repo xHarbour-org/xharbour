@@ -1116,7 +1116,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
                          IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
-                            IF ::Application:IsThemedXP
+                            IF ::Application:IsThemedXP .AND. ::System:Os:Version < 6.2
                                nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1
                                IF nHot == 0
                                   nHot := ::nPressed+1
@@ -1342,7 +1342,7 @@ METHOD UpdateMenu( lShow ) CLASS ToolBar
 
           oItem:MenuItemInfo:cbSize := oItem:MenuItemInfo:SizeOf()
           oItem:MenuItemInfo:fMask  := MIIM_CHECKMARKS | MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
-
+          oItem:Type := MFT_OWNERDRAW
 //          GetMenuItemInfo( hSysMenu, n-1, .T., @oItem:MenuItemInfo )
 //          oItem:BmpItem := oItem:MenuItemInfo:hBmpItem
           oItem:Enabled := GetMenuState( hSysMenu, n-1, MF_BYPOSITION ) & MF_DISABLED == 0

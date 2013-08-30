@@ -382,10 +382,14 @@ METHOD Create() CLASS CMenuItem
    ::MenuItemInfo:cbSize        := ::MenuItemInfo:SizeOf()
    ::MenuItemInfo:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
    ::MenuItemInfo:wID           := ::Id
-   IF ::Caption == "-"
+   IF ::Type != NIL
+      ::MenuItemInfo:fType      := ::Type
+    ELSEIF ::Caption == "-"
       ::MenuItemInfo:fType      := MFT_SEPARATOR
-    ELSE
+    ELSEIF ::ImageIndex > 0 .OR. ::System:Os:Version < 6.2
       ::MenuItemInfo:fType      := MFT_OWNERDRAW
+    ELSE
+      ::MenuItemInfo:fType      := MFT_STRING
    ENDIF
    ::MenuItemInfo:fType := ::MenuItemInfo:fType | ::MenuBreak
    IF ::RadioCheck
