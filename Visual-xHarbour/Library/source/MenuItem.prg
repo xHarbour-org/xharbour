@@ -89,12 +89,11 @@ METHOD GetMenuById( nId ) CLASS MenuItem
 RETURN oMenu
 
 //-------------------------------------------------------------------------------------------------------
-
+  
 METHOD Create() CLASS MenuItem
    LOCAL cShort, cText, mii := (struct MENUITEMINFO)
 
-   IF ::Parent:ClsName == "MenuItem" .AND. ::Parent:hMenu == NIL
-      ::Parent:hMenu := CreateMenu()
+   IF ::Parent:ClsName == "MenuItem"
       mii:cbSize     := mii:SizeOf()
       mii:hSubMenu   := ::Parent:hMenu
       mii:fMask      := MIIM_SUBMENU
@@ -129,7 +128,8 @@ METHOD Create() CLASS MenuItem
       mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
    ENDIF
    InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
-   
+   ::hMenu := CreateMenu()
+
    IF ::ImageIndex > 0
       ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
       IF ! ::xChecked

@@ -5124,13 +5124,12 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS Win
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __PaintBakgndImage( hDC ) CLASS WinForm
-   LOCAL hBrush
+METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
    LOCAL hMemBitmap, hOldBitmap, hMemDC
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
       DEFAULT hDC TO ::Drawing:hDC
 
-      hBrush := ::BkBrush
+      DEFAULT hBrush TO ::BkBrush
       IF !::ClsName == "Dialog"
          DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
       ENDIF

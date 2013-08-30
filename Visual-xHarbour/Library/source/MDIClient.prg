@@ -29,7 +29,6 @@ CLASS MDIClient INHERIT Window
    DATA ClsName         EXPORTED
    DATA Name            EXPORTED
    DATA DisableParent   EXPORTED INIT .F.
-   DATA WindowMenu      EXPORTED
    DATA Center          EXPORTED
    DATA MDIClient       EXPORTED
    DATA WindowStyle     EXPORTED
@@ -111,7 +110,7 @@ METHOD Init( oParent ) CLASS MDIClient
    ::FirstChild := 100
 
    ::Parent      := oParent
-   ::ClsName        := "MDIClient"
+   ::ClsName     := "MDIClient"
    ::ExStyle     := WS_EX_CLIENTEDGE
    ::WindowStyle := 4
    //::Form        := oParent
@@ -207,6 +206,17 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
            lShow := ::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE != 0
            ::Parent:Children[nwParam]:UpdateMenu( lShow )
            RETURN 1
+
+      CASE WM_ERASEBKGND
+           ::Parent:__PaintBakgndImage( nwParam, ::BkBrush )
+           RETURN 1
+
+      CASE WM_SIZE
+           IF ::Parent:BackgroundImage != NIL .AND. !EMPTY( ::Parent:BackgroundImage:ImageName )
+              ::CallWindowProc()
+              ::InvalidateRect()
+              ::RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+           ENDIF
    END
 RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
 

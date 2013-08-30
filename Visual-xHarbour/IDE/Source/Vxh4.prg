@@ -63,6 +63,7 @@ CLASS ObjManager INHERIT TreeView
 
    METHOD Init() CONSTRUCTOR
    METHOD ResetProperties()
+   METHOD CheckObjProp()
    METHOD Create()
    METHOD OnHScroll( n)        INLINE ::nScroll := n
    METHOD OnDestroy()          INLINE ::Super:OnDestroy(), ::LevelFont:Delete(), CloseThemeData( ::hChkTheme ), NIL
@@ -1084,7 +1085,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
-   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, xValue2, lReadOnly//, oObj
+   LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly//, oObj
    LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
@@ -1635,87 +1636,8 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        ENDIF
 
        oSub := oItem:AddItem( cProp, 0, aCol )
+       ::CheckObjProp( xValue, oSub, cProp, aSubExpand )
 
-       IF VALTYPE( xValue ) == "O"
-          aSub := __ClsGetPropertiesAndValues( xValue )
-          FOR EACH aSubProp IN aSub
-              ::Application:Yield()
-
-              cProp2  := aSubProp[1]
-              xValue2 := __objSendMsg( xValue, cProp2 )
-
-              cType   := VALTYPE( xValue2 )
-              nColor  := NIL
-
-              IF GetProperPar( cProp2 ) == "Colors" .AND. VALTYPE(xValue2) != "L"
-                 nColor := ::GetColorValues( xValue, cProp2, @xValue2 )
-                 cType  := "COLORREF"
-              ENDIF
-
-              cProp2  := __GetProperCase( cProp2 )[1]
-              aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
-
-              IF cProp == "Dock"
-                 IF cProp2 $ "LeftTopRightBottom"
-                    aCol[1]:Value := { "", { NIL } }
-                    AADD( aCol[1]:Value[2], ::ActiveObject:Parent )
-                    FOR EACH Child IN ::ActiveObject:Parent:Children
-                        IF Child:hWnd != ::ActiveObject:hWnd .AND. Child:__xCtrlName != "DataTable" .AND. Child:__xCtrlName != "AdsDataTable" .AND. Child:__xCtrlName != "Splitter"
-                           AADD( aCol[1]:Value[2], Child )
-                        ENDIF
-                    NEXT
-                    TRY
-                       IF xValue2 != NIL .AND. VALTYPE( xValue2 ) == "O"
-                          aCol[1]:Value[1] := xValue2:Name
-                       ENDIF
-                    catch
-                    END
-                    aCol[1]:ColType  := "DOCKING"
-                    xValue2 := NIL
-                 ENDIF
-               ELSEIF cProp2 == "AlignLeft" .OR. cProp2 == "AlignTop" .OR. cProp2 == "AlignRight" .OR. cProp2 == "AlignBottom"
-                 aCol[1]:Value := { "", { NIL } }
-                 FOR EACH Child IN ::ActiveObject:Children
-                     IF Child:hWnd != ::ActiveObject:hWnd .AND. Child:__xCtrlName != "DataTable" .AND. Child:__xCtrlName != "AdsDataTable" .AND. Child:__xCtrlName != "Splitter"
-                        AADD( aCol[1]:Value[2], Child )
-                     ENDIF
-                 NEXT
-                 TRY
-                    IF xValue2 != NIL .AND. VALTYPE( xValue2 ) == "O"
-                       aCol[1]:Value[1] := xValue2:Name
-                    ENDIF
-                 catch
-                 END
-                 aCol[1]:ColType  := "MDICLIENTALIGNMENT"
-                 xValue2 := NIL
-              ENDIF
-              IF cProp2 == "FaceName"
-                 aCol[1]:ColType  := "FACENAME"
-                 xValue2 := NIL
-               ELSEIF cProp2 == "Key"
-                 aCol[1]:ColType := "SHORTCUTKEY_KEY"
-                 xValue2 := NIL
-               ELSEIF cProp2 == "ImageName"
-                 IF xValue2 != NIL
-                    aCol[1]:Value := xValue2
-                    xValue2 := NIL
-                 ENDIF
-                 aCol[1]:ColType  := "IMAGENAME"
-
-               ELSEIF cProp2 == "Type" .AND. cProp == "Animation"
-                  xValue2 := NIL
-                  aCol[1]:Value := ::System:WindowAnimation:Keys
-                  aCol[1]:ColType  := "ANIMATIONSTYLE"
-              ENDIF
-              IF cProp2 == "Alignment"
-                 aCol[1]:Value    := xValue:__Alignments
-                 aCol[1]:ColType  := "ALIGNMENT"
-                 aCol[1]:SetValue := xValue:Alignment
-                 xValue2 := NIL
-              ENDIF
-              oSub:AddItem( cProp2, 0, aCol )
-          NEXT
-       ENDIF
        oSub:SortChildren( .T. )
        IF aSubExpand != NIL .AND. ASCAN( aSubExpand, cProp ) > 0
           oSub:Expand()
@@ -1773,6 +1695,98 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    hb_gcall()
 RETURN NIL
 
+METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
+   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub
+   IF VALTYPE( xValue ) == "O"
+      aSub := __ClsGetPropertiesAndValues( xValue )
+      VIEW cProp
+      FOR EACH aSubProp IN aSub
+          ::Application:Yield()
+
+          cProp2  := aSubProp[1]
+          xValue2 := __objSendMsg( xValue, cProp2 )
+
+          cType   := VALTYPE( xValue2 )
+          nColor  := NIL
+
+          IF GetProperPar( cProp2 ) == "Colors" .AND. VALTYPE(xValue2) != "L"
+             nColor := ::GetColorValues( xValue, cProp2, @xValue2 )
+             cType  := "COLORREF"
+          ENDIF
+
+          cProp2  := __GetProperCase( cProp2 )[1]
+          aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
+
+          IF cProp == "Dock"
+             IF cProp2 $ "LeftTopRightBottom"
+                aCol[1]:Value := { "", { NIL } }
+                AADD( aCol[1]:Value[2], ::ActiveObject:Parent )
+                FOR EACH Child IN ::ActiveObject:Parent:Children
+                    IF Child:hWnd != ::ActiveObject:hWnd .AND. Child:__xCtrlName != "DataTable" .AND. Child:__xCtrlName != "AdsDataTable" .AND. Child:__xCtrlName != "Splitter"
+                       AADD( aCol[1]:Value[2], Child )
+                    ENDIF
+                NEXT
+                TRY
+                   IF xValue2 != NIL .AND. VALTYPE( xValue2 ) == "O"
+                      aCol[1]:Value[1] := xValue2:Name
+                   ENDIF
+                catch
+                END
+                aCol[1]:ColType  := "DOCKING"
+                xValue2 := NIL
+             ENDIF
+           ELSEIF cProp2 == "AlignLeft" .OR. cProp2 == "AlignTop" .OR. cProp2 == "AlignRight" .OR. cProp2 == "AlignBottom"
+             aCol[1]:Value := { "", { NIL } }
+             FOR EACH Child IN ::ActiveObject:Children
+                 IF Child:hWnd != ::ActiveObject:hWnd .AND. Child:__xCtrlName != "DataTable" .AND. Child:__xCtrlName != "AdsDataTable" .AND. Child:__xCtrlName != "Splitter"
+                    AADD( aCol[1]:Value[2], Child )
+                 ENDIF
+             NEXT
+             TRY
+                IF xValue2 != NIL .AND. VALTYPE( xValue2 ) == "O"
+                   aCol[1]:Value[1] := xValue2:Name
+                ENDIF
+             catch
+             END
+             aCol[1]:ColType  := "MDICLIENTALIGNMENT"
+             xValue2 := NIL
+          ENDIF
+          IF cProp2 == "FaceName"
+             aCol[1]:ColType  := "FACENAME"
+             xValue2 := NIL
+           ELSEIF cProp2 == "Key"
+             aCol[1]:ColType := "SHORTCUTKEY_KEY"
+             xValue2 := NIL
+           ELSEIF cProp2 == "ImageName"
+             IF xValue2 != NIL
+                aCol[1]:Value := xValue2
+                xValue2 := NIL
+             ENDIF
+             aCol[1]:ColType  := "IMAGENAME"
+
+           ELSEIF cProp2 == "Type" .AND. cProp == "Animation"
+              xValue2 := NIL
+              aCol[1]:Value := ::System:WindowAnimation:Keys
+              aCol[1]:ColType  := "ANIMATIONSTYLE"
+
+           ELSEIF cProp2 == "Alignment"
+             aCol[1]:Value    := xValue:__Alignments
+             aCol[1]:ColType  := "ALIGNMENT"
+             aCol[1]:SetValue := xValue:Alignment
+             xValue2 := NIL
+          ENDIF
+          oSub := oItem:AddItem( cProp2, 0, aCol )
+          ::CheckObjProp( xValue2, oSub, cProp2, aSubExpand )
+
+          oSub:SortChildren( .T. )
+          //IF aSubExpand != NIL .AND. ASCAN( aSubExpand, cProp ) > 0
+          //   oSub:Expand()
+          //ENDIF
+          oItem:SortChildren( .T. )
+          //oItem:Expand()
+      NEXT
+   ENDIF
+RETURN NIL
 //--------------------------------------------------------------------------------------------------------------------------------
 
 METHOD GetColorValues( oObj, cProp, xValue ) CLASS ObjManager
