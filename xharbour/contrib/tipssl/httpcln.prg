@@ -70,6 +70,7 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA hFields      INIT  {=>}
    DATA cUserAgent   INIT  "Mozilla/3.0 compatible"
    DATA cAuthMode    INIT ""
+   DATA cConnetion   INIT "close"
    DATA cBoundary
    DATA aAttachments init {}
 
@@ -208,7 +209,7 @@ METHOD StandardFields() CLASS tIPClientHTTP
 
    ::InetSendall( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    ::InetSendall( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
-   ::InetSendall( ::SocketCon, "Connection: close" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "Connection: " + ::cConnetion + ::cCRLF )
 
    // Perform a basic authentication request
    IF ::cAuthMode == "Basic" .and. .not. ("Authorization" in ::hFields)

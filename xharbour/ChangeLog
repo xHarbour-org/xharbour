@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2013-09-03 10:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/tip/client.prg
+    contrib/tipssl/client.prg
+    * fixed read method to allow long http response
+  * contrib/tipssl/httpcln.prg
+    * change to allow Connection: field in http header allow other values then close
+    
 2013-08-21 10:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/sendmail.prg
     ! changes for blind carbon copy and speedup read results from smtp server responses

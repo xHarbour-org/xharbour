@@ -252,11 +252,11 @@ METHOD READ( nLen ) CLASS TIPClient
       RETURN NIL
    ENDIF
 
-   IF Empty( nLen ) .OR. nLen < 0 .OR. ( ::nLength > 0 .AND. nLen > ::nLength - ::nRead )
-      nLen := ::nLength - ::nRead
-   ENDIF
+   //IF Empty( nLen ) .OR. nLen < 0 .OR. ( ::nLength > 0 .AND. nLen > ::nLength - ::nRead )
+      //nLen := ::nLength - ::nRead
+   //ENDIF
 
-   IF Empty( nLen ) .OR. nLen < 0
+   IF ::nLength > RCV_BUF_SIZE  //Empty( nLen ) .OR. nLen < 0
       // read till end of stream
       cStr1 := Space( RCV_BUF_SIZE )
       cStr0 := ""
