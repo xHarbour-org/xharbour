@@ -288,6 +288,7 @@ CLASS MenuBar INHERIT Component
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD __AddMenuItem()
+   METHOD __ResetImageList()
    METHOD Destroy()
    METHOD GetMenuById()
 ENDCLASS
@@ -316,6 +317,14 @@ METHOD Create() CLASS MenuBar
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD __ResetImageList( oImgList ) CLASS MenuBar
+   LOCAL oSubMenu
+   FOR EACH oSubMenu IN ::Children
+       oSubMenu:__ResetImageList( oImgList )
+   NEXT
 RETURN Self
 
 METHOD Destroy() CLASS MenuBar

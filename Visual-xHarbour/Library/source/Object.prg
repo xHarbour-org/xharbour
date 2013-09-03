@@ -79,6 +79,7 @@ CLASS Object
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
    METHOD HasProperty()
    METHOD __SetCtrlName()
+   METHOD __ResetImageList()   VIRTUAL
    METHOD GetControlName()
    METHOD __CreateProperty()
    METHOD __SetAsProperty()

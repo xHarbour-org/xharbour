@@ -5662,7 +5662,7 @@ FUNCTION __ChkComponent( oObj, cComp )
          ENDIF
       ENDIF
    ENDIF
-   IF VALTYPE( cComp ) != "O"
+   IF VALTYPE( cComp ) != "O" .AND. oObj:__ClassInst == NIL
       cComp := NIL
    ENDIF
 RETURN cComp

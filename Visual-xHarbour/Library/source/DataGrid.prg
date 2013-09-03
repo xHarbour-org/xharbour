@@ -1977,7 +1977,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
            IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible .AND. ! ::Children[ i ]:__lHidden
 
               lHighLight := ::ShowSelection .AND. lFocus .AND. lData .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
-              lShadow    := ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+              lShadow    := lData .AND. ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
  
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
@@ -2103,7 +2103,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
               aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
               DEFAULT aAlign TO {1,1}
-
+              DEFAULT nWImg TO 0
               x := zLeft + IIF( ::Children[i]:ImageAlignment == 1, nWImg, 2 )
 
               y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
@@ -2984,8 +2984,8 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
              ENDIF
 
              IF nImageIndex > 0 .AND. ::ImageList != NIL
-                nImageWidth := ::ImageList:IconWidth
-                nImageHeight:= ::ImageList:IconHeight
+                nImageWidth  := IIF( ::ImageList:IconWidth  != NIL, ::ImageList:IconWidth,  nImageWidth )
+                nImageHeight := IIF( ::ImageList:IconHeight != NIL, ::ImageList:IconHeight, nImageHeight )
              ENDIF
 
              nColBkColor := ::Children[n]:BackColor

@@ -40,7 +40,7 @@ CLASS MenuItem INHERIT Object
    DATA Separator      PUBLISHED INIT .F.
    DATA RightJustified PUBLISHED INIT .F.
 
-   DATA __hBitmap      PROTECTED
+   DATA __hBitmap      EXPORTED
    DATA __pObjPtr      EXPORTED
 
    DATA Visible        PUBLISHED INIT .T.
@@ -50,6 +50,7 @@ CLASS MenuItem INHERIT Object
    METHOD __AddMenuItem()
    METHOD __SetEnabled()
    METHOD __SetChecked()
+   METHOD __ResetImageList()
    METHOD __ModifyMenu()  INLINE NIL
    METHOD Destroy()
    METHOD GetMenuById()
@@ -73,6 +74,25 @@ METHOD Init( oParent ) CLASS MenuItem
    ::__CreateProperty()
    Super:Init( oParent )
    ::ShortCutKey  := __MenuStripItemShortCut( Self )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD __ResetImageList( oImgList ) CLASS MenuItem
+   LOCAL oSubMenu, mii
+   IF ::ImageIndex > 0 .AND. ::__hBitmap == NIL .AND. ::Parent:ImageList != NIL .AND. ::Parent:ImageList == oImgList
+      ::__hBitmap := oImgList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
+
+      IF ! ::xChecked
+         mii := (struct MENUITEMINFO)
+         mii:cbSize   := mii:SizeOf()
+         mii:fMask    := MIIM_BITMAP
+         mii:hbmpItem := ::__hBitmap
+         SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
+      ENDIF
+   ENDIF
+   FOR EACH oSubMenu IN ::Children
+       oSubMenu:__ResetImageList( oImgList )
+   NEXT
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -130,7 +150,7 @@ METHOD Create() CLASS MenuItem
    InsertMenuItem( ::Parent:hMenu, -1, .T., mii )
    ::hMenu := CreateMenu()
 
-   IF ::ImageIndex > 0
+   IF ::ImageIndex > 0 .AND. VALTYPE( ::Parent:ImageList ) == "O"
       ::__hBitmap := ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
       IF ! ::xChecked
          mii := (struct MENUITEMINFO)
