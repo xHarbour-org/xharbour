@@ -306,9 +306,9 @@ METHOD Read( nLen ) CLASS tIPClient
       RETURN NIL
    ENDIF
 
-   //IF Empty( nLen ) .or. nLen < 0 .or.( ::nLength > 0 .and. nLen > ::nLength - ::nRead )
-      //nLen := ::nLength - ::nRead
-   //ENDIF
+   IF Empty( nLen ) .or. nLen < 0 .or.( ::nLength > 0 .and. nLen > ::nLength - ::nRead )
+      nLen := ::nLength - ::nRead
+   ENDIF
 
    IF ::nLength > RCV_BUF_SIZE //Empty( nLen ) .or. nLen < 0
       // read till end of stream
