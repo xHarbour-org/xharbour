@@ -3171,7 +3171,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
       IF ::Children[ ::ColPos ]:__lHidden
          ::__FillCol( ::ColPos )
       ENDIF
-
+VIEW ::Children[nCur]:__nLeft
       IF ::Children[nCur]:__nLeft + ::Children[nCur]:Width > ::ClientWidth+ABS(::__HorzScrolled)
          nScroll := (::Children[nCur]:__nLeft + ::Children[nCur]:Width) - (::ClientWidth+ABS(::__HorzScrolled))
          ::ColPos := nCur
