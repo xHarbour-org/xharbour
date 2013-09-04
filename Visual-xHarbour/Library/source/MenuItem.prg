@@ -26,7 +26,7 @@ CLASS MenuItem INHERIT Object
    DATA Id             EXPORTED
    DATA xImageList     EXPORTED
 
-   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
+   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList, .F. ) PERSISTENT
    ASSIGN ImageList(o)  INLINE ::xImageList := o
 
    DATA ImageIndex     PUBLISHED INIT 0
@@ -77,22 +77,26 @@ METHOD Init( oParent ) CLASS MenuItem
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD __ResetImageList( oImgList ) CLASS MenuItem
+METHOD __ResetImageList() CLASS MenuItem
    LOCAL oSubMenu, mii
-   IF ::ImageIndex > 0 .AND. ::__hBitmap == NIL .AND. ::Parent:ImageList != NIL .AND. ::Parent:ImageList == oImgList
-      ::__hBitmap := oImgList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
 
-      IF ! ::xChecked
-         mii := (struct MENUITEMINFO)
-         mii:cbSize   := mii:SizeOf()
-         mii:fMask    := MIIM_BITMAP
-         mii:hbmpItem := ::__hBitmap
-         SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
-      ENDIF
+   IF ::ImageList != NIL
+      FOR EACH oSubMenu IN ::Children
+          WITH OBJECT oSubMenu
+             IF :ImageIndex > 0 .AND. :__hBitmap == NIL
+                :__hBitmap := ::ImageList:GetBitmap( :ImageIndex, GetSysColorBrush( COLOR_MENU ) )
+
+                IF ! :xChecked
+                   mii := (struct MENUITEMINFO)
+                   mii:cbSize   := mii:SizeOf()
+                   mii:fMask    := MIIM_BITMAP
+                   mii:hbmpItem := :__hBitmap
+                   SetMenuItemInfo( ::hMenu, :Id, .F., mii )
+                ENDIF
+             ENDIF
+          END
+      NEXT
    ENDIF
-   FOR EACH oSubMenu IN ::Children
-       oSubMenu:__ResetImageList( oImgList )
-   NEXT
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -159,6 +163,9 @@ METHOD Create() CLASS MenuItem
          mii:hbmpItem := ::__hBitmap
          SetMenuItemInfo( ::Parent:hMenu, LEN( ::Parent:Children ), .T., mii )
       ENDIF
+   ENDIF
+   IF VALTYPE( ::xImageList ) == "C"
+      AADD( ::Form:__aPostCreateProc, { Self, "__ResetImageList" } )
    ENDIF
    ::ShortCutKey:SetAccel()
    AADD( ::Parent:Children, Self )

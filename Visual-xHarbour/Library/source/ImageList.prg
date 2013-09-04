@@ -93,9 +93,7 @@ METHOD Create() CLASS ImageList
    LOCAL oComp, aImage, cEvent, nStyle := ::Palette | ILC_MASK
 
    IF VALTYPE( ::Form ) == "O"
-             view ::Name
       FOR EACH oComp IN ::Form:Components
-             VIEW oComp:Name, oComp:ImageList 
           IF ! oComp == Self .AND. oComp:HasMessage( "ImageList" ) .AND. VALTYPE( oComp:ImageList ) == "C" .AND. UPPER( oComp:ImageList ) == UPPER( ::Name )
              oComp:ImageList := Self
              oComp:__ResetImageList( Self )

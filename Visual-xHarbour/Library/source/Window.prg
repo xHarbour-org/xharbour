@@ -4853,6 +4853,7 @@ CLASS WinForm INHERIT Window
    DATA AppParam               EXPORTED
 
    DATA __lLoading             EXPORTED INIT .F.
+   DATA __aPostCreateProc      EXPORTED INIT {}
    
    ACCESS Form                 INLINE Self
 
@@ -4897,7 +4898,7 @@ CLASS WinForm INHERIT Window
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
-   METHOD __SetActiveMenuBar(oMenu)  INLINE IIF( ::hWnd != NIL, SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) ), )
+   METHOD __SetActiveMenuBar()
 
    METHOD SetImageList()
 
@@ -4991,12 +4992,18 @@ METHOD Create( hoParent ) CLASS WinForm
    ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( 0, IDI_WINLOGO ) ) )
    ::SetOpacity( ::xOpacity )
 
+   AEVAL( ::__aPostCreateProc, {|a| hb_ExecFromArray( a[1], a[2] )} )
+   IF ::ActiveMenuBar != NIL
+      ::__SetActiveMenuBar( ::ActiveMenuBar )
+   ENDIF
    IF ::BackgroundImage != NIL
       ::BackgroundImage:Create()
    ENDIF
+RETURN Self
 
-   IF ::ActiveMenuBar != NIL
-      ::__SetActiveMenuBar( ::ActiveMenuBar )
+METHOD __SetActiveMenuBar( oMenu ) CLASS WinForm
+   IF ::hWnd != NIL .AND. VALTYPE( oMenu ) != "C"
+      SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) )
    ENDIF
 RETURN Self
 
@@ -5198,7 +5205,7 @@ METHOD Show( nShow ) CLASS WinForm
          ENDIF
          ::Application:DoEvents()
          ::__FixDocking()
-         
+
          nRet := ExecuteEvent( "OnLoad", Self )
 
          ODEFAULT nRet TO ::OnLoad( Self )
@@ -5643,13 +5650,16 @@ FUNCTION GetDesktopRect()
    aDesktopRect[4] := aDesktopRect[2] + GetSystemMetrics( SM_CYVIRTUALSCREEN )
 RETURN aDesktopRect
 
-FUNCTION __ChkComponent( oObj, cComp )
+FUNCTION __ChkComponent( oObj, cComp, lClear )
    LOCAL oForm
+   DEFAULT lClear TO .T.
    IF VALTYPE( cComp ) == "C" 
       oForm := oObj:Form
       IF oForm:__hObjects != NIL 
          IF HGetPos( oForm:__hObjects, cComp ) > 0
-            cComp := oForm:__hObjects[ cComp ]
+            IF oForm:__hObjects[ cComp ] != NIL
+               cComp := oForm:__hObjects[ cComp ]
+            ENDIF
           ELSE
             IF oObj:__ClassInst == NIL 
                oForm := oObj:Application:MainForm
@@ -5657,12 +5667,14 @@ FUNCTION __ChkComponent( oObj, cComp )
                oForm := oObj:Application:Project:Forms[1]
             ENDIF
             IF oForm:__hObjects != NIL .AND. HGetPos( oForm:__hObjects, cComp ) > 0
-               cComp := oForm:__hObjects[ cComp ]
+               IF oForm:__hObjects[ cComp ] != NIL
+                  cComp := oForm:__hObjects[ cComp ]
+               ENDIF
             ENDIF
          ENDIF
       ENDIF
    ENDIF
-   IF VALTYPE( cComp ) != "O" .AND. oObj:__ClassInst == NIL
+   IF lClear .AND. VALTYPE( cComp ) != "O" .AND. oObj:__ClassInst == NIL
       cComp := NIL
    ENDIF
 RETURN cComp

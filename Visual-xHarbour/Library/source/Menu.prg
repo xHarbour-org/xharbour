@@ -283,7 +283,9 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 CLASS MenuBar INHERIT Component
    DATA hMenu          EXPORTED
-   DATA ImageList      PUBLISHED
+   DATA xImageList     EXPORTED
+   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList, .F. ) PERSISTENT
+   ASSIGN ImageList(o)  INLINE ::xImageList := o
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -298,9 +300,18 @@ METHOD Init( oParent ) CLASS MenuBar
    DEFAULT ::ComponentType TO "MenuBar"
    DEFAULT ::ClsName       TO "MenuBar"
    Super:Init( oParent )
+/*
+   ::Parent := oParent
+   ::__CreateProperty()
+
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
+      IF oParent:TreeItem == NIL
+         ::Application:ObjectTree:Set( oParent )
+      ENDIF
+      ::Application:ObjectTree:Set( Self )
    ENDIF
+*/
 RETURN Self
 
 METHOD Create() CLASS MenuBar
@@ -313,6 +324,9 @@ METHOD Create() CLASS MenuBar
    lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
    SetMenuInfo( ::hMenu, lpMenuInfo )
 
+   IF VALTYPE( ::xImageList ) == "C"
+      AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
+   ENDIF
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
@@ -320,11 +334,26 @@ METHOD Create() CLASS MenuBar
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD __ResetImageList( oImgList ) CLASS MenuBar
-   LOCAL oSubMenu
-   FOR EACH oSubMenu IN ::Children
-       oSubMenu:__ResetImageList( oImgList )
-   NEXT
+METHOD __ResetImageList() CLASS MenuBar
+   LOCAL oSubMenu, mii
+
+   IF ::ImageList != NIL
+      FOR EACH oSubMenu IN ::Children
+          WITH OBJECT oSubMenu
+             IF :ImageIndex > 0 .AND. :__hBitmap == NIL
+                :__hBitmap := ::ImageList:GetBitmap( :ImageIndex, GetSysColorBrush( COLOR_MENU ) )
+
+                IF ! :xChecked
+                   mii := (struct MENUITEMINFO)
+                   mii:cbSize   := mii:SizeOf()
+                   mii:fMask    := MIIM_BITMAP
+                   mii:hbmpItem := :__hBitmap
+                   SetMenuItemInfo( ::hMenu, :Id, .F., mii )
+                ENDIF
+             ENDIF
+          END
+      NEXT
+   ENDIF
 RETURN Self
 
 METHOD Destroy() CLASS MenuBar

@@ -1422,7 +1422,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   NEXT
 
                   IF xValue != NIL
-                     aCol[1]:Value[1] := xValue:Name
+                     aCol[1]:Value[1] := IIF( VALTYPE( xValue ) == "C", xValue, xValue:Name )
                   ENDIF
 
                   aCol[1]:ColType  := "ACTIVEMENUBAR"
@@ -1699,7 +1699,6 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
    LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub
    IF VALTYPE( xValue ) == "O"
       aSub := __ClsGetPropertiesAndValues( xValue )
-      VIEW cProp
       FOR EACH aSubProp IN aSub
           ::Application:Yield()
 

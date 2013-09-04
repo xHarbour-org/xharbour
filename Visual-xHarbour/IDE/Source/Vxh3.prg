@@ -556,7 +556,7 @@ METHOD OnPaint() CLASS ControlMask
       RETURN NIL
    ENDIF
 
-   IF ::CurForm:InActive .OR. Empty( ::CurForm:Selected ) .OR. __clsParent( ::CurForm:Selected[1][1]:ClassH, "COMPONENT" )
+   IF ::CurForm:InActive .OR. Empty( ::CurForm:Selected ) .OR. __clsParent( ::CurForm:Selected[1][1]:ClassH, "COMPONENT" ) .OR. ::CurForm:Selected[1][1]:ClsName == "MenuBar"
       RETURN NIL
    ENDIF
 

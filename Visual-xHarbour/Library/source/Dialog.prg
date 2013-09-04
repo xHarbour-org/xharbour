@@ -110,6 +110,11 @@ METHOD PostInitDialog() CLASS Dialog
 
    ::SetOpacity( ::xOpacity )
 
+   AEVAL( ::__aPostCreateProc, {|a| hb_ExecFromArray( a[1], a[2] )} )
+   IF ::ActiveMenuBar != NIL
+      ::__SetActiveMenuBar( ::ActiveMenuBar )
+   ENDIF
+
    IF ::BackgroundImage != NIL
       ::BackgroundImage:Create()
    ENDIF

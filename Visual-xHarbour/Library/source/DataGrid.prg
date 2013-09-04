@@ -938,12 +938,12 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
 
       FOR i := nCol+1 TO ::ColCount
           IF ::Children[i]:__lHidden
-             ::Children[i]:__lHidden := ::Children[i]:Width < ::__HorzScrolled .OR. (::Children[i]:__nRight-::Children[i]:Width) > ::ClientWidth
+             ::Children[i]:__lHidden := ::Children[i]:Width < ::__HorzScrolled .OR. (::Children[i]:__nLeft-::Children[i]:Width) > ::ClientWidth
              IF ! ::Children[i]:__lHidden
                 ::__FillCol(i)
              ENDIF
           ENDIF
-          ::Children[i]:__nRight += nDiff
+          ::Children[i]:__nLeft += nDiff
       NEXT
       
       IF ( nCol > ::FreezeColumn )
@@ -958,7 +958,7 @@ METHOD __SetColWidth( nCol, nWidth ) CLASS DataGrid
       ::InvalidateRect( { ::__DataWidth, 0, ::ClientWidth, ::ClientHeight } )
       ::__UpdateHScrollBar(.T.)
    ENDIF
-   ::__GetDataWidth()
+   ::__GetDataWidth(,.T.)
 RETURN 1
 
 //---------------------------------------------------------------------------------
@@ -1444,7 +1444,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
    nClickCol := 1
    FOR n := 1 TO LEN( ::Children )
-       IF ::Children[n]:__nRight <= xPos-::__HorzScrolled
+       IF ::Children[n]:__nLeft <= xPos-::__HorzScrolled
           nClickCol := n
        ENDIF
    NEXT
@@ -2272,7 +2272,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
        IF ::FullRowSelect .AND. ( nLine == nFocRow .OR. lHover )
           TRY
-             nLeft   := nHScroll + ::Children[nCol]:__nRight
+             nLeft   := nHScroll + ::Children[nCol]:__nLeft
              nTop    := ::__GetHeaderHeight() + ( ( nLine-1 ) * ::ItemHeight ) + IIF( ::xShowGrid, 0, 1 )
              nBottom := nTop + ::ItemHeight - 1
 
@@ -2968,7 +2968,7 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
 
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
-          ::Children[n]:__nRight := ::__DataWidth
+          ::Children[n]:__nLeft := ::__DataWidth
           IF ::Children[n]:__lHidden // Column is not into VIEW
              ::__DisplayArray[ nPos ][1][n] := ARRAY( 9 )
              ::__DisplayArray[ nPos ][1][n][1] := ""
@@ -3116,7 +3116,7 @@ METHOD ArrowLeft( lMove ) CLASS DataGrid
          ENDIF
       ENDIF
 
-      nScroll := ::Children[::ColPos]:__nRight - ABS(::__HorzScrolled)
+      nScroll := ::Children[::ColPos]:__nLeft - ABS(::__HorzScrolled)
       IF nScroll < 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) - ABS(nScroll),, FALSE )
          IF ::IsCovered( ::__GetHeaderHeight() )
@@ -3164,6 +3164,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
          IF nCol > LEN( ::Children )
             RETURN .F.
          ENDIF
+         
          ::ColPos := nCol
       ENDIF
 
@@ -3171,7 +3172,12 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
          ::__FillCol( ::ColPos )
       ENDIF
 
-      nScroll := ( ::Children[::ColPos]:__nRight + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
+      IF ::Children[nCur]:__nLeft + ::Children[nCur]:Width > ::ClientWidth+ABS(::__HorzScrolled)
+         nScroll := (::Children[nCur]:__nLeft + ::Children[nCur]:Width) - (::ClientWidth+ABS(::__HorzScrolled))
+         ::ColPos := nCur
+       ELSE
+         nScroll := ( ::Children[::ColPos]:__nLeft + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
+      ENDIF
 
       IF ::Children[ ::ColPos ]:Width > ::ClientWidth
          nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
@@ -3858,7 +3864,7 @@ RETURN Self
 METHOD GetItemRect() CLASS DataGrid
    LOCAL aRect, nLeft, nTop, nBottom, nRight
    IF ::RowPos> 0 .AND. ::RowPos<=::RowCountUsable
-      nLeft   := ::__HorzScrolled + ::Children[::ColPos]:__nRight
+      nLeft   := ::__HorzScrolled + ::Children[::ColPos]:__nLeft
       nTop    := ::__GetHeaderHeight() + ( ( ::RowPos-1 ) * ::ItemHeight )
       nBottom := nTop + ::ItemHeight - 1
       nRight  := nLeft + ::Children[ ::ColPos ]:Width - 1
@@ -4043,7 +4049,7 @@ CLASS GridColumn INHERIT Object
    DATA MDIContainer                 EXPORTED  INIT .F.
 
    DATA Theming                      EXPORTED INIT .F.
-   DATA __nRight                     EXPORTED  INIT 0
+   DATA __nLeft                     EXPORTED  INIT 0
 
    DATA __HeaderLeft                 PROTECTED INIT 0
    DATA __HeaderRight                PROTECTED INIT 0
