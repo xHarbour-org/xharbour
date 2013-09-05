@@ -1730,6 +1730,7 @@ METHOD Init() CLASS IDE_MainForm
       :Text             := "ToolBox"
 
       :StaticEdge       := .F.
+      :ClientEdge       := .F.
       :Border           := .T.
       :Flat             := .T.
       :AllowUndock      := .T.
