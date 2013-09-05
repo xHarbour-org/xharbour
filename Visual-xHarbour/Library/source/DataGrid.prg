@@ -2078,8 +2078,14 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  aText[1] := iRight
                  aText[3] += iRight - zLeft
               ENDIF
+
+              // Header ---------------------------------------------------------
               IF nLine == 1 .AND. ::ShowHeaders
-                 aAlign := _GetTextExtentPoint32( hMemDC, IIF( Empty( ::Children[i]:xText ), 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', ::Children[i]:xText ) )
+
+                 hOldFont := SelectObject( hMemDC, ::Children[i]:HeaderFont:Handle )
+                 aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM(::Children[i]:xText) )
+                 SelectObject( hMemDC, hOldFont )
+
                  DEFAULT aAlign TO {1,1}
 
                  iAlign := ::Children[i]:HeaderAlignment
@@ -2088,18 +2094,18 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  ENDIF
 
                  x := zLeft + 3
-
                  SWITCH iAlign
                     CASE 2
-                         x := nRight - aAlign[1]-3
+                         x := nRight - aAlign[1] - 3
                          EXIT
 
                     CASE 3
-                         x:= zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
+                         x := zLeft + ( ( nRight - zLeft - aAlign[1] ) / 2 )
                          EXIT
                  END
-                 ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
+                 ::Children[i]:DrawHeader( hMemDC, zLeft, nHeaderRight, x )
               ENDIF
+              //-----------------------------------------------------------------
 
               aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM( aData[1] ) )
               DEFAULT aAlign TO {1,1}
@@ -2968,7 +2974,9 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
 
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
-          ::Children[n]:__nLeft := ::__DataWidth
+          IF nCol == NIL
+             ::Children[n]:__nLeft := ::__DataWidth
+          ENDIF
           IF ::Children[n]:__lHidden // Column is not into VIEW
              ::__DisplayArray[ nPos ][1][n] := ARRAY( 9 )
              ::__DisplayArray[ nPos ][1][n][1] := ""
@@ -3171,13 +3179,14 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
       IF ::Children[ ::ColPos ]:__lHidden
          ::__FillCol( ::ColPos )
       ENDIF
-VIEW ::Children[nCur]:__nLeft
+
       IF ::Children[nCur]:__nLeft + ::Children[nCur]:Width > ::ClientWidth+ABS(::__HorzScrolled)
          nScroll := (::Children[nCur]:__nLeft + ::Children[nCur]:Width) - (::ClientWidth+ABS(::__HorzScrolled))
          ::ColPos := nCur
        ELSE
          nScroll := ( ::Children[::ColPos]:__nLeft + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
       ENDIF
+
 
       IF ::Children[ ::ColPos ]:Width > ::ClientWidth
          nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
@@ -4234,10 +4243,10 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ENDIF
    IF n == 2
       x -= nx
-    ELSEIF n == 3
-      x := x - (nx/2)
+    ELSEIF n == 3 .AND. nx > 0
+      x -= (nx/2)
    ENDIF
-   
+
    IF nImage > 0 .AND. VALTYPE( ::Parent:ImageList ) == "O"
       nTop  := ( aRect[4] - ::Parent:ImageList:IconHeight ) / 2
 
