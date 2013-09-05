@@ -4992,12 +4992,12 @@ METHOD Create( hoParent ) CLASS WinForm
    ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( 0, IDI_WINLOGO ) ) )
    ::SetOpacity( ::xOpacity )
 
+   IF ::BackgroundImage != NIL
+      ::BackgroundImage:Create()
+   ENDIF
    AEVAL( ::__aPostCreateProc, {|a| hb_ExecFromArray( a[1], a[2] )} )
    IF ::ActiveMenuBar != NIL
       ::__SetActiveMenuBar( ::ActiveMenuBar )
-   ENDIF
-   IF ::BackgroundImage != NIL
-      ::BackgroundImage:Create()
    ENDIF
 RETURN Self
 

@@ -208,7 +208,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
            RETURN 1
 
       CASE WM_ERASEBKGND
-           ::Parent:__PaintBakgndImage( nwParam, ::BkBrush )
+           ::Parent:__PaintBakgndImage( nwParam, IIF( ::BkBrush == NIL .AND. ::Parent:BkBrush == NIL, GetSysColorBrush( COLOR_APPWORKSPACE ), ::BkBrush ) )
            RETURN 1
 
       CASE WM_SIZE
