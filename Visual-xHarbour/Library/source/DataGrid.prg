@@ -2084,7 +2084,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
                  hOldFont := SelectObject( hMemDC, ::Children[i]:HeaderFont:Handle )
                  aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM(::Children[i]:xText) )
-                 SelectObject( hMemDC, hOldFont )
+                 hOldFont := SelectObject( hMemDC, hOldFont )
 
                  DEFAULT aAlign TO {1,1}
 
