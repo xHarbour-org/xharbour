@@ -3124,7 +3124,14 @@ METHOD ArrowLeft( lMove ) CLASS DataGrid
          ENDIF
       ENDIF
 
-      nScroll := ::Children[::ColPos]:__nLeft - ABS(::__HorzScrolled)
+      IF ::Children[::ColPos]:__nLeft + ::Children[::ColPos]:Width > ::ClientWidth+ABS(::__HorzScrolled)
+         nScroll := (::Children[::ColPos]:__nLeft + ::Children[::ColPos]:Width) - (::ClientWidth+ABS(::__HorzScrolled))
+         //needs to scroll left instead of right
+         ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
+         ::__DisplayData()         
+      ELSE
+         nScroll := ::Children[::ColPos]:__nLeft - ABS(::__HorzScrolled)
+      ENDIF
       IF nScroll < 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) - ABS(nScroll),, FALSE )
          IF ::IsCovered( ::__GetHeaderHeight() )
@@ -3194,7 +3201,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
 
       IF nScroll > 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
-         IF ::IsCovered( ::__GetHeaderHeight() )
+         IF ::IsCovered( ::__GetHeaderHeight() ) .OR. ::ColPos == nCur 
             ::__DisplayData()
           ELSE
             ::__DisplayData(, nCur,, ::ColPos )
