@@ -145,7 +145,7 @@ METHOD PreInitDialog() CLASS Dialog
    ::sih:cbSize := ::sih:sizeof()
    ::sih:nMin   := 0
 
-   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL  .AND. ::Application:OsVersion:dwMajorVersion >= 5.AND. ::Application:IsThemedXP .AND. ::Theming
+   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL  .AND. ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Application:IsThemedXP .AND. ::Theming
       ::EnableThemeDialogTexture( ETDT_ENABLETAB )
    ENDIF
 

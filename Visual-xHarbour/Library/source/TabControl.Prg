@@ -147,7 +147,7 @@ CLASS TabControl INHERIT Control
    METHOD OnTabInsert()              VIRTUAL
 
    METHOD OnParentNotify()
-   METHOD OnEraseBkGnd()             INLINE 1
+   METHOD OnEraseBkGnd()             INLINE IIF( ! ::Theming .OR. ! IsThemeActive(), NIL, 1 )
 
    METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),; 
                                             IIF( ::IsWindow(),;
@@ -510,7 +510,9 @@ METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
    LOCAL aItem, oPage, hWnd, rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
-
+   IF ( !::Theming .OR. !IsThemeActive() )
+      RETURN NIL
+   ENDIF
    IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
       hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
       WHILE hWnd <> 0
