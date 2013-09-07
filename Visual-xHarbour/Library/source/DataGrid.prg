@@ -2115,6 +2115,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               y := nTop + ((nBottom-nTop)/(LEN( aData )+1)) - (aAlign[2]/2)
 
               SWITCH nAlign
+                 CASE 1
+                      nAlign := DT_LEFT
+                      EXIT
+
                  CASE 2
                       x := nRight - aAlign[1]-4
                       IF ::Children[i]:ImageAlignment == 3
@@ -2213,12 +2217,18 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
                ELSEIF nRep > 1
 
-                 x:= zLeft + ((nRight-zLeft+nWImg)/2) - (aAlign[1]/2)
-
+                 x := zLeft + ((nRight-zLeft+nWImg)/2) - (aAlign[1]/2)
+                 
                  IF nRep == 3
-                    aRect := {zLeft+IIF(::Children[i]:ControlAlign==DT_LEFT,1,0),nTop+1,nRight-2,MAX(nBottom-1,nTop+::ItemHeight)}
+                    IF nAlign == DT_LEFT
+                       aRect := { aText[1]+1, aText[2], aText[1]+17, aText[4] }
+                     ELSEIF nAlign == DT_RIGHT
+                       aRect := { aText[3]-17, aText[2], aText[3], aText[4] }
+                     ELSEIF nAlign == DT_CENTER
+                       aRect := aText
+                    ENDIF
                  ENDIF
-                 ::__DrawRepresentation( hMemDC, nRep, aText, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
+                 ::__DrawRepresentation( hMemDC, nRep, aRect, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
 
               ENDIF
 
