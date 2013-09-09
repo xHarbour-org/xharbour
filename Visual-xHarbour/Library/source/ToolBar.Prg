@@ -22,8 +22,33 @@ static s_nMenu
 #include "debug.ch"
 #include "vxh.ch"
 
+#define TMT_TEXTCOLOR               3803
+
 #define MBM_POPUPMENU  (WM_USER + 1801)
 #define SM_CXSHADOW 4
+
+/* MENU parts */
+#define MP_MENUITEM        1
+#define MP_MENUDROPDOWN    2
+#define MP_MENUBARITEM     3
+#define MP_MENUBARDROPDOWN 4
+#define MP_CHEVRON         5
+#define MP_SEPARATOR       6
+
+/* MENU * states */
+#define MS_NORMAL    1
+#define MS_SELECTED  2
+#define MS_DEMOTED   3
+
+
+#define MENU_BARITEM 8
+
+#define MBI_NORMAL          1
+#define MBI_HOT             2
+#define MBI_PUSHED          3
+#define MBI_DISABLED        4
+#define MBI_DISABLEDHOT     5
+#define MBI_DISABLEDPUSHED  6
 
 
 #define ATL_IDM_FIRST_MDICHILD 50000
@@ -996,7 +1021,7 @@ RETURN NIL
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
    LOCAL oButton, oBtn, nDif, n, nState, x, nRet
-   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton, hBrush
+   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton//, hBrush
    LOCAL tbcd, nmt, nmtb, rc, pt, cr, lColor := .F.
    (nwParam)
    DO CASE
@@ -1116,20 +1141,29 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
                          IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
-                            IF ::Application:IsThemedXP .AND. ::System:Os:Version < 6.2
+                            IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
                                nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1
                                IF nHot == 0
                                   nHot := ::nPressed+1
                                ENDIF
                                IF nHot > 0
-                                  hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
 
+                                  hTheme := OpenThemeData(,"MENU")
+                                  aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
+                                  DrawThemeBackground( hTheme, tbcd:nmcd:hdc, MENU_BARITEM, MBI_HOT, aRect, aRect )
+                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
+                                  CloseThemeData( hTheme )
+
+
+/*
+                                  hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
                                   SelectObject( tbcd:nmcd:hdc, hBrush )
                                   SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
                                   Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
+                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
+*/                                  
                                   SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
                                   SelectObject( tbcd:nmcd:hdc, ::GetFont() )
-                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
                                   DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
                                   nRet := CDRF_SKIPDEFAULT
                                ENDIF
