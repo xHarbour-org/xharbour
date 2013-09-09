@@ -50,6 +50,13 @@ static s_nMenu
 #define MBI_DISABLEDHOT     5
 #define MBI_DISABLEDPUSHED  6
 
+#define MENU_POPUPITEM  14
+
+#define MPI_NORMAL          1
+#define MPI_HOT             2
+#define MPI_DISABLED        3
+#define MPI_DISABLEDHOT     4
+
 
 #define ATL_IDM_FIRST_MDICHILD 50000
 #define IDM_MDI_BASE      (ATL_IDM_FIRST_MDICHILD - 5)
@@ -1150,8 +1157,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 
                                   hTheme := OpenThemeData(,"MENU")
                                   aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
-                                  DrawThemeBackground( hTheme, tbcd:nmcd:hdc, MENU_BARITEM, MBI_HOT, aRect, aRect )
-                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
+                                  DrawThemeBackground( hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, IIF( tbcd:nmcd:uItemState == CDIS_SELECTED .OR. nHot==::nPressed+1, MPI_HOT, MPI_HOT ), aRect, aRect )
+                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( hTheme, MENU_POPUPITEM, IIF( tbcd:nmcd:uItemState == CDIS_SELECTED .OR. nHot==::nPressed+1, MPI_HOT, MPI_HOT ), TMT_TEXTCOLOR ) )
                                   CloseThemeData( hTheme )
 
 
