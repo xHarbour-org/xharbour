@@ -1028,7 +1028,7 @@ RETURN NIL
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
    LOCAL oButton, oBtn, nDif, n, nState, x, nRet
-   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton//, hBrush
+   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton, hBrush
    LOCAL tbcd, nmt, nmtb, rc, pt, cr, lColor := .F.
    (nwParam)
    DO CASE
@@ -1148,27 +1148,17 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
                          IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
-                            IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
+                            IF ::Application:IsThemedXP .AND. ::System:Os:Version < 6
                                nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1
                                IF nHot == 0
                                   nHot := ::nPressed+1
                                ENDIF
                                IF nHot > 0
-
-                                  hTheme := OpenThemeData(,"MENU")
-                                  aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
-                                  DrawThemeBackground( hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, IIF( tbcd:nmcd:uItemState == CDIS_SELECTED .OR. nHot==::nPressed+1, MPI_HOT, MPI_HOT ), aRect, aRect )
-                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( hTheme, MENU_POPUPITEM, IIF( tbcd:nmcd:uItemState == CDIS_SELECTED .OR. nHot==::nPressed+1, MPI_HOT, MPI_HOT ), TMT_TEXTCOLOR ) )
-                                  CloseThemeData( hTheme )
-
-
-/*
                                   hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
                                   SelectObject( tbcd:nmcd:hdc, hBrush )
                                   SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
                                   Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
-                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
-*/                                  
+                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )                                  
                                   SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
                                   SelectObject( tbcd:nmcd:hdc, ::GetFont() )
                                   DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )

@@ -413,7 +413,7 @@ METHOD Create() CLASS CMenuItem
       ::MenuItemInfo:fType      := ::Type
     ELSEIF ::Caption == "-"
       ::MenuItemInfo:fType      := MFT_SEPARATOR
-    ELSEIF ::ImageIndex > 0 .OR. ::System:Os:Version < 6.2
+    ELSEIF ::ImageIndex > 0 .OR. ::System:Os:Version <= 6
       ::MenuItemInfo:fType      := MFT_OWNERDRAW
     ELSE
       ::MenuItemInfo:fType      := MFT_STRING
