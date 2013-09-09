@@ -37,6 +37,9 @@ INIT PROCEDURE __InitSystem
 RETURN
 
 EXIT PROCEDURE __SystemCleanup
+   IF oSystem:hButtonTheme != NIL
+      CloseThemeData( oSystem:hButtonTheme )
+   ENDIF
    oSystem:ImageList[ "StdSmall" ]:Destroy()
    DeleteObject( oSystem:FocusPen )
    DeleteObject( oSystem:TitleBackBrush )
@@ -93,6 +96,7 @@ CLASS System
    DATA hRich20                 EXPORTED
 
    DATA hFont                   EXPORTED
+   DATA hButtonTheme            EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -746,6 +750,8 @@ METHOD Init() CLASS System
    ::TitleBorderPen := CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
    
    ::hFont          := __GetMessageFont()
+
+   ::hButtonTheme   := OpenThemeData(,"button")
 RETURN Self
 
 METHOD GetRunningProcs() CLASS System

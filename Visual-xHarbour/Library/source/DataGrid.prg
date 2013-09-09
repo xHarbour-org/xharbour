@@ -2328,9 +2328,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 RETURN .T.
 
 METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i ) CLASS DataGrid
-   LOCAL nWidth, aClip, nFore, nBack, hPen, hOP, hOB, hBrush, hTheme, nStatus, nFlags, lXP
+   LOCAL nWidth, aClip, nFore, nBack, hPen, hOP, hOB, hBrush, nStatus, nFlags, lXP
 
-   lXP    := ::Application:IsThemedXP .AND. ::Theming
+   lXP    := ::Application:IsThemedXP .AND. ::Theming .AND. ::System:hButtonTheme != NIL
    nFlags := DFCS_BUTTONCHECK
 
    IF nRep == 2
@@ -2404,9 +2404,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
       nFlags := nFlags | nStatus
 
       IF lXP
-         hTheme := OpenThemeData(,"button")
-         DrawThemeBackground( hTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
-         CloseThemeData( hTheme )
+         DrawThemeBackground( ::System:hButtonTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
        ELSE
          aRect[1] := aRect[1] + (( aRect[3]-aRect[1]-15 )/2)
          aRect[2] := aRect[2] + (( aRect[4]-aRect[2]-15 )/2)
@@ -2424,9 +2422,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          IF ::__lMouseDown  .AND. i == ::ColPos
             nStatus := PBS_PRESSED
          ENDIF
-         hTheme := OpenThemeData(,"button")
-         DrawThemeBackground( hTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
-         CloseThemeData( hTheme )
+         DrawThemeBackground( ::System:hButtonTheme, hDC, BP_PUSHBUTTON, nStatus, aRect, aRect )
        ELSE
          nStatus := DFCS_BUTTONPUSH
          IF ::__lMouseDown  .AND. i == ::ColPos
