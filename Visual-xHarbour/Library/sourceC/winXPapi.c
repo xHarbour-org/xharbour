@@ -99,41 +99,20 @@ void  Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
 }
 
 //-------------------------------------------------------------------------------------------
-void InitUxTheme( void )
+HB_FUNC( __INITUXTHEME )
 {
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = (HINSTANCE ) LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-       hb_retnl( (LONG) hUxTheme );
-   }
+   hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
 }
 
-void EndUxTheme( void )
+HB_FUNC( __ENDUXTHEME )
 {
-   if( hUxTheme != NULL )
-   {
-      FreeLibrary( hUxTheme );
-   }
+   FreeLibrary( hUxTheme );
 }
-
-HB_FUNC( INITUXTHEME )
-{
-   InitUxTheme();
-}
-
-HB_FUNC( ENDUXTHEME )
-{
-   EndUxTheme();
-}
+//-------------------------------------------------------------------------------------------
 
 HB_FUNC( ISTHEMEACTIVE )
 {
    BOOL bRet = (BOOL) FALSE ;
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = (HINSTANCE) LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -154,11 +133,6 @@ HB_FUNC( GETTHEMESYSFONT )
 {
    HFONT hFont = NULL;
    HRESULT hRet;
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = (HINSTANCE) LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -189,11 +163,6 @@ HB_FUNC( GETTHEMEFONT )
 {
    HFONT hFont = NULL;
    HRESULT hRet;
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -229,11 +198,6 @@ HB_FUNC( GETTHEMECOLOR )
    COLORREF pColor = 0;
    HRESULT nRet;
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeColor pfn = (fnGetThemeColor) GetProcAddress( hUxTheme, "GetThemeColor") ;
@@ -255,11 +219,6 @@ HB_FUNC( OPENTHEMEDATA )
 {
    HTHEME nRet;
    HWND hWnd = (HWND) hb_parnl(1);
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -285,11 +244,6 @@ HB_FUNC( CLOSETHEMEDATA )
 {
    HTHEME nRet;
    HTHEME hTheme   = (HTHEME) hb_parnl(1);
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -321,12 +275,7 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
    RECT pRect;
 
    Array2Rect( hb_param(5,HB_IT_ARRAY), &pRect );
-   //Array2Rect( hb_param(6,HB_IT_ARRAY), &pClipRect );
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -351,11 +300,6 @@ HB_FUNC( DRAWTHEMETEXTEX )
    HDC    hDC      = (HDC) hb_parnl(2);
    int    iPartId  = hb_parni(3);
    int    iStateId = hb_parni(4);
-
-   if( hUxTheme == NULL )
-   {
-      hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -393,11 +337,6 @@ HB_FUNC( DRAWTHEMETEXT )
 
    Array2Rect( hb_param(7,HB_IT_ARRAY), &pRect );
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnDrawThemeText pfn = (fnDrawThemeText) GetProcAddress( hUxTheme, "DrawThemeText") ;
@@ -424,11 +363,6 @@ HB_FUNC( GETTHEMEMETRIC )
    int    iPropId  = hb_parni(5);
    int    piVal;
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeMetric pfn = (fnGetThemeMetric) GetProcAddress( hUxTheme, "GetThemeMetric") ;
@@ -451,11 +385,6 @@ HB_FUNC( GETTHEMEINT )
    int    iStateId = hb_parni(3);
    int    iPropId  = hb_parni(4);
    int    iVal;
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -481,11 +410,6 @@ HB_FUNC( GETTHEMERECT )
    PHB_ITEM pArray = hb_param( 5, HB_IT_ARRAY );
    RECT rc = { 0 };
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeRect pfn = (fnGetThemeRect) GetProcAddress( hUxTheme, "GetThemeRect" ) ;
@@ -510,11 +434,6 @@ HB_FUNC( GETTHEMEPARTSIZE )
    SIZE pSize;
 
    PHB_ITEM pArray = hb_param( 7, HB_IT_ARRAY );
-
-   if( hUxTheme == NULL )
-   {
-      hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    hb_reta( 2 );
    hb_storni( 0, -1, 1 );
@@ -556,11 +475,6 @@ HB_FUNC( DRAWTHEMEPARENTBACKGROUND )
       Array2Rect( hb_param(3,HB_IT_ARRAY), &pRect );
    }
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnDrawThemeParentBackground pfn = (fnDrawThemeParentBackground) GetProcAddress( hUxTheme, "DrawThemeParentBackground") ;
@@ -576,11 +490,6 @@ HB_FUNC( DRAWTHEMEPARENTBACKGROUND )
 
 HB_FUNC( GETCURRENTTHEMENAME )
 {
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
       fnGetCurrentThemeName pfn = (fnGetCurrentThemeName) GetProcAddress( hUxTheme, "GetCurrentThemeName" );
@@ -612,11 +521,6 @@ HB_FUNC( GETCURRENTTHEMENAME )
 
 HB_FUNC( GETTHEMEDOCUMENTATIONPROPERTY )
 {
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeDocumentationProperty pfn = (fnGetThemeDocumentationProperty) GetProcAddress( hUxTheme, "GetThemeDocumentationProperty" );
@@ -649,11 +553,6 @@ HB_FUNC( GETTHEMEBACKGROUNDCONTENTRECT )
    RECT pBoundingRect;
    RECT pContentRect;
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeBackgroundContentRect pfn = (fnGetThemeBackgroundContentRect) GetProcAddress( hUxTheme, "GetThemeBackgroundContentRect") ;
@@ -682,11 +581,6 @@ HB_FUNC( GETTHEMEBACKGROUNDEXTENT )
    RECT pContentRect;
    RECT pExtentRect;
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetThemeBackgroundExtent pfn = (fnGetThemeBackgroundExtent) GetProcAddress( hUxTheme, "GetThemeBackgroundExtent") ;
@@ -709,11 +603,6 @@ HB_FUNC( SETWINDOWTHEME )
    HRESULT nRet;
 
    HWND hWnd = (HWND) hb_parnl(1);
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnSetWindowTheme pfn = (fnSetWindowTheme) GetProcAddress( hUxTheme, "SetWindowTheme") ;
@@ -741,11 +630,6 @@ HB_FUNC( GETWINDOWTHEME )
 
    HWND hWnd = (HWND) hb_parnl(1);
 
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnGetWindowTheme pfn = (fnGetWindowTheme) GetProcAddress( hUxTheme, "GetWindowTheme") ;
@@ -763,11 +647,6 @@ HB_FUNC( GETWINDOWTHEME )
 
 HB_FUNC( SETTHEMEAPPPROPERTIES )
 {
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
-
    if( hUxTheme )
    {
        fnSetThemeAppProperties pfn = (fnSetThemeAppProperties) GetProcAddress( hUxTheme, "SetThemeAppProperties") ;
@@ -783,11 +662,6 @@ HB_FUNC( SETTHEMEAPPPROPERTIES )
 HB_FUNC( GETTHEMESYSCOLOR )
 {
    COLORREF nRet = 0;
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {
@@ -810,11 +684,6 @@ HB_FUNC( ENABLETHEMEDIALOGTEXTURE )
 
    HWND hWnd = (HWND) hb_parnl(1);
    DWORD flags = hb_parnl(2);
-
-   if( hUxTheme == NULL )
-   {
-       hUxTheme = LoadLibraryEx( "uxtheme.dll", NULL, 0 );
-   }
 
    if( hUxTheme )
    {

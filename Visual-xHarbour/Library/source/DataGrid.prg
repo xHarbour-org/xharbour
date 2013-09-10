@@ -2452,7 +2452,7 @@ METHOD __UpdateHeight() CLASS DataGrid
    nVisible := 0
 
    IF ::DataSource != NIL
-      nRec     := ::DataSource:Recno()
+      nRec  := ::DataSource:Recno()
 
       n := 1
       WHILE nHeight <= ::ClientHeight

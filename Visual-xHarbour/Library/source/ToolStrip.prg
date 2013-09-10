@@ -834,7 +834,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
    LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom
 
-   IF hDC == 0
+   IF EMPTY( hDC )
       hDC := ::BeginPaint()
    ENDIF
 
@@ -944,7 +944,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS ToolStrip
       NEXT
    ENDIF
 
-   IF hDC != NIL
+   IF hMemDC != NIL
       BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
       SelectObject( hMemDC,  hOldBitmap )
       DeleteObject( hMemBitmap )
@@ -1152,7 +1152,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS ToolStrip
    ::__PrevSize := LOWORD(nlParam)
    IF ::Row > 0 .AND. ::__PrevRow == 0 
       ::__SetVertex()
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
    ENDIF
 RETURN NIL
 

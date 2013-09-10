@@ -33,6 +33,7 @@ static oSystem
 #define DEF_SCHEME "Classic"
 
 INIT PROCEDURE __InitSystem
+   __InitUxTheme()
    oSystem := System( NIL )
 RETURN
 
@@ -51,6 +52,7 @@ EXIT PROCEDURE __SystemCleanup
    IF oSystem:hRich20 != NIL
       FreeLibrary( oSystem:hRich20 )
    ENDIF
+   __EndUxTheme()
 RETURN
 
 FUNCTION __GetSystem(); RETURN oSystem

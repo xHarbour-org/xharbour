@@ -89,7 +89,6 @@ EXIT PROCEDURE __CleanUp
       DeleteObject( Application:hTitleBackBrushInactive )
       DeleteObject( Application:hTitleBackBrushActive )
    ENDIF
-   EndUxTheme()
    OleUninitialize()
    Application := NIL
 RETURN
@@ -519,7 +518,6 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
 
       GetVersionEx( @::OsVersion )
 
-      InitUxTheme()
    ENDIF
    ::Instance := GetModuleHandle( ::FileName )
 RETURN Self
