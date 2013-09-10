@@ -3156,7 +3156,7 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 METHOD ArrowRight( lMove ) CLASS DataGrid
-   LOCAL nScroll, nCol, nCur, nPos := 0, lREs
+   LOCAL nScroll := 0, nCol, nCur, nPos := 0, lREs
 
    DEFAULT lMove TO .T.
 
@@ -3196,16 +3196,18 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
       IF ::Children[nCur]:__nLeft + ::Children[nCur]:Width > ::ClientWidth+ABS(::__HorzScrolled)
          nScroll := (::Children[nCur]:__nLeft + ::Children[nCur]:Width) - (::ClientWidth+ABS(::__HorzScrolled))
          ::ColPos := nCur
+       ELSEIF ::Children[::ColPos]:__nLeft < ABS(::__HorzScrolled)
+         nScroll := ::Children[::ColPos]:__nLeft - ABS(::__HorzScrolled)
+         ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
+         ::__DisplayData()         
        ELSE
          nScroll := ( ::Children[::ColPos]:__nLeft + ::Children[ ::ColPos ]:Width ) - ::ClientWidth - ABS(::__HorzScrolled)
       ENDIF
 
-
-      IF ::Children[ ::ColPos ]:Width > ::ClientWidth
-         nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
-      ENDIF
-
       IF nScroll > 0
+         IF ::Children[ ::ColPos ]:Width > ::ClientWidth
+            nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
+         ENDIF
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
          IF ::IsCovered( ::__GetHeaderHeight() ) .OR. ::ColPos == nCur 
             ::__DisplayData()
