@@ -10,6 +10,7 @@
 #include "item.api"
 #include "hbapi.h"
 #include "uxtheme.h"
+#include "hbapierr.h"
 
 HB_EXTERN_BEGIN
    extern HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString );
@@ -266,27 +267,32 @@ HB_FUNC( CLOSETHEMEDATA )
 HB_FUNC( DRAWTHEMEBACKGROUND )
 {
    HRESULT nRet;
+   PHB_ITEM pArray = hb_param( 5, HB_IT_ARRAY );
 
-   HTHEME hTheme   = (HTHEME) hb_parnl(1);
-   HDC    hDC      = (HDC) hb_parnl(2);
-   int    iPartId  = hb_parni(3);
-   int    iStateId = hb_parni(4);
-
-   RECT pRect;
-
-   Array2Rect( hb_param(5,HB_IT_ARRAY), &pRect );
-
-
-   if( hUxTheme )
+   if( pArray )
    {
-       fnDrawThemeBackground pfn = (fnDrawThemeBackground) GetProcAddress( hUxTheme, "DrawThemeBackground") ;
+      HTHEME hTheme   = (HTHEME) hb_parnl(1);
+      HDC    hDC      = (HDC) hb_parnl(2);
+      int    iPartId  = hb_parni(3);
+      int    iStateId = hb_parni(4);
 
-       if( pfn )
-       {
-           nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, &pRect, NULL );
-       }
+      RECT pRect;
+      Array2Rect( pArray, &pRect );
+
+      if( hUxTheme )
+      {
+          fnDrawThemeBackground pfn = (fnDrawThemeBackground) GetProcAddress( hUxTheme, "DrawThemeBackground") ;
+
+          if( pfn )
+          {
+              nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, &pRect, NULL );
+          }
+      }
    }
-
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 6001, NULL, "pArray in DrawThemeBackground", 1, hb_paramError( 1 ) );
+   }
    hb_retl( (nRet==S_OK) );
 }
 

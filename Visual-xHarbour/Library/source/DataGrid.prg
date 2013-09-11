@@ -1977,7 +1977,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
            IF LEN( ::Children ) >= i .AND. ::Children[ i ]:Visible .AND. ! ::Children[ i ]:__lHidden
 
               lHighLight := ::ShowSelection .AND. lFocus .AND. lData .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
-              lShadow    := lData .AND. ::ShowSelection .AND. ! lFocus .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos == i  .OR. ::FullRowSelect ) )
+              lShadow    := lData .AND. ::ShowSelection .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos <> i .OR. ! lFocus ) )
  
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
@@ -2060,12 +2060,14 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
               IF ! lEnabled
                  nForeColor := ::System:Color:Gray
-               ELSEIF lHighLight .AND. nRep <> 2
-                 nBackColor := ::HighlightColor
-                 nForeColor := ::HighlightTextColor
-               ELSEIF lShadow
-                 nBackColor := ::__InactiveHighlight
-                 nForeColor := ::__InactiveHighlightText
+               ELSEIF nRep <> 2
+                 IF lHighLight
+                    nBackColor := ::HighlightColor
+                    nForeColor := ::HighlightTextColor
+                  ELSEIF lShadow
+                    nBackColor := ::__InactiveHighlight
+                    nForeColor := ::__InactiveHighlightText
+                 ENDIF
               ENDIF
 
               SetBkColor( hMemDC, nBackColor )
@@ -2236,7 +2238,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                   ELSE
                     aRect := aText
                  ENDIF
-                 ::__DrawRepresentation( hMemDC, nRep, aRect, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
+                 ::__DrawRepresentation( hMemDC, nRep, aRect, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i, nRec == nRecno )
 
               ENDIF
 
@@ -2335,7 +2337,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
 RETURN .T.
 
-METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i ) CLASS DataGrid
+METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i, lRec ) CLASS DataGrid
    LOCAL nWidth, aClip, nFore, nBack, hPen, hOP, hOB, hBrush, nStatus, nFlags, lXP
 
    lXP    := ::Application:IsThemedXP .AND. ::Theming .AND. ::System:hButtonTheme != NIL
@@ -2438,7 +2440,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          ENDIF
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, nStatus )
       ENDIF
-      IF ::ShowSelectionBorder .AND. i == ::ColPos
+      IF ::ShowSelectionBorder .AND. i == ::ColPos .AND. lRec
          _DrawFocusRect( hDC, {aRect[1]+3, aRect[2]+3, aRect[3]-3, aRect[4]-3} )
       ENDIF
       IF ! EMPTY( ::Children[i]:ButtonText )
@@ -4032,7 +4034,7 @@ CLASS GridColumn INHERIT Object
    ACCESS HeaderForeColor            INLINE IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor ) PERSISTENT
    ASSIGN HeaderForeColor( n )       INLINE ::xHeaderForeColor := n
 
-
+   ACCESS CellData                   INLINE ::Parent:__DisplayArray[ ::Parent:RowPos ][1][ ::Parent:ColPos ][1]
 
    DATA __lResizeable                EXPORTED  INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    DATA __lMoveable                  EXPORTED  INIT .F.
@@ -4081,7 +4083,7 @@ CLASS GridColumn INHERIT Object
    DATA MDIContainer                 EXPORTED  INIT .F.
 
    DATA Theming                      EXPORTED INIT .F.
-   DATA __nLeft                     EXPORTED  INIT 0
+   DATA __nLeft                      EXPORTED  INIT 0
 
    DATA __HeaderLeft                 PROTECTED INIT 0
    DATA __HeaderRight                PROTECTED INIT 0
