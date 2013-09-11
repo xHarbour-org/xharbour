@@ -2162,11 +2162,17 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                  FOR z := 1 TO LEN( aData )
                      aAlign := _GetTextExtentExPoint( hMemDC, ALLTRIM(aData[z]), aText[3]-aText[1], @iLen )
                      IF aAlign != NIL
-                        IF nAlign == 1
-                           nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
-                           IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
-                              aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
-                           ENDIF
+                        nDif := (aAlign[1]+nWImg) - (aText[3]-aText[1])
+
+                        IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
+                           aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
+                        ENDIF
+                        IF nAlign == DT_RIGHT
+                           aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM(aData[z]) )
+                           x := nRight - aAlign[1]-4
+                         ELSEIF nAlign == DT_CENTER
+                           aAlign := _GetTextExtentPoint32( hMemDC, ALLTRIM(aData[z]) )
+                           x := zLeft + ((nRight-zLeft+IIF( ::Children[i]:ImageAlignment == 1, nWImg, 0 ))/2) - (aAlign[1]/2)
                         ENDIF
                         _ExtTextOut( hMemDC, x, y, ETO_CLIPPED+IIF( z==1,ETO_OPAQUE,0), aText,aData[z])
                         y += aAlign[2]
@@ -2227,6 +2233,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                      ELSEIF nAlign == DT_CENTER
                        aRect := aText
                     ENDIF
+                  ELSE
+                    aRect := aText
                  ENDIF
                  ::__DrawRepresentation( hMemDC, nRep, aRect, aData[1], nBackColor, nForeColor, x, y, aAlign, ::__DisplayArray[nPos][1][i][ 1], i )
 
