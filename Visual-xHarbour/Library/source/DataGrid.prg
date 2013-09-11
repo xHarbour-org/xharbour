@@ -2060,7 +2060,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 
               IF ! lEnabled
                  nForeColor := ::System:Color:Gray
-               ELSEIF lHighLight
+               ELSEIF lHighLight .AND. nRep <> 2
                  nBackColor := ::HighlightColor
                  nForeColor := ::HighlightTextColor
                ELSEIF lShadow
