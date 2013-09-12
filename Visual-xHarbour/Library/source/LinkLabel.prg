@@ -33,7 +33,7 @@ CLASS LinkLabel INHERIT Control
    PROPERTY AutoSize     READ xAutoSize     WRITE SetWindowText   DEFAULT .T.            PROTECTED
    PROPERTY ImageIndex   READ xImageIndex   WRITE SetImageIndex   DEFAULT 0              PROTECTED
 
-   DATA __Alignments                   EXPORTED  INIT { "Left", "Center", "Right" }
+   DATA EnumAlignment                  EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
    ACCESS Alignment                    INLINE ::xAlignment PERSISTENT
    ASSIGN Alignment(n)                 INLINE ::xAlignment := n, ::Refresh()
 

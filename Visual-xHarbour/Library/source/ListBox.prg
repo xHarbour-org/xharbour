@@ -54,7 +54,7 @@ CLASS ListBox FROM TitleControl
    PROPERTY OwnerDraw                                     READ xOwnerDraw         WRITE SetDrawStyle      DEFAULT 1   PROTECTED
    PROPERTY ItemToolTips                                  READ xItemToolTips      WRITE __SetItemToolTips DEFAULT .F. PROTECTED 
 
-   DATA OwnerDraw_Styles EXPORTED  INIT { "No", "Fixed", "Variable" }
+   DATA EnumOwnerDraw EXPORTED  INIT { { "No", "Fixed", "Variable" }, {1,2,3} }
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

@@ -340,10 +340,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              ENDIF
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "ROLE"
-             cText := cText[ ::ActiveObject:Role ]
-          ENDIF
-
           IF oItem:ColItems[n]:ColType == "DROPDOWN"
              cText := cText[ ::ActiveObject:DropDown ]
           ENDIF
@@ -413,40 +409,16 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              END
           ENDIF
 
-          IF oItem:ColItems[n]:ColType IN {"FIELDPOS","SERVERTYPE","TARGETTYPE","REPRESENTATION","ALIGNMENT"}
+          IF oItem:ColItems[n]:ColType IN {"FIELDPOS","TARGETTYPE"}
              cText := IIF( oItem:ColItems[n]:SetValue > 0, cText[ oItem:ColItems[n]:SetValue ], "None" )
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "SHOWMODE"
-             cText := cText[ ::ActiveObject:ShowMode ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "FRAMESTYLES"
-             cText := cText[ ::ActiveObject:FrameStyle ]
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "IMAGETYPE"
              cText := cText[ ::ActiveObject:ImageType ]
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "PAGE_POSITIONS"
-             cText := cText[ ::ActiveObject:Position+1 ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "CHECKSTYLES"
-             cText := cText[ ::ActiveObject:CheckStyle ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "DRAWSTYLES"
-             cText := cText[ ::ActiveObject:OwnerDraw ]
-          ENDIF
-
           IF oItem:ColItems[n]:ColType == "BALLOONICONS"
              cText := cText[ ::ActiveObject:BalloonTipIcon+1 ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "CASETYPES"
-             cText := cText[ ::ActiveObject:Case ]
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "ENUMERATION"
@@ -1436,12 +1408,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   ENDIF
                   aCol[1]:ColType  := "ICONS"
 
-             CASE cProp == "ServerType"
-                  aCol[1]:Value    := ::ActiveObject:__ServerTypes
-                  aCol[1]:ColType  := "SERVERTYPE"
-                  aCol[1]:SetValue := ::ActiveObject:ServerType
-                  xValue := NIL
-
              CASE cProp == "BitmapMask"
                   IF xValue != NIL
                      aCol[1]:Value := xValue
@@ -1468,66 +1434,16 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := "IMAGEINDEX"
                   xValue := NIL
 
-             CASE cProp == "Representation"
-                  aCol[1]:Value := ::ActiveObject:__Representation
-                  aCol[1]:ColType  := "REPRESENTATION"
-                  aCol[1]:SetValue := ::ActiveObject:Representation
-                  xValue := NIL
-
              CASE cProp == "Alignment"
                   IF ::ActiveObject:__xCtrlName == "ListViewGroup"
                      aCol[1]:Value := ::System:ListViewGroupAlign:Keys
                      aCol[1]:ColType  := "LVGALIGNMENT"
-                   ELSE
-                     aCol[1]:Value := ::ActiveObject:__Alignments
-                     aCol[1]:ColType  := "ALIGNMENT"
-                     aCol[1]:SetValue := ::ActiveObject:Alignment
                   ENDIF
                   xValue := NIL
-
-   //          CASE cProp == "ShortCut"
-   //               aCol[1]:Value   := ""
-   //               aCol[1]:ColType := "SHORTCUT"
-   //               xValue := NIL
-
-             CASE cProp == "ShowMode"
-                  aCol[1]:Value := ::ActiveObject:__Show_Modes
-                  aCol[1]:ColType  := "SHOWMODE"
-                  xValue := NIL
-
-             CASE cProp == "FrameStyle"
-                  aCol[1]:Value := ::ActiveObject:__Frame_Styles
-                  aCol[1]:ColType  := "FRAMESTYLES"
-                  xValue := NIL
-
-             CASE cProp == "Case"
-                  aCol[1]:Value := ::ActiveObject:CaseTypes
-                  aCol[1]:ColType  := "CASETYPES"
-                  xValue := NIL
-
-             //CASE cProp == "InitialState"
-             //     aCol[1]:Value := ::ActiveObject:States
-             //     aCol[1]:ColType  := "STATES"
-             //     xValue := NIL
-
-             CASE cProp == "Position" .AND. __ObjHasMsg( ::ActiveObject, "Page_Positions" )
-                  aCol[1]:Value := ::ActiveObject:Page_Positions
-                  aCol[1]:ColType  := "PAGE_POSITIONS"
-                  xValue := NIL
-
-//              CASE cProp == "ViewStyle"
-//                   aCol[1]:Value := ::ActiveObject:View_Styles
-//                   aCol[1]:ColType  := "VIEWSTYLES"
-//                   xValue := NIL
 
              CASE cProp == "CheckStyle"
                   aCol[1]:Value := ::ActiveObject:Check_Styles
                   aCol[1]:ColType  := "CHECKSTYLES"
-                  xValue := NIL
-
-             CASE cProp == "OwnerDraw" .AND. __ObjHasMsg( ::ActiveObject, "OwnerDraw_Styles" )
-                  aCol[1]:Value := ::ActiveObject:OwnerDraw_Styles
-                  aCol[1]:ColType  := "DRAWSTYLES"
                   xValue := NIL
 
              CASE cProp == "BalloonTipIcon"
@@ -1545,24 +1461,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType := "CURSORS"
                   aCol[1]:Action  := {|o| BrowseFile(o) }
 
-                  xValue := NIL
-
-             CASE cProp == "DropDown" .AND. ::ActiveObject:ClsName != "ToolButton"
-                  aCol[1]:Value   := ::ActiveObject:__DropDown
-                  aCol[1]:ColType := "DROPDOWN"
-                  aCol[1]:Action  := {|o, n, oPar| n := o:GetCurSel(),;
-                                                     oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( n ) }
-                  xValue := NIL
-
-             CASE cProp == "Role"
-                  aCol[1]:Value   := ::ActiveObject:__Roles
-                  aCol[1]:ColType := "ROLE"
-                  aCol[1]:Action  := {|o, n, oPar| n := o:GetCurSel(),;
-                                                     oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( n ) }
                   xValue := NIL
 
              CASE cProp == "AnimationStyle"
@@ -1768,11 +1666,6 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
               aCol[1]:Value := ::System:WindowAnimation:Keys
               aCol[1]:ColType  := "ANIMATIONSTYLE"
 
-           ELSEIF cProp2 == "Alignment"
-             aCol[1]:Value    := xValue:__Alignments
-             aCol[1]:ColType  := "ALIGNMENT"
-             aCol[1]:SetValue := xValue:Alignment
-             xValue2 := NIL
           ENDIF
           oSub := oItem:AddItem( cProp2, 0, aCol )
           ::CheckObjProp( xValue2, oSub, cProp2, aSubExpand )
@@ -1955,7 +1848,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN {"FIELDPOS","ALIGNMENT","REPRESENTATION","SERVERTYPE","TARGETTYPE"} .AND. oItem:ColItems[nCol-1]:Value != NIL
+               CASE cType IN {"FIELDPOS","TARGETTYPE"} .AND. oItem:ColItems[nCol-1]:Value != NIL
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -2036,27 +1929,19 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "DTSFORMATS" .OR.;
                     cType == "DATADRIVERS" .OR.;
                     cType == "ADSDATADRIVERS" .OR.;
-                    cType == "SHOWMODE" .OR.;
                     cType == "IMAGETYPE" .OR.;
                     cType == "SERVICES" .OR.;
                     cType == "STATES" .OR.;
-                    /*cType == "VIEWSTYLES" .OR.*/;
-                    cType == "DRAWSTYLES" .OR.;
-                    cType == "CASETYPES" .OR.;
-                    cType == "CHECKSTYLES" .OR.;
-                    cType == "FRAMESTYLES" .OR.;
                     cType == "CURSORS" .OR.;
                     cType == "BALLOONICONS" .OR.;
                     cType == "LVGALIGNMENT" .OR.;
                     cType == "SYSFOLDERS" .OR.;
                     cType == "OLEVERB" .OR.;
-                    cType == "ROLE" .OR.;
-                    cType == "DROPDOWN" .OR.;
                     cType == "HANDSHAKE" .OR.;
                     cType == "PARITY" .OR.;
                     cType == "STOPBITS" .OR.;
                     cType == "ANIMATIONSTYLE" .OR.;
-                    cType == "PAGE_POSITIONS" .OR. ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
+                    ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
                     ::ActiveControl := IIF( cType == "CURSORS", CursorComboBox( Self ), IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) ) )
                     WITH OBJECT ::ActiveControl
                        :ClientEdge := .F.
@@ -2073,9 +1958,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :Height := 300
                        ENDIF
                        :Action := oItem:ColItems[nCol-1]:Action
-                       IF cType == "ROLE" .OR. cType == "DROPDOWN"
-
-                        ELSEIF cType == "OLEVERB"
+                       IF cType == "OLEVERB"
                           :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
                                                    oPar := o:Parent,;
                                                    o:Destroy(),;
@@ -2130,7 +2013,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                       o:Destroy(),;
                                                       oPar:SetValue( cSel ) }
                         ELSE
-                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. /*cType == "VIEWSTYLES" .OR.*/ cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
+                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
                        ENDIF
                        :Create()
 
@@ -2146,28 +2029,14 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :ImageList  := ::ActiveObject:Parent:ImageList
                        ENDIF
                        
-                       IF cType == "SHOWMODE"
-                          :SetCurSel( ::ActiveObject:ShowMode, 0 )
-                        ELSEIF cType == "IMAGETYPE"
+                       IF cType == "IMAGETYPE"
                           :SetCurSel( ::ActiveObject:ImageType )
-//                        ELSEIF cType == "VIEWSTYLES"
-//                          :SendMessage( CB_SETCURSEL, ::ActiveObject:ViewStyle )
-                        ELSEIF cType == "CHECKSTYLES"
-                          :SetCurSel( ::ActiveObject:CheckStyle )
-                        ELSEIF cType == "DRAWSTYLES"
-                          :SetCurSel( ::ActiveObject:OwnerDraw )
-                        ELSEIF cType == "FRAMETYLES"
-                          :SetCurSel( ::ActiveObject:FrameStyle )
-                        ELSEIF cType == "CASETYPES"
-                          :SetCurSel( ::ActiveObject:Case )
                         ELSEIF cType == "BALLOONICONS"
                           :SetCurSel( ::ActiveObject:BalloonTipIcon )
                         ELSEIF cType == "IMAGEINDEX"
                           :SendMessage( CB_SETCURSEL, MAX( ::ActiveObject:&cProp, 0 ) )
                         //ELSEIF cType == "STATES"
                         //  :SetCurSel( ::ActiveObject:InitialState )
-                        ELSEIF cType == "PAGE_POSITIONS"
-                          :SetCurSel( ::ActiveObject:Position )
                         ELSEIF cType == "CURSORS"
                           n := ASCAN( ::ActiveObject:__CursorValues, ::ActiveObject:Cursor )
                           :SetCurSel( n )
@@ -2195,8 +2064,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                         ELSEIF cType == "SYSFOLDERS"
                           n := hScan( ::System:Folders, ::ActiveObject:SysFolder )
                           :SetCurSel( n )
-                        ELSEIF cType == "ROLE"
-                          :SetCurSel( ::ActiveObject:Role )
                         ELSEIF cType == "DROPDOWN"
                           :SetCurSel( ::ActiveObject:DropDown )
                         ELSEIF cType == "OLEVERB"
@@ -3500,6 +3367,7 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "Hidden",                  "Style" },;
                    { "HideClippedButtons",      "Style" },;
                    { "HeaderMenu",              "Behavior" },;
+                   { "HoverRow",                "Behavior" },;
                    { "HandShake",               "" },;
                    { "HideInvert",              "" },;
                    { "HTMLBody",                "" },;

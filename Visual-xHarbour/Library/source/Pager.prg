@@ -24,7 +24,7 @@ CLASS PageScroller INHERIT Control
    DATA AllowUnDock          EXPORTED  INIT FALSE
    DATA AllowClose           EXPORTED  INIT FALSE
 
-   DATA Page_Positions EXPORTED  INIT { "Vertical", "Horizontal" }
+   DATA EnumPosition EXPORTED  INIT { { "Vertical", "Horizontal" }, {1,2} }
 
    PROPERTY PageChild    READ xPageChild    WRITE SetChild                   PROTECTED
    PROPERTY ButtonHeight READ xButtonHeight WRITE SetButtonHeight DEFAULT 12 PROTECTED

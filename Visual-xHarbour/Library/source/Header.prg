@@ -301,7 +301,7 @@ CLASS HeaderItem INHERIT Object
 
    DATA Parent                 EXPORTED
    DATA Position               EXPORTED
-   DATA __Alignments           EXPORTED  INIT { "Left", "Right", "Center", "JustifyMask", "RTLReading" }
+   DATA EnumAlignment          EXPORTED  INIT { { "Left", "Right", "Center", "JustifyMask", "RTLReading" }, {1,2,3,4,5} }
 
    PROPERTY Caption            READ xCaption    WRITE SetCaption                 PROTECTED
    PROPERTY ImageIndex         READ xImageIndex WRITE SetImageIndex DEFAULT 0    PROTECTED

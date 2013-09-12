@@ -56,7 +56,8 @@ CLASS CheckBox INHERIT Control
 
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.
-   DATA Check_Styles   EXPORTED INIT { "AutoCheckBox", "Auto3State" }
+
+   DATA EnumCheckStyle EXPORTED INIT {{ "AutoCheckBox", "Auto3State" }, {1,2} }
    DATA EnumState      EXPORTED INIT {{ "Unchecked", "Checked", "Indeterminate" }, {BST_UNCHECKED,BST_CHECKED,BST_INDETERMINATE} }
 
 

@@ -158,11 +158,7 @@ CLASS Window INHERIT Object
    PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren   WRITE SetStyle          DEFAULT .T.       PROTECTED
    PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings   WRITE SetStyle          DEFAULT .T.       PROTECTED
    PROPERTY AcceptFiles   INDEX WS_EX_ACCEPTFILES   READ xAcceptFiles    WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY AnimationStyle                          READ xAnimationStyle                         DEFAULT 0
    PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate     WRITE SetExStyle        DEFAULT .F.       PROTECTED
-
-   PROPERTY VertScrollSize                          READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
-   PROPERTY HorzScrollSize                          READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
    PROPERTY Theming READ xTheming WRITE __SetTheming DEFAULT .T. PROTECTED
 
@@ -198,7 +194,6 @@ CLASS Window INHERIT Object
    DATA wParam                 EXPORTED
    DATA lParam                 EXPORTED
 
-   DATA ShowMode               EXPORTED  INIT 1
    DATA Id                     EXPORTED
    DATA Drawing                EXPORTED
 
@@ -319,12 +314,18 @@ CLASS Window INHERIT Object
                                                  IDC_UPARROW      ,;
                                                  IDC_HAND          }
 
-   DATA Hidden                 EXPORTED  INIT .F.
 
-   DATA xAlignment             EXPORTED  INIT 1
-   ACCESS Alignment            INLINE    ::xAlignment
-   ASSIGN Alignment(n)         INLINE    ::SetAlignment(n)
+   DATA xAlignment             EXPORTED INIT 1
+   ACCESS Alignment            INLINE   ::xAlignment
+   ASSIGN Alignment(n)         INLINE   ::SetAlignment(n)
 
+   // Compatibility --------------------------
+   DATA AnimationStyle         EXPORTED INIT 0
+   DATA VertScrollSize         EXPORTED INIT 0
+   DATA HorzScrollSize         EXPORTED INIT 0
+   // ----------------------------------------
+
+   DATA Hidden                 EXPORTED INIT .F.
    DATA FilesDroped            EXPORTED INIT {}
    DATA VertScrollPos          EXPORTED INIT 0
    DATA HorzScrollPos          EXPORTED INIT 0
@@ -334,6 +335,9 @@ CLASS Window INHERIT Object
    DATA AutoDock               EXPORTED INIT .T.
    DATA Dock                   EXPORTED AS OBJECT
    DATA HelpInfo               EXPORTED
+   DATA BackSysColor           EXPORTED INIT GetSysColor( COLOR_BTNFACE )
+   DATA ForeSysColor           EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+
 
    ACCESS Handle               INLINE ::hWnd
    ACCESS HasFocus             INLINE GetFocus() == ::hWnd
@@ -341,9 +345,6 @@ CLASS Window INHERIT Object
 
    ACCESS Child                INLINE ::Style & WS_CHILD != 0 //PERSISTENT
    ASSIGN Child(l)             INLINE ::SetStyle( WS_CHILD, l )
-
-   DATA BackSysColor           EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   DATA ForeSysColor           EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
    DATA xBackColor             EXPORTED
    ACCESS BackColor            INLINE IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) PERSISTENT
@@ -1166,22 +1167,6 @@ METHOD Create( oParent ) CLASS Window
    ::__ClientRect   := { ::Left, ::Top, ::Width, ::Height }
    ::OriginalRect := { ::Left, ::Top, ::ClientWidth, ::ClientHeight }
 
-   IF ::VertScrollSize > 0
-      ::OriginalRect[4] := ::VertScrollSize
-    ELSE
-      ::VertScrollSize := ::ClientHeight
-      IF ::__ClassInst != NIL
-         ::__ClassInst:VertScrollSize := ::ClientHeight
-      ENDIF
-   ENDIF
-   IF ::HorzScrollSize > 0
-      ::OriginalRect[3] := ::HorzScrollSize
-    ELSE
-      ::HorzScrollSize := ::ClientWidth
-      IF ::__ClassInst != NIL
-         ::__ClassInst:HorzScrollSize := ::ClientWidth
-      ENDIF
-   ENDIF
    ::Font:Set( Self )
 
    IF ::Parent != NIL .AND. ::ClsName != TOOLTIPS_CLASS .AND. ::__xCtrlName != "CtrlMask" .AND. ::ClsName != "MDIClient"
@@ -3579,7 +3564,7 @@ METHOD Animate( nSpeed, nFlags ) CLASS Window
 RETURN Self
 
 METHOD Show( nShow ) CLASS Window
-   DEFAULT nShow TO ::ShowMode
+   DEFAULT nShow TO SW_SHOW
 
    IF nShow == SW_HIDE
       RETURN ::Hide()
@@ -4780,6 +4765,10 @@ CLASS WinForm INHERIT Window
    DATA ControlId              PROTECTED  INIT 101
    DATA TabOrder               EXPORTED
    DATA DllInstance            EXPORTED
+
+   DATA EnumShowMode           EXPORTED  INIT { { "Normal", "Minimized", "Maximized", "NoActivate" }, {1,2,3,4} }
+   DATA EnumFrameStyle         EXPORTED  INIT { {"Overlapped", "PopUp"}, {1,2} }
+
    ACCESS IsMDIContainter  INLINE ::MDIContainter
 
    DATA Modal                   PUBLISHED INIT .F.
@@ -4795,14 +4784,12 @@ CLASS WinForm INHERIT Window
    DATA MaxWidth                PUBLISHED INIT 0
    DATA MaxHeight               PUBLISHED INIT 0
    DATA ShowInTaskBar           PUBLISHED INIT .T.
+   DATA AnimationStyle          PUBLISHED INIT 0
 
    DATA ScrollOnChildFocus      PUBLISHED INIT .F.
 
    DATA __lResizeable            EXPORTED  INIT {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
    DATA __lMoveable              EXPORTED  INIT .F.
-
-   PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
-   PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
 
    PROPERTY ToolWindow    INDEX WS_EX_TOOLWINDOW    READ xToolWindow      WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY AlwaysOnTop   INDEX WS_EX_TOPMOST       READ xAlwaysOnTop     WRITE SetExStyle      DEFAULT .F. PROTECTED
@@ -4824,15 +4811,9 @@ CLASS WinForm INHERIT Window
 
    PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET __SetActiveMenuBar
 
-
-   // backward compatibility
-
-   ACCESS TopMost    INLINE ::xAlwaysOnTop
-   ASSIGN TopMost(l) INLINE ::AlwaysOnTop := l
-
    //compatibility ONLY, forms do not set "Border" property
    DATA Border                 EXPORTED INIT .F.
-   DATA __hObjects             EXPORTED
+
    DATA xMDIChild              EXPORTED INIT .F.
    ACCESS MDIChild             INLINE IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild ) PERSISTENT
    ASSIGN MDIChild(l)          INLINE IIF( ::__ClassInst != NIL .AND. l .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := l, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, l ), )
@@ -4847,8 +4828,7 @@ CLASS WinForm INHERIT Window
 
    //DATA Visible                EXPORTED  INIT .T.
    DATA MaskBitmap             EXPORTED
-   DATA __Frame_Styles         EXPORTED  INIT {"Overlapped", "PopUp"}
-   DATA __Show_Modes           EXPORTED  INIT { "Normal", "Minimized", "Maximized", "NoActivate" }
+   DATA __hObjects             EXPORTED
    DATA Ole                    EXPORTED
    DATA AppParam               EXPORTED
 

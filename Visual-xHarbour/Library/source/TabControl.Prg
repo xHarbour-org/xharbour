@@ -839,6 +839,10 @@ CLASS TabPage INHERIT Dialog
    PROPERTY ImageIndex READ xImageIndex WRITE __SetImageIndex DEFAULT 0 PROTECTED
    PROPERTY Position   READ xPosition   WRITE __SetPosition   INVERT
    PROPERTY Visible    READ xVisible    WRITE __SetVisible    DEFAULT .T. INVERT 
+
+   PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
+   PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
+
    DATA TopMargin          PUBLISHED INIT 0
    DATA LeftMargin         PUBLISHED INIT 0
    DATA RightMargin        PUBLISHED INIT 0
@@ -1048,6 +1052,24 @@ METHOD Create() CLASS TabPage
 
    ::Super:Create()
    tci:lParam := ::hWnd
+
+   IF ::VertScrollSize > 0
+      ::OriginalRect[4] := ::VertScrollSize
+    ELSE
+      ::VertScrollSize := ::ClientHeight
+      IF ::__ClassInst != NIL
+         ::__ClassInst:VertScrollSize := ::ClientHeight
+      ENDIF
+   ENDIF
+   IF ::HorzScrollSize > 0
+      ::OriginalRect[3] := ::HorzScrollSize
+    ELSE
+      ::HorzScrollSize := ::ClientWidth
+      IF ::__ClassInst != NIL
+         ::__ClassInst:HorzScrollSize := ::ClientWidth
+      ENDIF
+   ENDIF
+
 
    IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 

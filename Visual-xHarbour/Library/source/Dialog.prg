@@ -136,7 +136,6 @@ RETURN nRet
 
 METHOD PreInitDialog() CLASS Dialog
    LOCAL oCtrl, cClass, hWnd, nStyle, nLeft, nTop, nWidth, nHeight
-
    ::siv := (struct SCROLLINFO)
    ::siv:cbSize := ::siv:sizeof()
    ::siv:nMin   := 0
@@ -166,8 +165,8 @@ METHOD PreInitDialog() CLASS Dialog
    ::xWidth := nWidth
    ::xHeight:= nHeight
 
-   ::__ClientRect   := { nLeft, nTop, ::xWidth, ::xHeight }
-   ::__aCltRect  := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::__ClientRect := { nLeft, nTop, ::xWidth, ::xHeight }
+   ::__aCltRect   := { nLeft, nTop, ::xWidth, ::xHeight }
    ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
 
    __SetObjPtr( Self )

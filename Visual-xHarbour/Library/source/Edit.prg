@@ -60,7 +60,9 @@ CLASS EditBox INHERIT Control
    PROPERTY WantReturn    INDEX ES_WANTRETURN           READ xWantReturn       WRITE SetStyle        DEFAULT .F. PROTECTED
    PROPERTY HorzScroll    INDEX WS_HSCROLL              READ xHorzScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
    PROPERTY VertScroll    INDEX WS_VSCROLL              READ xVertScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
+
    PROPERTY Case                                        READ xCase             WRITE SetCase         DEFAULT 1   PROTECTED
+
    PROPERTY Border        INDEX WS_BORDER               READ xBorder           WRITE SetStyle        DEFAULT !__GetApplication():IsThemedXP PROTECTED
    PROPERTY Number        INDEX ES_NUMBER               READ xNumber           WRITE SetStyle        DEFAULT .F.
 
@@ -96,9 +98,9 @@ CLASS EditBox INHERIT Control
    ACCESS SelBackColor                 INLINE ::xSelBackColor PERSISTENT //IIF( ::xSelBackColor == NIL, ::BackSysColor, ::xSelBackColor ) PERSISTENT
    ASSIGN SelBackColor( n )            INLINE ::xSelBackColor := n, ::SetSelColor( ::SelForeColor, ::SelBackColor )
 
-   DATA CaseTypes                      EXPORTED  INIT { "Mixed Case", "Upper Case", "Lower Case" }
+   DATA EnumCase                       EXPORTED  INIT { { "Mixed Case", "Upper Case", "Lower Case" }, {1,2,3} }
+   DATA EnumAlignment                  EXPORTED  INIT { { "Left", "Center", "Right" }, { 1, 2, 3 } }
 
-   DATA __Alignments                   EXPORTED  INIT { "Left", "Center", "Right" }
    ACCESS Alignment                    INLINE ::xAlignment PERSISTENT
    ASSIGN Alignment(n)                 INLINE ::SetAlignment(n)
 
@@ -528,7 +530,7 @@ RETURN Self
 METHOD SetAlignment( n ) CLASS EditBox
    LOCAL x
    ::xAlignment := n
-   FOR x := 1 TO LEN( ::__Alignments )
+   FOR x := 1 TO LEN( ::EnumAlignment )
        IF x != n
           ::SetStyle( x-1, .F. )
        ENDIF

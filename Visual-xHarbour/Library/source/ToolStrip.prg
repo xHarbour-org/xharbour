@@ -1403,7 +1403,7 @@ CLASS ToolStripItem INHERIT Control
    DATA __lHidden          PROTECTED INIT .F.
    DATA __hKeyMenuHook     PROTECTED
    DATA __nSeparator       EXPORTED  INIT 0
-   DATA __Roles            EXPORTED  INIT { "Button", "CkeckButton", "GroupCheck" }
+   DATA EnumRole           EXPORTED  INIT { { "Button", "CkeckButton", "GroupCheck" }, {1,2,3} }
    
    // REMOVED PROPERTIES
    DATA Cursor             EXPORTED
@@ -1706,7 +1706,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
 
    ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
    
-   DATA __DropDown          EXPORTED INIT { "None", "Partial", "Full" }
+   DATA EnumDropDown    EXPORTED  INIT { { "None", "Partial", "Full" }, {1,2,3} }
 
    DATA __pObjPtr       PROTECTED
    DATA __hMenu         PROTECTED
@@ -2730,8 +2730,7 @@ CLASS ToolStripComboBox INHERIT ToolStripItem, ComboBox
    PROPERTY Height        INDEX 4 READ xHeight WRITE __SetSizePos      DEFAULT 0
    PROPERTY Alignment     READ xAlignment DEFAULT 1
 
-   DATA __Alignments        EXPORTED INIT { "Left", "Right" }
-
+   DATA EnumAlignment     EXPORTED INIT { { "Left", "Right" }, {1,2} }
    DATA ShortCutKey       EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -2768,13 +2767,13 @@ CLASS ToolStripLabel INHERIT ToolStripButton
    PROPERTY Height        INDEX 4 READ xHeight WRITE __SetSizePos      DEFAULT 0
    PROPERTY Alignment     READ xAlignment DEFAULT 1
 
-   DATA __Alignments        EXPORTED INIT { "Left", "Right" }
+   DATA EnumAlignment     EXPORTED INIT { { "Left", "Right" }, { 1,2 } }
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
    METHOD OnMouseHover()  INLINE NIL
    METHOD OnMouseLeave()  INLINE NIL
-   //METHOD OnMouseMove()   INLINE NIL
    METHOD OnLButtonDown() INLINE NIL
    METHOD OnLButtonUp()   INLINE NIL
 ENDCLASS

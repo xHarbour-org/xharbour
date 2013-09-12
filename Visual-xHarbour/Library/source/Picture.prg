@@ -25,16 +25,16 @@ CLASS PictureBox INHERIT Panel
    DATA ImageIndex      EXPORTED INIT -1
    DATA __IsGif         PROTECTED
    DATA __aPixels       PROTECTED
-   DATA __Alignments    EXPORTED INIT { "None",;
-                                        "Center",;
-                                        "Left - Top",;
-                                        "Top - Center",;
-                                        "Top - Right",;
-                                        "Right - Center",;
-                                        "Right - Bottom",;
-                                        "Bottom - Center",;
-                                        "Bottom - Left",;
-                                        "Left - Center" }
+   DATA EnumAlignment   EXPORTED INIT { { "None",;
+                                          "Center",;
+                                          "Left - Top",;
+                                          "Top - Center",;
+                                          "Top - Right",;
+                                          "Right - Center",;
+                                          "Right - Bottom",;
+                                          "Bottom - Center",;
+                                          "Bottom - Left",;
+                                          "Left - Center" }, {0,1,2,3,4,5,6,7,8,9} }
    DATA __ExplorerFilter INIT {;
                               { "All Supported Graphics", "*.bmp;*.jpg;*.jif;*.jpeg;*.jpe;*.gif;*.ico;*.ani;*.cur;*.wmf;*.emf" },;
                               { "Windows Bitmap (*.bmp)", "*.bmp" },;

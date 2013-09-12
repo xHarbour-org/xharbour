@@ -249,8 +249,6 @@ CLASS Line INHERIT CONTROL
    DATA StaticEdge         EXPORTED
    DATA Transparent        EXPORTED
 
-   DATA HorzScrollSize     EXPORTED  INIT 0
-   DATA VertScrollSize     EXPORTED  INIT 0
    DATA AcceptFiles        EXPORTED  INIT .F.
    DATA AnimationStyle     EXPORTED  INIT 0
    DATA ContextMenu        EXPORTED

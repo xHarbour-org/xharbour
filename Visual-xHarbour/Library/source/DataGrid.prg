@@ -87,7 +87,6 @@ CLASS DataGrid INHERIT TitleControl
    DATA ExtVertScrollBar        PUBLISHED INIT .F.
    DATA MultipleSelection       PUBLISHED INIT .F.
    DATA TagRecords              PUBLISHED INIT .F.
-   DATA ClearColumns            PUBLISHED INIT .T.
    DATA GradientHeader          PUBLISHED INIT .F.
 
    PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
@@ -147,7 +146,6 @@ CLASS DataGrid INHERIT TitleControl
    DATA __HorzScrolled          PROTECTED INIT 0
    DATA __DisplayArray          PROTECTED INIT {}
    DATA __InactiveHighlight     PROTECTED
-   DATA __InactiveHighlightText PROTECTED
    DATA __CurControl            PROTECTED
    DATA __TrackColumn           PROTECTED
    DATA __DragColumn            PROTECTED INIT 0
@@ -283,19 +281,6 @@ CLASS DataGrid INHERIT TitleControl
    METHOD DeselectAll()
 ENDCLASS
 
-//----------------------------------------------------------------------------------
-
-METHOD OnGetDlgCode( msg ) CLASS DataGrid
-   IF msg != NIL
-      IF Len(::Children) == 0 //.OR. ( ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_RETURN )
-         RETURN NIL
-      ENDIF
-      IF msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE
-         RETURN NIL
-      ENDIF
-   ENDIF
-RETURN DLGC_WANTMESSAGE
-
 METHOD Init( oParent ) CLASS DataGrid
    DEFAULT ::__xCtrlName TO "DataGrid"
    ::ClsName                 := "DataGrid"
@@ -322,7 +307,6 @@ METHOD Init( oParent ) CLASS DataGrid
    ::HighlightSysColor       := ::System:Colors:Highlight
    ::HighlightTextSysColor   := ::System:Colors:HighlightText
    ::__InactiveHighlight     := RGB(240,240,240)
-   ::__InactiveHighlightText := ::System:Colors:WindowText
    ::__lCreateAfterChildren  := .T.
    ::DeferRedraw             := FALSE
    IF ::__ClassInst != NIL
@@ -339,8 +323,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ENDIF
 RETURN Self
 
-//--------------------------------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS DataGrid
    ::__SetBlocks()
    ::__LinePen      := CreatePen( PS_SOLID, 0, ::GridColor )
@@ -377,6 +360,19 @@ METHOD Create() CLASS DataGrid
    ::__hPrevCursor := ::Cursor
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
+METHOD OnGetDlgCode( msg ) CLASS DataGrid
+   IF msg != NIL
+      IF Len(::Children) == 0 //.OR. ( ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_RETURN )
+         RETURN NIL
+      ENDIF
+      IF msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE
+         RETURN NIL
+      ENDIF
+   ENDIF
+RETURN DLGC_WANTMESSAGE
+
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __GetDataWidth( lSetPos, lFixCol ) CLASS DataGrid
    LOCAL n, lHidden := .F., nLeft := 0
    DEFAULT lSetPos TO .F.
@@ -403,6 +399,7 @@ METHOD __GetDataWidth( lSetPos, lFixCol ) CLASS DataGrid
    NEXT
 RETURN ::__DataWidth
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __GetPosition() CLASS DataGrid
    LOCAL nRec, lDeleted, nKeyNo, nDel := 0, nPos := 0
    IF ::DataSource != NIL
@@ -440,9 +437,11 @@ METHOD __GetPosition() CLASS DataGrid
    ENDIF
 RETURN nPos
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD GetPosition() CLASS DataGrid
 RETURN ASCAN( ::__DisplayArray, {|a|a[2]==::DataSource:Recno()} )
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
    LOCAL nLines, nScroll, nDelta, nPage, pt, rc, n, si, cBuffer
    pt := (struct POINT)
@@ -500,6 +499,7 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS DataGrid
    ENDIF
 RETURN 0
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD CreateDragImage(y) CLASS DataGrid
    LOCAL hImageList, hMemBitmap, nTop
    nTop       := ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos-1) )
@@ -510,6 +510,7 @@ METHOD CreateDragImage(y) CLASS DataGrid
    ::__nDragTop := y-nTop
 RETURN hImageList
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
    LOCAL n, nRow, nCol, nWidth, nDrag, nTop, nDragPos, nDragRec, x, y
    DEFAULT lSuper TO .T.
@@ -676,7 +677,7 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
    ENDIF
 RETURN NIL
    
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SaveLayout( cIniFile, cSection ) CLASS DataGrid
    LOCAL oIni, n, cEntry := ""
    FOR n := 1 TO LEN( ::Children )
@@ -694,6 +695,7 @@ METHOD SaveLayout( cIniFile, cSection ) CLASS DataGrid
    Super:SaveLayout( cIniFile, cSection )
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD RestoreLayout( cIniFile, cSection )  CLASS DataGrid
    LOCAL aColumns, x, n, aColumn, c, oIni
    IF EMPTY( cIniFile )
@@ -718,6 +720,7 @@ METHOD RestoreLayout( cIniFile, cSection )  CLASS DataGrid
    Super:RestoreLayout( cIniFile, cSection )
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __CheckData( cData ) CLASS DataGrid
    LOCAL lFailed := .F.
    TRY
@@ -726,8 +729,8 @@ METHOD __CheckData( cData ) CLASS DataGrid
       lFailed := .T.
    END
 RETURN lFailed
-//----------------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __SetDataSource( oSource ) CLASS DataGrid
    LOCAL n, hWnd, lUpdate := .F.
 
@@ -737,7 +740,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
       DestroyWindow( hWnd )
    ENDIF
    
-   IF ::ClearColumns .AND. ::Children != NIL
+   IF ::Children != NIL
       FOR n := 1 TO LEN( ::Children )
           ::Children[n]:Destroy()
           n--
@@ -764,9 +767,9 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
       ::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
    ENDIF
-   //::__ResetRecordPos(.F.)
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __ResetDataSource( oSource ) CLASS DataGrid
    ::__SetDataSource( oSource )
    IF ::__ClassInst != NIL
@@ -774,28 +777,25 @@ METHOD __ResetDataSource( oSource ) CLASS DataGrid
    ENDIF
 RETURN Self
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __GoToRec( nRec ) CLASS DataGrid
    IF nRec != NIL
       ::DataSource:Goto( nRec )
    ENDIF
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __SkipRecords( n ) CLASS DataGrid
    IF n <> 0
       ::DataSource:Skip( n )
    ENDIF
 RETURN Self
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __SetBlocks() CLASS DataGrid
-
    IF !VALTYPE( ::DataSource ) == "O" .OR. ::DataSource:Fields == NIL .OR. !::DataSource:IsOpen
       RETURN NIL
    ENDIF
-
    ::__VertScrolled := ::Record
    ::__bGoTop    := <|| 
                       IF ::DataSource != NIL
@@ -812,8 +812,7 @@ METHOD __SetBlocks() CLASS DataGrid
    ::__bRecNo    := {|| ::DataSource:RecNo() }
 RETURN Self
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __OnTimer( nID ) CLASS DataGrid
    ::KillTimer( nID )
    DO CASE
@@ -827,8 +826,7 @@ METHOD __OnTimer( nID ) CLASS DataGrid
    ENDCASE
 RETURN 0
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD Skip( n ) CLASS DataGrid
    DEFAULT n TO 1
    ::__SkipRecords( n )
@@ -1858,7 +1856,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    LOCAL nDif, nFocRow, aData, z, lDrawControl, nCtrl, nRep, aRect, lEnabled := ::IsWindowEnabled()
    LOCAL iLen, lHighLight, lBorder, hBrush, nLine, nRecPos := 0, hPen, nImgX
    LOCAL nForeColor, nBackColor, lFocus := GetFocus() == ::hWnd, /*lFocusRect,*/ lShadow
-
+   LOCAL nBackGrid, nForeGrid
 
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
       RETURN .F.
@@ -1910,6 +1908,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    IF nRowEnd == 0 .AND. ::ShowHeaders
       nRowEnd := 1
    ENDIF
+
+   nBackGrid := ExecuteEvent( "OnQueryBackColor", Self )
+   nForeGrid := ExecuteEvent( "OnQueryForeColor", Self )
+   DEFAULT nBackGrid TO ::BackColor
+   DEFAULT nForeGrid TO ::ForeColor
+
    FOR nLine := nRow TO nRowEnd
        IF nLine <= LEN( ::__DisplayArray ) .AND. ::__DisplayArray[nLine] == NIL
           LOOP
@@ -1985,14 +1989,13 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               nAlign := IIF( lData, ::__DisplayArray[nPos][1][i][ 4], 1 )
               nHImg  := IIF( lData, ::__DisplayArray[nPos][1][i][ 5], 0 )
 
-              nBackColor := IIF( lHover, ::__HoverBackColor, IIF( lData, ::__DisplayArray[nPos][1][i][ 6], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, ::BackColor )) )
+              nBackColor := IIF( lHover, ::__HoverBackColor, IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 6] != NIL, ::__DisplayArray[nPos][1][i][ 6], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, nBackGrid )) )
 
               IF lData .AND. ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                  nBackColor := DarkenColor( nBackColor, 25 )
               ENDIF
-              nForeColor := IIF( lData, ::__DisplayArray[nPos][1][i][ 7], 0 )
+              nForeColor := IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 7] != NIL, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:ForeColor != NIL, ::Children[i]:ForeColor, nForeGrid ) )
               nStatus    := IIF( lData, ::__DisplayArray[nPos][1][i][ 8], 0 )
-
               nRep       := IIF( lData, ::Children[i]:Representation, 1 )
               
               IF lData
@@ -2066,7 +2069,6 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                     nForeColor := ::HighlightTextColor
                   ELSEIF lShadow
                     nBackColor := ::__InactiveHighlight
-                    nForeColor := ::__InactiveHighlightText
                  ENDIF
               ENDIF
 
@@ -2322,8 +2324,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
       x := ::__DataWidth - ABS( nHScroll )
       y := 0
 
-      SetBkColor( hMemDC, ::BackColor )
-      SetTextColor( hMemDC, ::ForeColor )
+      SetBkColor( hMemDC, nBackGrid )
+      SetTextColor( hMemDC, nForeGrid )
 
       _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, { x, y, ::ClientWidth, ::ClientHeight }," ")
    ENDIF
@@ -2344,37 +2346,23 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
    nFlags := DFCS_BUTTONCHECK
 
    IF nRep == 2
-//      hPen := CreatePen( PS_SOLID, 0, nBkCol )
-
       nWidth := aRect[1] + ( ( ( aRect[3] - aRect[1] ) * VAL( cText ) ) / 100 )
       aClip  := { x, aRect[2], X + aMetrics[1], aRect[4] }
 
-//      IF nWidth < aRect[3]
-//         hBrush := CreateSolidBrush( nBkCol )
-//         _FillRect( hDC, { nWidth, aRect[2], aRect[3], aRect[4] }, hBrush )
-//         DeleteObject( hBrush )
-//      ENDIF
       hBrush := CreateSolidBrush( nTxCol )
       _FillRect( hDC, { aRect[1]+1, aRect[2]+1, MIN( nWidth, aRect[3] )-1, aRect[4]-1 }, hBrush )
       DeleteObject( hBrush )
-
-//      hOP := SelectObject( hDC, hPen )
-//      hOB := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-//      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
 
       SetTextColor(hDC, nTxCol )
       SetBkColor(hDC, nBkCol )
       _ExtTextOut(hDC, x, y, ETO_CLIPPED, aClip, cText)
 
-      IF x<=nWidth
+      IF x <= nWidth
          SetTextColor(hDC, nBkCol )
          SetBkColor(hDC, nTxCol )
-         aClip:={ x, aRect[2], nWidth, aRect[4] }
+         aClip := { x, aRect[2], nWidth, aRect[4] }
          _ExtTextOut(hDC, x, y, ETO_CLIPPED, aClip, cText)
       END
-//      SelectObject( hDC, hOP )
-//      SelectObject( hDC, hOB )
-//      DeleteObject( hPen )
     ELSEIF nRep == 3
       IF VALTYPE( xVal ) == "L"
          IF xVal
@@ -2973,16 +2961,13 @@ RETURN NIL
 METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL nBack, nFore, hFont, oFont
+   LOCAL hFont, oFont
 
    IF nCol == NIL
       ::__DataWidth := 0
    ENDIF
 
    DEFAULT nPos TO ::RowPos
-
-   nBack := ExecuteEvent( "OnQueryBackColor", Self )
-   nFore := ExecuteEvent( "OnQueryForeColor", Self )
 
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
@@ -3008,17 +2993,10 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                 nImageHeight := IIF( ::ImageList:IconHeight != NIL, ::ImageList:IconHeight, nImageHeight )
              ENDIF
 
-             nColBkColor := ::Children[n]:BackColor
-             nColTxColor := ::Children[n]:ForeColor
-
-             DEFAULT nColBkColor TO nBack
-
              nRet := ExecuteEvent( "OnQueryBackColor", ::Children[n] )
              IF VALTYPE( nRet ) == "N"
                 nColBkColor :=  nRet
              ENDIF
-
-             DEFAULT nColTxColor TO nFore
              nRet := ExecuteEvent( "OnQueryForeColor", ::Children[n] )
              IF VALTYPE( nRet ) == "N"
                 nColTxColor :=  nRet
@@ -3029,7 +3007,6 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
              IF VALTYPE( nColBkColor ) == "B"
                 nColBkColor := EVAL( nColBkColor, Self, ::Children[n] )
              ENDIF
-
              IF VALTYPE( nColTxColor ) == "B"
                 nColTxColor := EVAL( nColTxColor, Self, ::Children[n] )
              ENDIF
@@ -3037,9 +3014,6 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
              IF VALTYPE( nAlign ) == "B"
                 nAlign := EVAL( nAlign, Self, ::Children[n] )
              ENDIF
-
-             DEFAULT nColBkColor TO ::BackColor
-             DEFAULT nColTxColor TO ::ForeColor
 
              nStatus := ::Children[n]:ControlStatus
 
@@ -3793,7 +3767,7 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
    ENDIF
 RETURN Self
 
-//----------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------
 
 METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
    LOCAL aRect, x, xValue, nAlign
@@ -3889,7 +3863,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
    ENDIF
 RETURN Self
 
-//----------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------
 
 METHOD GetItemRect() CLASS DataGrid
    LOCAL aRect, nLeft, nTop, nBottom, nRight
@@ -3902,7 +3876,7 @@ METHOD GetItemRect() CLASS DataGrid
    ENDIF
 RETURN aRect
 
-//----------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------
 
 METHOD __ControlSaveData( lFocus, nKey ) CLASS DataGrid
    LOCAL oCtrl, lRefresh := .T.
@@ -3991,6 +3965,7 @@ CLASS GridColumn INHERIT Object
    
    DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
    DATA EnumHeaderAlignment   EXPORTED INIT { {"Column Default", "Left", "Right", "Center"}, {0,1,2,3} }
+   DATA EnumRepresentation    EXPORTED INIT { { "Normal", "ProgressBar", "CheckBox", "Button" }, {1,2,3,4} }
 
    DATA ButtonText                   PUBLISHED
 
@@ -4041,9 +4016,10 @@ CLASS GridColumn INHERIT Object
    DATA __TempRect                   EXPORTED
    DATA __IsControl                  EXPORTED  INIT .F.
    DATA __PropFilter                 EXPORTED  INIT {}
-   DATA __Representation             EXPORTED  INIT { "Normal", "ProgressBar", "CheckBox", "Button" }
    DATA __lHidden                    EXPORTED  INIT .F.
-   DATA __Alignments                 EXPORTED  INIT { "Left", "Right", "Center" }
+
+   DATA EnumAlignment                EXPORTED  INIT { { "Left", "Right", "Center" }, { 1, 2, 3 } }
+
    DATA Parent                       EXPORTED
    DATA ClsName                      EXPORTED  INIT "GridColumn"
    DATA Owner                        EXPORTED
@@ -4068,8 +4044,8 @@ CLASS GridColumn INHERIT Object
    DATA Events                       EXPORTED
    DATA Cargo                        EXPORTED
 
-   DATA BackSysColor                 EXPORTED  INIT RGB( 255, 255, 255 )
-   DATA ForeSysColor                 EXPORTED  INIT RGB( 0, 0, 0 )
+   DATA BackSysColor                 EXPORTED
+   DATA ForeSysColor                 EXPORTED
 
    DATA Children                     EXPORTED
    DATA hWnd                         EXPORTED
@@ -4120,6 +4096,131 @@ CLASS GridColumn INHERIT Object
    METHOD __SetAutoEdit()
 ENDCLASS
 
+METHOD Init( oParent ) CLASS GridColumn
+   LOCAL nColor1, nColor2
+   ::Children    := {}
+   ::Parent      := oParent
+   ::xImageIndex := 0
+   ::xPosition   := LEN( ::Parent:Children )+1
+   IF oParent:__ClassInst != NIL
+      ::__ClassInst := __ClsInst( ::ClassH )
+   ENDIF
+   //::Form       := oParent:Form
+   
+   ::HeaderFont := Font()
+   ::Font       := Font()
+
+   ::Font:Parent       := Self
+   ::HeaderFont:Parent := Self
+
+   IF ::__ClassInst != NIL
+      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
+      ::Font:__ClassInst:__IsInstance := .T.
+      ::HeaderFont:__ClassInst := __ClsInst( ::HeaderFont:ClassH )
+      ::HeaderFont:__ClassInst:__IsInstance := .T.
+   ENDIF
+
+   nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+   nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+
+   ::__aMesh    := { {=>} }
+   ::__aMesh[1]:UpperLeft  := 0
+   ::__aMesh[1]:LowerRight := 1
+
+   ::__aVertex  := { {=>}, {=>} }
+
+   ::__aVertex[1]:Alpha := 0
+   ::__aVertex[2]:Alpha := 0
+
+   ::Font:Create()
+
+   ::HeaderFont:Create()
+ 
+   ::EventHandler := Hash()
+   HSetCaseMatch( ::EventHandler, .F. )
+   ::__xCtrlName := "GridColumn"
+   ::__CreateProperty( "GridColumn" )
+   ::Events := {}
+   IF oParent:__ClassInst != NIL
+      ::Events := { ;
+                  {"Object",      {;
+                                  { "OnInit"             , "", "" } } },;
+                  {"Data",        {;
+                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" },;
+                                  { "ButtonClicked"     , "", "" } } },;
+                  {"Color",       {;
+                                  { "OnQueryBackColor"  , "", "" },;
+                                  { "OnQueryForeColor"  , "", "" } } },;
+                  {"Image",       {;
+                                  { "OnQueryImageIndex" , "", "" } } },;
+                  {"General",     {;
+                                  { "OnCreate"          , "", "" },;
+                                  { "OnContextMenu"     , "", "" },;
+                                  { "OnCellFont"        , "", "" },;
+                                  { "OnHeaderClick"     , "", "" } } } }
+   ENDIF
+   ::Font:FaceName  := oParent:Font:FaceName
+   ::Font:Bold      := oParent:Font:Bold
+   ::Font:Italic    := oParent:Font:Italic
+   ::Font:Underline := oParent:Font:Underline
+   ::Font:PointSize := oParent:Font:PointSize
+   ::Font:FileName  := oParent:Font:FileName
+RETURN Self
+
+//---------------------------------------------------------------------------------------------------------------------------
+METHOD Create() CLASS GridColumn
+   LOCAL cText
+   IF ::hWnd != NIL
+      RETURN Self
+   ENDIF
+
+   IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
+      cText := ::Text
+
+      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
+         cText := &cText
+      ENDIF
+      IF VALTYPE(cText)=="B"
+         cText := EVAL(cText)
+      ENDIF
+      ::xText := cText
+   ENDIF
+   IF ::__ClassInst != NIL
+      IF ::Parent:TreeItem == NIL
+         ::Application:ObjectTree:Set( ::Parent )
+      ENDIF
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
+
+   IF VALTYPE( ::xImageIndex ) == "N"
+      ::xImageIndex := MAX( 0, ::xImageIndex )
+   ENDIF
+
+   ExecuteEvent( "OnInit", Self )
+
+   AADD( ::Parent:Children, Self )
+
+   ::xPosition := LEN( ::Parent:Children )
+   ::hWnd := Seconds()
+   DEFAULT ::xWidth TO 10 * LEN( ::xText )
+   ::Parent:__UpdateHScrollBar()
+
+   TRY
+      IF ::AutoEdit
+         IF ::Type $ "MC"
+            ::Control := {|o|Edit( o )  }
+         ELSE
+            ::Control := {|o|MaskEdit( o )  }
+         ENDIF
+         ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
+      ENDIF
+   CATCH
+   END
+   ExecuteEvent( "OnCreate", Self )
+   ::Parent:Update()
+RETURN Self
+
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD CreateDragImage( nLeft ) CLASS GridColumn
    LOCAL hImageList, hMemBitmap, nWidth
 
@@ -4134,6 +4235,7 @@ METHOD CreateDragImage( nLeft ) CLASS GridColumn
    DeleteObject( hMemBitmap )
 RETURN hImageList
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __SetSortArrow(n) CLASS GridColumn
    LOCAL i
    IF ::Parent:IsWindow()
@@ -4146,6 +4248,7 @@ METHOD __SetSortArrow(n) CLASS GridColumn
    ENDIF
 RETURN NIL
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    LOCAL aAlign, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
    LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex, y := 0
@@ -4181,10 +4284,6 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
 
    hOldFont := SelectObject( hDC, ::HeaderFont:Handle )
    aAlign := _GetTextExtentPoint32( hDC, IIF( Empty( ::xText ), "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", ::xText ) )
-   //OutputDebugString( "hDC: " + ::xText )
-   //OutputDebugString( "hDC: " + ValType( hDC ) )
-   //OutputDebugString( "aAlign: " + ValType( aAlign ) )
-   //OutputDebugString( "-------------------------------------------------------------------------------------------------------" )
 
    IF aAlign != NIL
       y := (::Parent:__GetHeaderHeight() - aAlign[2] ) / 2
@@ -4352,6 +4451,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
    ENDIF
 RETURN NIL
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD GetSize( nPos ) CLASS GridColumn
    LOCAL n, nLeft := 0
    IF !EMPTY( ::Parent:Children )
@@ -4396,133 +4496,7 @@ METHOD GetRect() CLASS GridColumn
    rc:bottom := pt:y
 RETURN rc
 
-//----------------------------------------------------------------------------------
-
-METHOD Init( oParent ) CLASS GridColumn
-   LOCAL nColor1, nColor2
-   ::Children    := {}
-   ::Parent      := oParent
-   ::xImageIndex := 0
-   ::xPosition   := LEN( ::Parent:Children )+1
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-   ENDIF
-   //::Form       := oParent:Form
-   
-   ::HeaderFont := Font()
-   ::Font       := Font()
-
-   ::Font:Parent       := Self
-   ::HeaderFont:Parent := Self
-
-   IF ::__ClassInst != NIL
-      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
-      ::Font:__ClassInst:__IsInstance := .T.
-      ::HeaderFont:__ClassInst := __ClsInst( ::HeaderFont:ClassH )
-      ::HeaderFont:__ClassInst:__IsInstance := .T.
-   ENDIF
-
-   nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-   nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
-
-   ::__aMesh    := { {=>} }
-   ::__aMesh[1]:UpperLeft  := 0
-   ::__aMesh[1]:LowerRight := 1
-
-   ::__aVertex  := { {=>}, {=>} }
-
-   ::__aVertex[1]:Alpha := 0
-   ::__aVertex[2]:Alpha := 0
-
-   ::Font:Create()
-
-   ::HeaderFont:Create()
- 
-   ::EventHandler := Hash()
-   HSetCaseMatch( ::EventHandler, .F. )
-   ::__xCtrlName := "GridColumn"
-   ::__CreateProperty( "GridColumn" )
-   ::Events := {}
-   IF oParent:__ClassInst != NIL
-      ::Events := { ;
-                  {"Object",      {;
-                                  { "OnInit"             , "", "" } } },;
-                  {"Data",        {;
-                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" },;
-                                  { "ButtonClicked"     , "", "" } } },;
-                  {"Color",       {;
-                                  { "OnQueryBackColor"  , "", "" },;
-                                  { "OnQueryForeColor"  , "", "" } } },;
-                  {"Image",       {;
-                                  { "OnQueryImageIndex" , "", "" } } },;
-                  {"General",     {;
-                                  { "OnCreate"          , "", "" },;
-                                  { "OnContextMenu"     , "", "" },;
-                                  { "OnCellFont"        , "", "" },;
-                                  { "OnHeaderClick"     , "", "" } } } }
-   ENDIF
-   ::Font:FaceName  := oParent:Font:FaceName
-   ::Font:Bold      := oParent:Font:Bold
-   ::Font:Italic    := oParent:Font:Italic
-   ::Font:Underline := oParent:Font:Underline
-   ::Font:PointSize := oParent:Font:PointSize
-   ::Font:FileName  := oParent:Font:FileName
-RETURN Self
-
-//----------------------------------------------------------------------------------
-
-METHOD Create() CLASS GridColumn
-   LOCAL cText
-   IF ::hWnd != NIL
-      RETURN Self
-   ENDIF
-
-   IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
-      cText := ::Text
-
-      IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
-         cText := &cText
-      ENDIF
-      IF VALTYPE(cText)=="B"
-         cText := EVAL(cText)
-      ENDIF
-      ::xText := cText
-   ENDIF
-   IF ::__ClassInst != NIL
-      IF ::Parent:TreeItem == NIL
-         ::Application:ObjectTree:Set( ::Parent )
-      ENDIF
-      ::Application:ObjectTree:Set( Self )
-   ENDIF
-
-   IF VALTYPE( ::xImageIndex ) == "N"
-      ::xImageIndex := MAX( 0, ::xImageIndex )
-   ENDIF
-
-   ExecuteEvent( "OnInit", Self )
-
-   AADD( ::Parent:Children, Self )
-
-   ::xPosition := LEN( ::Parent:Children )
-   ::hWnd := Seconds()
-   DEFAULT ::xWidth TO 10 * LEN( ::xText )
-   ::Parent:__UpdateHScrollBar()
-
-   TRY
-      IF ::AutoEdit
-         IF ::Type $ "MC"
-            ::Control := {|o|Edit( o )  }
-         ELSE
-            ::Control := {|o|MaskEdit( o )  }
-         ENDIF
-         ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
-      ENDIF
-   CATCH
-   END
-   ExecuteEvent( "OnCreate", Self )
-   ::Parent:Update()
-RETURN Self
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
    IF lEdit != ::AutoEdit
       IF lEdit
@@ -4539,6 +4513,7 @@ METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
    ENDIF
 RETURN lEdit
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SetImageIndex(n) CLASS GridColumn
    LOCAL x
    ::xImageIndex := n
@@ -4557,19 +4532,17 @@ METHOD SetImageIndex(n) CLASS GridColumn
    END
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SetHeaderImageIndex(n) CLASS GridColumn
    ::xHeaderImageIndex := n
 RETURN Self
 
-
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS GridColumn
    ::Parent:DeleteColumn( ::Position, .T. )
 RETURN Self
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SetAlignment(nAlign) CLASS GridColumn
    LOCAL n
    ::xAlignment := nAlign
@@ -4585,35 +4558,24 @@ METHOD SetAlignment(nAlign) CLASS GridColumn
    END
 RETURN Self
 
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SetRepresentation(n) CLASS GridColumn
    ::xRepresentation := n
    ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
 RETURN Self
 
-//----------------------------------------------------------------------------------
-
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD SetColor( nInd, nColor ) CLASS GridColumn
-   LOCAL n
    IF nInd == 1
-      DEFAULT nColor TO ::BackSysColor
       ::xBackColor := nColor
     ELSE
-      DEFAULT nColor TO ::ForeSysColor
       ::xForeColor := nColor
    ENDIF
    IF ::Parent:hWnd != NIL .AND. ::xPosition != NIL
-      FOR n := 1 TO LEN( ::Parent:__DisplayArray )
-          TRY
-             ::Parent:__DisplayArray[n][1][ ::xPosition ][5+nInd] := nColor
-          CATCH
-          END
-      NEXT
       ::Parent:__DisplayData( ,::xPosition, , ::xPosition )
    ENDIF
 RETURN Self
 
 
-*-----------------------------------------------------------------------------*
-
-Function Ceiling( x )
-Return( If( x - Int( x ) > 0, Int( x ) + 1, x ) )
+//---------------------------------------------------------------------------------------------------------------------------
+STATIC FUNCTION Ceiling( x );RETURN( If( x - Int( x ) > 0, Int( x ) + 1, x ) )
