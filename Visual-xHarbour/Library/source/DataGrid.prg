@@ -2338,33 +2338,29 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
 RETURN .T.
 
 METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMetrics, xVal, i, lRec ) CLASS DataGrid
-   LOCAL nWidth, aClip, nFore, nBack, hPen, hOP, hOB, hBrush, nStatus, nFlags, lXP
+   LOCAL nWidth, aClip, hBrush, nStatus, nFlags, lXP
 
    lXP    := ::Application:IsThemedXP .AND. ::Theming .AND. ::System:hButtonTheme != NIL
    nFlags := DFCS_BUTTONCHECK
 
    IF nRep == 2
-      hPen := CreatePen( PS_SOLID, 0, nBkCol )
-
-      nFore := GetTextColor(hDC)
-      nBack := GetBkColor(hDC)
+//      hPen := CreatePen( PS_SOLID, 0, nBkCol )
 
       nWidth := aRect[1] + ( ( ( aRect[3] - aRect[1] ) * VAL( cText ) ) / 100 )
       aClip  := { x, aRect[2], X + aMetrics[1], aRect[4] }
 
-      IF nWidth < aRect[3]
-         hBrush := CreateSolidBrush( nBkCol )
-         _FillRect( hDC, { nWidth, aRect[2], aRect[3], aRect[4] }, hBrush )
-         DeleteObject( hBrush )
-      ENDIF
+//      IF nWidth < aRect[3]
+//         hBrush := CreateSolidBrush( nBkCol )
+//         _FillRect( hDC, { nWidth, aRect[2], aRect[3], aRect[4] }, hBrush )
+//         DeleteObject( hBrush )
+//      ENDIF
       hBrush := CreateSolidBrush( nTxCol )
-      _FillRect( hDC, { aRect[1], aRect[2], MIN( nWidth, aRect[3] ), aRect[4] }, hBrush )
+      _FillRect( hDC, { aRect[1]+1, aRect[2]+1, MIN( nWidth, aRect[3] )-1, aRect[4]-1 }, hBrush )
       DeleteObject( hBrush )
 
-      hOP := SelectObject( hDC, hPen )
-      hOB := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-
-      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+//      hOP := SelectObject( hDC, hPen )
+//      hOB := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+//      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
 
       SetTextColor(hDC, nTxCol )
       SetBkColor(hDC, nBkCol )
@@ -2376,9 +2372,9 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, x, y, aMet
          aClip:={ x, aRect[2], nWidth, aRect[4] }
          _ExtTextOut(hDC, x, y, ETO_CLIPPED, aClip, cText)
       END
-      SelectObject( hDC, hOP )
-      SelectObject( hDC, hOB )
-      DeleteObject( hPen )
+//      SelectObject( hDC, hOP )
+//      SelectObject( hDC, hOB )
+//      DeleteObject( hPen )
     ELSEIF nRep == 3
       IF VALTYPE( xVal ) == "L"
          IF xVal
@@ -4606,9 +4602,9 @@ METHOD SetColor( nInd, nColor ) CLASS GridColumn
       ::xForeColor := nColor
    ENDIF
    IF ::Parent:hWnd != NIL .AND. ::xPosition != NIL
-      FOR n := 1 TO ::Parent:RowCountVisible
+      FOR n := 1 TO LEN( ::Parent:__DisplayArray )
           TRY
-             ::Parent:__DisplayArray[n][1][ ::xPosition ][6+nInd] := nColor
+             ::Parent:__DisplayArray[n][1][ ::xPosition ][5+nInd] := nColor
           CATCH
           END
       NEXT
