@@ -1899,9 +1899,6 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    ENDIF
 
    IF nCode == 0 .AND. oCtrl != NIL
-      IF oCtrl:__xCtrlName == "LinkLabel"
-         oCtrl:LinkVisited := .T.
-      ENDIF
       lHandled := .F.
 
       IF __ObjHasMsg( oCtrl, "DropDown" ) .AND. oCtrl:DropDown == 3
@@ -4812,6 +4809,9 @@ CLASS WinForm INHERIT Window
    PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET __SetActiveMenuBar
 
    //compatibility ONLY, forms do not set "Border" property
+   ACCESS TopMost              INLINE ::AlwaysOnTop
+   ASSIGN TopMost(l)           INLINE ::AlwaysOnTop := l
+
    DATA Border                 EXPORTED INIT .F.
 
    DATA xMDIChild              EXPORTED INIT .F.
