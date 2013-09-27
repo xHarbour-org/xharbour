@@ -965,7 +965,7 @@ int sqlo_close __P(( sqlo_stmt_handle_t sth ));
  *
  * @see sqlo_run
  */
-int sqlo_exec __P(( sqlo_db_handle_t dbh, CONST char * stmt ));
+int sqlo_exec __P(( sqlo_db_handle_t dbh, CONST char * stmt, unsigned int  *rr ));
 
 
 

@@ -146,6 +146,10 @@ Local cAlias
 
 if !empty(cWhere) .and. valtype( aVarSust) == "A"
 
+for i:=1 to len( aVarSust ) 
+   cBind := ":"+alltrim(str( i))
+   cWhere := strtran( cWhere,cBind,   sr_cdbvalue(aVarSust[i]) )
+next
 * nat := at
 endif
 if !empty( cWhere ) 
@@ -583,7 +587,7 @@ if nAliasTmp >0
 nAliasTmp--
 endif
 /* Clipper's NG says that DBEdit always returns NIL, but doesn't. */
-RETURN .T.
+RETURN 0 //.T.
 
 
 
@@ -623,7 +627,8 @@ Local aValues :={}
      enddo
 
      if nRet != DE_ABORT
-        nRet := dbe_return( Eval(bFunc, DE_INIT, nColPos, oTBR) )
+        nRet := dbe_return( Eval(bFunc, DE_INIT, nColPos,   GetCurValue(calias),oTBR) )
+        
      endif
 
      Return nRet

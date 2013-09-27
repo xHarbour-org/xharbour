@@ -53,7 +53,7 @@ typedef struct _OCI_SESSION
    ORA_BIND_COLS *  pLink;
    unsigned int   ubBindNum;
    sqlo_stmt_handle_t stmtParamRes;
-
+   unsigned int uRows;
 } OCI_SESSION;
 
 typedef OCI_SESSION * POCI_SESSION;
@@ -189,7 +189,7 @@ HB_FUNC( SQLO_EXECDIRECT )
 
    if( session )
    {
-      while (SQLO_STILL_EXECUTING == (session->status = sqlo_exec(session->dbh, stm)))
+      while (SQLO_STILL_EXECUTING == (session->status = sqlo_exec(session->dbh, stm,&session->uRows)))
       {
          SQLO_USLEEP;
       }
@@ -1436,3 +1436,13 @@ HB_FUNC( CLOSECURSOR )
    } 
    hb_retni( SQL_SUCCESS );
 }  
+
+
+HB_FUNC( GETAFFECTROWS) 
+{
+   OCI_SESSION * session  = ( OCI_SESSION* ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   if ( session ) 
+      hb_retnl( session->uRows ) ;
+   else
+      hb_retnl(0);                      
+}

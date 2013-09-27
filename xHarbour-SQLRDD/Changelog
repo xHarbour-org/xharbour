@@ -8,6 +8,23 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-09-27 20:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/oraedit.prg
+  * source/oraclip.prg 
+    ! somefixes
+  * source/sqlora.h
+  * source/sqlora.c
+  * source/sqlorax.c
+    ! Added GETAFFECTROWS() function and change sqlo_exec to return the value of number of rows affected by the querie
+  + source/sqlora2.c  
+    ! new code to access oracle that use ocilib
+  + source/sqloracle2.prg
+    ! updated version of sr_oracle class to take advantage of new C bindinds
+  + source/ocilib.h
+    ! Header file for ocilib
+  + dll/ociliba.dll
+    ! dll for ocilib      
+
 2013-07-28 10:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/sqlodbc.prg 
   * source/sqlsrodbc.c  

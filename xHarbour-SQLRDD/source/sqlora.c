@@ -4787,9 +4787,9 @@ DEFUN(sqlo_trace, (dbh, on),
 {
   int stat;
   if (on)
-    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE TRUE");
+    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE TRUE",NULL);
   else
-    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE FALSE");
+    stat = sqlo_exec(dbh, "ALTER SESSION SET SQL_TRACE FALSE",NULL);
 
   return stat;
 }
@@ -5119,9 +5119,10 @@ DEFUN(sqlo_run, (dbh, stmt, argc, argv),
  *         sqlo_exec
  *--------------------------------------------------------------------------*/
 int
-DEFUN(sqlo_exec, (dbh, stmt),
+DEFUN(sqlo_exec, (dbh, stmt,rr),
       sqlo_db_handle_t   dbh   AND
-      const char *       stmt )
+      const char *       stmt  AND
+      ub4 * rr )
 {
   sqlo_db_struct_ptr_t  dbp;
 
@@ -5195,6 +5196,7 @@ DEFUN(sqlo_exec, (dbh, stmt),
 
     if (dbp->status == OCI_SUCCESS ) {
       /* SUCCESS */
+      *rr=prows;
       dbp->status =  OCIHandleFree(dbp->stmthp, OCI_HTYPE_STMT);
 
       CHECK_OCI_STATUS_RETURN(dbp, dbp->status, "sqlo_exec", "OCIHandleFree");
