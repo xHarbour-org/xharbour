@@ -953,7 +953,7 @@ void hb_dateTime( int * piHour, int * piMinute, double * pdSeconds )
       GetLocalTime( &st );
       *piHour     = ( int ) st.wHour;
       *piMinute   = ( int ) st.wMinute;
-      *pdSeconds  = ( double ) st.wSecond;
+      *pdSeconds  = ( double ) st.wSecond + ( double ) st.wMilliseconds / 1000;
    }
 #else
    {
