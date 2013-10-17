@@ -384,8 +384,8 @@ HB_FUNC( IMAGELISTGETBITMAPS )
    IMAGEINFO ImageInfo;
    ImageList_GetImageInfo( (HIMAGELIST) hb_parnl(1), hb_parni(2), &ImageInfo );
    hb_reta( 2 );
-   hb_stornl( ImageInfo.hbmImage, -1, 1 );
-   hb_stornl( ImageInfo.hbmMask,  -1, 2 );
+   hb_stornl( (long) ImageInfo.hbmImage, -1, 1 );
+   hb_stornl( (long) ImageInfo.hbmMask,  -1, 2 );
 }
 
 //HB_FUNC( IMAGELISTGETIMAGEINFO )
