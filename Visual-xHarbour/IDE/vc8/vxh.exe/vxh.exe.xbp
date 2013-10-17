@@ -40,11 +40,12 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
+#VC specific - do NOT remove!
 [filemem.lib]
 
 [\xhb\lib\vc8\vxh.lib]
 
-[\xhb\lib\vc8\Editor.lib]
+[..\..\..\Editor\vc8\Editor.lib.xbp]
 
 [\xhb\lib\vc8\vxhd.lib]
 

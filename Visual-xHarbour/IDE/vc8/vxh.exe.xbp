@@ -40,11 +40,12 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
+#VC specific - do NOT remove!
 [filemem.lib]
 
 [vxh.lib]
 
-[Editor.lib]
+[..\..\..\Editor\vc8\Editor.lib.xbp]
 
 [vxhd.lib]
 
@@ -61,3 +62,12 @@ MYRC_FLAGS =
 [Ole.lib]
 
 [ActiveX.lib]
+
+[libmysql.lib]
+
+[fbclient_ms.lib]
+
+[libpq.lib]
+
+[oci.lib]
+
