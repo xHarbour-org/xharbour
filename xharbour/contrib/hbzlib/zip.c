@@ -713,6 +713,8 @@ HB_FUNC( HB_UNZIPFILE )
 
       if( szZipFileName )
       {
+         BYTE bCurDrv = hb_fsCurDrv();
+
          if( ISARRAY( 6 ) || ISCHAR( 6 ) )
             pUnzip = hb_param( 6, HB_IT_ANY );
 
@@ -767,6 +769,7 @@ HB_FUNC( HB_UNZIPFILE )
 
          hb_xfree( szZipFileName );
          hb_itemRelease( UnzipFiles );
+         hb_fsChDrv( bCurDrv );
          hb_fsChDir( ( const char * ) pCurDir );
          hb_xfree( pCurDir );
          hb_itemClear( ZipArray );
