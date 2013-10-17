@@ -1,4 +1,4 @@
-MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName);__HB_COMPILER__;HAVE_CONFIG_H;DHARBOUR_CONF;HB_VM_ALL;DHB_FM_DL_ALLOC
+MYDEFINES = HB_BACK_END=xHarbourBackEnd(szFileName);__HB_COMPILER__
 
 [source\compiler\hbmain.c]
 
