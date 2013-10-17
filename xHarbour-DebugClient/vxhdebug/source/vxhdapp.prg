@@ -186,7 +186,7 @@ CLASS MainWindow FROM WinForm
 ENDCLASS
 
 METHOD Init() CLASS MainWindow
-   LOCAL aEntries, cProject, oItem
+   //LOCAL aEntries, cProject, oItem
 
    ::Super:Init()
 
@@ -748,7 +748,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMems, aEntries, n, oItem, oLink, x, lLink := .T.
+   LOCAL lMems, aEntries, n, oItem, /*oLink, x,*/ lLink := .T.
 
    aEntries := ::Application:IniFile:GetSectionEntries( "Recent", .T. )
    IF cFile != NIL .AND. ( n := ASCAN( aEntries, {|c| lower(c) == lower(cFile) } ) ) > 0
