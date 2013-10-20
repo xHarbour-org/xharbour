@@ -52,6 +52,8 @@ CLASS TabControl INHERIT Control
 
    ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
+   PROPERTY Theming        ROOT "Appearance" ASSIGN {|Self,l| ::EnableThemeDialogTexture( IIF( l, ETDT_ENABLETAB, ETDT_DISABLE ) ) }
+
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.
    
@@ -74,7 +76,6 @@ CLASS TabControl INHERIT Control
    DATA __lMouseDown     PROTECTED INIT .F.
    DATA __ColorTable     PROTECTED 
 
-   DATA __aDel           PROTECTED INIT {}
    DATA __UpDn           PROTECTED
 
    PROPERTY TabPosition  READ xTabPosition WRITE __SetTabPosition DEFAULT 2 INVERT
@@ -171,14 +172,12 @@ CLASS TabControl INHERIT Control
    METHOD Show()
    
    METHOD OnMouseMove()
+
    METHOD OnUserMsg(n)
-   
-   //METHOD RestoreTabPos()
    
    METHOD OnLButtonDown()
    
    METHOD __OnParentSize()
-   //METHOD __SetTheming()
    METHOD __SetTabPosition()
    METHOD SelectPage()
    METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
@@ -289,6 +288,7 @@ METHOD Create() CLASS TabControl
       ::VertFont:Create()
    ENDIF
    ::Super:Create()
+   ::EnableThemeDialogTexture( IIF( ::Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
 
    IF ! ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
@@ -356,36 +356,6 @@ METHOD SelectPage( n ) CLASS TabControl
       ::SetCurSel( n )
    ENDIF
 RETURN NIL
-
-/*
-//-----------------------------------------------------------------------------------------------
-METHOD RestoreTabPos() CLASS TabControl
-   LOCAL tci, n, aTabs := ARRAY( LEN( ::aTabs ) )
-   
-   FOR n := 1 TO LEN( ::aTabs )
-      aTabs[ ::aTabs[n]:Position ] := ::aTabs[n]
-   NEXT
-
-   tci := (struct TCITEM)
-   tci:mask := TCIF_IMAGE | TCIF_TEXT
-   
-   ::aTabs := aTabs
-
-   FOR n := 1 TO LEN( ::aTabs )
-      ::aTabs[n]:Index := n
-
-      SendMessage( ::hWnd, TCM_DELETEITEM, n-1 )
-      tci:pszText := ::aTabs[n]:Caption
-      tci:iImage  := IIF( ::aTabs[n]:ImageIndex > 0, ::aTabs[n]:ImageIndex-1, -1 )
-      SendMessage( ::hWnd, TCM_INSERTITEM, n-1, tci )
-
-   NEXT   
-RETURN Self
-*/
-//-----------------------------------------------------------------------------------------------
-//METHOD __SetTheming( lSet ) CLASS TabControl
-//   AEVAL( ::aTabs, {|o| o:Theming := lSet, o:__OnParentSize( ::ClientWidth, ::ClientHeight ) } )
-//RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD GetItemText( n ) CLASS TabControl
@@ -510,7 +480,7 @@ METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
    LOCAL aItem, oPage, hWnd, rc, tci, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
-   IF ( !::Theming .OR. !IsThemeActive() )
+   IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
       RETURN NIL
    ENDIF
    IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
@@ -554,7 +524,7 @@ METHOD OnPaint() CLASS TabControl
    hBrush := ::GetbkBrush()
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    
-   IF IsThemeActive()
+   IF ::Theming .AND. IsThemeActive()
       DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
     ELSE
       _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
@@ -904,9 +874,6 @@ CLASS TabPage INHERIT Dialog
    ACCESS TopMost          INLINE ::xTopMost
 
    ACCESS Form             INLINE ::Parent:Form
-   
-   DATA __aRect            PROTECTED
-   DATA __nPos             PROTECTED INIT 0
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -928,6 +895,7 @@ CLASS TabPage INHERIT Dialog
    METHOD __SetVisible()
    METHOD OnPaint()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
+   METHOD OnMouseLeave(n,l) INLINE ::Super:OnMouseLeave(n,l), ::InvalidateRect(, .F. ), NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -1263,7 +1231,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    IF GetClassName( GetParent( ::hWnd ) ) == WC_TABCONTROL
       rc:Left   := 0
       rc:Top    := 0
-      rc:Right  := ::Parent:ClientWidth
+      rc:Right  := ::Parent:ClientWidth-1
       rc:Bottom := ::Parent:ClientHeight
     ELSE
       rc:Left   := ::Parent:Left
@@ -1282,10 +1250,6 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
       IF ::Application:OsVersion:dwMajorVersion > 5
          rc:Bottom += 1
       ENDIF      
-    ELSEIF ::Application:ThemeActive .AND. ::Theming
-      rc:Left   -= 1
-      rc:Right  += 1
-      rc:Bottom -= 1
     ELSE
       rc:Left   -= 3
       rc:Top    -= 1
@@ -1354,39 +1318,47 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Hide() CLASS TabPage
-   IF ::__nPos == 0
-      ::__nPos := ::__GetPosition()
-      ::Parent:SendMessage( TCM_DELETEITEM, ::__nPos - 1, 0 )
-      SetProp( ::hWnd, "TabPageVisible", 0 )
+   LOCAL nPos := ::__GetPosition()
 
-      IF ::Parent:CurSel == ::__nPos
-         Super:Hide()
-         IF ::Parent:GetItemCount() > 0
-            ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
-            ::Parent:GetItemObject():ShowTab()
-         ENDIF
-       ELSEIF ::Parent:CurSel > ::__nPos
-         ::Parent:CurSel--
+   ::Parent:SendMessage( TCM_DELETEITEM, nPos - 1, 0 )
+
+   IF ::Parent:CurSel == nPos
+      Super:Hide()
+      IF ::Parent:GetItemCount() > 0
+         ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
+         ::Parent:GetItemObject():ShowTab()
       ENDIF
+    ELSEIF ::Parent:CurSel > nPos
+      ::Parent:CurSel--
    ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __Show() CLASS TabPage
-   LOCAL tci, n := 0
-   IF ::__nPos > 0
-      tci := (struct TCITEM)
-      tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
-      tci:pszText := ::Text
-      tci:lParam  := ::hWnd
-      tci:iImage  := IIF( ::ImageIndex > 0, ::ImageIndex-1, -1 )
-      SendMessage( ::Parent:hWnd, TCM_INSERTITEM, ::__nPos-1, tci )
+   LOCAL n := 0, oCur, tci := (struct TCITEM)
 
-      IF ::Parent:CurSel >= ::__nPos
-         ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
-      ENDIF
-      ::Parent:GetItemObject():ShowTab()
-      ::__nPos := 0
+   ::xVisible  := .T.
+   ::Parent:SendMessage( TCM_DELETEALLITEMS, 0, 0 )
+
+   FOR n := 1 TO LEN( ::Parent:Children )
+       IF ::Parent:Children[ n ]:ClsName == "TabPage"
+          IF ::Parent:Children[ n ]:xVisible
+             tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
+             tci:pszText := ::Parent:Children[ n ]:xText
+             tci:lParam  := ::Parent:Children[ n ]:hWnd
+             tci:iImage  := IIF( ::Parent:Children[ n ]:ImageIndex > 0, ::Parent:Children[ n ]:ImageIndex-1, -1 )
+             SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci )
+          ENDIF
+       ENDIF
+   NEXT
+
+   ::Application:DoEvents()
+
+   IF ::Parent:CurSel >= ::xPosition
+      ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
+   ENDIF
+   IF ( oCur := ::Parent:GetItemObject() ) != NIL
+      oCur:ShowTab()
    ENDIF
 RETURN Self
 

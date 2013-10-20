@@ -144,9 +144,9 @@ METHOD PreInitDialog() CLASS Dialog
    ::sih:cbSize := ::sih:sizeof()
    ::sih:nMin   := 0
 
-   IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL  .AND. ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Application:IsThemedXP .AND. ::Theming
-      ::EnableThemeDialogTexture( ETDT_ENABLETAB )
-   ENDIF
+   //IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL  .AND. ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Application:IsThemedXP .AND. ::Theming
+      //::EnableThemeDialogTexture( ETDT_ENABLETAB )
+   //ENDIF
 
    nLeft   := ::Left
    nTop    := ::Top
@@ -230,7 +230,6 @@ METHOD Create( hParent ) CLASS Dialog
   
    ::__lOnPaint   := HGetPos( ::EventHandler, "OnPaint" ) != 0
 
-   ::ClsName  := "Dialog"
    ::lEmpty   := ::Template == NIL
 
    nRet := ExecuteEvent( "OnInit", Self )

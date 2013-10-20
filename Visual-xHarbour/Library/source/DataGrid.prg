@@ -1909,10 +1909,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
       nRowEnd := 1
    ENDIF
 
-   nBackGrid := ExecuteEvent( "OnQueryBackColor", Self )
-   nForeGrid := ExecuteEvent( "OnQueryForeColor", Self )
-   DEFAULT nBackGrid TO ::BackColor
-   DEFAULT nForeGrid TO ::ForeColor
+   nBackGrid := ::BackColor
+   DEFAULT nBackGrid TO ::BackSysColor
+
+   nForeGrid := ::ForeColor
+   DEFAULT nForeGrid TO ::ForeSysColor
 
    FOR nLine := nRow TO nRowEnd
        IF nLine <= LEN( ::__DisplayArray ) .AND. ::__DisplayArray[nLine] == NIL
@@ -1990,11 +1991,20 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               nHImg  := IIF( lData, ::__DisplayArray[nPos][1][i][ 5], 0 )
 
               nBackColor := IIF( lHover, ::__HoverBackColor, IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 6] != NIL, ::__DisplayArray[nPos][1][i][ 6], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, nBackGrid )) )
+              IF VALTYPE( nBackColor ) == "B"
+                 nBackColor := EVAL( nBackColor, ::Children[i] )
+              ENDIF
+              DEFAULT nBackColor TO nBackGrid
 
               IF lData .AND. ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                  nBackColor := DarkenColor( nBackColor, 25 )
               ENDIF
               nForeColor := IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 7] != NIL, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:ForeColor != NIL, ::Children[i]:ForeColor, nForeGrid ) )
+              IF VALTYPE( nForeColor ) == "B"
+                 nForeColor := EVAL( nForeColor, ::Children[i] )
+              ENDIF
+              DEFAULT nForeColor TO nForeGrid
+
               nStatus    := IIF( lData, ::__DisplayArray[nPos][1][i][ 8], 0 )
               nRep       := IIF( lData, ::Children[i]:Representation, 1 )
               
@@ -2107,7 +2117,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
                          x := zLeft + ( ( nRight - zLeft - aAlign[1] ) / 2 )
                          EXIT
                  END
-                 ::Children[i]:DrawHeader( hMemDC, zLeft, nHeaderRight, x )
+                 ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x )
               ENDIF
               //-----------------------------------------------------------------
 
@@ -2961,13 +2971,23 @@ RETURN NIL
 METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL hFont, oFont
+   LOCAL hFont, oFont, nGridBkColor, nGridTxColor
 
    IF nCol == NIL
       ::__DataWidth := 0
    ENDIF
 
    DEFAULT nPos TO ::RowPos
+
+   nRet := ExecuteEvent( "OnQueryBackColor", Self )
+   IF VALTYPE( nRet ) == "N"
+      nGridBkColor :=  nRet
+   ENDIF
+   nRet := ExecuteEvent( "OnQueryForeColor", Self )
+   IF VALTYPE( nRet ) == "N"
+      nGridTxColor :=  nRet
+   ENDIF
+
 
    FOR n := 1 TO LEN( ::Children )
        IF nCol == NIL .OR. nCol == n // Loading new column?
@@ -2993,6 +3013,9 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                 nImageHeight := IIF( ::ImageList:IconHeight != NIL, ::ImageList:IconHeight, nImageHeight )
              ENDIF
 
+             nColBkColor := NIL
+             nColTxColor := NIL
+
              nRet := ExecuteEvent( "OnQueryBackColor", ::Children[n] )
              IF VALTYPE( nRet ) == "N"
                 nColBkColor :=  nRet
@@ -3010,6 +3033,9 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
              IF VALTYPE( nColTxColor ) == "B"
                 nColTxColor := EVAL( nColTxColor, Self, ::Children[n] )
              ENDIF
+
+             DEFAULT nColBkColor TO nGridBkColor
+             DEFAULT nColTxColor TO nGridTxColor
 
              IF VALTYPE( nAlign ) == "B"
                 nAlign := EVAL( nAlign, Self, ::Children[n] )
@@ -3036,6 +3062,8 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                 cData := ::DataSource:FieldGet( ::Children[n]:FieldPos )
               ELSE
                 cData := ""
+             ENDIF
+             IF ::Children[n]:Representation == 5 .AND. VALTYPE( cData ) == "D"
              ENDIF
 
              IF ::ConvertOem .AND. VALTYPE( cData ) == "C"
@@ -3929,6 +3957,9 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 CLASS GridColumn INHERIT Object
+   PROPERTY HeaderBackColor   ROOT "Colors" GET IIF( ::xHeaderBackColor == NIL, ::HeaderBackSysColor, ::xHeaderBackColor )
+   PROPERTY HeaderForeColor   ROOT "Colors" GET IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor )
+
    DATA aSelRect      EXPORTED
 
    DATA xLeft         EXPORTED
@@ -3996,14 +4027,6 @@ CLASS GridColumn INHERIT Object
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
    DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
-
-   DATA xHeaderBackColor             EXPORTED
-   ACCESS HeaderBackColor            INLINE IIF( ::xHeaderBackColor == NIL, ::HeaderBackSysColor, ::xHeaderBackColor ) PERSISTENT
-   ASSIGN HeaderBackColor( n )       INLINE ::xHeaderBackColor := n
-
-   DATA xHeaderForeColor             EXPORTED
-   ACCESS HeaderForeColor            INLINE IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor ) PERSISTENT
-   ASSIGN HeaderForeColor( n )       INLINE ::xHeaderForeColor := n
 
    ACCESS CellData                   INLINE ::Parent:__DisplayArray[ ::Parent:RowPos ][1][ ::Parent:ColPos ][1]
 
