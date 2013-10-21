@@ -88,8 +88,6 @@ HB_FUNC( LISTVIEWBROWSEINIT )
 
    s_bShowFolders = hb_parl(4);
 
-   LPITEMIDLIST pidl = NULL;
-
    himlSmall = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
    himlLarge = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 
