@@ -137,7 +137,6 @@ HTREEITEM FolderTreeInsertRoot(LPSHELLFOLDER lpsf, HWND hTreeView, int iFolder, 
    HTREEITEM hParent = NULL;
    char szBuff [MAX_PATH];
    TVINSERTSTRUCT tvins;
-   HRESULT hr;
    LPSHELLFOLDER pRoot = NULL;
 
    if( cInitialPath != NULL )
@@ -146,8 +145,8 @@ HTREEITEM FolderTreeInsertRoot(LPSHELLFOLDER lpsf, HWND hTreeView, int iFolder, 
       ULONG chEaten;
       ULONG dwAttributes;
       MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, cInitialPath, -1, olePath, MAX_PATH);
-      hr = lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
-      hr = lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pRoot);
+      lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
+      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pRoot);
    }
    else
    {
@@ -156,7 +155,7 @@ HTREEITEM FolderTreeInsertRoot(LPSHELLFOLDER lpsf, HWND hTreeView, int iFolder, 
 
    if( pRoot == NULL && iFolder != CSIDL_DESKTOP )
    {
-      hr = lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pRoot);
+      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pRoot);
    }
 
    FolderTreeInsertItem( TRUE, &tvins, szBuff, NULL, NULL , lpsf, NULL, lpi , TRUE, pRoot);
@@ -177,7 +176,6 @@ HB_FUNC( FOLDERTREEINIT )
    HWND          hTreeView = (HWND) hb_parnl(1);
    LPSHELLFOLDER lpsf = NULL;
    HRESULT       hr;
-   HTREEITEM     hParent = NULL;
    SHFILEINFO    sfi;
    HIMAGELIST    himlSmall;
    HIMAGELIST    himlLarge;
@@ -193,7 +191,7 @@ HB_FUNC( FOLDERTREEINIT )
    hr = SHGetDesktopFolder (&lpsf);
    if (SUCCEEDED (hr))
    {
-      hParent = FolderTreeInsertRoot(lpsf, hTreeView, hb_parni(2), hb_parc(3) );
+      FolderTreeInsertRoot(lpsf, hTreeView, hb_parni(2), hb_parc(3) );
       lpsf->lpVtbl->Release (lpsf);
    }
 }
@@ -202,8 +200,6 @@ HB_FUNC( FOLDERTREEINIT )
 void FolderTreePopulate( HWND hTreeView, TVITEM *tvi, UINT action )
 {
    LPTVITEMDATA* lptvid = NULL;
-   HTREEITEM hItem = NULL;
-   HTREEITEM hPrev;
    HRESULT hr;
    ULONG celtFetched;
    LPITEMIDLIST pidlItems = NULL;
@@ -257,7 +253,7 @@ void FolderTreePopulate( HWND hTreeView, TVITEM *tvi, UINT action )
       {
          if( FolderTreeInsertItem(FALSE, &tvins, szBuff, tvi->hItem, NULL , psfProgFiles , lptvid->lpifq, pidlItems , TRUE, NULL) )
          {
-            hPrev = TreeView_InsertItem(hTreeView, &tvins);
+            TreeView_InsertItem(hTreeView, &tvins);
          }
       }
    }
@@ -307,7 +303,7 @@ HB_FUNC( FOLDERTREEPOPULATETREE )
 HB_FUNC( FOLDERTREESHOWSTDMENU )
 {
    HWND hWnd = (HWND) hb_parnl(1);
-   LPARAM lParam = (LPARAM) hb_parnl(2);
+   //LPARAM lParam = (LPARAM) hb_parnl(2);
    BOOL bShowMenu = hb_parl(3);
 
    TVITEM tvi;

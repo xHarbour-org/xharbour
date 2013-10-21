@@ -88,6 +88,8 @@ HB_FUNC( LISTVIEWBROWSEINIT )
 
    s_bShowFolders = hb_parl(4);
 
+//   LPITEMIDLIST pidl = NULL;
+
    himlSmall = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
    himlLarge = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 
@@ -115,7 +117,7 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
 {
    LPMALLOC lpMalloc;
    LPLVITEMDATA lptvid = NULL;
-   LPITEMIDLIST pidl = NULL;
+//   LPITEMIDLIST pidl = NULL;
    LV_ITEM lvi;
 
    lvi.mask     = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
@@ -148,7 +150,7 @@ void FolderListPopulate(HWND hWndListView, LPARAM lParam )
 {
    LPLVITEMDATA lptvid = NULL;
    HRESULT hr;
-   LPITEMIDLIST pidlItems = NULL;
+//   LPITEMIDLIST pidlItems = NULL;
    LPSHELLFOLDER pFolder = NULL;
    LPMALLOC pMalloc;
 
@@ -186,15 +188,15 @@ void FolderListPopulate(HWND hWndListView, LPARAM lParam )
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 HB_FUNC( LISTVIEWBROWSEGOUP )
 {
-   LPITEMIDLIST lpi = NULL;
+//   LPITEMIDLIST lpi = NULL;
    HWND hWnd = (HWND) hb_parnl(1);
    LPARAM lParam = (LPARAM) hb_parnl(2);
    LPMALLOC pMalloc;
    LPLVITEMDATA lptvid;
    LVITEM lvi;
    LPSHELLFOLDER pFolder;
-   HRESULT hr;
-   
+   //HRESULT hr;
+
    ZeroMemory(&lvi, sizeof(lvi));
    ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
 
@@ -203,7 +205,7 @@ HB_FUNC( LISTVIEWBROWSEGOUP )
    lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
    lptvid = (LPLVITEMDATA)lvi.lParam;
 
-   hr = lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+   lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
  
    FolderListSet( hWnd, pFolder, lptvid->lpi);
 
