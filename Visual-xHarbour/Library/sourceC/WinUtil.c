@@ -4947,7 +4947,7 @@ HB_FUNC( VXH_MAINLOOP )
 {
    MSG msg;
    BOOL bRet;
-   HWND hMain = (HWND) hb_parnl(1);
+   //HWND hMain = (HWND) hb_parnl(1);
    HWND hMDI  = (HWND) hb_parnl(2);
    PHB_ITEM aAccel = (PHB_ITEM) hb_param( 3, HB_IT_ARRAY );
    BOOL bAccEnabled = (BOOL) hb_parl(4);
@@ -4958,7 +4958,7 @@ HB_FUNC( VXH_MAINLOOP )
       {
          TCHAR cClass[ MAX_PATH ];
          GetClassName( msg.hwnd, cClass, MAX_PATH ) ;
-         
+
          if( ! AxTranslateMessageEx( &msg, cClass ) )
          {
             if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
@@ -4998,19 +4998,17 @@ HB_FUNC( VXH_MAINLOOP )
 
 HB_FUNC( GETPROCESSMEMORYINFO )
 {
-   DWORD processID;
-   HANDLE hProcess;
+   //DWORD processID;
+   //HANDLE hProcess;
    PROCESS_MEMORY_COUNTERS pmc;
-   HINSTANCE hProcHandle = GetModuleHandle( ISNIL(1)?NULL:hb_parc(1) );
+   //HINSTANCE hProcHandle = GetModuleHandle( ISNIL(1)?NULL:hb_parc(1) );
 
+   //hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
 
-   hProcess = OpenProcess(  PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
-
-
-   GetProcessMemoryInfo( hProcHandle, &pmc, sizeof(pmc) );
+   GetProcessMemoryInfo( /*hProcHandle*/ (HANDLE) -1, &pmc, sizeof(pmc) );
    hb_retnl( (long) pmc.WorkingSetSize );
 
-   CloseHandle( hProcess );
+   //CloseHandle( hProcess );
 }
 
 HB_FUNC( ISWOW64 )

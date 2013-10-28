@@ -171,7 +171,7 @@ HB_FUNC( GETTHEMEFONT )
 
        if( pfn )
        {
-           LPVOID Buffer;
+           //LPVOID Buffer;
            LOGFONT pFont;
            OutputDebugString( "1" );
            hRet = pfn( (HTHEME) hb_parnl(1), ISNIL(2) ? NULL : (HDC) hb_parnl(2), hb_parni(3), hb_parni(4), TMT_FONT, &pFont );
@@ -314,11 +314,11 @@ HB_FUNC( DRAWTHEMETEXTEX )
       if( pfn )
       {
          RECT pRect;
-         DTTOPTS *pOptions;
+         //DTTOPTS *pOptions;
          LPCWSTR wText;
 
          Array2Rect( hb_param(7,HB_IT_ARRAY), &pRect );
-         pOptions = (DTTOPTS*) hb_param( 8, HB_IT_STRING )->item.asString.value;
+         /*pOptions =*/ (DTTOPTS*) hb_param( 8, HB_IT_STRING )->item.asString.value;
          wText = hb_oleAnsiToWide( hb_parc(5) );
          nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, wText, -1, (DWORD) hb_parnl(6), &pRect, NULL );
          hb_xfree( (void *) wText );
@@ -439,7 +439,7 @@ HB_FUNC( GETTHEMEPARTSIZE )
    int iStateId  = hb_parni(4);
    SIZE pSize;
 
-   PHB_ITEM pArray = hb_param( 7, HB_IT_ARRAY );
+   //PHB_ITEM pArray = hb_param( 7, HB_IT_ARRAY );
 
    hb_reta( 2 );
    hb_storni( 0, -1, 1 );

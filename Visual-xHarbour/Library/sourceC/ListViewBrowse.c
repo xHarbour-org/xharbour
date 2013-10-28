@@ -126,7 +126,7 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
    lvi.pszText  = LPSTR_TEXTCALLBACK;
 
    lpsf->lpVtbl->AddRef(lpsf);
-   
+
 
    SHGetMalloc(&lpMalloc);
    lptvid = (LPLVITEMDATA) lpMalloc->lpVtbl->Alloc (lpMalloc, sizeof (LVITEMDATA));
@@ -141,7 +141,7 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
 
    ListView_InsertItem (hWndListView, &lvi);
    lpMalloc->lpVtbl->Release(lpMalloc);
-   
+
    return TRUE;
 }
 
@@ -206,7 +206,7 @@ HB_FUNC( LISTVIEWBROWSEGOUP )
    lptvid = (LPLVITEMDATA)lvi.lParam;
 
    lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
- 
+
    FolderListSet( hWnd, pFolder, lptvid->lpi);
 
    if( pFolder )
@@ -218,22 +218,22 @@ HB_FUNC( LISTVIEWBROWSEGOUP )
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 HB_FUNC( LISTVIEWBROWSEPOPULATEBYID )
 {
-   LPSHELLFOLDER lpsf = (LPSHELLFOLDER) hb_parnl(3);
+   //LPSHELLFOLDER lpsf = (LPSHELLFOLDER) hb_parnl(3);
    FolderListSet( (HWND) hb_parnl(1), lpShell, (LPITEMIDLIST) hb_parnl(2) );
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 HB_FUNC( LISTVIEWBROWSEPOPULATE )
 {
-   LPITEMIDLIST lpi = NULL;
+   //LPITEMIDLIST lpi = NULL;
    HWND hWnd = (HWND) hb_parnl(1);
    LPARAM lParam = (LPARAM) hb_parnl(2);
    LPMALLOC pMalloc;
    LPLVITEMDATA lptvid;
    LVITEM lvi;
    LPSHELLFOLDER pFolder;
-   HRESULT hr;
-   
+   //HRESULT hr;
+
    ZeroMemory(&lvi, sizeof(lvi));
    ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
 
@@ -242,8 +242,8 @@ HB_FUNC( LISTVIEWBROWSEPOPULATE )
    lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
    lptvid = (LPLVITEMDATA)lvi.lParam;
 
-   hr = lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
- 
+   /*hr =*/ lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+
    FolderListSet( hWnd, pFolder, lptvid->lpifq);
 
    if( pFolder )
@@ -268,7 +268,7 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
    ULONG celtFetched;
    LPENUMIDLIST ppenum;
    LPITEMIDLIST pidlItems;
-   
+
    giRowCtr = 0;
    SetCursor(LoadCursor(NULL,IDC_WAIT));
    SendMessage(hWndListView, WM_SETREDRAW, FALSE, 0L);
@@ -276,7 +276,7 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 
    SHGetDesktopFolder( &lpsf );
 
-   
+
    if( s_bShowFolders || pFolder == lpsf )
    {
       hr = pFolder->lpVtbl->EnumObjects(pFolder, NULL,SHCONTF_FOLDERS, &ppenum);
@@ -290,7 +290,7 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
          }
       }
    }
-   
+
    if( pFolder != lpsf )
    {
       hr = pFolder->lpVtbl->EnumObjects(pFolder, NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &ppenum);
@@ -312,13 +312,13 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
    SetCursor(LoadCursor(NULL,IDC_ARROW));
    SendMessage(hWndListView, WM_SETREDRAW, TRUE, 0L);
    InvalidateRect(hWndListView, NULL, TRUE);
-   
+
    lpsf->lpVtbl->Release( lpsf );
 }
 
 HB_FUNC( FOLDERLISTGETPATH )
 {
-   LPITEMIDLIST lpi = NULL;
+   //LPITEMIDLIST lpi = NULL;
    HWND hWnd = (HWND) hb_parnl(1);
    LPARAM lParam = (LPARAM) hb_parnl(2);
    LVITEM lvi;
@@ -346,19 +346,19 @@ HB_FUNC( FOLDERLISTSETFOLDER )
    ULONG chEaten;
    ULONG dwAttributes;
    LPITEMIDLIST lpi = (LPITEMIDLIST) hb_parnl(4);
-   HRESULT hr;
+   //HRESULT hr;
    int iFolder = hb_parni(3);
    LPSHELLFOLDER lpsf;
    LPSHELLFOLDER pFolder = NULL;
    char *cFolder = (char*) hb_parc(2);
 
-   hr = SHGetDesktopFolder (&lpsf);
+   /*hr =*/ SHGetDesktopFolder (&lpsf);
 
    if( cFolder != NULL )
    {
       MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, cFolder, -1, olePath, MAX_PATH);
-      hr = lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
-      hr = lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+      /*hr =*/ lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
+      /*hr =*/ lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
    }
    else
    {
@@ -378,7 +378,7 @@ HB_FUNC( FOLDERLISTSETFOLDER )
       {
          if( pFolder == NULL )
          {
-            hr = lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+            /*hr =*/ lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
          }
          FolderListSet( (HWND) hb_parnl(1), pFolder, lpi );
       }
@@ -640,32 +640,32 @@ Done:
 }
 
 /*
-int CALLBACK ListViewCompareProc(LPARAM lParam1,    
-                                 LPARAM lParam2,   
-                                 LPARAM lParamSort)   
-{   
-    LPLVITEMDATA lplvid1=(LPLVITEMDATA)lParam1;   
-    LPLVITEMDATA lplvid2=(LPLVITEMDATA)lParam2;   
-    char      szTemp1[MAX_PATH];   
-    char      szTemp2[MAX_PATH];   
-    int       iResult = 1;   
-   
-    if( lplvid1 && lplvid2)   
-    {   
-       if(  (lplvid1 -> ulAttribs & SFGAO_FOLDER) &&    
-           !(lplvid2 -> ulAttribs & SFGAO_FOLDER) )   
-              return -1;   
-   
-       if( !(lplvid1 -> ulAttribs & SFGAO_FOLDER) &&    
-            (lplvid2 -> ulAttribs & SFGAO_FOLDER) )   
-              return 1;   
-   
-       GetName(lplvid1 -> lpsfParent, lplvid1 -> lpi, SHGDN_NORMAL, szTemp1) ;   
-       GetName(lplvid2 -> lpsfParent, lplvid2 -> lpi, SHGDN_NORMAL, szTemp2) ;   
-   
-       iResult = lstrcmpi(szTemp1, szTemp2) ;   
-    }   
-   
-    return iResult;   
-}   
+int CALLBACK ListViewCompareProc(LPARAM lParam1,
+                                 LPARAM lParam2,
+                                 LPARAM lParamSort)
+{
+    LPLVITEMDATA lplvid1=(LPLVITEMDATA)lParam1;
+    LPLVITEMDATA lplvid2=(LPLVITEMDATA)lParam2;
+    char      szTemp1[MAX_PATH];
+    char      szTemp2[MAX_PATH];
+    int       iResult = 1;
+
+    if( lplvid1 && lplvid2)
+    {
+       if(  (lplvid1 -> ulAttribs & SFGAO_FOLDER) &&
+           !(lplvid2 -> ulAttribs & SFGAO_FOLDER) )
+              return -1;
+
+       if( !(lplvid1 -> ulAttribs & SFGAO_FOLDER) &&
+            (lplvid2 -> ulAttribs & SFGAO_FOLDER) )
+              return 1;
+
+       GetName(lplvid1 -> lpsfParent, lplvid1 -> lpi, SHGDN_NORMAL, szTemp1) ;
+       GetName(lplvid2 -> lpsfParent, lplvid2 -> lpi, SHGDN_NORMAL, szTemp2) ;
+
+       iResult = lstrcmpi(szTemp1, szTemp2) ;
+    }
+
+    return iResult;
+}
 */
