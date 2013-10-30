@@ -314,11 +314,9 @@ HB_FUNC( DRAWTHEMETEXTEX )
       if( pfn )
       {
          RECT pRect;
-         //DTTOPTS *pOptions;
          LPCWSTR wText;
 
          Array2Rect( hb_param(7,HB_IT_ARRAY), &pRect );
-         /*pOptions =*/ (DTTOPTS*) hb_param( 8, HB_IT_STRING )->item.asString.value;
          wText = hb_oleAnsiToWide( hb_parc(5) );
          nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, wText, -1, (DWORD) hb_parnl(6), &pRect, NULL );
          hb_xfree( (void *) wText );
