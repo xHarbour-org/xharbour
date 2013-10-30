@@ -64,7 +64,7 @@ HB_FUNC( MAX )
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
-   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
+   if( HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
    {
       register LONG  ld1   = p1->item.asDate.value;
       register LONG  ld2   = p2->item.asDate.value;
@@ -73,7 +73,7 @@ HB_FUNC( MAX )
       else
          hb_itemReturn( p2 );
    }
-   else if( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
+   else if( HB_IS_DATETIME( p1 ) || HB_IS_DATETIME( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -140,7 +140,7 @@ HB_FUNC( MIN )
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
-   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
+   if( HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
    {
       register LONG  ld1   = p1->item.asDate.value;
       register LONG  ld2   = p2->item.asDate.value;
@@ -149,7 +149,7 @@ HB_FUNC( MIN )
       else
          hb_itemReturn( p2 );
    }
-   else if( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
+   else if( HB_IS_DATETIME( p1 ) || HB_IS_DATETIME( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
