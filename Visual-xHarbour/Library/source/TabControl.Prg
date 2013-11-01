@@ -52,7 +52,7 @@ CLASS TabControl INHERIT Control
 
    ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
 
-   PROPERTY Theming        ROOT "Appearance" ASSIGN {|Self,l| ::EnableThemeDialogTexture( IIF( l, ETDT_ENABLETAB, ETDT_DISABLE ) ) }
+   PROPERTY Theming      ROOT "Appearance" ASSIGN {|Self,v| ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) )} DEFAULT IsThemeActive()
 
    DATA BoldSelection    PUBLISHED INIT .F.
    DATA ShowTabs         PUBLISHED INIT .T.
@@ -1529,7 +1529,7 @@ CLASS TabStrip INHERIT TabControl
    PROPERTY ColorScheme  READ xColorScheme WRITE __SetColorScheme DEFAULT 1
    DATA EnumColorScheme  EXPORTED INIT { { "System Default", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7} }
       
-   DATA Border, AllowMaximize, Theming, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
+   DATA Border, AllowMaximize, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19
@@ -1545,11 +1545,11 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS TabStrip
    ::__xCtrlName := "TabStrip"
-   Super:Init( oParent )
+   ::Super:Init( oParent )
 RETURN Self
 
 METHOD Create() CLASS TabStrip
-   Super:Create()
+   ::Super:Create()
    IF ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,::ItemHeight) )
    ENDIF
