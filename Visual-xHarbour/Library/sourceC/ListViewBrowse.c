@@ -232,8 +232,7 @@ HB_FUNC( LISTVIEWBROWSEPOPULATE )
    LPLVITEMDATA lptvid;
    LVITEM lvi;
    LPSHELLFOLDER pFolder;
-   //HRESULT hr;
-
+   
    ZeroMemory(&lvi, sizeof(lvi));
    ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
 
@@ -242,8 +241,8 @@ HB_FUNC( LISTVIEWBROWSEPOPULATE )
    lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
    lptvid = (LPLVITEMDATA)lvi.lParam;
 
-   /*hr =*/ lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
-
+   lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+ 
    FolderListSet( hWnd, pFolder, lptvid->lpifq);
 
    if( pFolder )
@@ -261,7 +260,6 @@ HB_FUNC( LISTVIEWBROWSEGETPARENTID )
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 {
-   HRESULT hr;
    WIN32_FIND_DATA fd;
    LPSHELLFOLDER lpsf;
 
@@ -279,8 +277,8 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 
    if( s_bShowFolders || pFolder == lpsf )
    {
-      hr = pFolder->lpVtbl->EnumObjects(pFolder, NULL,SHCONTF_FOLDERS, &ppenum);
-      while( ( hr = ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
+      pFolder->lpVtbl->EnumObjects(pFolder, NULL,SHCONTF_FOLDERS, &ppenum);
+      while( ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
       {
          ULONG uAttr = SFGAO_FOLDER;
          pFolder->lpVtbl->GetAttributesOf(pFolder, 1, (LPCITEMIDLIST *) &pidlItems, &uAttr);
@@ -293,8 +291,8 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 
    if( pFolder != lpsf )
    {
-      hr = pFolder->lpVtbl->EnumObjects(pFolder, NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &ppenum);
-      while( ( hr = ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
+      pFolder->lpVtbl->EnumObjects(pFolder, NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &ppenum);
+      while( ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
       {
          ULONG uAttr = SFGAO_STREAM;
          pFolder->lpVtbl->GetAttributesOf(pFolder, 1, (LPCITEMIDLIST *) &pidlItems, &uAttr);
@@ -318,7 +316,6 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 
 HB_FUNC( FOLDERLISTGETPATH )
 {
-   //LPITEMIDLIST lpi = NULL;
    HWND hWnd = (HWND) hb_parnl(1);
    LPARAM lParam = (LPARAM) hb_parnl(2);
    LVITEM lvi;
@@ -346,19 +343,18 @@ HB_FUNC( FOLDERLISTSETFOLDER )
    ULONG chEaten;
    ULONG dwAttributes;
    LPITEMIDLIST lpi = (LPITEMIDLIST) hb_parnl(4);
-   //HRESULT hr;
    int iFolder = hb_parni(3);
    LPSHELLFOLDER lpsf;
    LPSHELLFOLDER pFolder = NULL;
    char *cFolder = (char*) hb_parc(2);
 
-   /*hr =*/ SHGetDesktopFolder (&lpsf);
+   SHGetDesktopFolder (&lpsf);
 
    if( cFolder != NULL )
    {
       MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, cFolder, -1, olePath, MAX_PATH);
-      /*hr =*/ lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
-      /*hr =*/ lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+      lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
+      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
    }
    else
    {
@@ -378,7 +374,7 @@ HB_FUNC( FOLDERLISTSETFOLDER )
       {
          if( pFolder == NULL )
          {
-            /*hr =*/ lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+            lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
          }
          FolderListSet( (HWND) hb_parnl(1), pFolder, lpi );
       }
