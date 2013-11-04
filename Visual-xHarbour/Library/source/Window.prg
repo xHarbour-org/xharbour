@@ -5117,7 +5117,7 @@ METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
       DEFAULT hDC TO ::Drawing:hDC
 
       DEFAULT hBrush TO ::BkBrush
-      IF !::ClsName == "Dialog"
+      IF !::ClsName == "TabPage"
          DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
 
@@ -5125,11 +5125,11 @@ METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
       hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
       hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-      IF hBrush == NIL .AND. ::ClsName == "Dialog" .AND. ::Application:OsVersion:dwMajorVersion >= 5
+      IF hBrush == NIL .AND. ::ClsName == "TabPage" .AND. ::Application:OsVersion:dwMajorVersion >= 5
          ::OpenThemeData()
          DrawThemeBackground( ::hTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::Width, ::Height } )
          ::CloseThemeData()
-       ELSE
+       ELSEIF hBrush != NIL .AND. hBrush <> 0
          _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
       ENDIF
 
