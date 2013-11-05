@@ -409,10 +409,11 @@ METHOD Create() CLASS CMenuItem
    ::MenuItemInfo:cbSize        := ::MenuItemInfo:SizeOf()
    ::MenuItemInfo:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
    ::MenuItemInfo:wID           := ::Id
-   IF ::Type != NIL
-      ::MenuItemInfo:fType      := ::Type
-    ELSEIF ::Caption == "-"
+
+   IF ::Caption == "-"
       ::MenuItemInfo:fType      := MFT_SEPARATOR
+    ELSEIF ::Type != NIL
+      ::MenuItemInfo:fType      := ::Type
     ELSEIF ::ImageIndex > 0 .OR. ::System:Os:Version <= 6
       ::MenuItemInfo:fType      := MFT_OWNERDRAW
     ELSE
