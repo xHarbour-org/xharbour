@@ -4881,13 +4881,13 @@ CLASS WinForm INHERIT Window
    METHOD __SetActiveMenuBar()
 
    METHOD SetImageList()
-
-   METHOD SetBackColor( nColor, lRepaint ) INLINE ::Super:SetBackColor( nColor, lRepaint ), IIF( ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL, ::BackgroundImage:__SetImageName( ::BackgroundImage:xImageName ), )
+   METHOD SetBackColor()
 
    METHOD OnSysCommand()
    METHOD SetInstance()
    METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
+   METHOD InvalidateRect(a,l) INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -4981,12 +4981,14 @@ METHOD Create( hoParent ) CLASS WinForm
    ENDIF
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD __SetActiveMenuBar( oMenu ) CLASS WinForm
    IF ::hWnd != NIL .AND. VALTYPE( oMenu ) != "C"
       SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) )
    ENDIF
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    Super:OnSize( nwParam, nlParam )
    IF ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
@@ -4997,6 +4999,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    ENDIF
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD OnSysCommand( nwParam ) CLASS WinForm
    LOCAL oChild, hDef
    IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2} .AND. ! EMPTY( ::__aDock )
@@ -5012,6 +5015,17 @@ METHOD OnSysCommand( nwParam ) CLASS WinForm
       RETURN 0
    ENDIF
 RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD SetBackColor( nColor, lRepaint ) CLASS WinForm
+   ::Super:SetBackColor( nColor, lRepaint )
+   IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
+      ::BackgroundImage:__SetImageName( ::BackgroundImage:xImageName )
+   ENDIF
+   IF ::xMDIContainer .AND. ::MDIClient != NIL
+      ::MDIClient:InvalidateRect()
+   ENDIF
+RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD SaveLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS WinForm

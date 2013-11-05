@@ -1,7 +1,3 @@
-#ifdef VXH_ENTERPRISE
-   #define VXH_PROFESSIONAL
-#endif
-
 /*
  * $Id$
  */
@@ -14,6 +10,11 @@
 //  This source file is an intellectual property of xHarbour.com Inc.                                   *
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
+
+#ifdef VXH_ENTERPRISE
+   #define VXH_PROFESSIONAL
+#endif
+
 
 #ifdef VXH_PROFESSIONAL
 
