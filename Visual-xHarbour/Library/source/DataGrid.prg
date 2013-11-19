@@ -58,39 +58,68 @@
 #define CREP_CHECKBOX    3
 #define CREP_BUTTON      4
 
-#define HEADERSIZEGAP  5
+#define HEADERSIZEGAP    5
+
+#define HIS_ICONNORMAL   7
+#define HIS_ICONHOT      8
+#define HIS_ICONPRESSED  9
+
+#define TMT_BORDERCOLOR             3801
+#define TMT_FILLCOLOR               3802
+#define TMT_TEXTCOLOR               3803
+#define TMT_EDGELIGHTCOLOR          3804
+#define TMT_EDGEHIGHLIGHTCOLOR      3805
+#define TMT_EDGESHADOWCOLOR         3806
+#define TMT_EDGEDKSHADOWCOLOR       3807
+#define TMT_EDGEFILLCOLOR           3808
+#define TMT_TRANSPARENTCOLOR        3809
+#define TMT_GRADIENTCOLOR1          3810
+#define TMT_GRADIENTCOLOR2          3811
+#define TMT_GRADIENTCOLOR3          3812
+#define TMT_GRADIENTCOLOR4          3813
+#define TMT_GRADIENTCOLOR5          3814
+#define TMT_SHADOWCOLOR             3815
+#define TMT_GLOWCOLOR               3816
+#define TMT_TEXTBORDERCOLOR         3817
+#define TMT_TEXTSHADOWCOLOR         3818
+#define TMT_GLYPHTEXTCOLOR          3819
+#define TMT_GLYPHTRANSPARENTCOLOR   3820
+#define TMT_FILLCOLORHINT           3821
+#define TMT_BORDERCOLORHINT         3822
+#define TMT_ACCENTCOLORHINT         3823
 
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
-   DATA ItemHeight              PUBLISHED INIT 19
-   DATA FullRowSelect           PUBLISHED INIT FALSE
-   DATA ShadowRow               PUBLISHED INIT TRUE
-   DATA GridColor               PUBLISHED
-   DATA AutoHorzScroll          PUBLISHED INIT TRUE
-   DATA AutoVertScroll          PUBLISHED INIT TRUE
-   DATA FreezeColumn            PUBLISHED INIT 0
-   DATA ShowHeaders             PUBLISHED INIT .T.
-   DATA HeaderHeight            PUBLISHED INIT 20
-   DATA ShowSelection           PUBLISHED INIT .T.
-   DATA ShowSelectionBorder     PUBLISHED INIT .T.
-   DATA AnchorColumn            PUBLISHED INIT 0
-   DATA ConvertOem              PUBLISHED INIT .F.
-   DATA HighlightBorderColor    PUBLISHED
-   DATA HighlightColor          PUBLISHED
-   DATA HighlightTextColor      PUBLISHED
+   PROPERTY ItemHeight              DEFAULT 19
+   PROPERTY FullRowSelect           DEFAULT .F.
+   PROPERTY ShadowRow               DEFAULT .T.
+   PROPERTY AutoHorzScroll          DEFAULT .T.
+   PROPERTY AutoVertScroll          DEFAULT .T.
+   PROPERTY FreezeColumn            DEFAULT 0
+   PROPERTY ShowHeaders             DEFAULT .T.
+   PROPERTY HeaderHeight            DEFAULT 20
+   PROPERTY ShowSelection           DEFAULT .T.
+   PROPERTY ShowSelectionBorder     DEFAULT .T.
+   PROPERTY AnchorColumn            DEFAULT 0
+   PROPERTY ConvertOem              DEFAULT .F.
 
-   DATA HoverRow                PUBLISHED INIT .T.
+   PROPERTY GridColor            ROOT "Colors"
+   PROPERTY HighlightBorderColor ROOT "Colors"
+   PROPERTY HighlightColor       ROOT "Colors"
+   PROPERTY HighlightTextColor   ROOT "Colors"
 
-   DATA Columns                 PUBLISHED
-   DATA AllowDragRecords        PUBLISHED INIT .F.
-   DATA ExtVertScrollBar        PUBLISHED INIT .F.
-   DATA MultipleSelection       PUBLISHED INIT .F.
-   DATA TagRecords              PUBLISHED INIT .F.
-   DATA GradientHeader          PUBLISHED INIT .F.
+   PROPERTY HoverRow                DEFAULT .T.
+
+   PROPERTY Columns
+   PROPERTY AllowDragRecords        DEFAULT .F.
+   PROPERTY ExtVertScrollBar        DEFAULT .F.
+   PROPERTY MultipleSelection       DEFAULT .F.
+   PROPERTY TagRecords              DEFAULT .F.
+   PROPERTY GradientHeader          DEFAULT .F.
 
    PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
-   PROPERTY DataSource GET __ChkComponent( Self, @::xDataSource ) SET __SetDataSource 
+   PROPERTY DataSource GET __ChkComponent( Self, @::xDataSource ) SET ::__SetDataSource(v)
 
    PROPERTY ShowGrid      READ xShowGrid    WRITE InvalidateRect    DEFAULT .T.
    PROPERTY Striping      READ xStriping    WRITE InvalidateRect    DEFAULT .F.
@@ -184,6 +213,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA __aRect                 PROTECTED
    DATA __cSearch               PROTECTED INIT ""
    DATA __aLastHover            PROTECTED INIT {0,0}
+   DATA __nHotHeader            PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -270,7 +300,10 @@ CLASS DataGrid INHERIT TitleControl
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd()
    METHOD OnHeaderClick()
-   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(), IIF( ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
+   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(),;
+                                  IIF( ::__nHotHeader != NIL, ::Children[ ::__nHotHeader ]:DrawHeader(),),;
+                                  ::__nHotHeader := NIL,;
+                                  IIF( ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
 
    METHOD __DrawRepresentation()
    METHOD OnMouseMove()
@@ -577,6 +610,11 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
                      ENDIF
                      ::Tooltip:Text := ::Children[n+1]:HeaderTooltip
                   ENDIF
+                  IF ::__nHotHeader != NIL
+                     ::Children[ ::__nHotHeader ]:DrawHeader()
+                  ENDIF
+                  ::Children[n+1]:DrawHeader(,,,,, .T.)
+                  ::__nHotHeader := n+1
                ENDIF
             ENDIF
           ELSE
@@ -1999,7 +2037,8 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               IF lData .AND. ::Striping .AND. ( nRecPos / 2 ) > Int( nRecPos / 2 )
                  nBackColor := DarkenColor( nBackColor, 25 )
               ENDIF
-              nForeColor := IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 7] != NIL, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:ForeColor != NIL, ::Children[i]:ForeColor, nForeGrid ) )
+
+              nForeColor := IIF( lHover, nForeGrid, IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 7] != NIL, ::__DisplayArray[nPos][1][i][ 7], IIF( ::Children[i]:ForeColor != NIL, ::Children[i]:ForeColor, nForeGrid )) )
               IF VALTYPE( nForeColor ) == "B"
                  nForeColor := EVAL( nForeColor, ::Children[i] )
               ENDIF
@@ -2289,7 +2328,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
               ENDIF
 
               IF !::FullRowSelect .AND. ( lBorder .OR. ( lHover .AND. ::__HoverBorderPen != NIL ) ) .AND. nRep <> 4
-                 IF lHover .OR. ::__SelBorderPen != NIL
+                IF ::__SelBorderPen != NIL .OR. ( lHover .AND. ::__HoverBorderPen != NIL .AND. ! lHighLight )
                     hPen := SelectObject( hMemDC, IIF( lHover .AND. ! lBorder, ::__HoverBorderPen, ::__SelBorderPen ) )
                     hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
                     Rectangle( hMemDC, aText[1], aText[2], aText[3], aText[4] )
@@ -2315,7 +2354,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
              nBottom := nTop + ::ItemHeight - 1
 
              IF ::ShowSelectionBorder .OR. lHover
-                IF ::__SelBorderPen != NIL .OR. ( lHover .AND. ::__HoverBorderPen != NIL )
+                IF ::__SelBorderPen != NIL .OR. ( lHover .AND. ::__HoverBorderPen != NIL .AND. ! lHighLight )
                    hPen := SelectObject( hMemDC, IIF( lHover .AND. nLine <> nFocRow, ::__HoverBorderPen, ::__SelBorderPen ) )
                    hBrush := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
                    Rectangle( hMemDC, nLeft, nTop-IIF(::xShowGrid,0,1), nRight-IIF( ::xShowGrid, 1, 0 ), nBottom )
@@ -3957,6 +3996,42 @@ RETURN .T.
 //----------------------------------------------------------------------------------
 
 CLASS GridColumn INHERIT Object
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
+   PROPERTY ButtonMenu  GET __ChkComponent( Self, @::xButtonMenu )
+   PROPERTY HeaderMenu  GET __ChkComponent( Self, @::xHeaderMenu )
+
+   PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
+   PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
+   PROPERTY Width             READ xWidth            WRITE SetWidth
+   PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
+   PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
+   PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
+   PROPERTY Text              READ xText             WRITE SetText
+   PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow      DEFAULT 0
+   PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
+   PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
+   PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
+
+   PROPERTY AllowSize         DEFAULT .F.
+   PROPERTY AllowDrag         DEFAULT .F.
+   PROPERTY Locked            DEFAULT .F.
+   PROPERTY Picture           
+   PROPERTY Visible           DEFAULT .T.
+   PROPERTY Data              
+   PROPERTY MinWidth          DEFAULT 0
+   PROPERTY MaxWidth          DEFAULT 0
+   
+   PROPERTY ButtonText        
+
+   PROPERTY Tag               
+   PROPERTY SelOnlyRep        DEFAULT .T.
+   PROPERTY HeaderTooltip     
+   PROPERTY HeaderFont        
+   PROPERTY HeaderAlignment   DEFAULT 0
+   PROPERTY Font              
+   PROPERTY Type              DEFAULT "C"
+   PROPERTY FieldPos          DEFAULT 0
+
    PROPERTY HeaderBackColor   ROOT "Colors" GET IIF( ::xHeaderBackColor == NIL, ::HeaderBackSysColor, ::xHeaderBackColor )
    PROPERTY HeaderForeColor   ROOT "Colors" GET IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor )
 
@@ -3985,45 +4060,8 @@ CLASS GridColumn INHERIT Object
    ASSIGN Caption(c)  INLINE ::xText := c
 
    DATA IsContainer EXPORTED INIT .F.
-   DATA AllowSize             PUBLISHED INIT .F.
-   DATA AllowDrag             PUBLISHED INIT .F.
-   DATA Locked                PUBLISHED INIT FALSE
-   DATA Picture               PUBLISHED
-   DATA Visible               PUBLISHED INIT .T.
-   DATA Data                  PUBLISHED
-   DATA MinWidth              PUBLISHED INIT 0
-   DATA MaxWidth              PUBLISHED INIT 0
-   
-   DATA EnumImageAlignment    EXPORTED INIT { {"Left", "Center", "Right"}, {1,2,3} }
-   DATA EnumHeaderAlignment   EXPORTED INIT { {"Column Default", "Left", "Right", "Center"}, {0,1,2,3} }
-   DATA EnumRepresentation    EXPORTED INIT { { "Normal", "ProgressBar", "CheckBox", "Button" }, {1,2,3,4} }
 
-   DATA ButtonText                   PUBLISHED
-
-   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
-   PROPERTY ButtonMenu  GET __ChkComponent( Self, @::xButtonMenu )
-   PROPERTY HeaderMenu  GET __ChkComponent( Self, @::xHeaderMenu )
-
-   PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
-   PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
-   PROPERTY Width             READ xWidth            WRITE SetWidth
-   PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
-   PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
-   PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
-   PROPERTY Text              READ xText             WRITE SetText
-   PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow      DEFAULT 0
-   PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
-   PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
-   PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
-
-   DATA Tag                          PUBLISHED
-   DATA SelOnlyRep                   PUBLISHED INIT .T.
-   DATA HeaderTooltip                PUBLISHED
-   DATA HeaderFont                   PUBLISHED
-   DATA HeaderAlignment              PUBLISHED INIT 0
-   DATA Font                         PUBLISHED
-   DATA Type                         PUBLISHED INIT "C"
-   DATA FieldPos                     PUBLISHED INIT 0
+   ACCESS EnumFieldPos               INLINE ::__GetFields()
 
    DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
    DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
@@ -4041,6 +4079,9 @@ CLASS GridColumn INHERIT Object
    DATA __PropFilter                 EXPORTED  INIT {}
    DATA __lHidden                    EXPORTED  INIT .F.
 
+   DATA EnumImageAlignment           EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
+   DATA EnumHeaderAlignment          EXPORTED  INIT { { "Column Default", "Left", "Right", "Center" }, {0,1,2,3} }
+   DATA EnumRepresentation           EXPORTED  INIT { { "Normal", "ProgressBar", "CheckBox", "Button", "Long Date" }, {1,2,3,4,5} }
    DATA EnumAlignment                EXPORTED  INIT { { "Left", "Right", "Center" }, { 1, 2, 3 } }
 
    DATA Parent                       EXPORTED
@@ -4117,6 +4158,7 @@ CLASS GridColumn INHERIT Object
    METHOD SetRepresentation()
    METHOD __SetSortArrow()
    METHOD __SetAutoEdit()
+   METHOD __GetFields()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS GridColumn
@@ -4244,6 +4286,18 @@ METHOD Create() CLASS GridColumn
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------------------------------
+METHOD __GetFields() CLASS GridColumn
+   LOCAL n, aFields := {{},{}}, aStruct := ::Parent:DataSource:Structure
+
+   AADD( aFields[1], "" )
+   AADD( aFields[2], 0 )
+   FOR n := 1 TO LEN( aStruct )
+       AADD( aFields[1], aStruct[n][1] )
+       AADD( aFields[2], n )
+   NEXT
+RETURN aFields
+
+//---------------------------------------------------------------------------------------------------------------------------
 METHOD CreateDragImage( nLeft ) CLASS GridColumn
    LOCAL hImageList, hMemBitmap, nWidth
 
@@ -4272,16 +4326,17 @@ METHOD __SetSortArrow(n) CLASS GridColumn
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------------------------------
-METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
+METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot ) CLASS GridColumn
    LOCAL aAlign, nColor, hOldPen, hOldBrush, hOldFont, n, aRect, nH := 5, nx := 0
-   LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex, y := 0
+   LOCAL nTop, nIcoLeft, nTxColor, nImage := ::xHeaderImageIndex, lTheme := .f., y := 0
    LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC, hBrush
-   
-   DEFAULT lHot   TO .F.
-   DEFAULT nLeft  TO ::__HeaderLeft
-   DEFAULT nRight TO ::__HeaderRight
-   DEFAULT x      TO ::__HeaderX
-   DEFAULT nImage TO 0
+
+   DEFAULT lPressed TO .F.
+   DEFAULT lHot     TO .F.
+   DEFAULT nLeft    TO ::__HeaderLeft
+   DEFAULT nRight   TO ::__HeaderRight
+   DEFAULT x        TO ::__HeaderX
+   DEFAULT nImage   TO 0
 
    IF hDC == 0
       hDC := NIL
@@ -4313,72 +4368,76 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
     ELSE
       y := (::Parent:__GetHeaderHeight() ) / 2
    ENDIF
-   IF ::Parent:GradientHeader
-      ::__aVertex[1]:x := aRect[1]-1
-      ::__aVertex[1]:y := aRect[2]
-      ::__aVertex[2]:x := aRect[3]
-      ::__aVertex[2]:y := aRect[4]
+   
+   IF lTheme
+      DrawThemeBackground( ::System:hHeaderTheme, hDC, HP_HEADERITEM, IIF( lPressed, HIS_PRESSED, IIF( lHot, HIS_HOT, HIS_NORMAL ) ), aRect, aRect )
+    ELSE   
+      IF ::Parent:GradientHeader
+         ::__aVertex[1]:x := aRect[1]-1
+         ::__aVertex[1]:y := aRect[2]
+         ::__aVertex[2]:x := aRect[3]
+         ::__aVertex[2]:y := aRect[4]
 
-      IF ! lHot
-         IF ::Parent:__ClassInst == NIL .AND. ! lHot .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
-            cOrd := ::Parent:DataSource:OrdSetFocus()
-         ENDIF
-         IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-            nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
-            nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
-            hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+         IF ! lPressed
+            IF ::Parent:__ClassInst == NIL .AND. ! lPressed .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
+               cOrd := ::Parent:DataSource:OrdSetFocus()
+            ENDIF
+            IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
+               nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
+               nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
+               hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+             ELSE
+               nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
+               nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+               hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+            ENDIF
           ELSE
-            nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-            nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+            nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
+            nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
             hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
          ENDIF
+
+         ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
+         ::__aVertex[1]:Green := GetGValue( nColor1 ) * 256
+         ::__aVertex[1]:Blue  := GetBValue( nColor1 ) * 256
+
+         ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
+         ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
+         ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
+
+         hOldPen   := SelectObject( hDC, hBorderPen )
+         hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+
+         __GradientFill( hDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
+         Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
        ELSE
-         nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
-         nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
-         hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+         nBorder    := ::HeaderForeColor
+         nBackColor := ::HeaderBackColor
+         IF lPressed
+            nBorder    := ::System:CurrentScheme:MenuItemBorder
+            nBackColor := ::System:CurrentScheme:MenuItemSelected
+         ENDIF
+
+         ::__HeaderLeft  := nLeft
+         ::__HeaderRight := nRight
+         ::__HeaderX     := x
+
+         hBrush   := CreateSolidBrush( nBackColor )
+         hOldBrush := SelectObject( hDC, hBrush )
+
+         Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+
+         nColor  := LightenColor( nBackColor, 100 )
+         nShadow := DarkenColor( nBackColor, 100 )
+
+         __Draw3dRect( hDC, aRect, nColor, nShadow )
+
       ENDIF
-
-      ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
-      ::__aVertex[1]:Green := GetGValue( nColor1 ) * 256
-      ::__aVertex[1]:Blue  := GetBValue( nColor1 ) * 256
-
-      ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
-      ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
-      ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
-
-      hOldPen   := SelectObject( hDC, hBorderPen )
-      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-
-      __GradientFill( hDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
-      Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
-    ELSE
-      nBorder    := ::HeaderForeColor
-      nBackColor := ::HeaderBackColor
-      IF lHot
-         nBorder    := ::System:CurrentScheme:MenuItemBorder
-         nBackColor := ::System:CurrentScheme:MenuItemSelected
+      SelectObject( hDC, hOldBrush )
+      IF hBrush != NIL
+         DeleteObject( hBrush )
       ENDIF
-
-      ::__HeaderLeft  := nLeft
-      ::__HeaderRight := nRight
-      ::__HeaderX     := x
-
-      hBrush   := CreateSolidBrush( nBackColor )
-      hOldBrush := SelectObject( hDC, hBrush )
-
-      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-
-      nColor  := LightenColor( nBackColor, 100 )
-      nShadow := DarkenColor( nBackColor, 100 )
-
-      __Draw3dRect( hDC, aRect, nColor, nShadow )
-      
    ENDIF
-   SelectObject( hDC, hOldBrush )
-   IF hBrush != NIL
-      DeleteObject( hBrush )
-   ENDIF
-   nPrevColor := SetTextColor( hDC, nTxColor )
 
    n := ::HeaderAlignment
    IF n == 0
@@ -4417,23 +4476,28 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lHot ) CLASS GridColumn
       IF !::Parent:xEnabled
          ::Parent:ImageList:DrawDisabled( hDC, nImage, Int( nIcoLeft ), Int( nTop ) )
        ELSE
-         ::Parent:ImageList:DrawImage( hDC, nImage, Int( nIcoLeft ), Int( nTop ) )
+         //::Parent:ImageList:DrawImage( hDC, nImage, Int( nIcoLeft ), Int( nTop ) )
+         view nIcoLeft-x
+         ::Parent:ImageList:DrawIndirect( hDC, nImage, Int( nIcoLeft ), Int( nTop ), x-nIcoLeft )
       ENDIF
    ENDIF
 
-   IF !::Parent:xEnabled
-      SetTextColor( hDC, GetSysColor( COLOR_GRAYTEXT ) )
+   IF lTheme
+      DrawThemeText( ::System:hHeaderTheme, hDC, HP_HEADERITEM, HIS_NORMAL, ::xText, DT_LEFT|DT_VCENTER, {x, aRect[2]+2, aRect[3],aRect[4]} )
+   ELSE      
+      IF !::Parent:xEnabled
+         nTxColor := GetSysColor( COLOR_GRAYTEXT )
+      ENDIF
+      SetBkMode( hDC, TRANSPARENT )
+
+      nPrevColor := SetTextColor( hDC, nTxColor )
+      _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
+
+      SetTextColor( hDC, nPrevColor )
+
+      SelectObject( hDC, hOldFont )
+      SelectObject( hDC, hOldPen )
    ENDIF
-   SetBkMode( hDC, TRANSPARENT )
-
-   SetTextColor( hDC, nTxColor )
-
-   _ExtTextOut( hDC, x, y, ETO_CLIPPED, aRect, ::xText )
-   SetTextColor( hDC, nPrevColor )
-
-   SelectObject( hDC, hOldFont )
-   SelectObject( hDC, hOldPen )
-
    IF ::SortArrow > 0 .AND. aRect[3]-15 > nLeft .AND. aRect[3]-15 > x + aAlign[1]
       IF ::Parent:GradientHeader
          hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )

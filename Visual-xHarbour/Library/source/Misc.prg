@@ -28,7 +28,7 @@ CLASS Registry
    METHOD Create()
    METHOD GetKeys()
    METHOD DeleteAllKeys()          INLINE ::GetKeys( .T. )
-   METHOD GetValue( cKey )         INLINE RegQueryValueEx( ATAIL( ::aKeys ), cKey, @::Value ), ::Value
+   METHOD GetValue( cKey )
    METHOD SetValue( cKey, xValue ) INLINE RegSetValueEx( ATAIL( ::aKeys ), cKey,, IIF( VALTYPE(xValue) == "C", REG_SZ, REG_DWORD ), xValue ) == 0
    METHOD Delete( cKey )           INLINE RegDeleteKey( ATAIL( ::aKeys ), cKey )
    METHOD Close()                  INLINE RegCloseKey( ATAIL( ::aKeys ) ), ADEL( ::aKeys, LEN( ::aKeys ), .T. )
@@ -45,13 +45,20 @@ METHOD OnError( xValue ) CLASS Registry
    ENDIF
 RETURN NIL
 
-//-----------------------------------------------------------------------------------------------
-
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init( nKey, cKey ) CLASS Registry
    ::nKey := nKey
    ::cKey := cKey
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD GetValue( cKey ) CLASS Registry
+   LOCAL cValue
+   RegQueryValueEx( ATAIL( ::aKeys ), cKey, @cValue )
+   ::Value := cValue
+RETURN cValue
+
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetKeys( lDel ) CLASS Registry
    LOCAL cName, cType, xData, aRet := {}
    LOCAL n := 0
@@ -66,14 +73,15 @@ METHOD GetKeys( lDel ) CLASS Registry
    ENDDO
 RETURN aRet
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD Open( nKey, cKey ) CLASS Registry
    LOCAL lRet, hKey
-   DEFAULT nKey TO ::nKey
-   DEFAULT cKey TO ::cKey
    IF VALTYPE( nKey ) == "C"
       cKey := nKey
       nKey := ATAIL( ::aKeys )
     ELSE
+      DEFAULT nKey TO ::nKey
+      DEFAULT cKey TO ::cKey
       ::nKey := nKey
       ::cKey := cKey
    ENDIF
@@ -84,18 +92,20 @@ METHOD Open( nKey, cKey ) CLASS Registry
    ENDIF
 RETURN lRet
 
-METHOD Create( nKey, cKey ) CLASS Registry
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD Create( ncKey, cKey ) CLASS Registry
    LOCAL lRet, hKey
-   DEFAULT nKey TO ::nKey
-   DEFAULT cKey TO ::cKey
-   IF VALTYPE( nKey ) == "C"
-      cKey := nKey
-      nKey := ATAIL( ::aKeys )
+
+   IF VALTYPE( ncKey ) == "C"
+      cKey  := ncKey
+      ncKey := ATAIL( ::aKeys )
     ELSE
-      ::nKey := nKey
+      DEFAULT ncKey TO ::nKey
+      DEFAULT cKey  TO ::cKey
+      ::nKey := ncKey
       ::cKey := cKey
    ENDIF
-   lRet := RegCreateKeyEx( nKey, cKey, KEY_ALL_ACCESS | KEY_WOW64_64KEY, @hKey  ) == 0
+   lRet := RegCreateKeyEx( ncKey, cKey, KEY_ALL_ACCESS | KEY_WOW64_64KEY, @hKey  ) == 0
    IF lRet
       RegDisableReflectionKey( hKey )
       AADD( ::aKeys, hKey )

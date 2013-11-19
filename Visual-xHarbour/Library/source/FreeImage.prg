@@ -139,7 +139,7 @@ CLASS FreeImageRenderer
    DATA __cData         PROTECTED
    DATA hDIB            EXPORTED
 
-   DATA EnumAlignments  EXPORTED INIT { { "None",;
+   DATA EnumAlignment   EXPORTED INIT { { "None",;
                                           "Center",;
                                           "Left - Top",;
                                           "Top - Center",;
@@ -148,7 +148,7 @@ CLASS FreeImageRenderer
                                           "Right - Bottom",;
                                           "Bottom - Center",;
                                           "Bottom - Left",;
-                                          "Left - Center" }, {0,1,2,3,4,5,6,7,8,9} }
+                                          "Left - Center" }, {1,2,3,4,5,6,7,8,9,10} }
    DATA __ExplorerFilter INIT {}
    
    ACCESS ImageWidth       INLINE IIF( ::hDIB != NIL, FreeImageGetWidth( ::hDIB ), 0 )

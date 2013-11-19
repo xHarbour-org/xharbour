@@ -129,7 +129,7 @@ RETURN self
 CLASS OpenFileDialog INHERIT CommonDialogs
    PROPERTY CheckFileExists  INDEX OFN_FILEMUSTEXIST      READ xCheckFileExists  WRITE SetStyle    DEFAULT .T. PROTECTED
    PROPERTY CheckPathExists  INDEX OFN_PATHMUSTEXIST      READ xCheckPathExists  WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY Multiselect      INDEX OFN_ALLOWMULTISELECT   READ xMultiselect      WRITE SetStyle    DEFAULT .T. PROTECTED
+   PROPERTY MultiSelect      INDEX OFN_ALLOWMULTISELECT   READ xMultiSelect      WRITE SetStyle    DEFAULT .T. PROTECTED
    PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE __SetInvStyle DEFAULT .T. PROTECTED
    PROPERTY ReadOnlyChecked  INDEX OFN_READONLY           READ xReadOnlyChecked  WRITE SetStyle    DEFAULT .F. PROTECTED
    PROPERTY RestoreDirectory INDEX OFN_NOCHANGEDIR        READ xRestoreDirectory WRITE SetStyle    DEFAULT .F. PROTECTED
@@ -138,11 +138,11 @@ CLASS OpenFileDialog INHERIT CommonDialogs
 
    DATA AddExtension     INIT .T. PUBLISHED
    DATA CheckFileExists  INIT .T. PUBLISHED
-   DATA FileName                  PUBLISHED
+   DATA FileName         INIT ""  PUBLISHED
    DATA Filter           INIT ""  PUBLISHED
    DATA DefaultExt                PUBLISHED
    DATA FilterIndex      INIT 1   PUBLISHED
-   DATA InitialDirectory INIT ""  PUBLISHED
+   DATA InitialDirectory          PUBLISHED
    DATA Title                     PUBLISHED
    DATA ShowPlacesBar    INIT .T. PUBLISHED
    
@@ -179,9 +179,7 @@ METHOD Show() CLASS OpenFileDialog
    ::__PrevFilter := ::FilterIndex
 
    DEFAULT ::Title TO ::Owner:Caption
-   DEFAULT ::FileName TO ""
    
-   ofn:lStructSize     := 76
    ofn:hInstance       := ::AppInstance
    ofn:nMaxFile        := 8192 + 1
    ofn:hwndOwner       := ::Owner:hWnd
@@ -231,10 +229,10 @@ RETURN .F.
 CLASS SaveFileDialog INHERIT CommonDialogs
    DATA AddExtension              PUBLISHED INIT .T.
    DATA DefaultExt                PUBLISHED
-   DATA FileName                  PUBLISHED
+   DATA FileName         INIT ""  PUBLISHED
    DATA Filter           INIT ""  PUBLISHED
    DATA FilterIndex      INIT 1   PUBLISHED
-   DATA InitialDirectory INIT ""  PUBLISHED
+   DATA InitialDirectory          PUBLISHED
    DATA Title                     PUBLISHED
    DATA ShowPlacesBar    INIT .T. PUBLISHED
 
@@ -280,9 +278,7 @@ METHOD Show() CLASS SaveFileDialog
    ::__PrevFilter := ::FilterIndex
 
    DEFAULT ::Title TO ::Owner:Caption
-   DEFAULT ::FileName TO ""
 
-   ofn:lStructSize     := 76
    ofn:hInstance       := ::AppInstance
    ofn:nMaxFile        := 8192 + 1
    ofn:hwndOwner       := ::Owner:hWnd
@@ -683,7 +679,7 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
                                                      { "OnReplaceAll", "", "" } } };
                                      }
 
-   DATA hDlg           PROTECTED
+   CLASSDATA hDlg      PROTECTED
    DATA __pCallBackPtr PROTECTED
    DATA __nProc        PROTECTED
    DATA cInit          PROTECTED
@@ -711,6 +707,7 @@ METHOD Show( oOwner, cInit ) CLASS ReplaceTextDialog
    ::cInit := cInit
    IF IsWindow( ::hDlg )
       SetActiveWindow( ::hDlg )
+      SetDlgItemText( ::hDlg, 1152, ::cInit )
    ELSE
       ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__WndProc" ), Self )
       IF ::ClsName == "ReplaceTextDialog"

@@ -53,7 +53,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS HeaderStrip INHERIT Control
-   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList ) SET SetImageList
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList ) SET ::SetImageList(v)
    PROPERTY ImageMargin READ xImageMargin WRITE SetImageMargin DEFAULT 2 PROTECTED
 
    DATA AllowUnDock          EXPORTED INIT FALSE

@@ -76,6 +76,7 @@ METHOD GetSectionEntries( cSection, lFixOld ) CLASS IniFile
    LOCAL cRet, n, aRet := {}
    IF ( cRet := GetPrivateProfileSection( cSection, ::Name ) ) != NIL
       aRet := hb_aTokens( cRet, chr(0) )
+      ADEL( aRet, -1, .T. )
       IF lFixOld != NIL .AND. lFixOld
          FOR n := 1 TO LEN( aRet )
              IF aRet[n][-1] == "="
@@ -220,8 +221,8 @@ METHOD ReadArray( cSection ) CLASS IniFile
    ENDIF
 
    IF ! Empty( cEntry )
-      cEntry := STRTRAN( cEntry, chr(0)+chr(0), chr(0) )
       aEntry := hb_aTokens( cEntry, chr(0) )
+      ADEL( aEntry, -1, .T. )
    ENDIF
 RETURN aEntry
 

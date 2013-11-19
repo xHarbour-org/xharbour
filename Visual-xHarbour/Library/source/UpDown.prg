@@ -18,7 +18,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS UpDown INHERIT Control
-   PROPERTY Buddy GET __ChkComponent( Self, @::xBuddy, .F. ) SET __SetBuddy
+   PROPERTY Buddy GET __ChkComponent( Self, @::xBuddy, .F. ) SET ::__SetBuddy(v)
    DATA MinRange         PUBLISHED INIT 0
    DATA MaxRange         PUBLISHED INIT 100
    DATA DisplayThousands PUBLISHED INIT .F.

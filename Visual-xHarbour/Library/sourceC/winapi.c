@@ -319,6 +319,8 @@ static HRESULT (WINAPI *pDwmIsCompositionEnabled)(BOOL*)                        
 static HRESULT (WINAPI *pTaskDialogIndirect)(const TASKDIALOGCONFIG*,int*,int*,BOOL*)                          = NULL;
 static BOOL    (WINAPI *pCSSD2SD)(LPCSTR, DWORD, PSECURITY_DESCRIPTOR *, PULONG)                               = NULL;
 
+static BOOL    (WINAPI *pWow64DisableWow64FsRedirection)(PVOID)                                                = NULL;
+static BOOL    (WINAPI *pWow64RevertWow64FsRedirection)(PVOID)                                                 = NULL;
 
 
 #ifdef TRACE_ARRAYPOINTER
@@ -620,13 +622,15 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       pGlobalMemoryStatusEx = (BOOL (WINAPI *)(LPMEMORYSTATUSEX)) GetProcAddress( hKernel32, "GlobalMemoryStatusEx");
       pGetUserDefaultUILanguage = (LANGID (WINAPI *)(VOID)) GetProcAddress( hKernel32, "GetUserDefaultUILanguage");
       pGetSystemDefaultUILanguage = (LANGID (WINAPI *)(VOID)) GetProcAddress( hKernel32, "GetSystemDefaultUILanguage");
+      pWow64DisableWow64FsRedirection = (BOOL (WINAPI *)(PVOID)) GetProcAddress( hKernel32, "Wow64DisableWow64FsRedirection");
+      pWow64RevertWow64FsRedirection = (BOOL (WINAPI *)(PVOID)) GetProcAddress( hKernel32, "Wow64RevertWow64FsRedirection");
    }
    if( hdwmapi )
    {
       pDwmEnableBlurBehindWindow = (HRESULT (WINAPI *)(HWND,const DWM_BLURBEHIND*)) GetProcAddress( hdwmapi, "DwmEnableBlurBehindWindow");
-      pDwmExtendFrameIntoClientArea = (HRESULT (WINAPI *)(HWND,const MARGINS*))     GetProcAddress( hdwmapi, "DwmExtendFrameIntoClientArea");
-      pDwmGetColorizationColor = (HRESULT (WINAPI *)(DWORD*,BOOL*))                 GetProcAddress( hdwmapi, "DwmGetColorizationColor");
-      pDwmIsCompositionEnabled = (HRESULT (WINAPI *)(BOOL*))                        GetProcAddress( hdwmapi, "DwmIsCompositionEnabled");
+      pDwmExtendFrameIntoClientArea = (HRESULT (WINAPI *)(HWND,const MARGINS*)) GetProcAddress( hdwmapi, "DwmExtendFrameIntoClientArea");
+      pDwmGetColorizationColor = (HRESULT (WINAPI *)(DWORD*,BOOL*)) GetProcAddress( hdwmapi, "DwmGetColorizationColor");
+      pDwmIsCompositionEnabled = (HRESULT (WINAPI *)(BOOL*)) GetProcAddress( hdwmapi, "DwmIsCompositionEnabled");
    }
    if( hComctl32 )
    {
@@ -4933,12 +4937,15 @@ HB_FUNC( GETOPENFILENAME )
    if( pStructure && HB_IS_OBJECT( pStructure ) )
    {
       OPENFILENAME *pOfn;
+      ZeroMemory( &pOfn, sizeof(pOfn) );
 
       hb_vmPushSymbol( pVALUE->pSymbol );
       hb_vmPush( pStructure );
       hb_vmSend(0);
 
       pOfn = (OPENFILENAME *) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
+
+      pOfn->lStructSize = sizeof(OPENFILENAME);
 
       if( GetOpenFileName( pOfn ) )
       {
@@ -6328,6 +6335,12 @@ HB_FUNC( GETTEMPFILENAME )
 HB_FUNC( MOVEFILE )
 {
    hb_retl( MoveFile( (LPCTSTR) hb_parc(1), (LPCTSTR) hb_parc(2) ) );
+}
+
+//-----------------------------------------------------------------------------
+HB_FUNC( MOVEFILEEX )
+{
+   hb_retl( MoveFileEx( (LPCTSTR) hb_parc(1), (LPCTSTR) hb_parc(2), (DWORD) hb_parnl(3) ) );
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -9105,9 +9118,8 @@ HB_FUNC ( FTPFINDFIRSTFILE )
    {
       hb_errRT_BASE( EG_ARG, 6001, NULL, "FTPFINDFIRSTFILE", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
    }
-
 }
-/*
+
 //-------------------------------------------------------------------------------------------------
 HB_FUNC ( INTERNETFINDNEXTFILE )
 {
@@ -9159,9 +9171,8 @@ HB_FUNC ( INTERNETFINDNEXTFILE )
    {
       hb_errRT_BASE( EG_ARG, 6001, NULL, "INTERNETFINDNEXTFILE", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
    }
-
 }
-*/
+
 //-------------------------------------------------------------------------------------------------
 HB_FUNC ( FTPGETFILE )
 {
@@ -9260,13 +9271,14 @@ VOID CALLBACK InternetStatusCallback( HINTERNET hInternet, DWORD dwContext, DWOR
        hb_vmPushLong( (long) dwContext );
        hb_vmPushLong( (long) dwInternetStatus );
 
-       if( dwInternetStatus == INTERNET_STATUS_RESPONSE_RECEIVED )
+       if( (dwInternetStatus == INTERNET_STATUS_RESPONSE_RECEIVED) || (dwInternetStatus == INTERNET_STATUS_REQUEST_SENT) || (dwInternetStatus == INTERNET_STATUS_REQUEST_COMPLETE) )
        {
-          hb_vmPushLong( *((LPDWORD) lpvStatusInformation) );
+          DWORD *lpBytesSent = (DWORD*)lpvStatusInformation; 
+          hb_vmPushLong( (long) *lpBytesSent );
        }
        else
        {
-          hb_vmPushLong( (LONG) lpvStatusInformation );
+          hb_vmPushLong( (long) lpvStatusInformation );
        }
 
        hb_vmPushLong( (long) dwStatusInformationLength );
@@ -10789,3 +10801,16 @@ HB_FUNC( GETENVIRONMENTVARIABLE )
    GetEnvironmentVariable( hb_parc(1), szBuffer, buff_size + 1 );
    hb_retcAdopt( szBuffer );
 }
+
+HB_FUNC( WOW64DISABLEWOW64FSREDIRECTION )
+{
+   PVOID OldValue;
+   hb_retl( pWow64DisableWow64FsRedirection( OldValue ) );
+}
+
+HB_FUNC( WOW64REVERTWOW64FSREDIRECTION )
+{
+   PVOID OldValue;
+   hb_retl( pWow64RevertWow64FsRedirection( OldValue ) );
+}
+

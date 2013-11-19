@@ -41,6 +41,9 @@ EXIT PROCEDURE __SystemCleanup
    IF oSystem:hButtonTheme != NIL
       CloseThemeData( oSystem:hButtonTheme )
    ENDIF
+   IF oSystem:hHeaderTheme != NIL
+      CloseThemeData( oSystem:hHeaderTheme )
+   ENDIF
    oSystem:ImageList[ "StdSmall" ]:Destroy()
    DeleteObject( oSystem:FocusPen )
    DeleteObject( oSystem:TitleBackBrush )
@@ -99,10 +102,11 @@ CLASS System
 
    DATA hFont                   EXPORTED
    DATA hButtonTheme            EXPORTED
+   DATA hHeaderTheme            EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
-   ACCESS LastError     INLINE STRTRAN( FormatMessage( , , GetLastError() ), CRLF )
+   ACCESS LastError     INLINE ::__GetLastError()
    
    METHOD Init() CONSTRUCTOR
    METHOD Update()
@@ -119,8 +123,22 @@ CLASS System
    ACCESS Services             INLINE __ENUMSERVICES()
    METHOD GetFocus()           INLINE ObjFromHandle( GetFocus() )
    METHOD GetEnvironment()
+   METHOD GetEnumCursor()
+   METHOD __GetLastError()
 ENDCLASS
 
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD __GetLastError() CLASS System
+   LOCAL cError, nError := GetLastError()
+   VIEW InternetGetLastResponseInfo()
+   cError := FormatMessage( , , nError )
+   IF ! Empty( cError )
+      cError := STRTRAN( cError, CRLF )
+   ENDIF
+   DEFAULT cError TO ""
+RETURN cError
+
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetPathFromFolder( nId, lCreate ) CLASS System
    LOCAL cPath := ""
    DEFAULT lCreate TO .F.
@@ -130,6 +148,7 @@ METHOD GetPathFromFolder( nId, lCreate ) CLASS System
    SHGetFolderPath( 0, nId, 0, SHGFP_TYPE_CURRENT, @cPath )
 RETURN cPath
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetEnvironment( cVar ) CLASS System
    LOCAL cEnv, oReg := Registry( HKEY_LOCAL_MACHINE, "System\CurrentControlSet\Control\Session Manager\Environment" )
    IF oReg:Open()
@@ -138,6 +157,7 @@ METHOD GetEnvironment( cVar ) CLASS System
    ENDIF
 RETURN cEnv
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetLocalTime() CLASS System
    LOCAL st
    GetLocalTime( @st )
@@ -151,9 +171,10 @@ METHOD GetLocalTime() CLASS System
    ::xLocalTime[ "Milliseconds" ] := st:wMilliseconds
 RETURN ::xLocalTime
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init() CLASS System
    LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""
-   LOCAL osvi, cSupp := ""
+   LOCAL n, aCursors, osvi, cSupp := ""
    ::FreeImageFormats := {;
                    { "Windows or OS/2 Bitmap (*.bmp)",                   "*.bmp;" },;
                    { "Dr. Halo (*.cut)",                                 "*.cut;" },;
@@ -683,21 +704,10 @@ METHOD Init() CLASS System
    HSetCaseMatch( ::Cursor, .F. )
    HSetAACompatibility( ::Cursor, .T. )
 
-   ::Cursor[ "Arrow" ]       := LoadCursor(, IDC_ARROW       )
-   ::Cursor[ "Help" ]        := LoadCursor(, IDC_HELP        )
-   ::Cursor[ "Working" ]     := LoadCursor(, IDC_APPSTARTING )
-   ::Cursor[ "Busy" ]        := LoadCursor(, IDC_WAIT        )
-   ::Cursor[ "Cross" ]       := LoadCursor(, IDC_CROSS       )
-   ::Cursor[ "TextSelect" ]  := LoadCursor(, IDC_IBEAM       )
-   ::Cursor[ "Unavailable" ] := LoadCursor(, IDC_NO          )
-   ::Cursor[ "SizeNS" ]      := LoadCursor(, IDC_SIZENS      )
-   ::Cursor[ "SizeWE" ]      := LoadCursor(, IDC_SIZEWE      )
-   ::Cursor[ "SizeNESW" ]    := LoadCursor(, IDC_SIZENESW    )
-   ::Cursor[ "SizeNWSE" ]    := LoadCursor(, IDC_SIZENWSE    )
-   ::Cursor[ "SizeAll" ]     := LoadCursor(, IDC_SIZEALL     )
-   ::Cursor[ "UpArrow" ]     := LoadCursor(, IDC_UPARROW     )
-   ::Cursor[ "LinkSelect" ]  := LoadCursor(, IDC_HAND        )
-   ::Cursor[ "Hand" ]        := LoadCursor(, IDC_HAND        )
+   aCursors := ::GetEnumCursor()
+   FOR n := 2 TO LEN( aCursors[1] )
+       ::Cursor[ aCursors[1][n] ] := LoadCursor(, aCursors[2][n] )
+   NEXT
 
    ::ImageList := Hash()
    HSetCaseMatch( ::ImageList, .F. )
@@ -754,8 +764,10 @@ METHOD Init() CLASS System
    ::hFont          := __GetMessageFont()
 
    ::hButtonTheme   := OpenThemeData(,"button")
+   ::hHeaderTheme   := OpenThemeData(,"HEADER")
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetRunningProcs() CLASS System
    LOCAL aProcessList, oProcess, aProcess := {}
    aProcessList := GetWin32Proc( "SELECT * FROM Win32_Process" )
@@ -764,6 +776,7 @@ METHOD GetRunningProcs() CLASS System
    NEXT
 RETURN aProcess
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetOSName( cProcName ) CLASS System
    LOCAL aName, oProcess, aProcessList, aProcess := {}
    DEFAULT cProcName TO __GetApplication():FileName
@@ -776,6 +789,7 @@ METHOD GetOSName( cProcName ) CLASS System
    NEXT
 RETURN aName
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetProcMemory( cProcName ) CLASS System
    LOCAL nMemory := 0, oProcess, aProcessList, aProcess := {}
    DEFAULT cProcName TO __GetApplication():FileName
@@ -785,6 +799,7 @@ METHOD GetProcMemory( cProcName ) CLASS System
    NEXT
 RETURN nMemory
 
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
    LOCAL oProcess, aProcessList
    DEFAULT lTerminate TO .F.
@@ -796,16 +811,22 @@ METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
    ENDIF
 RETURN aProcessList:Count > 0
 
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD GetEnumCursor() CLASS System
+   LOCAL aCursors
+   aCursors := { { "System Default", "Arrow", "Help", "Working", "Busy", "Cross", "TextSelect", "Unavailable", "SizeNS", "SizeWE", "SizeNESW", "SizeNWSE", "SizeAll", "UpArrow", "LinkSelect", "Hand" },;
+                 { NIL, IDC_ARROW, IDC_HELP, IDC_APPSTARTING, IDC_WAIT, IDC_CROSS, IDC_IBEAM, IDC_NO, IDC_SIZENS, IDC_SIZEWE, IDC_SIZENESW, IDC_SIZENWSE, IDC_SIZEALL, IDC_UPARROW, IDC_HAND, IDC_HAND } }
+RETURN aCursors
+
+//-----------------------------------------------------------------------------------------------------------------------------
 FUNCTION GC2RGB( p_nColor )
    LOCAL l_nRed, l_nGreen, l_nBlue 
-
    l_nRed   := MOD(p_nColor, 256) 
    l_nGreen := MOD(INT(p_nColor/256), 256) 
    l_nBlue  := MOD(INT(p_nColor/(256*256)), 256) 
-
 RETURN ALLTRIM(STR(l_nRed))+","+ALLTRIM(STR(l_nGreen))+","+ALLTRIM(STR(l_nBlue)) 
 
-
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD Update() CLASS System   
    LOCAL cBuffer
    FreeExplorerBarInfo()
@@ -815,6 +836,7 @@ METHOD Update() CLASS System
    ::ExplorerBar:Buffer( cBuffer )
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------------------------------------
 CLASS __SysTime
    ACCESS Year          INLINE ::__GetSysTime(1)
    ACCESS Month         INLINE ::__GetSysTime(2)
@@ -899,6 +921,7 @@ STATIC FUNCTION GetWin32Proc( cQuery )
    END
 RETURN aProcessList
 
+
 FUNCTION __GetMessageFont( nWeight )
    LOCAL ncm := (struct NONCLIENTMETRICS)
    ncm:cbSize := ncm:Sizeof()
@@ -910,4 +933,33 @@ FUNCTION __GetMessageFont( nWeight )
    ENDIF
 
 RETURN CreateFontIndirect( ncm:lfMessageFont )
+/*
+FUNCTION WinOS()
+Set dtmConvertedDate = CreateObject("WbemScripting.SWbemDateTime")
+strComputer = "."
+Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+Set oss = objWMIService.ExecQuery ("Select * from Win32_OperatingSystem")
 
+For Each os in oss
+    Wscript.Echo "Boot Device: " & os.BootDevice
+    Wscript.Echo "Build Number: " & os.BuildNumber
+    Wscript.Echo "Build Type: " & os.BuildType
+    Wscript.Echo "Caption: " & os.Caption
+    Wscript.Echo "Code Set: " & os.CodeSet
+    Wscript.Echo "Country Code: " & os.CountryCode
+    Wscript.Echo "Debug: " & os.Debug
+    Wscript.Echo "Encryption Level: " & os.EncryptionLevel
+    dtmConvertedDate.Value = os.InstallDate
+    dtmInstallDate = dtmConvertedDate.GetVarDate
+    Wscript.Echo "Install Date: " & dtmInstallDate 
+    Wscript.Echo "Licensed Users: " & os.NumberOfLicensedUsers
+    Wscript.Echo "Organization: " & os.Organization
+    Wscript.Echo "OS Language: " & os.OSLanguage
+    Wscript.Echo "OS Product Suite: " & os.OSProductSuite
+    Wscript.Echo "OS Type: " & os.OSType
+    Wscript.Echo "Primary: " & os.Primary
+    Wscript.Echo "Registered User: " & os.RegisteredUser
+    Wscript.Echo "Serial Number: " & os.SerialNumber
+    Wscript.Echo "Version: " & os.Version
+Next
+*/

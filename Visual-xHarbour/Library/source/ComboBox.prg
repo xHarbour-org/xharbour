@@ -874,15 +874,18 @@ METHOD Init( oParent ) CLASS CursorComboBox
 RETURN Self
 
 METHOD Create() CLASS CursorComboBox
-   LOCAL n, hCursor, aSize, ii := (struct ICONINFO)
-
+   LOCAL n, hCursor, aSize, aCursors := ::System:GetEnumCursor()
    ::Super:Create()
    ::Cursors := {}
-   FOR n := 1 TO LEN( ::__Cursors )
-       hCursor := HGetValueAt( ::System:Cursor, HAAGetRealPos( ::System:Cursor, n ) )
-       aSize := __GetIconSize( hCursor )
-       AADD( ::Cursors, { ::__Cursors[n], hCursor, aSize[1], aSize[2] } )
-       ::AddItem( ::__Cursors[n] )
+   FOR n := 1 TO LEN( aCursors[1] )
+       hCursor := NIL
+       aSize   := {0,0}
+       IF aCursors[2][n] != NIL
+          hCursor := ::System:Cursor[ aCursors[1][n] ]
+          aSize := __GetIconSize( hCursor )
+       ENDIF
+       AADD( ::Cursors, { aCursors[1][n], hCursor, aSize[1], aSize[2] } )
+       ::AddItem( aCursors[1][n] )
    NEXT
    ::ItemHeight := 32
 RETURN Self
@@ -909,7 +912,7 @@ METHOD OnParentDrawItem() CLASS CursorComboBox
 
          IF n > 0
             ExtTextOut( ::Parent:DrawItemStruct:hDC, ::Cursors[n][3]+10, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
-            IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
+            IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0 .AND. ::Cursors[n][2] != NIL
                DrawIcon( ::Parent:DrawItemStruct:hDC, 3, ::Parent:DrawItemStruct:rcItem:Top, ::Cursors[n][2] )
             ENDIF
           ELSE
@@ -1012,7 +1015,7 @@ RETURN 0
 //----------------------------------------------------------------------------------------------------------------
 
 CLASS ComboBoxEx INHERIT ComboBox
-   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList ) SET SetImageList
+   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList ) SET ::SetImageList(v)
 
    DATA ClientEdge EXPORTED INIT .F.
    DATA hControl   EXPORTED

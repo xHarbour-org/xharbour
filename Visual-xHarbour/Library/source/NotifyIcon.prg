@@ -46,7 +46,7 @@ CLASS NotifyIcon INHERIT Component
    PROPERTY Text           READ xText           WRITE __SetText         INVERT
    PROPERTY ContextMenu    GET __ChkComponent( Self, @::xContextMenu )
 
-   DATA Balloon_Icons   EXPORTED  INIT { "None", "Info", "Warning", "Error" }
+   DATA EnumBalloonTipIcon EXPORTED  INIT { { "None", "Info", "Warning", "Error" }, {0,1,2,3} }
    DATA ID              EXPORTED
    DATA Flags           EXPORTED
    DATA Message         EXPORTED

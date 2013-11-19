@@ -13,8 +13,14 @@
 #include "debug.ch"
 #Include "vxh.ch"
 
+#define MENU_POPUPITEM     14
+
+#define MPI_NORMAL          1
+#define MPI_HOT             2
+#define MPI_DISABLEDHOT     4
+#define TMT_TEXTCOLOR               3803
+
 #define MBM_ACCEL      (WM_USER + 1802)
-#define MENU_POPUPITEM 14
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MenuItem INHERIT Object
@@ -704,7 +710,7 @@ METHOD MeasureItem( mi, nlParam ) CLASS CMenuItem
       aExt := _GetTextExtentPoint32( hDC, ::Caption + IIF( ::ShortCutText != NIL, SPACE(3)+::ShortCutText,"") )
       _DrawText( hDC, ::Caption + IIF( ::ShortCutText != NIL, SPACE(3)+::ShortCutText,""), @aRect, DT_SINGLELINE + DT_CALCRECT )
       aRect[3] := aExt[1]+35
-      aRect[4] := aExt[2]+((aExt[2]*10)/100)
+      aRect[4] := aExt[2]*1.1
    ENDIF
    IF ::Font:Handle != NIL
       SelectObject( hDC, hOld )
@@ -717,7 +723,7 @@ METHOD MeasureItem( mi, nlParam ) CLASS CMenuItem
    ENDIF
 
    xIcon := MAX( xIcon, GetSystemMetrics( SM_CXMENUCHECK )+2 )+6
-   yIcon := MAX( 2+yIcon+2, GetSystemMetrics( SM_CYMENUCHECK ) )
+   yIcon := MAX( yIcon, GetSystemMetrics( SM_CYMENUCHECK )+2 )+4
 
    IF ::Caption == NIL
       xIcon -= 6
@@ -733,7 +739,7 @@ METHOD MeasureItem( mi, nlParam ) CLASS CMenuItem
       ENDIF
    ENDIF
 
-   mi:itemHeight:= MAX(aRect[4], GetSystemMetrics( SM_CYMENU ) )
+   mi:itemHeight := MAX(aRect[4], GetSystemMetrics( SM_CYMENU ) )
    IF lSeparator
       mi:itemHeight := 8
    ENDIF
@@ -743,7 +749,7 @@ RETURN 1
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD DrawItem( dis, l3D ) CLASS CMenuItem
+METHOD DrawItem( dis, l3D, hTheme ) CLASS CMenuItem
    LOCAL lSeparator, xIcon:=0, yIcon:=0, aRect
    LOCAL hDC, nIcon, nOff, lDisabled, lRadio, lSelected, lChecked, hBrush, nTop, lCheck := .F., nWidth, oItem, x
 
@@ -778,7 +784,7 @@ METHOD DrawItem( dis, l3D ) CLASS CMenuItem
    ENDIF
    nOff := Int(xIcon/2)-Int(nIcon/2)
 
-   aRect[3] := xIcon + aRect[3]
+   //aRect[3] := xIcon + aRect[3]
 
    aRect[4] := MAX( aRect[4], 2+yIcon+2 )
    aRect[4] := MAX( aRect[4], GetSystemMetrics( SM_CYMENU ) )
@@ -790,13 +796,14 @@ METHOD DrawItem( dis, l3D ) CLASS CMenuItem
 
    IF lSelected //.AND. !lDisabled
       IF !l3D
-         SetTextColor( hDC, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
-         _FillRect( hDC, { aRect[1],    aRect[2],  aRect[3]-(xIcon),   aRect[4]  }, GetSysColorBrush( COLOR_HIGHLIGHT ) )
-         _FillRect( hDC, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1}, GetSysColorBrush( IIF( ::Application:IsThemedXP, 29, COLOR_HIGHLIGHT ) ) )
-
-         //hTheme := OpenThemeData(,  "MENU" )
-         //DrawThemeBackground( hTheme, hDC, 16, dis:itemState, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1}, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1} )
-         //CloseThemeData( hTheme )
+         IF hTheme != NIL
+            DrawThemeBackground( hTheme, hDC, MENU_POPUPITEM, IIF( lDisabled, MPI_DISABLEDHOT, MPI_HOT ), aRect, aRect )
+            SetTextColor( hDC, GetThemeColor( hTheme, MENU_POPUPITEM, IIF( lDisabled, MPI_DISABLEDHOT, MPI_HOT ), TMT_TEXTCOLOR ) )
+          ELSE
+            SetTextColor( hDC, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
+            _FillRect( hDC, { aRect[1],    aRect[2],  aRect[3]-(xIcon),   aRect[4]  }, GetSysColorBrush( COLOR_HIGHLIGHT ) )
+            _FillRect( hDC, { aRect[1]+ 1, aRect[2]+1,aRect[3]-(xIcon+1), aRect[4]-1}, GetSysColorBrush( IIF( ::Application:IsThemedXP, 29, COLOR_HIGHLIGHT ) ) )
+         ENDIF
 
        ELSE
          aRect[3]:=aRect[3]-xIcon

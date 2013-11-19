@@ -24,7 +24,7 @@ CLASS FtpClient INHERIT Component
    DATA OpenType      PUBLISHED INIT INTERNET_OPEN_TYPE_DIRECT
 
 
-   DATA Context, InternetStatus, StatusInformation
+   DATA Context, InternetStatus, StatusInformation, StatusInfoLength
    DATA hHandle   EXPORTED INIT 0
    DATA hFtp      EXPORTED
    DATA Server    PUBLISHED
@@ -40,8 +40,8 @@ CLASS FtpClient INHERIT Component
    METHOD DisConnect()
    METHOD GetDirectory()
    METHOD GetCurrentDirectory()
-   METHOD PutFile( cLocalFile, cRemoteFile )    INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile )
-   METHOD GetFile( cRemoteFile, cLocalFile )    INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile )
+   METHOD PutFile( cLocalFile, cRemoteFile )    INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile, FTP_TRANSFER_TYPE_UNKNOWN, 1 )
+   METHOD GetFile( cRemoteFile, cLocalFile )    INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile, FTP_TRANSFER_TYPE_UNKNOWN, 1 )
    METHOD DeleteFile( cRemoteFile )             INLINE FtpDeleteFile( ::hFtp, cRemoteFile )
    METHOD RenameFile( cExistingFile, cNewFile ) INLINE FtpRenameFile( ::hFtp, cExistingFile, cNewFile )
    METHOD CreateDirectory( cDirectory )         INLINE FtpCreateDirectory( ::hFtp, cDirectory )
@@ -51,6 +51,7 @@ CLASS FtpClient INHERIT Component
    METHOD GetLastResponseInfo()
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner ) CLASS FtpClient
    LOCAL n
    ::__xCtrlName   := "FtpClient"
@@ -71,6 +72,7 @@ METHOD Init( oOwner ) CLASS FtpClient
                         { INTERNET_STATUS_CONNECTION_CLOSED,    "ConnectionClosed" },;
                         { INTERNET_STATUS_HANDLE_CREATED,       "HandleCreated" },;
                         { INTERNET_STATUS_HANDLE_CLOSING,       "HandleClosing" },;
+                        { INTERNET_STATUS_STATE_CHANGE,         "StatusStateChange" },;
                         { INTERNET_STATUS_REQUEST_COMPLETE,     "RequestComplete" } }
 
    ::Events := { {"Status", {} } }
@@ -85,7 +87,6 @@ METHOD Create() CLASS FtpClient
    IF ::__ClassInst == NIL
       ::hHandle := InternetOpen( ::Application:Name, ::OpenType, NIL, NIL, ::Operation )
       __oFtp := Self
-      InternetSetStatusCallback( ::hHandle, ( @FtpStatusCallback() ) )
    ENDIF
 RETURN Self
 
@@ -96,6 +97,7 @@ FUNCTION FtpStatusCallback( hInternet, dwContext, dwInternetStatus, lpvStatusInf
    __oFtp:Context           := dwContext
    __oFtp:InternetStatus    := dwInternetStatus
    __oFtp:StatusInformation := lpvStatusInformation
+   __oFtp:StatusInfoLength  := dwStatusInformationLength
    
    IF ( n := ASCAN( aEvents, {|a| a[1]==dwInternetStatus} ) ) > 0
       ExecuteEvent( aEvents[n][2], __oFtp )
@@ -107,16 +109,13 @@ METHOD Connect() CLASS FtpClient
    IF ::hHandle == 0
       ::Create()
    ENDIF
-   IF ::hHandle <> 0 .AND. ( ::hFtp := InternetConnect( ::hHandle, ::Server, IIF( ::Port == 0, INTERNET_DEFAULT_FTP_PORT, ::Port ), ::UserName, ::Password, ::Service, IIF( ::Passive, INTERNET_FLAG_PASSIVE, )  ) ) <> NIL
+   IF ::hHandle <> 0 .AND. ( ::hFtp := InternetConnect( ::hHandle, ::Server, IIF( ::Port == 0, INTERNET_DEFAULT_FTP_PORT, ::Port ), ::UserName, ::Password, ::Service, IIF( ::Passive, INTERNET_FLAG_PASSIVE, ), 1  ) ) <> NIL
+      InternetSetStatusCallback( ::hFtp, ( @FtpStatusCallback() ) )
       RETURN .T.
    ENDIF
 RETURN .F.
 
-//METHOD Read( cFile ) CLASS FtpClient
-//   LOCAL hFile := FtpOpenFile( ::hHandle, cFile,  InternetReadFile( ::hFtp, cBuffer, cFile )
-
 //-------------------------------------------------------------------------------------------------------
-
 METHOD DisConnect() CLASS FtpClient
    LOCAL lRet := .f.
    IF ::hFtp <> 0 .AND. InternetCloseHandle( ::hFtp )
@@ -126,21 +125,22 @@ METHOD DisConnect() CLASS FtpClient
 RETURN lRet
 
 //-------------------------------------------------------------------------------------------------------
-
 METHOD GetCurrentDirectory() CLASS FtpClient
    LOCAL cDirectory := space( 260 )
    FtpGetCurrentDirectory( ::hFtp, @cDirectory )
 RETURN cDirectory
 
 //-------------------------------------------------------------------------------------------------------
-
 METHOD GetLastResponseInfo() CLASS FtpClient
-   LOCAL nError, cRet := ""
+   LOCAL nError, cRet := "", aRet
    InternetGetLastResponseInfo( @nError, @cRet )
-RETURN cRet
+   aRet := hb_aTokens( cRet, CRLF )
+   IF ! EMPTY( aRet ) .AND. EMPTY( aRet[-1] )
+      ADEL( aRet, -1, .T. )
+   ENDIF
+RETURN aRet
 
 //-------------------------------------------------------------------------------------------------------
-
 METHOD GetDirectory( cFileSpec ) CLASS FtpClient
    LOCAL hFind, aFile := {}, aDir := {}
    LOCAL pFindData := (struct WIN32_FIND_DATA)

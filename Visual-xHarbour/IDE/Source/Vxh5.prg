@@ -73,9 +73,8 @@ CLASS ErrorListView INHERIT ListView
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
-METHOD ProcessErrors( oError, aErrors ) CLASS ErrorListView
+METHOD ProcessErrors( aErrors ) CLASS ErrorListView
    LOCAL n
-   ( oError )
    ::ResetContent()
    
    FOR n := 1 TO LEN( aErrors )

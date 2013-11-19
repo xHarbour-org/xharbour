@@ -28,42 +28,46 @@ static nMemSel := 100
 //-------------------------------------------------------------------------------------------------------
 
 CLASS DataTable INHERIT Component
-   PROPERTY Alias          READ xAlias          WRITE SetAlias
-   PROPERTY FileName       READ xFileName       WRITE SetFileName
 
-   ACCESS BindingSource    INLINE ::SqlConnector
-   ASSIGN BindingSource(o) INLINE ::SqlConnector := o
+   PROPERTY Alias        ROOT "General"    READ xAlias       WRITE SetAlias
+   PROPERTY MemoType     ROOT "General"    READ xMemoType WRITE __SetMemoType DEFAULT RddInfo( RDDI_MEMOTYPE )
+   PROPERTY Shared       ROOT "General"    DEFAULT .T.
+   PROPERTY CodePage     ROOT "General"
+   PROPERTY Socket       ROOT "General"
+   PROPERTY Structure    ROOT "General"
+   PROPERTY Table        ROOT "General"    DEFAULT {}
+   PROPERTY Driver       ROOT "General"    ASSIGN {|Self,c| ::xDriver := IIF( !EMPTY( c ), c, NIL )}
 
-   ASSIGN DataConnector(o) INLINE ::BindingSource := o
+   PROPERTY FileName     ROOT "Path"       READ xFileName    WRITE SetFileName
+   PROPERTY Path         ROOT "Path"       DEFAULT ""
+
+   PROPERTY SqlConnector ROOT "Connection" GET __ChkComponent( Self, @::xSqlConnector )
+
+   PROPERTY ReadOnly     ROOT "Behavior"   DEFAULT .F.
+   PROPERTY AutoOpen     ROOT "Behavior"   DEFAULT .T.
    
-   DATA Shared             PUBLISHED INIT .T.
-   DATA ReadOnly           PUBLISHED INIT .F.
-   DATA AutoOpen           PUBLISHED INIT .T.
    
-   DATA xSqlConnector      EXPORTED
-   ACCESS SqlConnector     INLINE __ChkComponent( Self, @::xSqlConnector ) PERSISTENT
-   ASSIGN SqlConnector(o)  INLINE ::xSqlConnector := o
-   
-   DATA Path               PUBLISHED INIT ""
-   DATA CodePage           PUBLISHED
-   DATA Socket             PUBLISHED
-   
+
+   ACCESS Exists           INLINE ::IsOpen
+  
    DATA EnumMemoType       EXPORTED INIT { { "None", "DBT", "FTP", "SMT" }, { DB_MEMO_NONE, DB_MEMO_DBT, DB_MEMO_FPT, DB_MEMO_SMT } }
-   PROPERTY MemoType READ xMemoType WRITE __SetMemoType DEFAULT RddInfo( RDDI_MEMOTYPE )
 
    DATA __lMemory          EXPORTED  INIT .F.
-   DATA Structure          PUBLISHED
 
    DATA IDEButton          EXPORTED
    DATA Fields             EXPORTED
    DATA IndexOrder         EXPORTED  INIT 0
 
-   DATA Table              PUBLISHED  INIT {}
    DATA Border             EXPORTED
    DATA Text               EXPORTED
 
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
+
+   ACCESS BindingSource    INLINE ::SqlConnector
+   ASSIGN BindingSource(o) INLINE ::SqlConnector := o
+
+   ASSIGN DataConnector(o) INLINE ::BindingSource := o
 
    DATA Font               EXPORTED
    DATA ToolTip            EXPORTED
@@ -106,10 +110,6 @@ CLASS DataTable INHERIT Component
    
    DATA Connector          EXPORTED
    
-   ACCESS Driver           INLINE ::xDriver PERSISTENT
-   ASSIGN Driver(c)        INLINE ::xDriver := IIF( !EMPTY( c ), c, NIL )
-   ACCESS Exists           INLINE ::IsOpen
-
    DATA __aTmpStruct       PROTECTED
    DATA __lNew             PROTECTED INIT .F.
    DATA __aData            PROTECTED INIT {}

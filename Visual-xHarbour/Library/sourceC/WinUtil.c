@@ -57,6 +57,10 @@
 
 #define stricmp           _stricmp
 
+#define _bset  memset
+#define _bcopy memcpy
+#define MAX_PATH_LEN    254
+
 typedef struct
 {
    BOOL bRoot;
@@ -5041,3 +5045,236 @@ Same code as in "Total Virtual Memory" and then
 
     DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile
 */
+
+HB_FUNC( __GETPROPERTYCASE )
+{
+   PHB_DYNS pMessage = hb_dynsymGetCase( hb_parcx(1) );
+   hb_retc( pMessage->pSymbol->szName );
+}
+
+
+HB_FUNC( RUNASADMIN )
+{
+   OSVERSIONINFO osvi;
+
+   BOOL bRet;
+   BOOL bWait = ISNIL(5) ? TRUE : hb_parl(5);
+   SHELLEXECUTEINFO sei;
+   ZeroMemory ( &sei, sizeof(sei) );
+
+   sei.cbSize       = sizeof(SHELLEXECUTEINFO);
+   sei.hwnd         = GetActiveWindow();
+   sei.fMask        = 0;
+   if( bWait )
+      sei.fMask     = SEE_MASK_NOASYNC;
+   sei.lpVerb       = TEXT("runas");
+   sei.lpFile       = (LPTSTR) hb_parc(1);
+   sei.lpParameters = (LPTSTR) hb_parc(2);
+   sei.lpDirectory  = (LPSTR) hb_parc(3);
+   sei.nShow        = ISNIL(4)?SW_SHOWNORMAL:hb_parni(4);
+
+   osvi.dwOSVersionInfoSize = sizeof( osvi );
+   GetVersionExA( &osvi ) ;
+
+   if( osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6 && osvi.dwMinorVersion >= 2 )
+   {
+      HKEY hKey;
+      const BYTE mydata[] = TEXT("RUNASADMIN");
+
+      RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"), NULL, KEY_SET_VALUE, &hKey);
+      RegSetValueEx(hKey, hb_parc(1), NULL, REG_SZ, mydata, sizeof(mydata) );
+      RegCloseKey(hKey);
+   }
+
+   bRet = ShellExecuteEx( &sei );
+   if( bWait )
+   {
+      WaitForSingleObject( sei.hProcess, INFINITE );
+   }
+   hb_retl( bRet );
+}
+
+HB_FUNC( _GETOPENFILENAME )   // ( cFileMask, cTitle, nDefaultMask, cInitDir, lSave, lLongNames, nFlags, cDefFile, cDefExt, lMultiFile, lOverwritePrompt )  --> cFileName
+{
+   OPENFILENAME ofn;
+   LPSTR pFile, pFilter, pDir, pTitle, pTmp, pStart;
+   int  iCount = 1, iNext = 2;
+   WORD w = 0, wLen;
+   BYTE bIndex = hb_parni( 3 );
+   BOOL bSave = (hb_pcount() > 4 && ISLOG( 5 )) ? hb_parl( 5 ): FALSE;
+   BOOL bLongNames = ISNIL(6) ? TRUE : hb_parl( 6 );
+   BOOL bMultiFile = ISNIL(10) ? FALSE : hb_parl( 10 );
+   BOOL bOverwritePrompt = ISNIL(11) ? FALSE : hb_parl( 11 );
+   DWORD dwFlags = hb_parnl( 7 );
+   DWORD dwFileBufSize = bMultiFile ? 1024 * 32 : 256;
+
+   char pDefExt[ 4 ];
+   char cMsg[25];
+
+   if( hb_pcount() < 1 )
+   {
+      hb_retc( "" );
+       return;
+   }
+
+   // alloc for title
+
+   pTitle = (LPSTR)hb_xgrab( MAX_PATH_LEN+1 );
+
+   wLen   = min( MAX_PATH_LEN, hb_parclen( 2 ) );
+   _bcopy( pTitle, (char*)hb_parc( 2 ), wLen );
+   * ( pTitle + wLen ) = 0;
+
+   // alloc for initial dir
+
+   pDir = (LPSTR) hb_xgrab( MAX_PATH_LEN+1 );
+
+   if ( hb_pcount() > 3 && ISCHAR( 4 ) )
+   {
+      wLen  = min( MAX_PATH_LEN, hb_parclen( 4 ) );
+      _bcopy( pDir, (char*)hb_parc( 4 ), wLen );
+      * ( pDir + wLen ) = 0;
+   }
+   else
+   {
+      * ( pDir ) = 0;
+   }
+
+   // alloc for file
+
+   pFile   = (LPSTR) hb_xgrab( dwFileBufSize );
+   if ( hb_pcount() > 7 && ISCHAR( 8 ) )
+   {
+      wLen = min( dwFileBufSize - 2, hb_parclen( 8 ) );
+      _bcopy( pFile, (char*) hb_parc( 8 ), wLen );
+   }else
+   {
+      wLen    = min( dwFileBufSize - 2, hb_parclen( 1 ) );
+      _bcopy( pFile, (char*) hb_parc( 1 ), wLen );
+   }
+   * ( pFile + wLen ) = 0;
+
+   // alloc for mask
+
+   pFilter = (LPSTR) hb_xgrab( 400 );
+   wLen    = min( 398, hb_parclen( 1 ) );
+   _bcopy( pFilter, (char*) hb_parc( 1 ), wLen );
+   * ( pFilter + wLen ) = 0;
+
+   while( * ( pFilter + w ) )
+   {
+      if( * ( pFilter + w ) == '|' )
+      {
+         * ( pFilter + w ) = 0;
+         if( ! ISCHAR( 8 ) )
+            * (pFile) = 0;    // if no default name was passed, terminate at end of first spec
+      }
+      w++;
+   }
+   * ( pFilter + wLen  ) = 0;
+   * ( pFilter + wLen + 1 ) = 0;
+
+   // Default Extension
+   if ( hb_pcount() > 8 && ISCHAR( 9 ) )
+      _bcopy( pDefExt, (char*) hb_parc( 9 ), 3 );
+   else
+      * pDefExt = 0;
+
+   _bset( ( char * ) &ofn, 0, sizeof( OPENFILENAME ) );
+
+   ofn.lStructSize     = sizeof( OPENFILENAME );
+   ofn.hwndOwner       = GetActiveWindow();
+   ofn.lpstrFilter     = pFilter;
+   ofn.lpstrCustomFilter = 0; // NIL;
+   ofn.nFilterIndex    = bIndex ? bIndex: 1;
+   ofn.lpstrFile       = pFile;
+   ofn.nMaxFile        = dwFileBufSize ; //MAX_PATH_LEN;
+   ofn.lpstrFileTitle  = 0; // NIL;
+   ofn.lpstrInitialDir = pDir;
+   ofn.lpstrTitle      = pTitle;
+   ofn.lpstrDefExt     = pDefExt[0] ? pDefExt : NULL ;
+   ofn.Flags           = OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR |
+                         OFN_HIDEREADONLY |
+                         bOverwritePrompt ? OFN_OVERWRITEPROMPT : 0 |
+                         bMultiFile ? (OFN_ALLOWMULTISELECT | OFN_EXPLORER) : 0 |
+                         bLongNames ? OFN_LONGNAMES : 0;
+
+   if( dwFlags )
+      ofn.Flags = dwFlags;
+
+   if( bSave )
+   {
+      if( GetSaveFileName( &ofn ) )
+         hb_retc( pFile );
+      else
+         hb_retc( "" );
+   }
+   else
+   {
+      if( GetOpenFileName( &ofn ) )
+      {
+         if( bMultiFile )
+         {
+            /*
+             *    Multi-Select returns an array if any are selected (Cancel returns an empty string).
+             *    If ONE file is selected, you get 1 element with full path to the file.
+             *    If more are selected you get an array sized at (nNumFiles + 1)
+             *    with the FIRST element as the path to the FOLDER,
+             *    plus an additional element for each filename.
+             */
+
+            pTmp = pFile + ofn.nFileOffset;
+            // first must get count of files to allocate the array
+            while ( *pTmp || *(pTmp + 1) )
+            {
+               if ( *pTmp == NULL )
+               {
+                  iCount++;             // represents the number of FILES selected, not array size
+               }
+               pTmp++;
+            }
+//            TraceLog( NULL, "iCount %d \n", iCount );
+            hb_reta( iCount + ( iCount == 1 ? 0 : 1) );
+            hb_storc( pFile, -1, 1 );     // the directory, or full path if a single file was selected
+
+            if ( iCount > 1 )
+            {
+               pStart = pFile + ofn.nFileOffset;
+               pTmp = pStart + 1;
+               while ( *pTmp || *(pTmp + 1) )
+               {
+                  if ( *pTmp == NULL )  // curChar as NULL marks end of a string
+                  {
+                     //TraceLog( NULL, "pStart  file? %s \n", pStart);
+                     hb_storc( pStart, -1, iNext++ );      // the directory, or full path if a single file was selected
+                     pStart = pTmp + 1;
+                  }
+                  pTmp++;
+               }
+               if ( iNext <= iCount + 1 )   // loop controller won't see the end of the last string
+               {
+                  //TraceLog( NULL, "pStart last file? %s \n", pStart);
+                  hb_storc( pStart, -1, iNext++ );
+               }
+            }
+         }
+         else
+            hb_retc( pFile );
+      }
+      else
+      {
+         //wsprintf(cMsg, "%d", sizeof( OPENFILENAME ) );
+         if ( CommDlgExtendedError() )
+         {
+            wsprintf(cMsg, "CommDlg Error# %d", CommDlgExtendedError() );
+            MessageBox( GetActiveWindow(), cMsg, "Dialog Error", MB_ICONSTOP );
+         }
+         hb_retc( "" );
+      }
+   }
+
+   hb_xfree( pFilter );
+   hb_xfree( pFile );
+   hb_xfree( pDir );
+   hb_xfree( pTitle );
+}

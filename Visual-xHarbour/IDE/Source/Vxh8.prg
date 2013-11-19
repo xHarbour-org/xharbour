@@ -33,7 +33,7 @@ METHOD Init( oGrid ) CLASS ColumnManager
    ::Text       := "DataGrid Column Manager"
    ::Modal      := .T.
    ::Top        := 400
-   ::Width      := 500
+   ::Width      := 490
    ::Height     := 600
    ::Style      := WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle    := WS_EX_DLGMODALFRAME
@@ -53,17 +53,18 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS ColumnManager
-  
-   WITH OBJECT Image( Self )
-      :Height      := 77
-      :ImageName   := "Banner"
-      :Dock:Margin := 0
-      :Dock:Left   := :Parent
-      :Dock:Top    := :Parent
-      :Dock:Right  := :Parent
+   WITH OBJECT PictureBox( Self )
+      :Height          := 77
+      :BackColor       := C_WHITE
+      :Type            := "BMP"
+      :ImageName       := "Banner"
+      :Dock:Margin     := 0
+      :Dock:Left       := :Parent
+      :Dock:Top        := :Parent
+      :Dock:Right      := :Parent
       :Create()
    END
-   
+
    WITH OBJECT ToolStrip( Self )
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
@@ -72,7 +73,7 @@ METHOD OnInitDialog() CLASS ColumnManager
       :Width       := ::Width
       :Dock:Margin := 0
       :Dock:Left   := :Parent
-      :Dock:Top    := ::Image1
+      :Dock:Top    := ::PictureBox1
       :Dock:Right  := :Parent
       :Create()
 

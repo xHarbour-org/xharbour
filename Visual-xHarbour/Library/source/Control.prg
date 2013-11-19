@@ -18,26 +18,22 @@
 
 CLASS Control INHERIT Window
 
-   DATA Dock              PUBLISHED
-   DATA Anchor            PUBLISHED
-   DATA Transparent       EXPORTED INIT .F.
-
-   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
-
-   PROPERTY TabStop INDEX WS_TABSTOP READ xTabStop      WRITE SetStyle          DEFAULT .T. PROTECTED
-   PROPERTY Enabled                  READ xEnabled      WRITE __Enable          DEFAULT .T.
+   // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
+   PROPERTY Dock           ROOT "Position"
+   PROPERTY Anchor         ROOT "Position"
+   PROPERTY Transparent    ROOT "Appearance" DEFAULT .F.
+   PROPERTY ContextMenu    ROOT "Behavior"   GET __ChkComponent( Self, @::xContextMenu )
+   PROPERTY TabStop        ROOT "Behavior"   INDEX WS_TABSTOP READ xTabStop WRITE SetStyle          DEFAULT .T. PROTECTED
+   PROPERTY Enabled        ROOT "Behavior"   READ xEnabled WRITE __Enable          DEFAULT .T.
+   PROPERTY Text           ROOT "Appearance" ACCESS {|Self| IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) )} ASSIGN {|Self,c| ::SetWindowText( c ), ::xText := c} DEFAULT ""
+   PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
+   //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
 
    ACCESS Caption        INLINE ::Text
    ASSIGN Caption(c)     INLINE ::Text := c
-
-   DATA xText                  EXPORTED  INIT ""
-   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
-   ASSIGN Text(c)              INLINE    ::SetWindowText( c ), ::xText := c
-
-   DATA AllowMaximize     PUBLISHED INIT .F.
 
    DATA IsContainer       EXPORTED INIT .F.
    DATA Value             EXPORTED

@@ -55,32 +55,36 @@
 //----------------------------------------------------------------------------------------------------------------------------------
 
 
-#xcommand PROPERTY <p> [ROOT <r>] [PARAM <i>] GET <rf> [DEFAULT <d>] [<prot: PROTECTED>];
-           =>  ;
-           DATA __CONCAT x <p>  [<prot>] [INIT <d>] ;
-           ; #ifdef VXH ;
-           ;    DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;
-           ; #endif ;
-           ; ACCESS <p>    INLINE <rf> PERSISTENT ;
-           ; ASSIGN <p>(v) INLINE ::x<p> := v, v
+#xtranslate __CONCAT <x> <y> => <x>[<y>]
 
-#xcommand PROPERTY <p> [ROOT <r>] [PARAM <i>] SET <wf> [DEFAULT <d>] [<prot: PROTECTED>];
+
+#xcommand PROPERTY <p> [ROOT <r>] GET <bget> [DEFAULT <d>] [<prot: PROTECTED>];
+           =>  ;
+           #ifdef VXH ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
+           #endif ;;
+           DATA __CONCAT x <p>  [<prot>] [INIT <d>] ;;
+           ACCESS <p>    INLINE <bget> PERSISTENT ;;
+           ASSIGN <p>(v) INLINE ::x<p> := v, v
+
+#xcommand PROPERTY <p> [ROOT <r>] SET <bset> [DEFAULT <d>] [<prot: PROTECTED>];
            =>  ;
            #ifdef VXH ;;
               DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
            #endif ;;
            DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
            ACCESS <p>    INLINE ::x<p> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE ::<wf>( [ <i>,] @v ), ::x<p> := v, v
+           ASSIGN <p>(v) INLINE Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
 
-#xcommand PROPERTY <p> [ROOT <r>] [PARAM <i>] GET <rf> SET <wf> [DEFAULT <d>] [<prot: PROTECTED>];
+#xcommand PROPERTY <p> [ROOT <r>] GET <bget> SET <bset> [DEFAULT <d>] [<prot: PROTECTED>];
            =>  ;
-           DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
            #ifdef VXH ;;
               DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
            #endif ;;
-           ACCESS <p>    INLINE <rf> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE ::<wf>( [ <i>,] @v ), ::x<p> := v, v
+           DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
+           ACCESS <p>    INLINE <bget> PERSISTENT ;;
+           ASSIGN <p>(v) INLINE Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
+
 
 
 // CODEBLOCK

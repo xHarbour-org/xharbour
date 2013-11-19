@@ -14,8 +14,6 @@ static __aProps := {=>}
 #include "commdlg.ch"
 #include "scintilla.ch"
 
-//#include "xEditConstants.ch"
-
 #define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
 #define DG_MOVESELECTION   4
@@ -141,7 +139,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS ObjManager
    Super:OnSize( nwParam, nlParam )
    ::Columns[1][1] := Int(::ClientWidth/2)-11
    ::Columns[2][1] := Int(::ClientWidth/2)-7
-   //::InvalidateRect(,.f.)
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
@@ -195,13 +192,13 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
    hDC      := tvcd:nmcd:hdc
    nLevel   := tvcd:iLevel
    lEnabled := IsWindowEnabled( ::hWnd )
-   nBack := IIF( lEnabled, ::Columns[1][2], /*GetSysColor( COLOR_BTNFACE )*/ ::System:CurrentScheme:ToolStripPanelGradientEnd )
+   nBack := IIF( lEnabled, ::Columns[1][2], ::System:CurrentScheme:ToolStripPanelGradientEnd )
    nFore := IIF( lEnabled, C_BLACK, GetSysColor( COLOR_BTNSHADOW ) )
 
    nState := ::GetItemState( tvcd:nmcd:dwItemSpec, TVIF_STATE )
 
    IF nState & TVIS_SELECTED == TVIS_SELECTED .AND. ::CurCol == 1 .AND. ::HasFocus
-      nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd //GetSysColor( COLOR_HIGHLIGHT )
+      nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd
       nFore := IIF( lEnabled, RGB(0,0,0), GetSysColor( COLOR_BTNSHADOW ) )
    ENDIF
 
@@ -274,8 +271,8 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
          LineTo( hDC, rc:right, rc:bottom-1 )
       ENDIF
     ELSE
-      _FillRect( hDC, { rc:left, rc:top, nLeft, rc:bottom }, /*GetSysColorBrush( COLOR_BTNFACE )*/ ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
-      _FillRect( hDC, { nRight+::Columns[2][1], rc:top, rc:right, rc:bottom }, /*GetSysColorBrush( COLOR_BTNFACE )*/ ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
+      _FillRect( hDC, { rc:left, rc:top, nLeft, rc:bottom }, ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
+      _FillRect( hDC, { nRight+::Columns[2][1], rc:top, rc:right, rc:bottom }, ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
 
       _ExtTextOut( hDC, x+2, y, ETO_CLIPPED+ETO_OPAQUE, { nLeft, rc:top, nRight, rc:bottom }, cText  )
    ENDIF
@@ -295,7 +292,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
    aRest := { rc:Left, rc:bottom, rc:right, ::ClientHeight }
    
    IF VALTYPE( oItem:ColItems ) == "A"
-//   TRY
       FOR n := 1 TO LEN( oItem:ColItems )
           nLeft   += nWidth
 
@@ -390,12 +386,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              ENDIF
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "CURSORS"
-             IF ( nPos := ASCAN( ::ActiveObject:__CursorValues, ::ActiveObject:Cursor ) ) > 0 .AND. LEN( cText ) >= nPos
-                cText := cText[ nPos ]
-             ENDIF
-          ENDIF
-
           IF oItem:ColItems[n]:ColType == "SERVICES"
              IF ( nPos := ASCAN( oItem:ColItems[n]:Value, ::ActiveObject:ServiceName ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
@@ -407,18 +397,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                cText := cText[ oItem:ColItems[n]:SetValue ]
              CATCH
              END
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType IN {"FIELDPOS","TARGETTYPE"}
-             cText := IIF( oItem:ColItems[n]:SetValue > 0, cText[ oItem:ColItems[n]:SetValue ], "None" )
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "IMAGETYPE"
-             cText := cText[ ::ActiveObject:ImageType ]
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "BALLOONICONS"
-             cText := cText[ ::ActiveObject:BalloonTipIcon+1 ]
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "ENUMERATION"
@@ -456,7 +434,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                   EXIT
              CASE "L"
                   lVal := cText
-                  //_DrawFrameControl( hDC, {nLeft,rc:top,70,20}, DFC_BUTTON, DFCS_BUTTONCHECK|DFCS_CHECKED )
                   cText  := ""
           END
           DEFAULT cText TO ""
@@ -482,11 +459,11 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                   x:= nLeft + ( ( nRight - nLeft )/2 ) - ( aAlign[1]/2 )
                   EXIT
           END
-          nBack := IIF( lEnabled, ::Columns[n+1][2], /*GetSysColor( COLOR_BTNFACE )*/ ::System:CurrentScheme:ToolStripPanelGradientEnd ) 
+          nBack := IIF( lEnabled, ::Columns[n+1][2], ::System:CurrentScheme:ToolStripPanelGradientEnd ) 
           nFore := IIF( lEnabled, C_BLACK, GetSysColor( COLOR_BTNSHADOW ) )
           IF nState & TVIS_SELECTED != 0 .AND. ::CurCol == n+1 .AND. ::HasFocus
-             nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd //GetSysColor( COLOR_HIGHLIGHT )
-             nFore := RGB(0,0,0) //GetSysColor( COLOR_HIGHLIGHTTEXT )
+             nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd
+             nFore := RGB(0,0,0)
           ENDIF
           SetBkColor( hDC, nBack )
           SetTextColor( hDC, nFore )
@@ -547,8 +524,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           SelectObject( hDC, hOldPen )
 
       NEXT
-//   CATCH
-//   END 
    ENDIF
    IF lHasChildren
       y := rc:top + ( ( rc:bottom - rc:top ) / 2 ) - ( 9/2 )
@@ -630,11 +605,6 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
       IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
          TRY
             oEditor:TreeItem:Text := cNewName +".prg *"
-            //IF ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
-            //   IF ( n := aScan( ::Application:Project:Forms, ::ActiveObject, , , .T. ) ) > 0
-            //      ::Application:FormsTabs:SetItemText( n, cNewName+" *", .F. )
-            //   ENDIF
-            //ENDIF
           catch
          END
       ENDIF
@@ -681,9 +651,7 @@ METHOD ChangeCtrlFont( cf, oItem, oFont ) CLASS ObjManager
       AADD( aFont2, oFont:Quality        )
       AADD( aFont2, oFont:PitchAndFamily )
 
-//      IF IsWindow( oFont:Parent:hWnd )
-         ::Application:Project:SetAction( { { DG_FONTCHANGED, oFont, aFont1, aFont2, oItem } }, ::Application:Project:aUndo )
-//      ENDIF
+      ::Application:Project:SetAction( { { DG_FONTCHANGED, oFont, aFont1, aFont2, oItem } }, ::Application:Project:aUndo )
    ENDIF
 RETURN Self
 
@@ -766,9 +734,6 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
       RETURN NIL
    ENDIF
 
-   IF cProp == "Cursor"
-      xValue := ::ActiveObject:__CursorValues[ xValue ]
-   ENDIF
    TRY
       xVal := oObj:&cProp
     CATCH
@@ -933,17 +898,6 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       TRY
          IF cProp == "Name"
             ::RenameForm( cVal, xValue,, oActiveObject )
-            IF oActiveObject:ClsName == "VXH_FORM_IDE"
-               ::Application:FileExplorer:UpdateView()
-               //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg" )
-               //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".prg",;
-               //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".prg" )
-               //ENDIF
-               //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
-               //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
-               //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
-               //ENDIF
-            ENDIF
             
             FOR EACH Topic IN oActiveObject:Events
                 FOR EACH Event IN Topic[2]
@@ -967,10 +921,6 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       END
     ELSEIF cProp == "Name"
       ::RenameForm( "__"+cVal, "__"+xValue, .T., oActiveObject )
-      //IF FILE( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm" )
-      //   FRENAME( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + cVal +".xfm",;
-      //            ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source + "\" + xValue +".xfm" )
-      //ENDIF
    ENDIF
    s_bSetting := .F.
 
@@ -1102,12 +1052,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       RETURN Self
    ENDIF
 
-   //IF ::ActiveObject != NIL
-   //   IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
-   //      ::Application:Components:InvalidateRect()
-   //   ENDIF
-   //ENDIF
-
    ::ActiveObject := aSel[1][1]
 
    IF ::Form:HasProperty( "Label2" )
@@ -1117,10 +1061,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    
    ::Application:Props[ "ComboSelect" ]:SelectControl( ::ActiveObject )
 
-   //IF lRefreshComp
-   //   ::Application:Components:Refresh()
-   //ENDIF
-   
    ::lPaint := .F.
    ::SetRedraw( .F. )
    ::ResetContent()
@@ -1145,8 +1085,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    aSort( aProperties,,,{|x, y| x[1] < y[1]})
 
    FOR EACH aProperty IN aProperties
-       //::Application:Yield()
-       //hb_gcAll()
        cProp  := aProperty[1]
 
        //------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1199,14 +1137,19 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        hb_gcStep()
 
        TRY
-         xValue := ::ActiveObject:&cProp
+          xValue := ::ActiveObject:&cProp
        CATCH
-         xValue := NIL
+          xValue := NIL
        END
        cType  := VALTYPE( xValue )
        nColor := NIL
+ 
+       IF __ObjHasMsg( ::ActiveObject, "__a_"+cProp )
+          aProp := __objSendMsg( ::ActiveObject, "__a_"+cProp )
+        ELSE
+          aProp := __GetProperCase( cProp )
+       ENDIF
 
-       aProp := __GetProperCase( cProp )
        cProp := aProp[1]
 
        IF Empty( aProp[2] )
@@ -1221,12 +1164,12 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           oItem:Create()
        ENDIF
 
-       IF GetProperPar( cProp ) == "Colors" .AND. VALTYPE(xValue) != "L" //oItem:Caption == "Colors"
+       IF GetProperPar( cProp ) == "Colors" .AND. VALTYPE(xValue) != "L"
           cType  := "COLORREF"
           nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue )
        ENDIF
 
-       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , ,/*aProp[3]*/ ) }
+       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , ) }
 
        IF __ObjHasMsg( ::ActiveObject, "Enum"+cProp )
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
@@ -1241,24 +1184,9 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           xValue := NIL
         ELSE
           DO CASE
-             CASE cProp == "FieldPos" .AND. ::ActiveObject:Parent:DataSource != NIL .AND. ::ActiveObject:Parent:DataSource:Structure != NIL
-                  aCol[1]:Value    := ::ActiveObject:Parent:DataSource:Structure
-                  aCol[1]:ColType  := "FIELDPOS"
-                  aCol[1]:SetValue := ::ActiveObject:FieldPos
-                  xValue := NIL
-
-             CASE cProp == "TargetType"
-                  aCol[1]:Value    := ::ActiveObject:__TargetTypes
-                  aCol[1]:ColType  := "TARGETTYPE"
-                  aCol[1]:SetValue := ::ActiveObject:TargetType
-                  xValue := NIL
-
              CASE cProp == "ShortcutKey"
                   aCol[1]:Value   := ::ActiveObject:ShortcutKey:GetShortcutText()
                   aCol[1]:ColType := ""
-
-             CASE cProp == "ToolTip" .AND. VALTYPE( xValue ) == "O"
-                  aCol[1]:Value := ""
 
              CASE cProp == "Structure"
                   aCol[1]:Value := "Edit Structure"
@@ -1425,12 +1353,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
              CASE cProp == "MaskType"
                   aCol[1]:ColType  := "MASKTYPE"
 
-
-             CASE cProp == "ImageIndex"
-                  aCol[1]:ColType  := "IMAGEINDEX"
-                  xValue := NIL
-
-             CASE cProp == "HeaderImageIndex"
+             CASE RIGHT(cProp,10) == "ImageIndex"
                   aCol[1]:ColType  := "IMAGEINDEX"
                   xValue := NIL
 
@@ -1439,28 +1362,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      aCol[1]:Value := ::System:ListViewGroupAlign:Keys
                      aCol[1]:ColType  := "LVGALIGNMENT"
                   ENDIF
-                  xValue := NIL
-
-             CASE cProp == "CheckStyle"
-                  aCol[1]:Value := ::ActiveObject:Check_Styles
-                  aCol[1]:ColType  := "CHECKSTYLES"
-                  xValue := NIL
-
-             CASE cProp == "BalloonTipIcon"
-                  aCol[1]:Value := ::ActiveObject:Balloon_Icons
-                  aCol[1]:ColType  := "BALLOONICONS"
-                  xValue := NIL
-
-             CASE cProp == "ImageType"
-                  aCol[1]:Value := ::ActiveObject:Image_Type
-                  aCol[1]:ColType  := "IMAGETYPE"
-                  xValue := NIL
-
-             CASE cProp == "Cursor"
-                  aCol[1]:Value   := ::ActiveObject:__Cursors
-                  aCol[1]:ColType := "CURSORS"
-                  aCol[1]:Action  := {|o| BrowseFile(o) }
-
                   xValue := NIL
 
              CASE cProp == "AnimationStyle"
@@ -1560,7 +1461,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                 cType := "ENUMERATION"
               ELSEIF cType == "O"
                 cType := "COLLECTION"
-                //lReadOnly := .F.
              ENDIF
 
              aCol  := { TreeColItem( xValue, cType, , NIL, cProp,, lReadOnly ) }
@@ -1586,8 +1486,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    IF ::ActiveObject:TreeItem != NIL
       ::ActiveObject:TreeItem:Select()
-   // ELSE
-   //   ::Application:ObjectTree:Set( ::ActiveObject )
    ENDIF
 
    hb_gcall()
@@ -1614,7 +1512,19 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
           cProp2  := __GetProperCase( cProp2 )[1]
           aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
 
-          IF cProp == "Dock"
+          IF __ObjHasMsg( xValue, "Enum"+cProp2 )
+             aCol[1]:Value    := xValue:Enum&cProp2[1]
+             aCol[1]:ColType  := "ENUM"
+             aCol[1]:SetValue := ASCAN( xValue:Enum&cProp2[2], xValue:&cProp2,,, .T. )
+             aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
+                                                    oPar := o:Parent,;
+                                                    o:Destroy(),;
+                                                    c := o:Cargo[1],;
+                                                    o:Cargo[2]:ColItems[1]:SetValue := n+1,;
+                                                    oPar:SetValue( xValue:Enum&c[2][n+1] ) }
+             xValue2 := NIL
+
+           ELSEIF cProp == "Dock"
              IF cProp2 $ "LeftTopRightBottom"
                 aCol[1]:Value := { "", { NIL } }
                 AADD( aCol[1]:Value[2], ::ActiveObject:Parent )
@@ -1671,11 +1581,7 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
           ::CheckObjProp( xValue2, oSub, cProp2, aSubExpand )
 
           oSub:SortChildren( .T. )
-          //IF aSubExpand != NIL .AND. ASCAN( aSubExpand, cProp ) > 0
-          //   oSub:Expand()
-          //ENDIF
           oItem:SortChildren( .T. )
-          //oItem:Expand()
       NEXT
    ENDIF
 RETURN NIL
@@ -1848,29 +1754,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ShowDropDown()
                     END
 
-               CASE cType IN {"FIELDPOS","TARGETTYPE"} .AND. oItem:ColItems[nCol-1]:Value != NIL
-                    ::ActiveControl := ObjCombo( Self )
-                    WITH OBJECT ::ActiveControl
-                       :Left   := nLeft-1
-                       :Top    := rc:top
-                       :Width  := ::Columns[ nCol ][ 1 ]+4
-                       :Height := 120
-                       :Border := .F.
-                       :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
-                       :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1 ), oItem:ColItems[nCol-1]:SetValue := n+1 }
-                       :Create()
-
-                       FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
-                           :AddItem( IIF( cType == "FIELDPOS", oItem:ColItems[nCol-1]:Value[n][1], oItem:ColItems[nCol-1]:Value[n] ) )
-                       NEXT
-
-                       :SetCurSel( oItem:ColItems[nCol-1]:SetValue )
-                       :SetItemHeight( -1, ::GetItemHeight()-5 )
-                       :SetFocus()
-                       :ShowDropDown()
-                    END
-
                CASE cType == "FACENAME"
                     ::ActiveControl := FontComboBox( Self )
                     WITH OBJECT ::ActiveControl
@@ -1889,7 +1772,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        cFont := :Cargo
 
                        :SetItemHeight( -1, ::GetItemHeight()-5 )
-                       //:SetItemHeight( 1, ABS( :Owner:&cFont:Height ) )
 
                        :SetFocus()
                        :ShowDropDown()
@@ -1929,11 +1811,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "DTSFORMATS" .OR.;
                     cType == "DATADRIVERS" .OR.;
                     cType == "ADSDATADRIVERS" .OR.;
-                    cType == "IMAGETYPE" .OR.;
                     cType == "SERVICES" .OR.;
                     cType == "STATES" .OR.;
-                    cType == "CURSORS" .OR.;
-                    cType == "BALLOONICONS" .OR.;
                     cType == "LVGALIGNMENT" .OR.;
                     cType == "SYSFOLDERS" .OR.;
                     cType == "OLEVERB" .OR.;
@@ -1942,7 +1821,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "STOPBITS" .OR.;
                     cType == "ANIMATIONSTYLE" .OR.;
                     ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
-                    ::ActiveControl := IIF( cType == "CURSORS", CursorComboBox( Self ), IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) ) )
+                    ::ActiveControl := IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) )
                     WITH OBJECT ::ActiveControl
                        :ClientEdge := .F.
                        :Left   := nLeft-1
@@ -2013,11 +1892,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                       o:Destroy(),;
                                                       oPar:SetValue( cSel ) }
                         ELSE
-                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "BALLOONICONS" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
+                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
                        ENDIF
                        :Create()
 
-                       IF cType != "CURSORS" .AND. cType != "IMAGEINDEX"
+                       IF cType != "IMAGEINDEX"
                           FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
                               :AddItem( oItem:ColItems[nCol-1]:Value[n] )
                           NEXT
@@ -2029,17 +1908,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :ImageList  := ::ActiveObject:Parent:ImageList
                        ENDIF
                        
-                       IF cType == "IMAGETYPE"
-                          :SetCurSel( ::ActiveObject:ImageType )
-                        ELSEIF cType == "BALLOONICONS"
-                          :SetCurSel( ::ActiveObject:BalloonTipIcon )
-                        ELSEIF cType == "IMAGEINDEX"
+                       IF cType == "IMAGEINDEX"
                           :SendMessage( CB_SETCURSEL, MAX( ::ActiveObject:&cProp, 0 ) )
-                        //ELSEIF cType == "STATES"
-                        //  :SetCurSel( ::ActiveObject:InitialState )
-                        ELSEIF cType == "CURSORS"
-                          n := ASCAN( ::ActiveObject:__CursorValues, ::ActiveObject:Cursor )
-                          :SetCurSel( n )
                         ELSEIF cType == "DATADRIVERS"
                           n := hScan( ::System:DataDrivers, ::ActiveObject:Driver )
                           :SetCurSel( n )
@@ -2197,7 +2067,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     RETURN 0
 
                CASE cType == "ENUM"
-                    WITH OBJECT ::ActiveControl := ObjCombo( Self )
+                    WITH OBJECT ::ActiveControl := IIF( UPPER(cProp) == "CURSOR", CursorComboBox( Self ), ObjCombo( Self ) )
                        :Left   := nLeft-1
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
@@ -2209,9 +2079,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Action := oItem:ColItems[nCol-1]:Action
                        :Cargo  := { cProp, oItem }
                        :Create()
-                       FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
-                           :AddItem( oItem:ColItems[nCol-1]:Value[n] )
-                       NEXT
+                       IF :GetCount() == 0
+                          FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
+                              :AddItem( oItem:ColItems[nCol-1]:Value[n] )
+                          NEXT
+                       ENDIF
                        :SetCurSel( oItem:ColItems[nCol-1]:SetValue )
                        :SetItemHeight( -1, ::GetItemHeight()-5 )
                        :SetFocus()
@@ -2585,7 +2457,6 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
                ClientToScreen( ::hWnd, @pt )
                ::ToolTip:TrackPosition( pt:x, pt:y )
                ::ToolTip:TrackActivate()
-               //SetTimer( ::hWnd, 1, 5000 )
              ELSE
                ::ToolTip:Text  := NIL
             ENDIF
@@ -2601,14 +2472,11 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
                ClientToScreen( ::hWnd, @pt )
                ::ToolTip:TrackPosition( pt:x, pt:y )
                ::ToolTip:TrackActivate()
-               //SetTimer( ::hWnd, 1, 5000 )
              ELSE
                cText := NIL
                ::ToolTip:Text  := NIL
             ENDIF
             
-          ELSE
-            //SetTimer( ::hWnd, 1, 5000 )
          ENDIF
       CATCH
       END
@@ -2812,9 +2680,6 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
 
          nPos := :GetTextLen()-2
          :AppendText( "RETURN Self" + CRLF )
-
-         //:Modified := .T.
-         //::Application:Project:Modified := .T.
          ::Application:Project:CurrentForm:__lModified := .T.
 
       ENDIF
@@ -2829,7 +2694,6 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
    
    ::Application:MainForm:ToolBox1:Enabled := .F.
-   //::Application:ObjectTree:Enabled        := .F.
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -2884,7 +2748,7 @@ STATIC FUNCTION ChangePrgLine( cLine, cOldVal, cNewVal, lComment )
           cWord := ""
        ENDIF
 
-       IF cChar  == " " .OR. cChar == "." /*.OR. cChar == ":"*/ .OR. cChar == '"' .OR. cChar == "(" .OR. cChar == ")" .OR. cChar == "=" .OR. cChar == "{" .OR. cChar == ","
+       IF cChar  == " " .OR. cChar == "." .OR. cChar == '"' .OR. cChar == "(" .OR. cChar == ")" .OR. cChar == "=" .OR. cChar == "{" .OR. cChar == ","
           cNewLine += cWord
           cWord := ""
        ENDIF
@@ -3038,7 +2902,7 @@ METHOD OnParentDrawItem() CLASS ObjCombo
       aClip     := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
                      ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0 //.OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
+      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
          SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -3388,7 +3252,7 @@ __aProps["H"] := { { "HasStrings",              "Style" },;
                    { "Height",                  "Size" },;
                    { "HeaderBackColor",         "Colors" },;
                    { "HeaderForeColor",         "Colors" },;
-                   { "HeaderImageIndex",        "Colors" },;
+                   { "HeaderImageIndex",        "Appearance" },;
                    { "HeaderHeight",            "Size" } }
 
 __aProps["I"] := { { "Icons",                   "Style" },;
@@ -3703,7 +3567,6 @@ __aProps["X"] := {}
 __aProps["Y"] := { { "YES_Button",              "CommonButtons" } }
 __aProps["Z"] := {}
    
-   //aSort( aSet,,,{|x, y| x[1] < y[1]})   
 RETURN
 
 STATIC FUNCTION BrowseFile( o )
@@ -3713,7 +3576,7 @@ STATIC FUNCTION BrowseFile( o )
 RETURN NIL
 
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
-   LOCAL oFile := CFile( oEdit:Caption )
+   LOCAL oFile := CFile( oEdit:Text )
    oEdit:OnWMKillFocus := NIL
    
    IF aFilter == NIL
@@ -3740,6 +3603,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
       oFile:Path := oMan:ActiveObject:Path
    ENDIF
    oFile:OpenDialog()
+
    oEdit:OnWMKillFocus := {|o|o:Destroy() }
    IF oFile:Result != IDCANCEL
       oEdit:Destroy()

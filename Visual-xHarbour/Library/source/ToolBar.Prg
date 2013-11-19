@@ -50,7 +50,7 @@ static s_nMenu
 #define MBI_DISABLEDHOT     5
 #define MBI_DISABLEDPUSHED  6
 
-#define MENU_POPUPITEM  14
+#define MENU_POPUPITEM     14
 
 #define MPI_NORMAL          1
 #define MPI_HOT             2
@@ -158,6 +158,7 @@ CLASS ToolBar INHERIT Control
    DATA nItem            PROTECTED
    DATA nPushed          PROTECTED
    DATA ShowMDIButtons   PROTECTED INIT .T.
+   DATA __hTheme         PROTECTED
 
    METHOD SetBanner()
    METHOD IsButtonChecked( nId ) INLINE ::GetButtonInfo( nId ):fsState & TBSTATE_CHECKED != 0
@@ -176,29 +177,32 @@ CLASS ToolBar INHERIT Control
    METHOD GetButtonSize()                    INLINE ::SendMessage( TB_GETBUTTONSIZE, 0, 0 )
    METHOD GetButtonBitmap( nButton )         INLINE ::SendMessage( TB_GETBITMAP, nButton, 0 )
 
-   METHOD DisableBtn( nBtn )      INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, 0)
-   METHOD EnableBtn( nBtn, lEnable ) INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, IIF( lEnable==NIL, .T., lEnable ) )
-   METHOD GetButtonCount()        INLINE SendMessage( ::hWnd, TB_BUTTONCOUNT, 0, 0 )
-   METHOD SetImageList(oImg)      INLINE ::__ChkImageList(1,@oImg), SendMessage( ::hWnd, TB_SETIMAGELIST, 0, IIF( oImg != NIL, oImg:handle, NIL ) ), ::xImageList := oImg
-   METHOD SetHotImageList(oImg)   INLINE ::__ChkImageList(2,@oImg), SendMessage( ::hWnd, TB_SETHOTIMAGELIST, 0, IIF( oImg != NIL, oImg:handle, NIL ) ), ::xHotImageList := oImg
-   METHOD CheckButton(nBtn,lFlag) INLINE lFlag := IFNIL( lFlag, .T., lFlag ),;
-                                         ::SendMessage( TB_CHECKBUTTON, nBtn, If( lFlag, 1, 0 ) )
+   METHOD DisableBtn( nBtn )                 INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, 0)
+   METHOD EnableBtn( nBtn, lEnable )         INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, IIF( lEnable==NIL, .T., lEnable ) )
+   METHOD GetButtonCount()                   INLINE SendMessage( ::hWnd, TB_BUTTONCOUNT, 0, 0 )
+   METHOD SetImageList(oImg)                 INLINE ::__ChkImageList(1,@oImg), SendMessage( ::hWnd, TB_SETIMAGELIST, 0, IIF( oImg != NIL, oImg:handle, NIL ) ), ::xImageList := oImg
+   METHOD SetHotImageList(oImg)              INLINE ::__ChkImageList(2,@oImg), SendMessage( ::hWnd, TB_SETHOTIMAGELIST, 0, IIF( oImg != NIL, oImg:handle, NIL ) ), ::xHotImageList := oImg
+   METHOD CheckButton(nBtn,lFlag)            INLINE lFlag := IFNIL( lFlag, .T., lFlag ),;
+                                                    ::SendMessage( TB_CHECKBUTTON, nBtn, If( lFlag, 1, 0 ) )
 
-   METHOD IsButtonClicked(nBtn)   INLINE IF( ::SendMessage( TB_ISBUTTONCHECKED, nBtn, 0) == 0, .F., .T. )
-   METHOD SetListStyle()          INLINE ::Style := ::Style | TBSTYLE_LIST
-   METHOD Disable()               INLINE ::DisableAll()
-   METHOD Enable()                INLINE ::EnableAll()
+   METHOD IsButtonClicked(nBtn)              INLINE IF( ::SendMessage( TB_ISBUTTONCHECKED, nBtn, 0) == 0, .F., .T. )
+   METHOD SetListStyle()                     INLINE ::Style := ::Style | TBSTYLE_LIST
+   METHOD Disable()                          INLINE ::DisableAll()
+   METHOD Enable()                           INLINE ::EnableAll()
+
+   METHOD GetHeight()                        INLINE HiWord(::GetButtonSize())*(LEN(::aItems))
+   METHOD OnLButtonDblClk(nwParam,x,y,hWnd)  INLINE ::OnLButtonDown(nwParam,x,y,hWnd)
+   METHOD _SetBitmapSize()                   INLINE IIF( ::hWnd != NIL .AND. ::BitmapWidth >= 0 .AND. ::BitmapHeight >= 0, ::SendMessage( TB_SETBITMAPSIZE, 0, MAKELONG( ::BitmapWidth, ::BitmapHeight ) ), NIL )
 
    METHOD SetPadding()
    METHOD GetGapWidth()
-//   METHOD Hook()
+
    METHOD SetButtonState()
    METHOD GetButtonInfo()
    METHOD GetButton()
    METHOD DrawArrow()
    METHOD CreateDropDown()
    METHOD SetColorScheme()
-   METHOD GetHeight() INLINE HiWord(::GetButtonSize())*(LEN(::aItems))
    METHOD GetButtonsWidth()
    METHOD OpenPopup()
 
@@ -206,7 +210,6 @@ CLASS ToolBar INHERIT Control
    METHOD OnInitMenuPopup()
    METHOD OnMeasureItem()
    METHOD OnDrawItem()
-   METHOD OnLButtonDblClk(nwParam,x,y,hWnd) INLINE ::OnLButtonDown(nwParam,x,y,hWnd)
    METHOD OnKillFocus()
    METHOD OnToolTipNotify()
    METHOD OnParentNotify()
@@ -219,7 +222,6 @@ CLASS ToolBar INHERIT Control
    METHOD __OnParentSize()
    METHOD SetExtStyle()
    METHOD __AddButton()
-   METHOD _SetBitmapSize() INLINE IIF( ::hWnd != NIL .AND. ::BitmapWidth >= 0 .AND. ::BitmapHeight >= 0 , ::SendMessage( TB_SETBITMAPSIZE, 0, MAKELONG( ::BitmapWidth, ::BitmapHeight ) ), NIL )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -232,14 +234,10 @@ METHOD Init( oParent ) CLASS ToolBar
    ::Style           :=  WS_CHILD | WS_VISIBLE | TBSTYLE_TRANSPARENT | CCS_NODIVIDER | CCS_NORESIZE | TBSTYLE_FLAT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ThemeName := "toolbar"
 
-   //::CCS_Adjustable  := .T.
-   //::CCS_NoResize    := .T.
-   //::CCS_NoDevider   := .T.
+   ::__hTheme        := OpenThemeData(,"MENU")
 
    ::Transparent     := .T.
    ::ToolTips        := .T.
-//   ::Flat            := .T.
-
    ::pRect           := (struct POINT)
    ::pRect:x         := 0
    ::pRect:y         := 0
@@ -378,6 +376,7 @@ METHOD OnDestroy() CLASS ToolBar
    IF ::__hDesList != NIL
       ImageListDestroy( ::__hDesList )
    ENDIF
+   CloseThemeData( ::__hTheme )
    ::Super:OnDestroy()
 RETURN NIL
 
@@ -460,13 +459,13 @@ METHOD OnDrawItem() CLASS ToolBar
       FOR EACH oButton IN ::aItems
          IF oButton:Style & BTNS_SEP == 0 .AND. oButton:Menu != NIL
             IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==::DrawItemStruct:itemID } ) ) > 0
-               oButton:Menu:aItems[n]:DrawItem( ::DrawItemStruct, .F. )
+               oButton:Menu:aItems[n]:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
                RETURN 1
             ENDIF
             // it is NOT the 1st level, let's see the rest
             FOR EACH oSub IN oButton:Menu:aItems
                IF ( oItem := oSub:GetMenuById(::DrawItemStruct:itemID ) )!= NIL
-                  oItem:DrawItem( ::DrawItemStruct, .F. )
+                  oItem:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
                   RETURN 1
                ENDIF
             NEXT
@@ -482,7 +481,7 @@ METHOD OnDrawItem() CLASS ToolBar
          ELSE
             FOR EACH oSub IN ::Chevron:Menu:aItems
                IF ( oItem := oSub:GetMenuById( ::DrawItemStruct:itemID ) )!= NIL
-                  oItem:DrawItem( ::DrawItemStruct, .F. )
+                  oItem:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
                   RETURN 1
                ENDIF
             NEXT
@@ -920,9 +919,6 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
 
 
          SendMessage( hWnd, TB_PRESSBUTTON, oBtn:Id, MAKELONG(0,0) )
-         
-//         ::Parent:PostMessage( WM_USER+3026, 0, ::oMenu:hMenu )
-         //DestroyMenu( ::oMenu:hMenu )
 
          oBtn:Menu:Destroy()
 
@@ -1028,7 +1024,7 @@ RETURN NIL
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
    LOCAL oButton, oBtn, nDif, n, nState, x, nRet
-   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton, hBrush
+   LOCAL nHot, oMdi, nTop, aRect, hIcon, hTheme, nButton//, hBrush
    LOCAL tbcd, nmt, nmtb, rc, pt, cr, lColor := .F.
    (nwParam)
    DO CASE
@@ -1148,17 +1144,25 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
                          IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
-                            IF ::Application:IsThemedXP .AND. ::System:Os:Version < 6
+                            IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
                                nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1
                                IF nHot == 0
                                   nHot := ::nPressed+1
                                ENDIF
                                IF nHot > 0
+
+                                  aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
+                                  DrawThemeBackground( ::__hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, MPI_HOT, aRect, aRect )
+                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( ::__hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
+
+
+/*
                                   hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
                                   SelectObject( tbcd:nmcd:hdc, hBrush )
                                   SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
                                   Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
-                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )                                  
+                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
+*/                                  
                                   SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
                                   SelectObject( tbcd:nmcd:hdc, ::GetFont() )
                                   DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
@@ -1374,8 +1378,6 @@ METHOD UpdateMenu( lShow ) CLASS ToolBar
           oItem:MenuItemInfo:cbSize := oItem:MenuItemInfo:SizeOf()
           oItem:MenuItemInfo:fMask  := MIIM_CHECKMARKS | MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
           oItem:Type := MFT_OWNERDRAW
-//          GetMenuItemInfo( hSysMenu, n-1, .T., @oItem:MenuItemInfo )
-//          oItem:BmpItem := oItem:MenuItemInfo:hBmpItem
           oItem:Enabled := GetMenuState( hSysMenu, n-1, MF_BYPOSITION ) & MF_DISABLED == 0
           oItem:Create()
       NEXT

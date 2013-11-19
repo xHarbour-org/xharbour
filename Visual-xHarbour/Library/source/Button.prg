@@ -36,7 +36,7 @@ CLASS Button INHERIT Control
    PROPERTY ImageIndex                           READ xImageIndex    WRITE SetImageIndex    DEFAULT  0  PROTECTED
    PROPERTY Border        INDEX WS_BORDER        READ xBorder        WRITE SetStyle         DEFAULT .F. PROTECTED
    PROPERTY DefaultButton                        READ xDefaultButton WRITE SetDefault       DEFAULT .F. PROTECTED
-   PROPERTY Enabled       INDEX WS_DISABLED      READ xEnabled       WRITE SetStyle         DEFAULT .T. PROTECTED
+   PROPERTY Enabled       ROOT "Behavior" INDEX WS_DISABLED      READ xEnabled       WRITE SetStyle         DEFAULT .T. PROTECTED
    PROPERTY MultiLine     INDEX BS_MULTILINE     READ xMultiLine     WRITE SetStyle         DEFAULT .F. PROTECTED
 
    DATA ImgInst           EXPORTED

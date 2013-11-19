@@ -26,9 +26,9 @@ CLASS Image INHERIT Label
    PROPERTY Sunken          INDEX SS_SUNKEN      READ xSunken      WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY CenterImage     INDEX SS_CENTERIMAGE READ xCenterImage WRITE SetStyle  DEFAULT .F. PROTECTED
 
-   DATA Image_Type      EXPORTED  INIT {"Bitmap","Icon"}
-   DATA ImageTypes      EXPORTED  INIT {IMAGE_BITMAP, IMAGE_ICON}
    DATA ImageType       PUBLISHED INIT 1
+   DATA EnumImageType   EXPORTED  INIT {{"Bitmap","Icon"},{IMAGE_BITMAP, IMAGE_ICON}}
+
    DATA LoadFromFile    PUBLISHED INIT .F.
 
    DATA RightAlign   PROTECTED

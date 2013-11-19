@@ -37,16 +37,15 @@ static s_hFloatCalendar
 
 //-----------------------------------------------------------------------------------------------
 CLASS EditBox INHERIT Control
-   DATA DropCalendar      PUBLISHED INIT .F.
-   DATA FullSelectOnClick PUBLISHED INIT .F.
-   DATA EnterNext  PUBLISHED INIT .F.
-   DATA EnumLayout                     EXPORTED INIT { { "None",;
-                                                         "Text, Image, Arrow",;
-                                                         "Text, Arrow, Image",;
-                                                         "Image, Text, Arrow",;
-                                                         "Image, Arrow, Text",;
-                                                         "Arrow, Text, Image",; 
-                                                         "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
+   PROPERTY DropCalendar      DEFAULT .F.
+   PROPERTY FullSelectOnClick DEFAULT .F.
+   PROPERTY EnterNext         DEFAULT .F.
+   PROPERTY Transparent       DEFAULT .F.
+   PROPERTY ImageIndex        DEFAULT 0
+
+   PROPERTY DataSearchField   DEFAULT 1
+   PROPERTY DataSearchWidth   DEFAULT 0
+   PROPERTY DataSearchRecords DEFAULT 0
  
    PROPERTY MenuArrow                                   READ xMenuArrow        WRITE __SetMenuArrow  DEFAULT .F.
    PROPERTY Layout                                      READ xLayout           WRITE __SetLayout     DEFAULT 1   PROTECTED
@@ -68,18 +67,24 @@ CLASS EditBox INHERIT Control
 
    PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle      DEFAULT .T. PROTECTED
 
-   PROPERTY ContextMenu                                 GET __ChkComponent( Self, @::xContextMenu ) SET __SetContextMenu
+   PROPERTY ContextMenu                                 GET __ChkComponent( Self, @::xContextMenu ) SET ::__SetContextMenu(v)
    PROPERTY CueBanner                                   READ xCueBanner        WRITE SetCueBanner
    PROPERTY ImageIndex                                  READ xImageIndex       WRITE __SetImageIndex  DEFAULT 0   PROTECTED
 
    PROPERTY DataSource    GET __ChkComponent( Self, @::xDataSource )
 
-   DATA Transparent                    PUBLISHED INIT .F.
-   DATA ImageIndex                     PUBLISHED INIT 0
+   PROPERTY Alignment     SET ::SetAlignment(v) DEFAULT 1
 
-   DATA DataSearchField                PUBLISHED INIT 1
-   DATA DataSearchWidth                PUBLISHED INIT 0
-   DATA DataSearchRecords              PUBLISHED INIT 0
+   PROPERTY SelForeColor  ROOT "Colors" READ xSelForeColor WRITE __SetSelColor
+   PROPERTY SelBackColor  ROOT "Colors" READ xSelBackColor WRITE __SetSelColor
+
+   DATA EnumLayout                     EXPORTED INIT { { "None",;
+                                                         "Text, Image, Arrow",;
+                                                         "Text, Arrow, Image",;
+                                                         "Image, Text, Arrow",;
+                                                         "Image, Arrow, Text",;
+                                                         "Arrow, Text, Image",; 
+                                                         "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
 
    DATA ImageList                      EXPORTED
    DATA AllowUnDock                    EXPORTED INIT FALSE
@@ -90,19 +95,8 @@ CLASS EditBox INHERIT Control
    DATA ForeSysColor                   EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
    DATA LastKey                        EXPORTED INIT 0
 
-   DATA xSelForeColor                  EXPORTED
-   ACCESS SelForeColor                 INLINE ::xSelForeColor PERSISTENT //IIF( ::xSelForeColor == NIL, ::ForeSysColor, ::xSelForeColor ) PERSISTENT
-   ASSIGN SelForeColor( n )            INLINE ::xSelForeColor := n, ::SetSelColor( ::SelForeColor, ::SelBackColor )
-
-   DATA xSelBackColor                  EXPORTED
-   ACCESS SelBackColor                 INLINE ::xSelBackColor PERSISTENT //IIF( ::xSelBackColor == NIL, ::BackSysColor, ::xSelBackColor ) PERSISTENT
-   ASSIGN SelBackColor( n )            INLINE ::xSelBackColor := n, ::SetSelColor( ::SelForeColor, ::SelBackColor )
-
    DATA EnumCase                       EXPORTED  INIT { { "Mixed Case", "Upper Case", "Lower Case" }, {1,2,3} }
    DATA EnumAlignment                  EXPORTED  INIT { { "Left", "Center", "Right" }, { 1, 2, 3 } }
-
-   ACCESS Alignment                    INLINE ::xAlignment PERSISTENT
-   ASSIGN Alignment(n)                 INLINE ::SetAlignment(n)
 
    DATA __BackMargin                   EXPORTED INIT 2
 
@@ -176,7 +170,6 @@ CLASS EditBox INHERIT Control
    METHOD SetRectNP(aRect, lRelative)
    METHOD SetTabStops( nTabs, aTabs )
    METHOD ShowBalloonTip( EBT )
-   METHOD SetSelColor()
    METHOD OnParentCommand()
    METHOD OnNCCalcSize()
    METHOD OnNCPaint()
@@ -190,6 +183,7 @@ CLASS EditBox INHERIT Control
    METHOD OnVertScroll()               INLINE NIL
    METHOD __SetScrollBars()            INLINE NIL
    METHOD __SetContextMenu()
+   METHOD __SetSelColor()
    METHOD OnKeyDown()
    METHOD OnGetDlgCode()
    METHOD OnKillFocus()
@@ -539,23 +533,17 @@ METHOD SetAlignment( n ) CLASS EditBox
 RETURN n
 
 //-----------------------------------------------------------------------------------------------
-METHOD SetSelColor( nFore, nColor, lRepaint ) CLASS EditBox
-
-   DEFAULT lRepaint TO TRUE
-
-   ::xSelForeColor := nFore
-   ::xSelBackColor := nColor
+METHOD __SetSelColor() CLASS EditBox
    IF ::SelBkBrush != NIL
       DeleteObject( ::SelBkBrush )
       ::SelBkBrush := NIL
    ENDIF
-   IF nColor != NIL
-      ::SelBkBrush := CreateSolidBrush( nColor )
+   IF ::xSelBackColor != NIL
+      ::SelBkBrush := CreateSolidBrush( ::xSelBackColor )
    ENDIF
-   IF lRepaint .AND. ::IsWindowVisible() .AND. GetFocus() == ::hWnd
+   IF ::IsWindowVisible() .AND. GetFocus() == ::hWnd
       ::InvalidateRect()
    ENDIF
-
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------

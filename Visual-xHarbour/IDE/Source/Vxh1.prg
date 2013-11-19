@@ -141,10 +141,7 @@ CLASS IDE INHERIT Application
    DATA SaveAsMenu       EXPORTED
    DATA SaveAllMenu      EXPORTED
 
-   DATA AddToProjectMenu EXPORTED
-   DATA AddSourceMenu    EXPORTED
-   DATA AddLibraryMenu   EXPORTED
-   DATA RemoveSourceMenu EXPORTED
+   DATA AddFileMenu      EXPORTED
 
    DATA ObjectTab        EXPORTED
    DATA Sizes            EXPORTED
@@ -665,106 +662,46 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
 
          WITH OBJECT MenuStripItem( :this )
-            :Caption    := "&New"
-            :ImageList := :Parent:ImageList
-            :ImageIndex := 26
+            :Caption           := "&New"
+            :ImageList         := :Parent:ImageList
+            :ImageIndex        := 26
+            :ShortCutText      := "Ctrl+N"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := ASC( "N" )
+            :Action            := {|| ::Application:Project:NewProject() }
             :Create()
-
-            WITH OBJECT MenuStripItem( :this )
-               :Caption           := "&Project"
-               :ImageIndex        := 21
-               :ShortCutText      := "Ctrl+Shift+N"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Shift := .T.
-               :ShortCutKey:Key   := ASC( "N" )
-               :Action            := {|| ::Application:Project:NewProject() }
-               :Create()
-            END
-
-            WITH OBJECT MenuStripItem( :this )
-               :Caption           := "&File"
-               :ImageIndex        := 22
-               :ShortCutText      := "Ctrl+N"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Key   := ASC( "N" )
-               :Action            := {||::Application:Project:NewSource() }
-               :Create()
-            END
-
-            WITH OBJECT ::Application:Props[ "NewFormItem" ] := MenuStripItem( :this )
-               :Caption           := "F&orm"
-               :ImageIndex        := 27
-               :ShortCutText      := "Ctrl+Shift+F"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Shift := .T.
-               :ShortCutKey:Key   := ASC( "F" )
-               :Action            := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(),) }
-               :Enabled           := .F.
-               :Create()
-            END
-
-            WITH OBJECT ::Application:Props[ "CustomControl" ] := MenuStripItem( :this )
-               :Caption           := "&Custom Control"
-               :ImageIndex        := 28
-               :BeginGroup        := .T.
-               :ShortCutText      := "Ctrl+Shift+C"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Shift := .T.
-               :ShortCutKey:Key   := ASC( "C" )
-               #ifdef VXH_ENTERPRISE
-                :Action           := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(,,.T.),) }
-               #else
-                :Action           := {|| MessageBox( , "Sorry, Custom Controls are available in the Enterprise edition only.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
-               #endif
-               :Enabled           := .F.
-               :Create()
-            END
          END
 
          WITH OBJECT MenuStripItem( :this )
-            :Caption    := "&Open"
-            :ImageList  := :Parent:ImageList
-            :ImageIndex := ::System:StdIcons:FileOpen
+            :Caption           := "&Open"
+            :ImageList         := :Parent:ImageList
+            :ImageIndex        := ::System:StdIcons:FileOpen
+            :ImageIndex        := 23
+            :ShortCutText      := "Ctrl+O"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := ASC( "O" )
+            :Action            := {||::Application:Project:Open() }
             :Create()
-
-            WITH OBJECT MenuStripItem( :this )
-               :Caption           := "&Project"
-               :ImageIndex        := 23
-               :ShortCutText      := "Ctrl+Shift+O"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Shift := .T.
-               :ShortCutKey:Key   := ASC( "O" )
-               :Action            := {||::Application:Project:Open() }
-               :Create()
-            END
-            WITH OBJECT ::Application:Props[ "FileOpenItem" ] := MenuStripItem( :this )
-               :Caption           := "&File"
-               :ImageIndex        := ::System:StdIcons:FileOpen
-               :ShortCutText      := "Ctrl+O"
-               :ShortCutKey:Ctrl  := .T.
-               :ShortCutKey:Key   := ASC( "O" )
-               :Action            := {||::Application:Project:OpenSource() }
-               :Create()
-            END
          END
 
          WITH OBJECT ::Application:CloseMenu := MenuStripItem( :this )
-            :Caption    := "&Close Project"
+            :Caption    := "&Close"
             :ImageIndex := 16
             :Enabled    := .F.
             :Create()
          END
 
          WITH OBJECT ::Application:SaveMenu := MenuStripItem( :this )
-            :Caption    := "&Save Project"
-            :ImageIndex := ::System:StdIcons:FileSave
-            :Enabled    := .F.
-            :BeginGroup := .T.
+            :Caption           := "&Save"
+            :ImageIndex        := ::System:StdIcons:FileSave
+            :Enabled           := .F.
+            :BeginGroup        := .T.
+            :ShortCutText      := "Ctrl+S"
             :Create()
          END
 
          WITH OBJECT ::Application:SaveAsMenu := MenuStripItem( :this )
-            :Caption    := "Save Project &As ... "
+            :Caption    := "Save &As ... "
             :ImageIndex := 0
             :Enabled    := .F.
             :Create()
@@ -786,47 +723,6 @@ METHOD Init() CLASS IDE_MainForm
                            oWait:Close()
                        >
 
-            :Enabled    := .F.
-            :Create()
-         END
-
-         WITH OBJECT ::Application:AddToProjectMenu := MenuStripItem( :this )
-            :Caption    := "&Add to project"
-            :Enabled    := .f.
-            :ImageList  := :Parent:ImageList
-            :BeginGroup := .T.
-            :Create()
-
-            WITH OBJECT ::Application:AddSourceMenu := MenuStripItem( :this )
-               :Caption    := "&Selected Program"
-               :ImageIndex := 0
-               :Action := {||::Application:Project:AddSource() }
-               :Enabled    := .F.
-               :Create()
-            END
-
-            WITH OBJECT ::Application:AddLibraryMenu := MenuStripItem( :this )
-               :Caption    := "&Binary Files (*.lib, *.obj)"
-               :ImageIndex := 0
-               :BeginGroup := .T.
-               :Action     := {||::Application:Project:AddBinary() }
-               :Create()
-            END
-
-            WITH OBJECT ::Application:Props[ "ImportResource" ] := MenuStripItem( :this )
-               :BeginGroup := .T.
-               :ImageIndex := 0
-               :Caption    := "&Project Resources"
-               :Action     := {|| ::Application:Project:ImportImages() }
-               :Create()
-            END
-
-         END
-
-         WITH OBJECT ::Application:RemoveSourceMenu := MenuStripItem( :this )
-            :Caption    := "&Remove from project"
-            :ImageIndex := 0
-            :Action     := {||::Application:Project:RemoveSource() }
             :Enabled    := .F.
             :Create()
          END
@@ -1207,26 +1103,26 @@ METHOD Init() CLASS IDE_MainForm
          :Create()
 
          WITH OBJECT ::Application:Props[ "NewFormProjItem" ] := MenuStripItem( :this )
-            :Caption      := "Add &Form"
-            :ImageIndex   := 27
-            :ShortCutText := "Ctrl+Shift+F"
+            :Caption           := "Add &Form"
+            :ImageIndex        := 27
+            :ShortCutText      := "Ctrl+Shift+F"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
             :ShortCutKey:Key   := ASC( "F" )
-            :Action       := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(),) }
-            :Enabled      := .F.
+            :Action            := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(),) }
+            :Enabled           := .F.
             :Create()
          END
 
          WITH OBJECT ::Application:Props[ "SaveItem" ] := MenuStripItem( :this )
-            :ImageIndex   := ::System:StdIcons:FileSave
-            :BeginGroup   := .T.
-            :Caption      := "Save"
-            :ShortCutText := "Ctrl+S"
-            :ShortCutKey:Ctrl := .T.
-            :ShortCutKey:Key  := ASC( "S" )
-            :Action       := {|| ::Application:Project:Save(.T.) }
-            :Enabled      := .F.
+            :ImageIndex        := ::System:StdIcons:FileSave
+            :BeginGroup        := .T.
+            :Caption           := "Save"
+            :ShortCutText      := "Ctrl+S"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := ASC( "S" )
+            :Action            := {|| ::Application:Project:Save(.T.) }
+            :Enabled           := .F.
             :Create()
          END
          WITH OBJECT ::Application:Props[ "ForceBuildItem" ] := MenuStripItem( :this )
@@ -1305,21 +1201,10 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT MenuStripItem( :this )
             :Caption           := "&Project"
             :ImageIndex        := 21
-            :ShortCutText      := "Ctrl+Shift+N"
-            :ShortCutKey:Ctrl  := .T.
-            :ShortCutKey:Shift := .T.
-            :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|| ::Application:Project:NewProject() }
-            :Create()
-         END
-
-         WITH OBJECT MenuStripItem( :this )
-            :Caption           := "&File"
-            :ImageIndex        := 22
             :ShortCutText      := "Ctrl+N"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {||::Application:Project:NewSource() }
+            :Action            := {|| ::Application:Project:NewProject() }
             :Create()
          END
 
@@ -1985,10 +1870,6 @@ METHOD Init() CLASS IDE_MainForm
                :Dock:Right    := :Parent
                :Dock:Margin   := 0
                :HasButtons    := .T.
-               :ImageList     := ImageList( :this, 16, 16 ):Create()
-               :ImageList:MaskColor := C_LIGHTCYAN
-               :ImageList:AddBitmap( "TREE" )
-               :ImageList:AddBitmap( "TBEXTRA" )
                :Create()
             END
          END
@@ -2430,42 +2311,17 @@ FUNCTION OnShowDesigner()
    IF oApp:Project:CurrentForm != NIL
       oApp:Project:EditReset(0)
    ENDIF
-   oApp:CloseMenu:Action  := {||oApp:Project:Close() }
-   oApp:CloseMenu:Caption := "&Close Project"
-   oApp:CloseMenu:Enable()
-
-   oApp:SaveMenu:Action  := {||oApp:Project:Save() }
-   oApp:SaveMenu:Caption := "Save Project"
-
-   oApp:SaveAsMenu:Action  := {||oApp:Project:SaveAs() }
-   oApp:SaveAsMenu:Caption := "Save Project &As ..."
-   oApp:SaveAsMenu:Enable()
-   
    oApp:SaveAllMenu:Enable()
 RETURN NIL
 
 FUNCTION OnShowEditors()
-   LOCAL cFile
    LOCAL oApp := __GetApplication()
-
    IF oApp:SourceEditor != NIL .AND. oApp:SourceEditor:DocCount > 0
       IF oApp:SourceEditor:Source == oApp:ProjectPrgEditor .OR. ASCAN( oApp:Project:Forms, {|o| o:Editor == oApp:SourceEditor:Source} ) > 0
          OnShowDesigner( oApp:DesignPage )
          RETURN NIL
       ENDIF
-
       oApp:Project:EditReset(0)
-
-      cFile := oApp:Project:CheckValidProgram()
-
-      oApp:CloseMenu:Action   := {||oApp:Project:CloseSource() }
-      oApp:CloseMenu:Caption  := "Close " + cFile + " Source File"
-
-      oApp:SaveMenu:Action    := {||oApp:Project:SaveSource() }
-      oApp:SaveMenu:Caption   := "Save " + cFile + " Source File"
-
-      oApp:SaveAsMenu:Action  := {||oApp:Project:SaveSourceAs(,.T.) }
-      oApp:SaveAsMenu:Caption := "Save " + cFile + " Source File &As ..."
    ENDIF
 RETURN NIL
 
@@ -2593,9 +2449,6 @@ CLASS Project
    DATA aImages          EXPORTED INIT {}
    DATA aRealSelection   EXPORTED
 
-   DATA cFileRemove      EXPORTED
-   DATA cSourceRemove    EXPORTED
-
    DATA __CustomOwner    EXPORTED INIT .F.
    DATA __ExtraLibs      EXPORTED INIT {}
    
@@ -2638,14 +2491,10 @@ CLASS Project
 
    METHOD NewSource()
    METHOD OpenSource()
-   METHOD CloseSource()
    METHOD SaveSource()
    METHOD SaveSourceAs()
-   METHOD AddSource()
-   METHOD RemoveSource()
-   METHOD AddBinary()
+   METHOD AddFile()
    METHOD SourceTabChanged()
-   METHOD CheckValidProgram()
 
    METHOD AlignRights()
    METHOD AlignLefts()
@@ -2718,7 +2567,7 @@ METHOD DelControl( oCtrl ) CLASS Project
          RETURN .F.
       ENDIF
    ENDIF
-   ::Application:Project:Modified := .T.
+   ::Modified := .T.
    ::CurrentForm:__lModified := .T.
 
    aAction := {}
@@ -2792,7 +2641,6 @@ METHOD NewProject() CLASS Project
 
    ::Application:Props[ "CloseBttn" ]:Enable()   // Close Button
    ::Application:Props[ "RunBttn"   ]:Enable()   // Run Button
-   ::Application:AddToProjectMenu:Enabled := .T.
 
    ::ProjectFile := CFile( "" )
    ::Properties := ProjProp()
@@ -2810,10 +2658,6 @@ METHOD NewProject() CLASS Project
    ::Properties:Path := cPath + "\" + cName
    ::Properties:Name := cName
 
-   ::Application:ObjectTree:InitProject()
-
-   //-----------------------------------------------------
-
    ::OpenDesigner(.F.)
 
    // Code Generation
@@ -2827,16 +2671,17 @@ METHOD NewProject() CLASS Project
 
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
-   ::Application:Props[ "NewFormItem"       ]:Enabled := .T.
-   ::Application:Props[ "FileOpenItem"      ]:Enabled := .T.
-   ::Application:Props[ "CustomControl"     ]:Enabled := .T.
+   ::Application:Props[ "NewFormItemEnabled"] := .T.
+   ::Application:Props[ "CustControlEnabled"] := .T.
    ::Application:Props[ "BttnCustomControl" ]:Enabled := .T.
    ::Application:Props[ "ResourceManager"   ]:Enabled := .T.
 
    ::Application:QuickForm:Enable()
-   ::Application:FileExplorer:UpdateView()
 
    ::Modified := .T.
+
+   ::Application:ObjectTree:InitProject()
+   ::Application:FileExplorer:InitProject()
 
    ::Application:EditorPage:Select()
    ::Application:SourceEditor:SetFocus()
@@ -2863,35 +2708,6 @@ METHOD SourceTabChanged( nCur ) CLASS Project
    ENDIF
    OnShowEditors()
 RETURN Self
-
-METHOD CheckValidProgram() CLASS Project
-   ::Application:SaveAsMenu:Enable()
-   ::Application:SaveAllMenu:Enable()
-   ::cFileRemove := NIL
-   IF EMPTY( ::Application:SourceEditor:Source:File )
-      ::Application:AddSourceMenu:Disable()
-      RETURN "Untitled"
-    ELSE
-      ::Application:CloseMenu:Enable()
-      IF ::Properties != NIL
-         IF ASCAN( ::Properties:Sources, ::Application:SourceEditor:Source:File ) > 0
-            ::Application:AddSourceMenu:Disable()
-            ::cSourceRemove := ::Application:SourceEditor:Source:File
-            ::Application:RemoveSourceMenu:Enable()
-          ELSEIF ASCAN( ::Forms, {|o| o:Editor:File == ::Application:SourceEditor:Source:File } ) > 0 .OR.;
-                 ::Application:SourceEditor:Source:File == ::Application:ProjectPrgEditor:File
-            ::Application:AddSourceMenu:Disable()
-            ::Application:RemoveSourceMenu:Disable()
-            ::cSourceRemove := NIL
-            ::Application:CloseMenu:Disable()
-          ELSE
-            ::Application:AddSourceMenu:Enable()
-            ::Application:RemoveSourceMenu:Disable()
-         ENDIF
-      ENDIF
-      RETURN ::Application:SourceEditor:Source:FileName
-   ENDIF
-RETURN ""
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -3538,14 +3354,23 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
-   LOCAL oWnd := ::CurrentForm
+   LOCAL aErrors := {}, oWnd := ::CurrentForm
    DEFAULT hTree TO 0
    DEFAULT lFromTab TO .F.
 
    ::CurrentForm:Hide()
 
    IF oWin:Cargo != NIL
-      ::LoadForm( oWin:Cargo,,, .T., oWin )
+      ::LoadForm( oWin:Cargo, @aErrors,, .T., oWin )
+
+      IF !EMPTY( aErrors )
+         ::Application:DebugWindow:Visible := .T.
+         ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+         ::Application:ErrorView:ProcessErrors( aErrors )
+         ::Application:ErrorView:Parent:Select()
+         ::Application:Yield()
+      ENDIF
+
       oWin:Cargo := NIL
       oWin:MoveWindow()
    ENDIF
@@ -3591,7 +3416,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
-   LOCAL oWin
+   LOCAL oWin, n
    DEFAULT lCustom TO .F.
    oWin := WindowEdit( ::Application:MainForm:FormEditor1, cFileName, lReset, lCustom )
 
@@ -3604,8 +3429,18 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
     ELSE
       AADD( ::Forms, oWin )
    ENDIF
+
    IF lReset // New Window button
-      ::Application:FileExplorer:UpdateView()
+      IF EMPTY( oWin:Editor:File )
+         WITH OBJECT oWin:Editor
+            :File := ::Properties:Path + "\" + ::Properties:Source + "\" + oWin:Name + ".prg"
+            n := RAT( "\", :File )
+            :FileName := SUBSTR( :File, n+1 )
+            :Path     := SUBSTR( :File, 1, n-1 )
+            :Modified := .T.
+         END
+      ENDIF
+      ::Application:FileExplorer:AddSource( oWin:Editor )
    ENDIF
 
    WITH OBJECT oWin
@@ -3648,7 +3483,7 @@ RETURN oWin
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Close( lCloseErrors, lClosing ) CLASS Project
-   LOCAL nRes, n, oMsg, lRem
+   LOCAL nRes, n, lRem
    DEFAULT lCloseErrors TO .T.
    DEFAULT lClosing TO .F.
 
@@ -3672,40 +3507,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    lRem := .F.
 
    FOR n := 1 TO ::Application:SourceEditor:DocCount
-       IF lCloseErrors
-          IF ( ( ::Application:ProjectPrgEditor == NIL .OR. !( ::Application:ProjectPrgEditor == ::Application:SourceEditor:aDocs[n] ) ) .AND. ASCAN( ::Forms, {|o| o:Editor == ::Application:SourceEditor:aDocs[n] } ) == 0 ) .AND.;
-               ( EMPTY( ::Application:SourceEditor:aDocs[n]:File ) .OR. ( ::Properties != NIL .AND. ASCAN( ::Properties:Sources, ::Application:SourceEditor:aDocs[n]:File ) == 0 ) )
-
-             IF ::Application:SourceEditor:aDocs[n]:Modified
-                IF nRes == NIL .AND. !EMPTY( ::Application:SourceEditor:aDocs[n]:FileName )
-                   oMsg := MsgBoxEx( ::Application:MainForm, "Save changes to "+::Application:SourceEditor:aDocs[n]:FileName+" before closing?", "Source File", IDI_QUESTION )
-                   nRes := oMsg:Result
-                   IF nRes == 4002 // No to All
-                      lRem := .T.
-                    ELSEIF nRes == 4001 // Yes to All
-                      nRes := IDYES
-                      lRem := .T.
-                   ENDIF
-                ENDIF
-                SWITCH nRes
-                   CASE IDYES
-                        IF EMPTY( ::Application:SourceEditor:aDocs[n]:File )
-                           ::SaveSourceAs( ::Application:SourceEditor:aDocs[n] )
-                         ELSE
-                           ::Application:SourceEditor:aDocs[n]:Save()
-                        ENDIF
-                        EXIT
-
-                   CASE IDCANCEL
-                        RETURN .F.
-                END
-                IF !lRem
-                   nRes := NIL
-                ENDIF
-             ENDIF
-             ::Application:SourceEditor:aDocs[n]:Modified := .F.
-          ENDIF
-       ENDIF
        ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
@@ -3753,16 +3554,14 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:Props[ "RunItem"           ]:Enabled := .F.
    ::Application:Props[ "ResourceManager"   ]:Enabled := .F.
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .F.
-   ::Application:Props[ "NewFormItem"       ]:Enabled := .F.
-   ::Application:Props[ "CustomControl"     ]:Enabled := .F.
+   ::Application:Props[ "NewFormItemEnabled"] := .F.
+   ::Application:Props[ "CustControlEnabled"] := .F.
    ::Application:Props[ "BttnCustomControl" ]:Enabled := .F.
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .F.
-   ::Application:Props[ "FileOpenItem"      ]:Enabled := .F.
 
    ::Application:QuickForm:Disable()
 
 
-   ::Application:AddToProjectMenu:Disable()
    ::Application:SaveMenu:Disable()
    ::Application:SaveAsMenu:Disable()
    ::Application:SaveAllMenu:Disable()
@@ -3884,111 +3683,39 @@ METHOD SaveSourceAs( oEditor, lSetTabName ) CLASS Project
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD CloseSource() CLASS Project
-   LOCAL nRes, n := 0
-   nRes := IDNO
-   IF ::Application:SourceEditor:Source:Modified
-      nRes := MessageBox( 0, "Save changes before closing?", ::Application:SourceEditor:Source:FileName, MB_YESNOCANCEL | MB_ICONQUESTION )
-      IF nRes == IDCANCEL
-         RETURN Self
-      ENDIF
-   ENDIF
-
-   IF nRes == IDYES
-      ::SaveSource()
-   ENDIF
-   ::Application:SourceEditor:Source:Close()
-   n := MIN( n, ::Application:SourceEditor:DocCount )
-   IF n > 0
-      ::SourceTabChanged( n )
-    ELSE
-      ::Application:SourceEditor:Caption := ""
-      ::Application:SourceEditor:Hide()
-
-      ::Application:CloseMenu:Caption := "&Close Project"
-      ::Application:CloseMenu:Disable()
-
-      ::Application:SaveMenu:Caption := "Save Project"
-      ::Application:SaveMenu:Disable()
-
-      ::Application:SaveAsMenu:Caption := "Save Project &As ..."
-      ::Application:SaveAsMenu:Disable()
-      
-      ::Application:SaveAllMenu:Disable()
-   ENDIF
-RETURN Self
-
-//-------------------------------------------------------------------------------------------------------
-
 METHOD NewSource() CLASS Project
    LOCAL oEditor
    ::Application:SourceEditor:Show()
    ::Application:SourceEditor:Enable()
 
    oEditor := Source( ::Application:SourceEditor )
-   oEditor:FileName  := "Untitled Source"
-   oEditor:TreeItem  := ::Application:FileExplorer:ExtSource:AddItem( oEditor:FileName, 16 )
-   oEditor:TreeItem:Cargo := oEditor
+   oEditor:FileName := "Untitled Source"
+
+   ::Application:FileExplorer:AddExtSource( oEditor )
+
    oEditor:TreeItem:Select()
    ::Application:FileExplorer:Parent:Select()
 
-   ::SourceTabChanged( ::Application:SourceEditor:DocCount )
    ::Application:EditorPage:Select()
 
    ::Application:SourceEditor:SetFocus()
-   ::Application:CloseMenu:Enable()
+
+   ::Modified := .T.
    OnShowEditors()
+   oEditor:FirstOpen := .F.
+
 RETURN Self
 
 METHOD OpenSource( cSource ) CLASS Project
-   LOCAL oFile, n, oEditor, aFilter
-   DEFAULT cSource TO ""
-   oFile := CFile( cSource )
-   oFile:AddFilter( "Source File (*.prg,*.c,*.cpp,*.rc)", "*.prg;*.c;*.cpp;*.rc" )
-   oFile:AddFilter( "Header File (*.ch,*.h)", "*.ch;*.h" )
-   oFile:AddFilter( "All Files (*.*)", "*.*" )
+   LOCAL oEditor
 
-   IF !EMPTY( cSource )
-      aFilter := { ".prg", ".c", ".cpp", ".rc", ".ch", ".h" }
-      n := RAT( ".", cSource )
-      IF ASCAN( oFile:Filter, SUBSTR( cSource, n ) ) == 0
-         RETURN Self
-      ENDIF
-   ENDIF
-
-   oFile:Path := ::Application:DefaultFolder
-   IF ::ProjectFile != NIL
-      oFile:Path := ::ProjectFile:Path
-      IF EMPTY( oFile:Path )
-         oFile:Path := ::Application:DefaultFolder
-      ENDIF
-   ENDIF
-   IF EMPTY( cSource )
-      oFile:Flags := OFN_EXPLORER | OFN_FILEMUSTEXIST
-      oFile:OpenDialog()
-      ::Application:MainForm:UpdateWindow()
-      IF oFile:Result == IDCANCEL
-         RETURN Self
-      ENDIF
-   ENDIF
-
-   IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| lower(o:File) == lower(oFile:Path+"\"+oFile:Name) } ) ) > 0
-      // File is open, just re-show
-
-      ::SourceTabChanged( n )
-
-      IF !::Application:SourceEditor:IsWindowVisible()
-         ::Application:EditorPage:Select()
-      ENDIF
-      ::Application:SourceEditor:SetFocus()
-      RETURN Self
-   ENDIF
    ::Application:SourceEditor:Show()
 
-   oEditor := Source( ::Application:SourceEditor, oFile:Path+"\"+oFile:Name )
-   oEditor:TreeItem  := ::Application:FileExplorer:ExtSource:AddItem( oEditor:File, 16 )
+   oEditor := Source( ::Application:SourceEditor, cSource )
+   oEditor:TreeItem  := ::Application:FileExplorer:ExtSource:AddItem( cSource, 16 )
    oEditor:TreeItem:Cargo := oEditor
    oEditor:TreeItem:Select()
+
    ::Application:FileExplorer:Parent:Select()
 
    ::SourceTabChanged( ::Application:SourceEditor:DocCount )
@@ -4000,73 +3727,45 @@ METHOD OpenSource( cSource ) CLASS Project
    OnShowEditors()
 RETURN Self
 
-METHOD AddSource( cFile ) CLASS Project
-   IF cFile != NIL
-      ::OpenSource( cFile )
-   ENDIF
-   DEFAULT cFile TO ::Application:SourceEditor:Source:File
-   AADD( ::Properties:Sources, cFile )
-   ::Application:RemoveSourceMenu:Enable()
-   ::Application:AddSourceMenu:Disable()
-   ::Application:FileExplorer:UpdateView()
-   ::Modified := .T.
-RETURN Self
-
-METHOD RemoveSource() CLASS Project
-   LOCAL n
-   IF ::cFileRemove != NIL
-      IF ( n := ASCAN( ::Properties:Binaries, ::cFileRemove ) ) > 0
-         ADEL( ::Properties:Binaries, n, .T. )
-      ENDIF
-    ELSE
-      IF ( n := ASCAN( ::Properties:Sources, ::cSourceRemove ) ) > 0
-         ADEL( ::Properties:Sources, n, .T. )
-      ENDIF
-   ENDIF
-   ::cFileRemove   := NIL
-   ::cSourceRemove := NIL
-   ::Application:RemoveSourceMenu:Disable()
-   ::Application:FileExplorer:UpdateView()
-   ::Modified := .T.
-RETURN Self
-
 //-------------------------------------------------------------------------------------------------------
 
-METHOD AddBinary( cFile ) CLASS Project
-   LOCAL oFile, n, c
+METHOD AddFile( cFile, lBin ) CLASS Project
+   LOCAL oFile
+   DEFAULT lBin TO .F.
    IF cFile == NIL
       oFile := CFile( NIL )
-      oFile:AddFilter( "Binary Files (*.lib,*.obj)", "*.lib;*.obj" )
+      IF lBin
+         oFile:AddFilter( "Binary Files (*.lib,*.obj)", "*.lib;*.obj" )
+       ELSE
+         oFile:AddFilter( "Source Files (*.prg, *.c)", "*.prg;*.c" )
+      ENDIF
       oFile:Path := SPACE(256)
       oFile:Name := SPACE(256)
       oFile:OpenDialog()
       IF oFile:Result == IDCANCEL
-         RETURN Self
+         RETURN .F.
       ENDIF
       cFile := oFile:Path + "\" + oFile:Name
    ENDIF
    ::Application:MainForm:UpdateWindow()
-   IF ASCAN( ::Properties:Binaries, cFile ) > 0
-      ::Application:MainForm:MessageBox( "The File " + cFile + " is already part of the project", "Add Binary", MB_ICONEXCLAMATION )
-      RETURN Self
-   ENDIF
+   
+   IF lBin
+      IF ASCAN( ::Properties:Binaries, cFile ) > 0
+         ::Application:MainForm:MessageBox( "The File " + cFile + " is already part of the project", "Project Files", MB_ICONEXCLAMATION )
+         RETURN .F.
+      ENDIF
+      ::Application:FileExplorer:AddExtBinary( cFile )
 
-   c := cFile
-   IF ( n := RAT( "\", cFile ) ) > 0
-      c := SUBSTR( cFile, n+1 )
+    ELSE
+      IF ASCAN( ::Application:SourceEditor:aDocs, {|o| lower(o:File) == lower(cFile) } ) > 0
+         ::Application:MainForm:MessageBox( "The File " + cFile + " is already part of the project", "Project Files", MB_ICONEXCLAMATION )
+         RETURN .F.
+      ENDIF
+      ::OpenSource( cFile )
    ENDIF
-
-   IF UPPER( c ) == "VXH.LIB"
-      ::Application:MainForm:MessageBox( "The File " + cFile + " is a system file and it's already part of the project", "Add Binary", MB_ICONEXCLAMATION )
-      RETURN Self
-   ENDIF
-
-   AADD( ::Properties:Binaries, cFile )
-   ::Application:FileExplorer:UpdateView()
    ::Modified := .T.
    ::Application:FileExplorer:ExpandAll()
-
-RETURN Self
+RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cProject ) CLASS Project
@@ -4074,7 +3773,7 @@ METHOD Open( cProject ) CLASS Project
    EXTERN MDIChildWindow
 
    LOCAL n, Xfm, aChildren, oWait
-   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, nLine, aErrors, aEditors, cProp, cSourcePath
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, cBin, nLine, aErrors, aEditors, cProp, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -4134,6 +3833,9 @@ METHOD Open( cProject ) CLASS Project
    ::aImages := {}
 
    ::Properties := ProjProp( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
+   ::Modified := .F.
+
+   ::Application:FileExplorer:InitProject()
 
    // Open Project.prg
    cSourcePath := ::Properties:Path + "\" + ::Properties:Source
@@ -4166,7 +3868,6 @@ METHOD Open( cProject ) CLASS Project
    ::OpenDesigner()
    ::Application:ToolBox:Enabled := .T.
 
-   ::Application:AddToProjectMenu:Enabled := .T.
    ::Application:QuickForm:Enable()
 
    ::Application:Props[ "RunBttn"           ]:Enabled := .T.
@@ -4174,11 +3875,10 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Props[ "RunItem"           ]:Enabled := .T.
    ::Application:Props[ "RunBttn"           ]:Enabled := .T.
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
-   ::Application:Props[ "NewFormItem"       ]:Enabled := .T.
-   ::Application:Props[ "CustomControl"     ]:Enabled := .T.
+   ::Application:Props[ "NewFormItemEnabled"] := .T.
+   ::Application:Props[ "CustControlEnabled"] := .T.
    ::Application:Props[ "BttnCustomControl" ]:Enabled := .T.
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
-   ::Application:Props[ "FileOpenItem"      ]:Enabled := .T.
    ::Application:Props[ "CloseBttn"         ]:Enabled := .T.
    ::Application:Props[ "SaveBttn"          ]:Enabled := .T.
    ::Application:Props[ "ForceBuildItem"    ]:Enabled := .T.
@@ -4189,9 +3889,7 @@ METHOD Open( cProject ) CLASS Project
 
    ::AppObject := Application():Init( .T. )
    ::AppObject:__ClassInst := __ClsInst( ::AppObject:ClassH )
-   ::Application:ObjectTree:InitProject()
 
-   ::Modified := .F.
    oWait:Position := 30
 
    IF FILE( cSourcePath +"\" + ::Properties:Name +"_XFM.prg" )
@@ -4206,7 +3904,11 @@ METHOD Open( cProject ) CLASS Project
       END
       oWait:Position := 40
       FClose( hFile )
+
+      ::Application:ProjectPrgEditor:TreeItem := ::Application:FileExplorer:Main
+      ::Application:FileExplorer:Main:Cargo := ::Application:ProjectPrgEditor
    ENDIF
+   ::Application:ObjectTree:InitProject()
 
    aEditors := {}
 
@@ -4226,17 +3928,27 @@ METHOD Open( cProject ) CLASS Project
        IF FILE( cSource )
           oEditor := Source( ::Application:SourceEditor )
           oEditor:Open( cSource )
+          ::Application:FileExplorer:AddExtSource( oEditor )
           ::SourceTabChanged( ::Application:SourceEditor:DocCount )
         ELSE
           AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cSource, "I/O Error"} )
        ENDIF
    NEXT
+   FOR EACH cBin IN ::Properties:Binaries
+       view cBin
+       IF FILE( cBin )
+          ::Application:FileExplorer:AddExtBinary( cBin )
+        ELSE
+          AADD( aErrors, { ::Properties:Name, "0", "Open error: " + cBin, "I/O Error"} )
+       ENDIF
+   NEXT
+
    oWait:Position := 80
 
    IF !EMPTY( aErrors )
-      ::Application:DebugWindow:Show()
+      ::Application:DebugWindow:Visible := .T.
       ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
-      ::Application:ErrorView:ProcessErrors( , aErrors )
+      ::Application:ErrorView:ProcessErrors( aErrors )
       ::Application:ErrorView:Parent:Select()
       ::Application:Yield()
       ::Application:Cursor := NIL
@@ -4244,15 +3956,12 @@ METHOD Open( cProject ) CLASS Project
       RETURN ::Close(.F.)
    ENDIF
 
-   ::Application:FileExplorer:UpdateView()
-
    // Initialize everything !!!!!
    IF LEN( ::Forms ) > 0
       ::CurrentForm := ::Forms[1]
 
       ::SelectBuffer(.F.)
       IF ::CurrentForm != NIL
-         ::CheckValidProgram()
          ::Application:DesignPage:Select()
 
          oWait:Position := 90
@@ -4435,9 +4144,11 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
 
    ::Application:ObjectTree:Set( oForm )
    IF oForm:Editor:TreeItem == NIL
-      oForm:Editor:TreeItem := oForm:TreeItem:AddItem( oForm:Editor:FileName, ::Application:ObjectTree:nPrgImg,, .T. )
+      oForm:Editor:TreeItem := oForm:TreeItem:AddItem( oForm:Editor:FileName, ::Application:ObjectTree:nPrgImg,, TVI_FIRST )
       oForm:Editor:TreeItem:Cargo := oForm:Editor
    ENDIF
+
+   ::Application:FileExplorer:AddSource( oForm:Editor )
 
    oForm:__lLoading := .F.
 RETURN .T.
@@ -4839,8 +4550,6 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
    CATCH oErr
       IF oErr != NIL
-         ::Application:DebugWindow:Visible := .T.
-         ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
          IF Empty( oErr:ProcName )
             AADD( aErrors, { cFile, NTRIM( nLine ), "PARSER", IIF( VALTYPE( oErr:Description ) == "C", oErr:Description, "" ) } )
           ELSE
@@ -5006,15 +4715,13 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       ::Properties:ClassID := UPPER( CreateUUID() )
    ENDIF
 
-   ::Properties:Save()
-
    aEditors := ::Application:SourceEditor:aDocs
 
    cSourcePath := cPath + "\" + ::Properties:Source
 
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
-          IF (:Modified .OR. lForce) .AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
+          IF (:Modified .OR. lForce) //.AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
              :Save()
              IF :PrevFile != NIL
                 FERASE( cSourcePath + "\" + :PrevFile + ".prg" )
@@ -5152,31 +4859,43 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    NEXT
 
    IF ::Properties:ThemeActive
-      oFile := CFile( ::Properties:Name + ".XML" )
+      oFile := CFile( ::Properties:Name + ".exe.manifest" )
       oFile:Path := cPath + "\" + ::Properties:Resource
       oFile:FileBuffer := ;
-         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                    + CRLF +;
-         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'  + CRLF +;
-         '<assemblyIdentity'                                                          + CRLF +;
-         '    version="1.0.0.0"'                                                      + CRLF +;
-         '    processorArchitecture="X86"'                                            + CRLF +;
-         '    name="CompanyName.ProductName.YourApp"'                                 + CRLF +;
-         '    type="win32"'                                                           + CRLF +;
-         '/>'                                                                         + CRLF +;
-         '<description>Your application description here.</description>'              + CRLF +;
-         '<dependency>'                                                               + CRLF +;
-         '    <dependentAssembly>'                                                    + CRLF +;
-         '        <assemblyIdentity'                                                  + CRLF +;
-         '            type="win32"'                                                   + CRLF +;
-         '            name="Microsoft.Windows.Common-Controls"'                       + CRLF +;
-         '            version="6.0.0.0"'                                              + CRLF +;
-         '            processorArchitecture="X86"'                                    + CRLF +;
-         '            publicKeyToken="6595b64144ccf1df"'                              + CRLF +;
-         '            language="*"'                                                   + CRLF +;
-         '        />'                                                                 + CRLF +;
-         '    </dependentAssembly>'                                                   + CRLF +;
-         '</dependency>'                                                              + CRLF +;
-         '</assembly>'                                                                + CRLF
+         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                       + CRLF +;
+         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'     + CRLF +;
+         '   <assemblyIdentity'                                                          + CRLF +;
+         '      version="1.0.0.0"'                                                       + CRLF +;
+         '      processorArchitecture="*"'                                             + CRLF +;
+         '      name="CompanyName.ProductName.YourApp"'                                  + CRLF +;
+         '      type="win32"'                                                            + CRLF +;
+         '   />'                                                                         + CRLF +;
+         '   <description>Your application description here.</description>'              + CRLF +;
+         '   <dependency>'                                                               + CRLF +;
+         '      <dependentAssembly>'                                                     + CRLF +;
+         '         <assemblyIdentity'                                                    + CRLF +;
+         '            type="win32"'                                                      + CRLF +;
+         '            name="Microsoft.Windows.Common-Controls"'                          + CRLF +;
+         '            version="6.0.0.0"'                                                 + CRLF +;
+         '            processorArchitecture="*"'                                         + CRLF +;
+         '            publicKeyToken="6595b64144ccf1df"'                                 + CRLF +;
+         '            language="*"'                                                      + CRLF +;
+         '         />'                                                                   + CRLF +;
+         '      </dependentAssembly>'                                                    + CRLF +;
+         '   </dependency>'                                                              + CRLF
+   IF ::Properties:Compatibility
+      oFile:FileBuffer += ;
+         '   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">'         + CRLF +;
+         '      <application>'                                                           + CRLF +;
+         '         <!--The ID below indicates application support for Windows Vista -->' + CRLF +;
+         '         <supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}" />'          + CRLF +;
+         '         <!--The ID below indicates application support for Windows 7 -->'     + CRLF +;
+         '         <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" />'          + CRLF +;
+         '      </application>'                                                          + CRLF +;
+         '   </compatibility>'                                                           + CRLF
+   ENDIF
+      oFile:FileBuffer += ;
+         '</assembly>'                                                                   + CRLF
 
       oFile:Save()
    ENDIF
@@ -5185,7 +4904,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    oFile:Path := cPath + "\" + ::Properties:Resource
 
    IF ::Properties:ThemeActive
-      cBuffer := 'IDOK MANIFEST "' + ::Properties:Name + '.XML"' + CRLF
+      cBuffer := '1 24 "' + ::Properties:Name + '.exe.manifest"' + CRLF
     ELSE
       cBuffer := ""
    ENDIF
@@ -5297,6 +5016,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    oFile:FileBuffer := cBuffer
    oFile:Save()
    //OutputDebugString( " Saving finished: " + xStr( Seconds()-nSecs ) )
+
+   ::Properties:Save()
+
 
    ::Built := .F.
 
@@ -5453,7 +5175,11 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
           IF cProperty == NIL
              IF hOleVars == NIL
-                cProp := __GetProperCase( __Proper( aProperty[1] ) )[1]
+                IF __ObjHasMsg( oCtrl, "__a_"+aProperty[1] )
+                   cProp := __objSendMsg( oCtrl, "__a_"+aProperty[1] )[1]
+                 ELSE
+                   cProp := __GetProperCase( __Proper( aProperty[1] ) )[1]
+                ENDIF
                ELSE
                 cProp := aProperty
              ENDIF
@@ -5657,32 +5383,30 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
           x := RAT( "\", aEntries[n] )
           IF LEN( ::Application:aoLinks ) < n
              oLink := LinkLabel( ::Application:MainForm:Panel4 )
-             oLink:ImageIndex  := 32
-             oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-             oLink:Left        := 30
-             oLink:Top         := nBkHeight + 2
-             oLink:Url         := aEntries[n]
-             oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
-             oLink:Font:Bold   := .T.
+             oLink:ImageIndex   := 32
+             oLink:Caption      := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+             oLink:Left         := 30
+             oLink:Top          := nBkHeight + 2
+             oLink:Url          := aEntries[n]
+             oLink:Tooltip:Text := aEntries[n]
+             oLink:Action       := {|o| ::Application:Project:Open( o:Url ) }
              oLink:Create()
              AADD( ::Application:aoLinks, oLink )
            ELSE
              oLink := ::Application:aoLinks[n]
-             oLink:Caption     := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-             oLink:Url         := aEntries[n]
-             oLink:Action      := {|o| ::Application:Project:Open( o:Url ) }
+             oLink:Caption      := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+             oLink:Url          := aEntries[n]
+             oLink:Tooltip:Text := aEntries[n]
           ENDIF
        ENDIF
+
        nBkHeight := oLink:Top + oLink:Height
        IF nBkHeight > oLink:Parent:Height-( (oLink:Height*3 )*1.5)
           lLink := .F.  
        ENDIF
    NEXT
-
    ::Application:IniFile:Write( "Recent", aEntries )
-
    ::Application:GenerateMembers := lMems
-
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -5762,7 +5486,7 @@ RETURN 0
 #define TYPE_HRB        13
 
 METHOD Build( lForce ) CLASS Project
-   LOCAL n, cProject, cExe, cResPath
+   LOCAL n, cProject, cExe, cResPath, oItem
    LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp, cVar, cInc, aInc
    LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude
 
@@ -5903,7 +5627,8 @@ METHOD Build( lForce ) CLASS Project
              ENDIF
          NEXT
 
-         FOR EACH cSource IN ::Application:Project:Properties:Sources
+         FOR EACH oItem IN ::Application:FileExplorer:ExtSource:Items
+             cSource := oItem:Cargo:File
              IF oHrb != NIL
                 oHrb:FileBuffer += '#include ' + ValToPrgExp( cSource ) + CRLF
               ELSE
@@ -5959,8 +5684,8 @@ METHOD Build( lForce ) CLASS Project
                :AddFiles( ::Application:IniFile:ReadString( "General", "SQL lib", "sql.lib" ) )
             ENDIF
 
-            FOR EACH cSource IN ::Application:Project:Properties:Binaries
-               :AddFiles( cSource )
+            FOR EACH oItem IN ::Application:FileExplorer:ExtBinary:Items
+               :AddFiles( oItem:Cargo:File )
             NEXT
 
          ENDIF
@@ -6046,7 +5771,7 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
 
    oApp:DebugWindow:Show()
    oApp:Yield()
-   oApp:ErrorView:ProcessErrors( oError, aErrors, cLog )
+   oApp:ErrorView:ProcessErrors( aErrors )
    oApp:ErrorView:Parent:Select()
 RETURN .T.
 
@@ -6565,11 +6290,11 @@ RETURN NIL
 
 CLASS ProjProp INHERIT Component
 
-   DATA __TargetTypes EXPORTED INIT { "Executable", "Library", "Dynamic Load Library", "Harbour PCode", "Ole Server" }
+   DATA TargetType    PUBLISHED INIT 1
+   DATA EnumTargetType EXPORTED INIT { { "Executable", "Library", "Dynamic Load Library", "Harbour PCode", "Ole Server" }, {1,2,3,4,5} }
 
    DATA ClsName       EXPORTED INIT "ProjProp"
 
-   DATA TargetType    PUBLISHED INIT 1
 
    DATA Binary        PUBLISHED INIT "Bin"
    DATA Objects       PUBLISHED INIT "Obj"
@@ -6590,6 +6315,7 @@ CLASS ProjProp INHERIT Component
    DATA Parameters    PUBLISHED INIT ""
    DATA MultiThread   PUBLISHED INIT .F.
    DATA GUI           PUBLISHED INIT .F.
+   DATA Compatibility PUBLISHED INIT .F.
 
    DATA ClassID       EXPORTED INIT ""
    DATA Files         EXPORTED
@@ -6643,7 +6369,7 @@ METHOD Init( cFile ) CLASS ProjProp
 
       ::Files         := ::oIni:GetEntries( "Files" )
       ::Sources       := ::oIni:GetEntries( "Sources" )
-      ::Binaries      := ::oIni:GetEntries( "Binaries" )
+      ::Binaries      := ::oIni:GetSectionEntries( "Binaries" )
 
       ::ExtImages     := ::oIni:GetSectionEntries( "ExtImages" )
       ::Resources     := ::oIni:GetSectionEntries( "Resources" )
@@ -6657,7 +6383,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS ProjProp
-   LOCAL oWnd, oFile, cSource, cBkMk, n
+   LOCAL oWnd, oFile, cSource, oItem
 
    oFile := CFile( ::Name + ".vxh" )
 
@@ -6689,17 +6415,13 @@ METHOD Save() CLASS ProjProp
    NEXT
 
    oFile:FileBuffer += CRLF + "[Sources]"
-   FOR EACH cSource IN ::Sources
-       cBkMk := ""
-       IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| UPPER(o:File)==UPPER(cSource)} ) ) > 0
-          cBkMk := ::Application:SourceEditor:aDocs[n]:GetBookmarks()
-       ENDIF
-       oFile:FileBuffer += CRLF + cSource +"=" + cBkMk
+   FOR EACH oItem IN ::Application:FileExplorer:ExtSource:Items
+       oFile:FileBuffer += CRLF + oItem:Cargo:File + "=" + oItem:Cargo:GetBookmarks()
    NEXT
 
    oFile:FileBuffer += CRLF + "[Binaries]"
-   FOR EACH cSource IN ::Binaries
-       oFile:FileBuffer += CRLF + cSource +"="
+   FOR EACH oItem IN ::Application:FileExplorer:ExtBinary:Items
+       oFile:FileBuffer += CRLF + oItem:Cargo:File
    NEXT
 
    oFile:FileBuffer += CRLF + "[ExtImages]"
@@ -7294,3 +7016,20 @@ RETURN NIL
 
 FUNCTION xEditListView()
 RETURN NIL
+
+CLASS ProjectFile
+   DATA TreeItem  EXPORTED
+   DATA File      EXPORTED INIT ""
+   DATA FileName  EXPORTED
+   DATA lSource   EXPORTED INIT .F.
+   DATA Form      EXPORTED
+   DATA Path      EXPORTED
+
+   METHOD Init() CONSTRUCTOR
+   METHOD Close() INLINE .T.
+ENDCLASS
+
+METHOD Init( cFile ) CLASS ProjectFile
+   ::File := cFile
+RETURN Self
+

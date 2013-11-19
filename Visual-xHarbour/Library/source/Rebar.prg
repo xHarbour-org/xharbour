@@ -31,7 +31,6 @@ CLASS CoolBar FROM Control
    DATA Repaint              EXPORTED  INIT .T.
    DATA Bands                EXPORTED  INIT {}
    DATA lDestroyed           PROTECTED INIT .F.
-//   ACCESS Height             INLINE    ::GetHeight()
    DATA hWndBand             PROTECTED
    DATA rbi                  PROTECTED
    DATA nmr                  PROTECTED
@@ -45,9 +44,7 @@ CLASS CoolBar FROM Control
    ASSIGN BackColor( n )     INLINE    ::SetBkColor(n)
 
    PROPERTY Vertical        INDEX CCS_VERT            READ xVertical        WRITE SetStyle DEFAULT .F.
-//   PROPERTY VerticalGripper INDEX RBS_VERTICALGRIPPER READ xVerticalGripper WRITE SetStyle DEFAULT .F.
 
-//   DATA Dock                 EXPORTED
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
    METHOD Init() CONSTRUCTOR
@@ -369,7 +366,7 @@ CLASS CoolBarBand INHERIT Control
    DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
    
-   PROPERTY BandChild  GET __ChkComponent( Self, @::xBandChild ) SET SetChild
+   PROPERTY BandChild  GET __ChkComponent( Self, @::xBandChild ) SET ::SetChild(v)
    
    PROPERTY Caption                          READ xCaption   WRITE SetCaption
    PROPERTY MinWidth                         READ xMinWidth  WRITE SetMinWidth    DEFAULT 200

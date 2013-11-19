@@ -8,11 +8,13 @@
 #include "debug.ch"
 #include "commdlg.ch"
 
-#define FILE_ATTRIBUTE_NORMAL   0x00000080
-#define SHGFI_SMALLICON         0x000000001
-#define SHGFI_SHELLICONSIZE     0x000000004
-#define SHGFI_USEFILEATTRIBUTES 0x000000010
-#define SHGFI_ICON              0x000000100
+#define FILE_ATTRIBUTE_NORMAL    0x00000080
+#define FILE_ATTRIBUTE_DIRECTORY 0x00000010
+
+#define SHGFI_SMALLICON          0x000000001
+#define SHGFI_SHELLICONSIZE      0x000000004
+#define SHGFI_USEFILEATTRIBUTES  0x000000010
+#define SHGFI_ICON               0x000000100
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -442,6 +444,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
    LOCAL hIcon, n, cName := oObj:__xCtrlName
+   DEFAULT lChange TO .F.
 
    n := ASCAN( ::aImages, {|a| a[1] == oObj:Name} )
    IF n > 0
@@ -581,14 +584,61 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS FileExplorer INHERIT TreeView
-   DATA Changing   EXPORTED INIT .F.
+   DATA Project    EXPORTED
+   DATA Main       EXPORTED
    DATA ExtSource  EXPORTED
-   DATA nPrgImg    EXPORTED INIT -1
-   METHOD UpdateView()
+   DATA ExtBinary  EXPORTED
+   DATA aExt       EXPORTED INIT {".prg",".c",".lib",".obj"}
+
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+
+   METHOD InitProject()
+
+   METHOD AddSource()
+   METHOD AddExtSource()
+   METHOD AddExtBinary()
+
    METHOD OnSelChanged()
    METHOD OnDropFiles()
    METHOD OnUserMsg()
+   METHOD OnRightClick()
+   METHOD GetImage()
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Init( oParent ) CLASS FileExplorer
+   LOCAL cExt, shfi := (struct SHFILEINFO)
+
+   Super:Init( oParent )
+
+   ::ImageList := ImageList( Self, 16, 16 ):Create()
+
+   SHGetFileInfo( GetModuleFileName(), FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+   ::ImageList:AddIcon( shfi:hIcon )
+
+   SHGetFileInfo( GetWindowsDirectory(), FILE_ATTRIBUTE_DIRECTORY, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+   ::ImageList:AddIcon( shfi:hIcon )
+
+   FOR EACH cExt IN ::aExt
+       SHGetFileInfo( cExt, FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+       ::ImageList:AddIcon( shfi:hIcon )
+   NEXT
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Create() CLASS FileExplorer
+   Super:Create()
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD GetImage( cFile )  CLASS FileExplorer
+   LOCAL n, cExt := RIGHT( cFile, LEN(cFile)-RAT( ".", cFile )+1 )
+   n := ASCAN( ::aExt, {|c|lower(c)==lower(cExt)} )
+   IF n > 0
+      n += 2
+   ENDIF
+RETURN n
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg ) CLASS FileExplorer
@@ -611,68 +661,125 @@ METHOD OnDropFiles() CLASS FileExplorer
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD UpdateView() CLASS FileExplorer
-   LOCAL shfi := (struct SHFILEINFO), Form, MainItem, oEditor, SubItem, Item, cFile := ::Application:Project:Properties:Name
-   DEFAULT cFile TO "Untitled"
+METHOD InitProject() CLASS FileExplorer
+   LOCAL cName := ::Application:Project:Properties:Name
+
    ::ResetContent()
 
-   MainItem := ::AddItem( cFile+".vxh", 6 )
-   MainItem:Bold := .T.
-   
-   Item := MainItem:AddItem( cFile+"_Main.prg"+IIF( ::Application:ProjectPrgEditor:Modified, " *", ""), 16 )
-   Item:Cargo := ::Application:ProjectPrgEditor
-   ::Application:ProjectPrgEditor:TreeItem := Item
+   ::Project := ::AddItem( cName, 1 )
+   ::Project:Bold := .T.
 
-   IF ::nPrgImg == -1
-      SHGetFileInfo( ".prg", FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
-      ::ImageList:AddIcon( shfi:hIcon )
-      ::nPrgImg := ::ImageList:Count
+   ::Main := ::Project:AddItem( cName + "_Main.prg" + IIF( ::Application:ProjectPrgEditor != NIL .AND. ::Application:ProjectPrgEditor:Modified, " *", ""), ::GetImage( cName + "_Main.prg" )  )
+   ::Main:Cargo := ::Application:ProjectPrgEditor
+   IF ::Application:ProjectPrgEditor != NIL
+      ::Application:ProjectPrgEditor:TreeItem := ::Main
    ENDIF
 
-   FOR EACH Form IN ::Application:Project:Forms
-       SubItem := MainItem:AddItem( Form:Name + ".prg"+IIF( Form:Editor:Modified, " *", ""), ::nPrgImg )
-       SubItem:Cargo := Form:Editor
-       SubItem:Cargo:TreeItem := SubItem
-   NEXT
-   ::ExtSource := MainItem:AddItem( "External Source Files", 20 )
+   ::ExtSource := ::Project:AddItem( "External Source Files", 2 )
    ::ExtSource:Bold := .T.
-   IF !EMPTY( ::Application:Project:Properties:Sources )
-      FOR EACH cFile IN ::Application:Project:Properties:Sources
-          oEditor := ::Application:SourceEditor:GetEditor( cFile )
-          SubItem := ::ExtSource:AddItem( cFile+IIF( oEditor:Modified, " *", ""), ::nPrgImg )
-          SubItem:Cargo := oEditor
-          SubItem:Cargo:TreeItem := SubItem
-      NEXT
-   ENDIF
-   IF !EMPTY( ::Application:Project:Properties:Binaries )
-      Item := MainItem:AddItem( "External Binary Files", 19 )
-      Item:Bold := .T.
-      FOR EACH cFile IN ::Application:Project:Properties:Binaries
-          SubItem := Item:AddItem( cFile, 19 )
-      NEXT
-   ENDIF
-   ::ExpandAll()
+
+   ::ExtBinary := ::Project:AddItem( "External Binary Files", 2 )
+   ::ExtBinary:Bold := .T.
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD AddSource( oEditor ) CLASS FileExplorer
+   LOCAL cFile := oEditor:FileName
+   cFile += IIF( oEditor:Modified, " *", "" )
+   oEditor:TreeItem := ::Project:AddItem( cFile, ::GetImage( oEditor:FileName ),, ::Project:Items[-3]:hItem  )
+   oEditor:TreeItem:Cargo := oEditor
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD AddExtSource( oEditor ) CLASS FileExplorer
+   LOCAL cFile := oEditor:FileName
+   cFile += IIF( oEditor:Modified, " *", "" )
+   oEditor:TreeItem := ::ExtSource:AddItem( cFile, ::GetImage( oEditor:FileName ) )
+   oEditor:TreeItem:Cargo := oEditor
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD AddExtBinary( cFile ) CLASS FileExplorer
+   LOCAL oFile := ProjectFile( cFile )
+   oFile:TreeItem := ::ExtBinary:AddItem( cFile, ::GetImage( cFile ) )
+   oFile:TreeItem:Cargo := oFile
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS FileExplorer
-   ::Application:Project:cFileRemove   := NIL
-   ::Application:Project:cSourceRemove := NIL
-   ::Application:RemoveSourceMenu:Disable()
-   IF oItem:Owner != NIL
-      IF oItem:Owner:Text == "External Binary Files" 
-         ::Application:Project:cFileRemove := oItem:Text
-         ::Application:RemoveSourceMenu:Enable()
-       ELSEIF oItem:Owner:Text == "External Source Files" 
-         ::Application:Project:cSourceRemove := oItem:Text
-         ::Application:RemoveSourceMenu:Enable()
-      ENDIF
-   ENDIF   
    IF oItem:Cargo != NIL
-      ::Application:SourceEditor:Source := oItem:Cargo
-      ::Application:Project:EditReset()
-      IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
-         ::PostMessage( WM_USER + 555 )
+      IF oItem:Cargo:lSource
+         ::Application:SourceEditor:Source := oItem:Cargo
+         ::Application:Project:EditReset()
+         IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
+            ::PostMessage( WM_USER + 555 )
+         ENDIF
       ENDIF
    ENDIF
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD OnRightClick() CLASS FileExplorer
+   LOCAL pt := (struct POINT), oItem, oMenu, oSel, lGroup := .F.
+   
+   GetCursorPos( @pt )
+   ScreenToClient( ::hWnd, @pt )
+   oSel := ::HitTest( pt:x, pt:y )
+
+   oMenu := ContextStrip( Self )
+   oMenu:Create()
+
+   IF oSel == ::Project
+      oItem            := MenuStripItem( oMenu )
+      oItem:Text       := "&New Form"
+      oItem:Action     := {|| ::Application:Project:AddWindow() }
+      oItem:Enabled    := ::Application:Props[ "NewFormItemEnabled" ]
+      oItem:Create()
+      oItem            := MenuStripItem( oMenu )
+      oItem:Text       := "&Add Existing Form"
+      oItem:Create()
+      oItem            := MenuStripItem( oMenu )
+      oItem:BeginGroup := .T.
+      oItem:Text       := "&New Custom Control"
+      oItem:Enabled    := ::Application:Props[ "CustControlEnabled"]
+      #ifdef VXH_ENTERPRISE
+      oItem:Action     := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(,,.T.),) }
+      #else
+      oItem:Action     := {|| MessageBox( , "Sorry, Custom Controls are available in the Enterprise edition only.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
+      #endif
+      oItem:Create()
+
+    ELSEIF oSel == ::ExtBinary
+      oItem            := MenuStripItem( oMenu )
+      oItem:Text       := "&Add existing file"
+      oItem:Action     := {|| ::Application:Project:AddFile(,.T.) }
+      oItem:Create()
+
+    ELSEIF oSel == ::ExtSource
+      oItem            := MenuStripItem( oMenu )
+      oItem:Text       := "&New file"
+      oItem:Action     := {|| ::Application:Project:NewSource() }
+      oItem:Create()
+
+      oItem := MenuStripItem( oMenu )
+      oItem:BeginGroup := .T.
+      oItem:Text       := "&Add existing file"
+      oItem:Action     := {|| ::Application:Project:AddFile() }
+      oItem:Create()
+   ENDIF
+   IF oSel:Cargo != NIL .AND. oSel:Cargo:Form == NIL
+
+      oItem := MenuStripItem( oMenu )
+      oItem:Text    := "&Remove"
+      oItem:Action  := <||
+                        IF oSel:Cargo:Close()
+                           oSel:Delete()
+                           ::Application:Project:Modified := .T.
+                        ENDIF
+                        RETURN NIL
+                       >
+      oItem:Create()
+   ENDIF
+   GetCursorPos( @pt )
+   oMenu:Show( pt:x, pt:y )
+RETURN NIL

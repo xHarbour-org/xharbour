@@ -352,36 +352,7 @@ CLASS Application
    DATA GenerateMembers                PUBLISHED INIT .T.
    DATA EditBoxFocusBorder             PUBLISHED INIT .F.
    
-   DATA __Cursors                      EXPORTED  INIT { "None",;
-                                                         "Arrow"       ,;
-                                                         "Help"        ,;
-                                                         "Working"     ,;
-                                                         "Busy"        ,;
-                                                         "Cross"       ,;
-                                                         "TextSelect"  ,;
-                                                         "Unavailable" ,;
-                                                         "SizeNS"      ,;
-                                                         "SizeWE"      ,;
-                                                         "SizeNESW"    ,;
-                                                         "SizeNWSE"    ,;
-                                                         "SizeAll"     ,;
-                                                         "UpArrow"    ,;
-                                                         "LinkSelect"  }
-   DATA __CursorValues                 EXPORTED  INIT { NIL,;
-                                                         IDC_ARROW        ,;
-                                                         IDC_HELP         ,;
-                                                         IDC_APPSTARTING  ,;
-                                                         IDC_WAIT         ,;
-                                                         IDC_CROSS        ,;
-                                                         IDC_IBEAM        ,;
-                                                         IDC_NO           ,;
-                                                         IDC_SIZENS       ,;
-                                                         IDC_SIZEWE       ,;
-                                                         IDC_SIZENESW     ,;
-                                                         IDC_SIZENWSE     ,;
-                                                         IDC_SIZEALL      ,;
-                                                         IDC_UPARROW      ,;
-                                                         IDC_HAND          }
+   ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
 
    DATA __Accelerators                 EXPORTED  INIT {}
    DATA __InstMsg                      PROTECTED

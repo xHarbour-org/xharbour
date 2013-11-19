@@ -20,6 +20,11 @@
 
 //#define __PARENTDOCKING__
 
+#define ETDT_DISABLE        0x00000001
+#define ETDT_ENABLE         0x00000002
+#define ETDT_USETABTEXTURE  0x00000004
+#define ETDT_ENABLETAB      (ETDT_ENABLE | ETDT_USETABTEXTURE)
+
 #define CTYPE_BOOL                 9
 #define PP_MOVEOVERLAY 8
 #define HKEY_CLASSES_ROOT            (0x80000000)
@@ -66,7 +71,7 @@
 #define KEY_NOTIFY                    0x0010
 #define KEY_CREATE_LINK               0x0020
 
-
+#define WM_SYS_SHOWMODE               32768
 
 #Define WT_DIALOG     0
 #Define WT_WINDOW     1
@@ -136,19 +141,21 @@ static aMessages := {;
 //-----------------------------------------------------------------------------------------------
 
 CLASS Window INHERIT Object
-   // IDE Published properties
 
-   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
+   // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
+   PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) SET ( ::xBackColor := v, ::SetBackColor( v ) )
+   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) SET ( ::xForeColor := v, ::SetForeColor( v ) )
+   PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu )
 
-   PROPERTY Left          INDEX 1                   READ xLeft           WRITE __SetSizePos
-   PROPERTY Top           INDEX 2                   READ xTop            WRITE __SetSizePos
-   PROPERTY Width         INDEX 3                   READ xWidth          WRITE __SetSizePos
-   PROPERTY Height        INDEX 4                   READ xHeight         WRITE __SetSizePos
+   PROPERTY Left          ROOT "Position"                                                              SET ::__SetSizePos( 1, v )
+   PROPERTY Top           ROOT "Position"                                                              SET ::__SetSizePos( 2, v )
+   PROPERTY Width         ROOT "Size"                                                                  SET ::__SetSizePos( 3, v )
+   PROPERTY Height        ROOT "Size"                                                                  SET ::__SetSizePos( 4, v )
 
-   PROPERTY Cursor                                  READ xCursor         WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED
-   PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge     WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY ControlParent INDEX WS_EX_CONTROLPARENT READ xControlParent  WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY Cursor                                                                                     SET ::__SetWindowCursor(v)                 DEFAULT IDC_ARROW PROTECTED
+   PROPERTY StaticEdge                                                                                 SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F.       PROTECTED
+   PROPERTY ClientEdge                                                                                 SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.       PROTECTED
+   PROPERTY ControlParent                                                                              SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F.       PROTECTED
 
    PROPERTY Visible       INDEX WS_VISIBLE          READ xVisible        WRITE SetStyle          DEFAULT .T.       PROTECTED
    PROPERTY Enabled       INDEX WS_DISABLED         READ xEnabled        WRITE SetStyle          DEFAULT .T.       PROTECTED
@@ -161,6 +168,14 @@ CLASS Window INHERIT Object
    PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate     WRITE SetExStyle        DEFAULT .F.       PROTECTED
 
    PROPERTY Theming READ xTheming WRITE __SetTheming DEFAULT .T. PROTECTED
+   PROPERTY Text               READ xText WRITE SetWindowText DEFAULT ""
+   PROPERTY Font
+   PROPERTY ToolTip
+   PROPERTY DisableParent      DEFAULT .F.
+
+   //-------------------------------------------------------------------------------------------------------------------------------------------------------
+   
+
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
@@ -168,21 +183,13 @@ CLASS Window INHERIT Object
    ACCESS Caption        INLINE ::Text
    ASSIGN Caption(c)     INLINE ::Text := c
 
-   DATA xText                  EXPORTED  INIT ""
-   ACCESS Text                 INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) PERSISTENT
-   ASSIGN Text(c)              INLINE    ::SetWindowText( c )
-
-   DATA Font                   PUBLISHED
-   DATA ToolTip                PUBLISHED
-
    DATA xAnimation             EXPORTED
    ASSIGN Animation(o)         INLINE    ::xAnimation := o
-   ACCESS Animation            INLINE    IIF( ::xAnimation == NIL, ::xAnimation := __Animation( Self ),), ::xAnimation //PERSISTENT
+   ACCESS Animation            INLINE    IIF( ::xAnimation == NIL, ::xAnimation := __Animation( Self ),), ::xAnimation
 
    DATA ClientWidth            EXPORTED  INIT 0
    DATA ClientHeight           EXPORTED  INIT 0
 
-   DATA DisableParent          PUBLISHED INIT .F.
    DATA AutoClose              EXPORTED INIT .T.
    
    DATA VertScroll             EXPORTED INIT .F.
@@ -284,35 +291,8 @@ CLASS Window INHERIT Object
    DATA __hParent                EXPORTED
    DATA __lKeyDown               EXPORTED INIT .F.   
    DATA __PropFilter             EXPORTED INIT {}
-   DATA __Cursors                EXPORTED INIT { "Arrow"       ,;
-                                                 "Help"        ,;
-                                                 "Working"     ,;
-                                                 "Busy"        ,;
-                                                 "Cross"       ,;
-                                                 "TextSelect"  ,;
-                                                 "Unavailable" ,;
-                                                 "SizeNS"      ,;
-                                                 "SizeWE"      ,;
-                                                 "SizeNESW"    ,;
-                                                 "SizeNWSE"    ,;
-                                                 "SizeAll"     ,;
-                                                 "UpArrow"    ,;
-                                                 "LinkSelect"  }
 
-   DATA __CursorValues           EXPORTED INIT { IDC_ARROW        ,;
-                                                 IDC_HELP         ,;
-                                                 IDC_APPSTARTING  ,;
-                                                 IDC_WAIT         ,;
-                                                 IDC_CROSS        ,;
-                                                 IDC_IBEAM        ,;
-                                                 IDC_NO           ,;
-                                                 IDC_SIZENS       ,;
-                                                 IDC_SIZEWE       ,;
-                                                 IDC_SIZENESW     ,;
-                                                 IDC_SIZENWSE     ,;
-                                                 IDC_SIZEALL      ,;
-                                                 IDC_UPARROW      ,;
-                                                 IDC_HAND          }
+   ACCESS EnumCursor             INLINE ::System:GetEnumCursor()
 
 
    DATA xAlignment             EXPORTED INIT 1
@@ -343,16 +323,8 @@ CLASS Window INHERIT Object
    ACCESS HasFocus             INLINE GetFocus() == ::hWnd
    ACCESS IsChild              INLINE ::Style & WS_CHILD != 0
 
-   ACCESS Child                INLINE ::Style & WS_CHILD != 0 //PERSISTENT
+   ACCESS Child                INLINE ::Style & WS_CHILD != 0
    ASSIGN Child(l)             INLINE ::SetStyle( WS_CHILD, l )
-
-   DATA xBackColor             EXPORTED
-   ACCESS BackColor            INLINE IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) PERSISTENT
-   ASSIGN BackColor( n )       INLINE ::xBackColor := n, ::SetBackColor( n )
-
-   DATA xForeColor             EXPORTED
-   ACCESS ForeColor            INLINE IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) PERSISTENT
-   ASSIGN ForeColor( n )       INLINE ::xForeColor := n, ::SetForeColor( n ) //IIF( ::IsWindow() .AND. ::IsWindowVisible(), ::InvalidateRect(), NIL )
 
    DATA xMDIChild              EXPORTED INIT .F.
    DATA xMdiContainer          EXPORTED INIT .F.
@@ -569,6 +541,7 @@ CLASS Window INHERIT Object
    METHOD OnActivate()          VIRTUAL
    METHOD OnUserMsg()           VIRTUAL
    METHOD OnMessage()           VIRTUAL
+   METHOD OnSystemMessage()     VIRTUAL
    METHOD OnSetFont()           VIRTUAL
    METHOD OnNCCreate()          VIRTUAL
    METHOD OnNCActivate()
@@ -1850,17 +1823,18 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    IF nCode == 0
       nId := nwParam
    ENDIF
+
    IF nId == IDOK
       oCtrl := ObjFromHandle( GetFocus() )
 
       IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit"
          oCtrl := ObjFromHandle( GetNextDlgTabItem( ::hWnd, GetFocus(), IsKeyDown( VK_SHIFT ) ) )
       ENDIF               
-         
+
       IF oCtrl != NIL .AND. oCtrl:__xCtrlName != "MaskEdit"
-         if ! ::Form:Modal
-            return 0
-         endif
+         //if ! ::Form:Modal
+         //   return 0
+         //endif
          IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
             nId := HGetValueAt( ::Form:__hObjects, n ):Id
             nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd
@@ -1886,7 +1860,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
             ENDIF
             RETURN 1
          ENDIF
-        ELSEIF nwParam == IDOK
+       ELSEIF nwParam == IDOK
 
          nRet := ExecuteEvent( "OnOk", Self )
          ODEFAULT nRet TO ::OnOk()
@@ -1941,11 +1915,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
       ENDIF
 
     ELSEIF oCtrl != NIL
-
-      nRet := oCtrl:OnParentCommand( nId, nCode, nlParam )
-      IF nCode == CBN_SELENDOK .AND. oCtrl:__xCtrlName == "ToolStripComboBox"
-         ExecuteEvent( "OnCBNSelEndOk", oCtrl )
-      ENDIF
+      ODEFAULT nRet TO oCtrl:OnParentCommand( nId, nCode, nlParam )
    ENDIF
    ODEFAULT nRet TO ::OnParentCommand( nId, nCode, nlParam )
 
@@ -2791,7 +2761,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  IF nwParam == SC_MINIMIZE
                     ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
                  ENDIF
-                 ::PostMessage( WM_USER + 3025 )
+                 ::PostMessage( WM_SYS_SHOWMODE )
               ENDIF
               EXIT
 
@@ -3213,15 +3183,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               RETURN 1
 
          DEFAULT
-              IF nMsg >= WM_USER
-                 IF nMsg == WM_USER + 3025
-                    ::ShowMode := ::__GetShowMode()
-                  ELSEIF nMsg == WM_USER + 3026
-                     IF IsMenu( nlParam )
-                        DestroyMenu( nlParam )
-                     ENDIF
+              IF nMsg >= WM_USER .AND. nMsg < 32768
 
-                  ELSEIF LOWORD( nlParam ) == WM_RBUTTONDOWN
+                 IF LOWORD( nlParam ) == WM_RBUTTONDOWN
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"
                            IF oObj:ContextMenu != NIL
@@ -3257,6 +3221,12 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                   ELSE
                     nRet := ExecuteEvent( "OnUserMsg", Self )
                     ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
+                 ENDIF
+               ELSEIF nMsg >= 32768 .AND. nMsg <= 49151
+                 IF nMsg == WM_SYS_SHOWMODE
+                    ::ShowMode := ::__GetShowMode()
+                  ELSE
+                    ODEFAULT nRet TO ::OnSystemMessage( nMsg, nwParam, nlParam)
                  ENDIF
                ELSE
                  nRet := ExecuteEvent( "OnMessage", Self )
@@ -4767,27 +4737,25 @@ CLASS WinForm INHERIT Window
    DATA EnumFrameStyle         EXPORTED  INIT { {"Overlapped", "PopUp"}, {1,2} }
 
    ACCESS IsMDIContainter  INLINE ::MDIContainter
-
-   DATA Modal                   PUBLISHED INIT .F.
-   DATA UserVariables           PUBLISHED INIT ""
-   DATA ShowMode                PUBLISHED INIT 1
-   DATA AutoClose               PUBLISHED INIT .T.
-   DATA VertScroll              PUBLISHED INIT .F.
-   DATA HorzScroll              PUBLISHED INIT .F.
-   DATA MDIClient               PUBLISHED
-   DATA MinWidth                PUBLISHED INIT 0
-
-   DATA MinHeight               PUBLISHED INIT 0
-   DATA MaxWidth                PUBLISHED INIT 0
-   DATA MaxHeight               PUBLISHED INIT 0
-   DATA ShowInTaskBar           PUBLISHED INIT .T.
-   DATA AnimationStyle          PUBLISHED INIT 0
-
-   DATA ScrollOnChildFocus      PUBLISHED INIT .F.
-
    DATA __lResizeable            EXPORTED  INIT {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
    DATA __lMoveable              EXPORTED  INIT .F.
 
+
+   PROPERTY Modal                   DEFAULT .F.
+   PROPERTY UserVariables           DEFAULT ""
+   PROPERTY ShowMode                DEFAULT 1
+   PROPERTY AutoClose               DEFAULT .T.
+   PROPERTY VertScroll              DEFAULT .F.
+   PROPERTY HorzScroll              DEFAULT .F.
+   PROPERTY MDIClient
+   PROPERTY MinWidth                DEFAULT 0
+   PROPERTY MinHeight               DEFAULT 0
+   PROPERTY MaxWidth                DEFAULT 0
+   PROPERTY MaxHeight               DEFAULT 0
+   PROPERTY ShowInTaskBar           DEFAULT .T.
+   PROPERTY AnimationStyle          DEFAULT 0
+   PROPERTY ScrollOnChildFocus      DEFAULT .F.
+   PROPERTY BackgroundImage
    PROPERTY ToolWindow    INDEX WS_EX_TOOLWINDOW    READ xToolWindow      WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY AlwaysOnTop   INDEX WS_EX_TOPMOST       READ xAlwaysOnTop     WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY ThickFrame    INDEX WS_THICKFRAME       READ xThickFrame      WRITE SetStyle        DEFAULT .T. PROTECTED
@@ -4800,31 +4768,20 @@ CLASS WinForm INHERIT Window
    PROPERTY DlgModalFrame INDEX WS_EX_DLGMODALFRAME READ xDlgModalFrame   WRITE SetExStyle      DEFAULT .F. PROTECTED
    PROPERTY Icon                                    READ xIcon            WRITE SetFormIcon                 PROTECTED INVERT
    PROPERTY Opacity                                 READ xOpacity         WRITE SetOpacity      DEFAULT 100 PROTECTED
-
    PROPERTY BitmapMask                              READ xBitmapMask      WRITE __SetBitmapMask             PROTECTED INVERT
    PROPERTY BitmapMaskColor                         READ xBitmapMaskColor WRITE __SetBitmapMaskColor        PROTECTED
+   PROPERTY ImageList     GET __ChkComponent( Self, @::xImageList )     SET ::SetImageList(v)
+   PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET ::__SetActiveMenuBar(v)
 
-   PROPERTY ImageList     GET __ChkComponent( Self, @::xImageList )     SET SetImageList                PROTECTED
+   PROPERTY MDIChild           ACCESS {|Self| IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild )} ASSIGN {|Self,v| IIF( ::__ClassInst != NIL .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )} DEFAULT .F. 
+   PROPERTY MdiContainer       ASSIGN {|Self,v| ::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)} DEFAULT .F. 
 
-   PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET __SetActiveMenuBar
 
    //compatibility ONLY, forms do not set "Border" property
    ACCESS TopMost              INLINE ::AlwaysOnTop
    ASSIGN TopMost(l)           INLINE ::AlwaysOnTop := l
 
    DATA Border                 EXPORTED INIT .F.
-
-   DATA xMDIChild              EXPORTED INIT .F.
-   ACCESS MDIChild             INLINE IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild ) PERSISTENT
-   ASSIGN MDIChild(l)          INLINE IIF( ::__ClassInst != NIL .AND. l .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := l, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, l ), )
-
-   DATA xMdiContainer          EXPORTED  INIT .F.
-   ACCESS MdiContainer         INLINE    ::xMdiContainer PERSISTENT
-   ASSIGN MdiContainer(l)      INLINE    ::xMdiContainer := l, ::IsContainer := .F., ::__CreateMDI(l)
-
-   DATA BackgroundImage        PUBLISHED
-
-
 
    //DATA Visible                EXPORTED  INIT .T.
    DATA MaskBitmap             EXPORTED

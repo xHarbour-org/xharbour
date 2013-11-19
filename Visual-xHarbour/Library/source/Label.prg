@@ -18,15 +18,15 @@
 
 CLASS Label INHERIT Control
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
-   PROPERTY Alignment    SET Redraw  DEFAULT DT_LEFT PROTECTED
+   PROPERTY Alignment    SET ::Redraw(v)  DEFAULT DT_LEFT PROTECTED
 
    DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
-   PROPERTY Border       SET Redraw  DEFAULT 0       PROTECTED
+   PROPERTY Border       SET ::Redraw(v)  DEFAULT 0       PROTECTED
 
    PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
 
-   PROPERTY NoPrefix     SET Redraw  DEFAULT .F.     PROTECTED
-   PROPERTY VertCenter   SET Redraw  DEFAULT .F.     PROTECTED
+   PROPERTY NoPrefix     SET ::Redraw(v)  DEFAULT .F.     PROTECTED
+   PROPERTY VertCenter   SET ::Redraw(v)  DEFAULT .F.     PROTECTED
 
    PROPERTY TextShadowColor READ xTextShadowColor WRITE InvalidateRect
    PROPERTY BlinkColor      READ xBlinkColor      WRITE __SetBlinkColor

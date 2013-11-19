@@ -43,7 +43,7 @@ CLASS SourceEditor INHERIT TitleControl
    
    DATA xSource  PROTECTED
 
-   ASSIGN Source(o) INLINE IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
+   ASSIGN Source(o) INLINE ::Parent:Text := IIF( o == NIL, "Source Code Editor", o:FileName ), IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
    ACCESS Source    INLINE ::xSource
    
    DATA aDocs        EXPORTED INIT {}
@@ -83,7 +83,7 @@ CLASS SourceEditor INHERIT TitleControl
    DATA FontBold          EXPORTED
    DATA FontItalic        EXPORTED
 
-   DATA cFindWhat         EXPORTED
+   DATA cFindWhat         EXPORTED INIT ""
    DATA nDirection        EXPORTED
    DATA CaretLineVisible  EXPORTED
    DATA AutoIndent        EXPORTED
@@ -475,24 +475,15 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
       ENDIF
-      IF ! ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
-         ::MessageBox( "Cannot find literal text: " + ::cFindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
+      IF ! EMPTY( ::cFindWhat )
+         IF ! ::FindNext( ::cFindWhat, CheckBit( GetKeyState( VK_SHIFT ), 32768 ) )
+            ::MessageBox( "Cannot find literal text: " + ::cFindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
+         ENDIF
+       ELSE
+         ::Application:Project:Find()
       ENDIF
 
     ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
-/*
-      IF CheckBit( GetKeyState( VK_SHIFT ), 32768 )
-         nPos := ::Application:SourceSelect:GetCursel()-1
-         IF nPos < 0
-            nPos := ::Application:SourceSelect:GetCount()
-         ENDIF
-       ELSE
-         nPos := ::Application:SourceSelect:GetCursel()+1
-         IF nPos > ::Application:SourceSelect:GetCount()
-            nPos := 1
-         ENDIF
-      ENDIF
-*/
       nSel := ASCAN( ::aDocs, ::xSource,,, .T. )
       
       DEFAULT ::nLastTabTime TO SECONDS()
@@ -500,23 +491,21 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       nSecs := SECONDS() - ::nLastTabTime
 
       IF nSecs < 1 .OR. ::nLastTabPos == NIL
-         nPos := nSel /*::Application:SourceSelect:GetCursel()*/+ IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
+         nPos := nSel + IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
        ELSE
          nPos := ::nLastTabPos 
       ENDIF
-      IF nPos > LEN( ::aDocs ) //::Application:SourceSelect:GetCount()
+      IF nPos > LEN( ::aDocs )
          nPos := 1
       ENDIF
       IF nPos < 0
-         nPos := LEN( ::aDocs ) //::Application:SourceSelect:GetCount()
+         nPos := LEN( ::aDocs )
       ENDIF
 
-      ::nLastTabPos  := nSel //::Application:SourceSelect:GetCursel()
+      ::nLastTabPos  := nSel
       ::nLastTabTime := SECONDS()
 
-      //::Application:SourceSelect:SetCurSel( nPos )
       ::Application:Project:SourceTabChanged( nPos )
-
    ENDIF
 RETURN NIL
 
@@ -564,6 +553,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                              cText := ALLTRIM( STRTRAN( cText, "*" ) )
                              ::Source:TreeItem:Text := cText + " *"
                           ENDIF
+                          ::Parent:Text := ::Source:TreeItem:Text
                        ENDIF
                        IF ! ::Application:Project:Modified
                           ::Application:Project:Modified := .T.
@@ -875,14 +865,11 @@ RETURN 0
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS Source
+CLASS Source INHERIT ProjectFile
    ACCESS Application INLINE ::Owner:Application
    DATA pSource   EXPORTED
    DATA Owner     EXPORTED
-   DATA Path      EXPORTED
-   DATA FileName  EXPORTED
    DATA FileTime  EXPORTED
-   DATA File      EXPORTED INIT ""
    DATA Modified  EXPORTED INIT .F.
    DATA FirstOpen EXPORTED INIT .T.
    DATA SavedPos  EXPORTED INIT 0
@@ -890,10 +877,8 @@ CLASS Source
    DATA Extension EXPORTED INIT "prg"
    DATA lStyled   EXPORTED INIT .T.
    DATA cObj      EXPORTED INIT ""
-   DATA Form      EXPORTED
    DATA nPrevLine EXPORTED
    DATA PrevFile  EXPORTED
-   DATA TreeItem  EXPORTED
    DATA __xCtrlName EXPORTED INIT "Source"
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
@@ -917,7 +902,7 @@ CLASS Source
    METHOD Save()
    METHOD GetText()
 
-   METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos(), ::nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos(), ::nVisLine := ::SendEditor( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
    METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos ), ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
@@ -960,7 +945,7 @@ CLASS Source
    METHOD BeginUndoAction()                   INLINE ::SendEditor( SCI_BEGINUNDOACTION, 0, 0 )
    METHOD EndUndoAction()                     INLINE ::SendEditor( SCI_ENDUNDOACTION, 0, 0 )
 
-   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, ::Select(),)
+   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ),)
 
    METHOD FindText( nFlags, ttf )             INLINE ::SendEditor( SCI_FINDTEXT, nFlags, ttf )
    METHOD SearchNext( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHNEXT, nFlags, cText )
@@ -1004,36 +989,40 @@ ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetBookmarks() CLASS Source
-   LOCAL n, nVisLine, nPos, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
-   nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   LOCAL n, nLines, nVisLine, nPos, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
 
-   IF pSource != ::pSource
+   IF ! ( pSource == ::pSource )
+      nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
+      nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
-   FOR n := 0 TO ::GetLineCount()
-       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n, 1<<MARKER_MASK ) ) > 0
+
+   nLines   := ::Owner:SendMessage( SCI_GETLINECOUNT, 0, 0 )
+   FOR n := 1 TO nLines
+       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n-1, 1<<MARKER_MASK ) ) >= 0
           cMarks += IIF( ! EMPTY(cMarks),"|","") + xStr(nLine)
-          n := nLine
+          n := nLine+1
+          LOOP
         ELSE
           EXIT
        ENDIF
    NEXT
-   IF pSource != ::pSource
+
+   IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+      ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
+      ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
    ENDIF
-   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
 RETURN cMarks
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
-   IF pSource != ::pSource
+   IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    ENDIF
    xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
-   IF pSource != ::pSource
+   IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
 RETURN xReturn
@@ -1042,7 +1031,7 @@ RETURN xReturn
 METHOD Init( oOwner, cFile ) CLASS Source
    ::Owner   := oOwner
    ::Owner:xSource := Self
-   
+   ::lSource := .T.
    ::pSource := ::CreateDocument()
    
    ::FirstOpen := .T.
@@ -1062,7 +1051,7 @@ RETURN Self
 METHOD Close() CLASS Source
    LOCAL n
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
-      ::ReleaseDocument()
+//      ::ReleaseDocument()
       IF ::TreeItem != NIL
          ::TreeItem:Delete()
       ENDIF
@@ -1079,6 +1068,7 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Reload( cText ) CLASS Source
    LOCAL nPos, nVisLine, lReadOnly
+   ::ChkDoc()
    nPos        := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
    nVisLine    := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    lReadOnly   := ::lReadOnly
@@ -1125,12 +1115,20 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetText() CLASS Source
-   LOCAL cText, nLen
-   ::ChkDoc()
+   LOCAL cText, nLen, pSource := ::Owner:GetCurDoc()
+
+   IF ! ( ::pSource == pSource )
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   ENDIF
+
    nLen := ::Owner:SendMessage( SCI_GETLENGTH, 0, 0 )+1
    cText := SPACE( nLen )
    ::Owner:SendMessage( SCI_GETTEXT, nLen, @cText )
    cText := STRTRAN( cText, CHR(0) )
+
+   IF ! ( ::pSource == pSource )
+      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+   ENDIF
 RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1145,15 +1143,24 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL pPrev, hFile, cText, n, nPos, cBak
+   LOCAL hFile, cText, n, cBak
+
    IF cFile != NIL
       ::File := cFile
    ENDIF
-   IF !EMPTY( ::File )
-      pPrev := ::Owner:GetCurDoc()
-      nPos  := ::Owner:Source:GetCurrentPos()
-      ::Owner:Source:nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
 
+   IF EMPTY( ::File )
+      oFile := CFile( "" )
+      oFile:Flags := OFN_EXPLORER | OFN_OVERWRITEPROMPT
+      oFile:AddFilter( "Source Files (*.prg, *.c)", "*.prg;*.c" )
+      oFile:Path := ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source
+      oFile:SaveDialog()
+      IF oFile:Result == IDOK
+         ::File := oFile:Path + "\" + oFile:Name
+      ENDIF
+   ENDIF
+
+   IF ! EMPTY( ::File )
       IF ::Application:EditorProps:SaveBAK == 1 .AND. FILE( ::File )
          cBak := ::File
          IF ( n := RAT( ".", cBak ) ) > 0
@@ -1166,7 +1173,6 @@ METHOD Save( cFile ) CLASS Source
          FRENAME( ::File, cBak )
       ENDIF
 
-      ::Owner:SelectDocument( ::pSource )
       IF ( hFile := fCreate( ::File ) ) <> -1
          cText := ::GetText()
          fWrite( hFile, cText, Len(cText) )
@@ -1174,28 +1180,14 @@ METHOD Save( cFile ) CLASS Source
          ::FileTime := FileTime( ::File )
          ::Modified := .F.
       ENDIF
-      ::Owner:SelectDocument( pPrev )
-
-      ::Owner:Source:GoToPosition( nPos )
-      ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::Owner:Source:nVisLine, 0 )
 
       n := RAT( "\", ::File )
       ::FileName := SUBSTR( ::File, n+1 )
       ::Path     := SUBSTR( ::File, 1, n-1 )
 
-      n := aScan( ::Owner:aDocs, Self,,, .T. )
-
-      //cText := ::Application:SourceTabs:GetItemText(n)
-      //cText := ::Application:SourceSelect:GetString(n)
-      //cText := ALLTRIM( STRTRAN( cText, "*" ) )
-      //::Application:SourceTabs:SetItemText( n, cText, .F. )
-      //::Application:SourceSelect:SetItemText( n, cText )
-
-      cText := ::TreeItem:Text
-      IF cText != NIL
-         cText := ALLTRIM( STRTRAN( cText, "*" ) )
-         ::TreeItem:Text := cText
-      ENDIF
+      ::TreeItem:Text       := ::FileName
+      ::Owner:Parent:Text   := ::FileName
+      ::TreeItem:ImageIndex := IIF( RIGHT( lower(::FileName), 2 ) == ".c", 4, 3 )
 
       ::FirstOpen := .F.
    ENDIF

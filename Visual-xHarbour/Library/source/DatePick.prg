@@ -18,7 +18,24 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS DateTimePicker INHERIT Control
-   DATA AutoChange            PUBLISHED INIT .F.
+   PROPERTY AutoChange        DEFAULT .F.
+   PROPERTY Date              ASSIGN {|Self,d| ::xDate := d, ::SetSystemTime()} DEFAULT DATE()
+   PROPERTY Time              ASSIGN {|Self,c| ::xTime := c, ::SetSystemTime()} DEFAULT DATE()
+   PROPERTY UpDown            INDEX DTS_UPDOWN        READ xUpDown            WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY Parse             INDEX DTS_APPCANPARSE   READ xParse             WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY Format                                    READ xFormat            WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
+   PROPERTY CustomFormat                              READ xCustomFormat      WRITE SetCustomFormat       PROTECTED
+   PROPERTY Border            INDEX WS_BORDER         READ xBorder            WRITE SetStyle  DEFAULT .F. PROTECTED
+
+   PROPERTY ShowNone          INDEX DTS_SHOWNONE      READ xShowNone          WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY RightAlign        INDEX DTS_RIGHTALIGN    READ xRightAlign        WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY BlankDate                                 READ xBlankDate         WRITE __SetBlankDate DEFAULT .F.  PROTECTED
+
+   PROPERTY BackColor         INDEX MCSC_MONTHBK      READ xBackColor         WRITE SetCalendarColor PROTECTED
+   PROPERTY ForeColor         INDEX MCSC_TEXT         READ xForeColor         WRITE SetCalendarColor PROTECTED
+   PROPERTY TitleBackColor    INDEX MCSC_TITLEBK      READ xTitleBackColor    WRITE SetCalendarColor PROTECTED
+   PROPERTY TitleForeColor    INDEX MCSC_TITLETEXT    READ xTitleForeColor    WRITE SetCalendarColor PROTECTED
+   PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
@@ -40,32 +57,6 @@ CLASS DateTimePicker INHERIT Control
 
    ACCESS Caption              INLINE    IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xCaption, _GetWindowText( ::hWnd ) )
 
-   DATA xDate                 EXPORTED  INIT DATE()
-   ACCESS Date                INLINE    ::xDate PERSISTENT
-   ASSIGN Date(d)             INLINE    ::xDate := d, ::SetSystemTime()
-
-   DATA xTime                 EXPORTED  INIT TIME()
-   ACCESS Time                INLINE    ::xTime PERSISTENT
-   ASSIGN Time(c)             INLINE    ::xTime := c, ::SetSystemTime()
-
-   PROPERTY UpDown       INDEX DTS_UPDOWN      READ xUpDown       WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Parse        INDEX DTS_APPCANPARSE READ xParse        WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Format                             READ xFormat       WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
-   PROPERTY CustomFormat                       READ xCustomFormat WRITE SetCustomFormat       PROTECTED
-   PROPERTY Border       INDEX WS_BORDER       READ xBorder       WRITE SetStyle  DEFAULT .F. PROTECTED
-
-   PROPERTY ShowNone     INDEX DTS_SHOWNONE    READ xShowNone     WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY RightAlign   INDEX DTS_RIGHTALIGN  READ xRightAlign   WRITE SetStyle  DEFAULT .F. PROTECTED
-
-   PROPERTY BlankDate                          READ xBlankDate WRITE __SetBlankDate DEFAULT .F.  PROTECTED
-
-   PROPERTY BackColor         INDEX MCSC_MONTHBK      READ xBackColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY ForeColor         INDEX MCSC_TEXT         READ xForeColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleBackColor    INDEX MCSC_TITLEBK      READ xTitleBackColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleForeColor    INDEX MCSC_TITLETEXT    READ xTitleForeColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
-
-   DATA     PUBLISHED INIT .F.
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -83,13 +74,6 @@ CLASS DateTimePicker INHERIT Control
 
    METHOD SetCalendarColor( nPos, nColor ) INLINE ::SendMessage( DTM_SETMCCOLOR, nPos, nColor )
    METHOD SetCalendarFont( nPos, hFont )   INLINE ::SendMessage( DTM_SETMCFONT, nPos, hFont )
-
-   METHOD SetBkColor( nColor )             INLINE ::SetCalendarColor( MCSC_TITLEBK,   nColor )
-   METHOD SetTextColor( nColor )           INLINE ::SetCalendarColor( MCSC_TEXT,      nColor )
-   METHOD SetTitleTextColor( nColor )      INLINE ::SetCalendarColor( MCSC_TITLETEXT, nColor )
-   METHOD SetTitleBackColor( nColor )      INLINE ::SetCalendarColor( MCSC_TITLEBK,   nColor )
-   METHOD SetMonthBackColor( nColor )      INLINE ::SetCalendarColor( MCSC_MONTHBK,   nColor )
-   METHOD SetTrailingTextColor( nColor )   INLINE ::SetCalendarColor( MCSC_TRAILINGTEXT, nColor )
 
    METHOD OnChar()
 

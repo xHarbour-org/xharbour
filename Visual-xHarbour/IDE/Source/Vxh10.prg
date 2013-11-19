@@ -144,7 +144,7 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceName"
          :Width      := 100
          :AllowSize  := .T.
-         :BackColor  := {|o| IIF( !o:DataSource:Eof() .AND. !FILE( o:DataSource:Fields:ResourceFile ), ::System:Color:Red, NIL ) }
+         :BackColor  := {|o| IIF( ! EMPTY(o:Parent:DataSource:Fields:ResourceFile) .AND. ! FILE( o:Parent:DataSource:Fields:ResourceFile ), ::System:Color:Red, NIL ) }
          :Create()
       END
       WITH OBJECT GridColumn( :this )
@@ -153,7 +153,7 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceType"
          :Width      := 50
          :AllowSize  := .T.
-         :BackColor  := {|o| IIF( !o:DataSource:Eof() .AND. !FILE( o:DataSource:Fields:ResourceFile ), ::System:Color:Red, NIL ) }
+         //:BackColor  := ::ResourceName:BackColor
          :Create()
       END
       WITH OBJECT GridColumn( :this )
@@ -162,7 +162,7 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceFile"
          :Width      := MAX( 1000, :Parent:ClientWidth-150 )
          :AllowSize  := .T.
-         :BackColor  := {|o| IIF( !o:DataSource:Eof() .AND. !FILE( o:DataSource:Fields:ResourceFile ), ::System:Color:Red, NIL ) }
+         //:BackColor  := ::ResourceName:BackColor
          :Create()
       END
       :Create()
