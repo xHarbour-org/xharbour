@@ -2560,3 +2560,24 @@ METHOD All_OnClick() CLASS FindReplace
       ::Parent:Source:ReplaceAll( ::FindWhat:Caption, ::ReplaceWith:Caption, nFlags, ::Parent:InSelection )
    ENDIF
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+CLASS ProjectFile
+   DATA TreeItem  EXPORTED
+   DATA File      EXPORTED INIT ""
+   DATA FileName  EXPORTED
+   DATA lSource   EXPORTED INIT .F.
+   DATA Form      EXPORTED
+   DATA Path      EXPORTED
+
+   METHOD Init() CONSTRUCTOR
+   METHOD Close() INLINE .T.
+ENDCLASS
+
+METHOD Init( cFile ) CLASS ProjectFile
+   ::File := cFile
+RETURN Self
+
