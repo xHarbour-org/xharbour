@@ -19,8 +19,8 @@
 
 CLASS DateTimePicker INHERIT Control
    PROPERTY AutoChange        DEFAULT .F.
-   PROPERTY Date              ASSIGN {|Self,d| ::xDate := d, ::SetSystemTime()} DEFAULT DATE()
-   PROPERTY Time              ASSIGN {|Self,c| ::xTime := c, ::SetSystemTime()} DEFAULT DATE()
+   PROPERTY Date              SET (::xDate := v, ::SetSystemTime()) DEFAULT DATE()
+   PROPERTY Time              SET (::xTime := v, ::SetSystemTime()) DEFAULT TIME()
    PROPERTY UpDown            INDEX DTS_UPDOWN        READ xUpDown            WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY Parse             INDEX DTS_APPCANPARSE   READ xParse             WRITE SetStyle  DEFAULT .F. PROTECTED
    PROPERTY Format                                    READ xFormat            WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
