@@ -21,7 +21,6 @@
 CLASS Font
    DATA Handle         EXPORTED
    
-   DATA AllowHandle    EXPORTED INIT .T.
    PROPERTY FaceName     READ xFaceName    WRITE Modify
    PROPERTY Escapement   READ xEscapement  WRITE Modify
    PROPERTY Orientation  READ xOrientation WRITE Modify
@@ -113,14 +112,14 @@ METHOD Create() CLASS Font
       ENDIF
    ENDIF
    
-   ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height         )
+   ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height        )
    ::ncm:lfMessageFont:lfWidth          := IFNIL( ::Width         , ::ncm:lfMessageFont:lfWidth         , ::Width          )
    ::ncm:lfMessageFont:lfEscapement     := IFNIL( ::Escapement    , ::ncm:lfMessageFont:lfEscapement    , ::Escapement     )
    ::ncm:lfMessageFont:lfOrientation    := IFNIL( ::Orientation   , ::ncm:lfMessageFont:lfOrientation   , ::Orientation    )
    ::ncm:lfMessageFont:lfWeight         := IFNIL( ::Weight        , ::ncm:lfMessageFont:lfWeight        , ::Weight         )
-   ::ncm:lfMessageFont:lfItalic         := IFNIL( ::nItalic       , ::ncm:lfMessageFont:lfItalic        , ::nItalic         )
-   ::ncm:lfMessageFont:lfUnderline      := IFNIL( ::nUnderline    , ::ncm:lfMessageFont:lfUnderline     , ::nUnderline      )
-   ::ncm:lfMessageFont:lfStrikeOut      := IFNIL( ::nStrikeOut    , ::ncm:lfMessageFont:lfStrikeOut     , ::nStrikeOut      )
+   ::ncm:lfMessageFont:lfItalic         := IFNIL( ::nItalic       , ::ncm:lfMessageFont:lfItalic        , ::nItalic        )
+   ::ncm:lfMessageFont:lfUnderline      := IFNIL( ::nUnderline    , ::ncm:lfMessageFont:lfUnderline     , ::nUnderline     )
+   ::ncm:lfMessageFont:lfStrikeOut      := IFNIL( ::nStrikeOut    , ::ncm:lfMessageFont:lfStrikeOut     , ::nStrikeOut     )
    ::ncm:lfMessageFont:lfCharSet        := IFNIL( ::CharSet       , ::ncm:lfMessageFont:lfCharSet       , ::CharSet        )
 
    ::ncm:lfMessageFont:lfOutPrecision   := IFNIL( ::OutPrecision  , OUT_DEFAULT_PRECIS                  , ::OutPrecision   )
@@ -129,9 +128,7 @@ METHOD Create() CLASS Font
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
    
    ::Delete()
-   IF ::AllowHandle
-      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
-   ENDIF
+   ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
    
    ::xFaceName     := cFont
 
@@ -286,9 +283,7 @@ METHOD Modify() CLASS Font
       lf:lfPitchAndFamily := ::PitchAndFamily
 
       ::Delete()
-      IF ::AllowHandle
-         ::Handle := CreateFontIndirect( lf )
-      ENDIF
+      ::Handle := CreateFontIndirect( lf )
       IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
          ::Set( ::Parent )
       ENDIF

@@ -6369,7 +6369,13 @@ METHOD Init( cFile ) CLASS ProjProp
 
       ::Files         := ::oIni:GetEntries( "Files" )
       ::Sources       := ::oIni:GetEntries( "Sources" )
+
       ::Binaries      := ::oIni:GetSectionEntries( "Binaries" )
+      FOR n := 1 TO LEN(::Binaries)
+          IF ::Binaries[n][-1] == "="
+             ::Binaries[n] := LEFT( ::Binaries[n], LEN( ::Binaries[n] )-1 )
+          ENDIF
+      NEXT
 
       ::ExtImages     := ::oIni:GetSectionEntries( "ExtImages" )
       ::Resources     := ::oIni:GetSectionEntries( "Resources" )

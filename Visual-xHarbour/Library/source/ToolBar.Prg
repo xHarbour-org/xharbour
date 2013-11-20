@@ -1145,17 +1145,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                          IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
                             IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
-                               nHot := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )+1
-                               IF nHot == 0
-                                  nHot := ::nPressed+1
-                               ENDIF
+                               nHot := ASCAN( ::aItems, {|o| o:id == tbcd:nmcd:dwItemSpec} )
                                IF nHot > 0
-
                                   aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
                                   DrawThemeBackground( ::__hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, MPI_HOT, aRect, aRect )
                                   SetTextColor( tbcd:nmcd:hdc, GetThemeColor( ::__hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
-
-
 /*
                                   hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
                                   SelectObject( tbcd:nmcd:hdc, hBrush )
