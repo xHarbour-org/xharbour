@@ -135,7 +135,6 @@ CLASS IDE INHERIT Application
    DATA FormsTabs        EXPORTED
    DATA ProjectPrgEditor EXPORTED
 
-   DATA QuickForm        EXPORTED
    DATA CloseMenu        EXPORTED
    DATA SaveMenu         EXPORTED
    DATA SaveAsMenu       EXPORTED
@@ -685,9 +684,10 @@ METHOD Init() CLASS IDE_MainForm
          END
 
          WITH OBJECT ::Application:CloseMenu := MenuStripItem( :this )
-            :Caption    := "&Close"
-            :ImageIndex := 16
-            :Enabled    := .F.
+            :Caption           := "&Close"
+            :ImageIndex        := 16
+            :Action            := {||::Application:Project:Close() }
+            :Enabled           := .F.
             :Create()
          END
 
@@ -1197,46 +1197,6 @@ METHOD Init() CLASS IDE_MainForm
          :Action       := {|| ::Application:Project:NewProject() }
          :ImageList    := :Parent:ImageList
          :Create()
-
-         WITH OBJECT MenuStripItem( :this )
-            :Caption           := "&Project"
-            :ImageIndex        := 21
-            :ShortCutText      := "Ctrl+N"
-            :ShortCutKey:Ctrl  := .T.
-            :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|| ::Application:Project:NewProject() }
-            :Create()
-         END
-
-         WITH OBJECT ::Application:QuickForm := MenuStripItem( :this )
-            :Caption           := "F&orm"
-            :ImageIndex        := 27
-            :ShortCutText      := "Ctrl+Shift+F"
-            :ShortCutKey:Ctrl  := .T.
-            :ShortCutKey:Shift := .T.
-            :ShortCutKey:Key   := ASC( "F" )
-            :Action            := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(),) }
-            :Enabled           := .F.
-            :Create()
-         END
-
-         WITH OBJECT ::Application:Props[ "BttnCustomControl" ] := MenuStripItem( :this )
-            :Caption           := "&Custom Control"
-            :ImageIndex        := 28
-            :BeginGroup        := .T.
-            :ShortCutText      := "Ctrl+Shift+C"
-            :ShortCutKey:Ctrl  := .T.
-            :ShortCutKey:Shift := .T.
-            :ShortCutKey:Key   := ASC( "C" )
-            #ifdef VXH_ENTERPRISE
-             :Action            := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(,,.T.),) }
-            #else
-             :Action            := {|| MessageBox( , "Sorry, Custom Controls are available in the Enterprise edition only.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
-            #endif
-            :Enabled            := .F.
-            :Create()
-         END
-
       END
 
       WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
@@ -2673,10 +2633,7 @@ METHOD NewProject() CLASS Project
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
    ::Application:Props[ "NewFormItemEnabled"] := .T.
    ::Application:Props[ "CustControlEnabled"] := .T.
-   ::Application:Props[ "BttnCustomControl" ]:Enabled := .T.
    ::Application:Props[ "ResourceManager"   ]:Enabled := .T.
-
-   ::Application:QuickForm:Enable()
 
    ::Modified := .T.
 
@@ -2694,6 +2651,7 @@ METHOD NewProject() CLASS Project
    ::Application:EventManager:ResetEvents( {{::AppObject}} )
 
    ::Application:ProjectPrgEditor:TreeItem:Select()
+   ::Application:CloseMenu:Enabled := .T.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -3556,11 +3514,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .F.
    ::Application:Props[ "NewFormItemEnabled"] := .F.
    ::Application:Props[ "CustControlEnabled"] := .F.
-   ::Application:Props[ "BttnCustomControl" ]:Enabled := .F.
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .F.
-
-   ::Application:QuickForm:Disable()
-
 
    ::Application:SaveMenu:Disable()
    ::Application:SaveAsMenu:Disable()
@@ -3609,6 +3563,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       ::Application:DebugWindow:Hide()
       ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
+   ::Application:CloseMenu:Enabled := .F.
    hb_gcall( .T. )
 RETURN .T.
 
@@ -3868,8 +3823,6 @@ METHOD Open( cProject ) CLASS Project
    ::OpenDesigner()
    ::Application:ToolBox:Enabled := .T.
 
-   ::Application:QuickForm:Enable()
-
    ::Application:Props[ "RunBttn"           ]:Enabled := .T.
    ::Application:Props[ "ResourceManager"   ]:Enabled := .T.
    ::Application:Props[ "RunItem"           ]:Enabled := .T.
@@ -3877,7 +3830,6 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Props[ "NewFormBttn"       ]:Enabled := .T.
    ::Application:Props[ "NewFormItemEnabled"] := .T.
    ::Application:Props[ "CustControlEnabled"] := .T.
-   ::Application:Props[ "BttnCustomControl" ]:Enabled := .T.
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
    ::Application:Props[ "CloseBttn"         ]:Enabled := .T.
    ::Application:Props[ "SaveBttn"          ]:Enabled := .T.
@@ -4050,6 +4002,8 @@ METHOD Open( cProject ) CLASS Project
               ::Close()
       ENDCASE
    ENDIF
+   ::Application:CloseMenu:Enabled := .T.
+
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, IIF( LEN( ::Forms ) > 0, 4, 3 ) )
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )
