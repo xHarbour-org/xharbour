@@ -26,6 +26,7 @@ CLASS ListBox FROM TitleControl
 
    DATA ImageList      EXPORTED
    DATA OnSelChanged   EXPORTED
+   DATA EnumOwnerDraw  EXPORTED  INIT { { "No", "Fixed", "Variable" }, {1,2,3} }
 
    DATA ImageIndex     PROTECTED
    DATA __nWidth       PROTECTED INIT 0
@@ -35,26 +36,22 @@ CLASS ListBox FROM TitleControl
    DATA __pTipCallBack PROTECTED
    DATA __nTipProc     PROTECTED
 
-   PROPERTY VertScroll        INDEX WS_VSCROLL            READ xVertScroll        WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY HorzScroll        INDEX WS_HSCROLL            READ xHorzScroll        WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY IntegralHeight    INDEX LBS_NOINTEGRALHEIGHT  READ xIntegralHeight    WRITE SetIntegralHeight DEFAULT .F. PROTECTED
-   PROPERTY ExtendedSel       INDEX LBS_EXTENDEDSEL       READ xExtendedSel       WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY MultiColumn       INDEX LBS_MULTICOLUMN       READ xMultiColumn       WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY NoRedraw          INDEX LBS_NOREDRAW          READ xNoRedraw          WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY Notify            INDEX LBS_NOTIFY            READ xNotify            WRITE SetStyle          DEFAULT .T. PROTECTED
-   PROPERTY Sort              INDEX LBS_SORT              READ xSort              WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY UseTabStops       INDEX LBS_USETABSTOPS       READ xUseTabStops       WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY WantKeyboardInput INDEX LBS_WANTKEYBOARDINPUT READ xWantKeyboardInput WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY DisableNoScroll   INDEX LBS_DISABLENOSCROLL   READ xDisableNoScroll   WRITE SetStyle          DEFAULT .F. PROTECTED
-   PROPERTY HasStrings        INDEX LBS_HASSTRINGS        READ xHasStrings        WRITE SetStyle          DEFAULT .T. PROTECTED
-   PROPERTY Border            INDEX WS_BORDER             READ xBorder            WRITE SetStyle          DEFAULT .F. PROTECTED
-
-   PROPERTY ClientEdge        INDEX WS_EX_CLIENTEDGE      READ xClientEdge        WRITE SetExStyle        DEFAULT .T. PROTECTED
-
-   PROPERTY OwnerDraw                                     READ xOwnerDraw         WRITE SetDrawStyle      DEFAULT 1   PROTECTED
-   PROPERTY ItemToolTips                                  READ xItemToolTips      WRITE __SetItemToolTips DEFAULT .F. PROTECTED 
-
-   DATA EnumOwnerDraw EXPORTED  INIT { { "No", "Fixed", "Variable" }, {1,2,3} }
+   PROPERTY VertScroll        SET ::SetStyle( WS_VSCROLL, v )                     DEFAULT .F.
+   PROPERTY HorzScroll        SET ::SetStyle( WS_HSCROLL, v )                     DEFAULT .F.
+   PROPERTY IntegralHeight    SET ::SetIntegralHeight( LBS_NOINTEGRALHEIGHT, v )  DEFAULT .F.
+   PROPERTY ExtendedSel       SET ::SetStyle( LBS_EXTENDEDSEL, v )                DEFAULT .F.
+   PROPERTY MultiColumn       SET ::SetStyle( LBS_MULTICOLUMN, v )                DEFAULT .F.
+   PROPERTY NoRedraw          SET ::SetStyle( LBS_NOREDRAW, v )                   DEFAULT .F.
+   PROPERTY Notify            SET ::SetStyle( LBS_NOTIFY, v )                     DEFAULT .T.
+   PROPERTY Sort              SET ::SetStyle( LBS_SORT, v )                       DEFAULT .F.
+   PROPERTY UseTabStops       SET ::SetStyle( LBS_USETABSTOPS, v )                DEFAULT .F.
+   PROPERTY WantKeyboardInput SET ::SetStyle( LBS_WANTKEYBOARDINPUT, v )          DEFAULT .F.
+   PROPERTY DisableNoScroll   SET ::SetStyle( LBS_DISABLENOSCROLL, v )            DEFAULT .F.
+   PROPERTY HasStrings        SET ::SetStyle( LBS_HASSTRINGS, v )                 DEFAULT .T.
+   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )                      DEFAULT .F.
+   PROPERTY ClientEdge        SET ::SetExStyle( WS_EX_CLIENTEDGE, v )             DEFAULT .T.
+   PROPERTY OwnerDraw         SET ::SetDrawStyle(v)                               DEFAULT 1
+   PROPERTY ItemToolTips      SET ::__SetItemToolTips                             DEFAULT .F.
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -89,8 +86,8 @@ CLASS ListBox FROM TitleControl
    METHOD AddFile( cFile )                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_ADDFILE, 0, cFile ), NIL )
    METHOD SetTopIndex( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETTOPINDEX, nLine, 0 ), NIL )
    //METHOD GetItemRect( nLine, bRect )   INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETITEMRECT, nLine, bRect ) , NIL )
-   METHOD GetItemData( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETITEMDATA, nLine, 0 ) , NIL )
-   METHOD SetItemData( nLine, cData )      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETITEMDATA, nLine+1, cData ) , NIL )
+   METHOD GetItemData( nLine )             INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETITEMDATA, nLine-1, 0 ) , NIL )
+   METHOD SetItemData( nLine, cData )      INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETITEMDATA, nLine-1, cData ) , NIL )
    METHOD SelItemRange( nFrom, nTo, lSel ) INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SELITEMRANGE, IIF( lSel, 1, 0 ), MAKELONG( nFrom, nTo ) ) , NIL )
    METHOD SetAnchorIndex( nLine )          INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_SETANCHORINDEX, nLine, 0 ), NIL )
    METHOD GetAnchorIndex()                 INLINE IIF( ::hWnd != NIL, ::SendMessage( LB_GETANCHORINDEX, 0, 0 ) , NIL )

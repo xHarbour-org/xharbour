@@ -31,8 +31,9 @@
 
 
 CLASS MemoryTable INHERIT Component
-   DATA Structure          PUBLISHED
-   DATA Table              PUBLISHED INIT {}
+   PROPERTY Structure
+   PROPERTY Table          DEFAULT {}
+
    DATA Alias              EXPORTED
    DATA Fields             EXPORTED
    DATA Tag                EXPORTED
@@ -267,11 +268,18 @@ RETURN ::Parent:Table[ ::Parent:Record ][ ::Parent:FieldPos( Upper( cName ) ) ]
 
 //-------------------------------------------------------------------------------------------------------
 METHOD FieldPut( nField, xVal ) CLASS MemData
-RETURN ::Parent:Table[ ::Parent:Record ][ nField ] := xVal
+   IF ::Parent:Record > 0
+      ::Parent:Table[ ::Parent:Record ][ nField ] := xVal
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD FieldGet( nField ) CLASS MemData
-RETURN ::Parent:Table[ ::Parent:Record ][ nField ]
+   LOCAL xRet
+   IF ::Parent:Record > 0
+      xRet := ::Parent:Table[ ::Parent:Record ][ nField ]
+   ENDIF
+RETURN xRet
 
 //-------------------------------------------------------------------------------------------------------
 //#ifdef VXH_PROFESSIONAL
@@ -448,10 +456,10 @@ RETURN oGrid
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MemoryDataTable INHERIT DataTable
-   DATA Table              EXPORTED  INIT {}
-   DATA Structure          PUBLISHED
-   DATA Shared             PUBLISHED INIT .T.
+   PROPERTY Structure
+   PROPERTY Shared         DEFAULT .T.
 
+   DATA Table              EXPORTED  INIT {}
    DATA __lMemory          EXPORTED INIT .T.
    DATA xFileName          PROTECTED
    ACCESS FileName         INLINE ::xFileName
