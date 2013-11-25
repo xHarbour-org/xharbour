@@ -645,8 +645,12 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
                        FOR n := 1 TO LEN( aProperties )
                            IF ! aProperties[n][1][1] $ "_X"
-                              aProp := __GetProperCase( __Proper( aProperties[n] ) )
-                              AADD( aList, aProp[1]+"?8" )
+                              IF __ObjHasMsg( oObj, "__a_"+aProperties[n] )
+                                 aProp   := __objSendMsg( oObj, "__a_"+aProperties[n] )
+                                 AADD( aList, aProp[1]+"?8" )
+                               ELSE
+                                 AADD( aList, aProperties[n] + "?8" )
+                              ENDIF
                            ENDIF
                        NEXT
 
