@@ -154,8 +154,11 @@ CLASS IDE INHERIT Application
 
    DATA AddOnPath        EXPORTED
 
-   DATA CControls        EXPORTED INIT {}
-   DATA DisableWhenRunning EXPORTED INIT .F.
+   DATA CControls                      EXPORTED INIT {}
+   DATA DisableWhenRunning             EXPORTED INIT .F.
+   DATA InsKey                         EXPORTED INIT .T.
+   DATA __lCopyCut                     EXPORTED  INIT .F.
+   DATA __PropFilter                   EXPORTED  INIT {}
 
    METHOD Init() CONSTRUCTOR
    METHOD SetEditorPos()
@@ -5129,12 +5132,8 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
           IF cProperty == NIL
              IF hOleVars == NIL
-                IF __ObjHasMsg( oCtrl, "__a_"+aProperty[1] )
-                   cProp := __objSendMsg( oCtrl, "__a_"+aProperty[1] )[1]
-                 ELSE
-                   cProp := __GetProperCase( __Proper( aProperty[1] ) )[1]
-                ENDIF
-               ELSE
+                cProp := __objSendMsg( oCtrl, "__a_"+aProperty[1] )[1]
+              ELSE
                 cProp := aProperty
              ENDIF
            ELSE

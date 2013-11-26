@@ -724,7 +724,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
       ENDIF
    ENDIF
 
-   IF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margin", cProp ) == 0
+   IF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margin", cProp ) == 0 .AND. AT( "RightProportional", cProp ) == 0
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
     ELSEIF cProp IN {"ActiveMenuBar","Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
@@ -789,7 +789,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       ENDIF
       PostMessage( oActiveObject:hWnd, WM_SIZE, 0, MAKELPARAM( oActiveObject:ClientWidth, oActiveObject:ClientHeight ) )
 
-    ELSEIF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margins", cProp ) == 0
+    ELSEIF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margins", cProp ) == 0 .AND. AT( "RightProportional", cProp ) == 0
 
       __objSendMsg( oActiveObject:Dock, "_"+cProp, xValue )
       IF xValue != NIL
@@ -1144,12 +1144,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        cType  := VALTYPE( xValue )
        nColor := NIL
  
-       IF __ObjHasMsg( ::ActiveObject, "__a_"+cProp )
-          aProp := __objSendMsg( ::ActiveObject, "__a_"+cProp )
-        ELSE
-          aProp := __GetProperCase( cProp )
-       ENDIF
-
+       aProp := __objSendMsg( ::ActiveObject, "__a_"+cProp )
        cProp := aProp[1]
 
        IF Empty( aProp[2] )
@@ -1164,7 +1159,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           oItem:Create()
        ENDIF
 
-       IF GetProperPar( cProp ) == "Colors" .AND. VALTYPE(xValue) != "L"
+       IF aProp[2] == "Colors" .AND. VALTYPE(xValue) != "L"
           cType  := "COLORREF"
           nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue )
        ENDIF
@@ -1492,7 +1487,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 RETURN NIL
 
 METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
-   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub
+   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub, aProp
    IF VALTYPE( xValue ) == "O"
       aSub := __ClsGetPropertiesAndValues( xValue )
       FOR EACH aSubProp IN aSub
@@ -1504,13 +1499,15 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
           cType   := VALTYPE( xValue2 )
           nColor  := NIL
 
-          IF GetProperPar( cProp2 ) == "Colors" .AND. VALTYPE(xValue2) != "L"
+          aProp   := __objSendMsg( xValue, "__a_"+cProp2 )
+          cProp2  := aProp[1]
+
+          IF aProp[2] == "Colors" .AND. VALTYPE(xValue2) != "L"
              nColor := ::GetColorValues( xValue, cProp2, @xValue2 )
              cType  := "COLORREF"
           ENDIF
 
-          cProp2  := __GetProperCase( cProp2 )[1]
-          aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
+          aCol   := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
 
           IF __ObjHasMsg( xValue, "Enum"+cProp2 )
              aCol[1]:Value    := xValue:Enum&cProp2[1]
@@ -3045,20 +3042,6 @@ CLASS ObjObjManager INHERIT ObjManager
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------
-
-STATIC FUNCTION GetProperPar( cProp )
-   LOCAL cPar, n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
-   IF n > 0
-      cPar := __aProps[ UPPER( cProp[1] ) ][n][2]
-   ENDIF
-RETURN cPar
-
-FUNCTION __GetProperCase( cProp )
-   LOCAL n := ASCAN( __aProps[ UPPER( cProp[1] ) ], {|a| UPPER( a[1] ) == UPPER( cProp ) } )
-   IF n > 0
-      RETURN __aProps[ UPPER( cProp[1] ) ][n]
-   ENDIF
-RETURN { __Proper( cProp ), "" }
 
 INIT PROCEDURE GetPropArray()
 __aProps["A"] := { { "AutoHScroll",             "Style"     },;
