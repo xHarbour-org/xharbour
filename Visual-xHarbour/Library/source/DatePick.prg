@@ -21,21 +21,21 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY AutoChange        DEFAULT .F.
    PROPERTY Date              SET (::xDate := v, ::SetSystemTime()) DEFAULT DATE()
    PROPERTY Time              SET (::xTime := v, ::SetSystemTime()) DEFAULT TIME()
-   PROPERTY UpDown            INDEX DTS_UPDOWN        READ xUpDown            WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Parse             INDEX DTS_APPCANPARSE   READ xParse             WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY Format                                    READ xFormat            WRITE SetFormat DEFAULT __GetSystem():DateTimeFormat:Short  PROTECTED
-   PROPERTY CustomFormat                              READ xCustomFormat      WRITE SetCustomFormat       PROTECTED
-   PROPERTY Border            INDEX WS_BORDER         READ xBorder            WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY UpDown            SET ::SetStyle( DTS_UPDOWN, v )       DEFAULT .F.
+   PROPERTY Parse             SET ::SetStyle( DTS_APPCANPARSE, v )  DEFAULT .F.
+   PROPERTY Format            SET ::SetFormat(v)                    DEFAULT __GetSystem():DateTimeFormat:Short
+   PROPERTY CustomFormat      SET ::SetCustomFormat(v)
+   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )        DEFAULT .F.
 
-   PROPERTY ShowNone          INDEX DTS_SHOWNONE      READ xShowNone          WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY RightAlign        INDEX DTS_RIGHTALIGN    READ xRightAlign        WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY BlankDate                                 READ xBlankDate         WRITE __SetBlankDate DEFAULT .F.  PROTECTED
+   PROPERTY ShowNone          SET ::SetStyle( DTS_SHOWNONE, v )     DEFAULT .F.
+   PROPERTY RightAlign        SET ::SetStyle( DTS_RIGHTALIGN, v )   DEFAULT .F.
+   PROPERTY BlankDate         SET ::__SetBlankDate(v)               DEFAULT .F.
 
-   PROPERTY BackColor         INDEX MCSC_MONTHBK      READ xBackColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY ForeColor         INDEX MCSC_TEXT         READ xForeColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleBackColor    INDEX MCSC_TITLEBK      READ xTitleBackColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleForeColor    INDEX MCSC_TITLETEXT    READ xTitleForeColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
+   PROPERTY BackColor         SET ::SetCalendarColor( MCSC_MONTHBK, v )      
+   PROPERTY ForeColor         SET ::SetCalendarColor( MCSC_TEXT, v )         
+   PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )      
+   PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
+   PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
@@ -60,7 +60,7 @@ CLASS DateTimePicker INHERIT Control
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-
+   METHOD IsShowNoneChecked()              INLINE ::ShowNone .AND. ::SendMessage( DTM_GETSYSTEMTIME ) <> GDT_NONE 
    METHOD GetCalendarColor( nPos )         INLINE ::SendMessage( DTM_GETMCCOLOR, nPos, 0 )
    METHOD GetCalendarFont()                INLINE ::SendMessage( DTM_GETMCFONT, 0, 0 )
    METHOD GetCalendarHandle()              INLINE ::SendMessage( DTM_GETMONTHCAL, 0, 0 )
