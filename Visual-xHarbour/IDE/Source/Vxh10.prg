@@ -25,6 +25,7 @@ CLASS ResourceManager INHERIT Dialog
    METHOD OnOk()
    METHOD OnCancel()
    METHOD Save()
+   METHOD ResourceManagerOnQueryBackColor()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
@@ -106,6 +107,7 @@ METHOD OnInitDialog() CLASS ResourceManager
       :Dock:Right   := :Parent
       :Dock:Bottom  := :Parent:Button1
 
+      :EventHandler[ "OnQueryBackColor" ] := "ResourceManagerOnQueryBackColor"
       :OnWMSize     := {|o| IIF( !EMPTY( o:Children ), o:Children[3]:Width := MAX( 1000, o:ClientWidth-150 ), ) }
 
       WITH OBJECT :DataSource := MemoryTable( ::Parent )
@@ -144,7 +146,6 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceName"
          :Width      := 100
          :AllowSize  := .T.
-         :BackColor  := {|o| IIF( ! EMPTY(o:Parent:DataSource:Fields:ResourceFile) .AND. ! FILE( o:Parent:DataSource:Fields:ResourceFile ), ::System:Color:Red, NIL ) }
          :Create()
       END
       WITH OBJECT GridColumn( :this )
@@ -153,7 +154,6 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceType"
          :Width      := 50
          :AllowSize  := .T.
-         //:BackColor  := ::ResourceName:BackColor
          :Create()
       END
       WITH OBJECT GridColumn( :this )
@@ -162,7 +162,6 @@ METHOD OnInitDialog() CLASS ResourceManager
          :Data       := "hb_QSelf():DataSource:Fields:ResourceFile"
          :Width      := MAX( 1000, :Parent:ClientWidth-150 )
          :AllowSize  := .T.
-         //:BackColor  := ::ResourceName:BackColor
          :Create()
       END
       :Create()
@@ -172,6 +171,13 @@ METHOD OnInitDialog() CLASS ResourceManager
 
    ::ToolStripButton2:Enabled := ::DataGrid1:DataSource:RecCount() > 0
 RETURN NIL
+
+METHOD ResourceManagerOnQueryBackColor( Sender ) CLASS ResourceManager
+   LOCAL nColor
+   IF Sender:DataSource != NIL .AND. ! EMPTY(Sender:DataSource:Fields:ResourceFile) .AND. ! FILE( Sender:DataSource:Fields:ResourceFile )
+      nColor := ::System:Color:Red
+   ENDIF
+RETURN nColor
 
 METHOD AddResource() CLASS ResourceManager
    LOCAL cFile, lCopy, cResName, cType, oFile := CFile( "" )
