@@ -5131,7 +5131,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
       FOR EACH aProperty IN aProperties
 
           IF cProperty == NIL
-             IF hOleVars == NIL
+             IF hOleVars == NIL .AND. __objHasMsg( oCtrl, "__a_"+aProperty[1] )
                 cProp := __objSendMsg( oCtrl, "__a_"+aProperty[1] )[1]
               ELSE
                 cProp := aProperty
@@ -5441,7 +5441,7 @@ RETURN 0
 METHOD Build( lForce ) CLASS Project
    LOCAL n, cProject, cExe, cResPath, oItem
    LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp, cVar, cInc, aInc
-   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude
+   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude, cDef
 
    DEFAULT lForce TO .F.
 
@@ -5504,11 +5504,9 @@ METHOD Build( lForce ) CLASS Project
          :RunArguments := ::Properties:Parameters
          :lNoAutoFWH   := .T.
 
-         IF !EMPTY( ::Properties:Definitions )
-            ::Properties:Definitions := "; " + ::Properties:Definitions
-         ENDIF
-
-         :SetDefines( "__VXH__" + ::Properties:Definitions )
+         cDef := ALLTRIM( ::Properties:Definitions )
+         
+         :SetDefines( "__VXH__" + IIF( cDef[1] != ";", ";", "" ) + cDef )
 
          :lClean := ::Properties:CleanBuild
 
@@ -6243,32 +6241,31 @@ RETURN NIL
 
 CLASS ProjProp INHERIT Component
 
-   DATA TargetType    PUBLISHED INIT 1
+   PROPERTY TargetType    DEFAULT 1
+   PROPERTY Binary        ROOT "Directories" DEFAULT "Bin"
+   PROPERTY Objects       ROOT "Directories" DEFAULT "Obj"
+   PROPERTY Source        ROOT "Directories" DEFAULT "Source"
+   PROPERTY Resource      ROOT "Directories" DEFAULT "Resource"
+
+   PROPERTY Name
+   PROPERTY Path
+
+   PROPERTY SourcePath    DEFAULT ""
+   PROPERTY IncludePath   DEFAULT ""
+
+   PROPERTY CompilerFlags DEFAULT "-es2 -gc0 -m -n -w -q"
+   PROPERTY Definitions   DEFAULT ""
+   PROPERTY CleanBuild    DEFAULT .F.
+   PROPERTY UseDLL        DEFAULT .F.
+   PROPERTY TargetName    DEFAULT ""
+   PROPERTY ThemeActive   DEFAULT .T.
+   PROPERTY Parameters    DEFAULT ""
+   PROPERTY MultiThread   DEFAULT .F.
+   PROPERTY GUI           DEFAULT .F.
+   PROPERTY Compatibility DEFAULT .F.
+
    DATA EnumTargetType EXPORTED INIT { { "Executable", "Library", "Dynamic Load Library", "Harbour PCode", "Ole Server" }, {1,2,3,4,5} }
-
    DATA ClsName       EXPORTED INIT "ProjProp"
-
-
-   DATA Binary        PUBLISHED INIT "Bin"
-   DATA Objects       PUBLISHED INIT "Obj"
-   DATA Source        PUBLISHED INIT "Source"
-   DATA Resource      PUBLISHED INIT "Resource"
-
-   DATA Name          PUBLISHED
-   DATA Path          PUBLISHED
-
-   DATA SourcePath    PUBLISHED INIT ""
-   DATA IncludePath   PUBLISHED INIT ""
-   DATA CompilerFlags PUBLISHED INIT "-es2 -gc0 -m -n -w -q"
-   DATA Definitions   PUBLISHED INIT ""
-   DATA CleanBuild    PUBLISHED INIT .F.
-   DATA UseDLL        PUBLISHED INIT .F.
-   DATA TargetName    PUBLISHED INIT ""
-   DATA ThemeActive   PUBLISHED INIT .T.
-   DATA Parameters    PUBLISHED INIT ""
-   DATA MultiThread   PUBLISHED INIT .F.
-   DATA GUI           PUBLISHED INIT .F.
-   DATA Compatibility PUBLISHED INIT .F.
 
    DATA ClassID       EXPORTED INIT ""
    DATA Files         EXPORTED
