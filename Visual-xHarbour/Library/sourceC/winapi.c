@@ -4981,6 +4981,8 @@ HB_FUNC( GETSAVEFILENAME )
 
       pOfn = (OPENFILENAME *) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
 
+      pOfn->lStructSize = sizeof(OPENFILENAME);
+
       if( GetSaveFileName( pOfn ) )
       {
          hb_vmPushSymbol( pDEVALUE->pSymbol );
