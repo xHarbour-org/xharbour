@@ -6896,7 +6896,7 @@ RETURN Self
       DATA ProgID        EXPORTED
       DATA ClsID         EXPORTED
 
-      PROPERTY Url READ xUrl WRITE WebNavigate PROTECTED
+      PROPERTY Url SET ::WebNavigate(v) PROTECTED
 
       METHOD Init() CONSTRUCTOR
       METHOD Create()
