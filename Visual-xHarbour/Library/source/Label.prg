@@ -14,22 +14,25 @@
 #include "debug.ch"
 #include "vxh.ch"
 
+#define EP_EDITBORDER_NOSCROLL 6
+#define EPSN_NORMAL            1
+#define EPSN_HOT               2
+#define EPSN_FOCUSED           3
+#define EPSN_DISABLED          4
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS Label INHERIT Control
+   PROPERTY Alignment       SET ::Redraw(v)  DEFAULT DT_LEFT
+   PROPERTY Border          SET ::Redraw(v)  DEFAULT 0
+   PROPERTY Transparent     SET ::__SetTransp(v) DEFAULT .F.
+   PROPERTY NoPrefix        SET ::Redraw(v)  DEFAULT .F.
+   PROPERTY VertCenter      SET ::Redraw(v)  DEFAULT .F.
+   PROPERTY TextShadowColor SET ::InvalidateRect()
+   PROPERTY BlinkColor      SET ::__SetBlinkColor(v)
+
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
-   PROPERTY Alignment    SET ::Redraw(v)  DEFAULT DT_LEFT PROTECTED
-
-   DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
-   PROPERTY Border       SET ::Redraw(v)  DEFAULT 0       PROTECTED
-
-   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
-
-   PROPERTY NoPrefix     SET ::Redraw(v)  DEFAULT .F.     PROTECTED
-   PROPERTY VertCenter   SET ::Redraw(v)  DEFAULT .F.     PROTECTED
-
-   PROPERTY TextShadowColor READ xTextShadowColor WRITE InvalidateRect
-   PROPERTY BlinkColor      READ xBlinkColor      WRITE __SetBlinkColor
+   DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen", "EditBox" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER, 3 } }
 
    // Backward compatibility
    ACCESS CenterText    INLINE ::Alignment == DT_CENTER
@@ -158,7 +161,7 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hTheme, nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
 
    hDC := ::BeginPaint()
 
@@ -175,6 +178,12 @@ METHOD OnPaint() CLASS Label
          hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
          Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
          SelectObject( hDC, hBrush )
+
+       ELSEIF ::Border == 3
+         hTheme := OpenThemeData(,"edit")
+         DrawThemeBackground( hTheme, hDC, EP_EDITBORDER_NOSCROLL, EPSN_NORMAL, aRect, aRect )
+         CloseThemeData( hTheme )
+
        ELSE
          _DrawEdge( hDC, aRect, ::Border, BF_RECT )
       ENDIF
@@ -222,9 +231,10 @@ RETURN 0
 
 
 CLASS Line INHERIT CONTROL
-   PROPERTY Lenght         READ xLenght   WRITE __SetLenght   DEFAULT 150 INVERT
-   PROPERTY Sunken         READ xSunken   WRITE __SetSunken   DEFAULT .T. INVERT
-   PROPERTY Vertical       READ xVertical WRITE __SetVertical DEFAULT .F.
+   PROPERTY Lenght         SET ::__SetLenght(v)   DEFAULT 150
+   PROPERTY Sunken         SET ::__SetSunken(v)   DEFAULT .T.
+   PROPERTY Vertical       SET ::__SetVertical(v) DEFAULT .F.
+   PROPERTY Color                                 DEFAULT  GetSysColor( COLOR_BTNSHADOW )
 
    ACCESS Width            INLINE ::xWidth
    ACCESS Height           INLINE ::xHeight
@@ -257,8 +267,6 @@ CLASS Line INHERIT CONTROL
    DATA TabOrder           EXPORTED  INIT 0  
    DATA NoActivate         EXPORTED  INIT .F.
    DATA Theming            EXPORTED  INIT .F.
-
-   DATA Color              PUBLISHED INIT GetSysColor( COLOR_BTNSHADOW )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

@@ -47,13 +47,13 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS GroupBox INHERIT Control
-   DATA ImageIndex PROTECTED
+   PROPERTY Transparent SET ::__SetTransp(v) DEFAULT .F.
+   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList )
 
-   PROPERTY Transparent READ xTransparent WRITE __SetTransp DEFAULT .F.
+   DATA ImageIndex PROTECTED
 
    ACCESS ForeSysColor INLINE ::GetSysColor()
 
-   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
    
    METHOD Init()  CONSTRUCTOR
    METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent, ::__SetTransp(.T.), ), Super:Create()

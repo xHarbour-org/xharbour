@@ -18,26 +18,29 @@
 //--------------------------------------------------------------------------------------------------------------
 
 CLASS Splitter INHERIT Control
+
+   DATA lDown          PROTECTED INIT .F.
+   DATA InvRect        PROTECTED
+   DATA hWinDC         PROTECTED
+
    DATA MoveWhileDrag  EXPORTED INIT .F. // backward compatibility
-   DATA ShowDragging   PUBLISHED INIT .F.
-   DATA Position       PUBLISHED  //INIT 1
 
    DATA Weight         EXPORTED  INIT 3
    DATA Cursor         EXPORTED
    DATA MinTop         EXPORTED
    DATA MaxBottom      EXPORTED
-   DATA lDown          PROTECTED INIT .F.
-   DATA lSizing        EXPORTED INIT .F.
-   DATA InvRect        PROTECTED
-   DATA hWinDC         PROTECTED
+   DATA lSizing        EXPORTED  INIT .F.
    DATA TabOrder       EXPORTED
 
-   PROPERTY Left    INDEX 1 READ xLeft   WRITE __SetSizePos HIDDEN
-   PROPERTY Top     INDEX 2 READ xTop    WRITE __SetSizePos HIDDEN
-   PROPERTY Width   INDEX 3 READ xWidth  WRITE __SetSizePos HIDDEN
-   PROPERTY Height  INDEX 4 READ xHeight WRITE __SetSizePos HIDDEN
-   
-   PROPERTY Owner GET __ChkComponent( Self, @::xOwner )
+   PROPERTY Left       SET ::__SetSizePos( 1, v ) NOTPUBLIC
+   PROPERTY Top        SET ::__SetSizePos( 2, v ) NOTPUBLIC
+   PROPERTY Width      SET ::__SetSizePos( 3, v ) NOTPUBLIC
+   PROPERTY Height     SET ::__SetSizePos( 4, v ) NOTPUBLIC
+
+   PROPERTY Owner      GET __ChkComponent( Self, @::xOwner )
+
+   PROPERTY ShowDragging DEFAULT .F.
+   PROPERTY Position
 
    EXPORTED:
       DATA ToolTip
@@ -90,7 +93,7 @@ METHOD Init( oParent ) CLASS Splitter
    ::Weight       := 3
    ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle      := WS_EX_TRANSPARENT
-   ::__IsStandard   := .F.
+   ::__IsStandard := .F.
    ::Events       := {}
 RETURN Self
 
@@ -393,6 +396,9 @@ METHOD SetSizes() CLASS Splitter
          ::Owner:xWidth := ::xLeft - ::Owner:xLeft
          IF ::Owner:xWidth != nOld
             ::Owner:__WidthPerc := ( ::Owner:xWidth / ( ::Owner:Parent:xWidth-::Owner:xLeft ) )
+            IF ::Owner:Dock != NIL .AND. ::Owner:Dock:__nWidthPerc != NIL
+               ::Owner:Dock:__nWidthPerc := ( ::Owner:xWidth  / ( ::Owner:Parent:ClientWidth-::Owner:xLeft ) )
+            ENDIF
             lMove := .T.
          ENDIF
          EXIT

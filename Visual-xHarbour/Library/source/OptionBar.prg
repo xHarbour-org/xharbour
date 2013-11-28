@@ -26,6 +26,11 @@
 #define DG_ADDCONTROL             1
 
 CLASS OptionBar INHERIT Control
+   PROPERTY CheckGroup    DEFAULT .T.
+   PROPERTY ImageList     GET __ChkComponent( Self, @::xImageList ) ;
+                          SET IIF( ::__ToolBar != NIL, ::__ToolBar:ImageList := v,)
+   PROPERTY HotImageList  GET __ChkComponent( Self, @::xHotImageList )
+   PROPERTY List          SET IIF( ::__ToolBar != NIL, ::__ToolBar:List := v,) DEFAULT .F.
 
    DATA PagerSize    EXPORTED INIT 12
    DATA __oPage      EXPORTED
@@ -43,23 +48,6 @@ CLASS OptionBar INHERIT Control
    DATA  xButtonCheckSolid PROTECTED INIT .T.
    ACCESS ButtonCheckSolid    INLINE ::xButtonCheckSolid
    ASSIGN ButtonCheckSolid(l) INLINE ::xButtonCheckSolid := l, IIF( ::__ToolBar != NIL, ::__ToolBar:ButtonCheckSolid := l, )
-
-   DATA xCheckGroup  PROTECTED INIT .T.
-   ACCESS CheckGroup    INLINE ::xCheckGroup PERSISTENT
-   ASSIGN CheckGroup(l) INLINE ::xCheckGroup := l
-
-   DATA xImageList  PROTECTED
-   ACCESS ImageList    INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
-   ASSIGN ImageList(o) INLINE ::xImageList := o, IIF( ::__ToolBar != NIL, ::__ToolBar:ImageList := o,)
-
-   DATA xHotImageList      EXPORTED
-   ACCESS HotImageList     INLINE __ChkComponent( Self, @::xHotImageList ) PERSISTENT
-   ASSIGN HotImageList(o)  INLINE ::xHotImageList := o
-
-
-   DATA xList  PROTECTED INIT .F.
-   ACCESS List    INLINE ::xList PERSISTENT
-   ASSIGN List(l) INLINE ::xList := l, IIF( ::__ToolBar != NIL, ::__ToolBar:List := l,)
 
    METHOD IsButtonChecked( nId ) INLINE ::__ToolBar:IsButtonChecked( nId )
 

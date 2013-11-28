@@ -23,9 +23,9 @@ CLASS Control INHERIT Window
    PROPERTY Anchor         ROOT "Position"
    PROPERTY Transparent    ROOT "Appearance" DEFAULT .F.
    PROPERTY ContextMenu    ROOT "Behavior"   GET __ChkComponent( Self, @::xContextMenu )
-   PROPERTY TabStop        ROOT "Behavior"   INDEX WS_TABSTOP READ xTabStop WRITE SetStyle          DEFAULT .T. PROTECTED
-   PROPERTY Enabled        ROOT "Behavior"   READ xEnabled WRITE __Enable          DEFAULT .T.
-   PROPERTY Text           ROOT "Appearance" ACCESS {|Self| IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) )} ASSIGN {|Self,c| ::SetWindowText( c ), ::xText := c} DEFAULT ""
+   PROPERTY TabStop        ROOT "Behavior"   SET ::SetStyle( WS_TABSTOP, v )          DEFAULT .T. PROTECTED
+   PROPERTY Enabled        ROOT "Behavior"   SET ::__Enable(v)                        DEFAULT .T.
+   PROPERTY Text           ROOT "Appearance" GET IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) SET ::SetWindowText( v ) DEFAULT ""
    PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -286,20 +286,17 @@ RETURN hBkGnd
 //---------------------------------------------------------------------------------------------------
 
 CLASS CommonControls INHERIT Control
-   PROPERTY CCS_Adjustable    INDEX CCS_ADJUSTABLE    READ xCCS_Adjustable    WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoDevider     INDEX CCS_NODIVIDER     READ xCCS_NoDevider     WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_Left          INDEX CCS_LEFT          READ xCCS_Left          WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Top           INDEX CCS_TOP           READ xCCS_Top           WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Right         INDEX CCS_RIGHT         READ xCCS_Right         WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_Bottom        INDEX CCS_BOTTOM        READ xCCS_Bottom        WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_NoMoveX       INDEX CCS_NOMOVEX       READ xCCS_NoMoveX       WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoMoveY       INDEX CCS_NOMOVEY       READ xCCS_NoMoveY       WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoResize      INDEX CCS_NORESIZE      READ xCCS_NoResize      WRITE SetProperty DEFAULT .F. PROTECTED
-   PROPERTY CCS_NoParentAlign INDEX CCS_NOPARENTALIGN READ xCCS_NoParentAlign WRITE SetProperty DEFAULT .F. PROTECTED
-
-   PROPERTY CCS_Vert          INDEX CCS_VERT          READ xCCS_Vert          WRITE SetProperty DEFAULT .F. PROTECTED
+   PROPERTY CCS_Adjustable    SET ::SetProperty( CCS_ADJUSTABLE, v )    DEFAULT .F.
+   PROPERTY CCS_NoDevider     SET ::SetProperty( CCS_NODIVIDER, v )     DEFAULT .F.
+   PROPERTY CCS_Left          SET ::SetProperty( CCS_LEFT, v )          DEFAULT .F.
+   PROPERTY CCS_Top           SET ::SetProperty( CCS_TOP, v )           DEFAULT .F.
+   PROPERTY CCS_Right         SET ::SetProperty( CCS_RIGHT, v )         DEFAULT .F.
+   PROPERTY CCS_Bottom        SET ::SetProperty( CCS_BOTTOM, v )        DEFAULT .F.
+   PROPERTY CCS_NoMoveX       SET ::SetProperty( CCS_NOMOVEX, v )       DEFAULT .F.
+   PROPERTY CCS_NoMoveY       SET ::SetProperty( CCS_NOMOVEY, v )       DEFAULT .F.
+   PROPERTY CCS_NoResize      SET ::SetProperty( CCS_NORESIZE, v )      DEFAULT .F.
+   PROPERTY CCS_NoParentAlign SET ::SetProperty( CCS_NOPARENTALIGN, v ) DEFAULT .F.
+   PROPERTY CCS_Vert          SET ::SetProperty( CCS_VERT, v )          DEFAULT .F.
 
    METHOD SetProperty( nProp, lSet ) INLINE  ::Style := IIF( lSet, ::Style | nProp, ::Style & NOT( nProp ) )
 
@@ -327,9 +324,12 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 CLASS TitleControl INHERIT Control
-   DATA AllowUnDock          PUBLISHED INIT FALSE
-   DATA AllowClose           PUBLISHED INIT FALSE
-   DATA MenuArrow            PUBLISHED INIT .F.
+
+   PROPERTY TitleHeight SET ::ResetFrame() DEFAULT 21
+   PROPERTY Text        SET ::ResetFrame() DEFAULT ""
+   PROPERTY AllowUnDock                    DEFAULT FALSE
+   PROPERTY AllowClose                     DEFAULT FALSE
+   PROPERTY MenuArrow                      DEFAULT .F.
 
    DATA __lActive            EXPORTED  INIT .F.
 
@@ -342,9 +342,6 @@ CLASS TitleControl INHERIT Control
    DATA __aCloseRect         PROTECTED
    DATA __aArrowRect         PROTECTED
    DATA __nBtnHeight         PROTECTED INIT 17
-
-   PROPERTY TitleHeight READ xTitleHeight WRITE ResetFrame DEFAULT 21
-   PROPERTY Text        READ xText        WRITE ResetFrame DEFAULT ""
 
    METHOD Create()
    METHOD OnNCCalcSize()

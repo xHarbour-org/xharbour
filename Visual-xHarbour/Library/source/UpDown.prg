@@ -19,15 +19,14 @@
 
 CLASS UpDown INHERIT Control
    PROPERTY Buddy GET __ChkComponent( Self, @::xBuddy, .F. ) SET ::__SetBuddy(v)
-   DATA MinRange         PUBLISHED INIT 0
-   DATA MaxRange         PUBLISHED INIT 100
-   DATA DisplayThousands PUBLISHED INIT .F.
-   DATA ArrowKeys        PUBLISHED INIT .T.
+   PROPERTY MinRange         DEFAULT 0
+   PROPERTY MaxRange         DEFAULT 100
+   PROPERTY DisplayThousands DEFAULT .F.
+   PROPERTY ArrowKeys        DEFAULT .T.
+   PROPERTY Alignment        DEFAULT UDS_ALIGNRIGHT
    
-   DATA EnumAlignment    EXPORTED INIT {{ "Left", "Right" }, {UDS_ALIGNLEFT, UDS_ALIGNRIGHT} }
-   DATA Alignment        PUBLISHED INIT UDS_ALIGNRIGHT
-
-   DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
+   DATA EnumAlignment        EXPORTED INIT {{ "Left", "Right" }, {UDS_ALIGNLEFT, UDS_ALIGNRIGHT} }
+   DATA __lResizeable        EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

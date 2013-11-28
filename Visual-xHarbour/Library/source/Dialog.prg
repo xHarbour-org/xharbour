@@ -27,11 +27,12 @@
 //------------------------------------------------------------------------------------------------
 
 CLASS Dialog INHERIT WinForm
+   PROPERTY Modal    DEFAULT .T.
+
    DATA Template
    DATA MDIClient    PROTECTED
    DATA MdiContainer PROTECTED INIT .F.
    DATA Result       EXPORTED
-   DATA Modal        AS LOGIC  PUBLISHED INIT .T.
    DATA lEmpty       PROTECTED
    ACCESS Form       INLINE IIF( ::Modal .OR. ::Parent == NIL, Self, ::Parent:Form )
    

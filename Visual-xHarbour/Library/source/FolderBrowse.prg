@@ -68,11 +68,10 @@
 
 CLASS FolderTree INHERIT TreeView
    DATA RootFolder, InitialPath
-   DATA AllowShellMenu PUBLISHED INIT .T.
 
-   PROPERTY SysFolder READ xSysFolder WRITE __SetFolder DEFAULT __GetSystem():Folders:Desktop
-   PROPERTY Folder    READ xFolder    WRITE __SetFolder
-
+   PROPERTY AllowShellMenu                      DEFAULT .T.
+   PROPERTY SysFolder      SET ::__SetFolder(v) DEFAULT __GetSystem():Folders:Desktop
+   PROPERTY Folder         SET ::__SetFolder(v)
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -143,13 +142,12 @@ RETURN Self
 
 CLASS FolderList INHERIT ListView
    DATA RootFolder, InitialPath
-   
-   PROPERTY SysFolder  READ xSysFolder  WRITE __SetSysFolder DEFAULT __GetSystem():Folders:Desktop
-   PROPERTY Folder     READ xFolder     WRITE __SetFolder
-   
-   DATA AllowNavigation PUBLISHED INIT .T.
-   DATA ShowFolders     PUBLISHED INIT .T.
-   DATA AllowShellMenu  PUBLISHED INIT .T.
+
+   PROPERTY AllowNavigation                      DEFAULT .T.
+   PROPERTY ShowFolders                          DEFAULT .T.
+   PROPERTY AllowShellMenu                       DEFAULT .T.
+   PROPERTY SysFolder   SET ::__SetFolder(v,.t.) DEFAULT __GetSystem():Folders:Desktop
+   PROPERTY Folder      SET ::__SetFolder(v)
    
    DATA SelFile         EXPORTED  INIT ""
    DATA SelFolder       EXPORTED  INIT ""
@@ -166,7 +164,6 @@ CLASS FolderList INHERIT ListView
    METHOD __SetFolder()
    METHOD OnUserMsg()
    METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
-   METHOD __SetSysFolder(n)  INLINE ::__SetFolder( n, .T. )
    METHOD OpenSelFile(cFile) INLINE ShellExecute( GetActiveWindow(), "open", cFile )
    METHOD OpenSelFolder()
    METHOD Open()             INLINE IIF( !EMPTY( ::SelFile ), ::OpenSelFile( ::SelFile ), ::OpenSelFolder() )

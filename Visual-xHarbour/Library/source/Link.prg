@@ -38,13 +38,13 @@ CLASS Link INHERIT Control
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
 
-   PROPERTY Caption READ GetCaption WRITE SetCaption DEFAULT "" PROTECTED
+   PROPERTY Text GET ::GetText() SET ::SetText(v) DEFAULT ""
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD OnParentNotify()
-   METHOD GetCaption()
-   METHOD SetCaption()
+   METHOD GetText()
+   METHOD SetText()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -55,27 +55,27 @@ METHOD Init( oParent ) CLASS Link
    ::Style       := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Width       := 80
    ::Height      := 16
-   ::xCaption    := E"Sample link to web <A HREF=\"http://www.microsoft.com\">Microsoft</A>, and to <A HREF=\"http://www.xharbour.com\">xHarbour</A>"
+   ::xText    := E"Sample link to web <A HREF=\"http://www.microsoft.com\">Microsoft</A>, and to <A HREF=\"http://www.xharbour.com\">xHarbour</A>"
    ::Super:Init( oParent )
 RETURN Self
 
-METHOD GetCaption() CLASS Link
-   LOCAL cCaption := ::xCaption
-//   cCaption := StrTran( cCaption , "\\", "\" )
-//   cCaption := StrTran( cCaption , '\"', '"' )
-RETURN cCaption
+METHOD GetText() CLASS Link
+   LOCAL cText := ::xText
+//   cText := StrTran( cText , "\\", "\" )
+//   cText := StrTran( cText , '\"', '"' )
+RETURN cText
 
-METHOD SetCaption() CLASS Link
-   LOCAL cCaption := ::xCaption
-   cCaption := StrTran( cCaption , "\", "\\" )
-   cCaption := StrTran( cCaption , '"', '\"' )
-   ::xCaption := cCaption
-   SetWindowText( ::hWnd, ::xCaption )
-RETURN cCaption
+METHOD SetText() CLASS Link
+   LOCAL cText := ::xText
+   cText := StrTran( cText , "\", "\\" )
+   cText := StrTran( cText , '"', '\"' )
+   ::xText := cText
+   SetWindowText( ::hWnd, ::xText )
+RETURN cText
 
 METHOD Create() CLASS Link
-   ::xCaption := StrTran( ::xCaption, "\\", "\" )
-   ::xCaption := StrTran( ::xCaption, '\"', '"' )
+   ::xText := StrTran( ::xText, "\\", "\" )
+   ::xText := StrTran( ::xText, '\"', '"' )
    Super:Create()
 RETURN Self
 

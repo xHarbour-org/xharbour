@@ -68,27 +68,27 @@ CLASS ListView INHERIT TitleControl
    PROPERTY ImageListSmall GET __ChkComponent( Self, @::xImageListSmall ) SET ::SetImageListSmall(v)
    PROPERTY DataSource     GET __ChkComponent( Self, @::xDataSource )     SET ::SetDataSource(v)
 
-   PROPERTY Gradient       INDEX LVS_EX_GRADIENT      READ xGradient       WRITE SetLVExStyle DEFAULT .F. PROTECTED
-   PROPERTY FlatScrollBar  INDEX LVS_EX_FLATSB        READ xFlatScrollBar  WRITE SetLVExStyle DEFAULT .F. PROTECTED
-   PROPERTY GridLines      INDEX LVS_EX_GRIDLINES     READ xGridLines      WRITE SetLVExStyle DEFAULT .F. PROTECTED
-   PROPERTY FullRowSelect  INDEX LVS_EX_FULLROWSELECT READ xFullRowSelect  WRITE SetLVExStyle DEFAULT .F. PROTECTED
-   PROPERTY AlignLeft      INDEX LVS_ALIGNLEFT        READ xAlignLeft      WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY AlignMask      INDEX LVS_ALIGNMASK        READ xAlignMask      WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY AlignTop       INDEX LVS_ALIGNTOP         READ xAlignTop       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY NoColumnHeader INDEX LVS_NOCOLUMNHEADER   READ xNoColumnHeader WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY NoLabelWrap    INDEX LVS_NOLABELWRAP      READ xNoLabelWrap    WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY NoScroll       INDEX LVS_NOSCROLL         READ xNoScroll       WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY NoSortHeader   INDEX LVS_NOSORTHEADER     READ xNoSortHeader   WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY OwnerDrawFixed INDEX LVS_OWNERDRAWFIXED   READ xOwnerDrawFixed WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY OwnerData      INDEX LVS_OWNERDATA        READ xOwnerData      WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY EditLabels     INDEX LVS_EDITLABELS       READ xEditLabels     WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY AutoArrange    INDEX LVS_AUTOARRANGE      READ xAutoArrange    WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY ShowSelAlways  INDEX LVS_SHOWSELALWAYS    READ xShowSelAlways  WRITE SetStyle     DEFAULT .F. PROTECTED
-   PROPERTY SingleSel      INDEX LVS_SINGLESEL        READ xSingleSel      WRITE SetStyle     DEFAULT .F. PROTECTED
+   PROPERTY Gradient       SET ::SetLVExStyle( LVS_EX_GRADIENT, v )      DEFAULT .F.
+   PROPERTY FlatScrollBar  SET ::SetLVExStyle( LVS_EX_FLATSB, v )        DEFAULT .F.
+   PROPERTY GridLines      SET ::SetLVExStyle( LVS_EX_GRIDLINES, v )     DEFAULT .F.
+   PROPERTY FullRowSelect  SET ::SetLVExStyle( LVS_EX_FULLROWSELECT, v ) DEFAULT .F.
+   PROPERTY AlignLeft      SET ::SetStyle( LVS_ALIGNLEFT, v )            DEFAULT .F.
+   PROPERTY AlignMask      SET ::SetStyle( LVS_ALIGNMASK, v )            DEFAULT .F.
+   PROPERTY AlignTop       SET ::SetStyle( LVS_ALIGNTOP, v )             DEFAULT .F.
+   PROPERTY NoColumnHeader SET ::SetStyle( LVS_NOCOLUMNHEADER, v )       DEFAULT .F.
+   PROPERTY NoLabelWrap    SET ::SetStyle( LVS_NOLABELWRAP, v )          DEFAULT .F.
+   PROPERTY NoScroll       SET ::SetStyle( LVS_NOSCROLL, v )             DEFAULT .F.
+   PROPERTY NoSortHeader   SET ::SetStyle( LVS_NOSORTHEADER, v )         DEFAULT .F.
+   PROPERTY OwnerDrawFixed SET ::SetStyle( LVS_OWNERDRAWFIXED, v )       DEFAULT .F.
+   PROPERTY OwnerData      SET ::SetStyle( LVS_OWNERDATA, v )            DEFAULT .F.
+   PROPERTY EditLabels     SET ::SetStyle( LVS_EDITLABELS, v )           DEFAULT .F.
+   PROPERTY AutoArrange    SET ::SetStyle( LVS_AUTOARRANGE, v )          DEFAULT .F.
+   PROPERTY ShowSelAlways  SET ::SetStyle( LVS_SHOWSELALWAYS, v )        DEFAULT .F.
+   PROPERTY SingleSel      SET ::SetStyle( LVS_SINGLESEL, v )            DEFAULT .F.
    
-   PROPERTY BackColor                                 READ xBackColor      WRITE SetBackColor             PROTECTED
-   PROPERTY ForeColor                                 READ xForeColor      WRITE SetForeColor             PROTECTED
-   PROPERTY ViewStyle                                 READ xViewStyle      WRITE __SetViewStyle DEFAULT LVS_ICON  PROTECTED INVERT
+   PROPERTY BackColor      SET ::SetBackColor(v)
+   PROPERTY ForeColor      SET ::SetForeColor(v)
+   PROPERTY ViewStyle      SET ::__SetViewStyle(v) DEFAULT LVS_ICON
 
    DATA EnumViewStyle EXPORTED  INIT { { "Icon", "Report", "SmallIcon", "List", "Tile" }, {LV_VIEW_ICON,LV_VIEW_DETAILS,LV_VIEW_SMALLICON,LV_VIEW_LIST,LV_VIEW_TILE} }
 
@@ -162,11 +162,11 @@ METHOD Create( lNew ) CLASS ListView
    IF ::__ClassInst != NIL
       ::__IdeContextMenuItems := { { "Add Group", {|o| o:=ListViewGroup( Self ),;
                                                    ::Application:Project:Modified := .T.,;
-                                                   o:Caption := o:Name,;
+                                                   o:Text := o:Name,;
                                                    o:Create() } }}
    ENDIF
 
-   IF !EMPTY( ::Caption )
+   IF !EMPTY( ::Text )
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
    ENDIF
    IF ::ImageList != NIL
@@ -349,8 +349,8 @@ RETURN Self
     
 //--------------------------------------------------------------------------------------------------------
 
-METHOD AddColumn( cCaption, nWidth, nAlign )
-   LOCAL oColumn := ListViewColumn( Self, cCaption, nWidth, nAlign, .T. )
+METHOD AddColumn( cText, nWidth, nAlign )
+   LOCAL oColumn := ListViewColumn( Self, cText, nWidth, nAlign, .T. )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
@@ -469,12 +469,12 @@ ENDCLASS
 
 //----------------------------------------------------------------------------------------------
 
-METHOD Init( oParent, cCaption, nWidth, nAlign, lCreate ) CLASS ListViewColumn
+METHOD Init( oParent, cText, nWidth, nAlign, lCreate ) CLASS ListViewColumn
 
    DEFAULT lCreate TO .F.
 
    ::Parent    := oParent
-   ::Caption   := cCaption
+   ::Text      := cText
    ::Width     := nWidth
    ::Align     := nAlign
    ::__CreateProperty( "ListViewColumn" )
@@ -494,7 +494,7 @@ METHOD Create() CLASS ListViewColumn
    lvc:iSubItem   := LEN( ::Parent:Columns )
    lvc:cchTextMax := 0
    lvc:iImage     := ::ImageIndex-1
-   lvc:pszText    := ::Caption
+   lvc:pszText    := ::Text
    lvc:fmt        := ::Align
    lvc:cx         := ::Width
    ::Index        := LEN(::Parent:Columns)
@@ -517,13 +517,13 @@ RETURN Self
 
 CLASS ListViewGroup INHERIT Control
    DATA __lCreated  PROTECTED INIT .F.
-   PROPERTY Caption     READ xCaption   WRITE SetCaption PROTECTED
-   PROPERTY Alignment   READ xAlignment WRITE SetAlignment DEFAULT __GetSystem():ListViewGroupAlign:Left PROTECTED
+   PROPERTY Text        SET ::SetText(v)
+   PROPERTY Alignment   SET ::SetAlignment(v) DEFAULT __GetSystem():ListViewGroupAlign:Left
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Destroy()
-   METHOD SetCaption()
+   METHOD SetText()
    METHOD SetAlignment()
    METHOD AddItem( cText, nImage, nRow ) INLINE ::Parent:InsertItem( cText, nImage, nRow, ::Id )
    METHOD GetRectangle()
@@ -544,8 +544,8 @@ METHOD Create() CLASS ListViewGroup
 
    plvg:cbSize    := plvg:sizeof()
    plvg:mask      := LVGF_HEADER | LVGF_GROUPID | LVGF_ALIGN
-   plvg:pszHeader := ANSITOWIDE( ::Caption )
-   plvg:cchHeader := LEN( ::Caption )
+   plvg:pszHeader := ANSITOWIDE( ::Text )
+   plvg:cchHeader := LEN( ::Text )
    plvg:uAlign    := ::Alignment
    plvg:iGroupId  := ::Id
    plvg:stateMask := LVGS_NORMAL
@@ -569,7 +569,7 @@ METHOD Destroy() CLASS ListViewGroup
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------
-METHOD SetCaption() CLASS ListViewGroup
+METHOD SetText() CLASS ListViewGroup
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------

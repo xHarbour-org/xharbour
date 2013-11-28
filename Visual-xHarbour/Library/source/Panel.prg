@@ -15,22 +15,17 @@
 #include "debug.ch"
 
 CLASS Panel FROM TitleControl
-   PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
-   PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
+   PROPERTY VertScroll                                  DEFAULT .F.
+   PROPERTY HorzScroll                                  DEFAULT .F.
+   PROPERTY ScrollOnChildFocus                          DEFAULT .F.
+   PROPERTY Transparent                                 DEFAULT .F.
+   PROPERTY VertScrollSize SET ::__SetVertScrollSize(v) DEFAULT 0
+   PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
+   PROPERTY ImageList      GET __ChkComponent( Self, @::xImageList )
 
-   DATA xImageList     EXPORTED
-   ACCESS ImageList    INLINE ::xImageList PERSISTENT
-   ASSIGN ImageList(o) INLINE ::xImageList := __ChkComponent( Self, o )
+   DATA oLastFocus EXPORTED
 
    DATA ImageIndex PROTECTED
-   DATA oLastFocus EXPORTED
-   //DATA Border     EXPORTED INIT .F.
-   DATA Transparent PUBLISHED INIT .F.
-
-   DATA VertScroll              INIT .F. PUBLISHED
-   DATA HorzScroll              INIT .F. PUBLISHED
-
-   DATA ScrollOnChildFocus      PUBLISHED INIT .F.
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

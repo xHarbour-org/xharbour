@@ -5278,3 +5278,8 @@ HB_FUNC( _GETOPENFILENAME )   // ( cFileMask, cTitle, nDefaultMask, cInitDir, lS
    hb_xfree( pDir );
    hb_xfree( pTitle );
 }
+
+HB_FUNC( ISRGB )
+{
+   hb_retl( sizeof(COLORREF) == sizeof(hb_parnl(1)) );
+}

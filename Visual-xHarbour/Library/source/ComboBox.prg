@@ -56,38 +56,36 @@ CLASS ComboBox FROM Control
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
 
-   ACCESS CurSel            INLINE ::GetCurSel()
-   ASSIGN Cursel(n)         INLINE ::SetCurSel(n)
+   ACCESS CurSel             INLINE ::GetCurSel()
+   ASSIGN Cursel(n)          INLINE ::SetCurSel(n)
 
    // temporary ONLY for compatibility
-   ACCESS AutoHorzScroll INLINE ::AutoEditHorzScroll
-   ASSIGN AutoHorzScroll(l) INLINE ::AutoEditHorzScroll := l
+   ACCESS AutoHorzScroll     INLINE ::AutoEditHorzScroll
+   ASSIGN AutoHorzScroll(l)  INLINE ::AutoEditHorzScroll := l
+
    //-----------------------------------------------------------
-   PROPERTY HorzScroll         INDEX WS_HSCROLL            READ xHorzScroll         WRITE SetStyle          PROTECTED DEFAULT .F. 
-   PROPERTY Border             INDEX WS_BORDER             READ xBorder             WRITE SetStyle                    DEFAULT .F.
-   PROPERTY SelectionHeight    INDEX -1                    READ xSelectionHeight    WRITE SetItemHeight     PROTECTED DEFAULT 15
-   PROPERTY OwnerDrawFixed     INDEX CBS_OWNERDRAWFIXED    READ xOwnerDrawFixed     WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY OwnerDrawVariable  INDEX CBS_OWNERDRAWVARIABLE READ xOwnerDrawVariable  WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY AutoEditHorzScroll INDEX CBS_AUTOHSCROLL       READ xAutoEditHorzScroll WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY Sort               INDEX CBS_SORT              READ xSort               WRITE SetStyle          PROTECTED DEFAULT .F.
 
-   PROPERTY DropDownStyle                                  READ xDropDownStyle      WRITE SetDropDownStyle  PROTECTED DEFAULT __GetSystem():DropDownStyle:DropDownList
+   PROPERTY Border              ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )             DEFAULT .F.
+   PROPERTY SelectionHeight     ROOT "Appearance" SET ::SetItemHeight( -1, v )               DEFAULT 15
+   PROPERTY Sort                ROOT "Appearance" SET ::SetStyle( CBS_SORT, v )              DEFAULT .F.
+   PROPERTY UpperCase           ROOT "Appearance" SET ::SetStyle( CBS_UPPERCASE, v )         DEFAULT .F.
+   PROPERTY LowerCase           ROOT "Appearance" SET ::SetStyle( CBS_LOWERCASE, v )         DEFAULT .F.
+   PROPERTY HasStrings          ROOT "Appearance" SET ::SetStyle( CBS_HASSTRINGS, v )        DEFAULT .F.
+   PROPERTY OemConvert          ROOT "Appearance" SET ::SetStyle( CBS_OEMCONVERT, v )        DEFAULT .F.
+   PROPERTY ItemHeight          ROOT "Appearance" SET ::SetItemHeight( 1, v )                     
+   PROPERTY ClientEdge          ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F. 
+   PROPERTY ItemToolTips        ROOT "Appearance" SET ::__SetItemToolTips(v)                 DEFAULT .F.
+   PROPERTY Flat                ROOT "Appearance"                                            DEFAULT .F.
 
-   PROPERTY UpperCase          INDEX CBS_UPPERCASE         READ xUpperCase          WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY LowerCase          INDEX CBS_LOWERCASE         READ xLowerCase          WRITE SetStyle          PROTECTED DEFAULT .F.
-
-   PROPERTY HasStrings         INDEX CBS_HASSTRINGS        READ xHasStrings         WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY DisableNoScroll    INDEX CBS_DISABLENOSCROLL   READ xDisableNoScroll    WRITE SetStyle          PROTECTED DEFAULT .T.
-   PROPERTY NoIntegralHeight   INDEX CBS_NOINTEGRALHEIGHT  READ xNoIntegralHeight   WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY OemConvert         INDEX CBS_OEMCONVERT        READ xOemConvert         WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY ItemHeight         INDEX 1                     READ xItemHeight         WRITE SetItemHeight     PROTECTED
-   PROPERTY VertScroll         INDEX WS_VSCROLL            READ xVertScroll         WRITE SetStyle          PROTECTED DEFAULT .F.
-
-   PROPERTY ClientEdge         INDEX WS_EX_CLIENTEDGE      READ xClientEdge         WRITE SetExStyle        PROTECTED DEFAULT .F. 
-   PROPERTY ItemToolTips                                   READ xItemToolTips       WRITE __SetItemToolTips PROTECTED DEFAULT .F.
-
-   DATA FitToolBar        PUBLISHED INIT .T.
-   DATA Flat              PUBLISHED INIT .F.
+   PROPERTY FitToolBar          ROOT "Behavior"                                              DEFAULT .T.
+   PROPERTY VertScroll          ROOT "Behavior"   SET ::SetStyle( WS_VSCROLL, v )            DEFAULT .F.
+   PROPERTY DisableNoScroll     ROOT "Behavior"   SET ::SetStyle( CBS_DISABLENOSCROLL, v )   DEFAULT .T.
+   PROPERTY NoIntegralHeight    ROOT "Behavior"   SET ::SetStyle( CBS_NOINTEGRALHEIGHT, v )  DEFAULT .F.
+   PROPERTY DropDownStyle       ROOT "Behavior"   SET ::SetDropDownStyle( v )                DEFAULT __GetSystem():DropDownStyle:DropDownList
+   PROPERTY HorzScroll          ROOT "Behavior"   SET ::SetStyle( WS_HSCROLL, v )            DEFAULT .F. 
+   PROPERTY OwnerDrawFixed      ROOT "Behavior"   SET ::SetStyle( CBS_OWNERDRAWFIXED, v )    DEFAULT .F.
+   PROPERTY OwnerDrawVariable   ROOT "Behavior"   SET ::SetStyle( CBS_OWNERDRAWVARIABLE, v ) DEFAULT .F.
+   PROPERTY AutoEditHorzScroll  ROOT "Behavior"   SET ::SetStyle( CBS_AUTOHSCROLL, v )       DEFAULT .F.
 
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
@@ -692,12 +690,13 @@ RETURN Self
 
 
 CLASS ColorPicker INHERIT ComboBox
+   PROPERTY AllowCustomColor   DEFAULT .F.
+   PROPERTY AllowSystemDefault DEFAULT .F.
+
    DATA ColorSelected   EXPORTED
    DATA Colors          EXPORTED INIT {}
    DATA SysDefault      EXPORTED
    DATA Custom          EXPORTED
-   DATA AllowCustomColor   PUBLISHED INIT .F.
-   DATA AllowSystemDefault PUBLISHED INIT .F.
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnParentDrawItem()

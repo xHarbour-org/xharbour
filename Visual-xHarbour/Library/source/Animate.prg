@@ -19,15 +19,15 @@
 // 150 = Shell Move File Flying papers
 CLASS Animation INHERIT TitleControl
 
-   PROPERTY ImageName                         READ xImageName   WRITE __SetImageName INVERT
-   PROPERTY Centered    INDEX ACS_CENTER      READ xCentered    WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY Transparent INDEX ACS_TRANSPARENT READ xTransparent WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY AutoPlay    INDEX ACS_AUTOPLAY    READ xAutoPlay    WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY SystemAnimation READ xSystemAnimation WRITE Open     DEFAULT 0   PROTECTED
+   PROPERTY ImageName       ROOT "Appearance" SET ::__SetImageName(v)
+   PROPERTY Transparent     ROOT "Appearance" SET ::SetStyle( ACS_TRANSPARENT, v ) DEFAULT .F. PROTECTED
+   PROPERTY AutoPlay        ROOT "Behavior"   SET ::SetStyle( ACS_AUTOPLAY, v )    DEFAULT .F. PROTECTED
+   PROPERTY Centered        ROOT "Behavior"   SET ::SetStyle( ACS_CENTER, v )      DEFAULT .F. PROTECTED
+   PROPERTY SystemAnimation ROOT "Behavior"   SET ::Open(v)                        DEFAULT 0   PROTECTED
+   PROPERTY Repeat          ROOT "Behavior"                                        DEFAULT -1
 
    DATA FromFrame EXPORTED INIT 0
    DATA ToFrame   EXPORTED INIT -1
-   DATA Repeat    PUBLISHED INIT -1
 
    // 161
    DATA SysAnimations EXPORTED INIT {"FileMove", "FileCopy", "FileRecycle", "EmptyRecycle", "FileDel", "FileNuke", "Web-Search" }

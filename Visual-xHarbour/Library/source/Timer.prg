@@ -17,11 +17,10 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS Timer INHERIT Component
-   PROPERTY Delay READ xDelay  WRITE SetDelay DEFAULT 1000 PROTECTED
+   PROPERTY Delay   SET ::SetDelay(v) DEFAULT 1000
+   PROPERTY AutoRun                   DEFAULT .T.
 
    DATA lRunning      EXPORTED INIT .F.
-   DATA AutoRun       PUBLISHED INIT .T.
-
    DATA Id            EXPORTED
    DATA ClsName       EXPORTED  INIT "Timer"
    DATA Events        EXPORTED  INIT {  {"General", { { "OnTimeOut"       , "", "" } } } }

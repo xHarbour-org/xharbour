@@ -33,10 +33,10 @@
 #define REG_SZ                      1
 
 CLASS WebBrowser INHERIT ActiveX
+   PROPERTY Url SET ::WebNavigate(v)
+
    DATA ProgID        EXPORTED
    DATA ClsID         EXPORTED
-
-   PROPERTY Url READ xUrl WRITE WebNavigate PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

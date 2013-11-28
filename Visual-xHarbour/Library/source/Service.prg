@@ -29,10 +29,10 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS Service
-   PROPERTY ServiceName READ xServiceName WRITE __SetServiceName DEFAULT "" INVERT 
-   DATA File                PUBLISHED INIT ""
-   DATA DisplayName         PUBLISHED INIT ""
-   DATA Description         PUBLISHED INIT ""
+   PROPERTY ServiceName SET ::__SetServiceName(v) DEFAULT ""
+   PROPERTY File            DEFAULT ""
+   PROPERTY DisplayName     DEFAULT ""
+   PROPERTY Description     DEFAULT ""
    
    DATA hServiceManager     EXPORTED
    DATA hService            EXPORTED

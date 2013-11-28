@@ -47,12 +47,12 @@ CLASS CheckBox INHERIT Control
    DATA ImageList   EXPORTED
    DATA ImageIndex  PROTECTED
 
-   PROPERTY Transparent                READ xTransparent WRITE __SetTransp             DEFAULT .F.
-   PROPERTY Group      INDEX WS_GROUP  READ xGroup       WRITE SetStyle      PROTECTED DEFAULT .F.
-   PROPERTY CheckStyle                 READ xCheckStyle  WRITE SetCheckStyle PROTECTED DEFAULT 1
-   PROPERTY State                      READ xState       WRITE SetState      PROTECTED DEFAULT BST_UNCHECKED
-   PROPERTY Border     INDEX WS_BORDER READ xBorder      WRITE SetStyle      PROTECTED DEFAULT .F. 
-   PROPERTY AutoSize                   READ xAutoSize    WRITE __SetSize     PROTECTED DEFAULT .F.
+   PROPERTY Transparent ROOT "Appearance" SET ::__SetTransp(v)        DEFAULT .F.
+   PROPERTY Group       ROOT "Behavior"   SET ::SetStyle(WS_GROUP,v)  DEFAULT .F.
+   PROPERTY CheckStyle  ROOT "Behavior"   SET ::SetCheckStyle(v)      DEFAULT 1
+   PROPERTY State       ROOT "Behavior"   SET ::SetState(v)           DEFAULT BST_UNCHECKED
+   PROPERTY Border      ROOT "Appearance" SET ::SetStyle(WS_BORDER,v) DEFAULT .F. 
+   PROPERTY AutoSize    ROOT "Behavior"   SET ::__SetSize(v)          DEFAULT .F.
 
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.

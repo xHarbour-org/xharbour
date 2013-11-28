@@ -20,6 +20,9 @@
 #Define WM_CARET   WM_USER + 2551
 
 CLASS MaskEdit INHERIT EditBox
+   PROPERTY Picture      SET ::SetGetProp( "Picture" )
+   PROPERTY Text         GET IIF( ::oGet != NIL, ::oGet:VarGet(), ::xText );
+                         SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
    DATA OnCharacter  EXPORTED
    DATA OnKey        EXPORTED
@@ -42,18 +45,12 @@ CLASS MaskEdit INHERIT EditBox
    ACCESS Picture        INLINE ::oGet:picture
    ASSIGN Picture(c)     INLINE ::oGet:picture   := c
 
-
-   PROPERTY Picture         INDEX "Picture"             READ xPicture         WRITE SetGetProp     DEFAULT NIL PROTECTED
-
    METHOD SetGetProp()
 
    ACCESS VarGet         INLINE ::oGet:VarGet()
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
-
-   ACCESS Text           INLINE IIF( ::oGet != NIL, ::oGet:VarGet(), ::xText ) PERSISTENT
-   ASSIGN Text(c)        INLINE IIF( ::oGet != NIL, ( ::oGet:VarPut(c), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ), ::xText := c )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

@@ -32,8 +32,8 @@ GLOBAL EXTERNAL s_hKeyMenuHook
 CLASS MenuStrip INHERIT ToolStrip
    DATA __lIsMenu  EXPORTED  INIT .T.
    
-   PROPERTY Height      READ xHeight      WRITE __SetHeight DEFAULT 22 MIN 22 HIDDEN
-   PROPERTY ShowChevron READ xShowChevron WRITE __ShowChevron  PROTECTED DEFAULT .F. HIDDEN
+   PROPERTY Height      SET ::__SetHeight(v)   DEFAULT 22 MIN 22
+   PROPERTY ShowChevron SET ::__ShowChevron(v) DEFAULT .F. NOTPUBLIC
    
    METHOD Init() CONSTRUCTOR
    METHOD OnPaint()

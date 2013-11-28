@@ -53,8 +53,8 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS HeaderStrip INHERIT Control
-   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList ) SET ::SetImageList(v)
-   PROPERTY ImageMargin READ xImageMargin WRITE SetImageMargin DEFAULT 2 PROTECTED
+   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList ) SET ::SetImageList(v)
+   PROPERTY ImageMargin                                           SET ::SetImageMargin(v) DEFAULT 2
 
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
@@ -296,18 +296,18 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 CLASS HeaderItem INHERIT Object
-   DATA AllowResize            PUBLISHED INIT .T.
-   DATA AllowDrag              PUBLISHED INIT .T.
+
+   PROPERTY AllowResize                               DEFAULT .T.
+   PROPERTY AllowDrag                                 DEFAULT .T.
+   PROPERTY Caption            SET ::SetCaption(v)
+   PROPERTY ImageIndex         SET ::SetImageIndex(v) DEFAULT 0
+   PROPERTY Width              SET ::SetWidth(v)      DEFAULT 100
+   PROPERTY Alignment          SET ::SetAlignment(v)  DEFAULT 1
+
 
    DATA Parent                 EXPORTED
    DATA Position               EXPORTED
    DATA EnumAlignment          EXPORTED  INIT { { "Left", "Right", "Center", "JustifyMask", "RTLReading" }, {1,2,3,4,5} }
-
-   PROPERTY Caption            READ xCaption    WRITE SetCaption                 PROTECTED
-   PROPERTY ImageIndex         READ xImageIndex WRITE SetImageIndex DEFAULT 0    PROTECTED
-   PROPERTY Width              READ xWidth      WRITE SetWidth      DEFAULT 100
-   PROPERTY Alignment          READ xAlignment  WRITE SetAlignment  DEFAULT 1    PROTECTED
-
    DATA Anchor                 EXPORTED
    DATA Dock                   EXPORTED
    DATA Events                 EXPORTED

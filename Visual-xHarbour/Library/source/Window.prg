@@ -157,21 +157,21 @@ CLASS Window INHERIT Object
    PROPERTY ClientEdge                                                                                 SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.       PROTECTED
    PROPERTY ControlParent                                                                              SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F.       PROTECTED
 
-   PROPERTY Visible       INDEX WS_VISIBLE          READ xVisible        WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY Enabled       INDEX WS_DISABLED         READ xEnabled        WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY Border        INDEX WS_BORDER           READ xBorder         WRITE SetStyle          DEFAULT .F.       PROTECTED
+   PROPERTY Visible         SET ::SetStyle( WS_VISIBLE, v )          DEFAULT .T.
+   PROPERTY Enabled         SET ::SetStyle( WS_DISABLED, v )         DEFAULT .T.
+   PROPERTY Border          SET ::SetStyle( WS_BORDER, v )           DEFAULT .F.
 
-   PROPERTY Center                                  READ xCenter         WRITE CenterWindow      DEFAULT .F.       PROTECTED
-   PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren   WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings   WRITE SetStyle          DEFAULT .T.       PROTECTED
-   PROPERTY AcceptFiles   INDEX WS_EX_ACCEPTFILES   READ xAcceptFiles    WRITE SetExStyle        DEFAULT .F.       PROTECTED
-   PROPERTY NoActivate    INDEX WS_EX_NOACTIVATE    READ xNoActivate     WRITE SetExStyle        DEFAULT .F.       PROTECTED
+   PROPERTY Center          SET ::CenterWindow(v)                    DEFAULT .F.
+   PROPERTY ClipChildren    SET ::SetStyle( WS_CLIPCHILDREN, v )     DEFAULT .T.
+   PROPERTY ClipSiblings    SET ::SetStyle( WS_CLIPSIBLINGS, v )     DEFAULT .T.
+   PROPERTY AcceptFiles     SET ::SetExStyle( WS_EX_ACCEPTFILES, v ) DEFAULT .F.
+   PROPERTY NoActivate      SET ::SetExStyle( WS_EX_NOACTIVATE, v )  DEFAULT .F.
 
-   PROPERTY Theming READ xTheming WRITE __SetTheming DEFAULT .T. PROTECTED
-   PROPERTY Text               READ xText WRITE SetWindowText DEFAULT ""
+   PROPERTY Theming         SET ::__SetTheming(v)                    DEFAULT .T.
+   PROPERTY Text            SET ::SetWindowText(v)                   DEFAULT ""
    PROPERTY Font
    PROPERTY ToolTip
-   PROPERTY DisableParent      DEFAULT .F.
+   PROPERTY DisableParent                                            DEFAULT .F.
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
    
@@ -3803,6 +3803,9 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                ::xWidth := oRight:xLeft - ::xLeft - ::Dock:RightMargin - IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
             ENDIF
          ENDIF
+       ELSEIF oLeft != NIL .AND. ::Dock:RightProportional
+         DEFAULT ::Dock:__nWidthPerc TO ( ::xWidth  / ( ::Parent:ClientWidth - -::xLeft ) )
+         ::xWidth  := Int( ( ::Parent:ClientWidth  ) * ::Dock:__nWidthPerc )
       ENDIF
 
       IF oBottom != NIL
@@ -4187,11 +4190,13 @@ RETURN nRet
 //---------------------------------------------------------------------------------------------
 
 CLASS __WindowDock
-   PROPERTY Left    INDEX 1 READ xLeft    WRITE SetDock    PROTECTED INVERT
-   PROPERTY Top     INDEX 2 READ xTop     WRITE SetDock    PROTECTED INVERT
-   PROPERTY Right   INDEX 3 READ xRight   WRITE SetDock    PROTECTED INVERT
-   PROPERTY Bottom  INDEX 4 READ xBottom  WRITE SetDock    PROTECTED INVERT
-   PROPERTY Margins         READ xMargins WRITE SetMargins PROTECTED
+   PROPERTY Left     SET ::SetDock( 1,v ) 
+   PROPERTY Top      SET ::SetDock( 2,v ) 
+   PROPERTY Right    SET ::SetDock( 3,v ) 
+   PROPERTY Bottom   SET ::SetDock( 4,v ) 
+   PROPERTY Margins  SET ::SetMargins(v)
+
+   PROPERTY RightProportional DEFAULT .F.
 
    DATA LeftMargin   EXPORTED INIT 0
    DATA TopMargin    EXPORTED INIT 0
@@ -4211,6 +4216,7 @@ CLASS __WindowDock
    DATA __ClassInst  EXPORTED
    DATA ClsName      EXPORTED INIT "Dock"
 
+   DATA __nWidthPerc EXPORTED
 
    DATA xMargin      PROTECTED INIT 2
    ACCESS Margin     INLINE ::xMargin
@@ -4290,11 +4296,11 @@ METHOD SetDock( x ) CLASS __WindowDock
 RETURN Self
 
 CLASS __AnchorSet
-   PROPERTY Left   INDEX 1 READ xLeft   WRITE SetAnchor DEFAULT .F. PROTECTED
-   PROPERTY Top    INDEX 2 READ xTop    WRITE SetAnchor DEFAULT .F. PROTECTED
-   PROPERTY Right  INDEX 3 READ xRight  WRITE SetAnchor DEFAULT .F. PROTECTED
-   PROPERTY Bottom INDEX 4 READ xBottom WRITE SetAnchor DEFAULT .F. PROTECTED
-   PROPERTY Center INDEX 5 READ xCenter WRITE SetAnchor DEFAULT .F. PROTECTED
+   PROPERTY Left         SET ::SetAnchor( 1, v ) DEFAULT .F.
+   PROPERTY Top          SET ::SetAnchor( 2, v ) DEFAULT .F.
+   PROPERTY Right        SET ::SetAnchor( 3, v ) DEFAULT .F.
+   PROPERTY Bottom       SET ::SetAnchor( 4, v ) DEFAULT .F.
+   PROPERTY Center       SET ::SetAnchor( 4, v ) DEFAULT .F.
 
    DATA ProportionalLeft  EXPORTED INIT .F.
    DATA ProportionalTop   EXPORTED INIT .F.
@@ -4741,40 +4747,41 @@ CLASS WinForm INHERIT Window
    DATA __lMoveable              EXPORTED  INIT .F.
 
 
-   PROPERTY Modal                   DEFAULT .F.
-   PROPERTY UserVariables           DEFAULT ""
-   PROPERTY ShowMode                DEFAULT 1
-   PROPERTY AutoClose               DEFAULT .T.
-   PROPERTY VertScroll              DEFAULT .F.
-   PROPERTY HorzScroll              DEFAULT .F.
+   PROPERTY Modal                DEFAULT .F.
+   PROPERTY UserVariables        DEFAULT ""
+   PROPERTY ShowMode             DEFAULT 1
+   PROPERTY AutoClose            DEFAULT .T.
+   PROPERTY VertScroll           DEFAULT .F.
+   PROPERTY HorzScroll           DEFAULT .F.
    PROPERTY MDIClient
-   PROPERTY MinWidth                DEFAULT 0
-   PROPERTY MinHeight               DEFAULT 0
-   PROPERTY MaxWidth                DEFAULT 0
-   PROPERTY MaxHeight               DEFAULT 0
-   PROPERTY ShowInTaskBar           DEFAULT .T.
-   PROPERTY AnimationStyle          DEFAULT 0
-   PROPERTY ScrollOnChildFocus      DEFAULT .F.
+   PROPERTY MinWidth             DEFAULT 0
+   PROPERTY MinHeight            DEFAULT 0
+   PROPERTY MaxWidth             DEFAULT 0
+   PROPERTY MaxHeight            DEFAULT 0
+   PROPERTY ShowInTaskBar        DEFAULT .T.
+   PROPERTY AnimationStyle       DEFAULT 0
+   PROPERTY ScrollOnChildFocus   DEFAULT .F.
    PROPERTY BackgroundImage
-   PROPERTY ToolWindow    INDEX WS_EX_TOOLWINDOW    READ xToolWindow      WRITE SetExStyle      DEFAULT .F. PROTECTED
-   PROPERTY AlwaysOnTop   INDEX WS_EX_TOPMOST       READ xAlwaysOnTop     WRITE SetExStyle      DEFAULT .F. PROTECTED
-   PROPERTY ThickFrame    INDEX WS_THICKFRAME       READ xThickFrame      WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY Resizable     INDEX WS_THICKFRAME       READ xResizable       WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY MaximizeBox   INDEX WS_MAXIMIZEBOX      READ xMaximizeBox     WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY MinimizeBox   INDEX WS_MINIMIZEBOX      READ xMinimizeBox     WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY CaptionBar    INDEX WS_CAPTION          READ xCaptionBar      WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY SysMenu       INDEX WS_SYSMENU          READ xSysMenu         WRITE SetStyle        DEFAULT .T. PROTECTED
-   PROPERTY FrameStyle                              READ xFrameStyle      WRITE __SetFrameStyle DEFAULT 1   PROTECTED
-   PROPERTY DlgModalFrame INDEX WS_EX_DLGMODALFRAME READ xDlgModalFrame   WRITE SetExStyle      DEFAULT .F. PROTECTED
-   PROPERTY Icon                                    READ xIcon            WRITE SetFormIcon                 PROTECTED INVERT
-   PROPERTY Opacity                                 READ xOpacity         WRITE SetOpacity      DEFAULT 100 PROTECTED
-   PROPERTY BitmapMask                              READ xBitmapMask      WRITE __SetBitmapMask             PROTECTED INVERT
-   PROPERTY BitmapMaskColor                         READ xBitmapMaskColor WRITE __SetBitmapMaskColor        PROTECTED
-   PROPERTY ImageList     GET __ChkComponent( Self, @::xImageList )     SET ::SetImageList(v)
-   PROPERTY ActiveMenuBar GET __ChkComponent( Self, @::xActiveMenuBar ) SET ::__SetActiveMenuBar(v)
+   PROPERTY ToolWindow           SET ::SetExStyle( WS_EX_TOOLWINDOW, v )   DEFAULT .F.
+   PROPERTY AlwaysOnTop          SET ::SetExStyle( WS_EX_TOPMOST, v )      DEFAULT .F.
+   PROPERTY ThickFrame           SET ::SetStyle( WS_THICKFRAME, v )        DEFAULT .T.
+   PROPERTY Resizable            SET ::SetStyle( WS_THICKFRAME, v )        DEFAULT .T.
+   PROPERTY MaximizeBox          SET ::SetStyle( WS_MAXIMIZEBOX, v )       DEFAULT .T.
+   PROPERTY MinimizeBox          SET ::SetStyle( WS_MINIMIZEBOX, v )       DEFAULT .T.
+   PROPERTY CaptionBar           SET ::SetStyle( WS_CAPTION, v )           DEFAULT .T.
+   PROPERTY SysMenu              SET ::SetStyle( WS_SYSMENU, v )           DEFAULT .T.
+   PROPERTY FrameStyle           SET ::__SetFrameStyle(v)                  DEFAULT 1
+   PROPERTY DlgModalFrame        SET ::SetExStyle( WS_EX_DLGMODALFRAME, v) DEFAULT .F.
+   PROPERTY Icon                 SET ::SetFormIcon(v)
+   PROPERTY Opacity              SET ::SetOpacity(v)                       DEFAULT 100
+   PROPERTY BitmapMask           SET ::__SetBitmapMask(v)
+   PROPERTY BitmapMaskColor      SET ::__SetBitmapMaskColor(v)
+   PROPERTY ImageList            GET __ChkComponent( Self, @::xImageList )     SET ::SetImageList(v)
+   PROPERTY ActiveMenuBar        GET __ChkComponent( Self, @::xActiveMenuBar ) SET ::__SetActiveMenuBar(v)
 
-   PROPERTY MDIChild           ACCESS {|Self| IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild )} ASSIGN {|Self,v| IIF( ::__ClassInst != NIL .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )} DEFAULT .F. 
-   PROPERTY MdiContainer       ASSIGN {|Self,v| ::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)} DEFAULT .F. 
+   PROPERTY MDIChild             GET IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild );
+                                 SET ( IIF( ::__ClassInst != NIL .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F. 
+   PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F. 
 
 
    //compatibility ONLY, forms do not set "Border" property
@@ -5526,13 +5533,13 @@ FUNCTION AssociateWith( cExt, cCode, cFile, cDesc, nIcon )
 RETURN(NIL)
 
 CLASS __Animation
+   PROPERTY Type          DEFAULT 0
+   PROPERTY Speed         DEFAULT 1000
+   PROPERTY HideInvert    DEFAULT .T.
+
    DATA Owner        EXPORTED
    DATA __ClassInst  EXPORTED
    DATA ClsName      EXPORTED INIT "__Animation"
-
-   DATA Type          PUBLISHED INIT 0
-   DATA Speed         PUBLISHED INIT 1000
-   DATA HideInvert    PUBLISHED INIT .T.
 
    ACCESS Parent          INLINE ::Owner
    ACCESS Form            INLINE ::Owner:Form

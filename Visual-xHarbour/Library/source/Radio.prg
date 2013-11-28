@@ -41,16 +41,16 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS RadioButton INHERIT Control
+
+   PROPERTY Transparent   SET ::__SetTransp(v)              DEFAULT .F.
+   PROPERTY Group         SET ::SetStyle( WS_GROUP, v )     DEFAULT .F.
+   PROPERTY OwnerDraw     SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.           
+   PROPERTY Border        SET ::SetStyle( WS_BORDER, v )    DEFAULT .F.           
+   PROPERTY InitialState  SET ::__SetInitialState( v )      DEFAULT BST_UNCHECKED
+
    DATA DefaultButton INIT .F.
    DATA States       INIT { "Unchecked", "Checked" }
    DATA State     EXPORTED
-
-   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
-
-   PROPERTY Group         INDEX WS_GROUP         READ xGroup        WRITE SetStyle          PROTECTED DEFAULT .F.
-   PROPERTY OwnerDraw     INDEX BS_OWNERDRAW     READ xOwnerDraw    WRITE SetStyle          PROTECTED DEFAULT .F.           
-   PROPERTY Border        INDEX WS_BORDER        READ xBorder       WRITE SetStyle          PROTECTED DEFAULT .F.           
-   PROPERTY InitialState                         READ xInitialState WRITE __SetInitialState PROTECTED DEFAULT BST_UNCHECKED
 
    ACCESS Checked INLINE ::GetState() == BST_CHECKED
 

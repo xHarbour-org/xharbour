@@ -93,25 +93,21 @@ CLASS ToolBar INHERIT Control
    ACCESS RowCount          INLINE SendMessage( ::handle, TB_GETROWS, 0, 0 )
    ASSIGN RowCount( nRows ) INLINE SendMessage( ::handle, TB_SETROWS, nRows )
 
-   PROPERTY List               INDEX TBSTYLE_LIST                  READ xList               WRITE SetStyle     DEFAULT .F.
-   PROPERTY ToolTips           INDEX TBSTYLE_TOOLTIPS              READ xToolTips           WRITE SetStyle     DEFAULT .F.
-   PROPERTY Flat               INDEX TBSTYLE_FLAT                  READ xFlat               WRITE SetStyle     DEFAULT .T.
-   PROPERTY Transparent        INDEX TBSTYLE_TRANSPARENT           READ xTransparent        WRITE SetStyle     DEFAULT .T.
-   PROPERTY ImageList                                              READ xImageList          WRITE SetImageList
-   PROPERTY HotImageList                                           READ xHotImageList       WRITE SetHotImageList
-
-   PROPERTY HorzPadding        INDEX 1                             READ xHorzPadding        WRITE SetPadding
-   PROPERTY VertPadding        INDEX 2                             READ xVertPadding        WRITE SetPadding
-
-   PROPERTY DrawArrows         INDEX TBSTYLE_EX_DRAWDDARROWS       READ xDrawArrows         WRITE SetExtStyle  DEFAULT .T.
-   PROPERTY MixedButtons       INDEX TBSTYLE_EX_MIXEDBUTTONS       READ xMixedButtons       WRITE SetExtStyle  DEFAULT .F.
-   PROPERTY HideClippedButtons INDEX TBSTYLE_EX_HIDECLIPPEDBUTTONS READ xHideClippedButtons WRITE SetExtStyle  DEFAULT .F.
-   PROPERTY Border             INDEX WS_BORDER                     READ xBorder             WRITE SetStyle     DEFAULT .F.
-
-   PROPERTY BitmapWidth                                            READ xBitmapWidth        WRITE _SetBitmapSize DEFAULT -1
-   PROPERTY BitmapHeight                                           READ xBitmapHeight       WRITE _SetBitmapSize DEFAULT -1
-
-   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
+   PROPERTY List               SET ::SetStyle( TBSTYLE_LIST, v )                     DEFAULT .F.
+   PROPERTY ToolTips           SET ::SetStyle( TBSTYLE_TOOLTIPS, v )                 DEFAULT .F.
+   PROPERTY Flat               SET ::SetStyle( TBSTYLE_FLAT, v )                     DEFAULT .T.
+   PROPERTY Transparent        SET ::SetStyle( TBSTYLE_TRANSPARENT, v )              DEFAULT .T.
+   PROPERTY ImageList          GET __ChkComponent( Self, @::xImageList );
+                               SET ::SetImageList(v)                                  
+   PROPERTY HotImageList       SET ::SetHotImageList(v)                               
+   PROPERTY HorzPadding        SET ::SetPadding( 1, v )                             
+   PROPERTY VertPadding        SET ::SetPadding( 2, v )                             
+   PROPERTY DrawArrows         SET ::SetExtStyle( TBSTYLE_EX_DRAWDDARROWS, v )       DEFAULT .T.
+   PROPERTY MixedButtons       SET ::SetExtStyle( TBSTYLE_EX_MIXEDBUTTONS, v )       DEFAULT .F.
+   PROPERTY HideClippedButtons SET ::SetExtStyle( TBSTYLE_EX_HIDECLIPPEDBUTTONS, v ) DEFAULT .F.
+   PROPERTY Border             SET ::SetStyle( WS_BORDER, v )                        DEFAULT .F.
+   PROPERTY BitmapWidth        SET ::_SetBitmapSize(v)                               DEFAULT -1
+   PROPERTY BitmapHeight       SET ::_SetBitmapSize(v)                               DEFAULT -1
 
    EXPORTED:
       DATA Caption
@@ -1441,18 +1437,20 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove ) CLASS ToolBar
    LOCAL oControl
    ::Super:__OnParentSize( x, y, hDef, lMoveNow, lNoMove )
    ::GetClientRect()
-   FOR EACH oControl IN ::Children
-       IF oControl:__xCtrlName == "ComboBox"
-          IF oControl:FitToolBar
-             oControl:xTop := 1
-             oControl:SetItemHeight( -1, ::ClientHeight-8 )
-             oControl:MoveWindow()
-           ELSE
-             oControl:xTop := ( (::ClientHeight-6)/2 ) - ( oControl:GetItemHeight( -1 )/2 )
-             oControl:MoveWindow()
+   IF ::Children != NIL
+      FOR EACH oControl IN ::Children
+          IF oControl:__xCtrlName == "ComboBox"
+             IF oControl:FitToolBar
+                oControl:xTop := 1
+                oControl:SetItemHeight( -1, ::ClientHeight-8 )
+                oControl:MoveWindow()
+              ELSE
+                oControl:xTop := ( (::ClientHeight-6)/2 ) - ( oControl:GetItemHeight( -1 )/2 )
+                oControl:MoveWindow()
+             ENDIF
           ENDIF
-       ENDIF
-   NEXT
+      NEXT
+   ENDIF
 RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
@@ -1495,18 +1493,29 @@ RETURN 0
 
 CLASS ToolButton INHERIT Object
 
-   DATA ToolTip          PUBLISHED
-   DATA Message          PUBLISHED
-
-   DATA Menu             EXPORTED
+   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
+   PROPERTY ToolTip
+   PROPERTY Message
+   PROPERTY WholeDropDown  SET ::SetStyle( BTNS_WHOLEDROPDOWN, v ) DEFAULT .F.
+   PROPERTY DropDown       SET ::SetStyle( BTNS_DROPDOWN, v )      DEFAULT .F.
+   PROPERTY AutoSize       SET ::SetStyle( TBSTYLE_AUTOSIZE, v )   DEFAULT .T.
+   PROPERTY ShowText       SET ::SetStyle( BTNS_SHOWTEXT, v )      DEFAULT .F.
+   PROPERTY Width          SET ::SetWidth(v)                       DEFAULT 24
+   PROPERTY Text           SET ::SetText(v)                           
+   PROPERTY ImageIndex     SET ::SetImageIndex(v)                  DEFAULT 0
+   PROPERTY BtnCheck       SET ::SetStyle( BTNS_CHECK, v )         DEFAULT .F.
+   PROPERTY CheckGroup     SET ::__Dummy( TBSTYLE_CHECKGROUP, v )  DEFAULT .F.
+   PROPERTY Enabled        SET ::Enable(v)                         DEFAULT .T.
+   PROPERTY Visible        SET ::Show(v)                           DEFAULT .T.
+   PROPERTY Wrap           SET ::SetState( TBSTATE_WRAP, v )       DEFAULT .F.
+   PROPERTY Separator      SET ::SetStyle( BTNS_SEP, v )           DEFAULT .F.
+   PROPERTY Position       SET ::SetPosition(v)
 
    ACCESS ImageList      INLINE ::Parent:ImageList
    ACCESS HotImageList   INLINE ::Parent:HotImageList
 
-
-   PROPERTY ContextMenu GET __ChkComponent( Self, @::xContextMenu )
-
    EXPORTED:
+      DATA Menu
       DATA Id
       DATA AllowUnDock            INIT FALSE
       DATA AllowClose             INIT FALSE
@@ -1534,33 +1543,9 @@ CLASS ToolButton INHERIT Object
       DATA VertScrollPos          INIT 0
       DATA Font
       DATA ShortCut
-   PROPERTY WholeDropDown INDEX BTNS_WHOLEDROPDOWN  READ xWholeDropDown WRITE SetStyle DEFAULT .F.
-   PROPERTY DropDown      INDEX BTNS_DROPDOWN       READ xDropDown      WRITE SetStyle DEFAULT .F.
-
-   PROPERTY AutoSize      INDEX TBSTYLE_AUTOSIZE    READ xAutoSize      WRITE SetStyle DEFAULT .T.
-   PROPERTY ShowText      INDEX BTNS_SHOWTEXT       READ xShowText      WRITE SetStyle DEFAULT .F.
-
-   PROPERTY Width                                   READ xWidth         WRITE SetWidth DEFAULT 24
-   PROPERTY Text                                    READ xText          WRITE SetText
-
-   PROPERTY ImageIndex                              READ xImageIndex    WRITE SetImageIndex DEFAULT 0
-
-   PROPERTY BtnCheck      INDEX BTNS_CHECK          READ xBtnCheck      WRITE SetStyle DEFAULT .F.
-   PROPERTY CheckGroup    INDEX TBSTYLE_CHECKGROUP  READ xCheckGroup    WRITE __Dummy DEFAULT .F.
-
-   PROPERTY Enabled                                 READ xEnabled       WRITE Enable DEFAULT .T.
-   PROPERTY Visible                                 READ xVisible       WRITE Show   DEFAULT .T.
-
-   PROPERTY Wrap          INDEX TBSTATE_WRAP        READ xWrap          WRITE SetState DEFAULT .F.
-   PROPERTY Separator     INDEX BTNS_SEP            READ xSeparator     WRITE SetStyle DEFAULT .F.
 
    ACCESS IsChecked      INLINE ::Parent:IsButtonChecked( ::ID )
-
    ACCESS IsPressed      INLINE ( ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState & TBSTATE_PRESSED ) == TBSTATE_PRESSED
-
-   DATA xPosition          EXPORTED
-   ACCESS Position         INLINE ::xPosition PERSISTENT
-   ASSIGN Position(n)      INLINE ::SetPosition(n)
 
    ACCESS xCaption    INLINE ::xText
    ASSIGN xCaption(c) INLINE ::xText := c

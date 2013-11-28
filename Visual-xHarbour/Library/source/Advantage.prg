@@ -20,8 +20,9 @@
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsDataTable INHERIT DataTable
+   PROPERTY ServerType ROOT "Behavior"  DEFAULT 1
+
    DATA EnumServerType   EXPORTED  INIT { { "Local", "Remote", "Either" }, {1,2,3} }
-   DATA ServerType       PUBLISHED INIT 1
 
    DATA xDriver          PROTECTED INIT "ADSCDX"
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable / Advantage (*.dbf,*.adt)", "*.dbf;*.adt" } }

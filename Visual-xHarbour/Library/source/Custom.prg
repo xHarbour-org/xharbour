@@ -25,10 +25,10 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS CustomControl INHERIT Control
-   DATA Reference PUBLISHED
-   DATA __ChgRef  PRIVATE
-
    PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
+   PROPERTY Reference
+
+   DATA __ChgRef  PRIVATE
 
    METHOD Init()    CONSTRUCTOR
    METHOD Create()

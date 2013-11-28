@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 CLASS DataSet INHERIT Component
-   ACCESS Tables INLINE ::Children PERSISTENT // Wiil go to "General" category
+   PROPERTY Tables GET ::Children
    METHOD Init() CONSTRUCTOR
 ENDCLASS
 

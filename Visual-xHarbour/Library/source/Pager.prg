@@ -18,17 +18,17 @@
 
 CLASS PageScroller INHERIT Control
 
-   DATA ImageList            EXPORTED
-   DATA ImageIndex           PROTECTED
-   DATA ScrollUnits          PUBLISHED INIT 12
-   DATA AllowUnDock          EXPORTED  INIT FALSE
-   DATA AllowClose           EXPORTED  INIT FALSE
+   PROPERTY PageChild    SET ::SetChild(v)
+   PROPERTY ButtonHeight SET ::SetButtonHeight(v) DEFAULT 12
+   PROPERTY Position     SET ::SetPosition(v)     DEFAULT 0
+   PROPERTY ScrollUnits                           DEFAULT 12
 
+   DATA ImageList    EXPORTED
+   DATA AllowUnDock  EXPORTED  INIT FALSE
+   DATA AllowClose   EXPORTED  INIT FALSE
    DATA EnumPosition EXPORTED  INIT { { "Vertical", "Horizontal" }, {1,2} }
 
-   PROPERTY PageChild    READ xPageChild    WRITE SetChild                   PROTECTED
-   PROPERTY ButtonHeight READ xButtonHeight WRITE SetButtonHeight DEFAULT 12 PROTECTED
-   PROPERTY Position     READ xPosition     WRITE SetPosition     DEFAULT 0  PROTECTED
+   DATA ImageIndex   PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD SetChild()

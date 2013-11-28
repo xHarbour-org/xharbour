@@ -29,16 +29,16 @@ static nMemSel := 100
 
 CLASS DataTable INHERIT Component
 
-   PROPERTY Alias        ROOT "General"    READ xAlias       WRITE SetAlias
-   PROPERTY MemoType     ROOT "General"    READ xMemoType WRITE __SetMemoType DEFAULT RddInfo( RDDI_MEMOTYPE )
-   PROPERTY Shared       ROOT "General"    DEFAULT .T.
+   PROPERTY Alias        ROOT "General"    SET ::SetAlias(v)
+   PROPERTY MemoType     ROOT "General"    SET ::__SetMemoType(v) DEFAULT RddInfo( RDDI_MEMOTYPE )
+   PROPERTY Shared       ROOT "General"                           DEFAULT .T.
    PROPERTY CodePage     ROOT "General"
    PROPERTY Socket       ROOT "General"
    PROPERTY Structure    ROOT "General"
-   PROPERTY Table        ROOT "General"    DEFAULT {}
-   PROPERTY Driver       ROOT "General"    ASSIGN {|Self,c| ::xDriver := IIF( !EMPTY( c ), c, NIL )}
+   PROPERTY Table        ROOT "General"                           DEFAULT {}
+   PROPERTY Driver       ROOT "General"    SET ::xDriver := IIF( !EMPTY( v ), v, NIL )
 
-   PROPERTY FileName     ROOT "Path"       READ xFileName    WRITE SetFileName
+   PROPERTY FileName     ROOT "Path"       SET ::SetFileName(v)
    PROPERTY Path         ROOT "Path"       DEFAULT ""
 
    PROPERTY SqlConnector ROOT "Connection" GET __ChkComponent( Self, @::xSqlConnector )
@@ -122,6 +122,7 @@ CLASS DataTable INHERIT Component
    METHOD MemoExt()                           INLINE ::Connector:MemoExt() 
    METHOD Gather()                            INLINE ::Connector:Gather()
    METHOD Scatter( aData )                    INLINE ::Connector:Scatter( aData )
+   METHOD SetScope( xScope )                  INLINE ::Connector:SetScope( xScope )
    METHOD SetTopScope( xScope )               INLINE ::Connector:SetTopScope( xScope )
    METHOD SetBottomScope( xScope )            INLINE ::Connector:SetBottomScope( xScope )
    METHOD KillScope()                         INLINE ::Connector:KillScope()
@@ -503,6 +504,8 @@ CLASS DataRdd
    
    METHOD SetTopScope( xScope )               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdScope( TOPSCOPE, xScope ) ),)
    METHOD SetBottomScope( xScope )            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, xScope ) ),)
+   METHOD SetScope( xScope )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, ( (::Owner:Alias)->( OrdScope( TOPSCOPE, xScope ) ),;
+                                                                                         (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, xScope ) ) ),)
    METHOD KillScope()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, ( (::Owner:Alias)->( OrdScope( TOPSCOPE, NIL ) ),;
                                                                                          (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, NIL ) ) ),)
    METHOD Alias()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Alias() ),)
@@ -866,6 +869,8 @@ CLASS SocketRdd
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Request( "OrdDescend", {cnOrder, cFile, lDescend} )
    METHOD SetTopScope( xScope )               INLINE ::Request( "OrdScope", {TOPSCOPE, xScope} )
    METHOD SetBottomScope( xScope )            INLINE ::Request( "OrdScope", {BOTTOMSCOPE, xScope} )
+   METHOD SetScope( xScope )                  INLINE ::Request( "OrdScope", {TOPSCOPE, xScope} ),;
+                                                     ::Request( "OrdScope", {BOTTOMSCOPE, xScope} )
    METHOD KillScope()                         INLINE ::Request( "OrdScope", {TOPSCOPE, NIL} ),;
                                                      ::Request( "OrdScope", {BOTTOMSCOPE, NIL} )
    METHOD FieldPut( nField, xVal )            INLINE ::Request( "FieldPut", { nField, xVal } )
@@ -1015,8 +1020,8 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS Database INHERIT Component
+   PROPERTY SqlConnector
    DATA Parent        EXPORTED
-   DATA SqlConnector PUBLISHED
    METHOD Init() CONSTRUCTOR
 ENDCLASS
 

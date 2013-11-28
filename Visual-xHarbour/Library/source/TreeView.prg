@@ -20,7 +20,23 @@
 //----------------------------------------------------------------------------//
 
 CLASS TreeView FROM TitleControl
-   DATA DragItems        PUBLISHED INIT .F.   
+   PROPERTY DragItems                                                DEFAULT .F.   
+   PROPERTY HasLines        SET ::SetStyle( TVS_HASLINES, v )        DEFAULT .T.
+   PROPERTY HasButtons      SET ::SetStyle( TVS_HASBUTTONS, v )      DEFAULT .T.
+   PROPERTY LinesAtRoot     SET ::SetStyle( TVS_LINESATROOT, v )     DEFAULT .T.
+   PROPERTY ShowSelAlways   SET ::SetStyle( TVS_SHOWSELALWAYS, v )   DEFAULT .F.
+   PROPERTY CheckBoxes      SET ::SetStyle( TVS_CHECKBOXES, v )      DEFAULT .F.
+   PROPERTY FullRowSelect   SET ::SetStyle( TVS_FULLROWSELECT, v )   DEFAULT .F.
+   PROPERTY NoHScroll       SET ::SetStyle( TVS_NOHSCROLL, v )       DEFAULT .F.
+   PROPERTY NoToolTips      SET ::SetStyle( TVS_NOTOOLTIPS, v )      DEFAULT .F.
+   PROPERTY SingleExpand    SET ::SetStyle( TVS_SINGLEEXPAND, v )    DEFAULT .F.
+   PROPERTY TrackSelect     SET ::SetStyle( TVS_TRACKSELECT, v )     DEFAULT .F.
+   PROPERTY DisableDragDrop SET ::SetStyle( TVS_DISABLEDRAGDROP, v ) DEFAULT .F.
+   PROPERTY BackColor       SET ( _SendMessage( ::hWnd, TVM_SETBKCOLOR, 0, v ), IIF( ::IsWindowVisible(), ::InvalidateRect(),) ) DEFAULT GetSysColor( COLOR_WINDOW )
+   PROPERTY ImageList       GET __ChkComponent( Self, @::xImageList );
+                            SET (::xImageList := __ChkComponent( Self, v ), ::SetImageList(::xImageList))
+
+
    DATA Items            EXPORTED INIT {}
    DATA Header
    DATA OnSelDelete      EXPORTED
@@ -36,28 +52,6 @@ CLASS TreeView FROM TitleControl
 
    DATA __lResetting     PROTECTED INIT .F.
    DATA __oDrag          PROTECTED
-
-   PROPERTY HasLines        INDEX TVS_HASLINES        READ xHasLines        WRITE SetStyle   DEFAULT .T. PROTECTED
-   PROPERTY HasButtons      INDEX TVS_HASBUTTONS      READ xHasButtons      WRITE SetStyle   DEFAULT .T. PROTECTED
-   PROPERTY LinesAtRoot     INDEX TVS_LINESATROOT     READ xLinesAtRoot     WRITE SetStyle   DEFAULT .T. PROTECTED
-   PROPERTY ShowSelAlways   INDEX TVS_SHOWSELALWAYS   READ xShowSelAlways   WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY CheckBoxes      INDEX TVS_CHECKBOXES      READ xCheckBoxes      WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY FullRowSelect   INDEX TVS_FULLROWSELECT   READ xFullRowSelect   WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY NoHScroll       INDEX TVS_NOHSCROLL       READ xFullRowSelect   WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY NoToolTips      INDEX TVS_NOTOOLTIPS      READ xFullRowSelect   WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY SingleExpand    INDEX TVS_SINGLEEXPAND    READ xSingleExpand    WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY TrackSelect     INDEX TVS_TRACKSELECT     READ xTrackSelect     WRITE SetStyle   DEFAULT .F. PROTECTED
-   PROPERTY DisableDragDrop INDEX TVS_DISABLEDRAGDROP READ xDisableDragDrop WRITE SetStyle   DEFAULT .F. PROTECTED
-   //PROPERTY StaticEdge      INDEX WS_EX_STATICEDGE    READ xStaticEdge      WRITE SetExStyle DEFAULT .F. PROTECTED
-   //PROPERTY Border          INDEX WS_BORDER           READ xBorder          WRITE SetStyle   DEFAULT .F. PROTECTED
-
-   DATA xBackColor          EXPORTED INIT GetSysColor( COLOR_WINDOW )
-   ACCESS BackColor         INLINE ::xBackColor PERSISTENT
-   ASSIGN BackColor( n )    INLINE ::xBackColor := n, _SendMessage( ::hWnd, TVM_SETBKCOLOR, 0, n ), IIF( ::IsWindowVisible(), ::InvalidateRect(),)
-
-   DATA xImageList      EXPORTED
-   ACCESS ImageList     INLINE ::xImageList PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := __ChkComponent( Self, o ), ::SetImageList(::xImageList)
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

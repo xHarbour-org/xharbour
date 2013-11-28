@@ -26,25 +26,19 @@ CLASS LinkLabel INHERIT Control
    DATA AllowUnDock   INIT FALSE
    DATA AllowClose    INIT FALSE
    DATA LinkSysColor  INIT RGB(0,0,255)
+   DATA EnumAlignment EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
 
-   PROPERTY LinkVisited  READ xLinkVisited  WRITE InvalidateRect  DEFAULT .F.            PROTECTED
-   PROPERTY LinkColor    READ xLinkColor    WRITE SetLinkColor    DEFAULT RGB(0,0,255)   PROTECTED
-   PROPERTY VisitedColor READ xVisitedColor WRITE SetVisitedColor DEFAULT RGB(128,0,128) PROTECTED
-   PROPERTY AutoSize     READ xAutoSize     WRITE SetWindowText   DEFAULT .T.            PROTECTED
-   PROPERTY ImageIndex   READ xImageIndex   WRITE SetImageIndex   DEFAULT 0              PROTECTED
-
-   DATA EnumAlignment                  EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
-   ACCESS Alignment                    INLINE ::xAlignment PERSISTENT
-   ASSIGN Alignment(n)                 INLINE ::xAlignment := n, ::Refresh()
-
-   DATA ActiveLinkColor  PUBLISHED INIT RGB(255,0,0)
-   DATA Url              PUBLISHED
-   DATA FocusRect        PUBLISHED INIT .T.
+   PROPERTY Url
+   PROPERTY ActiveLinkColor                       DEFAULT RGB(255,0,0)
+   PROPERTY FocusRect                             DEFAULT .T.
+   PROPERTY LinkVisited  SET ::InvalidateRect()   DEFAULT .F.
+   PROPERTY LinkColor    SET ::SetLinkColor(v)    DEFAULT RGB(0,0,255)
+   PROPERTY VisitedColor SET ::SetVisitedColor(v) DEFAULT RGB(128,0,128)
+   PROPERTY AutoSize     SET ::SetWindowText(v)   DEFAULT .T.
+   PROPERTY ImageIndex   SET ::SetImageIndex(v)   DEFAULT 0
+   PROPERTY Alignment    SET ::Refresh()          DEFAULT 1
+   PROPERTY SelBackColor SET ::SetSelColor(v)
    
-   DATA xSelBackColor       EXPORTED
-   ACCESS SelBackColor      INLINE ::xSelBackColor PERSISTENT
-   ASSIGN SelBackColor( n ) INLINE ::xSelBackColor := n, ::SetSelColor( ::SelBackColor )
-
    DATA __lSelected     PROTECTED INIT .F.
    DATA __lFocused      PROTECTED INIT .F.
 

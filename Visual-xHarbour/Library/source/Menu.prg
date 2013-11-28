@@ -282,10 +282,10 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS MenuBar INHERIT Component
+   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList, .F. )
+
    DATA hMenu          EXPORTED
    DATA xImageList     EXPORTED
-   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList, .F. ) PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := o
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -388,12 +388,11 @@ RETURN oMenu
 //ENDCLASS
 
 CLASS ContextMenu INHERIT Component
+   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList )
+
    DATA Menu            EXPORTED
    DATA Text            EXPORTED INIT "ContextMenu"
    DATA xImageList      EXPORTED
-   
-   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := o
    
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c

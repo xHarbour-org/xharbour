@@ -5,104 +5,47 @@
 
 #xtranslate __CONCAT <x> <y> => <x>[<y>]
 
-#xcommand PROPERTY <p> [ROOT <r>] [DEFAULT <d>];
+#xcommand PROPERTY <p> [ROOT <r>] [DEFAULT <d>] [HELP <h>] [<hid: NOTPUBLIC>];
            =>  ;
-           DATA <p> PUBLISHED [INIT <d>] ;;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif
+           if ! <.hid.> ;;
+              DATA <p> PUBLISHED [INIT <d>] ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+           else ;;
+              DATA <p> [INIT <d>] ;;
+           endif ;;
 
-#xcommand PROPERTY <p> [ROOT <r>] [AS <astype>] [INDEX <i>] [INDEX1 <j>] READ <rf> [DEFAULT <d>] [<prot: PROTECTED>] [MIN <m>] [MAX <x>];
+#xcommand PROPERTY <p> [ROOT <r>] GET <bget> [DEFAULT <d>] [<prot: PROTECTED>] [HELP <h>] [<hid: NOTPUBLIC>] [MIN <m>] [MAX <x>] ;
            =>  ;
-           DATA __CONCAT x <p> [AS <astype>] [<prot>] [INIT <d>] ;
-           ; #ifdef VXH ;
-           ;    DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;
-           ; #endif ;
-           ; ACCESS <p>    INLINE ::<rf> PERSISTENT ;
-           ; ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] ::<rf> := v, v
-
-#xcommand PROPERTY <p> [ROOT <r>] [AS <astype>] [INDEX <i>] [INDEX1 <j>] READ <rf> WRITE <wf> [DEFAULT <d>] [<prot: PROTECTED>] [MIN <m>] [MAX <x>];
-           =>  ;
-           DATA __CONCAT x <p> [AS <astype>] [<prot>] [INIT <d>] ;
-           ; #ifdef VXH ;
-           ;    DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;
-           ; #endif ;
-           ; ACCESS <p>    INLINE ::<rf> PERSISTENT ;
-           ; ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] ::<rf> := v, ::<wf>( [ <i>,] [ <j>,] v ), v
-
-
-#xcommand PROPERTY <p> [ROOT <r>] [AS <astype>] [INDEX <i>] [INDEX1 <j>] READ <rf> WRITE <wf> [DEFAULT <d>] [<prot: PROTECTED>] [MIN <m>] [MAX <x>] INVERT;
-           =>  ;
-           DATA __CONCAT x <p> [AS <astype>] [<prot>] [INIT <d>] ;
-           ; #ifdef VXH ;
-           ;    DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;
-           ; #endif ;
-           ; ACCESS <p>    INLINE ::<rf> PERSISTENT ;
-           ; ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] ::<wf>( [ <i>,] [ <j>,] @v ), ::<rf> := v, v
-
-
-#xcommand PROPERTY <p> [ROOT <r>] [AS <astype>] [INDEX <i>] [INDEX1 <j>] READ <rf> WRITE <wf> [DEFAULT <d>] [<prot: PROTECTED>] [MIN <m>] [MAX <x>] HIDDEN;
-           =>  ;
-           DATA __CONCAT x <p> [AS <astype>] [<prot>] [INIT <d>] ;
-           ; #ifdef VXH ;
-           ;    DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;
-           ; #endif ;
-           ; ACCESS <p>    INLINE ::<rf> ;
-           ; ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] ::<rf> := v, ::<wf>( [<i>,] [ <j>,] v ), v
-
-
-
-//----------------------------------------------------------------------------------------------------------------------------------
-
-
-#xtranslate __CONCAT <x> <y> => <x>[<y>]
-
-
-#xcommand PROPERTY <p> [ROOT <r>] GET <bget> [DEFAULT <d>] [<prot: PROTECTED>];
-           =>  ;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif ;;
            DATA __CONCAT x <p>  [<prot>] [INIT <d>] ;;
-           ACCESS <p>    INLINE <bget> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE ::x<p> := v, v
+           if ! <.hid.> ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              ACCESS <p>    INLINE <bget> PERSISTENT ;;
+           else ;;
+              ACCESS <p>    INLINE <bget> ;;
+           endif ;;
+           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] ::x<p> := v, v
 
-#xcommand PROPERTY <p> [ROOT <r>] SET <bset> [DEFAULT <d>] [<prot: PROTECTED>];
-           =>  ;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif ;;
-           DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
-           ACCESS <p>    INLINE ::x<p> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
-
-#xcommand PROPERTY <p> [ROOT <r>] GET <bget> SET <bset> [DEFAULT <d>] [<prot: PROTECTED>];
-           =>  ;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif ;;
-           DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
-           ACCESS <p>    INLINE <bget> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
-
-
-
-// CODEBLOCK
-#xcommand PROPERTY <p> [ROOT <r>] ASSIGN <assign> [DEFAULT <d>] [<prot: PROTECTED>];
+#xcommand PROPERTY <p> [ROOT <r>] SET <bset> [DEFAULT <d>] [<prot: PROTECTED>] [HELP <h>] [<hid: NOTPUBLIC>] [MIN <m>] [MAX <x>] ;
            =>  ;
            DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif ;;
-           ACCESS <p>    INLINE ::x<p> PERSISTENT ;;
-           ASSIGN <p>(v) INLINE if( valtype(<assign>)=="B", Eval( <{assign}>, Self, v ), ::assign := v ), ::x<p> := v
+           if ! <.hid.> ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              ACCESS <p>    INLINE ::x<p> PERSISTENT ;;
+           else ;;
+              ACCESS <p>    INLINE ::x<p> ;;
+           endif ;;
+           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
 
-
-#xcommand PROPERTY <p> [ROOT <r>] [PARAM <i>] ACCESS <access> ASSIGN <assign> [DEFAULT <d>] [<prot: PROTECTED>];
+#xcommand PROPERTY <p> [ROOT <r>] GET <bget> SET <bset> [DEFAULT <d>] [<prot: PROTECTED>] [HELP <h>] [<hid: NOTPUBLIC>] [MIN <m>] [MAX <x>] ;
            =>  ;
            DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
-           #ifdef VXH ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>]} ;;
-           #endif ;;
-           ACCESS <p>    INLINE if( valtype(<access>)=="B", Eval( <{access}>, Self ), ::x<p> ) PERSISTENT ;;
-           ASSIGN <p>(v) INLINE if( valtype(<assign>)=="B", Eval( <{assign}>, Self, v ), NIL ), ::x<p> := v
+           if ! <.hid.> ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              ACCESS <p>    INLINE <bget> PERSISTENT ;;
+           else ;;
+              ACCESS <p>    INLINE <bget> ;;
+           endif ;;
+           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
+
+
+

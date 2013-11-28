@@ -24,6 +24,17 @@
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MenuItem INHERIT Object
+   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList, .F. )
+   PROPERTY ImageIndex                        DEFAULT 0
+   PROPERTY ShortCutKey
+   PROPERTY Text        SET ::__ModifyMenu(v)
+   PROPERTY Enabled     SET ::__SetEnabled(v) DEFAULT .T.
+   PROPERTY Checked     SET ::__SetChecked(v) DEFAULT .F.
+   PROPERTY RadioCheck                        DEFAULT .F.
+   PROPERTY Separator                         DEFAULT .F.
+   PROPERTY RightJustified                    DEFAULT .F.
+   PROPERTY Visible                           DEFAULT .T.
+
    DATA hMenu          EXPORTED
    DATA __lResizeable  EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable    EXPORTED INIT .F.
@@ -31,25 +42,8 @@ CLASS MenuItem INHERIT Object
    DATA __TempRect     EXPORTED
    DATA Id             EXPORTED
    DATA xImageList     EXPORTED
-
-   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList, .F. ) PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := o
-
-   DATA ImageIndex     PUBLISHED INIT 0
-   DATA ShortCutKey    PUBLISHED
-
-   PROPERTY Text       READ xText       WRITE __ModifyMenu
-   PROPERTY Enabled    READ xEnabled    WRITE __SetEnabled DEFAULT .T.
-   PROPERTY Checked    READ xChecked    WRITE __SetChecked DEFAULT .F.
-
-   DATA RadioCheck     PUBLISHED INIT .F.
-   DATA Separator      PUBLISHED INIT .F.
-   DATA RightJustified PUBLISHED INIT .F.
-
    DATA __hBitmap      EXPORTED
    DATA __pObjPtr      EXPORTED
-
-   DATA Visible        PUBLISHED INIT .T.
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -234,6 +228,19 @@ RETURN Self
 //ENDCLASS
 
 CLASS CMenuItem INHERIT Object
+   PROPERTY Enabled   SET ::SetStatus( MFS_ENABLED, MFS_DISABLED, v ) DEFAULT .T.
+   PROPERTY Text
+   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
+   PROPERTY ImageIndex               DEFAULT -1
+   PROPERTY RadioCheck               DEFAULT .F.
+   PROPERTY ShortCutText
+   PROPERTY Font
+   PROPERTY HotImageList
+   PROPERTY Message
+   PROPERTY ShortCutKey
+   PROPERTY Visible                  DEFAULT .T.
+   PROPERTY ForeColor GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor )
+
    DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable              EXPORTED INIT .F.
    DATA __lCopyCut               EXPORTED INIT .F.
@@ -242,25 +249,8 @@ CLASS CMenuItem INHERIT Object
    DATA __IdeImageIndex          EXPORTED INIT 8
    DATA __TempRect               EXPORTED
 
-   DATA Text                     PUBLISHED
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
-
-   DATA ImageIndex               PUBLISHED INIT -1
-   DATA RadioCheck               PUBLISHED INIT .F.
-   DATA ShortCutText             PUBLISHED
-   DATA Font                     PUBLISHED
-   DATA HotImageList             PUBLISHED
-   DATA Message                  PUBLISHED
-   DATA ShortCutKey              PUBLISHED
-
-   DATA xImageList      EXPORTED
-   ACCESS ImageList     INLINE __ChkComponent( Self, @::xImageList ) PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := o
-
-   DATA Visible                  PUBLISHED INIT .T.
-
-   PROPERTY Enabled INDEX MFS_ENABLED INDEX1 MFS_DISABLED READ xEnabled WRITE SetStatus DEFAULT .T. PROTECTED
 
    DATA Id                       EXPORTED
    DATA Cargo                    EXPORTED
@@ -274,7 +264,7 @@ CLASS CMenuItem INHERIT Object
    DATA MenuItemInfo             EXPORTED AS OBJECT
    DATA MenuBreak                EXPORTED INIT 0
    DATA Status                   EXPORTED INIT MFS_ENABLED
-   DATA ShortCut                 EXPORTED //PUBLISHED INIT ""
+   DATA ShortCut                 EXPORTED
    DATA Default                  EXPORTED INIT .F.
    DATA BkBrush                  EXPORTED INIT GetSysColorBrush( COLOR_MENU )
    DATA Type                     EXPORTED
@@ -297,10 +287,6 @@ CLASS CMenuItem INHERIT Object
    DATA HorzScrollPos            EXPORTED INIT 0
    DATA VertScrollPos            EXPORTED INIT 0
    DATA ForeSysColor             EXPORTED INIT GetSysColor( COLOR_MENUTEXT )
-
-   DATA xForeColor               EXPORTED
-   ACCESS ForeColor              INLINE IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) PERSISTENT
-   ASSIGN ForeColor( n )         INLINE ::xForeColor := n
 
    ACCESS hWnd                   INLINE ::hMenu
 

@@ -105,9 +105,16 @@ RETURN
 
 CLASS ActiveX INHERIT ToleAuto, TitleControl
 
-   DATA ProgID        PUBLISHED
-   DATA ClsID         PUBLISHED
-   DATA OleVerb       PUBLISHED INIT __GetSystem():OleVerb:Show
+   PROPERTY StaticEdge    ROOT "Appearance" SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F. HELP "Creates a window with a three-dimensional border style intended to be used for items that do not accept user input."
+   PROPERTY ClientEdge    ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F. HELP "Specifies that a window has a 3D look — that is, a border with a sunken edge."
+   PROPERTY ControlParent ROOT "Behavior"   SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F. HELP "Allows the user to navigate among the child windows of the window by using the TAB key."
+   PROPERTY ClipChildren  ROOT "Behavior"   SET ::SetStyle( WS_CLIPCHILDREN, v )       DEFAULT .T. HELP "Excludes the area occupied by child windows when you draw within the parent window. Used when you create the parent window."
+   PROPERTY ClipSiblings  ROOT "Behavior"   SET ::SetStyle( WS_CLIPSIBLINGS, v )       DEFAULT .T. HELP "Clips child windows relative to each other; that is, when a particular child window receives a paint message"
+   PROPERTY ProgID        ROOT "Control"
+   PROPERTY ClsID         ROOT "Control"
+   PROPERTY OleVerb       ROOT "Control"    DEFAULT __GetSystem():OleVerb:Show
+   PROPERTY Center        ROOT "Position"   SET ::CenterWindow(v)                      DEFAULT .F.
+
 
    DATA BackColor     EXPORTED
    DATA ForeColor     EXPORTED
@@ -120,15 +127,6 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    DATA __OleVars     EXPORTED
    DATA __LoadEvents  EXPORTED INIT .T.
    DATA Constants     EXPORTED
-
-   PROPERTY StaticEdge    INDEX WS_EX_STATICEDGE    READ xStaticEdge    WRITE SetExStyle DEFAULT .F.
-   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE    READ xClientEdge    WRITE SetExStyle DEFAULT .F.
-   PROPERTY ControlParent INDEX WS_EX_CONTROLPARENT READ xControlParent WRITE SetExStyle DEFAULT .F.
-
-   PROPERTY Center                                  READ xCenter        WRITE CenterWindow DEFAULT .F.
-
-   PROPERTY ClipChildren  INDEX WS_CLIPCHILDREN     READ xClipChildren  WRITE SetStyle   DEFAULT .T.
-   PROPERTY ClipSiblings  INDEX WS_CLIPSIBLINGS     READ xClipSiblings  WRITE SetStyle   DEFAULT .T.
 
    DATA xCaption               EXPORTED  INIT ""
    ACCESS Caption              INLINE    ::xCaption
@@ -292,29 +290,29 @@ METHOD __OpExactEqual( oObj ) CLASS ActiveX
 RETURN lRet
 
 METHOD __GetObjProp( oObj ) CLASS ActiveX
-   LOCAL n, cArg, Property, xVal, cProp, o, xVal2, lReadOnly
+   LOCAL n, cArg, oProperty, xVal, cProp, o, xVal2, lReadOnly
    LOCAL __OleVars := {=>}
    WITH OBJECT oObj
-      FOR EACH Property IN :Properties
-          cProp := Property:Name
+      FOR EACH oProperty IN :Properties
+          cProp := oProperty:Name
           IF cProp != "Picture" .AND. cProp != "XMLData" .AND. cProp != "HTMLData" .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
-             lReadOnly := Property:ReadOnly
+             lReadOnly := oProperty:ReadOnly
              TRY
-                SWITCH Property:VT
+                SWITCH oProperty:VT
                    CASE VT_VOID
-                        IF LEFT( Property:Arguments[1]:TypeDesc, 3 ) == "VT_"
-                           cArg := Property:Arguments[1]:TypeDesc
+                        IF LEFT( oProperty:Arguments[1]:TypeDesc, 3 ) == "VT_"
+                           cArg := oProperty:Arguments[1]:TypeDesc
                          ELSE
-                           cArg := SUBSTR( Property:Arguments[1]:TypeDesc, 13 )
+                           cArg := SUBSTR( oProperty:Arguments[1]:TypeDesc, 13 )
                         ENDIF
                         IF ( n := ASCAN( ::oTypeLib:Enumerations, {|o| o:Name == cArg } ) ) > 0
                            o := ::oTypeLib:Enumerations[n]
                            xVal  := o:Constants
                            xVal2 := ::AxGet( cProp ) //::&cProp
                          ELSE
-                           IF Property:Arguments[1]:TypeDesc != "VT_UNKNOWN" //.AND. Property:Arguments[1]:TypeDesc != "VT_I4" .AND. Property:Arguments[1]:TypeDesc != "VT_I2"
+                           IF oProperty:Arguments[1]:TypeDesc != "VT_UNKNOWN" //.AND. oProperty:Arguments[1]:TypeDesc != "VT_I4" .AND. oProperty:Arguments[1]:TypeDesc != "VT_I2"
                               xVal  := ::AxGet( cProp ) //::&cProp
                            ENDIF
                         ENDIF
@@ -323,7 +321,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
                    CASE VT_PTR
                         EXIT
                 END
-                IF Property:VT != VT_VOID
+                IF oProperty:VT != VT_VOID
                    DEFAULT xVal TO ::AxGet( cProp ) //::&cProp
                 ENDIF
              catch
@@ -333,7 +331,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
              //IF VALTYPE( xVal ) == "O"
              //   xVal3 := ::__GetObjProp( xVal:hObj )
              //ENDIF
-             __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, Property:HelpString }
+             __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
            ELSE
           ENDIF
 

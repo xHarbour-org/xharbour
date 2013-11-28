@@ -17,6 +17,10 @@
 //----------------------------------------------------------------------------//
 
 CLASS TreeViewItem INHERIT Object
+   PROPERTY Bold       SET ::SetItemState( TVIS_BOLD, v ) DEFAULT .F.
+   PROPERTY Text       SET ::SetItemText( v )             DEFAULT ""
+   PROPERTY ImageIndex SET ::SetImageIndex( v )           DEFAULT 0
+
    DATA hItem          EXPORTED
    DATA Items          EXPORTED INIT {}
    DATA Parent         EXPORTED
@@ -27,9 +31,6 @@ CLASS TreeViewItem INHERIT Object
    DATA HotImageIndex  EXPORTED
    DATA PointerItem    EXPORTED
    DATA InsertAfter    EXPORTED INIT TVI_LAST
-   PROPERTY Bold    INDEX TVIS_BOLD READ xBold       WRITE SetItemState PROTECTED
-   PROPERTY Text                    READ xText       WRITE SetItemText
-   PROPERTY ImageIndex              READ xImageIndex WRITE SetImageIndex DEFAULT 0
 
    ACCESS xCaption         INLINE ::xText
    ASSIGN xCaption(c)      INLINE ::xText := c

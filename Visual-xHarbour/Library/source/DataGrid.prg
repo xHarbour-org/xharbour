@@ -91,38 +91,38 @@
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
-   PROPERTY ItemHeight              DEFAULT 19
-   PROPERTY FullRowSelect           DEFAULT .F.
-   PROPERTY ShadowRow               DEFAULT .T.
-   PROPERTY AutoHorzScroll          DEFAULT .T.
-   PROPERTY AutoVertScroll          DEFAULT .T.
-   PROPERTY FreezeColumn            DEFAULT 0
-   PROPERTY ShowHeaders             DEFAULT .T.
-   PROPERTY HeaderHeight            DEFAULT 20
-   PROPERTY ShowSelection           DEFAULT .T.
-   PROPERTY ShowSelectionBorder     DEFAULT .T.
-   PROPERTY AnchorColumn            DEFAULT 0
-   PROPERTY ConvertOem              DEFAULT .F.
+   PROPERTY ItemHeight                                                                              DEFAULT 19
+   PROPERTY FullRowSelect                                                                           DEFAULT .F.
+   PROPERTY ShadowRow                                                                               DEFAULT .T.
+   PROPERTY AutoHorzScroll                                                                          DEFAULT .T.
+   PROPERTY AutoVertScroll                                                                          DEFAULT .T.
+   PROPERTY FreezeColumn                                                                            DEFAULT 0
+   PROPERTY ShowHeaders                                                                             DEFAULT .T.
+   PROPERTY HeaderHeight                                                                            DEFAULT 20
+   PROPERTY ShowSelection                                                                           DEFAULT .T.
+   PROPERTY ShowSelectionBorder                                                                     DEFAULT .T.
+   PROPERTY AnchorColumn                                                                            DEFAULT 0
+   PROPERTY ConvertOem                                                                              DEFAULT .F.
 
    PROPERTY GridColor            ROOT "Colors"
    PROPERTY HighlightBorderColor ROOT "Colors"
    PROPERTY HighlightColor       ROOT "Colors"
    PROPERTY HighlightTextColor   ROOT "Colors"
 
-   PROPERTY HoverRow                DEFAULT .T.
+   PROPERTY HoverRow                                                                                DEFAULT .T.
 
    PROPERTY Columns
-   PROPERTY AllowDragRecords        DEFAULT .F.
-   PROPERTY ExtVertScrollBar        DEFAULT .F.
-   PROPERTY MultipleSelection       DEFAULT .F.
-   PROPERTY TagRecords              DEFAULT .F.
-   PROPERTY GradientHeader          DEFAULT .F.
+   PROPERTY AllowDragRecords                                                                        DEFAULT .F.
+   PROPERTY ExtVertScrollBar                                                                        DEFAULT .F.
+   PROPERTY MultipleSelection                                                                       DEFAULT .F.
+   PROPERTY TagRecords                                                                              DEFAULT .F.
+   PROPERTY GradientHeader                                                                          DEFAULT .F.
 
-   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
-   PROPERTY DataSource GET __ChkComponent( Self, @::xDataSource ) SET ::__SetDataSource(v)
+   PROPERTY ImageList           GET __ChkComponent( Self, @::xImageList )
+   PROPERTY DataSource          GET __ChkComponent( Self, @::xDataSource ) SET ::__SetDataSource(v)
 
-   PROPERTY ShowGrid      READ xShowGrid    WRITE InvalidateRect    DEFAULT .T.
-   PROPERTY Striping      READ xStriping    WRITE InvalidateRect    DEFAULT .F.
+   PROPERTY ShowGrid            SET ::InvalidateRect()                                              DEFAULT .T.
+   PROPERTY Striping            SET ::InvalidateRect()                                              DEFAULT .F.
 
    DATA HighlightSysColor       EXPORTED
    DATA HighlightTextSysColor   EXPORTED
@@ -3010,7 +3010,7 @@ RETURN NIL
 METHOD __FillRow( nPos, nCol ) CLASS DataGrid
    EXTERN hb_QSelf
    LOCAL nImageWidth, nImageHeight, nImageIndex, n, nColBkColor, nColTxColor, nStatus, nAlign, cData, nRet
-   LOCAL hFont, oFont, nGridBkColor, nGridTxColor
+   LOCAL hFont, oFont, nGridBkColor, nGridTxColor, e
 
    IF nCol == NIL
       ::__DataWidth := 0
@@ -3090,13 +3090,17 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
                 cData := ::Children[n]:Data
                 IF VALTYPE( cData ) == "B"
                    cData := EVAL( cData, Self )
+                 ELSE
+                   DEFAULT cData TO "' '"
+                   TRY
+                      cData := &cData
+                   catch e
+                      cData := e:Description
+                   END
+                   IF VALTYPE( cData ) == "B"
+                      cData := EVAL( cData, Self )
+                   ENDIF
                 ENDIF
-                DEFAULT cData TO "' '"
-                TRY
-                   cData := &cData
-                catch
-                   cData := ""
-                END
               ELSEIF ::Children[n]:FieldPos > 0 .AND. ::DataSource:Structure != NIL
                 cData := ::DataSource:FieldGet( ::Children[n]:FieldPos )
               ELSE
@@ -4000,17 +4004,17 @@ CLASS GridColumn INHERIT Object
    PROPERTY ButtonMenu  GET __ChkComponent( Self, @::xButtonMenu )
    PROPERTY HeaderMenu  GET __ChkComponent( Self, @::xHeaderMenu )
 
-   PROPERTY ImageAlignment    READ xImageAlignment   WRITE Refresh DEFAULT 1
-   PROPERTY Alignment         READ xAlignment        WRITE SetAlignment  DEFAULT 1
-   PROPERTY Width             READ xWidth            WRITE SetWidth
-   PROPERTY BackColor INDEX 1 READ xBackColor        WRITE SetColor
-   PROPERTY ForeColor INDEX 2 READ xForeColor        WRITE SetColor
-   PROPERTY ImageIndex        READ xImageIndex       WRITE SetImageIndex
-   PROPERTY Text              READ xText             WRITE SetText
-   PROPERTY SortArrow         READ xSortArrow        WRITE __SetSortArrow      DEFAULT 0
-   PROPERTY HeaderImageIndex  READ xHeaderImageIndex WRITE SetHeaderImageIndex DEFAULT 0
-   PROPERTY Representation    READ xRepresentation   WRITE SetRepresentation   DEFAULT 1
-   PROPERTY AutoEdit          READ xAutoEdit         WRITE __SetAutoEdit       DEFAULT .F. INVERT
+   PROPERTY ImageAlignment    SET ::Refresh(v)             DEFAULT 1
+   PROPERTY Alignment         SET ::SetAlignment(v)        DEFAULT 1
+   PROPERTY Width             SET ::SetWidth(v)
+   PROPERTY BackColor         SET ::SetColor(1,v)
+   PROPERTY ForeColor         SET ::SetColor(2,v)
+   PROPERTY ImageIndex        SET ::SetImageIndex(v)
+   PROPERTY Text              SET ::SetText(v)
+   PROPERTY SortArrow         SET ::__SetSortArrow(v)      DEFAULT 0
+   PROPERTY HeaderImageIndex  SET ::SetHeaderImageIndex(v) DEFAULT 0
+   PROPERTY Representation    SET ::SetRepresentation(v)   DEFAULT 1
+   PROPERTY AutoEdit          SET ::__SetAutoEdit(v)       DEFAULT .F.
 
    PROPERTY AllowSize         DEFAULT .F.
    PROPERTY AllowDrag         DEFAULT .F.
@@ -4287,14 +4291,18 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------------------------------
 METHOD __GetFields() CLASS GridColumn
-   LOCAL n, aFields := {{},{}}, aStruct := ::Parent:DataSource:Structure
+   LOCAL n, aFields := {{},{}}, aStruct
+   
+   IF VALTYPE( ::Parent:DataSource ) == "O"
+      aStruct := ::Parent:DataSource:Structure
 
-   AADD( aFields[1], "" )
-   AADD( aFields[2], 0 )
-   FOR n := 1 TO LEN( aStruct )
-       AADD( aFields[1], aStruct[n][1] )
-       AADD( aFields[2], n )
-   NEXT
+      AADD( aFields[1], "" )
+      AADD( aFields[2], 0 )
+      FOR n := 1 TO LEN( aStruct )
+          AADD( aFields[1], aStruct[n][1] )
+          AADD( aFields[2], n )
+      NEXT
+   ENDIF
 RETURN aFields
 
 //---------------------------------------------------------------------------------------------------------------------------

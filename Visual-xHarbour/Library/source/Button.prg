@@ -28,16 +28,17 @@
 
 CLASS Button INHERIT Control
 
-   DATA ImageAlign        PUBLISHED INIT __GetSystem():TextAlignment:Center
-   DATA MenuArrow         PUBLISHED INIT .F.
+   PROPERTY ImageAlign    ROOT "Appearance"                                   DEFAULT __GetSystem():TextAlignment:Center
+   PROPERTY MenuArrow     ROOT "Appearance"                                   DEFAULT .F.
+   PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)            DEFAULT  0
+   PROPERTY Border        ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )    DEFAULT .F.
 
-   PROPERTY Group         INDEX WS_GROUP         READ xGroup         WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY OwnerDraw     INDEX BS_OWNERDRAW     READ xOwnerDraw     WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY ImageIndex                           READ xImageIndex    WRITE SetImageIndex    DEFAULT  0  PROTECTED
-   PROPERTY Border        INDEX WS_BORDER        READ xBorder        WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY DefaultButton                        READ xDefaultButton WRITE SetDefault       DEFAULT .F. PROTECTED
-   PROPERTY Enabled       ROOT "Behavior" INDEX WS_DISABLED      READ xEnabled       WRITE SetStyle         DEFAULT .T. PROTECTED
-   PROPERTY MultiLine     INDEX BS_MULTILINE     READ xMultiLine     WRITE SetStyle         DEFAULT .F. PROTECTED
+   PROPERTY ShortCutKey   ROOT "Behavior" 
+   PROPERTY Group         ROOT "Behavior"   SET ::SetStyle( WS_GROUP, v )     DEFAULT .F.
+   PROPERTY OwnerDraw     ROOT "Behavior"   SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.
+   PROPERTY DefaultButton ROOT "Behavior"   SET ::SetDefault(v)               DEFAULT .F.
+   PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )  DEFAULT .T.
+   PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v ) DEFAULT .F. PROTECTED
 
    DATA ImgInst           EXPORTED
    DATA ImageIndent       EXPORTED INIT 3
@@ -45,7 +46,6 @@ CLASS Button INHERIT Control
    DATA DrawFocus         EXPORTED INIT .T.
    DATA AllowUnDock       EXPORTED INIT FALSE
    DATA AllowClose        EXPORTED INIT FALSE
-   DATA ShortCutKey       PUBLISHED
    ACCESS Checked INLINE ( ::GetState() == BST_CHECKED)
 
    DATA xState            PROTECTED INIT BST_UNCHECKED

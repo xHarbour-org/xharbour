@@ -13,9 +13,9 @@
 #ifdef VXH_PROFESSIONAL
 
 CLASS FreeImage INHERIT Panel, FreeImageRenderer
-   PROPERTY Transparent                 READ xTransparent WRITE Update   DEFAULT .F.
-   PROPERTY Alignment                   READ xAlignment   WRITE Update   DEFAULT 1
-   PROPERTY Border      INDEX WS_BORDER READ xBorder      WRITE SetStyle DEFAULT .F.       PROTECTED
+   PROPERTY Transparent SET ::Update()                 DEFAULT .F.
+   PROPERTY Alignment   SET ::Update()                 DEFAULT 1
+   PROPERTY Border      SET ::SetStyle( WS_BORDER, v ) DEFAULT .F.
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -115,25 +115,23 @@ RETURN 0
 
 
 CLASS FreeImageRenderer
-   PROPERTY ImageName        READ xImageName        WRITE __SetImageName  INVERT
-   PROPERTY Opacity          READ xOpacity          WRITE Update DEFAULT 100
-   PROPERTY Alignment        READ xAlignment        WRITE Update DEFAULT 1
-   PROPERTY KeepAspectRatio  READ xKeepAspectRatio  WRITE Update DEFAULT .F.
-   PROPERTY Stretch          READ xStretch          WRITE Update DEFAULT .F.
+   PROPERTY ImageName        SET ::__SetImageName(v)
+   PROPERTY Opacity          SET ::Update() DEFAULT 100
+   PROPERTY Alignment        SET ::Update() DEFAULT 1
+   PROPERTY KeepAspectRatio  SET ::Update() DEFAULT .F.
+   PROPERTY Stretch          SET ::Update() DEFAULT .F.
+   PROPERTY Margins          SET ::SetMargins(v)
 
-   DATA LeftMargin   EXPORTED INIT 0
-   DATA TopMargin    EXPORTED INIT 0
-   DATA RightMargin  EXPORTED INIT 0
-   DATA BottomMargin EXPORTED INIT 0
-
-   PROPERTY Margins         READ xMargins WRITE SetMargins PROTECTED
-
-
+   DATA LeftMargin      EXPORTED INIT 0
+   DATA TopMargin       EXPORTED INIT 0
+   DATA RightMargin     EXPORTED INIT 0
+   DATA BottomMargin    EXPORTED INIT 0
    DATA lTransparentSet EXPORTED INIT .F.
    DATA Owner           EXPORTED
    DATA Type            EXPORTED
    DATA Transparent     EXPORTED INIT .F.
    DATA ClsName         EXPORTED INIT "FreeImageRenderer"
+   DATA __xCtrlName     EXPORTED INIT "FreeImage"
    DATA __IsInstance    EXPORTED INIT .F.
    DATA __ClassInst     EXPORTED
    DATA __cData         PROTECTED

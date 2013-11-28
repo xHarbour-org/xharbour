@@ -16,7 +16,18 @@ static aDef := {"BMP","ICO"}
 //CreateMappedBitmap 
 
 CLASS PictureBox INHERIT Panel
-   DATA TransparencyByPixel PUBLISHED INIT .F.
+   PROPERTY TransparencyByPixel DEFAULT .F.
+   PROPERTY ImageName        SET ::SetImageName(v)
+   PROPERTY Stretch          SET ::Update()         DEFAULT .F.
+   PROPERTY KeepAspectRatio  SET ::Update()         DEFAULT .F.
+   PROPERTY Transparent      SET ::InvalidateRect() DEFAULT .F.
+   PROPERTY BlackAndWhite    SET ::InvalidateRect() DEFAULT .F.
+   PROPERTY InvertedColors   SET ::InvalidateRect() DEFAULT .F.
+   PROPERTY Opacity          SET ::InvalidateRect() DEFAULT 100
+
+   PROPERTY Alignment        SET ::Update()         DEFAULT 1
+
+
    DATA pPicture        EXPORTED
    DATA ResourceName    EXPORTED
    DATA PictureWidth    EXPORTED
@@ -48,16 +59,6 @@ CLASS PictureBox INHERIT Panel
 
    DATA TransparentColor //compatibility only
    
-   PROPERTY ImageName        READ xImageName        WRITE SetImageName   INVERT
-   PROPERTY Stretch          READ xStretch          WRITE Update         DEFAULT .F.
-   PROPERTY KeepAspectRatio  READ xKeepAspectRatio  WRITE Update         DEFAULT .F.
-   PROPERTY Transparent      READ xTransparent      WRITE InvalidateRect DEFAULT .F.
-   PROPERTY BlackAndWhite    READ xBlackAndWhite    WRITE InvalidateRect DEFAULT .F.
-   PROPERTY InvertedColors   READ xInvertedColors   WRITE InvalidateRect DEFAULT .F.
-   PROPERTY Opacity          READ xOpacity          WRITE InvalidateRect DEFAULT 100
-
-   PROPERTY Alignment        READ xAlignment        WRITE Update         DEFAULT 1
-
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Draw()

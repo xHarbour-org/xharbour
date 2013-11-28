@@ -22,14 +22,13 @@ CLASS Image INHERIT Label
    METHOD Create()
    METHOD SetImage()
 
-   PROPERTY ImageName                            READ xImageName   WRITE SetImage  DEFAULT NIL PROTECTED
-   PROPERTY Sunken          INDEX SS_SUNKEN      READ xSunken      WRITE SetStyle  DEFAULT .F. PROTECTED
-   PROPERTY CenterImage     INDEX SS_CENTERIMAGE READ xCenterImage WRITE SetStyle  DEFAULT .F. PROTECTED
+   PROPERTY ImageName       SET ::SetImage(v)
+   PROPERTY Sunken          SET ::SetStyle( SS_SUNKEN, v )      DEFAULT .F.
+   PROPERTY CenterImage     SET ::SetStyle( SS_CENTERIMAGE, v ) DEFAULT .F.
+   PROPERTY LoadFromFile                                        DEFAULT .F.
+   PROPERTY ImageType                                           DEFAULT 1
 
-   DATA ImageType       PUBLISHED INIT 1
    DATA EnumImageType   EXPORTED  INIT {{"Bitmap","Icon"},{IMAGE_BITMAP, IMAGE_ICON}}
-
-   DATA LoadFromFile    PUBLISHED INIT .F.
 
    DATA RightAlign   PROTECTED
    DATA Sunken       PROTECTED

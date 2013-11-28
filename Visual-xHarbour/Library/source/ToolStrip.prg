@@ -34,12 +34,12 @@ static s_MenuhWnd
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStripContainer INHERIT Control
-   PROPERTY Position                                READ xPosition      WRITE __SetPosition DEFAULT 2
 
-   PROPERTY Left          INDEX 1                   READ xLeft          WRITE __SetSizePos  DEFAULT 0   HIDDEN
-   PROPERTY Top           INDEX 2                   READ xTop           WRITE __SetSizePos  DEFAULT 0   HIDDEN
-   PROPERTY Width         INDEX 3                   READ xWidth         WRITE __SetSizePos  DEFAULT 100 HIDDEN
-   PROPERTY Height        INDEX 4                   READ xHeight        WRITE __SetSizePos  DEFAULT 0   HIDDEN
+   PROPERTY Position     SET ::__SetPosition( v )   DEFAULT 2
+   PROPERTY Left         SET ::__SetSizePos( 1, v ) DEFAULT 0   NOTPUBLIC
+   PROPERTY Top          SET ::__SetSizePos( 2, v ) DEFAULT 0   NOTPUBLIC
+   PROPERTY Width        SET ::__SetSizePos( 3, v ) DEFAULT 100 NOTPUBLIC
+   PROPERTY Height       SET ::__SetSizePos( 4, v ) DEFAULT 0   NOTPUBLIC
 
    DATA ImageList        EXPORTED
    DATA Border           EXPORTED INIT .T.
@@ -326,21 +326,22 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStrip INHERIT Control
-   PROPERTY ImageList   READ xImageList      WRITE __SetImageList PROTECTED
-   PROPERTY ShowChevron READ xShowChevron    WRITE __ShowChevron  PROTECTED DEFAULT .T. INVERT
-   PROPERTY ShowGrip    READ xShowGrip       WRITE __ShowGrip     PROTECTED DEFAULT .T. INVERT
+   PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList ) SET ::__SetImageList(v)
+   PROPERTY ShowChevron  SET ::__ShowChevron(v)  DEFAULT .T.
+   PROPERTY ShowGrip     SET ::__ShowGrip(v)     DEFAULT .T.
+   PROPERTY ImagePadding DEFAULT 4
+   PROPERTY Cursor       SET ::__SetWindowCursor(v) DEFAULT IDC_ARROW NOTPUBLIC
+   PROPERTY Row          SET ( ::__SetRow(v), IIF( ::Parent != NIL .AND. ::Parent:ClsName == "ToolStripContainer",;
+                               (::Parent:__RefreshPosNo(), ::Parent:__RefreshLayout(), ::MoveWindow()),) ) DEFAULT 1
 
-   PROPERTY ImagePadding READ xImagePadding                       PROTECTED DEFAULT 4
-   
-   DATA xRow PROTECTED INIT 1
-   ACCESS Row         INLINE ::xRow PERSISTENT
-   ASSIGN Row(n)      INLINE ::__SetRow(n), ::xRow := n, IIF( ::Parent != NIL .AND. ::Parent:ClsName == "ToolStripContainer",;
-                             (::Parent:__RefreshPosNo(), ::Parent:__RefreshLayout(), ::MoveWindow()),)
+   PROPERTY Height     ROOT "Position" SET ::__SetHeight(v)    DEFAULT 25 MIN 25
+   PROPERTY Left       ROOT "Position" SET ::__SetSizePos(1,v) DEFAULT 2
+   PROPERTY Top        ROOT "Position" SET ::__SetSizePos(2,v) DEFAULT 2
+   PROPERTY Width      ROOT "Position" SET ::__SetSizePos(3,v) DEFAULT 20  NOTPUBLIC
+   PROPERTY Float      ROOT "Position" SET ::__SetFloat(v)     DEFAULT .F. NOTPUBLIC
 
    ACCESS __lMoveable INLINE ::Parent:ClsName != "ToolStripContainer"
-   ACCESS ImageList   INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
    
-   PROPERTY Cursor    READ xCursor WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED HIDDEN
    DATA Border         EXPORTED INIT .T.
    //DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
@@ -380,13 +381,6 @@ CLASS ToolStrip INHERIT Control
    DATA __LastY        PROTECTED INIT 0
    DATA __LastX        PROTECTED INIT 0
    DATA __DesignAddNew EXPORTED
-   
-   PROPERTY Height         READ xHeight WRITE __SetHeight DEFAULT 25 MIN 25
-
-   PROPERTY Left   INDEX 1 READ xLeft   WRITE __SetSizePos DEFAULT 2   //HIDDEN
-   PROPERTY Top    INDEX 2 READ xTop    WRITE __SetSizePos DEFAULT 2   //HIDDEN
-   PROPERTY Width  INDEX 3 READ xWidth  WRITE __SetSizePos DEFAULT 20  HIDDEN
-   PROPERTY Float          READ xFloat  WRITE __SetFloat   DEFAULT .F. HIDDEN
    
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -1369,19 +1363,16 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStripItem INHERIT Control
-   // PUBLISHED PROPERTIES
-   PROPERTY BeginGroup  READ xBeginGroup WRITE __SetBeginGroup DEFAULT .F.                       PROTECTED
-   PROPERTY ImageAlign  READ xImageAlign WRITE __SetImageAlign DEFAULT __GetSystem():TextAlignment:Left PROTECTED
-   //PROPERTY Cursor                READ xCursor WRITE __SetWindowCursor DEFAULT IDC_ARROW PROTECTED
-
-   DATA Role              PUBLISHED INIT 1
-   DATA ShortCutKey       PUBLISHED
+   PROPERTY BeginGroup  SET ::__SetBeginGroup(v) DEFAULT .F.
+   PROPERTY ImageAlign  SET ::__SetImageAlign(v) DEFAULT __GetSystem():TextAlignment:Left
+   PROPERTY Role        DEFAULT 1
+   PROPERTY ShortCutKey
 
    // INTERNALS   
-   PROPERTY Left          INDEX 1 READ xLeft    WRITE __SetSizePos      DEFAULT 0   HIDDEN
-   PROPERTY Top           INDEX 2 READ xTop     WRITE __SetSizePos      DEFAULT 1   HIDDEN
-   PROPERTY Width         INDEX 3 READ xWidth   WRITE __SetSizePos      DEFAULT 25  HIDDEN
-   PROPERTY Height        INDEX 4 READ xHeight  WRITE __SetSizePos      DEFAULT 0   HIDDEN
+   PROPERTY Left        SET ::__SetSizePos(1,v) DEFAULT 0   NOTPUBLIC
+   PROPERTY Top         SET ::__SetSizePos(2,v) DEFAULT 1   NOTPUBLIC
+   PROPERTY Width       SET ::__SetSizePos(3,v) DEFAULT 25  NOTPUBLIC
+   PROPERTY Height      SET ::__SetSizePos(4,v) DEFAULT 0   NOTPUBLIC
    
    ACCESS ColorSelectedBegin  INLINE ::System:CurrentScheme:ButtonSelectedGradientBegin
    ACCESS ColorSelectedEnd    INLINE ::System:CurrentScheme:ButtonSelectedGradientEnd
@@ -1678,7 +1669,7 @@ METHOD OnLButtonUp() CLASS ToolStripItem
       
       IF ::__lSelected
          IF ::Role == 2
-            ::xChecked := !::xChecked
+            ::Checked := !::Checked
          ENDIF
 
          IF VALTYPE( ::Action ) == "B"
@@ -1698,14 +1689,11 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStripButton INHERIT ToolStripItem
-   PROPERTY ImageList  READ xImageList     WRITE __SetImageList              PROTECTED
-   PROPERTY ImageIndex READ xImageIndex    WRITE __SetImageIndex DEFAULT  0  PROTECTED
-   
-   PROPERTY DropDown   READ xDropDown      WRITE __SetDropDown   DEFAULT  1  PROTECTED
-   PROPERTY Checked    READ xChecked                             DEFAULT .F.
+   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList ) SET ::__SetImageList(v)
+   PROPERTY ImageIndex                                           SET ::__SetImageIndex(v) DEFAULT  0
+   PROPERTY DropDown                                             SET ::__SetDropDown(v)   DEFAULT  1
+   PROPERTY Checked                                                                       DEFAULT .F.
 
-   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
-   
    DATA EnumDropDown    EXPORTED  INIT { { "None", "Partial", "Full" }, {1,2,3} }
 
    DATA __pObjPtr       PROTECTED
@@ -1847,7 +1835,7 @@ METHOD OnPaint() CLASS ToolStripButton
       hOldBitmap := SelectObject( hMemDC, hMemBitmap)
    ENDIF
 
-   IF ( ::__lSelected .OR. ::xChecked ) .AND. !::ClsName == "ToolStripLabel"
+   IF ( ::__lSelected .OR. ::Checked ) .AND. !::ClsName == "ToolStripLabel"
    
       hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder //::ColorSelectedBorder
       IF ::__lPushed
@@ -1863,7 +1851,7 @@ METHOD OnPaint() CLASS ToolStripButton
             hBorderPen := ::System:CurrentScheme:Pen:MenuBorder
          ENDIF
 
-       ELSEIF !::xChecked
+       ELSEIF !::Checked
          ::__SetVertex()
 
        ELSE
@@ -2726,9 +2714,9 @@ RETURN CallNextHookEx( s_hMenuDialogHook, nCode, nwParam, nlParam)
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStripComboBox INHERIT ToolStripItem, ComboBox
-   PROPERTY Width         INDEX 3 READ xWidth  WRITE __SetSizePos      DEFAULT 25
-   PROPERTY Height        INDEX 4 READ xHeight WRITE __SetSizePos      DEFAULT 0
-   PROPERTY Alignment     READ xAlignment DEFAULT 1
+   PROPERTY Width         SET ::__SetSizePos( 3, v )      DEFAULT 25
+   PROPERTY Height        SET ::__SetSizePos( 4, v )      DEFAULT 0
+   PROPERTY Alignment                                     DEFAULT 1
 
    DATA EnumAlignment     EXPORTED INIT { { "Left", "Right" }, {1,2} }
    DATA ShortCutKey       EXPORTED
@@ -2763,9 +2751,9 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStripLabel INHERIT ToolStripButton
-   PROPERTY Width         INDEX 3 READ xWidth  WRITE __SetSizePos      DEFAULT 80
-   PROPERTY Height        INDEX 4 READ xHeight WRITE __SetSizePos      DEFAULT 0
-   PROPERTY Alignment     READ xAlignment DEFAULT 1
+   PROPERTY Width         SET ::__SetSizePos( 3, v )      DEFAULT 80
+   PROPERTY Height        SET ::__SetSizePos( 4, v )      DEFAULT 0
+   PROPERTY Alignment                                     DEFAULT 1
 
    DATA EnumAlignment     EXPORTED INIT { { "Left", "Right" }, { 1,2 } }
 
@@ -2799,13 +2787,13 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS MenuStripItem INHERIT ToolStripButton
+   PROPERTY Checked      DEFAULT .F.
+   PROPERTY ShortCutText
+   PROPERTY RadioCheck   DEFAULT .F.
 
    ACCESS ColorPressedBegin   INLINE IIF( ( ::Parent:__lIsMenu .AND. !EMPTY( ::Children ) ), ::System:CurrentScheme:MenuItemPressedGradientBegin, ::System:CurrentScheme:ButtonPressedGradientBegin )
    ACCESS ColorPressedEnd     INLINE IIF( ( ::Parent:__lIsMenu .AND. !EMPTY( ::Children ) ), ::System:CurrentScheme:MenuItemPressedGradientEnd,   ::System:CurrentScheme:ButtonPressedGradientEnd )
    
-   DATA Checked      PUBLISHED INIT .F.
-   DATA ShortCutText PUBLISHED
-   DATA RadioCheck   PUBLISHED INIT .F.
    DATA Position     EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -3003,10 +2991,10 @@ FUNCTION RestoreShadow()
 RETURN NIL
 
 CLASS __MenuStripItemShortCut
-   PROPERTY Shift READ xShift WRITE __SetShortcut DEFAULT .F.
-   PROPERTY Ctrl  READ xCtrl  WRITE __SetShortcut DEFAULT .F.
-   PROPERTY Alt   READ xAlt   WRITE __SetShortcut DEFAULT .F.
-   PROPERTY Key   READ xKey   WRITE __SetShortcut DEFAULT 0
+   PROPERTY Shift SET (::xShift := v, ::__SetShortcut()) DEFAULT .F.
+   PROPERTY Ctrl  SET (::xCtrl  := v, ::__SetShortcut()) DEFAULT .F.
+   PROPERTY Alt   SET (::xAlt   := v, ::__SetShortcut()) DEFAULT .F.
+   PROPERTY Key   SET (::xKey   := v, ::__SetShortcut()) DEFAULT 0
    
    DATA ClsName     EXPORTED  INIT ""
    DATA Parent      EXPORTED
@@ -3110,9 +3098,10 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ContextStrip INHERIT Component
+   PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList )
+
    DATA __hMenu               EXPORTED
    DATA Left, Top, Width      EXPORTED INIT 0
-   DATA ImageList PUBLISHED
    METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD Create()

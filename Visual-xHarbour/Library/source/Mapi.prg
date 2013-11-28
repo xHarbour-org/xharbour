@@ -17,27 +17,26 @@
 #include "fileio.ch"
 
 CLASS eMail INHERIT Component
-   DATA To                PUBLISHED INIT ""
-   DATA From              PUBLISHED INIT ""
-   DATA CC                PUBLISHED INIT ""
-   DATA BCC               PUBLISHED INIT ""
-   DATA ReplyTo           PUBLISHED INIT ""
+   PROPERTY To                DEFAULT ""
+   PROPERTY From              DEFAULT ""
+   PROPERTY CC                DEFAULT ""
+   PROPERTY BCC               DEFAULT ""
+   PROPERTY ReplyTo           DEFAULT ""
+   PROPERTY SendUsing         DEFAULT 2
+   PROPERTY SMTPServer        DEFAULT ""
+   PROPERTY MimeFormatted     DEFAULT .T.
+   PROPERTY SMTPServerPort    DEFAULT 0
+   PROPERTY SMTPAuthenticate  DEFAULT .T.
+   PROPERTY SMTPUseSSL        DEFAULT .F.
+   
+   PROPERTY SendUserName      DEFAULT ""
+   PROPERTY SendPassword      DEFAULT ""
+   PROPERTY Attachments
     
    DATA Subject           EXPORTED  INIT ""
    DATA HTMLBody          EXPORTED  INIT ""
    DATA TextBody          EXPORTED  INIT ""
    DATA EnumSendUsing     EXPORTED  INIT {{"Pickup","Port"},{1,2}}
-
-   DATA SendUsing         PUBLISHED INIT 2
-   DATA SMTPServer        PUBLISHED INIT ""
-   DATA MimeFormatted     PUBLISHED INIT .T.
-   DATA SMTPServerPort    PUBLISHED INIT 0
-   DATA SMTPAuthenticate  PUBLISHED INIT .T.
-   DATA SMTPUseSSL        PUBLISHED INIT .F.
-   
-   DATA SendUserName      PUBLISHED INIT ""
-   DATA SendPassword      PUBLISHED INIT ""
-   DATA Attachments       PUBLISHED
 
    METHOD Init() CONSTRUCTOR
    METHOD Send()
@@ -151,9 +150,9 @@ RETURN lReturn
 #define MAPI_NEW_SESSION  0x00000002
 
 CLASS MSendMail
-   PROPERTY ShowDialog INDEX MAPI_DIALOG      READ xShowDialog WRITE SetFlags DEFAULT .T. PROTECTED
-   PROPERTY LogonUI    INDEX MAPI_LOGON_UI    READ xLogonUI    WRITE SetFlags DEFAULT .F. PROTECTED
-   PROPERTY NewSession INDEX MAPI_NEW_SESSION READ NewSession  WRITE SetFlags DEFAULT .F. PROTECTED
+   PROPERTY ShowDialog SET ::SetFlags( MAPI_DIALOG, v )      DEFAULT .T.
+   PROPERTY LogonUI    SET ::SetFlags( MAPI_LOGON_UI, v )    DEFAULT .F.
+   PROPERTY NewSession SET ::SetFlags( MAPI_NEW_SESSION, v ) DEFAULT .F.
 
    DATA Subject           EXPORTED INIT ""
    DATA MessageBody       EXPORTED INIT ""

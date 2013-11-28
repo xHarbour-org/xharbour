@@ -16,18 +16,27 @@
 #Include "colors.ch"
 
 CLASS ToolTip INHERIT Window
-   //DATA Parent           EXPORTED
-   DATA xCloseButton     PROTECTED INIT .F.
-   DATA xBalloon         PROTECTED INIT .F.
-   DATA xAnimate         PROTECTED INIT .F.
-   DATA Icon             PUBLISHED INIT 0
-   DATA xText            PROTECTED INIT ""
-   DATA xTitle           PROTECTED INIT ""
-   DATA CloseOnClick     PUBLISHED INIT .F.
+   PROPERTY BackColor     GET IIF( ::hWnd != NIL, ::SendMessage( TTM_GETTIPBKCOLOR, 0, 0 ), IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) );
+                          SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPBKCOLOR, v, 0 ), )
+
+   PROPERTY ForeColor     GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) ;
+                          SET IIF( ::hWnd != NIL, ::SendMessage( TTM_SETTIPTEXTCOLOR, v, 0 ), )
+
+   PROPERTY Text          SET ::SetText( v )                                                 DEFAULT ""
+   PROPERTY CloseButton   SET ::SetStyle( TTS_CLOSE, v )                                     DEFAULT .F.
+   PROPERTY Balloon       SET ( ::SetStyle( TTS_BALLOON, v ), ::SetStyle( WS_BORDER, .F. ) ) DEFAULT .F.
+   PROPERTY Animate       SET ::SetStyle( TTS_NOANIMATE, v )                                 DEFAULT .F.
+   PROPERTY Title         SET ::SetTitle( ::Icon, v  )                                       DEFAULT ""
+   PROPERTY Track         SET ::SetTTStyle( TTF_TRACK, v )                                   DEFAULT .F.
+   PROPERTY Transparent   SET ::SetTTStyle( TTF_TRANSPARENT, v )                             DEFAULT .F.
+   PROPERTY CenterTip     SET ::SetTTStyle( TTF_CENTERTIP, v )                               DEFAULT .F.
+   PROPERTY Absolute      SET ::SetTTStyle( TTF_ABSOLUTE, v )                                DEFAULT .T.
+   PROPERTY Icon                                                                             DEFAULT 0
+   PROPERTY CloseOnClick                                                                     DEFAULT .F.
+
    DATA CropedText       PROTECTED
 
    DATA TabOrder         EXPORTED
-
    DATA Theming          EXPORTED  INIT .T.
    DATA ContextMenu      EXPORTED
    DATA Cursor           EXPORTED
@@ -66,45 +75,16 @@ CLASS ToolTip INHERIT Window
    DATA BackSysColor      EXPORTED INIT GetSysColor( COLOR_INFOBK )
    DATA ForeSysColor      EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
 
-   DATA xBackColor        EXPORTED
-   ACCESS BackColor       INLINE IIF( ::hWnd != NIL, ::SendMessage( TTM_GETTIPBKCOLOR, 0, 0 ), IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) ) PERSISTENT
-   ASSIGN BackColor( n )  INLINE ::xBackColor := n, IIF( ::hWnd != NIL .AND. n != NIL, ::SendMessage( TTM_SETTIPBKCOLOR, n, 0 ), )
-
-   DATA xForeColor        EXPORTED
-   ACCESS ForeColor       INLINE IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) PERSISTENT
-   ASSIGN ForeColor( n )  INLINE ::xForeColor := n, IIF( ::hWnd != NIL, ::SendMessage( TTM_SETTIPTEXTCOLOR, n, 0 ), )
-
-   ACCESS Text            INLINE ::xText  PERSISTENT
-   ASSIGN Text(c)         INLINE ::SetText( c )
-
-   ACCESS CloseButton     INLINE ::xCloseButton  PERSISTENT
-   ASSIGN CloseButton(l)  INLINE ::xCloseButton := l, ::SetStyle( TTS_CLOSE, l )
-
-   ACCESS Balloon         INLINE ::xBalloon  PERSISTENT
-   ASSIGN Balloon(l)      INLINE ::xBalloon := l, ::SetStyle( TTS_BALLOON, l ), ::SetStyle( WS_BORDER, .F. )
-
-   ACCESS Animate         INLINE ::xAnimate  PERSISTENT
-   ASSIGN Animate(l)      INLINE ::xAnimate := l, ::SetStyle( TTS_NOANIMATE, l )
-
-   ACCESS Title           INLINE ::xTitle  PERSISTENT
-   ASSIGN Title(c)        INLINE ::SetTitle( ::Icon, c )
-
    ACCESS ClipChildren    INLINE ::Style & WS_CLIPCHILDREN != 0
    ASSIGN ClipChildren(l) INLINE ::SetStyle( WS_CLIPCHILDREN, l )
 
    ACCESS ClipSiblings    INLINE ::Style & WS_CLIPSIBLINGS != 0
    ASSIGN ClipSiblings(l) INLINE ::SetStyle( WS_CLIPSIBLINGS, l )
 
-   DATA Tip              EXPORTED AS OBJECT
-
-   PROPERTY Track       INDEX TTF_TRACK       READ xTrack       WRITE SetTTStyle DEFAULT .F. PROTECTED
-   PROPERTY Transparent INDEX TTF_TRANSPARENT READ xTransparent WRITE SetTTStyle DEFAULT .F. PROTECTED
-   PROPERTY CenterTip   INDEX TTF_CENTERTIP   READ xCenterTip   WRITE SetTTStyle DEFAULT .F. PROTECTED
-   PROPERTY Absolute    INDEX TTF_ABSOLUTE    READ xAbsolute    WRITE SetTTStyle DEFAULT .T. PROTECTED
-
+   DATA Tip               EXPORTED AS OBJECT
    DATA TTStyle           EXPORTED INIT TTF_SUBCLASS | TTF_IDISHWND | TTF_ABSOLUTE
+   DATA xMdiContainer     EXPORTED INIT .F.
 
-   DATA xMdiContainer     EXPORTED  INIT .F.
    ACCESS MdiContainer    INLINE    ::xMdiContainer
 
    METHOD Init() CONSTRUCTOR

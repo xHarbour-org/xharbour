@@ -25,6 +25,11 @@
 
 //-------------------------------------------------------------------------------------------------------
 CLASS WinSock INHERIT Component
+   PROPERTY LocalPort   DEFAULT 0
+   PROPERTY RemoteIP
+   PROPERTY RemotePort  DEFAULT 0
+   PROPERTY Protocol    DEFAULT 1
+
    DATA ClsName         EXPORTED  INIT "Timer"
    DATA Events          EXPORTED  INIT {  {"Socket", { { "OnAccepting" , "", "" },;
                                                        { "OnReceive"   , "", "" },;
@@ -37,16 +42,8 @@ CLASS WinSock INHERIT Component
    DATA Handle          EXPORTED
    DATA RemoteHandle    EXPORTED
    DATA LocalIP         EXPORTED INIT 0
-   
    DATA RecData         EXPORTED INIT ""
-   
-   DATA LocalPort       PUBLISHED INIT 0
-   DATA RemoteIP        PUBLISHED
-   DATA RemotePort      PUBLISHED INIT 0
-   
    DATA EnumProtocol    EXPORTED INIT { __GetSystem():SockProtocol:Keys, {1,2} }
-   DATA Protocol        PUBLISHED INIT 1
-   
    DATA Connected       EXPORTED INIT .F.
    
    ACCESS Status  INLINE IIF( ::Handle != NIL, InetErrorDesc( ::Handle ), "Failed to connect" )

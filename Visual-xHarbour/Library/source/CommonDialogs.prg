@@ -41,13 +41,12 @@ RETURN self
 //------------------------------------------------------------------------------------------------
 
 CLASS ColorDialog INHERIT CommonDialogs
-   PROPERTY FullOpen        INDEX CC_FULLOPEN        READ xFullOpen        WRITE SetStyle DEFAULT .T. PROTECTED
-   PROPERTY AnyColor        INDEX CC_ANYCOLOR        READ xAnyColor        WRITE SetStyle DEFAULT .T. PROTECTED
-   PROPERTY SolidColor      INDEX CC_SOLIDCOLOR      READ xSolidColor      WRITE SetStyle DEFAULT .T. PROTECTED
-   PROPERTY PreventFullOpen INDEX CC_PREVENTFULLOPEN READ xPreventFullOpen WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY ShowHelp        INDEX CC_SHOWHELP        READ xShowHelp        WRITE SetStyle DEFAULT .F. PROTECTED
-
-   DATA Color           INIT RGB(0,0,0) PUBLISHED
+   PROPERTY FullOpen        SET ::SetStyle( CC_FULLOPEN, v )        DEFAULT .T.
+   PROPERTY AnyColor        SET ::SetStyle( CC_ANYCOLOR, v )        DEFAULT .T.
+   PROPERTY SolidColor      SET ::SetStyle( CC_SOLIDCOLOR, v )      DEFAULT .T.
+   PROPERTY PreventFullOpen SET ::SetStyle( CC_PREVENTFULLOPEN, v ) DEFAULT .F.
+   PROPERTY ShowHelp        SET ::SetStyle( CC_SHOWHELP, v )        DEFAULT .F.
+   PROPERTY Color           DEFAULT RGB(0,0,0)
 
    DATA Colors          EXPORTED INIT {}
    DATA SysDefault      EXPORTED
@@ -74,11 +73,12 @@ RETURN lRet
 //------------------------------------------------------------------------------------------------
 
 CLASS FolderBrowserDialog INHERIT CommonDialogs
-   DATA Description     INIT ""                         PUBLISHED
-   DATA RootFolder      INIT __GetSystem():RootFolders:Desktop PUBLISHED
-   DATA SelectedPath    INIT ""                         PUBLISHED
+   PROPERTY Description                                                                  DEFAULT ""
+   PROPERTY RootFolder                                                                   DEFAULT __GetSystem():RootFolders:Desktop
+   PROPERTY SelectedPath                                                                 DEFAULT ""
+   PROPERTY ShowNewFolderButton SET ::SetShowNewFolderButton( BIF_NONEWFOLDERBUTTON, v ) DEFAULT .T.
+
    DATA SelectedId      INIT 0
-   PROPERTY ShowNewFolderButton INDEX BIF_NONEWFOLDERBUTTON READ xShowNewFolderButton WRITE SetShowNewFolderButton DEFAULT .T. PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -127,24 +127,24 @@ RETURN self
 //------------------------------------------------------------------------------------------------
 
 CLASS OpenFileDialog INHERIT CommonDialogs
-   PROPERTY CheckFileExists  INDEX OFN_FILEMUSTEXIST      READ xCheckFileExists  WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY CheckPathExists  INDEX OFN_PATHMUSTEXIST      READ xCheckPathExists  WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY MultiSelect      INDEX OFN_ALLOWMULTISELECT   READ xMultiSelect      WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE __SetInvStyle DEFAULT .T. PROTECTED
-   PROPERTY ReadOnlyChecked  INDEX OFN_READONLY           READ xReadOnlyChecked  WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY RestoreDirectory INDEX OFN_NOCHANGEDIR        READ xRestoreDirectory WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY ShowHelp         INDEX OFN_SHOWHELP           READ xShowHelp         WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY ShowReadOnly     INDEX OFN_HIDEREADONLY       READ xShowReadOnly     WRITE __SetInvStyle DEFAULT .F. PROTECTED
+   PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .T. 
+   PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T. 
+   PROPERTY MultiSelect      SET ::SetStyle( OFN_ALLOWMULTISELECT, v )        DEFAULT .T. 
+   PROPERTY DeferenceLinks   SET ::__SetInvStyle( OFN_NODEREFERENCELINKS, v ) DEFAULT .T.
+   PROPERTY ReadOnlyChecked  SET ::SetStyle( OFN_READONLY, v )                DEFAULT .F.
+   PROPERTY RestoreDirectory SET ::SetStyle( OFN_NOCHANGEDIR, v )             DEFAULT .F.
+   PROPERTY ShowHelp         SET ::SetStyle( OFN_SHOWHELP, v )                DEFAULT .F.
+   PROPERTY ShowReadOnly     SET ::__SetInvStyle( OFN_HIDEREADONLY, v )       DEFAULT .F.
 
-   DATA AddExtension     INIT .T. PUBLISHED
-   DATA CheckFileExists  INIT .T. PUBLISHED
-   DATA FileName         INIT ""  PUBLISHED
-   DATA Filter           INIT ""  PUBLISHED
-   DATA DefaultExt                PUBLISHED
-   DATA FilterIndex      INIT 1   PUBLISHED
-   DATA InitialDirectory          PUBLISHED
-   DATA Title                     PUBLISHED
-   DATA ShowPlacesBar    INIT .T. PUBLISHED
+   PROPERTY AddExtension     DEFAULT .T.
+   PROPERTY CheckFileExists  DEFAULT .T.
+   PROPERTY FileName         DEFAULT "" 
+   PROPERTY Filter           DEFAULT "" 
+   PROPERTY DefaultExt               
+   PROPERTY FilterIndex      DEFAULT 1  
+   PROPERTY InitialDirectory         
+   PROPERTY Title                    
+   PROPERTY ShowPlacesBar    DEFAULT .T.
    
    DATA __PrevName    PROTECTED
    DATA __PrevFilter  PROTECTED
@@ -227,26 +227,26 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 CLASS SaveFileDialog INHERIT CommonDialogs
-   DATA AddExtension              PUBLISHED INIT .T.
-   DATA DefaultExt                PUBLISHED
-   DATA FileName         INIT ""  PUBLISHED
-   DATA Filter           INIT ""  PUBLISHED
-   DATA FilterIndex      INIT 1   PUBLISHED
-   DATA InitialDirectory          PUBLISHED
-   DATA Title                     PUBLISHED
-   DATA ShowPlacesBar    INIT .T. PUBLISHED
+   PROPERTY AddExtension                                                      DEFAULT .T.
+   PROPERTY DefaultExt                                                                   
+   PROPERTY FileName                                                          DEFAULT ""  
+   PROPERTY Filter                                                            DEFAULT ""  
+   PROPERTY FilterIndex                                                       DEFAULT 1   
+   PROPERTY InitialDirectory                                                             
+   PROPERTY Title                                                                        
+   PROPERTY ShowPlacesBar                                                     DEFAULT .T. 
+   PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T.
+   PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .F.
+   PROPERTY CreatePrompt     SET ::SetStyle( OFN_CREATEPROMPT, v )            DEFAULT .T.
+   PROPERTY DeferenceLinks   SET ::__SetInvStyle( OFN_NODEREFERENCELINKS, v ) DEFAULT .T.
+   PROPERTY RestoreDirectory SET ::SetStyle( OFN_NOCHANGEDIR, v )             DEFAULT .F.
+   PROPERTY ShowHelp         SET ::SetStyle( OFN_SHOWHELP, v )                DEFAULT .F.
 
    DATA __PrevName    PROTECTED
    DATA __PrevFilter  PROTECTED
    DATA FileExtension EXPORTED
-   PROPERTY CheckPathExists  INDEX OFN_PATHMUSTEXIST      READ xCheckPathExists  WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY CheckFileExists  INDEX OFN_FILEMUSTEXIST      READ xCheckFileExists  WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY CreatePrompt     INDEX OFN_CREATEPROMPT       READ xCreatePrompt     WRITE SetStyle    DEFAULT .T. PROTECTED
-   PROPERTY DeferenceLinks   INDEX OFN_NODEREFERENCELINKS READ xDeferenceLinks   WRITE __SetInvStyle DEFAULT .T. PROTECTED
-   PROPERTY RestoreDirectory INDEX OFN_NOCHANGEDIR        READ xRestoreDirectory WRITE SetStyle    DEFAULT .F. PROTECTED
-   PROPERTY ShowHelp         INDEX OFN_SHOWHELP           READ xShowHelp         WRITE SetStyle    DEFAULT .F. PROTECTED
-
-   METHOD Init() CONSTRUCTOR
+                                                                                       
+   METHOD Init() CONSTRUCTOR                                                           
    METHOD Show()
    METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
@@ -326,14 +326,13 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 CLASS PrintDialog INHERIT CommonDialogs
-   PROPERTY AllowCurrentPage INDEX PD_NOCURRENTPAGE       READ xAllowCurrentPage WRITE __SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowPrintFile   INDEX PD_DISABLEPRINTTOFILE  READ xAllowPrintFile   WRITE __SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowSelection   INDEX PD_NOSELECTION         READ xAllowSelection   WRITE __SetInvStyle DEFAULT .F. PROTECTED
-   PROPERTY AllowSomePages   INDEX PD_NOPAGENUMS          READ xAllowSomePages   WRITE __SetInvStyle DEFAULT .F. PROTECTED
-
-   DATA FromPage         INIT 0 PUBLISHED
-   DATA ToPage           INIT 0 PUBLISHED
-   DATA Copies           INIT 1 PUBLISHED
+   PROPERTY AllowCurrentPage SET ::__SetInvStyle( PD_NOCURRENTPAGE, v )      DEFAULT .F.
+   PROPERTY AllowPrintFile   SET ::__SetInvStyle( PD_DISABLEPRINTTOFILE, v ) DEFAULT .F.
+   PROPERTY AllowSelection   SET ::__SetInvStyle( PD_NOSELECTION, v )        DEFAULT .F.
+   PROPERTY AllowSomePages   SET ::__SetInvStyle( PD_NOPAGENUMS, v )         DEFAULT .F.
+   PROPERTY FromPage                                                         DEFAULT 0
+   PROPERTY ToPage                                                           DEFAULT 0
+   PROPERTY Copies                                                           DEFAULT 1
 
    DATA PrinterName EXPORTED
    DATA Default     EXPORTED INIT .F.
@@ -394,8 +393,7 @@ RETURN .F.
 //------------------------------------------------------------------------------------------------
 
 CLASS FontDialog INHERIT CommonDialogs
-   //DATA cf   EXPORTED
-   DATA Font PUBLISHED
+   PROPERTY Font
    DATA ForeColor EXPORTED
 
    ACCESS Color INLINE ::ForeColor
@@ -427,7 +425,7 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 CLASS FontDialogFont
-   DATA Name  PUBLISHED
+   PROPERTY Name
    DATA Owner       EXPORTED
    DATA ClsName     EXPORTED INIT "FontDialogFont"
    DATA __ClassInst EXPORTED
@@ -446,11 +444,11 @@ RETURN Self
 //------------------------------------------------------------------------------------------------
 
 CLASS PageSetup INHERIT CommonDialogs
-   PROPERTY ReturnDefault  INDEX PSD_RETURNDEFAULT  READ xReturnDefault  WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY DisableMargins INDEX PSD_DISABLEMARGINS READ xDisableMargins WRITE SetStyle DEFAULT .T. PROTECTED
+   PROPERTY ReturnDefault  SET ::SetStyle( PSD_RETURNDEFAULT, v )  DEFAULT .F.
+   PROPERTY DisableMargins SET ::SetStyle( PSD_DISABLEMARGINS, v ) DEFAULT .T. PROTECTED
+   PROPERTY PaperSize                                              DEFAULT DMPAPER_LETTER
+   PROPERTY Orientation                                            DEFAULT DMORIENT_PORTRAIT
 
-   DATA PaperSize       PUBLISHED INIT DMPAPER_LETTER
-   DATA Orientation     PUBLISHED INIT DMORIENT_PORTRAIT
    DATA EnumPaperSize   EXPORTED
    DATA EnumOrientation EXPORTED INIT { { "Portrait", "Landscape" }, {__GetSystem():PageSetup:Portrait, __GetSystem():PageSetup:Landscape} }
 
@@ -573,35 +571,33 @@ CLASS TaskDialog INHERIT CommonDialogs
    DATA RadioButton             EXPORTED
    DATA VerificationFlagChecked EXPORTED
    
-   DATA Buttons         PUBLISHED INIT ""
-   DATA MainInstruction PUBLISHED INIT ""
-   DATA Content         PUBLISHED INIT ""
-   DATA WindowTitle     PUBLISHED INIT ""
-   DATA Footer          PUBLISHED INIT ""
-
-   PROPERTY EnableHyperlinks         INDEX TDF_ENABLE_HYPERLINKS           READ xEnableHyperlinks         WRITE __SetFlags DEFAULT .F.
-   PROPERTY UseIconMain              INDEX TDF_USE_HICON_MAIN              READ xUseIconMain              WRITE __SetFlags DEFAULT .F.
-   PROPERTY UseIconFooter            INDEX TDF_USE_HICON_FOOTER            READ xUseIconFooter            WRITE __SetFlags DEFAULT .F.
-   PROPERTY AllowDialogCancellation  INDEX TDF_ALLOW_DIALOG_CANCELLATION   READ xAllowDialogCancellation  WRITE __SetFlags DEFAULT .F.
-   PROPERTY UseCommandLinks          INDEX TDF_USE_COMMAND_LINKS           READ xUseCommandLinks          WRITE __SetFlags DEFAULT .F.
-   PROPERTY UseCommandLinksNoIcon    INDEX TDF_USE_COMMAND_LINKS_NO_ICON   READ xUseCommandLinksNoIcon    WRITE __SetFlags DEFAULT .F.
-   PROPERTY ExpandFooterArea         INDEX TDF_EXPAND_FOOTER_AREA          READ xExpandFooterArea         WRITE __SetFlags DEFAULT .F.
-   PROPERTY ExpandedByDefault        INDEX TDF_EXPANDED_BY_DEFAULT         READ xExpandedByDefault        WRITE __SetFlags DEFAULT .F.
-   PROPERTY VerificationFlagChecked  INDEX TDF_VERIFICATION_FLAG_CHECKED   READ xVerificationFlagChecked  WRITE __SetFlags DEFAULT .F.
-   PROPERTY ShowProgressBar          INDEX TDF_SHOW_PROGRESS_BAR           READ xShowProgressBar          WRITE __SetFlags DEFAULT .F.
-   PROPERTY ShowMarqueeProgressBar   INDEX TDF_SHOW_MARQUEE_PROGRESS_BAR   READ xShowMarqueeProgressBar   WRITE __SetFlags DEFAULT .F.
-   PROPERTY CallbackTimer            INDEX TDF_CALLBACK_TIMER              READ xCallbackTimer            WRITE __SetFlags DEFAULT .F.
-   PROPERTY PositionRelativeToWindow INDEX TDF_POSITION_RELATIVE_TO_WINDOW READ xPositionRelativeToWindow WRITE __SetFlags DEFAULT .F.
-   PROPERTY RTLLayout                INDEX TDF_RTL_LAYOUT                  READ xRTLLayout                WRITE __SetFlags DEFAULT .F.
-   PROPERTY NoDefaultRadioButton     INDEX TDF_NO_DEFAULT_RADIO_BUTTON     READ xNoDefaultRadioButton     WRITE __SetFlags DEFAULT .F.   
-   PROPERTY CanBeMinimized           INDEX TDF_CAN_BE_MINIMIZED            READ xCanBeMinimized           WRITE __SetFlags DEFAULT .F.   
-
-   PROPERTY OK_Button                INDEX TDCBF_OK_BUTTON                 READ xOK_Button                WRITE __SetBttns DEFAULT .F.   
-   PROPERTY YES_Button               INDEX TDCBF_YES_BUTTON                READ xYES_Button               WRITE __SetBttns DEFAULT .F.   
-   PROPERTY NO_Button                INDEX TDCBF_NO_BUTTON                 READ xNO_Button                WRITE __SetBttns DEFAULT .F.   
-   PROPERTY CANCEL_Button            INDEX TDCBF_CANCEL_BUTTON             READ xCANCEL_Button            WRITE __SetBttns DEFAULT .F.   
-   PROPERTY RETRY_Button             INDEX TDCBF_RETRY_BUTTON              READ xRETRY_Button             WRITE __SetBttns DEFAULT .F.   
-   PROPERTY CLOSE_Button             INDEX TDCBF_CLOSE_BUTTON              READ xCLOSE_Button             WRITE __SetBttns DEFAULT .F.   
+   PROPERTY Buttons                                                                         DEFAULT ""
+   PROPERTY MainInstruction                                                                 DEFAULT ""
+   PROPERTY Content                                                                         DEFAULT ""
+   PROPERTY WindowTitle                                                                     DEFAULT ""
+   PROPERTY Footer                                                                          DEFAULT ""
+   PROPERTY EnableHyperlinks         SET ::__SetFlags( TDF_ENABLE_HYPERLINKS, v )           DEFAULT .F.
+   PROPERTY UseIconMain              SET ::__SetFlags( TDF_USE_HICON_MAIN, v )              DEFAULT .F.
+   PROPERTY UseIconFooter            SET ::__SetFlags( TDF_USE_HICON_FOOTER, v )            DEFAULT .F.
+   PROPERTY AllowDialogCancellation  SET ::__SetFlags( TDF_ALLOW_DIALOG_CANCELLATION, v )   DEFAULT .F.
+   PROPERTY UseCommandLinks          SET ::__SetFlags( TDF_USE_COMMAND_LINKS, v )           DEFAULT .F.
+   PROPERTY UseCommandLinksNoIcon    SET ::__SetFlags( TDF_USE_COMMAND_LINKS_NO_ICON, v )   DEFAULT .F.
+   PROPERTY ExpandFooterArea         SET ::__SetFlags( TDF_EXPAND_FOOTER_AREA, v )          DEFAULT .F.
+   PROPERTY ExpandedByDefault        SET ::__SetFlags( TDF_EXPANDED_BY_DEFAULT, v )         DEFAULT .F.
+   PROPERTY VerificationFlagChecked  SET ::__SetFlags( TDF_VERIFICATION_FLAG_CHECKED, v )   DEFAULT .F.
+   PROPERTY ShowProgressBar          SET ::__SetFlags( TDF_SHOW_PROGRESS_BAR, v )           DEFAULT .F.
+   PROPERTY ShowMarqueeProgressBar   SET ::__SetFlags( TDF_SHOW_MARQUEE_PROGRESS_BAR, v )   DEFAULT .F.
+   PROPERTY CallbackTimer            SET ::__SetFlags( TDF_CALLBACK_TIMER, v )              DEFAULT .F.
+   PROPERTY PositionRelativeToWindow SET ::__SetFlags( TDF_POSITION_RELATIVE_TO_WINDOW, v ) DEFAULT .F.
+   PROPERTY RTLLayout                SET ::__SetFlags( TDF_RTL_LAYOUT, v )                  DEFAULT .F.
+   PROPERTY NoDefaultRadioButton     SET ::__SetFlags( TDF_NO_DEFAULT_RADIO_BUTTON, v )     DEFAULT .F.   
+   PROPERTY CanBeMinimized           SET ::__SetFlags( TDF_CAN_BE_MINIMIZED, v )            DEFAULT .F.   
+   PROPERTY OK_Button                SET ::__SetBttns( TDCBF_OK_BUTTON, v )                 DEFAULT .F.   
+   PROPERTY YES_Button               SET ::__SetBttns( TDCBF_YES_BUTTON, v )                DEFAULT .F.   
+   PROPERTY NO_Button                SET ::__SetBttns( TDCBF_NO_BUTTON, v )                 DEFAULT .F.   
+   PROPERTY CANCEL_Button            SET ::__SetBttns( TDCBF_CANCEL_BUTTON, v )             DEFAULT .F.   
+   PROPERTY RETRY_Button             SET ::__SetBttns( TDCBF_RETRY_BUTTON, v )              DEFAULT .F.   
+   PROPERTY CLOSE_Button             SET ::__SetBttns( TDCBF_CLOSE_BUTTON, v )              DEFAULT .F.   
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -663,9 +659,9 @@ RETURN self
 //------------------------------------------------------------------------------------------------
 
 CLASS ReplaceTextDialog INHERIT CommonDialogs
-   PROPERTY HideUpDown    INDEX FR_HIDEUPDOWN    READ xHideUpDown    WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY HideMatchCase INDEX FR_HIDEMATCHCASE READ xHideMatchCase WRITE SetStyle DEFAULT .F. PROTECTED
-   PROPERTY HideWholeWord INDEX FR_HIDEWHOLEWORD READ xHideWholeWord WRITE SetStyle DEFAULT .F. PROTECTED
+   PROPERTY HideUpDown    SET ::SetStyle( FR_HIDEUPDOWN, v )    DEFAULT .F.
+   PROPERTY HideMatchCase SET ::SetStyle( FR_HIDEMATCHCASE, v ) DEFAULT .F.
+   PROPERTY HideWholeWord SET ::SetStyle( FR_HIDEWHOLEWORD, v ) DEFAULT .F.
 
    DATA FindWhat      EXPORTED  INIT ""
    DATA ReplaceWith   EXPORTED  INIT ""

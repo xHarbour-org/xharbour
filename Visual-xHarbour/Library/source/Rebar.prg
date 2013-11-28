@@ -28,23 +28,18 @@
 
 CLASS CoolBar FROM Control
 
+   PROPERTY ImageList        GET __ChkComponent( Self, @::xImageList ) ;
+                             SET ::SetImageList( v )
+   PROPERTY BackColor        SET ::SetBkColor(v)           DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY Vertical         SET ::SetStyle( CCS_VERT, v ) DEFAULT .F.
+
    DATA Repaint              EXPORTED  INIT .T.
    DATA Bands                EXPORTED  INIT {}
    DATA lDestroyed           PROTECTED INIT .F.
    DATA hWndBand             PROTECTED
    DATA rbi                  PROTECTED
    DATA nmr                  PROTECTED
-   
-   DATA xImageList           PROTECTED
-   ACCESS ImageList          INLINE    __ChkComponent( Self, @::xImageList )
-   ASSIGN ImageList( oImg )  INLINE    ::SetImageList( oImg )
-
-   DATA xBackColor           EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   ACCESS BackColor          INLINE    ::xBackColor PERSISTENT
-   ASSIGN BackColor( n )     INLINE    ::SetBkColor(n)
-
-   PROPERTY Vertical        INDEX CCS_VERT            READ xVertical        WRITE SetStyle DEFAULT .F.
-
+  
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
    METHOD Init() CONSTRUCTOR
@@ -356,6 +351,18 @@ RETURN rc
 
 CLASS CoolBarBand INHERIT Control
 
+   PROPERTY BandChild  GET __ChkComponent( Self, @::xBandChild ) ;
+                       SET ::SetChild(v)
+   PROPERTY Caption    SET ::SetCaption(v)
+   PROPERTY MinWidth   SET ::SetMinWidth(v)                DEFAULT 200
+   PROPERTY MinHeight  SET ::SetMinHeight(v)               DEFAULT 22
+   PROPERTY Width      SET ::SetWidth(v)                   DEFAULT 100
+   PROPERTY Chevron    SET ::SetChevron(v)                 DEFAULT .F.
+   PROPERTY Grippers   SET ::SetGrippers(v)                DEFAULT .T.
+   PROPERTY FixedSize  SET ::SetStyle( RBBS_FIXEDSIZE, v ) DEFAULT .F.
+   PROPERTY Break      SET ::SetStyle( RBBS_BREAK, v )     DEFAULT .F.
+   PROPERTY BackColor  SET ::ReflectColor   
+
    DATA oStruct        EXPORTED
    DATA Index          EXPORTED
    DATA Parent         EXPORTED
@@ -366,18 +373,6 @@ CLASS CoolBarBand INHERIT Control
    DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
    
-   PROPERTY BandChild  GET __ChkComponent( Self, @::xBandChild ) SET ::SetChild(v)
-   
-   PROPERTY Caption                          READ xCaption   WRITE SetCaption
-   PROPERTY MinWidth                         READ xMinWidth  WRITE SetMinWidth    DEFAULT 200
-   PROPERTY MinHeight                        READ xMinHeight WRITE SetMinHeight   DEFAULT 22
-   PROPERTY Width                            READ xWidth     WRITE SetWidth       DEFAULT 100
-   PROPERTY Chevron                          READ xChevron   WRITE SetChevron     DEFAULT .F.
-   PROPERTY Grippers                         READ xGrippers  WRITE SetGrippers    DEFAULT .T.
-   PROPERTY FixedSize  INDEX RBBS_FIXEDSIZE  READ xFixedSize WRITE SetStyle       DEFAULT .F.
-   PROPERTY Break      INDEX RBBS_BREAK      READ xBreak     WRITE SetStyle       DEFAULT .F.
-   PROPERTY BackColor                        READ xBackColor WRITE ReflectColor   
-
    ACCESS Height INLINE ::xMinHeight   
    DATA Left           EXPORTED INIT 0
    DATA Top            EXPORTED INIT 0

@@ -17,51 +17,53 @@
 #define WM_MDICHILDSIZED      4500
 
 CLASS MDIClient INHERIT Window
-   DATA WindowMenu      EXPORTED
-   DATA FirstChild      EXPORTED
-   DATA Parent          EXPORTED
-   DATA Left            EXPORTED
-   DATA Top             EXPORTED
-   DATA Width           EXPORTED
-   DATA Height          EXPORTED
-   DATA Style           EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   DATA ExStyle         EXPORTED
-   DATA ClsName         EXPORTED
-   DATA Name            EXPORTED
-   DATA DisableParent   EXPORTED INIT .F.
-   DATA Center          EXPORTED
-   DATA MDIClient       EXPORTED
-   DATA WindowStyle     EXPORTED
-   DATA Tooltip         EXPORTED
-   DATA __ClientStruct  EXPORTED
-   DATA TabStop         EXPORTED INIT .F.
-   DATA Text            EXPORTED
+
+   PROPERTY AlignLeft
+   PROPERTY AlignTop
+   PROPERTY AlignRight
+   PROPERTY AlignBottom
+   PROPERTY WindowsMenu  DEFAULT .T.
+   PROPERTY BackColor    GET IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) SET ::SetBackColor(v)
+   PROPERTY ForeColor    GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor );
+                         SET IIF( ::IsWindow() .AND. ::IsWindowVisible(), ::InvalidateRect(), NIL )
+   PROPERTY ClientEdge   SET ::SetExStyle( WS_EX_CLIENTEDGE, v ) DEFAULT .T.
+
+   DATA WindowMenu         EXPORTED
+   DATA FirstChild         EXPORTED
+   DATA Parent             EXPORTED
+   DATA Left               EXPORTED
+   DATA Top                EXPORTED
+   DATA Width              EXPORTED
+   DATA Height             EXPORTED
+   DATA Style              EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DATA ExStyle            EXPORTED
+   DATA ClsName            EXPORTED
+   DATA Name               EXPORTED
+   DATA DisableParent      EXPORTED INIT .F.
+   DATA Center             EXPORTED
+   DATA MDIClient          EXPORTED
+   DATA WindowStyle        EXPORTED
+   DATA Tooltip            EXPORTED
+   DATA __ClientStruct     EXPORTED
+   DATA TabStop            EXPORTED INIT .F.
+   DATA Text               EXPORTED
 
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
-   DATA Enabled         EXPORTED INIT .T.
-   DATA Theming         EXPORTED INIT .T.
-   DATA Cursor          EXPORTED
-   DATA TabOrder        EXPORTED
-   DATA ForeColor       EXPORTED
-   DATA ContextMenu     EXPORTED
-   DATA BackSysColor     EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
-   DATA ForeSysColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
-
-   DATA xBackColor       EXPORTED
-   ACCESS BackColor      INLINE IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) PERSISTENT
-   ASSIGN BackColor( n ) INLINE ::xBackColor := n, ::SetBackColor( n )
-
-   DATA xForeColor       EXPORTED
-   ACCESS ForeColor      INLINE IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) PERSISTENT
-   ASSIGN ForeColor( n ) INLINE ::xForeColor := n, IIF( ::IsWindow() .AND. ::IsWindowVisible(), ::InvalidateRect(), NIL )
-
-   DATA BkBrush          EXPORTED
+   DATA Enabled            EXPORTED INIT .T.
+   DATA Theming            EXPORTED INIT .T.
+   DATA Cursor             EXPORTED
+   DATA TabOrder           EXPORTED
+   DATA ForeColor          EXPORTED
+   DATA ContextMenu        EXPORTED
+   DATA BackSysColor       EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
+   DATA ForeSysColor       EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA BkBrush            EXPORTED
    DATA __IsInstance       EXPORTED INIT .F.
 
 
-   DATA Font             EXPORTED
+   DATA Font               EXPORTED
    ACCESS StaticEdge       INLINE ::ExStyle & WS_EX_STATICEDGE != 0
    ACCESS MDIChild         INLINE ::ExStyle & WS_EX_MDICHILD != 0
    ACCESS ControlParent    INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
@@ -77,15 +79,6 @@ CLASS MDIClient INHERIT Window
    ACCESS MinimizeBox    INLINE ::Style & WS_MINIMIZEBOX != 0
    ACCESS CaptionBar     INLINE ::Style & WS_CAPTION != 0
    ACCESS SysMenu        INLINE ::Style & WS_SYSMENU != 0
-
-   PROPERTY ClientEdge INDEX WS_EX_CLIENTEDGE READ xClientEdge WRITE SetExStyle DEFAULT .T. PROTECTED
-
-   DATA AlignLeft   PUBLISHED
-   DATA AlignTop    PUBLISHED
-   DATA AlignRight  PUBLISHED
-   DATA AlignBottom PUBLISHED
-
-   DATA WindowsMenu PUBLISHED INIT .T.
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()

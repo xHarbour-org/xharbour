@@ -19,12 +19,11 @@
 
 CLASS ImageList INHERIT Component
 
-   DATA Images      PUBLISHED INIT {}
-
-   PROPERTY IconWidth   READ xIconWidth    WRITE __RefreshHandle DEFAULT 16
-   PROPERTY IconHeight  READ xIconHeight   WRITE __RefreshHandle DEFAULT 16
-   PROPERTY Palette     READ xPalette      WRITE __RefreshHandle DEFAULT ILC_COLOR32 //ILC_COLORDDB
-   PROPERTY MaskColor   READ xMaskColor    WRITE __RefreshHandle
+   PROPERTY Images                               DEFAULT {}
+   PROPERTY IconWidth   SET ::__RefreshHandle(v) DEFAULT 16
+   PROPERTY IconHeight  SET ::__RefreshHandle(v) DEFAULT 16
+   PROPERTY Palette     SET ::__RefreshHandle(v) DEFAULT ILC_COLOR32 //ILC_COLORDDB
+   PROPERTY MaskColor   SET ::__RefreshHandle(v)
 
    DATA Handle      EXPORTED
    DATA Events      EXPORTED INIT {  {"General", { { "OnCreate"     , "", "" } } } }

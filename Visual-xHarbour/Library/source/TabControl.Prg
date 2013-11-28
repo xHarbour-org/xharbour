@@ -41,22 +41,20 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabControl INHERIT Control
-   PROPERTY Transparent  READ xTransparent WRITE __SetTransp DEFAULT .F.
+   PROPERTY Transparent         SET ::__SetTransp(v)                                    DEFAULT .F.
+   PROPERTY MultiLine           SET ::SetPos( TCS_MULTILINE, v )                        DEFAULT .F.
+   PROPERTY ImageList           SET ::SetImageList(v)
+   PROPERTY FocusNever          SET ::SetStyle( TCS_FOCUSNEVER, v )                     DEFAULT .F.
+   PROPERTY FixedWidth          SET ::SetStyle( TCS_FIXEDWIDTH, v )                     DEFAULT .F.
+   PROPERTY ColorInactiveHeader SET ( ::xColorInactiveHeader := v, ::InvalidateRect() ) DEFAULT .F.
+   PROPERTY MinTabWidth         SET ::SetMinTabWidth(v)                                 DEFAULT 0
+   PROPERTY ImageList           GET __ChkComponent( Self, @::xImageList )
+   PROPERTY Theming  ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
 
-   PROPERTY MultiLine           INDEX TCS_MULTILINE      READ xMultiline           WRITE SetPos         DEFAULT .F. PROTECTED
-   PROPERTY ImageList                                    READ xImageList           WRITE SetImageList   
-   PROPERTY FocusNever          INDEX TCS_FOCUSNEVER     READ xFocusNever          WRITE SetStyle       DEFAULT .F. PROTECTED
-   PROPERTY FixedWidth          INDEX TCS_FIXEDWIDTH     READ xFixedWidth          WRITE SetStyle       DEFAULT .F. PROTECTED
-   PROPERTY ColorInactiveHeader                          READ xColorInactiveHeader WRITE InvalidateRect DEFAULT .F. PROTECTED
-   PROPERTY MinTabWidth                                  READ xMinTabWidth         WRITE SetMinTabWidth DEFAULT 0
+   PROPERTY BoldSelection                                 DEFAULT .F.
+   PROPERTY ShowTabs                                      DEFAULT .T.
+   PROPERTY TabPosition         SET ::__SetTabPosition(v) DEFAULT 2
 
-   ACCESS ImageList        INLINE __ChkComponent( Self, @::xImageList )     PERSISTENT
-
-   PROPERTY Theming      ROOT "Appearance" ASSIGN {|Self,v| ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) )} DEFAULT IsThemeActive()
-
-   DATA BoldSelection    PUBLISHED INIT .F.
-   DATA ShowTabs         PUBLISHED INIT .T.
-   
    DATA CurSel           EXPORTED  INIT 1
    DATA VertFont         EXPORTED
    DATA BoldFont         EXPORTED
@@ -78,7 +76,6 @@ CLASS TabControl INHERIT Control
 
    DATA __UpDn           PROTECTED
 
-   PROPERTY TabPosition  READ xTabPosition WRITE __SetTabPosition DEFAULT 2 INVERT
    DATA EnumTabPosition  EXPORTED INIT { { "Left", "Top", "Right", "Bottom" }, {1,2,3,4} }
 
    METHOD Init()  CONSTRUCTOR
@@ -806,18 +803,18 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabPage INHERIT Dialog
-   PROPERTY ImageIndex READ xImageIndex WRITE __SetImageIndex DEFAULT 0 PROTECTED
-   PROPERTY Position   READ xPosition   WRITE __SetPosition   INVERT
-   PROPERTY Visible    READ xVisible    WRITE __SetVisible    DEFAULT .T. INVERT 
+   PROPERTY ImageIndex     SET ::__SetImageIndex(v)     DEFAULT 0
+   PROPERTY Position       SET ::__SetPosition(v)
+   PROPERTY Visible        SET ::__SetVisible(v)        DEFAULT .T.
+   PROPERTY VertScrollSize SET ::__SetVertScrollSize(v) DEFAULT 0
+   PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
+   PROPERTY Text           SET ::__SetCaption(v)
 
-   PROPERTY VertScrollSize READ xVertScrollSize WRITE __SetVertScrollSize DEFAULT 0
-   PROPERTY HorzScrollSize READ xHorzScrollSize WRITE __SetHorzScrollSize DEFAULT 0
-
-   DATA TopMargin          PUBLISHED INIT 0
-   DATA LeftMargin         PUBLISHED INIT 0
-   DATA RightMargin        PUBLISHED INIT 0
-   DATA BottomMargin       PUBLISHED INIT 0
-   DATA AllowDrag          PUBLISHED INIT .F.
+   PROPERTY TopMargin      DEFAULT 0
+   PROPERTY LeftMargin     DEFAULT 0
+   PROPERTY RightMargin    DEFAULT 0
+   PROPERTY BottomMargin   DEFAULT 0
+   PROPERTY AllowDrag      DEFAULT .F.
 
    DATA Index              EXPORTED
    DATA ColorMode          EXPORTED INIT 0
@@ -841,10 +838,6 @@ CLASS TabPage INHERIT Dialog
    DATA ShowMode           EXPORTED INIT 1
    DATA Center             EXPORTED INIT .F.
    DATA Icon               EXPORTED
-
-   DATA xText              PROTECTED
-   ACCESS Text             INLINE ::xText PERSISTENT
-   ASSIGN Text( c )        INLINE ::SetCaption(c)
 
    ACCESS xCaption         INLINE ::xText
    ASSIGN xCaption(c)      INLINE ::xText := c
@@ -886,7 +879,7 @@ CLASS TabPage INHERIT Dialog
    METHOD Delete()
    METHOD Select()
    METHOD __SetImageIndex()
-   METHOD SetCaption()
+   METHOD __SetCaption()
    METHOD __Hide()
    METHOD __Show()
    METHOD __SetPosition()
@@ -1192,7 +1185,7 @@ METHOD Delete() CLASS TabPage
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD SetCaption( c ) CLASS TabPage
+METHOD __SetCaption( c ) CLASS TabPage
    LOCAL n
    ::xCaption := c
    IF ::IsWindow()
@@ -1228,17 +1221,10 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    (x, y)
    rc := (struct RECT)
 
-   IF GetClassName( GetParent( ::hWnd ) ) == WC_TABCONTROL
-      rc:Left   := 0
-      rc:Top    := 0
-      rc:Right  := ::Parent:ClientWidth-1
-      rc:Bottom := ::Parent:ClientHeight
-    ELSE
-      rc:Left   := ::Parent:Left
-      rc:Top    := ::Parent:Top
-      rc:Right  := ::Parent:Left+::Parent:ClientWidth
-      rc:Bottom := ::Parent:Top+::Parent:ClientHeight
-   ENDIF
+   rc:Left   := 0
+   rc:Top    := 0
+   rc:Right  := ::Parent:ClientWidth
+   rc:Bottom := ::Parent:ClientHeight
 
    SendMessage( ::Parent:hWnd, TCM_ADJUSTRECT, 0, @rc )
 
@@ -1526,7 +1512,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabStrip INHERIT TabControl
-   PROPERTY ColorScheme  READ xColorScheme WRITE __SetColorScheme DEFAULT 1
+   PROPERTY ColorScheme  SET ::__SetColorScheme(v) DEFAULT 1
    DATA EnumColorScheme  EXPORTED INIT { { "System Default", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7} }
       
    DATA Border, AllowMaximize, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.

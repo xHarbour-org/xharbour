@@ -9,11 +9,10 @@
 
 //-------------------------------------------------------------------------------------------------------
 CLASS SqlConnector INHERIT Component
-   DATA ConnectionString PUBLISHED
-   DATA AutoConnect      PUBLISHED INIT .T.
-   
-   DATA Server           PUBLISHED INIT CONNECT_ODBC
-   
+   PROPERTY ConnectionString
+   PROPERTY AutoConnect      DEFAULT .T.
+   PROPERTY Server           DEFAULT CONNECT_ODBC
+
    DATA Sql              EXPORTED
    DATA ConnectionID     EXPORTED          // to be used as dbUseArea() parameter
    DATA Connected        EXPORTED INIT .F.

@@ -246,15 +246,17 @@ RETURN 0
 //---------------------------------------------------------------------------------------------------
 
 CLASS Expando INHERIT Button
+   PROPERTY Expanded  SET ::SetExpand(v) DEFAULT .T.
+   PROPERTY PaneHeight                   DEFAULT 0
+   PROPERTY Special                      DEFAULT .F.
+   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
+
+
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
-   DATA Special               PUBLISHED INIT .F.
-
-   PROPERTY ImageList  GET __ChkComponent( Self, @::xImageList )
 
    DATA HeaderHeight          EXPORTED
-   DATA PaneHeight            PUBLISHED INIT 0
 
    DATA __MouseIn             PROTECTED INIT .F.
    DATA __PrevHeight          PROTECTED INIT 0
@@ -278,8 +280,6 @@ CLASS Expando INHERIT Button
    DATA __lSave               PROTECTED INIT .T.
    DATA BackColor             EXPORTED
    DATA ForeColor             EXPORTED
-
-   PROPERTY Expanded READ xExpanded WRITE SetExpand PROTECTED DEFAULT .T.
 
    DATA Visible               EXPORTED INIT .F.
 

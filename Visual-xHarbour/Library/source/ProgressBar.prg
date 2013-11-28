@@ -24,50 +24,23 @@
 #define PBM_SETMARQUEE WM_USER + 10
 
 CLASS ProgressBar FROM Control
-   PROPERTY Marquee INDEX PBS_MARQUEE READ xMarquee        WRITE SetStyle            DEFAULT .F.
-   PROPERTY MarqueeSeconds            READ xMarqueeSeconds WRITE __SetMarqueeSeconds DEFAULT 0
-   DATA TaskBarProgress PUBLISHED INIT .F.
+   PROPERTY Marquee         SET ::SetStyle( PBS_MARQUEE, v )  DEFAULT .F.
+   PROPERTY MarqueeSeconds  SET ::__SetMarqueeSeconds(v)      DEFAULT 0
+   PROPERTY TaskBarProgress                                   DEFAULT .F.
+   PROPERTY MinRange        SET ::SetRange(v,::xMaxRange)     DEFAULT 0
+   PROPERTY MaxRange        SET ::SetRange(::xMinRange,v)     DEFAULT 100
+   PROPERTY Position        SET ::SetPosition( v )            DEFAULT 0
+   PROPERTY Smooth          SET ::SetStyle( PBS_SMOOTH, v )   DEFAULT .F.
+   PROPERTY ForeColor       SET ::SetBarColor( v )            DEFAULT GetSysColor( COLOR_HIGHLIGHT )
+   PROPERTY BackColor       SET ::SetBkColor( v )             DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY Step            SET ::SetStep( v )                DEFAULT 10
+   PROPERTY Vertical        SET ::SetStyle( PBS_VERTICAL, v ) DEFAULT .F.
+   PROPERTY Border          SET ( ::SetStyle( WS_BORDER, v ), ::SetPosition( ::xPosition ) ) DEFAULT .F.
+
    DATA AllowUnDock     EXPORTED INIT FALSE
    DATA AllowClose      EXPORTED INIT FALSE
    DATA ImageList       EXPORTED
    DATA ImageIndex      PROTECTED
-   DATA xRange          PROTECTED INIT { 0, 100 }
-
-   ACCESS Range         INLINE ::xRange
-   ASSIGN Range( a )    INLINE ::SetRange( a )
-
-   ACCESS MinRange      INLINE ::xRange[1] PERSISTENT
-   ASSIGN MinRange( n ) INLINE ::xRange[1]:=n, ::SetRange( ::xRange )
-
-   ACCESS MaxRange      INLINE ::xRange[2] PERSISTENT
-   ASSIGN MaxRange( n ) INLINE ::xRange[2]:=n, ::SetRange( ::xRange )
-
-   DATA xPosition   PROTECTED INIT 0
-   ACCESS Position      INLINE ::xPosition PERSISTENT
-   ASSIGN Position( n ) INLINE ::SetPosition( n )
-
-   DATA xSmooth     PROTECTED INIT .F.
-   ACCESS Smooth        INLINE ::xSmooth PERSISTENT
-   ASSIGN Smooth( l )   INLINE ::xSmooth := IIF( l == NIL, .F., l ), ::SetStyle( PBS_SMOOTH, ::xSmooth )
-
-   DATA xForeColor   EXPORTED INIT GetSysColor( COLOR_HIGHLIGHT )
-   ACCESS ForeColor      INLINE ::xForeColor PERSISTENT
-   ASSIGN ForeColor( n ) INLINE ::SetBarColor( n )
-
-   DATA xBackColor    EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   ACCESS BackColor       INLINE ::xBackColor PERSISTENT
-   ASSIGN BackColor( n )  INLINE ::SetBkColor( n )
-
-   DATA xStep       PROTECTED  INIT 10
-   ACCESS Step          INLINE ::xStep PERSISTENT
-   ASSIGN Step( n )     INLINE ::SetStep( n )
-
-   DATA xVertical   PROTECTED INIT .F.
-   ACCESS Vertical      INLINE ::xVertical PERSISTENT
-   ASSIGN Vertical( l ) INLINE ::xVertical := IIF( l == NIL, .F., l ), ::SetStyle( PBS_VERTICAL, ::xVertical )
- 
-   ACCESS Border           INLINE ::Style & WS_BORDER != 0 PERSISTENT
-   ASSIGN Border(l)        INLINE ::SetStyle( WS_BORDER, l ), ::SetPosition( ::xPosition )
 
    DATA PropParent  PROTECTED
    
@@ -76,7 +49,7 @@ CLASS ProgressBar FROM Control
 
    METHOD DeltaPos( n )    INLINE ::SendMessage( PBM_DELTAPOS, n, 0 )
 
-   METHOD SetRange( a )    INLINE ::xRange     := a, IIF( ::IsWindow(), ::SendMessage( PBM_SETRANGE, 0, MAKELONG( a[1], a[2] ) ), NIL )
+   METHOD SetRange(x,y)    INLINE IIF( ::IsWindow(), ::SendMessage( PBM_SETRANGE, 0, MAKELONG( x, y ) ), NIL )
    METHOD SetPosition()
    METHOD SetBarColor( n ) INLINE ::xForeColor := n, IIF( ::IsWindow(), ::SendMessage( PBM_SETBARCOLOR, 0, n ), NIL )
    METHOD StepIt()         INLINE ::SendMessage( PBM_STEPIT, 0, 0 )
@@ -114,7 +87,7 @@ RETURN Self
 METHOD Create() CLASS ProgressBar
    ::Super:Create()
 
-   ::SetRange( ::Range )
+   ::SetRange( ::xMinRange,::xMaxRange )
    ::SetPosition( ::Position )
    ::SetBarColor( ::ForeColor )
    ::__SetMarqueeSeconds( ::xMarqueeSeconds )

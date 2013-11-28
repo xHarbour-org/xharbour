@@ -17,20 +17,14 @@
 //----------------------------------------------------------------------------------------------------
 
 CLASS StatusBar INHERIT Control
-   PROPERTY ImageIndex READ xImageIndex WRITE SetImageIndex DEFAULT -1
-
-   DATA xImageList      EXPORTED
-   ACCESS ImageList     INLINE __ChkComponent( Self, ::xImageList ) PERSISTENT
-   ASSIGN ImageList(o)  INLINE ::xImageList := o
+   PROPERTY ImageIndex  SET ::SetImageIndex(v) DEFAULT -1
+   PROPERTY ImageList   GET __ChkComponent( Self, ::xImageList )
+   PROPERTY BackColor   SET ::SendMessage( SB_SETBKCOLOR, 0, v ) DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY Text        SET IIF( ::IsWindow(),;
+                               ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ),;
+                                 ::SendMessage( SB_SETTEXT, SB_SIMPLEID, v ) ), ) DEFAULT ""
 
    DATA nCurPanelTip     PROTECTED
-
-   DATA xBackColor       EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   ACCESS BackColor      INLINE    ::xBackColor PERSISTENT
-   ASSIGN BackColor( n ) INLINE    IIF( n==NIL, n:=CLR_DEFAULT , NIL ),;
-                                   ::xBackColor := n,;
-                                   ::SendMessage( SB_SETBKCOLOR, 0, n ),;
-                                   ::InvalidateRect()
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
@@ -38,9 +32,6 @@ CLASS StatusBar INHERIT Control
    ACCESS Caption        INLINE ::Text
    ASSIGN Caption(c)     INLINE ::Text := c
 
-   DATA xText            EXPORTED  INIT ""
-   ACCESS Text           INLINE    ::xText PERSISTENT
-   ASSIGN Text(cText)    INLINE    ::xText := cText, IIF( ::IsWindow(), ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ), ::SendMessage( SB_SETTEXT, SB_SIMPLEID, cText ) ), )
 
    EXPORTED:
       //DATA Height        INIT 0
@@ -223,6 +214,12 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 
 CLASS StatusBarPanel INHERIT Control
+   PROPERTY Text         SET ::SetText(v)
+   PROPERTY ImageIndex   SET ::SetImageIndex(v)
+   PROPERTY ToolTipText  
+   PROPERTY ToolTipTitle 
+   PROPERTY Width        SET ( ::xWidth := v, ::Update() ) DEFAULT 0
+
    EXPORTED:
       DATA Border        INIT .F.
       DATA Font
@@ -259,10 +256,6 @@ CLASS StatusBarPanel INHERIT Control
    ACCESS Top                 INLINE ::xTop
    ASSIGN Top(n)              INLINE ::xTop := n
 
-   DATA xWidth                EXPORTED INIT 0
-   ACCESS Width               INLINE ::xWidth PERSISTENT
-   ASSIGN Width(n)            INLINE ::xWidth := n, ::Update()
-
    DATA xHeight               EXPORTED INIT 30
    ACCESS Height              INLINE ::xHeight
    ASSIGN Height(n)           INLINE ::xHeight := n
@@ -274,13 +267,6 @@ CLASS StatusBarPanel INHERIT Control
 
    ACCESS Caption        INLINE ::Text
    ASSIGN Caption(c)     INLINE ::Text := c
-
-   PROPERTY Text       READ xText       WRITE SetText
-
-   PROPERTY ImageIndex READ xImageIndex WRITE SetImageIndex
-
-   DATA ToolTipText  PUBLISHED
-   DATA ToolTipTitle PUBLISHED
 
    METHOD Init() CONSTRUCTOR
    METHOD GetRect() 

@@ -37,46 +37,41 @@ static s_hFloatCalendar
 
 //-----------------------------------------------------------------------------------------------
 CLASS EditBox INHERIT Control
-   PROPERTY DropCalendar      DEFAULT .F.
-   PROPERTY FullSelectOnClick DEFAULT .F.
-   PROPERTY EnterNext         DEFAULT .F.
-   PROPERTY Transparent       DEFAULT .F.
-   PROPERTY ImageIndex        DEFAULT 0
+   PROPERTY Transparent       ROOT "Appearance"                                            DEFAULT .F.
+   PROPERTY MenuArrow         ROOT "Appearance" SET ::__SetMenuArrow(v)                    DEFAULT .F.
+   PROPERTY Layout            ROOT "Appearance" SET ::__SetLayout(v)                       DEFAULT 1  
+   PROPERTY Password          ROOT "Appearance" SET ::SetStyle( ES_PASSWORD, v )           DEFAULT .F.
+   PROPERTY Case              ROOT "Appearance" SET ::SetCase(v)                           DEFAULT 1  
+   PROPERTY Border            ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )             DEFAULT !__GetApplication():IsThemedXP
+   PROPERTY ClientEdge        ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .T.
+   PROPERTY CueBanner         ROOT "Appearance" SET ::SetCueBanner(v)
+   PROPERTY ImageIndex        ROOT "Appearance" SET ::__SetImageIndex(v)                   DEFAULT 0  
 
-   PROPERTY DataSearchField   DEFAULT 1
-   PROPERTY DataSearchWidth   DEFAULT 0
-   PROPERTY DataSearchRecords DEFAULT 0
- 
-   PROPERTY MenuArrow                                   READ xMenuArrow        WRITE __SetMenuArrow  DEFAULT .F.
-   PROPERTY Layout                                      READ xLayout           WRITE __SetLayout     DEFAULT 1   PROTECTED
-   PROPERTY AutoVScroll   INDEX ES_AUTOVSCROLL          READ xAutoVScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
-   PROPERTY AutoHScroll   INDEX ES_AUTOHSCROLL          READ xAutoHScroll      WRITE __SetAutoScroll DEFAULT .F. PROTECTED
-   PROPERTY MultiLine     INDEX ES_MULTILINE            READ xMultiLine        WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY Password      INDEX ES_PASSWORD             READ xPassword         WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY NoHideSel     INDEX ES_NOHIDESEL            READ xNoHideSel        WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY OemConvert    INDEX ES_OEMCONVERT           READ xOemConvert       WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY ReadOnly                                    READ xReadOnly         WRITE SetReadOnly     DEFAULT .F. PROTECTED
-   PROPERTY WantReturn    INDEX ES_WANTRETURN           READ xWantReturn       WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY HorzScroll    INDEX WS_HSCROLL              READ xHorzScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
-   PROPERTY VertScroll    INDEX WS_VSCROLL              READ xVertScroll       WRITE SetStyle        DEFAULT .F. PROTECTED
+   PROPERTY DropCalendar      ROOT "Behavior"                                              DEFAULT .F.
+   PROPERTY FullSelectOnClick ROOT "Behavior"                                              DEFAULT .F.
+   PROPERTY EnterNext         ROOT "Behavior"                                              DEFAULT .F.
+   PROPERTY AutoVScroll       ROOT "Behavior"   SET ::__SetAutoScroll( ES_AUTOVSCROLL, v ) DEFAULT .F.
+   PROPERTY AutoHScroll       ROOT "Behavior"   SET ::__SetAutoScroll( ES_AUTOHSCROLL, v ) DEFAULT .F.
+   PROPERTY MultiLine         ROOT "Behavior"   SET ::SetStyle( ES_MULTILINE, v )          DEFAULT .F.
+   PROPERTY NoHideSel         ROOT "Behavior"   SET ::SetStyle( ES_NOHIDESEL, v )          DEFAULT .F.
+   PROPERTY OemConvert        ROOT "Behavior"   SET ::SetStyle( ES_OEMCONVERT, v )         DEFAULT .F.
+   PROPERTY ReadOnly          ROOT "Behavior"   SET ::SetReadOnly( v )                     DEFAULT .F. HELP "Prevents the user from typing or editing text in the edit control."
+   PROPERTY WantReturn        ROOT "Behavior"   SET ::SetStyle( ES_WANTRETURN, v )         DEFAULT .F.
+   PROPERTY HorzScroll        ROOT "Behavior"   SET ::SetStyle( WS_HSCROLL, v )            DEFAULT .F.
+   PROPERTY VertScroll        ROOT "Behavior"   SET ::SetStyle( WS_VSCROLL, v )            DEFAULT .F.
+   PROPERTY Number            ROOT "Behavior"   SET ::SetStyle( ES_NUMBER, v )             DEFAULT .F.
+   PROPERTY ContextMenu       ROOT "Behavior"   GET __ChkComponent( Self, @::xContextMenu ) SET ::__SetContextMenu(v)
+   PROPERTY Alignment         ROOT "Behavior"   SET ::SetAlignment(v)                      DEFAULT 1
 
-   PROPERTY Case                                        READ xCase             WRITE SetCase         DEFAULT 1   PROTECTED
+   PROPERTY SelForeColor      ROOT "Colors"     SET ::__SetSelColor(v)
+   PROPERTY SelBackColor      ROOT "Colors"     SET ::__SetSelColor(v)
 
-   PROPERTY Border        INDEX WS_BORDER               READ xBorder           WRITE SetStyle        DEFAULT !__GetApplication():IsThemedXP PROTECTED
-   PROPERTY Number        INDEX ES_NUMBER               READ xNumber           WRITE SetStyle        DEFAULT .F.
+   PROPERTY DataSearchField   ROOT "Data"                                                  DEFAULT 1
+   PROPERTY DataSearchWidth   ROOT "Data"                                                  DEFAULT 0
+   PROPERTY DataSearchRecords ROOT "Data"                                                  DEFAULT 0
+   PROPERTY DataSource        ROOT "Data"       GET __ChkComponent( Self, @::xDataSource )
 
-   PROPERTY ClientEdge    INDEX WS_EX_CLIENTEDGE        READ xClientEdge       WRITE SetExStyle      DEFAULT .T. PROTECTED
 
-   PROPERTY ContextMenu                                 GET __ChkComponent( Self, @::xContextMenu ) SET ::__SetContextMenu(v)
-   PROPERTY CueBanner                                   READ xCueBanner        WRITE SetCueBanner
-   PROPERTY ImageIndex                                  READ xImageIndex       WRITE __SetImageIndex  DEFAULT 0   PROTECTED
-
-   PROPERTY DataSource    GET __ChkComponent( Self, @::xDataSource )
-
-   PROPERTY Alignment     SET ::SetAlignment(v) DEFAULT 1
-
-   PROPERTY SelForeColor  ROOT "Colors" READ xSelForeColor WRITE __SetSelColor
-   PROPERTY SelBackColor  ROOT "Colors" READ xSelBackColor WRITE __SetSelColor
 
    DATA EnumLayout                     EXPORTED INIT { { "None",;
                                                          "Text, Image, Arrow",;

@@ -25,21 +25,19 @@
 
 CLASS MonthCalendar INHERIT TitleControl
 
-   PROPERTY DayState          INDEX MCS_DAYSTATE      READ xDayState          WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY MultiSelect       INDEX MCS_MULTISELECT   READ xMultiSelect       WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY NoToday           INDEX MCS_NOTODAY       READ xNoToday           WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY NoTodayCircle     INDEX MCS_NOTODAYCIRCLE READ xNoTodayCircle     WRITE SetStyle         DEFAULT .F. PROTECTED
-   PROPERTY WeekNumbers       INDEX MCS_WEEKNUMBERS   READ xWeekNumbers       WRITE SetStyle         DEFAULT .F. PROTECTED
-
-   PROPERTY Date                                      READ xDate              WRITE SetCurSel        DEFAULT DATE() PROTECTED
-   PROPERTY Today                                     READ xToday             WRITE SetToday         DEFAULT DATE() PROTECTED
-
-   PROPERTY BackColor         INDEX MCSC_MONTHBK      READ xBackColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY ForeColor         INDEX MCSC_TEXT         READ xForeColor         WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleBackColor    INDEX MCSC_TITLEBK      READ xTitleBackColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TitleForeColor    INDEX MCSC_TITLETEXT    READ xTitleForeColor    WRITE SetCalendarColor PROTECTED
-   PROPERTY TrailingTextColor INDEX MCSC_TRAILINGTEXT READ xTrailingTextColor WRITE SetCalendarColor PROTECTED
-   PROPERTY Border            INDEX WS_BORDER         READ xBorder            WRITE SetStyle         DEFAULT .F. PROTECTED
+   PROPERTY DayState          SET ::SetStyle( MCS_DAYSTATE, v )      DEFAULT .F.
+   PROPERTY MultiSelect       SET ::SetStyle( MCS_MULTISELECT, v )   DEFAULT .F.
+   PROPERTY NoToday           SET ::SetStyle( MCS_NOTODAY, v )       DEFAULT .F.
+   PROPERTY NoTodayCircle     SET ::SetStyle( MCS_NOTODAYCIRCLE, v ) DEFAULT .F.
+   PROPERTY WeekNumbers       SET ::SetStyle( MCS_WEEKNUMBERS, v )   DEFAULT .F.
+   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )         DEFAULT .F.
+   PROPERTY Date              SET ::SetCurSel(v)                     DEFAULT DATE()
+   PROPERTY Today             SET ::SetToday(v)                      DEFAULT DATE()
+   PROPERTY BackColor         SET ::SetCalendarColor( MCSC_MONTHBK, v )      
+   PROPERTY ForeColor         SET ::SetCalendarColor( MCSC_TEXT, v )         
+   PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )      
+   PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
+   PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
 
    DATA NmDayState   EXPORTED
    DATA NmSelChange  EXPORTED

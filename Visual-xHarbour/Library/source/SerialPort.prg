@@ -66,34 +66,28 @@
 
 //-------------------------------------------------------------------------------------------------------
 CLASS SerialPort INHERIT Component
+   PROPERTY PortName                                   DEFAULT "COM1"
+   PROPERTY BaudRate                                   DEFAULT 9600
+   PROPERTY HandShake                                  DEFAULT __GetSystem():HandShake:None
+   PROPERTY Parity                                     DEFAULT __GetSystem():Parity:None
+   PROPERTY StopBits                                   DEFAULT __GetSystem():StopBits:One
+   PROPERTY DataBits                                   DEFAULT 8
+   PROPERTY ReadBufferSize                             DEFAULT 4096
+   PROPERTY ReadTimeOut                                DEFAULT 500
+   PROPERTY DtrEnabled     SET ::__SetCommData( 2, v ) DEFAULT .F.
+   PROPERTY RtsEnabled     SET ::__SetCommData( 1, v ) DEFAULT .F.
+
    DATA Events                 EXPORTED  INIT {  {"Serial", { { "OnDataReceived"  , "", "" },;
                                                               { "OnError"         , "", "" },;
                                                               { "OnPinChanged"    , "", "" }} } }
 
    DATA Handle                 EXPORTED
 
-   DATA PortName               PUBLISHED INIT "COM1"
-   DATA BaudRate               PUBLISHED INIT 9600
-   DATA HandShake              PUBLISHED INIT __GetSystem():HandShake:None
-   DATA Parity                 PUBLISHED INIT __GetSystem():Parity:None
-   DATA StopBits               PUBLISHED INIT __GetSystem():StopBits:One
-   DATA DataBits               PUBLISHED INIT 8
-   DATA ReadBufferSize         PUBLISHED INIT 4096
-   DATA ReadTimeOut            PUBLISHED INIT 500
-
-   PROPERTY DtrEnabled INDEX 2 READ xDtrEnabled WRITE __SetCommData DEFAULT .F.
-   PROPERTY RtsEnabled INDEX 1 READ xRtsEnabled WRITE __SetCommData DEFAULT .F.
-
    ACCESS Cts                  INLINE ::GetStatus( MS_CTS_ON )
    ACCESS Dsr                  INLINE ::GetStatus( MS_DSR_ON )
    ACCESS Ring                 INLINE ::GetStatus( MS_RING_ON )
    ACCESS Rlsd                 INLINE ::GetStatus( MS_RLSD_ON )
    ACCESS IsOpen               INLINE ::Handle != NIL
-
-   //DATA ReceivedBytesThreshold PUBLISHED INIT 1
-   //DATA DiscardNull            PUBLISHED INIT .F.
-   //DATA WriteTimeOut           PUBLISHED INIT -1
-   //DATA ParityReplace          PUBLISHED INIT 63
 
    DATA __pCallBackPtr         PROTECTED
    DATA __nTimID               PROTECTED

@@ -18,12 +18,14 @@
 static __aObjects := {}
 
 CLASS Object
+   PROPERTY GenerateMember ROOT "Object" DEFAULT .T.
+   PROPERTY Name           ROOT "Object" SET ::__SetCtrlName(v)
+
    ACCESS Instance             INLINE   IIF( __GetApplication() != NIL, __GetApplication():Instance, GetModuleHandle() )
 
    DATA hWnd                   EXPORTED
    
    DATA Error                  EXPORTED
-   DATA GenerateMember         PUBLISHED INIT .T.
    DATA Parent                 EXPORTED
    DATA ThemeName              EXPORTED
    DATA hTheme                 EXPORTED
@@ -31,7 +33,7 @@ CLASS Object
    DATA Action                 EXPORTED
 
    DATA __xCtrlName            EXPORTED
-   DATA __lCreateAfterChildren EXPORTED  INIT .F.
+   DATA __lCreateAfterChildren EXPORTED INIT .F.
 
    DATA __ForceSysColor        EXPORTED INIT .F.
    DATA __ClassInst            EXPORTED
@@ -62,8 +64,6 @@ CLASS Object
    DATA __OnInitCanceled       EXPORTED INIT .F.
    DATA __InstApp              EXPORTED
    DATA xName                  EXPORTED
-   ACCESS Name                 INLINE ::xName PERSISTENT
-   ASSIGN Name(c)              INLINE ::__SetCtrlName(c)
 
    ACCESS Application          INLINE IIF( ::__InstApp != NIL, ::__InstApp, __GetApplication() )
    ACCESS System               INLINE __GetSystem()
@@ -74,7 +74,7 @@ CLASS Object
    ACCESS This                 INLINE Self
 
    ACCESS Siblings             INLINE ::Parent:Children
-   PROPERTY TabOrder                                READ xTabOrder       WRITE SetTabOrder                         INVERT
+   PROPERTY TabOrder           SET ::SetTabOrder(v)
 
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
    METHOD HasProperty()

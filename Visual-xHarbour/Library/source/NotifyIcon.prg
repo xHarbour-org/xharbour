@@ -37,13 +37,12 @@ static nMess
 
 //-------------------------------------------------------------------------------------------------------
 CLASS NotifyIcon INHERIT Component
-   DATA BalloonTipText  PUBLISHED
-   DATA BalloonTipTitle PUBLISHED
-   DATA Text            PUBLISHED
-   PROPERTY BalloonTipIcon READ xBalloonTipIcon WRITE SetBalloonTipIcon DEFAULT 0
-   PROPERTY Visible        READ xVisible        WRITE SetVisible        DEFAULT .T.
-   PROPERTY Icon           READ xIcon           WRITE __SetIcon         INVERT
-   PROPERTY Text           READ xText           WRITE __SetText         INVERT
+   PROPERTY BalloonTipText
+   PROPERTY BalloonTipTitle
+   PROPERTY BalloonTipIcon SET ::SetBalloonTipIcon(v) DEFAULT 0
+   PROPERTY Visible        SET ::SetVisible(v)        DEFAULT .T.
+   PROPERTY Icon           SET ::__SetIcon(v)
+   PROPERTY Text           SET ::__SetText(v)
    PROPERTY ContextMenu    GET __ChkComponent( Self, @::xContextMenu )
 
    DATA EnumBalloonTipIcon EXPORTED  INIT { { "None", "Info", "Warning", "Error" }, {0,1,2,3} }

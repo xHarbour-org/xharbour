@@ -44,14 +44,15 @@ CLASS xCoolMenuItem INHERIT MenuItem
 ENDCLASS
 
 CLASS CoolMenu INHERIT ToolBar
+   PROPERTY HotImageList GET __ChkComponent( Self, @::xHotImageList )
+   PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList )
+
    DATA BackColor       EXPORTED
    DATA ForeColor       EXPORTED
    DATA Editor          EXPORTED
 
-   DATA HotImageList    PUBLISHED
    DATA hBackupColor    EXPORTED
 
-   PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
 
    METHOD Init( oParent ) CONSTRUCTOR
    METHOD Create()
@@ -330,8 +331,6 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 CLASS CoolMenuItem INHERIT ToolButton
-   //DATA Name                PUBLISHED
-
    DATA BackColor             EXPORTED
    DATA ForeColor             EXPORTED
    DATA Menu                  EXPORTED
