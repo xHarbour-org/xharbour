@@ -16,30 +16,40 @@
 #include "colors.ch"
 #include "commdlg.ch"
 
+#define CLEARTYPE_QUALITY 0x05
+
 //--------------------------------------------------------------------------------------------------------
 
 CLASS Font
+   DATA EnumQuality EXPORTED INIT { { "Default", "Draft", "Proof", "Non Antialiased", "Antialiased" },;
+                                    { DEFAULT_QUALITY, DRAFT_QUALITY, PROOF_QUALITY, NONANTIALIASED_QUALITY, ANTIALIASED_QUALITY, CLEARTYPE_QUALITY } }
+  
+   PROPERTY FaceName     SET (::xFaceName    := v, ::Modify(v))
+   PROPERTY Escapement   SET (::xEscapement  := v, ::Modify(v))
+   PROPERTY Orientation  SET (::xOrientation := v, ::Modify(v))
+   PROPERTY Width        SET (::xWidth       := v, ::Modify(v))
+   PROPERTY Quality      SET (::xQuality     := v, ::Modify(v)) DEFAULT DEFAULT_QUALITY
+
+   PROPERTY FileName     SET ::AddResource(v)
+
+   PROPERTY Bold         GET (::Weight == 700)   SET (::Weight := IIF( v, 700, 400 ))
+   PROPERTY Italic       GET (::nItalic == 1)    SET (::nItalic := IIF( v, 1, 0 ))
+   PROPERTY Underline    GET (::nUnderline == 1) SET (::nUnderline := IIF( v, 1, 0 ))
+   PROPERTY StrikeOut    GET (::nStrikeOut == 1) SET (::nStrikeOut := IIF( v, 1, 0 ))
+   PROPERTY PointSize    SET ::SetPointSize( v )
+
+   PROPERTY CharSet      SET (::xCharSet    := v, ::Modify(v)) NOTPUBLIC
+   PROPERTY Height       SET (::xHeight     := v, ::Modify(v)) NOTPUBLIC
+   PROPERTY Weight       SET (::xWeight     := v, ::Modify(v)) NOTPUBLIC
+   PROPERTY nItalic      SET (::xnItalic    := v, ::Modify(v)) NOTPUBLIC
+   PROPERTY nUnderline   SET (::xnUnderline := v, ::Modify(v)) NOTPUBLIC
+   PROPERTY nStrikeOut   SET (::xnStrikeOut := v, ::Modify(v)) NOTPUBLIC
+
    DATA Handle         EXPORTED
-   
-   PROPERTY FaceName     READ xFaceName    WRITE Modify
-   PROPERTY Escapement   READ xEscapement  WRITE Modify
-   PROPERTY Orientation  READ xOrientation WRITE Modify
-   PROPERTY Width        READ xWidth       WRITE Modify
-   PROPERTY FileName     READ xFileName    WRITE AddResource
-
-   PROPERTY CharSet      READ xCharSet     WRITE Modify HIDDEN
-
-   PROPERTY Height       READ xHeight      WRITE Modify HIDDEN
-   PROPERTY Weight       READ xWeight      WRITE Modify HIDDEN
-   PROPERTY nItalic      READ xnItalic     WRITE Modify HIDDEN
-   PROPERTY nUnderline   READ xnUnderline  WRITE Modify HIDDEN
-   PROPERTY nStrikeOut   READ xnStrikeOut  WRITE Modify HIDDEN
-
    DATA Parent         EXPORTED
    DATA ClsName        EXPORTED INIT "Font"
    DATA OutPrecision   EXPORTED
    DATA ClipPrecision  EXPORTED
-   DATA Quality        EXPORTED
    DATA PitchAndFamily EXPORTED
    DATA Shared         EXPORTED INIT .F.
    DATA ncm            EXPORTED
@@ -54,22 +64,6 @@ CLASS Font
                                        { "TrueType resource (*.fot)", "*.fot" },;
                                        { "PostScript OpenType (*.otf)", "*.otf" };
                                        }
-
-   ACCESS Bold      INLINE ::Weight == 700  PERSISTENT
-   ASSIGN Bold(l)   INLINE ::Weight := IIF( l, 700, 400 )
-
-   ACCESS Italic    INLINE ::nItalic == 1  PERSISTENT
-   ASSIGN Italic(l) INLINE ::nItalic := IIF( l, 1, 0 )
-
-   ACCESS Underline    INLINE ::nUnderline == 1  PERSISTENT
-   ASSIGN Underline(l) INLINE ::nUnderline := IIF( l, 1, 0 )
-
-   ACCESS StrikeOut    INLINE ::nStrikeOut == 1  PERSISTENT
-   ASSIGN StrikeOut(l) INLINE ::nStrikeOut := IIF( l, 1, 0 )
-
-   DATA xPointSize     PROTECTED INIT 0
-   ACCESS PointSize    INLINE ::xPointSize PERSISTENT
-   ASSIGN PointSize(n) INLINE ::SetPointSize( n )
 
    METHOD Create()
    METHOD Select( hDC ) INLINE SelectObject( hDC, ::Handle )

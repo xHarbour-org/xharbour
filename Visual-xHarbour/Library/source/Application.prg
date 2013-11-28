@@ -223,85 +223,90 @@ RETURN EXCEPTION_EXECUTE_HANDLER
 //------------------------------------------------------------------------------------------------
 
 CLASS Application
-   DATA Icon          PUBLISHED INIT ""
-   
-   ACCESS System INLINE __GetSystem() 
-   DATA Version       PUBLISHED INIT "1.0.0.0"
-   DATA Company       PUBLISHED INIT ""
-   DATA Copyright     PUBLISHED INIT ""
-   DATA Description   PUBLISHED INIT ""
 
-   DATA Resources     PUBLISHED INIT {}
+   PROPERTY Icon                   ROOT "Appearance" DEFAULT ""
+   PROPERTY Cursor                 ROOT "Appearance"
+   PROPERTY TitleBackColorActive   ROOT "Appearance" DEFAULT RGB( 255, 230, 151 )
+   PROPERTY TitleBackColorInactive ROOT "Appearance" DEFAULT RGB(  69,  89, 124 )
+   PROPERTY EditBoxFocusBorder     ROOT "Appearance" DEFAULT .F.
 
-   DATA TitleBackSysColorActive   EXPORTED INIT RGB( 255, 230, 151 )
-   DATA TitleBackSysColorInactive EXPORTED INIT RGB(  69,  89, 124 )
+   PROPERTY Version                ROOT "Data"       DEFAULT "1.0.0.0"
+   PROPERTY Company                ROOT "Data"       DEFAULT ""
+   PROPERTY Copyright              ROOT "Data"       DEFAULT ""
+   PROPERTY Description            ROOT "Data"       DEFAULT ""
 
-   DATA hTitleBackBrushActive   EXPORTED
-   DATA hTitleBackBrushInactive EXPORTED
+   PROPERTY Resources              ROOT "General"    DEFAULT {}
+   PROPERTY UserVariables          ROOT "General"    DEFAULT ""
 
-   DATA TitleBackColorActive   PUBLISHED INIT RGB( 255, 230, 151 )
-   DATA TitleBackColorInactive PUBLISHED INIT RGB(  69,  89, 124 )
-   
+   PROPERTY GenerateMembers        ROOT "Object"     DEFAULT .T.
 
-   PROPERTY SetCentury         INDEX -1                   READ xSetCentury         WRITE Set PROTECTED DEFAULT .F.
-   PROPERTY SetDeleted         INDEX _SET_DELETED         READ xSetDeleted         WRITE Set PROTECTED DEFAULT SET( _SET_DELETED         )
-   PROPERTY SetDefault         INDEX _SET_DEFAULT         READ xSetDefault         WRITE Set PROTECTED DEFAULT SET( _SET_DEFAULT         )
-   PROPERTY SetExact           INDEX _SET_EXACT           READ xSetExact           WRITE Set PROTECTED DEFAULT SET( _SET_EXACT           )
-   PROPERTY SetFixed           INDEX _SET_FIXED           READ xSetFixed           WRITE Set PROTECTED DEFAULT SET( _SET_FIXED           )
-   PROPERTY SetDecimals        INDEX _SET_DECIMALS        READ xSetDecimals        WRITE Set PROTECTED DEFAULT SET( _SET_DECIMALS        )
-   PROPERTY SetDateFormat      INDEX _SET_DATEFORMAT      READ xSetDateFormat      WRITE Set PROTECTED DEFAULT SET( _SET_DATEFORMAT      )
-   PROPERTY SetEpoch           INDEX _SET_EPOCH           READ xSetEpoch           WRITE Set PROTECTED DEFAULT SET( _SET_EPOCH           )
-   PROPERTY SetPath            INDEX _SET_PATH            READ xSetPath            WRITE Set PROTECTED DEFAULT SET( _SET_PATH            )
-   PROPERTY SetExclusive       INDEX _SET_EXCLUSIVE       READ xSetExclusive       WRITE Set PROTECTED DEFAULT SET( _SET_EXCLUSIVE       )
-   PROPERTY SetSoftseek        INDEX _SET_SOFTSEEK        READ xSetSoftseek        WRITE Set PROTECTED DEFAULT SET( _SET_SOFTSEEK        )
-   PROPERTY SetUnique          INDEX _SET_UNIQUE          READ xSetUnique          WRITE Set PROTECTED DEFAULT SET( _SET_UNIQUE          )
-   PROPERTY SetCancel          INDEX _SET_CANCEL          READ xSetCancel          WRITE Set PROTECTED DEFAULT SET( _SET_CANCEL          )
-   PROPERTY SetDebug           INDEX _SET_DEBUG           READ xSetDebug           WRITE Set PROTECTED DEFAULT SET( _SET_DEBUG           )
-   PROPERTY SetTypeahead       INDEX _SET_TYPEAHEAD       READ xSetTypeahead       WRITE Set PROTECTED DEFAULT SET( _SET_TYPEAHEAD       )
-   PROPERTY SetAlternate       INDEX _SET_ALTERNATE       READ xSetAlternate       WRITE Set PROTECTED DEFAULT SET( _SET_ALTERNATE       )
-   PROPERTY SetAltfile         INDEX _SET_ALTFILE         READ xSetAltfile         WRITE Set PROTECTED DEFAULT SET( _SET_ALTFILE         )
-   PROPERTY SetDevice          INDEX _SET_DEVICE          READ xSetDevice          WRITE Set PROTECTED DEFAULT SET( _SET_DEVICE          )
-   PROPERTY SetExtra           INDEX _SET_EXTRA           READ xSetExtra           WRITE Set PROTECTED DEFAULT SET( _SET_EXTRA           )
-   PROPERTY SetExtrafile       INDEX _SET_EXTRAFILE       READ xSetExtrafile       WRITE Set PROTECTED DEFAULT SET( _SET_EXTRAFILE       )
-   PROPERTY SetPrintfile       INDEX _SET_PRINTFILE       READ xSetPrintfile       WRITE Set PROTECTED DEFAULT SET( _SET_PRINTFILE       )
-   PROPERTY SetMargin          INDEX _SET_MARGIN          READ xSetMargin          WRITE Set PROTECTED DEFAULT SET( _SET_MARGIN          )
-   PROPERTY SetBell            INDEX _SET_BELL            READ xSetBell            WRITE Set PROTECTED DEFAULT SET( _SET_BELL            )
-   PROPERTY SetConfirm         INDEX _SET_CONFIRM         READ xSetConfirm         WRITE Set PROTECTED DEFAULT SET( _SET_CONFIRM         )
-   PROPERTY SetEscape          INDEX _SET_ESCAPE          READ xSetEscape          WRITE Set PROTECTED DEFAULT SET( _SET_ESCAPE          )
-   PROPERTY SetInsert          INDEX _SET_INSERT          READ xSetInsert          WRITE Set PROTECTED DEFAULT SET( _SET_INSERT          )
-   PROPERTY SetExit            INDEX _SET_EXIT            READ xSetExit            WRITE Set PROTECTED DEFAULT SET( _SET_EXIT            )
-   PROPERTY SetWrap            INDEX _SET_WRAP            READ xSetWrap            WRITE Set PROTECTED DEFAULT SET( _SET_WRAP            )
-   PROPERTY SetMessage         INDEX _SET_MESSAGE         READ xSetMessage         WRITE Set PROTECTED DEFAULT SET( _SET_MESSAGE         )
-   PROPERTY SetMcenter         INDEX _SET_MCENTER         READ xSetMcenter         WRITE Set PROTECTED DEFAULT SET( _SET_MCENTER         )
-   PROPERTY SetScrollbreak     INDEX _SET_SCROLLBREAK     READ xSetScrollbreak     WRITE Set PROTECTED DEFAULT SET( _SET_SCROLLBREAK     )
-   PROPERTY SetEventmask       INDEX _SET_EVENTMASK       READ xSetEventmask       WRITE Set PROTECTED DEFAULT SET( _SET_EVENTMASK       )
-   PROPERTY SetVideomode       INDEX _SET_VIDEOMODE       READ xSetVideomode       WRITE Set PROTECTED DEFAULT SET( _SET_VIDEOMODE       )
-   PROPERTY SetMblocksize      INDEX _SET_MBLOCKSIZE      READ xSetMblocksize      WRITE Set PROTECTED DEFAULT SET( _SET_MBLOCKSIZE      )
-   PROPERTY SetMfileext        INDEX _SET_MFILEEXT        READ xSetMfileext        WRITE Set PROTECTED DEFAULT SET( _SET_MFILEEXT        )
-   PROPERTY SetStrictread      INDEX _SET_STRICTREAD      READ xSetStrictread      WRITE Set PROTECTED DEFAULT SET( _SET_STRICTREAD      )
-   PROPERTY SetOptimize        INDEX _SET_OPTIMIZE        READ xSetOptimize        WRITE Set PROTECTED DEFAULT SET( _SET_OPTIMIZE        )
-   PROPERTY SetAutopen         INDEX _SET_AUTOPEN         READ xSetAutopen         WRITE Set PROTECTED DEFAULT SET( _SET_AUTOPEN         )
-   PROPERTY SetAutorder        INDEX _SET_AUTORDER        READ xSetAutorder        WRITE Set PROTECTED DEFAULT SET( _SET_AUTORDER        )
-   PROPERTY SetAutoshare       INDEX _SET_AUTOSHARE       READ xSetAutoshare       WRITE Set PROTECTED DEFAULT SET( _SET_AUTOSHARE       )
-   PROPERTY SetCount           INDEX _SET_COUNT           READ xSetCount           WRITE Set PROTECTED DEFAULT SET( _SET_COUNT           )
-   PROPERTY SetLanguage        INDEX _SET_LANGUAGE        READ xSetLanguage        WRITE Set PROTECTED DEFAULT SET( _SET_LANGUAGE        )
-   PROPERTY SetIdlerepeat      INDEX _SET_IDLEREPEAT      READ xSetIdlerepeat      WRITE Set PROTECTED DEFAULT SET( _SET_IDLEREPEAT      )
-   PROPERTY SetTrace           INDEX _SET_TRACE           READ xSetTrace           WRITE Set PROTECTED DEFAULT SET( _SET_TRACE           )
-   PROPERTY SetTracefile       INDEX _SET_TRACEFILE       READ xSetTracefile       WRITE Set PROTECTED DEFAULT SET( _SET_TRACEFILE       )
-   PROPERTY SetTracestack      INDEX _SET_TRACESTACK      READ xSetTracestack      WRITE Set PROTECTED DEFAULT SET( _SET_TRACESTACK      )
-   PROPERTY SetFilecase        INDEX _SET_FILECASE        READ xSetFilecase        WRITE Set PROTECTED DEFAULT SET( _SET_FILECASE        )
-   PROPERTY SetDircase         INDEX _SET_DIRCASE         READ xSetDircase         WRITE Set PROTECTED DEFAULT SET( _SET_DIRCASE         )
-   PROPERTY SetDirseparator    INDEX _SET_DIRSEPARATOR    READ xSetDirseparator    WRITE Set PROTECTED DEFAULT SET( _SET_DIRSEPARATOR    )
-   PROPERTY SetErrorloop       INDEX _SET_ERRORLOOP       READ xSetErrorloop       WRITE Set PROTECTED DEFAULT SET( _SET_ERRORLOOP       )
-   PROPERTY SetOutputsafety    INDEX _SET_OUTPUTSAFETY    READ xSetOutputsafety    WRITE Set PROTECTED DEFAULT SET( _SET_OUTPUTSAFETY    )
-   PROPERTY SetDbflockscheme   INDEX _SET_DBFLOCKSCHEME   READ xSetDbflockscheme   WRITE Set PROTECTED DEFAULT SET( _SET_DBFLOCKSCHEME   )
-   PROPERTY SetTrimfilename    INDEX _SET_TRIMFILENAME    READ xSetTrimfilename    WRITE Set PROTECTED DEFAULT SET( _SET_TRIMFILENAME    )
-   PROPERTY SetPrinterjob      INDEX _SET_PRINTERJOB      READ xSetPrinterjob      WRITE Set PROTECTED DEFAULT SET( _SET_PRINTERJOB      )
-   PROPERTY SetHardcommit      INDEX _SET_HARDCOMMIT      READ xSetHardcommit      WRITE Set PROTECTED DEFAULT SET( _SET_HARDCOMMIT      )
-   PROPERTY SetForceopt        INDEX _SET_FORCEOPT        READ xSetForceopt        WRITE Set PROTECTED DEFAULT SET( _SET_FORCEOPT        )
-   PROPERTY SetEol             INDEX _SET_EOL             READ xSetEol             WRITE Set PROTECTED DEFAULT SET( _SET_EOL             )
-   PROPERTY SetErrorlog        INDEX _SET_ERRORLOG        READ xSetErrorlog        WRITE Set PROTECTED DEFAULT SET( _SET_ERRORLOG        )
+   PROPERTY SetCentury             ROOT "Set" SET ::Set( -1, v )                 DEFAULT .F.
+   PROPERTY SetDeleted             ROOT "Set" SET ::Set( _SET_DELETED, v       ) DEFAULT SET( _SET_DELETED         )
+   PROPERTY SetDefault             ROOT "Set" SET ::Set( _SET_DEFAULT, v       ) DEFAULT SET( _SET_DEFAULT         )
+   PROPERTY SetExact               ROOT "Set" SET ::Set( _SET_EXACT, v         ) DEFAULT SET( _SET_EXACT           )
+   PROPERTY SetFixed               ROOT "Set" SET ::Set( _SET_FIXED, v         ) DEFAULT SET( _SET_FIXED           )
+   PROPERTY SetDecimals            ROOT "Set" SET ::Set( _SET_DECIMALS, v      ) DEFAULT SET( _SET_DECIMALS        )
+   PROPERTY SetDateFormat          ROOT "Set" SET ::Set( _SET_DATEFORMAT, v    ) DEFAULT SET( _SET_DATEFORMAT      )
+   PROPERTY SetEpoch               ROOT "Set" SET ::Set( _SET_EPOCH, v         ) DEFAULT SET( _SET_EPOCH           )
+   PROPERTY SetPath                ROOT "Set" SET ::Set( _SET_PATH, v          ) DEFAULT SET( _SET_PATH            )
+   PROPERTY SetExclusive           ROOT "Set" SET ::Set( _SET_EXCLUSIVE, v     ) DEFAULT SET( _SET_EXCLUSIVE       )
+   PROPERTY SetSoftseek            ROOT "Set" SET ::Set( _SET_SOFTSEEK, v      ) DEFAULT SET( _SET_SOFTSEEK        )
+   PROPERTY SetUnique              ROOT "Set" SET ::Set( _SET_UNIQUE, v        ) DEFAULT SET( _SET_UNIQUE          )
+   PROPERTY SetCancel              ROOT "Set" SET ::Set( _SET_CANCEL, v        ) DEFAULT SET( _SET_CANCEL          )
+   PROPERTY SetDebug               ROOT "Set" SET ::Set( _SET_DEBUG, v         ) DEFAULT SET( _SET_DEBUG           )
+   PROPERTY SetTypeahead           ROOT "Set" SET ::Set( _SET_TYPEAHEAD, v     ) DEFAULT SET( _SET_TYPEAHEAD       )
+   PROPERTY SetAlternate           ROOT "Set" SET ::Set( _SET_ALTERNATE, v     ) DEFAULT SET( _SET_ALTERNATE       )
+   PROPERTY SetAltfile             ROOT "Set" SET ::Set( _SET_ALTFILE, v       ) DEFAULT SET( _SET_ALTFILE         )
+   PROPERTY SetDevice              ROOT "Set" SET ::Set( _SET_DEVICE, v        ) DEFAULT SET( _SET_DEVICE          )
+   PROPERTY SetExtra               ROOT "Set" SET ::Set( _SET_EXTRA, v         ) DEFAULT SET( _SET_EXTRA           )
+   PROPERTY SetExtrafile           ROOT "Set" SET ::Set( _SET_EXTRAFILE, v     ) DEFAULT SET( _SET_EXTRAFILE       )
+   PROPERTY SetPrintfile           ROOT "Set" SET ::Set( _SET_PRINTFILE, v     ) DEFAULT SET( _SET_PRINTFILE       )
+   PROPERTY SetMargin              ROOT "Set" SET ::Set( _SET_MARGIN, v        ) DEFAULT SET( _SET_MARGIN          )
+   PROPERTY SetBell                ROOT "Set" SET ::Set( _SET_BELL, v          ) DEFAULT SET( _SET_BELL            )
+   PROPERTY SetConfirm             ROOT "Set" SET ::Set( _SET_CONFIRM, v       ) DEFAULT SET( _SET_CONFIRM         )
+   PROPERTY SetEscape              ROOT "Set" SET ::Set( _SET_ESCAPE, v        ) DEFAULT SET( _SET_ESCAPE          )
+   PROPERTY SetInsert              ROOT "Set" SET ::Set( _SET_INSERT, v        ) DEFAULT SET( _SET_INSERT          )
+   PROPERTY SetExit                ROOT "Set" SET ::Set( _SET_EXIT, v          ) DEFAULT SET( _SET_EXIT            )
+   PROPERTY SetWrap                ROOT "Set" SET ::Set( _SET_WRAP, v          ) DEFAULT SET( _SET_WRAP            )
+   PROPERTY SetMessage             ROOT "Set" SET ::Set( _SET_MESSAGE, v       ) DEFAULT SET( _SET_MESSAGE         )
+   PROPERTY SetMcenter             ROOT "Set" SET ::Set( _SET_MCENTER, v       ) DEFAULT SET( _SET_MCENTER         )
+   PROPERTY SetScrollbreak         ROOT "Set" SET ::Set( _SET_SCROLLBREAK, v   ) DEFAULT SET( _SET_SCROLLBREAK     )
+   PROPERTY SetEventmask           ROOT "Set" SET ::Set( _SET_EVENTMASK, v     ) DEFAULT SET( _SET_EVENTMASK       )
+   PROPERTY SetVideomode           ROOT "Set" SET ::Set( _SET_VIDEOMODE, v     ) DEFAULT SET( _SET_VIDEOMODE       )
+   PROPERTY SetMblocksize          ROOT "Set" SET ::Set( _SET_MBLOCKSIZE, v    ) DEFAULT SET( _SET_MBLOCKSIZE      )
+   PROPERTY SetMfileext            ROOT "Set" SET ::Set( _SET_MFILEEXT, v      ) DEFAULT SET( _SET_MFILEEXT        )
+   PROPERTY SetStrictread          ROOT "Set" SET ::Set( _SET_STRICTREAD, v    ) DEFAULT SET( _SET_STRICTREAD      )
+   PROPERTY SetOptimize            ROOT "Set" SET ::Set( _SET_OPTIMIZE, v      ) DEFAULT SET( _SET_OPTIMIZE        )
+   PROPERTY SetAutopen             ROOT "Set" SET ::Set( _SET_AUTOPEN, v       ) DEFAULT SET( _SET_AUTOPEN         )
+   PROPERTY SetAutorder            ROOT "Set" SET ::Set( _SET_AUTORDER, v      ) DEFAULT SET( _SET_AUTORDER        )
+   PROPERTY SetAutoshare           ROOT "Set" SET ::Set( _SET_AUTOSHARE, v     ) DEFAULT SET( _SET_AUTOSHARE       )
+   PROPERTY SetCount               ROOT "Set" SET ::Set( _SET_COUNT, v         ) DEFAULT SET( _SET_COUNT           )
+   PROPERTY SetLanguage            ROOT "Set" SET ::Set( _SET_LANGUAGE, v      ) DEFAULT SET( _SET_LANGUAGE        )
+   PROPERTY SetIdlerepeat          ROOT "Set" SET ::Set( _SET_IDLEREPEAT, v    ) DEFAULT SET( _SET_IDLEREPEAT      )
+   PROPERTY SetTrace               ROOT "Set" SET ::Set( _SET_TRACE, v         ) DEFAULT SET( _SET_TRACE           )
+   PROPERTY SetTracefile           ROOT "Set" SET ::Set( _SET_TRACEFILE, v     ) DEFAULT SET( _SET_TRACEFILE       )
+   PROPERTY SetTracestack          ROOT "Set" SET ::Set( _SET_TRACESTACK, v    ) DEFAULT SET( _SET_TRACESTACK      )
+   PROPERTY SetFilecase            ROOT "Set" SET ::Set( _SET_FILECASE, v      ) DEFAULT SET( _SET_FILECASE        )
+   PROPERTY SetDircase             ROOT "Set" SET ::Set( _SET_DIRCASE, v       ) DEFAULT SET( _SET_DIRCASE         )
+   PROPERTY SetDirseparator        ROOT "Set" SET ::Set( _SET_DIRSEPARATOR, v  ) DEFAULT SET( _SET_DIRSEPARATOR    )
+   PROPERTY SetErrorloop           ROOT "Set" SET ::Set( _SET_ERRORLOOP, v     ) DEFAULT SET( _SET_ERRORLOOP       )
+   PROPERTY SetOutputsafety        ROOT "Set" SET ::Set( _SET_OUTPUTSAFETY, v  ) DEFAULT SET( _SET_OUTPUTSAFETY    )
+   PROPERTY SetDbflockscheme       ROOT "Set" SET ::Set( _SET_DBFLOCKSCHEME, v ) DEFAULT SET( _SET_DBFLOCKSCHEME   )
+   PROPERTY SetTrimfilename        ROOT "Set" SET ::Set( _SET_TRIMFILENAME, v  ) DEFAULT SET( _SET_TRIMFILENAME    )
+   PROPERTY SetPrinterjob          ROOT "Set" SET ::Set( _SET_PRINTERJOB, v    ) DEFAULT SET( _SET_PRINTERJOB      )
+   PROPERTY SetHardcommit          ROOT "Set" SET ::Set( _SET_HARDCOMMIT, v    ) DEFAULT SET( _SET_HARDCOMMIT      )
+   PROPERTY SetForceopt            ROOT "Set" SET ::Set( _SET_FORCEOPT, v      ) DEFAULT SET( _SET_FORCEOPT        )
+   PROPERTY SetEol                 ROOT "Set" SET ::Set( _SET_EOL, v           ) DEFAULT SET( _SET_EOL             )
+   PROPERTY SetErrorlog            ROOT "Set" SET ::Set( _SET_ERRORLOG, v      ) DEFAULT SET( _SET_ERRORLOG        )
 
+   ACCESS aPath                        INLINE ::Path
+   ACCESS System                       INLINE __GetSystem() 
+   ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
+
+   DATA TitleBackSysColorActive        EXPORTED INIT RGB( 255, 230, 151 )
+   DATA TitleBackSysColorInactive      EXPORTED INIT RGB(  69,  89, 124 )
+   DATA hTitleBackBrushActive          EXPORTED
+   DATA hTitleBackBrushInactive        EXPORTED
    DATA CustomColors                   EXPORTED INIT Array(16)
    DATA AccelEnabled                   EXPORTED INIT .T.
    DATA Caption                        EXPORTED INIT ""
@@ -313,7 +318,6 @@ CLASS Application
    DATA OsVersion                      EXPORTED
    DATA Instance                       EXPORTED
    DATA Msg                            EXPORTED
-   DATA lExit                          PROTECTED INIT .F.
    DATA Parent                         EXPORTED
    DATA ThemeActive                    EXPORTED  INIT IsThemeActive()
    DATA MDIClient                      EXPORTED
@@ -321,6 +325,40 @@ CLASS Application
    DATA IniFile                        EXPORTED
    DATA MainForm                       EXPORTED
    DATA bUserError                     EXPORTED
+
+   DATA Params                         EXPORTED
+   DATA IdeActive                      EXPORTED  INIT .F.
+   DATA Running                        EXPORTED
+   DATA ClsName                        EXPORTED  INIT "Application"
+   DATA Form                           EXPORTED
+   DATA hWnd                           EXPORTED  INIT 0
+   DATA Events                         EXPORTED  INIT {}
+   DATA TreeItem                       EXPORTED
+   DATA oCurMenu                       EXPORTED
+   DATA Components                     EXPORTED  INIT {}
+   DATA Children                       EXPORTED  INIT {}
+   DATA UserVariables                  EXPORTED
+   DATA Modal                          EXPORTED  INIT .F.
+   DATA __Accelerators                 EXPORTED  INIT {}
+   DATA __hMutex                       EXPORTED
+   DATA __ClassInst                    EXPORTED
+   DATA __CurCoolMenu                  EXPORTED
+   DATA __hCursor                      EXPORTED
+   DATA __IsControl                    EXPORTED  INIT .F.
+   DATA __hObjects                     EXPORTED
+   DATA __xCtrlName                    EXPORTED  INIT "Application"
+   DATA __Vxh                          EXPORTED  INIT .F.
+   DATA __SocketInit                   EXPORTED  INIT .F.
+   DATA __hIcon                        EXPORTED
+   DATA __hMenuHook                    EXPORTED
+
+   DATA __CustomOwner                  EXPORTED  INIT .F.
+   DATA __lMoveable                    EXPORTED  INIT .F.
+   DATA __lResizeable                  EXPORTED  INIT .F.
+
+   DATA __InstMsg                      PROTECTED
+   DATA lExit                          PROTECTED INIT .F.
+   
    // compatibility with previous versions
    ACCESS MainWindow                   INLINE ::MainForm
    ASSIGN MainWindow(o)                INLINE ::MainForm := o
@@ -328,80 +366,27 @@ CLASS Application
    ACCESS TempDir                      INLINE GetTempPath()
    ACCESS AppIniFile                   INLINE ::IniFile
    
-   DATA Params                         EXPORTED
-   DATA IdeActive                      EXPORTED  INIT .F.
-   DATA Running                        EXPORTED
-   DATA ClsName                        EXPORTED  INIT "Application"
-   DATA Form                           EXPORTED
-   DATA OnFunctionKey                  EXPORTED
-   DATA hWnd                           EXPORTED  INIT 0
-   DATA Events                         EXPORTED  INIT {} //{  {"General", { { "OnInit"       , "", "" },;
-                                                         //                 { "OnFinish"      , "", "" }} } }
-   DATA OfficeXPLook                   EXPORTED  INIT .F.
-
-   DATA TreeItem                       EXPORTED
-   DATA oCurMenu                       EXPORTED
-   DATA Components                     EXPORTED  INIT {}
-   DATA __hObjects                     EXPORTED
-   DATA Children                       EXPORTED  INIT {}
-   DATA UserVariables                  EXPORTED
-   DATA Modal                          EXPORTED  INIT .F.
-   DATA InsKey                         EXPORTED  INIT .T.
-   DATA UserVariables                  PUBLISHED INIT ""
-   DATA Cursor                         PUBLISHED
-   DATA GenerateMembers                PUBLISHED INIT .T.
-   DATA EditBoxFocusBorder             PUBLISHED INIT .F.
-   
-   ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
-
-   DATA __Accelerators                 EXPORTED  INIT {}
-   DATA __InstMsg                      PROTECTED
-   DATA __hMutex                       EXPORTED
-   DATA __ClassInst                    EXPORTED
-   DATA __CurCoolMenu                  EXPORTED
-   DATA __hCursor                      EXPORTED
-   DATA __IsControl                    EXPORTED  INIT .F.
-   DATA __xCtrlName                    EXPORTED  INIT "Application"
-   DATA __Vxh                          EXPORTED  INIT .F.
-   DATA __SocketInit                   EXPORTED  INIT .F.
-   DATA __hIcon                        EXPORTED
-   DATA __lCopyCut                     EXPORTED  INIT .F.
-   DATA __hMenuHook                    EXPORTED
-   DATA __PropFilter                   EXPORTED  INIT {}
-   DATA __FileOkMsg                    EXPORTED
-
-   DATA __CustomOwner                  EXPORTED  INIT .F.
-   DATA __lMoveable                    EXPORTED  INIT .F.
-   DATA __lResizeable                  EXPORTED  INIT .F.
-
-   //DATA RemoteSocket                   EXPORTED
-   
-   ACCESS aPath INLINE ::Path
    METHOD Init() CONSTRUCTOR
    METHOD Create()                     VIRTUAL
-   
-   METHOD Run()
-   METHOD Close()                      INLINE PostQuitMessage(0)
-   METHOD AddAccelerators()
-   METHOD DelAccelerators()
-   METHOD Exit()
+   METHOD OnExit()                     VIRTUAL
 
+   METHOD Close()                      INLINE PostQuitMessage(0)
    METHOD Yield()                      INLINE __VxhYield()
    METHOD DoEvents()                   INLINE __DoEvents()
-
-   METHOD OnExit()                     VIRTUAL
    METHOD LoadIcon( cIcon )            INLINE LoadIcon( ::Instance, cIcon )
    METHOD RestorePrevInstance(nNotify) INLINE SendMessage( HWND_BROADCAST, ::__InstMsg, nNotify, 0 )
    METHOD IsThemeActive()              INLINE IsThemeActive()
-   METHOD TranslateAccelerator()
    METHOD Set( nIndex, lSet )          INLINE IIF( ::__ClassInst == NIL, IIF( nIndex == -1, __SetCentury(lSet), Set( nIndex, lSet ) ), )
+   METHOD HasMessage( cMsg )           INLINE __ObjHasMsg( Self, cMsg )
+   METHOD GetRectangle()               INLINE {0,0,0,0}
+   METHOD LoadResource( cName, cType ) INLINE __ResourceToString( Application:Instance, cName, cType )
+   METHOD Run()
+   METHOD AddAccelerators()
+   METHOD DelAccelerators()
+   METHOD Exit()
+   METHOD TranslateAccelerator()
    METHOD AxTranslate()
    METHOD MessageBox()
-   METHOD HasMessage( cMsg )           INLINE __ObjHasMsg( Self, cMsg )
-
-   METHOD GetRectangle()               INLINE {0,0,0,0}
-   
-   METHOD LoadResource( cName, cType ) INLINE __ResourceToString( Application:Instance, cName, cType )
    METHOD SaveResource()
    METHOD __SetAsProperty()
    METHOD __InvalidMember()
@@ -410,36 +395,6 @@ CLASS Application
    METHOD LoadCustomColors()
    error HANDLER OnError()
 ENDCLASS
-
-//-----------------------------------------------------------------------------------------------------------------------------
-METHOD OnError( ... ) CLASS Application
-   LOCAL cMsg, uRet, aParams := HB_AParams()
-   cMsg := __GetMessage()
-   
-   IF PCount() == 0 .AND. ::__hObjects != NIL
-      IF hGetPos( ::__hObjects, cMsg ) > 0
-         uRet := ::__hObjects[ cMsg ]
-       ELSE
-         uRet := ::__InvalidMember( cMsg )
-      ENDIF
-   ENDIF
-RETURN uRet
-
-//-----------------------------------------------------------------------------------------------------------------------------
-METHOD __InvalidMember( cMsg ) CLASS Application
-   LOCAL uRet, oErr := ErrorNew()
-   oErr:Args          := { Self, cMsg,  }
-   oErr:CanDefault    := .F.
-   oErr:CanRetry      := .F.
-   oErr:CanSubstitute := .T.
-   oErr:Description   := "Invalid Class Member"
-   oErr:GenCode       := EG_NOVARMETHOD
-   oErr:Operation     := cMsg
-   oErr:Severity      := ES_ERROR
-   oErr:SubCode       := -1
-   oErr:SubSystem     := ::classname
-   uRet := Eval( ErrorBlock(), oErr )
-RETURN uRet
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init( lIde, __hDllInstance ) CLASS Application
@@ -494,6 +449,36 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------
+METHOD OnError( ... ) CLASS Application
+   LOCAL cMsg, uRet, aParams := HB_AParams()
+   cMsg := __GetMessage()
+   
+   IF PCount() == 0 .AND. ::__hObjects != NIL
+      IF hGetPos( ::__hObjects, cMsg ) > 0
+         uRet := ::__hObjects[ cMsg ]
+       ELSE
+         uRet := ::__InvalidMember( cMsg )
+      ENDIF
+   ENDIF
+RETURN uRet
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD __InvalidMember( cMsg ) CLASS Application
+   LOCAL uRet, oErr := ErrorNew()
+   oErr:Args          := { Self, cMsg,  }
+   oErr:CanDefault    := .F.
+   oErr:CanRetry      := .F.
+   oErr:CanSubstitute := .T.
+   oErr:Description   := "Invalid Class Member"
+   oErr:GenCode       := EG_NOVARMETHOD
+   oErr:Operation     := cMsg
+   oErr:Severity      := ES_ERROR
+   oErr:SubCode       := -1
+   oErr:SubSystem     := ::classname
+   uRet := Eval( ErrorBlock(), oErr )
+RETURN uRet
+
+//-----------------------------------------------------------------------------------------------------------------------------
 METHOD __SetAsProperty( cName, oObj ) CLASS Application
    LOCAL n
    IF ::__hObjects == NIL .OR. ! ::GenerateMembers
@@ -526,11 +511,7 @@ METHOD SaveResource( ncRes, cFileName ) CLASS Application
       CreateBMPFile( hBmp, cFileName )
       lRet := FILE( cFileName )
     ELSE
-      //IF ::Resources[n][2] == "ICO"
-      //   cData := __ResIconToString( ::Instance, ::Resources[n][1] )
-      // ELSE  
-         cData := __ResourceToString( ::Instance, ::Resources[n][1], ::Resources[n][2] )
-      //ENDIF
+      cData := __ResourceToString( ::Instance, ::Resources[n][1], ::Resources[n][2] )
       IF !EMPTY( cData ) .AND. ( hFile := fCreate( cFileName ) ) <> -1
          fWrite( hFile, cData, Len( cData ) )
          fClose( hFile )
