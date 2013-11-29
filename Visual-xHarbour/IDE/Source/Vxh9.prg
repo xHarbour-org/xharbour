@@ -371,12 +371,12 @@ CLASS ObjectTreeView INHERIT TreeView
 ENDCLASS
 
 METHOD OnBeginDrag( oDrag ) CLASS ObjectTreeView
-   ::oDrag := oDrag
+   //::oDrag := oDrag
 RETURN Self
 
 METHOD OnEndDrag( oTarget ) CLASS ObjectTreeView
    LOCAL nPos, oObj, nPre//, oItem
-   IF ::oDrag != NIL .AND. oTarget != NIL
+   IF .F. //::oDrag != NIL .AND. oTarget != NIL
       oObj := ::oDrag:Cargo
 
       nPre := ASCAN( ::oDrag:Cargo:Parent:Children, {|o| o==oObj} )

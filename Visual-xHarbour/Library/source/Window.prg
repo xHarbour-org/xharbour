@@ -3184,7 +3184,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          DEFAULT
               IF nMsg >= WM_USER .AND. nMsg < 32768
-
                  IF LOWORD( nlParam ) == WM_RBUTTONDOWN
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"
