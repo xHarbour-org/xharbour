@@ -370,7 +370,7 @@ CLASS ObjectTreeView INHERIT TreeView
                                 IIF( ::oList != NIL, ::oList:Destroy(), )
 ENDCLASS
 
-METHOD OnBeginDrag( oDrag ) CLASS ObjectTreeView
+METHOD OnBeginDrag( /*oDrag*/ ) CLASS ObjectTreeView
    //::oDrag := oDrag
 RETURN Self
 
