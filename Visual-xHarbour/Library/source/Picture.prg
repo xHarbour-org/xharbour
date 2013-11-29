@@ -98,7 +98,7 @@ METHOD Create() CLASS PictureBox
               IF ( n := ASCAN( aDef, cType,,,.T.) ) > 0
                  ::pPicture := PictureLoadImageFromResource( ::AppInstance, UPPER(::ImageName[2]), n )
                ELSE
-                 ::pPicture := PictureLoadFromResource( ::AppInstance, UPPER(::ImageName[2]), "" )
+                 ::pPicture := PictureLoadFromResource( ::AppInstance, UPPER(::ImageName[2]), cType )
               ENDIF
               ::xImageName := ::ImageName[2]
             ELSE
