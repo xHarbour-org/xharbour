@@ -1055,11 +1055,11 @@ METHOD Create() CLASS TabPage
          ::__ClassInst:Caption    := cText
          ::__ClassInst:ImageIndex := ::ImageIndex
 
-         IF ::BackSysColor != ::xBackColor .AND. ::xBackColor != NIL
-            ::BackSysColor := ::xBackColor
+         IF ::SysBackColor != ::xBackColor .AND. ::xBackColor != NIL
+            ::SysBackColor := ::xBackColor
          ENDIF
-         IF ::ForeSysColor != ::xForeColor .AND. ::xForeColor != NIL
-            ::ForeSysColor := ::xForeColor
+         IF ::SysForeColor != ::xForeColor .AND. ::xForeColor != NIL
+            ::SysForeColor := ::xForeColor
          ENDIF
 
          IF ::__CustomOwner

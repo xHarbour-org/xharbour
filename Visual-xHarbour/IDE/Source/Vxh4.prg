@@ -875,7 +875,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       ENDIF
 
       IF oItem:Owner:Caption == "Colors"
-         oItem:ColItems[1]:Color := ::GetColorValues( oObj, cProp, @xValue )
+         oItem:ColItems[1]:Color := ::GetColorValues( oActiveObject, cProp, @xValue, oItem:ColItems[1]:Default )
          ::InvalidateRect(,.F.)
       ENDIF
 
@@ -1008,7 +1008,7 @@ RETURN Self
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
    LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly//, oObj
-   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp
+   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1159,12 +1159,13 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           oItem:Create()
        ENDIF
 
+       nDefault := NIL
        IF aProp[2] == "Colors" .AND. VALTYPE(xValue) != "L"
           cType  := "COLORREF"
-          nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue )
+          nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue, @nDefault )
        ENDIF
 
-       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , ) }
+       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , , nDefault ) }
 
        IF __ObjHasMsg( ::ActiveObject, "Enum"+cProp )
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
@@ -1487,7 +1488,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 RETURN NIL
 
 METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
-   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub, aProp
+   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub, aProp, nDefault
    IF VALTYPE( xValue ) == "O"
       aSub := __ClsGetPropertiesAndValues( xValue )
       FOR EACH aSubProp IN aSub
@@ -1502,12 +1503,13 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
           aProp   := __objSendMsg( xValue, "__a_"+cProp2 )
           cProp2  := aProp[1]
 
+          nDefault := NIL
           IF aProp[2] == "Colors" .AND. VALTYPE(xValue2) != "L"
-             nColor := ::GetColorValues( xValue, cProp2, @xValue2 )
+             nColor := ::GetColorValues( xValue, cProp2, @xValue2, @nDefault )
              cType  := "COLORREF"
           ENDIF
 
-          aCol   := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
+          aCol   := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp,,, nDefault ) }
 
           IF __ObjHasMsg( xValue, "Enum"+cProp2 )
              aCol[1]:Value    := xValue:Enum&cProp2[1]
@@ -1584,22 +1586,18 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
 RETURN NIL
 //--------------------------------------------------------------------------------------------------------------------------------
 
-METHOD GetColorValues( oObj, cProp, xValue ) CLASS ObjManager
-   LOCAL nDefault, n, nColor := xValue
+METHOD GetColorValues( oObj, cProp, xValue, nDefault ) CLASS ObjManager
+   LOCAL n, nColor := xValue
 
    IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
       xValue := "None"
     ELSE
-      IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
-        xValue := ::Colors[n][2]
+      IF nDefault == NIL .AND. __ObjHasMsg( oObj, "Sys" + cProp )
+         nDefault := __objSendMsg( oObj, "Sys" + cProp )
       ENDIF
-
-      TRY
-         nDefault := oObj:&( STRTRAN( cProp, "Color", "SysColor" ) )
-      CATCH
-         nDefault := NIL
-      END
-
+      IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
+         xValue := ::Colors[n][2]
+      ENDIF
       DEFAULT nColor TO nDefault
       IF nColor == nDefault
          xValue := "System Default..." 
@@ -1607,6 +1605,10 @@ METHOD GetColorValues( oObj, cProp, xValue ) CLASS ObjManager
       IF VALTYPE( xValue ) != "C"
          xValue := "Custom..."
       ENDIF
+   ENDIF
+   IF nDefault == NIL
+      nDefault := nColor
+      xValue := "System Default..." 
    ENDIF
 RETURN nColor
 
@@ -2554,6 +2556,7 @@ CLASS TreeColItem
    DATA SetValue  EXPORTED
    DATA Value     EXPORTED
    DATA Align     EXPORTED
+   DATA Default   EXPORTED
    DATA ColType   EXPORTED
    DATA Action    EXPORTED
    DATA Color     EXPORTED
@@ -2566,7 +2569,7 @@ CLASS TreeColItem
    METHOD Init() CONSTRUCTOR
 ENDCLASS
 
-METHOD Init( xValue, cType, nAlign, nColor, cProp, cProp2, lReadOnly, cHelp ) CLASS TreeColItem
+METHOD Init( xValue, cType, nAlign, nColor, cProp, cProp2, lReadOnly, cHelp, xDefault ) CLASS TreeColItem
    DEFAULT lReadOnly TO ::ReadOnly
    ::Value   := xValue
    ::Align   := nAlign
@@ -2576,6 +2579,7 @@ METHOD Init( xValue, cType, nAlign, nColor, cProp, cProp2, lReadOnly, cHelp ) CL
    ::Prop2   := cProp2
    ::ReadOnly:= lReadOnly
    ::Help    := cHelp
+   ::Default := xDefault
 RETURN Self
 
 //------------------------------------------------------------------------------------------

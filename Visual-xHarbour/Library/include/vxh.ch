@@ -9,7 +9,7 @@
            =>  ;
            if ! <.hid.> ;;
               DATA <p> PUBLISHED [INIT <d>] ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>],[<d>]} ;;
            else ;;
               DATA <p> [INIT <d>] ;;
            endif ;;
@@ -18,7 +18,7 @@
            =>  ;
            DATA __CONCAT x <p>  [<prot>] [INIT <d>] ;;
            if ! <.hid.> ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>],[<d>]} ;;
               ACCESS <p>    INLINE <bget> PERSISTENT ;;
            else ;;
               ACCESS <p>    INLINE <bget> ;;
@@ -29,7 +29,7 @@
            =>  ;
            DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
            if ! <.hid.> ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>],[<d>]} ;;
               ACCESS <p>    INLINE ::x<p> PERSISTENT ;;
            else ;;
               ACCESS <p>    INLINE ::x<p> ;;
@@ -40,7 +40,7 @@
            =>  ;
            DATA __CONCAT x <p> [<prot>] [INIT <d>] ;;
            if ! <.hid.> ;;
-              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>]} ;;
+              DATA __CONCAT __a_ <p> INIT {<(p)>,[<r>],[<h>],[<d>]} ;;
               ACCESS <p>    INLINE <bget> PERSISTENT ;;
            else ;;
               ACCESS <p>    INLINE <bget> ;;

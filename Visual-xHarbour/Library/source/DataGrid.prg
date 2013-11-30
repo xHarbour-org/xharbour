@@ -317,7 +317,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS DataGrid
    DEFAULT ::__xCtrlName TO "DataGrid"
    ::ClsName                 := "DataGrid"
-   ::BackSysColor            := GetSysColor( COLOR_WINDOW )
+   ::SysBackColor            := GetSysColor( COLOR_WINDOW )
    ::BackColor               := GetSysColor( COLOR_WINDOW )
    ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Super:Init( oParent )
@@ -333,7 +333,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ::IsContainer             := .F.
    ::GridSysColor            := RGB(196,192,192)
    ::GridColor               := RGB(196,192,192)
-   ::ForeSysColor            := ::System:Colors:WindowText
+   ::SysForeColor            := ::System:Colors:WindowText
    ::ForeColor               := ::System:Colors:WindowText
    ::HighlightColor          := ::System:Colors:Highlight
    ::HighlightTextColor      := ::System:Colors:HighlightText
@@ -1948,10 +1948,10 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover ) CLASS DataG
    ENDIF
 
    nBackGrid := ::BackColor
-   DEFAULT nBackGrid TO ::BackSysColor
+   DEFAULT nBackGrid TO ::SysBackColor
 
    nForeGrid := ::ForeColor
-   DEFAULT nForeGrid TO ::ForeSysColor
+   DEFAULT nForeGrid TO ::SysForeColor
 
    FOR nLine := nRow TO nRowEnd
        IF nLine <= LEN( ::__DisplayArray ) .AND. ::__DisplayArray[nLine] == NIL
@@ -4036,8 +4036,8 @@ CLASS GridColumn INHERIT Object
    PROPERTY Type              DEFAULT "C"
    PROPERTY FieldPos          DEFAULT 0
 
-   PROPERTY HeaderBackColor   ROOT "Colors" GET IIF( ::xHeaderBackColor == NIL, ::HeaderBackSysColor, ::xHeaderBackColor )
-   PROPERTY HeaderForeColor   ROOT "Colors" GET IIF( ::xHeaderForeColor == NIL, ::HeaderForeSysColor, ::xHeaderForeColor )
+   PROPERTY HeaderBackColor   ROOT "Colors" GET IIF( ::xHeaderBackColor == NIL, ::HeaderSysBackColor, ::xHeaderBackColor )
+   PROPERTY HeaderForeColor   ROOT "Colors" GET IIF( ::xHeaderForeColor == NIL, ::HeaderSysForeColor, ::xHeaderForeColor )
 
    DATA aSelRect      EXPORTED
 
@@ -4067,8 +4067,8 @@ CLASS GridColumn INHERIT Object
 
    ACCESS EnumFieldPos               INLINE ::__GetFields()
 
-   DATA HeaderBackSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
-   DATA HeaderForeSysColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
+   DATA HeaderSysBackColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripPanelGradientBegin
+   DATA HeaderSysForeColor           EXPORTED INIT __GetSystem():CurrentScheme:ToolStripBorder
 
    ACCESS CellData                   INLINE ::Parent:__DisplayArray[ ::Parent:RowPos ][1][ ::Parent:ColPos ][1]
 
@@ -4111,9 +4111,6 @@ CLASS GridColumn INHERIT Object
 
    DATA Events                       EXPORTED
    DATA Cargo                        EXPORTED
-
-   DATA BackSysColor                 EXPORTED
-   DATA ForeSysColor                 EXPORTED
 
    DATA Children                     EXPORTED
    DATA hWnd                         EXPORTED
@@ -4360,7 +4357,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot ) CLASS GridColumn
    ENDIF
    
    nTxColor   := ::HeaderForeColor
-   IF nTxColor == ::HeaderForeSysColor
+   IF nTxColor == ::HeaderSysForeColor
       nTxColor := ::System:Colors:BtnText
    ENDIF
    

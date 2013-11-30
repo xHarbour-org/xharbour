@@ -1029,143 +1029,133 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
            tbcd := (struct NMTBCUSTOMDRAW)
            tbcd:Pointer( nlParam )
 
-           IF .T. //( ::ForeColor != NIL .AND. !(::ForeColor == ::ForeSysColor ) ) .OR. ::ButtonCheckColor != NIL .OR. ::Banner != NIL .OR. tbcd:nmcd:dwItemSpec >= IDM_MDI_GAP
+           rc := (struct RECT)
+           pt := (struct POINT)
+           DO CASE
+              CASE tbcd:nmcd:dwDrawStage == CDDS_PREPAINT
+                   nRet := CDRF_NOTIFYITEMDRAW
 
-              rc := (struct RECT)
-              pt := (struct POINT)
-              DO CASE
-                 CASE tbcd:nmcd:dwDrawStage == CDDS_PREPAINT
-                      nRet := CDRF_NOTIFYITEMDRAW
+              CASE tbcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
+                   IF !(::ForeColor == ::SysForeColor) .AND. ::ForeColor != NIL
+                      tbcd:clrText          := ::ForeColor
+                      tbcd:clrTextHighlight := ::ForeColor
+                      tbcd:clrMark          := RGB(0,0,0)//::ButtonCheckColor
+                      lColor := .T.
+                   ENDIF
+                   IF !(::BackColor == ::SysBackColor) .AND. ::BackColor != NIL
+                      tbcd:clrBtnFace := ::BackColor
+                      lColor := .T.
+                   ENDIF
+                   IF lColor
+                      tbcd:CopyTo( nlParam )
+                   ENDIF
 
-                 CASE tbcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
-                      //IF ::ButtonCheckColor != NIL
-                         tbcd:clrMark := RGB(0,0,0)//::ButtonCheckColor
-                         lColor := .T.
-                      //ENDIF
-                      IF !(::ForeColor == ::ForeSysColor) .AND. ::ForeColor != NIL
-                         tbcd:clrText    := ::ForeColor
-                         tbcd:clrTextHighlight := ::ForeColor
-                         lColor := .T.
-                      ENDIF
-                      IF !(::BackColor == ::BackSysColor) .AND. ::BackColor != NIL
-                         tbcd:clrBtnFace := ::BackColor
-                         lColor := .T.
-                      ENDIF
-                      IF lColor
-                         tbcd:CopyTo( nlParam )
-                      ENDIF
+                   IF ::__MenuBar
+                      nState := NIL
+                      DO CASE
+                         CASE tbcd:nmcd:dwItemSpec == IDM_MDI_ICON
+                              oMdi := ::Parent:MDIClient:GetActive()
+                              hIcon := oMdi:GetIcon( ICON_SMALL )
 
-                      IF ::__MenuBar
-                         nState := NIL
-                         DO CASE
-                            CASE tbcd:nmcd:dwItemSpec == IDM_MDI_ICON
-                                 oMdi := ::Parent:MDIClient:GetActive()
-                                 hIcon := oMdi:GetIcon( ICON_SMALL )
-
+                              IF hIcon == 0
+                                 hIcon := GetClassLong( oMdi:hWnd, GCL_HICONSM )
                                  IF hIcon == 0
-                                    hIcon := GetClassLong( oMdi:hWnd, GCL_HICONSM )
-                                    IF hIcon == 0
-                                       hIcon := LoadIcon( 0, IDI_WINLOGO )
-                                    ENDIF
+                                    hIcon := LoadIcon( 0, IDI_WINLOGO )
                                  ENDIF
+                              ENDIF
 
-                                 nTop  := ( ( tbcd:nmcd:rc:Bottom - GetSystemMetrics(SM_CYSMICON) ) / 2 )
-                                 DrawIconEx( tbcd:nmcd:hdc, 0, nTop, hIcon, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0,, DI_NORMAL )
-                                 DestroyIcon( hIcon )
-                                 SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
-                                 RETURN CDRF_SKIPDEFAULT
+                              nTop  := ( ( tbcd:nmcd:rc:Bottom - GetSystemMetrics(SM_CYSMICON) ) / 2 )
+                              DrawIconEx( tbcd:nmcd:hdc, 0, nTop, hIcon, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0,, DI_NORMAL )
+                              DestroyIcon( hIcon )
+                              SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
+                              RETURN CDRF_SKIPDEFAULT
 
-                            CASE tbcd:nmcd:dwItemSpec == IDM_MDI_GAP
-                                 IF ::Application:OsVersion:dwMajorVersion < 5 .OR. !::Application:ThemeActive .OR. !::Theming
-                                    FillRect( tbcd:nmcd:hdc, tbcd:nmcd:rc, GetSysColorBrush( COLOR_BTNFACE ) )
-                                 ENDIF
-                                 SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
-                                 RETURN CDRF_SKIPDEFAULT
+                         CASE tbcd:nmcd:dwItemSpec == IDM_MDI_GAP
+                              IF ::Application:OsVersion:dwMajorVersion < 5 .OR. !::Application:ThemeActive .OR. !::Theming
+                                 FillRect( tbcd:nmcd:hdc, tbcd:nmcd:rc, GetSysColorBrush( COLOR_BTNFACE ) )
+                              ENDIF
+                              SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
+                              RETURN CDRF_SKIPDEFAULT
 
-                            CASE tbcd:nmcd:dwItemSpec == IDM_MDI_MINIMIZE
-                                 nState := DFCS_CAPTIONMIN
-                                 nButton:= WP_MDIMINBUTTON
+                         CASE tbcd:nmcd:dwItemSpec == IDM_MDI_MINIMIZE
+                              nState := DFCS_CAPTIONMIN
+                              nButton:= WP_MDIMINBUTTON
 
-                            CASE tbcd:nmcd:dwItemSpec == IDM_MDI_RESTORE
-                                 nState := DFCS_CAPTIONRESTORE
-                                 nButton:= WP_MDIRESTOREBUTTON
+                         CASE tbcd:nmcd:dwItemSpec == IDM_MDI_RESTORE
+                              nState := DFCS_CAPTIONRESTORE
+                              nButton:= WP_MDIRESTOREBUTTON
 
-                            CASE tbcd:nmcd:dwItemSpec == IDM_MDI_CLOSE
-                                 nState := DFCS_CAPTIONCLOSE
-                                 nButton:= WP_MDICLOSEBUTTON
-                         ENDCASE
+                         CASE tbcd:nmcd:dwItemSpec == IDM_MDI_CLOSE
+                              nState := DFCS_CAPTIONCLOSE
+                              nButton:= WP_MDICLOSEBUTTON
+                      ENDCASE
 
-                         IF nState != NIL
-                            IF ::ShowMDIButtons
-                               tbcd:nmcd:rc:Top += (tbcd:nmcd:rc:bottom - tbcd:nmcd:rc:top - 14) / 2 + 1
-                               tbcd:nmcd:rc:bottom := tbcd:nmcd:rc:top + 14
-                               tbcd:nmcd:rc:right  := tbcd:nmcd:rc:left + 16
-                               IF nState == DFCS_CAPTIONCLOSE
-                                  tbcd:nmcd:rc:Left+=2
-                                  tbcd:nmcd:rc:Right+=2
-                               ENDIF
-                               rc:left   := tbcd:nmcd:rc:Left//-1
-                               rc:top    := tbcd:nmcd:rc:top
-                               rc:right  := tbcd:nmcd:rc:right//+1
-                               rc:bottom := tbcd:nmcd:rc:bottom
-                               IF !::Application:IsThemedXP .OR. !::Theming
-                                  FillRect( tbcd:nmcd:hdc, rc, GetSysColorBrush( COLOR_BTNFACE ) )
-                                  IF tbcd:nmcd:uItemState & CDIS_DISABLED == 0
-                                     DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + IIF( tbcd:nmcd:uItemState & CDIS_SELECTED != 0, DFCS_PUSHED, 0 ) )
-                                   ELSE
-                                     DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + DFCS_INACTIVE )
-                                  ENDIF
+                      IF nState != NIL
+                         IF ::ShowMDIButtons
+                            tbcd:nmcd:rc:Top += (tbcd:nmcd:rc:bottom - tbcd:nmcd:rc:top - 14) / 2 + 1
+                            tbcd:nmcd:rc:bottom := tbcd:nmcd:rc:top + 14
+                            tbcd:nmcd:rc:right  := tbcd:nmcd:rc:left + 16
+                            IF nState == DFCS_CAPTIONCLOSE
+                               tbcd:nmcd:rc:Left+=2
+                               tbcd:nmcd:rc:Right+=2
+                            ENDIF
+                            rc:left   := tbcd:nmcd:rc:Left//-1
+                            rc:top    := tbcd:nmcd:rc:top
+                            rc:right  := tbcd:nmcd:rc:right//+1
+                            rc:bottom := tbcd:nmcd:rc:bottom
+                            IF !::Application:IsThemedXP .OR. !::Theming
+                               FillRect( tbcd:nmcd:hdc, rc, GetSysColorBrush( COLOR_BTNFACE ) )
+                               IF tbcd:nmcd:uItemState & CDIS_DISABLED == 0
+                                  DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + IIF( tbcd:nmcd:uItemState & CDIS_SELECTED != 0, DFCS_PUSHED, 0 ) )
                                 ELSE
-                                  nState := IIF( ::Parent:Active, MDIBS_NORMAL, MDIBS_DISABLED )
-                                  IF tbcd:nmcd:uItemState & CDIS_SELECTED != 0
-                                     nState := MDIBS_PUSHED
-                                  ENDIF
-                                  IF tbcd:nmcd:uItemState & CDIS_DISABLED != 0
-                                     nState := MDIBS_DISABLED
-                                  ENDIF
-                                  IF tbcd:nmcd:uItemState & CDIS_HOT != 0
-                                     nState := MDIBS_HOT
-                                  ENDIF
-
-                                  hTheme := OpenThemeData(,"window")
-                                  aRect := { tbcd:nmcd:rc:Left, Int(tbcd:nmcd:rc:Top-2), tbcd:nmcd:rc:Right, Int(tbcd:nmcd:rc:Bottom) }
-                                  DrawThemeBackground( hTheme, tbcd:nmcd:hdc, nButton, nState, aRect, aRect )
-                                  CloseThemeData( hTheme )
+                                  DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + DFCS_INACTIVE )
                                ENDIF
-                               RETURN CDRF_SKIPDEFAULT
-
-                            ENDIF
-                            nRet   := CDRF_SKIPDEFAULT
-                         ENDIF
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-                         IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
-
-                            IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
-                               nHot := ASCAN( ::aItems, {|o| o:id == tbcd:nmcd:dwItemSpec} )
-                               IF nHot > 0
-                                  aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
-                                  DrawThemeBackground( ::__hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, MPI_HOT, aRect, aRect )
-                                  SetTextColor( tbcd:nmcd:hdc, GetThemeColor( ::__hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
-/*
-                                  hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
-                                  SelectObject( tbcd:nmcd:hdc, hBrush )
-                                  SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
-                                  Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
-                                  SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
-*/                                  
-                                  SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
-                                  SelectObject( tbcd:nmcd:hdc, ::GetFont() )
-                                  DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
-                                  nRet := CDRF_SKIPDEFAULT
+                             ELSE
+                               nState := IIF( ::Parent:Active, MDIBS_NORMAL, MDIBS_DISABLED )
+                               IF tbcd:nmcd:uItemState & CDIS_SELECTED != 0
+                                  nState := MDIBS_PUSHED
                                ENDIF
-                            ENDIF
-                         ENDIF
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
+                               IF tbcd:nmcd:uItemState & CDIS_DISABLED != 0
+                                  nState := MDIBS_DISABLED
+                               ENDIF
+                               IF tbcd:nmcd:uItemState & CDIS_HOT != 0
+                                  nState := MDIBS_HOT
+                               ENDIF
 
+                               hTheme := OpenThemeData(,"window")
+                               aRect := { tbcd:nmcd:rc:Left, Int(tbcd:nmcd:rc:Top-2), tbcd:nmcd:rc:Right, Int(tbcd:nmcd:rc:Bottom) }
+                               DrawThemeBackground( hTheme, tbcd:nmcd:hdc, nButton, nState, aRect, aRect )
+                               CloseThemeData( hTheme )
+                            ENDIF
+                            RETURN CDRF_SKIPDEFAULT
+
+                         ENDIF
+                         nRet   := CDRF_SKIPDEFAULT
                       ENDIF
-              ENDCASE
+                      IF ( tbcd:nmcd:uItemState == CDIS_HOT .OR. tbcd:nmcd:uItemState == CDIS_SELECTED .OR. tbcd:nmcd:uItemState == 65 )
 
-           ENDIF
+                         IF ::Application:IsThemedXP //.AND. ::System:Os:Version < 6.2
+                            nHot := ASCAN( ::aItems, {|o| o:id == tbcd:nmcd:dwItemSpec} )
+                            IF nHot > 0
+                               aRect := { tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom }
+                               DrawThemeBackground( ::__hTheme, tbcd:nmcd:hdc, MENU_POPUPITEM, MPI_HOT, aRect, aRect )
+                               SetTextColor( tbcd:nmcd:hdc, GetThemeColor( ::__hTheme, MENU_BARITEM, MBI_HOT, TMT_TEXTCOLOR ) )
+/*
+                               hBrush := GetSysColorBrush( COLOR_HIGHLIGHT )
+                               SelectObject( tbcd:nmcd:hdc, hBrush )
+                               SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
+                               Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
+                               SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
+*/                               
+                               SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
+                               SelectObject( tbcd:nmcd:hdc, ::GetFont() )
+                               DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
+                               nRet := CDRF_SKIPDEFAULT
+                            ENDIF
+                         ENDIF
+                      ENDIF
+                   ENDIF
+           ENDCASE
            SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
            RETURN nRet
 

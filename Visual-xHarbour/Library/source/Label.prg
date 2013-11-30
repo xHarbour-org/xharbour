@@ -28,11 +28,12 @@ CLASS Label INHERIT Control
    PROPERTY Transparent     SET ::__SetTransp(v) DEFAULT .F.
    PROPERTY NoPrefix        SET ::Redraw(v)  DEFAULT .F.
    PROPERTY VertCenter      SET ::Redraw(v)  DEFAULT .F.
-   PROPERTY TextShadowColor SET ::InvalidateRect()
-   PROPERTY BlinkColor      SET ::__SetBlinkColor(v)
+   PROPERTY TextShadowColor ROOT "Colors" SET ::InvalidateRect()
+   PROPERTY BlinkColor      ROOT "Colors" SET ::__SetBlinkColor(v)
+   PROPERTY BorderColor     ROOT "Colors" DEFAULT __GetSystem():Color:Gray
 
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
-   DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen", "EditBox" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER, 3 } }
+   DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
 
    // Backward compatibility
    ACCESS CenterText    INLINE ::Alignment == DT_CENTER
@@ -104,7 +105,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create()  CLASS Label
-   IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor
+   IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::SysBackColor
       ::__SetTransp(.T.)
    ENDIF
    Super:Create()
@@ -161,7 +162,7 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL hTheme, nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
 
    hDC := ::BeginPaint()
 
@@ -179,11 +180,6 @@ METHOD OnPaint() CLASS Label
          Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
          SelectObject( hDC, hBrush )
 
-       ELSEIF ::Border == 3
-         hTheme := OpenThemeData(,"edit")
-         DrawThemeBackground( hTheme, hDC, EP_EDITBORDER_NOSCROLL, EPSN_NORMAL, aRect, aRect )
-         CloseThemeData( hTheme )
-
        ELSE
          _DrawEdge( hDC, aRect, ::Border, BF_RECT )
       ENDIF
@@ -199,11 +195,9 @@ METHOD OnPaint() CLASS Label
    ENDIF
 
    IF ::VertCenter
-      nFlags := nFlags | DT_VCENTER
-      aText  := ACLONE( aRect )
-      _DrawText( hDC, ::xText, @aText, nFlags | DT_CALCRECT )
-      aRect[2] := ( aRect[4]-aText[4] ) / 2
-      aRect[4] := aRect[2] + aText[4]
+      aText  := _GetTextExtentPoint32( hDC, ::xText )
+      aRect[2] := ( aRect[4]-aText[2] ) / 2
+      aRect[4] := aRect[2] + aText[2]
    ENDIF
    
    cText := ::xText

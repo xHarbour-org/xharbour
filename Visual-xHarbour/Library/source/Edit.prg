@@ -86,8 +86,8 @@ CLASS EditBox INHERIT Control
    DATA AllowClose                     EXPORTED INIT FALSE
    DATA Button                         EXPORTED INIT .F.
    DATA ButtonAction                   EXPORTED
-   DATA BackSysColor                   EXPORTED INIT GetSysColor( COLOR_WINDOW )
-   DATA ForeSysColor                   EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
+   DATA SysBackColor                   EXPORTED INIT GetSysColor( COLOR_WINDOW )
+   DATA SysForeColor                   EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
    DATA LastKey                        EXPORTED INIT 0
 
    DATA EnumCase                       EXPORTED  INIT { { "Mixed Case", "Upper Case", "Lower Case" }, {1,2,3} }
@@ -207,8 +207,6 @@ METHOD Init( oParent ) CLASS EditBox
    ::Height       := 22
    ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | IIF( !::Application:IsThemedXP, WS_BORDER, 0 )
    ::ExStyle      := WS_EX_CLIENTEDGE
-   ::BackSysColor := GetSysColor( COLOR_WINDOW )
-   ::ForeSysColor := GetSysColor( COLOR_WINDOWTEXT )
 
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE" }
@@ -545,12 +543,12 @@ RETURN SELF
 METHOD OnCtlColorStatic( nwParam ) CLASS EditBox
    LOCAL hBkGnd := ::GetBkBrush()
 
-   IF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
+   IF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
       RETURN hBkGnd
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
+    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
       SetBkMode( nwParam, TRANSPARENT )
       RETURN GetStockObject( NULL_BRUSH )
    ENDIF

@@ -38,8 +38,8 @@ CLASS OptionBar INHERIT Control
    DATA lCreated     PROTECTED INIT .F.
    DATA lDown        PROTECTED INIT .F.
    DATA IsContainer  EXPORTED INIT .F.
-   DATA BackSysColor EXPORTED INIT GetSysColor( COLOR_BTNSHADOW )
-   DATA ForeSysColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNSHADOW )
+   DATA SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
    DATA  xButtonCheckColor PROTECTED INIT GetSysColor( COLOR_BTNSHADOW )
    ACCESS ButtonCheckColor    INLINE ::xButtonCheckColor 

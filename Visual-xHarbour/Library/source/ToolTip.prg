@@ -16,12 +16,9 @@
 #Include "colors.ch"
 
 CLASS ToolTip INHERIT Window
-   PROPERTY BackColor     GET IIF( ::hWnd != NIL, ::SendMessage( TTM_GETTIPBKCOLOR, 0, 0 ), IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) );
-                          SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPBKCOLOR, v, 0 ), )
-
-   PROPERTY ForeColor     GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) ;
-                          SET IIF( ::hWnd != NIL, ::SendMessage( TTM_SETTIPTEXTCOLOR, v, 0 ), )
-
+   PROPERTY BackColor     ROOT "Colors" SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPBKCOLOR, v, 0 ), )   DEFAULT GetSysColor( COLOR_INFOBK )
+   PROPERTY ForeColor     ROOT "Colors" SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPTEXTCOLOR, v, 0 ), ) DEFAULT GetSysColor( COLOR_INFOTEXT )
+ 
    PROPERTY Text          SET ::SetText( v )                                                 DEFAULT ""
    PROPERTY CloseButton   SET ::SetStyle( TTS_CLOSE, v )                                     DEFAULT .F.
    PROPERTY Balloon       SET ( ::SetStyle( TTS_BALLOON, v ), ::SetStyle( WS_BORDER, .F. ) ) DEFAULT .F.
@@ -72,8 +69,8 @@ CLASS ToolTip INHERIT Window
    //------------------------------------------
 
    DATA MDIClient         PROTECTED
-   DATA BackSysColor      EXPORTED INIT GetSysColor( COLOR_INFOBK )
-   DATA ForeSysColor      EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
+   DATA SysBackColor      EXPORTED INIT GetSysColor( COLOR_INFOBK )
+   DATA SysForeColor      EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
 
    ACCESS ClipChildren    INLINE ::Style & WS_CLIPCHILDREN != 0
    ASSIGN ClipChildren(l) INLINE ::SetStyle( WS_CLIPCHILDREN, l )

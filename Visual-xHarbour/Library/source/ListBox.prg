@@ -385,7 +385,6 @@ METHOD Init( oParent ) CLASS ListBox
    ::Width        := 80
    ::Height       := 80
    ::DeferRedraw  := .F.
-   ::BackSysColor := GetSysColor( COLOR_WINDOW )
    IF !EMPTY( ::Events )
       AADD( ::Events[2][2], { "OnSelChange" , "", "" } )
       AADD( ::Events[2][2], { "OnDblClk" , "", "" } )
@@ -495,15 +494,15 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
    LOCAL hBkGnd := ::BkBrush
-   IF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
+   IF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
       SetBkMode( nwParam, TRANSPARENT )
       RETURN hBkGnd
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::ForeSysColor
+    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
       SetBkMode( nwParam, TRANSPARENT )
-      IF ::BackColor == ::BackSysColor
+      IF ::BackColor == ::SysBackColor
          RETURN GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
    ENDIF

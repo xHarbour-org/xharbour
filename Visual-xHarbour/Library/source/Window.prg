@@ -143,38 +143,40 @@ static aMessages := {;
 CLASS Window INHERIT Object
 
    // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
-   PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::BackSysColor, ::xBackColor ) SET ( ::xBackColor := v, ::SetBackColor( v ) )
-   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::ForeSysColor, ::xForeColor ) SET ( ::xForeColor := v, ::SetForeColor( v ) )
+   PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
+   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::SysForeColor, ::xForeColor ) SET ::SetForeColor(v) 
    PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu )
 
-   PROPERTY Left          ROOT "Position"                                                              SET ::__SetSizePos( 1, v )
-   PROPERTY Top           ROOT "Position"                                                              SET ::__SetSizePos( 2, v )
-   PROPERTY Width         ROOT "Size"                                                                  SET ::__SetSizePos( 3, v )
-   PROPERTY Height        ROOT "Size"                                                                  SET ::__SetSizePos( 4, v )
+   PROPERTY Left          ROOT "Position" SET ::__SetSizePos( 1, v )
+   PROPERTY Top           ROOT "Position" SET ::__SetSizePos( 2, v )
+   PROPERTY Width         ROOT "Size"     SET ::__SetSizePos( 3, v )
+   PROPERTY Height        ROOT "Size"     SET ::__SetSizePos( 4, v )
 
-   PROPERTY Cursor                                                                                     SET ::__SetWindowCursor(v)                 DEFAULT IDC_ARROW PROTECTED
-   PROPERTY StaticEdge                                                                                 SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F.       PROTECTED
-   PROPERTY ClientEdge                                                                                 SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.       PROTECTED
-   PROPERTY ControlParent                                                                              SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F.       PROTECTED
+   PROPERTY Cursor                        SET ::__SetWindowCursor(v)                 DEFAULT IDC_ARROW PROTECTED
+   PROPERTY StaticEdge                    SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F.       PROTECTED
+   PROPERTY ClientEdge                    SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.       PROTECTED
+   PROPERTY ControlParent                 SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F.       PROTECTED
 
-   PROPERTY Visible         SET ::SetStyle( WS_VISIBLE, v )          DEFAULT .T.
-   PROPERTY Enabled         SET ::SetStyle( WS_DISABLED, v )         DEFAULT .T.
-   PROPERTY Border          SET ::SetStyle( WS_BORDER, v )           DEFAULT .F.
+   PROPERTY Visible                       SET ::SetStyle( WS_VISIBLE, v )          DEFAULT .T.
+   PROPERTY Enabled                       SET ::SetStyle( WS_DISABLED, v )         DEFAULT .T.
+   PROPERTY Border                        SET ::SetStyle( WS_BORDER, v )           DEFAULT .F.
 
-   PROPERTY Center          SET ::CenterWindow(v)                    DEFAULT .F.
-   PROPERTY ClipChildren    SET ::SetStyle( WS_CLIPCHILDREN, v )     DEFAULT .T.
-   PROPERTY ClipSiblings    SET ::SetStyle( WS_CLIPSIBLINGS, v )     DEFAULT .T.
-   PROPERTY AcceptFiles     SET ::SetExStyle( WS_EX_ACCEPTFILES, v ) DEFAULT .F.
-   PROPERTY NoActivate      SET ::SetExStyle( WS_EX_NOACTIVATE, v )  DEFAULT .F.
+   PROPERTY Center                        SET ::CenterWindow(v)                    DEFAULT .F.
+   PROPERTY ClipChildren                  SET ::SetStyle( WS_CLIPCHILDREN, v )     DEFAULT .T.
+   PROPERTY ClipSiblings                  SET ::SetStyle( WS_CLIPSIBLINGS, v )     DEFAULT .T.
+   PROPERTY AcceptFiles                   SET ::SetExStyle( WS_EX_ACCEPTFILES, v ) DEFAULT .F.
+   PROPERTY NoActivate                    SET ::SetExStyle( WS_EX_NOACTIVATE, v )  DEFAULT .F.
 
-   PROPERTY Theming         SET ::__SetTheming(v)                    DEFAULT .T.
-   PROPERTY Text            SET ::SetWindowText(v)                   DEFAULT ""
+   PROPERTY Theming                       SET ::__SetTheming(v)                    DEFAULT .T.
+   PROPERTY Text                          SET ::SetWindowText(v)                   DEFAULT ""
    PROPERTY Font
    PROPERTY ToolTip
-   PROPERTY DisableParent                                            DEFAULT .F.
+   PROPERTY DisableParent                                                           DEFAULT .F.
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
    
+   DATA SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNFACE )
+   DATA SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
 
    ACCESS xCaption       INLINE ::xText
@@ -235,7 +237,7 @@ CLASS Window INHERIT Object
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
    DATA ExStyle                EXPORTED  INIT 0
-   DATA ClassStyle             EXPORTED  INIT CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+   DATA ClassStyle             EXPORTED  INIT CS_OWNDC | CS_DBLCLKS //| CS_SAVEBITS
 
    DATA TopMargin              EXPORTED  INIT 0
    DATA RightMargin            EXPORTED  INIT 0
@@ -315,8 +317,6 @@ CLASS Window INHERIT Object
    DATA AutoDock               EXPORTED INIT .T.
    DATA Dock                   EXPORTED AS OBJECT
    DATA HelpInfo               EXPORTED
-   DATA BackSysColor           EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   DATA ForeSysColor           EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
 
    ACCESS Handle               INLINE ::hWnd
@@ -978,12 +978,12 @@ METHOD Create( oParent ) CLASS Window
 
       __ResetClassInst( Self )
 
-      IF ::BackSysColor != ::xBackColor .AND. ::xBackColor != NIL
-         ::BackSysColor := ::xBackColor
+      IF ::SysBackColor != ::xBackColor .AND. ::xBackColor != NIL
+         ::SysBackColor := ::xBackColor
          ::__ForceSysColor := .T.
       ENDIF
-      IF ::ForeSysColor != ::xForeColor .AND. ::xForeColor != NIL
-         ::ForeSysColor := ::xForeColor
+      IF ::SysForeColor != ::xForeColor .AND. ::xForeColor != NIL
+         ::SysForeColor := ::xForeColor
          ::__ForceSysColor := .T.
       ENDIF
 
@@ -1346,7 +1346,7 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS Window
 
    DEFAULT lRepaint TO .T.
    IF nColor == NIL .AND. ::__ForceSysColor
-      nColor := ::BackSysColor
+      nColor := ::SysBackColor
    ENDIF
    ::xBackColor := nColor
 
@@ -2448,7 +2448,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_ERASEBKGND
-              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::BackSysColor != ::BackColor .OR. ::__ForceSysColor )
+              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::SysBackColor != ::BackColor .OR. ::__ForceSysColor )
                  SetBkColor( nwParam, ::BackColor )
               ENDIF
               nRet := ExecuteEvent( "OnEraseBkGnd", Self )

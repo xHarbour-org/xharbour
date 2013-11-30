@@ -108,7 +108,7 @@ RETURN Self
 
 METHOD Create() CLASS CheckBox
    LOCAL aSize
-   IF ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor
+   IF ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::SysBackColor
       ::__SetTransp(.T.)
    ENDIF
    ::Super:Create()
@@ -141,7 +141,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    nColor := NIL
                    IF lDisabled
                       nColor := SetTextColor( cd:hDC, GetSysColor( COLOR_GRAYTEXT ) )
-                    ELSEIF ::ForeColor != NIL .AND. !( ::ForeColor == ::ForeSysColor )
+                    ELSEIF ::ForeColor != NIL .AND. !( ::ForeColor == ::SysForeColor )
                       nColor := SetTextColor( cd:hDC, ::ForeColor )
                    ENDIF
 

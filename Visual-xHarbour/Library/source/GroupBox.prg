@@ -52,7 +52,7 @@ CLASS GroupBox INHERIT Control
 
    DATA ImageIndex PROTECTED
 
-   ACCESS ForeSysColor INLINE ::GetSysColor()
+   ACCESS SysForeColor INLINE ::GetSysColor()
 
    
    METHOD Init()  CONSTRUCTOR
