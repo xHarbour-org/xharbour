@@ -642,7 +642,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     IF VALTYPE(oObj) == "O"
                        aList := {}
 
-                       aProperties := __GetMembers( oObj,,HB_OO_CLSTP_EXPORTED | HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
+                       aProperties := __GetMembers( oObj,,/*HB_OO_CLSTP_EXPORTED |*/ HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
                        FOR n := 1 TO LEN( aProperties )
                            IF ! aProperties[n][1][1] $ "_X"
                               IF __ObjHasMsg( oObj, "__a_"+aProperties[n] )
@@ -657,7 +657,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        aMethods := __objGetMethodList( oObj )
                        //aMethods := __GetMembers( oObj,,HB_OO_CLSTP_SYMBOL, HB_OO_MSG_METHOD )
                        FOR n := 1 TO LEN( aMethods )
-                           AADD( aList, __Proper( aMethods[n] )+"?7" )
+                           IF __ObjHasMsg( oObj, "__m_"+aMethods[n] )
+                              aProp   := __objSendMsg( oObj, "__m_"+aMethods[n] )
+                              AADD( aList, aProp[1]+"?7" )
+                           ENDIF
                        NEXT
 
                        IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:__hObjects != NIL

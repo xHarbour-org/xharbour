@@ -1592,8 +1592,8 @@ METHOD GetColorValues( oObj, cProp, xValue, nDefault ) CLASS ObjManager
    IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
       xValue := "None"
     ELSE
-      IF nDefault == NIL .AND. __ObjHasMsg( oObj, "Sys" + cProp )
-         nDefault := __objSendMsg( oObj, "Sys" + cProp )
+      IF nDefault == NIL .AND. __ObjHasMsg( oObj, "__Sys" + cProp )
+         nDefault := __objSendMsg( oObj, "__Sys" + cProp )
       ENDIF
       IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
          xValue := ::Colors[n][2]

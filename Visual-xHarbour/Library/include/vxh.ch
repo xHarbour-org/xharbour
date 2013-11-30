@@ -5,6 +5,21 @@
 
 #xtranslate __CONCAT <x> <y> => <x>[<y>]
 
+#xcommand VXH_METHOD <p>([<params,...>]) [<hid: NOTPUBLIC>];
+           =>  ;
+           if ! <.hid.> ;;
+              DATA __CONCAT __m_ <p> INIT {<(p)>} ;;
+           endif ;;
+           METHOD <p>([<params>])
+
+#xcommand VXH_METHOD <p>([<params,...>]) INLINE <Code,...> [<hid: NOTPUBLIC>];
+           =>  ;
+           if ! <.hid.> ;;
+              DATA __CONCAT __m_ <p> INIT {<(p)>} ;;
+           endif ;;
+           METHOD <p>([<params>]) [INLINE <Code>]
+
+
 #xcommand PROPERTY <p> [ROOT <r>] [DEFAULT <d>] [HELP <h>] [<hid: NOTPUBLIC>];
            =>  ;
            if ! <.hid.> ;;

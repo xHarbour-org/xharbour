@@ -69,8 +69,8 @@ CLASS ToolTip INHERIT Window
    //------------------------------------------
 
    DATA MDIClient         PROTECTED
-   DATA SysBackColor      EXPORTED INIT GetSysColor( COLOR_INFOBK )
-   DATA SysForeColor      EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
+   DATA __SysBackColor    EXPORTED INIT GetSysColor( COLOR_INFOBK )
+   DATA __SysForeColor    EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
 
    ACCESS ClipChildren    INLINE ::Style & WS_CLIPCHILDREN != 0
    ASSIGN ClipChildren(l) INLINE ::SetStyle( WS_CLIPCHILDREN, l )

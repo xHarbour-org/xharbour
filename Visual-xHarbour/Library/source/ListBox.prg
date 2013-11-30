@@ -494,15 +494,15 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
    LOCAL hBkGnd := ::BkBrush
-   IF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
+   IF ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
       SetBkMode( nwParam, TRANSPARENT )
       RETURN hBkGnd
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
+    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor
       SetBkMode( nwParam, TRANSPARENT )
-      IF ::BackColor == ::SysBackColor
+      IF ::BackColor == ::__SysBackColor
          RETURN GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
    ENDIF

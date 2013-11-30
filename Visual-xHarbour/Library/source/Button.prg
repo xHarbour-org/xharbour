@@ -127,7 +127,7 @@ METHOD Create() CLASS Button
                                  "OnNCMouseMove",;
                                  "OnNCPaint" } )
    ENDIF
-   IF ( ::ImageIndex != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox" .AND. !::OwnerDraw
+   IF ( ::ImageIndex != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox" .AND. !::OwnerDraw
       ::Style := ::Style | BS_OWNERDRAW
    ENDIF
    ::Super:Create()
@@ -144,18 +144,18 @@ METHOD Create() CLASS Button
 RETURN Self
 
 METHOD SetBackColor( nColor, lRepaint ) CLASS Button
-   IF ( nColor == NIL .OR. nColor == ::SysBackColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
+   IF ( nColor == NIL .OR. nColor == ::__SysBackColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
       ::SetStyle( BS_OWNERDRAW, .F. )
-    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
+    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::__SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
       ::SetStyle( BS_OWNERDRAW, .T. )
    ENDIF
    Super:SetBackColor( nColor, lRepaint )
 RETURN SELF
 
 METHOD SetForeColor( nColor, lRepaint ) CLASS Button
-   IF ( nColor == NIL .OR. nColor == ::SysForeColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
+   IF ( nColor == NIL .OR. nColor == ::__SysForeColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
       ::SetStyle( BS_OWNERDRAW, .F. )
-    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::SysForeColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
+    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::__SysForeColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
       ::SetStyle( BS_OWNERDRAW, .T. )
    ENDIF
    Super:SetForeColor( nColor, lRepaint )
@@ -163,7 +163,7 @@ RETURN SELF
 
 METHOD SetImageIndex( n ) CLASS Button
    DEFAULT n TO ::xImageIndex
-   IF ( ( ::Parent:ImageList != NIL .AND. n > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor ) .OR. ( ::BackColor != NIL .AND. ( ::BackColor != ::SysBackColor  .OR. ::__ForceSysColor ) ) )  .OR. ::Parent:__xCtrlName == "GroupBox"
+   IF ( ( ::Parent:ImageList != NIL .AND. n > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor ) .OR. ( ::BackColor != NIL .AND. ( ::BackColor != ::__SysBackColor  .OR. ::__ForceSysColor ) ) )  .OR. ::Parent:__xCtrlName == "GroupBox"
       ::Style := ::Style | BS_OWNERDRAW
     ELSEIF !::OwnerDraw
       ::Style := ::Style & NOT( BS_OWNERDRAW )
@@ -244,7 +244,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
       RETURN NIL
    ENDIF
-   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::SysForeColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
+   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
       nLeft := 6
       
@@ -330,7 +330,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
             _FillRect( dis:hDC, aRect, IIF( ::BkBrush != NIL, ::BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
 
             nColor := ::BackColor
-            IF nColor != NIL .AND. ( nColor != ::SysBackColor  .OR. ::__ForceSysColor )
+            IF nColor != NIL .AND. ( nColor != ::__SysBackColor  .OR. ::__ForceSysColor )
                nColor := LightenColor( nColor, 100 )
                __Draw3dRect( dis:hDC, aRect, IIF( !lSelected, nColor, GetSysColor(COLOR_3DDKSHADOW) ), GetSysColor(COLOR_3DDKSHADOW) )
              ELSE
@@ -419,15 +419,15 @@ METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS Button
 
    SetTextColor( nwParam, GetThemeSysColor( ::hWnd, TMT_BTNTEXT ) )
 
-   IF ::ForeColor != NIL .AND. !(::ForeColor == ::SysForeColor)
+   IF ::ForeColor != NIL .AND. !(::ForeColor == ::__SysForeColor)
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
       SetBkMode( nwParam, TRANSPARENT )
       RETURN hBkGnd
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
+    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor
       SetBkMode( nwParam, TRANSPARENT )
-      IF ::BackColor == ::SysBackColor
+      IF ::BackColor == ::__SysBackColor
          RETURN GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
       RETURN GetStockObject( NULL_BRUSH )

@@ -32,14 +32,14 @@ CLASS OptionBar INHERIT Control
    PROPERTY HotImageList  GET __ChkComponent( Self, @::xHotImageList )
    PROPERTY List          SET IIF( ::__ToolBar != NIL, ::__ToolBar:List := v,) DEFAULT .F.
 
-   DATA PagerSize    EXPORTED INIT 12
-   DATA __oPage      EXPORTED
-   DATA __ToolBar    EXPORTED
-   DATA lCreated     PROTECTED INIT .F.
-   DATA lDown        PROTECTED INIT .F.
-   DATA IsContainer  EXPORTED INIT .F.
-   DATA SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNSHADOW )
-   DATA SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA PagerSize      EXPORTED INIT 12
+   DATA __oPage        EXPORTED
+   DATA __ToolBar      EXPORTED
+   DATA lCreated       PROTECTED INIT .F.
+   DATA lDown          PROTECTED INIT .F.
+   DATA IsContainer    EXPORTED INIT .F.
+   DATA __SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNSHADOW )
+   DATA __SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
    DATA  xButtonCheckColor PROTECTED INIT GetSysColor( COLOR_BTNSHADOW )
    ACCESS ButtonCheckColor    INLINE ::xButtonCheckColor 

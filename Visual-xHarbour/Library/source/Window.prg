@@ -143,8 +143,8 @@ static aMessages := {;
 CLASS Window INHERIT Object
 
    // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
-   PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
-   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::SysForeColor, ::xForeColor ) SET ::SetForeColor(v) 
+   PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
+   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor ) SET ::SetForeColor(v) 
    PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu )
 
    PROPERTY Left          ROOT "Position" SET ::__SetSizePos( 1, v )
@@ -173,10 +173,25 @@ CLASS Window INHERIT Object
    PROPERTY ToolTip
    PROPERTY DisableParent                                                           DEFAULT .F.
 
+
+
+   VXH_METHOD MessageWait()
+   VXH_METHOD CenterWindow()
+   VXH_METHOD Animate()
+
+   METHOD Destroy()
+   METHOD Disable()               INLINE ::Enabled := .F.
+   METHOD Enable()                INLINE ::Enabled := .T.
+   METHOD Close()
+
+   METHOD Hide()
+   VXH_METHOD Show()
+   VXH_METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
+
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
    
-   DATA SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNFACE )
-   DATA SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA __SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNFACE )
+   DATA __SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
 
    ACCESS xCaption       INLINE ::xText
@@ -374,8 +389,8 @@ CLASS Window INHERIT Object
 
 
    METHOD Init( oParent ) CONSTRUCTOR
-
    METHOD Create()
+
    METHOD __RegisterTransparentControl()
    METHOD __UnregisterTransparentControl()
    METHOD __Register()
@@ -403,18 +418,6 @@ CLASS Window INHERIT Object
    METHOD __SetInvStyle( n, l )   INLINE ::SetStyle( n, !l )
    METHOD DragAcceptFiles(l)      INLINE IIF( ::hWnd != NIL, DragAcceptFiles( ::hWnd, l ), NIL )
 
-   METHOD CenterWindow()
-   METHOD Animate()
-
-   METHOD Destroy()
-   METHOD Disable()               INLINE ::Enabled := .F.
-   METHOD Enable()                INLINE ::Enabled := .T.
-   METHOD Close()
-
-   METHOD Hide()
-   METHOD Show()
-   METHOD MessageWait()
-   METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
    METHOD IsCovered()
    METHOD LockWindowUpdate()      INLINE LockWindowUpdate( ::hWnd )
    METHOD UnlockWindowUpdate()    INLINE LockWindowUpdate()
@@ -978,12 +981,12 @@ METHOD Create( oParent ) CLASS Window
 
       __ResetClassInst( Self )
 
-      IF ::SysBackColor != ::xBackColor .AND. ::xBackColor != NIL
-         ::SysBackColor := ::xBackColor
+      IF ::__SysBackColor != ::xBackColor .AND. ::xBackColor != NIL
+         ::__SysBackColor := ::xBackColor
          ::__ForceSysColor := .T.
       ENDIF
-      IF ::SysForeColor != ::xForeColor .AND. ::xForeColor != NIL
-         ::SysForeColor := ::xForeColor
+      IF ::__SysForeColor != ::xForeColor .AND. ::xForeColor != NIL
+         ::__SysForeColor := ::xForeColor
          ::__ForceSysColor := .T.
       ENDIF
 
@@ -1346,7 +1349,7 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS Window
 
    DEFAULT lRepaint TO .T.
    IF nColor == NIL .AND. ::__ForceSysColor
-      nColor := ::SysBackColor
+      nColor := ::__SysBackColor
    ENDIF
    ::xBackColor := nColor
 
@@ -2448,7 +2451,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_ERASEBKGND
-              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::SysBackColor != ::BackColor .OR. ::__ForceSysColor )
+              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::__SysBackColor != ::BackColor .OR. ::__ForceSysColor )
                  SetBkColor( nwParam, ::BackColor )
               ENDIF
               nRet := ExecuteEvent( "OnEraseBkGnd", Self )

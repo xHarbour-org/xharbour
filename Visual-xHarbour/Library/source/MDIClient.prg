@@ -23,8 +23,8 @@ CLASS MDIClient INHERIT Window
    PROPERTY AlignRight
    PROPERTY AlignBottom
    PROPERTY WindowsMenu  DEFAULT .T.
-   PROPERTY BackColor    GET IIF( ::xBackColor == NIL, ::SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
-   PROPERTY ForeColor    GET IIF( ::xForeColor == NIL, ::SysForeColor, ::xForeColor );
+   PROPERTY BackColor    GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
+   PROPERTY ForeColor    GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor );
                          SET IIF( ::IsWindow() .AND. ::IsWindowVisible(), ::InvalidateRect(), NIL )
    PROPERTY ClientEdge   SET ::SetExStyle( WS_EX_CLIENTEDGE, v ) DEFAULT .T.
 
@@ -57,8 +57,8 @@ CLASS MDIClient INHERIT Window
    DATA TabOrder           EXPORTED
    DATA ForeColor          EXPORTED
    DATA ContextMenu        EXPORTED
-   DATA SysBackColor       EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
-   DATA SysForeColor       EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA __SysBackColor       EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
+   DATA __SysForeColor       EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
    DATA BkBrush            EXPORTED
    DATA __IsInstance       EXPORTED INIT .F.
 
@@ -157,7 +157,7 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS MDIClient
       DeleteObject( ::BkBrush )
    ENDIF
 
-   IF nColor != NIL .AND. nColor != ::SysBackColor
+   IF nColor != NIL .AND. nColor != ::__SysBackColor
       ::BkBrush := CreateSolidBrush( nColor )
       IF ::hWnd != NIL
          SetClassLong( ::hWnd, GCL_HBRBACKGROUND, ::BkBrush )

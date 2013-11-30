@@ -86,8 +86,8 @@ CLASS EditBox INHERIT Control
    DATA AllowClose                     EXPORTED INIT FALSE
    DATA Button                         EXPORTED INIT .F.
    DATA ButtonAction                   EXPORTED
-   DATA SysBackColor                   EXPORTED INIT GetSysColor( COLOR_WINDOW )
-   DATA SysForeColor                   EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
+   DATA __SysBackColor                 EXPORTED INIT GetSysColor( COLOR_WINDOW )
+   DATA __SysForeColor                 EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
    DATA LastKey                        EXPORTED INIT 0
 
    DATA EnumCase                       EXPORTED  INIT { { "Mixed Case", "Upper Case", "Lower Case" }, {1,2,3} }
@@ -543,12 +543,12 @@ RETURN SELF
 METHOD OnCtlColorStatic( nwParam ) CLASS EditBox
    LOCAL hBkGnd := ::GetBkBrush()
 
-   IF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
+   IF ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
    IF hBkGnd != NIL
       RETURN hBkGnd
-    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::SysForeColor
+    ELSEIF ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor
       SetBkMode( nwParam, TRANSPARENT )
       RETURN GetStockObject( NULL_BRUSH )
    ENDIF
