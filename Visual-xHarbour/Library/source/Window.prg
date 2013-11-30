@@ -252,7 +252,7 @@ CLASS Window INHERIT Object
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
    DATA ExStyle                EXPORTED  INIT 0
-   DATA ClassStyle             EXPORTED  INIT CS_OWNDC | CS_DBLCLKS //| CS_SAVEBITS
+   DATA ClassStyle             EXPORTED  INIT CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
 
    DATA TopMargin              EXPORTED  INIT 0
    DATA RightMargin            EXPORTED  INIT 0

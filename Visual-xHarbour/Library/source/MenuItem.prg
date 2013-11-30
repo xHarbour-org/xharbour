@@ -239,7 +239,7 @@ CLASS CMenuItem INHERIT Object
    PROPERTY Message
    PROPERTY ShortCutKey
    PROPERTY Visible                  DEFAULT .T.
-   PROPERTY ForeColor ROOT "Colors"  GET IIF( ::xForeColor == NIL, ::SysForeColor, ::xForeColor )
+   PROPERTY ForeColor ROOT "Colors"  GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor )
 
    DATA __lResizeable            EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable              EXPORTED INIT .F.
@@ -286,7 +286,7 @@ CLASS CMenuItem INHERIT Object
    DATA EventHandler             EXPORTED
    DATA HorzScrollPos            EXPORTED INIT 0
    DATA VertScrollPos            EXPORTED INIT 0
-   DATA SysForeColor             EXPORTED INIT GetSysColor( COLOR_MENUTEXT )
+   DATA __SysForeColor           EXPORTED INIT GetSysColor( COLOR_MENUTEXT )
 
    ACCESS hWnd                   INLINE ::hMenu
 
@@ -340,7 +340,6 @@ METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
    
    ::Position     := nPos
    ::Parent       := oParent
-   ::SysForeColor := GetSysColor( COLOR_MENUTEXT )
 
    IF oParent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )

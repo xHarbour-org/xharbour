@@ -1036,13 +1036,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                    nRet := CDRF_NOTIFYITEMDRAW
 
               CASE tbcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
-                   IF !(::ForeColor == ::SysForeColor) .AND. ::ForeColor != NIL
+                   IF !(::ForeColor == ::__SysForeColor) .AND. ::ForeColor != NIL
                       tbcd:clrText          := ::ForeColor
                       tbcd:clrTextHighlight := ::ForeColor
                       tbcd:clrMark          := RGB(0,0,0)//::ButtonCheckColor
                       lColor := .T.
                    ENDIF
-                   IF !(::BackColor == ::SysBackColor) .AND. ::BackColor != NIL
+                   IF !(::BackColor == ::__SysBackColor) .AND. ::BackColor != NIL
                       tbcd:clrBtnFace := ::BackColor
                       lColor := .T.
                    ENDIF

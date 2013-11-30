@@ -23,14 +23,14 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS Label INHERIT Control
-   PROPERTY Alignment       SET ::Redraw(v)  DEFAULT DT_LEFT
-   PROPERTY Border          SET ::Redraw(v)  DEFAULT 0
-   PROPERTY Transparent     SET ::__SetTransp(v) DEFAULT .F.
-   PROPERTY NoPrefix        SET ::Redraw(v)  DEFAULT .F.
-   PROPERTY VertCenter      SET ::Redraw(v)  DEFAULT .F.
+   PROPERTY Alignment                     SET ::Redraw(v)      DEFAULT DT_LEFT
+   PROPERTY Border                        SET ::Redraw(v)      DEFAULT 0
+   PROPERTY Transparent                   SET ::__SetTransp(v) DEFAULT .F.
+   PROPERTY NoPrefix                      SET ::Redraw(v)      DEFAULT .F.
+   PROPERTY VertCenter                    SET ::Redraw(v)      DEFAULT .F.
    PROPERTY TextShadowColor ROOT "Colors" SET ::InvalidateRect()
    PROPERTY BlinkColor      ROOT "Colors" SET ::__SetBlinkColor(v)
-   PROPERTY BorderColor     ROOT "Colors" DEFAULT __GetSystem():Color:Gray
+   PROPERTY BorderColor     ROOT "Colors"                      DEFAULT __GetSystem():Color:Gray
 
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
    DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
@@ -70,13 +70,13 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS Label
    DEFAULT ::__xCtrlName TO "Label"
-   ::Style := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ClsName := "Label"
+   ::Style        := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::ClsName      := "Label"
    ::Super:Init( oParent )
    ::__IsStandard := .F.
-   ::xWidth      := 80
-   ::xHeight     := 16
-   ::Events     := ;
+   ::xWidth       := 80
+   ::xHeight      := 16
+   ::Events       := ;
           { ;
             {"Command",     {;
                             { "OnClick"            , "", "" } } },;
@@ -162,7 +162,7 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hOldPen, nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
 
    hDC := ::BeginPaint()
 
@@ -176,9 +176,11 @@ METHOD OnPaint() CLASS Label
    ENDIF
    IF ::Border <> 0
       IF ::Border == -1
-         hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+         hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
+         hBrush  := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
          Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
          SelectObject( hDC, hBrush )
+         DeleteObject( SelectObject( hDC, hOldPen ) )
 
        ELSE
          _DrawEdge( hDC, aRect, ::Border, BF_RECT )
