@@ -303,8 +303,9 @@ CLASS Application
    ACCESS System                       INLINE __GetSystem() 
    ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
 
-   DATA TitleBackSysColorActive        EXPORTED INIT RGB( 255, 230, 151 )
-   DATA TitleBackSysColorInactive      EXPORTED INIT RGB(  69,  89, 124 )
+   DATA SysTitleBackColorActive        EXPORTED INIT RGB( 255, 230, 151 )
+   DATA SysTitleBackColorInactive      EXPORTED INIT RGB(  69,  89, 124 )
+
    DATA hTitleBackBrushActive          EXPORTED
    DATA hTitleBackBrushInactive        EXPORTED
    DATA CustomColors                   EXPORTED INIT Array(16)

@@ -25,7 +25,7 @@ CLASS LinkLabel INHERIT Control
    DATA ForeColor
    DATA AllowUnDock   INIT FALSE
    DATA AllowClose    INIT FALSE
-   DATA LinkSysColor  INIT RGB(0,0,255)
+   DATA __SysLinkColor  INIT RGB(0,0,255)
    DATA EnumAlignment EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
 
    PROPERTY Url

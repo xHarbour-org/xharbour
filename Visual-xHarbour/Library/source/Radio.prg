@@ -58,7 +58,7 @@ CLASS RadioButton INHERIT Control
    DATA ImageIndex EXPORTED
 
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::BackSysColor, ::__SetTransp(.T.), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
+   METHOD Create()             INLINE IIF( ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor, ::__SetTransp(.T.), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
    
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE 1

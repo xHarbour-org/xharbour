@@ -2225,9 +2225,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        
                        TRY
                           IF AT( "BackColor", oItem:Caption ) > 0
-                             :SysDefault := ::ActiveObject:BackSysColor
+                             :SysDefault := ::ActiveObject:__SysBackColor
                             ELSEIF UPPER( oItem:Caption )!= "MASKCOLOR"
-                             :SysDefault := ::ActiveObject:ForeSysColor
+                             :SysDefault := ::ActiveObject:__SysForeColor
                           ENDIF
                          catch
                        END

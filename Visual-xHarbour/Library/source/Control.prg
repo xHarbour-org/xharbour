@@ -362,8 +362,8 @@ ENDCLASS
 
 METHOD Create() CLASS TitleControl
 
-   DEFAULT ::Application:TitleBackColorInactive  TO ::Application:TitleBackSysColorInactive
-   DEFAULT ::Application:TitleBackColorActive    TO ::Application:TitleBackSysColorActive
+   DEFAULT ::Application:TitleBackColorInactive  TO ::Application:SysTitleBackColorInactive
+   DEFAULT ::Application:TitleBackColorActive    TO ::Application:SysTitleBackColorActive
 
    DEFAULT ::Application:hTitleBackBrushInactive TO CreateSolidBrush( ::Application:TitleBackColorInactive )
    DEFAULT ::Application:hTitleBackBrushActive   TO CreateSolidBrush( ::Application:TitleBackColorActive )
