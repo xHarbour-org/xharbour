@@ -887,6 +887,8 @@ CLASS Source INHERIT ProjectFile
    DATA nPrevLine EXPORTED
    DATA PrevFile  EXPORTED
    DATA __xCtrlName EXPORTED INIT "Source"
+   DATA __lSelected EXPORTED INIT .F.
+   
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -911,7 +913,7 @@ CLASS Source INHERIT ProjectFile
 
    METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos(), ::nVisLine := ::SendEditor( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
-   METHOD Select()                            INLINE ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos ), ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
+   METHOD Select()                            INLINE ::__lSelected := .T., ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos ), ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
 
    METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
@@ -952,7 +954,7 @@ CLASS Source INHERIT ProjectFile
    METHOD BeginUndoAction()                   INLINE ::SendEditor( SCI_BEGINUNDOACTION, 0, 0 )
    METHOD EndUndoAction()                     INLINE ::SendEditor( SCI_ENDUNDOACTION, 0, 0 )
 
-   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ),)
+   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, (::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ),::__lSelected := .T.),)
 
    METHOD FindText( nFlags, ttf )             INLINE ::SendEditor( SCI_FINDTEXT, nFlags, ttf )
    METHOD SearchNext( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHNEXT, nFlags, cText )
@@ -1002,6 +1004,7 @@ METHOD GetBookmarks() CLASS Source
       nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
       nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      ::__lSelected := .T.
    ENDIF
 
    nLines   := ::Owner:SendMessage( SCI_GETLINECOUNT, 0, 0 )
@@ -1027,6 +1030,7 @@ METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
    IF ! ( pSource == ::pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      ::__lSelected := .T.
    ENDIF
    xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
    IF ! ( pSource == ::pSource )
@@ -1058,7 +1062,9 @@ RETURN Self
 METHOD Close() CLASS Source
    LOCAL n
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
-//      ::ReleaseDocument()
+      IF ! ::__lSelected
+         ::ReleaseDocument()
+      ENDIF
       IF ::TreeItem != NIL
          ::TreeItem:Delete()
       ENDIF
@@ -1126,6 +1132,7 @@ METHOD GetText() CLASS Source
 
    IF ! ( ::pSource == pSource )
       ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      ::__lSelected := .T.
    ENDIF
 
    nLen := ::Owner:SendMessage( SCI_GETLENGTH, 0, 0 )+1

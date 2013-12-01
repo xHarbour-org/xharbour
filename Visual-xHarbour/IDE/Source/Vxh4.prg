@@ -1134,7 +1134,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        ENDIF
        //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-       hb_gcStep()
+       //hb_gcStep()
 
        TRY
           xValue := ::ActiveObject:&cProp
@@ -1484,7 +1484,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       ::ActiveObject:TreeItem:Select()
    ENDIF
 
-   hb_gcall()
+   hb_gcall(.T.)
 RETURN NIL
 
 METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
@@ -2799,7 +2799,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ::lPaint := .T.
    ::SetRedraw( .T. )
    ::Application:Yield()
-   hb_gcall()
+   hb_gcall(.T.)
 RETURN Self
 
 //------------------------------------------------------------------------------------------
