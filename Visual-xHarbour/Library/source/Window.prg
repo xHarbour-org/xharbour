@@ -175,9 +175,11 @@ CLASS Window INHERIT Object
 
 
 
-   VXH_METHOD MessageWait()
-   VXH_METHOD CenterWindow()
-   VXH_METHOD Animate()
+   METHOD MessageWait()
+   METHOD CenterWindow()
+   METHOD Animate()
+   METHOD Show()
+   METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
 
    METHOD Destroy()
    METHOD Disable()               INLINE ::Enabled := .F.
@@ -185,8 +187,6 @@ CLASS Window INHERIT Object
    METHOD Close()
 
    METHOD Hide()
-   VXH_METHOD Show()
-   VXH_METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
    
