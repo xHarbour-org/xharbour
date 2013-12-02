@@ -1134,7 +1134,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        ENDIF
        //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-       //hb_gcStep()
+       hb_gcStep()
 
        TRY
           xValue := ::ActiveObject:&cProp
