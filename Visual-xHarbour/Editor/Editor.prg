@@ -660,6 +660,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                            IF __ObjHasMsg( oObj, "__m_"+aMethods[n] )
                               aProp   := __objSendMsg( oObj, "__m_"+aMethods[n] )
                               AADD( aList, aProp[1]+"?7" )
+                            ELSE
+                              AADD( aList, Upper(aMethods[n][1])+Lower(SubStr(aMethods[n],2))+"?7" )
                            ENDIF
                        NEXT
 
@@ -1062,9 +1064,9 @@ RETURN Self
 METHOD Close() CLASS Source
    LOCAL n
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
-      IF ! ::__lSelected
+      //IF ! ::__lSelected
          ::ReleaseDocument()
-      ENDIF
+      //ENDIF
       IF ::TreeItem != NIL
          ::TreeItem:Delete()
       ENDIF

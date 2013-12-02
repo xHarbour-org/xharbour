@@ -173,8 +173,6 @@ CLASS Window INHERIT Object
    PROPERTY ToolTip
    PROPERTY DisableParent                                                           DEFAULT .F.
 
-
-
    METHOD MessageWait()
    METHOD CenterWindow()
    METHOD Animate()
