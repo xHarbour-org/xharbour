@@ -4677,12 +4677,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    cSourcePath := cPath + "\" + ::Properties:Source
 
    FOR EACH oItem IN ::Application:FileExplorer:ExtSource:Items
-       oFile:FileBuffer += CRLF + oItem:Cargo:File + "=" + oItem:Cargo:GetBookmarks()
-       WITH OBJECT oFile:Editor
-          IF :Modified
-             :Save()
-          ENDIF
-       END
+       IF oItem:Cargo:Modified
+          oItem:Cargo:Save()
+       ENDIF
    NEXT
 /*
    FOR n := 1 TO LEN( aEditors )
