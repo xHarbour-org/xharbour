@@ -110,9 +110,8 @@ RETURN xVal
 METHOD Create() CLASS MaskEdit
    LOCAL aTextExt := ::Drawing:GetTextExtentPoint32( 'X' )
 
-   IF ::Text == NIL
-      ::Text := SPACE( ::Width / aTextExt[1] )
-   ENDIF
+   DEFAULT ::xText TO SPACE( ::Width / aTextExt[1] )
+
    ::oGet:cargo   := ::Text
    ::oGet:Picture := ::Picture
    ::oGet:SetFocus()

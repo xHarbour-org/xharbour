@@ -130,7 +130,6 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __GetLastError() CLASS System
    LOCAL cError, nError := GetLastError()
-   VIEW InternetGetLastResponseInfo()
    cError := FormatMessage( , , nError )
    IF ! Empty( cError )
       cError := STRTRAN( cError, CRLF )

@@ -1099,22 +1099,24 @@ METHOD OnPaint() CLASS TabPage
    LOCAL hMemBitmap, hOldBitmap, hMemDC, hDC
    IF ! EMPTY( ::__aTransparent ) .AND. ( EMPTY( ::BackgroundImage ) .OR. EMPTY( ::BackgroundImage:ImageName ) ) .AND. ::BkBrush == NIL
       hDC := ::BeginPaint()
-      IF ::System:OS:Version < 6
-         hMemDC     := CreateCompatibleDC( hDC )
-         hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-         hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+      IF ::System:OS:Version >= 6 
+         IF ::Theming .AND. ::Parent:Theming .AND. IsThemeActive()
+            hMemDC     := CreateCompatibleDC( hDC )
+            hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+            hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-         SendMessage( ::hWnd, WM_PRINT, hMemDC, PRF_CLIENT )
+            SendMessage( ::hWnd, WM_PRINT, hMemDC, PRF_CLIENT )
 
-         BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+            BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
-         ::__SetTransparentChildren( hDC, hMemDC )
+            ::__SetTransparentChildren( hDC, hMemDC )
 
-         SelectObject( hMemDC,  hOldBitmap )
-         DeleteObject( hMemBitmap )
-         DeleteDC( hMemDC )
+            SelectObject( hMemDC,  hOldBitmap )
+            DeleteObject( hMemBitmap )
+            DeleteDC( hMemDC )
+         ENDIF
       ELSE
-         ::BkBrush := CreateSolidBrush( GetPixel( hDC, 1, 1 ) )
+         ::BkBrush := CreateSolidBrush( GetPixel( hDC, 2, 2 ) )
       ENDIF
       ::EndPaint()
    ENDIF

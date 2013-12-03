@@ -4613,7 +4613,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm
+   LOCAL n, cWindow := "", oFile, oForm, oItem
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
 
@@ -4676,6 +4676,15 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    cSourcePath := cPath + "\" + ::Properties:Source
 
+   FOR EACH oItem IN ::Application:FileExplorer:ExtSource:Items
+       oFile:FileBuffer += CRLF + oItem:Cargo:File + "=" + oItem:Cargo:GetBookmarks()
+       WITH OBJECT oFile:Editor
+          IF :Modified
+             :Save()
+          ENDIF
+       END
+   NEXT
+/*
    FOR n := 1 TO LEN( aEditors )
        WITH OBJECT aEditors[n]
           IF (:Modified .OR. lForce) //.AND. !EMPTY( :Path ) .AND. !EMPTY( :File )
@@ -4688,6 +4697,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           ENDIF
        END
    NEXT
+*/
 
    IF ::Application:ProjectPrgEditor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
       ::Application:ProjectPrgEditor:Save( cSourcePath + "\" + ::Properties:Name +"_Main.prg" )
@@ -4800,18 +4810,16 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
           oFile:FileBuffer := cWindow
           oFile:Save()
 
-          //::Forms[n]:XFMEditor:Reload( cWindow )
-
-          IF ::Forms[n]:Editor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
-             xPath := cSourcePath
-             xName := ::Forms[n]:Name + ".prg"
-             IF x == 2
-                xPath := oFile:Path
-             ENDIF
-             ::Forms[n]:Editor:Save( xPath + "\" + xName )
-          ENDIF
-
           ::Forms[n]:__lModified := .F.
+       ENDIF
+
+       IF ::Forms[n]:Editor:Modified .OR. lForce .OR. !FILE( cSourcePath + "\" + ::Forms[n]:Name + ".prg" )
+          xPath := cSourcePath
+          xName := ::Forms[n]:Name + ".prg"
+          IF x == 2
+             xPath := oFile:Path
+          ENDIF
+          ::Forms[n]:Editor:Save( xPath + "\" + xName )
        ENDIF
    NEXT
 
