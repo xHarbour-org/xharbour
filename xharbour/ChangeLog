@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2013-12-09  16:16  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+* contrib/tipssl/sendmail.prg
+    ! minor fix
+    
+    
 2013-10-30 23:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/minmax.c
     ! fixed MAX() and MIN() functions to work with datetime
