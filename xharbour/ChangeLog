@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2013-12-09  16:16  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
-* contrib/tipssl/sendmail.prg
+2013-12-09 17:16 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * contrib/tipssl/sendmail.prg
     ! minor fix
-    
-    
+
+2013-12-09  16:16  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/tipssl/sendmail.prg
+    ! minor fix
+
+
 2013-10-30 23:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/minmax.c
     ! fixed MAX() and MIN() functions to work with datetime
@@ -29,14 +33,14 @@
   * source/tip/client.prg
     contrib/tipssl/client.prg
      ! minor fix for this morning commit
-     
+
 2013-09-03 10:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/client.prg
     contrib/tipssl/client.prg
     * fixed read method to allow long http response
   * contrib/tipssl/httpcln.prg
     * change to allow Connection: field in http header allow other values then close
-    
+
 2013-08-21 10:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/sendmail.prg
     ! changes for blind carbon copy and speedup read results from smtp server responses
@@ -44,8 +48,8 @@
 2013-07-05 13:10 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * xharbour.spec
    bin/pack_src.sh
-    ! fixes to build libmisc.a 
-    
+    ! fixes to build libmisc.a
+
 2013-06-23 21:50 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/sendmail.prg
     ! fixed wrong variable name
@@ -60,7 +64,7 @@
 2013-06-21 12:57 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/pp/ppgen.c
     * Unused variables warning
-    
+
 2013-06-20 12:26 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/compiler/comptool.c
     * Commented an #ifndef __HB_COMPILER__ (I am not yet sure about this :-)
@@ -70,14 +74,14 @@
   + xcode/xHarbour.xcodeproj
     * Initial attempt in building from SVN with unmodified Xcode 4.6, and no additional tools, using a native project
       So far it does build ppgen, and the compiler (using yacc).
-      /* 
+      /*
           WARNING: Make sure to connect the Xcode SVN to a local folder which dos NOT have Spaces in its name
           because I did not yet find away to stringify arguments to ppgen without stringifying the switch too.
           on first look, the stringifying of $(MACROS) in an external build phase appears buggy :-(
        */
       I am very new to Xcode, and this is really just an experiment at this time, so any help and direction
       will be appreciated. :-)
-      
+
 2013-06-17 13:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/client.prg
   * source/tip/ftpcln.prg
@@ -152,7 +156,7 @@
   * source/tip/mail.prg
   * source/tip/sendmail.prg
     ! minor fix 7-bit to 7bit
-  
+
 2013-05-11 14:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/client.prg
   * source/tip/ftpcln.prg

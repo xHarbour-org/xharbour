@@ -298,7 +298,8 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       CATCH
          lReturn := .F.
       END
-      if !oInmail:lSSL  .and. lSSL
+      
+      if !lReturn .AND. !oInmail:lSSL  .and. lSSL
          oInmail:lSSL := .T.
       endif
 
@@ -331,8 +332,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       ELSEIF Valtype( aThisFile ) == "A" .AND. Len( aThisFile ) >= 2
          cFile := aThisFile[ 1 ]
       ELSE
-         lReturn := .F.
-         EXIT
+         //lReturn := .F.
+         //EXIT
+         LOOP
       ENDIF
 
       omail:AttachFile( cFile )
