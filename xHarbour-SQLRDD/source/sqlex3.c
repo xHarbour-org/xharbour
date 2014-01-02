@@ -209,7 +209,6 @@ BOOL CreateSeekStmt( SQLEXAREAP thiswa, int queryLevel )
    if( thiswa->bConditionChanged2 || thiswa->bRebuildSeekQuery ||
      ( thiswa->recordListDirection == LIST_FORWARD  && (! SeekBind->SeekFwdStmt ) ) ||
      ( thiswa->recordListDirection == LIST_BACKWARD && (! SeekBind->SeekBwdStmt ) ) )
-     
    {
 
       pIndexRef = hb_arrayGetItemPtr( thiswa->aOrders, ( ULONG ) thiswa->hOrdCurrent );
@@ -286,11 +285,13 @@ HB_ERRCODE FeedSeekKeyToBindings( SQLEXAREAP thiswa, PHB_ITEM pKey, int * queryL
          {
             SQLFreeStmt( SeekBind->SeekFwdStmt, SQL_DROP );
             SeekBind->SeekFwdStmt = NULL;
+            thiswa->bRebuildSeekQuery = TRUE;
          }
          if ( SeekBind->SeekBwdStmt )
          {
             SQLFreeStmt( SeekBind->SeekBwdStmt, SQL_DROP );
             SeekBind->SeekBwdStmt = NULL;
+            thiswa->bRebuildSeekQuery = TRUE;
          }
 
          SeekBind++;
@@ -544,7 +545,10 @@ void BindSeekStmt( SQLEXAREAP thiswa, int queryLevel )
       if( !BindStructure->isArgumentNull )
       {
 
-       if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+       // Corrigido 27/12/2013 09:53 - lpereira
+       // Estava atribuindo o valor de SYSTEMID_ORACLE para thiswa->nSystemID.
+       //if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+       if ( thiswa->nSystemID == SYSTEMID_ORACLE )
           if ( BindStructure->iCType == SQL_C_TYPE_DATE ) 
 	           BindStructure->iCType = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
 	           
@@ -573,11 +577,17 @@ void BindSeekStmt( SQLEXAREAP thiswa, int queryLevel )
             case SQL_C_TYPE_TIMESTAMP:
             {
 	            //DebugBreak();
+               //res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
+               //                        SQL_C_TYPE_DATE,
+               //                        SQL_TYPE_DATE,
+               //                        SQL_TIMESTAMP_LEN,
+               //                        0,
+               //                        &(BindStructure->asTimestamp), 0, 0 );
                res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
-                                       SQL_C_TYPE_DATE,
-                                       SQL_TYPE_DATE,
+                                          SQL_C_TYPE_TIMESTAMP,
+                                          SQL_TYPE_TIMESTAMP,
                                        SQL_TIMESTAMP_LEN,
-                                       0,
+                                          thiswa->nSystemID == SYSTEMID_MSSQL7 ||thiswa->nSystemID == SYSTEMID_AZURE ? 3 : 0,
                                        &(BindStructure->asTimestamp), 0, 0 );
                break;
             }
@@ -634,7 +644,8 @@ HB_ERRCODE getPreparedSeek( SQLEXAREAP thiswa, int queryLevel, USHORT * iIndex, 
    if ( CHECK_SQL_N_OK( res ) )
    {
       odbcErrorDiagRTE( * hStmt, "getPreparedSeek", "", res, __LINE__, __FILE__ );
-      SQLCloseCursor( * hStmt );
+//       SQLCloseCursor( * hStmt );
+      SQLFreeStmt( * hStmt, SQL_CLOSE );
       return (HB_FAILURE);
    }
 
@@ -648,7 +659,7 @@ HB_ERRCODE getPreparedSeek( SQLEXAREAP thiswa, int queryLevel, USHORT * iIndex, 
 
    if( res == SQL_ERROR )
    {
-      SQLFreeStmt( * hStmt, SQL_DROP );
+      SQLFreeStmt( * hStmt, SQL_CLOSE );
       return (HB_FAILURE);
    }
 
@@ -658,7 +669,7 @@ HB_ERRCODE getPreparedSeek( SQLEXAREAP thiswa, int queryLevel, USHORT * iIndex, 
       res = SQLGetData( * hStmt, 2, SQL_C_CHAR, szValue, 2, NULL );
       if( res == SQL_ERROR )
       {
-         SQLFreeStmt( * hStmt, SQL_DROP );
+         SQLFreeStmt( * hStmt, SQL_CLOSE );
          return (HB_FAILURE);
       }
       else

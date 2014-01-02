@@ -207,7 +207,6 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
       bMultiLang   = hb_arrayGetL( pFieldStruct, FIELD_MULTILANG );
       bIsMemo      = cType == 'M';
 
-  
       if( i != (int)(thiswa->ulhRecno) )      // RECNO is never included in INSERT column list
       {
          temp = hb_strdup( (const char *) sFields );
@@ -276,7 +275,10 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
         
          case 'D':
          {
-	        if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+           // Corrigido 27/12/2013 09:53 - lpereira
+           // Estava atribuindo o valor de SYSTEMID_ORACLE para thiswa->nSystemID.
+           //if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+	        if ( thiswa->nSystemID == SYSTEMID_ORACLE )
 	           InsertRecord->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
 	        else
             InsertRecord->iCType          = lType;        // May be DATE or TIMESTAMP
@@ -448,7 +450,7 @@ HB_ERRCODE BindInsertColumns( SQLEXAREAP thiswa )
                                        SQL_C_TYPE_TIMESTAMP,
                                        SQL_TYPE_TIMESTAMP,
                                        SQL_TIMESTAMP_LEN,
-                                       0,
+                                       thiswa->nSystemID == SYSTEMID_MSSQL7 ||thiswa->nSystemID == SYSTEMID_AZURE ? 3 : 0 ,
                                        &(InsertRecord->asTimestamp), 0, &(InsertRecord->lIndPtr) );
                break;
             }
@@ -789,7 +791,7 @@ HB_ERRCODE CreateUpdateStmt( SQLEXAREAP thiswa )
                                        SQL_C_TYPE_TIMESTAMP,
                                        SQL_TYPE_TIMESTAMP,
                                        SQL_TIMESTAMP_LEN,
-                                       0,
+                                       thiswa->nSystemID == SYSTEMID_MSSQL7 ||thiswa->nSystemID == SYSTEMID_AZURE ? 3 : 0 ,
                                        &(CurrRecord->asTimestamp), 0, &(CurrRecord->lIndPtr) );
                break;
             }

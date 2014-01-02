@@ -3670,8 +3670,12 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stod(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted )  .and. lsoft
+                  ::aInfo[ AINFO_FOUND ] := (  dtos( ::aLocalBuffer[::aPosition[i]]) >= dtos(::aDat[i]) )   
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )                     
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted )     .and. lsoft
+                  ::aInfo[ AINFO_FOUND ] := ( ttos( ::aLocalBuffer[::aPosition[i]]) >=  ttos(::aDat[i]) )                     
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -3941,8 +3945,12 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stod(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted )  .and. lsoft
+                  ::aInfo[ AINFO_FOUND ] := (  dtos( ::aLocalBuffer[::aPosition[i]]) >= dtos(::aDat[i]) )                    
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )                     
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted )    .and. lsoft
+                  ::aInfo[ AINFO_FOUND ] := ( ttos( ::aLocalBuffer[::aPosition[i]]) >=  ttos(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -4166,8 +4174,12 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = stot(::aDat[i]) )                  
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( dtos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( dtos(::aDat[i]), ::nPartialDateSeek ) )
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "D" .and. valtype( ::aDat[i] ) == "D" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted ) .and. lsoft
+                  ::aInfo[ AINFO_FOUND ] := (  dtos( ::aLocalBuffer[::aPosition[i]]) >= dtos(::aDat[i]) )                     
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek > 0 .and. i == len( ::aQuoted )
                   ::aInfo[ AINFO_FOUND ] := ( Left( ttos( ::aLocalBuffer[::aPosition[i]]), ::nPartialDateSeek ) == Left( ttos(::aDat[i]), ::nPartialDateSeek ) )   
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "T" .and. valtype( ::aDat[i] ) == "T" .and. ::nPartialDateSeek == 0 .and. i == len( ::aQuoted )  .and. lsoft  
+                  ::aInfo[ AINFO_FOUND ] := ( ttos( ::aLocalBuffer[::aPosition[i]]) >=  ttos(::aDat[i]) )                                                         
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) != valtype( ::aDat[i] )
                   ::RuntimeErr( "28" )
                   Set( _SET_EXACT, uSet )
@@ -6182,6 +6194,7 @@ METHOD sqlOrderListAdd( cBagName, cTag ) CLASS SR_WORKAREA
             cSqlD += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ DESC,]
 
          endif   
+         exit
          Case SYSTEMID_IBMDB2
             If "08.0" $ ::oSql:cSystemVers .and. (!"08.00" $ ::oSql:cSystemVers)
                cSqlA += [ A.] + SR_DBQUALIFY( cCol, ::oSql:nSystemID ) + [ NULLS FIRST,]

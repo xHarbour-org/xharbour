@@ -8,6 +8,29 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+
+2014-01-02 20:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  *  source/sqlorax.c
+    ! added functions GETORAHANDLE and SETORAHANDLE
+  *  source/sqlora2.c
+    ! Removed unneaded tracelogs
+    ! some fixes on ORACLEINBINDPARAM()
+    ! added functions SQLO_ORACLESETLOBPREFETCH , SQLO_SETSTATEMENTCACHESIZE, SQLO_GETSTATEMENTCACHESIZE,GETORAHANDLE,SETORAHANDLE
+  * source/sqlex.h
+    * COLUMN_BLOCK_SIZE increase size from 8k to 32k
+  * source/sqlrdd2.prg
+    ! fix when softseeking complete date index
+  * source/sqlex1.c     
+  * source/sqlex2.c
+  * source/sqlex3.c
+    ! fixed close cursors
+    ! fixed bind problems for datetime fields when using sqlserver native cliemt 10.x
+  * source/oraedit.prg
+    source/oraclip.prg
+    ! some fixes
+      
+
 2013-09-27 20:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
   * source/oraedit.prg
   * source/oraclip.prg 

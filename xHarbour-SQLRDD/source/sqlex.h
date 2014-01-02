@@ -20,7 +20,7 @@
 #define MAX_INDEX_COLS                        10  // Seek will work on indexes with up to MAX_INDEX_COLS columns
 #define PREPARED_SQL_LEN                     400
 #define RECORD_LIST_SIZE                     250
-#define COLUMN_BLOCK_SIZE                   8192
+#define COLUMN_BLOCK_SIZE                   32768
 #define FIELD_LIST_SIZE                     6000
 #define MAX_SQL_QUERY_LEN                  32000
 #define PAGE_READ_SIZE                        50

@@ -47,6 +47,7 @@ Quick to do list, 2009 feb 23:
 
 #include "sqlex.h"
 
+#include <time.h>
 static RDDFUNCS sqlExSuper;
 
 /*static PHB_DYNS s_pSym_SOLVERESTRICTORS;*/
@@ -374,8 +375,11 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
    char * colName;
    char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
    HB_ERRCODE res;
-   PTR bBuffer;
-   LONG lLenOut, lLen;
+   PTR bBuffer,bOut;
+   LONG lLenOut, lLen, lInitBuff, lIndex;
+   int     iReallocs  = 0;
+   RETCODE wResult;
+   int iError = 0;
 
    pFieldStruct = hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB );
 
@@ -445,9 +449,11 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
    memset( bBuffer, 0, COLUMN_BLOCK_SIZE ) ;
    lLen        = COLUMN_BLOCK_SIZE;
    lLenOut     = 0;
-
+   iReallocs  = 0;
+   bOut       = NULL;
+   lInitBuff  = COLUMN_BLOCK_SIZE;
    res = SQLGetData( thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR, ( PTR ) bBuffer, lLen, &lLenOut );
-   if( res == SQL_SUCCESS )
+   if( res == SQL_SUCCESS || res  == SQL_SUCCESS_WITH_INFO)
    {
       odbcFieldGet( hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, FALSE );
    }
@@ -954,11 +960,18 @@ static void BindAllIndexStmts( SQLEXAREAP thiswa )
                   case SQL_C_TYPE_TIMESTAMP:
                   {
                      //DebugBreak();
+                     //res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
+                     //                        SQL_C_TYPE_TIMESTAMP,
+                     //                        SQL_TYPE_TIMESTAMP,
+                     //                        SQL_TIMESTAMP_LEN,
+                     //                        0,
+                     //                        &(BindStructure->asTimestamp), 0, 0 );
+
                      res = SQLBindParameter( hStmt, iBind, SQL_PARAM_INPUT,
                                              SQL_C_TYPE_TIMESTAMP,
                                              SQL_TYPE_TIMESTAMP,
                                              SQL_TIMESTAMP_LEN,
-                                             0,
+                                             thiswa->nSystemID == SYSTEMID_MSSQL7 ||thiswa->nSystemID == SYSTEMID_AZURE ? 3 : 0 ,
                                              &(BindStructure->asTimestamp), 0, 0 );
                      break;
                   }
@@ -1343,7 +1356,11 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
          case 'D':
          {
 //             BindStructure->iCType          = lType;    // DATE or TIMESTAMP
-	        if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+
+           // Corrigido 27/12/2013 09:53 - lpereira
+           // Estava atribuindo o valor de SYSTEMID_ORACLE para thiswa->nSystemID.
+           //if ( thiswa->nSystemID = SYSTEMID_ORACLE )
+	        if ( thiswa->nSystemID == SYSTEMID_ORACLE )
 	           BindStructure->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
 	        else
                BindStructure->iCType          = lType;        // May be DATE or TIMESTAMP
@@ -1647,7 +1664,7 @@ static HB_ERRCODE getPreparedRecordList( SQLEXAREAP thiswa, int iMax ) // Return
       res = SQLGetData( hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof( SQL_C_ULONG ), NULL );
       if( res == SQL_ERROR )
       {
-         SQLFreeStmt( hStmt, SQL_DROP );
+         SQLFreeStmt( hStmt, SQL_CLOSE );
          return (HB_FAILURE);
       }
 
@@ -1659,7 +1676,7 @@ static HB_ERRCODE getPreparedRecordList( SQLEXAREAP thiswa, int iMax ) // Return
          res = SQLGetData( hStmt, 2, SQL_C_CHAR, szValue, 2, NULL );
          if( res == SQL_ERROR )
          {
-            SQLFreeStmt( hStmt, SQL_DROP );
+            SQLFreeStmt( hStmt, SQL_CLOSE );
             return (HB_FAILURE);
          }
          else
@@ -1736,7 +1753,7 @@ static HB_ERRCODE getRecordList( SQLEXAREAP thiswa, int iMax ) // Returns TRUE i
       res = SQLGetData( thiswa->hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof( SQL_C_ULONG ), NULL );
       if( res == SQL_ERROR )
       {
-         SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+         SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
          return (HB_FAILURE);
       }
 
@@ -1748,7 +1765,7 @@ static HB_ERRCODE getRecordList( SQLEXAREAP thiswa, int iMax ) // Returns TRUE i
          res = SQLGetData( thiswa->hStmt, 2, SQL_C_CHAR, szValue, 2, NULL );
          if( res == SQL_ERROR )
          {
-            SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+            SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
             return (HB_FAILURE);
          }
          else
@@ -1769,7 +1786,7 @@ static HB_ERRCODE getRecordList( SQLEXAREAP thiswa, int iMax ) // Returns TRUE i
       }
    }
 
-   SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+   SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
 
    if( recordListChanged )
    {
@@ -1800,18 +1817,18 @@ static HB_ERRCODE getFirstColumnAsLong( SQLEXAREAP thiswa, long * szValue ) // R
    res = SQLFetch( thiswa->hStmt );
    if( res == SQL_ERROR )
    {
-      SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+      SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
       return (HB_FAILURE);    // It means a fault in SQL statement
    }
 
    res = SQLGetData( thiswa->hStmt, 1, SQL_C_ULONG, szValue, sizeof( SQL_C_ULONG ), NULL );
    if( res == SQL_ERROR )
    {
-      SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+      SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
       return (HB_FAILURE);
    }
 
-   SQLFreeStmt( thiswa->hStmt, SQL_DROP );
+   SQLFreeStmt( thiswa->hStmt, SQL_CLOSE );
 
    return HB_SUCCESS;
 }
@@ -2025,7 +2042,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
       if ( thiswa->hStmtBuffer )
       {
-         res = SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
+         res = SQLFreeStmt( thiswa->hStmtBuffer, SQL_CLOSE );
          if ( CHECK_SQL_N_OK( res ) )
          {
 	         
@@ -2099,7 +2116,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       res = SQLGetData( thiswa->hStmtBuffer, 1, SQL_C_ULONG, &(lCurrRecord), sizeof( SQL_C_ULONG ), NULL );
       if( res == SQL_ERROR )
       {
-         SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
+         SQLFreeStmt( thiswa->hStmtBuffer, SQL_CLOSE );
          //thiswa->hStmtBuffer =NULL;
          
          return (HB_FAILURE);
@@ -2117,7 +2134,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
             res = SQLGetData( thiswa->hStmtBuffer, 2, SQL_C_CHAR, szValue, 2, NULL );
             if( res == SQL_ERROR )
             {
-               SQLFreeStmt( thiswa->hStmtBuffer, SQL_DROP );
+               SQLFreeStmt( thiswa->hStmtBuffer, SQL_CLOSE );
 
                //thiswa->hStmtBuffer =NULL;
                
@@ -2756,7 +2773,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
    USHORT iIndex, i;
    HB_ERRCODE res, retvalue = HB_SUCCESS;
    PHB_ITEM pNewKey = NULL;
-   HSTMT hStmt;
+   HSTMT hStmt = NULL;
 
    thiswa->lpdbPendingRel = NULL;
    thiswa->firstinteract = 0;
@@ -2812,6 +2829,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       return HB_FAILURE;
    }
 
+   thiswa->bRebuildSeekQuery = TRUE;
    if( CreateSeekStmt( thiswa, queryLevel ) )      // Create and prepare new SEEK statement, if needed
    {
       BindSeekStmt( thiswa, queryLevel );          // Bind parameters to IndexBind structure
@@ -2907,7 +2925,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       hb_itemRelease( aRecord );
       //hb_xfree( ( PTR ) bBuffer );
       SQLFreeStmt( hStmt, SQL_CLOSE );
-
+    
       // End search code
 
       iComp = sqlKeyCompareEx( thiswa, pKey, FALSE );
@@ -2958,7 +2976,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       sqlGetCleanBuffer( thiswa );
       thiswa->area.fFound = FALSE;
    }
-
+   thiswa->bRebuildSeekQuery = TRUE;
    if( pNewKey )
       hb_itemRelease( pNewKey );
 
@@ -3580,8 +3598,6 @@ static HB_ERRCODE sqlExPutValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
    char * cfield;
    double dNum;
    USHORT len, dec, fieldindex;
-
-   // TraceLog( NULL, "sqlPutValue, writing column %i\n", fieldNum );
 
    if( thiswa->firstinteract )
    {
@@ -4624,8 +4640,6 @@ static int sqlKeyCompareEx( SQLEXAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    BYTE len1, len2;
    const char * val1, * val2;
    char * valbuf = NULL;
-
-   // TraceLog( NULL, "sqlKeyCompare\n" );
 
    pTag = loadTagDefault( thiswa, NULL, &lorder );
    if( pTag )
