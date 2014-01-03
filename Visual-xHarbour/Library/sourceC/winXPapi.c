@@ -271,13 +271,20 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
 
    if( pArray )
    {
+      RECT pRect, pRect1;
+
       HTHEME hTheme   = (HTHEME) hb_parnl(1);
       HDC    hDC      = (HDC) hb_parnl(2);
       int    iPartId  = hb_parni(3);
       int    iStateId = hb_parni(4);
+      PHB_ITEM pClip  = hb_param( 6, HB_IT_ARRAY );
 
-      RECT pRect;
       Array2Rect( pArray, &pRect );
+
+      if( pClip )
+      {
+         Array2Rect( pClip, &pRect1 );
+      }
 
       if( hUxTheme )
       {
@@ -285,7 +292,14 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
 
           if( pfn )
           {
-              nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, &pRect, NULL );
+             if( pClip )
+             {
+                nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, &pRect, &pRect1 );
+             }
+             else
+             {
+                nRet = (HRESULT) pfn( hTheme, hDC, iPartId, iStateId, &pRect, NULL );
+             }
           }
       }
    }

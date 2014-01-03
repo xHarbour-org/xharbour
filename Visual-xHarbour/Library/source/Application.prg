@@ -226,9 +226,10 @@ CLASS Application
 
    PROPERTY Icon                   ROOT "Appearance" DEFAULT ""
    PROPERTY Cursor                 ROOT "Appearance"
-   PROPERTY TitleBackColorActive   ROOT "Appearance" DEFAULT RGB( 255, 230, 151 )
-   PROPERTY TitleBackColorInactive ROOT "Appearance" DEFAULT RGB(  69,  89, 124 )
    PROPERTY EditBoxFocusBorder     ROOT "Appearance" DEFAULT .F.
+
+   PROPERTY TitleBackColorActive   ROOT "Colors"     DEFAULT RGB( 255, 230, 151 )
+   PROPERTY TitleBackColorInactive ROOT "Colors"     DEFAULT RGB(  69,  89, 124 )
 
    PROPERTY Version                ROOT "Data"       DEFAULT "1.0.0.0"
    PROPERTY Company                ROOT "Data"       DEFAULT ""
@@ -303,8 +304,8 @@ CLASS Application
    ACCESS System                       INLINE __GetSystem() 
    ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
 
-   DATA SysTitleBackColorActive        EXPORTED INIT RGB( 255, 230, 151 )
-   DATA SysTitleBackColorInactive      EXPORTED INIT RGB(  69,  89, 124 )
+   DATA __SysTitleBackColorActive      EXPORTED INIT RGB( 255, 230, 151 )
+   DATA __SysTitleBackColorInactive    EXPORTED INIT RGB(  69,  89, 124 )
 
    DATA hTitleBackBrushActive          EXPORTED
    DATA hTitleBackBrushInactive        EXPORTED
@@ -356,7 +357,7 @@ CLASS Application
    DATA __CustomOwner                  EXPORTED  INIT .F.
    DATA __lMoveable                    EXPORTED  INIT .F.
    DATA __lResizeable                  EXPORTED  INIT .F.
-
+   DATA __lCopyCut                     EXPORTED  INIT .F.
    DATA __InstMsg                      PROTECTED
    DATA lExit                          PROTECTED INIT .F.
    

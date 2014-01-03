@@ -25,6 +25,7 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS CustomControl INHERIT Control
+   DATA BackgroundImage PROTECTED
    PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
    PROPERTY Reference
 

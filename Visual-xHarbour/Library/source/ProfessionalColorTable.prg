@@ -41,6 +41,7 @@ CLASS ProfessionalColorTable
    DATA ImageMarginRevealedGradientEnd       EXPORTED
    DATA ImageMarginRevealedGradientMiddle    EXPORTED
    DATA MenuBorder                           EXPORTED
+   DATA MenuBackground                       EXPORTED
    DATA MenuItemBorder                       EXPORTED
    DATA MenuItemPressedGradientBegin         EXPORTED
    DATA MenuItemPressedGradientEnd           EXPORTED
@@ -129,6 +130,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := RGB(216, 213, 206)
            ::ImageMarginRevealedGradientMiddle      := RGB(225, 222, 217)
            ::MenuBorder                             := RGB(102, 102, 102)
+           ::MenuBackground                         := GetSysColor( COLOR_WINDOW )
            ::MenuItemBorder                         := GetSysColor( COLOR_HIGHLIGHT )
            ::MenuItemPressedGradientBegin           := RGB(245, 244, 242)
            ::MenuItemPressedGradientEnd             := RGB(234, 232, 228)
@@ -187,6 +189,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := IIF( ::UseSystemColors, RGB(238, 235, 220), RGB(114, 155, 215) )
            ::ImageMarginRevealedGradientMiddle      := IIF( ::UseSystemColors, RGB(242, 240, 228), RGB(161, 197, 249) )
            ::MenuBorder                             := IIF( ::UseSystemColors, RGB(138, 134, 122), RGB(0, 45, 150) )
+           ::MenuBackground                         := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
            ::MenuItemBorder                         := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(0, 0, 128) )
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(251, 250, 246), RGB(227, 239, 255) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(246, 244, 236), RGB(123, 164, 224) )
@@ -245,6 +248,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := IIF( ::UseSystemColors, RGB(238, 235, 220), RGB(160, 177, 116) )
            ::ImageMarginRevealedGradientMiddle      := IIF( ::UseSystemColors, RGB(242, 240, 228), RGB(186, 201, 143) )
            ::MenuBorder                             := IIF( ::UseSystemColors, RGB(138, 134, 122), RGB(117, 141, 94) )
+           ::MenuBackground                         := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
            ::MenuItemBorder                         := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(63, 93, 56) )
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(251, 250, 246), RGB(237, 240, 214) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(246, 244, 236), RGB(181, 196, 143) )
@@ -303,6 +307,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(118, 116, 151) )
            ::ImageMarginRevealedGradientMiddle      := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(184, 185, 202) )
            ::MenuBorder                             := IIF( ::UseSystemColors, RGB(126, 126, 129), RGB(124, 124, 148) )
+           ::MenuBackground                         := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
            ::MenuItemBorder                         := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(75, 75, 111) )
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(248, 248, 249), RGB(232, 233, 242) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(240, 239, 241), RGB(172, 170, 194) )
@@ -361,6 +366,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := IIF( ::UseSystemColors, RGB(237, 235, 239), RGB(228, 226, 230) )
            ::ImageMarginRevealedGradientMiddle      := IIF( ::UseSystemColors, RGB(241, 240, 242), RGB(241, 240, 242) )
            ::MenuBorder                             := IIF( ::UseSystemColors, RGB(134, 133, 136), RGB(134, 133, 136) )
+           ::MenuBackground                         := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
            ::MenuItemBorder                         := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(51, 94, 168) )
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(250, 250, 251), RGB(252, 252, 252) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(245, 244, 246), RGB(245, 244, 246) )
@@ -419,6 +425,7 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ImageMarginRevealedGradientEnd         := RGB(245, 245, 245)
            ::ImageMarginRevealedGradientMiddle      := RGB(247, 247, 247)
            ::MenuBorder                             := RGB(128, 128, 128)
+           ::MenuBackground                         := GetSysColor( COLOR_WINDOW )
            ::MenuItemBorder                         := GetSysColor( COLOR_HIGHLIGHT )
            ::MenuItemPressedGradientBegin           := RGB(252, 252, 252)
            ::MenuItemPressedGradientEnd             := RGB(250, 250, 250)

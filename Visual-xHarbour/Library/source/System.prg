@@ -44,6 +44,9 @@ EXIT PROCEDURE __SystemCleanup
    IF oSystem:hHeaderTheme != NIL
       CloseThemeData( oSystem:hHeaderTheme )
    ENDIF
+   IF oSystem:hTabTheme != NIL
+      CloseThemeData( oSystem:hTabTheme )
+   ENDIF
    oSystem:ImageList[ "StdSmall" ]:Destroy()
    DeleteObject( oSystem:FocusPen )
    DeleteObject( oSystem:TitleBackBrush )
@@ -101,8 +104,10 @@ CLASS System
    DATA hRich20                 EXPORTED
 
    DATA hFont                   EXPORTED
+
    DATA hButtonTheme            EXPORTED
    DATA hHeaderTheme            EXPORTED
+   DATA hTabTheme               EXPORTED
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -764,6 +769,7 @@ METHOD Init() CLASS System
 
    ::hButtonTheme   := OpenThemeData(,"button")
    ::hHeaderTheme   := OpenThemeData(,"HEADER")
+   ::hTabTheme      := OpenThemeData(,"TAB")
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------

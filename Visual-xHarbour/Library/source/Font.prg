@@ -45,14 +45,15 @@ CLASS Font
    PROPERTY nUnderline   SET (::xnUnderline := v, ::Modify(v)) NOTPUBLIC
    PROPERTY nStrikeOut   SET (::xnStrikeOut := v, ::Modify(v)) NOTPUBLIC
 
-   DATA Handle         EXPORTED
-   DATA Parent         EXPORTED
-   DATA ClsName        EXPORTED INIT "Font"
-   DATA OutPrecision   EXPORTED
-   DATA ClipPrecision  EXPORTED
-   DATA PitchAndFamily EXPORTED
-   DATA Shared         EXPORTED INIT .F.
-   DATA ncm            EXPORTED
+   DATA Handle           EXPORTED
+   DATA Parent           EXPORTED
+   DATA ClsName          EXPORTED INIT "Font"
+   DATA OutPrecision     EXPORTED
+   DATA ClipPrecision    EXPORTED
+   DATA PitchAndFamily   EXPORTED
+   DATA Shared           EXPORTED INIT .F.
+   DATA ncm              EXPORTED
+   DATA lCreateHandle    EXPORTED INIT .T.
    DATA __IsInstance     EXPORTED INIT .F.
    DATA __ClassInst      EXPORTED
    DATA __ExplorerFilter EXPORTED INIT {;
@@ -122,8 +123,9 @@ METHOD Create() CLASS Font
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
    
    ::Delete()
-   ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
-   
+   IF ::lCreateHandle
+      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
+   ENDIF   
    ::xFaceName     := cFont
 
    ::xHeight       := ::ncm:lfMessageFont:lfHeight
@@ -277,9 +279,11 @@ METHOD Modify() CLASS Font
       lf:lfPitchAndFamily := ::PitchAndFamily
 
       ::Delete()
-      ::Handle := CreateFontIndirect( lf )
-      IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
-         ::Set( ::Parent )
+      IF ::lCreateHandle
+         ::Handle := CreateFontIndirect( lf )
+         IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
+            ::Set( ::Parent )
+         ENDIF
       ENDIF
    ENDIF
 RETURN Self

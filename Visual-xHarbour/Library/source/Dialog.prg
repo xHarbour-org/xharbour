@@ -145,10 +145,6 @@ METHOD PreInitDialog() CLASS Dialog
    ::sih:cbSize := ::sih:sizeof()
    ::sih:nMin   := 0
 
-   //IF ::Parent != NIL .AND. !::Parent:Flat .AND. ::Parent:ClsName == "SysTabControl32" .AND. ::Application != NIL  .AND. ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Application:IsThemedXP .AND. ::Theming
-      //::EnableThemeDialogTexture( ETDT_ENABLETAB )
-   //ENDIF
-
    nLeft   := ::Left
    nTop    := ::Top
    nWidth  := ::Width
@@ -172,43 +168,46 @@ METHOD PreInitDialog() CLASS Dialog
 
    __SetObjPtr( Self )
 
-   hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
-   WHILE hWnd != 0
+   IF ::Template != NIL
 
-      cClass := GetClassName( hWnd )
+      hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
+      WHILE hWnd != 0
 
-      IF cClass != NIL
-         //TraceLog( cClass )
-         nStyle := GetWindowLong( hWnd, GWL_STYLE )
+         cClass := GetClassName( hWnd )
 
-         IF cClass == "Static"
-            oCtrl := Label( Self )
-          ELSEIF cClass == "SysListView32"
-            oCtrl := ListView( Self )
-          ELSEIF cClass == "Button" .AND. nStyle & BS_GROUPBOX == BS_GROUPBOX
-            oCtrl := GroupBox( Self )
-          ELSEIF cClass == "Button" .AND. ( nStyle & BS_RADIOBUTTON == BS_RADIOBUTTON .OR. nStyle & BS_AUTORADIOBUTTON == BS_AUTORADIOBUTTON )
-            oCtrl := RadioButton( Self )
-          ELSEIF cClass == "Button" .AND. ( nStyle & BS_CHECKBOX == BS_CHECKBOX .OR. nStyle & BS_AUTOCHECKBOX == BS_AUTOCHECKBOX )
-            oCtrl := CheckBox( Self )
-          ELSE
-            oCtrl := &cClass( Self )
+         IF cClass != NIL
+            //TraceLog( cClass )
+            nStyle := GetWindowLong( hWnd, GWL_STYLE )
+
+            IF cClass == "Static"
+               oCtrl := Label( Self )
+             ELSEIF cClass == "SysListView32"
+               oCtrl := ListView( Self )
+             ELSEIF cClass == "Button" .AND. nStyle & BS_GROUPBOX == BS_GROUPBOX
+               oCtrl := GroupBox( Self )
+             ELSEIF cClass == "Button" .AND. ( nStyle & BS_RADIOBUTTON == BS_RADIOBUTTON .OR. nStyle & BS_AUTORADIOBUTTON == BS_AUTORADIOBUTTON )
+               oCtrl := RadioButton( Self )
+             ELSEIF cClass == "Button" .AND. ( nStyle & BS_CHECKBOX == BS_CHECKBOX .OR. nStyle & BS_AUTOCHECKBOX == BS_AUTOCHECKBOX )
+               oCtrl := CheckBox( Self )
+             ELSE
+               oCtrl := &cClass( Self )
+            ENDIF
+
+            oCtrl:hWnd := hWnd
+            oCtrl:Id   := GetDlgCtrlID( hWnd )
+            oCtrl:GetClientRect()
+            oCtrl:GetWindowRect()
+
+            __SetObjPtr( oCtrl )
+
+            AADD( ::Children, oCtrl )
          ENDIF
 
-         oCtrl:hWnd := hWnd
-         oCtrl:Id   := GetDlgCtrlID( hWnd )
-         oCtrl:GetClientRect()
-         oCtrl:GetWindowRect()
-
-         __SetObjPtr( oCtrl )
-
-         AADD( ::Children, oCtrl )
-      ENDIF
-
-      hWnd   := GetWindow( hWnd, GW_HWNDNEXT )
-   ENDDO
-   IF !EMPTY( ::xCaption )
-      SetWindowText( ::hWnd, ::xCaption )
+         hWnd   := GetWindow( hWnd, GW_HWNDNEXT )
+      ENDDO
+   ENDIF
+   IF !EMPTY( ::xText )
+      SetWindowText( ::hWnd, ::xText )
    ENDIF
    IF ::lEmpty //.AND. ::Modal
       ::SetDialogRect()

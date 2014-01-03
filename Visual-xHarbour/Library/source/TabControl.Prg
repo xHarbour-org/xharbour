@@ -49,7 +49,7 @@ CLASS TabControl INHERIT Control
    PROPERTY ColorInactiveHeader SET ( ::xColorInactiveHeader := v, ::InvalidateRect() ) DEFAULT .F.
    PROPERTY MinTabWidth         SET ::SetMinTabWidth(v)                                 DEFAULT 0
    PROPERTY ImageList           GET __ChkComponent( Self, @::xImageList )
-   PROPERTY Theming  ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
+   PROPERTY Theming  ROOT "Appearance" SET ::Refresh(v) DEFAULT IsThemeActive()
 
    PROPERTY BoldSelection                                 DEFAULT .F.
    PROPERTY ShowTabs                                      DEFAULT .T.
@@ -154,7 +154,6 @@ CLASS TabControl INHERIT Control
 
    METHOD Refresh()                  INLINE ::Super:Refresh(), ::OnNcCalcSize()
    METHOD OnDestroy()                INLINE ::Super:OnDestroy(),;
-                                            ::CloseThemeData(),;
                                             IIF( ::FocusFont     != NIL, ::FocusFont:Delete(),     NIL ),;
                                             IIF( ::VertFont      != NIL, ::VertFont:Delete(),      NIL ),;
                                             IIF( ::BoldFont      != NIL, ::BoldFont:Delete(),      NIL ),;
@@ -191,8 +190,6 @@ METHOD Init( oParent ) CLASS TabControl
    ::Width        := 200
    ::Height       := 200
    ::IsContainer  := .T.
-   ::ThemeName    := "TAB"
-   ::OpenThemeData()
    ::Events := ;
             { ;
             {"Command",     {;
@@ -285,7 +282,6 @@ METHOD Create() CLASS TabControl
       ::VertFont:Create()
    ENDIF
    ::Super:Create()
-   ::EnableThemeDialogTexture( IIF( ::Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
 
    IF ! ::ShowTabs
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
@@ -522,7 +518,7 @@ METHOD OnPaint() CLASS TabControl
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    
    IF ::Theming .AND. IsThemeActive()
-      DrawThemeBackground( ::hTheme, hMemDC, TABP_PANE, , aRect  )
+      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_PANE, , aRect  )
     ELSE
       _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
    ENDIF
@@ -551,7 +547,7 @@ METHOD OnPaint() CLASS TabControl
              ENDIF
 
              IF ::ShowTabs
-                DrawThemeBackground( ::hTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_TABITEM, nState, aItem )
                 IF ::ImageList != NIL .AND. oPage != NIL .AND. oPage:ImageIndex > 0
                    ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
                    aItem[1]+=::ImageList:IconWidth + 6
@@ -583,7 +579,7 @@ METHOD OnPaint() CLASS TabControl
       ENDIF
 
       IF ::ShowTabs
-         DrawThemeBackground( ::hTheme, hMemDC, nPart, nState, aItem, aItem )
+         DrawThemeBackground( ::System:hTabTheme, hMemDC, nPart, nState, aItem, aItem )
       ENDIF
       aItem[4]-=2
       n := nSel
@@ -809,6 +805,7 @@ CLASS TabPage INHERIT Dialog
    PROPERTY VertScrollSize SET ::__SetVertScrollSize(v) DEFAULT 0
    PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
    PROPERTY Text           SET ::__SetCaption(v)
+   PROPERTY Theming  ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
 
    PROPERTY TopMargin      DEFAULT 0
    PROPERTY LeftMargin     DEFAULT 0
@@ -872,8 +869,8 @@ CLASS TabPage INHERIT Dialog
    METHOD Create()
    METHOD OnGetDlgCode()   INLINE DLGC_WANTMESSAGE
    METHOD Destroy()        INLINE ::Delete()
-   METHOD HideTab()        INLINE Super:Hide()
-   METHOD ShowTab()        INLINE Super:Show()
+   METHOD HideTab()        INLINE ShowWindow( ::hWnd, SW_HIDE ), ::UpdateWindow()//Super:Hide()
+   METHOD ShowTab()        INLINE ShowWindow( ::hWnd, SW_SHOW ), ::UpdateWindow()//Super:Show()
    METHOD OnHotKey()       INLINE ::Select(), NIL
    METHOD OnCtlColorDlg()
    METHOD Delete()
@@ -886,7 +883,7 @@ CLASS TabPage INHERIT Dialog
    METHOD __GetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
-   METHOD OnPaint()
+   METHOD __PaintBakgndImage()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
    METHOD OnMouseLeave(n,l) INLINE ::Super:OnMouseLeave(n,l), ::InvalidateRect(, .F. ), NIL
 ENDCLASS
@@ -900,7 +897,6 @@ METHOD Init( oParent, acResource ) CLASS TabPage
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle       := WS_EX_CONTROLPARENT
    ::ClsName       := "TabPage"
-   ::ThemeName     := "TAB"
    ::ClipChildren  := .T.
    ::ClipSiblings  := .T.
    ::modal         := .F.
@@ -1013,6 +1009,7 @@ METHOD Create() CLASS TabPage
 
    ::Super:Create()
    tci:lParam := ::hWnd
+   ::EnableThemeDialogTexture( IIF( ::Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
 
    IF ::VertScrollSize > 0
       ::OriginalRect[4] := ::VertScrollSize
@@ -1044,10 +1041,12 @@ METHOD Create() CLASS TabPage
 
       SendMessage( ::Parent:hWnd, TCM_ADJUSTRECT, 0, @rc )
 
-      ::Left   := 0               + ::LeftMargin
-      ::Top    := rc:Top          + ::TopMargin
-      ::Width  := ::Parent:Width  - ::RightMargin - ::LeftMargin
-      ::height := ::Parent:height - ::BottomMargin - ::TopMargin
+      ::xLeft   := 0               + ::LeftMargin
+      ::xTop    := rc:Top          + ::TopMargin
+      ::xWidth  := ::Parent:Width  - ::RightMargin - ::LeftMargin
+      ::xheight := ::Parent:height - ::BottomMargin - ::TopMargin
+
+      ::MoveWindow()
 
       IF ::__ClassInst != NIL .AND. ::__CustomOwner
 
@@ -1094,39 +1093,44 @@ METHOD Create() CLASS TabPage
    ENDIF
 RETURN Self
 
-//-----------------------------------------------------------------------------------------------
-METHOD OnPaint() CLASS TabPage
-   LOCAL hMemBitmap, hOldBitmap, hMemDC, hDC
-   IF ! EMPTY( ::__aTransparent ) .AND. ( EMPTY( ::BackgroundImage ) .OR. EMPTY( ::BackgroundImage:ImageName ) ) .AND. ::BkBrush == NIL
-      hDC := ::BeginPaint()
-      IF ::System:OS:Version >= 6 
-         IF ::Theming .AND. ::Parent:Theming .AND. IsThemeActive()
-            hMemDC     := CreateCompatibleDC( hDC )
-            hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-            hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+METHOD __PaintBakgndImage( hDC, hBrush ) CLASS TabPage
+   LOCAL hMemBitmap, hOldBitmap, hMemDC
 
-            SendMessage( ::hWnd, WM_PRINT, hMemDC, PRF_CLIENT )
+   DEFAULT hDC TO ::Drawing:hDC
+   DEFAULT hBrush TO ::BkBrush
 
-            BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-
-            ::__SetTransparentChildren( hDC, hMemDC )
-
-            SelectObject( hMemDC,  hOldBitmap )
-            DeleteObject( hMemBitmap )
-            DeleteDC( hMemDC )
-         ENDIF
-      ELSE
-         ::BkBrush := CreateSolidBrush( GetPixel( hDC, 2, 2 ) )
-      ENDIF
-      ::EndPaint()
+   IF ! ::Theming
+      DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
    ENDIF
-RETURN NIL
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   IF hBrush == NIL .AND. ::Application:OsVersion:dwMajorVersion >= 5
+      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight } )
+    ELSEIF hBrush != NIL .AND. hBrush <> 0
+      _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
+   ENDIF
+
+   IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
+      ::BackgroundImage:Draw( hMemDC )
+   ENDIF
+
+   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+
+   ::__SetTransparentChildren( hDC, hMemDC )
+
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+RETURN 1
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
    IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
-      IF !lVisible
+      IF ! lVisible
          ::__Hide()
        ELSE
          ::__Show()
@@ -1241,7 +1245,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
     ELSE
       rc:Left   -= 3
       rc:Top    -= 1
-      rc:Right  += 2
+      rc:Right  += 1
       rc:Bottom += 2
       IF ::Parent:Style & TCS_VERTICAL == TCS_VERTICAL
          rc:Top  -= 2

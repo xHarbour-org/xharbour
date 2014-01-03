@@ -120,6 +120,7 @@ static aMessages := {;
                     { WM_NCMOUSEHOVER,    "OnNCMouseHover"    },;
                     { WM_MOUSEWHEEL,      "OnMouseWheel"      },;
                     { WM_SETCURSOR,       "OnSetCursor"       },;
+                    { WM_SETFOCUS,        "OnSetFocus"        },;
                     { WM_COMMAND,         "OnCommand"         },;
                     { WM_PAINT,           "OnPaint"           },;
                     { WM_NCPAINT,         "OnNCPaint"         },;
@@ -523,7 +524,6 @@ CLASS Window INHERIT Object
    METHOD OnMoving()            VIRTUAL
    METHOD OnRButtonDown()       VIRTUAL
    METHOD OnRButtonUp()         VIRTUAL
-   METHOD OnSetFocus()          VIRTUAL
    METHOD OnSysCommand()        VIRTUAL
    METHOD OnTimer()             VIRTUAL
    METHOD OnCtlColorListBox()   VIRTUAL
@@ -613,6 +613,7 @@ CLASS Window INHERIT Object
 
    METHOD OnMeasureItem()
    METHOD OnDrawItem()
+   METHOD OnSetFocus()
 
    METHOD GetChildFromPoint()
    METHOD SetTimer(nId,nElapse,hProc)               INLINE SetTimer( ::hWnd, nId, nElapse,hProc )
@@ -1655,6 +1656,7 @@ RETURN NIL
 METHOD OnSize( nwParam, nlParam ) CLASS Window
    LOCAL x, y, aChildren, hDef, oChild, cProp, n, hDC
    ::__lReqBrush := .T.
+
    IF EMPTY( ::__ClientRect )
       RETURN 0
    ENDIF
@@ -1664,7 +1666,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
    x := MAX( ::xWidth,  ::OriginalRect[3] )
    y := MAX( ::xHeight, ::OriginalRect[4] )
 
-   IF ::__hMemBitmap != NIL
+   IF ::__hMemBitmap != NIL .AND. ::HasMessage( "Transparent" ) .AND. ::Transparent
       DeleteObject( ::__hMemBitmap )
       hDC := GetDC( ::hWnd )
       ::__hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -1833,12 +1835,11 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
       ENDIF               
 
       IF oCtrl != NIL .AND. oCtrl:__xCtrlName != "MaskEdit"
-         //if ! ::Form:Modal
-         //   return 0
-         //endif
-         IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
+         IF ( n := HSCAN( ::Form:__hObjects, {|,o| ( oCtrl:hWnd != o:hWnd .OR. ::Modal ) .AND. o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
             nId := HGetValueAt( ::Form:__hObjects, n ):Id
             nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd
+          ELSE
+            oCtrl := NIL
          ENDIF
       ENDIF
    ENDIF
@@ -2177,7 +2178,7 @@ RETURN NIL
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
-   LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess, aParent
+   LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
    
    ::Msg    := nMsg
    ::wParam := nwParam
@@ -2540,66 +2541,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  WHILE oCtrl != NIL
                     IF __objHasMsg( oCtrl, "SetActive" )
                        oCtrl:SetActive(.F.)
-                    ENDIF
-                    oCtrl := oCtrl:Parent
-                 ENDDO
-              ENDIF
-              EXIT
-
-         CASE WM_SETFOCUS
-              IF ::Parent != NIL .AND. ::Parent:VertScroll
-
-                 IF ::Parent:ScrollOnChildFocus
-                    aRect    := _GetWindowRect( ::hWnd )
-
-                    aPt := { aRect[1], aRect[2] }
-                    _ScreenToClient( ::Parent:hWnd, @aPt )
-                    aRect[1] := aPt[1]
-                    aRect[2] := aPt[2]
-
-                    aPt := { aRect[3], aRect[4] }
-                    _ScreenToClient( ::Parent:hWnd, @aPt )
-                    aRect[3] := aPt[1]
-                    aRect[4] := aPt[2]
-
-                    aParent  := _GetClientRect( ::Parent:hWnd )
-
-                    // Set Vertical Position
-                    IF aRect[4] > aParent[4]
-                       n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
-                       ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
-                     ELSEIF aRect[2] < 0
-                       ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
-                    ENDIF
-
-                    // Set Horizontal Position
-                    IF aRect[3] > aParent[3]
-                       n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
-                       ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
-                     ELSEIF aRect[1] < 0
-                       ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
-                    ENDIF
-                 ENDIF
-              ENDIF
-
-              nRet := ExecuteEvent( "OnSetFocus", Self )
-              ODEFAULT nRet TO ::OnSetFocus( nwParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMSetFocus, Self, nwParam, nlParam, nRet )
-
-              IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
-                 aRect := ::GetRectangle()
-                 aRect[1] -= 3 + ::Parent:HorzScrollPos
-                 aRect[2] -= 3 + ::Parent:VertScrollPos
-                 aRect[3] += 3 + ::Parent:HorzScrollPos
-                 aRect[4] += 3 + ::Parent:VertScrollPos
-                 _InvalidateRect( ::Parent:hWnd, aRect )
-              ENDIF
-              
-              IF .F. //::Parent != NIL
-                 oCtrl := Self
-                 WHILE oCtrl != NIL
-                    IF __objHasMsg( oCtrl, "SetActive" )
-                       oCtrl:SetActive(.T.)
                     ENDIF
                     oCtrl := oCtrl:Parent
                  ENDDO
@@ -3321,6 +3262,53 @@ METHOD OnMeasureItem( nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN NIL
 
+METHOD OnSetFocus() CLASS Window
+   LOCAL aRect, aPt, n, nRet, aParent
+   IF ::Parent != NIL .AND. ::Parent:VertScroll
+
+      IF ::Parent:ScrollOnChildFocus
+         aRect    := _GetWindowRect( ::hWnd )
+
+         aPt := { aRect[1], aRect[2] }
+         _ScreenToClient( ::Parent:hWnd, @aPt )
+         aRect[1] := aPt[1]
+         aRect[2] := aPt[2]
+
+         aPt := { aRect[3], aRect[4] }
+         _ScreenToClient( ::Parent:hWnd, @aPt )
+         aRect[3] := aPt[1]
+         aRect[4] := aPt[2]
+
+         aParent  := _GetClientRect( ::Parent:hWnd )
+
+         // Set Vertical Position
+         IF aRect[4] > aParent[4]
+            n := aParent[2]+( aRect[4]-aParent[4] ) - aRect[2]
+            ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[4]-aParent[4] )- MAX(n,0), 0 )
+          ELSEIF aRect[2] < 0
+            ::Parent:OnVScroll( SB_THUMBTRACK, ::Parent:VertScrollPos + ( aRect[2] ), 0 )
+         ENDIF
+
+         // Set Horizontal Position
+         IF aRect[3] > aParent[3]
+            n := aParent[1]+( aRect[3]-aParent[3] ) - aRect[1]
+            ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[3]-aParent[3] ) - MAX(n,0), 0 )
+          ELSEIF aRect[1] < 0
+            ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
+         ENDIF
+      ENDIF
+   ENDIF
+
+   IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
+      aRect := ::GetRectangle()
+      aRect[1] -= 3 + ::Parent:HorzScrollPos
+      aRect[2] -= 3 + ::Parent:VertScrollPos
+      aRect[3] += 3 + ::Parent:HorzScrollPos
+      aRect[4] += 3 + ::Parent:VertScrollPos
+      _InvalidateRect( ::Parent:hWnd, aRect )
+   ENDIF
+RETURN nRet
+
 METHOD OnDrawItem() CLASS Window
    LOCAL n, oItem, oButton, oSub, oMenu
 
@@ -3592,7 +3580,7 @@ RETURN Self
 
 
 METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Window
-   LOCAL n, nCurLeft, nCurTop, oLeft, oTop, oRight, oBottom, lAnchor, lDock, nHeight, rc
+   LOCAL n, nCurLeft, nCurTop, oLeft, oTop, oRight, oBottom, lAnchor, lDock, nHeight, rc, nMargin
 
    DEFAULT lMoveNow TO FALSE
    DEFAULT lNoMove TO FALSE
@@ -3765,7 +3753,11 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oLeft:hWnd == ::Parent:hWnd
             ::xLeft := ::Dock:LeftMargin
           ELSEIF oLeft:IsChild
-            ::xLeft := oLeft:xLeft + oLeft:xWidth + ::Dock:LeftMargin + IIF( oLeft:RightSplitter != NIL, oLeft:RightSplitter:Weight, 0 )
+            nMargin := ::Dock:LeftMargin
+            IF oLeft:RightSplitter != NIL
+               nMargin := MAX( nMargin, oLeft:RightSplitter:Weight )
+            ENDIF
+            ::xLeft := oLeft:xLeft + oLeft:xWidth + nMargin
          ENDIF
        ELSEIF ::Dock:JoinLeft != NIL
          ::xLeft := ::Dock:JoinLeft:Left
@@ -3784,7 +3776,11 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
              ELSE
                n := oTop:Height
             ENDIF
-            ::xTop  := oTop:Top + n + ::Dock:TopMargin + IIF( oTop:BottomSplitter != NIL, oTop:BottomSplitter:Weight, 0 )
+            nMargin := ::Dock:TopMargin
+            IF oTop:BottomSplitter != NIL
+               nMargin := MAX( nMargin, oTop:BottomSplitter:Weight )
+            ENDIF
+            ::xTop  := oTop:Top + n + ::Dock:TopMargin + nMargin //IIF( oTop:BottomSplitter != NIL, oTop:BottomSplitter:Weight, 0 )
          ENDIF
       ENDIF
 
@@ -3794,13 +3790,21 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             IF oRight:hWnd == ::Parent:hWnd
                ::xLeft := ::Parent:ClientWidth - ::xWidth - ::Dock:RightMargin
              ELSEIF oRight:IsChild
-               ::xLeft := oRight:xLeft - ::xWidth - ::Dock:RightMargin - IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
+               nMargin := ::Dock:RightMargin
+               IF oRight:LeftSplitter != NIL
+                  nMargin := MAX( nMargin, oRight:LeftSplitter:Weight )
+               ENDIF
+               ::xLeft := oRight:xLeft - ::xWidth - nMargin //::Dock:RightMargin - IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
             ENDIF
           ELSE // resize to the right
             IF oRight:hWnd == ::Parent:hWnd
                ::xWidth := oRight:ClientWidth - ::xLeft - ::Dock:RightMargin
              ELSEIF oRight:IsChild
-               ::xWidth := oRight:xLeft - ::xLeft - ::Dock:RightMargin - IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
+               nMargin := ::Dock:RightMargin
+               IF oRight:LeftSplitter != NIL
+                  nMargin := MAX( nMargin, oRight:LeftSplitter:Weight )
+               ENDIF
+               ::xWidth := oRight:xLeft - ::xLeft - nMargin //::Dock:RightMargin - //IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
             ENDIF
          ENDIF
        ELSEIF oLeft != NIL .AND. ::Dock:RightProportional
@@ -3818,16 +3822,13 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
           ELSEIF ::ClsName != "ComboBox" //.OR. (::Style & CBS_SIMPLE) == CBS_SIMPLE
             IF oBottom:hWnd == ::Parent:hWnd
-               //IF oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin < ::MinHeight
-               //   IF oTop != NIL
-               //      oTop:Height -= ( ::MinHeight )//- ( oBottom:Height - ::xTop - ::Dock:BottomMargin ) )
-               //      RETURN NIL
-               //   ENDIF
-               // ELSE
-                  ::xHeight := oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin
-               //ENDIF
+               ::xHeight := oBottom:ClientHeight - ::xTop - ::Dock:BottomMargin
              ELSEIF oBottom:IsChild
-               ::xHeight := oBottom:Top  - ::xTop - ::Dock:BottomMargin - IIF( oBottom:TopSplitter != NIL, oBottom:TopSplitter:Weight, 0 )
+               nMargin := ::Dock:BottomMargin
+               IF oBottom:TopSplitter != NIL
+                  nMargin := MAX( nMargin, oBottom:TopSplitter:Weight )
+               ENDIF
+               ::xHeight := oBottom:Top  - ::xTop - nMargin
             ENDIF
          ENDIF
 
@@ -3934,7 +3935,7 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
    ::xWidth := w
    ::xHeight:= h
 
-   IF ::ClsName == "VXH_FORM_IDE"
+   IF ::ClsName == "VXH_FORM_IDE" .AND. ::__ClassInst != NIL
       x := 10-::Parent:HorzScrollPos
       y := 10-::Parent:VertScrollPos
    ENDIF
@@ -4835,6 +4836,7 @@ CLASS WinForm INHERIT Window
    METHOD RestoreLayout()
    METHOD OnSize()
    METHOD OnNCDestroy()         INLINE Super:OnNCDestroy(), hb_gcAll(.T.)
+
    ACCESS ActiveForm            INLINE ObjFromHandle( GetActiveWindow() )
 
    METHOD __RefreshPosNo() INLINE NIL // Compatibility
@@ -5091,6 +5093,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
    LOCAL hMemBitmap, hOldBitmap, hMemDC
+
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
       DEFAULT hDC TO ::Drawing:hDC
 
@@ -5104,9 +5107,7 @@ METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
       hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
       IF hBrush == NIL .AND. ::ClsName == "TabPage" .AND. ::Application:OsVersion:dwMajorVersion >= 5
-         ::OpenThemeData()
-         DrawThemeBackground( ::hTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::Width, ::Height } )
-         ::CloseThemeData()
+         DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::Width, ::Height } )
        ELSEIF hBrush != NIL .AND. hBrush <> 0
          _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
       ENDIF
@@ -5161,7 +5162,7 @@ METHOD Show( nShow ) CLASS WinForm
             DeleteObject( hMemBitmap )
             DeleteDC( hMemDC )
          ENDIF
-         ::Application:DoEvents()
+         //::Application:DoEvents()
          ::__FixDocking()
 
          nRet := ExecuteEvent( "OnLoad", Self )
@@ -5176,6 +5177,7 @@ METHOD Show( nShow ) CLASS WinForm
          ::UpdateChildren()
        ELSEIF ::Visible
          ShowWindow( ::hWnd, IIF( ::__ClassInst == NIL, nShow, SW_SHOW ) )
+         ::UpdateWindow()
          
          IF ::MDIContainer
             ::PostMessage( WM_SIZE, 0, MAKELPARAM( ::ClientWidth, ::ClientHeight ) )

@@ -8925,11 +8925,8 @@ HB_FUNC ( FILETIMETOSYSTEMTIME )
       }
       else
       {
-         hb_retl( FALSE );
-      }
-      if( pSt )
-      {
          hb_xfree( (void *) pSt );
+         hb_retl( FALSE );
       }
    }
    else
@@ -9053,7 +9050,7 @@ HB_FUNC ( INTERNETREADFILE )
 HB_FUNC ( FTPCOMMAND )
 {
    HINTERNET hInternet       = (HINTERNET *) hb_parnl(1);
-   BOOL      fExpectResponse = hb_parl(2);
+   BOOL      fExpectResponse = ISNIL(2)?TRUE:hb_parl(2);
    DWORD     dwFlags         = (DWORD) hb_parnl(3);
    LPCTSTR   lpszCommand     = (LPCTSTR) hb_parc(4);
    DWORD_PTR dwContext       = (DWORD_PTR) hb_parnl(5);
@@ -9064,7 +9061,7 @@ HB_FUNC ( FTPCOMMAND )
 
    hb_retl( bRet );
 
-   if ( bRet )
+   if ( bRet && ISBYREF(6) )
    {
       hb_stornl( (ULONG) hFtpCommand, 6 );
    }
@@ -9084,7 +9081,6 @@ HB_FUNC ( FTPFINDFIRSTFILE )
       if( hResult != INVALID_HANDLE_VALUE )
       {
          PHB_ITEM pByRef;
-
          if( HB_IS_OBJECT( pStructure ) )
          {
             pByRef = NULL;
@@ -9136,7 +9132,6 @@ HB_FUNC ( INTERNETFINDNEXTFILE )
       if( bRes )
       {
          PHB_ITEM pByRef;
-
          if( HB_IS_OBJECT( pStructure ) )
          {
             pByRef = NULL;
@@ -10816,3 +10811,7 @@ HB_FUNC( WOW64REVERTWOW64FSREDIRECTION )
    hb_retl( pWow64RevertWow64FsRedirection( OldValue ) );
 }
 
+HB_FUNC( INTERNETOPENURL )
+{
+   hb_retnl( (long) InternetOpenUrl( (HINTERNET) hb_parnl(1), (LPCTSTR) hb_parc(2), ISNIL(3)?NULL:(LPCTSTR) hb_parc(3), (DWORD) hb_parnl(4), (DWORD) hb_parnl(5), (DWORD_PTR) hb_parnl(6) ) );
+}

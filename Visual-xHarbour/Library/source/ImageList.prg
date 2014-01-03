@@ -281,19 +281,27 @@ RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
 #define ILD_DPISCALE 0x4000 
-#define ILS_ALPHA 0x00000008
-#define ILS_SHADOW 0x00000002
-#define ILS_SATURATE (0x00000004)
+#define ILS_ALPHA    0x00000008
+#define ILS_SHADOW   0x00000002
+#define ILS_SATURATE 0x00000004
 
-METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp ) CLASS ImageList
+METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled ) CLASS ImageList
+   LOCAL nFlags := ILD_TRANSPARENT
    LOCAL ildp   := (struct IMAGELISTDRAWPARAMS)
+
+   DEFAULT lDisabled TO .F.
+
+   IF lDisabled
+      nFlags := nFlags | ILS_SHADOW
+   ENDIF
+
    ildp:cbSize  := ildp:sizeof()
    ildp:i       := nIndex-1
    ildp:himl    := ::handle
    ildp:hdcDst  := hDC
    ildp:x       := x
    ildp:y       := y
-   ildp:fStyle  := ILD_TRANSPARENT
+   ildp:fStyle  := nFlags
    ildp:xBitmap := xBmp
    ildp:yBitmap := yBmp
    ImageListDrawIndirect( ildp )

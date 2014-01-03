@@ -1135,6 +1135,93 @@ HB_FUNC( _FILETIMETOSYSTEMTIME )
    hb_retl( bRet );
 }
 
+HB_FUNC( _SYSTEMTIMETOTZSPECIFICLOCALTIME )
+{
+   SYSTEMTIME lpLocalTime;
+   SYSTEMTIME *lpUniversalTime = (SYSTEMTIME*) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+   BOOL bRet = SystemTimeToTzSpecificLocalTime( NULL, lpUniversalTime, &lpLocalTime );
+   if( bRet )
+   {
+      hb_storclen( (char *) &lpLocalTime, sizeof(SYSTEMTIME), 2 );
+   }
+   hb_retl( bRet );
+}
+
+HB_FUNC( _FILETIMETOLOCALFILETIME )
+{
+   FILETIME *ft  = (FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+   FILETIME lt;
+   BOOL bRet;
+
+   bRet = FileTimeToLocalFileTime( ft, &lt );
+   if( bRet )
+   {
+      hb_storclen( (char *) &lt, sizeof(FILETIME), 2 );
+   }
+   hb_retl( bRet );
+}
+
+HB_FUNC( _LOCALFILETIMETOFILETIME )
+{
+   FILETIME *lt  = (FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+   FILETIME ft;
+   BOOL bRet;
+
+   bRet = LocalFileTimeToFileTime( lt, &ft );
+   if( bRet )
+   {
+      hb_storclen( (char *) &ft, sizeof(FILETIME), 2 );
+   }
+   hb_retl( bRet );
+}
+
+HB_FUNC( LOCALFILETIMETOSYSTEMTIME )
+{
+   FILETIME *lt  = (FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+   FILETIME ft;
+   SYSTEMTIME st;
+   BOOL bRet;
+
+   bRet = LocalFileTimeToFileTime( lt, &ft );
+   if( bRet )
+   {
+      bRet = FileTimeToSystemTime( &ft, &st );
+      hb_storclen( (char *) &st, sizeof(SYSTEMTIME), 2 );
+   }
+   hb_retl( bRet );
+}
+
+HB_FUNC( GETTIMESTAMP )
+{
+   FILETIME ft;
+   FILETIME lt;
+   SYSTEMTIME st;
+   char buffer[ 9 ];
+   SystemTimeToFileTime( (SYSTEMTIME *) hb_parc(1), &lt );
+   LocalFileTimeToFileTime( &lt, &ft );
+   FileTimeToSystemTime( &ft, &st );
+   wsprintf( buffer, "%02i:%02i:%02i", (int)st.wHour, (int)st.wMinute, (int)st.wSecond );
+   hb_reta(2);
+   hb_stord( st.wYear, st.wMonth, st.wDay, -1, 1 );
+   hb_storc( buffer, -1, 2 );
+}
+
+
+HB_FUNC( GETLOCALTIMESTAMP )
+{
+   FILETIME ft;
+   FILETIME lt;
+   SYSTEMTIME st;
+   char buffer[ 9 ];
+   SystemTimeToFileTime( (SYSTEMTIME *) hb_parc(1), &ft );
+   FileTimeToLocalFileTime( &ft, &lt );
+   FileTimeToSystemTime( &lt, &st );
+   wsprintf( buffer, "%02i:%02i:%02i", (int)st.wHour, (int)st.wMinute, (int)st.wSecond );
+   hb_reta(2);
+   hb_stord( st.wYear, st.wMonth, st.wDay, -1, 1 );
+   hb_storc( buffer, -1, 2 );
+}
+
 HB_FUNC( _ALPHABLEND )
 {
    BLENDFUNCTION bf;

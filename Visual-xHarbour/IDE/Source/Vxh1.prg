@@ -31,8 +31,8 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define HKEY_LOCAL_MACHINE           (0x80000002)
 #define KEY_ALL_ACCESS              (0xF003F)
 
-#define VXH_Version      "5"
-#define VXH_BuildVersion "5.5.0"
+#define VXH_Version      "6"
+#define VXH_BuildVersion "6.0.0"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -53,6 +53,9 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #define __GENVERSIONINFO__
 INIT PROCEDURE __VXH_Start
    LOCAL cRunning, cIni, aRect, oReg
+
+   PUBLIC VXHIDE
+   m->VXHIDE := .T.
 
    oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour" )
    IF oReg:Create()
@@ -85,7 +88,6 @@ PROCEDURE Main( cFile )
    AssociateWith( ".vxh", "vxh_project_file", GetModuleFileName(), "Visual xHarbour Project", 0 )
 
    //AssociateWith( ".prg", "prg_file", "c:\Program Files\TextPad 5\TextPad.exe", "xHarbour file", 0 )
-
    IDE( cFile )
    QUIT
 RETURN
@@ -700,6 +702,8 @@ METHOD Init() CLASS IDE_MainForm
             :Enabled           := .F.
             :BeginGroup        := .T.
             :ShortCutText      := "Ctrl+S"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := ASC( "S" )
             :Create()
          END
 
@@ -1117,17 +1121,36 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
-         WITH OBJECT ::Application:Props[ "SaveItem" ] := MenuStripItem( :this )
-            :ImageIndex        := ::System:StdIcons:FileSave
-            :BeginGroup        := .T.
-            :Caption           := "Save"
-            :ShortCutText      := "Ctrl+S"
+         WITH OBJECT ::Application:Props[ "AddFormProjItem" ] := MenuStripItem( :this )
+            :Caption           := "Add &Existing Form"
+            :ImageIndex        := 27
+            :ShortCutText      := "Ctrl+Shift+X"
             :ShortCutKey:Ctrl  := .T.
-            :ShortCutKey:Key   := ASC( "S" )
-            :Action            := {|| ::Application:Project:Save(.T.) }
+            :ShortCutKey:Shift := .T.
+            :ShortCutKey:Key   := ASC( "X" )
+            //:Action            := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(),) }
             :Enabled           := .F.
             :Create()
          END
+
+         WITH OBJECT ::Application:Props[ "ProjLinkItem" ] := MenuStripItem( :this )
+            :BeginGroup        := .T.
+            :Caption           := "&Build"
+            :ShortCutText      := "F4"
+            :ShortCutKey:Key   := VK_F4
+            :Action            := {|| ::Application:Project:Build() }
+            :Create()
+         END
+
+         WITH OBJECT ::Application:Props[ "ProjLinkItem" ] := MenuStripItem( :this )
+            :Caption           := "&Link"
+            :ShortCutText      := "Ctrl+L"
+            :ShortCutKey:Ctrl  := .T.
+            :ShortCutKey:Key   := ASC( "L" )
+            :Action            := {|| ::Application:Project:Build(, .T. ) }
+            :Create()
+         END
+
          WITH OBJECT ::Application:Props[ "ForceBuildItem" ] := MenuStripItem( :this )
             :ImageIndex        := 25
             :Caption           := "Force Build"
@@ -1139,6 +1162,7 @@ METHOD Init() CLASS IDE_MainForm
             :Enabled           := .F.
             :Create()
          END
+
          WITH OBJECT ::Application:Props[ "RunItem" ] := MenuStripItem( :this )
             :ImageIndex := 18
             :Caption    := "Run"
@@ -1180,7 +1204,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
+      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:OsVersion:dwMinorVersion == 2
          :Showgrip := .F.
          :ShowChevron := .F.
       ENDIF
@@ -1196,7 +1220,6 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := 26
          :ToolTip:Text := "New"
-         :DropDown     := 2
          :Action       := {|| ::Application:Project:NewProject() }
          :ImageList    := :Parent:ImageList
          :Create()
@@ -1221,6 +1244,8 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "SaveBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileSave
          :ToolTip:Text := "Save"
+         :ShortCutKey:Ctrl  := .T.
+         :ShortCutKey:Key   := ASC( "S" )
          :Action       := {||::Application:Project:Save(.T.) }
          :Enabled      := .F.
          :Create()
@@ -1587,9 +1612,7 @@ METHOD Init() CLASS IDE_MainForm
 
       :Width            := Round( ( :Parent:ClientWidth*::Application:Sizes["ToolBoxWidth"])/100,0)
       :Left             := 149
-      :Dock:Margin      := 2
-      :Dock:BottomMargin:= 3
-
+      :Dock:Margin      := 3
       :Dock:Left        := :Parent
       :Dock:Top         := ::Application:Props[ "MainToolBar" ]
       :Dock:Bottom      := ::StatusBar1
@@ -1616,13 +1639,14 @@ METHOD Init() CLASS IDE_MainForm
       :Text         := "Object Manager"
       :AllowUndock  := .T.
       :AllowClose   := .T.
+      :BackColor    := ::System:Color:white
       :OnWMClose    := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewObjectManagerItem" ]:Checked := .F. ), o:Redock() ) }
       :Width        := Round( ( :Parent:ClientWidth*::Application:Sizes["ObjectManagerWidth"])/100,0)
       :Height       := 300
-      :Dock:Margin  := 2
       :Dock:Top     := ::Application:Props[ "MainToolBar" ]
       :Dock:Bottom  := ::StatusBar1
       :Dock:Right   := :Parent
+      :Dock:Margin  := 3
       :Create()
 
       WITH OBJECT ::Application:Props[ "ComboSelect" ] := FormComboBox( :this )
@@ -1637,7 +1661,6 @@ METHOD Init() CLASS IDE_MainForm
 
       IF ::Application:ShowObjExplorerPanel
          WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
-            :Dock:Margin   := 1
             :AllowUndock   := .T.
             //:DragItems     := .T.
             :Text          := "Object Explorer"
@@ -1660,7 +1683,6 @@ METHOD Init() CLASS IDE_MainForm
       ENDIF
 
       WITH OBJECT ::Application:ObjectTab := TabStrip( :this )
-         :Dock:Margin := 1
          :Dock:Left   := :Parent
          :Dock:Top    := ::Application:Props[ "ComboSelect" ]
          :Dock:Right  := :Parent
@@ -1802,7 +1824,7 @@ METHOD Init() CLASS IDE_MainForm
                :Caption   := "Object Explorer"
                :Create()
                WITH OBJECT ::Application:ObjectTree := ObjectTreeView( :this )
-                  :Dock:Margin   := 1
+                  //:Dock:Margin   := 1
                   :Height        := 300
                   :DragItems     := .T.
                   :Dock:Left     := :Parent
@@ -1853,6 +1875,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::StatusBar1
       :Dock:Right    := ::Panel1
+      :Dock:Margin   := 3
       :TabStop       := .F.
       :Visible       := .F.
       :Create()
@@ -1934,7 +1957,7 @@ METHOD Init() CLASS IDE_MainForm
       :Border         := .T.
       :Dock:Left      := ::Application:ToolBox
       :Dock:Bottom    := ::Application:DebugWindow
-      :Dock:BottomMargin := 3
+      :Dock:Margin    := 3
       :Dock:Right     := ::Panel1
       :BackColor      := ::System:CurrentScheme:ToolStripPanelGradientEnd
       :OnWMClose      := {|o| o:Hide() }
@@ -1949,10 +1972,9 @@ METHOD Init() CLASS IDE_MainForm
 
    // TabControl
    WITH OBJECT ::Application:MainTab := TabStrip( Self )
-      :Width     := 680
-      :Height    := 300
-      
-      :Dock:BottomMargin := 3
+      :Width       := 680
+      :Height      := 300
+      :Dock:Margin := 3
       :Dock:Left   := ::Application:ToolBox
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
       :Dock:Right  := ::Panel1
@@ -2020,15 +2042,13 @@ METHOD Init() CLASS IDE_MainForm
 
          WITH OBJECT StartPagePanel( :this )
             :nPanel     := 1
-
-            :ImageList   := ::ToolStrip1:ImageList
-
+            :ImageList  := ::ToolStrip1:ImageList
             :BackColor  := C_WHITE
 
-            :Left   := 300
-            :Top    := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
-            :Width  := ::Application:StartPageBrushes:NewsBk[2]
-            :Height := ::Application:StartPageBrushes:NewsBk[3]
+            :Left       := 300
+            :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
+            :Width      := ::Application:StartPageBrushes:NewsBk[2]
+            :Height     := ::Application:StartPageBrushes:NewsBk[3]
 
             :Cursor     := IDC_HAND
             :HorzScroll := .T.
@@ -2036,11 +2056,11 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
             WITH OBJECT WebBrowser( :this )
                :ControlParent := .T.
-               :Left   := 6
-               :Top    := 28
-               :Width  := :Parent:Width - 12
-               :height := :Parent:height - 76
-               :Url    := __NEWS_URL__
+               :Left    := 6
+               :Top     := 28
+               :Width   := :Parent:Width - 12
+               :height  := :Parent:height - 76
+               :Url     := __NEWS_URL__
                :EventHandler[ "NavigateError" ] := "OnNavigateError"
                :Create()
             END
@@ -3303,7 +3323,6 @@ METHOD SetCaption( lMod ) CLASS Project
       cCaption += IIF( lMod," * ]","]" )
 
       ::Application:Props[ "SaveBttn" ]:Enabled     := lMod
-      ::Application:Props[ "SaveItem" ]:Enabled     := lMod
       ::Application:SaveMenu:Enabled                := lMod
       ::Application:Props[ "ProjSaveItem" ]:Enabled := lMod
 
@@ -5444,12 +5463,13 @@ RETURN 0
 #define TYPE_DLL        12
 #define TYPE_HRB        13
 
-METHOD Build( lForce ) CLASS Project
+METHOD Build( lForce, lLinkOnly ) CLASS Project
    LOCAL n, cProject, cExe, cResPath, oItem
    LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp, cVar, cInc, aInc
    LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude, cDef
 
-   DEFAULT lForce TO .F.
+   DEFAULT lForce    TO .F.
+   DEFAULT lLinkOnly TO .F.
 
    IF LEN( ::Forms ) > 0 .AND. ASCAN( ::Forms, {|o| ! o:lCustom} ) == 0
       RETURN .F.
@@ -5514,7 +5534,8 @@ METHOD Build( lForce ) CLASS Project
          
          :SetDefines( "__VXH__" + IIF( cDef[1] != ";", ";", "" ) + cDef )
 
-         :lClean := ::Properties:CleanBuild
+         :lClean := ! lLinkOnly .AND. ::Properties:CleanBuild
+         :lLink  := lLinkOnly
 
          cInc := ""
          aInc := hb_aTokens( ::Properties:IncludePath, ";" )

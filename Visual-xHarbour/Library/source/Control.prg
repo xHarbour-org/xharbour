@@ -90,6 +90,7 @@ METHOD __Enable( lEnable ) CLASS Control
    IF ::hWnd != NIL .AND. ::__xCtrlName != "Button"
       EnableWindow( ::hWnd, lEnable )
       ::InvalidateRect( , .F. )
+      ::UpdateWindow()
    ENDIF
 RETURN lEnable
 

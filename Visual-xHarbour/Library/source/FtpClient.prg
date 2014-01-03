@@ -14,22 +14,24 @@ static __oFtp
 static aEvents
 
 CLASS FtpClient INHERIT Component
-   PROPERTY Operation DEFAULT 0
-   PROPERTY OpenType  DEFAULT INTERNET_OPEN_TYPE_DIRECT
-   PROPERTY Service   DEFAULT INTERNET_SERVICE_FTP
+   PROPERTY Operation    DEFAULT 0
+   PROPERTY OpenType     DEFAULT INTERNET_OPEN_TYPE_DIRECT
+   PROPERTY Service      DEFAULT INTERNET_SERVICE_FTP
    PROPERTY Server
    PROPERTY UserName
    PROPERTY Password
-   PROPERTY Port      DEFAULT INTERNET_DEFAULT_FTP_PORT
-   PROPERTY Passive   DEFAULT .F.
-
-   DATA EnumOperation EXPORTED INIT { { "Synchronous", "Asynchronous" }, { 0, INTERNET_FLAG_ASYNC } }
-   DATA EnumService   EXPORTED INIT { { "FTP", "HTTP" }, { INTERNET_SERVICE_FTP, INTERNET_SERVICE_HTTP } }
-   DATA EnumOpenType  EXPORTED INIT { { "Direct", "Pre-Config", "Proxy" }, { INTERNET_OPEN_TYPE_DIRECT, INTERNET_OPEN_TYPE_PRECONFIG, INTERNET_OPEN_TYPE_PROXY } }
-   DATA Context, InternetStatus, StatusInformation, StatusInfoLength
-   DATA hHandle   EXPORTED INIT 0
-   DATA hFtp      EXPORTED
+   PROPERTY Port         DEFAULT INTERNET_DEFAULT_FTP_PORT
+   PROPERTY Passive      DEFAULT .F.
+   PROPERTY TransferType DEFAULT FTP_TRANSFER_TYPE_BINARY
    
+   DATA EnumTransferType EXPORTED INIT { { "ASCII", "Binary" }, { FTP_TRANSFER_TYPE_ASCII, FTP_TRANSFER_TYPE_BINARY } }
+   DATA EnumOperation    EXPORTED INIT { { "Synchronous", "Asynchronous" }, { 0, INTERNET_FLAG_ASYNC } }
+   DATA EnumService      EXPORTED INIT { { "FTP", "HTTP" }, { INTERNET_SERVICE_FTP, INTERNET_SERVICE_HTTP } }
+   DATA EnumOpenType     EXPORTED INIT { { "Direct", "Pre-Config", "Proxy" }, { INTERNET_OPEN_TYPE_DIRECT, INTERNET_OPEN_TYPE_PRECONFIG, INTERNET_OPEN_TYPE_PROXY } }
+   DATA Context, InternetStatus, StatusInformation, StatusInfoLength
+   DATA hHandle          EXPORTED INIT 0
+   DATA hFtp             EXPORTED
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
@@ -37,15 +39,17 @@ CLASS FtpClient INHERIT Component
    METHOD DisConnect()
    METHOD GetDirectory()
    METHOD GetCurrentDirectory()
-   METHOD PutFile( cLocalFile, cRemoteFile )    INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile, FTP_TRANSFER_TYPE_UNKNOWN, 1 )
-   METHOD GetFile( cRemoteFile, cLocalFile )    INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile, FTP_TRANSFER_TYPE_UNKNOWN, 1 )
+   METHOD PutFile( cLocalFile, cRemoteFile )    INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile, ::TransferType, 1 )
+   METHOD GetFile( cRemoteFile, cLocalFile )    INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile, ::TransferType, 1 )
    METHOD DeleteFile( cRemoteFile )             INLINE FtpDeleteFile( ::hFtp, cRemoteFile )
    METHOD RenameFile( cExistingFile, cNewFile ) INLINE FtpRenameFile( ::hFtp, cExistingFile, cNewFile )
    METHOD CreateDirectory( cDirectory )         INLINE FtpCreateDirectory( ::hFtp, cDirectory )
    METHOD RemoveDirectory( cDirectory )         INLINE FtpRemoveDirectory( ::hFtp, cDirectory )
    METHOD SetCurrentDirectory( cDirectory )     INLINE FtpSetCurrentDirectory( ::hFtp, cDirectory )
+   METHOD Command( cCmd )                       INLINE FtpCommand( ::hFtp, .F., ::TransferType, cCmd, 1 )
    //METHOD Read()
    METHOD GetLastResponseInfo()
+   METHOD GetFileData()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -141,49 +145,31 @@ RETURN aRet
 METHOD GetDirectory( cFileSpec ) CLASS FtpClient
    LOCAL hFind, aFile := {}, aDir := {}
    LOCAL pFindData := (struct WIN32_FIND_DATA)
-   LOCAL pSysTime  := (struct SYSTEMTIME)
-   LOCAL cBuffer
+
    DEFAULT cFileSpec TO "*.*"
 
-   IF ( hFind := _FtpFindFirstFile( ::hFtp, cFileSpec, @cBuffer, INTERNET_FLAG_NEED_FILE ) ) != 0
-      pFindData:Buffer( cBuffer )
-
-      aFile:= array( 5 )
-      aFile[1] := pFindData:cFileName:AsString()
-      aFile[2] := pFindData:dwFileAttributes
-      aFile[3] := pFindData:nFileSizeLow
-
-      IF _FileTimeToSystemTime( pFindData:ftLastWriteTime:Value, @cBuffer )
-         pSysTime:Buffer( cBuffer )
-
-         aFile[4] := STOD( STRZERO( pSysTime:wYear, 4 ) + STRZERO( pSysTime:wMOnth, 2 ) + STRZERO( pSysTime:wDay, 2 ) )
-         aFile[5] := STRZERO( pSysTime:wHour, 2 ) + ":" + STRZERO( pSysTime:wMinute, 2 ) + ":" + STRZERO( pSysTime:wSecond, 2 )
-      ENDIF
-
-      AADD( aDir, aFile )
-
-      DO WHILE _InternetFindNextFile( hFind, @cBuffer )
-         pFindData:Buffer( cBuffer )
-
-         aFile:= array( 5 )
-         aFile[1] := pFindData:cFileName:AsString()
-         aFile[2] := pFindData:dwFileAttributes
-         aFile[3] := pFindData:nFileSizeLow
-
-         IF _FileTimeToSystemTime( pFindData:ftLastWriteTime:Value, @cBuffer )
-            pSysTime:Buffer( cBuffer )
-
-            aFile[4] := STOD( STRZERO( pSysTime:wYear, 4 ) + STRZERO( pSysTime:wMOnth, 2 ) + STRZERO( pSysTime:wDay, 2 ) )
-            aFile[5] := STRZERO( pSysTime:wHour, 2 ) + ":" + STRZERO( pSysTime:wMinute, 2 ) + ":" + STRZERO( pSysTime:wSecond, 2 )
-         ENDIF
-
-         AADD( aDir, aFile )
-
+   IF ( hFind := FtpFindFirstFile( ::hFtp, cFileSpec, @pFindData, 0, 0 ) ) != 0
+      AADD( aDir, ::GetFileData( pFindData ) )
+      DO WHILE InternetFindNextFile( hFind, @pFindData )
+         AADD( aDir, ::GetFileData( pFindData ) )
+         ::Application:DoEvents()
       ENDDO
-
       InternetCloseHandle( hFind )
    ENDIF
 
 RETURN aDir
+
+METHOD GetFileData( pFindData ) CLASS FtpClient
+   LOCAL pSysTime := (struct SYSTEMTIME)
+   LOCAL aFile    := Array( 5 )
+   aFile[1] := pFindData:cFileName:AsString()
+   aFile[2] := pFindData:dwFileAttributes
+   aFile[3] := pFindData:nFileSizeLow
+
+   IF FileTimeToSystemTime( pFindData:ftLastWriteTime, @pSysTime )
+      aFile[4] := STOD( STRZERO( pSysTime:wYear, 4 ) + STRZERO( pSysTime:wMonth, 2 ) + STRZERO( pSysTime:wDay, 2 ) )
+      aFile[5] := STRZERO( pSysTime:wHour, 2 ) + ":" + STRZERO( pSysTime:wMinute, 2 ) + ":" + STRZERO( pSysTime:wSecond, 2 )
+   ENDIF
+RETURN aFile
 
 #endif

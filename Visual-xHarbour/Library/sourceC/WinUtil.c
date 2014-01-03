@@ -41,6 +41,7 @@
 #include <olectl.h>
 #include <pshpack8.h>
 #include <psapi.h>
+#include <tchar.h>
 //#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
@@ -5282,4 +5283,27 @@ HB_FUNC( _GETOPENFILENAME )   // ( cFileMask, cTitle, nDefaultMask, cInitDir, lS
 HB_FUNC( ISRGB )
 {
    hb_retl( sizeof(COLORREF) == sizeof(hb_parnl(1)) );
+}
+
+HB_FUNC( SYSTEMTIMETOLOCALTIME )
+{
+   SYSTEMTIME lt;
+   SYSTEMTIME utc;
+   char *dateTimeString = (char *) hb_parc(1);
+   char cbuffer[9];
+
+   sscanf( dateTimeString, "%4d%2d%2d%2d%2d%2d", 
+                           &utc.wYear, &utc.wMonth, &utc.wDay,
+                           &utc.wHour, &utc.wMinute, &utc.wSecond );
+
+   if( SystemTimeToTzSpecificLocalTime( NULL, &utc, &lt ) )
+   {
+      char cTime[9];
+
+      hb_reta(2);
+      hb_stord( lt.wYear, lt.wMonth, lt.wDay, -1, 1 );
+
+      wsprintf( cTime, "%02i:%02i:%02i", lt.wHour, lt.wMinute, lt.wSecond );
+      hb_storclen( cTime, 8, -1, 2 );
+   }
 }

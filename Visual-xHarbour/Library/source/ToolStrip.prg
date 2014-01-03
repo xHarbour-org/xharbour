@@ -2250,7 +2250,7 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
 
               hdc       := GetWindowDC( hWnd )
               hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:MenuBorder )
-              hOldBrush := SelectObject( hDC, o:System:CurrentScheme:Brush:ToolStripDropDownBackground )
+              hOldBrush := SelectObject( hDC, o:System:CurrentScheme:Brush:MenuBackground )
               
               Rectangle( hDC, 0, 0, aRect[3]-aRect[1], aRect[4]-aRect[2] )
               
@@ -2262,7 +2262,7 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               _ScreenToClient( hWnd, @aPt )
               
               // merge menu to strip item
-              hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:ToolStripDropDownBackground )
+              hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:MenuBackground )
               Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
               
               SelectObject( hDC, hOldPen )
@@ -2863,7 +2863,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
 
    IF lSelected //.AND. !lDisabled
       hOldPen   := SelectObject( dis:hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
-      hOldBrush := SelectObject( dis:hDC, IIF( lDisabled, ::System:CurrentScheme:Brush:ToolStripDropDownBackground, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+      hOldBrush := SelectObject( dis:hDC, IIF( lDisabled, ::System:CurrentScheme:Brush:MenuBackground, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       
       Rectangle( dis:hDC, dis:rcItem:left+1, dis:rcItem:top, dis:rcItem:right-2, dis:rcItem:bottom )
       
@@ -2875,7 +2875,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
          ::__DrawStripe( dis:hDC, 0, dis:rcItem:top - IIF( ::BeginGroup, 3, 0 ), 24, dis:rcItem:bottom )
          dis:rcItem:left := xIcon - 8
       ENDIF
-      FillRect( dis:hDC, dis:rcItem, ::System:CurrentScheme:Brush:ToolStripDropDownBackground )
+      FillRect( dis:hDC, dis:rcItem, ::System:CurrentScheme:Brush:MenuBackground )
       dis:rcItem:left := 0
    ENDIF
 
@@ -2922,7 +2922,7 @@ RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
-   LOCAL hOld, aRect, hDC, aExt, cText
+   LOCAL hOld, aRect, hDC, aExt, n, nWidth, nShort
    LOCAL xIcon := 0
    LOCAL yIcon := 0
    (nwParam)
@@ -2938,10 +2938,17 @@ METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
          hOld := SelectObject( hDC, ::Form:Font:Handle )
       ENDIF
       IF ::Caption != NIL
-         cText := ::Caption + IIF( !EMPTY( ::ShortCutText ), SPACE(3)+::ShortCutText,"")
-         aExt := _GetTextExtentPoint32( hDC, cText )
-         _DrawText( hDC, cText, @aRect, DT_SINGLELINE + DT_CALCRECT )
-         aRect[3] := aExt[1]+20
+         nWidth := 0
+         nShort := 0
+         FOR n := 1 TO LEN( ::Parent:Children )
+             aExt := _GetTextExtentPoint32( hDC, ::Parent:Children[n]:Text )
+             nWidth := MAX( nWidth, aExt[1]+30 )
+         NEXT
+
+         //cText := ::Caption + IIF( !EMPTY( ::ShortCutText ), SPACE(3)+::ShortCutText,"")
+         aExt := _GetTextExtentPoint32( hDC, ::ShortCutText )
+         //_DrawText( hDC, cText, @aRect, DT_SINGLELINE + DT_CALCRECT )
+         aRect[3] := nWidth + aExt[1]
          aRect[4] := aExt[2]+((aExt[2]*10)/100)
       ENDIF
       SelectObject( hDC, hOld )
@@ -3061,14 +3068,17 @@ METHOD GetShortcutText( lCtrl, lAlt, lShift, nKey ) CLASS __MenuStripItemShortCu
       cAccel := ""
       ::xKey := 0
    ENDIF
-   IF __GetApplication() != NIL .AND. ::Parent:__ClassInst != NIL
-      WITH OBJECT __GetApplication():ObjectManager
-         IF ( oItem := FindTreeItem( :Items, TVGetSelected( :hWnd ) ) ) != NIL
-            oItem:Owner:ColItems[1]:Value := cAccel
-            :InvalidateRect(, .F. )
-         ENDIF
-      END
-   ENDIF
+   TRY
+      IF __GetApplication() != NIL .AND. ::Parent:__ClassInst != NIL
+         WITH OBJECT __GetApplication():ObjectManager
+            IF ( oItem := FindTreeItem( :Items, TVGetSelected( :hWnd ) ) ) != NIL
+               oItem:Owner:ColItems[1]:Value := cAccel
+               :InvalidateRect(, .F. )
+            ENDIF
+         END
+      ENDIF
+   CATCH
+   END
 RETURN cAccel
 
 FUNCTION __GradientFill( hDC, aVertex, nVertex, aMesh, nCount, ulMode )

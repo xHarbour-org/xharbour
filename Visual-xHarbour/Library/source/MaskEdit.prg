@@ -24,17 +24,17 @@ CLASS MaskEdit INHERIT EditBox
    PROPERTY Text         GET IIF( ::oGet != NIL, ::oGet:VarGet(), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
-   DATA OnCharacter  EXPORTED
-   DATA OnKey        EXPORTED
-   DATA ReadOnly     EXPORTED  INIT .F.
-   DATA lInValid     EXPORTED  INIT .F.
-   DATA NoEdit       EXPORTED  INIT .F.
-   DATA NoOverStrike EXPORTED  INIT .F.
-   DATA oGet         EXPORTED
-   DATA  __Validate  EXPORTED INIT .F.
+   DATA OnCharacter      EXPORTED
+   DATA OnKey            EXPORTED
+   DATA ReadOnly         EXPORTED INIT .F.
+   DATA lInValid         EXPORTED INIT .F.
+   DATA NoEdit           EXPORTED INIT .F.
+   DATA NoOverStrike     EXPORTED INIT .F.
+   DATA oGet             EXPORTED
+   DATA  __Validate      EXPORTED INIT .F.
 
-   DATA CueBanner    PROTECTED
-   DATA EnterNext    INIT .F.
+   DATA CueBanner        PROTECTED
+   DATA EnterNext        INIT .F.
 
    ACCESS PreBlock       INLINE ::oGet:preblock
    ASSIGN PreBlock(b)    INLINE ::oGet:preblock  := b

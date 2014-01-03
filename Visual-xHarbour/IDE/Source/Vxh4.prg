@@ -101,7 +101,11 @@ METHOD OnGetDlgCode() CLASS ObjManager
       ::PostMessage( WM_USER+4768 )
       RETURN 0
    ENDIF
+   IF ::wParam == VK_SPACE
+      RETURN 0
+   ENDIF
 RETURN DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
+
 
 METHOD Init( oParent ) CLASS ObjManager
    LOCAL cColor
@@ -1592,23 +1596,27 @@ METHOD GetColorValues( oObj, cProp, xValue, nDefault ) CLASS ObjManager
    IF nColor == NIL .AND. UPPER( cProp ) == "MASKCOLOR"
       xValue := "None"
     ELSE
+      IF nDefault == NIL .AND. __ObjHasMsg( oObj, "__a_" + cProp )
+         nDefault := __objSendMsg( oObj, "__a_" + cProp )[4]
+      ENDIF
       IF nDefault == NIL .AND. __ObjHasMsg( oObj, "__Sys" + cProp )
          nDefault := __objSendMsg( oObj, "__Sys" + cProp )
       ENDIF
       IF ( n := ASCAN( ::Colors, {|a|a[1]==xValue} ) ) > 0
          xValue := ::Colors[n][2]
+       ELSEIF xValue != nDefault
+         xValue := "Custom..."
       ENDIF
       DEFAULT nColor TO nDefault
       IF nColor == nDefault
          xValue := "System Default..." 
       ENDIF
-      IF VALTYPE( xValue ) != "C"
-         xValue := "Custom..."
-      ENDIF
    ENDIF
    IF nDefault == NIL
       nDefault := nColor
-      xValue := "System Default..." 
+      IF VALTYPE( xValue ) != "C"
+         xValue := "System Default..." 
+      ENDIF
    ENDIF
 RETURN nColor
 

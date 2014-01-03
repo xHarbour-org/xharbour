@@ -250,38 +250,38 @@ METHOD Create() CLASS SourceEditor
    WITH OBJECT ( ::ContextMenu := ContextStrip( Self ) )
       :Create()
       WITH OBJECT ( ::EditMenuItems[ "Undo" ]   := MENUSTRIPITEM( :this ) )
-         :Caption      := "&Undo"
+         :Text         := "&Undo"
          :ShortCutText := "Ctrl+Z"
          :Action       := {|| ::Source:Undo() }
          :Create()
       END
       WITH OBJECT ( ::EditMenuItems[ "Cut" ]    := MENUSTRIPITEM( :this ) )
-         :Caption      := "C&ut"
+         :Text         := "C&ut"
          :ShortCutText := "Ctrl+X"
          :Begingroup   := .T.
          :Action       := {|| ::Source:Cut() }
          :Create()
       END
       WITH OBJECT ( ::EditMenuItems[ "Copy" ]   := MENUSTRIPITEM( :this ) )
-         :Caption      := "&Copy"
+         :Text         := "&Copy"
          :ShortCutText := "Ctrl+C"
          :Action       := {|| ::Source:Copy() }
          :Create()
       END
       WITH OBJECT ( ::EditMenuItems[ "Paste" ]  := MENUSTRIPITEM( :this ) )
-         :Caption      := "&Paste"
+         :Text         := "&Paste"
          :ShortCutText := "Ctrl+V"
          :Action       := {|| ::Source:Paste() }
          :Create()
       END
       WITH OBJECT ( ::EditMenuItems[ "Delete" ] := MENUSTRIPITEM( :this ) )
-         :Caption      := "&Delete"
+         :Text         := "&Delete"
          :ShortCutText := "Del"
          :Action       := {|| ::Source:Delete() }
          :Create()
       END
       WITH OBJECT ( ::EditMenuItems[ "SelAll" ] := MENUSTRIPITEM( :this ) )
-         :Caption      := "Select &All"
+         :Text         := "Select &All"
          :ShortCutText := "Ctrl+A"
          :Action       := {|| ::Source:SelectAll() }
          :Begingroup   := .T.
@@ -642,35 +642,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     IF VALTYPE(oObj) == "O"
                        aList := {}
 
-                       aProperties := __GetMembers( oObj,,/*HB_OO_CLSTP_EXPORTED |*/ HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
-                       FOR n := 1 TO LEN( aProperties )
-                           IF ! aProperties[n][1][1] $ "_X"
-                              IF __ObjHasMsg( oObj, "__a_"+aProperties[n] )
-                                 aProp   := __objSendMsg( oObj, "__a_"+aProperties[n] )
-                                 AADD( aList, aProp[1]+"?8" )
-                               ELSE
-                                 AADD( aList, aProperties[n] + "?8" )
-                              ENDIF
-                           ENDIF
-                       NEXT
-
-                       aMethods := __objGetMethodList( oObj )
-                       //aMethods := __GetMembers( oObj,,HB_OO_CLSTP_SYMBOL, HB_OO_MSG_METHOD )
-                       FOR n := 1 TO LEN( aMethods )
-                           IF __ObjHasMsg( oObj, "__m_"+aMethods[n] )
-                              aProp   := __objSendMsg( oObj, "__m_"+aMethods[n] )
-                              AADD( aList, aProp[1]+"?7" )
-                            ELSE
-                              AADD( aList, Upper(aMethods[n][1])+Lower(SubStr(aMethods[n],2))+"?7" )
-                           ENDIF
-                       NEXT
-
-                       IF __ObjHasMsg( oObj, "Property" ) .AND. oObj:__hObjects != NIL
-                          FOR EACH cCtrl IN oObj:__hObjects:Keys
-                              IF oObj:__hObjects[ cCtrl ]:Name != NIL
-                                 AADD( aList, oObj:__hObjects[ cCtrl ]:Name+"?8" )
-                              ENDIF
-                          NEXT
+                       IF oObj:__hObjects != NIL
+                          HEval( oObj:__hObjects, {|k,v,i| AADD( aList, k + "?8" ) } )
                        ENDIF
 
                        IF __ObjHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
@@ -680,6 +653,31 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                               NEXT
                           NEXT
                        ENDIF
+
+                       aProperties := __GetMembers( oObj,, HB_OO_CLSTP_PUBLISHED, HB_OO_MSG_DATA )
+                       FOR n := 1 TO LEN( aProperties )
+                           IF ASCAN( aList, {|c| Upper(PosDel(c,,2))==Upper(aProperties[n])} ) == 0
+                              IF __ObjHasMsg( oObj, "__a_"+aProperties[n] )
+                                 aProp   := __objSendMsg( oObj, "__a_"+aProperties[n] )
+                                 AADD( aList, aProp[1]+"?8" )
+                               ELSE
+                                 AADD( aList, aProperties[n] + "?8" )
+                              ENDIF
+                           ENDIF
+                       NEXT
+
+                       aMethods := __objGetMethodList( oObj, HB_OO_MTHD_SYMBOL )
+                       //aMethods := __GetMembers( oObj,,HB_OO_MTHD_SYMBOL, HB_OO_MSG_METHOD | HB_OO_MSG_INLINE )
+                       FOR n := 1 TO LEN( aMethods )
+                           IF ASCAN( aList, {|c| Upper(PosDel(c,,2))==Upper(aMethods[n])} ) == 0
+                              IF __ObjHasMsg( oObj, "__m_"+aMethods[n] )
+                                 aProp   := __objSendMsg( oObj, "__m_"+aMethods[n] )
+                                 AADD( aList, aProp[1]+"?7" )
+                               ELSE
+                                 AADD( aList, Upper(aMethods[n][1])+Lower(SubStr(aMethods[n],2))+"?7" )
+                              ENDIF
+                           ENDIF
+                       NEXT
 
                        aSort( aList,,,{|x, y| x < y})
                        cList := ""
@@ -1401,7 +1399,7 @@ METHOD Init( oParent, aParameters ) CLASS Settings
    ::Width         := 471
    ::Height        := 632
    ::Center        := .T.
-   ::Caption       := "Settings"
+   ::Text          := "Settings"
    ::DlgModalFrame := .T.
    ::Create()
 RETURN Self
@@ -1411,10 +1409,10 @@ METHOD OnInitDialog() CLASS Settings
    WITH OBJECT ( TABSTRIP( Self ) )
       :Name                 := "TabStrip1"
       WITH OBJECT :Dock
-         :Left                 := "Settings"
-         :Top                  := "Settings"
-         :Right                := "Settings"
-         :Bottom               := "Settings"
+         :Left                 := Self
+         :Top                  := Self
+         :Right                := Self
+         :Bottom               := Self
          :Margins              := "5,5,5,35"
       END
 
@@ -1425,7 +1423,7 @@ METHOD OnInitDialog() CLASS Settings
       :Create()
       WITH OBJECT ( TABPAGE( :this ) )
          :Name                 := "EditorSettings"
-         :Caption              := "&Editor"
+         :Text                 := "&Editor"
          :Create()
          WITH OBJECT ( GROUPBOX( :this ) )
             :Name                 := "GroupBox1"
@@ -1433,7 +1431,7 @@ METHOD OnInitDialog() CLASS Settings
             :Top                  := 7
             :Width                := 431
             :Height               := 309
-            :Caption              := "Colors"
+            :Text                 := "Colors"
             :ForeColor            := 0
             :Create()
             WITH OBJECT ( BUTTON( :this ) )
@@ -1442,7 +1440,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 16
                :Width                := 77
                :Height               := 22
-               :Caption              := "Background"
+               :Text                 := "Background"
                :EventHandler[ "OnClick" ] := "DefBack_OnClick"
                :Create()
             END //BUTTON
@@ -1453,18 +1451,17 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 16
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label1"
                :Left                 := 15
                :Top                  := 19
                :Width                := 96
                :Height               := 16
-               :Caption              := "Default"
+               :Text                 := "Default"
                :Transparent          := .T.
                :Alignment            := DT_RIGHT
                :Create()
@@ -1478,7 +1475,7 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "Normal Text"
+               :Text                 := "Normal Text"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
@@ -1489,7 +1486,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 43
                :Width                := 77
                :Height               := 22
-               :Caption              := "Background"
+               :Text                 := "Background"
                :EventHandler[ "OnClick" ] := "DefBack_OnClick"
                :Create()
             END //BUTTON
@@ -1502,18 +1499,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "Normal Text"
+               :Text                 := "Normal Text"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label2"
                :Left                 := 10
                :Top                  := 46
                :Width                := 101
                :Height               := 16
-               :Caption              := "Current Line"
+               :Text                 := "Current Line"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1524,7 +1520,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 70
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1537,18 +1533,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "12345678"
+               :Text                 := "12345678"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label3"
                :Left                 := 16
                :Top                  := 74
                :Width                := 96
                :Height               := 16
-               :Caption              := "Numbers"
+               :Text                 := "Numbers"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1559,7 +1554,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 96
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1572,18 +1567,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := '"This is text"'
+               :Text                 := '"This is text"'
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label4"
                :Left                 := 16
                :Top                  := 100
                :Width                := 96
                :Height               := 16
-               :Caption              := "Strings"
+               :Text                 := "Strings"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1594,7 +1588,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 123
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1607,18 +1601,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "// Comment"
+               :Text                 := "// Comment"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label5"
                :Left                 := 16
                :Top                  := 127
                :Width                := 96
                :Height               := 16
-               :Caption              := "Comments"
+               :Text                 := "Comments"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1629,7 +1622,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 149
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1642,18 +1635,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := ":="
+               :Text                 := ":="
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label6"
                :Left                 := 16
                :Top                  := 153
                :Width                := 96
                :Height               := 16
-               :Caption              := "Operators"
+               :Text                 := "Operators"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1664,7 +1656,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 175
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1677,18 +1669,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "#include"
+               :Text                 := "#include"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label7"
                :Left                 := 16
                :Top                  := 179
                :Width                := 96
                :Height               := 16
-               :Caption              := "Preprocessor"
+               :Text                 := "Preprocessor"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1699,7 +1690,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 201
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1712,18 +1703,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "DO CASE"
+               :Text                 := "DO CASE"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label8"
                :Left                 := 16
                :Top                  := 205
                :Width                := 96
                :Height               := 16
-               :Caption              := "Keywords 1"
+               :Text                 := "Keywords 1"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1734,7 +1724,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 226
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1747,18 +1737,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "Function / Method"
+               :Text                 := "Function / Method"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label9"
                :Left                 := 16
                :Top                  := 230
                :Width                := 96
                :Height               := 16
-               :Caption              := "Keywords 2"
+               :Text                 := "Keywords 2"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1769,7 +1758,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 251
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1782,18 +1771,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "SendMessage"
+               :Text                 := "SendMessage"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label10"
                :Left                 := 16
                :Top                  := 255
                :Width                := 96
                :Height               := 16
-               :Caption              := "Keywords 3"
+               :Text                 := "Keywords 3"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1804,7 +1792,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 276
                :Width                := 77
                :Height               := 22
-               :Caption              := "Foreground"
+               :Text                 := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
@@ -1817,18 +1805,17 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :StaticEdge           := .T.
                :ClientEdge           := .F.
-               :Caption              := "dbEval"
+               :Text                 := "dbEval"
                :ReadOnly             := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Name                 := "Label11"
                :Left                 := 16
                :Top                  := 280
                :Width                := 96
                :Height               := 16
-               :Caption              := "Keywords 4"
+               :Text                 := "Keywords 4"
                :Alignment            := DT_RIGHT
                :Create()
             END //LABEL
@@ -1841,7 +1828,7 @@ METHOD OnInitDialog() CLASS Settings
             :Top                  := 450
             :Width                := 431
             :Height               := 76
-            :Caption              := "Misc"
+            :Text                 := "Misc"
             :ForeColor            := 0
             :Create()
 
@@ -1851,7 +1838,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 22
                :Width                := 83
                :Height               := 15
-               :Caption              := "Wrap Search"
+               :Text                 := "Wrap Search"
                :State                := ::Application:EditorProps:WrapSearch
                :Create()
             END //CHECKBOX
@@ -1862,7 +1849,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 22
                :Width                := 109
                :Height               := 15
-               :Caption              := "Caret Line Visible"
+               :Text                 := "Caret Line Visible"
                :State                := ::Application:SourceEditor:CaretLineVisible
                :Create()
             END //CHECKBOX
@@ -1873,7 +1860,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 22
                :Width                := 86
                :Height               := 15
-               :Caption              := "Auto Indent"
+               :Text                 := "Auto Indent"
                :State                := ::Application:SourceEditor:AutoIndent
                :Create()
             END //CHECKBOX
@@ -1883,7 +1870,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 49
                :Width                := 71
                :Height               := 16
-               :Caption              := "Tab Spacing"
+               :Text                 := "Tab Spacing"
                :Create()
             END //LABEL
 
@@ -1893,7 +1880,7 @@ METHOD OnInitDialog() CLASS Settings
                :Top                  := 46
                :Width                := 18
                :Height               := 22
-               :Caption              := "UpDown1"
+               :Text                 := "UpDown1"
                :Buddy                := "TabSpacing"
                :Create()
             END //UPDOWN
@@ -1906,7 +1893,7 @@ METHOD OnInitDialog() CLASS Settings
                :Height               := 22
                :Alignment            := 3
                :Number               := .T.
-               :Caption := xStr(::Application:SourceEditor:TabWidth)
+               :Text    := xStr(::Application:SourceEditor:TabWidth)
                :Create()
             END //EDITBOX
 
@@ -1918,7 +1905,7 @@ METHOD OnInitDialog() CLASS Settings
             :Top                  := 316
             :Width                := 431
             :Height               := 132
-            :Caption              := "Font"
+            :Text                 := "Font"
             :ForeColor            := 0
             :Create()
             WITH OBJECT ( COMBOBOX( :this ) )
@@ -1997,102 +1984,14 @@ METHOD OnInitDialog() CLASS Settings
          END //GROUPBOX
 
       END //TABPAGE
-/*
-      WITH OBJECT ( TABPAGE( :this ) )
-         :Name                 := "TabPage1"
-         :Caption              := "Designer"
-         :Create()
-         WITH OBJECT ( GROUPBOX( :this ) )
-            :Name                 := "GroupBox2"
-            :Left                 := 11
-            :Top                  := 9
-            :Width                := 428
-            :Height               := 99
-            :Caption              := "Show"
-            :ForeColor            := 0
-            :Create()
-            WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox1"
-               :Left                 := 9
-               :Top                  := 17
-               :Width                := 100
-               :Height               := 15
-               :Caption              := "Grid"
-               :Create()
-            END //CHECKBOX
 
-            WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox4"
-               :Left                 := 9
-               :Top                  := 71
-               :Width                := 100
-               :Height               := 17
-               :Caption              := "Docking"
-               :Create()
-            END //CHECKBOX
-
-            WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox2"
-               :Left                 := 9
-               :Top                  := 36
-               :Width                := 100
-               :Height               := 15
-               :Caption              := "Rulers"
-               :Create()
-            END //CHECKBOX
-
-            WITH OBJECT ( CHECKBOX( :this ) )
-               :Name                 := "CheckBox3"
-               :Left                 := 9
-               :Top                  := 54
-               :Width                := 123
-               :Height               := 15
-               :Caption              := "OLE Source"
-               :Create()
-            END //CHECKBOX
-
-         END //GROUPBOX
-
-         WITH OBJECT ( GROUPBOX( :this ) )
-            :Name                 := "GroupBox3"
-            :Left                 := 11
-            :Top                  := 109
-            :Width                := 428
-            :Height               := 50
-            :Caption              := "Ruller Type"
-            :ForeColor            := 0
-            :Create()
-            WITH OBJECT ( RADIOBUTTON( :this ) )
-               :Name                 := "RadioButton1"
-               :Left                 := 10
-               :Top                  := 22
-               :Width                := 57
-               :Height               := 15
-               :Caption              := "Inches"
-               :Create()
-            END //RADIOBUTTON
-
-            WITH OBJECT ( RADIOBUTTON( :this ) )
-               :Name                 := "RadioButton2"
-               :Left                 := 99
-               :Top                  := 22
-               :Width                := 100
-               :Height               := 15
-               :Caption              := "Centimeters"
-               :Create()
-            END //RADIOBUTTON
-
-         END //GROUPBOX
-
-      END //TABPAGE
-*/
    END //TABSTRIP
 
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Button3"
       WITH OBJECT :Dock
          :Right                := "Button4"
-         :Bottom               := "Settings"
+         :Bottom               := Self
          :Margins              := "5,5,5,5"
       END
 
@@ -2100,7 +1999,7 @@ METHOD OnInitDialog() CLASS Settings
       :Top                  := 399
       :Width                := 75
       :Height               := 24
-      :Caption              := "OK"
+      :Text                 := "OK"
       :EventHandler[ "OnClick" ] := "Button3_OnClick"
       :Create()
    END //BUTTON
@@ -2109,7 +2008,7 @@ METHOD OnInitDialog() CLASS Settings
       :Name                 := "Button4"
       WITH OBJECT :Dock
          :Right                := "Button5"
-         :Bottom               := "Settings"
+         :Bottom               := Self
          :Margins              := "5,5,5,5"
       END
 
@@ -2117,7 +2016,7 @@ METHOD OnInitDialog() CLASS Settings
       :Top                  := 399
       :Width                := 75
       :Height               := 24
-      :Caption              := "Cancel"
+      :Text                 := "Cancel"
       :EventHandler[ "OnClick" ] := "Close"
       :Create()
    END //BUTTON
@@ -2125,8 +2024,8 @@ METHOD OnInitDialog() CLASS Settings
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Button5"
       WITH OBJECT :Dock
-         :Right                := "Settings"
-         :Bottom               := "Settings"
+         :Right                := Self
+         :Bottom               := Self
          :Margins              := "5,5,5,5"
       END
 
@@ -2134,11 +2033,11 @@ METHOD OnInitDialog() CLASS Settings
       :Top                  := 399
       :Width                := 75
       :Height               := 24
-      :Caption              := "&Apply"
+      :Text                 := "&Apply"
       :EventHandler[ "OnClick" ] := "Apply"
       :Create()
    END //BUTTON
-RETURN Self
+RETURN 1
 
 //----------------------------------------------------------------------------------------------------
 METHOD DefBack_OnClick( Sender ) CLASS Settings
@@ -2246,7 +2145,7 @@ METHOD Apply() CLASS Settings
       :ColorKeywords2    := ::Keywords2Edit:ForeColor
       :ColorKeywords3    := ::Keywords3Edit:ForeColor
       :ColorKeywords4    := ::Keywords4Edit:ForeColor
-      :TabWidth          := VAL( ::TabSpacing:Caption )
+      :TabWidth          := VAL( ::TabSpacing:Text    )
       :CaretLineVisible  := ::CaretLine:GetState()
       :AutoIndent        := ::AutoIndent:GetState()
       ::Application:EditorProps:WrapSearch := ::WrapSearch:GetState()
@@ -2275,7 +2174,7 @@ METHOD Init( oParent, aParameters ) CLASS GotoDialog
    ::Top                  := 10
    ::Width                := 160
    ::Height               := 120
-   ::Caption              := "Go To"
+   ::Text                 := "Go To"
    ::MaximizeBox          := .F.
    ::MinimizeBox          := .F.
    ::DlgModalFrame        := .T.
@@ -2286,12 +2185,11 @@ RETURN Self
 
 METHOD OnInitDialog() CLASS GotoDialog
    WITH OBJECT ( LABEL( Self ) )
-      :Name                 := "Label1"
       :Left                 := 10
       :Top                  := 18
       :Width                := 72
       :Height               := 16
-      :Caption              := "Line Number"
+      :Text                 := "Line Number"
       :Create()
    END //LABEL
    
@@ -2303,7 +2201,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Top                  := 15
       :Width                := 18
       :Height               := 22
-      :Caption              := ""
+      :Text                 := ""
       :Buddy                := "LineNum"
       :Create()
    END //UPDOWN
@@ -2316,7 +2214,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Height               := 22
       :Alignment            := 3
       :Number               := .T.
-      :Caption              := xStr(::Application:SourceEditor:Source:nPrevLine)
+      :Text                 := xStr(::Application:SourceEditor:Source:nPrevLine)
       :Create()
    END //EDITBOX
 
@@ -2326,7 +2224,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Top                  := 67
       :Width                := 70
       :Height               := 25
-      :Caption              := "&Go to"
+      :Text                 := "&Go to"
       :DefaultButton        := .T.
       :Dock:Bottom          := Self
       :Dock:Left            := Self
@@ -2341,7 +2239,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Top                  := 67
       :Width                := 70
       :Height               := 25
-      :Caption              := "&Cancel"
+      :Text                 := "&Cancel"
       :EventHandler[ "OnClick" ] := "Close"
       :Dock:Bottom          := Self
       :Dock:Right           := Self
@@ -2351,7 +2249,7 @@ METHOD OnInitDialog() CLASS GotoDialog
 RETURN 1
 
 METHOD Go_OnClick() CLASS GotoDialog
-   ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Caption )-1 )
+   ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Text    )-1 )
    ::Close()
 RETURN Self
 
@@ -2378,7 +2276,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
    ::Top                  := aRect[2] + 17
    ::Width                := 446
    ::Height               := 153
-   ::Caption              := "Replace"
+   ::Text                 := "Replace"
    ::Resizable            := .F.
    ::MaximizeBox          := .F.
    ::MinimizeBox          := .F.
@@ -2392,14 +2290,14 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Left                 := 93
       :Top                  := 9
       :Width                := 244
-      :Caption              := ::Parent:Source:GetSelText()
+      :Text                 := ::Parent:Source:GetSelText()
       :OnWMKeyUp            := <|o,nKey|
                                  IF nKey == 27
                                     o:Parent:Close()
                                   ELSE
                                     o:Parent:Next:Enabled := ;
                                     o:Parent:Replace:Enabled := ;
-                                    o:Parent:All:Enabled := ! Empty(o:Caption)
+                                    o:Parent:All:Enabled := ! Empty(o:Text   )
                                  ENDIF
                                >
       :Create()
@@ -2421,7 +2319,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Top                  := 62
       :Width                := 150
       :Height               := 15
-      :Caption              := "Match Whole &Word"
+      :Text                 := "Match Whole &Word"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
@@ -2432,7 +2330,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Top                  := 81
       :Width                := 100
       :Height               := 15
-      :Caption              := "Match &Case"
+      :Text                 := "Match &Case"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
@@ -2443,7 +2341,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Top                  := 100
       :Width                := 100
       :Height               := 15
-      :Caption              := "&Global Search"
+      :Text                 := "&Global Search"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //CHECKBOX
@@ -2455,7 +2353,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Width                := 80
       :Height               := 24
       :Enabled              := .F.
-      :Caption              := "Find &Next"
+      :Text                 := "Find &Next"
       :DefaultButton        := .T.
       :EventHandler[ "OnClick" ] := "Next_OnClick"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
@@ -2469,7 +2367,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Width                := 80
       :Enabled              := .F.
       :Height               := 24
-      :Caption              := "&Replace"
+      :Text                 := "&Replace"
       :EventHandler[ "OnClick" ] := "Replace_OnClick"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
@@ -2482,7 +2380,7 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Width                := 80
       :Height               := 24
       :Enabled              := .F.
-      :Caption              := "Replace &All"
+      :Text                 := "Replace &All"
       :EventHandler[ "OnClick" ] := "All_OnClick"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
@@ -2494,29 +2392,27 @@ METHOD Init( oParent, aParameters ) CLASS FindReplace
       :Top                  := 86
       :Width                := 80
       :Height               := 24
-      :Caption              := "Cancel"
+      :Text                 := "Cancel"
       :EventHandler[ "OnClick" ] := "Close"
       :OnWMKeyUp            := {|o,nKey| IIF( nKey==27, o:Parent:Close(),)}
       :Create()
    END //BUTTON
 
    WITH OBJECT ( LABEL( Self ) )
-      :Name                 := "Label1"
       :Left                 := 15
       :Top                  := 12
       :Width                := 72
       :Height               := 16
-      :Caption              := "&Find"
+      :Text                 := "&Find"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
-      :Name                 := "Label2"
       :Left                 := 15
       :Top                  := 37
       :Width                := 70
       :Height               := 16
-      :Caption              := "&Replace with"
+      :Text                 := "&Replace with"
       :Create()
    END //LABEL
 
@@ -2526,7 +2422,7 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 METHOD Next_OnClick() CLASS FindReplace
    LOCAL nFlags := 0
-   ::Parent:cFindWhat  := ::FindWhat:Caption
+   ::Parent:cFindWhat  := ::FindWhat:Text   
 
    IF ::MatchCase:Checked()
       nFlags := nFlags | SCFIND_MATCHCASE
@@ -2535,7 +2431,7 @@ METHOD Next_OnClick() CLASS FindReplace
       nFlags := nFlags | SCFIND_WHOLEWORD
    ENDIF
    ::Parent:Source:SetSearchFlags( nFlags )
-   ::Parent:FindNext( ::FindWhat:Caption, .F. )
+   ::Parent:FindNext( ::FindWhat:Text   , .F. )
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
@@ -2548,11 +2444,11 @@ METHOD Replace_OnClick() CLASS FindReplace
       nFlags := nFlags | SCFIND_WHOLEWORD
    ENDIF
    IF ::Parent:Source:GetSelLen() == 0
-      IF ! EMPTY( ::FindWhat:Caption )
-         ::Parent:Source:SearchNext( nFlags, ::FindWhat:Caption )
+      IF ! EMPTY( ::FindWhat:Text    )
+         ::Parent:Source:SearchNext( nFlags, ::FindWhat:Text    )
       ENDIF
     ELSEIF ::Parent:Source:GetSelLen() > 0
-      ::Parent:Source:ReplaceSel( ::ReplaceWith:Caption )
+      ::Parent:Source:ReplaceSel( ::ReplaceWith:Text    )
    ENDIF
 RETURN Self
 
@@ -2569,11 +2465,11 @@ METHOD All_OnClick() CLASS FindReplace
       oSource := ::Parent:Source
       FOR n := 1 TO LEN( ::Parent:aDocs )
           ::Parent:aDocs[n]:Select()
-          ::Parent:aDocs[n]:ReplaceAll( ::FindWhat:Caption, ::ReplaceWith:Caption, nFlags, ::Parent:InSelection )
+          ::Parent:aDocs[n]:ReplaceAll( ::FindWhat:Text   , ::ReplaceWith:Text   , nFlags, ::Parent:InSelection )
       NEXT
       oSource:Select()
     ELSE
-      ::Parent:Source:ReplaceAll( ::FindWhat:Caption, ::ReplaceWith:Caption, nFlags, ::Parent:InSelection )
+      ::Parent:Source:ReplaceAll( ::FindWhat:Text   , ::ReplaceWith:Text   , nFlags, ::Parent:InSelection )
    ENDIF
 RETURN Self
 

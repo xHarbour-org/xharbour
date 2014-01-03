@@ -438,6 +438,7 @@ METHOD OnMouseHover() CLASS Button
    IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
       RETURN NIL
    ENDIF
+   ::__lMouseHover := .T.
    ::InvalidateRect(, .F. )
 RETURN NIL
 
@@ -445,5 +446,6 @@ METHOD OnMouseLeave() CLASS Button
    IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
       RETURN NIL
    ENDIF
+   ::__lMouseHover := .F.
    ::InvalidateRect(, .F. )
 RETURN NIL
