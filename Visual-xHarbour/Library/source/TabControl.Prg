@@ -1108,9 +1108,9 @@ METHOD __PaintBakgndImage( hDC, hBrush ) CLASS TabPage
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    IF hBrush == NIL .AND. ::Application:OsVersion:dwMajorVersion >= 5
-      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight } )
+      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::ClientWidth, ::ClientHeight } )
     ELSEIF hBrush != NIL .AND. hBrush <> 0
-      _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    ENDIF
 
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
