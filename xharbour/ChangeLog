@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-01-07 14:10  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/rdd_ads/adsfunc.c 
+    ! minor fix 
+    
 2013-12-09 17:16 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * contrib/tipssl/sendmail.prg
     ! minor fix

@@ -1511,7 +1511,6 @@ HB_FUNC( ADSCONNECTION )                /* Get/Set func to switch between connec
 HB_FUNC( ADSISCONNECTIONALIVE )                // Determine if passed or default connection is still valid
 {
    UNSIGNED16 bConnectionIsAlive;
-
    AdsIsConnectionAlive( HB_ADS_PARCONNECTION( 1 ), &bConnectionIsAlive );
    hb_retl( bConnectionIsAlive );
 }
@@ -1711,7 +1710,7 @@ HB_FUNC( ADSDDCREATEREFINTEGRITY)
 							( UNSIGNED16 ) hb_parcx( 8 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
 }
 #endif
-
+#endif
 HB_FUNC( ADSDDADDTABLE )
 {
    hb_retl( AdsDDAddTable( HB_ADS_PARCONNECTION( 4 ) /* hConnect */,
@@ -2228,7 +2227,7 @@ HB_FUNC( ADSGETSERVERNAME )
    /* QUESTION: Design decision or mistake to return NIL on error? [vszakats] */
 }
 
-#endif /* ADS_LIB_VERSION >= 600 */
+// #endif /* ADS_LIB_VERSION >= 600 */
 
 #if ADS_LIB_VERSION >= 700
 
