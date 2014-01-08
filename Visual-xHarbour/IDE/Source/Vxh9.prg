@@ -541,8 +541,9 @@ METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
          IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
             oItem:Cargo:Select()
          ENDIF
-
-         ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .T. )
+         IF ::Application:Project:CurrentForm != NIL
+            ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .T. )
+         endif
       ENDIF
    ENDIF
 RETURN NIL

@@ -20,8 +20,9 @@
 #Define WM_CARET   WM_USER + 2551
 
 CLASS MaskEdit INHERIT EditBox
-   PROPERTY Picture      SET ::SetGetProp( "Picture" )
-   PROPERTY Text         GET IIF( ::oGet != NIL, ::oGet:VarGet(), ::xText );
+   PROPERTY Picture      GET IIF( ::oGet != NIL .AND. ::oGet:picture != NIL, ::oGet:picture, ::xPicture );
+                         SET ::SetGetProp( "Picture" )
+   PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, ::oGet:VarGet(), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
    DATA OnCharacter      EXPORTED
@@ -34,16 +35,15 @@ CLASS MaskEdit INHERIT EditBox
    DATA  __Validate      EXPORTED INIT .F.
 
    DATA CueBanner        PROTECTED
+
    DATA EnterNext        INIT .F.
+   DATA Case             INIT 1
 
    ACCESS PreBlock       INLINE ::oGet:preblock
    ASSIGN PreBlock(b)    INLINE ::oGet:preblock  := b
 
    ACCESS PostBlock      INLINE ::oGet:postblock
    ASSIGN PostBlock(b)   INLINE ::oGet:postblock  := b
-
-   ACCESS Picture        INLINE ::oGet:picture
-   ASSIGN Picture(c)     INLINE ::oGet:picture   := c
 
    METHOD SetGetProp()
 

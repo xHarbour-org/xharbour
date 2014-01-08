@@ -36,6 +36,8 @@
 
 CLASS RichTextBox INHERIT EditBox
    DATA __EditStreamPtr PROTECTED
+   DATA EnterNext        INIT .F.
+
    METHOD Init()     CONSTRUCTOR
    METHOD Create()
    METHOD FindText()
@@ -43,6 +45,7 @@ CLASS RichTextBox INHERIT EditBox
    METHOD SetSelectionColor()
    METHOD EditStreamCallback()
    METHOD OnDestroy() INLINE ::Super:OnDestroy(), IIF( ::__EditStreamPtr != NIL, FreeCallBackPointer( ::__EditStreamPtr ), ), NIL
+   METHOD SetCase()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -70,6 +73,21 @@ METHOD Create() CLASS RichTextBox
    ::__EditStreamPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "EditStreamCallback" ), Self )
    es:pfnCallback := ::__EditStreamPtr
    ::SendMessage( EM_STREAMIN, SF_TEXT, es )
+   ::SetCase()
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD SetCase( nCase ) CLASS RichTextBox
+   DEFAULT nCase TO ::Case
+   
+   SWITCH nCase
+      CASE 2
+         ::SendMessage( EM_SETEDITSTYLE, SES_UPPERCASE, SES_UPPERCASE  )
+         EXIT
+      CASE 3
+         ::SendMessage( EM_SETEDITSTYLE, SES_LOWERCASE, SES_LOWERCASE )
+         EXIT
+   END
 RETURN Self
    
 //-----------------------------------------------------------------------------------------------
