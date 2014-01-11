@@ -322,6 +322,10 @@ METHOD Read( nLen ) CLASS tIPClient
       ENDDO
       ::bEof := .T.
    ELSE
+     if Empty( nLen ) .or. nLen < 0
+        nLen := RCV_BUF_SIZE
+     endif   
+
       // read an amount of data
       cStr0 := Space( nLen )
 

@@ -269,6 +269,10 @@ METHOD READ( nLen ) CLASS TIPClient
       ::bEof := .T.
    ELSE
       // read an amount of data
+     if Empty( nLen ) .or. nLen < 0
+        nLen := RCV_BUF_SIZE
+     endif   
+
       cStr0 := Space( nLen )
 
       // if len of file is less than RCV_BUF_SIZE InetRecvAll return 0
