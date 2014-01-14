@@ -115,7 +115,7 @@ RETURN 0
 
 
 CLASS FreeImageRenderer
-   PROPERTY ImageName        SET ::__SetImageName(v)
+   PROPERTY ImageName        SET ::__SetImageName( @v )
    PROPERTY Opacity          SET ::Update() DEFAULT 100
    PROPERTY Alignment        SET ::Update() DEFAULT 1
    PROPERTY KeepAspectRatio  SET ::Update() DEFAULT .F.
@@ -218,7 +218,7 @@ RETURN Self
 //--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS FreeImageRenderer
    IF !EMPTY( ::ImageName )
-      ::__SetImageName( ::xImageName )
+      ::__SetImageName( @::xImageName )
    ENDIF
 RETURN Self
 
@@ -417,7 +417,7 @@ RETURN lOK
 //--------------------------------------------------------------------------------------------------------
 METHOD Update() CLASS FreeImageRenderer
    IF ::__cData == NIL
-      ::__SetImageName( ::xImageName )
+      ::__SetImageName( @::xImageName )
    ENDIF
    IF ::Owner != NIL
       ::Owner:InvalidateRect()

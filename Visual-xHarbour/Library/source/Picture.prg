@@ -17,7 +17,7 @@ static aDef := {"BMP","ICO"}
 
 CLASS PictureBox INHERIT Panel
    PROPERTY TransparencyByPixel DEFAULT .F.
-   PROPERTY ImageName        SET ::SetImageName(v)
+   PROPERTY ImageName        SET ::SetImageName(@v)
    PROPERTY Stretch          SET ::Update()         DEFAULT .F.
    PROPERTY KeepAspectRatio  SET ::Update()         DEFAULT .F.
    PROPERTY Transparent      SET ::InvalidateRect() DEFAULT .F.

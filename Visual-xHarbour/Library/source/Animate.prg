@@ -19,7 +19,7 @@
 // 150 = Shell Move File Flying papers
 CLASS Animation INHERIT TitleControl
 
-   PROPERTY ImageName       ROOT "Appearance" SET ::__SetImageName(v)
+   PROPERTY ImageName       ROOT "Appearance" SET ::__SetImageName(@v)
    PROPERTY Transparent     ROOT "Appearance" SET ::SetStyle( ACS_TRANSPARENT, v ) DEFAULT .F. PROTECTED
    PROPERTY AutoPlay        ROOT "Behavior"   SET ::SetStyle( ACS_AUTOPLAY, v )    DEFAULT .F. PROTECTED
    PROPERTY Centered        ROOT "Behavior"   SET ::SetStyle( ACS_CENTER, v )      DEFAULT .F. PROTECTED

@@ -4986,7 +4986,7 @@ RETURN NIL
 METHOD SetBackColor( nColor, lRepaint ) CLASS WinForm
    ::Super:SetBackColor( nColor, lRepaint )
    IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
-      ::BackgroundImage:__SetImageName( ::BackgroundImage:xImageName )
+      ::BackgroundImage:__SetImageName( @::BackgroundImage:xImageName )
    ENDIF
    IF ::xMDIContainer .AND. ::MDIClient != NIL
       ::MDIClient:InvalidateRect()
