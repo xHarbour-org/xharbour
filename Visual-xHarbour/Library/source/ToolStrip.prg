@@ -35,7 +35,7 @@ static s_MenuhWnd
 
 CLASS ToolStripContainer INHERIT Control
 
-   PROPERTY Position     SET ::__SetPosition( v )   DEFAULT 2
+   PROPERTY Position     SET ::__SetPosition( @v )  DEFAULT 2
    PROPERTY Left         SET ::__SetSizePos( 1, v ) DEFAULT 0   NOTPUBLIC
    PROPERTY Top          SET ::__SetSizePos( 2, v ) DEFAULT 0   NOTPUBLIC
    PROPERTY Width        SET ::__SetSizePos( 3, v ) DEFAULT 100 NOTPUBLIC
@@ -114,8 +114,8 @@ RETURN Self
 METHOD OnSize( nwParam, nlParam ) CLASS ToolStripContainer
    Super:OnSize( nwParam, nlParam )
    ::__SetVertex()
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-   AEVAL( ::Children, {|o| o:InvalidateRect(, .F. ) } )
+   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+   //AEVAL( ::Children, {|o| o:InvalidateRect(, .F. ) } )
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
@@ -235,9 +235,11 @@ METHOD OnPaint() CLASS ToolStripContainer
 RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
-METHOD __SetPosition() CLASS ToolStripContainer
+METHOD __SetPosition(nPos) CLASS ToolStripContainer
    LOCAL oBottom, n
-   SWITCH ::xPosition
+   DEFAULT nPos TO ::xPosition
+   ::xPosition := nPos
+   SWITCH nPos
       CASE 1 // Left
          ::Dock:Left   := ::Parent
          ::Dock:Top    := ::Parent
@@ -301,14 +303,14 @@ METHOD __RefreshLayout( lLeft ) CLASS ToolStripContainer
        
        x := 0
        FOR n := 1 TO LEN( aStrip )
-           aStrip[n]:Top  := nTop
+           aStrip[n]:xTop := nTop
            aStrip[n]:xRow := nRow
            IF !lLeft
-              aStrip[n]:Left := nLeft
-              nLeft += aStrip[n]:Width + 2
+              aStrip[n]:xLeft := nLeft
+              nLeft += aStrip[n]:xWidth + 2
            ENDIF
 
-           x := MAX( x, aStrip[n]:Height )
+           x := MAX( x, aStrip[n]:xHeight )
            aStrip[n]:MoveWindow()
        NEXT
        nRow ++
