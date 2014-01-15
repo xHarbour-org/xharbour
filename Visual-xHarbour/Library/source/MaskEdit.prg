@@ -20,8 +20,7 @@
 #Define WM_CARET   WM_USER + 2551
 
 CLASS MaskEdit INHERIT EditBox
-   PROPERTY Picture      GET IIF( ::oGet != NIL .AND. ::oGet:picture != NIL, ::oGet:picture, ::xPicture );
-                         SET ::SetGetProp( "Picture" )
+   PROPERTY Picture      SET ::SetGetProp( "Picture", @v )
    PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, ::oGet:VarGet(), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
