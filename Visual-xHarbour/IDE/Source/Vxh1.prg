@@ -5529,13 +5529,8 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
          :TargetFolder := cBinPath
          :RunArguments := ::Properties:Parameters
          :lNoAutoFWH   := .T.
-
-         cDef := ALLTRIM( ::Properties:Definitions )
-         
-         :SetDefines( "__VXH__" + IIF( cDef[1] != ";", ";", "" ) + cDef )
-
-         :lClean := ! lLinkOnly .AND. ::Properties:CleanBuild
-         :lLink  := lLinkOnly
+         :lClean       := ! lLinkOnly .AND. ::Properties:CleanBuild
+         :lLink        := lLinkOnly
 
          cInc := ""
          aInc := hb_aTokens( ::Properties:IncludePath, ";" )
@@ -5546,7 +5541,10 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
                 i := AT( "%", cInclude )
                 IF i > 0
                    x := RAT("%",cInclude)-2
-                   cVar := ::System:GetEnvironment( SUBSTR( cInclude, i+1, x ) )
+                   cVar := GetEnv( SUBSTR( cInclude, i+1, x ) )
+                   IF EMPTY( cVar )
+                      cVar := ::System:GetEnvironment( SUBSTR( cInclude, i+1, x ) )
+                   ENDIF
                    IF cVar != NIL
                       cInclude := cVar + SubStr( cInclude, x+3 )
                    ENDIF
@@ -5646,13 +5644,21 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
              ENDIF
             #endif
 
+            cDef := ALLTRIM( ::Properties:Definitions )
+            IF ! Empty(cDef)
+               WHILE cDef[1] == ";"
+                  cDef := SubStr(cDef,2)
+               ENDDO
+            ENDIF
+
             IF ::Properties:UseDll
-               :SetDefines( "WIN ;WIN32 ;__EXPORT__ ;__IMPORT__ ;__VXH__" + ::Properties:Definitions )
+               :SetDefines( "WIN;WIN32;__EXPORT__ ;__IMPORT__ ;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
                IF ::Properties:GUI
                   :AddFiles( "vxhdll.lib" )
                ENDIF
              ELSEIF ::Properties:GUI
-               :SetDefines( "WIN ;WIN32 ;__EXPORT__; __VXH__" + ::Properties:Definitions )
+               :SetDefines( "WIN;WIN32;__EXPORT__;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
+               view :defines
                :AddFiles( "vxh.lib" )
                :AddFiles( "Activex.lib" )
                IF ::Properties:TargetType == 5
