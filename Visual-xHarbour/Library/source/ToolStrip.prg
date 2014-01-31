@@ -328,6 +328,8 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 CLASS ToolStrip INHERIT Control
+   CLASSDATA Flat      EXPORTED
+
    PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList ) SET ::__SetImageList(v)
    PROPERTY ShowChevron  SET ::__ShowChevron(v)  DEFAULT .T.
    PROPERTY ShowGrip     SET ::__ShowGrip(v)     DEFAULT .T.
@@ -360,7 +362,7 @@ CLASS ToolStrip INHERIT Control
    DATA TabStop        EXPORTED
    DATA Transparent    EXPORTED INIT .F.
    DATA Visible        EXPORTED INIT .T.
-   
+
    DATA __lIsMenu      EXPORTED INIT .F.
    DATA __nLeft        EXPORTED
    DATA __aChevron1    PROTECTED
@@ -434,6 +436,8 @@ RETURN lEnable
 METHOD Init( oParent ) CLASS ToolStrip
    DEFAULT ::__xCtrlName TO "ToolStrip"
    DEFAULT ::ClsName     TO "ToolStrip"
+   DEFAULT ::Flat        TO ::System:OS:Version >= 6.2
+
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Super:Init( oParent )
    ::ExStyle       := WS_EX_NOACTIVATE
@@ -2186,7 +2190,7 @@ METHOD __DrawStripe( hDC, x, y, cx, cy ) CLASS ToolStripButton
    nColor1 := ::System:CurrentScheme:ToolStripGradientBegin
    nColor2 := ::System:CurrentScheme:ToolStripGradientMiddle
    nColor3 := ::System:CurrentScheme:ToolStripGradientEnd
-
+   
    __aMesh       := { {=>} }
    __aMesh[1]:UpperLeft  := 0
    __aMesh[1]:LowerRight := 1
@@ -2259,16 +2263,18 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               SelectObject( hDC, hOldPen )
               SelectObject( hDC, hOldBrush )
 
-              aPt := { o:Left + 1, o:Top }
-              _ClientToScreen( o:Parent:hWnd, @aPt )
-              _ScreenToClient( hWnd, @aPt )
+              IF ! o:Parent:Flat
+                 aPt := { o:Left + 1, o:Top }
+                 _ClientToScreen( o:Parent:hWnd, @aPt )
+                 _ScreenToClient( hWnd, @aPt )
               
-              // merge menu to strip item
-              hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:MenuBackground )
-              Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
-              
-              SelectObject( hDC, hOldPen )
-              ReleaseDC( hWnd, hdc)
+                 // merge menu to strip item
+                 hOldPen   := SelectObject( hDC, o:System:CurrentScheme:Pen:MenuItemPressedGradientEnd )//MenuBackground )
+                 Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
+
+                 SelectObject( hDC, hOldPen )
+                 ReleaseDC( hWnd, hdc)
+              ENDIF
            //ENDIF
            RETURN 0
 
@@ -2863,9 +2869,9 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
       dis:rcItem:top += 3
    ENDIF
 
-   IF lSelected //.AND. !lDisabled
-      hOldPen   := SelectObject( dis:hDC, ::System:CurrentScheme:Pen:MenuItemBorder )
-      hOldBrush := SelectObject( dis:hDC, IIF( lDisabled, ::System:CurrentScheme:Brush:MenuBackground, ::System:CurrentScheme:Brush:MenuItemSelected ) )
+   IF lSelected //.AND. ! lDisabled
+      hOldPen   := SelectObject( dis:hDC, IIF( lDisabled, ::System:CurrentScheme:Pen:MenuItemDisabledBorder, ::System:CurrentScheme:Pen:MenuItemBorder ) )
+      hOldBrush := SelectObject( dis:hDC, IIF( lDisabled, ::System:CurrentScheme:Brush:MenuItemDisabled, ::System:CurrentScheme:Brush:MenuItemSelected ) )
       
       Rectangle( dis:hDC, dis:rcItem:left+1, dis:rcItem:top, dis:rcItem:right-2, dis:rcItem:bottom )
       
@@ -2873,7 +2879,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
       SelectObject( dis:hDC, hOldBrush )
     ELSE
 
-      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMinorVersion >= 2 )
+      IF ! ::Parent:Flat
          ::__DrawStripe( dis:hDC, 0, dis:rcItem:top - IIF( ::BeginGroup, 3, 0 ), 24, dis:rcItem:bottom )
          dis:rcItem:left := xIcon - 8
       ENDIF
@@ -2882,7 +2888,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    ENDIF
 
    IF ::Checked
-      IF ! ( ::Application:OsVersion:dwMajorVersion >= 6 .AND. ::Application:OsVersion:dwMinorVersion >= 2 )
+      IF ! ::Parent:Flat
          hOldPen   := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Pen:ButtonPressedBorder, ::System:CurrentScheme:Pen:ButtonSelectedBorder ) )
          hOldBrush := SelectObject( dis:hDC, IIF( lSelected, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin, ::System:CurrentScheme:Brush:ButtonCheckedGradientEnd ) )
          Rectangle( dis:hDC, 2, dis:rcItem:Top+1, xIcon-10, dis:rcItem:Bottom-1 )
@@ -3111,7 +3117,7 @@ RETURN NIL
 
 CLASS ContextStrip INHERIT Component
    PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList )
-
+   DATA Flat                  EXPORTED
    DATA __hMenu               EXPORTED
    DATA Left, Top, Width      EXPORTED INIT 0
    METHOD Init() CONSTRUCTOR
@@ -3128,6 +3134,7 @@ METHOD Init( oParent ) CLASS ContextStrip
    DEFAULT ::__xCtrlName   TO "ContextStrip"
    DEFAULT ::ComponentType TO "ContextMenu"
    DEFAULT ::ClsName       TO "ContextStrip"
+   ::Flat := ::System:OS:Version >= 6.2
    Super:Init( oParent )
 RETURN Self
 

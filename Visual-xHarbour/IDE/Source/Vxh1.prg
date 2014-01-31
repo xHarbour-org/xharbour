@@ -28,7 +28,9 @@ static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
 #include "fileio.ch"
 
 #define XFM_EOL Chr(13) + Chr(10)
-#define HKEY_LOCAL_MACHINE           (0x80000002)
+#define HKEY_LOCAL_MACHINE      0x80000002
+#define HKEY_CURRENT_USER       0x80000001
+
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "6"
@@ -57,7 +59,7 @@ INIT PROCEDURE __VXH_Start
    PUBLIC VXHIDE
    m->VXHIDE := .T.
 
-   oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour" )
+   oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour" )
    IF oReg:Create()
       cRunning := oReg:Running
       DEFAULT cRunning TO "0"
@@ -250,7 +252,7 @@ METHOD Init( ... ) CLASS IDE
    ::EditorProps[ "WrapSearch" ] := ::IniFile:ReadInteger( "Settings", "WrapSearch", 0 )
    ::EditorProps[ "SaveBAK" ]    := ::IniFile:ReadInteger( "Settings", "SaveBAK", 1 )
 
-   ::Application:LoadCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
+   ::Application:LoadCustomColors( HKEY_CURRENT_USER, "Software\Visual xHarbour", "CustomColors" )
 
    ::ShowTip := ::IniFile:ReadInteger( "General", "ShowTip", 1 ) == 0
    ::RunMode := ::IniFile:ReadInteger( "General", "RunMode", 1 )
@@ -430,16 +432,16 @@ METHOD OnClose() CLASS IDE_MainForm
 
    UnhookWindowsHookEx( ::hHook )
 
-   oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour" )
+   oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour" )
 
    IF oReg:Create()
       oReg:SetValue( "Running", "0" )
       oReg:Close()
    ENDIF
 
-   ::Application:SaveCustomColors( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour", "CustomColors" )
+   ::Application:SaveCustomColors( HKEY_CURRENT_USER, "Software\Visual xHarbour", "CustomColors" )
 
-   IF oReg:Create( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects" )
+   IF oReg:Create( HKEY_CURRENT_USER, "Software\Visual xHarbour\ComObjects" )
       oReg:DeleteAllKeys()
 
       FOR n := 1 TO LEN( ::Application:ToolBox:ComObjects )
@@ -496,52 +498,11 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc, oForm, nFormBack, nToolBack
-   LOCAL nOptionSelectBegin, nOptionSelectEnd, nOptionSelectBorder, nOptionPressBegin, nOptionPressEnd, nOptionPressBorder
-
+   LOCAL cVersion, rc, oForm
    ::Super:Init()
 
-   nFormBack           := RGB( 255, 255, 255 )
-   nToolBack           := RGB( 255, 255, 255 )
-
-   nOptionSelectBegin  := RGB( 232, 242, 252 )
-   nOptionSelectEnd    := RGB( 232, 242, 252 )
-   nOptionSelectBorder := RGB( 126, 180, 234 )
-
-   nOptionPressBegin   := RGB( 201, 224, 247 )
-   nOptionPressEnd     := RGB( 201, 224, 247 )
-   nOptionPressBorder  := RGB(  86, 157, 229 )
-
-   IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-      ::BackColor           := nFormBack
-
-      ::System:CurrentScheme:ToolStripPanelGradientBegin  := nToolBack
-      ::System:CurrentScheme:ToolStripPanelGradientEnd    := nToolBack
-
-      ::System:CurrentScheme:ToolStripGradientBegin       := nToolBack
-      ::System:CurrentScheme:ToolStripGradientMiddle      := nToolBack
-      ::System:CurrentScheme:ToolStripGradientEnd         := nToolBack
-      ::System:CurrentScheme:ToolStripBorder              := nToolBack
-
-      ::System:CurrentScheme:ButtonSelectedGradientBegin  := nOptionSelectBegin
-      ::System:CurrentScheme:ButtonSelectedGradientEnd    := nOptionSelectEnd
-      ::System:CurrentScheme:ButtonSelectedBorder         := nOptionSelectBorder
-
-      ::System:CurrentScheme:ButtonPressedGradientBegin   := nOptionPressBegin
-      ::System:CurrentScheme:ButtonPressedGradientEnd     := nOptionPressEnd
-      ::System:CurrentScheme:ButtonPressedBorder          := nOptionPressBorder
-      
-      ::System:CurrentScheme:ButtonCheckedGradientBegin   := RGB( 197, 222, 245 )
-      ::System:CurrentScheme:ButtonCheckedGradientEnd     := RGB( 197, 222, 245 )
-
-      ::System:CurrentScheme:MenuItemPressedGradientBegin := RGB( 201, 224, 247 )
-      ::System:CurrentScheme:MenuItemPressedGradientEnd   := RGB( 201, 224, 247 )
-
-      ::System:CurrentScheme:MenuItemSelected             := RGB( 209, 226, 242 )
-      ::System:CurrentScheme:MenuItemBorder               := RGB( 120, 174, 229 )
-
-      ::System:CurrentScheme:Brush:Clean()
-      ::System:CurrentScheme:Pen:Clean()
+   IF ::System:OS:Version >= 6.2
+      ::BackColor  := RGB( 255, 255, 255 )
    ENDIF
  
    #ifdef VXH_DEMO
@@ -647,11 +608,8 @@ METHOD Init() CLASS IDE_MainForm
 
    //--------------------------------------
    WITH OBJECT MenuStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-         :Showgrip := .F.
-      ENDIF
-
-      :Row := 1
+      :Showgrip  := ! :Flat
+      :Row       := 1
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
       :ImageList:MaskColor := C_LIGHTCYAN
@@ -1204,12 +1162,10 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:OsVersion:dwMinorVersion == 2
-         :Showgrip := .F.
-         :ShowChevron := .F.
-      ENDIF
-      :Caption := "Standard"
-      :Row     := 2
+      :Showgrip    := ! :Flat
+      :ShowChevron := ! :Flat
+      :Caption   := "Standard"
+      :Row       := 2
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
       :ImageList:MaskColor := C_LIGHTCYAN
@@ -1253,10 +1209,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-         :Showgrip := .F.
-         :ShowChevron := .F.
-      ENDIF
+      :Showgrip    := ! :Flat
+      :ShowChevron := ! :Flat
       :Caption := "Edit"
       :Row     := 2
       :Create()
@@ -1314,11 +1268,9 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-         :Showgrip := .F.
-         :ShowChevron := .F.
-      ENDIF
-      :Row := 2
+      :Showgrip    := ! :Flat
+      :ShowChevron := ! :Flat
+      :Row     := 2
       :Caption := "Build"
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
@@ -1370,10 +1322,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-         :Showgrip := .F.
-         :ShowChevron := .F.
-      ENDIF
+      :Showgrip    := ! :Flat
+      :ShowChevron := ! :Flat
       :Row       := 3
       :Caption   := ""
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1401,10 +1351,8 @@ METHOD Init() CLASS IDE_MainForm
 
 
    WITH OBJECT ::Application:Props[ "AlignBar" ] := ToolStrip( ::ToolStripContainer1 )
-      IF ::Application:Osversion:Dwmajorversion == 6 .AND. ::Application:Osversion:Dwminorversion == 2
-         :Showgrip := .F.
-         :ShowChevron := .F.
-      ENDIF
+      :Showgrip    := ! :Flat
+      :ShowChevron := ! :Flat
       :Row       := 3
       :Caption   := "Alignment"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -5070,13 +5018,14 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
 
       n := 1
       cChild := ""
-      FOR EACH oChild IN oCtrl:Children
-          IF oChild:__xCtrlName != "DataGridHeader"
-             cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":", ":this", n )
-          ENDIF
-          n++
-      NEXT
-
+      IF oCtrl:Children != NIL
+         FOR EACH oChild IN oCtrl:Children
+             IF oChild:__xCtrlName != "DataGridHeader"
+                cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":", ":this", n )
+             ENDIF
+             n++
+         NEXT
+      ENDIF
       IF !oCtrl:ClassName == "CUSTOMCONTROL"
          cProp += cChild
       ENDIF

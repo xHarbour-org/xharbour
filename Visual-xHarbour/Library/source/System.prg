@@ -23,7 +23,8 @@ static oSystem
 #define LVGA_HEADER_CENTER      0x00000002
 #define LVGA_HEADER_RIGHT       0x00000004
 
-#define HKEY_LOCAL_MACHINE           (0x80000002)
+#define HKEY_CURRENT_USER       0x80000001
+#define HKEY_LOCAL_MACHINE      0x80000002
 
 #define CSIDL_MYMUSIC           0x000d
 #define CSIDL_MYVIDEO           0x000e
@@ -154,10 +155,19 @@ RETURN cPath
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetEnvironment( cVar ) CLASS System
-   LOCAL cEnv, oReg := Registry( HKEY_LOCAL_MACHINE, "System\CurrentControlSet\Control\Session Manager\Environment" )
+   LOCAL cEnv, oReg
+
+   oReg := Registry( HKEY_CURRENT_USER, "Environment" )
    IF oReg:Open()
       cEnv := oReg:GetValue( cVar )
       oReg:Close()
+   ENDIF
+   IF cEnv == NIL
+      oReg := Registry( HKEY_LOCAL_MACHINE, "System\CurrentControlSet\Control\Session Manager\Environment" )
+      IF oReg:Open()
+         cEnv := oReg:GetValue( cVar )
+         oReg:Close()
+      ENDIF
    ENDIF
 RETURN cEnv
 
@@ -230,6 +240,11 @@ METHOD Init() CLASS System
    ::OS:ServicePack  := osvi:szCSDVersion:AsString()
 
    ::CurrentScheme := ProfessionalColorTable( NIL )
+   IF ::OS:Version >= 6.2
+      ::CurrentScheme:Theme       := "Aero"
+      ::CurrentScheme:ColorScheme := "Windows8"
+      ::CurrentScheme:AutoScheme  := .F.
+   ENDIF
    ::CurrentScheme:Load()
 
    ::__ToolStripFlags := {=>}

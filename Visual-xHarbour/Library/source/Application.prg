@@ -53,7 +53,9 @@ static nButWidth
 #endif
 #define ICC_LINK_CLASS 0x00008000
 
-#define HKEY_LOCAL_MACHINE           (0x80000002)
+#define HKEY_LOCAL_MACHINE      0x80000002
+#define HKEY_CURRENT_USER       0x80000001
+
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define STAP_ALLOW_NONCLIENT 0x00000001
@@ -1390,7 +1392,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            NEXT
            
            cOpt := NIL
-           oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+           oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour\Settings" )
            IF oReg:Open()
               cOpt := oReg:ErrorShowStack
               oReg:Close()
@@ -1478,7 +1480,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+              oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour\Settings" )
               IF oReg:Create()
                  oReg:SetValue( "ErrorShowStack", "1" )
                  oReg:Close()
@@ -1500,7 +1502,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               aRect   := _GetClientRect( hWnd )
               MoveWindow( hStk, 2, aRect[4]-17, nWidth, 17 )
 
-              oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\Settings" )
+              oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour\Settings" )
               IF oReg:Create()
                  oReg:SetValue( "ErrorShowStack", "0" )
                  oReg:Close()

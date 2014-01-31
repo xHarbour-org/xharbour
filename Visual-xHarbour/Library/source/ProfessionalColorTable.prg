@@ -41,6 +41,8 @@ CLASS ProfessionalColorTable
    DATA ImageMarginRevealedGradientEnd       EXPORTED
    DATA ImageMarginRevealedGradientMiddle    EXPORTED
    DATA MenuBorder                           EXPORTED
+   DATA MenuItemDisabled                     EXPORTED INIT RGB(240, 240, 240)
+   DATA MenuItemDisabledBorder               EXPORTED INIT RGB(174, 174, 174)
    DATA MenuBackground                       EXPORTED
    DATA MenuItemBorder                       EXPORTED
    DATA MenuItemPressedGradientBegin         EXPORTED
@@ -100,6 +102,70 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
    DEFAULT cScheme TO ::ColorScheme
 
    DO CASE
+      CASE cScheme == "Windows8"
+           ::ButtonCheckedGradientBegin             := RGB( 197, 222, 245 )
+           ::ButtonCheckedGradientEnd               := RGB( 197, 222, 245 )
+           ::ButtonCheckedGradientMiddle            := RGB( 197, 222, 245 )
+           ::ButtonCheckedHighlight                 := RGB(231, 232, 235)
+           ::ButtonCheckedHighlightBorder           := GetSysColor( COLOR_HIGHLIGHT )
+
+           ::ButtonPressedBorder                    := RGB(  86, 157, 229 )
+           ::ButtonPressedGradientBegin             := RGB( 201, 224, 247 )
+           ::ButtonPressedGradientEnd               := RGB( 201, 224, 247 )
+
+           ::ButtonPressedGradientMiddle            := RGB( 255, 255, 255 )
+           ::ButtonPressedHighlight                 := IIF( ::UseSystemColors, RGB(215, 216, 222), RGB(215, 216, 222) )
+           ::ButtonPressedHighlightBorder           := GetSysColor( COLOR_HIGHLIGHT )
+
+           ::ButtonSelectedBorder                   := RGB( 126, 180, 234 )
+           ::ButtonSelectedGradientBegin            := RGB( 232, 242, 252 )
+           ::ButtonSelectedGradientEnd              := RGB( 232, 242, 252 )
+           ::ButtonSelectedGradientMiddle           := RGB( 232, 242, 252 )
+
+           ::ButtonSelectedHighlight                := IIF( ::UseSystemColors, RGB(231, 232, 235), RGB(231, 232, 235) )
+           ::ButtonSelectedHighlightBorder          := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(75, 75, 111) )
+           ::CheckBackground                        := IIF( ::UseSystemColors, GetSysColor( COLOR_HIGHLIGHT ), RGB(255, 192, 111) )
+           ::CheckPressedBackground                 := IIF( ::UseSystemColors, RGB(217, 218, 223), RGB(254, 128, 62) )
+           ::CheckSelectedBackground                := IIF( ::UseSystemColors, RGB(217, 218, 223), RGB(254, 128, 62) )
+           ::GripDark                               := IIF( ::UseSystemColors, RGB(182, 182, 185), RGB(84, 84, 117) )
+           ::GripLight                              := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
+           ::ImageMarginGradientBegin               := IIF( ::UseSystemColors, RGB(248, 248, 249), RGB(249, 249, 255) )
+           ::ImageMarginGradientEnd                 := IIF( ::UseSystemColors, GetSysColor( COLOR_3DFACE ), RGB(147, 145, 176) )
+           ::ImageMarginGradientMiddle              := IIF( ::UseSystemColors, RGB(240, 239, 241), RGB(225, 226, 236) )
+           ::ImageMarginRevealedGradientBegin       := IIF( ::UseSystemColors, RGB(243, 242, 244), RGB(215, 215, 226) )
+           ::ImageMarginRevealedGradientEnd         := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(118, 116, 151) )
+           ::ImageMarginRevealedGradientMiddle      := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(184, 185, 202) )
+           ::MenuBorder                             := IIF( ::UseSystemColors, RGB(126, 126, 129), RGB(124, 124, 148) )
+           ::MenuBackground                         := RGB( 255, 255, 255 )
+
+           ::MenuItemBorder                         := RGB( 120, 174, 229 )
+           ::MenuItemPressedGradientBegin           := RGB( 201, 224, 247 )
+           ::MenuItemPressedGradientEnd             := RGB( 201, 224, 247 )
+           ::MenuItemPressedGradientMiddle          := RGB( 201, 224, 247 )
+           ::MenuItemSelected                       := RGB( 209, 226, 242 )
+           ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 255, 222) )
+           ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 203, 136) )
+           ::MenuStripGradientBegin                 := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB(215, 215, 229) )
+           ::MenuStripGradientEnd                   := IIF( ::UseSystemColors, RGB(249, 248, 249), RGB(243, 243, 247) )
+           ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(186, 185, 206) )
+           ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(118, 116, 146) )
+           ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(156, 155, 180) )
+           ::RaftingContainerGradientBegin          := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB(215, 215, 229) )
+           ::RaftingContainerGradientEnd            := IIF( ::UseSystemColors, RGB(249, 248, 249), RGB(243, 243, 247) )
+           ::SeparatorDark                          := IIF( ::UseSystemColors, RGB(186, 186, 189), RGB(110, 109, 143) )
+           ::SeparatorLight                         := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNHIGHLIGHT ), RGB(255, 255, 255) )
+           ::StatusStripGradientBegin               := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB(215, 215, 229) )
+           ::StatusStripGradientEnd                 := IIF( ::UseSystemColors, RGB(249, 248, 249), RGB(243, 243, 247) )
+           ::ToolStripBorder                        := RGB( 255, 255, 255 )
+           ::ToolStripContentPanelGradientBegin     := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB(215, 215, 229) )
+           ::ToolStripContentPanelGradientEnd       := IIF( ::UseSystemColors, RGB(249, 248, 249), RGB(243, 243, 247) )
+           ::ToolStripDropDownBackground            := IIF( ::UseSystemColors, RGB(251, 250, 251), RGB(253, 250, 255) )
+           ::ToolStripGradientBegin                 := RGB( 255, 255, 255 )
+           ::ToolStripGradientEnd                   := RGB( 255, 255, 255 )
+           ::ToolStripGradientMiddle                := RGB( 255, 255, 255 )
+           ::ToolStripPanelGradientBegin            := RGB( 255, 255, 255 )
+           ::ToolStripPanelGradientEnd              := RGB( 255, 255, 255 )
+
       CASE cScheme == "Classic"
            ::ButtonCheckedGradientBegin             := GetSysColor( COLOR_INACTIVECAPTION )
            ::ButtonCheckedGradientEnd               := GetSysColor( COLOR_INACTIVECAPTION )
