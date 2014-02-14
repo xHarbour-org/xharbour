@@ -9,6 +9,15 @@
 */
 
 
+2014-02-14 15:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/hbwinole.c
+  * source/rtl/win32ole.prg
+    ! fix hidden memory leaks in exceptions service
+    Thanks to Claudio Voskian for notifying
+
+  * contrib/libnf/dispc.c
+    ! globally visible variables moved to static structure.
+
 2014-01-15 12:10  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   + contrib/hbmlzo/Makefile
   + contrib/jpeg/Makefile

@@ -188,7 +188,7 @@ CLASS TOleAuto
 
 ENDCLASS
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
 
    LOCAL oErr
@@ -198,7 +198,7 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       RETURN HB_ExecFromArray( Self, "_New", HB_aParams() )
    ENDIF
 
-   IF ValType( uObj ) = 'C'
+   IF ValType( uObj ) == 'C'
       ::hObj := CreateOleObject( uObj, ,cLicense )
 
       IF OleError() != 0
@@ -234,7 +234,7 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       ENDIF
 
       ::cClassName := uObj
-   ELSEIF ValType( uObj ) = 'N'
+   ELSEIF ValType( uObj ) == 'N'
       OleAddRef( uObj )
       ::hObj := uObj
 
@@ -244,8 +244,8 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
          ::cClassName := LTrim( Str( uObj ) )
       ENDIF
 
-   ELSEIF ValType( uObj ) = 'P'
-      uObj := Ptr2Int( uObj )
+   ELSEIF ValType( uObj ) == 'P'
+      uObj := OlePtr2Int( uObj )
       OleAddRef( uObj )
       ::hObj := uObj
 
@@ -260,7 +260,7 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "Invalid argument to contructor!"
+      oErr:Description   := "Invalid argument to constructor!"
       oErr:GenCode       := 0
       oErr:Operation     := ProcName()
       oErr:Severity      := ES_ERROR
@@ -272,7 +272,7 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
 
 RETURN Self
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 // Destructor!
 PROCEDURE Release() CLASS TOleAuto
 
@@ -286,12 +286,12 @@ PROCEDURE Release() CLASS TOleAuto
 
 RETURN
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
    LOCAL oErr
 
-   IF ValType( cClass ) = 'C'
+   IF ValType( cClass ) == 'C'
       ::hObj := GetOleObject( cClass )
 
       IF OleError() != 0
@@ -328,13 +328,13 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
       ::cClassName := cClass
    ELSE
-      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetActiveObject()!", "OLE Interface", 0 )
+      OleMessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetActiveObject()!", "OLE Interface", 0 )
       ::hObj := 0
    ENDIF
 
 RETURN Self
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 
    LOCAL xRet
@@ -358,7 +358,7 @@ METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValuePlus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -383,7 +383,7 @@ METHOD OleValuePlus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueMinus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -408,7 +408,7 @@ METHOD OleValueMinus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueMultiply( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -433,7 +433,7 @@ METHOD OleValueMultiply( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueDivide( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -458,7 +458,7 @@ METHOD OleValueDivide( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueModulus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -483,7 +483,7 @@ METHOD OleValueModulus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueInc() CLASS TOleAuto
 
    LOCAL oErr
@@ -508,7 +508,7 @@ METHOD OleValueInc() CLASS TOleAuto
 
 RETURN Self
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueDec() CLASS TOleAuto
 
    LOCAL oErr
@@ -533,7 +533,7 @@ METHOD OleValueDec() CLASS TOleAuto
 
 RETURN Self
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValuePower( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -558,7 +558,7 @@ METHOD OleValuePower( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -583,7 +583,7 @@ METHOD OleValueEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -608,7 +608,7 @@ METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -633,7 +633,7 @@ METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
    // LOCAL xRet
@@ -659,4 +659,4 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
 RETURN Self
 
-#endif
+#endif  //__PLATFORM__Windows

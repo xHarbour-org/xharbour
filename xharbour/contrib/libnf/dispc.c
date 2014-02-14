@@ -51,67 +51,51 @@
  *
  */
 
-/* NOTE: we need this to prevent base types redefinition */
-#define _CLIPDEFS_H
-
-#include "hbdefs.h"
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapigt.h"
 
-#include "fm.api"
-#include "inkey.ch"
-
-#define OFF          FALSE
-#define ON           TRUE
-#define NO           FALSE
-#define YES          TRUE
-#define OK           0
 #define K_STRING     0
 #define K_LIST       ( ! K_STRING )
 
 #define CR           ( ( char ) 13 )
 #define LF           ( ( char ) 10 )
-#define FEOF         ( ( char ) 26 )
-
-#define READONLY     0          /* open file modes */
-#define WRITEONLY    1
-#define READWRITE    2
-
-#define BUFFERSIZE   4096        /* maximum size of the file buffer */
-#define MAXLINE      255         /* default maximum size of a line  */
 
 #define TABSET       8
 
-long     buffoffset;          /* offset into buffer of current line  */
-long     fsize;               /* file size in bytes                  */
-int      bufftop, buffbot;    /* first and last character in buffer  */
-int      wintop, winbot;      /* first and last character in window  */
-int      winrow, wincol;      /* row and column of window highlight  */
-int      sline, eline;        /* start and end line of window        */
-int      scol, ecol;          /* start and end col of window         */
-int      height, width;       /* height and width of window          */
-int      infile;              /* input file handle                   */
-int      maxlin;              /* line size                           */
-int      buffsize;            /* buffer size                         */
-int      hlight;              /* highlight attribute                 */
-int      norm;                /* normal attribute                    */
-int      kcount;              /* number of keys in terminate key list*/
-int      colinc;              /* col increment amount                */
-BOOL     brows;               /* browse flag                         */
-BOOL     refresh;             /* YES means refresh screen            */
-char     kstr[ 25 ];          /* terminate key string                */
-int      keylist[ 24 ];       /* terminate key list                  */
-int      keytype;             /* K_STRING or K_LIST                  */
+typedef struct
+{
+   long     buffoffset;          /* offset into buffer of current line  */
+   long     fsize;               /* file size in bytes                  */
+   int      bufftop, buffbot;    /* first and last character in buffer  */
+   int      wintop, winbot;      /* first and last character in window  */
+   int      winrow, wincol;      /* row and column of window highlight  */
+   int      sline, eline;        /* start and end line of window        */
+   int      scol, ecol;          /* start and end col of window         */
+   int      height, width;       /* height and width of window          */
+   int      infile;              /* input file handle                   */
+   int      maxlin;              /* line size                           */
+   int      buffsize;            /* buffer size                         */
+   int      hlight;              /* highlight attribute                 */
+   int      norm;                /* normal attribute                    */
+   int      kcount;              /* number of keys in terminate key list*/
+   int      colinc;              /* col increment amount                */
+   BOOL     brows;               /* browse flag                         */
+   BOOL     refresh;             /* TRUE means refresh screen           */
+   char     kstr[ 25 ];          /* terminate key string                */
+   int      keylist[ 24 ];       /* terminate key list                  */
+   int      keytype;             /* K_STRING or K_LIST                  */
 
-BOOL     isallocated;         /* if buffers were allocated           */
-char *   buffer;              /* file buffer pointer                 */
-char *   lbuff;               /* line buffer pointer                 */
-char *   vseg;                /* video segment variable              */
+   BOOL     bIsAllocated;        /* if buffers were allocated           */
+   char *   buffer;              /* file buffer pointer                 */
+   char *   lbuff;               /* line buffer pointer                 */
+   char *   vseg;                /* video segment variable              */
+} FT_DISPC, * PFT_DISPC;
+
+static FT_DISPC DISPC;
 
 /* prototypes */
 
-static int           keyin( void );
 static void          chattr( int x, int y, int len, int attr );
 static long          getblock( long offset );
 static void          buff_align( void );
@@ -123,7 +107,6 @@ static void          linedown( void );
 static void          lineup( void );
 static void          filetop( void );
 static void          filebot( void );
-static void          strcpyn( char * dest, const char * source, int len );
 
 /*
  * chattr() replace the color attribute with a new one starting at
@@ -133,10 +116,11 @@ static void          strcpyn( char * dest, const char * source, int len );
 
 static void chattr( int x, int y, int len, int attr )
 {
-   int      i;
-   char *   vmem;
+   int    i;
+   char * vmem;
 
-   vmem = vseg + ( y * ( width + 1 ) * 2 ) + ( x * 2 ) + 1;
+   vmem = DISPC.vseg + ( y * ( DISPC.width + 1 ) * 2 ) + ( x * 2 ) + 1;
+
    /* calc the screen memory coord */
 
    for( i = 0; i <= len; i++, vmem += 2 )   /* write the new attribute value */
@@ -165,28 +149,28 @@ static long getblock( long offset )
        the beginning of the file.
     */
 
-   hb_fsSeek( infile, offset, FS_SET );
+   hb_fsSeek( DISPC.infile, offset, FS_SET );
 
    /* read in the file and set the buffer bottom variable equal */
    /*  to the number of bytes actually read in.                 */
 
-   buffbot = (int) hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
+   DISPC.buffbot = (int) hb_fsReadLarge( DISPC.infile, ( BYTE * ) DISPC.buffer, DISPC.buffsize );
 
    /* if a full buffer's worth was not read in, make it full.   */
 
-   if( ( buffbot != buffsize ) && ( fsize > buffsize ) )
+   if( ( DISPC.buffbot != DISPC.buffsize ) && ( DISPC.fsize > DISPC.buffsize ) )
    {
       if( offset > 0 )
-         hb_fsSeek( infile, ( long ) -buffsize, FS_END );
+         hb_fsSeek( DISPC.infile, ( long ) -DISPC.buffsize, FS_END );
       else
-         hb_fsSeek( infile, ( long ) buffsize, FS_SET );
+         hb_fsSeek( DISPC.infile, ( long ) DISPC.buffsize, FS_SET );
 
-      buffbot = (int) hb_fsReadLarge( infile, ( BYTE * ) buffer, buffsize );
+      DISPC.buffbot = (int) hb_fsReadLarge( DISPC.infile, ( BYTE * ) DISPC.buffer, DISPC.buffsize );
    }
 
    /* return the actual file position */
 
-   return hb_fsSeek( infile, 0L, FS_RELATIVE ) - buffbot;
+   return hb_fsSeek( DISPC.infile, 0L, FS_RELATIVE ) - DISPC.buffbot;
 }
 
 /*
@@ -199,24 +183,25 @@ static void buff_align( void )
 {
    int i;
 
-   bufftop  = 0;
-   buffbot  = buffsize;
+   DISPC.bufftop = 0;
+   DISPC.buffbot = DISPC.buffsize;
 
-   if( buffoffset != 0L )        /* if the buffoffset is otherthan 0      */
+   if( DISPC.buffoffset != 0L )        /* if the buffoffset is otherthan 0      */
    {
-      i = bufftop;               /* start at the top of the file and scan */
-                                 /* forward until a CR is reached.        */
+      i = DISPC.bufftop;               /* start at the top of the file and scan */
 
-      while( ( buffer[ i ] != CR ) && ( i < buffbot ) )
+      /* forward until a CR is reached. */
+
+      while( ( DISPC.buffer[ i ] != CR ) && ( i < DISPC.buffbot ) )
          i++;
 
-      bufftop = i + 2;
+      DISPC.bufftop = i + 2;
    }
 
    /* if the buffer offset is not a complete */
    /* buffer's length away from the file end */
 
-   if( buffoffset + ( ( long ) buffbot ) != fsize )
+   if( DISPC.buffoffset + ( ( long ) DISPC.buffbot ) != DISPC.fsize )
    {
       /*
          if the file position of the last byte
@@ -227,16 +212,17 @@ static void buff_align( void )
           the last character of the file.
        */
 
-      if( buffoffset + ( ( long ) buffbot ) > fsize )
-         buffbot = ( int ) ( fsize - buffoffset );
+      if( DISPC.buffoffset + ( ( long ) DISPC.buffbot ) > DISPC.fsize )
+         DISPC.buffbot = ( int ) ( DISPC.fsize - DISPC.buffoffset );
 
-      i = buffbot;               /* point the end of the buffer to a valid */
-                                 /* complete text line.                    */
+      i = DISPC.buffbot;               /* point the end of the buffer to a valid */
 
-      while( ( buffer[ i ] != CR ) && ( i > bufftop ) )
+      /* complete text line. */
+
+      while( ( DISPC.buffer[ i ] != CR ) && ( i > DISPC.bufftop ) )
          i--;
 
-      buffbot = i + 2;
+      DISPC.buffbot = i + 2;
    }
 }
 
@@ -252,34 +238,35 @@ static void win_align( void )
 {
    int i;
 
-   winbot   = wintop;            /* find out if there is enough text for */
-   i        = 0;                 /* full window.                         */
+   DISPC.winbot = DISPC.wintop;        /* find out if there is enough text for */
+   i            = 0;                   /* full window.                         */
 
-   while( ( winbot < buffbot ) && ( i < height ) )
+   while( ( DISPC.winbot < DISPC.buffbot ) && ( i < DISPC.height ) )
    {
-      if( buffer[ winbot ] == CR )
+      if( DISPC.buffer[ DISPC.winbot ] == CR )
          i++;
-      winbot++;
+      DISPC.winbot++;
    }
 
-   if( i < height )             /* if there is not a full window,       */
+   if( i < DISPC.height )              /* if there is not a full window,       */
    {
       /* then retrofit winbot to the end of a line */
-      while( buffer[ winbot ] != LF && winbot > bufftop )
-         winbot--;
 
-      wintop   = winbot;
-      i        = 0;                         /* and setup wintop */
+      while( DISPC.buffer[ DISPC.winbot ] != LF && DISPC.winbot > DISPC.bufftop )
+         DISPC.winbot--;
 
-      while( ( wintop > bufftop ) && ( i <= height ) )
+      DISPC.wintop = DISPC.winbot;
+      i            = 0;                /* and setup wintop                     */
+
+      while( ( DISPC.wintop > DISPC.bufftop ) && ( i <= DISPC.height ) )
       {
-         if( buffer[ wintop ] == LF )
+         if( DISPC.buffer[ DISPC.wintop ] == LF )
             i++;
-         wintop--;
+         DISPC.wintop--;
       }
 
-      if( wintop != bufftop )
-         wintop += 2;
+      if( DISPC.wintop != DISPC.bufftop )
+         DISPC.wintop += 2;
    }
 }
 
@@ -294,14 +281,14 @@ static void win_align( void )
 
 static void disp_update( int offset )
 {
-   int      line, col, pos, i;
-   char *   vmem;
+   int    line, col, pos, i;
+   char * vmem;
 
 
-   refresh  = NO;
-   line     = 0;
+   DISPC.refresh = FALSE;
+   line          = 0;
 
-   while( line < height )
+   while( line < DISPC.height )
    {
       /*
          calculate the initial position, this save execution
@@ -309,42 +296,42 @@ static void disp_update( int offset )
          from the line start
        */
 
-      pos = ( line * ( width + 1 ) * 2 );
+      pos = ( line * ( DISPC.width + 1 ) * 2 );
 
       /* copy string to temp buffer */
 
-      for( i = 0; buffer[ offset ] != CR && offset <= winbot; offset++ )
+      for( i = 0; DISPC.buffer[ offset ] != CR && offset <= DISPC.winbot; offset++ )
       {
-         if( i <= maxlin )
+         if( i <= DISPC.maxlin )
          {
-            if( buffer[ offset ] == '\t' )            /* check for a tab   */
+            if( DISPC.buffer[ offset ] == '\t' )            /* check for a tab      */
             {
-               lbuff[ i++ ] = ' ';                    /* pad with spaces   */
-               while( i % TABSET && i <= maxlin )     /* until tab stop    */
-                  lbuff[ i++ ] = ' ';                 /* is reached or EOL */
+               DISPC.lbuff[ i++ ] = ' ';                    /* pad with spaces      */
+               while( i % TABSET && i <= DISPC.maxlin )     /* until tab stop       */
+                  DISPC.lbuff[ i++ ] = ' ';                 /* is reached or EOL    */
             }
             else
-               lbuff[ i++ ] = buffer[ offset ];
+               DISPC.lbuff[ i++ ] = DISPC.buffer[ offset ];
 
          }
       }
 
-      for(; i <= maxlin; i++ )          /* fill out with spaces */
-         lbuff[ i ] = ' ';
+      for( ; i <= DISPC.maxlin; i++ )                       /* fill out with spaces */
+         DISPC.lbuff[ i ] = ' ';
 
       /* place the proper characters onto the screen */
 
-      for( i = wincol, col = 0; col <= width; col++ )
+      for( i = DISPC.wincol, col = 0; col <= DISPC.width; col++ )
       {
-         vmem  = vseg + pos + ( col * 2 );
+         vmem  = DISPC.vseg + pos + ( col * 2 );
 
-         *vmem = lbuff[ i++ ];
+         *vmem = DISPC.lbuff[ i++ ];
       }
 
-      line     += 1;
-      offset   += 2;
+      line   += 1;
+      offset += 2;
    }
-   hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+   hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 }
 
 /*
@@ -356,39 +343,39 @@ static void disp_update( int offset )
 
 static void winup( void )
 {
-   int   k;
-   long  i, j;
+   int  k;
+   long i, j;
 
-   refresh  = YES;
-   k        = wintop - 3;
+   DISPC.refresh = TRUE;
+   k             = DISPC.wintop - 3;
 
-   while( ( buffer[ k ] != CR ) && ( k > bufftop ) )
+   while( ( DISPC.buffer[ k ] != CR ) && ( k > DISPC.bufftop ) )
       k--;
 
-   if( k >= bufftop )
+   if( k >= DISPC.bufftop )
    {
-      if( buffer[ k ] == CR )
+      if( DISPC.buffer[ k ] == CR )
          k += 2;
 
-      wintop   = k;
-      k        = winbot - 3;
+      DISPC.wintop = k;
+      k            = DISPC.winbot - 3;
 
-      while( buffer[ k ] != CR )
+      while( DISPC.buffer[ k ] != CR )
          k--;
 
-      winbot = k + 2;
+      DISPC.winbot = k + 2;
    }
    else
-   if( ( ( long ) bufftop ) + buffoffset > 0 && fsize > buffsize )
+   if( ( ( long ) DISPC.bufftop ) + DISPC.buffoffset > 0 && DISPC.fsize > DISPC.buffsize )
    {
-      i  = buffoffset + wintop;
-      j  = buffoffset - ( ( long ) ( buffsize / 2 ) );
+      i = DISPC.buffoffset + DISPC.wintop;
+      j = DISPC.buffoffset - ( ( long ) ( DISPC.buffsize / 2 ) );
 
       if( j < 0 )
          j = 0;
 
-      buffoffset  = getblock( j );
-      wintop      = ( ( int ) ( i - buffoffset ) );
+      DISPC.buffoffset = getblock( j );
+      DISPC.wintop     = ( ( int ) ( i - DISPC.buffoffset ) );
 
       buff_align();
       win_align();
@@ -404,40 +391,39 @@ static void winup( void )
 
 static void windown( void )
 {
-   int   k;
-   long  i, j;
+   int  k;
+   long i, j;
 
-   refresh  = YES;
-   k        = winbot;
+   DISPC.refresh = TRUE;
+   k             = DISPC.winbot;
 
-   while( ( buffer[ k ] != CR ) && ( k <= buffbot ) )
+   while( ( DISPC.buffer[ k ] != CR ) && ( k <= DISPC.buffbot ) )
       k++;
    k += 2;
 
-   if( k <= buffbot )
+   if( k <= DISPC.buffbot )
    {
-      winbot   = k;
-      k        = wintop;
+      DISPC.winbot = k;
+      k            = DISPC.wintop;
 
-      while( buffer[ k ] != CR )
+      while( DISPC.buffer[ k ] != CR )
          k++;
-      wintop = k + 2;
+      DISPC.wintop = k + 2;
    }
-   else
-   if( ( ( ( long ) buffbot ) + buffoffset ) < fsize && fsize > buffsize )
+   else if( ( ( ( long ) DISPC.buffbot ) + DISPC.buffoffset ) < DISPC.fsize && DISPC.fsize > DISPC.buffsize )
    {
-      i  = buffoffset + wintop;
-      j  = i;
+      i = DISPC.buffoffset + DISPC.wintop;
+      j = i;
 
-      if( j > fsize )
-         j = fsize - ( ( long ) buffsize );
+      if( j > DISPC.fsize )
+         j = DISPC.fsize - ( ( long ) DISPC.buffsize );
 
-      buffoffset = getblock( j );
+      DISPC.buffoffset = getblock( j );
 
-      if( i < buffoffset )
-         wintop = 0;
+      if( i < DISPC.buffoffset )
+         DISPC.wintop = 0;
       else
-         wintop = ( ( int ) ( i - buffoffset ) );
+         DISPC.wintop = ( ( int ) ( i - DISPC.buffoffset ) );
 
       buff_align();
       win_align();
@@ -448,9 +434,9 @@ static void windown( void )
 
 static void linedown( void )
 {
-   if( winrow < eline )          /* if cursor not at last line */
-      winrow += 1;
-   else                          /* otherwise adjust the window top variable */
+   if( DISPC.winrow < DISPC.eline )    /* if cursor not at last line */
+      ++DISPC.winrow;
+   else                                /* otherwise adjust the window top variable */
       windown();
 }
 
@@ -458,8 +444,8 @@ static void linedown( void )
 
 static void lineup( void )
 {
-   if( winrow > sline )
-      winrow -= 1;
+   if( DISPC.winrow > DISPC.sline )
+      --DISPC.winrow;
    else
       winup();
 }
@@ -468,17 +454,17 @@ static void lineup( void )
 
 static void filetop( void )
 {
-   if( buffoffset != 0 )
+   if( DISPC.buffoffset != 0 )
    {
-      buffoffset = getblock( 0L );
+      DISPC.buffoffset = getblock( 0L );
 
       buff_align();
    }
 
-   refresh  = YES;
-   wintop   = ( int ) buffoffset;
-   winrow   = sline;
-   wincol   = 0;
+   DISPC.refresh = TRUE;
+   DISPC.wintop  = ( int ) DISPC.buffoffset;
+   DISPC.winrow  = DISPC.sline;
+   DISPC.wincol  = 0;
 
    win_align();
 }
@@ -487,113 +473,111 @@ static void filetop( void )
 
 static void filebot( void )
 {
-   if( ( ( ( long ) buffbot ) + buffoffset ) < fsize && fsize > buffsize )
+   if( ( ( ( long ) DISPC.buffbot ) + DISPC.buffoffset ) < DISPC.fsize && DISPC.fsize > DISPC.buffsize )
    {
-      buffoffset = getblock( fsize + 1 );
+      DISPC.buffoffset = getblock( DISPC.fsize + 1 );
 
       buff_align();
    }
 
-   refresh  = YES;
-   wintop   = buffbot - 3;
-   winrow   = eline;
-   wincol   = 0;
+   DISPC.refresh = TRUE;
+   DISPC.wintop  = DISPC.buffbot - 3;
+   DISPC.winrow  = DISPC.eline;
+   DISPC.wincol  = 0;
 
    win_align();
 }
 
 HB_FUNC( _FT_DFINIT )
 {
-   int   rval, i, j;
+   int     rval, i, j;
    HB_SIZE ulSize;
 
-   rval     = 0;
+   rval = 0;
 
-   sline    = hb_parni( 2 );              /* top row of window   */
-   scol     = hb_parni( 3 );              /* left col            */
-   eline    = hb_parni( 4 );              /* bottom row          */
-   ecol     = hb_parni( 5 );              /* right col           */
+   DISPC.sline  = hb_parni( 2 );                            /* top row of window     */
+   DISPC.scol   = hb_parni( 3 );                            /* left col              */
+   DISPC.eline  = hb_parni( 4 );                            /* bottom row            */
+   DISPC.ecol   = hb_parni( 5 );                            /* right col             */
 
-   width    = ecol - scol;                /* calc width of window  */
-   height   = eline - sline + 1;          /* calc height of window */
+   DISPC.width  = DISPC.ecol  - DISPC.scol;                 /* calc width of window  */
+   DISPC.height = DISPC.eline - DISPC.sline + 1;            /* calc height of window */
 
-   hb_gtRectSize( sline, scol, eline, ecol, &ulSize );
-   vseg     = ( char * ) hb_xalloc( ulSize );
-   if( vseg != NULL )
-      hb_gtSave( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+   hb_gtRectSize( DISPC.sline, DISPC.scol, DISPC.eline, DISPC.ecol, &ulSize );
+   DISPC.vseg = ( char * ) hb_xalloc( ulSize );
+   if( DISPC.vseg != NULL )
+      hb_gtSave( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
-   maxlin      = hb_parni( 12 );
-   buffsize    = hb_parni( 13 );                      /* yes - load value */
+   DISPC.maxlin   = hb_parni( 12 );
+   DISPC.buffsize = hb_parni( 13 );                            /* yes - load value */
 
-   buffer      = ( char * ) hb_xalloc( buffsize );    /* allocate memory  */
-   lbuff       = ( char * ) hb_xalloc( maxlin + 1 );  /*  for buffers     */
+   DISPC.buffer   = ( char * ) hb_xalloc( DISPC.buffsize );    /* allocate memory  */
+   DISPC.lbuff    = ( char * ) hb_xalloc( DISPC.maxlin + 1 );  /*  for buffers     */
 
-
-   isallocated = ! ( buffer == NULL || lbuff == NULL || vseg == NULL );
+   DISPC.bIsAllocated = ! ( DISPC.buffer == NULL || DISPC.lbuff == NULL || DISPC.vseg == NULL );
    /* memory allocated? */
-   if( ! isallocated )
+   if( ! DISPC.bIsAllocated )
    {
-      rval = 8;                     /* return error code 8 (memory) */
-      if( buffer != NULL )
-         hb_xfree( buffer );
-      if( lbuff != NULL )
-         hb_xfree( lbuff );
-      if( vseg != NULL )
-         hb_xfree( vseg );
+      rval = 8;                                 /* return error code 8 (memory) */
+      if( DISPC.buffer != NULL )
+         hb_xfree( DISPC.buffer );
+      if( DISPC.lbuff != NULL )
+         hb_xfree( DISPC.lbuff );
+      if( DISPC.vseg != NULL )
+         hb_xfree( DISPC.vseg );
    }
-   else                                   /* get parameters               */
+   else                                         /* get parameters            */
    {
-      infile   = hb_parni( 1 );           /* file handle               */
-      j        = hb_parni( 6 );           /* starting line value       */
-      norm     = hb_parni( 7 );           /* normal color attribute    */
-      hlight   = hb_parni( 8 );           /* highlight color attribute */
+      DISPC.infile = hb_parni( 1 );             /* file handle               */
+      j            = hb_parni( 6 );             /* starting line value       */
+      DISPC.norm   = hb_parni( 7 );             /* normal color attribute    */
+      DISPC.hlight = hb_parni( 8 );             /* highlight color attribute */
 
-      if( hb_parinfo( 9 ) & HB_IT_ARRAY ) /* if array */
+      if( hb_parinfo( 9 ) & HB_IT_ARRAY )       /* if array */
       {
-         keytype  = K_LIST;
-         kcount   = (int) hb_parinfa( 9, 0 );
-         if( kcount > 24 )
-            kcount = 24;
-         for( i = 1; i <= kcount; i++ )
-            keylist[ i - 1 ] = hb_parni( 9, i );  /* get exit key list */
+         DISPC.keytype = K_LIST;
+         DISPC.kcount  = (int) hb_parinfa( 9, 0 );
+         if( DISPC.kcount > 24 )
+            DISPC.kcount = 24;
+         for( i = 1; i <= DISPC.kcount; i++ )
+            DISPC.keylist[ i - 1 ] = hb_parni( 9, i );  /* get exit key list */
       }
       else
       {
-         keytype  = K_STRING;
-         kcount   = (int) hb_parclen( 9 );
-         if( kcount > 24 )
-            kcount = 24;
-         strcpyn( kstr, hb_parcx( 9 ), kcount );  /* get exit key string */
+         DISPC.keytype = K_STRING;
+         DISPC.kcount  = (int) hb_parclen( 9 );
+         if( DISPC.kcount > 24 )
+            DISPC.kcount = 24;
+         hb_strncpy( DISPC.kstr, hb_parcx( 9 ), DISPC.kcount );  /* get exit key string */
       }
 
-      brows    = hb_parl( 10 ) ? TRUE: FALSE;   /* get browse flag   */
+      DISPC.brows      = hb_parl( 10 ) ? TRUE: FALSE;   /* get browse flag   */
+      DISPC.colinc     = hb_parni( 11 );                /* column skip value */
 
-      colinc   = hb_parni( 11 );                /* column skip value */
-
-      bufftop     = 0;                    /* init buffer top pointer      */
-      buffbot     = buffsize;             /* init buffer bottom pointer   */
-      buffoffset  = 0;                    /* curr line offset into buffer */
-      winrow      = sline;                /* init window row              */
-      wincol      = 0;                    /* init window col              */
-      wintop      = 0;                    /* init window top pointer      */
-      winbot      = 0;                    /* init window bottom pointer   */
+      DISPC.bufftop    = 0;                             /* init buffer top pointer      */
+      DISPC.buffbot    = DISPC.buffsize;                /* init buffer bottom pointer   */
+      DISPC.buffoffset = 0;                             /* curr line offset into buffer */
+      DISPC.winrow     = DISPC.sline;                   /* init window row              */
+      DISPC.wincol     = 0;                             /* init window col              */
+      DISPC.wintop     = 0;                             /* init window top pointer      */
+      DISPC.winbot     = 0;                             /* init window bottom pointer   */
 
       /* get file size */
 
-      fsize = hb_fsSeek( infile, 0L, FS_END ) - 1;
+      DISPC.fsize = hb_fsSeek( DISPC.infile, 0L, FS_END ) - 1;
 
       /* get the first block */
 
-      hb_fsSeek( infile, 0L, FS_SET );
+      hb_fsSeek( DISPC.infile, 0L, FS_SET );
 
       /* if block less than buffsize */
 
-      if( fsize < ( ( long ) buffbot ) )
-         buffbot = ( int ) fsize;           /* then set buffer bottom */
+      if( DISPC.fsize < ( ( long ) DISPC.buffbot ) )
+         DISPC.buffbot = ( int ) DISPC.fsize;           /* then set buffer bottom */
 
       /* set the current lines buffer offset pointer */
 
-      buffoffset = getblock( ( long ) bufftop );
+      DISPC.buffoffset = getblock( ( long ) DISPC.bufftop );
 
       /* align buffer and window pointer to valid values */
 
@@ -605,7 +589,7 @@ HB_FUNC( _FT_DFINIT )
       for( i = 1; i < j; i++ )
          linedown();
 
-      hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+      hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
    }
 
@@ -614,14 +598,14 @@ HB_FUNC( _FT_DFINIT )
 
 HB_FUNC( _FT_DFCLOS )
 {
-   if( isallocated )
+   if( DISPC.bIsAllocated )
    {
-      if( buffer != NULL )
-         hb_xfree( buffer );                /* free up allocated buffer memory */
-      if( lbuff != NULL )
-         hb_xfree( lbuff );
-      if( vseg != NULL )
-         hb_xfree( vseg );
+      if( DISPC.buffer != NULL )
+         hb_xfree( DISPC.buffer );                /* free up allocated buffer memory */
+      if( DISPC.lbuff != NULL )
+         hb_xfree( DISPC.lbuff );
+      if( DISPC.vseg != NULL )
+         hb_xfree( DISPC.vseg );
    }
 }
 
@@ -688,154 +672,184 @@ HB_FUNC( _FT_DFCLOS )
 
 HB_FUNC( FT_DISPFILE )
 {
-   int   i, done;
-   char  rval[ 2 ];
-
-   int   ch;
-
+   int  i, done;
+   char rval[ 2 ];
+   int  ch;
 
    /* make sure buffers were allocated and file was opened */
-   if( isallocated && infile > 0 )
+
+   if( DISPC.bIsAllocated && DISPC.infile > 0 )
    {
-      done     = NO;
-      refresh  = YES;
+      done          = FALSE;
+      DISPC.refresh = TRUE;
 
       /* draw inside of window with normal color attribute */
 
-      for( i = 0; i < height; i++ )
-         chattr( 0, i, width, norm );
+      for( i = 0; i < DISPC.height; i++ )
+         chattr( 0, i, DISPC.width, DISPC.norm );
 
-      hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+      hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
       /* main processing loop -- terminated by user key press */
 
       do
       {
-         if( refresh )               /* redraw window contents? */
-            disp_update( wintop );
+         if( DISPC.refresh )                      /* redraw window contents? */
+            disp_update( DISPC.wintop );
 
-         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+         hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
          /* if not browse, highlight the current line */
 
-         if( brows == NO )
-            chattr( 0, winrow - sline, width, hlight );
+         if( DISPC.brows == FALSE )
+            chattr( 0, DISPC.winrow - DISPC.sline, DISPC.width, DISPC.hlight );
 
-         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+         hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
-         hb_gtSetPos( ( SHORT ) winrow, ( SHORT ) scol );
+         hb_gtSetPos( ( SHORT ) DISPC.winrow, ( SHORT ) DISPC.scol );
 
-         ch = keyin();                      /* get user key press */
+         ch = hb_inkey( TRUE, 0.0, INKEY_ALL );   /* get user key press */
 
          /* if not browse, then un-highlight current line */
 
-         if( brows == NO )
-            chattr( 0, winrow - sline, width, norm );
+         if( DISPC.brows == FALSE )
+            chattr( 0, DISPC.winrow - DISPC.sline, DISPC.width, DISPC.norm );
 
-         hb_gtRest( ( USHORT ) sline, ( USHORT ) scol, ( USHORT ) eline, ( USHORT ) ecol, vseg );
+         hb_gtRest( ( USHORT ) DISPC.sline, ( USHORT ) DISPC.scol, ( USHORT ) DISPC.eline, ( USHORT ) DISPC.ecol, DISPC.vseg );
 
          /* figure out what the user wants to do */
 
          switch( ch )
          {
-            case K_DOWN:  if( brows )                       /* if browse flag */
-                  winrow = eline;                           /* is set, force  */
-                                                            /* active line to */
-               linedown();                                  /* be last line   */
+            case K_DOWN:
+
+               if( DISPC.brows )                                    /* if browse flag */
+                  DISPC.winrow = DISPC.eline;                       /* is set, force  */
+
+               /* active line to */
+               linedown();                                          /* be last line   */
                break;
 
-            case K_UP:  if( brows )                         /* if browse flag */
-                  winrow = sline;                           /* is set, force  */
-                                                            /* active line to */
-               lineup();                                    /* be first line  */
+            case K_UP:
+
+               if( DISPC.brows )                                    /* if browse flag */
+                  DISPC.winrow = DISPC.sline;                       /* is set, force  */
+                                                                    /* active line to */
+               lineup();                                            /* be first line  */
                break;
 
-            case K_LEFT:  wincol -= colinc;                 /* move cursor    */
-               refresh           = YES;                     /* to the left    */
+            case K_LEFT:
 
-               if( wincol < 0 )
-                  wincol = 0;
+               DISPC.wincol -= DISPC.colinc;                        /* move cursor    */
+               DISPC.refresh = TRUE;                                /* to the left    */
 
-               break;
-
-            case K_RIGHT: wincol += colinc;                 /* move cursor  */
-               refresh           = YES;                     /* to the right */
-
-               if( wincol > ( maxlin - width ) )
-                  wincol = maxlin - width;
+               if( DISPC.wincol < 0 )
+                  DISPC.wincol = 0;
 
                break;
 
-            case K_HOME:  wincol = 0;                       /* move cursor  */
-               refresh           = YES;                     /* to first col */
+            case K_RIGHT:
+
+               DISPC.wincol += DISPC.colinc;                        /* move cursor  */
+               DISPC.refresh = TRUE;                                /* to the right */
+
+               if( DISPC.wincol > ( DISPC.maxlin - DISPC.width ) )
+                  DISPC.wincol = DISPC.maxlin - DISPC.width;
+
+               break;
+
+            case K_HOME:
+
+               DISPC.wincol  = 0;                                   /* move cursor  */
+               DISPC.refresh = TRUE;                                /* to first col */
 
                break;
 
             /* move cursor to last col */
 
-            case K_END:  wincol  = maxlin - width;
-               refresh           = YES;
+            case K_END:
+
+               DISPC.wincol  = DISPC.maxlin - DISPC.width;
+               DISPC.refresh = TRUE;
 
                break;
 
-            case K_CTRL_LEFT: wincol   -= 16;               /* move cursor    */
-               refresh                 = YES;               /* 16 col to left */
+            case K_CTRL_LEFT:
 
-               if( wincol < 0 )
-                  wincol = 0;
+               DISPC.wincol -= 16;                                  /* move cursor    */
+               DISPC.refresh = TRUE;                                /* 16 col to left */
 
-               break;
-
-            case K_CTRL_RIGHT: wincol  += 16;               /* move cursor     */
-               refresh                 = YES;               /* 16 col to right */
-
-               if( wincol > ( maxlin - width ) )
-                  wincol = maxlin - width;
+               if( DISPC.wincol < 0 )
+                  DISPC.wincol = 0;
 
                break;
 
-            case K_PGUP: for( i = 0; i < height; i++ )      /* move window */
-                  winup();                                  /* up one page */
+            case K_CTRL_RIGHT:
+
+               DISPC.wincol += 16;                                  /* move cursor     */
+               DISPC.refresh = TRUE;                                /* 16 col to right */
+
+               if( DISPC.wincol > ( DISPC.maxlin - DISPC.width ) )
+                  DISPC.wincol = DISPC.maxlin - DISPC.width;
 
                break;
 
-            case K_PGDN: for( i = 0; i < height; i++ )      /* move window */
-                  windown();                                /* down 1 page */
+            case K_PGUP:
+
+               for( i = 0; i < DISPC.height; i++ )                  /* move window */
+                  winup();                                          /* up one page */
 
                break;
 
-            case K_CTRL_PGUP: filetop();                    /* move cursor to */
-               break;                                       /* to top of file */
+            case K_PGDN:
 
-            case K_CTRL_PGDN: filebot();                    /* move cursor to */
-               break;                                       /* to bot of file */
+               for( i = 0; i < DISPC.height; i++ )                  /* move window */
+                  windown();                                        /* down 1 page */
 
-            case K_ENTER: done   = YES;                     /* carriage return */
-               break;                                       /* terminates      */
+               break;
 
-            case K_ESC: done     = YES;                     /* escape key */
-               break;                                       /* terminates */
+            case K_CTRL_PGUP:
+
+               filetop();                                           /* move cursor to */
+               break;                                               /* to top of file */
+
+            case K_CTRL_PGDN:
+
+               filebot();                                           /* move cursor to */
+               break;                                               /* to bot of file */
+
+            case K_ENTER:
+
+               done = TRUE;                                         /* carriage return */
+               break;                                               /* terminates      */
+
+            case K_ESC:
+
+               done = TRUE;                                         /* escape key */
+               break;                                               /* terminates */
 
             /* scan key list and see if key pressed is there */
 
-            default: if( keytype == K_STRING )
+            default:
+
+               if( DISPC.keytype == K_STRING )
                {
-                  for( i = 0; i <= kcount; i++ )
+                  for( i = 0; i <= DISPC.kcount; i++ )
                      if( ( ch > 0 ) && ( ch < 256 ) )
-                        if( ( int ) kstr[ i ] == ch )
-                           done = YES;
-                  break;                                   /* if so terminate */
+                        if( ( int ) DISPC.kstr[ i ] == ch )
+                           done = TRUE;
                }
                else
                {
-                  for( i = 0; i < kcount; i++ )
-                     if( keylist[ i ] == ch )
-                        done = YES;
-                  break;
+                  for( i = 0; i < DISPC.kcount; i++ )
+                     if( DISPC.keylist[ i ] == ch )
+                        done = TRUE;
                }
+
+               break;
          }
       }
-      while( done == NO );
+      while( done == FALSE );
    }
    else
       ch = 0;
@@ -845,39 +859,12 @@ HB_FUNC( FT_DISPFILE )
 
    /* return key value to caller */
 
-   if( keytype == K_STRING )
+   if( DISPC.keytype == K_STRING )
    {
-      rval[ 0 ]   = ( char ) ch;
-      rval[ 1 ]   = '\0';
+      rval[ 0 ] = ( char ) ch;
+      rval[ 1 ] = '\0';
       hb_retc( rval );
    }
    else
       hb_retni( ch );
 }
-
-/*
- *  keyin() gets the next key typed and does any translation needed.
- *  Some keys are converted to a common name - like the up arrow is
- *  converted to the UP value which also is the Ctrl-E value.  This
- *  allows the Wordstar-like control keys to be used.  Only extended
- *  keys are translated - the values of the defines were chosen to
- *  match up with the non-extended key codes.
- *
- */
-
-static int keyin( void )
-{
-   return hb_inkey( TRUE, 0.0, INKEY_ALL );
-}
-
-
-static void strcpyn( char * dest, const char * source, int len )
-{
-   int i;
-
-   for( i = 0; i < len; i++ )
-      dest[ i ] = source[ i ];
-
-   dest[ len + 1 ] = 0x00;
-}
-
