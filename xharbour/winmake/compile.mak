@@ -3019,6 +3019,9 @@ $(OBJ_DIR)$(DIR_SEP)trpccli.c : $(RTL_DIR)$(DIR_SEP)trpccli.prg
 $(OBJ_DIR)$(DIR_SEP)trpccli$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)trpccli.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)win_misc$(OBJEXT) : $(RTL_DIR)$(DIR_SEP)win_misc.c
+	$(CCC_CMD)
+
 #===============================================================================
 # ZLIB.LIB rules
 #===============================================================================

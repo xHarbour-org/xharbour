@@ -153,22 +153,23 @@ C_SOURCES=\
 	word.c       \
 	xhelp.c      \
 	xsavescr.c   \
-	hbsha1.c \
-	hbsha1hm.c \
-	hbsha2.c \
-	hbsha2hm.c \
-	sha1.c \
-	sha1hmac.c \
-	sha2.c \
-	sha2hmac.c \
-	hbsocket.c \
-	hbsockhb.c \
-	hbcom.c \
-	hbcomhb.c \
-	hbbffnc.c \
-	hbbfish.c \
-	hbrand.c \
-	arc4.c \
+	hbsha1.c     \
+	hbsha1hm.c   \
+	hbsha2.c     \
+	hbsha2hm.c   \
+	sha1.c       \
+	sha1hmac.c   \
+	sha2.c       \
+	sha2hmac.c   \
+	hbsocket.c   \
+	hbsockhb.c   \
+	hbcom.c      \
+	hbcomhb.c    \
+	hbbffnc.c    \
+	hbbfish.c    \
+	hbrand.c     \
+	arc4.c       \
+	win_misc.c   \
 
 
 PRG_SOURCES=\
@@ -244,9 +245,9 @@ PRG_SOURCES=\
 	wait.prg     \
 	win32ole.prg \
 	win32prn.prg \
-	winos.prg \
-	winreg.prg \
-	stream.prg \
+	winos.prg    \
+	winreg.prg   \
+	stream.prg   \
 
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=rtlmt

@@ -9,6 +9,17 @@
 */
 
 
+2014-02-16 15:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/rtl.lst
+  * source/rtl/Makefile
+  * source/rtl/win_misc.prg
+    + Separated Windows API wrappers from hbwinole.c:
+      ANSITOWIDE
+      WIDETOANSI
+      MESSAGEBOX
+
 2014-02-14 15:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/hbwinole.c
   * source/rtl/win32ole.prg

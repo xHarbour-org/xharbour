@@ -1062,6 +1062,7 @@ RTL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)win32prn$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winos$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)winreg$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)win_misc$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)sha1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)sha1hmac$(OBJEXT)\
