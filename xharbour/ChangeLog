@@ -9,8 +9,18 @@
 */
 
 
+2014-02-26 12:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/hbusage.c
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbrun/hbrun.prg
+  * utils/hbtest/hbtest.prg
+  * winmake/compile.mak
+    ! bump copyright year to 2014
+
 2014-02-16 17:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source/rtl/win_misc.prg
+  * source/rtl/win_misc.c
     ! Correct file version line
 
 2014-02-16 17:00 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>

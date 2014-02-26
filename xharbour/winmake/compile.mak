@@ -173,13 +173,13 @@ $(HARBOUR_EXE_RES) : $(HARBOUR_EXE_RC)
 	$(RC_CMD)
 
 $(HARBOUR_EXE_RC) : ChangeLog
-	$(HBRC_EXE) $(HARBOUR_EXE_RC) "xHarbour Compiler" "harbour.exe" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source" "resource/xhb.ico"
+	$(HBRC_EXE) $(HARBOUR_EXE_RC) "xHarbour Compiler" "harbour.exe" "1999-2014, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source" "resource/xhb.ico"
 
 $(HARBOUR_DLL_RES) : $(HARBOUR_DLL_RC)
 	$(RC_CMD)
 
 $(HARBOUR_DLL_RC) : ChangeLog
-	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2013, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
+	$(HBRC_EXE) $(HARBOUR_DLL_RC) "xHarbour Runtime" "xharbour.dll" "1999-2014, http://www.xharbour.org/" "The xHarbour Team" "xHarbour Open Source"
 
 #===============================================================================
 # HBCGI.LIB

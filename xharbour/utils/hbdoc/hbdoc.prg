@@ -273,7 +273,7 @@ FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
 
    IF cLinkName = NIL
       outstd( "xHarbour Doc Extractor"+ hb_osnewline() )
-      outstd( "Copyright 1999-2013, http://www.xharbour.org"+ hb_osnewline() )
+      outstd( "Copyright 1999-2014, http://www.xharbour.org"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
       outstd( "Syntax:  hbdoc [options] <linkname> [<ifile>]"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
