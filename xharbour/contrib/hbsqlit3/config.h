@@ -9,14 +9,9 @@
    #define SQLITE_ENABLE_COLUMN_METADATA
 
    #if defined( __BORLANDC__ )
-      #pragma warn -rch /* unreachable code */
-      #pragma warn -ccc /* Condition is always true or false */
-      #pragma warn -aus /* Assigned value is never used */
-      #pragma warn -csu /* Comparing signed and unsigned */
-      #pragma warn -spa /* Suspicious pointer arithmetic */
-      #pragma warn -prc
-      #pragma warn -pia
-      #pragma warn -use
+      #pragma warn -par                 /* Parameter '%s' is never used    */
+      #pragma warn -pia                 /* Possibly incorrect assignment   */
+      #pragma warn -use                 /* '%s' is declared but never used */
    #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
       #pragma disable_message ( 136 )

@@ -56,7 +56,7 @@
  XHarbour Port from orginale Harbour version by P.Chornyj <myorg63@mail.ru>
  November 18, 2011 by R.Visscher <richard@irvis.com>
 -----------------------------------------------------------------------------------------*/
- 
+
 #include "hbvm.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -120,12 +120,12 @@ static int busy_handler( void * Cargo, int iNumberOfTimes )
    if( pCallback && hb_vmRequestReenter() )
    {
       int iRes;
-      
+
 	  hb_vmPushSymbol( hb_dynsymGetSymbol( hb_dynsymName( pCallback ) ) );
 	  hb_vmPushNil();
 	  hb_vmPushInteger( iNumberOfTimes );
 	  hb_vmFunction( 1 );
-      
+
       iRes = hb_parni( -1 );
 
       hb_vmRequestRestore();
@@ -183,7 +183,7 @@ static int hook_commit( void * Cargo )
 static void hook_rollback( void * Cargo )
 {
    PHB_DYNS pCallback = ( PHB_DYNS ) Cargo;
-   
+
    if( pCallback && hb_vmRequestReenter() )
    {
 	  hb_vmPushSymbol( hb_dynsymGetSymbol( hb_dynsymName( pCallback ) ) );
@@ -197,32 +197,32 @@ static void hook_rollback( void * Cargo )
 static int callback( void * Cargo, int argc, char ** argv, char ** azColName )
 {
     PHB_DYNS pCallback = ( PHB_DYNS ) Cargo;
-	
+
    if( pCallback && hb_vmRequestReenter() )
    {
       PHB_ITEM pArrayValue = hb_itemArrayNew( argc );
       PHB_ITEM pArrayColName = hb_itemArrayNew( argc );
       int      iRes, i;
       const char * cFunc = hb_dynsymName( pCallback );
-	  
-	  
+
+
       for( i = 0; i < argc; i++ )
       {
          hb_arraySetC( pArrayValue, i + 1, ( const char * ) ( argv[ i ] ? argv[ i ] : "NULL" ) );
          hb_arraySetC( pArrayColName, i + 1, ( const char * ) azColName[ i ] );
       }
- 
+
 	  hb_vmPushSymbol( hb_dynsymGetSymbol( cFunc ) );
       hb_vmPushNil();
-	  
+
       hb_vmPushInteger( argc );
       hb_vmPush( pArrayValue );
       hb_vmPush( pArrayColName );
-      
+
       iRes = hb_parni( -1 );
 
 	  hb_vmFunction( 3 );
-	  
+
       hb_itemRelease( pArrayValue );
       hb_itemRelease( pArrayColName );
 
@@ -238,12 +238,12 @@ static int authorizer( void * Cargo, int iAction, const char * sName1, const cha
                        const char * sName3,
                        const char * sName4 )
 {
-    
+
    PHB_DYNS pCallback = ( PHB_DYNS ) Cargo;
-   
+
    if( pCallback && hb_vmRequestReenter() )
    {
-      
+
       int      iRes;
       PHB_ITEM pItem1 = hb_itemPutStrUTF8( NULL, sName1 );
       PHB_ITEM pItem2 = hb_itemPutStrUTF8( NULL, sName2 );
@@ -251,18 +251,18 @@ static int authorizer( void * Cargo, int iAction, const char * sName1, const cha
       PHB_ITEM pItem4 = hb_itemPutStrUTF8( NULL, sName4 );
 
 	  const char * cFunc = hb_dynsymName( pCallback );
-	 
+
 	  hb_vmPushSymbol( hb_dynsymGetSymbol( cFunc ) );
       hb_vmPushNil();
 
 	  hb_vmPushInteger( iAction );
       hb_vmPush( pItem1 );
-      hb_vmPush( pItem2 ); 
+      hb_vmPush( pItem2 );
       hb_vmPush( pItem3 );
       hb_vmPush( pItem4 );
-       
+
 	  hb_vmFunction( 5 );
-      
+
       iRes = hb_parni( -1 );
 
       hb_itemRelease( pItem1 );
@@ -313,7 +313,7 @@ static void SQL3TraceLog( void * sFile, const char * sTraceMsg )
 static HB_GARBAGE_FUNC( hb_sqlite3_destructor )
 {
    PHB_SQLITE3_HOLDER pStructHolder = ( PHB_SQLITE3_HOLDER ) Cargo;
-   
+
    if( pStructHolder && pStructHolder->hbsqlite3 )
    {
 		if( pStructHolder->hbsqlite3->db )
@@ -321,15 +321,15 @@ static HB_GARBAGE_FUNC( hb_sqlite3_destructor )
 			sqlite3_close( pStructHolder->hbsqlite3->db );
 			pStructHolder->hbsqlite3->db = NULL;
 		}
-		
+
 		if( pStructHolder->hbsqlite3->cbAuthorizer )
 		{
 			hb_itemRelease( pStructHolder->hbsqlite3->cbAuthorizer );
 			pStructHolder->hbsqlite3->cbAuthorizer = NULL;
 		}
-		
+
 		if( pStructHolder->hbsqlite3->cbHookCommit )
-		{	
+		{
 			hb_itemRelease( pStructHolder->hbsqlite3->cbHookCommit );
 			pStructHolder->hbsqlite3->cbHookCommit = NULL;
 		}
@@ -339,7 +339,7 @@ static HB_GARBAGE_FUNC( hb_sqlite3_destructor )
 			hb_itemRelease( pStructHolder->hbsqlite3->cbHookRollback );
 			pStructHolder->hbsqlite3->cbHookRollback = NULL;
 		}
-		
+
 		if( pStructHolder->hbsqlite3->cbBusyHandler )
 		{
 			hb_itemRelease( pStructHolder->hbsqlite3->cbBusyHandler );
@@ -351,7 +351,7 @@ static HB_GARBAGE_FUNC( hb_sqlite3_destructor )
 			hb_itemRelease( pStructHolder->hbsqlite3->cbProgressHandler );
 			pStructHolder->hbsqlite3->cbProgressHandler = NULL;
 		}
-		
+
 		hb_xfree( pStructHolder->hbsqlite3 );
 		pStructHolder->hbsqlite3 = NULL;
    }
@@ -414,7 +414,7 @@ static void * hb_sqlite3_param( int iParam, int iType, BOOL fError )
 HB_FUNC( SQLITE3_SET_AUTHORIZER )
 {
 	HB_SQLITE3 * pHbSqlite3 = ( HB_SQLITE3 * ) hb_sqlite3_param( 1, HB_SQLITE3_DB, TRUE );
-   
+
 	if( pHbSqlite3 && pHbSqlite3->db )
 	{
 		if( pHbSqlite3->cbAuthorizer )
@@ -422,17 +422,17 @@ HB_FUNC( SQLITE3_SET_AUTHORIZER )
 			hb_itemRelease( pHbSqlite3->cbAuthorizer );
 			pHbSqlite3->cbAuthorizer = NULL;
 		}
-     	  
+
 		if( ISPOINTER( 2 ) )
 		{
 			pHbSqlite3->cbAuthorizer = hb_itemNew( hb_param( 2, HB_IT_POINTER ) );
-         
+
 			hb_gcUnlock( pHbSqlite3->cbAuthorizer );
-         
+
 			hb_retni( sqlite3_set_authorizer( pHbSqlite3->db, authorizer,( void * ) pHbSqlite3->cbAuthorizer ) );
 		}
 		else
-		{	 
+		{
 			hb_retni( sqlite3_set_authorizer( pHbSqlite3->db, NULL, NULL ) );
 		}
 	}
@@ -527,7 +527,7 @@ HB_FUNC( SQLITE3_BIND_INT )
 		hb_retni( sqlite3_bind_int( pStmt, hb_parni( 2 ), hb_parni( 3 ) ) );
 	else
 		hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
-} 
+}
 
 HB_FUNC( SQLITE3_BIND_INT64 )
 {
@@ -585,7 +585,6 @@ HB_FUNC( SQLITE3_BIND_PARAMETER_NAME )
 	else
 		hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
 }
-
 
 HB_FUNC( SQLITE3_BIND_TEXT )
 {
@@ -754,7 +753,6 @@ HB_FUNC( SQLITE3_BUSY_HANDLER )
 	}
 }
 
-
 HB_FUNC( SQLITE3_BUSY_TIMEOUT )
 {
 	HB_SQLITE3 * pHbSqlite3 = ( HB_SQLITE3 * ) hb_sqlite3_param( 1, HB_SQLITE3_DB, TRUE );
@@ -764,7 +762,6 @@ HB_FUNC( SQLITE3_BUSY_TIMEOUT )
 	else
 		hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
 }
-
 
 HB_FUNC( SQLITE3_CHANGES )
 {
@@ -797,7 +794,7 @@ HB_FUNC( SQLITE3_CLOSE )
 	else
 	{
 		hb_retni( -1 );
-    }			
+    }
 }
 
 HB_FUNC( SQLITE3_COMMIT_HOOK )
@@ -1048,7 +1045,6 @@ HB_FUNC( SQLITE3_COLUMN_TYPE )
 		hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
 }
 
-
 HB_FUNC( SQLITE3_COMPLETE )
 {
 	void * hSQLText;
@@ -1099,12 +1095,12 @@ HB_FUNC( SQLITE3_EXEC )
 {
 	HB_SQLITE3 * pHbSqlite3 = ( HB_SQLITE3 * ) hb_sqlite3_param( 1, HB_SQLITE3_DB, TRUE );
 
-	if( pHbSqlite3 && pHbSqlite3->db ) 
+	if( pHbSqlite3 && pHbSqlite3->db )
 	{
 	    void *   hSQLText;
 		char *   pszErrMsg = NULL;
-		int      rc; 
-      
+		int      rc;
+
 		if( ISPOINTER( 3 ) )
 		{
 			rc = sqlite3_exec( pHbSqlite3->db, hb_parstr_utf8( 2, &hSQLText,
@@ -1115,15 +1111,15 @@ HB_FUNC( SQLITE3_EXEC )
 			 rc = sqlite3_exec( pHbSqlite3->db, hb_parstr_utf8( 2, &hSQLText,
                                                             NULL ), NULL, 0, &pszErrMsg );
 		}
-		
+
 		if( rc != SQLITE_OK )
 		{
 			HB_TRACE( HB_TR_DEBUG, ( "sqlite3_exec(): Returned error: %s", pszErrMsg ) );
 			sqlite3_free( pszErrMsg );
 		}
-        
+
 		hb_strfree( hSQLText );
-		
+
 		hb_retni( rc );
 	}
 	else
@@ -1195,7 +1191,7 @@ HB_FUNC( SQLITE3_GET_TABLE )
 
 				for( j = 1; j <= iCol; j++, k++ )
 					hb_arraySetStrUTF8( pArray, j, ( const char * ) pResult[ k ] );
-			
+
 				hb_arrayAddForward( pResultList, pArray );
 				hb_itemRelease( pArray );
 			}
@@ -1525,7 +1521,7 @@ HB_FUNC( SQLITE3_TEMP_DIRECTORY )
 {
 	BOOL bResult = FALSE;
 
-	{	
+	{
 		char *         pszFree;
 		const char *   pszDirName = hb_fsNameConv( hb_parcx( 1 ), &pszFree );
 
@@ -1542,7 +1538,7 @@ HB_FUNC( SQLITE3_TEMP_DIRECTORY )
 					bResult = TRUE;
 				}
 				else
-				{	
+				{
 					HB_TRACE( HB_TR_DEBUG,
                          ( "sqlite_temp_directory(): Can't create directory %s", pszDirName ) );
 				}
@@ -1562,8 +1558,6 @@ HB_FUNC( SQLITE3_TEMP_DIRECTORY )
 	}
 	hb_retl( bResult );
 }
-
-
 
 HB_FUNC( SQLITE3_THREADSAFE )
 {
@@ -1626,6 +1620,3 @@ HB_FUNC( SQLITE3_BUFF_TO_FILE )
 	else
 		hb_retni( 1 );
 }
-
-
-
