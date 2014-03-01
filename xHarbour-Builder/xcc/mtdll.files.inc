@@ -279,6 +279,7 @@
 [\xbp\xcc\xhbmt.lib\throw.obj]
 
 [\xbp\xcc\xhbmt.lib\hbwinole.obj]
+[\xbp\xcc\xhbmt.lib\win_misc.obj]
 
 [\xbp\xcc\xhbmt.lib\set.obj]
 [\xbp\xcc\xhbmt.lib\hbmem.obj]

@@ -374,6 +374,7 @@
 [source\rtl\hbjson.c]
 
 [source\rtl\hbwinole.c]
+[source\rtl\win_misc.c]
 
 [source\rtl\browdb.prg]
 [source\rtl\tpopup.prg]

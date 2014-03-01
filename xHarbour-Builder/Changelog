@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-03-01 14:56 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * stdlib.files.inc
+  * xcc\mtdll.files.inc
+  * xcc\stddll.files.inc
+    * Synched with .ORG addition of win_misc.c
+
 2013-06-06 08:21 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * xbldfull2.bat
     ! Reverted last commit!!! (Call \xharbour.com\xharbour-xcc\build_xcc.bat)
