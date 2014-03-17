@@ -20,13 +20,14 @@
 #define MAX_INDEX_COLS                        10  // Seek will work on indexes with up to MAX_INDEX_COLS columns
 #define PREPARED_SQL_LEN                     400
 #define RECORD_LIST_SIZE                     250
-#define COLUMN_BLOCK_SIZE                   32768
+#define COLUMN_BLOCK_SIZE                     64
 #define FIELD_LIST_SIZE                     6000
+#define FIELD_LIST_SIZE_PARAM                600
 #define MAX_SQL_QUERY_LEN                  32000
 #define PAGE_READ_SIZE                        50
 #define BUFFER_POOL_SIZE                     250
 #define DEFAULT_INDEX_COLUMN_MAX_LEN         200
-#define INITIAL_MEMO_ALLOC                  1024
+#define INITIAL_MEMO_ALLOC                   256
 
 //                           0 1 2 34 5 6 7 8 9 0 1 23 4 5 67 8 9
 static char * openQuotes  = "\"\"\"[\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";

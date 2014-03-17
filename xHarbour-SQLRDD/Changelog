@@ -9,6 +9,20 @@
 */
 
 
+2014-03-17 09:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlex.h
+    * COLUMN_BLOCK_SIZE decrease  32k to 64 bytes
+    * INITIAL_MEMO_ALLOC decrease from 1K to  256 bytes.
+  * source/sqlex1.c  
+    some fixes for memo detecting, release of cursors and data retriving from rdbms to use less memory
+  * source/sqlex2.c  
+    some fixes for memo detecting and release cursors
+  * source/sqlex3.c  
+    ! fixed getSeekWhereExpression becouse sometimes was passing wrong value to bwhere even is thisWa->sWhere is filler
+  * source/sqlsrodbc.c
+    ! some casts  and data retriving from rdbms to use less memory
+    
+  
 
 2014-01-02 20:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
   *  source/sqlorax.c

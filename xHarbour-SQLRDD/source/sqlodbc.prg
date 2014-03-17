@@ -197,7 +197,7 @@ Return ::nRetCode
 
 METHOD FreeStatement() CLASS SR_ODBC
 
-   if ::hStmt != NIL //!= 0
+   if !empty( ::hStmt ) //  != NIL //!= 0
       if SR_FreeStm( ::hStmt, SQL_DROP ) != SQL_SUCCESS
          ::RunTimeErr("", "SQLFreeStmt [DROP] error" + chr(13)+chr(10)+ chr(13)+chr(10)+"Last command sent to database : " + chr(13)+chr(10) + ::cLastComm )
       endif
@@ -294,10 +294,14 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          if  ::nSystemID == SYSTEMID_ORACLE  .and. nLen == 19 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME)
              nType := SQL_DATE
          ENDIF    
+         if ::nsystemId ==  SYSTEMID_MSSQL7
+            if ( ntype == SQL_TYPE_DATE ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
+            elseif ( nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
          
-         if ::nsystemId ==  SYSTEMID_MSSQL7 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES()
+            elseif  (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES() .and.   !::lSqlServer2008 
             nType := SQL_DATE
          endif   
+         endif
 
          cName     := upper(alltrim( cName ))
          cType     := ::SQLType( nType, cName, nLen )

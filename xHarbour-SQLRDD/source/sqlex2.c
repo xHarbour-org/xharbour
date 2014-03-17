@@ -190,7 +190,7 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
 
    InsertRecord = thiswa->InsertRecord;
    sFields      = (char *) hb_xgrab( FIELD_LIST_SIZE * sizeof( char ) );
-   sParams      = (char *) hb_xgrab( (FIELD_LIST_SIZE / 2) * sizeof( char ) );
+   sParams      = (char *) hb_xgrab( (FIELD_LIST_SIZE_PARAM) * sizeof( char ) );
    uiPos        = 0;
    sFields[0]   = '\0';
 
@@ -205,7 +205,9 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
       cType        = ( * hb_arrayGetCPtr( pFieldStruct, FIELD_TYPE ));
       colName      = hb_arrayGetC( pFieldStruct, FIELD_NAME );
       bMultiLang   = hb_arrayGetL( pFieldStruct, FIELD_MULTILANG );
-      bIsMemo      = cType == 'M';
+      if ( bMultiLang ) 
+         cType = 'M';
+      bIsMemo      = cType == 'M' || bMultiLang ;
 
       if( i != (int)(thiswa->ulhRecno) )      // RECNO is never included in INSERT column list
       {
@@ -296,6 +298,8 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
             break;
          }
       }
+      //if (InsertRecord->isMultiLang) // culik, se e multiplang, binda como binario
+      // InsertRecord->iCType            = SQL_C_BINARY;
       InsertRecord++;
    }
 
@@ -307,10 +311,10 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
    case SYSTEMID_MSSQL7:
    case SYSTEMID_SYBASE:
    {
-      //sprintf( ident, "; SELECT @@IDENTITY ;" );
+//      sprintf( ident, " SELECT @@IDENTITY ;" );
       sprintf( ident, "SELECT %s FROM @InsertedData;",thiswa->sRecnoName);
-      
       sprintf( declare,"Declare @InsertedData table ( %s numeric(15,0) );",thiswa->sRecnoName);
+//      sprintf( ident, ";SELECT SCOPE_IDENTITY() AS NewID ;" );
       break;
    }
    case SYSTEMID_FIREBR:
@@ -345,17 +349,21 @@ void CreateInsertStmt( SQLEXAREAP thiswa )
       ident[0] = '\0';
    }
    if ( thiswa->sSql ) 
+      hb_xfree(thiswa->sSql ) ;
+   thiswa->sSql               = ( char * ) hb_xgrab( MAX_SQL_QUERY_LEN * sizeof( char ) );
    memset( thiswa->sSql, 0,  MAX_SQL_QUERY_LEN * sizeof( char ) );
    if (thiswa->nSystemID ==  SYSTEMID_MSSQL7 )
    {
-		 sprintf( thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData VALUES (%s );%s", declare, thiswa->sTable, sFields, thiswa->sRecnoName, sParams ,ident);
+      sprintf( thiswa->sSql, "%s INSERT INTO %s (%s ) OUTPUT Inserted.%s INTO @InsertedData(%s) VALUES (%s );%s", declare, thiswa->sTable, sFields, thiswa->sRecnoName, thiswa->sRecnoName,sParams ,ident);
+
+   // sprintf( thiswa->sSql, "%s INSERT INTO %s (%s ) VALUES (%s );%s", declare, thiswa->sTable, sFields, sParams ,ident);
+
    }   
    else
    {
    sprintf( thiswa->sSql, "INSERT INTO %s (%s ) VALUES (%s )%s", thiswa->sTable, sFields, sParams, ident );
    }   
 
-      
    hb_xfree( sFields );
    hb_xfree( sParams );
 }
@@ -381,6 +389,7 @@ HB_ERRCODE PrepareInsertStmt( SQLEXAREAP thiswa )
       odbcErrorDiagRTE( thiswa->hStmtInsert, "PrepareInsertStmt", thiswa->sSql, res, __LINE__, __FILE__ );
       return HB_FAILURE;
    }
+         
    return HB_SUCCESS;
 }
 
@@ -568,10 +577,13 @@ HB_ERRCODE ExecuteInsertStmt( SQLEXAREAP thiswa )
 {
    SQLRETURN res;
 
+   
    res = SQLExecute( thiswa->hStmtInsert );
 
+      
    if ( CHECK_SQL_N_OK( res ) )
    {
+	  
       odbcErrorDiagRTE( thiswa->hStmtInsert, "ExecuteInsertStmt/SQLExecute", thiswa->sSql, res, __LINE__, __FILE__ );
       SQLCloseCursor( thiswa->hStmtInsert );
       return (HB_FAILURE);
@@ -589,12 +601,21 @@ HB_ERRCODE ExecuteInsertStmt( SQLEXAREAP thiswa )
    {
       if( thiswa->nSystemID != SYSTEMID_FIREBR )
       {
+         //#if defined( _MSC_VER ) 
+            res = SQLMoreResults( thiswa->hStmtInsert );
+            if ( res != SQL_SUCCESS )
+            {
          res = SQLMoreResults( thiswa->hStmtInsert );
          if ( CHECK_SQL_N_OK( res ) )
          {
             odbcErrorDiagRTE( thiswa->hStmtInsert, "SQLMoreResults", thiswa->sSql, res, __LINE__, __FILE__ );
+                  
+                  SQLCloseCursor(  thiswa->hStmtInsert );
+
             return (HB_FAILURE);
          }
+      }
+         //#endif
       }
       res = SQLFetch( thiswa->hStmtInsert );
       if ( CHECK_SQL_N_OK( res ) )
@@ -690,7 +711,8 @@ HB_ERRCODE ExecuteInsertStmt( SQLEXAREAP thiswa )
    hb_arraySetNL( thiswa->aInfo, AINFO_RCOUNT, thiswa->recordList[0] );
    thiswa->lLastRec      = thiswa->recordList[0] + 1;
 
-   SQLFreeStmt( thiswa->hStmtInsert, SQL_CLOSE );
+   SQLCloseCursor(  thiswa->hStmtInsert );
+   
    return (HB_SUCCESS);
 }
 
@@ -741,6 +763,8 @@ HB_ERRCODE CreateUpdateStmt( SQLEXAREAP thiswa )
                                                       // current order is not affected by UPDATE, so it takes
                                                       // worst scenario
          }
+         if (strcmp(CurrRecord->colName,thiswa->sRecnoName )== 0)
+            break;
          // Bind the query column
          iBind++;
          switch (CurrRecord->iCType)
@@ -889,8 +913,9 @@ HB_ERRCODE ExecuteUpdateStmt( SQLEXAREAP thiswa )
 
    if ( res == SQL_ERROR )
    {
-      odbcErrorDiagRTE( thiswa->hStmtInsert, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__ );
-      SQLCloseCursor( thiswa->hStmtInsert );
+      odbcErrorDiagRTE( thiswa->hStmtUpdate, "ExecuteUpdateStmt", thiswa->sSql, res, __LINE__, __FILE__ );
+      SQLCloseCursor( thiswa->hStmtUpdate );
+      thiswa->hStmtUpdate = NULL; 
       return (HB_FAILURE);
    }
 

@@ -141,12 +141,91 @@ static HB_ERRCODE getSeekWhereExpression( SQLEXAREAP thiswa, int iListType, int 
       // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio era o ultimo item da chave
       SeekBind ++;         // place offset      
    }
+   bWhere  = strlen(  thiswa->sWhere ) >0;
+   SolveFilters( thiswa, bWhere );
+
+   return ( HB_SUCCESS );
+}
+/*
+static HB_ERRCODE getSeekWhereExpression( SQLEXAREAP thiswa, int iListType, int queryLevel, BOOL * bUseOptimizerHints )
+{
+   SqlExLog( "getSeekWhereExpression()", 3 );
+
+   BOOL bWhere = FALSE;
+   int iCol;
+   INDEXBINDP SeekBind;
+   COLUMNBINDP BindStructure;
+   BOOL bDirectionFWD;
+   char * temp;
+
+   thiswa->sWhere[0] = '\0';
+
+   SeekBind = thiswa->IndexBindings[ thiswa->hOrdCurrent ];
+   //Nao necessario esta aqui, fazia com que fosse para o ultimo item da chave
+   //SeekBind += ( queryLevel -1 );         // place offset
+
+   thiswa->recordListDirection = ( iListType == LIST_SKIP_FWD ? LIST_FORWARD : LIST_BACKWARD );
+   bDirectionFWD               = iListType == LIST_SKIP_FWD;
+
+   if( thiswa->bReverseIndex )
+   {
+      bDirectionFWD = !bDirectionFWD;
+   }
+
+   for (iCol = 1; iCol <= queryLevel; iCol++)
+   {
+      BindStructure   = GetBindStruct( thiswa, SeekBind );
+
+      if( BindStructure->isArgumentNull )
+      {
+         * bUseOptimizerHints = FALSE;    // We cannot use this high speed solution
+                                          // because Oracle does not store NULLs in indexes
+
+         if( BindStructure->iCType == SQL_C_DOUBLE )
+         {
+            temp = hb_strdup( (const char *) thiswa->sWhere );
+            sprintf( thiswa->sWhere, "%s %s ( A.%c%s%c %s %s OR A.%c%s%c IS NULL )", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
+                                                       OPEN_QUALIFIER( thiswa ), BindStructure->colName, CLOSE_QUALIFIER( thiswa ),
+                                                       iCol == queryLevel ? ( bDirectionFWD ? ">=" : "<=" ) : "IS",
+                                                       iCol == queryLevel ? "0" : "NULL",
+                                                       OPEN_QUALIFIER( thiswa ), BindStructure->colName, CLOSE_QUALIFIER( thiswa ) );
+             hb_xfree( temp );
+         }
+         else
+         {
+            if (iCol == queryLevel && iListType == LIST_SKIP_FWD )
+            {
+               // This condition should create a WHERE clause like "COLUMN >= NULL".
+               // Since this is not numeric, EVERYTHING is greater
+               // or equal to NULL, so we do not add any restriction to WHERE clause.
+            }
+            else
+            {
+               temp = hb_strdup( (const char *) thiswa->sWhere );
+               sprintf( thiswa->sWhere, "%s %s A.%c%s%c IS NULL", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
+                                                          OPEN_QUALIFIER( thiswa ), BindStructure->colName, CLOSE_QUALIFIER( thiswa ) );
+               hb_xfree( temp );
+            }
+         }
+      }
+      else
+      {
+         temp = hb_strdup( (const char *) thiswa->sWhere );
+         sprintf( thiswa->sWhere, "%s %s A.%c%s%c %s ?", bWhere ? temp : "\nWHERE", bWhere ? "AND" : "",
+                                                    OPEN_QUALIFIER( thiswa ), BindStructure->colName, CLOSE_QUALIFIER( thiswa ),
+                                                    iCol == queryLevel ? ( bDirectionFWD ? ">=" : "<=" ) : "=" );
+         hb_xfree( temp );
+      }
+      bWhere = TRUE;
+      // Culik Movido a posicao do seekbind para essa posicao, onde estava assumuia que o inicio era o ultimo item da chave
+      SeekBind ++;         // place offset      
+   }
 
    SolveFilters( thiswa, bWhere );
 
    return ( HB_SUCCESS );
 }
-
+*/
 /*------------------------------------------------------------------------*/
 
 HB_ERRCODE prepareSeekQuery( SQLEXAREAP thiswa, INDEXBINDP SeekBind )
