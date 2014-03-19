@@ -2422,9 +2422,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               SendMessage( hWnd, WM_PAINT, nwParam, nlParam )
               nRet := ExecuteEvent( "OnPrintClient", Self )
               ODEFAULT nRet TO ::OnPrintClient( nwParam, nlParam )
-              IF ::__ClassInst == NIL
-                 RETURN 1
-              ENDIF
               EXIT
 
          CASE WM_PRINT
