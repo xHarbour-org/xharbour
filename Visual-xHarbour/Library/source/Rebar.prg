@@ -30,7 +30,7 @@ CLASS CoolBar FROM Control
 
    PROPERTY ImageList        GET __ChkComponent( Self, @::xImageList ) ;
                              SET ::SetImageList( v )
-   PROPERTY BackColor        SET ::SetBkColor(v)           DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY BackColor        ROOT "Colors" SET ::SetBkColor(v)           DEFAULT GetSysColor( COLOR_BTNFACE )
    PROPERTY Vertical         SET ::SetStyle( CCS_VERT, v ) DEFAULT .F.
 
    DATA Repaint              EXPORTED  INIT .T.
@@ -361,7 +361,7 @@ CLASS CoolBarBand INHERIT Control
    PROPERTY Grippers   SET ::SetGrippers(v)                DEFAULT .T.
    PROPERTY FixedSize  SET ::SetStyle( RBBS_FIXEDSIZE, v ) DEFAULT .F.
    PROPERTY Break      SET ::SetStyle( RBBS_BREAK, v )     DEFAULT .F.
-   PROPERTY BackColor  SET ::ReflectColor   
+   PROPERTY BackColor  ROOT "Colors" SET ::ReflectColor   
 
    DATA oStruct        EXPORTED
    DATA Index          EXPORTED

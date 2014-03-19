@@ -67,6 +67,7 @@ CLASS TabControl INHERIT Control
 
    DATA CloseBtn         PROTECTED
    DATA PinBtn           PROTECTED
+   DATA __nPrevHot       PROTECTED INIT 0
    DATA __nHot           PROTECTED INIT 0
    DATA __nPrevHot       PROTECTED INIT 0
    
@@ -168,6 +169,7 @@ CLASS TabControl INHERIT Control
    METHOD Show()
    
    METHOD OnMouseMove()
+   METHOD OnMouseLeave(n,l)    INLINE ::Super:OnMouseLeave(n,l), ::__nPrevHot := 0, ::__nHot := 0, ::InvalidateRect(, .F. ), NIL
 
    METHOD OnUserMsg(n)
    
@@ -433,7 +435,6 @@ RETURN hDef
 //-----------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, nlParam ) CLASS TabControl
    LOCAL aItem
-   static nHot := 0
 
    ::Super:OnMouseMove( nwParam, nlParam )
 
@@ -443,19 +444,19 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS TabControl
          ::CurSel := ::__nHot
          RETURN 0
       ENDIF
-      IF nHot <> ::__nHot
-         IF nHot > 0
-            aItem := ::GetItemRect( nHot )
+      IF ::__nPrevHot <> ::__nHot
+         IF ::__nPrevHot > 0
+            aItem := ::GetItemRect( ::__nPrevHot )
             ::InvalidateRect( aItem, .F. )
          ENDIF
          aItem := ::GetItemRect( ::__nHot )
          ::InvalidateRect( aItem, .F. )
-         nHot := ::__nHot
+         ::__nPrevHot := ::__nHot
       ENDIF
-    ELSEIF nHot > 0
-      aItem := ::GetItemRect( nHot )
+    ELSEIF ::__nPrevHot > 0
+      aItem := ::GetItemRect( ::__nPrevHot )
       ::InvalidateRect( aItem, .F. )
-      nHot := 0
+      ::__nPrevHot := 0
    ENDIF
 RETURN NIL
 
@@ -1397,8 +1398,8 @@ RETURN Self
 METHOD DrawClose( hDC, aRect ) CLASS TabCloseButton
    LOCAL hOld
    IF ::CloseHover
-      hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:ButtonSelectedBorder )
-      SelectObject( hDC, IIF( !::ClosePushed, ::System:CurrentScheme:Brush:ButtonSelectedGradientEnd, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin ) )
+      hOld := SelectObject( hDC, ::ColorScheme:Pen:ButtonSelectedBorder )
+      SelectObject( hDC, IIF( !::ClosePushed, ::ColorScheme:Brush:ButtonSelectedGradientEnd, ::ColorScheme:Brush:ButtonPressedGradientBegin ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
       SelectObject( hDC, hOld )
     ELSE
@@ -1475,8 +1476,8 @@ METHOD DrawPin( hDC, aRect ) CLASS TabPinButton
    LOCAL hOld
    LOCAL nLeft, nRight, nBottom
    IF ::CloseHover
-      hOld := SelectObject( hDC, ::System:CurrentScheme:Pen:ButtonSelectedBorder )
-      SelectObject( hDC, IIF( !::ClosePushed, ::System:CurrentScheme:Brush:ButtonSelectedGradientEnd, ::System:CurrentScheme:Brush:ButtonPressedGradientBegin ) )
+      hOld := SelectObject( hDC, ::ColorScheme:Pen:ButtonSelectedBorder )
+      SelectObject( hDC, IIF( !::ClosePushed, ::ColorScheme:Brush:ButtonSelectedGradientEnd, ::ColorScheme:Brush:ButtonPressedGradientBegin ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
       SelectObject( hDC, hOld )
     ELSE
@@ -1517,10 +1518,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 
-CLASS TabStrip INHERIT TabControl
-   PROPERTY ColorScheme  SET ::__SetColorScheme(v) DEFAULT 1
-   DATA EnumColorScheme  EXPORTED INIT { { "System Default", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7} }
-      
+CLASS TabStrip INHERIT TabControl      
    DATA Border, AllowMaximize, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
@@ -1529,7 +1527,6 @@ CLASS TabStrip INHERIT TabControl
    METHOD Create() 
    METHOD OnPaint()
    METHOD DrawTabStripItem()
-   METHOD __SetColorScheme()
    METHOD __GetGradienBrush()
    METHOD OnEraseBkGnd() INLINE 1
 ENDCLASS
@@ -1611,10 +1608,6 @@ METHOD OnPaint() CLASS TabStrip
    ::EndPaint()
 RETURN 0
 
-//-----------------------------------------------------------------------------------------------
-METHOD __SetColorScheme(n) CLASS TabStrip
-   ::__ColorTable := ProfessionalColorTable():Load( ::EnumColorScheme[1][n] )
-RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
@@ -1743,14 +1736,10 @@ METHOD __GetGradienBrush( hDC, hRgn, aItem, n, d ) CLASS TabStrip
    LOCAL hBrush, hOldBitmap, hMemBitmap, hMemDC
    LOCAL __aMesh, aPt := { {=>}, {=>} }
    (hRgn)
-   IF ::ColorScheme == 1
-      nColor1 := ::System:CurrentScheme:ToolStripGradientBegin
-      nColor2 := ::System:CurrentScheme:ToolStripGradientEnd
-    ELSE
-      nColor1 := ::__ColorTable:ToolStripGradientBegin
-      nColor2 := ::__ColorTable:ToolStripGradientEnd
-   ENDIF
-   hMemDC     := CreateCompatibleDC( hDC )
+   nColor1 := ::ColorScheme:ToolStripGradientBegin
+   nColor2 := ::ColorScheme:ToolStripGradientEnd
+
+   hMemDC  := CreateCompatibleDC( hDC )
    
    __aMesh      := { {=>} }
    __aMesh[1]:UpperLeft  := 0

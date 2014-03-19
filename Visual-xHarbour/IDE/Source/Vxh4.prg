@@ -492,7 +492,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
           IF cType == "L"
              aRect := { nLeft, rc:top, nLeft+20, rc:top+20 }
              DrawThemeBackground( ::hChkTheme, hDC, BP_CHECKBOX, IIF( lVal, CBS_CHECKEDNORMAL, CBS_UNCHECKEDNORMAL ), aRect, aRect )
-             RETURN NIL
+          //   RETURN NIL
           ENDIF
 
           SelectObject( hDC, ::Font:Handle )
@@ -510,7 +510,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              DrawIconEx( hDC, nLeft, y, hIcon, ::ActiveObject:Parent:ImageList:IconWidth, 16,,,DI_NORMAL )
           ENDIF
 
-          IF nColor != NIL
+          IF nColor != NIL .AND. cType != "L"
              hBrush := CreateSolidBrush( nColor )
              hOld := SelectObject( hDC, hBrush )
              Rectangle( hDC, x-24, rc:top+3, x-2, rc:bottom-2 )

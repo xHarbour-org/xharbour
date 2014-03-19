@@ -4857,18 +4857,28 @@ HB_FUNC( TASKBARPROGRESSSTATE )
    CoUninitialize();
    hb_retl( bRet );
 }
-
+//#define WM_FORWARDMSG 0x037F
+ 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
 {
    BOOL bRet = FALSE;
    if( pMsg->message == WM_KEYDOWN )
    {
-      if( pMsg->wParam == VK_RETURN || ( ( pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE ) && strcmp( cClass, TEXT("Internet Explorer_Server") ) == 0 ) )
+      if( pMsg->wParam == VK_RETURN || ( ( pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE ) && ( strcmp( cClass, TEXT("Internet Explorer_Server") ) == 0 || strcmp( cClass, TEXT("Shell DocObject View") ) == 0 ) ) )
       {
          LPUNKNOWN pUnk;
          HWND hParent;
          HWND hWnd = pMsg->hwnd;
+
+         if( strcmp( cClass, TEXT("Shell DocObject View") ) == 0 )
+         {
+            hWnd = FindWindowEx( hWnd, 0, NULL, NULL );
+            if( ! hWnd )
+            {
+               hWnd = pMsg->hwnd;
+            }
+         }
 
          while( ! ( pUnk = (LPUNKNOWN) GetWindowLong( hWnd, GWL_USERDATA ) ) )
          {
@@ -4879,6 +4889,7 @@ BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
             }
             hWnd = hParent;
          }
+//         bRet = SendMessage(hWnd, WM_FORWARDMSG, 0, (LPARAM) pMsg );
 
          if( pUnk )
          {
@@ -5307,3 +5318,222 @@ HB_FUNC( SYSTEMTIMETOLOCALTIME )
       hb_storclen( cTime, 8, -1, 2 );
    }
 }
+
+/*
+HB_FUNC( MAPIREADMAIL )
+{
+   FLAGS flFlags     = IF( ISNUM(2) , hb_parnl( 2 ), MAPI_ENVELOPE_ONLY | MAPI_SUPPRESS_ATTACH | MAPI_PEEK);
+   LPSTR szMessageID = IF( ISCHAR(1), (LPSTR) hb_parc( 1 ) , NULL );
+   lpMapiMessage FAR *lppMapiMess;
+   lpMapiMessage lpMapiMess;
+   ITEM nTemp,cTemp,aRet,aTemp,aAdr ;
+   ULONG i ;
+   ULONG rc = ERR_CANT_LOAD_MAPI;
+   PMAPIReadMail lpfnMAPIReadMail;
+
+   // Logon has to be done, because the ID needs to be from the same session
+
+   if( lhMailHandle )
+   {
+
+      lppMapiMess = (lpMapiMessage FAR *) &lpMapiMess;
+
+      if( LoadMapiLib() )
+      {
+
+         lpfnMAPIReadMail = ( PMAPIReadMail ) GetProcAddress(hMapiLib,"MAPIReadMail") ;
+
+         rc = (*lpfnMAPIReadMail)( lhMailHandle, ( unsigned long ) GetActiveWindow(), szMessageID,
+                         flFlags,0,lppMapiMess) ;
+
+         FreeMapiLib();
+      }
+
+      if( rc == SUCCESS_SUCCESS )
+      {
+
+         //  Subject             1
+         //  NoteText            2
+         //  Type                3
+         //  Date                4
+         //  Flags               5
+         //  Recipient  (To)     6
+         //  Originator (From)   7
+
+
+         aRet = _itemArrayNew( 7 ) ;
+
+         if( lpMapiMess->lpszSubject )
+         {
+            cTemp = _itemPutC(NULL,lpMapiMess->lpszSubject);
+         }
+         else
+         {
+            cTemp = _itemPutC( NULL,"");
+         }
+
+         _itemArrayPut( aRet, 1, cTemp );
+         _itemRelease( cTemp );
+
+         //
+         // Testen ob NoteText gekommen ist
+         //
+         if( lpMapiMess->lpszNoteText )
+         {
+            cTemp = _itemPutC(NULL,lpMapiMess->lpszNoteText);
+         }
+         else
+         {
+            cTemp = _itemPutC( NULL,"");
+         }
+
+         _itemArrayPut( aRet, 2, cTemp );
+         _itemRelease( cTemp );
+
+
+
+         cTemp = _itemPutC(NULL,lpMapiMess->lpszMessageType);
+         _itemArrayPut( aRet, 3, cTemp );
+         _itemRelease( cTemp );
+
+         if( lpMapiMess->lpszDateReceived )
+         {
+            cTemp = _itemPutC(NULL,lpMapiMess->lpszDateReceived);
+         }
+         else
+         {
+            cTemp = _itemPutC( NULL,"");
+         }
+         _itemArrayPut( aRet, 4, cTemp );
+         _itemRelease( cTemp );
+
+         nTemp = _itemPutNL(NULL,lpMapiMess->flFlags);
+         _itemArrayPut( aRet, 5, nTemp );
+         _itemRelease( nTemp );
+
+         //
+         // Add recipients
+         //
+
+         aAdr = _itemArrayNew( lpMapiMess->nRecipCount );         // Create new array of that len
+
+         for ( i = 1; i <= lpMapiMess->nRecipCount; i++ )             // Iterate through elements
+         {
+
+            aTemp = _itemArrayNew( 3 );            // Create new array of that len
+
+            if( lpMapiMess->lpRecips[ i - 1].lpszName )
+            {
+               cTemp = _itemPutC( NULL,lpMapiMess->lpRecips[ i - 1].lpszName);
+            }
+            else
+            {
+               cTemp = _itemPutC( NULL,"");
+            }
+            _itemArrayPut( aTemp, 1, cTemp );
+            _itemRelease( cTemp );
+
+            // Check if adress is ok
+            // ( local groups have no adress )
+
+            if( lpMapiMess->lpRecips[ i - 1].lpszAddress )
+            {
+               cTemp = _itemPutC( NULL,lpMapiMess->lpRecips[ i - 1].lpszAddress);
+            }
+            else
+            {
+               cTemp = _itemPutC( NULL,"");
+            }
+
+            _itemArrayPut( aTemp, 2, cTemp );
+            _itemRelease( cTemp );
+
+            nTemp = _itemPutNL( NULL,lpMapiMess->lpRecips[ i - 1].ulRecipClass);
+            _itemArrayPut( aTemp, 3, nTemp );
+            _itemRelease( nTemp );
+
+            _itemArrayPut( aAdr, i, aTemp );
+            _itemRelease( aTemp );
+
+         }
+
+         _itemArrayPut( aRet, 6, aAdr );
+         _itemRelease( aAdr );
+
+         //
+         // Add FROM
+         //
+
+         aAdr = _itemArrayNew( 1 );         // Create new array of that len
+
+         aTemp = _itemArrayNew( 3 );            // Create new array of that len
+
+         if( lpMapiMess->lpOriginator->lpszName )
+         {
+            cTemp = _itemPutC( NULL,lpMapiMess->lpOriginator->lpszName);
+         }
+         else
+         {
+            cTemp = _itemPutC( NULL,"");
+         }
+         _itemArrayPut( aTemp, 1, cTemp );
+         _itemRelease( cTemp );
+
+         // Check adress
+
+         if( lpMapiMess->lpOriginator->lpszAddress )
+         {
+            cTemp = _itemPutC( NULL,lpMapiMess->lpOriginator->lpszAddress);
+         }
+         else
+         {
+            cTemp = _itemPutC( NULL,"");
+         }
+
+         _itemArrayPut( aTemp, 2, cTemp );
+         _itemRelease( cTemp );
+
+         nTemp = _itemPutNL( NULL,lpMapiMess->lpOriginator->ulRecipClass);
+         _itemArrayPut( aTemp, 3, nTemp );
+         _itemRelease( nTemp );
+
+         _itemArrayPut( aAdr, 1, aTemp );
+         _itemRelease( aTemp );
+
+
+         _itemArrayPut( aRet, 7, aAdr );
+         _itemRelease( aAdr );
+
+
+         _itemReturn ( aRet );
+         _itemRelease( aRet );                  //    release "aRet"
+
+         rc = FreeBuffer(lpMapiMess);
+
+
+         if( rc == SUCCESS_SUCCESS )
+         {
+         }
+         else
+         {
+            MessageBox( 0, "MAPI memory not released!", "Error", 0 );
+         }
+
+      }
+      else
+      {
+         aRet = _itemArrayNew( 0 );         // Create new array of that len
+         _itemReturn ( aRet );
+         _itemRelease( aRet );                  //    release "aRet"
+      }
+   }
+   else
+   {
+      // Better return NIL, so that we know in the case of an error
+
+      // aRet = _itemArrayNew( 0 );         // Create new array of that len
+      // _itemReturn ( aRet );
+      // _itemRelease( aRet );                  //    release "aRet"
+   }
+}
+*/

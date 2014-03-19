@@ -89,11 +89,6 @@
 #define TMT_ACCENTCOLORHINT         3823
 
 
-#define A_DEFAULT                   0
-#define A_LEFT                      1
-#define A_CENTER                    2
-#define A_RIGHT                     3
-
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
@@ -422,12 +417,12 @@ METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHea
           IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
              aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
           ENDIF
-          IF nAlign == A_LEFT
-             x := zLeft + 1 + IIF( nImgAlign == A_LEFT, nWimg, 0 )
-           ELSEIF nAlign == A_RIGHT
+          IF nAlign == ALIGN_LEFT
+             x := zLeft + 1 + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
+           ELSEIF nAlign == ALIGN_RIGHT
              aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
-             x := nRight - aAlign[1]-4 - IIF( nImgAlign == A_RIGHT, nWimg, 0 ) + IIF( nImgAlign == A_LEFT, nWimg, 0 )
-           ELSEIF nAlign == A_CENTER
+             x := nRight - aAlign[1]-4 - IIF( nImgAlign == ALIGN_RIGHT, nWimg, 0 ) + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
+           ELSEIF nAlign == ALIGN_CENTER
              aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
              x := zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
           ENDIF
@@ -703,7 +698,7 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
              ::__SelWidth += ::Children[n]:Width
          NEXT
          ::__SetColWidth( ::__SelCol, MAX( 1, x - (::__SelWidth-::Children[::__SelCol]:Width) ) )
-         
+         ::UpdateWindow()
        ELSEIF ::__lMoveMouseDown
 
          nDrag  := 0
@@ -1922,7 +1917,7 @@ METHOD OnPaint() CLASS DataGrid
 RETURN 0
 
 //----------------------------------------------------------------------------------
-METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lHot ) CLASS DataGrid
+METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lHot, lHeader ) CLASS DataGrid
    LOCAL n, i, cData, x, y, nY, nRec, nRecno, lHide, aText, lSelected, nHScroll, iRight, iLeft, zLeft
    LOCAL nLeft, nTop, nRight, nBottom, hOldFont, hOldPen, nWImg, nHImg, nInd, nAlign, aAlign, aGrid, lFreeze, nHeaderRight
    LOCAL xLeft, nStatus, lDeleted, nPos, lDC, lData
@@ -1934,7 +1929,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
    IF LEN( ::Children ) == 0 .OR. ::hWnd == NIL .OR. !IsWindow( ::hWnd ) .OR. ::hWnd == 0 
       RETURN .F.
    ENDIF
-
+   DEFAULT lHeader TO .F.
    lFreeze := ::FreezeColumn > 0
    IF ::RowPos < 1
       ::RowPos := 1
@@ -2060,7 +2055,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
               nWImg  := IIF( lData, IIF( ::ImageList != NIL, ::__DisplayArray[nPos][1][i][ 3], 2 ), 0 )
-              nAlign := IIF( lData, ::__DisplayArray[nPos][1][i][ 4], A_LEFT )
+              nAlign := IIF( lData, ::__DisplayArray[nPos][1][i][ 4], ALIGN_LEFT )
               nHImg  := IIF( lData, ::__DisplayArray[nPos][1][i][ 5], 0 )
 
               nBackColor := IIF( lHover, ::__HoverBackColor, IIF( lData .AND. ::__DisplayArray[nPos][1][i][ 6] != NIL, ::__DisplayArray[nPos][1][i][ 6], IIF( ::Children[i]:BackColor != NIL, ::Children[i]:BackColor, nBackGrid )) )
@@ -2085,7 +2080,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
               IF lData
                  hOldFont := SelectObject( hMemDC, ::__DisplayArray[nPos][1][i][9] )
               ENDIF
-              nImgAlign  := IIF( lData, ::__DisplayArray[nPos][1][i][10], A_DEFAULT )
+              nImgAlign  := IIF( lData, ::__DisplayArray[nPos][1][i][10], ALIGN_DEFAULT )
 
               zLeft := nLeft
               IF lFreeze .AND. i <= ::FreezeColumn
@@ -2103,32 +2098,32 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
 
               SWITCH VALTYPE( cData )
                  CASE "N"
-                      DEFAULT nAlign TO A_RIGHT
+                      DEFAULT nAlign TO ALIGN_RIGHT
                       cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( STR( cData ) )
                       EXIT
 
                  CASE "D"
-                      DEFAULT nAlign TO A_CENTER
+                      DEFAULT nAlign TO ALIGN_CENTER
                       cData := ALLTRIM(DTOC( cData ))
                       EXIT
 
                  CASE "L"
-                      DEFAULT nAlign TO A_CENTER
+                      DEFAULT nAlign TO ALIGN_CENTER
                       cData := ALLTRIM(IIF( cData, "<True>", "<False>" ))
                       EXIT
 
                  CASE "C"
-                      DEFAULT nAlign TO A_LEFT
+                      DEFAULT nAlign TO ALIGN_LEFT
                       cData := ALLTRIM( TRANSFORM( cData, ::Children[ i ]:Picture ) ) //ALLTRIM( cData )
                       EXIT
 
                  CASE "B"
-                      DEFAULT nAlign TO A_CENTER
+                      DEFAULT nAlign TO ALIGN_CENTER
                       cData := "<block>"
                       EXIT
 
                  CASE "A"
-                      DEFAULT nAlign TO A_LEFT
+                      DEFAULT nAlign TO ALIGN_LEFT
                       WHILE VALTYPE( cData ) == "A"
                          cData := cData[1]
                          DEFAULT cData TO ""
@@ -2173,6 +2168,9 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
               // Header ---------------------------------------------------------
               IF nLine == 1 .AND. ::ShowHeaders
                  ::Children[i]:DrawHeader( hMemDC, aText[1], nHeaderRight, x, lPressed, lHot, zLeft, nImgAlign, aText[3] )
+                 IF lHeader
+                    EXIT
+                 ENDIF
               ENDIF
               //-----------------------------------------------------------------
 
@@ -2214,11 +2212,11 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
                  IF nWImg > 0 .AND. ::ImageList != NIL
                     nY := nTop + ( (nBottom-nTop-nHImg)/2) + 1
 
-                    IF nImgAlign == A_LEFT
+                    IF nImgAlign == ALIGN_LEFT
                        nImgX := zLeft+nCtrl+1
-                     ELSEIF nImgAlign == A_CENTER
+                     ELSEIF nImgAlign == ALIGN_CENTER
                        nImgX := Int( zLeft + (((aText[3]-aText[1])-nWImg)/2) )
-                     ELSEIF nImgAlign == A_RIGHT
+                     ELSEIF nImgAlign == ALIGN_RIGHT
                        nImgX := zLeft + (aText[3]-aText[1])-nWImg
                     ENDIF
 
@@ -2257,13 +2255,13 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
                  x := zLeft + ((nRight-zLeft+nWImg)/2) - (aAlign[1]/2)
 
                  IF nRep == 3
-                    IF nAlign == A_LEFT
+                    IF nAlign == ALIGN_LEFT
                        aRect  := { aText[1], aText[2], aText[1]+17, aText[4] }
                        xRight := zLeft + 17
-                     ELSEIF nAlign == A_RIGHT
+                     ELSEIF nAlign == ALIGN_RIGHT
                        aRect  := { aText[3]-17, aText[2], aText[3], aText[4] }
                        xRight := nRight
-                     ELSEIF nAlign == A_CENTER
+                     ELSEIF nAlign == ALIGN_CENTER
                        aRect  := aText
                        xRight := nRight
                     ENDIF
@@ -2275,7 +2273,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
 
               ENDIF
 
-              lBorder := ::ShowSelectionBorder .AND. nRec == nRecno .AND. i == ::ColPos .AND. ! ::FullRowSelect
+              lBorder := lData .AND. ::ShowSelectionBorder .AND. nRec == nRecno .AND. i == ::ColPos .AND. ! ::FullRowSelect
 
               IF lBorder .AND. lFocus
                  IF ::__SelBorderPen != NIL
@@ -2357,10 +2355,10 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, nAlign, zL
 
       _ExtTextOut(hDC, x, y, ETO_CLIPPED, {aRect[1],aRect[2],aRect[3],aRect[4]}, cText)
 
-         SetTextColor(hDC, nBkCol )
-         SetBkColor(hDC, nTxCol )
-         aClip := { zLeft, aRect[2], zLeft+nWidth, aRect[4] }
-         _ExtTextOut(hDC, x, y, ETO_CLIPPED, {aRect[1],aRect[2],aRect[1]+Max( 1, nWidth-(aRect[1]-zLeft) ),aRect[4]}, cText)
+      SetTextColor(hDC, nBkCol )
+      SetBkColor(hDC, nTxCol )
+      aClip := { zLeft, aRect[2], zLeft+nWidth, aRect[4] }
+      _ExtTextOut(hDC, x, y, ETO_CLIPPED, {aRect[1],aRect[2],aRect[1]+Max( 1, nWidth-(aRect[1]-zLeft) ),aRect[4]}, cText)
 
     ELSEIF nRep == 3
       IF VALTYPE( xVal ) == "L"
@@ -2398,7 +2396,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, nAlign, zL
 
       IF lXP
          aClip  := { aRect[1], aRect[2], aRect[3], aRect[4] }
-         IF nAlign == A_RIGHT
+         IF nAlign == ALIGN_RIGHT
             aRect[1] := nRight-17
             aRect[3] := nRight
           ELSE
@@ -2975,6 +2973,10 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
 
    DEFAULT nPos TO ::RowPos
 
+   IF LEN( ::__DisplayArray ) < nPos
+      RETURN .F.
+   ENDIF
+
    nRet := ExecuteEvent( "OnQueryBackColor", Self )
    IF VALTYPE( nRet ) == "N"
       nGridBkColor :=  nRet
@@ -3095,7 +3097,7 @@ METHOD __FillRow( nPos, nCol ) CLASS DataGrid
        ENDIF
    NEXT
 
-RETURN Self
+RETURN .T.
 
 //----------------------------------------------------------------------------------
 
@@ -3775,15 +3777,15 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
                   IF lEdit
                      oCol:Control := {|o|MaskEdit( o )  }
                   ENDIF
-                  oCol:Alignment := A_CENTER
+                  oCol:Alignment := ALIGN_CENTER
              CASE aField[2]=="L"
                   oCol:Width := MAX( 6, LEN(oCol:xText)+2 )*7
-                  oCol:Alignment := A_CENTER
+                  oCol:Alignment := ALIGN_CENTER
              CASE aField[2]=="N"
                   IF lEdit
                      oCol:Control := {|o|MaskEdit( o )  }
                   ENDIF
-                  oCol:Alignment := A_RIGHT
+                  oCol:Alignment := ALIGN_RIGHT
           ENDCASE
 
           IF lEdit
@@ -3851,29 +3853,29 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
             SWITCH VALTYPE( xValue )
                CASE "N"
                     xValue := STR( xValue )
-                    nAlign := A_RIGHT
+                    nAlign := ALIGN_RIGHT
                     EXIT
 
                CASE "D"
-                    nAlign := A_CENTER
+                    nAlign := ALIGN_CENTER
                     EXIT
 
                CASE "L"
-                    nAlign := A_CENTER
+                    nAlign := ALIGN_CENTER
                     EXIT
 
                CASE "C"
-                    nAlign := A_LEFT
+                    nAlign := ALIGN_LEFT
                     EXIT
             END
          ENDIF
          DO CASE
-            CASE nAlign == A_RIGHT
+            CASE nAlign == ALIGN_RIGHT
                  ::__CurControl:SetStyle( ES_RIGHT )
-            CASE nAlign == A_CENTER
+            CASE nAlign == ALIGN_CENTER
                  ::__CurControl:SetStyle( ES_CENTER )
          ENDCASE
-         ::__CurControl:xText := XSTR( xValue )
+         ::__CurControl:Text := XSTR( xValue )
          ::__CurControl:Create()
 
          DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
@@ -3963,8 +3965,8 @@ CLASS GridColumn INHERIT Object
    PROPERTY ButtonMenu  GET __ChkComponent( Self, @::xButtonMenu )
    PROPERTY HeaderMenu  GET __ChkComponent( Self, @::xHeaderMenu )
 
-   PROPERTY ImageAlignment    SET ::Refresh(v)             DEFAULT A_DEFAULT
-   PROPERTY Alignment         SET ::SetAlignment(v)        DEFAULT A_LEFT
+   PROPERTY ImageAlignment    SET ::Refresh(v)             DEFAULT ALIGN_DEFAULT
+   PROPERTY Alignment         SET ::SetAlignment(v)        DEFAULT ALIGN_LEFT
    PROPERTY Width             SET ::SetWidth(v)
    PROPERTY BackColor         ROOT "Colors" SET ::SetColor(1,v)
    PROPERTY ForeColor         ROOT "Colors" SET ::SetColor(2,v)
@@ -3990,7 +3992,7 @@ CLASS GridColumn INHERIT Object
    PROPERTY SelOnlyRep        DEFAULT .T.
    PROPERTY HeaderTooltip     
    PROPERTY HeaderFont        
-   PROPERTY HeaderAlignment   SET ::Refresh(v) DEFAULT A_DEFAULT
+   PROPERTY HeaderAlignment   SET ::Refresh(v) DEFAULT ALIGN_DEFAULT
    PROPERTY Font              
    PROPERTY Type              DEFAULT "C"
    PROPERTY FieldPos          DEFAULT 0
@@ -4042,10 +4044,10 @@ CLASS GridColumn INHERIT Object
    DATA __PropFilter                 EXPORTED  INIT {}
    DATA __lHidden                    EXPORTED  INIT .F.
 
-   DATA EnumImageAlignment           EXPORTED  INIT { { "Column Default", "Left", "Center", "Right" }, {A_DEFAULT,A_LEFT,A_CENTER,A_RIGHT} }
-   DATA EnumHeaderAlignment          EXPORTED  INIT { { "Column Default", "Left", "Center", "Right" }, {A_DEFAULT,A_LEFT,A_CENTER,A_RIGHT} }
+   DATA EnumImageAlignment           EXPORTED  INIT { { "Column Default", "Left", "Center", "Right" }, {ALIGN_DEFAULT,ALIGN_LEFT,ALIGN_CENTER,ALIGN_RIGHT} }
+   DATA EnumHeaderAlignment          EXPORTED  INIT { { "Column Default", "Left", "Center", "Right" }, {ALIGN_DEFAULT,ALIGN_LEFT,ALIGN_CENTER,ALIGN_RIGHT} }
    DATA EnumRepresentation           EXPORTED  INIT { { "Normal", "ProgressBar", "CheckBox", "Button", "Long Date" }, {1,2,3,4,5} }
-   DATA EnumAlignment                EXPORTED  INIT { { "Left", "Center", "Right" }, {A_LEFT,A_CENTER,A_RIGHT} }
+   DATA EnumAlignment                EXPORTED  INIT { { "Left", "Center", "Right" }, {ALIGN_LEFT,ALIGN_CENTER,ALIGN_RIGHT} }
 
    DATA Parent                       EXPORTED
    DATA ClsName                      EXPORTED  INIT "GridColumn"
@@ -4144,8 +4146,8 @@ METHOD Init( oParent ) CLASS GridColumn
       ::HeaderFont:__ClassInst:__IsInstance := .T.
    ENDIF
 
-   nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-   nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
+   nColor1 := ::ColorScheme:ButtonSelectedGradientBegin
+   nColor2 := ::ColorScheme:ButtonSelectedGradientEnd
 
    ::__aMesh    := { {=>} }
    ::__aMesh[1]:UpperLeft  := 0
@@ -4296,7 +4298,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    LOCAL nWImg
 
    IF hDC == NIL .AND. nLeft == NIL .AND. nRight == NIL
-      RETURN ::Parent:__DisplayData( 1, ::xPosition, 1, ::xPosition,,, lPressed, lHot )
+      RETURN ::Parent:__DisplayData( 1, ::xPosition, 1, ::xPosition,,, lPressed, lHot, .T. )
    ENDIF
 
    DEFAULT nImgAlign TO IIF( ::xImageAlignment > 0, ::xImageAlignment, IIF( ::xHeaderAlignment == 0, ::xAlignment, ::xHeaderAlignment ) ) 
@@ -4357,18 +4359,18 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
             cOrd := ::Parent:DataSource:OrdSetFocus()
          ENDIF
          IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
-            nColor1 := ::System:CurrentScheme:ButtonCheckedGradientBegin
-            nColor2 := ::System:CurrentScheme:ButtonCheckedGradientEnd
-            hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+            nColor1 := ::ColorScheme:ButtonCheckedGradientBegin
+            nColor2 := ::ColorScheme:ButtonCheckedGradientEnd
+            hBorderPen := ::ColorScheme:Pen:ButtonSelectedBorder
           ELSE
-            nColor1 := ::System:CurrentScheme:ButtonSelectedGradientBegin
-            nColor2 := ::System:CurrentScheme:ButtonSelectedGradientEnd
-            hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+            nColor1 := ::ColorScheme:ButtonSelectedGradientBegin
+            nColor2 := ::ColorScheme:ButtonSelectedGradientEnd
+            hBorderPen := ::ColorScheme:Pen:ButtonSelectedBorder
          ENDIF
        ELSE
-         nColor1 := ::System:CurrentScheme:ButtonPressedGradientBegin
-         nColor2 := ::System:CurrentScheme:ButtonPressedGradientEnd
-         hBorderPen := ::System:CurrentScheme:Pen:ButtonSelectedBorder
+         nColor1 := ::ColorScheme:ButtonPressedGradientBegin
+         nColor2 := ::ColorScheme:ButtonPressedGradientEnd
+         hBorderPen := ::ColorScheme:Pen:ButtonSelectedBorder
       ENDIF
 
       ::__aVertex[1]:Red   := GetRValue( nColor1 ) * 256
@@ -4388,8 +4390,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
       nBorder    := ::HeaderForeColor
       nBackColor := ::HeaderBackColor
       IF lPressed
-         nBorder    := ::System:CurrentScheme:MenuItemBorder
-         nBackColor := ::System:CurrentScheme:MenuItemSelected
+         nBorder    := ::ColorScheme:MenuItemBorder
+         nBackColor := ::ColorScheme:MenuItemSelected
       ENDIF
 
       hBrush   := CreateSolidBrush( nBackColor )
@@ -4415,13 +4417,13 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
       nWImg := ::Parent:ImageList:IconWidth
       nTop  := Int( ( aRect[4] - ::Parent:ImageList:IconHeight ) / 2 )
 
-      IF nImgAlign == A_LEFT
+      IF nImgAlign == ALIGN_LEFT
          nImgX := zLeft+1
 
-       ELSEIF nImgAlign == A_CENTER
+       ELSEIF nImgAlign == ALIGN_CENTER
          nImgX := Int( zLeft + (((aRect[3]+1-aRect[1])-nWImg)/2) )
 
-       ELSEIF nImgAlign == A_RIGHT
+       ELSEIF nImgAlign == ALIGN_RIGHT
          nImgX := nRight-nWImg
 
       ENDIF

@@ -30,6 +30,7 @@ CLASS Component INHERIT Object
    DATA __lCreateAfterChildren EXPORTED INIT .F.
    DATA __IdeImageIndex        EXPORTED INIT 7
    DATA __PropFilter           EXPORTED INIT {}
+   DATA __lMoveable            EXPORTED INIT .F.
    DATA Caption                EXPORTED INIT ""
    DATA Text                   EXPORTED INIT ""
    DATA lComponent             EXPORTED INIT .T.

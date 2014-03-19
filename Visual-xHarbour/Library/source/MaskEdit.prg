@@ -58,7 +58,6 @@ CLASS MaskEdit INHERIT EditBox
    METHOD OnUndo()
    METHOD OnKeyDown()
    METHOD OnChar()
-   METHOD TabNextControl()
    METHOD OnSetFocus()
    METHOD OnKillFocus()
    METHOD OnPaste()
@@ -67,6 +66,8 @@ CLASS MaskEdit INHERIT EditBox
    METHOD OnCut()
    METHOD VarPut( xVal ) INLINE Eval( ::oGet:Block, xVal ), ::oGet:updateBuffer()
    METHOD OnLButtonDown()
+
+   METHOD __GoToNextControl()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -136,7 +137,8 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode( msg ) CLASS MaskEdit
-   IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {13,9,40,38}
+   LOCAL n, nRet
+   IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_UP,VK_DOWN}
       ::oGet:assign()
       ::oGet:updatebuffer()
       IF ::oGet:baddate()
@@ -146,12 +148,20 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
       SetWindowText( ::hWnd, ::oGet:buffer )
       ::SendMessage( WM_INVALID, 0, 0 )
 
+      IF msg:wParam == VK_RETURN
+         IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+            nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
+            RETURN NIL
+         ENDIF
+      ENDIF
+      
       IF ::IsValid
-         ::TabNextControl( IIF( msg:wParam == VK_UP, .T., NIL ) )
+         ::__GoToNextControl( msg:wParam )
        ELSE
          SetFocus( ::hWnd )
       ENDIF
       RETURN NIL
+
    ENDIF
    IF ::wParam == VK_RETURN
       ::LastKey := ::wParam
@@ -223,7 +233,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL nStart, nEnd, i, lShift, lCtrl, nCur, nPos
+   LOCAL nStart, nEnd, i, lShift, lCtrl
    IF ::ReadOnly
       RETURN(0)
    ENDIF
@@ -248,41 +258,6 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
    ENDIF
 
    DO CASE
-      CASE ( nwParam == 40 .OR. nwParam == 38 )
-
-           nCur := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) + IIF( nwParam == 38, -1, 1 )
-           FOR nPos := nCur TO IIF( nwParam == 38, 1, LEN( ::Parent:Children ) ) STEP IIF( nwParam == 38, -1, 1 )
-               IF ::Parent:Children[nPos]:__xCtrlName == "MaskEdit" .AND. ::Parent:Children[nPos]:IsWindowEnabled() .AND. !::Parent:Children[nPos]:NoEdit .AND. ::Parent:Children[nPos]:IsWindowVisible()
-                  ::Parent:Children[nPos]:SetFocus()
-                  RETURN NIL
-               ENDIF
-           NEXT
-           IF nwParam == 40
-              IF !::Parent:ClsName == "DataGrid"
-                 IF ( nPos := ASCAN( ::Parent:Children, {|o|o:ClsName == "MaskEdit" .AND. o:oGet != NIL } ) ) > 0
-                    ::Parent:Children[nPos]:SetFocus()
-                 ENDIF
-               ELSE
-                 ::Parent:OnKeyDown(VK_DOWN)
-              ENDIF
-            ELSE
-              IF nwParam == 38 .AND. ::Parent:ClsName == "DataGrid"
-                 ::Parent:OnKeyDown(VK_UP)
-              ENDIF
-
-              nCur := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} )
-              FOR nPos := LEN( ::Parent:Children ) TO nCur + 1 STEP -1
-                  IF ::Parent:Children[nPos]:__xCtrlName == "MaskEdit" .AND.;
-                     Valtype( ::Parent:Children[nPos]:oGet ) == "O" .AND.;
-                     ::Parent:Children[nPos]:IsWindowEnabled() .AND.;
-                     !::Parent:Children[nPos]:NoEdit .AND.;
-                     ::Parent:Children[nPos]:IsWindowVisible()
-                     ::Parent:Children[nPos]:SetFocus()
-                     RETURN NIL
-                  ENDIF
-              NEXT
-           ENDIF
-
       CASE nwParam == 27
            IF ::Parent:ClsName == "DataGrid"
               ::lInValid := .T.
@@ -381,14 +356,13 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD TabNextControl( lShift ) CLASS MaskEdit
-   LOCAL h
-   DEFAULT lShift TO IsKeyDown( VK_SHIFT )
-   IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) > 0
+METHOD __GoToNextControl( nKey ) CLASS MaskEdit
+   LOCAL hNext
+   IF nKey IN { VK_UP, VK_DOWN, VK_RETURN }
       IF ::Form:Modal
-         PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, h, MAKELPARAM( 1, 0 ) )
-       ELSE
-         SetFocus(h)
+         PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, IIF( nKey == VK_UP, 1, 0 ), 0 )
+       ELSEIF ( hNext := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, nKey == VK_UP ) ) > 0
+         SetFocus( hNext )
       ENDIF
    ENDIF
 RETURN NIL

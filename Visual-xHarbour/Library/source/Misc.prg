@@ -30,7 +30,7 @@ CLASS Registry
    METHOD DeleteAllKeys()          INLINE ::GetKeys( .T. )
    METHOD GetValue( cKey )
    METHOD SetValue( cKey, xValue ) INLINE RegSetValueEx( ATAIL( ::aKeys ), cKey,, IIF( VALTYPE(xValue) == "C", REG_SZ, REG_DWORD ), xValue ) == 0
-   METHOD Delete( cKey )           INLINE RegDeleteKey( ATAIL( ::aKeys ), cKey )
+   METHOD Delete( cVal )           INLINE IIF( EMPTY(cVal), RegDeleteKey( ATAIL( ::aKeys ), "" ), RegDeleteValue( ATAIL( ::aKeys ), cVal ) )
    METHOD Close()                  INLINE RegCloseKey( ATAIL( ::aKeys ) ), ADEL( ::aKeys, LEN( ::aKeys ), .T. )
 
    error HANDLER OnError()

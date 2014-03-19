@@ -118,10 +118,13 @@ METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
 RETURN NIL
   
 FUNCTION CntChildren( oObj )
-   LOCAL n, nCnt := LEN( oObj:Children )
-   FOR n := 1 TO LEN( oObj:Children )
-       nCnt += CntChildren( oObj:Children[n] )
-   NEXT
+   LOCAL n, nCnt := 0
+   IF oObj != NIL .AND. oObj:Children != NIL
+      nCnt := LEN( oObj:Children )
+      FOR n := 1 TO LEN( oObj:Children )
+          nCnt += CntChildren( oObj:Children[n] )
+      NEXT
+   ENDIF
 RETURN nCnt
 //----------------------------------------------------------------------------
 

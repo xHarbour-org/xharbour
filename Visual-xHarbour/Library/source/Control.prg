@@ -771,7 +771,7 @@ METHOD DrawClose( hDC ) CLASS TitleControl
 
    hOld := SelectObject( hDC, ::System:TitleBorderPen )
    IF ::__lCloseHover
-      SelectObject( hDC, IIF( !::__lClosePushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
+      SelectObject( hDC, IIF( !::__lClosePushed, ::Application:ColorTable:Brush:MenuItemSelected, ::Application:ColorTable:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
       _FillRect( hDC, aRect, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )
@@ -807,7 +807,7 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
 
    hOld := SelectObject( hDC, ::System:TitleBorderPen )
    IF ::__lPinHover
-      SelectObject( hDC, IIF( ! ::__lPinPushed, ::System:CurrentScheme:Brush:MenuItemSelected, ::System:CurrentScheme:Brush:MenuItemSelectedGradientEnd ) )
+      SelectObject( hDC, IIF( ! ::__lPinPushed, ::Application:ColorTable:Brush:MenuItemSelected, ::Application:ColorTable:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
     ELSE
       SelectObject( hDC, IIF( ! ::__lActive, ::Application:hTitleBackBrushInactive, ::Application:hTitleBackBrushActive ) )

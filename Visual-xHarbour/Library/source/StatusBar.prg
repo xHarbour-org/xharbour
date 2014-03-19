@@ -19,7 +19,7 @@
 CLASS StatusBar INHERIT Control
    PROPERTY ImageIndex  SET ::SetImageIndex(v) DEFAULT -1
    PROPERTY ImageList   GET __ChkComponent( Self, ::xImageList )
-   PROPERTY BackColor   SET ::SendMessage( SB_SETBKCOLOR, 0, v ) DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY BackColor   ROOT "Colors" SET ::SendMessage( SB_SETBKCOLOR, 0, v ) DEFAULT GetSysColor( COLOR_BTNFACE )
    PROPERTY Text        SET IIF( ::IsWindow(),;
                                ( ::SendMessage( SB_SIMPLE, LEN( ::Children ) == 0, 0 ),;
                                  ::SendMessage( SB_SETTEXT, SB_SIMPLEID, v ) ), ) DEFAULT ""

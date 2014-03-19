@@ -31,11 +31,11 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY RightAlign        SET ::SetStyle( DTS_RIGHTALIGN, v )   DEFAULT .F.
    PROPERTY BlankDate         SET ::__SetBlankDate(v)               DEFAULT .F.
 
-   PROPERTY BackColor         SET ::SetCalendarColor( MCSC_MONTHBK, v )      
-   PROPERTY ForeColor         SET ::SetCalendarColor( MCSC_TEXT, v )         
-   PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )      
-   PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
-   PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
+   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )      
+   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )         
+   PROPERTY TitleBackColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLEBK, v )      
+   PROPERTY TitleForeColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
+   PROPERTY TrailingTextColor ROOT "Colors" SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED

@@ -470,10 +470,17 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode() CLASS EditBox
-   IF ::wParam == VK_RETURN .AND. ::EnterNext
-      ::LastKey := ::wParam
-      ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
-      RETURN 0
+   LOCAL n, nRet
+   IF ::wParam == VK_RETURN
+      IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+         nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
+         RETURN NIL
+      ENDIF
+      IF ::EnterNext
+         ::LastKey := ::wParam
+         ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
+         RETURN 0
+      ENDIF
    ENDIF
 RETURN NIL
 

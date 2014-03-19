@@ -86,8 +86,8 @@ CLASS ListView INHERIT TitleControl
    PROPERTY ShowSelAlways  SET ::SetStyle( LVS_SHOWSELALWAYS, v )        DEFAULT .F.
    PROPERTY SingleSel      SET ::SetStyle( LVS_SINGLESEL, v )            DEFAULT .F.
    
-   PROPERTY BackColor      SET ::SetBackColor(v)
-   PROPERTY ForeColor      SET ::SetForeColor(v)
+   PROPERTY BackColor      ROOT "Colors" SET ::SetBackColor(v)
+   PROPERTY ForeColor      ROOT "Colors" SET ::SetForeColor(v)
    PROPERTY ViewStyle      SET ::__SetViewStyle(v) DEFAULT LVS_ICON
 
    DATA EnumViewStyle EXPORTED  INIT { { "Icon", "Report", "SmallIcon", "List", "Tile" }, {LV_VIEW_ICON,LV_VIEW_DETAILS,LV_VIEW_SMALLICON,LV_VIEW_LIST,LV_VIEW_TILE} }

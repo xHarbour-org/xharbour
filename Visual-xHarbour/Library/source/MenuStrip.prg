@@ -221,15 +221,15 @@ METHOD OnPaint() CLASS MenuStrip
    IF ::Row > 0 .AND. ::ShowGrip
       y := 4
       FOR n := 1 TO nDots  
-          SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::System:CurrentScheme:GripLight )
-          SetPixel( hMemDC, ::__GripperPos + 1, y + 2, ::System:CurrentScheme:GripLight )
-          SetPixel( hMemDC, ::__GripperPos + 2, y + 1, ::System:CurrentScheme:GripLight )
-          SetPixel( hMemDC, ::__GripperPos + 2, y + 2, ::System:CurrentScheme:GripLight )
+          SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripLight )
+          SetPixel( hMemDC, ::__GripperPos + 1, y + 2, ::ColorScheme:GripLight )
+          SetPixel( hMemDC, ::__GripperPos + 2, y + 1, ::ColorScheme:GripLight )
+          SetPixel( hMemDC, ::__GripperPos + 2, y + 2, ::ColorScheme:GripLight )
 
-          SetPixel( hMemDC, ::__GripperPos,     y + 0, ::System:CurrentScheme:GripDark )
-          SetPixel( hMemDC, ::__GripperPos,     y + 1, ::System:CurrentScheme:GripDark )
-          SetPixel( hMemDC, ::__GripperPos + 1, y + 0, ::System:CurrentScheme:GripDark )
-          SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::System:CurrentScheme:GripDark )
+          SetPixel( hMemDC, ::__GripperPos,     y + 0, ::ColorScheme:GripDark )
+          SetPixel( hMemDC, ::__GripperPos,     y + 1, ::ColorScheme:GripDark )
+          SetPixel( hMemDC, ::__GripperPos + 1, y + 0, ::ColorScheme:GripDark )
+          SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripDark )
           y += 4
       NEXT
    ENDIF

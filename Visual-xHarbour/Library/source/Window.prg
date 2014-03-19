@@ -1819,29 +1819,12 @@ METHOD OnMouseWheel( nwParam, nlParam ) CLASS Window
 RETURN NIL
 
 METHOD OnCommand( nwParam, nlParam ) CLASS Window
-   LOCAL nCode, nId, nRet, n, oCtrl, lHandled, oForm, oChild, oItem
+   LOCAL nCode, nId, nRet, oCtrl, lHandled, oForm, oChild, oItem
    nCode := HIWORD( nwParam )
    nId   := ABS(LOWORD( nwParam ))
 
    IF nCode == 0
       nId := nwParam
-   ENDIF
-
-   IF nId == IDOK
-      oCtrl := ObjFromHandle( GetFocus() )
-
-      IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit"
-         oCtrl := ObjFromHandle( GetNextDlgTabItem( ::hWnd, GetFocus(), IsKeyDown( VK_SHIFT ) ) )
-      ENDIF               
-
-      IF oCtrl != NIL .AND. oCtrl:__xCtrlName != "MaskEdit"
-         IF ( n := HSCAN( ::Form:__hObjects, {|,o| ( oCtrl:hWnd != o:hWnd .OR. ::Modal ) .AND. o:__xCtrlName == "Button" .AND. o:DefaultButton } ) ) > 0
-            nId := HGetValueAt( ::Form:__hObjects, n ):Id
-            nlParam := HGetValueAt( ::Form:__hObjects, n ):hWnd
-          ELSE
-            oCtrl := NIL
-         ENDIF
-      ENDIF
    ENDIF
 
    IF ::AutoClose .AND. ::Style & WS_CHILD == 0 .AND. ( ::Modal .OR. ::Parent != NIL )
@@ -2439,6 +2422,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               SendMessage( hWnd, WM_PAINT, nwParam, nlParam )
               nRet := ExecuteEvent( "OnPrintClient", Self )
               ODEFAULT nRet TO ::OnPrintClient( nwParam, nlParam )
+              IF ::__ClassInst == NIL
+                 RETURN 1
+              ENDIF
               EXIT
 
          CASE WM_PRINT
@@ -2620,9 +2606,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     oCtrl := ObjFromHandle( ::DrawItemStruct:hwndItem )
                     IF oCtrl != NIL
                        IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
-                          nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( Self )
+                          nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( oCtrl )
                        ENDIF
-                       ODEFAULT nRet TO oCtrl:OnParentDrawItem(nwParam,nlParam, ::DrawItemStruct)
+                       ODEFAULT nRet TO oCtrl:OnParentDrawItem( nwParam, nlParam, ::DrawItemStruct )
                     ENDIF
                  ENDIF
 

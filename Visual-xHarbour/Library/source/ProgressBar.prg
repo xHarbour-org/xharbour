@@ -31,8 +31,8 @@ CLASS ProgressBar FROM Control
    PROPERTY MaxRange        SET ::SetRange(::xMinRange,v)     DEFAULT 100
    PROPERTY Position        SET ::SetPosition( v )            DEFAULT 0
    PROPERTY Smooth          SET ::SetStyle( PBS_SMOOTH, v )   DEFAULT .F.
-   PROPERTY ForeColor       SET ::SetBarColor( v )            DEFAULT GetSysColor( COLOR_HIGHLIGHT )
-   PROPERTY BackColor       SET ::SetBkColor( v )             DEFAULT GetSysColor( COLOR_BTNFACE )
+   PROPERTY ForeColor       ROOT "Colors" SET ::SetBarColor( v )            DEFAULT GetSysColor( COLOR_HIGHLIGHT )
+   PROPERTY BackColor       ROOT "Colors" SET ::SetBkColor( v )             DEFAULT GetSysColor( COLOR_BTNFACE )
    PROPERTY Step            SET ::SetStep( v )                DEFAULT 10
    PROPERTY Vertical        SET ::SetStyle( PBS_VERTICAL, v ) DEFAULT .F.
    PROPERTY Border          SET ( ::SetStyle( WS_BORDER, v ), ::SetPosition( ::xPosition ) ) DEFAULT .F.
@@ -123,7 +123,7 @@ METHOD SetPosition( n ) CLASS ProgressBar
       ENDIF
       IF ::__ClassInst == NIL .AND. ::TaskBarProgress
          IF ! ::xMarquee
-            TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), n, ::xRange[2] )
+            TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), n, ::xMaxRange )
           ELSE
             TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_INDETERMINATE )
          ENDIF
@@ -146,7 +146,7 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS ProgressBar
       IF ::xMarquee
          TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_INDETERMINATE )
        ELSE
-         TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), ::Position, ::xRange[2] )
+         TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), ::Position, ::xMaxRange )
       ENDIF
    ENDIF
 RETURN NIL

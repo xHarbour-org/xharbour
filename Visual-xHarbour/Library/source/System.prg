@@ -239,11 +239,10 @@ METHOD Init() CLASS System
    ::OS:Bitness      := IIF( IsWow64(), "x64", "x86" )
    ::OS:ServicePack  := osvi:szCSDVersion:AsString()
 
-   ::CurrentScheme := ProfessionalColorTable( NIL )
    IF ::OS:Version >= 6.2
-      ::CurrentScheme:Theme       := "Aero"
-      ::CurrentScheme:ColorScheme := "Windows8"
-      ::CurrentScheme:AutoScheme  := .F.
+      ::CurrentScheme := FlatGrayColorTable()
+    ELSE 
+      ::CurrentScheme := ProfessionalColorTable()
    ENDIF
    ::CurrentScheme:Load()
 

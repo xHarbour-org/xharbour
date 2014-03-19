@@ -155,14 +155,15 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    METHOD __GetObjProp()
 
    METHOD OnDestroy()
-   METHOD OnGetDlgCode()
+   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ActiveX
    ::Parent       := oParent
    ::ClsName      := "AtlAxWin"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+
    IF ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance   := .T.
@@ -174,11 +175,7 @@ METHOD Init( oParent ) CLASS ActiveX
    ::Constants    := {=>}
    DEFAULT ::xWidth  TO 200
    DEFAULT ::xHeight TO 200
-
 RETURN Self
-
-METHOD OnGetDlgCode() CLASS ActiveX
-RETURN DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 
 //----------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ActiveX
@@ -188,29 +185,30 @@ METHOD Create() CLASS ActiveX
 
    DEFAULT ::ClsID TO ::ProgID
 
-   TRY
-      DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
-      cId := ::oTypeLib:Objects[1]:Name
-    CATCH
-      cId := STRTRAN( ::ProgID, "." )
-   END
+   ::ClsName := "AtlAxWin"
 
-   DO CASE
-      CASE cId == "ChartSpace"
-           ::Width  := 576
-           ::Height := 384
+   IF ::__ClassInst != NIL
+      TRY
+         DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
+         cId := ::oTypeLib:Objects[1]:Name
+       CATCH
+         TRY
+            cId := STRTRAN( ::ProgID, "." )
+         CATCH
+         END
+      END
 
-      CASE cId == "Spreadsheet"
-           ::Width  := 576
-           ::Height := 288
-   ENDCASE
-
-   ::ClsName     := "AtlAxWin"
-
-   DEFAULT ::__xCtrlName TO cId
+      DEFAULT ::__xCtrlName TO cId
+   ENDIF
 
    ::TitleControl:Init( ::Parent )
    ExecuteEvent( "OnInit", Self )
+
+   IF ::__ClassInst == NIL
+      DEFAULT ::ClsID TO ::ProgID
+      DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
+   ENDIF
+
    ::__IsStandard := .F.
 
    ::Caption    := ::ClsID

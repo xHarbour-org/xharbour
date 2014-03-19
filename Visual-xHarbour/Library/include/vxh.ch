@@ -3,6 +3,11 @@
 #include "commctrl.ch"
 #include "wingdi.ch"
 
+#define ALIGN_DEFAULT   0
+#define ALIGN_LEFT      1
+#define ALIGN_CENTER    2
+#define ALIGN_RIGHT     3
+
 #xtranslate __CONCAT <x> <y> => <x>[<y>]
 
 #xcommand PROPERTY <p> [ROOT <r>] [DEFAULT <d>] [HELP <h>] [<hid: NOTPUBLIC>];

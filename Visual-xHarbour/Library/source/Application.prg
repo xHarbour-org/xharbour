@@ -225,6 +225,8 @@ RETURN EXCEPTION_EXECUTE_HANDLER
 //------------------------------------------------------------------------------------------------
 
 CLASS Application
+   PROPERTY ColorScheme  SET ::__SetColorScheme(v) DEFAULT 1
+   DATA EnumColorScheme  EXPORTED INIT { { "System Default", "FlatGray", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7,8} }
 
    PROPERTY Icon                   ROOT "Appearance" DEFAULT ""
    PROPERTY Cursor                 ROOT "Appearance"
@@ -308,6 +310,9 @@ CLASS Application
 
    DATA __SysTitleBackColorActive      EXPORTED INIT RGB( 255, 230, 151 )
    DATA __SysTitleBackColorInactive    EXPORTED INIT RGB(  69,  89, 124 )
+   DATA __ColorTable                   EXPORTED
+
+   ACCESS ColorTable INLINE IIF( ::ColorScheme == 1, ::System:CurrentScheme, ::__SetColorScheme() )
 
    DATA hTitleBackBrushActive          EXPORTED
    DATA hTitleBackBrushInactive        EXPORTED
@@ -392,11 +397,14 @@ CLASS Application
    METHOD AxTranslate()
    METHOD MessageBox()
    METHOD SaveResource()
-   METHOD __SetAsProperty()
-   METHOD __InvalidMember()
    METHOD Quit()
    METHOD SaveCustomColors()
    METHOD LoadCustomColors()
+
+   METHOD __SetAsProperty()
+   METHOD __InvalidMember()
+   METHOD __SetColorScheme()
+
    error HANDLER OnError()
 ENDCLASS
 
@@ -499,6 +507,20 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Application
    ENDIF
    oObj:xName := cName
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __SetColorScheme(n) CLASS Application
+   LOCAL cScheme
+   DEFAULT n TO ::ColorScheme
+   IF n <> ::ColorScheme .OR. ::__ColorTable == NIL
+      cScheme := ::EnumColorScheme[1][n] + "ColorTable"
+      IF ::EnumColorScheme[1][n] == "FlatGray"
+         ::__ColorTable := &cScheme():Load()
+       ELSE
+         ::__ColorTable := ProfessionalColorTable():Load( ::EnumColorScheme[1][n] )
+      ENDIF
+   ENDIF
+RETURN ::__ColorTable
 
 //------------------------------------------------------------------------------------------------
 METHOD SaveResource( ncRes, cFileName ) CLASS Application
@@ -616,7 +638,12 @@ METHOD Run( oWnd ) CLASS Application
       ENDIF
       ::MainForm := NIL
       AEVAL( ::ImageLists, {|o|o:Destroy()} )
+      IF ::__ColorTable != NIL
+         ::__ColorTable:Unload()
+      ENDIF
    ENDIF
+   ::System:CurrentScheme:Unload()
+   ::ColorTable:Unload()
 RETURN 0
 
 //------------------------------------------------------------------------------------------------
@@ -872,7 +899,7 @@ RETURN
 //------------------------------------------------------------------------------------------------------
 
 STATIC FUNCTION VXH_DefError( e, lGpf )
-   LOCAL aOptions, nChoice, aStack, c, cErr, cPath, nAt, i
+   LOCAL aOptions, nChoice, aStack, c, cErr, cPath, nAt, i//, hPen, hHash
    LOCAL cProcStack := ""
    
    DEFAULT lGpf TO .F.
@@ -894,6 +921,14 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
       NETERR( .T. )
       RETURN .F.
    ENDIF
+
+//   IF e:genCode == EG_NOMETHOD .AND. e:subCode == 1004 .AND. e:args != NIL
+//      hHash := e:args[1]
+//      IF ValType( hHash ) == "H" .AND. HHasKey( hHash, "ColorTable" )
+//         hPen := hHash:ColorTable:SetHash( hHash, e:operation )
+//         return if( e:canSubstitute, hPen, .t. )
+//      ENDIF
+//   ENDIF
 
    IF Application != NIL
       Application:Cursor := NIL

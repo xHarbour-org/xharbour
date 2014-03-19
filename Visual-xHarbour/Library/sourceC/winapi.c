@@ -298,6 +298,9 @@ static NET_API_STATUS (WINAPI *pNetApiBufferFree)(PVOID)                        
 static HWND (WINAPI *pHtmlHelp)(HWND,LPCSTR,UINT,DWORD_PTR)                                                    = NULL;
 
 static ULONG (WINAPI *pMAPISendMail)(LHANDLE,ULONG,lpMapiMessage,FLAGS,ULONG)                                  = NULL;
+static ULONG (WINAPI *pMAPILogon)(ULONG,LPSTR,LPSTR,FLAGS,ULONG,LPLHANDLE)                                     = NULL;
+static ULONG (WINAPI *pMAPILogoff)(LHANDLE,ULONG,FLAGS,ULONG)                                                  = NULL;
+
 static ULONG (WINAPI *pMAPISendDocuments)(ULONG,LPTSTR,LPTSTR,LPTSTR,ULONG)                                    = NULL;
 static UINT  (WINAPI *pOleUIInsertObject)(LPOLEUIINSERTOBJECT)                                                 = NULL;
 
@@ -591,8 +594,10 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
 
    if( hMAPI )
    {
-      pMAPISendMail = (ULONG (WINAPI *)(LHANDLE,ULONG,lpMapiMessage,FLAGS,ULONG)) GetProcAddress( hMAPI, "MAPISendMail" );
-      pMAPISendDocuments = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,LPTSTR,ULONG)) GetProcAddress( hMAPI, "MAPISendDocuments" );
+      pMAPISendMail      = (ULONG (WINAPI *)(LHANDLE,ULONG,lpMapiMessage,FLAGS,ULONG)) GetProcAddress( hMAPI, "MAPISendMail" );
+      pMAPISendDocuments = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,LPTSTR,ULONG))        GetProcAddress( hMAPI, "MAPISendDocuments" );
+      pMAPILogon         = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,FLAGS,ULONG,LHANDLE)) GetProcAddress( hMAPI, "MAPILogon" );
+      pMAPILogoff        = (ULONG (WINAPI *)(LHANDLE,ULONG,FLAGS))                     GetProcAddress( hMAPI, "MAPILogoff" );
    }
 
    if( hOleDlg )
@@ -8085,6 +8090,37 @@ HB_FUNC( MAPISENDDOCUMENTS )
    else
    {
       hb_errRT_BASE( EG_ARG, 6001, NULL, "MAPISENDMAIL", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+   }
+}
+
+//------------------------------------------------------------------------------------------------
+HB_FUNC( MAPILOGON )
+{
+   if( pMAPILogon )
+   {
+      LHANDLE hHandle;
+      hb_retl( pMAPILogon( (ULONG) hb_parnl(1), (LPTSTR) hb_parc(2), (LPTSTR) hb_parc(3), (FLAGS) hb_parnl(4), (ULONG) hb_parnl(5), &hHandle ) );
+      if ISBYREF( 6 )
+      {
+         hb_stornl( (LONG) hHandle, 6 );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "MAPILOGON", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+   }
+}
+
+//------------------------------------------------------------------------------------------------
+HB_FUNC( MAPILOGOFF )
+{
+   if( pMAPILogoff )
+   {
+      hb_retl( pMAPILogoff( (LHANDLE) hb_parnl(1), (ULONG) hb_parnl(2), (FLAGS) hb_parnl(3), (ULONG) hb_parnl(4) ) );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "MAPILOGOFF", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
    }
 }
 

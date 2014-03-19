@@ -32,7 +32,7 @@ CLASS TreeView FROM TitleControl
    PROPERTY SingleExpand    SET ::SetStyle( TVS_SINGLEEXPAND, v )    DEFAULT .F.
    PROPERTY TrackSelect     SET ::SetStyle( TVS_TRACKSELECT, v )     DEFAULT .F.
    PROPERTY DisableDragDrop SET ::SetStyle( TVS_DISABLEDRAGDROP, v ) DEFAULT .F.
-   PROPERTY BackColor       SET ( _SendMessage( ::hWnd, TVM_SETBKCOLOR, 0, v ), IIF( ::IsWindowVisible(), ::InvalidateRect(),) ) DEFAULT GetSysColor( COLOR_WINDOW )
+   PROPERTY BackColor       ROOT "Colors" SET ( _SendMessage( ::hWnd, TVM_SETBKCOLOR, 0, v ), IIF( ::IsWindowVisible(), ::InvalidateRect(),) ) DEFAULT GetSysColor( COLOR_WINDOW )
    PROPERTY ImageList       GET __ChkComponent( Self, @::xImageList );
                             SET (::xImageList := __ChkComponent( Self, v ), ::SetImageList(::xImageList))
 

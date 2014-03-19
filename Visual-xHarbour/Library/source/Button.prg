@@ -28,17 +28,16 @@
 
 CLASS Button INHERIT Control
 
-   PROPERTY ImageAlign    ROOT "Appearance"                                   DEFAULT __GetSystem():TextAlignment:Center
-   PROPERTY MenuArrow     ROOT "Appearance"                                   DEFAULT .F.
-   PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)            DEFAULT  0
-   PROPERTY Border        ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )    DEFAULT .F.
+   PROPERTY ImageAlign    ROOT "Appearance"                                      DEFAULT __GetSystem():TextAlignment:Center
+   PROPERTY MenuArrow     ROOT "Appearance"                                      DEFAULT .F.
+   PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)               DEFAULT  0
+   PROPERTY Border        ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )       DEFAULT .F.
 
    PROPERTY ShortCutKey   ROOT "Behavior" 
-   PROPERTY Group         ROOT "Behavior"   SET ::SetStyle( WS_GROUP, v )     DEFAULT .F.
-   PROPERTY OwnerDraw     ROOT "Behavior"   SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.
-   PROPERTY DefaultButton ROOT "Behavior"   SET ::SetDefault(v)               DEFAULT .F.
-   PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )  DEFAULT .T.
-   PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v ) DEFAULT .F. PROTECTED
+   PROPERTY Group         ROOT "Behavior"   SET ::SetStyle( WS_GROUP, v )        DEFAULT .F.
+   PROPERTY DefaultButton ROOT "Behavior"   SET ::SetStyle( BS_DEFPUSHBUTTON, v) DEFAULT .F.
+   PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )     DEFAULT .T.
+   PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v )    DEFAULT .F. PROTECTED
 
    DATA ImgInst           EXPORTED
    DATA ImageIndent       EXPORTED INIT 3
@@ -47,6 +46,13 @@ CLASS Button INHERIT Control
    DATA AllowUnDock       EXPORTED INIT FALSE
    DATA AllowClose        EXPORTED INIT FALSE
    ACCESS Checked INLINE ( ::GetState() == BST_CHECKED)
+
+   ACCESS __IsOD  INLINE ( ::ImageIndex != NIL .AND. ::ImageIndex > 0 ) .OR.;
+                         ( ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor ) .OR.;
+                         ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor ) .OR.;
+                         ::Parent:__xCtrlName == "GroupBox" .OR.;
+                         ( ::MenuArrow .AND. ::ContextMenu != NIL )
+
 
    DATA xState            PROTECTED INIT BST_UNCHECKED
 
@@ -63,7 +69,6 @@ CLASS Button INHERIT Control
    METHOD IsPushed()          INLINE ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_PUSHED != 0
    METHOD OnCtlColorBtn()
    METHOD OnCtlColorStatic()
-   METHOD SetFocus()          INLINE ::Super:SetFocus(), ::DefaultButton := .T.
    METHOD SetState()
    METHOD Create()
    METHOD SetBackColor()
@@ -72,7 +77,6 @@ CLASS Button INHERIT Control
    METHOD OnMouseHover()
    METHOD OnMouseLeave()
    METHOD OnParentCommand()
-   METHOD SetDefault( l )     INLINE IIF( ::Style & BS_DEFPUSHBUTTON == 0, ::SetStyle( BS_DEFPUSHBUTTON, l ), )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -127,47 +131,26 @@ METHOD Create() CLASS Button
                                  "OnNCMouseMove",;
                                  "OnNCPaint" } )
    ENDIF
-   IF ( ::ImageIndex != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox" .AND. !::OwnerDraw
-      ::Style := ::Style | BS_OWNERDRAW
-   ENDIF
+   ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    ::Super:Create()
    
    ::SetImageIndex( ::ImageIndex )
    ::ShortCutKey:SetAccel()
-   
-   IF !(::Style & BS_OWNERDRAW) == BS_OWNERDRAW
-      ::DefaultButton := ::xDefaultButton
-   ENDIF
-   IF ::MenuArrow .AND. ::ContextMenu != NIL 
-      ::SetStyle( BS_OWNERDRAW, .T. )
-   ENDIF
 RETURN Self
 
 METHOD SetBackColor( nColor, lRepaint ) CLASS Button
-   IF ( nColor == NIL .OR. nColor == ::__SysBackColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
-      ::SetStyle( BS_OWNERDRAW, .F. )
-    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::__SysBackColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
-      ::SetStyle( BS_OWNERDRAW, .T. )
-   ENDIF
+   ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    Super:SetBackColor( nColor, lRepaint )
 RETURN SELF
 
 METHOD SetForeColor( nColor, lRepaint ) CLASS Button
-   IF ( nColor == NIL .OR. nColor == ::__SysForeColor ) .AND. !::__ForceSysColor .AND. ::Parent:__xCtrlName != "GroupBox"
-      ::SetStyle( BS_OWNERDRAW, .F. )
-    ELSEIF ::__ForceSysColor .OR. ( ::Style & BS_OWNERDRAW == 0 ) .AND. ( nColor != NIL .AND. nColor != ::__SysForeColor ) .OR. ::Parent:__xCtrlName == "GroupBox"
-      ::SetStyle( BS_OWNERDRAW, .T. )
-   ENDIF
+   ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    Super:SetForeColor( nColor, lRepaint )
 RETURN SELF
 
 METHOD SetImageIndex( n ) CLASS Button
    DEFAULT n TO ::xImageIndex
-   IF ( ( ::Parent:ImageList != NIL .AND. n > 0 ) .OR. ( ::ForeColor != NIL .AND. ::ForeColor != ::__SysForeColor ) .OR. ( ::BackColor != NIL .AND. ( ::BackColor != ::__SysBackColor  .OR. ::__ForceSysColor ) ) )  .OR. ::Parent:__xCtrlName == "GroupBox"
-      ::Style := ::Style | BS_OWNERDRAW
-    ELSEIF !::OwnerDraw
-      ::Style := ::Style & NOT( BS_OWNERDRAW )
-   ENDIF
+   ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    IF ::IsWindow()
       ::SetWindowLong( GWL_STYLE, ::Style )
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
@@ -241,7 +224,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    LOCAL nLeft, nTop, aRect, nStyle, lDisabled, lSelected, lFocus, aTextRect, nTextFlags, nColor, n, lDefault
    (nwParam)
    (nlParam)
-   IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
+   IF !( ::__xCtrlName == "Button" )
       RETURN NIL
    ENDIF
    IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
@@ -286,21 +269,15 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
 
       IF ::Theming  .AND. ::Application:OsVersion:dwMajorVersion > 4 .AND. ::DrawTheme .AND. IsThemeActive()
          nStyle := PBS_NORMAL
-         IF lDefault .OR. lFocus
-            nStyle := nStyle | PBS_DEFAULTED
-            IF ! lFocus .AND. GetClassName( GetFocus() ) == "Button"
-               nStyle := nStyle & NOT( PBS_DEFAULTED )
-            ENDIF
-         ENDIF
 
          IF lDisabled
             nStyle := PBS_DISABLED
-         ENDIF
-         IF lSelected
+          ELSEIF lSelected
             nStyle := PBS_PRESSED
-         ENDIF
-         IF dis:itemState & ODS_HOTLIGHT != 0 .OR. ( ::__lMouseHover .AND. !lSelected )
+          ELSEIF dis:itemState & ODS_HOTLIGHT != 0 .OR. ( ::__lMouseHover .AND. !lSelected )
             nStyle := PBS_HOT
+          ELSEIF lDefault
+            nStyle := PBS_DEFAULTED
          ENDIF
 
          DrawThemeBackground( ::hTheme, dis:hDC, BP_PUSHBUTTON, nStyle, aRect, aRect )
@@ -435,7 +412,7 @@ METHOD OnCtlColorStatic( nwParam, nlParam ) CLASS Button
 RETURN NIL
 
 METHOD OnMouseHover() CLASS Button
-   IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
+   IF !( ::__xCtrlName == "Button" )
       RETURN NIL
    ENDIF
    ::__lMouseHover := .T.
@@ -443,7 +420,7 @@ METHOD OnMouseHover() CLASS Button
 RETURN NIL
 
 METHOD OnMouseLeave() CLASS Button
-   IF !( ::__xCtrlName == "Button" ) .OR. ::OwnerDraw
+   IF !( ::__xCtrlName == "Button" )
       RETURN NIL
    ENDIF
    ::__lMouseHover := .F.

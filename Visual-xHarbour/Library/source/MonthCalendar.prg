@@ -33,8 +33,8 @@ CLASS MonthCalendar INHERIT TitleControl
    PROPERTY Border            SET ::SetStyle( WS_BORDER, v )         DEFAULT .F.
    PROPERTY Date              SET ::SetCurSel(v)                     DEFAULT DATE()
    PROPERTY Today             SET ::SetToday(v)                      DEFAULT DATE()
-   PROPERTY BackColor         SET ::SetCalendarColor( MCSC_MONTHBK, v )      
-   PROPERTY ForeColor         SET ::SetCalendarColor( MCSC_TEXT, v )         
+   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )      
+   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )         
    PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )      
    PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
    PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 

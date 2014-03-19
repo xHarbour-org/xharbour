@@ -65,6 +65,8 @@ CLASS Object
    DATA __InstApp              EXPORTED
    DATA xName                  EXPORTED
 
+   ACCESS ColorScheme          INLINE IIF( ::__ClassInst != NIL, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
+
    ACCESS Application          INLINE IIF( ::__InstApp != NIL, ::__InstApp, __GetApplication() )
    ACCESS System               INLINE __GetSystem()
 

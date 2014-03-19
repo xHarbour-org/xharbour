@@ -29,7 +29,7 @@ static nMemSel := 100
 
 CLASS DataTable INHERIT Component
 
-   PROPERTY Alias        ROOT "General"    SET ::SetAlias(v)
+   PROPERTY Alias        ROOT "General"    SET ::__SetAlias(@v)
    PROPERTY MemoType     ROOT "General"    SET ::__SetMemoType(v) DEFAULT RddInfo( RDDI_MEMOTYPE )
    PROPERTY Shared       ROOT "General"                           DEFAULT .T.
    PROPERTY CodePage     ROOT "General"
@@ -38,7 +38,7 @@ CLASS DataTable INHERIT Component
    PROPERTY Table        ROOT "General"                           DEFAULT {}
    PROPERTY Driver       ROOT "General"    SET ::xDriver := IIF( !EMPTY( v ), v, NIL )
 
-   PROPERTY FileName     ROOT "Path"       SET ::SetFileName(v)
+   PROPERTY FileName     ROOT "Path"       SET ::SetFileName(@v)
    PROPERTY Path         ROOT "Path"       DEFAULT ""
 
    PROPERTY SqlConnector ROOT "Connection" GET __ChkComponent( Self, @::xSqlConnector )
@@ -194,7 +194,7 @@ CLASS DataTable INHERIT Component
    METHOD AdsSetServerType(n)   VIRTUAL
    
    METHOD Destroy(lNotify)                    INLINE IIF( ::IsOpen, ::Close(lNotify),), ::Super:Destroy()
-   METHOD SetAlias()
+   METHOD __SetAlias()
    METHOD SetFileName()
    METHOD CreateOrder()
    ACCESS IsOpen INLINE ::Structure != NIL //Select( ::Area ) > 0
@@ -421,10 +421,9 @@ RETURN ::xAlias
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SetAlias( cAlias ) CLASS DataTable
+METHOD __SetAlias( cAlias ) CLASS DataTable
    LOCAL lCreate := .F.
-   ::xAlias := cAlias
-   IF !::__lMemory
+   IF ! ::__lMemory
       IF EMPTY( cAlias )
          cAlias := NIL
       ENDIF
