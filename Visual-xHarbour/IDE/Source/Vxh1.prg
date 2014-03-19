@@ -8,6 +8,7 @@
 
 STATIC lSplash := .F.
 static aTargetTypes := {".exe", ".lib", ".dll", ".hrb", ".dll"}
+static s_cVersion, s_cCopyright
 
 #ifndef HB_CDP_SUPPORT_ON
    #define HB_CDP_SUPPORT_OFF
@@ -185,6 +186,10 @@ RETURN Self
 METHOD Init( ... ) CLASS IDE
    LOCAL aEntries, n, cFile
    PUBLIC aChangedProps
+
+   IF ::System:OS:Version >= 6.2
+      ::System:CurrentScheme:Load( "FlatGray" )
+   ENDIF
 
    m->aChangedProps := {}
 
@@ -498,7 +503,7 @@ RETURN NIL
 
 
 METHOD Init() CLASS IDE_MainForm
-   LOCAL cVersion, rc, oForm
+   LOCAL rc, oForm
    ::Super:Init()
 
    IF ::System:OS:Version >= 6.2
@@ -548,20 +553,21 @@ METHOD Init() CLASS IDE_MainForm
       WITH OBJECT ::Application:Props[ "StatusBarCopy" ] := StatusBarPanel( :this )
          :ImageIndex := 1
 
-         cVersion := "Demo"
+         s_cVersion := "Demo"
          #ifdef VXH_PROFESSIONAL
-            cVersion := "Professional"
+            s_cVersion := "Professional"
          #endif
          #ifdef VXH_ENTERPRISE
-            cVersion := "Enterprise"
+            s_cVersion := "Enterprise"
          #endif
          #ifdef VXH_PERSONAL
-            cVersion := "Personal"
+            s_cVersion := "Personal"
          #endif
+         s_cCopyright := "Copyright "+CHR(169)+" 2003-"+Str(Year(Date()))+" xHarbour.com Inc. All rights reserved"
 
-         :Caption  := "Visual xHarbour " + cVersion + ". Copyright "+CHR(169)+" 2003-"+Str(Year(Date()))+" xHarbour.com Inc. All rights reserved"
+         :Text  := "Visual xHarbour " + s_cVersion + ". " + s_cCopyright
 
-         :Width    := :Parent:Drawing:GetTextExtentPoint32( :Caption )[1] + 40
+         :Width := :Parent:Drawing:GetTextExtentPoint32( :Text )[1] + 40
          :Create()
       END
 
@@ -608,7 +614,7 @@ METHOD Init() CLASS IDE_MainForm
 
    //--------------------------------------
    WITH OBJECT MenuStrip( ::ToolStripContainer1 )
-      :Showgrip  := ! :Flat
+      :Showgrip  := .F.
       :Row       := 1
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
@@ -1091,21 +1097,23 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
          END
 
-         WITH OBJECT ::Application:Props[ "ProjLinkItem" ] := MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "BuildItem" ] := MenuStripItem( :this )
             :BeginGroup        := .T.
             :Caption           := "&Build"
             :ShortCutText      := "F4"
             :ShortCutKey:Key   := VK_F4
             :Action            := {|| ::Application:Project:Build() }
+            :Enabled           := .F.
             :Create()
          END
 
-         WITH OBJECT ::Application:Props[ "ProjLinkItem" ] := MenuStripItem( :this )
+         WITH OBJECT ::Application:Props[ "LinkItem" ] := MenuStripItem( :this )
             :Caption           := "&Link"
             :ShortCutText      := "Ctrl+L"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "L" )
             :Action            := {|| ::Application:Project:Build(, .T. ) }
+            :Enabled           := .F.
             :Create()
          END
 
@@ -1162,8 +1170,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      :Showgrip    := ! :Flat
-      :ShowChevron := ! :Flat
+      :Showgrip    := .F.
+      :ShowChevron := .F.
       :Caption   := "Standard"
       :Row       := 2
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1209,8 +1217,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      :Showgrip    := ! :Flat
-      :ShowChevron := ! :Flat
+      :Showgrip    := .F.
+      :ShowChevron := .F.
       :Caption := "Edit"
       :Row     := 2
       :Create()
@@ -1268,8 +1276,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      :Showgrip    := ! :Flat
-      :ShowChevron := ! :Flat
+      :Showgrip    := .F.
+      :ShowChevron := .F.
       :Row     := 2
       :Caption := "Build"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1322,8 +1330,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::ToolStripContainer1 )
-      :Showgrip    := ! :Flat
-      :ShowChevron := ! :Flat
+      :Showgrip    := .F.
+      :ShowChevron := .F.
       :Row       := 3
       :Caption   := ""
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1346,13 +1354,11 @@ METHOD Init() CLASS IDE_MainForm
          :Enabled      := .F.
          :Create()
       END
-
    END
 
-
    WITH OBJECT ::Application:Props[ "AlignBar" ] := ToolStrip( ::ToolStripContainer1 )
-      :Showgrip    := ! :Flat
-      :ShowChevron := ! :Flat
+      :Showgrip    := .F.
+      :ShowChevron := .F.
       :Row       := 3
       :Caption   := "Alignment"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -3477,6 +3483,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:Props[ "RunBttn"           ]:Enabled := .F.
    ::Application:Props[ "ProjSaveItem"      ]:Enabled := .F.
    ::Application:Props[ "ProjBuildItem"     ]:Enabled := .F.
+   ::Application:Props[ "BuildItem"         ]:Enabled := .F.
+   ::Application:Props[ "LinkItem"          ]:Enabled := .F.
    ::Application:Props[ "ProjRunItem"       ]:Enabled := .F.
    ::Application:Props[ "ForceBuildItem"    ]:Enabled := .F.
    ::Application:Props[ "RunItem"           ]:Enabled := .F.
@@ -3534,6 +3542,11 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
    ::Application:CloseMenu:Enabled := .F.
+
+   IF ::AppObject:__ColorTable != NIL
+      ::AppObject:__ColorTable:Unload()
+   ENDIF
+
    hb_gcall( .T. )
 RETURN .T.
 
@@ -3804,6 +3817,8 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Props[ "CloseBttn"         ]:Enabled := .T.
    ::Application:Props[ "SaveBttn"          ]:Enabled := .T.
    ::Application:Props[ "ForceBuildItem"    ]:Enabled := .T.
+   ::Application:Props[ "BuildItem"         ]:Enabled := .T.
+   ::Application:Props[ "LinkItem"          ]:Enabled := .T.
 
    ::Application:Props:StatusBarLog:Text := "Loading " + ::Properties:Path + "\" + ::Properties:Name
 
@@ -4958,6 +4973,8 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ::Application:Props[ "ProjSaveItem"    ]:Enabled := .F.
    ::Application:Props[ "ProjBuildItem"   ]:Enabled := .T.
    ::Application:Props[ "ProjRunItem"     ]:Enabled := .T.
+   ::Application:Props[ "BuildItem"       ]:Enabled := .T.
+   ::Application:Props[ "LinkItem"        ]:Enabled := .T.
 
    ::Application:Cursor := NIL
    WinSetCursor( ::System:Cursor:Arrow )
@@ -6779,20 +6796,6 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Create()
       END
 
-      WITH OBJECT ( LABEL( :this ) )
-         :Left           := 165
-         :Top            := 61
-         :Width          := 300
-         :Height         := 20
-         :Text           := "Build: " + VXH_BuildVersion
-         :Font:FaceName  := "Tahoma"
-         :Font:Bold      := .T.
-         :Font:PointSize := 10
-         :Transparent    := .T.
-         :ForeColor      := C_DARKBLUE
-         :Create()
-      END
-
    END
 
    WITH OBJECT ( oBtn := Button( Self ) )
@@ -6803,6 +6806,20 @@ METHOD OnInitDialog() CLASS AboutVXH
       :Create()
    END
 
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Left           := 2
+      :Dock:Bottom    := :Parent
+      :Dock:Right     := :Parent
+      :Width          := 90
+      :Height         := 15
+      :FocusRect      := .F.
+      :Text           := s_cCopyright
+      :Font:Underline := .T.
+      :EventHandler[ "OnClick" ] := "LinkLabel1_OnClick"
+      :Create()
+      :DockIt()
+   END
+
    WITH OBJECT ( ::Panel := PANEL( Self ) )
       :Dock:Margin := 0
       :Dock:Left   := Self
@@ -6810,18 +6827,18 @@ METHOD OnInitDialog() CLASS AboutVXH
       :Dock:Right  := Self
       :Dock:Bottom := oBtn
       :Create()
-      WITH OBJECT ( LINKLABEL( :this ) )
-         :Left           := 2
-         :Dock:Bottom    := :Parent
-         :Dock:Right     := :Parent
-         :Width          := 90
+      WITH OBJECT ( LABEL( :this ) )
+         :Left           := 29
+         :Top            := 4
+         :Width          := 300
          :Height         := 15
-         :FocusRect      := .F.
-         :Caption        := ::Application:Props:StatusBarCopy:Text
-         :Font:Underline := .T.
-         :EventHandler[ "OnClick" ] := "LinkLabel1_OnClick"
+         :Text           := "Visual xHarbour " + s_cVersion + " " + VXH_Version + " Build " + VXH_BuildVersion
+         :Dock:Right     := :Parent
+         :Dock:RightMargin := 10
+         :Font:Bold      := .T.
+         :Alignment      := DT_RIGHT
+         :Font:PointSize := 10
          :Create()
-         :DockIt()
       END
 
       WITH OBJECT ( oLabel := LABEL( :this ) )

@@ -642,7 +642,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     IF VALTYPE(oObj) == "O"
                        aList := {}
 
-                       IF oObj:__hObjects != NIL
+                       IF __ObjHasMsg( oObj, "__hObjects" ) .AND. oObj:__hObjects != NIL
                           HEval( oObj:__hObjects, {|k,v,i| AADD( aList, k + "?8" ) } )
                        ENDIF
 
