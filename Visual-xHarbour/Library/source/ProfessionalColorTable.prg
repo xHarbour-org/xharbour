@@ -335,5 +335,6 @@ METHOD Load() CLASS FlatGrayColorTable
    ::ToolStripPanelGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
 
    ::MenuItemShadow                         := .F.
+   ::MenuBarSeparated                       := .T.
    ::Clean()
 RETURN Self
