@@ -531,7 +531,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    LOCAL scn, nPos, n, cObj, cText, nLine, nChar, nPosStart, nPosEnd, oObj, aObj, aProperties, aProp, cList, aMethods, Topic, Event, aList//, cFind
-   LOCAL nWrap, cCtrl, nVisLine
+   LOCAL nWrap, nVisLine
    (nwParam, nlParam)
    IF ::Source != NIL
       DO CASE
@@ -599,7 +599,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                         EXIT
                      ENDIF
                  NEXT
-                 IF cObj == ":" 
+                 IF cObj == ":"
                     nWrap := ::Application:EditorProps:WrapSearch
                     ::Application:EditorProps:WrapSearch := 0
                     nPos     := ::SendMessage( SCI_GETCURRENTPOS, 0, 0 )
@@ -643,7 +643,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        aList := {}
 
                        IF __ObjHasMsg( oObj, "__hObjects" ) .AND. oObj:__hObjects != NIL
-                          HEval( oObj:__hObjects, {|k,v,i| AADD( aList, k + "?8" ) } )
+                          HEval( oObj:__hObjects, {|k| AADD( aList, k + "?8" ) } )
                        ENDIF
 
                        IF __ObjHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
