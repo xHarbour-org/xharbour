@@ -57,8 +57,7 @@ CLASS GroupBox INHERIT Control
    
    METHOD Init()  CONSTRUCTOR
    METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent, ::__SetTransp(.T.), ), Super:Create()
-   METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), NIL
-   METHOD OnEraseBkGnd()       INLINE IIF( LEN( ::Children ) == 0, ::SetWindowPos( HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE ), ), 1
+   METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
    METHOD OnSize(w,l)          INLINE Super:OnSize(w,l),::InvalidateRect(), NIL
    METHOD GetSysColor()
@@ -77,8 +76,6 @@ METHOD Init( oParent ) CLASS GroupBox
    ::ControlParent := .T.
    ::__IsStandard  := .F.
    ::__IsControl   := .T.
-   ::ThemeName     := "button"
-   ::OpenThemeData()
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE", "ALLOWCLOSE", "ALLOWUNDOCK" }
    ENDIF
@@ -87,7 +84,7 @@ RETURN Self
 METHOD GetSysColor() CLASS GroupBox
    LOCAL nColor
    IF ::Application:IsThemedXP .AND. ::Theming
-      nColor := GetThemeColor( ::hTheme, BP_GROUPBOX, GBS_NORMAL, TMT_TEXTCOLOR )
+      nColor := GetThemeColor( ::System:hButtonTheme, BP_GROUPBOX, GBS_NORMAL, TMT_TEXTCOLOR )
     ELSE
       nColor := GetSysColor( COLOR_BTNTEXT )
    ENDIF
@@ -121,7 +118,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
 
    rc:top    := sz:cy / 2 
    IF ::Theming .AND. ::Application:IsThemedXP
-      DrawThemeBackground( ::hTheme, hMemDC, BP_GROUPBOX, 0, rc:Array, rc:Array )
+      DrawThemeBackground( ::System:hButtonTheme, hMemDC, BP_GROUPBOX, 0, rc:Array, rc:Array )
     ELSE
       DrawEdge( hMemDC, rc, EDGE_ETCHED, BF_RECT )
    ENDIF
