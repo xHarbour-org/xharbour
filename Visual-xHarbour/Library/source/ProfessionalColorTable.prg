@@ -251,6 +251,7 @@ RETURN Self
 
 METHOD Clean() CLASS ProfessionalColorTable
    LOCAL nColor, cProp,  aKeys := { "ToolStripBorder",;
+                                    "ToolStripGradientBegin",;
                                     "SeparatorDark",;
                                     "SeparatorLight",;
                                     "ButtonSelectedBorder",;
