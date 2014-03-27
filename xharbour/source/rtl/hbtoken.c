@@ -115,8 +115,16 @@ static const char * hb_tokenGet( const char * szLine, HB_SIZE nLen,
       {
          if( --nToken == 0 )
          {
-            *pnLen = ul - nStart;
-            return szLine + nStart;
+            if ( ul > nStart )
+            {
+               *pnLen = ul - nStart;
+               return szLine + nStart;
+            }
+            else
+            {
+               *pnLen = 0;
+               return NULL;
+            }
          }
          if( ( iFlags & _HB_TOK_ISDELIM ) == 0 )
          {
@@ -126,7 +134,7 @@ static const char * hb_tokenGet( const char * szLine, HB_SIZE nLen,
          nStart = ul + nDelim;
       }
    }
-   if( --nToken == 0 )
+   if( --nToken == 0 && ul > nStart )
    {
       *pnLen = ul - nStart;
       return szLine + nStart;
