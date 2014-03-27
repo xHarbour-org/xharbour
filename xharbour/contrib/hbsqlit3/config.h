@@ -9,9 +9,10 @@
    #define SQLITE_ENABLE_COLUMN_METADATA
 
    #if defined( __BORLANDC__ )
-      #pragma warn -par                 /* Parameter '%s' is never used    */
-      #pragma warn -pia                 /* Possibly incorrect assignment   */
-      #pragma warn -use                 /* '%s' is declared but never used */
+      #pragma warn -par                 /* Parameter '%s' is never used              */
+      #pragma warn -pia                 /* Possibly incorrect assignment             */
+      #pragma warn -prc                 /* Suggest parentheses to clarify precedence */
+      #pragma warn -use                 /* '%s' is declared but never used           */
    #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
       #pragma disable_message ( 136 )

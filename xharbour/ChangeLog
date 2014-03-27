@@ -9,6 +9,10 @@
 */
 
 
+2014-03-27 15:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * contrib/hbsqlit3/config.h
+    ! pacify BCC warning
+
 2014-02-28 13:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbsqlit3/*
     * sqlite3 update 3.7.15.2 -> 3.8.3.1
