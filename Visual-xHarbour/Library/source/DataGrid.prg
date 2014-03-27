@@ -105,7 +105,7 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY AnchorColumn                                                                            DEFAULT 0
    PROPERTY ConvertOem                                                                              DEFAULT .F.
 
-   PROPERTY GridColor            ROOT "Colors"
+   PROPERTY GridColor            ROOT "Colors"                                                      DEFAULT RGB(196,192,192)
    PROPERTY HighlightBorderColor ROOT "Colors"
    PROPERTY HighlightColor       ROOT "Colors"
    PROPERTY HighlightTextColor   ROOT "Colors"
@@ -125,9 +125,6 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY ShowGrid            SET ::InvalidateRect()                                              DEFAULT .T.
    PROPERTY Striping            SET ::InvalidateRect()                                              DEFAULT .F.
 
-   DATA HighlightSysColor       EXPORTED
-   DATA HighlightTextSysColor   EXPORTED
-   DATA GridSysColor            EXPORTED
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
    DATA RowCountVisible         EXPORTED
@@ -159,6 +156,10 @@ CLASS DataGrid INHERIT TitleControl
    ACCESS HitBottom             INLINE ::DataSource == NIL .OR. ::DataSource:eof()
 
    DATA __HoverBackColor        PROTECTED
+
+   DATA __SysGridColor          EXPORTED  INIT RGB(196,192,192)
+   DATA __SysHighlightColor     EXPORTED
+   DATA __SysHighlightTextColor EXPORTED
 
    DATA __HScrollUnits          PROTECTED INIT 15
    DATA __HorzScroll            PROTECTED INIT FALSE
@@ -324,22 +325,19 @@ METHOD Init( oParent ) CLASS DataGrid
    ::Super:Init( oParent )
    ::Width                   := 340
    ::Height                  := 240
-   ::StaticEdge   := .T.
-   IF ::__ClassInst != NIL
-      ::__ClassInst:xStaticEdge := .T.
-   ENDIF
 
    ::EmptyLeft               := 0
    ::__IsStandard            := .F.
    ::IsContainer             := .F.
-   ::GridSysColor            := RGB(196,192,192)
-   ::GridColor               := RGB(196,192,192)
-   ::__SysForeColor          := ::System:Colors:WindowText
+
    ::ForeColor               := ::System:Colors:WindowText
    ::HighlightColor          := ::System:Colors:Highlight
    ::HighlightTextColor      := ::System:Colors:HighlightText
-   ::HighlightSysColor       := ::System:Colors:Highlight
-   ::HighlightTextSysColor   := ::System:Colors:HighlightText
+
+   ::__SysForeColor          := ::System:Colors:WindowText
+   ::__SysHighlightColor     := ::System:Colors:Highlight
+   ::__SysHighlightTextColor := ::System:Colors:HighlightText
+
    ::__InactiveHighlight     := RGB(240,240,240)
    ::__lCreateAfterChildren  := .T.
    ::DeferRedraw             := FALSE
@@ -1901,7 +1899,7 @@ METHOD OnPaint() CLASS DataGrid
    LOCAL hDC := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::xWidth, ::xHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    lPaint := ::__DisplayData(,,,, hMemDC )
@@ -4296,6 +4294,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    LOCAL nTop, nImgX, nTxColor, nImage := ::xHeaderImageIndex, y := 0
    LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC, hBrush, aTxAlign, a, nOffset
    LOCAL nWImg
+
 
    IF hDC == NIL .AND. nLeft == NIL .AND. nRight == NIL
       RETURN ::Parent:__DisplayData( 1, ::xPosition, 1, ::xPosition,,, lPressed, lHot, .T. )

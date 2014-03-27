@@ -361,7 +361,7 @@ CLASS CoolBarBand INHERIT Control
    PROPERTY Grippers   SET ::SetGrippers(v)                DEFAULT .T.
    PROPERTY FixedSize  SET ::SetStyle( RBBS_FIXEDSIZE, v ) DEFAULT .F.
    PROPERTY Break      SET ::SetStyle( RBBS_BREAK, v )     DEFAULT .F.
-   PROPERTY BackColor  ROOT "Colors" SET ::ReflectColor   
+   PROPERTY BackColor  ROOT "Colors" SET ::ReflectColor(v)
 
    DATA oStruct        EXPORTED
    DATA Index          EXPORTED

@@ -51,7 +51,7 @@ CLASS ListBox FROM TitleControl
    PROPERTY Border            SET ::SetStyle( WS_BORDER, v )                      DEFAULT .F.
    PROPERTY ClientEdge        SET ::SetExStyle( WS_EX_CLIENTEDGE, v )             DEFAULT .T.
    PROPERTY OwnerDraw         SET ::SetDrawStyle(v)                               DEFAULT 1
-   PROPERTY ItemToolTips      SET ::__SetItemToolTips                             DEFAULT .F.
+   PROPERTY ItemToolTips      SET ::__SetItemToolTips(v)                          DEFAULT .F.
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()

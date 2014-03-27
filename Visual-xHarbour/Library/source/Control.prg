@@ -327,7 +327,7 @@ RETURN Self
 CLASS TitleControl INHERIT Control
 
    PROPERTY TitleHeight SET ::ResetFrame() DEFAULT 21
-   PROPERTY Text        SET ::ResetFrame() DEFAULT ""
+   PROPERTY Text        SET IIF( ::__ClassInst != NIL, ::ResetFrame(),) DEFAULT ""
    PROPERTY AllowUnDock                    DEFAULT FALSE
    PROPERTY AllowClose                     DEFAULT FALSE
    PROPERTY MenuArrow                      DEFAULT .F.
@@ -356,9 +356,7 @@ CLASS TitleControl INHERIT Control
    METHOD DrawClose()
    METHOD DrawPin()
    METHOD SetActive( l ) INLINE IIF( ::__lActive != l, ( ::__lActive := l, ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), ::UpdateWindow() ), )
-   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),;
-                              ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),;
-                              ::UpdateWindow()
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
 METHOD Create() CLASS TitleControl
@@ -375,15 +373,10 @@ METHOD Create() CLASS TitleControl
 RETURN Self
 
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS TitleControl
-   LOCAL nccs
    (nwParam)
    ::__nCaptionHeight := IIF( EMPTY( ::xText ), 0, ::xTitleHeight )
    IF ::__nCaptionHeight > 0
-      nccs := (struct NCCALCSIZE_PARAMS)
-      nccs:Pointer( nlParam )
-      nccs:rgrc[1]:Left += ::EmptyLeft
-      nccs:rgrc[1]:Top  += ::__nCaptionHeight
-      nccs:CopyTo( nlParam )
+      SET_CONTROL_NCCALCSIZE_PARAMS( nlParam, ::EmptyLeft, ::__nCaptionHeight )
    ENDIF
 RETURN NIL
 

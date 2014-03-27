@@ -3847,6 +3847,13 @@ HB_FUNC( SET_NCCALCSIZE_PARAMS )
    lpncsp->rgrc[0].right -= 1;
 }
 
+HB_FUNC( SET_CONTROL_NCCALCSIZE_PARAMS )
+{
+   NCCALCSIZE_PARAMS *lpncsp = (NCCALCSIZE_PARAMS*) hb_parnl(1);
+   lpncsp->rgrc[0].left  += hb_parni(2);
+   lpncsp->rgrc[0].top   += hb_parni(3);
+}
+
 HB_FUNC( SET_WINDOWPOS )
 {
    int x = hb_parni(2);

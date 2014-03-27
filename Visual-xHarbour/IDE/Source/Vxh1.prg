@@ -5141,7 +5141,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
           ENDIF
           IF cProp != "Parent"
              IF hOleVars == NIL
-                IF UPPER( cProp ) == "HEIGHT" .AND. oCtrl:__xCtrlName == "Expando"
+                IF UPPER( cProp ) == "HEIGHT" .AND. __ObjHasMsg( oCtrl, "__xCtrlName" ) .AND. oCtrl:__xCtrlName == "Expando"
                    xValue1 := oCtrl:__nHeight
                    DEFAULT xValue1 TO oCtrl:Height
                    xValue2 := 0
@@ -5618,12 +5618,12 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
             ENDIF
 
             IF ::Properties:UseDll
-               :SetDefines( "WIN;WIN32;__EXPORT__ ;__IMPORT__ ;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
+               :SetDefines( "WIN;WIN32;__EXPORT__ ;__IMPORT__ ;__VXHAPP__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
                IF ::Properties:GUI
                   :AddFiles( "vxhdll.lib" )
                ENDIF
              ELSEIF ::Properties:GUI
-               :SetDefines( "WIN;WIN32;__EXPORT__;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
+               :SetDefines( "WIN;WIN32;__EXPORT__;__VXHAPP__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
                view :defines
                :AddFiles( "vxh.lib" )
                :AddFiles( "Activex.lib" )

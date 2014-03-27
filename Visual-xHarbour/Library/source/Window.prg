@@ -2371,6 +2371,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDCASE
                  ::Animate( 1000, AW_HIDE | nAnimation )
               ENDIF
+              ::Application:DoEvents()
               EXIT
 
          CASE WM_INITMENU

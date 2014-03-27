@@ -39,7 +39,7 @@
            else ;;
               ACCESS <p>    INLINE ::x<p> ;;
            endif ;;
-           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
+           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] <bset>, ::x<p> := v, v
 
 #xcommand PROPERTY <p> [ROOT <r>] GET <bget> SET <bset> [DEFAULT <d>] [<prot: PROTECTED>] [HELP <h>] [<hid: NOTPUBLIC>] [MIN <m>] [MAX <x>] ;
            =>  ;
@@ -50,4 +50,4 @@
            else ;;
               ACCESS <p>    INLINE <bget> ;;
            endif ;;
-           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] Eval( {|Self,v|(Self,v), <bset>}, Self, @v ), ::x<p> := v, v
+           ASSIGN <p>(v) INLINE [v := MAX( <m>, v ),] [v := MIN( <x>, v ),] <bset>, ::x<p> := v, v
