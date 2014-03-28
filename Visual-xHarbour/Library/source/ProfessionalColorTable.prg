@@ -20,6 +20,8 @@ CLASS ProfessionalColorTable
    DATA MenuItemPressedGradientBegin         EXPORTED
    DATA MenuItemPressedGradientEnd           EXPORTED
    DATA MenuItemSelected                     EXPORTED
+   DATA MenuItemSelectedGradientBegin        EXPORTED
+   DATA MenuItemSelectedGradientEnd          EXPORTED
    DATA OverflowButtonGradientBegin          EXPORTED
    DATA OverflowButtonGradientEnd            EXPORTED
    DATA OverflowButtonGradientMiddle         EXPORTED
@@ -88,6 +90,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := RGB(245, 244, 242)
            ::MenuItemPressedGradientEnd             := RGB(234, 232, 228)
            ::MenuItemSelected                       := GetSysColor( COLOR_WINDOW )
+           ::MenuItemSelectedGradientBegin          := RGB(182, 189, 210)
+           ::MenuItemSelectedGradientEnd            := RGB(182, 189, 210)
+
            ::OverflowButtonGradientBegin            := RGB(225, 222, 217)
            ::OverflowButtonGradientEnd              := GetSysColor( COLOR_BTNSHADOW )
            ::OverflowButtonGradientMiddle           := RGB(216, 213, 206)
@@ -117,6 +122,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(251, 250, 246), RGB(227, 239, 255) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(246, 244, 236), RGB(123, 164, 224) )
            ::MenuItemSelected                       := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 238, 194) )
+           ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(193, 210, 238), RGB(255, 255, 222) )
+           ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(193, 210, 238), RGB(255, 203, 136) )
+
            ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(242, 240, 228), RGB(127, 177, 250) )
            ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(0, 53, 145) )
            ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(238, 235, 220), RGB(82, 127, 208) )
@@ -146,6 +154,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(251, 250, 246), RGB(237, 240, 214) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(246, 244, 236), RGB(181, 196, 143) )
            ::MenuItemSelected                       := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 238, 194) )
+           ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(223, 227, 212), RGB(255, 255, 222) )
+           ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(223, 227, 212), RGB(255, 203, 136) )
+
            ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(242, 240, 228), RGB(186, 204, 150) )
            ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(96, 119, 107) )
            ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(238, 235, 220), RGB(141, 160, 107) )
@@ -175,6 +186,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(248, 248, 249), RGB(232, 233, 242) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(240, 239, 241), RGB(172, 170, 194) )
            ::MenuItemSelected                       := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 238, 194) )
+           ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 255, 222) )
+           ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 203, 136) )
+
            ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(186, 185, 206) )
            ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(118, 116, 146) )
            ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(156, 155, 180) )
@@ -204,6 +218,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := IIF( ::UseSystemColors, RGB(250, 250, 251), RGB(252, 252, 252) )
            ::MenuItemPressedGradientEnd             := IIF( ::UseSystemColors, RGB(245, 244, 246), RGB(245, 244, 246) )
            ::MenuItemSelected                       := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(194, 207, 229) )
+           ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(194, 207, 229), RGB(194, 207, 229) )
+           ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(194, 207, 229), RGB(194, 207, 229) )
+
            ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(241, 240, 242), RGB(242, 242, 242) )
            ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(167, 166, 170) )
            ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(237, 235, 239), RGB(224, 224, 225) )
@@ -233,6 +250,9 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::MenuItemPressedGradientBegin           := RGB(252, 252, 252)
            ::MenuItemPressedGradientEnd             := RGB(250, 250, 250)
            ::MenuItemSelected                       := RGB(194, 224, 255)
+           ::MenuItemSelectedGradientBegin          := RGB(194, 224, 255)
+           ::MenuItemSelectedGradientEnd            := RGB(194, 224, 255)
+
            ::OverflowButtonGradientBegin            := RGB(247, 247, 247)
            ::OverflowButtonGradientEnd              := GetSysColor( COLOR_BTNSHADOW )
            ::OverflowButtonGradientMiddle           := GetSysColor( COLOR_BTNSHADOW ) //RGB(245, 245, 245)
@@ -263,6 +283,7 @@ METHOD Clean() CLASS ProfessionalColorTable
                                     "MenuItemSelected",;
                                     "MenuItemDisabledBorder",;
                                     "MenuItemDisabled",;
+                                    "MenuItemSelectedGradientEnd",;
                                     "MenuItemPressedGradientEnd",;
                                     "MenuItemBorder",;
                                     "MenuBorder",;
@@ -322,6 +343,10 @@ METHOD Load() CLASS FlatGrayColorTable
    ::MenuItemPressedGradientBegin           := RGB( 201, 224, 247 )
    ::MenuItemPressedGradientEnd             := RGB( 201, 224, 247 )
    ::MenuItemSelected                       := RGB( 209, 226, 242 )
+
+   ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 255, 222) )
+   ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 203, 136) )
+
    ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(186, 185, 206) )
    ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(118, 116, 146) )
    ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(156, 155, 180) )

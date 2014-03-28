@@ -32,6 +32,7 @@ CLASS Panel FROM TitleControl
    METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
 
    METHOD OnEraseBkGnd()
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

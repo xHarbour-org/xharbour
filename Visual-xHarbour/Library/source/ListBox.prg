@@ -49,7 +49,6 @@ CLASS ListBox FROM TitleControl
    PROPERTY DisableNoScroll   SET ::SetStyle( LBS_DISABLENOSCROLL, v )            DEFAULT .F.
    PROPERTY HasStrings        SET ::SetStyle( LBS_HASSTRINGS, v )                 DEFAULT .T.
    PROPERTY Border            SET ::SetStyle( WS_BORDER, v )                      DEFAULT .F.
-   PROPERTY ClientEdge        SET ::SetExStyle( WS_EX_CLIENTEDGE, v )             DEFAULT .T.
    PROPERTY OwnerDraw         SET ::SetDrawStyle(v)                               DEFAULT 1
    PROPERTY ItemToolTips      SET ::__SetItemToolTips(v)                          DEFAULT .F.
 
@@ -131,7 +130,34 @@ CLASS ListBox FROM TitleControl
    METHOD __HandleOnPaint()
    METHOD __HandleOnTimer()
    METHOD __TrackMouseEvent()
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
+
+METHOD Init( oParent ) CLASS ListBox
+   ::ClsName      := "ListBox"
+   DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::__xCtrlName TO "ListBox"
+   ::Border       := .T.
+   ::Super:Init( oParent )
+   ::Width        := 80
+   ::Height       := 80
+   ::DeferRedraw  := .F.
+   IF !EMPTY( ::Events )
+      AADD( ::Events[2][2], { "OnSelChange" , "", "" } )
+      AADD( ::Events[2][2], { "OnDblClk" , "", "" } )
+      AADD( ::Events[2][2], { "OnErrSpace" , "", "" } )
+      AADD( ::Events[2][2], { "OnLBNKillFocus" , "", "" } )
+      AADD( ::Events[2][2], { "OnLBNSetFocus" , "", "" } )
+   ENDIF
+RETURN Self
+
+METHOD Create() CLASS ListBox
+   ::Super:Create()
+   IF ::ItemToolTips
+      ::__SetItemToolTips( .T. )
+   ENDIF
+RETURN Self
+
 
 METHOD GetText( nItem ) CLASS ListBox
    LOCAL cBuffer := ""
@@ -374,38 +400,6 @@ METHOD SetHorizontalExtent( nWidth ) CLASS ListBox
 RETURN NIL
 
 //--------------------------------------------------------------------------------------------------------------
-
-METHOD Init( oParent ) CLASS ListBox
-   ::ClsName      := "ListBox"
-   DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ExStyle := WS_EX_CLIENTEDGE
-
-   DEFAULT ::__xCtrlName TO "ListBox"
-   ::Super:Init( oParent )
-   ::Width        := 80
-   ::Height       := 80
-   ::DeferRedraw  := .F.
-   IF !EMPTY( ::Events )
-      AADD( ::Events[2][2], { "OnSelChange" , "", "" } )
-      AADD( ::Events[2][2], { "OnDblClk" , "", "" } )
-      AADD( ::Events[2][2], { "OnErrSpace" , "", "" } )
-      AADD( ::Events[2][2], { "OnLBNKillFocus" , "", "" } )
-      AADD( ::Events[2][2], { "OnLBNSetFocus" , "", "" } )
-   ENDIF
-RETURN Self
-
-METHOD Create() CLASS ListBox
-   ::Super:Create()
-   IF !EMPTY( ::Caption )
-      IF ::Flat
-         ::ClientEdge := .F.
-      ENDIF
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
-   ENDIF
-   IF ::ItemToolTips
-      ::__SetItemToolTips( .T. )
-   ENDIF
-RETURN Self
 
 METHOD SetDrawStyle(n) CLASS ListBox
    SWITCH n

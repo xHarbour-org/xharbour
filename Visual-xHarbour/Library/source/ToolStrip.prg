@@ -1302,6 +1302,7 @@ RETURN NIL
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS ToolStrip
    IF ::Row == 0
       TOOLSTRIP_NCCALCSIZE_PARAMS( nlParam, nwParam )
+      RETURN 0
    ENDIF
 RETURN NIL
 
