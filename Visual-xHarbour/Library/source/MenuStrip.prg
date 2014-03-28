@@ -150,8 +150,8 @@ METHOD OnSize( nwParam, nlParam ) CLASS MenuStrip
    Super:OnSize( nwParam, nlParam )
    ::__PrevSize := LOWORD(nlParam)
    IF ::Row > 0 //.AND. ::__PrevRow == 0 
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-      AEVAL( ::Children, {|o| o:SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ) } )
+      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      //AEVAL( ::Children, {|o| o:SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ) } )
    ENDIF
 RETURN NIL
 

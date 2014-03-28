@@ -299,7 +299,7 @@ METHOD Create() CLASS EditBox
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
-   ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+   //::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    IF ::__ClassInst == NIL 
       IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:xBuddy)=="C" .AND. o:xBuddy == ::Name } ) ) > 0
          ::Parent:Children[n]:xBuddy := Self
@@ -335,7 +335,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __SetAutoScroll( nIndex, lSet ) CLASS EditBox
    ::SetStyle( nIndex, lSet )
-   ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+   //::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

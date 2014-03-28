@@ -303,7 +303,8 @@ METHOD SetPointSize( n ) CLASS Font
    ::Height := -MulDiv( n, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
    DeleteDC( hDC )
    ::xPointSize := n
-   IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
+   
+   IF ::__ClassInst != NIL .AND. ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
       ::Parent:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    ENDIF
 RETURN Self
