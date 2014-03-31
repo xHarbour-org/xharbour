@@ -269,8 +269,10 @@ METHOD SetFormat( nFormat ) CLASS DateTimePicker
 
       IF ::IsWindow()
          ::SetWindowLong( GWL_STYLE, ::Style )
-         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-         ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+         IF ::__ClassInst != NIL
+            ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+            ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+         ENDIF
       ENDIF
     ELSEIF ::xCustomFormat != NIL
       ::SendMessage( DTM_SETFORMAT, 0, ::xCustomFormat )

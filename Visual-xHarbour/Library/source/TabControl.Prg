@@ -388,7 +388,7 @@ METHOD SetItemText( n, cText, lBold ) CLASS TabControl
          tci:pszText := cText
          tci:cchTextMax := LEN( cText )
          SendMessage( ::hWnd, TCM_SETITEM, n-1, @tci )
-         SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+         //SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
          ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
       ENDIF
     catch
@@ -720,7 +720,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
               ENDIF
               ExecuteEvent( "OnTabChanged", Self )
               IF ::__xCtrlName == "TabStrip"
-                 ::Redraw()
+                 ::Invalidaterect()
               ENDIF
               RETURN 0
            ENDIF
@@ -1306,7 +1306,7 @@ METHOD Select() CLASS TabPage
       ::ShowTab()
    ENDIF
    ::Parent:SetCurSel( ::__GetPosition() )
-   ::Parent:Redraw()
+//   ::Parent:Redraw()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

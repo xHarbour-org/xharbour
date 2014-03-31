@@ -252,11 +252,13 @@ METHOD Create( hParent ) CLASS Dialog
    IF ::Modal
       IF ::Template == NIL
          ::Template := __GetTemplate( Self )
-         ::Result := DialogBoxIndirect( ::Instance, ::Template, hParent, ::__pCallBackPtr )
-         RETURN ::Result == IDOK
-       ELSE
-         RETURN ( ::Result := DialogBox( ::Instance, ::Template, hParent, ::__pCallBackPtr )) == IDOK
       ENDIF
+      ::Result := DialogBoxIndirect( ::Instance, ::Template, hParent, ::__pCallBackPtr )
+      IF ::__pCallBackPtr != NIL
+         FreeCallBackPointer( ::__pCallBackPtr )
+         ::__pCallBackPtr := NIL
+      ENDIF
+      RETURN ::Result == IDOK
    ELSE
       IF ::Template == NIL
          ::Template := __GetTemplate( Self )

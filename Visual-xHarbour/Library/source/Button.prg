@@ -62,7 +62,6 @@ CLASS Button INHERIT Control
    METHOD OnParentDrawItem()
    METHOD OnLButtonDblClk( nwParam, x, y ) INLINE ::SendMessage( WM_LBUTTONDOWN, nwParam, MAKELONG( x,y ) )
    METHOD DrawFrame()
-   METHOD OnDestroy()         INLINE ::CloseThemeData(), ::Super:OnDestroy()
    METHOD Click()             INLINE SetActiveWindow( ::Parent:hWnd ), ::SendMessage( BM_CLICK, 0, 0 )
    METHOD Push()              INLINE ::SendMessage( BM_SETSTATE, .T., 0 )
    METHOD Release()           INLINE ::SendMessage( BM_SETSTATE, .F., 0 )
@@ -89,8 +88,6 @@ METHOD Init( oParent ) CLASS Button
    ::Super:Init( oParent )
    ::Width     := 80
    ::Height    := 25
-   ::ThemeName := "button"
-   ::OpenThemeData()
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
@@ -280,7 +277,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
             nStyle := PBS_DEFAULTED
          ENDIF
 
-         DrawThemeBackground( ::hTheme, dis:hDC, BP_PUSHBUTTON, nStyle, aRect, aRect )
+         DrawThemeBackground( ::System:hButtonTheme, dis:hDC, BP_PUSHBUTTON, nStyle, aRect, aRect )
          _InFlateRect( @aRect, -2, -2 )
          IF ::BkBrush != NIL
             _FillRect( dis:hDC, aRect, ::BkBrush )

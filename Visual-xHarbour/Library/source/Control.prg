@@ -326,7 +326,7 @@ RETURN Self
 
 CLASS TitleControl INHERIT Control
 
-   PROPERTY TitleHeight SET ::ResetFrame() DEFAULT 21
+   PROPERTY TitleHeight SET IIF( ::__ClassInst != NIL, ::ResetFrame(),) DEFAULT 21
    PROPERTY Text        SET IIF( ::__ClassInst != NIL, ::ResetFrame(),) DEFAULT ""
    PROPERTY AllowUnDock                    DEFAULT FALSE
    PROPERTY AllowClose                     DEFAULT FALSE
@@ -394,7 +394,7 @@ METHOD OnNCMouseLeave() CLASS TitleControl
       ::__lClosePushed := .F.
       ::__lPinHover    := .F.
       ::__lPinPushed   := .F.
-      ::Redraw()
+      ::OnNCPaint()
       RETURN 0
    ENDIF
 RETURN NIL

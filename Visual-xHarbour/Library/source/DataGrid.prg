@@ -314,6 +314,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD CreateDragImage()
    METHOD GetRecordCount()
    METHOD DeselectAll()
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
 METHOD Init( oParent ) CLASS DataGrid
@@ -384,9 +385,6 @@ METHOD Create() CLASS DataGrid
 
    ::AutoUpdate := ::__nUpdtTimer
    ::__lCreated := .T.
-   IF !EMPTY( ::xText )
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
-   ENDIF
    ::__UpdateHScrollBar()
    ::__UpdateVScrollBar()
    ::__hPrevCursor := ::Cursor

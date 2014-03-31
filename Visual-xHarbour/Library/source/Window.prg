@@ -441,8 +441,8 @@ CLASS Window INHERIT Object
    METHOD BringWindowToTop()      INLINE BringWindowToTop( ::hWnd )
    METHOD ScreenToClient( pt )    INLINE ScreenToClient( ::hWnd, @pt )
    METHOD ClientToScreen( pt )    INLINE ClientToScreen( ::hWnd, @pt )
-   METHOD SetWindowPos( hAfter, x, y, w, h , n)             INLINE IIF( ::ClsName == "VXH_FORM_IDE", (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), SetWindowPos( ::hWnd, hAfter, x, y, w, h , n )
-   METHOD DeferWindowPos( hDef, hAfter, x, y, w, h , n)     INLINE IIF( ::ClsName == "VXH_FORM_IDE", (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), DeferWindowPos( hDef, ::hWnd, hAfter, x, y, w, h , n )
+   METHOD SetWindowPos( hAfter, x, y, w, h , n)             INLINE IIF( ::ClsName == "VXH_FORM_IDE" .AND. ::__ClassInst != NIL, (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), SetWindowPos( ::hWnd, hAfter, x, y, w, h, n )
+   METHOD DeferWindowPos( hDef, hAfter, x, y, w, h , n)     INLINE IIF( ::ClsName == "VXH_FORM_IDE" .AND. ::__ClassInst != NIL, (x:=10-::Parent:HorzScrollPos,y:=10-::Parent:VertScrollPos),), DeferWindowPos( hDef, ::hWnd, hAfter, x, y, w, h, n )
    METHOD SendMessage( nMsg, nwParam, nlParam )             INLINE SendMessage( ::hWnd, nMsg, nwParam, nlParam )
    METHOD SendDlgItemMessage( nId, nMsg, nwParam, nlParam ) INLINE SendDlgItemMessage( ::hWnd, nId, nMsg, nwParam, nlParam )
    METHOD PostMessage( nMsg, nwParam, nlParam )             INLINE _PostMessage( ::hWnd, nMsg, nwParam, nlParam )
@@ -1289,22 +1289,19 @@ RETURN DefWindowProc( hWnd, nMsg, nwParam, nlParam )
 
 //-------------------------------------------------------------------------------------------------
 METHOD __SubClass() CLASS Window
-   IF ::__lSubClass
-      IF ::__nProc != NIL
-         ::__UnSubClass()
-      ENDIF
+   IF ::__lSubClass .AND. ::__nProc == NIL .AND. ::__pCallBackPtr == NIL
       ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, ::__WndProc ), Self )
       ::__nProc := SetWindowLong( ::hWnd, GWL_WNDPROC, ::__pCallBackPtr )
-
-      //::__nProc := VXH_SubClass( ::hWnd, HB_ObjMsgPtr( Self, ::__WndProc ) )
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------
 METHOD __UnSubClass() CLASS Window
-   IF ::__lSubClass .AND. ::__nProc != NIL
+   IF ::__nProc != NIL
       SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
       ::__nProc := NIL
+   ENDIF
+   IF ::__pCallBackPtr != NIL
       FreeCallBackPointer( ::__pCallBackPtr )
       ::__pCallBackPtr := NIL
    ENDIF
@@ -1999,7 +1996,18 @@ METHOD EndPaint() CLASS Window
 RETURN NIL
 
 METHOD OnDestroy() CLASS Window
+RETURN NIL
+
+METHOD OnNCDestroy() CLASS Window
    LOCAL n, aComp
+   aComp := {}
+   FOR n := 1 TO LEN( ::Components )
+       IF ::Components[n]:Exists
+          AADD( aComp, ::Components[n] )
+       ENDIF
+   NEXT
+   AEVAL( aComp, {|o| o:Destroy(.F.) } )
+   ::Components := {}
    IF ::__ClassInst != NIL
       IF ::LeftSplitter != NIL
          ::LeftSplitter:Destroy()
@@ -2018,25 +2026,8 @@ METHOD OnDestroy() CLASS Window
          ::BottomSplitter := NIL
       ENDIF
    ENDIF
-   //::xHorzScroll := .F.
-   //::xVertScroll := .F.
-
-   aComp := {}
-   FOR n := 1 TO LEN( ::Components )
-       IF ::Components[n]:Exists
-          AADD( aComp, ::Components[n] )
-       ENDIF
-   NEXT
-   AEVAL( aComp, {|o| o:Destroy(.F.) } )
-   ::Components := {}
-
-   IF ::Drawing != NIL
-      ::Drawing:Destroy()
-   ENDIF
-
    IF ::HasMessage( "BackgroundImage" ) .AND. ::BackgroundImage != NIL
       ::BackgroundImage:Destroy()
-      ::BackgroundImage := NIL
    ENDif
    IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
@@ -2074,10 +2065,6 @@ METHOD OnDestroy() CLASS Window
          ENDIF
       ENDIF
    ENDIF
-
-RETURN NIL
-
-METHOD OnNCDestroy() CLASS Window
    IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
       ::Font:Delete()
       IF ::Font:FileName != NIL
@@ -2106,6 +2093,10 @@ METHOD OnNCDestroy() CLASS Window
       DeleteObject( ::SelBkBrush )
    ENDIF
 
+   IF ::Drawing != NIL
+      ::Drawing:Destroy()
+   ENDIF
+
    ObjFromHandle( ::hWnd, .T. )
    ::__UnSubClass()
 
@@ -2127,6 +2118,7 @@ METHOD OnNCDestroy() CLASS Window
    ::Children          := NIL
    ::Dock              := NIL
    ::Anchor            := NIL
+   
    ::__lInitialized    := .F.
 
    IF ::__ClassInst != NIL
@@ -2154,7 +2146,7 @@ METHOD OnNCDestroy() CLASS Window
    IF ::__TaskBarParent != NIL
       DestroyWindow( ::__TaskBarParent )
    ENDIF
-   hb_gcStep()
+   hb_gcAll()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -4819,7 +4811,6 @@ CLASS WinForm INHERIT Window
    METHOD SaveLayout()
    METHOD RestoreLayout()
    METHOD OnSize()
-   METHOD OnNCDestroy()         INLINE Super:OnNCDestroy(), hb_gcAll(.T.)
 
    ACCESS ActiveForm            INLINE ObjFromHandle( GetActiveWindow() )
 
@@ -4918,8 +4909,8 @@ METHOD Create( hoParent ) CLASS WinForm
       RETURN NIL
    ENDIF
 
-   ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( 0, IDI_WINLOGO ) ) )
-   ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( 0, IDI_WINLOGO ) ) )
+   ::SetIcon( ICON_SMALL, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( NIL, IDI_WINLOGO ) ) )
+   ::SetIcon( ICON_BIG, IIF( !EMPTY( ::__hIcon ), ::__hIcon, LoadIcon( NIL, IDI_WINLOGO ) ) )
    ::SetOpacity( ::xOpacity )
 
    IF ::BackgroundImage != NIL
@@ -4943,7 +4934,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    Super:OnSize( nwParam, nlParam )
    IF ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
-      ::InvalidateRect()
       ::RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
       RETURN 0
    ENDIF

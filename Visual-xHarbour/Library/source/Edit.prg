@@ -182,7 +182,7 @@ CLASS EditBox INHERIT Control
    METHOD OnKeyDown()
    METHOD OnGetDlgCode()
    METHOD OnKillFocus()
-   METHOD OnSetFocus()                 INLINE ::Redraw(), NIL
+   METHOD OnSetFocus()                 INLINE ::InvalidateRect(,.F.), NIL
    METHOD OnLButtonDown()
    METHOD OnChar()
    METHOD OnContextMenu()              INLINE IIF( ::MenuArrow, ( ::CallWindowProc(), 0 ), NIL )
@@ -285,7 +285,7 @@ METHOD __SetMenuArrow() CLASS EditBox
       ::xLayout := 1
    ENDIF
    IF ::IsWindow()
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+      //::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
       ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    ENDIF
 RETURN Self
@@ -433,7 +433,7 @@ METHOD OnKillFocus() CLASS EditBox
       aRect[4] += 3 + ::Parent:VertScrollPos
       _InvalidateRect( ::Parent:hWnd, aRect )
    ENDIF
-   ::Redraw()
+   ::InvalidateRect(,.F.)
    IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN}
       ::__ChkGridKeys( NIL, VK_RETURN, .F. )
    ENDIF
@@ -486,7 +486,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetLayout() CLASS EditBox
-   IF ::IsWindow()
+   IF ::IsWindow() .AND ::__ClassInst != NIL
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER )
    ENDIF
 RETURN Self
@@ -563,7 +563,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD __SetContextMenu() CLASS EditBox
-   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER )
+   //::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER )
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------

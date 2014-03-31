@@ -732,7 +732,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                ::xLeft := MAX( 2, nLeft )
                IF ::xLeft == 2
                   ::MoveWindow()
-                  ::Redraw()
+                  //::Redraw()
                   RETURN 0
                ENDIF
                IF ::xLeft + ::xWidth > ::Parent:ClientWidth - 2

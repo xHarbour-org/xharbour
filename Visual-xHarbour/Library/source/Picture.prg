@@ -151,9 +151,6 @@ METHOD Create() CLASS PictureBox
       ::OriginalRect[4] := aSize[2]
       ::__SetScrollBars()
    ENDIF
-   IF !EMPTY( ::Caption )
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-   ENDIF
    ::InvalidateRect()
 RETURN Self
 

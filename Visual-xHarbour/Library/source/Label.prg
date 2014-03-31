@@ -64,6 +64,7 @@ CLASS Label INHERIT Control
    METHOD OnLButtonUp()
    METHOD OnTimer()
    METHOD SetForeColor()
+   METHOD Redraw() INLINE IIF( ::IsWindow(), ::InvalidateRect(,.F.),)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -172,10 +173,10 @@ METHOD OnPaint() CLASS Label
    _FillRect( hDC, aRect, hBkGnd )
 
    IF VALTYPE( ::Border ) == "L"
-      ::Border := -1
+      ::xBorder := -1
    ENDIF
-   IF ::Border <> 0
-      IF ::Border == -1
+   IF ::xBorder <> 0
+      IF ::xBorder == -1
          hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
          hBrush  := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
          Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
@@ -183,7 +184,7 @@ METHOD OnPaint() CLASS Label
          DeleteObject( SelectObject( hDC, hOldPen ) )
 
        ELSE
-         _DrawEdge( hDC, aRect, ::Border, BF_RECT )
+         _DrawEdge( hDC, aRect, ::xBorder, BF_RECT )
       ENDIF
       aRect := {1,1,::xWidth-1,::xHeight-1}
    ENDIF
