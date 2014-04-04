@@ -115,7 +115,7 @@ static const char * hb_tokenGet( const char * szLine, HB_SIZE nLen,
       {
          if( --nToken == 0 )
          {
-            if ( ul > nStart )
+            if ( ul >= nStart )
             {
                *pnLen = ul - nStart;
                return szLine + nStart;
