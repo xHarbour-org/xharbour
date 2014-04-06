@@ -5287,7 +5287,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       // oracle datetime
       Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
          cSql := cSql + 'TIMESTAMP '   
-      CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )  .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+      CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  ) // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
          cSql := cSql + 'DATETIME NULL '   
       CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
          cSql := cSql + 'DATETIME '   

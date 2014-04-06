@@ -29,6 +29,8 @@
 
 #define MYSQL_OK     0
 
+#define CLIENT_ALL_FLAGS        (CLIENT_COMPRESS | CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
+#define CLIENT_ALL_FLAGS2        (CLIENT_MULTI_RESULTS | CLIENT_MULTI_STATEMENTS)
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 static int iConnectionCount = 0;
@@ -53,6 +55,7 @@ HB_FUNC( MYSCONNECT )
    const char *szDb = hb_parc(4);
    UINT uiPort    = ISNUM(5) ? hb_parnl(5) : MYSQL_PORT ;
    UINT uiTimeout = ISNUM(7) ? hb_parnl(7) : 3600 ;
+   BOOL lCompress = ISLOG(8) ?  hb_parl(8) : 0 ;
    mysql_library_init(0,NULL,NULL);
    memset( session, 0, sizeof( MYSQL_SESSION ) );
 
@@ -63,7 +66,10 @@ HB_FUNC( MYSCONNECT )
    {
 	  iConnectionCount ++ ; 
       mysql_options( session->dbh, MYSQL_OPT_CONNECT_TIMEOUT, (const char *) &uiTimeout );
-      mysql_real_connect( session->dbh, szHost, szUser, szPass, szDb, uiPort, NULL, 0 );
+      if (lCompress)
+         mysql_real_connect( session->dbh, szHost, szUser, szPass, szDb, uiPort, NULL, CLIENT_ALL_FLAGS );
+      else
+         mysql_real_connect( session->dbh, szHost, szUser, szPass, szDb, uiPort, NULL, CLIENT_ALL_FLAGS2 );
       hb_retptr( (void *) session );
    }
    else

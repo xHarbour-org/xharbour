@@ -262,7 +262,7 @@ void setResultSetLimit( SQLEXAREAP thiswa, int iRows );
 void SetIndexBindStructure( SQLEXAREAP thiswa );
 void SetInsertRecordStructure( SQLEXAREAP thiswa );
 ULONG GetCurrentRecordNum( SQLEXAREAP thiswa );
-
+extern void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate,USHORT ui  );
 /* INSERT and UPDATE prototypes */
 
 void CreateInsertStmt( SQLEXAREAP thiswa );

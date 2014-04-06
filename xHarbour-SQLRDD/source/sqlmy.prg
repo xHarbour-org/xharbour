@@ -198,7 +198,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    (lCounter)
    (lAutoCommit)
 
-   hDbc := MYSConnect( ::cHost,::cUser,::cPassWord,::cDtb,::cPort,::cDtb, nTimeout )
+   hDbc := MYSConnect( ::cHost,::cUser,::cPassWord,::cDtb,::cPort,::cDtb, nTimeout,::lCompress )
    nRet := MYSStatus( hDbc )
 
    if nRet != SQL_SUCCESS .and. nRet != SQL_SUCCESS_WITH_INFO

@@ -58,6 +58,7 @@ CLASS SR_CONNECTION
    DATA lCounter        AS LOGICAL INIT .F.
    DATA lLogDateTime    AS LOGICAL INIT .F.
    DATA lCluster        AS LOGICAL INIT .F.
+   DATA lCompress       AS LOGICAL INIT .F. // to enable mysql compression
 
 //   DATA nParallel
 //   DATA cLastLine
@@ -692,7 +693,7 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
          ::lSqlServer2008 := .T.
       ENDIF   
 
-   Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "7.0" $ ::cSystemVers .or. "8.0" $ ::cSystemVers .or. "9.0" $ ::cSystemVers .or. "10.00" $ ::cSystemVers .or. "10.50" $ ::cSystemVers   )) //.or. ( "SQL SERVER" $ cTargetDB .and. !("SYBASE" $ cTargetDB))
+   Case ("MICROSOFT" $ cTargetDB .and. "SQL" $ cTargetDB .and. "SERVER" $ cTargetDB .and.( "7.0" $ ::cSystemVers .or. "8.0" $ ::cSystemVers .or. "9.0" $ ::cSystemVers .or. "10.00" $ ::cSystemVers .or. "10.50" $ ::cSystemVers  .or. "11.00" $ ::cSystemVers   )) //.or. ( "SQL SERVER" $ cTargetDB .and. !("SYBASE" $ cTargetDB))
       ::nSystemID := SYSTEMID_MSSQL7
       aVers := hb_atokens( ::cSystemVers , '.' ) 
       IF val(aVers[1]) >= 8
@@ -1046,6 +1047,8 @@ METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
             ::sslrootcert := aToken[2]
          CASE cBuff == "SSLCRL"      
             ::sslcrl    := aToken[2]   
+         case cBuff == "COMPRESS"
+            ::lCompress := Upper( aToken[2] ) $ "Y,S,TRUE"
 //         OtherWise
 //            SR_MsgLogFile( "Invalid connection string entry : " + cBuff + " = " + SR_Val2Char(aToken[2]) )
          EndCase

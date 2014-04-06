@@ -9,6 +9,25 @@
 */
 
 
+2013-04-06 10:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/mysql.c
+    ! added 8th parameter to MYSCONNECT to inform to use compression or not in mysql connection togheter with client_multi_result flags for stored procedure execution
+  * source/sqlconnection.prg
+    ! added lcompress member to class
+    ! on connect method, check for "COMPRESS" keyword to enable compression under mysql    
+  * source/sqlex.h
+    ! added prototype for  odbcGetData function
+  * source/sqlmy.prg
+    ! Changed ConnectRaw to pass lcompress parameter to MYSCONNECT function
+  * source/sqlrdd2.prg
+    ! minor change to detect timestamp field under sqlserver
+  * source/sqlsrodbc.c
+    ! added odbcGetData function
+    ! Added some casts
+    ! add data retrive changed to new function odbcGetData, so we can reduce memory consume since if not allocated an char buffer to retrive data
+  * source/sqlex1.c
+    ! add data retrive changed to new function odbcGetData, so we can reduce memory consume since if not allocated an char buffer to retrive data
+    
 2014-03-17 09:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/sqlex.h
     * COLUMN_BLOCK_SIZE decrease  32k to 64 bytes

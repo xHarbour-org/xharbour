@@ -459,86 +459,12 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
    }
    }
 
-      /*
-
-    lLenOut        = 0;
-                   if( SQL_SUCCEEDED( res = SQLGetData( thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR,  buffer, 0, &lLenOut  ) ) )
-               {
-                  if( lLenOut >= 0 )
-                  {
-                     SQLPOINTER * val = ( SQLPOINTER * ) hb_xgrab( lLenOut + sizeof( char ) );
-                     if( SQL_SUCCEEDED( res = SQLGetData(  thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR, val, lLenOut + sizeof( char ), &lLenOut ) ) )
-                     {
-#if defined( UNICODE )
-                        lLenOut  /= 2;
-#endif
-      //                  pItem = O_HB_ITEMPUTSTRLEN( NULL, ( O_HB_CHAR * ) val, ( HB_SIZE ) iLen );
-                        odbcFieldGet( hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) val, lLenOut, 0,thiswa->nSystemID, FALSE );
-                     }
-                     hb_xfree( val );
-                  }
-               }
-               */
-	        bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 ); 
-	        lLen    = COLUMN_BLOCK_SIZE;
-	        memset( bBuffer, 0, COLUMN_BLOCK_SIZE ) ; 
-            bOut       = NULL;
-            lInitBuff  = lLen;
-            lLenOut    = 0;
-            iReallocs  = 0;               
             lType = ( LONG ) hb_arrayGetNL(thiswa->colStmt[lFieldPosDB - 1], FIELD_DOMAIN );
-            
-             switch (lType )
-             {
-                case SQL_CHAR:
-                case SQL_VARCHAR:
-                case SQL_NVARCHAR:
-                case SQL_WCHAR:
-                case SQL_GUID:
-                case SQL_LONGVARCHAR:
-                case SQL_WLONGVARCHAR:
-                case SQL_DB2_CLOB:
-                case SQL_FAKE_LOB:
-                case SQL_LONGVARBINARY:            
-                {
-	              char buffer[2];
-                  lLenOut        = 0;
-                  res = SQLGetData( ( HSTMT )thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR  ,  buffer, 0, &lLenOut  );                      
-                  
-                  if( SQL_SUCCEEDED( res   ) )
-                  {
-                     
-                       if( lLenOut == SQL_NULL_DATA )
-	                   {
-		                  odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) buffer, 0,  0, thiswa->nSystemID, FALSE );                                        
-	                   }
-                       else if( lLenOut >= 0 )
-                       {
-                          char * val = ( char * ) hb_xgrab( lLenOut+sizeof( char )   );
-                          if( SQL_SUCCEEDED( res = SQLGetData(  thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR, val, lLenOut+sizeof(char) , &lLenOut ) ) )
-                          {
-                    
-                             odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) val, lLenOut, 0, thiswa->nSystemID, FALSE  );
-                                       
-           	           }
-    	                  hb_xfree( val );
-                        }
-                  }
-                  break;
-               }
-               default:
-               {
-	              res    = SQLGetData( ( HSTMT )thiswa->colStmt[lFieldPosDB - 1], 1, SQL_CHAR, ( PTR ) bBuffer, lLen, &lLenOut );
-                  if( res == SQL_SUCCESS && iReallocs == 0 )
-                  {
-                     odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, FALSE );             
-                  }
-	           }
-            }  
-
+   odbcGetData( ( HSTMT ) ( HSTMT )thiswa->colStmt[lFieldPosDB - 1],hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ),pFieldData,  0,  thiswa->nSystemID, FALSE, 1 );
+//   odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, FALSE );             
 
    SQLFreeStmt( thiswa->colStmt[lFieldPosDB - 1], SQL_CLOSE );
-   hb_xfree( bBuffer );
+
    return HB_SUCCESS;
 }
 
@@ -2296,60 +2222,12 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
          {
 	        LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
             ++iIndex;
-
-             switch (lType )
-             {
-                case SQL_CHAR:
-                case SQL_VARCHAR:
-                case SQL_NVARCHAR:
-                case SQL_WCHAR:
-                case SQL_GUID:
-                case SQL_LONGVARCHAR:
-                case SQL_WLONGVARCHAR:
-                case SQL_DB2_CLOB:
-                case SQL_FAKE_LOB:
-                case SQL_LONGVARBINARY:            
-                {
-	              char buffer[2];
-                  lLenOut        = 0;
-                  res = SQLGetData( ( HSTMT )thiswa->hStmtBuffer, iIndex, SQL_CHAR  ,  buffer, 0, &lLenOut  );                      
-                  
-                  if( SQL_SUCCEEDED( res   ) )
-                  {
-                     
-                       if( lLenOut == SQL_NULL_DATA )
-	                   {
-		                  odbcFieldGet(  hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) buffer, 0,  0, thiswa->nSystemID, bTranslate );         
-		                  hb_arraySetForward( aRecord, i, temp );                               
-	                   }
-                       else if( lLenOut >= 0 )
-                       {
-                          char * val = ( char * ) hb_xgrab( lLenOut+sizeof( char )   );
-                          if( SQL_SUCCEEDED( res = SQLGetData(  thiswa->hStmtBuffer, iIndex, SQL_CHAR, val, lLenOut+sizeof(char) , &lLenOut ) ) )
-                          {
-                    
-                             odbcFieldGet( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) val, lLenOut, 0, thiswa->nSystemID, bTranslate  );
+	        odbcGetData( ( HSTMT )thiswa->hStmtBuffer,hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ),temp,  0,  thiswa->nSystemID, bTranslate,iIndex  );
                            hb_arraySetForward( aRecord, i, temp );
                           
            	           }
-    	                  hb_xfree( val );
-                        }
-                  }
-                  break;
-               }
-               default:
-               {
-	              res    = SQLGetData( ( HSTMT )thiswa->hStmtBuffer, iIndex, SQL_CHAR, ( PTR ) bBuffer, lLen, &lLenOut );
-                  if( res == SQL_SUCCESS && iReallocs == 0 )
-                  {
-                     odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, bTranslate );
-                    hb_arraySetForward( aRecord, i, temp );                 
-                  }
-	           }
-            }  
-         }
          hb_itemRelease( temp );
-         hb_xfree( ( PTR ) bBuffer );   
+         
       }
 
       // Add new array to Buffer Pool
@@ -2370,7 +2248,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
    hb_itemRelease( pKey );
    
    SQLFreeStmt( thiswa->hStmtBuffer, SQL_CLOSE );
-//   thiswa->hStmtBuffer =NULL;
+
 
    if( res == SQL_NO_DATA_FOUND && iRow == 1 )
    {
@@ -2984,14 +2862,14 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
       
       for( i=1; i <= thiswa->area.uiFieldCount; i++ )
       { 
-         bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 );
   //       bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 );
-         lLen    = COLUMN_BLOCK_SIZE;
-         memset( bBuffer, 0, lLen ) ;
-         bOut       = NULL;
-         lInitBuff  = lLen;
-         lLenOut    = 0;
-         iReallocs  = 0;
+//   //       bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 );
+//          lLen    = COLUMN_BLOCK_SIZE;
+//          memset( bBuffer, 0, lLen ) ;
+//          bOut       = NULL;
+//          lInitBuff  = lLen;
+//          lLenOut    = 0;
+//          iReallocs  = 0;
          
          temp=hb_itemNew(NULL) ;
          //temp.type = HB_IT_NIL;        // I know this is not a good practice, but we save tons of allocs.
@@ -3006,61 +2884,12 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
          {
      	    LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
             ++iIndex;
-
-             switch (lType )
-             {
-                case SQL_CHAR:
-                case SQL_VARCHAR:
-                case SQL_NVARCHAR:
-                case SQL_WCHAR:
-                case SQL_GUID:
-                case SQL_LONGVARCHAR:
-                case SQL_WLONGVARCHAR:
-                case SQL_DB2_CLOB:
-                case SQL_FAKE_LOB:
-                case SQL_LONGVARBINARY:            
-                {
-	              char buffer[2];
-                  lLenOut        = 0;
-                  res = SQLGetData(  hStmt, iIndex, SQL_CHAR  ,  buffer, 0, &lLenOut  );                      
-                  
-                  if( SQL_SUCCEEDED( res   ) )
-                  {
-                       if( lLenOut == SQL_NULL_DATA )
-	                   {
-		                  odbcFieldGet(  hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) buffer, 0,  0, thiswa->nSystemID, bTranslate );         
-		                  hb_arraySetForward( aRecord, i, temp );                               
-	                   }
-                       else if( lLenOut >= 0 )
-                       {
-                          char * val = ( char * ) hb_xgrab( lLenOut+sizeof( char )   );
-                          if( SQL_SUCCEEDED( res = SQLGetData( hStmt, iIndex, SQL_CHAR, val, lLenOut+sizeof(char) , &lLenOut ) ) )
-                          {
-                    
-                             odbcFieldGet( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) val, lLenOut, 0, thiswa->nSystemID, bTranslate  );
-                           hb_arraySetForward( aRecord, i, temp );
-                          
-           	           }
-    	                  hb_xfree( val );
-                        }
-                  }
-                  break;
-               }
-               default:
-               {
-	              res    = SQLGetData( ( HSTMT )hStmt, iIndex, SQL_CHAR, ( PTR ) bBuffer, lLen, &lLenOut );
-                  if( res == SQL_SUCCESS && iReallocs == 0 )
-                  {
-                     odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), temp, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, bTranslate );
+	        odbcGetData( ( HSTMT )hStmt,hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ),temp,  0,  thiswa->nSystemID, bTranslate,iIndex  );
                     hb_arraySetForward( aRecord, i, temp );                 
-                  }
-	           }
-            }
-               
                
          }
          hb_itemRelease( temp );
-         hb_xfree( ( PTR ) bBuffer );
+         
       }
       
 
