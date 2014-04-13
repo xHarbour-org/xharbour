@@ -195,12 +195,12 @@ METHOD Open( cUrl ) CLASS TIPClientFTP
       ENDIF
    ENDIF
    IF lRet
-      WHILE .T.
-         ::GetReply()
-         IF ::cReply == NIL
-            EXIT
-         ENDIF
-      ENDDO
+//      WHILE .T.
+//         ::GetReply()
+//         IF ::cReply == NIL
+//            EXIT
+//         ENDIF
+//      ENDDO
       RETURN lRet
    ENDIF
 

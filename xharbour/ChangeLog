@@ -9,6 +9,10 @@
 */
 
 
+2014-04-14 19:25 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/ftpcln.prg
+    ! commented out extra loop in Open() method
+
 2014-04-04 23:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/hbtoken.c
     ! fixed hb_tokenGet() when szLine is empty
