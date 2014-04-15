@@ -38,7 +38,7 @@ CLASS SR_MYSQL FROM SR_CONNECTION
    METHOD MoreResults( aArray, lTranslate )
    METHOD Getline( aFields, lTranslate, aArray )
    METHOD KillConnectionID( nID ) INLINE MYSKILLCONNID( ::hDbc, nID )
-
+   METHOD GetAffectedRows()
 ENDCLASS
 
 /*------------------------------------------------------------------------*/
@@ -269,3 +269,6 @@ METHOD ExecuteRaw( cCommand ) CLASS SR_MYSQL
 Return MYSResultStatus( ::hDbc )
 
 /*------------------------------------------------------------------------*/
+
+METHOD GetAffectedRows() CLASS SR_MYSQL
+return MYSAFFECTEDROWS( ::hDbc )

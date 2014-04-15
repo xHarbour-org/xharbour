@@ -41,6 +41,7 @@ typedef struct _MYSQL_SESSION
    int ifetch;                   // Fetch position in result set
    MYSQL * dbh;                  // Connection handler
    MYSQL_RES * stmt;             // Current statement handler
+   ULONGLONG ulAffected_rows;    // Number of affected rows
 } MYSQL_SESSION;
 
 typedef MYSQL_SESSION * PMYSQL_SESSION;
@@ -128,10 +129,11 @@ HB_FUNC( MYSEXEC )
 
    assert( session != NULL );
    assert( session->dbh != NULL );
-
+   session->ulAffected_rows = 0;
    //mysql_query( session->dbh, szQuery );
    mysql_real_query( session->dbh, szQuery, hb_parclen( 2 ) );
    session->stmt = mysql_store_result( session->dbh );
+   session->ulAffected_rows = mysql_affected_rows(session->dbh) ;
    if ( session->stmt )
    {
 	   session->numcols = mysql_num_fields( session->stmt );
@@ -861,3 +863,16 @@ HB_FUNC( MYSTABLEATTR )
    session->stmt = NULL;
 }
 
+
+
+HB_FUNC( MYSAFFECTEDROWS )
+{
+   PMYSQL_SESSION session  = ( PMYSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   if( session )
+   {
+      hb_retni( session->ulAffected_rows) ;
+      return;
+   }   
+   hb_retni( 0) ;
+}
+//-----------------------------------------------------------------------------//

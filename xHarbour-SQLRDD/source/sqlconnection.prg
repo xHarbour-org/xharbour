@@ -157,6 +157,7 @@ CLASS SR_CONNECTION
    METHOD KillConnectionID( nID ) VIRTUAL
    METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  ) VIRTUAL
    METHOD ExecSP( cComm, aReturn, nParam ) VIRTUAL
+   METHOD GetAffectedRows() Virtual
 
    
 ENDCLASS

@@ -33,6 +33,7 @@ CLASS SR_PGS FROM SR_CONNECTION
    METHOD FieldGet( nField, aFields, lTranslate )
    METHOD MoreResults( aArray, lTranslate )
    METHOD Getline( aFields, lTranslate, aArray )
+   METHOD GetAffectedRows()
 
 ENDCLASS
 
@@ -324,6 +325,9 @@ METHOD AllocStatement() CLASS SR_PGS
    EndIf
 
 return SQL_SUCCESS
+
+METHOD GetAffectedRows()
+return PGSAFFECTEDROWS( ::hDbc )
 
 /*------------------------------------------------------------------------*/
 

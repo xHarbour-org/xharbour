@@ -46,7 +46,7 @@ CLASS SR_ORACLE FROM SR_CONNECTION
    METHOD Getline( aFields, lTranslate, aArray )
    METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  ) 
    METHOD ExecSP( cComm, aReturn, nParam )
-   
+   METHOD GetAffectedRows()   
    
 ENDCLASS
 
@@ -701,3 +701,6 @@ function  ExecuteSP( cComm, aReturn  )
    CLOSECURSOR( oConn:hDbc )
     
 Return nError
+
+METHOD GetAffectedRows()   CLASS SR_ORACLE
+return GETAFFECTROWS(::hdbc ) 

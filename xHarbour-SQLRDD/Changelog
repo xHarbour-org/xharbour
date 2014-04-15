@@ -9,7 +9,19 @@
 */
 
 
-2013-04-06 10:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+204-04-14 23:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlconnection.prg
+    source/sqlpgs.prg
+    source/sqlmy.prg
+    source/sqloracle.prg
+    ! Added GetAffectedRows() method to return the number of rows affected by commands
+  * source/pgs.c
+    ! added PGSAFFECTEDROWS function 
+  * source/mysql.c
+    ! added MYSAFFECTEDROWS function
+  
+
+2014-04-06 10:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/mysql.c
     ! added 8th parameter to MYSCONNECT to inform to use compression or not in mysql connection togheter with client_multi_result flags for stored procedure execution
   * source/sqlconnection.prg

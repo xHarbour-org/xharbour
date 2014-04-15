@@ -25,6 +25,7 @@ typedef struct _PSQL_SESSION
    int ifetch;                   // Fetch position in result set
    PGconn * dbh;                 // Connection handler
    PGresult * stmt;              // Current statement handler
+   int iAffectedRows;            // Number of affected rows by command
 } PSQL_SESSION;
 
 // culik 11/9/2010 variavel para setar o comportamento do postgresql
@@ -45,7 +46,7 @@ HB_FUNC( PGSCONNECT )   /* PGSConnect( ConnectionString ) => ConnHandle */
    const char *szConn = hb_parc(1);
 
    memset( session, 0, sizeof( PSQL_SESSION ) );
-
+   session->iAffectedRows = 0;
    session->dbh = PQconnectdb( szConn );
    session->ifetch = -2;
    /* Setup Postgres Notice Processor */
@@ -120,12 +121,25 @@ HB_FUNC( PGSEXEC )      /* PGSExec( ConnHandle, cCommand ) => ResultSet */
 {
    /* TraceLog( NULL, "PGSExec : %s\n", hb_parc(2) ); */
    PPSQL_SESSION session  = ( PPSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   int ret;
    assert( session->dbh  != NULL );
 
    session->stmt = PQexec( session->dbh, hb_parc(2));
    hb_retptr( (void *) session->stmt );
+   
    session->ifetch  = -1;
    session->numcols = PQnfields( session->stmt );
+   ret = (int) PQresultStatus( session->stmt );
+
+   switch (ret)
+   {
+   case PGRES_COMMAND_OK:
+      session->iAffectedRows =(int) atoi(PQcmdTuples( session->stmt ));
+   break;
+   default :
+   session->iAffectedRows =0;
+   }
+    
 }
 
 HB_FUNC( PGSFETCH )     /* PGSFetch( ResultSet ) => nStatus */
@@ -136,7 +150,7 @@ HB_FUNC( PGSFETCH )     /* PGSFetch( ResultSet ) => nStatus */
    assert( session->stmt != NULL );
 
    iTpl = PQresultStatus( session->stmt );
-
+   session->iAffectedRows = 0;
    if (iTpl != PGRES_TUPLES_OK)
    {
       hb_retni( SQL_INVALID_HANDLE );
@@ -149,10 +163,12 @@ HB_FUNC( PGSFETCH )     /* PGSFetch( ResultSet ) => nStatus */
          iTpl = PQntuples( session->stmt )-1;
          if (session->ifetch > iTpl)
          {
+	        
             hb_retni( SQL_NO_DATA_FOUND );
          }
          else
          {
+            session->iAffectedRows =(int) iTpl;	         
             hb_retni( SQL_SUCCESS );
          }
       }
@@ -898,4 +914,15 @@ HB_FUNC( PGSLINEPROCESSED )
    }
 }
 
+
+HB_FUNC( PGSAFFECTEDROWS )
+{
+   PPSQL_SESSION session  = ( PPSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   if( session )
+   {
+      hb_retni( session->iAffectedRows) ;
+      return;
+   }   
+   hb_retni( 0) ;
+}
 //-----------------------------------------------------------------------------//
