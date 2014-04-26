@@ -9,6 +9,13 @@
 */
 
 
+2014-04-26 22:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/ftpcln.prg
+    ! commented out four calls to Cwd() method
+    ! add a call to Cwd() in Open() method on successful login
+  * source/tip/url.prg
+    ! empty cPath is now left empty
+
 2014-04-15 12:12 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/ftpcln.prg
     ! fixed Cwd() method, it now sets oUrl:cPath on success

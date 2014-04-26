@@ -195,6 +195,14 @@ METHOD Open( cUrl ) CLASS TIPClientFTP
       ENDIF
    ENDIF
    IF lRet
+      IF ! Empty( ::oUrl:cPath )
+
+         IF ! ::Cwd( ::oUrl:cPath )
+            RETURN .F.
+         ENDIF
+
+      ENDIF
+
 //      WHILE .T.
 //         ::GetReply()
 //         IF ::cReply == NIL
@@ -536,7 +544,7 @@ METHOD READ( nLen ) CLASS TIPClientFTP
    LOCAL cRet
 
    IF ! ::bInitialized
-
+/*
       IF ! Empty( ::oUrl:cPath )
 
          IF ! ::Cwd( ::oUrl:cPath )
@@ -547,7 +555,7 @@ METHOD READ( nLen ) CLASS TIPClientFTP
          ENDIF
 
       ENDIF
-
+*/
       IF Empty( ::oUrl:cFile )
 
          RETURN ::List()
@@ -590,7 +598,7 @@ METHOD Write( cData, nLen ) CLASS TIPClientFTP
          RETURN - 1
 
       ENDIF
-
+/*
       IF ! Empty( ::oUrl:cPath )
 
          IF ! ::Cwd( ::oUrl:cPath )
@@ -598,7 +606,7 @@ METHOD Write( cData, nLen ) CLASS TIPClientFTP
          ENDIF
 
       ENDIF
-
+*/
       IF ! ::Stor( ::oUrl:cFile )
          RETURN - 1
       ENDIF
@@ -698,7 +706,7 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS TIPClientFTP
       IF Empty( ::oUrl:cFile )
          RETURN .F.
       ENDIF
-
+/*
       IF ! Empty( ::oUrl:cPath )
 
          IF ! ::Cwd( ::oUrl:cPath )
@@ -706,7 +714,7 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS TIPClientFTP
          ENDIF
 
       ENDIF
-
+*/
       IF ! ::bUsePasv .AND. ! ::Port()
          RETURN .F.
       ENDIF
@@ -774,12 +782,12 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS TIPClientFTP
    ::oUrl:cFile := cRemoteFile
 
    IF ! ::bInitialized
-
+/*
       IF ! Empty( ::oUrl:cPath ) .AND. ! ::Cwd( ::oUrl:cPath )
          ::bEof := .T.    // no data for this transaction
          RETURN .F.
       ENDIF
-
+*/
       IF ! ::bUsePasv .AND. ! ::Port()
          RETURN .F.
       ENDIF
