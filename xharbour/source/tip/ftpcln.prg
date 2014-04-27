@@ -303,17 +303,9 @@ METHOD Rest( nPos ) CLASS TIPClientFTP
 
 METHOD Cwd( cPath ) CLASS TIPClientFTP
 
-   LOCAL lReply
-
    ::InetSendAll( ::SocketCon, "CWD " + cPath + ::cCRLF )
 
-   lReply = ::GetReply()
-
-   IF lReply
-      ::oUrl:cPath = cPath
-   ENDIF
-
-   RETURN lReply
+   RETURN ::GetReply()
 
 METHOD CDUP() CLASS TIPClientFTP
 
