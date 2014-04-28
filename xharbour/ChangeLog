@@ -9,6 +9,12 @@
 */
 
 
+2014-04-28 17:32 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/url.prg
+    ! reverted the following change:
+
+      ! empty cPath is now left empty
+
 2014-04-27 22:25 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/ftpcln.prg
     ! reverted the following change:

@@ -172,7 +172,7 @@ METHOD BuildAddress() CLASS tURL
       ENDIF
    ENDIF
 
-   IF Len( ::cPath ) > 0 .AND. ::cPath[-1] != "/"
+   IF Len( ::cPath ) = 0 .OR. ::cPath[-1] != "/"
       ::cPath += "/"
    ENDIF
 
@@ -193,7 +193,7 @@ METHOD BuildQuery() CLASS tURL
 
    LOCAL cLine
 
-   IF Len( ::cPath ) > 0 .AND. ::cPath[-1] != "/"
+   IF Len( ::cPath ) = 0 .OR. ::cPath[-1] != "/"
       ::cPath += "/"
    ENDIF
 
