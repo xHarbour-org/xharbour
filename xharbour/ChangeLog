@@ -9,6 +9,12 @@
 */
 
 
+
+2014-05-03 12:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/rtl/win_misc.c
+    ! minor fix to previus commiit
+    
+
 2014-05-01 17:43 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * winmake/makefile.bc
     ! pacify BCC irrelevant warning

@@ -52,10 +52,10 @@
 
 //---------------------------------------------------------------------------//
 
+
+#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+
 #define HB_OS_WIN_USED
-
-#if defined( HB_OS_WIN )
-
 #include "hbapi.h"
 #include <windows.h>
 
