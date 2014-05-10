@@ -52,12 +52,15 @@
 
 //---------------------------------------------------------------------------//
 
+#include "hbsetup.h"
 
-#if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
+#if defined( HB_OS_WIN )
+
+#include <windows.h>
 
 #define HB_OS_WIN_USED
 #include "hbapi.h"
-#include <windows.h>
+
 
 
 //---------------------------------------------------------------------------//
