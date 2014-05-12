@@ -395,7 +395,7 @@ HB_FUNC( FREECALLBACKPOINTER )
    {
       PHB_ITEM pSelf = hb_param( 2, HB_IT_ANY );
 
-      VirtualFree( (LPVOID) pCallback, 0, MEM_DECOMMIT | MEM_RELEASE );
+      VirtualFree( (LPVOID) pCallback, 0, MEM_RELEASE );
       hb_retl( TRUE );
 
 
