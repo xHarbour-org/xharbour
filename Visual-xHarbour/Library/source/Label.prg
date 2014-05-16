@@ -163,34 +163,39 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL hOldPen, nFlags, cText, hDC, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hOldPen, nFlags, cText, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC
 
-   hDC := ::BeginPaint()
+   hDC        := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    DEFAULT ::__CurColor TO ::ForeColor
 
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
-   _FillRect( hDC, aRect, hBkGnd )
+   _FillRect( hMemDC, aRect, hBkGnd )
 
    IF VALTYPE( ::Border ) == "L"
       ::xBorder := -1
    ENDIF
    IF ::xBorder <> 0
       IF ::xBorder == -1
-         hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
-         hBrush  := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-         Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-         SelectObject( hDC, hBrush )
-         DeleteObject( SelectObject( hDC, hOldPen ) )
+         hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
+         hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+         Rectangle( hMemDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+         SelectObject( hMemDC, hBrush )
+         DeleteObject( SelectObject( hMemDC, hOldPen ) )
 
        ELSE
-         _DrawEdge( hDC, aRect, ::xBorder, BF_RECT )
+         _DrawEdge( hMemDC, aRect, ::xBorder, BF_RECT )
       ENDIF
       aRect := {1,1,::xWidth-1,::xHeight-1}
    ENDIF
 
-   SetBkMode( hDC, TRANSPARENT )
-   hFont  := SelectObject( hDC, ::Font:Handle )
+   SetBkMode( hMemDC, TRANSPARENT )
+   hFont  := SelectObject( hMemDC, ::Font:Handle )
    nFlags := ::Alignment | DT_WORDBREAK
 
    IF ::NoPrefix
@@ -198,7 +203,7 @@ METHOD OnPaint() CLASS Label
    ENDIF
 
    IF ::VertCenter
-      aText  := _GetTextExtentPoint32( hDC, ::xText )
+      aText  := _GetTextExtentPoint32( hMemDC, ::xText )
       aRect[2] := ( aRect[4]-aText[2] ) / 2
       aRect[4] := aRect[2] + aText[2]
    ENDIF
@@ -211,17 +216,22 @@ METHOD OnPaint() CLASS Label
       aRect[2] += 1
       aRect[3] += 1
       aRect[4] += 1
-      SetTextColor( hDC, ::xTextShadowColor )
-      _DrawText( hDC, cText, aRect, nFlags )
+      SetTextColor( hMemDC, ::xTextShadowColor )
+      _DrawText( hMemDC, cText, aRect, nFlags )
       aRect[1] -= 1
       aRect[2] -= 1
       aRect[3] -= 1
       aRect[4] -= 1
    ENDIF
-   SetTextColor( hDC, ::__CurColor )
-   _DrawText( hDC, cText, aRect, nFlags )
-   SelectObject( hDC, hFont )
+   SetTextColor( hMemDC, ::__CurColor )
+   _DrawText( hMemDC, cText, aRect, nFlags )
+   SelectObject( hMemDC, hFont )
+
+   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
    
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
    ::EndPaint()
 RETURN 0
 

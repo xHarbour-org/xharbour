@@ -1175,7 +1175,7 @@ METHOD Save( cFile ) CLASS Source
    ENDIF
 
    IF ! EMPTY( ::File )
-      IF ::Application:EditorProps:SaveBAK == 1 .AND. FILE( ::File )
+      IF FILE( ::File ) .AND. ( ! __ObjHasMsg( ::Application, "EditorProps" ) .OR. ::Application:EditorProps:SaveBAK == 1 )
          cBak := ::File
          IF ( n := RAT( ".", cBak ) ) > 0
             cBak := SUBSTR( cBak, 1, n-1 )
@@ -2251,6 +2251,7 @@ RETURN 1
 METHOD Go_OnClick() CLASS GotoDialog
    ::Application:SourceEditor:Source:GoToLine( VAL( ::LineNum:Text    )-1 )
    ::Close()
+   ::Application:SourceEditor:SetFocus()
 RETURN Self
 
 CLASS FindReplace INHERIT WinForm

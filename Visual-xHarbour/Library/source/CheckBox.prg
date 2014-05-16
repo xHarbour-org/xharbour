@@ -65,7 +65,6 @@ CLASS CheckBox INHERIT Control
    METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD Create()
 
-   METHOD OnDestroy()          INLINE ::CloseThemeData(), Super:OnDestroy()
    METHOD DrawFrame()
    METHOD SetCheckStyle()
    METHOD OnCtlColorStatic()
@@ -85,12 +84,10 @@ ENDCLASS
 METHOD Init( oParent ) CLASS CheckBox
    DEFAULT ::__xCtrlName TO "CheckBox"
    DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ThemeName := "button"
    ::ClsName := "button"
    ::Super:Init( oParent )
    ::Width  := 100
    ::Height := 15
-   ::OpenThemeData()
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
@@ -176,7 +173,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    nFlags := nFlags | nStatus
 
                    IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-                      DrawThemeBackground( ::hTheme, cd:hDC, BP_CHECKBOX, nStatus, aRect, aRect )
+                      DrawThemeBackground( ::System:hButtonTheme, cd:hDC, BP_CHECKBOX, nStatus, aRect, aRect )
                     ELSE
                       _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
                    ENDIF
@@ -250,7 +247,7 @@ METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nHeight, nStatus, lDraw ) CLASS Ch
    aRect[4] := aRect[2] + nHeight -1
    IF lDraw
       IF ::Application:OsVersion:dwMajorVersion > 4 .AND. ::Application:ThemeActive
-         DrawThemeBackground( ::hTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
+         DrawThemeBackground( ::System:hButtonTheme, hDC, BP_CHECKBOX, nStatus, aRect, aRect )
        ELSE
          DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
       ENDIF

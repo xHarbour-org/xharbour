@@ -81,18 +81,26 @@ RETURN Self
 METHOD GetTextExtentPoint32( cText ) CLASS Drawing
    LOCAL hFont, aExt
    DEFAULT cText TO ::Owner:Caption
-   hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
+   IF ::Owner:Font != NIL .AND. ::Owner:Font:Handle != NIL
+      hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
+   ENDIF
    aExt := _GetTextExtentPoint32( ::hDC, cText )
-   ::SelectObject( hFont )
+   IF hFont != NIL
+      ::SelectObject( hFont )
+   ENDIF
 RETURN aExt
 
 //------------------------------------------------------------------------------------------------
 
 METHOD GetTextExtentExPoint( cText, nMaxWidth, nFit ) CLASS Drawing
    LOCAL hFont, aExt
-   hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
+   IF ::Owner:Font != NIL .AND. ::Owner:Font:Handle != NIL
+      hFont := SelectObject( ::hDC, ::Owner:Font:Handle )
+   ENDIF
    aExt := _GetTextExtentExPoint( ::hDC, cText, nMaxWidth, @nFit )
-   ::SelectObject( hFont )
+   IF hFont != NIL
+      ::SelectObject( hFont )
+   ENDIF
 RETURN aExt
 
 //------------------------------------------------------------------------------------------------
@@ -113,8 +121,12 @@ RETURN nRet
 //------------------------------------------------------------------------------------------------
 
 METHOD Destroy() CLASS Drawing
-   IF ::xhDC != NIL .AND. ::cPaint == NIL
-      ::ReleaseDC()
+   IF ::xhDC != NIL
+      IF ::cPaint == NIL
+         ::ReleaseDC()
+       ELSE
+         ::EndPaint()
+      ENDIF
       ::xhDC := NIL
    ENDIF
 RETURN Self

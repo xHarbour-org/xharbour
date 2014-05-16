@@ -356,8 +356,7 @@ METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
    ::Menu         := IIF( ::Parent:ClsName == "CMenuItem", ::Parent, ::Parent:Menu )
    ::MenuItemInfo := (struct MENUITEMINFO)
 
-   ::Font := Font()
-   ::Font:Parent := Self
+   ::Font := Font( Self )
    ::Font:Create()
    
    ::__CreateProperty()

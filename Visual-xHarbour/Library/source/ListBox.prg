@@ -53,6 +53,8 @@ CLASS ListBox FROM TitleControl
    PROPERTY ItemToolTips      SET ::__SetItemToolTips(v)                          DEFAULT .F.
 
    METHOD Init()  CONSTRUCTOR
+   DESTRUCTOR __FreeCallBack
+
    METHOD Create()
 
    METHOD GetString()
@@ -133,6 +135,13 @@ CLASS ListBox FROM TitleControl
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
+PROCEDURE __FreeCallBack() CLASS ListBox
+   IF ::__pTipCallBack != NIL
+      FreeCallBackPointer( ::__pTipCallBack )
+      ::__pTipCallBack := NIL
+   ENDIF
+RETURN
+
 METHOD Init( oParent ) CLASS ListBox
    ::ClsName      := "ListBox"
    DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -199,9 +208,9 @@ METHOD __SetItemToolTips( lTips ) CLASS ListBox
       IF IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
          SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
          ::__nTipProc := NIL
-         FreeCallBackPointer( ::__pTipCallBack )
-         ::__pTipCallBack := NIL
-
+         //FreeCallBackPointer( ::__pTipCallBack )
+         //::__pTipCallBack := NIL
+         ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pTipCallBack )
          DestroyWindow( ::__tipWnd )
       ENDIF
 

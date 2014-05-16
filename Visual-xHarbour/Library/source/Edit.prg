@@ -26,7 +26,6 @@
 #define CS_DROPSHADOW 0x00020000
 
 
-#Define WM_INVALID WM_USER + 50
 #Define WM_CARET   WM_USER + 51
 
 #ifdef VXH_ENTERPRISE
@@ -119,7 +118,6 @@ CLASS EditBox INHERIT Control
    METHOD OnCtlColorEdit()
    METHOD OnCtlColorStatic()
 
-   METHOD OnDestroy()                  INLINE Super:OnDestroy(), IIF( ::__hBrush != NIL, DeleteObject( ::__hBrush ), ), NIL
    METHOD CanUndo()                    INLINE ::SendMessage( EM_CANUNDO, 0, 0 )
    METHOD CharFromPos(x,y)             INLINE ::SendMessage( EM_CHARFROMPOS, L2Bin(x)+L2Bin(y) )
    METHOD EmptyUndoBuffer()            INLINE ::SendMessage( EM_EMPTYUNDOBUFFER, 0, 0 )
@@ -299,7 +297,12 @@ METHOD Create() CLASS EditBox
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
-   //::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+
+   IF ::xLayout > 1 .OR. ::Button
+      IF ::Button .OR. ::DropCalendar .OR. ::MenuArrow .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
+         ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+      ENDIF
+   ENDIF
    IF ::__ClassInst == NIL 
       IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:xBuddy)=="C" .AND. o:xBuddy == ::Name } ) ) > 0
          ::Parent:Children[n]:xBuddy := Self
@@ -486,7 +489,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetLayout() CLASS EditBox
-   IF ::IsWindow() .AND ::__ClassInst != NIL
+   IF ::IsWindow() .AND. ::__ClassInst != NIL
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER )
    ENDIF
 RETURN Self

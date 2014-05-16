@@ -50,7 +50,6 @@ CLASS ToolTip INHERIT Window
    DATA Name             EXPORTED
    DATA AutoClose        EXPORTED INIT .T.
    DATA ShowMode         EXPORTED INIT 1
-   DATA DisableParent    EXPORTED INIT .F.
    
    DATA ToolTip          EXPORTED
    
@@ -94,8 +93,6 @@ CLASS ToolTip INHERIT Window
    METHOD SetTitle(nIcon,cTitle) INLINE ::Icon := IFNIL( nIcon, ::Icon, nIcon ),;
                                         ::xTitle := cTitle,;
                                         IIF( ::hWnd != NIL, ::SendMessage( TTM_SETTITLE, ::Icon, ::xTitle ), NIL )
-
-//                                        ::xTitle := IFNIL( cTitle, ::xTitle, cTitle ),;
 
    METHOD SetTTStyle()
    METHOD GetMargin()

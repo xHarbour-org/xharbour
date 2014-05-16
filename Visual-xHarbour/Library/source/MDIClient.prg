@@ -39,7 +39,6 @@ CLASS MDIClient INHERIT Window
    DATA ExStyle            EXPORTED
    DATA ClsName            EXPORTED
    DATA Name               EXPORTED
-   DATA DisableParent      EXPORTED INIT .F.
    DATA Center             EXPORTED
    DATA MDIClient          EXPORTED
    DATA WindowStyle        EXPORTED

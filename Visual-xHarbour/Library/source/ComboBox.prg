@@ -242,7 +242,7 @@ RETURN Self
 METHOD __ResetEdit() CLASS ComboBox
    IF IsWindow( ::hEdit )
       SetWindowLong( ::hEdit, GWL_WNDPROC, ::__nProcEdit )
-      FreeCallBackPointer( ::__pCallBackEdit )
+      ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackEdit )
    ENDIF
 RETURN Self
 
@@ -290,16 +290,14 @@ METHOD __SetItemToolTips( lTips ) CLASS ComboBox
       IF IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
          SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
          ::__nTipProc := NIL
-         FreeCallBackPointer( ::__pTipCallBack )
-         ::__pTipCallBack := NIL
+         ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pTipCallBack )
 
          DestroyWindow( ::__tipWnd )
 
          IF IsWindow( ::cbi:hwndList ) .AND. ::__nListProc != NIL
             SetWindowLong( ::cbi:hwndList, GWL_WNDPROC, ::__nListProc )
             ::__nListProc := NIL
-            FreeCallBackPointer( ::__pListCallBack )
-            ::__pListCallBack := NIL
+            ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pListCallBack )
          ENDIF
       ENDIF
 

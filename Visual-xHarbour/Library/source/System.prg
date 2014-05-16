@@ -39,6 +39,9 @@ INIT PROCEDURE __InitSystem
 RETURN
 
 EXIT PROCEDURE __SystemCleanup
+   IF oSystem:hWindowTheme != NIL
+      CloseThemeData( oSystem:hWindowTheme )
+   ENDIF
    IF oSystem:hButtonTheme != NIL
       CloseThemeData( oSystem:hButtonTheme )
    ENDIF
@@ -106,6 +109,7 @@ CLASS System
 
    DATA hFont                   EXPORTED
 
+   DATA hWindowTheme            EXPORTED
    DATA hButtonTheme            EXPORTED
    DATA hHeaderTheme            EXPORTED
    DATA hTabTheme               EXPORTED
@@ -781,6 +785,7 @@ METHOD Init() CLASS System
    
    ::hFont          := __GetMessageFont()
 
+   ::hWindowTheme   := OpenThemeData(,"WINDOW")
    ::hButtonTheme   := OpenThemeData(,"button")
    ::hHeaderTheme   := OpenThemeData(,"HEADER")
    ::hTabTheme      := OpenThemeData(,"TAB")
@@ -816,6 +821,7 @@ METHOD GetProcMemory( cProcName ) CLASS System
    FOR EACH oProcess IN aProcessList
        nMemory := Int( VAL(oProcess:WorkingSetSize) )//VirtualSize
    NEXT
+   aProcessList := NIL
 RETURN nMemory
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -938,6 +944,8 @@ STATIC FUNCTION GetWin32Proc( cQuery )
       aProcessList := oWMIService:ExecQuery( cQuery )
    CATCH
    END
+   oWMIService := NIL
+   oLocator    := NIL
 RETURN aProcessList
 
 

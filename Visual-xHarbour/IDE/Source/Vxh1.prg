@@ -35,7 +35,7 @@ static s_cVersion, s_cCopyright
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "7"
-#define VXH_BuildVersion "RC 1"
+#define VXH_BuildVersion "RC 2"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -1668,7 +1668,7 @@ METHOD Init() CLASS IDE_MainForm
                   :Left       := 5
                   :Top        := 5
                   :Width      := 70
-                  :RightAlign := .T.
+                  :Alignment  := DT_RIGHT
                   :Caption    := "Control Name"
                   :Create()
                END
@@ -1685,7 +1685,7 @@ METHOD Init() CLASS IDE_MainForm
                   :Left       := 5
                   :Top        := 25
                   :Width      := 70
-                  :RightAlign := .T.
+                  :Alignment  := DT_RIGHT
                   :Caption    := "Object Type"
                   :Create()
                END
@@ -3440,21 +3440,34 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    lRem := .F.
 
+   ::Application:ObjectTree:ResetContent()
+   ::Application:ObjectManager:ActiveObject := NIL
+   FOR n := 1 TO LEN( ::Application:ObjectManager:Items )
+      ::Application:ObjectManager:Items[n]:Cargo := NIL
+      ::Application:ObjectManager:Items[n]:ColItems := NIL
+      ::Application:ObjectManager:Items[n]:Delete()
+   NEXT
+
    FOR n := 1 TO ::Application:SourceEditor:DocCount
        ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
+   ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
 
+   ::CurrentForm := NIL
    FOR n := 1 TO LEN( ::Forms )
        IF ::Forms[n]:Editor != NIL
           ::Forms[n]:Editor:Close()
+          ::Forms[n]:TreeItem:Cargo := NIL
+          ::Forms[n]:Editor:Form := NIL
           ::Forms[n]:Editor := NIL
           //::Forms[n]:XFMEditor:Close()
           //::Forms[n]:XFMEditor := NIL
           ::Forms[n]:Destroy()
+          ::Forms[n] := NIL
        ENDIF
    NEXT
-   ::Forms := {}
+   ::Forms := NIL
 
    IF ::DesignPage == NIL .OR. lClosing
       RETURN .T.
@@ -3475,7 +3488,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:EventManager:ResetContent()
    ::Application:EventManager:SetRedraw( .T. )
 
-   ::Application:ObjectTree:ResetContent()
    ::Application:FileExplorer:ResetContent()
 
    ::Application:Props[ "CloseBttn"         ]:Enabled := .F.
@@ -3529,8 +3541,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Modified    := .F.
    ::Properties  := NIL
    ::Modified    := .F.
-
-   ::CurrentForm := NIL
    
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
    ::EditReset(1)
@@ -4282,7 +4292,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
             ELSEIF cLine HAS "(?i)^END"
                // Finish object type PROPERTY / Control, return to previous parent
-               IF __clsParent( oObj:ClassH, "COMPONENT" ) .OR. UPPER( oObj:ClsName ) IN { "ANCHOR", "DOCK", "FREEIMAGERENDERER" }
+               IF __clsParent( oObj:ClassH, "COMPONENT" ) .OR. UPPER( oObj:ClsName ) IN { "ANCHOR", "DOCK", "FREEIMAGERENDERER", "FONT" }
                   oObj := oObj:Owner
                 ELSE
                   TRY
@@ -4317,25 +4327,8 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                   oObj:__xCtrlName := cWithClassName
                   oObj:Init( oParent )
                 ELSE
-                  //TRY
-                     oObj := &cWithClassName( oObj )
-                     oObj:__CustomOwner := lCustomOwner
-                  //CATCH
-                  //   WITH OBJECT OpenFileDialog( ::Application:MainForm )
-                  //      :CheckFileExists := .T.
-                  //      :Multiselect     := .F.
-                  //      :DefaultExt      := "xfm"
-                  //      :Title           := "Missing File " + cWithClassName
-                  //      :Filter := "Visual xHarbour Form (*.xfm)|*.xfm"
-                  //      IF :Show()
-                  //         cWithClassName := STRTRAN( SplitFile( :FileName )[2], ".xfm" )
-                  //         oParent := oObj
-                  //         oObj := CustomControl()
-                  //         oObj:__xCtrlName := cWithClassName
-                  //         oObj:Init( oParent, :FileName )
-                  //      ENDIF
-                  //   END
-                  //END
+                  oObj := &cWithClassName( oObj )
+                  oObj:__CustomOwner := lCustomOwner
                ENDIF
 
                IF UPPER( cWithClassName ) == "TABPAGE"
@@ -5213,7 +5206,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := ::" + xValue1:Name + CRLF
                           ELSE
                             lParent := .F.
-                            IF __clsParent( xValue1:ClassH, "COMPONENT" ) .OR. xValue1:ClsName == "FreeImageRenderer"
+                            IF __clsParent( xValue1:ClassH, "COMPONENT" ) .OR. xValue1:ClsName IN { "FreeImageRenderer", "Font" }
                                IF xValue1:Owner == oCtrl
                                   lParent := .T.
                                ENDIF
@@ -5226,7 +5219,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             IF lParent
                                cProps := ::GenerateProperties( xValue1, nTab+3, ":", cProp,,,,cParent )
   
-                               IF cProp == "BackgroundImage"
+                               IF UPPER(cProp) == "BACKGROUNDIMAGE"
                                   cProp := "BackgroundImage := FreeImageRenderer( "+cParent+" )"
                                ENDIF
                                IF !EMPTY( ALLTRIM( cProps ) )
@@ -5618,13 +5611,12 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
             ENDIF
 
             IF ::Properties:UseDll
-               :SetDefines( "WIN;WIN32;__EXPORT__ ;__IMPORT__ ;__VXHAPP__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
+               :SetDefines( "WIN;WIN32;__EXPORT__ ;__IMPORT__ ;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
                IF ::Properties:GUI
                   :AddFiles( "vxhdll.lib" )
                ENDIF
              ELSEIF ::Properties:GUI
-               :SetDefines( "WIN;WIN32;__EXPORT__;__VXHAPP__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
-               view :defines
+               :SetDefines( "WIN;WIN32;__EXPORT__;__VXH__" + IIF( ! Empty(cDef), ";" + cDef, "" ) )
                :AddFiles( "vxh.lib" )
                :AddFiles( "Activex.lib" )
                IF ::Properties:TargetType == 5
@@ -6481,7 +6473,6 @@ METHOD Init( oParent ) CLASS ListOle
    ::Modal    := .T.
    ::Center   := .T.
    ::aOle     := GetRegOle()
-   ::AutoClose := .T.
    ::Create()
 RETURN Self
 

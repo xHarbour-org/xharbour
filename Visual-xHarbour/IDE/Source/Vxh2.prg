@@ -106,7 +106,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
-   METHOD OnDestroy()            INLINE ::CloseThemeData(), ::Super:OnDestroy()
+   METHOD OnDestroy()            INLINE ::Selected := NIL, ::Super:OnDestroy()
 ENDCLASS
 
 METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
@@ -143,7 +143,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    #ifndef VXH_PROFESSIONAL 
       lCustom := .F.
    #endif
-   ::OpenThemeData()
 
    ::lCustom     := lCustom
    IF !lCustom
@@ -163,7 +162,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       ::xName   := "CustomControl" + XSTR( n )
       ::__lResizeable :=  {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
    ENDIF
-   ::AutoClose := .F.
 
    ::__ClassInst := __ClsInst( ::ClassH )
    ::__ClassInst:__IsInstance   := .T.
@@ -1885,12 +1883,12 @@ METHOD OnNCPaint() CLASS WindowEdit
       _FillRect( hdc, { 0, 0, 5, 5 }, GetStockObject( WHITE_BRUSH ) )
       _FillRect( hdc, { ::Width-5, 0, ::Width, 5 }, GetStockObject( WHITE_BRUSH ) )
 
-      DrawThemeBackground( ::hTheme, hdc, aStyle[1], nState, { 0, 0, ::Width, nCaption } )
-      DrawThemeBackground( ::hTheme, hdc, aStyle[2], nState, { 0, nCaption, nBorder, ::Height } )
-      DrawThemeBackground( ::hTheme, hdc, aStyle[3], nState, { ::Width-nBorder, nCaption, ::Width, ::Height } )
-      DrawThemeBackground( ::hTheme, hdc, aStyle[4], nState, { 0, ::Height-nBorder, ::Width, ::Height } )
+      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[1], nState, { 0, 0, ::Width, nCaption } )
+      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[2], nState, { 0, nCaption, nBorder, ::Height } )
+      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[3], nState, { ::Width-nBorder, nCaption, ::Width, ::Height } )
+      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[4], nState, { 0, ::Height-nBorder, ::Width, ::Height } )
       
-      aSize := GetThemePartSize( ::hTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE )
+      aSize := GetThemePartSize( ::System:hWindowTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE )
       
       aRect[1] := ::Width - aSize[1] - 6
       aRect[2] := ( ( nCaption - aSize[2] ) / 2 ) + 1
@@ -1899,7 +1897,7 @@ METHOD OnNCPaint() CLASS WindowEdit
 
       IF ::SysMenu
          nState := IIF( ::InActive, 5, CBS_NORMAL )
-         DrawThemeBackground( ::hTheme, hdc, aStyle[6], nState, aRect )
+         DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[6], nState, aRect )
          aRect[1] -= (aSize[1]+2)
          aRect[3] -= (aSize[1]+2)
 
@@ -1908,7 +1906,7 @@ METHOD OnNCPaint() CLASS WindowEdit
             IF !::MaximizeBox
                nState := IIF( ::InActive, MAXBS_DISINACTIVE, MAXBS_DISABLED )
             ENDIF
-            DrawThemeBackground( ::hTheme, hdc, WP_MAXBUTTON, nState, aRect )
+            DrawThemeBackground( ::System:hWindowTheme, hdc, WP_MAXBUTTON, nState, aRect )
             aRect[1] -= (aSize[1]+2)
             aRect[3] -= (aSize[1]+2)
 
@@ -1916,7 +1914,7 @@ METHOD OnNCPaint() CLASS WindowEdit
             IF !::MinimizeBox
                nState := IIF( ::InActive, MINBS_DISINACTIVE, MINBS_DISABLED )
             ENDIF
-            DrawThemeBackground( ::hTheme, hdc, WP_MINBUTTON, nState, aRect )
+            DrawThemeBackground( ::System:hWindowTheme, hdc, WP_MINBUTTON, nState, aRect )
          ENDIF
 
       ENDIF
@@ -1937,17 +1935,17 @@ METHOD OnNCPaint() CLASS WindowEdit
       ENDIF
 
       SetBkMode( hdc, TRANSPARENT )
-      IF ( hFont := GetThemeSysFont( ::hTheme, aStyle[5] ) ) != NIL
+      IF ( hFont := GetThemeSysFont( ::System:hWindowTheme, aStyle[5] ) ) != NIL
          hOldFont := SelectObject( hdc, hFont )
       ENDIF
       
       IF ::Application:OsVersion:dwMajorVersion == 5
          IF !::InActive
-            DrawThemeText( ::hTheme, hdc, aStyle[1], nState, ::Caption, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE, { x+cx+4, IIF( !::ToolWindow, 1, 0 )+3, ::Width, nCaption } )
+            DrawThemeText( ::System:hWindowTheme, hdc, aStyle[1], nState, ::Caption, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE, { x+cx+4, IIF( !::ToolWindow, 1, 0 )+3, ::Width, nCaption } )
          ENDIF
       ENDIF
       
-      SetTextColor( hdc, GetThemeSysColor( ::hTheme, COLOR_CAPTIONTEXT ) )
+      SetTextColor( hdc, GetThemeSysColor( ::System:hWindowTheme, COLOR_CAPTIONTEXT ) )
       _DrawText( hdc, ::Caption, { x+cx+4, 3, ::Width, nCaption }, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE )
       SetTextColor( hdc, nColor )
 

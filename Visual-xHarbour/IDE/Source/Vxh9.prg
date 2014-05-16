@@ -364,15 +364,30 @@ CLASS ObjectTreeView INHERIT TreeView
    METHOD OnBeginDrag()
    METHOD OnEndDrag()
    METHOD OnUserMsg()
-   METHOD ResetContent() INLINE Super:ResetContent(),;
-                                ::aImages := {},;
-                                ::ImageList := NIL,;
-                                IIF( ::oList != NIL, ::oList:Destroy(), )
+   METHOD ResetContent()
 ENDCLASS
 
 METHOD OnBeginDrag( /*oDrag*/ ) CLASS ObjectTreeView
    //::oDrag := oDrag
 RETURN Self
+
+METHOD ResetContent() CLASS ObjectTreeView
+   ::aImages := {}
+   ::ImageList := NIL
+   IF ::oList != NIL
+      ::oList:Destroy()
+   ENDIF
+   IF ::Application:Project:Properties != NIL
+      ::Application:Project:Properties:TreeItem := NIL
+   ENDIF
+   IF ::oApp != NIL
+      ::oApp:Cargo := NIL
+      ::oPrj:Cargo := NIL
+      ::oPrj:Delete()
+    ELSE
+      Super:ResetContent()
+   ENDIF
+RETURN NIL
 
 METHOD OnEndDrag( oTarget ) CLASS ObjectTreeView
    LOCAL nPos, oObj, nPre//, oItem
@@ -592,7 +607,6 @@ CLASS FileExplorer INHERIT TreeView
    DATA aExt       EXPORTED INIT {".prg",".c",".lib",".obj"}
 
    METHOD Init() CONSTRUCTOR
-   METHOD Create()
 
    METHOD InitProject()
 
@@ -628,9 +642,23 @@ METHOD Init( oParent ) CLASS FileExplorer
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Create() CLASS FileExplorer
-   Super:Create()
-RETURN Self
+METHOD ResetContent() CLASS FileExplorer
+   ::aImages := {}
+   ::ImageList := NIL
+   IF ::oList != NIL
+      ::oList:Destroy()
+   ENDIF
+   IF ::Application:Project:Properties != NIL
+      ::Application:Project:Properties:TreeItem := NIL
+   ENDIF
+   IF ::oApp != NIL
+      ::oApp:Cargo := NIL
+      ::oPrj:Cargo := NIL
+      ::oPrj:Delete()
+    ELSE
+      Super:ResetContent()
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD GetImage( cFile )  CLASS FileExplorer

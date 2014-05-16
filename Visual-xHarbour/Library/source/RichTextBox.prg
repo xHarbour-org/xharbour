@@ -44,7 +44,8 @@ CLASS RichTextBox INHERIT EditBox
    METHOD GetTextLength()
    METHOD SetSelectionColor()
    METHOD EditStreamCallback()
-   METHOD OnDestroy() INLINE ::Super:OnDestroy(), IIF( ::__EditStreamPtr != NIL, FreeCallBackPointer( ::__EditStreamPtr ), ), NIL
+   METHOD OnDestroy() INLINE ::Super:OnDestroy(),;
+                             IIF( ::__EditStreamPtr != NIL, ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__EditStreamPtr ), ), NIL
    METHOD SetCase()
 ENDCLASS
 

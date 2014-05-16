@@ -236,6 +236,9 @@ METHOD Create( hParent ) CLASS Dialog
    IF VALTYPE( nRet ) == "N" .AND. nRet == 0
       ::__OnInitCanceled := .T.
       ::RemoveProperty()
+      IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
+         ::Font:Delete()
+      ENDIF
       RETURN Self
    ENDIF
 
@@ -252,8 +255,10 @@ METHOD Create( hParent ) CLASS Dialog
    IF ::Modal
       IF ::Template == NIL
          ::Template := __GetTemplate( Self )
+         ::Result := DialogBoxIndirect( ::Instance, ::Template, hParent, ::__pCallBackPtr )
+      ELSE
+         ::Result := DialogBox( ::Instance, ::Template, hParent, ::__pCallBackPtr )
       ENDIF
-      ::Result := DialogBoxIndirect( ::Instance, ::Template, hParent, ::__pCallBackPtr )
       IF ::__pCallBackPtr != NIL
          FreeCallBackPointer( ::__pCallBackPtr )
          ::__pCallBackPtr := NIL

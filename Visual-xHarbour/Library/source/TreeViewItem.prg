@@ -249,7 +249,7 @@ RETURN Self
 
 METHOD SetImageIndex(n) CLASS TreeViewItem
    LOCAL tvi
-   IF ::Parent:hWnd != NIL .AND. ::hItem != NIL
+   IF ::Parent != NIL .AND. ::Parent:hWnd != NIL .AND. ::hItem != NIL
       tvi := (struct TVITEM)
       tvi:mask    := TVIF_IMAGE | TVIF_SELECTEDIMAGE
       tvi:hItem   := ::hItem

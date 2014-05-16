@@ -3163,6 +3163,7 @@ HB_FUNC( SCREENTOCLIENT )
       }
       else
       {
+         hb_xfree( (void *) pPoint );
          hb_retnl( FALSE );
       }
    }
@@ -3202,6 +3203,7 @@ HB_FUNC( CLIENTTOSCREEN )
       }
       else
       {
+         hb_xfree( (void *) pPoint );
          hb_retnl( FALSE );
       }
    }
@@ -3780,14 +3782,13 @@ HB_FUNC( GETPROFILESTRING )
 
    if( dwLen )
    {
-      hb_retclen( ( char * ) bBuffer, dwLen );
+      hb_retclenAdopt( ( char * ) bBuffer, dwLen );
    }
    else
    {
+      hb_xfree( bBuffer );
       hb_retc( lpDefault );
    }
-
-   hb_xfree( bBuffer );
 }
 
 //-----------------------------------------------------------------------------
@@ -3818,14 +3819,13 @@ HB_FUNC( GETPRIVATEPROFILESTRING )
 
    if( dwLen )
    {
-      hb_retclen( ( char * ) bBuffer, dwLen );
+      hb_retclenAdopt( ( char * ) bBuffer, dwLen );
    }
    else
    {
+      hb_xfree( bBuffer );
       hb_retc( lpDefault );
    }
-
-   hb_xfree( bBuffer );
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -6775,7 +6775,7 @@ HB_FUNC( GETPROFILESECTION )
 
    if( dwLen )
    {
-      hb_retclen( (char *) bBuffer, dwLen );
+      hb_retclenAdopt( (char *) bBuffer, dwLen );
    }
    else
    {
@@ -6811,7 +6811,7 @@ HB_FUNC( GETPRIVATEPROFILESECTION )
 
    if( dwLen )
    {
-      hb_retclen( (char *) bBuffer, dwLen );
+      hb_retclenAdopt( (char *) bBuffer, dwLen );
    }
    else
    {
@@ -10850,4 +10850,10 @@ HB_FUNC( WOW64REVERTWOW64FSREDIRECTION )
 HB_FUNC( INTERNETOPENURL )
 {
    hb_retnl( (long) InternetOpenUrl( (HINTERNET) hb_parnl(1), (LPCTSTR) hb_parc(2), ISNIL(3)?NULL:(LPCTSTR) hb_parc(3), (DWORD) hb_parnl(4), (DWORD) hb_parnl(5), (DWORD_PTR) hb_parnl(6) ) );
+}
+
+HB_FUNC( ISCARET )
+{
+   POINT lpPoint;
+   hb_retl( GetCaretPos( &lpPoint ) );
 }

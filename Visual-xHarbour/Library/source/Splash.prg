@@ -106,7 +106,8 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
            RETURN 1
            
       CASE WM_NCDESTROY
-           FreeCallBackPointer( __pCallBackPtr )
+           __GetApplication():MainForm:PostMessage( WM_VXH_FREECALLBACK, __pCallBackPtr )
+           //FreeCallBackPointer( __pCallBackPtr )
 
    END
 RETURN 0
@@ -369,6 +370,6 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
       CASE WM_NCDESTROY
            DeleteObject( s_hFont )
-           FreeCallBackPointer( __pCallBackPtr )
+           //FreeCallBackPointer( __pCallBackPtr )
    END
 RETURN 0

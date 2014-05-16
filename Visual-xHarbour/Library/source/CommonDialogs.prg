@@ -409,8 +409,7 @@ METHOD Init( oParent ) CLASS FontDialog
    ::ComponentType  := "CommonDialog"
    Super:Init( oParent )
 
-   ::Font := Font()
-   ::Font:Parent := Self
+   ::Font := Font( Self )
    IF ::__ClassInst != NIL
       ::Font:Create()
    ENDIF
@@ -752,7 +751,8 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
                    ::Direction := 1
 
               CASE nwParam == IDCANCEL
-                   FreeCallBackPointer( ::__pCallBackPtr )
+                   //FreeCallBackPointer( ::__pCallBackPtr )
+                   ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackPtr )
            ENDCASE
    ENDCASE
 RETURN 0

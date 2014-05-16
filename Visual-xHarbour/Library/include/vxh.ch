@@ -8,6 +8,10 @@
 #define ALIGN_CENTER    2
 #define ALIGN_RIGHT     3
 
+#define WM_VXH_SHOWMODE               WM_APP + 1
+#define WM_VXH_FREECALLBACK           WM_APP + 2
+#define WM_VXH_DESTRUCTOBJECT         WM_APP + 3
+
 #xtranslate __CONCAT <x> <y> => <x>[<y>]
 
 #xcommand PROPERTY <p> [ROOT <r>] [DEFAULT <d>] [HELP <h>] [<hid: NOTPUBLIC>];

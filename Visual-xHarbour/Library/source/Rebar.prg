@@ -445,8 +445,7 @@ METHOD Init( oParent ) CLASS CoolBarBand
    
    ::ClsName            := "CoolBarBand"
 
-   ::Font := Font()
-   ::Font:Parent := Self
+   ::Font := Font( Self )
    IF ::__ClassInst != NIL 
       ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
       ::Font:__ClassInst:__IsInstance := .T.

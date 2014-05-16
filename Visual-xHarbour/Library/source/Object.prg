@@ -76,7 +76,7 @@ CLASS Object
    ACCESS This                 INLINE Self
 
    ACCESS Siblings             INLINE ::Parent:Children
-   PROPERTY TabOrder           SET ::SetTabOrder(v)
+   PROPERTY TabOrder           SET ::SetTabOrder(v) DEFAULT 0
 
    METHOD HasMessage( cMsg )   INLINE __ObjHasMsg( Self, cMsg )
    METHOD HasProperty()
@@ -198,14 +198,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
-
       ::__hObjects[ cName ] := oObj
-
-      //::__hObjects[ cName ] := ASCAN( __aObjects, oObj,,,.T. )
-      //IF ::__hObjects[ cName ] == 0
-      //   AADD( __aObjects, oObj )
-      //   ::__hObjects[ cName ] := LEN( __aObjects )
-      //ENDIF
    ENDIF
    oObj:xName := cName
 RETURN Self
@@ -228,8 +221,13 @@ RETURN Self
 
 METHOD RemoveProperty() CLASS Object
    LOCAL n
-   IF !EMPTY( ::xName ) .AND. ( n := hGetPos( ::Form:__hObjects, ::xName ) ) > 0
-      RETURN HDelAt( ::Form:__hObjects, n )
+   IF ! EMPTY( ::xName ) 
+      IF ( n := hGetPos( ::Form:__hObjects, ::xName ) ) > 0
+         HDelAt( ::Form:__hObjects, n )
+      ENDIF
+      IF ( n := hGetPos( ::Application:__hObjects, ::xName ) ) > 0
+         HDelAt( ::Application:__hObjects, n )
+      ENDIF
    ENDIF
 RETURN NIL
 
@@ -275,8 +273,13 @@ RETURN Self
 FUNCTION __GetObj( nPos )
 RETURN __aObjects[nPos]
 
-FUNCTION __SetObjPtr( oObj )
-   LOCAL n := ASCAN( __aObjects, {|o|o==oObj} )
+FUNCTION __SetObjPtr( oObj, hWnd )
+   LOCAL n
+   IF hWnd != NIL
+      n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
+    ELSE
+      n := ASCAN( __aObjects, {|o|o==oObj} )
+   ENDIF
    IF n == 0
       AADD( __aObjects, oObj )
    ENDIF

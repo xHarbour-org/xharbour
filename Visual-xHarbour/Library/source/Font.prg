@@ -46,7 +46,7 @@ CLASS Font
    PROPERTY nStrikeOut   SET (::xnStrikeOut := v, ::Modify(v)) NOTPUBLIC
 
    DATA Handle           EXPORTED
-   DATA Parent           EXPORTED
+   DATA Owner            EXPORTED
    DATA ClsName          EXPORTED INIT "Font"
    DATA OutPrecision     EXPORTED
    DATA ClipPrecision    EXPORTED
@@ -65,7 +65,7 @@ CLASS Font
                                        { "TrueType resource (*.fot)", "*.fot" },;
                                        { "PostScript OpenType (*.otf)", "*.otf" };
                                        }
-
+   METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Select( hDC ) INLINE SelectObject( hDC, ::Handle )
    METHOD Delete()
@@ -80,7 +80,11 @@ CLASS Font
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
+METHOD Init( oOwner ) CLASS Font
+   ::Owner := oOwner
+RETURN Self
 
+//--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS Font
    LOCAL cFont
 
@@ -100,8 +104,8 @@ METHOD Create() CLASS Font
       cFont := "Tahoma"
    ENDIF
    
-   IF ::Parent != NIL
-      IF ::nUnderline == NIL .AND. ::Parent:__xCtrlName == "LinkLabel"
+   IF ::Owner != NIL
+      IF ::nUnderline == NIL .AND. ::Owner:__xCtrlName == "LinkLabel"
          ::ncm:lfMessageFont:lfUnderline := 1
          ::nUnderline := 1
       ENDIF
@@ -121,11 +125,7 @@ METHOD Create() CLASS Font
    ::ncm:lfMessageFont:lfClipPrecision  := IFNIL( ::ClipPrecision , CLIP_DEFAULT_PRECIS                 , ::ClipPrecision  )
    ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
-   
-   ::Delete()
-   IF ::lCreateHandle
-      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
-   ENDIF   
+
    ::xFaceName     := cFont
 
    ::xHeight       := ::ncm:lfMessageFont:lfHeight
@@ -138,9 +138,15 @@ METHOD Create() CLASS Font
    ::xnItalic      := ::ncm:lfMessageFont:lfItalic
    ::xnUnderline   := ::ncm:lfMessageFont:lfUnderline
    ::xnStrikeOut   := ::ncm:lfMessageFont:lfStrikeOut
+
    ::GetPointSize()
 
-   IF ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
+   ::Delete()
+   IF ::lCreateHandle
+      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
+   ENDIF   
+
+   IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance  := .T.
       ::__ClassInst:xWeight      := ::xWeight
@@ -160,21 +166,25 @@ RETURN Self
 
 METHOD Delete() CLASS Font
    IF ::Handle != NIL
+      IF ::Owner != NIL
+         SendMessage( ::Owner:hWnd, WM_SETFONT, NIL, MAKELPARAM( 1, 0 ) )
+      ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
    ENDIF
-RETURN Self
+RETURN .T.
 
 
 //--------------------------------------------------------------------------------------------------------
 
-METHOD Set( o ) CLASS Font
-   ::Parent := o
-   IF o:ClsName != "FontDialog"
-      IF o:HasMessage( "SendMessage" )
-         o:SendMessage( WM_SETFONT, ::Handle, MAKELPARAM( 1, 0 ) )
-       ELSEIF o:HasMessage( "InvalidateRect" )
-         o:InvalidateRect()
+METHOD Set( oOwner ) CLASS Font
+   DEFAULT oOwner TO ::Owner 
+   ::Owner := oOwner
+   IF oOwner:ClsName != "FontDialog"
+      IF oOwner:HasMessage( "SendMessage" )
+         oOwner:SendMessage( WM_SETFONT, ::Handle, MAKELPARAM( 1, 0 ) )
+       ELSEIF oOwner:HasMessage( "InvalidateRect" )
+         oOwner:InvalidateRect()
       ENDIF
       ::GetPointSize()
    ENDIF
@@ -204,8 +214,8 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
    ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
    ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
    cf:lpLogFont   := ::ncm:lfMessageFont
-   IF ::Parent != NIL .AND. ::Parent:HasMessage( "ForeColor" )
-      cf:rgbColors := ::Parent:ForeColor
+   IF ::Owner != NIL .AND. ::Owner:HasMessage( "ForeColor" )
+      cf:rgbColors := ::Owner:ForeColor
    ENDIF
    cf:Flags       := IIF( nStyle != NIL, nStyle, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS )
 
@@ -216,8 +226,8 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
       IF lSet
          ::xFaceName      := cf:lpLogFont:lfFaceName:AsString()
 
-         IF ::Parent != NIL .AND. ::Parent:HasMessage( "ForeColor" )
-            ::Parent:ForeColor := cf:rgbColors
+         IF ::Owner != NIL .AND. ::Owner:HasMessage( "ForeColor" )
+            ::Owner:ForeColor := cf:rgbColors
          ENDIF
 
          ::xHeight        := cf:lpLogFont:lfHeight
@@ -278,18 +288,19 @@ METHOD Modify() CLASS Font
       lf:lfQuality        := ::Quality
       lf:lfPitchAndFamily := ::PitchAndFamily
 
-      ::Delete()
-      IF ::lCreateHandle
-         ::Handle := CreateFontIndirect( lf )
-         IF ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
-            ::Set( ::Parent )
+      IF ::Delete()
+         IF ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
+            ::Set( ::Owner )
+         ENDIF
+         IF ::lCreateHandle
+            ::Handle := CreateFontIndirect( lf )
          ENDIF
       ENDIF
    ENDIF
 RETURN Self
 
 METHOD EnumFamilies( cFamily ) CLASS Font
-   EnumFontFamilies( ::Parent:Drawing:hDC, cFamily, WinCallBackPointer( HB_ObjMsgPtr( Self, "EnumFamiliesProc" ), Self ), NIL )
+   EnumFontFamilies( ::Owner:Drawing:hDC, cFamily, WinCallBackPointer( HB_ObjMsgPtr( Self, "EnumFamiliesProc" ), Self ), NIL )
 RETURN Self
 
 METHOD EnumFamiliesProc( lpelf ) CLASS Font
@@ -304,18 +315,18 @@ METHOD SetPointSize( n ) CLASS Font
    DeleteDC( hDC )
    ::xPointSize := n
    
-   IF ::__ClassInst != NIL .AND. ::Parent != NIL .AND. IsWindow( ::Parent:hWnd )
-      ::Parent:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+   IF ::__ClassInst != NIL .AND. ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
+      ::Owner:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    ENDIF
 RETURN Self
 
 
 METHOD GetPointSize() CLASS Font
    LOCAL tm, n, hDC
-   hDC := GetDC(0)
+   hDC := CreateCompatibleDC()
    GetTextMetrics( hDC, @tm )
    IF tm != NIL
       ::xPointSize := MulDiv( ABS( ::Height ) - tm:tmInternalLeading, 72, GetDeviceCaps( hDC, LOGPIXELSY ) ) + 2
    ENDIF
-   ReleaseDC( 0, hDC )
+   DeleteDC( hDC )
 RETURN n

@@ -832,7 +832,6 @@ CLASS TabPage INHERIT Dialog
 
    DATA Modal              EXPORTED INIT .T.
    DATA AutoClose          EXPORTED INIT .T.
-   DATA DisableParent      EXPORTED INIT .F.
    DATA ShowMode           EXPORTED INIT 1
    DATA Center             EXPORTED INIT .F.
    DATA Icon               EXPORTED
@@ -1330,6 +1329,8 @@ RETURN Self
 METHOD __Show() CLASS TabPage
    LOCAL n := 0, oCur, tci := (struct TCITEM)
 
+   oCur := ::Parent:GetItemObject()
+
    ::xVisible  := .T.
    ::Parent:SendMessage( TCM_DELETEALLITEMS, 0, 0 )
 
@@ -1347,12 +1348,7 @@ METHOD __Show() CLASS TabPage
 
    ::Application:DoEvents()
 
-   IF ::Parent:CurSel >= ::xPosition
-      ::Parent:CurSel := MIN( ::Parent:GetItemCount(), ::Parent:CurSel+1 )
-   ENDIF
-   IF ( oCur := ::Parent:GetItemObject() ) != NIL
-      oCur:ShowTab()
-   ENDIF
+   oCur:Select()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

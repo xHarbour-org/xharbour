@@ -222,8 +222,8 @@ CLASS StatusBarPanel INHERIT Control
 
    EXPORTED:
       DATA Border        INIT .F.
-      DATA Font
       DATA ToolTip
+      DATA Font
       DATA Theming     INIT .F.
       DATA AllowClose    INIT .F.
       DATA AllowUndock   INIT .F.
@@ -247,7 +247,7 @@ CLASS StatusBarPanel INHERIT Control
    DATA TabOrder   EXPORTED
 
    ACCESS ImageList INLINE ::Parent:ImageList
-   
+
    DATA xLeft                 EXPORTED INIT 0
    ACCESS Left                INLINE ::xLeft
    ASSIGN Left(n)             INLINE ::xLeft := n

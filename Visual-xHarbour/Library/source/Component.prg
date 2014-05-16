@@ -124,6 +124,7 @@ METHOD Destroy() CLASS Component
          NEXT
          
       ENDIF
+      ::Owner := NIL
       RETURN .T.
    ENDIF
 RETURN .F.

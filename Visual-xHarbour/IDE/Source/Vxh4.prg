@@ -668,7 +668,7 @@ METHOD SetActiveObjectFont( oFont, aFont1, aFont2, oItem ) CLASS ObjManager
        __objSendMsg( oFont, "_" + UPPER( aProps[n] ), aFont1[n] )
    NEXT
    oFont:Modify()
-   oFont:Set( oFont:Parent )
+   oFont:Set()
    ::ResetProperties(,,.T., IIF( oItem:Expanded, {oItem:Caption},) )
 RETURN Self
 
@@ -1030,6 +1030,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
    IF aSel[1][1] == NIL
+      FOR n := 1 TO LEN( ::Items )
+         ::Items[n]:Cargo := NIL
+         ::Items[n]:ColItems := NIL
+         ::Items[n]:Delete()
+      NEXT
       ::ResetContent()
       RETURN NIL
    ENDIF
@@ -1067,6 +1072,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    ::lPaint := .F.
    ::SetRedraw( .F. )
+   FOR n := 1 TO LEN( ::Items )
+      ::Items[n]:Cargo := NIL
+      ::Items[n]:ColItems := NIL
+      ::Items[n]:Delete()
+   NEXT
    ::ResetContent()
    
    TRY
@@ -1411,7 +1421,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType  := "SYSFOLDERS"
                   xValue := NIL
 
-             CASE cProp == "Driver" .AND. ::ActiveObject:__xCtrlName == "DataTable"
+             CASE cProp == "Driver" .AND. ::ActiveObject:ComponentType == "DataSource"
                   aCol[1]:Value := ::System:DataDrivers:Keys
                   aCol[1]:ColType  := "DATADRIVERS"
                   xValue := NIL

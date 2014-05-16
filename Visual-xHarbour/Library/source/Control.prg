@@ -44,7 +44,6 @@ CLASS Control INHERIT Window
    DATA EmptyLeft         EXPORTED INIT 0
    DATA ToolBarPos        EXPORTED INIT 1
    DATA AutoClose         EXPORTED INIT .T.
-   DATA DisableParent     EXPORTED INIT .F.
    DATA ShowMode          EXPORTED INIT 1
    DATA Modal             EXPORTED INIT .F.
    DATA __IdeImageIndex   EXPORTED INIT 3

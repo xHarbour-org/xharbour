@@ -269,7 +269,6 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS ControlMask
    Super:Init( oParent )
-   ::AutoClose       := .F.
    ::ClsName         := "CtrlMask"
    ::__xCtrlName       := "CtrlMask"
    ::ClassBrush  := GetStockObject( NULL_BRUSH )

@@ -946,7 +946,12 @@ METHOD DeleteColumn( nCol, lDisplay ) CLASS DataGrid
    ENDIF
 
    ::Children[ nCol ]:Font:Delete()
+   ::Children[ nCol ]:Font:Owner := NIL
+   ::Children[ nCol ]:Font := NIL
+
    ::Children[ nCol ]:HeaderFont:Delete()
+   ::Children[ nCol ]:HeaderFont:Owner := NIL
+   ::Children[ nCol ]:HeaderFont := NIL
 
    aDel( ::Children, nCol, .T. )
 
@@ -3438,6 +3443,7 @@ METHOD OnDestroy() CLASS DataGrid
    WHILE LEN( ::Children ) > 0
        ATAIL( ::Children ):Destroy()
    ENDDO
+   ::DataSource := NIL
    IF ::__LinePen != NIL
       DeleteObject( ::__LinePen )
    ENDIF
@@ -4129,11 +4135,8 @@ METHOD Init( oParent ) CLASS GridColumn
    ENDIF
    //::Form       := oParent:Form
    
-   ::HeaderFont := Font()
-   ::Font       := Font()
-
-   ::Font:Parent       := Self
-   ::HeaderFont:Parent := Self
+   ::HeaderFont := Font( Self )
+   ::Font       := Font( Self )
 
    IF ::__ClassInst != NIL
       ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
@@ -4246,7 +4249,7 @@ RETURN Self
 METHOD __GetFields() CLASS GridColumn
    LOCAL n, aFields := {{},{}}, aStruct
    
-   IF VALTYPE( ::Parent:DataSource ) == "O"
+   IF VALTYPE( ::Parent:DataSource ) == "O" .AND. ::Parent:DataSource:Structure != NIL
       aStruct := ::Parent:DataSource:Structure
 
       AADD( aFields[1], "" )

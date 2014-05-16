@@ -526,7 +526,7 @@ HB_FUNC( POKE )
    else
       hb_xmemcpy( (char *) hb_parnl(1), hb_parcx( 2 ), hb_parclen( 2 ) );
 }
-
+/*
 HB_FUNC( MEMFREE )
 {
    hb_xfree( ( char * ) hb_parnl( 1 ) ) ;
@@ -536,7 +536,7 @@ HB_FUNC( MEMALLOC )
 {
    hb_retnl( ( LONG) hb_xgrab( hb_parnl( 1 ) ) ) ;
 }
-
+*/
 HB_FUNC( BIN2F )
 {
    hb_retnd( (double) *( (float *) hb_parcx( 1 ) ) );
@@ -1218,6 +1218,12 @@ HB_FUNC( _GETCLASSINFO )
    {
       hb_retclen( (char*) &WndClass, sizeof(WNDCLASS) ) ;
    }
+}
+
+HB_FUNC( ISREGISTERED )
+{
+   WNDCLASS WndClass  ;
+   hb_retl( (BOOL) GetClassInfo( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ), &WndClass ) );
 }
 
 HB_FUNC( ISBADCODEPTR )
@@ -2742,8 +2748,6 @@ static PHB_DYNS pDynSym;
 
 void __stdcall _InternetStatusCallback( HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
 {
-   OutputDebugString( "?" );
-
    if( pDynSym )
    {
        hb_vmPushSymbol( (HB_SYMB *) pDynSym );
@@ -5019,7 +5023,7 @@ HB_FUNC( VXH_MAINLOOP )
    } PROCESS_MEMORY_COUNTERS_EX, *PPROCESS_MEMORY_COUNTERS_EX;
 #endif
 
-HB_FUNC( GETPROCESSMEMORYINFO )
+HB_FUNC( GETPROCESSMEMORY )
 {
    //DWORD processID;
    //HANDLE hProcess;
@@ -5028,7 +5032,7 @@ HB_FUNC( GETPROCESSMEMORYINFO )
 
    //hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
 
-   GetProcessMemoryInfo( /*hProcHandle*/ (HANDLE) -1, &pmc, sizeof(pmc) );
+   GetProcessMemoryInfo( /*hProcHandle*/ GetCurrentProcess(), &pmc, sizeof(pmc) );
    hb_retnl( (long) pmc.WorkingSetSize );
 
    //CloseHandle( hProcess );
