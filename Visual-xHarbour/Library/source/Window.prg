@@ -2004,7 +2004,7 @@ METHOD OnNCDestroy() CLASS Window
       ::Dock:Owner := NIL
       ::Dock := NIL
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::__ClassInst != NIL .AND. ::TreeItem != NIL
       ::TreeItem:Cargo := NIL
       ::TreeItem := NIL
    ENDIF
