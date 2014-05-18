@@ -171,7 +171,7 @@ METHOD Delete() CLASS Font
       ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
-      ::__ClassInst := NIL
+      //::__ClassInst := NIL
    ENDIF
 RETURN .T.
 
@@ -290,11 +290,11 @@ METHOD Modify() CLASS Font
       lf:lfPitchAndFamily := ::PitchAndFamily
 
       IF ::Delete()
-         IF ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
-            ::Set( ::Owner )
-         ENDIF
          IF ::lCreateHandle
             ::Handle := CreateFontIndirect( lf )
+         ENDIF
+         IF ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
+            ::Set( ::Owner )
          ENDIF
       ENDIF
    ENDIF

@@ -295,7 +295,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
 
    aRest := { rc:Left, rc:bottom, rc:right, ::ClientHeight }
    
-   IF VALTYPE( oItem:ColItems ) == "A"
+   IF ::ActiveObject != NIL .AND. VALTYPE( oItem:ColItems ) == "A"
       FOR n := 1 TO LEN( oItem:ColItems )
           nLeft   += nWidth
 
@@ -1532,7 +1532,6 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
                                                     oPar := o:Parent,;
                                                     o:Destroy(),;
-                                                    c := o:Cargo[1],;
                                                     o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                     oPar:SetValue( xValue:Enum&c[2][n+1] ) }
              xValue2 := NIL
@@ -1731,8 +1730,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                      
                        :Action := {|o, d, oPar| d := o:Date,;
                                                      oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( d, o ) }
+                                                     o:Parent:SetValue( d, o ),;
+                                                     o:Destroy() }
                        :Date := ::GetEditBuffer( oItem, nCol )
                        :SetFocus()
                        :PostMessage( WM_LBUTTONDOWN, 1, MAKELPARAM( :Width - 10, :Height / 2 ) )
