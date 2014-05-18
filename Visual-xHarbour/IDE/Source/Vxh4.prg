@@ -1530,9 +1530,10 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              aCol[1]:ColType  := "ENUM"
              aCol[1]:SetValue := ASCAN( xValue:Enum&cProp2[2], xValue:&cProp2,,, .T. )
              aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
-                                                    oPar := o:Parent,;
-                                                    o:Destroy(),;
+                                                    oPar := ObjFromHandle(o:Parent:hWnd),;
+													c := o:Cargo[1],;
                                                     o:Cargo[2]:ColItems[1]:SetValue := n+1,;
+                                                    o:Destroy(),;
                                                     oPar:SetValue( xValue:Enum&c[2][n+1] ) }
              xValue2 := NIL
 
@@ -2910,28 +2911,28 @@ METHOD Create() CLASS ObjCombo
    ::ColFont:Create()
 RETURN Self
 
-METHOD OnParentDrawItem() CLASS ObjCombo
+METHOD OnParentDrawItem( nlParam, nwParam, dis ) CLASS ObjCombo
    LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, z, aAlign, y
-
-   IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
+   ( nlParam, nwParam ) 
+   IF dis:hwndItem == ::hWnd
       DEFAULT ::ColWidth TO ::ClientWidth
 
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := left( itemTxt, nLen )
 
-         z := ::Parent:DrawItemStruct:rcItem:Top
-         IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT != 0 .AND. ::Parent:DrawItemStruct:itemAction & ODA_SELECT == 0
-            z := ::Parent:DrawItemStruct:rcItem:Top - 2
+         z := dis:rcItem:Top
+         IF dis:itemState & ODS_COMBOBOXEDIT != 0 .AND. dis:itemAction & ODA_SELECT == 0
+            z := dis:rcItem:Top - 2
          ENDIF
 
          cText   := ""
@@ -2943,21 +2944,21 @@ METHOD OnParentDrawItem() CLASS ObjCombo
              IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
                 x := aRect[1] + 2
 
-                ::Font:Select( ::Parent:DrawItemStruct:hDC )
+                ::Font:Select( dis:hDC )
                 IF nField == 1
-                   ::ColFont:Select( ::Parent:DrawItemStruct:hDC )
+                   ::ColFont:Select( dis:hDC )
                 ENDIF
 
-                aAlign  := _GetTextExtentPoint32( ::Parent:DrawItemStruct:hDC, cText )
-                y := ::Parent:DrawItemStruct:rcItem:top + ( ( ::Parent:DrawItemStruct:rcItem:bottom - ::Parent:DrawItemStruct:rcItem:top )/2 ) - ( aAlign[2]/2 )
+                aAlign  := _GetTextExtentPoint32( dis:hDC, cText )
+                y := dis:rcItem:top + ( ( dis:rcItem:bottom - dis:rcItem:top )/2 ) - ( aAlign[2]/2 )
 
-                _ExtTextOut( ::Parent:DrawItemStruct:hDC, x, y, ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
+                _ExtTextOut( dis:hDC, x, y, ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
                 cText := ""
                 aRect[1] += ::ColWidth
                 nField ++
 
                 IF nField  > 1
-                   aRect[3] := ::Parent:DrawItemStruct:rcItem:Right
+                   aRect[3] := dis:rcItem:Right
                   ELSE
                    aRect[3] += ::ColWidth
                 ENDIF
@@ -2968,11 +2969,11 @@ METHOD OnParentDrawItem() CLASS ObjCombo
          NEXT
       ENDIF
 
-      IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
-         IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-            aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                       ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-            _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      IF dis:itemState & ODS_COMBOBOXEDIT == 0
+         IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+            aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                       dis:rcItem:Right, dis:rcItem:Bottom  }
+            _DrawfocusRect( dis:hDC, aclip )
          ENDIF
       ENDIF
    ENDIF
