@@ -218,8 +218,8 @@ CLASS Window INHERIT Object
    DATA StatusBar              EXPORTED
 
    DATA WindowPos              EXPORTED
-   DATA DrawItemStruct         EXPORTED
-   DATA MeasureItemStruct      EXPORTED
+   //DATA DrawItemStruct         EXPORTED
+   //DATA MeasureItemStruct      EXPORTED
    DATA hdr                    EXPORTED
    DATA ScrollInfo             EXPORTED
 
@@ -662,9 +662,6 @@ METHOD Init( oParent ) CLASS Window
    ENDIF
    Super:Init()
    ::__lInitialized := .T.
-   //::hdr               := {=>}
-   //::WindowPos         := {=>}
-   //::MeasureItemStruct := {=>}
 
    DEFAULT ::ThemeName    TO "window"
    DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -1966,7 +1963,7 @@ METHOD EndPaint() CLASS Window
 RETURN NIL
 
 METHOD OnNCDestroy() CLASS Window
-   LOCAL n, aComp, aProperties, aProperty
+   LOCAL n, aComp
    aComp := {}
    FOR n := 1 TO LEN( ::Components )
        IF ::Components[n]:Exists
@@ -2120,8 +2117,6 @@ METHOD OnNCDestroy() CLASS Window
 
    ::siv               := NIL
    ::sih               := NIL
-   ::DrawItemStruct    := NIL
-   ::MeasureItemStruct := NIL
    ::ScrollInfo        := NIL
    ::hdr               := NIL
    ::WindowPos         := NIL
@@ -2133,12 +2128,7 @@ METHOD OnNCDestroy() CLASS Window
    ::__lInitialized    := .F.
    //::EventHandler      := NIL
 
-   aProperties := __ClsGetIvarNamesAndValues( Self )
-   FOR EACH aProperty IN aProperties
-       IF VALTYPE( aProperty[2] ) $ "BOA"
-          __objSendMsg( Self, "_" + aProperty[1], NIL )
-       ENDIF
-   NEXT
+   __CleanUp( Self )
        
    IF ::Application != NIL
       IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
@@ -2160,11 +2150,30 @@ METHOD OnNCDestroy() CLASS Window
    ::Application:MainForm:PostMessage( WM_VXH_DESTRUCTOBJECT )
 RETURN NIL
 
+static function __CleanUp( oObj )
+   LOCAL aProperty, aProperties := __ClsGetIvarNamesAndValues( oObj )
+   
+   IF LEFT( oObj:ClassName, 11 ) != "C STRUCTURE"
+      FOR EACH aProperty IN aProperties
+          IF VALTYPE( aProperty[2] ) $ "BOA" .AND. ! ( Upper( aProperty[1] ) IN {"PARENT","FORM","OWNER","TOOLTIP","ACMEMBERS","SIBLINGS","SYSTEM","APPLICATION" } )
+             TRY
+                //IF VALTYPE( aProperty[2] ) == "O"
+                //   __CleanUp( aProperty[2] )
+                //ENDIF
+                __objSendMsg( oObj, "_" + aProperty[1], NIL )
+             CATCH
+                //view oObj:ClassName, aProperty[1]
+             END
+          ENDIF
+      NEXT
+   ENDIF
+return nil
+
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
-   LOCAL pt, hwndFrom, idFrom, code, aParams, nAnimation, nMess
+   LOCAL pt, hwndFrom, idFrom, code, nAnimation, nMess, mis, dis
    
    ::Msg    := nMsg
    ::wParam := nwParam
@@ -2190,13 +2199,13 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
             ::hWnd := hWnd
             ::PreInitDialog()
          ENDIF
-         nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
-         IF VALTYPE(nRet) $ "OU"
-            ExecuteEvent( aMessages[nMess][2], Self )
-         ENDIF
          cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
          IF nRet == NIL .AND. __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
             nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
+         ENDIF
+         nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
+         IF VALTYPE(nRet) $ "OU"
+            ExecuteEvent( aMessages[nMess][2], Self )
          ENDIF
          IF nMsg == WM_INITDIALOG
             ::PostInitDialog()
@@ -2384,7 +2393,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_HELP
-              ::HelpInfo  := (struct HELPINFO *) nlParam
               nRet := ExecuteEvent( "OnHelp", Self )
               EXIT
 
@@ -2463,13 +2471,13 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          CASE WM_GETDLGCODE
               IF ! ( nlParam == 0 )
-                 //msg := (struct MSG*) nlParam
-                 aParams    := __GetMSG( nlParam )
-                 msg := {=>}
-                 msg:hwnd    := aParams[1]
-                 msg:message := aParams[2]
-                 msg:wParam  := aParams[3]
-                 msg:lParam  := aParams[4]
+                 msg := (struct MSG*) nlParam
+                 //aParams    := __GetMSG( nlParam )
+                 //msg := {=>}
+                 //msg:hwnd    := aParams[1]
+                 //msg:message := aParams[2]
+                 //msg:wParam  := aParams[3]
+                 //msg:lParam  := aParams[4]
               ENDIF
               IF ::Parent != NIL
                  nRet := ::Parent:OnChildGetDlgCode( msg )
@@ -2538,81 +2546,52 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_MEASUREITEM
-              ::MeasureItemStruct := (struct MEASUREITEMSTRUCT*) nlParam
-              //aParams := __GetMEASUREITEMSTRUCT( nlParam )
-              //::MeasureItemStruct:CtlType    := aParams[1]
-              //::MeasureItemStruct:CtlID      := aParams[2]
-              //::MeasureItemStruct:itemID     := aParams[3]
-              //::MeasureItemStruct:itemWidth  := aParams[4]
-              //::MeasureItemStruct:itemHeight := aParams[5]
-              //::MeasureItemStruct:itemData   := aParams[6]
+              mis := (struct MEASUREITEMSTRUCT*) nlParam
 
-              IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. ::MeasureItemStruct:itemData != NIL .AND. ::MeasureItemStruct:itemData <> 0
-                 IF ( oCtrl := ArrayFromPointer( ::MeasureItemStruct:itemData ) ) != NIL
+              IF mis:CtlType == ODT_MENU .AND. mis:itemData != NIL .AND. mis:itemData <> 0
+                 IF ( oCtrl := ArrayFromPointer( mis:itemData ) ) != NIL
                     IF __objHasMsg( oCtrl, "OnMeasureItem" )
-                       nRet := oCtrl:OnMeasureItem( nwParam, nlParam, ::MeasureItemStruct )
+                       nRet := oCtrl:OnMeasureItem( nwParam, nlParam, mis )
                      ELSE
                        nRet := ::OnMeasureItem( nwParam, nlParam )
                     ENDIF
                  ENDIF
                ELSE
                  nRet := ExecuteEvent( "OnMeasureItem", Self )
-                 ODEFAULT nRet TO ::OnMeasureItem( nwParam, nlParam )
+                 ODEFAULT nRet TO ::OnMeasureItem( nwParam, nlParam, mis )
 
-                 IF nRet == NIL .AND. ( n := ASCAN( ::Children, {|o| o:Id == ::MeasureItemStruct:itemID} ) ) > 0
+                 IF nRet == NIL .AND. ( n := ASCAN( ::Children, {|o| o:Id == mis:itemID} ) ) > 0
                     oCtrl := ::Children[n]
                     IF HGetPos( oCtrl:EventHandler, "OnParentMeasureItem" ) != 0
                        nRet := ::&( oCtrl:EventHandler[ "OnParentMeasureItem" ] )( Self )
                     ENDIF
-                    ODEFAULT nRet TO oCtrl:OnParentMeasureItem(nwParam,nlParam, ::MeasureItemStruct)
+                    ODEFAULT nRet TO oCtrl:OnParentMeasureItem(nwParam,nlParam, mis)
                  ENDIF
 
               ENDIF
               EXIT
 
          CASE WM_DRAWITEM
-              ::DrawItemStruct := (struct DRAWITEMSTRUCT*) nlParam
-              /*
-              aDraw := __DRAWITEMSTRUCT( nlParam )
-              ::DrawItemStruct := {=>}
-              HSetCaseMatch( ::DrawItemStruct, .F. )
-              ::DrawItemStruct:rcItem := {=>}
-              HSetCaseMatch( ::DrawItemStruct:rcItem, .F. )
-
-              ::DrawItemStruct:CtlType       := aDraw[1]
-              ::DrawItemStruct:CtlID         := aDraw[2]
-              ::DrawItemStruct:itemID        := aDraw[3]
-              ::DrawItemStruct:itemAction    := aDraw[4]
-              ::DrawItemStruct:itemState     := aDraw[5]
-              ::DrawItemStruct:hWndItem      := aDraw[6]
-              ::DrawItemStruct:hDC           := aDraw[7]
-              ::DrawItemStruct:itemData      := aDraw[8]
-
-              ::DrawItemStruct:rcItem:Left   := aDraw[9][1]
-              ::DrawItemStruct:rcItem:Top    := aDraw[9][2]
-              ::DrawItemStruct:rcItem:Right  := aDraw[9][3]
-              ::DrawItemStruct:rcItem:Bottom := aDraw[9][4]
-              ::DrawItemStruct:rcItem:Array  := ACOPY(aDraw)
-              */
-              IF ::DrawItemStruct:CtlType == ODT_MENU .AND. ::DrawItemStruct:itemData != NIL .AND. ::DrawItemStruct:itemData <> 0
-                 IF ( oCtrl := ArrayFromPointer( ::DrawItemStruct:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
+              dis := (struct DRAWITEMSTRUCT*) nlParam
+              IF dis:CtlType == ODT_MENU .AND. dis:itemData != NIL .AND. dis:itemData <> 0
+                 IF ( oCtrl := ArrayFromPointer( dis:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
                     IF __objHasMsg( oCtrl, "OnMeasureItem" )
-                       nRet := oCtrl:OnDrawItem( nwParam, nlParam, ::DrawItemStruct )
+                       nRet := oCtrl:OnDrawItem( nwParam, nlParam, dis )
                      ELSE
-                       nRet := ::OnDrawItem( nwParam, nlParam )
+                       nRet := ::OnDrawItem( nwParam, nlParam, dis )
                     ENDIF
                  ENDIF
                ELSE
 
                  nRet := ExecuteEvent( "OnDrawItem", Self )
-                 ODEFAULT nRet TO ::OnDrawItem( nwParam, nlParam )
+                 ODEFAULT nRet TO ::OnDrawItem( nwParam, nlParam, dis )
                  IF nRet == NIL
-                    oCtrl := ObjFromHandle( ::DrawItemStruct:hwndItem )
+                    oCtrl := ObjFromHandle( dis:hwndItem )
                     IF oCtrl != NIL
                        IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
                           nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( oCtrl )
                        ENDIF
-                       ODEFAULT nRet TO oCtrl:OnParentDrawItem( nwParam, nlParam, ::DrawItemStruct )
+                       ODEFAULT nRet TO oCtrl:OnParentDrawItem( nwParam, nlParam, dis )
                     ENDIF
                  ENDIF
 
@@ -3246,23 +3225,23 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnMeasureItem( nwParam, nlParam ) CLASS Window
+METHOD OnMeasureItem( nwParam, nlParam, mis ) CLASS Window
    LOCAL n, oItem, oButton, oSub, oMenu
    (nwParam)
    IF ::Application != NIL
       oMenu := ::Application:oCurMenu
    ENDIF
 
-   IF ::MeasureItemStruct:CtlType == ODT_MENU .AND. oMenu != NIL
+   IF mis:CtlType == ODT_MENU .AND. oMenu != NIL
       FOR EACH oButton IN oMenu:aItems
          IF oButton:MenuItemInfo:fType & BTNS_SEP == 0 .AND. oButton:Menu != NIL
-            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==::MeasureItemStruct:itemID } ) ) > 0
-               RETURN oButton:Menu:aItems[n]:MeasureItem( ::MeasureItemStruct, nlParam )
+            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==mis:itemID } ) ) > 0
+               RETURN oButton:Menu:aItems[n]:MeasureItem( mis, nlParam )
             ENDIF
             // it is NOT the 1st level, let's see the rest
             FOR EACH oSub IN oButton:Menu:aItems
-               IF ( oItem := oSub:GetMenuById( ::MeasureItemStruct:itemID ) )!= NIL
-                  RETURN oItem:MeasureItem( ::MeasureItemStruct, nlParam )
+               IF ( oItem := oSub:GetMenuById( mis:itemID ) )!= NIL
+                  RETURN oItem:MeasureItem( mis, nlParam )
                ENDIF
             NEXT
          ENDIF
@@ -3317,24 +3296,24 @@ METHOD OnSetFocus() CLASS Window
    ENDIF
 RETURN nRet
 
-METHOD OnDrawItem() CLASS Window
+METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS Window
    LOCAL n, oItem, oButton, oSub, oMenu
-
+   (nwParam, nlParam)
    oMenu := ::Application:oCurMenu
-   IF ::DrawItemStruct:CtlType == ODT_MENU .AND. oMenu != NIL
-      IF ::DrawItemStruct:itemState > 200
-         ::DrawItemStruct:itemState -= 256
+   IF dis:CtlType == ODT_MENU .AND. oMenu != NIL
+      IF dis:itemState > 200
+         dis:itemState -= 256
       ENDIF
       FOR EACH oButton IN oMenu:aItems
          IF oButton:MenuItemInfo:fType & BTNS_SEP == 0 .AND. oButton:Menu != NIL
-            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==::DrawItemStruct:itemID } ) ) > 0
-               oButton:Menu:aItems[n]:DrawItem( ::DrawItemStruct, .F. )
+            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==dis:itemID } ) ) > 0
+               oButton:Menu:aItems[n]:DrawItem( dis, .F. )
                RETURN 1
             ENDIF
             // it is NOT the 1st level, let's see the rest
             FOR EACH oSub IN oButton:Menu:aItems
-               IF ( oItem := oSub:GetMenuById(::DrawItemStruct:itemID ) )!= NIL
-                  oItem:DrawItem( ::DrawItemStruct, .F. )
+               IF ( oItem := oSub:GetMenuById(dis:itemID ) )!= NIL
+                  oItem:DrawItem( dis, .F. )
                   RETURN 1
                ENDIF
             NEXT
@@ -4253,6 +4232,7 @@ METHOD Destroy() CLASS __WindowDock
    ::xRight  := NIL
    ::xBottom := NIL
    ::Owner   := NIL
+   ::__ClassInst := NIL
 RETURN NIL
 
 METHOD SetMargins( cMargins ) CLASS __WindowDock

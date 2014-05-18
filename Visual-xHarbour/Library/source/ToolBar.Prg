@@ -402,18 +402,18 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnMeasureItem( nwParam, nlParam ) CLASS ToolBar
+METHOD OnMeasureItem( nwParam, nlParam, mis ) CLASS ToolBar
    LOCAL n, oItem, oButton, oSub
    (nwParam)
-   IF ::MeasureItemStruct:CtlType == ODT_MENU
+   IF mis:CtlType == ODT_MENU
 
       IF ::Chevron != NIL
-         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==::MeasureItemStruct:itemID } ) ) > 0
-            RETURN ::Chevron:aItems[n]:MeasureItem( ::MeasureItemStruct, nlParam )
+         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==mis:itemID } ) ) > 0
+            RETURN ::Chevron:aItems[n]:MeasureItem( mis, nlParam )
          ELSE
             FOR EACH oSub IN ::Chevron:Menu:aItems
-               IF ( oItem := oSub:GetMenuById( ::MeasureItemStruct:itemID ) )!= NIL
-                  RETURN oItem:MeasureItem( ::MeasureItemStruct, nlParam )
+               IF ( oItem := oSub:GetMenuById( mis:itemID ) )!= NIL
+                  RETURN oItem:MeasureItem( mis, nlParam )
                ENDIF
             NEXT
          ENDIF
@@ -421,13 +421,13 @@ METHOD OnMeasureItem( nwParam, nlParam ) CLASS ToolBar
 
       FOR EACH oButton IN ::aItems
          IF oButton:Style & BTNS_SEP == 0 .AND. oButton:Menu != NIL
-            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==::MeasureItemStruct:itemID } ) ) > 0
-               RETURN oButton:Menu:aItems[n]:MeasureItem( ::MeasureItemStruct, nlParam )
+            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==mis:itemID } ) ) > 0
+               RETURN oButton:Menu:aItems[n]:MeasureItem( mis, nlParam )
             ENDIF
             // it is NOT the 1st level, let's see the rest
             FOR EACH oSub IN oButton:Menu:aItems
-               IF ( oItem := oSub:GetMenuById( ::MeasureItemStruct:itemID ) )!= NIL
-                  RETURN oItem:MeasureItem( ::MeasureItemStruct, nlParam )
+               IF ( oItem := oSub:GetMenuById( mis:itemID ) )!= NIL
+                  RETURN oItem:MeasureItem( mis, nlParam )
                ENDIF
             NEXT
          ENDIF
@@ -439,29 +439,29 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnDrawItem() CLASS ToolBar
+METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
    LOCAL hDC, rc, n:=0, hBrush, xIcon:=0, yIcon:=0
    LOCAL nTop, oButton, oItem, oMenu, nOff := 0, Chk
    LOCAL lCheck := .F., nPos, lArrow := .F., lWhole := .F., oSub
    LOCAL lDisabled, lSelected, nIcon, lDrop := .F.
    LOCAL Rect, pt
+   (nwParam, nlParam)
+   IF dis:CtlType == ODT_MENU
 
-   IF ::DrawItemStruct:CtlType == ODT_MENU
-
-      IF ::DrawItemStruct:itemState > 200
-         ::DrawItemStruct:itemState -= 256
+      IF dis:itemState > 200
+         dis:itemState -= 256
       ENDIF
 
       FOR EACH oButton IN ::aItems
          IF oButton:Style & BTNS_SEP == 0 .AND. oButton:Menu != NIL
-            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==::DrawItemStruct:itemID } ) ) > 0
-               oButton:Menu:aItems[n]:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
+            IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==dis:itemID } ) ) > 0
+               oButton:Menu:aItems[n]:DrawItem( dis, .F., ::__hTheme )
                RETURN 1
             ENDIF
             // it is NOT the 1st level, let's see the rest
             FOR EACH oSub IN oButton:Menu:aItems
-               IF ( oItem := oSub:GetMenuById(::DrawItemStruct:itemID ) )!= NIL
-                  oItem:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
+               IF ( oItem := oSub:GetMenuById(dis:itemID ) )!= NIL
+                  oItem:DrawItem( dis, .F., ::__hTheme )
                   RETURN 1
                ENDIF
             NEXT
@@ -470,14 +470,14 @@ METHOD OnDrawItem() CLASS ToolBar
 
       IF ::Chevron != NIL
          n := 0
-         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==::DrawItemStruct:itemID } ) ) > 0
+         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==dis:itemID } ) ) > 0
             oMenu:= ::Chevron
             oItem:= ::Chevron:aItems[n]
             nPos := n
          ELSE
             FOR EACH oSub IN ::Chevron:Menu:aItems
-               IF ( oItem := oSub:GetMenuById( ::DrawItemStruct:itemID ) )!= NIL
-                  oItem:DrawItem( ::DrawItemStruct, .F., ::__hTheme )
+               IF ( oItem := oSub:GetMenuById( dis:itemID ) )!= NIL
+                  oItem:DrawItem( dis, .F., ::__hTheme )
                   RETURN 1
                ENDIF
             NEXT
@@ -489,9 +489,9 @@ METHOD OnDrawItem() CLASS ToolBar
          Chk := (struct RECT)
          pt  := (struct POINT)
 
-         hDC   := ::DrawItemStruct:hDC
+         hDC   := dis:hDC
          rc := (struct RECT)
-         rc:Buffer( ::DrawItemStruct:rcItem:value )
+         rc:Buffer( dis:rcItem:value )
 
          IF oMenu:ImageList != NIL
             xIcon := oMenu:ImageList:IconWidth
@@ -506,12 +506,12 @@ METHOD OnDrawItem() CLASS ToolBar
          rc:bottom := MAX( rc:bottom, 2+yIcon+1 )
          rc:bottom := MAX( rc:bottom, GetSystemMetrics( SM_CYMENU ) )
 
-         lDisabled  := ::DrawItemStruct:itemState & ODS_DISABLED != 0
-         lSelected  := ::DrawItemStruct:itemState & ODS_SELECTED != 0
+         lDisabled  := dis:itemState & ODS_DISABLED != 0
+         lSelected  := dis:itemState & ODS_SELECTED != 0
 
          IF lSelected .AND. !lDisabled
             // for chevron bar use only
-            IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE .AND. ::Application:OsVersion:dwMajorVersion <= 4
+            IF dis:itemAction==ODA_DRAWENTIRE .AND. ::Application:OsVersion:dwMajorVersion <= 4
                hBrush:= GetSysColorBrush( COLOR_MENU )
                FillRect( hDC, rc, hBrush )
             ENDIF
@@ -526,7 +526,7 @@ METHOD OnDrawItem() CLASS ToolBar
                     Chk:bottom := rc:bottom
 
                     lArrow := .T.
-                    IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE
+                    IF dis:itemAction==ODA_DRAWENTIRE
                        OffsetRect( @Chk, 1, 1 )
                        lWhole := .T.
                     ENDIF
@@ -534,7 +534,7 @@ METHOD OnDrawItem() CLASS ToolBar
                CASE oItem:Style & BTNS_DROPDOWN != 0
                     n := rc:right
                     rc:right -= GetSystemMetrics( SM_CXMENUCHECK )
-                    IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE
+                    IF dis:itemAction==ODA_DRAWENTIRE
                        _ScreenToClient( WindowFromDC( hDC ), ::PushPos )
                        IF ::PushPos[1] >= rc:right
                           lCheck := .T.
@@ -566,20 +566,20 @@ METHOD OnDrawItem() CLASS ToolBar
                ENDIF
 
                IF n>0
-                  IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE
+                  IF dis:itemAction==ODA_DRAWENTIRE
                      OffsetRect( @Chk, 1, 1 )
                   ENDIF
                ENDIF
              ELSE
-               DrawEdge( hDC, rc, IIF( ::DrawItemStruct:itemAction==ODA_DRAWENTIRE .AND. !lCheck, BDR_SUNKENOUTER, BDR_RAISEDINNER), BF_RECT )
+               DrawEdge( hDC, rc, IIF( dis:itemAction==ODA_DRAWENTIRE .AND. !lCheck, BDR_SUNKENOUTER, BDR_RAISEDINNER), BF_RECT )
                IF n>0
                   Chk:left   := rc:right
                   Chk:top    := rc:top
                   Chk:right  := n
                   Chk:bottom := rc:bottom
                   rc:right := n
-                  DrawEdge( hDC, Chk, IIF( !::DrawItemStruct:itemAction==ODA_DRAWENTIRE, BDR_RAISEDINNER,BDR_SUNKENOUTER), BF_RECT )
-                  IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE
+                  DrawEdge( hDC, Chk, IIF( !dis:itemAction==ODA_DRAWENTIRE, BDR_RAISEDINNER,BDR_SUNKENOUTER), BF_RECT )
+                  IF dis:itemAction==ODA_DRAWENTIRE
                      OffsetRect( @Chk, 1, 1 )
                   ENDIF
                ENDIF
@@ -588,7 +588,7 @@ METHOD OnDrawItem() CLASS ToolBar
             IF lArrow
                ::DrawArrow( hDC, Chk )
             ENDIF
-            IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE.AND.!lCheck
+            IF dis:itemAction==ODA_DRAWENTIRE.AND.!lCheck
                OffsetRect( @rc, 1, 1 )
                nOff := 1
             ENDIF
@@ -623,14 +623,14 @@ METHOD OnDrawItem() CLASS ToolBar
          nTop := rc:top + ( ( (rc:bottom-rc:top) - yIcon) / 2 )
          SetBkMode( hDC, 1 )
 
-         IF oMenu:ImageList != NIL .AND. oItem:ImageIndex != NIL .AND. oItem:ImageIndex > 0 .AND. ::DrawItemStruct:itemState & ODS_CHECKED == 0
+         IF oMenu:ImageList != NIL .AND. oItem:ImageIndex != NIL .AND. oItem:ImageIndex > 0 .AND. dis:itemState & ODS_CHECKED == 0
             IF lDisabled
                oMenu:ImageList:DrawDisabled( hDC, oItem:ImageIndex, rc:left+2, nTop )
             ELSE
                IF oItem:Caption == NIL
-                  rc:left := (::DrawItemStruct:rcItem:Right/2)-(xIcon/2)
+                  rc:left := (dis:rcItem:Right/2)-(xIcon/2)
                ENDIF
-               IF ::DrawItemStruct:itemState == ODS_SELECTED .AND. oMenu:HotImageList != NIL
+               IF dis:itemState == ODS_SELECTED .AND. oMenu:HotImageList != NIL
                   oMenu:HotImageList:DrawImage( hDC, oItem:ImageIndex, rc:left+2, nTop )
                ELSE
                   oMenu:ImageList:DrawImage( hDC, oItem:ImageIndex, rc:left+2, nTop, ILD_TRANSPARENT )
@@ -643,10 +643,10 @@ METHOD OnDrawItem() CLASS ToolBar
          ENDIF
 
          //----------------------------------------------------------------------------------------------
-         IF ::DrawItemStruct:itemAction==ODA_DRAWENTIRE .AND. ( lCheck.OR.lWhole ) .AND. ( oItem:Style & BTNS_DROPDOWN != 0 .OR. oItem:Style & BTNS_WHOLEDROPDOWN != 0 )
-            IF ( nPos := ASCAN( ::aItems, {|o|o:Id==::DrawItemStruct:itemID} ) ) > 0
-               pt:x := ::DrawItemStruct:rcItem:Left
-               pt:y := ::DrawItemStruct:rcItem:Bottom
+         IF dis:itemAction==ODA_DRAWENTIRE .AND. ( lCheck.OR.lWhole ) .AND. ( oItem:Style & BTNS_DROPDOWN != 0 .OR. oItem:Style & BTNS_WHOLEDROPDOWN != 0 )
+            IF ( nPos := ASCAN( ::aItems, {|o|o:Id==dis:itemID} ) ) > 0
+               pt:x := dis:rcItem:Left
+               pt:y := dis:rcItem:Bottom
                ClientToScreen( WindowFromDC( hDC ), @pt )
                ::CreateDropDown( nPos, pt:x, pt:y, TPM_LEFTALIGN | TPM_TOPALIGN, ::hWnd )
                SendMessage( ::hWnd, WM_CANCELMODE, 0, 0 )

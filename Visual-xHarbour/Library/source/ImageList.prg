@@ -348,31 +348,32 @@ METHOD Create() CLASS __ImageListComboBox
    NEXT
 RETURN Self
 
-METHOD OnParentDrawItem() CLASS __ImageListComboBox
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS __ImageListComboBox
    LOCAL n, y, lSelected, nLen, itemTxt, aSize
-   IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
+   ( nwParam, nlParam )
+   IF dis:hwndItem == ::hWnd
+      lSelected := dis:itemState & ODS_SELECTED != 0
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE == ODA_DRAWENTIRE .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT == ODA_SELECT
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+      IF dis:itemAction & ODA_DRAWENTIRE == ODA_DRAWENTIRE .OR. dis:itemAction & ODA_SELECT == ODA_SELECT
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := Left( itemTxt, nLen )
-         n := ::Parent:DrawItemStruct:itemID +1
+         n := dis:itemID +1
 
-         aSize := _GetTextExtentPoint32( ::Parent:DrawItemStruct:hDC, itemTxt )
-         y := ::Parent:DrawItemStruct:rcItem:Top + ((::Parent:DrawItemStruct:rcItem:Bottom-::Parent:DrawItemStruct:rcItem:Top)/2) - (aSize[2]/2)
+         aSize := _GetTextExtentPoint32( dis:hDC, itemTxt )
+         y := dis:rcItem:Top + ((dis:rcItem:Bottom-dis:rcItem:Top)/2) - (aSize[2]/2)
 
          IF n > 0
-            ExtTextOut( ::Parent:DrawItemStruct:hDC, ::ImageList:IconWidth+20, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
-            IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
-               DrawIconEx( ::Parent:DrawItemStruct:hDC, 3, ::Parent:DrawItemStruct:rcItem:Top, ::ImageList:GetImage(n), ::ImageList:IconWidth, ::ImageList:IconHeight, 0, NIL,  DI_NORMAL )
+            ExtTextOut( dis:hDC, ::ImageList:IconWidth+20, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
+            IF dis:itemState & ODS_COMBOBOXEDIT == 0
+               DrawIconEx( dis:hDC, 3, dis:rcItem:Top, ::ImageList:GetImage(n), ::ImageList:IconWidth, ::ImageList:IconHeight, 0, NIL,  DI_NORMAL )
             ENDIF
           ELSE
-            ExtTextOut( ::Parent:DrawItemStruct:hDC, ( ::Parent:DrawItemStruct:rcItem:right - aSize[1] )/2, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
+            ExtTextOut( dis:hDC, ( dis:rcItem:right - aSize[1] )/2, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
          ENDIF
       ENDIF
    ENDIF

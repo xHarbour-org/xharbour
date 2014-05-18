@@ -171,6 +171,7 @@ METHOD Delete() CLASS Font
       ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
+      ::__ClassInst := NIL
    ENDIF
 RETURN .T.
 
@@ -217,7 +218,7 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
    IF ::Owner != NIL .AND. ::Owner:HasMessage( "ForeColor" )
       cf:rgbColors := ::Owner:ForeColor
    ENDIF
-   cf:Flags       := IIF( nStyle != NIL, nStyle, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS )
+   cf:Flags := IIF( nStyle != NIL, nStyle, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS )
 
    IF ChooseFont( @cf )
       IF cf:lpLogFont:lfItalic <> 0

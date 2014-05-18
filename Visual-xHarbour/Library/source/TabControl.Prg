@@ -1418,14 +1418,15 @@ METHOD DrawClose( hDC, aRect ) CLASS TabCloseButton
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentDrawItem() CLASS TabCloseButton
-   IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS TabCloseButton
+   (nwParam, nlParam)
+   IF dis:itemState & ODS_FOCUS != 0
       ::ClosePushed := .T.
    ENDIF
-   IF ::Parent:DrawItemStruct:itemState & ODS_SELECTED == 0
+   IF dis:itemState & ODS_SELECTED == 0
       ::ClosePushed := .F.
    ENDIF
-   ::DrawClose( ::Parent:DrawItemStruct:hDC, { 0, 0, ::Width, ::Height } )
+   ::DrawClose( dis:hDC, { 0, 0, ::Width, ::Height } )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -1500,14 +1501,15 @@ METHOD DrawPin( hDC, aRect ) CLASS TabPinButton
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnParentDrawItem() CLASS TabPinButton
-   IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS TabPinButton
+   (nwParam, nlParam)
+   IF dis:itemState & ODS_FOCUS != 0
       ::ClosePushed := .T.
    ENDIF
-   IF ::Parent:DrawItemStruct:itemState & ODS_SELECTED == 0
+   IF dis:itemState & ODS_SELECTED == 0
       ::ClosePushed := .F.
    ENDIF
-   ::DrawPin( ::Parent:DrawItemStruct:hDC, { 0, 0, ::Width, ::Height } )
+   ::DrawPin( dis:hDC, { 0, 0, ::Width, ::Height } )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------

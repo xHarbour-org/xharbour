@@ -635,30 +635,31 @@ METHOD Create() CLASS DriveCombobox
    NEXT
 RETURN Self
 
-METHOD OnParentDrawItem() CLASS DriveCombobox
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS DriveCombobox
    LOCAL n, x, lSelected, aClip, nLen, itemTxt, cText, aRect, nField, y
-   IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+   ( nwParam, nlParam )
+   IF dis != NIL .AND. dis:hwndItem == ::hWnd
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
 
          itemTxt := Left( itemTxt, nLen )
          cText   := ""
          aRect   := ACLONE(aClip)
          nField  := 1
 
-         _ExtTextOut( ::Parent:DrawItemStruct:hDC, 0, ::Parent:DrawItemStruct:rcItem:Top, ETO_OPAQUE + ETO_CLIPPED, { ::Parent:DrawItemStruct:rcItem:Left, ::Parent:DrawItemStruct:rcItem:Top, ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom }, " " )
+         _ExtTextOut( dis:hDC, 0, dis:rcItem:Top, ETO_OPAQUE + ETO_CLIPPED, { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }, " " )
          FOR n := 3 to nLen + 1
              IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
                 x := aRect[1] + 2
-                _DrawText( ::Parent:DrawItemStruct:hDC, cText, {x, aRect[2], aRect[3], aRect[4] }, DT_VCENTER | DT_SINGLELINE )
+                _DrawText( dis:hDC, cText, {x, aRect[2], aRect[3], aRect[4] }, DT_VCENTER | DT_SINGLELINE )
                 cText := ""
                 aRect[1] += 4 
                 nField ++
@@ -671,15 +672,15 @@ METHOD OnParentDrawItem() CLASS DriveCombobox
 
          n := ASCAN( ::Drives, {|a|a[1] == LEFT( itemTxt, 2 ) } )
          IF n > 0
-            y := ::Parent:DrawItemStruct:rcItem:Top + ((::Parent:DrawItemStruct:rcItem:Bottom-::Parent:DrawItemStruct:rcItem:Top)/2) - (16/2)
-            DrawIconEx( ::Parent:DrawItemStruct:hDC, 3, y, ::Drives[ n ][3], 16, 16, 0, NIL,  DI_NORMAL )
+            y := dis:rcItem:Top + ((dis:rcItem:Bottom-dis:rcItem:Top)/2) - (16/2)
+            DrawIconEx( dis:hDC, 3, y, ::Drives[ n ][3], 16, 16, 0, NIL,  DI_NORMAL )
          ENDIF
 
       ENDIF
-      IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                    ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-         _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+         aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                    dis:rcItem:Right, dis:rcItem:Bottom  }
+         _DrawfocusRect( dis:hDC, aclip )
       ENDIF
    ENDIF
 RETURN Self
@@ -791,63 +792,64 @@ METHOD OnParentCommand( nId, nCode ) CLASS ColorPicker
    ENDCASE
 RETURN nRet
 
-METHOD OnParentDrawItem() CLASS ColorPicker
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColorPicker
    LOCAL n, lSelected, aClip, nLen, itemTxt, hBrush, hOld, z
-   IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
+   (nwParam, nlParam)
+   IF dis != NIL .AND. dis:hwndItem == ::hWnd
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := left( itemTxt, nLen )
 
          z := 0
-         IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT != 0
+         IF dis:itemState & ODS_COMBOBOXEDIT != 0
             z := 2
          ENDIF
-         //_ExtTextOut( ::Parent:DrawItemStruct:hDC, IIF( itemTxt != "None", 28, 3 ), ::Parent:DrawItemStruct:rcItem:Top-z, ETO_OPAQUE + ETO_CLIPPED, { ::Parent:DrawItemStruct:rcItem:Left, ::Parent:DrawItemStruct:rcItem:Top, ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom }, itemTxt )
+         //_ExtTextOut( dis:hDC, IIF( itemTxt != "None", 28, 3 ), dis:rcItem:Top-z, ETO_OPAQUE + ETO_CLIPPED, { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }, itemTxt )
 
-         FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
+         FillRect( dis:hDC, dis:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
          IF itemTxt != "None"
-            ::Parent:DrawItemStruct:rcItem:Left += 28
+            dis:rcItem:Left += 28
           ELSE
-            ::Parent:DrawItemStruct:rcItem:Left += 3
+            dis:rcItem:Left += 3
          ENDIF
-         DrawText( ::Parent:DrawItemStruct:hDC, itemTxt, ::Parent:DrawItemStruct:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+         DrawText( dis:hDC, itemTxt, dis:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
          IF itemTxt != "None"
-            ::Parent:DrawItemStruct:rcItem:Left -= 28
+            dis:rcItem:Left -= 28
           ELSE
-            ::Parent:DrawItemStruct:rcItem:Left -= 3
+            dis:rcItem:Left -= 3
          ENDIF
 
-         n := ::Parent:DrawItemStruct:itemID +1 //ASCAN( ::Colors, {|a|a[2] == itemTxt} )
+         n := dis:itemID +1 //ASCAN( ::Colors, {|a|a[2] == itemTxt} )
 
          IF n > 0
             z := 2
-            IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT != 0
+            IF dis:itemState & ODS_COMBOBOXEDIT != 0
                z := 0
             ENDIF
             IF itemTxt != "None"
                hBrush := CreateSolidBrush( ::Colors[n][1] )
-               hOld := SelectObject( ::Parent:DrawItemStruct:hDC, hBrush )
-               Rectangle( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem:Left+z, ::Parent:DrawItemStruct:rcItem:Top+z, ::Parent:DrawItemStruct:rcItem:Left+22+z, ::Parent:DrawItemStruct:rcItem:Bottom-z )
-               SelectObject( ::Parent:DrawItemStruct:hDC, hOld )
+               hOld := SelectObject( dis:hDC, hBrush )
+               Rectangle( dis:hDC, dis:rcItem:Left+z, dis:rcItem:Top+z, dis:rcItem:Left+22+z, dis:rcItem:Bottom-z )
+               SelectObject( dis:hDC, hOld )
                DeleteObject( hBrush )
             ENDIF
          ENDIF
       ENDIF
 
-      //IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
-      //   IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-      //      aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-      //                 ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-      //      _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      //IF dis:itemState & ODS_COMBOBOXEDIT == 0
+      //   IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      //      aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+      //                 dis:rcItem:Right, dis:rcItem:Bottom  }
+      //      _DrawfocusRect( dis:hDC, aclip )
       //   ENDIF
       //ENDIF
    ENDIF
@@ -890,39 +892,40 @@ METHOD Create() CLASS CursorComboBox
 RETURN Self
 
 
-METHOD OnParentDrawItem() CLASS CursorComboBox
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CursorComboBox
    LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize
-   IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+   (nwParam, nlParam)
+   IF dis:hwndItem == ::hWnd
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := Left( itemTxt, nLen )
-         n := ::Parent:DrawItemStruct:itemID +1 //ASCAN( ::Cursors, {|a|a[1] == itemTxt } )
+         n := dis:itemID +1 //ASCAN( ::Cursors, {|a|a[1] == itemTxt } )
 
-         aSize := _GetTextExtentPoint32( ::Parent:DrawItemStruct:hDC, itemTxt )
-         y := ::Parent:DrawItemStruct:rcItem:Top + ((::Parent:DrawItemStruct:rcItem:Bottom-::Parent:DrawItemStruct:rcItem:Top)/2) - (aSize[2]/2)
+         aSize := _GetTextExtentPoint32( dis:hDC, itemTxt )
+         y := dis:rcItem:Top + ((dis:rcItem:Bottom-dis:rcItem:Top)/2) - (aSize[2]/2)
 
          IF n > 0
-            ExtTextOut( ::Parent:DrawItemStruct:hDC, ::Cursors[n][3]+10, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
-            IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0 .AND. ::Cursors[n][2] != NIL
-               DrawIcon( ::Parent:DrawItemStruct:hDC, 3, ::Parent:DrawItemStruct:rcItem:Top, ::Cursors[n][2] )
+            ExtTextOut( dis:hDC, ::Cursors[n][3]+10, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
+            IF dis:itemState & ODS_COMBOBOXEDIT == 0 .AND. ::Cursors[n][2] != NIL
+               DrawIcon( dis:hDC, 3, dis:rcItem:Top, ::Cursors[n][2] )
             ENDIF
           ELSE
-            ExtTextOut( ::Parent:DrawItemStruct:hDC, ( ::Parent:DrawItemStruct:rcItem:right - aSize[1] )/2, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
+            ExtTextOut( dis:hDC, ( dis:rcItem:right - aSize[1] )/2, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
          ENDIF
 
       ENDIF
-      IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                    ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-         _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+         aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                    dis:rcItem:Right, dis:rcItem:Bottom  }
+         _DrawfocusRect( dis:hDC, aclip )
       ENDIF
    ENDIF
 RETURN 0
@@ -970,41 +973,42 @@ METHOD Create() CLASS FontComboBox
    ::ItemToolTips:= .T.
 RETURN Self
 
-METHOD OnParentDrawItem() CLASS FontComboBox
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FontComboBox
    LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize, hFont, hOld
-   IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left+20,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+   (nwParam, nlParam)
+   IF dis:hwndItem == ::hWnd
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := Left( itemTxt, nLen )
-         n := ::Parent:DrawItemStruct:itemID +1
+         n := dis:itemID +1
 
-         aSize := _GetTextExtentPoint32( ::Parent:DrawItemStruct:hDC, itemTxt )
-         y := ::Parent:DrawItemStruct:rcItem:Top + ((::Parent:DrawItemStruct:rcItem:Bottom-::Parent:DrawItemStruct:rcItem:Top)/2) - (aSize[2]/2)
+         aSize := _GetTextExtentPoint32( dis:hDC, itemTxt )
+         y := dis:rcItem:Top + ((dis:rcItem:Bottom-dis:rcItem:Top)/2) - (aSize[2]/2)
 
          IF n > 0
             hFont := CreateFontIndirect( ::Fonts[n][1] )
-            hOld  := SelectObject( ::Parent:DrawItemStruct:hDC, hFont )
+            hOld  := SelectObject( dis:hDC, hFont )
             
-            FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
-            DrawText( ::Parent:DrawItemStruct:hDC, itemTxt, ::Parent:DrawItemStruct:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+            FillRect( dis:hDC, dis:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
+            DrawText( dis:hDC, itemTxt, dis:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
             
-            //ExtTextOut( ::Parent:DrawItemStruct:hDC, 10, y, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem, itemTxt )
-            SelectObject( ::Parent:DrawItemStruct:hDC, hOld )
+            //ExtTextOut( dis:hDC, 10, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
+            SelectObject( dis:hDC, hOld )
             DeleteObject( hFont )
          ENDIF
       ENDIF
-      IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                    ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-         _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+         aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                    dis:rcItem:Right, dis:rcItem:Bottom  }
+         _DrawfocusRect( dis:hDC, aclip )
       ENDIF
    ENDIF
 RETURN 0
@@ -1169,19 +1173,20 @@ METHOD Reset( oControl ) CLASS FormComboBox
 RETURN Self
 
 
-METHOD OnParentDrawItem() CLASS FormComboBox
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FormComboBox
    LOCAL n, lSelected, nLen, itemTxt, cText, aSize, hDC, hOld
-   IF ::Parent:DrawItemStruct != NIL .AND. ::Parent:DrawItemStruct:hwndItem == ::hWnd
-      hDC := ::Parent:DrawItemStruct:hDC
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
+   (nwParam, nlParam)
+   IF dis != NIL .AND. dis:hwndItem == ::hWnd
+      hDC := dis:hDC
+      lSelected := dis:itemState & ODS_SELECTED != 0
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
          SetTextColor( hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
 
          itemTxt := Left( itemTxt, nLen )
          n := AT( chr(9), itemTxt )
@@ -1191,15 +1196,15 @@ METHOD OnParentDrawItem() CLASS FormComboBox
 
          aSize := _GetTextExtentPoint32( hDC, cText )
 
-         _ExtTextOut( hDC, 5, ::Parent:DrawItemStruct:rcItem:Top, ETO_OPAQUE + ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem:Array, cText )
+         _ExtTextOut( hDC, 5, dis:rcItem:Top, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem:Array, cText )
 
          hOld  := SelectObject( hDC, ::hFont2 )
          cText := SUBSTR( itemTxt, n+1 )
-         _ExtTextOut( hDC, aSize[1]+15, ::Parent:DrawItemStruct:rcItem:Top, ETO_CLIPPED, ::Parent:DrawItemStruct:rcItem:Array, cText )
+         _ExtTextOut( hDC, aSize[1]+15, dis:rcItem:Top, ETO_CLIPPED, dis:rcItem:Array, cText )
          SelectObject( hOld )
       ENDIF
-      IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         _DrawfocusRect( hDC, ::Parent:DrawItemStruct:rcItem:Array )
+      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+         _DrawfocusRect( hDC, dis:rcItem:Array )
       ENDIF
    ENDIF
 RETURN 0
