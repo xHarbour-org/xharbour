@@ -3440,6 +3440,19 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    lRem := .F.
 
+   FOR n := 1 TO LEN( ::Forms )
+       IF ::Forms[n]:Editor != NIL
+          ::Forms[n]:Editor:Close()
+          ::Forms[n]:TreeItem:Cargo := NIL
+          ::Forms[n]:Editor:Form := NIL
+          ::Forms[n]:Editor := NIL
+          //::Forms[n]:XFMEditor:Close()
+          //::Forms[n]:XFMEditor := NIL
+          ::Forms[n]:Destroy()
+          ::Forms[n] := NIL
+       ENDIF
+   NEXT
+
    ::Application:ObjectTree:ResetContent()
    ::Application:ObjectManager:ActiveObject := NIL
    FOR n := 1 TO LEN( ::Application:ObjectManager:Items )
@@ -3455,18 +3468,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
 
    ::CurrentForm := NIL
-   FOR n := 1 TO LEN( ::Forms )
-       IF ::Forms[n]:Editor != NIL
-          ::Forms[n]:Editor:Close()
-          ::Forms[n]:TreeItem:Cargo := NIL
-          ::Forms[n]:Editor:Form := NIL
-          ::Forms[n]:Editor := NIL
-          //::Forms[n]:XFMEditor:Close()
-          //::Forms[n]:XFMEditor := NIL
-          ::Forms[n]:Destroy()
-          ::Forms[n] := NIL
-       ENDIF
-   NEXT
    ::Forms := NIL
 
    IF ::DesignPage == NIL .OR. lClosing

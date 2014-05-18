@@ -2195,18 +2195,18 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          ExecuteEvent( aMessages[nMess][2], Self )
          nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
        ELSE
+         nRet := NIL
          IF nMsg == WM_INITDIALOG
             ::hWnd := hWnd
             ::PreInitDialog()
          ENDIF
          cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
-         IF nRet == NIL .AND. __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
+         IF __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
             nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
          ENDIF
          nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
-         IF VALTYPE(nRet) $ "OU"
-            ExecuteEvent( aMessages[nMess][2], Self )
-         ENDIF
+         ExecuteEvent( aMessages[nMess][2], Self )
+
          IF nMsg == WM_INITDIALOG
             ::PostInitDialog()
          ENDIF

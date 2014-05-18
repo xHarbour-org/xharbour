@@ -1531,7 +1531,7 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              aCol[1]:SetValue := ASCAN( xValue:Enum&cProp2[2], xValue:&cProp2,,, .T. )
              aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
                                                     oPar := ObjFromHandle(o:Parent:hWnd),;
-													c := o:Cargo[1],;
+													             c := o:Cargo[1],;
                                                     o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                     o:Destroy(),;
                                                     oPar:SetValue( xValue:Enum&c[2][n+1] ) }
