@@ -660,7 +660,7 @@ METHOD Init( oParent ) CLASS Window
                                                 "Use the prevously created instance to avoid this Message", ::Name, MB_ICONEXCLAMATION )
       RETURN Self
    ENDIF
-   Super:Init()
+
    ::__lInitialized := .T.
 
    DEFAULT ::ThemeName    TO "window"
@@ -672,7 +672,7 @@ METHOD Init( oParent ) CLASS Window
    DEFAULT ::__xCtrlName  TO "Window"
    DEFAULT ::ClsName      TO "Window"
 
-   ::Parent       := oParent
+   ::Parent := oParent
 
    IF ::__ClassInst == NIL .AND. ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
@@ -708,6 +708,7 @@ METHOD Init( oParent ) CLASS Window
           aSort( Topic[2],,,{|x, y| x[1] < y[1]})
       NEXT
    ENDIF
+   oParent := NIL
 
 RETURN SELF
 
@@ -830,23 +831,22 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __UnregisterTransparentControl( oCtrl ) CLASS Window
    LOCAL n
-   IF ( n := ASCAN( ::__aTransparent, oCtrl,,, .T. ) ) > 0
+   IF ( n := ASCAN( ::__aTransparent, {|o| o:hWnd == oCtrl:hWnd} ) ) > 0
       ADEL( ::__aTransparent, n, .T. )
-      IF oCtrl:__hMemBitmap != NIL
-         DeleteObject( oCtrl:__hMemBitmap )
-      ENDIF
-      IF oCtrl:__hBrush != NIL
-         DeleteObject( oCtrl:__hBrush )
-      ENDIF
-      oCtrl:__hMemBitmap := NIL
-      oCtrl:__hBrush := NIL
-      RETURN .T.
    ENDIF
-RETURN .F.
+   IF oCtrl:__hMemBitmap != NIL
+      DeleteObject( oCtrl:__hMemBitmap )
+   ENDIF
+   IF oCtrl:__hBrush != NIL
+      DeleteObject( oCtrl:__hBrush )
+   ENDIF
+   oCtrl:__hMemBitmap := NIL
+   oCtrl:__hBrush := NIL
+RETURN .T.
 
 //-----------------------------------------------------------------------------------------------
 METHOD __RegisterTransparentControl( oCtrl ) CLASS Window
-   IF ASCAN( ::__aTransparent, oCtrl,,, .T. ) == 0
+   IF ASCAN( ::__aTransparent, {|o| o:hWnd == oCtrl:hWnd} ) == 0
       AADD( ::__aTransparent, oCtrl )
       RETURN .T.
    ENDIF
@@ -1634,7 +1634,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
    IF ::__hMemBitmap != NIL .AND. ::HasMessage( "Transparent" ) .AND. ::Transparent
       DeleteObject( ::__hMemBitmap )
       hDC := GetDC( ::hWnd )
-      ::__hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      ::__hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
       ReleaseDC( ::hWnd, hDC )
    ENDIF
 
@@ -1804,7 +1804,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
             nRet := 1
          ENDIF
          IF nRet == 1
-            IF ::Modal .AND. ( ::AutoClose .OR. ! IsKeyDown( VK_ESCAPE ) )
+            IF ( ::Modal .AND. ( ::AutoClose .OR. ! IsKeyDown( VK_ESCAPE ) ) ) .OR. ( ! ::Modal .AND. ::AutoClose .AND. IsKeyDown( VK_ESCAPE ) )
                ::Close( IDCANCEL )
                RETURN 0
             ENDIF
@@ -2133,7 +2133,7 @@ METHOD OnNCDestroy() CLASS Window
    ::__lInitialized    := .F.
    //::EventHandler      := NIL
 
-   __CleanUp( Self )
+   //__CleanUp( Self )
        
    IF ::Application != NIL
       IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
@@ -2160,7 +2160,7 @@ static function __CleanUp( oObj )
    
    IF LEFT( oObj:ClassName, 11 ) != "C STRUCTURE"
       FOR EACH aProperty IN aProperties
-          IF VALTYPE( aProperty[2] ) $ "BOA" .AND. ! ( Upper( aProperty[1] ) IN {"PARENT","FORM","OWNER","TOOLTIP","ACMEMBERS","SIBLINGS","SYSTEM","APPLICATION" } )
+          IF VALTYPE( aProperty[2] ) $ "OA" .AND. ! ( Upper( aProperty[1] ) IN {"PARENT","FORM","OWNER","TOOLTIP","ACMEMBERS","SIBLINGS","SYSTEM","APPLICATION" } )
              TRY
                 //IF VALTYPE( aProperty[2] ) == "O"
                 //   __CleanUp( aProperty[2] )
@@ -4889,6 +4889,8 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
 
    Super:Init( oParent )
 
+   oParent := NIL
+
    IF !::ClsName == "MDIChild"
       ::MDIClient := MDIClient( Self )
    ENDIF
@@ -4966,9 +4968,10 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    Super:OnSize( nwParam, nlParam )
-   IF ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
+   IF ::IsWindowVisible() .AND. ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
       ::InvalidateRect()
+      AEVAL( ::__aTransparent, {|o| o:InvalidateRect(,.f.)} )
       RETURN 0
    ENDIF
 RETURN Self

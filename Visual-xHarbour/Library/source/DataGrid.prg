@@ -165,8 +165,8 @@ CLASS DataGrid INHERIT TitleControl
    DATA __HorzScroll            PROTECTED INIT FALSE
    DATA __VertScroll            PROTECTED INIT FALSE
    DATA __lCreated              PROTECTED INIT .F.
-   DATA __bGoTop                PROTECTED
-   DATA __bGoBottom             PROTECTED
+   DATA __bGoTop                PROTECTED INIT {||.F.}
+   DATA __bGoBottom             PROTECTED INIT {||.F.}
    DATA __bRecNo                PROTECTED
    DATA __LinePen               PROTECTED
    DATA __SelBorderPen          PROTECTED
