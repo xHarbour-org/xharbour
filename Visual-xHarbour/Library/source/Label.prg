@@ -107,7 +107,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create()  CLASS Label
    IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor
-      ::__SetTransp(.T.)
+      ::Transparent := .T.
    ENDIF
    Super:Create()
    ::__SetBlinkColor()
