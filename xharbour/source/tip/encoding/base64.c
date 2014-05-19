@@ -25,38 +25,36 @@ static char Base64Table[ 64 ] = {
 
 char * Base64Encode( const unsigned char * pcCode, unsigned int uCodeLen )
 {
-   unsigned int   i, j = 0, uOutLen = 4 * ( ( uCodeLen + 2 ) / 3 ) + 1;
-   char *         pRet = ( char * ) hb_xgrab( uOutLen + 1 );
-   unsigned int   tailCnt;
+   unsigned int i, j = 0, tailCnt = uCodeLen % 3;
+   char *       pRet = ( char * ) hb_xgrab( 4 * ( ( uCodeLen + 2 ) / 3 ) + 1 );
 
-   for( i = 0; i < uCodeLen / 3; i++, pcCode += 3 ) //codeLen/3 segments.
+   //uCodeLen/3 segments.
+   for( i = 0; i < uCodeLen / 3; i++, pcCode += 3 )
+   {
+      pRet[ j++ ] = Base64Table[     pcCode[ 0 ]          >> 2 ];
+      pRet[ j++ ] = Base64Table[ ( ( pcCode[ 0 ] & 0x03 ) << 4 ) | ( pcCode[ 1 ] >> 4 ) ];
+      pRet[ j++ ] = Base64Table[ ( ( pcCode[ 1 ] & 0x0F ) << 2 ) | ( pcCode[ 2 ] >> 6 ) ];
+      pRet[ j++ ] = Base64Table[     pcCode[ 2 ] & 0x3F ];
+   }
+
+   if( tailCnt )
    {
       pRet[ j++ ] = Base64Table[ pcCode[ 0 ] >> 2 ];
-      pRet[ j++ ] = Base64Table[ ( ( pcCode[ 0 ] & 3 ) << 4 ) | ( pcCode[ 1 ] >> 4 ) ];
-      pRet[ j++ ] = Base64Table[ ( ( pcCode[ 1 ] & 15 ) << 2 ) | ( pcCode[ 2 ] >> 6 ) ];
-      pRet[ j++ ] = Base64Table[ pcCode[ 2 ] & 0X3F ];
-   }
-   ;
 
-   tailCnt = uCodeLen % 3;
-   if( tailCnt == 1 )
-   {
-      pRet[ j++ ] = Base64Table[ pcCode[ 0 ] >> 2 ];
-      pRet[ j++ ] = Base64Table[ ( pcCode[ 0 ] & 3 ) << 4 ];
-      pRet[ j++ ] = XTYPAD;
-      pRet[ j++ ] = XTYPAD;
-   }
-   else if( tailCnt == 2 )
-   {
-      pRet[ j++ ] = Base64Table[ pcCode[ 0 ] >> 2 ];
-      pRet[ j++ ] = Base64Table[ ( ( pcCode[ 0 ] & 3 ) << 4 ) | ( pcCode[ 1 ] >> 4 ) ];
-      pRet[ j++ ] = Base64Table[ ( pcCode[ 1 ] & 15 ) << 2 ];
+      if( tailCnt == 1 )
+      {
+         pRet[ j++ ] = Base64Table[ ( pcCode[ 0 ] & 0x03 ) << 4 ];
+         pRet[ j++ ] = XTYPAD;
+      }
+      else if( tailCnt == 2 )
+      {
+         pRet[ j++ ] = Base64Table[ ( ( pcCode[ 0 ] & 0x03 ) << 4 ) | ( pcCode[ 1 ] >> 4 ) ];
+         pRet[ j++ ] = Base64Table[   ( pcCode[ 1 ] & 0x0F ) << 2 ];
+      }
       pRet[ j++ ] = XTYPAD;
    }
-   ;
-
-   pRet[ j++ ] = XTYPAD;
-   pRet[ j ]   = '\0';
+   
+   pRet[ j ] = '\0';
 
    return pRet;
 }
@@ -64,24 +62,22 @@ char * Base64Encode( const unsigned char * pcCode, unsigned int uCodeLen )
 //assume input != NULL.
 unsigned char * Base64Decode( const char * pcszInput, unsigned int * puOutLen )
 {
-   int               iSize = strlen( pcszInput ) + 1;
-   char              map[ 256 ], i, c, * pBuf = ( char * ) hb_xgrab( iSize );
-   unsigned int      j, uBufLen;
-   unsigned int      uSegCnt;
-   unsigned int      uTailCnt;
-   unsigned char *   pRet, * pTmp;
-   char *            ptr;
+   int             iSize = strlen( pcszInput ) + 1;
+   char            map[ 256 ], i, c, * pBuf = ( char * ) hb_xgrab( iSize );
+   unsigned int    j, uBufLen;
+   unsigned int    uSegCnt;
+   unsigned int    uTailCnt;
+   unsigned char * pRet, * pTmp;
+   char *          ptr;
 
-   memset( map, 0XFF, 256 );
-   for( i = 'A', map[ 'A' ] = 0; i < 'Z'; map[ i + 1 ] = map[ i ] + 1, i++ )
-      ;
-   for( i = 'a', map[ 'a' ] = 26; i <= 'z'; map[ i + 1 ] = map[ i ] + 1, i++ )
-      ;
-   for( i = '0', map[ '0' ] = 52; i <= '9'; map[ i + 1 ] = map[ i ] + 1, i++ )
-      ;
-   map[ XTY62 ]   = 62; map[ XTY63 ] = 63;
+   memset( map, 0xFF, 256 );
+   for( i = 'A', map[ 'A' ] =  0; i <  'Z'; map[ i + 1 ] = map[ i ] + 1, i++ );
+   for( i = 'a', map[ 'a' ] = 26; i <= 'z'; map[ i + 1 ] = map[ i ] + 1, i++ );
+   for( i = '0', map[ '0' ] = 52; i <= '9'; map[ i + 1 ] = map[ i ] + 1, i++ );
+   map[ XTY62 ] = 62; map[ XTY63 ] = 63;
 
-   uBufLen        = 0; c = pcszInput[ 0 ];
+   uBufLen = 0;
+   c       = pcszInput[ 0 ];
    while( c != '\0' && c != XTYPAD )
    {
       pBuf[ uBufLen ] = map[ c ];
@@ -90,38 +86,37 @@ unsigned char * Base64Decode( const char * pcszInput, unsigned int * puOutLen )
          uBufLen++;
       c = *( ++pcszInput );
    }
-   ;
-   pBuf[ uBufLen ]   = '\0';
 
-   uSegCnt           = uBufLen / 4;
-//  unsigned char *pRet=new unsigned char[(uSegCnt+1)*3], *pTmp=pRet;
-   pRet              = ( unsigned char * ) hb_xgrab( ( uSegCnt + 1 ) * 3 ), pTmp = pRet;
+   pBuf[ uBufLen ] = '\0';
+
+   uSegCnt = uBufLen / 4;
+   pRet    = ( unsigned char * ) hb_xgrab( ( uSegCnt + 1 ) * 3 );
+   pTmp    = pRet;
 
    //full segments.
-   ptr               = pBuf;
+   ptr = pBuf;
    for( j = 0; j < uSegCnt; j++ )
    {
-      *pTmp++  = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
-      *pTmp++  = ( ( ptr[ 1 ] << 4 ) | ( ptr[ 2 ] >> 2 ) );
-      *pTmp++  = ( ( ptr[ 2 ] << 6 ) | ptr[ 3 ] );
-      ptr      += 4;
+      *pTmp++ = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
+      *pTmp++ = ( ( ptr[ 1 ] << 4 ) | ( ptr[ 2 ] >> 2 ) );
+      *pTmp++ = ( ( ptr[ 2 ] << 6 ) |   ptr[ 3 ] );
+      ptr    += 4;
    }
-   ;
-   *puOutLen   = uSegCnt * 3;
 
-   uTailCnt    = uBufLen % 4;
+   *puOutLen = uSegCnt * 3;
+   uTailCnt  = uBufLen % 4;
+
    if( uTailCnt == 2 )
    {
-      *pTmp++ = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
+      *pTmp = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
       ( *puOutLen )++;
    }
    else if( uTailCnt == 3 )
    {
       *pTmp++        = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
-      *pTmp++        = ( ( ptr[ 1 ] << 4 ) | ( ptr[ 2 ] >> 2 ) );
-      ( *puOutLen )  += 2;
+      *pTmp          = ( ( ptr[ 1 ] << 4 ) | ( ptr[ 2 ] >> 2 ) );
+      ( *puOutLen ) += 2;
    }
-   ;
 
    hb_xfree( pBuf );
 
@@ -131,20 +126,20 @@ unsigned char * Base64Decode( const char * pcszInput, unsigned int * puOutLen )
 HB_FUNC( HB_BASE64ENCODE )
 {
    HB_THREAD_STUB
-   const unsigned char *   pcCode   = ( const unsigned char * ) hb_parcx( 1 );
-   unsigned int            uCodeLen = hb_parni( 2 );
-   char *                  szBase64Encode;
+   const unsigned char * pcCode   = ( const unsigned char * ) hb_parcx( 1 );
+   unsigned int          uCodeLen = hb_parni( 2 );
+   char *                szBase64Encode;
 
    szBase64Encode = Base64Encode( pcCode, uCodeLen );
-   hb_retc( szBase64Encode );
+   hb_retcAdopt( szBase64Encode );
 }
 
 HB_FUNC( HB_BASE64DECODE )
 {
    HB_THREAD_STUB
-   const char *      pcCode = hb_parcx( 1 );
-   unsigned int      uCodeLen;
-   unsigned char *   szBase64Encode;
+   const char *    pcCode = hb_parcx( 1 );
+   unsigned int    uCodeLen;
+   unsigned char * szBase64Encode;
 
    szBase64Encode = Base64Decode( pcCode, &uCodeLen );
 
@@ -153,8 +148,8 @@ HB_FUNC( HB_BASE64DECODE )
 
 static long filelength( int handle )
 {
-   long  nEnd     = hb_fsSeek( handle, 0, 2 );
-   long  nStart   = hb_fsSeek( handle, 0, 0 );
+   long nEnd   = hb_fsSeek( handle, 0, 2 );
+   long nStart = hb_fsSeek( handle, 0, 0 );
 
    return nEnd - nStart;
 }
@@ -162,11 +157,11 @@ static long filelength( int handle )
 static char * filetoBuff( char * f, const char * s )
 {
 
-   int   i;
-   int   fh = hb_fsOpen( s, 2 );
+   int i;
+   int fh = hb_fsOpen( s, 2 );
 
-   i        = hb_fsReadLarge( fh, ( BYTE * ) f, filelength( fh ) );
-   f[ i ]   = '\0';
+   i      = hb_fsReadLarge( fh, ( BYTE * ) f, filelength( fh ) );
+   f[ i ] = '\0';
    hb_fsClose( fh );
    return f;
 }
