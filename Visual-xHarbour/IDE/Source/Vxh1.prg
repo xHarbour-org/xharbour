@@ -3558,7 +3558,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       ::AppObject:__ColorTable:Unload()
    ENDIF
 
-   hb_gcall( .T. )
+   //hb_gcall( .T. )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
@@ -3847,7 +3847,7 @@ METHOD Open( cProject ) CLASS Project
       aChildren   := {}
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
          ::ParseXFM(, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
-         hb_gcall()
+         //hb_gcall()
          nLine++
       END
       oWait:Position := 40
@@ -4079,7 +4079,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       nLine := 1
       DEFAULT aErrors  TO {}
       DEFAULT aEditors TO {}
-      hb_gcall()
+      //hb_gcall()
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
          ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
          nLine++
@@ -4598,7 +4598,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::__ExtraLibs := {}
    
-   hb_gcall(.T.)
+   //hb_gcall(.T.)
    nSecs := Seconds()
 
    DEFAULT lProj TO .F.
@@ -5400,7 +5400,7 @@ METHOD Run( lRunOnly ) CLASS Project
       DirChange( cCurDir )
    CATCH
    END
-   hb_gcall( .T. )
+   //hb_gcall( .T. )
 RETURN 0
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -5426,7 +5426,7 @@ RETURN 0
 METHOD Build( lForce, lLinkOnly ) CLASS Project
    LOCAL n, cProject, cExe, cResPath, oItem
    LOCAL oProject, bErrorHandler, bProgress, oErr, oWnd, cTemp, cVar, cInc, aInc
-   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude, cDef
+   LOCAL lBuilt, cSource, cPath, oHrb, cControl, cBinPath, cSourcePath, cObjPath, cCurDir, i, x, cInclude, cDef//, aPath
 
    DEFAULT lForce    TO .F.
    DEFAULT lLinkOnly TO .F.
@@ -5438,6 +5438,30 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
 
    cBinPath    := ::FixPath( cPath, ::Properties:Binary )
    cSourcePath := ::FixPath( cPath, ::Properties:Source )
+ /*
+   aPath := hb_aTokens( cSourcePath, ";" )
+   cSourcePath := ""
+   IF ! EMPTY( aPath )
+      FOR n := 1 TO LEN( aPath )
+          cPath := aPath[n]
+          i := AT( "%", cPath )
+          IF i > 0
+             x := RAT("%",cPath)-2
+             cVar := GetEnv( SUBSTR( cPath, i+1, x ) )
+             IF EMPTY( cVar )
+                cVar := ::System:GetEnvironment( SUBSTR( cPath, i+1, x ) )
+             ENDIF
+             IF cVar != NIL
+                cPath := cVar + SubStr( cPath, x+3 )
+             ENDIF
+          ENDIF
+          cSourcePath += cPath+";"
+      NEXT
+   ENDIF
+ 
+   cPath := ::Properties:Path
+ */
+ 
    cObjPath    := ::FixPath( cPath, ::Properties:Objects )
    cResPath    := ::FixPath( cPath, ::Properties:Resource )
 
@@ -6145,7 +6169,7 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
            ::Application:ObjectManager:SetObjectValue( aAction[2], aAction[3], aAction[4], aAction[5], aAction[6], aAction[7] )
            ::Application:ObjectManager:InvalidateRect(,.F.)
            AADD( aReverse, { DG_PROPERTYCHANGED, aAction[2], aAction[6], aAction[4], aAction[5], aAction[3], aAction[7] } )
-           hb_gcall()
+           //hb_gcall()
            EXIT
 
       CASE DG_FONTCHANGED

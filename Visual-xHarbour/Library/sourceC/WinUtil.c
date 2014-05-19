@@ -2581,6 +2581,34 @@ HB_FUNC( SENDBITMAP )
    GlobalFree((HGLOBAL)lpBits);
 }
 
+HB_FUNC( GETBITMAPBITS )
+{
+   BITMAPFILEHEADER hdr;
+   PBITMAPINFOHEADER pbih;
+   LPBYTE lpBits;
+   PBITMAPINFO pbi;
+
+   HBITMAP hBMP = (HBITMAP) hb_parnl(1);
+   HDC hDC = GetDC(0);
+
+   pbi    = CreateBitmapInfoStruct( hBMP );
+   pbih   = (PBITMAPINFOHEADER) pbi;
+   lpBits = (LPBYTE) GlobalAlloc(GMEM_FIXED, pbih->biSizeImage);
+   
+   GetDIBits(hDC, hBMP, 0, (WORD) pbih->biHeight, lpBits, pbi, DIB_RGB_COLORS );
+
+   hdr.bfType = 0x4d42;
+
+   hdr.bfSize = (DWORD) (sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof(RGBQUAD) + pbih->biSizeImage);
+   hdr.bfReserved1 = 0;
+   hdr.bfReserved2 = 0;
+
+   hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof (RGBQUAD);
+
+   hb_retnl( (long) lpBits);
+   //GlobalFree((HGLOBAL)lpBits);
+   ReleaseDC(0,hDC);
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // The following example code defines a function that initializes the remaining structures, retrieves the array of palette indices, opens the file, copies the data, and closes the file.

@@ -2104,6 +2104,11 @@ METHOD OnNCDestroy() CLASS Window
       ::Events := NIL
    ENDIF
 
+   IF ::__ClassInst != NIL
+      ::Events := NIL
+   ENDIF
+
+
    ObjFromHandle( ::hWnd, .T. )
 
    ::__hObjects        := NIL

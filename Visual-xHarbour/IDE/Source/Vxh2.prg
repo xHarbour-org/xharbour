@@ -484,7 +484,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
          ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
       ENDIF
    ENDIF
-   hb_gcall()
+   //hb_gcall()
 RETURN 0
 
 //----------------------------------------------------------------------------
