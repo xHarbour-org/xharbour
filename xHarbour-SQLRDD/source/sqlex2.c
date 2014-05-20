@@ -90,6 +90,7 @@ static void ResolveSpecialCols( SQLEXAREAP thiswa )
    PHB_ITEM pKeyVal;
    PHB_ITEM pIndIt;
    USHORT uiPos;
+   int iOldArea;
    
    if( !thiswa->pIndexMgmnt )
    {
@@ -97,9 +98,14 @@ static void ResolveSpecialCols( SQLEXAREAP thiswa )
       thiswa->pIndexMgmnt  = hb_itemNew( NULL ) ;      
       hb_itemForwardValue( thiswa->pIndexMgmnt, hb_stackReturnItem()  );            
    }
-
+   iOldArea = hb_rddGetCurrentWorkAreaNumber();
+   if (iOldArea != thiswa->area.uiArea )    
+   {
+      hb_rddSelectWorkAreaNumber( thiswa->area.uiArea );
+   }   
    iIndexes    = hb_arrayLen( thiswa->pIndexMgmnt );
 
+   
    for( i=1; i <= iIndexes; i++ )
    {
       pIndex = hb_arrayGetItemPtr( thiswa->pIndexMgmnt, i );
@@ -118,6 +124,7 @@ static void ResolveSpecialCols( SQLEXAREAP thiswa )
          //uiPos = (USHORT) hb_itemGetNI( hb_arrayGetItemPtr( pIndex, INDEXMAN_SYNTH_COLPOS ) );
          uiPos = (USHORT) hb_itemGetNI( hb_itemArrayGet( pIndex, INDEXMAN_SYNTH_COLPOS ) );
          thiswa->specialMask[ uiPos ] = '1';
+
          hb_arraySetForward( thiswa->aBuffer, uiPos, pKeyVal );
          hb_itemRelease( pKeyVal );
       }
@@ -140,6 +147,8 @@ static void ResolveSpecialCols( SQLEXAREAP thiswa )
          hb_itemRelease( pKeyVal );
       }
    }
+if (iOldArea != thiswa->area.uiArea )    
+      hb_rddSelectWorkAreaNumber(iOldArea );   
 }
 
 /*------------------------------------------------------------------------*/
@@ -518,8 +527,14 @@ HB_ERRCODE FeedRecordCols( SQLEXAREAP thiswa, BOOL bUpdate )
       InsertRecord = thiswa->InsertRecord;
    }
 
-   ResolveSpecialCols( thiswa );    // Fix INDKEY and FOR CLAUSE columns
+   if ( !bUpdate )
+   {
 
+       hb_arraySetNL( thiswa->aInfo, AINFO_RECNO, GetCurrentRecordNum( thiswa )-1 );
+   }   
+   
+   ResolveSpecialCols( thiswa );    // Fix INDKEY and FOR CLAUSE columns
+                  
    for( i=1; i <= iCols; i++ )
    {
       if( (!bUpdate) || (bUpdate && (thiswa->editMask[ i-1 ] || thiswa->specialMask[ i-1 ]) ) )

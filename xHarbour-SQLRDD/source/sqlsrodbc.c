@@ -508,6 +508,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          case SQL_DB2_CLOB:
          case SQL_FAKE_LOB:
          case SQL_LONGVARBINARY:
+         case SQL_VARBINARY:
          {
             if( lLenBuff > 0 && (strncmp( bBuffer, "[", 1 ) == 0 || strncmp( bBuffer, "[]", 2 ) )&& (sr_lSerializeArrayAsJson()) )
             {
@@ -1194,6 +1195,7 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
              case SQL_DB2_CLOB:
              case SQL_FAKE_LOB:
              case SQL_LONGVARBINARY:            
+             case SQL_VARBINARY:
              {
 
 	           char buffer[2];

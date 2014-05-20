@@ -599,9 +599,11 @@ METHOD LoadRegisteredTags()  CLASS SR_WORKAREA
          aInd[INDEXMAN_IDXKEY]  := SubStr( aInd[INDEXMAN_IDXKEY], 5 )
       EndIf
       if !Empty( aInd[INDEXMAN_COLUMNS] )
+         
          aInd[INDEXMAN_KEY_CODEBLOCK] := &( "{|| SR_Val2Char(" + alltrim( aInd[INDEXMAN_IDXKEY] ) + ") + str(Recno(),15) }" )
          aInd[INDEXMAN_SYNTH_COLPOS]  := aScan( ::aNames, "INDKEY_" + aInd[ INDEXMAN_COLUMNS] )     // Make life easier in odbcrdd2.c
       Else
+      
          aInd[INDEXMAN_KEY_CODEBLOCK] := &( "{|| " + alltrim( aInd[INDEXMAN_IDXKEY] ) + " }" )
       EndIf
       aInd[INDEXMAN_IDXNAME] := alltrim( aInd[INDEXMAN_IDXNAME] )
@@ -2283,7 +2285,8 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                   oXml := sr_arraytoXml( aBuffer[nThisField] )
                   nlen:=len(oxml:tostring(HBXML_STYLE_NONEWLINE))
                   cVal := if(!lFirst,", ","") + SR_DBQUALIFY( ::aNames[nThisField], ::oSql:nSystemID ) + " = " + ::QuotedNull(oxml:tostring(HBXML_STYLE_NONEWLINE),.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
-
+               elseif ::aFields[nthisField,6] == SQL_VARBINARY .and. ::osql:nsystemID ==SYSTEMID_MSSQL7
+                  cVal := '0x'+StrtoHex(aBuffer[nThisField])
                Else
                   Loop
                EndIf
@@ -2435,7 +2438,7 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                      cMemo := NIL
                   ElseIf ::oSql:nSystemID == SYSTEMID_ADABAS //.or. ::oSql:nSystemID == SYSTEMID_MSSQL7      // ADABAS always need binding
                      aadd( aMemos, { ::aNames[i], cMemo } )
-                     Loop
+                     Loop                     
                   Else
                      cMemo := aBuffer[i]
                   EndIf
@@ -2464,7 +2467,14 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
 
                   nlen:=len(oxml:tostring(HBXML_STYLE_NONEWLINE))
                   cVal += if(!lFirst,", ","( ") + ::QuotedNull(oXml:tostring(HBXML_STYLE_NONEWLINE),.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
-                  exit                  
+                  exit   
+               Case SQL_VARBINARY
+                  if ::osql:nsystemID ==SYSTEMID_MSSQL7
+                     cVal += if(!lFirst,", ","( ")+ '0x'+StrtoHex(cmemo)
+                  else    
+                     cVal += if(!lFirst,", ","( ") + ::QuotedNull(cMemo,.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
+                  endif   
+                  exit                                  
                Default
                   cVal += if(!lFirst,", ","( ") + ::QuotedNull(cMemo,.t.,If(lMemo, NIL, nLen),nDec,,lNull,lMemo)
                End
@@ -5291,7 +5301,8 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          cSql := cSql + 'DATETIME NULL '   
       CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
          cSql := cSql + 'DATETIME '   
-
+      CASE (aCreate[i,FIELD_TYPE] == "V") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )    
+ 	         cSql := cSql + ' VARBINARY(MAX) '   
       
       OtherWise
          SR_MsgLogFile(  SR_Msg(9)+cField+" ("+aCreate[i,FIELD_TYPE]+")" )
@@ -8486,6 +8497,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
          EndIf
 
          Do Case
+
          Case (aCreate[i,FIELD_TYPE] == "C") .and. ::oSql:nSystemID == SYSTEMID_ORACLE
             If (aCreate[i,FIELD_LEN] > 30)
                cSql := cSql + "VARCHAR2(" + ltrim(str(min(aCreate[i,FIELD_LEN],4000),9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
@@ -8506,8 +8518,16 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
 
          Case (aCreate[i,FIELD_TYPE] == "C") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_CACHE  .or. ::oSql:nSystemID == SYSTEMID_ADABAS .or. ::oSql:nSystemID == SYSTEMID_AZURE )
             If ::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_AZURE
-               cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
-            ElseIf ::oSql:nSystemID == SYSTEMID_POSTGR .and. aCreate[i,FIELD_LEN] > 10
+               IF  ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+                  IF  aCreate[i,FIELD_LEN] > 10
+                     cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+                  ELSE
+                     cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+                  ENDIF
+               ELSE      
+                  cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + if(!Empty(SR_SetCollation()), "COLLATE " + SR_SetCollation() + " " , "")  + IF(lNotNull, " NOT NULL", "")
+               ENDIF
+            ElseIf ::oSql:nSystemID == SYSTEMID_POSTGR .and. aCreate[i,FIELD_LEN] > nMininumVarchar2Size -1 //10
                cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
             Else
                cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
@@ -8708,6 +8728,19 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
             Else
                cSql := cSql + "DECIMAL (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str(aCreate[i,FIELD_DEC],9,0)) +  ")" + IF(lPrimary .or. lNotNull, " NOT NULL", " " )
             EndIf
+         // including xml data type
+         // postgresql datetime
+         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  )
+            cSql := cSql + 'timestamp without time zone '
+         // oracle datetime
+         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
+            cSql := cSql + 'TIMESTAMP '   
+         CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  ) // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
+            cSql := cSql + 'DATETIME NULL '   
+         CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
+            cSql := cSql + 'DATETIME '   
+         CASE (aCreate[i,FIELD_TYPE] == "V") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )    
+ 	         cSql := cSql + ' VARBINARY(MAX) '   
 
          OtherWise
             SR_MsgLogFile(  SR_Msg(9)+cField+" ("+aCreate[i,FIELD_TYPE]+")" )
@@ -10099,3 +10132,4 @@ RETURN NIL
 FUNCTION SR_GetOracleSyntheticVirtual( l )
    
 RETURN lOracleSyntheticVirtual
+

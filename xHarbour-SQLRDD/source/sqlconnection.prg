@@ -1100,9 +1100,11 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
    case nType == SQL_DATE .or. nType == SQL_TYPE_DATE
       cType = "D"
    case nType == SQL_TIME
-      cType = "C"
-   case nType == SQL_LONGVARCHAR .or. nType == SQL_LONGVARBINARY .or. nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB
-      cType = "M"
+      cType := "C"
+   case nType == SQL_LONGVARCHAR .or.  nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB .or.  ntype == SQL_LONGVARBINARY .or. (nType == SQL_VARBINARY .and. ::nSystemID != SYSTEMID_MSSQL7) 
+      cType := "M"
+   case nType == SQL_VARBINARY  .and. ::nSystemID == SYSTEMID_MSSQL7
+      cType := "V"  
    case nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME
       cType := 'T'   
    endcase
@@ -1155,7 +1157,7 @@ METHOD SQLLen( nType, nLen, nDec )  CLASS SR_CONNECTION
    case nType == SQL_TIME
      nLen := 8
 
-   case nType == SQL_LONGVARCHAR .or. nType == SQL_LONGVARBINARY .or. nType == SQL_FAKE_LOB
+   case nType == SQL_LONGVARCHAR .or. nType == SQL_LONGVARBINARY .or. nType == SQL_FAKE_LOB .or. nType == SQL_VARBINARY
      nLen := 10
 
    Case nType == SQL_GUID

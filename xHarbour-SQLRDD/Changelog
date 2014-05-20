@@ -9,7 +9,18 @@
 */
 
 
-204-04-14 23:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+2014-05-20 00:05  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlrdd2.prg
+    ! changed sqlCreate to allow binary field in mssql as type "V"
+    ! changed altercolumn to allow new field type as for creating tables
+  * source/sqlconnection.prg
+    ! added decode to type V in binaries field
+  * source/sqlsrodbc.c
+    ! added test for SQL_VARBINARY  
+  * source/sqlex2.c  
+    ! minor fix for feedrecord to respect data from correct work area
+
+2014-04-14 23:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
   * source/sqlconnection.prg
     source/sqlpgs.prg
     source/sqlmy.prg
