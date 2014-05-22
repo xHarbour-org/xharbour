@@ -1563,7 +1563,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
 
    IF nClickRow > ::RowCountUsable
-      IF nClickRow > ::RowCount
+      IF nClickRow > ::RowCount .OR. ! ::ExtVertScrollBar
          nClickRow := ::RowCountUsable
       ENDIF
       lLineChange := TRUE
