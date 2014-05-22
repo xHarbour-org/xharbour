@@ -2370,10 +2370,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_CLOSE
-              nRet := ExecuteEvent( "OnClose", Self )
-              ODEFAULT nRet TO ::OnClose( nwParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
-
+              IF ! ::Modal
+                 nRet := ExecuteEvent( "OnClose", Self )
+                 ODEFAULT nRet TO ::OnClose( nwParam )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
+              ENDIF
               IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
                  nAnimation := ::AnimationStyle
                  DO CASE
@@ -3183,9 +3184,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
 
    IF ! Empty( ::__nProc )
-      //IF GetParent(hWnd)==0
-      //   OutputDebugString( xStr(nMsg) )
-      //ENDIF
       RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
    ENDIF
 
