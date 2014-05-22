@@ -1602,6 +1602,8 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    IF lLineChange
       IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
          ::__ScrollUp()
+       ELSE
+         ::OnKeyDown( VK_DOWN )
       ENDIF
       ::RowPos := ::RowCountUsable
    ENDIF
