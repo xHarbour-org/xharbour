@@ -1527,6 +1527,7 @@ GTALLEG_LIB_OBJS=\
 TIP_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)base64x$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)utils$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)base64$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)client$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)credent$(OBJEXT)\

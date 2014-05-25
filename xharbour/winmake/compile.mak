@@ -4187,6 +4187,9 @@ $(OBJ_DIR)$(DIR_SEP)base64x$(OBJEXT) : $(TIP_DIR)$(DIR_SEP)base64x.c
 $(OBJ_DIR)$(DIR_SEP)utils$(OBJEXT) : $(TIP_DIR)$(DIR_SEP)utils.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)base64$(OBJEXT) : $(TIP_DIR)$(DIR_SEP)base64.c
+	$(CC_CMD)
+
 $(OBJ_DIR)$(DIR_SEP)client.c : $(TIP_DIR)$(DIR_SEP)client.prg
 	$(HB_CMD)
 

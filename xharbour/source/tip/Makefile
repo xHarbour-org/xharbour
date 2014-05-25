@@ -7,6 +7,7 @@ ROOT = ../../
 C_SOURCES = \
    base64x.c \
    utils.c \
+   base64.c \
 
 PRG_SOURCES= \
    cgi.prg \

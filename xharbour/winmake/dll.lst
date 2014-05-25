@@ -272,6 +272,7 @@ bkgtsks
 ; TIP_LIB_OBJS
 base64x
 utils
+base64
 client
 credent
 encb64
