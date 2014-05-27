@@ -1600,11 +1600,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
       ::__DisplayData( nRow, , nRow, )
    ENDIF
    IF lLineChange
-      IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
-         ::__ScrollUp()
-       ELSE
-         ::OnKeyDown( VK_DOWN )
-      ENDIF
+      ::OnKeyDown( VK_DOWN )
       ::RowPos := ::RowCountUsable
    ENDIF
    IF ::hWnd != GetFocus()
@@ -3445,7 +3441,7 @@ METHOD OnDestroy() CLASS DataGrid
    WHILE LEN( ::Children ) > 0
        ATAIL( ::Children ):Destroy()
    ENDDO
-   ::DataSource := NIL
+   ::xDataSource := NIL
    IF ::__LinePen != NIL
       DeleteObject( ::__LinePen )
    ENDIF
