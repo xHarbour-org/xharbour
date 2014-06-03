@@ -1051,14 +1051,16 @@ METHOD Init( oParent ) CLASS TblEditor
 RETURN Self
 
 FUNCTION __SetEditKey( o, nKey )
+   local oParent
    SWITCH nKey
       CASE 27
            o:Destroy()
            RETURN NIL
       CASE 13
-           o:Parent:__ControlSaveData()
+           oParent := o:Parent
+           oParent:__ControlSaveData()
            o:Destroy()
-           o:Parent:DataSource:UnLock()
+           oParent:DataSource:UnLock()
            RETURN NIL
    END
    IF !o:Modified

@@ -1035,8 +1035,8 @@ METHOD __ResetControl() CLASS DataGrid
       IF ::Children[ ::ColPos ]:ControlValid != NIL
          ::__CurControl:IsValid := FALSE
       ENDIF
-      ::__CurControl:Destroy()
       ::DataSource:UnLock()
+      ::__CurControl:Destroy()
       ::__CurControl:= NIL
       RETURN TRUE
    ENDIF
@@ -1668,8 +1668,8 @@ METHOD __OnParentSysCommand()
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::__CurControl:Destroy()
       ::DataSource:UnLock()
+      ::__CurControl:Destroy()
       ::__CurControl:=NIL
    ENDIF
    IF ::Parent:wParam != SC_SIZE
@@ -1685,8 +1685,8 @@ METHOD OnKillFocus() CLASS DataGrid
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::__CurControl:Destroy()
       ::DataSource:UnLock()
+      ::__CurControl:Destroy()
       ::__CurControl:=NIL
    ENDIF
    ::__DisplayData( ::RowPos,, ::RowPos )
@@ -3826,11 +3826,12 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
       ENDIF
 
       IF ::__CurControl != NIL .AND. ::DataSource:RecLock()
-         ::__CurControl:OnWMKillFocus  := {|o|o:Parent:__ControlSaveData(.T.),;
+         ::__CurControl:OnWMKillFocus  := {|o,oParent| oParent := o:Parent,;
+                                              oParent:__ControlSaveData(.T.),;
+                                              oParent:DataSource:UnLock(),;
                                               o:Destroy(),;
-                                              o:Parent:DataSource:UnLock(),;
-                                              o:Parent:__CurControl := NIL,;
-                                              o:Parent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
+                                              oParent:__CurControl := NIL,;
+                                              oParent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
          IF ::__CurControl:HasMessage( "Picture" )
             ::__CurControl:Picture := ::Children[::ColPos]:Picture
          ENDIF
@@ -3878,7 +3879,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          ::__CurControl:Text := XSTR( xValue )
          ::__CurControl:Create()
 
-         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),o:Parent:DataSource:UnLock(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Destroy(),o:Parent:DataSource:UnLock()), NIL ) )}
+         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Parent:DataSource:UnLock(),o:Destroy(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Parent:DataSource:UnLock(),o:Destroy()), NIL ) )}
          DEFAULT ::__CurControl:OnWMKillFocus TO {|o|o:Parent:__ControlSaveData(.T.) }
 
          ::__CurControl:BackColor     := ::Children[::ColPos]:ControlBackColor
@@ -3946,8 +3947,8 @@ METHOD __ControlSaveData( lFocus, nKey ) CLASS DataGrid
       ::PostMessage( WM_KILLFOCUS, 0, 0 )
    ENDIF
    IF ::__CurControl != NIL
-      ::__CurControl:Destroy()
       ::DataSource:UnLock()
+      ::__CurControl:Destroy()
       ::__CurControl := NIL
    ENDIF
    IF lRefresh

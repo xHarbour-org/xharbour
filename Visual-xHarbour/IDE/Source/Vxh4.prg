@@ -227,10 +227,10 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
 
    TRY
       lDisabled := oItem:ColItems[1]:ReadOnly
-     catch
+   catch
       lDisabled := .F.
    END
-   IF cText == "Height" .AND. ::ActiveObject:__xCtrlName == "Expando" .AND. !::ActiveObject:Expanded
+   IF cText == "Height" .AND. ::ActiveObject != NIL .AND. ::ActiveObject:__xCtrlName == "Expando" .AND. !::ActiveObject:Expanded
       lDisabled := .T.
    ENDIF   
 
@@ -2071,8 +2071,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                        ::Application:Project:Modified := .T.}
                           ENDIF
                         ELSE
-                          :Action := {|o| StructEditor( o:Parent:ActiveObject ),;
-                                          o:Parent:ResetProperties(,,.T.),;
+                          :Action := {|o,oParent| oParent := o:Parent,;
+                                          StructEditor( o:Parent:ActiveObject ),;
+                                          oParent:ResetProperties(,,.T.),;
                                           o:Destroy(),;
                                           ::Application:Project:Modified := .T.}
                        ENDIF
