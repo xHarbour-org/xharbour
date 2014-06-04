@@ -3879,7 +3879,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          ::__CurControl:Text := XSTR( xValue )
          ::__CurControl:Create()
 
-         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Parent:DataSource:UnLock(),o:Destroy(),0), IIF( n IN {13,9}, (o:Parent:__ControlSaveData(,n),o:Parent:DataSource:UnLock(),o:Destroy()), NIL ) )}
+         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n,oParent| oParent := o:Parent, IIF( n==27, (o:Destroy(),oParent:DataSource:UnLock(),0), IIF( n IN {13,9}, (oParent:__ControlSaveData(,n),o:Destroy(),oParent:DataSource:UnLock()), NIL ) )}
          DEFAULT ::__CurControl:OnWMKillFocus TO {|o|o:Parent:__ControlSaveData(.T.) }
 
          ::__CurControl:BackColor     := ::Children[::ColPos]:ControlBackColor
