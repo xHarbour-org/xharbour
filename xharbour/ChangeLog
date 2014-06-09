@@ -9,6 +9,10 @@
 */
 
 
+2014-06-09 20:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/misc/hb_f.c
+    ! fixed HB_FGOBOTTOM() function
+
 2014-05-25 16:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/encoding/base64.h
   * source/tip/encoding/base64.c

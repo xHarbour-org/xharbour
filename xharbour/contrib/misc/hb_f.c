@@ -306,7 +306,7 @@ HB_FUNC( HB_FGOBOTTOM )
             cr1 = *(c + x);
             cr2 = *(c + x + 1);
 
-            if ( ( ( cr1 == 13 || cr1 == 141 ) && cr2 == 10 ) || ( cr1 == 10 ) || ( x - loc > b_size ) )
+            if ( ( ( cr1 == 13 || cr1 == 141 ) && cr2 == 10 ) || ( cr1 == 10 ) ) //|| ( x - loc > b_size ) )
             {
                last = offset[area] + loc;
                recno[area]++;
