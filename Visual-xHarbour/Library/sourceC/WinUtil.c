@@ -27,6 +27,7 @@
 #endif
 
 #include <windows.h>
+#include <process.h>
 #include <objbase.h>
 
 #include <wbemidl.h>
@@ -42,6 +43,10 @@
 #include <pshpack8.h>
 #include <psapi.h>
 #include <tchar.h>
+
+#include <Tlhelp32.h>
+#include <winbase.h>
+#include <string.h>
 //#include <Awesomium\awesomium_capi.h>
 
 #define __strcpy            _tcscpy
@@ -5356,6 +5361,52 @@ HB_FUNC( SYSTEMTIMETOLOCALTIME )
       wsprintf( cTime, "%02i:%02i:%02i", lt.wHour, lt.wMinute, lt.wSecond );
       hb_storclen( cTime, 8, -1, 2 );
    }
+}
+
+HB_FUNC( KILLPROCESS )
+{
+   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   PROCESSENTRY32 pEntry;
+   pEntry.dwSize = sizeof( pEntry );
+
+   BOOL hRes = Process32First( hSnapShot, &pEntry );
+
+   while( hRes )
+   {
+      if( strcmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
+      {
+         HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, (DWORD) pEntry.th32ProcessID );
+         if( hProcess != NULL )
+         {
+            TerminateProcess(hProcess, 9);
+            CloseHandle( hProcess );
+         }
+      }
+      hRes = Process32Next( hSnapShot, &pEntry );
+   }
+   CloseHandle( hSnapShot );
+}
+
+HB_FUNC( ISPROCESSRUNNING )
+{
+   BOOL bRet = FALSE;
+   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   PROCESSENTRY32 pEntry;
+   pEntry.dwSize = sizeof( pEntry );
+
+   BOOL hRes = Process32First( hSnapShot, &pEntry );
+
+   while( hRes )
+   {
+      if( strcmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
+      {
+         bRet = TRUE;
+         break;
+      }
+      hRes = Process32Next( hSnapShot, &pEntry );
+   }
+   CloseHandle( hSnapShot );
+   hb_retl( bRet );
 }
 
 /*
