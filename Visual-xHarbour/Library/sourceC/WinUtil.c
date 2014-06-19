@@ -5373,7 +5373,7 @@ HB_FUNC( KILLPROCESS )
 
    while( hRes )
    {
-      if( strcmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
+      if( stricmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
       {
          HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, (DWORD) pEntry.th32ProcessID );
          if( hProcess != NULL )
@@ -5398,7 +5398,7 @@ HB_FUNC( ISPROCESSRUNNING )
 
    while( hRes )
    {
-      if( strcmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
+      if( stricmp( pEntry.szExeFile, hb_parc(1) ) == 0 )
       {
          bRet = TRUE;
          break;
