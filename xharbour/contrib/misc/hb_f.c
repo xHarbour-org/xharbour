@@ -173,9 +173,9 @@ static ULONG hb_hbfskip( int recs )
 
       for (y = recs; y > 0; y-- )
       {
-	 i = 0;
+         i = 0;
 
-         if ( offset[area] - b_size < 0L )
+         if ( offset[area] < b_size )
          {
             read_pos = 0;
             read_len = (size_t)offset[area];

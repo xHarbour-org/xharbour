@@ -9,6 +9,10 @@
 */
 
 
+2014-06-26 23:55 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/misc/hb_f.c
+    ! fixed hb_hbfskip() function
+
 2014-06-09 20:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/misc/hb_f.c
     ! fixed HB_FGOBOTTOM() function
