@@ -37,8 +37,9 @@ CLASS MenuStrip INHERIT ToolStrip
    
    METHOD Init() CONSTRUCTOR
    METHOD OnPaint()
+   METHOD OnEraseBkgnd() //INLINE 1
    METHOD OnSize()
-   METHOD OnMove()
+   //METHOD OnMove()
    METHOD __OnParentSize()
    METHOD __SetHeight( x )    INLINE ::__SetSizePos( 4, x ), IIF( ::hWnd != NIL, (::Parent:__RefreshLayout( .T. ), /*AEVAL( ::Children, {|o| o:Height := o:Parent:Height - 1, o:MoveWindow() } )*/ ),)
    METHOD __UpdateWidth()
@@ -149,6 +150,7 @@ RETURN NIL
 METHOD OnSize( nwParam, nlParam ) CLASS MenuStrip
    Super:OnSize( nwParam, nlParam )
    ::__PrevSize := LOWORD(nlParam)
+   ::Parent:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    IF ::Row > 0 //.AND. ::__PrevRow == 0 
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
       //AEVAL( ::Children, {|o| o:SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ) } )
@@ -198,25 +200,30 @@ METHOD __OnParentSize( x, y, hDef ) CLASS MenuStrip
 RETURN hDef
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnMove( x, y ) CLASS MenuStrip
-   Super:OnMove( x, y )
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-   AEVAL( ::Children, {|o| o:InvalidateRect() } )
-RETURN NIL
+//METHOD OnMove( x, y ) CLASS MenuStrip
+//   Super:OnMove( x, y )
+//   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+//   AEVAL( ::Children, {|o| o:InvalidateRect() } )
+//RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
+/*
 METHOD OnPaint() CLASS MenuStrip
    LOCAL aRect := Array(4)
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hDC
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC, pt := (struct POINT)
 
-   hDC := ::BeginPaint()
+   ::Parent:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+
+   hDC        := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
    
-   _FillRect( hMemDC, {0,0,::ClientWidth,::ClientHeight}, ::__hBrush )
+   SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top, @pt )
+
+   _FillRect( hMemDC, {0,0,::ClientWidth,::ClientHeight}, ::Parent:BkBrush )
    
    IF ::Row > 0 .AND. ::ShowGrip
       y := 4
@@ -233,27 +240,6 @@ METHOD OnPaint() CLASS MenuStrip
           y += 4
       NEXT
    ENDIF
-   
-   IF hMemBitmap != NIL
-      FOR EACH oChild IN ::Children
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
-          ENDIF
-
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-
-          hMemDC1      := CreateCompatibleDC( hDC )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-
-          SelectObject( hMemDC1,  hOldBitmap1 )
-          DeleteDC( hMemDC1 )
-
-      NEXT
-   ENDIF
 
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
    SelectObject( hMemDC,  hOldBitmap )
@@ -262,4 +248,52 @@ METHOD OnPaint() CLASS MenuStrip
 
    ::EndPaint()
 RETURN 0
+*/
 
+
+METHOD OnPaint() CLASS MenuStrip
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC
+
+   hDC        := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   
+   ::OnEraseBkgnd( hMemDC )
+
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
+   ::EndPaint()
+RETURN 0
+
+//-------------------------------------------------------------------------------------------------------
+METHOD OnEraseBkgnd( hDC ) CLASS MenuStrip
+   LOCAL y, n, nDots := ( ::Height - 6 ) / 4
+
+   //::Parent:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+
+   _FillRect( hDC, {0,0,::Width,::Height}, ::Parent:BkBrush )
+   
+   IF ::Row > 0 .AND. ::ShowGrip
+      y := 4
+      FOR n := 1 TO nDots  
+          SetPixel( hDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripLight )
+          SetPixel( hDC, ::__GripperPos + 1, y + 2, ::ColorScheme:GripLight )
+          SetPixel( hDC, ::__GripperPos + 2, y + 1, ::ColorScheme:GripLight )
+          SetPixel( hDC, ::__GripperPos + 2, y + 2, ::ColorScheme:GripLight )
+
+          SetPixel( hDC, ::__GripperPos,     y + 0, ::ColorScheme:GripDark )
+          SetPixel( hDC, ::__GripperPos,     y + 1, ::ColorScheme:GripDark )
+          SetPixel( hDC, ::__GripperPos + 1, y + 0, ::ColorScheme:GripDark )
+          SetPixel( hDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripDark )
+          y += 4
+      NEXT
+   ENDIF
+
+RETURN 1

@@ -42,7 +42,7 @@
 
 CLASS RadioButton INHERIT Control
 
-   PROPERTY Transparent   SET ::__SetTransp(v)              DEFAULT .F.
+   //PROPERTY Transparent   SET ::__SetTransp(v)              DEFAULT .F.
    PROPERTY Group         SET ::SetStyle( WS_GROUP, v )     DEFAULT .F.
    PROPERTY OwnerDraw     SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.           
    PROPERTY Border        SET ::SetStyle( WS_BORDER, v )    DEFAULT .F.           
@@ -58,7 +58,7 @@ CLASS RadioButton INHERIT Control
    DATA ImageIndex EXPORTED
 
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor, ::__SetTransp(.T.), ), ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
+   METHOD Create()             INLINE ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
    
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE 1
@@ -68,7 +68,7 @@ CLASS RadioButton INHERIT Control
    METHOD SetState(nState)     INLINE ::SendMessage( BM_SETCHECK, nState, 0 )
    METHOD __SetInitialState()
    METHOD OnCtlColorStatic()
-   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS RadioButton
@@ -120,14 +120,18 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                    lChecked  := nState & BST_CHECKED == BST_CHECKED
                    lPressed  := nState & BST_PUSHED  == BST_PUSHED
 
-                   DEFAULT hBkGnd TO ::__hBrush
-                   DEFAULT hBkGnd TO ::Parent:BkBrush
+                   hBkGnd := ::BkBrush
+                   IF hBkGnd == NIL
+                      hBkGnd := ::Parent:BkBrush
+                      SetBrushOrgEx( cd:hdc, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+                   ENDIF
+                   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
+
                    IF hBkGnd == NIL
                       SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
                       RETURN nRet
                    ENDIF
 
-                   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
                    FillRect( cd:hdc, cd:rc, hBkGnd )
 
                    aRect := cd:rc:Array

@@ -701,7 +701,7 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT MenuStripItem( :this )
             :Begingroup := .T.
             :Caption    := "&Settings"
-            :Action     := {|| Settings( Self ) }
+            :Action     := {|| Settings( NIL ) }
             :Create()
          END
 
@@ -2138,7 +2138,7 @@ CLASS StartTabPage INHERIT TabPage
    METHOD OnEraseBkGnd()
    METHOD OnPaint()
    METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
-   METHOD Create()  INLINE    ::Super:Create(), ::__lOnPaint := .F., Self
+   //METHOD Create()  INLINE    ::Super:Create(), ::__lOnPaint := .F., Self
 ENDCLASS
 
 METHOD OnPaint( hDC ) CLASS StartTabPage
@@ -2177,8 +2177,8 @@ CLASS StartPagePanel INHERIT Panel
    DATA nPanel INIT 0
    METHOD OnEraseBkGnd()
    METHOD OnPaint()
-   METHOD OnSize(w,l)  INLINE Super:OnSize( w, l ), ::InvalidateRect(,.F.), NIL
-   METHOD Create()  INLINE ::Super:Create(), ::__lOnPaint := .F., Self
+   METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
+   METHOD Create()
 ENDCLASS
 
 METHOD OnPaint() CLASS StartPagePanel
@@ -2187,17 +2187,19 @@ METHOD OnPaint() CLASS StartPagePanel
    ::EndPaint()
 RETURN 0
 
-METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartPagePanel
-   LOCAL oChild, hOldBitmap1, hMemDC1
-   LOCAL hMemBitmap, hOldBitmap
-   IF !::IsWindow()
-      RETURN 0
+METHOD Create() CLASS StartPagePanel
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC := ::Drawing:hDC
+
+   ::Super:Create()
+
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
+      ::BkBrush := NIL
    ENDIF
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   ENDIF
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    IF ::nPanel == 0
       PicturePaint( ::Application:StartPageBrushes:RecentBk[1], hMemDC, 0, 0 )
@@ -2205,38 +2207,15 @@ METHOD OnEraseBkGnd( hDC, hMemDC ) CLASS StartPagePanel
       PicturePaint( ::Application:StartPageBrushes:NewsBk[1], hMemDC, 0, 0 )
    ENDIF
 
-   IF hMemBitmap != NIL
+   ::BkBrush := CreatePatternBrush( hMemBitmap )
 
-      FOR EACH oChild IN ::__aTransparent
-          IF oChild:__lReqBrush
-             oChild:__lReqBrush :=.F.
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+RETURN NIL
 
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-
-             hMemDC1      := CreateCompatibleDC( hDC )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-
-             SelectObject( hMemDC1,  hOldBitmap1 )
-             DeleteDC( hMemDC1 )
-          ENDIF
-      NEXT
-   ENDIF
-
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
+METHOD OnEraseBkGnd( hDC ) CLASS StartPagePanel
+   _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
 RETURN 1
 
 //-------------------------------------------------------------------------------------------------------
@@ -3440,19 +3419,20 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    lRem := .F.
 
-   FOR n := 1 TO LEN( ::Forms )
-       IF ::Forms[n]:Editor != NIL
-          ::Forms[n]:Editor:Close()
-          ::Forms[n]:TreeItem:Cargo := NIL
-          ::Forms[n]:Editor:Form := NIL
-          ::Forms[n]:Editor := NIL
-          //::Forms[n]:XFMEditor:Close()
-          //::Forms[n]:XFMEditor := NIL
-          ::Forms[n]:Destroy()
-          ::Forms[n] := NIL
-       ENDIF
-   NEXT
-
+   IF ::Forms != NIL
+      FOR n := 1 TO LEN( ::Forms )
+          IF ::Forms[n]:Editor != NIL
+             ::Forms[n]:Editor:Close()
+             ::Forms[n]:TreeItem:Cargo := NIL
+             ::Forms[n]:Editor:Form := NIL
+             ::Forms[n]:Editor := NIL
+             //::Forms[n]:XFMEditor:Close()
+             //::Forms[n]:XFMEditor := NIL
+             ::Forms[n]:Destroy()
+             ::Forms[n] := NIL
+          ENDIF
+      NEXT
+   ENDIF
    ::Application:ObjectTree:ResetContent()
    ::Application:ObjectManager:ActiveObject := NIL
    FOR n := 1 TO LEN( ::Application:ObjectManager:Items )
@@ -3468,7 +3448,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
 
    ::CurrentForm := NIL
-   ::Forms := NIL
+   ::Forms := {}
 
    IF ::DesignPage == NIL .OR. lClosing
       RETURN .T.
@@ -3784,8 +3764,6 @@ METHOD Open( cProject ) CLASS Project
    ::Properties := ProjProp( ::ProjectFile:Path + "\" + ::ProjectFile:Name )
    ::Modified := .F.
 
-   ::Application:FileExplorer:InitProject()
-
    // Open Project.prg
    cSourcePath := ::Properties:Path + "\" + ::Properties:Source
 
@@ -3815,6 +3793,8 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 20
 
    ::OpenDesigner()
+   ::Application:FileExplorer:InitProject()
+
    ::Application:ToolBox:Enabled := .T.
 
    ::Application:Props[ "RunBttn"           ]:Enabled := .T.
@@ -3978,6 +3958,8 @@ METHOD Open( cProject ) CLASS Project
 
       ::Application:ObjectManager:ResetProperties( {{::AppObject}} )
       ::Application:EventManager:ResetEvents( {{::AppObject}} )
+
+      ::Application:ProjectPrgEditor:TreeItem:Select()
 
       ::Application:EditorPage:Select()
    ENDIF
@@ -5328,6 +5310,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
              oLink:Tooltip:Text := aEntries[n]
              oLink:Action       := {|o| ::Application:Project:Open( o:Url ) }
              oLink:Create()
+             oLink:UpdateWIndow()
              AADD( ::Application:aoLinks, oLink )
            ELSE
              oLink := ::Application:aoLinks[n]
@@ -6528,7 +6511,7 @@ METHOD OnInitDialog() CLASS ListOle
          :Caption  := ::aOle[1][6]
          :Left     := 70
          :Top      := 16
-         :Width    := :Parent:Width - :Left
+         :Width    := :Parent:ClientWidth - :Left - 1
          :Create()
       END
       WITH OBJECT Label( :This )
@@ -6537,7 +6520,7 @@ METHOD OnInitDialog() CLASS ListOle
          :Dock:Margin := 3
          :Dock:Top := ::Label1
          :Height   := :Height * 2
-         :Width    := :Parent:Width - :Left
+         :Width    := :Parent:ClientWidth - :Left - 1
          :Create()
       END
       :MoveWindow()
@@ -6581,7 +6564,8 @@ METHOD Init( oParent ) CLASS RegOle
    ::Height        := 300
    ::ShowGrid      := .F.
    ::ItemHeight    := 17
-
+   //::Border        := .T.
+   ::ShowHeaders   := .F.
    ::Dock:Margin   := 0
    ::Dock:Left     := ::Parent
    ::Dock:Top      := ::Parent:PictureBox1
@@ -6619,7 +6603,6 @@ METHOD Init( oParent ) CLASS RegOle
 RETURN Self
 
 METHOD OnDestroy() CLASS RegOle
-   ::Super:OnDestroy()
    ::DataSource:GoTop()
    WHILE ! ::DataSource:Eof()
       IF VALTYPE( ::Form:aOle[ ::DataSource:Recno() ][4] ) == "N"
@@ -6627,6 +6610,7 @@ METHOD OnDestroy() CLASS RegOle
       ENDIF
       ::DataSource:Skip()
    ENDDO
+   ::Super:OnDestroy()
 RETURN NIL
 
 METHOD OnRowChanged() CLASS RegOle
@@ -6765,9 +6749,11 @@ CLASS AboutVXH INHERIT Dialog
    DATA Panel      EXPORTED
    DATA LinkLabel1 EXPORTED
    DATA BetaLabel  EXPORTED
+
    DATA Red        EXPORTED INIT 255
    DATA Green      EXPORTED INIT 255
    DATA Blue       EXPORTED INIT 255
+
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
    METHOD LinkLabel1_OnClick()

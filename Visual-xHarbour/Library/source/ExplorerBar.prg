@@ -445,7 +445,7 @@ RETURN NIL
 METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    LOCAL x := 0, y := 0, cx, cy, nHeight := ::HeaderHeight
    LOCAL aArrow, nArrow, hPen, hPen1, oHeader, hTitle, hMemBitmap, hOldBitmap, hBrush, nImage, hButton, nButton, nMargin, hFont, oTask, nIconX, nIconY
-   LOCAL oChild, hOldBitmap1, hMemDC1, hOldPen, hOldBrush, nLeft, nTop, nRight, nBottom
+   LOCAL hOldPen, hOldBrush, nLeft, nTop, nRight, nBottom
    IF !::IsWindow()
       RETURN 0
    ENDIF
@@ -561,21 +561,6 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
    IF nIconX > 0
       ::Parent:ImageList:DrawImage( hMemDC, ::ImageIndex, x, y-nIconY, ILD_TRANSPARENT )
    ENDIF
-
-   hMemDC1 := CreateCompatibleDC( hDC )
-   FOR EACH oChild IN ::__aTransparent
-       IF GetParent( oChild:hWnd ) == ::hWnd
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
-          ENDIF
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, x + oChild:Left+oChild:__BackMargin, y-nIconY + oChild:Top+oChild:__BackMargin, SRCCOPY )
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-          SelectObject( hMemDC1,  hOldBitmap1 )
-       ENDIF
-   NEXT
-   DeleteDC( hMemDC1 )
 
    SelectObject( hMemDC, hFont )
    SelectObject( hMemDC, hOldPen )

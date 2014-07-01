@@ -21,9 +21,9 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
    METHOD Create()
    METHOD OnDestroy()           INLINE ::Panel:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
    METHOD OnGetDlgCode()        INLINE DLGC_WANTMESSAGE
-   METHOD OnPaint()
-   METHOD OnEraseBkGnd()        INLINE 1
+   METHOD OnEraseBkGnd()
    METHOD Destroy()             INLINE ::Panel:Destroy()
+   METHOD __CreateBkBrush()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -51,61 +51,40 @@ METHOD Create() CLASS FreeImage
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
-METHOD OnPaint( hDC, hMemDC ) CLASS FreeImage
-   LOCAL hMemBitmap, hOldBitmap, hBrush, lDC
-   LOCAL oChild, hOldBitmap1, hMemDC1, pPt := (struct POINT)
-   
-   lDC := ( hDC == NIL .OR. hDC == 0 )
-   IF lDC
-      hDC := ::BeginPaint()
-   ENDIF
+METHOD __CreateBkBrush( hDC ) CLASS FreeImage
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush
 
-   IF !::Transparent
-      hBrush := ::BkBrush
-    ELSE
-      hBrush := ::__hBrush
-      DEFAULT hBrush TO ::Parent:BkBrush
-   ENDIF
-   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   IF ::xBackColor != NIL
+      hBrush := CreateSolidBrush( ::xBackColor )
    ENDIF
-
-   _FillRect( hMemDC, {0, 0, ::ClientWidth, ::ClientHeight}, hBrush )
+   _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
+   IF hBrush != NIL
+      DeleteObject( hBrush )
+   ENDIF
 
    ::Draw( hMemDC )
 
-   IF hMemBitmap != NIL
-      hMemDC1 := CreateCompatibleDC( hDC )
-      FOR EACH oChild IN ::__aTransparent
-          IF GetParent( oChild:hWnd ) == ::hWnd
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-             BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin+oChild:__nCaptionHeight, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC1,  hOldBitmap1 )
-          ENDIF
-      NEXT
-      DeleteDC( hMemDC1 )
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
    ENDIF
+   ::BkBrush := CreatePatternBrush( hMemBitmap )
 
-   IF hDC != NIL
-      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-   ENDIF
-   IF lDC
-      ::EndPaint()
-   ENDIF
-RETURN 0
+RETURN NIL
+
+//--------------------------------------------------------------------------------------------------------
+METHOD OnEraseBkGnd( hDC ) CLASS FreeImage
+   ::__CreateBkBrush( hDC )
+   _FillRect( hDC, {0, 0, ::ClientWidth, ::ClientHeight}, ::BkBrush )
+RETURN 1
+
 #endif
 
 //--------------------------------------------------------------------------------------------------------
@@ -235,7 +214,7 @@ METHOD LoadFromString( cData ) CLASS FreeImageRenderer
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
-METHOD Draw( hMemDC ) CLASS FreeImageRenderer
+METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
    LOCAL cx, cy, hDIBMemBitmap, display_dib, hDib, nRatio, iy, nHeight, nWidth
    LOCAL hMemBitmap1, hOldBitmap1, hMemDC1, x, y
    IF ::hDIB == NIL
@@ -333,9 +312,7 @@ METHOD Draw( hMemDC ) CLASS FreeImageRenderer
                   hDib := hDIBMemBitmap
                ENDIF
 
-               display_dib := FreeImageComposite( ::hDIB, .F., , hDib )
-
-               IF display_dib != NIL
+               IF ( display_dib := FreeImageComposite( ::hDIB, .F., , hDib ) ) != NIL
                   FreeImageUnload( ::hDIB )
                   ::hDIB := display_dib
                ENDIF
@@ -347,10 +324,18 @@ METHOD Draw( hMemDC ) CLASS FreeImageRenderer
             DeleteObject( hMemBitmap1 )
             DeleteDC( hMemDC1 )
           ELSE
-            IF ( display_dib := FreeImageComposite( ::hDIB, .F., ::Owner:BackColor ) ) != NIL
+            hDIBMemBitmap := FreeImagehBitmapToDib( hBitmap )
+            IF FreeImageGetBPP( hDIBMemBitmap ) == 32
+               hDib := FreeImageConvertTo24Bits( hDIBMemBitmap )
+               FreeImageUnload( hDIBMemBitmap )
+             ELSE 
+               hDib := hDIBMemBitmap
+            ENDIF
+            IF ( display_dib := FreeImageComposite( ::hDIB, .F., , hDib ) ) != NIL
                FreeImageUnload( ::hDIB )
                ::hDIB := display_dib
             ENDIF
+            FreeImageUnload( hDib )
          ENDIF   
       ENDIF
    ENDIF
@@ -401,7 +386,7 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
          hBmp := LoadImage( hInst, cResource, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE )
       ENDIF
       
-      IF hBmp != NIL 
+      IF ! Empty( hBmp )
          IF ::hDIB != NIL
             FreeImageUnload( ::hDIB )
          ENDIF

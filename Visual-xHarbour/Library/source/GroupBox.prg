@@ -47,7 +47,6 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS GroupBox INHERIT Control
-   PROPERTY Transparent SET ::__SetTransp(v) DEFAULT .F.
    PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList )
 
    DATA ImageIndex PROTECTED
@@ -56,15 +55,16 @@ CLASS GroupBox INHERIT Control
 
    
    METHOD Init()  CONSTRUCTOR
-   METHOD Create()             INLINE IIF( ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent, ::__SetTransp(.T.), ), Super:Create()
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
-   METHOD OnSize(w,l)          INLINE Super:OnSize(w,l),::InvalidateRect(), NIL
+   METHOD OnSize(w,l)          INLINE ::__CreateBkBrush(), Super:OnSize(w,l), ::InvalidateRect(), NIL
    METHOD GetSysColor()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
-   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   METHOD __CreateBkBrush()
+   METHOD Refresh()            INLINE ::__CreateBkBrush(), Super:Refresh()
 ENDCLASS
 
+//-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS GroupBox
    ::__xCtrlName := "GroupBox"
    ::ClsName   := "GroupBox"
@@ -81,6 +81,7 @@ METHOD Init( oParent ) CLASS GroupBox
    ENDIF
 RETURN Self
 
+//-----------------------------------------------------------------------------------------------
 METHOD GetSysColor() CLASS GroupBox
    LOCAL nColor
    IF ::Application:IsThemedXP .AND. ::Theming
@@ -90,69 +91,86 @@ METHOD GetSysColor() CLASS GroupBox
    ENDIF
 RETURN nColor
 
-METHOD OnPaint( hDC, hMemDC ) CLASS GroupBox
-   LOCAL lDC, hFont, hBrush, hMemBitmap, hOldBitmap, rc := (struct RECT), rcalc := (struct RECT), sz := (struct SIZE)
-   IF !::IsWindow()
-      RETURN 0
+//-----------------------------------------------------------------------------------------------
+METHOD __CreateBkBrush() CLASS GroupBox
+   LOCAL aRect, hDC, hMemBitmap, hOldBitmap, hMemDC, hBrush
+   IF ::xBackColor == NIL
+      ::GetClientRect()
+      aRect      := _GetClientRect( ::Parent:hWnd )
+      hDC        := GetDC( ::hWnd )
+
+      hMemDC     := CreateCompatibleDC( hDC )
+      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+      hBrush     := ::Parent:BkBrush
+      DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+
+      SetBrushOrgEx( hMemDC, aRect[3]-::Left, aRect[4]-::Top )  
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+
+      IF ::BkBrush != NIL
+         DeleteObject( ::BkBrush )
+      ENDIF
+      ::BkBrush   := CreatePatternBrush( hMemBitmap )
+
+      SelectObject( hMemDC,  hOldBitmap )
+      DeleteObject( hMemBitmap )
+      DeleteDC( hMemDC )
+
+      ReleaseDC( ::hWnd, hDC )
    ENDIF
+RETURN NIL
 
-   hBrush := ::GetBkBrush()
+//-----------------------------------------------------------------------------------------------
+METHOD OnPaint() CLASS GroupBox
+   LOCAL hDC, hFont, hBrush, hMemDC, hMemBitmap, hOldBitmap, sz := (struct SIZE), aRect
 
-   rc:left   := 0
-   rc:top    := 0
-   rc:right  := ::Width
-   rc:bottom := ::Height
+   ::__CreateBkBrush()
 
-   lDC := ( hDC == NIL .OR. hDC == 0 )
-   IF lDC
-      hDC := ::BeginPaint()
-   ENDIF
+   aRect      := { 0, 0, ::ClientWidth, ::ClientHeight }
+   hBrush     := ::BkBrush
+
+   hDC        := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   FillRect( hMemDC, rc, hBrush )
+
+   _FillRect( hMemDC, { 0, 0, ::Width, ::Height }, hBrush )
 
    hFont := SelectObject( hMemDC, ::Font:Handle )
    GetTextExtentPoint32( hMemDC, ::Text, @sz )
 
-   rc:top    := sz:cy / 2 
+   aRect[2]    := sz:cy / 2 
    IF ::Theming .AND. ::Application:IsThemedXP
-      DrawThemeBackground( ::System:hButtonTheme, hMemDC, BP_GROUPBOX, 0, rc:Array, rc:Array )
+      DrawThemeBackground( ::System:hButtonTheme, hMemDC, BP_GROUPBOX, 0, aRect, aRect )
     ELSE
-      DrawEdge( hMemDC, rc, EDGE_ETCHED, BF_RECT )
+      _DrawEdge( hMemDC, aRect, EDGE_ETCHED, BF_RECT )
    ENDIF
 
    IF ! Empty( ::Text )
-      rcalc:left   := 7
-      rcalc:top    := 0
-      rcalc:right  := sz:cx + 12
-      rcalc:bottom := sz:cy
-
-      FillRect( hMemDC, rcalc, hBrush )
+      _FillRect( hMemDC, {7,0,sz:cx + 12,sz:cy}, hBrush )
 
       IF ::ForeColor != NIL
          SetTextColor( hMemDC, ::ForeColor )
       ENDIF
-      rc:top    := 0
-      rc:left   := 10
+      aRect[2] := 0
+      aRect[1] := 10
 
       SetBkMode( hMemDC, TRANSPARENT )
-      DrawText( hMemDC, ::Text, rc, DT_LEFT | DT_SINGLELINE )
+      _DrawText( hMemDC, ::Text, aRect, DT_LEFT | DT_SINGLELINE )
    ENDIF
+
    SelectObject( hMemDC, hFont )
   
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-
-   ::__SetTransparentChildren( hDC, hMemDC )
 
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
 
-   IF lDC
-      ::EndPaint()
-   ENDIF
+   ::EndPaint()
 RETURN 0
 
 

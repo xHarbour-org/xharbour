@@ -123,6 +123,7 @@ METHOD Init( oParent ) CLASS ToolTip
    ::Top          := CW_USEDEFAULT
    ::Width        := CW_USEDEFAULT
    ::Height       := CW_USEDEFAULT
+   oParent := NIL
 RETURN( self )
 
 METHOD Create() CLASS ToolTip
@@ -205,13 +206,13 @@ RETURN Self
 
 METHOD SetText(c) CLASS ToolTip
    LOCAL x, n, cColor, ti := (struct TOOLINFO)
-   IF c != NIL
-      IF AT( "<\b>", c ) == 0 .AND. AT( "<\i>", c ) == 0 .AND. AT( "<\c\", c ) == 0
-         ::__lOnPaint := .F.
-       ELSE
-         ::__lOnPaint := .T.
-      ENDIF
-   ENDIF
+   //IF c != NIL
+   //   IF AT( "<\b>", c ) == 0 .AND. AT( "<\i>", c ) == 0 .AND. AT( "<\c\", c ) == 0
+   //      ::__lOnPaint := .F.
+   //    ELSE
+   //      ::__lOnPaint := .T.
+   //   ENDIF
+   //ENDIF
    ::xText := c
    IF ::hWnd != NIL
       ti:cbSize      := ti:sizeof()

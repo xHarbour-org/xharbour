@@ -10,7 +10,9 @@
 #include "commdlg.ch"
 #include "fileio.ch"
 
-#define HKEY_LOCAL_MACHINE           (0x80000002)
+#define HKEY_LOCAL_MACHINE     (0x80000002)
+#define HKEY_CURRENT_USER       0x80000001
+
 #define KEY_ALL_ACCESS              (0xF003F)
 #define DG_ADDCONTROL      1
 #define XFM_EOL Chr(13) + Chr(10)
@@ -212,7 +214,7 @@ METHOD Create() CLASS ToolBox
 
    //COM
    FOR n := 1 TO LEN( ::ComObjects )
-       AADD( ::aButtons[-2], { ::ComObjects[2], lPro } )
+       AADD( ::aButtons[7], { ::ComObjects[n][2], lPro } )
    NEXT
 
    FOR n := 2 TO LEN( ::aButtons )
@@ -254,7 +256,7 @@ METHOD Create() CLASS ToolBox
 
    #ifdef VXH_PROFESSIONAL
     ::ComObjects    := {}
-    oReg := Registry( HKEY_LOCAL_MACHINE, "Software\Visual xHarbour\ComObjects" )
+    oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour\ComObjects" )
     IF oReg:Open()
        n := 0
        aKeys := oReg:GetKeys()

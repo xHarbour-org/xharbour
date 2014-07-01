@@ -127,11 +127,11 @@ CLASS System
    METHOD GetLocalTime()
    METHOD GetRunningProcs()
    METHOD GetOSName()
-   METHOD IsProcRunning()
-   METHOD GetProcMemory()
-   METHOD UpdateColorSchemes() INLINE ::CurrentScheme:Load()
-   ACCESS Services             INLINE __ENUMSERVICES()
-   METHOD GetFocus()           INLINE ObjFromHandle( GetFocus() )
+   METHOD IsProcRunning( cExe ) INLINE IsProcessRunning( cExe )
+   METHOD GetProcMemory()       INLINE GetProcessMemory()
+   METHOD UpdateColorSchemes()  INLINE ::CurrentScheme:Load()
+   ACCESS Services              INLINE __ENUMSERVICES()
+   METHOD GetFocus()            INLINE ObjFromHandle( GetFocus() )
    METHOD GetEnvironment()
    METHOD GetEnumCursor()
    METHOD __GetLastError()
@@ -812,29 +812,6 @@ METHOD GetOSName( cProcName ) CLASS System
        ENDIF
    NEXT
 RETURN aName
-
-//-----------------------------------------------------------------------------------------------------------------------------
-METHOD GetProcMemory( cProcName ) CLASS System
-   LOCAL nMemory := 0, oProcess, aProcessList, aProcess := {}
-   DEFAULT cProcName TO __GetApplication():FileName
-   aProcessList := GetWin32Proc("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
-   FOR EACH oProcess IN aProcessList
-       nMemory := Int( VAL(oProcess:WorkingSetSize) )//VirtualSize
-   NEXT
-   aProcessList := NIL
-RETURN nMemory
-
-//-----------------------------------------------------------------------------------------------------------------------------
-METHOD IsProcRunning( cProcName, lTerminate ) CLASS System
-   LOCAL oProcess, aProcessList
-   DEFAULT lTerminate TO .F.
-   aProcessList := GetWin32Proc("SELECT * FROM Win32_Process WHERE Name = '"+cProcName+"'")
-   IF lTerminate
-      FOR EACH oProcess IN aProcessList
-          oProcess:Terminate()
-      NEXT
-   ENDIF
-RETURN aProcessList:Count > 0
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetEnumCursor() CLASS System

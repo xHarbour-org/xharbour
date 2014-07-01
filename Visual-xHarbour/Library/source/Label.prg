@@ -25,7 +25,7 @@
 CLASS Label INHERIT Control
    PROPERTY Alignment                     SET ::Redraw(v)      DEFAULT DT_LEFT
    PROPERTY Border                        SET ::Redraw(v)      DEFAULT 0
-   PROPERTY Transparent                   SET ::__SetTransp(v) DEFAULT .F.
+   //PROPERTY Transparent                   SET ::__SetTransp(v) DEFAULT .F.
    PROPERTY NoPrefix                      SET ::Redraw(v)      DEFAULT .F.
    PROPERTY VertCenter                    SET ::Redraw(v)      DEFAULT .F.
    PROPERTY TextShadowColor ROOT "Colors" SET ::InvalidateRect()
@@ -54,11 +54,11 @@ CLASS Label INHERIT Control
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
-   METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect()
-   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD __SetBlinkColor()
    METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::InvalidateRect(, .F. ), NIL
    METHOD OnLButtonUp()
@@ -106,9 +106,10 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create()  CLASS Label
-   IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor
-      ::Transparent := .T.
-   ENDIF
+   //IF ::Parent:__xCtrlName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor
+   //   ::Transparent := .T.
+   //ENDIF
+   ::Parent:Refresh()
    Super:Create()
    ::__SetBlinkColor()
 RETURN Self
@@ -163,7 +164,7 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL hOldPen, nFlags, cText, hBrush, hFont, aText, hBkGnd := ::GetBkBrush(), aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hOldPen, nFlags, cText, hBrush, hFont, aText, hBkGnd, aRect := {0,0,::xWidth,::xHeight}
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC
 
    hDC        := ::BeginPaint()
@@ -171,6 +172,13 @@ METHOD OnPaint() CLASS Label
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   hBkGnd := ::BkBrush
+   IF hBkGnd == NIL
+      hBkGnd := ::Parent:BkBrush
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+   ENDIF
+   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
 
    DEFAULT ::__CurColor TO ::ForeColor
 
@@ -264,7 +272,7 @@ CLASS Line INHERIT CONTROL
    DATA ClipSiblings       EXPORTED
    DATA OwnerDraw          EXPORTED  INIT .F.
    DATA StaticEdge         EXPORTED
-   DATA Transparent        EXPORTED
+   //DATA Transparent        EXPORTED
 
    DATA AcceptFiles        EXPORTED  INIT .F.
    DATA AnimationStyle     EXPORTED  INIT 0

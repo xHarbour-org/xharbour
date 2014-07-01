@@ -66,8 +66,8 @@ CLASS ToolStripContainer INHERIT Control
    
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnPaint()
    METHOD OnEraseBkGnd()      INLINE 1
+   METHOD OnPaint()
    METHOD OnThemeChanged()    INLINE ::__SetVertex(), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), AEVAL( ::Children, {|o| o:InvalidateRect() } ), NIL
    METHOD OnSize()
    METHOD OnParentSysCommand()
@@ -114,7 +114,8 @@ RETURN Self
 METHOD OnSize( nwParam, nlParam ) CLASS ToolStripContainer
    Super:OnSize( nwParam, nlParam )
    ::__SetVertex()
-   //::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+//   ::InvalidateRect(, .F. )
+   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    AEVAL( ::Children, {|o| o:InvalidateRect(, .F. ) } )
 RETURN NIL
 
@@ -193,40 +194,22 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS ToolStripContainer
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hMemDC
-   LOCAL hDC := ::BeginPaint()
+   LOCAL hDC, hMemBitmap, hOldBitmap, hMemDC
 
-   IF RGB( ::__aVertex[1]:Red, ::__aVertex[1]:Green, ::__aVertex[1]:Blue ) != ::ColorScheme:ToolStripPanelGradientBegin
-      ::__SetVertex()
-   ENDIF
+   hDC        := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    __GradientFill( hMemDC, ::__aVertex, 2, ::__aMesh, 1, 0 )
 
-   IF hMemBitmap != NIL
-      FOR EACH oChild IN ::Children
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
-          ENDIF
+   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-
-          hMemDC1      := CreateCompatibleDC( hDC )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-
-          SelectObject( hMemDC1,  hOldBitmap1 )
-          DeleteDC( hMemDC1 )
-      NEXT
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
    ENDIF
-
-   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   ::BkBrush  := CreatePatternBrush( hMemBitmap )
 
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
@@ -421,6 +404,7 @@ CLASS ToolStrip INHERIT Control
    METHOD __ShowChevron()
    METHOD __ShowGrip()
    METHOD __Enable( lEnable )
+   METHOD __CreateBkBrush()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS ToolStrip
@@ -654,6 +638,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD __OnParentSize(x,y,hDef) CLASS ToolStrip
    LOCAL oStrip, nPos, i
+   ::__CreateBkBrush()
    IF ::Row > 0 .AND. ::ShowChevron .AND. ::__ClassInst == NIL
       ::Parent:GetClientrect()
       IF ::Parent:ClientWidth < ::Left + ::Width + 2
@@ -826,26 +811,15 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnPaint() CLASS ToolStrip
-   LOCAL hOldPen, aRect := Array(4)
+METHOD __CreateBkBrush() CLASS ToolStrip
+   LOCAL hMemBitmap, hOldBitmap, hSepLight, hSepDark, nLeft, nTop, nBottom, hDC, hMemDC, oChild
+   LOCAL hOldPen, aRect[2]
    LOCAL y, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, oChild, hOldBitmap1, hMemDC1, hSepLight, hSepDark, nLeft, nTop, nBottom, hDC, hMemDC
 
-   IF RGB( ::__aVertex1[1]:Red, ::__aVertex1[1]:Green, ::__aVertex1[1]:Blue ) != ::ColorScheme:ToolStripGradientBegin
-      ::__SetVertex()
-   ENDIF
-
-   hDC := ::BeginPaint()
-
+   hDC        := GetDC( ::hWnd )
    hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::xWidth, ::xHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   
-   IF ::Row > 0
-      // Round
-      aRect[1] := ::Parent:Drawing:GetPixel( ::Left-1,             ::Top-1 )
-      aRect[2] := ::Parent:Drawing:GetPixel( ::Left + ::Width + 1, ::Top-1 )
-   ENDIF
    
    __GradientFill( hMemDC, ::__aVertex1, 2, ::__aMesh, 1, 1 )
    __GradientFill( hMemDC, ::__aVertex2, 2, ::__aMesh, 1, 1 )
@@ -855,13 +829,7 @@ METHOD OnPaint() CLASS ToolStrip
       IF ::xShowChevron
          ::__DrawChevron( hMemDC, ::__ChevronWidth, ::ColorScheme:OverflowButtonGradientBegin,,,::ColorScheme:OverflowButtonGradientEnd )
       ENDIF
-      IF ::Parent:ClsName == "ToolStripContainer"
-         SetPixel( hMemDC, 0,           0,            aRect[1] )
-         SetPixel( hMemDC, 0,           ::Height - 1, aRect[1] )
-         SetPixel( hMemDC, ::Width - 1, 0,            aRect[2] )
-         SetPixel( hMemDC, ::Width - 1, ::Height - 1, aRect[2] )
-      ENDIF
-      // Gripper
+
       IF ::ShowGrip
          y := 4
          FOR n := 1 TO nDots  
@@ -878,9 +846,9 @@ METHOD OnPaint() CLASS ToolStrip
          NEXT
       ENDIF
    ENDIF
-   
+
    // Border
-   hOldPen   := SelectObject( hMemDC, ::ColorScheme:Pen:ToolStripBorder )
+   hOldPen := SelectObject( hMemDC, ::ColorScheme:Pen:ToolStripBorder )
    MoveTo( hMemDC, 2,   ::Height-1   )
    LineTo( hMemDC, ::Width-IIF( ::xShowChevron, ::__ChevronWidth, 2 ), ::Height-1  )
    
@@ -903,7 +871,7 @@ METHOD OnPaint() CLASS ToolStrip
       nLeft := 0
       nBottom -= 21
    ENDIF
-   
+
    IF hMemBitmap != NIL
       FOR EACH oChild IN ::Children
           DEFAULT oChild:__nSeparator TO 0
@@ -919,26 +887,43 @@ METHOD OnPaint() CLASS ToolStrip
                 SelectObject( hMemDC, hOldPen )
              ENDIF
           ENDIF
-          
-          IF oChild:__hBrush != NIL
-             DeleteObject( oChild:__hBrush )
-             oChild:__hBrush := NIL
-          ENDIF
-
-          DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-
-          hMemDC1      := CreateCompatibleDC( hDC )
-          hOldBitmap1  := SelectObject( hMemDC1, oChild:__hMemBitmap )
-
-          BitBlt( hMemDC1, 0, 0, oChild:Width, oChild:Height, hMemDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-
-          oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-
-          SelectObject( hMemDC1,  hOldBitmap1 )
-          DeleteDC( hMemDC1 )
-          
           nLeft += oChild:Width + oChild:__nSeparator
       NEXT
+   ENDIF
+   
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
+   ENDIF
+   ::BkBrush := CreatePatternBrush( hMemBitmap )
+
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+   
+   ReleaseDC( ::hWnd, hDC )
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD OnPaint() CLASS ToolStrip
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, aRect[2]
+   LOCAL hDC := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::xWidth, ::xHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   IF ::Parent:ClsName == "ToolStripContainer"
+      aRect[1] := ::Parent:Drawing:GetPixel( ::Left-1,             ::Top-1 )
+      aRect[2] := ::Parent:Drawing:GetPixel( ::Left + ::Width + 1, ::Top-1 )
+   ENDIF
+
+   _FillRect( hMemDC, {0,0,::xWidth,::xHeight}, ::BkBrush )
+
+   IF ::Parent:ClsName == "ToolStripContainer"
+      SetPixel( hMemDC, 0,           0,            aRect[1] )
+      SetPixel( hMemDC, 0,           ::Height - 1, aRect[1] )
+      SetPixel( hMemDC, ::Width - 1, 0,            aRect[2] )
+      SetPixel( hMemDC, ::Width - 1, ::Height - 1, aRect[2] )
    ENDIF
 
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
@@ -1146,9 +1131,10 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS ToolStrip
    Super:OnSize( nwParam, nlParam )
+   ::__SetVertex()
+   ::__CreateBkBrush()
    ::__PrevSize := LOWORD(nlParam)
    IF ::Row > 0 .AND. ::__PrevRow == 0 
-      ::__SetVertex()
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
    ENDIF
 RETURN NIL
@@ -1888,9 +1874,11 @@ METHOD OnPaint() CLASS ToolStripButton
          lPaint := .T.
          ::Parent:OnPaint( , hMemDC )
       ENDIF
-      //SendMessage( ::Parent:hWnd, WM_PRINTCLIENT, hMemDC, PRF_CLIENT | PRF_ERASEBKGND )
-      IF ::__hBrush != NIL
-         _FillRect( hMemDC, {0,0,::Width,::Height}, ::__hBrush )
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+      IF ::ClsName == "MenuStripItem"
+         _FillRect( hMemDC, {0,0,::Width,::Height}, ::Parent:Parent:BkBrush )
+       ELSE
+         _FillRect( hMemDC, {0,0,::Width,::Height}, ::Parent:BkBrush )
       ENDIF
    ENDIF
    SetBkMode( hMemDC, TRANSPARENT )

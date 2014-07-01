@@ -92,6 +92,7 @@
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
+   PROPERTY Border                        SET ::SetStyle( WS_BORDER, v )                            DEFAULT .T.
    PROPERTY ItemHeight                                                                              DEFAULT 19
    PROPERTY FullRowSelect                                                                           DEFAULT .F.
    PROPERTY ShadowRow                                                                               DEFAULT .T.
@@ -322,7 +323,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ::ClsName                 := "DataGrid"
    ::__SysBackColor          := GetSysColor( COLOR_WINDOW )
    ::BackColor               := GetSysColor( COLOR_WINDOW )
-   ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER
    ::Super:Init( oParent )
    ::Width                   := 340
    ::Height                  := 240
@@ -402,8 +403,8 @@ METHOD OnGetDlgCode( msg ) CLASS DataGrid
    ENDIF
 RETURN DLGC_WANTMESSAGE
 
-METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHeader, nImgAlign ) CLASS DataGrid
-   LOCAL z, nDif, aAlign, iLen, x, cx
+METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHeader, nImgAlign, lSelected ) CLASS DataGrid
+   LOCAL z, nDif, aAlign, iLen, x, cx, pt := (struct POINT)
    
    FOR z := 1 TO LEN( aData )
        aAlign := _GetTextExtentExPoint( hDC, ALLTRIM(aData[z]), aText[3]-aText[1]-nWimg, @iLen )
@@ -424,8 +425,12 @@ METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHea
           ENDIF
 
           cx := aText[3]-( aText[1]-zLeft )
-
-          _ExtTextOut( hDC, x, y, ETO_CLIPPED+IIF( z==1 .AND. ! lHeader, ETO_OPAQUE, 0 ), {aText[1],aText[2],cx,aText[4]},aData[z])
+          IF ::Transparent .AND. ! lHeader .AND. ! lSelected
+             SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left-1, ::Parent:ClientHeight-::Top-::TitleHeight-1, @pt )
+             _FillRect( hDC, {aText[1],aText[2],cx,aText[4]}, ::Parent:BkBrush )
+             SetBrushOrgEx( hDC, pt:x, pt:y )
+          ENDIF
+          _ExtTextOut( hDC, x, y, ETO_CLIPPED+IIF( z==1 .AND. ! lHeader .AND. ( lSelected .OR. ! ::Transparent ), ETO_OPAQUE, 0 ), {aText[1],aText[2],cx,aText[4]},aData[z])
           y += aAlign[2]
        ENDIF
    NEXT
@@ -2222,7 +2227,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
                     nOffset := IIF( nImgX-aText[1] > 0, 0, aText[1]-nImgX )
                  ENDIF
 
-                 ::__DrawMultiText( hMemDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, .F., nImgAlign )
+                 ::__DrawMultiText( hMemDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, .F., nImgAlign, lHighLight .OR. lShadow .OR. lHover )
 
                  IF nOffset != NIL
                     ::ImageList:DrawIndirect( hMemDC, nInd, nImgX+nOffset, nY, nOffset,, ! ::xEnabled )
@@ -2649,7 +2654,7 @@ METHOD __ScrollUp( nScroll ) CLASS DataGrid
          ::RowPos := nPos
       ENDIF
 
-      IF ::IsCovered( ::__GetHeaderHeight() )
+      IF ::Transparent .OR. ::IsCovered( ::__GetHeaderHeight() )
          ::__DisplayData()
        ELSE
          // Scroll up
@@ -2701,7 +2706,7 @@ METHOD __ScrollDown( nScroll ) CLASS DataGrid
       // Reposition and display new __Records
       ::__GoToRec( nRec )
 
-      IF ::IsCovered( ::__GetHeaderHeight() )
+      IF ::Transparent .OR. ::IsCovered( ::__GetHeaderHeight() )
          ::__DisplayData()
        ELSE
          // Scroll up
@@ -2869,26 +2874,30 @@ METHOD OnHorzScroll( nCode, nPos, nlParam, lDraw ) CLASS DataGrid
               lDraw := .T.
            ENDIF
 
-           ::ScrollWindow( ::__nScrolled-nPos, 0, aScroll, aClip )
-           ::ValidateRect()
-
-           IF lDraw == NIL .OR. lDraw
-              DEFAULT lDraw TO ::IsCovered( ::__GetHeaderHeight() )
-              IF lDraw
-                 ::__DisplayData()
-               ELSE
-                 IF nPos > ::__nScrolled
-                    aClip := { ::ClientWidth-(nPos-::__nScrolled)-1, 0, ::ClientWidth, ::ClientHeight }
-                  ELSE
-                    aClip := { 0, 0, (::__nScrolled-nPos)+1, ::ClientHeight }
-                 ENDIF
-                 ::InvalidateRect( aClip, FALSE )
-              ENDIF
-              ::UpdateWindow()
-              ::__DisplayData( ::RowPos, , ::RowPos,  )
+           IF ::Transparent
+              ::__DisplayData()
+            ELSE
+              ::ScrollWindow( ::__nScrolled-nPos, 0, aScroll, aClip )
               ::ValidateRect()
-           ENDIF
 
+
+              IF lDraw == NIL .OR. lDraw
+                 DEFAULT lDraw TO ::IsCovered( ::__GetHeaderHeight() )
+                 IF lDraw
+                    ::__DisplayData()
+                  ELSE
+                    IF nPos > ::__nScrolled
+                       aClip := { ::ClientWidth-(nPos-::__nScrolled)-1, 0, ::ClientWidth, ::ClientHeight }
+                     ELSE
+                       aClip := { 0, 0, (::__nScrolled-nPos)+1, ::ClientHeight }
+                    ENDIF
+                    ::InvalidateRect( aClip, FALSE )
+                 ENDIF
+                 ::UpdateWindow()
+                 ::__DisplayData( ::RowPos, , ::RowPos,  )
+                 ::ValidateRect()
+              ENDIF
+           ENDIF
            ::__nScrolled := nPos
    END
 RETURN 0
@@ -3151,7 +3160,7 @@ METHOD ArrowLeft( lMove ) CLASS DataGrid
       ENDIF
       IF nScroll < 0
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) - ABS(nScroll),, FALSE )
-         IF ::IsCovered( ::__GetHeaderHeight() )
+         IF ::Transparent .OR. ::IsCovered( ::__GetHeaderHeight() )
             ::__DisplayData()
           ELSE
             ::__DisplayData(, ::ColPos,, nCur )
@@ -3220,7 +3229,7 @@ METHOD ArrowRight( lMove ) CLASS DataGrid
             nScroll -= ( ::Children[ ::ColPos ]:Width - ::ClientWidth )
          ENDIF
          ::OnHorzScroll( SB_THUMBTRACK, ABS(::__HorzScrolled) + nScroll,, FALSE )
-         IF ::IsCovered( ::__GetHeaderHeight() ) .OR. ::ColPos == nCur 
+         IF ::Transparent .OR. ::IsCovered( ::__GetHeaderHeight() ) .OR. ::ColPos == nCur 
             ::__DisplayData()
           ELSE
             ::__DisplayData(, nCur,, ::ColPos )
@@ -3328,11 +3337,15 @@ METHOD Down() CLASS DataGrid
       ENDIF
 
       // Scroll up
-      aScroll := { 0, ::__GetHeaderHeight(), ::ClientWidth, (::RowCountUsable-1)*::ItemHeight + ::__GetHeaderHeight() }
-      aClip   := { 0, ::__GetHeaderHeight(), ::ClientWidth, (::RowCountUsable-1)*::ItemHeight + ::__GetHeaderHeight() }
-      ::ScrollWindow( 0, -::ItemHeight, aScroll, aClip )
-      ::ValidateRect()
-      ::__DisplayData( MIN( ::RowCountUsable-1, ::RowCountVisible ),, ::RowCountVisible )
+      IF ::Transparent
+         ::__DisplayData()
+       ELSE
+         aScroll := { 0, ::__GetHeaderHeight(), ::ClientWidth, (::RowCountUsable-1)*::ItemHeight + ::__GetHeaderHeight() }
+         aClip   := { 0, ::__GetHeaderHeight(), ::ClientWidth, (::RowCountUsable-1)*::ItemHeight + ::__GetHeaderHeight() }
+         ::ScrollWindow( 0, -::ItemHeight, aScroll, aClip )
+         ::ValidateRect()
+         ::__DisplayData( MIN( ::RowCountUsable-1, ::RowCountVisible ),, ::RowCountVisible )
+      ENDIF
     ELSE
       ::__DisplayData( ::RowPos-1,, ::RowPos )
    ENDIF
@@ -3422,11 +3435,15 @@ METHOD Up() CLASS DataGrid
          RETURN Self
       ENDIF
 
-      // Scroll Down
-      aScroll := { 0, ::__GetHeaderHeight()+::ItemHeight, ::ClientWidth, ( ::RowCountVisible * ::ItemHeight ) + ::__GetHeaderHeight() }
-      aClip   := { 0, ::__GetHeaderHeight()+::ItemHeight, ::ClientWidth, ( ::RowCountVisible * ::ItemHeight ) + ::__GetHeaderHeight() }
-      ::ScrollWindow(  0, ::ItemHeight, aScroll, aClip )
-      ::ValidateRect()
+      IF ::Transparent
+         ::__DisplayData()
+       ELSE
+         // Scroll Down
+         aScroll := { 0, ::__GetHeaderHeight()+::ItemHeight, ::ClientWidth, ( ::RowCountVisible * ::ItemHeight ) + ::__GetHeaderHeight() }
+         aClip   := { 0, ::__GetHeaderHeight()+::ItemHeight, ::ClientWidth, ( ::RowCountVisible * ::ItemHeight ) + ::__GetHeaderHeight() }
+         ::ScrollWindow(  0, ::ItemHeight, aScroll, aClip )
+         ::ValidateRect()
+      ENDIF
    ENDIF
    ::__DisplayData( ::RowPos,, ::RowPos+1 )
    IF ::bRowChanged != NIL
@@ -4440,7 +4457,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    nPrevColor := SetTextColor( hDC, nTxColor )
    DEFAULT zLeft TO nLeft
    ::Parent:__DrawMultiText( hDC, {aRect[1],aRect[2],xRight,aRect[4]},aText, nRight, zLeft,nWImg,;
-                                  IIF( ::xHeaderAlignment == 0, ::xAlignment, ::xHeaderAlignment ), y, .T., nImgAlign )
+                                  IIF( ::xHeaderAlignment == 0, ::xAlignment, ::xHeaderAlignment ), y, .T., nImgAlign, .f. )
 
    SetTextColor( hDC, nPrevColor )
 

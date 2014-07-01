@@ -115,6 +115,9 @@ METHOD __Validate() CLASS MaskEdit
          ENDIF
          IF HGetPos( ::EventHandler, "Valid" ) > 0
             ::IsValid := ExecuteEvent( "Valid", Self )
+            IF ValType(::IsValid) != "L"
+               ::IsValid := .T.
+            ENDIF
          ENDIF
          ::Validating := FALSE
 

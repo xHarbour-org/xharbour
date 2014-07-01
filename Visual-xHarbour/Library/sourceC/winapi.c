@@ -6980,7 +6980,7 @@ HB_FUNC( SETBRUSHORGEX )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 6001, NULL, "SETBRUSHORGEX", 1, hb_paramError(1) );
+      hb_retl( SetBrushOrgEx( (HDC) hb_parnl(1), hb_parni(2), hb_parni(3), NULL ) );
    }
 }
 

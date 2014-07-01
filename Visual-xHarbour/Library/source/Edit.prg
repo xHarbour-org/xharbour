@@ -157,8 +157,8 @@ CLASS EditBox INHERIT Control
    METHOD SetSel(nStart,nEnd)          INLINE ::SendMessage( EM_SETSEL, nStart-IIF(nStart>0,1,0), nEnd-IIF(nEnd>0,1,0) )
    METHOD SetWordBreakProc(nProc)      INLINE ::SendMessage( EM_SETWORDBREAKPROC, 0, nProc )
    METHOD Undo()                       INLINE ::SendMessage( EM_UNDO, 0, 0 )
-   METHOD OnEraseBkGnd()               INLINE IIF( ::Transparent, 1, NIL )
-   METHOD SetParent( oParent )         INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD OnEraseBkGnd()
+   METHOD SetParent( oParent )         INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD SetRect(aRect, lRelative)
    METHOD SetRectNP(aRect, lRelative)
    METHOD SetTabStops( nTabs, aTabs )
@@ -203,7 +203,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::Super:Init( oParent )
    ::Width        := 80
    ::Height       := 22
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | IIF( !::Application:IsThemedXP, WS_BORDER, 0 )
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
    ::ExStyle      := WS_EX_CLIENTEDGE
 
    IF ::__ClassInst != NIL
@@ -291,9 +291,12 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS EditBox
    LOCAL pWi, n
-   IF ::Transparent
-      ::Parent:__RegisterTransparentControl( Self )
-   ENDIF
+   //IF ::Transparent
+   //   ::Parent:__RegisterTransparentControl( Self )
+   //   IF ( ::ExStyle & WS_EX_CLIENTEDGE ) == 0
+   //      ::__BackMargin -= 2
+   //   ENDIF
+   //ENDIF
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
@@ -317,6 +320,13 @@ METHOD Create() CLASS EditBox
    ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
    ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkGnd() CLASS EditBox
+   IF ::Transparent
+      RETURN 1
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetCueBanner( cText, lFocus ) CLASS EditBox
@@ -887,7 +897,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnCtlColorEdit( nwParam ) CLASS EditBox
-   LOCAL hBrush, nFore, nBack, pt := (struct POINT)
+   LOCAL hBrush, nFore, nBack, pt := (struct POINT), n
 
    nFore := ::ForeColor
    nBack := ::BackColor
@@ -906,17 +916,21 @@ METHOD OnCtlColorEdit( nwParam ) CLASS EditBox
       SetBkColor( nwParam, nBack )
    ENDIF
 
+   hBrush := ::BkBrush
+
    IF ::Transparent
-      IF ::__hBrush != NIL
-         SelectObject( nwParam, ::__hBrush )
-         IF ::ReadOnly
-            SetBkMode( nwParam, TRANSPARENT )
-         ENDIF
-         RETURN ::__hBrush
-      ENDIF
+      hBrush := ::Parent:BkBrush
+      SelectObject( nwParam, hBrush )
+      SetBkMode( nwParam, TRANSPARENT )
+      n := (::Width - ::ClientWidth)/2
+      SetBrushOrgEx( nwParam, ::Parent:ClientWidth-::Left-n, ::Parent:ClientHeight-::Top-n, @pt )
+      RETURN hBrush
    ENDIF
 
-   hBrush := ::BkBrush
+
+   IF ::xSelBackColor != NIL
+      DEFAULT ::SelBkBrush TO CreateSolidBrush( ::xSelBackColor )
+   ENDIF
 
    IF ::HasFocus .AND. ::SelBkBrush != NIL
       hBrush := ::SelBkBrush

@@ -136,11 +136,13 @@ METHOD Create() CLASS Button
 RETURN Self
 
 METHOD SetBackColor( nColor, lRepaint ) CLASS Button
+   ::xBackColor := nColor
    ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    Super:SetBackColor( nColor, lRepaint )
 RETURN SELF
 
 METHOD SetForeColor( nColor, lRepaint ) CLASS Button
+   ::xForeColor := nColor
    ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    Super:SetForeColor( nColor, lRepaint )
 RETURN SELF

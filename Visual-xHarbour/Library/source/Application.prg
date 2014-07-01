@@ -87,10 +87,6 @@ RETURN
 
 EXIT PROCEDURE __CleanUp
    SetUnhandledExceptionFilter( NIL )
-   IF Application != NIL .AND. Application:hTitleBackBrushInactive != NIL
-      DeleteObject( Application:hTitleBackBrushInactive )
-      DeleteObject( Application:hTitleBackBrushActive )
-   ENDIF
    OleUninitialize()
    Application := NIL
 RETURN
@@ -232,9 +228,6 @@ CLASS Application
    PROPERTY Cursor                 ROOT "Appearance"
    PROPERTY EditBoxFocusBorder     ROOT "Appearance" DEFAULT .F.
 
-   PROPERTY TitleBackColorActive   ROOT "Colors"     DEFAULT RGB( 255, 230, 151 )
-   PROPERTY TitleBackColorInactive ROOT "Colors"     DEFAULT RGB(  69,  89, 124 )
-
    PROPERTY Version                ROOT "Data"       DEFAULT "1.0.0.0"
    PROPERTY Company                ROOT "Data"       DEFAULT ""
    PROPERTY Copyright              ROOT "Data"       DEFAULT ""
@@ -308,14 +301,10 @@ CLASS Application
    ACCESS System                       INLINE __GetSystem() 
    ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
 
-   DATA __SysTitleBackColorActive      EXPORTED INIT RGB( 255, 230, 151 )
-   DATA __SysTitleBackColorInactive    EXPORTED INIT RGB(  69,  89, 124 )
    DATA __ColorTable                   EXPORTED
 
    ACCESS ColorTable INLINE IIF( ::ColorScheme == 1, ::System:CurrentScheme, ::__SetColorScheme() )
 
-   DATA hTitleBackBrushActive          EXPORTED
-   DATA hTitleBackBrushInactive        EXPORTED
    DATA CustomColors                   EXPORTED INIT Array(16)
    DATA AccelEnabled                   EXPORTED INIT .T.
    DATA Caption                        EXPORTED INIT ""

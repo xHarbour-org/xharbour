@@ -33,6 +33,7 @@ CLASS Panel FROM TitleControl
 
    METHOD OnEraseBkGnd()
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD __CreateBkBrush()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -84,12 +85,30 @@ METHOD Create() CLASS Panel
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( hDC ) CLASS Panel
-   IF ::Transparent
-      IF ::__hBrush != NIL
-         _FillRect( hDC, _GetClientRect( ::hWnd ), ::__hBrush )
-         RETURN 1
+METHOD __CreateBkBrush( hDC ) CLASS Panel
+   LOCAL hMemBitmap, hOldBitmap, hMemDC
+   IF ::xBackColor == NIL
+      hMemDC     := CreateCompatibleDC( hDC )
+      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight+1, 0 ) )
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( ::Parent:BkBrush != NIL, ::Parent:BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
+
+      IF ::BkBrush != NIL
+         DeleteObject( ::BkBrush )
       ENDIF
+      ::BkBrush   := CreatePatternBrush( hMemBitmap )
+
+      SelectObject( hMemDC,  hOldBitmap )
+      DeleteObject( hMemBitmap )
+      DeleteDC( hMemDC )
    ENDIF
 RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkGnd( hDC ) CLASS Panel
+   ::__CreateBkBrush( hDC )
+   _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+RETURN 1
 

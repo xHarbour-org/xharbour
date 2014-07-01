@@ -979,9 +979,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                 ScreenToClient( ::NewParent:hWnd, @pt )
 
                 ::Selected[n][1]:SetParent( ::NewParent )
-                IF ::Selected[n][1]:__lRegTrans
-                   ::NewParent:__RegisterTransparentControl( ::Selected[n][1] )
-                ENDIF
+
                 SetParent( ::Selected[n][1]:hWnd, ::NewParent:hWnd )
 
                 ::Selected[n][1]:TreeItem:SetOwner( ::NewParent:TreeItem )
@@ -1019,9 +1017,6 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                 ScreenToClient( ::OldParent:hWnd, @pt )
                 
                 SetParent( ::Selected[n][1]:hWnd, ::OldParent:hWnd )
-                IF ::Selected[n][1]:__lRegTrans
-                   ::OldParent:__RegisterTransparentControl( ::Selected[n][1] )
-                ENDIF
 
                 //::Selected[n][1]:MoveWindow( pt:x, pt:y,,,.T.)
                 DeferWindowPos( hDef, ::Selected[n][1]:hWnd, , pt:x, pt:y, ::Selected[n][1]:Width, ::Selected[n][1]:Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER )
@@ -1357,8 +1352,6 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
                                  ClientToScreen( aSelected[n][1]:Parent:hWnd, @pt )
                                  ScreenToClient( ::hWnd, @pt )
-
-                                 aSelected[n][1]:__lRegTrans := aSelected[n][1]:Parent:__UnregisterTransparentControl( aSelected[n][1] )
 
                                  SetParent( aSelected[n][1]:hWnd, ::hWnd )
 

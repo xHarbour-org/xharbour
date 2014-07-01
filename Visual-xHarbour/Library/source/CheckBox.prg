@@ -47,7 +47,7 @@ CLASS CheckBox INHERIT Control
    DATA ImageList   EXPORTED
    DATA ImageIndex  PROTECTED
 
-   PROPERTY Transparent ROOT "Appearance" SET ::__SetTransp(v)        DEFAULT .F.
+   //PROPERTY Transparent ROOT "Appearance" SET ::__SetTransp(v)        DEFAULT .F.
    PROPERTY Group       ROOT "Behavior"   SET ::SetStyle(WS_GROUP,v)  DEFAULT .F.
    PROPERTY CheckStyle  ROOT "Behavior"   SET ::SetCheckStyle(v)      DEFAULT 1
    PROPERTY State       ROOT "Behavior"   SET ::SetState(v)           DEFAULT BST_UNCHECKED
@@ -62,7 +62,7 @@ CLASS CheckBox INHERIT Control
 
 
    METHOD Init()           CONSTRUCTOR
-   METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD Create()
 
    METHOD DrawFrame()
@@ -78,7 +78,7 @@ CLASS CheckBox INHERIT Control
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
 
    METHOD __SetSize()
-   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CheckBox
@@ -105,9 +105,6 @@ RETURN Self
 
 METHOD Create() CLASS CheckBox
    LOCAL aSize
-   IF ::Parent:ClsName IN {"TabPage","GroupBox"} .AND. ! ::xTransparent .AND. ::BackColor == ::__SysBackColor
-      ::__SetTransp(.T.)
-   ENDIF
    ::Super:Create()
    IF ::AutoSize
       aSize := ::Drawing:GetTextExtentPoint32( ::Text )
@@ -144,7 +141,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
 
                    SetBkMode( cd:hdc, TRANSPARENT )
                    
-                   hBkGnd := ::GetBkBrush()
+                   hBkGnd := ::BkBrush
+                   IF hBkGnd == NIL
+                      hBkGnd := ::Parent:BkBrush
+                      SetBrushOrgEx( cd:hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+                   ENDIF
+                   DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
+
                    FillRect( cd:hDC, cd:rc, hBkGnd )
 
                    aRect := {0,0,15,15}

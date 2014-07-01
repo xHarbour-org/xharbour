@@ -524,6 +524,7 @@ METHOD Set( oObj, nImg ) CLASS ObjectTreeView
          oObj:TreeItem:ImageIndex := nImg
       ENDIF
    ENDIF
+   oObj := NIL
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

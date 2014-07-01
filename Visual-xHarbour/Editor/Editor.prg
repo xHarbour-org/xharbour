@@ -1385,13 +1385,14 @@ CLASS Settings INHERIT Dialog
    METHOD SetFonts()
 ENDCLASS
 
-METHOD Init( oParent, aParameters ) CLASS Settings
-   ::Super:Init( oParent, aParameters )
+METHOD Init() CLASS Settings
+   ::Super:Init()
    ::EventHandler[ "OnLoad" ] := "Settings_OnLoad"
    WITH OBJECT ( ColorDialog( Self ) )
       :Name := "ColorDialog1"
       :Create()
    END
+   ::ThickFrame    := .F.
    ::Name          := "Settings"
    ::Modal         := .T.
    ::Left          := 10
@@ -1400,7 +1401,6 @@ METHOD Init( oParent, aParameters ) CLASS Settings
    ::Height        := 632
    ::Center        := .T.
    ::Text          := "Settings"
-   ::DlgModalFrame := .T.
    ::Create()
 RETURN Self
 

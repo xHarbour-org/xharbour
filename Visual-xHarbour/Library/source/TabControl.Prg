@@ -41,7 +41,6 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabControl INHERIT Control
-   PROPERTY Transparent         SET ::__SetTransp(v)                                    DEFAULT .F.
    PROPERTY MultiLine           SET ::SetPos( TCS_MULTILINE, v )                        DEFAULT .F.
    PROPERTY ImageList           SET ::SetImageList(v)
    PROPERTY FocusNever          SET ::SetStyle( TCS_FOCUSNEVER, v )                     DEFAULT .F.
@@ -178,7 +177,6 @@ CLASS TabControl INHERIT Control
    METHOD __OnParentSize()
    METHOD __SetTabPosition()
    METHOD SelectPage()
-   METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -515,7 +513,11 @@ METHOD OnPaint() CLASS TabControl
       aRect[2] += 2
       aRect[4] -= ( aRect[4]-aItem[2]-2 )
    ENDIF
-   hBrush := ::GetbkBrush()
+   hBrush := ::BkBrush
+   IF hBrush == NIL
+      hBrush := ::Parent:BkBrush
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+   ENDIF
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    
    IF ::Theming .AND. IsThemeActive()
@@ -610,8 +612,6 @@ METHOD OnPaint() CLASS TabControl
 
    ENDIF
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
-
-   ::__SetTransparentChildren( hDC, hMemDC )
 
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
@@ -883,7 +883,7 @@ CLASS TabPage INHERIT Dialog
    METHOD __GetPosition()
    METHOD __OnParentSize()
    METHOD __SetVisible()
-   METHOD __PaintBakgndImage()
+   METHOD __CreateBkBrush()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
    METHOD OnMouseLeave(n,l) INLINE ::Super:OnMouseLeave(n,l), ::InvalidateRect(, .F. ), NIL
 ENDCLASS
@@ -1028,7 +1028,6 @@ METHOD Create() CLASS TabPage
       ENDIF
    ENDIF
 
-
    IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 
       ::xPosition := SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT )
@@ -1093,37 +1092,45 @@ METHOD Create() CLASS TabPage
    ENDIF
 RETURN Self
 
-METHOD __PaintBakgndImage( hDC, hBrush ) CLASS TabPage
-   LOCAL hMemBitmap, hOldBitmap, hMemDC
+//-----------------------------------------------------------------------------------------------
+METHOD __CreateBkBrush( hDC ) CLASS TabPage
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush
 
-   DEFAULT hDC TO ::Drawing:hDC
-   DEFAULT hBrush TO ::BkBrush
+   IF ::xBackColor == NIL .OR. ( ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL )
+      DEFAULT hDC TO ::Drawing:hDC
 
-   IF ! ::Theming
-      DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+      hMemDC     := CreateCompatibleDC( hDC )
+      hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+      IF ::xBackColor != NIL
+         hBrush := CreateSolidBrush( ::xBackColor )
+       ELSEIF ! ::Theming
+         DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+      ENDIF
+
+      IF hBrush == NIL .AND. ::Application:OsVersion:dwMajorVersion >= 5
+         DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::xWidth, ::xHeight } )
+       ELSEIF hBrush != NIL .AND. hBrush <> 0
+         _FillRect( hMemDC, { 0, 0, ::xWidth, ::xHeight }, hBrush )
+      ENDIF
+
+      IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
+         ::BackgroundImage:Draw( hMemDC, hMemBitmap )
+      ENDIF
+
+      IF ::BkBrush != NIL
+         DeleteObject( ::BkBrush )
+      endif
+      ::BkBrush   := CreatePatternBrush( hMemBitmap )
+
+      SelectObject( hMemDC,  hOldBitmap )
+      DeleteObject( hMemBitmap )
+      DeleteDC( hMemDC )
+      IF ::xBackColor != NIL
+         DeleteObject( hBrush )
+      ENDIF
    ENDIF
-
-   hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
-   IF hBrush == NIL .AND. ::Application:OsVersion:dwMajorVersion >= 5
-      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::Width, ::Height } )
-    ELSEIF hBrush != NIL .AND. hBrush <> 0
-      _FillRect( hMemDC, { 0, 0, ::Width, ::Height }, hBrush )
-   ENDIF
-
-   IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
-      ::BackgroundImage:Draw( hMemDC )
-   ENDIF
-
-   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-
-   ::__SetTransparentChildren( hDC, hMemDC )
-
-   SelectObject( hMemDC,  hOldBitmap )
-   DeleteObject( hMemBitmap )
-   DeleteDC( hMemDC )
 RETURN 1
 
 //-----------------------------------------------------------------------------------------------
@@ -1290,11 +1297,8 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
       ENDIF
    ENDIF
 
-   IF hDef == NIL
-      ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
-    ELSE
-      ::DeferWindowPos( hDef, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE + SWP_NOOWNERZORDER + SWP_NOZORDER + IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
-   ENDIF
+   ::MoveWindow( ::Left, ::Top, ::Width, ::Height )
+   ::__CreateBkBrush()
 
 RETURN hDef
 

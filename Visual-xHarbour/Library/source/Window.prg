@@ -132,6 +132,7 @@ static aMessages := {;
                     { WM_MOUSEACTIVATE,   "OnMouseActivate"   },;
                     { WM_NCLBUTTONUP,     "OnNCLButtonUp"     },;
                     { WM_NCLBUTTONDOWN,   "OnNCLButtonDown"   },;
+                    { WM_ERASEBKGND,      "OnEraseBkgnd"      },;
                     { WM_NCLBUTTONDBLCLK, "OnNCLButtonDblClk" };
                     }
 
@@ -218,8 +219,6 @@ CLASS Window INHERIT Object
    DATA StatusBar              EXPORTED
 
    DATA WindowPos              EXPORTED
-   //DATA DrawItemStruct         EXPORTED
-   //DATA MeasureItemStruct      EXPORTED
    DATA hdr                    EXPORTED
    DATA ScrollInfo             EXPORTED
 
@@ -264,16 +263,12 @@ CLASS Window INHERIT Object
    DATA __Docked                 PROTECTED INIT .T.
    DATA __aCltRect               PROTECTED
    DATA __cPaint                 PROTECTED
-   DATA __lReqBrush              PROTECTED INIT .F.
    DATA __lShown                 PROTECTED INIT .F.
-   DATA __hMemBitmap             PROTECTED
-   DATA __hBrush                 PROTECTED
 
    DATA __nCaptionHeight         EXPORTED  INIT 0
    DATA __lRegTrans              EXPORTED  INIT .F.
    DATA __aValues                EXPORTED  INIT {}
    DATA __hCursor                EXPORTED
-   DATA __aTransparent           EXPORTED  INIT {}
    DATA __MenuBar                EXPORTED  INIT .F.
    DATA __Splitting              EXPORTED  INIT .F.
    DATA __lPopTip                EXPORTED  INIT .F.
@@ -283,7 +278,6 @@ CLASS Window INHERIT Object
    DATA __lAllowCopy             EXPORTED  INIT .T.
    DATA __lInitialized           EXPORTED  INIT .F.
    DATA __nProc                  EXPORTED
-   DATA __lOnPaint               EXPORTED  INIT .F.
    DATA __hAccelTable            EXPORTED
    DATA __lMouseHover            EXPORTED  INIT .F.
    DATA __IsInstance             EXPORTED  INIT .F.
@@ -385,8 +379,6 @@ CLASS Window INHERIT Object
    METHOD Init( oParent ) CONSTRUCTOR
    METHOD Create()
 
-   METHOD __RegisterTransparentControl()
-   METHOD __UnregisterTransparentControl()
    METHOD __Register()
    METHOD __ControlProc()
    METHOD __CreateMDI()
@@ -405,7 +397,6 @@ CLASS Window INHERIT Object
    METHOD __GetBrush()         VIRTUAL
    METHOD __PaintBakgndImage() VIRTUAL
    METHOD __GC()               VIRTUAL
-   METHOD __SetTransparentChildren()
    METHOD __SetTheming()
 
    METHOD EnableThemeDialogTexture( nFlags ) INLINE EnableThemeDialogTexture( ::hWnd, nFlags )
@@ -478,7 +469,6 @@ CLASS Window INHERIT Object
    METHOD DockIt()
    METHOD UpdateLayout()          INLINE ::PostMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
 
-   //METHOD DefControlProc()
    METHOD PaintFocusRect()
    METHOD DockToParent()          INLINE ::Dock:Left   := ::Parent,;
                                          ::Dock:Top    := ::Parent,;
@@ -503,7 +493,6 @@ CLASS Window INHERIT Object
    METHOD OnHotKey()            VIRTUAL
    METHOD OnParentDrawItem()    VIRTUAL
    METHOD OnParentMeasureItem() VIRTUAL
-   METHOD OnEraseBkGnd()        VIRTUAL
    METHOD OnGetDlgCode()        VIRTUAL
    METHOD OnKeyDown()           VIRTUAL
    METHOD OnKeyUp()             VIRTUAL
@@ -601,7 +590,9 @@ CLASS Window INHERIT Object
    METHOD OnExitSizeMove()      VIRTUAL
    METHOD OnGetText()           VIRTUAL
    METHOD InitDialogBox()       VIRTUAL
-   METHOD OnDestroy()   		VIRTUAL
+   METHOD OnDestroy()   		  VIRTUAL
+   METHOD OnPaint()             VIRTUAL
+
    METHOD OnMouseWheel()
 
    METHOD OnHScroll()
@@ -636,12 +627,13 @@ CLASS Window INHERIT Object
    METHOD OnNCMouseLeave()
    METHOD OnSize()
    METHOD OnSetCursor()
-   METHOD OnPaint()
    METHOD OnCommand()
    METHOD BeginPaint()
    METHOD EndPaint()
    METHOD GetControl()
    METHOD OnNCDestroy()
+   METHOD OnEraseBkGnd()
+   METHOD __CreateBkBrush() VIRTUAL
 ENDCLASS
 
 PROCEDURE __FreeCallBack() CLASS Window
@@ -829,31 +821,6 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut ) CLASS Window
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __UnregisterTransparentControl( oCtrl ) CLASS Window
-   LOCAL n
-   IF ( n := ASCAN( ::__aTransparent, {|o| o:hWnd == oCtrl:hWnd} ) ) > 0
-      ADEL( ::__aTransparent, n, .T. )
-   ENDIF
-   IF oCtrl:__hMemBitmap != NIL
-      DeleteObject( oCtrl:__hMemBitmap )
-   ENDIF
-   IF oCtrl:__hBrush != NIL
-      DeleteObject( oCtrl:__hBrush )
-   ENDIF
-   oCtrl:__hMemBitmap := NIL
-   oCtrl:__hBrush := NIL
-RETURN .T.
-
-//-----------------------------------------------------------------------------------------------
-METHOD __RegisterTransparentControl( oCtrl ) CLASS Window
-   IF ASCAN( ::__aTransparent, {|o| o:hWnd == oCtrl:hWnd} ) == 0
-      AADD( ::__aTransparent, oCtrl )
-      RETURN .T.
-   ENDIF
-RETURN .F.
-
-//-----------------------------------------------------------------------------------------------
-
 METHOD GetCCTL() CLASS Window
    LOCAL oParent := ::Parent
    WHILE oParent:ClsName != "CCTL"
@@ -899,11 +866,11 @@ RETURN(.T.)
 
 //-----------------------------------------------------------------------------------------------
 METHOD Refresh( lPaint ) CLASS Window
-   LOCAL Child
+   LOCAL oChild
    ::InvalidateRect(,lPaint)
-   FOR EACH Child IN ::Children
-       IF VALTYPE( Child ) == "O"
-          Child:Refresh( lPaint )
+   FOR EACH oChild IN ::Children
+       IF oChild != NIL //.AND. oChild:BackColor == NIL
+          oChild:Refresh( lPaint )
        ENDIF
    NEXT
 RETURN Self
@@ -1004,7 +971,6 @@ METHOD Create( oParent ) CLASS Window
 
    ::RegisterDocking()
 
-   ::__lOnPaint   := HGetPos( ::EventHandler, "OnPaint" ) > 0
    IF VALTYPE( oParent ) == "N"
       hParent := oParent
 
@@ -1195,7 +1161,7 @@ METHOD Create( oParent ) CLASS Window
    NEXT
 
    TRY
-      IF ::Parent != NIL .AND. !::ClsName == "MDIChild"
+      IF ::Parent != NIL .AND. ! ::ClsName == "MDIChild"
          ::__OnParentSize( ::Parent:Width, ::Parent:Height /*::Parent:OriginalRect[3], ::Parent:OriginalRect[4]*/, NIL, .T. )
       ENDIF
    CATCH
@@ -1331,16 +1297,9 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS Window
    ENDIF
    IF ::IsWindowVisible()
       IF lRepaint
-         ::Refresh()
+         ::Redraw()
        ELSE
          ::InValidateRect()
-      ENDIF
-   ENDIF
-   IF ::Parent != NIL
-      IF ::BkBrush != NIL
-         ::Parent:__UnregisterTransparentControl( Self )
-       ELSEIF ::HasMessage( "Transparent" ) .AND. ::Transparent
-         ::Parent:__RegisterTransparentControl( Self )
       ENDIF
    ENDIF
 RETURN SELF
@@ -1349,7 +1308,7 @@ METHOD SetForeColor( nColor, lRepaint ) CLASS Window
    DEFAULT lRepaint TO .T.
    ::xForeColor := nColor
    IF lRepaint .AND. ::IsWindowVisible()
-      ::Refresh()
+      ::Redraw()//::Refresh()
    ENDIF
    IF ::IsWindowVisible()
       ::InValidateRect()
@@ -1398,11 +1357,6 @@ METHOD SetParent( oParent ) CLASS Window
    IF n > 0
       ADEL( ::Parent:__aDock, n, .T. )
       AADD( oParent:__aDock, Self )
-   ENDIF
-   n := ASCAN( ::Parent:__aTransparent, {|o| o == Self} )
-   IF n > 0
-      ::Parent:__UnregisterTransparentControl( Self )
-      oParent:__RegisterTransparentControl( Self )
    ENDIF
    ::Dock:Left   := NIL
    ::Dock:Top    := NIL
@@ -1619,8 +1573,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
-   LOCAL x, y, aChildren, hDef, oChild, cProp, n, hDC
-   ::__lReqBrush := .T.
+   LOCAL x, y, aChildren, hDef, oChild, cProp, n
 
    IF EMPTY( ::__ClientRect )
       RETURN 0
@@ -1630,13 +1583,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
 
    x := MAX( ::xWidth,  ::OriginalRect[3] )
    y := MAX( ::xHeight, ::OriginalRect[4] )
-
-   IF ::__hMemBitmap != NIL .AND. ::HasMessage( "Transparent" ) .AND. ::Transparent
-      DeleteObject( ::__hMemBitmap )
-      hDC := GetDC( ::hWnd )
-      ::__hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-      ReleaseDC( ::hWnd, hDC )
-   ENDIF
 
    IF ::ClsName != "DataGrid"
       aChildren := IIF( ::__DockChildren != NIL, ::__DockChildren, ::__aDock )
@@ -1936,16 +1882,6 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN NIL
 
-METHOD OnPaint( nwParam ) CLASS Window
-   IF nwParam != 0
-      ::lParam := -1
-      IF ! ::__lOnPaint .AND. ::__WindowStyle != WT_DIALOG
-         _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( ::BkBrush != NIL, ::BkBrush, ::ClassBrush ) )
-      ENDIF
-      RETURN 0
-   ENDIF
-RETURN NIL
-
 METHOD BeginPaint( hDC ) CLASS Window
    LOCAL cPaint
    ::__cPaint := NIL
@@ -2036,7 +1972,6 @@ METHOD OnNCDestroy() CLASS Window
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
          ADEL( ::Parent:Children, n, .T. )
       ENDIF
-      ::Parent:__UnregisterTransparentControl( Self )
    ENDIF
    IF ::ToolTip != NIL
       ::ToolTip:Destroy()
@@ -2084,16 +2019,8 @@ METHOD OnNCDestroy() CLASS Window
       DestroyIcon( ::__hIcon )
    ENDIF
 
-   IF ::__hMemBitmap != NIL
-      DeleteObject( ::__hMemBitmap )
-   ENDIF
-
    IF ::BkBrush != NIL
       DeleteObject( ::BkBrush )
-   ENDIF
-
-   IF ::__hBrush != NIL
-      DeleteObject( ::__hBrush )
    ENDIF
 
    IF ::SelBkBrush != NIL
@@ -2107,7 +2034,6 @@ METHOD OnNCDestroy() CLASS Window
    IF ::__ClassInst != NIL
       ::Events := NIL
    ENDIF
-
 
    ObjFromHandle( ::hWnd, .T. )
 
@@ -2131,10 +2057,7 @@ METHOD OnNCDestroy() CLASS Window
    ::lParam            := NIL
    ::__ClassInst       := NIL
    ::__lInitialized    := .F.
-   //::EventHandler      := NIL
 
-   //__CleanUp( Self )
-       
    IF ::Application != NIL
       IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
          CloseHandle( ::Application:__hMutex )
@@ -2155,24 +2078,18 @@ METHOD OnNCDestroy() CLASS Window
    ::Application:MainForm:PostMessage( WM_VXH_DESTRUCTOBJECT )
 RETURN NIL
 
-static function __CleanUp( oObj )
-   LOCAL aProperty, aProperties := __ClsGetIvarNamesAndValues( oObj )
-   
-   IF LEFT( oObj:ClassName, 11 ) != "C STRUCTURE"
-      FOR EACH aProperty IN aProperties
-          IF VALTYPE( aProperty[2] ) $ "OA" .AND. ! ( Upper( aProperty[1] ) IN {"PARENT","FORM","OWNER","TOOLTIP","ACMEMBERS","SIBLINGS","SYSTEM","APPLICATION" } )
-             TRY
-                //IF VALTYPE( aProperty[2] ) == "O"
-                //   __CleanUp( aProperty[2] )
-                //ENDIF
-                __objSendMsg( oObj, "_" + aProperty[1], NIL )
-             CATCH
-                //view oObj:ClassName, aProperty[1]
-             END
-          ENDIF
-      NEXT
+//-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkgnd( hDC ) CLASS Window
+   LOCAL nRet, n
+
+   IF ::BkBrush != NIL
+      _FillRect( hDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+      nRet := 1
    ENDIF
-return nil
+   IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
+      ::Children[n]:PaintFocusRect( hDC )
+   ENDIF
+RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
@@ -2196,25 +2113,20 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
 
    IF ( nMess := aScan( aMessages, {|a| a[1] == nMsg} ) ) > 0
-      IF .f. //nMsg == WM_NCDESTROY
-         ExecuteEvent( aMessages[nMess][2], Self )
-         nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
-       ELSE
-         nRet := NIL
-         IF nMsg == WM_INITDIALOG
-            ::hWnd := hWnd
-            ::PreInitDialog()
-         ENDIF
-         cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
-         IF __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
-            nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
-         ENDIF
-         nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
-         ExecuteEvent( aMessages[nMess][2], Self )
+      nRet := NIL
+      IF nMsg == WM_INITDIALOG
+         ::hWnd := hWnd
+         ::PreInitDialog()
+      ENDIF
+      cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
+      IF __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
+         nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
+      ENDIF
+      nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
+      ExecuteEvent( aMessages[nMess][2], Self )
 
-         IF nMsg == WM_INITDIALOG
-            ::PostInitDialog()
-         ENDIF
+      IF nMsg == WM_INITDIALOG
+         ::PostInitDialog()
       ENDIF
    ELSE
       SWITCH nMsg
@@ -2262,7 +2174,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnNCXButtonDblClk", Self )
               ODEFAULT nRet TO ::OnNCXButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ), hWnd )
               EXIT
-
 
          CASE WM_NCHITTEST
               nRet := ExecuteEvent( "OnNCHitTest", Self )
@@ -2451,28 +2362,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_MENUGETOBJECT
-              EXIT
-
-         CASE WM_ERASEBKGND
-              IF ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" .AND. VALTYPE( ::BackColor ) == "N" .AND. ( ::__SysBackColor != ::BackColor .OR. ::__ForceSysColor )
-                 SetBkColor( nwParam, ::BackColor )
-              ENDIF
-              nRet := ExecuteEvent( "OnEraseBkGnd", Self )
-              ODEFAULT nRet TO ::OnEraseBkGnd( nwParam )
-              IF nRet == NIL .AND. ::__WindowStyle != WT_DIALOG .AND. ::BkBrush != NIL .AND. ::ClsName != "Button" //Style & WS_CHILD == 0
-                 ::GetClientRect()
-                 IF ::__PaintBakgndImage( nwParam ) == NIL
-                    _FillRect( nwParam, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-                 ENDIF
-                 IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
-                    ::Children[n]:PaintFocusRect( nwParam )
-                 ENDIF
-                 RETURN 1
-              ENDIF
-              DEFAULT nRet TO ::__PaintBakgndImage( nwParam )
-              IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
-                 ::Children[n]:PaintFocusRect( nwParam )
-              ENDIF
               EXIT
 
          CASE WM_GETDLGCODE
@@ -4136,32 +4025,6 @@ METHOD __SetWindowCursor( nCursor ) CLASS Window
    ENDIF
 RETURN Self
 
-METHOD __SetTransparentChildren( hDC, hMDC ) CLASS Window
-   LOCAL oChild, hMemDC, hOldBitmap, lDC := hDC == NIL
-   
-   IF ! EMPTY( ::__aTransparent )
-      DEFAULT hDC TO GetDC( ::hWnd )
-      hMemDC := CreateCompatibleDC( hDC )
-
-      FOR EACH oChild IN ::__aTransparent
-          IF GetParent( oChild:hWnd ) == ::hWnd
-             IF oChild:__hBrush != NIL
-                DeleteObject( oChild:__hBrush )
-             ENDIF
-             DEFAULT oChild:__hMemBitmap TO CreateCompatibleBitmap( hDC, oChild:Width+oChild:__BackMargin, oChild:Height+oChild:__BackMargin )
-             hOldBitmap  := SelectObject( hMemDC, oChild:__hMemBitmap )
-             BitBlt( hMemDC, 0, 0, oChild:Width, oChild:Height, hMDC, oChild:Left+oChild:__BackMargin, oChild:Top+oChild:__BackMargin, SRCCOPY )
-             oChild:__hBrush := CreatePatternBrush( oChild:__hMemBitmap )
-             SelectObject( hMemDC,  hOldBitmap )
-          ENDIF
-      NEXT
-      DeleteDC( hMemDC )
-      IF lDC
-         ReleaseDC( ::hWnd, hDC )
-      ENDIF
-   ENDIF
-RETURN NIL
-
 //---------------------------------------------------------------------------------------------
 
 FUNCTION __Evaluate( iVar, Param1, Param2, Param3, nRet )
@@ -4843,6 +4706,7 @@ CLASS WinForm INHERIT Window
    METHOD __PaintBakgndImage()
    METHOD __PrcMdiMenu()
    METHOD __SetActiveMenuBar()
+   METHOD __CreateBkBrush()
 
    METHOD SetImageList()
    METHOD SetBackColor()
@@ -4957,6 +4821,19 @@ METHOD Create( hoParent ) CLASS WinForm
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD __CreateBkBrush( hDC ) CLASS WinForm
+   LOCAL lDC
+   IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
+      lDC := ( hDC == NIL )
+      DEFAULT hDC TO GetDC( ::hWnd )
+      ::__PaintBakgndImage( hDC )
+      IF lDC
+         ReleaseDC( ::hWnd, hDC )
+      ENDIF
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 METHOD __SetActiveMenuBar( oMenu ) CLASS WinForm
    IF ::hWnd != NIL .AND. VALTYPE( oMenu ) != "C"
       SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) )
@@ -4968,8 +4845,10 @@ METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    Super:OnSize( nwParam, nlParam )
    IF ::IsWindowVisible() .AND. ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
+      ::__CreateBkBrush()
       ::InvalidateRect()
-      AEVAL( ::__aTransparent, {|o| o:InvalidateRect(,.f.)} )
+      ::Redraw()
+      //AEVAL( ::Children, {|o| o:Refresh()} )
       RETURN 0
    ENDIF
 RETURN Self
@@ -5100,38 +4979,35 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS Win
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __PaintBakgndImage( hDC, hBrush ) CLASS WinForm
-   LOCAL hMemBitmap, hOldBitmap, hMemDC
+METHOD __PaintBakgndImage( hDC ) CLASS WinForm
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush
 
-   IF ::BackgroundImage != NIL .AND. ::BackgroundImage:hDIB != NIL
-      DEFAULT hDC TO ::Drawing:hDC
+   DEFAULT hDC TO ::Drawing:hDC
 
-      DEFAULT hBrush TO ::BkBrush
-      IF !::ClsName == "TabPage"
-         DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-      ENDIF
-
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
-      IF hBrush == NIL .AND. ::ClsName == "TabPage" .AND. ::Application:OsVersion:dwMajorVersion >= 5
-         DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_BODY, 0, { 0, 0, ::Width, ::Height } )
-       ELSEIF hBrush != NIL .AND. hBrush <> 0
-         _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
-      ENDIF
-
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   
+   IF ::xBackColor != NIL
+      hBrush := CreateSolidBrush( ::xBackColor )
+   ENDIF
+   _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
+   
+   IF ::BackgroundImage != NIL
       ::BackgroundImage:Draw( hMemDC )
+   ENDIF
 
-      BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
+   ENDIF
 
-      ::__SetTransparentChildren( hDC, hMemDC )
+   ::BkBrush   := CreatePatternBrush( hMemBitmap )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-
-      RETURN 1
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+   IF hBrush != NIL
+      DeleteObject( hBrush )
    ENDIF
 RETURN NIL
 
@@ -5168,7 +5044,7 @@ METHOD Show( nShow ) CLASS WinForm
 
             BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
-            ::__SetTransparentChildren( hDC, hMemDC )
+            //::__SetTransparentChildren( hDC, hMemDC )
 
             SelectObject( hMemDC,  hOldBitmap )
             DeleteObject( hMemBitmap )

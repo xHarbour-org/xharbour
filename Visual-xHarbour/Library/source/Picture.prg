@@ -63,14 +63,13 @@ CLASS PictureBox INHERIT Panel
    METHOD Create()
    METHOD Draw()
    METHOD Kill() INLINE IIF( ::pPicture != NIL .AND. ::pPicture > 0, PictureRemove( ::pPicture ), ), ::pPicture := NIL
-   METHOD OnPaint()
    METHOD SetImageName()
    METHOD SetBitmap( hBmp ) INLINE ::pPicture := PictureLoadBitmap( hBmp )
    METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE
-   METHOD OnEraseBkGnd()    INLINE 1
-   METHOD OnSize(w,l)       INLINE Super:OnSize( w, l ), ::InvalidateRect(), 0
+   METHOD OnEraseBkGnd()    //INLINE 1
    METHOD Update()          INLINE IIF( ::hWnd != NIL, ::InvalidateRect(), )
    METHOD Destroy()
+   METHOD __CreateBkBrush()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS PictureBox
@@ -168,10 +167,12 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
 
    IF ::xOpacity < 100
       hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+      hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
       hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-      PicturePaint( ::pPicture, hMemDC, x-::HorzScrollPos, y-::VertScrollPos, ::Width, ::Height, ::Stretch, ::KeepAspectRatio )
+      TransparentBlt( hMemDC, 0, 0, ::ClientWidth, ::ClientHeight, hDC, 0, 0, ::ClientWidth, ::ClientHeight, GetPixel( hMemDC,0,0) )
+
+      PicturePaint( ::pPicture, hMemDC, x-::HorzScrollPos, y-::VertScrollPos, ::ClientWidth, ::ClientHeight, ::Stretch, ::KeepAspectRatio )
 
       aSize := {::PictureWidth, ::PictureHeight}
       IF ::KeepAspectRatio
@@ -184,26 +185,22 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
          PictureInvertColors( hMemDC, hMemBitmap, aSize[1], aSize[2] ) 
       ENDIF
 
-      aSize[1] := MIN( aSize[1], ::Width )
-      aSize[2] := MIN( aSize[2], ::Height )
+      aSize[1] := MIN( aSize[1], ::ClientWidth )
+      aSize[2] := MIN( aSize[2], ::ClientHeight )
 
       aPixels := {}
       IF ::TransparencyByPixel .AND. ::Transparent
-         ::__aPixels := __GetBkArray( hMemDC, ::Width, ::Height, GetPixel( hMemDC,0,0), hDC )
+         ::__aPixels := __GetBkArray( hMemDC, ::ClientWidth, ::ClientHeight, GetPixel( hMemDC,0,0), hDC )
       ENDIF
 
-      _AlphaBlend( hDC, 0, 0, aSize[1], aSize[2], hMemDC, 0, 0, aSize[1], aSize[2], ( 255 * ::xOpacity ) / 100 )
+      _AlphaBlend( hDC, x, y, aSize[1], aSize[2], hMemDC, x, y, aSize[1], aSize[2], ( 255 * ::xOpacity ) / 100 )
 
-      //IF ::TransparencyByPixel
-      //   __SetBkArray( hDC, ::__aPixels )
-      //ENDIF
-      
       SelectObject( hMemDC,  hOldBitmap )
       DeleteObject( hMemBitmap )
       DeleteDC( hMemDC )
 
     ELSE
-      PicturePaint( ::pPicture, hDC, x-::HorzScrollPos, y-::VertScrollPos, ::Width, ::Height, ::Stretch, ::KeepAspectRatio )
+      PicturePaint( ::pPicture, hDC, x-::HorzScrollPos, y-::VertScrollPos, ::ClientWidth, ::ClientHeight, ::Stretch, ::KeepAspectRatio )
 
       aSize := {::PictureWidth, ::PictureHeight}
       IF ::KeepAspectRatio
@@ -216,75 +213,54 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
       IF ::InvertedColors
          PictureInvertColors( hDC, hBmp, aSize[1], aSize[2] ) 
       ENDIF
-      
-
    ENDIF
 RETURN NIL
 
-METHOD OnPaint( hDC, hMemDC ) CLASS PictureBox
+METHOD __CreateBkBrush( hDC ) CLASS PictureBox
    LOCAL x := 0, y := 0
-   LOCAL hMemBitmap, hOldBitmap, hBrush, lTransparent, nFill
-   LOCAL rgbTransparent := RGB(255,255,255)
-   LOCAL pt := (struct POINT)
+   LOCAL hMemBitmap, hOldBitmap, hBrush, hMemDC
 
-   IF !::IsWindow()
-      RETURN 0
+   IF ::xBackColor != NIL
+      hBrush := CreateSolidBrush( ::xBackColor )
    ENDIF
 
-   hDC := ::BeginPaint()
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   lTransparent := ::Transparent
-   
-   hBrush := ::BkBrush
-   DEFAULT hBrush TO ::__hBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
-   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+   _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
 
-   IF hDC != NIL
-      hMemDC     := CreateCompatibleDC( hDC )
-      hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-      hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   IF ::xBackColor != NIL
+      DeleteObject( hBrush )
    ENDIF
 
-   _FillRect( hMemDC, {0, 0, ::Width, ::Height}, hBrush )
-
-   IF hDC != NIL .AND. lTransparent
-      BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-   ENDIF
-
-   nFill := GetPixel( hMemDC, 0, 0 )
-   
    IF ::pPicture != NIL .AND. ::pPicture != 0
-      IF ::xAlignment == 2
-         x := ( ::Width / 2 ) - ( ::PictureWidth / 2 )
-         y := ( ::Height / 2 ) - ( ::PictureHeight / 2 )
+      IF ::xAlignment == 1
+         x := ( ::ClientWidth - ::PictureWidth ) / 2
+         y := ( ::ClientHeight - ::PictureHeight ) / 2
       ENDIF
       ::Draw( hMemDC, x, y, hMemBitmap )
    ENDIF
 
-   IF lTransparent .AND. ( !::TransparencyByPixel .OR. ::xOpacity == 100 )
-      TransparentBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, ::Width, ::Height, GetPixel( hMemDC,0,0) )
+   IF ::BkBrush != NIL
+      DeleteObject( ::BkBrush )
    ENDIF
 
-   IF hMemBitmap != NIL
-      ::__SetTransparentChildren( hDC, hMemDC )
-   ENDIF
+   ::BkBrush := CreatePatternBrush( hMemBitmap )
 
-   IF hDC != NIL
-      IF !lTransparent .OR. ( ::TransparencyByPixel .AND. ::xOpacity < 100 )
-         BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-      ENDIF
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
 
-      SelectObject( hMemDC,  hOldBitmap )
-      DeleteObject( hMemBitmap )
-      DeleteDC( hMemDC )
-
-   ENDIF
-   ::EndPaint()
-RETURN 0
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkGnd( hDC ) CLASS PictureBox
+   ::__CreateBkBrush( hDC )
+   _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+RETURN 1
 
+//-----------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS PictureBox
    IF ::__ClassInst != NIL
       ::Kill()

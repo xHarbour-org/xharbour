@@ -228,8 +228,6 @@ METHOD Create( hParent ) CLASS Dialog
    DEFAULT hParent TO GetDesktopWindow()
    DEFAULT ::EventHandler TO Hash()
   
-   ::__lOnPaint   := HGetPos( ::EventHandler, "OnPaint" ) != 0
-
    ::lEmpty   := ::Template == NIL
 
    nRet := ExecuteEvent( "OnInit", Self )

@@ -52,10 +52,11 @@ CLASS LinkLabel INHERIT Control
    METHOD OnLButtonUp()        INLINE ::__lSelected := .F., ::InvalidateRect(), NIL
    METHOD OnSetFocus()         INLINE ::__lFocused  := .T., ::InvalidateRect(), NIL
    METHOD OnKillFocus()        INLINE ::__lFocused  := .F., ::InvalidateRect(), NIL
-   METHOD OnEraseBkGnd() //INLINE 1
-
-   METHOD SetParent( oParent ) INLINE IIF( ::__hBrush != NIL, ( DeleteObject( ::__hBrush ), ::__hBrush := NIL ), ), ::Super:SetParent( oParent ), ::__lReqBrush := .T., ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD OnEraseBkGnd( hDC )  INLINE ::PaintLabel( hDC ), 1
+   METHOD OnPaint()
+   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD SetImageIndex()
+   METHOD PaintLabel()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -71,20 +72,12 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS LinkLabel
-   LOCAL aSize, hDC
-
-   IF ::Parent != NIL .AND. ::Parent:ClsName == "StatusBarPanel"
-      hDC := ::Parent:Parent:Drawing:hDC
-    ELSE
-      hDC := ::Parent:Drawing:hDC
-   ENDIF
-   DEFAULT ::Parent:__hMemBitmap TO CreateCompatibleBitmap( hDC, ::Parent:ClientWidth, ::Parent:ClientHeight )
-
-   ::Parent:__RegisterTransparentControl( Self )
-
-   ::__lReqBrush := .T.
+   LOCAL aSize
 
    Super:Create()
+
+   //::Parent:__RegisterTransparentControl( Self )
+
    IF ::AutoSize
       ::__lResizeable   := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
       aSize := ::Drawing:GetTextExtentPoint32( ::Caption )
@@ -125,27 +118,23 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-
-METHOD OnEraseBkGnd( hDC ) CLASS LinkLabel
+METHOD PaintLabel( hDC ) CLASS LinkLabel
+   LOCAL nColor, hBrush := ::BkBrush
    LOCAL rc := (struct RECT)
-   LOCAL nColor, lFocus, hBrush := ::BkBrush
 
-   lFocus := ::__lFocused
-
-   IF lFocus
-      hBrush := ::SelBkBrush
+   IF hBrush == NIL
+      hBrush := ::Parent:BkBrush
+      IF hBrush != NIL
+         SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )  
+      ENDIF
    ENDIF
-   ::Parent:UpdateWindow()
-   DEFAULT hBrush TO ::__hBrush
-   DEFAULT hBrush TO ::Parent:BkBrush
    DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-
-   _FillRect( hDC, {0,0,::ClientWidth,::ClientHeight}, hBrush )
+   _FillRect( hDC, {0,0,::Width,::Height}, hBrush )
 
    GetClientRect( ::hWnd, @rc )
 
    IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-      IF lFocus
+      IF ::__lFocused
          ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, ILD_TRANSPARENT | ILD_FOCUS, ::BackColor )
        ELSE
          ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, ILD_TRANSPARENT )
@@ -167,11 +156,31 @@ METHOD OnEraseBkGnd( hDC ) CLASS LinkLabel
    rc:Left+=2
    
    DrawText( hDC, ::Caption, rc, (::Alignment-1)|DT_WORDBREAK )
-   IF lFocus .AND. ::FocusRect
+   IF ::__lFocused .AND. ::FocusRect
       rc:Left-=2
       DrawFocusRect( hDC, rc)
    ENDIF
-RETURN 1
+RETURN NIL
+
+METHOD OnPaint() CLASS LinkLabel
+   LOCAL hDC, hMemDC, hMemBitmap, hOldBitmap
+   
+   hDC        := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
+   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+   ::PaintLabel( hMemDC )
+
+   BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC,  hOldBitmap )
+   DeleteObject( hMemBitmap )
+   DeleteDC( hMemDC )
+
+   ::EndPaint()
+RETURN 0
 
 METHOD SetSelColor( nColor, lRepaint ) CLASS LinkLabel
    DEFAULT lRepaint TO TRUE
