@@ -9,6 +9,10 @@
 */
 
 
+2014-07-06 17:15 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include/button.ch
+    ! temporary replaced Chr(16) with ">" in #define HB_TMENUITEM_STYLE
+
 2014-06-26 23:55 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/misc/hb_f.c
     ! fixed hb_hbfskip() function
