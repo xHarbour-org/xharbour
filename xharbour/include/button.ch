@@ -65,7 +65,7 @@
 #define SEPARATOR_DOUBLE_SINGLE  ( Chr(199) + MENU_SEPARATOR + Chr(182) )  /* double line left and right and single separator for popup menu */
 
 /* string constants for menuitems display */
-#define HB_TMENUITEM_STYLE       ( Chr(251) + ">" ) /* Chr(16) ) */
+#define HB_TMENUITEM_STYLE       ( Chr(251) + Chr(16) )
 
 /* return values for HitTest methods */
 #define HTNOWHERE                0
