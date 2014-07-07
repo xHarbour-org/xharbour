@@ -1231,7 +1231,6 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
             case SQL_INTEGER:
             case SQL_BIGINT:
             case SQL_FAKE_NUM:
-            case SQL_NUMERIC:
             {
 	            if ( lLen <  10 ) 
 	            {
@@ -1277,11 +1276,13 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                 }
 	            break;
 	            }
+
+
+            case SQL_NUMERIC:                       
 	        case SQL_FLOAT:    
             case SQL_REAL:
             case SQL_DECIMAL:
             case SQL_DOUBLE:
-            
             {
                double val = 0.0;
                if( SQL_SUCCEEDED( res = SQLGetData( hStmt, ui, SQL_C_DOUBLE, &val, sizeof( val ), &iLen ) ) )
