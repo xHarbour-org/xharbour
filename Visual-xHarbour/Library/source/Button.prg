@@ -33,7 +33,7 @@ CLASS Button INHERIT Control
    PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)               DEFAULT  0
    PROPERTY Border        ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )       DEFAULT .F.
 
-   PROPERTY ShortCutKey   ROOT "Behavior" 
+   PROPERTY ShortCutKey   ROOT "Behavior"
    PROPERTY Group         ROOT "Behavior"   SET ::SetStyle( WS_GROUP, v )        DEFAULT .F.
    PROPERTY DefaultButton ROOT "Behavior"   SET ::SetStyle( BS_DEFPUSHBUTTON, v) DEFAULT .F.
    PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )     DEFAULT .T.
@@ -130,7 +130,7 @@ METHOD Create() CLASS Button
    ENDIF
    ::SetStyle( BS_OWNERDRAW, ::__IsOD )
    ::Super:Create()
-   
+
    ::SetImageIndex( ::ImageIndex )
    ::ShortCutKey:SetAccel()
 RETURN Self
@@ -229,7 +229,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
       nLeft := 6
-      
+
       aRect := { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }
 
       lDisabled := dis:itemState & ODS_DISABLED != 0
@@ -344,7 +344,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
        ELSE
          SetTextColor( dis:hDC, ::ForeColor )
       ENDIF
-      IF ::MenuArrow .AND. ::ContextMenu != NIL 
+      IF ::MenuArrow .AND. ::ContextMenu != NIL
          ::DrawArrow( dis:hDC, {aTextRect[3]-22,aTextRect[2],aTextRect[3],aTextRect[4]} )
          aTextRect[1] := 6
          nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
@@ -377,6 +377,7 @@ RETURN NIL
 METHOD OnCtlColorBtn( nwParam, nlParam ) CLASS Button
    LOCAL hBkGnd := ::Parent:BkBrush
    (nlParam)
+   SetBrushOrgEx( nwParam, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
    IF ::Parent:ClsName == "DataGrid"
       hBkGnd := GetSysColorBrush( COLOR_HIGHLIGHT )
    ENDIF
