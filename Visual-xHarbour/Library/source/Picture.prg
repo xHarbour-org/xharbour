@@ -13,7 +13,7 @@
 
 static aDef := {"BMP","ICO"}
 
-//CreateMappedBitmap 
+//CreateMappedBitmap
 
 CLASS PictureBox INHERIT Panel
    PROPERTY TransparencyByPixel DEFAULT .F.
@@ -25,7 +25,7 @@ CLASS PictureBox INHERIT Panel
    PROPERTY InvertedColors   SET ::InvalidateRect() DEFAULT .F.
    PROPERTY Opacity          SET ::InvalidateRect() DEFAULT 100
 
-   PROPERTY Alignment        SET ::Update()         DEFAULT 1
+   PROPERTY Alignment        SET ::Update()         DEFAULT 0
 
 
    DATA pPicture        EXPORTED
@@ -58,7 +58,7 @@ CLASS PictureBox INHERIT Panel
                               }
 
    DATA TransparentColor //compatibility only
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Draw()
@@ -179,10 +179,10 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
          aSize := PictureSize( ::pPicture )
       ENDIF
       IF ::BlackAndWhite
-         PictureDisplayBlackAndWhite( hMemDC, hMemBitmap, aSize[1], aSize[2] ) 
+         PictureDisplayBlackAndWhite( hMemDC, hMemBitmap, aSize[1], aSize[2] )
       ENDIF
       IF ::InvertedColors
-         PictureInvertColors( hMemDC, hMemBitmap, aSize[1], aSize[2] ) 
+         PictureInvertColors( hMemDC, hMemBitmap, aSize[1], aSize[2] )
       ENDIF
 
       aSize[1] := MIN( aSize[1], ::ClientWidth )
@@ -208,10 +208,10 @@ METHOD Draw( hDC, x, y, hBmp ) CLASS PictureBox
       ENDIF
 
       IF ::BlackAndWhite
-         PictureDisplayBlackAndWhite( hDC, hBmp, aSize[1], aSize[2] ) 
+         PictureDisplayBlackAndWhite( hDC, hBmp, aSize[1], aSize[2] )
       ENDIF
       IF ::InvertedColors
-         PictureInvertColors( hDC, hBmp, aSize[1], aSize[2] ) 
+         PictureInvertColors( hDC, hBmp, aSize[1], aSize[2] )
       ENDIF
    ENDIF
 RETURN NIL
@@ -275,7 +275,7 @@ METHOD SetImageName( cFile, cType ) CLASS PictureBox
    ENDIF
 
    cPrev := ::xImageName
-   
+
    IF ::hWnd != NIL
       IF ::pPicture != NIL
          ::Kill()
@@ -302,7 +302,7 @@ METHOD SetImageName( cFile, cType ) CLASS PictureBox
       ::InvalidateRect()
 
    ENDIF
-   IF ::__ClassInst != NIL 
+   IF ::__ClassInst != NIL
       IF !EMPTY( cPrev )
          ::Application:Project:RemoveImage( cPrev, Self )
       ENDIF
@@ -311,7 +311,7 @@ METHOD SetImageName( cFile, cType ) CLASS PictureBox
          ::Application:Project:AddImage( cFile, cType, Self )
       ENDIF
    ENDIF
-   
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
