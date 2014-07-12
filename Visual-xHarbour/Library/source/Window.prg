@@ -142,7 +142,7 @@ CLASS Window INHERIT Object
 
    // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
    PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
-   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor ) SET ::SetForeColor(v) 
+   PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor ) SET ::SetForeColor(v)
    PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu )
 
    PROPERTY Left          ROOT "Position" SET ::__SetSizePos( 1, v )
@@ -184,7 +184,7 @@ CLASS Window INHERIT Object
    METHOD Hide()
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
-   
+
    DATA __SysBackColor EXPORTED INIT GetSysColor( COLOR_BTNFACE )
    DATA __SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
@@ -203,7 +203,7 @@ CLASS Window INHERIT Object
    DATA ClientHeight           EXPORTED  INIT 0
 
    DATA AutoClose              EXPORTED INIT .T.
-   
+
    DATA VertScroll             EXPORTED INIT .F.
    DATA HorzScroll             EXPORTED INIT .F.
    DATA ScrollOnChildFocus     EXPORTED INIT .F.
@@ -294,7 +294,7 @@ CLASS Window INHERIT Object
    DATA __IdeImageIndex          EXPORTED INIT 0
    DATA __TempRect               EXPORTED
    DATA __hParent                EXPORTED
-   DATA __lKeyDown               EXPORTED INIT .F.   
+   DATA __lKeyDown               EXPORTED INIT .F.
    DATA __PropFilter             EXPORTED INIT {}
 
    ACCESS EnumCursor             INLINE ::System:GetEnumCursor()
@@ -522,7 +522,7 @@ CLASS Window INHERIT Object
    METHOD OnInitDialog()        VIRTUAL
    METHOD PreInitDialog()       VIRTUAL
    METHOD PostInitDialog()      VIRTUAL
-   
+
    METHOD OnActivate()          VIRTUAL
    METHOD OnUserMsg()           VIRTUAL
    METHOD OnMessage()           VIRTUAL
@@ -530,7 +530,7 @@ CLASS Window INHERIT Object
    METHOD OnSetFont()           VIRTUAL
    METHOD OnNCCreate()          VIRTUAL
    METHOD OnNCActivate()
- 
+
    METHOD OnNCHitTest()         VIRTUAL
    METHOD OnNCPaint()           VIRTUAL
    METHOD OnWindowPosChanged()  VIRTUAL
@@ -934,7 +934,7 @@ METHOD Create( oParent ) CLASS Window
    IF __ObjHasMsg( Self, "MDIContainer" ) .AND. ! ::MDIContainer
       ::MDIClient := NIL
    ENDIF
-   
+
    IF ::__ClassInst != NIL .AND. ::__CustomOwner .AND. ::hWnd != NIL
       RETURN Self
    ENDIF
@@ -1967,7 +1967,7 @@ METHOD OnNCDestroy() CLASS Window
    ENDif
 
    ::RemoveProperty()
-   
+
    IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
          ADEL( ::Parent:Children, n, .T. )
@@ -2096,7 +2096,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, nAnimation, nMess, mis, dis
-   
+
    ::Msg    := nMsg
    ::wParam := nwParam
    ::lParam := nlParam
@@ -3033,7 +3033,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
                  ENDIF
                ELSEIF nMsg >= WM_APP .AND. nMsg <= 49151
-                 
+
                  DO CASE
                     CASE nMsg == WM_VXH_SHOWMODE
                          ::ShowMode := ::__GetShowMode()
@@ -3676,7 +3676,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
           ELSE // resize to the right
             IF oRight:hWnd == ::Parent:hWnd
-               ::xWidth := oRight:ClientWidth - ::xLeft - ::Dock:RightMargin
+               ::xWidth := oRight:ClientWidth - ::xLeft - ::Dock:RightMargin - 1
              ELSEIF oRight:IsChild
                nMargin := ::Dock:RightMargin
                IF oRight:LeftSplitter != NIL
@@ -4042,10 +4042,10 @@ RETURN nRet
 //---------------------------------------------------------------------------------------------
 
 CLASS __WindowDock
-   PROPERTY Left     SET ::SetDock( 1,v ) 
-   PROPERTY Top      SET ::SetDock( 2,v ) 
-   PROPERTY Right    SET ::SetDock( 3,v ) 
-   PROPERTY Bottom   SET ::SetDock( 4,v ) 
+   PROPERTY Left     SET ::SetDock( 1,v )
+   PROPERTY Top      SET ::SetDock( 2,v )
+   PROPERTY Right    SET ::SetDock( 3,v )
+   PROPERTY Bottom   SET ::SetDock( 4,v )
    PROPERTY Margins  SET ::SetMargins(v)
 
    PROPERTY RightProportional DEFAULT .F.
@@ -4642,8 +4642,8 @@ CLASS WinForm INHERIT Window
    PROPERTY ActiveMenuBar        GET __ChkComponent( Self, @::xActiveMenuBar ) SET ::__SetActiveMenuBar(v)
 
    PROPERTY MDIChild             GET IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild );
-                                 SET ( IIF( ::__ClassInst != NIL .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F. 
-   PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F. 
+                                 SET ( IIF( ::__ClassInst != NIL .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F.
+   PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F.
 
 
    //compatibility ONLY, forms do not set "Border" property
@@ -4660,7 +4660,7 @@ CLASS WinForm INHERIT Window
 
    DATA __lLoading             EXPORTED INIT .F.
    DATA __aPostCreateProc      EXPORTED INIT {}
-   
+
    ACCESS Form                 INLINE Self
 
    METHOD Init() CONSTRUCTOR
@@ -4721,12 +4721,12 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
    LOCAL hInst, hPointer
-   
+
    IF VALTYPE( oParent ) == "N"
       ::__hParent := oParent
       oParent := NIL
    ENDIF
-   
+
    IF ::DllInstance == NIL .AND. cProjectName != NIL
       IF ::Application == NIL
          hInst := GetModuleHandle( cProjectName )
@@ -4737,7 +4737,7 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
          ::DllInstance := GetModuleHandle( cProjectName )
       ENDIF
    ENDIF
-   
+
    IF ::Application != NIL
       DEFAULT ::Application:MainForm TO Self
    ENDIF
@@ -4786,7 +4786,7 @@ METHOD Create( hoParent ) CLASS WinForm
    IF ::__hParent != NIL
       hoParent := ::__hParent
    ENDIF
-   
+
    IF ::__ClassInst != NIL .AND. VALTYPE( ::xIcon ) == "A"
       ::xIcon := ::xIcon[1]
    ENDIF
@@ -4894,7 +4894,7 @@ METHOD SaveLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS WinFor
       rc:top    := ::__aMinRect[2]
       rc:right  := ::__aMinRect[3]+::__aMinRect[1]
       rc:bottom := ::__aMinRect[4]+::__aMinRect[2]
-      
+
       // Main Form cannot start minimized can it?
       IF nShow == 2 .AND. ! lAllowMinimized
          nShow := 1
@@ -4957,7 +4957,7 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS Win
          ::ShowMode := 3
          RETURN Self
       ENDIF
-         
+
       IF !lAllowOut
          aRect := GetDesktopRect()
 
@@ -4987,12 +4987,12 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   
+
    IF ::xBackColor != NIL
       hBrush := CreateSolidBrush( ::xBackColor )
    ENDIF
    _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
-   
+
    IF ::BackgroundImage != NIL
       ::BackgroundImage:Draw( hMemDC )
    ENDIF
@@ -5066,7 +5066,7 @@ METHOD Show( nShow ) CLASS WinForm
        ELSEIF ::Visible
          ShowWindow( ::hWnd, IIF( ::__ClassInst == NIL, nShow, SW_SHOW ) )
          ::UpdateWindow()
-         
+
          IF ::MDIContainer
             ::PostMessage( WM_SIZE, 0, MAKELPARAM( ::ClientWidth, ::ClientHeight ) )
          ENDIF
@@ -5501,15 +5501,15 @@ RETURN aDesktopRect
 FUNCTION __ChkComponent( oObj, cComp, lClear )
    LOCAL oForm
    DEFAULT lClear TO .T.
-   IF VALTYPE( cComp ) == "C" 
+   IF VALTYPE( cComp ) == "C"
       oForm := oObj:Form
-      IF oForm:__hObjects != NIL 
+      IF oForm:__hObjects != NIL
          IF HGetPos( oForm:__hObjects, cComp ) > 0
             IF oForm:__hObjects[ cComp ] != NIL
                cComp := oForm:__hObjects[ cComp ]
             ENDIF
           ELSE
-            IF oObj:__ClassInst == NIL 
+            IF oObj:__ClassInst == NIL
                oForm := oObj:Application:MainForm
              ELSE
                oForm := oObj:Application:Project:Forms[1]
