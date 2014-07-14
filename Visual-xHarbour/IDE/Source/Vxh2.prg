@@ -65,7 +65,7 @@ CLASS WindowEdit INHERIT WinForm
    DATA __SelMoved          EXPORTED INIT .F.
    DATA __PrevSelRect       EXPORTED
    ACCESS CtrlMask          INLINE ::Parent:CtrlMask
-   
+
    DATA __lModified         EXPORTED INIT .F.
    DATA __OldName           EXPORTED
    DATA __NewName           EXPORTED
@@ -116,7 +116,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
      ::Parent:UpdateScroll()
   ENDIF
 RETURN NIL
-  
+
 FUNCTION CntChildren( oObj )
    LOCAL n, nCnt := 0
    IF oObj != NIL .AND. oObj:Children != NIL
@@ -140,7 +140,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::__lModified := lNew
    ::__IdeImageIndex := 1
 
-   #ifndef VXH_PROFESSIONAL 
+   #ifndef VXH_PROFESSIONAL
       lCustom := .F.
    #endif
 
@@ -179,7 +179,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       //::Application:SourceTabs:InsertTab( "  " + ::Name+".prg * ",,, .T. )
       //::Application:SourceSelect:AddItem( ::Name+".prg *" )
    ENDIF
-   
+
    cInitialBuffer := ""
    IF lNew
       cInitialBuffer += '#include "vxh.ch"' + CRLF +;
@@ -191,7 +191,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       ::Editor:Modified := .T.
    ENDIF
    //::Editor:SetExtension( "prg" )
-   
+
    cMain := ::Application:ProjectPrgEditor:GetText()
    IF AT( "[BEGIN SYSTEM CODE]", cMain ) == 0
       cProject := "//----------------------------------- [BEGIN SYSTEM CODE] ------------------------------------//" + CRLF
@@ -237,7 +237,7 @@ RETURN Self
 
 METHOD Show() CLASS WindowEdit
    IF ::Application:Project:CurrentForm != NIL
-      Super:Show()
+      ShowWindow( ::hWnd, SW_SHOW )
    ENDIF
    ::CtrlMask:BringWindowToTop()
 RETURN Self
@@ -257,7 +257,7 @@ RETURN 0
 METHOD UpdateSelection( nKey, lDes ) CLASS WindowEdit
    DEFAULT lDes TO .T.
    DEFAULT nKey TO -1
-   
+
    ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
    ::CtrlMask:Clean( , .F., lDes )
 
@@ -494,7 +494,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
    LOCAL nInRect, lMouse, pt, lToolItem := .F.
    LOCAL nCursor, rc := (struct RECT)
 
-   
+
    IF ::Application:CurCursor != NIL .OR. ::Application:Project:PasteOn
       ::CheckMouse( x, y )
       RETURN NIL
@@ -558,7 +558,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
          ENDIF
        CATCH
       END
-      
+
       IF oControl:hWnd == ::hWnd
          ::SelInitPoint := { x,y }
          ::SelEndPoint  := { x,y }
@@ -586,10 +586,10 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                oControl := oControl:aItems[n+1]
              ELSE
                oControl:lKeyboard := .T.
-               IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:__xCtrlName == "CoolMenuItem" 
-                  
+               IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:__xCtrlName == "CoolMenuItem"
+
                   IF ::Selected[1][1]:Id==oControl:aItems[n+1]:Id
-                  
+
                      oControl:OpenPopup( oControl:hWnd )
                      RETURN 0
                    ELSE
@@ -642,7 +642,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                ::InRect    := nInRect
                RETURN -2
             ENDIF
-            
+
             IF ASCAN( ::Selected, {|a| a[1]:hWnd == oControl:Parent:hWnd} ) == 0
                AADD( ::Selected, { oControl, aRect, NIL } )
             ENDIF
@@ -654,7 +654,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
                    lChild := .T.
                 ENDIF
             NEXT
-            
+
           ELSEIF lCtrl
             IF ASCAN( ::Selected, {|a|a[1]:Parent:hWnd == oControl:Parent:hWnd} ) > 0
                IF ( n := ASCAN( ::Selected, {|a|a[1]:hWnd == oControl:hWnd} ) ) > 0
@@ -805,7 +805,7 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
    IF lPure
       n := 0
    ENDIF
-   
+
    IF oControl:ClsName  == "ToolBarWindow32"
       oControl:GetWindowRect()
    ENDIF
@@ -815,7 +815,7 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       TRY
          aRect := ACLONE( oControl:__TempRect )
          lConvert := .F.
-      CATCH   
+      CATCH
       END
    ENDIF
 
@@ -892,7 +892,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       ENDIF
 
 
-      IF !lOrderMode      
+      IF !lOrderMode
          IF ( oControl:IsContainer .OR. ( VALTYPE( ::Application:CurCursor ) == "C" .AND. ( ::Application:CurCursor == "Splitter" .AND. !oControl:ClsName == "TabPage" ) ) )
             IF !( ::CtrlParent == oControl )
                ::CtrlParent := oControl
@@ -942,23 +942,23 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          nLeft := ::Selected[1][1]:Left
          nTop  := ::Selected[1][1]:Top
       ENDIF
-      
+
       lLeft   := ::Application:ObjectManager:CheckValue( "Left",   "Position", nLeft )
       lTop    := ::Application:ObjectManager:CheckValue( "Top",    "Position", nTop  )
       lWidth  := ::Application:ObjectManager:CheckValue( "Width",  "Size",     ::Selected[1][1]:Width )
       lHeight := ::Application:ObjectManager:CheckValue( "Height", "Size",     ::Selected[1][1]:Height )
-      
+
       ::__LeftSnap   := NIL
       ::__TopSnap    := NIL
       ::__RightSnap  := NIL
       ::__BottomSnap := NIL
-      
+
       TRY
          IF ::Selected[1][1] == Self
             ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
          ENDIF
        CATCH
-      END  
+      END
       ::CtrlPos := NIL
       IF ( !lLeft .OR. !lTop .OR. !lWidth .OR. !lHeight ) .AND. ( !::Application:Project:Modified .OR. ::NewParent != NIL .OR. ::OldParent != NIL )
 
@@ -970,11 +970,11 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                    pt:y := ::Selected[n][1]:__TempRect[2]
                  ELSE
                    pt:x := ::Selected[n][1]:Left
-                   pt:y := ::Selected[n][1]:Top 
+                   pt:y := ::Selected[n][1]:Top
                 ENDIF
 
                 nTab := ::Selected[n][1]:xTabOrder
-                
+
                 ClientToScreen( ::hWnd, @pt )
                 ScreenToClient( ::NewParent:hWnd, @pt )
 
@@ -991,7 +991,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                 ENDIF
             NEXT
             EndDeferWindowPos( hDef )
-            
+
             FOR z := 1 TO LEN( ::NewParent:Children )
                 ::NewParent:Children[z]:xTabOrder := z
                 ::NewParent:Children[z]:__ClassInst:xTabOrder := z
@@ -1010,12 +1010,12 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                    pt:y := ::Selected[n][1]:__TempRect[2]
                  ELSE
                    pt:x := ::Selected[n][1]:Left
-                   pt:y := ::Selected[n][1]:Top 
+                   pt:y := ::Selected[n][1]:Top
                 ENDIF
-                
+
                 ClientToScreen( ::hWnd, @pt )
                 ScreenToClient( ::OldParent:hWnd, @pt )
-                
+
                 SetParent( ::Selected[n][1]:hWnd, ::OldParent:hWnd )
 
                 //::Selected[n][1]:MoveWindow( pt:x, pt:y,,,.T.)
@@ -1033,15 +1033,15 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          aControls := {}
          FOR n := 1 TO LEN( ::Selected )
              nLeft   := ::Selected[n][1]:Left
-             nTop    := ::Selected[n][1]:Top   
-             nWidth  := ::Selected[n][1]:Width 
+             nTop    := ::Selected[n][1]:Top
+             nWidth  := ::Selected[n][1]:Width
              nHeight := ::Selected[n][1]:Height
              AADD( aRect, { nLeft, nTop, nWidth, nHeight } )
              AADD( aControls, ::Selected[n][1] )
          NEXT
          ::Application:Project:Modified := .T.
          ::__lModified := .T.
-   
+
          ::Application:Project:SetAction( { { DG_MOVESELECTION,;
                                             aControls,;
                                             aRect,;
@@ -1070,7 +1070,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
       ::InRect := 0
       ::CtrlHover := 1
-      
+
       nFor := 1
       FOR EACH aControl IN ::Selected
           IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"}
@@ -1205,12 +1205,12 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
     ELSEIF ::MouseDown
 
       IF LEN( ::Selected ) > 0
-       
+
          aSelected := ACLONE( ::Selected )
          IF aSelected[1][1]:__CustomOwner
             aSelected := { { aSelected[1][1]:GetCCTL() } }
          ENDIF
-         
+
          IF ( aSelected[1][1]:__xCtrlName == "CoolMenu" .AND. aSelected[1][1]:Owner != NIL ) .OR. aSelected[1][1]:__xCtrlName == "ToolButton"
             RETURN NIL
          ENDIF
@@ -1270,7 +1270,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                ::CtrlMask:SetMouseShape( ::InRect )
             ENDIF
          ENDIF
-         
+
          // move/size the control, selected controls ???
          aPt := { x, y }
          _ClientToScreen( ::CtrlMask:hWnd, @aPt )
@@ -1288,16 +1288,16 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                ::__PrevSelRect := {}
                FOR n := 1 TO LEN( aSelected )
                    nLeft   := aSelected[n][1]:Left
-                   nTop    := aSelected[n][1]:Top   
-                   nWidth  := aSelected[n][1]:Width 
+                   nTop    := aSelected[n][1]:Top
+                   nWidth  := aSelected[n][1]:Width
                    nHeight := aSelected[n][1]:Height
                    AADD( ::__PrevSelRect, { nLeft, nTop, nWidth, nHeight } )
                NEXT
                ::__SelMoved := .T.
             ENDIF
-            
+
             aRect := aSelected[1][1]:GetRectangle()
-            
+
             IF ::Application:ShowGrid == 1 .AND. aSelected[1][1]:hWnd != ::hWnd
                aRect[1] := Snap( aRect[1], ::CtrlMask:xGrid )
                aRect[2] := Snap( aRect[2], ::CtrlMask:xGrid )
@@ -1337,7 +1337,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
                CASE ::InRect == -1 .AND. aSelected[1][1]:hWnd != ::hWnd
                     aSel := ::GetSelRect(.T.,.F.)
-                    
+
                     IF aSelected[1][1]:Parent:IsContainer
                        ClientToScreen( ::CtrlMask:hWnd, @pt )
                        oParent := ::GetChildFromPoint( pt,, aSelected )
@@ -1360,7 +1360,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                              NEXT
                              EndDeferWindowPos( hDef )
                              RETURN 0
-                             
+
                           ENDIF
                           IF ( ::NewParent == NIL .OR. !(oParent:hWnd == ::NewParent:hWnd) ) .AND. !(oParent:hWnd == ::OldParent:hWnd)
                              ::NewParent := oParent
@@ -1408,22 +1408,22 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                            aRect := NIL
                            TRY
                               aRect := aControl[1]:__TempRect
-                           CATCH   
+                           CATCH
                            END
                            DEFAULT aRect TO aControl[1]:GetRectangle()
-                           
+
                            IF ::Application:ShowGrid == 1 .AND. aSelected[1][1]:hWnd != ::hWnd
                               aRect[1] := Snap( aRect[1], ::CtrlMask:xGrid )
                               aRect[2] := Snap( aRect[2], ::CtrlMask:xGrid )
                            ENDIF
-                           
+
                            IF aControl[1]:__TempRect == NIL
                               aControl[1]:Left := aRect[1] + ( x - ::CtrlOldPt[1] ) + aSnap[1] + aSnap[3]
                               aControl[1]:Top  := aRect[2] + ( y - ::CtrlOldPt[2] ) + aSnap[2] + aSnap[4]
                               //aControl[1]:MoveWindow()
                               DeferWindowPos( hDef, aControl[1]:hWnd, , aControl[1]:Left, aControl[1]:Top, aControl[1]:Width, aControl[1]:Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER )
                             ELSE
-                             
+
                               aRect[1] := aRect[1] + ( x - ::CtrlOldPt[1] ) + aSnap[1] + aSnap[3]
                               aRect[2] := aRect[2] + ( y - ::CtrlOldPt[2] ) + aSnap[2] + aSnap[4]
 
@@ -1446,7 +1446,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                        ScreenToClient( IIF( ::NewParent == NIL, aSelected[1][1]:Parent:hWnd, ::NewParent:hWnd ), @pt )
                        nLeft := pt:x
                        nTop  := pt:y
-                       
+
                        ::Application:Props:StatusBarPos:Caption := XSTR(nLeft)+", "+XSTR(nTop)+", "+XSTR(aSelected[1][1]:Width)+", "+XSTR(aSelected[1][1]:Height)
                      ELSE
                        IF ::NewParent != NIL
@@ -1522,7 +1522,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
                                               aSelected[1][1]:xTop,;
                                               aSelected[1][1]:xWidth,;
                                               aSelected[1][1]:xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
-              
+
                ::CtrlOldPt := { x, y }
                IF aSelected[1][1]:hWnd == ::hWnd
                   SetCapture( ::CtrlMask:hWnd )
@@ -1559,15 +1559,15 @@ RETURN NIL
 METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
    LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static nDif := 0
-   
+
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__RightSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
       nDif := 0
       RETURN 0
    ENDIF
-   
+
    oParent   := ::Selected[1][1]:Parent
    aChildren := oParent:Children
-   
+
    FOR n := 1 TO LEN( aChildren )
        IF aChildren[n]:__xCtrlName != "Splitter" .AND. ASCAN( ::Selected, {|a|a[1]:hWnd == aChildren[n]:hWnd} ) == 0 // Target should not be selected
           IF xDif < 0
@@ -1577,7 +1577,7 @@ METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
              nDis := ( aChildren[n]:Left - aRect[1] )
              x    := 9
           ENDIF
-          
+
           IF nDis <= 10 .AND. nDis >= 0
              IF nDif >= 10
                 nDif := 0
@@ -1598,7 +1598,7 @@ METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
                 ENDIF
                 AEVAL( ::Selected, {|a| a[1]:InvalidateRect()} )
                 ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
-                
+
                 ::__LeftSnap := {0,0,0,0,0}
                 pt:x := aChildren[n]:Left-1
                 pt:y := IIF( aChildren[n]:Top < aRect[4], aChildren[n]:Top-1, aRect[2] )
@@ -1622,7 +1622,7 @@ METHOD StickLeft( aRect, xDif ) CLASS WindowEdit
                 RETURN aChildren[n]:Left - aRect[1] - xDif
              ENDIF
           ENDIF
-          
+
        ENDIF
    NEXT
 RETURN 0
@@ -1638,7 +1638,7 @@ METHOD StickRight( aRect, xDif ) CLASS WindowEdit
 
    oParent   := ::Selected[1][1]:Parent
    aChildren := oParent:Children
-   
+
    FOR n := 1 TO LEN( aChildren )
        IF aChildren[n]:__xCtrlName != "Splitter" .AND. ASCAN( ::Selected, {|a|a[1]:hWnd == aChildren[n]:hWnd} ) == 0 // Target should not be selected
           IF xDif < 0
@@ -1669,7 +1669,7 @@ METHOD StickRight( aRect, xDif ) CLASS WindowEdit
 
                 AEVAL( ::Selected, {|a| a[1]:InvalidateRect()} )
                 ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
-                
+
                 ::__RightSnap := {0,0,0,0,0}
                 pt:x := aChildren[n]:Left + aChildren[n]:Width
                 pt:y := IIF( aChildren[n]:Top < aRect[4], aChildren[n]:Top-1, aRect[2] )
@@ -1693,7 +1693,7 @@ METHOD StickRight( aRect, xDif ) CLASS WindowEdit
                 RETURN ( aChildren[n]:Left + aChildren[n]:Width ) - aRect[3] - xDif
              ENDIF
           ENDIF
-          
+
        ENDIF
    NEXT
 RETURN nSnap
@@ -1719,7 +1719,7 @@ METHOD StickTop( aRect, yDif ) CLASS WindowEdit
              nDis := ( aChildren[n]:Top - aRect[2] )
              x    := 9
           ENDIF
-          
+
           IF nDis <= 10 .AND. nDis >= 0
              IF nDif >= 10
                 nDif := 0
@@ -1741,13 +1741,13 @@ METHOD StickTop( aRect, yDif ) CLASS WindowEdit
                 IF aPrev != NIL
                    AEVAL( ::Selected, {|a| a[1]:InvalidateRect()} )
                    ::RedrawWindow( aPrev, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
-                ENDIF                
+                ENDIF
                 ::__TopSnap := {0,0,0,0,0}
                 pt:x := IIF( aChildren[n]:Left < aRect[3], aChildren[n]:Left-1, aRect[1] )
                 pt:y := aChildren[n]:Top-1
-                
+
                 aPrev := {pt:x, pt:y, 0, 0 }
-                
+
                 ClientToScreen( oParent:hWnd, @pt )
                 ScreenToClient( ::CtrlMask:hWnd, @pt )
                 ::__TopSnap[1] := pt:x
@@ -1757,7 +1757,7 @@ METHOD StickTop( aRect, yDif ) CLASS WindowEdit
                 pt:y := aChildren[n]:Top
                 aPrev[3] := pt:x
                 aPrev[4] := pt:y
-                
+
                 ClientToScreen( oParent:hWnd, @pt )
                 ScreenToClient( ::CtrlMask:hWnd, @pt )
                 ::__TopSnap[3] := pt:x
@@ -1769,7 +1769,7 @@ METHOD StickTop( aRect, yDif ) CLASS WindowEdit
                 RETURN aChildren[n]:Top - aRect[2] - yDif
              ENDIF
           ENDIF
-          
+
        ENDIF
    NEXT
 RETURN nSnap
@@ -1777,7 +1777,7 @@ RETURN nSnap
 METHOD StickBottom( aRect, yDif ) CLASS WindowEdit
    LOCAL nSnap := 0, aChildren, n, oParent, nDis, x, pt := (struct POINT)
    static nDif := 0
-   
+
    IF ::Application:ShowGrid != 2 .OR. !::Selected[1][1]:__lMoveable .OR. ::__TopSnap != NIL .OR. ::Selected[1][1]:hWnd == ::hWnd
       nDif := 0
       RETURN 0
@@ -1815,7 +1815,7 @@ METHOD StickBottom( aRect, yDif ) CLASS WindowEdit
 
                 AEVAL( ::Selected, {|a| a[1]:InvalidateRect()} )
                 ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
-                
+
                 ::__BottomSnap := {0,0,0,0,0}
                 pt:x := IIF( aChildren[n]:Left < aRect[3], aChildren[n]:Left-1, aRect[1] )
                 pt:y := aChildren[n]:Top + aChildren[n]:Height
@@ -1839,7 +1839,7 @@ METHOD StickBottom( aRect, yDif ) CLASS WindowEdit
                 RETURN ( aChildren[n]:Top + aChildren[n]:Height ) - aRect[4] - yDif
              ENDIF
           ENDIF
-          
+
        ENDIF
    NEXT
 RETURN nSnap
@@ -1872,7 +1872,7 @@ METHOD OnNCPaint() CLASS WindowEdit
       ENDIF
       hdc      := GetWindowDC(::hWnd)
       nState   := IIF( ::InActive, CS_INACTIVE, CS_ACTIVE )
-      
+
       _FillRect( hdc, { 0, 0, 5, 5 }, GetStockObject( WHITE_BRUSH ) )
       _FillRect( hdc, { ::Width-5, 0, ::Width, 5 }, GetStockObject( WHITE_BRUSH ) )
 
@@ -1880,9 +1880,9 @@ METHOD OnNCPaint() CLASS WindowEdit
       DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[2], nState, { 0, nCaption, nBorder, ::Height } )
       DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[3], nState, { ::Width-nBorder, nCaption, ::Width, ::Height } )
       DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[4], nState, { 0, ::Height-nBorder, ::Width, ::Height } )
-      
+
       aSize := GetThemePartSize( ::System:hWindowTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE )
-      
+
       aRect[1] := ::Width - aSize[1] - 6
       aRect[2] := ( ( nCaption - aSize[2] ) / 2 ) + 1
       aRect[3] := aRect[1] + aSize[1]
@@ -1911,7 +1911,7 @@ METHOD OnNCPaint() CLASS WindowEdit
          ENDIF
 
       ENDIF
-      
+
       IF ::ToolWindow .OR. !::SysMenu .OR. ( ::Modal .AND. ::DlgModalFrame )
          cx := 0
          x  := 0
@@ -1931,13 +1931,13 @@ METHOD OnNCPaint() CLASS WindowEdit
       IF ( hFont := GetThemeSysFont( ::System:hWindowTheme, aStyle[5] ) ) != NIL
          hOldFont := SelectObject( hdc, hFont )
       ENDIF
-      
+
       IF ::Application:OsVersion:dwMajorVersion == 5
          IF !::InActive
             DrawThemeText( ::System:hWindowTheme, hdc, aStyle[1], nState, ::Caption, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE, { x+cx+4, IIF( !::ToolWindow, 1, 0 )+3, ::Width, nCaption } )
          ENDIF
       ENDIF
-      
+
       SetTextColor( hdc, GetThemeSysColor( ::System:hWindowTheme, COLOR_CAPTIONTEXT ) )
       _DrawText( hdc, ::Caption, { x+cx+4, 3, ::Width, nCaption }, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE )
       SetTextColor( hdc, nColor )

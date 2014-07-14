@@ -206,7 +206,7 @@ METHOD Init( ... ) CLASS IDE
    ::Super:Init( NIL )
 
    ::IdeActive := TRUE
-   
+
    IF HB_ArgC() > 0
       cFile := ""
       FOR n := 1 TO HB_ArgC()
@@ -242,7 +242,7 @@ METHOD Init( ... ) CLASS IDE
    ENDIF
 
    ::ShowTip := .T.
-   
+
    ::Sizes       := Hash()
    ::Sizes["ObjectManagerWidth"] := 23
    ::Sizes["ToolBoxWidth"]       := 18
@@ -509,7 +509,7 @@ METHOD Init() CLASS IDE_MainForm
    IF ::System:OS:Version >= 6.2
       ::BackColor  := RGB( 255, 255, 255 )
    ENDIF
- 
+
    #ifdef VXH_DEMO
     ::Caption := "Visual xHarbour Demo " + VXH_Version
    #else
@@ -1661,7 +1661,7 @@ METHOD Init() CLASS IDE_MainForm
 
                :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
                :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
-               
+
                :Create()
 
                WITH OBJECT Label( :this )
@@ -2057,7 +2057,7 @@ METHOD Init() CLASS IDE_MainForm
 
       WITH OBJECT ::Application:DesignPage := TabPage( :this )
          :Caption   := "Form Designer"
-         :BackColor := ::System:Color:White 
+         :BackColor := ::System:Color:White
          :Enabled   := .F.
          :Create()
          :OnWMShowWindow := {|o| OnShowDesigner(o) }
@@ -2367,7 +2367,7 @@ CLASS Project
 
    DATA __CustomOwner    EXPORTED INIT .F.
    DATA __ExtraLibs      EXPORTED INIT {}
-   
+
    DATA FindDialog       EXPORTED
    DATA ReplaceDialog    EXPORTED
 
@@ -3336,7 +3336,7 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
    ::Properties:GUI := .T. // Force GUI so vxh.lib gets linked in
 
    DEFAULT lReset TO .T.
-   
+
    IF nPos != NIL
       AINS( ::Forms, nPos, oWin, .T. )
     ELSE
@@ -3501,7 +3501,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:SourceEditor:Enabled := .F.
    ::Application:SourceEditor:Visible := .F.
    ::Application:DesignPage:Enabled   := .F.
-   
+
    ::Application:Props[ "StartTabPage" ]:Select()
    ::Application:Props[ "ComboSelect" ]:ResetContent()
 
@@ -3522,7 +3522,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Modified    := .F.
    ::Properties  := NIL
    ::Modified    := .F.
-   
+
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 1)
    ::EditReset(1)
 
@@ -3677,7 +3677,7 @@ METHOD AddFile( cFile, lBin ) CLASS Project
       cFile := oFile:Path + "\" + oFile:Name
    ENDIF
    ::Application:MainForm:UpdateWindow()
-   
+
    IF lBin
       IF ASCAN( ::Properties:Binaries, cFile ) > 0
          ::Application:MainForm:MessageBox( "The File " + cFile + " is already part of the project", "Project Files", MB_ICONEXCLAMATION )
@@ -3709,7 +3709,7 @@ METHOD Open( cProject ) CLASS Project
       ::ResetQuickOpen( cProject )
       RETURN Self
    ENDIF
-   
+
    IF ::Application:DebugWindow:Visible
       ::Application:ErrorView:ResetContent()
       ::Application:DebugWindow:Visible := .F.
@@ -3996,7 +3996,7 @@ METHOD LoadUnloadedImages( cFile ) CLASS Project
    LOCAL n, aImage, cLine, hFile := FOpen( cFile, FO_READ )
    WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
       cLine := ALLTRIM( cLine )
-      IF UPPER( LEFT( cLine, 6 ) ) == "::ICON" .OR. UPPER( LEFT( cLine, 10 ) ) == ":IMAGENAME" 
+      IF UPPER( LEFT( cLine, 6 ) ) == "::ICON" .OR. UPPER( LEFT( cLine, 10 ) ) == ":IMAGENAME"
          IF ( n := AT( "{", cLine ) ) > 0
             aImage := &(SUBSTR( cLine, n ))
             IF ASCAN( ::aImages, {|a| a[2] == aImage[2] } ) == 0
@@ -4041,7 +4041,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       ENDIF
    ENDDO
    FSeek( hFile, 0, 0 )
-   
+
    IF oForm == NIL
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
       cBkMk := GetPrivateProfileString( "Files", cFile, "", ::Properties:Path + "\" + ::Properties:Name + ".vxh")
@@ -4579,7 +4579,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ::Application:ObjectManager:InvalidateRect(, .F. )
 
    ::__ExtraLibs := {}
-   
+
    //hb_gcall(.T.)
    nSecs := Seconds()
 
@@ -4690,7 +4690,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
                             '   METHOD ' + oForm:Name + '( hWnd, aParam ) INLINE ::o'+oForm:Name+' := ' + oForm:Name + '():SetInstance( s_cProjectName, Self ):Init( hWnd, aParam )' + CRLF+ CRLF
                NEXT
                cText += 'ENDCLASS' + CRLF
-               
+
       oFile:FileBuffer := cText
       oFile:Save()
    ENDIF
@@ -4716,7 +4716,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    #endif
 
    FOR n := 1 TO LEN( ::Forms )
-      
+
        // Unloaded forms need to report resources to be generated in RC file!!!
        IF ::Forms[n]:Cargo != NIL
           ::LoadUnloadedImages( cSourcePath + "\" + ::Forms[n]:Cargo )
@@ -5129,7 +5129,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
               ELSE
                 xValue1 := hOleVars[cProp][1]
                 xValue2 := hOleVars[cProp][2]
-                
+
                 IF VALTYPE( xValue1 ) == "A" // Enumeration
                    xValue1 := hOleVars[cProp][4]
                    TRY
@@ -5148,7 +5148,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                 ENDIF
              ENDIF
              IF !( xValue1 == xValue2 )
-                IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name ) 
+                IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name )
 
                    IF UPPER( LEFT( xValue1:Name, 9 ) ) != "::SYSTEM:"
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp(xValue1:Name)+ CRLF
@@ -5157,7 +5157,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    ENDIF
 
                  ELSEIF ( cProp == "Icon" .OR. cProp == "ImageName" .OR. cProp == "BitmapMask") .AND. VALTYPE( xValue1 ) == "C" .AND. ! oCtrl == ::AppObject
-                 
+
                    IF !EMPTY( xValue1 )
                       n := RAT( "\", xValue1 ) + 1
                       cResImg := RIGHT( xValue1, LEN( xValue1 ) - n + 1 )
@@ -5201,7 +5201,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
                             IF lParent
                                cProps := ::GenerateProperties( xValue1, nTab+3, ":", cProp,,,,cParent )
-  
+
                                IF UPPER(cProp) == "BACKGROUNDIMAGE"
                                   cProp := "BackgroundImage := FreeImageRenderer( "+cParent+" )"
                                ENDIF
@@ -5322,7 +5322,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
 
        nBkHeight := oLink:Top + oLink:Height
        IF nBkHeight > oLink:Parent:Height-( (oLink:Height*3 )*1.5)
-          lLink := .F.  
+          lLink := .F.
        ENDIF
    NEXT
    ::Application:IniFile:Write( "Recent", aEntries )
@@ -5337,7 +5337,7 @@ METHOD Run( lRunOnly ) CLASS Project
    TRY
       cPath := ::Properties:Path
       cBinPath := ::FixPath( cPath, ::Properties:Binary )
-      
+
       cCurDir := GetCurrentDirectory()
       DirChange( cPath )
 
@@ -5441,10 +5441,10 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
           cSourcePath += cPath+";"
       NEXT
    ENDIF
- 
+
    cPath := ::Properties:Path
  */
- 
+
    cObjPath    := ::FixPath( cPath, ::Properties:Objects )
    cResPath    := ::FixPath( cPath, ::Properties:Resource )
 
@@ -5480,7 +5480,7 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
       cPath := ::Properties:Path
       cCurDir := GetCurrentDirectory()
       DirChange( cPath )
-      
+
       cProject := cPath + "\" + ::Properties:Name + aTargetTypes[ ::Properties:TargetType ]
       IF !EMPTY( ::Properties:TargetName )
          cProject := cPath + "\" + ::Properties:TargetName + aTargetTypes[ ::Properties:TargetType ]
@@ -5826,7 +5826,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
                 cText += "   REQUEST " + oChild:Driver + CRLF
           ENDCASE
        ENDIF
-       
+
        IF oChild:__xCtrlName IN {"BindingSource", "SqlConnector"}
           IF oChild:Server == 0
              AADD( ::__ExtraLibs, "libmysql.lib" )
@@ -5844,7 +5844,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
              ENDIF
           ENDIF
        ENDIF
-       
+
        cText += "   WITH OBJECT ( " + oChild:__xCtrlName + "( Self ) )" + CRLF
        cText += ::GenerateProperties( oChild, 6, ":",,,,, ":This" )
 
@@ -6617,7 +6617,7 @@ METHOD OnRowChanged() CLASS RegOle
    LOCAL hBmp, aBmp, cImage := ::Form:aOle[ ::DataSource:Recno() ][4]
    ::Form:GroupBox1:Caption := ::DataSource:Fields:Control
    ::Form:GroupBox1:Redraw()
-   
+
    IF VALTYPE( ::Form:aOle[ ::DataSource:Recno() ][4] ) == "C"
       aBmp := hb_aTokens( cImage, "," )
       IF LEN( aBmp ) > 1
