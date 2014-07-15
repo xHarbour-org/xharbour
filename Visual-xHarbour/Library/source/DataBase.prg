@@ -45,11 +45,11 @@ CLASS DataTable INHERIT Component
 
    PROPERTY ReadOnly     ROOT "Behavior"   DEFAULT .F.
    PROPERTY AutoOpen     ROOT "Behavior"   DEFAULT .T.
-   
-   
+
+
 
    ACCESS Exists           INLINE ::IsOpen
-  
+
    DATA EnumMemoType       EXPORTED INIT { { "None", "DBT", "FTP", "SMT" }, { DB_MEMO_NONE, DB_MEMO_DBT, DB_MEMO_FPT, DB_MEMO_SMT } }
 
    DATA __lMemory          EXPORTED  INIT .F.
@@ -103,47 +103,52 @@ CLASS DataTable INHERIT Component
    DATA Area               EXPORTED
    DATA __ExplorerFilter   EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" } }
    DATA aScatter           EXPORTED
-   
+
    DATA Bitmap             PROTECTED
    DATA MDIClient          PROTECTED
    DATA xDriver            PROTECTED INIT RddSetDefault()
-   
+
    DATA Connector          EXPORTED
-   
+
    DATA __aTmpStruct       PROTECTED
    DATA __lNew             PROTECTED INIT .F.
    DATA __aData            PROTECTED INIT {}
+
+   DATA __hClass           PROTECTED
 
    METHOD Init() CONSTRUCTOR
 
    METHOD Open()
    METHOD CreateFields()
    METHOD Create()
-   METHOD MemoExt()                           INLINE ::Connector:MemoExt() 
+   METHOD MemoExt()                           INLINE ::Connector:MemoExt()
    METHOD Gather()                            INLINE ::Connector:Gather()
    METHOD Scatter( aData )                    INLINE ::Connector:Scatter( aData )
    METHOD SetScope( xScope )                  INLINE ::Connector:SetScope( xScope )
    METHOD SetTopScope( xScope )               INLINE ::Connector:SetTopScope( xScope )
    METHOD SetBottomScope( xScope )            INLINE ::Connector:SetBottomScope( xScope )
    METHOD KillScope()                         INLINE ::Connector:KillScope()
-   METHOD Reindex()                           INLINE ::Connector:Reindex()   
-   METHOD Commit()                            INLINE ::Connector:Commit()    
-   METHOD RecLock()                           INLINE ::Connector:RecLock()   
-   METHOD FileLock()                          INLINE ::Connector:FileLock()  
-   METHOD UnLock()                            INLINE ::Connector:UnLock()    
+   METHOD Reindex()                           INLINE ::Connector:Reindex()
+   METHOD Commit()                            INLINE ::Connector:Commit()
+   METHOD RecLock()                           INLINE ::Connector:RecLock()
+   METHOD FileLock()                          INLINE ::Connector:FileLock()
+   METHOD UnLock()                            INLINE ::Connector:UnLock()
    METHOD dbEval(b)                           INLINE ::Connector:dbEval(b)
-   METHOD UnLockAll()                         INLINE ::Connector:UnLockAll() 
-   METHOD FCount()                            INLINE ::Connector:FCount()       
-   METHOD Bof()                               INLINE ::Connector:Bof()       
-   METHOD Eof()                               INLINE ::Connector:Eof()       
-   METHOD Deleted()                           INLINE ::Connector:Deleted()   
-   METHOD RecCount()                          INLINE ::Connector:RecCount()  
-   METHOD RecNo()                             INLINE ::Connector:RecNo()     
-   METHOD GoTop()                             INLINE ::Cancel(), ::Connector:GoTop()     
+   METHOD UnLockAll()                         INLINE ::Connector:UnLockAll()
+   METHOD FCount()                            INLINE ::Connector:FCount()
+   METHOD Bof()                               INLINE ::Connector:Bof()
+   METHOD Eof()                               INLINE ::Connector:Eof()
+   METHOD Deleted()                           INLINE ::Connector:Deleted()
+   METHOD RecCount()                          INLINE ::Connector:RecCount()
+   METHOD RecNo()                             INLINE ::Connector:RecNo()
+   METHOD GoTop()                             INLINE ::Cancel(), ::Connector:GoTop()
    METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
-   METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()  
-   METHOD Skip( n )                           INLINE ::Cancel(), ::Connector:Skip( n )   
-   METHOD Close(lNotify)                      INLINE ::Cancel(), ::Connector:Close(), ::Structure := NIL, ::Fields := NIL,;
+   METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()
+   METHOD Skip( n )                           INLINE ::Cancel(), ::Connector:Skip( n )
+   METHOD Close(lNotify)                      INLINE ::Cancel(), ::Connector:Close(), ::DestroyFields(),;
+                                                                                      ::Connector := NIL,;
+                                                                                      ::Structure := NIL,;
+                                                                                      ::Fields := NIL,;
                                                                       IIF( VALTYPE( lNotify ) == "L" .AND. lNotify, __Evaluate( ::bOnFileClosed, Self ), ),;
                                                                       ExecuteEvent( "OnClose", Self )
    METHOD Append()                            INLINE ::Connector:Append()
@@ -159,7 +164,7 @@ CLASS DataTable INHERIT Component
    METHOD Found()                             INLINE ::Connector:Found()
    METHOD SetDriver( cDriver )                INLINE ::Driver := cDriver, ::Connector:SetDriver( cDriver )
    METHOD CreateIndex( cName, xKey, lUnique ) INLINE ::Connector:CreateIndex( cName, xKey, lUnique )
-   
+
    METHOD IndexOrd()                          INLINE ::Connector:IndexOrd()
    METHOD Zap()                               INLINE ::Cancel(), ::Connector:Zap()
    METHOD OrdCount()                          INLINE ::Connector:OrdCount()
@@ -175,7 +180,7 @@ CLASS DataTable INHERIT Component
 
    METHOD FieldPut( nField, xVal )            INLINE IIF( ! Empty(::__aData), ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
    METHOD FieldGet( nField,n )                INLINE IIF( ! Empty(::__aData) .AND. n==NIL, ::__aData[nField], ::Connector:FieldGet( nField ) )
-  
+
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
@@ -189,10 +194,10 @@ CLASS DataTable INHERIT Component
    METHOD DbInfo( nType, nSetting )           INLINE ::Connector:DbInfo( nType, nSetting )
 
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
-   
+
    METHOD CheckAlias()
    METHOD AdsSetServerType(n)   VIRTUAL
-   
+
    METHOD Destroy(lNotify)                    INLINE IIF( ::IsOpen, ::Close(lNotify),), ::Super:Destroy()
    METHOD __SetAlias()
    METHOD SetFileName()
@@ -208,6 +213,7 @@ CLASS DataTable INHERIT Component
    METHOD Load()
    METHOD Save()
    METHOD Cancel() INLINE ::__lNew := .F., ::__aData := {}
+   METHOD DestroyFields()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -292,7 +298,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
    ENDIF
    ::Connector:Create( lIgnoreAO )
    IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
-      lChanged := LEN(::__aTmpStruct) <> LEN(::Structure) 
+      lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
              lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
@@ -326,7 +332,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             modstru->( dbCloseArea() )
             FERASE( cPath + "\" + cFileName )
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
-            
+
             n := RAT( ".", cFileName )
             cFileName := Left( cFileName, n-1 ) + cMemo
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
@@ -355,29 +361,40 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateFields() CLASS DataTable
-   LOCAL aField, hClass, cField
+   LOCAL aField, cField
 
-   hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
+   ::__hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
 
    FOR EACH aField IN ::Structure
        cField := aField[1]
-       __clsAddMsg( hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
-       __clsAddMsg( hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+       __clsAddMsg( ::__hClass,       cField, &( "{|Self| ::FieldGet( " + Str( HB_EnumIndex() ) + " ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
+       __clsAddMsg( ::__hClass, "_" + cField, &( "{|Self, xVal| ::FieldPut( " + Str( HB_EnumIndex() ) + ", xVal ) }" ), HB_OO_MSG_INLINE, NIL, 1 )
    NEXT
 
-   ::CheckAlias()
+   //::CheckAlias()
 
-   ::Fields := __clsInst( hClass ):Init( Self )
+   ::Fields := __clsInst( ::__hClass ):Init( Self )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lAll )
+METHOD DestroyFields() CLASS DataTable
+   LOCAL aField, cField
+   FOR EACH aField IN ::Structure
+       cField := aField[1]
+       __clsDelMsg( ::__hClass,       cField )
+       __clsDelMsg( ::__hClass, "_" + cField )
+   NEXT
+   ::__hClass := NIL
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lAll ) CLASS DataTable
    IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0
       (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest ) )
       (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
    ENDIF
 RETURN Self
-   
+
 //-------------------------------------------------------------------------------------------------------
 METHOD Open() CLASS DataTable
    ::Create(.T.)
@@ -401,7 +418,7 @@ METHOD CheckAlias() CLASS DataTable
             ::Path      := SUBSTR( ::xFileName, 1, n-1 )
             ::xFileName := SUBSTR( ::xFileName, n+1 )
          ENDIF
-         
+
          ::Structure  := ::Struct()
 
          hClass := __ClsNew( "DATA_" + ::Alias, 0, 0, { Data():ClassH } )
@@ -450,7 +467,7 @@ METHOD SetFileName( cFileName ) CLASS DataTable
       ::Close()
    ENDIF
    ::xFileName := cFileName
-   
+
    IF ::lCreated
       ::Create()
       IF ::bOnFileNameChanged != NIL
@@ -466,7 +483,7 @@ RETURN Self
 CLASS Data
    DATA Parent
    DATA __ClassInst
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Put()
    METHOD FieldPut( nField, xVal )  INLINE ::Parent:FieldPut( nField, xVal )
@@ -485,9 +502,9 @@ RETURN Self
 
 METHOD Put(xVal, cName) CLASS Data
    IF xVal != NIL
-      (::Parent:Alias)->&cName := xVal
+      (::Parent:Area)->&cName := xVal
     ELSE
-      RETURN (::Parent:Alias)->&cName
+      RETURN (::Parent:Area)->&cName
    ENDIF
 RETURN Self
 
@@ -497,66 +514,69 @@ RETURN Self
 
 CLASS DataRdd
    DATA Owner           EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   
-   METHOD SetTopScope( xScope )               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdScope( TOPSCOPE, xScope ) ),)
-   METHOD SetBottomScope( xScope )            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, xScope ) ),)
-   METHOD SetScope( xScope )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, ( (::Owner:Alias)->( OrdScope( TOPSCOPE, xScope ) ),;
-                                                                                         (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, xScope ) ) ),)
-   METHOD KillScope()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, ( (::Owner:Alias)->( OrdScope( TOPSCOPE, NIL ) ),;
-                                                                                         (::Owner:Alias)->( OrdScope( BOTTOMSCOPE, NIL ) ) ),)
-   METHOD Alias()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Alias() ),)
-   METHOD Reindex()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbReindex() ),)
-   METHOD Commit()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbCommit() ),)
-   METHOD RecLock()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( RLOCK() ),)
-   METHOD FileLock()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FLOCK() ),)
-   METHOD UnLock()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbUnlock() ),)
-   METHOD UnLockAll()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbUnlockAll() ),)
-   METHOD dbEval(b)                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbEval(b) ),)
-   METHOD Bof()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Bof() ),)
-   METHOD FCount()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FCount() ),)
-   METHOD Eof()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Eof() ),)
-   METHOD Deleted()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Deleted() ),)
-   METHOD RecCount()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Reccount() ),)
-   METHOD RecNo()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Recno() ),)
-   METHOD GoTop()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbgotop() ),)
-   METHOD GoTo( nRec )                        INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbgoto( nRec ) ),)
-   METHOD GoBottom()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbgobottom() ),)
-   METHOD Skip( n )                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSkip( n ) ),)
-   METHOD Close()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbCloseArea() ),)
-   METHOD Append()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbAppend() ),)
-   METHOD OrdSetFocus( cOrder )               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdSetFocus( cOrder ) ),)
-   METHOD SetIndex( cIndex )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetIndex( cIndex ) ),)
-   METHOD SetOrder( nOrder )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetOrder( nOrder ) ),)
+
+   METHOD SetTopScope( xScope )               INLINE (::Owner:Area)->( OrdScope( TOPSCOPE, xScope ) )
+   METHOD SetBottomScope( xScope )            INLINE (::Owner:Area)->( OrdScope( BOTTOMSCOPE, xScope ) )
+
+   METHOD SetScope( xScope )                  INLINE (::Owner:Area)->( OrdScope( TOPSCOPE, xScope ) ),;
+                                                     (::Owner:Area)->( OrdScope( BOTTOMSCOPE, xScope ) )
+
+   METHOD KillScope()                         INLINE (::Owner:Area)->( OrdScope( TOPSCOPE, NIL ) ),;
+                                                     (::Owner:Area)->( OrdScope( BOTTOMSCOPE, NIL ) )
+
+   METHOD Alias()                             INLINE (::Owner:Area)->( Alias() )
+   METHOD Reindex()                           INLINE (::Owner:Area)->( dbReindex() )
+   METHOD Commit()                            INLINE (::Owner:Area)->( dbCommit() )
+   METHOD RecLock()                           INLINE (::Owner:Area)->( RLOCK() )
+   METHOD FileLock()                          INLINE (::Owner:Area)->( FLOCK() )
+   METHOD UnLock()                            INLINE (::Owner:Area)->( dbUnlock() )
+   METHOD UnLockAll()                         INLINE (::Owner:Area)->( dbUnlockAll() )
+   METHOD dbEval(b)                           INLINE (::Owner:Area)->( dbEval(b) )
+   METHOD Bof()                               INLINE (::Owner:Area)->( Bof() )
+   METHOD FCount()                            INLINE (::Owner:Area)->( FCount() )
+   METHOD Eof()                               INLINE (::Owner:Area)->( Eof() )
+   METHOD Deleted()                           INLINE (::Owner:Area)->( Deleted() )
+   METHOD RecCount()                          INLINE (::Owner:Area)->( Reccount() )
+   METHOD RecNo()                             INLINE (::Owner:Area)->( Recno() )
+   METHOD GoTop()                             INLINE (::Owner:Area)->( dbgotop() )
+   METHOD GoTo( nRec )                        INLINE (::Owner:Area)->( dbgoto( nRec ) )
+   METHOD GoBottom()                          INLINE (::Owner:Area)->( dbgobottom() )
+   METHOD Skip( n )                           INLINE (::Owner:Area)->( dbSkip( n ) )
+   METHOD Close()                             INLINE (::Owner:Area)->( dbCloseArea() )
+   METHOD Append()                            INLINE (::Owner:Area)->( dbAppend() )
+   METHOD OrdSetFocus( cOrder )               INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
+   METHOD SetIndex( cIndex )                  INLINE (::Owner:Area)->( dbSetIndex( cIndex ) )
+   METHOD SetOrder( nOrder )                  INLINE (::Owner:Area)->( dbSetOrder( nOrder ) )
    METHOD Select( cAlias )                    INLINE IIF( ! EMPTY(cAlias), Select(cAlias), dbSelectArea( ::Owner:Area ) )
    METHOD SelectArea()                        INLINE dbSelectArea( ::Owner:Area )
-   METHOD Delete()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbDelete() ),)
-   METHOD Recall()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbRecall() ),)
-   METHOD Seek( xKey, lSoft )                 INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSeek( xKey, lSoft ) ),)
-   METHOD Found()                             INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Found() ),)
-   METHOD SetDriver( cDriver )                INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetDriver( cDriver ) ),)
-   METHOD CreateIndex( cName, xKey, lUnique ) INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbCreateIndex( cName, xKey, &("{||"+xKey+"}"), lUnique ) ),)
-   METHOD IndexOrd()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( IndexOrd() ),)
-   METHOD Zap()                               INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( __dbZap() ),)
-   METHOD OrdCount()                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdCount() ),)
-   METHOD OrdName(n)                          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdName(n) ),)
-   METHOD OrdNumber(cOrd,cBag)                INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdNumber(cOrd,cBag) ),)
-   METHOD OrdBagName(n)                       INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdBagName(n) ),)
-   METHOD OrdKey(n)                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKey(n) ), )
-   METHOD Struct()                            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbStruct() ),)
-   METHOD OrdKeyGoTo( nPos )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKeyGoTo( nPos ) ),)
-   METHOD SetFilter( b, c )                   INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( dbSetFilter( b, c ) ),)
-   METHOD OrdKeyCount()                       INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKeyCount() ),)
-   METHOD Used()                              INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( Used() ),)
-   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdDescend( cnOrder, cFile, lDescend ) ),)
+   METHOD Delete()                            INLINE (::Owner:Area)->( dbDelete() )
+   METHOD Recall()                            INLINE (::Owner:Area)->( dbRecall() )
+   METHOD Seek( xKey, lSoft )                 INLINE (::Owner:Area)->( dbSeek( xKey, lSoft ) )
+   METHOD Found()                             INLINE (::Owner:Area)->( Found() )
+   METHOD SetDriver( cDriver )                INLINE (::Owner:Area)->( dbSetDriver( cDriver ) )
+   METHOD CreateIndex( cName, xKey, lUnique ) INLINE (::Owner:Area)->( dbCreateIndex( cName, xKey, &("{||"+xKey+"}"), lUnique ) )
+   METHOD IndexOrd()                          INLINE (::Owner:Area)->( IndexOrd() )
+   METHOD Zap()                               INLINE (::Owner:Area)->( __dbZap() )
+   METHOD OrdCount()                          INLINE (::Owner:Area)->( OrdCount() )
+   METHOD OrdName(n)                          INLINE (::Owner:Area)->( OrdName(n) )
+   METHOD OrdNumber(cOrd,cBag)                INLINE (::Owner:Area)->( OrdNumber(cOrd,cBag) )
+   METHOD OrdBagName(n)                       INLINE (::Owner:Area)->( OrdBagName(n) )
+   METHOD OrdKey(n)                           INLINE (::Owner:Area)->( OrdKey(n) )
+   METHOD Struct()                            INLINE (::Owner:Area)->( dbStruct() )
+   METHOD OrdKeyGoTo( nPos )                  INLINE (::Owner:Area)->( OrdKeyGoTo( nPos ) )
+   METHOD SetFilter( b, c )                   INLINE (::Owner:Area)->( dbSetFilter( b, c ) )
+   METHOD OrdKeyCount()                       INLINE (::Owner:Area)->( OrdKeyCount() )
+   METHOD Used()                              INLINE (::Owner:Area)->( Used() )
+   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE (::Owner:Area)->( OrdDescend( cnOrder, cFile, lDescend ) )
    METHOD SetRelation()
-   METHOD FieldPut( nField, xVal )            INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldPut( nField, xVal ) ),)
-   METHOD FieldGet( nField )                  INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldGet( nField ) ),)
-   METHOD FieldType( nField )                 INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( FieldType( nField ) ),)
-   METHOD OrdBagExt()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdBagExt() ),)
-   METHOD MemoExt()                           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( RddInfo( RDDI_MEMOEXT ) ), )
+   METHOD FieldPut( nField, xVal )            INLINE (::Owner:Area)->( FieldPut( nField, xVal ) )
+   METHOD FieldGet( nField )                  INLINE (::Owner:Area)->( FieldGet( nField ) )
+   METHOD FieldType( nField )                 INLINE (::Owner:Area)->( FieldType( nField ) )
+   METHOD OrdBagExt()                         INLINE (::Owner:Area)->( OrdBagExt() )
+   METHOD MemoExt()                           INLINE (::Owner:Area)->( RddInfo( RDDI_MEMOEXT ) )
 
    METHOD CreateTable( cFile, aStru, cDriver) INLINE dbCreate( cFile, aStru, cDriver )
    METHOD Gather()
@@ -564,9 +584,9 @@ CLASS DataRdd
    METHOD OrdKeyRelPos(n)
    METHOD OrdKeyNo()
    METHOD OrdkeyNoRaw()
-   METHOD OrdKeyVal()                         INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( OrdKeyVal() ),)
-   METHOD RddInfo( nType, nSetting )          INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( RddInfo( nType, nSetting, ::Owner:Driver ) ), )
-   METHOD DbInfo( nType, nSetting )           INLINE IIF( SELECT( ::Owner:Alias ) > 0, (::Owner:Alias)->( DbInfo( nType, nSetting ) ), )
+   METHOD OrdKeyVal()                         INLINE (::Owner:Area)->( OrdKeyVal() )
+   METHOD RddInfo( nType, nSetting )          INLINE (::Owner:Area)->( RddInfo( nType, nSetting, ::Owner:Driver ) )
+   METHOD DbInfo( nType, nSetting )           INLINE (::Owner:Area)->( DbInfo( nType, nSetting ) )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -578,7 +598,7 @@ RETURN Self
 METHOD OrdKeyRelPos(n) CLASS DataRdd
    LOCAL nRelPos := 0
    IF ::Owner:IsOpen
-      nRelPos := (::Owner:Alias)->( OrdKeyRelPos(n) )
+      nRelPos := (::Owner:Area)->( OrdKeyRelPos(n) )
       IF VALTYPE(nRelPos)=="C"
          IF EMPTY(nRelPos)
             nRelPos := NIL
@@ -586,7 +606,7 @@ METHOD OrdKeyRelPos(n) CLASS DataRdd
             nRelPos := VAL(nRelPos)
          ENDIF
       ENDIF
-      DEFAULT nRelPos TO (::Owner:Alias)->( OrdKeyNo() )
+      DEFAULT nRelPos TO (::Owner:Area)->( OrdKeyNo() )
       IF VALTYPE(nRelPos)=="C"
          nRelPos := VAL(nRelPos)
       ENDIF
@@ -595,22 +615,22 @@ RETURN nRelPos
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OrdKeyNo() CLASS DataRdd
-   LOCAL nPos := (::Owner:Alias)->( OrdKeyNo() )
-   DEFAULT nPos TO (::Owner:Alias)->( Recno() )
+   LOCAL nPos := (::Owner:Area)->( OrdKeyNo() )
+   DEFAULT nPos TO (::Owner:Area)->( Recno() )
 RETURN nPos
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OrdKeyNoRaw() CLASS DataRdd
-   LOCAL nPos := (::Owner:Alias)->( dbOrderInfo( DBOI_KEYNORAW ) )
+   LOCAL nPos := (::Owner:Area)->( dbOrderInfo( DBOI_KEYNORAW ) )
    DEFAULT nPos TO ::OrdKeyNo()
 RETURN nPos
-   
+
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SetRelation( oData, xKey, lAdditive ) CLASS DataRdd
    LOCAL bKey, cKey
    DEFAULT lAdditive TO FALSE
-   
+
    IF !lAdditive
       (::Owner:Area)->( dbClearRel() )
    ENDIF
@@ -635,14 +655,14 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
    LOCAL nAlias, cAlias, oErr
    LOCAL cEvent, n, nServer, cFile, lDef := .T.
    DEFAULT lIgnoreAO TO .F.
-   
+
    IF VALTYPE( ::Owner:SqlConnector ) == "C"
       RETURN .F.
    ENDIF
-   
+
    IF ( ::Owner:AutoOpen .OR. lIgnoreAO ) .AND. ( ( !::Owner:IsOpen .AND. !EMPTY( ::Owner:FileName ) ) .OR. ::Owner:__lMemory )
       ExecuteEvent( "OnInit", ::Owner )
-      
+
       IF !::Owner:__lMemory
          IF ::Owner:Driver IN { "SQLRDD", "SQLEX" }
             IF ::Owner:__ClassInst != NIL
@@ -702,7 +722,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       IF !::Owner:__lMemory .AND. ::Owner:Driver != NIL .AND. ::Owner:Driver != NIL .AND. UPPER( ::Owner:Driver ) $ "ADSCDXADSNTXADSADT" .AND. __objHasMsg( ::Owner, "ServerType" )
          nServer := ::Owner:AdsSetServerType( ::Owner:ServerType )
       ENDIF
-      
+
       IF ::Owner:__lMemory
          cFile := "mem:"+::Owner:Name
          IF EMPTY( ::Owner:Structure )
@@ -720,14 +740,14 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             END
          ENDIF
       ENDIF
-      
+
       nAlias := 1
       cAlias := ::Owner:xAlias
       IF EMPTY( cAlias )
          cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
          cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
       ENDIF
-      
+
       IF Select( cAlias ) > 0
          WHILE Select( cAlias + XSTR( nAlias ) ) > 0
             nAlias ++
@@ -787,12 +807,12 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       DEFAULT ::Owner:xAlias TO Alias()
 
       ::Owner:Area := Select()
-      ::Owner:Structure := (::Owner:Alias)->( dbStruct() )
-      
+      ::Owner:Structure := (::Owner:Area)->( dbStruct() )
+
       AEVAL( ::Owner:Structure, {|,n| ASIZE( ::Owner:Structure[n], 4 )} )
-      
+
       ::Owner:CreateFields()
-      
+
       IF HGetPos( ::Owner:EventHandler, "OnOpen" ) != 0
          cEvent := ::Owner:EventHandler[ "OnOpen" ]
          IF __objHasMsg( ::Owner:Form, cEvent )
@@ -807,13 +827,13 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Scatter() CLASS DataRdd
    ::Owner:aScatter := ARRAY( LEN( ::Owner:Structure ) )
-   aEval( ::Owner:aScatter, {|,n| ::Owner:aScatter[n] := (::Owner:Alias)->( FieldGet(n) ) } )
+   aEval( ::Owner:aScatter, {|,n| ::Owner:aScatter[n] := (::Owner:Area)->( FieldGet(n) ) } )
    ::Owner:Load( .T. )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Gather() CLASS DataRdd
-   aEval( ::Owner:aScatter, {|,n| (::Owner:Alias)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
+   aEval( ::Owner:aScatter, {|,n| (::Owner:Area)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -878,15 +898,15 @@ CLASS SocketRdd
    METHOD FieldPut( nField, xVal )            INLINE ::Request( "FieldPut", { nField, xVal } )
    METHOD FieldGet( nField )                  INLINE ::Request( "FieldGet", { nField } )
    METHOD FieldType( nField )                 INLINE ::Request( "FieldType", { nField } )
-   METHOD Gather()                            INLINE ::Request( "Gather" ) 
-   METHOD Scatter( aData )                    INLINE ::Request( "Scatter", {aData} ) 
+   METHOD Gather()                            INLINE ::Request( "Gather" )
+   METHOD Scatter( aData )                    INLINE ::Request( "Scatter", {aData} )
    METHOD SetRelation()
    METHOD Request()
-   METHOD OrdKeyRelPos(n)                     INLINE ::Request( "OrdKeyRelPos", {n} ) 
-   METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" ) 
-   METHOD OrdKeyRaw()                         INLINE ::Request( "OrdKeyNoRaw" ) 
-   METHOD OrdKeyVal()                         INLINE ::Request( "OrdKeyVal" ) 
-   METHOD OrdBagExt()                         INLINE ::Request( "OrdBagExt" ) 
+   METHOD OrdKeyRelPos(n)                     INLINE ::Request( "OrdKeyRelPos", {n} )
+   METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" )
+   METHOD OrdKeyRaw()                         INLINE ::Request( "OrdKeyNoRaw" )
+   METHOD OrdKeyVal()                         INLINE ::Request( "OrdKeyVal" )
+   METHOD OrdBagExt()                         INLINE ::Request( "OrdBagExt" )
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS SocketRdd
@@ -910,7 +930,7 @@ RETURN Self
 METHOD SetRelation( oData, xKey, lAdditive ) CLASS SocketRdd
    LOCAL bKey, cKey
    DEFAULT lAdditive TO FALSE
-   
+
    IF !lAdditive
       ::Request( "dbClearRel" )
    ENDIF
@@ -932,14 +952,14 @@ METHOD Request( cFuncName, aParams ) CLASS SocketRdd
    LOCAL cData, cRecData, hSock, nSecs
    LOCAL lRet := .F., n, cSendStr := "SOCKETRDD|Request|"+::Owner:Alias+"|"+cFuncName
    DEFAULT aParams TO {}
-   
+
    FOR n := 1 TO LEN( aParams )
        cSendStr += "|" + ValToPrgExp( aParams[n] )
    NEXT
-   
+
    IF ::Owner:__ClassInst == NIL .AND. ::Owner:Socket:Connected
       ::Owner:Socket:Send( cSendStr )
-      
+
       hSock := ::Owner:Socket:Handle
       cRecData := ""
 
@@ -999,10 +1019,10 @@ CLASS RddSQL
    METHOD OrdKeyGoTo( nPos )                  INLINE ::Request( "OrdKeyGoTo", {nPos} )
    METHOD OrdKeyCount()                       INLINE ::Request( "OrdKeyCount" )
    METHOD FieldGet( nField )                  INLINE ::Request( "FieldGet", { nField } )
-   METHOD Gather()                            INLINE ::Request( "Gather" ) 
-   METHOD Scatter( aData )                    INLINE ::Request( "Scatter", {aData} ) 
-   METHOD OrdKeyRelPos(n)                     INLINE ::Request( "OrdKeyRelPos", {n} ) 
-   METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" ) 
+   METHOD Gather()                            INLINE ::Request( "Gather" )
+   METHOD Scatter( aData )                    INLINE ::Request( "Scatter", {aData} )
+   METHOD OrdKeyRelPos(n)                     INLINE ::Request( "OrdKeyRelPos", {n} )
+   METHOD OrdKeyNo()                          INLINE ::Request( "OrdKeyNo" )
 */
 ENDCLASS
 

@@ -3403,7 +3403,6 @@ METHOD Show( nShow ) CLASS Window
    IF nShow == SW_HIDE
       RETURN ::Hide()
    ENDIF
-//   VIEW ::Visible, ::IsWindowVisible()
 
    IF ::hWnd != NIL
       IF ::AnimationStyle != NIL .AND. ::AnimationStyle <> 0 .AND. ::__ClassInst == NIL
