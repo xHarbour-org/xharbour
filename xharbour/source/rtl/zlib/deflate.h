@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 /* deflate.h -- internal compression state
  * Copyright (C) 1995-2012 Jean-loup Gailly
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -107,7 +104,7 @@ typedef struct internal_state {
     int   wrap;          /* bit 0 true for zlib, bit 1 true for gzip */
     gz_headerp  gzhead;  /* gzip header information to write */
     uInt   gzindex;      /* where in extra, name, or comment */
-    Byte  method;        /* STORED (for zip only) or DEFLATED */
+    Byte  method;        /* can only be DEFLATED */
     int   last_flush;    /* value of flush param for previous deflate call */
 
                 /* used by deflate.c: */

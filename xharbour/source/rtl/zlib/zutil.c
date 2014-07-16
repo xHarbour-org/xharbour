@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 /* zutil.c -- target dependent utility functions for the compression library
  * Copyright (C) 1995-2005, 2010, 2011, 2012 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -17,7 +14,7 @@
 struct internal_state      {int dummy;}; /* for buggy compilers */
 #endif
 
-const char * const z_errmsg[10] = {
+z_const char * const z_errmsg[10] = {
 "need dictionary",     /* Z_NEED_DICT       2  */
 "stream end",          /* Z_STREAM_END      1  */
 "",                    /* Z_OK              0  */
@@ -30,12 +27,12 @@ const char * const z_errmsg[10] = {
 ""};
 
 
-const char * ZEXPORT zlibVersion( void )
+const char * ZEXPORT zlibVersion()
 {
     return ZLIB_VERSION;
 }
 
-uLong ZEXPORT zlibCompileFlags( void )
+uLong ZEXPORT zlibCompileFlags()
 {
     uLong flags;
 

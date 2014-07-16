@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 /* header created automatically with -DGEN_TREES_H */
 
 local const ct_data static_ltree[L_CODES+2] = {

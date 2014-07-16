@@ -9,6 +9,10 @@
 */
 
 
+2014-07-16 16:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/zlib
+    ! updated to 1.2.8
+
 2014-07-06 20:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include/button.ch
     ! reverted previous change

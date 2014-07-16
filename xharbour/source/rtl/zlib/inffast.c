@@ -1,8 +1,5 @@
-/*
- * $Id$
- */
 /* inffast.c -- fast decoding
- * Copyright (C) 1995-2008, 2010 Mark Adler
+ * Copyright (C) 1995-2008, 2010, 2013 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -68,12 +65,12 @@
       output space.
  */
 void ZLIB_INTERNAL inflate_fast(
-z_streamp strm,
-unsigned start)         /* inflate()'s starting value for strm->avail_out */
+	z_streamp strm,
+	unsigned start)         /* inflate()'s starting value for strm->avail_out */
 {
     struct inflate_state FAR *state;
-    unsigned char FAR *in;      /* local strm->next_in */
-    unsigned char FAR *last;    /* while in < last, enough input available */
+    z_const unsigned char FAR *in;      /* local strm->next_in */
+    z_const unsigned char FAR *last;    /* have enough input while in < last */
     unsigned char FAR *out;     /* local strm->next_out */
     unsigned char FAR *beg;     /* inflate()'s initial strm->next_out */
     unsigned char FAR *end;     /* while out < end, enough space available */

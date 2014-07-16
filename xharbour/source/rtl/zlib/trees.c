@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 /* trees.c -- output deflated data using Huffman coding
  * Copyright (C) 1995-2012 Jean-loup Gailly
  * detect_data_type() function provided freely by Cosmin Truta, 2006
@@ -149,8 +146,8 @@ local void send_tree      OF((deflate_state *s, ct_data *tree, int max_code));
 local int  build_bl_tree  OF((deflate_state *s));
 local void send_all_trees OF((deflate_state *s, int lcodes, int dcodes,
                               int blcodes));
-local void compress_block OF((deflate_state *s, ct_data *ltree,
-                              ct_data *dtree));
+local void compress_block OF((deflate_state *s, const ct_data *ltree,
+                              const ct_data *dtree));
 local int  detect_data_type OF((deflate_state *s));
 local unsigned bi_reverse OF((unsigned value, int length));
 local void bi_windup      OF((deflate_state *s));
@@ -234,7 +231,7 @@ local void send_bits(
 /* ===========================================================================
  * Initialize the various 'constant' tables.
  */
-local void tr_static_init( void )
+local void tr_static_init()
 {
 #if defined(GEN_TREES_H) || !defined(STDC)
     static int static_init_done = 0;
@@ -456,7 +453,7 @@ local void init_block(
 local void pqdownheap(
     deflate_state *s,
     ct_data *tree,  /* the tree to restore */
-    int k)               /* node to move down */
+    int k)          /* node to move down */
 {
     int v = s->heap[k];
     int j = k << 1;  /* left son of k */
@@ -753,7 +750,7 @@ local void scan_tree (
 local void send_tree (
     deflate_state *s,
     ct_data *tree, /* the tree to be scanned */
-    int max_code)       /* and its largest code of non zero frequency */
+    int max_code)  /* and its largest code of non zero frequency */
 {
     int n;                     /* iterates over all tree elements */
     int prevlen = -1;          /* last emitted length */
@@ -975,7 +972,8 @@ void ZLIB_INTERNAL _tr_flush_block(
     } else if (s->strategy == Z_FIXED || static_lenb == opt_lenb) {
 #endif
         send_bits(s, (STATIC_TREES<<1)+last, 3);
-        compress_block(s, (ct_data *)static_ltree, (ct_data *)static_dtree);
+        compress_block(s, (const ct_data *)static_ltree,
+                       (const ct_data *)static_dtree);
 #ifdef DEBUG
         s->compressed_len += 3 + s->static_len;
 #endif
@@ -983,7 +981,8 @@ void ZLIB_INTERNAL _tr_flush_block(
         send_bits(s, (DYN_TREES<<1)+last, 3);
         send_all_trees(s, s->l_desc.max_code+1, s->d_desc.max_code+1,
                        max_blindex+1);
-        compress_block(s, (ct_data *)s->dyn_ltree, (ct_data *)s->dyn_dtree);
+        compress_block(s, (const ct_data *)s->dyn_ltree,
+                       (const ct_data *)s->dyn_dtree);
 #ifdef DEBUG
         s->compressed_len += 3 + s->opt_len;
 #endif
@@ -1060,8 +1059,8 @@ int ZLIB_INTERNAL _tr_tally (
  */
 local void compress_block(
     deflate_state *s,
-    ct_data *ltree, /* literal tree */
-    ct_data *dtree) /* distance tree */
+    const ct_data *ltree, /* literal tree */
+    const ct_data *dtree) /* distance tree */
 {
     unsigned dist;      /* distance of matched string */
     int lc;             /* match length or unmatched char (if dist == 0) */

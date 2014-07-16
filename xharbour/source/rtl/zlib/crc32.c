@@ -1,6 +1,3 @@
-/*
- * $Id$
- */
 /* crc32.c -- compute the CRC-32 of a data stream
  * Copyright (C) 1995-2006, 2010, 2011, 2012 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
@@ -167,9 +164,9 @@ local void make_crc_table()
 }
 
 #ifdef MAKECRCH
-local void write_table(
-    FILE *out,
-    const z_crc_t FAR *table)
+local void write_table(out, table)
+    FILE *out;
+    const z_crc_t FAR *table;
 {
     int n;
 
@@ -190,7 +187,7 @@ local void write_table(
 /* =========================================================================
  * This function can be used by asm versions of crc32()
  */
-const z_crc_t FAR * ZEXPORT get_crc_table( void )
+const z_crc_t FAR * ZEXPORT get_crc_table()
 {
 #ifdef DYNAMIC_CRC_TABLE
     if (crc_table_empty)
