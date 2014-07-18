@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2014-07-17 21:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/rtl/zlib/gzguts.h
+  * source/rtl/zlib/gzlib.c
+    ! updated for compile with pcc
 
 2014-07-16 16:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/zlib

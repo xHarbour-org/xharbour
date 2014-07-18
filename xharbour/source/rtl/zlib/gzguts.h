@@ -3,6 +3,15 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
+#if defined( __POCC__ )
+#elif defined( _MSC_VER )
+   #if ( _MSC_VER >= 1400 ) && !defined( _CRT_SECURE_NO_WARNINGS )
+      #define _CRT_SECURE_NO_WARNINGS
+   #endif
+   #pragma warning (disable:4996)
+   #pragma warning (disable:4244)
+#endif
+
 #ifdef _LARGEFILE64_SOURCE
 #  ifndef _LARGEFILE_SOURCE
 #    define _LARGEFILE_SOURCE 1
@@ -129,10 +138,16 @@
 
 /* provide prototypes for these when building zlib without LFS */
 #if !defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0
+    #if defined(__cplusplus)
+       extern "C" {
+    #endif
     ZEXTERN gzFile ZEXPORT gzopen64 OF((const char *, const char *));
     ZEXTERN z_off64_t ZEXPORT gzseek64 OF((gzFile, z_off64_t, int));
     ZEXTERN z_off64_t ZEXPORT gztell64 OF((gzFile));
     ZEXTERN z_off64_t ZEXPORT gzoffset64 OF((gzFile));
+    #if defined(__cplusplus)
+       }
+    #endif
 #endif
 
 /* default memLevel */
