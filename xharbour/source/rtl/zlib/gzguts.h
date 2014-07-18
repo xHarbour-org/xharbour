@@ -109,7 +109,9 @@
    termination of the result -- however this is only used in gzlib.c where
    the result is assured to fit in the space provided */
 #ifdef _MSC_VER
-#  define snprintf _snprintf
+   #if ! defined( __XCC__ )
+      #  define snprintf _snprintf
+   #endif
 #endif
 
 #ifndef local

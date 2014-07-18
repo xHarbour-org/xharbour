@@ -58,7 +58,7 @@ PROCEDURE Main( cParam1, cParam2 )
    
    HB_PushSignalHandler( HB_SIGNAL_ALL, "Handle" )
    // a newer push will override previous ones
-   HB_PushSignalHandler( HB_SIGNAL_FAULT + HB_SIGNAL_MATHERR, @SignalFault())
+   HB_PushSignalHandler( HB_SIGNAL_ALL, @SignalFault())
    
 
 #ifdef HB_THREAD_SUPPORT
