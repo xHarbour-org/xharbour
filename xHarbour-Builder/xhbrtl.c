@@ -4,6 +4,8 @@
 
 #include "hbapi.h"
 
+#ifdef __XCC__
+
 unsigned long _doserrno = 0;
 
 #if 0
@@ -95,30 +97,6 @@ static struct errentry errtable[] = {
 #define MIN_EACCES_RANGE ERROR_WRITE_PROTECT
 #define MAX_EACCES_RANGE ERROR_SHARING_BUFFER_EXCEEDED
 
-#ifdef DEMO
-   extern void hb_vmAtInit( void (*pFunc)(void), void *cargo );
-
-   void xHB_DemoInit( void )
-   {
-      OutputDebugString( "Demo Startup\n" );
-
-      if( hb_dynsymFind( "WINAPIVER" ) == NULL )
-      {
-         MessageBox( 0, (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2007 xHarbour.com Inc. \n http://www.xHarbour.com" , (LPCSTR) "xHarbour Builder Demo", MB_OK | MB_ICONINFORMATION ) ;
-      }
-   }
-
-   void xHbSetInit( void )
-   {
-     hb_vmAtInit( xHB_DemoInit, NULL );
-   }
-
-   #pragma startup xHbSetInit
-
-   //#pragma startup xHbStartDemo
-   //#pragma exit    xHbEndDemo
-#endif
-
 unsigned int _inp(unsigned int port)
 {
    __asm {
@@ -177,6 +155,7 @@ retsign:        sar     edx,31
                 ret
     };
 }
+
 #undef isascii
 int isascii( int c )
 {
@@ -264,6 +243,32 @@ COORD xCCGetLargestConsoleWindowSize( HANDLE h )
    }
 #endif
 
+#endif
+
+#ifdef DEMO
+   extern void hb_vmAtInit( void (*pFunc)(void), void *cargo );
+
+   void xHB_DemoInit( void )
+   {
+      OutputDebugString( "Demo Startup\n" );
+
+      if( hb_dynsymFind( "WINAPIVER" ) == NULL )
+      {
+         MessageBox( 0, (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2007 xHarbour.com Inc. \n http://www.xHarbour.com" , (LPCSTR) "xHarbour Builder Demo", MB_OK | MB_ICONINFORMATION ) ;
+      }
+   }
+
+   void xHbSetInit( void )
+   {
+     hb_vmAtInit( xHB_DemoInit, NULL );
+   }
+
+   #pragma startup xHbSetInit
+
+   //#pragma startup xHbStartDemo
+   //#pragma exit    xHbEndDemo
+#endif
+
 /* Patch an address of the dynamic function */
 void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
 {
@@ -279,7 +284,6 @@ void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
 /* #elseif ... */
 /* #endif */
 }
-
 
 /* Intel specific ?? Patch an address relative to the next instruction */
 void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext )

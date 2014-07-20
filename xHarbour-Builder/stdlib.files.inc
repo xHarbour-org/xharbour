@@ -579,8 +579,8 @@
 [source\tip\smtpcln.prg]
 [source\tip\thtml.prg]
 [source\tip\url.prg]
+[source\tip\base64.c]
 [source\tip\encoding\uuencode.c]
-[source\tip\encoding\base64.c]
 
 
 # *** ct.lib ***
