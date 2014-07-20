@@ -9,6 +9,11 @@
 */
 
 2014-07-07 11:06   UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlex1.c
+    ! added cast to line 2205
+    ! fixed parameter passing on line  462
+    
+2014-07-07 11:06   UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlsrodbc.c
     ! minor optimize to return SQL_NUMERIC correctly in odbcGetData
 

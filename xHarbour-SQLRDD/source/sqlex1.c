@@ -459,7 +459,7 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
    }
    }
 
-            lType = ( LONG ) hb_arrayGetNL(thiswa->colStmt[lFieldPosDB - 1], FIELD_DOMAIN );
+            lType = ( LONG ) hb_arrayGetNL(pFieldStruct, FIELD_DOMAIN );
    odbcGetData( ( HSTMT ) ( HSTMT )thiswa->colStmt[lFieldPosDB - 1],hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ),pFieldData,  0,  thiswa->nSystemID, FALSE, 1 );
 //   odbcFieldGet(hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB ), pFieldData, (char * ) bBuffer, lLenOut, 0, thiswa->nSystemID, FALSE );             
 
@@ -2202,7 +2202,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       for( i=1; i <= thiswa->area.uiFieldCount; i++ )
       {
 	     
-	     bBuffer = hb_xgrab(COLUMN_BLOCK_SIZE + 1 ); 
+	     bBuffer = (char*)hb_xgrab(COLUMN_BLOCK_SIZE + 1 ); 
 	     lLen    = COLUMN_BLOCK_SIZE;
 	     memset( bBuffer, 0, COLUMN_BLOCK_SIZE ) ; 
          bOut       = NULL;

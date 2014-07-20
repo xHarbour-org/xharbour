@@ -24,7 +24,7 @@ Function Main( cRDD, cDSN )
                      {"OBS","M",10,0},;
                      {"VALUE","N",18,6}}
    local nCnn, i
-
+SR_SETSQL2008NEWTYPES(.t.)
    ? ""
    ? "demo01.exe"
    ? ""
@@ -33,14 +33,24 @@ Function Main( cRDD, cDSN )
    ? ""
 
    ? "Connecting to database..."
+   SR_SetMininumVarchar2Size( 2 ) 
+   SR_SetOracleSyntheticVirtual( .F. )
 
+   sr_usedeleteds(.f.)
    Connect( @cRDD, cDSN )    // see connect.prg
 
    ? "Connected to        :", SR_GetConnectionInfo(, SQL_DBMS_NAME ), SR_GetConnectionInfo(, SQL_DBMS_VER )
    ? "RDD in use          :", cRDD
-   ? "Creating table      :", dbCreate( "TEST_TABLE", aStruct, cRDD )
+   altd()
+   ? "Creating table      :", dbCreate( "test_table4", aStruct, cRDD )
+   ? "Creating table      :", dbCreate( "test_table41", aStruct, cRDD )
+   USE "test_table41" NEW EXCLUSIVE VIA cRDD
+   Index on CODE_ID+DESCR            tAG test_table4_IND01
+   Index on str(DAYS)+dtos(DATE_LIM) tAG test_table4_IND02
+   index on code_id+str(DAYS)+dtos(DATE_LIM) tAG test_table4_IND03
 
-   USE "TEST_TABLE" EXCLUSIVE VIA cRDD
+
+   USE "test_table4" NEW EXCLUSIVE VIA cRDD
 
    ? "Table opened. Alias :", select(), alias(), RddName()
    ? "Fieldpos( CODE_ID ) :", Fieldpos( "CODE_ID" )
@@ -48,8 +58,11 @@ Function Main( cRDD, cDSN )
 
    ? "Creating 02 indexes..."
 
-   Index on CODE_ID+DESCR            to TEST_TABLE_IND01
-   Index on str(DAYS)+dtos(DATE_LIM) to TEST_TABLE_IND02
+   Index on CODE_ID+DESCR            to test_table4_IND01
+   Index on str(DAYS)+dtos(DATE_LIM) to test_table4_IND02
+   index on code_id+str(DAYS)+dtos(DATE_LIM) to test_table4_IND03
+   index on dtos(date_lim) to test_table4_IND04
+
 
    ? "Appending " + alltrim(str(RECORDS_IN_TEST)) + " records.."
 
@@ -60,7 +73,7 @@ Function Main( cRDD, cDSN )
       Replace CODE_ID  with strZero( i, 5 )
       Replace DESCR    with dtoc( date() ) + " - " + time()
       Replace DAYS     with (RECORDS_IN_TEST - i)
-      Replace DATE_LIM with date()
+      Replace DATE_LIM with date() + if(i%2 == 0,4,if(i%3==0,12,3))
       Replace ENABLE   with .T.
       Replace OBS      with "This is a memo field. Seconds since midnight : " + alltrim(str(seconds()))
    Next
@@ -68,11 +81,34 @@ Function Main( cRDD, cDSN )
    ? "dbClearIndex()      :", dbClearIndex()
    ? "dbCloseArea()       :", dbCloseArea()
 
-   USE "TEST_TABLE" SHARED VIA cRDD
+   USE "test_table4" SHARED VIA cRDD
 
    ? "Opening Indexes"
-   SET INDEX TO TEST_TABLE_IND01
-   SET INDEX TO TEST_TABLE_IND02 ADDITIVE
+   SET INDEX TO test_table4_IND01
+   SET INDEX TO test_table4_IND02 ADDITIVE
+   SET INDEX TO test_table4_IND03 ADDITIVE
+   SET INDEX TO test_table4_IND04 ADDITIVE
+altd()
+set order to 4
+?"dbseek( dtos(date()),.t.)   ",dbseek( dtos(date()),.t.),date_lim
+?"dbseek( dtos(date()+4),.t.) ",dbseek( dtos(date()+4),.t.),date_lim
+?"dbseek( dtos(date()+5),.t.) ",dbseek( dtos(date()+5),.t.),date_lim
+?"dbseek( dtos(date()+12),.t.)",dbseek( dtos(date()+12),.t.),date_lim
+?"dbseek( dtos(date()))       ",dbseek( dtos(date())),date_lim
+?"dbseek( dtos(date()+4))     ",dbseek( dtos(date()+4)),date_lim
+?"dbseek( dtos(date()+5))     ",dbseek( dtos(date()+5)),date_lim
+?"dbseek( dtos(date()+12))    ",dbseek( dtos(date()+12)),date_lim
+inkey(0)
+   sr_starttrace()
+set order to 1
+go top
+BROWSE()
+set order to 2
+go top
+BROWSE()
+set order to 3
+go top
+BROWSE()
 
    ? "Set Order to 1      :", OrdSetFocus(1)
    ? "Seek                :", dbSeek( "00002" )
