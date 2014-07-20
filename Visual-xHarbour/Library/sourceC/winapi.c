@@ -141,7 +141,9 @@ typedef struct _TASKDIALOGCONFIG {
   UINT                           cxWidth;
 } TASKDIALOGCONFIG;
 
-#define KEY_WOW64_64KEY 0x0100
+#if defined( __XCC__ )
+   #define KEY_WOW64_64KEY 0x0100
+#endif
 
 typedef struct _DWM_BLURBEHIND {
     DWORD dwFlags;
@@ -594,10 +596,10 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
 
    if( hMAPI )
    {
-      pMAPISendMail      = (ULONG (WINAPI *)(LHANDLE,ULONG,lpMapiMessage,FLAGS,ULONG)) GetProcAddress( hMAPI, "MAPISendMail" );
-      pMAPISendDocuments = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,LPTSTR,ULONG))        GetProcAddress( hMAPI, "MAPISendDocuments" );
-      pMAPILogon         = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,FLAGS,ULONG,LHANDLE)) GetProcAddress( hMAPI, "MAPILogon" );
-      pMAPILogoff        = (ULONG (WINAPI *)(LHANDLE,ULONG,FLAGS))                     GetProcAddress( hMAPI, "MAPILogoff" );
+      pMAPISendMail      = (ULONG (WINAPI *)(LHANDLE,ULONG,lpMapiMessage,FLAGS,ULONG))   GetProcAddress( hMAPI, "MAPISendMail" );
+      pMAPISendDocuments = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,LPTSTR,ULONG))          GetProcAddress( hMAPI, "MAPISendDocuments" );
+      pMAPILogon         = (ULONG (WINAPI *)(ULONG,LPTSTR,LPTSTR,FLAGS,ULONG,LPLHANDLE)) GetProcAddress( hMAPI, "MAPILogon" );
+      pMAPILogoff        = (ULONG (WINAPI *)(LHANDLE,ULONG,FLAGS,ULONG))                 GetProcAddress( hMAPI, "MAPILogoff" );
    }
 
    if( hOleDlg )
