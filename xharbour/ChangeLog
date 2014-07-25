@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-07-24 19:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * bin/bld_vc.bat
+    * Added missing VS support to match make_vc.bat
+
 2014-07-22 21:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * make_vc.bat
     ! Minor refinment
