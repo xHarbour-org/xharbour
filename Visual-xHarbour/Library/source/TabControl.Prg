@@ -69,10 +69,10 @@ CLASS TabControl INHERIT Control
    DATA __nPrevHot       PROTECTED INIT 0
    DATA __nHot           PROTECTED INIT 0
    DATA __nPrevHot       PROTECTED INIT 0
-   
+
    DATA __pUpDnPtr       PROTECTED
    DATA __lMouseDown     PROTECTED INIT .F.
-   DATA __ColorTable     PROTECTED 
+   DATA __ColorTable     PROTECTED
 
    DATA __UpDn           PROTECTED
 
@@ -147,7 +147,7 @@ CLASS TabControl INHERIT Control
    METHOD OnParentNotify()
    METHOD OnEraseBkGnd()             INLINE IIF( ! ::Theming .OR. ! IsThemeActive(), NIL, 1 )
 
-   METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),; 
+   METHOD SetPos(n,l)                INLINE ::SetStyle(n,l),;
                                             IIF( ::IsWindow(),;
                                                ( SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ),;
                                             ::__OnParentSize( ::ClientWidth, ::ClientHeight ) ),)
@@ -166,14 +166,14 @@ CLASS TabControl INHERIT Control
    METHOD OnHScroll(x,y,n)           INLINE ::Super:OnHScroll(x,y,n)
    METHOD Hide()
    METHOD Show()
-   
+
    METHOD OnMouseMove()
    METHOD OnMouseLeave(n,l)    INLINE ::Super:OnMouseLeave(n,l), ::__nPrevHot := 0, ::__nHot := 0, ::InvalidateRect(, .F. ), NIL
 
    METHOD OnUserMsg(n)
-   
+
    METHOD OnLButtonDown()
-   
+
    METHOD __OnParentSize()
    METHOD __SetTabPosition()
    METHOD SelectPage()
@@ -321,7 +321,7 @@ RETURN Self
 METHOD OnSize(w,l) CLASS TabControl
    LOCAL oPage
    Super:OnSize(w,l)
-   IF ::IsWindowVisible() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel 
+   IF ::IsWindowVisible() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
       IF oPage != NIL
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
@@ -478,7 +478,7 @@ METHOD OnPaint() CLASS TabControl
    IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
       hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
       WHILE hWnd <> 0
-         IF GetClassName( hWnd ) == "msctls_updown32" 
+         IF GetClassName( hWnd ) == "msctls_updown32"
             ::__UpDn := hWnd
             DestroyWindow( hWnd )
             EXIT
@@ -519,13 +519,13 @@ METHOD OnPaint() CLASS TabControl
       SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
    ENDIF
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
-   
+
    IF ::Theming .AND. IsThemeActive()
       DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_PANE, , aRect  )
     ELSE
       _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
    ENDIF
-   
+
    nItems := ::GetItemCount()
    IF ( ::ShowTabs .OR. ::__ClassInst != NIL ) .AND. nItems > 0
       FOR n := nItems TO 1 STEP -1
@@ -568,7 +568,7 @@ METHOD OnPaint() CLASS TabControl
       NEXT
 
       aItem := ::GetItemRect( nSel )
- 
+
       aItem[1]-= 2
       aItem[3]+= 2
       aItem[2]-=1
@@ -663,7 +663,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
            IF VALTYPE( lAllow := ExecuteEvent( "OnTabChanging", Self ) ) != "L"
               lAllow := NIL
            ENDIF
-           
+
            DEFAULT lAllow TO .T.
            IF !lAllow
               RETURN(1)
@@ -824,7 +824,7 @@ CLASS TabPage INHERIT Dialog
    DATA MinHeight          EXPORTED  INIT 0
    DATA MaxWidth           EXPORTED  INIT 0
    DATA MaxHeight          EXPORTED  INIT 0
-   
+
    DATA Left               EXPORTED
    DATA Top                EXPORTED
    DATA Width              EXPORTED
@@ -891,7 +891,7 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, acResource ) CLASS TabPage
    DEFAULT ::__xCtrlName TO "TabPage"
-   
+
    ::Super:Init( oParent, acResource )
    ::__hObjects    := NIL
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -989,7 +989,7 @@ METHOD Create() CLASS TabPage
 
    tci := (struct TCITEM)
    tci:mask    := TCIF_IMAGE | TCIF_TEXT | TCIF_PARAM
-   
+
    cText := ::Caption
 
    IF ::__ClassInst == NIL
@@ -1073,16 +1073,16 @@ METHOD Create() CLASS TabPage
             RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( cText[n+1] ) )
          ENDIF
       ENDIF
-     
+
       IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
          ::HideTab()
        ELSE
          ::ShowTab()
          ::Parent:SetCurSel( ::Parent:Cursel )
       ENDIF
-      
+
       ::__OnParentSize()
-      
+
       IF ::__ClassInst != NIL
          ::Application:ObjectTree:Set( Self )
          ::Application:Props[ "ComboSelect" ]:Reset()
@@ -1159,7 +1159,7 @@ RETURN nRet
 //-----------------------------------------------------------------------------------------------
 METHOD __SetPosition(n) CLASS TabPage
    LOCAL tci
-   
+
    ::Parent:SendMessage( TCM_DELETEITEM, ::__GetPosition() - 1 )
 
    tci := (struct TCITEM)
@@ -1183,17 +1183,18 @@ METHOD __SetPosition(n) CLASS TabPage
           ::Parent:Children[n]:__ClassInst:xPosition := n
        ENDIF
    NEXT
-   
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Delete() CLASS TabPage
-   ::Parent:SendMessage( TCM_DELETEITEM, ::__GetPosition() - 1 )
+   LOCAL oParent := ::Parent
+   oParent:SendMessage( TCM_DELETEITEM, ::__GetPosition() - 1 )
    Super:Destroy()
 
-   ::Parent:SetCurSel( MIN( ::Parent:CurSel, ::Parent:GetItemCount() ) )
-   IF ::Parent:CurSel > 0 .AND. ::Parent:GetItemCount() >= ::Parent:CurSel
-      ::Parent:GetItemObject():ShowTab()
+   oParent:SetCurSel( MIN( oParent:CurSel, oParent:GetItemCount() ) )
+   IF oParent:CurSel > 0 .AND. oParent:GetItemCount() >= oParent:CurSel
+      oParent:GetItemObject():ShowTab()
    ENDIF
 RETURN Self
 
@@ -1248,7 +1249,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
       rc:Bottom += 1
       IF ::Application:OsVersion:dwMajorVersion > 5
          rc:Bottom += 1
-      ENDIF      
+      ENDIF
     ELSE
       rc:Left   -= 3
       rc:Top    -= 1
@@ -1266,7 +1267,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
          rc:Bottom -= 2
       ENDIF
    ENDIF
-   
+
    ::Left    := rc:Left + ::LeftMargin
    ::Top     := rc:Top  + ::TopMargin
    ::Width   := rc:Right - rc:left - ::RightMargin - ::LeftMargin
@@ -1278,11 +1279,11 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
               ::Left += 2
               ::Top -= 2
               ::Height += 4
-              
+
          CASE ::Parent:TabPosition == 2 // Top
               ::Width += 2
               ::Height += 2
-              
+
          CASE ::Parent:TabPosition == 3 // Right
               ::Top -= 2
               ::Height += 4
@@ -1520,13 +1521,13 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 
-CLASS TabStrip INHERIT TabControl      
+CLASS TabStrip INHERIT TabControl
    DATA Border, AllowMaximize, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19
    METHOD Init()  CONSTRUCTOR
-   METHOD Create() 
+   METHOD Create()
    METHOD OnPaint()
    METHOD DrawTabStripItem()
    METHOD __GetGradienBrush()
@@ -1564,7 +1565,7 @@ METHOD OnPaint() CLASS TabStrip
 
    //---------------------------------------------------------------------------
    hBrush := ::GetBkBrush()
-  
+
    IF hBrush != NIL
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
    ENDIF
@@ -1590,7 +1591,7 @@ METHOD OnPaint() CLASS TabStrip
    hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, RGB(128,128,128) ) )
    Rectangle( hMemDC, aRect[1], aRect[2], aRect[3], aRect[4] )
    DeleteObject( SelectObject( hMemDC, hOldPen ) )
-   
+
    IF ::ShowTabs
       IF ( nItems := ::GetItemCount() ) > 0
          FOR n := nItems TO 1 STEP -1
@@ -1623,7 +1624,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
       CASE ::xTabPosition == 1
            lVert := .T.
            d := Round( (aItem[3]-aItem[1])/2, 0 ) + 0
-           aRect := { { aItem[3]+n, aItem[2]      },; 
+           aRect := { { aItem[3]+n, aItem[2]      },;
                       { aItem[1]+2, aItem[2]      },;
                       { aItem[1],   aItem[2]+ 2   },;
                       { aItem[1],   aItem[4]-10   },;
@@ -1631,7 +1632,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
                       { aItem[3]+n, aItem[4]+ d+n } }
       CASE ::xTabPosition == 2
            d := Round( (aItem[4]-aItem[2])/2, 0 ) + 0
-           aRect := { { aItem[1],      aItem[4]+n },; 
+           aRect := { { aItem[1],      aItem[4]+n },;
                       { aItem[1],      aItem[2]+2 },;
                       { aItem[1]+ 2,   aItem[2]   },;
                       { aItem[3]-10,   aItem[2]   },;
@@ -1640,7 +1641,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
       CASE ::xTabPosition == 3
            d := Round( (aItem[3]-aItem[1])/2, 0 ) + 0
            lVert := .T.
-           aRect := { { aItem[1]-n, aItem[2]      },; 
+           aRect := { { aItem[1]-n, aItem[2]      },;
                       { aItem[3]-2, aItem[2]      },;
                       { aItem[3],   aItem[2]+ 2   },;
                       { aItem[3],   aItem[4]-10   },;
@@ -1648,7 +1649,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
                       { aItem[1]-n, aItem[4]+ d+n } }
       CASE ::xTabPosition == 4
            d := Round( (aItem[4]-aItem[2])/2, 0 ) + 0
-           aRect := { { aItem[1],      aItem[2]-n },; 
+           aRect := { { aItem[1],      aItem[2]-n },;
                       { aItem[1],      aItem[4]-2 },;
                       { aItem[1]+ 2,   aItem[4]   },;
                       { aItem[3]-10,   aItem[4]   },;
@@ -1658,7 +1659,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
    oPage := ::GetItemObject( nSel )
    hRgn := _CreatePolygonRgn( aRect, ALTERNATE )
    IF hRgn != NIL
-      
+
       IF nSel > 0 .AND. oPage != NIL .AND. ::GetItemCount() >= nSel .AND. oPage:BkBrush != NIL
          hBrush := oPage:BkBrush
       ENDIF
@@ -1667,18 +1668,18 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
          hBrush := ::__GetGradienBrush( hDC, hRgn, aItem, n, d )
          lGrad := .T.
       ENDIF
-      
+
       DEFAULT hBrush TO GetStockObject( WHITE_BRUSH )
-      
+
       FillRgn( hDC, hRgn, hBrush )
-      
+
       IF lGrad
          DeleteObject( hBrush )
       ENDIF
-      
+
       DeleteObject( hRgn )
    ENDIF
-   
+
    hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, RGB(128,128,128) ) )
    _PolyLine( hDC, aRect )
    DeleteObject( SelectObject( hDC, hOldPen ) )
@@ -1702,7 +1703,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
 
    IF !EMPTY( tci:pszText )
 
-      IF oPage != NIL 
+      IF oPage != NIL
          SetTextColor( hDC, oPage:ForeColor )
       ENDIF
       IF lGrad
@@ -1710,7 +1711,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
       ENDIF
 
       SetBkMode( hDC, TRANSPARENT )
-      
+
       IF !lVert
          hOldFont := SelectObject( hDC, ::Font:Handle )
          _DrawText( hDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
@@ -1729,7 +1730,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
 
       SelectObject( hDC, hOldFont )
    ENDIF
-   
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -1742,7 +1743,7 @@ METHOD __GetGradienBrush( hDC, hRgn, aItem, n, d ) CLASS TabStrip
    nColor2 := ::ColorScheme:ToolStripGradientEnd
 
    hMemDC  := CreateCompatibleDC( hDC )
-   
+
    __aMesh      := { {=>} }
    __aMesh[1]:UpperLeft  := 0
    __aMesh[1]:LowerRight := 1
@@ -1752,13 +1753,13 @@ METHOD __GetGradienBrush( hDC, hRgn, aItem, n, d ) CLASS TabStrip
    aPt[1]:Alpha := 0
    aPt[1]:x     := aItem[1]
    aPt[1]:y     := aItem[2]
-   
+
    aPt[2]:Red   := GetRValue( nColor2 ) * 256
    aPt[2]:Green := GetGValue( nColor2 ) * 256
    aPt[2]:Blue  := GetBValue( nColor2 ) * 256
    aPt[2]:Alpha := 0
 
-   
+
    IF ::xTabPosition == 2 .OR. ::xTabPosition == 4
       aPt[2]:x     := aItem[3]+d+n
       aPt[2]:y     := aItem[4]+n
@@ -1768,7 +1769,7 @@ METHOD __GetGradienBrush( hDC, hRgn, aItem, n, d ) CLASS TabStrip
       aPt[2]:y     := aItem[4]+d+n
       x := 0
    ENDIF
-   
+
    hMemBitmap := CreateCompatibleBitmap( hDC, aPt[2]:x, aPt[2]:y )
 
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
