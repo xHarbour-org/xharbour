@@ -83,7 +83,7 @@ METHOD OnInitDialog() CLASS ColumnManager
          :Action       := {|o| o:Form:ListBox1:NewColumn() }
          :Create()
       END
-      
+
       WITH OBJECT ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:Delete
          :ToolTip:Text := "Delete"
@@ -113,7 +113,7 @@ METHOD OnInitDialog() CLASS ColumnManager
       :Dock:Bottom     := Self
       :Dock:Right      := Self
       :Create()
-      
+
       WITH OBJECT TabPage( :this )
          :Text := "Properties"
          :Create()
@@ -200,7 +200,7 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS ColManager
    ( x )
    ::nMove := ::GetTopIndex() + Int( y / ::GetItemHeight( 0 ) )
 RETURN NIL
-   
+
 METHOD OnLButtonUp() CLASS ColManager
    ::Cursor := ::System:Cursor:Arrow
    ::nMove := -1
@@ -222,14 +222,14 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ColManager
       nSel := ::GetTopIndex() + Int( y / ::GetItemHeight( 0 ) )
       IF nSel <> ::nMove .AND. nSel <> - 1 .AND. nSel < ::GetCount()
          cText := ::GetItemText( ::nMove )
-         
+
          SendMessage( ::hWnd, LB_DELETESTRING, ::nMove, 0 )
          SendMessage( ::hWnd, LB_INSERTSTRING, nSel, cText )
 
          ::Parent:Grid:Children[::nMove+1]:Position := nSel + 1
          ::nMove := nSel
       ENDIF
-   ENDIF   
+   ENDIF
 RETURN NIL
 
 METHOD OnParentMeasureItem( nwParam, nlParam, mis ) CLASS ColManager
@@ -240,21 +240,22 @@ RETURN NIL
 
 METHOD OnParentDrawItem() CLASS ColManager
    LOCAL lSelected, cText, hBrush
+   IF ::Parent != NIL
+      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED == ODS_SELECTED
 
-   lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED == ODS_SELECTED    
+      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
 
-   IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
+         hBrush := GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) )
+         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHTTEXT, COLOR_WINDOWTEXT ) ) )
+         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) ) )
 
-      hBrush := GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) )
-      SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHTTEXT, COLOR_WINDOWTEXT ) ) )
-      SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) ) )
-      
-      FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, hBrush )
-      
-      cText := ::GetItemText( ::Parent:DrawItemStruct:ItemID+1 )
-      ::Parent:DrawItemStruct:rcItem:Left += 5
-      DrawText( ::Parent:DrawItemStruct:hDC, cText, ::Parent:DrawItemStruct:rcItem, DT_SINGLELINE | DT_VCENTER )
+         FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, hBrush )
 
+         cText := ::GetItemText( ::Parent:DrawItemStruct:ItemID+1 )
+         ::Parent:DrawItemStruct:rcItem:Left += 5
+         DrawText( ::Parent:DrawItemStruct:hDC, cText, ::Parent:DrawItemStruct:rcItem, DT_SINGLELINE | DT_VCENTER )
+
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -278,8 +279,8 @@ METHOD NewColumn() CLASS ColManager
 
     ::AddItem( ATAIL( ::Parent:Grid:Children ):Name )
     ::SetCurSel( ::GetCount() )
-    
-    
+
+
     ::Parent:ItemManager:ResetProperties( {{ ::Parent:Grid:Children[ MAX( ::CurSel, 1 ) ]  }} )
     ::Parent:ItemEventManager:ResetEvents( {{ ::Parent:Grid:Children[ MAX( ::CurSel, 1 ) ]  }} )
     //::Parent:ItemManager:EditCaption()
@@ -339,7 +340,7 @@ ENDCLASS
 METHOD Init( oData ) CLASS StructEditor
    ::DataSource  := oData
    DEFAULT ::__xCtrlName  TO "StructEditor"
-   
+
    ::Super:Init( ::Application:MainForm )
 
    ::Modal      := .T.
@@ -354,7 +355,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS StructEditor
    ::Caption    := "DataSource Structure Editor"
-   
+
    PictureBox( Self )
    WITH OBJECT ::PictureBox1
       :Height          := 77
@@ -368,13 +369,13 @@ METHOD OnInitDialog() CLASS StructEditor
       :Dock:Right      := :Parent
       :Create()
    END
-   
+
    StatusBar( Self )
    WITH OBJECT ::StatusBar1
       :Create()
       :DockIt()
    END
-   
+
    ::oSave := Button( Self )
    WITH OBJECT ::Button1
       :Caption := "&Save Changes"
@@ -386,7 +387,7 @@ METHOD OnInitDialog() CLASS StructEditor
       :Enabled := .F.
       :Create()
    END
-   
+
    Button( Self )
    WITH OBJECT ::Button2
       :Caption := "&Close"
@@ -399,7 +400,7 @@ METHOD OnInitDialog() CLASS StructEditor
    END
 
    Label( Self )
-   
+
    WITH OBJECT ::Label1
       :Caption := "Use the navigation keys"+CRLF+"DOWN appends blank at EOF"
       :Left    := 309
@@ -440,12 +441,12 @@ METHOD Save() CLASS StructEditor
       ENDIF
 
       GetTempFileName( GetTempPath(), "vxh", 0, @cFile )
-      
+
       n := AdsSetServerType(1)
-      
+
       dbCreate( cFile, ::DataGrid1:DataSource:Table, ::DataSource:Driver )
       dbUseArea( .T., ::DataSource:Driver, cFile, "TEMPDATA", .F., .F. )
-      
+
       IF ::DataSource:IsOpen
          nArea := Select()
          nRec  := ::DataSource:Recno()
@@ -476,7 +477,7 @@ METHOD Save() CLASS StructEditor
          ENDIF
          FERASE( cOrig )
          MoveFile( cFile, cOrig )
-         
+
        ELSE
          nRec := 1
          oFile := CFile()
@@ -498,7 +499,7 @@ METHOD Save() CLASS StructEditor
             RETURN .F.
          ENDIF
       ENDIF
-      
+
       TRY
          AdsSetServerType( ::DataSource:ServerType )
       CATCH
@@ -570,12 +571,12 @@ METHOD Init( oParent ) CLASS StrEditor
    ::Dock:Left     := ::Parent
    ::Dock:Top      := ::Parent:PictureBox1
    ::Dock:Right    := ::Parent
-   
+
    IF !::Parent:DataSource:IsOpen
       ::Parent:DataSource:Create()
    ENDIF
    ::DataSource := MemoryTable( ::Parent )
-   
+
    WITH OBJECT ::DataSource
       :Structure := { {"NAME", "C", 100 }, {"TYPE", "C", 100 }, {"SIZE", "N", 3 }, {"DECIMALS", "N", 2 } }
       :Table     := ACLONE( ::Parent:DataSource:Structure )
@@ -684,7 +685,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS StrEditor
       ENDIF
       ::PostMessage( WM_KEYDOWN, VK_RETURN )
       RETURN 0
-      
+
     ELSEIF nwParam == VK_DELETE
       ::DataSource:Delete()
       IF ::DataSource:RecCount() == 0
@@ -693,7 +694,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS StrEditor
       ::Update()
       ::Parent:oSave:Enabled := .T.
       RETURN 0
-      
+
     ELSEIF nwParam == VK_RETURN .AND. ::ColPos == 2
       RETURN Super:OnKeyDown( VK_RIGHT, 0 )
    ENDIF
@@ -753,7 +754,7 @@ FUNCTION ChkNameChar( oEdit, nKey )
    ENDIF
    IF !oEdit:Modified
       oEdit:Modified := .T.
-      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT 
+      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT
          oEdit:Caption := ""
       ENDIF
    ENDIF
@@ -776,7 +777,7 @@ FUNCTION ChkNameKey( oEdit, nKey )
       oEdit:Destroy()
     ELSEIF !oEdit:Modified
       oEdit:Modified := .T.
-      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT 
+      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT
          oEdit:Caption := ""
       ENDIF
    ENDIF
@@ -789,8 +790,8 @@ FUNCTION ChkTypeChar( oEdit, nKey )
       oEdit:Form:StatusBar1:Caption := ""
       RETURN NIL
    ENDIF
-   
-   IF UPPER( CHR( nKey ) ) $ "CNLMD" 
+
+   IF UPPER( CHR( nKey ) ) $ "CNLMD"
       oEdit:Form:StatusBar1:Caption := ""
       IF UPPER( CHR( nKey ) ) == "D"
          oEdit:Parent:DataSource:Fields:SIZE := 8
@@ -831,11 +832,11 @@ FUNCTION ChkNumberChar( nKey, oEdit, nMax, nMin )
       oEdit:Form:StatusBar1:Caption := "Cannot set "+cCaption+" minimum value is "+ XSTR(nMin)
       RETURN 0
    ENDIF
-   
+
    oEdit:Form:StatusBar1:Caption := ""
    IF !oEdit:Modified
       oEdit:Modified := .T.
-      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT 
+      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT
          oEdit:Caption := ""
       ENDIF
    ENDIF
@@ -875,7 +876,7 @@ METHOD Init( oData ) CLASS TableEditor
    ::DataSource  := oData
    DEFAULT ::__xCtrlName  TO "TableEditor"
    ::Super:Init( ::Application:MainForm )
-   
+
    ::Modal      := .T.
    ::DlgModalFrame := .T.
    ::Top        := 400
@@ -888,7 +889,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 METHOD OnInitDialog() CLASS TableEditor
    ::Caption    := "DataSource Editor"
-   
+
    WITH OBJECT PictureBox( Self )
       :Height          := 77
       :BackColor       := C_WHITE
@@ -901,12 +902,12 @@ METHOD OnInitDialog() CLASS TableEditor
       :Dock:Right      := :Parent
       :Create()
    END
-   
+
    WITH OBJECT StatusBar( Self )
       :Create()
       :DockIt()
    END
-   
+
    WITH OBJECT ::oSave := Button( Self )
       :Caption := "&Save Changes"
       :Left    := 6
@@ -917,7 +918,7 @@ METHOD OnInitDialog() CLASS TableEditor
       :Enabled := .F.
       :Create()
    END
-   
+
    WITH OBJECT Button( Self )
       :Caption := "&Close"
       :Left    := 115
@@ -986,7 +987,7 @@ METHOD Init( oParent ) CLASS TblEditor
    ::Dock:Left     := ::Parent
    ::Dock:Top      := ::Parent:PictureBox1
    ::Dock:Right    := ::Parent
-   
+
    ::DataSource := oParent:DataSource //MemoryTable( ::Parent )
    /*
    WITH OBJECT ::DataSource
@@ -1013,7 +1014,7 @@ METHOD Init( oParent ) CLASS TblEditor
 
        oCol:ControlAccessKey := GRID_CHAR
        oCol:OnSave  := {|, oGrid, xData| oGrid:DataSave( aField[1], xData ) }
-       
+
        DO CASE
           CASE aField[2]=="C"
                oCol:Control := {|o, oCtrl| oCtrl := EditBox( o ),;
@@ -1042,7 +1043,7 @@ METHOD Init( oParent ) CLASS TblEditor
        ENDCASE
 
    NEXT
-   
+
    ::Create()
    ::SetFocus()
    IF lEnter
@@ -1065,7 +1066,7 @@ FUNCTION __SetEditKey( o, nKey )
    END
    IF !o:Modified
       o:Modified := .T.
-      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT 
+      IF nKey >= 32 .AND. nKey < 255 .AND. nKey != VK_LEFT .AND. nKey != VK_RIGHT
          o:Caption := ""
       ENDIF
    ENDIF
