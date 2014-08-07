@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-08-07 10:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/rdd_ads/ads1.c
+    ! add checking of hb_ads_bOEM in adsGetValue() and adsPutValue
+      thanks to Jan Sperling
+
 2014-07-24 19:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * bin/bld_vc.bat
     * Added missing VS support to match make_vc.bat

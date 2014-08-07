@@ -2215,9 +2215,17 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                      hb_itemPutC( pItem, "" );
                   else
                   {
-                     char * szRet = hb_adsAnsiToOem( ( char * ) pucBuf, u32Len );
-                     hb_itemPutCL( pItem, szRet, u32Len );
-                     hb_adsOemAnsiFree( szRet );
+                     if( hb_ads_bOEM ) /*Jan Sperling 06/08/2014*/
+                     {
+                        char * szRet = ( char * ) pucBuf;
+                        hb_itemPutCL( pItem, szRet, u32Len );
+                     }  
+                     else 
+                     {
+                        char * szRet = hb_adsAnsiToOem( ( char * ) pucBuf, u32Len );
+                        hb_itemPutCL( pItem, szRet, u32Len );
+                        hb_adsOemAnsiFree( szRet );
+                     }
                   }
                   hb_xfree( pucBuf );
                }
@@ -2491,10 +2499,19 @@ static HB_ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             */
             if( pField->uiTypeExtended != ADS_BINARY && pField->uiTypeExtended != ADS_IMAGE )
             {
-               char * szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), ulLen );
-               ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
-                  ( UNSIGNED8 * ) szRet, ulLen );
-               hb_adsOemAnsiFree( szRet );
+               if( hb_ads_bOEM ) /*Jan Sperling 06/08/2014*/
+               {
+                  char * szRet = hb_itemGetCPtr( pItem );
+                  ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
+                     ( UNSIGNED8 * ) szRet, ulLen );
+               }
+               else
+               {
+                  char * szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), ulLen );
+                  ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
+                     ( UNSIGNED8 * ) szRet, ulLen );
+                  hb_adsOemAnsiFree( szRet );
+               }  
             }
             else
             {
