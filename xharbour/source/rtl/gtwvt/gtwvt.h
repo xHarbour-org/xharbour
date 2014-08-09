@@ -4,10 +4,10 @@
 
 /*
  * Harbour Project source code:
- * Header File for Video subsystem for Win32 using GUI windows instead of Console
+ * Header File for Video subsystem for Windows using GUI windows instead of Console
  * Copyright 2003 Peter Rees <peter@rees.co.nz>
  *                Rees Software & Systems Ltd
- * www - http://www.harbour-project.org
+ * www - http://harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,16 +51,24 @@
  */
 
 #ifndef HB_WVT_H_
-
 #define HB_WVT_H_
 
 #define HB_GT_NAME  WVT
-
-
-#include <windows.h>
-/*#include <winuser.h>*/
-/*#include <commctrl.h>*/
-
+#define HB_OS_WIN 
+#define HB_OS_WIN_USED 
+// #include "hbset.h"
+// #include "hbgtcore.h"
+// #include "hbinit.h"
+// #include "hbapicdp.h"
+// #include "hbapierr.h"
+// #include "hbapiitm.h"
+// #include "inkey.ch"
+// #include "error.ch"
+// #include "hbvm.h"
+// #include "hbthread.h"
+// #include "hbgfxdef.ch"
+// #include "hbwinuni.h"
+#include "hbapi.h"
 #include "hbset.h"
 #include "hbgtcore.h"
 #include "hbinit.h"
@@ -71,15 +79,14 @@
 #include "error.ch"
 #include "hbvm.h"
 #include "hbgfxdef.ch"
-
-#if defined( __DMC__ )
-   typedef DWORD UINT_PTR;
+#include "hbapistr.h"
+#include <windows.h>
+#if defined( HB_OS_WIN_CE )
+   #include "hbwince.h"
 #endif
 
 #define WVT_CHAR_QUEUE_SIZE   128
 #define WVT_MAX_TITLE_SIZE    128
-#define WVT_MAX_ROWS          256
-#define WVT_MAX_COLS          256
 #define WVT_MAX_WINDOWS       256
 #if defined( HB_OS_WIN_CE )
 #  define WVT_DEFAULT_ROWS          15
@@ -92,24 +99,25 @@
 #  define WVT_DEFAULT_FONT_HEIGHT   20
 #  define WVT_DEFAULT_FONT_WIDTH    10
 #endif
-#define WVT_DEFAULT_FONT_NAME    "Courier New"
+#define WVT_DEFAULT_FONT_ATTR    0
+#define WVT_DEFAULT_FONT_NAME    TEXT( "Courier New" )
 
-#define BLACK          RGB( 0x0 ,0x0 ,0x0  )
-#define BLUE           RGB( 0x0 ,0x0 ,0x85 )
-#define GREEN          RGB( 0x0 ,0x85,0x0  )
-#define CYAN           RGB( 0x0 ,0x85,0x85 )
-#define RED            RGB( 0x85,0x0 ,0x0  )
-#define MAGENTA        RGB( 0x85,0x0 ,0x85 )
-#define BROWN          RGB( 0x85,0x85,0x0  )
-#define WHITE          RGB( 0xC6,0xC6,0xC6 )
-#define LIGHT_GRAY     RGB( 0x60,0x60,0x60 )
-#define BRIGHT_BLUE    RGB( 0x00,0x00,0xFF )
-#define BRIGHT_GREEN   RGB( 0x60,0xFF,0x60 )
-#define BRIGHT_CYAN    RGB( 0x60,0xFF,0xFF )
-#define BRIGHT_RED     RGB( 0xF8,0x00,0x26 )
-#define BRIGHT_MAGENTA RGB( 0xFF,0x60,0xFF )
-#define YELLOW         RGB( 0xFF,0xFF,0x00 )
-#define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
+#define BLACK          RGB( 0x00, 0x00, 0x00 )
+#define BLUE           RGB( 0x00, 0x00, 0xAA )
+#define GREEN          RGB( 0x00, 0xAA, 0x00 )
+#define CYAN           RGB( 0x00, 0xAA, 0xAA )
+#define RED            RGB( 0xAA, 0x00, 0x00 )
+#define MAGENTA        RGB( 0xAA, 0x00, 0xAA )
+#define BROWN          RGB( 0xAA, 0x55, 0x00 )
+#define LIGHT_GRAY     RGB( 0xAA, 0xAA, 0xAA )
+#define GRAY           RGB( 0x55, 0x55, 0x55 )
+#define BRIGHT_BLUE    RGB( 0x55, 0x55, 0xFF )
+#define BRIGHT_GREEN   RGB( 0x55, 0xFF, 0x55 )
+#define BRIGHT_CYAN    RGB( 0x55, 0xFF, 0xFF )
+#define BRIGHT_RED     RGB( 0xFF, 0x55, 0x55 )
+#define BRIGHT_MAGENTA RGB( 0xFF, 0x55, 0xFF )
+#define YELLOW         RGB( 0xFF, 0xFF, 0x55 )
+#define WHITE          RGB( 0xFF, 0xFF, 0xFF )
 
 #define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )
 
@@ -118,17 +126,23 @@ typedef struct
    PHB_GT   pGT;                          /* core GT pointer */
    int      iHandle;                      /* window number */
 
-   USHORT   ROWS;                         /* number of displayable rows in window */
-   USHORT   COLS;                         /* number of displayable columns in window */
+   HINSTANCE hInstance;                   /* parent window instance */
+   int       iCmdShow;
+
+   int      ROWS;                         /* number of displayable rows in window */
+   int      COLS;                         /* number of displayable columns in window */
+
+   TCHAR *  TextLine;                     /* buffer for text line */
 
    COLORREF COLORS[ 16 ];                 /* colors */
 
-   BOOL     CaretExist;                   /* TRUE if a caret has been created */
-   BOOL     CaretHidden;                  /* TRUE if a caret has been hiden */
-   int      CaretSize;                    /* Size of solid caret */
+   BOOL  CaretExist;                   /* TRUE if a caret has been created */
+   BOOL  CaretHidden;                  /* TRUE if a caret has been hiden */
+   int      CaretSize;                    /* Height of solid caret */
+   int      CaretWidth;                   /* Width of solid caret */
 
    POINT    MousePos;                     /* the last mouse position */
-   BOOL     MouseMove;                    /* Flag to say whether to return mouse movement events */
+   BOOL  MouseMove;                    /* Flag to say whether to return mouse movement events */
 
    int      Keys[ WVT_CHAR_QUEUE_SIZE ];  /* Array to hold the characters & events */
    int      keyPointerIn;                 /* Offset into key array for character to be placed */
@@ -136,35 +150,65 @@ typedef struct
    int      keyLast;                      /* last inkey code value in buffer */
 
    POINT    PTEXTSIZE;                    /* size of the fixed width font */
-   BOOL     FixedFont;                    /* TRUE if current font is a fixed font */
-   int      FixedSize[ WVT_MAX_COLS ];    /* buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected */
+   BOOL  FixedFont;                    /* TRUE if current font is a fixed font */
+   int *    FixedSize;                    /* buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected */
    int      fontHeight;                   /* requested font height */
    int      fontWidth;                    /* requested font width */
    int      fontWeight;                   /* Bold level */
    int      fontQuality;                  /* requested font quality */
-   char     fontFace[ LF_FACESIZE ];      /* requested font face name LF_FACESIZE #defined in wingdi.h */
+   int      fontAttribute;                /* font attribute: HB_GTI_FONTA_* */
+   TCHAR    fontFace[ LF_FACESIZE ];      /* requested font face name LF_FACESIZE #defined in wingdi.h */
    HFONT    hFont;                        /* current font handle */
+#if ! defined( UNICODE )
+   HFONT    hFontBox;                     /* current font handle to draw lines */
+#endif
 
    HWND     hWnd;                         /* the window handle */
+   BOOL  fInit;                        /* logical variable indicating that window should be open */
 
-   PHB_CODEPAGE hostCDP;                  /* Host/HVM CodePage for unicode output translations */
-   PHB_CODEPAGE inCDP;                    /* Host/HVM CodePage for unicode input translations */
+   HICON    hIcon;                        /* Title Bar and Task List icon. Can be NULL. */
+   BOOL  bIconToFree;                  /* Do we need to free this icon when it's not NULL? */
+
+   void *   hWindowTitle;
+   LPCTSTR  lpWindowTitle;
 
    int      CodePage;                     /* Code page to use for display characters */
-   BOOL     Win9X;                        /* Flag to say if running on Win9X not NT/2000/XP */
-   BOOL     AltF4Close;                   /* Can use Alt+F4 to close application */
-   BOOL     CentreWindow;                 /* True if window is to be Reset into centre of window */
+#if ! defined( UNICODE )
+   int      boxCodePage;                  /* Code page to use for display draw line characters */
+#else
+   HB_WCHAR * wcTrans;                    /* unicode character translation table */
+   HB_SIZE  wcTransLen;                   /* size of unicode character translation table */
+#endif
+   BOOL  Win9X;                        /* Flag to say if running on Win9X not NT/2000/XP */
+   BOOL  AltF4Close;                   /* Can use Alt+F4 to close application */
+   BOOL  CentreWindow;                 /* TRUE if window is to be Reset into centre of window */
 
-   BOOL     IgnoreWM_SYSCHAR;
+   BOOL  IgnoreWM_SYSCHAR;
 
-   BOOL     bMaximized;                   /* Flag is set when window has been maximized */
-   BOOL     bBeingMarked;                 /* Flag to control DOS window like copy operation */
-   BOOL     bBeginMarked;
+   BOOL  bResizable;
+   BOOL  bClosable;
+   BOOL  bFullScreen;
+   BOOL  bAltEnter;                    /* Can use Alt+Enter to enter full screen mode */
+   int      MarginTop;
+   int      MarginLeft;
 
-   BOOL     bResizable;
-   BOOL     bSelectCopy;
-   char *   pszSelectCopy;
-   BOOL     bClosable;
+   BOOL  bMaximized;                   /* Flag is set when window has been maximized */
+   BOOL  bBeingMarked;                 /* Flag to control DOS window like copy operation */
+   BOOL  bBeginMarked;
+
+   BOOL  bSelectCopy;
+   void *   hSelectCopy;
+   LPCTSTR  lpSelectCopy;
+
+   RECT     sRectNew;
+   RECT     sRectOld;
+
+   int      ResizeMode;                   /* Sets the resizing mode either to FONT or ROWS */
+
+   BOOL  bResizing;
+   BOOL  bAlreadySizing;
+
+   RECT     ciLast;                       /* need in WM_ENTERSIZEMOVE processing and hb_gt_wvt_PaintText() function [HVB] */
 
 } HB_GTWVT, * PHB_GTWVT;
 
@@ -186,6 +230,22 @@ typedef struct
 
 #ifndef WM_MOUSEWHEEL
 #  define WM_MOUSEWHEEL 0x020A
+#endif
+#ifndef WM_ENTERSIZEMOVE
+#  define WM_ENTERSIZEMOVE 561
+#endif
+#ifndef WM_EXITSIZEMOVE
+#  define WM_EXITSIZEMOVE  562
+#endif
+
+#ifndef SWP_DEFERERASE
+#  define SWP_DEFERERASE 0x2000
+#endif
+#ifndef SW_NORMAL
+#  define SW_NORMAL 1
+#endif
+#ifndef SC_MAXIMIZE
+#  define SC_MAXIMIZE 0xF030
 #endif
 
 #define SYS_EV_MARK  1000
