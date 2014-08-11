@@ -1,4 +1,4 @@
-@ECHO OFF
+ECHO ON
 
 SET _PRESET_PATH=%PATH%
 SET _PRESET_INCLUDE=%INCLUDE%
@@ -7,35 +7,71 @@ SET _PRESET_CFLAGS=%CFLAGS%
 SET _PRESET_LFLAGS=%LFLAGS%
  
 :FIND_VC
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
    GOTO NONE
 
+:SET_VC2013
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2012X86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2012
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2010X86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2010
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+
 :SET_VC2008
-   CALL "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2005
-   CALL "%ProgramFiles%\Microsoft Visual Studio 8\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2003
-   CALL "%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
-   CALL "%ProgramFiles%\Microsoft Visual Studio\VC98\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :NONE   
-
+   ECHO MSVC not found!!!
+   GOTO RESTORE
+   
 :READY
+
+ECHO ON
 
 SET PELLESCDIR=%ProgramFiles%\PellesC
 SET XCCDIR=\xhb\bin
@@ -55,16 +91,17 @@ echo multi-thread >>log
 nmake __MT__=1 >> log
 if errorlevel 1 goto q
 
-echo wince
-..\utils\narmw -o wince\xdiv.obj -f win32 wince\xdiv.asm
-@if errorlevel 1 goto Q
-xlib.exe -out:crtce.lib wince\xdiv.obj
+REM echo wince
+REM ..\utils\narmw -o wince\xdiv.obj -f win32 wince\xdiv.asm
+REM @if errorlevel 1 goto Q
+REM xlib.exe -out:crtce.lib wince\xdiv.obj
 
 :q
 IF ERRORLEVEL 0 xcopy crt.lib \xhb\c_lib /d /r /y
 IF ERRORLEVEL 0 xcopy crtmt.lib \xhb\c_lib /d /r /y
 xcopy "%PELLESCDIR%\lib\win" \xhb\c_lib\win /d /y 
 
+:RESTORE
 SET PATH=%_PRESET_PATH%
 SET INCLUDE=%_PRESET_INCLUDE% 
 SET LIB=%_PRESET_LIB% 

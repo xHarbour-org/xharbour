@@ -7,30 +7,62 @@ SET _PRESET_CFLAGS=%CFLAGS%
 SET _PRESET_LFLAGS=%LFLAGS%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
    GOTO NONE
 
+:SET_VC2013
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2012X86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2012
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2010X86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2010
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+
 :SET_VC2008
-   CALL "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2005
-   CALL "%ProgramFiles%\Microsoft Visual Studio 8\vc\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2003
-   CALL "%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
-   CALL "%ProgramFiles%\Microsoft Visual Studio\VC98\vcvarsall.bat"
-   REM SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :NONE   
