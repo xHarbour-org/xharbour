@@ -23,20 +23,28 @@ IF "%_XB_Compiler%"=="xcc" GOTO No_MakeFolders
    IF NOT EXIST \xhb\lib\%_XB_Compiler% MD \xhb\lib\%_XB_Compiler%
 :No_MakeFolders
 
+REM  ===============================================
+REM  ===============================================
+ECHO XCC
+REM  ===============================================
+REM  ===============================================
 
+      IF NOT "%_XB_Compiler%"=="xcc" GOTO No_xCC
+        CD \xHarbour.com\xHarbour-XCC
+        CALL build_xcc.bat
+     :No_xCC
 
 REM  ===============================================
 REM  ===============================================
-ECHO XCC Linker
+ECHO xBuild
 REM  ===============================================
 REM  ===============================================
 
-      IF NOT "%_XB_Compiler%"=="xcc" GOTO No_xLink
-        CD \xHarbour.com\xHarbour-XCC\xlink
-        CALL g.bat
-     :No_xLink
-
-
+     IF EXIST \xhb\bin\xbuild.exe GOTO No_xBuild    
+        CD \xHarbour.com\xHarbour-xBuild\ 
+        CALL \xharbour\bin\bld_vc xbuild tproject tproject-c
+        XCOPY xbuild.exe \xhb\bin
+     :No_xBuild
 
 REM  ===============================================
 REM  ===============================================
