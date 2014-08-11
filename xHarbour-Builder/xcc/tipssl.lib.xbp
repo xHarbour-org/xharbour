@@ -1,6 +1,6 @@
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = \openssl\include
+INCLUDEFOLDERS = \openssl-win32\include
 INCLUDEFOLDERS =
 LDEBUG = .T.
 LGUI = .F.
