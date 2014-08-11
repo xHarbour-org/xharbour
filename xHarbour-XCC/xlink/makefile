@@ -59,7 +59,7 @@ mscvars = $(mscvars) -DUNICODE -D_UNICODE
 !IFDEF POWERDEBUG
 mslflags = /nodefaultlib /incremental:no /pdb:none /debug /nologo
 !ELSE
-mslflags = /incremental:no /pdb:none /release /nologo /opt:nowin98 /profile $(LFLAGS)
+mslflags = /incremental:no /pdb:none /release /nologo /profile $(LFLAGS)
 !ENDIF
 
 mscc = cl $(mscflags) $(mscvars) $(mscdebug)
