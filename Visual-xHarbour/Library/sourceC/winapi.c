@@ -176,7 +176,7 @@ extern HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 
 HB_EXTERN_END
 
-#if defined( __XCC__ )
+#if 0 && defined( __XCC__ )
 typedef struct {
     LPITEMIDLIST pidl;
     BOOL fRecursive;
