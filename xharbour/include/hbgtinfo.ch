@@ -75,7 +75,8 @@
 #define HB_GTI_KBDALT           12  /* This will get/set the status of the alt-numpad
                                        key handling.
                                        Default is Enabled. */
-#define HB_GTI_FULLSCREEN       13  /* Is it full screen GT driver? */
+#define HB_GTI_ISSCREENPOS      13  /* Is full screen cursor positioning supported by GT driver? */
+#define HB_GTI_FULLSCREEN       HB_GTI_ISSCREENPOS /* Compatibility. Do not use it. */
 #define HB_GTI_KBDSUPPORT       14  /* Is it keyboard input supported? */
 #define HB_GTI_CLIPBOARDDATA    15  /* Get/Set clipboard */
 #define HB_GTI_CLIPBOARDPAST    16  /* Paste clipboard data into keyboard buffer */
@@ -136,6 +137,20 @@
 #define HB_GTI_CARGO            58  /* Storage of any user defined value */
 #define HB_GTI_FONTSEL          59  /* X11 style font selecting */
 
+#define HB_GTI_INKEYFILTER      60  /* Get/Set inkey keycodes filter */
+#define HB_GTI_INKEYREAD        61  /* Get/Set inkey read block */
+
+#define HB_GTI_ALTENTER         62  /* Toggles Alt+Enter as full screen switch (supported by: GTWVT) */
+#define HB_GTI_ISFULLSCREEN     63  /* Is the GT windows using the full physical display? (supported by: GTWIN, GTWVT) */
+#define HB_GTI_ONLINE           64  /* Is terminal connected? */
+#define HB_GTI_VERSION          65  /* Get terminal version string */
+
+#define HB_GTI_MAXIMIZED        66  /* Get/Set Window's Maximized status (supported by: GTWVT) */
+
+#define HB_GTI_FONTATTRIBUTE    67  /* Get/set font attribute */
+
+#define HB_GTI_UNITRANS         68  /* set translation table for UNICODE characters */
+
 /* Font weights */
 #define HB_GTI_FONTW_THIN       1
 #define HB_GTI_FONTW_NORMAL     2
@@ -145,6 +160,12 @@
 #define HB_GTI_FONTQ_DRAFT      1
 #define HB_GTI_FONTQ_NORMAL     2
 #define HB_GTI_FONTQ_HIGH       3
+
+/* Font attributes */
+#define HB_GTI_FONTA_FIXMETRIC  1
+#define HB_GTI_FONTA_CLRBKG     2
+#define HB_GTI_FONTA_DRAWBOX    4
+#define HB_GTI_FONTA_CTRLCHARS  8
 
 /* Keyboard shifts states */
 #define HB_GTI_KBD_SHIFT        1
