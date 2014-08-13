@@ -169,7 +169,7 @@ static BOOL hb_iswinvista( void )
    return bRet;
 }
 
-static BOOL hb_iswin9x()
+static BOOL hb_iswin9x( void )
 {
    OSVERSIONINFO osvi;
    BOOL bRet = FALSE;
@@ -1158,10 +1158,10 @@ static void hb_gt_wvt_MouseEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, L
             RedrawWindow( pWVT->hWnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW );
 
             {
-#if !defined( UNICODE )
-               PHB_CODEPAGE cdpHost = hb_vmCDP(),
-                            cdpBox = hb_vmCDP();
-#endif
+//#if !defined( UNICODE )
+//               PHB_CODEPAGE cdpHost = hb_vmCDP(),
+//                            cdpBox = hb_vmCDP();
+//#endif
                TCHAR * sBuffer;
                HB_SIZE nSize;
                int     irow, icol, j, top, left, bottom, right;
