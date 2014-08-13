@@ -2843,6 +2843,8 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 #endif
          else
          {
+	        char *   szClipboardData;
+            HB_SIZE  ulLen;  
             if( pInfo->pResult == NULL )
                pInfo->pResult = hb_itemNew( NULL );
 #if defined( UNICODE )
@@ -2851,8 +2853,7 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
 //             hb_gt_w32_getClipboard( pWVT->CodePage == OEM_CHARSET ?
 //                                        CF_OEMTEXT : CF_TEXT, pInfo->pResult );
 //                                        
-            char *   szClipboardData;
-            HB_SIZE  ulLen;
+
             if( hb_gt_w32_getClipboard( pWVT->CodePage == OEM_CHARSET ?
                                         CF_OEMTEXT : CF_TEXT,
                                         &szClipboardData, &ulLen ) )
