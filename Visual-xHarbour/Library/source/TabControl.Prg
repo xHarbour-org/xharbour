@@ -514,10 +514,11 @@ METHOD OnPaint() CLASS TabControl
       aRect[4] -= ( aRect[4]-aItem[2]-2 )
    ENDIF
    hBrush := ::BkBrush
-   IF hBrush == NIL
+   IF hBrush == NIL .AND. ::Parent:BkBrush != NIL
       hBrush := ::Parent:BkBrush
       SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
    ENDIF
+   DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
    _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
 
    IF ::Theming .AND. IsThemeActive()
@@ -882,10 +883,12 @@ CLASS TabPage INHERIT Dialog
    METHOD __SetPosition()
    METHOD __GetPosition()
    METHOD __OnParentSize()
+   METHOD __CreateProperty()
    METHOD __SetVisible()
    METHOD __CreateBkBrush()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
    METHOD OnMouseLeave(n,l) INLINE ::Super:OnMouseLeave(n,l), ::InvalidateRect(, .F. ), NIL
+   METHOD OnEraseBkgnd()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -974,6 +977,16 @@ METHOD Init( oParent, acResource ) CLASS TabPage
                                { "OnShowWindow"       , "", "" } } } }
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnEraseBkgnd( hDC ) CLASS TabPage
+   LOCAL nRet
+   ::GetClientRect()
+   IF ::BkBrush != NIL
+      _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+      nRet := 1
+   ENDIF
+RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabPage
@@ -1091,6 +1104,11 @@ METHOD Create() CLASS TabPage
       ::Parent:InvalidateRect(,.f.)
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __CreateProperty( cBaseName ) CLASS TabPage
+   ::Object:__CreateProperty( cBaseName )
+RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS TabPage
