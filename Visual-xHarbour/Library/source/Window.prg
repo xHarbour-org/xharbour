@@ -372,6 +372,7 @@ CLASS Window INHERIT Object
    DATA __lSubClass            EXPORTED  INIT .T.
    DATA __aHotKey              PROTECTED INIT {}
    DATA __aDock                EXPORTED  INIT {}
+   DATA __lCallbackReleased    PROTECTED INIT .F.
 
    ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
 
@@ -637,8 +638,9 @@ CLASS Window INHERIT Object
 ENDCLASS
 
 PROCEDURE __FreeCallBack() CLASS Window
-   IF ::__pCallBackPtr != NIL
-      FreeCallBackPointer( ::__pCallBackPtr )
+   IF ::__pCallBackPtr != NIL .AND. ! ::__lCallbackReleased
+      VXH_FreeCallBackPointer( ::__pCallBackPtr )
+      ::__pCallBackPtr := NIL
    ENDIF
 RETURN
 
@@ -931,7 +933,7 @@ METHOD Create( oParent ) CLASS Window
    LOCAL oObj, nError, cError, aSize
    LOCAL cBmpMask, cText
 
-   IF __ObjHasMsg( Self, "MDIContainer" ) .AND. ! ::MDIContainer
+   IF ! __ObjHasMsg( Self, "MDIContainer" ) .OR. ! ::MDIContainer
       ::MDIClient := NIL
    ENDIF
 
@@ -1125,14 +1127,7 @@ METHOD Create( oParent ) CLASS Window
       ::ToolTip:Create()
    ENDIF
 
-   IF ::__ClassInst != NIL .AND. ::ClsName != TOOLTIPS_CLASS
-
-      IF ::xMdiContainer
-         ::__ClassInst:MDIClient := __ClsInst( ::MDIClient:ClassH )
-      ENDIF
-
-   ENDIF
-   IF ::xMdiContainer
+   IF ::xMdiContainer .AND. ::MDIClient != NIL
       ::MDIClient:Create()
 
       IF ::__ClassInst != NIL
@@ -1141,8 +1136,6 @@ METHOD Create( oParent ) CLASS Window
          ::Application:MDIClient := ::MDIClient:hWnd
       ENDIF
 
-    ELSEIF !::__IsControl
-      ::MDIClient := NIL
    ENDIF
 
    IF ::Parent != NIL .AND. ( ::Parent:VertScroll .OR. ::Parent:HorzScroll )
@@ -1243,6 +1236,10 @@ METHOD __UnSubClass() CLASS Window
    IF ::__nProc != NIL
       SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
       ::__nProc := NIL
+   ENDIF
+   IF ::Application:MainForm:hWnd <> ::hWnd
+      ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackPtr )
+      ::__lCallbackReleased := .T.
    ENDIF
 RETURN Self
 
@@ -1909,6 +1906,10 @@ METHOD OnNCDestroy() CLASS Window
    AEVAL( aComp, {|o| o:Destroy(.F.) } )
 
    IF ::Parent != NIL
+      IF ( n := ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) ) > 0
+         ADEL( ::Parent:__aDock, n, .T. )
+      ENDIF
+
       FOR n := 1 TO LEN( ::Parent:Children )
           IF __objHasMsg( ::Parent:Children[n], "Dock" ) .AND. ::Parent:Children[n]:Dock != NIL
              IF VALTYPE(::Parent:Children[n]:Dock:Left)=="O" .AND. ::Parent:Children[n]:Dock:Left:hWnd == ::hWnd
@@ -1936,6 +1937,11 @@ METHOD OnNCDestroy() CLASS Window
       ::Dock:Destroy()
       ::Dock:Owner := NIL
       ::Dock := NIL
+   ENDIF
+   IF ::Anchor != NIL
+      ::Anchor:Destroy()
+      ::Anchor:Owner := NIL
+      ::Anchor := NIL
    ENDIF
    IF ::__ClassInst != NIL .AND. ::TreeItem != NIL
       ::TreeItem:Cargo := NIL
@@ -2031,21 +2037,11 @@ METHOD OnNCDestroy() CLASS Window
       ::Events := NIL
    ENDIF
 
-   IF ::__ClassInst != NIL
-      ::Events := NIL
-   ENDIF
-
    ObjFromHandle( ::hWnd, .T. )
 
    ::__hObjects        := NIL
    ::Children          := NIL
    ::Parent            := NIL
-
-   IF ::Anchor         != NIL
-      ::Anchor:Owner   := NIL
-      ::Anchor         := NIL
-   ENDIF
-
    ::siv               := NIL
    ::sih               := NIL
    ::ScrollInfo        := NIL
@@ -2057,6 +2053,14 @@ METHOD OnNCDestroy() CLASS Window
    ::lParam            := NIL
    ::__ClassInst       := NIL
    ::__lInitialized    := .F.
+   ::__aDock           := NIL
+
+//   aProperties := __clsGetIVarNamesAndValues( Self )
+//   FOR n := 1 TO LEN( aProperties )
+//      IF VALTYPE( aProperties[n][2] ) $ "O" //.AND. aProperties[n][2] > 10000
+//         VIEW aProperties[n][1]
+//      ENDIF
+//   NEXT
 
    IF ::Application != NIL
       IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
@@ -2075,7 +2079,6 @@ METHOD OnNCDestroy() CLASS Window
       DestroyWindow( ::__TaskBarParent )
    ENDIF
    ::__UnSubClass()
-   ::Application:MainForm:PostMessage( WM_VXH_DESTRUCTOBJECT )
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -2083,6 +2086,7 @@ METHOD OnEraseBkgnd( hDC ) CLASS Window
    LOCAL nRet, n
 
    IF ::BkBrush != NIL
+      ::GetClientRect()
       _FillRect( hDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
       nRet := 1
    ENDIF
@@ -3039,10 +3043,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                          ::ShowMode := ::__GetShowMode()
 
                     CASE nMsg == WM_VXH_FREECALLBACK
-                         FreeCallBackPointer( nwParam )
-                         hb_gcAll(.t.)
-
-                    CASE nMsg == WM_VXH_DESTRUCTOBJECT
+                         VXH_FreeCallBackPointer( nwParam )
                          hb_gcAll(.t.)
 
                     OTHERWISE
@@ -4180,6 +4181,7 @@ CLASS __AnchorSet
    METHOD Init() CONSTRUCTOR
    METHOD CenterWindow(l) INLINE IIF( l, ::Owner:CenterWindow(), ), Self
    METHOD SetAnchor()
+   METHOD Destroy()
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS __AnchorSet
@@ -4188,6 +4190,15 @@ METHOD Init( oOwner ) CLASS __AnchorSet
       ::__ClassInst := __ClsInst( ::ClassH )
    ENDIF
 RETURN Self
+
+METHOD Destroy() CLASS __AnchorSet
+   ::xLeft   := NIL
+   ::xTop    := NIL
+   ::xRight  := NIL
+   ::xBottom := NIL
+   ::Owner   := NIL
+   ::__ClassInst := NIL
+RETURN NIL
 
 METHOD SetAnchor( nPos, lSet ) CLASS __AnchorSet
    LOCAL oItem, Item, aValue, n, cVar
@@ -4666,7 +4677,6 @@ CLASS WinForm INHERIT Window
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD GetNextControlId()
-   METHOD OnNCDestroy()
 
    // MDI Messages
    METHOD MdiTileHorizontal( lTileDisable )         INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
@@ -4711,17 +4721,21 @@ CLASS WinForm INHERIT Window
    METHOD SetImageList()
    METHOD SetBackColor()
 
+   METHOD OnNCDestroy()
+
    METHOD OnSysCommand()
    METHOD SetInstance()
    METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
    METHOD InvalidateRect(a,l) INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
+   METHOD __CreateProperty()
+   METHOD RegisterDocking() INLINE NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
    LOCAL hInst, hPointer
-
+   ::SetChildren := .F.
    IF VALTYPE( oParent ) == "N"
       ::__hParent := oParent
       oParent := NIL
@@ -4751,8 +4765,6 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
 
    Super:Init( oParent )
 
-   oParent := NIL
-
    IF !::ClsName == "MDIChild"
       ::MDIClient := MDIClient( Self )
    ENDIF
@@ -4764,10 +4776,14 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnNCDestroy() CLASS WinForm
-   ::Params := NIL
-   ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackPtr )
-RETURN Super:OnNCDestroy()
+METHOD __CreateProperty( cBaseName ) CLASS WinForm
+   LOCAL n
+   DEFAULT cBaseName TO ::__xCtrlName
+   IF EMPTY( ::xName ) .AND. ::GenerateMember
+      n := ::GetControlName( cBaseName )
+      ::Application:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
+   ENDIF
+RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetInstance( cProjectName, oOle ) CLASS WinForm
@@ -4804,6 +4820,7 @@ METHOD Create( hoParent ) CLASS WinForm
       IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
          ::Font:Delete()
       ENDIF
+      ::Font := NIL
       RETURN NIL
    ENDIF
 
@@ -4819,6 +4836,14 @@ METHOD Create( hoParent ) CLASS WinForm
       ::__SetActiveMenuBar( ::ActiveMenuBar )
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnNCDestroy() CLASS WinForm
+   ::Super:OnNCDestroy()
+   IF ::xAnimation != NIL .AND. ::xAnimation:Owner != NIL
+      ::xAnimation:Owner := NIL
+   ENDIF
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS WinForm
@@ -5685,7 +5710,4 @@ RETURN { ;
                                   { "UserMethod17"       , "", "" },;
                                   { "UserMethod18"       , "", "" },;
                                   { "UserMethod19"       , "", "" } } } }
-function dview( ... )
-   VIEW HB_AParams()
-RETURN NIL
 

@@ -35,7 +35,7 @@ CLASS Dialog INHERIT WinForm
    DATA Result       EXPORTED
    DATA lEmpty       PROTECTED
    ACCESS Form       INLINE IIF( ::Modal .OR. ::Parent == NIL, Self, ::Parent:Form )
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Close()
@@ -227,7 +227,7 @@ METHOD Create( hParent ) CLASS Dialog
    hParent := IIF( ::Parent == NIL, hParent, ::Parent:hWnd )
    DEFAULT hParent TO GetDesktopWindow()
    DEFAULT ::EventHandler TO Hash()
-  
+
    ::lEmpty   := ::Template == NIL
 
    nRet := ExecuteEvent( "OnInit", Self )
@@ -241,7 +241,7 @@ METHOD Create( hParent ) CLASS Dialog
    ENDIF
 
    ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, ::__WndProc ), Self )
-   
+
    IF !::ShowInTaskBar .AND. ::Parent == NIL .AND. ::__ClassInst == NIL .AND. ::Application:DllInstance == NIL
       ::__TaskBarParent := CreateDialogIndirect( ::Instance, __GetTemplate( Self ), 0, NIL )
       IF ::__hIcon != NIL
@@ -258,7 +258,7 @@ METHOD Create( hParent ) CLASS Dialog
          ::Result := DialogBox( ::Instance, ::Template, hParent, ::__pCallBackPtr )
       ENDIF
       IF ::__pCallBackPtr != NIL
-         FreeCallBackPointer( ::__pCallBackPtr )
+         VXH_FreeCallBackPointer( ::__pCallBackPtr )
          ::__pCallBackPtr := NIL
       ENDIF
       RETURN ::Result == IDOK

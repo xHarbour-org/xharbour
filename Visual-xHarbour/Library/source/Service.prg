@@ -22,9 +22,9 @@
 #include "colors.ch"
 #include "Service.ch"
 
-#define SERVICE_NO_CHANGE     0xffffffff 
+#define SERVICE_NO_CHANGE     0xffffffff
 #define SERVICE_DEMAND_START  0x00000003
-#define SERVICE_DISABLED      0x00000004 
+#define SERVICE_DISABLED      0x00000004
 
 //-----------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ CLASS Service
    PROPERTY File            DEFAULT ""
    PROPERTY DisplayName     DEFAULT ""
    PROPERTY Description     DEFAULT ""
-   
+
    DATA hServiceManager     EXPORTED
    DATA hService            EXPORTED
    DATA ServiceStatusStruct EXPORTED
@@ -52,9 +52,9 @@ CLASS Service
                                              "Pause pending",;
                                              "Paused" }
    DESTRUCTOR __ExitService
-   
+
    ACCESS Status INLINE ::aStatus[ ::GetStatus ]
-   
+
    METHOD Install()
    METHOD Run()
    METHOD Enable()      INLINE ChangeServiceConfig( ::hService, SERVICE_NO_CHANGE, SERVICE_AUTO_START, SERVICE_NO_CHANGE )
@@ -151,10 +151,10 @@ PROCEDURE __ExitService CLASS Service
       CloseServiceHandle( ::hServiceManager )
    ENDIF
    IF ::__pMainCallBackPtr != NIL
-      FreeCallBackPointer( ::__pMainCallBackPtr )
+      VXH_FreeCallBackPointer( ::__pMainCallBackPtr )
    ENDIF
    IF ::__pProcCallBackPtr != NIL
-      FreeCallBackPointer( ::__pProcCallBackPtr )
+      VXH_FreeCallBackPointer( ::__pProcCallBackPtr )
    ENDIF
 RETURN
 

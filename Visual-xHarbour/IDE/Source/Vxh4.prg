@@ -75,7 +75,7 @@ CLASS ObjManager INHERIT TreeView
    METHOD SetObjectValue()
 
    METHOD OnEraseBkGnd()
-   
+
    METHOD OnParentNotify()
    METHOD DrawItem()
 
@@ -176,7 +176,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjManager
               CASE tvcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
                    ::DrawItem( tvcd )
                    SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT  )
-                   RETURN CDRF_SKIPDEFAULT 
+                   RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
 RETURN 0
@@ -232,7 +232,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
    END
    IF cText == "Height" .AND. ::ActiveObject != NIL .AND. ::ActiveObject:__xCtrlName == "Expando" .AND. !::ActiveObject:Expanded
       lDisabled := .T.
-   ENDIF   
+   ENDIF
 
    IF lDisabled
       nFore := GetSysColor( COLOR_BTNSHADOW )
@@ -294,7 +294,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
    ENDIF
 
    aRest := { rc:Left, rc:bottom, rc:right, ::ClientHeight }
-   
+
    IF ::ActiveObject != NIL .AND. VALTYPE( oItem:ColItems ) == "A"
       FOR n := 1 TO LEN( oItem:ColItems )
           nLeft   += nWidth
@@ -463,7 +463,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                   x:= nLeft + ( ( nRight - nLeft )/2 ) - ( aAlign[1]/2 )
                   EXIT
           END
-          nBack := IIF( lEnabled, ::Columns[n+1][2], ::System:CurrentScheme:ToolStripPanelGradientEnd ) 
+          nBack := IIF( lEnabled, ::Columns[n+1][2], ::System:CurrentScheme:ToolStripPanelGradientEnd )
           nFore := IIF( lEnabled, C_BLACK, GetSysColor( COLOR_BTNSHADOW ) )
           IF nState & TVIS_SELECTED != 0 .AND. ::CurCol == n+1 .AND. ::HasFocus
              nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd
@@ -497,11 +497,11 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
 
           SelectObject( hDC, ::Font:Handle )
 
-          IF oItem:ColItems[n]:ColType == "ICONS" 
+          IF oItem:ColItems[n]:ColType == "ICONS"
              IF ::ActiveObject:__hIcon == NIL .AND. VALTYPE( ::ActiveObject:Icon ) == "C"
                 ::ActiveObject:__hIcon := LoadImage( ::AppInstance, ::ActiveObject:Icon, IMAGE_ICON,,, LR_LOADFROMFILE )
              ENDIF
-             IF ::ActiveObject:__hIcon != NIL 
+             IF ::ActiveObject:__hIcon != NIL
                 DrawIconEx( hDC, x-20, y, ::ActiveObject:__hIcon, 16, 16,,,DI_NORMAL )
              ENDIF
           ENDIF
@@ -579,9 +579,9 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
    LOCAL /*n,*/ oEditor
 
    IF !( cOldName == cNewName )
-      
+
       DEFAULT lProject TO .F.
-      
+
       oEditor := ::Application:ProjectPrgEditor
       ::Application:ProjectPrgEditor:Select()
       ::Application:ProjectPrgEditor:ReplaceAll( cOldName, cNewName, 0 )
@@ -605,8 +605,8 @@ METHOD RenameForm( cOldName, cNewName, lProject ) CLASS ObjManager
          ENDIF
       ENDIF
       oEditor:PrevFile := cOldName
-      
-      IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL" 
+
+      IF lProject .OR. ::ActiveObject:ClsName == "VXH_FORM_IDE" .OR. ::ActiveObject:ClsName == "CCTL"
          TRY
             oEditor:TreeItem:Text := cNewName +".prg *"
           catch
@@ -618,12 +618,12 @@ RETURN Self
 
 METHOD ChangeCtrlFont( cf, oItem, oFont ) CLASS ObjManager
    LOCAL aFont1, aFont2, aProps
-   
+
    IF cf != NIL
       aProps := { "xHeight", "xWidth", "xEscapement", "xOrientation", "xWeight", "xnItalic", "xnUnderline", "xnStrikeOut",;
                   "xCharSet", "OutPrecision", "ClipPrecision", "Quality", "PitchAndFamily" }
 
-      aFont1 := {}                                
+      aFont1 := {}
       AADD( aFont1, cf:lpLogFont:lfFaceName:AsString() )
       AADD( aFont1, cf:lpLogFont:lfHeight              )
       AADD( aFont1, cf:lpLogFont:lfWidth               )
@@ -675,7 +675,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
    LOCAL oObj, cProp, cProp2, xVal
-    
+
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    IF oItem == NIL
       RETURN Self
@@ -690,7 +690,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
       ::SetFocus()
       RETURN Self
    ENDIF
-   
+
    cProp := oItem:ColItems[1]:Prop
    cProp2:= oItem:ColItems[1]:Prop2
 
@@ -715,7 +715,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
       ::SetFocus()
       RETURN NIL
    ENDIF
-  
+
    IF cProp2 != NIL
       oObj := ::ActiveObject:&cProp2
     ELSE
@@ -751,7 +751,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
 
    LOCAL n, cProp, cProp2, oObj, Topic, Event, nCurr, nHost, cVal
    LOCAL oError
-   
+
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
 
    IF oItem == NIL .OR. Empty( oItem:ColItems )
@@ -842,19 +842,19 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       IF cProp == "Caption" .AND. xValue == "" .AND. oObj:ClsName == "ToolButton"
          xValue := NIL
       ENDIF
-      
+
       IF oItem:Owner:Caption == "COM Properties"
          IF HGetPos( oObj:__OleVars, cProp ) != 0
             IF VALTYPE( oObj:__OleVars[cProp][1] ) == "A"
                oObj:__OleVars[cProp][4] := xValue
              ELSE
                oObj:__OleVars[cProp][1] := xValue
-            ENDIF   
+            ENDIF
          ENDIF
        ELSE
          __objSendMsg( oObj, "_"+cProp, xValue )
       ENDIF
-      
+
       IF cProp == "Name"
          IF oActiveObject:ClsName == "ProjProp" .AND. !FILE( oActiveObject:Path + "\" + oActiveObject:Name + ".vxh" )
             n := RAT( "\", oActiveObject:Path )
@@ -866,11 +866,11 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       IF cProp == "Name" .OR. cProp == "Icon" .OR. cProp == "ImageIndex"
          ::Application:ObjectTree:Set( oActiveObject )
       ENDIF
-      
+
       IF cProp2 != NIL .AND. cProp2 == "Font" .AND. __clsParent( oActiveObject:ClassH, "COMPONENT" )
          oObj:Set( oActiveObject )
       ENDIF
-      
+
       IF cProp IN {"Left","Top","Width","Height"}
          IF oActiveObject:ClsName != "VXH_FORM_IDE" .OR. cProp IN {"Width","Height"}
             oActiveObject:MoveWindow()
@@ -885,7 +885,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
 
       cVal := oItem:ColItems[1]:Value
 
-      IF !( VALTYPE( oItem:ColItems[1]:Value ) == "A" ) 
+      IF !( VALTYPE( oItem:ColItems[1]:Value ) == "A" )
          oItem:ColItems[1]:Value := xValue
       ENDIF
 
@@ -902,7 +902,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       TRY
          IF cProp == "Name"
             ::RenameForm( cVal, xValue,, oActiveObject )
-            
+
             FOR EACH Topic IN oActiveObject:Events
                 FOR EACH Event IN Topic[2]
                     IF Empty( Event[2] )
@@ -910,7 +910,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
                     ENDIF
 
                     ::Application:EventManager:RenameEvent( Event[1], Event[2], IIF( cProp != "Name", xValue, STRTRAN( Event[2], cVal, xValue ) ), .F. )
-                    
+
                     Event[2] := STRTRAN( Event[2], cVal, xValue )
 
                 NEXT
@@ -946,7 +946,7 @@ FUNCTION IsValidIdentifier( sID, oObject )
    IF ! ( sID[1] == '_' .OR. ( sID[1] >= 'a' .AND. sID[1] <= 'z' ) .OR. ( sID[1] >= 'A' .AND. sID[1] <= 'Z' ) )
       RETURN .F.
    ENDIF
-   
+
    nFor := 1
    FOR EACH cChar IN sID
       IF ! ( sID[ nFor ] == '_' .OR. ( sID[ nFor ] >= 'a' .AND. sID[ nFor ] <= 'z' ) .OR. ( sID[ nFor ] >= 'A' .AND. sID[ nFor ] <= 'Z' ) .OR. ( sID[ nFor ] >= '0' .AND. sID[ nFor ] <= '9' ) )
@@ -1026,7 +1026,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    DEFAULT lForce TO .F.
    DEFAULT lRefreshComp TO .T.
-   
+
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
    IF aSel[1][1] == NIL
@@ -1056,7 +1056,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
          ::Form:Label4:Caption := ::ActiveObject:__xCtrlName
       ENDIF
    ENDIF
-   
+
    IF ::ActiveObject != NIL .AND. ::ActiveObject == aSel[1][1] .AND. !lForce
       RETURN Self
    ENDIF
@@ -1067,7 +1067,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       ::Form:Label2:Caption := ::ActiveObject:Name
       ::Form:Label4:Caption := ::ActiveObject:__xCtrlName
    ENDIF
-   
+
    ::Application:Props[ "ComboSelect" ]:SelectControl( ::ActiveObject )
 
    ::lPaint := .F.
@@ -1078,7 +1078,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       ::Items[n]:Delete()
    NEXT
    ::ResetContent()
-   
+
    TRY
       WITH OBJECT ::Form
          :Label5:Hide()
@@ -1157,7 +1157,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        END
        cType  := VALTYPE( xValue )
        nColor := NIL
- 
+
        aProp := __objSendMsg( ::ActiveObject, "__a_"+cProp )
        cProp := aProp[1]
 
@@ -1262,7 +1262,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
                   FOR EACH Child IN ::ActiveObject:Form:Components
                       IF Child:ComponentType IN cProp
-                         IF ( Child:lCreated .OR. Child:ComponentType IN {"DataSource","BindingSource","SqlConnector"} .OR. Child:ClsName == "ImageList" ) 
+                         IF ( Child:lCreated .OR. Child:ComponentType IN {"DataSource","BindingSource","SqlConnector"} .OR. Child:ClsName == "ImageList" )
                             AADD( aCol[1]:Value[2], Child )
                          ENDIF
                       ENDIF
@@ -1341,7 +1341,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
              CASE cProp == "Icon"
                   IF xValue != NIL
-                     aCol[1]:Value := xValue 
+                     aCol[1]:Value := xValue
                      xValue := NIL
                   ENDIF
                   aCol[1]:ColType  := "ICONS"
@@ -1475,7 +1475,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
              aCol  := { TreeColItem( xValue, cType, , NIL, cProp,, lReadOnly ) }
              oSub := oItem:AddItem( cProp, 0, aCol )
-         NEXT 
+         NEXT
          oItem:SortChildren( .T. )
          oItem:Expand()
       ENDIF
@@ -1619,13 +1619,13 @@ METHOD GetColorValues( oObj, cProp, xValue, nDefault ) CLASS ObjManager
       ENDIF
       DEFAULT nColor TO nDefault
       IF nColor == nDefault
-         xValue := "System Default..." 
+         xValue := "System Default..."
       ENDIF
    ENDIF
    IF nDefault == NIL
       nDefault := nColor
       IF VALTYPE( xValue ) != "C"
-         xValue := "System Default..." 
+         xValue := "System Default..."
       ENDIF
    ENDIF
 RETURN nColor
@@ -1643,14 +1643,14 @@ RETURN cText
 //--------------------------------------------------------------------------------------------------------------------------------
 
 METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
-   LOCAL oItem, rc, cType, n, cProp, cText, oFont, cFont
+   LOCAL oItem, rc, cType, n, cProp, cText, oFont, cFont, oSelf := Self
    ( hWnd )
    IF nMsg == WM_USER + 4767
       IF ( oItem := ::GetSelected() ) != NIL .AND. ::ActiveObject:HasMessage( "Dock" ) .AND. ::ActiveObject:Dock != NIL
          oItem:ColItems[1]:Value := ::ActiveObject:Dock:Margins
          ::InvalidateRect(,.F.)
       ENDIF
-      
+
     ELSEIF nMsg == WM_USER + 4766
       IF ( oItem := ::GetSelected() ) != NIL
          IF ::ActiveObject:HasMessage( "BackgroundImage" ) .AND. VALTYPE( ::ActiveObject:BackgroundImage ) == "O"
@@ -1698,7 +1698,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Style       := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
 
                        GetRealKeyName(::ActiveObject:ShortcutKey:Key, @cText, 40)
-                       
+
                        :Caption     := cText
                        :Cargo       := ::ActiveObject:ShortcutKey:Key
 
@@ -1725,10 +1725,10 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Border := .F.
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                        :Create()
-                       
+
                        :OnDTNDateTimeChange := {|o, d| d := o:Date,;
                                                      o:Parent:SetValue( d, o ) }
-                                                     
+
                        :Action := {|o, d, oPar| d := o:Date,;
                                                      oPar := o:Parent,;
                                                      o:Parent:SetValue( d, o ),;
@@ -1815,7 +1815,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
                            :AddItem( oItem:ColItems[nCol-1]:Value[n]:Name )
                        NEXT
-                       
+
                        :SetCurSel( 1 )
 
                        :SetItemHeight( -1, ::GetItemHeight()-5 )
@@ -1924,7 +1924,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           NEXT
                           :ImageList  := ::ActiveObject:Parent:ImageList
                        ENDIF
-                       
+
                        IF cType == "IMAGEINDEX"
                           :SendMessage( CB_SETCURSEL, MAX( ::ActiveObject:&cProp, 0 ) )
                         ELSEIF cType == "DATADRIVERS"
@@ -2056,7 +2056,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
 
                        :OnWMLButtonUp := {|o,x,y|CheckBtnClickPos(o,x,y) }
                        :OnWMKillFocus := {|o|o:Destroy() }
-                       
+
                        oFont := ::ActiveObject:&cProp
                        IF cType == "CHOOSEFONT"
 
@@ -2160,11 +2160,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Height := rc:bottom-rc:top-1
                        :SetExStyle( WS_EX_CLIENTEDGE, .F. )
                        :Style := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
-                       
+
                        IF oItem:Caption == "Path" .OR. oItem:Caption IN {"SelectedPath","DefaultPath","Default","IncludePath","SourcePath"} .OR. oItem:Owner:Caption == "Target Folder"
                           :Button := .T.
                           :ButtonAction := {|o| BrowseForFolder(o, Self, oItem)}
-                          
+
                         ELSEIF __ObjHasMsg( ::ActiveObject, "__ExplorerFilter" ) .OR. oItem:Caption IN {"FileName","Icon","ImageName"} .OR. oItem:Owner:Caption == "Font"
                           IF oItem:Caption IN {"FileName","Icon","ImageName"}
                              :Button := .T.
@@ -2181,11 +2181,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :Button := .T.
                           :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject:BitmapMask, .F., { "Windows Bitmap (*.bmp)", "*.bmp" } ) }
                        ENDIF
-                       
+
                        :Create()
                        :Caption := ::GetEditBuffer( oItem, nCol )
                        :Cargo   := :Caption
-                       
+
                        IF !( oItem:Caption == "IncludePath"  .OR. oItem:Caption == "SourcePath" )
                           :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
                                                             oPar  := o:Parent,;
@@ -2241,7 +2241,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top+1
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 120
-                       
+
                        TRY
                           IF AT( "BackColor", oItem:Caption ) > 0
                              :SysDefault := ::ActiveObject:__SysBackColor
@@ -2250,7 +2250,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           ENDIF
                          catch
                        END
-                       
+
                        IF oItem:ColItems[nCol-1]:Value == "Custom..."
                           :Custom := oItem:ColItems[nCol-1]:Color
                        ENDIF
@@ -2258,7 +2258,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :ColorSelected := oItem:ColItems[nCol-1]:Color
 
                        :Create( UPPER( oItem:Caption ) == "MASKCOLOR" )
-                       :Action := {|o, c, oPar| c := o:ColorSelected, oPar := o:Parent, o:Destroy(), oPar:SetValue( c ), ::ActiveObject:InvalidateRect(,.F.) }
+                       :Action := {|o, c| c := o:ColorSelected, o:Destroy(), ::SetValue( c ), ::ActiveObject:InvalidateRect(,.F.) }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
 
@@ -2340,18 +2340,18 @@ RETURN NIL
 STATIC FUNCTION CheckShortCutKeyDown( o, n )
    LOCAL nScanCode, cText, lAsc, aSys := { VK_CONTROL, VK_SHIFT, VK_MENU, VK_CAPITAL, VK_SCROLL }
    IF ASCAN( aSys, n ) == 0
-      
+
       nScanCode := MapVirtualKey( n, 0 )
 
       lAsc := (n <= 32) .OR. (n >= 112 .AND. n <= 135) .OR. n == VK_MULTIPLY
-      
+
       IF (!lAsc .AND. n != VK_DIVIDE )
          lAsc := ToAscii( n, nScanCode, cText,, 1)
       ENDIF
-      
+
       nScanCode := nScanCode << 16
       nScanCode := nScanCode | 0x1 << 25 // <- don't care
-   
+
       IF !lAsc
          nScanCode := nScanCode | 0x1 << 24 // <- extended bit
       ENDIF
@@ -2360,7 +2360,7 @@ STATIC FUNCTION CheckShortCutKeyDown( o, n )
 
       o:Caption := cText
       o:Cargo   := n
-    
+
    ENDIF
 RETURN 0
 
@@ -2408,7 +2408,7 @@ STATIC FUNCTION CheckChar( o, n, oItem )
          IF oItem:Caption != "Contrast" .AND. oItem:Caption != "Brightness" .AND. CHR(n) == "-"
             RETURN 0
          ENDIF
-         
+
          IF !CHR(n) $ "-0123456789"
             IF ! ( n >= 35 .AND. n <= 40 ) .AND. n != VK_BACK
                RETURN 0
@@ -2463,7 +2463,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
             ClientToScreen( ::hWnd, @pt )
             ::ToolTip:TrackPosition( pt:x, pt:y )
             ::ToolTip:TrackActivate()
-         
+
           ELSEIF oItem:ColItems != NIL .AND. x >= ::Columns[1][1] + nfHeight + 3
             cText := oItem:ColItems[1]:Text
             aAlign := ::Drawing:GetTextExtentPoint32( cText )
@@ -2482,7 +2482,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
           ELSEIF oItem:ColItems != NIL .AND. x < ::Columns[1][1]+nfHeight+3
             cText := oItem:Caption
             aAlign := ::Drawing:GetTextExtentPoint32( cText )
-            IF aAlign[1] > ::Columns[1][1] - nPlus 
+            IF aAlign[1] > ::Columns[1][1] - nPlus
                ::ToolTip:Text  := cText
                pt := (struct POINT)
                pt:x := nfHeight - ( aAlign[1] - ::Columns[1][1] ) - 3
@@ -2494,7 +2494,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ObjManager
                cText := NIL
                ::ToolTip:Text  := NIL
             ENDIF
-            
+
          ENDIF
       CATCH
       END
@@ -2563,7 +2563,7 @@ METHOD OnKeyDown( nKey ) CLASS ObjManager
 
       CASE nKey == VK_SPACE
            ::PostMessage( WM_USER+4768 )
-      
+
    ENDCASE
 RETURN NIL
 
@@ -2712,7 +2712,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    ENDIF
    ::Application:SourceEditor:SetFocus()
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
-   
+
    ::Application:MainForm:ToolBox1:Enabled := .F.
 RETURN Self
 
@@ -2801,7 +2801,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ::ResetContent()
 
    ::cEventList := ""
- 
+
    IF ::ActiveObject:Events != NIL
       FOR EACH Topic IN ::ActiveObject:Events
           oItem := ::AddItem( Topic[1] )
@@ -2914,7 +2914,7 @@ RETURN Self
 
 METHOD OnParentDrawItem( nlParam, nwParam, dis ) CLASS ObjCombo
    LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, z, aAlign, y
-   ( nlParam, nwParam ) 
+   ( nlParam, nwParam )
    IF dis:hwndItem == ::hWnd
       DEFAULT ::ColWidth TO ::ClientWidth
 
@@ -3012,7 +3012,7 @@ RETURN Self
 METHOD OnInitDialog() CLASS ObjectManager
 
    ::Caption    := "Object Manager"
-   
+
    Image( Self )
    WITH OBJECT ::Image1
       :Height  := 77
@@ -3025,7 +3025,7 @@ METHOD OnInitDialog() CLASS ObjectManager
       :Create()
       :DockIt()
    END
-   
+
    StatusBar( Self )
    WITH OBJECT ::StatusBar1
       StatusBarPanel( :Parent:StatusBar1, , 120 )
@@ -3085,8 +3085,8 @@ __aProps["A"] := { { "AutoHScroll",             "Style"     },;
                    { "AllowMaximize",           "Behavior"  },;
                    { "AutoOpen",                "Behavior"  },;
                    { "AlignLeft",               "Behavior"  },;
-                   { "AlignTop",                "Behavior"  },; 
-                   { "AlignRight",              "Behavior"  },; 
+                   { "AlignTop",                "Behavior"  },;
+                   { "AlignRight",              "Behavior"  },;
                    { "AlignBottom",             "Behavior"  },;
                    { "AlignMask",               "Behavior"  },;
                    { "AlignTop",                "Behavior"   },;
@@ -3171,7 +3171,7 @@ __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "CurSel",                  "Behavior" },;
                    { "Color",                   "Colors" },;
                    { "ColorScheme",             "Colors", } }
-   
+
 __aProps["D"] := { { "DisableNoScroll",         "Style" },;
                    { "DlgModalFrame",           "Style" },;
                    { "DrawArrows",              "Style" },;
@@ -3283,7 +3283,7 @@ __aProps["I"] := { { "Icons",                   "Style" },;
                    { "ItemHeight",              "Size" } }
 
 __aProps["J"] := {}
-   
+
 __aProps["K"] := { { "KeepAspectRatio",         "Image" } }
 
 __aProps["L"] := { { "List",                    "Style" },;
@@ -3357,8 +3357,8 @@ __aProps["P"] := { { "PopUp",                   "Style" },;
                    { "Path",                    "Path" },;
                    { "Position",                "Position" } }
 
-__aProps["Q"] := {} 
-   
+__aProps["Q"] := {}
+
 __aProps["R"] := { { "RadioCheck",              "Style" },;
                    { "ReadOnly",                "Style" },;
                    { "Report",                  "Style" },;
@@ -3503,7 +3503,7 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
                    { "Step",                    "Position" },;
                    { "State",                   "Behavior" },;
                    { "SelectionHeight",         "Size" } }
-   
+
 __aProps["T"] := { { "TabStop",                 "Style" },;
                    { "TabOrder",                "Position" },;
                    { "ThickFrame",              "Style" },;
@@ -3572,7 +3572,7 @@ __aProps["W"] := { { "WantKeyboardInput",       "Style" },;
 __aProps["X"] := {}
 __aProps["Y"] := { { "YES_Button",              "CommonButtons" } }
 __aProps["Z"] := {}
-   
+
 RETURN
 
 STATIC FUNCTION BrowseFile( o )
@@ -3584,7 +3584,7 @@ RETURN NIL
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    LOCAL oFile := CFile( oEdit:Text )
    oEdit:OnWMKillFocus := NIL
-   
+
    IF aFilter == NIL
       IF lIcon
          oFile:AddFilter( "Icon Files (*.ico)", "*.ico" )
@@ -3613,7 +3613,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    oEdit:OnWMKillFocus := {|o|o:Destroy() }
    IF oFile:Result != IDCANCEL
       oEdit:Destroy()
-      
+
       IF oMan:ActiveObject:ClsName != "Application" .AND. __ObjHasMsg( oMan:ActiveObject, "Path" )
          oMan:ActiveObject:Path := oFile:Path
          oMan:SetValue( oFile:Name )
@@ -3635,7 +3635,7 @@ STATIC FUNCTION BrowseForFolder( oEdit, oMan, oItem )
    cDir := SHBrowseForFolder(,,BIF_NEWDIALOGSTYLE | BIF_BROWSEINCLUDEURLS, CSIDL_DESKTOP, pCallBack )
    oEdit:OnWMKillFocus := {|o|o:Destroy() }
    IF !EMPTY( cDir )
-      IF oItem:Caption == "IncludePath" .OR. oItem:Caption == "SourcePath" 
+      IF oItem:Caption == "IncludePath" .OR. oItem:Caption == "SourcePath"
          oEdit:Caption += "; " + cDir
          oEdit:SetFocus()
          RETURN NIL

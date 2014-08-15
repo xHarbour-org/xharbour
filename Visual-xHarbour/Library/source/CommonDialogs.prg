@@ -97,7 +97,7 @@ RETURN Self
 METHOD Show() CLASS FolderBrowserDialog
    LOCAL pCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "BrowseForFolderCallBack" ), Self )
    ::SelectedPath := SHBrowseForFolder( ::Owner:hWnd, ::Description, ::Style, ::RootFolder, pCallBack, @::SelectedId )
-   FreeCallBackPointer( pCallBack )
+   VXH_FreeCallBackPointer( pCallBack )
 RETURN ::SelectedPath
 
 METHOD BrowseForFolderCallBack( hWnd, nMsg, lp ) CLASS FolderBrowserDialog
@@ -127,9 +127,9 @@ RETURN self
 //------------------------------------------------------------------------------------------------
 
 CLASS OpenFileDialog INHERIT CommonDialogs
-   PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .T. 
-   PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T. 
-   PROPERTY MultiSelect      SET ::SetStyle( OFN_ALLOWMULTISELECT, v )        DEFAULT .T. 
+   PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .T.
+   PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T.
+   PROPERTY MultiSelect      SET ::SetStyle( OFN_ALLOWMULTISELECT, v )        DEFAULT .T.
    PROPERTY DeferenceLinks   SET ::__SetInvStyle( OFN_NODEREFERENCELINKS, v ) DEFAULT .T.
    PROPERTY ReadOnlyChecked  SET ::SetStyle( OFN_READONLY, v )                DEFAULT .F.
    PROPERTY RestoreDirectory SET ::SetStyle( OFN_NOCHANGEDIR, v )             DEFAULT .F.
@@ -138,14 +138,14 @@ CLASS OpenFileDialog INHERIT CommonDialogs
 
    PROPERTY AddExtension     DEFAULT .T.
    PROPERTY CheckFileExists  DEFAULT .T.
-   PROPERTY FileName         DEFAULT "" 
-   PROPERTY Filter           DEFAULT "" 
-   PROPERTY DefaultExt               
-   PROPERTY FilterIndex      DEFAULT 1  
-   PROPERTY InitialDirectory         
-   PROPERTY Title                    
+   PROPERTY FileName         DEFAULT ""
+   PROPERTY Filter           DEFAULT ""
+   PROPERTY DefaultExt
+   PROPERTY FilterIndex      DEFAULT 1
+   PROPERTY InitialDirectory
+   PROPERTY Title
    PROPERTY ShowPlacesBar    DEFAULT .T.
-   
+
    DATA __PrevName    PROTECTED
    DATA __PrevFilter  PROTECTED
    METHOD Init() CONSTRUCTOR
@@ -174,12 +174,12 @@ METHOD Show() CLASS OpenFileDialog
    IF ::__PrevFilter != NIL
       ::FilterIndex := ::__PrevFilter
    ENDIF
-   
+
    ::__PrevName   := ::FileName
    ::__PrevFilter := ::FilterIndex
 
    DEFAULT ::Title TO ::Owner:Caption
-   
+
    ofn:hInstance       := ::AppInstance
    ofn:nMaxFile        := 8192 + 1
    ofn:hwndOwner       := ::Owner:hWnd
@@ -189,7 +189,7 @@ METHOD Show() CLASS OpenFileDialog
    ofn:nFilterIndex    := ::FilterIndex
    ofn:lpstrDefExt     := ::DefaultExt
    ofn:lpstrTitle      := ::Title
-   
+
    cFilter := ::Filter
    IF VALTYPE( cFilter ) == "A"
       cFilter := ""
@@ -207,7 +207,7 @@ METHOD Show() CLASS OpenFileDialog
    ofn:FlagsEx     := 0
    IF !::ShowPlacesBar
       ofn:FlagsEx  := OFN_EX_NOPLACESBAR
-      ofn:Flags := ofn:Flags | OFN_ENABLEHOOK 
+      ofn:Flags := ofn:Flags | OFN_ENABLEHOOK
    ENDIF
    IF GetOpenFileName( @ofn )
       ::FilterIndex := ofn:nFilterIndex
@@ -228,13 +228,13 @@ RETURN .F.
 
 CLASS SaveFileDialog INHERIT CommonDialogs
    PROPERTY AddExtension                                                      DEFAULT .T.
-   PROPERTY DefaultExt                                                                   
-   PROPERTY FileName                                                          DEFAULT ""  
-   PROPERTY Filter                                                            DEFAULT ""  
-   PROPERTY FilterIndex                                                       DEFAULT 1   
-   PROPERTY InitialDirectory                                                             
-   PROPERTY Title                                                                        
-   PROPERTY ShowPlacesBar                                                     DEFAULT .T. 
+   PROPERTY DefaultExt
+   PROPERTY FileName                                                          DEFAULT ""
+   PROPERTY Filter                                                            DEFAULT ""
+   PROPERTY FilterIndex                                                       DEFAULT 1
+   PROPERTY InitialDirectory
+   PROPERTY Title
+   PROPERTY ShowPlacesBar                                                     DEFAULT .T.
    PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T.
    PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .F.
    PROPERTY CreatePrompt     SET ::SetStyle( OFN_CREATEPROMPT, v )            DEFAULT .T.
@@ -245,14 +245,14 @@ CLASS SaveFileDialog INHERIT CommonDialogs
    DATA __PrevName    PROTECTED
    DATA __PrevFilter  PROTECTED
    DATA FileExtension EXPORTED
-                                                                                       
-   METHOD Init() CONSTRUCTOR                                                           
+
+   METHOD Init() CONSTRUCTOR
    METHOD Show()
    METHOD __SetInvStyle( n, l ) INLINE ::SetStyle( n, !l )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS SaveFileDialog
-   ::Style := OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS | OFN_CREATEPROMPT 
+   ::Style := OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS | OFN_CREATEPROMPT
    ::__xCtrlName := "SaveFileDialog"
    ::ClsName     := "SaveFileDialog"
    ::ComponentType := "CommonDialog"
@@ -273,7 +273,7 @@ METHOD Show() CLASS SaveFileDialog
    IF ::__PrevFilter != NIL
       ::FilterIndex := ::__PrevFilter
    ENDIF
-   
+
    ::__PrevName   := ::FileName
    ::__PrevFilter := ::FilterIndex
 
@@ -299,13 +299,13 @@ METHOD Show() CLASS SaveFileDialog
 
    IF !::ShowPlacesBar
       ofn:FlagsEx  := OFN_EX_NOPLACESBAR
-      ofn:Flags := ofn:Flags | OFN_ENABLEHOOK 
+      ofn:Flags := ofn:Flags | OFN_ENABLEHOOK
    ENDIF
 
    IF GetSaveFileName( @ofn )
       ::FileName := Left( ofn:lpstrFile, At( Chr(0), ofn:lpstrFile ) - 1 )
       ::FilterIndex := ofn:nFilterIndex
-      
+
       IF ::AddExtension .AND. ofn:nFileExtension == 0
          aFilter := __str2a( ::Filter, "|" )
          IF LEN( aFilter ) > 0 .AND. ::FilterIndex > 0
@@ -397,7 +397,7 @@ CLASS FontDialog INHERIT CommonDialogs
    DATA ForeColor EXPORTED
 
    ACCESS Color INLINE ::ForeColor
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Show()
 ENDCLASS
@@ -455,7 +455,7 @@ CLASS PageSetup INHERIT CommonDialogs
    DATA Default      EXPORTED INIT .F.
    DATA DriverName   EXPORTED
    DATA Port         EXPORTED
-   
+
    DATA PageWidth    EXPORTED
    DATA PageHeight   EXPORTED
 
@@ -478,7 +478,7 @@ METHOD Init( oParent ) CLASS PageSetup
    ::ComponentType := "CommonDialog"
    ::EnumPaperSize := {{},{}}
    ::psd := (struct PAGESETUPDLG)
-   
+
    FOR n := 1 TO LEN( ::System:PaperSize )
        AADD( ::EnumPaperSize[1], ::System:PaperSize[n][1] )
        AADD( ::EnumPaperSize[2], ::System:PaperSize[n][2] )
@@ -493,7 +493,7 @@ METHOD Show() CLASS PageSetup
    nPaperSize   := ::PaperSize
    nLenght      := ::PageHeight
    nWidth       := ::PageWidth
-   
+
    ::psd:hwndOwner       := ::Owner:hWnd
    ::psd:Flags           := ::Style
    ::psd:ptPaperSize:x   := ::PageWidth
@@ -520,12 +520,12 @@ METHOD Show() CLASS PageSetup
       ENDIF
       ::Orientation  := nOrientation
       ::PaperSize    := nPaperSize
-      
+
       ::LeftMargin   := ::psd:rtMargin:Left
       ::TopMargin    := ::psd:rtMargin:Top
       ::RightMargin  := ::psd:rtMargin:Right
       ::BottomMargin := ::psd:rtMargin:Bottom
-      
+
       ::PageWidth    := nWidth
       ::PageHeight   := nLenght
       RETURN .T.
@@ -560,16 +560,16 @@ RETURN .F.
 #define TDCBF_CANCEL_BUTTON                 0x0008
 #define TDCBF_RETRY_BUTTON                  0x0010
 #define TDCBF_CLOSE_BUTTON                  0x0020
-   
+
 
 CLASS TaskDialog INHERIT CommonDialogs
    DATA __Flags         PROTECTED INIT 0
    DATA __ComBttns      PROTECTED INIT 0
-   
+
    DATA ButtonPressed           EXPORTED
    DATA RadioButton             EXPORTED
    DATA VerificationFlagChecked EXPORTED
-   
+
    PROPERTY Buttons                                                                         DEFAULT ""
    PROPERTY MainInstruction                                                                 DEFAULT ""
    PROPERTY Content                                                                         DEFAULT ""
@@ -589,14 +589,14 @@ CLASS TaskDialog INHERIT CommonDialogs
    PROPERTY CallbackTimer            SET ::__SetFlags( TDF_CALLBACK_TIMER, v )              DEFAULT .F.
    PROPERTY PositionRelativeToWindow SET ::__SetFlags( TDF_POSITION_RELATIVE_TO_WINDOW, v ) DEFAULT .F.
    PROPERTY RTLLayout                SET ::__SetFlags( TDF_RTL_LAYOUT, v )                  DEFAULT .F.
-   PROPERTY NoDefaultRadioButton     SET ::__SetFlags( TDF_NO_DEFAULT_RADIO_BUTTON, v )     DEFAULT .F.   
-   PROPERTY CanBeMinimized           SET ::__SetFlags( TDF_CAN_BE_MINIMIZED, v )            DEFAULT .F.   
-   PROPERTY OK_Button                SET ::__SetBttns( TDCBF_OK_BUTTON, v )                 DEFAULT .F.   
-   PROPERTY YES_Button               SET ::__SetBttns( TDCBF_YES_BUTTON, v )                DEFAULT .F.   
-   PROPERTY NO_Button                SET ::__SetBttns( TDCBF_NO_BUTTON, v )                 DEFAULT .F.   
-   PROPERTY CANCEL_Button            SET ::__SetBttns( TDCBF_CANCEL_BUTTON, v )             DEFAULT .F.   
-   PROPERTY RETRY_Button             SET ::__SetBttns( TDCBF_RETRY_BUTTON, v )              DEFAULT .F.   
-   PROPERTY CLOSE_Button             SET ::__SetBttns( TDCBF_CLOSE_BUTTON, v )              DEFAULT .F.   
+   PROPERTY NoDefaultRadioButton     SET ::__SetFlags( TDF_NO_DEFAULT_RADIO_BUTTON, v )     DEFAULT .F.
+   PROPERTY CanBeMinimized           SET ::__SetFlags( TDF_CAN_BE_MINIMIZED, v )            DEFAULT .F.
+   PROPERTY OK_Button                SET ::__SetBttns( TDCBF_OK_BUTTON, v )                 DEFAULT .F.
+   PROPERTY YES_Button               SET ::__SetBttns( TDCBF_YES_BUTTON, v )                DEFAULT .F.
+   PROPERTY NO_Button                SET ::__SetBttns( TDCBF_NO_BUTTON, v )                 DEFAULT .F.
+   PROPERTY CANCEL_Button            SET ::__SetBttns( TDCBF_CANCEL_BUTTON, v )             DEFAULT .F.
+   PROPERTY RETRY_Button             SET ::__SetBttns( TDCBF_RETRY_BUTTON, v )              DEFAULT .F.
+   PROPERTY CLOSE_Button             SET ::__SetBttns( TDCBF_CLOSE_BUTTON, v )              DEFAULT .F.
 
    METHOD Init() CONSTRUCTOR
    METHOD Show()
@@ -751,7 +751,7 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
                    ::Direction := 1
 
               CASE nwParam == IDCANCEL
-                   //FreeCallBackPointer( ::__pCallBackPtr )
+                   //VXH_FreeCallBackPointer( ::__pCallBackPtr )
                    ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackPtr )
            ENDCASE
    ENDCASE

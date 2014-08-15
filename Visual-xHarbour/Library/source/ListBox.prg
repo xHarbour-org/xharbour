@@ -137,7 +137,7 @@ ENDCLASS
 
 PROCEDURE __FreeCallBack() CLASS ListBox
    IF ::__pTipCallBack != NIL
-      FreeCallBackPointer( ::__pTipCallBack )
+      VXH_FreeCallBackPointer( ::__pTipCallBack )
       ::__pTipCallBack := NIL
    ENDIF
 RETURN
@@ -208,7 +208,7 @@ METHOD __SetItemToolTips( lTips ) CLASS ListBox
       IF IsWindow( ::__tipWnd ) .AND. ::__nTipProc != NIL
          SetWindowLong( ::__tipWnd, GWL_WNDPROC, ::__nTipProc )
          ::__nTipProc := NIL
-         //FreeCallBackPointer( ::__pTipCallBack )
+         //VXH_FreeCallBackPointer( ::__pTipCallBack )
          //::__pTipCallBack := NIL
          ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pTipCallBack )
          DestroyWindow( ::__tipWnd )
@@ -229,7 +229,7 @@ METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ListBox
 
       CASE WM_PAINT
            RETURN ::__HandleOnPaint( hWnd )
-           
+
       CASE WM_TIMER
            ::__HandleOnTimer( nwParam )
            EXIT
@@ -266,7 +266,7 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
    (nwParam)
 
    IF ::__OriginalSel == nCurSel
-      RETURN NIL 
+      RETURN NIL
    ENDIF
    IF nCurSel == 65540 .AND. IsWindowVisible( ::__tipWnd )
       ShowWindow( ::__tipWnd, SW_HIDE )
@@ -281,14 +281,14 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
 
    hDC := GetDC( ::__tipWnd )
    hOldFont := SelectObject( hDC, ::Font:Handle )
-   
+
    cBuf := space( SendMessage( ::hWnd, LB_GETTEXTLEN, nCurSel, 0 ) + 1 )
    SendMessage( ::hWnd, LB_GETTEXT, nCurSel, @cBuf)
 
    SendMessage( ::hWnd, LB_GETITEMRECT, nCurSel, @rcBounds)
-   rcDraw:left   := rcBounds:left  
-   rcDraw:top    := rcBounds:top   
-   rcDraw:right  := rcBounds:right 
+   rcDraw:left   := rcBounds:left
+   rcDraw:top    := rcBounds:top
+   rcDraw:right  := rcBounds:right
    rcDraw:bottom := rcBounds:bottom
 
    DrawText( hDC, cBuf, @rcDraw, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
@@ -302,7 +302,7 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
    ENDIF
 
    InflateRect( @rcDraw, 2, 2 )
-   
+
    pt:x := rcDraw:left
    pt:y := rcDraw:top
    ClientToScreen( ::hWnd, @pt )
@@ -314,7 +314,7 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
    ClientToScreen( ::hWnd, @pt )
    rcDraw:right  := pt:x
    rcDraw:bottom := pt:y
-   
+
    SetWindowText( ::__tipWnd, cBuf )
 
    ShowWindow( ::__tipWnd, SW_HIDE )

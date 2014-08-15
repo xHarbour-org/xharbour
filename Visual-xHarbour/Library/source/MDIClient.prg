@@ -105,10 +105,6 @@ METHOD Init( oParent ) CLASS MDIClient
    ::ClsName     := "MDIClient"
    ::ExStyle     := WS_EX_CLIENTEDGE
    ::WindowStyle := 4
-   //::Form        := oParent
-   ::__ClientStruct := (struct CLIENTCREATESTRUCT)
-   ::__ClientStruct:hWindowMenu  := ::WindowMenu
-   ::__ClientStruct:idFirstChild := ::FirstChild
 
 RETURN Self
 
@@ -116,6 +112,9 @@ RETURN Self
 
 METHOD Create() CLASS MDIClient
    ::ControlParent := .T.
+   ::__ClientStruct := (struct CLIENTCREATESTRUCT)
+   ::__ClientStruct:hWindowMenu  := ::WindowMenu
+   ::__ClientStruct:idFirstChild := ::FirstChild
    IF ::Parent != NIL .AND.::Parent:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance   := .T.

@@ -23,7 +23,7 @@
 CLASS Font
    DATA EnumQuality EXPORTED INIT { { "Default", "Draft", "Proof", "Non Antialiased", "Antialiased" },;
                                     { DEFAULT_QUALITY, DRAFT_QUALITY, PROOF_QUALITY, NONANTIALIASED_QUALITY, ANTIALIASED_QUALITY, CLEARTYPE_QUALITY } }
-  
+
    PROPERTY FaceName     SET (::xFaceName    := v, ::Modify(v))
    PROPERTY Escapement   SET (::xEscapement  := v, ::Modify(v))
    PROPERTY Orientation  SET (::xOrientation := v, ::Modify(v))
@@ -90,7 +90,7 @@ METHOD Create() CLASS Font
 
    ::ncm := (struct NONCLIENTMETRICS)
    ::ncm:cbSize := ::ncm:Sizeof()
-   
+
    SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ::ncm:Sizeof(), @::ncm, 0 )
 
    IF ::FaceName != NIL
@@ -103,14 +103,14 @@ METHOD Create() CLASS Font
       ::ncm:lfMessageFont:lfFaceName:Buffer( "Tahoma" )
       cFont := "Tahoma"
    ENDIF
-   
+
    IF ::Owner != NIL
       IF ::nUnderline == NIL .AND. ::Owner:__xCtrlName == "LinkLabel"
          ::ncm:lfMessageFont:lfUnderline := 1
          ::nUnderline := 1
       ENDIF
    ENDIF
-   
+
    ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height        )
    ::ncm:lfMessageFont:lfWidth          := IFNIL( ::Width         , ::ncm:lfMessageFont:lfWidth         , ::Width          )
    ::ncm:lfMessageFont:lfEscapement     := IFNIL( ::Escapement    , ::ncm:lfMessageFont:lfEscapement    , ::Escapement     )
@@ -144,7 +144,7 @@ METHOD Create() CLASS Font
    ::Delete()
    IF ::lCreateHandle
       ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
-   ENDIF   
+   ENDIF
 
    IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
@@ -171,6 +171,7 @@ METHOD Delete() CLASS Font
       ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
+      ::xFaceName := NIL
       //::__ClassInst := NIL
    ENDIF
 RETURN .T.
@@ -179,7 +180,7 @@ RETURN .T.
 //--------------------------------------------------------------------------------------------------------
 
 METHOD Set( oOwner ) CLASS Font
-   DEFAULT oOwner TO ::Owner 
+   DEFAULT oOwner TO ::Owner
    ::Owner := oOwner
    IF oOwner:ClsName != "FontDialog"
       IF oOwner:HasMessage( "SendMessage" )
@@ -315,7 +316,7 @@ METHOD SetPointSize( n ) CLASS Font
    ::Height := -MulDiv( n, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
    DeleteDC( hDC )
    ::xPointSize := n
-   
+
    IF ::__ClassInst != NIL .AND. ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
       ::Owner:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    ENDIF

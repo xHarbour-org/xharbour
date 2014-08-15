@@ -263,7 +263,7 @@ RETURN cp
 METHOD Destroy() CLASS SerialPort
    ::Close()
    IF ::__pCallBackPtr != NIL
-      FreeCallBackPointer( ::__pCallBackPtr )
+      VXH_FreeCallBackPointer( ::__pCallBackPtr )
       ::__pCallBackPtr := NIL
    ENDIF
    ::Super:Destroy()

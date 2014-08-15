@@ -60,10 +60,10 @@ CLASS ToolStripContainer INHERIT Control
    DATA Transparent      EXPORTED INIT .F.
    DATA Visible          EXPORTED INIT .T.
    DATA __aStrips        EXPORTED INIT {}
-   
+
    DATA __aVertex        PROTECTED
    DATA __aMesh          PROTECTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnEraseBkGnd()      INLINE 1
@@ -138,7 +138,7 @@ METHOD __SetVertex() CLASS ToolStripContainer
    ::__aVertex[2]:Red   := GetRValue( nColor2 ) * 256
    ::__aVertex[2]:Green := GetGValue( nColor2 ) * 256
    ::__aVertex[2]:Blue  := GetBValue( nColor2 ) * 256
-   
+
    ::__aMesh[1]:UpperLeft  := 0
    ::__aMesh[1]:LowerRight := 1
 RETURN Self
@@ -284,7 +284,7 @@ METHOD __RefreshLayout( lLeft ) CLASS ToolStripContainer
        IF !lLeft
           nLeft := 2
        ENDIF
-       
+
        x := 0
        FOR n := 1 TO LEN( aStrip )
            aStrip[n]:xTop := nTop
@@ -327,7 +327,7 @@ CLASS ToolStrip INHERIT Control
    PROPERTY Float      ROOT "Position" SET ::__SetFloat(v)     DEFAULT .F. NOTPUBLIC
 
    ACCESS __lMoveable INLINE ::Parent:ClsName != "ToolStripContainer"
-   
+
    DATA Border         EXPORTED INIT .T.
    //DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
@@ -367,7 +367,7 @@ CLASS ToolStrip INHERIT Control
    DATA __LastY        PROTECTED INIT 0
    DATA __LastX        PROTECTED INIT 0
    DATA __DesignAddNew EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnEraseBkGnd() INLINE 1
@@ -408,7 +408,7 @@ CLASS ToolStrip INHERIT Control
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS ToolStrip
-   IF ::hWnd != NIL 
+   IF ::hWnd != NIL
       EnableWindow( ::hWnd, lEnable )
       ::InvalidateRect()
       AEVAL( ::Children, {|o| o:InvalidateRect()} )
@@ -477,7 +477,7 @@ METHOD Create() CLASS ToolStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolStrip 
+METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolStrip
    LOCAL n, i, nRet
    FOR n := 1 TO LEN( ::Children )
        IF ( nRet := ::Children[n]:OnParentCommand( nId, nCode, nlParam ) ) == NIL
@@ -573,7 +573,7 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
          IF EMPTY( ::Parent:__aStrips[ ::Row ] )
             ADEL( ::Parent:__aStrips, ::Row, .T. )
          ENDIF
-         
+
          IF nRow > 0
             IF LEN( ::Parent:__aStrips ) < nRow
                AADD( ::Parent:__aStrips, { Self } )
@@ -609,7 +609,7 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
                      IF ::__ClassInst != NIL
                         ::Parent:__aStrips[ nRow ][i]:MoveWindow()
                      ENDIF
-                     
+
                      oStrip := Self
                      FOR x  := nPos+1 TO LEN( ::Parent:__aStrips[ nRow ] )
                          IF oStrip:Left + oStrip:Width + 2 >= ::Parent:__aStrips[ nRow ][x]:Left
@@ -705,12 +705,12 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
          ::Parent:ScreenToClient( @pt )
 
          IF pt:x > 1 //::__GripperPos
-            
+
             DEFAULT ::__PrevPos TO { pt:x, pt:y }
             IF ::__PrevPos[1] != pt:x
-            
+
                nLeft  := ::Left + ( pt:x - ::__PrevPos[1] )
-               
+
                ::xLeft := MAX( 2, nLeft )
                IF ::xLeft == 2
                   ::MoveWindow()
@@ -721,25 +721,25 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                   ::Left := ::Parent:Width - ::Width - 2
                   RETURN 0
                ENDIF
-               
+
                nPos   := ASCAN( ::Parent:__aStrips[ ::Row ], {|o| o:hWnd == ::hWnd} )
                oStrip := Self
-               
+
                IF pt:x > ::__PrevPos[1] // moving to the right
                   FOR i  := nPos+1 TO LEN( ::Parent:__aStrips[ ::Row ] )
                       IF oStrip:Left + oStrip:Width + 2 >= ::Parent:__aStrips[ ::Row ][i]:Left
-                         
+
                          nWidth := oStrip:Left + oStrip:Width
                          FOR nCur := i TO LEN( ::Parent:__aStrips[ ::Row ] )
                              nWidth += ::Parent:__aStrips[ ::Row ][nCur]:Width + 2
                          NEXT nCur
-                         
+
                          IF nWidth <= ::Parent:ClientWidth - 2
                             ::Parent:__aStrips[ ::Row ][i]:Left := oStrip:Left + oStrip:Width + 2
                           ELSE
                             oStrip:xLeft := ::Parent:__aStrips[ ::Row ][i]:Left - oStrip:Width - 2
                          ENDIF
-                         
+
                       ENDIF
                       oStrip := ::Parent:__aStrips[ ::Row ][i]
                   NEXT
@@ -752,7 +752,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                          FOR nCur := i-1 TO 1 STEP -1
                              nLeft += ::Parent:__aStrips[ ::Row ][nCur]:Width + 2
                          NEXT nCur
-                         
+
                          IF ::Parent:__aStrips[ ::Row ][i]:Left >= nLeft
                             ::Parent:__aStrips[ ::Row ][i]:Left := oStrip:Left - ::Parent:__aStrips[ ::Row ][i]:Width - 2
                           ELSE
@@ -782,7 +782,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                   ::xRow  := 1
                   ::Parent:__RefreshPosNo()
                   ::Parent:__RefreshLayout( .T. )
-                
+
                 ELSEIF pt:y >= ::Parent:Height .AND. ::__PrevPos[2] < pt:y .AND. LEN( ::Parent:__aStrips[ ::Row ] ) == 1// down
                   // detatch
                   ::__LastX := x
@@ -792,7 +792,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                   ::__SetRow( ::Row+1 )
                   ::Parent:__RefreshPosNo()
 
-                ELSEIF ::__PrevPos[2] != pt:y 
+                ELSEIF ::__PrevPos[2] != pt:y
                   IF ::__PrevPos[2] > pt:y .AND. ::Row > 1
                      ::__SetRow( ::Row - IIF( ::Parent:__aStrips[ ::Row-1 ][1]:__lIsMenu, 2, 1 ) )
                      ::Parent:__RefreshPosNo()
@@ -800,10 +800,10 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                      ::__SetRow( ::Row + IIF( ::Parent:__aStrips[ ::Row+1 ][1]:__lIsMenu, 2, 1 ) )
                      ::Parent:__RefreshPosNo()
                   ENDIF
-                     
+
                ENDIF
             ENDIF
-            
+
             ::__PrevPos := { pt:x, pt:y }
          ENDIF
       ENDIF
@@ -820,7 +820,7 @@ METHOD __CreateBkBrush() CLASS ToolStrip
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::xWidth, ::xHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   
+
    __GradientFill( hMemDC, ::__aVertex1, 2, ::__aMesh, 1, 1 )
    __GradientFill( hMemDC, ::__aVertex2, 2, ::__aMesh, 1, 1 )
    __GradientFill( hMemDC, ::__aVertex3, 2, ::__aMesh, 1, 1 )
@@ -832,7 +832,7 @@ METHOD __CreateBkBrush() CLASS ToolStrip
 
       IF ::ShowGrip
          y := 4
-         FOR n := 1 TO nDots  
+         FOR n := 1 TO nDots
              SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripLight )
              SetPixel( hMemDC, ::__GripperPos + 1, y + 2, ::ColorScheme:GripLight )
              SetPixel( hMemDC, ::__GripperPos + 2, y + 1, ::ColorScheme:GripLight )
@@ -851,13 +851,13 @@ METHOD __CreateBkBrush() CLASS ToolStrip
    hOldPen := SelectObject( hMemDC, ::ColorScheme:Pen:ToolStripBorder )
    MoveTo( hMemDC, 2,   ::Height-1   )
    LineTo( hMemDC, ::Width-IIF( ::xShowChevron, ::__ChevronWidth, 2 ), ::Height-1  )
-   
+
    IF !::xShowChevron
       MoveTo( hMemDC, ::Width-1,   2 )
       LineTo( hMemDC, ::Width-1, ::Height-2  )
       SetPixel( hMemDC, ::Width-2, ::Height-2, ::ColorScheme:ToolStripBorder )
    ENDIF
-   
+
    SelectObject( hMemDC, hOldPen )
 
    hSepDark  := ::ColorScheme:Pen:SeparatorDark
@@ -890,7 +890,7 @@ METHOD __CreateBkBrush() CLASS ToolStrip
           nLeft += oChild:Width + oChild:__nSeparator
       NEXT
    ENDIF
-   
+
    IF ::BkBrush != NIL
       DeleteObject( ::BkBrush )
    ENDIF
@@ -899,7 +899,7 @@ METHOD __CreateBkBrush() CLASS ToolStrip
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
-   
+
    ReleaseDC( ::hWnd, hDC )
 RETURN NIL
 
@@ -947,15 +947,15 @@ METHOD __DrawChevron( hDC, nWidth, nColor1, nColor2, nColor3, nColor4, nColor5 )
    __GradientFill( hDC, ::__aChevron2, 2, ::__aMesh, 1, 1 )
    __GradientFill( hDC, ::__aChevron3, 2, ::__aMesh, 1, 1 )
 
-   SetPixel( hDC, ::Width - (nWidth-1), 0, nColor1 ) 
-   SetPixel( hDC, ::Width - (nWidth-0), 0, nColor2 ) 
-   SetPixel( hDC, ::Width - (nWidth-1), 1, nColor2 ) 
+   SetPixel( hDC, ::Width - (nWidth-1), 0, nColor1 )
+   SetPixel( hDC, ::Width - (nWidth-0), 0, nColor2 )
+   SetPixel( hDC, ::Width - (nWidth-1), 1, nColor2 )
 
    SetPixel( hDC, ::Width - 2, 0, nColor3 )
    SetPixel( hDC, ::Width - 2, 1, nColor1 )
    SetPixel( hDC, ::Width - 1, 1, nColor3 )
 
-   SetPixel( hDC, ::Width - (nWidth-1), ::Height - 1, nColor4 )   
+   SetPixel( hDC, ::Width - (nWidth-1), ::Height - 1, nColor4 )
    SetPixel( hDC, ::Width - (nWidth-0), ::Height - 1, nColor5 )
    SetPixel( hDC, ::Width - (nWidth-1), ::Height - 2, nColor5 )
 
@@ -973,10 +973,10 @@ METHOD __DrawChevron( hDC, nWidth, nColor1, nColor2, nColor3, nColor4, nColor5 )
    SelectObject( hDC, GetStockObject( BLACK_PEN ) )
    MoveTo( hDC, ::Width - 8, ::Height -  7 )
    LineTo( hDC, ::Width - 3, ::Height -  7 )
-   
+
    MoveTo( hDC, ::Width - 7, ::Height -  6 )
    LineTo( hDC, ::Width - 4, ::Height -  6 )
-   
+
    MoveTo( hDC, ::Width - 6, ::Height -  5 )
    LineTo( hDC, ::Width - 5, ::Height -  5 )
 
@@ -993,7 +993,7 @@ METHOD __SetChevronVertex() CLASS ToolStrip
    LOCAL aChevron := { ::ColorScheme:OverflowButtonGradientBegin,;
                        ::ColorScheme:OverflowButtonGradientMiddle,;
                        ::ColorScheme:OverflowButtonGradientEnd }
-                       
+
    ::__aChevron1[1]:x     := ::ClientWidth - 11
    ::__aChevron1[1]:y     := 0
    ::__aChevron1[1]:Alpha := 0
@@ -1043,7 +1043,7 @@ METHOD __SetVertex() CLASS ToolStrip
    LOCAL aStrip   := { ::ColorScheme:ToolStripGradientBegin,;
                        ::ColorScheme:ToolStripGradientMiddle,;
                        ::ColorScheme:ToolStripGradientEnd }
-                       
+
 
    ::__aVertex1[1]:x     := 0
    ::__aVertex1[1]:y     := 0
@@ -1073,8 +1073,8 @@ METHOD __SetVertex() CLASS ToolStrip
    ::__aVertex2[2]:Red   := GetRValue( aStrip[2] ) * 256
    ::__aVertex2[2]:Green := GetGValue( aStrip[2] ) * 256
    ::__aVertex2[2]:Blue  := GetBValue( aStrip[2] ) * 256
-   
-   
+
+
    ::__aVertex3[1]:x     := 0
    ::__aVertex3[1]:y     := ::ClientHeight - 12
    ::__aVertex3[1]:Alpha := 0
@@ -1102,11 +1102,11 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS ToolStrip
 
    ::__LastY := y
    ::__LastX := x
-   
+
    IF ::Row > 0 .AND. ::xShowGrip .AND. ::Parent:ClsName == "ToolStripContainer"
       ::SetCapture()
       IF ::__PrevRow > 0 .AND. nwParam == 1500
-         ::__PrevRow    := 0 
+         ::__PrevRow    := 0
          ::Left := ::__LastLeft
          ::Top  := IIF( ::__LastTop > 0, ::Parent:Height - ::Height - 2, 2 )
       ENDIF
@@ -1134,7 +1134,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS ToolStrip
    ::__SetVertex()
    ::__CreateBkBrush()
    ::__PrevSize := LOWORD(nlParam)
-   IF ::Row > 0 .AND. ::__PrevRow == 0 
+   IF ::Row > 0 .AND. ::__PrevRow == 0
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
    ENDIF
 RETURN NIL
@@ -1165,7 +1165,7 @@ METHOD __SetFloat( lFloat ) CLASS ToolStrip
    GetCursorPos( @pt )
    IF !lFloat
       ::xRow := ::__PrevRow
-      
+
       ::SendMessage( WM_LBUTTONUP, 0, MAKELPARAM( pt:x, pt:y ) )
 
       ::SetWindowLong( GWL_EXSTYLE, WS_EX_NOACTIVATE )
@@ -1189,7 +1189,7 @@ METHOD __SetFloat( lFloat ) CLASS ToolStrip
          ::Parent:__RefreshPosNo()
       ENDIF
       ::Parent:__RefreshLayout(.T.)
-      
+
       ::__lOnCaption := .F.
       ::__OnGripper := .T.
 
@@ -1233,7 +1233,7 @@ METHOD OnNCPaint() CLASS ToolStrip
    LOCAL hDC, hOldPen, hRegion, hPen, hOldBrush, nColor, aAlign, y, hOldFont, nForeColor, nBackColor
    IF ::Row == 0
       nColor  := ::ColorScheme:MenuBorder
-      
+
       hPen    := CreatePen( PS_SOLID, 1, GetSysColor( COLOR_BTNFACE ) )
 
       hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
@@ -1248,9 +1248,9 @@ METHOD OnNCPaint() CLASS ToolStrip
       SelectObject( hDC, hPen )
       IF ::Font != NIL .AND. ::Font:Handle != NIL
          hOldFont := SelectObject( hDC, ::Font:Handle )
-      ENDIF      
+      ENDIF
       Rectangle( hDC, 2, 2, ::Width - 2, ::Height - 2 )
-     
+
       SetPixel( hDC, 2,           2,            nColor )
       SetPixel( hDC, ::Width - 3, 2,            nColor )
       SetPixel( hDC, ::Width - 3, ::Height - 3, nColor )
@@ -1271,12 +1271,12 @@ METHOD OnNCPaint() CLASS ToolStrip
       ENDIF
       SelectObject( hDC, hOldpen )
       SelectObject( hDC, hOldBrush )
-      
+
       ReleaseDC( ::hWnd, hDC )
-      
+
       DeleteObject( hPen )
       DeleteObject( hRegion )
-      
+
    ENDIF
 RETURN NIL
 
@@ -1361,12 +1361,12 @@ CLASS ToolStripItem INHERIT Control
    PROPERTY Role        DEFAULT 1
    PROPERTY ShortCutKey
 
-   // INTERNALS   
+   // INTERNALS
    PROPERTY Left        SET ::__SetSizePos(1,v) DEFAULT 0   NOTPUBLIC
    PROPERTY Top         SET ::__SetSizePos(2,v) DEFAULT 1   NOTPUBLIC
    PROPERTY Width       SET ::__SetSizePos(3,v) DEFAULT 25  NOTPUBLIC
    PROPERTY Height      SET ::__SetSizePos(4,v) DEFAULT 0   NOTPUBLIC
-   
+
    ACCESS ColorSelectedBegin  INLINE ::ColorScheme:ButtonSelectedGradientBegin
    ACCESS ColorSelectedEnd    INLINE ::ColorScheme:ButtonSelectedGradientEnd
    ACCESS ColorSelectedBorder INLINE ::ColorScheme:ButtonSelectedBorder
@@ -1374,12 +1374,12 @@ CLASS ToolStripItem INHERIT Control
    ACCESS ColorPressedBegin   INLINE ::ColorScheme:ButtonPressedGradientBegin
    ACCESS ColorPressedEnd     INLINE ::ColorScheme:ButtonPressedGradientEnd
    ACCESS ColorPressedBorder  INLINE ::ColorScheme:ButtonPressedBorder
-   
+
    ACCESS ColorCheckedBegin   INLINE ::ColorScheme:ButtonCheckedGradientBegin
    ACCESS ColorCheckedEnd     INLINE ::ColorScheme:ButtonCheckedGradientEnd
-   
+
    ACCESS ColorPressedText    INLINE ::ColorScheme:ButtonPressedHighlightBorder
-   
+
    DATA __aVertex          PROTECTED
    DATA __aMesh            PROTECTED
    DATA __lSelected        EXPORTED  INIT .F.
@@ -1388,7 +1388,7 @@ CLASS ToolStripItem INHERIT Control
    DATA __hKeyMenuHook     PROTECTED
    DATA __nSeparator       EXPORTED  INIT 0
    DATA EnumRole           EXPORTED  INIT { { "Button", "CkeckButton", "GroupCheck" }, {1,2,3} }
-   
+
    // REMOVED PROPERTIES
    DATA Cursor             EXPORTED
    DATA Border             EXPORTED  INIT .T.
@@ -1475,7 +1475,7 @@ METHOD Create() CLASS ToolStripItem
    ::xCursor := ::System:Cursor:Arrow
 
    Super:Create()
-   
+
    IF ::__xCtrlName == "ToolStripComboBox"
       ::Top := ((::Parent:Height-5) - ::SelectionHeight)/2
    ENDIF
@@ -1483,7 +1483,7 @@ METHOD Create() CLASS ToolStripItem
    ::Parent:__UpdateWidth()
    IF ::__xCtrlName != "ToolStripComboBox"
       ::ShortCutKey:SetAccel()
-   ENDIF  
+   ENDIF
 
 RETURN Self
 
@@ -1567,13 +1567,13 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD __SetVertex( nColorBegin, nColorEnd, x, y, cx, cy ) CLASS ToolStripItem
-   DEFAULT nColorBegin  TO ::ColorSelectedBegin 
-   DEFAULT nColorEnd    TO ::ColorSelectedEnd   
+   DEFAULT nColorBegin  TO ::ColorSelectedBegin
+   DEFAULT nColorEnd    TO ::ColorSelectedEnd
    DEFAULT x            TO 0
    DEFAULT y            TO 0
    DEFAULT cx           TO ::ClientWidth
    DEFAULT cy           TO ::ClientHeight
-   
+
    ::__aVertex[1]:x     := x
    ::__aVertex[1]:y     := y
    ::__aVertex[1]:Alpha := 0
@@ -1587,7 +1587,7 @@ METHOD __SetVertex( nColorBegin, nColorEnd, x, y, cx, cy ) CLASS ToolStripItem
    ::__aVertex[2]:Red   := GetRValue( nColorEnd ) * 256
    ::__aVertex[2]:Green := GetGValue( nColorEnd ) * 256
    ::__aVertex[2]:Blue  := GetBValue( nColorEnd ) * 256
-   
+
    ::__aMesh[1]:UpperLeft  := 0
    ::__aMesh[1]:LowerRight := 1
 RETURN Self
@@ -1602,7 +1602,7 @@ METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
          s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
          s_CurrFocus := NIL
       ENDIF
-      
+
       IF s_hKeyMenuHook != NIL
          UnhookWindowsHookEx( s_hKeyMenuHook )
          s_hKeyMenuHook := NIL
@@ -1650,16 +1650,16 @@ METHOD OnLButtonUp() CLASS ToolStripItem
    s_lExecuting := .T.
 
    IF ::__lPushed .AND. ::DropDown < 3 .AND. ( !::Parent:__lIsMenu  .OR. EMPTY( ::Children ) )
-      
+
       ::__lPushed   := .F.
       ::__lSelected  := .F.
-      
+
       pt := (struct POINT)
       GetCursorPos( @pt )
       ::ScreenToClient( @pt )
 
       ::__lSelected := _PtInRect( { 0, 0, ::Width, ::Height }, { pt:x, pt:y } )
-      
+
       IF ::__lSelected
          IF ::Role == 2
             ::Checked := !::Checked
@@ -1693,7 +1693,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
    DATA __hMenu         PROTECTED
    DATA __nDropDown     PROTECTED INIT 0
    DATA __hMenu         EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnPaint()
@@ -1740,7 +1740,7 @@ METHOD Create() CLASS ToolStripButton
    IF !::Parent:__lIsMenu
       nAdd := ::Parent:ImagePadding * 2
    ENDIF
-   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
+   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL
       ::xText := EVAL( &(::xText) )
 
       IF ( n := AT( "&", ::xText ) ) > 0
@@ -1752,7 +1752,7 @@ METHOD Create() CLASS ToolStripButton
    ENDIF
    aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
    ::xWidth := aSize[1]+nAdd
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 
+   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       IF ::ImageAlign != DT_CENTER
          ::xWidth += ::Parent:ImageList:IconWidth + 1
        ELSE
@@ -1779,14 +1779,14 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS ToolStripButton
    DO CASE
       CASE ::DropDown == 1
            RETURN Super:OnLButtonDown( nwParam, x, y )
-           
+
       CASE ::DropDown == 2
            IF ::Width - x <= 11
               ::__OpenMenu()
             ELSE
               RETURN Super:OnLButtonDown( nwParam, x, y )
            ENDIF
-           
+
       CASE ::DropDown == 3
            ::__OpenMenu()
    ENDCASE
@@ -1817,7 +1817,7 @@ METHOD OnPaint() CLASS ToolStripButton
    LOCAL x, n, nDots := ( ::Height - 6 ) / 4
    LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled, hDC, hMemDC
    static lPaint := .F.
-   
+
    lEnabled := ::Enabled .AND. ::Parent:Enabled
 
    hDC := ::BeginPaint()
@@ -1827,7 +1827,7 @@ METHOD OnPaint() CLASS ToolStripButton
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
    IF ( ::__lSelected .OR. ::Checked ) .AND. !::ClsName == "ToolStripLabel"
-   
+
       hBorderPen := ::ColorScheme:Pen:ButtonSelectedBorder //::ColorSelectedBorder
       IF ::__lPushed
          IF ::DropDown == 1 .OR. s_hMenuDialogHook == NIL
@@ -1859,7 +1859,7 @@ METHOD OnPaint() CLASS ToolStripButton
 
       __GradientFill( hMemDC, ::__aVertex, 2, ::__aMesh, 1, 1 )
       Rectangle( hMemDC, 0, 0, ::Width, ::Height )
-      
+
       //Paint DropDown
       IF ::DropDown == 2 .AND. s_hMenuDialogHook == NIL
          ::__SetVertex( , , ::Width - 11 )
@@ -1885,7 +1885,7 @@ METHOD OnPaint() CLASS ToolStripButton
    IF ::Font != NIL .AND. ::Font:Handle != NIL
       hPrevFont := SelectObject( hMemDC, ::Font:Handle )
    ENDIF
-   aTextRect  := { 0, 0, ::Width-::__nDropDown, ::Height }   
+   aTextRect  := { 0, 0, ::Width-::__nDropDown, ::Height }
    nTextFlags := DT_CENTER | DT_VCENTER | DT_SINGLELINE
    x          := 0
    nTop       := 5
@@ -1916,11 +1916,11 @@ METHOD OnPaint() CLASS ToolStripButton
          nTop := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
       ENDIF
 
-      
+
       //y := ( ( ::Height - ::Top ) - ::Parent:ImageList:IconHeight ) / 2
       //::Parent:ImageList:DrawImage( hMemDC, ::ImageIndex, 3, y, ILD_TRANSPARENT )
       //x := ::Parent:ImageList:IconWidth + 3
-      
+
       IF !lEnabled
          ::Parent:ImageList:DrawDisabled( hMemDC, ::ImageIndex, Int( nLeft ), Int( nTop ) )
        ELSE
@@ -1944,10 +1944,10 @@ METHOD OnPaint() CLASS ToolStripButton
       MoveTo( hMemDC, ::Width - 7, ( ::Height / 2 ) + 1 )
       LineTo( hMemDC, ::Width - 6, ( ::Height / 2 ) + 1 )
    ENDIF
-   
+
    IF hPrevFont != NIL
       SelectObject( hMemDC, hPrevFont )
-   ENDIF   
+   ENDIF
 
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
@@ -1969,7 +1969,7 @@ METHOD __SetImageIndex() CLASS ToolStripButton
       ENDIF
 
       ::xWidth := aSize[1]+nAdd
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 
+      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
          IF ::ImageAlign != DT_CENTER
             ::xWidth += ::Parent:ImageList:IconWidth + 1
           ELSE
@@ -1980,7 +1980,7 @@ METHOD __SetImageIndex() CLASS ToolStripButton
 
       nLeft := IIF( ::Parent:ShowGrip, ::Parent:__GripperPos + 4, 1 )
       AEVAL( ::Parent:Children, {|o| o:xLeft := nLeft, o:MoveWindow(), nLeft := o:Left + o:Width } )
-   
+
       ::Parent:__UpdateWidth()
    ENDIF
 RETURN Self
@@ -2001,10 +2001,10 @@ METHOD SetWindowText( cText ) CLASS ToolStripButton
          nAdd := ::Parent:ImagePadding * 2
       ENDIF
       nDiff := (aSize[1]+nAdd) - ::Width
-      
+
       ::Width := aSize[1]+nAdd
 
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 
+      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
          IF ::ImageAlign != DT_CENTER
             ::Width += ::Parent:ImageList:IconWidth + 1
           ELSE
@@ -2077,7 +2077,7 @@ RETURN ___OpenMenu( Self )
 
 FUNCTION ___OpenMenu( Self )
    LOCAL hMonitor, mix, lChildren, aPt
-   
+
    s_PrevFocus := NIL
 
    lChildren := !EMPTY( ::Children )
@@ -2092,7 +2092,7 @@ FUNCTION ___OpenMenu( Self )
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
       RETURN Super:OnLButtonDown()
    ENDIF
-   
+
    ::__lPushed   := .T.
    ::__lSelected := .T.
    s_hMenuDialogHook := 0
@@ -2100,17 +2100,17 @@ FUNCTION ___OpenMenu( Self )
 
    ::SetCapture()
    s_lExecuting := .T.
-   
+
    __SetSubMenu( Self, ::__hMenu )
 
    aPt := { ::Left, ::Top + ::Height - 1 }
    _ClientToScreen( ::Parent:hWnd, @aPt )
-   
+
 
    IF ( hMonitor := _MonitorFromPoint( aPt, MONITOR_DEFAULTTONEAREST ) ) != 0
       IF GetMonitorInfo( hMonitor, @mix )
          aPt[1] := MAX( aPt[1], mix:rcMonitor:Left )
-         
+
          s_nmw := 0
          s_nx  := aPt[1]
          s_ncx := mix:rcMonitor:right
@@ -2130,24 +2130,24 @@ FUNCTION ___OpenMenu( Self )
    IF ::ColorScheme:MenuItemShadow
       RestoreShadow()
    ENDIF
-   
+
    UnhookWindowsHookEx( s_hMenuDialogHook )
    s_hMenuDialogHook := NIL
-   
+
    IF s_CurrFocus == NIL .AND. s_hKeyMenuHook != NIL
       UnhookWindowsHookEx( s_hKeyMenuHook )
       s_hKeyMenuHook    := NIL
    ENDIF
    s_oCurrMenuItem := NIL
    //----------------------------------------------------------------------------------------------------------------------------------
-   
+
    s_lExecuting   := .F.
    ::__lPushed    := .F.
    ::__lSelected  := .F.
-   
+
    s_aPixels := NIL
    s_aRect   := NIL
-   
+
    ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
    ::PostMessage( WM_USER + 1027, 0, 0 )
 RETURN Self
@@ -2161,10 +2161,10 @@ METHOD OnUserMsg() CLASS ToolStripButton
    DO CASE
       CASE ::Msg == WM_USER + 1027
            __ReleaseMenu( Self, ::__hMenu )
-           
+
       CASE ::Msg == WM_USER + 1028
            ::__OpenMenu()
-           
+
       CASE ::Msg == WM_USER + 1029
            ::__lSelected := .T.
            ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -2176,11 +2176,11 @@ RETURN NIL
 METHOD __DrawStripe( hDC, x, y, cx, cy ) CLASS ToolStripButton
    LOCAL __aVertex1, __aVertex2, __aMesh, nColor1, nColor2, nColor3, n := Int(cx/2)
    // Paint side stripe
-   
+
    nColor1 := ::ColorScheme:ToolStripGradientBegin
    nColor2 := ::ColorScheme:ToolStripGradientMiddle
    nColor3 := ::ColorScheme:ToolStripGradientEnd
-   
+
    __aMesh       := { {=>} }
    __aMesh[1]:UpperLeft  := 0
    __aMesh[1]:LowerRight := 1
@@ -2223,7 +2223,7 @@ RETURN Self
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
    LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, o := s_CurrentObject
-   
+
    pProc := GetProp( hWnd, "PROP_WND_PROC" )
 
    SWITCH nMsg
@@ -2239,16 +2239,16 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
            SET_WINDOWPOS( nlParam, n, 5, 2 )
            RETURN 0
 
-           
+
       CASE WM_NCPAINT
            aRect := _GetWindowRect( hWnd )
 
            hdc       := GetWindowDC( hWnd )
            hOldPen   := SelectObject( hDC, o:ColorScheme:Pen:MenuBorder )
            hOldBrush := SelectObject( hDC, o:ColorScheme:Brush:MenuBackground )
-           
+
            Rectangle( hDC, 0, 0, aRect[3]-aRect[1], aRect[4]-aRect[2] )
-           
+
            SelectObject( hDC, hOldPen )
            SelectObject( hDC, hOldBrush )
 
@@ -2256,7 +2256,7 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               aPt := { o:Left + 1, o:Top }
               _ClientToScreen( o:Parent:hWnd, @aPt )
               _ScreenToClient( hWnd, @aPt )
-           
+
               // merge menu to strip item
               hOldPen   := SelectObject( hDC, o:ColorScheme:Pen:MenuItemPressedGradientEnd )//MenuBackground )
               Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
@@ -2298,10 +2298,10 @@ METHOD __DrawShadow() CLASS ToolStripButton
    BitBlt( hMemDC, 0, 0, s_aRect[3]+1, s_aRect[4]+1, hDC, s_aRect[1], s_aRect[2], SRCCOPY )
 
    ix := 4
-   iy := 0 
+   iy := 0
 
    DEFAULT s_aPixels TO {}
-   
+
    FOR x := 1 TO 4
        FOR y := 4 TO 7
            IF ( n := ASCAN( s_aPixels, {|a| a[1]==ix-x .AND. a[2]==y+iy} ) ) > 0
@@ -2329,7 +2329,7 @@ METHOD __DrawShadow() CLASS ToolStripButton
    DeleteDC( hMemDC )
    DeleteDC( hDC )
 
-RETURN NIL           
+RETURN NIL
 
 
 //-------------------------------------------------------------------------------------------------------
@@ -2444,17 +2444,17 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            ENDIF
 
            IF oMenu != NIL
-           
+
               FOR n := 1 TO LEN( oMenu:Children )
                   IF s_oCurrMenuItem == oMenu:Children[n]
                      nCurr := n
                      EXIT
                   ENDIF
               NEXT
-              
+
               IF ( nItem := __GetHotItem( oMenu, nCurr, ms_wParam ) ) > 0
                  oItem := oMenu:Children[ nItem ]
-                 
+
                  IF s_lOpenMenu
 
                     IF nItem < nCurr
@@ -2501,7 +2501,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                        ENDIF
 
                     ENDIF
-                 ENDIF                 
+                 ENDIF
                  RETURN 1
 
               ENDIF
@@ -2513,7 +2513,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
 
       CASE WM_KEYDOWN
            SWITCH ms_wParam
-                   
+
               CASE VK_LEFT
                    oObj := s_CurrFocus
                    DEFAULT oObj TO s_CurrentObject
@@ -2541,7 +2541,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       ENDIF
                    ENDIF
                    RETURN 0
-                   
+
               CASE VK_RIGHT
                    oObj := s_CurrFocus
                    DEFAULT oObj TO s_CurrentObject
@@ -2557,7 +2557,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                          SendMessage( oObj:Form:hWnd, WM_CANCELMODE, 0, 0 )
                       ENDIF
                       s_lKey := .T.
-                      
+
                       IF s_lOpenMenu .AND. !EMPTY( oObj:Parent:Children[n]:Children ) .AND. ( oObj:Parent:Children[n]:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
                          s_lExecuting := .T.
                          s_CurrFocus  := NIL
@@ -2570,11 +2570,11 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       ENDIF
                    ENDIF
                    RETURN 0
-                   
+
               CASE VK_DOWN
                    oObj := s_CurrFocus
                    DEFAULT oObj TO s_CurrentObject
-              
+
                    IF !s_lOpenMenu .AND. !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
                       s_lKey := .T.
 
@@ -2589,12 +2589,12 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       RETURN 1
                    ENDIF
                    EXIT
-                   
+
               CASE VK_ESCAPE
                    s_lExecuting := .F.
                    s_lKey       := .F.
                    s_lOpenMenu  := .T.
-                   
+
                    IF s_CurrFocus != NIL
                       s_CurrFocus:__lSelected := .F.
                       s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -2606,7 +2606,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       s_lExecuting := .F.
                       s_lKey       := .F.
                       s_lOpenMenu  := .T.
-                      
+
                     ELSEIF s_CurrentObject:ClsName != "ContextStrip"
                       SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
                       s_CurrFocus  := s_CurrentObject
@@ -2616,7 +2616,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       s_lKey := .T.
                    ENDIF
                    RETURN 0
-                   
+
            END
            EXIT
    END
@@ -2672,9 +2672,9 @@ FUNCTION __MenuDialogHook( nCode, nwParam, nlParam )
       CASE WM_MENUSELECT
            s_MenuhWnd := cwp_hwnd
            EXIT
-           
+
       CASE WM_INITMENUPOPUP
-           IF s_lKey 
+           IF s_lKey
               IF s_oCurrMenuItem == NIL
                  PostMessage( cwp_hWnd, WM_KEYDOWN, VK_DOWN, 0)
                  //HiLiteMenuItem( cwp_hWnd, ::__hMenu, 0, MF_BYPOSITION | MF_HILITE )
@@ -2692,7 +2692,7 @@ FUNCTION __MenuDialogHook( nCode, nwParam, nlParam )
               ENDIF
               SetProp( cwp_hwnd, "PROP_WND_PROC", pWndProc )
               IF pCallBack != NIL
-                 FreeCallBackPointer( pCallBack )
+                 VXH_FreeCallBackPointer( pCallBack )
               ENDIF
               pCallBack := WinCallBackPointer( @__MenuDialogProc() )
               IF SetWindowLong( cwp_hwnd, GWL_WNDPROC, pCallBack ) == 0
@@ -2789,7 +2789,7 @@ CLASS MenuStripItem INHERIT ToolStripButton
 
    ACCESS ColorPressedBegin   INLINE IIF( ( ::Parent:__lIsMenu .AND. !EMPTY( ::Children ) ), ::ColorScheme:MenuItemPressedGradientBegin, ::ColorScheme:ButtonPressedGradientBegin )
    ACCESS ColorPressedEnd     INLINE IIF( ( ::Parent:__lIsMenu .AND. !EMPTY( ::Children ) ), ::ColorScheme:MenuItemPressedGradientEnd,   ::ColorScheme:ButtonPressedGradientEnd )
-   
+
    DATA Position     EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -2816,7 +2816,7 @@ METHOD Create() CLASS MenuStripItem
    IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
       Super:Create()
     ELSE
-      IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL 
+      IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL
          ::xCaption := EVAL( &(::xCaption) )
       ENDIF
       IF ::Position != NIL
@@ -2836,7 +2836,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    (nwParam)
    (nlParam)
    yIcon := 22
-   
+
    IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       xIcon := ::Parent:ImageList:IconWidth
       yIcon := ::Parent:ImageList:IconHeight
@@ -2860,9 +2860,9 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    IF lSelected //.AND. ! lDisabled
       hOldPen   := SelectObject( dis:hDC, IIF( lDisabled, ::ColorScheme:Pen:MenuItemDisabledBorder, ::ColorScheme:Pen:MenuItemBorder ) )
       hOldBrush := SelectObject( dis:hDC, IIF( lDisabled, ::ColorScheme:Brush:MenuItemDisabled, ::ColorScheme:Brush:MenuItemSelected ) )
-      
+
       Rectangle( dis:hDC, dis:rcItem:left+1, dis:rcItem:top, dis:rcItem:right-2, dis:rcItem:bottom )
-      
+
       SelectObject( dis:hDC, hOldPen )
       SelectObject( dis:hDC, hOldBrush )
     ELSE
@@ -2897,7 +2897,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
          ::Parent:ImageList:DrawImage( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
       ENDIF
    ENDIF
-   
+
    IF lDisabled
       SetTextColor( dis:hDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
@@ -2928,7 +2928,7 @@ METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
    (nwParam)
    (nlParam)
    IF mi:CtlType == ODT_MENU
-   
+
       hDC   := GetDC( NIL )
       aRect := {0,0,0,0}
 
@@ -2967,7 +2967,7 @@ METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
 
       mi:itemWidth  := xIcon + 8 + aRect[3]-IIF( ::Caption != NIL, GetSystemMetrics( SM_CXMENUCHECK ), 0 )//+6
       mi:itemHeight := MAX( aRect[4], GetSystemMetrics( SM_CYMENU ) )
-      
+
       IF ::BeginGroup //Separator
          mi:itemHeight += 3
       ENDIF
@@ -3002,7 +3002,7 @@ CLASS __MenuStripItemShortCut
    PROPERTY Ctrl  SET (::xCtrl  := v, ::__SetShortcut()) DEFAULT .F.
    PROPERTY Alt   SET (::xAlt   := v, ::__SetShortcut()) DEFAULT .F.
    PROPERTY Key   SET (::xKey   := v, ::__SetShortcut()) DEFAULT 0
-   
+
    DATA ClsName     EXPORTED  INIT ""
    DATA Parent      EXPORTED
    DATA __ClassInst EXPORTED
@@ -3094,7 +3094,7 @@ FUNCTION __GradientFill( hDC, aVertex, nVertex, aMesh, nCount, ulMode )
    NEXT
    FOR n := 1 TO LEN( aMesh )
        pRect := Array(2)
-       pRect[1] := aMesh[n]:UpperLeft 
+       pRect[1] := aMesh[n]:UpperLeft
        pRect[2] := aMesh[n]:LowerRight
        AADD( __aMesh, pRect )
    NEXT
@@ -3155,7 +3155,7 @@ METHOD Show( x, y ) CLASS ContextStrip
    LOCAL lpMenuInfo := (struct MENUINFO)
 
    __ReleaseMenu( Self, ::__hMenu )
-   
+
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::__ClassInst != NIL
       GetWindowRect( ::Application:MainForm:FormEditor1:hWnd, @rc )
@@ -3177,7 +3177,7 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    UnhookWindowsHookEx( s_hMenuDialogHook )
    s_hMenuDialogHook := NIL
-   
+
    IF s_CurrFocus == NIL .AND. s_hKeyMenuHook != NIL
       UnhookWindowsHookEx( s_hKeyMenuHook )
       s_hKeyMenuHook    := NIL
@@ -3204,7 +3204,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
 
    __InsertMenuStripItem( oParent:__hMenu, oItem:Position-1, .T., mii:fMask, mii:hSubMenu, mii:wID, oItem:Caption, mii:dwItemData, mii:fState )
-   
+
    ::Application:Project:Modified := .T.
    ::Form:__lModified := .T.
 

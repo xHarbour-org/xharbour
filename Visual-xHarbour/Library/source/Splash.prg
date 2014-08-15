@@ -31,15 +31,15 @@ static s_lAutoClose
 FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    LOCAL nTop, nWidth, nHeight, nStyle, dt, nLeft
    nSecs := nTimeout
-   
+
    DEFAULT hInst TO GetModuleHandle()
    __aCenter   := aCenter
-   
+
    HB_CStructureCSyntax("_DIALOGTEMPLATE",{"-4","style -4","dwExtendedStyle -2","cdit","2","x","2","y","2","cx","2","cy -2","menu -2","windowclass -2","title",},,,4 )
    __ClsSetModule(__ActiveStructure() )
 
    dt := (struct _DIALOGTEMPLATE)
-      
+
    __pCallBackPtr := WinCallBackPointer( @__SplashDlgProc() )
    IF cType != NIL
       IF cType == "BMP"
@@ -56,9 +56,9 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    nTop    := 0
    nWidth  := Int( ( aSize[1] * 4 )/LOWORD(GetDialogBaseUnits()) )
    nHeight := Int( ( aSize[2] * 4 )/LOWORD(GetDialogBaseUnits()) )
-   
+
    dt:style           := nStyle
-   dt:dwExtendedStyle := WS_EX_TOOLWINDOW 
+   dt:dwExtendedStyle := WS_EX_TOOLWINDOW
    dt:x               := Int( (nLeft * 4)/LOWORD(GetDialogBaseUnits()) )
    dt:y               := nTop
    dt:cx              := nWidth
@@ -73,16 +73,16 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
            aPar  := _GetWindowRect( GetDeskTopWindow() )
            aRect := _GetWindowRect( hWnd )
-           
+
            DEFAULT __aCenter TO aPar
            DEFAULT __aCenter[1] TO 0
            DEFAULT __aCenter[2] TO 0
            DEFAULT __aCenter[3] TO aPar[3]
            DEFAULT __aCenter[4] TO aPar[4]
-           
+
            nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
-            
+
            MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], aRect[4]-aRect[2] )
            IF nSecs == NIL
               SetTimer( hWnd, 2, 100 )
@@ -101,13 +101,13 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
            ENDIF
            EXIT
 
-      CASE WM_ERASEBKGND  
+      CASE WM_ERASEBKGND
            PicturePaint( __pPicture, nwParam, 0, 0, aSize[1], aSize[2], .F., .T. )
            RETURN 1
-           
+
       CASE WM_NCDESTROY
            __GetApplication():MainForm:PostMessage( WM_VXH_FREECALLBACK, __pCallBackPtr )
-           //FreeCallBackPointer( __pCallBackPtr )
+           //VXH_FreeCallBackPointer( __pCallBackPtr )
 
    END
 RETURN 0
@@ -233,7 +233,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
    s_lProgress := lProgress
    s_lMarquee  := lMarquee
    s_cText     := cText
-   
+
    nStyle := WS_POPUP | WS_DLGFRAME | WS_CLIPCHILDREN
 
    IF cTitle != NIL
@@ -244,7 +244,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
    __ClsSetModule(__ActiveStructure() )
 
    dt := (struct _DIALOGTEMPLATE)
-      
+
    __pCallBackPtr := WinCallBackPointer( @__MsgWaitDlgProc() )
 
    dt:style           := nStyle
@@ -278,13 +278,13 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            DrawText( hDC, s_cText, @rc, DT_CALCRECT )
 
            aRect[4] := aRect[2] + rc:bottom + nBorder + 20
-           
+
            aCenter := aPar
            DEFAULT aCenter[1] TO 0
            DEFAULT aCenter[2] TO 0
            DEFAULT aCenter[3] TO aPar[3]
            DEFAULT aCenter[4] TO aPar[4]
-           
+
            nLeft := aCenter[1] + ( ( aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := aCenter[2] + ( ( aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
@@ -316,7 +316,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               aSize[1] += 18
 
               nLeft := ( aRect[3] - aSize[1] ) / 2
-              
+
               IF s_lProgress
                  nLeft := ( aRect[3] - aSize[1] ) - 4
               ENDIF
@@ -344,7 +344,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
            _FillRect( hDC, s_aRect, GetSysColorBrush( COLOR_BTNFACE ) )
-           
+
            hOldFont := SelectObject( hDC, s_hFont )
 
            _DrawText( hDC, s_cText, s_aRect, DT_CENTER|DT_VCENTER|DT_NOPREFIX )
@@ -370,6 +370,6 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
       CASE WM_NCDESTROY
            DeleteObject( s_hFont )
-           //FreeCallBackPointer( __pCallBackPtr )
+           //VXH_FreeCallBackPointer( __pCallBackPtr )
    END
 RETURN 0

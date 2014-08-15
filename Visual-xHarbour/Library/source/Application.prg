@@ -298,7 +298,7 @@ CLASS Application
    PROPERTY SetErrorlog            ROOT "Set" SET ::Set( _SET_ERRORLOG, v      ) DEFAULT SET( _SET_ERRORLOG        )
 
    ACCESS aPath                        INLINE ::Path
-   ACCESS System                       INLINE __GetSystem() 
+   ACCESS System                       INLINE __GetSystem()
    ACCESS EnumCursor                   INLINE __GetSystem():GetEnumCursor()
 
    DATA __ColorTable                   EXPORTED
@@ -356,14 +356,14 @@ CLASS Application
    DATA __lCopyCut                     EXPORTED  INIT .F.
    DATA __InstMsg                      PROTECTED
    DATA lExit                          PROTECTED INIT .F.
-   
+
    // compatibility with previous versions
    ACCESS MainWindow                   INLINE ::MainForm
    ASSIGN MainWindow(o)                INLINE ::MainForm := o
    ACCESS IsThemedXP                   INLINE IsThemeActive() .AND. ::OsVersion:dwMajorVersion > 4
    ACCESS TempDir                      INLINE GetTempPath()
    ACCESS AppIniFile                   INLINE ::IniFile
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()                     VIRTUAL
    METHOD OnExit()                     VIRTUAL
@@ -413,7 +413,7 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
    ::__InstMsg := RegisterWindowMessage( GetModuleFileName(::DllInstance) )
 
    IF !lIde
-      
+
       //SetThemeAppProperties( STAP_ALLOW_NONCLIENT | STAP_ALLOW_CONTROLS | STAP_ALLOW_WEBCONTENT )
 
       __GetSystem():Update()
@@ -426,17 +426,17 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
 
       cName := STRTRAN( UPPER( ::FileName ), " ", "_" )
       cName := STRTRAN( cName, "." )
-      
+
       hPrevInstance = OpenMutex( MUTEX_ALL_ACCESS, .F., cName )
       ::Running := hPrevInstance <> 0
       IF !::Running
          ::__hMutex := CreateMutex( NIL , .T., cName )
          ReleaseMutex( ::__hMutex )
       ENDIF
-      IF hPrevInstance <> 0 
+      IF hPrevInstance <> 0
          CloseHandle( hPrevInstance )
       ENDIF
-      
+
       Set( _SET_INSERT, .T. )
 
       ::IniFile          := IniFile( ::Path + "\" + ::Name + ".ini" )
@@ -453,7 +453,7 @@ RETURN Self
 METHOD OnError( ... ) CLASS Application
    LOCAL cMsg, uRet, aParams := HB_AParams()
    cMsg := __GetMessage()
-   
+
    IF PCount() == 0 .AND. ::__hObjects != NIL
       IF hGetPos( ::__hObjects, cMsg ) > 0
          uRet := ::__hObjects[ cMsg ]
@@ -488,7 +488,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Application
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName )
       cName := oObj:xName
    ENDIF
-   IF !( oObj == Self ) 
+   IF !( oObj == Self )
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
@@ -711,7 +711,7 @@ METHOD LoadCustomColors( nKey, cNode, cValue ) CLASS Application
       oReg:Close()
    ENDIF
 RETURN NIL
-   
+
 
 //------------------------------------------------------------------------------------------------
 
@@ -757,14 +757,14 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    Local hWnd, hDC
    Local nWidth, nMsgHeight
    LOCAL aSize
-   
+
    nButWidth := 0
-   
+
    DEFAULT nDefault TO 1
-   
+
    ::_Default   := nDefault
    ::_Icon      := nIcon
-   
+
    IF VALTYPE( cMsg ) != "C"
       IF VALTYPE( cMsg)=="A"
          cMsg:=__a2str(cMsg,";")
@@ -791,14 +791,14 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    FOR i = 1 To n
        nButWidth := MAX( nButWidth, _GetTextExtentPoint32( hDC, aChoices[i] )[1]+15+BTTNGAP )
    NEXT i
-   
+
    IF nWidth > nButWidth
       x := ( nWidth - nButWidth ) / n
       FOR i = 1 To n
           nButWidth := MAX( nButWidth, _GetTextExtentPoint32( hDC, aChoices[i] )[1]+x+BTTNGAP )
       NEXT i
    ENDIF
-   
+
    SelectObject( hDC, hOldFont )
    DeleteObject( hFont )
    ReleaseDC( 0, hDC )
@@ -816,8 +816,8 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    ::Width    := nWidth + IIF( ::_Icon != NIL, 60, 20 )
    ::Height   := nMsgHeight + 100
    ::Modal    := .T.
-   ::Create() 
- 
+   ::Create()
+
    SetFocus( hWnd )
 RETURN Self
 
@@ -835,7 +835,7 @@ METHOD OnInitDialog() CLASS __AlertDlg
       o:SendMessage( STM_SETICON, LoadIcon( NIL, ::_Icon ) )
       n := 60
    ENDIF
-   
+
    o := Label( Self )
    o:Style   := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    o:Caption := ::Message
@@ -848,7 +848,7 @@ METHOD OnInitDialog() CLASS __AlertDlg
    n := LEN( ::aChoices )
    nLeft  := ( ::ClientWidth - ( ( nButWidth + BTTNGAP ) *n ) ) / 2
    nTop   := ::ClientHeight - 34
-   
+
    For i = 1 To n
        o := Button( Self )
        o:Caption := ::aChoices[i]
@@ -890,9 +890,9 @@ RETURN
 STATIC FUNCTION VXH_DefError( e, lGpf )
    LOCAL aOptions, nChoice, aStack, c, cErr, cPath, nAt, i//, hPen, hHash
    LOCAL cProcStack := ""
-   
+
    DEFAULT lGpf TO .F.
-   
+
    nWinError := GetLastError()
 
      // By default, division by zero results in zero
@@ -981,12 +981,12 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
    ENDIF
 
    IF lGpf
-      // cannot process PostQuitMessage, Application:Exit() or QUIT while in 
+      // cannot process PostQuitMessage, Application:Exit() or QUIT while in
       // Exception's callback. Must return to GPFCatch and let the OS
       // clean the application
       RETURN .F.
    ENDIF
-   
+
    IF Application != NIL
       Application:Exit()
    ENDIF
@@ -1025,7 +1025,7 @@ STATIC FUNCTION LogError( e, cProcStack )
    cErr += ( CRLF + "Date/Time      " + DTOC( FileDate( GetModuleFileName(Application:DllInstance) ) ) + " - " + FileTime( GetModuleFileName(Application:DllInstance) ) )
    cErr += ( CRLF + "Size           " + XSTR( GetFileSize( GetModuleFileName(Application:DllInstance) ) ) )
    cErr += ( CRLF )
-   
+
    IF Application != NIL .AND. Application:bUserError != NIL
       cErr += ( CRLF )
       cErr += ( CRLF + "--------------------------------------------------------------------" )
@@ -1302,7 +1302,7 @@ FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
    __oError           := e
    __aErrorStack      := aStack
 
-   
+
    //ncm := (struct NONCLIENTMETRICS)
    //SystemParametersInfo( SPI_GETNONCLIENTMETRICS, 0, @ncm, 0 )
 
@@ -1313,21 +1313,21 @@ FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
    n := DialogBoxIndirect( GetModuleHandle( Application:FileName ), dt, GetActiveWindow(), __pCallBackPtr )
    DeleteObject( __hErrorFont )
    DeleteObject( __hErrorFontBold )
-   FreeCallBackPointer( __pCallBackPtr )
+   VXH_FreeCallBackPointer( __pCallBackPtr )
 RETURN n
 
 FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
    LOCAL cText, rc, nWidth, nHeight, cCaption, hStk, hLst, aRect, hDC, nColor, oReg
    LOCAL nLeft, cOpt, aLabels, aCaptions, nTop, n, hCtrl, dis, lSelected, aPar, __nWidth
    static hGpf, hBrush
-   
+
    SWITCH nMsg
       CASE WM_INITDIALOG
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
 
            cText := Substr( GetModuleFileName(Application:DllInstance), Rat( "\", GetModuleFileName(Application:DllInstance) ) + 1 )
            cText := Left( cText, Rat("." ,cText )-1 )
-           
+
            SetWindowText( hWnd, cText )
 
            rc := (struct RECT)
@@ -1337,7 +1337,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               hGpf := CreateWindowEx( WS_EX_TRANSPARENT, "static", __cGpfError, WS_CHILD | WS_VISIBLE | SS_SUNKEN, 5, 5, rc:right - 10, __nGpfHeight - 2, hWnd, 10, Application:Instance )
               SendMessage( hGpf, WM_SETFONT, __hErrorFontBold, MAKELPARAM( 1, 0 ) )
            ENDIF
-           
+
            hCtrl := CreateWindowEx( WS_EX_TRANSPARENT, "static", "", WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_SIMPLE | SS_SUNKEN, 5, 5+__nGpfHeight, rc:right - 10, rc:bottom - 55 - __nGpfHeight, hWnd, 101, Application:Instance )
            SendMessage( hCtrl, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
 
@@ -1414,7 +1414,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            FOR EACH cText IN __aErrorStack
                SendMessage( hLst, LB_ADDSTRING, 0, cText )
            NEXT
-           
+
            cOpt := NIL
            oReg := Registry( HKEY_CURRENT_USER, "Software\Visual xHarbour\Settings" )
            IF oReg:Open()
@@ -1468,7 +1468,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
               RETURN hBrush
            ENDIF
            EXIT
-           
+
       CASE WM_DRAWITEM
            dis  := (struct DRAWITEMSTRUCT)
            dis:Pointer( nlParam )

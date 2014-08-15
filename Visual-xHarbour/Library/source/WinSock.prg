@@ -45,13 +45,13 @@ CLASS WinSock INHERIT Component
    DATA RecData         EXPORTED INIT ""
    DATA EnumProtocol    EXPORTED INIT { __GetSystem():SockProtocol:Keys, {1,2} }
    DATA Connected       EXPORTED INIT .F.
-   
+
    ACCESS Status  INLINE IIF( ::Handle != NIL, InetErrorDesc( ::Handle ), "Failed to connect" )
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD SockControlProc()
-   METHOD Destroy()    INLINE ::Disconnect(), ::Super:Destroy(), IIF( ::pCallBack != NIL, FreeCallBackPointer( ::pCallBack ), ), NIL
+   METHOD Destroy()    INLINE ::Disconnect(), ::Super:Destroy(), IIF( ::pCallBack != NIL, VXH_FreeCallBackPointer( ::pCallBack ), ), NIL
 
    METHOD Connect()
    METHOD Send()
@@ -160,13 +160,13 @@ METHOD SockControlProc() CLASS WinSock
       IF ::RemoteHandle != NIL
          ::RemoteIP   := InetAddress( ::RemoteHandle )
          ::RemotePort := InetPort( ::RemoteHandle )
-         
+
          ExecuteEvent( "OnConnected", Self )
       ENDIF
       SetTimer( ::Owner:hWnd, ::nRecId, 250, ::pCallBack )
       RETURN 0
    ENDIF
-   
+
    IF ::Handle == NIL .OR. InetErrorCode( IIF( ::RemoteHandle != NIL, ::RemoteHandle, ::Handle ) ) <> 0
       ::Connected := .F.
       ExecuteEvent( "OnError", Self )
@@ -188,7 +188,7 @@ METHOD SockControlProc() CLASS WinSock
       ENDIF
 
    ENDIF
-   
+
    SetTimer( ::Owner:hWnd, ::nRecId, 250, ::pCallBack )
 RETURN Self
 
@@ -201,7 +201,7 @@ METHOD Listen() CLASS WinSock
 
    ExecuteEvent( "OnAccepting", Self )
    ::RemoteHandle := InetAccept( ::Handle )
-   
+
    IF ::RemoteHandle != NIL
       ::RemoteIP   := InetAddress( ::RemoteHandle )
       ::RemotePort := InetPort( ::RemoteHandle )

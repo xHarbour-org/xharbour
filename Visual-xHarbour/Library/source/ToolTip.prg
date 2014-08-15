@@ -18,7 +18,7 @@
 CLASS ToolTip INHERIT Window
    PROPERTY BackColor     ROOT "Colors" SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPBKCOLOR, v, 0 ), )   DEFAULT GetSysColor( COLOR_INFOBK )
    PROPERTY ForeColor     ROOT "Colors" SET IIF( ::hWnd != NIL .AND. v != NIL, ::SendMessage( TTM_SETTIPTEXTCOLOR, v, 0 ), ) DEFAULT GetSysColor( COLOR_INFOTEXT )
- 
+
    PROPERTY Text          SET ::SetText( v )                                                 DEFAULT ""
    PROPERTY CloseButton   SET ::SetStyle( TTS_CLOSE, v )                                     DEFAULT .F.
    PROPERTY Balloon       SET ( ::SetStyle( TTS_BALLOON, v ), ::SetStyle( WS_BORDER, .F. ) ) DEFAULT .F.
@@ -50,9 +50,9 @@ CLASS ToolTip INHERIT Window
    DATA Name             EXPORTED
    DATA AutoClose        EXPORTED INIT .T.
    DATA ShowMode         EXPORTED INIT 1
-   
+
    DATA ToolTip          EXPORTED
-   
+
    ACCESS Visible        INLINE ::Style & WS_VISIBLE != 0
    ACCESS ClientEdge     INLINE ::ExStyle & WS_EX_CLIENTEDGE != 0
    ACCESS StaticEdge     INLINE ::ExStyle & WS_EX_STATICEDGE != 0

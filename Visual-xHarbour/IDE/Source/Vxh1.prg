@@ -2472,7 +2472,7 @@ METHOD DelControl( oCtrl ) CLASS Project
 
    oSelect := aDel[1][1]:Parent
 
-   IF aDel[1][1]:hWnd == ::CurrentForm:hWnd
+   IF aDel[1][1] != NIL .AND. ::CurrentForm != NIL .AND. aDel[1][1]:hWnd == ::CurrentForm:hWnd
       IF aDel[1][1]:hWnd == ::Forms[1]:hWnd
          MessageBox( GetActiveWindow(), "Cannot delete "+::Forms[1]:Name+" because it's designed to be Main Window", "Delete Form", MB_ICONEXCLAMATION )
          RETURN .F.

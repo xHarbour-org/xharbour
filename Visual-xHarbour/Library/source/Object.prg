@@ -22,9 +22,9 @@ CLASS Object
    PROPERTY Name           ROOT "Object" SET ::__SetCtrlName(v)
 
    ACCESS Instance             INLINE   IIF( __GetApplication() != NIL, __GetApplication():Instance, GetModuleHandle() )
-
+   ACCESS MainForm             INLINE   IIF( __GetApplication() != NIL, __GetApplication():MainForm, )
    DATA hWnd                   EXPORTED
-   
+
    DATA Error                  EXPORTED
    DATA Parent                 EXPORTED
    DATA ThemeName              EXPORTED
@@ -54,7 +54,7 @@ CLASS Object
    DATA ExtraChildren          EXPORTED INIT {}
    DATA Cargo                  EXPORTED
    DATA TreeItem               EXPORTED
-   
+
    DATA Owner                  EXPORTED
    DATA Components             EXPORTED INIT {}
    DATA __hObjects             EXPORTED
@@ -103,7 +103,7 @@ ENDCLASS
 METHOD OnError( ... ) CLASS Object
    LOCAL cMsg, uRet, aParams := HB_AParams()
    cMsg := __GetMessage()
-   
+
    IF PCount() == 0 .AND. ::__hObjects != NIL
       IF hGetPos( ::__hObjects, UPPER( cMsg ) ) > 0
          uRet := ::__hObjects[ UPPER( cMsg ) ]
@@ -123,7 +123,7 @@ METHOD OnError( ... ) CLASS Object
    ENDIF
 RETURN uRet
 
-METHOD HasProperty( cName ) 
+METHOD HasProperty( cName )
 RETURN ::__hObjects != NIL .AND. hGetPos( ::__hObjects, cName ) > 0
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"
       cName := oObj:xName
    ENDIF
-   IF !( oObj == Self ) 
+   IF !( oObj == Self )
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
@@ -206,7 +206,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS Object
    LOCAL nRet := ExecuteEvent( "OnInit", Self )
-   
+
    IF ::__ClassInst != NIL
       ::Application:ObjectTree:Set( Self )
    ENDIF
@@ -221,7 +221,7 @@ RETURN Self
 
 METHOD RemoveProperty() CLASS Object
    LOCAL n
-   IF ! EMPTY( ::xName ) 
+   IF ! EMPTY( ::xName )
       IF ( n := hGetPos( ::Form:__hObjects, ::xName ) ) > 0
          HDelAt( ::Form:__hObjects, n )
       ENDIF
