@@ -638,9 +638,13 @@ CLASS Window INHERIT Object
 ENDCLASS
 
 PROCEDURE __FreeCallBack() CLASS Window
-   IF ::__pCallBackPtr != NIL .AND. ! ::__lCallbackReleased
-      VXH_FreeCallBackPointer( ::__pCallBackPtr )
-      ::__pCallBackPtr := NIL
+   IF ::__pCallBackPtr != NIL
+      IF ! ::__lCallbackReleased
+         VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
+         ::__pCallBackPtr := NIL
+      ELSE
+         VXH_FreeCallBackObject( Self )
+      ENDIF
    ENDIF
 RETURN
 
@@ -2488,7 +2492,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     oCtrl := ObjFromHandle( dis:hwndItem )
                     IF oCtrl != NIL
                        IF HGetPos( oCtrl:EventHandler, "OnParentDrawItem" ) != 0
-                          nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( oCtrl )
+                          nRet := ::&( oCtrl:EventHandler[ "OnParentDrawItem" ] )( oCtrl, dis )
                        ENDIF
                        ODEFAULT nRet TO oCtrl:OnParentDrawItem( nwParam, nlParam, dis )
                     ENDIF

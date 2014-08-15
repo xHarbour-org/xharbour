@@ -5423,7 +5423,6 @@ HB_FUNC( ASLONG )
 HB_FUNC( VXH_FREECALLBACKPOINTER )
 {
    void *pCallback = (void *) hb_parnl( 1 );
-
    if( pCallback )
    {
       PHB_ITEM pSelf = hb_param( 2, HB_IT_ANY );
@@ -5441,3 +5440,12 @@ HB_FUNC( VXH_FREECALLBACKPOINTER )
    hb_retl( FALSE );
 }
 
+HB_FUNC( VXH_FREECALLBACKOBJECT )
+{
+   PHB_ITEM pSelf = hb_param( 1, HB_IT_ANY );
+   if( pSelf && HB_IS_OBJECT( pSelf ) )
+   {
+      hb_gcUnlock( pSelf->item.asArray.value );
+   }
+   hb_retl( FALSE );
+}

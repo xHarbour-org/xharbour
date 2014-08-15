@@ -238,22 +238,23 @@ METHOD OnParentMeasureItem( nwParam, nlParam, mis ) CLASS ColManager
    mis:CopyTo( nlParam )
 RETURN NIL
 
-METHOD OnParentDrawItem() CLASS ColManager
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColManager
    LOCAL lSelected, cText, hBrush
+   (nwParam, nlParam)
    IF ::Parent != NIL
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED == ODS_SELECTED
+      lSelected := dis:itemState & ODS_SELECTED == ODS_SELECTED
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
 
          hBrush := GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) )
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHTTEXT, COLOR_WINDOWTEXT ) ) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) ) )
+         SetTextColor( dis:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHTTEXT, COLOR_WINDOWTEXT ) ) )
+         SetBkColor( dis:hDC, GetSysColor( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW ) ) )
 
-         FillRect( ::Parent:DrawItemStruct:hDC, ::Parent:DrawItemStruct:rcItem, hBrush )
+         FillRect( dis:hDC, dis:rcItem, hBrush )
 
-         cText := ::GetItemText( ::Parent:DrawItemStruct:ItemID+1 )
-         ::Parent:DrawItemStruct:rcItem:Left += 5
-         DrawText( ::Parent:DrawItemStruct:hDC, cText, ::Parent:DrawItemStruct:rcItem, DT_SINGLELINE | DT_VCENTER )
+         cText := ::GetItemText( dis:ItemID+1 )
+         dis:rcItem:Left += 5
+         DrawText( dis:hDC, cText, dis:rcItem, DT_SINGLELINE | DT_VCENTER )
 
       ENDIF
    ENDIF
