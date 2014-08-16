@@ -257,10 +257,6 @@ METHOD Create( hParent ) CLASS Dialog
       ELSE
          ::Result := DialogBox( ::Instance, ::Template, hParent, ::__pCallBackPtr )
       ENDIF
-      IF ::__pCallBackPtr != NIL
-         VXH_FreeCallBackPointer( ::__pCallBackPtr )
-         ::__pCallBackPtr := NIL
-      ENDIF
       RETURN ::Result == IDOK
    ELSE
       IF ::Template == NIL
