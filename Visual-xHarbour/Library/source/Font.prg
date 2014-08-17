@@ -48,6 +48,7 @@ CLASS Font
    DATA Handle           EXPORTED
    DATA Owner            EXPORTED
    DATA ClsName          EXPORTED INIT "Font"
+   DATA __xCtrlName      EXPORTED INIT "Font"
    DATA OutPrecision     EXPORTED
    DATA ClipPrecision    EXPORTED
    DATA PitchAndFamily   EXPORTED
@@ -171,7 +172,6 @@ METHOD Delete() CLASS Font
       ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
-      ::xFaceName := NIL
       //::__ClassInst := NIL
    ENDIF
 RETURN .T.

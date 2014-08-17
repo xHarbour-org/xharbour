@@ -3003,7 +3003,8 @@ CLASS __MenuStripItemShortCut
    PROPERTY Alt   SET (::xAlt   := v, ::__SetShortcut()) DEFAULT .F.
    PROPERTY Key   SET (::xKey   := v, ::__SetShortcut()) DEFAULT 0
 
-   DATA ClsName     EXPORTED  INIT ""
+   DATA ClsName     EXPORTED INIT ""
+   DATA __xCtrlName EXPORTED INIT "MenuStripItemShortCut"
    DATA Parent      EXPORTED
    DATA __ClassInst EXPORTED
    METHOD Init() CONSTRUCTOR

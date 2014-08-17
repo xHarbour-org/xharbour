@@ -639,8 +639,7 @@ ENDCLASS
 
 PROCEDURE __FreeCallBack() CLASS Window
    IF ::__pCallBackPtr != NIL
-      VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
-      ::__pCallBackPtr := NIL
+      FreeCallBackPointer( ::__pCallBackPtr )
    ENDIF
 RETURN
 

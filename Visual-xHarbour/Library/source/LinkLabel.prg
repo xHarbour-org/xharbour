@@ -38,7 +38,7 @@ CLASS LinkLabel INHERIT Control
    PROPERTY ImageIndex   SET ::SetImageIndex(v)   DEFAULT 0
    PROPERTY Alignment    SET ::Refresh()          DEFAULT 1
    PROPERTY SelBackColor SET ::SetSelColor(v)
-   
+
    DATA __lSelected     PROTECTED INIT .F.
    DATA __lFocused      PROTECTED INIT .F.
 
@@ -125,7 +125,7 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    IF hBrush == NIL
       hBrush := ::Parent:BkBrush
       IF hBrush != NIL
-         SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )  
+         SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
       ENDIF
    ENDIF
    DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
@@ -147,14 +147,14 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    SetBkMode( hDC, TRANSPARENT )
    nColor := IIF( !::xLinkVisited, ::xLinkColor, ::xVisitedColor )
    nColor := IIF( ::__lSelected, ::ActiveLinkColor, nColor )
-   
+
    IF ( ! ::IsWindowEnabled() .OR. ! ::Parent:IsWindowEnabled() ) .AND. ! ::Parent:ClsName IN {"StatusBarPanel"}
       nColor := ::System:Colors:GrayText
    ENDIF
-   
+
    SetTextColor( hDC, nColor )
    rc:Left+=2
-   
+
    DrawText( hDC, ::Caption, rc, (::Alignment-1)|DT_WORDBREAK )
    IF ::__lFocused .AND. ::FocusRect
       rc:Left-=2
@@ -164,7 +164,7 @@ RETURN NIL
 
 METHOD OnPaint() CLASS LinkLabel
    LOCAL hDC, hMemDC, hMemBitmap, hOldBitmap
-   
+
    hDC        := ::BeginPaint()
 
    hMemDC     := CreateCompatibleDC( hDC )

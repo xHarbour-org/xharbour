@@ -91,7 +91,7 @@ METHOD Create() CLASS StatusBar
    ::Super:Create()
 
    ::Parent:StatusBar := Self
-   
+
    TRY
       IF ::Parent:MDIClient != NIL
          ::Parent:MDIClient:Height -= ::Height
@@ -104,7 +104,7 @@ METHOD Create() CLASS StatusBar
       PostMessage( ::Parent:hWnd, WM_SIZE, 0, MAKELPARAM( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
       ::Parent:InvalidateRect()
    ENDIF
-   
+
    IF ( n := ASCAN( ::Parent:Children, {|o| VALTYPE(o:Dock:Bottom)=="O" .AND. o:Dock:Bottom == o:Parent} ) ) > 0
       ::Parent:Children[n]:Dock:Bottom := Self
       ::Parent:Children[n]:DockIt()
@@ -216,8 +216,8 @@ RETURN Self
 CLASS StatusBarPanel INHERIT Control
    PROPERTY Text         SET ::SetText(v)
    PROPERTY ImageIndex   SET ::SetImageIndex(v)
-   PROPERTY ToolTipText  
-   PROPERTY ToolTipTitle 
+   PROPERTY ToolTipText
+   PROPERTY ToolTipTitle
    PROPERTY Width        SET ( ::xWidth := v, ::Update() ) DEFAULT 0
 
    EXPORTED:
@@ -242,7 +242,7 @@ CLASS StatusBarPanel INHERIT Control
       DATA ContextMenu
       DATA Cursor
       DATA hWnd
-      
+
    DATA Index      PROTECTED
    DATA TabOrder   EXPORTED
 
@@ -261,7 +261,7 @@ CLASS StatusBarPanel INHERIT Control
    ASSIGN Height(n)           INLINE ::xHeight := n
 
    //ACCESS hWnd                INLINE IIF( ::Parent != NIL, ::Parent:hWnd, 0 ) // Will use statusbar HANDLE for children
-  
+
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
 
@@ -269,7 +269,7 @@ CLASS StatusBarPanel INHERIT Control
    ASSIGN Caption(c)     INLINE ::Text := c
 
    METHOD Init() CONSTRUCTOR
-   METHOD GetRect() 
+   METHOD GetRect()
    METHOD GetRectangle()
 
    METHOD __OnParentSize() INLINE 0
@@ -296,7 +296,7 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::ClsName       := ::__xCtrlName := "StatusBarPanel"
    ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::IsContainer   := .T.
-   //::Form          := oParent:Form 
+   //::Form          := oParent:Form
    ::__CreateProperty( "StatusBarPanel" )
    IF ::Parent:__ClassInst != NIL
       ::__ClassInst  := __ClsInst( ::ClassH )
@@ -336,7 +336,7 @@ METHOD Destroy() CLASS StatusBarPanel
        ::Parent:Children[n]:Index := n - 1
    NEXT
    ::Parent:SetPanels()
-   
+
    ::Parent:SendMessage( SB_SIMPLE, LEN( ::Parent:Children ) == 0, 0 )
    ::Parent:Caption := ::Parent:xCaption
    TRY
@@ -349,7 +349,7 @@ METHOD GetRectangle() CLASS StatusBarPanel
    LOCAL rc := ::Parent:GetPanelRect( ::Index )
    ::Left   := rc:left
    ::Top    := rc:top
-//   ::Width  := rc:right - rc:left 
+//   ::Width  := rc:right - rc:left
    ::Height := rc:bottom - rc:top
 RETURN rc:Array
 
@@ -360,7 +360,7 @@ METHOD GetRect() CLASS StatusBarPanel
    ClientToScreen( ::Parent:hWnd, @pt )
    rc:left := pt:x
    rc:top  := pt:y
-   
+
    pt:x := rc:right
    pt:y := rc:bottom
    ClientToScreen( ::Parent:hWnd, @pt )
