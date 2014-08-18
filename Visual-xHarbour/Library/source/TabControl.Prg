@@ -1044,6 +1044,7 @@ METHOD Create() CLASS TabPage
    IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 
       ::xPosition := SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT )
+      AADD( ::Parent:Children, Self )
 
       rc := (struct RECT)
       rc:Left  := 0

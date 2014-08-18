@@ -292,6 +292,17 @@ FUNCTION __ObjFromClassH( hClass )
    ENDIF
 RETURN NIL
 
+FUNCTION __ObjFromPoint( pt )
+   LOCAL n, rc
+   n := ASCAN( __aObjects, <|o|
+                              rc := o:GetRect()
+                              RETURN ptInRect( rc, pt )
+                           > )
+   IF n > 0
+      RETURN __aObjects[n]
+   ENDIF
+RETURN NIL
+
 FUNCTION __ObjFromName( cName, oForm )
    LOCAL n := ASCAN( __aObjects, {|o|o:ClsName == cName .AND. o:Form == oForm } )
    IF n > 0

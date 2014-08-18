@@ -176,7 +176,7 @@ extern HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 
 HB_EXTERN_END
 
-#if 0 && defined( __XCC__ )
+#if defined( __XCC__ )
 typedef struct {
     LPITEMIDLIST pidl;
     BOOL fRecursive;
@@ -9308,7 +9308,7 @@ VOID CALLBACK InternetStatusCallback( HINTERNET hInternet, DWORD dwContext, DWOR
 
        if( (dwInternetStatus == INTERNET_STATUS_RESPONSE_RECEIVED) || (dwInternetStatus == INTERNET_STATUS_REQUEST_SENT) || (dwInternetStatus == INTERNET_STATUS_REQUEST_COMPLETE) )
        {
-          DWORD *lpBytesSent = (DWORD*)lpvStatusInformation; 
+          DWORD *lpBytesSent = (DWORD*)lpvStatusInformation;
           hb_vmPushLong( (long) *lpBytesSent );
        }
        else
