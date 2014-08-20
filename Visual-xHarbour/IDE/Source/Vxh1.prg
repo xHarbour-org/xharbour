@@ -3986,6 +3986,10 @@ METHOD Open( cProject ) CLASS Project
    ::Application:Cursor := NIL
    SetCursor( ::System:Cursor:Arrow )
    ::Built := .F.
+
+   SetWindowPos( ::Application:MainForm:FormEditor1:hWnd,,0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   ::Application:MainForm:FormEditor1:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+
    oWait:Position := 0
    oWait:Visible := .F.
 
