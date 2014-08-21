@@ -1329,7 +1329,8 @@ METHOD Select() CLASS TabPage
       ::ShowTab()
    ENDIF
    ::Parent:SetCurSel( ::__GetPosition() )
-//   ::Parent:Redraw()
+   ::__OnParentSize( ::ClientWidth, ::ClientHeight )
+   //   ::Parent:Redraw()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
