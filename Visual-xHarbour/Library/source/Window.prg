@@ -2083,7 +2083,7 @@ METHOD OnNCDestroy() CLASS Window
       DestroyWindow( ::__TaskBarParent )
    ENDIF
    ::__UnSubClass()
-RETURN NIL
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkgnd( hDC ) CLASS Window
@@ -3078,7 +3078,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
 
    IF ! Empty( ::__nProc )
-      RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
+      IF IsWindow( ::hWnd ) .AND. IsWindow( hWnd )
+         RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
+       ELSE
+         RETURN 0
+      ENDIF
    ENDIF
 
    IF ::xMdiContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
