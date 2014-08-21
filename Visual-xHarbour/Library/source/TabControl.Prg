@@ -1095,7 +1095,7 @@ METHOD Create() CLASS TabPage
          ::Parent:SetCurSel( ::Parent:Cursel )
       ENDIF
 
-      ::__OnParentSize()
+      ::__OnParentSize( ::ClientWidth, ::ClientHeight )
 
       IF ::__ClassInst != NIL
          ::Application:ObjectTree:Set( Self )
@@ -1253,7 +1253,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
    LOCAL rc
    (x, y)
    rc := (struct RECT)
-
+   ::Parent:GetClientRect()
    rc:Left   := 0
    rc:Top    := 0
    rc:Right  := ::Parent:ClientWidth

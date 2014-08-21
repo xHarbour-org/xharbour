@@ -640,7 +640,9 @@ ENDCLASS
 PROCEDURE __FreeCallBack() CLASS Window
    IF ::__pCallBackPtr != NIL
       IF ! ::__lCallbackReleased
-         FreeCallBackPointer( ::__pCallBackPtr, Self )
+         VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
+       ELSE
+         VXH_FreeCallBackobject( Self )
       ENDIF
       ::__pCallBackPtr := NIL
    ENDIF
@@ -1241,7 +1243,8 @@ METHOD __UnSubClass() CLASS Window
    ENDIF
 
    IF ::Application:MainForm:hWnd <> ::hWnd .AND. ::__pCallBackPtr != NIL
-      ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK,, ::__pCallBackPtr )
+      ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
+      ::__lCallbackReleased := .T.
    ENDIF
 RETURN Self
 
@@ -3047,7 +3050,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                          ::ShowMode := ::__GetShowMode()
 
                     CASE nMsg == WM_VXH_FREECALLBACK
-                         ::__lCallbackReleased := FreeCallBackPointer( nlParam )
+                         VXH_FreeCallBackPointer( nlParam )
                          hb_gcAll(.t.)
 
                     OTHERWISE
