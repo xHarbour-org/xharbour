@@ -640,9 +640,7 @@ ENDCLASS
 PROCEDURE __FreeCallBack() CLASS Window
    IF ::__pCallBackPtr != NIL
       IF ! ::__lCallbackReleased
-         VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
-      ELSE
-         VXH_FreeCallbackObject( Self )
+         FreeCallBackPointer( ::__pCallBackPtr, Self )
       ENDIF
       ::__pCallBackPtr := NIL
    ENDIF
@@ -2083,7 +2081,7 @@ METHOD OnNCDestroy() CLASS Window
       DestroyWindow( ::__TaskBarParent )
    ENDIF
    ::__UnSubClass()
-RETURN 0
+RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkgnd( hDC ) CLASS Window
@@ -2104,6 +2102,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
    LOCAL pt, hwndFrom, idFrom, code, nAnimation, nMess, mis, dis
+
+   DEFAULT ::hWnd TO hWnd
 
    ::Msg    := nMsg
    ::wParam := nwParam
@@ -3047,7 +3047,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                          ::ShowMode := ::__GetShowMode()
 
                     CASE nMsg == WM_VXH_FREECALLBACK
-                         ::__lCallbackReleased := VXH_FreeCallBackPointer( nlParam )
+                         ::__lCallbackReleased := FreeCallBackPointer( nlParam )
                          hb_gcAll(.t.)
 
                     OTHERWISE
@@ -3059,6 +3059,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
               EXIT
       END
+   ENDIF
+
+   IF ! IsWindow( ::hWnd ) .OR. ! IsWindow( hWnd )
+      RETURN 0
    ENDIF
    IF VALTYPE( nRet ) == "O"
       nRet := NIL
@@ -3078,11 +3082,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
 
    IF ! Empty( ::__nProc )
-      IF IsWindow( ::hWnd ) .AND. IsWindow( hWnd )
-         RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
-       ELSE
-         RETURN 0
-      ENDIF
+      RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
    ENDIF
 
    IF ::xMdiContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
