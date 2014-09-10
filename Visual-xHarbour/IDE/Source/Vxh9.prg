@@ -232,7 +232,7 @@ METHOD AddImage() CLASS ImageManager
             DeleteObject( hBmp )
          ENDIF
       ENDIF
-      
+
       lCopy := .F.
       IF !( oFile:Path == ::Application:Project:Properties:path + "\" + ::Application:Project:Properties:Resource )
          IF ::MessageBox( "Selected files are not in the project path, would you like to copy them to the resource folder?", "Resources", MB_ICONEXCLAMATION | MB_YESNO ) == IDYES
@@ -240,7 +240,7 @@ METHOD AddImage() CLASS ImageManager
             lCopy := .T.
          ENDIF
       ENDIF
-      
+
       WITH OBJECT ::DataGrid1
          FOR EACH cFile IN oFile:Name
              IF lCopy
@@ -254,7 +254,7 @@ METHOD AddImage() CLASS ImageManager
          :DataSource:GoBottom()
          :Update()
       END
-      
+
       WITH OBJECT ::DataGrid2
          :ImageList  := ::DataGrid1:ImageList
          nCount := :ImageList:Count
@@ -287,7 +287,7 @@ RETURN Self
 
 METHOD DeleteImage() CLASS ImageManager
    LOCAL oData, nCount, nWidth, n
-   
+
    AADD( ::aDeleted, ::DataGrid1:DataSource:Fields:Resource )
 
    ADEL( ::DataGrid1:ImageList:Images, ::DataGrid1:DataSource:Record, .T. )
@@ -299,7 +299,7 @@ METHOD DeleteImage() CLASS ImageManager
    IF ::DataGrid1:DataSource:RecCount() == 0
       ::ToolButton2:Disable()
    ENDIF
-   
+
    WITH OBJECT ::DataGrid2
       :ImageList  := ::DataGrid1:ImageList
       nCount := :ImageList:Count
@@ -336,7 +336,7 @@ METHOD OnOk() CLASS ImageManager
    FOR n := 1 TO LEN( ::aDeleted )
        ::Application:Project:RemoveImage( ::aDeleted[n], ::ImageList )
    NEXT
-   
+
    ::ImageList:Images := ACLONE( ::DataGrid1:ImageList:Images )
    IF ::DataGrid1:ImageList:MaskColor != NIL
       ::ImageList:MaskColor := ::DataGrid1:ImageList:MaskColor
@@ -420,7 +420,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD InitProject() CLASS ObjectTreeView
    LOCAL cProject, shfi := (struct SHFILEINFO)
-   
+
    ::oList := ImageList( Self, 16, 16 ):Create()
    ::oList:MaskColor := C_LIGHTCYAN
    ::oList:AddBitmap( "TREE" )
@@ -447,12 +447,13 @@ METHOD InitProject() CLASS ObjectTreeView
    ::oPrj:Cargo := ::Application:Project:Properties
    ::Application:Project:Properties:TreeItem := ::oPrj
 
+   IF ! Empty( ::Application:Project:Forms )
+      ::oApp := ::oPrj:AddItem( "Application", 9 )
+      ::oApp:Cargo := ::Application:Project:AppObject
+      ::Application:Project:AppObject:TreeItem := ::oApp
 
-   ::oApp := ::oPrj:AddItem( "Application", 9 )
-   ::oApp:Cargo := ::Application:Project:AppObject
-   ::Application:Project:AppObject:TreeItem := ::oApp
-
-   ::Application:MainForm:FormEditor1:TreeItem := ::oApp
+      ::Application:MainForm:FormEditor1:TreeItem := ::oApp
+   ENDIF
 
 RETURN Self
 
@@ -470,14 +471,14 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
        ELSEIF oObj:ClsName == "VXH_FORM_IDE" .AND. ::oList:GetImage( ::aImages[n][2]-1 ) != NIL
          ADEL( ::aImages, ::aImages[n][2]-1 )
          RETURN -1
-       
+
        ELSEIF lChange .AND. oObj:HasMessage( "ImageIndex" ) .AND. oObj:ImageIndex > 0
          ::oList:AddIcon( oObj:Parent:ImageList:GetImage( oObj:ImageIndex ) )
          ::aImages[n][2] := ::oList:Count
          n := ::oList:Count
       ENDIF
    ENDIF
-   
+
    n := ASCAN( ::aImages, {|a| a[1] == cName} )
    IF n > 0
       n := ::aImages[n][2]
@@ -487,7 +488,7 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
       IF hIcon != NIL
          AADD( ::aImages, { cName, ::oList:Count } )
          n := ::oList:Count
-         
+
        ELSEIF oObj:HasMessage( "ImageIndex" )
          TRY
             IF oObj:ImageIndex > 0
@@ -537,7 +538,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
-   IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN" 
+   IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN"
       IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "Source"
          ::Application:SourceEditor:Source := oItem:Cargo
          ::Application:Project:EditReset()
@@ -566,7 +567,7 @@ RETURN NIL
 
 METHOD OnRightClick() CLASS ObjectTreeView
    LOCAL pt := (struct POINT), oItem, Item, oMenu, oSel, lGroup := .F.
-   
+
    GetCursorPos( @pt )
    ScreenToClient( ::hWnd, @pt )
    oSel := ::HitTest( pt:x, pt:y )
@@ -575,7 +576,7 @@ METHOD OnRightClick() CLASS ObjectTreeView
    oMenu:Create()
    oMenu:ImageList := ImageList( Self, 16, 16 ):Create()
    oMenu:ImageList:AddImage( IDB_STD_SMALL_COLOR )
-   
+
    IF oSel != NIL .AND. __ObjHasMsg( oSel:Cargo, "__IdeContextMenuItems" ) .AND. !EMPTY( oSel:Cargo:__IdeContextMenuItems )
       FOR EACH Item IN oSel:Cargo:__IdeContextMenuItems
           oItem := MenuStripItem( oMenu )
@@ -751,7 +752,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD OnRightClick() CLASS FileExplorer
    LOCAL pt := (struct POINT), oItem, oMenu, oSel, lGroup := .F.
-   
+
    GetCursorPos( @pt )
    ScreenToClient( ::hWnd, @pt )
    oSel := ::HitTest( pt:x, pt:y )

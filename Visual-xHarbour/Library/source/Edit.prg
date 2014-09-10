@@ -38,13 +38,13 @@ static s_hFloatCalendar
 CLASS EditBox INHERIT Control
    PROPERTY Transparent       ROOT "Appearance"                                            DEFAULT .F.
    PROPERTY MenuArrow         ROOT "Appearance" SET ::__SetMenuArrow(v)                    DEFAULT .F.
-   PROPERTY Layout            ROOT "Appearance" SET ::__SetLayout(v)                       DEFAULT 1  
+   PROPERTY Layout            ROOT "Appearance" SET ::__SetLayout(v)                       DEFAULT 1
    PROPERTY Password          ROOT "Appearance" SET ::SetStyle( ES_PASSWORD, v )           DEFAULT .F.
-   PROPERTY Case              ROOT "Appearance" SET ::SetCase(v)                           DEFAULT 1  
+   PROPERTY Case              ROOT "Appearance" SET ::SetCase(v)                           DEFAULT 1
    PROPERTY Border            ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )             DEFAULT !__GetApplication():IsThemedXP
    PROPERTY ClientEdge        ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .T.
    PROPERTY CueBanner         ROOT "Appearance" SET ::SetCueBanner(v)
-   PROPERTY ImageIndex        ROOT "Appearance" SET ::__SetImageIndex(v)                   DEFAULT 0  
+   PROPERTY ImageIndex        ROOT "Appearance" SET ::__SetImageIndex(v)                   DEFAULT 0
 
    PROPERTY DropCalendar      ROOT "Behavior"                                              DEFAULT .F.
    PROPERTY FullSelectOnClick ROOT "Behavior"                                              DEFAULT .F.
@@ -77,7 +77,7 @@ CLASS EditBox INHERIT Control
                                                          "Text, Arrow, Image",;
                                                          "Image, Text, Arrow",;
                                                          "Image, Arrow, Text",;
-                                                         "Arrow, Text, Image",; 
+                                                         "Arrow, Text, Image",;
                                                          "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
 
    DATA ImageList                      EXPORTED
@@ -306,7 +306,7 @@ METHOD Create() CLASS EditBox
          ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
       ENDIF
    ENDIF
-   IF ::__ClassInst == NIL 
+   IF ::__ClassInst == NIL
       IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:xBuddy)=="C" .AND. o:xBuddy == ::Name } ) ) > 0
          ::Parent:Children[n]:xBuddy := Self
       ENDIF
@@ -342,7 +342,7 @@ METHOD SetCueBanner( cText, lFocus ) CLASS EditBox
    IF ::IsWindow()
       EditSetCueBannerText( ::hWnd, IIF( lFocus == NIL, .F., lFocus ), cText )
    ENDIF
-RETURN Self 
+RETURN Self
 
 
 //-----------------------------------------------------------------------------------------------
@@ -354,9 +354,9 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD __UpdateDataGrid() CLASS EditBox
    LOCAL nRecs, cData, nOrder
-   
+
    IF ::__oDataGrid == NIL
-      
+
       WITH OBJECT ( ::__oDataGrid := DataGrid( ::Parent ) )
          :AutoVertScroll  := .F.
          :ShowHeaders := .F.
@@ -381,7 +381,7 @@ METHOD __UpdateDataGrid() CLASS EditBox
          :OnWMLButtonDblClk := {|o| ::__ChkGridKeys( o, VK_RETURN ), 0 }
          :Create()
          :BringWindowToTop()
-         
+
          WITH OBJECT GridColumn( :this )
             :xCaption  := ""
             :Data      := "hb_QSelf():DataSource:Fields:" + ::__oDataGrid:DataSource:Structure[1][1]
@@ -394,10 +394,10 @@ METHOD __UpdateDataGrid() CLASS EditBox
    ENDIF
 
    ::__oDataGrid:DataSource:Zap()
-   
+
    ::DataSource:GoTop()
    nRecs := 0
-   
+
    TRY
       nOrder := ::DataSource:SetOrder( ::DataSearchField )
       ::DataSource:Seek( ::Caption )
@@ -461,7 +461,7 @@ METHOD __ChkGridKeys( o, nKey, lFocus ) CLASS EditBox
     ELSEIF nKey == VK_RETURN
       DEFAULT lFocus TO .T.
       ::Caption := ALLTRIM( ::__oDataGrid:DataSource:Fields:FieldGet( 1 ) )
-      ExecuteEvent( "OnDataSelected", Self )      
+      ExecuteEvent( "OnDataSelected", Self )
       ::__oDataGrid:Height := 0
       IF lFocus
          ::SetFocus()
@@ -513,7 +513,7 @@ METHOD __SetImageIndex(n) CLASS EditBox
       ENDIF
    ENDIF
 RETURN Self
-   
+
 //-----------------------------------------------------------------------------------------------
 METHOD SetCase( nCase ) CLASS EditBox
    SWITCH nCase
@@ -612,9 +612,9 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
          nccs := (struct NCCALCSIZE_PARAMS)
          nccs:Pointer( nlParam )
 
-         IF ::Button 
+         IF ::Button
             nccs:rgrc[1]:right -= 16
-          ELSE      
+          ELSE
             n := 2
             IF valtype( ::Parent:ImageList ) == "O" .AND. ::ImageIndex > 0
                ::__nImageSize := ::Parent:ImageList:IconWidth
@@ -622,7 +622,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
             IF ::DropCalendar .OR. ::MenuArrow
                ::__nArrowSize := 13
             ENDIF
-            DO CASE 
+            DO CASE
                CASE ::xLayout == 2 // "Text, Image, Arrow"
                     nccs:rgrc[1]:right -= ( ::__nArrowSize + ::__nImageSize )
                     ::__aImagePos := { ::Width - ( ::__nImageSize + ::__nArrowSize ) - n, ::__nImageSize }
@@ -655,7 +655,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
                     ::__aArrowPos := { n, ::__nArrowSize, -( ::__nArrowSize + ::__nImageSize ) }
                     ::__aImagePos := { n + ::__nArrowSize, ::__nImageSize }
             ENDCASE
-         ENDIF 
+         ENDIF
          nccs:CopyTo( nlParam )
       ENDIF
    ENDIF
@@ -669,18 +669,18 @@ METHOD OnNCPaint() CLASS EditBox
 
 
 //      _FillRect( hDC, { 1, 1, ::Width-1, ::Height-1 }, hBrush )
-   
+
       nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
       IF nStyle & WS_EX_CLIENTEDGE == 0
          n := 0
       ENDIF
 
       IF ::Button
-      
+
          aRect := {::Width-16-n, n, ::Width-n, ::Height-n}
          hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
          hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
-         
+
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
          SetBkMode( hDC, TRANSPARENT )
          _DrawText( hDC, "...", aRect, DT_CENTER + DT_SINGLELINE + DT_VCENTER )
@@ -694,7 +694,7 @@ METHOD OnNCPaint() CLASS EditBox
             hBrush := ::SelBkBrush
          ENDIF
          DEFAULT hBrush TO GetSysColorBrush( COLOR_WINDOW )
-      
+
          IF ::__aArrowPos[2] > 0
 
             aRect := { ::__aArrowPos[1], 1, ::__aArrowPos[1] + ::__aArrowPos[2], ::Height-1 }
@@ -714,7 +714,7 @@ METHOD OnNCPaint() CLASS EditBox
             ReleaseDC(::hWnd, hdc)
             DeleteObject( hRegion )
          ENDIF
-         
+
          IF ::__aImagePos[2] > 0
             aRect := { ::__aImagePos[1], 1, ::__aImagePos[1] + ::__aImagePos[2], ::Height-1 }
             hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
@@ -731,10 +731,10 @@ METHOD OnNCPaint() CLASS EditBox
          ENDIF
 
       ENDIF
-      
+
 
    ENDIF
-   
+
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
@@ -750,11 +750,11 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
    IF ::xLayout == 1 .AND. !::Button
       RETURN NIL
    ENDIF
-   
+
    IF nwParam == HTHELP
       _ScreenToClient( ::hWnd, @aPt )
-      
-      IF ::Button 
+
+      IF ::Button
          ::__ButtonPushed := .T.
          nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
          IF nStyle & WS_EX_CLIENTEDGE == 0
@@ -791,12 +791,12 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
                :Cargo  := Self
                :Create()
             END
-         ENDIF         
+         ENDIF
          RETURN 0
 #endif
 
        ELSEIF ::__aArrowPos[2] > 0
-         DO CASE 
+         DO CASE
 
             CASE ::xLayout == 3 // "Image, Text, Arrow"
                  x += ::__nImageSize
@@ -816,7 +816,7 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
             rc:left   := ::__aArrowPos[1]
             rc:top    := 0
             rc:right  := ::__aArrowPos[1] + ::__aArrowPos[2]
-            rc:bottom := ::Height 
+            rc:bottom := ::Height
 
             pt := (struct POINT)
             pt:x := x
@@ -885,10 +885,10 @@ RETURN nwParam
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCHitTest( x, y ) CLASS EditBox
    LOCAL aPt := {x,y}, n := 3
-   
-   IF ::Button .OR. ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0 
+
+   IF ::Button .OR. ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0
       _ScreenToClient( ::hWnd, @aPt )
-      
+
       IF aPt[1] < 0 .OR. aPt[1] > ::ClientWidth
          RETURN HTHELP
       ENDIF
@@ -1085,7 +1085,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
    IF ::Transparent
       ::InvalidateRect(, .F.)
    ENDIF
-   
+
    IF ::Style & ES_MULTILINE == ES_MULTILINE .AND. nKey == VK_TAB
       lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
       IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) # 0
@@ -1097,18 +1097,18 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       ENDIF
    ENDIF
    IF ::DataSource != NIL .AND. ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0
-      SWITCH nKey 
+      SWITCH nKey
          CASE VK_DELETE
             ::CallWindowProc()
             ::__UpdateDataGrid()
             RETURN 0
-            
+
          CASE VK_DOWN
             ::__oDataGrid:SetFocus()
             ::DataSource:GoTop()
             ::__oDataGrid:Update()
             RETURN 0
-            
+
          CASE VK_ESCAPE
             ::__oDataGrid:Height := 0
             RETURN 0
@@ -1144,7 +1144,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS FloatCalendar
    ::__IsControl  := .F.
    ::__IsStandard := .F.
-   
+
    ::Super:Init( oParent )
 
    ::Style   := WS_POPUP | WS_CLIPSIBLINGS
@@ -1165,8 +1165,8 @@ RETURN Self
 
 METHOD Create() CLASS FloatCalendar
    Super:Create()
-   
-   ::Calendar:Date    := CTOD( xStr( ::Cargo:Text ) )   
+
+   ::Calendar:Date    := CTOD( xStr( ::Cargo:Text ) )
    ::Calendar:Create()
    ::Calendar:SetFocus()
 

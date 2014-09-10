@@ -127,10 +127,10 @@ CLASS FreeImageRenderer
                                           "Bottom - Left",;
                                           "Left - Center" }, {1,2,3,4,5,6,7,8,9,10} }
    DATA __ExplorerFilter INIT {}
-   
+
    ACCESS ImageWidth       INLINE IIF( ::hDIB != NIL, FreeImageGetWidth( ::hDIB ), 0 )
    ACCESS ImageHeight      INLINE IIF( ::hDIB != NIL, FreeImageGetHeight( ::hDIB ), 0 )
-   
+
    METHOD Init()   CONSTRUCTOR
    METHOD Kill()   INLINE FreeImageUnload( ::hDIB ), ::hDIB := NIL
    METHOD Update()
@@ -151,7 +151,7 @@ METHOD SetMargins( cMargins ) CLASS FreeImageRenderer
    ::TopMargin    := 0
    ::RightMargin  := 0
    ::BottomMargin := 0
-   
+
    IF LEN( aMargins ) == 1
       ASIZE( aMargins, 4 )
       FOR n := 2 TO 4
@@ -167,16 +167,16 @@ METHOD SetMargins( cMargins ) CLASS FreeImageRenderer
           ENDIF
       NEXT
    ENDIF
-   
+
    ::LeftMargin   := VAL( aMargins[1] )
    ::TopMargin    := VAL( aMargins[2] )
    ::RightMargin  := VAL( aMargins[3] )
    ::BottomMargin := VAL( aMargins[4] )
-   
+
    ::xMargins := Alltrim( Str( ::LeftMargin ) )+ "," + Alltrim( Str( ::TopMargin ) ) + "," + Alltrim( Str( ::RightMargin ) ) + "," + Alltrim( Str( ::BottomMargin ) )
 
    ::Update()
-   
+
    IF ::__ClassInst != NIL .AND. oApp:ObjectManager != NIL
       oApp:ObjectManager:PostMessage( WM_USER + 4766 )
    ENDIF
@@ -236,7 +236,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
          nRatio := nHeight / cy
          nWidth := cx * nRatio
       ENDIF
-      cy := nHeight 
+      cy := nHeight
       cx := nWidth
 
     ELSEIF ::Stretch
@@ -308,7 +308,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
                IF FreeImageGetBPP( hDIBMemBitmap ) == 32
                   hDib := FreeImageConvertTo24Bits( hDIBMemBitmap )
                   FreeImageUnload( hDIBMemBitmap )
-                ELSE 
+                ELSE
                   hDib := hDIBMemBitmap
                ENDIF
 
@@ -328,7 +328,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
             IF FreeImageGetBPP( hDIBMemBitmap ) == 32
                hDib := FreeImageConvertTo24Bits( hDIBMemBitmap )
                FreeImageUnload( hDIBMemBitmap )
-             ELSE 
+             ELSE
                hDib := hDIBMemBitmap
             ENDIF
             IF ( display_dib := FreeImageComposite( ::hDIB, .F., , hDib ) ) != NIL
@@ -336,7 +336,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
                ::hDIB := display_dib
             ENDIF
             FreeImageUnload( hDib )
-         ENDIF   
+         ENDIF
       ENDIF
    ENDIF
 
@@ -348,7 +348,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
       hMemDC1     := CreateCompatibleDC( hMemDC )
       hMemBitmap1 := CreateCompatibleBitmap( hMemDC, cx, cy )
       hOldBitmap1 := SelectObject( hMemDC1, hMemBitmap1 )
-      
+
       FreeImageDraw( ::hDIB, hMemDC1, 0, 0, cx, cy )
 
       _AlphaBlend( hMemDC, x, y, cx, cy, hMemDC1, 0, 0, cx, cy, ( 255 * ::xOpacity ) / 100 )
@@ -368,7 +368,7 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
    LOCAL lOK := .F., cData, hBmp, hInst
    hInst := ::Owner:AppInstance
    IF cType != "BMP" .AND. cType != "ICO"
-   
+
       cData := __ResourceToString( hInst, cResource, cType )
       IF !EMPTY( cData )
          IF ::hDIB != NIL
@@ -377,15 +377,15 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
          ::hDIB := FreeImageStringToDib( cData )
          lOK := ::hDIB != NIL
       ENDIF
-      
+
     ELSE
-    
+
       IF cType == "BMP"
          hBmp := LoadImage( hInst, cResource, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_CREATEDIBSECTION )
        ELSE
          hBmp := LoadImage( hInst, cResource, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE )
       ENDIF
-      
+
       IF ! Empty( hBmp )
          IF ::hDIB != NIL
             FreeImageUnload( ::hDIB )
@@ -394,7 +394,7 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
          lOK := ::hDIB != NIL
          DeleteObject( hBmp )
       ENDIF
-      
+
    ENDIF
 
 RETURN lOK
@@ -432,7 +432,7 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
       ::xImageName := NIL
    ENDIF
 
-   IF ::__ClassInst != NIL 
+   IF ::__ClassInst != NIL
       IF !EMPTY( cPrev )
          ::Owner:Application:Project:RemoveImage( cPrev, Self )
       ENDIF
@@ -488,7 +488,7 @@ HB_FUNC( FREEIMAGECOMPOSITE )
       appBkColor.rgbRed = GetRValue( rgb );
       appBkColor.rgbGreen = GetGValue( rgb );
       appBkColor.rgbBlue = GetBValue( rgb );
-   } 
+   }
    fi = FreeImage_Composite( (FIBITMAP*) hb_parptr(1),
                                          hb_parl(2),
                                          ISNIL(3) ? NULL : &appBkColor,

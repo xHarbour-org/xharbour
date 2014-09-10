@@ -367,6 +367,7 @@ CLASS Window INHERIT Object
    DATA __hRegion              PROTECTED
    DATA __aMinRect             PROTECTED
    DATA __hBmpRgn              PROTECTED
+   DATA __lSizeChanged         PROTECTED INIT .F.
    DATA __lNCMouseHover        PROTECTED INIT .F.
    DATA __IsForm               PROTECTED INIT .F.
    DATA __lSubClass            EXPORTED  INIT .T.
@@ -376,9 +377,9 @@ CLASS Window INHERIT Object
 
    ACCESS AppInstance          INLINE IIF( ::Form:DllInstance != NIL, ::Form:DllInstance, ::Application:Instance )
 
-   DESTRUCTOR __FreeCallback
    METHOD Init( oParent ) CONSTRUCTOR
    METHOD Create()
+   DESTRUCTOR __FreeCallback
 
    METHOD __Register()
    METHOD __ControlProc()
@@ -637,17 +638,6 @@ CLASS Window INHERIT Object
    METHOD __CreateBkBrush() VIRTUAL
 ENDCLASS
 
-PROCEDURE __FreeCallBack() CLASS Window
-   IF ::__pCallBackPtr != NIL
-      IF ! ::__lCallbackReleased
-         VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
-       ELSE
-         VXH_FreeCallBackobject( Self )
-      ENDIF
-      ::__pCallBackPtr := NIL
-   ENDIF
-RETURN
-
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS Window
    LOCAL Topic
@@ -709,6 +699,17 @@ METHOD Init( oParent ) CLASS Window
    oParent := NIL
 
 RETURN SELF
+
+//-----------------------------------------------------------------------------------------------
+PROCEDURE __FreeCallBack() CLASS Window
+   IF ::__pCallBackPtr != NIL .AND. ::ClsName != "AtlAxWin"
+      VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
+   ENDIF
+   IF ::ClsName == "ListBox" .AND. ::__pTipCallBack != NIL
+      VXH_FreeCallBackPointer( ::__pTipCallBack )
+      ::__pTipCallBack := NIL
+   ENDIF
+RETURN
 
 //-----------------------------------------------------------------------------------------------
 
@@ -1131,8 +1132,9 @@ METHOD Create( oParent ) CLASS Window
       ::ToolTip:Create()
    ENDIF
 
-   IF ::xMdiContainer .AND. ::MDIClient != NIL
+   IF ::MDIClient != NIL
       ::MDIClient:Create()
+      ::SendMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
 
       IF ::__ClassInst != NIL
          ::__ClassInst:MDIClient := __ClsInst( ::MDIClient:ClassH )
@@ -1577,6 +1579,8 @@ RETURN NIL
 METHOD OnSize( nwParam, nlParam ) CLASS Window
    LOCAL x, y, aChildren, hDef, oChild, cProp, n
 
+   ::__lSizeChanged := .T.
+
    IF EMPTY( ::__ClientRect )
       RETURN 0
    ENDIF
@@ -1752,7 +1756,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
             nRet := 1
          ENDIF
          IF nRet == 1
-            IF ( ::Modal .AND. ( ::AutoClose .OR. ! IsKeyDown( VK_ESCAPE ) ) ) .OR. ( ! ::Modal .AND. ::AutoClose .AND. IsKeyDown( VK_ESCAPE ) )
+            IF ::Modal .OR. ::AutoClose
                ::Close( IDCANCEL )
                RETURN 0
             ENDIF
@@ -2090,8 +2094,11 @@ RETURN NIL
 METHOD OnEraseBkgnd( hDC ) CLASS Window
    LOCAL nRet, n
 
-   IF ::BkBrush != NIL
+   IF ::__lSizeChanged
       ::GetClientRect()
+      ::__lSizeChanged := .F.
+   ENDIF
+   IF ::BkBrush != NIL
       _FillRect( hDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, ::BkBrush )
       nRet := 1
    ENDIF
@@ -3050,7 +3057,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                          ::ShowMode := ::__GetShowMode()
 
                     CASE nMsg == WM_VXH_FREECALLBACK
-                         VXH_FreeCallBackPointer( nlParam )
+                    //     VXH_FreeCallBackPointer( nlParam )
                          hb_gcAll(.t.)
 
                     OTHERWISE
@@ -4634,7 +4641,7 @@ CLASS WinForm INHERIT Window
    PROPERTY Modal                DEFAULT .F.
    PROPERTY UserVariables        DEFAULT ""
    PROPERTY ShowMode             DEFAULT 1
-   PROPERTY AutoClose            DEFAULT .T.
+   PROPERTY AutoClose            DEFAULT .F.
    PROPERTY VertScroll           DEFAULT .F.
    PROPERTY HorzScroll           DEFAULT .F.
    PROPERTY MDIClient
@@ -4686,19 +4693,20 @@ CLASS WinForm INHERIT Window
    ACCESS Form                 INLINE Self
 
    METHOD Init() CONSTRUCTOR
+
    METHOD Create()
    METHOD GetNextControlId()
 
    // MDI Messages
-   METHOD MdiTileHorizontal( lTileDisable )         INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
-                                                           SendMessage( ::MDIClient:hWnd, WM_MDITILE, MDITILE_HORIZONTAL + IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
-   METHOD MdiTileVertical( lTileDisable )           INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
-                                                           SendMessage( ::MDIClient:hWnd, WM_MDITILE, MDITILE_VERTICAL + IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
-   METHOD MdiCascade( lTileDisable )                INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
-                                                           SendMessage( ::MDIClient:hWnd, WM_MDICASCADE, IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
+   METHOD MdiTileHorizontal( lTileDisable ) INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
+                                                   SendMessage( ::MDIClient:hWnd, WM_MDITILE, MDITILE_HORIZONTAL + IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
+   METHOD MdiTileVertical( lTileDisable )   INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
+                                                   SendMessage( ::MDIClient:hWnd, WM_MDITILE, MDITILE_VERTICAL + IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
+   METHOD MdiCascade( lTileDisable )        INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
+                                                   SendMessage( ::MDIClient:hWnd, WM_MDICASCADE, IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
 
-   METHOD MdiIconArrange()                          INLINE SendMessage( ::MDIClient:hWnd, WM_MDIICONARRANGE )
-   METHOD MdiNext()                                 INLINE SendMessage( ::Application:MainForm:MDIClient:hWnd, WM_MDINEXT )
+   METHOD MdiIconArrange()                  INLINE SendMessage( ::MDIClient:hWnd, WM_MDIICONARRANGE )
+   METHOD MdiNext()                         INLINE SendMessage( ::Application:MainForm:MDIClient:hWnd, WM_MDINEXT )
 
    METHOD MdiActivate()
    METHOD MdiDestroy()
@@ -4709,9 +4717,9 @@ CLASS WinForm INHERIT Window
    METHOD MdiRestore()
    METHOD SetFormIcon()
 
-   METHOD Maximize()            INLINE ShowWindow( ::hWnd, SW_SHOWMAXIMIZED)
-   METHOD Minimize()            INLINE ShowWindow( ::hWnd, SW_SHOWMINIMIZED)
-   METHOD Restore()             INLINE ShowWindow( ::hWnd, SW_RESTORE)
+   METHOD Maximize()                        INLINE ShowWindow( ::hWnd, SW_SHOWMAXIMIZED)
+   METHOD Minimize()                        INLINE ShowWindow( ::hWnd, SW_SHOWMINIMIZED)
+   METHOD Restore()                         INLINE ShowWindow( ::hWnd, SW_RESTORE)
    METHOD SetOpacity()
    METHOD Show()
 
@@ -4719,9 +4727,9 @@ CLASS WinForm INHERIT Window
    METHOD RestoreLayout()
    METHOD OnSize()
 
-   ACCESS ActiveForm            INLINE ObjFromHandle( GetActiveWindow() )
+   ACCESS ActiveForm                        INLINE ObjFromHandle( GetActiveWindow() )
 
-   METHOD __RefreshPosNo() INLINE NIL // Compatibility
+   METHOD __RefreshPosNo()                  INLINE NIL // Compatibility
    METHOD __SetBitmapMask()
    METHOD __SetBitmapMaskColor()
    METHOD __PaintBakgndImage()
@@ -4736,11 +4744,11 @@ CLASS WinForm INHERIT Window
 
    METHOD OnSysCommand()
    METHOD SetInstance()
-   METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD Redraw()                          INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
-   METHOD InvalidateRect(a,l) INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
+   METHOD InvalidateRect(a,l)               INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
    METHOD __CreateProperty()
-   METHOD RegisterDocking() INLINE NIL
+   METHOD RegisterDocking()                 INLINE NIL
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -4776,14 +4784,13 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
 
    Super:Init( oParent )
 
-   IF !::ClsName == "MDIChild"
+   IF ! Upper(::ClsName) IN {"MDICHILD","MDICLIENT"}
       ::MDIClient := MDIClient( Self )
    ENDIF
    ::__lCopyCut := .T.
    ::__IsForm   := .T.
 
    __DeleteEvents( ::Events,{ "OnClick" } )
-
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -5027,7 +5034,7 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
    IF ::xBackColor != NIL
       hBrush := CreateSolidBrush( ::xBackColor )
    ENDIF
-   _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
+   _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
 
    IF ::BackgroundImage != NIL
       ::BackgroundImage:Draw( hMemDC )
@@ -5076,7 +5083,7 @@ METHOD Show( nShow ) CLASS WinForm
             hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
             hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-            _FillRect( hMemDC, { ::LeftMargin, ::TopMargin, ::ClientWidth, ::ClientHeight }, hBrush )
+            _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
 
             BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 

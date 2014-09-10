@@ -181,7 +181,7 @@ RETURN Self
 METHOD Create() CLASS ActiveX
    EXTERN CreateActiveX
 
-   LOCAL nStatus, cId, oServer, cHandle, cEvent, hEventHandler := {=>}
+   LOCAL cId, nStatus, oServer, cHandle, cEvent, hEventHandler := {=>}
 
    DEFAULT ::ClsID TO ::ProgID
 
@@ -256,12 +256,13 @@ METHOD Create() CLASS ActiveX
    IF !::Visible .AND. ::__ClassInst == NIL
       ::Hide()
    ENDIF
-   ::Border := ::xBorder
+   //::Border := ::xBorder
+
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
    SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
- 
+
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
    ENDIF
@@ -293,7 +294,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
    WITH OBJECT oObj
       FOR EACH oProperty IN :Properties
           cProp := oProperty:Name
-          IF cProp != "Picture" .AND. cProp != "XMLData" .AND. cProp != "HTMLData" .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
+          IF ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
              lReadOnly := oProperty:ReadOnly
@@ -325,12 +326,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
              catch
                 xVal := NIL
              END
-             //xVal3 := NIL
-             //IF VALTYPE( xVal ) == "O"
-             //   xVal3 := ::__GetObjProp( xVal:hObj )
-             //ENDIF
              __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
-           ELSE
           ENDIF
 
       NEXT

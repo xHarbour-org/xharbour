@@ -506,6 +506,8 @@ METHOD OnDestroy() CLASS ToolStrip
       UnhookWindowsHookEx( s_hMenuDialogHook )
       s_hMenuDialogHook := NIL
    ENDIF
+   s_oCurrMenuItem := NIL
+   s_PrevFocus := NIL
    Super:OnDestroy()
 RETURN NIL
 

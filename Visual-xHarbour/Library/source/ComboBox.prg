@@ -72,8 +72,8 @@ CLASS ComboBox FROM Control
    PROPERTY LowerCase           ROOT "Appearance" SET ::SetStyle( CBS_LOWERCASE, v )         DEFAULT .F.
    PROPERTY HasStrings          ROOT "Appearance" SET ::SetStyle( CBS_HASSTRINGS, v )        DEFAULT .F.
    PROPERTY OemConvert          ROOT "Appearance" SET ::SetStyle( CBS_OEMCONVERT, v )        DEFAULT .F.
-   PROPERTY ItemHeight          ROOT "Appearance" SET ::SetItemHeight( 1, v )                     
-   PROPERTY ClientEdge          ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F. 
+   PROPERTY ItemHeight          ROOT "Appearance" SET ::SetItemHeight( 1, v )
+   PROPERTY ClientEdge          ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.
    PROPERTY ItemToolTips        ROOT "Appearance" SET ::__SetItemToolTips(v)                 DEFAULT .F.
    PROPERTY Flat                ROOT "Appearance"                                            DEFAULT .F.
 
@@ -82,7 +82,7 @@ CLASS ComboBox FROM Control
    PROPERTY DisableNoScroll     ROOT "Behavior"   SET ::SetStyle( CBS_DISABLENOSCROLL, v )   DEFAULT .T.
    PROPERTY NoIntegralHeight    ROOT "Behavior"   SET ::SetStyle( CBS_NOINTEGRALHEIGHT, v )  DEFAULT .F.
    PROPERTY DropDownStyle       ROOT "Behavior"   SET ::SetDropDownStyle( v )                DEFAULT __GetSystem():DropDownStyle:DropDownList
-   PROPERTY HorzScroll          ROOT "Behavior"   SET ::SetStyle( WS_HSCROLL, v )            DEFAULT .F. 
+   PROPERTY HorzScroll          ROOT "Behavior"   SET ::SetStyle( WS_HSCROLL, v )            DEFAULT .F.
    PROPERTY OwnerDrawFixed      ROOT "Behavior"   SET ::SetStyle( CBS_OWNERDRAWFIXED, v )    DEFAULT .F.
    PROPERTY OwnerDrawVariable   ROOT "Behavior"   SET ::SetStyle( CBS_OWNERDRAWVARIABLE, v ) DEFAULT .F.
    PROPERTY AutoEditHorzScroll  ROOT "Behavior"   SET ::SetStyle( CBS_AUTOHSCROLL, v )       DEFAULT .F.
@@ -90,7 +90,7 @@ CLASS ComboBox FROM Control
    DATA OnCBNSelEndOk     EXPORTED
    DATA OnCBNSelEndCancel EXPORTED
    DATA OnCBNKillFocus    EXPORTED
-   DATA cbi               EXPORTED   
+   DATA cbi               EXPORTED
    DATA __pListCallBack   EXPORTED
    DATA __pTipCallBack    EXPORTED
    DATA __nListProc       EXPORTED
@@ -430,7 +430,7 @@ METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
             ELSE
               SendMessage( hWnd, WM_MOUSELEAVE, nwParam, nlParam )
            ENDIF
-           
+
            IF ! ::__isEnter
               ::__TrackMouseEvent( hWnd, TME_HOVER|TME_LEAVE )
            ENDIF
@@ -476,11 +476,11 @@ METHOD __TipCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
    SWITCH nMsg
       CASE WM_PAINT
            RETURN ::__HandleOnPaint( hWnd )
-           
+
       CASE WM_TIMER
            ::__HandleOnTimer( nwParam )
            EXIT
-      //CASE WM_SHOWWINDOW 
+      //CASE WM_SHOWWINDOW
       //     IF nwParam == 0
       //        ReleaseCapture()
       //     ENDIF
@@ -525,7 +525,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    LOCAL nCurSel := SendMessage( hList, LB_ITEMFROMPOINT, 0, MAKELONG( aPt[1], aPt[2] ) )
    (nwParam)
    IF ::__OriginalSel == nCurSel
-      RETURN NIL 
+      RETURN NIL
    ENDIF
 
    IF nCurSel == LB_ERR .OR. nCurSel < 0 .OR. nCurSel >= SendMessage( hList, LB_GETCOUNT, 0, 0 )
@@ -536,14 +536,14 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
 
    hDC := GetDC( ::__tipWnd )
    hOldFont := SelectObject( hDC, ::Font:Handle )
-   
+
    cBuf := space( SendMessage( hList, LB_GETTEXTLEN, nCurSel, 0 ) + 1 )
    SendMessage( hList, LB_GETTEXT, nCurSel, @cBuf)
 
    SendMessage( hList, LB_GETITEMRECT, nCurSel, @rcBounds)
-   rcDraw:left   := rcBounds:left  
-   rcDraw:top    := rcBounds:top   
-   rcDraw:right  := rcBounds:right 
+   rcDraw:left   := rcBounds:left
+   rcDraw:top    := rcBounds:top
+   rcDraw:right  := rcBounds:right
    rcDraw:bottom := rcBounds:bottom
 
    DrawText( hDC, cBuf, @rcDraw, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
@@ -557,7 +557,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    ENDIF
 
    InflateRect( @rcDraw, 2, 2 )
-   
+
    pt:x := rcDraw:left
    pt:y := rcDraw:top
    ClientToScreen( hList, @pt )
@@ -569,7 +569,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    ClientToScreen( hList, @pt )
    rcDraw:right  := pt:x
    rcDraw:bottom := pt:y
-   
+
    SetWindowText( ::__tipWnd, cBuf )
 
    ShowWindow( ::__tipWnd, SW_HIDE )
@@ -661,7 +661,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS DriveCombobox
                 x := aRect[1] + 2
                 _DrawText( dis:hDC, cText, {x, aRect[2], aRect[3], aRect[4] }, DT_VCENTER | DT_SINGLELINE )
                 cText := ""
-                aRect[1] += 4 
+                aRect[1] += 4
                 nField ++
 
                 LOOP
@@ -996,10 +996,10 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FontComboBox
          IF n > 0
             hFont := CreateFontIndirect( ::Fonts[n][1] )
             hOld  := SelectObject( dis:hDC, hFont )
-            
+
             FillRect( dis:hDC, dis:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
             DrawText( dis:hDC, itemTxt, dis:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
-            
+
             //ExtTextOut( dis:hDC, 10, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
             SelectObject( dis:hDC, hOld )
             DeleteObject( hFont )
@@ -1135,7 +1135,7 @@ RETURN Self
 
 METHOD SelectControl( oControl ) CLASS FormComboBox
    LOCAL n := ASCAN( ::aItems, oControl,,, .T. )//MAX( ::FindString(, oControl:Name ), 1 )
-   ::SetCurSel(n)
+   ::SetCurSel( MAX(n,1))
 RETURN Self
 
 METHOD Reset( oControl ) CLASS FormComboBox
@@ -1144,9 +1144,10 @@ METHOD Reset( oControl ) CLASS FormComboBox
    ::SetRedraw(.F.)
    ::ResetContent()
    IF ::Application:Project:Properties != NIL
-      ::AddItem( "Application" + CHR(9) + "Visual xHarbour" )
-      AADD( ::aItems, ::Application:Project:AppObject )
-      
+      IF ! Empty( ::Application:Project:Forms )
+         ::AddItem( "Application" + CHR(9) + "Visual xHarbour" )
+         AADD( ::aItems, ::Application:Project:AppObject )
+      ENDIF
       ::AddItem( ::Application:Project:Properties:Name + CHR(9) + "Project" )
       AADD( ::aItems, ::Application:Project:Properties )
 

@@ -43,8 +43,8 @@ METHOD Init( oParent ) CLASS Panel
    ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle      := WS_EX_CONTROLPARENT
    ::Super:Init( oParent )
-   ::Width        := 80
-   ::Height       := 80
+   ::xWidth        := 80
+   ::xHeight       := 80
    ::__IsStandard   := .F.
    IF ! ::__ClassInst != NIL
       __DeleteEvents( ::Events,{ /*"OnClick",*/;

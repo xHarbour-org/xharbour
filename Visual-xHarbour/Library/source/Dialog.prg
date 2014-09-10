@@ -47,6 +47,7 @@ CLASS Dialog INHERIT WinForm
    METHOD OnInitDialog()        VIRTUAL
    METHOD PreInitDialog()
    METHOD PostInitDialog()
+   METHOD __UnSubclass() INLINE NIL
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------

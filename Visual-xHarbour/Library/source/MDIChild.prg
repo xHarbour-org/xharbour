@@ -62,16 +62,19 @@ METHOD Create() CLASS MDIChildWindow
    ::Style := ::Style & NOT( WS_POPUP )
    ::Style := ::Style & NOT( WS_CHILD )
    ::Style := ::Style | WS_OVERLAPPED
-   
+
    ::ExStyle := ::ExStyle | WS_EX_MDICHILD
    ::Super:Create()
+
+   AADD( ::Parent:Children, Self )
+
    IF ::__hParent != NIL
       InvalidateRect( ::hWnd )
    ENDIF
    IF ::Parent != NIL .AND. ::Parent:WindowsMenu .AND. ( n := ASCAN( ::Parent:Parent:Children, {|o| o:__xCtrlName == "CoolMenu"} ) ) > 0
       ::__oCoolMenu := ::Parent:Parent:Children[n]
       IF ASCAN( ::__oCoolMenu:aItems, {|o| o:MDIMenu == .T. } ) == 0
-         
+
          FOR n := 1 TO len( ::__oCoolMenu:aItems )
              cText := UPPER( ::__oCoolMenu:aItems[n]:Caption )
              IF "HELP" IN cText
@@ -84,7 +87,7 @@ METHOD Create() CLASS MDIChildWindow
          o:Caption := "&Windows"
          o:MDIMenu := .T.
          o:Create( nPos )
-         
+
          oItem := CMenuItem( o )
          oItem:Caption:= "Tile Horizontally"
          oItem:Action := {|o| o:Menu:Parent:Parent:MdiTileHorizontal() }
@@ -121,12 +124,14 @@ METHOD ResetMDIMenu() CLASS MDIChildWindow
       NEXT
       n := 1
       FOR EACH oChild IN ::Parent:Children
-          oItem := CMenuItem( oMenu )
-          oItem:Caption:= "&"+ALLTRIM(STR(n))+" "+oChild:Caption
-          oItem:Cargo  := oChild
-          oItem:Action := {|o| o:Cargo:MdiActivate() }
-          oItem:Create()
-          n++
+          IF ! Empty( oChild:Text )
+             oItem := CMenuItem( oMenu )
+             oItem:Caption:= "&"+ALLTRIM(STR(n))+" "+oChild:Text
+             oItem:Cargo  := oChild
+             oItem:Action := {|o| o:Cargo:MdiActivate() }
+             oItem:Create()
+             n++
+          ENDIF
       NEXT
    ENDIF
 RETURN Self

@@ -1177,7 +1177,6 @@ HB_FUNC ( DRAWGRID )
    int nWidth       = hb_parni(5);
    int nHeight      = hb_parni(6);
    int j;
-   int i;
    DWORD dwraster     = hb_parnl(7);
    HBITMAP hOldBmp;
 
@@ -1186,7 +1185,7 @@ HB_FUNC ( DRAWGRID )
    j=0;
    while (j < nHeight)
    {
-      i=0;
+      int i=0;
       while (i < nWidth)
       {
          BitBlt( hDC, i, j, xGrid, yGrid, hMemDC, 0, 0, dwraster );

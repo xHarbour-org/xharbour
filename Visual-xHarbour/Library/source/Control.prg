@@ -171,7 +171,7 @@ RETURN Self
 
 METHOD DrawArrow( hDC, aRect ) CLASS Control
    LOCAL nShadow, nColor, hPenShadow, hPenLight, hOldPen, z, i, n, x, y, nArrow := 1, nH := 5, nBackColor
-   
+
    nBackColor := GetSysColor( COLOR_ACTIVECAPTION )
 
    nColor  := LightenColor( nBackColor, 100 )
@@ -243,7 +243,7 @@ RETURN NIL
 METHOD OnMouseActivate( nwParam, nlParam ) CLASS Control
    LOCAL oChild
    ::Super:OnMouseActivate( nwParam, nlParam )
-      
+
    IF LoWord(nlParam) == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
       FOR EACH oChild IN ::Parent:Children
           IF oChild:Active
@@ -383,7 +383,7 @@ RETURN NIL
 
 METHOD OnNCMouseLeave() CLASS TitleControl
    ::Super:OnNCMouseLeave()
-   IF ::__nCaptionHeight > 0 .AND. ::AllowClose
+   IF ::__nCaptionHeight > 0 .AND. ( ::AllowClose .OR. ::AllowUnDock )
       ::__lCloseHover  := .F.
       ::__lClosePushed := .F.
       ::__lPinHover    := .F.
@@ -398,7 +398,9 @@ RETURN NIL
 METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
    LOCAL hOldBrush, hOldPen, hdc, hOldFont, nWidth, n:=0, nLeft, nTop
    ::CallWindowProc()
-   ::Super:OnNCPaint( nwParam, nlParam )
+   IF nwParam != NIL
+      ::Super:OnNCPaint( nwParam, nlParam )
+   ENDIF
    IF ::__nCaptionHeight > 0
       hdc := GetWindowDC( ::hWnd )
       IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
@@ -411,11 +413,11 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
 
       hOldPen   := SelectObject( hDC, ::System:TitleBorderPen )
       hOldBrush := SelectObject( hDC, IIF( ! ::__lActive, ::ColorScheme:Brush:TitleBackColorInactive, ::ColorScheme:Brush:TitleBackColorActive ) )
-      
+
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
       SelectObject( hDC, hOldBrush )
       SelectObject( hDC, hOldPen )
-      
+
       SetTextColor( hDC, IIF( ! ::__lActive, ::System:Color:White, ::System:Color:Black ) )
 
       hOldFont := SelectObject( hDC, ::System:hFont )
@@ -512,7 +514,7 @@ METHOD OnNCHitTest( x, y ) CLASS TitleControl
       IF !::AllowUnDock .AND. !::AllowClose .AND. !::AllowMaximize .AND. nRes == NIL .AND. _PtInRect( ::__aCaptionRect, aPt )
          RETURN HTNOWHERE
       ENDIF
-      
+
    ENDIF
 RETURN nRes
 
@@ -614,7 +616,7 @@ METHOD Redock() CLASS TitleControl
 
       ::ClientWidth := ::BackInfo[ 9]
       ::ClientHeight:= ::BackInfo[10]
-      
+
       IF ::BackInfo[ 1] != NIL
          o := Splitter( ::Parent )
          o:Owner    := Self
@@ -645,8 +647,6 @@ METHOD Redock() CLASS TitleControl
       ENDIF
       ::SetWindowPos(, ::xLeft, ::xTop, ::xWidth, ::xHeight, SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOSENDCHANGING )
 
-      ::BackInfo := NIL
-
       IF ! Empty( ::Parent:__aDock )
          hDef := BeginDeferWindowPos( LEN( ::Parent:__aDock ) )
          FOR EACH oControl IN ::Parent:__aDock
@@ -667,6 +667,13 @@ METHOD Redock() CLASS TitleControl
          ENDIF
        CATCH
       END
+      ::Dock:Left   := ::BackInfo[16][1]
+      ::Dock:Top    := ::BackInfo[16][2]
+      ::Dock:Right  := ::BackInfo[16][3]
+      ::Dock:Bottom := ::BackInfo[16][4]
+
+      ::BackInfo := NIL
+
       ::Show()
       ExecuteEvent( "OnRedock", Self )
    ENDIF
@@ -676,12 +683,12 @@ RETURN Self
 
 METHOD Undock() CLASS TitleControl
    LOCAL hDef, oChild, pt
-   
+
    IF __Evaluate( ::OnWMUnDock,  Self ) == NIL .AND. ::AllowUnDock
       ::__Docked := .F.
       ::BackInfo := { ::LeftSplitter, ::TopSplitter, ::RightSplitter, ::BottomSplitter,;
                       ::xLeft, ::xTop, ::xWidth, ::xHeight, ::ClientWidth, ::ClientHeight,;
-                      ::Style, ::ExStyle, ::Parent:hWnd,, ::xText }
+                      ::Style, ::ExStyle, ::Parent:hWnd,, ::xText, { ::Dock:Left, ::Dock:Top, ::Dock:Right, ::Dock:Bottom } }
 
       ::xText := ""
       ::ResetFrame()
@@ -729,10 +736,13 @@ METHOD Undock() CLASS TitleControl
       ::__DockParent:Width      := ::Width  + ( GetSystemMetrics( SM_CXFRAME ) + 2 )
       ::__DockParent:Height     := ::Height + ( GetSystemMetrics( SM_CYFRAME ) + 2 ) + GetSystemMetrics( SM_CYSMCAPTION )
       ::__DockParent:ToolWindow := .T.
-      ::__DockParent:SysMenu    := ::AllowClose
-      ::__DockParent:ThickFrame := .F.
+      ::__DockParent:SysMenu    := .T. //::AllowClose
+      ::__DockParent:ThickFrame := .T.
+      ::__DockParent:AutoClose  := .T.
       ::__DockParent:Create()
+
       SetParent( ::hWnd, ::__DockParent:hWnd )
+
       MoveWindow( ::hWnd, 0, 0, ::Width, ::Height )
       ::__DockParent:Show()
       ::__DockParent:OnWMClose   := {|| IIF( ::IsDocked, 0, ::Redock() ) }
@@ -749,10 +759,13 @@ METHOD Undock() CLASS TitleControl
          NEXT
          EndDeferWindowPos( hDef )
       ENDIF
+
+      ::__DockParent:OnWMSize := {|o,nwParam,nlParam| (o,nwParam), ::MoveWindow(0,0,LOWORD(nlParam),HIWORD(nlParam),.T.) }
+
       ::ResetFrame()
       ExecuteEvent( "OnUndock", Self )
    ENDIF
-  
+
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -769,7 +782,7 @@ METHOD DrawClose( hDC ) CLASS TitleControl
       _FillRect( hDC, aRect, IIF( ! ::__lActive, ::ColorScheme:Brush:TitleBackColorInactive, ::ColorScheme:Brush:TitleBackColorActive ) )
       SelectObject( hDC, GetStockObject( IIF( ! ::__lActive, WHITE_PEN, BLACK_PEN ) ) )
    ENDIF
-   
+
    aRect[1]+=4
    aRect[2]+=4
    aRect[3]-=4

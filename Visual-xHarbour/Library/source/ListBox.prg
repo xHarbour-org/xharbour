@@ -53,8 +53,6 @@ CLASS ListBox FROM TitleControl
    PROPERTY ItemToolTips      SET ::__SetItemToolTips(v)                          DEFAULT .F.
 
    METHOD Init()  CONSTRUCTOR
-   DESTRUCTOR __FreeCallBack
-
    METHOD Create()
 
    METHOD GetString()
@@ -134,13 +132,6 @@ CLASS ListBox FROM TitleControl
    METHOD __TrackMouseEvent()
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
-
-PROCEDURE __FreeCallBack() CLASS ListBox
-   IF ::__pTipCallBack != NIL
-      VXH_FreeCallBackPointer( ::__pTipCallBack )
-      ::__pTipCallBack := NIL
-   ENDIF
-RETURN
 
 METHOD Init( oParent ) CLASS ListBox
    ::ClsName      := "ListBox"

@@ -140,6 +140,16 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::__lModified := lNew
    ::__IdeImageIndex := 1
 
+   WITH OBJECT ::Application:ObjectTree
+      IF :oApp == NIL
+         :oApp := :oPrj:AddItem( "Application", 9 )
+         :oApp:Cargo := :Application:Project:AppObject
+         :Application:Project:AppObject:TreeItem := :oApp
+
+         :Application:MainForm:FormEditor1:TreeItem := :oApp
+      ENDIF
+   END
+
    #ifndef VXH_PROFESSIONAL
       lCustom := .F.
    #endif

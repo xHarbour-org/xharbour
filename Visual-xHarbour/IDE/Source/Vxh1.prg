@@ -35,7 +35,7 @@ static s_cVersion, s_cCopyright
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "7"
-#define VXH_BuildVersion "RC 2"
+#define VXH_BuildVersion ""
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -675,6 +675,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption    := "Save &As ... "
             :ImageIndex := 0
             :Enabled    := .F.
+            :Action     := {||::Application:Project:SaveAs() }
             :Create()
          END
 
@@ -2603,8 +2604,8 @@ METHOD NewProject() CLASS Project
 
    ::Application:Props[ "ComboSelect" ]:Reset()
 
-   ::Application:ObjectManager:ResetProperties( {{::AppObject}} )
-   ::Application:EventManager:ResetEvents( {{::AppObject}} )
+   ::Application:ObjectManager:ResetProperties( {{::Properties}} )
+   ::Application:EventManager:ResetEvents( {{::Properties}} )
 
    ::Application:ProjectPrgEditor:TreeItem:Select()
    ::Application:CloseMenu:Enabled := .T.
@@ -3434,6 +3435,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       NEXT
    ENDIF
    ::Application:ObjectTree:ResetContent()
+   ::Application:ObjectTree:oApp := NIL
+
    ::Application:ObjectManager:ActiveObject := NIL
    FOR n := 1 TO LEN( ::Application:ObjectManager:Items )
       ::Application:ObjectManager:Items[n]:Cargo := NIL
@@ -3537,6 +3540,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    IF ::AppObject:__ColorTable != NIL
       ::AppObject:__ColorTable:Unload()
    ENDIF
+   ::Application:SaveAsMenu:Enabled := .F.
 
    //hb_gcall( .T. )
 RETURN .T.
@@ -3956,8 +3960,8 @@ METHOD Open( cProject ) CLASS Project
     ELSE
       ::Application:Props[ "ComboSelect" ]:Reset()
 
-      ::Application:ObjectManager:ResetProperties( {{::AppObject}} )
-      ::Application:EventManager:ResetEvents( {{::AppObject}} )
+      ::Application:ObjectManager:ResetProperties( {{::Properties}} )
+      ::Application:EventManager:ResetEvents( {{::Properties}} )
 
       ::Application:ProjectPrgEditor:TreeItem:Select()
 
@@ -3989,6 +3993,8 @@ METHOD Open( cProject ) CLASS Project
 
    oWait:Position := 0
    oWait:Visible := .F.
+
+   ::Application:SaveAsMenu:Enabled := .T.
 
 RETURN Self
 
