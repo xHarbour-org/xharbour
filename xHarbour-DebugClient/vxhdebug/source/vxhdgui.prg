@@ -20,9 +20,9 @@ CLASS XHDebuggerGUI FROM XHDebugger
   DATA btnGo, btnBreak, btnStop, btnInto, btnOver, btnOut, btnCursor, btnToggle
 
   DATA hHook
-  
+
   ACCESS oApp INLINE __GetApplication()
-  
+
   METHOD New() CONSTRUCTOR
   METHOD AddPoint( lTrace, cExpr )
   METHOD GetUnavailableEditor( cFile )
@@ -51,7 +51,6 @@ METHOD New() CLASS XHDebuggerGUI
     :Height      := 24
     :ShowChevron := .F.
     :Create()
-
     WITH OBJECT ::btnGo := ToolStripButton( :this )
       :Caption    := "Start"
       :ToolTip:Text := "Start <F5>"
@@ -107,7 +106,7 @@ METHOD New() CLASS XHDebuggerGUI
       :Action     := {|| ::ToggleBreak() }
       :Create()
     END
-  
+
   END /* ::oToolBar */
 
   ::oTab := TabControl( ::oApp:DebuggerPanel )
@@ -149,7 +148,7 @@ METHOD New() CLASS XHDebuggerGUI
     ENDIF
 */
     ::aTabs := { ::oConsole, ::oMonitor, ::oCallStack, ::oWatch, ::oWorkArea, ::oSets }
-    
+
     :OnSelChanged := {| , , new| IIF( ::socket != NIL .OR. new $ { 1, 3 }, ;
                                       ::aTabs[ new ]:ShowUp(), ;
                                       ::oConsole:Select() ) }
@@ -236,13 +235,13 @@ RETURN Self
 METHOD InspectSave( oGrid, cExpr, cType, xData ) CLASS XHDebuggerGUI
   LOCAL cValue, aTable := oGrid:DataSource:Table
   LOCAL nRec := oGrid:DataSource:Record
-  
+
   IF cType == 'A'
     cExpr += "[" + LTrim( Str( nRec ) ) + "]"
   ELSEIF cType == 'O'
     cExpr += ":" + aTable[ nRec ][ 1 ]
   ENDIF
-  
+
   cValue := ::ReadExpressionValue( cExpr + ":=" + xData )
   aTable[ nRec ] := { aTable[ nRec ][ 1 ], cValue[ 1 ], SubStr( cValue, 2 ) }
 RETURN .T.
@@ -278,21 +277,23 @@ METHOD OnStart() CLASS XHDebuggerGUI
         ENDIF
         ::oApp:EnableBars( .T. )
      ENDIF
-  CATCH   
+  CATCH
   END
 
   ::oApp:DebuggerPanel:Show()
   ::oApp:DebuggerPanel:DockIt()
-  
+  ::oToolBar:Show()
+  ::oToolBar:DockIt()
+
   IF ::oApp:IdeActive
      ::hHook := SetWindowsHookEx( WH_KEYBOARD, HB_ObjMsgPtr( Self, "DebugHookKeys" ), NIL, GetCurrentThreadId(), Self )
      ::oApp:EnableBars( .F. )
   ENDIF
-  
+
   ::oTab:Children[1]:Select()
 
   ::oConsole:Clear()
-  
+
   ::oApp:MainWindow:UpdateWindow()
 
 RETURN Self
@@ -409,7 +410,7 @@ METHOD Sync() CLASS XHDebuggerGUI
   ::oWatch:lDirty := .T.
   ::oWorkArea:lDirty := .T.
   ::aTabs[ ::oTab:CurSel ]:ShowUp()
-  
+
   IF ::oApp:ClassName == "DEBUGGER"
     cFile := ::cModule
     IF ::aSources == NIL
@@ -451,7 +452,7 @@ METHOD Sync() CLASS XHDebuggerGUI
     ::oApp:SourceEditor:SetFocus()
   ELSE
     ::oApp:SourceEditor:Show()
-    
+
     IF lAutoFind
        cFile:=find_source( cFile, ::oApp:aPath )
     ENDIF
@@ -513,7 +514,7 @@ METHOD ToggleBreak() CLASS XHDebuggerGUI
    cFile := ::oApp:SourceEditor:Source:FileName
    nLine := ::oApp:SourceEditor:Source:GetCurLine()+1
    IF ::IsValidStopLine( cFile, nLine )
-      ::oApp:SourceEditor:Source:ToggleBookmark()
+      ::oApp:SourceEditor:ToggleBookmark()
       ::Super:ToggleBreak( cFile, nLine )
    ENDIF
 RETURN Self
