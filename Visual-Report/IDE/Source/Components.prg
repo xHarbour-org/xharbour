@@ -48,7 +48,7 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
    WITH OBJECT oBtn
       :Component   := oComponent
       :Left        := :Parent:LeftMargin - :Parent:HorzScrollPos
-      :OwnerDraw   := .T.
+      //:OwnerDraw   := .T.
       :Caption     := oComponent:Name
       :ImageList   := ::Application:MainForm:ToolBox1:ImageList
       :Action      := {|o| o:SelectComponent()}

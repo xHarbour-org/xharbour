@@ -16,7 +16,7 @@
 #define  acObjectTypeText           5
 
 CLASS VrLabel INHERIT VrObject
-   PROPERTY Text      READ xText WRITE SetText
+   PROPERTY Text      SET ::SetText( v )
    DATA AutoResize    EXPORTED  INIT .F.
    DATA Picture       EXPORTED  INIT ""
    DATA ClsName       EXPORTED  INIT "Label"
@@ -58,13 +58,13 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "AutoResize", "Size"    } )
       AADD( ::aProperties, { "Name",       "Object"  } )
    ENDIF
-   DEFAULT ::Font TO Font()
-   ::Font:AllowHandle := oParent != NIL
+   DEFAULT ::Font TO Font( Self )
+   ::Font:lCreateHandle := oParent != NIL
 RETURN Self
 
 METHOD Create() CLASS VrLabel
-   DEFAULT ::Font TO Font()
-   IF ::__ClsInst == NIL // Runtime
+   DEFAULT ::Font TO Font( Self )
+   IF ::__ClassInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
 
@@ -75,7 +75,7 @@ METHOD Create() CLASS VrLabel
          WITH OBJECT ::EditCtrl := __VrLabel( IIF( ::Parent:ClsName == "PanelBox", ::Parent, ::Parent:EditCtrl ) )
             :Transparent := .T.
             :Cargo   := Self
-            :Caption := ::Text
+            :Text    := ::Text
             :Left    := ::Left
             :Top     := ::Top
             :Create()
@@ -93,13 +93,13 @@ METHOD Configure() CLASS VrLabel
    IF ::lUI
       WITH OBJECT ::EditCtrl
          :Text           := ::Text
-         :ForeColor      := ::ForeColor     
-         :BackColor      := ::BackColor     
-         :Font:FaceName  := ::Font:FaceName 
+         :ForeColor      := ::ForeColor
+         :BackColor      := ::BackColor
+         :Font:FaceName  := ::Font:FaceName
          :Font:PointSize := ::Font:PointSize
-         :Font:Italic    := ::Font:Italic   
+         :Font:Italic    := ::Font:Italic
          :Font:Underline := ::Font:Underline
-         :Font:Weight    := ::Font:Weight   
+         :Font:Weight    := ::Font:Weight
       END
       ::SetText( ::xText )
    ENDIF
@@ -109,7 +109,7 @@ METHOD SetText( cText ) CLASS VrLabel
    LOCAL aSize, aRect
    IF ::EditCtrl != NIL
       WITH OBJECT ::EditCtrl
-         IF :hWnd != NIL 
+         IF :hWnd != NIL
             aRect := :GetRectangle()
             aRect := {aRect[1]-1, aRect[2]-1, aRect[3]+1, aRect[4]+1}
             :Parent:InvalidateRect( aRect, .F. )
@@ -117,7 +117,7 @@ METHOD SetText( cText ) CLASS VrLabel
             IF VALTYPE( cText ) == "C"
                SetWindowText( :hWnd, cText )
             ENDIF
-            
+
             aSize  := :Drawing:GetTextExtentPoint32( cText )
             :xWidth  := ::Width //aSize[1]+4
             :xHeight := MAX( ::Height, aSize[2]+2 )
@@ -226,7 +226,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
 
       x  := ( ::nPixPerInch / nX ) * ::Left
       y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
-      
+
       cItalic    := IIF( ::Font:Italic, "1", "0" )
       cUnderline := IIF( ::Font:Underline, "1", "0" )
 
@@ -296,7 +296,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
             lf:lfStrikeOut      := IIF( ::Font:StrikeOut, 1, 0 )
             hFont     := CreateFontIndirect( lf )
             hPrevFont := SelectObject( hDC, hFont )
-            
+
             aTxSize := _GetTextExtentPoint32( hDC, cText )
             DEFAULT aTxSize TO {0,0}
             IF ::SingleLine .AND. aTxSize[1] > ::Width
@@ -306,7 +306,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
                ENDDO
                cText += "..."
             ENDIF
-            
+
             SelectObject( hDC, hPrevFont )
             DeleteObject( hFont )
             :Attribute( "Right",   x + ( (::nPixPerInch / nX) * ::Width ) )
@@ -319,7 +319,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
          :Attribute( "Left",   x )
          :Attribute( "Top",    y )
          :Attribute( "TextFont", Alltrim( ::Font:FaceName ) + "," +Alltrim( Str( ::Font:PointSize ) ) + "," + Alltrim( Str( ::Font:Weight ) ) +","+cItalic+","+cUnderline )
-         
+
 
          :Attribute( "Text", cText )
          IF ::ForeColor != ::SysForeColor
@@ -328,7 +328,7 @@ METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
          IF ::BackColor != ::SysBackColor
             :Attribute( "BackColor", PADL( DecToHexa( ::BackColor ), 6, "0" ) )
          ENDIF
-         
+
          IF ::TextAngle <> 0
             :Attribute( "TextAngle", ::TextAngle*10 )
          ENDIF
@@ -351,7 +351,7 @@ RETURN Self
    ENDCLASS
 
    //-----------------------------------------------------------------------------------------------------------------------------------
-   METHOD OnLButtonDown(n,x,y) CLASS __VrLabel 
+   METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
       LOCAL aRect, oCtrl
       ::Parent:SetCapture()
       IF ::Application:Props:PropEditor:ActiveObject != NIL
@@ -393,7 +393,7 @@ RETURN aPoints
 
 FUNCTION MouseMove( oCtrl, n, x, y )
    LOCAL i, aPoint, aPoints, nCursor := 0
-   IF n != MK_LBUTTON 
+   IF n != MK_LBUTTON
       oCtrl:Parent:nMove := 0
       aPoints := GetPoints( oCtrl )
       FOR i := 1 TO LEN( aPoints )
@@ -410,14 +410,14 @@ RETURN NIL
 FUNCTION PaintMarkers( hDC, oCtrl )
    LOCAL nColor, i, aPt, hBrush, aPts := GetPoints( oCtrl )
    local r,g,b, hOld, lDC := hDC != NIL
-   
+
    IF !lDC
       hDC := GetDCEx( oCtrl:Parent:hWnd )
    ENDIF
    r = 255-GetRValue( oCtrl:BackColor )
    g = 255-GetGValue( oCtrl:BackColor )
    b = 255-GetBValue( oCtrl:BackColor )
-            
+
    hBrush := CreateSolidBrush( RGB(r,g,b) )
    hOld := SelectObject( hDC, hBrush )
    FOR i := 1 TO LEN( aPts )

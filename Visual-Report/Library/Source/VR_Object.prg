@@ -17,7 +17,7 @@
 #define  acObjectTypeText           5
 
 CLASS VrObject
-   PROPERTY Name READ xName WRITE SetControlName
+   PROPERTY Name SET ::SetControlName(v)
    DATA Font        PUBLISHED
 
    DATA lUI         EXPORTED INIT .T.
@@ -41,16 +41,16 @@ CLASS VrObject
 
    DATA Parent      EXPORTED
    DATA ClsName     EXPORTED
-   DATA __ClsInst   EXPORTED
+   DATA __ClassInst EXPORTED
    DATA aProperties INIT { { "Left", "Position" },;
                            { "Top",  "Position" },;
                            { "Alignment",  "Position" } }
-   ACCESS EditMode  INLINE ::__ClsInst != NIL
+   ACCESS EditMode  INLINE ::__ClassInst != NIL
    ACCESS __xCtrlName INLINE ::ClsName
-   
+
    DATA EditCtrl    EXPORTED
    DATA PDFCtrl     EXPORTED
-   
+
    DATA Report      EXPORTED
    DATA nPixPerInch EXPORTED INIT PIX_PER_INCH
    DATA bCreate
@@ -75,7 +75,7 @@ METHOD Init( oParent ) CLASS VrObject
    IF ::Parent != NIL
       ::SetControlName()
    ENDIF
-   ::Font := Font()
+   ::Font := Font( Self )
 RETURN Self
 
 METHOD __GetDataSource( cDataSource ) CLASS VrObject
@@ -110,7 +110,7 @@ METHOD Delete() CLASS VrObject
          ::Parent:InvalidateRect()
       ENDIF
    ENDIF
-   
+
    TRY
       ::Button:Delete()
    CATCH
@@ -159,7 +159,9 @@ METHOD SetControlName( cProp ) CLASS VrObject
       ENDIF
       AADD( ::Application:aNames, cProp )
       ::xName := cProp
-      ::Text := cProp
+      IF Empty( ::Text )
+         ::Text := cProp
+      ENDIF
    ENDIF
 RETURN n
 
@@ -167,7 +169,7 @@ METHOD SetSize( cx, cy ) CLASS VrObject
    LOCAL aRect
    DEFAULT cx TO ::Width
    DEFAULT cy TO ::Height
-   
+
    WITH OBJECT ::EditCtrl
       :Parent:nDownPos := {0,0}
       aRect := :GetRectangle()

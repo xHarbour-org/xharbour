@@ -20,7 +20,7 @@ CLASS VrLine INHERIT VrObject
    DATA SysForeColor EXPORTED  INIT RGB(0,0,0)
    DATA ForeColor    PUBLISHED INIT RGB(0,0,0)
    DATA ClsName EXPORTED INIT "Line"
-   
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD WriteProps()
@@ -38,7 +38,7 @@ RETURN Self
 
 METHOD Create() CLASS VrLine
 
-   IF ::__ClsInst == NIL // Runtime
+   IF ::__ClassInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
    #ifndef VRDLL
@@ -75,7 +75,7 @@ METHOD Draw( hDC ) CLASS VrLine
    x  := ( ::nPixPerInch / nX ) * ::Left
    y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
    cx := ( ::nPixPerInch / nX ) * ::Width
- 
+
    ::Parent:oPDF:CreateObject( acObjectTypeLine, cName )
    ::PDFCtrl := ::Parent:oPDF:GetObjectByName( cName )
    WITH OBJECT ::PDFCtrl
@@ -91,7 +91,7 @@ RETURN Self
 
 METHOD Configure() CLASS VrLine
    WITH OBJECT ::EditCtrl
-      :ForeColor      := ::ForeColor     
+      :ForeColor      := ::ForeColor
       :xLeft          := ::Left
       :xTop           := ::Top
       :xWidth         := ::Width

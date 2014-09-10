@@ -59,7 +59,7 @@ static oApp
          ENDIF
       ENDIF
    RETURN Self
-   
+
    METHOD Close() CLASS VR
       ::oRep := NIL
       ::oDoc := NIL
@@ -139,7 +139,7 @@ CLASS RepApp INHERIT Application
    DATA aNames   EXPORTED INIT {}
    DATA Props    EXPORTED INIT {=>}
    DATA Report   EXPORTED
-   
+
    ACCESS Project INLINE ::Report
    METHOD Init() CONSTRUCTOR
 ENDCLASS
@@ -166,13 +166,13 @@ ENDCLASS
 METHOD Init() CLASS MainForm
    LOCAL aSize, aEntries, cReport, oItem, aComp, n, i
    ::Super:Init()
-   
+
    ::Caption := "Visual Report"
    ::Icon    := "AVR"
    ::xName   := "VR"
-   
-   ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
-   ::OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
+
+   //::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
+   //::OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
 
    ::Create()
 
@@ -377,7 +377,7 @@ METHOD Init() CLASS MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
-      //:ShowChevron := .F.
+      :ShowChevron := .F.
       :Caption := "Standard"
       :Row     := 2
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -431,6 +431,7 @@ METHOD Init() CLASS MainForm
    END
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+      :ShowChevron := .F.
       :Caption := "Edit"
       :Row     := 2
       :Create()
@@ -489,6 +490,7 @@ METHOD Init() CLASS MainForm
 
 
    WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+      :ShowChevron := .F.
       :Row := 2
       :Caption := "Build"
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -509,11 +511,15 @@ METHOD Init() CLASS MainForm
 
 
    WITH OBJECT ::Application:Props[ "ToolBox" ] := ToolBox( Self )
-      :Dock:Top     := ::ToolStripContainer1
-      :Dock:Bottom  := ::StatusBar1
+      :Dock:Left      := Self
+      :Dock:Top       := ::ToolStripContainer1
+      :Dock:Bottom    := ::StatusBar1
       :Dock:Margins   := "2,2,2,2"
+      :Text           := "ToolBox"
 
       :FullRowSelect    := .T.
+      :StaticEdge       := .F.
+      :ClientEdge       := .F.
       :Border           := .T.
 
       :NoHScroll        := .T.
@@ -714,12 +720,12 @@ RETURN Self
 
 METHOD OnClose() CLASS MainForm
    LOCAL nClose
-   IF ::Application:Report != NIL 
+   IF ::Application:Report != NIL
       IF ( nClose := ::Application:Report:Close() ) != NIL
          RETURN nClose
       ENDIF
    ENDIF
-   
+
    ::SaveLayout(, "Layout")
    ::Application:Props[ "ToolBox" ]:SaveLayout(, "Layout")
    ::Application:Props[ "PropEditor" ]:SaveLayout(, "Layout")
@@ -743,7 +749,7 @@ CLASS Report
    DATA aCopy         EXPORTED
    DATA aUndo         EXPORTED INIT {}
    DATA aRedo         EXPORTED INIT {}
-   
+
    ACCESS Modified    INLINE ::xModified
    ASSIGN Modified(l) INLINE oApp:MainForm:Caption := "Visual Report [" + ::GetName() + "]" + IIF( l, " *", "" ), ::xModified := l
 
@@ -868,7 +874,7 @@ METHOD NewReport() CLASS Report
 
    oApp:Props[ "CompObjects" ]      := {}
 
-   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )
    ::FileName := "Untitled.vrt"
    oApp:MainForm:Caption := "Visual Report [" + ::FileName + "]"
    ::VrReport := VrReport( NIL )
@@ -894,7 +900,7 @@ METHOD EditPaste( aProps ) CLASS Report
    DEFAULT aProps TO ::aCopy
    hPointer := HB_FuncPtr( aProps[1][2] )
    oObj := HB_Exec( hPointer,, aProps[2][2] )
-   oObj:__ClsInst := __ClsInst( oObj:ClassH )
+   oObj:__ClassInst := __ClsInst( oObj:ClassH )
    oObj:Create()
    FOR n := 3 TO LEN( aProps )
        cProp := aProps[n][1]
@@ -924,9 +930,9 @@ METHOD PageSetup() CLASS Report
    oPs:Orientation  := ::VrReport:Orientation
    oPs:PaperSize    := ::VrReport:PaperSize
 
-   oPs:LeftMargin   := ::VrReport:LeftMargin  
-   oPs:TopMargin    := ::VrReport:TopMargin   
-   oPs:RightMargin  := ::VrReport:RightMargin 
+   oPs:LeftMargin   := ::VrReport:LeftMargin
+   oPs:TopMargin    := ::VrReport:TopMargin
+   oPs:RightMargin  := ::VrReport:RightMargin
    oPs:BottomMargin := ::VrReport:BottomMargin
 
    IF oPs:Show()
@@ -940,9 +946,9 @@ METHOD PageSetup() CLASS Report
 
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "PaperSize", oPs:PaperSize )
       ::VrReport:oPDF:ObjectAttribute( "Pages[1]", "Landscape", oPs:Orientation == __GetSystem():PageSetup:Landscape )
-      
+
       ::SetScrollArea()
-      
+
       oApp:Props:RepHeader:InvalidateRect()
       oApp:Props:Header:InvalidateRect()
       oApp:Props:Body:InvalidateRect()
@@ -980,6 +986,10 @@ METHOD Close() CLASS Report
       END
    ENDIF
    ::oXMLDoc  := NIL
+   IF ::VrReport != NIL
+      ::VrReport:oPDF:Destroy()
+      ::VrReport:oPDF := NIL
+   ENDIF
    ::VrReport := NIL
    WITH OBJECT oApp
       :Props:Components:Reset()
@@ -987,9 +997,9 @@ METHOD Close() CLASS Report
       AEVAL( :Props:RepHeader:Objects, {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:RepFooter:Objects, {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:Header:Objects,    {|o|o:EditCtrl:Destroy()} )
-      
+
       AEVAL( :Props:Body:Objects,      {|o|IIF( o:EditCtrl != NIL, o:EditCtrl:Destroy(),) } )
-      
+
       AEVAL( :Props:Footer:Objects,    {|o|o:EditCtrl:Destroy()} )
       AEVAL( :Props:ExtraPage:Objects, {|o|o:EditCtrl:Destroy()} )
       :Props:RepHeader:Objects := {}
@@ -1018,7 +1028,7 @@ METHOD Close() CLASS Report
       :Props:RunBttn:Enabled       := .F.
       :Props:PageSetupMenu:Enabled := .F.
 
-      :Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+      :Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )
       :MainForm:Caption := "Visual Report"
       :Props:PropEditor:ResetProperties( {{ NIL }} )
 
@@ -1039,10 +1049,10 @@ METHOD SetScrollArea() CLASS Report
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
    nY := GetDeviceCaps( hDC, LOGPIXELSY )
    ReleaseDC( 0, hDC )
-   
+
    cx := Int( ( ::VrReport:oPDF:PageWidth / 1440 ) * nX )
    cy := Int( ( ::VrReport:oPDF:PageLength / 1440 ) * nY )
-   
+
    oApp:Props:Header:Width    := cx
    oApp:Props:Body:Width      := cx
    oApp:Props:Footer:Width    := cx
@@ -1050,7 +1060,7 @@ METHOD SetScrollArea() CLASS Report
    oApp:Props:RepFooter:Width := cx
    oApp:Props:ExtraPage:Width := cx
    oApp:Props:ExtraPage:Height := cy
-   
+
    oApp:Props:ReportPageTab:HorzScrollSize := cx + 4
 
    oApp:Props:ExtraTab:HorzScrollSize := cx + 4
@@ -1069,7 +1079,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
    LOCAL oFile, pHrb, nX
-   
+
    IF ::VrReport != NIL .AND. ::Close() != NIL
       RETURN NIL
    ENDIF
@@ -1093,7 +1103,7 @@ METHOD Open( cReport ) CLASS Report
    oApp:Props:RunBttn:Enabled    := .T.
    oApp:Props:PageSetupMenu:Enabled := .T.
 
-   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )   
+   oApp:Props:ToolBox:RedrawWindow( , , RDW_INVALIDATE + RDW_UPDATENOW + RDW_ALLCHILDREN )
    ::FileName := cReport
    ::ResetQuickOpen( cReport )
 
@@ -1124,7 +1134,7 @@ METHOD Generate( oCtrl, oXmlNode ) CLASS Report
       oXmlControl:addBelow( oXmlValue )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Name", NIL, oCtrl:Name )
       oXmlControl:addBelow( oXmlValue )
-      
+
       TRY
          oCtrl:WriteProps( @oXmlControl )
       CATCH
@@ -1144,12 +1154,12 @@ METHOD Save( lSaveAs, cTemp ) CLASS Report
    LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
    LOCAL oFile, cFile
    LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep, oXmlComp
-   
+
    cFile := cTemp
    DEFAULT cFile TO ::FileName
 
    DEFAULT lSaveAs TO .F.
-   
+
    IF cTemp == NIL
       IF ::FileName == "Untitled.vrt" .OR. lSaveAs
          IF ( cName := ::SaveAs() ) == NIL
@@ -1169,7 +1179,7 @@ METHOD Save( lSaveAs, cTemp ) CLASS Report
             NEXT
             oXmlReport:addBelow( oXmlComp )
          ENDIF
-      
+
          oXmlProp := TXmlNode():new( , "Properties" )
             oXmlSource := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, cFile )
             oXmlProp:addBelow( oXmlSource )
@@ -1293,7 +1303,7 @@ METHOD Run() CLASS Report
    IF ::Save(, cTemp )
       oWait := oApp:MainForm:MessageWait( "Generating Report. Please wait...", "Visual Report", .T. )
       oRep  := VrReport()
-      
+
       lRun := oRep:Run( ::oXMLDoc, oWait )
       oWait:Destroy()
       IF lRun
@@ -1325,21 +1335,21 @@ METHOD ResetQuickOpen( cFile ) CLASS Report
    aEntries := oApp:IniFile:ReadArray( "Recent" )
 
    WHILE LEN( aEntries ) > 19
-      ADEL( aEntries, 1, .T. ) 
+      ADEL( aEntries, 1, .T. )
    ENDDO
-   
+
    IF !EMPTY( cFile )
       IF ( n := ASCAN( aEntries, {|c| UPPER(c) == UPPER(cFile) } ) ) > 0
          ADEL( aEntries, n, .T. )
       ENDIF
       AINS( aEntries, 1, cFile, .T. )
    ENDIF
-   
+
    oApp:IniFile:Write( "Recent", aEntries )
 
    // Reset Open Dropdown menu
    WITH OBJECT oApp:Props[ "OpenBttn" ]   // Open Button
-      :Children := {}
+      AEVAL( :Children, {|o| o:Destroy()} )
       FOR EACH cProject IN aEntries
           IF !EMPTY( cProject )
              oItem := MenuStripItem( :this )

@@ -41,11 +41,11 @@ CLASS PropEditor INHERIT TreeView
    METHOD OnDestroy()          INLINE ::LevelFont:Delete(), NIL
 
    METHOD OnEraseBkGnd()
-   
+
    METHOD OnParentNotify()
    METHOD DrawItem()
    METHOD EditText()
-   
+
    METHOD GetEditBuffer()
    METHOD SetPropValue()
    METHOD OnGetDlgCode()
@@ -161,7 +161,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PropEditor
               CASE tvcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
                    ::DrawItem( tvcd )
                    SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT  )
-                   RETURN CDRF_SKIPDEFAULT 
+                   RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
 RETURN 0
@@ -169,7 +169,7 @@ RETURN 0
 //------------------------------------------------------------------------------------------
 METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
    LOCAL oObj, xVal, n, xProp, oItem, lUndo
-   
+
    lUndo := oObject != NIL
 
    IF ! lUndo
@@ -187,7 +187,7 @@ METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
       oObject := ::ActiveObject
       cProp   := oItem:ColItems[1]:Prop
       cProp2  := oItem:ColItems[1]:Prop2
-      
+
       IF cProp2 != NIL
          xVal := oObject:&cProp2:&cProp
        ELSE
@@ -248,7 +248,7 @@ METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
             xValue := cCaption
          ENDIF
       ENDIF
-      view oObject:Name, cProp, xValue
+
       __objSendMsg( oObject, "_" + UPPER( cProp ), xValue )
 
       IF oObject:lUI
@@ -391,7 +391,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
    ENDIF
 
    aRest := { rc:Left, rc:bottom, rc:right, ::ClientHeight }
-   
+
    IF VALTYPE( oItem:ColItems ) == "A"
       FOR n := 1 TO LEN( oItem:ColItems )
           nLeft   += nWidth
@@ -404,7 +404,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
           nAlign  := oItem:ColItems[n]:Align
 
           nAlign  := TA_LEFT
- 
+
           cText   := oItem:ColItems[n]:Value
 
           IF oItem:ColItems[n]:ColType == "ENUM"
@@ -415,7 +415,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
 
           SWITCH cType
              CASE "O"
-                  cText  := "(object)"
+                  cText  := ""
                   EXIT
 
              CASE "A"
@@ -481,7 +481,7 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
                   x:= nLeft + ( ( nRight - nLeft )/2 ) - ( aAlign[1]/2 )
                   EXIT
           END
-          nBack := IIF( lEnabled, ::Columns[n+1][2], /*GetSysColor( COLOR_BTNFACE )*/ ::System:CurrentScheme:ToolStripPanelGradientEnd ) 
+          nBack := IIF( lEnabled, ::Columns[n+1][2], /*GetSysColor( COLOR_BTNFACE )*/ ::System:CurrentScheme:ToolStripPanelGradientEnd )
           nFore := IIF( lEnabled, C_BLACK, GetSysColor( COLOR_BTNSHADOW ) )
           IF nState & TVIS_SELECTED != 0 .AND. ::CurCol == n+1 .AND. ::HasFocus
              nBack := ::System:CurrentScheme:ButtonSelectedGradientEnd //GetSysColor( COLOR_HIGHLIGHT )
@@ -668,7 +668,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Top    := rc:top+1
                             :Width  := ::Columns[ nCol ][ 1 ]+4
                             :Height := 120
-                            
+
                             :SysDefault := ::ActiveObject:Sys&cProp
 
                             IF ::ActiveItem:ColItems[nCol-1]:Value == "Custom..."
@@ -703,7 +703,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :OnWMLButtonUp := {|o,x,y|CheckBtnClickPos(o,x,y) }
                             :OnWMKillFocus := {|o|o:Destroy() }
 
-                            :Action := <|o,oUI| 
+                            :Action := <|o,oUI|
                                          oUI := FilterUI( ::ActiveObject )
                                          IF oUI != NIL .AND. oUI:Result==IDOK
                                             ::ActiveObject:Filter := oUI:BuildFilter
@@ -937,14 +937,14 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
 
    DEFAULT lForce TO .F.
    DEFAULT lRefreshComp TO .T.
-   
+
    DEFAULT aSel TO { { ::ActiveObject,, } }
 
    IF aSel[1][1] == NIL
       ::ResetContent()
       RETURN NIL
    ENDIF
-   
+
    IF ::ActiveObject != NIL .AND. ::ActiveObject == aSel[1][1] .AND. !lForce
       RETURN Self
    ENDIF
@@ -1045,14 +1045,14 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
               ENDIF
           NEXT
           xValue := NIL
-        
+
         ELSEIF UPPER(cProp) == "COLUMN"
           aCol[1]:ColType := "COLUMN"
           aCol[1]:Value   := { "", { NIL } }
           FOR EACH Child IN ::Application:Props:Body:Objects
               IF Child:ClsName IN {"Label","Total"}
                  AADD( aCol[1]:Value[2], Child )
-               
+
                ELSEIF Child:ClsName == "GroupFooter"
                  FOR EACH oObj IN Child:Objects
                      IF oObj:ClsName IN {"Label","Total"}
@@ -1102,7 +1102,19 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
        oSub := oItem:AddItem( cProp, 0, aCol )
 
        IF VALTYPE( xValue ) == "O"
-          aSub := __ClsGetPropertiesAndValues( xValue )
+          IF xValue:ClassName == "FONT"
+             aSub := { { "FaceName",},;
+                       { "Orientation",},;
+                       { "Width",},;
+                       { "Quality",},;
+                       { "Bold",},;
+                       { "Italic",},;
+                       { "Underline",},;
+                       { "StrikeOut",},;
+                       { "PointSize" } }
+           ELSE
+             aSub := __ClsGetPropertiesAndValues( xValue )
+          ENDIF
           FOR EACH aSubProp IN aSub
               ::Application:Yield()
 
@@ -1112,8 +1124,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
               cType   := VALTYPE( xValue2 )
               nColor  := NIL
 
-              cProp2  := GetProperCase( __Proper( cProp2 ) )[1]
-              aCol    := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
+              IF xValue:ClassName != "FONT"
+                 cProp2 := GetProperCase( __Proper( cProp2 ) )[1]
+              ENDIF
+              aCol := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp ) }
 
               IF UPPER(cProp2) == "FACENAME"
                  aCol[1]:ColType  := "FACENAME"
@@ -1197,29 +1211,29 @@ METHOD Create() CLASS ObjCombo
    ::ColFont:Create()
 RETURN Self
 
-METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ObjCombo
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ObjCombo
 
    LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, hBrush, hOld, z, aAlign, y
 
-   IF ::Parent:DrawItemStruct:hwndItem == ::hWnd
+   IF dis:hwndItem == ::hWnd
       DEFAULT ::ColWidth TO ::ClientWidth
 
-      lSelected := ::Parent:DrawItemStruct:itemState & ODS_SELECTED != 0
-      aClip     := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                     ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
+      lSelected := dis:itemState & ODS_SELECTED != 0
+      aClip     := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                     dis:rcItem:Right, dis:rcItem:Bottom  }
 
-      IF ::Parent:DrawItemStruct:itemAction & ODA_DRAWENTIRE != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_SELECT != 0 //.OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-         SetTextColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
-         SetBkColor( ::Parent:DrawItemStruct:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0 //.OR. dis:itemAction & ODA_FOCUS != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
-         nLen    := SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXTLEN, ::Parent:DrawItemStruct:itemID, 0 )
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
          itemTxt := Space( nLen + 1 )
-         SendMessage( ::Parent:DrawItemStruct:hwndItem, CB_GETLBTEXT, ::Parent:DrawItemStruct:itemID, @itemTxt )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
          itemTxt := left( itemTxt, nLen )
 
-         z := ::Parent:DrawItemStruct:rcItem:Top
-         IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT != 0 .AND. ::Parent:DrawItemStruct:itemAction & ODA_SELECT == 0
-            z := ::Parent:DrawItemStruct:rcItem:Top - 2
+         z := dis:rcItem:Top
+         IF dis:itemState & ODS_COMBOBOXEDIT != 0 .AND. dis:itemAction & ODA_SELECT == 0
+            z := dis:rcItem:Top - 2
          ENDIF
 
          cText   := ""
@@ -1231,21 +1245,21 @@ METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ObjCombo
              IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
                 x := aRect[1] + 2
 
-                ::Font:Select( ::Parent:DrawItemStruct:hDC )
+                ::Font:Select( dis:hDC )
                 IF nField == 1
-                   ::ColFont:Select( ::Parent:DrawItemStruct:hDC )
+                   ::ColFont:Select( dis:hDC )
                 ENDIF
 
-                aAlign  := _GetTextExtentPoint32( ::Parent:DrawItemStruct:hDC, cText )
-                y := ::Parent:DrawItemStruct:rcItem:top + ( ( ::Parent:DrawItemStruct:rcItem:bottom - ::Parent:DrawItemStruct:rcItem:top )/2 ) - ( aAlign[2]/2 )
+                aAlign  := _GetTextExtentPoint32( dis:hDC, cText )
+                y := dis:rcItem:top + ( ( dis:rcItem:bottom - dis:rcItem:top )/2 ) - ( aAlign[2]/2 )
 
-                _ExtTextOut( ::Parent:DrawItemStruct:hDC, x, y, ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
+                _ExtTextOut( dis:hDC, x, y, ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
                 cText := ""
                 aRect[1] += ::ColWidth
                 nField ++
 
                 IF nField  > 1
-                   aRect[3] := ::Parent:DrawItemStruct:rcItem:Right
+                   aRect[3] := dis:rcItem:Right
                   ELSE
                    aRect[3] += ::ColWidth
                 ENDIF
@@ -1257,15 +1271,15 @@ METHOD OnParentDrawItem( nwParam, nlParam ) CLASS ObjCombo
 
 
 
-         //_ExtTextOut( ::Parent:DrawItemStruct:hDC, 24, y, ETO_OPAQUE + ETO_CLIPPED, { ::Parent:DrawItemStruct:rcItem:Left, ::Parent:DrawItemStruct:rcItem:Top, ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom }, itemTxt )
+         //_ExtTextOut( dis:hDC, 24, y, ETO_OPAQUE + ETO_CLIPPED, { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }, itemTxt )
 
       ENDIF
 
-      IF ::Parent:DrawItemStruct:itemState & ODS_COMBOBOXEDIT == 0
-         IF ::Parent:DrawItemStruct:itemState & ODS_FOCUS != 0 .OR. ::Parent:DrawItemStruct:itemAction & ODA_FOCUS != 0
-            aClip := { ::Parent:DrawItemStruct:rcItem:Left,  ::Parent:DrawItemStruct:rcItem:Top, ;
-                       ::Parent:DrawItemStruct:rcItem:Right, ::Parent:DrawItemStruct:rcItem:Bottom  }
-            _DrawfocusRect( ::Parent:DrawItemStruct:hDC, aclip )
+      IF dis:itemState & ODS_COMBOBOXEDIT == 0
+         IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+            aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+                       dis:rcItem:Right, dis:rcItem:Bottom  }
+            _DrawfocusRect( dis:hDC, aclip )
          ENDIF
       ENDIF
    ENDIF
@@ -1320,7 +1334,7 @@ HB_FUNC( DRAWMINUSPLUS )
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    LOCAL cName, oFile := CFile( oEdit:Caption )
    oEdit:OnWMKillFocus := NIL
-   
+
    DEFAULT lIcon TO .F.
    IF aFilter == NIL
       IF lIcon
@@ -1349,7 +1363,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    oEdit:OnWMKillFocus := {|o|o:Destroy() }
    IF oFile:Result != IDCANCEL
       oEdit:Destroy()
-      
+
       IF __ObjHasMsg( oMan:ActiveObject, "Path" )
          oMan:ActiveObject:Path := oFile:Path
          oMan:SetPropValue( oFile:Name )
@@ -1371,7 +1385,7 @@ STATIC FUNCTION BrowseForFolder( oEdit, oMan, oItem )
    cDir := SHBrowseForFolder(,,BIF_NEWDIALOGSTYLE | BIF_BROWSEINCLUDEURLS, CSIDL_DESKTOP, pCallBack )
    oEdit:OnWMKillFocus := {|o|o:Destroy() }
    IF !EMPTY( cDir )
-      IF oItem:Caption == "IncludePath" .OR. oItem:Caption == "SourcePath" 
+      IF oItem:Caption == "IncludePath" .OR. oItem:Caption == "SourcePath"
          oEdit:Caption += "; " + cDir
          oEdit:SetFocus()
          RETURN NIL
@@ -1437,7 +1451,7 @@ STATIC FUNCTION CheckChar( o, n, oItem )
          IF ! ( oItem:Caption IN { "Contrast", "Brightness", "PagePosition" } ) .AND. CHR(n) == "-"
             RETURN 0
          ENDIF
-         
+
          IF !CHR(n) $ "-0123456789"
             IF ! ( n >= 35 .AND. n <= 40 ) .AND. n != VK_BACK
                RETURN 0

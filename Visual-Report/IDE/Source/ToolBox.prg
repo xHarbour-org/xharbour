@@ -189,7 +189,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS ToolBox
          RETURN 1
       ENDIF
    ENDIF
-   _FillRect( hDC, {0,nTop,::ClientWidth, ::ClientHeight}, ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd )
+   _FillRect( hDC, {0,nTop,::ClientWidth, ::ClientHeight}, ::ColorScheme:Brush:ToolStripPanelGradientEnd )
 RETURN 1
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
@@ -218,11 +218,11 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
    LOCAL hBorderPen, hSelBrush, hDC
 
    hDC        := tvcd:nmcd:hdc
-   nBackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
-   hSelBrush  := ::System:CurrentScheme:Brush:ButtonCheckedGradientBegin
-   hItemBrush := ::System:CurrentScheme:Brush:MenuItemSelected
-   hBackBrush := ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd
-   hBorderPen := ::System:CurrentScheme:Pen:MenuItemBorder
+   nBackColor := ::ColorScheme:ToolStripPanelGradientEnd
+   hSelBrush  := ::ColorScheme:Brush:ButtonCheckedGradientBegin
+   hItemBrush := ::ColorScheme:Brush:MenuItemSelected
+   hBackBrush := ::ColorScheme:Brush:ToolStripPanelGradientEnd
+   hBorderPen := ::ColorScheme:Pen:MenuItemBorder
 
    rc         := tvcd:nmcd:rc
    oItem      := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
@@ -239,7 +239,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
       nBack := GetSysColor( COLOR_BTNSHADOW )
       SelectObject( hDC, ::LevelFont:Handle )
     ELSEIF nState & TVIS_SELECTED != 0 .AND. ::IsWindowEnabled() .AND. oItem:Cargo
-      nBack := ::System:CurrentScheme:MenuItemSelected
+      nBack := ::ColorScheme:MenuItemSelected
    ENDIF
 
    cText := oItem:Caption
@@ -263,7 +263,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
    
    IF oItem:Level == 0
       rc:top ++
-      FillGradient( hDC, rc, ::System:CurrentScheme:ToolStripGradientEnd, ::System:CurrentScheme:ToolStripGradientBegin )
+      FillGradient( hDC, rc, ::ColorScheme:ToolStripGradientEnd, ::ColorScheme:ToolStripGradientBegin )
       rc:top --
       hBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
       hPen := SelectObject( hDC, ::hPenShadow )
@@ -284,7 +284,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
          Rectangle( hDC, rc:left, rc:top, rc:right, rc:bottom )
          SelectObject( hDC, hPen )
          SelectObject( hDC, hBrush )
-         SetBkColor( hDC, ::System:CurrentScheme:MenuItemSelected )
+         SetBkColor( hDC, ::ColorScheme:MenuItemSelected )
       ENDIF
    ENDIF
    
@@ -300,7 +300,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
       Rectangle( hDC, rc:left, rc:top, rc:right, rc:bottom )
       SelectObject( hDC, hPen )
       SelectObject( hDC, hBrush )
-      SetBkColor( hDC, ::System:CurrentScheme:ButtonCheckedGradientEnd )
+      SetBkColor( hDC, ::ColorScheme:ButtonCheckedGradientEnd )
    ENDIF
 
    _ExtTextOut( hDC, x, y, nFlags, { rc:left+1, rc:top+1, rc:right-1, rc:bottom-1 }, cText  )

@@ -241,10 +241,10 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
    DEFAULT nVirTop TO 0
    DEFAULT nTop    TO 0
 
-   IF HGetPos( hCtrl, "Left" ) > 0 
+   IF HGetPos( hCtrl, "Left" ) > 0
       x := VAL( hCtrl:Left )
    ENDIF
-   IF HGetPos( hCtrl, "Top" ) > 0 
+   IF HGetPos( hCtrl, "Top" ) > 0
       y := VAL( hCtrl:Top )-nVirTop
       y += nTop
    ENDIF
@@ -292,9 +292,9 @@ METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal )
          ENDIF
       ENDIF
    ENDIF
-      
-   IF HGetPos( hCtrl, "Font" ) > 0 
-      DEFAULT oControl:Font TO Font()
+
+   IF HGetPos( hCtrl, "Font" ) > 0
+      DEFAULT oControl:Font TO Font( oControl )
       oControl:Font:FaceName  := hCtrl:Font:FaceName
       oControl:Font:PointSize := VAL( hCtrl:Font:PointSize )
       oControl:Font:Italic    := hCtrl:Font:Italic == "True"
@@ -496,7 +496,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
 
 
 
-         CASE oNode:cName == "Control" 
+         CASE oNode:cName == "Control"
               IF !EMPTY( hControl )
                  hControl:cParent := SUBSTR( cParent, 2 )
                  AADD( ::&cParent, hControl )
@@ -519,7 +519,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               ATAIL( hControl:Filter:Expressions ):AskMeLater := {=>}
               HSetCaseMatch( ATAIL( hControl:Filter:Expressions ):AskMeLater, .F. )
 
-         CASE LEFT(oNode:cName,10) == "Expression" 
+         CASE LEFT(oNode:cName,10) == "Expression"
               IF HGetPos( hControl[ "Filter" ], "Expressions" ) == 0
                  hControl[ "Filter" ][ "Expressions" ] := {}
               ENDIF
@@ -536,7 +536,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
                  cParCls := oNode:cData
               ENDIF
 
-         CASE oNode:oParent:cName IN { "Font", "Filter" } 
+         CASE oNode:oParent:cName IN { "Font", "Filter" }
               DEFAULT oNode:cData TO ""
               hControl[ oNode:oParent:cName ][ oNode:cName ] := oNode:cData
 
@@ -544,7 +544,7 @@ METHOD PrepareArrays( oDoc ) CLASS VrReport
               DEFAULT oNode:cData TO ""
               ATAIL( hControl:Filter:Expressions ):AskMeLater[ oNode:cName ] := oNode:cData
 
-         CASE oNode:oParent:cName != NIL .AND. LEFT( oNode:oParent:cName, 10 ) == "Expression" 
+         CASE oNode:oParent:cName != NIL .AND. LEFT( oNode:oParent:cName, 10 ) == "Expression"
               DEFAULT oNode:cData TO ""
               IF oNode:cName == "AndOr" .AND. EMPTY( oNode:cData )
                  oNode:cData := NIL
@@ -615,7 +615,7 @@ METHOD Load( cReport ) CLASS VrReport
    LOCAL n, hCtrl, oCtrl, oDoc := TXmlDocument():New( cReport )
 
    ::PrepareArrays( oDoc )
-   
+
    FOR EACH hCtrl IN ::aComponents
        oCtrl := ::CreateControl( hCtrl,, ::Application:Props:Body )
        IF !EMPTY( ::hProps:DataSource ) .AND. hCtrl:Name == ::hProps:DataSource
@@ -651,7 +651,7 @@ METHOD Load( cReport ) CLASS VrReport
       ::hProps:GroupBy3 := NIL
       ::GroupBy3 := ::hProps:GroupBy3
    END
-   
+
    FOR EACH hCtrl IN ::aRepHeader
        ::CreateControl( hCtrl,, ::Application:Props:RepHeader )
    NEXT
@@ -735,7 +735,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
              IF ! EMPTY( hCtrl:Order )
                 oData:OrdSetFocus( hCtrl:Order )
              ENDIF
-           
+
            ELSEIF !EMPTY( hCtrl:ConnectionFile )
              oData:BindingSource        := SqlConnector( NIL )
              oData:BindingSource:Server := hCtrl:Server
@@ -746,7 +746,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
               ELSE
                 oData:BindingSource:ConnectionString := hCtrl:ConnectionFile
              ENDIF
-             
+
              TRY
                 oData:BindingSource:Create()
              CATCH
@@ -964,7 +964,7 @@ METHOD OnInitDialog() CLASS VrPreview
             :Caption           := "Print"
             :Begingroup        := .T.
             :ImageIndex        := 3
-            :Action            := <|o| 
+            :Action            := <|o|
                                    TRY
                                      ::Report:oPDF:Print( "", .T. )
                                    CATCH
@@ -1144,7 +1144,7 @@ METHOD OnInitDialog() CLASS VrAskLater
          ENDIF
          :SetCurSel( ::nCond )
       END
-      
+
       WITH OBJECT EditBox( :this )
          :Caption      := ::hExp:Exp1
          :Name         := "EditBox1"
@@ -1374,13 +1374,13 @@ RETURN Self
 FUNCTION BuildFilterExp( hFilter )
    LOCAL cType, cExp1, cExp2, nSel2, cValue, cField, cAndOr, hExp, n, cFilter := ""
    LOCAL cExpSel, bExp, nNum, aExp, oCond := Conditions( NIL )
-   
+
    cAndOr := IIF( hFilter:ANDRadio == "1", " .AND. ", " .OR. " )
-   
-   IF HGetPos( hFilter, "Expressions" ) == 0 
+
+   IF HGetPos( hFilter, "Expressions" ) == 0
       RETURN "" // returning NIL forces the report to cancel
    ENDIF
-   
+
    FOR n := 1 TO LEN( hFilter:Expressions )
        hExp    := hFilter:Expressions[n]
 
@@ -1690,7 +1690,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD FilterPerQuarter_OnLoad( Sender ) CLASS FilterPerQuarter
-   
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -1810,9 +1810,9 @@ METHOD OnInitDialog() CLASS IsInTheLast
          :Create()
       END
    END
-   
+
    WITH OBJECT ( GroupBox( Self ) )
-      :Caption   := ::Text    
+      :Caption   := ::Text
       :Left      := 15
       :Top       := 15
       :Width     := ::ClientWidth-30

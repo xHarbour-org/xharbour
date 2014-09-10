@@ -25,7 +25,7 @@ CLASS VrImage INHERIT VrObject
    DATA Opacity          EXPORTED INIT 100
    DATA Alignment        EXPORTED INIT 1
    DATA KeepAspectRatio  EXPORTED INIT .F.
-   
+
    DATA __ExplorerFilter EXPORTED
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -46,10 +46,10 @@ RETURN Self
 
 METHOD Create() CLASS VrImage
 
-   IF ::__ClsInst == NIL // Runtime
+   IF ::__ClassInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
-   
+
    WITH OBJECT ::EditCtrl := __VrImage( ::Parent )
       :Cargo     := Self
       :ImageName := ::FileName
@@ -114,7 +114,7 @@ CLASS __VrImage INHERIT FreeImage
    #endif
 ENDCLASS
 
-METHOD OnLButtonDown(n,x,y) CLASS __VrImage 
+METHOD OnLButtonDown(n,x,y) CLASS __VrImage
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
    IF ::Application:Props:PropEditor:ActiveObject != NIL

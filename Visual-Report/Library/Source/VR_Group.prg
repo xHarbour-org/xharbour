@@ -42,7 +42,7 @@ METHOD Init( oParent ) CLASS VrGroupHeader
 RETURN Self
 
 METHOD Create() CLASS VrGroupHeader
-   IF ::__ClsInst == NIL // Runtime
+   IF ::__ClassInst == NIL // Runtime
       RETURN ::Draw()
    ENDIF
    #ifndef VRDLL

@@ -16,15 +16,13 @@
 CLASS RepEdit INHERIT Panel
    CLASSDATA aCursor EXPORTED
    DATA Objects      EXPORTED INIT {}
-   DATA FlatCaption  EXPORTED INIT .T.
-   //DATA FlatBorder   EXPORTED INIT .T.
    DATA xGrid        EXPORTED INIT 8
    DATA yGrid        EXPORTED INIT 8
-   DATA hBmpGrid     EXPORTED 
-   DATA xBmpSize     EXPORTED 
-   DATA yBmpSize     EXPORTED 
-   DATA aSelect      EXPORTED 
-   DATA aPrevSel     EXPORTED 
+   DATA hBmpGrid     EXPORTED
+   DATA xBmpSize     EXPORTED
+   DATA yBmpSize     EXPORTED
+   DATA aSelect      EXPORTED
+   DATA aPrevSel     EXPORTED
    DATA nDownPos     EXPORTED
    DATA oPs          EXPORTED
    DATA nMove        EXPORTED INIT 0
@@ -36,7 +34,7 @@ CLASS RepEdit INHERIT Panel
    METHOD Create()
    METHOD OnMouseMove()
    METHOD CreateControl()
-   METHOD OnDestroy()  INLINE DeleteObject( ::hBmpGrid ), NIL
+   METHOD OnDestroy()  INLINE IIF( ::hBmpGrid != NIL, DeleteObject( ::hBmpGrid ),), NIL
    METHOD Snap( nPos ) INLINE IIF( ::Application:Props[ "ViewMenuGrid" ]:Checked, Snap( nPos, ::xGrid ), nPos )
 ENDCLASS
 
@@ -51,18 +49,18 @@ METHOD Create() CLASS RepEdit
                          ::System:Cursor:SizeWE,;
                          ::System:Cursor:SizeNESW,;
                          ::System:Cursor:SizeNS }
-   
+
    n := ( ::Parent:ClientWidth / ::oPs:PageWidth ) * 100
-   
-   ::Width := ::oPs:PageWidth - ( ( ::oPs:PageWidth * n ) / 100 )
-   ::Parent:OriginalRect[3] := ::Width + 6
-   
+
+   ::xWidth := ::oPs:PageWidth - ( ( ::oPs:PageWidth * n ) / 100 )
+   ::Parent:OriginalRect[3] := ::xWidth + 6
+
    Super:Create()
    ::ForeColor := ::System:Color:LightGray
-   cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
-   IF !Empty(::hBmpGrid)
+   IF ::hBmpGrid != NIL
       DeleteObject(::hBmpGrid)
    ENDIF
+   cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
    ::hBmpGrid := CreateBitmap( xSize, ySize, 1, 1, cBits )
    ::xBmpSize := xSize
    ::yBmpSize := ySize
@@ -77,7 +75,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS RepEdit
    y := HIWORD( nlParam )
 
    oCtrl := ::Application:Props:PropEditor:ActiveObject
-   IF nwParam == MK_LBUTTON 
+   IF nwParam == MK_LBUTTON
       IF ::aSelect != NIL
          hDC := GetDC( ::hWnd )
          IF ::aPrevSel != NIL
@@ -169,9 +167,9 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       DEFAULT x TO 0
       DEFAULT y TO 0
       oControl := HB_Exec( hPointer,, oParent )
-      oControl:__ClsInst := __ClsInst( oControl:ClassH )
-      oControl:Left := x 
-      oControl:Top  := y 
+      oControl:__ClassInst := __ClsInst( oControl:ClassH )
+      oControl:Left := x
+      oControl:Top  := y
       IF oControl:ClsName == "GroupHeader"
          oControl:bCreate := <|Self|
                         WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
@@ -221,7 +219,7 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
          ::Application:Report:Modified := .T.
          ::Application:Props:PropEditor:ResetProperties( {{ oControl }} )
       ENDIF
-      
+
       IF !oControl:lUI
          ::Application:Props:Components:AddButton( oControl )
       ENDIF
@@ -237,7 +235,7 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
          RETURN NIL
       ENDIF
       ::CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y )
-      
+
     ELSEIF ::Type != "ExtraPage"
       pt := (struct POINT)
       pt:x := x
@@ -275,6 +273,7 @@ RETURN NIL
 METHOD OnPaint() CLASS RepEdit
    LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor, lMarkers := .F.
+   LOCAL xSize, ySize, cBits
 
    hDC        := ::BeginPaint()
 
@@ -285,14 +284,21 @@ METHOD OnPaint() CLASS RepEdit
    nBColor := SetBkColor( hMemDC, ::BackColor )
    nFColor := SetTextColor( hMemDC, ::ForeColor )
    SetBkMode( hMemDC, TRANSPARENT )
+
    IF ::Application:Props[ "ViewMenuGrid" ]:Checked
+      IF ::hBmpGrid == NIL
+         cBits := MakeGridTile( ::xGrid, ::yGrid, @xSize, @ySize )
+         ::hBmpGrid := CreateBitmap( xSize, ySize, 1, 1, cBits )
+         ::xBmpSize := xSize
+         ::yBmpSize := ySize
+      ENDIF
       DrawGrid( hMemDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
     ELSE
       _Fillrect( hMemDC, {0,0,::Width,::Height}, ::BkBrush )
    ENDIF
    SetTextColor( hMemDC, nFColor )
    SetBkColor( hMemDC, nBColor )
-   
+
    cx := ::Width
    cy := ::Height
 
@@ -310,7 +316,7 @@ METHOD OnPaint() CLASS RepEdit
    DeleteDC( hMemDC )
 
    ::EndPaint()
-   
+
    IF lMarkers
       hDC := GetDCEx( ::hWnd )
       PaintMarkers( hDC, oCtrl )
@@ -410,7 +416,6 @@ RETURN ROUND( ( x / nGrain ), 0) * nGrain
 
 CLASS __VrGroup INHERIT RepEdit
    DATA aSize EXPORTED INIT {.F.,.F.,.F.,.T.,.F.,.F.,.F.,.T.}
-   DATA FlatCaption EXPORTED INIT .T.
    DATA Type INIT "Group"
    METHOD OnLButtonDown()
    METHOD OnMouseMove()
@@ -420,12 +425,12 @@ CLASS __VrGroup INHERIT RepEdit
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnLButtonDown(n,x,y) CLASS __VrGroup 
+METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
    LOCAL aRect, oCtrl
    ::Parent:SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
       ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, ::Cargo )
-    
+
     ELSEIF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
       TRY
@@ -445,7 +450,7 @@ METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnMouseMove(w,l) CLASS __VrGroup 
+METHOD OnMouseMove(w,l) CLASS __VrGroup
    LOCAL oCtrl
    IF w == MK_LBUTTON
       oCtrl := ::Application:Props:PropEditor:ActiveObject
