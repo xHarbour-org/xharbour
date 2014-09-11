@@ -2071,7 +2071,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                        ::Application:Project:Modified := .T.}
                            ELSE
                              :Action := {|o, cf| cf := oFont:Choose(o,.T.),;
-                                                       o:Parent:ChangeCtrlFont( cf, oItem, oFont ),;
+                                                       oSelf:ChangeCtrlFont( cf, oItem, oFont ),;
                                                        o:Destroy(),;
                                                        ::Application:Project:Modified := .T.}
                           ENDIF
