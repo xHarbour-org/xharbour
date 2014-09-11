@@ -397,9 +397,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              ENDIF
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "CHOOSEFONT"
-             cText := "Choose Font"
-          ENDIF
           IF oItem:ColItems[n]:ColType == "ENUM"
              TRY
                cText := cText[ oItem:ColItems[n]:SetValue ]
@@ -426,7 +423,7 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
 
           SWITCH cType
              CASE "O"
-                  cText  := ""
+                  cText  := "(object)"
                   EXIT
 
              CASE "A"
@@ -678,17 +675,12 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
-   LOCAL cProp, cProp2, xVal, oObj
+   LOCAL oObj, cProp, cProp2, xVal
 
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    IF oItem == NIL
       RETURN Self
    ENDIF
-
-   IF VALTYPE( oItem:Owner:ColItems[1]:Value ) == "O"
-      oObj := oItem:Owner:ColItems[1]:Value
-   ENDIF
-
    IF oItem:Caption == "ImageName" .AND. !EMPTY( xValue ) .AND. !FILE( xValue )
       IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
          ::ActiveControl:OnWMKillFocus := NIL
@@ -725,16 +717,11 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
       RETURN NIL
    ENDIF
 
-   IF oObj == NIL
-      IF cProp2 != NIL
-         oObj := ::ActiveObject:&cProp2
-       ELSE
-         oObj := ::ActiveObject
-      ENDIF
-    else
-      view oObj:ClassName
+   IF cProp2 != NIL
+      oObj := ::ActiveObject:&cProp2
+    ELSE
+      oObj := ::ActiveObject
    ENDIF
-
    IF cProp2 == "MDIClient"
       IF cProp == "AlignLeft" .OR. cProp == "AlignTop" .OR. cProp == "AlignRight" .OR. cProp == "AlignBottom"
          xValue := oItem:ColItems[1]:Value[2][ xValue ]
@@ -1197,7 +1184,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue, @nDefault )
        ENDIF
 
-       aCol := { TreeColItem( xValue, cType, , nColor, cProp, , , , nDefault ) }
+       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , , nDefault ) }
 
        IF __ObjHasMsg( ::ActiveObject, "Enum"+cProp )
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
@@ -1221,6 +1208,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   aCol[1]:ColType := "STRUCTEDIT"
 
              CASE RIGHT( cProp, 4 ) == "Font"
+                  aCol[1]:Value := "Choose Font"
                   aCol[1]:ColType := "CHOOSEFONT"
 
              CASE cProp == "Functable"
@@ -1540,7 +1528,7 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              cType  := "COLORREF"
           ENDIF
 
-          aCol   := { TreeColItem( xValue2, cType, , nColor, cProp2, cProp,,, nDefault ) }
+          aCol   := { TreeColItem( IIF( VALTYPE(xValue2)=="O", "", xValue2 ), cType, , nColor, cProp2, cProp,,, nDefault ) }
 
           IF __ObjHasMsg( xValue, "Enum"+cProp2 )
              aCol[1]:Value    := xValue:Enum&cProp2[1]
@@ -1553,9 +1541,6 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
                                                     o:Destroy(),;
                                                     oPar:SetValue( xValue:Enum&c[2][n+1] ) }
              xValue2 := NIL
-
-           ELSEIF RIGHT( cProp2, 4 ) == "Font"
-             aCol[1]:ColType := "CHOOSEFONT"
 
            ELSEIF cProp == "Dock"
              IF cProp2 $ "LeftTopRightBottom"
@@ -2068,7 +2053,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                CASE cType == "STRUCTEDIT" .OR. cType == "CHOOSEFONT"
                     ::ActiveControl := Button( Self )
                     WITH OBJECT ::ActiveControl
-                       :Caption := IIF( cType == "CHOOSEFONT", "Choose Font", oItem:ColItems[nCol-1]:Value )
+                       :Caption := oItem:ColItems[nCol-1]:Value
                        :Left    := nLeft-1
                        :Top     := rc:top
                        :Width   := ::Columns[ nCol ][ 1 ]+4
@@ -2077,15 +2062,16 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :OnWMLButtonUp := {|o,x,y|CheckBtnClickPos(o,x,y) }
                        :OnWMKillFocus := {|o|o:Destroy() }
 
+                       oFont := ::ActiveObject:&cProp
                        IF cType == "CHOOSEFONT"
-                          oFont := oItem:Owner:ColItems[1]:Value //::ActiveObject:&cProp
+
                           IF __clsParent( ::ActiveObject:ClassH, "COMPONENT" )
                              :Action := {|o, cf| cf := o:Parent:ActiveObject:Show(o),;
                                                        o:Destroy(),;
                                                        ::Application:Project:Modified := .T.}
                            ELSE
                              :Action := {|o, cf| cf := oFont:Choose(o,.T.),;
-                                                       oSelf:ChangeCtrlFont( cf, oItem, oFont ),;
+                                                       o:Parent:ChangeCtrlFont( cf, oItem, oFont ),;
                                                        o:Destroy(),;
                                                        ::Application:Project:Modified := .T.}
                           ENDIF
