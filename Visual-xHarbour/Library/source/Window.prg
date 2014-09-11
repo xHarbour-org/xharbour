@@ -702,12 +702,12 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 PROCEDURE __FreeCallBack() CLASS Window
-   //IF ::__pCallBackPtr != NIL .AND. ::ClsName != "AtlAxWin"
-   //   VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
-   //ENDIF
-   //IF ::ClsName == "ListBox" .AND. ::__pTipCallBack != NIL
-   //   VXH_FreeCallBackPointer( ::__pTipCallBack )
-   //ENDIF
+   IF ::__pCallBackPtr != NIL .AND. ::ClsName != "AtlAxWin"
+      VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
+   ENDIF
+   IF ::ClsName == "ListBox" .AND. ::__pTipCallBack != NIL
+      VXH_FreeCallBackPointer( ::__pTipCallBack )
+   ENDIF
 RETURN
 
 //-----------------------------------------------------------------------------------------------
@@ -1246,6 +1246,8 @@ METHOD __UnSubClass() CLASS Window
    IF ::Application:MainForm:hWnd <> ::hWnd .AND. ::__pCallBackPtr != NIL
       ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
       ::__lCallbackReleased := .T.
+   ELSE
+      ::__pCallBackPtr := NIL
    ENDIF
 RETURN Self
 
