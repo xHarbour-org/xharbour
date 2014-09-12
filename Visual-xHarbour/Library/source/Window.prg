@@ -379,7 +379,6 @@ CLASS Window INHERIT Object
 
    METHOD Init( oParent ) CONSTRUCTOR
    METHOD Create()
-   DESTRUCTOR __FreeCallback
 
    METHOD __Register()
    METHOD __ControlProc()
@@ -699,16 +698,6 @@ METHOD Init( oParent ) CLASS Window
    oParent := NIL
 
 RETURN SELF
-
-//-----------------------------------------------------------------------------------------------
-PROCEDURE __FreeCallBack() CLASS Window
-   IF ::__pCallBackPtr != NIL .AND. ::ClsName != "AtlAxWin"
-      VXH_FreeCallBackPointer( ::__pCallBackPtr, Self )
-   ENDIF
-   IF ::ClsName == "ListBox" .AND. ::__pTipCallBack != NIL
-      VXH_FreeCallBackPointer( ::__pTipCallBack )
-   ENDIF
-RETURN
 
 //-----------------------------------------------------------------------------------------------
 
@@ -1241,13 +1230,6 @@ METHOD __UnSubClass() CLASS Window
    IF ::__nProc != NIL
       SetWindowLong( ::hWnd, GWL_WNDPROC, ::__nProc )
       ::__nProc := NIL
-   ENDIF
-
-   IF ::Application:MainForm:hWnd <> ::hWnd .AND. ::__pCallBackPtr != NIL
-      ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
-      ::__lCallbackReleased := .T.
-   ELSE
-      ::__pCallBackPtr := NIL
    ENDIF
 RETURN Self
 
@@ -2047,6 +2029,7 @@ METHOD OnNCDestroy() CLASS Window
       ::Events := NIL
    ENDIF
 
+   ::__UnSubClass()
    ObjFromHandle( ::hWnd, .T. )
 
    ::__hObjects        := NIL
@@ -2065,13 +2048,6 @@ METHOD OnNCDestroy() CLASS Window
    ::__lInitialized    := .F.
    ::__aDock           := NIL
 
-//   aProperties := __clsGetIVarNamesAndValues( Self )
-//   FOR n := 1 TO LEN( aProperties )
-//      IF VALTYPE( aProperties[n][2] ) $ "O" //.AND. aProperties[n][2] > 10000
-//         VIEW aProperties[n][1]
-//      ENDIF
-//   NEXT
-
    IF ::Application != NIL
       IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
          CloseHandle( ::Application:__hMutex )
@@ -2088,7 +2064,6 @@ METHOD OnNCDestroy() CLASS Window
    IF ::__TaskBarParent != NIL
       DestroyWindow( ::__TaskBarParent )
    ENDIF
-   ::__UnSubClass()
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------

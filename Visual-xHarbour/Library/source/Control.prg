@@ -83,6 +83,8 @@ CLASS Control INHERIT Window
    METHOD GetBkBrush()
    METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
    METHOD DrawArrow()
+
+   METHOD __UnSubClass()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS Control
@@ -92,6 +94,13 @@ METHOD __Enable( lEnable ) CLASS Control
       ::UpdateWindow()
    ENDIF
 RETURN lEnable
+
+METHOD __UnSubClass() CLASS Control
+   Super:__UnSubClass()
+   IF ::__pCallBackPtr != NIL
+      ::Parent:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
+   ENDIF
+RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 
