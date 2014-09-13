@@ -3033,7 +3033,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                          ::ShowMode := ::__GetShowMode()
 
                     CASE nMsg == WM_VXH_FREECALLBACK
-                         VXH_FreeCallBackPointer( nlParam )
+                         FreeCallBackPointer( nlParam )
                          hb_gcAll(.t.)
 
                     OTHERWISE
