@@ -180,7 +180,7 @@ RETURN Self
 
 CLASS MainWindow FROM WinForm
    METHOD Init() CONSTRUCTOR
-   METHOD OnClose()  INLINE Super:OnClose(), ::SaveLayout()
+   METHOD OnClose()  INLINE IIF( ::Application:Project == NIL .OR. ::Application:Project:Close(), (Super:OnClose(), ::SaveLayout()), 0 )
    DATA oButtonOpenSrc
    DATA oButtonOpen
 ENDCLASS
@@ -244,14 +244,17 @@ METHOD Init() CLASS MainWindow
          :ImageList    := ImageList( :this, 32, 32 ):Create()
          :ImageList:AddIcon( "ICO_OPEN" )
          :ImageList:AddIcon( "ICO_CLOSE" )
+         :ImageList:AddIcon( "ICO_SAVE" )
          :Create()
 
          WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
-            :ImageIndex := 1
-            :Text       := "Open"
-            :ImageAlign := DT_CENTER            
-            :Action     := {||::Application:Project:Open() }
-            :DropDown   := 2
+            :ImageIndex       := 1
+            :Text             := "Open"
+            :ImageAlign       := DT_CENTER            
+            :Action           := {||::Application:Project:Open() }
+            :DropDown         := 2
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "O" )
             :Create()
             ::Application:Project:ResetQuickOpen()
          END
@@ -261,6 +264,46 @@ METHOD Init() CLASS MainWindow
             :ImageAlign := DT_CENTER            
             :Text       := "Close"
             :Action     := {||::Application:Project:Close() }
+            :Create()
+         END
+
+         WITH OBJECT ::Application:Props[ "SaveBttn" ] := ToolStripButton( :this )
+            :ImageIndex       := 3
+            :Text             := "Save"
+            :ImageAlign       := DT_CENTER            
+            :Action           := {||::Application:Project:Save() }
+            :Enabled          := .F.
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "S" )
+            :Create()
+            ::Application:Project:ResetQuickOpen()
+         END
+
+         WITH OBJECT ::Application:Props[ "FindBttn" ] := ToolStripButton( :this )
+            :ImageIndex       := 0
+            :Text             := ""
+            :Action           := {||::Application:Project:Find() }
+            :Enabled          := .F.
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "F" )
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "ReplBttn" ] := ToolStripButton( :this )
+            :ImageIndex       := 0
+            :Text             := ""
+            :Action           := {||::Application:Project:Replace() }
+            :Enabled          := .F.
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "H" )
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "SearchGoto" ] := ToolStripButton( :this )
+            :ImageIndex       := 0
+            :Text             := ""
+            :Enabled          := .F.
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC("G")
+            :Action           := {|| ::Application:SourceEditor:GotoDialog() }
             :Create()
          END
       END
@@ -340,6 +383,11 @@ CLASS Project
    DATA lDebugging       EXPORTED INIT .F.
    DATA Debugger         EXPORTED
 
+   DATA FindDialog       EXPORTED
+   DATA ReplaceDialog    EXPORTED
+
+   DATA __cFindText      EXPORTED INIT ""
+
    ASSIGN Modified(lMod) INLINE ::SetCaption( lMod )
    ACCESS Modified       INLINE ::lModified
 
@@ -348,6 +396,9 @@ CLASS Project
    METHOD Save()
    METHOD Close()
    METHOD Open()
+   METHOD Find()
+   METHOD Replace()
+
    METHOD ResetQuickOpen()
    METHOD EditReset()
 
@@ -363,6 +414,39 @@ ENDCLASS
 METHOD Init() CLASS Project
 RETURN Self
 
+METHOD Find() CLASS Project
+   LOCAL cSel
+   IF ::Application:SourceEditor:IsWindowVisible() .AND. ::Application:SourceEditor:Source != NIL
+      IF ::ReplaceDialog != NIL
+         ::ReplaceDialog:Close()
+      ENDIF
+      ::Application:SourceEditor:SetFocus()
+
+      ::FindDialog := FindTextDialog( ::Application:SourceEditor )
+      ::FindDialog:Owner := ::Application:SourceEditor
+      
+      cSel := ::Application:SourceEditor:Source:GetSelText()
+      IF ! EMPTY( cSel )
+         ::__cFindText := cSel
+      ENDIF
+      ::FindDialog:Show(, ::__cFindText )
+   ENDIF
+RETURN 0
+
+METHOD Replace() CLASS Project
+   IF ::Application:SourceEditor:IsWindowVisible() .AND. ::Application:SourceEditor:Source != NIL
+      IF ::FindDialog != NIL
+         ::FindDialog:Close()
+      ENDIF
+      IF ::ReplaceDialog != NIL .AND. ::ReplaceDialog:IsWindowVisible()
+         ::ReplaceDialog:FindWhat:Caption := ::Application:SourceEditor:Source:GetSelText()
+         ::ReplaceDialog:FindWhat:SetFocus()
+       ELSE
+         ::ReplaceDialog := FindReplace( ::Application:SourceEditor )
+      ENDIF
+   ENDIF
+RETURN 0
+
 METHOD SetCaption( lMod ) CLASS Project
 
    LOCAL cCaption
@@ -371,7 +455,7 @@ METHOD SetCaption( lMod ) CLASS Project
 
    IF ::Properties == NIL
       cCaption := "Visual xHarbour Debugger"
-     ELSE
+    ELSE
       IF ::Properties:Name == NIL
          cCaption := "Visual xHarbour Debugger [Untitled"
        ELSE
@@ -379,15 +463,11 @@ METHOD SetCaption( lMod ) CLASS Project
       ENDIF
 
       cCaption += IIF( lMod," * ]","]" )
-
-      IF lMod
-         //::Application:MainWindow:ToolBar1:ToolButton4:Enable()   // Save Button
-       ELSE
-         //::Application:MainWindow:ToolBar1:ToolButton4:Disable()   // Save Button
-      ENDIF
    ENDIF
 
    ::Application:MainWindow:Caption := cCaption
+
+   ::Application:Props[ "SaveBttn" ]:Enabled := lMod
 
 RETURN Self
 
@@ -443,18 +523,6 @@ RETURN Self
 METHOD Close() CLASS Project
 
    LOCAL nRes, n, oMsg, lRem
-
-   IF ::Modified
-      nRes := MessageBox( GetActiveWindow(), "Save changes before closing?", IIF( EMPTY(::Properties:Name), "Untitled", ::Properties:Name ), MB_YESNOCANCEL | MB_ICONQUESTION )
-      SWITCH nRes
-         CASE IDYES
-              ::Save()
-              EXIT
-
-         CASE IDCANCEL
-              RETURN .F.
-      END
-   ENDIF
 
    IF ! ::Application:oDebugger:lStopped
       ::Application:oDebugger:Stop()
@@ -741,8 +809,18 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Save() CLASS Project
-
-
+   LOCAL n
+   FOR n := 1 TO ::Application:SourceEditor:DocCount
+       IF ::Application:SourceEditor:aDocs[n]:Modified
+          IF EMPTY( ::Application:SourceEditor:aDocs[n]:cFile )
+             ::SaveSourceAs( ::Application:SourceEditor:aDocs[n] )
+           ELSE
+             ::Application:SourceEditor:aDocs[n]:Save()
+          ENDIF
+       ENDIF
+       ::Application:SourceEditor:aDocs[n]:Modified := .F.
+   NEXT
+   ::Modified  := .F.
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
