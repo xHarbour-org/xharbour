@@ -17,7 +17,7 @@ HB_EXTERN_BEGIN
    extern HB_EXPORT LPWSTR hb_oleAnsiToWide( const char *cString );
 HB_EXTERN_END
 
-#if defined( __XCC__ )
+#if defined( __XCC__ ) || _MSC_VER < 1800
    typedef struct _DTTOPTS {
        DWORD dwSize;
        DWORD dwFlags;
