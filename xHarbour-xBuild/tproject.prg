@@ -4366,12 +4366,12 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
          FOR c := 'C' TO 'Z'
             IF DiskChange( c )
                IF File( c + ":\bcc55\bin\bcc32.exe" )
-                  s_sBCCFolder := c + ":\bcc55" 
+                  s_sBCCFolder := c + ":\bcc55"
                   C_Root := Pad( s_sBCCFolder, Len( C_Root ) )
 
                   EXIT
                ELSEIF File( c + ":\borland\bcc55\bin\bcc32.exe" )
-                  s_sBCCFolder := c + ":\borland\bcc55" 
+                  s_sBCCFolder := c + ":\borland\bcc55"
                   C_Root := Pad( s_sBCCFolder, Len( C_Root ) )
 
                   EXIT
@@ -4384,11 +4384,11 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
          // TODO!!!
          #ifdef __PLATFORM__Windows
             IF File( s_sGCCFolder + "\bin\gcc.exe" )
-               C_Root := Pad( s_GCCFolder, Len( C_Root ) )
+               C_Root := Pad( s_sGCCFolder, Len( C_Root ) )
             ENDIF
          #else
             s_sGCCFolder := "/usr/"
-            C_Root := Pad( s_GCCFolder, Len( C_Root ) )
+            C_Root := Pad( s_sGCCFolder, Len( C_Root ) )
          #endif
 
       CASE C_Compiler == "LCC"
