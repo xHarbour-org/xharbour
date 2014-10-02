@@ -176,6 +176,7 @@ extern HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 
 HB_EXTERN_END
 
+/*
 #if defined( __XCC__ )
 typedef struct {
     LPITEMIDLIST pidl;
@@ -207,6 +208,7 @@ typedef struct _PERFORMANCE_INFORMATION {
    DWORD ThreadCount;
 } PERFORMANCE_INFORMATION,  *PPERFORMANCE_INFORMATION;
 #endif
+*/
 
 #ifndef NO_PRG_CODE
    #define __PRG_SOURCE__ __FILE__
