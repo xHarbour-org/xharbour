@@ -93,7 +93,7 @@
 
 CLASS DataGrid INHERIT TitleControl
    PROPERTY Border                        SET ::SetStyle( WS_BORDER, v )                            DEFAULT .T.
-   PROPERTY ItemHeight                                                                              DEFAULT 19
+   PROPERTY ItemHeight                                                                              DEFAULT 18
    PROPERTY FullRowSelect                                                                           DEFAULT .F.
    PROPERTY ShadowRow                                                                               DEFAULT .T.
    PROPERTY AutoHorzScroll                                                                          DEFAULT .T.
@@ -105,6 +105,8 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY ShowSelectionBorder                                                                     DEFAULT .T.
    PROPERTY AnchorColumn                                                                            DEFAULT 0
    PROPERTY ConvertOem                                                                              DEFAULT .F.
+
+   PROPERTY SchemeHeader         ROOT "Appearance"                                                  DEFAULT .F.
 
    PROPERTY GridColor            ROOT "Colors"                                                      DEFAULT RGB(196,192,192)
    PROPERTY HighlightBorderColor ROOT "Colors"
@@ -118,13 +120,14 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY ExtVertScrollBar                                                                        DEFAULT .F.
    PROPERTY MultipleSelection                                                                       DEFAULT .F.
    PROPERTY TagRecords                                                                              DEFAULT .F.
-   PROPERTY GradientHeader                                                                          DEFAULT .F.
 
    PROPERTY ImageList           GET __ChkComponent( Self, @::xImageList )
    PROPERTY DataSource          GET __ChkComponent( Self, @::xDataSource ) SET ::__SetDataSource(v)
 
    PROPERTY ShowGrid            SET ::InvalidateRect()                                              DEFAULT .T.
    PROPERTY Striping            SET ::InvalidateRect()                                              DEFAULT .F.
+
+   ASSIGN GradientHeader(l)     INLINE ::SchemeHeader := l
 
    DATA ColPos                  EXPORTED INIT 1
    DATA RowPos                  EXPORTED INIT 1
@@ -137,6 +140,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA CurPos                  EXPORTED INIT 1
    DATA CurTag                  EXPORTED
    DATA bSearchKey              EXPORTED
+
    // backward compatibility
    DATA HoverBackColor          EXPORTED
    DATA HoverForeColor          EXPORTED
@@ -178,7 +182,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA __HorzScrolled          PROTECTED INIT 0
    DATA __DisplayArray          PROTECTED INIT {}
    DATA __InactiveHighlight     PROTECTED
-   DATA __CurControl            PROTECTED
+   DATA __CurControl            EXPORTED
    DATA __TrackColumn           PROTECTED
    DATA __DragColumn            PROTECTED INIT 0
    DATA __lResizing             PROTECTED INIT FALSE
@@ -217,6 +221,8 @@ CLASS DataGrid INHERIT TitleControl
    DATA __cSearch               PROTECTED INIT ""
    DATA __aLastHover            PROTECTED INIT {0,0}
    DATA __nHotHeader            PROTECTED
+   DATA __cEditText             PROTECTED
+   DATA __aEditCol              PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -301,7 +307,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD OnGetDlgCode()// msg ) INLINE IIF( Len(::Children) == 0 .OR. ! ::Children[ ::ColPos ]:AutoEdit .AND. msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_ESCAPE}, NIL, DLGC_WANTMESSAGE )
    METHOD OnLButtonDblClk()
    METHOD OnItemChanged()
-   METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd( hDC ) INLINE IIF( LEN( ::Children ) > 0, 1, Super:OnEraseBkGnd( hDC ) )
    METHOD OnHeaderClick()
    METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(),;
                                   IIF( ::__nHotHeader != NIL, ::Children[ ::__nHotHeader ]:DrawHeader(),),;
@@ -410,9 +416,8 @@ METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHea
        aAlign := _GetTextExtentExPoint( hDC, ALLTRIM(aData[z]), aText[3]-aText[1]-nWimg, @iLen )
        IF aAlign != NIL
           nDif := (aAlign[1]) - (aText[3]-aText[1]-nWimg)
-
           IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
-             aData[z] := ALLTRIM( LEFT( aData[z], iLen - 3 ) )+ "..."
+             aData[z] := ALLTRIM( LEFT( aData[z], iLen-2 ) )+ "..."
           ENDIF
           IF nAlign == ALIGN_LEFT
              x := zLeft + 1 + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
@@ -885,6 +890,13 @@ RETURN Self
 METHOD __OnTimer( nID ) CLASS DataGrid
    ::KillTimer( nID )
    DO CASE
+      CASE nID == 20
+           IF ::__CurControl != NIL
+              ::__CurControl:BackColor := ::__aEditCol[1]
+              ::__CurControl:ForeColor := ::__aEditCol[2]
+              ::__aEditCol := NIL
+           ENDIF
+
       CASE nID == 15
            ::Update()
            ::SetTimer( 15, ::__nUpdtTimer*1000 )
@@ -1040,7 +1052,6 @@ METHOD __ResetControl() CLASS DataGrid
       IF ::Children[ ::ColPos ]:ControlValid != NIL
          ::__CurControl:IsValid := FALSE
       ENDIF
-      ::DataSource:UnLock()
       ::__CurControl:Destroy()
       ::__CurControl:= NIL
       RETURN TRUE
@@ -1206,7 +1217,7 @@ METHOD OnChar( nKey ) CLASS DataGrid
          RETURN 0
       ENDIF
    ENDIF
-   IF nKey == 13 .AND. ::__CurControl == NIL .AND. ::Action != NIL
+   IF nKey IN {13,9} .AND. ::__CurControl == NIL .AND. ::Action != NIL
       __Evaluate( ::Action, Self )
    ENDIF
 RETURN NIL
@@ -1673,7 +1684,6 @@ METHOD __OnParentSysCommand()
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::DataSource:UnLock()
       ::__CurControl:Destroy()
       ::__CurControl:=NIL
    ENDIF
@@ -1690,7 +1700,6 @@ METHOD OnKillFocus() CLASS DataGrid
          RETURN 0
       ENDIF
       ::__CurControl:IsValid := FALSE
-      ::DataSource:UnLock()
       ::__CurControl:Destroy()
       ::__CurControl:=NIL
    ENDIF
@@ -1896,10 +1905,6 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
 RETURN NIL
 
 //----------------------------------------------------------------------------------
-
-METHOD OnEraseBkGnd() CLASS DataGrid
-RETURN IIF( LEN( ::Children ) > 0, 1, NIL )
-
 METHOD OnPaint() CLASS DataGrid
    LOCAL hMemBitmap, hOldBitmap, lPaint, hMemDC
    LOCAL hDC := ::BeginPaint()
@@ -3470,6 +3475,7 @@ METHOD OnDestroy() CLASS DataGrid
    ENDIF
 
    DeleteObject( ::__hDragBrush )
+
    Super:OnDestroy()
 RETURN NIL
 
@@ -3807,7 +3813,7 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
 
           IF lEdit
              oCol:ControlAccessKey := GRID_CHAR | GRID_LCLICK
-             oCol:OnSave := {|, oGrid, xData| oGrid:DataSource:Fields:Put( xData, Alltrim(aField[1] ) ) }
+             oCol:OnSave := {|xData| ::DataSource:Fields:Put( xData, ::System:TypeCast( Alltrim(aField[1], aField[2] ) ) ) }
           ENDIF
       NEXT
       IF ::__lCreated
@@ -3833,8 +3839,8 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          FOR x := 1 TO LEN( ::Children )
              IF ::Children[x]:Control != NIL .AND. ::Children[x]:ControlAccessKey & nMessage != 0
                 ::__CurControl := EVAL( ::Children[x]:Control, Self, ::DataSource:Recno() )
-                IF ::__CurControl != NIL .AND. RIGHT( ::__CurControl:__xCtrlName, 4 ) != "Edit"
-                   ::ColPos     := x
+                IF ::__CurControl != NIL .AND. ::__CurControl:__xCtrlName = "Edit"
+                   ::ColPos := x
                    aRect := ::GetItemRect()
                    EXIT
                 ENDIF
@@ -3842,23 +3848,19 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          NEXT
       ENDIF
 
-      IF ::__CurControl != NIL .AND. ::DataSource:RecLock()
-         ::__CurControl:OnWMKillFocus  := {|o,oParent| oParent := o:Parent,;
-                                              oParent:__ControlSaveData(.T.),;
-                                              oParent:DataSource:UnLock(),;
-                                              o:Destroy(),;
-                                              oParent:__CurControl := NIL,;
-                                              oParent:__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos ) }
-         IF ::__CurControl:HasMessage( "Picture" )
+      IF ::__CurControl != NIL
+         IF ::__CurControl:__xCtrlName == "MaskEdit"
             ::__CurControl:Picture := ::Children[::ColPos]:Picture
          ENDIF
-         ::__CurControl:Left   := aRect[1]+1
-         ::__CurControl:Width  := aRect[3]-aRect[1]-IIF( ::xShowGrid, 2, 1 )
-         ::__CurControl:Top    := aRect[2]+1
-         ::__CurControl:Height := ( aRect[4]-aRect[2] )-2
+
+         ::__CurControl:Left   := aRect[1]-1
+         ::__CurControl:Width  := aRect[3]-aRect[1]+2
+         ::__CurControl:Top    := aRect[2]-1
+         ::__CurControl:Height := aRect[4]-aRect[2]+2
+
          ::__CurControl:SetStyle( ES_MULTILINE )
          ::__CurControl:SetStyle( ES_AUTOHSCROLL )
-         ::__CurControl:SetStyle( WS_BORDER, FALSE )
+         ::__CurControl:SetStyle( WS_BORDER, .T. )
          ::__CurControl:ExStyle := 0
 
          nAlign := ::Children[::ColPos]:Alignment
@@ -3893,21 +3895,42 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
             CASE nAlign == ALIGN_CENTER
                  ::__CurControl:SetStyle( ES_CENTER )
          ENDCASE
-         ::__CurControl:Text := XSTR( xValue )
+         IF ::__CurControl:__xCtrlName == "EditBox"
+            ::__CurControl:xText := ALLTRIM( XSTR( xValue ) )
+          ELSE
+            ::__CurControl:Text := xValue
+         ENDIF
+         ::__CurControl:OnWMKeyDown   := <|o,n|
+                                           IF ::__aEditCol != NIL
+                                              ::KillTimer(20)
+                                              o:BackColor := ::__aEditCol[1]
+                                              o:ForeColor := ::__aEditCol[2]
+                                              ::__aEditCol := NIL
+                                           ENDIF
+                                           IF n == 27
+                                              ::__ResetControl()
+                                              RETURN 0
+                                            ELSEIF n IN {13,9}
+                                              IF ! ::__ControlSaveData(o,n)
+                                                 RETURN 0
+                                              ENDIF
+                                              ::__ResetControl()
+                                           ENDIF
+                                           RETURN NIL
+                                         >
+
+         ::__CurControl:OnWMKillFocus := {|o| ::__cEditText := o:Text, ::__ResetControl() }
          ::__CurControl:Create()
 
-         DEFAULT ::__CurControl:OnWMKeyDown   TO {|o,n| IIF( n==27, (o:Destroy(),oSelf:DataSource:UnLock(),0), IIF( n IN {13,9}, (oSelf:__ControlSaveData(,n),o:Destroy(),oSelf:DataSource:UnLock()), NIL ) )}
-         DEFAULT ::__CurControl:OnWMKillFocus TO {||oSelf:__ControlSaveData(.T.) }
+         IF ::__CurControl:__xCtrlName == "EditBox"
+            ::__CurControl:PostMessage( EM_SETSEL, 0, -1 )
+         ENDIF
 
-         ::__CurControl:BackColor     := ::Children[::ColPos]:ControlBackColor
-         ::__CurControl:ForeColor     := ::Children[::ColPos]:ControlForeColor
-
-         IF n == 1 .AND. nwParam != NIL .AND. nwParam != 13
-            ::__CurControl:SendMessage( WM_CHAR, nwParam, 0 )
+         IF n == 1 .AND. nwParam != NIL .AND. ! nwParam IN {13,9}
+            ::__CurControl:PostMessage( WM_CHAR, nwParam, 0 )
          ENDIF
 
          ::__CurControl:SetFocus()
-
       ENDIF
 
    ENDIF
@@ -3928,45 +3951,53 @@ RETURN aRect
 
 //---------------------------------------------------------------------------------------------------------------------------
 
-METHOD __ControlSaveData( lFocus, nKey ) CLASS DataGrid
-   LOCAL oCtrl, lRefresh := .T.
-   DEFAULT lFocus TO .F.
-   IF ::__CurControl:__xCtrlName == "MaskEdit" .AND. !::__CurControl:validating
-      IF ::__CurControl:IsValid
-         IF ( ::__CurControl:lInvalid .OR. ::Children[::ColPos]:ControlValid == NIL )
-            IF ::Children[::ColPos]:OnSave != NIL
-               lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:oGet:VarGet(), lFocus, nKey )
-            ENDIF
-            IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
-               oCtrl := ::Children[::ColPos]
+METHOD __ControlSaveData( oEdit, nKey ) CLASS DataGrid
+   LOCAL oCol, lRefresh := .T.
+   oCol := ::Children[::ColPos]
+   DEFAULT oEdit TO ::__CurControl
 
-               ::__CurControl:VarPut( ::__CurControl:oGet:Buffer )
-               lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:oGet:VarGet(), lFocus, nKey )
-            ENDIF
+   IF oEdit:__xCtrlName == "MaskEdit" .AND. !oEdit:validating
+      IF oEdit:oGet:BadDate
+         oEdit:ToolTip:Text    := "Invalid Date"
+         oEdit:ToolTip:Balloon := .T.
+         oEdit:ToolTip:Popup()
+
+         ::__aEditCol := { oEdit:BackColor, oEdit:ForeColor }
+
+         oEdit:BackColor := RGB( 255, 0, 0 )
+         oEdit:ForeColor := RGB( 255, 255, 255 )
+
+         ::SetTimer( 20, 1000 )
+         MessageBeep( MB_OK )
+         oEdit:SendMessage( EM_SETSEL, 0, 0 )
+         RETURN .F.
+      ENDIF
+      IF ( oEdit:lInvalid .OR. oCol:ControlValid == NIL )
+         oEdit:oGet:Assign()
+         IF oCol:OnSave != NIL
+            lRefresh := EVAL( oCol:OnSave, Self, oEdit:oGet:VarGet(), nKey )
+         ENDIF
+         IF HGetPos( oCol:EventHandler, "OnSave" ) != 0
+            lRefresh := oCol:Form:&( oCol:EventHandler[ "OnSave" ] )( Self, oEdit:oGet:VarGet(), nKey )
          ENDIF
       ENDIF
-    ELSEIF ::__CurControl:__xCtrlName == "Edit" .OR. ::__CurControl:__xCtrlName == "EditBox"
-      IF ::Children[::ColPos]:ControlValid == NIL
-         IF ::Children[::ColPos]:OnSave != NIL
-            lRefresh := EVAL( ::Children[::ColPos]:OnSave, ::Children[::ColPos], Self, ::__CurControl:Text, lFocus, nKey )
+    ELSEIF oEdit:__xCtrlName == "EditBox"
+      IF oCol:ControlValid == NIL
+         IF oCol:OnSave != NIL
+            lRefresh := EVAL( oCol:OnSave, Self, ::System:TypeCast( IIF( nKey == VK_TAB, ::__cEditText, oEdit:Text ), VALTYPE( oCol:CellData ) ), nKey )
          ENDIF
-         IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) != 0
-            oCtrl := ::Children[::ColPos]
-            lRefresh := oCtrl:Form:&( oCtrl:EventHandler[ "OnSave" ] )( ::__CurControl, Self, ::__CurControl:Text, lFocus, nKey )
+         IF HGetPos( oCol:EventHandler, "OnSave" ) > 0
+            lRefresh := oCol:Form:&( oCol:EventHandler[ "OnSave" ] )( Self, ::System:TypeCast( IIF( nKey == VK_TAB, ::__cEditText, oEdit:Text ), VALTYPE( oCol:CellData ) ), nKey  )
          ENDIF
       ENDIF
    ENDIF
+   ::SetFocus()
 
    IF VALTYPE( lRefresh ) != "L"
       lRefresh := .T.
    ENDIF
    IF GetFocus() != ::hWnd
       ::PostMessage( WM_KILLFOCUS, 0, 0 )
-   ENDIF
-   IF ::__CurControl != NIL
-      ::DataSource:UnLock()
-      ::__CurControl:Destroy()
-      ::__CurControl := NIL
    ENDIF
    IF lRefresh
       ::__FillRow( ::RowPos )
@@ -4187,7 +4218,7 @@ METHOD Init( oParent ) CLASS GridColumn
                   {"Object",      {;
                                   { "OnInit"             , "", "" } } },;
                   {"Data",        {;
-                                  { "OnSave"            , "", "oGrid, cText, lFocusKilled, nLastKey" },;
+                                  { "OnSave"            , "", "xValue", "nKey" },;
                                   { "ButtonClicked"     , "", "" } } },;
                   {"Color",       {;
                                   { "OnQueryBackColor"  , "", "" },;
@@ -4248,11 +4279,7 @@ METHOD Create() CLASS GridColumn
 
    TRY
       IF ::AutoEdit
-         IF ::Type $ "MC"
-            ::Control := {|o|Edit( o )  }
-         ELSE
-            ::Control := {|o|MaskEdit( o )  }
-         ENDIF
+         ::Control := {|o| IIF( ValType(::CellData) $ "MC", EditBox(o), MaskEdit(o) ) }
          ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
       ENDIF
    CATCH
@@ -4312,6 +4339,9 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    LOCAL hBorderPen, nColor1, nColor2, cOrd, nBackColor, nBorder, nShadow, hPenShadow, hPenLight, z, i, nPrevColor, lDC, hBrush, aTxAlign, a, nOffset
    LOCAL nWImg
 
+   IF ::Parent:__GetHeaderHeight() <= 0
+      RETURN NIL
+   ENDIF
 
    IF hDC == NIL .AND. nLeft == NIL .AND. nRight == NIL
       RETURN ::Parent:__DisplayData( 1, ::xPosition, 1, ::xPosition,,, lPressed, lHot, .T. )
@@ -4364,7 +4394,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
 
    y := (::Parent:__GetHeaderHeight() - (aAlign[2]*LEN(aTxAlign)) ) / 2
 
-   IF ::Parent:GradientHeader
+   IF ::Parent:SchemeHeader .AND. ::__SysHeaderBackColor == ::HeaderBackColor
       ::__aVertex[1]:x := aRect[1]-1
       ::__aVertex[1]:y := aRect[2]
       ::__aVertex[2]:x := aRect[3]
@@ -4410,16 +4440,26 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
          nBackColor := ::ColorScheme:MenuItemSelected
       ENDIF
 
-      hBrush   := CreateSolidBrush( nBackColor )
+      nShadow := DarkenColor( nBackColor, 100 )
+      nColor  := LightenColor( nBackColor, 100 )
+
+      IF ::Parent:SchemeHeader
+         hOldPen := SelectObject( hDC, CreatePen( PS_SOLID, 0, nShadow ) )
+         hBrush  := CreateSolidBrush( nColor )
+       ELSE
+         hBrush   := CreateSolidBrush( nBackColor )
+      ENDIF
       hOldBrush := SelectObject( hDC, hBrush )
 
-      Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
 
-      nColor  := LightenColor( nBackColor, 100 )
-      nShadow := DarkenColor( nBackColor, 100 )
-
-      __Draw3dRect( hDC, aRect, nColor, nShadow )
-
+      IF ! ::Parent:SchemeHeader
+         Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
+         __Draw3dRect( hDC, aRect, nColor, nShadow )
+       ELSE
+         Rectangle( hDC, aRect[1]-1, aRect[2]-1, aRect[3], aRect[4] )
+         DeleteObject( SelectObject( hDC, hOldPen ) )
+         hOldPen := NIL
+      ENDIF
    ENDIF
    SelectObject( hDC, hOldBrush )
    IF hBrush != NIL
@@ -4465,7 +4505,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    SelectObject( hDC, hOldPen )
 
    IF ::SortArrow > 0 .AND. aRect[3]-15-nWImg > nLeft .AND. aRect[3]-15-nWImg > x + aAlign[1]
-      IF ::Parent:GradientHeader
+      IF ::Parent:SchemeHeader
          hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )
          FOR n := 1 TO nH
              x := IIF( ::SortArrow == 1,n,nH-n+1)
@@ -4553,11 +4593,7 @@ RETURN rc
 METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
    IF lEdit != ::AutoEdit
       IF lEdit
-         IF ::Type $ "MC"
-            ::Control := {|o|Edit( o )  }
-         ELSE
-            ::Control := {|o|MaskEdit( o )  }
-         ENDIF
+         ::Control := {|o| IIF( ValType(::CellData) $ "MC", EditBox(o), MaskEdit(o) ) }
          ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
        ELSE
          ::Control := NIL

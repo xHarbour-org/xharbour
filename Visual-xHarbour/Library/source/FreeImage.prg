@@ -293,6 +293,10 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
             EXIT
       END
    ENDIF
+
+   x -= ::Owner:HorzScrollPos
+   y -= ::Owner:VertScrollPos
+
    IF !::lTransparentSet
       ::lTransparentSet := .T.
       IF FreeImageIsTransparent( ::hDIB ) .OR. FreeImageHasBackgroundColor( ::hDIB )

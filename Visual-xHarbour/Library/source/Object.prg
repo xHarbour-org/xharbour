@@ -146,7 +146,7 @@ RETURN uRet
 METHOD __SetCtrlName(c) CLASS Object
    IF !(::Name == c) .AND. ::Form != NIL
       ::Form:__SetAsProperty( c, Self )
-      IF ::Form:hWnd == ::hWnd
+      IF IsWindow(::hWnd) .AND. ::Form:hWnd == ::hWnd
          ::Application:__SetAsProperty( c, Self )
       ENDIF
       ::xName := c
@@ -164,9 +164,6 @@ METHOD __CreateProperty( cBaseName ) CLASS Object
    IF EMPTY( ::xName ) .AND. ::Form != NIL  .AND. ::__xCtrlName != "ToolTip" .AND. ::GenerateMember
       n := ::GetControlName( cBaseName )
       ::Form:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
-      IF ::Form:hWnd == ::hWnd
-         ::Application:__SetAsProperty( cBaseName + ALLTRIM( STR( n ) ), Self )
-      ENDIF
    ENDIF
 RETURN SELF
 
@@ -194,7 +191,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"
       cName := oObj:xName
    ENDIF
-   IF !( oObj == Self )
+   IF ! ( oObj == Self )
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
@@ -221,7 +218,7 @@ RETURN Self
 
 METHOD RemoveProperty() CLASS Object
    LOCAL n
-   IF ! EMPTY( ::xName )
+   IF ! EMPTY( ::xName ) .AND. ::Form:hWnd <> ::hWnd
       IF ( n := hGetPos( ::Form:__hObjects, ::xName ) ) > 0
          HDelAt( ::Form:__hObjects, n )
       ENDIF
@@ -233,6 +230,7 @@ RETURN NIL
 
 METHOD SetTabOrder( nTabOrder ) CLASS Object
    LOCAL n, hAfter
+   DEFAULT nTabOrder TO 0
    IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
       TRY
          IF nTabOrder == 1

@@ -2609,6 +2609,7 @@ METHOD NewProject() CLASS Project
 
    ::Application:ProjectPrgEditor:TreeItem:Select()
    ::Application:CloseMenu:Enabled := .T.
+   ::Application:SaveAsMenu:Enabled := .T.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -3358,7 +3359,7 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
    ENDIF
 
    WITH OBJECT oWin
-      :__ClassInst:Caption := ""
+      :__ClassInst:Text := ""
       :Caption     := :Name
 
       IF lReset // New Window button
@@ -3420,18 +3421,22 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    lRem := .F.
 
-   IF ::Forms != NIL
+   ::CurrentForm := NIL
+   ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
+
+   IF ! Empty( ::Forms )
       FOR n := 1 TO LEN( ::Forms )
           IF ::Forms[n]:Editor != NIL
              ::Forms[n]:Editor:Close()
-             ::Forms[n]:TreeItem:Cargo := NIL
              ::Forms[n]:Editor:Form := NIL
              ::Forms[n]:Editor := NIL
-             //::Forms[n]:XFMEditor:Close()
-             //::Forms[n]:XFMEditor := NIL
-             ::Forms[n]:Destroy()
-             ::Forms[n] := NIL
           ENDIF
+          //::Forms[n]:XFMEditor:Close()
+          //::Forms[n]:XFMEditor := NIL
+
+          ::Forms[n]:Destroy()
+          ::Forms[n]:Selected        := NIL
+          ::Forms[n]                 := NIL
       NEXT
    ENDIF
    ::Application:ObjectTree:ResetContent()
@@ -3448,9 +3453,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
        ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
-   ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
 
-   ::CurrentForm := NIL
    ::Forms := {}
 
    IF ::DesignPage == NIL .OR. lClosing
@@ -3473,6 +3476,8 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:EventManager:SetRedraw( .T. )
 
    ::Application:FileExplorer:ResetContent()
+   ::Application:FileExplorer:Main:Cargo := NIL
+   ::Application:FileExplorer:Main := NIL
 
    ::Application:Props[ "CloseBttn"         ]:Enabled := .F.
    ::Application:Props[ "SaveBttn"          ]:Enabled := .F.
@@ -3542,7 +3547,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ENDIF
    ::Application:SaveAsMenu:Enabled := .F.
 
-   //hb_gcall( .T. )
+   hb_gcall( .T. )
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
@@ -5088,7 +5093,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cText, cParent ) CLASS Project
-   LOCAL aProperties, aProperty, cProp, xValue1, xValue2, cProps
+   LOCAL aProperties, aProperty, cProp, xValue1, cProps, xValue2
    LOCAL lParent, cResImg, n, cArray, x
 
    DEFAULT cPrev TO ""
@@ -5130,7 +5135,12 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    xValue2 := 0
                  ELSE
                    xValue1 := __objSendMsg( oCtrl, UPPER( cProp ) )
-                   xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
+                   xValue2 := NIL
+                   IF __objHasMsg( oCtrl, "__a_"+cProp )
+                      xValue2 := __objSendMsg( oCtrl, UPPER( "__a_"+cProp ) )[4]
+                   ENDIF
+                   //xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
+
                 ENDIF
 
               ELSE
@@ -6085,9 +6095,10 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                      ADEL( ::CustomControls, x, .T. )
                   ENDIF
                ENDIF
-
-               aAction[8]:TreeItem:Delete()
-               aAction[8]:TreeItem := NIL
+               IF aAction[8]:TreeItem != NIL
+                  aAction[8]:TreeItem:Delete()
+                  aAction[8]:TreeItem := NIL
+               ENDIF
                aAction[8]:Destroy()
                TRY
                   aAction[8]:Owner := NIL

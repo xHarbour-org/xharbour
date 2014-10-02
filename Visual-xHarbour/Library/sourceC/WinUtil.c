@@ -5448,3 +5448,20 @@ HB_FUNC( VXH_FREECALLBACKOBJECT )
    }
    hb_retl( FALSE );
 }
+
+//-------------------------------------------------------------------------------------------------
+HB_FUNC( GETDISPLAYWORKAREA )
+{
+   RECT rc;
+   PHB_ITEM aRect = hb_itemArrayNew(4);
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   SystemParametersInfo( SPI_GETWORKAREA, 0, &rc, 0 );
+
+   hb_arraySet(aRect, 1, hb_itemPutNL(element, rc.left));
+   hb_arraySet(aRect, 2, hb_itemPutNL(element, rc.top));
+   hb_arraySet(aRect, 3, hb_itemPutNL(element, rc.right));
+   hb_arraySet(aRect, 4, hb_itemPutNL(element, rc.bottom));
+   hb_itemRelease( element );
+   hb_itemRelease( hb_itemReturnForward( aRect ) );
+}

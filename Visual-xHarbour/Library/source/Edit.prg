@@ -109,6 +109,8 @@ CLASS EditBox INHERIT Control
    ACCESS ContextArrow                 INLINE ::xMenuArrow
    ASSIGN ContextArrow(l)              INLINE ::MenuArrow(l)
 
+   ACCESS InDataGrid                   INLINE ::Parent:ClsName == "DataGrid"
+
    METHOD Init()     CONSTRUCTOR
    METHOD Create()
 
@@ -546,13 +548,13 @@ METHOD SetAlignment( n ) CLASS EditBox
 RETURN n
 
 //-----------------------------------------------------------------------------------------------
-METHOD __SetSelColor() CLASS EditBox
+METHOD __SetSelColor( nColor ) CLASS EditBox
    IF ::SelBkBrush != NIL
       DeleteObject( ::SelBkBrush )
       ::SelBkBrush := NIL
    ENDIF
-   IF ::xSelBackColor != NIL
-      ::SelBkBrush := CreateSolidBrush( ::xSelBackColor )
+   IF nColor != NIL
+      ::SelBkBrush := CreateSolidBrush( nColor )
    ENDIF
    IF ::IsWindowVisible() .AND. GetFocus() == ::hWnd
       ::InvalidateRect()

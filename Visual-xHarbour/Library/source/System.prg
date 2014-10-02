@@ -102,7 +102,7 @@ CLASS System
    DATA OsVersion               EXPORTED
 
    DATA TitleBackBrush          EXPORTED
-   
+
    DATA TitleBorderPen          EXPORTED
 
    DATA hRich20                 EXPORTED
@@ -117,7 +117,7 @@ CLASS System
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
    ACCESS LastError     INLINE ::__GetLastError()
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Update()
 
@@ -135,6 +135,7 @@ CLASS System
    METHOD GetEnvironment()
    METHOD GetEnumCursor()
    METHOD __GetLastError()
+   METHOD TypeCast()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -245,7 +246,7 @@ METHOD Init() CLASS System
 
    IF ::OS:Version >= 6.2
       ::CurrentScheme := FlatGrayColorTable()
-    ELSE 
+    ELSE
       ::CurrentScheme := ProfessionalColorTable()
    ENDIF
    ::CurrentScheme:Load()
@@ -272,14 +273,14 @@ METHOD Init() CLASS System
 
    ::KeyboardList := {=>}
    HSetCaseMatch( ::KeyboardList, .F. )
-   
+
    ::KeyboardList["A"] := 65
    ::KeyboardList["B"] := 65
    ::KeyboardList["Backspace"] := 32
    ::KeyboardList["C"] := 65
    ::KeyboardList["D"] := 65
    ::Time := __SysTime()
-   
+
    ::xLocalTime := {=>}
    HSetCaseMatch( ::xLocalTime, .F. )
    ::GetLocalTime()
@@ -307,12 +308,12 @@ METHOD Init() CLASS System
    ::HandShake[ "RequestToSend"       ] := 3
    ::HandShake[ "RequestToSendXOnOff" ] := 4
 
-   
+
    ::SockProtocol := {=>}
    HSetCaseMatch( ::SockProtocol, .F. )
    ::SockProtocol[ "TCP"           ]   := 1
    ::SockProtocol[ "UDP"           ]   := 2
-   
+
    ::Colors := __SystemColors()
 
    ::Color := {=>}
@@ -782,7 +783,7 @@ METHOD Init() CLASS System
    ::FocusPen       := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
    ::TitleBackBrush := CreateSolidBrush( RGB( 69, 89, 124 ) )
    ::TitleBorderPen := CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
-   
+
    ::hFont          := __GetMessageFont()
 
    ::hWindowTheme   := OpenThemeData(,"WINDOW")
@@ -820,16 +821,45 @@ METHOD GetEnumCursor() CLASS System
                  { NIL, IDC_ARROW, IDC_HELP, IDC_APPSTARTING, IDC_WAIT, IDC_CROSS, IDC_IBEAM, IDC_NO, IDC_SIZENS, IDC_SIZEWE, IDC_SIZENESW, IDC_SIZENWSE, IDC_SIZEALL, IDC_UPARROW, IDC_HAND, IDC_HAND } }
 RETURN aCursors
 
-//-----------------------------------------------------------------------------------------------------------------------------
-FUNCTION GC2RGB( p_nColor )
-   LOCAL l_nRed, l_nGreen, l_nBlue 
-   l_nRed   := MOD(p_nColor, 256) 
-   l_nGreen := MOD(INT(p_nColor/256), 256) 
-   l_nBlue  := MOD(INT(p_nColor/(256*256)), 256) 
-RETURN ALLTRIM(STR(l_nRed))+","+ALLTRIM(STR(l_nGreen))+","+ALLTRIM(STR(l_nBlue)) 
+METHOD TypeCast( xValue, cType )
+   LOCAL aVal, n
+   IF VALTYPE( xValue ) != "C"
+      xValue := xStr( xValue )
+   ENDIF
+   DO CASE
+      CASE cType == "N"
+           xValue := VAL( xValue )
+
+      CASE cType == "D"
+           xValue := CTOD( xValue )
+
+      CASE cType == "B"
+           xValue := &xValue
+
+      CASE cType == "U"
+           xValue := NIL
+
+      CASE cType == "L"
+           aVal := { { "<true>", .T.}, {"<false>", .F.}, { ".t.", .T.}, {".f.", .F.}, { "t", .T.}, {"f", .F.}, { "1", .T.}, {"0", .F.} }
+           n := ASCAN( aVal, {|a| a[1] == lower(xValue) } )
+           TRY
+              xValue := IIF( n > 0, aVal[n][2], &xValue > 0 )
+           CATCH
+              xValue := .F.
+           END
+   ENDCASE
+RETURN xValue
 
 //-----------------------------------------------------------------------------------------------------------------------------
-METHOD Update() CLASS System   
+FUNCTION GC2RGB( p_nColor )
+   LOCAL l_nRed, l_nGreen, l_nBlue
+   l_nRed   := MOD(p_nColor, 256)
+   l_nGreen := MOD(INT(p_nColor/256), 256)
+   l_nBlue  := MOD(INT(p_nColor/(256*256)), 256)
+RETURN ALLTRIM(STR(l_nRed))+","+ALLTRIM(STR(l_nGreen))+","+ALLTRIM(STR(l_nBlue))
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD Update() CLASS System
    LOCAL cBuffer
    FreeExplorerBarInfo()
    GetExplorerBarInfo()
@@ -912,12 +942,12 @@ RETURN st:Array[n]
 STATIC FUNCTION GetWin32Proc( cQuery )
    LOCAL oLocator, aProcessList, oWMIService
    TRY
-      oLocator := GetActiveObject("WbemScripting.SWbemLocator") 
+      oLocator := GetActiveObject("WbemScripting.SWbemLocator")
     CATCH
-      oLocator := CreateObject("WbemScripting.SWbemLocator") 
+      oLocator := CreateObject("WbemScripting.SWbemLocator")
    END
    TRY
-      oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", ) 
+      oWMIService  := oLocator:ConnectServer( , "root\CIMV2", , , "MS_409", )
       aProcessList := oWMIService:ExecQuery( cQuery )
    CATCH
    END
@@ -955,7 +985,7 @@ For Each os in oss
     Wscript.Echo "Encryption Level: " & os.EncryptionLevel
     dtmConvertedDate.Value = os.InstallDate
     dtmInstallDate = dtmConvertedDate.GetVarDate
-    Wscript.Echo "Install Date: " & dtmInstallDate 
+    Wscript.Echo "Install Date: " & dtmInstallDate
     Wscript.Echo "Licensed Users: " & os.NumberOfLicensedUsers
     Wscript.Echo "Organization: " & os.Organization
     Wscript.Echo "OS Language: " & os.OSLanguage

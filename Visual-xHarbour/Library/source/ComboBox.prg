@@ -242,7 +242,6 @@ RETURN Self
 METHOD __ResetEdit() CLASS ComboBox
    IF IsWindow( ::hEdit )
       SetWindowLong( ::hEdit, GWL_WNDPROC, ::__nProcEdit )
-      ::Parent:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackEdit )
    ENDIF
 RETURN Self
 

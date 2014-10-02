@@ -74,6 +74,9 @@ CLASS Control INHERIT Window
    METHOD OnSize()
    METHOD OnMove()
    METHOD OnSysKeyDown()
+   METHOD OnEnterSizeMove()
+   METHOD OnExitSizeMove()
+
    METHOD Redraw() INLINE /*::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),*/;
                           ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD IsComponent( oComp ) INLINE ::HasMessage( oComp:__xCtrlName ) .AND. &("HB_QSELF():"+oComp:__xCtrlName) == oComp
@@ -84,7 +87,7 @@ CLASS Control INHERIT Window
    METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
    METHOD DrawArrow()
 
-   METHOD __UnSubClass()
+   //METHOD __UnSubClass()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS Control
@@ -94,14 +97,14 @@ METHOD __Enable( lEnable ) CLASS Control
       ::UpdateWindow()
    ENDIF
 RETURN lEnable
-
+/*
 METHOD __UnSubClass() CLASS Control
    Super:__UnSubClass()
    IF ::__pCallBackPtr != NIL
       ::Parent:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
    ENDIF
 RETURN Self
-
+*/
 //---------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS Control
@@ -230,6 +233,39 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
    ENDIF
 RETURN NIL
 
+//-----------------------------------------------------------------------------------------------
+METHOD OnEnterSizeMove() CLASS Control
+   IF ::LeftSplitter != NIL
+      ::LeftSplitter:Visible := .F.
+   ENDIF
+   IF ::TopSplitter != NIL
+      ::TopSplitter:Visible := .F.
+   ENDIF
+   IF ::RightSplitter != NIL
+      ::RightSplitter:Visible := .F.
+   ENDIF
+   IF ::BottomSplitter != NIL
+      ::BottomSplitter:Visible := .F.
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnExitSizeMove() CLASS Control
+   IF ::LeftSplitter != NIL
+      ::LeftSplitter:Visible := .T.
+   ENDIF
+   IF ::TopSplitter != NIL
+      ::TopSplitter:Visible := .T.
+   ENDIF
+   IF ::RightSplitter != NIL
+      ::RightSplitter:Visible := .T.
+   ENDIF
+   IF ::BottomSplitter != NIL
+      ::BottomSplitter:Visible := .T.
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 METHOD OnMove( x, y ) CLASS Control
    IF ::Super:OnMove( x, y ) == NIL
       IF ::LeftSplitter != NIL

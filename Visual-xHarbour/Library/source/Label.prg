@@ -215,7 +215,7 @@ METHOD OnPaint() CLASS Label
       aRect[2] := ( aRect[4]-aText[2] ) / 2
       aRect[4] := aRect[2] + aText[2]
    ENDIF
-   
+
    cText := ::xText
    DEFAULT cText TO ""
 
@@ -236,7 +236,7 @@ METHOD OnPaint() CLASS Label
    SelectObject( hMemDC, hFont )
 
    BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
-   
+
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
@@ -249,7 +249,7 @@ CLASS Line INHERIT CONTROL
    PROPERTY Lenght         SET ::__SetLenght(v)   DEFAULT 150
    PROPERTY Sunken         SET ::__SetSunken(v)   DEFAULT .T.
    PROPERTY Vertical       SET ::__SetVertical(v) DEFAULT .F.
-   PROPERTY Color                                 DEFAULT  GetSysColor( COLOR_BTNSHADOW )
+   PROPERTY Color  ROOT "Colors"  DEFAULT  GetSysColor( COLOR_BTNSHADOW )
 
    ACCESS Width            INLINE ::xWidth
    ACCESS Height           INLINE ::xHeight
@@ -279,7 +279,7 @@ CLASS Line INHERIT CONTROL
    DATA ContextMenu        EXPORTED
    DATA AllowMaximize      EXPORTED  INIT .F.
    DATA Enabled            EXPORTED  INIT .T.
-   DATA TabOrder           EXPORTED  INIT 0  
+   DATA TabOrder           EXPORTED  INIT 0
    DATA NoActivate         EXPORTED  INIT .F.
    DATA Theming            EXPORTED  INIT .F.
 
@@ -367,7 +367,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Line
       ::xLenght := IIF( ::xVertical, ::Height, ::Width )
    ENDIF
 RETURN NIL
-   
+
 METHOD OnEraseBkGnd( hDC ) CLASS Line
    LOCAL lVert := ::xVertical, hBrush := CreateSolidBrush( ::Color )
    _FillRect( hDC, { 0, 0, IIF( lVert, 1, ::Width ), IIF( lVert, ::Height, 1 ) }, hBrush )

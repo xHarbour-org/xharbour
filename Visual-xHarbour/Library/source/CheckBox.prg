@@ -44,6 +44,9 @@
 //-----------------------------------------------------------------------------------------------
 
 CLASS CheckBox INHERIT Control
+   PROPERTY TextAlignment ROOT "Appearance" SET ::Redraw(v)      DEFAULT DT_LEFT
+   PROPERTY VertAlignment ROOT "Appearance" SET ::Redraw(v)      DEFAULT DT_VCENTER
+
    DATA ImageList   EXPORTED
    DATA ImageIndex  PROTECTED
 
@@ -51,14 +54,18 @@ CLASS CheckBox INHERIT Control
    PROPERTY Group       ROOT "Behavior"   SET ::SetStyle(WS_GROUP,v)  DEFAULT .F.
    PROPERTY CheckStyle  ROOT "Behavior"   SET ::SetCheckStyle(v)      DEFAULT 1
    PROPERTY State       ROOT "Behavior"   SET ::SetState(v)           DEFAULT BST_UNCHECKED
-   PROPERTY Border      ROOT "Appearance" SET ::SetStyle(WS_BORDER,v) DEFAULT .F. 
+   PROPERTY Border      ROOT "Appearance" SET ::SetStyle(WS_BORDER,v) DEFAULT .F.
    PROPERTY AutoSize    ROOT "Behavior"   SET ::__SetSize(v)          DEFAULT .F.
+   PROPERTY RightAlign  ROOT "Appearance"                             DEFAULT .F.
+   PROPERTY BoxSize     ROOT "Appearance"                             DEFAULT 15
 
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.
 
-   DATA EnumCheckStyle EXPORTED INIT {{ "AutoCheckBox", "Auto3State" }, {1,2} }
-   DATA EnumState      EXPORTED INIT {{ "Unchecked", "Checked", "Indeterminate" }, {BST_UNCHECKED,BST_CHECKED,BST_INDETERMINATE} }
+   DATA EnumCheckStyle    EXPORTED INIT {{ "AutoCheckBox", "Auto3State" }, {1,2} }
+   DATA EnumState         EXPORTED INIT {{ "Unchecked", "Checked", "Indeterminate" }, {BST_UNCHECKED,BST_CHECKED,BST_INDETERMINATE} }
+   DATA EnumTextAlignment EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
+   DATA EnumVertAlignment EXPORTED INIT { { "Bottom", "Center", "Top" }, { DT_BOTTOM, DT_VCENTER, DT_TOP } }
 
 
    METHOD Init()           CONSTRUCTOR
@@ -79,6 +86,7 @@ CLASS CheckBox INHERIT Control
 
    METHOD __SetSize()
    //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
+   METHOD ResetFrame() INLINE    ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CheckBox
@@ -87,17 +95,17 @@ METHOD Init( oParent ) CLASS CheckBox
    ::ClsName := "button"
    ::Super:Init( oParent )
    ::Width  := 100
-   ::Height := 15
+   ::Height := 16
    IF ::__ClassInst != NIL
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
 RETURN Self
 
-METHOD __SetSize() CLASS CheckBox
+METHOD __SetSize( lAuto ) CLASS CheckBox
    LOCAL aSize
-   IF ::AutoSize
+   IF lAuto
       aSize := ::Drawing:GetTextExtentPoint32( ::Text )
-      ::xWidth := aSize[1]+18
+      ::xWidth := aSize[1]+ :: BoxSize + 3
       ::MoveWindow()
       ::Redraw()
    ENDIF
@@ -108,10 +116,10 @@ METHOD Create() CLASS CheckBox
    ::Super:Create()
    IF ::AutoSize
       aSize := ::Drawing:GetTextExtentPoint32( ::Text )
-      ::xWidth := aSize[1]+18
-      ::MoveWindow()
+      ::Width := aSize[1]+ :: BoxSize + 3
       ::Redraw()
    ENDIF
+   ::Height := MAX( 16, ::Height )
    ::SetState( ::xState )
 RETURN Self
 
@@ -140,7 +148,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    ENDIF
 
                    SetBkMode( cd:hdc, TRANSPARENT )
-                   
+
                    hBkGnd := ::BkBrush
                    IF hBkGnd == NIL
                       hBkGnd := ::Parent:BkBrush
@@ -150,7 +158,16 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
 
                    FillRect( cd:hDC, cd:rc, hBkGnd )
 
-                   aRect := {0,0,15,15}
+                   aRect := {0,0,::BoxSize,::BoxSize}
+                   IF ::RightAlign
+                      aRect := { cd:rc:Right-(::BoxSize-1),0,cd:rc:Right,::BoxSize}
+                   ENDIF
+                   IF ::VertAlignment == DT_VCENTER
+                      aRect[2] := ( cd:rc:bottom - ::BoxSize ) / 2
+                    ELSEIF ::VertAlignment == DT_BOTTOM
+                      aRect[2] := cd:rc:bottom - ::BoxSize
+                   ENDIF
+                   aRect[4] := aRect[2] + ::BoxSize
 
                    nStatus := ::SendMessage( BM_GETCHECK, 0, 0 )
 
@@ -181,9 +198,21 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                       _DrawFrameControl( cd:hDC, aRect, DFC_BUTTON, nFlags )
                    ENDIF
 
-                   cd:rc:left += 16
+                   IF ::RightAlign
+                      cd:rc:left := 2
+                      cd:rc:Right -= ( ::BoxSize + 2 )
+                    ELSE
+                      cd:rc:left += ( ::BoxSize + 1 )
+                   ENDIF
 
-                   DrawText( cd:hDC, ::Text, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+                   IF ::VertAlignment == DT_BOTTOM
+                      cd:rc:top ++
+                      cd:rc:bottom --
+                    ELSEIF ::VertAlignment == DT_TOP
+                      cd:rc:top --
+                   ENDIF
+
+                   DrawText( cd:hDC, ::Text, cd:rc, ::TextAlignment | ::VertAlignment | DT_SINGLELINE )
                    IF nColor != NIL
                       SetTextColor( cd:hDC, nColor )
                    ENDIF
@@ -195,10 +224,24 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                       sz := (struct SIZE)
                       GetTextExtentPoint32( cd:hDC, ::Text, @sz )
 
-                      cd:rc:left -= 2
-                      cd:rc:right  := sz:cx + cd:rc:left + 4
-                      cd:rc:top    := ( ::Height - sz:cy ) / 2
-                      cd:rc:bottom := sz:cy + cd:rc:top
+                      IF ::TextAlignment == DT_LEFT
+                         cd:rc:left  -= 1
+                       ELSEIF ::TextAlignment == DT_CENTER
+                         cd:rc:left  := ( ( cd:rc:right + cd:rc:left - sz:cx ) / 2 ) - 1
+                       ELSEIF ::TextAlignment == DT_RIGHT
+                         cd:rc:left  := cd:rc:right - sz:cx - 1
+                      ENDIF
+                      cd:rc:right := cd:rc:left + sz:cx + 2
+
+                      IF ::VertAlignment == DT_TOP
+                         cd:rc:top   := 0
+                       ELSEIF ::VertAlignment == DT_VCENTER
+                         cd:rc:top   := ( cd:rc:bottom - sz:cy ) / 2
+                       ELSEIF ::VertAlignment == DT_BOTTOM
+                         cd:rc:top   := cd:rc:bottom - sz:cy
+                      ENDIF
+                      cd:rc:bottom := cd:rc:top + sz:cy + 1
+
 
                       DrawFocusRect( cd:hDC, cd:rc )
                    ENDIF

@@ -78,6 +78,7 @@ CLASS Font
    METHOD AddResource(c) INLINE AddFontResource( c )//, FR_PRIVATE | FR_NOT_ENUM )
    METHOD EnumFamilies()
    METHOD EnumFamiliesProc()
+   METHOD Destroy()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -150,32 +151,27 @@ METHOD Create() CLASS Font
    IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance  := .T.
-      ::__ClassInst:xWeight      := ::xWeight
-      ::__ClassInst:xFaceName    := ::xFaceName
-      ::__ClassInst:xWidth       := ::xWidth
-      ::__ClassInst:xEscapement  := ::xEscapement
-      ::__ClassInst:xOrientation := ::xOrientation
-      ::__ClassInst:xCharSet     := ::xCharSet
-      ::__ClassInst:xHeight      := ::xHeight
-      ::__ClassInst:xnItalic     := ::xnItalic
-      ::__ClassInst:xnUnderline  := ::xnUnderline
-      ::__ClassInst:xnStrikeOut  := ::xnStrikeOut
-      ::__ClassInst:xPointSize   := ::xPointSize
    ENDIF
 
 RETURN Self
 
 METHOD Delete() CLASS Font
    IF ::Handle != NIL
-      IF ::Owner != NIL
+      IF ::Owner != NIL .AND. __objHasMsg( ::Owner, "hWnd" )
          SendMessage( ::Owner:hWnd, WM_SETFONT, NIL, MAKELPARAM( 1, 0 ) )
       ENDIF
       DeleteObject( ::Handle )
       ::Handle := NIL
-      //::__ClassInst := NIL
    ENDIF
 RETURN .T.
 
+METHOD Destroy() CLASS Font
+   ::Delete()
+   IF ::__ClassInst != NIL
+      ::__ClassInst:Owner := NIL
+      ::__ClassInst := NIL
+   ENDIF
+RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 
@@ -294,7 +290,7 @@ METHOD Modify() CLASS Font
          IF ::lCreateHandle
             ::Handle := CreateFontIndirect( lf )
          ENDIF
-         IF ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
+         IF ::Owner != NIL .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
             ::Set( ::Owner )
          ENDIF
       ENDIF
@@ -317,7 +313,7 @@ METHOD SetPointSize( n ) CLASS Font
    DeleteDC( hDC )
    ::xPointSize := n
 
-   IF ::__ClassInst != NIL .AND. ::Owner != NIL .AND. IsWindow( ::Owner:hWnd )
+   IF ::__ClassInst != NIL .AND. ::Owner != NIL  .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
       ::Owner:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    ENDIF
 RETURN Self

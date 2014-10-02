@@ -23,14 +23,11 @@ CLASS MaskEdit INHERIT EditBox
    PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, ::oGet:VarGet(), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
-   DATA OnCharacter      EXPORTED
-   DATA OnKey            EXPORTED
    DATA ReadOnly         EXPORTED INIT .F.
    DATA lInValid         EXPORTED INIT .F.
    DATA NoEdit           EXPORTED INIT .F.
    DATA NoOverStrike     EXPORTED INIT .F.
    DATA oGet             EXPORTED
-   DATA  __Validate      EXPORTED INIT .F.
 
    DATA CueBanner        PROTECTED
 
@@ -128,11 +125,11 @@ METHOD __Validate() CLASS MaskEdit
             SetWindowText( ::hWnd, ::oGet:buffer )
          ENDIF
 
-         IF lCaret 
+         IF lCaret
             ::ShowCaret()
          ENDIF
 
-         IF ::IsValid.AND. ::Parent:ClsName == "DataGrid"
+         IF ::IsValid .AND. ::InDataGrid
             ::SendMessage( WM_KILLFOCUS )
             ::Parent:SetFocus()
          ENDIF
@@ -181,6 +178,9 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode( msg ) CLASS MaskEdit
    LOCAL n, nRet
+   IF ::InDataGrid .AND. msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_ESCAPE}
+      RETURN ::Super:OnGetDlgCode( msg )
+   ENDIF
    IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_UP,VK_DOWN}
       ::oGet:assign()
       ::oGet:updatebuffer()
@@ -199,7 +199,7 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
             RETURN NIL
          ENDIF
       ENDIF
-      
+
       IF ::IsValid
          ::__GoToNextControl( msg:wParam )
        ELSE
@@ -210,7 +210,9 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
    ENDIF
    IF ::wParam == VK_RETURN
       ::LastKey := ::wParam
-      ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
+      IF ! ::InDataGrid
+         ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
+      ENDIF
       RETURN DLGC_WANTALLKEYS
    ENDIF
 RETURN NIL
@@ -232,17 +234,18 @@ METHOD OnUndo() CLASS MaskEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
+METHOD OnKeyDown( nwParam ) CLASS MaskEdit
    LOCAL nStart, nEnd, i, lShift, lCtrl
    IF ::ReadOnly
       RETURN(0)
    ENDIF
 
-   IF ValType( ::OnKey ) == 'B'
-      IF !eval( ::OnKey, ::oGet, ::hWnd, nwParam, nlParam )
-         RETURN 0
-      ENDIF
-   ENDIF
+//   IF ValType( ::OnWMKeyDown ) == 'B'
+//      nRet := Eval( ::OnWMKeyDown, ::oGet, nwParam, nlParam )
+//      IF nRet != NIL
+//         RETURN nRet
+//      ENDIF
+//   ENDIF
 
    IF CHR( nwParam )$"UuZz" .AND. CheckBit( GetKeyState( VK_CONTROL ) , 32768 )
       RETURN ::OnUndo( 0, 0 )
@@ -259,7 +262,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS MaskEdit
 
    DO CASE
       CASE nwParam == 27
-           IF ::Parent:ClsName == "DataGrid"
+           IF ::InDataGrid
               ::lInValid := .T.
               ::IsValid := .F.
               ::Parent:SetFocus()
@@ -376,12 +379,6 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
    ENDIF
    IF ::ReadOnly
       RETURN 0
-   ENDIF
-
-   IF ValType( ::OnCharacter ) == 'B'
-      IF ! eval( ::OnCharacter, ::oGet, ::hWnd, nwParam, nlParam )
-         RETURN 0
-      ENDIF
    ENDIF
 
    IF ::IsWindowEnabled()
@@ -531,7 +528,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
-   IF ! ::Validating .AND. nwParam <> 0
+   IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid
       ::__Validate()
 
       IF ! ::IsValid
