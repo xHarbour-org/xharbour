@@ -5135,12 +5135,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    xValue2 := 0
                  ELSE
                    xValue1 := __objSendMsg( oCtrl, UPPER( cProp ) )
-                   xValue2 := NIL
-                   IF __objHasMsg( oCtrl, "__a_"+cProp )
-                      xValue2 := __objSendMsg( oCtrl, UPPER( "__a_"+cProp ) )[4]
-                   ENDIF
-                   //xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
-
+                   xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
                 ENDIF
 
               ELSE
