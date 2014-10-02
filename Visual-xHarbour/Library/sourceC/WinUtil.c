@@ -5039,6 +5039,7 @@ HB_FUNC( VXH_MAINLOOP )
    }
 }
 
+#ifdef __XCC__
 #ifndef _PROCESS_MEMORY_COUNTERS_EX
    typedef struct _PROCESS_MEMORY_COUNTERS_EX {
      DWORD  cb;
@@ -5053,6 +5054,7 @@ HB_FUNC( VXH_MAINLOOP )
      SIZE_T PeakPagefileUsage;
      SIZE_T PrivateUsage;
    } PROCESS_MEMORY_COUNTERS_EX, *PPROCESS_MEMORY_COUNTERS_EX;
+#endif
 #endif
 
 HB_FUNC( GETPROCESSMEMORY )
