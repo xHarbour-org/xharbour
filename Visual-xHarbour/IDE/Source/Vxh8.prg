@@ -604,7 +604,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                        oCtrl:Case := 2,;
                                        oCtrl }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Name", xData, lFocus, {VK_RIGHT} ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Name", xData, nKey ) }
       :Create()
    END
 
@@ -618,7 +618,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                        oCtrl }
       :ControlAccessKey := GRID_CHAR
       :Alignment        := 3
-      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Type", xData, lFocus, {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Type", xData, nKey ) }
       :Create()
    END
 
@@ -633,7 +633,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                   oCtrl:Alignment := 3,;
                                                                                   oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), lFocus, {VK_RIGHT,VK_RETURN} ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), nKey ) }
       :Create()
    END
 
@@ -648,7 +648,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                oCtrl:Alignment := 3,;
                                                                                oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|, oGrid, xData, lFocus| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), lFocus, {VK_LEFT,VK_LEFT,VK_LEFT,VK_DOWN,VK_RETURN} ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), nKey ) }
       :Create()
    END
    ::Create()
@@ -704,9 +704,8 @@ RETURN NIL
 
 
 //------------------------------------------------------------------------------------------
-METHOD DataSave( cField, xData, lFocus, aKeys ) CLASS StrEditor
-   (aKeys)
-   IF !lFocus .AND. !EMPTY( XSTR( xData ) )
+METHOD DataSave( cField, xData ) CLASS StrEditor
+   IF ! EMPTY( XSTR( xData ) )
       IF cField == "Type"
          xData := LEFT( xData, 1 )
       ENDIF
@@ -1014,7 +1013,7 @@ METHOD Init( oParent ) CLASS TblEditor
        oCol:Create()
 
        oCol:ControlAccessKey := GRID_CHAR
-       oCol:OnSave  := {|, oGrid, xData| oGrid:DataSave( aField[1], xData ) }
+       oCol:OnSave  := {|oGrid, xData| oGrid:DataSave( aField[1], xData ) }
 
        DO CASE
           CASE aField[2]=="C"
@@ -1076,11 +1075,9 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 METHOD DataSave( cField, xData ) CLASS TblEditor
    LOCAL cType := VALTYPE( ::DataSource:Fields:&cField )
-   IF !EMPTY( XSTR( xData ) )
-      IF VALTYPE( xData ) != cType
-         xData := CStrToVal( xStr( xData ), cType )
-      ENDIF
+   IF ::DataSource:RecLock()
       ::DataSource:Fields:Put( xData, cField )
+      ::DataSource:Unlock()
       ::Parent:oSave:Enabled := .T.
    ENDIF
 RETURN .T.

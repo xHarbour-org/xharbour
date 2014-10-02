@@ -445,7 +445,7 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
                                ::oGet:buffer := SPACE( LEN( ::oGet:buffer ) )
 
                           CASE ::oGet:Type == "D"
-                               ::oGet:buffer := CTOD( "" )
+                               //::oGet:buffer := CTOD( "" )
                        ENDCASE
                        ::oGet:Assign()
                        ::oGet:UpdateBuffer()
