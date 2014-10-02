@@ -151,6 +151,17 @@ METHOD Create() CLASS Font
    IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
       ::__ClassInst := __ClsInst( ::ClassH )
       ::__ClassInst:__IsInstance  := .T.
+      ::__ClassInst:xWeight      := ::xWeight
+      ::__ClassInst:xFaceName    := ::xFaceName
+      ::__ClassInst:xWidth       := ::xWidth
+      ::__ClassInst:xEscapement  := ::xEscapement
+      ::__ClassInst:xOrientation := ::xOrientation
+      ::__ClassInst:xCharSet     := ::xCharSet
+      ::__ClassInst:xHeight      := ::xHeight
+      ::__ClassInst:xnItalic     := ::xnItalic
+      ::__ClassInst:xnUnderline  := ::xnUnderline
+      ::__ClassInst:xnStrikeOut  := ::xnStrikeOut
+      ::__ClassInst:xPointSize   := ::xPointSize
    ENDIF
 
 RETURN Self
