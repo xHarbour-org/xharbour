@@ -1658,28 +1658,28 @@ CLASS TMakeProject FROM TMakeObject
          VAR bExe_Build INIT {|Self| CreateProcessWait( ::Linker, ;
                                                         ::Link_Executable + " " + ::EXE_Command(), ;
                                                         ::Project:cFile + ".log", ;
-														"TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
          VAR bLIB_Build INIT {|Self| CreateProcessWait( ::Librarian, ;
                                                         ::Lib_Executable + " " + ::LIB_Command(), ;
                                                         ::Project:cFile + ".log", ;
-														"TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
          VAR bIMPLIB_Build INIT {|Self| CreateProcessWait( ::Librarian, ;
                                                         ::Lib_Executable + " " + ::IMPLIB_Command(), ;
                                                         ::Project:cFile + ".log", ;
-														"TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
          VAR bDLL_Build INIT {|Self| CreateProcessWait( ::Linker, ;
                                                         ::Link_Executable + " " + ::DLL_Command(), ;
                                                         ::Project:cFile + ".log", ;
-														"TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
@@ -1796,7 +1796,7 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::Link_Executable := "link.exe", ;
                                                          /*::RC_Root := Left( cRoot, RAt( '\', cRoot ) ) + "Common\MSDev98\", */;
                                                          ::RC_Root := IIF( File( s_sWinSDKFolder + "\bin\rc.exe" ), ;
-                                                                             s_sWinSDKFolder, ;
+                                                                             s_sWinSDKFolder + "\", ;
                                                                              ::C_Root ), ;
                                                          ::RC_Executable := "rc.exe", ;
                                                          ::RC_Flags := "-x ", ;
