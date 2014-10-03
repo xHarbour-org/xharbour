@@ -51,12 +51,14 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
    IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\Common7\Tools\
    IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
+   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
    GOTO FIND_BISON
 
 :SET_VC2012
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
    IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 11.0\Common7\Tools\
    IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
+   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
    GOTO FIND_BISON
 
 :SET_VC2010X86
