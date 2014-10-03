@@ -12,7 +12,7 @@
    #define CINTERFACE 1
 #endif
 
-#define NONAMELESSUNION
+//#define NONAMELESSUNION
 
 #include <tchar.h>
 #include <stdio.h>
@@ -1687,8 +1687,8 @@ PHB_ITEM ProcessVar( ITypeInfo * pITypeInfo, VARDESC *pVarDesc, char **psDesc, P
    {
       case VAR_CONST:
       {
-         long lConstant = pVarDesc->lpvarValue->n1.n2.n3.lVal;
-         const char *sVTName = GetVTName( pVarDesc->lpvarValue->n1.n2.vt );
+         long lConstant = pVarDesc->lpvarValue->lVal;
+         const char *sVTName = GetVTName( pVarDesc->lpvarValue->vt );
 
          snprintf( s, 512, "         %ls = %i (%s)-> %ls\n", bstrVarName, lConstant, sVTName, bstrDoc );
 
@@ -1698,7 +1698,7 @@ PHB_ITEM ProcessVar( ITypeInfo * pITypeInfo, VARDESC *pVarDesc, char **psDesc, P
          hb_vmDo(0);
          hb_itemCopy( pVar, hb_stackReturnItem() );
 
-         hb_itemPutNL( pTemp, pVarDesc->lpvarValue->n1.n2.vt );
+         hb_itemPutNL( pTemp, pVarDesc->lpvarValue->vt );
          //hb_objSendMsg( pVar, "_VT", 1, pTemp );
          hb_vmPushSymbol( s_pSym_VT->pSymbol );
          hb_vmPush( pVar );
