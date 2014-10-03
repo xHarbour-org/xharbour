@@ -7,7 +7,7 @@
 #endif
 
 #ifndef NONAMELESSUNION
-   #define NONAMELESSUNION
+   //#define NONAMELESSUNION
 #endif
 #define _WIN32_DCOM
 
@@ -2012,25 +2012,25 @@ BOOL AxAtlSetProp( IDispatch* lpDispatch, LPSTR cProp, PHB_ITEM pValue )
       {
          memset(&pArgs, 0, sizeof pArgs);
 
-         pArgs.n1.n2.vt = result.n1.n2.vt;
+         pArgs.vt = result.vt;
 
-         switch( result.n1.n2.vt )
+         switch( result.vt )
          {
             case VT_BSTR:
                  bstrValue = hb_oleAnsiToSysString( hb_itemGetCPtr( pValue ) );
-                 pArgs.n1.n2.n3.bstrVal = bstrValue;
+                 pArgs.bstrVal = bstrValue;
                  break;
 
             case VT_I2:
-                 pArgs.n1.n2.n3.intVal = hb_itemGetNI( pValue );
+                 pArgs.intVal = hb_itemGetNI( pValue );
                  break;
 
             case VT_I4:
-                 pArgs.n1.n2.n3.lVal = hb_itemGetNL( pValue );
+                 pArgs.lVal = hb_itemGetNL( pValue );
                  break;
 
             case VT_BOOL:
-                 pArgs.n1.n2.n3.boolVal = hb_itemGetL( pValue ) ? VARIANT_TRUE : VARIANT_FALSE;
+                 pArgs.boolVal = hb_itemGetL( pValue ) ? VARIANT_TRUE : VARIANT_FALSE;
                  break;
          }
 
@@ -2079,14 +2079,14 @@ HB_FUNC( __AXGETPROPERTY )
       {
          IUnknown  *pUnk   = NULL;
          IDispatch *pDisp  = NULL;
-         switch( result.n1.n2.vt )
+         switch( result.vt )
          {
             case VT_DISPATCH:
-                 hb_retnl( (long) result.n1.n2.n3.pdispVal );
+                 hb_retnl( (long) result.pdispVal );
                  break;
 
             case VT_UNKNOWN:
-                 pUnk = result.n1.n2.n3.punkVal;
+                 pUnk = result.punkVal;
                  if( pUnk )
                  {
                     pDispPtr = pDisp;
@@ -2096,24 +2096,24 @@ HB_FUNC( __AXGETPROPERTY )
                  break;
 
             case VT_BOOL:
-                 hb_retl( (BOOL) result.n1.n2.n3.boolVal );
+                 hb_retl( (BOOL) result.boolVal );
                  break;
 
             case VT_I4:
-                 hb_retnl( (long) result.n1.n2.n3.plVal );
+                 hb_retnl( (long) result.plVal );
                  break;
 
             case VT_I2:
-                 hb_retni( (int) result.n1.n2.n3.pintVal );
+                 hb_retni( (int) result.pintVal );
                  break;
 
             case VT_BSTR:
             {
-                 int iLen = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.n1.n2.n3.bstrVal, -1, NULL, 0, NULL, NULL );
+                 int iLen = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.bstrVal, -1, NULL, 0, NULL, NULL );
                  if ( iLen )
                  {
                     char *cString = (char *) hb_xgrab( iLen );
-                    WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.n1.n2.n3.bstrVal, -1, cString, iLen, NULL, NULL );
+                    WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.bstrVal, -1, cString, iLen, NULL, NULL );
                     hb_retc( cString );
                     hb_xfree( cString );
                  }
@@ -2163,13 +2163,13 @@ HB_FUNC( __AXCALLMETHOD )
             switch( pItem->type )
             {
                case HB_IT_STRING:
-                  pArgs[n].n1.n2.vt = VT_BSTR;
-                  pArgs[n].n1.n2.n3.bstrVal = hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) );
+                  pArgs[n].vt = VT_BSTR;
+                  pArgs[n].bstrVal = hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) );
                   break;
 
                case HB_IT_LOGICAL:
-                  pArgs[n].n1.n2.vt = VT_BOOL;
-                  pArgs[n].n1.n2.n3.boolVal = hb_itemGetL( pItem ) ? VARIANT_TRUE : VARIANT_FALSE;
+                  pArgs[n].vt = VT_BOOL;
+                  pArgs[n].boolVal = hb_itemGetL( pItem ) ? VARIANT_TRUE : VARIANT_FALSE;
             }
          }
          pParams.cArgs = iCount;
@@ -2182,14 +2182,14 @@ HB_FUNC( __AXCALLMETHOD )
       {
          IUnknown  *pUnk   = NULL;
          IDispatch *pDisp  = NULL;
-         switch( result.n1.n2.vt )
+         switch( result.vt )
          {
             case VT_DISPATCH:
-                 hb_retnl( (long) result.n1.n2.n3.pdispVal );
+                 hb_retnl( (long) result.pdispVal );
                  break;
 
             case VT_UNKNOWN:
-                 pUnk = result.n1.n2.n3.punkVal;
+                 pUnk = result.punkVal;
                  if( pUnk )
                  {
                     pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
@@ -2198,24 +2198,24 @@ HB_FUNC( __AXCALLMETHOD )
                  break;
 
             case VT_BOOL:
-                 hb_retl( (BOOL) result.n1.n2.n3.boolVal );
+                 hb_retl( (BOOL) result.boolVal );
                  break;
 
             case VT_I4:
-                 hb_retnl( (long) result.n1.n2.n3.plVal );
+                 hb_retnl( (long) result.plVal );
                  break;
 
             case VT_I2:
-                 hb_retni( (int) result.n1.n2.n3.pintVal );
+                 hb_retni( (int) result.pintVal );
                  break;
 
             case VT_BSTR:
             {
-                 int iLen = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.n1.n2.n3.bstrVal, -1, NULL, 0, NULL, NULL );
+                 int iLen = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.bstrVal, -1, NULL, 0, NULL, NULL );
                  if ( iLen )
                  {
                     char *cString = (char *) hb_xgrab( iLen );
-                    WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.n1.n2.n3.bstrVal, -1, cString, iLen, NULL, NULL );
+                    WideCharToMultiByte( CP_ACP, 0, (LPCWSTR) result.bstrVal, -1, cString, iLen, NULL, NULL );
                     hb_retc( cString );
                     hb_xfree( cString );
                  }
