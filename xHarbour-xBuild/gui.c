@@ -14,7 +14,7 @@
    #define CINTERFACE 1
 #endif
 
-#define NONAMELESSUNION
+//#define NONAMELESSUNION
 
 #include "windows.h"
 #include "commctrl.h"
