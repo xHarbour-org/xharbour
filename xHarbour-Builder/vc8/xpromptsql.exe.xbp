@@ -24,6 +24,8 @@ TARGETFOLDER = \xhb\bin\vc8
 
 [\xharbour\utils\xbscript\xbscript.prg]
 
+[fix.odbccp32.lib.sdk710.c]
+
 [sql.lib]
 
 [libmysql.lib]

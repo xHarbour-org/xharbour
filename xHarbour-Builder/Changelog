@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-06 23:48 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  + vc8\fix.odbccp32.lib.sdk710.c
+    + New file to workaround versions 7,7.,8 and 8.1 of PSDK odbccp32.lib
+      requiring a DLL version of vnprintf()
+  * vc8\xPromptSQL.exe.xbp
+    + Added fix.odbccp32.lib.sdk710.c
+ 
 2014-03-01 14:56 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * stdlib.files.inc
   * xcc\mtdll.files.inc
