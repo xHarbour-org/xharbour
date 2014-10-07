@@ -8,9 +8,6 @@
 //#define UNICODE
 //#define _UNICODE
 
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
 
 //#define NONAMELESSUNION
 
@@ -25,6 +22,8 @@
 #include "hbvm.h"
 #include "hbvmpub.h"
 
+// Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <ole2.h>
 #include <winreg.h>

@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-07 00:22 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source\TypeLib.c
+  * source\oleserver.c
+    * Use new .ORG's "cinterface.h"
+
 2013-06-01 01:10 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source\oleserver.c
     ! Moved #pragma comment section to top, to fix linker export directives generation under xcc

@@ -22,9 +22,6 @@
   #endif
 #endif
 
-#define CINTERFACE 1
-//#define NONAMELESSUNION
-
 #define HB_NO_DEFAULT_API_MACROS
 //#define HB_NO_DEFAULT_STACK_MACROS
 
@@ -41,6 +38,8 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <ole2.h>
 #include <olectl.h>
