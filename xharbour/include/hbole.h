@@ -62,33 +62,6 @@
 #if defined(_MSC_VER) && !defined(HB_OS_WIN_64) && \
     !defined(__LCC__) && !defined(__POCC__) && !defined(__XCC__)
 
-#ifndef CINTERFACE
-#define CINTERFACE 1
-#endif
-
-#ifndef _REFGUID_DEFINED
-#define _REFGUID_DEFINED 1
-#define REFGUID const GUID * const
-#endif
-
-#ifndef _REFIID_DEFINED
-#define _REFIID_DEFINED 1
-#define REFIID const IID * const
-#endif
-
-#ifndef _REFCLSID_DEFINED
-#define _REFCLSID_DEFINED 1
-#define REFCLSID const IID * const
-#endif
-
-#ifndef _REFFMTID_DEFINED
-#define _REFFMTID_DEFINED 1
-#define REFFMTID const IID * const
-#endif
-
-#ifndef _SYS_GUID_OPERATOR_EQ_
-#define _SYS_GUID_OPERATOR_EQ_ 1
-#endif  // _SYS_GUID_OPERATOR_EQ_
-
+   #include "cinterface.h"
 #endif  // _MSC_VER
 #endif  // HB_OLE_H_

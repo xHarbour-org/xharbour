@@ -65,6 +65,8 @@
          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
+         // Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+         #include "cinterface.h"
          #include <windows.h>
 
          #define HB_INET_CLOSE( x )    closesocket( x )

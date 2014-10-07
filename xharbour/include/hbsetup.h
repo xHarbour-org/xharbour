@@ -350,6 +350,8 @@
    Visual Studio 2005, version 8.0         1400
    Visual Studio 2008, version 9.0         1500
    Visual Studio 2010, version 10.0        1600
+   Visual Studio 2012, version 11.0        1700
+   Visual Studio 2013, version 12.0        1800
 */
 
 /* ***********************************************************************

@@ -75,28 +75,7 @@
  *
  */
 
-#include "hbole.h"
-#include <tchar.h>
-#include <stdlib.h>
-
-#define TTS_BALLOON             0x40 // added by MAG
-
-
-#define WINVER 0x0500
-
-#ifndef _WIN32_WINNT
-   #define _WIN32_WINNT 0x0500
-#endif
-
-#ifndef _WIN32_IE
-   #define _WIN32_IE 0x0400
-#endif
-
 #include "hbgtwvw.h"
-
-#include <windows.h>
-#include <commctrl.h>
-
 
 HB_FUNC( WVW_YESCLOSE )
 {

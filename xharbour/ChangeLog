@@ -8,6 +8,37 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-06 23:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  + include/cinterface.h
+    + New header to define CINTERFACE and genericly workaround missing
+      incomplete CINTERFACE support in Windows SDK's guiddef.h and propkeydef.h
+
+  * include/hbole.h
+    * Moved CINTERFACE workaround to new cinterface.h
+ 
+  * include/hbatomic.h
+  * include/hbdefs.h
+  * include/hbstack.h
+  * include/inet.h
+  * include/thread.h
+    * Added #include "cinterface.h" to precede all #include <windows.h>
+
+  * include/hbsetup.h
+    * Added latest versions of Visual Studio to the notes
+
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/wvwcheck.c
+  * contrib/gtwvw/wvwdraw.c
+  * contrib/gtwvw/wvwedit.c
+  * contrib/gtwvw/wvwfuncs.c
+  * contrib/gtwvw/wvwmenu.c
+  * contrib/gtwvw/wvwpush.c
+  * contrib/gtwvw/wvwstbar.c
+  * contrib/gtwvw/wvwtbar.c
+    * Moved replicated redundant code to header hbgtwvw.h
+    * Use new cinterface.h  
+
 2014-10-03 16:27 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * make_vc.bat
    + Auto detection of RC.exe

@@ -85,10 +85,9 @@ typedef struct _HB_STACKRDD_TLS
    /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
    #define WIN32_LEAN_AND_MEAN
 
-   #ifndef CINTERFACE
-   #define CINTERFACE
-   #endif
 
+   // Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+   #include "cinterface.h"
    #include <windows.h>
 #endif
 

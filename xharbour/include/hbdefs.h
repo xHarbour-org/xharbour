@@ -53,8 +53,6 @@
 #ifndef HB_DEFS_H_
 #define HB_DEFS_H_
 
-#include "hbole.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,6 +125,8 @@
 
    #define WIN32_LEAN_AND_MEAN
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+// Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+   #include "cinterface.h"
    #include <windows.h>
    #if defined( __GNUC__ )
       #define HB_DONT_DEFINE_BASIC_TYPES

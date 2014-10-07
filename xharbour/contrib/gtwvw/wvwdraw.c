@@ -75,29 +75,8 @@
  *
  */
 
-#if defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
-   #if !defined( _CRT_SECURE_NO_WARNINGS )
-      #define _CRT_SECURE_NO_WARNINGS
-   #endif
-#endif
-
-#include "hbole.h"
-#include <tchar.h>
-#include <stdlib.h>
-
-#define TTS_BALLOON             0x40 // added by MAG
-
-#define WINVER 0x0500
-#define _WIN32_WINNT 0x0500
-
-  #ifndef _WIN32_IE
-    #define _WIN32_IE 0x0400
-#endif
-
 #include "hbgtwvw.h"
 
-#include <windows.h>
-#include <commctrl.h>
 static COLORREF _COLORS[] = {
    BLACK,
    BLUE,
