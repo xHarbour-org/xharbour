@@ -2,6 +2,15 @@
  * $Id:
  */
 
+2014-10-06 23:56 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * crt\src\g.bat
+  * xcc\g.bat
+  * xlib\g.bat
+  * xlink\g.bat
+  * xrc\g.bat
+    * Minor synch and refinment in the MSVC FIND block
+    * Avoid redundant calls to vcvarsall.bat
+
 2013-06-03 22:51 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
    % xcc\cc\init.c
      % Optimized find_elem() by creating optimized add_elem_find_elem() and get_elem_find_elem()

@@ -10,6 +10,7 @@ ECHO ON
    SET _PRESET_PSDKDIR=%PSDKDIR%
    SET _PRESET_PELLESCDIR=%PELLESCDIR%
 
+IF NOT "%MSVCDIR%"=="" GOTO READY
 :FIND_VC
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
@@ -60,21 +61,21 @@ ECHO ON
    GOTO READY
 
 :SET_VC2005
-   CALL "%ProgramFiles%\Microsoft Visual Studio 8\vc\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
    SET PSDKDIR=%ProgramFiles%\Microsoft Visual Studio 8\Common7\Tools
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2003
-   CALL "%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
-   CALL "%ProgramFiles%\Microsoft Visual Studio\VC98\vcvarsall.bat"
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :NONE

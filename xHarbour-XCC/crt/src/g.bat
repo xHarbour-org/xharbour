@@ -6,6 +6,7 @@ SET _PRESET_LIB=%LIB%
 SET _PRESET_CFLAGS=%CFLAGS%
 SET _PRESET_LFLAGS=%LFLAGS%
  
+IF NOT "%MSVCDIR%"=="" GOTO READY
 :FIND_VC
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
@@ -21,47 +22,55 @@ SET _PRESET_LFLAGS=%LFLAGS%
 
 :SET_VC2013
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2012X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2012
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2010X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2010
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
-
 :SET_VC2008
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v6.0A
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2005
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft Visual Studio 8\Common7\Tools
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2003
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
