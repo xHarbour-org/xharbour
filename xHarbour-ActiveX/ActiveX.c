@@ -16,6 +16,8 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 
+#define WIN32_LEAN_AND_MEAN
+#include "cinterface.h"
 #include <windows.h>
 
 #include <olectl.h>
