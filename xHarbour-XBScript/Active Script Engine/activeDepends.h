@@ -25,8 +25,8 @@
 
 #include <crtdbg.h>
 
-// To avoid hack forcing C mode in hbole.h
-#define HB_OLE_H_
+// To avoid hack forcing C mode in cinterface.h
+#define CINTERFACE_H_
 
 #ifdef CLASSFACTORY
 #define XBSCRIPT
