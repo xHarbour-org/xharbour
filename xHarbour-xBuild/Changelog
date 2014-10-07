@@ -8,22 +8,26 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2013-06-02 20:29 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+2014-10-07 00:35 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
+  * gui.c
+    * Use .ORG's new cinterface.h
+
+2013-06-02 20:29 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * tproject-c.c
     - Removed redundant code copy/pasted from tproject.prg
 
   * tproject.prg
     * Added missining support for copying :h[*]EnvVars Hashes of parent to sub project
 
-2013-06-01 01:16 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+2013-06-01 01:16 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * tproject.prg
     * Commented workaround of using xLib to generate implib instead of xLink
 
-2013-03-17 21:02 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+2013-03-17 21:02 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * tproject-c.c
     * HB_ITEM_PTR and HB_MACRO_PTR -> PHB_ITEM and PHB_MACRO
 
-2012-09-17 19:11 UTC-0700 Ron Pinkas <Ron in xHarbour.com>
+2012-09-17 19:11 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * tproject.prg
     + Added HACK support for IMP LIB generation to follow DLL generation.
 

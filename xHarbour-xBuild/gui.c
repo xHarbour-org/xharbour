@@ -10,12 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
-
 //#define NONAMELESSUNION
 
+// Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+#include "cinterface.h"
 #include "windows.h"
 #include "commctrl.h"
 #include "shlwapi.h"
