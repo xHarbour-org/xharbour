@@ -1847,7 +1847,7 @@ static HB_ERRCODE sixCreate( SIXAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    pArea->szDataFileName = hb_strdup( path );
 
-   pArea->uiSxArea = sx_CreateNew( (PBYTE)path, (PBYTE)pCreateInfo->atomAlias,
+   pArea->uiSxArea = sx_CreateNew( (const char *)path, (const char *)pCreateInfo->atomAlias,
                ( SHORT ) sixFileType, ( SHORT ) pArea->area.uiFieldCount );
 
    if( pArea->uiSxArea == 0 )
@@ -2161,7 +2161,7 @@ static HB_ERRCODE sixOpen( SIXAREAP pArea, LPDBOPENINFO pOpenInfo )
    do  {
 
       iErrorLevel = sx_ErrorLevel( 2 );
-      pArea->uiSxArea = sx_Use( (PBYTE)path, (PBYTE)pOpenInfo->atomAlias,
+      pArea->uiSxArea = sx_Use( (char *)path, (const char *)pOpenInfo->atomAlias,
                                 ( pOpenInfo->fReadonly ) ? READONLY :
                                 ( ( pOpenInfo->fShared ) ? READWRITE : EXCLUSIVE ),
                                 ( SHORT ) pArea->iFileType );
@@ -2684,12 +2684,12 @@ static HB_ERRCODE sixOrderCreate( SIXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       iOptions = IDX_UNIQUE;
 
    if( isCompound )
-      usOrder = sx_IndexTag( (PBYTE)pOrderInfo->abBagName, (PBYTE)pOrderInfo->atomBagName,
+      usOrder = sx_IndexTag( (const char *)pOrderInfo->abBagName, (const char *)pOrderInfo->atomBagName,
           hb_itemGetCPtr( pExprItem ), iOptions,
           ( pArea->area.lpdbOrdCondInfo )? pArea->area.lpdbOrdCondInfo->fDescending : FALSE,
           ( pArea->area.lpdbOrdCondInfo && pArea->area.lpdbOrdCondInfo->abFor ) ? pArea->area.lpdbOrdCondInfo->abFor : "" );
    else
-      usOrder = sx_Index( (PBYTE)pOrderInfo->abBagName, hb_itemGetCPtr( pExprItem ), iOptions,
+      usOrder = sx_Index( (const char *)pOrderInfo->abBagName, hb_itemGetCPtr( pExprItem ), iOptions,
         ( pArea->area.lpdbOrdCondInfo )? pArea->area.lpdbOrdCondInfo->fDescending : FALSE,
         ( pArea->area.lpdbOrdCondInfo && pArea->area.lpdbOrdCondInfo->abFor ) ? pArea->area.lpdbOrdCondInfo->abFor :  "" );
 

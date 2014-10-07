@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-07 00:03 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  ! six1.c
+    ! Fixed MSVC compilation, which was broken for few years without notice
+
 2010-06-15 15:40 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   ! rddsix.h
     six1.c
