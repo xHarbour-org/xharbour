@@ -2,13 +2,11 @@
  * $Id$
  */
 
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <olectl.h>
 

@@ -1,6 +1,9 @@
 /*
  * $Id$
  */
+
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 //#include <commdlg.h>
 #include <commctrl.h>

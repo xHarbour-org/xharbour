@@ -16,6 +16,8 @@
 
 //#include "winreg.h"
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <unknwn.h>
 #include <commdlg.h>

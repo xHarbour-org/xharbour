@@ -5,6 +5,8 @@
 #define TMT_FONT     210
 
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <winuser.h>
 #include "item.api"

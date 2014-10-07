@@ -2,6 +2,8 @@
 
 #define DUMMYUNIONNAME
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <Windows.h>
 #include <commctrl.h>
 #include <shlobj.h>

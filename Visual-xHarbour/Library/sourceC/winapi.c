@@ -31,11 +31,6 @@
 
 
 #define _WIN32_WINNT 0x0500
-
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
-
 #define WIN32_LEAN_AND_MEAN
 
 #include "item.api"
@@ -49,6 +44,8 @@
 #include "hbpcode.h"
 #include "hbstack.h"
 
+// Don't move, must precede any #include of Windows to fix guiddef.h BUG!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <unknwn.h>
 #include <commdlg.h>

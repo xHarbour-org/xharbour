@@ -2,13 +2,9 @@
  * $Id$
  */
 
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
-
-#ifndef NONAMELESSUNION
+//#ifndef NONAMELESSUNION
    //#define NONAMELESSUNION
-#endif
+//#endif
 #define _WIN32_DCOM
 
 #define SEE_MASK_NOASYNC           0x00000100
@@ -26,6 +22,8 @@
 #define _WIN32_DCOM
 #endif
 
+// Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
+#include "cinterface.h"
 #include <windows.h>
 #include <process.h>
 #include <objbase.h>
@@ -90,7 +88,7 @@ BOOL GetName(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi, DWORD dwFlags, LPSTR lpFriend
 #define COLORREF2RGB(Color) (Color & 0xff00) | ((Color >> 16) & 0xff) | ((Color << 16) & 0xff0000)
 
 #define ECM_FIRST  0x1500
-#define EM_SETCUEBANNER    (ECM_FIRST + 1)
+//#define EM_SETCUEBANNER    (ECM_FIRST + 1)
 
 HB_EXTERN_BEGIN
 extern BSTR hb_oleAnsiToSysString( const char *cString );
@@ -4306,8 +4304,8 @@ typedef struct XCCLVTILEINFO {
    #endif
 } XCCLVTILEINFO, *PXCCLVTILEINFO;
 
-#define LVM_SETVIEW             (LVM_FIRST + 142)
-#define LVM_SETTILEINFO         (LVM_FIRST + 164)
+//#define LVM_SETVIEW             (LVM_FIRST + 142)
+//#define LVM_SETTILEINFO         (LVM_FIRST + 164)
 
 HB_FUNC( __LISTVIEWSETVIEW )
 {
@@ -5040,7 +5038,7 @@ HB_FUNC( VXH_MAINLOOP )
 }
 
 #ifdef __XCC__
-#ifndef _PROCESS_MEMORY_COUNTERS_EX
+#if 0
    typedef struct _PROCESS_MEMORY_COUNTERS_EX {
      DWORD  cb;
      DWORD  PageFaultCount;

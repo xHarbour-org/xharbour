@@ -8,6 +8,18 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-07 00:11 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * Library/SourceC/ExplorBar.c
+  * Library/SourceC/FastWinAPI.c
+  * Library/SourceC/ListViewBrowse.c
+  * Library/SourceC/LoadPic.c
+  * Library/SourceC/ShellFunc.c
+  * Library/SourceC/TreeViewBrowse.c
+  * Library/SourceC/WinUtil.c
+  * Library/SourceC/winXPapi.c
+  * Library/SourceC/winapi.c
+    * Use new .ORG's "cinterface.h"
+
 2013-05-27 18:58 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * Library/sourceC/winutil.c
     ! Fixed bug in TranslateVXHAccel() resulting from wrong comparison due to missing ()
