@@ -281,6 +281,16 @@ HB_FUNC( HB_FGOTO )
 
 HB_FUNC( HB_FGOBOTTOM )
 {
+    while ( !isEof[area] )
+    {
+        hb_hbfskip( 1 );
+    }
+
+    last_rec[area] = hb_hbfskip( 0 );
+}
+/*
+HB_FUNC( HB_FGOBOTTOM )
+{
    int x;
    int len;
    ULONG loc, last;
@@ -322,7 +332,7 @@ HB_FUNC( HB_FGOBOTTOM )
       last_off[area] = last;
    }
 }
-
+*/
 HB_FUNC( HB_FGOTOP )
 {
    offset[area] = 0L;

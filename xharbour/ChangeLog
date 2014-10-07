@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-07 19:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/misc/hb_f.c
+    ! more fixes to HB_FGOBOTTOM() function
+
 2014-10-06 23:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   + include/cinterface.h
     + New header to define CINTERFACE and genericly workaround missing
