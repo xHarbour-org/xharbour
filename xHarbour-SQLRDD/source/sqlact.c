@@ -5,6 +5,8 @@
 * All Rights Reserved
 */
 
+#define WIN32_LEAN_AND_MEAN 
+
 #include "compat.h"
 #include "hbsql.h"
 

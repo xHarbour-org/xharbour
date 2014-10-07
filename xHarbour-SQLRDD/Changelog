@@ -8,6 +8,13 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2014-10-07 00:29 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/sqlact.c
+  * source/sqllex.c
+    + Added #define WIN32_LEAN_AND_MEAN to protect against inlusion of winsock2.h
+      due to #define conflict of GROUP with sqly.h
+
 2014-07-07 11:06   UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlex1.c
     ! added cast to line 2205
