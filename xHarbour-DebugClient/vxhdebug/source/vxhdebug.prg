@@ -198,7 +198,6 @@ METHOD ProcessOutput() CLASS XHDebugger
          cString += Left( s, n )
       ENDDO
       IF Len( cString ) > 0
-         VIEW cString
          cString += EOL
          DO WHILE ( n := At( EOL, cString ) ) > 0
             cMessage := Left( cString, n - 1 )
