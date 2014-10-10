@@ -11,6 +11,7 @@ ECHO ON
    SET _PRESET_PELLESCDIR=%PELLESCDIR%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
@@ -22,6 +23,13 @@ ECHO ON
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
    GOTO NONE
+
+:SET_VC2013X86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
+   IF "%VS120COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Common7\Tools\
+   IF NOT "%VS120COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
+   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
+   GOTO FIND_BISON
 
 :SET_VC2013
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
