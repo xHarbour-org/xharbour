@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-10 11:22 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
+  * make_vc
+    + Auto detect of Microsoft Visual Studio 12.0 for 64 bits
+
 2014-10-07 19:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/misc/hb_f.c
     ! more fixes to HB_FGOBOTTOM() function
