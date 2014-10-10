@@ -6,7 +6,6 @@ SET _PRESET_LIB=%LIB%
 SET _PRESET_CFLAGS=%CFLAGS%
 SET _PRESET_LFLAGS=%LFLAGS%
 
-IF NOT "%MSVCDIR%"=="" GOTO READY 
 :FIND_VC
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86

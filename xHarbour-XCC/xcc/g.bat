@@ -10,7 +10,6 @@ ECHO ON
    SET _PRESET_PSDKDIR=%PSDKDIR%
    SET _PRESET_PELLESCDIR=%PELLESCDIR%
 
-IF NOT "%MSVCDIR%"=="" GOTO READY
 :FIND_VC
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
