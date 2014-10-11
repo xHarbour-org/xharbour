@@ -5,6 +5,6 @@ SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 SET __MSC__=12
 
 SET HB_DIR_ADS=\Program Files\Advantage 11.10\acesdk
-SET HB_DOR_OPENSSL=\OpenSSL-Win32
+SET HB_DIR_OPENSSL=\OpenSSL-Win32
 
 CD \xharbour
