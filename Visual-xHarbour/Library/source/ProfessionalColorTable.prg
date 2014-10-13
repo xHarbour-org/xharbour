@@ -44,8 +44,8 @@ CLASS ProfessionalColorTable
    DATA Theme                                EXPORTED INIT ""
    DATA cScheme                              EXPORTED
 
-   DATA TitleBackColorActive                 EXPORTED INIT RGB( 255, 230, 151 )
-   DATA TitleBackColorInactive               EXPORTED INIT RGB(  69,  89, 124 )
+   DATA TitleBackColorActive                 EXPORTED INIT RGB(70,130,180)
+   DATA TitleBackColorInactive               EXPORTED INIT RGB(70,130,180)
 
    DATA Pen                                  EXPORTED INIT {=>}
    DATA Brush                                EXPORTED INIT {=>}
@@ -204,8 +204,8 @@ METHOD Load( cScheme ) CLASS ProfessionalColorTable
            ::ToolStripPanelGradientBegin            := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB(215, 215, 229) )
            ::ToolStripPanelGradientEnd              := IIF( ::UseSystemColors, RGB(249, 248, 249), RGB(243, 243, 247) )
 
-           ::TitleBackColorActive                   := RGB( 209, 16, 26 )
-           ::TitleBackColorInactive                 := RGB( 152, 12, 19 )
+           ::TitleBackColorActive                   := RGB(70,130,180)
+           ::TitleBackColorInactive                 := RGB(70,130,180)
 
       CASE cScheme == "MediaCenter"
            ::ButtonCheckedGradientBegin             := IIF( ::UseSystemColors, NIL, RGB(226, 229, 238) )
