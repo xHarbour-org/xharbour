@@ -18,8 +18,8 @@ FUNCTION Build_xHB_Setup(cOFw,cVersion)
    ? ">"+cRevision+"<"
 
    DO CASE
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.8")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.8\bin\x86\"
+      CASE IsDirectory("C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\")
+                  cAI:="C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\bin\x86\"
       OTHER
           ?     "Geen Advanced installer gevonden"
           Alert("Geen Advanced installer gevonden")
@@ -30,16 +30,16 @@ FUNCTION Build_xHB_Setup(cOFw,cVersion)
    cAIP:="C:\xHB-SetupFiles\xHB.aip"
 
    IF "DEMO"$cVersion
-      cOriginalAIP:= "W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Demo.aip"
+      cOriginalAIP:= "\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Demo.aip"
    ELSE
-      cOriginalAIP:= "W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD.aip"
+      cOriginalAIP:= "\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD.aip"
    ENDIF
 
    cBuild+='COPY '+cOriginalAIP+' '+cAIP+' /Y'+CRLF
    cBuild+='MD C:\xHB-SetupFiles\Resources'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\xHB-Files\*.vbs /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\xHB-Files\*.vbs /Y'+CRLF
 
    //----------------------------------------------------------------------------------------------------//
 
@@ -99,7 +99,7 @@ FUNCTION Build_xHB_Setup(cOFw,cVersion)
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /build '+cAIP+CRLF+CRLF
 
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
 
    cBuild+='RD C:\xHB-SetupFiles\xHB-cache /Q /S'+CRLF
    cBuild+='RD C:\xHB-SetupFiles\Resources /Q /S'+CRLF

@@ -15,8 +15,8 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
    ENDIF
 
    DO CASE
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.8")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.8\bin\x86\"
+      CASE IsDirectory("C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\")
+                  cAI:="C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\bin\x86\"
       OTHER
           ?     "Geen Advanced installer gevonden"
           Alert("Geen Advanced installer gevonden")
@@ -41,15 +41,15 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
    cAIP:="C:\xHB-SetupFiles\xHB.aip"
 
    IF cEdition="DEMO"
-      cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Demo.aip '+cAIP+' /Y'+CRLF
+      cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Demo.aip '+cAIP+' /Y'+CRLF
    ELSE
-      cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB.aip '+cAIP+' /Y'+CRLF
+      cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB.aip '+cAIP+' /Y'+CRLF
    ENDIF
    cBuild+='MD C:\xHB-SetupFiles\Resources'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini C:\xHB-SetupFiles\xHB-Files\Bin\*.ini /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\xHB-Files\*.vbs /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini C:\xHB-SetupFiles\xHB-Files\Bin\*.ini /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\xHB-Files\*.vbs /Y'+CRLF
 
    //----------------------------------------------------------------------------------------------------//
 
@@ -58,7 +58,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "xPrompt"'+;
             ' -desc "xPrompt"'+;
             ' -target "APPDIR\bin\xPrompt.exe"'+;
-			' -icon W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\xPrompt2.ico'+;
+			' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\xPrompt2.ico'+;
             ' -dir SHORTCUTDIR'+;
             ' -wkdir APPDIR'+;
             CRLF+CRLF
@@ -91,7 +91,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "Visual xDebugger"'+;
             ' -desc "Visual xDebugger"'+;
             ' -target "APPDIR\bin\xDebugW.exe"'+;
-			' -icon W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\bug.ico'+;
+			' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\bug.ico'+;
             ' -dir SHORTCUTDIR'+;
             ' -wkdir APPDIR\bin'+;
             CRLF+CRLF
@@ -122,7 +122,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "Visual xHarbour"'+;
             ' -desc "Visual xHarbour"'+;
             ' -target "APPDIR\Visual xHarbour.url"'+;
-			' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+			' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -130,7 +130,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "xHarbour Builder Buttons"'+;
             ' -desc "xHarbour Builder Buttons"'+;
             ' -target "APPDIR\xHarbour Builder Buttons.url"'+;
-            ' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+            ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -138,7 +138,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "xHarbour documentation online"'+;
             ' -desc "xHarbour documentation online"'+;
             ' -target "APPDIR\xHarbour.doc.url"'+;
-			' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+			' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -146,7 +146,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "xHarbour.com website"'+;
             ' -desc "xHarbour.com website"'+;
             ' -target "APPDIR\xHarbour.com.url"'+;
-            ' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+            ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -154,7 +154,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
             ' -name "xHarbour.org website"'+;
             ' -desc "xHarbour.org website"'+;
             ' -target "APPDIR\xHarbour.org.url"'+;
-            ' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+            ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -189,7 +189,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /build '+cAIP+CRLF+CRLF
 
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
 
    cBuild+='RD C:\xHB-SetupFiles\xHB-cache /Q /S'+CRLF
    cBuild+='RD C:\xHB-SetupFiles\Resources /Q /S'+CRLF

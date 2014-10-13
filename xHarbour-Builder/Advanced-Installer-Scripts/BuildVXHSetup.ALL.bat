@@ -1,13 +1,13 @@
     RD c:\xHB-SetupFiles\vxh\ /Q /S
 
-REM @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Demo
-REM W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe DEMO W
+REM @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Demo
+REM C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe DEMO C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Personal
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe PERS W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Personal
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe PERS C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Professional
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe PROF W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Professional
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe PROF C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Enterprise
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe ENT W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-VXH.bat Enterprise
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Setup.exe ENT C

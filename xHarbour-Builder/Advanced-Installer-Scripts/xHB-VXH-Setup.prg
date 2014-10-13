@@ -9,17 +9,15 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
       cOFw:="C"
    ENDIF
 
-   cTmp:=MemoRead("W:\xHarbour.com\Visual-xHarbour\IDE\Source\VXH1.PRG")
+   cTmp:=MemoRead("\xHarbour.com\Visual-xHarbour\IDE\Source\VXH1.PRG")
    nTmp1:=At("#define VXH_Version",cTmp)
-//   cVersion:=SubStr(cTmp,nTmp1+26,3)
-//   ? ">"+cVersion+"<"
    nTmp2:=At("#define VXH_BuildVersion",cTmp)
    cRevision:="Build "+CMonth(Date())+"-"+NtoC(Day(Date()))+"-"+NtoC(Year(Date()))+" v"+SubStr(cTmp,nTmp1+26,3)+"."+SubStr(cTmp,nTmp2+26,3)
    ? ">"+cRevision+"<"
 
    DO CASE
-      CASE IsDirectory("C:\Program Files\Caphyon\Advanced Installer 9.8")
-                  cAI:="C:\Program Files\Caphyon\Advanced Installer 9.8\bin\x86\"
+      CASE IsDirectory("C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\")
+                  cAI:="C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\bin\x86\"
       OTHER
           ?     "Geen Advanced installer gevonden"
           Alert("Geen Advanced installer gevonden")
@@ -44,15 +42,15 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
    cAIP:="C:\xHB-SetupFiles\xHB.aip"
 
    IF cEdition="DEMO"
-      cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Demo.aip '+cAIP+' /Y'+CRLF
+      cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH-Demo.aip '+cAIP+' /Y'+CRLF
    ELSE
-      cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH.aip '+cAIP+' /Y'+CRLF
+      cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-VXH.aip '+cAIP+' /Y'+CRLF
    ENDIF
    cBuild+='MD C:\xHB-SetupFiles\Resources'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini C:\xHB-SetupFiles\xHB-Files\Bin\*.ini /Y'+CRLF
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\xHB-Files\*.vbs /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\xHB-SetupFiles\Resources\*.jpg /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\xHB-SetupFiles\Resources\*.rtf /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini C:\xHB-SetupFiles\xHB-Files\Bin\*.ini /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\xHB-SetupFiles\Resources\*.vbs /Y'+CRLF
 
    //----------------------------------------------------------------------------------------------------//
 
@@ -71,7 +69,7 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
             ' -name "Visual xHarbour"'+;
             ' -desc "Visual xHarbour"'+;
             ' -target "APPDIR\Visual xHarbour.url"'+;
-			   ' -icon w:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+			   ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -105,15 +103,13 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /build '+cAIP+CRLF+CRLF
 
-   cBuild+='COPY W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'serial.txt" /Y'+CRLF
 
    cBuild+='RD C:\xHB-SetupFiles\xHB-cache /Q /S'+CRLF
    cBuild+='RD C:\xHB-SetupFiles\Resources /Q /S'+CRLF
    cBuild+='RD C:\xHB-SetupFiles\Setups /Q /S'+CRLF
    cBuild+='DEL '+cAIP+' /Q'+CRLF
    cBuild+='ATTRIB +H C:\xHB-SetupFiles\xHB-Files'+CRLF
-
-// cBuild+='pause'+CRLF+CRLF
 
    MemoWrit("C:\xHB-SetupFiles\Build.bat",cBuild,.F.)
    __Run("C:\xHB-SetupFiles\Build.bat")

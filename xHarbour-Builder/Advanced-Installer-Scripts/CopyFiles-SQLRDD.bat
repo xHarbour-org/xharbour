@@ -20,13 +20,13 @@ REM ===============================================
 
     MD "%RC_To%\SQLRDD"
 
-    SET XHB-DOC=W:\xHarbour.com\xHarbour-Documentation
+    SET XHB-DOC=\xHarbour.com\xHarbour-Documentation
 
-    COPY "W:\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD Manual - EN.pdf"    "%RC_To%\SQLRDD\SQLRDD Manual.pdf"
-    COPY "W:\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD Reference - EN.pdf" "%RC_To%\SQLRDD\SQLRDD Reference.pdf"
-    COPY "W:\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_methodology_en.pdf" "%RC_To%\SQLRDD\SQLRDD Methodology.pdf"
-    COPY "W:\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_Reference_EN.chm"   "%RC_To%\SQLRDD\SQLRDD_Reference_EN.chm"
-    COPY "W:\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_Reference_br.chm"   "%RC_To%\SQLRDD\SQLRDD_Reference_BR.chm"
+    COPY "\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD Manual - EN.pdf"    "%RC_To%\SQLRDD\SQLRDD Manual.pdf"
+    COPY "\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD Reference - EN.pdf" "%RC_To%\SQLRDD\SQLRDD Reference.pdf"
+    COPY "\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_methodology_en.pdf" "%RC_To%\SQLRDD\SQLRDD Methodology.pdf"
+    COPY "\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_Reference_EN.chm"   "%RC_To%\SQLRDD\SQLRDD_Reference_EN.chm"
+    COPY "\xHarbour.com\xHarbour-SQLRDD\doc\SQLRDD_Reference_br.chm"   "%RC_To%\SQLRDD\SQLRDD_Reference_BR.chm"
 
 
 REM ===============================================
@@ -38,7 +38,7 @@ REM ===============================================
 
     SET RC_Exclude_File=.cvsignore
     SET RC_Exclude_Folder=CVS CVSROOT
-    ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
+    ROBOCOPY "\xHarbour.com\xHarbour-SQLRDD\include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
 
 REM ===============================================
@@ -48,7 +48,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Dll
     SET RC_Exclude_Folder=CVS CVSROOT
 
-    ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\dll" "%RC_To%\SQLRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
+    ROBOCOPY "\xHarbour.com\xHarbour-SQLRDD\dll" "%RC_To%\SQLRDD" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder%
 
 
 REM ===============================================
@@ -58,7 +58,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\Samples
 
     SET RC_Exclude_Folder=CVS CVSROOT
-    ROBOCOPY "W:\xHarbour.com\xHarbour-SQLRDD\samples" "%RC_To%\SQLRDD" *.* /NS /NC /NP /XF %RC_Exclude_File% /XA:H
+    ROBOCOPY "\xHarbour.com\xHarbour-SQLRDD\samples" "%RC_To%\SQLRDD" *.* /NS /NC /NP /XF %RC_Exclude_File% /XA:H
 
 
 REM ==============================================================================================
@@ -76,8 +76,8 @@ REM ===============================================
     IF "%1" == "XHB-DEMO" SET RC_Include=SQL.lib
     IF "%1" == "BCC-DEMO" SET RC_Include=SQLBCC55.lib SQLBCC58.lib SQLBCC65.lib
 
-    IF "%1" == "XHB-DEMO" ROBOCOPY "W:\xHB\Lib\Demo"     "%RC_To%" %RC_Include% /NS /NC /NP
-    IF "%1" == "BCC-DEMO" ROBOCOPY "W:\xHB\Lib\Demo\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "XHB-DEMO" ROBOCOPY "\xHB\Lib\Demo"     "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "BCC-DEMO" ROBOCOPY "\xHB\Lib\Demo\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
 
 IF "%1" == "Demo" GOTO :EOF
 
@@ -99,8 +99,8 @@ REM ===============================================
     IF "%1" == "XHB-RELEASE" SET RC_Include=SQL.lib SQLMT.lib
     IF "%1" == "BCC-RELEASE" SET RC_Include=SQLBCC55.lib SQLBCC58.lib SQLBCC65.lib
 
-    IF "%1" == "XHB-RELEASE" ROBOCOPY "W:\xHB\Lib"     "%RC_To%" %RC_Include% /NS /NC /NP
-    IF "%1" == "BCC-RELEASE" ROBOCOPY "W:\xHB\Lib\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "XHB-RELEASE" ROBOCOPY "\xHB\Lib"     "%RC_To%" %RC_Include% /NS /NC /NP
+    IF "%1" == "BCC-RELEASE" ROBOCOPY "\xHB\Lib\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
 
 
 REM ==============================================================================================
