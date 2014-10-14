@@ -1,14 +1,14 @@
-   RD c:\xHB-SetupFiles\sqlrdd\ /Q /S
+    RD C:\xHB-SetupFiles\sqlrdd\ /Q /S
 
-   @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat XHB-RELEASE
-   W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W XHB-RELEASE
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat XHB-RELEASE
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe C XHB-RELEASE
 
-   @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat XHB-DEMO
-   W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W XHB-DEMO
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat XHB-DEMO
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe C XHB-DEMO
 
-   @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-RELEASE
-   W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W BCC-RELEASE
+REM @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-RELEASE
+REM C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe C BCC-RELEASE
 
-   @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-DEMO
-   W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe W BCC-DEMO
+REM @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles-SQLRDD.bat BCC-DEMO
+REM C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Setup.exe C BCC-DEMO
 

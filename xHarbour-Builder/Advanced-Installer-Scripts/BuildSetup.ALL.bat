@@ -1,13 +1,13 @@
-    RD c:\xHB-SetupFiles\xHB\ /Q /S
+    RD C:\xHB-SetupFiles\xHB\ /Q /S
 
-REM @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Demo
-REM W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe DEMO W
+REM @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Demo
+REM C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe DEMO C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Personal
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe PERS W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Personal
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe PERS C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Professional 
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe PROF W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Professional 
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe PROF C
 
-    @call W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Enterprise
-    W:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe ENT W
+    @call C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\CopyFiles.bat Enterprise
+    C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Build-Setup.exe ENT C
