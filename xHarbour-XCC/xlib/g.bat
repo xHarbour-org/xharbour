@@ -21,63 +21,72 @@ SET _PRESET_LFLAGS=%LFLAGS%
    GOTO NONE
 
 :SET_VC2013X86
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
-   IF "%VS120COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Common7\Tools\
-   IF NOT "%VS120COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
+   SET PSDKDIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A
+   SET PELLESCDIR=%ProgramW6432%\PellesC
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
 
 :SET_VC2013
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
    SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2012X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramW6432%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2012
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2010X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramW6432%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2010
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2008
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
    SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v6.0A
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2005
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
    SET PSDKDIR=%ProgramFiles%\Microsoft Visual Studio 8\Common7\Tools
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC2003
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+   SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
@@ -85,7 +94,6 @@ SET _PRESET_LFLAGS=%LFLAGS%
 
 :READY
 
-SET PELLESCDIR=%ProgramFiles%\PellesC
 SET PATH=%PATH%;"%PELLESCDIR%\bin"
 
 SET _PRESET_CFLAGS=%CFLAGS%

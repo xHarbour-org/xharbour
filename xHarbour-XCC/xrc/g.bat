@@ -21,11 +21,10 @@ SET _PRESET_LFLAGS=%LFLAGS%
    GOTO NONE
 
 :SET_VC2013X86
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
-   IF "%VS120COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Common7\Tools\
-   IF NOT "%VS120COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
+   SET PSDKDIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
 
 :SET_VC2013
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
