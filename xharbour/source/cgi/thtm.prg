@@ -315,6 +315,7 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       ::FName := "cgiout.htm"
    ELSE
       ::FName := cFile
+      ::nh := fcreate(cfile)
    ENDIF
    IF lCgi
       ::cStr +=  'Content-Type: text/html' + CRLF() + CRLF()

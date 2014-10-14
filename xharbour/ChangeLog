@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-14 14:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/tipssl/mail.prg
+  * source/tip/mail.prg
+    ! method attachFile simplified , now all extensions use base64 encoding, with exception of .txt and .html/.htm
+  * contrib/tipssl/sendmail.prg
+  * source/tip/sendmail.prg
+    ! HB_SetMimeType function only return the mimetype
+  * source/vm/macro.c
+    ! fix hb_macroGetValue to allow >16k string macros
+  * source/rtl/cdpapi.c
+    ! minor fix on hb_cdpnDup3
+  * include/std.ch 
+    ! added missing comma to sort command translation since the connection parameter was being passed as rdd position
+  * source/cgi/thtm.prg
+    ! minor fix on new method when output is file creation  
+      
+
 2014-10-10 11:22 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * make_vc
     + Auto detect of Microsoft Visual Studio 12.0 for 64 bits

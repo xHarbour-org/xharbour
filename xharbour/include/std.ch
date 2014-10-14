@@ -436,9 +436,9 @@
 #command SORT [TO <(f)>] [ON <fields,...>] ;
               [FOR <for>] [WHILE <while>] [NEXT <next>] ;
               [RECORD <rec>] [<rest:REST>] [ALL] ;
-              [CODEPAGE <cp>] [CONNECTION <conn>] => ;
+              [CODEPAGE <cp>] [CONNECTION <conn>] [VIA <rdd>]=> ;
          __dbSort( <(f)>, { <(fields)> }, ;
-                   <{for}>, <{while}>, <next>, <rec>, <.rest.>, <conn>, <cp> )
+                   <{for}>, <{while}>, <next>, <rec>, <.rest.>,<rdd>, <conn>, <cp> )
 
 #command TOTAL [TO <(f)>] [ON <key>] [FIELDS <fields,...>] ;
                [FOR <for>] [WHILE <while>] [NEXT <next>] ;

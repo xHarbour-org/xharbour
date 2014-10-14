@@ -350,1741 +350,1741 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
 //-------------------------------------------------------------//
 
-FUNCTION HB_SetMimeType( cFile, cFname, cFext )
+FUNCTION HB_SetMimeType( cFile)
 
    cFile := Lower( cFile )
 
 IF cFile LIKE ".+\.vbd" 
-   RETURN "application/activexdocument=" + cFname + cFext
+   RETURN "application/activexdocument"
 ELSEIF cFile LIKE ".+\.(asn|asz|asd)" 
-   RETURN "application/astound=" + cFname + cFext
+   RETURN "application/astound"
 ELSEIF cFile LIKE ".+\.pqi" 
-   RETURN "application/cprplayer=" + cFname + cFext
+   RETURN "application/cprplayer"
 ELSEIF cFile LIKE ".+\.tsp" 
-   RETURN "application/dsptype=" + cFname + cFext
+   RETURN "application/dsptype"
 ELSEIF cFile LIKE ".+\.exe" 
-   RETURN "application/exe=" + cFname + cFext
+   RETURN "application/exe"
 ELSEIF cFile LIKE ".+\.(sml|ofml)" 
-   RETURN "application/fml=" + cFname + cFext
+   RETURN "application/fml"
 ELSEIF cFile LIKE ".+\.pfr" 
-   RETURN "application/font-tdpfr=" + cFname + cFext
+   RETURN "application/font-tdpfr"
 ELSEIF cFile LIKE ".+\.frl" 
-   RETURN "application/freeloader=" + cFname + cFext
+   RETURN "application/freeloader"
 ELSEIF cFile LIKE ".+\.spl" 
-   RETURN "application/futuresplash =" + cFname + cFext
+   RETURN "application/futuresplash "
 ELSEIF cFile LIKE ".+\.gz" 
-   RETURN "application/gzip =" + cFname + cFext
+   RETURN "application/gzip "
 ELSEIF cFile LIKE ".+\.stk" 
-   RETURN "application/hstu =" + cFname + cFext
+   RETURN "application/hstu "
 ELSEIF cFile LIKE ".+\.ips" 
-   RETURN "application/ips=" + cFname + cFext
+   RETURN "application/ips"
 ELSEIF cFile LIKE ".+\.ptlk" 
-   RETURN "application/listenup =" + cFname + cFext
+   RETURN "application/listenup "
 ELSEIF cFile LIKE ".+\.hqx" 
-   RETURN "application/mac-binhex40 =" + cFname + cFext
+   RETURN "application/mac-binhex40 "
 ELSEIF cFile LIKE ".+\.mbd" 
-   RETURN "application/mbedlet=" + cFname + cFext
+   RETURN "application/mbedlet"
 ELSEIF cFile LIKE ".+\.mfp" 
-   RETURN "application/mirage=" + cFname + cFext
+   RETURN "application/mirage"
 ELSEIF cFile LIKE ".+\.(pot|pps|ppt|ppz)" 
-   RETURN "application/mspowerpoint =" + cFname + cFext
+   RETURN "application/mspowerpoint "
 ELSEIF cFile LIKE ".+\.n2p" 
-   RETURN "application/n2p=" + cFname + cFext
+   RETURN "application/n2p"
 ELSEIF cFile LIKE ".+\.(bin|class|lha|lzh|lzx|dbf)" 
-   RETURN "application/octet-stream =" + cFname + cFext
+   RETURN "application/octet-stream "
 ELSEIF cFile LIKE ".+\.oda" 
-   RETURN "application/oda=" + cFname + cFext
+   RETURN "application/oda"
 ELSEIF cFile LIKE ".+\.axs" 
-   RETURN "application/olescript=" + cFname + cFext
+   RETURN "application/olescript"
 ELSEIF cFile LIKE ".+\.zpa" 
-   RETURN "application/pcphoto=" + cFname + cFext
+   RETURN "application/pcphoto"
 ELSEIF cFile LIKE ".+\.pdf" 
-   RETURN "application/pdf=" + cFname + cFext
+   RETURN "application/pdf"
 ELSEIF cFile LIKE ".+\.(ai|eps|ps)" 
-   RETURN "application/postscript=" + cFname + cFext
+   RETURN "application/postscript"
 ELSEIF cFile LIKE ".+\.shw" 
-   RETURN "application/presentations=" + cFname + cFext
+   RETURN "application/presentations"
 ELSEIF cFile LIKE ".+\.qrt" 
-   RETURN "application/quest=" + cFname + cFext
+   RETURN "application/quest"
 ELSEIF cFile LIKE ".+\.rtc" 
-   RETURN "application/rtc=" + cFname + cFext
+   RETURN "application/rtc"
 ELSEIF cFile LIKE ".+\.rtf" 
-   RETURN "application/rtf=" + cFname + cFext
+   RETURN "application/rtf"
 ELSEIF cFile LIKE ".+\.smp" 
-   RETURN "application/studiom=" + cFname + cFext
+   RETURN "application/studiom"
 ELSEIF cFile LIKE ".+\.dst" 
-   RETURN "application/tajima=" + cFname + cFext
+   RETURN "application/tajima"
 ELSEIF cFile LIKE ".+\.talk" 
-   RETURN "application/talker=" + cFname + cFext
+   RETURN "application/talker"
 ELSEIF cFile LIKE ".+\.tbk" 
-   RETURN "application/toolbook =" + cFname + cFext
+   RETURN "application/toolbook "
 ELSEIF cFile LIKE ".+\.vmd" 
-   RETURN "application/vocaltec-media-desc=" + cFname + cFext
+   RETURN "application/vocaltec-media-desc"
 ELSEIF cFile LIKE ".+\.vmf" 
-   RETURN "application/vocaltec-media-file=" + cFname + cFext
+   RETURN "application/vocaltec-media-file"
 ELSEIF cFile LIKE ".+\.wri" 
-   RETURN "application/write=" + cFname + cFext
+   RETURN "application/write"
 ELSEIF cFile LIKE ".+\.wid" 
-   RETURN "application/x-DemoShield =" + cFname + cFext
+   RETURN "application/x-DemoShield "
 ELSEIF cFile LIKE ".+\.rrf" 
-   RETURN "application/x-InstallFromTheWeb=" + cFname + cFext
+   RETURN "application/x-InstallFromTheWeb"
 ELSEIF cFile LIKE ".+\.wis" 
-   RETURN "application/x-InstallShield=" + cFname + cFext
+   RETURN "application/x-InstallShield"
 ELSEIF cFile LIKE ".+\.ins" 
-   RETURN "application/x-NET-Install=" + cFname + cFext
+   RETURN "application/x-NET-Install"
 ELSEIF cFile LIKE ".+\.tmv" 
-   RETURN "application/x-Parable-Thing=" + cFname + cFext
+   RETURN "application/x-Parable-Thing"
 ELSEIF cFile LIKE ".+\.arj" 
-   RETURN "application/x-arj=" + cFname + cFext
+   RETURN "application/x-arj"
 ELSEIF cFile LIKE ".+\.asp" 
-   RETURN "application/x-asap=" + cFname + cFext
+   RETURN "application/x-asap"
 ELSEIF cFile LIKE ".+\.aab" 
-   RETURN "application/x-authorware-bin =" + cFname + cFext
+   RETURN "application/x-authorware-bin "
 ELSEIF cFile LIKE ".+\.(aam|aas)" 
-   RETURN "application/x-authorware-map =" + cFname + cFext
+   RETURN "application/x-authorware-map "
 ELSEIF cFile LIKE ".+\.bcpio" 
-   RETURN "application/x-bcpio=" + cFname + cFext
+   RETURN "application/x-bcpio"
 ELSEIF cFile LIKE ".+\.vcd" 
-   RETURN "application/x-cdlink =" + cFname + cFext
+   RETURN "application/x-cdlink "
 ELSEIF cFile LIKE ".+\.chat" 
-   RETURN "application/x-chat=" + cFname + cFext
+   RETURN "application/x-chat"
 ELSEIF cFile LIKE ".+\.cnc" 
-   RETURN "application/x-cnc=" + cFname + cFext
+   RETURN "application/x-cnc"
 ELSEIF cFile LIKE ".+\.(coda|page)" 
-   RETURN "application/x-coda=" + cFname + cFext
+   RETURN "application/x-coda"
 ELSEIF cFile LIKE ".+\.z" 
-   RETURN "application/x-compress=" + cFname + cFext
+   RETURN "application/x-compress"
 ELSEIF cFile LIKE ".+\.con" 
-   RETURN "application/x-connector=" + cFname + cFext
+   RETURN "application/x-connector"
 ELSEIF cFile LIKE ".+\.cpio" 
-   RETURN "application/x-cpio=" + cFname + cFext
+   RETURN "application/x-cpio"
 ELSEIF cFile LIKE ".+\.pqf" 
-   RETURN "application/x-cprplayer=" + cFname + cFext
+   RETURN "application/x-cprplayer"
 ELSEIF cFile LIKE ".+\.csh" 
-   RETURN "application/x-csh=" + cFname + cFext
+   RETURN "application/x-csh"
 ELSEIF cFile LIKE ".+\.(cu|csm)" 
-   RETURN "application/x-cu-seeme=" + cFname + cFext
+   RETURN "application/x-cu-seeme"
 ELSEIF cFile LIKE ".+\.(dcr|dir|dxr|swa)" 
-   RETURN "application/x-director=" + cFname + cFext
+   RETURN "application/x-director"
 ELSEIF cFile LIKE ".+\.dvi" 
-   RETURN "application/x-dvi=" + cFname + cFext
+   RETURN "application/x-dvi"
 ELSEIF cFile LIKE ".+\.evy" 
-   RETURN "application/x-envoy=" + cFname + cFext
+   RETURN "application/x-envoy"
 ELSEIF cFile LIKE ".+\.ebk" 
-   RETURN "application/x-expandedbook=" + cFname + cFext
+   RETURN "application/x-expandedbook"
 ELSEIF cFile LIKE ".+\.gtar" 
-   RETURN "application/x-gtar=" + cFname + cFext
+   RETURN "application/x-gtar"
 ELSEIF cFile LIKE ".+\.hdf" 
-   RETURN "application/x-hdf=" + cFname + cFext
+   RETURN "application/x-hdf"
 ELSEIF cFile LIKE ".+\.map" 
-   RETURN "application/x-httpd-imap =" + cFname + cFext
+   RETURN "application/x-httpd-imap "
 ELSEIF cFile LIKE ".+\.phtml" 
-   RETURN "application/x-httpd-php=" + cFname + cFext
+   RETURN "application/x-httpd-php"
 ELSEIF cFile LIKE ".+\.php3" 
-   RETURN "application/x-httpd-php3 =" + cFname + cFext
+   RETURN "application/x-httpd-php3 "
 ELSEIF cFile LIKE ".+\.ica" 
-   RETURN "application/x-ica=" + cFname + cFext
+   RETURN "application/x-ica"
 ELSEIF cFile LIKE ".+\.ipx" 
-   RETURN "application/x-ipix=" + cFname + cFext
+   RETURN "application/x-ipix"
 ELSEIF cFile LIKE ".+\.ips" 
-   RETURN "application/x-ipscript=" + cFname + cFext
+   RETURN "application/x-ipscript"
 ELSEIF cFile LIKE ".+\.js" 
-   RETURN "application/x-javascript =" + cFname + cFext
+   RETURN "application/x-javascript "
 ELSEIF cFile LIKE ".+\.latex" 
-   RETURN "application/x-latex=" + cFname + cFext
+   RETURN "application/x-latex"
 ELSEIF cFile LIKE ".+\.bin" 
-   RETURN "application/x-macbinary=" + cFname + cFext
+   RETURN "application/x-macbinary"
 ELSEIF cFile LIKE ".+\.mif" 
-   RETURN "application/x-mif=" + cFname + cFext
+   RETURN "application/x-mif"
 ELSEIF cFile LIKE ".+\.(mpl|mpire)" 
-   RETURN "application/x-mpire=" + cFname + cFext
+   RETURN "application/x-mpire"
 ELSEIF cFile LIKE ".+\.adr" 
-   RETURN "application/x-msaddr =" + cFname + cFext
+   RETURN "application/x-msaddr "
 ELSEIF cFile LIKE ".+\.wlt" 
-   RETURN "application/x-mswallet=" + cFname + cFext
+   RETURN "application/x-mswallet"
 ELSEIF cFile LIKE ".+\.(nc|cdf)" 
-   RETURN "application/x-netcdf =" + cFname + cFext
+   RETURN "application/x-netcdf "
 ELSEIF cFile LIKE ".+\.npx" 
-   RETURN "application/x-netfpx =" + cFname + cFext
+   RETURN "application/x-netfpx "
 ELSEIF cFile LIKE ".+\.nsc" 
-   RETURN "application/x-nschat =" + cFname + cFext
+   RETURN "application/x-nschat "
 ELSEIF cFile LIKE ".+\.pgp" 
-   RETURN "application/x-pgp-plugin =" + cFname + cFext
+   RETURN "application/x-pgp-plugin "
 ELSEIF cFile LIKE ".+\.css" 
-   RETURN "application/x-pointplus=" + cFname + cFext
+   RETURN "application/x-pointplus"
 ELSEIF cFile LIKE ".+\.sh" 
-   RETURN "application/x-sh =" + cFname + cFext
+   RETURN "application/x-sh "
 ELSEIF cFile LIKE ".+\.shar" 
-   RETURN "application/x-shar=" + cFname + cFext
+   RETURN "application/x-shar"
 ELSEIF cFile LIKE ".+\.swf" 
-   RETURN "application/x-shockwave-flash=" + cFname + cFext
+   RETURN "application/x-shockwave-flash"
 ELSEIF cFile LIKE ".+\.spr" 
-   RETURN "application/x-sprite =" + cFname + cFext
+   RETURN "application/x-sprite "
 ELSEIF cFile LIKE ".+\.sprite" 
-   RETURN "application/x-sprite =" + cFname + cFext
+   RETURN "application/x-sprite "
 ELSEIF cFile LIKE ".+\.sit" 
-   RETURN "application/x-stuffit=" + cFname + cFext
+   RETURN "application/x-stuffit"
 ELSEIF cFile LIKE ".+\.sca" 
-   RETURN "application/x-supercard=" + cFname + cFext
+   RETURN "application/x-supercard"
 ELSEIF cFile LIKE ".+\.sv4cpio" 
-   RETURN "application/x-sv4cpio=" + cFname + cFext
+   RETURN "application/x-sv4cpio"
 ELSEIF cFile LIKE ".+\.sv4crc" 
-   RETURN "application/x-sv4crc =" + cFname + cFext
+   RETURN "application/x-sv4crc "
 ELSEIF cFile LIKE ".+\.tar" 
-   RETURN "application/x-tar=" + cFname + cFext
+   RETURN "application/x-tar"
 ELSEIF cFile LIKE ".+\.tcl" 
-   RETURN "application/x-tcl=" + cFname + cFext
+   RETURN "application/x-tcl"
 ELSEIF cFile LIKE ".+\.tex" 
-   RETURN "application/x-tex=" + cFname + cFext
+   RETURN "application/x-tex"
 ELSEIF cFile LIKE ".+\.(texinfo|texi)" 
-   RETURN "application/x-texinfo=" + cFname + cFext
+   RETURN "application/x-texinfo"
 ELSEIF cFile LIKE ".+\.tlk" 
-   RETURN "application/x-tlk=" + cFname + cFext
+   RETURN "application/x-tlk"
 ELSEIF cFile LIKE ".+\.(t|tr|roff)" 
-   RETURN "application/x-troff=" + cFname + cFext
+   RETURN "application/x-troff"
 ELSEIF cFile LIKE ".+\.man" 
-   RETURN "application/x-troff-man=" + cFname + cFext
+   RETURN "application/x-troff-man"
 ELSEIF cFile LIKE ".+\.me" 
-   RETURN "application/x-troff-me=" + cFname + cFext
+   RETURN "application/x-troff-me"
 ELSEIF cFile LIKE ".+\.ms" 
-   RETURN "application/x-troff-ms=" + cFname + cFext
+   RETURN "application/x-troff-ms"
 ELSEIF cFile LIKE ".+\.alt" 
-   RETURN "application/x-up-alert=" + cFname + cFext
+   RETURN "application/x-up-alert"
 ELSEIF cFile LIKE ".+\.che" 
-   RETURN "application/x-up-cacheop =" + cFname + cFext
+   RETURN "application/x-up-cacheop "
 ELSEIF cFile LIKE ".+\.ustar" 
-   RETURN "application/x-ustar=" + cFname + cFext
+   RETURN "application/x-ustar"
 ELSEIF cFile LIKE ".+\.src" 
-   RETURN "application/x-wais-source=" + cFname + cFext
+   RETURN "application/x-wais-source"
 ELSEIF cFile LIKE ".+\.xls" 
-   RETURN "application/xls=" + cFname + cFext
+   RETURN "application/xls"
 ELSEIF cFile LIKE ".+\.xlt" 
-   RETURN "application/xlt=" + cFname + cFext
+   RETURN "application/xlt"
 ELSEIF cFile LIKE ".+\.zip" 
-   RETURN "application/zip=" + cFname + cFext
+   RETURN "application/zip"
 ELSEIF cFile LIKE ".+\.(au|snd)" 
-   RETURN "audio/basic=" + cFname + cFext
+   RETURN "audio/basic"
 ELSEIF cFile LIKE ".+\.es" 
-   RETURN "audio/echospeech =" + cFname + cFext
+   RETURN "audio/echospeech "
 ELSEIF cFile LIKE ".+\.(gsm|gsd)" 
-   RETURN "audio/gsm=" + cFname + cFext
+   RETURN "audio/gsm"
 ELSEIF cFile LIKE ".+\.rmf" 
-   RETURN "audio/rmf=" + cFname + cFext
+   RETURN "audio/rmf"
 ELSEIF cFile LIKE ".+\.tsi" 
-   RETURN "audio/tsplayer=" + cFname + cFext
+   RETURN "audio/tsplayer"
 ELSEIF cFile LIKE ".+\.vox" 
-   RETURN "audio/voxware=" + cFname + cFext
+   RETURN "audio/voxware"
 ELSEIF cFile LIKE ".+\.wtx" 
-   RETURN "audio/wtx=" + cFname + cFext
+   RETURN "audio/wtx"
 ELSEIF cFile LIKE ".+\.(aif|aiff|aifc)" 
-   RETURN "audio/x-aiff =" + cFname + cFext
+   RETURN "audio/x-aiff "
 ELSEIF cFile LIKE ".+\.(cht|dus)" 
-   RETURN "audio/x-dspeech=" + cFname + cFext
+   RETURN "audio/x-dspeech"
 ELSEIF cFile LIKE ".+\.(mid|midi)" 
-   RETURN "audio/x-midi =" + cFname + cFext
+   RETURN "audio/x-midi "
 ELSEIF cFile LIKE ".+\.mp3" 
-   RETURN "audio/x-mpeg =" + cFname + cFext
+   RETURN "audio/x-mpeg "
 ELSEIF cFile LIKE ".+\.mp2" 
-   RETURN "audio/x-mpeg =" + cFname + cFext
+   RETURN "audio/x-mpeg "
 ELSEIF cFile LIKE ".+\.m3u" 
-   RETURN "audio/x-mpegurl=" + cFname + cFext
+   RETURN "audio/x-mpegurl"
 ELSEIF cFile LIKE ".+\.(ram|ra)" 
-   RETURN "audio/x-pn-realaudio =" + cFname + cFext
+   RETURN "audio/x-pn-realaudio "
 ELSEIF cFile LIKE ".+\.rpm" 
-   RETURN "audio/x-pn-realaudio-plugin=" + cFname + cFext
+   RETURN "audio/x-pn-realaudio-plugin"
 ELSEIF cFile LIKE ".+\.stream" 
-   RETURN "audio/x-qt-stream=" + cFname + cFext
+   RETURN "audio/x-qt-stream"
 ELSEIF cFile LIKE ".+\.rmf" 
-   RETURN "audio/x-rmf=" + cFname + cFext
+   RETURN "audio/x-rmf"
 ELSEIF cFile LIKE ".+\.(vqf|vql)" 
-   RETURN "audio/x-twinvq=" + cFname + cFext
+   RETURN "audio/x-twinvq"
 ELSEIF cFile LIKE ".+\.vqe" 
-   RETURN "audio/x-twinvq-plugin=" + cFname + cFext
+   RETURN "audio/x-twinvq-plugin"
 ELSEIF cFile LIKE ".+\.wav" 
-   RETURN "audio/x-wav=" + cFname + cFext
+   RETURN "audio/x-wav"
 ELSEIF cFile LIKE ".+\.wtx" 
-   RETURN "audio/x-wtx=" + cFname + cFext
+   RETURN "audio/x-wtx"
 ELSEIF cFile LIKE ".+\.mol" 
-   RETURN "chemical/x-mdl-molfile=" + cFname + cFext
+   RETURN "chemical/x-mdl-molfile"
 ELSEIF cFile LIKE ".+\.pdb" 
-   RETURN "chemical/x-pdb=" + cFname + cFext
+   RETURN "chemical/x-pdb"
 ELSEIF cFile LIKE ".+\.dwf" 
-   RETURN "drawing/x-dwf=" + cFname + cFext
+   RETURN "drawing/x-dwf"
 ELSEIF cFile LIKE ".+\.ivr" 
-   RETURN "i-world/i-vrml=" + cFname + cFext
+   RETURN "i-world/i-vrml"
 ELSEIF cFile LIKE ".+\.cod" 
-   RETURN "image/cis-cod=" + cFname + cFext
+   RETURN "image/cis-cod"
 ELSEIF cFile LIKE ".+\.cpi" 
-   RETURN "image/cpi=" + cFname + cFext
+   RETURN "image/cpi"
 ELSEIF cFile LIKE ".+\.fif" 
-   RETURN "image/fif=" + cFname + cFext
+   RETURN "image/fif"
 ELSEIF cFile LIKE ".+\.gif" 
-   RETURN "image/gif=" + cFname + cFext
+   RETURN "image/gif"
 ELSEIF cFile LIKE ".+\.ief" 
-   RETURN "image/ief=" + cFname + cFext
+   RETURN "image/ief"
 ELSEIF cFile LIKE ".+\.(jpeg|jpg|jpe)" 
-   RETURN "image/jpeg=" + cFname + cFext
+   RETURN "image/jpeg"
 ELSEIF cFile LIKE ".+\.rip" 
-   RETURN "image/rip=" + cFname + cFext
+   RETURN "image/rip"
 ELSEIF cFile LIKE ".+\.svh" 
-   RETURN "image/svh=" + cFname + cFext
+   RETURN "image/svh"
 ELSEIF cFile LIKE ".+\.(tiff|tif)" 
-   RETURN "image/tiff=" + cFname + cFext
+   RETURN "image/tiff"
 ELSEIF cFile LIKE ".+\.mcf" 
-   RETURN "image/vasa=" + cFname + cFext
+   RETURN "image/vasa"
 ELSEIF cFile LIKE ".+\.(svf|dwg|dxf)" 
-   RETURN "image/vnd=" + cFname + cFext
+   RETURN "image/vnd"
 ELSEIF cFile LIKE ".+\.wi" 
-   RETURN "image/wavelet=" + cFname + cFext
+   RETURN "image/wavelet"
 ELSEIF cFile LIKE ".+\.ras" 
-   RETURN "image/x-cmu-raster=" + cFname + cFext
+   RETURN "image/x-cmu-raster"
 ELSEIF cFile LIKE ".+\.etf" 
-   RETURN "image/x-etf=" + cFname + cFext
+   RETURN "image/x-etf"
 ELSEIF cFile LIKE ".+\.fpx" 
-   RETURN "image/x-fpx=" + cFname + cFext
+   RETURN "image/x-fpx"
 ELSEIF cFile LIKE ".+\.(fh5|fh4|fhc)" 
-   RETURN "image/x-freehand =" + cFname + cFext
+   RETURN "image/x-freehand "
 ELSEIF cFile LIKE ".+\.dsf" 
-   RETURN "image/x-mgx-dsf=" + cFname + cFext
+   RETURN "image/x-mgx-dsf"
 ELSEIF cFile LIKE ".+\.pnm" 
-   RETURN "image/x-portable-anymap=" + cFname + cFext
+   RETURN "image/x-portable-anymap"
 ELSEIF cFile LIKE ".+\.pbm" 
-   RETURN "image/x-portable-bitmap=" + cFname + cFext
+   RETURN "image/x-portable-bitmap"
 ELSEIF cFile LIKE ".+\.pgm" 
-   RETURN "image/x-portable-graymap =" + cFname + cFext
+   RETURN "image/x-portable-graymap "
 ELSEIF cFile LIKE ".+\.ppm" 
-   RETURN "image/x-portable-pixmap=" + cFname + cFext
+   RETURN "image/x-portable-pixmap"
 ELSEIF cFile LIKE ".+\.rgb" 
-   RETURN "image/x-rgb=" + cFname + cFext
+   RETURN "image/x-rgb"
 ELSEIF cFile LIKE ".+\.xbm" 
-   RETURN "image/x-xbitmap=" + cFname + cFext
+   RETURN "image/x-xbitmap"
 ELSEIF cFile LIKE ".+\.xpm" 
-   RETURN "image/x-xpixmap=" + cFname + cFext
+   RETURN "image/x-xpixmap"
 ELSEIF cFile LIKE ".+\.xwd" 
-   RETURN "image/x-xwindowdump=" + cFname + cFext
+   RETURN "image/x-xwindowdump"
 ELSEIF cFile LIKE ".+\.dig" 
-   RETURN "multipart/mixed=" + cFname + cFext
+   RETURN "multipart/mixed"
 ELSEIF cFile LIKE ".+\.push" 
-   RETURN "multipart/x-mixed-replace=" + cFname + cFext
+   RETURN "multipart/x-mixed-replace"
 ELSEIF cFile LIKE ".+\.(wan|waf)" 
-   RETURN "plugin/wanimate=" + cFname + cFext
+   RETURN "plugin/wanimate"
 ELSEIF cFile LIKE ".+\.ccs" 
-   RETURN "text/ccs =" + cFname + cFext
+   RETURN "text/ccs "
 ELSEIF cFile LIKE ".+\.(htm|html)" 
-   RETURN "text/html=" + cFname + cFext
+   RETURN "text/html"
 ELSEIF cFile LIKE ".+\.pgr" 
-   RETURN "text/parsnegar-document=" + cFname + cFext
+   RETURN "text/parsnegar-document"
 ELSEIF cFile LIKE ".+\.txt" 
-   RETURN "text/plain=" + cFname + cFext
+   RETURN "text/plain"
 ELSEIF cFile LIKE ".+\.rtx" 
-   RETURN "text/richtext=" + cFname + cFext
+   RETURN "text/richtext"
 ELSEIF cFile LIKE ".+\.tsv" 
-   RETURN "text/tab-separated-values=" + cFname + cFext
+   RETURN "text/tab-separated-values"
 ELSEIF cFile LIKE ".+\.hdml" 
-   RETURN "text/x-hdml=" + cFname + cFext
+   RETURN "text/x-hdml"
 ELSEIF cFile LIKE ".+\.etx" 
-   RETURN "text/x-setext=" + cFname + cFext
+   RETURN "text/x-setext"
 ELSEIF cFile LIKE ".+\.(talk|spc)" 
-   RETURN "text/x-speech=" + cFname + cFext
+   RETURN "text/x-speech"
 ELSEIF cFile LIKE ".+\.afl" 
-   RETURN "video/animaflex=" + cFname + cFext
+   RETURN "video/animaflex"
 ELSEIF cFile LIKE ".+\.(mpeg|mpg|mpe)" 
-   RETURN "video/mpeg=" + cFname + cFext
+   RETURN "video/mpeg"
 ELSEIF cFile LIKE ".+\.(qt|mov)" 
-   RETURN "video/quicktime=" + cFname + cFext
+   RETURN "video/quicktime"
 ELSEIF cFile LIKE ".+\.(viv|vivo)" 
-   RETURN "video/vnd.vivo=" + cFname + cFext
+   RETURN "video/vnd.vivo"
 ELSEIF cFile LIKE ".+\.(asf|asx)" 
-   RETURN "video/x-ms-asf=" + cFname + cFext
+   RETURN "video/x-ms-asf"
 ELSEIF cFile LIKE ".+\.avi" 
-   RETURN "video/x-msvideo=" + cFname + cFext
+   RETURN "video/x-msvideo"
 ELSEIF cFile LIKE ".+\.movie" 
-   RETURN "video/x-sgi-movie=" + cFname + cFext
+   RETURN "video/x-sgi-movie"
 ELSEIF cFile LIKE ".+\.(vgm|vgx|xdr)" 
-   RETURN "video/x-videogram=" + cFname + cFext
+   RETURN "video/x-videogram"
 ELSEIF cFile LIKE ".+\.vgp" 
-   RETURN "video/x-videogram-plugin =" + cFname + cFext
+   RETURN "video/x-videogram-plugin "
 ELSEIF cFile LIKE ".+\.vts" 
-   RETURN "workbook/formulaone=" + cFname + cFext
+   RETURN "workbook/formulaone"
 ELSEIF cFile LIKE ".+\.vtts" 
-   RETURN "workbook/formulaone=" + cFname + cFext
+   RETURN "workbook/formulaone"
 ELSEIF cFile LIKE ".+\.(3dmf|3dm|qd3d|qd3)" 
-   RETURN "x-world/x-3dmf=" + cFname + cFext
+   RETURN "x-world/x-3dmf"
 ELSEIF cFile LIKE ".+\.svr" 
-   RETURN "x-world/x-svr=" + cFname + cFext
+   RETURN "x-world/x-svr"
 ELSEIF cFile LIKE ".+\.(wrl|wrz)" 
-   RETURN "x-world/x-vrml=" + cFname + cFext
+   RETURN "x-world/x-vrml"
 ELSEIF cFile LIKE ".+\.vrt" 
-   RETURN "x-world/x-vrt=" + cFname + cFext
+   RETURN "x-world/x-vrt"
 ELSEIF cFile LIKE ".+\.rar" 
-   RETURN "application/x-rar-compressed=" + cFname + cFext
+   RETURN "application/x-rar-compressed"
 ELSEIF cFile LIKE ".+\.torrent" 
-   RETURN "application/x-bittorrent=" + cFname + cFext
+   RETURN "application/x-bittorrent"
 ELSEIF cFile LIKE ".+\.x3d" 
-   RETURN "application/vnd.hzn-3d-crossword=" + cFname + cFext
+   RETURN "application/vnd.hzn-3d-crossword"
 ELSEIF cFile LIKE ".+\.3gp" 
-   RETURN "video/3gpp=" + cFname + cFext
+   RETURN "video/3gpp"
 ELSEIF cFile LIKE ".+\.3g2" 
-   RETURN "video/3gpp2=" + cFname + cFext
+   RETURN "video/3gpp2"
 ELSEIF cFile LIKE ".+\.mseq" 
-   RETURN "application/vnd.mseq=" + cFname + cFext
+   RETURN "application/vnd.mseq"
 ELSEIF cFile LIKE ".+\.pwn" 
-   RETURN "application/vnd.3m.post-it-notes=" + cFname + cFext
+   RETURN "application/vnd.3m.post-it-notes"
 ELSEIF cFile LIKE ".+\.plb" 
-   RETURN "application/vnd.3gpp.pic-bw-large=" + cFname + cFext
+   RETURN "application/vnd.3gpp.pic-bw-large"
 ELSEIF cFile LIKE ".+\.psb" 
-   RETURN "application/vnd.3gpp.pic-bw-small=" + cFname + cFext
+   RETURN "application/vnd.3gpp.pic-bw-small"
 ELSEIF cFile LIKE ".+\.pvb" 
-   RETURN "application/vnd.3gpp.pic-bw-var=" + cFname + cFext
+   RETURN "application/vnd.3gpp.pic-bw-var"
 ELSEIF cFile LIKE ".+\.tcap" 
-   RETURN "application/vnd.3gpp2.tcap=" + cFname + cFext
+   RETURN "application/vnd.3gpp2.tcap"
 ELSEIF cFile LIKE ".+\.7z" 
-   RETURN "application/x-7z-compressed=" + cFname + cFext
+   RETURN "application/x-7z-compressed"
 ELSEIF cFile LIKE ".+\.abw" 
-   RETURN "application/x-abiword=" + cFname + cFext
+   RETURN "application/x-abiword"
 ELSEIF cFile LIKE ".+\.ace" 
-   RETURN "application/x-ace-compressed=" + cFname + cFext
+   RETURN "application/x-ace-compressed"
 ELSEIF cFile LIKE ".+\.acc" 
-   RETURN "application/vnd.americandynamics.acc=" + cFname + cFext
+   RETURN "application/vnd.americandynamics.acc"
 ELSEIF cFile LIKE ".+\.acu" 
-   RETURN "application/vnd.acucobol=" + cFname + cFext
+   RETURN "application/vnd.acucobol"
 ELSEIF cFile LIKE ".+\.atc" 
-   RETURN "application/vnd.acucorp=" + cFname + cFext
+   RETURN "application/vnd.acucorp"
 ELSEIF cFile LIKE ".+\.adp" 
-   RETURN "audio/adpcm=" + cFname + cFext
+   RETURN "audio/adpcm"
 ELSEIF cFile LIKE ".+\.aab" 
-   RETURN "application/x-authorware-bin=" + cFname + cFext
+   RETURN "application/x-authorware-bin"
 ELSEIF cFile LIKE ".+\.aam" 
-   RETURN "application/x-authorware-map=" + cFname + cFext
+   RETURN "application/x-authorware-map"
 ELSEIF cFile LIKE ".+\.aas" 
-   RETURN "application/x-authorware-seg=" + cFname + cFext
+   RETURN "application/x-authorware-seg"
 ELSEIF cFile LIKE ".+\.air" 
-   RETURN "application/vnd.adobe.air-application-installer-package+zip=" + cFname + cFext
+   RETURN "application/vnd.adobe.air-application-installer-package+zip"
 ELSEIF cFile LIKE ".+\.swf" 
-   RETURN "application/x-shockwave-flash=" + cFname + cFext
+   RETURN "application/x-shockwave-flash"
 ELSEIF cFile LIKE ".+\.fxp" 
-   RETURN "application/vnd.adobe.fxp=" + cFname + cFext
+   RETURN "application/vnd.adobe.fxp"
 ELSEIF cFile LIKE ".+\.pdf" 
-   RETURN "application/pdf=" + cFname + cFext
+   RETURN "application/pdf"
 ELSEIF cFile LIKE ".+\.ppd" 
-   RETURN "application/vnd.cups-ppd=" + cFname + cFext
+   RETURN "application/vnd.cups-ppd"
 ELSEIF cFile LIKE ".+\.dir" 
-   RETURN "application/x-director=" + cFname + cFext
+   RETURN "application/x-director"
 ELSEIF cFile LIKE ".+\.xdp" 
-   RETURN "application/vnd.adobe.xdp+xml=" + cFname + cFext
+   RETURN "application/vnd.adobe.xdp+xml"
 ELSEIF cFile LIKE ".+\.xfdf" 
-   RETURN "application/vnd.adobe.xfdf=" + cFname + cFext
+   RETURN "application/vnd.adobe.xfdf"
 ELSEIF cFile LIKE ".+\.aac" 
-   RETURN "audio/x-aac=" + cFname + cFext
+   RETURN "audio/x-aac"
 ELSEIF cFile LIKE ".+\.ahead" 
-   RETURN "application/vnd.ahead.space=" + cFname + cFext
+   RETURN "application/vnd.ahead.space"
 ELSEIF cFile LIKE ".+\.azf" 
-   RETURN "application/vnd.airzip.filesecure.azf=" + cFname + cFext
+   RETURN "application/vnd.airzip.filesecure.azf"
 ELSEIF cFile LIKE ".+\.azs" 
-   RETURN "application/vnd.airzip.filesecure.azs=" + cFname + cFext
+   RETURN "application/vnd.airzip.filesecure.azs"
 ELSEIF cFile LIKE ".+\.azw" 
-   RETURN "application/vnd.amazon.ebook=" + cFname + cFext
+   RETURN "application/vnd.amazon.ebook"
 ELSEIF cFile LIKE ".+\.ami" 
-   RETURN "application/vnd.amiga.ami=" + cFname + cFext
+   RETURN "application/vnd.amiga.ami"
 ELSEIF cFile LIKE ".+\.apk" 
-   RETURN "application/vnd.android.package-archive=" + cFname + cFext
+   RETURN "application/vnd.android.package-archive"
 ELSEIF cFile LIKE ".+\.cii" 
-   RETURN "application/vnd.anser-web-certificate-issue-initiation=" + cFname + cFext
+   RETURN "application/vnd.anser-web-certificate-issue-initiation"
 ELSEIF cFile LIKE ".+\.fti" 
-   RETURN "application/vnd.anser-web-funds-transfer-initiation=" + cFname + cFext
+   RETURN "application/vnd.anser-web-funds-transfer-initiation"
 ELSEIF cFile LIKE ".+\.atx" 
-   RETURN "application/vnd.antix.game-component=" + cFname + cFext
+   RETURN "application/vnd.antix.game-component"
 ELSEIF cFile LIKE ".+\.mpkg" 
-   RETURN "application/vnd.apple.installer+xml=" + cFname + cFext
+   RETURN "application/vnd.apple.installer+xml"
 ELSEIF cFile LIKE ".+\.aw " 
-   RETURN "application/applixware=" + cFname + cFext
+   RETURN "application/applixware"
 ELSEIF cFile LIKE ".+\.les" 
-   RETURN "application/vnd.hhe.lesson-player=" + cFname + cFext
+   RETURN "application/vnd.hhe.lesson-player"
 ELSEIF cFile LIKE ".+\.swi" 
-   RETURN "application/vnd.aristanetworks.swi=" + cFname + cFext
+   RETURN "application/vnd.aristanetworks.swi"
 ELSEIF cFile LIKE ".+\.s" 
-   RETURN "text/x-asm=" + cFname + cFext
+   RETURN "text/x-asm"
 ELSEIF cFile LIKE ".+\.atomcat" 
-   RETURN "application/atomcat+xml=" + cFname + cFext
+   RETURN "application/atomcat+xml"
 ELSEIF cFile LIKE ".+\.atomsvc" 
-   RETURN "application/atomsvc+xml=" + cFname + cFext
+   RETURN "application/atomsvc+xml"
 ELSEIF cFile LIKE ".+\.atom" 
-   RETURN "application/atom+xml=" + cFname + cFext
+   RETURN "application/atom+xml"
 ELSEIF cFile LIKE ".+\.ac" 
-   RETURN "application/pkix-attr-cert=" + cFname + cFext
+   RETURN "application/pkix-attr-cert"
 ELSEIF cFile LIKE ".+\.aif" 
-   RETURN "audio/x-aiff=" + cFname + cFext
+   RETURN "audio/x-aiff"
 ELSEIF cFile LIKE ".+\.avi" 
-   RETURN "video/x-msvideo=" + cFname + cFext
+   RETURN "video/x-msvideo"
 ELSEIF cFile LIKE ".+\.aep" 
-   RETURN "application/vnd.audiograph=" + cFname + cFext
+   RETURN "application/vnd.audiograph"
 ELSEIF cFile LIKE ".+\.dxf" 
-   RETURN "image/vnd.dxf=" + cFname + cFext
+   RETURN "image/vnd.dxf"
 ELSEIF cFile LIKE ".+\.dwf" 
-   RETURN "model/vnd.dwf=" + cFname + cFext
+   RETURN "model/vnd.dwf"
 ELSEIF cFile LIKE ".+\.par" 
-   RETURN "text/plain-bas=" + cFname + cFext
+   RETURN "text/plain-bas"
 ELSEIF cFile LIKE ".+\.bcpio" 
-   RETURN "application/x-bcpio=" + cFname + cFext
+   RETURN "application/x-bcpio"
 ELSEIF cFile LIKE ".+\.bin" 
-   RETURN "application/octet-stream=" + cFname + cFext
+   RETURN "application/octet-stream"
 ELSEIF cFile LIKE ".+\.bmp" 
-   RETURN "image/bmp=" + cFname + cFext
+   RETURN "image/bmp"
 ELSEIF cFile LIKE ".+\.torrent " 
-   RETURN "application/x-bittorrent=" + cFname + cFext
+   RETURN "application/x-bittorrent"
 ELSEIF cFile LIKE ".+\.cod" 
-   RETURN "application/vnd.rim.cod=" + cFname + cFext
+   RETURN "application/vnd.rim.cod"
 ELSEIF cFile LIKE ".+\.mpm" 
-   RETURN "application/vnd.blueice.multipass=" + cFname + cFext
+   RETURN "application/vnd.blueice.multipass"
 ELSEIF cFile LIKE ".+\.bmi" 
-   RETURN "application/vnd.bmi=" + cFname + cFext
+   RETURN "application/vnd.bmi"
 ELSEIF cFile LIKE ".+\.sh" 
-   RETURN "application/x-sh=" + cFname + cFext
+   RETURN "application/x-sh"
 ELSEIF cFile LIKE ".+\.btif" 
-   RETURN "image/prs.btif=" + cFname + cFext
+   RETURN "image/prs.btif"
 ELSEIF cFile LIKE ".+\.rep" 
-   RETURN "application/vnd.businessobjects=" + cFname + cFext
+   RETURN "application/vnd.businessobjects"
 ELSEIF cFile LIKE ".+\.bz" 
-   RETURN "application/x-bzip=" + cFname + cFext
+   RETURN "application/x-bzip"
 ELSEIF cFile LIKE ".+\.bz2" 
-   RETURN "application/x-bzip2=" + cFname + cFext
+   RETURN "application/x-bzip2"
 ELSEIF cFile LIKE ".+\.csh" 
-   RETURN "application/x-csh=" + cFname + cFext
+   RETURN "application/x-csh"
 ELSEIF cFile LIKE ".+\.c" 
-   RETURN "text/x-c=" + cFname + cFext
+   RETURN "text/x-c"
 ELSEIF cFile LIKE ".+\.cdxml" 
-   RETURN "application/vnd.chemdraw+xml=" + cFname + cFext
+   RETURN "application/vnd.chemdraw+xml"
 ELSEIF cFile LIKE ".+\.css" 
-   RETURN "text/css=" + cFname + cFext
+   RETURN "text/css"
 ELSEIF cFile LIKE ".+\.cdx" 
-   RETURN "chemical/x-cdx=" + cFname + cFext
+   RETURN "chemical/x-cdx"
 ELSEIF cFile LIKE ".+\.cml" 
-   RETURN "chemical/x-cml=" + cFname + cFext
+   RETURN "chemical/x-cml"
 ELSEIF cFile LIKE ".+\.csml" 
-   RETURN "chemical/x-csml=" + cFname + cFext
+   RETURN "chemical/x-csml"
 ELSEIF cFile LIKE ".+\.cdbcmsg " 
-   RETURN "application/vnd.contact.cmsg=" + cFname + cFext
+   RETURN "application/vnd.contact.cmsg"
 ELSEIF cFile LIKE ".+\.cla" 
-   RETURN "application/vnd.claymore=" + cFname + cFext
+   RETURN "application/vnd.claymore"
 ELSEIF cFile LIKE ".+\.c4g" 
-   RETURN "application/vnd.clonk.c4group=" + cFname + cFext
+   RETURN "application/vnd.clonk.c4group"
 ELSEIF cFile LIKE ".+\.sub" 
-   RETURN "image/vnd.dvb.subtitle=" + cFname + cFext
+   RETURN "image/vnd.dvb.subtitle"
 ELSEIF cFile LIKE ".+\.cdmia" 
-   RETURN "application/cdmi-capability=" + cFname + cFext
+   RETURN "application/cdmi-capability"
 ELSEIF cFile LIKE ".+\.cdmic" 
-   RETURN "application/cdmi-container=" + cFname + cFext
+   RETURN "application/cdmi-container"
 ELSEIF cFile LIKE ".+\.cdmid" 
-   RETURN "application/cdmi-domain=" + cFname + cFext
+   RETURN "application/cdmi-domain"
 ELSEIF cFile LIKE ".+\.cdmio" 
-   RETURN "application/cdmi-object=" + cFname + cFext
+   RETURN "application/cdmi-object"
 ELSEIF cFile LIKE ".+\.cdmiq" 
-   RETURN "application/cdmi-queue=" + cFname + cFext
+   RETURN "application/cdmi-queue"
 ELSEIF cFile LIKE ".+\.c11amc" 
-   RETURN "application/vnd.cluetrust.cartomobile-config=" + cFname + cFext
+   RETURN "application/vnd.cluetrust.cartomobile-config"
 ELSEIF cFile LIKE ".+\.c11amz" 
-   RETURN "application/vnd.cluetrust.cartomobile-config-pkg=" + cFname + cFext
+   RETURN "application/vnd.cluetrust.cartomobile-config-pkg"
 ELSEIF cFile LIKE ".+\.ras" 
-   RETURN "image/x-cmu-raster=" + cFname + cFext
+   RETURN "image/x-cmu-raster"
 ELSEIF cFile LIKE ".+\.dae" 
-   RETURN "model/vnd.collada+xml=" + cFname + cFext
+   RETURN "model/vnd.collada+xml"
 ELSEIF cFile LIKE ".+\.csv" 
-   RETURN "text/csv=" + cFname + cFext
+   RETURN "text/csv"
 ELSEIF cFile LIKE ".+\.cpt" 
-   RETURN "application/mac-compactpro=" + cFname + cFext
+   RETURN "application/mac-compactpro"
 ELSEIF cFile LIKE ".+\.wmlc" 
-   RETURN "application/vnd.wap.wmlc=" + cFname + cFext
+   RETURN "application/vnd.wap.wmlc"
 ELSEIF cFile LIKE ".+\.cgm" 
-   RETURN "image/cgm=" + cFname + cFext
+   RETURN "image/cgm"
 ELSEIF cFile LIKE ".+\.ice" 
-   RETURN "x-conference/x-cooltalk=" + cFname + cFext
+   RETURN "x-conference/x-cooltalk"
 ELSEIF cFile LIKE ".+\.cmx" 
-   RETURN "image/x-cmx=" + cFname + cFext
+   RETURN "image/x-cmx"
 ELSEIF cFile LIKE ".+\.xar" 
-   RETURN "application/vnd.xara=" + cFname + cFext
+   RETURN "application/vnd.xara"
 ELSEIF cFile LIKE ".+\.cmc" 
-   RETURN "application/vnd.cosmocaller=" + cFname + cFext
+   RETURN "application/vnd.cosmocaller"
 ELSEIF cFile LIKE ".+\.cpio" 
-   RETURN "application/x-cpio=" + cFname + cFext
+   RETURN "application/x-cpio"
 ELSEIF cFile LIKE ".+\.clkx" 
-   RETURN "application/vnd.crick.clicker=" + cFname + cFext
+   RETURN "application/vnd.crick.clicker"
 ELSEIF cFile LIKE ".+\.clkk" 
-   RETURN "application/vnd.crick.clicker.keyboard=" + cFname + cFext
+   RETURN "application/vnd.crick.clicker.keyboard"
 ELSEIF cFile LIKE ".+\.clkp" 
-   RETURN "application/vnd.crick.clicker.palette=" + cFname + cFext
+   RETURN "application/vnd.crick.clicker.palette"
 ELSEIF cFile LIKE ".+\.clkt" 
-   RETURN "application/vnd.crick.clicker.template=" + cFname + cFext
+   RETURN "application/vnd.crick.clicker.template"
 ELSEIF cFile LIKE ".+\.clkw" 
-   RETURN "application/vnd.crick.clicker.wordbank=" + cFname + cFext
+   RETURN "application/vnd.crick.clicker.wordbank"
 ELSEIF cFile LIKE ".+\.wbs" 
-   RETURN "application/vnd.criticaltools.wbs+xml=" + cFname + cFext
+   RETURN "application/vnd.criticaltools.wbs+xml"
 ELSEIF cFile LIKE ".+\.cryptonote" 
-   RETURN "application/vnd.rig.cryptonote=" + cFname + cFext
+   RETURN "application/vnd.rig.cryptonote"
 ELSEIF cFile LIKE ".+\.cif" 
-   RETURN "chemical/x-cif=" + cFname + cFext
+   RETURN "chemical/x-cif"
 ELSEIF cFile LIKE ".+\.cmdf" 
-   RETURN "chemical/x-cmdf=" + cFname + cFext
+   RETURN "chemical/x-cmdf"
 ELSEIF cFile LIKE ".+\.cu" 
-   RETURN "application/cu-seeme=" + cFname + cFext
+   RETURN "application/cu-seeme"
 ELSEIF cFile LIKE ".+\.cww" 
-   RETURN "application/prs.cww=" + cFname + cFext
+   RETURN "application/prs.cww"
 ELSEIF cFile LIKE ".+\.curl" 
-   RETURN "text/vnd.curl=" + cFname + cFext
+   RETURN "text/vnd.curl"
 ELSEIF cFile LIKE ".+\.dcurl" 
-   RETURN "text/vnd.curl.dcurl=" + cFname + cFext
+   RETURN "text/vnd.curl.dcurl"
 ELSEIF cFile LIKE ".+\.mcurl" 
-   RETURN "text/vnd.curl.mcurl=" + cFname + cFext
+   RETURN "text/vnd.curl.mcurl"
 ELSEIF cFile LIKE ".+\.scurl" 
-   RETURN "text/vnd.curl.scurl=" + cFname + cFext
+   RETURN "text/vnd.curl.scurl"
 ELSEIF cFile LIKE ".+\.car" 
-   RETURN "application/vnd.curl.car=" + cFname + cFext
+   RETURN "application/vnd.curl.car"
 ELSEIF cFile LIKE ".+\.pcurl" 
-   RETURN "application/vnd.curl.pcurl=" + cFname + cFext
+   RETURN "application/vnd.curl.pcurl"
 ELSEIF cFile LIKE ".+\.cmp" 
-   RETURN "application/vnd.yellowriver-custom-menu=" + cFname + cFext
+   RETURN "application/vnd.yellowriver-custom-menu"
 ELSEIF cFile LIKE ".+\.dssc" 
-   RETURN "application/dssc+der=" + cFname + cFext
+   RETURN "application/dssc+der"
 ELSEIF cFile LIKE ".+\.xdssc" 
-   RETURN "application/dssc+xml=" + cFname + cFext
+   RETURN "application/dssc+xml"
 ELSEIF cFile LIKE ".+\.deb" 
-   RETURN "application/x-debian-package=" + cFname + cFext
+   RETURN "application/x-debian-package"
 ELSEIF cFile LIKE ".+\.uva" 
-   RETURN "audio/vnd.dece.audio=" + cFname + cFext
+   RETURN "audio/vnd.dece.audio"
 ELSEIF cFile LIKE ".+\.uvi" 
-   RETURN "image/vnd.dece.graphic=" + cFname + cFext
+   RETURN "image/vnd.dece.graphic"
 ELSEIF cFile LIKE ".+\.uvh" 
-   RETURN "video/vnd.dece.hd=" + cFname + cFext
+   RETURN "video/vnd.dece.hd"
 ELSEIF cFile LIKE ".+\.uvm" 
-   RETURN "video/vnd.dece.mobile=" + cFname + cFext
+   RETURN "video/vnd.dece.mobile"
 ELSEIF cFile LIKE ".+\.uvu" 
-   RETURN "video/vnd.uvvu.mp4=" + cFname + cFext
+   RETURN "video/vnd.uvvu.mp4"
 ELSEIF cFile LIKE ".+\.uvp" 
-   RETURN "video/vnd.dece.pd=" + cFname + cFext
+   RETURN "video/vnd.dece.pd"
 ELSEIF cFile LIKE ".+\.uvs" 
-   RETURN "video/vnd.dece.sd=" + cFname + cFext
+   RETURN "video/vnd.dece.sd"
 ELSEIF cFile LIKE ".+\.uvv" 
-   RETURN "video/vnd.dece.video=" + cFname + cFext
+   RETURN "video/vnd.dece.video"
 ELSEIF cFile LIKE ".+\.dvi" 
-   RETURN "application/x-dvi=" + cFname + cFext
+   RETURN "application/x-dvi"
 ELSEIF cFile LIKE ".+\.seed" 
-   RETURN "application/vnd.fdsn.seed=" + cFname + cFext
+   RETURN "application/vnd.fdsn.seed"
 ELSEIF cFile LIKE ".+\.dtb" 
-   RETURN "application/x-dtbook+xml=" + cFname + cFext
+   RETURN "application/x-dtbook+xml"
 ELSEIF cFile LIKE ".+\.res" 
-   RETURN "application/x-dtbresource+xml=" + cFname + cFext
+   RETURN "application/x-dtbresource+xml"
 ELSEIF cFile LIKE ".+\.ait" 
-   RETURN "application/vnd.dvb.ait=" + cFname + cFext
+   RETURN "application/vnd.dvb.ait"
 ELSEIF cFile LIKE ".+\.svc" 
-   RETURN "application/vnd.dvb.service=" + cFname + cFext
+   RETURN "application/vnd.dvb.service"
 ELSEIF cFile LIKE ".+\.eol" 
-   RETURN "audio/vnd.digital-winds=" + cFname + cFext
+   RETURN "audio/vnd.digital-winds"
 ELSEIF cFile LIKE ".+\.djvu" 
-   RETURN "image/vnd.djvu=" + cFname + cFext
+   RETURN "image/vnd.djvu"
 ELSEIF cFile LIKE ".+\.dtd" 
-   RETURN "application/xml-dtd=" + cFname + cFext
+   RETURN "application/xml-dtd"
 ELSEIF cFile LIKE ".+\.mlp" 
-   RETURN "application/vnd.dolby.mlp=" + cFname + cFext
+   RETURN "application/vnd.dolby.mlp"
 ELSEIF cFile LIKE ".+\.wad" 
-   RETURN "application/x-doom=" + cFname + cFext
+   RETURN "application/x-doom"
 ELSEIF cFile LIKE ".+\.dpg" 
-   RETURN "application/vnd.dpgraph=" + cFname + cFext
+   RETURN "application/vnd.dpgraph"
 ELSEIF cFile LIKE ".+\.dra" 
-   RETURN "audio/vnd.dra=" + cFname + cFext
+   RETURN "audio/vnd.dra"
 ELSEIF cFile LIKE ".+\.dfac" 
-   RETURN "application/vnd.dreamfactory=" + cFname + cFext
+   RETURN "application/vnd.dreamfactory"
 ELSEIF cFile LIKE ".+\.dts" 
-   RETURN "audio/vnd.dts=" + cFname + cFext
+   RETURN "audio/vnd.dts"
 ELSEIF cFile LIKE ".+\.dtshd" 
-   RETURN "audio/vnd.dts.hd=" + cFname + cFext
+   RETURN "audio/vnd.dts.hd"
 ELSEIF cFile LIKE ".+\.dwg" 
-   RETURN "image/vnd.dwg=" + cFname + cFext
+   RETURN "image/vnd.dwg"
 ELSEIF cFile LIKE ".+\.geo" 
-   RETURN "application/vnd.dynageo=" + cFname + cFext
+   RETURN "application/vnd.dynageo"
 ELSEIF cFile LIKE ".+\.es" 
-   RETURN "application/ecmascript=" + cFname + cFext
+   RETURN "application/ecmascript"
 ELSEIF cFile LIKE ".+\.mag" 
-   RETURN "application/vnd.ecowin.chart=" + cFname + cFext
+   RETURN "application/vnd.ecowin.chart"
 ELSEIF cFile LIKE ".+\.mmr" 
-   RETURN "image/vnd.fujixerox.edmics-mmr=" + cFname + cFext
+   RETURN "image/vnd.fujixerox.edmics-mmr"
 ELSEIF cFile LIKE ".+\.rlc" 
-   RETURN "image/vnd.fujixerox.edmics-rlc=" + cFname + cFext
+   RETURN "image/vnd.fujixerox.edmics-rlc"
 ELSEIF cFile LIKE ".+\.exi" 
-   RETURN "application/exi=" + cFname + cFext
+   RETURN "application/exi"
 ELSEIF cFile LIKE ".+\.mgz" 
-   RETURN "application/vnd.proteus.magazine=" + cFname + cFext
+   RETURN "application/vnd.proteus.magazine"
 ELSEIF cFile LIKE ".+\.epub" 
-   RETURN "application/epub+zip=" + cFname + cFext
+   RETURN "application/epub+zip"
 ELSEIF cFile LIKE ".+\.eml" 
-   RETURN "message/rfc822=" + cFname + cFext
+   RETURN "message/rfc822"
 ELSEIF cFile LIKE ".+\.nml" 
-   RETURN "application/vnd.enliven=" + cFname + cFext
+   RETURN "application/vnd.enliven"
 ELSEIF cFile LIKE ".+\.xpr" 
-   RETURN "application/vnd.is-xpr=" + cFname + cFext
+   RETURN "application/vnd.is-xpr"
 ELSEIF cFile LIKE ".+\.xif" 
-   RETURN "image/vnd.xiff=" + cFname + cFext
+   RETURN "image/vnd.xiff"
 ELSEIF cFile LIKE ".+\.xfdl" 
-   RETURN "application/vnd.xfdl=" + cFname + cFext
+   RETURN "application/vnd.xfdl"
 ELSEIF cFile LIKE ".+\.emma" 
-   RETURN "application/emma+xml=" + cFname + cFext
+   RETURN "application/emma+xml"
 ELSEIF cFile LIKE ".+\.ez2" 
-   RETURN "application/vnd.ezpix-album=" + cFname + cFext
+   RETURN "application/vnd.ezpix-album"
 ELSEIF cFile LIKE ".+\.ez3" 
-   RETURN "application/vnd.ezpix-package=" + cFname + cFext
+   RETURN "application/vnd.ezpix-package"
 ELSEIF cFile LIKE ".+\.fst" 
-   RETURN "image/vnd.fst=" + cFname + cFext
+   RETURN "image/vnd.fst"
 ELSEIF cFile LIKE ".+\.fvt" 
-   RETURN "video/vnd.fvt=" + cFname + cFext
+   RETURN "video/vnd.fvt"
 ELSEIF cFile LIKE ".+\.fbs" 
-   RETURN "image/vnd.fastbidsheet=" + cFname + cFext
+   RETURN "image/vnd.fastbidsheet"
 ELSEIF cFile LIKE ".+\.fe_launch" 
-   RETURN "application/vnd.denovo.fcselayout-link=" + cFname + cFext
+   RETURN "application/vnd.denovo.fcselayout-link"
 ELSEIF cFile LIKE ".+\.f4v" 
-   RETURN "video/x-f4v=" + cFname + cFext
+   RETURN "video/x-f4v"
 ELSEIF cFile LIKE ".+\.flv" 
-   RETURN "video/x-flv=" + cFname + cFext
+   RETURN "video/x-flv"
 ELSEIF cFile LIKE ".+\.fpx" 
-   RETURN "image/vnd.fpx=" + cFname + cFext
+   RETURN "image/vnd.fpx"
 ELSEIF cFile LIKE ".+\.npx" 
-   RETURN "image/vnd.net-fpx=" + cFname + cFext
+   RETURN "image/vnd.net-fpx"
 ELSEIF cFile LIKE ".+\.flx" 
-   RETURN "text/vnd.fmi.flexstor=" + cFname + cFext
+   RETURN "text/vnd.fmi.flexstor"
 ELSEIF cFile LIKE ".+\.fli" 
-   RETURN "video/x-fli=" + cFname + cFext
+   RETURN "video/x-fli"
 ELSEIF cFile LIKE ".+\.ftc" 
-   RETURN "application/vnd.fluxtime.clip=" + cFname + cFext
+   RETURN "application/vnd.fluxtime.clip"
 ELSEIF cFile LIKE ".+\.fdf" 
-   RETURN "application/vnd.fdf=" + cFname + cFext
+   RETURN "application/vnd.fdf"
 ELSEIF cFile LIKE ".+\.f" 
-   RETURN "text/x-fortran=" + cFname + cFext
+   RETURN "text/x-fortran"
 ELSEIF cFile LIKE ".+\.mif" 
-   RETURN "application/vnd.mif=" + cFname + cFext
+   RETURN "application/vnd.mif"
 ELSEIF cFile LIKE ".+\.fm" 
-   RETURN "application/vnd.framemaker=" + cFname + cFext
+   RETURN "application/vnd.framemaker"
 ELSEIF cFile LIKE ".+\.fh" 
-   RETURN "image/x-freehand=" + cFname + cFext
+   RETURN "image/x-freehand"
 ELSEIF cFile LIKE ".+\.fsc" 
-   RETURN "application/vnd.fsc.weblaunch=" + cFname + cFext
+   RETURN "application/vnd.fsc.weblaunch"
 ELSEIF cFile LIKE ".+\.fnc" 
-   RETURN "application/vnd.frogans.fnc=" + cFname + cFext
+   RETURN "application/vnd.frogans.fnc"
 ELSEIF cFile LIKE ".+\.ltf" 
-   RETURN "application/vnd.frogans.ltf=" + cFname + cFext
+   RETURN "application/vnd.frogans.ltf"
 ELSEIF cFile LIKE ".+\.ddd" 
-   RETURN "application/vnd.fujixerox.ddd=" + cFname + cFext
+   RETURN "application/vnd.fujixerox.ddd"
 ELSEIF cFile LIKE ".+\.xdw" 
-   RETURN "application/vnd.fujixerox.docuworks=" + cFname + cFext
+   RETURN "application/vnd.fujixerox.docuworks"
 ELSEIF cFile LIKE ".+\.xbd" 
-   RETURN "application/vnd.fujixerox.docuworks.binder=" + cFname + cFext
+   RETURN "application/vnd.fujixerox.docuworks.binder"
 ELSEIF cFile LIKE ".+\.oas" 
-   RETURN "application/vnd.fujitsu.oasys=" + cFname + cFext
+   RETURN "application/vnd.fujitsu.oasys"
 ELSEIF cFile LIKE ".+\.oa2" 
-   RETURN "application/vnd.fujitsu.oasys2=" + cFname + cFext
+   RETURN "application/vnd.fujitsu.oasys2"
 ELSEIF cFile LIKE ".+\.oa3" 
-   RETURN "application/vnd.fujitsu.oasys3=" + cFname + cFext
+   RETURN "application/vnd.fujitsu.oasys3"
 ELSEIF cFile LIKE ".+\.fg5" 
-   RETURN "application/vnd.fujitsu.oasysgp=" + cFname + cFext
+   RETURN "application/vnd.fujitsu.oasysgp"
 ELSEIF cFile LIKE ".+\.bh2" 
-   RETURN "application/vnd.fujitsu.oasysprs=" + cFname + cFext
+   RETURN "application/vnd.fujitsu.oasysprs"
 ELSEIF cFile LIKE ".+\.spl" 
-   RETURN "application/x-futuresplash=" + cFname + cFext
+   RETURN "application/x-futuresplash"
 ELSEIF cFile LIKE ".+\.fzs" 
-   RETURN "application/vnd.fuzzysheet=" + cFname + cFext
+   RETURN "application/vnd.fuzzysheet"
 ELSEIF cFile LIKE ".+\.g3" 
-   RETURN "image/g3fax=" + cFname + cFext
+   RETURN "image/g3fax"
 ELSEIF cFile LIKE ".+\.gmx" 
-   RETURN "application/vnd.gmx=" + cFname + cFext
+   RETURN "application/vnd.gmx"
 ELSEIF cFile LIKE ".+\.gtw" 
-   RETURN "model/vnd.gtw=" + cFname + cFext
+   RETURN "model/vnd.gtw"
 ELSEIF cFile LIKE ".+\.txd" 
-   RETURN "application/vnd.genomatix.tuxedo=" + cFname + cFext
+   RETURN "application/vnd.genomatix.tuxedo"
 ELSEIF cFile LIKE ".+\.ggb" 
-   RETURN "application/vnd.geogebra.file=" + cFname + cFext
+   RETURN "application/vnd.geogebra.file"
 ELSEIF cFile LIKE ".+\.ggt" 
-   RETURN "application/vnd.geogebra.tool=" + cFname + cFext
+   RETURN "application/vnd.geogebra.tool"
 ELSEIF cFile LIKE ".+\.gdl" 
-   RETURN "model/vnd.gdl=" + cFname + cFext
+   RETURN "model/vnd.gdl"
 ELSEIF cFile LIKE ".+\.gex" 
-   RETURN "application/vnd.geometry-explorer=" + cFname + cFext
+   RETURN "application/vnd.geometry-explorer"
 ELSEIF cFile LIKE ".+\.gxt" 
-   RETURN "application/vnd.geonext=" + cFname + cFext
+   RETURN "application/vnd.geonext"
 ELSEIF cFile LIKE ".+\.g2w" 
-   RETURN "application/vnd.geoplan=" + cFname + cFext
+   RETURN "application/vnd.geoplan"
 ELSEIF cFile LIKE ".+\.g3w" 
-   RETURN "application/vnd.geospace=" + cFname + cFext
+   RETURN "application/vnd.geospace"
 ELSEIF cFile LIKE ".+\.gsf" 
-   RETURN "application/x-font-ghostscript=" + cFname + cFext
+   RETURN "application/x-font-ghostscript"
 ELSEIF cFile LIKE ".+\.bdf" 
-   RETURN "application/x-font-bdf=" + cFname + cFext
+   RETURN "application/x-font-bdf"
 ELSEIF cFile LIKE ".+\.gtar" 
-   RETURN "application/x-gtar=" + cFname + cFext
+   RETURN "application/x-gtar"
 ELSEIF cFile LIKE ".+\.texinfo " 
-   RETURN "application/x-texinfo=" + cFname + cFext
+   RETURN "application/x-texinfo"
 ELSEIF cFile LIKE ".+\.gnumeric" 
-   RETURN "application/x-gnumeric=" + cFname + cFext
+   RETURN "application/x-gnumeric"
 ELSEIF cFile LIKE ".+\.kml" 
-   RETURN "application/vnd.google-earth.kml+xml=" + cFname + cFext
+   RETURN "application/vnd.google-earth.kml+xml"
 ELSEIF cFile LIKE ".+\.kmz" 
-   RETURN "application/vnd.google-earth.kmz=" + cFname + cFext
+   RETURN "application/vnd.google-earth.kmz"
 ELSEIF cFile LIKE ".+\.gqf" 
-   RETURN "application/vnd.grafeq=" + cFname + cFext
+   RETURN "application/vnd.grafeq"
 ELSEIF cFile LIKE ".+\.gif" 
-   RETURN "image/gif=" + cFname + cFext
+   RETURN "image/gif"
 ELSEIF cFile LIKE ".+\.gv" 
-   RETURN "text/vnd.graphviz=" + cFname + cFext
+   RETURN "text/vnd.graphviz"
 ELSEIF cFile LIKE ".+\.gac" 
-   RETURN "application/vnd.groove-account=" + cFname + cFext
+   RETURN "application/vnd.groove-account"
 ELSEIF cFile LIKE ".+\.ghf" 
-   RETURN "application/vnd.groove-help=" + cFname + cFext
+   RETURN "application/vnd.groove-help"
 ELSEIF cFile LIKE ".+\.gim" 
-   RETURN "application/vnd.groove-identity-message=" + cFname + cFext
+   RETURN "application/vnd.groove-identity-message"
 ELSEIF cFile LIKE ".+\.grv" 
-   RETURN "application/vnd.groove-injector=" + cFname + cFext
+   RETURN "application/vnd.groove-injector"
 ELSEIF cFile LIKE ".+\.gtm" 
-   RETURN "application/vnd.groove-tool-message=" + cFname + cFext
+   RETURN "application/vnd.groove-tool-message"
 ELSEIF cFile LIKE ".+\.tpl" 
-   RETURN "application/vnd.groove-tool-template=" + cFname + cFext
+   RETURN "application/vnd.groove-tool-template"
 ELSEIF cFile LIKE ".+\.vcg" 
-   RETURN "application/vnd.groove-vcard=" + cFname + cFext
+   RETURN "application/vnd.groove-vcard"
 ELSEIF cFile LIKE ".+\.h261" 
-   RETURN "video/h261=" + cFname + cFext
+   RETURN "video/h261"
 ELSEIF cFile LIKE ".+\.h263" 
-   RETURN "video/h263=" + cFname + cFext
+   RETURN "video/h263"
 ELSEIF cFile LIKE ".+\.h264" 
-   RETURN "video/h264=" + cFname + cFext
+   RETURN "video/h264"
 ELSEIF cFile LIKE ".+\.hpid" 
-   RETURN "application/vnd.hp-hpid=" + cFname + cFext
+   RETURN "application/vnd.hp-hpid"
 ELSEIF cFile LIKE ".+\.hps" 
-   RETURN "application/vnd.hp-hps=" + cFname + cFext
+   RETURN "application/vnd.hp-hps"
 ELSEIF cFile LIKE ".+\.hdf" 
-   RETURN "application/x-hdf=" + cFname + cFext
+   RETURN "application/x-hdf"
 ELSEIF cFile LIKE ".+\.rip" 
-   RETURN "audio/vnd.rip=" + cFname + cFext
+   RETURN "audio/vnd.rip"
 ELSEIF cFile LIKE ".+\.hbci" 
-   RETURN "application/vnd.hbci=" + cFname + cFext
+   RETURN "application/vnd.hbci"
 ELSEIF cFile LIKE ".+\.jlt" 
-   RETURN "application/vnd.hp-jlyt=" + cFname + cFext
+   RETURN "application/vnd.hp-jlyt"
 ELSEIF cFile LIKE ".+\.pcl" 
-   RETURN "application/vnd.hp-pcl=" + cFname + cFext
+   RETURN "application/vnd.hp-pcl"
 ELSEIF cFile LIKE ".+\.hpgl" 
-   RETURN "application/vnd.hp-hpgl=" + cFname + cFext
+   RETURN "application/vnd.hp-hpgl"
 ELSEIF cFile LIKE ".+\.hvs" 
-   RETURN "application/vnd.yamaha.hv-script=" + cFname + cFext
+   RETURN "application/vnd.yamaha.hv-script"
 ELSEIF cFile LIKE ".+\.hvd" 
-   RETURN "application/vnd.yamaha.hv-dic=" + cFname + cFext
+   RETURN "application/vnd.yamaha.hv-dic"
 ELSEIF cFile LIKE ".+\.hvp" 
-   RETURN "application/vnd.yamaha.hv-voice=" + cFname + cFext
+   RETURN "application/vnd.yamaha.hv-voice"
 ELSEIF cFile LIKE ".+\.sfd-hdstx" 
-   RETURN "application/vnd.hydrostatix.sof-data=" + cFname + cFext
+   RETURN "application/vnd.hydrostatix.sof-data"
 ELSEIF cFile LIKE ".+\.stk" 
-   RETURN "application/hyperstudio=" + cFname + cFext
+   RETURN "application/hyperstudio"
 ELSEIF cFile LIKE ".+\.hal" 
-   RETURN "application/vnd.hal+xml=" + cFname + cFext
+   RETURN "application/vnd.hal+xml"
 ELSEIF cFile LIKE ".+\.html" 
-   RETURN "text/html=" + cFname + cFext
+   RETURN "text/html"
 ELSEIF cFile LIKE ".+\.irm" 
-   RETURN "application/vnd.ibm.rights-management=" + cFname + cFext
+   RETURN "application/vnd.ibm.rights-management"
 ELSEIF cFile LIKE ".+\.sc" 
-   RETURN "application/vnd.ibm.secure-container=" + cFname + cFext
+   RETURN "application/vnd.ibm.secure-container"
 ELSEIF cFile LIKE ".+\.ics" 
-   RETURN "text/calendar=" + cFname + cFext
+   RETURN "text/calendar"
 ELSEIF cFile LIKE ".+\.icc" 
-   RETURN "application/vnd.iccprofile=" + cFname + cFext
+   RETURN "application/vnd.iccprofile"
 ELSEIF cFile LIKE ".+\.ico" 
-   RETURN "image/x-icon=" + cFname + cFext
+   RETURN "image/x-icon"
 ELSEIF cFile LIKE ".+\.igl" 
-   RETURN "application/vnd.igloader=" + cFname + cFext
+   RETURN "application/vnd.igloader"
 ELSEIF cFile LIKE ".+\.ief" 
-   RETURN "image/ief=" + cFname + cFext
+   RETURN "image/ief"
 ELSEIF cFile LIKE ".+\.ivp" 
-   RETURN "application/vnd.immervision-ivp=" + cFname + cFext
+   RETURN "application/vnd.immervision-ivp"
 ELSEIF cFile LIKE ".+\.ivu" 
-   RETURN "application/vnd.immervision-ivu=" + cFname + cFext
+   RETURN "application/vnd.immervision-ivu"
 ELSEIF cFile LIKE ".+\.rif" 
-   RETURN "application/reginfo+xml=" + cFname + cFext
+   RETURN "application/reginfo+xml"
 ELSEIF cFile LIKE ".+\.3dml" 
-   RETURN "text/vnd.in3d.3dml=" + cFname + cFext
+   RETURN "text/vnd.in3d.3dml"
 ELSEIF cFile LIKE ".+\.spot" 
-   RETURN "text/vnd.in3d.spot=" + cFname + cFext
+   RETURN "text/vnd.in3d.spot"
 ELSEIF cFile LIKE ".+\.igs" 
-   RETURN "model/iges=" + cFname + cFext
+   RETURN "model/iges"
 ELSEIF cFile LIKE ".+\.i2g" 
-   RETURN "application/vnd.intergeo=" + cFname + cFext
+   RETURN "application/vnd.intergeo"
 ELSEIF cFile LIKE ".+\.cdy" 
-   RETURN "application/vnd.cinderella=" + cFname + cFext
+   RETURN "application/vnd.cinderella"
 ELSEIF cFile LIKE ".+\.xpw" 
-   RETURN "application/vnd.intercon.formnet=" + cFname + cFext
+   RETURN "application/vnd.intercon.formnet"
 ELSEIF cFile LIKE ".+\.fcs" 
-   RETURN "application/vnd.isac.fcs=" + cFname + cFext
+   RETURN "application/vnd.isac.fcs"
 ELSEIF cFile LIKE ".+\.ipfix" 
-   RETURN "application/ipfix=" + cFname + cFext
+   RETURN "application/ipfix"
 ELSEIF cFile LIKE ".+\.cer" 
-   RETURN "application/pkix-cert=" + cFname + cFext
+   RETURN "application/pkix-cert"
 ELSEIF cFile LIKE ".+\.pki" 
-   RETURN "application/pkixcmp=" + cFname + cFext
+   RETURN "application/pkixcmp"
 ELSEIF cFile LIKE ".+\.crl" 
-   RETURN "application/pkix-crl=" + cFname + cFext
+   RETURN "application/pkix-crl"
 ELSEIF cFile LIKE ".+\.pkipath " 
-   RETURN "application/pkix-pkipath=" + cFname + cFext
+   RETURN "application/pkix-pkipath"
 ELSEIF cFile LIKE ".+\.igm" 
-   RETURN "application/vnd.insors.igm=" + cFname + cFext
+   RETURN "application/vnd.insors.igm"
 ELSEIF cFile LIKE ".+\.rcprofile" 
-   RETURN "application/vnd.ipunplugged.rcprofile=" + cFname + cFext
+   RETURN "application/vnd.ipunplugged.rcprofile"
 ELSEIF cFile LIKE ".+\.irp" 
-   RETURN "application/vnd.irepository.package+xml=" + cFname + cFext
+   RETURN "application/vnd.irepository.package+xml"
 ELSEIF cFile LIKE ".+\.jad" 
-   RETURN "text/vnd.sun.j2me.app-descriptor=" + cFname + cFext
+   RETURN "text/vnd.sun.j2me.app-descriptor"
 ELSEIF cFile LIKE ".+\.jar" 
-   RETURN "application/java-archive=" + cFname + cFext
+   RETURN "application/java-archive"
 ELSEIF cFile LIKE ".+\.class" 
-   RETURN "application/java-vm=" + cFname + cFext
+   RETURN "application/java-vm"
 ELSEIF cFile LIKE ".+\.jnlp" 
-   RETURN "application/x-java-jnlp-file=" + cFname + cFext
+   RETURN "application/x-java-jnlp-file"
 ELSEIF cFile LIKE ".+\.ser" 
-   RETURN "application/java-serialized-object=" + cFname + cFext
+   RETURN "application/java-serialized-object"
 ELSEIF cFile LIKE ".+\.java" 
-   RETURN "text/x-java-source=" + cFname + cFext
+   RETURN "text/x-java-source"
 ELSEIF cFile LIKE ".+\.js" 
-   RETURN "application/javascript=" + cFname + cFext
+   RETURN "application/javascript"
 ELSEIF cFile LIKE ".+\.json" 
-   RETURN "application/json=" + cFname + cFext
+   RETURN "application/json"
 ELSEIF cFile LIKE ".+\.joda" 
-   RETURN "application/vnd.joost.joda-archive=" + cFname + cFext
+   RETURN "application/vnd.joost.joda-archive"
 ELSEIF cFile LIKE ".+\.jpm" 
-   RETURN "video/jpm=" + cFname + cFext
+   RETURN "video/jpm"
 ELSEIF cFile LIKE ".+\.jpgv" 
-   RETURN "video/jpeg=" + cFname + cFext
+   RETURN "video/jpeg"
 ELSEIF cFile LIKE ".+\.ktz" 
-   RETURN "application/vnd.kahootz=" + cFname + cFext
+   RETURN "application/vnd.kahootz"
 ELSEIF cFile LIKE ".+\.mmd" 
-   RETURN "application/vnd.chipnuts.karaoke-mmd=" + cFname + cFext
+   RETURN "application/vnd.chipnuts.karaoke-mmd"
 ELSEIF cFile LIKE ".+\.karbon" 
-   RETURN "application/vnd.kde.karbon=" + cFname + cFext
+   RETURN "application/vnd.kde.karbon"
 ELSEIF cFile LIKE ".+\.chrt" 
-   RETURN "application/vnd.kde.kchart=" + cFname + cFext
+   RETURN "application/vnd.kde.kchart"
 ELSEIF cFile LIKE ".+\.kfo" 
-   RETURN "application/vnd.kde.kformula=" + cFname + cFext
+   RETURN "application/vnd.kde.kformula"
 ELSEIF cFile LIKE ".+\.flw" 
-   RETURN "application/vnd.kde.kivio=" + cFname + cFext
+   RETURN "application/vnd.kde.kivio"
 ELSEIF cFile LIKE ".+\.kon" 
-   RETURN "application/vnd.kde.kontour=" + cFname + cFext
+   RETURN "application/vnd.kde.kontour"
 ELSEIF cFile LIKE ".+\.kpr" 
-   RETURN "application/vnd.kde.kpresenter=" + cFname + cFext
+   RETURN "application/vnd.kde.kpresenter"
 ELSEIF cFile LIKE ".+\.ksp" 
-   RETURN "application/vnd.kde.kspread=" + cFname + cFext
+   RETURN "application/vnd.kde.kspread"
 ELSEIF cFile LIKE ".+\.kwd" 
-   RETURN "application/vnd.kde.kword=" + cFname + cFext
+   RETURN "application/vnd.kde.kword"
 ELSEIF cFile LIKE ".+\.htke" 
-   RETURN "application/vnd.kenameaapp=" + cFname + cFext
+   RETURN "application/vnd.kenameaapp"
 ELSEIF cFile LIKE ".+\.kia" 
-   RETURN "application/vnd.kidspiration=" + cFname + cFext
+   RETURN "application/vnd.kidspiration"
 ELSEIF cFile LIKE ".+\.kne" 
-   RETURN "application/vnd.kinar=" + cFname + cFext
+   RETURN "application/vnd.kinar"
 ELSEIF cFile LIKE ".+\.sse" 
-   RETURN "application/vnd.kodak-descriptor=" + cFname + cFext
+   RETURN "application/vnd.kodak-descriptor"
 ELSEIF cFile LIKE ".+\.lasxml" 
-   RETURN "application/vnd.las.las+xml=" + cFname + cFext
+   RETURN "application/vnd.las.las+xml"
 ELSEIF cFile LIKE ".+\.latex" 
-   RETURN "application/x-latex=" + cFname + cFext
+   RETURN "application/x-latex"
 ELSEIF cFile LIKE ".+\.lbd" 
-   RETURN "application/vnd.llamagraphics.life-balance.desktop=" + cFname + cFext
+   RETURN "application/vnd.llamagraphics.life-balance.desktop"
 ELSEIF cFile LIKE ".+\.lbe" 
-   RETURN "application/vnd.llamagraphics.life-balance.exchange+xml=" + cFname + cFext
+   RETURN "application/vnd.llamagraphics.life-balance.exchange+xml"
 ELSEIF cFile LIKE ".+\.jam" 
-   RETURN "application/vnd.jam=" + cFname + cFext
+   RETURN "application/vnd.jam"
 ELSEIF cFile LIKE ".+\.123" 
-   RETURN "application/vnd.lotus-1-2-3=" + cFname + cFext
+   RETURN "application/vnd.lotus-1-2-3"
 ELSEIF cFile LIKE ".+\.apr" 
-   RETURN "application/vnd.lotus-approach=" + cFname + cFext
+   RETURN "application/vnd.lotus-approach"
 ELSEIF cFile LIKE ".+\.pre" 
-   RETURN "application/vnd.lotus-freelance=" + cFname + cFext
+   RETURN "application/vnd.lotus-freelance"
 ELSEIF cFile LIKE ".+\.nsf" 
-   RETURN "application/vnd.lotus-notes=" + cFname + cFext
+   RETURN "application/vnd.lotus-notes"
 ELSEIF cFile LIKE ".+\.org" 
-   RETURN "application/vnd.lotus-organizer=" + cFname + cFext
+   RETURN "application/vnd.lotus-organizer"
 ELSEIF cFile LIKE ".+\.scm" 
-   RETURN "application/vnd.lotus-screencam=" + cFname + cFext
+   RETURN "application/vnd.lotus-screencam"
 ELSEIF cFile LIKE ".+\.lwp" 
-   RETURN "application/vnd.lotus-wordpro=" + cFname + cFext
+   RETURN "application/vnd.lotus-wordpro"
 ELSEIF cFile LIKE ".+\.lvp" 
-   RETURN "audio/vnd.lucent.voice=" + cFname + cFext
+   RETURN "audio/vnd.lucent.voice"
 ELSEIF cFile LIKE ".+\.m3u" 
-   RETURN "audio/x-mpegurl=" + cFname + cFext
+   RETURN "audio/x-mpegurl"
 ELSEIF cFile LIKE ".+\.m4v" 
-   RETURN "video/x-m4v=" + cFname + cFext
+   RETURN "video/x-m4v"
 ELSEIF cFile LIKE ".+\.hqx" 
-   RETURN "application/mac-binhex40=" + cFname + cFext
+   RETURN "application/mac-binhex40"
 ELSEIF cFile LIKE ".+\.portpkg " 
-   RETURN "application/vnd.macports.portpkg=" + cFname + cFext
+   RETURN "application/vnd.macports.portpkg"
 ELSEIF cFile LIKE ".+\.mgp" 
-   RETURN "application/vnd.osgeo.mapguide.package=" + cFname + cFext
+   RETURN "application/vnd.osgeo.mapguide.package"
 ELSEIF cFile LIKE ".+\.mrc" 
-   RETURN "application/marc=" + cFname + cFext
+   RETURN "application/marc"
 ELSEIF cFile LIKE ".+\.mrcx" 
-   RETURN "application/marcxml+xml=" + cFname + cFext
+   RETURN "application/marcxml+xml"
 ELSEIF cFile LIKE ".+\.mxf" 
-   RETURN "application/mxf=" + cFname + cFext
+   RETURN "application/mxf"
 ELSEIF cFile LIKE ".+\.nbp" 
-   RETURN "application/vnd.wolfram.player=" + cFname + cFext
+   RETURN "application/vnd.wolfram.player"
 ELSEIF cFile LIKE ".+\.ma" 
-   RETURN "application/mathematica=" + cFname + cFext
+   RETURN "application/mathematica"
 ELSEIF cFile LIKE ".+\.mathml" 
-   RETURN "application/mathml+xml=" + cFname + cFext
+   RETURN "application/mathml+xml"
 ELSEIF cFile LIKE ".+\.mbox" 
-   RETURN "application/mbox=" + cFname + cFext
+   RETURN "application/mbox"
 ELSEIF cFile LIKE ".+\.mc1" 
-   RETURN "application/vnd.medcalcdata=" + cFname + cFext
+   RETURN "application/vnd.medcalcdata"
 ELSEIF cFile LIKE ".+\.mscml" 
-   RETURN "application/mediaservercontrol+xml=" + cFname + cFext
+   RETURN "application/mediaservercontrol+xml"
 ELSEIF cFile LIKE ".+\.cdkey" 
-   RETURN "application/vnd.mediastation.cdkey=" + cFname + cFext
+   RETURN "application/vnd.mediastation.cdkey"
 ELSEIF cFile LIKE ".+\.mwf" 
-   RETURN "application/vnd.mfer=" + cFname + cFext
+   RETURN "application/vnd.mfer"
 ELSEIF cFile LIKE ".+\.mfm" 
-   RETURN "application/vnd.mfmp=" + cFname + cFext
+   RETURN "application/vnd.mfmp"
 ELSEIF cFile LIKE ".+\.msh" 
-   RETURN "model/mesh=" + cFname + cFext
+   RETURN "model/mesh"
 ELSEIF cFile LIKE ".+\.mads" 
-   RETURN "application/mads+xml=" + cFname + cFext
+   RETURN "application/mads+xml"
 ELSEIF cFile LIKE ".+\.mets" 
-   RETURN "application/mets+xml=" + cFname + cFext
+   RETURN "application/mets+xml"
 ELSEIF cFile LIKE ".+\.mods" 
-   RETURN "application/mods+xml=" + cFname + cFext
+   RETURN "application/mods+xml"
 ELSEIF cFile LIKE ".+\.meta4" 
-   RETURN "application/metalink4+xml=" + cFname + cFext
+   RETURN "application/metalink4+xml"
 ELSEIF cFile LIKE ".+\.potm" 
-   RETURN "application/vnd.ms-powerpoint.template.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint.template.macroenabled.12"
 ELSEIF cFile LIKE ".+\.docm" 
-   RETURN "application/vnd.ms-word.document.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-word.document.macroenabled.12"
 ELSEIF cFile LIKE ".+\.dotm" 
-   RETURN "application/vnd.ms-word.template.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-word.template.macroenabled.12"
 ELSEIF cFile LIKE ".+\.mcd" 
-   RETURN "application/vnd.mcd=" + cFname + cFext
+   RETURN "application/vnd.mcd"
 ELSEIF cFile LIKE ".+\.flo" 
-   RETURN "application/vnd.micrografx.flo=" + cFname + cFext
+   RETURN "application/vnd.micrografx.flo"
 ELSEIF cFile LIKE ".+\.igx" 
-   RETURN "application/vnd.micrografx.igx=" + cFname + cFext
+   RETURN "application/vnd.micrografx.igx"
 ELSEIF cFile LIKE ".+\.es3" 
-   RETURN "application/vnd.eszigno3+xml=" + cFname + cFext
+   RETURN "application/vnd.eszigno3+xml"
 ELSEIF cFile LIKE ".+\.mdb" 
-   RETURN "application/x-msaccess=" + cFname + cFext
+   RETURN "application/x-msaccess"
 ELSEIF cFile LIKE ".+\.asf" 
-   RETURN "video/x-ms-asf=" + cFname + cFext
+   RETURN "video/x-ms-asf"
 ELSEIF cFile LIKE ".+\.exe" 
-   RETURN "application/x-msdownload=" + cFname + cFext
+   RETURN "application/x-msdownload"
 ELSEIF cFile LIKE ".+\.cil" 
-   RETURN "application/vnd.ms-artgalry=" + cFname + cFext
+   RETURN "application/vnd.ms-artgalry"
 ELSEIF cFile LIKE ".+\.cab" 
-   RETURN "application/vnd.ms-cab-compressed=" + cFname + cFext
+   RETURN "application/vnd.ms-cab-compressed"
 ELSEIF cFile LIKE ".+\.ims" 
-   RETURN "application/vnd.ms-ims=" + cFname + cFext
+   RETURN "application/vnd.ms-ims"
 ELSEIF cFile LIKE ".+\.application" 
-   RETURN "application/x-ms-application=" + cFname + cFext
+   RETURN "application/x-ms-application"
 ELSEIF cFile LIKE ".+\.clp" 
-   RETURN "application/x-msclip=" + cFname + cFext
+   RETURN "application/x-msclip"
 ELSEIF cFile LIKE ".+\.mdi" 
-   RETURN "image/vnd.ms-modi=" + cFname + cFext
+   RETURN "image/vnd.ms-modi"
 ELSEIF cFile LIKE ".+\.eot" 
-   RETURN "application/vnd.ms-fontobject=" + cFname + cFext
+   RETURN "application/vnd.ms-fontobject"
 ELSEIF cFile LIKE ".+\.xls" 
-   RETURN "application/vnd.ms-excel=" + cFname + cFext
+   RETURN "application/vnd.ms-excel"
 ELSEIF cFile LIKE ".+\.xlam" 
-   RETURN "application/vnd.ms-excel.addin.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-excel.addin.macroenabled.12"
 ELSEIF cFile LIKE ".+\.xlsb" 
-   RETURN "application/vnd.ms-excel.sheet.binary.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-excel.sheet.binary.macroenabled.12"
 ELSEIF cFile LIKE ".+\.xltm" 
-   RETURN "application/vnd.ms-excel.template.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-excel.template.macroenabled.12"
 ELSEIF cFile LIKE ".+\.xlsm" 
-   RETURN "application/vnd.ms-excel.sheet.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-excel.sheet.macroenabled.12"
 ELSEIF cFile LIKE ".+\.chm" 
-   RETURN "application/vnd.ms-htmlhelp=" + cFname + cFext
+   RETURN "application/vnd.ms-htmlhelp"
 ELSEIF cFile LIKE ".+\.crd" 
-   RETURN "application/x-mscardfile=" + cFname + cFext
+   RETURN "application/x-mscardfile"
 ELSEIF cFile LIKE ".+\.lrm" 
-   RETURN "application/vnd.ms-lrm=" + cFname + cFext
+   RETURN "application/vnd.ms-lrm"
 ELSEIF cFile LIKE ".+\.mvb" 
-   RETURN "application/x-msmediaview=" + cFname + cFext
+   RETURN "application/x-msmediaview"
 ELSEIF cFile LIKE ".+\.mny" 
-   RETURN "application/x-msmoney=" + cFname + cFext
+   RETURN "application/x-msmoney"
 ELSEIF cFile LIKE ".+\.pptx" 
-   RETURN "application/vnd.openxmlformats-officedocument.presentationml.presentation=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 ELSEIF cFile LIKE ".+\.sldx" 
-   RETURN "application/vnd.openxmlformats-officedocument.presentationml.slide=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.presentationml.slide"
 ELSEIF cFile LIKE ".+\.ppsx" 
-   RETURN "application/vnd.openxmlformats-officedocument.presentationml.slideshow=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
 ELSEIF cFile LIKE ".+\.potx" 
-   RETURN "application/vnd.openxmlformats-officedocument.presentationml.template=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.presentationml.template"
 ELSEIF cFile LIKE ".+\.xlsx" 
-   RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 ELSEIF cFile LIKE ".+\.xltx" 
-   RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.template=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.spreadsheetml.template"
 ELSEIF cFile LIKE ".+\.docx" 
-   RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.document=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ELSEIF cFile LIKE ".+\.dotx" 
-   RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.template=" + cFname + cFext
+   RETURN "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
 ELSEIF cFile LIKE ".+\.obd" 
-   RETURN "application/x-msbinder=" + cFname + cFext
+   RETURN "application/x-msbinder"
 ELSEIF cFile LIKE ".+\.thmx" 
-   RETURN "application/vnd.ms-officetheme=" + cFname + cFext
+   RETURN "application/vnd.ms-officetheme"
 ELSEIF cFile LIKE ".+\.onetoc" 
    
-   RETURN "application/onenote=" + cFname + cFext
+   RETURN "application/onenote"
 ELSEIF cFile LIKE ".+\.pya" 
-   RETURN "audio/vnd.ms-playready.media.pya=" + cFname + cFext
+   RETURN "audio/vnd.ms-playready.media.pya"
 ELSEIF cFile LIKE ".+\.pyv" 
-   RETURN "video/vnd.ms-playready.media.pyv=" + cFname + cFext
+   RETURN "video/vnd.ms-playready.media.pyv"
 ELSEIF cFile LIKE ".+\.ppt" 
-   RETURN "application/vnd.ms-powerpoint=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint"
 ELSEIF cFile LIKE ".+\.ppam" 
-   RETURN "application/vnd.ms-powerpoint.addin.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint.addin.macroenabled.12"
 ELSEIF cFile LIKE ".+\.sldm" 
-   RETURN "application/vnd.ms-powerpoint.slide.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint.slide.macroenabled.12"
 ELSEIF cFile LIKE ".+\.pptm" 
-   RETURN "application/vnd.ms-powerpoint.presentation.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint.presentation.macroenabled.12"
 ELSEIF cFile LIKE ".+\.ppsm" 
-   RETURN "application/vnd.ms-powerpoint.slideshow.macroenabled.12=" + cFname + cFext
+   RETURN "application/vnd.ms-powerpoint.slideshow.macroenabled.12"
 ELSEIF cFile LIKE ".+\.mpp" 
-   RETURN "application/vnd.ms-project=" + cFname + cFext
+   RETURN "application/vnd.ms-project"
 ELSEIF cFile LIKE ".+\.pub" 
-   RETURN "application/x-mspublisher=" + cFname + cFext
+   RETURN "application/x-mspublisher"
 ELSEIF cFile LIKE ".+\.scd" 
-   RETURN "application/x-msschedule=" + cFname + cFext
+   RETURN "application/x-msschedule"
 ELSEIF cFile LIKE ".+\.xap" 
-   RETURN "application/x-silverlight-app=" + cFname + cFext
+   RETURN "application/x-silverlight-app"
 ELSEIF cFile LIKE ".+\.stl" 
-   RETURN "application/vnd.ms-pki.stl=" + cFname + cFext
+   RETURN "application/vnd.ms-pki.stl"
 ELSEIF cFile LIKE ".+\.cat" 
-   RETURN "application/vnd.ms-pki.seccat=" + cFname + cFext
+   RETURN "application/vnd.ms-pki.seccat"
 ELSEIF cFile LIKE ".+\.vsd" 
-   RETURN "application/vnd.visio=" + cFname + cFext
+   RETURN "application/vnd.visio"
 ELSEIF cFile LIKE ".+\.wm" 
-   RETURN "video/x-ms-wm=" + cFname + cFext
+   RETURN "video/x-ms-wm"
 ELSEIF cFile LIKE ".+\.wma" 
-   RETURN "audio/x-ms-wma=" + cFname + cFext
+   RETURN "audio/x-ms-wma"
 ELSEIF cFile LIKE ".+\.wax" 
-   RETURN "audio/x-ms-wax=" + cFname + cFext
+   RETURN "audio/x-ms-wax"
 ELSEIF cFile LIKE ".+\.wmx" 
-   RETURN "video/x-ms-wmx=" + cFname + cFext
+   RETURN "video/x-ms-wmx"
 ELSEIF cFile LIKE ".+\.wmd" 
-   RETURN "application/x-ms-wmd=" + cFname + cFext
+   RETURN "application/x-ms-wmd"
 ELSEIF cFile LIKE ".+\.wpl" 
-   RETURN "application/vnd.ms-wpl=" + cFname + cFext
+   RETURN "application/vnd.ms-wpl"
 ELSEIF cFile LIKE ".+\.wmz" 
-   RETURN "application/x-ms-wmz=" + cFname + cFext
+   RETURN "application/x-ms-wmz"
 ELSEIF cFile LIKE ".+\.wmv" 
-   RETURN "video/x-ms-wmv=" + cFname + cFext
+   RETURN "video/x-ms-wmv"
 ELSEIF cFile LIKE ".+\.wvx" 
-   RETURN "video/x-ms-wvx=" + cFname + cFext
+   RETURN "video/x-ms-wvx"
 ELSEIF cFile LIKE ".+\.wmf" 
-   RETURN "application/x-msmetafile=" + cFname + cFext
+   RETURN "application/x-msmetafile"
 ELSEIF cFile LIKE ".+\.trm" 
-   RETURN "application/x-msterminal=" + cFname + cFext
+   RETURN "application/x-msterminal"
 ELSEIF cFile LIKE ".+\.doc" 
-   RETURN "application/msword=" + cFname + cFext
+   RETURN "application/msword"
 ELSEIF cFile LIKE ".+\.wri" 
-   RETURN "application/x-mswrite=" + cFname + cFext
+   RETURN "application/x-mswrite"
 ELSEIF cFile LIKE ".+\.wps" 
-   RETURN "application/vnd.ms-works=" + cFname + cFext
+   RETURN "application/vnd.ms-works"
 ELSEIF cFile LIKE ".+\.xbap" 
-   RETURN "application/x-ms-xbap=" + cFname + cFext
+   RETURN "application/x-ms-xbap"
 ELSEIF cFile LIKE ".+\.xps" 
-   RETURN "application/vnd.ms-xpsdocument=" + cFname + cFext
+   RETURN "application/vnd.ms-xpsdocument"
 ELSEIF cFile LIKE ".+\.mid" 
-   RETURN "audio/midi=" + cFname + cFext
+   RETURN "audio/midi"
 ELSEIF cFile LIKE ".+\.mpy" 
-   RETURN "application/vnd.ibm.minipay=" + cFname + cFext
+   RETURN "application/vnd.ibm.minipay"
 ELSEIF cFile LIKE ".+\.afp" 
-   RETURN "application/vnd.ibm.modcap=" + cFname + cFext
+   RETURN "application/vnd.ibm.modcap"
 ELSEIF cFile LIKE ".+\.rms" 
-   RETURN "application/vnd.jcp.javame.midlet-rms=" + cFname + cFext
+   RETURN "application/vnd.jcp.javame.midlet-rms"
 ELSEIF cFile LIKE ".+\.tmo" 
-   RETURN "application/vnd.tmobile-livetv=" + cFname + cFext
+   RETURN "application/vnd.tmobile-livetv"
 ELSEIF cFile LIKE ".+\.prc" 
-   RETURN "application/x-mobipocket-ebook=" + cFname + cFext
+   RETURN "application/x-mobipocket-ebook"
 ELSEIF cFile LIKE ".+\.mbk" 
-   RETURN "application/vnd.mobius.mbk=" + cFname + cFext
+   RETURN "application/vnd.mobius.mbk"
 ELSEIF cFile LIKE ".+\.dis" 
-   RETURN "application/vnd.mobius.dis=" + cFname + cFext
+   RETURN "application/vnd.mobius.dis"
 ELSEIF cFile LIKE ".+\.plc" 
-   RETURN "application/vnd.mobius.plc=" + cFname + cFext
+   RETURN "application/vnd.mobius.plc"
 ELSEIF cFile LIKE ".+\.mqy" 
-   RETURN "application/vnd.mobius.mqy=" + cFname + cFext
+   RETURN "application/vnd.mobius.mqy"
 ELSEIF cFile LIKE ".+\.msl" 
-   RETURN "application/vnd.mobius.msl=" + cFname + cFext
+   RETURN "application/vnd.mobius.msl"
 ELSEIF cFile LIKE ".+\.txf" 
-   RETURN "application/vnd.mobius.txf=" + cFname + cFext
+   RETURN "application/vnd.mobius.txf"
 ELSEIF cFile LIKE ".+\.daf" 
-   RETURN "application/vnd.mobius.daf=" + cFname + cFext
+   RETURN "application/vnd.mobius.daf"
 ELSEIF cFile LIKE ".+\.fly" 
-   RETURN "text/vnd.fly=" + cFname + cFext
+   RETURN "text/vnd.fly"
 ELSEIF cFile LIKE ".+\.mpc" 
-   RETURN "application/vnd.mophun.certificate=" + cFname + cFext
+   RETURN "application/vnd.mophun.certificate"
 ELSEIF cFile LIKE ".+\.mpn" 
-   RETURN "application/vnd.mophun.application=" + cFname + cFext
+   RETURN "application/vnd.mophun.application"
 ELSEIF cFile LIKE ".+\.mj2" 
-   RETURN "video/mj2=" + cFname + cFext
+   RETURN "video/mj2"
 ELSEIF cFile LIKE ".+\.mpga" 
-   RETURN "audio/mpeg=" + cFname + cFext
+   RETURN "audio/mpeg"
 ELSEIF cFile LIKE ".+\.mxu" 
-   RETURN "video/vnd.mpegurl=" + cFname + cFext
+   RETURN "video/vnd.mpegurl"
 ELSEIF cFile LIKE ".+\.mpeg" 
-   RETURN "video/mpeg=" + cFname + cFext
+   RETURN "video/mpeg"
 ELSEIF cFile LIKE ".+\.m21" 
-   RETURN "application/mp21=" + cFname + cFext
+   RETURN "application/mp21"
 ELSEIF cFile LIKE ".+\.mp4a" 
-   RETURN "audio/mp4=" + cFname + cFext
+   RETURN "audio/mp4"
 ELSEIF cFile LIKE ".+\.mp4" 
-   RETURN "video/mp4=" + cFname + cFext
+   RETURN "video/mp4"
 ELSEIF cFile LIKE ".+\.mp4" 
-   RETURN "application/mp4=" + cFname + cFext
+   RETURN "application/mp4"
 ELSEIF cFile LIKE ".+\.m3u8" 
-   RETURN "application/vnd.apple.mpegurl=" + cFname + cFext
+   RETURN "application/vnd.apple.mpegurl"
 ELSEIF cFile LIKE ".+\.mus" 
-   RETURN "application/vnd.musician=" + cFname + cFext
+   RETURN "application/vnd.musician"
 ELSEIF cFile LIKE ".+\.msty" 
-   RETURN "application/vnd.muvee.style=" + cFname + cFext
+   RETURN "application/vnd.muvee.style"
 ELSEIF cFile LIKE ".+\.mxml" 
-   RETURN "application/xv+xml=" + cFname + cFext
+   RETURN "application/xv+xml"
 ELSEIF cFile LIKE ".+\.ngdat" 
-   RETURN "application/vnd.nokia.n-gage.data=" + cFname + cFext
+   RETURN "application/vnd.nokia.n-gage.data"
 ELSEIF cFile LIKE ".+\.n-gage" 
 
-   RETURN "application/vnd.nokia.n-gage.symbian.install=" + cFname + cFext
+   RETURN "application/vnd.nokia.n-gage.symbian.install"
 ELSEIF cFile LIKE ".+\.ncx" 
-   RETURN "application/x-dtbncx+xml=" + cFname + cFext
+   RETURN "application/x-dtbncx+xml"
 ELSEIF cFile LIKE ".+\.nc" 
-   RETURN "application/x-netcdf=" + cFname + cFext
+   RETURN "application/x-netcdf"
 ELSEIF cFile LIKE ".+\.nlu" 
-   RETURN "application/vnd.neurolanguage.nlu=" + cFname + cFext
+   RETURN "application/vnd.neurolanguage.nlu"
 ELSEIF cFile LIKE ".+\.dna" 
-   RETURN "application/vnd.dna=" + cFname + cFext
+   RETURN "application/vnd.dna"
 ELSEIF cFile LIKE ".+\.nnd" 
-   RETURN "application/vnd.noblenet-directory=" + cFname + cFext
+   RETURN "application/vnd.noblenet-directory"
 ELSEIF cFile LIKE ".+\.nns" 
-   RETURN "application/vnd.noblenet-sealer=" + cFname + cFext
+   RETURN "application/vnd.noblenet-sealer"
 ELSEIF cFile LIKE ".+\.nnw" 
-   RETURN "application/vnd.noblenet-web=" + cFname + cFext
+   RETURN "application/vnd.noblenet-web"
 ELSEIF cFile LIKE ".+\.rpst" 
-   RETURN "application/vnd.nokia.radio-preset=" + cFname + cFext
+   RETURN "application/vnd.nokia.radio-preset"
 ELSEIF cFile LIKE ".+\.rpss" 
-   RETURN "application/vnd.nokia.radio-presets=" + cFname + cFext
+   RETURN "application/vnd.nokia.radio-presets"
 ELSEIF cFile LIKE ".+\.n3" 
-   RETURN "text/n3=" + cFname + cFext
+   RETURN "text/n3"
 ELSEIF cFile LIKE ".+\.edm" 
-   RETURN "application/vnd.novadigm.edm=" + cFname + cFext
+   RETURN "application/vnd.novadigm.edm"
 ELSEIF cFile LIKE ".+\.edx" 
-   RETURN "application/vnd.novadigm.edx=" + cFname + cFext
+   RETURN "application/vnd.novadigm.edx"
 ELSEIF cFile LIKE ".+\.ext" 
-   RETURN "application/vnd.novadigm.ext=" + cFname + cFext
+   RETURN "application/vnd.novadigm.ext"
 ELSEIF cFile LIKE ".+\.gph" 
-   RETURN "application/vnd.flographit=" + cFname + cFext
+   RETURN "application/vnd.flographit"
 ELSEIF cFile LIKE ".+\.ecelp4800" 
-   RETURN "audio/vnd.nuera.ecelp4800=" + cFname + cFext
+   RETURN "audio/vnd.nuera.ecelp4800"
 ELSEIF cFile LIKE ".+\.ecelp7470" 
-   RETURN "audio/vnd.nuera.ecelp7470=" + cFname + cFext
+   RETURN "audio/vnd.nuera.ecelp7470"
 ELSEIF cFile LIKE ".+\.ecelp9600" 
-   RETURN "audio/vnd.nuera.ecelp9600=" + cFname + cFext
+   RETURN "audio/vnd.nuera.ecelp9600"
 ELSEIF cFile LIKE ".+\.oda" 
-   RETURN "application/oda=" + cFname + cFext
+   RETURN "application/oda"
 ELSEIF cFile LIKE ".+\.ogx" 
-   RETURN "application/ogg=" + cFname + cFext
+   RETURN "application/ogg"
 ELSEIF cFile LIKE ".+\.oga" 
-   RETURN "audio/ogg=" + cFname + cFext
+   RETURN "audio/ogg"
 ELSEIF cFile LIKE ".+\.ogv" 
-   RETURN "video/ogg=" + cFname + cFext
+   RETURN "video/ogg"
 ELSEIF cFile LIKE ".+\.dd2" 
-   RETURN "application/vnd.oma.dd2+xml=" + cFname + cFext
+   RETURN "application/vnd.oma.dd2+xml"
 ELSEIF cFile LIKE ".+\.oth" 
-   RETURN "application/vnd.oasis.opendocument.text-web=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.text-web"
 ELSEIF cFile LIKE ".+\.opf" 
-   RETURN "application/oebps-package+xml=" + cFname + cFext
+   RETURN "application/oebps-package+xml"
 ELSEIF cFile LIKE ".+\.qbo" 
-   RETURN "application/vnd.intu.qbo=" + cFname + cFext
+   RETURN "application/vnd.intu.qbo"
 ELSEIF cFile LIKE ".+\.oxt" 
-   RETURN "application/vnd.openofficeorg.extension=" + cFname + cFext
+   RETURN "application/vnd.openofficeorg.extension"
 ELSEIF cFile LIKE ".+\.osf" 
-   RETURN "application/vnd.yamaha.openscoreformat=" + cFname + cFext
+   RETURN "application/vnd.yamaha.openscoreformat"
 ELSEIF cFile LIKE ".+\.weba" 
-   RETURN "audio/webm=" + cFname + cFext
+   RETURN "audio/webm"
 ELSEIF cFile LIKE ".+\.webm" 
-   RETURN "video/webm=" + cFname + cFext
+   RETURN "video/webm"
 ELSEIF cFile LIKE ".+\.odc" 
-   RETURN "application/vnd.oasis.opendocument.chart=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.chart"
 ELSEIF cFile LIKE ".+\.otc" 
-   RETURN "application/vnd.oasis.opendocument.chart-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.chart-template"
 ELSEIF cFile LIKE ".+\.odb" 
-   RETURN "application/vnd.oasis.opendocument.database=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.database"
 ELSEIF cFile LIKE ".+\.odf" 
-   RETURN "application/vnd.oasis.opendocument.formula=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.formula"
 ELSEIF cFile LIKE ".+\.odft" 
-   RETURN "application/vnd.oasis.opendocument.formula-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.formula-template"
 ELSEIF cFile LIKE ".+\.odg" 
-   RETURN "application/vnd.oasis.opendocument.graphics=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.graphics"
 ELSEIF cFile LIKE ".+\.otg" 
-   RETURN "application/vnd.oasis.opendocument.graphics-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.graphics-template"
 ELSEIF cFile LIKE ".+\.odi" 
-   RETURN "application/vnd.oasis.opendocument.image=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.image"
 ELSEIF cFile LIKE ".+\.oti" 
-   RETURN "application/vnd.oasis.opendocument.image-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.image-template"
 ELSEIF cFile LIKE ".+\.odp" 
-   RETURN "application/vnd.oasis.opendocument.presentation=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.presentation"
 ELSEIF cFile LIKE ".+\.otp" 
-   RETURN "application/vnd.oasis.opendocument.presentation-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.presentation-template"
 ELSEIF cFile LIKE ".+\.ods" 
-   RETURN "application/vnd.oasis.opendocument.spreadsheet=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.spreadsheet"
 ELSEIF cFile LIKE ".+\.ots" 
-   RETURN "application/vnd.oasis.opendocument.spreadsheet-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.spreadsheet-template"
 ELSEIF cFile LIKE ".+\.odt" 
-   RETURN "application/vnd.oasis.opendocument.text=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.text"
 ELSEIF cFile LIKE ".+\.odm" 
-   RETURN "application/vnd.oasis.opendocument.text-master=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.text-master"
 ELSEIF cFile LIKE ".+\.ott" 
-   RETURN "application/vnd.oasis.opendocument.text-template=" + cFname + cFext
+   RETURN "application/vnd.oasis.opendocument.text-template"
 ELSEIF cFile LIKE ".+\.ktx" 
-   RETURN "image/ktx=" + cFname + cFext
+   RETURN "image/ktx"
 ELSEIF cFile LIKE ".+\.sxc" 
-   RETURN "application/vnd.sun.xml.calc=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.calc"
 ELSEIF cFile LIKE ".+\.stc" 
-   RETURN "application/vnd.sun.xml.calc.template=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.calc.template"
 ELSEIF cFile LIKE ".+\.sxd" 
-   RETURN "application/vnd.sun.xml.draw=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.draw"
 ELSEIF cFile LIKE ".+\.std" 
-   RETURN "application/vnd.sun.xml.draw.template=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.draw.template"
 ELSEIF cFile LIKE ".+\.sxi" 
-   RETURN "application/vnd.sun.xml.impress=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.impress"
 ELSEIF cFile LIKE ".+\.sti" 
-   RETURN "application/vnd.sun.xml.impress.template=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.impress.template"
 ELSEIF cFile LIKE ".+\.sxm" 
-   RETURN "application/vnd.sun.xml.math=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.math"
 ELSEIF cFile LIKE ".+\.sxw" 
-   RETURN "application/vnd.sun.xml.writer=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.writer"
 ELSEIF cFile LIKE ".+\.sxg" 
-   RETURN "application/vnd.sun.xml.writer.global=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.writer.global"
 ELSEIF cFile LIKE ".+\.stw" 
-   RETURN "application/vnd.sun.xml.writer.template=" + cFname + cFext
+   RETURN "application/vnd.sun.xml.writer.template"
 ELSEIF cFile LIKE ".+\.otf" 
-   RETURN "application/x-font-otf=" + cFname + cFext
+   RETURN "application/x-font-otf"
 ELSEIF cFile LIKE ".+\.osfpvg" 
-   RETURN "application/vnd.yamaha.openscoreformat.osfpvg+xml=" + cFname + cFext
+   RETURN "application/vnd.yamaha.openscoreformat.osfpvg+xml"
 ELSEIF cFile LIKE ".+\.dp" 
-   RETURN "application/vnd.osgi.dp=" + cFname + cFext
+   RETURN "application/vnd.osgi.dp"
 ELSEIF cFile LIKE ".+\.pdb" 
-   RETURN "application/vnd.palm=" + cFname + cFext
+   RETURN "application/vnd.palm"
 ELSEIF cFile LIKE ".+\.p" 
-   RETURN "text/x-pascal=" + cFname + cFext
+   RETURN "text/x-pascal"
 ELSEIF cFile LIKE ".+\.paw" 
-   RETURN "application/vnd.pawaafile=" + cFname + cFext
+   RETURN "application/vnd.pawaafile"
 ELSEIF cFile LIKE ".+\.pclxl" 
-   RETURN "application/vnd.hp-pclxl=" + cFname + cFext
+   RETURN "application/vnd.hp-pclxl"
 ELSEIF cFile LIKE ".+\.efif" 
-   RETURN "application/vnd.picsel=" + cFname + cFext
+   RETURN "application/vnd.picsel"
 ELSEIF cFile LIKE ".+\.pcx" 
-   RETURN "image/x-pcx=" + cFname + cFext
+   RETURN "image/x-pcx"
 ELSEIF cFile LIKE ".+\.psd" 
-   RETURN "image/vnd.adobe.photoshop=" + cFname + cFext
+   RETURN "image/vnd.adobe.photoshop"
 ELSEIF cFile LIKE ".+\.prf" 
-   RETURN "application/pics-rules=" + cFname + cFext
+   RETURN "application/pics-rules"
 ELSEIF cFile LIKE ".+\.pic" 
-   RETURN "image/x-pict=" + cFname + cFext
+   RETURN "image/x-pict"
 ELSEIF cFile LIKE ".+\.chat" 
-   RETURN "application/x-chat=" + cFname + cFext
+   RETURN "application/x-chat"
 ELSEIF cFile LIKE ".+\.p10" 
-   RETURN "application/pkcs10=" + cFname + cFext
+   RETURN "application/pkcs10"
 ELSEIF cFile LIKE ".+\.p12" 
-   RETURN "application/x-pkcs12=" + cFname + cFext
+   RETURN "application/x-pkcs12"
 ELSEIF cFile LIKE ".+\.p7m" 
-   RETURN "application/pkcs7-mime=" + cFname + cFext
+   RETURN "application/pkcs7-mime"
 ELSEIF cFile LIKE ".+\.p7s" 
-   RETURN "application/pkcs7-signature=" + cFname + cFext
+   RETURN "application/pkcs7-signature"
 ELSEIF cFile LIKE ".+\.p7r" 
-   RETURN "application/x-pkcs7-certreqresp=" + cFname + cFext
+   RETURN "application/x-pkcs7-certreqresp"
 ELSEIF cFile LIKE ".+\.p7b" 
-   RETURN "application/x-pkcs7-certificates=" + cFname + cFext
+   RETURN "application/x-pkcs7-certificates"
 ELSEIF cFile LIKE ".+\.p8" 
-   RETURN "application/pkcs8=" + cFname + cFext
+   RETURN "application/pkcs8"
 ELSEIF cFile LIKE ".+\.plf" 
-   RETURN "application/vnd.pocketlearn=" + cFname + cFext
+   RETURN "application/vnd.pocketlearn"
 ELSEIF cFile LIKE ".+\.pnm" 
-   RETURN "image/x-portable-anymap=" + cFname + cFext
+   RETURN "image/x-portable-anymap"
 ELSEIF cFile LIKE ".+\.pbm" 
-   RETURN "image/x-portable-bitmap=" + cFname + cFext
+   RETURN "image/x-portable-bitmap"
 ELSEIF cFile LIKE ".+\.pcf" 
-   RETURN "application/x-font-pcf=" + cFname + cFext
+   RETURN "application/x-font-pcf"
 ELSEIF cFile LIKE ".+\.pfr" 
-   RETURN "application/font-tdpfr=" + cFname + cFext
+   RETURN "application/font-tdpfr"
 ELSEIF cFile LIKE ".+\.pgn" 
-   RETURN "application/x-chess-pgn=" + cFname + cFext
+   RETURN "application/x-chess-pgn"
 ELSEIF cFile LIKE ".+\.pgm" 
-   RETURN "image/x-portable-graymap=" + cFname + cFext
+   RETURN "image/x-portable-graymap"
 ELSEIF cFile LIKE ".+\.png" 
-   RETURN "image/png=" + cFname + cFext
+   RETURN "image/png"
 ELSEIF cFile LIKE ".+\.ppm" 
-   RETURN "image/x-portable-pixmap=" + cFname + cFext
+   RETURN "image/x-portable-pixmap"
 ELSEIF cFile LIKE ".+\.pskcxml" 
-   RETURN "application/pskc+xml=" + cFname + cFext
+   RETURN "application/pskc+xml"
 ELSEIF cFile LIKE ".+\.pml" 
-   RETURN "application/vnd.ctc-posml=" + cFname + cFext
+   RETURN "application/vnd.ctc-posml"
 ELSEIF cFile LIKE ".+\.ai" 
-   RETURN "application/postscript=" + cFname + cFext
+   RETURN "application/postscript"
 ELSEIF cFile LIKE ".+\.pfa" 
-   RETURN "application/x-font-type1=" + cFname + cFext
+   RETURN "application/x-font-type1"
 ELSEIF cFile LIKE ".+\.pbd" 
-   RETURN "application/vnd.powerbuilder6=" + cFname + cFext
+   RETURN "application/vnd.powerbuilder6"
 ELSEIF cFile LIKE ".+\.pgp" 
-   RETURN "application/pgp-signature=" + cFname + cFext
+   RETURN "application/pgp-signature"
 ELSEIF cFile LIKE ".+\.box" 
-   RETURN "application/vnd.previewsystems.box=" + cFname + cFext
+   RETURN "application/vnd.previewsystems.box"
 ELSEIF cFile LIKE ".+\.ptid" 
-   RETURN "application/vnd.pvi.ptid1=" + cFname + cFext
+   RETURN "application/vnd.pvi.ptid1"
 ELSEIF cFile LIKE ".+\.pls" 
-   RETURN "application/pls+xml=" + cFname + cFext
+   RETURN "application/pls+xml"
 ELSEIF cFile LIKE ".+\.str" 
-   RETURN "application/vnd.pg.format=" + cFname + cFext
+   RETURN "application/vnd.pg.format"
 ELSEIF cFile LIKE ".+\.ei6" 
-   RETURN "application/vnd.pg.osasli=" + cFname + cFext
+   RETURN "application/vnd.pg.osasli"
 ELSEIF cFile LIKE ".+\.dsc" 
-   RETURN "text/prs.lines.tag=" + cFname + cFext
+   RETURN "text/prs.lines.tag"
 ELSEIF cFile LIKE ".+\.psf" 
-   RETURN "application/x-font-linux-psf=" + cFname + cFext
+   RETURN "application/x-font-linux-psf"
 ELSEIF cFile LIKE ".+\.qps" 
-   RETURN "application/vnd.publishare-delta-tree=" + cFname + cFext
+   RETURN "application/vnd.publishare-delta-tree"
 ELSEIF cFile LIKE ".+\.wg" 
-   RETURN "application/vnd.pmi.widget=" + cFname + cFext
+   RETURN "application/vnd.pmi.widget"
 ELSEIF cFile LIKE ".+\.qxd" 
-   RETURN "application/vnd.quark.quarkxpress=" + cFname + cFext
+   RETURN "application/vnd.quark.quarkxpress"
 ELSEIF cFile LIKE ".+\.esf" 
-   RETURN "application/vnd.epson.esf=" + cFname + cFext
+   RETURN "application/vnd.epson.esf"
 ELSEIF cFile LIKE ".+\.msf" 
-   RETURN "application/vnd.epson.msf=" + cFname + cFext
+   RETURN "application/vnd.epson.msf"
 ELSEIF cFile LIKE ".+\.ssf" 
-   RETURN "application/vnd.epson.ssf=" + cFname + cFext
+   RETURN "application/vnd.epson.ssf"
 ELSEIF cFile LIKE ".+\.qam" 
-   RETURN "application/vnd.epson.quickanime=" + cFname + cFext
+   RETURN "application/vnd.epson.quickanime"
 ELSEIF cFile LIKE ".+\.qfx" 
-   RETURN "application/vnd.intu.qfx=" + cFname + cFext
+   RETURN "application/vnd.intu.qfx"
 ELSEIF cFile LIKE ".+\.qt" 
-   RETURN "video/quicktime=" + cFname + cFext
+   RETURN "video/quicktime"
 ELSEIF cFile LIKE ".+\.rar" 
-   RETURN "application/x-rar-compressed=" + cFname + cFext
+   RETURN "application/x-rar-compressed"
 ELSEIF cFile LIKE ".+\.ram" 
-   RETURN "audio/x-pn-realaudio=" + cFname + cFext
+   RETURN "audio/x-pn-realaudio"
 ELSEIF cFile LIKE ".+\.rmp" 
-   RETURN "audio/x-pn-realaudio-plugin=" + cFname + cFext
+   RETURN "audio/x-pn-realaudio-plugin"
 ELSEIF cFile LIKE ".+\.rsd" 
-   RETURN "application/rsd+xml=" + cFname + cFext
+   RETURN "application/rsd+xml"
 ELSEIF cFile LIKE ".+\.rm" 
-   RETURN "application/vnd.rn-realmedia=" + cFname + cFext
+   RETURN "application/vnd.rn-realmedia"
 ELSEIF cFile LIKE ".+\.bed" 
-   RETURN "application/vnd.realvnc.bed=" + cFname + cFext
+   RETURN "application/vnd.realvnc.bed"
 ELSEIF cFile LIKE ".+\.mxl" 
-   RETURN "application/vnd.recordare.musicxml=" + cFname + cFext
+   RETURN "application/vnd.recordare.musicxml"
 ELSEIF cFile LIKE ".+\.musicxml" 
-   RETURN "application/vnd.recordare.musicxml+xml=" + cFname + cFext
+   RETURN "application/vnd.recordare.musicxml+xml"
 ELSEIF cFile LIKE ".+\.rnc" 
-   RETURN "application/relax-ng-compact-syntax=" + cFname + cFext
+   RETURN "application/relax-ng-compact-syntax"
 ELSEIF cFile LIKE ".+\.rdz" 
-   RETURN "application/vnd.data-vision.rdz=" + cFname + cFext
+   RETURN "application/vnd.data-vision.rdz"
 ELSEIF cFile LIKE ".+\.rdf" 
-   RETURN "application/rdf+xml=" + cFname + cFext
+   RETURN "application/rdf+xml"
 ELSEIF cFile LIKE ".+\.rp9" 
-   RETURN "application/vnd.cloanto.rp9=" + cFname + cFext
+   RETURN "application/vnd.cloanto.rp9"
 ELSEIF cFile LIKE ".+\.jisp" 
-   RETURN "application/vnd.jisp=" + cFname + cFext
+   RETURN "application/vnd.jisp"
 ELSEIF cFile LIKE ".+\.rtf" 
-   RETURN "application/rtf=" + cFname + cFext
+   RETURN "application/rtf"
 ELSEIF cFile LIKE ".+\.rtx" 
-   RETURN "text/richtext=" + cFname + cFext
+   RETURN "text/richtext"
 ELSEIF cFile LIKE ".+\.link66" 
-   RETURN "application/vnd.route66.link66+xml=" + cFname + cFext
+   RETURN "application/vnd.route66.link66+xml"
 ELSEIF cFile LIKE ".+\.rss" 
-   RETURN "application/rss+xml=" + cFname + cFext
+   RETURN "application/rss+xml"
 ELSEIF cFile LIKE ".+\.shf" 
-   RETURN "application/shf+xml=" + cFname + cFext
+   RETURN "application/shf+xml"
 ELSEIF cFile LIKE ".+\.st" 
-   RETURN "application/vnd.sailingtracker.track=" + cFname + cFext
+   RETURN "application/vnd.sailingtracker.track"
 ELSEIF cFile LIKE ".+\.svg" 
-   RETURN "image/svg+xml=" + cFname + cFext
+   RETURN "image/svg+xml"
 ELSEIF cFile LIKE ".+\.sus" 
-   RETURN "application/vnd.sus-calendar=" + cFname + cFext
+   RETURN "application/vnd.sus-calendar"
 ELSEIF cFile LIKE ".+\.sru" 
-   RETURN "application/sru+xml=" + cFname + cFext
+   RETURN "application/sru+xml"
 ELSEIF cFile LIKE ".+\.setpay" 
-   RETURN "application/set-payment-initiation=" + cFname + cFext
+   RETURN "application/set-payment-initiation"
 ELSEIF cFile LIKE ".+\.setreg" 
-   RETURN "application/set-registration-initiation=" + cFname + cFext
+   RETURN "application/set-registration-initiation"
 ELSEIF cFile LIKE ".+\.sema" 
-   RETURN "application/vnd.sema=" + cFname + cFext
+   RETURN "application/vnd.sema"
 ELSEIF cFile LIKE ".+\.semd" 
-   RETURN "application/vnd.semd=" + cFname + cFext
+   RETURN "application/vnd.semd"
 ELSEIF cFile LIKE ".+\.semf" 
-   RETURN "application/vnd.semf=" + cFname + cFext
+   RETURN "application/vnd.semf"
 ELSEIF cFile LIKE ".+\.see" 
-   RETURN "application/vnd.seemail=" + cFname + cFext
+   RETURN "application/vnd.seemail"
 ELSEIF cFile LIKE ".+\.snf" 
-   RETURN "application/x-font-snf=" + cFname + cFext
+   RETURN "application/x-font-snf"
 ELSEIF cFile LIKE ".+\.spq" 
-   RETURN "application/scvp-vp-request=" + cFname + cFext
+   RETURN "application/scvp-vp-request"
 ELSEIF cFile LIKE ".+\.spp" 
-   RETURN "application/scvp-vp-response=" + cFname + cFext
+   RETURN "application/scvp-vp-response"
 ELSEIF cFile LIKE ".+\.scq" 
-   RETURN "application/scvp-cv-request=" + cFname + cFext
+   RETURN "application/scvp-cv-request"
 ELSEIF cFile LIKE ".+\.scs" 
-   RETURN "application/scvp-cv-response=" + cFname + cFext
+   RETURN "application/scvp-cv-response"
 ELSEIF cFile LIKE ".+\.sdp" 
-   RETURN "application/sdp=" + cFname + cFext
+   RETURN "application/sdp"
 ELSEIF cFile LIKE ".+\.etx" 
-   RETURN "text/x-setext=" + cFname + cFext
+   RETURN "text/x-setext"
 ELSEIF cFile LIKE ".+\.movie" 
-   RETURN "video/x-sgi-movie=" + cFname + cFext
+   RETURN "video/x-sgi-movie"
 ELSEIF cFile LIKE ".+\.ifm" 
-   RETURN "application/vnd.shana.informed.formdata=" + cFname + cFext
+   RETURN "application/vnd.shana.informed.formdata"
 ELSEIF cFile LIKE ".+\.itp" 
-   RETURN "application/vnd.shana.informed.formtemplate=" + cFname + cFext
+   RETURN "application/vnd.shana.informed.formtemplate"
 ELSEIF cFile LIKE ".+\.iif" 
-   RETURN "application/vnd.shana.informed.interchange=" + cFname + cFext
+   RETURN "application/vnd.shana.informed.interchange"
 ELSEIF cFile LIKE ".+\.ipk" 
-   RETURN "application/vnd.shana.informed.package=" + cFname + cFext
+   RETURN "application/vnd.shana.informed.package"
 ELSEIF cFile LIKE ".+\.tfi" 
-   RETURN "application/thraud+xml=" + cFname + cFext
+   RETURN "application/thraud+xml"
 ELSEIF cFile LIKE ".+\.shar" 
-   RETURN "application/x-shar=" + cFname + cFext
+   RETURN "application/x-shar"
 ELSEIF cFile LIKE ".+\.rgb" 
-   RETURN "image/x-rgb=" + cFname + cFext
+   RETURN "image/x-rgb"
 ELSEIF cFile LIKE ".+\.slt" 
-   RETURN "application/vnd.epson.salt=" + cFname + cFext
+   RETURN "application/vnd.epson.salt"
 ELSEIF cFile LIKE ".+\.aso" 
-   RETURN "application/vnd.accpac.simply.aso=" + cFname + cFext
+   RETURN "application/vnd.accpac.simply.aso"
 ELSEIF cFile LIKE ".+\.imp" 
-   RETURN "application/vnd.accpac.simply.imp=" + cFname + cFext
+   RETURN "application/vnd.accpac.simply.imp"
 ELSEIF cFile LIKE ".+\.twd" 
-   RETURN "application/vnd.simtech-mindmapper=" + cFname + cFext
+   RETURN "application/vnd.simtech-mindmapper"
 ELSEIF cFile LIKE ".+\.csp" 
-   RETURN "application/vnd.commonspace=" + cFname + cFext
+   RETURN "application/vnd.commonspace"
 ELSEIF cFile LIKE ".+\.saf" 
-   RETURN "application/vnd.yamaha.smaf-audio=" + cFname + cFext
+   RETURN "application/vnd.yamaha.smaf-audio"
 ELSEIF cFile LIKE ".+\.mmf" 
-   RETURN "application/vnd.smaf=" + cFname + cFext
+   RETURN "application/vnd.smaf"
 ELSEIF cFile LIKE ".+\.spf" 
-   RETURN "application/vnd.yamaha.smaf-phrase=" + cFname + cFext
+   RETURN "application/vnd.yamaha.smaf-phrase"
 ELSEIF cFile LIKE ".+\.teacher" 
-   RETURN "application/vnd.smart.teacher=" + cFname + cFext
+   RETURN "application/vnd.smart.teacher"
 ELSEIF cFile LIKE ".+\.svd" 
-   RETURN "application/vnd.svd=" + cFname + cFext
+   RETURN "application/vnd.svd"
 ELSEIF cFile LIKE ".+\.rq" 
-   RETURN "application/sparql-query=" + cFname + cFext
+   RETURN "application/sparql-query"
 ELSEIF cFile LIKE ".+\.srx" 
-   RETURN "application/sparql-results+xml=" + cFname + cFext
+   RETURN "application/sparql-results+xml"
 ELSEIF cFile LIKE ".+\.gram" 
-   RETURN "application/srgs=" + cFname + cFext
+   RETURN "application/srgs"
 ELSEIF cFile LIKE ".+\.grxml" 
-   RETURN "application/srgs+xml=" + cFname + cFext
+   RETURN "application/srgs+xml"
 ELSEIF cFile LIKE ".+\.ssml" 
-   RETURN "application/ssml+xml=" + cFname + cFext
+   RETURN "application/ssml+xml"
 ELSEIF cFile LIKE ".+\.skp" 
-   RETURN "application/vnd.koan=" + cFname + cFext
+   RETURN "application/vnd.koan"
 ELSEIF cFile LIKE ".+\.sgml" 
-   RETURN "text/sgml=" + cFname + cFext
+   RETURN "text/sgml"
 ELSEIF cFile LIKE ".+\.sdc" 
-   RETURN "application/vnd.stardivision.calc=" + cFname + cFext
+   RETURN "application/vnd.stardivision.calc"
 ELSEIF cFile LIKE ".+\.sda" 
-   RETURN "application/vnd.stardivision.draw=" + cFname + cFext
+   RETURN "application/vnd.stardivision.draw"
 ELSEIF cFile LIKE ".+\.sdd" 
-   RETURN "application/vnd.stardivision.impress=" + cFname + cFext
+   RETURN "application/vnd.stardivision.impress"
 ELSEIF cFile LIKE ".+\.smf" 
-   RETURN "application/vnd.stardivision.math=" + cFname + cFext
+   RETURN "application/vnd.stardivision.math"
 ELSEIF cFile LIKE ".+\.sdw" 
-   RETURN "application/vnd.stardivision.writer=" + cFname + cFext
+   RETURN "application/vnd.stardivision.writer"
 ELSEIF cFile LIKE ".+\.sgl" 
-   RETURN "application/vnd.stardivision.writer-global=" + cFname + cFext
+   RETURN "application/vnd.stardivision.writer-global"
 ELSEIF cFile LIKE ".+\.sm" 
-   RETURN "application/vnd.stepmania.stepchart=" + cFname + cFext
+   RETURN "application/vnd.stepmania.stepchart"
 ELSEIF cFile LIKE ".+\.sit" 
-   RETURN "application/x-stuffit=" + cFname + cFext
+   RETURN "application/x-stuffit"
 ELSEIF cFile LIKE ".+\.sitx" 
-   RETURN "application/x-stuffitx=" + cFname + cFext
+   RETURN "application/x-stuffitx"
 ELSEIF cFile LIKE ".+\.sdkm" 
-   RETURN "application/vnd.solent.sdkm+xml=" + cFname + cFext
+   RETURN "application/vnd.solent.sdkm+xml"
 ELSEIF cFile LIKE ".+\.xo" 
-   RETURN "application/vnd.olpc-sugar=" + cFname + cFext
+   RETURN "application/vnd.olpc-sugar"
 ELSEIF cFile LIKE ".+\.au" 
-   RETURN "audio/basic=" + cFname + cFext
+   RETURN "audio/basic"
 ELSEIF cFile LIKE ".+\.wqd" 
-   RETURN "application/vnd.wqd=" + cFname + cFext
+   RETURN "application/vnd.wqd"
 ELSEIF cFile LIKE ".+\.sis" 
-   RETURN "application/vnd.symbian.install=" + cFname + cFext
+   RETURN "application/vnd.symbian.install"
 ELSEIF cFile LIKE ".+\.smi" 
-   RETURN "application/smil+xml=" + cFname + cFext
+   RETURN "application/smil+xml"
 ELSEIF cFile LIKE ".+\.xsm" 
-   RETURN "application/vnd.syncml+xml=" + cFname + cFext
+   RETURN "application/vnd.syncml+xml"
 ELSEIF cFile LIKE ".+\.bdm" 
-   RETURN "application/vnd.syncml.dm+wbxml=" + cFname + cFext
+   RETURN "application/vnd.syncml.dm+wbxml"
 ELSEIF cFile LIKE ".+\.xdm" 
-   RETURN "application/vnd.syncml.dm+xml=" + cFname + cFext
+   RETURN "application/vnd.syncml.dm+xml"
 ELSEIF cFile LIKE ".+\.sv4cpio" 
-   RETURN "application/x-sv4cpio=" + cFname + cFext
+   RETURN "application/x-sv4cpio"
 ELSEIF cFile LIKE ".+\.sv4crc" 
-   RETURN "application/x-sv4crc=" + cFname + cFext
+   RETURN "application/x-sv4crc"
 ELSEIF cFile LIKE ".+\.sbml" 
-   RETURN "application/sbml+xml=" + cFname + cFext
+   RETURN "application/sbml+xml"
 ELSEIF cFile LIKE ".+\.tsv" 
-   RETURN "text/tab-separated-values=" + cFname + cFext
+   RETURN "text/tab-separated-values"
 ELSEIF cFile LIKE ".+\.tiff" 
-   RETURN "image/tiff=" + cFname + cFext
+   RETURN "image/tiff"
 ELSEIF cFile LIKE ".+\.tao" 
-   RETURN "application/vnd.tao.intent-module-archive=" + cFname + cFext
+   RETURN "application/vnd.tao.intent-module-archive"
 ELSEIF cFile LIKE ".+\.tar" 
-   RETURN "application/x-tar=" + cFname + cFext
+   RETURN "application/x-tar"
 ELSEIF cFile LIKE ".+\.tcl" 
-   RETURN "application/x-tcl=" + cFname + cFext
+   RETURN "application/x-tcl"
 ELSEIF cFile LIKE ".+\.tex" 
-   RETURN "application/x-tex=" + cFname + cFext
+   RETURN "application/x-tex"
 ELSEIF cFile LIKE ".+\.tfm" 
-   RETURN "application/x-tex-tfm=" + cFname + cFext
+   RETURN "application/x-tex-tfm"
 ELSEIF cFile LIKE ".+\.tei" 
-   RETURN "application/tei+xml=" + cFname + cFext
+   RETURN "application/tei+xml"
 ELSEIF cFile LIKE ".+\.txt" 
-   RETURN "text/plain=" + cFname + cFext
+   RETURN "text/plain"
 ELSEIF cFile LIKE ".+\.dxp" 
-   RETURN "application/vnd.spotfire.dxp=" + cFname + cFext
+   RETURN "application/vnd.spotfire.dxp"
 ELSEIF cFile LIKE ".+\.sfs" 
-   RETURN "application/vnd.spotfire.sfs=" + cFname + cFext
+   RETURN "application/vnd.spotfire.sfs"
 ELSEIF cFile LIKE ".+\.tsd" 
-   RETURN "application/timestamped-data=" + cFname + cFext
+   RETURN "application/timestamped-data"
 ELSEIF cFile LIKE ".+\.tpt" 
-   RETURN "application/vnd.trid.tpt=" + cFname + cFext
+   RETURN "application/vnd.trid.tpt"
 ELSEIF cFile LIKE ".+\.mxs" 
-   RETURN "application/vnd.triscape.mxs=" + cFname + cFext
+   RETURN "application/vnd.triscape.mxs"
 ELSEIF cFile LIKE ".+\.t" 
-   RETURN "text/troff=" + cFname + cFext
+   RETURN "text/troff"
 ELSEIF cFile LIKE ".+\.tra" 
-   RETURN "application/vnd.trueapp=" + cFname + cFext
+   RETURN "application/vnd.trueapp"
 ELSEIF cFile LIKE ".+\.ttf" 
-   RETURN "application/x-font-ttf=" + cFname + cFext
+   RETURN "application/x-font-ttf"
 ELSEIF cFile LIKE ".+\.ttl" 
-   RETURN "text/turtle=" + cFname + cFext
+   RETURN "text/turtle"
 ELSEIF cFile LIKE ".+\.umj" 
-   RETURN "application/vnd.umajin=" + cFname + cFext
+   RETURN "application/vnd.umajin"
 ELSEIF cFile LIKE ".+\.uoml" 
-   RETURN "application/vnd.uoml+xml=" + cFname + cFext
+   RETURN "application/vnd.uoml+xml"
 ELSEIF cFile LIKE ".+\.unityweb" 
-   RETURN "application/vnd.unity=" + cFname + cFext
+   RETURN "application/vnd.unity"
 ELSEIF cFile LIKE ".+\.ufd" 
-   RETURN "application/vnd.ufdl=" + cFname + cFext
+   RETURN "application/vnd.ufdl"
 ELSEIF cFile LIKE ".+\.uri" 
-   RETURN "text/uri-list=" + cFname + cFext
+   RETURN "text/uri-list"
 ELSEIF cFile LIKE ".+\.utz" 
-   RETURN "application/vnd.uiq.theme=" + cFname + cFext
+   RETURN "application/vnd.uiq.theme"
 ELSEIF cFile LIKE ".+\.ustar" 
-   RETURN "application/x-ustar=" + cFname + cFext
+   RETURN "application/x-ustar"
 ELSEIF cFile LIKE ".+\.uu" 
-   RETURN "text/x-uuencode=" + cFname + cFext
+   RETURN "text/x-uuencode"
 ELSEIF cFile LIKE ".+\.vcs" 
-   RETURN "text/x-vcalendar=" + cFname + cFext
+   RETURN "text/x-vcalendar"
 ELSEIF cFile LIKE ".+\.vcf" 
-   RETURN "text/x-vcard=" + cFname + cFext
+   RETURN "text/x-vcard"
 ELSEIF cFile LIKE ".+\.vcd" 
-   RETURN "application/x-cdlink=" + cFname + cFext
+   RETURN "application/x-cdlink"
 ELSEIF cFile LIKE ".+\.vsf" 
-   RETURN "application/vnd.vsf=" + cFname + cFext
+   RETURN "application/vnd.vsf"
 ELSEIF cFile LIKE ".+\.wrl" 
-   RETURN "model/vrml=" + cFname + cFext
+   RETURN "model/vrml"
 ELSEIF cFile LIKE ".+\.vcx" 
-   RETURN "application/vnd.vcx=" + cFname + cFext
+   RETURN "application/vnd.vcx"
 ELSEIF cFile LIKE ".+\.mts" 
-   RETURN "model/vnd.mts=" + cFname + cFext
+   RETURN "model/vnd.mts"
 ELSEIF cFile LIKE ".+\.vtu" 
-   RETURN "model/vnd.vtu=" + cFname + cFext
+   RETURN "model/vnd.vtu"
 ELSEIF cFile LIKE ".+\.vis" 
-   RETURN "application/vnd.visionary=" + cFname + cFext
+   RETURN "application/vnd.visionary"
 ELSEIF cFile LIKE ".+\.viv" 
-   RETURN "video/vnd.vivo=" + cFname + cFext
+   RETURN "video/vnd.vivo"
 ELSEIF cFile LIKE ".+\.ccxml" 
-   RETURN "application/ccxml+xml=" + cFname + cFext
+   RETURN "application/ccxml+xml"
 ELSEIF cFile LIKE ".+\.vxml" 
-   RETURN "application/voicexml+xml=" + cFname + cFext
+   RETURN "application/voicexml+xml"
 ELSEIF cFile LIKE ".+\.src" 
-   RETURN "application/x-wais-source=" + cFname + cFext
+   RETURN "application/x-wais-source"
 ELSEIF cFile LIKE ".+\.wbxml" 
-   RETURN "application/vnd.wap.wbxml=" + cFname + cFext
+   RETURN "application/vnd.wap.wbxml"
 ELSEIF cFile LIKE ".+\.wbmp" 
-   RETURN "image/vnd.wap.wbmp=" + cFname + cFext
+   RETURN "image/vnd.wap.wbmp"
 ELSEIF cFile LIKE ".+\.wav" 
-   RETURN "audio/x-wav=" + cFname + cFext
+   RETURN "audio/x-wav"
 ELSEIF cFile LIKE ".+\.davmount" 
-   RETURN "application/davmount+xml=" + cFname + cFext
+   RETURN "application/davmount+xml"
 ELSEIF cFile LIKE ".+\.woff" 
-   RETURN "application/x-font-woff=" + cFname + cFext
+   RETURN "application/x-font-woff"
 ELSEIF cFile LIKE ".+\.wspolicy" 
-   RETURN "application/wspolicy+xml=" + cFname + cFext
+   RETURN "application/wspolicy+xml"
 ELSEIF cFile LIKE ".+\.webp" 
-   RETURN "image/webp=" + cFname + cFext
+   RETURN "image/webp"
 ELSEIF cFile LIKE ".+\.wtb" 
-   RETURN "application/vnd.webturbo=" + cFname + cFext
+   RETURN "application/vnd.webturbo"
 ELSEIF cFile LIKE ".+\.wgt" 
-   RETURN "application/widget=" + cFname + cFext
+   RETURN "application/widget"
 ELSEIF cFile LIKE ".+\.hlp" 
-   RETURN "application/winhlp=" + cFname + cFext
+   RETURN "application/winhlp"
 ELSEIF cFile LIKE ".+\.wml" 
-   RETURN "text/vnd.wap.wml=" + cFname + cFext
+   RETURN "text/vnd.wap.wml"
 ELSEIF cFile LIKE ".+\.wmls" 
-   RETURN "text/vnd.wap.wmlscript=" + cFname + cFext
+   RETURN "text/vnd.wap.wmlscript"
 ELSEIF cFile LIKE ".+\.wmlsc" 
-   RETURN "application/vnd.wap.wmlscriptc=" + cFname + cFext
+   RETURN "application/vnd.wap.wmlscriptc"
 ELSEIF cFile LIKE ".+\.wpd" 
-   RETURN "application/vnd.wordperfect=" + cFname + cFext
+   RETURN "application/vnd.wordperfect"
 ELSEIF cFile LIKE ".+\.stf" 
-   RETURN "application/vnd.wt.stf=" + cFname + cFext
+   RETURN "application/vnd.wt.stf"
 ELSEIF cFile LIKE ".+\.wsdl" 
-   RETURN "application/wsdl+xml=" + cFname + cFext
+   RETURN "application/wsdl+xml"
 ELSEIF cFile LIKE ".+\.xbm" 
-   RETURN "image/x-xbitmap=" + cFname + cFext
+   RETURN "image/x-xbitmap"
 ELSEIF cFile LIKE ".+\.xpm" 
-   RETURN "image/x-xpixmap=" + cFname + cFext
+   RETURN "image/x-xpixmap"
 ELSEIF cFile LIKE ".+\.xwd" 
-   RETURN "image/x-xwindowdump=" + cFname + cFext
+   RETURN "image/x-xwindowdump"
 ELSEIF cFile LIKE ".+\.der" 
-   RETURN "application/x-x509-ca-cert=" + cFname + cFext
+   RETURN "application/x-x509-ca-cert"
 ELSEIF cFile LIKE ".+\.fig" 
-   RETURN "application/x-xfig=" + cFname + cFext
+   RETURN "application/x-xfig"
 ELSEIF cFile LIKE ".+\.xhtml" 
-   RETURN "application/xhtml+xml=" + cFname + cFext
+   RETURN "application/xhtml+xml"
 ELSEIF cFile LIKE ".+\.xml" 
-   RETURN "application/xml=" + cFname + cFext
+   RETURN "application/xml"
 ELSEIF cFile LIKE ".+\.xdf" 
-   RETURN "application/xcap-diff+xml=" + cFname + cFext
+   RETURN "application/xcap-diff+xml"
 ELSEIF cFile LIKE ".+\.xenc" 
-   RETURN "application/xenc+xml=" + cFname + cFext
+   RETURN "application/xenc+xml"
 ELSEIF cFile LIKE ".+\.xer" 
-   RETURN "application/patch-ops-error+xml=" + cFname + cFext
+   RETURN "application/patch-ops-error+xml"
 ELSEIF cFile LIKE ".+\.rl" 
-   RETURN "application/resource-lists+xml=" + cFname + cFext
+   RETURN "application/resource-lists+xml"
 ELSEIF cFile LIKE ".+\.rs" 
-   RETURN "application/rls-services+xml=" + cFname + cFext
+   RETURN "application/rls-services+xml"
 ELSEIF cFile LIKE ".+\.rld" 
-   RETURN "application/resource-lists-diff+xml=" + cFname + cFext
+   RETURN "application/resource-lists-diff+xml"
 ELSEIF cFile LIKE ".+\.xslt" 
-   RETURN "application/xslt+xml=" + cFname + cFext
+   RETURN "application/xslt+xml"
 ELSEIF cFile LIKE ".+\.xop" 
-   RETURN "application/xop+xml=" + cFname + cFext
+   RETURN "application/xop+xml"
 ELSEIF cFile LIKE ".+\.xpi" 
-   RETURN "application/x-xpinstall=" + cFname + cFext
+   RETURN "application/x-xpinstall"
 ELSEIF cFile LIKE ".+\.xspf" 
-   RETURN "application/xspf+xml=" + cFname + cFext
+   RETURN "application/xspf+xml"
 ELSEIF cFile LIKE ".+\.xul" 
-   RETURN "application/vnd.mozilla.xul+xml=" + cFname + cFext
+   RETURN "application/vnd.mozilla.xul+xml"
 ELSEIF cFile LIKE ".+\.xyz" 
-   RETURN "chemical/x-xyz=" + cFname + cFext
+   RETURN "chemical/x-xyz"
 ELSEIF cFile LIKE ".+\.yang" 
-   RETURN "application/yang=" + cFname + cFext
+   RETURN "application/yang"
 ELSEIF cFile LIKE ".+\.yin" 
-   RETURN "application/yin+xml=" + cFname + cFext
+   RETURN "application/yin+xml"
 ELSEIF cFile LIKE ".+\.zir" 
-   RETURN "application/vnd.zul=" + cFname + cFext
+   RETURN "application/vnd.zul"
 ELSEIF cFile LIKE ".+\.zip" 
-   RETURN "application/zip=" + cFname + cFext
+   RETURN "application/zip"
 ELSEIF cFile LIKE ".+\.zmm" 
-   RETURN "application/vnd.handheld-entertainment+xml=" + cFname + cFext
+   RETURN "application/vnd.handheld-entertainment+xml"
 ELSEIF cFile LIKE ".+\.zaz" 
-   RETURN "application/vnd.zzazz.deck+xml=" + cFname + cFext
+   RETURN "application/vnd.zzazz.deck+xml"
    ENDIF
 
-   RETURN "text/plain;filename=" + cFname + cFext
+   RETURN "text/plain"
 

@@ -526,7 +526,9 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       HB_MACRO       struMacro;
       int            iStatus;
       const char *   szString;
-      char           szCopy[ MAX_MACRO_TEXT ];
+      char       *   szCopy = NULL;
+      BOOL           bAlloc = FALSE;
+      
       HB_SIZE        ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
@@ -546,13 +548,15 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
        *   ? "Result:", &cText
        * RETURN
        */
-      szString                = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
 
+      szString                = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
       struMacro.Flags         = HB_MACRO_GEN_PUSH;
       struMacro.uiNameLen     = HB_SYMBOL_NAME_LEN;
       struMacro.status        = HB_MACRO_CONT;
       struMacro.iListElements = 0;
       struMacro.supported     = ( flags & HB_SM_RT_MACRO ) ? s_macroFlags : flags;
+
+      
 
       if( iContext != 0 )
       {
@@ -598,6 +602,8 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
          ulLength = strlen( szCopy );
       }
 #else
+      bAlloc = TRUE;
+      szCopy = (char*) hb_xgrab( ulLength ) ;  
       hb_xstrcpy( szCopy, szString, 0 );
 #endif
 
@@ -618,6 +624,8 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
          hb_xfree( pOut );
       }
 #endif
+      if ( bAlloc )
+          hb_xfree(szCopy);
 
       hb_stackPop();    /* remove compiled string */
 

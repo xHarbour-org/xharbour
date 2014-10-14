@@ -1163,12 +1163,12 @@ const char * hb_cdpnDup3( const char * pszSrc, HB_SIZE ulSrc,
       }
       if( pszPrev )
          hb_xfree( pszPrev );
-      if( *pulDst )
+      if( pulDst )
          *pulDst = ulDst;
       return pszDst;
    }
 
-   if( *pulDst )
+   if( pulDst )
       *pulDst = ulSrc;
    return pszSrc;
 }
