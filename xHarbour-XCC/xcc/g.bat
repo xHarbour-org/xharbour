@@ -124,8 +124,10 @@ ECHO ON
 :SUCCESS
    xcopy xcc.exe \xhb\bin /d /r /y
    xcopy xcc.dll \xhb\bin /d /r /y
-   xcopy crt\include \xhb\c_include /s /d /r /y
-   xcopy ..\include\win \xhb\c_include\win /s /d /r /y
+   REM *** DO NOT USE ..\crt\include !!!
+   xcopy crt\include \xhb\c_include /s /d /r /y /i
+   xcopy ..\crt\include\sys \xhb\c_include\sys /s /d /r /y /i
+   xcopy ..\include\win \xhb\c_include\win /s /d /r /y /i
 
 :RESTORE
    SET PATH=%_PRESET_PATH%
