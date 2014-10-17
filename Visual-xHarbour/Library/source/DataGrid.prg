@@ -1899,7 +1899,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
       ::__UpdateVScrollBar()
    ENDIF
    IF nKey != NIL .AND. nKey != GRID_DOWN
-      ::__Edit(0, 0, 0, nKey )
+      ::__Edit(0, 0, 0, nKey, nwParam )
    ENDIF
    ::AutoUpdate := ::__nUpdtTimer
 RETURN NIL
@@ -3829,6 +3829,21 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
    (xPos)
    (yPos)
    IF ::__CurControl == NIL .AND. ( ::ColPos > 0 .OR. ::FullRowSelect )
+      IF ::Children[::ColPos]:Representation == 3 .AND. nMessage == GRID_LCLICK .OR. nwParam IN {VK_SPACE,VK_RETURN}
+         xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ ::ColPos ][ 1 ]
+         IF VALTYPE( xValue ) == "L"
+            IF nwParam IN {VK_SPACE,VK_RETURN} .AND. n == 0
+               RETURN Self
+            ENDIF
+            IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) > 0
+               xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ ::ColPos ][ 1 ]
+               ::Form:&( ::Children[::ColPos]:EventHandler[ "OnSave" ] )( Self, ! xValue, nwParam )
+               ::__FillRow( ::RowPos )
+               ::__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos )
+               RETURN Self
+            ENDIF
+         ENDIF
+      ENDIF
       IF !::FullRowSelect .AND. ::Children[::ColPos]:Control != NIL .AND. ::Children[::ColPos]:ControlAccessKey & nMessage != 0
          ::__CurControl := EVAL( ::Children[::ColPos]:Control, Self, ::DataSource:Recno() )
          aRect := ::GetItemRect()
