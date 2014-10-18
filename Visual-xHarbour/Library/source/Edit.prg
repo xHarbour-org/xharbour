@@ -208,7 +208,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
    ::ExStyle      := WS_EX_CLIENTEDGE
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
       ::Events := ;
              { ;
@@ -308,7 +308,7 @@ METHOD Create() CLASS EditBox
          ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
       ENDIF
    ENDIF
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       IF ( n := ASCAN( ::Parent:Children, {|o| o:ClsName == UPDOWN_CLASS .AND. VALTYPE(o:xBuddy)=="C" .AND. o:xBuddy == ::Name } ) ) > 0
          ::Parent:Children[n]:xBuddy := Self
       ENDIF
@@ -333,7 +333,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD SetCueBanner( cText, lFocus ) CLASS EditBox
    DEFAULT cText TO ::xCueBanner
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       IF VALTYPE( cText )=="C" .AND. LEFT( cText, 2 ) == "{|"
          cText := &cText
       ENDIF
@@ -486,7 +486,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode() CLASS EditBox
    LOCAL n, nRet
-   IF ::wParam == VK_RETURN
+   IF ::wParam == VK_RETURN .AND. ::Parent:ClsName != "DataGrid"
       IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
          nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
          RETURN NIL
@@ -501,16 +501,16 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetLayout() CLASS EditBox
-   IF ::IsWindow() .AND. ::__ClassInst != NIL
+   IF ::IsWindow() .AND. ::DesignMode
       ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER )
    ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetImageIndex(n) CLASS EditBox
-   IF ::__ClassInst != NIL .AND. n > 0 .AND. ::xLayout == 1
+   IF ::DesignMode .AND. n > 0 .AND. ::xLayout == 1
       ::Layout := 2
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          ::Application:ObjectManager:CheckValue( "Layout", "General", ::Layout )
       ENDIF
    ENDIF
@@ -899,7 +899,7 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnCtlColorEdit( nwParam ) CLASS EditBox
-   LOCAL hBrush, nFore, nBack, pt := (struct POINT), n
+   LOCAL hBrush, oParent, nFore, nBack, n
 
    nFore := ::ForeColor
    nBack := ::BackColor
@@ -921,11 +921,12 @@ METHOD OnCtlColorEdit( nwParam ) CLASS EditBox
    hBrush := ::BkBrush
 
    IF ::Transparent
-      hBrush := ::Parent:BkBrush
+      oParent := IIF( ::Parent:ClsName == "DataGrid", ::Parent:Parent, ::Parent )
+      hBrush := oParent:BkBrush
       SelectObject( nwParam, hBrush )
       SetBkMode( nwParam, TRANSPARENT )
       n := (::Width - ::ClientWidth)/2
-      SetBrushOrgEx( nwParam, ::Parent:ClientWidth-::Left-n, ::Parent:ClientHeight-::Top-n, @pt )
+      SetBrushOrgEx( nwParam, oParent:ClientWidth-::Left-n, oParent:ClientHeight-::Top-n )
       RETURN hBrush
    ENDIF
 

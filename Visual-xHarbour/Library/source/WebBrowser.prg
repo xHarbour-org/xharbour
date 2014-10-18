@@ -85,7 +85,7 @@ RETURN Self
 
 METHOD Create() CLASS WebBrowser
    LOCAL oReg
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       oReg := Registry( HKEY_CURRENT_USER, "Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION" )
       IF ::BrowserEmulation <> EMULATION_IE_07
          IF oReg:Create()
@@ -116,7 +116,7 @@ METHOD __SetScrollBars( /*lScroll*/ ) CLASS WebBrowser
 RETURN Self
 
 METHOD WebNavigate( Url ) CLASS WebBrowser
-   IF ::__ClassInst == NIL .AND. ::hObj != NIL
+   IF ! ::DesignMode .AND. ::hObj != NIL
       ::Navigate( Url )
    ENDIF
 RETURN Self

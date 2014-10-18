@@ -46,7 +46,7 @@ METHOD Init( oParent ) CLASS Panel
    ::xWidth        := 80
    ::xHeight       := 80
    ::__IsStandard   := .F.
-   IF ! ::__ClassInst != NIL
+   IF ! ::DesignMode
       __DeleteEvents( ::Events,{ /*"OnClick",*/;
                                  "OnCtlColorBtn",;
                                  "OnCtlColorEdit",;
@@ -70,16 +70,16 @@ METHOD Create() CLASS Panel
       ::OriginalRect[4] := ::VertScrollSize
     ELSE
       ::VertScrollSize := ::ClientHeight
-      IF ::__ClassInst != NIL
-         ::__ClassInst:VertScrollSize := ::ClientHeight
+      IF ::DesignMode
+         __SetInitialValues( Self, "VertScrollSize", ::ClientHeight )
       ENDIF
    ENDIF
    IF ::HorzScrollSize > 0
       ::OriginalRect[3] := ::HorzScrollSize
     ELSE
       ::HorzScrollSize := ::ClientWidth
-      IF ::__ClassInst != NIL
-         ::__ClassInst:HorzScrollSize := ::ClientWidth
+      IF ::DesignMode
+         __SetInitialValues( Self, "HorzScrollSize", ::ClientWidth )
       ENDIF
    ENDIF
 RETURN Self

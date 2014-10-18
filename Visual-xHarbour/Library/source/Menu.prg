@@ -38,7 +38,6 @@ CLASS Menu INHERIT Object
    DATA ParProc       PROTECTED
    DATA ClsName       EXPORTED INIT "Menu"
    DATA Children      EXPORTED
-   DATA __ClassInst   EXPORTED
    DATA __PropFilter                 EXPORTED INIT {}
    //DATA __pCallBackPtr  EXPORTED
    ACCESS hWnd        INLINE ::hMenu
@@ -70,8 +69,8 @@ METHOD Init( oParent ) CLASS Menu
    ::aItems:= {}
    ::Parent:= oParent
 
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::ImageList    := ::Parent:ImageList
    ::HotImageList := ::Parent:HotImageList
@@ -254,8 +253,8 @@ METHOD Init( oParent ) CLASS MenuPopup
    ::__hObjects     := Hash()
    HSetCaseMatch( ::__hObjects, .F. )
 
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    IF __ObjHasMsg( ::Parent, "ImageList" )
       ::ImageList    := ::Parent:ImageList
@@ -300,18 +299,6 @@ METHOD Init( oParent ) CLASS MenuBar
    DEFAULT ::ComponentType TO "MenuBar"
    DEFAULT ::ClsName       TO "MenuBar"
    Super:Init( oParent )
-/*
-   ::Parent := oParent
-   ::__CreateProperty()
-
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      IF oParent:TreeItem == NIL
-         ::Application:ObjectTree:Set( oParent )
-      ENDIF
-      ::Application:ObjectTree:Set( Self )
-   ENDIF
-*/
 RETURN Self
 
 METHOD Create() CLASS MenuBar
@@ -327,7 +314,7 @@ METHOD Create() CLASS MenuBar
    IF VALTYPE( ::xImageList ) == "C"
       AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
@@ -393,14 +380,14 @@ CLASS ContextMenu INHERIT Component
    DATA Menu            EXPORTED
    DATA Text            EXPORTED INIT "ContextMenu"
    DATA xImageList      EXPORTED
-   
+
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Show()
-   METHOD __AddMenuItem()   
+   METHOD __AddMenuItem()
    METHOD Cancel()    INLINE ::Parent:SendMessage( WM_CANCELMODE, 0, 0 )
 ENDCLASS
 
@@ -416,7 +403,7 @@ METHOD Init( oParent ) CLASS ContextMenu
    ::Parent := oParent
    ::Menu := MenuPopup( ::Owner )
    ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Menu:Style := TPM_CENTERALIGN | TPM_LEFTBUTTON
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
    ENDIF
@@ -437,7 +424,7 @@ METHOD Show( x, y ) CLASS ContextMenu
    ::Menu:Create()
 
    FOR EACH oItem IN ::Menu:aItems
-       IF oItem:Visible .OR. ::__ClassInst != NIL
+       IF oItem:Visible .OR. ::DesignMode
           oItem:Create()
        ENDIF
    NEXT

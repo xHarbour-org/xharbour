@@ -70,7 +70,7 @@ CLASS HeaderStrip INHERIT Control
    DATA OnItemClick        EXPORTED
    DATA OnItemDblClick     EXPORTED
    DATA OnFilterChange     EXPORTED
-   
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD InsertItem()
@@ -113,7 +113,7 @@ METHOD Create() CLASS HeaderStrip
       ::SetImageList( ::ImageList )
    ENDIF
    ::SetImageMargin( ::ImageMargin )
-   IF ::__ClassInst != NIL // it's been created in the IDE
+   IF ::DesignMode // it's been created in the IDE
       ::__IdeContextMenuItems := { { "&Add New HeaderItem", {|o| o := HeaderItem( Self ):Create(),;
                                                              ::Application:Project:Modified := .T.,;
                                                              ::Application:Project:CurrentForm:SelectControl(o) } } }
@@ -192,7 +192,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS HeaderStrip
               nRet := __Evaluate( ::OnItemClick, n )
               ExecuteEvent( "OnClick", ::Children[ n + 1 ] )
            ENDIF
-           
+
       CASE hdr:code == HDN_GETDISPINFO
       CASE hdr:code == HDN_ITEMDBLCLICK
       CASE hdr:code == HDN_FILTERCHANGE
@@ -201,7 +201,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS HeaderStrip
 
       CASE hdr:code == NM_CUSTOMDRAW
            nRet := __Evaluate( ::OnCustomDraw, nlParam )
-           
+
    ENDCASE
    //DEFAULT nRet TO 0
 
@@ -354,8 +354,8 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS HeaderItem
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::__lCopyCut   := .F.
    ::EventHandler := Hash()

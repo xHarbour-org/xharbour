@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------//
 
 CLASS TreeView FROM TitleControl
-   PROPERTY DragItems                                                DEFAULT .F.   
+   PROPERTY DragItems                                                DEFAULT .F.
    PROPERTY HasLines        SET ::SetStyle( TVS_HASLINES, v )        DEFAULT .T.
    PROPERTY HasButtons      SET ::SetStyle( TVS_HASBUTTONS, v )      DEFAULT .T.
    PROPERTY LinesAtRoot     SET ::SetStyle( TVS_LINESATROOT, v )     DEFAULT .T.
@@ -48,7 +48,7 @@ CLASS TreeView FROM TitleControl
    DATA Level            EXPORTED INIT -1
    DATA SelectedItem     EXPORTED
    DATA PreviousItem     EXPORTED
-   DATA ClickedItem      EXPORTED   
+   DATA ClickedItem      EXPORTED
 
    DATA __lResetting     PROTECTED INIT .F.
    DATA __oDrag          PROTECTED
@@ -75,7 +75,7 @@ CLASS TreeView FROM TitleControl
    METHOD GetRoot()                   INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_ROOT, 0 )
    METHOD GetFirstVisibleItem()       INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_FIRSTVISIBLE, 0 )
    METHOD GetLastVisibleItem()        INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_LASTVISIBLE, 0 )
-   
+
    METHOD GetNextVisibleItem( hItem ) INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_NEXTVISIBLE, hItem )
    METHOD GetNextItem( hItem )        INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_NEXT, hItem )
    METHOD GetChild( hItem )           INLINE _SendMessage( ::hWnd, TVM_GETNEXTITEM, TVGN_CHILD, IIF( hItem==NIL, ::hWnd, hItem ) )
@@ -319,7 +319,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
    LOCAL tvht, rc
    LOCAL tvkd, nState, lRet, hItem
    DEFAULT hdr TO ::Parent:hdr
-   
+
    IF ::__lResetting
       RETURN 0
    ENDIF
@@ -340,7 +340,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
            tvht:flags := TVHT_ONITEM | TVHT_ONITEMICON
            GetCursorPos( @tvht:pt )
            ScreenToClient( ::hWnd, @tvht:pt )
-           
+
            ::ClickedItem := NIL
            hItem := SendMessage( ::hWnd, TVM_HITTEST, 0, tvht )
            IF hItem != 0
@@ -416,7 +416,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
               ::wParam := tvkd:wVKey
            ENDIF
            lRet := ExecuteEvent( "KeyDown", Self )
-           
+
       CASE hdr:code == TVN_SELCHANGED
            IF ( ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) ) ) != NIL
               hItem := __GetTreeViewOldItem( nlParam )
@@ -476,7 +476,7 @@ METHOD OnLButtonUp( w, x, y ) CLASS TreeView
    LOCAL oItem
    (w)
    IF ::DragItems .AND. ::__oDrag != NIL
-      SendMessage( ::hWnd, TVM_SETINSERTMARK, .F., NIL )      
+      SendMessage( ::hWnd, TVM_SETINSERTMARK, .F., NIL )
       IF ( oItem := ::HitTest( x, y ) ) != NIL .AND. ::__oDrag:hItem != oItem:hItem
          ::OnEndDrag( oItem )
          ExecuteEvent( "OnEndDrag", Self, oItem )
@@ -488,17 +488,17 @@ METHOD OnLButtonUp( w, x, y ) CLASS TreeView
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------
-METHOD MoveItem( oDrag, nPos, oOwner ) CLASS TreeView      
+METHOD MoveItem( oDrag, nPos, oOwner ) CLASS TreeView
    LOCAL oItem
    IF oDrag != NIL .AND. oOwner != NIL
+      oDrag:Delete()
+
       oItem             := TreeViewItem( Self )
       oItem:Text        := oDrag:Text
       oItem:ImageIndex  := oDrag:ImageIndex
       oItem:Cargo       := IIF( VALTYPE(oDrag:Cargo) == "A", ACLONE( oDrag:Cargo ), oDrag:Cargo )
 
-      oDrag:Delete()
-
-      oItem:InsertAfter := IIF( nPos == 1, TVI_FIRST, oOwner:Items[nPos-1]:hItem )
+      oItem:InsertAfter := IIF( nPos == 1, TVI_FIRST, IIF( LEN( oOwner:Items ) < nPos-1, TVI_LAST, oOwner:Items[nPos-1]:hItem ) )
       oItem:Owner       := oOwner
 
       oItem:Create()

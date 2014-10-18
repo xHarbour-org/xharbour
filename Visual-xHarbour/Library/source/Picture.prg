@@ -93,7 +93,7 @@ METHOD Create() CLASS PictureBox
             ELSE
               cType := ::Type
            ENDIF
-           IF ::__ClassInst == NIL .OR. EMPTY( ::ImageName[1] )
+           IF ! ::DesignMode .OR. EMPTY( ::ImageName[1] )
               IF ( n := ASCAN( aDef, cType,,,.T.) ) > 0
                  ::pPicture := PictureLoadImageFromResource( ::AppInstance, UPPER(::ImageName[2]), n )
                ELSE
@@ -131,7 +131,7 @@ METHOD Create() CLASS PictureBox
            EXIT
    END
 
-   IF ::__ClassInst != NIL .AND. !EMPTY( ::xImageName )
+   IF ::DesignMode .AND. !EMPTY( ::xImageName )
       ::Application:Project:AddImage( ::xImageName, ::Type, Self )
    ENDIF
 
@@ -262,7 +262,7 @@ RETURN 1
 
 //-----------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS PictureBox
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Kill()
       ::Application:Project:RemoveImage( ::xImageName, Self )
    ENDIF
@@ -271,7 +271,7 @@ RETURN ::Super:Destroy()
 METHOD SetImageName( cFile, cType ) CLASS PictureBox
    LOCAL aSize, n, cPrev
    IF VALTYPE( cFile ) == "A"
-      cFile := IIF( ::__ClassInst != NIL .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
+      cFile := IIF( ::DesignMode .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF
 
    cPrev := ::xImageName
@@ -302,7 +302,7 @@ METHOD SetImageName( cFile, cType ) CLASS PictureBox
       ::InvalidateRect()
 
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       IF !EMPTY( cPrev )
          ::Application:Project:RemoveImage( cPrev, Self )
       ENDIF

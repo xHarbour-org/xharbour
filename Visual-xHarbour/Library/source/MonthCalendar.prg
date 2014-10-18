@@ -33,15 +33,15 @@ CLASS MonthCalendar INHERIT TitleControl
    PROPERTY Border            SET ::SetStyle( WS_BORDER, v )         DEFAULT .F.
    PROPERTY Date              SET ::SetCurSel(v)                     DEFAULT DATE()
    PROPERTY Today             SET ::SetToday(v)                      DEFAULT DATE()
-   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )      
-   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )         
-   PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )      
-   PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
-   PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
+   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )
+   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )
+   PROPERTY TitleBackColor    SET ::SetCalendarColor( MCSC_TITLEBK, v )
+   PROPERTY TitleForeColor    SET ::SetCalendarColor( MCSC_TITLETEXT, v )
+   PROPERTY TrailingTextColor SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v )
 
    DATA NmDayState   EXPORTED
    DATA NmSelChange  EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnParentNotify()
@@ -63,7 +63,7 @@ METHOD Init( oParent ) CLASS MonthCalendar
    ::Super:Init( oParent )
    ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::Events := {}
-   IF oParent:__ClassInst != NIL
+   IF oParent:DesignMode
       ::Events := { ;
                   {"General",     {;
                                   { "OnInit"            , "", "" },;

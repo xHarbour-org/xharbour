@@ -750,7 +750,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
    STATIC s_bSetting := .F.
 
    LOCAL n, cProp, cProp2, oObj, Topic, Event, nCurr, nHost, cVal
-   LOCAL oError
+   LOCAL oError, aSel
 
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
 
@@ -783,7 +783,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       xValue := ALLTRIM( xValue )
    ENDIF
 
-   IF cProp2 != NIL .AND. cProp2 == "MDIClient" .AND. ( cProp == "AlignLeft" .OR. cProp == "AlignTop" .OR. cProp == "AlignRight" .OR. cProp == "AlignBottom" )
+   IF cProp2 != NIL .AND. cProp2 == "MDIClient" .AND. cProp IN {"AlignLeft","AlignTop","AlignRight","AlignBottom"}
       __objSendMsg( oActiveObject:MDIClient, "_"+cProp, xValue )
       IF xValue != NIL
          oItem:ColItems[1]:Value[1] := xValue:Name
@@ -852,7 +852,22 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
             ENDIF
          ENDIF
        ELSE
-         __objSendMsg( oObj, "_"+cProp, xValue )
+         IF LEN( ::Application:Project:CurrentForm:Selected ) > 1
+            FOR EACH aSel IN ::Application:Project:CurrentForm:Selected
+                IF cProp2 != NIL
+                   __objSendMsg( aSel[1]:&cProp2, "_"+cProp, xValue )
+                 ELSE
+                   __objSendMsg( aSel[1], "_"+cProp, xValue )
+
+                   IF cProp IN {"Left","Top","Width","Height"}
+                      aSel[1]:MoveWindow()
+                      aSel[1]:Parent:InvalidateRect()
+                   ENDIF
+                ENDIF
+            NEXT
+          ELSE
+            __objSendMsg( oObj, "_"+cProp, xValue )
+         ENDIF
       ENDIF
 
       IF cProp == "Name"
@@ -1016,8 +1031,8 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
-   LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly//, oObj
-   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault
+   LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly, aObjs
+   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1062,7 +1077,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       ENDIF
    ENDIF
 
-   IF ::ActiveObject != NIL .AND. ::ActiveObject == aSel[1][1] .AND. !lForce
+   IF ::ActiveObject != NIL .AND. ::ActiveObject == aSel[1][1] .AND. !lForce .AND. LEN( aSel ) == 1
       RETURN Self
    ENDIF
 
@@ -1099,13 +1114,45 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
    CATCH
    END
 
-   aProperties := ::GetPropertiesAndValues( ::ActiveObject )
+   IF LEN( aSel ) > 1
+      aProperties := {}
+      aObjs := {}
+      FOR EACH aObj IN aSel
+          IF ASCAN( aObjs, {|a| a[1]==aObj[1]:ClsName} ) == 0
+
+             aProps := ::GetPropertiesAndValues( aObj[1] )
+             AADD( aObjs, { aObj[1]:ClsName, aProps } )
+
+             FOR EACH aProp IN aProps
+                 IF ASCAN( aProperties, {|a| a[1]==aProp[1]} ) == 0
+                    AADD( aProperties, aProp )
+                 ENDIF
+             NEXT
+          ENDIF
+      NEXT
+    ELSE
+      aProperties := ::GetPropertiesAndValues( ::ActiveObject )
+   ENDIF
 
    aSort( aProperties,,,{|x, y| x[1] < y[1]})
 
    FOR EACH aProperty IN aProperties
        cProp  := aProperty[1]
-
+       IF LEN( aSel ) > 1
+          IF cProp IN {"NAME","TABORDER","DOCK","ANCHOR","SHORTCUTKEY","TOOLTIP"}
+             LOOP
+          ENDIF
+          FOR EACH aObj IN aSel
+              n := ASCAN( aObjs, {|a| a[1]==aObj[1]:ClsName} )
+              IF ASCAN( aObjs[n][2], {|a| a[1]==cProp}) == 0
+                 cProp := NIL
+                 EXIT
+              ENDIF
+          NEXT
+          IF cProp == NIL
+             LOOP
+          ENDIF
+       ENDIF
        //------------------------------------------------------------------------------------------------------------------------------------------------------
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
           LOOP
@@ -1496,11 +1543,14 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       oItem:EnsureVisible()
    ENDIF
    ::lPaint := .T.
+
    ::SetRedraw( .T. )
+
    ::Application:Yield()
 
    IF ::ActiveObject:TreeItem != NIL
       ::ActiveObject:TreeItem:Select()
+      ::ActiveObject:TreeItem:Expand()
    ENDIF
 
    //hb_gcall(.T.)
@@ -1518,6 +1568,10 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
 
           cType   := VALTYPE( xValue2 )
           nColor  := NIL
+
+          IF ! __ObjHasMsg( xValue, "__a_" + cProp2 )
+             EXIT
+          ENDIF
 
           aProp   := __objSendMsg( xValue, "__a_"+cProp2 )
           cProp2  := aProp[1]
@@ -1543,7 +1597,7 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              xValue2 := NIL
 
            ELSEIF cProp == "Dock"
-             IF cProp2 $ "LeftTopRightBottom"
+             IF cProp2 IN {"Left","Top","Right","Bottom"}
                 aCol[1]:Value := { "", { NIL } }
                 AADD( aCol[1]:Value[2], ::ActiveObject:Parent )
                 FOR EACH Child IN ::ActiveObject:Parent:Children
@@ -1552,8 +1606,8 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
                     ENDIF
                 NEXT
                 TRY
-                   IF xValue2 != NIL .AND. VALTYPE( xValue2 ) == "O"
-                      aCol[1]:Value[1] := xValue2:Name
+                   IF xValue2 != NIL
+                      aCol[1]:Value[1] := IIF( VALTYPE( xValue2 ) == "O", xValue2:Name, xValue2 )
                    ENDIF
                 catch
                 END
@@ -1765,7 +1819,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                            :AddItem( ::ActiveObject:MaskTypes[n] )
                        NEXT
 
-                       IF ( n := :FindStringExact( ::ActiveObject:MaskType ) ) > 0
+                       IF ( n := :FindStringExact(, ::ActiveObject:MaskType ) ) > 0
                           :SetCurSel(n)
                         ELSE
                           :SetCurSel(1)
@@ -1996,27 +2050,19 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :AddItem( "" )
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value[2] )
                            IF VALTYPE( oItem:ColItems[nCol-1]:Value[2][n] ) == "O"
-                              IF oItem:ColItems[nCol-1]:Value[2][n]:hWnd == ::ActiveObject:Parent:hWnd
-                                 :AddItem( "Parent" )
-                               ELSE
-                                 :AddItem( oItem:ColItems[nCol-1]:Value[2][n]:Name )
-                              ENDIF
+                              :AddItem( oItem:ColItems[nCol-1]:Value[2][n]:Name )
                            ENDIF
                        NEXT
 
-                       IF ::ActiveObject:Parent != NIL .AND. oItem:ColItems[nCol-1]:Value[1] == ::ActiveObject:Parent:Name
-                          n := :FindStringExact( "Parent" )
-                        ELSE
-                          n := :FindStringExact( oItem:ColItems[nCol-1]:Value[1] )
-                       ENDIF
-                       IF n > 0
+                       :SetItemHeight( -1, ::GetItemHeight()-5 )
+                       :SetFocus()
+                       :ShowDropDown()
+
+                       IF ( n := :FindStringExact( ,oItem:ColItems[nCol-1]:Value[1] ) ) > 0
                           :SetCurSel(n)
                         ELSE
                           :SetCurSel(1)
                        ENDIF
-                       :SetItemHeight( -1, ::GetItemHeight()-5 )
-                       :SetFocus()
-                       :ShowDropDown()
                     END
 
                CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","PAGECHILD","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
@@ -2040,7 +2086,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                            ENDIF
                        NEXT
 
-                       IF ( n := :FindStringExact( oItem:ColItems[nCol-1]:Value[1] ) ) > 0
+                       IF ( n := :FindStringExact(, oItem:ColItems[nCol-1]:Value[1] ) ) > 0
                           :SetCurSel(n)
                         ELSE
                           :SetCurSel(1)
@@ -2912,7 +2958,7 @@ RETURN Self
 
 METHOD Create() CLASS ObjCombo
    ::Super:Create()
-   ::ColFont:Weight := 700
+   ::ColFont:Bold := .T.
    ::ColFont:Create()
 RETURN Self
 

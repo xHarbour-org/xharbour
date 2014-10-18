@@ -42,7 +42,7 @@ CLASS OptionBar INHERIT Control
    DATA __SysForeColor EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
 
    DATA  xButtonCheckColor PROTECTED INIT GetSysColor( COLOR_BTNSHADOW )
-   ACCESS ButtonCheckColor    INLINE ::xButtonCheckColor 
+   ACCESS ButtonCheckColor    INLINE ::xButtonCheckColor
    ASSIGN ButtonCheckColor(n) INLINE ::xButtonCheckColor := n, IIF( ::__ToolBar != NIL, ::__ToolBar:ButtonCheckColor := n, )
 
    DATA  xButtonCheckSolid PROTECTED INIT .T.
@@ -100,7 +100,7 @@ METHOD Create() CLASS OptionBar
    ::ClassBrush := ::BkBrush
    DEFAULT ::ClassBrush TO GetSysColorBrush( COLOR_BTNSHADOW )
    ::Super:Create()
-   IF ::__ClassInst != NIL 
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add Button", {|| ::__AddButton()} } }
    ENDIF
 

@@ -56,7 +56,7 @@ METHOD Create() CLASS CustomControl
    ::Super:Create()
 
    #ifdef VXH_PROFESSIONAL
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       IF ::__ChgRef != NIL
          ::Reference := ::__ChgRef
          ::__ChgRef := NIL
@@ -81,17 +81,17 @@ METHOD Create() CLASS CustomControl
 
          ::SetRedraw( .F. )
          WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-            ::Application:Project:ParseXFM( cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors, Self, .T. )
+            ::Application:Project:ParseXFM( Self, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors, Self, .T. )
             nLine++
          END
 
          FClose( hFile )
          ::__DockChildren := ::Children
 
-         __ResetClassInst( Self )
+         //__ResetClassInst( Self )
 
          ::Reference := cReference
-         ::__ClassInst:Reference := ""
+         __SetInitialValues( Self, "Reference", "" )
 
          ::xLeft   := nLeft
          ::xTop    := nTop

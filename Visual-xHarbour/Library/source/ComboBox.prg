@@ -185,7 +185,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __SetSizePos( nPos, nVal ) CLASS ComboBox
-   IF nPos == 4 .AND. ::hWnd != NIL .AND. ::__ClassInst == NIL
+   IF nPos == 4 .AND. ::hWnd != NIL .AND. ! ::DesignMode
       ::SendMessage( CB_SETMINVISIBLE, nVal/::xItemHeight )
    ENDIF
 RETURN Super:__SetSizePos( nPos, nVal )
@@ -206,7 +206,7 @@ METHOD SetDropDownStyle( nDrop ) CLASS ComboBox
    ::Style := ::Style | nDrop
    IF ::IsWindow()
       ::SetWindowLong( GWL_STYLE, ::Style )
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
          ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
       ENDIF
@@ -618,7 +618,7 @@ METHOD Init( oParent ) CLASS DriveCombobox
        AADD( ::Drives, { SUBSTR( cDrives, n, 2 ), cType, shfi:hIcon } )
        n += 3
    NEXT
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
 RETURN Self
@@ -1051,7 +1051,7 @@ METHOD Create() CLASS ComboBoxEx
    h := ::SendMessage( CBEM_GETCOMBOCONTROL, 0, 0 )
    SendMessage( h, CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
    ::hControl := ::SendMessage( CBEM_GETCOMBOCONTROL, 0, 0 )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::BackColor := ::Parent:BackColor
    ENDIF
 RETURN Self
@@ -1118,6 +1118,7 @@ CLASS FormComboBox INHERIT ComboBox
    METHOD Create()
    METHOD OnParentCommand()
    METHOD SelectControl()
+   METHOD ResetContent()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FormComboBox
@@ -1132,6 +1133,15 @@ METHOD Create() CLASS FormComboBox
    Super:Create()
 RETURN Self
 
+METHOD ResetContent() CLASS FormComboBox
+   LOCAL n
+   FOR n := 1 TO LEN( ::aItems )
+       ::aItems[n] := NIL
+   NEXT
+   ::aItems := {}
+   Super:ResetContent()
+RETURN NIL
+
 METHOD SelectControl( oControl ) CLASS FormComboBox
    LOCAL n := ASCAN( ::aItems, oControl,,, .T. )//MAX( ::FindString(, oControl:Name ), 1 )
    ::SetCurSel( MAX(n,1))
@@ -1139,7 +1149,6 @@ RETURN Self
 
 METHOD Reset( oControl ) CLASS FormComboBox
    LOCAL cCtrl, oForm, cText
-   ::aItems := {}
    ::SetRedraw(.F.)
    ::ResetContent()
    IF ::Application:Project:Properties != NIL

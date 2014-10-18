@@ -128,7 +128,7 @@ RETURN( self )
 
 METHOD Create() CLASS ToolTip
    ::SetChildren := .F.
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::Super:Create()
 
       ::Tip             := (struct TOOLINFO)

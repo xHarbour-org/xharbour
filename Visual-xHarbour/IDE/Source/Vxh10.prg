@@ -77,7 +77,7 @@ METHOD OnInitDialog() CLASS ResourceManager
       END
 
    END
-   
+
    WITH OBJECT Button( Self )
       :Caption     := "Cancel"
       :Dock:Right  := Self
@@ -93,7 +93,7 @@ METHOD OnInitDialog() CLASS ResourceManager
       :ID          := IDOK
       :Create()
    END
-   
+
    WITH OBJECT DataGrid( Self )
       :xName        := "DataGrid"
       :Left         := 5
@@ -108,7 +108,7 @@ METHOD OnInitDialog() CLASS ResourceManager
       :Dock:Bottom  := :Parent:Button1
 
       :EventHandler[ "OnQueryBackColor" ] := "ResourceManagerOnQueryBackColor"
-      :OnWMSize     := {|o| IIF( !EMPTY( o:Children ), o:Children[3]:Width := MAX( 1000, o:ClientWidth-150 ), ) }
+      :AnchorColumn := 3
 
       WITH OBJECT :DataSource := MemoryTable( ::Parent )
          :Structure := { {"ResourceName", "C", 100 },;
@@ -193,9 +193,9 @@ METHOD AddResource() CLASS ResourceManager
             lCopy := .T.
          ENDIF
       ENDIF
-      
+
       ::DataGrid1:DataSource:Tag := "ResourceFile"
-      
+
       WITH OBJECT ::DataGrid1
          FOR EACH cFile IN oFile:Name
              IF lCopy
@@ -270,6 +270,6 @@ METHOD OnCancel() CLASS ResourceManager
       ENDIF
    ENDIF
 RETURN NIL
-  
+
 //-------------------------------------------------------------------------------------------------------
 

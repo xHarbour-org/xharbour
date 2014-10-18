@@ -40,12 +40,12 @@ CLASS SourceEditor INHERIT TitleControl
    DATA xTabWidth     PROTECTED INIT 3
    ASSIGN TabWidth(n) INLINE ::xTabWidth := n, AEVAL( ::aDocs, {|o| o:SetTabWidth(o:Owner:TabWidth)} ), IIF( ::Source != NIL, ::Source:Select(),)
    ACCESS TabWidth    INLINE ::xTabWidth
-   
+
    DATA xSource  PROTECTED
 
    ASSIGN Source(o) INLINE ::Parent:Text := IIF( o == NIL, "Source Code Editor", o:FileName ), IIF( ::xSource != NIL, ::xSource:SavePos(),), IIF( o != NIL, o:Select(),)
    ACCESS Source    INLINE ::xSource
-   
+
    DATA aDocs        EXPORTED INIT {}
    DATA PosFind      EXPORTED INIT -1
    DATA FindInStyle  EXPORTED INIT .F.
@@ -87,7 +87,7 @@ CLASS SourceEditor INHERIT TitleControl
    DATA nDirection        EXPORTED
    DATA CaretLineVisible  EXPORTED
    DATA AutoIndent        EXPORTED
-   
+
    DATA EditMenuItems     EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -104,7 +104,7 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD StyleSetSize( nSize )           INLINE ::FontSize := nSize, ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize ), Self
    METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
-   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )   
+   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )
    METHOD GetCurDoc()                     INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
 
    METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
@@ -137,7 +137,7 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
-   
+
    METHOD GetSearchFlags()
    METHOD FindNext()
    METHOD EnsureRangeVisible()
@@ -186,7 +186,7 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::EventHandler[ "OnFindNext" ]   := "OnFindNext"
    ::EventHandler[ "OnReplace" ]    := "OnReplace"
    ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
-   
+
    IF FILE( cSyntax )
       ::Keywords1 := STRTRAN( GetPrivateProfileSection( "Keywords1", cSyntax ), CHR(0), " " )
       ::Keywords2 := STRTRAN( GetPrivateProfileSection( "Keywords2", cSyntax ), CHR(0), " " )
@@ -195,8 +195,8 @@ METHOD Init( oParent ) CLASS SourceEditor
    ENDIF
 
    ::ColorNormalText   := ::Application:IniFile:ReadColor( "Colors", "NormalText",   ::System:Color:Black          )
-   ::ColorBackground   := ::Application:IniFile:ReadColor( "Colors", "BackGround",   ::System:Color:White          ) 
-   ::ColorSelectedLine := ::Application:IniFile:ReadColor( "Colors", "SelectedLine", RGB( 240, 240, 240 )          ) 
+   ::ColorBackground   := ::Application:IniFile:ReadColor( "Colors", "BackGround",   ::System:Color:White          )
+   ::ColorSelectedLine := ::Application:IniFile:ReadColor( "Colors", "SelectedLine", RGB( 240, 240, 240 )          )
 
    ::ColorNumbers      := ::Application:IniFile:ReadColor( "Colors", "Numbers",      ::System:Color:Green          )
    ::ColorStrings      := ::Application:IniFile:ReadColor( "Colors", "Strings",      ::System:Color:Teal           )
@@ -207,8 +207,8 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::ColorKeywords1    := ::Application:IniFile:ReadColor( "Colors", "Keywords1",    ::System:Color:Maroon         )
    ::ColorKeywords2    := ::Application:IniFile:ReadColor( "Colors", "Keywords2",    ::System:Color:DarkCyan       )
    ::ColorKeywords3    := ::Application:IniFile:ReadColor( "Colors", "Keywords3",    ::System:Color:SteelBlue      )
-   ::ColorKeywords4    := ::Application:IniFile:ReadColor( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  ) 
-   
+   ::ColorKeywords4    := ::Application:IniFile:ReadColor( "Colors", "Keywords4",    ::System:Color:DarkSlateGray  )
+
    ::FontFaceName      := ::Application:IniFile:ReadString( "Font", "FaceName", "FixedSys" )
    ::FontSize          := ::Application:IniFile:ReadInteger( "Font", "Size", 10 )
    ::FontBold          := ::Application:IniFile:ReadInteger( "Font", "Bold", 0 ) == 1
@@ -231,7 +231,7 @@ METHOD Create() CLASS SourceEditor
 
    ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
    ::SendMessage( SCI_SETSTYLEBITS, ::SendMessage( SCI_GETSTYLEBITSNEEDED ) )
-   
+
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
 
@@ -368,7 +368,7 @@ METHOD InitLexer() CLASS SourceEditor
    SciSetKeywords( ::hWnd, 3, ::Keywords4 )
 
    ::SendMessage( SCI_SETCARETPERIOD, 500, 0 )
-   
+
    ::SendMessage( SCI_SETCARETWIDTH, 2 )
    ::SendMessage( SCI_SETCARETSTYLE, 1 )
 
@@ -485,7 +485,7 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
 
     ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
       nSel := ASCAN( ::aDocs, ::xSource,,, .T. )
-      
+
       DEFAULT ::nLastTabTime TO SECONDS()
 
       nSecs := SECONDS() - ::nLastTabTime
@@ -493,7 +493,7 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       IF nSecs < 1 .OR. ::nLastTabPos == NIL
          nPos := nSel + IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
        ELSE
-         nPos := ::nLastTabPos 
+         nPos := ::nLastTabPos
       ENDIF
       IF nPos > LEN( ::aDocs )
          nPos := 1
@@ -512,7 +512,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyUp() CLASS SourceEditor
    LOCAL lSel
-   
+
    IF ::Source != NIL
       lSel := ::Source:GetSelLen() > 0
 
@@ -700,11 +700,11 @@ METHOD GetWithObject() CLASS SourceEditor
    cObj := ""
    IF ::FindNext( "WITH OBJECT", .T. )
       nWith := ::PosFind
-      ::Source:GotoPosition( nPos ) 
+      ::Source:GotoPosition( nPos )
       IF ! ::FindNext( "END", .T. ) .OR. ::PosFind < nWith // END is before WITH OBJECT
-         ::Source:GotoPosition( nPos ) 
+         ::Source:GotoPosition( nPos )
          IF ! ::FindNext( "METHOD", .T. ) .OR. ::PosFind < nWith
-            ::Source:GotoPosition( nPos ) 
+            ::Source:GotoPosition( nPos )
             IF ! ::FindNext( "FUNCTION", .T. ) .OR. ::PosFind < nWith
                ::PosFind := nWith+11
                WHILE ( nChar := ::Source:GetCharAt(::PosFind) ) != 13
@@ -713,14 +713,14 @@ METHOD GetWithObject() CLASS SourceEditor
                ENDDO
                cObj := ALLTRIM(cObj)+":"
                IF cObj[1] == ":"
-                  ::Source:GotoPosition( nWith-1 ) 
+                  ::Source:GotoPosition( nWith-1 )
                   cObj := ::GetWithObject() + cObj
                ENDIF
             ENDIF
          ENDIF
       ENDIF
    ENDIF
-   ::Source:GotoPosition( nPos ) 
+   ::Source:GotoPosition( nPos )
 RETURN cObj
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -728,7 +728,7 @@ METHOD AutoIndentText() CLASS SourceEditor
    LOCAL nCurLine     := ::Source:GetCurLine()
    LOCAL nIndentation := ::Source:GetLineIndentation( nCurLine - 1 )
    ::Source:SetLineIndentation( nCurLine, nIndentation )
-   ::Source:GotoPosition( ::Source:GetCurrentPos() + nIndentation ) 
+   ::Source:GotoPosition( ::Source:GetCurrentPos() + nIndentation )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -742,7 +742,7 @@ METHOD OnDestroy() CLASS SourceEditor
 
    ::Application:IniFile:WriteColor( "Colors", "NormalText",   ::ColorNormalText )
    ::Application:IniFile:WriteColor( "Colors", "BackGround",   ::ColorBackground )
-   ::Application:IniFile:WriteColor( "Colors", "SelectedLine", ::ColorSelectedLine ) 
+   ::Application:IniFile:WriteColor( "Colors", "SelectedLine", ::ColorSelectedLine )
 
    ::Application:IniFile:WriteColor( "Colors", "Numbers",      ::ColorNumbers )
    ::Application:IniFile:WriteColor( "Colors", "Strings",      ::ColorStrings )
@@ -888,7 +888,7 @@ CLASS Source INHERIT ProjectFile
    DATA PrevFile  EXPORTED
    DATA __xCtrlName EXPORTED INIT "Source"
    DATA __lSelected EXPORTED INIT .F.
-   
+
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -1044,7 +1044,7 @@ METHOD Init( oOwner, cFile ) CLASS Source
    ::Owner:xSource := Self
    ::lSource := .T.
    ::pSource := ::CreateDocument()
-   
+
    ::FirstOpen := .T.
 
    IF cFile != NIL .AND. File( cFile )
@@ -1061,6 +1061,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Close() CLASS Source
    LOCAL n
+   ::lSource := .F.
    IF ( n := ASCAN( ::Owner:aDocs, {|o| o:pSource==::pSource} ) ) > 0
       //IF ! ::__lSelected
          ::ReleaseDocument()
@@ -1111,6 +1112,7 @@ METHOD Open( cFile, cBookmarks ) CLASS Source
    ::GotoPosition( 0 )
    ::EmptyUndoBuffer()
    ::Modified  := .F.
+   ::lSource := .T.
 
    IF ! EMPTY( cBookmarks )
       aBookmarks := hb_aTokens( cBookmarks, "|" )
@@ -1235,7 +1237,7 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
 //    pSource  := ::Owner:GetCurDoc()
 //    nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
 //    nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
-//    
+//
 //    ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
    //-------------------------------------------------------------
 
@@ -1297,7 +1299,7 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
             IF ! linsideASel
                // Found target is totally or partly outside the selections
                nLastMatch := nPosFind + 1
-               
+
                IF nLastMatch >= nEndPos
                   // Run off the end of the document/selection with an empty match
                   nPosFind := -1
@@ -1318,7 +1320,7 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
 
          nLenReplaced := nRepLen
 
-         ::ReplaceTarget( nRepLen, cReplace ) 
+         ::ReplaceTarget( nRepLen, cReplace )
 
          nEndPos += nLenReplaced - nLenTarget
          nLastMatch := nPosFind + nLenReplaced + nMovePastEOL
@@ -2150,7 +2152,7 @@ METHOD Apply() CLASS Settings
       :AutoIndent        := ::AutoIndent:GetState()
       ::Application:EditorProps:WrapSearch := ::WrapSearch:GetState()
       ::Application:Props:WrapSearchItem:Checked := ::WrapSearch:GetState()==1
-      
+
       :StyleSetBack( STYLE_DEFAULT, :ColorBackground )
       :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
       :StyleClearAll()
@@ -2192,7 +2194,7 @@ METHOD OnInitDialog() CLASS GotoDialog
       :Text                 := "Line Number"
       :Create()
    END //LABEL
-   
+
    DEFAULT ::Application:SourceEditor:Source:nPrevLine TO ::Application:SourceEditor:Source:GetCurLine()+1
 
    WITH OBJECT ( UPDOWN( Self ) )
@@ -2423,7 +2425,7 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 METHOD Next_OnClick() CLASS FindReplace
    LOCAL nFlags := 0
-   ::Parent:cFindWhat  := ::FindWhat:Text   
+   ::Parent:cFindWhat  := ::FindWhat:Text
 
    IF ::MatchCase:Checked()
       nFlags := nFlags | SCFIND_MATCHCASE

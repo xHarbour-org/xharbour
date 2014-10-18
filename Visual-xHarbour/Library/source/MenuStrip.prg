@@ -31,10 +31,10 @@ GLOBAL EXTERNAL s_hKeyMenuHook
 
 CLASS MenuStrip INHERIT ToolStrip
    DATA __lIsMenu  EXPORTED  INIT .T.
-   
+
    PROPERTY Height      SET ::__SetHeight(v)   DEFAULT 22 MIN 22
    PROPERTY ShowChevron SET ::__ShowChevron(v) DEFAULT .F. NOTPUBLIC
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD OnPaint()
    METHOD OnEraseBkgnd() //INLINE 1
@@ -54,7 +54,7 @@ METHOD Init( oParent ) CLASS MenuStrip
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ClsName       := "MenuStrip"
    ::Super:Init( oParent )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "Add MenuStripItem",   {|| ::__AddToolStripItem( "MenuStripItem" ) } },;
                                    { "Add ToolStrip&Label", {|| ::__AddToolStripItem( "ToolStripLabel" ) } },;
                                    { "Add ToolStrip&ComboBox", {|| ::__AddToolStripItem( "ToolStripComboBox" ) } } }
@@ -124,7 +124,7 @@ METHOD OnSysKeyDown( nwParam ) CLASS MenuStrip
       s_lKey       := .F.
       s_lOpenMenu  := .T.
       RETURN 1
-      
+
     ELSEIF nwParam != VK_MENU
 
       FOR n := 1 TO LEN( ::Children )
@@ -151,7 +151,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS MenuStrip
    Super:OnSize( nwParam, nlParam )
    ::__PrevSize := LOWORD(nlParam)
    ::Parent:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-   IF ::Row > 0 //.AND. ::__PrevRow == 0 
+   IF ::Row > 0 //.AND. ::__PrevRow == 0
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
       //AEVAL( ::Children, {|o| o:SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ) } )
    ENDIF
@@ -163,7 +163,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS MenuStrip
    (x,y)
    IF ::IsWindowVisible() .AND. ::Parent:ClientWidth > 0
       ::Width := ::Parent:ClientWidth - IIF( ::xShowGrip, (::__GripperPos + 1), 0 )
-      IF ::Row > 0 .AND. ::__PrevRow == 0 
+      IF ::Row > 0 .AND. ::__PrevRow == 0
          ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
       ENDIF
       IF LEN( ::Children ) > 0
@@ -220,14 +220,14 @@ METHOD OnPaint() CLASS MenuStrip
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   
+
    SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top, @pt )
 
    _FillRect( hMemDC, {0,0,::ClientWidth,::ClientHeight}, ::Parent:BkBrush )
-   
+
    IF ::Row > 0 .AND. ::ShowGrip
       y := 4
-      FOR n := 1 TO nDots  
+      FOR n := 1 TO nDots
           SetPixel( hMemDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripLight )
           SetPixel( hMemDC, ::__GripperPos + 1, y + 2, ::ColorScheme:GripLight )
           SetPixel( hMemDC, ::__GripperPos + 2, y + 1, ::ColorScheme:GripLight )
@@ -259,7 +259,7 @@ METHOD OnPaint() CLASS MenuStrip
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-   
+
    ::OnEraseBkgnd( hMemDC )
 
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
@@ -279,10 +279,10 @@ METHOD OnEraseBkgnd( hDC ) CLASS MenuStrip
    SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
 
    _FillRect( hDC, {0,0,::Width,::Height}, ::Parent:BkBrush )
-   
+
    IF ::Row > 0 .AND. ::ShowGrip
       y := 4
-      FOR n := 1 TO nDots  
+      FOR n := 1 TO nDots
           SetPixel( hDC, ::__GripperPos + 1, y + 1, ::ColorScheme:GripLight )
           SetPixel( hDC, ::__GripperPos + 1, y + 2, ::ColorScheme:GripLight )
           SetPixel( hDC, ::__GripperPos + 2, y + 1, ::ColorScheme:GripLight )

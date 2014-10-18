@@ -349,7 +349,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ::__InactiveHighlight     := RGB(240,240,240)
    ::__lCreateAfterChildren  := .T.
    ::DeferRedraw             := FALSE
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       AINS( ::Events, 1, {"Navigation", {;
                                           { "OnRowChanging",    "", "" },;
                                           { "OnRowChanged",     "", "" },;
@@ -846,7 +846,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------------------------------
 METHOD __ResetDataSource( oSource ) CLASS DataGrid
    ::__SetDataSource( oSource )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::AutoAddColumns()
    ENDIF
 RETURN Self
@@ -3863,7 +3863,12 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          NEXT
       ENDIF
 
-      IF ::__CurControl != NIL
+      IF ::__CurControl == NIL
+         IF nwParam == VK_RETURN .AND. ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+            ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
+            RETURN NIL
+         ENDIF
+       ELSE
          IF ::__CurControl:__xCtrlName == "MaskEdit"
             ::__CurControl:Picture := ::Children[::ColPos]:Picture
          ENDIF
@@ -3935,6 +3940,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
                                          >
 
          ::__CurControl:OnWMKillFocus := {|o| ::__cEditText := o:Text, ::__ResetControl() }
+         ::__CurControl:Transparent := ::Transparent
          ::__CurControl:Create()
 
          IF ::__CurControl:__xCtrlName == "EditBox"
@@ -4192,20 +4198,13 @@ METHOD Init( oParent ) CLASS GridColumn
    ::Parent      := oParent
    ::xImageIndex := 0
    ::xPosition   := LEN( ::Parent:Children )+1
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    //::Form       := oParent:Form
 
    ::HeaderFont := Font( Self )
    ::Font       := Font( Self )
-
-   IF ::__ClassInst != NIL
-      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
-      ::Font:__ClassInst:__IsInstance := .T.
-      ::HeaderFont:__ClassInst := __ClsInst( ::HeaderFont:ClassH )
-      ::HeaderFont:__ClassInst:__IsInstance := .T.
-   ENDIF
 
    nColor1 := ::ColorScheme:ButtonSelectedGradientBegin
    nColor2 := ::ColorScheme:ButtonSelectedGradientEnd
@@ -4228,7 +4227,7 @@ METHOD Init( oParent ) CLASS GridColumn
    ::__xCtrlName := "GridColumn"
    ::__CreateProperty( "GridColumn" )
    ::Events := {}
-   IF oParent:__ClassInst != NIL
+   IF oParent:DesignMode
       ::Events := { ;
                   {"Object",      {;
                                   { "OnInit"             , "", "" } } },;
@@ -4261,7 +4260,7 @@ METHOD Create() CLASS GridColumn
       RETURN Self
    ENDIF
 
-   IF ::__ClassInst == NIL .AND. ! ::Application:__Vxh
+   IF ! ::DesignMode .AND. ! ::Application:__Vxh
       cText := ::Text
 
       IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
@@ -4272,7 +4271,7 @@ METHOD Create() CLASS GridColumn
       ENDIF
       ::xText := cText
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       IF ::Parent:TreeItem == NIL
          ::Application:ObjectTree:Set( ::Parent )
       ENDIF
@@ -4416,7 +4415,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
       ::__aVertex[2]:y := aRect[4]
 
       IF ! lPressed
-         IF ::Parent:__ClassInst == NIL .AND. ! lPressed .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
+         IF ! ::Parent:DesignMode .AND. ! lPressed .AND. ! Empty( ::Tag ) .AND. ::Parent:DataSource != NIL
             cOrd := ::Parent:DataSource:OrdSetFocus()
          ENDIF
          IF ! Empty(cOrd) .AND. Upper( cOrd ) == Upper( ::Tag )
@@ -4622,7 +4621,7 @@ METHOD SetImageIndex(n) CLASS GridColumn
    LOCAL x
    ::xImageIndex := n
    TRY
-      IF ::Parent:__ClassInst != NIL
+      IF ::Parent:DesignMode
          ::Parent:Update()
        ELSE
          IF LEN( ::Parent:Children ) >= ::xPosition

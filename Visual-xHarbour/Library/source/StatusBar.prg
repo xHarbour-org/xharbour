@@ -71,7 +71,7 @@ METHOD Init( oParent ) CLASS StatusBar
    ::Style     := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    //::IsContainer   := .T.
    ::Super:Init( oParent )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "Add Panel", {|| StatusBarPanel( Self ):Create(),;
                                                       ::Application:Project:Modified := .T. } }}
       ::Events := {}
@@ -100,7 +100,7 @@ METHOD Create() CLASS StatusBar
     CATCH
    END
    ::SetImageIndex( ::xImageIndex )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       PostMessage( ::Parent:hWnd, WM_SIZE, 0, MAKELPARAM( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
       ::Parent:InvalidateRect()
    ENDIF
@@ -298,9 +298,8 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::IsContainer   := .T.
    //::Form          := oParent:Form
    ::__CreateProperty( "StatusBarPanel" )
-   IF ::Parent:__ClassInst != NIL
-      ::__ClassInst  := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance   := .T.
+   IF ::DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::Style  := WS_VISIBLE
    ::Events := {}
@@ -311,7 +310,7 @@ RETURN Self
 
 METHOD Create() CLASS StatusBarPanel
    ::hWnd := Seconds()
-   IF ::Parent:__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
    ENDIF
    ::Parent:SendMessage( SB_SIMPLE, .F., 0 )

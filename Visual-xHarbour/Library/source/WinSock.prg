@@ -73,7 +73,7 @@ METHOD Init( oOwner, lCallBack ) CLASS WinSock
       ::Application:__SocketInit := .T.
       InetInit()
    ENDIF
-   IF ::__ClassInst == NIL .AND. lCallBack
+   IF ! ::DesignMode .AND. lCallBack
       ::pCallBack := WinCallBackPointer( HB_ObjMsgPtr( Self, "SockControlProc" ), Self )
    ENDIF
 RETURN Self
@@ -81,7 +81,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS WinSock
    LOCAL oComp
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::Handle := InetCreate( 250 )
    ENDIF
    ::lCreated := .T.
@@ -90,7 +90,7 @@ METHOD Create() CLASS WinSock
        IF oComp:HasMessage( "Socket" ) .AND. VALTYPE( oComp:Socket ) == "C" .AND. UPPER( oComp:Socket ) == UPPER( ::Name )
 
           oComp:Socket := Self
-          IF ::__ClassInst == NIL
+          IF ! ::DesignMode
              oComp:Connector := SocketRdd( oComp )
              oComp:Connector:Create()
           ENDIF
@@ -112,7 +112,7 @@ RETURN ::Connected
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Disconnect( lAll ) CLASS WinSock
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       DEFAULT lAll TO .F.
       IF ::RemoteHandle != NIL
          InetClose( ::RemoteHandle )

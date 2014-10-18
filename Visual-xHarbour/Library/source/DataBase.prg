@@ -292,7 +292,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
    LOCAL lChanged, n, cFileName, cPath, nServer, cMemo
    IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:__hObjects[ ::Socket ]
-      IF ::__ClassInst == NIL
+      IF ! ::DesignMode
          ::Connector := SocketRdd( Self )
       ENDIF
    ENDIF
@@ -482,7 +482,6 @@ RETURN Self
 
 CLASS Data
    DATA Parent
-   DATA __ClassInst
 
    METHOD Init() CONSTRUCTOR
    METHOD Put()
@@ -665,14 +664,14 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       IF !::Owner:__lMemory
          IF ::Owner:Driver IN { "SQLRDD", "SQLEX" }
-            IF ::Owner:__ClassInst != NIL
+            IF ::Owner:DesignMode
                RETURN ::Owner
             ENDIF
             cFile := ::Owner:FileName
           ELSEIF !EMPTY( ALLTRIM( ::Owner:Path ) )
             cFile := ALLTRIM( ::Owner:Path ) + "\" + ::Owner:FileName
             IF !FILE( cFile )
-               IF ::Owner:__ClassInst == NIL
+               IF ! ::Owner:DesignMode
                   Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", EF_CANRETRY | EF_CANDEFAULT ) )
                 ELSE
                   ::Owner:Application:MainForm:MessageBox( "The specified file could not be found", ::Owner:FileName, "Error" )
@@ -682,7 +681,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
           ELSEIF ( n := RAT( "\", ::Owner:FileName ) ) > 0
             cFile := ALLTRIM( ::Owner:FileName )
             IF !FILE( cFile )
-               IF ::Owner:__ClassInst == NIL
+               IF ! ::Owner:DesignMode
                   Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", EF_CANRETRY | EF_CANDEFAULT ) )
                 ELSE
                   ::Owner:Application:MainForm:MessageBox( "The specified file could not be found", ::Owner:FileName, "Error" )
@@ -690,7 +689,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
                RETURN ::Owner
             ENDIF
           ELSE
-            IF ::Owner:__ClassInst != NIL
+            IF ::Owner:DesignMode
                cFile := ::Owner:Application:Project:AppObject:SetDefault
                IF EMPTY( cFile )
                   lDef := .F.
@@ -759,7 +758,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
          n := NIL
-         IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ::Owner:__ClassInst != NIL
+         IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ::Owner:DesignMode
             //   6060  Advantage Database Server not started/loaded on specified server
             //   6420  Unable to "discover" the Advantage Database Server
             IF MessageBox(0, "Error " + alltrim(str(oErr:SubCode)) + ": Advantage Server Not Found"+CHR(13)+;
@@ -957,7 +956,7 @@ METHOD Request( cFuncName, aParams ) CLASS SocketRdd
        cSendStr += "|" + ValToPrgExp( aParams[n] )
    NEXT
 
-   IF ::Owner:__ClassInst == NIL .AND. ::Owner:Socket:Connected
+   IF ! ::Owner:DesignMode .AND. ::Owner:Socket:Connected
       ::Owner:Socket:Send( cSendStr )
 
       hSock := ::Owner:Socket:Handle

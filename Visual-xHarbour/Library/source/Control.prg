@@ -62,6 +62,7 @@ CLASS Control INHERIT Window
    ACCESS ControlParent   INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer    INLINE ::xMdiContainer
    ASSIGN MdiContainer(l) INLINE ::xMdiContainer := l
+   ACCESS DesignMode      INLINE IIF( ::Parent != NIL, ::Parent:DesignMode, .F. )
 
    ACCESS IsDocked        INLINE ::__Docked
 
@@ -107,10 +108,10 @@ RETURN Self
 */
 //---------------------------------------------------------------------------------------------------
 
-METHOD Init( oParent ) CLASS Control
+METHOD Init( oParent, lInitValues ) CLASS Control
    ::__IsControl  := .T.
    ::__IsStandard := .T.
-   ::Super:Init( oParent )
+   ::Super:Init( oParent, lInitValues )
    ::Id := ::Form:GetNextControlId()
    oParent := NIL
 RETURN Self
@@ -133,8 +134,8 @@ METHOD Create( hParent ) CLASS Control
       RETURN NIL
    ENDIF
 
-   IF ::__ClassInst != NIL
-      ::__ClassInst:Id           := ::Id
+   IF ::DesignMode
+      __SetInitialValues( Self, "Id" )
       __DeleteEvents( ::Events, { "OnLoad",;
                                   "OnChangeCbChain",;
                                   "OnDrawClipboard",;
@@ -371,8 +372,8 @@ RETURN Self
 
 CLASS TitleControl INHERIT Control
 
-   PROPERTY TitleHeight SET IIF( ::__ClassInst != NIL, ::ResetFrame(),) DEFAULT 21
-   PROPERTY Text        SET IIF( ::__ClassInst != NIL, ::ResetFrame(),) DEFAULT ""
+   PROPERTY TitleHeight SET IIF( ::DesignMode, ::ResetFrame(),) DEFAULT 21
+   PROPERTY Text        SET IIF( ::DesignMode, ::ResetFrame(),) DEFAULT ""
    PROPERTY AllowUnDock                    DEFAULT FALSE
    PROPERTY AllowClose                     DEFAULT FALSE
    PROPERTY MenuArrow                      DEFAULT .F.

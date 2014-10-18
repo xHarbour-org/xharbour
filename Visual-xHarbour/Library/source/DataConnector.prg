@@ -54,7 +54,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS SqlConnector
    LOCAL cStr, cLib
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       IF ::Server > 0
          cStr := ::aIncLibs[ ::Server + 1 ]
          IF cStr != NIL .AND. ASCAN( ::Application:Project:__ExtraLibs, cStr,,, .T. ) == 0
@@ -83,7 +83,7 @@ METHOD Connect( cConnString ) CLASS SqlConnector
    LOCAL nCnn, cEvent, nServer
 
    DEFAULT cConnString TO ::ConnectionString
-   
+
    If valtype( ::Sql ) == "O"         // reconnect ?
       ::Sql:End()
    EndIf
@@ -91,7 +91,7 @@ METHOD Connect( cConnString ) CLASS SqlConnector
    ::Connected     := .F.
    ::ConnectionID  := 0
    ::Sql           := NIL
-   
+
    IF VALTYPE( ::Server ) == "C"
       ::Server := ASCAN( ::EnumServer[1], {|c| UPPER(c)==UPPER(::Server)} )
    ENDIF
@@ -99,8 +99,8 @@ METHOD Connect( cConnString ) CLASS SqlConnector
    IF nServer == 0
       nServer := DetectDBFromDSN( cConnString )
    ENDIF
-   
-   IF ::__ClassInst == NIL .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0 
+
+   IF ! ::DesignMode .AND. ( nCnn := SR_AddConnection( nServer, cConnString ) ) > 0
       ::Connected     := .T.
       ::ConnectionID  := nCnn
       ::Sql           := SR_GetConnection( nCnn )

@@ -106,6 +106,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
+   METHOD OnNCDestroy()
 ENDCLASS
 
 METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
@@ -130,13 +131,14 @@ RETURN nCnt
 METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    LOCAL cInitialBuffer, cMain, cProject, n
    DEFAULT lNew TO .T.
+   (cFileName)
    IF !lCustom
       ::ClsName := "VXH_FORM_IDE"
     ELSE
       ::ClsName := "CCTL"
    ENDIF
-   ::__ClassInst := __ClsInst( ::ClassH )
-   ::__ClassInst:__IsInstance   := .T.
+
+   ::DesignMode := .T.
 
    ::Super:Init( oParent )
    ::__lModified := lNew
@@ -181,14 +183,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
    ::Editor      := Source( ::Application:SourceEditor )
    ::Editor:Form := Self // Will be needed in IntelliSense
 
-   IF cFileName != NIL
-      //::Application:SourceTabs:InsertTab( cFileName )
-      //::Application:SourceSelect:AddItem( cFileName )
-    ELSE
-      //::Application:SourceTabs:InsertTab( "  " + ::Name+".prg * ",,, .T. )
-      //::Application:SourceSelect:AddItem( ::Name+".prg *" )
-   ENDIF
-
    cInitialBuffer := ""
    IF lNew
       cInitialBuffer += '#include "vxh.ch"' + CRLF +;
@@ -199,7 +193,6 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       ::Editor:EmptyUndoBuffer()
       ::Editor:Modified := .T.
    ENDIF
-   //::Editor:SetExtension( "prg" )
 
    cMain := ::Application:ProjectPrgEditor:GetText()
    IF AT( "[BEGIN SYSTEM CODE]", cMain ) == 0
@@ -218,9 +211,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
       ::Application:Project:DesignPage := .T.
       ::Application:DesignPage:Enable()
    ENDIF
-
    ::Selected := {{Self}}
-
 RETURN Self
 
 
@@ -240,6 +231,13 @@ METHOD Create() CLASS WindowEdit
    ENDIF
    ::Parent:UpdateScroll()
    ::Parent:UpdateWindow()
+RETURN Self
+
+//----------------------------------------------------------------------------
+
+METHOD OnNCDestroy() CLASS WindowEdit
+   ::Selected := NIL
+   Super:OnNCDestroy()
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -732,9 +730,10 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
             ::MouseDown := lMouse
             ::InRect    := nInRect
 
-            IF !lCtrl
-               ::Application:ObjectManager:ResetProperties( ::Selected )
-               ::Application:EventManager:ResetEvents( ::Selected )
+            ::Application:ObjectManager:ResetProperties( ::Selected,, .T. )
+            ::Application:EventManager:ResetEvents( ::Selected,, .T. )
+
+            IF ! lCtrl
                IF ::MouseDown
                   ::CheckMouse( x, y )
                ENDIF
@@ -871,7 +870,7 @@ RETURN aPoints
 
 //----------------------------------------------------------------------------
 
-METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
+METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
    LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect, xOld, yOld
    LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, nPlus, cClass, lLeft, lTop, lWidth, lHeight
    LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, aSnap, nSnap, hDef, nFor, aSelected
@@ -886,9 +885,8 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
       RETURN NIL
    ENDIF
 
-   DEFAULT lOrderMode TO .F.
    DEFAULT lRealUp TO .F.
-   IF ::Application:CurCursor != NIL .or. ::Application:Project:PasteOn .OR. lOrderMode
+   IF ::Application:CurCursor != NIL .or. ::Application:Project:PasteOn
 
       ClientToScreen( ::CtrlMask:hWnd, @pt )
 
@@ -900,45 +898,27 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          cClass := oControl:Parent:ClsName
       ENDIF
 
+      IF ( oControl:IsContainer .OR. ( VALTYPE( ::Application:CurCursor ) == "C" .AND. ( ::Application:CurCursor == "Splitter" .AND. !oControl:ClsName == "TabPage" ) ) )
+         IF !( ::CtrlParent == oControl )
+            ::CtrlParent := oControl
 
-      IF !lOrderMode
-         IF ( oControl:IsContainer .OR. ( VALTYPE( ::Application:CurCursor ) == "C" .AND. ( ::Application:CurCursor == "Splitter" .AND. !oControl:ClsName == "TabPage" ) ) )
-            IF !( ::CtrlParent == oControl )
-               ::CtrlParent := oControl
+            ::UpdateSelection()
+            ::Selected  := { { oControl, , NIL } }
+            ::CtrlOldPt := NIL
+            ::InvalidateRect()
+            ::InRect    := -1
+            oControl:Parent:InvalidateRect()
+            ::CtrlMask:InvalidateRect()
+            ::CtrlMask:UpdateWindow()
+            ::UpdateSelection()
 
-               ::UpdateSelection()
-               ::Selected  := { { oControl, , NIL } }
-               ::CtrlOldPt := NIL
-               ::InvalidateRect()
-               ::InRect    := -1
-               oControl:Parent:InvalidateRect()
-               ::CtrlMask:InvalidateRect()
-               ::CtrlMask:UpdateWindow()
-               ::UpdateSelection()
-
-               ::Application:Props:StatusBarPos:Caption := oControl:Name
-            ENDIF
-          ELSE
-            IF !::Application:Props:StatusBarPos:Caption == ::Name
-               ::Application:Props:StatusBarPos:Caption := ::Name
-            ENDIF
-            ::CtrlParent := Self
+            ::Application:Props:StatusBarPos:Caption := oControl:Name
          ENDIF
-       ELSEIF !( ::CurObj == oControl ) .AND. !( oControl == Self )
-         ::Application:Props:StatusBarPos:Caption := "Next Tab " + XSTR( oControl:Parent:__CurrentPos )
-         ::CurObj := oControl
-         ::__lModified := .T.
-         ::UpdateSelection()
-         ::Selected    := { { oControl, , NIL } }
-         ::CtrlOldPt := NIL
-         ::InvalidateRect()
-         ::InRect    := -1
-         oControl:Parent:InvalidateRect()
-         ::CtrlMask:InvalidateRect()
-         ::CtrlMask:UpdateWindow()
-         ::UpdateSelection()
-       ELSEIF lOrderMode .AND. ( oControl == Self )
-         ::Application:Props:StatusBarPos:Caption := "No Order for " + oControl:Name
+       ELSE
+         IF !::Application:Props:StatusBarPos:Caption == ::Name
+            ::Application:Props:StatusBarPos:Caption := ::Name
+         ENDIF
+         ::CtrlParent := Self
       ENDIF
       RETURN 0
    ENDIF
@@ -1003,7 +983,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
 
             FOR z := 1 TO LEN( ::NewParent:Children )
                 ::NewParent:Children[z]:xTabOrder := z
-                ::NewParent:Children[z]:__ClassInst:xTabOrder := z
+                __SetInitialValues( ::NewParent:Children[z], "TabOrder", z )
             NEXT
             ::Application:ObjectManager:CheckValue( "Left",   "Position", ::Selected[1][1]:Left ) //+ IIF( __ObjHasMsg( ::Selected[1][1]:Parent, "HorzScrollPos" ), ::Selected[1][1]:Parent:HorzScrollPos, 0 ) )
             ::Application:ObjectManager:CheckValue( "Top",    "Position", ::Selected[1][1]:Top ) //+ IIF( __ObjHasMsg( ::Selected[1][1]:Parent, "VertScrollPos" ), ::Selected[1][1]:Parent:VertScrollPos, 0 ) )
@@ -1199,7 +1179,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam, lOrderMode ) CLASS WindowEdit
          ::CtrlMask:UpdateWindow()
          ::Parent:InvalidateRect()
 
-         IF LEN( ::Selected ) == 1 //.AND. ::Selected[1][1]:__xCtrlName == "GroupBox"
+         IF LEN( ::Selected ) >= 1 //.AND. ::Selected[1][1]:__xCtrlName == "GroupBox"
             ::Application:ObjectManager:ResetProperties( ::Selected )
             ::Application:EventManager:ResetEvents( ::Selected )
             ::Application:ObjectManager:Parent:Select()
@@ -1856,7 +1836,7 @@ RETURN nSnap
 //----------------------------------------------------------------------------
 
 METHOD EditClickEvent() CLASS WindowEdit
-   IF LEN( ::Selected ) > 0 .AND. !::CtrlMask:lOrderMode
+   IF LEN( ::Selected ) > 0 .AND. ! ::CtrlMask:lOrderMode
       ::Application:EventManager:EditEvent( IIF( ::Selected[1][1]:hWnd==::hWnd, "OnLoad", "OnClick" ) )
    ENDIF
 RETURN Self

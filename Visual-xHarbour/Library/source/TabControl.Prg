@@ -287,7 +287,7 @@ METHOD Create() CLASS TabControl
       ::SendMessage( TCM_SETITEMSIZE, 0, MAKELPARAM(0,0) )
    ENDIF
    ::SetMinTabWidth( ::MinTabWidth )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "Add TabPage", {|o| o:=::Application:Project:AddControl( "TabPage", Self ) } }}
    ENDIF
 
@@ -311,7 +311,7 @@ METHOD Create() CLASS TabControl
    ::BoldFont:Bold := .T.
    ::BoldFont:Create()
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::SetWindowPos(, ::Left, ::Top, ::Width, ::Height, SWP_FRAMECHANGED | SWP_NOZORDER )
    ENDIF
 
@@ -475,7 +475,7 @@ METHOD OnPaint() CLASS TabControl
    IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
       RETURN NIL
    ENDIF
-   IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ::__ClassInst == NIL
+   IF !::ShowTabs .AND. ::__UpDn == NIL .AND. ! ::DesignMode
       hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
       WHILE hWnd <> 0
          IF GetClassName( hWnd ) == "msctls_updown32"
@@ -528,7 +528,7 @@ METHOD OnPaint() CLASS TabControl
    ENDIF
 
    nItems := ::GetItemCount()
-   IF ( ::ShowTabs .OR. ::__ClassInst != NIL ) .AND. nItems > 0
+   IF ( ::ShowTabs .OR. ::DesignMode ) .AND. nItems > 0
       FOR n := nItems TO 1 STEP -1
 
           IF n != nSel
@@ -914,7 +914,7 @@ METHOD Init( oParent, acResource ) CLASS TabPage
    ::__IsStandard  := .F.
    ::__lAllowCopy  := .F.
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Events := ;
              { ;
                {"Command",     {;
@@ -980,13 +980,11 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkgnd( hDC ) CLASS TabPage
-   LOCAL nRet
-   ::GetClientRect()
    IF ::BkBrush != NIL
+      ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-      nRet := 1
    ENDIF
-RETURN nRet
+RETURN 1
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabPage
@@ -1005,7 +1003,7 @@ METHOD Create() CLASS TabPage
 
    cText := ::Caption
 
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       IF VALTYPE(cText)=="C" .AND. LEFT(cText,2)=="{|"
          cText := &cText
       ENDIF
@@ -1028,16 +1026,16 @@ METHOD Create() CLASS TabPage
       ::OriginalRect[4] := ::VertScrollSize
     ELSE
       ::VertScrollSize := ::ClientHeight
-      IF ::__ClassInst != NIL
-         ::__ClassInst:VertScrollSize := ::ClientHeight
+      IF ::DesignMode
+         __SetInitialValues( Self, "VertScrollSize", ::ClientHeight )
       ENDIF
    ENDIF
    IF ::HorzScrollSize > 0
       ::OriginalRect[3] := ::HorzScrollSize
     ELSE
       ::HorzScrollSize := ::ClientWidth
-      IF ::__ClassInst != NIL
-         ::__ClassInst:HorzScrollSize := ::ClientWidth
+      IF ::DesignMode
+         __SetInitialValues( Self, "HorzScrollSize", ::ClientWidth )
       ENDIF
    ENDIF
 
@@ -1061,11 +1059,9 @@ METHOD Create() CLASS TabPage
 
       ::MoveWindow()
 
-      IF ::__ClassInst != NIL .AND. ::__CustomOwner
-
-         __ResetClassInst( Self )
-         ::__ClassInst:Caption    := cText
-         ::__ClassInst:ImageIndex := ::ImageIndex
+      IF ::DesignMode .AND. ::__CustomOwner
+         __SetInitialValues( Self, "Caption", cText )
+         __SetInitialValues( Self, "ImageIndex", cText )
 
          IF ::__SysBackColor != ::xBackColor .AND. ::xBackColor != NIL
             ::__SysBackColor := ::xBackColor
@@ -1081,14 +1077,14 @@ METHOD Create() CLASS TabPage
 
       ::RegisterDocking()
 
-      IF ::__ClassInst == NIL
+      IF ! ::DesignMode
          //SetParent( ::hWnd, ::Parent:Parent:hWnd )
          IF !EMPTY( cText ) .AND. ( n := AT( "&", cText ) ) > 0
             RegisterHotKey( ::hWnd, ::Id, MOD_ALT, ASC( cText[n+1] ) )
          ENDIF
       ENDIF
 
-      IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ::__ClassInst == NIL .AND. !::Parent:Visible )
+      IF ::Parent:GetItemCount() != ::Parent:Cursel .OR. ( ! ::DesignMode .AND. !::Parent:Visible )
          ::HideTab()
        ELSE
          ::ShowTab()
@@ -1097,7 +1093,7 @@ METHOD Create() CLASS TabPage
 
       ::__OnParentSize( ::ClientWidth, ::ClientHeight )
 
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          ::Application:ObjectTree:Set( Self )
          ::Application:Props[ "ComboSelect" ]:Reset()
       ENDIF
@@ -1155,7 +1151,7 @@ RETURN 1
 //-----------------------------------------------------------------------------------------------
 METHOD __SetVisible( lVisible, lForce ) CLASS TabPage
    DEFAULT lForce TO .F.
-   IF ( lVisible != ::Visible .OR. lForce ) .AND. ::__ClassInst == NIL .AND. ::hWnd != NIL
+   IF ( lVisible != ::Visible .OR. lForce ) .AND. ! ::DesignMode .AND. ::hWnd != NIL
       IF ! lVisible
          ::__Hide()
        ELSE
@@ -1198,8 +1194,8 @@ METHOD __SetPosition(n) CLASS TabPage
    ENDIF
    FOR n := 1 TO LEN( ::Parent:Children )
        ::Parent:Children[n]:xPosition := n
-       IF ::Parent:Children[n]:__ClassInst != NIL
-          ::Parent:Children[n]:__ClassInst:xPosition := n
+       IF ::Parent:Children[n]:DesignMode
+          __SetInitialValues( ::Parent:Children[n], "Position", n )
        ENDIF
    NEXT
 

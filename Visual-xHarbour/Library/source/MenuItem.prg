@@ -64,8 +64,8 @@ METHOD Init( oParent ) CLASS MenuItem
    ::__IsStandard := .T.
    ::Parent       := oParent
    ::Id           := ::Form:GetNextControlId()
-   IF ::__ClassInst == NIL .AND. ::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF ::DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::Events       := { ;
                         {"Mouse",     {;
@@ -113,7 +113,7 @@ METHOD GetMenuById( nId ) CLASS MenuItem
 RETURN oMenu
 
 //-------------------------------------------------------------------------------------------------------
-  
+
 METHOD Create() CLASS MenuItem
    LOCAL cShort, cText, mii := (struct MENUITEMINFO)
 
@@ -141,13 +141,13 @@ METHOD Create() CLASS MenuItem
       mii:fMask   := MIIM_ID | MIIM_STATE | MIIM_TYPE
       mii:fType   := MFT_SEPARATOR
     ELSE
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
          ::Application:ObjectTree:Set( Self )
       ENDIF
       cText  := ::Text
       cShort := ::ShortCutKey:GetShortcutText()
-      
+
       mii:dwTypeData := cText + IIF( ! EMPTY(cShort), CHR(9) + cShort, "" )
       mii:dwItemData := ::__pObjPtr := ArrayPointer( Self )
    ENDIF
@@ -337,12 +337,12 @@ METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
    DEFAULT lAdd TO .F.
    DEFAULT nPos TO -1
    DEFAULT ::__xCtrlName TO "CoolMenuItem"
-   
+
    ::Position     := nPos
    ::Parent       := oParent
 
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
       IF ::Parent:ClsName == "CMenuItem"
          ::Parent:__IdeImageIndex := 8
       ENDIF
@@ -358,7 +358,7 @@ METHOD Init( oParent, lAdd, nPos ) CLASS CMenuItem
 
    ::Font := Font( Self )
    ::Font:Create()
-   
+
    ::__CreateProperty()
 
    IF ::Position > -1
@@ -428,11 +428,11 @@ METHOD Create() CLASS CMenuItem
    IF ::Default
       ::SetDefaultItem()
    ENDIF
-   
-   IF ::__ClassInst == NIL .AND. ::ShortCut != NIL
+
+   IF ! ::DesignMode .AND. ::ShortCut != NIL
       ::Form:AddAccelerator( ::ShortCut[1], ::ShortCut[2], ::Id )
    ENDIF
-   
+
    ::ShortCutKey:SetAccel()
 
    FOR EACH oSubMenu IN ::aItems
@@ -442,7 +442,7 @@ METHOD Create() CLASS CMenuItem
       oSubMenu:Create()
    NEXT
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
    ENDIF
@@ -528,7 +528,7 @@ METHOD Delete() CLASS CMenuItem
    AEVAL( ::aItems, {|o| IIF( o == NIL, , o:Delete() ) } )
    DestroyMenu( ::hMenu )
    DeleteMenu( ::Menu:hMenu, ::Id, MF_BYCOMMAND )
-   
+
    IF ( n := ASCAN( ::Menu:aItems, {|o|o:Id == ::Id} ) ) > 0
       aDel( ::Menu:aItems, n, .T. )
    ENDIF

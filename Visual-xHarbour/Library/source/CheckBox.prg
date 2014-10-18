@@ -96,7 +96,7 @@ METHOD Init( oParent ) CLASS CheckBox
    ::Super:Init( oParent )
    ::Width  := 100
    ::Height := 16
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
 RETURN Self
@@ -327,11 +327,6 @@ METHOD OnCtlColorStatic( nwParam ) CLASS CheckBox
 RETURN hBkGnd
 
 METHOD SetState( nState ) CLASS CheckBox
-   // Patch
-   //IF ::__ClassInst != NIL
-   //   ::__ClassInst:xState := ::xState
-   //ENDIF
-   //::xState := nState
    IF ::IsWindow()
       ::SendMessage( BM_SETCHECK, nState, 0 )
    ENDIF

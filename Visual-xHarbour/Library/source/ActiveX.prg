@@ -164,9 +164,8 @@ METHOD Init( oParent ) CLASS ActiveX
    ::ClsName      := "AtlAxWin"
    ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
 
-   IF ::Parent != NIL .AND. ::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance   := .T.
+   IF ::Parent != NIL .AND. ::Parent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
 
    ::Dock         := __WindowDock( Self )
@@ -187,7 +186,7 @@ METHOD Create() CLASS ActiveX
 
    ::ClsName := "AtlAxWin"
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       TRY
          DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
          cId := ::oTypeLib:Objects[1]:Name
@@ -201,10 +200,10 @@ METHOD Create() CLASS ActiveX
       DEFAULT ::__xCtrlName TO cId
    ENDIF
 
-   ::TitleControl:Init( ::Parent )
+   ::TitleControl:Init( ::Parent, .F. )
    ExecuteEvent( "OnInit", Self )
 
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       DEFAULT ::ClsID TO ::ProgID
       DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
    ENDIF
@@ -215,16 +214,17 @@ METHOD Create() CLASS ActiveX
    ::TitleControl:Create()
 
    ::__IUnknown := __AxGetUnknown( ::hWnd )
-   SetWindowLong( ::hWnd, GWL_USERDATA, ::__IUnknown )
 
+   SetWindowLong( ::hWnd, GWL_USERDATA, ::__IUnknown )
    ::hObj       := __AxGetDispatch( ::__IUnknown, ::hWnd, ::OleVerb )
 
    ::cClassName := ::ClsID
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__GetEventList(.T.)
-   ENDIF
-   IF ::__ClassInst == NIL
+      ::__IdeContextMenuItems := { { "Properties", {|| ::ShowPropertiesDialog( GetActiveWindow() ) } } }
+      __DeleteEvents( ::Events,{ "OnLoad" } )
+    ELSE
       FOR EACH cHandle IN ::EventHandler:Keys
           cEvent := ::EventHandler[ cHandle ]
           hEventHandler[ cHandle ] := {|p1, p2, p3, p4, p5, p6, p7, p8, p9| __objSendMsg( ::Form, UPPER( ::EventHandler[ cHandle ] ), Self, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9 ) }
@@ -236,10 +236,6 @@ METHOD Create() CLASS ActiveX
          oServer:ConnectEvents( hEventHandler )
          ::oServer := oServer
       ENDIF
-
-    ELSE
-      ::__IdeContextMenuItems := { { "Properties", {|| ::ShowPropertiesDialog( GetActiveWindow() ) } } }
-      __DeleteEvents( ::Events,{ "OnLoad" } )
    ENDIF
 
    IF ( nStatus := __AxGetMiscStatus( ::hObj, DVASPECT_CONTENT ) ) != NIL
@@ -247,13 +243,13 @@ METHOD Create() CLASS ActiveX
    ENDIF
 
    IF ::InvisibleAtRuntime
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
        ELSE
          ::Hide()
       ENDIF
    ENDIF
-   IF !::Visible .AND. ::__ClassInst == NIL
+   IF !::Visible .AND. ! ::DesignMode
       ::Hide()
    ENDIF
    //::Border := ::xBorder
@@ -335,7 +331,7 @@ RETURN __OleVars
 
 METHOD __GetEventList( lVars ) CLASS ActiveX
    LOCAL Event, Interface, cArg, Arg
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
 
       DEFAULT ::ClsID TO ::ProgID
       TRY
@@ -409,7 +405,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ActiveX
    IF ::IsWindow()
       SWITCH nStyle
          CASE WS_VISIBLE
-              IF ::__ClassInst != NIL
+              IF ::DesignMode
                  RETURN NIL
               ENDIF
               IF lAdd

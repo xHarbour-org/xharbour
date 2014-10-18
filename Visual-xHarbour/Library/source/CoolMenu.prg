@@ -78,8 +78,8 @@ ENDCLASS
 METHOD Init( oParent ) CLASS CoolMenu
    ::__xCtrlName        := "CoolMenu"
    ::Super:Init( oParent )
-   IF ::__ClassInst != NIL
-      ::__ClassInst:xForeColor := ::xForeColor
+   IF ::DesignMode
+      __SetInitialValues( Self, "ForeColor" )
    ENDIF
    ::Height             := 21
    ::List               := .T.
@@ -104,7 +104,7 @@ METHOD Create() CLASS CoolMenu
       SetWindowTheme( ::hWnd, NIL, NIL )
    ENDIF
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
       ::__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "CoolMenuItem",,,1, {}, } }, ::Application:Project:aUndo ) } } }
    ENDIF
@@ -358,7 +358,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS CoolMenuItem
    LOCAL oSubItem
-   IF oParent:__ClassInst != NIL .AND. oParent:__xCtrlName == "CoolMenuItem"
+   IF oParent:DesignMode .AND. oParent:__xCtrlName == "CoolMenuItem"
       oSubItem := CMenuItem( oParent )
       oSubItem:Caption := oSubItem:Name
       oSubItem:__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| oSubItem:__AddCoolMenuItem() } } }
@@ -370,9 +370,8 @@ METHOD Init( oParent ) CLASS CoolMenuItem
    ::Super:Init( oParent )
    ::Index        := LEN( ::Parent:aItems ) + 1
    ::ImageIndex   := 0
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance   := .T.
+   IF oParent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::Menu := MenuPopup( ::Parent )
    ::Menu:ThemeActive := ::Application:ThemeActive
@@ -395,7 +394,7 @@ METHOD Create( nPos ) CLASS CoolMenuItem
    IF ::Parent:Owner != NIL
       ::Parent:Owner:SetChevron()
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
       ::__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| ::__AddCoolMenuItem() } } }
    ENDIF

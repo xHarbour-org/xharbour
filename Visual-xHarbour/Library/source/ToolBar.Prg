@@ -98,10 +98,10 @@ CLASS ToolBar INHERIT Control
    PROPERTY Flat               SET ::SetStyle( TBSTYLE_FLAT, v )                     DEFAULT .T.
    PROPERTY Transparent        SET ::SetStyle( TBSTYLE_TRANSPARENT, v )              DEFAULT .T.
    PROPERTY ImageList          GET __ChkComponent( Self, @::xImageList );
-                               SET ::SetImageList(v)                                  
-   PROPERTY HotImageList       SET ::SetHotImageList(v)                               
-   PROPERTY HorzPadding        SET ::SetPadding( 1, v )                             
-   PROPERTY VertPadding        SET ::SetPadding( 2, v )                             
+                               SET ::SetImageList(v)
+   PROPERTY HotImageList       SET ::SetHotImageList(v)
+   PROPERTY HorzPadding        SET ::SetPadding( 1, v )
+   PROPERTY VertPadding        SET ::SetPadding( 2, v )
    PROPERTY DrawArrows         SET ::SetExtStyle( TBSTYLE_EX_DRAWDDARROWS, v )       DEFAULT .T.
    PROPERTY MixedButtons       SET ::SetExtStyle( TBSTYLE_EX_MIXEDBUTTONS, v )       DEFAULT .F.
    PROPERTY HideClippedButtons SET ::SetExtStyle( TBSTYLE_EX_HIDECLIPPEDBUTTONS, v ) DEFAULT .F.
@@ -164,7 +164,7 @@ CLASS ToolBar INHERIT Control
    METHOD Disableall()
    METHOD Enableall()
    METHOD __ChkImageList()
-   
+
    METHOD GetImageList()                     INLINE ::SendMessage( TB_GETIMAGELIST, 0, 0 )
    METHOD SetDrawTextFlags( nFlag1, nFlag2 ) INLINE ::SendMessage( TB_SETDRAWTEXTFLAGS, nFlag1, nFlag2 )
    METHOD SetBitmapSize( nWidth, nHeight )   INLINE ::SendMessage( TB_SETBITMAPSIZE, 0, MAKELONG( nWidth, nHeight ) )
@@ -269,7 +269,7 @@ METHOD __ChkImageList(n,oImg) CLASS ToolBar
       IF ASCAN( ::Form:__hObjects:Keys, {|c| UPPER(c) == UPPER(oImg) } ) > 0
          oImg := ::Form:__hObjects[ oImg ]
        ELSE
-         IF ::__ClassInst != NIL
+         IF ::DesignMode
             oImg := ::Application:Project:Forms[1]:__hObjects[ oImg ]
           ELSE
             oImg := ::Application:MainForm:__hObjects[ oImg ]
@@ -290,7 +290,7 @@ METHOD Create() CLASS ToolBar
    //EnumDisplayMonitors( NIL, NIL, WinCallBackPointer( @EnumMonitorsProc() ) )
 
    SendMessage( ::hWnd, TB_BUTTONSTRUCTSIZE, tbb:SizeOf(), 0 )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add Button", {|| ::__AddButton()} } }
    ENDIF
    IF !::__MenuBar
@@ -311,15 +311,15 @@ METHOD Create() CLASS ToolBar
 
    IF ::xHorzPadding == NIL
       ::xHorzPadding := LOWORD( nPadding )
-      IF ::__ClassInst != NIL
-         ::__ClassInst:xHorzPadding := LOWORD( nPadding )
+      IF ::DesignMode
+         __SetInitialValues( Self, "HorzPadding", LOWORD( nPadding ) )
       ENDIF
    ENDIF
 
    IF ::xVertPadding == NIL
       ::xVertPadding := HIWORD( nPadding )
-      IF ::__ClassInst != NIL
-         ::__ClassInst:xVertPadding := HIWORD( nPadding )
+      IF ::DesignMode
+         __SetInitialValues( Self, "VertPadding", HIWORD( nPadding ) )
       ENDIF
    ENDIF
 
@@ -349,7 +349,7 @@ METHOD SetExtStyle( nStyle, lSet ) CLASS ToolBar
 RETURN Self
 
 METHOD OnKillFocus() CLASS ToolBar
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::nPressed := -1
       SendMessage( ::hWndHook, WM_CANCELMODE, 0, 0)
    ENDIF
@@ -887,7 +887,7 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
          nHeight := 0
          n := GetSystemMetrics( SM_CYMENUSIZE )
          FOR EACH oItem IN oBtn:Menu:aItems
-            IF oItem:Visible .OR. ::__ClassInst != NIL
+            IF oItem:Visible .OR. ::DesignMode
                oItem:Create()
                nHeight += n
             ENDIF
@@ -1005,7 +1005,7 @@ METHOD OnToolTipNotify( nwParam, nlParam, hdr ) CLASS ToolBar
    (nwParam)
    IF (n:=ASCAN(::aItems,{|btn| btn:oStruct:idCommand==hdr:idFrom})) > 0 .AND. hdr:code == TTN_NEEDTEXT
       cText := ::aItems[n]:ToolTip
-      IF VALTYPE( cText ) == "B" 
+      IF VALTYPE( cText ) == "B"
          cText := EVAL( cText, Self )
       ENDIF
 
@@ -1146,7 +1146,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                                SelectObject( tbcd:nmcd:hdc, GetStockObject( NULL_PEN ) )
                                Rectangle( tbcd:nmcd:hdc, tbcd:nmcd:rc:Left, tbcd:nmcd:rc:Top, tbcd:nmcd:rc:Right, tbcd:nmcd:rc:Bottom+1 )
                                SetTextColor( tbcd:nmcd:hdc, GetSysColor( COLOR_HIGHLIGHTTEXT ) )
-*/                               
+*/
                                SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
                                SelectObject( tbcd:nmcd:hdc, ::GetFont() )
                                DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
@@ -1491,7 +1491,7 @@ CLASS ToolButton INHERIT Object
    PROPERTY AutoSize       SET ::SetStyle( TBSTYLE_AUTOSIZE, v )   DEFAULT .T.
    PROPERTY ShowText       SET ::SetStyle( BTNS_SHOWTEXT, v )      DEFAULT .F.
    PROPERTY Width          SET ::SetWidth(v)                       DEFAULT 24
-   PROPERTY Text           SET ::SetText(v)                           
+   PROPERTY Text           SET ::SetText(v)
    PROPERTY ImageIndex     SET ::SetImageIndex(v)                  DEFAULT 0
    PROPERTY BtnCheck       SET ::SetStyle( BTNS_CHECK, v )         DEFAULT .F.
    PROPERTY CheckGroup     SET ::__Dummy( TBSTYLE_CHECKGROUP, v )  DEFAULT .F.
@@ -1596,11 +1596,7 @@ METHOD Init( oParent ) CLASS ToolButton
    ::Parent       := IIF( oParent:ClsName == "OptionBar", oParent:__ToolBar, oParent )
    ::Style        := TBSTYLE_BUTTON
 
-   IF oParent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance   := .T.
-   ENDIF
-
+   __SetInitialValues( Self )
    ::__CreateProperty()
 
    ::Id := ::Form:GetNextControlId()
@@ -1738,10 +1734,10 @@ METHOD Create( nPos ) CLASS ToolButton
          ::Menu := ::ContextMenu:Menu
       ENDIF
    ENDIF
-   IF ::__ClassInst == NIL .AND. ::ShortCut != NIL
+   IF ! ::DesignMode .AND. ::ShortCut != NIL
       ::Form:AddAccelerator( ::ShortCut[1], ::ShortCut[2], ::Id )
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
    ENDIF
 RETURN Self
@@ -1765,7 +1761,7 @@ RETuRN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Enable( lEnable ) CLASS ToolButton
-   IF ::oStruct != NIL //.AND. ::__ClassInst == NIL
+   IF ::oStruct != NIL //.AND. ! ::DesignMode
       DEFAULT lEnable TO .T.
       ::Parent:SendMessage( TB_ENABLEBUTTON, ::oStruct:idCommand, lEnable )
    ENDIF
@@ -1774,7 +1770,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Show( lShow ) CLASS ToolButton
-   IF ::oStruct != NIL .AND. ::__ClassInst == NIL
+   IF ::oStruct != NIL .AND. ! ::DesignMode
       DEFAULT lShow TO .T.
       ::Parent:SendMessage( TB_HIDEBUTTON, ::oStruct:idCommand, !lShow )
    ENDIF
@@ -1963,7 +1959,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ToolButton
       ::Style := ::Style | nStyle
       IF nStyle == BTNS_SEP
          ::Caption := ""
-         IF ::lCreated .AND. !::__ClassInst != NIL
+         IF ::lCreated .AND. !::DesignMode
             n := ::xPosition
             ::Delete()
             ::Create()
@@ -2022,13 +2018,13 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
    pt := (struct POINT)
    DO CASE
       CASE ms:message == WM_MENUSELECT
-      
+
            IF oBar:Chevron == NIL
               oBar:SelPopup:= HiWord( ms:wParam ) & MF_POPUP != 0
 
               hMenu     := ms:lParam
               //nMenu := oBar:nPressed+1
-              
+
               nMenu := SendMessage( oBar:hWnd, TB_GETHOTITEM, 0, 0 )+1
               IF nMenu > 0
                  s_nMenu := nMenu
@@ -2036,7 +2032,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
               hSubMenu := GetSubMenu( ms:lParam, LoWord( ms:wParam ) )
               s_oItem := NIL
-              
+
               IF s_nMenu != NIL .AND. s_nMenu > 0
                  IF oBar:aItems[s_nMenu]:Menu != NIL
                     IF oBar:SelPopup
@@ -2116,7 +2112,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
       CASE ms:message == WM_MOUSEMOVE
            IF oBar:Chevron == NIL
-              IF oBar:__ClassInst == NIL .OR. ms:wParam & MK_LBUTTON == MK_LBUTTON
+              IF ! oBar:DesignMode .OR. ms:wParam & MK_LBUTTON == MK_LBUTTON
                  oBar:lKeyboard := .F.
                  pt:x := LoWord(ms:lparam)
                  pt:y := HiWord(ms:lparam)
@@ -2129,7 +2125,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                  n := SendMessage( ms:hwnd, TB_HITTEST, 0, pt)
                  IF n!=oBar:nPressed .AND. n >= 0 .AND. n < SendMessage( oBar:hWndHook, TB_BUTTONCOUNT )
                     IF !( oBar:oMenu == oBar:aItems[n+1]:Menu )
-                       IF oBar:aItems[n+1]:Id < IDM_MDI_GAP .AND. oBar:__ClassInst == NIL
+                       IF oBar:aItems[n+1]:Id < IDM_MDI_GAP .AND. ! oBar:DesignMode
                           SendMessage( oBar:hWndHook, WM_CANCELMODE, 0, 0 )
                           oBar:nPressed := n
                           PostMessage( oBar:hWndHook, MBM_POPUPMENU, pt:x, pt:y )
@@ -2143,7 +2139,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
       CASE ms:message == WM_KEYDOWN
            IF oBar:Chevron == NIL .AND. oBar:__MenuBar
               oBar:lKeyboard := .T.
-              IF VALTYPE( oBar:__ClassInst ) == "O" .AND. oBar:__MenuBar
+              IF oBar:DesignMode .AND. oBar:__MenuBar
                  DO CASE
                     CASE ms:wParam == VK_RETURN
                          IF oBar:hWndHook != NIL .AND. s_oItem != NIL
@@ -2154,7 +2150,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
               ENDIF
               DO CASE
                  CASE ms:wParam == VK_LEFT
-                      IF oBar:nPressed < 0 .OR. ( s_oItem != NIL .AND. s_oItem:Parent:__xCtrlName == "CMenuItem" ) .OR. oBar:__ClassInst != NIL
+                      IF oBar:nPressed < 0 .OR. ( s_oItem != NIL .AND. s_oItem:Parent:__xCtrlName == "CMenuItem" ) .OR. oBar:DesignMode
                          RETURN 0
                       ENDIF
                       oBar:nPressed--
@@ -2172,7 +2168,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                       RETURN 1
 
                  CASE ms:wParam == VK_RIGHT
-                      IF oBar:nPressed < 0 .OR. oBar:SelPopup .OR. oBar:__ClassInst != NIL
+                      IF oBar:nPressed < 0 .OR. oBar:SelPopup .OR. oBar:DesignMode
                          RETURN 0
                       ENDIF
                       IF oBar:hWndHook != NIL

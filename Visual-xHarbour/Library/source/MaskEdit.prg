@@ -73,7 +73,7 @@ METHOD Init( oParent ) CLASS MaskEdit
    ::__xCtrlName := "MaskEdit"
    ::Super:Init( oParent )
    ::WantReturn := .T.
-   IF ::Parent:__ClassInst != NIL
+   IF ::Parent:DesignMode
       AINS( ::Events, 1, {"Get System", {;
                                          { "Valid"   , "", "" },;
                                          { "When"    , "", "" } } }, .T. )
@@ -81,70 +81,6 @@ METHOD Init( oParent ) CLASS MaskEdit
    ::oGet := VXHGet()
    ::oGet:New( - 1, - 1, { | x | If( x == NIL, ::oGet:cargo, ::oGet:cargo := x ) } , '', ::Picture )
 RETURN Self
-
-//-----------------------------------------------------------------------------------------------
-METHOD OnLButtonDown( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL oCtrl := ObjFromHandle( GetFocus() )
-   Super:OnLButtonDown()
-   IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit" .AND. oCtrl:hWnd != ::hWnd
-      oCtrl:__Validate()
-      IF ! oCtrl:IsValid
-         RETURN 0
-       ELSE
-         ::PostMessage( WM_LBUTTONUP, nwParam, nlParam )
-      ENDIF
-   ENDIF
-RETURN NIL
-
-METHOD __Validate() CLASS MaskEdit
-   LOCAL coldbuff, lCaret
-   IF ! ::lInValid
-      ::lInValid := .T.
-      IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) != 0
-         coldbuff := ::oGet:buffer
-         IF ( lCaret := IsCaret() )
-            ::HideCaret()
-         ENDIF
-         ::Validating := TRUE
-         ::IsValid := .T.
-         IF ValType( ::oGet:postblock ) == "B"
-            ::IsValid := eval( ::oGet:postblock, Self )
-         ENDIF
-         IF HGetPos( ::EventHandler, "Valid" ) > 0
-            ::IsValid := ExecuteEvent( "Valid", Self )
-            IF ValType(::IsValid) != "L"
-               ::IsValid := .T.
-            ENDIF
-         ENDIF
-         ::Validating := FALSE
-
-         IF ! ::IsValid
-            SetFocus( ::hWnd )
-         ENDIF
-         IF !( coldbuff == ::oGet:buffer )
-            SetWindowText( ::hWnd, ::oGet:buffer )
-         ENDIF
-
-         IF lCaret
-            ::ShowCaret()
-         ENDIF
-
-         IF ::IsValid .AND. ::InDataGrid
-            ::SendMessage( WM_KILLFOCUS )
-            ::Parent:SetFocus()
-         ENDIF
-
-      ENDIF
-      ::lInValid := .F.
-   ENDIF
-RETURN NIL
-
-//-----------------------------------------------------------------------------------------------
-METHOD SetGetProp( cProp, xVal ) CLASS MaskEdit
-   IF cProp == "Picture" .AND. ::oGet != NIL
-      ::oGet:Picture := xVal
-   ENDIF
-RETURN xVal
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS MaskEdit
@@ -167,7 +103,7 @@ METHOD Create() CLASS MaskEdit
 
    ::SendMessage( EM_LIMITTEXT, MAX( LEN( TRANSFORM( ::Text, ::oGet:Picture ) ), LEN( ::oGet:buffer ) ) , 0 )
 
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       SetWindowText( ::hWnd, ::oGet:buffer )
    ENDIF
    IF ValType( ::oGet:preblock ) == 'B' .AND. ! eval( ::oGet:preblock, Self, .F. )
@@ -216,6 +152,66 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
       RETURN DLGC_WANTALLKEYS
    ENDIF
 RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnLButtonDown( nwParam, nlParam ) CLASS MaskEdit
+   LOCAL oCtrl := ObjFromHandle( GetFocus() )
+   Super:OnLButtonDown()
+   IF oCtrl != NIL .AND. oCtrl:__xCtrlName == "MaskEdit" .AND. oCtrl:hWnd != ::hWnd
+      oCtrl:__Validate()
+      IF ! oCtrl:IsValid
+         RETURN 0
+       ELSE
+         ::PostMessage( WM_LBUTTONUP, nwParam, nlParam )
+      ENDIF
+   ENDIF
+RETURN NIL
+
+METHOD __Validate() CLASS MaskEdit
+   LOCAL lCaret
+   IF ! ::lInValid
+      ::lInValid := .T.
+      IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) != 0
+         IF ( lCaret := IsCaret() )
+            ::HideCaret()
+         ENDIF
+         ::Validating := TRUE
+         ::IsValid := .T.
+         IF ValType( ::oGet:postblock ) == "B"
+            ::IsValid := eval( ::oGet:postblock, Self )
+         ENDIF
+         IF HGetPos( ::EventHandler, "Valid" ) > 0
+            ::IsValid := ExecuteEvent( "Valid", Self )
+            IF ValType(::IsValid) != "L"
+               ::IsValid := .T.
+            ENDIF
+         ENDIF
+         ::Validating := FALSE
+
+         IF ! ::IsValid
+            SetFocus( ::hWnd )
+         ENDIF
+
+         IF lCaret
+            ::ShowCaret()
+         ENDIF
+
+         IF ::IsValid .AND. ::InDataGrid
+            ::SendMessage( WM_KILLFOCUS )
+            ::Parent:SetFocus()
+         ENDIF
+
+      ENDIF
+      ::lInValid := .F.
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD SetGetProp( cProp, xVal ) CLASS MaskEdit
+   IF cProp == "Picture" .AND. ::oGet != NIL
+      ::oGet:Picture := xVal
+   ENDIF
+RETURN xVal
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS MaskEdit
@@ -529,12 +525,6 @@ RETURN NIL
 
 METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
    IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid
-      ::__Validate()
-
-      IF ! ::IsValid
-         ::SetFocus()
-         RETURN 0
-      ENDIF
       IF ::oGet:Type == "N" .AND. ::oGet:VarGet() == 0
          ::oget:VarPut( 0 )
       ENDIF
@@ -549,6 +539,12 @@ METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
       SetWindowText( ::hWnd, ::oGet:buffer )
       ::InvalidateRect()
       ::SendMessage( WM_MOUSEMOVE, 1, 1 )
+
+      ::__Validate()
+      IF ! ::IsValid
+         ::SetFocus()
+         RETURN 0
+      ENDIF
    ENDIF
 RETURN Super:OnKillFocus( nwParam, nlParam )
 

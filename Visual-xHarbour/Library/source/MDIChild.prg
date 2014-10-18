@@ -150,7 +150,7 @@ METHOD Show( nShow ) CLASS MDIChildWindow
          nRet := ExecuteEvent( "OnLoad", Self )
          ODEFAULT nRet TO ::OnLoad( Self )
       ENDIF
-      ShowWindow( ::hWnd, IIF( ::__ClassInst == NIL, nShow, SW_SHOW ) )
+      ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
    ENDIF
 
    DO CASE

@@ -43,7 +43,7 @@ CLASS ProgressBar FROM Control
    DATA ImageIndex      PROTECTED
 
    DATA PropParent  PROTECTED
-   
+
    METHOD Init()    CONSTRUCTOR
    METHOD Create()
 
@@ -97,7 +97,7 @@ METHOD Create() CLASS ProgressBar
    IF ::BackColor != NIL
       ::SetBkColor( ::BackColor )
    ENDIF
-   IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+   IF ! ::DesignMode .AND. ::TaskBarProgress
       ::PostMessage( WM_USER + 555 )
    ENDIF
 RETURN Self
@@ -105,7 +105,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD __SetMarqueeSeconds( nSecs ) CLASS ProgressBar
-   IF ::__ClassInst == NIL .AND. ::IsWindow()
+   IF ! ::DesignMode .AND. ::IsWindow()
       ::SendMessage( PBM_SETMARQUEE, ::xMarquee, nSecs )
    ENDIF
 RETURN Self
@@ -116,12 +116,12 @@ METHOD SetPosition( n ) CLASS ProgressBar
    ::xPosition  := n
    IF ::IsWindow()
       ::SendMessage( PBM_SETPOS, n, 0 )
-      IF ::__ClassInst != NIL .AND. ::Application:OsVersion:dwMajorVersion > 5
+      IF ::DesignMode .AND. ::Application:OsVersion:dwMajorVersion > 5
          sleep(500)
          ::SendMessage( PBM_SETPOS, n+1, 0 )
          ::SendMessage( PBM_SETPOS, n, 0 )
       ENDIF
-      IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+      IF ! ::DesignMode .AND. ::TaskBarProgress
          IF ! ::xMarquee
             TaskBarProgressValue( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), n, ::xMaxRange )
           ELSE
@@ -134,7 +134,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnDestroy() CLASS ProgressBar
-   IF ::__ClassInst == NIL .AND. ::TaskBarProgress
+   IF ! ::DesignMode .AND. ::TaskBarProgress
       TaskBarProgressState( IIF( ::Form:Parent != NIL, ::Form:Parent:hWnd, ::Form:hWnd ), TBPF_NOPROGRESS )
    ENDIF
    Super:OnDestroy()

@@ -15,7 +15,7 @@
 #include "vxh.ch"
 
 #define BP_GROUPBOX              4
-#define TMT_CAPTIONTEXT 1610 
+#define TMT_CAPTIONTEXT 1610
 #define GBS_NORMAL   1
 
 /* Color rendering properties */
@@ -53,7 +53,7 @@ CLASS GroupBox INHERIT Control
 
    ACCESS __SysForeColor INLINE ::GetSysColor()
 
-   
+
    METHOD Init()  CONSTRUCTOR
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
@@ -76,7 +76,7 @@ METHOD Init( oParent ) CLASS GroupBox
    ::ControlParent := .T.
    ::__IsStandard  := .F.
    ::__IsControl   := .T.
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE", "ALLOWCLOSE", "ALLOWUNDOCK" }
    ENDIF
 RETURN Self
@@ -106,7 +106,7 @@ METHOD __CreateBkBrush() CLASS GroupBox
       hBrush     := ::Parent:BkBrush
       DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
 
-      SetBrushOrgEx( hMemDC, aRect[3]-::Left, aRect[4]-::Top )  
+      SetBrushOrgEx( hMemDC, aRect[3]-::Left, aRect[4]-::Top )
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
 
       IF ::BkBrush != NIL
@@ -142,7 +142,7 @@ METHOD OnPaint() CLASS GroupBox
    hFont := SelectObject( hMemDC, ::Font:Handle )
    GetTextExtentPoint32( hMemDC, ::Text, @sz )
 
-   aRect[2]    := sz:cy / 2 
+   aRect[2]    := sz:cy / 2
    IF ::Theming .AND. ::Application:IsThemedXP
       DrawThemeBackground( ::System:hButtonTheme, hMemDC, BP_GROUPBOX, 0, aRect, aRect )
     ELSE
@@ -163,7 +163,7 @@ METHOD OnPaint() CLASS GroupBox
    ENDIF
 
    SelectObject( hMemDC, hFont )
-  
+
    BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
 
    SelectObject( hMemDC,  hOldBitmap )

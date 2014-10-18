@@ -88,14 +88,14 @@ METHOD Init( oParent ) CLASS Button
    ::Super:Init( oParent )
    ::Width     := 80
    ::Height    := 25
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
    ::ShortCutKey   := __MenuStripItemShortCut( Self )
 RETURN Self
 
 METHOD Create() CLASS Button
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       __DeleteEvents( ::Events,{ "OnCtlColorEdit",;
                                  "OnCtlColorListBox",;
                                  "OnCtlColorScrollBar",;
@@ -189,8 +189,8 @@ RETURN nState
 
 METHOD SetState( nState ) CLASS Button
    // Patch
-   IF ::__ClassInst != NIL
-      ::__ClassInst:xState := ::xState
+   IF ::DesignMode
+      __SetInitialValues( Self, "State" )
    ENDIF
    ::xState := nState
    IF ::IsWindow()
@@ -226,7 +226,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    IF !( ::__xCtrlName == "Button" )
       RETURN NIL
    ENDIF
-   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::__ClassInst != NIL) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
+   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::DesignMode) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
       nLeft := 6
 

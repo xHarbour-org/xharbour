@@ -62,7 +62,7 @@ METHOD __GetInstance() CLASS Component
       hInstance := GetModuleHandle()
    ENDIF
 RETURN hInstance
- 
+
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oOwner ) CLASS Component
@@ -84,11 +84,11 @@ METHOD Init( oOwner ) CLASS Component
          AADD( oOwner:Components, Self )
       ENDIF
    ENDIF
-   
+
    ::__CreateProperty()
 
-   IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
+   IF ::Owner != NIL .AND. ::Owner:DesignMode
+      __SetInitialValues( Self )
       IF oOwner:TreeItem == NIL
          ::Application:ObjectTree:Set( oOwner )
       ENDIF
@@ -109,12 +109,12 @@ METHOD Destroy() CLASS Component
       IF ::Owner != NIL .AND. __ObjHasMsg( ::Owner, "Components" ) .AND. ( n := ASCAN( ::Owner:Components, {|o|o:Name==::Name} ) ) > 0
          ADEL( ::Owner:Components, n, .T. )
       ENDIF
-      IF ::__ClassInst != NIL
+      IF ::DesignMode
          // Clear referenced property
          FOR EACH cCtrl IN ::Form:__hObjects:Keys
              TRY
                 oObj := ::Form:__hObjects[ cCtrl ]
-                IF VALTYPE( oObj ) == "O" 
+                IF VALTYPE( oObj ) == "O"
                    IF __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "O" .AND. oObj:&cType == Self
                       __objSendMsg( oObj, "_" + cType, NIL )
                    ENDIF
@@ -122,7 +122,7 @@ METHOD Destroy() CLASS Component
              CATCH
              END
          NEXT
-         
+
       ENDIF
       ::Owner := NIL
       RETURN .T.
@@ -158,7 +158,7 @@ METHOD __SetCtrlName( cName ) CLASS Component
    Super:__SetCtrlName( cName )
 
    IF ! ::Owner:__lLoading
-      IF ::__ClassInst != NIL .AND. ! Empty( cOldName ) .AND. UPPER(cName) != UPPER(cOldName)
+      IF ::DesignMode .AND. ! Empty( cOldName ) .AND. UPPER(cName) != UPPER(cOldName)
          ::RenameComponents( ::Owner, cName, cOldName )
 
          IF ::Owner == ::Application:Project:Forms[1]

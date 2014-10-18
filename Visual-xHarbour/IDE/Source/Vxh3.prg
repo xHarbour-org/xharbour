@@ -2,8 +2,6 @@
  * $Id$
  */
 
-static s_oParent
-
 // touched
 #include "vxh.ch"
 #include "cstruct.ch"
@@ -31,11 +29,6 @@ static s_oParent
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 
-EXIT PROCEDURE __CleanVxh3()
-   s_oParent := NIL
-RETURN
-
-
 //-----------------------------------------------------------------------------------------------
 
 CLASS FormEditor INHERIT Control
@@ -44,9 +37,9 @@ CLASS FormEditor INHERIT Control
    DATA RulerFont     PROTECTED
    DATA RulerVertFont PROTECTED
    DATA RulerBkBrush  EXPORTED INIT GetStockObject( WHITE_BRUSH )
-   DATA RulerBrush    EXPORTED 
+   DATA RulerBrush    EXPORTED
    DATA CtrlMask      EXPORTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD OnDestroy()                INLINE   ::Super:OnDestroy(),;
                                               DeleteObject( ::RulerFont ),;
@@ -179,7 +172,7 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oMenu:Left         := x
       oMenu:Top          := y
       oMenu:Create()
-      
+
       oItem := CMenuItem( oMenu )
       oItem:Caption := "Inches"
       oItem:Check( ::Application:RulerType == 1 )
@@ -201,7 +194,7 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oItem:Create()
 
       oMenu:Context()
-      
+
    ENDIF
 RETURN NIL
 
@@ -214,14 +207,12 @@ RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
 //-----------------------------------------------------------------------------------------------------------------------------
 
 CLASS ControlMask INHERIT Window
-   DATA Points     EXPORTED
-   DATA CurControl EXPORTED
-   DATA __xCtrlName  EXPORTED INIT "ControlMask"
-   DATA lTimer     EXPORTED INIT .F.
+   DATA Points              EXPORTED
+   DATA __xCtrlName         EXPORTED INIT "ControlMask"
+   DATA lTimer              EXPORTED INIT .F.
    DATA RubberBrush         PROTECTED
    DATA RubberBmp           PROTECTED
-   ACCESS CurForm  INLINE ::Application:Project:CurrentForm
-   DATA DrawBand   EXPORTED INIT .T.
+   DATA DrawBand            EXPORTED INIT .T.
    DATA xGrid               EXPORTED
    DATA yGrid               EXPORTED
    DATA hBmpGrid            EXPORTED
@@ -231,15 +222,16 @@ CLASS ControlMask INHERIT Window
    DATA lOrderMode          EXPORTED INIT .F.
    DATA nSplitterPos        EXPORTED INIT 0
    DATA xMdiContainer       EXPORTED INIT .F.
-   
+
    DATA hCursorDrag         EXPORTED
    DATA hCursorNo           EXPORTED
    DATA aPointsCursors      EXPORTED
 
+   ACCESS CurForm           INLINE ::Application:Project:CurrentForm
    ACCESS MdiContainer      INLINE    ::xMdiContainer PERSISTENT
    DATA aPrevRect           PROTECTED
    DATA aCursors            PROTECTED
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnEraseBkGnd()
@@ -274,7 +266,7 @@ METHOD Init( oParent ) CLASS ControlMask
    ::ClassBrush  := GetStockObject( NULL_BRUSH )
 //   ::ClassStyle      := CS_VREDRAW | CS_HREDRAW
    ::Left            := 0//::Parent:Left
-   ::Top             := 0//::Parent:Top 
+   ::Top             := 0//::Parent:Top
    ::Width           := ::Parent:OriginalRect[3]
    ::Height          := ::Parent:OriginalRect[4]
 
@@ -298,7 +290,7 @@ METHOD SetMouseShape( nPos )
    ::__hCursor := IIF( nPos > 0, ::aCursors[ nPos ], NIL )
    SendMessage( ::hWnd, WM_SETCURSOR )
 RETURN Self
-   
+
 METHOD Create() CLASS ControlMask
 //   ::SetChildren := .F.
    ::SetGridSize(6,6)
@@ -342,12 +334,12 @@ METHOD OnTimer( nId ) CLASS ControlMask
          ::KillTimer( 1 )
          //SetActiveWindow( ::Application:MainForm:hWnd )
          EXIT
-         
+
       CASE 2
          IF ::CurForm != NIL .AND. ::CurForm:CtrlParent != NIL .AND. !(::CurForm:CtrlParent==::CurForm) .AND. VALTYPE( ::Application:CurCursor ) == "C" .AND. ::Application:CurCursor == "Splitter"
             KillTimer( ::hWnd, 2 )
             IF !lOn
-               lOn := .T.   
+               lOn := .T.
                GetCursorPos( @pt )
                ScreenToClient( ::CurForm:CtrlParent:hWnd, @pt )
 
@@ -387,7 +379,7 @@ METHOD OnTimer( nId ) CLASS ControlMask
                ::Drawing:Rectangle( aRect[1]+2, aRect[2]+2, aRect[3]-2, aRect[4]-2, C_RED, GetStockObject( NULL_BRUSH ), 2 )
                ::Drawing:Rectangle( aRect[1], aRect[2], aRect[3], aRect[4], C_RED, GetStockObject( NULL_BRUSH ), 2 )
              ELSE
-               lOn := .F.   
+               lOn := .F.
                ::CurForm:InvalidateRect()
             ENDIF
             SetTimer( ::hWnd, 2, 250 )
@@ -433,8 +425,8 @@ RETURN Self
 
 METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
    LOCAL nX, nY, aCtrl, aActions, nLeft, nTop, aPt
-   
-   IF !::lOrderMode
+
+   IF ! ::lOrderMode
       ::ToolTip:Title := NIL
       ::ToolTip:Text := NIL
 
@@ -443,7 +435,7 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
          ::CurForm:CtrlOldPt := NIL
          IF ::Application:Project:PasteOn
 
-            // Paste ---------------------------------------------------------------------------------------            
+            // Paste ---------------------------------------------------------------------------------------
             aActions := {}
 
             aPt := { x, y }
@@ -495,47 +487,59 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
 RETURN NIL
 
 METHOD OnLButtonDown(n,x,y) CLASS ControlMask
+   LOCAL pt, oControl, oPrj := ::Application:Project
    ( n )
    ::SetFocus()
-   
-   IF !::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:ControlSelect( x, y ) == -2
+
+   IF ! ::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:ControlSelect( x, y ) == -2
       ::PostMessage( WM_USER + 2222 )
 
-    ELSEIF ::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:CurObj != NIL
-      DEFAULT s_oParent TO ::CurForm:CurObj:Parent
-      IF !( s_oParent == ::CurForm:CurObj:Parent )
-         ::CurForm:CurObj:Parent:__CurrentPos := 1
-         s_oParent := ::CurForm:CurObj:Parent
+    ELSEIF ::lOrderMode .AND. ::CurForm != NIL
+
+      pt := (struct POINT)
+      pt:x := x
+      pt:y := y
+      ClientToScreen( ::hWnd, @pt )
+      oControl := ::CurForm:GetChildFromPoint( pt )
+
+      IF oPrj:__oTabStop != NIL .AND. oControl:Parent:hWnd <> oPrj:__oTabStop:hWnd
+         oControl := NIL
       ENDIF
-      TRY
-         WITH OBJECT ::CurForm:CurObj
-            :TabOrder := :Parent:__CurrentPos
-            :Parent:__CurrentPos++
-            ::Application:Props:StatusBarPos:Caption := "Next Tab " + XSTR( :Parent:__CurrentPos )
-            ::DrawOrder( ::CurForm, "", :Parent )
-            ::InvalidateRect()
-            ::UpdateWindow()
-            IF :Parent:__CurrentPos > LEN( :Parent:Children )
-               WITH OBJECT ::Application:Props[ "TabOrderBttn" ]
-                  :Checked := .F.
-                  ::Application:Project:TabOrder( :this )
-               END   
-            ENDIF
-            IF !::Application:Project:Modified
-               ::Application:Project:Modified := .T.
-            ENDIF
-         END
-      CATCH   
-      END
-   ENDIF   
+
+      IF oControl != NIL
+         IF oPrj:__oTabStop == NIL
+            oControl:Parent:__CurrentPos := 1
+            oPrj:__oTabStop := oControl:Parent
+         ENDIF
+
+         oControl:TabOrder := oControl:Parent:__CurrentPos
+         oControl:Parent:__CurrentPos++
+
+         ::Application:Props:StatusBarPos:Caption := "Next Tab " + XSTR( oControl:Parent:__CurrentPos )
+         ::DrawOrder( ::CurForm, "", oControl:Parent )
+
+         ::InvalidateRect()
+         ::UpdateWindow()
+
+         IF oControl:Parent:__CurrentPos > LEN( oControl:Parent:Children )
+            WITH OBJECT ::Application:Props[ "TabOrderBttn" ]
+               :Checked := .F.
+               ::Application:Project:TabOrder( :this )
+            END
+         ENDIF
+         IF !::Application:Project:Modified
+            ::Application:Project:Modified := .T.
+         ENDIF
+      ENDIF
+   ENDIF
 RETURN 0
 
 METHOD OnMouseMove( nwParam, nlParam ) CLASS ControlMask
    ::Super:OnMouseMove( nwParam, nlParam )
-   IF ::CurForm != NIL
+   IF ::CurForm != NIL .AND. ! ::lOrderMode
       ::CurForm:MouseDown := ( nwParam == MK_LBUTTON )
-      ::CurForm:CheckMouse( LOWORD(nlParam), HIWORD(nLParam),, nwParam, ::lOrderMode )
-   ENDIF   
+      ::CurForm:CheckMouse( LOWORD(nlParam), HIWORD(nLParam),, nwParam )
+   ENDIF
 RETURN 0
 
 METHOD OnEraseBkGnd() CLASS ControlMask
@@ -550,7 +554,11 @@ METHOD OnPaint() CLASS ControlMask
    LOCAL i := 0
    LOCAL j := 0
 
-   IF ( ::CurForm == NIL .OR. !::DrawBand  .OR. ! ::CurForm:IsWindow() ) .AND. !::lOrderMode
+   IF ::lOrderMode
+      RETURN NIL
+   ENDIF
+
+   IF ( ::CurForm == NIL .OR. !::DrawBand  .OR. ! ::CurForm:IsWindow() ) .AND. ! ::lOrderMode
       ::aPrevRect := NIL
       RETURN NIL
    ENDIF
@@ -569,14 +577,14 @@ METHOD OnPaint() CLASS ControlMask
       nTop    := aRect[2]
       nRight  := aRect[3]
       nBottom := aRect[4]
-      
+
       _DrawFocusRect( hDC, { nLeft   + (::CurForm:SelPointSize/2),;
                              nTop    + (::CurForm:SelPointSize/2),;
                              nRight  - (::CurForm:SelPointSize/2),;
                              nBottom - (::CurForm:SelPointSize/2) } )
    ENDIF
 
-   IF !::lOrderMode .AND. ::Application:CurCursor == NIL
+   IF ::Application:CurCursor == NIL
       SelectObject( hDC, GetStockObject( WHITE_BRUSH ) )
       FOR EACH aControl IN ::CurForm:Selected
           IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"}
@@ -598,8 +606,9 @@ METHOD OnPaint() CLASS ControlMask
          Rectangle( hDC, ::CurForm:SelInitPoint[1], ::CurForm:SelInitPoint[2], ::CurForm:SelEndPoint[1], ::CurForm:SelEndPoint[2]  )
       ENDIF
 
-    ELSEIF ::Application:CurCursor == NIL
-      ::DrawOrder( ::CurForm, "" )
+      IF ::lOrderMode
+         ::DrawOrder( ::CurForm, "" )
+      ENDIF
    ENDIF
    ::EndPaint()
 RETURN 0
@@ -607,9 +616,9 @@ RETURN 0
 METHOD DrawSelRect( lClear ) CLASS ControlMask
    LOCAL hDC
    static aRect
-   
+
    DEFAULT aRect TO ARRAY(4)
-   
+
    hDC := GetDC( ::hWnd )
 
    IF !lClear .AND. ::CurForm:SelInitPoint != NIL .AND. ::CurForm:SelEndPoint != NIL
@@ -619,7 +628,7 @@ METHOD DrawSelRect( lClear ) CLASS ControlMask
       aRect[3] := MAX( ::CurForm:SelInitPoint[1], ::CurForm:SelEndPoint[1] )
       aRect[4] := MAX( ::CurForm:SelInitPoint[2], ::CurForm:SelEndPoint[2] )
    ENDIF
-   
+
    IF !EMPTY( aRect )
       _DrawFocusRect( hDC, aRect ) //{ ::CurForm:SelInitPoint[1], ::CurForm:SelInitPoint[2], ::CurForm:SelEndPoint[1], ::CurForm:SelEndPoint[2] } )
    ENDIF
@@ -637,10 +646,10 @@ METHOD DrawOrder( oParent, cOrder, oRedraw ) CLASS ControlMask
    LOCAL hOldFont, hOldPen, hOldBrush
 
    IF ( oRedraw == NIL .OR. oParent == oRedraw ) .AND. oParent:Children != NIL
-   
+
       hPen   := CreatePen( PS_SOLID, 1, DarkenColor( GetSysColor( COLOR_BTNFACE ), 40 ) )
       hBrush := CreateSolidBrush( MidColor(GetSysColor(COLOR_WINDOW),GetSysColor(COLOR_HIGHLIGHT)) )
-      
+
       FOR n := 1 TO LEN( oParent:Children )
           IF __ObjHasMsg( oParent:Children[n], "xTabOrder" )
              oParent:Children[n]:xTabOrder := n
@@ -660,13 +669,11 @@ METHOD DrawOrder( oParent, cOrder, oRedraw ) CLASS ControlMask
 
                    SetBkMode( hDC, TRANSPARENT )
 
-                   aAlign := _GetTextExtentPoint32( hDC, cData+"   " )
+                   aAlign := _GetTextExtentPoint32( hDC, cData )
 
-                   aRect := { aPt[1], aPt[2], aPt[1]+aAlign[1], aPt[2]+aAlign[2] }
+                   aRect := { aPt[1], aPt[2], aPt[1]+aAlign[1]+5, aPt[2]+aAlign[2] }
 
                    Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-
-                   aAlign := _GetTextExtentPoint32( hDC, cData )
 
                    x := aRect[1] + ((aRect[3]-aRect[1])/2) - (aAlign[1]/2)
                    y := aRect[2]
@@ -684,9 +691,9 @@ METHOD DrawOrder( oParent, cOrder, oRedraw ) CLASS ControlMask
 
                    ReleaseDC( hWnd, hDC )
                    cData := cOrder
-                END  
+                END
 
-                ::DrawOrder( oParent:Children[n], cData+".", oRedraw )
+                ::DrawOrder( oParent:Children[n], "", oRedraw )
              ENDIF
           ENDIF
       NEXT
@@ -714,7 +721,7 @@ METHOD OnContextMenu( x, y ) CLASS ControlMask
       IF _PtInRect( aRect, aPt )
          IF __ObjHasMsg( ::CurForm:Selected[1][1], "__IdeContextMenuItems" ) .AND. !EMPTY( ::CurForm:Selected[1][1]:__IdeContextMenuItems )
             n := ::Application:Cursor
-            
+
             ::Application:Cursor := ::System:Cursor:Arrow
             oMenu := MenuPopup( Self )
             oMenu:Style        := TPM_LEFTALIGN+TPM_TOPALIGN
@@ -731,7 +738,7 @@ METHOD OnContextMenu( x, y ) CLASS ControlMask
             NEXT
             oMenu:Context()
             ::Application:Cursor := n
-            
+
          ENDIF
       ENDIF
    ENDIF
@@ -774,9 +781,9 @@ HB_FUNC( PAINTRULERS )
    int    RulerWeight   = hb_parni(3);
    int    nWidth         = hb_parni(4);
    LONG   nHeight        = hb_parnl(5);
-   
+
    //LONG   hChild         = hb_parnl(6);
-   
+
    LONG   HorzScrollPos    = hb_parnl(7);
    LONG   VertScrollPos    = hb_parnl(8);
    HANDLE RulerFont     = (HANDLE) hb_parnl(9);
@@ -798,7 +805,7 @@ HB_FUNC( PAINTRULERS )
    float  x, z, i;
    HBRUSH  hFace  = (HBRUSH) hb_parnl(15);//GetSysColorBrush( COLOR_BTNFACE );
    HBRUSH  hWhite = (HBRUSH) hb_parnl(12);
-   
+
    hRegion = CreateRectRgn( 0, CaptionHeight, nWidth, RulerWeight );
 
    hDC       = GetDCEx( hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE );
@@ -895,13 +902,13 @@ HB_FUNC( PAINTRULERS )
       y = 4;
    }
    x = (float) (nPxI / y);
-   
+
    n = 0;
    for ( i = 0; i < nWidth; i+= nPxI)
    {
        wsprintf(buffer, "%i", n ) ;
        n10  = i - HorzScrollPos + RulerWeight + 1;
-       
+
        if( n10 > RulerWeight )
        {
           MoveToEx( hDC, n10, CaptionHeight + RulerBorder+3, NULL );
@@ -933,7 +940,7 @@ HB_FUNC( PAINTRULERS )
    if( rChild )
    {
       // Draw unused top space
-      
+
       if ( pt.y > 0 )
       {
          rc.left   = nGap;
@@ -990,13 +997,13 @@ HB_FUNC( PAINTRULERS )
 
    SetBkMode( hDC, TRANSPARENT );
    SelectObject( hDC, RulerVertFont );
-   
+
    n = 0;
    for ( i = 0; i < nHeight; i+= nPxI)
    {
        wsprintf(buffer, "%i", n ) ;
        n10  = i - VertScrollPos + RulerWeight + 1;
-       
+
        if( n10 > RulerWeight )
        {
           MoveToEx( hDC, RulerBorder+3, CaptionHeight + n10, NULL );

@@ -115,9 +115,8 @@ METHOD Create() CLASS MDIClient
    ::__ClientStruct := (struct CLIENTCREATESTRUCT)
    ::__ClientStruct:hWindowMenu  := ::WindowMenu
    ::__ClientStruct:idFirstChild := ::FirstChild
-   IF ::Parent != NIL .AND.::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance   := .T.
+   IF ::Parent != NIL .AND.::Parent:DesignMode
+      __SetInitialValues( Self )
    ENDIF
    ::ClipChildren := .T.
    ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, , ::Style, ::Left, ::Top, ::Width, ::Height, ::Parent:hWnd, 0, ::Parent:Instance, ::__ClientStruct )

@@ -88,7 +88,7 @@ METHOD PostInitDialog() CLASS Dialog
    IF EMPTY( ::__hIcon )
       SWITCH VALTYPE( ::Icon )
          CASE "A"
-              IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
+              IF ! ::DesignMode .OR. EMPTY( ::Icon[1] )
                  ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
                  ::xIcon := ::Icon[2]
                ELSE
@@ -126,7 +126,7 @@ METHOD PostInitDialog() CLASS Dialog
 
       nRet := ExecuteEvent( "OnLoad", Self )
       ODEFAULT nRet TO ::OnLoad( Self )
-      IF ::AnimationStyle != 0 .AND. ::__ClassInst == NIL
+      IF ::AnimationStyle != 0 .AND. ! ::DesignMode
          RETURN ::Animate( 1000, ::AnimationStyle )
       ENDIF
    ENDIF
@@ -242,7 +242,7 @@ METHOD Create( hParent ) CLASS Dialog
 
    ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, ::__WndProc ), Self )
 
-   IF !::ShowInTaskBar .AND. ::Parent == NIL .AND. ::__ClassInst == NIL .AND. ::Application:DllInstance == NIL
+   IF !::ShowInTaskBar .AND. ::Parent == NIL .AND. ! ::DesignMode .AND. ::Application:DllInstance == NIL
       ::__TaskBarParent := CreateDialogIndirect( ::Instance, __GetTemplate( Self ), 0, NIL )
       IF ::__hIcon != NIL
          SendMessage( ::__TaskBarParent, WM_SETICON, ICON_BIG, ::__hIcon )

@@ -20,12 +20,12 @@ CLASS Drawing
    DATA Owner       EXPORTED
    DATA xhDC        EXPORTED
    DATA cPaint      EXPORTED
-   DATA __aFonts     PROTECTED   
-   
+   DATA __aFonts     PROTECTED
+
    ACCESS hDC       INLINE ::RefreshDC(), ::xhDC
 
    METHOD Init() CONSTRUCTOR
-   
+
    METHOD Destroy()
    METHOD RefreshDC()
    METHOD GetTextExtentPoint32()
@@ -157,19 +157,19 @@ METHOD Rectangle( nLeft, nTop, nRight, nBottom, nColor, hBrush, nPen ) CLASS Dra
    DEFAULT nTop      TO aRect[2]
    DEFAULT nRight    TO aRect[3]
    DEFAULT nBottom   TO aRect[4]
-   
+
    IF nColor != NIL
       DEFAULT nPen TO 1
       hPen    := CreatePen( PS_SOLID, nPen, nColor )
       hOldPen := SelectObject( ::hDC, hPen )
    ENDIF
-   
+
    IF hBrush != NIL
       hOldBrush := SelectObject( ::hDC, hBrush )
    ENDIF
 
    Rectangle( ::hDC, nLeft, nTop, nRight, nBottom )
-   
+
    IF hOldBrush != NIL
       SelectObject( ::hDC, hOldBrush )
    ENDIF
@@ -196,6 +196,8 @@ METHOD EnumProc( plf, ptm ) CLASS Drawing
    LOCAL lf, tm
    lf := (struct LOGFONT*) plf
    tm := (struct TEXTMETRIC*) ptm
-   AADD( ::__aFonts, { lf, tm } )
+   IF lf:lfFaceName[1] != "@"
+      AADD( ::__aFonts, { lf, tm } )
+   ENDIF
 RETURN 1
 

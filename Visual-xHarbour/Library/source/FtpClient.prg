@@ -23,7 +23,7 @@ CLASS FtpClient INHERIT Component
    PROPERTY Port         DEFAULT INTERNET_DEFAULT_FTP_PORT
    PROPERTY Passive      DEFAULT .F.
    PROPERTY TransferType DEFAULT FTP_TRANSFER_TYPE_BINARY
-   
+
    DATA EnumTransferType EXPORTED INIT { { "ASCII", "Binary" }, { FTP_TRANSFER_TYPE_ASCII, FTP_TRANSFER_TYPE_BINARY } }
    DATA EnumOperation    EXPORTED INIT { { "Synchronous", "Asynchronous" }, { 0, INTERNET_FLAG_ASYNC } }
    DATA EnumService      EXPORTED INIT { { "FTP", "HTTP" }, { INTERNET_SERVICE_FTP, INTERNET_SERVICE_HTTP } }
@@ -80,12 +80,12 @@ METHOD Init( oOwner ) CLASS FtpClient
    FOR n := 1 TO LEN( aEvents )
        AADD( ::Events[1][2], { aEvents[n][2], "", "" } )
    NEXT
-   
+
 RETURN self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS FtpClient
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::hHandle := InternetOpen( ::Application:Name, ::OpenType, NIL, NIL, ::Operation )
       __oFtp := Self
    ENDIF
@@ -99,7 +99,7 @@ FUNCTION FtpStatusCallback( hInternet, dwContext, dwInternetStatus, lpvStatusInf
    __oFtp:InternetStatus    := dwInternetStatus
    __oFtp:StatusInformation := lpvStatusInformation
    __oFtp:StatusInfoLength  := dwStatusInformationLength
-   
+
    IF ( n := ASCAN( aEvents, {|a| a[1]==dwInternetStatus} ) ) > 0
       ExecuteEvent( aEvents[n][2], __oFtp )
    ENDIF

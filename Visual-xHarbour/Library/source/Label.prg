@@ -129,7 +129,7 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetBlinkColor() CLASS Label
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       IF ::BlinkColor != NIL
          ::SetTimer( 512, 500 )
        ELSE
@@ -363,7 +363,7 @@ RETURN NIL
 
 METHOD OnSize( nwParam, nlParam ) CLASS Line
    Super:OnSize( nwParam, nlParam )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::xLenght := IIF( ::xVertical, ::Height, ::Width )
    ENDIF
 RETURN NIL

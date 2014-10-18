@@ -31,11 +31,11 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY RightAlign        SET ::SetStyle( DTS_RIGHTALIGN, v )   DEFAULT .F.
    PROPERTY BlankDate         SET ::__SetBlankDate(v)               DEFAULT .F.
 
-   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )      
-   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )         
-   PROPERTY TitleBackColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLEBK, v )      
-   PROPERTY TitleForeColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLETEXT, v )    
-   PROPERTY TrailingTextColor ROOT "Colors" SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v ) 
+   PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )
+   PROPERTY ForeColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_TEXT, v )
+   PROPERTY TitleBackColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLEBK, v )
+   PROPERTY TitleForeColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLETEXT, v )
+   PROPERTY TrailingTextColor ROOT "Colors" SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v )
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
@@ -60,7 +60,7 @@ CLASS DateTimePicker INHERIT Control
    DATA __nLast   PROTECTED INIT 0
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD IsShowNoneChecked()              INLINE ::ShowNone .AND. ::SendMessage( DTM_GETSYSTEMTIME ) <> GDT_NONE 
+   METHOD IsShowNoneChecked()              INLINE ::ShowNone .AND. ::SendMessage( DTM_GETSYSTEMTIME ) <> GDT_NONE
    METHOD GetCalendarColor( nPos )         INLINE ::SendMessage( DTM_GETMCCOLOR, nPos, 0 )
    METHOD GetCalendarFont()                INLINE ::SendMessage( DTM_GETMCFONT, 0, 0 )
    METHOD GetCalendarHandle()              INLINE ::SendMessage( DTM_GETMONTHCAL, 0, 0 )
@@ -109,7 +109,7 @@ METHOD Init( oParent ) CLASS DateTimePicker
    ::MaxRange  := SysTime()
 
    ::Events := {}
-   IF oParent:__ClassInst != NIL
+   IF oParent:DesignMode
       ::Events := { ;
                   {"General",     {;
                                   { "OnInit"            , "", "" },;
@@ -269,7 +269,7 @@ METHOD SetFormat( nFormat ) CLASS DateTimePicker
 
       IF ::IsWindow()
          ::SetWindowLong( GWL_STYLE, ::Style )
-         IF ::__ClassInst != NIL
+         IF ::DesignMode
             ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
             ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
          ENDIF

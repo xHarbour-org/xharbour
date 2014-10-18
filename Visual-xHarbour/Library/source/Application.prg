@@ -323,6 +323,7 @@ CLASS Application
    DATA IniFile                        EXPORTED
    DATA MainForm                       EXPORTED
    DATA bUserError                     EXPORTED
+   DATA DesignMode                     EXPORTED  INIT .F.
 
    DATA Params                         EXPORTED
    DATA IdeActive                      EXPORTED  INIT .F.
@@ -339,7 +340,6 @@ CLASS Application
    DATA Modal                          EXPORTED  INIT .F.
    DATA __Accelerators                 EXPORTED  INIT {}
    DATA __hMutex                       EXPORTED
-   DATA __ClassInst                    EXPORTED
    DATA __CurCoolMenu                  EXPORTED
    DATA __hCursor                      EXPORTED
    DATA __IsControl                    EXPORTED  INIT .F.
@@ -374,7 +374,7 @@ CLASS Application
    METHOD LoadIcon( cIcon )            INLINE LoadIcon( ::Instance, cIcon )
    METHOD RestorePrevInstance(nNotify) INLINE SendMessage( HWND_BROADCAST, ::__InstMsg, nNotify, 0 )
    METHOD IsThemeActive()              INLINE IsThemeActive()
-   METHOD Set( nIndex, lSet )          INLINE IIF( ::__ClassInst == NIL, IIF( nIndex == -1, __SetCentury(lSet), Set( nIndex, lSet ) ), )
+   METHOD Set( nIndex, lSet )          INLINE IIF( ! ::DesignMode, IIF( nIndex == -1, __SetCentury(lSet), Set( nIndex, lSet ) ), )
    METHOD HasMessage( cMsg )           INLINE __ObjHasMsg( Self, cMsg )
    METHOD GetRectangle()               INLINE {0,0,0,0}
    METHOD LoadResource( cName, cType ) INLINE __ResourceToString( Application:Instance, cName, cType )
@@ -488,7 +488,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Application
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName )
       cName := oObj:xName
    ENDIF
-   IF !( oObj == Self )
+   IF !( oObj == Self ) .AND. ! oObj:DesignMode
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF

@@ -94,12 +94,12 @@ METHOD Init( oParent ) CLASS ToolStripContainer
    ::__lMoveable   := .F.
    ::__aVertex     := { {=>}, {=>} }
    ::__aMesh       := { {=>} }
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuStrip", {|| ::__AddToolStrip( "MenuStrip" ) } },;
                                    { "&Add ToolStrip", {|| ::__AddToolStrip( "ToolStrip" ) } } }
    ENDIF
    ::Dock:Margin := 0
-   IF ::Height == 0 .AND. ::__ClassInst != NIL
+   IF ::Height == 0 .AND. ::DesignMode
       ::Height := 30
    ENDIF
 RETURN Self
@@ -435,7 +435,7 @@ METHOD Init( oParent ) CLASS ToolStrip
    ::__aChevron1   := { {=>}, {=>} }
    ::__aChevron2   := { {=>}, {=>} }
    ::__aChevron3   := { {=>}, {=>} }
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "Add ToolStrip&Button",   {|| ::__AddToolStripItem( "ToolStripButton" ) } },;
                                    { "Add ToolStrip&ComboBox", {|| ::__AddToolStripItem( "ToolStripComboBox" ) } },;
                                    { "Add ToolStrip&Label",    {|| ::__AddToolStripItem( "ToolStripLabel" ) } } }
@@ -580,11 +580,11 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
             IF LEN( ::Parent:__aStrips ) < nRow
                AADD( ::Parent:__aStrips, { Self } )
              ELSE
-               IF /*::__ClassInst == NIL .AND.*/ ( i := ASCAN( ::Parent:__aStrips[ nRow ], {|o| o:Left >= ::Left } ) ) > 0
+               IF ( i := ASCAN( ::Parent:__aStrips[ nRow ], {|o| o:Left >= ::Left } ) ) > 0
                   IF ::Parent:__aStrips[ nRow ][i]:Left < ::Left + ::Width + 2
                      ::Parent:__aStrips[ nRow ][i]:__nLeft := ::Parent:__aStrips[ nRow ][i]:Left // Set Previous Left
                      ::Parent:__aStrips[ nRow ][i]:Left := ::Left + ::Width + 2
-                     IF ::__ClassInst != NIL
+                     IF ::DesignMode
                         ::Parent:__aStrips[ nRow ][i]:MoveWindow()
                      ENDIF
                      oStrip := ::Parent:__aStrips[ nRow ][i]
@@ -592,7 +592,7 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
                          IF oStrip:Left + oStrip:Width + 2 >= ::Parent:__aStrips[ nRow ][x]:Left
                             ::Parent:__aStrips[ nRow ][x]:__nLeft := ::Parent:__aStrips[ nRow ][x]:Left // Set Previous Left
                             ::Parent:__aStrips[ nRow ][x]:Left := oStrip:Left + oStrip:Width + 2
-                            IF ::__ClassInst != NIL
+                            IF ::DesignMode
                                ::Parent:__aStrips[ nRow ][x]:MoveWindow()
                             ENDIF
                          ENDIF
@@ -604,11 +604,11 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
                 ELSE
                   AADD( ::Parent:__aStrips[ nRow ], Self )
                ENDIF
-               IF /*::__ClassInst == NIL .AND.*/ ( nPos := ASCAN( ::Parent:__aStrips[ nRow ], Self,,, .T. ) ) > 1
+               IF ( nPos := ASCAN( ::Parent:__aStrips[ nRow ], Self,,, .T. ) ) > 1
                   IF ::Left <= ::Parent:__aStrips[ nRow ][nPos-1]:Left + ::Parent:__aStrips[ nRow ][nPos-1]:Width + 2
                      ::__nLeft := ::Left
                      ::Left := ::Parent:__aStrips[ nRow ][nPos-1]:Left + ::Parent:__aStrips[ nRow ][nPos-1]:Width + 2
-                     IF ::__ClassInst != NIL
+                     IF ::DesignMode
                         ::Parent:__aStrips[ nRow ][i]:MoveWindow()
                      ENDIF
 
@@ -617,7 +617,7 @@ METHOD __SetRow( nRow ) CLASS ToolStrip
                          IF oStrip:Left + oStrip:Width + 2 >= ::Parent:__aStrips[ nRow ][x]:Left
                             ::Parent:__aStrips[ nRow ][x]:__nLeft := ::Parent:__aStrips[ nRow ][x]:Left // Set previous Left
                             ::Parent:__aStrips[ nRow ][x]:Left := ::Parent:__aStrips[ nRow ][x]:__nLeft := oStrip:Left + oStrip:Width + 2
-                            IF ::__ClassInst != NIL
+                            IF ::DesignMode
                                ::Parent:__aStrips[ nRow ][x]:MoveWindow()
                             ENDIF
                          ENDIF
@@ -641,7 +641,7 @@ RETURN Self
 METHOD __OnParentSize(x,y,hDef) CLASS ToolStrip
    LOCAL oStrip, nPos, i
    ::__CreateBkBrush()
-   IF ::Row > 0 .AND. ::ShowChevron .AND. ::__ClassInst == NIL
+   IF ::Row > 0 .AND. ::ShowChevron .AND. ! ::DesignMode
       ::Parent:GetClientrect()
       IF ::Parent:ClientWidth < ::Left + ::Width + 2
          //Sizing down, need to check if there is some wasted space
@@ -1161,7 +1161,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD __SetFloat( lFloat ) CLASS ToolStrip
    LOCAL pt := (struct POINT), pt2 := (struct POINT)
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       RETURN NIL
    ENDIF
    GetCursorPos( @pt )
@@ -1446,7 +1446,7 @@ METHOD Init( oParent ) CLASS ToolStripItem
    ::__lMoveable   := .F.
    ::ShortCutKey   := __MenuStripItemShortCut( Self )
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuStripItem", {|| ::__AddToolStripItem( "MenuStripItem" ) } } }
    ENDIF
 RETURN Self
@@ -1455,7 +1455,7 @@ RETURN Self
 METHOD Create() CLASS ToolStripItem
    LOCAL nLeft
 
-   IF ::__ClassInst != NIL .AND. ::Parent:__DesignAddNew != NIL
+   IF ::DesignMode .AND. ::Parent:__DesignAddNew != NIL
       ::Parent:__DesignAddNew:Destroy()
       ::Parent:__DesignAddNew := NIL
    ENDIF
@@ -1742,7 +1742,7 @@ METHOD Create() CLASS ToolStripButton
    IF !::Parent:__lIsMenu
       nAdd := ::Parent:ImagePadding * 2
    ENDIF
-   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL
+   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ! ::DesignMode
       ::xText := EVAL( &(::xText) )
 
       IF ( n := AT( "&", ::xText ) ) > 0
@@ -2802,6 +2802,8 @@ CLASS MenuStripItem INHERIT ToolStripButton
    METHOD OnMeasureItem()
    METHOD OnDrawItem()
    METHOD OnLButtonDown() INLINE ::__OpenMenu()
+   METHOD Destroy()
+   METHOD OnDestroy()
 ENDCLASS
 
 
@@ -2818,7 +2820,7 @@ METHOD Create() CLASS MenuStripItem
    IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
       Super:Create()
     ELSE
-      IF LEFT( ::xCaption, 2 ) == '{|' .AND. ::__ClassInst == NIL
+      IF LEFT( ::xCaption, 2 ) == '{|' .AND. ! ::DesignMode
          ::xCaption := EVAL( &(::xCaption) )
       ENDIF
       IF ::Position != NIL
@@ -2830,6 +2832,30 @@ METHOD Create() CLASS MenuStripItem
       ::Object:Create()
    ENDIF
 RETURN Self
+
+//--------------------------------------------------------------------------------------------------------------------------------
+METHOD OnDestroy() CLASS MenuStripItem
+   LOCAL n
+   FOR n := 1 TO LEN( ::Children )
+       ::Children[n]:Destroy()
+       n--
+   NEXT
+   Super:OnDestroy()
+RETURN Self
+
+//--------------------------------------------------------------------------------------------------------------------------------
+METHOD Destroy() CLASS MenuStripItem
+   LOCAL n
+   Super:Destroy()
+   IF ( n := ASCAN( ::Parent:Children, {|o| o == Self } ) ) > 0
+      ADEL( ::Parent:Children, n, .T. )
+   ENDIF
+   ::Parent := NIL
+   FOR n := 1 TO LEN( ::Children )
+       ::Children[n]:Destroy()
+       n--
+   NEXT
+RETURN SELF
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
@@ -3008,7 +3034,8 @@ CLASS __MenuStripItemShortCut
    DATA ClsName     EXPORTED INIT ""
    DATA __xCtrlName EXPORTED INIT "MenuStripItemShortCut"
    DATA Parent      EXPORTED
-   DATA __ClassInst EXPORTED
+   ACCESS DesignMode INLINE ::Parent:DesignMode
+
    METHOD Init() CONSTRUCTOR
    METHOD GetShortcutText()
    METHOD __SetShortcut INLINE ::GetShortcutText()
@@ -3017,14 +3044,12 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS __MenuStripItemShortCut
    ::Parent := oParent
-   IF ::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-   ENDIF
+   __SetInitialValues( Self )
 RETURN Self
 
 METHOD SetAccel() CLASS __MenuStripItemShortCut
    LOCAL nAccel
-   IF ::__ClassInst == NIL .AND. ::xKey <> 0
+   IF ! ::DesignMode .AND. ::xKey <> 0
       nAccel := FVIRTKEY
       IF ::xCtrl
          nAccel := nAccel | FCONTROL
@@ -3072,7 +3097,7 @@ METHOD GetShortcutText( lCtrl, lAlt, lShift, nKey ) CLASS __MenuStripItemShortCu
       ::xKey := 0
    ENDIF
    TRY
-      IF __GetApplication() != NIL .AND. ::Parent:__ClassInst != NIL
+      IF __GetApplication() != NIL .AND. ::Parent:DesignMode
          WITH OBJECT __GetApplication():ObjectManager
             IF ( oItem := FindTreeItem( :Items, TVGetSelected( :hWnd ) ) ) != NIL
                oItem:Owner:ColItems[1]:Value := cAccel
@@ -3142,7 +3167,7 @@ METHOD Create() CLASS ContextStrip
    SetMenuInfo( ::__hMenu, lpMenuInfo )
    ::lCreated := .T.
    ::hWnd := ::Form:hWnd
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuStripItem", {|| ::__AddToolStripItem( "MenuStripItem" ) } } }
    ENDIF
 RETURN Self
@@ -3160,7 +3185,7 @@ METHOD Show( x, y ) CLASS ContextStrip
    __ReleaseMenu( Self, ::__hMenu )
 
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       GetWindowRect( ::Application:MainForm:FormEditor1:hWnd, @rc )
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2

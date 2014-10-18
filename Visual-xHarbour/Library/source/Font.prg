@@ -56,7 +56,6 @@ CLASS Font
    DATA ncm              EXPORTED
    DATA lCreateHandle    EXPORTED INIT .T.
    DATA __IsInstance     EXPORTED INIT .F.
-   DATA __ClassInst      EXPORTED
    DATA __ExplorerFilter EXPORTED INIT {;
                                        { "Font Files", "*.ttf;*.fnt;*.fon;*.ttc;*.fot;*.otf" },;
                                        { "Raw TrueType (*.ttf)", "*.ttf" },;
@@ -66,6 +65,8 @@ CLASS Font
                                        { "TrueType resource (*.fot)", "*.fot" },;
                                        { "PostScript OpenType (*.otf)", "*.otf" };
                                        }
+   ACCESS DesignMode      INLINE IIF( ::Owner != NIL .AND. __ObjHasMsg( ::Owner, "DesignMode" ), ::Owner:DesignMode, .F. )
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Select( hDC ) INLINE SelectObject( hDC, ::Handle )
@@ -148,21 +149,7 @@ METHOD Create() CLASS Font
       ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
    ENDIF
 
-   IF ::Owner != NIL .AND. ::Owner:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance  := .T.
-      ::__ClassInst:xWeight      := ::xWeight
-      ::__ClassInst:xFaceName    := ::xFaceName
-      ::__ClassInst:xWidth       := ::xWidth
-      ::__ClassInst:xEscapement  := ::xEscapement
-      ::__ClassInst:xOrientation := ::xOrientation
-      ::__ClassInst:xCharSet     := ::xCharSet
-      ::__ClassInst:xHeight      := ::xHeight
-      ::__ClassInst:xnItalic     := ::xnItalic
-      ::__ClassInst:xnUnderline  := ::xnUnderline
-      ::__ClassInst:xnStrikeOut  := ::xnStrikeOut
-      ::__ClassInst:xPointSize   := ::xPointSize
-   ENDIF
+   __SetInitialValues( Self )
 
 RETURN Self
 
@@ -178,10 +165,6 @@ RETURN .T.
 
 METHOD Destroy() CLASS Font
    ::Delete()
-   IF ::__ClassInst != NIL
-      ::__ClassInst:Owner := NIL
-      ::__ClassInst := NIL
-   ENDIF
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
@@ -324,7 +307,7 @@ METHOD SetPointSize( n ) CLASS Font
    DeleteDC( hDC )
    ::xPointSize := n
 
-   IF ::__ClassInst != NIL .AND. ::Owner != NIL  .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
+   IF ::DesignMode .AND. ::Owner != NIL  .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
       ::Owner:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
    ENDIF
 RETURN Self

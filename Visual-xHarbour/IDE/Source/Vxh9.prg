@@ -132,7 +132,6 @@ METHOD OnInitDialog() CLASS ImageManager
       :Dock:Top      := :Parent:Coolbar1
       :Dock:Right    := :Parent
 
-      :OnWMSize      := {|o| IIF( !EMPTY( o:Children ), o:Children[1]:Width := o:ClientWidth, ) }
       WITH OBJECT :DataSource := MemoryTable( ::Parent )
          :Structure := { {"Resource", "C", 247 } }
          :Table     := {}
@@ -147,9 +146,10 @@ METHOD OnInitDialog() CLASS ImageManager
          :Data       := "hb_QSelf():DataSource:Fields:Resource"
          :Width      := :Parent:Parent:ClientWidth-6
          :ImageIndex := {|o| o:Record }
-         :AllowSize  := .T.
+         :AllowSize  := .F.
          :Create()
       END
+      :AnchorColumn(1)
       :Create()
       :Home()
    END
@@ -525,7 +525,6 @@ METHOD Set( oObj, nImg ) CLASS ObjectTreeView
          oObj:TreeItem:ImageIndex := nImg
       ENDIF
    ENDIF
-   oObj := NIL
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -539,28 +538,19 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
    IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN"
-      IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "Source"
-         ::Application:SourceEditor:Source := oItem:Cargo
-         ::Application:Project:EditReset()
-         ::Application:SourceEditor:Parent:Select()
-         IF ! CheckBit( GetKeyState( VK_UP ) ) .AND. ! CheckBit( GetKeyState( VK_DOWN ) )
-            ::PostMessage( WM_USER + 555 )
+      IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
+         IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
+            ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
          ENDIF
-       ELSE
-         IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
-            IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
-               ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
-            ENDIF
-         ENDIF
-         IF oItem:Cargo:Parent != NIL .AND. oItem:Cargo:Parent:__xCtrlName == "TabPage"
-            oItem:Cargo:Parent:Select()
-         ENDIF
-         IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
-            oItem:Cargo:Select()
-         ENDIF
-         IF ::Application:Project:CurrentForm != NIL
-            ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .T. )
-         endif
+      ENDIF
+      IF oItem:Cargo:Parent != NIL .AND. oItem:Cargo:Parent:__xCtrlName == "TabPage"
+         oItem:Cargo:Parent:Select()
+      ENDIF
+      IF oItem:Cargo != NIL .AND. oItem:Cargo:__xCtrlName == "TabPage"
+         oItem:Cargo:Select()
+      ENDIF
+      IF ::Application:Project:CurrentForm != NIL
+         ::Application:Project:CurrentForm:SelectControl( oItem:Cargo, .T. )
       ENDIF
    ENDIF
 RETURN NIL

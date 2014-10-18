@@ -59,7 +59,7 @@ RETURN Self
 
 METHOD TimeProc() CLASS Timer
    LOCAL nRet := 0
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::OnTimeOut()
       nRet := ExecuteEvent( "OnTimeOut", Self )
    ENDIF

@@ -98,72 +98,72 @@ RETURN
 //-------------------------------------------------------------------------------------------------------
 
 CLASS IDE INHERIT Application
-   DATA Props            EXPORTED INIT {=>}
-   DATA EditorProps      EXPORTED INIT {=>}
+   DATA Props                 EXPORTED INIT {=>}
+   DATA EditorProps           EXPORTED INIT {=>}
 
-   DATA ToolBox          EXPORTED
-   DATA ObjectManager    EXPORTED
-   DATA EventManager     EXPORTED
+   DATA ToolBox               EXPORTED
+   DATA ObjectManager         EXPORTED
+   DATA EventManager          EXPORTED
 
-   DATA MainTab          EXPORTED
-   DATA ObjectTree       EXPORTED
-   DATA FileExplorer     EXPORTED
+   DATA MainTab               EXPORTED
+   DATA ObjectTree            EXPORTED
+   DATA FileExplorer          EXPORTED
 
-   DATA Project          EXPORTED
-   DATA SourceEditor     EXPORTED
-   DATA DebugWindow      EXPORTED
+   DATA Project               EXPORTED
+   DATA SourceEditor          EXPORTED
+   DATA DebugWindow           EXPORTED
 
-   DATA DebuggerPanel    EXPORTED
+   DATA DebuggerPanel         EXPORTED
 
-   DATA ShowGrid         EXPORTED
-   DATA ShowRulers       EXPORTED INIT .T.
-   DATA ShowDocking      EXPORTED INIT .F.
-   DATA ShowObjExplorerPanel EXPORTED INIT .T.
+   DATA ShowGrid              EXPORTED
+   DATA ShowRulers            EXPORTED INIT .T.
+   DATA ShowDocking           EXPORTED INIT .F.
+   DATA ShowObjExplorerPanel  EXPORTED INIT .T.
 
-   DATA RulerType        EXPORTED INIT 1
-   DATA ShowTip          EXPORTED
-   DATA DefaultFolder    EXPORTED
-   DATA EditorPage       EXPORTED
-   DATA DesignPage       EXPORTED
-   DATA ErrorView        EXPORTED
-   DATA BuildLog         EXPORTED
+   DATA RulerType             EXPORTED INIT 1
+   DATA ShowTip               EXPORTED
+   DATA DefaultFolder         EXPORTED
+   DATA EditorPage            EXPORTED
+   DATA DesignPage            EXPORTED
+   DATA ErrorView             EXPORTED
+   DATA BuildLog              EXPORTED
 
-   DATA FileMenu         EXPORTED
-   DATA SearchMenu       EXPORTED
-   DATA ProjectMenu      EXPORTED
-   DATA EditMenu         EXPORTED
-   DATA ViewMenu         EXPORTED
-   DATA HelpMenu         EXPORTED
+   DATA FileMenu              EXPORTED
+   DATA SearchMenu            EXPORTED
+   DATA ProjectMenu           EXPORTED
+   DATA EditMenu              EXPORTED
+   DATA ViewMenu              EXPORTED
+   DATA HelpMenu              EXPORTED
 
-   DATA SourceTabs       EXPORTED
-   DATA SourceSelect     EXPORTED
-   DATA FormsTabs        EXPORTED
-   DATA ProjectPrgEditor EXPORTED
+   DATA SourceTabs            EXPORTED
+   DATA SourceSelect          EXPORTED
+   DATA FormsTabs             EXPORTED
+   DATA ProjectPrgEditor      EXPORTED
 
-   DATA CloseMenu        EXPORTED
-   DATA SaveMenu         EXPORTED
-   DATA SaveAsMenu       EXPORTED
-   DATA SaveAllMenu      EXPORTED
+   DATA CloseMenu             EXPORTED
+   DATA SaveMenu              EXPORTED
+   DATA SaveAsMenu            EXPORTED
+   DATA SaveAllMenu           EXPORTED
 
-   DATA AddFileMenu      EXPORTED
+   DATA AddFileMenu           EXPORTED
 
-   DATA ObjectTab        EXPORTED
-   DATA Sizes            EXPORTED
-   DATA RunMode          EXPORTED
+   DATA ObjectTab             EXPORTED
+   DATA Sizes                 EXPORTED
+   DATA RunMode               EXPORTED
 
-   DATA CurCursor        EXPORTED
-   DATA ToolBoxBar       EXPORTED
+   DATA CurCursor             EXPORTED
+   DATA ToolBoxBar            EXPORTED
 
-   DATA StartPageBrushes EXPORTED
-   DATA aoLinks          EXPORTED INIT {}
+   DATA StartPageBrushes      EXPORTED
+   DATA aoLinks               EXPORTED INIT {}
 
-   DATA AddOnPath        EXPORTED
+   DATA AddOnPath             EXPORTED
 
-   DATA CControls                      EXPORTED INIT {}
-   DATA DisableWhenRunning             EXPORTED INIT .F.
-   DATA InsKey                         EXPORTED INIT .T.
-   DATA __lCopyCut                     EXPORTED  INIT .F.
-   DATA __PropFilter                   EXPORTED  INIT {}
+   DATA CControls             EXPORTED INIT {}
+   DATA DisableWhenRunning    EXPORTED INIT .F.
+   DATA InsKey                EXPORTED INIT .T.
+   DATA __lCopyCut            EXPORTED INIT .F.
+   DATA __PropFilter          EXPORTED INIT {}
 
    METHOD Init() CONSTRUCTOR
    METHOD SetEditorPos()
@@ -478,13 +478,11 @@ METHOD OnUserMsg( hWnd, nMsg, nwParam ) CLASS IDE_MainForm
       CASE nMsg == WM_USER + 3001
            IF ::Application:Project:CurrentForm != NIL
               ::Application:Project:SelectBuffer()
-
               ::Application:Project:CurrentForm:UpdateSelection()
-
               ::Application:ObjectManager:ResetProperties( IIF( EMPTY( ::Application:Project:CurrentForm:Selected ), {{::Application:Project:CurrentForm}}, ::Application:Project:CurrentForm:Selected ) )
               ::Application:EventManager:ResetEvents( IIF( EMPTY( ::Application:Project:CurrentForm:Selected ), {{::Application:Project:CurrentForm}}, ::Application:Project:CurrentForm:Selected ) )
               ::Application:Props[ "ComboSelect" ]:Reset()
-            ENDIF
+           ENDIF
 
       CASE nMsg == WM_USER + 3002
            IF ::Application:Project:StartFile != NIL
@@ -515,6 +513,10 @@ METHOD Init() CLASS IDE_MainForm
    #else
     ::Caption := "Visual xHarbour " + VXH_Version
    #endif
+
+   ::Application:ColorTable:TitleBackColorActive   := RGB( 255, 230, 151 )
+   ::Application:ColorTable:TitleBackColorInactive := RGB(  69,  89, 124 )
+   ::Application:ColorTable:Clean()
 
    ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
    ::OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
@@ -2139,7 +2141,6 @@ CLASS StartTabPage INHERIT TabPage
    METHOD OnEraseBkGnd()
    METHOD OnPaint()
    METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
-   //METHOD Create()  INLINE    ::Super:Create(), ::__lOnPaint := .F., Self
 ENDCLASS
 
 METHOD OnPaint( hDC ) CLASS StartTabPage
@@ -2373,6 +2374,7 @@ CLASS Project
    DATA ReplaceDialog    EXPORTED
 
    DATA __cFindText      EXPORTED INIT ""
+   DATA __oTabStop       EXPORTED
 
    ASSIGN Modified(lMod) INLINE ::SetCaption( lMod )
    ACCESS Modified       INLINE ::lModified
@@ -2554,7 +2556,8 @@ METHOD NewProject() CLASS Project
    ::aImages := {}
 
    ::AppObject := Application():Init( .T. )
-   ::AppObject:__ClassInst := __ClsInst( ::AppObject:ClassH )
+   ::AppObject:DesignMode := .T.
+   __SetInitialValues( ::AppObject )
 
    ::Application:Props[ "CloseBttn" ]:Enable()   // Close Button
    ::Application:Props[ "RunBttn"   ]:Enable()   // Run Button
@@ -2891,7 +2894,6 @@ RETURN Self
 
 
 METHOD TabOrder( oBtn ) CLASS Project
-   ::CurrentForm:CtrlMask:lOrderMode  := oBtn:Checked
    ::Application:ToolBox:Enabled      := !oBtn:Checked
    ::Application:ObjectTab:Enabled    := !oBtn:Checked
    ::Application:EventManager:Enabled := !oBtn:Checked
@@ -2899,16 +2901,16 @@ METHOD TabOrder( oBtn ) CLASS Project
    ::Application:FileExplorer:InvalidateRect()
    ::Application:EnableBars( !oBtn:Checked, .T. )
 
-   IF ::CurrentForm:CtrlMask:lOrderMode
+   ::CurrentForm:CtrlMask:lOrderMode  := oBtn:Checked
+
+   ::__oTabStop := NIL
+
+   IF oBtn:Checked
       ::aRealSelection := ACLONE( ::CurrentForm:Selected )
-    ELSEIF ::CurrentForm:CurObj != NIL
+    ELSE
       ::CurrentForm:Refresh()
       ::CurrentForm:Selected := ACLONE( ::aRealSelection )
       ::aRealSelection := NIL
-      IF ::CurrentForm:CurObj != NIL
-         ::CurrentForm:CurObj:Parent:__CurrentPos := 1
-         ::CurrentForm:CurObj := NIL
-      ENDIF
    ENDIF
    WITH OBJECT ::CurrentForm
       :CtrlOldPt := NIL
@@ -2917,11 +2919,13 @@ METHOD TabOrder( oBtn ) CLASS Project
        ELSE
          :Refresh()
       ENDIF
-      :InRect    := -1
+      :InRect := -1
       :CtrlMask:InvalidateRect()
       :CtrlMask:UpdateWindow()
       :UpdateSelection()
+      :Redraw()
    END
+
 RETURN Self
 
 METHOD ImportImages() CLASS Project
@@ -3035,7 +3039,10 @@ STATIC FUNCTION GetCtrlProps( oCtrl, aExclude )
        IF cProp != "PARENT" .AND. cProp != "OWNER" .AND. ASCAN( aExclude, cProp ) == 0
           TRY
              xValue1 := __objSendMsg( oCtrl, UPPER( cProp ) )
-             xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
+             xValue2 := NIL
+             IF __objHasMsg( oCtrl, "__a_"+cProp )
+                xValue2 := __objSendMsg( oCtrl, UPPER( "__a_"+cProp ) )[4]
+             ENDIF
 
              IF !( xValue1 == xValue2 )
                 IF ( cProp == "DATASOURCE" .OR. cProp == "IMAGELIST" .OR. cProp == "HOTIMAGELIST" .OR. cProp == "IMAGELISTSMALL" .OR. cProp == "CONTEXTMENU" .OR. cProp == "SOCKET" ) .AND. xValue1 != NIL .AND. xValue1:Name != "CommonImageList" .AND. xValue1:Name != "CommonImageListSmall"
@@ -3358,8 +3365,9 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
       ::Application:FileExplorer:AddSource( oWin:Editor )
    ENDIF
 
+   __SetInitialValues( oWin, "Text", "" )
+
    WITH OBJECT oWin
-      :__ClassInst:Text := ""
       :Caption     := :Name
 
       IF lReset // New Window button
@@ -3367,10 +3375,10 @@ METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
             ::CurrentForm:Hide()
          ENDIF
 
-         :Left        := 10
-         :Top         := 10
-         :Width       := 300
-         :Height      := 300
+         :Left   := 10
+         :Top    := 10
+         :Width  := 300
+         :Height := 300
          :Create()
 
          ::CurrentForm := oWin
@@ -3419,30 +3427,20 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       ::DebugStop()
    ENDIF
 
+   IF ::DesignPage == NIL .OR. lClosing
+      RETURN .T.
+   ENDIF
+
+
    lRem := .F.
 
-   ::CurrentForm := NIL
-   ::Application:MainForm:FormEditor1:CtrlMask:CurControl := NIL
-
-   IF ! Empty( ::Forms )
-      FOR n := 1 TO LEN( ::Forms )
-          IF ::Forms[n]:Editor != NIL
-             ::Forms[n]:Editor:Close()
-             ::Forms[n]:Editor:Form := NIL
-             ::Forms[n]:Editor := NIL
-          ENDIF
-          //::Forms[n]:XFMEditor:Close()
-          //::Forms[n]:XFMEditor := NIL
-
-          ::Forms[n]:Destroy()
-          ::Forms[n]:Selected        := NIL
-          ::Forms[n]                 := NIL
-      NEXT
-   ENDIF
+   ::Application:Props[ "ComboSelect" ]:ResetContent()
    ::Application:ObjectTree:ResetContent()
    ::Application:ObjectTree:oApp := NIL
 
    ::Application:ObjectManager:ActiveObject := NIL
+   ::Application:EventManager:ActiveObject := NIL
+
    FOR n := 1 TO LEN( ::Application:ObjectManager:Items )
       ::Application:ObjectManager:Items[n]:Cargo := NIL
       ::Application:ObjectManager:Items[n]:ColItems := NIL
@@ -3453,12 +3451,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
        ::Application:SourceEditor:aDocs[n]:Close()
        n--
    NEXT
-
-   ::Forms := {}
-
-   IF ::DesignPage == NIL .OR. lClosing
-      RETURN .T.
-   ENDIF
 
    ::Application:ToolBox:Disable()
 
@@ -3511,7 +3503,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:DesignPage:Enabled   := .F.
 
    ::Application:Props[ "StartTabPage" ]:Select()
-   ::Application:Props[ "ComboSelect" ]:ResetContent()
 
    ::aUndo := {}
    ::aRedo := {}
@@ -3526,7 +3517,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    ::DesignPage  := .F.
    ::ProjectFile := NIL
-   ::Forms       := {}
    ::Modified    := .F.
    ::Properties  := NIL
    ::Modified    := .F.
@@ -3546,6 +3536,33 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
       ::AppObject:__ColorTable:Unload()
    ENDIF
    ::Application:SaveAsMenu:Enabled := .F.
+
+   ::aImages   := NIL
+   ::AppObject := NIL
+
+   ::CurrentForm := NIL
+   IF ! Empty( ::Forms )
+      FOR n := 1 TO LEN( ::Forms )
+          IF ::Forms[n]:Editor != NIL
+             ::Forms[n]:Editor:Close()
+             ::Forms[n]:Editor:TreeItem:Cargo := NIL
+             ::Forms[n]:Editor:Form := NIL
+             ::Forms[n]:Editor := NIL
+          ENDIF
+          //::Forms[n]:XFMEditor:Close()
+          //::Forms[n]:XFMEditor := NIL
+
+          //::Forms[n]:TreeItem:Cargo := NIL
+          ::Forms[n]:Selected := NIL
+          IF ::Forms[n]:IsWindow()
+             ::Forms[n]:Destroy()
+           ELSE
+             ::Forms[n]:OnNCDestroy()
+          ENDIF
+      NEXT
+   ENDIF
+   ::Forms := {}
+
 
    hb_gcall( .T. )
 RETURN .T.
@@ -3825,7 +3842,8 @@ METHOD Open( cProject ) CLASS Project
    aErrors     := {}
 
    ::AppObject := Application():Init( .T. )
-   ::AppObject:__ClassInst := __ClsInst( ::AppObject:ClassH )
+   ::AppObject:DesignMode := .T.
+   __SetInitialValues( ::AppObject )
 
    oWait:Position := 30
 
@@ -3836,7 +3854,6 @@ METHOD Open( cProject ) CLASS Project
       aChildren   := {}
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
          ::ParseXFM(, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
-         //hb_gcall()
          nLine++
       END
       oWait:Position := 40
@@ -3872,7 +3889,6 @@ METHOD Open( cProject ) CLASS Project
        ENDIF
    NEXT
    FOR EACH cBin IN ::Properties:Binaries
-       view cBin
        IF FILE( cBin )
           ::Application:FileExplorer:AddExtBinary( cBin )
         ELSE
@@ -4058,39 +4074,31 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
       cBkMk := GetPrivateProfileString( "Files", cFile, "", ::Properties:Path + "\" + ::Properties:Name + ".vxh")
 
-      ::CurrentForm := oForm
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
 
       ::Application:SourceEditor:Source := oForm:Editor
       oForm:Editor:Open( cSourcePath + "\" + cObjectName + ".prg", cBkMk )
-      //oForm:XFMEditor:Open( cSourcePath + "\" + cObjectName + ".xfm" )
-      //oForm:XFMEditor:lReadOnly := .T.
    ENDIF
 
    oForm:__lLoading := .T.
 
    IF lLoadProps
+      ::CurrentForm := oForm
       nLine := 1
       DEFAULT aErrors  TO {}
       DEFAULT aEditors TO {}
-      //hb_gcall()
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
          ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
          nLine++
       END
+      aChildren := NIL
     ELSEIF aErrors != NIL
       oForm:Name := cObjectName
       oForm:Cargo := cFile
    ENDIF
    FClose( hFile )
 
-   //oForm:__IdeContextMenuItems := { { "View XFM", {|| oForm:XFMEditor:Owner:Parent:Select(), oForm:XFMEditor:Select() } } }
-
    ::Application:ObjectTree:Set( oForm )
-   IF oForm:Editor:TreeItem == NIL
-      oForm:Editor:TreeItem := oForm:TreeItem:AddItem( oForm:Editor:FileName, ::Application:ObjectTree:nPrgImg,, TVI_FIRST )
-      oForm:Editor:TreeItem:Cargo := oForm:Editor
-   ENDIF
 
    ::Application:FileExplorer:AddSource( oForm:Editor )
 
@@ -5099,7 +5107,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
    DEFAULT cPrev TO ""
    DEFAULT cText TO ""
 
-   IF oCtrl:__ClassInst != NIL
+   IF oCtrl:DesignMode
       IF hOleVars == NIL
          aProperties := __ClsGetPropertiesAndValues( oCtrl )
        ELSE
@@ -5135,7 +5143,10 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    xValue2 := 0
                  ELSE
                    xValue1 := __objSendMsg( oCtrl, UPPER( cProp ) )
-                   xValue2 := __objSendMsg( oCtrl:__ClassInst, UPPER( cProp ) )
+                   xValue2 := xValue1
+                   IF __objHasMsg( oCtrl, "__a_"+cProp )
+                      xValue2 := __objSendMsg( oCtrl, UPPER( "__a_"+cProp ) )[4]
+                   ENDIF
                 ENDIF
 
               ELSE
@@ -6119,7 +6130,6 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
            IF !(o == ::CurrentForm)
               TRY
                  o:CtrlMask:Points := NIL
-                 o:CtrlMask:CurControl := NIL
                  o:CtrlMask:InvalidateRect()
                  o:CtrlMask:UpdateWindow()
                CATCH
@@ -6128,6 +6138,7 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
            ENDIF
            ::Application:Props[ "ComboSelect" ]:Reset()
            ::Application:Project:Modified := .T.
+           hb_gcAll(.t.)
            RETURN Self
 
       CASE DG_MOVESELECTION
@@ -6932,7 +6943,7 @@ RETURN Self
    RETURN Self
 
    METHOD WebNavigate( Url ) CLASS WebBrowser
-      IF ::__ClassInst == NIL .AND. ::hObj != NIL
+      IF ! ::DesignMode .AND. ::hObj != NIL
          ::Navigate( Url )
       ENDIF
    RETURN Self

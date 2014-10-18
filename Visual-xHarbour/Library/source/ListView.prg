@@ -85,7 +85,7 @@ CLASS ListView INHERIT TitleControl
    PROPERTY AutoArrange    SET ::SetStyle( LVS_AUTOARRANGE, v )          DEFAULT .F.
    PROPERTY ShowSelAlways  SET ::SetStyle( LVS_SHOWSELALWAYS, v )        DEFAULT .F.
    PROPERTY SingleSel      SET ::SetStyle( LVS_SINGLESEL, v )            DEFAULT .F.
-   
+
    PROPERTY BackColor      ROOT "Colors" SET ::SetBackColor(v)
    PROPERTY ForeColor      ROOT "Colors" SET ::SetForeColor(v)
    PROPERTY ViewStyle      SET ::__SetViewStyle(v) DEFAULT LVS_ICON
@@ -135,10 +135,9 @@ METHOD Init( oParent ) CLASS ListView
    ::Super:Init( oParent )
    ::Width        := 245
    ::Height       := 153
-//   ::ExStyle      := WS_EX_STATICEDGE
    ::ClientEdge   := .T.
-   IF ::__ClassInst != NIL
-      ::__ClassInst:xClientEdge   := .T.
+   IF ::DesignMode
+      __SetInitialValues( Self, "ClientEdge", .T. )
    ENDIF
    ::ClipSiblings := .T.
    ::TabStop      := .T.
@@ -159,7 +158,7 @@ METHOD Create( lNew ) CLASS ListView
    ::Super:Create()
    DEFAULT lNew TO .F.
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "Add Group", {|o| o:=ListViewGroup( Self ),;
                                                    ::Application:Project:Modified := .T.,;
                                                    o:Text := o:Name,;
@@ -188,7 +187,7 @@ METHOD Create( lNew ) CLASS ListView
    IF ::xBackColor != NIL
       ::SetBackColor( ::xBackColor )
    ENDIF
-   
+
    ::__SetViewStyle()
    DEFAULT ::xBackColor TO ::SendMessage( LVM_GETBKCOLOR, 0, 0 )
    DEFAULT ::xForeColor TO ::SendMessage( LVM_GETTEXTCOLOR, 0, 0 )
@@ -238,7 +237,7 @@ RETURN cStr
 METHOD SetDataSource( oSource ) CLASS ListView
    LOCAL aField, n, nAlign
    oSource := __ChkComponent( Self, oSource )
-   
+
    ::xDataSource := oSource
 
    IF VALTYPE( oSource )=="O" .AND. oSource:IsOpen
@@ -346,7 +345,7 @@ METHOD SortItems( nColumn, lAscending ) CLASS ListView
       __ListViewSortColumn( ::hWnd, nColumn, lAscending )
    ENDIF
 RETURN Self
-    
+
 //--------------------------------------------------------------------------------------------------------
 
 METHOD AddColumn( cText, nWidth, nAlign )
@@ -382,18 +381,18 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS ListView
    LOCAL nmia, pnkd, lCopy := .F., lpnmh := (struct NMHDR*) nlParam, pnmv
    (nwParam)
    SWITCH lpnmh:code
-      CASE NM_RCLICK 
+      CASE NM_RCLICK
            nmia := (struct NMITEMACTIVATE*) nlParam
            ::CurPos := nmia:iItem + 1
            ExecuteEvent( "OnRButtonUp", Self )
            EXIT
 
-      CASE NM_CLICK 
+      CASE NM_CLICK
            nmia := (struct NMITEMACTIVATE*) nlParam
            ::CurPos := nmia:iItem + 1
            ExecuteEvent( "OnClick", Self )
            EXIT
-           
+
       CASE LVN_KEYDOWN
            pnkd = (struct NMLVKEYDOWN*) nlParam
            ::wParam := pnkd:wVKey
@@ -498,9 +497,9 @@ METHOD Create() CLASS ListViewColumn
    lvc:fmt        := ::Align
    lvc:cx         := ::Width
    ::Index        := LEN(::Parent:Columns)
-   
+
    AADD( ::Parent:Columns, Self )
-   
+
    ListViewInsertColumn( ::Parent:hWnd, ::Index, lvc:Value )
 RETURN Self
 

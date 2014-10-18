@@ -65,6 +65,7 @@ CLASS TreeViewItem INHERIT Object
    METHOD GetExpandedCount()
    METHOD SetImageIndex()
    METHOD SetOwner()
+   METHOD SetPosition()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -92,7 +93,7 @@ METHOD Create( lSetOwner ) CLASS TreeViewItem
    tvis:item:iSelectedImage := IIF( ::HotImageIndex == NIL, ::ImageIndex-1, ::HotImageIndex-1 )
 
    ::hItem := SendMessage( ::Parent:hWnd, TVM_INSERTITEM, 0, tvis )
-   
+
    IF !lSetOwner
       nPos := 0
       IF ::InsertAfter != TVI_LAST
@@ -176,6 +177,28 @@ METHOD SetItemState( nState ) CLASS TreeViewItem
 
 RETURN Self
 
+METHOD SetPosition( nPos ) CLASS TreeViewItem
+   LOCAL hOldItem, tvis := (struct TV_INSERTSTRUCT)
+
+   hOldItem := ::hItem
+
+   tvis:hParent             := ::Owner:hItem
+   tvis:hInsertAfter        := IIF( nPos == 1, TVI_FIRST, ::Parent:Items[nPos-1]:hItem )
+
+   tvis:item:mask           := TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE
+   tvis:item:pszText        := ::Text
+   tvis:item:cchTextMax     := MAX_PATH + 1
+   tvis:item:iImage         := ::ImageIndex-1
+   tvis:item:iSelectedImage := IIF( ::HotImageIndex == NIL, ::ImageIndex-1, ::HotImageIndex-1 )
+
+   ::hItem := SendMessage( ::Parent:hWnd, TVM_INSERTITEM, 0, tvis )
+
+   TVDeleteItem( ::Parent:handle, hOldItem )
+
+   AEVAL( ::Items, {|o,n| o:SetPosition(n)} )
+
+RETURN Self
+
 //----------------------------------------------------------------------------//
 
 METHOD AddItem( cPrompt, nImage, aColItems, hAfter ) CLASS TreeViewItem
@@ -215,24 +238,23 @@ RETURN Self
 
 METHOD Delete() CLASS TreeViewItem
    LOCAL n
+
+   TVDeleteItem( ::Parent:handle, ::hItem )
+
    FOR n := 1 TO LEN( ::Items )
        ::Items[n]:Delete()
+       n--
    NEXT
-   
+
    IF ::Owner != NIL .AND. ( n := ASCAN( ::Owner:Items, {|o|o:hItem == ::hItem } ) ) > 0
       ADEL( ::Owner:Items, n, .T. )
    ENDIF
 
-   TRY
-      TVDeleteItem( ::Parent:handle, ::hItem )
-   CATCH
-   END
-   ::Cargo    := NIL
-   ::ColItems := NIL
-   ::Parent   := NIL
-   ::Owner    := NIL
-   ::Items := {}
-return( len( ::Items) )
+   //::Cargo    := NIL
+   //::ColItems := NIL
+   //::Owner    := NIL
+   //::Items    := {}
+RETURN NIL
 
 //----------------------------------------------------------------------------//
 

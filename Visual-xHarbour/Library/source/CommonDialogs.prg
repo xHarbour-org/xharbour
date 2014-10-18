@@ -159,7 +159,7 @@ METHOD Init( oParent ) CLASS OpenFileDialog
    ::ClsName     := "OpenFileDialog"
    ::ComponentType := "CommonDialog"
    Super:Init( oParent )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::FileName := ::Name
    ENDIF
 RETURN Self
@@ -257,7 +257,7 @@ METHOD Init( oParent ) CLASS SaveFileDialog
    ::ClsName     := "SaveFileDialog"
    ::ComponentType := "CommonDialog"
    Super:Init( oParent )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::FileName := ::Name
    ENDIF
 RETURN Self
@@ -410,7 +410,7 @@ METHOD Init( oParent ) CLASS FontDialog
    Super:Init( oParent )
 
    ::Font := Font( Self )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Font:Create()
    ENDIF
 RETURN Self
@@ -427,15 +427,16 @@ CLASS FontDialogFont
    PROPERTY Name
    DATA Owner       EXPORTED
    DATA ClsName     EXPORTED INIT "FontDialogFont"
-   DATA __ClassInst EXPORTED
    ACCESS Parent INLINE ::Owner
+   ACCESS DesignMode INLINE IIF( ::Owner != NIL, ::Owner:DesignMode, .F. )
+
    METHOD Init() CONSTRUCTOR
    METHOD Choose() INLINE ::Owner:Show()
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS FontDialogFont
    ::Owner     := oOwner
-   ::__ClassInst := __ClsInst( ::ClassH )
+   __SetInitialValues( Self )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------

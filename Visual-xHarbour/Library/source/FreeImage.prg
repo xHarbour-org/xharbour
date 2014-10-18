@@ -17,6 +17,8 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
    PROPERTY Alignment   SET ::Update()                 DEFAULT 1
    PROPERTY Border      SET ::SetStyle( WS_BORDER, v ) DEFAULT .F.
 
+   ACCESS DesignMode    INLINE IIF( ::Parent != NIL, ::Parent:DesignMode, .F. )
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnDestroy()           INLINE ::Panel:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
@@ -37,7 +39,7 @@ METHOD Init( oParent ) CLASS FreeImage
    ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::IsContainer   := .T.
    ::ControlParent := .T.
-   IF ::Parent:__ClassInst != NIL
+   IF ::Parent:DesignMode
       ::__ExplorerFilter := __GetSystem():FreeImageFormats
    ENDIF
 RETURN Self
@@ -112,7 +114,6 @@ CLASS FreeImageRenderer
    DATA ClsName         EXPORTED INIT "FreeImageRenderer"
    DATA __xCtrlName     EXPORTED INIT "FreeImage"
    DATA __IsInstance    EXPORTED INIT .F.
-   DATA __ClassInst     EXPORTED
    DATA __cData         PROTECTED
    DATA hDIB            EXPORTED
 
@@ -128,8 +129,9 @@ CLASS FreeImageRenderer
                                           "Left - Center" }, {1,2,3,4,5,6,7,8,9,10} }
    DATA __ExplorerFilter INIT {}
 
-   ACCESS ImageWidth       INLINE IIF( ::hDIB != NIL, FreeImageGetWidth( ::hDIB ), 0 )
-   ACCESS ImageHeight      INLINE IIF( ::hDIB != NIL, FreeImageGetHeight( ::hDIB ), 0 )
+   ACCESS ImageWidth    INLINE IIF( ::hDIB != NIL, FreeImageGetWidth( ::hDIB ), 0 )
+   ACCESS ImageHeight   INLINE IIF( ::hDIB != NIL, FreeImageGetHeight( ::hDIB ), 0 )
+   ACCESS DesignMode    INLINE IIF( ::Owner != NIL, ::Owner:DesignMode, .F. )
 
    METHOD Init()   CONSTRUCTOR
    METHOD Kill()   INLINE FreeImageUnload( ::hDIB ), ::hDIB := NIL
@@ -139,7 +141,7 @@ CLASS FreeImageRenderer
    METHOD Draw()
    METHOD LoadResource()
    METHOD LoadFromString()
-   METHOD Destroy()            INLINE IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ), ), NIL
+   METHOD Destroy()            INLINE ::Owner := NIL, IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ), ), NIL
    METHOD SetMargins()
 ENDCLASS
 
@@ -177,7 +179,7 @@ METHOD SetMargins( cMargins ) CLASS FreeImageRenderer
 
    ::Update()
 
-   IF ::__ClassInst != NIL .AND. oApp:ObjectManager != NIL
+   IF ::DesignMode .AND. oApp:ObjectManager != NIL
       oApp:ObjectManager:PostMessage( WM_USER + 4766 )
    ENDIF
 
@@ -185,13 +187,8 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner ) CLASS FreeImageRenderer
-   LOCAL cSupp := ""
    ::Owner := oOwner
-   IF ::Owner:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance  := .T.
-      ::__ExplorerFilter := __GetSystem():FreeImageFormats
-   ENDIF
+   __SetInitialValues( Self )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
@@ -417,7 +414,7 @@ RETURN Self
 METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
    LOCAL cType, cPrev
    IF VALTYPE( cFile ) == "A"
-      cFile := IIF( ::__ClassInst != NIL .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
+      cFile := IIF( ::DesignMode .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF
    ::lTransparentSet := .F.
    IF ::hDIB != NIL
@@ -436,7 +433,7 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
       ::xImageName := NIL
    ENDIF
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       IF !EMPTY( cPrev )
          ::Owner:Application:Project:RemoveImage( cPrev, Self )
       ENDIF

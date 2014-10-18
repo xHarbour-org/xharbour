@@ -118,7 +118,7 @@ METHOD Init( oOwner ) CLASS SerialPort
    ::ClsName       := "SerialPort"
    ::ComponentType := "SerialPort"
    ::Super:Init( oOwner )
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__SerialControlProc" ), Self )
    ENDIF
    ::__nTimID := ::Owner:__Timers ++

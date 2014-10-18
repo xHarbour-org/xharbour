@@ -87,17 +87,17 @@ RETURN Self
 METHOD __SetImageName( cFile ) CLASS Animation
    LOCAL cType, cPrev
    IF VALTYPE( cFile ) == "A"
-      cFile := IIF( ::__ClassInst != NIL .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
+      cFile := IIF( ::DesignMode .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF
    cPrev := ::xImageName
-   
+
    IF !EMPTY( cFile )
       ::Open( cFile )
     ELSE
       ::xImageName := NIL
    ENDIF
 
-   IF ::__ClassInst != NIL 
+   IF ::DesignMode
       IF !EMPTY( cPrev )
          ::Application:Project:RemoveImage( cPrev, Self )
       ENDIF
@@ -111,7 +111,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS Animation
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Style := ::Style & NOT( ACS_AUTOPLAY )
    ENDIF
    ::Super:Create()

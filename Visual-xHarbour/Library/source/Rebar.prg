@@ -39,7 +39,7 @@ CLASS CoolBar FROM Control
    DATA hWndBand             PROTECTED
    DATA rbi                  PROTECTED
    DATA nmr                  PROTECTED
-  
+
    DATA AllowUnDock          EXPORTED INIT FALSE
    DATA AllowClose           EXPORTED INIT FALSE
    METHOD Init() CONSTRUCTOR
@@ -90,7 +90,7 @@ RETURN SELF
 METHOD Create() CLASS CoolBar
    ::Super:Create()
    //SetClassLong( ::hWnd, GCL_STYLE, GetClassLong( ::hWnd, GCL_STYLE ) & NOT( CS_VREDRAW + CS_HREDRAW ) )
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add CoolBar Band", {|o| o := CoolBarBand( Self ):Create(), o:Break := .T.,;
                                                              ::Application:Project:Modified := .T.,;
                                                              ::Application:Project:CurrentForm:SelectControl(o) } },;
@@ -309,7 +309,7 @@ METHOD UpdateSize() CLASS CoolBar
          ENDIF
       NEXT
       EndDeferWindowPos( hDef )
-      
+
       IF ::Parent:ClsName == "Vxh_Form" .AND. ::Parent:MDIClient != NIL
          PostMessage( ::Parent:hWnd, WM_SIZE, 0, MAKELPARAM( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
          RETURN 0
@@ -372,14 +372,14 @@ CLASS CoolBarBand INHERIT Control
    DATA ToolTip        PROTECTED
    DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
-   
-   ACCESS Height INLINE ::xMinHeight   
+
+   ACCESS Height INLINE ::xMinHeight
    DATA Left           EXPORTED INIT 0
    DATA Top            EXPORTED INIT 0
-   
+
    DATA __IsInstance     EXPORTED INIT .F.
    DATA lCreated       PROTECTED INIT .F.
-   
+
    DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.t.,.F.,.F.}
    DATA __lMoveable            EXPORTED INIT .F.
    DATA __lCopyCut             EXPORTED INIT .F.
@@ -442,23 +442,16 @@ METHOD Init( oParent ) CLASS CoolBarBand
    ::oStruct:fMask      := RBBIM_STYLE | RBBIM_ID
    ::oStruct:fStyle     := RBBS_NOVERT | RBBS_GRIPPERALWAYS
    ::oStruct:wID        := LEN( oParent:Bands )
-   
+
    ::ClsName            := "CoolBarBand"
 
    ::Font := Font( Self )
-   IF ::__ClassInst != NIL 
-      ::Font:__ClassInst := __ClsInst( ::Font:ClassH )
-      ::Font:__ClassInst:__IsInstance := .T.
-   ENDIF
-   
    ::Font:Create()
 
    ::__CreateProperty( "Band" )
    AADD( ::Parent:Bands, Self )
-   IF /*::Application:IdeActive .AND. */::Parent:__ClassInst != NIL
-      ::__ClassInst := __ClsInst( ::ClassH )
-      ::__ClassInst:__IsInstance := .T.
-   ENDIF
+
+   __SetInitialValues( Self )
 RETURN Self
 
 METHOD Create() CLASS CoolBarBand
@@ -529,10 +522,10 @@ RETURN SELF
 METHOD SetChild( oChild, lInit ) CLASS CoolBarBand
    LOCAL aExt, oOwner
    DEFAULT lInit TO .F.
-   
+
    IF oChild != NIL
       oChild := __ChkComponent( Self, oChild )
-      
+
       IF !lInit .AND. oChild:Owner != NIL
          oOwner := oChild:Owner
          oOwner:BandChild := NIL
@@ -547,7 +540,7 @@ METHOD SetChild( oChild, lInit ) CLASS CoolBarBand
 
       IF oChild != NIL .AND. ( oChild:__xCtrlName == "CoolMenu" .OR. ASCAN( oChild:Children, {|o|o:ClsName == "ComboBox"} ) > 0 )
          aExt := ::Parent:Drawing:GetTextExtentPoint32( "A" )
-         IF aExt[2]+6 > ::MinHeight 
+         IF aExt[2]+6 > ::MinHeight
             ::MinHeight := aExt[2]+6
          ENDIF
          IF oChild:Height > ::MinHeight
@@ -663,7 +656,7 @@ METHOD GetRect() CLASS CoolBarBand
    rc := ::Parent:GetBandRect( ::Index )
    pt := (struct POINT)
    pt:x := rc:left
-   pt:y := rc:top 
+   pt:y := rc:top
    ClientToScreen( ::Parent:hWnd, @pt )
    rc:left := pt:x
    rc:top  := pt:y
@@ -896,7 +889,7 @@ METHOD Create() CLASS FloatingToolBar
 
    oTool:SetStyle( TBSTYLE_TRANSPARENT )
 
-   ::Band:BandChild := oTool 
+   ::Band:BandChild := oTool
    ::Band:Create()
    oBar:Show()
 
@@ -916,7 +909,7 @@ RETURN SELF
 
 METHOD OnMove( x, y ) CLASS FloatingToolBar
    LOCAL oBand, pt, oControl
-   
+
    pt := (struct POINT)
    pt:x  := x
    pt:y  := y-18

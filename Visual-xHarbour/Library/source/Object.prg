@@ -36,7 +36,6 @@ CLASS Object
    DATA __lCreateAfterChildren EXPORTED INIT .F.
 
    DATA __ForceSysColor        EXPORTED INIT .F.
-   DATA __ClassInst            EXPORTED
    DATA __lCopyCut             EXPORTED INIT .T.
    DATA __IsControl            EXPORTED INIT .F.
    DATA __IsStandard           EXPORTED INIT .F.
@@ -65,7 +64,15 @@ CLASS Object
    DATA __InstApp              EXPORTED
    DATA xName                  EXPORTED
 
-   ACCESS ColorScheme          INLINE IIF( ::__ClassInst != NIL, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
+
+   //------------------------------------------------------
+   DATA lDesignMode            EXPORTED INIT .F.
+   ACCESS DesignMode           INLINE IIF( ::Form != NIL, ::Form:lDesignMode, .F. )
+   ASSIGN DesignMode(l)        INLINE ::lDesignMode := l
+   //------------------------------------------------------
+
+
+   ACCESS ColorScheme          INLINE IIF( ::DesignMode, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
 
    ACCESS Application          INLINE IIF( ::__InstApp != NIL, ::__InstApp, __GetApplication() )
    ACCESS System               INLINE __GetSystem()
@@ -151,7 +158,7 @@ METHOD __SetCtrlName(c) CLASS Object
       ENDIF
       ::xName := c
    ENDIF
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
    ENDIF
 RETURN c
@@ -204,7 +211,7 @@ RETURN Self
 METHOD Create() CLASS Object
    LOCAL nRet := ExecuteEvent( "OnInit", Self )
 
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
    ENDIF
    IF VALTYPE( nRet ) == "N" .AND. nRet == 0
@@ -232,27 +239,27 @@ METHOD SetTabOrder( nTabOrder ) CLASS Object
    LOCAL n, hAfter
    DEFAULT nTabOrder TO 0
    IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
-      TRY
-         IF nTabOrder == 1
-            hAfter := HWND_TOP
-          ELSE
-            hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
-         ENDIF
-      CATCH
-      END
-      IF ::__ClassInst != NIL
-         ::Application:ObjectTree:MoveItem( ::TreeItem, nTabOrder, ::Parent:TreeItem )
-
+      IF nTabOrder == 1
+         hAfter := HWND_TOP
+       ELSE
+         hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
+      ENDIF
+      IF ::DesignMode
          ADEL( ::Parent:Children, ::xTabOrder, .T. )
          IF nTabOrder > LEN( ::Parent:Children )
             AADD( ::Parent:Children, Self )
+            nTabOrder := LEN( ::Parent:Children )
           ELSE
             AINS( ::Parent:Children, nTabOrder, Self, .T. )
          ENDIF
+
+         //::TreeItem:SetPosition( nTabOrder )
+         ::TreeItem := ::Application:ObjectTree:MoveItem( ::TreeItem, nTabOrder, ::Parent:TreeItem )
+
          FOR n := 1 TO LEN( ::Parent:Children )
              ::Parent:Children[n]:xTabOrder := n
-             IF ::Parent:Children[n]:__ClassInst != NIL
-                ::Parent:Children[n]:__ClassInst:xTabOrder := n
+             IF ::Parent:Children[n]:DesignMode
+                __SetInitialValues( Self, "TabOrder", n )
              ENDIF
          NEXT
       ENDIF

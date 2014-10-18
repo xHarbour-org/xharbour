@@ -49,18 +49,18 @@ CLASS ImageList INHERIT Component
    METHOD GetBitmap( nIndex )
    METHOD __RefreshHandle()
    METHOD GetImages()
-   
+
    METHOD BeginDrag(i,x,y)    INLINE ImageListBeginDrag( ::Handle, i, x, y )
    METHOD EndDrag()           INLINE ImageListEndDrag()
    METHOD DragMove(x,y)       INLINE ImageListDragMove( x, y )
    METHOD DragEnter(hWnd,x,y) INLINE ImageListDragEnter( hWnd, x, y )
    METHOD DragShowNolock(l)   INLINE ImageListDragShowNolock(l)
    METHOD RemoveAll()         INLINE ImageListRemoveAll( ::Handle )
-   
+
    METHOD ComboBox( oParent ) INLINE __ImageListComboBox( oParent, Self )
    METHOD DrawIndirect()
    METHOD SaveImage(n, cFile) INLINE ImageListSaveImage( ::Handle, n-1, cFile )
-   
+
    METHOD InvalidateRect()    INLINE NIL
 ENDCLASS
 
@@ -70,7 +70,7 @@ METHOD Init( oOwner, x, y, nPalette, lAdd ) CLASS ImageList
    ::__xCtrlName := "ImageList"
    ::ComponentType := "ImageList"
    ::ClsName := "ImageList"
-   
+
    DEFAULT lAdd TO .T.
    IF lAdd
       ::Super:Init( oOwner )
@@ -99,7 +99,7 @@ METHOD Create() CLASS ImageList
           ENDIF
       NEXT
    ENDIF
-   
+
    ::Handle := ImageListCreate( ::IconWidth, ::IconHeight, nStyle, 1, 0 )
    FOR EACH aImage IN ::Images
        ::AddImage( aImage[1], aImage[2], aImage[3], aImage[4], aImage[5], aImage[6], .F. )
@@ -115,6 +115,7 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS ImageList
    ImageListDestroy( ::Handle )
+   ::Owner := NIL
    IF ::__lAdd
       ::Super:Destroy()
    ENDIF
@@ -181,13 +182,13 @@ METHOD AddImage( cImage, nMask, hInst, nLoad, nType, cFile, lAdd, lParser ) CLAS
    DEFAULT lParser TO .F.
 
    hInst := ::AppInstance
-   
+
    IF lParser
       cImage := cFile
       nLoad  := LR_LOADFROMFILE //| LR_CREATEDIBSECTION
    ENDIF
 
-   IF ::__ClassInst != NIL 
+   IF ::DesignMode
       IF AT( "\", cImage ) == 0
          DirChange( ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Resource )
       ENDIF
@@ -280,7 +281,7 @@ METHOD DrawDisabled( hDC, nIndex, x, y, hBrush ) CLASS ImageList
 RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
-#define ILD_DPISCALE 0x4000 
+#define ILD_DPISCALE 0x4000
 #define ILS_ALPHA    0x00000008
 #define ILS_SHADOW   0x00000002
 #define ILS_SATURATE 0x00000004
@@ -306,7 +307,7 @@ METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled ) CLASS ImageList
    ildp:yBitmap := yBmp
    ImageListDrawIndirect( ildp )
 RETURN SELF
-   
+
 //----------------------------------------------------------------------------------------------------
 
 METHOD DrawImage( hDC, nIndex, x, y, nFlags, nColor ) CLASS ImageList

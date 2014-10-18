@@ -124,7 +124,7 @@
 CLASS ExplorerBar INHERIT Control
    DATA BackColor          EXPORTED
    DATA ForeColor          EXPORTED
-   
+
    DATA __nHeight          EXPORTED INIT 0
    DATA __hImageListTitle  EXPORTED
    DATA __hImageListButton EXPORTED
@@ -161,7 +161,7 @@ METHOD Init( oParent ) CLASS ExplorerBar
    ::Top           := 0
    ::Height        := 400
    ::__lResizeable := {.F.,.F.,.F.,.T.,.F.,.F.,.F.,.T.}
-   IF ::__ClassInst != NIL
+   IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add Expando", {|| ::__AddTaskPanel()} } }
    ENDIF
    ::ThemeName := "EXPLORERBAR"
@@ -344,7 +344,7 @@ METHOD Create() CLASS Expando
    ::SetExpand( ::Expanded )
 
    ::Parent:OriginalRect[4] := ( ::Top + ::Height + ::System:ExplorerBar:headernormal:rcTLPadding:top )
-   //IF ::__ClassInst == NIL //::Parent:OriginalRect[4] > ::Parent:Height
+   //IF ! ::DesignMode //::Parent:OriginalRect[4] > ::Parent:Height
       ::Parent:__SetScrollBars()
    //ENDIF
 RETURN Self
@@ -374,7 +374,7 @@ METHOD Expand( lExpand, lForce ) CLASS Expando
             IF !lForce
                ::Parent:OriginalRect[4] -= ( ::Height - ::HeaderHeight )
             ENDIF
-            IF ::__ClassInst != NIL
+            IF ::DesignMode
                ::__nHeight := ::Height
                ::__lSave := .F.
             ENDIF
@@ -399,7 +399,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Expando
    LOCAL n
    Super:OnSize( nwParam, nlParam )
    ::InvalidateRect()
-   IF ::__ClassInst != NIL .AND. ::__lSave
+   IF ::DesignMode .AND. ::__lSave
       ::__nHeight := ::Height
    ENDIF
    ::__lSave := .T.
@@ -412,7 +412,7 @@ RETURN 0
 
 METHOD __OnParentSize( x ) CLASS Expando
    ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth
-   IF ::__ClassInst == NIL .AND. ::Parent:Height < ::Parent:OriginalRect[4] .AND. ( x - GetSystemMetrics( SM_CXVSCROLL ) ) < ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:right + ::System:ExplorerBar:headernormal:rcTLPadding:left
+   IF ! ::DesignMode .AND. ::Parent:Height < ::Parent:OriginalRect[4] .AND. ( x - GetSystemMetrics( SM_CXVSCROLL ) ) < ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:right + ::System:ExplorerBar:headernormal:rcTLPadding:left
       ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth - GetSystemMetrics( SM_CXVSCROLL )
    ENDIF
    ::MoveWindow( , ::OriginalRect[2] - ::Parent:VertScrollPos )
@@ -596,7 +596,7 @@ METHOD __SetSizePos( nPos, nVal ) CLASS Expando
             nVal := ::Height
          ENDIF
          ::xHeight := nVal
-         IF ::__ClassInst != NIL
+         IF ::DesignMode
             ::Application:ObjectManager:CheckValue( "Height", "Size", ::PaneHeight )
          ENDIF
          EXIT

@@ -56,13 +56,13 @@ CLASS NotifyIcon INHERIT Component
                                                  { "OnRButtonDown"     , "", "" },;
                                                  { "OnRButtonUp"       , "", "" };
                                                  } } }
-   
+
    METHOD Init() CONSTRUCTOR
    METHOD SetVisible()
    METHOD SetBalloonTipIcon()
    METHOD __SetIcon()
    METHOD __SetText()
-   METHOD Destroy() INLINE IIF( ::__ClassInst == NIL, ::Visible := .F.,), Super:Destroy()
+   METHOD Destroy() INLINE IIF( ! ::DesignMode, ::Visible := .F.,), Super:Destroy()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD SetVisible( lVisible ) CLASS NotifyIcon
    LOCAL lOpen, tray := (struct NOTIFYICONDATA)
-   IF ::__ClassInst == NIL
+   IF ! ::DesignMode
       DEFAULT ::Id   TO ::Owner:GetNextControlId()
       tray:cbSize           := NOTIFYICONDATA_V2_SIZE
       tray:hWnd             := ::Owner:hWnd
@@ -96,7 +96,7 @@ METHOD SetVisible( lVisible ) CLASS NotifyIcon
          IF !EMPTY( ::Icon )
             SWITCH VALTYPE( ::Icon )
                CASE "A"
-                    IF ::__ClassInst == NIL .OR. EMPTY( ::Icon[1] )
+                    IF ! ::DesignMode .OR. EMPTY( ::Icon[1] )
                        ::__hIcon := LoadIcon( ::AppInstance, ::Icon[2] )
                        ::xIcon := ::Icon[2]
                      ELSE
@@ -137,7 +137,7 @@ RETURN Self
 
 METHOD __SetText( cText ) CLASS NotifyIcon
    LOCAL tray
-   IF ::__ClassInst == NIL .AND. ::Owner != NIL .AND. ::Owner:hWnd != NIL
+   IF ! ::DesignMode .AND. ::Owner != NIL .AND. ::Owner:hWnd != NIL
       tray := (struct NOTIFYICONDATA)
       tray:cbSize := NOTIFYICONDATA_V2_SIZE
       tray:hWnd   := ::Owner:hWnd
@@ -157,7 +157,7 @@ METHOD __SetIcon( cIcon ) CLASS NotifyIcon
 
    SWITCH VALTYPE( cIcon )
       CASE "A"
-           IF ::__ClassInst == NIL .OR. EMPTY( cIcon[1] )
+           IF ! ::DesignMode .OR. EMPTY( cIcon[1] )
               ::__hIcon := LoadIcon( ::AppInstance, cIcon[2] )
               cIcon := cIcon[2]
             ELSE
@@ -165,7 +165,7 @@ METHOD __SetIcon( cIcon ) CLASS NotifyIcon
               cIcon := cIcon[1]
            ENDIF
            EXIT
-           
+
       CASE "C"
            //::__hIcon := LoadImage( ::AppInstance, cIcon, IMAGE_ICON,,, LR_LOADFROMFILE )
            ::__hIcon := LoadImage( ::AppInstance, cIcon, IMAGE_ICON,,, IIF( AT( ".ico", LOWER(cIcon) )>0,LR_LOADFROMFILE,) )
@@ -175,7 +175,7 @@ METHOD __SetIcon( cIcon ) CLASS NotifyIcon
            ::__hIcon := cIcon
            EXIT
    END
-   IF ::__ClassInst == NIL .AND. ( ::__hIcon != NIL .OR. ::Owner:__hIcon != NIL )
+   IF ! ::DesignMode .AND. ( ::__hIcon != NIL .OR. ::Owner:__hIcon != NIL )
       tray := (struct NOTIFYICONDATA)
       tray:cbSize           := NOTIFYICONDATA_V2_SIZE
       tray:hIcon            := IIF( ::__hIcon != NIL, ::__hIcon, ::Owner:__hIcon )
@@ -185,8 +185,8 @@ METHOD __SetIcon( cIcon ) CLASS NotifyIcon
       tray:uCallbackMessage := ::Message
       Shell_NotifyIcon( NIM_MODIFY, tray )
    ENDIF
-   
-   IF ::__ClassInst != NIL 
+
+   IF ::DesignMode
       IF !EMPTY( ::xIcon ) .AND. EMPTY( cIcon )
          ::Application:Project:RemoveImage( ::xIcon, Self )
       ENDIF
@@ -200,4 +200,3 @@ RETURN Self
 METHOD SetBalloonTipIcon(n) CLASS NotifyIcon
    ::xBalloonTipIcon := n
 RETURN Self
-         
