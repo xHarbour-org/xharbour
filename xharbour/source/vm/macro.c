@@ -526,8 +526,8 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       HB_MACRO       struMacro;
       int            iStatus;
       const char *   szString;
-      char       *   szCopy = NULL;
-      BOOL           bAlloc = FALSE;
+      char       *   szCopy;
+      BOOL           bAlloc;
       
       HB_SIZE        ulLength = pItem->item.asString.length;
 
@@ -580,6 +580,8 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       }
 
 #ifdef HB_MACRO_STATEMENTS
+      szCopy = NULL;
+      bAlloc = FALSE;
       if( struMacro.supported & HB_SM_PREPROC )
       {
          char * ptr;
