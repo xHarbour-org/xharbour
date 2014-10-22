@@ -1,0 +1,14 @@
+xbp
+*.log
+*.ppo
+tproject.c
+.DS_Store
+tproject.obj
+*.prg.bak
+._Changelog
+._gui.c
+._tproject.prg
+._xbuild.exe.xbp
+._xbuild.prg
+._xbuild.rc
+._xbuild.xml
