@@ -1,0 +1,10 @@
+*.log
+*.ppo
+.DS_Store
+._*
+dNews.c
+dnews.MAP
+dNews.obj
+Users.dat
+xbuild.windows.ini
+*.exe
