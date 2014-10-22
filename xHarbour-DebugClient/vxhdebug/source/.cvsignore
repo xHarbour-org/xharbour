@@ -1,0 +1,7 @@
+*.ppo
+*.prg.bak
+._gtkdgui.prg
+._vxhdapp.prg
+._vxhdebug.prg
+._vxhdgui.prg
+._vxhdmon.prg
