@@ -557,11 +557,11 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
    {
       HB_MACRO       struMacro;
       int            iStatus;
-      const char *   szString;
-      char       *   szCopy;
-      BOOL           bAlloc;
+      char *   szString;
       
-      HB_SIZE        ulLength = pItem->item.asString.length;
+
+      
+//       HB_SIZE        ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
       char *         pText;
@@ -617,11 +617,13 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       }
 
 #ifdef HB_MACRO_STATEMENTS
-      szCopy = NULL;
-      bAlloc = FALSE;
+
+      
       if( struMacro.supported & HB_SM_PREPROC )
       {
          char * ptr;
+         char       *   szCopy;
+         HB_SIZE        ulLength = pItem->item.asString.length;
 
          pText             = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          pOut              = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
@@ -652,9 +654,9 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       iStatus = hb_macroParseEx( &struMacro );
 
       if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
-         hb_macroSyntaxError( &struMacro, szCopy );
+         hb_macroSyntaxError( &struMacro, szString );
       else if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
-         hb_macroSyntaxError( &struMacro, szCopy );
+         hb_macroSyntaxError( &struMacro, szString );
 
 #ifdef HB_MACRO_STATEMENTS
       if( struMacro.supported & HB_SM_PREPROC )
@@ -684,7 +686,7 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
          }
       }
       if( szString )
-         hb_xfree( szString );
+         hb_xfree( ( char * )szString );
    }
 }
 
