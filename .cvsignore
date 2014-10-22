@@ -1,0 +1,7 @@
+xbp
+iegui.lib.log
+iegui.ppo
+trace.log
+xbuild.windows.ini
+*.log
+*.prg.bak
