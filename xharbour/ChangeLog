@@ -16,6 +16,12 @@
   * source\rtl\winos.prg
     + OS_ISWIN81()
 
+2014-10-22 16:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/vm/macro.c
+    ! minor fix to hb_macroGetValue
+  * source/tip/base64.c
+    ! added some missing cast to make mingw happy
+      
 2014-10-14 14:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/tipssl/mail.prg
   * source/tip/mail.prg

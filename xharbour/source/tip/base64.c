@@ -71,16 +71,16 @@ unsigned char * Base64Decode( const char * pcszInput, unsigned int * puOutLen )
    char *          ptr;
 
    memset( map, 0xFF, 256 );
-   for( i = 'A', map[ 'A' ] =  0; i <  'Z'; map[ i + 1 ] = map[ i ] + 1, i++ );
-   for( i = 'a', map[ 'a' ] = 26; i <= 'z'; map[ i + 1 ] = map[ i ] + 1, i++ );
-   for( i = '0', map[ '0' ] = 52; i <= '9'; map[ i + 1 ] = map[ i ] + 1, i++ );
+   for( i = 'A', map[(unsigned char) 'A' ] =  0; i <  'Z'; map[(unsigned char) i + 1 ] = map[(unsigned char) i ] + 1, i++ );
+   for( i = 'a', map[(unsigned char) 'a' ] = 26; i <= 'z'; map[ (unsigned char)i + 1 ] = map[(unsigned char) i ] + 1, i++ );
+   for( i = '0', map[(unsigned char) '0' ] = 52; i <= '9'; map[ (unsigned char)i + 1 ] = map[(unsigned char) i ] + 1, i++ );
    map[ XTY62 ] = 62; map[ XTY63 ] = 63;
 
    uBufLen = 0;
    c       = pcszInput[ 0 ];
    while( c != '\0' && c != XTYPAD )
    {
-      pBuf[ uBufLen ] = map[ c ];
+      pBuf[ uBufLen ] = map[ (unsigned char)c ];
 
       if( pBuf[ uBufLen ] >= 0 )
          uBufLen++;
