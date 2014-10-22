@@ -1,0 +1,10 @@
+xbp
+*.log
+*.ppo
+.DS_Store
+._xdo.dll.xbp
+*.prg.bak
+._Changelog
+._XDO.prg
+*.txt
+*.zip
