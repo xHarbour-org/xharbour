@@ -1,0 +1,8 @@
+XBScript
+XBScriptEnt
+XBScriptPro
+*.ncb
+*.suo
+XBScript*.vcproj.*.user
+.DS_Store
+._*
