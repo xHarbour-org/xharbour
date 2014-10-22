@@ -1,2 +1,8 @@
+xbp
 *.log
+vc70.*
+vc80.*
+zlib.lib
+.DS_Store
+._*
 ZLib.lib

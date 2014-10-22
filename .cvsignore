@@ -1,2 +1,11 @@
+Debug
+Release
+xbp
 *.log
+vc70.idb
+vc80.idb
+ziparchive.lib
+ZipArchive_STL.vcproj.*.user
+.DS_Store
+._*
 ZipArchive.lib
