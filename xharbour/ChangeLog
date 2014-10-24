@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-24 14:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/common/hbstr.c
+    ! more precision in arithmetic; minor formatting
+
 2014-10-22 18:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/macro.c
     ! minor fix to previus commit
@@ -41,7 +45,6 @@
     ! added missing comma to sort command translation since the connection parameter was being passed as rdd position
   * source/cgi/thtm.prg
     ! minor fix on new method when output is file creation  
-      
 
 2014-10-10 11:22 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * make_vc
@@ -281,7 +284,6 @@
 2013-12-09  16:16  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/tipssl/sendmail.prg
     ! minor fix
-
 
 2013-10-30 23:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/minmax.c
