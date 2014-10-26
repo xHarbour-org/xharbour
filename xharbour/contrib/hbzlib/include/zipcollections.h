@@ -69,7 +69,12 @@ int GetUpperBound() const
 }
 int Add( const TYPE&x )
 {
-   push_back( x ); return GetUpperBound();
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+      this->push_back( x );
+   #else
+      push_back( x );
+   #endif   
+    return GetUpperBound();
 }
 void RemoveAll()
 {
@@ -77,11 +82,19 @@ void RemoveAll()
 }
 void RemoveAt( int uIndex )
 {
-   erase( GetIterFromIndex( uIndex ) );
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+      this->erase( GetIterFromIndex( uIndex ) );
+   #else
+      erase( GetIterFromIndex( uIndex ) );
+   #endif   
 }
 void InsertAt( int uIndex, const TYPE&x )
 {
-   insert( GetIterFromIndex( uIndex ), x );
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+      this->insert( GetIterFromIndex( uIndex ), x );
+   #else
+      insert( GetIterFromIndex( uIndex ), x );
+   #endif   
 }
 #ifndef _MSC_VER
 TYPE&operator[]( int iIndex )
@@ -115,11 +128,19 @@ int GetCount() const
 }
 void AddTail( const TYPE&x )
 {
-   push_back( x );
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+      this->push_back( x );
+   #else	
+      push_back( x );
+   #endif
 }
 void AddHead( const TYPE&x )
 {
-   push_front( x );
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+      this->push_front( x );
+   #else
+      push_front( x );
+   #endif   
 }
 void RemoveHead()
 {
@@ -183,7 +204,11 @@ iterator Find( TYPE&x )
 }
 void RemoveAt( iterator&pos )
 {
-   erase( pos );
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+      this->erase( pos );
+   #else
+      erase( pos );
+   #endif
 }
 bool IteratorValid( const_iterator&iter ) const
 {
@@ -233,15 +258,27 @@ typedef typename std::map<KEY, VALUE>::const_iterator const_iterator;
 typedef typename  std::map<KEY, VALUE, std::less<KEY>, std::allocator<std::pair<const KEY, VALUE> > >::value_type v_type;
 void SetAt( KEY key, VALUE newValue )
 {
-   insert( v_type( key, newValue ) );
+    #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+       this->insert( v_type( key, newValue ) );
+    #else
+       insert( v_type( key, newValue ) );
+    #endif
 }
 BOOL RemoveKey( KEY key )
 {
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+   return this->erase( key ) != 0;
+   #else	
    return erase( key ) != 0;
+   #endif
 }
 BOOL Lookup( KEY key, VALUE&rValue ) const
 {
+#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+   const_iterator iter = this->find( key );
+#else
    const_iterator iter = find( key );
+#endif   
 
 #if ( __GNUC__ >= 3 ) // I'm not sure which version precisely should be put here
    if( iter == std::map<KEY, VALUE>::end() )
