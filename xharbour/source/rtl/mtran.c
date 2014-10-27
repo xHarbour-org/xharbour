@@ -70,7 +70,7 @@ static char * hb_strMemotran( char * pszResult, HB_SIZE * ulResultLen, const cha
          pszResult[ ulResultPos++ ] = cHardcr;
          ulStringPos                += 2;
       }
-      else if( ( unsigned char ) pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
+      else if( pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
                pszString[ ulStringPos + 1 ] == HB_CHAR_SOFT2 )
       {
          pszResult[ ulResultPos++ ] = cSoftcr;

@@ -8,7 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2014-10-27 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+2014-10-27 12:41 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/rtl/mtran.c
+    ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
+  * source/rtl/hardcr.c  
+    ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
+  * source/rtl/mlcfunc.c
+    ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
+  * source/rtl/txtline.c
+    ! removed unnecessary cast of ( unsigned char ) szText[ ulPos ]    
+  * include/hbdefs.h
+    ! removed the cast to char and unsigned char from the defines bellow
+      #define HB_CHAR_HARD1
+      #define HB_CHAR_HARD2
+      #define HB_CHAR_SOFT1
+      #define HB_CHAR_SOFT2
+      
+2014-10-27 12:25 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/inet.h
     ! changes to include of winsock2.h to make mingw happy
   * source/rtl/hbip.c  
