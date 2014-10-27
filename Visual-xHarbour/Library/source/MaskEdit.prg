@@ -117,35 +117,35 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
    IF ::InDataGrid .AND. msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_ESCAPE}
       RETURN ::Super:OnGetDlgCode( msg )
    ENDIF
-   IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_UP,VK_DOWN}
-      ::oGet:assign()
-      ::oGet:updatebuffer()
-      IF ::oGet:baddate()
-         MessageBeep( MB_OK )
-         ::oGet:buffer := dtoc(CTOD( "" ))
-      ENDIF
-      SetWindowText( ::hWnd, ::oGet:buffer )
-      IF msg:wParam <> VK_TAB
-         ::__Validate()
-      ENDIF
-      // default button
-      IF msg:wParam == VK_RETURN .AND. ::IsValid
-         IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
-            nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
-            RETURN NIL
+   IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN
+      ::LastKey := msg:wParam
+      IF msg:wParam IN {VK_RETURN,VK_UP,VK_DOWN}
+         ::oGet:assign()
+         ::oGet:updatebuffer()
+         IF ::oGet:baddate()
+            MessageBeep( MB_OK )
+            ::oGet:buffer := dtoc(CTOD( "" ))
          ENDIF
-      ENDIF
+         SetWindowText( ::hWnd, ::oGet:buffer )
+         ::__Validate()
+         // default button
+         IF msg:wParam == VK_RETURN .AND. ::IsValid
+            IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+               nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
+               RETURN NIL
+            ENDIF
+         ENDIF
 
-      IF ::IsValid
-         ::__GoToNextControl( msg:wParam )
-       ELSE
-         SetFocus( ::hWnd )
+         IF ::IsValid
+            ::__GoToNextControl( msg:wParam )
+          ELSE
+            SetFocus( ::hWnd )
+         ENDIF
+         RETURN NIL
       ENDIF
-      RETURN NIL
-
    ENDIF
+
    IF ::wParam == VK_RETURN
-      ::LastKey := ::wParam
       IF ! ::InDataGrid
          ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )
       ENDIF
@@ -171,7 +171,7 @@ METHOD __Validate() CLASS MaskEdit
    LOCAL lCaret
    IF ! ::lInValid
       ::lInValid := .T.
-      IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) != 0
+      IF ValType( ::oGet:postblock ) == "B" .OR. HGetPos( ::EventHandler, "Valid" ) > 0
          IF ( lCaret := IsCaret() )
             ::HideCaret()
          ENDIF
