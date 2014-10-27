@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-27 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * include/inet.h
+    ! changes to include of winsock2.h to make mingw happy
+  * source/rtl/hbip.c  
+    ! changes to include of winsock2.h to make mingw happy
+  * source/vm/fm.c
+    ! minor fix to make mingw happy
+    
 2014-10-25 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/hbzlib/include/zipcollections.h
     ! fixes to make mingw gcc 4.7 or newer happy

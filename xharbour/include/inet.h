@@ -62,12 +62,14 @@
        #define HB_NO_DEFAULT_INET
    #else
       #if defined( HB_OS_WIN )
-         #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+//          #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
-         // Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
          #include "cinterface.h"
          #include <windows.h>
+
+         #  include <ws2tcpip.h>
+         #  include <iphlpapi.h>
 
          #define HB_INET_CLOSE( x )    closesocket( x )
 

@@ -678,7 +678,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       HB_MEM_THLOCK();
 
-      free( ( void * ) HB_FM_PTR( pMem ) );
+      free(  HB_FM_PTR( pMem ) );
 
       HB_MEM_THUNLOCK();
 

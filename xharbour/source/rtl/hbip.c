@@ -76,7 +76,7 @@
 #endif
 
 #if defined( HB_OS_WIN )
-   #define _WINSOCKAPI_    /* Prevents inclusion of Winsock.h in Windows.h */
+//    #define _WINSOCKAPI_    /* Prevents inclusion of Winsock.h in Windows.h */
    #define HB_SOCKET_T     SOCKET
    #include <winsock2.h>
    #include <windows.h>
