@@ -887,15 +887,23 @@ RETURN
 
 //------------------------------------------------------------------------------------------------------
 
-STATIC FUNCTION VXH_DefError( e, lGpf )
-   LOCAL aOptions, nChoice, aStack, c, cErr, cPath, nAt, i//, hPen, hHash
+#ifdef d_WinFakt
+ FUNCTION VXH_DefError( e, lGpf, lSilent, cDir )
+    LOCAL cFile,cVersion
+#else
+ STATIC FUNCTION VXH_DefError( e, lGpf)
+#endif
+   LOCAL aOptions, nChoice, aStack, c, cErr, cPath, nAt, i
    LOCAL cProcStack := ""
 
    DEFAULT lGpf TO .F.
+   #ifdef d_WinFakt
+   DEFAULT lSilent TO .F.
+   #endif
 
    nWinError := GetLastError()
 
-     // By default, division by zero results in zero
+   // By default, division by zero results in zero
    IF e:genCode == EG_ZERODIV
       RETURN 0
    ENDIF
@@ -910,14 +918,6 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
       NETERR( .T. )
       RETURN .F.
    ENDIF
-
-//   IF e:genCode == EG_NOMETHOD .AND. e:subCode == 1004 .AND. e:args != NIL
-//      hHash := e:args[1]
-//      IF ValType( hHash ) == "H" .AND. HHasKey( hHash, "ColorTable" )
-//         hPen := hHash:ColorTable:SetHash( hHash, e:operation )
-//         return if( e:canSubstitute, hPen, .t. )
-//      ENDIF
-//   ENDIF
 
    IF Application != NIL
       Application:Cursor := NIL
@@ -951,7 +951,26 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
    nAt   := RAt( "\", cPath )
    cPath := Left( cPath, nAt )
 
+   #ifdef d_WinFakt
+    cVersion:=IniFile(cPath+"\WinFakt.ini"):ReadString("INSTELLINGEN","Version2")
+    cPath:=cPath+"e\"+If(Empty(cDir),"",cDir)
+    MakeDir(cPath)
+    cFile:=cPath+LTrim(Str(Year(Date())))+"-"+PadL(LTrim(Str(Month(Date()))),2,"0")+"-"+PadL(LTrim(Str(Day(Date()))),2,"0")+"-"+CharOnly("0123456789",Time())+".log"
+    MemoWrit(cFile,DToC(Date())+", "+Time()+", "+cVersion+CRLF+cErr)
+    MemoWrit("Error.txt",DToC(Date())+", "+Time()+", "+cVersion+CRLF+cErr)
+    FErase("Error.png")
+    IF File("wf_PrintScreen.exe")
+       WaitExecute("wf_PrintScreen.exe","/f Error.png")
+       TRY
+        IF File("Error.png")
+           COPY FILE ("Error.png") TO (StrTran(cFile,".log",".png"))
+        ENDIF
+       CATCH
+       END
+    ENDIF
+   #else
    MemoWrit( cPath + "\error.log", cErr )
+   #endif
 
    aOptions := { "Copy to clipboard", "Quit" }
    IF ( e:canRetry )
@@ -965,7 +984,30 @@ STATIC FUNCTION VXH_DefError( e, lGpf )
       UnhookWindowsHookEx( Application:__hMenuHook )
    ENDIF
 
-   nChoice := ErrDialog( e, aOptions, aStack, cErr )
+   #ifdef d_WinFakt
+    IF wf_QuitOnError()
+       IF !lGpf
+          ERRORLEVEL( 1 )
+          QUIT
+       ENDIF
+       RETURN .F.
+    ENDIF
+    IF lSilent
+       IF lGpf
+          RETURN .F.
+       ELSE
+          RETURN .T.
+       ENDIF
+    ELSE
+       IF File(wf_Get_Path_Root()+"\wf_SendFile.exe")
+          ShellExecute(0,"open", "wf_SendFile.exe", '"123" "'+cFile+'" "ERROR" "VXH" ', "",1)
+       ELSE
+          WinExec('Notepad "'+cFile+'"',5)
+       ENDIF
+    ENDIF
+   #else
+    nChoice := ErrDialog( e, aOptions, aStack, cErr )
+   #endif
 
    IF ( ! Empty( nChoice ) )
       DO CASE
