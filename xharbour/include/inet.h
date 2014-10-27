@@ -68,8 +68,6 @@
          #include "cinterface.h"
          #include <windows.h>
 
-         #  include <ws2tcpip.h>
-         #  include <iphlpapi.h>
 
          #define HB_INET_CLOSE( x )    closesocket( x )
 
