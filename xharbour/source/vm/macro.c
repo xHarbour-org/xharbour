@@ -159,17 +159,27 @@ static int hb_macroParse( PHB_MACRO pMacro, char * szString, HB_SIZE iLen )
  *    the 'pMacro' pointer is not released - it can be a pointer
  *    to a memory allocated on the stack.
  */
+ 
+static void hb_macroClear( PHB_MACRO pMacro )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_macroClear(%p)", pMacro ) );
+
+   hb_xfree( pMacro->pCodeInfo->pCode );
+   if( pMacro->pError )
+      hb_errRelease( pMacro->pError );
+}
+ 
 void hb_macroDelete( PHB_MACRO pMacro )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroDelete(%p)", pMacro ) );
 
-   hb_xfree( ( void * ) pMacro->pCodeInfo->pCode );
-   hb_xfree( ( void * ) pMacro->pCodeInfo );
-   if( pMacro->pError )
-      hb_errRelease( pMacro->pError );
+//    hb_xfree( ( void * ) pMacro->pCodeInfo->pCode );
+//    hb_xfree( ( void * ) pMacro->pCodeInfo );
+//    if( pMacro->pError )
+//       hb_errRelease( pMacro->pError );
+   hb_macroClear( pMacro );
    if( pMacro->Flags & HB_MACRO_DEALLOCATE )
    {
-//       hb_xfree( (void*) pMacro );
       hb_xfree( pMacro );
    }
 }
@@ -671,6 +681,7 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
+         
 
          if( iContext && struMacro.iListElements > 0 )
          {
@@ -1103,7 +1114,7 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
       else
          szType = "UE";  /* syntax error during compilation */
 
-      hb_macroDelete( &struMacro );
+      hb_macroClear( &struMacro );
    }
    else
       szType = "U";

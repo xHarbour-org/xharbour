@@ -9,6 +9,12 @@
 */
 
 2014-10-27 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/vm/macro.c 
+    ! added hb_macroClear borrow from harbour.
+    ! hb_macroDelete  optimized to use  now call hb_macroClear 
+    ! hb_macroGetType optimize to use hb_macroClear insted of hb_macroDelete
+
+2014-10-27 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * winmake/makefile.gc
     ! minor update
 
