@@ -524,7 +524,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
-   IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid
+   IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid .AND. ( ::Application:MaskEditKillFocusValid .OR. ::LastKey == VK_TAB )
       IF ::oGet:Type == "N" .AND. ::oGet:VarGet() == 0
          ::oget:VarPut( 0 )
       ENDIF
@@ -541,6 +541,8 @@ METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
       ::SendMessage( WM_MOUSEMOVE, 1, 1 )
 
       ::__Validate()
+
+      ::LastKey := 0
       IF ! ::IsValid
          ::SetFocus()
          RETURN 0

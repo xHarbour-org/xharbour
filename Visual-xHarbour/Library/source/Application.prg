@@ -221,6 +221,7 @@ RETURN EXCEPTION_EXECUTE_HANDLER
 //------------------------------------------------------------------------------------------------
 
 CLASS Application
+   PROPERTY MaskEditKillFocusValid ROOT "Behavior" DEFAULT .T.
    PROPERTY ColorScheme  SET ::__SetColorScheme(v) DEFAULT 1
    DATA EnumColorScheme  EXPORTED INIT { { "System Default", "FlatGray", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7,8} }
 
