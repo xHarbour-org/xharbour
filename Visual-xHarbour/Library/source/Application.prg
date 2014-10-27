@@ -1626,3 +1626,16 @@ HB_FUNC( FORCEGPF )
 #pragma ENDDUMP
 //----------------------------------------------------------------------------//
 
+#ifdef d_WinFakt
+ FUNCTION wf_ErrorDialog(oErr,lSilent,lQuit,cDir)
+   (lQuit)
+ RETURN VXH_DefError(oErr,.F.,lSilent,cDir)
+ FUNCTION wf_Get_Path_Root()
+ RETURN Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+#endif
+FUNCTION wf_QuitOnError(lSet)
+   STATIC lQuitOnError:=.F.
+   IF !(lSet=NIL)
+      lQuitOnError:=lSet
+   ENDIF
+RETURN lQuitOnError

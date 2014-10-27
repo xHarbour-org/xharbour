@@ -18,13 +18,13 @@ MYLINK_FLAGS =
 MYPRG_FLAGS = -es2 -gc0 -n -p -q -w2
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
-OUTPUTFOLDER = W:\wf-OBJ\VXH.EXE
+OUTPUTFOLDER = C:\xbp\wf\VXH.EXE
 PRG_OUTPUTFOLDER = 
 RC_OUTPUTFOLDER = 
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = W:\wf-PRG\Build\xHB\Bin 
+TARGETFOLDER = Z:\Dropbox\Programming\wf-PRG\Build\xHB\Bin 
 
 [..\..\source\vxh1.prg]
 MYC_FLAGS =
@@ -40,7 +40,7 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
-[W:\wf-PRG\Build\xHB\Lib\vxh.lib]
+[Z:\Dropbox\Programming\wf-PRG\Build\xHB\Lib\vxh.lib]
 
 [..\..\..\Editor\xcc\Editor.lib.xbp]
 
