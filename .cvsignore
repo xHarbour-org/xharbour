@@ -2,6 +2,7 @@ xbp
 *.log
 *.ppo
 tproject.c
+xBuild.c
 .DS_Store
 tproject.obj
 *.prg.bak
@@ -12,3 +13,4 @@ tproject.obj
 ._xbuild.prg
 ._xbuild.rc
 ._xbuild.xml
+tproject-c.c
