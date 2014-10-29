@@ -573,6 +573,7 @@ static PHB_PP_TOKEN hb_pp_tokenClone( PHB_PP_TOKEN pSource )
       HB_MEMCPY( pDest->value, pSource->value, pDest->len );
       pDest->value[ pDest->len ] = '\0';
    }
+   pDest->type &= ~HB_PP_TOKEN_PREDEFINED;
    pDest->pNext = NULL;
 
    return pDest;
