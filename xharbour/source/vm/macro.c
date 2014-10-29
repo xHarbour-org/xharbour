@@ -70,7 +70,7 @@
   #include "hbpp.h"
 #endif
 
-#define MAX_MACRO_TEXT 8192
+#define MAX_MACRO_TEXT 32768
 
 /* .and. & .or. expressions shortcuts - the expression optimiser needs
  * a global variable
@@ -91,37 +91,6 @@ static void hb_macroUseAliased( PHB_ITEM, PHB_ITEM, int, BYTE );
  * 'szString' - a string to compile
  * 'iLen' - length of the string to compile
  */
- 
-static int hb_macroParseEx( PHB_MACRO pMacro )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_macroParse(%p, %s, %i)", pMacro, szString, iLen ) );
-
-   /* update the current status for logical shortcuts */
-   hb_comp_bShortCuts            = pMacro->supported & HB_SM_SHORTCUTS;
-
-   /* initialize the input buffer - it will be scanned by lex */
-
-   pMacro->pos                   = 0;
-   pMacro->bShortCuts            = hb_comp_bShortCuts;
-   pMacro->pError                = NULL;
-
-   /* initialize the output (pcode) buffer - it will be filled by yacc */
-   pMacro->pCodeInfo             = ( PHB_PCODE_INFO ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
-   pMacro->pCodeInfo->lPCodeSize = HB_PCODE_SIZE;
-   pMacro->pCodeInfo->lPCodePos  = 0;
-   pMacro->pCodeInfo->pLocals    = NULL;
-   pMacro->pCodeInfo->pPrev      = NULL;
-
-   pMacro->pCodeInfo->pCode      = ( BYTE * ) hb_xgrab( HB_PCODE_SIZE );
-
-   /* reset the type of compiled expression - this should be filled after
-    * successfully compilation
-    */
-   pMacro->exprType              = HB_ET_NONE;
-
-   return hb_macroYYParse( pMacro );
-}
- 
 static int hb_macroParse( PHB_MACRO pMacro, char * szString, HB_SIZE iLen )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroParse(%p, %s, %i)", pMacro, szString, iLen ) );
@@ -159,25 +128,14 @@ static int hb_macroParse( PHB_MACRO pMacro, char * szString, HB_SIZE iLen )
  *    the 'pMacro' pointer is not released - it can be a pointer
  *    to a memory allocated on the stack.
  */
- 
-static void hb_macroClear( PHB_MACRO pMacro )
-{
-   HB_TRACE( HB_TR_DEBUG, ( "hb_macroClear(%p)", pMacro ) );
-
-   hb_xfree( pMacro->pCodeInfo->pCode );
-   if( pMacro->pError )
-      hb_errRelease( pMacro->pError );
-}
- 
 void hb_macroDelete( PHB_MACRO pMacro )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_macroDelete(%p)", pMacro ) );
 
-//    hb_xfree( ( void * ) pMacro->pCodeInfo->pCode );
-//    hb_xfree( ( void * ) pMacro->pCodeInfo );
-//    if( pMacro->pError )
-//       hb_errRelease( pMacro->pError );
-   hb_macroClear( pMacro );
+   hb_xfree( ( void * ) pMacro->pCodeInfo->pCode );
+   hb_xfree( ( void * ) pMacro->pCodeInfo );
+   if( pMacro->pError )
+      hb_errRelease( pMacro->pError );
    if( pMacro->Flags & HB_MACRO_DEALLOCATE )
    {
       hb_xfree( pMacro );
@@ -567,11 +525,10 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
    {
       HB_MACRO       struMacro;
       int            iStatus;
-      char *   szString;
-      
-
-      
-//       HB_SIZE        ulLength = pItem->item.asString.length;
+      const char *   szString;
+//       char           szCopy[ MAX_MACRO_TEXT ];
+      char           * szCopy;
+      HB_SIZE        ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
       char *         pText;
@@ -590,20 +547,13 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
        *   ? "Result:", &cText
        * RETURN
        */
-
+      szString                = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
       
       struMacro.Flags         = HB_MACRO_GEN_PUSH;
       struMacro.uiNameLen     = HB_SYMBOL_NAME_LEN;
       struMacro.status        = HB_MACRO_CONT;
       struMacro.iListElements = 0;
       struMacro.supported     = ( flags & HB_SM_RT_MACRO ) ? s_macroFlags : flags;
-      struMacro.length        = pItem->item.asString.length;      
-      
-      szString                = hb_macroTextSubst( pItem->item.asString.value, &struMacro.length );      
-      struMacro.string = szString;
-      
-      if( szString == pItem->item.asString.value )
-         szString = NULL;
 
       if( iContext != 0 )
       {
@@ -627,13 +577,9 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
       }
 
 #ifdef HB_MACRO_STATEMENTS
-
-      
       if( struMacro.supported & HB_SM_PREPROC )
       {
          char * ptr;
-         char       *   szCopy;
-         HB_SIZE        ulLength = pItem->item.asString.length;
 
          pText             = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          pOut              = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
@@ -649,24 +595,24 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
             hb_pp_Table();
 
          hb_pp_ParseExpression( ptr, pOut );
-         hb_xstrcpy( szCopy, pText, 0 );
+//          hb_xstrcpy( szCopy, pText, 0 );
+         szCopy = hb_strdup( pText ) ;
          ulLength = strlen( szCopy );
       }
 #else
-//       bAlloc = TRUE;
-//       szCopy = (char*) hb_xgrab( ulLength ) ;  
 //       hb_xstrcpy( szCopy, szString, 0 );
+      szCopy = hb_strdup( szString ) ;
 #endif
 
-//       if( szString != pItem->item.asString.value )
-//          hb_xfree( ( void * ) szString );
+      if( szString != pItem->item.asString.value )
+         hb_xfree( ( void * ) szString );
 
-      iStatus = hb_macroParseEx( &struMacro );
+      iStatus = hb_macroParse( &struMacro, szCopy, ulLength );
 
       if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
-         hb_macroSyntaxError( &struMacro, szString );
+         hb_macroSyntaxError( &struMacro, szCopy );
       else if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
-         hb_macroSyntaxError( &struMacro, szString );
+         hb_macroSyntaxError( &struMacro, szCopy );
 
 #ifdef HB_MACRO_STATEMENTS
       if( struMacro.supported & HB_SM_PREPROC )
@@ -675,13 +621,16 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
          hb_xfree( pOut );
       }
 #endif
+      if ( szCopy ) 
+      {
+         hb_xfree(  szCopy );
+      }
 
       hb_stackPop();    /* remove compiled string */
 
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
-         
 
          if( iContext && struMacro.iListElements > 0 )
          {
@@ -696,8 +645,6 @@ void hb_macroGetValue( PHB_ITEM pItem, BYTE iContext, BYTE flags )
                HB_VM_STACK.iExtraIndex = struMacro.iListElements;
          }
       }
-      if( szString )
-         hb_xfree( ( char * )szString );
    }
 }
 
@@ -1114,7 +1061,7 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
       else
          szType = "UE";  /* syntax error during compilation */
 
-      hb_macroClear( &struMacro );
+      hb_macroDelete( &struMacro );
    }
    else
       szType = "U";
