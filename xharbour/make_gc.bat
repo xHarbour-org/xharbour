@@ -120,7 +120,7 @@ rem=============================================================================
    SET HB_MT_DIR=%DIR_SEP%dll
    @CALL winmake\mdir.bat dllcreate
    mingw32-make.exe -f winmake\makefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
@@ -150,13 +150,13 @@ rem=============================================================================
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    mingw32-make.exe -f winmake\makefile.gc  1>cont0_%SUB_DIR%.log 2>cont_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_THREAD_SUPPORT=1
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=
    REM mingw32-make.exe -f winmake\makefile.gc  1>>cont0_%SUB_DIR%.log 2>>cont_%SUB_DIR%.log
-   REM if errorlevel 1 goto BUILD_ERR
+   REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK

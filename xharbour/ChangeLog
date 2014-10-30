@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-30 17:40 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * make_gc.bat
+    ! fixed typos in "goto 'label'" on error
+
 2014-10-29 21:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/macro.c
     ! reverted to initial version with minor fix to hb_macrogetvalue
