@@ -13,6 +13,8 @@
       #pragma warn -pia                 /* Possibly incorrect assignment             */
       #pragma warn -prc                 /* Suggest parentheses to clarify precedence */
       #pragma warn -use                 /* '%s' is declared but never used           */
+   #elif defined( __MINGW32__ )
+      #pragma GCC diagnostic ignored "-Warray-bounds"
    #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
       #pragma disable_message ( 136 )

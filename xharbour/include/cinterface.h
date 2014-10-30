@@ -1,3 +1,15 @@
+/*
+* $Id: gtwvw.c 10017 2014-10-07 04:14:54Z ronpinkas $
+ */
+
+/*
+ * New header to define CINTERFACE and genericly workaround missing
+ * incomplete CINTERFACE support in Windows SDK's guiddef.h and propkeydef.h
+ *
+ * Copyright 2014 Ron Pinkas <ronpinkas@profit-master.com>
+ * www - http://www.harbour-project.org
+ *
+ */
 
 #ifndef CINTERFACE_H_
 #define CINTERFACE_H_
@@ -13,6 +25,10 @@
 
 #if defined( _MSC_VER ) && _MSC_VER >= 1700
    #define _USING_V110_SDK71_
+#endif
+
+#if defined( __MINGW32__ )
+   #include <initguid.h>
 #endif
 
 /*
