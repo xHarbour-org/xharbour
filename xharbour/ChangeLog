@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-30 22:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/cinterface.h
+    ! copy/paste typo in header comment
+
 2014-10-30 21:45 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/cinterface.h
   * contrib/hbsqlit3/config.h
