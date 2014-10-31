@@ -388,6 +388,16 @@ HB_FUNC( OS_ISWIN7 )
   hb_retl( 0);
 }
 
+HB_FUNC( OS_ISWIN81 )
+{
+  hb_retl( 0 );
+}
+
+HB_FUNC( OS_ISWIN8 )
+{
+  hb_retl( 0 );
+}
+
 HB_FUNC( OS_ISWTSCLIENT )
 {
   hb_retl( 0 );
@@ -415,10 +425,7 @@ HB_FUNC( OS_ISUSERANADMIN )  // 24/11/09 11:43
 {
 hb_retl( 0 ) ;
 }
-HB_FUNC( OS_ISWIN8 )
-{
-hb_retl( 0 ) ;
-}
+
 #endif
 
 #pragma ENDDUMP

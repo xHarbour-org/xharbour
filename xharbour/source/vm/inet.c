@@ -56,9 +56,10 @@
  */
 
 #define _HB_API_INTERNAL_
+#include "inet.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "inet.h"
+
 #include "hbstack.h"
 #include <fcntl.h>
 #include <errno.h>

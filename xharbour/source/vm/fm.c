@@ -1029,7 +1029,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, HB_SIZE ulLen )
 {
    BYTE *   pDest;
    BYTE *   pSource;
-   ULONG    ulRemaining;
+   HB_SIZE    ulRemaining;
    int      iCopySize;
 
    assert( pDestArg != NULL && pSourceArg != NULL );
@@ -1049,7 +1049,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, HB_SIZE ulLen )
       if( ulRemaining > UINT_MAX )
       {
          iCopySize   = UINT_MAX;
-         ulRemaining -= ( ULONG ) iCopySize;
+         ulRemaining -= ( HB_SIZE ) iCopySize;
       }
       else
       {
@@ -1069,7 +1069,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, HB_SIZE ulLen )
 void * hb_xmemset( void * pDestArg, int iFill, HB_SIZE ulLen )
 {
    BYTE *   pDest;
-   ULONG    ulRemaining;
+   HB_SIZE    ulRemaining;
    int      iSetSize;
 
    assert( pDestArg != NULL );
@@ -1086,7 +1086,7 @@ void * hb_xmemset( void * pDestArg, int iFill, HB_SIZE ulLen )
       if( ulRemaining > UINT_MAX )
       {
          iSetSize    = UINT_MAX;
-         ulRemaining -= ( ULONG ) iSetSize;
+         ulRemaining -= ( HB_SIZE ) iSetSize;
       }
       else
       {

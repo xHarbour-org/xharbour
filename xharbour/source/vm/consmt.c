@@ -126,6 +126,7 @@ void hb_idle_releaseCPU( USHORT uiIdleSleepMsec, BOOL bIdleWaitNoCpu )
    usleep( uiIdleSleepMsec );
 #elif defined( HB_OS_UNIX )
    {
+      HB_SYMBOL_UNUSED( uiIdleSleepMsec );
       /* struct timeval tv;
        * tv.tv_sec = 0;
        * tv.tv_usec = 1000;

@@ -649,7 +649,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
    {
       /* decode the extension */
       char *   fname = hb_itemGetCPtr( pFile );
-      HB_SIZE  iPos  = strlen( fname ) - 1;
+      HB_ISIZ  iPos  = strlen( fname ) - 1;
 
       while( iPos >= 0 && fname[ iPos ] != '.' )
       {

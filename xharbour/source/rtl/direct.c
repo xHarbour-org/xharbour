@@ -453,7 +453,7 @@ HB_FUNC( DIRECTORYRECURSE )
 #if defined( __XCC__ )
             szDrvDelim[ 0 ]   = ( char * ) HB_OS_DRIVE_DELIM_CHR;
 #else
-            szDrvDelim[ 0 ]   = ( char * ) ( HB_LONG ) HB_OS_DRIVE_DELIM_CHR;
+            szDrvDelim[ 0 ]   = ( char * ) HB_OS_DRIVE_DELIM_CHR;
 #endif
             szDrvDelim[ 1 ]   = '\0';
 

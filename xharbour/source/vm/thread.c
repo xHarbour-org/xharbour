@@ -79,6 +79,7 @@ HB_EXTERN_END
       #include <sys/time.h>
       #include <time.h>
       #include <errno.h>
+      #include <unistd.h>
 #endif
 
 #if defined( HB_OS_OS2 )

@@ -73,7 +73,7 @@ HB_FUNC( HB_BLEN )
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
    if( pText )
-      hb_retns( ( LONG ) hb_itemGetCLen( pText ) );
+      hb_retns( hb_itemGetCLen( pText ) );
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
@@ -88,9 +88,9 @@ HB_FUNC( HB_BSUBSTR )
    if( pText && HB_ISNUM( 2 ) && ( iPCount < 3 || HB_ISNUM( 3 ) ) )
    {
       const char *   pszText  = hb_itemGetCPtr( pText );
-      ULONG          nSize    = ( ULONG ) hb_itemGetCLen( pText );
-      ULONG          nFrom    = hb_parnl( 2 );
-      ULONG          nCount   = iPCount < 3 ? nSize : hb_parnl( 3 );
+      HB_ISIZ          nSize    =  hb_itemGetCLen( pText );
+      HB_ISIZ          nFrom    = hb_parns( 2 );
+      HB_ISIZ          nCount   = iPCount < 3 ? nSize : hb_parns( 3 ); 
 
       if( nFrom > 0 )
       {

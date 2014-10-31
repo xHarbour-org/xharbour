@@ -8,6 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-10-31 21:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/vm/fm.c
+    ! ajusted typecasts in hb_xmemset and hb_xmemcpy ( ULONG  to HB_SIZE)
+  * source/common/hbver.c
+    ! updated to reflect new compiler based on harbour code
+  * include/hbsetup.h
+    include/hbdefs.h
+    include/hbcompat.c
+    ! added and updated some defines based on harbour code
+  * source/rtl/hbzlib/gzguts.h
+     ! added #include <unistd.h> when compiling in * nix ( unix and linux)
+  * source/vm/consmt.c
+    ! added HB_SYMBOL_UNUSED( uiIdleSleepMsec ); to HB_OS_UNIX  section of hb_idle_releaseCPU function
+  * source/vm/thread.c
+    ! added #include <unistd.h> to HB_OS_UNIX define section
+  * source/rtl/winos.prg
+    ! Added OS_ISWIN81 and OS_ISWIN8 functions when compiling for *nix platform   
+  * source/vm/inet.c
+    ! adjusted inet.h position on include  
+  * source/tip/utils.c
+    ! in function TIP_FILEMIMETYPE change HB_SIZE  iPos to HB_ISIZ  iPos  
+  * source/rtl/philes.c
+    ! in FWRITE  adjusted to use hb_retns insted of hb_retnl( ( LONG ) since hb_fsWriteLarge return HB_SIZE type
+  * source/rtl/hbcomprs.c
+    ! Change static ULONG hb_zlibUncompressedSize to static HB_SIZE hb_zlibUncompressedSize  
+    ! change ULONG to HB_SIZE where aplicable
+  * source/rtl/direct.c
+    ! removed unnecessary cast to HB_LONG for   szDrvDelim[ 0 ] assingment
+  * config/linux/gcc.cf
+    ! added -DMEMCPY_64BIT when targeting 64bits  
+  * include/cinterface.h
+    ! removed unnecessary #include initguid.h for mingw  
+    
+
 2014-10-30 22:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/cinterface.h
     ! copy/paste typo in header comment

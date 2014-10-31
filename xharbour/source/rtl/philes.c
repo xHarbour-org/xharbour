@@ -171,9 +171,9 @@ HB_FUNC( FWRITE )
 #else
       HB_SIZE  ulOffset = 0;
 #endif
-      hb_retnl( ( LONG ) hb_fsWriteLarge( hb_numToHandle( hb_parnint( 1 ) ),
+      hb_retns( hb_fsWriteLarge( hb_numToHandle( hb_parnint( 1 ) ),
                                           ( BYTE * ) hb_parc( 2 ) + ulOffset,
-                                          ISNUM( 3 ) ? hb_parnl( 3 ) : hb_parclen( 2 ) - ulOffset ) );
+                                          ISNUM( 3 ) ? (HB_SIZE)hb_parns( 3 ) : hb_parclen( 2 ) - ulOffset ) );
       uiError = hb_fsError();
    }
    else

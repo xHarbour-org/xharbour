@@ -26,7 +26,9 @@
 #else
 #  define ZLIB_INTERNAL
 #endif
-
+#if defined( HB_OS_UNIX ) || defined( HB_OS_LINUX)
+   #include <unistd.h>
+#endif   
 #include <stdio.h>
 #include "zlib.h"
 #ifdef STDC
