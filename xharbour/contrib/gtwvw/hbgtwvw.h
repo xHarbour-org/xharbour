@@ -104,7 +104,7 @@
 #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | (((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16)))
 #endif
 
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER) || defined(__DMC__)
+#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER) || defined(__DMC__) ||defined(__MINGW64__)
    #include <unknwn.h>
    #include <ole2.h>
    #include <ocidl.h>
@@ -128,6 +128,20 @@
    #endif
 #else
    #include <olectl.h>
+#endif
+
+#if ((defined(_MSC_VER)&&(_MSC_VER<1300)&&!defined(__POCC__)) || defined(__WATCOMC__)|| defined(__DMC__))
+   #define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+   #if (defined(_MSC_VER)&&(_MSC_VER<1300)||defined(__DMC__))
+      #define GetWindowLongPtr    GetWindowLong
+      #define SetWindowLongPtr    SetWindowLong
+      #define DWORD_PTR           DWORD
+      #define LONG_PTR            LONG
+      #define ULONG_PTR           ULONG
+      #define GWLP_WNDPROC        GWL_WNDPROC
+      #define GWLP_USERDATA       GWL_USERDATA
+      #define DWLP_MSGRESULT      DWL_MSGRESULT
+   #endif
 #endif
 
 #include <time.h>

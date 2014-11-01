@@ -2066,7 +2066,7 @@ static BOOL hb_gt_wvw_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          else
          {
             char * szClipboardData;
-            ULONG ulLen;
+            HB_SIZE ulLen;
             if( hb_gt_w32_getClipboard( pWindowData->CodePage == OEM_CHARSET ?
                                         CF_OEMTEXT : CF_TEXT,
                                         &szClipboardData, &ulLen ) )
@@ -2319,7 +2319,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
    PHB_ITEM pFunc = NULL;
 
 
-   iType = (int) NULL;
+   iType = 0;
 
    for ( iIndex = 0; iIndex < WVW_DLGML_MAX; iIndex++ )
    {
@@ -2453,7 +2453,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          s_pWvwData->s_sApp->hDlgModeless[ iIndex ] = NULL;
 
          s_pWvwData->s_sApp->pFunc[ iIndex ] = NULL;
-         s_pWvwData->s_sApp->iType[ iIndex ] = (int) NULL;
+         s_pWvwData->s_sApp->iType[ iIndex ] = 0; //(int) NULL;
          bReturn = FALSE;
       }
       break;
@@ -2479,7 +2479,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
       return ( bReturn );
    }
 
-   iType = ( int ) NULL;
+   iType = 0 ;//( int ) NULL;
 
    for ( iIndex = 0; iIndex < WVW_DLGMD_MAX; iIndex++ )
    {
@@ -2608,7 +2608,7 @@ HB_EXPORT BOOL CALLBACK hb_gt_wvwDlgProcModal( HWND hDlg, UINT message, WPARAM w
          }
          s_pWvwData->s_sApp->hDlgModal[ iIndex ]   = NULL;
          s_pWvwData->s_sApp->pFuncModal[ iIndex ]  = NULL;
-         s_pWvwData->s_sApp->iTypeModal[ iIndex ]  = ( int ) NULL;
+         s_pWvwData->s_sApp->iTypeModal[ iIndex ]  = 0 ; //( int ) NULL;
          bReturn = FALSE;
       }
       break;
@@ -4917,14 +4917,14 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
        s_pWvwData->s_sApp->hDlgModeless[ iIndex ]        = NULL;
 
        s_pWvwData->s_sApp->pFunc[ iIndex ]               = NULL;
-       s_pWvwData->s_sApp->iType[ iIndex ]               = (int) NULL;
+       s_pWvwData->s_sApp->iType[ iIndex ]               = 0;//(int) NULL;
     }
 
     for ( iIndex = 0; iIndex < WVW_DLGMD_MAX; iIndex++ )
     {
        s_pWvwData->s_sApp->hDlgModal[ iIndex ]           = NULL;
        s_pWvwData->s_sApp->pFuncModal[ iIndex ]          = NULL;
-       s_pWvwData->s_sApp->iTypeModal[ iIndex ]          = ( int ) NULL;
+       s_pWvwData->s_sApp->iTypeModal[ iIndex ]          = 0;//( int ) NULL;
     }
 
     s_pWvwData->s_sApp->pbhBitmapList = NULL;
@@ -5018,8 +5018,8 @@ static void hb_gtInitStatics( UINT usWinNum, LPCTSTR lpszWinName, USHORT usRow1,
   pWindowData->usSBHeight= 0;
 
   pWindowData->bSBPaint = FALSE;
-  pWindowData->cSBColorForeground = (COLORREF)NULL;
-  pWindowData->cSBColorBackground = (COLORREF)NULL;
+//   pWindowData->cSBColorForeground = NULL;
+//   pWindowData->cSBColorBackground = NULL;
 
   pWindowData->hToolBar = NULL;
   pWindowData->usTBHeight= 0;
@@ -7867,7 +7867,7 @@ HB_FUNC( WVW_NOPENWINDOW )
   UINT usWinNum;
 
   DWORD  dwStyle    = ( ISNIL( 6 ) ? ((DWORD)(WS_POPUP|WS_CAPTION|WS_SYSMENU |WS_CLIPCHILDREN)) : ((DWORD) hb_parnl( 6 )) );
-  INT   iParentWin = ( ISNIL( 7 ) ? ( s_pWvwData->s_bMainCoordMode ? s_pWvwData->s_usNumWindows-1 : s_pWvwData->s_usCurWindow ) : ((INT) hb_parni( 7 )) );
+  UINT   iParentWin = ( ISNIL( 7 ) ? ( s_pWvwData->s_bMainCoordMode ? s_pWvwData->s_usNumWindows-1 : s_pWvwData->s_usCurWindow ) : ((INT) hb_parni( 7 )) );
   PHB_FNAME pFileName = NULL;
 
   if (s_pWvwData->s_usNumWindows == 0)
@@ -7885,7 +7885,7 @@ HB_FUNC( WVW_NOPENWINDOW )
     return;
   }
 
-  if (iParentWin > (INT)s_pWvwData->s_usNumWindows-1)
+  if (iParentWin > (UINT)s_pWvwData->s_usNumWindows-1)
   {
     MessageBox( NULL, TEXT("Invalid Parent Window"),
                 "Error", MB_ICONERROR );
@@ -10275,7 +10275,7 @@ UINT FindControlId(UINT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, byte * pbStyl
     }
     pcd = pcd->pNext;
   }
-  return (UINT) NULL;
+  return (UINT) 0;
 }
 
 UINT LastControlId(UINT usWinNum, BYTE byCtrlClass)

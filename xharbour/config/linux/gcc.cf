@@ -41,7 +41,7 @@ ifeq ($(shell sh -c 'uname -m 2>/dev/null'),x86_64)
 USE_FPIC = yes
 endif
 ifeq ($(USE_FPIC),yes)
-CFLAGS += -fPIC
+CFLAGS += -fPIC -DMEMCPY_64BIT 
 endif
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)

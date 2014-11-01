@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-11-01 17:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/gtwvw/gtwvw.c
+    ! in hb_gt_wvwDlgProcMLess change init of iType variable from NULL to 0. also inside WM_NCDESTROY init the variable s_pWvwData->s_sApp->iType[ iIndex ] with 0 insted of NULL
+    ! in hb_gt_wvwDlgProcModal change init of iType variable from NULL to 0. also inside WM_NCDESTROY init the variable s_pWvwData->s_sApp->iTypeModal[ iIndex ] with 0 insted of NULL 
+    ! in hb_gtInitStatics init the s_pWvwData->s_sApp->iTypeModal array and s_pWvwData->s_sApp->iType array with 0 insted of NULL
+    ! on hb_gt_wvw_Info change the variable ulLen in the HB_GTI_CLIPBOARDDATA from ULONG to HB_SIZE       
+    ! in FindControlId changed return (UINT) NULL; to return (UINT) 0;
+  * contrib/gtwvw/wvwedit.c
+  * contrib/gtwvw/wvwpush.c
+  * contrib/gtwvw/wvwstbar.c
+  * contrib/gtwvw/wvwtbar.c
+    ! Changed  GWL_WNDPROC to  GWLP_WNDPROC 
+    ! SetWindowLong to SetWindowLongPtr and (LONG) to (LONG_PTR)
+  * contrib/gtwvw/wvwfuncs.c  
+    ! hb_retni( NULL ) -> hb_retni( 0 );
+    ! hb_retnl( NULL ) -> hb_retnl( 0 );
+  * contrib/gtwvw/hbgtwvw.h
+    ! added some missing defines        
+    
 2014-10-31 21:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/fm.c
     ! ajusted typecasts in hb_xmemset and hb_xmemcpy ( ULONG  to HB_SIZE)

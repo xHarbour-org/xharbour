@@ -2375,7 +2375,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
    if ( iIndex >= WVW_DLGML_MAX )
    {
       /* no more room */
-      hb_retnl( (ULONG) NULL );
+      hb_retnl( (ULONG) 0 );
       return;
    }
 
@@ -2504,7 +2504,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    if ( iIndex >= WVW_DLGMD_MAX )
    {
       /* no more room */
-      hb_retni( ( int ) NULL );
+      hb_retni( ( int ) 0 );
       return;
    }
 
