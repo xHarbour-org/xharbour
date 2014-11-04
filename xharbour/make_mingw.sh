@@ -25,9 +25,9 @@ if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtwin; fi
 
 # Set to constant value to be consistent with the non-GNU make files.
 
-if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=C:/HARBOUR/bin/; fi    
-if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=C:/HARBOUR/lib/; fi    
-if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=C:/HARBOUR/include/; fi
+if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=C:/xHARBOUR/bin/; fi    
+if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=C:/xHARBOUR/lib/; fi    
+if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=C:/xHARBOUR/include/; fi
 
 if [ -z "$HB_ARCHITECTURE" ]; then
    echo Error: HB_ARCHITECTURE is not set.

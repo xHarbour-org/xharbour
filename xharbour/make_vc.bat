@@ -11,7 +11,7 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-REM SET HB_ARCH=64
+rem SET HB_ARCH=64
 REM SET HB_WARNING_FLAGS=
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
@@ -29,6 +29,7 @@ REM SET HB_DIR_ADS=
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\Vc"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
@@ -60,6 +61,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\Common7\Tools\
    IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
    IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
+   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\
    GOTO FIND_BISON
 
 :SET_VC2012
@@ -67,6 +69,7 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 11.0\Common7\Tools\
    IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
    IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
+   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\
    GOTO FIND_BISON
 
 :SET_VC2010X86
@@ -123,8 +126,9 @@ SET SUB_DIR=vc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
 SET _PATH=%PATH%
-IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
-PATH "%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
+IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
+set PATH "%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
+echo %path%
 
 rem ============================================================================
 rem The followings should never change

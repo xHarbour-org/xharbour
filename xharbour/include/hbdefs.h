@@ -66,6 +66,7 @@
 #else
    #define HB_MEMCPY  dv_memcpy
 #endif
+
 #if defined( __XCC__ ) || defined( __POCC__ ) || defined( __LCC__ ) || \
     defined( __MINGW32__ ) || defined( __DMC__ ) || defined( __TINYC__ ) || \
     ( defined( _MSC_VER ) && _MSC_VER >= 1600 ) || \
@@ -80,14 +81,40 @@
         defined( HB_OS_BSD ) || defined( HB_OS_SUNOS ) || \
         defined( HB_OS_BEOS ) || defined( HB_OS_QNX ) || \
         defined( HB_OS_VXWORKS ) || defined( HB_OS_MINIX ) ) )
-#  include <stdint.h>
-#  if defined( _MSC_VER ) && _MSC_VER >= 1400
-#  include <intrin.h>
-#  endif
+      #undef  HAVE_INTTYPES_H
+      #define HAVE_INTTYPES_H        1
+      #undef  HAVE_STDINT_H
+      #define HAVE_STDINT_H          1
+        
+   #  include <stdint.h>
+   #if defined( _MSC_VER )   
+      #  if defined( _MSC_VER ) && _MSC_VER >= 1400
+         #  include <intrin.h>
+      #  endif
+      #undef  HAVE_INTTYPES_H
+      #define HAVE_INTTYPES_H        0
+      #if ( _MSC_VER >= 1600 )
+         #undef  HAVE_STDINT_H
+         #define HAVE_STDINT_H       1
+      #else
+         #undef  HAVE_STDINT_H
+         #define HAVE_STDINT_H       0
+         #if ( _MSC_VER > 1400 )
+            #define HAVE_INTSAFE_H   1
+         #endif
+      #endif      
+   #else
+      #undef  HAVE_STDINT_H
+      #define HAVE_STDINT_H          0
+      #undef  HAVE_INTTYPES_H
+      #define HAVE_INTTYPES_H        0
+      #undef  INT64_MAX
+      
+   #endif   
    /* NOTE: Hack to avoid collision between stdint.h and unistd.h. [vszakats] */
-#  if defined( HB_OS_VXWORKS ) && defined( _INTPTR ) && ! defined( _INTPTR_T )
-#     define _INTPTR_T
-#  endif
+   #  if defined( HB_OS_VXWORKS ) && defined( _INTPTR ) && ! defined( _INTPTR_T )
+   #     define _INTPTR_T
+   #  endif
 
 /* for backward compatibility */
 #define s_defaultGT     hb_gt_szNameDefault
