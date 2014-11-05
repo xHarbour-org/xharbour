@@ -27,6 +27,10 @@
    #define _USING_V110_SDK71_
 #endif
 
+#if ( defined( __MINGW32__ ) || defined(__MINGW64__)) && (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ == 2)
+   #include <initguid.h>
+#endif
+
 /*
 Circumvent guiddef.h and propkeydef.h lacking support for CINTERFACE
 Which makes it impossible to compile C style OLE code
