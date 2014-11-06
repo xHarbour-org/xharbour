@@ -205,7 +205,7 @@ BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )
    }
    else {
       HWND wSelf = (HWND) wWidget->get_top_widget( wWidget->widget_data );
-      SetWindowLong( wSelf, GWL_USERDATA, 0 );
+      SetWindowLongPtr( wSelf, GWLP_USERDATA, 0 );
       DestroyWindow( wSelf );
       if( wWidget->destructor != NULL )
       {

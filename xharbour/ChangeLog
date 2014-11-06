@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-11-06 13:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/vm/fm.c
+    ! in structure _HB_MEMINFO changed ULONG ulSignature to UINT32 ulSignature do the value will be 32bits on 64 bits compile
+    ! in hb_xautorelease function changed PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE ); to PHB_MEMINFO pMemBlock = HB_FM_PTR( pMem ) becouse HB_FM_PTR does the same
+      and also using HB_FM_GETSIG insted of HB_GET_LONG to get the signature
+    ! in hb_mem2str changed type of uiSize parameter from UINT to HB_SIZE, as also change uiIndex and  uiPrintable variables types from UINT to HB_SIZE
+    ! on functions calls to  hb_mem2str removed the cast to UINT on uiSize parameter
+  * contrib/xwt/src/xwt_win/xwt_win.c  
+    ! using SetWindowLongPtr with GWLP_USERDATA insted of SetWindowLong with GWL_USERDATA ( 64bits compilation)
+  * contrib/xwt/src/xwt_win/xwt_win.h 
+    ! using GetWindowLongPtr with GWLP_USERDATA insted of GetWindowLong with GWL_USERDATA ( 64bits compilation)
+  * contrib/xwt/src/xwt_win/xwt_win_framewnd.c  
+    ! using SetWindowLongPtr with GWLP_USERDATA insted of SetWindowLong with GWL_USERDATA ( 64bits compilation)
+  * source/rtl/regex.c
+    ! when  added cast to hb_size type to int when comparing with > 0 and  < 0 
+  * contrib/tipssl/inetssl.h
+    ! added include <cinterface.h>
+                  
 2014-11-05 11:32 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/cinterface.h
     ! minor fix on includes for mingw 4.8.2

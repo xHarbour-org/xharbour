@@ -218,7 +218,7 @@ static HANDLE hProcessHeap = 0;
 
 typedef struct _HB_MEMINFO
 {
-   ULONG ulSignature;
+   UINT32 ulSignature;
    HB_SIZE ulSize;
    USHORT uiProcLine;
    USHORT uiAutoRelease;
@@ -789,12 +789,12 @@ void hb_xautorelease( void * pMem )            /* set memory to autorelease */
 
    if( pMem )
    {
-      PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
+      PHB_MEMINFO pMemBlock = HB_FM_PTR( pMem ) ;;//( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
 
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
          hb_errInternal( HB_EI_XFREEINV, "hb_xautorelease() Invalid Pointer %p %s", ( char * ) pMem, ( char * ) pMem );
 
-      if( HB_GET_LONG( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
+      if( HB_FM_GETSIG( pMem ,  pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
          hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xautorelease(%p) Pointer Overflow '%s'", ( char * ) pMem, ( char * ) pMem );
 
       pMemBlock->uiAutoRelease = 1;
@@ -835,10 +835,10 @@ void hb_xinit( void ) /* Initialize fixed memory subsystem */
    of pMem memory block */
 
 #ifdef HB_FM_STATISTICS
-static char * hb_mem2str( char * membuffer, void * pMem, UINT uiSize )
+static char * hb_mem2str( char * membuffer, void * pMem, HB_SIZE uiSize )
 {
    BYTE *   cMem = ( BYTE * ) pMem;
-   UINT     uiIndex, uiPrintable;
+   HB_SIZE     uiIndex, uiPrintable;
 
    uiPrintable = 0;
    for( uiIndex = 0; uiIndex < uiSize; uiIndex++ )
@@ -864,9 +864,9 @@ static char * hb_mem2str( char * membuffer, void * pMem, UINT uiSize )
          hinibble                      = cMem[ uiIndex ] >> 4;
          lownibble                     = cMem[ uiIndex ] & 0x0F;
          membuffer[ uiIndex * 2 ]      = hinibble <= 9 ?
-                                         ( char ) ( '0' + hinibble ) : ( char ) ( 'A' + hinibble - 10 );
+                               ( '0' + hinibble ) : ( 'A' + hinibble - 10 );
          membuffer[ uiIndex * 2 + 1 ]  = lownibble <= 9 ?
-                                         ( char ) ( '0' + lownibble ) : ( char ) ( 'A' + lownibble - 10 );
+                               ( '0' + lownibble ) : ( 'A' + lownibble - 10 );
       }
       membuffer[ uiIndex * 2 ] = '\0';
    }
@@ -968,14 +968,14 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                   pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                                   hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                                              HB_MIN( ( UINT ) pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) ) );
+                                              HB_MIN(  pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) ) );
 
          if( hLog )
             fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n", ui - 1,
                      ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                      pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                      hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                                 HB_MIN( ( UINT ) pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) );
+                                 HB_MIN(  pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) );
       }
 
       if( hLog )
@@ -1316,7 +1316,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
                TraceLog( NULL, "Block %i %p (size %lu) %s(%i), \"%s\"\n", ui,
                          ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                          pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
-                         hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE, ( UINT ) pMemBlock->ulSize ) );
+                         hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,  pMemBlock->ulSize ) );
             }
 
             ulResult = s_lMemoryConsumed;

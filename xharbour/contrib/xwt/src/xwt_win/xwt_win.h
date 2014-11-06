@@ -11,6 +11,19 @@
 #ifndef XWT_WIN_H
 #define XWT_WIN_H
 
+#if ((defined(_MSC_VER)&&(_MSC_VER<1300)&&!defined(__POCC__)) || defined(__WATCOMC__)|| defined(__DMC__))
+   #define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+   #if (defined(_MSC_VER)&&(_MSC_VER<1300)||defined(__DMC__))
+      #define GetWindowLongPtr    GetWindowLong
+      #define SetWindowLongPtr    SetWindowLong
+      #define DWORD_PTR           DWORD
+      #define LONG_PTR            LONG
+      #define ULONG_PTR           ULONG
+      #define GWLP_WNDPROC        GWL_WNDPROC
+      #define GWLP_USERDATA       GWL_USERDATA
+      #define DWLP_MSGRESULT      DWL_MSGRESULT
+   #endif
+#endif
 #include <windows.h>
 #include <xwt_api.h>
 
@@ -26,7 +39,7 @@ HB_EXPORT extern int    hb_iCmdShow;
    HB_ITEM Self; \
    PXWT_WIDGET _wSelf; \
    Self.type = HB_IT_OBJECT;\
-   _wSelf = (PXWT_WIDGET) GetWindowLong( var, GWL_USERDATA ); \
+   _wSelf = (PXWT_WIDGET) GetWindowLongPtr( var, GWLP_USERDATA ); \
    Self.item.asArray.value = _wSelf ? _wSelf->owner: 0; 
 
 LRESULT CALLBACK xwt_gtk_framewndproc(

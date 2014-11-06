@@ -16,8 +16,18 @@
 #define _WIN32_WINNT 0x0500
 #endif
 
-#ifndef ULONG_PTR
+#if ((defined(_MSC_VER)&&(_MSC_VER<1300)&&!defined(__POCC__)) || defined(__WATCOMC__)|| defined(__DMC__))
+   #define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+   #if (defined(_MSC_VER)&&(_MSC_VER<1300)||defined(__DMC__))
+      #define GetWindowLongPtr    GetWindowLong
+      #define SetWindowLongPtr    SetWindowLong
+      #define DWORD_PTR           DWORD
+      #define LONG_PTR            LONG
 #define ULONG_PTR ULONG
+      #define GWLP_WNDPROC        GWL_WNDPROC
+      #define GWLP_USERDATA       GWL_USERDATA
+      #define DWLP_MSGRESULT      DWL_MSGRESULT
+   #endif
 #endif
 
 #include "hbapi.h"
@@ -326,7 +336,7 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
    data->hStatusBar = NULL;
 
    /* BackReferences our XWT widget */
-   SetWindowLong( hWnd, GWL_USERDATA, (LONG) xwtData );
+   SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR) xwtData );
 
    /* Forward reference the window into XWT_WIDGET */
    xwtData->widget_data = (void *) data;

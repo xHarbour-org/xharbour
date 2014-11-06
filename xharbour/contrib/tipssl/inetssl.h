@@ -77,11 +77,12 @@
             #pragma warn -use
             #pragma warn -8012
          #endif
-         #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
-         #define _WINSOCK2API_ /* Prevents inclusion of Winsock.h in Windows.h */
-         #define _WINSOCK2_H
+         //#define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+         //#define _WINSOCK2API_ /* Prevents inclusion of Winsock.h in Windows.h */
+         //#define _WINSOCK2_H
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
+         #include "cinterface.h"
          #include <windows.h>
 
          #define HB_INET_CLOSE( x )    closesocket( x )
@@ -158,6 +159,8 @@
          s->timeout = -1;\
          s->timelimit = -1;\
          s->caPeriodic = NULL;\
+         s->iSndBufSize = 1400; \
+         s->iRcvBufSize = 1400; \         
          s->pCTX= SSL_CTX_new( SSLv23_client_method());\
          s->store=NULL;\
       }

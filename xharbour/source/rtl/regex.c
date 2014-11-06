@@ -551,7 +551,7 @@ int Wild2RegEx( const char * sWild, char * sRegEx, BOOL bMatchCase )
    hb_strncpy( sRegEx + iLenResult, "\\b", 2 );
    iLenResult += 2;
 
-   for( i = 0; i < iLen; i++ )
+   for( i = 0; i < (int) iLen; i++ )
    {
       cChar = sWild[ i ];
 
@@ -650,7 +650,8 @@ HB_FUNC( HB_ATX )
    PHB_ITEM    pRegEx         = hb_param( 1, HB_IT_STRING );
    PHB_ITEM    pString        = hb_param( 2, HB_IT_STRING );
    PHB_ITEM    pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   HB_SIZE     lStart         = hb_parnl( 4 ), lEnd = hb_parnl( 5 );
+//    HB_SIZE     lStart         = hb_parnl( 4 ), lEnd = hb_parnl( 5 );
+   HB_SIZE     lStart         = hb_parns( 4 ), lEnd = hb_parns( 5 );
 
    if( pRegEx && pString && lStart <= pString->item.asString.length )
    {
@@ -661,26 +662,26 @@ HB_FUNC( HB_ATX )
       if( pReg )
       {
          /* Validate and convert to ZERO based */
-         if( lStart > 0 )
+         if( (int)lStart > 0 )
             lStart--;
-         else if( lStart < 0 )
+         else if( (int)lStart < 0 )
          {
             lStart += pString->item.asString.length - 1;
             /* lStart += hb_itemGetCLen( pString ) - 1; */
 
-            if( lStart < 0 )
+            if( (int)lStart < 0 )
                lStart = 0;
          }
 
          /* Validate and convert to ZERO based */
-         if( lEnd > 0 )
+         if( (int)lEnd > 0 )
          {
             lEnd--;
 
             if( lEnd > pString->item.asString.length )
                lEnd = lStart ? pString->item.asString.length : 0;
          }
-         else if( lEnd < 0 )
+         else if( (int)lEnd < 0 )
          {
             lEnd += pString->item.asString.length;
 
