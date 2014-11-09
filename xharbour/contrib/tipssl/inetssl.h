@@ -55,31 +55,15 @@
    #include "hbdefs.h"
    #include "hbvm.h"
    #include "hbapierr.h"
-   #include <openssl/ssl.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
-   #include <openssl/err.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
-   #include <openssl/rand.h>
-   #include <openssl/bio.h>
-   #include <openssl/sha.h>
-   #include <openssl/hmac.h>
-   #include <openssl/evp.h>
-   #include <openssl/bio.h>
-   #include <openssl/buffer.h>
 
    #define  HB_SOCKET_SIGN   0xF0123A42
 
    #if defined( HB_OS_DOS )
        #define HB_NO_DEFAULT_INET
    #else
-      #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
-         #if defined( __BORLANDC__ )
-            #pragma warn -aus
-            #pragma warn -prc
-            #pragma warn -use
-            #pragma warn -8012
-         #endif
-         //#define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
-         //#define _WINSOCK2API_ /* Prevents inclusion of Winsock.h in Windows.h */
-         //#define _WINSOCK2_H
+       #if defined( HB_OS_WIN )
+         #undef OPENSSL_SYS_WIN32
+         #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
          #include "cinterface.h"
@@ -111,6 +95,17 @@
          #endif
          #include <errno.h>
       #endif
+      
+      #include <openssl/ssl.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
+      #include <openssl/err.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
+      #include <openssl/rand.h>
+      #include <openssl/bio.h>
+      #include <openssl/sha.h>
+      #include <openssl/hmac.h>
+      #include <openssl/evp.h>
+      #include <openssl/bio.h>
+      #include <openssl/buffer.h>
+      
 
       typedef struct tag_HB_SSL_SOCKET_STRUCT
       {
@@ -131,18 +126,25 @@
           X509_STORE *store ;
       } HB_SSL_SOCKET_STRUCT;
 
+#if !defined(HB_OS_UNIX)
+      typedef struct _CPINGREPLY
+      {
+          IN_ADDR  Address;           /* The IP address of the replier */
+          ULONG    RTT;               /* Round Trip time in Milliseconds */
+      } HB_PINGREPLY;
+#endif
       #define HB_SSLPARSOCKET( n )     ( ( HB_SSL_SOCKET_STRUCT * ) hb_parptrGC( hb_inetSocketFinalize, n ) )
 
       #define HB_SOCKET_ZERO_ERROR( s )  s->errorCode = 0; s->errorDesc = ""
 
-      #if defined( HB_OS_WIN ) || defined( HB_OS_WIN_USED )
+      #if defined( HB_OS_WIN )
           #define HB_SOCKET_SET_ERROR( s ) \
               s->errorCode = WSAGetLastError(); \
               s->errorDesc = hb_strerror( s->errorCode );\
               WSASetLastError( 0 );
 
       #else
-          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = strerror( errno )
+          #define HB_SOCKET_SET_ERROR( s ) s->errorCode = errno; s->errorDesc = hb_strerror( errno )
       #endif
 
       #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = hb_strerror( code );
@@ -160,7 +162,7 @@
          s->timelimit = -1;\
          s->caPeriodic = NULL;\
          s->iSndBufSize = 1400; \
-         s->iRcvBufSize = 1400; \         
+         s->iRcvBufSize = 1400; \
          s->pCTX= SSL_CTX_new( SSLv23_client_method());\
          s->store=NULL;\
       }
