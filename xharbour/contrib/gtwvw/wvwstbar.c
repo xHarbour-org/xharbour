@@ -129,7 +129,7 @@ HB_FUNC( WVW_SBCREATE)
 
    }
 
-   hb_retnl ( (LONG) hWndSB );
+   HB_RETHANDLE ( (HWND) hWndSB );
 }
 
 /*WVW_SBdestroy( [nWinNum] )
@@ -555,7 +555,7 @@ HB_FUNC( WVW_XBCREATE)
        iRight-iLeft+1,                         /* width of the scroll bar */
        iBottom-iTop+1,                         /* height */
        hWndParent,                   /* handle to main window */
-       (HMENU) uiXBid,           /* id for this scroll bar control */
+       (HMENU)( HB_PTRDIFF ) uiXBid,           /* id for this scroll bar control */
        (HINSTANCE) hb_hInstance,                  /* instance owning this window */
        (LPVOID) NULL           /* pointer not needed */
    );

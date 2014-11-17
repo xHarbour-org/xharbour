@@ -213,7 +213,7 @@ HB_FUNC( WVW_EBCREATE)
        iRight-iLeft+1,
        iBottom-iTop+1,
        hWndParent,
-       (HMENU) uiEBid,
+       (HMENU) ( HB_PTRDIFF ) uiEBid,
        (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
@@ -809,7 +809,7 @@ HB_FUNC( WVW_STCREATE )
        iRight-iLeft+1,
        iBottom-iTop+1,
        hWndParent,
-       (HMENU) uiCBid,
+       (HMENU)( HB_PTRDIFF ) uiCBid,
        (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );

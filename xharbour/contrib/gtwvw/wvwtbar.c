@@ -202,7 +202,7 @@ HB_FUNC( WVW_TBCREATE)
      hb_gt_wvwResetWindow( usWinNum );
    }
 
-   hb_retnl ( (LONG) hWndTB );
+   HB_RETHANDLE ( (HWND) hWndTB );
 }
 
 /*WVW_TBAddButton([nWinNum], nCommand, xBitmap, cLabel, nBitmapType,;

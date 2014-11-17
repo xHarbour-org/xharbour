@@ -51,7 +51,7 @@
  *
  */
 
-
+#include "sqlite3.h"
 /*-----------------------------------------------------------------------------------------
  XHarbour Port from orginale Harbour version by P.Chornyj <myorg63@mail.ru>
  November 18, 2011 by R.Visscher <richard@irvis.com>
@@ -62,11 +62,14 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
+#include "hbapistr.h"
 #include "hbstack.h"
 
-#include "hbapistr.h"   // ported from Harbour
-
-#include "sqlite3.h"
+/* TOFIX: verify the exact SQLITE3 version */
+#if SQLITE_VERSION_NUMBER <= 3004001
+#define sqlite3_int64                       HB_LONGLONG
+#define sqlite3_uint64                      HB_ULONGLONG
+#endif
 
 #define HB_SQLITE3_DB                        6000001
 
@@ -76,28 +79,30 @@
 
 #ifdef SQLITE3_DYNLIB
 extern char * sqlite3_temp_directory;
-#endif
+#endif /* SQLITE3_DYNLIB */
 
 static PHB_ITEM hb_sqlite3_itemPut( PHB_ITEM pItem, void * pMemAddr, int iType );
 static void *   hb_sqlite3_itemGet( PHB_ITEM pItem, int iType, BOOL fError );
 static void     hb_sqlite3_ret( void * pMemAddr, int iType );
 static void *   hb_sqlite3_param( int iParam, int iType, BOOL fError );
 
-static int  authorizer( void *, int, const char *, const char *, const char *, const char * );
 static int  callback( void *, int, char **, char ** );
+static int  authorizer( void *, int, const char *, const char *, const char *, const char * );
 static int  busy_handler( void *, int );
 static int  progress_handler( void * );
 static int  hook_commit( void * );
 static void hook_rollback( void * );
+static void func( sqlite3_context *, int, sqlite3_value ** );
 
 typedef struct
 {
    sqlite3 * db;
    PHB_ITEM cbAuthorizer;
-   PHB_ITEM cbHookCommit;
-   PHB_ITEM cbHookRollback;
    PHB_ITEM cbBusyHandler;
    PHB_ITEM cbProgressHandler;
+   PHB_ITEM  cbHookCommit;
+   PHB_ITEM  cbHookRollback;
+   PHB_ITEM  cbFunc;
 } HB_SQLITE3, * PHB_SQLITE3;
 
 typedef struct

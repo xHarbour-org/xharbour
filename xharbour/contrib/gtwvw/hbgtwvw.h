@@ -89,9 +89,12 @@
 #endif
 
 #include <math.h>       /* fmod */
-
+#if !defined(WINVER)
 #define WINVER 0x0500
+#endif
+#if !defined(_WIN32_WINNT )
 #define _WIN32_WINNT 0x0500
+#endif
 #include "cinterface.h"
 #include <windows.h>
 #include <winuser.h>
@@ -599,12 +602,12 @@ typedef struct wvw_data
 
 }WVW_DATA ;
 
-   //#define HB_RETHANDLE( h )        hb_retptr( ( void * ) ( h ) )
-   //#define HB_PARHANDLE( n )        hb_parptr( n )
-   //#define HB_STOREHANDLE( h, n )   hb_storptr( ( void * ) ( h ), n )
-   #define HB_RETHANDLE( h )        hb_retnl( ( LONG ) ( h ) )
-   #define HB_PARHANDLE( n )        ( ( LONG ) hb_parnl( n ) )
-   #define HB_STOREHANDLE( h, n )   hb_stornl( ( LONG ) ( h ), n )
+   #define HB_RETHANDLE( h )        hb_retptr( ( void * ) ( h ) )
+   #define HB_PARHANDLE( n )        hb_parptr( n )
+   #define HB_STOREHANDLE( h, n )   hb_storptr( ( void * ) ( h ), n )
+//    #define HB_RETHANDLE( h )        hb_retnl( ( LONG ) ( h ) )
+//    #define HB_PARHANDLE( n )        ( ( LONG ) hb_parnl( n ) )
+//    #define HB_STOREHANDLE( h, n )   hb_stornl( ( LONG ) ( h ), n )
 HB_EXTERN_BEGIN
 extern HANDLE  hb_hInstance;
 extern HANDLE  hb_hPrevInstance;

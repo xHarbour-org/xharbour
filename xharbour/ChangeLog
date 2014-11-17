@@ -8,6 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2014-11-17 09:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * contrib/hbsqlit3/sqlite3.c
+  * contrib/hbsqlit3/sqlite3.h
+  * contrib/hbsqlit3/sqlite3ext.h
+    ! updated sqlite to version 3.8.7.1
+  * contrib/hbsqlit3/xhbsqlite3.c
+    ! some minor updates
+  * contrib/gtwvw/gtwvw.c  
+  * contrib/gtwvw/wvwcheck.c
+  * contrib/gtwvw/wvwedit.c
+  * contrib/gtwvw/wvwfuncs.c
+  * contrib/gtwvw/wvwmenu.c
+  * contrib/gtwvw/wvwpush.c
+  * contrib/gtwvw/wvwstbar.c
+  * contrib/gtwvw/wvwtbar.c
+    ! updated to compile also in 64bits .
+    ! warning. the functions in the list bellow should be tested !empty(returnvalues) insted of returnvalue !=0 since the return is now pointer type
+      WVW_GET_HND_WINDOW,WVW_GETWINDOWHANDLE,WIN_GETDLGITEM,WIN_LOADICON,WIN_LOADIMAGE,WIN_GETDC,WIN_CREATEBRUSH.CREATEIMAGELIST
+      LOADIMAGE,LOADBITMAP,LOADBITMAPEX,OPENIMAGE,OPENBITMAP,CREATESOLIDBRUSH,CREATEHATCHBRUSH,CREATEFONT,LOADICON,WINDOW2BITMAP
+      WVW_DLGSETICON,WVW_CREATEDIALOGDYNAMIC,WVW_CREATEFONT,WVW_SETPOPUPMENU,WVW_CREATEMENU,WVW_CREATEPOPUPMENU,WVW_GETMENU
+      WVW_GETSYSTEMMENU,WVW_SBCREATE,WVW_TBCREATE
+  * contrib/gtwvw/hbgtwvw.h    
+    ! some new constants and defines updated to allow 64bits
+    
+
 2014-11-09 10:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/tipssl/inetssl.h
     * moved openssl include files to be after the include of winsock2.h
@@ -7868,7 +7894,7 @@
 
   * source/vm/itemapi.c
   * include/hbapiitm.h
-    + function hb_itemPutTDT()
+    + function hb_itemPutDTL()
 
     /* borrowed from Harbour */
 

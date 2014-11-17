@@ -165,10 +165,13 @@ HB_FUNC( WVW_APPENDMENU )
   }
   else
   {
-    lpszCaption = ( LPCTSTR ) hb_parni( 4 ) ;
+    lpszCaption = ( LPCTSTR ) hb_parptr( 4 ) ;
   }
-
-  hb_retl( AppendMenu( ( HMENU ) HB_PARHANDLE( 1 ), ( UINT ) hb_parni( 2 ), ( UINT_PTR ) hb_parni( 3 ),( LPCTSTR ) lpszCaption ) ) ;
+  if ( ISPOINTER( 3 ) )
+     hb_retl( AppendMenu( ( HMENU ) HB_PARHANDLE( 1 ), ( UINT ) hb_parni( 2 ), ( UINT_PTR ) hb_parptr( 3 ),( LPCTSTR ) lpszCaption ) ) ;
+  else
+     hb_retl( AppendMenu( ( HMENU ) HB_PARHANDLE( 1 ), ( UINT ) hb_parni( 2 ), ( UINT_PTR ) hb_parni( 3 ),( LPCTSTR ) lpszCaption ) ) ;
+  
 }
 
 /*-------------------------------------------------------------------*/
@@ -387,5 +390,5 @@ HB_FUNC( WVW_GETSYSTEMMENU )
    UINT usWinNum = WVW_WHICH_WINDOW;
    WIN_DATA * pWindowData = hb_gt_wvw_GetWindowsData( usWinNum );
    BOOL   lReset = ISNIL(2) ? FALSE : hb_parl(2);
-   hb_retnl( ( ULONG ) GetSystemMenu( pWindowData->hWnd, lReset ) );
+   HB_RETHANDLE( ( HMENU ) GetSystemMenu( pWindowData->hWnd, lReset ) );
 }

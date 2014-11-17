@@ -151,6 +151,7 @@ HB_FUNC( WVW_PBCREATE)
                           iOffTop, iOffLeft, iOffBottom, iOffRight,
                           dStretch, bMap3Dcolors,
                           BS_PUSHBUTTON );
+   TraceLog("gt.log","push id %i\n",uiPBid);
    hb_retnl( (LONG) uiPBid );
 }
 
@@ -551,7 +552,7 @@ HB_FUNC( WVW_CBCREATE)
        iRight-iLeft+1,
        iBottom-iTop+1,
        hWndParent,
-       (HMENU) uiCBid,
+       (HMENU) ( HB_PTRDIFF )uiCBid,
        (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
@@ -641,7 +642,7 @@ HB_FUNC( WVW_CBCREATE)
      StoreControlProc(usWinNum, WVW_CONTROL_COMBOBOX, hWndCB, OldProc);
 
      SendMessage( hWndCB, WM_SETFONT, (WPARAM) pWindowData->hCBfont, (LPARAM) TRUE);
-     hb_stornl((LONG)hWndCB,11);
+     HB_STOREHANDLE((HWND)hWndCB,11);
 
      hb_retnl( (LONG) uiCBid );
    }

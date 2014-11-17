@@ -533,7 +533,7 @@ HB_FUNC( WVW_PGCREATE)
        iRight-iLeft+1,
        iBottom-iTop+1,
        hWndParent,
-       (HMENU) uiPGid,
+       (HMENU) ( HB_PTRDIFF )uiPGid,
        (HINSTANCE) hb_hInstance,
        (LPVOID) NULL
    );
