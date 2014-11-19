@@ -53,7 +53,7 @@
 
 #include "hbclass.ch"
 #include "tip.ch"
-
+#include "common.ch"
 /**
 * Inet service manager: http
 */
@@ -81,6 +81,7 @@ CLASS TIPClientHTTP FROM TIPClient
    METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
    METHOD READ( nLen )
+   
    METHOD UseBasicAuth()   INLINE ::cAuthMode := "Basic"
    METHOD ReadAll()
    METHOD SetCookie( cLine )
@@ -89,11 +90,19 @@ CLASS TIPClientHTTP FROM TIPClient
    METHOD Attach( cName, cFileName, cType )
    METHOD PostMultiPart( cPostData, cQuery )
    METHOD WriteAll( cFile )
+   
+   METHOD Put( xPostData, cQuery )
+   METHOD Delete( xPostData, cQuery )
+   METHOD Head( xPostData, cQuery )   
+   METHOD Close()
+   
+   
 
    DESTRUCTOR httpClnDestructor()
 
    HIDDEN:
    METHOD StandardFields()
+   METHOD PostData(xPostData, cQuery, cOp )
 
 ENDCLASS
 
@@ -147,8 +156,20 @@ METHOD Get( cQuery ) CLASS TIPClientHTTP
    RETURN .F.
 
 METHOD Post( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "POST" )
 
+METHOD Put( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "PUT" )
+
+METHOD Delete( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "DELETE" )
+METHOD Head( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "HEAD" )
+
+
+METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
    LOCAL cData, nI, cTmp, y
+   DEFAULT cOp to "POST"
 
    IF HB_ISHASH( cPostData )
       cData := ""
@@ -193,7 +214,7 @@ METHOD Post( cPostData, cQuery ) CLASS TIPClientHTTP
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, cOp + " " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
    IF ! "Content-Type" IN ::hFields
@@ -677,3 +698,14 @@ METHOD WriteAll( cFile ) CLASS TIPClientHTTP
    ENDIF
 
    RETURN lSuccess
+
+   
+METHOD CLOSE() CLASS TIPClientHTTP
+
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
+   if ::lTrace
+      FClose( ::nHandle )
+      ::nHandle := - 1
+   ENDIF
+
+RETURN ::super:CLOSE()   

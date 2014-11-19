@@ -53,7 +53,7 @@
 
 #include "hbclass.ch"
 #include "tip.ch"
-
+#include "common.ch"
 /**
 * Inet service manager: http
 */
@@ -79,6 +79,7 @@ CLASS tIPClientHTTP FROM tIPClient
    METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
    METHOD Read( nLen )
+   
    METHOD UseBasicAuth()      INLINE   ::cAuthMode := "Basic"
    Method ReadAll()
    Method SetCookie
@@ -87,11 +88,29 @@ CLASS tIPClientHTTP FROM tIPClient
    METHOD Attach(cName,cFileName,cType)
    Method PostMultiPart
    Method WriteAll( cFile )
-   DESTRUCTOR httpClnDestructor
+   
+   METHOD Put( xPostData, cQuery )
+   METHOD Delete( xPostData, cQuery )
+   METHOD Head( xPostData, cQuery )   
+   METHOD Close()
+   
+   
+
+   DESTRUCTOR httpClnDestructor()
 HIDDEN:
    METHOD StandardFields()
+   METHOD PostData(xPostData, cQuery, cOp )
 
 ENDCLASS
+
+PROCEDURE httpClnDestructor() CLASS TIPClientHTTP
+
+   IF ::lTrace .AND. ::nHandle > 0
+      FClose( ::nHandle )
+      ::nHandle := - 1
+   ENDIF
+
+   RETURN
 
 METHOD New( oUrl,lTrace, oCredentials, CAFile,CaPath ) CLASS tIPClientHTTP
    local cFile := "httpcln"
@@ -134,9 +153,21 @@ METHOD Get( cQuery ) CLASS tIPClientHTTP
    ENDIF
 RETURN .F.
 
+METHOD Post( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "POST" )
 
-METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
+METHOD Put( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "PUT" )
+
+METHOD Delete( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "DELETE" )
+METHOD Head( cPostData, cQuery ) CLASS TIPClientHTTP
+return ::PostData(cPostData, cQuery, "HEAD" )
+
+
+METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
    LOCAL cData, nI, cTmp,y
+   DEFAULT cOp to "POST"
 
    IF HB_IsHash( cPostData )
       cData := ""
@@ -181,7 +212,7 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
-   ::InetSendall( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::InetSendAll( ::SocketCon, cOp + " " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
    IF .not. "Content-Type" IN ::hFields
@@ -652,11 +683,12 @@ METHOD WriteAll( cFile ) CLASS tIPClientHTTP
    RETURN lSuccess
 
 
-PROCEDURE httpClnDestructor CLASS tIPClientHTTP
-   if ::ltrace .and. ::nhandle > -1    
+METHOD CLOSE() CLASS TIPClientHTTP
+
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
+   if ::lTrace
       fClose( ::nHandle )
       ::nhandle := -1 
    endif
 
-
-RETURN
+RETURN ::super:CLOSE()   
