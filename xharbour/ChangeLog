@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-11-14 00:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\gtwvw\wvwfuncs.c
+    ! pacify warning
+
 2014-11-19 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/httpcln.prg
     contrib/tipssl/httpcln.prg

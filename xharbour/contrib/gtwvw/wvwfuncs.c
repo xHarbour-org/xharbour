@@ -2291,7 +2291,7 @@ HB_FUNC( WVW__MAKEDLGTEMPLATE )
 /* 768 is the maximum size of one item */
       if( ( ( HB_PTRDIFF ) p - ( HB_PTRDIFF ) pdlgtemplate ) > _BUFFERSIZE - 768 )
       {
-         nItems = i;
+//         nItems = i;
          break;
       }      
     } 
