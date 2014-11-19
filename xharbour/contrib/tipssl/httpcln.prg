@@ -171,30 +171,34 @@ METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
 
    IF HB_IsHash( cPostData )
       cData := ""
+      y := Len( cPostData )
       FOR nI := 1 TO Len( cPostData )
-         cTmp := HGetKeyAt( cPostData, nI )
-         cTmp := CStr( cTmp )
-         cTmp := AllTrim( cTmp )
-         cTmp := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := HGetKeyAt( cPostData, nI )
+*          cTmp  := CStr( cTmp )
+*          cTmp  := AllTrim( cTmp )
+         cTmp  := TipEncoderUrl_Encode( Alltrim( cStr( HGetKeyAt( cPostData, nI ) ) ) )
          cData += cTmp +"="
-         cTmp := HGetValueAt( cPostData, nI )
-         cTmp := CStr( cTmp )
-         cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp + "&"
+*          cTmp  := HGetValueAt( cPostData, nI )
+*          cTmp  := CStr( cTmp )
+         cTmp  := TipEncoderUrl_Encode( cStr( HGetValueAt( cPostData, nI )) )
+          cData += cTmp 
+         IF nI != y
+            cData += "&"
+         ENDIF
       NEXT
-      cData := left( cData, len( cData ) - 1 )
+*       cData := Left( cData, Len( cData ) - 1 )
    elseIF HB_IsArray( cPostData )
       cData := ""
       y:=Len(cPostData)
       FOR nI := 1 TO y
-         cTmp := cPostData[ nI ,1]
-         cTmp := CStr( cTmp )
-         cTmp := AllTrim( cTmp )
-         cTmp := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := cPostData[ nI ,1]
+*          cTmp  := CStr( cTmp )
+*          cTmp  := AllTrim( cTmp )
+         cTmp  := TipEncoderUrl_Encode( Alltrim( cStr(cPostData[ nI ,1] ) ) )
          cData += cTmp +"="
-         cTmp := cPostData[ nI,2]
-         cTmp := CStr( cTmp )
-         cTmp := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := cPostData[ nI,2]
+*          cTmp  := CStr( cTmp )
+         cTmp  := TipEncoderUrl_Encode( cStr( cPostData[ nI,2] ) )
          cData += cTmp
          IF nI!=y
             cData+="&"
@@ -204,7 +208,7 @@ METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
    ELSEIF HB_IsString( cPostData )
       cData := cPostData
    ELSE
-      Alert( "TipClientHTTP_PostRequest: Invalid parameters" )
+*       Alert( "TIPClientHTTP_PostRequest: Invalid parameters" )
       RETURN .F.
    ENDIF
 

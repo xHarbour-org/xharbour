@@ -173,30 +173,35 @@ METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
 
    IF HB_ISHASH( cPostData )
       cData := ""
+      y := Len( cPostData )
       FOR nI := 1 TO Len( cPostData )
-         cTmp  := HGetKeyAt( cPostData, nI )
-         cTmp  := CStr( cTmp )
-         cTmp  := AllTrim( cTmp )
-         cTmp  := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := HGetKeyAt( cPostData, nI )
+*          cTmp  := CStr( cTmp )
+*          cTmp  := AllTrim( cTmp )
+         cTmp  := TipEncoderUrl_Encode( Alltrim( cStr( HGetKeyAt( cPostData, nI ) ) ) )
          cData += cTmp + "="
-         cTmp  := HGetValueAt( cPostData, nI )
-         cTmp  := CStr( cTmp )
-         cTmp  := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp + "&"
+*          cTmp  := HGetValueAt( cPostData, nI )
+*          cTmp  := CStr( cTmp )
+         cTmp  := TipEncoderUrl_Encode( cStr( HGetValueAt( cPostData, nI )) )
+          cData += cTmp 
+         IF nI != y
+            cData += "&"
+         ENDIF
       NEXT
-      cData := Left( cData, Len( cData ) - 1 )
+*       cData := Left( cData, Len( cData ) - 1 )
+
    ELSEIF HB_ISARRAY( cPostData )
       cData := ""
       y := Len( cPostData )
       FOR nI := 1 TO y
-         cTmp  := cPostData[ nI ,1]
-         cTmp  := CStr( cTmp )
-         cTmp  := AllTrim( cTmp )
-         cTmp  := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := cPostData[ nI ,1]
+*          cTmp  := CStr( cTmp )
+*          cTmp  := AllTrim( cTmp )
+         cTmp  := TipEncoderUrl_Encode( Alltrim( cStr(cPostData[ nI ,1] ) ) )
          cData += cTmp + "="
-         cTmp  := cPostData[ nI,2]
-         cTmp  := CStr( cTmp )
-         cTmp  := TipEncoderUrl_Encode( cTmp )
+*          cTmp  := cPostData[ nI,2]
+*          cTmp  := CStr( cTmp )
+         cTmp  := TipEncoderUrl_Encode( cStr( cPostData[ nI,2] ) )
          cData += cTmp
          IF nI != y
             cData += "&"
@@ -206,7 +211,7 @@ METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
    ELSEIF HB_ISSTRING( cPostData )
       cData := cPostData
    ELSE
-      Alert( "TIPClientHTTP_PostRequest: Invalid parameters" )
+*       Alert( "TIPClientHTTP_PostRequest: Invalid parameters" )
       RETURN .F.
    ENDIF
 
@@ -221,7 +226,7 @@ METHOD PostData(cPostData, cQuery, cOp ) CLASS TIPClientHTTP
       ::InetSendAll( ::SocketCon, e"Content-Type: application/x-www-form-urlencoded\r\n" )
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "Content-Length: " + LTrim( Str( Len( cData ) ) ) + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "Content-Length: " + hb_ntos( Len( cData ) )  + ::cCRLF )
 
    // End of header
    ::InetSendAll( ::SocketCon, ::cCRLF )
@@ -664,7 +669,7 @@ METHOD PostMultiPart( cPostData, cQuery ) CLASS TIPClientHTTP
       ::InetSendAll( ::SocketCon, e"Content-Type: multipart/form-data; boundary=" + ::Boundary( 2 ) + ::cCrlf )
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "Content-Length: " + LTrim( Str( Len( cData ) ) ) + ::cCRLF )
+   ::InetSendAll( ::SocketCon, "Content-Length: " + hb_ntos( Len( cData ) )  + ::cCRLF )
    // End of header
    ::InetSendAll( ::SocketCon, ::cCRLF )
 

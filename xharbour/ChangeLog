@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-11-19 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/tip/httpcln.prg
+    contrib/tipssl/httpcln.prg
+    ! optimize LTrim( Str( Len( cData ) ) ) -> hb_ntos( Len( cData ) )
+    ! minor fix to previus commit
+      
 2014-11-19 19:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/httpcln.prg
     contrib/tipssl/httpcln.prg
