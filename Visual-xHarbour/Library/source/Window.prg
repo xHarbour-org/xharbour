@@ -1213,18 +1213,18 @@ METHOD RegisterDocking() CLASS Window
       ENDIF
     ELSEIF ::Dock != NIL
       IF ::Dock:Left != NIL .AND. ASCAN( ::Dock:Left:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-         AADD( ::Dock:Left:__aDock, Self )
-      ENDIF
+            AADD( ::Dock:Left:__aDock, Self )
+         ENDIF
       IF ::Dock:Top != NIL .AND. ASCAN( ::Dock:Top:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-         AADD( ::Dock:Top:__aDock, Self )
-      ENDIF
+            AADD( ::Dock:Top:__aDock, Self )
+         ENDIF
       IF ::Dock:Right != NIL .AND. ASCAN( ::Dock:Right:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-         AADD( ::Dock:Right:__aDock, Self )
-      ENDIF
+            AADD( ::Dock:Right:__aDock, Self )
+         ENDIF
       IF ::Dock:Bottom != NIL .AND. ASCAN( ::Dock:Bottom:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-         AADD( ::Dock:Bottom:__aDock, Self )
+            AADD( ::Dock:Bottom:__aDock, Self )
+         ENDIF
       ENDIF
-   ENDIF
 RETURN Self
 
 FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
@@ -1600,8 +1600,8 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
          FOR EACH oChild IN aChildren
              IF VALTYPE( oChild ) == "O"
                 oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-                IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
-                   oChild:CenterWindow()
+             IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
+                oChild:CenterWindow()
                 ENDIF
                 oChild:UpdateWindow()
              ENDIF
@@ -2825,7 +2825,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                              oItem := oMenu:aItems[ i ]
                            ELSE
                              n := nwParam + 1
-                             FOR i := nwParam TO 1 STEP -1
+                             FOR i := nwParam + 1 TO 1 STEP -1
                                  oItem := oMenu:aItems[ i ]
                                  IF ! oItem:Visible
                                     n++
