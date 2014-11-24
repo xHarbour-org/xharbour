@@ -72,7 +72,7 @@
 // #include "hbstack.h"
 #include "hbvm.h"
 #include "hbipapi.h"
-#include "thread.h"
+#include "thread.h" 
 #include "directry.ch"
 
 #if ! defined( HB_OS_WIN_CE )
@@ -86,7 +86,7 @@
 
 #define HB_FLOCK_RESIZE 16
 
-#define HB_LENGTH_ACK   4
+#define HB_LENGTH_ACK   4 
 static char       szDataACK[ HB_LENGTH_ACK ];
 
 static PHB_FILE   s_openFiles = NULL;
@@ -776,7 +776,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 void hb_fileNetClose( PHB_FILE pFile )
 {
    HB_FHANDLE  hFile       = FS_ERROR;
-   HB_SOCKET_T hCurSocket  = ( HB_SOCKET_T ) NULL;
+   HB_SOCKET_T hCurSocket  =  NULL;
 
    hb_threadLock( S_FILENETMTX );
 
@@ -1065,7 +1065,11 @@ USHORT hb_fileNetWrite( PHB_FILE pFile, const char * pBuffer, USHORT uiCount )
       ULONG    ulLen;
 
       szData   = ( char * ) hb_xgrab( 36 + uiCount + HB_LENGTH_ACK );
+      #if defined(HB_ARCH_64BIT)            
+         ulLen    = sprintf( szData + HB_LENGTH_ACK, "O|%p|%hu|", ( void * ) ((uintptr_t)pFile->hFile), uiCount );
+      #else   
       ulLen    = sprintf( szData + HB_LENGTH_ACK, "O|%p|%hu|", ( void * ) pFile->hFile, uiCount );
+      #endif
       ptr      = szData + HB_LENGTH_ACK + ulLen;
       HB_MEMCPY( ptr, ( char * ) pBuffer, uiCount );
       ptr      = ptr + uiCount;
@@ -1103,8 +1107,11 @@ BOOL hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
    {
       char  szData[ 30 + HB_LENGTH_ACK ];
       int   nSend;
-
+      #if defined(HB_ARCH_64BIT)            
+         nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) ((uintptr_t)pFile->hFile), llOffset );
+      #else
       nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) pFile->hFile, llOffset );
+      #endif
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1006 ) )
          return strncmp( szBuffer, szOk, 2 ) == 0;
@@ -1123,8 +1130,11 @@ HB_FOFFSET hb_fileNetSeekLarge( PHB_FILE pFile, HB_FOFFSET llOffset, USHORT uiFl
    {
       char  szData[ 50 + HB_LENGTH_ACK ];
       ULONG nSend;
-
+      #if defined(HB_ARCH_64BIT)      
+      nSend = sprintf( szData + HB_LENGTH_ACK, "G|%p|%" PFHL "i|%hu|\r\n", ( void * ) ((uintptr_t)pFile->hFile), llOffset, uiFlags );
+      #else
       nSend = sprintf( szData + HB_LENGTH_ACK, "G|%p|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, llOffset, uiFlags );
+      #endif
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1007 ) )
       {
@@ -1173,7 +1183,13 @@ void hb_fileNetCommit( PHB_FILE pFile )
       char  szData[ 36 + HB_LENGTH_ACK ];
       int   nSend;
 
+//       nSend = sprintf( szData + HB_LENGTH_ACK, "H|%p|\r\n", ( void * ) pFile->hFile );
+  #if defined(HB_ARCH_64BIT)  
+         nSend = sprintf( szData + HB_LENGTH_ACK, "H|%p|\r\n", ( void * ) ((uintptr_t) pFile->hFile ));
+  #else
+  
       nSend = sprintf( szData + HB_LENGTH_ACK, "H|%p|\r\n", ( void * ) pFile->hFile );
+  #endif
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 ) )
       {
@@ -2097,7 +2113,11 @@ HB_FUNC( NET_OPENCONNECTION )
    hb_ipInit();
    hb_NetOpenConnection( hb_parc( 1 ), hb_parni( 2 ) );
    if( hSocket )
+      #if defined(HB_ARCH_64BIT)           
+         hb_retptr( ( void * ) ((uintptr_t)hSocket ));
+      #else         
       hb_retptr( ( void * ) hSocket );
+      #endif
    else
       hb_retnl( 0 );
 }
@@ -2141,6 +2161,19 @@ static const HB_FILE_FUNCS * hb_fileNetMethods( void )
    return &s_fileFuncs;
 }
 
+static int s_iFileInit = 0;
+static void hb_fileNet_exit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( s_iFileInit )
+   {
+      if ( szBuffer )
+         hb_xfree( szBuffer ) ;
+      s_iFileInit = 0;
+   }
+}
+
 static void hb_fileNet_init( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
@@ -2153,6 +2186,9 @@ static void hb_fileNet_init( void * cargo )
       szBuffer    = ( char * ) hb_xalloc( lBufferLen );
       hb_xautorelease( ( void * ) szBuffer );
       hb_fileRegister( hb_fileNetMethods() );
+      hb_vmAtQuit( hb_fileNet_exit, NULL );      
+      s_iFileInit = 1;
+      
    }
 }
 

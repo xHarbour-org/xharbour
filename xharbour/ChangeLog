@@ -8,6 +8,51 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2014-11-24 21:30  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
+  * source/tip/httpcln.prg
+    contrib/tipssl/httpcln.prg
+    ! minor adjust to close method to check if tracefile handle is valid
+  * include/hbdefs.h
+    ! added defined to HB_SIZE_MAX borrow from harbour
+  * include/hbjson.h
+    ! added hbset.h as part of includes files
+  * include/hbipapi.h
+    ! adjusted the order of winsock2.h in include file list  
+  * include/arc4.h
+    ! changed void hb_arc4random_buf( void * _buf, ULONG n ) --> void hb_arc4random_buf( void * _buf, HB_SIZE n )
+  * source/rtl/arc4.c
+    ! some sinc with harbour
+      arc4_seed_win32 -> arc4_seed_win
+      in function arc4_seed_rand changed ULONG i -> HB_SIZE i     
+      changed void hb_arc4random_buf( void * _buf, ULONG n ) with void hb_arc4random_buf( void * _buf, HB_SIZE n )  
+  * source/rtl/replic.c
+    ! optimized borrow the ideia from harbour
+  * source/rtl/hbsha2hm.c
+    ! ULONG -> HB_SIZE
+    ! HB_SIZE_MAX -> ULONG_MAX
+  * source/rtl/json.c   
+    ! some sinc with harbour version
+  * source/rtl/accept.c                     
+    ! ULONG ulLen -> to HB_SIZE ulLen       
+  * source/rtl/binnum.c
+    ! sinc with harbour version
+  * source/rtl/strtran.c
+    ! sinc with harbour version    
+  * source/vm/fm.c
+    ! changed  fixed hb_sprintf %li param with %" HB_PFS "i to make mingw happy
+  * source/rtl/filenet.c
+    ! when compiling under 64bits integer pointer casts to uintptr_t
+    ! added hb_fileNet_exit function and called when quit the program to release pending memory
+  * source/rtl/philes.c
+    ! removed some unnecessary cast to ULONG
+    ! ULONG -> HB_SIZE where aplicable as also parameter get on ULONG changed from hb_parnl to hb_parns. as also returns to hb_retns
+    ! USHORT ->HB_ERRCODE changed there aplicable
+  * source/rtl/hbrand.c
+    ! synced with harbour
+    
+      
+    
 2014-11-20 00:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\gtwvw\wvwfuncs.c
     ! pacify warning

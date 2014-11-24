@@ -139,6 +139,32 @@
    #endif
 #endif
 
+#  if defined(__BORLANDC__) && __BORLANDC__ < 0x560
+
+    typedef __int32 int32_t;
+    typedef __int64 int64_t;
+
+    typedef unsigned __int8 uint8_t;
+    typedef unsigned __int16 uint16_t;
+    typedef unsigned __int32 uint32_t;
+    typedef unsigned __int64 uint64_t;
+    typedef int32_t intptr_t;
+    typedef uint32_t uintptr_t;    
+    
+#  endif
+
+#if (_MSC_VER < 1300)
+
+
+   #ifdef _WIN64 // [
+      typedef signed __int64    intptr_t;
+      typedef unsigned __int64  uintptr_t;
+   #else // _WIN64 ][
+      typedef  signed int   intptr_t;
+      typedef  unsigned int uintptr_t;
+   #endif // _WIN64 ]
+#endif
+
 /*
 #define HB_CLIPPER_INT_ITEMS
 #define HB_LONG_LONG_OFF
@@ -626,6 +652,21 @@ typedef unsigned long HB_COUNTER;
 
 #define FHANDLE                 HB_FHANDLE
 
+
+/* maximum index size */
+#if defined( HB_OS_WIN_64 )
+#  if defined( HB_SIZE_SIGNED )
+#     define HB_SIZE_MAX    LONGLONG_MAX
+#  else
+#     define HB_SIZE_MAX    ULONGLONG_MAX
+#  endif
+#else
+#  if defined( HB_SIZE_SIGNED )
+#     define HB_SIZE_MAX    LONG_MAX
+#  else
+#     define HB_SIZE_MAX    ULONG_MAX
+#  endif
+#endif
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */
 #define HB_MAX_DOUBLE_LENGTH 320

@@ -62,7 +62,10 @@
 #define HB_SENDRECV_BUFFER_SIZE         32767
 #if defined( HB_OS_WIN )
    #define HB_SOCKET_T SOCKET
+   #undef _WINSOCKAPI_
    #include <winsock2.h>
+   #include "cinterface.h"
+   #include <windows.h>   
 #else
    #define HB_SOCKET_T int
 #endif

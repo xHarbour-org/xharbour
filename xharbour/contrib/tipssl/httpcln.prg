@@ -690,7 +690,7 @@ METHOD WriteAll( cFile ) CLASS tIPClientHTTP
 METHOD CLOSE() CLASS TIPClientHTTP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   if ::lTrace
+   IF ::lTrace .AND. ::nHandle > 0
       fClose( ::nHandle )
       ::nhandle := -1 
    endif

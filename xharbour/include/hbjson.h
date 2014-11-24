@@ -59,6 +59,7 @@
 #include "hbapiitm.h"
 #include "hashapi.h"
 #include "hbdate.h"
+#include "hbset.h"
 
 HB_EXTERN_BEGIN
 

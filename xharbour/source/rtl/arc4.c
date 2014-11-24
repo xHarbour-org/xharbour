@@ -63,9 +63,11 @@
 #endif
 
 #if defined( HB_OS_WIN )
-#  include <windows.h>
+#     include <windows.h>
+#  if ! defined( __TINYC__ )
 #  include <wincrypt.h>
 #  include <process.h>
+#  endif
 #elif defined( HB_OS_DOS ) || defined( HB_OS_OS2 )
 #  include <sys/types.h>
 #  include <process.h>
@@ -171,12 +173,12 @@ static HB_ISIZ read_all( int fd, HB_U8 * buf, size_t count )
 
    return ( HB_ISIZ ) numread;
 }
-#endif /* ! HB_OS_WIN */
+#endif /* HB_OS_UNIX */
 
-#if defined( HB_OS_WIN ) && ! defined( __DMC__ )
+#if defined( HB_OS_WIN ) && ! defined( __DMC__ ) && ! defined( __TINYC__ )
 
 #define TRY_SEED_MS_CRYPTOAPI
-static int arc4_seed_win32( void )
+static int arc4_seed_win( void )
 {
    /* This is adapted from Tor's crypto_seed_rng() */
    static int        provider_set = 0;
@@ -414,7 +416,7 @@ static int arc4_seed_urandom( void )
 
 static int arc4_seed_rand( void )
 {
-   ULONG i;
+   HB_SIZE i;
    HB_U8 buf[ ADD_ENTROPY ];
 
    srand( ( unsigned ) hb_dateMilliSeconds() );
@@ -439,7 +441,7 @@ static void arc4_seed( void )
     */
 
 #if defined( TRY_SEED_MS_CRYPTOAPI )
-   if( arc4_seed_win32() == 0 )
+   if( arc4_seed_win() == 0 )
       ok = 1;
 #endif
 
@@ -612,7 +614,7 @@ HB_U32 hb_arc4random( void )
    return val;
 }
 
-void hb_arc4random_buf( void * _buf, ULONG n )
+void hb_arc4random_buf( void * _buf, HB_SIZE n ) 
 {
    HB_U8 * buf = ( HB_U8 * ) _buf;
 

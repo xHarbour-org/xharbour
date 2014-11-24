@@ -60,6 +60,7 @@
 #define HB_U32                    UINT32
 #define HB_U8                     BYTE
 #define HB_UINT                   UINT
+#define HB_I16                    INT16
 #define HB_U16                    UINT16
 #define HB_I32                    INT32
 #define HB_ISCHAR                 ISCHAR
@@ -75,6 +76,7 @@
 #define hb_parnidef( n1, n2 )     ( ISNUM( n1 ) ? hb_parni( n1 )   : n2 )
 #define hb_parnldef( n1, n2 )     ( ISNUM( n1 ) ? hb_parnl( n1 )   : n2 )
 #define hb_parnintdef( n1, n2 )   ( ISNUM( n1 ) ? hb_parnint( n1 ) : n2 )
+#define hb_parnsdef( n1, n2 )     ( ISNUM( n1 ) ? hb_parns( n1 ) : n2 )	
 #define HB_BYTE                   BYTE
 #define HB_USHORT                 USHORT
 #define HB_UCHAR                  UCHAR

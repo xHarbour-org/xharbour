@@ -107,7 +107,7 @@ HB_FUNC( HB_FCREATE )
    if( ISCHAR( 1 ) )
    {
       hb_retnint( ( HB_NHANDLE ) hb_fsCreateEx( hb_parc( 1 ),
-                                                ISNUM( 2 ) ? ( ULONG ) hb_parni( 2 ) : ( ULONG ) FC_NORMAL,
+                                                ISNUM( 2 ) ?  hb_parni( 2 ) :  FC_NORMAL,
                                                 ISNUM( 3 ) ? ( USHORT ) hb_parni( 3 ) : ( USHORT ) FO_COMPAT ) );
       hb_fsSetFError( hb_fsError() );
    }
@@ -125,7 +125,7 @@ HB_FUNC( HB_FCREATE )
 HB_FUNC( FREAD )
 {
    PHB_ITEM pBuffer  = hb_param( 2, HB_IT_STRING );
-   USHORT   uiError  = 0;
+   HB_ERRCODE uiError  = 0;
    HB_SIZE  ulRead   = 0;
    HB_SIZE  ulSize;
    char *   buffer;
@@ -133,11 +133,11 @@ HB_FUNC( FREAD )
    if( ISNUM( 1 ) && pBuffer && ISBYREF( 2 ) && ISNUM( 3 ) )
    {
 #ifdef HB_EXTENSION
-      ULONG ulOffset = hb_parnl( 4 );
+      HB_SIZE ulOffset = hb_parns( 4 );
 #else
-      ULONG ulOffset = 0;
+      HB_SIZE ulOffset = 0;
 #endif
-      ulRead = hb_parnl( 3 );
+      ulRead = hb_parns( 3 );
 
       /* NOTE: CA-Cl*pper determines the maximum size by calling _parcsiz()
                instead of _parclen(), this means that the maximum read length
@@ -156,18 +156,18 @@ HB_FUNC( FREAD )
       }
    }
 
-   hb_retnint( ulRead );
+   hb_retns( ulRead );
    hb_fsSetFError( uiError );
 }
 
 HB_FUNC( FWRITE )
 {
-   USHORT uiError = 0;
+   HB_ERRCODE uiError = 0;
 
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
    {
 #ifdef HB_EXTENSION
-      HB_SIZE  ulOffset = hb_parnl( 4 );
+      HB_SIZE  ulOffset = hb_parns( 4 );
 #else
       HB_SIZE  ulOffset = 0;
 #endif
@@ -177,7 +177,7 @@ HB_FUNC( FWRITE )
       uiError = hb_fsError();
    }
    else
-      hb_retni( 0 );
+      hb_retns( 0 );
    hb_fsSetFError( uiError );
 }
 
@@ -185,7 +185,7 @@ HB_FUNC( FERROR )
 {
 // For clipper compatibility MSC return 32 for file open in share mode !
    #if defined( _MSC_VER ) || defined( __BORLANDC__ ) || defined( __WATCOMC__ ) || defined( __MINGW32__ ) || defined( __DMC__ )
-   USHORT uError = hb_fsError();
+   HB_ERRCODE uError = hb_fsError();
    if( uError == ERROR_SHARING_VIOLATION )
    {
       uError = ERROR_ACCESS_DENIED;
@@ -198,7 +198,7 @@ HB_FUNC( FERROR )
 
 HB_FUNC( FCLOSE )
 {
-   USHORT uiError = 0;
+   HB_ERRCODE uiError = 0;
 
    if( ISNUM( 1 ) )
    {
@@ -213,7 +213,7 @@ HB_FUNC( FCLOSE )
 
 HB_FUNC( FERASE )
 {
-   USHORT         uiError  = 3;
+   HB_ERRCODE         uiError  = 3;
    const char *   szFile   = hb_parc( 1 );
 
    if( szFile )
@@ -228,7 +228,7 @@ HB_FUNC( FERASE )
 
 HB_FUNC( FRENAME )
 {
-   USHORT         uiError     = 2;
+   HB_ERRCODE         uiError     = 2;
    const char *   szFileOld   = hb_parc( 1 ),
    * szFileNew                = hb_parc( 2 );
 
@@ -244,7 +244,7 @@ HB_FUNC( FRENAME )
 
 HB_FUNC( FSEEK )
 {
-   USHORT uiError = 0;
+   HB_ERRCODE uiError = 0;
 
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
@@ -261,15 +261,15 @@ HB_FUNC( FSEEK )
 
 HB_FUNC( FREADSTR )
 {
-   USHORT uiError = 0;
+   HB_ERRCODE uiError = 0;
 
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
-      ULONG ulToRead = ( ULONG ) hb_parnl( 2 );
+      HB_SIZE ulToRead = hb_parns( 2 );
 
       if( ulToRead > 0 )
       {
-         HB_FHANDLE  fhnd     = ( HB_FHANDLE ) hb_parni( 1 );
+         HB_FHANDLE  fhnd     = hb_numToHandle( hb_parnint( 1 ) );
          char *      buffer   = ( char * ) hb_xgrab( ulToRead + 1 );
          HB_SIZE     ulRead;
 
@@ -296,7 +296,7 @@ HB_FUNC( FREADSTR )
 HB_FUNC( CURDIR )
 {
    char           szBuffer[ HB_PATH_MAX ];
-   USHORT         uiDrive = 0;
+   int         uiDrive = 0;
    const char *   szDrive;
 
    szDrive = hb_parc( 1 );
@@ -314,7 +314,7 @@ HB_FUNC( CURDIR )
 
 HB_FUNC( HB_F_EOF )
 {
-   USHORT uiError = 6;
+   HB_ERRCODE uiError = 6;
 
    if( ISNUM( 1 ) )
    {
@@ -332,7 +332,7 @@ HB_FUNC( HB_F_EOF )
 
 HB_FUNC( CURDIRX )
 {
-   USHORT   uiErrorOld  = hb_fsError();
+   HB_ERRCODE uiErrorOld  = hb_fsError();
    char *   pbyBuffer   = ( char * ) hb_xgrab( HB_PATH_MAX );
    PHB_ITEM pDrv        = hb_param( 1, HB_IT_STRING );
    BYTE     cCurDrv     = hb_fsCurDrv();
@@ -340,7 +340,8 @@ HB_FUNC( CURDIRX )
 
    if( pDrv && hb_parclen( 1 ) > 0 )
    {
-      cDrv = ( BYTE ) ( HB_TOUPPER( pDrv->item.asString.value[ 0 ] ) - 'A' );
+	  const char *sDrv= hb_itemGetCPtr( pDrv ); 
+      cDrv = ( BYTE ) ( HB_TOUPPER( sDrv[ 0 ] ) - 'A' );
       if( cDrv != cCurDrv )
       {
          hb_fsChDrv( cDrv );
@@ -363,7 +364,7 @@ HB_FUNC( CURDIRX )
 
 HB_FUNC( HB_FCOMMIT )
 {
-   USHORT uiError = 6;
+   HB_ERRCODE uiError = 6;
 
    if( ISNUM( 1 ) )
    {
@@ -376,7 +377,7 @@ HB_FUNC( HB_FCOMMIT )
 
 HB_FUNC( HB_FLOCK )
 {
-   USHORT   uiError  = 0;
+   HB_ERRCODE uiError  = 0;
    BOOL     fResult  = FALSE;
 
    if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) )
@@ -393,7 +394,7 @@ HB_FUNC( HB_FLOCK )
 
 HB_FUNC( HB_FUNLOCK )
 {
-   USHORT   uiError  = 0;
+   HB_ERRCODE uiError  = 0;
    BOOL     fResult  = FALSE;
 
    if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) )
@@ -451,13 +452,13 @@ HB_FUNC( HB_OPENPROCESS )
    PHB_ITEM       pIn         = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM       pOut        = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM       pErr        = hb_param( 4, HB_IT_BYREF );
-   PHB_ITEM       pBackground = hb_param( 5, HB_IT_LOGICAL );
+   BOOL           bBackground = hb_parl( 5 );
    PHB_ITEM       pProcID     = hb_param( 6, HB_IT_BYREF );
 
-   FHANDLE        fhIn = 0, fhOut = 0, fhErr = 0;
-   FHANDLE *      pfhIn, * pfhOut, * pfhErr;
-   FHANDLE        fhProcess;
-   BOOL           bBackground;
+   HB_FHANDLE        fhIn = 0, fhOut = 0, fhErr = 0;
+   HB_FHANDLE *      pfhIn, * pfhOut, * pfhErr;
+   HB_FHANDLE        fhProcess;
+   
    ULONG          pid;
 
    if( szName == NULL )
@@ -493,14 +494,6 @@ HB_FUNC( HB_OPENPROCESS )
       return;
    }
 
-   if( pBackground == NULL )
-   {
-      bBackground = FALSE;
-   }
-   else
-   {
-      bBackground = hb_itemGetL( pBackground );
-   }
 
    if( pIn != NULL )
    {
@@ -539,37 +532,38 @@ HB_FUNC( HB_OPENPROCESS )
 
    if( fhProcess != FS_ERROR )
    {
-      if( pIn != NULL )
+
+      if( pfhIn )
       {
-         hb_itemPutNL( pIn, ( const LONG ) fhIn );
+         hb_stornint(  ( HB_NHANDLE )pfhIn ,2 );
       }
 
-      if( pOut != NULL )
+      if( pfhOut )
       {
-         hb_itemPutNL( pOut, ( const LONG ) fhOut );
+         hb_stornint( ( HB_NHANDLE )pfhOut ,3 );
       }
 
-      if( pErr != NULL && pErr != pOut )
+      if( pfhErr  && pfhErr != pfhOut )
       {
-         hb_itemPutNL( pErr, ( const LONG ) fhErr );
+         hb_stornint( ( HB_NHANDLE ) pfhErr ,4);
       }
 
-      if( pProcID != NULL )
-      {
-         hb_itemPutNL( pProcID, ( const LONG ) pid );
-      }
+         hb_stornint( pid ,6 );
+
    }
 
-   hb_retnl( ( long ) fhProcess );
+   hb_retnint( ( HB_NHANDLE ) fhProcess );
 }
 
 HB_FUNC( HB_CLOSEPROCESS )
 {
-   FHANDLE  fhProc   = hb_parnl( 1 );
+   HB_FHANDLE  fhProc   = hb_numToHandle( hb_parnint( 1 ) );
    PHB_ITEM pGentle  = hb_param( 2, HB_IT_LOGICAL );
+
 
    if( fhProc == 0 || hb_pcount() > 2 ||
        ( hb_pcount() == 2 && pGentle == NULL ) )
+
    {
       hb_errRT_BASE( EG_ARG, 4001,
                      "Wrong parameter count/type",
@@ -578,23 +572,16 @@ HB_FUNC( HB_CLOSEPROCESS )
       return;
    }
 
-   if( pGentle == NULL || pGentle->item.asLogical.value )
-   {
-      hb_retl( hb_fsCloseProcess( fhProc, TRUE ) );
-   }
-   else
-   {
-      hb_retl( hb_fsCloseProcess( fhProc, FALSE ) );
-   }
+   hb_retl( hb_fsCloseProcess( fhProc, hb_pcount() < 2 || hb_parl( 2 ) ) );
 
 }
 
 HB_FUNC( HB_PROCESSVALUE )
 {
-   FHANDLE  fhProc   = hb_parnl( 1 );
+   HB_FHANDLE  fhProc   = hb_numToHandle( hb_parnint( 1 ) );
    PHB_ITEM pWait    = hb_param( 2, HB_IT_LOGICAL );
 
-   if( fhProc == 0 || hb_pcount() > 2 ||
+   if( fhProc == 0 || fhProc == FS_ERROR || hb_pcount() > 2 ||
        ( hb_pcount() == 2 && pWait == NULL ) )
    {
       hb_errRT_BASE( EG_ARG, 4001,
@@ -603,14 +590,7 @@ HB_FUNC( HB_PROCESSVALUE )
                      hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
-
-   if( pWait == NULL || pWait->item.asLogical.value )
-   {
-      hb_retni( hb_fsProcessValue( fhProc, TRUE ) );
-   }
-   else
-   {
-      hb_retni( hb_fsProcessValue( fhProc, FALSE ) );
-   }
+   
+      hb_retni( hb_fsProcessValue( fhProc, hb_pcount() < 2 || hb_parl( 2 )  ) );
 
 }
