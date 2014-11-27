@@ -153,7 +153,7 @@
     
 #  endif
 
-#if (_MSC_VER < 1300)
+#if (_MSC_VER < 1300) && !defined(HAVE_STDINT_H)
 
 
    #ifdef _WIN64 // [

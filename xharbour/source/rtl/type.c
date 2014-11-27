@@ -66,7 +66,7 @@ HB_FUNC( TYPE )
 
       if( pFlags )
       {
-         Flags = ( BYTE ) ( pFlags->item.asInteger.value );
+         Flags = ( BYTE ) ( hb_itemGetNI( pFlags ) );//( pFlags->item.asInteger.value );
       }
       else
       {

@@ -58,32 +58,29 @@
 /* returns n copies of given string */
 HB_FUNC( REPLICATE )
 {
-   const char * szText = hb_parc( 1 );
+   PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNum  = hb_param( 2, HB_IT_NUMERIC );
 
-   if( szText && HB_ISNUM( 2 ) )
+   if( pText && pNum )
    {
-      HB_ISIZ lTimes = hb_parns( 2 ) ;
-      HB_SIZE ulLen = hb_parclen( 1 );
+      HB_ISIZ lTimes = hb_itemGetNL( pNum );
 
-      if( lTimes > 0  && ulLen >0)
+      if( lTimes > 0 )
       {
-
-         if( ( double ) ulLen *  lTimes  < HB_SIZE_MAX )
+         HB_SIZE ulLen =  hb_itemGetCLen( pText);
+            if( ( ulLen *  lTimes ) <  UINT_MAX )
          {
-	        HB_SIZE nSize = ulLen *  lTimes;
-            char * szResult, * szPtr;
+            char *  szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
+            char *  szPtr    = szResult;
+            char *  szText   = ( char *) hb_itemGetCPtr( pText );
+            HB_ISIZ    i;
 
-            szResult = szPtr = ( char * ) hb_xgrab( nSize + 1 );
-            if( ulLen == 1 )
-               memset( szResult, szText[ 0 ], nSize );
-            else
-            {
-               while( lTimes-- > 0 )
+            for( i = 0; i < lTimes; i++ )
                {
                   hb_xmemcpy( szPtr, szText, ulLen );
                   szPtr += ulLen;
                }
-            }
+
             hb_retclenAdopt( szResult, ulLen * lTimes );
          }
          else

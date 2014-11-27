@@ -63,11 +63,12 @@ HB_FUNC( SUBSTR )
 
    if( pText && pNum )
    {
-      LONG lPos = hb_itemGetNL( pNum );
+      HB_ISIZ lPos = hb_itemGetNS( pNum );
+      HB_ISIZ liLen = hb_itemGetCLen( pText );
 
       if( lPos < 0 )
       {
-         lPos += ( LONG ) pText->item.asString.length;
+         lPos += liLen;
 
          if( lPos < 0 )
             lPos = 0;
@@ -75,9 +76,9 @@ HB_FUNC( SUBSTR )
       else if( lPos )
          lPos--;
 
-      if( lPos < ( LONG ) pText->item.asString.length )
+      if( lPos < liLen )
       {
-         LONG lLen;
+         HB_ISIZ lLen;
 
          if( hb_pcount() >= 3 )
          {
@@ -85,10 +86,10 @@ HB_FUNC( SUBSTR )
 
             if( pNum1 )
             {
-               lLen = hb_itemGetNL( pNum1 );
+               lLen = hb_itemGetNS( pNum1 );
 
-               if( lLen > ( LONG ) pText->item.asString.length - lPos )
-                  lLen = ( LONG ) pText->item.asString.length - lPos;
+               if( lLen > liLen - lPos )
+                  lLen = liLen - lPos;
             }
             else
             {
@@ -98,10 +99,10 @@ HB_FUNC( SUBSTR )
             }
          }
          else
-            lLen = ( LONG ) pText->item.asString.length - lPos;
+            lLen = liLen - lPos;
 
          if( lLen > 0 )
-            hb_retclen( pText->item.asString.value + lPos, lLen );
+            hb_retclen( hb_itemGetCPtr( pText ) + lPos, lLen );
          else
             hb_retc( "" );
       }

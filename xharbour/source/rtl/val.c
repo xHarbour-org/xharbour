@@ -66,7 +66,8 @@ HB_FUNC( VAL )
       HB_LONG  lValue;
       double   dValue;
 
-      if( ! hb_valStrnToNum( pText->item.asString.value, ( int ) pText->item.asString.length, &lValue, &dValue, &iDec, &iWidth ) )
+      if( ! hb_valStrnToNum( hb_itemGetCPtr( pText ), hb_itemGetCLen( pText ), &lValue, &dValue, &iDec, &iWidth ) )
+
          hb_retnintlen( lValue, iWidth );
       else
          hb_retndlen( dValue, iWidth, iDec );

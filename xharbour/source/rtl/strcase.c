@@ -61,10 +61,10 @@
 /* converts szText to lower case. Does not create a new string! */
 char * hb_strLower( char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strLower(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strLower(%s, %" HB_PFS "u)", szText, ulLen ) );
 
    {
-      ULONG          i;
+      HB_SIZE          i;
 #ifndef HB_CDP_SUPPORT_OFF
       PHB_CODEPAGE   cdp = hb_cdppage();
       if( cdp && cdp->nChars )
@@ -83,10 +83,10 @@ char * hb_strLowerCopy( char * szText, HB_SIZE ulLen )
 {
    char * szCopy = ( char * ) hb_xgrab( ulLen + 1 );
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strLowerCopy(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strLowerCopy(%s, %" HB_PFS "u)", szText, ulLen ) );
 
    {
-      ULONG          i;
+      HB_SIZE          i;
 #ifndef HB_CDP_SUPPORT_OFF
       PHB_CODEPAGE   cdp = hb_cdppage();
       if( cdp && cdp->nChars )
@@ -106,9 +106,9 @@ char * hb_strUpperCopy( char * szText, HB_SIZE ulLen )
 {
    char * szCopy = ( char * ) hb_xgrab( ulLen + 1 );
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strUpperCopy(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strUpperCopy(%s, %" HB_PFS "u)", szText, ulLen ) );
    {
-      ULONG          i;
+      HB_SIZE          i;
 #ifndef HB_CDP_SUPPORT_OFF
       PHB_CODEPAGE   cdp = hb_cdppage();
       if( cdp && cdp->nChars )
@@ -127,10 +127,10 @@ char * hb_strUpperCopy( char * szText, HB_SIZE ulLen )
 /* converts szText to upper case. Does not create a new string! */
 char * hb_strUpper( char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strUpper(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strUpper(%s, %" HB_PFS "u)", szText, ulLen ) );
 
    {
-      ULONG          i;
+      HB_SIZE          i;
 #ifndef HB_CDP_SUPPORT_OFF
       PHB_CODEPAGE   cdp = hb_cdppage();
       if( cdp && cdp->nChars )

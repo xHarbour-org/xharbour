@@ -776,7 +776,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 void hb_fileNetClose( PHB_FILE pFile )
 {
    HB_FHANDLE  hFile       = FS_ERROR;
-   HB_SOCKET_T hCurSocket  =  NULL;
+   HB_SOCKET_T hCurSocket  ;
 
    hb_threadLock( S_FILENETMTX );
 
@@ -813,7 +813,11 @@ void hb_fileNetClose( PHB_FILE pFile )
 
       if( hCurSocket )
       {
-         nSend = sprintf( szData + HB_LENGTH_ACK, "B|%p|\r\n", ( void * ) hFile );
+	     #if defined(HB_ARCH_64BIT)            	         
+	        nSend = sprintf( szData + HB_LENGTH_ACK, "B|%p|\r\n", ( void * ) ((uintptr_t) hFile ));
+	     #else 
+            nSend = sprintf( szData + HB_LENGTH_ACK, "B|%p|\r\n", ( void * ) hFile );
+         #endif
          HB_PUT_BE_UINT32( szData, nSend );
          hb_NetSingleSendSingleRecv( hCurSocket, szData, nSend + HB_LENGTH_ACK, 1001 );
       }
@@ -847,7 +851,12 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
 
          if( pFile->hSocket )
          {
+         #if defined(HB_ARCH_64BIT)            	         
+            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) ((uintptr_t)pFile->hFile), ulStart, ulLen, ( USHORT ) iType );
+         #else
             nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
+         #endif            
+            
             HB_PUT_BE_UINT32( szData, nSend );
             hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1002 );
          }
@@ -873,7 +882,11 @@ BOOL hb_fileNetLock( PHB_FILE pFile, HB_FOFFSET ulStart, HB_FOFFSET ulLen, int i
 
          if( pFile->hSocket )
          {
+#if defined(HB_ARCH_64BIT)            
+            nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) ((uintptr_t)pFile->hFile), ulStart, ulLen, ( USHORT ) iType );
+#else	         
             nSend = sprintf( szData + HB_LENGTH_ACK, "C|%p|%" PFHL "i|%" PFHL "i|%hu|\r\n", ( void * ) pFile->hFile, ulStart, ulLen, ( USHORT ) iType );
+#endif            
             HB_PUT_BE_UINT32( szData, nSend );
             if( hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1003 ) )
                fResult = ( strncmp( szBuffer, szOk, 2 ) == 0 );
@@ -903,8 +916,11 @@ HB_SIZE hb_fileNetReadAt( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize, HB_FOF
       char  szData[ 50 + HB_LENGTH_ACK ];
       ULONG ulLen;
       int   nSend;
-
+#if defined(HB_ARCH_64BIT)                  
+      nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", ( void * ) ((uintptr_t)pFile->hFile), ( long unsigned int ) ulSize, llOffset );
+#else
       nSend = sprintf( szData + HB_LENGTH_ACK, "D|%p|%lu|%" PFHL "i|\r\n", ( void * ) pFile->hFile, ( long unsigned int ) ulSize, llOffset );
+#endif
       HB_PUT_BE_UINT32( szData, nSend );
 
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1004 );
@@ -941,8 +957,11 @@ HB_SIZE hb_fileNetReadLarge( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize )
       char  szData[ 30 + HB_LENGTH_ACK ];
       ULONG ulLen;
       int   nSend;
-
+#if defined(HB_ARCH_64BIT)                  
+      nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", ( void * ) ((uintptr_t)pFile->hFile), ( long unsigned int ) ulSize );
+#else
       nSend = sprintf( szData + HB_LENGTH_ACK, "K|%p|%lu|\r\n", ( void * ) pFile->hFile, ( long unsigned int ) ulSize );
+#endif      
       HB_PUT_BE_UINT32( szData, nSend );
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 );
       if( ulLen )
@@ -980,7 +999,11 @@ HB_SIZE hb_fileNetWriteAt( PHB_FILE pFile, const void * buffer, HB_SIZE ulSize, 
       ULONG    ulLen;
 
       szData   = ( char * ) hb_xgrab( 40 + ulSize );
+#if defined(HB_ARCH_64BIT)                  
+      ulLen    = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) ((uintptr_t)pFile->hFile), ( long unsigned int ) ulSize, llOffset );
+#else      
       ulLen    = sprintf( szData + HB_LENGTH_ACK, "E|%p|%lu|%" PFHL "i|", ( void * ) pFile->hFile, ( long unsigned int ) ulSize, llOffset );
+#endif      
       ptr      = szData + HB_LENGTH_ACK + ulLen;
       HB_MEMCPY( ptr, ( char * ) buffer, ( size_t ) ulSize );
       ptr      = ptr + ulSize;
@@ -1022,8 +1045,13 @@ HB_SIZE hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, HB_SIZE ulSi
       ULONG    ulLen;
 
       szData   = ( char * ) hb_xgrab( 36 + ulSize + HB_LENGTH_ACK );
-      ulLen    = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ( long unsigned int ) ulSize );
+#if defined(HB_ARCH_64BIT)                        
+      ulLen    = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) ((uintptr_t)pFile->hFile), ( long unsigned int ) ulSize );      
+#else      
+      ulLen    = sprintf( szData + HB_LENGTH_ACK, "J|%p|%lu|", ( void * ) pFile->hFile, ( long unsigned int ) ulSize );      
+#endif
       ptr      = szData + HB_LENGTH_ACK + ulLen;
+      
       HB_MEMCPY( ptr, ( char * ) pBuffer, ( size_t ) ulSize );
       ptr      = ptr + ulSize;
       HB_MEMCPY( ptr, "\r\n", 2 );
@@ -1110,7 +1138,7 @@ BOOL hb_fileNetTruncAt( PHB_FILE pFile, HB_FOFFSET llOffset )
       #if defined(HB_ARCH_64BIT)            
          nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) ((uintptr_t)pFile->hFile), llOffset );
       #else
-      nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) pFile->hFile, llOffset );
+         nSend = sprintf( szData + HB_LENGTH_ACK, "F|%p|%" PFHL "i|\r\n", ( void * ) pFile->hFile, llOffset );
       #endif
       HB_PUT_BE_UINT32( szData, nSend );
       if( hb_NetSingleSendSingleRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1006 ) )

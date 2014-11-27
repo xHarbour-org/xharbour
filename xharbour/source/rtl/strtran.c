@@ -1,14 +1,13 @@
 /*
+ * $Id$
+ */
+
+/*
  * Harbour Project source code:
  * StrTran() function
  *
  * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- *
- * Copyright 2011 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
- * rewritten to fix incompatibilities with Clipper and fatal performance
- * of original code
- *
- * www - http://harbour-project.org
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 /* TOFIX: Check for string overflow, Clipper can crash if the resulting
@@ -62,133 +62,149 @@
 HB_FUNC( STRTRAN )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pSeek = hb_param( 2, HB_IT_STRING );
 
-   if( pText && pSeek )
+   if( pText )
    {
-      HB_SIZE nStart, nCount;
+      PHB_ITEM pSeek = hb_param( 2, HB_IT_STRING );
 
-      nStart = hb_parnsdef( 4, 1 );
-      nCount = hb_parnsdef( 5, -1 );
-
-      if( nStart && nCount )
+      if( pSeek )
       {
-         HB_SIZE nText = hb_itemGetCLen( pText );
-         HB_SIZE nSeek = hb_itemGetCLen( pSeek );
+         char *   szText   = hb_itemGetCPtr(pText);
+         HB_SIZE  ulText   = hb_itemGetCLen( pText);
+         HB_SIZE  ulSeek   = hb_itemGetCLen( pSeek);
 
-         if( nSeek && nSeek <= nText && nStart > 0 )
+         if( ulSeek && ulSeek <= ulText )
          {
-            PHB_ITEM pReplace = hb_param( 3, HB_IT_STRING );
-            HB_SIZE nReplace = hb_itemGetCLen( pReplace );
-            const char * szReplace = hb_itemGetCPtr( pReplace );
-            const char * szText = hb_itemGetCPtr( pText );
-            const char * szSeek = hb_itemGetCPtr( pSeek );
-            HB_SIZE nFound = 0;
-            HB_SIZE nReplaced = 0;
-            HB_SIZE nT = 0;
-            HB_SIZE nS = 0;
+            char *   szSeek = hb_itemGetCPtr( pSeek);
+            char *   szReplace;
+            HB_SIZE  ulStart;
 
-            while( nT < nText && nText - nT >= nSeek - nS )
-            {
-               if( szText[ nT ] == szSeek[ nS ] )
+            ulStart = ( hb_param( 4, HB_IT_NUMERIC ) ? hb_parns( 4 ) : 1 );
+
+            if( ! ulStart )
                {
-                  ++nT;
-                  if( ++nS == nSeek )
+               /* Clipper seems to work this way */
+               hb_retc( "" );
+            }
+            else if( ulStart > 0 )
                   {
-                     if( ++nFound >= nStart )
+               PHB_ITEM pReplace = hb_param( 3, HB_IT_STRING );
+               HB_SIZE  ulReplace;
+               HB_SIZE  ulCount;
+               BOOL     bAll;
+
+               if( pReplace )
                      {
-                        nReplaced++;
-                        if( --nCount == 0 )
-                           nT = nText;
+                  szReplace   = hb_itemGetCPtr( pReplace );
+                  ulReplace   = hb_itemGetCLen( pReplace );
                      }
-                     nS = 0;
-                  }
-               }
-               else if( nS )
+               else
                {
-                  nT -= nS - 1;
-                  nS = 0;
+                  szReplace   = ""; /* shouldn't matter that we don't allocate */
+                  ulReplace   = 0;
+               }
+
+               if( ISNUM( 5 ) )
+               {
+                  ulCount  = hb_parns( 5 );
+                  bAll     = FALSE;
                }
                else
-                  ++nT;
+               {
+                  ulCount  = 0;
+                  bAll     = TRUE;
             }
 
-            if( nReplaced )
+               if( bAll || ulCount > 0 )
             {
-               HB_SIZE nLength = nText;
+                  HB_SIZE  ulFound     = 0;
+                  HB_SIZE  lReplaced   = 0;
+                  HB_SIZE  i           = 0;
+                  HB_SIZE  ulLength    = ulText;
 
-               if( nSeek > nReplace )
-                  nLength -= ( nSeek - nReplace ) * nReplaced;
-               else
-                  nLength += ( nReplace - nSeek ) * nReplaced;
-
-               if( nLength )
-               {
-                  char * szResult = ( char * ) hb_xgrab( nLength + 1 );
-                  char * szPtr = szResult;
-
-                  nFound -= nReplaced;
-                  nT = nS = 0;
-                  do
+                  while( i < ulText - ulSeek + 1 )
                   {
-                     if( nReplaced && szText[ nT ] == szSeek[ nS ] )
+                     if( ( bAll || lReplaced <  ulCount ) && memcmp( szText + i, szSeek,  ulSeek ) == 0 )
                      {
-                        ++nT;
-                        if( ++nS == nSeek )
-                        {
-                           const char * szCopy;
+                        ulFound++;
 
-                           if( nFound )
-                           {
-                              nFound--;
-                              szCopy = szSeek;
-                           }
-                           else
-                           {
-                              nReplaced--;
-                              szCopy = szReplace;
-                              nS = nReplace;
-                           }
-                           while( nS )
-                           {
-                              *szPtr++ = *szCopy++;
-                              --nS;
-                           }
+                        if( ulFound >= ulStart )
+               {
+                           lReplaced++;
+                           ulLength = ulLength - ulSeek + ulReplace;
+                           i        += ulSeek;
+                           continue;
                         }
+                     }
+
+                     i++;
+                  }
+
+                  if( ulFound )
+                  {
+                     char *   szResult = ( char * ) hb_xgrab( ulLength + 1 );
+                     char *   szPtr    = szResult;
+
+                     ulFound  = 0;
+                     i        = 0;
+
+                     while( i < ulText - ulSeek + 1 )
+                     {
+                        if( lReplaced && memcmp( szText + i, szSeek,  ulSeek ) == 0 )
+                        {
+                           ulFound++;
+
+                           if( ulFound >= ulStart )
+                           {
+                              lReplaced--;
+                              HB_MEMCPY( szPtr, szReplace,  ulReplace );
+                              szPtr += ulReplace;
+                              i     += ulSeek;
+                              continue;
+                           }
+                           }
+
+                        *szPtr = szText[ i ];
+                        szPtr++;
+                        i++;
+                           }
+
+                     while( i < ulText )
+                     {
+                        *szPtr = szText[ i ];
+                        szPtr++;
+                        i++;
+                        }
+
+                     hb_retclenAdopt( szResult, ulLength );
                      }
                      else
                      {
-                        if( nS )
-                        {
-                           nT -= nS;
-                           nS = 0;
+                     hb_retclen( szText, ulText );
                         }
-                        *szPtr++ = szText[ nT++ ];
                      }
+               else
+               {
+                  hb_retclen( szText, ulText );
                   }
-                  while( nT < nText );
-
-                  hb_retclen_buffer( szResult, nLength );
                }
                else
-                  hb_retc_null();
+            {
+               hb_retclen( szText, ulText );
             }
-            else
-               hb_itemReturn( pText );
          }
          else
-            hb_itemReturn( pText );
+         {
+            hb_retclen( szText, ulText );
+         }
       }
       else
-         hb_retc_null();
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, "STRTRAN", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) ); /* NOTE: Undocumented but existing Clipper Run-time error [vszakats] */
+      }
    }
    else
    {
-      /* NOTE: Undocumented but existing Clipper Run-time error [vszakats] */
-#ifdef HB_CLP_STRICT
-      hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, HB_ERR_FUNCNAME, 0 );
-#else
-      hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
-#endif
+      hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, "STRTRAN", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) ); /* NOTE: Undocumented but existing Clipper Run-time error [vszakats] */
    }
 }

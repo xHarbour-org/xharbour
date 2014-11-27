@@ -61,15 +61,15 @@ HB_FUNC( RIGHT )
 
    if( pText && pNum )
    {
-      LONG  lLen     = hb_itemGetNL( pNum );
-      LONG  lTextLen = ( LONG ) pText->item.asString.length;
+      HB_ISIZ  lLen     = hb_itemGetNS( pNum );
+      HB_ISIZ  lTextLen = hb_itemGetCLen( pText );
 
       if( lLen > lTextLen )
          lLen = lTextLen;
       else if( lLen < 0 )
          lLen = 0;
 
-      hb_retclen( pText->item.asString.value + lTextLen - lLen, lLen );
+      hb_retclen( hb_itemGetCPtr( pText ) + lTextLen - lLen, lLen );
       return;
    }
 

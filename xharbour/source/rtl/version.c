@@ -68,11 +68,11 @@
 #include "hbapilng.h"
 #include "hbver.h"
 
-HB_EXTERN_BEGIN
-extern char * hb_verPCode( void );
-extern void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
-extern int    hb_arrayMode( void );
-HB_EXTERN_END
+// HB_EXTERN_BEGIN
+// extern char * hb_verPCode( void );
+// extern void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
+// extern int    hb_arrayMode( void );
+// HB_EXTERN_END
 
 HB_FUNC( OS )
 {
@@ -112,40 +112,40 @@ HB_FUNC( HB_BUILDDATE )
 HB_FUNC( HB_BUILDINFO )
 {
    PHB_ITEM pQuery         = hb_param( 1, HB_IT_INTEGER );
-   HB_ITEM  hbInfo;
-   HB_ITEM  Return;
+   PHB_ITEM  hbInfo = hb_itemNew( NULL );
+   PHB_ITEM  Return = hb_itemNew( NULL );
    int      iWords         = 0;
    int      ui;
-   HB_ITEM  Temp;
+   PHB_ITEM  Temp = hb_itemNew(NULL);
    char *   pszBuildInfo   = hb_verBuildInfo( FALSE );
 
-   ( &hbInfo )->type = HB_IT_NIL;
-   ( &Return )->type = HB_IT_NIL;
-   ( &Temp )->type   = HB_IT_NIL;
+//    ( &hbInfo )->type = HB_IT_NIL;
+//    ( &Return )->type = HB_IT_NIL;
+//    ( &Temp )->type   = HB_IT_NIL;
 
-   hb_arrayNew( &hbInfo, 0 );
+   hb_arrayNew( hbInfo, 0 );
 
-   hb_ParseLine( &hbInfo, pszBuildInfo, '\t', &iWords );
+   hb_ParseLine( hbInfo, pszBuildInfo, '\t', &iWords );
    hb_xfree( pszBuildInfo );
 
-   hb_arrayNew( &Return, iWords );
+   hb_arrayNew( Return, iWords );
 
    for( ui = 0; ui < iWords; ui++ )
    {
-      char *   szInfo   = hb_arrayGetC( &hbInfo, ui + 1 );
+      char *   szInfo   = hb_arrayGetC( hbInfo, ui + 1 );
       HB_SIZE  iLen     = strlen( szInfo );
 
       if( hb_stricmp( szInfo, "yes" ) == 0 )
-         hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, TRUE ) );
+         hb_arraySetForward( Return, ui + 1, hb_itemPutL( Temp, TRUE ) );
       else if( hb_stricmp( szInfo, "no" ) == 0 )
-         hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, FALSE ) );
+         hb_arraySetForward( Return, ui + 1, hb_itemPutL( Temp, FALSE ) );
       else if( iLen > 5 && ( szInfo[ iLen - 1 ] == ')' && szInfo[ iLen - 2 ] == 'm' && szInfo[ iLen - 3 ] == 'u' && szInfo[ iLen - 4 ] == 'n' && szInfo[ iLen - 5 ] == '(' ) )
       {
          szInfo[ iLen - 5 ] = 0;
-         hb_arraySetForward( &Return, ui + 1, hb_itemPutNI( &Temp, atoi( szInfo ) ) );
+         hb_arraySetForward( Return, ui + 1, hb_itemPutNI( Temp, atoi( szInfo ) ) );
       }
       else
-         hb_arraySetForward( &Return, ui + 1, hb_itemPutC( &Temp, szInfo ) );
+         hb_arraySetForward( Return, ui + 1, hb_itemPutC( Temp, szInfo ) );
 
       hb_xfree( szInfo );
    }
@@ -153,50 +153,51 @@ HB_FUNC( HB_BUILDINFO )
    /* add info on MT and VM Optimization */
    {
       PHB_ITEM pMT   = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
-      BOOL     lMT   = pMT->item.asLogical.value;
+      BOOL     lMT   = hb_itemGetL( pMT) ;
       PHB_ITEM pOpt  = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
-      int      iOpt  = pOpt->item.asInteger.value;
+      int      iOpt  = hb_itemGetNI( pOpt ); 
 
-      hb_arrayAddForward( &Return, hb_itemPutL( &Temp, lMT ) );
-      hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, iOpt ) );
+      hb_arrayAddForward( Return, hb_itemPutL( Temp, lMT ) );
+      hb_arrayAddForward( Return, hb_itemPutNI( Temp, iOpt ) );
 
       hb_itemRelease( pMT );
       hb_itemRelease( pOpt );
    }
 
    /* Default Language */
-   hb_arrayAddForward( &Return, hb_itemPutC( &Temp, hb_langID() ) );
+   hb_arrayAddForward( Return, hb_itemPutC( Temp, hb_langID() ) );
 
    /* Array Mode, 0 = Counter, 1 = Owner */
-   hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, hb_arrayMode() ) );
+   hb_arrayAddForward( Return, hb_itemPutNI( Temp, hb_arrayMode() ) );
 
    /* Contributors */
    {
-      HB_ITEM  Credits;
+      PHB_ITEM  Credits =hb_itemNew( NULL );
       char *   szCredits = hb_credits();
 
-      ( &Credits )->type = HB_IT_NIL;
-      hb_arrayNew( &Credits, 0 );
-      hb_ParseLine( &Credits, szCredits, '\n', &iWords );
-      hb_arrayAddForward( &Return, &Credits );
+      hb_arrayNew( Credits, 0 );
+      hb_ParseLine( Credits, szCredits, '\n', &iWords );
+      hb_arrayAddForward( Return, Credits );
    }
+   
 
    if( pQuery )
    {
-      int iQuery = pQuery->item.asInteger.value;
+      int iQuery = hb_itemGetNI( pQuery ); 
 
       if( iQuery < _HB_VER_LAST )
       {
-         HB_ITEM Query;
-         ( &Query )->type = HB_IT_NIL;
-         hb_arrayGet( &Return, iQuery, &Query );
-         hb_itemReturnForward( &Query );
+         PHB_ITEM Query= hb_itemNew( NULL );         
+         hb_arrayGet( Return, iQuery, Query );
+         hb_itemReturnForward( Query );
       }
-      hb_itemClear( &Return );
+      hb_itemRelease( Return );
    }
    else
-      hb_itemReturnForward( &Return );
+      hb_itemReturnForward( Return );
 
-   hb_itemClear( &hbInfo );
+   hb_itemRelease( hbInfo );
+   hb_itemRelease(Temp);
+   
 
 }

@@ -183,7 +183,7 @@ HB_FUNC( HB_ISMEMO )
 
 HB_FUNC( HB_ISARRAY )
 {
-   hb_retl( ISARRAY( 1 ) && hb_param( 1, HB_IT_ARRAY )->item.asArray.value->uiClass == 0 );
+   hb_retl( ISARRAY( 1 ) &&  !hb_arrayIsObject( hb_param( 1, HB_IT_ARRAY ) ) ) ; 
 }
 
 HB_FUNC( HB_ISOBJECT )

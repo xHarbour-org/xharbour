@@ -9,6 +9,58 @@
 */
 
 
+2014-11-27 11:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
+  * source/rtl/version.c
+    ! moved externs to hbapi.h
+    ! changed to use itemapi insted of direct structure manipulation    
+  * include/hbapi.h
+    ! added new extends moved from source/rtl/version.c
+  * source/rtl/winreg.prg
+    ! Ajusted some functions return to return an pointer insted of an HB_SIZE
+  * source/rtl/valtype.c  
+    % optimized HB_ISARRAY to use hb_arrayIsObject insted of direct structure manipulation 
+  * source/rtl/val.c
+    ! changed to use itemapi insted of direct structure manipulation    
+  * source/rtl/type.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/txtline.c
+    ! changed void hb_readLine()  -> static void hb_readLine()
+    ! ULONG -> HB_SIZE
+    ! changed LONG hb_tabexpand( const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTabLen )  -> static HB_ISIZ hb_tabexpand( const char * szString, char * szRet, HB_ISIZ lEnd, HB_SIZE uiTabLen )
+    ! LONG -> HB_ISIZ
+  * source/rtl/trim.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/substr.c
+    ! LONG -> HB_ISIZ   
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/strzero.c
+    ! ULONG -> HB_SIZE
+  * source/rtl/strmatch.c
+    ! ULONG -> HB_SIZE
+  * source/rtl/str.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/space.c
+    ! long lLen -> HB_ISIZ lLen
+  * source/rtl/right.c
+    ! LONG -> HB_ISIZ   
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/readline.c   
+    ! changed to use itemapi insted of direct structure manipulation        
+    ! removed unnecessary last to (LONG) in call to hb_fsseek
+    ! int -> HB_SIZE where aplicable
+    ! USHORT -> HB_SIZE  where aplicable
+  * source/rtl/strcase.c
+    ! ULONG -> HB_SIZE
+    on HB_TRACE changed direct %lu with %" HB_PFS " to make some c compiler happy
+  * source/rtl/replic.c
+    ! minor fix on previus commit and using to test ulLen * lTimes < UINT_MAX since with ULONG_MAX on 64bits you get gpf
+  * source/rtl/strtran.c  
+    ! minor fix on previus commit
+  * include/hbdefs.h
+    ! minor ajust to define of uintptr_t where not exist    
+  * source/rtl/filenet.c
+    ! pacified some remaing warning   on 64bits compile
+      
 2014-11-24 21:30  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/httpcln.prg
     contrib/tipssl/httpcln.prg

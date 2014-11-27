@@ -98,8 +98,8 @@ HB_FUNC( LTRIM )
       HB_SIZE  ulLen, ulSrc;
       char *   szText;
 
-      ulLen    = ulSrc = pText->item.asString.length;
-      szText   = hb_strLTrim( pText->item.asString.value, &ulLen );
+      ulLen    = ulSrc = hb_itemGetCLen( pText ) ;
+      szText   = hb_strLTrim( hb_itemGetCPtr( pText ), &ulLen );
 
       if( ulLen == ulSrc )
       {
@@ -127,9 +127,9 @@ HB_FUNC( RTRIM )
    if( pText )
    {
       HB_SIZE  ulLen, ulSrc;
-      char *   szText = pText->item.asString.value;
+      char *   szText = hb_itemGetCPtr( pText ) ; 
 
-      ulSrc = pText->item.asString.length;
+      ulSrc = hb_itemGetCLen( pText );
 #ifdef HB_EXTENSION
       ulLen = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
 #else
@@ -167,9 +167,9 @@ HB_FUNC( ALLTRIM )
    if( pText )
    {
       HB_SIZE  ulLen, ulSrc;
-      char *   szText = pText->item.asString.value;
+      char *   szText = hb_itemGetCPtr( pText ) ; 
 
-      ulSrc    = pText->item.asString.length;
+      ulSrc    = hb_itemGetCLen( pText );;
 #ifdef HB_EXTENSION
       ulLen    = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
 #else

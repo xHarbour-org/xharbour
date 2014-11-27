@@ -224,17 +224,18 @@ static HKEY regkeykey( HB_PTRUINT nKey)
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 {
-  HKEY hWnd = ( HKEY ) hb_parns( 8 );
+*   HKEY hWnd = ( HKEY ) hb_parns( 8 );
+  HKEY hWnd ;
   ULONG rVal= ( ULONG ) -1, nresult = hb_parnl( 9 );
 
-  if ( RegCreateKeyEx( regkeykey( hb_parnl( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
+  if ( RegCreateKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
-    if ( ISBYREF( 8 ) )
-    {
+*     if ( ISBYREF( 8 ) )
+*     {
       // hb_stornl( ( ULONG ) hWnd, 8 );
-      hb_storns( ( HB_SIZE ) hWnd, 8 );
-    }
+      hb_storptr( hWnd, 8 );
+*     }
     if ( ISBYREF( 9 ) )
     {
       hb_stornl( nresult, 9 );
@@ -246,15 +247,12 @@ HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 HB_FUNC_STATIC( WINREGOPENKEYEX )
 {
   ULONG rVal= ( ULONG ) -1 ;
-  HKEY hWnd ;
-  if ( RegOpenKeyEx( regkeykey( hb_parnl( 1 ) ), hb_parc( 2 ), 0, hb_parnl( 4 ), &hWnd ) == ERROR_SUCCESS )
+  void * hWnd ;
+  if ( RegOpenKeyEx( regkeykey(( HB_PTRUINT ) hb_parnint( 1 ) ), hb_parc( 2 ), 0, hb_parnl( 4 ), &hWnd ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
-    if ( ISBYREF( 5 ) )
-    {
-      // hb_stornl( ( ULONG ) hWnd, 5 );
-      hb_storns( ( HB_SIZE ) hWnd, 5 );
-    }
+   hb_storptr( hWnd, 5 );
+
   }
   hb_retnl( rVal ) ;
 }
@@ -266,14 +264,14 @@ HB_FUNC_STATIC( WINREGQUERYVALUEEX )
   DWORD nSize = 0, nType ;
 
   cKey = ( const char *) hb_parc( 2 ) ;
-  if ( RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, 0, &nSize ) == ERROR_SUCCESS )
+  if ( RegQueryValueEx( ( HKEY ) hb_parptr( 1 ), cKey, 0, &nType, 0, &nSize ) == ERROR_SUCCESS )
   {
     if ( nSize > 0 )
     {
       cValue = ( BYTE *) hb_xgrab( nSize );
       if ( cValue )
       {
-        if ( RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, ( BYTE *) cValue, &nSize ) == ERROR_SUCCESS )
+        if ( RegQueryValueEx( ( HKEY ) hb_parptr( 1 ), cKey, 0, &nType, ( BYTE *) cValue, &nSize ) == ERROR_SUCCESS )
         {
           if ( ISBYREF( 4 ) )
           {
@@ -314,18 +312,18 @@ HB_FUNC_STATIC( WINREGSETVALUEEX )
   if ( nType != REG_DWORD )
   {
     cValue = ( BYTE *) hb_parc( 5 );
-    hb_retni( RegSetValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, nType, ( BYTE *) cValue, (DWORD) hb_parclen( 5 ) + 1 ) );
+    hb_retni( RegSetValueEx( ( HKEY ) hb_parptr( 1 ), cKey, 0, nType, ( BYTE *) cValue, (DWORD) hb_parclen( 5 ) + 1 ) );
   }
   else
   {
     nSpace= hb_parnl( 5 );
-    hb_retni( RegSetValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, nType, (BYTE *) &nSpace, sizeof( REG_DWORD ) ) );
+    hb_retni( RegSetValueEx( ( HKEY ) hb_parptr( 1 ), cKey, 0, nType, (BYTE *) &nSpace, sizeof( REG_DWORD ) ) );
   }
 }
 
 HB_FUNC_STATIC( WINREGCLOSEKEY )
 {
-  hb_retnl( RegCloseKey( (HKEY) hb_parns( 1 ) ) );
+  hb_retnl( RegCloseKey( ( HKEY ) hb_parptr( 1 ) ) );
 }
 
 #pragma ENDDUMP

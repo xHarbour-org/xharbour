@@ -1026,6 +1026,10 @@ extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pStr
 extern HB_EXPORT HB_ULONG hb_hextonum(const char *cHex);
 extern HB_EXPORT void *  dv_memcpy(void *dest, const void *src, size_t count);
 extern HB_EXPORT void    hb_strtohex( const char * pSource, HB_SIZE size, char * pDest );
+
+extern HB_EXPORT char * hb_verPCode( void );
+extern HB_EXPORT void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
+extern HB_EXPORT int    hb_arrayMode( void );
 #include "local.h"
 
 HB_EXTERN_END
