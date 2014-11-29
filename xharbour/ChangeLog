@@ -9,6 +9,10 @@
 */
 
 
+2014-11-29 19:48 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/winreg.prg
+    ! pacify warning
+
 2014-11-29 15:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
   * include/hbapi.h
     ! added defines to hb_xgrabz and hb_xmemdup borrow from harbour
@@ -109,10 +113,8 @@
   * source/rtl/hbrand.c
     ! synced with harbour
     
-      
-    
 2014-11-20 00:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * contrib\gtwvw\wvwfuncs.c
+  * contrib/gtwvw/wvwfuncs.c
     ! pacify warning
 
 2014-11-19 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
@@ -127,7 +129,6 @@
     + Added method put,delete,header borrow from harbour
     + added method close to close logfile before calling the destructor
     
-
 2014-11-17 09:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/hbsqlit3/sqlite3.c
   * contrib/hbsqlit3/sqlite3.h
@@ -151,7 +152,6 @@
       WVW_GETSYSTEMMENU,WVW_SBCREATE,WVW_TBCREATE
   * contrib/gtwvw/hbgtwvw.h    
     ! some new constants and defines updated to allow 64bits
-    
 
 2014-11-09 10:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/tipssl/inetssl.h
@@ -315,7 +315,7 @@
     ! added some missing cast to make mingw happy
 
 2014-10-21 11:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\macro.c
+  * source/vm/macro.c
     ! pacify warnings
 
 2014-10-20 21:34 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
@@ -382,7 +382,7 @@
    + Auto detection of RC.exe
 
 2014-08-14 16:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\gtwvt\gtwvt.c
+  * source/rtl/gtwvt/gtwvt.c
     ! pacify warnings
 
 2014-08-12 21:10 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>

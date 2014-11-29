@@ -228,7 +228,7 @@ HB_FUNC_STATIC( WINREGCREATEKEYEX  )
   HKEY hWnd ;
   ULONG rVal= ( ULONG ) -1, nresult = hb_parnl( 9 );
 
-  if ( RegCreateKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
+  if ( RegCreateKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char * ) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, ( PHKEY ) &hWnd, &nresult ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
 
@@ -247,10 +247,10 @@ HB_FUNC_STATIC( WINREGOPENKEYEX )
 {
   ULONG rVal= ( ULONG ) -1 ;
   void * hWnd ;
-  if ( RegOpenKeyEx( regkeykey(( HB_PTRUINT ) hb_parnint( 1 ) ), hb_parc( 2 ), 0, hb_parnl( 4 ), &hWnd ) == ERROR_SUCCESS )
+  if ( RegOpenKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char * ) hb_parc( 2 ), 0, hb_parnl( 4 ), ( PHKEY ) &hWnd ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
-   hb_storptr( hWnd, 5 );
+    hb_storptr( hWnd, 5 );
 
   }
   hb_retnl( rVal ) ;
