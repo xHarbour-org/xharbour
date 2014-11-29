@@ -224,18 +224,17 @@ static HKEY regkeykey( HB_PTRUINT nKey)
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 {
-*   HKEY hWnd = ( HKEY ) hb_parns( 8 );
+
   HKEY hWnd ;
   ULONG rVal= ( ULONG ) -1, nresult = hb_parnl( 9 );
 
   if ( RegCreateKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
-*     if ( ISBYREF( 8 ) )
-*     {
+
       // hb_stornl( ( ULONG ) hWnd, 8 );
       hb_storptr( hWnd, 8 );
-*     }
+
     if ( ISBYREF( 9 ) )
     {
       hb_stornl( nresult, 9 );

@@ -1030,6 +1030,9 @@ extern HB_EXPORT void    hb_strtohex( const char * pSource, HB_SIZE size, char *
 extern HB_EXPORT char * hb_verPCode( void );
 extern HB_EXPORT void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
 extern HB_EXPORT int    hb_arrayMode( void );
+#define hb_xgrabz( n )        memset( hb_xgrab( ( n ) ), 0, ( n ) )
+#define hb_xmemdup( p, n )    memcpy( hb_xgrab( ( n ) ), ( p ), ( n ) )
+
 #include "local.h"
 
 HB_EXTERN_END

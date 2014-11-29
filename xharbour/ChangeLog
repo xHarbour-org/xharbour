@@ -9,6 +9,12 @@
 */
 
 
+2014-11-29 15:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
+  * include/hbapi.h
+    ! added defines to hb_xgrabz and hb_xmemdup borrow from harbour
+  * source/rtl/winreg.prg
+    ! minor fix to previus commit
+      
 2014-11-27 11:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
   * source/rtl/version.c
     ! moved externs to hbapi.h
