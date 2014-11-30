@@ -9,6 +9,20 @@
 */
 
 
+2014-11-29 22:40  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * source/rtl/filebuf.c
+    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset
+  * source/rtl/filenet.c
+    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset  
+  * source/rtl/hbgtcore.c
+    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset where aplicable   
+  * source/rtl/dbf2txt.c
+    ! hb_strescape( const char * szInput, int lLen, const char * cDelim ) -> hb_strescape( const char * szInput, HB_ISIZ lLen, const char * cDelim )
+    ! int -> HB_ISIZ where aplicable
+    ! removed unnecessary casts
+  * include/hbapi.h
+    ! removed duplicated  hb_verPCode declaration
+        
 2014-11-29 19:48 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/winreg.prg
     ! pacify warning

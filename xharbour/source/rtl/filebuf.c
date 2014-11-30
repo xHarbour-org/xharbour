@@ -140,8 +140,9 @@ static PHB_FILE hb_fileNew( HB_FHANDLE hFile, BOOL fShared, BOOL fReadonly,
 
    if( ! pFile )
    {
-      pFile             = ( PHB_FILE ) hb_xgrab( sizeof( HB_FILE ) );
-      memset( pFile, 0, sizeof( HB_FILE ) );
+//       pFile             = ( PHB_FILE ) hb_xgrab( sizeof( HB_FILE ) );
+//       memset( pFile, 0, sizeof( HB_FILE ) );
+      pFile = (PHB_FILE) hb_xgrabz( sizeof( HB_FILE ) );
       pFile->pFuncs     = s_fileMethods();
       pFile->device     = device;
       pFile->inode      = inode;

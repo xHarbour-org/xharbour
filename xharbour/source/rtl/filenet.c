@@ -180,8 +180,9 @@ static PHB_FILE hb_fileNetNew( HB_FHANDLE hFile, BOOL fShared, BOOL fBufferLock,
 
    if( ! pFile )
    {
-      pFile             = ( PHB_FILE ) hb_xgrab( sizeof( HB_FILE ) );
-      memset( pFile, 0, sizeof( HB_FILE ) );
+//       pFile             = ( PHB_FILE ) hb_xgrab( sizeof( HB_FILE ) );
+//       memset( pFile, 0, sizeof( HB_FILE ) );
+      pFile = (PHB_FILE) hb_xgrabz( sizeof( HB_FILE ) );
       pFile->pFileName  = ( char * ) hb_xalloc( HB_PATH_MAX );
       memset( pFile->pFileName, 0, sizeof( HB_PATH_MAX ) );
       if( pFileName )

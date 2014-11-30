@@ -59,9 +59,9 @@
 #include "hbvm.h"
 
 /* Escaping delimited strings. Need to be cleaned/optimized/improved */
-static char * hb_strescape( const char * szInput, int lLen, const char * cDelim )
+static char * hb_strescape( const char * szInput, HB_ISIZ lLen, const char * cDelim )
 {
-   int            lCnt = 0;
+   HB_ISIZ            lCnt = 0;
    const char *   szChr;
    char *         szEscape;
    char *         szReturn;
@@ -104,7 +104,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          char *   szString;
 
          szStrEsc = hb_strescape( hb_itemGetCPtr( pValue ),
-                                  ( int ) hb_itemGetCLen( pValue ), cDelim );
+                                  hb_itemGetCLen( pValue ), cDelim );
 #ifndef HB_CDP_SUPPORT_OFF
          if( cdp )
          {
@@ -114,7 +114,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          szString = hb_xstrcpy( NULL, cDelim, szStrEsc, cDelim, NULL );
 
          /* FWrite( handle, szString ) */
-         hb_fsWriteLarge( handle, ( BYTE * ) szString, strlen( szString ) );
+         hb_fsWriteLarge( handle,  szString, strlen( szString ) );
 
          /* Orphaned, get rif off it */
          hb_xfree( szStrEsc );
@@ -127,13 +127,13 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
          char * szDate = ( char * ) hb_xgrab( 9 );
 
          hb_itemGetDS( pValue, szDate );
-         hb_fsWriteLarge( handle, ( BYTE * ) szDate, strlen( szDate ) );
+         hb_fsWriteLarge( handle,  szDate, strlen( szDate ) );
          hb_xfree( szDate );
          break;
       }
       /* an "L" field */
       case HB_IT_LOGICAL:
-         hb_fsWriteLarge( handle, ( BYTE * ) ( hb_itemGetL( pValue ) ? "T" : "F" ), 1 );
+         hb_fsWriteLarge( handle,  ( hb_itemGetL( pValue ) ? "T" : "F" ), 1 );
          break;
       /* an "N" field */
       case HB_IT_INTEGER:
@@ -147,7 +147,7 @@ static BOOL hb_ExportVar( HB_FHANDLE handle, PHB_ITEM pValue, const char * cDeli
             HB_SIZE        ulLen       = strlen( szResult );
             const char *   szTrimmed   = hb_strLTrim( szResult, &ulLen );
 
-            hb_fsWriteLarge( handle, ( BYTE * ) szTrimmed, strlen( szTrimmed ) );
+            hb_fsWriteLarge( handle,  szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
          break;
@@ -179,7 +179,7 @@ HB_FUNC( DBF2TEXT )
 
    /* Export DBF content to text file */
 
-   int      iSepLen;
+   HB_ISIZ      iSepLen;
    USHORT   uiFields       = 0;
    USHORT   ui;
    PHB_ITEM pTmp;
@@ -289,7 +289,7 @@ HB_FUNC( DBF2TEXT )
                }
             }
          }
-         hb_fsWriteLarge( handle, ( BYTE * ) "\r\n", 2 );
+         hb_fsWriteLarge( handle,  "\r\n", 2 );
          bWriteSep = FALSE;
       }
 
@@ -303,6 +303,6 @@ HB_FUNC( DBF2TEXT )
    }
 
    /* Writing EOF */
-   hb_fsWriteLarge( handle, ( BYTE * ) "\x1A", 1 );
+   hb_fsWriteLarge( handle,  "\x1A", 1 );
    hb_itemRelease( pTmp );
 }
