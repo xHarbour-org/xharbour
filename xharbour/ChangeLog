@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-01 21:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * include/hbsetup.h
+    ! minor fix when defining HB_OS_UNIX
+    
 2014-12-01 10:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * xharbour/source/rdd/hbsix/sxcompat.prg
     ! Fix bug, thanks to Claudio Voskian

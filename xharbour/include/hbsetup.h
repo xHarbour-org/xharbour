@@ -614,6 +614,7 @@
          #define HB_OS_UNIX_COMPATIBLE
       #endif
    #endif
+#endif
 
 #if defined( HB_OS_VXWORKS )
    #define HB_NO_FNMATCH
@@ -817,4 +818,4 @@
 #endif
 
 #endif /* HB_SETUP_H_ */
-#endif
+
