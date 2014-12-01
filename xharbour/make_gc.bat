@@ -27,9 +27,11 @@ REM SET HB_DIR_CURL=
 REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
-
-IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGW
+set HB_ARCHITECTURE=w32
+IF "%HB_ARCH%"=="64" SET SET CC_DIR=C:/MinGW64
+IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGw32
 IF "%SUB_DIR%"=="" SET SUB_DIR=gc
+IF "%HB_ARCH%"=="64" SET SUB_DIR=gc64
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 IF "%BISON_DIR%"=="" SET BISON_DIR=C:/MSYS/1.0/bin
 
@@ -37,7 +39,7 @@ SET _PATH=%PATH%
 SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
 
 rem Added for MinGW 4.70 -mno-cygwin is no longer valid
-rem SET NO_CYGWIN=1
+ SET NO_CYGWIN=1
 
 rem ============================================================================
 rem The followings should never change
