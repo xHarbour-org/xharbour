@@ -88,7 +88,7 @@
 
 FUNCTION sxChar( nLen, xKeyVal )
 
-   switch ValType( xKeyVal )
+   SWITCH ValType( xKeyVal )
    CASE "C"
    CASE "M"
       EXIT
@@ -101,16 +101,16 @@ FUNCTION sxChar( nLen, xKeyVal )
    CASE "L"
       xKeyVal := iif( xKeyVal, "T", "F" )
       EXIT
-      DEFAULT
-      xKeyVal := iif( ValType( nLen ) == "N", "", Space( 10 ) )
+   DEFAULT
+      xKeyVal := iif( HB_ISNUMERIC( nLen ), "", Space( 10 ) )
       EXIT
-   end switch
+   END SWITCH
 
-   RETURN iif( ValType( nLen ) == "N", PadR( LTrim( xKeyVal ), nLen ), xKeyVal )
+   RETURN iif( HB_ISNUMERIC( nLen ), PadR( LTrim( xKeyVal ), nLen ), xKeyVal )
 
 FUNCTION sxNum( xKeyVal )
 
-   switch ValType( xKeyVal )
+   SWITCH ValType( xKeyVal )
    CASE "N"
       EXIT
    CASE "C"
@@ -123,16 +123,16 @@ FUNCTION sxNum( xKeyVal )
    CASE "L"
       xKeyVal := iif( xKeyVal, 1, 0 )
       EXIT
-      DEFAULT
+   DEFAULT
       xKeyVal := 0.00
       EXIT
-   end switch
+   END SWITCH
 
    RETURN xKeyVal
 
 FUNCTION sxDate( xKeyVal )
 
-   switch ValType( xKeyVal )
+   SWITCH ValType( xKeyVal )
    CASE "D"
       EXIT
    CASE "C"
@@ -142,73 +142,68 @@ FUNCTION sxDate( xKeyVal )
    CASE "N"
       xKeyVal := CToD( "" ) + xKeyVal
       EXIT
-      DEFAULT
+   DEFAULT
       xKeyVal := CToD( "" )
       EXIT
-   end switch
+   END SWITCH
 
    RETURN xKeyVal
 
 FUNCTION sxLog( xKeyVal )
 
-   switch ValType( xKeyVal )
+   SWITCH ValType( xKeyVal )
    CASE "L"
       EXIT
    CASE "C"
    CASE "M"
-      IF xKeyVal $ { "T", "t", "Y", "y", ".T.", ".t.", ".Y.", ".y." }
-         xKeyVal := .T.
-      ELSE
-         xKeyVal := .F.
-      ENDIF
-      EXIT
+      RETURN ( xKeyVal $ { "T", "t", "Y", "y", ".T.", ".t.", ".Y.", ".y." } )
    CASE "N"
-      xKeyVal := xKeyVal != 0
-      EXIT
-      DEFAULT
-      xKeyVal := .F.
-      EXIT
-   end switch
+      RETURN ( xKeyVal != 0 )
+   DEFAULT
+      RETURN .F.
+   END SWITCH
 
    RETURN xKeyVal
 
 FUNCTION sx_Compress( xVal )
 
-   LOCAL cType := ValType( xVal ), xRetVal
+   LOCAL xRetVal
 
-   IF cType $ "CM"
-      xRetVal := _sx_StrCompress( xVal )
-   ELSEIF cType == "A"
+   SWITCH ValType( xVal )
+   CASE "C"
+   CASE "M"
+      RETURN _sx_StrCompress( xVal )
+   CASE "A"
       xRetVal := Array( Len( xVal ) )
-      AEval( xVal, { |x| xRetVal := sx_Compress( x ) } )
-   ELSE
-      xRetVal := xVal
-   ENDIF
+      AEval( xVal, { |x, i| xRetVal[ i ] := sx_Compress( x ) } )
+      RETURN xRetVal
+   END SWITCH
 
-   RETURN xRetVal
+   RETURN xVal
 
 FUNCTION sx_Decompress( xVal )
 
-   LOCAL cType := ValType( xVal ), xRetVal
+   LOCAL xRetVal
 
-   IF cType $ "CM"
-      xRetVal := _sx_StrDecompress( xVal )
-   ELSEIF cType == "A"
+   SWITCH ValType( xVal )
+   CASE "C"
+   CASE "M"
+      RETURN _sx_StrDecompress( xVal )
+   CASE "A"
       xRetVal := Array( Len( xVal ) )
-      AEval( xVal, { |x| xRetVal := sx_Decompress( x ) } )
-   ELSE
-      xRetVal := xVal
-   ENDIF
+      AEval( xVal, { |x, i| xRetVal[ i ] := sx_Decompress( x ) } )
+      RETURN xRetVal
+   END SWITCH
 
-   RETURN xRetVal
+   RETURN xVal
 
 FUNCTION sx_TagInfo( cIndex )
 
    LOCAL aInfo, nOrds, nFirst, i
 
-   IF Used() // ( nOrds := OrdCount( cIndex ) ) > 0
+   IF Used() .and. ( nOrds := ordCount( cIndex ) ) > 0
       aInfo := Array( nOrds, 6 )
-      IF ValType( cIndex ) == "C"
+      IF HB_ISSTRING( cIndex )
          nFirst := dbOrderInfo( DBOI_BAGORDER, cIndex )
          nOrds += nFirst - 1
       ELSE
@@ -233,12 +228,12 @@ FUNCTION sx_TagCount( xIndex )
    LOCAL nTags := 0, cIndex, nOrder
 
    IF Used()
-      IF ValType( xIndex ) == "N"
+      IF HB_ISNUMERIC( xIndex )
          nOrder := sx_TagOrder( 1, xIndex )
          IF nOrder != 0
-            cIndex := dbOrderInfo( DBOI_FULLPATH, , nOrder )
+            cIndex := dbOrderInfo( DBOI_FULLPATH,, nOrder )
          ENDIF
-      ELSEIF ValType( xIndex ) == "C" .AND. !Empty( xIndex )
+      ELSEIF HB_ISSTRING( xIndex ) .AND. !Empty( xIndex )
          cIndex := xIndex
       ELSE
          cIndex := dbOrderInfo( DBOI_FULLPATH )
@@ -255,18 +250,18 @@ FUNCTION sx_Tags( xIndex )
    LOCAL aTagNames := {}, nOrder, nTags
 
    IF Used()
-      IF ValType( xIndex ) == "N"
+      IF HB_ISNUMERIC( xIndex )
          nOrder := sx_TagOrder( 1, xIndex )
-      ELSEIF ValType( xIndex ) == "C" .AND. !Empty( xIndex )
+      ELSEIF HB_ISSTRING( xIndex ) .AND. !Empty( xIndex )
          nOrder := dbOrderInfo( DBOI_BAGORDER, xIndex )
       ELSE
          nOrder := ordNumber()
       ENDIF
       IF nOrder != 0
          nTags := ordCount( dbOrderInfo( DBOI_FULLPATH,, nOrder ) )
-         while --nTags >= 0
+         WHILE --nTags >= 0
             AAdd( aTagNames, ordName( nOrder++ ) )
-         ENDDO
+         END
       ENDIF
    ENDIF
 
@@ -274,13 +269,13 @@ FUNCTION sx_Tags( xIndex )
 
 FUNCTION sx_SetTag( xTag, xIndex )
 
-   LOCAL lRet := .F. , nOrder := 0, nOldOrd, cIndex
+   LOCAL lRet := .F., nOrder := 0, nOldOrd, cIndex
 
    IF Used() .AND. ValType( xTag ) $ "CN"
-      IF ValType( xTag ) == "N"
+      IF HB_ISNUMERIC( xTag )
          IF Empty( xIndex ) .OR. !ValType( xIndex ) $ "CN"
             nOrder := xTag
-         ELSEIF ValType( xIndex ) == "C"
+         ELSEIF HB_ISSTRING( xIndex )
             IF xTag >= 1 .AND. xTag <= ordCount( xIndex )
                nOrder := dbOrderInfo( DBOI_BAGORDER, xIndex ) + xTag - 1
             ENDIF
@@ -290,12 +285,12 @@ FUNCTION sx_SetTag( xTag, xIndex )
       ELSE
          IF Empty( xIndex ) .OR. !ValType( xIndex ) $ "CN"
             nOrder := ordNumber( xTag )
-         ELSEIF ValType( xIndex ) == "C"
+         ELSEIF HB_ISSTRING( xIndex )
             nOrder := sx_TagOrder( xTag, xIndex )
          ELSE
             nOrder := sx_TagOrder( 1, xIndex )
             IF nOrder != 0
-               cIndex := dbOrderInfo( DBOI_FULLPATH, , nOrder )
+               cIndex := dbOrderInfo( DBOI_FULLPATH,, nOrder )
                IF Empty( cIndex )
                   nOrder := 0
                ELSE
@@ -321,18 +316,18 @@ FUNCTION sx_SetTag( xTag, xIndex )
 
 FUNCTION sx_KillTag( xTag, xIndex )
 
-   LOCAL lRet := .F. , nOrder, cIndex
+   LOCAL lRet := .F., nOrder, cIndex
 
-   IF ValType( xTag ) == "L"
+   IF HB_ISLOGICAL( xTag )
       IF xTag
          IF Empty( xIndex )
             cIndex := sx_IndexName()
-         ELSEIF ValType( xIndex ) == "N"
+         ELSEIF HB_ISNUMERIC( xIndex )
             cIndex := sx_IndexName( 1, xIndex )
-         ELSEIF ValType( xIndex ) == "C"
+         ELSEIF HB_ISSTRING( xIndex )
             nOrder := dbOrderInfo( DBOI_BAGORDER, xIndex )
             IF nOrder != 0
-               cIndex := dbOrderInfo( DBOI_FULLPATH, , nOrder )
+               cIndex := dbOrderInfo( DBOI_FULLPATH,, nOrder )
             ENDIF
          ENDIF
          IF !Empty( cIndex )
@@ -342,10 +337,10 @@ FUNCTION sx_KillTag( xTag, xIndex )
          ENDIF
       ENDIF
    ELSE
-      IF ValType( xTag ) == "N"
+      IF HB_ISNUMERIC( xTag )
          IF Empty( xIndex ) .OR. !ValType( xIndex ) $ "CN"
             nOrder := xTag
-         ELSEIF ValType( xIndex ) == "C"
+         ELSEIF HB_ISSTRING( xIndex )
             IF xTag >= 1 .AND. xTag <= ordCount( xIndex )
                nOrder := dbOrderInfo( DBOI_BAGORDER, xIndex ) + xTag - 1
             ELSE
@@ -357,12 +352,12 @@ FUNCTION sx_KillTag( xTag, xIndex )
       ELSE
          IF Empty( xIndex ) .OR. !ValType( xIndex ) $ "CN"
             nOrder := ordNumber( xTag )
-         ELSEIF ValType( xIndex ) == "C"
+         ELSEIF HB_ISSTRING( xIndex )
             nOrder := sx_TagOrder( xTag, xIndex )
          ELSE
             nOrder := sx_TagOrder( 1, xIndex )
             IF nOrder != 0
-               cIndex := dbOrderInfo( DBOI_FULLPATH, , nOrder )
+               cIndex := dbOrderInfo( DBOI_FULLPATH,, nOrder )
                IF Empty( cIndex )
                   nOrder := 0
                ELSE
@@ -384,9 +379,9 @@ FUNCTION sx_FileOrder()
 
 FUNCTION sx_SetFileOrd( nIndex )
 
-   RETURN iif( ValType( nIndex ) == "N", ;
-      ordSetFocus( sx_TagOrder( 1, nIndex ) ), ;
-      ordSetFocus() )
+   RETURN iif( HB_ISNUMERIC( nIndex ), ;
+              ordSetFocus( sx_TagOrder( 1, nIndex ) ), ;
+              ordSetFocus() )
 
 FUNCTION rdd_Count()
 
@@ -396,7 +391,7 @@ FUNCTION rdd_Name( nRDD )
 
    LOCAL aRDD
 
-   IF ValType( nRDD ) == "N" .AND. nRDD >= 1
+   IF HB_ISNUMERIC( nRDD ) .AND. nRDD >= 1
       aRDD := rddList()
       IF nRDD <= Len( aRDD )
          RETURN aRDD[ nRDD ]
@@ -409,11 +404,11 @@ FUNCTION rdd_Info( xID )
 
    LOCAL aInfo, cRDD
 
-   IF ValType( xID ) == "N"
+   IF HB_ISNUMERIC( xID )
       IF !Empty( Alias( xID ) )
          ( xID )->( rddName() )
       ENDIF
-   ELSEIF ValType( xID ) == "C"
+   ELSEIF HB_ISSTRING( xID )
       cRDD := Upper( AllTrim( xID ) )
       IF AScan( rddList(), {|x| Upper( x ) == cRDD } ) == 0
          cRDD := NIL
@@ -491,7 +486,7 @@ FUNCTION sx_dbCreate( cFileName, aStruct, cRDD )
 
    aDbStruct := AClone( aStruct )
    FOR EACH aField in aDbStruct
-      switch aField[ 2 ]
+      SWITCH aField[ 2 ]
       CASE "V"
          aField[ 3 ] += 6
          EXIT
@@ -505,7 +500,7 @@ FUNCTION sx_dbCreate( cFileName, aStruct, cRDD )
             aField[ 2 ] := "V"
          ENDIF
          EXIT
-      end
+      END SWITCH
    NEXT
 
    RETURN dbCreate( cFileName, aDbStruct, cRDD )
@@ -515,9 +510,9 @@ FUNCTION sx_VSigLen( xField )
    LOCAL nResult := 0, nField := 0
 
    IF Used()
-      IF ValType( xField ) == "C"
+      IF HB_ISSTRING( xField )
          nField := FieldPos( xField )
-      ELSEIF ValType( xField ) == "N"
+      ELSEIF HB_ISNUMERIC( xField )
          nField := xField
       ENDIF
       IF nField >= 1 .AND. nField <= FCount()
@@ -535,7 +530,6 @@ FUNCTION sx_VFGet( cExpr, nLen )
    /* Our RDDs does not use any internal flags to cut V-Fields so
     * we can simply evaluate given expression */
 
-///
    IF Used() .AND. PCount() == 2
       RETURN PadR( &cExpr, nLen )
    ENDIF
@@ -544,7 +538,7 @@ FUNCTION sx_VFGet( cExpr, nLen )
 
 FUNCTION sx_IsLocked( xRec )
 
-   LOCAL lResult := .F. , xRecord
+   LOCAL lResult := .F., xRecord
 
    IF Used()
       xRecord := iif( xRec == NIL, RecNo(), xRec )
@@ -566,14 +560,14 @@ FUNCTION sx_SetTrigger( nAction, cTriggerName, cRDD /* Harbour extensions */ )
 
    LOCAL cPrevTrigger := ""
 
-   IF ValType( nAction ) == "N"
+   IF HB_ISNUMERIC( nAction )
       IF nAction == TRIGGER_PENDING
-         IF ValType( cTriggerName ) == "C"
+         IF HB_ISSTRING( cTriggerName )
             rddInfo( RDDI_PENDINGTRIGGER, cTriggerName, cRDD )
          ENDIF
       ELSEIF Used()
          cPrevTrigger := dbInfo( DBI_TRIGGER )
-         switch nAction
+         SWITCH nAction
          CASE TRIGGER_ENABLE
             dbInfo( DBI_TRIGGER, .T. )
             EXIT
@@ -584,11 +578,11 @@ FUNCTION sx_SetTrigger( nAction, cTriggerName, cRDD /* Harbour extensions */ )
             dbInfo( DBI_TRIGGER, "" )
             EXIT
          CASE TRIGGER_INSTALL
-            IF ValType( cTriggerName ) == "C"
+            IF HB_ISSTRING( cTriggerName )
                dbInfo( DBI_TRIGGER, cTriggerName )
             ENDIF
             EXIT
-         end
+         END SWITCH
       ENDIF
    ENDIF
 
