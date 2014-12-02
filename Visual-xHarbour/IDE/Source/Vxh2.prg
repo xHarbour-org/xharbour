@@ -484,10 +484,10 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
       ::__lModified := .T.
       ::UpdateSelection( nKey )
 
-      aRect := ::GetSelRect(.T.)
       IF LEN( ::Selected ) == 1
          ::Application:Props:StatusBarPos:Caption := XSTR(::Selected[1][1]:Left)+", "+XSTR(::Selected[1][1]:Top)+", "+XSTR(::Selected[1][1]:Width)+", "+XSTR(::Selected[1][1]:Height)
        ELSE
+         aRect := ::GetSelRect(.T.)
          ::Application:Props:StatusBarPos:Caption := XSTR(aRect[1])+", "+XSTR(aRect[2])+", "+XSTR(aRect[3])+", "+XSTR(aRect[4])
       ENDIF
    ENDIF

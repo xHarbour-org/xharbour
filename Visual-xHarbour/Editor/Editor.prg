@@ -35,8 +35,8 @@ RETURN
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT TitleControl
-   DATA nLastTabTime  PROTECTED
-   DATA nLastTabPos   PROTECTED
+   DATA nLastTabTime  PROTECTED INIT Seconds()
+   DATA nLastTabPos   PROTECTED INIT 1
    DATA xTabWidth     PROTECTED INIT 3
    ASSIGN TabWidth(n) INLINE ::xTabWidth := n, AEVAL( ::aDocs, {|o| o:SetTabWidth(o:Owner:TabWidth)} ), IIF( ::Source != NIL, ::Source:Select(),)
    ACCESS TabWidth    INLINE ::xTabWidth
@@ -484,13 +484,12 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       ENDIF
 
     ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
-      nSel := ASCAN( ::aDocs, ::xSource,,, .T. )
+      nSel := ASCAN( ::aDocs, {|o|o:pSource==::xSource:pSource} )
 
       DEFAULT ::nLastTabTime TO SECONDS()
 
       nSecs := SECONDS() - ::nLastTabTime
-
-      IF nSecs < 1 .OR. ::nLastTabPos == NIL
+      IF nSecs < 1 .OR. ::nLastTabPos == nSel .OR. ABS( ::nLastTabPos - nSel ) == 1
          nPos := nSel + IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
        ELSE
          nPos := ::nLastTabPos
@@ -502,10 +501,9 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
          nPos := LEN( ::aDocs )
       ENDIF
 
-      ::nLastTabPos  := nSel
       ::nLastTabTime := SECONDS()
 
-      ::Application:Project:SourceTabChanged( nPos )
+      ::Application:Project:SourceTabChanged( nPos, .F. )
    ENDIF
 RETURN NIL
 
@@ -913,7 +911,9 @@ CLASS Source INHERIT ProjectFile
 
    METHOD SavePos()                           INLINE ::SavedPos := ::GetCurrentPos(), ::nVisLine := ::SendEditor( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    METHOD ReleaseDocument()                   INLINE ::Owner:SendMessage( SCI_RELEASEDOCUMENT, 0, ::pSource )
-   METHOD Select()                            INLINE ::__lSelected := .T., ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ), ::Owner:xSource := Self, ::GotoPosition( ::SavedPos ), ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
+
+   METHOD Select()
+
    METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
 
    METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
@@ -995,6 +995,16 @@ CLASS Source INHERIT ProjectFile
    METHOD FindInTarget()
    METHOD GetBookmarks()
 ENDCLASS
+
+//------------------------------------------------------------------------------------------------------------------------------------
+METHOD Select() CLASS Source
+   ::Owner:nLastTabPos := ASCAN( ::Owner:aDocs, {|o| o:pSource==::Owner:Source:pSource } )
+   ::__lSelected := .T.
+   ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   ::Owner:xSource := Self
+   ::GotoPosition( ::SavedPos )
+   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
+RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD GetBookmarks() CLASS Source

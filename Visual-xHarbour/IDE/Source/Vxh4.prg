@@ -695,7 +695,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
    cProp := oItem:ColItems[1]:Prop
    cProp2:= oItem:ColItems[1]:Prop2
 
-   IF (cProp == "Name" .OR. cProp == "Alias" ).AND. !IsValidIdentifier( xValue )
+   IF (cProp == "Name" .OR. ( cProp == "Alias" .AND. ! Empty(xValue) .AND. xValue[1] != "&" ) ).AND. !IsValidIdentifier( xValue )
       IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
          ::ActiveControl:OnWMKillFocus := NIL
          ::ActiveControl:Destroy()

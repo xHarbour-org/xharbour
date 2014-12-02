@@ -2264,8 +2264,8 @@ STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
               Rectangle( hDC, aPt[1] + 1, 0, aPt[1] + o:Width - 1, 1 )
 
               SelectObject( hDC, hOldPen )
-              ReleaseDC( hWnd, hdc)
            ENDIF
+           ReleaseDC( hWnd, hdc)
            RETURN 0
 
       CASE WM_ERASEBKGND

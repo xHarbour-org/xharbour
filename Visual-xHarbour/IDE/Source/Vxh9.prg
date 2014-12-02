@@ -592,11 +592,12 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS FileExplorer INHERIT TreeView
-   DATA Project    EXPORTED
-   DATA Main       EXPORTED
-   DATA ExtSource  EXPORTED
-   DATA ExtBinary  EXPORTED
-   DATA aExt       EXPORTED INIT {".prg",".c",".lib",".obj"}
+   DATA Project     EXPORTED
+   DATA Main        EXPORTED
+   DATA ExtSource   EXPORTED
+   DATA ExtBinary   EXPORTED
+   DATA aExt        EXPORTED INIT {".prg",".c",".lib",".obj"}
+   DATA lSkipSelect EXPORTED INIT .F.
 
    METHOD Init() CONSTRUCTOR
 
@@ -728,7 +729,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS FileExplorer
-   IF oItem:Cargo != NIL
+   IF ! ::lSkipSelect .AND. oItem:Cargo != NIL
       IF oItem:Cargo:lSource
          ::Application:SourceEditor:Source := oItem:Cargo
          ::Application:Project:EditReset()
@@ -737,6 +738,7 @@ METHOD OnSelChanged( oItem ) CLASS FileExplorer
          ENDIF
       ENDIF
    ENDIF
+   ::lSkipSelect := .F.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

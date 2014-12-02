@@ -324,7 +324,7 @@ METHOD OnSize(w,l) CLASS TabControl
    IF ::IsWindowVisible() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
       IF oPage != NIL
-         oPage:__OnParentSize(LOWORD(w),HIWORD(w))
+//         oPage:__OnParentSize(LOWORD(w),HIWORD(w))
       ENDIF
    ENDIF
 RETURN NIL
@@ -427,7 +427,7 @@ RETURN SendMessage( ::hWnd, TCM_HITTEST, 0, tch )+1
 
 //-----------------------------------------------------------------------------------------------
 METHOD __OnParentSize( x, y, hDef ) CLASS TabControl
-   ::Super:__OnParentSize( x, y, hDef, .T., .F. )
+   ::Super:__OnParentSize( x, y, @hDef )
 RETURN hDef
 
 //-----------------------------------------------------------------------------------------------
@@ -1075,7 +1075,7 @@ METHOD Create() CLASS TabPage
          ENDIF
       ENDIF
 
-      ::RegisterDocking()
+//      ::RegisterDocking()
 
       IF ! ::DesignMode
          //SetParent( ::hWnd, ::Parent:Parent:hWnd )

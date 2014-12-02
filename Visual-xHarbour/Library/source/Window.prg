@@ -1207,24 +1207,13 @@ METHOD Destroy() CLASS Window
 RETURN Self
 
 METHOD RegisterDocking() CLASS Window
-   IF ::Parent != NIL .AND. __ClsMsgAssigned( Self, "__OnParentSize" )
-      IF ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-         AADD( ::Parent:__aDock, Self )
-      ENDIF
-    ELSEIF ::Dock != NIL
-      IF ::Dock:Left != NIL .AND. ASCAN( ::Dock:Left:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-            AADD( ::Dock:Left:__aDock, Self )
-         ENDIF
-      IF ::Dock:Top != NIL .AND. ASCAN( ::Dock:Top:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-            AADD( ::Dock:Top:__aDock, Self )
-         ENDIF
-      IF ::Dock:Right != NIL .AND. ASCAN( ::Dock:Right:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-            AADD( ::Dock:Right:__aDock, Self )
-         ENDIF
-      IF ::Dock:Bottom != NIL .AND. ASCAN( ::Dock:Bottom:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
-            AADD( ::Dock:Bottom:__aDock, Self )
+   IF ::Dock != NIL
+      IF ::Parent != NIL
+         IF ( ::Dock:Left != NIL .OR. ::Dock:Top != NIL .OR. ::Dock:Right != NIL .OR. ::Dock:Bottom != NIL ) .AND. ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
+            AADD( ::Parent:__aDock, Self )
          ENDIF
       ENDIF
+   ENDIF
 RETURN Self
 
 FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
@@ -1600,8 +1589,8 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
          FOR EACH oChild IN aChildren
              IF VALTYPE( oChild ) == "O"
                 oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
-             IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
-                oChild:CenterWindow()
+                IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
+                   oChild:CenterWindow()
                 ENDIF
                 oChild:UpdateWindow()
              ENDIF
@@ -2609,7 +2598,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  ENDIF
 
                  IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
-                    IF ::ClsName != "DataGrid"
+                    IF .f. //::ClsName != "DataGrid"
                        FOR EACH oChild IN ::Children
                            IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
                               nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
@@ -3699,7 +3688,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             nHeight := ::xHeight
          ENDIF
 
-         IF lMoveNow .OR. !::DeferRedraw
+         IF .T. //lMoveNow .OR. !::DeferRedraw .OR. hDef == NIL
             n := SWP_NOOWNERZORDER | SWP_NOZORDER
             IF ::DeferRedraw
                n := n | SWP_NOACTIVATE | SWP_DEFERERASE

@@ -88,6 +88,11 @@ METHOD Create() CLASS StatusBar
 
    ::Top    := ::Parent:ClientHeight - ::Height
    ::Width  := ::Parent:ClientWidth
+
+   ::Dock:Left   := ::Parent
+   ::Dock:Right  := ::Parent
+   ::Dock:Bottom := ::Parent
+
    ::Super:Create()
 
    ::Parent:StatusBar := Self

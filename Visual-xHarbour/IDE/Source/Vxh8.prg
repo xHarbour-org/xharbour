@@ -633,7 +633,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                   oCtrl:Alignment := 3,;
                                                                                   oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Size", MAX( VAL(xData), 1 ), nKey ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Size", MAX( xData, 1 ), nKey ) }
       :Create()
    END
 
@@ -648,7 +648,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                                                                oCtrl:Alignment := 3,;
                                                                                oCtrl ),) }
       :ControlAccessKey := GRID_CHAR
-      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Decimals", MAX( VAL(xData), 0 ), nKey ) }
+      :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Decimals", MAX( xData, 0 ), nKey ) }
       :Create()
    END
    ::Create()

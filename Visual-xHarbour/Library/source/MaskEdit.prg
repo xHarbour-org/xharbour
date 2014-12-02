@@ -145,6 +145,8 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
       ENDIF
    ENDIF
 
+   ::LastKey := 0
+
    IF ::wParam == VK_RETURN
       IF ! ::InDataGrid
          ::PostMessage( WM_KEYDOWN, VK_TAB, ::lParam )

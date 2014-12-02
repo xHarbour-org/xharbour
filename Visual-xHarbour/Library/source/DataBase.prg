@@ -746,12 +746,23 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
          cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
       ENDIF
-
-      IF Select( cAlias ) > 0
-         WHILE Select( cAlias + XSTR( nAlias ) ) > 0
-            nAlias ++
-         ENDDO
-         ::Owner:xAlias := cAlias + XSTR( nAlias )
+      IF cAlias[1] == "&"
+         cAlias := SUBSTR( cAlias, 2 )
+         IF ::Owner:DesignMode
+            TRY
+               cAlias := &cAlias
+            CATCH
+            END
+          ELSE
+            cAlias := &cAlias
+         ENDIF
+       ELSE
+         IF Select( cAlias ) > 0
+            WHILE Select( cAlias + XSTR( nAlias ) ) > 0
+               nAlias ++
+            ENDDO
+            ::Owner:xAlias := cAlias + XSTR( nAlias )
+         ENDIF
       ENDIF
 
       TRY

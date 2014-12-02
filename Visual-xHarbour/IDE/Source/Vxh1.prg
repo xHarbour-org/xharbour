@@ -2617,10 +2617,12 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SourceTabChanged( nCur ) CLASS Project
+METHOD SourceTabChanged( nCur, lTree ) CLASS Project
    IF nCur <= ::Application:SourceEditor:DocCount
+      DEFAULT lTree TO .T.
       ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
       IF ::Application:SourceEditor:Source:TreeItem != NIL
+         ::Application:FileExplorer:lSkipSelect := ! lTree
          ::Application:SourceEditor:Source:TreeItem:Select()
       ENDIF
       ::Application:Project:EditReset()
@@ -5170,6 +5172,9 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    xValue2 := NIL
                 ENDIF
              ENDIF
+             //IF ValType( xValue1 ) == "O" .AND. ValType( xValue2 ) == "C"
+             //   xValue1 := xValue1:Name
+             //ENDIF
              IF !( xValue1 == xValue2 )
                 IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name )
 
@@ -5267,6 +5272,7 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    ENDIF
                 ENDIF
              ENDIF
+
           ENDIF
           IF cProperty != NIL
              EXIT

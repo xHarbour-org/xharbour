@@ -136,10 +136,10 @@ METHOD Create() CLASS Splitter
    ::GetSizes()
 
    ::Style    := WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   
+
    TRY
       IF ::Owner:Visible
-         ::Style := ::Style | WS_VISIBLE 
+         ::Style := ::Style | WS_VISIBLE
       ENDIF
     CATCH
       OutputDebugString( ::Owner:ClassName )
@@ -258,6 +258,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS Splitter
       ::SplitOn( x, y )
       RETURN 0
     ELSEIF ::lDown
+      ::hWinDC := GetDCEx( ::Parent:hWnd,, DCX_PARENTCLIP )
 
       pt := (struct POINT)
       pt2 := (struct POINT)
@@ -298,10 +299,13 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS Splitter
               EXIT
       END
       _InvertRect( ::hWinDC, ::InvRect )
+      ReleaseDC( ::hWnd, ::hWinDC )
+
       RETURN 0
     ELSEIF ::InvRect != NIL
-
+      ::hWinDC := GetDCEx( ::Parent:hWnd,, DCX_PARENTCLIP )
       _InvertRect( ::hWinDC, ::InvRect )
+      ReleaseDC( ::hWnd, ::hWinDC )
       ::InvRect := NIL
    ENDIF
 
@@ -314,7 +318,6 @@ METHOD OnLButtonDown() CLASS Splitter
    SetCapture( ::hWnd )
 
    IF !::ShowDragging
-      ::hWinDC := GetDCEx( ::Parent:hWnd,, DCX_PARENTCLIP )
       ::OnMouseMove()
    ENDIF
 RETURN 0
@@ -327,7 +330,6 @@ METHOD OnLButtonUp(nwParam,x,y) CLASS Splitter
    ::lDown := .F.
    IF !::ShowDragging
       ::OnMouseMove()
-      ReleaseDC( ::hWnd, ::hWinDC )
       ::SplitOn( x, y, .T. )
    ENDIF
 RETURN 0
