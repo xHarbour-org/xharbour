@@ -1524,11 +1524,6 @@ typedef unsigned long HB_COUNTER;
 #define HB_SIZEOFARRAY( var )       ( sizeof( var ) / sizeof( *var ) )
 
 
-#if defined( __POCC__ ) || defined( __XCC__ )
-   #define HB_SYMBOL_UNUSED( symbol )  do if( symbol ) {;} while( 0 )
-#else
-   #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
-#endif
 
 /* ***********************************************************************
  * The name of starting procedure

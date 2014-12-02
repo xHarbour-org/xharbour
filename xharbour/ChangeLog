@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2014-12-02 20:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * include/hbdefs.h
+    ! minor fix for double defined HB_SYMBOL_USED
+    
 2014-12-02 14:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/win32ole.prg
     ! add missing include
@@ -16,14 +21,12 @@
   * contrib/gtwvg/wvtclass.prg
   * contrib/gtwvg/wvtpaint.prg
   * contrib/gtwvg/tests/demowvg.prg
-
   * source/cgi/hjwindow.prg
   * source/cgi/hterrsys.prg
   * source/cgi/htmutil.prg
   * source/cgi/tedit.prg
   * source/cgi/tframe.prg
   * source/cgi/thtm.prg
-
   * source/ct/color.prg
   * source/ct/cttime.prg
   * source/ct/diskutil.prg
@@ -31,23 +34,18 @@
   * source/ct/numconv.prg
   * source/ct/showtime.prg
   * source/ct/util.prg
-
   * source/ct/alt/ctwin.prg
   * source/ct/alt/datetime.prg
   * source/ct/alt/dattime2.prg
-
   * source/debug/dbgaltd.prg
   * source/debug/dbgthsh.prg
   * source/debug/dbgwa.prg
-
   * source/odbc/todbc.prg
-
   * source/rdd/dblist.prg
   * source/rdd/dbstrux.prg
   * source/rdd/usrrdd/rdds/adordd.prg
   * source/rdd/usrrdd/rdds/ansirdd.prg
   * source/rdd/usrrdd/rdds/arrayrdd.prg
-
   * source/rtl/achoice.prg
   * source/rtl/browse.prg
   * source/rtl/cstr.prg
@@ -75,16 +73,12 @@
   * source/rtl/txml.prg
   * source/rtl/win32ole.prg
   * source/rtl/winreg.prg
-
   * source/tip/cgi.prg
   * source/tip/encoder.prg
   * source/tip/sendmail.prg
   * source/tip/thtml.prg
-
   * source/vm/harbinit.prg
-
   * utils/xbscript/xbscript.prg
-
   * utils/hbdoc/genchm.prg
   * utils/hbdoc/genhtm.prg
   * utils/hbdoc/html.prg
@@ -92,7 +86,6 @@
   * utils/hbdoc/os2.prg
   * utils/hbdoc/rtf.prg
   * utils/hbdoc/troff.prg
-
   * utils/hbformat/hbfmtcls.prg
     ! use HB_IS*() instead of valtype()
 
