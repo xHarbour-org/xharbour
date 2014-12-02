@@ -324,7 +324,7 @@ METHOD OnSize(w,l) CLASS TabControl
    IF ::IsWindowVisible() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
       IF oPage != NIL
-//         oPage:__OnParentSize(LOWORD(w),HIWORD(w))
+         oPage:__OnParentSize(LOWORD(w),HIWORD(w))
       ENDIF
    ENDIF
 RETURN NIL
