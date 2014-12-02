@@ -252,14 +252,17 @@ METHOD ErrHandler( xError ) CLASS TIpCgi
 
    ::Print( '<table border="1">' )
    ::Print( '<tr><td>SCRIPT NAME:</td><td>' + GetEnv( 'SCRIPT_NAME' ) + '</td></tr>' )
-   IF ValType( xError ) == "O"
+   SWITCH ValType( xError )
+   CASE "O"
       ::Print( '<tr><td>CRITICAL ERROR:</td><td>' + xError:Description + '</td></tr>' )
       ::Print( '<tr><td>OPERATION:</td><td>' + xError:Operation + '</td></tr>' )
       ::Print( '<tr><td>OS ERROR:</td><td>' + AllTrim( Str( xError:OsCode ) ) + ' IN ' + xError:SubSystem + '/' + AllTrim( Str( xError:SubCode ) ) + '</td></tr>' )
       ::Print( '<tr><td>FILENAME:</td><td>' + Right( xError:FileName, 40 ) + '</td></tr>' )
-   ELSEIF ValType( xError ) == "C"
+      EXIT
+   CASE "C"
       ::Print( '<tr><td>ERROR MESSAGE:</td><td>' + xError + '</td></tr>' )
-   ENDIF
+      EXIT
+   END SWITCH
    FOR nCalls := 2 TO 6
       IF !Empty( ProcName( nCalls ) )
          ::Print( '<tr><td>PROC/LINE:</td><td>' + ProcName( nCalls ) + "/" + AllTrim( Str( ProcLine( nCalls ) ) ) + '</td></tr>' )
@@ -402,7 +405,7 @@ METHOD SessionDecode( cData ) CLASS TIpCgi
    LOCAL xVal, aElem
 
    DO WHILE ( xVal := HB_DeserialNext( @cSerial ) ) != nil
-      switch ValType( xVal )
+      SWITCH ValType( xVal )
       CASE 'A'  // Vars are stored in array { VarName, Value }
          FOR EACH aElem in xVal
             ::hSession[ aElem[1] ] := aElem[2]
@@ -411,7 +414,7 @@ METHOD SessionDecode( cData ) CLASS TIpCgi
          DEFAULT
          lRet := .F.
          EXIT
-      end
+      END SWITCH
    ENDDO
 
    RETURN lRet
@@ -511,24 +514,30 @@ STATIC FUNCTION HtmlScript( xVal, cKey )
    IF !Empty( xVal )
       IF ( nPos := hGetPos( xVal, cKey ) ) != 0
          cVal := hGetValueAt( xVal, nPos )
-         IF ValType( cVal ) == "C"
+         SWITCH ValType( cVal )
+         CASE "C"
             cVal := '<script language="JavaScript" type="text/javascript">' + _CRLF + ;
                '<!--' + _CRLF + ;
                cVal + _CRLF + ;
                '-->' + _CRLF + ;
                '</script>'
-         ELSEIF ValType( cVal ) == "H"
+            EXIT
+         CASE "H"
             IF ( nPos := hGetPos( cVal, 'src' ) ) != 0
                cVal := hGetValueAt( cVal, nPos )
-               IF ValType( cVal ) == "C"
+               SWITCH ValType( cVal )
+               CASE "C"
                   cVal := '<script language="JavaScript" src="' + cVal + '" type="text/javascript">' + _CRLF
-               ELSEIF ValType( cVal ) == "A"
+                  EXIT
+               CASE "A"
                   cTmp := ''
                   AScan( cVal, { |cFile| cTmp += '<script language="JavaScript" src="' + cFile + '" type="text/javascript">' + _CRLF } )
                   cVal := cTmp
-               ENDIF
+                  EXIT
+               END SWITCH
             ENDIF
-         ENDIF
+            EXIT
+         END SWITCH
          hDel( xVal, cKey )
       ENDIF
    ENDIF
@@ -545,22 +554,28 @@ STATIC FUNCTION HtmlStyle( xVal, cKey )
    IF !Empty( xVal )
       IF ( nPos := hGetPos( xVal, cKey ) ) != 0
          cVal := hGetValueAt( xVal, nPos )
-         IF ValType( cVal ) == "C"
+         SWITCH ValType( cVal )
+         CASE "C"
             cVal := '<style type="text/css">' + _CRLF + ;
                cVal + _CRLF + ;
                '</style>'
-         ELSEIF ValType( cVal ) == "H"
+            EXIT
+         CASE "H"
             IF ( nPos := hGetPos( cVal, 'src' ) ) != 0
                cVal := hGetValueAt( cVal, nPos )
-               IF ValType( cVal ) == "C"
+               SWITCH ValType( cVal )
+               CASE "C"
                   cVal := '<link rel="StyleSheet" href="' + cVal + '" type="text/css" />'
-               ELSEIF ValType( cVal ) == "A"
+                  EXIT
+               CASE "A"
                   cTmp := ''
                   AScan( cVal, { |cFile| cTmp += '<link rel="StyleSheet" href="' + cFile + '" type="text/css" />' + _CRLF } )
                   cVal := cTmp
-               ENDIF
+                  EXIT
+               END SWITCH
             ENDIF
-         ENDIF
+            EXIT
+         END SWITCH
          hDel( xVal, cKey )
       ENDIF
    ENDIF
@@ -589,7 +604,7 @@ STATIC FUNCTION GenerateSID( cCRCKey )
    cTemp   := StrZero( nSIDCRC, 5 )
    cSIDCRC := ""
    for n := 1 to Len( cTemp )
-       cSIDCRC += cCRCKey[ Val( cTemp[ n ] ) + 1 ]
+      cSIDCRC += cCRCKey[ Val( cTemp[ n ] ) + 1 ]
    next
    cRet := cSID + cSIDCRC
    RETURN cRet
@@ -631,8 +646,8 @@ STATIC FUNCTION DateToGMT( dDate, cTime )
    nMonth := Month( dDate )
    nYear  := Year( dDate )
    nDoW   := DOW( dDate )
-   cStr := aDays[ nDow ] + ", " + StrZero( nDay, 2 ) + "-" + aMonths[ nMonth ] + "-" + ;
-      Right( StrZero( nYear, 4 ), 2 ) + " " + cTime + " GMT"
+   cStr   := aDays[ nDow ] + ", " + StrZero( nDay, 2 ) + "-" + aMonths[ nMonth ] + "-" + ;
+             Right( StrZero( nYear, 4 ), 2 ) + " " + cTime + " GMT"
    SET( _SET_DATEFORMAT, cOldDateFormat )
 
    RETURN cStr

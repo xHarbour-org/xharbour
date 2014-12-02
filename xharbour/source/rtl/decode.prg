@@ -122,19 +122,17 @@ FUNCTION HB_Decode( ... )
 
       // Ok because I have no other value than default, I will check if it is a complex value
       // like an array or an hash, so I can get it to decode values
-      IF xDefault <> NIL .AND. ;
-            ( ValType( xDefault ) == "A" .OR. ;
-            ValType( xDefault ) == "H" )
+      IF HB_ISARRAY( xDefault ) .OR. HB_ISHASH( xDefault )
 
          // If it is an array I will restart this function creating a linear call
-         IF ValType( xDefault ) == "A" .AND. Len( xDefault ) > 0
+         IF HB_ISARRAY( xDefault ) .AND. Len( xDefault ) > 0
 
             // I can have a linear array like { 1, "A", 2, "B", 3, "C" }
             // or an array of array couples like { { 1, "A" }, { 2, "B" }, { 3, "C" } }
             // first element tell me what type is
 
             // couples of values
-            IF ValType( xDefault[ 1 ] ) == "A"
+            IF HB_ISARRAY( xDefault[ 1 ] )
 
                //// If i have an array as default, this contains couples of key / value
                //// so I have to convert in a linear array
@@ -143,7 +141,7 @@ FUNCTION HB_Decode( ... )
 
                // Check if array has a default value, this will be last value and has a value
                // different from an array
-               IF !( ValType( xDefault[ nLen ] ) == "A" )
+               IF !HB_ISARRAY( xDefault[ nLen ] )
 
                   aParams := Array( ( nLen - 1 ) * 2 )
 
@@ -176,7 +174,7 @@ FUNCTION HB_Decode( ... )
 
 
             // If it is an hash, translate it in an array
-         ELSEIF ValType( xDefault ) == "H"
+         ELSEIF HB_ISHASH( xDefault )
 
             aParams := Array( Len( xDefault ) * 2 )
 
@@ -289,4 +287,3 @@ STATIC FUNCTION EmptyValue( xVal )
    RETURN xRet
 
 // DECODE
-

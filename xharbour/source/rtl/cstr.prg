@@ -65,13 +65,7 @@ REQUEST HB_SaveBlock, HB_RestoreBlock, __ClsInstName
 //--------------------------------------------------------------//
 FUNCTION CStr( xExp )
 
-   LOCAL cType
-
-   IF xExp == NIL
-      RETURN 'NIL'
-   ENDIF
-
-   cType := ValType( xExp )
+   LOCAL cType := ValType( xExp )
 
    SWITCH cType
       CASE 'C'
@@ -104,16 +98,19 @@ FUNCTION CStr( xExp )
       CASE 'H'
          RETURN "{ Hash of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
 
+      CASE 'U'
+         RETURN 'NIL'
+
       DEFAULT
          RETURN "Type: " + cType
-   END
+   ENDSWITCH
 
 RETURN ""
 
 //--------------------------------------------------------------//
 FUNCTION CStrToVal( cExp, cType )
 
-   IF ValType( cExp ) != 'C'
+   IF !HB_ISSTRING( cExp )
       Throw( ErrorNew( "CSTRTOVAL", 0, 3101, ProcName(), "Argument error", { cExp, cType } ) )
    ENDIF
 
@@ -286,6 +283,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN cRet
       CASE 'T'
          RETURN TTOC( XVAL )
+
       DEFAULT
          //TraceLog( xVal, cName, nPad )
          IF xVal == NIL
@@ -293,7 +291,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ELSE
             Throw( ErrorNew( "VALTOPRG", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
-   END
+   ENDSWITCH
 
    //TraceLog( cRet )
 
@@ -405,6 +403,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
          RETURN cRet + cName + " )"
       CASE 'T'
          RETURN TTOC( XVAL )
+
       DEFAULT
          //TraceLog( xVal, cName, nPad )
          IF xVal == NIL
@@ -412,7 +411,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
          ELSE
             Throw( ErrorNew( "VALTOPRG", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
          ENDIF
-   END
+   ENDSWITCH
 
 //   TraceLog( cRet )
 
@@ -425,7 +424,7 @@ RETURN &( cExp )
 //--------------------------------------------------------------//
 FUNCTION ValToArray( xVal )
 
-   IF ValType( xVal ) == 'A'
+   IF HB_ISARRAY( xVal )
       RETURN xVal
    ENDIF
 
@@ -434,7 +433,7 @@ RETURN { xVal }
 //--------------------------------------------------------------//
 FUNCTION ValToBlock( xVal )
 
-   IF ValType( xVal ) == 'B'
+   IF HB_ISBLOCK( xVal )
       RETURN xVal
    ENDIF
 
@@ -443,7 +442,7 @@ RETURN { || xVal }
 //--------------------------------------------------------------//
 FUNCTION ValToCharacter( xVal )
 
-   IF ValType( xVal ) == 'C'
+   IF HB_ISSTRING( xVal )
       RETURN xVal
    ENDIF
 
@@ -489,7 +488,7 @@ RETURN cToD( "" )
 //--------------------------------------------------------------//
 FUNCTION ValToHash( xVal )
 
-   IF ValType( xVal ) == 'H'
+   IF HB_ISHASH( xVal )
       RETURN xVal
    ENDIF
 
@@ -530,7 +529,7 @@ FUNCTION ValToLogical( xVal )
 
       DEFAULT
          Throw( ErrorNew( "VALTOLOGICAL", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
-   END
+   ENDSWITCH
 
 RETURN .F.
 
@@ -570,7 +569,7 @@ FUNCTION ValToNumber( xVal )
 
       DEFAULT
          Throw( ErrorNew( "VALTONUMBER", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
-   END
+   ENDSWITCH
 
 RETURN 0
 
@@ -621,7 +620,7 @@ FUNCTION ValToObject( xVal )
 
       DEFAULT
          Throw( ErrorNew( "VALTOOBJECT", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
-   END
+   ENDSWITCH
 
 RETURN 0
 
@@ -661,7 +660,7 @@ FUNCTION ValToType( xVal, cType )
 
       DEFAULT
          Throw( ErrorNew( "VALTOTYPE", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
-   END
+   ENDSWITCH
 
 RETURN NIL
 //--------------------------------------------------------------//

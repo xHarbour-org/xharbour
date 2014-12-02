@@ -76,22 +76,22 @@ STATIC ctw_MODER        := .F.
 STATIC ctw_CANMOVE      := .T.
 STATIC ctw_SHADOWATTR   := -1
 STATIC ctw_WBOX_Type := {;
-            "…Õª∫ºÕ»∫ ",;   // 0      WB_DOUBLE_CLEAR
-            "⁄ƒø≥Ÿƒ¿≥ ",;   // 1      WB_SINGLE_CLEAR
-            "’Õ∏≥æÕ‘≥ ",;   // 2      WB_DOUBLE_SINGLE_CLEAR
-            "÷ƒ∑∫Ωƒ”∫ ",;   // 3      WB_SINGLE_DOUBLE_CLEAR
-            "…Õª∫ºÕ»∫" ,;   // 4      WB_DOUBLE
-            "⁄ƒø≥Ÿƒ¿≥" ,;   // 5      WB_SINGLE
-            "’Õ∏≥æÕ‘≥" ,;   // 6      WB_DOUBLE_SINGLE
-            "÷ƒ∑∫Ωƒ”∫" ,;   // 7      WB_SINGLE_DOUBLE
-            "€ﬂ€€€‹€€ ",;   // 8      WB_HALF_FULL_CLEAR
-            "ﬁﬂ›››‹ﬁﬁ ",;   // 9      WB_HALF_CLEAR
+            "…Õª∫ºÕ»∫ ",;   //  0      WB_DOUBLE_CLEAR
+            "⁄ƒø≥Ÿƒ¿≥ ",;   //  1      WB_SINGLE_CLEAR
+            "’Õ∏≥æÕ‘≥ ",;   //  2      WB_DOUBLE_SINGLE_CLEAR
+            "÷ƒ∑∫Ωƒ”∫ ",;   //  3      WB_SINGLE_DOUBLE_CLEAR
+            "…Õª∫ºÕ»∫" ,;   //  4      WB_DOUBLE
+            "⁄ƒø≥Ÿƒ¿≥" ,;   //  5      WB_SINGLE
+            "’Õ∏≥æÕ‘≥" ,;   //  6      WB_DOUBLE_SINGLE
+            "÷ƒ∑∫Ωƒ”∫" ,;   //  7      WB_SINGLE_DOUBLE
+            "€ﬂ€€€‹€€ ",;   //  8      WB_HALF_FULL_CLEAR
+            "ﬁﬂ›››‹ﬁﬁ ",;   //  9      WB_HALF_CLEAR
             "ﬁ€›››€ﬁﬁ ",;   // 10      WB_FULL_HALF_CLEAR
             "€€€€€€€€ ",;   // 11      WB_FULL_CLEAR
             "€ﬂ€€€‹€€" ,;   // 12      WB_HALF_FULL
             "ﬁﬂ›››‹ﬁﬁ" ,;   // 13      WB_HALF
             "ﬁ€›››€ﬁﬁ" ,;   // 14      WB_FULL_HALF
-            "€€€€€€€€" }   // 15      WB_FULL
+            "€€€€€€€€" }    // 15      WB_FULL
 
 
 *********************************************
@@ -222,7 +222,7 @@ FUNCTION ctw_DEVOUT(xVal,xColor,nT,nL)
  IF ctw_CURRENT == 0
    DEVOUT(xVal,xColor,nT,nL)
  ELSE
-   IF VALTYPE(nT)=="N" .AND. VALTYPE(nL)=="N"
+   IF HB_ISNUMERIC(nT) .AND. HB_ISNUMERIC(nL)
      ctw_WINDOWS[ctw_CURRENT]:DevPos(nT,nL)
    ENDIF
    ctw_WINDOWS[ctw_CURRENT]:DevOut(xVal,xColor)
@@ -233,7 +233,7 @@ FUNCTION ctw_DEVOUTPICT(xVal,cPict,xColor,nT,nL)
  IF ctw_CURRENT == 0
    DEVOUTPICT(xVal,cPict,xColor,nT,nL)
  ELSE
-   IF VALTYPE(nT)=="N" .AND. VALTYPE(nL)=="N"
+   IF HB_ISNUMERIC(nT) .AND. HB_ISNUMERIC(nL)
      ctw_WINDOWS[ctw_CURRENT]:DevPos(nT,nL)
    ENDIF
    ctw_WINDOWS[ctw_CURRENT]:DevOutPict(xVal,cPict,xColor)
@@ -358,39 +358,30 @@ RETURN ctw_CURRENT
 *********************************
 FUNCTION WSETMOVE(lMode)
  LOCAL lOldMode := ctw_CANMOVE
-  IF VALTYPE(lMode) == "L"
+  IF HB_ISLOGICAL(lMode)
     ctw_CANMOVE := lMode
   ENDIF
 RETURN lOldMode
 *********************************
 FUNCTION WSETSHADOW(xAttr)
  LOCAL lOldAttr := ctw_SHADOWATTR
-  IF !EMPTY(xAttr) .AND. ;
-     ( VALTYPE(xAttr) == "C" .OR. ( VALTYPE(xAttr) == "N" .AND. xAttr == -1 ) )
+  IF HB_ISSTRING(xAttr) .OR. HB_ISNUMERIC(xAttr) .AND. xAttr == -1
     ctw_SHADOWATTR := xAttr
   ENDIF
 RETURN lOldAttr
 *********************************
 FUNCTION WMODE(lT,lL,lB,lR)
-  IF lT != NIL
-     IF VALTYPE(lT) == "L"
-        ctw_MODET := lT
-     ENDIF
+  IF HB_ISLOGICAL(lT)
+     ctw_MODET := lT
   ENDIF
-  IF lL != NIL
-     IF VALTYPE(lL) == "L"
-        ctw_MODEL := lL
-     ENDIF
+  IF HB_ISLOGICAL(lL)
+     ctw_MODEL := lL
   ENDIF
-  IF lB != NIL
-     IF VALTYPE(lB) == "L"
-        ctw_MODEB := lB
-     ENDIF
+  IF HB_ISLOGICAL(lB)
+     ctw_MODEB := lB
   ENDIF
-  IF lR != NIL
-     IF VALTYPE(lR) == "L"
-        ctw_MODER := lR
-     ENDIF
+  IF HB_ISLOGICAL(lR)
+     ctw_MODER := lR
   ENDIF
 RETURN 0
 *********************************
@@ -458,7 +449,7 @@ FUNCTION WOPEN(nTop,nLeft,nBottom,nRight,lCls)
   ENDIF
   AADD(ctw_STOS,nNum)
   ctw_CURRENT := nNum
-  IF lCls .or. valtype(ctw_SHADOWATTR) == 'C'
+  IF lCls .or. HB_ISSTRING(ctw_SHADOWATTR)
     ctw_WINDOWS[nNum]:Scroll()
     ctw_WINDOWS[nNum]:SetPos(0,0)
   ENDIF
@@ -618,7 +609,7 @@ FUNCTION WSELECT(nSelect)
   IF nSelect == NIL
      RETURN nRet
   ENDIF
-  IF VALTYPE(nSelect) != "N"
+  IF !HB_ISNUMERIC( nSelect )
      RETURN -1
   ENDIF
   IF nSelect < 0 .or. nSelect > LEN(ctw_WINDOWS)
@@ -633,8 +624,8 @@ FUNCTION WSELECT(nSelect)
      SETPOS(ctw_0ROW,ctw_0COL)
      SETCOLOR(ctw_0COLOR)
      SETCURSOR(ctw_0CURSOR)
-  ELSE  //nSelect == 0
-    IF VALTYPE(ctw_WINDOWS[nSelect]) == "U"  //NIL
+  ELSE
+    IF HB_ISNIL( ctw_WINDOWS[nSelect] )
        RETURN -1
     ELSE
        DISPBEGIN()
@@ -645,12 +636,12 @@ FUNCTION WSELECT(nSelect)
            ctw_0CURSOR := SETCURSOR()
         ELSE
            ctw_WINDOWS[nRet]:Save()
-        ENDIF  //nRet == 0
+        ENDIF
         ToFront(nSelect)
         ctw_CURRENT:=nSelect
         DISPEND()
-    ENDIF //VALTYPE(ctw_WINDOWS[nSelect]) == "U"
-  ENDIF //nSelect == 0
+    ENDIF
+  ENDIF
 RETURN nRet
 ****************************************************
 FUNCTION WFORMAT(nT,nL,nB,nR)
@@ -801,7 +792,7 @@ method WinShadow() CLASS TctWIN
    local nRows := min(ctw_BOARDB - ::PosB, 1)
    local nCols := min(ctw_BOARDR - ::PosR, 2)
 
-   If valtype(ctw_SHADOWATTR) == 'C'
+   If HB_ISSTRING( ctw_SHADOWATTR )
       If nRows > 0
          ::ColorShadow(::PosB + nRows, ::PosL + 2, ::PosB + nRows, ::PosR, ctw_SHADOWATTR)
       Endif
@@ -832,7 +823,7 @@ Method ColorShadow( nTop, nLeft, nBottom, nRight, xAtt) CLASS TctWin
 
    // Replace an specific Attribute?
    For n := 1 to len(cEven)
-      If substr(cEven, n , 1) $ (xAtt + xAtt2) .or. left(token(ntocolor(asc(substr(cEven, n , 1)), .t.), '/,', 1), 1) == 'N'
+      If substr(cEven, n, 1) $ (xAtt + xAtt2) .or. left(token(ntocolor(asc(substr(cEven, n, 1)), .t.), '/,', 1), 1) == 'N'
          cBuff += xAtt2
 
       Else
@@ -1067,24 +1058,24 @@ METHOD ct__LF() CLASS TctWIN
 RETURN NIL
 **********
 METHOD QQout(xVal) CLASS TctWIN
- LOCAL cCR := CHR(13) , cLF:=CHR(10)
+ LOCAL cCR := CHR(13), cLF := CHR(10)
  LOCAL cVal := HB_VALTOSTR(xVal)
  LOCAL nLen := LEN(cVAL)
- LOCAL pCR := AT( cCR ,cVAL)
- LOCAL pLF := AT( cLF ,cVAL)
+ LOCAL pCR := AT( cCR, cVAL )
+ LOCAL pLF := AT( cLF, cVAL )
  LOCAL pp
  LOCAL nRest := ::UsedR - COL() + 1
  LOCAL cCode
  LOCAL lDev
 
  IF SET(_SET_PRINTER)                      // jesli takze PRINTER
-    lDev := SET(_SET_DEVICE , "PRINTER")   // tylko PRINTER
+    lDev := SET(_SET_DEVICE, "PRINTER")    // tylko PRINTER
     DEVOUT(cVal)
     SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE
  ENDIF
 
  IF SET(_SET_CONSOLE)                      // jesli takze CONSOLE
-    lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN
+    lDev := SET(_SET_DEVICE, "SCREEN")     // tylko SCREEN
    IF pCR == 0 .and. pLF == 0
       pp := 0
    ELSEIF pCR == 0 .or. pLF == 0
@@ -1116,14 +1107,14 @@ METHOD QQout(xVal) CLASS TctWIN
            ::ct__LF()
         ENDIF //cCode == cCR
         nLen := LEN(cVal)
-        pCR := AT( cCR ,cVal)
-        pLF := AT( cLF ,cVal)
+        pCR := AT( cCR, cVal )
+        pLF := AT( cLF, cVal )
         IF pCR == 0 .and. pLF == 0
            pp := 0
         ELSEIF pCR == 0 .or. pLF == 0
-           pp := MAX(pCR,pLF)
+           pp := MAX( pCR, pLF )
         ELSE
-           pp := MIN(pCR,pLF)
+           pp := MIN( pCR, pLF )
         ENDIF
         nRest := ::UsedR - COL() + 1
      ENDIF  //pp == 0
@@ -1136,21 +1127,21 @@ RETURN NIL
 METHOD Qout(xVal) CLASS TctWIN
  LOCAL lDev
 
- IF SET(_SET_PRINTER)                      //jesli takze PRINTER
-    lDev := SET(_SET_DEVICE , "PRINTER")   //tylko PRINTER
+ IF SET(_SET_PRINTER)                    //jesli takze PRINTER
+    lDev := SET(_SET_DEVICE, "PRINTER")  //tylko PRINTER
     DEVOUT( HB_OSNewLine() )
     SETPRC(PROW()+1,0)
-    IF xVal!=NIL
+    IF xVal != NIL
        DEVOUT(xVal)
     ENDIF
     SET(_SET_DEVICE, lDev)               // przywrocenie SET DEVICE
  ENDIF
 
  IF SET(_SET_CONSOLE)                    // jesli takße CONSOLE
-  lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN
+  lDev := SET(_SET_DEVICE, "SCREEN")     // tylko SCREEN
   ::ct__CR()
   ::ct__LF()
-  IF xVal!=NIL
+  IF xVal != NIL
     ::DEVOUT(xVal)
   ENDIF
   SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE
@@ -1235,17 +1226,17 @@ RETURN NIL
 METHOD DispOut(xVal,xColor) CLASS TctWIN
  LOCAL cVal := HB_VALTOSTR(xVal)
  cVal := LEFT(cVal, ::UsedR - COL() + 1)     //ucinamy
- DISPOUT(cVal,xColor)
+ DISPOUT(cVal, xColor)
  IF COL() > ::UsedR
    IF ROW() == ::UsedB
-      SETPOS(::UsedB,::UsedR)
+      SETPOS(::UsedB, ::UsedR)
    ELSE
-      SETPOS(ROW()+1,::UsedL)
+      SETPOS(ROW() + 1, ::UsedL)
    ENDIF
  ENDIF
 RETURN NIL
 *************
-METHOD DispOutAT(nT,nL,xVal,xColor) CLASS TctWIN
+METHOD DispOutAT(nT, nL, xVal, xColor) CLASS TctWIN
  ::SetPos(nT,nL)
  ::DispOut(xVal,xColor)
 RETURN NIL
@@ -1259,8 +1250,8 @@ METHOD DevOut(xVal,xColor) CLASS TctWIN
 
 RETURN NIL
 ************
-METHOD DevOutPict(xVal,cPict,xColor) CLASS TctWIN
-  ::DevOut( TRANSFORM(xVAl,cPict) , xColor)
+METHOD DevOutPict(xVal, cPict, xColor) CLASS TctWIN
+  ::DevOut( TRANSFORM(xVAl, cPict), xColor)
 RETURN NIL
 *************
 METHOD Save() CLASS TctWIN
@@ -1272,31 +1263,31 @@ METHOD Save() CLASS TctWIN
 RETURN NIL
 ****
 METHOD SaveBG() CLASS TctWIN
-  ::cBackground:=SAVESCREEN(::PosT ,::PosL ,::PosB+1 ,::PosR+2)   // Includes Shadow's area!
+  ::cBackground:=SAVESCREEN(::PosT, ::PosL, ::PosB+1, ::PosR+2)   // Includes Shadow's area!
 RETURN NIL
 ****
 METHOD SaveFG() CLASS TctWIN
-  ::cSaveData:=SAVESCREEN(::PosT ,::PosL ,::PosB ,::PosR)
+  ::cSaveData := SAVESCREEN(::PosT, ::PosL, ::PosB, ::PosR)
 RETURN NIL
 ****
 METHOD RestoreBG() CLASS TctWIN
   DISPBEGIN()
-  RESTSCREEN(::PosT ,::PosL ,::PosB+1 ,::PosR+2 ,::cBackground)   // Includes Shadow's area!
+  RESTSCREEN(::PosT, ::PosL, ::PosB+1, ::PosR+2, ::cBackground)   // Includes Shadow's area!
   DISPEND()
 RETURN NIL
 ****
 METHOD RestoreFG() CLASS TctWIN
   DISPBEGIN()
-  RESTSCREEN(::PosT ,::PosL ,::PosB ,::PosR ,::cSaveData)
+  RESTSCREEN(::PosT, ::PosL, ::PosB, ::PosR, ::cSaveData)
   ::WinShadow()
   DISPEND()
 RETURN NIL
 *************
 METHOD Restore() CLASS TctWIN
   DISPBEGIN()
-  RESTSCREEN(::PosT ,::PosL ,::PosB ,::PosR ,::cSaveData)
+  RESTSCREEN(::PosT, ::PosL, ::PosB, ::PosR, ::cSaveData)
   ::WinShadow()
-  SETPOS(::nRow , ::nCol)
+  SETPOS(::nRow, ::nCol)
   SETCURSOR(::nCursor)
   SETCOLOR(::cColor)
   DISPEND()
@@ -1363,18 +1354,18 @@ METHOD WBox(ncType) CLASS TctWIN
   ENDIF
   IF ncType == NIL
      ncType := ctw_WBOX_type[1]       //narazie DOUBLE CLEAR a nie wg SETCLEARB
-  ELSEIF VALTYPE(ncType) == "N"
+  ELSEIF HB_ISNUMERIC( ncType )
      IF ncType< 0 .or. ncType > 15
         ncType := ctw_WBOX_type[1]    //DOUBLE CLEAR
      ELSE
         ncType := ctw_WBOX_type[ncType+1]
      ENDIF
   ENDIF
-  DISPBOX(::PosT ,::PosL ,::PosB ,::PosR ,ncType)
+  DISPBOX(::PosT, ::PosL, ::PosB, ::PosR, ncType)
   ::WFormat(1,1,1,1)
 RETURN .T.
 **********
-METHOD WFormat(nT,nL,nB,nR) CLASS TctWIN
+METHOD WFormat(nT, nL, nB, nR) CLASS TctWIN
  IF nT == NIL
     nT := ::PosT - ::UsedT
  ENDIF
@@ -1474,6 +1465,7 @@ RETURN nRet
 METHOD Scroll(nT,nL,nB,nR,nV,nH) CLASS TctWIN
  LOCAL mr:=MAXROW() + 1
  LOCAL mc:=MAXCOL() + 1
+
  IF nT ==  NIL
     nT := ::UsedT
  ELSEIF nT <= 0

@@ -1,4 +1,4 @@
-/*
+ /*
  * $Id$
  */
 
@@ -157,7 +157,7 @@ PROCEDURE __dbgShowWorkAreas()
    /* Show dialog */
 
    oDlg:ShowModal()
-   
+
    dbSelectArea( nOldArea )
 
    RETURN
@@ -298,7 +298,6 @@ STATIC PROCEDURE WorkAreasKeyPressed( nKey, oBrw, nTotal )
 STATIC FUNCTION DbfInfo( aInfo )
 
    LOCAL nFor
-   LOCAL xType
    LOCAL xValue
    LOCAL cValue
 
@@ -319,16 +318,27 @@ STATIC FUNCTION DbfInfo( aInfo )
    FOR nFor := 1 TO FCount()
 
       xValue := __Dbg():GetExprValue( "FieldGet(" + hb_NToS( nFor ) + ")" )
-      xType  := ValType( xValue )
 
-      DO CASE
-      CASE xType $ "CM" ; cValue := xValue
-      CASE xType == "N" ; cValue := hb_NToS( xValue )
-      CASE xType == "D" ; cValue := DToC( xValue )
-      CASE xType == "L" ; cValue := iif( xValue, ".T.", ".F." )
-      CASE xType == "A" ; cValue := "Array"
-      OTHERWISE         ; cValue := "Error"
-      ENDCASE
+      SWITCH ValType( xValue )
+      CASE "C"
+      CASE "M"
+         cValue := xValue
+         exit
+      CASE "N"
+         cValue := hb_NToS( xValue )
+         exit
+      CASE "D"
+         cValue := DToC( xValue )
+         exit
+      CASE "L"
+         cValue := iif( xValue, ".T.", ".F." )
+         exit
+      CASE "A"
+         cValue := "Array"
+         exit
+      DEFAULT
+         cValue := "Error"
+      ENDSWITCH
 
       AAdd( aInfo, Space( 8 ) + PadR( FieldName( nFor ), 10) + " = " + PadR( cValue, 17 ) )
 

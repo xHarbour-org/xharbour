@@ -69,7 +69,7 @@ FUNCTION TIp_GetEncoder( cModel )
 
    LOCAL oEncoder
 
-   IF ValType( cModel ) <> "C"
+   IF ! HB_ISSTRING( cModel )
       cModel := "as-is"
    ENDIF
 
@@ -108,7 +108,7 @@ ENDCLASS
 
 METHOD New( cModel ) CLASS TIPEncoder
 
-   IF ValType( cModel ) <> "C"
+   IF ! HB_ISSTRING( cModel )
       cModel := "as-is"
    ENDIF
    ::cName := cModel
@@ -122,4 +122,3 @@ METHOD Encode( cData ) CLASS TIPEncoder
 METHOD Decode( cData ) CLASS TIPEncoder
 
    RETURN cData
-

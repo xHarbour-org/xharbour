@@ -17,7 +17,7 @@
  *                        - ENHANCED()
  *                        - STANDARD()
  *                        - UNSELECTED()
- * 
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -80,24 +80,24 @@ FUNCTION NTOCOLOR( nColor, lChar )
 
    DEFAULT lChar TO .F.
 
-   IF ValType( nColor ) == "N" .AND. nColor >= 0 .AND. nColor < 256
+   IF HB_ISNUMERIC( nColor ) .AND. nColor >= 0 .AND. nColor < 256
 
-      nColorFore = nColor % 16
-      nColorBack = Int( nColor / 16 )
+      nColorFore := nColor % 16
+      nColorBack := Int( nColor / 16 )
 
       IF !lChar
 
-         cColor = StrZero( nColorFore, 2 ) + "/" + StrZero( nColorBack, 2 )
+         cColor := StrZero( nColorFore, 2 ) + "/" + StrZero( nColorBack, 2 )
 
       ELSE
-       
-         lHiColor  = nColorFore > 7
-         lBlinking = nColorBack > 7
 
-         nColorFore = nColorFore % 8
-         nColorBack = nColorBack % 8
+         lHiColor   := nColorFore > 7
+         lBlinking  := nColorBack > 7
 
-         cColor = n2c( nColorFore ) + if( lHiColor, "+", "" ) + "/" + ;
+         nColorFore := nColorFore % 8
+         nColorBack := nColorBack % 8
+
+         cColor := n2c( nColorFore ) + if( lHiColor, "+", "" ) + "/" + ;
             n2c( nColorBack ) + if( lBlinking, "*", "" )
 
       ENDIF
@@ -107,32 +107,32 @@ FUNCTION NTOCOLOR( nColor, lChar )
 
 STATIC FUNCTION n2c( nColor )
 
-   DO CASE
-   CASE nColor = 0
+   SWITCH nColor
+   CASE 0
       RETURN "N"
-   CASE nColor = 1
+   CASE 1
       RETURN "B"
-   CASE nColor = 2
+   CASE 2
       RETURN "G"
-   CASE nColor = 3
+   CASE 3
       RETURN "BG"
-   CASE nColor = 4
+   CASE 4
       RETURN "R"
-   CASE nColor = 5
+   CASE 5
       RETURN "BR"
-   CASE nColor = 6
+   CASE 6
       RETURN "GR"
-   CASE nColor = 7
+   CASE 7
       RETURN "W"
-   ENDCASE
+   ENDSWITCH
 
    RETURN ""
 
 STATIC FUNCTION c2n( cColor )
-  
+
    LOCAL nColor := 0
 
-   cColor = Upper( cColor )
+   cColor := Upper( cColor )
 
    nColor += if( "B" $ cColor, 1, 0 )
    nColor += if( "G" $ cColor, 2, 0 )
@@ -145,14 +145,14 @@ FUNCTION COLORTON( cColor )
 
    LOCAL cColorFore, cColorBack
    LOCAL nColorFore, nColorBack
-   LOCAL lHiColor := .F. , lBlinking := .F.
+   LOCAL lHiColor := .F., lBlinking := .F.
    LOCAL nSep
 
-   IF ValType( cColor ) == "N"
+   IF HB_ISNUMERIC( cColor )
       RETURN cColor
    ENDIF
 
-   IF ValType( cColor ) == "C"
+   IF HB_ISSTRING( cColor )
 
       IF ( nSep := At( ",", cColor ) ) <> 0
          cColor := Left( cColor, nSep - 1 )
@@ -160,28 +160,28 @@ FUNCTION COLORTON( cColor )
 
       IF ( nSep := At( "/", cColor ) ) == 0
 
-         cColorFore = cColor
-         cColorBack = ""
+         cColorFore := cColor
+         cColorBack := ""
       ELSE
 
-         cColorFore = AllTrim( SubStr( cColor, 1, nSep - 1 ) )
-         cColorBack = AllTrim( SubStr( cColor, nSep + 1 ) )
+         cColorFore := AllTrim( SubStr( cColor, 1, nSep - 1 ) )
+         cColorBack := AllTrim( SubStr( cColor, nSep + 1 ) )
       ENDIF
 
       IF "+" $ cColorFore .OR. "+" $ cColorBack
-         lHiColor  = .T.
-         cColorFore = StrTran( cColorFore, "+", "" )
-         cColorBack = StrTran( cColorBack, "+", "" )
+         lHiColor   := .T.
+         cColorFore := StrTran( cColorFore, "+", "" )
+         cColorBack := StrTran( cColorBack, "+", "" )
       ENDIF
 
       IF "*" $ cColorFore .OR. "*" $ cColorBack
-         lBlinking = .T.
-         cColorFore = StrTran( cColorFore, "*", "" )
-         cColorBack = StrTran( cColorBack, "*", "" )
+         lBlinking  := .T.
+         cColorFore := StrTran( cColorFore, "*", "" )
+         cColorBack := StrTran( cColorBack, "*", "" )
       ENDIF
 
-      nColorFore = Val( cColorFore )
-      nColorBack = Val( cColorBack )
+      nColorFore := Val( cColorFore )
+      nColorBack := Val( cColorBack )
 
       IF nColorFore > 0 .OR. nColorBack > 0
          RETURN nColorFore + nColorBack * 16
@@ -191,8 +191,8 @@ FUNCTION COLORTON( cColor )
          RETURN 0
       ENDIF
 
-      nColorFore = c2n( cColorFore )
-      nColorBack = c2n( cColorBack )
+      nColorFore := c2n( cColorFore )
+      nColorBack := c2n( cColorBack )
 
       IF nColorFore > 7 .OR. nColorBack > 7
          RETURN 0
@@ -223,4 +223,3 @@ FUNCTION UNSELECTED()
    ColorSelect( CLR_UNSELECTED )
 
    RETURN ""
-

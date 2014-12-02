@@ -175,7 +175,7 @@ CLASS THtmlControl
    METHOD SetLabel( l ) INLINE ::lLabel := l
    METHOD SetLink( l )  INLINE ::cLink := l
    METHOD SetImage( l ) INLINE ::cImage := l
-   
+
 
    METHOD Put()
 
@@ -370,7 +370,7 @@ METHOD Put() CLASS THtmlControl
       //Fwrite( ::nH, "</SELECT>" )
       ::oHtm:cStr += "</SELECT>"
    ENDIF
-   
+
    IF ! Empty ( ::cLink ) .AND. ! Empty( ::cImage )
       cStr :=  ;
          '<A HREF="' + ::cLink + '"><IMG SRC="' + ::cImage + '"' + ;
@@ -449,7 +449,7 @@ CLASS THtmlForm
 
    DATA nH
    DATA oHtm
-   
+
    DATA aControls INIT {}
    DATA Name INIT ""
    DATA Action
@@ -500,7 +500,7 @@ CLASS THtmlForm
 
    METHOD setwidth( c ) INLINE ::width := c
 
-   METHOD AddControl( o ) INLINE iif( ValType( o ) == "O", ( o:nH := ::nH, o:Form := Self ), ), ;
+   METHOD AddControl( o ) INLINE iif( HB_ISOBJECT( o ), ( o:nH := ::nH, o:Form := Self ), ), ;
       AAdd( ::aControls, o )
 
    METHOD PutControls() INLINE AEval( ::aControls, { | e | e:Put() } )
@@ -556,19 +556,19 @@ METHOD Put( lPutControls ) CLASS THtmlForm
 
    DEFAULT lPutControls TO .F.
 
-   IF ValType( ::width ) != "N"
+   IF !HB_ISNUMERIC( ::width )
       ::width := 90
    ENDIF
 
-   IF ValType( ::color ) != "C"
+   IF !HB_ISSTRING( ::color )
       ::Color := "#9196A0"
    ENDIF
 
-   IF ValType( ::fontColor ) != "C"
+   IF !HB_ISSTRING( ::fontColor )
       ::fontColor := "black"
    ENDIF
 
-   IF ValType( ::CaptionColor ) != "C"
+   IF !!HB_ISSTRING( ::CaptionColor )
       ::CaptionColor := "black"
    ENDIF
 
@@ -693,8 +693,7 @@ METHOD Put( lPutControls ) CLASS THtmlForm
 //   Fwrite( ::nH, ::cOutput )
    ::oHtm:cStr += ::cOutput
    IF lPutControls
-      AEval( ::aControls, { | e | iif( ValType( e ) == "O", ;
-         e:Put(), ::oHtm:cStr += e  ) } )
+      AEval( ::aControls, { | e | iif( HB_ISOBJECT( e ), e:Put(), ::oHtm:cStr += e ) } )
    ENDIF
 
    RETURN Self
@@ -749,4 +748,3 @@ METHOD GetControl( cName ) CLASS THtmlForm
 FUNCTION HtmlFormObject()
 
    RETURN soForm
-

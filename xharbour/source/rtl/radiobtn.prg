@@ -113,9 +113,9 @@ METHOD New( nRow, nCol, cCaption, xData ) CLASS HBRadioButton
          __GUIColor( cColor, CLR_STANDARD   + 1 ) + "," + ;
          __GUIColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
-   
+
    ::fBlock := NIL
-  
+
    ::HasFocus := .F.
    ::Row := nRow
    ::sBlock := nil
@@ -127,8 +127,7 @@ METHOD New( nRow, nCol, cCaption, xData ) CLASS HBRadioButton
 
 METHOD SETFOCus()  CLASS HBRadioButton
 
-   IF ( !::hasfocus .AND. ISBLOCK( ( ::hasfocus := .T. , ;
-         ::Display(), ::fblock ) ) )
+   IF ( !::hasfocus .AND. ISBLOCK( ( ::hasfocus := .T., ::Display(), ::fblock ) ) )
       Eval( ::fblock )
    ENDIF
 
@@ -152,7 +151,7 @@ METHOD _SELECT( lStatus )  CLASS HBRadioButton
    RETURN self
 
 METHOD KillFocus()  CLASS HBRadioButton
-   
+
    if ::HasFocus
       ::HasFocus := .F.
       IF ISBLOCK( ::fBlock )
@@ -164,7 +163,7 @@ METHOD KillFocus()  CLASS HBRadioButton
    RETURN Self
 
 METHOD DISPLAY()  CLASS HBRadioButton
-   
+
    LOCAL cColor := SetColor(), cCurStyle, nCurRow := Row(), nCurCol := Col(), ;
       cPairs, nPos, cOldCaption
 
@@ -217,7 +216,7 @@ METHOD DISPLAY()  CLASS HBRadioButton
    RETURN Self
 
 METHOD IsAccel( xValue )  CLASS HBRadioButton
-   
+
    LOCAL nPos, cCaption, xResult
 
    IF ISNUMBER( xValue )
@@ -263,12 +262,12 @@ METHOD HitTest( nRow, nCol )  CLASS HBRadioButton
    RETURN HTNOWHERE
 
 METHOD SetData( Arg1 ) CLASS HBRadioButton
-   
+
    IF PCount() == 0
    ELSEIF ISNIL( Arg1 )
       ::pData := Arg1
    ELSE
-      ::pData := if( ValType( Arg1 ) == "C", arg1, "" )
+      ::pData := if( HB_ISSTRING( Arg1 ), arg1, "" )
    ENDIF
 
    IF ISNIL( ::pData )

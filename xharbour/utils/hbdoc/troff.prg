@@ -75,7 +75,7 @@ ENDCLASS
 
 METHOD NEW( cFile ) CLASS TTROFF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF

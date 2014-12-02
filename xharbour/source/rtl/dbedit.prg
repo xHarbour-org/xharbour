@@ -207,7 +207,7 @@ FUNCTION dbEdit( nTop, ;
    ENDIF
 
    IF !HB_ISNIL( acColumnHeaders ) .AND. ( !HB_ISSTRING( acColumnHeaders ) .AND. !HB_ISARRAY( acColumnHeaders ) )
-      Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <" + ValType(acColumnHeaders ) + ">" , ProcName() + " <acColumnHeaders|cColumnHeader>" ) )
+      Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <" + ValType(acColumnHeaders ) + ">", ProcName() + " <acColumnHeaders|cColumnHeader>" ) )
    ENDIF
 
    IF !HB_ISNIL( acHeadingSep ) .AND. ( !HB_ISSTRING( acHeadingSep ) .AND. !HB_ISARRAY( acHeadingSep ) )
@@ -223,7 +223,7 @@ FUNCTION dbEdit( nTop, ;
    ENDIF
 
    IF !HB_ISNIL( acColumnFootings ) .AND. ( !HB_ISSTRING( acColumnFootings ) .AND. !HB_ISARRAY( acColumnFootings ) )
-      Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <" + ValType(acColumnFootings ) + ">" , ProcName() + " <acColumnFootings|cColumnFooting>" ) )
+      Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <" + ValType(acColumnFootings ) + ">", ProcName() + " <acColumnFootings|cColumnFooting>" ) )
    ENDIF
 
    IF !HB_ISNIL( bPreBlock ) .AND. !HB_ISBLOCK( bPreBlock )
@@ -297,7 +297,7 @@ FUNCTION dbEdit( nTop, ;
             bFunc := iif( HB_ISBLOCK( i ), i, &( "{||" + i + '}' ) )
          End
 
-         IF ValType( Eval( bFunc ) ) == 'M'  // HB_ISMEMO() returns .T. for strings :(
+         IF HB_ISMEMO( Eval( bFunc ) )
             bFunc := {|| "  <Memo>  " }
          End
 
@@ -371,7 +371,7 @@ FUNCTION dbEdit( nTop, ;
 
    DispEnd()
 
-   IF Len( axColumns ) = 1
+   IF Len( axColumns ) == 1
       oTBR:SetKey( K_LEFT, Nil )
       oTBR:SetKey( K_RIGHT, Nil )
    ENDIF
@@ -393,7 +393,7 @@ FUNCTION dbEdit( nTop, ;
    oTBR:ForceStable()
    oTBR:DeHilite()
 
-   IF HB_ISLOGICAL( xUserFunc ) .AND. xUserFunc = .F.
+   IF HB_ISLOGICAL( xUserFunc ) .AND. !xUserFunc
       nRet := DE_ABORT
    ENDIF
 
@@ -409,16 +409,16 @@ FUNCTION dbEdit( nTop, ;
 
    WHILE nRet != DE_ABORT
 
-      IF nRet = DE_CONT
+      IF nRet == DE_CONT
 
          oTBR:RefreshCurrent()
 
-      ELSEIF nRet = DE_REFRESH
+      ELSEIF nRet == DE_REFRESH
 
          oTBR:RefreshAll()
 
          IF lAppend
-            lAppend := .F.
+            lAppend    := .F.
             oTBR:Cargo := .F.
             oTBR:GoBottom()
          ENDIF
@@ -429,7 +429,7 @@ FUNCTION dbEdit( nTop, ;
 
       oTBR:ForceStable()
 
-      IF nRet = DE_CONT
+      IF nRet == DE_CONT
 
          IF ! lExcept
 
@@ -456,7 +456,7 @@ FUNCTION dbEdit( nTop, ;
          ENDIF
 
          // No keystrokes pending...
-         IF NextKey() = 0
+         IF NextKey() == 0
             dbe_CallUDF( bFunc, DE_IDLE, oTBR:colPos, oTBR )
             // force dbedit DE_CONT state after IDLE mode.
             nRet := DE_CONT
@@ -465,16 +465,16 @@ FUNCTION dbEdit( nTop, ;
       ENDIF
 
 
-      IF nRet = DE_ABORT
+      IF nRet == DE_ABORT
          EXIT
 
-      ELSEIF nRet = DE_REFRESH
+      ELSEIF nRet == DE_REFRESH
          LOOP
 
-      ELSEIF nRet = DE_APPEND .AND. ! oTBR:Cargo
+      ELSEIF nRet == DE_APPEND .AND. ! oTBR:Cargo
 
          oTBR:Cargo := .T.
-         lAppend := .T.
+         lAppend    := .T.
 
          IF ! EOF() .OR. ! dbe_emptydb()
             oTBR:Down()
@@ -485,7 +485,7 @@ FUNCTION dbEdit( nTop, ;
          nRet := DE_CONT
 
       ENDIF
- 
+
       oTBR:Hilite()
 
       IF NextKey() != 0
@@ -502,11 +502,11 @@ FUNCTION dbEdit( nTop, ;
             EXIT
          ENDIF
 
-         IF dbe_ProcessKey( nKey, oTBR ) = DE_ABORT
+         IF dbe_ProcessKey( nKey, oTBR ) == DE_ABORT
             EXIT
          ENDIF
 
-         IF ValType( SetKey( nKey ) ) == 'B'
+         IF HB_ISBLOCK( SetKey( nKey ) )
             Eval( SetKey( nKey ), ProcName( 1 ), ProcLine( 1 ), "" )
          ENDIF
 
@@ -533,7 +533,7 @@ STATIC FUNCTION dbe_CallUDF( bFunc, nMode, nColPos, oTBR )
 
    nRet := DE_CONT
 
-   IF nMode = DE_INIT
+   IF nMode == DE_INIT
 
       nKey := NextKey()
 
@@ -546,12 +546,12 @@ STATIC FUNCTION dbe_CallUDF( bFunc, nMode, nColPos, oTBR )
          Inkey()
          dbe_ProcessKey( nKey, oTBR )
          nRet := dbe_return( Eval( bFunc, DE_EXCEPT, nColPos, oTBR ) )
-         IF nRet = DE_ABORT
+         IF nRet == DE_ABORT
             EXIT
-         ELSEIF nRet = DE_REFRESH
+         ELSEIF nRet == DE_REFRESH
             oTBR:RefreshAll()
             oTBR:ForceStable()
-         ELSEIF nRet = DE_CONT
+         ELSEIF nRet == DE_CONT
             oTBR:RefreshCurrent()
             oTBR:ForceStable()
          ENDIF
@@ -564,7 +564,7 @@ STATIC FUNCTION dbe_CallUDF( bFunc, nMode, nColPos, oTBR )
 
       RETURN nRet
 
-   ELSEIF nMode = DE_EXCEPT
+   ELSEIF nMode == DE_EXCEPT
 
       oTBR:DeHilite()
       oTBR:ColorRect( { oTBR:rowpos, oTBR:colpos, oTBR:rowpos, oTBR:colpos }, { 1, 2 } )
@@ -590,7 +590,7 @@ STATIC FUNCTION dbe_CallUDF( bFunc, nMode, nColPos, oTBR )
       nRec != RecNo() )
 
 
-   IF nRet = DE_ABORT .OR. nRet = DE_APPEND
+   IF nRet == DE_ABORT .OR. nRet == DE_APPEND
       RETURN nRet
    ENDIF
 
@@ -661,10 +661,10 @@ STATIC FUNCTION dbe_Skipper( nSkip, oTb )
    LOCAL i       := 0
 
    DO CASE
-   CASE ( nSkip = 0 .OR. LastRec() = 0 )
+   CASE nSkip == 0 .OR. LastRec() == 0
       // Skip 0 (significant on a network)
       dbSkip( 0 )
-   CASE ( nSkip > 0 .AND. !EOF() )
+   CASE nSkip > 0 .AND. !EOF()
       WHILE ( i < nSkip )           // Skip Foward
          dbSkip( 1 )
          i++
@@ -692,14 +692,14 @@ STATIC FUNCTION _MoveCol( oTBR, nKey )
 
    LOCAL oTBR1, oTBR2
 
-   IF nKey = K_CTRL_DOWN .AND. oTBR:colPos < oTBR:colCount
+   IF nKey == K_CTRL_DOWN .AND. oTBR:colPos < oTBR:colCount
       oTBR1 := oTBR:getColumn( oTBR:colPos )
       oTBR2 := oTBR:getColumn( oTBR:colPos + 1 )
       oTBR:setColumn( oTBR:colPos, oTBR2 )
       oTBR:SetColumn( oTBR:colPos + 1, oTBR1 )
       oTBR:colPos++
       oTBR:invalidate()
-   ELSEIF nKey = K_CTRL_UP .AND. oTBR:colPos > 1
+   ELSEIF nKey == K_CTRL_UP .AND. oTBR:colPos > 1
       oTBR1 := oTBR:getColumn( oTBR:colPos )
       oTBR2 := oTBR:getColumn( oTBR:colPos - 1 )
       oTBR:setColumn( oTBR:colPos, oTBR2 )
@@ -721,17 +721,17 @@ STATIC FUNCTION dbe_emptydb()
 //-------------------------------------*
    LOCAL lEmpty
 
-   IF LastRec() = 0
+   IF LastRec() == 0
       RETURN .T.
    ENDIF
 
    IF ! Empty( dbFilter() )
       lEmpty := ( EOF() .OR. RecNo() > LastRec() )
-   ELSEIF IndexOrd() = 0
+   ELSEIF IndexOrd() == 0
       lEmpty := ( ( EOF() .OR. RecNo() > LastRec() ) .AND. BOF() )
    ELSE
-      //lEmpty := ( OrdKeyCount() = 0  ) // this code decrease dbedit's speed at large table.
-      lEmpty := ( ordKeyNo() = 0 )
+      //lEmpty := ( OrdKeyCount() == 0 ) // this code decrease dbedit's speed at large table.
+      lEmpty := ( ordKeyNo() == 0 )
    ENDIF
 
    RETURN lEmpty
@@ -744,7 +744,7 @@ STATIC FUNCTION dbe_processKey( nKey, oTb )
    LOCAL nRet := DE_CONT
 
 #ifdef HB_COMPAT_C53
-   IF oTb:ApplyKey( nKey ) = TBR_EXIT
+   IF oTb:ApplyKey( nKey ) == TBR_EXIT
       nRet := DE_ABORT
    ENDIF
 #else
@@ -837,7 +837,7 @@ STATIC FUNCTION dbe_syncpos( oTb )
             dbGoto( nRec )
             oTb:RowPos := nKeyNo - nDel
          ENDIF
-         SET( _SET_DELETED , lDeleted )
+         SET( _SET_DELETED, lDeleted )
       ENDIF
 
    ELSE

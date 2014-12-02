@@ -2810,9 +2810,9 @@ RETURN
         //OutputDebugString( "Block: " + Str( nBlock ) + "Op: " + CStr( OpCode ) )
 
       #ifdef __MACRO_COMPILE__
-        IF ValType( OpCode ) == 'C'
+        IF HB_ISSTRING( OpCode )
       #else
-        IF ValType( OpCode ) == 'B'
+        IF HB_ISBLOCK( OpCode )
       #endif
            aProcStack[2] := aCode[3] // Line No.
 
@@ -4195,12 +4195,12 @@ STATIC PROCEDURE ExecuteLine( sPPed )
             ELSE
                sSymbol := SubStr( sLeft, nLen + 1 )
             ENDIF
-            IF ( Type( sSymbol ) = 'U' )
+            IF Type( sSymbol ) == 'U'
                __QQPub( sSymbol )
             ENDIF
          ENDDO
 
-         IF sBlock = "__"
+         IF sBlock == "__"
             sSymbol := Upper( SubStr( sBlock, 3, 12 ) ) // Len( "SetOtherwise" )
          ELSE
             sSymbol := ""
@@ -4524,40 +4524,41 @@ PROCEDURE RP_Dot_Err( oErr )
 
    LOCAL Counter, xArg, sArgs := ";"
 
-   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
+   IF HB_ISARRAY( oErr:Args ) .AND. Len( oErr:Args ) > 0
       sArgs := ";Arguments: "
 
       FOR Counter := 1 TO Len( oErr:Args )
          xArg := oErr:Args[Counter]
 
-         DO CASE
-            CASE xArg == NIL
+         SWITCH ValType( xArg )
+            CASE "U"
                sArgs += "NIL; "
-
-            CASE ValType( xArg ) == 'A'
+               exit
+            CASE "A"
                sArgs += "{}; "
-
-            CASE ValType( xArg ) == 'B'
+               exit
+            CASE "B"
                sArgs += "{|| }; "
-
-            CASE ValType( xArg ) == 'C'
+               exit
+            CASE "C"
                sArgs += '"' + xArg + '"; '
-
-            CASE ValType( xArg ) == 'D'
+               exit
+            CASE "D"
                sArgs +=  dtoc( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'L'
+               exit
+            CASE "L"
                sArgs += IIF( xArg, ".T.; ", ".F.; " )
-
-            CASE ValType( xArg ) == 'N'
+               exit
+            CASE "N"
                sArgs +=  Str( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'O'
+               exit
+            CASE "O"
                sArgs +=  "{o}"
-
-            OTHERWISE
+               exit
+            DEFAULT
                sArgs +=  '[' + ValType( xArg ) + "]; "
-         ENDCASE
+               exit
+         END SWITCH
       NEXT
    ENDIF
 
@@ -4677,7 +4678,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       s_xRet := Eval( s_bRTEBlock, oRecover )
       //Alert( "Script Error returned:" + ValType( s_xRet ) )
 
-      IF ValType( s_xRet ) != 'L' .AND. ( ! oRecover:CanSubStitute )
+      IF ! HB_ISLOGICAL( s_xRet ) .AND. ( ! oRecover:CanSubStitute )
          Alert( "SCRIPT - Error Recovery Failure!" )
          Break( oRecover )
       ENDIF
@@ -5372,7 +5373,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    ENDDO
 
                 CASE ( cChar == '[' )
-                   IF LTrim( sLine ) = "#" .OR. ( IsAlpha( cPrev ) .OR. IsDigit( cPrev ) .OR. cPrev $ "])}._"  )
+                   IF LTrim( sLine ) = "#" .OR. ( IsAlpha( cPrev ) .OR. IsDigit( cPrev ) .OR. cPrev $ "])}._" )
                       sLine += cChar
                       nPosition++
                       LOOP
@@ -5596,13 +5597,13 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
    RECOVER USING oError
 
-      IF ValType( oError ) == 'C'
+      IF HB_ISSTRING( oError )
          //TraceLog( "No EOL after: ", cError )
          //Alert( [No EOL after: ] + cError )
          oError := ErrorNew( [PP], 0, 1002, [Pre-Process], [Missing EOL], { sLine, oError } )
       ENDIF
 
-      IF ValType( oError ) == 'O'
+      IF HB_ISOBJECT( oError )
          //oError:Description += ";Script line: " + Str( nLine ) + ";Source: " + sLine
 
          Eval( s_bRTEBlock, oError )
@@ -5910,7 +5911,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             //TraceLog( sLine )
 
             #ifdef OUTPUT_DIRECTIVES
-               aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
+               aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */" )
             #endif
 
             IF sDirective == Left( "DEFINE", nLen )
@@ -6291,7 +6292,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          RECOVER USING oError
 
-           IF ValType( oError ) == 'O'
+           IF HB_ISOBJECT( oError )
               //Alert( oError )
               Break( oError ) // We have another wrapper outside.
            ENDIF
@@ -6460,7 +6461,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
          IF bDbgMatch
-            IF ValType( sLine ) == 'C'
+            IF HB_ISSTRING( sLine )
                ? "TRANSLATED to:", sPPO
             ELSE
                ? "Output failed! Continue with next rule."
@@ -6469,7 +6470,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
             WAIT
          ENDIF
 
-         IF ValType( sPPO ) == 'C'
+         IF HB_ISSTRING( sPPO )
             sLine := sPPO + sPad + sWorkLine
             RETURN nRule
          ELSE
@@ -6731,7 +6732,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                #endif
             ENDIF
 
-            IF ValType( xMarker ) == 'C'
+            IF HB_ISSTRING( xMarker )
                DropTrailingWS( @xMarker )
             ENDIF
 
@@ -6841,7 +6842,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                   IF bDbgMatch
-                     IF ValType( sLine ) == 'C'
+                     IF HB_ISSTRING( sLine )
                         ? "Skipped optionals and TRANSLATED to:", sPPO
                      ELSE
                         ? "Output failed! Continue with next rule."
@@ -6850,7 +6851,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      WAIT
                   ENDIF
 
-                  IF ValType( sPPO ) == 'C'
+                  IF HB_ISSTRING( sPPO )
                      sLine := sPPO + sPad + sWorkLine
                      RETURN nRule
                   ELSE
@@ -6981,7 +6982,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                IF bDbgMatch
-                  IF ValType( sLine ) == 'C'
+                  IF HB_ISSTRING( sLine )
                      ? "TRANSLATED to:", sPPO
                   ELSE
                      ? "Output failed! Continue with next rule."
@@ -6990,7 +6991,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   WAIT
                ENDIF
 
-               IF ValType( sPPO ) == 'C'
+               IF HB_ISSTRING( sPPO )
                   sLine := sPPO + sPad + sWorkLine
                   RETURN nRule
                ELSE
@@ -7088,7 +7089,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                   IF bDbgMatch
-                     IF ValType( sLine ) == 'C'
+                     IF HB_ISSTRING( sLine )
                         ? "TRANSLATED to:", sPPO
                      ELSE
                         ? "Output failed! Continue with next rule."
@@ -7097,7 +7098,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      WAIT
                   ENDIF
 
-                  IF ValType( sPPO ) == 'C'
+                  IF HB_ISSTRING( sPPO )
                      sLine := sPPO + sPad + sWorkLine
                      RETURN nRule
                   ELSE
@@ -7312,7 +7313,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
       sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
       IF bDbgMatch
-         IF ValType( sLine ) == 'C'
+         IF HB_ISSTRING( sLine )
             ? "TRANSLATED to:", sPPO
          ELSE
             ? "Output failed! Continue with next rule."
@@ -7321,7 +7322,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          WAIT
       ENDIF
 
-      IF ValType( sPPO ) == 'C'
+      IF HB_ISSTRING( sPPO )
          sLine := sPPO
          RETURN nRule
       ELSE
@@ -7330,7 +7331,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
       ENDIF
    ENDDO
 
-   Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Match-Rule], [Logic Failure],  ) )
+   Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Match-Rule], [Logic Failure], ) )
 
 RETURN 0
 
@@ -7842,7 +7843,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      IF nNextLen == 1
 
-        IF sNext1 == '(' .AND. ( IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_."  )
+        IF sNext1 == '(' .AND. ( IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_." )
            LOOP
         ELSEIF sNext1 == '[' // No need to check prefix because NextToken() already has the logic.
            LOOP
@@ -7864,9 +7865,9 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      ELSEIF nNextLen == 2
 
         IF sNext2 $ "--\++"
-           IF IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_.]"
-              sExp           += sNextToken
-              sLine          := sNextLine
+           IF IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_.]"
+              sExp  += sNextToken
+              sLine := sNextLine
 
               #ifdef USE_C_BOOST
                  SetArrayPrefix( .F. )
@@ -8175,7 +8176,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers, aMatchers )
                  nMarkers := Len( anMarkers )
                  FOR nMarker := 1 TO nMarkers
                     // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
-                    IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
+                    IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) == 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
                        IF bDbgPPO
                           ? nMarker, "- Removing Repeatable", aMarkers[ anMarkers[nMarker] ][1]
                           WAIT
@@ -8542,7 +8543,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers, aMatchers )
         nMarkers := Len( anMarkers )
         FOR nMarker := 1 TO nMarkers
            // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
-           IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
+           IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) == 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
               aDel( aMarkers[ anMarkers[nMarker] ], 1 )
               aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
               IF bDbgPPO
@@ -9609,7 +9610,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
          aRP[1] := nOptional
       ENDIF
 
-      IF ValType( aRP[2] ) == 'C'
+      IF HB_ISSTRING( aRP[2] )
          aRP[2] := StrTran( aRP[2], '\\', '' )
          aRP[2] := StrTran( aRP[2], '\', '' )
          aRP[2] := StrTran( aRP[2], '', '\' )
@@ -9991,7 +9992,7 @@ RETURN Len( aDefRules )
 
                nClose := AT( ']]', sLine )
                IF nClose == 0
-                  //Alert( "ERROR! [NextToken()] Unterminated '[[' at: " + sLine + "[" + Str( ProcLine() ) + "]"  )
+                  //Alert( "ERROR! [NextToken()] Unterminated '[[' at: " + sLine + "[" + Str( ProcLine() ) + "]" )
                   sReturn := "["  // Clipper does NOT consider '[[' a single token
                ELSE
                   sReturn := Left( sLine, nClose + 2 )
@@ -10252,7 +10253,7 @@ RETURN Len( aDefRules )
              ENDDO
              LOOP // No need to record cLastChar
           ELSEIF cChar == '['
-             IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+             IF ! ( IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
                 DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
                 ENDDO
              ENDIF
@@ -10526,7 +10527,7 @@ STATIC FUNCTION CompileToCCH( sSource )
                aRP := aResult[1][nRP] //{ nLevel, xVal }
 
                FWrite( hCCH, "{ " + Str( aRP[1], 3) + ", " )
-               IF ValType( aRP[2] ) == 'C'
+               IF HB_ISSTRING( aRP[2] )
                   FWrite( hCCH, "'" + aRP[2] + "' }" )
                ELSE
                   FWrite( hCCH, Str( aRP[2], 3 ) + " }" )
@@ -11526,7 +11527,7 @@ FUNCTION AtSkipStrings( sFind, sLine, nStart, bRule )
           ENDDO
           LOOP // No need to record cLastChar
        ELSEIF cChar == '['
-          IF ! ( bRule .OR. IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+          IF ! ( bRule .OR. IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
              DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
              ENDDO
              cLastChar := ']'
@@ -11568,7 +11569,7 @@ FUNCTION nAtAnyCharSkipStr( sChars, sLine, nStart )
           ENDDO
           LOOP // No need to record cLastChar
        ELSEIF lRule == .F. .AND. cChar == '['
-          IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+          IF ! ( IsAlpha( cLastChar ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
              DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
              ENDDO
           ENDIF
@@ -12315,7 +12316,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
                   cParamList := ""
 
                   FOR EACH xParam IN s_aParams
-                     IF ValType( xParam ) == 'C'
+                     IF HB_ISSTRING( xParam )
                         IF ! xParam[1] IN '"'+ "'\["
                            xParam := '"' + xParam + '"'
                         ENDIF
@@ -12609,7 +12610,7 @@ FUNCTION PP_ErrorMessage( e )
      cMessage := "Warning "
   ENDIF
 
-  IF ValType( e:subsystem ) == 'C'
+  IF HB_ISSTRING( e:subsystem )
     cMessage += e:subsystem()
   ELSE
     cMessage += "???"
@@ -12621,15 +12622,15 @@ FUNCTION PP_ErrorMessage( e )
     cMessage += "/???"
   ENDIF
 
-  IF ValType( e:description ) == 'C'
+  IF HB_ISSTRING( e:description )
     cMessage += (";Description: " + e:description)
   ENDIF
 
-  IF ValType( e:filename ) == 'C' .AND. ! Empty( e:filename )
+  IF HB_ISSTRING( e:filename ) .AND. ! Empty( e:filename )
     cMessage += ";Offending file: " + e:filename
   ENDIF
 
-  IF ValType( e:operation ) == 'C'
+  IF HB_ISSTRING( e:operation )
     cMessage += ";Operation: " + e:operation
   ENDIF
 
@@ -12648,11 +12649,11 @@ FUNCTION PP_ErrorMessage( e )
   ENDIF
 
   #ifdef __XHARBOUR__
-     IF ValType( e:ModuleName ) != 'C'
+     IF ! HB_ISSTRING( e:ModuleName )
         e:ModuleName := "Unspecified module"
      ENDIF
 
-     IF ValType( e:ProcName ) != 'C'
+     IF ! HB_ISSTRING( e:ProcName )
         e:ProcName := "No explicit Procedure"
      ENDIF
 
@@ -12798,42 +12799,37 @@ RETURN oError
    //--------------------------------------------------------------//
    FUNCTION CStr( xExp )
 
-      LOCAL cType
-
-      IF xExp == NIL
-         RETURN 'NIL'
-      ENDIF
-
-      cType := ValType( xExp )
-
-      DO CASE
-         CASE cType = 'C'
+      SWITCH ValType( xExp )
+         CASE "C"
             RETURN xExp
 
-         CASE cType = 'D'
+         CASE "D"
             RETURN dToc( xExp )
 
-         CASE cType = 'L'
+         CASE "L"
             RETURN IIF( xExp, '.T.', '.F.' )
 
-         CASE cType = 'N'
+         CASE "N"
             RETURN Str( xExp )
 
-         CASE cType = 'M'
+         CASE "M"
             RETURN xExp
 
-         CASE cType = 'A'
+         CASE "A"
             RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
 
-         CASE cType = 'B'
+         CASE "B"
             RETURN '{|| Block }'
 
-         CASE cType = 'O'
+         CASE "O"
             RETURN "{ " + xExp:ClassName() + " Object }"
 
-         OTHERWISE
-            RETURN "Type: " + cType
-      ENDCASE
+         CASE "U"
+            RETURN 'NIL'
+
+         DEFAULT
+            RETURN "Type: " + ValType( xExp )
+      ENDSWITCH
 
    RETURN ""
 

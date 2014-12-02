@@ -86,7 +86,7 @@ METHOD New( hHash, cVarName, lEditable ) CLASS HBDbHash
    ::hashName := cVarName
    ::TheHash := hHash
    ::lEditable := lEditable
-   
+
    ::addWindows( ::TheHash )
 
    RETURN Self
@@ -129,7 +129,7 @@ METHOD addWindows( hHash, nRow ) CLASS HBDbHash
    oCol:DefColor := { 1, 2 }
    nColWidth := oCol:Width
 
-   oBrwSets:AddColumn( oCol := TBColumnNew( "" ,{ || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
+   oBrwSets:AddColumn( oCol := TBColumnNew( "", { || PadR( __dbgValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
 
    /* 09/08/2004 - <maurilio.longo@libero.it>
                    Setting a fixed width like it is done in the next line of code wich I've
@@ -158,7 +158,7 @@ METHOD addWindows( hHash, nRow ) CLASS HBDbHash
                            ::aWindows[ ::nCurWindow ],::hashName, hHash ) }
 
    SetCursor( SC_NONE )
-   
+
    ::aWindows[ ::nCurWindow ]:ShowModal()
 
    RETURN Self
@@ -321,19 +321,21 @@ STATIC PROCEDURE RefreshVarsS( oBrowse )
    RETURN
 
 STATIC FUNCTION HashBrowseSkip( nPos, oBrwSets )
-   RETURN iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
+   RETURN iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1, ;
              iif( oBrwSets:cargo[ 1 ] + nPos > Len( oBrwSets:cargo[ 2 ][ 1 ] ), ;
                 Len( oBrwSets:cargo[ 2 ][ 1 ] ) - oBrwSets:cargo[ 1 ], nPos ) )
 
 STATIC FUNCTION HashKeyString( hHash, nAt )
 
    LOCAL xVal  := HGetKeyAt( hHash, nAt )
-   LOCAL cType := ValType( xVal )
 
-   DO CASE
-   CASE cType == "C" ; RETURN '"' + xVal + '"'
-   CASE cType == "D" ; RETURN '"' + DToC( xVal ) + '"'
-   CASE cType == "N" ; RETURN hb_NToS( xVal )
-   ENDCASE
-  
+   SWITCH ValType( xVal )
+   CASE "C"
+      RETURN '"' + xVal + '"'
+   CASE "D"
+      RETURN '"' + DToC( xVal ) + '"'
+   CASE "N"
+      RETURN hb_NToS( xVal )
+   ENDSWITCH
+
    RETURN AllTrim( CStr( xVal ) )

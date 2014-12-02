@@ -113,7 +113,7 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
    DEFAULT nBorder TO 1
    DEFAULT BGCOLOR TO "black"
 
-   IF ValType( nNumber ) == "N"
+   IF HB_ISNUMERIC( nNumber )
       cStr := StrZero( nNumber, nDigits )
    ENDIF
 
@@ -170,7 +170,7 @@ oHtm:endTable()
       oHtm:TableHead( aFlds[ i, 1 ] )
    NEXT
 
-   WHILE !( EOF() )
+   WHILE ! EOF()
 
       // each row has a different color...
       IF n == 0
@@ -199,7 +199,7 @@ oHtm:endTable()
       // --> put the formatted fields data...
       FOR i := 1 TO Len( aFlds )
          cAlign := IF( aFlds[ i, 2 ] == "N", "RIGHT", "CENTER" )
-         oHtm:newTableCell( cAlign, , , , "black" )
+         oHtm:newTableCell( cAlign,,,, "black" )
          oHtm:Write( greek2Html( htmlany2Str( FieldGet( i ) ) ) )
          oHtm:EndTableCell()
       NEXT
@@ -275,7 +275,7 @@ oHtm:endTable()
       FOR i := 1 TO oquery:FCount()
 
          cAlign := IF( oCurRow:FieldType( i ) == "N", "RIGHT", "CENTER" )
-         oHtm:newTableCell( cAlign, , , , "black" )
+         oHtm:newTableCell( cAlign,,,, "black" )
          oHtm:Write( greek2Html( htmlany2Str( oCurRow:FieldGet( i ) ) ) )
          oHtm:EndTableCell()
       END
@@ -556,7 +556,7 @@ METHOD Put() CLASS JWindow
       ::setFeatures()
    ENDIF
 
-   IF ValType( ::name ) != "C"
+   IF !HB_ISSTRING( ::name )
       ::name := "newWin"
    ENDIF
 
@@ -792,4 +792,3 @@ FUNCTION Greek2Html( cText )
    NEXT
 
    RETURN ( cStr )
-

@@ -97,9 +97,9 @@ ENDCLASS
 METHOD GetColor( xColor ) CLASS HBPushButton
 
    IF ! ISNIL( xColor )
-      ::Color := iif( ValType( xColor ) == "C" .AND. ;
-         !Empty( __GUIColor( xColor, 4 ) ) .AND. ;
-         Empty( __GUIColor( xColor, 6 ) ), xColor, )
+      ::Color := iif( HB_ISSTRING( xColor ) .AND. ;
+                      !Empty( __GUIColor( xColor, 4 ) ) .AND. ;
+                      Empty( __GUIColor( xColor, 6 ) ), xColor, )
 
    ENDIF
 
@@ -108,8 +108,8 @@ METHOD GetColor( xColor ) CLASS HBPushButton
 METHOD GetStyle( cStyle ) CLASS HBPushButton
 
    IF ! ISNIL( cStyle )
-      ::curStyle := iif( ValType( cStyle ) == "C" .AND. ;
-         LTrim( Str( Len( cStyle ) ) ) IN "0ù2ù8", cStyle, )
+      ::curStyle := iif( HB_ISSTRING( cStyle ) .AND. ;
+                         LTrim( Str( Len( cStyle ) ) ) IN "0ù2ù8", cStyle, )
    ENDIF
 
    RETURN ::curStyle
@@ -137,17 +137,17 @@ METHOD New( nRow, nCol, cCaption ) CLASS HBPushButton
    ELSE
       cColor      := SetColor()
       ::ColorSpec := __GUIColor( cColor, CLR_UNSELECTED + 1 ) + "," + ;
-         __GUIColor( cColor, CLR_ENHANCED   + 1 ) + "," + ;
-         __GUIColor( cColor, CLR_STANDARD   + 1 ) + "," + ;
-         __GUIColor( cColor, CLR_BACKGROUND + 1 )
+                     __GUIColor( cColor, CLR_ENHANCED   + 1 ) + "," + ;
+                     __GUIColor( cColor, CLR_STANDARD   + 1 ) + "," + ;
+                     __GUIColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
 
    RETURN Self
 
 METHOD SetFocus() CLASS HBPushButton
 
-   IF ( !::HasFocus .AND. ISBLOCK( ( ::lCursor := SetCursor( 0 ), ;
-         ::HasFocus := .T. , ::display(), ::fBlock ) ) )
+   IF ( !::HasFocus .AND. ;
+   	ISBLOCK( ( ::lCursor := SetCursor( 0 ), ::HasFocus := .T., ::display(), ::fBlock ) ) )
       Eval( ::fBlock )
    ENDIF
 
@@ -240,8 +240,8 @@ METHOD DISPLAY() CLASS HBPushButton
    LOCAL cStyle
    LOCAL nCurCol
    LOCAL cCaption
-   LOCAL nRow      := Row()
-   LOCAL nCol      := Col()
+   LOCAL nRow := Row()
+   LOCAL nCol := Col()
    LOCAL nCurRow
    LOCAL nAmpPos
    LOCAL cColor4
@@ -339,19 +339,19 @@ FUNCTION _PUSHBUTT_( cCaption, cMessage, cColor, bFBlock, bSBlock, cStyle )
 
 FUNCTION _GETNUMCOL( Arg1 )
 
-   LOCAL aColors := { { "N+", 8 },  { "B+", 9 },   { "G+", 10 },  { "BG+", 11 }, ;
-      { "R+", 12 }, { "RB+", 13 }, { "GR+", 14 }, { "W+", 15 }, ;
-      { "BG", 3 },  { "RB", 5 },   { "GR", 6 },   { "B", 1 }, ;
-      { "G", 2 },   { "R", 4 },    { "W", 7 } }
-   LOCAL nPos    := At( "/", Arg1 )
+   LOCAL aColors := { { "N+",  8 }, { "B+" ,  9 }, { "G+" , 10 }, { "BG+", 11 }, ;
+                      { "R+", 12 }, { "RB+", 13 }, { "GR+", 14 }, { "W+" , 15 }, ;
+                      { "BG",  3 }, { "RB" ,  5 }, { "GR" ,  6 }, { "B"  ,  1 }, ;
+                      { "G" ,  2 }, { "R"  ,  4 }, { "W"  ,  7 } }
+   LOCAL nPos := At( "/", Arg1 )
    LOCAL nReturn
 
-   IF ( nPos > 1 )
+   IF nPos > 1
       Arg1 := SubStr( Arg1, 1, nPos - 1 )
-   ELSEIF ( nPos == 1 )
+   ELSEIF nPos == 1
       Arg1 := ""
    ENDIF
- 
+
    nReturn := AScan( aColors, { | a| a[ 1 ] == arg1 } )
 
    IF nReturn > 0

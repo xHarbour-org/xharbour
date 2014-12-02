@@ -75,7 +75,7 @@ EXTERNAL HB_OLEINIT
 //----------------------------------------------------------------------------//
 FUNCTION CreateObject( cString, cLicense )
 
-RETURN TOleAuto():New( cString, , cLicense )
+RETURN TOleAuto():New( cString,, cLicense )
 
 //----------------------------------------------------------------------------//
 FUNCTION GetActiveObject( cString )
@@ -121,20 +121,18 @@ RETURN IIF( PCount() == 1, ::Value[nIndex], ::Value[nIndex] := xValue )
 //----------------------------------------------------------------------------//
 METHOD Enumerate( nEnumOp, nIndex ) CLASS VTarrayWrapper
 
-   (nIndex)
+   HB_SYMBOL_UNUSED( nIndex )
 
    SWITCH nEnumOp
       CASE FOREACH_BEGIN
          RETURN ::Value
-
       CASE FOREACH_ENUMERATE
          // Can never happen!
          EXIT
-
       CASE FOREACH_END
          // Can never happen!
          EXIT
-   END
+   ENDSWITCH
 
  RETURN Self
 
@@ -198,8 +196,9 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       RETURN HB_ExecFromArray( Self, "_New", HB_aParams() )
    ENDIF
 
-   IF ValType( uObj ) == 'C'
-      ::hObj := CreateOleObject( uObj, ,cLicense )
+   SWITCH ValType( uObj )
+   CASE 'C'
+      ::hObj := CreateOleObject( uObj,, cLicense )
 
       IF OleError() != 0
          IF Ole2TxtError() == "DISP_E_EXCEPTION"
@@ -234,27 +233,29 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       ENDIF
 
       ::cClassName := uObj
-   ELSEIF ValType( uObj ) == 'N'
+      EXIT
+   CASE 'N'
       OleAddRef( uObj )
       ::hObj := uObj
 
-      IF ValType( cClass ) == 'C'
+      IF HB_ISSTRING( cClass )
          ::cClassName := cClass
       ELSE
          ::cClassName := LTrim( Str( uObj ) )
       ENDIF
-
-   ELSEIF ValType( uObj ) == 'P'
+      EXIT
+   CASE 'P'
       uObj := OlePtr2Int( uObj )
       OleAddRef( uObj )
       ::hObj := uObj
 
-      IF ValType( cClass ) == 'C'
+      IF HB_ISSTRING( cClass )
          ::cClassName := cClass
       ELSE
          ::cClassName := LTrim( Str( uObj ) )
       ENDIF
-   ELSE
+      EXIT
+   DEFAULT
       oErr := ErrorNew()
       oErr:Args          := HB_aParams()
       oErr:CanDefault    := .F.
@@ -268,12 +269,12 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       oErr:SubSystem     := "TOleAuto"
 
       RETURN Throw( oErr )
-   ENDIF
+   ENDSWITCH
 
 RETURN Self
 
-//----------------------------------------------------------------------------//
 // Destructor!
+//----------------------------------------------------------------------------//
 PROCEDURE Release() CLASS TOleAuto
 
    //TraceLog( ::cClassName, ::hObj )
@@ -291,7 +292,7 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
    LOCAL oErr
 
-   IF ValType( cClass ) == 'C'
+   IF HB_ISSTRING( cClass )
       ::hObj := GetOleObject( cClass )
 
       IF OleError() != 0
@@ -345,7 +346,7 @@ METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
       RETURN ::Item( xIndex )
    ENDIF
 
-   IF ValType( xIndex ) == 'N' .AND. xIndex < 0
+   IF HB_ISNUMERIC( xIndex ) .AND. xIndex < 0
       xIndex += ( ::Count + 1 )
    ENDIF
 
@@ -564,7 +565,7 @@ METHOD OleValueEqual( xArg ) CLASS TOleAuto
    LOCAL xRet, oErr
 
    TRY
-      xRet := ::OleValue = xArg
+      xRet := ::OleValue == xArg
    CATCH
       oErr := ErrorNew()
       oErr:Args          := { Self, xArg }
@@ -638,7 +639,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
    // LOCAL xRet
 
-   (nIndex)
+   HB_SYMBOL_UNUSED( nIndex )
 
    SWITCH nEnumOp
       CASE FOREACH_BEGIN

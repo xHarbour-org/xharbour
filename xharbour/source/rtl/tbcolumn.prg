@@ -61,47 +61,47 @@
 CLASS TBColumn
 
    ACCESS Block      INLINE ::bBlock
-   ASSIGN Block( b )   INLINE ::bBlock := ::SetValue( b, @::bBlock, "B" )
+   ASSIGN Block( b ) INLINE ::bBlock := ::SetValue( b, @::bBlock, "B" )
 
    ACCESS Cargo      INLINE ::xCargo
-   ASSIGN Cargo( x )   INLINE ::xCargo := iif( !HB_ISNIL( x ), x, ::xCargo )
+   ASSIGN Cargo( x ) INLINE ::xCargo := iif( !HB_ISNIL( x ), x, ::xCargo )
 
    ACCESS ColorBlock      INLINE ::bColorBlock
-   ASSIGN ColorBlock( b )   INLINE ::SetValue( b, @::bColorBlock, "B" )
+   ASSIGN ColorBlock( b ) INLINE ::SetValue( b, @::bColorBlock, "B" )
 
    ACCESS ColSep      INLINE ::cColSep
-   ASSIGN ColSep( c )   INLINE ::SetValue( c, @::cColSep, "C" )
+   ASSIGN ColSep( c ) INLINE ::SetValue( c, @::cColSep, "C" )
 
    ACCESS DefColor      INLINE ::aDefColor
-   ASSIGN DefColor( a )   INLINE ::aDefColor := ::SetDefColor( a )
+   ASSIGN DefColor( a ) INLINE ::aDefColor := ::SetDefColor( a )
 
    ACCESS Footing      INLINE ::cFooting
-   ASSIGN Footing( c )   INLINE ::SetValue( c, @::cFooting, "C" )
+   ASSIGN Footing( c ) INLINE ::SetValue( c, @::cFooting, "C" )
 
    ACCESS FootSep      INLINE ::cFootSep
-   ASSIGN FootSep( c )   INLINE ::SetValue( c, @::cFootSep, "C" )
+   ASSIGN FootSep( c ) INLINE ::SetValue( c, @::cFootSep, "C" )
 
    ACCESS Heading      INLINE ::cHeading
-   ASSIGN Heading( c )   INLINE ::SetValue( c, @::cHeading, "C" )
+   ASSIGN Heading( c ) INLINE ::SetValue( c, @::cHeading, "C" )
 
    ACCESS HeadSep      INLINE ::cHeadSep
-   ASSIGN HeadSep( c )   INLINE ::SetValue( c, @::cHeadSep, "C" )
+   ASSIGN HeadSep( c ) INLINE ::SetValue( c, @::cHeadSep, "C" )
 
    ACCESS PICTURE      INLINE ::cPicture
-   ASSIGN Picture( c )   INLINE ::SetValue( c, @::cPicture, "C" )
+   ASSIGN Picture( c ) INLINE ::SetValue( c, @::cPicture, "C" )
 
    ACCESS Width      INLINE ::nWidth
-   ASSIGN Width( n )   INLINE ::nWidth := ::SetValue( n, @::nWidth, "N" )
+   ASSIGN Width( n ) INLINE ::nWidth := ::SetValue( n, @::nWidth, "N" )
 
 
    METHOD  New( cHeading, bBlock )
 
 #ifdef HB_COMPAT_C53
    ACCESS PreBlock      INLINE ::bPreBlock
-   ASSIGN PreBlock( b )   INLINE ::SetValue( b, @::bPreBlock, "B" )
+   ASSIGN PreBlock( b ) INLINE ::SetValue( b, @::bPreBlock, "B" )
 
    ACCESS PostBlock      INLINE ::bPostBlock
-   ASSIGN PostBlock( b )   INLINE ::SetValue( b, @::bPostBlock, "B" )
+   ASSIGN PostBlock( b ) INLINE ::SetValue( b, @::bPostBlock, "B" )
 #endif
 
 
@@ -173,7 +173,7 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    ::ColSep   := nil
 
    ::nWidth   := nil
-   ::Heading  := if( ValType( cHeading ) == 'C', cHeading, ' ' )
+   ::Heading  := if( HB_ISSTRING( cHeading ), cHeading, ' ' )
 
    /* NOTE: needs to be initialized to an empty string or TBrowse()::WriteMLineText() does not work
             if there are columns which have a footing and others which don't
@@ -289,4 +289,3 @@ FUNCTION TBColumnNew( cHeading, bBlock )
    RETURN TBColumn():New( cHeading, bBlock )
 
 //-------------------------------------------------------------------//
-

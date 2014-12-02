@@ -52,9 +52,12 @@
 
 #define CRLF HB_OSNewLine()
 #xtranslate UPPERLOWER(<exp>) => (UPPER(SUBSTR(<exp>,1,1))+LOWER(SUBSTR(<exp>,2)))
+
 #include 'hbclass.ch'
 #include 'common.ch'
+
 MEMVAR aWWW,aResult
+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
 *+    Class TRTF
@@ -76,7 +79,7 @@ CLASS TRTF
    METHOD WriteParBox( cPar )
    METHOD WriteLink( clink )
    METHOD WriteJumpLink( clink )
-   METHOD WritekLink( aLink ,lAlink)
+   METHOD WritekLink( aLink, lAlink)
    METHOD WriteJumpLink1( cLink, cName, cText )
    METHOD CLOSE()
    METHOD WriteParBold( cPar, lCenter )
@@ -90,7 +93,7 @@ ENDCLASS
 
 METHOD new( cFile ) CLASS TRTF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF
@@ -148,18 +151,21 @@ METHOD WritePar( cPar, cIden ) CLASS TRTF
    cPar := STRTRAN( cPar, "}", "\}" )
    FWRITE( Self:nHandle, '\par' + CRLF + '\pard\cf1\f6\fs20\b0\i0' + cIden + HB_OEMTOANSI( cPar ) + CRLF )
 RETURN Self
+
 METHOD WriteParNoIndent( cPar ) CLASS TRTF
 
    cPar := STRTRAN( cPar, "{", "\{" )
    cPar := STRTRAN( cPar, "}", "\}" )
    FWRITE( Self:nHandle, '\par' + CRLF + '\pard\cf1\f6\fs20\b0\i0' + HB_OEMTOANSI( cPar ) + CRLF )
 RETURN Self
+
 METHOD WriteParBox( cPar ) CLASS TRTF
 
    cPar := STRTRAN( cPar, "{", "\{" )
    cPar := STRTRAN( cPar, "}", "\}" )
    FWRITE( Self:nHandle, '\par' + CRLF + '\pard\cf1\f4\b0\i0\fi-426\li426' + HB_OEMTOANSI( cPar ) + CRLF )
 RETURN Self
+
 METHOD WriteParFixed( cPar ) CLASS TRTF
 
    cPar := STRTRAN( cPar, "{", "\{" )
@@ -206,7 +212,7 @@ METHOD WriteParBoldText( cPar, cText ) CLASS TRTF
    FWRITE( Self:nHandle, '\par \pard\cf1\f6\fs20\i\b       ' + ALLTRIM( HB_OEMTOANSI( cPar ) ) + ' \b\cf1\f6\fs20\i0\b0\li300 ' + ALLTRIM( HB_OEMTOANSI( cText ) ) + CRLF )
 RETURN Self
 
-METHOD WriteTitle( cTitle, cTopic, cOne ,cCat) CLASS TRTF
+METHOD WriteTitle( cTitle, cTopic, cOne, cCat ) CLASS TRTF
 
    LOCAL cTemp
    LOCAL nPos
@@ -240,9 +246,9 @@ METHOD WriteTitle( cTitle, cTopic, cOne ,cCat) CLASS TRTF
 
    /*'{\f6' + CRLF + ;*/
              /*" ; " + UPPERLOWER(cCat) +" , " +UPPERLOWER(ALLTRIM( strtran(cTopic,"()","" )))+ */
-   aadd(aWww,{cTopic,"IDH_"+cTemp,cCat})
+   aadd( aWww, { cTopic, "IDH_" + cTemp, cCat } )
    nPos := ascan(aResult,{|a| UPPER(a) == UPPER(cCat)})
-   if nPos==0
+   if nPos == 0
       aadd(aResult,cCat)
    endif
    FWRITE( Self:nHandle, cWrite )
@@ -279,6 +285,7 @@ METHOD WriteJumpTitle( cTitle, cTopic ) CLASS TRTF
    Self:WriteParBold( cTopic )
 
 RETURN Self
+
 METHOD EndPage() CLASS TRTF
 
    FWRITE( Self:nHandle, "\par " + CRLF + '\page' + CRLF )
@@ -313,29 +320,30 @@ METHOD WriteJumpLink1( cLink, cName, cText ) CLASS TRTF
 
 RETURN Self
 
-METHOD WritekLink( aLink ,lAlink) CLASS TRTF
-Local cItem:=' '
-Local nPos
-Local nSize:=Len(aLink)
+METHOD WritekLink( aLink, lAlink ) CLASS TRTF
 
-(lAlink)
+   Local cItem := ' '
+   Local nPos
+   Local nSize := Len( aLink )
 
-if nSize >2
-For nPos:=1 to nSize
-    if nPos==nSize
-        cItem+= UPPERLOWER(aLink[nPos])
-    else
-        cItem+= UPPERLOWER(aLink[nPos])
-        cItem+=";"
-    endif
-next
-cItem:=Alltrim(cItem)
-   FWRITE( Self:nHandle, '\par \pard\cf1\fs20       \{button , ALink('+UPPER(cItem) + ', 2) \}{\f6\uldb Related Topic }'+'{\v\f6 %!ALink(" '+cItem + '", 2) }'+ CRLF )
-else
-For nPos:=1 to nSize
-    FWRITE( Self:nHandle, '\par \pard\cf1\fs20       {\f6\uldb '+aLink[nPos] +' }{\v\f6 !KLink(" '+UPPERLOWER(aLink[nPos]) + '", 2) }'+ CRLF )
-next
-endif
+   HB_SYMBOL_UNUSED( lAlink )
+
+   if nSize > 2
+      For nPos := 1 to nSize
+         if nPos == nSize
+            cItem += UPPERLOWER(aLink[nPos])
+         else
+            cItem += UPPERLOWER(aLink[nPos])
+            cItem += ";"
+         endif
+      next
+      cItem := Alltrim(cItem)
+      FWRITE( Self:nHandle, '\par \pard\cf1\fs20       \{button , ALink('+UPPER(cItem) + ', 2) \}{\f6\uldb Related Topic }' + '{\v\f6 %!ALink(" ' + cItem + '", 2) }'+ CRLF )
+   else
+      For nPos := 1 to nSize
+         FWRITE( Self:nHandle, '\par \pard\cf1\fs20       {\f6\uldb '+aLink[nPos] + ' }{\v\f6 !KLink(" '+UPPERLOWER(aLink[nPos]) + '", 2) }' + CRLF )
+      next
+   endif
+
 RETURN Self
-
 *+ EOF: RTF.PRG

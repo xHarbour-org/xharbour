@@ -120,7 +120,7 @@ FUNCTION QueryRegistry( nHKEYHandle, cKeyName, cEntryName, xValue, lSetIt )
       rVal := SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
    ENDIF
 
-   RETURN(  rVal )
+   RETURN rVal
 
 //---- GetRegistry ------------------------
 
@@ -147,7 +147,7 @@ FUNCTION GetRegistry( nHKEYHandle, cKeyName, cEntryName )
       WinRegCloseKey( nKeyHandle )
    ENDIF
 
-   RETURN( cName )
+   RETURN cName
 
 //---- SetRegistry ------------------------
 
@@ -155,28 +155,32 @@ FUNCTION SetRegistry( nHKEYHandle, cKeyName, cEntryName, xValue )
 
    LOCAL cName := NIL, nKeyHandle, nValueType
    LOCAL rVal := .F.
-   LOCAL cType, nResult := 1
+   LOCAL nResult := 1
 
    IF nHKeyHandle == NIL
       nHKeyHandle := 0
    ENDIF
    nKeyHandle := 0
-   IF WinRegCreateKeyEx( nHKEYHandle, cKeyName, 0, 0, 0, KEY_SET_VALUE, 0, @nKeyHandle, @nResult ) = 0
-      cType := ValType( xValue ) // no support for Arrays, Codeblock ...
-      DO CASE
-      CASE cType == 'L'
-         nValueType  := REG_DWORD
+   IF WinRegCreateKeyEx( nHKEYHandle, cKeyName, 0, 0, 0, KEY_SET_VALUE, 0, @nKeyHandle, @nResult ) == 0
+      SWITCH ValType( xValue )          // no support for Arrays, Codeblock ...
+      CASE 'L'
+         nValueType := REG_DWORD
          cName := iif( xValue, 1, 0 )
-      CASE cType == 'D'
-         nValueType  := REG_SZ
+         EXIT
+      CASE 'D'
+         nValueType := REG_SZ
          cName := DToS( xValue )
-      CASE cType == 'N'
-         nValueType  := REG_DWORD
+         EXIT
+      CASE 'N'
+         nValueType := REG_DWORD
          cName := xValue
-      CASE cType $ 'CM'
-         nValueType  := REG_SZ
+         EXIT
+      CASE 'C'
+      CASE 'M'
+         nValueType := REG_SZ
          cName := xValue
-      ENDCASE
+         EXIT
+      END SWITCH
       IF cName != NIL
          rVal := Empty( WinRegSetValueEx( nKeyHandle, cEntryName,0, nValueType, cName ) )
       ENDIF
@@ -198,10 +202,10 @@ static HKEY regkeykey( HB_PTRUINT nKey)
      return (HKEY) nKey;
   switch ( nKey )
   {
-  case  0 :
+  case 0 :
     Result = (HKEY) HKEY_LOCAL_MACHINE;
     break;
-  case  1 :
+  case 1 :
     Result = (HKEY) HKEY_CLASSES_ROOT ;
     break;
   case 2 :
@@ -224,8 +228,7 @@ static HKEY regkeykey( HB_PTRUINT nKey)
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 {
-
-  HKEY hWnd ;
+  HKEY  hWnd ;
   ULONG rVal= ( ULONG ) -1, nresult = hb_parnl( 9 );
 
   if ( RegCreateKeyEx( regkeykey( ( HB_PTRUINT ) hb_parnint( 1 ) ), ( const char * ) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, ( PHKEY ) &hWnd, &nresult ) == ERROR_SUCCESS )

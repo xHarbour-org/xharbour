@@ -101,10 +101,6 @@ REQUEST DbfCdx
 
 //-------------------------------------------------------------------//
 
-MEMVAR cCdxExp, First, Last, City
-
-//-------------------------------------------------------------------//
-
 static wvtScreen := {}
 static pic_:= { , , , , , , , , , , , , , , , , , , , }
 static keys_:= { , , , , , , , , , , , , , , , , , , , }
@@ -118,9 +114,9 @@ static paint_:= { { '', {} } }
 #endif
 
 //-------------------------------------------------------------------//
-PROCEDURE Main( cDSN )
+PROCEDURE Main()
 
-   LOCAL aLastPaint, clr, scr, bWhen, bValid, a_:={}
+   LOCAL aLastPaint, clr, scr
    LOCAL dDate   := ctod( '' )
    LOCAL cName   := Pad( 'Pritpal Bedi', 35 )
    LOCAL cAdd1   := Pad( '60, New Professor Colony', 35 )
@@ -138,10 +134,8 @@ PROCEDURE Main( cDSN )
    LOCAL nBtnRow := nMaxRows - 1
    LOCAL cLabel  := '(x)Harbour simulated GUI.'
    LOCAL aObjects:= WvtSetObjects( {} )
-   LOCAL aObj    := {}
    LOCAL hPopup
    LOCAL oMenu
-   LOCAL nConxn
 
    WVT_Core()
    WVT_Utils()
@@ -305,14 +299,6 @@ PROCEDURE WvtNextGets()
    LOCAL aBlocks    := {}
    LOCAL nColGet    := 8
    LOCAL GetList    := {}
-   LOCAL nTop       := 4
-   LOCAL nLft       := 4
-   LOCAL nBtm       := 20
-   LOCAL nRgt       := 75
-   LOCAL kf2        := SetKey( K_F2, {|| WvtGets() } )
-   LOCAL kf3        := SetKey( K_F3, {|| WvtWindowExpand(  1 ) } )
-   LOCAL kf4        := SetKey( K_F4, {|| WvtWindowExpand( -1 ) } )
-   LOCAL cLabel     := 'VOUCH, that GROWS with you'
    LOCAL aPalette   := Wvt_GetPalette()
    LOCAL aNewPalette:= aclone( aPalette )
    LOCAL aObjects   := WvtSetObjects( {} )
@@ -320,6 +306,10 @@ PROCEDURE WvtNextGets()
    LOCAL nCol       := Col()
    LOCAL scr        := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL wvtScr     := Wvt_SaveScreen( 0,0,maxrow(),maxcol() )
+
+   SetKey( K_F2, {|| WvtGets() } )
+   SetKey( K_F3, {|| WvtWindowExpand(  1 ) } )
+   SetKey( K_F4, {|| WvtWindowExpand( -1 ) } )
 
    // Change the values of pallatte arbitrarily though yu can fine tune
    // these values with realistic values.
@@ -421,7 +411,7 @@ FUNCTION Wvt_Paint()
 //      needs to process messages sent through WM_SETFOCUS message
 //      received by the window.
 //-------------------------------------------------------------------//
-FUNCTION Wvt_SetFocus( hWnd )
+FUNCTION Wvt_SetFocus()
 
    LOCAL nRow := row()
    LOCAL nCol := col()
@@ -436,7 +426,7 @@ FUNCTION Wvt_SetFocus( hWnd )
 //      needs to process messages sent through WM_KILLFOCUS message
 //      received by the window.
 //-------------------------------------------------------------------//
-FUNCTION Wvt_KillFocus( hWnd )
+FUNCTION Wvt_KillFocus()
 
    LOCAL nRow := row()
    LOCAL nCol := col()
@@ -453,7 +443,7 @@ FUNCTION Wvt_KillFocus( hWnd )
 //
 //-------------------------------------------------------------------//
 FUNCTION Wvt_Mouse( nKey, nRow, nCol )
-   LOCAL i, nLen, aObjects := WvtSetObjects()
+   LOCAL nLen, aObjects := WvtSetObjects()
    LOCAL nObj
 
    STATIC nLastObj := 0
@@ -558,7 +548,7 @@ FUNCTION WvtSetObjects( aObject )
       if empty( aObject )
          aObjects := {}
       else
-         if valtype( aObject[ 1 ] ) == 'A'
+         if HB_ISARRAY( aObject[ 1 ] )
             aeval( aObject, {|e_| aadd( aObjects, e_ ) } )
          else
             aSize( aObject, WVT_OBJ_VRBLS )
@@ -616,10 +606,9 @@ FUNCTION VouChoice( aChoices )
 //-------------------------------------------------------------------//
 FUNCTION WvtMyBrowse()
 
-   LOCAL nKey, bBlock, oBrowse , aLastPaint, i
+   LOCAL nKey, bBlock, oBrowse , aLastPaint, i, info_
    LOCAL lEnd    := .f.
    LOCAL aBlocks := {}
-   LOCAL info_   := {}
    LOCAL nTop    :=  3
    LOCAL nLeft   :=  3
    LOCAL nBottom := maxrow() - 2
@@ -631,7 +620,7 @@ FUNCTION WvtMyBrowse()
    LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL hPopup  := Wvt_SetPopupMenu()
-   LOCAL stru_:={}, cDbfFile, cSqlFile, cFileIndex, cFileDbf, cRDD, nIndex
+   LOCAL cFileIndex, cFileDbf, cRDD, nIndex
 
    STATIC nStyle := 0
 
@@ -654,7 +643,7 @@ FUNCTION WvtMyBrowse()
    SET ORDER TO 1
    DbGoTo( 50 )
 
-   info_:= DbStruct()
+   info_ := DbStruct()
 
    Popups( 2 )
 
@@ -745,7 +734,7 @@ STATIC FUNCTION DbSkipBlock( n, oTbr )
 
    RETURN  nSkipped
 //-------------------------------------------------------------------//
-STATIC FUNCTION TBNext( oTbr )
+STATIC FUNCTION TBNext()
 
    LOCAL nSaveRecNum := recno()
    LOCAL lMoved := .T.
@@ -762,7 +751,7 @@ STATIC FUNCTION TBNext( oTbr )
 
    RETURN lMoved
 //-------------------------------------------------------------------//
-STATIC FUNCTION TBPrev( oTbr )
+STATIC FUNCTION TBPrev()
    LOCAL nSaveRecNum := Recno()
    LOCAL lMoved := .T.
 
@@ -848,6 +837,8 @@ STATIC FUNCTION BrwHandleKey( oBrowse, nKey, lEnd )
 
 STATIC FUNCTION BrwOnEvent( oWvtBrw, cPaintID, oBrowse, nKey )
    LOCAL lRet := .t., lRefAll := .f.
+
+   HB_SYMBOL_UNUSED( cPaintID )
 
    do case
    case nKey == K_DOWN
@@ -964,7 +955,7 @@ STATIC FUNCTION CfgMyBrowse( aFields, cUseAlias, aTLBR, cDesc, oParent, cColorSp
    aadd( aPopup, { 'Bottom'   , {|| oBrowse:GoBottom(), oBrowse:ForceStable() } } )
 
    Select( cUseAlias )
-   info_:= DbStruct()
+   info_ := DbStruct()
 
    //oBrowse := TBrowseNew( aTLBR[ 1 ], aTLBR[ 2 ], aTLBR[ 3 ], aTLBR[ 4 ] )
    oBrowse := TBrowseWVG():New( aTLBR[ 1 ], aTLBR[ 2 ], aTLBR[ 3 ], aTLBR[ 4 ] )
@@ -1291,13 +1282,13 @@ STATIC FUNCTION ActivateMenu( oMenu )
 //-------------------------------------------------------------------//
 
 STATIC FUNCTION MyDialogOne()
-   LOCAL aObjects:= WvtSetBlocks( {} )
-   Local nWinRows, nWinCols, cWinTitle, cFont, nHeight, nWidth
-   Local oDlg, obj_, oBar, d_, nN, cUseAlias
+   LOCAL aObjects := WvtSetBlocks( {} )
+   Local nWinRows, nWinCols, cWinTitle, cFont, nHeight
+   Local oDlg, oBar, cUseAlias
    Local oText, oTBar, aImg_, oImg, oLine, oBox, oBtn, oBtn2
-   Local oBBox, oCon, oGet, oGet2, nRowG, oBBox2, oBnr, oTBx
+   Local oBBox, oCon, oGet, oBBox2, oBnr, oTBx
    Local oBRsd, cTxt, oRct, nGetCol, nSayCol, bBlock, bBlock1
-   Local oMnu, oWvtBrw, oWvtBrw1, lOpen, lOpen1, cUseAlias1, oGetArea, oGet1
+   Local oWvtBrw, oWvtBrw1, lOpen, lOpen1, cUseAlias1, oGetArea, oGet1
    LOCAL hPopup, nGetRow, aGets_, lChkMouse
    LOCAL g_oMenuBar, oMenu, oPBar2,oPBar3
 
@@ -1359,7 +1350,7 @@ STATIC FUNCTION MyDialogOne()
    oText:nBackColorHoverOn := RGB( 255, 100,  12 )
    oText:lItalic           := .t.
    oText:ToolTip           := 'Software that GROWS with you'
-   oText:bOnSelect         := {|o,v| .t. }
+   oText:bOnSelect         := {|| .t. }
    oDlg:AddObject( oText )
 
    oImg := WvtImage():New( oDlg,102,20,oDlg:MaxCol()-40,37,oDlg:MaxCol()-2 )
@@ -1700,7 +1691,9 @@ Function DynDialog_1()
 //-------------------------------------------------------------------//
 
 Function DynDlgProc_1( hDlg, nMsg, wParam, lParam )
-   Local cText, lClicked
+   Local /*cText,*/ lClicked
+
+   HB_SYMBOL_UNUSED( lParam )
 
    Switch ( nMsg )
 
@@ -1713,7 +1706,7 @@ Function DynDlgProc_1( hDlg, nMsg, wParam, lParam )
       // Do whatevert you want to do with cText
       // Each box will retrieve its own text.
       //
-      cText := Win_GetDlgItemText( hDlg, 10 )
+      /*cText := */ Win_GetDlgItemText( hDlg, 10 )
 
       exit
 
@@ -1761,7 +1754,7 @@ Function DynDlgProc_1( hDlg, nMsg, wParam, lParam )
 //-------------------------------------------------------------------//
 
 Function DynDialog_2()
-   Local hDlg, aDlg, nStyle, nTimerTicks, cDlgIcon, cDlgProc, lOnTop, hMenu, nProc, bDlgProc
+   Local hDlg, aDlg, nStyle, /*nTimerTicks,*/ cDlgIcon, cDlgProc, lOnTop, hMenu /*, bDlgProc*/
 
    Static nInfo := 0
    nInfo++
@@ -1833,9 +1826,9 @@ Function DynDialog_2()
 
    lOnTop      := .f.
    cDlgProc    := 'DynDlgProc_2'
-   bDlgProc    := {|a,b,c,d| DYNDLGPROC_2(a,b,c,d) }
+   //bDlgProc    := {|a,b,c,d| DYNDLGPROC_2(a,b,c,d) }
    cDlgIcon    := 'V_Notes.Ico'
-   nTimerTicks := 1000  // 1 second
+   //nTimerTicks := 1000  // 1 second
 
    if nInfo % 2 == 1
       // Modal Dialog
@@ -1856,7 +1849,7 @@ Function DynDialog_2()
 //-------------------------------------------------------------------//
 
 Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
-   Local cText, lClicked, cPrompt, nIndex, hFont
+   Local /*cText,*/ lClicked, cPrompt, nIndex, hFont
 
    Switch ( nMsg )
 
@@ -1983,8 +1976,8 @@ Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
       // Do whatevert you want to do with cText
       // Each box will retrieve its own text.
       //
-      cText := Win_GetDlgItemText( hDlg, ID_MLE )
-      cText := nil
+      /*cText :=*/ Win_GetDlgItemText( hDlg, ID_MLE )
+      //cText := nil
       exit
 
    end
@@ -2060,8 +2053,10 @@ FUNCTION DlgSlideShow()
 //-------------------------------------------------------------------//
 
 FUNCTION DlgSlideShowProc( hDlg, nMsg, wParam, lParam )
-   LOCAL  aRect, hDC
    STATIC nSlide := 1
+
+   HB_SYMBOL_UNUSED( wParam )
+   HB_SYMBOL_UNUSED( lParam )
 
    Switch nMsg
 

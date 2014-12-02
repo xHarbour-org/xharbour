@@ -132,7 +132,7 @@ STATIC FUNCTION DefError( oError )
    ENDIF
 
 
-   IF ValType( oError:Args ) == "A"
+   IF HB_ISARRAY( oError:Args )
       cMessage += " Arguments: (" + Arguments( oError ) + ")"
    ENDIF
 
@@ -326,7 +326,7 @@ STATIC FUNCTION LogError( oerr )
       FWriteLine( nHandle, 'VM Optimization....: ' + strvalue( Hb_VmMode() ) )
 
       IF Type( "Select()" ) == "UI" .OR. Type( "Select()" )  == "N"
-        
+
          FWriteLine( nHandle, '' )
          FWriteLine( nHandle, 'Current Area ......:' + strvalue( &("Select()" ) ) )
       ENDIF
@@ -479,7 +479,7 @@ STATIC FUNCTION LogError( oerr )
       FWriteLine( nHandle, "" )
       FWriteLine( nHandle, "" )
 
-      IF ValType( cScreen ) == "C"
+      IF HB_ISSTRING( cScreen )
          FWriteLine( nHandle, PadC( " Video Screen Dump ", nCols, "#" ) )
          FWriteLine( nHandle, "" )
          //FWriteLine( nHandle, "" )
@@ -576,24 +576,23 @@ STATIC FUNCTION strvalue( c, l )
    LOCAL cr := ''
 
    DEFAULT l TO .F.
-   Switch ValType( c )
-   CASE "C"
+
+   SWITCH ValType( c )
+   CASE 'C'
+   CASE 'M'
       cr := c
       EXIT
-   CASE "N"
+   CASE 'N'
       cr := AllTrim( Str( c ) )
       EXIT
-   CASE "M"
-      cr := c
-      EXIT
-   CASE "D"
+   CASE 'D'
       cr := DToC( c )
       EXIT
-   CASE "L"
+   CASE 'L'
       //             cr := If( l, If( c, "On", "Off" ), If( c, "True", "False" ) )
       cr := If( l, If( c, "On", "Off" ), If( c, ".t.", ".f." ) )
       EXIT
-   End
+   ENDSWITCH
 
    RETURN Upper( cr )
 
@@ -608,7 +607,7 @@ STATIC FUNCTION Arguments( oErr )
 
    LOCAL xArg, cArguments := ""
 
-   IF ValType( oErr:Args ) == "A"
+   IF HB_ISARRAY( oErr:Args )
       FOR EACH xArg IN oErr:Args
          cArguments += " [" + Str( HB_EnumIndex(), 2 ) + "] = Type: " + ValType( xArg )
 

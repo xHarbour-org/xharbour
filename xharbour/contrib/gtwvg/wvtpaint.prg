@@ -297,7 +297,7 @@ FUNCTION Wvt_MakeDlgTemplate( nTop, nLeft, nRows, nCols, aOffSet, cTitle, nStyle
    nW  := ( nW * nXM / nBaseUnitsX )
    nH  := ( nH * nYM / nBaseUnitsY )
 
-   If ValType( nStyle ) <> "N"
+   If ! HB_ISNUMERIC( nStyle )
       nStyle := + WS_CAPTION    + WS_SYSMENU              ;
                 + WS_GROUP      + WS_TABSTOP + DS_SETFONT ;
                 + WS_THICKFRAME + WS_VISIBLE + WS_POPUP   ;
@@ -306,22 +306,22 @@ FUNCTION Wvt_MakeDlgTemplate( nTop, nLeft, nRows, nCols, aOffSet, cTitle, nStyle
 
    aAdd( aDlg[ 1 ] , If( Empty( nHelpId  ), 0, nHelpId  ) )
    aAdd( aDlg[ 1 ] , If( Empty( nExStyle ), 0, nExStyle ) )
-   aAdd( aDlg[ 1 ] , nStyle  )
-   aAdd( aDlg[ 1 ] , 0       )
-   aAdd( aDlg[ 1 ] , nX      )
-   aAdd( aDlg[ 1 ] , nY      )
-   aAdd( aDlg[ 1 ] , nW      )
-   aAdd( aDlg[ 1 ] , nH      )
-   aAdd( aDlg[ 1 ] , 0       )
-   aAdd( aDlg[ 1 ] , 0       )
-   aAdd( aDlg[ 1 ] , If( ValType( cTitle ) == "C", cTitle, "" ) )
+   aAdd( aDlg[ 1 ] , nStyle )
+   aAdd( aDlg[ 1 ] , 0      )
+   aAdd( aDlg[ 1 ] , nX     )
+   aAdd( aDlg[ 1 ] , nY     )
+   aAdd( aDlg[ 1 ] , nW     )
+   aAdd( aDlg[ 1 ] , nH     )
+   aAdd( aDlg[ 1 ] , 0      )
+   aAdd( aDlg[ 1 ] , 0      )
+   aAdd( aDlg[ 1 ] , If( HB_ISSTRING( cTitle ), cTitle, "" ) )
 
    //IF ( nStyle & DS_SETFONT ) == DS_SETFONT
    if hb_bitAnd( nStyle, DS_SETFONT ) == DS_SETFONT
-      aAdd( aDlg[ 1 ], If( ValType( nPointSize ) == "N", nPointSize, 8               ) )
-      aAdd( aDlg[ 1 ], If( ValType( nWeight    ) == "N", nWeight   , 400             ) )
-      aAdd( aDlg[ 1 ], If( ValType( lItalic    ) == "L", lItalic   , .F.             ) )
-      aAdd( aDlg[ 1 ], If( ValType( cFaceName  ) == "C", cFaceName , "MS Sans Serif" ) )
+      aAdd( aDlg[ 1 ], If( HB_ISNUMERIC( nPointSize ), nPointSize, 8               ) )
+      aAdd( aDlg[ 1 ], If( HB_ISNUMERIC( nWeight    ), nWeight,    400             ) )
+      aAdd( aDlg[ 1 ], If( HB_ISLOGICAL( lItalic    ), lItalic,    .F.             ) )
+      aAdd( aDlg[ 1 ], If( HB_ISSTRING ( cFaceName  ), cFaceName,  "MS Sans Serif" ) )
    EndIf
 
    Return( aDlg )
@@ -368,16 +368,16 @@ Function Wvt_AddDlgItem( aDlg, nTop, nLeft, nRows, nCols, aOffSet,;
 
    aDlg[ 1,4 ]++      // item count
 
-   aAdd( aDlg[  2 ] , If( ValType( nHelpId  ) == "N", nHelpId , 0                     ) )
-   aAdd( aDlg[  3 ] , If( ValType( nExStyle ) == "N", nExStyle, 0                     ) )
-   aAdd( aDlg[  4 ] , If( ValType( nStyle   ) == "N", nStyle  , WS_CHILD + WS_VISIBLE ) )
+   aAdd( aDlg[  2 ] , If( HB_ISNUMERIC( nHelpId  ), nHelpId , 0                     ) )
+   aAdd( aDlg[  3 ] , If( HB_ISNUMERIC( nExStyle ), nExStyle, 0                     ) )
+   aAdd( aDlg[  4 ] , If( HB_ISNUMERIC( nStyle   ), nStyle  , WS_CHILD + WS_VISIBLE ) )
    aAdd( aDlg[  5 ] , nX         )
    aAdd( aDlg[  6 ] , nY         )
    aAdd( aDlg[  7 ] , nW         )
    aAdd( aDlg[  8 ] , nH         )
    aAdd( aDlg[  9 ] , cnId       )
    aAdd( aDlg[ 10 ] , cnDlgClass )
-   aAdd( aDlg[ 11 ] , If( ValType( cText ) <> "C", If( ValType( cText ) == "N", cText, "" ) , cText ) )
+   aAdd( aDlg[ 11 ] , If( ! HB_ISSTRING( cText ), If( HB_ISNUMERIC( cText ), cText, "" ) , cText ) )
    aAdd( aDlg[ 12 ] , 0 )
 
    Return aDlg
@@ -387,7 +387,7 @@ Function Wvt_AddDlgItem( aDlg, nTop, nLeft, nRows, nCols, aOffSet,;
 Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu )
    LOCAL hDlg, cType, xTemplate, nDlgMode
 
-   if valtype( cbDlgProc ) == 'C'
+   if HB_ISSTRING( cbDlgProc )
       cbDlgProc := upper( cbDlgProc )
    endif
 
@@ -410,7 +410,7 @@ Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu
 
       endif
 
-      if valtype( nTimerTicks ) == 'N'
+      if HB_ISNUMERIC( nTimerTicks )
          Win_SetTimer( hDlg, 1001, nTimerTicks )
 
       endif
@@ -429,7 +429,7 @@ Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu
 Function Wvt_DialogBox( acnDlg, cbDlgProc, hWndParent )
    LOCAL nResult, cType, xTemplate, nDlgMode
 
-   if valtype( cbDlgProc ) == 'C'
+   if HB_ISSTRING( cbDlgProc )
       cbDlgProc := upper( cbDlgProc )
    endif
 
@@ -474,7 +474,7 @@ FUNCTION WVT_GetOpenFileName( hWnd, cPath, cTitle, aFilter, nFlags, cIniDir, cDe
    IF aFilter == nil
       aFilter := {}
    END
-   IF ValType( aFilter ) == "A"
+   IF HB_ISARRAY( aFilter )
       FOR n := 1 TO LEN( aFilter )
           c += aFilter[n][1] + chr(0) + aFilter[n][2] + chr(0)
       NEXT
@@ -583,13 +583,13 @@ FUNCTION Wvt_GetTitle()
 
 FUNCTION Wvt_SetIcon( ncIconRes, cIconName )
 
-   if     valtype( ncIconRes ) == 'N'
+   if HB_ISNUMERIC( ncIconRes )
       Hb_GtInfo( HB_GTI_ICONRES, ncIconRes )
 
-   elseif valtype( cIconName ) == 'C'
+   elseif HB_ISSTRING( cIconName )
       Hb_GtInfo( HB_GTI_ICONRES, cIconName )
 
-   elseif valtype( ncIconRes ) == 'C'
+   elseif HB_ISSTRING( ncIconRes )
       Hb_GtInfo( HB_GTI_ICONFILE, ncIconRes )
 
    endif

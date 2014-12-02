@@ -63,9 +63,8 @@ FUNCTION NTOC( xNum, nBase, nLenght, cPad )
    DEFAULT cPad TO " "
    DEFAULT nBase TO 10
 
-   IF ValType( xNum ) == "C"
-      xNum = Upper( AllTrim( xNum ) )
-      xNum = CTON( xNum, 16 )
+   IF HB_ISSTRING( xNum )
+      xNum := CTON( Upper( AllTrim( xNum ) ), 16 )
    ENDIF
    IF nBase > 36 .OR. nBase < 2
       RETURN ""
@@ -74,13 +73,13 @@ FUNCTION NTOC( xNum, nBase, nLenght, cPad )
    IF xNum < 0
       xNum += 4294967296
    ENDIF
-   cNum = B10TOBN( xNum, @nBase )
+   cNum := B10TOBN( xNum, @nBase )
 
    IF ISNUMBER( nLenght )
       IF Len( cNum ) > nLenght
-         cNum = Replicate( "*", nLenght )
+         cNum := Replicate( "*", nLenght )
       ELSEIF ISCHARACTER( cPad ) .AND. Len( cNum ) < nLenght
-         cNum = Replicate( cPad, nLenght - Len( cNum ) ) + cNum
+         cNum := Replicate( cPad, nLenght - Len( cNum ) ) + cNum
       ENDIF
    ENDIF
 
@@ -97,7 +96,7 @@ FUNCTION CTON( xNum, nBase, lMode )
 
       xNum := Upper( AllTrim( xNum ) )
 
-      FOR i = 1 TO Len( xNum )
+      FOR i := 1 TO Len( xNum )
          nPos := At( xNum[i], WORLD )
          IF nPos == 0 .OR. nPos > nBase
             EXIT
@@ -108,7 +107,7 @@ FUNCTION CTON( xNum, nBase, lMode )
 
       IF lMode
          IF nNum > 32767
-            nNum = nNum - 65536
+            nNum -= 65536
          ENDIF
       ENDIF
 
@@ -121,7 +120,7 @@ STATIC FUNCTION B10TOBN( nNum, nBase )
    LOCAL nInt
 
    IF nNum > 0
-   
+
       nInt := Int( nNum / nBase )
       RETURN iif( nInt == 0, "", B10TOBN( nInt, @nBase ) ) + ;
          SubStr( WORLD, ( nNum % nBase ) + 1, 1 )
@@ -140,17 +139,17 @@ FUNCTION BITTOC( nInteger, cBitPattern, lMode )
 
 
    cBitPattern := Right( cBitPattern, 16 )
-   cBinary = NTOC( nInteger, 2, 16 )
+   cBinary     := NTOC( nInteger, 2, 16 )
 
-   FOR nI = 1 TO 16
-     
+   FOR nI := 1 TO 16
+
       IF SubStr( cBinary, - nI, 1 ) == '1'
 
-         cString = SubStr( cBitPattern, - nI, 1 ) + cString
+         cString := SubStr( cBitPattern, - nI, 1 ) + cString
 
       ELSEIF lMode
-           
-         cString = ' ' + cString
+
+         cString := ' ' + cString
 
       ENDIF
 
@@ -162,14 +161,13 @@ FUNCTION CTOBIT( cCharString, cBitPattern )
 
    LOCAL nI, cString := ''
 
-   cCharString = Right( cCharString, 16 )
-   cBitPattern = Right( cBitPattern, 16 )
+   cCharString := Right( cCharString, 16 )
+   cBitPattern := Right( cBitPattern, 16 )
 
-   FOR nI = 1 TO Len( cBitPattern )
+   FOR nI := 1 TO Len( cBitPattern )
 
-      cString = IF( At( SubStr( cBitPattern, - nI, 1 ), cCharString ) > 0, '1', '0' ) + cString
+      cString := IF( At( SubStr( cBitPattern, - nI, 1 ), cCharString ) > 0, '1', '0' ) + cString
 
    NEXT
 
    RETURN CTON( cString, 2 )
-

@@ -99,8 +99,8 @@ STATIC FUNCTION __HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent, nRecursion
    LOCAL cType := ValType( xVar )
    LOCAL cString := "", cKey
 
-   DEFAULT lAssocAsObj        TO FALSE
-   DEFAULT lRecursive         TO FALSE
+   DEFAULT lAssocAsObj TO FALSE
+   DEFAULT lRecursive  TO FALSE
 
 //TraceLog( "Recursion: xVar, nRecursionLevel, nMaxRecursionLevel", xVar, nRecursionLevel, nMaxRecursionLevel )
 
@@ -178,7 +178,7 @@ STATIC FUNCTION DShowProperties( oVar, nScope, lRecursive, nIndent, nRecursionLe
 
    DEFAULT nIndent TO 0
 
-   IF ValType( oVar ) == "O"
+   IF HB_ISOBJECT( oVar )
       lOldScope := __SetClassScope( .F. )
       aMethods  := __objGetMsgFullList( oVar, .F. , HB_MSGLISTALL, nScope )
       aProps    := __objGetValueFullList( oVar, NIL, nScope )
@@ -219,7 +219,7 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent, nRecursionLevel, nMaxRecu
 
 //TraceLog( "DShowArray: aVar, lRecursive", aVar, lRecursive )
 
-   IF ValType( aVar ) == "A"
+   IF HB_ISARRAY( aVar )
       nChar := Len( LTrim( Str( Len( aVar ) ) ) )  // return number of chars to display that value
       // i.e. if Len( aVar ) == 99, then nChar := 2
       cString += Space( nIndent ) + "{" + CRLF
@@ -248,7 +248,7 @@ STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent, nRecursionLevel, nMaxRecur
 
 //TraceLog( "DShowHash: hVar, ValType( hVar ), lRecursive", hVar, ValType( hVar ), ValToPrg( hVar ), lRecursive )
 
-   IF ValType( hVar ) == "H"
+   IF HB_ISHASH( hVar )
       aKeys := HGetKeys( hVar )
       cString += Space( nIndent ) + "{" + CRLF
       FOR EACH xKey IN aKeys
@@ -339,13 +339,4 @@ STATIC FUNCTION DecodeType( nType AS NUMERIC )
 
 STATIC FUNCTION asString( x )
 
-   LOCAL v := ValType( x )
-
-   DO CASE
-   CASE v == "C"
-      RETURN '"' + x + '"'
-   OTHERWISE
-      RETURN cStr( x )
-   END CASE
-
-   RETURN( x )
+   RETURN iif( HB_ISSTRING( x ), '"' + x + '"', cStr( x ) )

@@ -55,16 +55,17 @@
 
 
 Function BOM( date)
- date := If( ValType( date) == 'D', date, Date())
+ date := If( HB_ISDATE( date ), date, Date())
  if (empty(date))
    return (date)
  endif
- Return StoD( SubStr( DtoS( date), 1, 6) + '01')
+ Return StoD( SubStr( DtoS( date ), 1, 6) + '01')
 
 
 Function EOM( date)
  Local m
- date := If( ValType( date) == 'D', date, Date())
+
+ date := If( HB_ISDATE( date ), date, Date())
  if (empty(date))
    return (date)
  endif
@@ -76,12 +77,13 @@ Function EOM( date)
 
 Function BOQ( date)
  Local boq AS DATE, m AS NUMERIC, yyyy AS STRING
- date := If( ValType( date) == 'D', date, Date())
+
+ date := If( HB_ISDATE( date ), date, Date())
  if (empty(date))
    return (date)
  endif
- yyyy := Str( Year( date), 4, 0)
- If     ( m := Month( date)) <= 3
+ yyyy := Str( Year( date ), 4, 0)
+ If     ( m := Month( date ) ) <= 3
   boq := StoD( yyyy + '0101')
  ElseIf m <= 6
   boq := StoD( yyyy + '0401')
@@ -95,7 +97,8 @@ Return boq
 
 Function EOQ( date)
  Local m AS NUMERIC, eoq AS DATE, yyyy AS STRING
- date := If( ValType( date) == 'D', date, Date())
+
+ date := If( HB_ISDATE( date ), date, Date() )
  if (empty(date))
   return (date)
  endif
@@ -113,7 +116,7 @@ Function EOQ( date)
 
 
 Function BOY( date)
- date := If( ValType( date) == 'D', date, Date())
+ date := If( HB_ISDATE( date ), date, Date())
  if (empty(date))
   return (date)
  endif
@@ -121,7 +124,7 @@ Function BOY( date)
 
 
 Function EOY( date)
- date := If( ValType( date) == 'D', date, Date())
+ date := If( HB_ISDATE( date ), date, Date())
  if (empty(date))
   return (date)
  endif
@@ -133,7 +136,7 @@ Function EOY( date)
 /*
 Function StoD( cdate)
  Local ofd := Set( _SET_DATEFORMAT, 'dd.mm.yyyy'), rvd
- cdate := If( ValType( cdate) == 'C', cdate, DtoS( Date()))
+ cdate := If( HB_ISSTRING( cdate ), cdate, DtoS( Date()))
  rvd := CtoD( SubStr( cDate, 7, 2) + '.' + SubStr( cDate, 5, 2)  + '.' + SubStr( cDate, 1, 4))
  Set( _SET_DATEFORMAT, ofd)
  Return rvd

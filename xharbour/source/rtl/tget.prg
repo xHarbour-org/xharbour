@@ -218,7 +218,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT nRow       TO Row()
    DEFAULT nCol       TO Col()
    DEFAULT cVarName   TO ""
-   DEFAULT bVarBlock  TO iif( ValType( cVarName ) == 'C', MemVarBlock( cVarName ), NIL )
+   DEFAULT bVarBlock  TO iif( HB_ISSTRING( cVarName ), MemVarBlock( cVarName ), NIL )
    DEFAULT cPicture   TO ""
    DEFAULT cColorSpec TO BuildGetColor( cColorSpec ) // SetColor()
 
@@ -715,7 +715,7 @@ METHOD DISPLAY( lForced ) CLASS Get
                               ListBox, CheckCob, PushButton or RadioGroup.
       */
 #ifdef HB_COMPAT_C53
-      IF ValType( ::Control ) != "O"
+      IF !HB_ISOBJECT( ::Control )
 #endif
          DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ), ;
             cDisplay, ;
@@ -742,7 +742,7 @@ METHOD DISPLAY( lForced ) CLASS Get
    /* 2007/SEP/14 - EF - The Caption below is only for plain get caption,
                          no object get. This display it's own ones.
    */
-   IF ValType( ::Control ) != "O"
+   IF !HB_ISOBJECT( ::Control )
 #endif
 
       IF !Empty( ::Caption )
@@ -786,7 +786,7 @@ METHOD DISPLAY( lForced ) CLASS Get
 
       ENDIF
 
-      SetPos( ::Row, nCol  )
+      SetPos( ::Row, nCol )
 
    ENDIF
 
@@ -1418,7 +1418,7 @@ METHOD overstrike( cChar ) CLASS Get
 
 // UPDATED() function previously did not return .T. even if a key press is
 // accepted.
-//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
+//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or. ;
 //                !( ::unTransform() == ::Original )
    ::Right( .F. )
 
@@ -1505,7 +1505,7 @@ METHOD Insert( cChar ) CLASS Get
 
 // UPDATED() function previously did not return .T. even if a key press is
 // accepted.
-//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
+//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or. ;
 //                !( ::unTransform() == ::Original )
    ::Right( .F. )
 
@@ -2002,7 +2002,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
       IF "E" IN cPicFunc
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", Chr( 1 ) ) + SubStr( cMask, ::LastEditable() + 1 )
-         cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cMask, ::LastEditable() + 1 )
+         cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".",      "," ) + SubStr( cMask, ::LastEditable() + 1 )
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), Chr( 1 ), "." ) + SubStr( cMask, ::LastEditable() + 1 )
       ENDIF
 
@@ -2018,7 +2018,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
       if ::lDecRev
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", Chr( 1 ) ) + SubStr( cBuffer, ::LastEditable() + 1 )
-         cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cBuffer, ::LastEditable() + 1 )
+         cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".",      "," ) + SubStr( cBuffer, ::LastEditable() + 1 )
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), Chr( 1 ), "." ) + SubStr( cBuffer, ::LastEditable() + 1 )
       ENDIF
 
@@ -2394,7 +2394,7 @@ METHOD SetPicture( cPicture ) CLASS Get
 
 METHOD HitTest( mRow, mCol ) CLASS GET
 
-   IF ( ValType( ::Control ) == "O" )
+   IF HB_ISOBJECT( ::Control )
       Return ::Control:HitTest( mRow, mCol )
    ENDIF
 
@@ -2525,15 +2525,15 @@ METHOD StopMoveH() CLASS Get
 // stop horizontal cursor movement under @L picture.
 
    LOCAL lStop := .F.
-   LOCAL nKey := LastKey()
+   LOCAL nKey  := LastKey()
 
    if ::lNumToLeft .AND. ! ::lDecPos .AND. ;
-         ( nKey == K_LEFT  .OR. ;
-         nKey == K_RIGHT .OR. ;
-         nKey == K_HOME  .OR. ;
-         nKey == K_END   .OR. ;
-         nKey == K_CTRL_RIGHT .OR. ;
-         nKey == K_CTRL_LEFT )
+      ( nKey == K_LEFT  .OR. ;
+        nKey == K_RIGHT .OR. ;
+        nKey == K_HOME  .OR. ;
+        nKey == K_END   .OR. ;
+        nKey == K_CTRL_RIGHT .OR. ;
+        nKey == K_CTRL_LEFT )
 
       if ::DecPos != NIL .AND. ::DecPos > 0
          lStop := ( ::Pos < ::DecPos )
@@ -2633,7 +2633,7 @@ STATIC FUNCTION BuildGetColor( cColorSpec )
 
    LOCAL cCur, nClrOth, nClrUns
 
-   IF ! ValType( cColorSpec ) == "C"
+   IF !HB_ISSTRING( cColorSpec )
       cColorSpec := Nil                          // Clipper compatibility
    ENDIF
 
@@ -2688,5 +2688,3 @@ STATIC FUNCTION HowMuchNumeric( cPict )
    NEXT
 
    RETURN r
-
-

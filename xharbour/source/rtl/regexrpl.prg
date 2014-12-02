@@ -156,11 +156,11 @@ FUNCTION hb_RegExStrTran( cString, cpSearch, cReplace, nStart, nCount, lCase, lN
       cReplace := ""
    ENDIF
 
-   IF !ValType( nStart ) == "N"
+   IF !HB_ISNUMERIC( nStart )
       nStart := 1
    ENDIF
 
-   IF !ValType( nCount ) == "N"
+   IF !HB_ISNUMERIC( nCount )
       nCount := 0
       lAll   := .T.
    ELSE

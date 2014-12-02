@@ -88,15 +88,15 @@ CLASS THtml
       onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
       cStyle, aImages, aServerSrc, baseURL, baseTarget, ;
       nRefresh, cRefreshURL, cStyleScr, lnocache, ;
-      nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft , lcgi )
+      nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft, lcgi )
 
    METHOD CGIClose()
 
-   METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT( lBody , .T. ), ::cStr +=  iif( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' )
+   METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT( lBody, .T. ), ::cStr +=  iif( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' )
 
-   METHOD SetTextColor( cColor, lBody ) INLINE DEFAULT( lBody , .T. ), ::cStr +=  iif( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' )
+   METHOD SetTextColor( cColor, lBody ) INLINE DEFAULT( lBody, .T. ), ::cStr +=  iif( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' )
 
-   METHOD SetBgImage( cImage, lBody ) INLINE DEFAULT( lBody , .T. ), ::cStr +=  iif( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' )
+   METHOD SetBgImage( cImage, lBody ) INLINE DEFAULT( lBody, .T. ), ::cStr +=  iif( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' )
 
    METHOD CLOSE()
 
@@ -112,13 +112,13 @@ CLASS THtml
 
    METHOD SAY( str, font, size, type, color, style )
 
-   METHOD QQOut( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+   METHOD QQOut( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c, if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
-   METHOD QOut( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+   METHOD QOut( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF(), if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
-   METHOD Write( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+   METHOD Write( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c, if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
-   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF(), if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
    METHOD SayColor( t, c ) INLINE DEFAULT( t, "" ), DEFAULT( c, "black" ), ;
       ::cStr +=  '<FONT COLOR="' + c + '">' + t + '</FONT>'
@@ -135,15 +135,15 @@ CLASS THtml
       DEFAULT( cols, 2 ), ;
       DEFAULT( gutter, 5 ), ;
       DEFAULT( width, 100 ), ;
-      ::cStr +=  '<MULTICOL COLS="' + NTRIM( cols ) + '" GUTTER="' + NTRIM( gutter ) + '" WIDTH="' + NTRIM( width ) + '">' , ;
-      ::cStr +=  txt , ;
+      ::cStr +=  '<MULTICOL COLS="' + NTRIM( cols ) + '" GUTTER="' + NTRIM( gutter ) + '" WIDTH="' + NTRIM( width ) + '">', ;
+      ::cStr +=  txt, ;
       ::cStr +=  "</MULTICOL>"
 
    METHOD PutHeading( cText, nWeight, lCentered )
 
    METHOD HLine( nSize, nWidth, lShade, cColor )
 
-   METHOD PutParagraph() INLINE ::cStr +=  "<P> </P>" + CRLF() , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+   METHOD PutParagraph() INLINE ::cStr +=  "<P> </P>" + CRLF(), if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
    METHOD Paragraph( l, c, style )
 
@@ -244,7 +244,7 @@ CLASS THtml
 
 
    METHOD MapArea( Shape, Alt, Coord, Url ) INLINE ;
-      ::cStr +=  "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() , if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
+      ::cStr +=  "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF(), if( Len( ::cStr ) >= 2048, ( FWrite( ::nh, ::cStr ),::cstr := "" ), )
 
    METHOD EndMap() INLINE ::cStr +=  "</MAP>"
 
@@ -265,7 +265,7 @@ METHOD cgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       cBaseURL, cBaseTarget, ;
       nRefresh, cRefreshURL, cStyleScr, ;
       lNocache, NOF, nMarginTop, nMarginHeight, ;
-      nMarginWidth, nMarginLeft , lCgi, cFile ) CLASS THtml
+      nMarginWidth, nMarginLeft, lCgi, cFile ) CLASS THtml
 
    ( lCgi ) /* unused variable */
 
@@ -277,7 +277,7 @@ METHOD cgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       cBaseURL, cBaseTarget, ;
       nRefresh, cRefreshURL, cStyleScr, ;
       lNocache, NOF, nMarginTop, nMarginHeight, ;
-      nMarginWidth, nMarginLeft , .T. , cFile )
+      nMarginWidth, nMarginLeft, .T., cFile )
 
 METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
@@ -287,7 +287,7 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
       cBaseURL, cBaseTarget, ;
       nRefresh, cRefreshURL, cStyleScr, ;
       lNocache, NOF, nMarginTop, nMarginHeight, ;
-      nMarginWidth, nMarginLeft , lCgi, cFile ) CLASS THtml
+      nMarginWidth, nMarginLeft, lCgi, cFile ) CLASS THtml
 
    LOCAL i
 
@@ -519,7 +519,7 @@ METHOD SetFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet ) CLASS THtml
    DEFAULT cFont TO ::fontFace
    DEFAULT nSize TO ::fontSize
    DEFAULT cColor TO ::fontColor
-   DEFAULT lset TO iif( cFont != NIL, .T. , .F. )
+   DEFAULT lset TO iif( cFont != NIL, .T., .F. )
 
    IF cFont != NIL
       cStr += ' FACE="' + cFont + '"'
@@ -569,7 +569,7 @@ METHOD SetFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet ) CLASS THtml
       FWrite( ::nh, ::cStr )
       ::cstr := ""
    ENDIF
-   
+
    RETURN Self
 
 /****
@@ -661,7 +661,7 @@ METHOD DefineFont( cFont, cType, nSize, cColor, lSet ) CLASS THtml
    DEFAULT cFont TO ::fontFace
    DEFAULT nSize TO ::fontSize
    DEFAULT cColor TO ::fontColor
-   DEFAULT lset TO iif( cFont != NIL, .T. , .F. )
+   DEFAULT lset TO iif( cFont != NIL, .T., .F. )
 
    IF cFont != NIL
       cStr += ' FACE="' + cFont + '"'
@@ -752,7 +752,7 @@ METHOD SAY( str, font, size, type, color, style ) CLASS THtml
 
    ENDIF
 
-   IF ValType( type ) == "C"
+   IF HB_ISSTRING( type )
 
       IF "<" $ type
 
@@ -854,7 +854,7 @@ METHOD Paragraph( lStart, cAlign, cStyle ) CLASS THtml
       FWrite( ::nh, ::cStr )
       ::cstr := ""
    ENDIF
-   
+
    RETURN Self
 
 /****
@@ -1035,18 +1035,18 @@ METHOD PutImageUrl( cImage, nBorder, nHeight, cUrl, ;
    ENDIF
 
    IF nBorder != NIL
-      cStr += " border = " + iif( ValType( nBorder ) == "N", NTRIM( nBorder ), nBorder ) + CRLF()
+      cStr += " border = " + iif( HB_ISNUMERIC( nBorder ), NTRIM( nBorder ), nBorder ) + CRLF()
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) == "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " height = " + NTRIM( nHeight ) + " " + CRLF()
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) == "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " height = " + nHeight + " " + CRLF()
    ENDIF
 
-   IF nWidth != NIL .AND. ValType( nWidth ) == "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " width = " + NTRIM( nWidth ) + " " + CRLF()
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) == "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " width = " + nWidth + " " + CRLF()
    ENDIF
 
@@ -1107,15 +1107,15 @@ METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, ;
       cStr += " border = " + NTRIM( nBorder )
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) == "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " height = " + NTRIM( nHeight ) + " "
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) == "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " height = " + nHeight + " "
    ENDIF
 
-   IF nWidth != NIL .AND. ValType( nWidth ) == "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " width = " + NTRIM( nWidth ) + " "
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) == "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " width = " + nWidth + " "
    ENDIF
 
@@ -1169,21 +1169,21 @@ METHOD PutImage( cImage, nBorder, nHeight, ;
       cStr += ' ALT= "' + cAlt + '"'
    ENDIF
 
-   IF nBorder != NIL .AND. ValType( nBorder ) == "N"
+   IF HB_ISNUMERIC( nBorder )
       cStr += " BORDER = " + NTRIM( nBorder )
-   ELSEIF nBorder != NIL .AND. ValType( nBorder ) == "C"
+   ELSEIF HB_ISSTRING( nBorder )
       cStr += " BORDER = " + '"' + nBorder + '"'
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) == "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " HEIGHT = " + NTRIM( nHeight ) + " "
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) == "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " HEIGHT = " + '"' + nHeight + '"'
    ENDIF
 
-   IF nWidth != NIL .AND. ValType( nWidth ) == "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " width = " + NTRIM( nWidth ) + " "
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) == "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " width = " + nWidth + " "
    ENDIF
 
@@ -1299,7 +1299,7 @@ METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, ;
       cStr += " bgcolor=" + ColorBG + ' '
    ENDIF
 
-   cStr += iif( nBorder = NIL, "border ", "border=" + NTRIM( nBorder ) + ' ' )
+   cStr += iif( nBorder == NIL, "border ", "border=" + NTRIM( nBorder ) + ' ' )
 
    IF ncellpadding != NIL
       cStr += ' CellPadding=' + NTRIM( nCellPadding )
@@ -1315,15 +1315,15 @@ METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, ;
 
    cStr += iif( xCols != NIL, " COLS=" + NTRIM( nCols ), "" )
 
-   IF nWidth != NIL .AND. ValType( nWidth ) == "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " WIDTH=" + NTRIM( nWidth )
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) == "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " WIDTH=" + '"' + nWidth + '"'
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) == "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " HEIGHT=" + NTRIM( nHeight )
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) == "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " HEIGHT=" + '"' + nHeight + '"'
    ENDIF
 
@@ -1469,7 +1469,7 @@ METHOD NewTableRow( cColor, vAling, aLing ) CLASS THtml
       FWrite( ::nh, ::cStr )
       ::cstr := ""
    ENDIF
-   
+
    RETURN Self
 
 /****
@@ -1525,9 +1525,9 @@ METHOD NewTableCell( cAlign, cColor, ;
       cStr += " VALIGN=" + cValign
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) = "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " HEIGHT=" + NTRIM( nHeight )
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) = "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " HEIGHT=" + '"' + nHeight + '"'
    ENDIF
 
@@ -1535,15 +1535,15 @@ METHOD NewTableCell( cAlign, cColor, ;
       cStr += " BACKGROUND=" + '"' + cBgPic + '"'
    ENDIF
 
-   IF nWidth != NIL .AND. ValType( nWidth ) = "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " WIDTH=" + NTRIM( nWidth )
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) = "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " WIDTH=" + '"' + nWidth + '"'
    ENDIF
 
-   IF nColspan != NIL .AND. ValType( nColspan ) = "N"
+   IF HB_ISNUMERIC( nColspan )
       cStr += " COLSPAN=" + NTRIM( nColspan )
-   ELSEIF nColspan != NIL .AND. ValType( nColspan ) = "C"
+   ELSEIF HB_ISSTRING( nColspan )
       cStr += " COLSPAN=" + '"' + nColspan + '"'
    ENDIF
 
@@ -1559,9 +1559,9 @@ METHOD NewTableCell( cAlign, cColor, ;
       cStr += ' Class ="' + cClass + '" '
    ENDIF
 
-   IF nRowspan != NIL .AND. ValType( nRowspan ) = "N"
+   IF HB_ISNUMERIC( nRowspan )
       cStr += " ROWSPAN=" + NTRIM( nRowspan )
-   ELSEIF nRowspan != NIL .AND. ValType( nRowspan ) = "C"
+   ELSEIF HB_ISSTRING( nRowspan )
       cStr += " ROWSPAN=" + '"' + nRowspan + '"'
    ENDIF
 
@@ -1597,7 +1597,7 @@ METHOD NewTableCell( cAlign, cColor, ;
       FWrite( ::nh, ::cStr )
       ::cstr := ""
    ENDIF
-   
+
    RETURN Self
 
 /****
@@ -1931,7 +1931,7 @@ METHOD Marquee( cText, cFont, cFntColor, nFntSize, ;
    ::cStr +=  'bgColor="' + cBgColor + '" '
    ::cStr +=  'scrollamount="' + NTRIM( nScrollAmt ) + '" '
    ::cStr +=  'scrolldelay="' + NTRIM( nScrollDelay ) + '" '
-   ::cStr +=  'loop=' + iif( ValType( loop ) == "N", NTRIM( loop ), loop ) + ' '
+   ::cStr +=  'loop=' + iif( HB_ISNUMERIC( loop ), NTRIM( loop ), loop ) + ' '
    ::cStr +=  'direction="' + cDirection + '" '
    ::cStr +=  iif( onMsOver != NIL, 'onMouseOver="' + onMsOver + '" ', "" )
    ::cStr +=  iif( onMsOut != NIL, 'onMouseOut="' + onMsOut + '" ', "" )
@@ -1987,7 +1987,7 @@ METHOD StartMarquee( cFont, cFntColor, nFntSize, ;
       'bgColor="' + cBgColor + '" ' + ;
       'scrollamount="' + NTRIM( nScrollAmt ) + '" ' + ;
       'scrolldelay="' + NTRIM( nScrollDelay ) + '" ' + ;
-      'loop=' + iif( ValType( loop ) == "N", NTRIM( loop ), loop ) + ' ' + ;
+      'loop=' + iif( HB_ISNUMERIC( loop ), NTRIM( loop ), loop ) + ' ' + ;
       'direction="' + cDirection + '" ' + ;
       iif( onMsOver != NIL, 'onMouseOver="' + onMsOver + '" ', "" ) + ;
       iif( onMsOut != NIL, 'onMouseOut="' + onMsOut + '" ', "" ) + ;
@@ -2142,15 +2142,15 @@ METHOD AddObject( cType, cClassid, cAling, cCode, lDisable, cCodeBase, cName, nW
       cStr += ' Name ="' + cName + '"' + CRLF()
    ENDIF
 
-   IF nHeight != NIL .AND. ValType( nHeight ) == "N"
+   IF HB_ISNUMERIC( nHeight )
       cStr += " height = " + NTRIM( nHeight ) + " " + CRLF()
-   ELSEIF nHeight != NIL .AND. ValType( nHeight ) == "C"
+   ELSEIF HB_ISSTRING( nHeight )
       cStr += " height = " + nHeight + " " + CRLF()
    ENDIF
 
-   IF nWidth != NIL .AND. ValType( nWidth ) == "N"
+   IF HB_ISNUMERIC( nWidth )
       cStr += " width = " + NTRIM( nWidth ) + " " + CRLF()
-   ELSEIF nWidth != NIL .AND. ValType( nWidth ) == "C"
+   ELSEIF HB_ISSTRING( nWidth )
       cStr += " width = " + nWidth + " " + CRLF()
    ENDIF
 
@@ -2400,33 +2400,23 @@ FUNCTION ANY2STR( xVal )
 
 FUNCTION HTMLANY2STR( xVal )
 
-   LOCAL xRet := NIL
+   SWITCH ValType( xVal )
+   CASE "C"
+      RETURN iif( Empty( xVal ), ".", xVal )
+   CASE "N"
+      RETURN AllTrim( Str( xVal ) )
+   CASE "O"
+      RETURN "<" + xVal:CLASSNAME() + ">"
+   CASE "D"
+      RETURN DToC( xVal )
+   CASE "L"
+      RETURN LTOC( xVal )
+   CASE "B"
+      RETURN "{||...}"
+   CASE "U"
+      RETURN "NIL"
+   DEFAULT
+      RETURN "<Unknown Value>"
+   ENDSWITCH
 
-   IF ValType( xVal ) == "C"
-      xRet := iif( Empty( xVal ), ".", xVal )
-
-   ELSEIF ValType( xVal ) == "N"
-      xRet := AllTrim( Str( xVal ) )
-
-   ELSEIF ValType( xVal ) == "O"
-      xRet := "<" + xVal:CLASSNAME() + ">"
-
-   ELSEIF ValType( xVal ) == "D"
-      xRet := DToC( xVal )
-
-   ELSEIF ValType( xVal ) == "L"
-      xRet := LTOC( xVal )
-
-   ELSEIF ValType( xVal ) == "B"
-      xRet := "{||...}"
-
-   ELSEIF ValType( xVal ) == NIL
-      xRet := "NIL"
-
-   ELSEIF ValType( xVal ) == "U"
-      xRet := "<Unknown Value>"
-
-   ENDIF
-
-   RETURN ( xRet )
-
+   RETURN xVal

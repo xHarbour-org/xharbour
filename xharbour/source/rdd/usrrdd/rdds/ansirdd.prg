@@ -59,7 +59,7 @@ STATIC FUNCTION ANSI_GETVALUE( nWA, nField, xValue )
 
    LOCAL nResult := UR_SUPER_GETVALUE( nWA, nField, @xValue )
 
-   IF nResult == SUCCESS .AND. ValType( xValue ) == 'C'
+   IF nResult == SUCCESS .AND. HB_ISSTRING( xValue )
       xValue := hb_OEMToANSI( xValue )
    ENDIF
 
@@ -67,7 +67,7 @@ STATIC FUNCTION ANSI_GETVALUE( nWA, nField, xValue )
 
 STATIC FUNCTION ANSI_PUTVALUE( nWA, nField, xValue )
 
-   IF ValType( xValue ) == 'C'
+   IF HB_ISSTRING( xValue )
       xValue := hb_ANSIToOEM( xValue )
    ENDIF
 
@@ -80,8 +80,8 @@ FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
    LOCAL aANSIFunc[ UR_METHODCOUNT ]
 
-   aANSIFunc[ UR_GETVALUE ]     := ( @ANSI_GETVALUE() )
-   aANSIFunc[ UR_PUTVALUE ]     := ( @ANSI_PUTVALUE() )
+   aANSIFunc[ UR_GETVALUE ] := ( @ANSI_GETVALUE() )
+   aANSIFunc[ UR_PUTVALUE ] := ( @ANSI_PUTVALUE() )
 
    RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'BMDBFCDX', aANSIFunc )
 

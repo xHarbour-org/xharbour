@@ -68,23 +68,23 @@
 
 //----------------------------------------------------------------------------------------------------
 
-FUNCTION DiskFormat( cDrive, nCapacity, cUDF, cBootText, nRepetitions, cLabel , lBoot , lQuickFormat )
+FUNCTION DiskFormat( cDrive, nCapacity, cUDF, cBootText, nRepetitions, cLabel, lBoot, lQuickFormat )
 
 //----------------------------------------------------------------------------------------------------
    LOCAL cCommand, uScreen, nErr
 
-   DEFAULT( @cDrive, "A" )          // floppy A
-   DEFAULT( @nCapacity , 0 )       // max floppy capacity
+   DEFAULT( @cDrive, "A" )         // floppy A
+   DEFAULT( @nCapacity, 0 )        // max floppy capacity
 
 // CT compatibility
    DEFAULT( @cUDF, "" )            // by default, no UDF is called.
    DEFAULT( @cBootText, "" )       // no boot text message.
-   DEFAULT( @nRepetitions, 1 )      // one repetition if format fail.
+   DEFAULT( @nRepetitions, 1 )     // one repetition if format fail.
 
 // xHarbour extensions.
    DEFAULT( @cLabel, " " )         // without label.
    DEFAULT( @lBoot, .F. )          // only for Win95/98/ME
-   DEFAULT( @lQuickFormat , .F. )  // force full format.
+   DEFAULT( @lQuickFormat, .F. )   // force full format.
 
 /*
 NOTE:
@@ -103,23 +103,23 @@ December/2004 - EF
 
    nErr := 0
 
-   IF ValType( cDrive ) != "C"
+   IF !HB_ISSTRING( cDrive )
       cDrive := "A"
    ENDIF
 
-   IF ValType( cLabel ) != "C"
+   IF !HB_ISSTRING( cLabel )
       cLabel := " "
    ENDIF
 
-   IF ValType( lBoot ) != "L"
+   IF !HB_ISLOGICAL( lBoot )
       lBoot := .F.
    ENDIF
 
-   IF ValType( lQuickFormat ) != "L"
+   IF !HB_ISLOGICAL( lQuickFormat )
       lQuickFormat := .F.
    ENDIF
-   
-   IF ValType( nCapacity ) != "N"
+
+   IF !HB_ISNUMERIC( nCapacity )
       nCapacity := 0
    ENDIF
 
@@ -196,12 +196,12 @@ December/2004 - EF
 
 //-----------------------------------
 
-FUNCTION DiskReady( cDrive , lMode )
+FUNCTION DiskReady( cDrive, lMode )
 
 //-----------------------------------
    LOCAL lReturn, cDsk, cCurDsk
 
-   DEFAULT( @lMode , .F. )
+   DEFAULT( @lMode, .F. )
 // lMode -> True = Windows/DOS mode. If a disk is not ready, open a dialog.
 //          False = Bios mode. If a disk is not ready don´t open a dialog.
 
@@ -209,7 +209,7 @@ FUNCTION DiskReady( cDrive , lMode )
 
    cDsk := _Drive( cDrive )
 
-   IF ValType( lMode ) != "L"
+   IF !HB_ISLOGICAL( lMode )
       lMode := .F.
    ENDIF
 
@@ -228,24 +228,24 @@ FUNCTION DiskReady( cDrive , lMode )
 
 //------------------------------------
 
-FUNCTION DiskReadyW( cDrive , lMode )
+FUNCTION DiskReadyW( cDrive, lMode )
 
 //------------------------------------
-   LOCAL cDsk, nHd, cFile, lReturn := .F. , cCurrent := DiskName()
+   LOCAL cDsk, nHd, cFile, lReturn := .F., cCurrent := DiskName()
 
-   DEFAULT( @lMode  , .T. )
+   DEFAULT( @lMode, .T. )
 // lMode -> Windows/DOS write ready mode. Same as DiskReady().
 
    cDsk := _Drive( cDrive )
 
-   IF ValType( lMode ) != "L"
+   IF !HB_ISLOGICAL( lMode )
       lMode := .T.
    ENDIF
 
    IF lMode
       IF DiskChange( cDsk )
          cFile := "wwxxyyzz.xyz"
-         nHd := FCreate( cFile , 0 )
+         nHd := FCreate( cFile, 0 )
          IF nHd > 0
             FClose( nHd )
             FErase( cFile )
@@ -276,10 +276,10 @@ FUNCTION DiskFree( cDrive )
        * so it's need to save the full path before call hb_DiskSpace and restore
        * them after.
        */
-      nRet := hb_DiskSpace( cDsk , HB_DISK_FREE )
+      nRet := hb_DiskSpace( cDsk, HB_DISK_FREE )
    ENDIF
 
-   IF !( DirName() == cCurDir )
+   IF DirName() != cCurDir
       DirChange( cCurPath )
    ENDIF
 
@@ -304,10 +304,10 @@ FUNCTION DiskTotal( cDrive )
        * so it's need to save the full path before call hb_DiskSpace and restore
        * them after.
        */
-      nRet := hb_DiskSpace( cDsk , HB_DISK_TOTAL )
+      nRet := hb_DiskSpace( cDsk, HB_DISK_TOTAL )
    ENDIF
 
-   IF !( DirName() == cCurDir )
+   IF DirName() != cCurDir
       DirChange( cCurPath )
    ENDIF
 
@@ -332,10 +332,10 @@ FUNCTION DiskUsed( cDrive )
        * so it's need to save the full path before call hb_DiskSpace and restore
        * them after.
        */
-      nRet := hb_DiskSpace( cDsk , HB_DISK_USED )
+      nRet := hb_DiskSpace( cDsk, HB_DISK_USED )
    ENDIF
 
-   IF !( DirName() == cCurDir )
+   IF DirName() != cCurDir
       DirChange( cCurPath )
    ENDIF
 
@@ -359,7 +359,7 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
    LOCAL cInvalid := ""
    LOCAL nDecimalPoint
    LOCAL nFileLen
- 
+
    DEFAULT cFileName TO ""
    DEFAULT nMaxName  TO 8      // max file name len.
    DEFAULT nMaxExt   TO 3      // max extension name len.
@@ -395,18 +395,18 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
       lWithoutExt := .T.
    ENDIF
 
- 
+
    FOR i := 0 TO 255
       IF ( i >= 0  .AND. i <= 32 ) .OR. ;
-            i = 34 .OR. ;
-            ( i >= 42 .AND. i <= 44 ) .OR. ;
-            ( i >= 46 .AND. i <= 47 ) .OR. ;
-            ( i >= 58 .AND. i <= 63 ) .OR. ;
-            ( i >= 91 .AND. i <= 93 ) .OR. ;
-            i = 124 .OR. i = 127
+           i == 34 .OR. ;
+           ( i >= 42 .AND. i <= 44 ) .OR. ;
+           ( i >= 46 .AND. i <= 47 ) .OR. ;
+           ( i >= 58 .AND. i <= 63 ) .OR. ;
+           ( i >= 91 .AND. i <= 93 ) .OR. ;
+           i == 124 .OR. i == 127
 
          cInvalid += Chr( i )
-       
+
       ENDIF
    NEXT
 
@@ -415,15 +415,15 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
    ENDIF
 
    cFileName := RTrim( cFileName )
- 
+
    nDecimalPoint := At( ".", cFileName )
    nFileLen      := Len( cFileName )
 
-   IF nFileLen = 0 .OR. nFileLen > ( nMaxName + nMaxExt + 1 )
+   IF nFileLen == 0 .OR. nFileLen > ( nMaxName + nMaxExt + 1 )
       lRet := .F.
    ELSEIF nDecimalPoint > ( nMaxName + 1 )
       lRet := .F.
-   ELSEIF nDecimalPoint > 0 .AND. nMaxExt = 0
+   ELSEIF nDecimalPoint > 0 .AND. nMaxExt == 0
       lRet := .F.
    ELSEIF nDecimalPoint > 0 .AND. nDecimalPoint <= ( nMaxName + 1 )
       cName := SubStr( cFileName, 1, nDecimalPoint - 1 )
@@ -431,11 +431,11 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
       IF Empty( cName ) .OR. ( !lWithoutExt .AND. Empty( cExt ) )
          lRet := .F.
       ENDIF
-   ELSEIF nDecimalPoint = 0 .AND. !lWithoutExt
+   ELSEIF nDecimalPoint == 0 .AND. !lWithoutExt
       lRet := .F.
-   ELSEIF nDecimalPoint = 0 .AND. nFileLen > nMaxName
+   ELSEIF nDecimalPoint == 0 .AND. nFileLen > nMaxName
       lRet := .F.
-   ELSEIF nDecimalPoint = 0 .AND. nFileLen <= nMaxName
+   ELSEIF nDecimalPoint == 0 .AND. nFileLen <= nMaxName
       cName := cFileName
    ENDIF
 
@@ -452,7 +452,7 @@ nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
       IF lRet .AND. ( Empty( cExt ) .AND. !lWithoutExt )
          lRet := .F.
       ENDIF
- 
+
       IF lRet .AND. !Empty( cExt )
          IF Len( cExt ) > nMaxExt
             lRet := .F.
@@ -516,12 +516,12 @@ FUNCTION FloppyType( cDrive )
 
 //-------------------------------------------------
 
-FUNCTION RenameFile( cOldFileName , cNewFileName )
+FUNCTION RenameFile( cOldFileName, cNewFileName )
 
 //-------------------------------------------------
 // FileMove function source is in "xharbour/source/ct/disk.c"
 
-   RETURN ( FileMove( cOldFileName , cNewFileName )  )
+   RETURN ( FileMove( cOldFileName, cNewFileName ) )
 
 FUNCTION TempFile( cDir, cExt, nAttr )
 
@@ -532,7 +532,7 @@ FUNCTION TempFile( cDir, cExt, nAttr )
    IF cDir == nil
       cDir := CurDirX()
    ENDIF
-   nFileHandle := hb_FTempCreate( cDir, , nAttr, @cFileName )
+   nFileHandle := hb_FTempCreate( cDir,, nAttr, @cFileName )
    IF nFileHandle > 0
       FClose( nFileHandle )
       nAt := RAt( ".", cFileName )

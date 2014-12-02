@@ -159,13 +159,17 @@ FUNCTION HB_BldLogMsg( ... )
    LOCAL cMsg := ""
 
    FOR EACH xVar IN hb_AParams()
-      IF ValType( xVar ) == "N"
+      SWITCH ValType( xVar )
+      CASE "N"
          cMsg += AllTrim( CStr( xVar ) )
-      ELSEIF ValType( xVar ) != "C"
-         cMsg += CStr( xVar )
-      ELSE
+         EXIT
+      CASE "C"
          cMsg += xVar
-      ENDIF
+         EXIT
+      DEFAULT
+         cMsg += CStr( xVar )
+         EXIT
+      END SWITCH
 
       IF HB_EnumIndex() < PCount()
          cMsg += " "
@@ -568,7 +572,7 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
          IF FRename( ::cFileName, ::cFileName + ".000" ) == 0
             ::nFileHandle := FCreate( ::cFileName )
             FWrite( ::nFileHandle, HB_BldLogMsg( HB_LogDateStamp(), Time(), "LogFile: Reopening file due to size limit breaking", hb_osNewLine() ) )
-            
+
             // FCreate leaves the file open in exclusive mode
             // so we close the new handle and open the file in shared mode
             FClose( ::nFileHandle )

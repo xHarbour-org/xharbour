@@ -72,7 +72,7 @@
 //   2. '- 1' for numeric literals.
 //   3. wrongly breaks line: 'FUNCTION Hello( /* comment */ )'
 //   4. INIT PROCEDURE/EXIT PROCEDURE are not recognized as PROCEDURE statement
-//   5. ".T.," / ".F.," gets wrongly corrected to ".T. ," / ".F. ,"
+//   5. ".T.," / ".F.," gets wrongly corrected to ".T., " / ".F., "
 //   6. "end class" is converted to "end CLASS" instead of "END CLASS"
 //   7. in PP commands "<var>" should not be converted to "< var >"
 
@@ -116,15 +116,15 @@ CREATE CLASS HBFORMATCODE
    VAR cCommands      INIT  ","
    VAR cClauses       INIT  ","
    VAR cFunctions     INIT  ","
-   VAR aContr         INIT { { "if"    , ""        , "|else|elseif|"   , "endif"     },;
-                             { "do"    , "while"   , ""                , "enddo"     },;
-                             { "while" , ""        , ""                , "enddo"     },;
-                             { "for"   , ""        , ""                , "next"      },;
-                             { "do"    , "case"    , "|case|otherwise|", "endcase"   },;
-                             { "with"  , "object"  , ""                , "end"       },;
-                             { "begin" , "sequence", "|recover|"       , "end"       },;
-                             { "try"    , ""       , "|catch|finally|" , "end"       },;
-                             { "switch" , ""       , "|case|otherwise|default|", "endswitch" } }
+   VAR aContr         INIT { { "if"     , ""        , "|else|elseif|"           , "endif"     }, ;
+                             { "do"     , "while"   , ""                        , "enddo"     }, ;
+                             { "while"  , ""        , ""                        , "enddo"     }, ;
+                             { "for"    , ""        , ""                        , "next"      }, ;
+                             { "do"     , "case"    , "|case|otherwise|"        , "endcase"   }, ;
+                             { "with"   , "object"  , ""                        , "end"       }, ;
+                             { "begin"  , "sequence", "|recover|"               , "end"       }, ;
+                             { "try"    , ""        , "|catch|finally|"         , "end"       }, ;
+                             { "switch" , ""        , "|case|otherwise|default|", "endswitch" } }
 
    VAR bCallback
 
@@ -168,19 +168,19 @@ METHOD New( aParams, cIniName ) CLASS HBFORMATCODE
    IF !( Right( ::cCommands, 1 ) == "," )
       ::cCommands += ","
    ENDIF
-   ::cCommands += "IF,ELSEIF,ELSE,ENDIF,END,DO,WHILE,ENDDO,WITH,CASE,OTHERWISE,ENDCASE,BEGIN," +;
-                  "FUNCTION,GLOBAL,PROCEDURE,RETURN,CLASS,ENDCLASS,METHOD,DATA,LOCAL,PRIVATE,PUBLIC,STATIC,FIELD,MEMVAR,PARAMETERS,DECLARE," +;
-                  "ACCEPT,APPEND,AVERAGE,CLEAR,CLOSE,COMMIT,CONTINUE,COPY,COUNT,CREATE,DEFAULT," +;
-                  "DELETE,DISPLAY,EJECT,ERASE,EXIT,FOR,GO,GOTO,INDEX,INPUT,JOIN,KEYBOARD,LABEL,LIST,LOCATE," +;
-                  "LOOP,MENU,NEXT,PACK,PRINT,QUIT,READ,RECALL,REINDEX,RELEASE,RENAME,REQUEST,REPLACE,RESTORE," +;
+   ::cCommands += "IF,ELSEIF,ELSE,ENDIF,END,DO,WHILE,ENDDO,WITH,CASE,OTHERWISE,ENDCASE,BEGIN," + ;
+                  "FUNCTION,GLOBAL,PROCEDURE,RETURN,CLASS,ENDCLASS,METHOD,DATA,LOCAL,PRIVATE,PUBLIC,STATIC,FIELD,MEMVAR,PARAMETERS,DECLARE," + ;
+                  "ACCEPT,APPEND,AVERAGE,CLEAR,CLOSE,COMMIT,CONTINUE,COPY,COUNT,CREATE,DEFAULT," + ;
+                  "DELETE,DISPLAY,EJECT,ERASE,EXIT,FOR,GO,GOTO,INDEX,INPUT,JOIN,KEYBOARD,LABEL,LIST,LOCATE," + ;
+                  "LOOP,MENU,NEXT,PACK,PRINT,QUIT,READ,RECALL,REINDEX,RELEASE,RENAME,REQUEST,REPLACE,RESTORE," + ;
                   "RUN,SAVE,SEEK,SELECT,SET,SKIP,SORT,STORE,SUM,TEXT,TOTAL,UNLOCK,USE,WAIT,ZAP,"
 
    IF !( Right( ::cClauses, 1 ) == "," )
       ::cClauses += ","
    ENDIF
-   ::cClauses += "ADDITIVE,ALIAS,ALL,BLANK,BOTTOM,BOX,COLOR,DATE,DELETED,EACH,EXTENDED,EXCLUSIVE,FROM,GET," +;
-                 "RANGE,READONLY,REST,SAY,SCREEN,ALTERNATE,BELL,CENTURY,CONFIRM,CONSOLE,CURSOR,DECIMALS,DELIMITERS,DEVICE,EPOCH,ESCAPE," +;
-                 "EXACT,EXCLUSIVE,FILTER,FIXED,FORMAT,INTENSITY,KEY,LIKE,MARGIN,MESSAGE,NEW,OFF,ON,ORDER,PATH,PICTURE,PRINTER,PROMPT," +;
+   ::cClauses += "ADDITIVE,ALIAS,ALL,BLANK,BOTTOM,BOX,COLOR,DATE,DELETED,EACH,EXTENDED,EXCLUSIVE,FROM,GET," + ;
+                 "RANGE,READONLY,REST,SAY,SCREEN,ALTERNATE,BELL,CENTURY,CONFIRM,CONSOLE,CURSOR,DECIMALS,DELIMITERS,DEVICE,EPOCH,ESCAPE," + ;
+                 "EXACT,EXCLUSIVE,FILTER,FIXED,FORMAT,INTENSITY,KEY,LIKE,MARGIN,MESSAGE,NEW,OFF,ON,ORDER,PATH,PICTURE,PRINTER,PROMPT," + ;
                  "PROTECTED,RELATION,SCOREBOARD,SEQUENCE,SOFTSEEK,STEP,STRUCTURE,TYPEAHEAD,UNIQUE,WRAP,TAG,TO,TOP,VALID,WHEN,"
 
    IF !( Right( ::cFunctions, 1 ) == "," )
@@ -341,15 +341,15 @@ METHOD Reformat( aFile ) CLASS HBFORMATCODE
                         RETURN .F.
                      ENDIF
                   ELSEIF nLenToken >= 4 .AND. ( ;
-                        LEFTEQUAL( "local", cToken1 ) .OR. ;
-                        LEFTEQUAL( "private", cToken1 ) .OR. ;
-                        LEFTEQUAL( "public", cToken1 ) .OR. ;
-                        LEFTEQUAL( "field", cToken1 ) .OR. ;
-                        LEFTEQUAL( "static", cToken1 ) .OR. ;
-                        LEFTEQUAL( "global", cToken1 ) .OR. ;
-                        LEFTEQUAL( "memvar", cToken1 ) .OR. ;
+                        LEFTEQUAL( "local",      cToken1 ) .OR. ;
+                        LEFTEQUAL( "private",    cToken1 ) .OR. ;
+                        LEFTEQUAL( "public",     cToken1 ) .OR. ;
+                        LEFTEQUAL( "field",      cToken1 ) .OR. ;
+                        LEFTEQUAL( "static",     cToken1 ) .OR. ;
+                        LEFTEQUAL( "global",     cToken1 ) .OR. ;
+                        LEFTEQUAL( "memvar",     cToken1 ) .OR. ;
                         LEFTEQUAL( "parameters", cToken1 ) .OR. ;
-                        LEFTEQUAL( "declare", cToken1 ) )
+                        LEFTEQUAL( "declare",    cToken1 ) )
                      IF nStatePrev == RF_STATE_FUNC
                         nState := RF_STATE_VAR
                      ENDIF
@@ -654,12 +654,12 @@ METHOD ConvertCmd( cLine, nBegin, nEnd, lFirstOnly ) CLASS HBFORMATCODE
 
    IF ::lCase
       default lFirstOnly to .F.
-      IF ( ( nPos := At( "," + cToken, ::cCommands ) ) != 0 .AND. ( Len( cToken ) >= 4 ;
-            .OR. SubStr( ::cCommands, nPos + Len( cToken ) + 1, 1 ) == "," ) ) ;
-            .OR. ;
-            ( ! lFirstOnly .AND. ;
-            ( nPos := At( "," + cToken, ::cClauses ) ) != 0 .AND. ( Len( cToken ) >= 4 ;
-            .OR. SubStr( ::cClauses, nPos + Len( cToken ) + 1, 1 ) == "," ) )
+      IF ( ( nPos := At( "," + cToken, ::cCommands ) ) != 0 ;
+      	    .AND. ( Len( cToken ) >= 4 ;
+	           .OR. SubStr( ::cCommands, nPos + Len( cToken ) + 1, 1 ) == "," ) ) ;
+          .OR. ( ! lFirstOnly .AND. ( nPos := At( "," + cToken, ::cClauses ) ) != 0 ;
+	        .AND. ( Len( cToken ) >= 4 ;
+		       .OR. SubStr( ::cClauses, nPos + Len( cToken ) + 1, 1 ) == "," ) )
          IF ::nCaseCmd > 0
             IF ::nCaseCmd > 1
                cToken := iif( ::nCaseCmd == 2, Lower( cToken ), Left( cToken, 1 ) + ;
@@ -824,7 +824,7 @@ METHOD Array2File( cFileName, aFile ) CLASS HBFORMATCODE
    IF Empty( ::cExtSave )
       cBakName := cName + iif( Left( ::cExtBack, 1 ) == ".", "", "." ) + ::cExtBack
       uRet := __CopyFile( cFileName, cBakName )
-      IF Valtype( uRet ) == "L" .AND. ! uRet
+      IF HB_ISLOGICAL( uRet ) .AND. ! uRet
          RETURN .F.
       ENDIF
       //IF hb_FCopy( cFileName, cBakName ) == F_ERROR

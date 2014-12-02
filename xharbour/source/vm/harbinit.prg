@@ -110,19 +110,19 @@ PROCEDURE __MinimalErrorHandler( oError )
 
    LOCAL cError := "Error!" + EOL
 
-   IF ValType( oError:Operation ) == 'C'
+   IF HB_ISSTRING( oError:Operation )
       cError += "Operation: " + oError:Operation + EOL
    ENDIF
-   IF ValType( oError:Description ) == 'C'
+   IF HB_ISSTRING( oError:Description )
       cError += "Description: " + oError:Description + EOL
    ENDIF
-   IF ValType( oError:ModuleName ) == 'C'
+   IF HB_ISSTRING( oError:ModuleName )
       cError += "Source: " + oError:ModuleName + EOL
    ENDIF
-   IF ValType( oError:ProcName ) == 'C'
+   IF HB_ISSTRING( oError:ProcName )
       cError += "Procedure: " + oError:ProcName + EOL
    ENDIF
-   IF ValType( oError:ProcLine ) == 'N'
+   IF HB_ISNUMERIC( oError:ProcLine )
       cError += "Line: " + LTrim( Str( oError:ProcLine ) ) + EOL
    ENDIF
 

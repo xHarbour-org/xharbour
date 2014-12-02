@@ -322,8 +322,7 @@ METHOD HitTest( nRow, nCol ) CLASS TopBarMenu
    IF ::row == nRow
       FOR EACH aItems IN ::aItems
          IF nCol >= aItems:column .AND. ;
-               nCol <= aItems:column + Len( aItems:caption ) .AND. ;
-                       aItems:enabled
+            nCol <= aItems:column + Len( aItems:caption ) .AND. aItems:enabled
             RETURN HB_EnumIndex()
          ENDIF
       next
@@ -340,7 +339,7 @@ METHOD InsItem( nPos, oItem ) CLASS TopBarMenu
       ::itemCount++
 
       For n := nPos to ::itemCount
-          ::aItems[ n ]:column := ::aItems[ n - 1 ]:column + Len( StrTran( ::aItems[ n -1 ]:caption, "&", "" ) ) + 2
+         ::aItems[ n ]:column := ::aItems[ n - 1 ]:column + Len( StrTran( ::aItems[ n -1 ]:caption, "&", "" ) ) + 2
       NEXT
 
    ENDIF
@@ -349,8 +348,8 @@ RETURN Self
 
 //--------------------------------------------------------------------------//
 METHOD _Select( nPos ) CLASS TopBarMenu
-   IF ( nPos > 0 .AND. nPos <= ::itemCount ) .AND. ;
-         nPos != ::current .AND. ::aItems[ nPos ]:enabled
+   IF nPos > 0 .AND. nPos <= ::itemCount .AND. ;
+      nPos != ::current .AND. ::aItems[ nPos ]:enabled
 
       IF ::current > 0
          IF ::aItems[ ::current ]:isPopUp()
@@ -468,7 +467,7 @@ RETURN iIF( nIndex > 0, SubStr( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", nIndex, 1 ), "" )
 ***/
 METHOD IsShortCut( nKey, nID ) CLASS TopBarMenu
 
-      RETURN ( ::IsQuick( nKey, @nID ) )
+      RETURN ::IsQuick( nKey, @nID )
 
 
 /***
@@ -484,28 +483,28 @@ METHOD IsQuick( nKey, nID ) CLASS TopBarMenu
 
    LOCAL nItem, nTotal, nShortCut, oItem // , i
 
-   IF ( ( nShortCut := ::GetShortCt( nKey ) ) == 0 )
+   IF ( nShortCut := ::GetShortCt( nKey ) ) == 0
       nTotal := ::ItemCount
 
       FOR nItem := 1 TO nTotal
-         IF ( !( oItem := ::GetItem( nItem ) ):Enabled )
-         ELSEIF ( !( oItem:IsPopUp() ) )
-         ELSEIF ( oItem:Data:IsQuick( nKey, @nID ) )
-            RETURN ( .T. )
+         IF !( oItem := ::GetItem( nItem ) ):Enabled
+         ELSEIF !( oItem:IsPopUp() )
+         ELSEIF oItem:Data:IsQuick( nKey, @nID )
+            RETURN .T.
          ENDIF
       NEXT
 
-   ELSEIF ( !( oItem := ::GetItem( nShortCut ) ):IsPopUp() )
+   ELSEIF !( oItem := ::GetItem( nShortCut ) ):IsPopUp()
       IF oItem:Enabled
          ::Select( nShortCut )
          EVAL( oItem:Data, oItem )
          nID := oItem:ID
-         RETURN ( .T. )
+         RETURN .T.
       ENDIF
 
    ENDIF
 
-   RETURN ( .F. )
+   RETURN .F.
 
 /***
 *  ModalGet
@@ -523,7 +522,7 @@ RETURN ::Modal( nSelect, oMsg:Row, oMsg:Left, oMsg:Right, oMsg:Color )
 *
 ***/
 METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
-                    cMsgColor, GetList ) CLASS TopBarMenu
+              cMsgColor, GetList ) CLASS TopBarMenu
 
    LOCAL nKey, nNewItem, lLeftDown, oNewMenu, nNewLevel, ;
          nEvent, oMenuItem, nMenuItem, nRETURN, oMenuMsg, ;
@@ -577,7 +576,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
    ::Select( nSelection )
    ::Display()
 
-   IF ( !::GetItem( nSelection ):Enabled )
+   IF !::GetItem( nSelection ):Enabled
       // Restore system entry state settings from file-wide array:
       // saStatics := ACLONE( aSavMenuSys )
       RETURN ( 0 )
@@ -613,12 +612,12 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
       case K_MOUSEMOVE
          //====== mouse movement.
 
-         IF ( lLeftDown )
+         IF lLeftDown
             // Changed '!HitTest' to '!MHitTest':
             IF ( ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem ) )
                //------------ hit nowhere.
 
-            ELSEIF ( nNewLevel != ::nMenuLevel )
+            ELSEIF nNewLevel != ::nMenuLevel
                //------------ menu level change.
 
                IF ( nNewItem == oNewMenu:Current )
@@ -631,12 +630,12 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                   oMenuMsg:Show( Self, .T. )
                ENDIF
 
-            ELSEIF ( nNewItem != oNewMenu:Current() )
+            ELSEIF nNewItem != oNewMenu:Current()
                //------------ menu item change.
 
                ::PopChild( ::nMenuLevel )
 
-               IF ( ::oMenu:GetItem( nNewItem ):Enabled )
+               IF ::oMenu:GetItem( nNewItem ):Enabled
                   ::oMenu:Select( nNewItem )
                   ::oMenu:Display()
                   ::PushMenu( .T. )
@@ -707,7 +706,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          //====== right arrow key.
          /* Reset PopUp MenuItem to 1:
          ::aPopUp[ ::nMenuLevel ] := 1 */
-         IF ( lSubMenu := ::nMenuLevel > 1 )
+         IF lSubMenu := ::nMenuLevel > 1
             /* Test !PopMenu() to determine calling PopAll():
             IF !( ::PopMenu() )
                ::PopAll()
@@ -732,7 +731,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
       case K_ENTER
          //====== enter key .
 
-         IF ( ::PushMenu( .T. ) )
+         IF ::PushMenu( .T. )
             oMenuMsg:Show( Self, .T. )
 
          ELSE
@@ -745,7 +744,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
             ENDIF
             ::Select(nSave)
 // A menu should always exit after an execute call (Clipper compatibility)
-//            IF ( nRETURN != 0 )
+//            IF nRETURN != 0
                lWhile := .F.
                ::Current:=0
                EXIT
@@ -777,10 +776,10 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          //====== mouse left button press.
 
          // Changed '!HitTest' to '!MHitTest':
-         IF ( ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem ) )
+         IF ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem )
             // Added the following to test Get System HitTest():
-            IF ( !( GetList == NIL ) .AND. ;
-               HitTest( GetList, MRow(), MCol(), oMenuMsg:aMsg ) != 0 )
+            IF !( GetList == NIL ) .AND. ;
+               HitTest( GetList, MRow(), MCol(), oMenuMsg:aMsg ) != 0
                GETACTIVE():ExitState := GE_MOUSEHIT
                // Reset Get System values:
                // ReadStats( SNLASTEXIT, GE_MOUSEHIT )
@@ -800,7 +799,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                ::PopMenu()
             ENDIF
 
-         ELSEIF ( nNewLevel == ::nMenuLevel )
+         ELSEIF nNewLevel == ::nMenuLevel
             ::oMenu:Select( nNewItem )
             ::oMenu:Display()
             ::PushMenu(.T.)
@@ -812,11 +811,11 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 
             nMenuItem := ::oMenu:Current
             //oMenuItem := ::oMenu:GetItem( nMenuItem )
-            IF ( ( oMenuItem := ::oMenu:GetItem( ::oMenu:Current ) ):IsPopUp() )
+            IF ( oMenuItem := ::oMenu:GetItem( ::oMenu:Current ) ):IsPopUp()
                oMenuItem:Data:Close()
             ENDIF
 
-            IF !( nMenuItem == nNewItem )
+            IF nMenuItem != nNewItem
                //nMenuItem := nNewItem
                ::oMenu:Select( nNewItem )
                ::oMenu:Display()
@@ -836,12 +835,12 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 
          // Changed '!HitTest' to '!MHitTest':
          IF ( ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem ) )
-         ELSEIF ( nNewLevel == ::nMenuLevel )
-            IF ( nNewItem == ::oMenu:Current )
+         ELSEIF nNewLevel == ::nMenuLevel
+            IF nNewItem == ::oMenu:Current
                oMenuMsg:Show( Self, .F. )
                nRETURN := ::Execute()
 // A menu should always exit after an execute call (Clipper compatibility)
-//               IF ( nRETURN != 0 )
+//               IF nRETURN != 0
                   lWhile := .F.
                   EXIT
 //               ENDIF
@@ -851,9 +850,9 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 
             /* This may not be necessary:
             nNewItem := ::oMenu:GetFirst()
-            IF ( nNewItem == 0 )
+            IF nNewItem == 0
             ELSE
-               ::oMenu:Select(  nNewItem )
+               ::oMenu:Select( nNewItem )
                ::oMenu:Display()
                oMenuMsg:Show( Self, .T. )
             ENDIF */
@@ -863,7 +862,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 
       Default
 
-         IF ( ( nNewItem := ::oMenu:GetAccel( nKey ) ) != 0 )
+         IF ( nNewItem := ::oMenu:GetAccel( nKey ) ) != 0
             //=== check for menu item accelerator key.
 
             IF ::oMenu:GetItem( nNewItem ):Enabled
@@ -885,12 +884,11 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 //                  ENDIF
                ENDIF
                oMenuMsg:Show( Self, .T. )
-
             ENDIF
 
          ELSEIF ::IsShortCut( nKey, @nRETURN )
 
-            IF ( nRETURN != 0 )
+            IF nRETURN != 0
                lWhile := .F.
                EXIT
             ENDIF
@@ -933,7 +931,6 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                oMenuMsg:Show( Self, .T. )
             ENDIF
          ENDIF
-
       END
 
    ENDDO
@@ -948,7 +945,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
    // Restore system entry state settings from file-wide array:
    // saStatics := ACLONE( aSavMenuSys )
 
-   RETURN ( nRETURN )
+   RETURN nRETURN
 
 /***
 *
@@ -963,10 +960,10 @@ METHOD PushMenu( lSelect ) CLASS TopBarMenu
 
    oNewMenu := ::oMenu:GetItem( ::oMenu:Current )
 
-   IF ( !( ValType( oNewMenu ) == "O" ) )
-   ELSEIF ( oNewMenu:IsPopUp )
+   IF !HB_ISOBJECT( oNewMenu )
+   ELSEIF oNewMenu:IsPopUp
 
-      IF ( !( ValType( lSelect ) == "L" ) )
+      IF !HB_ISNUMERIC( lSelect )
          lSelect := .F.
       ENDIF
 
@@ -981,24 +978,22 @@ METHOD PushMenu( lSelect ) CLASS TopBarMenu
          ::aPopUp[ ::nMenuLevel ] := 1
       ENDIF */
 
-      IF ( lSelect )
+      IF lSelect
          ::oMenu:Select( ::oMenu:GetFirst() )
          /* Select previous item:
          ::oMenu:Select( ::aPopUp[ ::nMenuLevel ) */
       ELSE
          ::oMenu:Select( 0 )
-
       ENDIF
 
-      IF !( ::oMenu:IsOpen )
+      IF ! ::oMenu:IsOpen
          ::oMenu:Open()
       ENDIF
 
-      RETURN ( .T. )
-
+      RETURN .T.
    ENDIF
 
-   RETURN ( .F. )
+   RETURN .F.
 
 
 /***
@@ -1009,16 +1004,16 @@ METHOD PushMenu( lSelect ) CLASS TopBarMenu
 *
 ***/
 METHOD PopMenu() CLASS TopBarMenu
-   IF ( ::nMenuLevel > 1 )
+   IF ::nMenuLevel > 1
       ::oMenu:Select(0)
       ::oMenu:Close(.T.)
       // Decrement MenuItem level AND assign:
       ::oMenu := ::aMenuList[ --::nMenuLevel ]
-      RETURN ( .T. )
+      RETURN .T.
 
    ENDIF
 
-   RETURN ( .F. )
+   RETURN .F.
 
 
 /***
@@ -1031,17 +1026,16 @@ METHOD PopMenu() CLASS TopBarMenu
 METHOD PopChild( nNewLevel ) CLASS TopBarMenu
    LOCAL oOldMenuItem, nCurrent
 
-   IF ( ( nCurrent := ::oMenu:Current ) != 0 )
+   IF ( nCurrent := ::oMenu:Current ) != 0
       oOldMenuItem := ::oMenu:GetItem( nCurrent )
-      IF ( oOldMenuItem:IsPopUp )
+      IF oOldMenuItem:IsPopUp
          oOldMenuItem:Data:Close()
          ::nMenuLevel := nNewLevel
-         RETURN ( .T. )
+         RETURN .T.
       ENDIF
-
    ENDIF
 
-   RETURN ( .F. )
+   RETURN .F.
 
 
 /***
@@ -1059,7 +1053,7 @@ METHOD PopAll( ) CLASS TopBarMenu
    ::nMenuLevel := 1
    ::oMenu      := ::aMenuList[ 1 ]
 
-   RETURN ( .T. )
+   RETURN .T.
 
 /***
 *
@@ -1073,10 +1067,10 @@ METHOD Execute() CLASS TopBarMenu
    LOCAL oNewMenu, nCurrent := 1, lPas := .T.
    oNewMenu := ::oMenu:GetItem( ::oMenu:Current )
 
-   IF ( !( ValType( oNewMenu ) == "O" ) )
+   IF !HB_ISOBJECT( oNewMenu )
    // Execute the Data block IF selected MenuItem is !IsPopUp:
-   ELSEIF ( !oNewMenu:IsPopUp )
-      IF ( ::oMenu:ClassName() $ "TOPBARMENU_POPUPMENU" )
+   ELSEIF !oNewMenu:IsPopUp
+      IF ::oMenu:ClassName() $ "TOPBARMENU_POPUPMENU"
          SETPOS( ::nOldRow, ::nOldCol )
          SETCURSOR( ::nOldCursor )
          EVAL( oNewMenu:Data, oNewMenu )
@@ -1091,8 +1085,8 @@ METHOD Execute() CLASS TopBarMenu
 
       ::oMenu:Select( nCurrent )
       // Display newly selected current menu item:
-      IF ( ::oMenu:ClassName() == "POPUPMENU" .AND. ;
-         ::nMenuLevel == 1 .AND. ! ::oMenu:IsOpen )
+      IF ::oMenu:ClassName() == "POPUPMENU" .AND. ;
+         ::nMenuLevel == 1 .AND. ! ::oMenu:IsOpen
          ::oMenu:Open()
       ENDIF
 
@@ -1102,14 +1096,11 @@ METHOD Execute() CLASS TopBarMenu
          SETCURSOR( ::nOldCursor )
          EVAL( oNewMenu:Data, oNewMenu )
          SETCURSOR( SC_NONE )
-
       ENDIF
-
-      RETURN ( oNewMenu:Id )
-
+      RETURN oNewMenu:Id
    ENDIF
 
-   RETURN ( 0 )
+   RETURN 0
 
 /***
 *
@@ -1124,18 +1115,16 @@ METHOD MHitTest( oNewMenu, nNewLevel, nNewItem ) CLASS TopBarMenu
    FOR nNewLevel := ::nMenuLevel TO 1 STEP -1
       oNewMenu   := ::aMenuList[ nNewLevel ]
       nNewItem   := oNewMenu:HitTest( MRow(), MCol() )
-      IF ( nNewItem < 0 )
+      IF nNewItem < 0
          // Test for the mouse on Menu separator or border
-         RETURN ( .F. )
+         RETURN .F.
 
       ELSEIF   ( nNewItem > 0 ) .AND. oNewMenu:GetItem( nNewItem ):Enabled
          // Test for the mouse on an enabled item in the menu
-         RETURN ( .T. )
-
+         RETURN .T.
       ENDIF
-
    NEXT
 
-   RETURN ( .F. )
+   RETURN .F.
 
 #ENDIF

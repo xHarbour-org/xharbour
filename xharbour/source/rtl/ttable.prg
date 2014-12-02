@@ -95,7 +95,7 @@ FUNCTION NetDbUse( cDataBase, cAlias, nSeconds, cDriver, ;
 
    slNetOk  := .F.
    nSeconds *= 1.00
-   lforever := ( nSeconds = 0 )
+   lforever := ( nSeconds == 0 )
 
    KEYBOARD Chr( 255 )
    Inkey()
@@ -153,10 +153,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
    LOCAL nCh
    LOCAL cWord
 
-   IF .NOT. ( ValType( nType ) == "N" ) .OR. ;
-         ( ( .NOT. ( nType == 1 ) ) .AND. ;
-         ( .NOT. ( nType == 2 ) ) .AND. ;
-         ( .NOT. ( nType == 3 ) ) )
+   IF !HB_ISNUMERIC( nType ) .OR. nType != 1 .AND. nType != 2 .AND. nType != 3
       Alert( "Invalid Argument passed to NETLOCK()" )
       RETURN ( lSuccess )
    ENDIF
@@ -289,7 +286,7 @@ FUNCTION NetOpenFiles( aFiles )
       ENDIF
 
       IF NetDbUse( xFile[ 1 ], xFile[ 2 ], snNetDelay, "DBFCDX" )
-         IF ValType( xFile[ 3 ] ) == "A"
+         IF HB_ISARRAY( xFile[ 3 ] )
             FOR EACH cIndex IN xFile[ 3 ]
                IF File( cIndex )
                   ordListAdd( cIndex )
@@ -353,7 +350,7 @@ FUNCTION NetRecLock( nSeconds )
 
    slNetOK := .F.
 
-   IF NetLock( NET_RECLOCK, , nSeconds )                     // 1
+   IF NetLock( NET_RECLOCK,, nSeconds )                     // 1
       slNetOK := .T.
    ENDIF
 
@@ -364,7 +361,7 @@ FUNCTION NetFileLock( nSeconds )
    slNetOK := .F.
    DEFAULT nSeconds := snNetDelay
 
-   IF NetLock( NET_FILELOCK, , nSeconds )
+   IF NetLock( NET_FILELOCK,, nSeconds )
       slNetOK := .T.
    ENDIF
 
@@ -379,7 +376,7 @@ FUNCTION NetAppend( nSeconds, lReleaseLocks )
    slNetOK := .F.
    nOrd    := ordSetFocus( 0 )          // --> set order to 0 to append ???
 
-   IF NetLock( NET_APPEND, , nSeconds )
+   IF NetLock( NET_APPEND,, nSeconds )
       //DbGoBottom()
       slNetOK := .T.
    ENDIF
@@ -515,7 +512,7 @@ CLASS HBField
    DATA Value
 
    METHOD Get() INLINE ::value := ( ::alias )->( FieldGet( ::order ) )
-   METHOD Put( x ) INLINE ::value := x , ;
+   METHOD Put( x ) INLINE ::value := x, ;
       ( ::alias )->( FieldPut( ::order, x ) )
 
 ENDCLASS
@@ -661,7 +658,7 @@ CLASS HBTable
    METHOD SetFocus() INLINE ( ::Alias )->( Select( ::ALias ) )
    METHOD APPEND( l ) INLINE IF( ::isNet, ( ::Alias )->( NetAppend( l ) ), ;
       ( ::alias )->( dbAppend() ) )
-   METHOD RECALL(  ) INLINE ( ::Alias )->( NetRecall(  ) )
+   METHOD RECALL() INLINE ( ::Alias )->( NetRecall() )
 
    METHOD LOCATE( bFor, bWhile, nNext, nRec, lRest ) INLINE ;
       ( ::Alias )->( __dbLocate( bFor, bWhile, ;
@@ -669,7 +666,7 @@ CLASS HBTable
    METHOD CONTINUE() INLINE ( ::Alias )->( __dbContinue() )
    METHOD Found() INLINE ( ::Alias )->( Found() )
    METHOD Kill() INLINE ( ::Alias )->( dbCommit() ), ;
-      ( ::Alias )->( dbUnlock() ) , ;
+      ( ::Alias )->( dbUnlock() ), ;
       ( ::Alias )->( dbCloseArea() ), ;
       ::ClearBuffers()
    METHOD ClearBuffers() INLINE ::ReadBuffers := {}, ;
@@ -678,14 +675,14 @@ CLASS HBTable
 
    METHOD dbIsShared() INLINE ( ::Alias )->( dbInfo( DBI_SHARED ) )
 
-   METHOD dbIsFLocked(  ) INLINE ( ::Alias )->( dbInfo( DBI_ISFLOCK ) )
+   METHOD dbIsFLocked() INLINE ( ::Alias )->( dbInfo( DBI_ISFLOCK ) )
 
    METHOD dbLockCount() INLINE ( ::Alias )->( dbInfo( DBI_LOCKCOUNT ) )
 
    METHOD dbInfo( n, x ) INLINE ( ::Alias )->( dbInfo( n, x ) )
 
    METHOD dbGetAlias() INLINE ( ::Alias )
-                                                
+
    METHOD dbFullPath() INLINE ( ::Alias )->( dbInfo( DBI_FULLPATH ) )
 
    METHOD IsRLocked( n ) INLINE ( ::Alias )->( dbRecordInfo( DBRI_LOCKED, n ) )
@@ -726,7 +723,7 @@ CLASS HBTable
       ( ::alias )->( ordScope( TOPSCOPE, xScope ) )
    METHOD SetBottomScope( xScope ) INLINE ;
       ( ::alias )->( ordScope( BOTTOMSCOPE, xScope ) )
-   METHOD KillScope() INLINE ( ::alias )->( ordScope( TOPSCOPE, NIL ) )  , ;
+   METHOD KillScope() INLINE ( ::alias )->( ordScope( TOPSCOPE, NIL ) ), ;
       ( ::alias )->( ordScope( BOTTOMSCOPE, NIL ) )
 
    METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
@@ -795,7 +792,7 @@ METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
    DEFAULT cPATH TO SET( _SET_DEFAULT )
    DEFAULT cAlias TO FixExt( cDbf )
    DEFAULT cOrderBag TO FixExt( cDbf )  //+".CDX"
-   
+
 
    ::IsNew      := lNEW
    ::IsNet      := lNET
@@ -957,7 +954,7 @@ PROCEDURE READ( lKeepBuffer ) CLASS HBTable
 //? len( ::Buffer )
 
    FOR EACH Buffer in ::Buffer
-      
+
       i      := HB_EnumIndex()
       Buffer := ( ::Alias )->( FieldGet( i ) )
 
@@ -1093,7 +1090,7 @@ METHOD __oTDelete( lKeepBuffer )        // ::Delete()
    ::Read()
 
    IF ::isNet
-      lRet := IF( ( ::Alias )->( NetDelete() ), .T. , .F. )
+      lRet := IF( ( ::Alias )->( NetDelete() ), .T., .F. )
    ELSE
       ( ::alias )->( dbDelete() ) ; lRet := .T.
    ENDIF
@@ -1377,10 +1374,9 @@ METHOD GetOrder( xOrder ) CLASS HBTable
 
 METHOD SetOrder( xTag ) CLASS HBTable
 
-   LOCAL xType   := ValType( xTag )
    LOCAL nOldOrd := ( ::Alias )->( ordSetFocus() )
 
-   SWITCH xType
+   SWITCH ValType( xTag )
    CASE "C"                    // we have an Order-TAG
       ( ::Alias )->( ordSetFocus( xTag ) )
       EXIT
@@ -1394,7 +1390,7 @@ METHOD SetOrder( xTag ) CLASS HBTable
    CASE "O"                    // we have an Order-Object
       xTag:SetFocus()
       EXIT
-      DEFAULT
+   DEFAULT
       ( ::Alias )->( ordSetFocus( 0 ) )
    END
 
@@ -1546,13 +1542,10 @@ PROCEDURE CREATE() CLASS HBOrder
    DEFAULT ::cOrderBag TO ::oTable:cOrderBag
 //? "<<<",::alias, ::cOrderBag
    ( ::alias )->( ordCondSet( ::cFor, ::bFor, ;
-      .T. , ;
+      .T., ;
       ::bWhile, ;
       ::bEval, ::nInterval ) )
 
-   ( ::alias )->( ordCreate( ::cOrderBag, ::Tag, ::cKey, ;
-      ::bKey, ::Unique ) )
+   ( ::alias )->( ordCreate( ::cOrderBag, ::Tag, ::cKey, ::bKey, ::Unique ) )
 
    RETURN
-
-

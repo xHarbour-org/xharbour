@@ -69,7 +69,7 @@ ANNOUNCE ERRORSYS
 
 PROC Errorsys()
 
-   
+
    Errorblock( { | e | DefError( e ) } )
 RETURN
 */
@@ -79,7 +79,7 @@ RETURN
 
 /*
 STATIC FUNC DefError( e )
-   
+
    LOCAL i
    LOCAL cMessage   := ""
    LOCAL cErrString
@@ -87,11 +87,11 @@ STATIC FUNC DefError( e )
 
 // by default, division by zero yields zero
    IF ( e:genCode == EG_ZERODIV )
-      RETURN ( 0 )
+      RETURN 0
    END
 
    IF ( e:genCode == EG_CORRUPTION )
-      IF ValType( sbFixCorrupt ) == "B"
+      IF HB_ISBLOCK( sbFixCorrupt )
          Eval( sbFixCorrupt, e )
          RETURN .F.
       ELSE
@@ -104,7 +104,7 @@ STATIC FUNC DefError( e )
          .AND. e:canDefault )
 
       NetErr( .T. )
-      RETURN ( .F. )                    // NOTE
+      RETURN .F.                        // NOTE
 
    END
 
@@ -112,7 +112,7 @@ STATIC FUNC DefError( e )
    IF ( e:genCode == EG_APPENDLOCK .AND. e:canDefault )
 
       NetErr( .T. )
-      RETURN ( .F. )                    // NOTE
+      RETURN .F.                        // NOTE
 
    END
 
@@ -164,7 +164,7 @@ STATIC FUNC DefError( e )
       cErrString += "Called from " + Trim( ProcName( i ) ) + ;
          "(" + NTRIM( ProcLine( i ) ) + ") <BR>" + CRLF()
 
-      i ++
+      i++
    END
 
    cErrstring += '</EM>'
@@ -190,12 +190,12 @@ STATIC FUNC DefError( e )
    ErrorLevel( 1 )
    QUIT
 
-   RETURN ( .F. )
+   RETURN .F.
 */
 
 FUNCTION SetCorruptFunc( bFunc )
-   
-   IF ValType( bFunc ) == "B"
+
+   IF HB_ISBLOCK( bFunc )
       sbFixCorrupt := bFunc
    ENDIF
 
@@ -203,7 +203,7 @@ FUNCTION SetCorruptFunc( bFunc )
 
 FUNCTION SetErrorFooter()
 
-   RETURN ( scErrFooter )
+   RETURN scErrFooter
 
 /***
 * ErrorMessage()
@@ -211,40 +211,40 @@ FUNCTION SetErrorFooter()
 
 /*
 STATIC FUNC ErrorMessage( e )
-   
+
    LOCAL cMessage := ""
 
 // start error message
    cMessage += IF( e:severity > ES_WARNING, "Error ", "Warning " )
 
 // add subsystem name if available
-   IF ( ValType( e:subsystem ) == "C" )
+   IF HB_ISSTRING( e:subsystem )
       cMessage += e:subsystem()
    ELSE
       cMessage += "???"
    END
 
 // add subsystem's error code if available
-   IF ( ValType( e:subCode ) == "N" )
+   IF HB_ISNUMERIC( e:subCode )
       cMessage += ( "/" + NTRIM( e:subCode ) )
    ELSE
       cMessage += "/???"
    END
 
 // add error description if available
-   IF ( ValType( e:description ) == "C" )
+   IF HB_ISSTRING( e:description )
       cMessage += ( "<BR>  " + e:description )
    END
 
 // add either filename or operation
-   IF ( !Empty( e:filename ) )
+   IF !Empty( e:filename )
       cMessage += ( ": " + e:filename )
 
-   ELSEIF ( !Empty( e:operation ) )
+   ELSEIF !Empty( e:operation )
       cMessage += ( ": " + e:operation )
 
    END
    cMessage += CRLF()
 
-   RETURN ( cMessage )
+   RETURN cMessage
 */

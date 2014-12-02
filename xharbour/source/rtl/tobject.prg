@@ -229,12 +229,12 @@ FUNCTION TAssociativeArray( aInit, lCase )
    LOCAL aKeys := {}
    LOCAL lCaseSensitive := .T.
 
-   IF ValType( lCase ) == "L"
+   IF HB_ISLOGICAL( lCase )
       lCaseSensitive := lCase
    ENDIF
 
 // Intentionally creating NEW Class for every instance - Don't change!
-   IF ValType( aInit ) == 'A'
+   IF HB_ISARRAY( aInit )
       hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
 
       aKeys := Array( Len( aInit ) )
@@ -353,7 +353,7 @@ STATIC FUNCTION TAssociativeArray_GetKey( cKey, lCaseSensitive )
    LOCAL aKeys, xRet, cMsg, nPos
    LOCAL lGlobalCase
 
-   IF !( ValType( lCaseSensitive ) == "L" )
+   IF !HB_ISLOGICAL( lCaseSensitive )
       lGlobalCase    := __SetAssociativeCaseSensitive()
       IF lGlobalCase <> NIL
          lCaseSensitive := lGlobalCase
@@ -389,8 +389,7 @@ FUNCTION __SetAssociativeCaseSensitive( lNew )
    STATIC s_lCase // Can be: TRUE or FALSE to force Case Sensitive or NIL to leave every associative to do itself
    LOCAL lOld := s_lCase
 
-   IF PCount() == 1 .AND. ;
-         ( ValType( lNew ) == "L" .OR. lNew == NIL )
+   IF PCount() == 1 .AND. ( HB_ISLOGICAL( lNew ) .OR. lNew == NIL )
       s_lCase := lNew
    ENDIF
 
@@ -402,7 +401,7 @@ FUNCTION HashEntry()
 
    STATIC hClass
 
-   IF ValType( hClass ) == "N"
+   IF HB_ISNUMERIC( hClass )
       RETURN __clsInst( hClass )
    ENDIF
 
@@ -513,5 +512,3 @@ PROCEDURE HashAddMember( aName, cType, uInit, oObj )
    NEXT
 
    RETURN
-
-

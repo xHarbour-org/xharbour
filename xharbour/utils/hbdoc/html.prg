@@ -53,7 +53,9 @@
 
 #include 'hbclass.ch'
 #include 'common.ch'
+
 #define CRLF HB_OSNewLine()
+
 STATIC nX := 0
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -66,42 +68,44 @@ CLASS THTML
 
    DATA nHandle
    DATA cFile
-   METHOD New( cFile ,aMetaContents)
+
+   METHOD New( cFile, aMetaContents )
    METHOD WriteTitle( cTitle )
    METHOD WritePar( cPar )
    METHOD WriteParBold( cPar )
-   METHOD WriteLink( cLink ,cName)
-   METHOD WriteLinkTable( cLink ,cName)
-   METHOD WriteChmLink( cLink ,cName)
+   METHOD WriteLink( cLink, cName )
+   METHOD WriteLinkTable( cLink, cName )
+   METHOD WriteChmLink( cLink, cName )
    METHOD WriteText( cText )
-   METHOD WriteMetaTag(cTag,cDescription)
+   METHOD WriteMetaTag( cTag, cDescription )
    METHOD CLOSE()
    // The Follow methods is for html source files for .CHM help
-   METHOD NewChm( cFile ,aMetaContents,cFuncName)
-   METHOD ADDoBJECT(cType,cClassid)
-   METHOD ADDPARAM(cName,cValue)
+   METHOD NewChm( cFile, aMetaContents, cFuncName )
+   METHOD ADDoBJECT( cType, cClassid )
+   METHOD ADDPARAM( cName, cValue )
    METHOD EndOBJect()
-   METHOD NewContent(cFile)
+   METHOD NewContent( cFile )
    METHOD ListItem()
 ENDCLASS
 
 METHOD New( cFile,aMetaContents ) CLASS THTML
-    
+
    Local nCount
+
    IF Nx > 0
       FCLOSE( NX )
    ENDIF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF
    nX := Self:nHandle
    FWRITE( Self:nHandle, "<HTML>" + CRLF )
    FWRITE( Self:nHandle, "<HEAD>" + CRLF )
-   if Valtype(aMetaContents) <> NIL .and. Valtype(aMetaContents)=="A"
-   For nCount:=1 to len(aMetaContents)
-      Self:WriteMetaTag(aMetaContents[nCount,1],aMetaContents[nCount,2])
+   if HB_ISARRAY( aMetaContents )
+   For nCount := 1 to len(aMetaContents)
+      Self:WriteMetaTag(aMetaContents[nCount, 1], aMetaContents[nCount, 2])
    NEXT
     Endif
 
@@ -110,7 +114,7 @@ RETURN Self
 
 METHOD WriteTitle( cTitle ) CLASS THTML
 
-   FWRITE( Self:nHandle, "<TITLE>" + CRLF + cTitle + CRLF + "</Title>" + CRLF + '</HEAD>' + CRLF  )
+   FWRITE( Self:nHandle, "<TITLE>" + CRLF + cTitle + CRLF + "</Title>" + CRLF + '</HEAD>' + CRLF )
    FWRITE( Self:nHandle, "<BODY>" + CRLF )
 RETURN Self
 
@@ -121,6 +125,7 @@ METHOD WritePar( cPar ) CLASS THTML
    FWRITE( Self:nHandle, '<dd>' + ALLTRIM( cPar ) + '</dd>' + CRLF )
 
 RETURN Self
+
 METHOD WriteText( cPar ) CLASS THTML
 
    FWRITE( Self:nHandle, cPar + CRLF )
@@ -130,7 +135,8 @@ RETURN Self
 METHOD WriteParBold( cPar, lEndDl, lPar ) CLASS THTML
 
    DEFAULT lEnddl TO .T.
-   DEFAULT lPar TO .T.
+   DEFAULT lPar   TO .T.
+
    IF lEndDl .AND. lPar
       FWRITE( Self:nHandle, "</P></dd>" + CRLF + "</DL>" + CRLF + "<DL>" + CRLF + "<dt><b>" + ALLTRIM( cPar ) + '</b></dt><p>' + CRLF )
    ELSEIF !lPar .AND. !lEnddl
@@ -139,7 +145,6 @@ METHOD WriteParBold( cPar, lEndDl, lPar ) CLASS THTML
       FWRITE( Self:nHandle, "</PRE>" + CRLF + "</DL>" + CRLF + "<DL>" + CRLF + "<dt><b>" + ALLTRIM( cPar ) + '</b></dt><p>' + CRLF )
    ELSEIF lPar .AND. !lEnddl
       FWRITE( Self:nHandle, "</P></dd>" + CRLF + "<DL>" + CRLF + "<dt><b>" + ALLTRIM( cPar ) + '</b></dt><p>' + CRLF )
-
    ENDIF
 RETURN Self
 
@@ -164,10 +169,10 @@ METHOD WriteLink( cLink, cName ) CLASS THTML
       cTemp := SUBSTR( cLink, 1, nPos - 1 )
       endif
    ELSE
-     if AT(".htm",cLink)=0
-      cTemp := ALLTRIM( cLink ) + '.htm'
-        else
-     cTemp := ALLTRIM( cLink ) 
+      if AT(".htm",cLink)=0
+         cTemp := ALLTRIM( cLink ) + '.htm'
+      else
+         cTemp := ALLTRIM( cLink )
       endif
    ENDIF
    IF cName != Nil
@@ -196,7 +201,7 @@ METHOD WriteLinkTable( cLink, cName,cInfo ) CLASS THTML
          if AT(".htm",cLink)=0
       cTemp := ALLTRIM( cLink ) + '.htm'
         else
-     cTemp := ALLTRIM( cLink ) 
+     cTemp := ALLTRIM( cLink )
       endif
    ENDIF
    IF cName != Nil
@@ -213,20 +218,21 @@ return Self
 
 /////////////////////Method for .CHM html source files support////////////////
 METHOD NewChm( cFile ,aMetaContents,cFuncName) CLASS THTML
-    
+
    Local nCount
+
    IF Nx > 0
       FCLOSE( NX )
    ENDIF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF
    nX := Self:nHandle
    FWRITE( Self:nHandle, "<HTML>" + CRLF +"<HEAD>" +CRLF)
-   if Valtype(aMetaContents) <> NIL .and. Valtype(aMetaContents)=="A"
-   For nCount:=1 to len(aMetaContents)
+   if HB_ISARRAY( aMetaContents )
+   For nCount := 1 to len(aMetaContents)
       Self:WriteMetaTag(aMetaContents[nCount,1],aMetaContents[nCount,2])
    NEXT
     Endif
@@ -239,27 +245,29 @@ METHOD NewChm( cFile ,aMetaContents,cFuncName) CLASS THTML
    ::ENDOBJECT()
 RETURN Self
 
-method ADDOBJECT(cType,cClassId) Class THTML
-   IF VALTYPE(cClassId)<>NIL .and. VALTYPE(cClassId)=="C"
+METHOD ADDOBJECT(cType,cClassId) Class THTML
+   IF HB_ISSTRING( cClassId )
       FWRITE( Self:nHandle,'<Object type="'+cType+'" classid="'+cClassId+'">'+CRLF)
    ELSE
       FWRITE( Self:nHandle,'<Object type="'+ cType +'">'+CRLF)
    ENDIF
 RETURN Self
+
 METHOD  ENDOBJECT() Class THTML
    FWRITE( Self:nHandle,"</OBJECT>"+CRLF)
 RETURN Self
+
 METHOD ADDPARAM(cType,cValue) Class THTML
    FWRITE( Self:nHandle,'<param name="'+cType+ '" value="'+cValue +'">'  +CRLF)
 RETURN Self
 
 METHOD NewContent( cFile ) CLASS THTML
-    
+
    IF Nx > 0
       FCLOSE( NX )
    ENDIF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF
@@ -270,6 +278,7 @@ RETURN Self
 METHOD ListItem() CLASS tHtml
    FWRITE( Self:nHandle, "<LI>" )
 RETURN SELF
+
 METHOD WriteChmLink( cLink, cName ) CLASS THTML
 
    LOCAL nPos
@@ -277,16 +286,16 @@ METHOD WriteChmLink( cLink, cName ) CLASS THTML
 
    nPos := AT( "()", cLink )
    IF nPos > 0
-      if AT(".htm",cLink)=0
-      cTemp := SUBSTR( cLink, 1, nPos - 1 ) + '.htm'
+      if AT(".htm",cLink) == 0
+         cTemp := SUBSTR( cLink, 1, nPos - 1 ) + '.htm'
       else
-      cTemp := SUBSTR( cLink, 1, nPos - 1 )
+         cTemp := SUBSTR( cLink, 1, nPos - 1 )
       endif
    ELSE
-         if AT(".htm",cLink)=0
-      cTemp := ALLTRIM( cLink ) + '.htm'
-        else
-     cTemp := ALLTRIM( cLink ) 
+      if AT(".htm",cLink) == 0
+         cTemp := ALLTRIM( cLink ) + '.htm'
+      else
+         cTemp := ALLTRIM( cLink )
       endif
    ENDIF
    IF cName != Nil

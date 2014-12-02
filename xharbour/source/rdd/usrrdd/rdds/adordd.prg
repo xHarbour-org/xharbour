@@ -27,7 +27,7 @@
  *  ADO_FORCEREL( nWA )
  *  ADO_RELEVAL( nWA, aRelInfo )
  *  ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
- *  ADO_DROP(  nRdd, cTable, cIndex, ulConnect ) 
+ *  ADO_DROP(  nRdd, cTable, cIndex, ulConnect )
  *  ADO_LOCATE( nWA, lContinue )
  *
  * www - http://www.xharbour.org
@@ -485,27 +485,27 @@ STATIC FUNCTION ADO_GETVALUE( nWA, nField, xValue )
          xValue := oField:Value
 
          IF nType == HB_FT_STRING
-            IF ValType( xValue ) == "U"
+            IF HB_ISNIL( xValue )
                 xValue := Space( oField:DefinedSize )
             ELSE
                 xValue := PadR( xValue, oField:DefinedSize )
             ENDIF
          ELSEIF nType == HB_FT_DATE
             // Null values
-            IF ValType( xValue ) == "U"
+            IF HB_ISNIL( xValue )
                 xValue := cToD( "" )
             ENDIF
 #ifdef HB_FT_DATETIME
          ELSEIF nType == HB_FT_DATETIME
             // Null values
-            IF ValType( xValue ) == "U"
+            IF HB_ISNIL( xValue )
                 xValue := cToD( "" )
             ENDIF
 #endif
 #ifdef HB_FT_TIMESTAMP
          ELSEIF nType == HB_FT_TIMESTAMP
             // Null values
-            IF ValType( xValue ) == "U"
+            IF HB_ISNIL( xValue )
                 xValue := cToD( "" )
             ENDIF
 #endif
@@ -708,7 +708,7 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_APPEND( nWA, lUnLockAll )
 
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
-   
+
    HB_SYMBOL_UNUSED( lUnLockAll )
 
    oRecordSet:AddNew()
@@ -1249,7 +1249,7 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
    LOCAL lRet := FAILURE
    LOCAL aRData := USRRDD_RDDDATA( nRDD )
-   
+
    HB_SYMBOL_UNUSED( ulConnect )
 
    IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
@@ -1272,7 +1272,7 @@ RETURN lRet
 STATIC FUNCTION ADO_DROP( nRdd, cTable, cIndex, ulConnect )
    LOCAL lRet := FAILURE
    LOCAL aRData := USRRDD_RDDDATA( nRDD )
-   
+
    HB_SYMBOL_UNUSED( ulConnect )
 
    IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
@@ -1300,7 +1300,7 @@ STATIC FUNCTION ADO_SEEK( nWA, lSoftSeek, cKey, lFindLast )
    HB_SYMBOL_UNUSED( lFindLast )
 /* TODO
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
-   
+
    LPCDXTAG pTag;
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )

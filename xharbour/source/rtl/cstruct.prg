@@ -107,10 +107,10 @@ FUNCTION __ActiveStructure( cStructure, nAlign )
 
          // In most cases we can simply ignore the redefinition, by returning a FAKED Structure Array!
          //TraceLog( "Redefinition of C Structure: " + cStructure )
-         RETURN ( s_aActiveStructure := { cStructure, NIL, {}, {}, iif( ValType( nAlign ) == "N", nAlign, 8 ) } )
+         RETURN ( s_aActiveStructure := { cStructure, NIL, {}, {}, iif( HB_ISNUMERIC( nAlign ), nAlign, 8 ) } )
       END
 
-      AAdd( s_aClasses, { cStructure, NIL, {}, {}, iif( ValType( nAlign ) == "N", nAlign, 8 ) } )
+      AAdd( s_aClasses, { cStructure, NIL, {}, {}, iif( HB_ISNUMERIC( nAlign ), nAlign, 8 ) } )
       //TraceLog( "Registered: " + cStructure, s_aClasses[-1][5] )
 
       s_aActiveStructure := s_aClasses[-1]
@@ -121,7 +121,7 @@ FUNCTION __ActiveStructure( cStructure, nAlign )
       aCTypes   := s_aActiveStructure[4]
       nAlign    := s_aActiveStructure[5]
 
-      hClass := __clsNew( "C Structure " + s_aActiveStructure[1] , Len( aCTypes ) + CLASS_PROPERTIES, 8 )
+      hClass := __clsNew( "C Structure " + s_aActiveStructure[1], Len( aCTypes ) + CLASS_PROPERTIES, 8 )
 
       s_aActiveStructure[2] := hClass
 
@@ -153,7 +153,7 @@ FUNCTION __ActiveStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, nAlign ), HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "_nID"           , Counter, HB_OO_MSG_PROPERTY, Len( s_aClasses ) )
+      __clsAddMsg( hClass,  "_nID"          , Counter, HB_OO_MSG_PROPERTY, Len( s_aClasses ) )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
@@ -363,7 +363,7 @@ STATIC PROCEDURE AllocateMembers( oStructure )
 
    FOR EACH CType IN aCTypes
       IF CType > CTYPE_STRUCTURE .AND. CType < CTYPE_STRUCTURE_PTR
-         oStructure[ HB_EnumIndex() ] := HB_CStructureFromID( CType, , .F. )
+         oStructure[ HB_EnumIndex() ] := HB_CStructureFromID( CType,, .F. )
          AllocateMembers( oStructure[ HB_EnumIndex() ] )
       ENDIF
    NEXT
@@ -450,7 +450,7 @@ FUNCTION HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
       //IF Abs( CType ) == 1
-      __clsAddMsg( hClass, "AsString", @AsString()   , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass, "AsString"   , @AsString()   , HB_OO_MSG_METHOD )
       //ENDIF
 
       FOR Counter := 1 TO nLen
@@ -461,16 +461,16 @@ FUNCTION HB_CTypeArrayID( CType, nLen )
          __clsAddMsg( hClass,       cMember, Counter, HB_OO_MSG_PROPERTY )
       NEXT
 
-      __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY, aCTypes )
+      __clsAddMsg( hClass,  "aCTypes"      , Counter, HB_OO_MSG_PROPERTY, aCTypes )
 
       Counter++
-      __clsAddMsg( hClass,  "aCMembers"     , Counter, HB_OO_MSG_PROPERTY, acMembers, HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "aCMembers"    , Counter, HB_OO_MSG_PROPERTY, acMembers, HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, 1, HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "nAlign"       , Counter, HB_OO_MSG_PROPERTY, 1, HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, 1 ), HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "SizeOf"       , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, 1 ), HB_OO_CLSTP_READONLY )
 
       Counter++
       __clsAddMsg( hClass,  "_nID", Counter, HB_OO_MSG_PROPERTY, nID )
@@ -558,7 +558,7 @@ STATIC FUNCTION Reset()
 
 STATIC FUNCTION Buffer( Buffer, lAdopt )
 
-   IF ValType( Buffer ) == "C"
+   IF HB_ISSTRING( Buffer )
       IF Len( Buffer ) < QSelf():SizeOf
          //TraceLog( Buffer )
          Buffer := PadR( Buffer, QSelf():SizeOf, Chr( 0 ) )
@@ -568,7 +568,7 @@ STATIC FUNCTION Buffer( Buffer, lAdopt )
       QSelf():DeValue( lAdopt )
    ENDIF
 
-   IF ValType( QSelf():InternalBuffer ) != "C"
+   IF !HB_ISSTRING( QSelf():InternalBuffer )
       QSelf():InternalBuffer := QSelf():Value()
    ENDIF
 
@@ -606,7 +606,7 @@ STATIC FUNCTION DeValue( lAdopt )
 
 //aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
-   IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
+   IF !HB_ISSTRING( Buffer ) .OR. Len( Buffer ) == 0
       TraceLog( "EMPTY Buffer", Buffer )
       Buffer := Replicate( Chr( 0 ), QSelf():SizeOf )
    ELSEIF Len( Buffer ) < QSelf():SizeOf

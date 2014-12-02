@@ -78,7 +78,7 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
 
 // Scan for strings instead of blocks - These are macros that need to be compiled into blocks.
    FOR nIndex := 1 TO nLen
-      IF ValType( abEval[ nIndex ] ) == 'C'
+      IF HB_ISSTRING( abEval[ nIndex ] )
          //? abEval[ nIndex ]
          // Macro may be a comma seperated list.
          asMacros := HB_aExpressions( abEval[ nIndex ] )
@@ -125,12 +125,12 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
 
    BEGIN SEQUENCE
 
-      IF Empty( lAll ) .AND. ;
-            Empty( bFor ) .AND. ;
-            Empty( bWhile ) .AND. ;
-            Empty( nNext ) .AND. ;
-            Empty( nRecord ) .AND. ;
-            Empty( lRest )
+      IF Empty( lAll    ) .AND. ;
+         Empty( bFor    ) .AND. ;
+         Empty( bWhile  ) .AND. ;
+         Empty( nNext   ) .AND. ;
+         Empty( nRecord ) .AND. ;
+         Empty( lRest   )
 
          Eval( bOutBlock )
       ELSE

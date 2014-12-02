@@ -105,11 +105,11 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
    LOCAL nFirstProperty, cMsg
    LOCAL lOldScope := __SetClassScope( .F. )
 
-   IF ValType( oObject ) != 'O'
+   IF !HB_ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
    ENDIF
 
-   IF ValType( lData ) != 'L'
+   IF !HB_ISLOGICAL( lData )
       lData := .T.
    ENDIF
 
@@ -121,7 +121,7 @@ FUNCTION __objGetMsgList( oObject, lData, nRange, nScope )
    nFirstProperty := AScan( aMessages, { | cElement | cElement[1] == '_' } )
 
    FOR EACH cMsg IN aMessages
-      IF cMsg[1] = '_'
+      IF cMsg[1] == '_'
          EXIT
       ENDIF
 
@@ -147,15 +147,15 @@ FUNCTION __objGetMsgFullList( oObject, lData, nRange, nScope, nNoScope )
    LOCAL nFirstProperty, aMsg
    LOCAL lOldScope := __SetClassScope( .F. )
 
-   IF ValType( oObject ) != 'O'
+   IF !HB_ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
    ENDIF
 
-   IF ValType( lData ) != 'L'
+   IF !HB_ISLOGICAL( lData )
       lData := .T.
    ENDIF
 
-   IF ValType( nNoScope ) != 'N'
+   IF !HB_ISNUMERIC( nNoScope )
       nNoScope := 0
    ENDIF
 
@@ -189,7 +189,7 @@ FUNCTION __objGetMethodList( oObject, nScope )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   RETURN __objGetMsgList( oObject, .F. , HB_MSGLISTALL, nScope )
+   RETURN __objGetMsgList( oObject, .F., HB_MSGLISTALL, nScope )
 
 FUNCTION __objGetValueLIST( oObject, aExcept, nScope )
 
@@ -198,15 +198,15 @@ FUNCTION __objGetValueLIST( oObject, aExcept, nScope )
    LOCAL cVar
    LOCAL lOldScope := __SetClassScope( .F. )
 
-   IF ValType( oObject ) != 'O'
+   IF !HB_ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   IF ValType( aExcept ) != 'A'
+   IF !HB_ISARRAY( aExcept )
       aExcept := {}
    ENDIF
 
-   aVars   := __objGetMsgList( oObject, .T. , HB_MSGLISTALL, nScope )
+   aVars   := __objGetMsgList( oObject, .T., HB_MSGLISTALL, nScope )
    aReturn := {}
 
    FOR EACH cVar IN aVars
@@ -231,15 +231,15 @@ FUNCTION __objGetValueFullList( oObject, aExcept, nScope, nNoScope )
    LOCAL aReturn
    LOCAL aVar
 
-   IF ValType( oObject ) != 'O'
+   IF !HB_ISOBJECT( oObject )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
-   IF ValType( aExcept ) != 'A'
+   IF !HB_ISARRAY( aExcept )
       aExcept := {}
    ENDIF
 
-   aVars   := __objGetMsgFullList( oObject, .T. , HB_MSGLISTALL, nScope, nNoScope )
+   aVars   := __objGetMsgFullList( oObject, .T., HB_MSGLISTALL, nScope, nNoScope )
    aReturn := {}
 
    FOR EACH aVar IN aVars
@@ -257,7 +257,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    LOCAL aReturn
    LOCAL aVar
 
-   IF ValType( oObject ) != 'O' .OR. ( oBase != NIL .AND. oObject:ClassH != oBase:ClassH )
+   IF !HB_ISOBJECT( oObject ) .OR. ( oBase != NIL .AND. oObject:ClassH != oBase:ClassH )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
@@ -277,8 +277,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    FOR EACH aVar IN aObjectVars
       IF HB_EnumIndex() > Len( aBaseVars ) .OR. ;
             ValType( aVar[2] ) != ValType( aBaseVars[ HB_EnumIndex() ][ 2 ] ) .OR. ;
-            ValType( aVar[2] ) == 'B' .OR. ;
-            ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
+            HB_ISBLOCK( aVar[2] ) .OR. ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
          AAdd( aReturn, aVar )
       ENDIF
    NEXT
@@ -291,7 +290,7 @@ FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
    LOCAL aReturn
    LOCAL aVar
 
-   IF ValType( oObject ) != 'O' .OR. ( oBase != NIL .AND. ! oObject:IsDerivedFrom( oBase ) )
+   IF !HB_ISOBJECT( oObject ) .OR. ( oBase != NIL .AND. ! oObject:IsDerivedFrom( oBase ) )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ENDIF
 
@@ -450,7 +449,7 @@ FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
    IF __objHasMsg( oObject, cMsg )
       __clsModMsg( oObject, cMsg, FuncOrBlock )
    ELSE
-      __clsAddMsg( oObject, cMsg, FuncOrBlock, iif( ValType( FuncOrBlock ) == 'B', HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
+      __clsAddMsg( oObject, cMsg, FuncOrBlock, iif( HB_ISBLOCK( FuncOrBlock ), HB_OO_MSG_INLINE, HB_OO_MSG_METHOD ), NIL, nScope )
    ENDIF
 
    RETURN oObject

@@ -60,32 +60,32 @@ FUNCTION TIMETOSEC( cTime )
 /* NOTE: In CA-Clipper Tools, timetosec() is limited to HH:MM:SS:hh (hundredth).
          In xHarbour, timetosec() is extended to HH:MM:SS:ttt (thousandth).
  */
-   IF ValType( cTime ) == "C"
+   IF HB_ISSTRING( cTime )
 
       nSec := 0
       nLen := Len( cTime )
 
       IF Timevalid( cTime )
 
-         IF nLen >= 2  // HH
+         IF nLen >= 2       // HH
             nVal := Val( SubStr( cTime,1,2 ) )  // hours
             nSec += nVal * 3600
          ENDIF
 
-         IF nLen >= 5 // HH:MM
+         IF nLen >= 5       // HH:MM
             nVal := Val( SubStr( cTime,4,2 ) )  // minutes
             nSec += nVal * 60
          ENDIF
 
-         IF nLen >= 8 // HH:MM:SS
+         IF nLen >= 8       // HH:MM:SS
             nVal := Val( SubStr( cTime,7,2 ) )  // seconds
             nSec += nVal
          ENDIF
 
-         IF nLen = 11 // HH:MM:SS:hh
+         IF nLen == 11      // HH:MM:SS:hh
             nVal := Val( SubStr( cTime,10,2 ) ) // hundredth
             nSec += nVal / 100
-         ELSEIF nLen = 12  // HH:MM:SS:ttt
+         ELSEIF nLen == 12  // HH:MM:SS:ttt
             nVal := Val( SubStr( cTime,10,3 ) ) // thousandth
             nSec += nVal / 1000
          ENDIF
@@ -96,21 +96,21 @@ FUNCTION TIMETOSEC( cTime )
 
    ENDIF
 
-   RETURN Round( nSec, iif( nSec - Int(nSec ) > 0, iif(nLen = 12,3,2 ), 0 ) )
+   RETURN Round( nSec, iif( nSec - Int(nSec ) > 0, iif(nLen == 12, 3, 2 ), 0 ) )
 
 FUNCTION SECTOTIME( nSec, lHundr, lThous )
 
    LOCAL i, h, n
 
-   n := iif( !ValType( nSec ) == "N", Seconds(), nSec )
+   n := iif( !HB_ISNUMERIC( nSec ), Seconds(), nSec )
    h := ""
-   IF ValType( lHundr ) == "L" .AND. lHundr
+   IF HB_ISLOGICAL( lHundr ) .AND. lHundr
       h := StrZero( ( nSec * 100 ) % 100, 2 )
    ENDIF
 /* NOTE: In CA-Clipper Tools, sectotime() is limited to HH:MM:SS:hh (hundredth).
          In xHarbour, sectotime() is extended to HH:MM:SS:ttt (thousandth).
  */
-   IF ValType( lThous ) == "L" .AND. lThous
+   IF HB_ISLOGICAL( lThous ) .AND. lThous
       h := StrZero( ( nSec * 1000 ) % 1000, 3 )
    ENDIF
    n := Int( n % 86400 )

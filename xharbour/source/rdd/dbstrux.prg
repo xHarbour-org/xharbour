@@ -133,17 +133,17 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDD, lNew, cAlias, cCodePage, nConne
 
       IF Empty( cFileFrom )
 
-         dbCreate( cFileName, { { "FIELD_NAME", "C", 10, 0 },;
-                                { "FIELD_TYPE", "C",  1, 0 },;
-                                { "FIELD_LEN" , "N",  3, 0 },;
-                                { "FIELD_DEC" , "N",  3, 0 } },;
+         dbCreate( cFileName, { { "FIELD_NAME", "C", 10, 0 }, ;
+                                { "FIELD_TYPE", "C",  1, 0 }, ;
+                                { "FIELD_LEN" , "N",  3, 0 }, ;
+                                { "FIELD_DEC" , "N",  3, 0 } }, ;
                    cRDD, .F., cAlias, NIL, cCodePage, nConnection )
       ELSE
          dbUseArea( lNew, NIL, cFileFrom, "" )
 
-         dbEval( {|| AAdd( aStruct, { FIELD->FIELD_NAME ,;
-                                      FIELD->FIELD_TYPE ,;
-                                      FIELD->FIELD_LEN ,;
+         dbEval( {|| AAdd( aStruct, { FIELD->FIELD_NAME, ;
+                                      FIELD->FIELD_TYPE, ;
+                                      FIELD->FIELD_LEN, ;
                                       FIELD->FIELD_DEC } ) } )
          dbCloseArea()
 
@@ -154,8 +154,8 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDD, lNew, cAlias, cCodePage, nConne
          /* Type detection is more in sync with dbCreate() logic in Harbour, as lowercase "C"
             and padded/continued strings ("C ", "C...") are also accepted. */
 
-         AEval( aStruct, {| aField | iif( Upper( Left( aField[ DBS_TYPE ], 1 ) ) == "C" .AND. aField[ DBS_DEC ] != 0,;
-            ( aField[ DBS_LEN ] += aField[ DBS_DEC ] * 256,;
+         AEval( aStruct, {| aField | iif( Upper( Left( aField[ DBS_TYPE ], 1 ) ) == "C" .AND. aField[ DBS_DEC ] != 0, ;
+            ( aField[ DBS_LEN ] += aField[ DBS_DEC ] * 256, ;
               aField[ DBS_DEC ] := 0 ), NIL ) } )
 
          dbCreate( cFileName, aStruct, cRDD, lNew, cAlias, NIL, cCodePage, nConnection )
@@ -218,7 +218,7 @@ FUNCTION dbModifyStructure( cFile )
       cFile := dbInfo( DBI_FULLPATH )
       cExt  := dbInfo( DBI_TABLEEXT )
 
-      hb_FNameSplit( cFile, , @cTable )
+      hb_FNameSplit( cFile,, @cTable )
 
       cBakFile       := cTable + ".bak." + cDateTime + cExt
       cStructureFile := cTable + ".str." + cDateTime + cExt
@@ -321,18 +321,21 @@ FUNCTION dbMerge( xSource, lAppend )
 
    // Validate args
    //-------------------------------------------------------------//
-   IF ValType( xSource ) == 'C'
+   SWITCH ValType( xSource )
+   CASE 'C'
       nArea := Select()
 
       USE ( xSource ) ALIAS MergeSource EXCLUSIVE NEW
       nSource := Select()
 
       SELECT ( nArea )
-   ELSEIF ValType( xSource ) == 'N'
+      EXIT
+   CASE 'N'
       nSource := xSource
-   ELSE
+      EXIT
+   DEFAULT
       RETURN .F.
-   ENDIF
+   ENDSWITCH
    //-------------------------------------------------------------//
 
    // Temp working record

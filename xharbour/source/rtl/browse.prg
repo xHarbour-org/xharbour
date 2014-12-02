@@ -111,7 +111,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
    for n := 1 to FCount()
       cField := FieldName( n )
-      if valtype( fieldget( n ) ) == "M"
+      if HB_ISMEMO( fieldget( n ) )
          oBrw:AddColumn( TBColumnNew( cField, &( "{|| ' <Memo> '}" ) ) )
       else
          oBrw:AddColumn( TBColumnNew( cField, FieldBlock( cField ) ) )
@@ -392,7 +392,7 @@ static function DOGET( oBrowse, lShared )
 
    oCol := oBrowse:getcolumn(oBrowse:colpos())
 
-   lMemo := ( ValType( FieldGet( FieldPos( oCol:Heading ) ) ) == 'M' )
+   lMemo := HB_ISMEMO( FieldGet( FieldPos( oCol:Heading ) ) )
 
    IF lMemo
       cMemoField := oCol:Heading
@@ -427,7 +427,7 @@ static function DOGET( oBrowse, lShared )
       oBrowse:RefreshAll()
    ELSE
       xData := eval(oCol:block())
-      if valtype( xData ) == "C"
+      if HB_ISSTRING( xData )
          if Len(xData) > ( oBrowse:nRight - oBrowse:nLeft - 2 )
             cPict := "@S"+ Ltrim(Str( oBrowse:nRight - oBrowse:nLeft - 2 ))
          else

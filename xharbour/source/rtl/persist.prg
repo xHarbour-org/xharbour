@@ -178,14 +178,14 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
                ENDIF
 
             CASE Left( cLine, 6 ) == "ARRAY "
-               cLine = SubStr( cLine, 8 )
+               cLine := SubStr( cLine, 8 )
                cLine := "HB_QWith()" + cLine
                cLine := StrTran( cLine, " LEN ", " := Array( " ) + ")"
                //TraceLog( cLine )
                &( cLine )
 
             CASE Left( cLine, 7 ) == "OBJECT "
-               cLine = SubStr( cLine, 9 )
+               cLine := SubStr( cLine, 9 )
                cLine := "HB_QWith()" + cLine
                cLine := StrTran( cLine, " AS ", " := " ) + "()"
 
@@ -248,8 +248,7 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
       IF HB_EnumIndex() > Len( aBasePropertiesAndValues ) .OR. ;
          cType != ValType( aBasePropertiesAndValues[ HB_EnumIndex() ][ 2 ] ) .OR. ;
-         ValType( xValue ) == 'B' .OR. ;
-         ! ( xValue == aBasePropertiesAndValues[ HB_EnumIndex() ][ 2 ] )
+         cType == 'B' .OR. ! ( xValue == aBasePropertiesAndValues[ HB_EnumIndex() ][ 2 ] )
 
          SWITCH cType
             CASE "A"

@@ -150,15 +150,15 @@ METHOD new( cHtmlString ) CLASS THtmlDocument
    </ html >
    ENDTEXT
 
-   IF ValType( cHtmlString ) <> "C"
-      ::root := THtmlNode():new( cEmptyHtmlDoc )
-   ELSE
+   IF HB_ISSTRING( cHtmlString )
       IF .NOT. "<html" $ Lower( Left( cHtmlString, 4096 ) )
          ::root := THtmlNode():new( cEmptyHtmlDoc )
          nMode := 1
       ELSE
          ::root := THtmlNode():new( cHtmlString )
       ENDIF
+   ELSE
+      ::root := THtmlNode():new( cEmptyHtmlDoc )
    ENDIF
 
    ::root:document := self
@@ -644,7 +644,7 @@ METHOD new( oParent, cTagName, cAttrib, cContent ) CLASS THtmlNode
       THtmlInit( .T. )
    ENDIF
 
-   IF ValType( oParent ) == "C"
+   IF HB_ISSTRING( oParent )
       // a HTML string is passed -> build new tree of objects
       IF Chr( 9 ) $ oParent
          oParent := StrTran( oParent, Chr( 9 ), Chr( 32 ) )
@@ -654,11 +654,11 @@ METHOD new( oParent, cTagName, cAttrib, cContent ) CLASS THtmlNode
       ::htmlTagType    := THtmlTagType( "_root_" )
       ::htmlContent    := {}
       ::parseHtml( P_PARSER( oParent ) )
-   ELSEIF ValType( oParent ) == "O"
+   ELSEIF HB_ISOBJECT( oParent )
       // a HTML object is passed -> we are in the course of building an object tree
       ::root           := oParent:root
       ::parent         := oParent
-      IF ValType( cAttrib ) == "C"
+      IF HB_ISSTRING( cAttrib )
          IF cAttrib[-1] == "/"
             cAttrib[-1] := " "
             ::htmlEndTagName := "/"
@@ -712,7 +712,7 @@ METHOD isOptional CLASS THtmlNode
 
 METHOD isNode CLASS THtmlNode
 
-   RETURN ( ValType( ::htmlContent ) == "A" .AND. Len( ::htmlContent ) > 0 )
+   RETURN ( HB_ISARRAY( ::htmlContent ) .AND. Len( ::htmlContent ) > 0 )
 
 // checks if this is a block node that must be closed with an ending tag: eg: <table></table>, <ul></ul>
 
@@ -960,7 +960,7 @@ METHOD insertBefore( oTHtmlNode ) CLASS THtmlNode
       ::root:_document:changed := .T.
    ENDIF
 
-   IF ValType( ::parent:htmlContent ) == "A"
+   IF HB_ISARRAY( ::parent:htmlContent )
       AIns( ::parent:htmlContent, 1, oTHtmlNode, .T. )
    ENDIF
 
@@ -1007,7 +1007,7 @@ METHOD DELETE()  CLASS THtmlNode
       ::root:_document:changed := .T.
    ENDIF
 
-   IF ValType( ::parent:htmlContent ) == "A"
+   IF HB_ISARRAY( ::parent:htmlContent )
       nPos := AScan( ::parent:htmlContent, self )
       ADel( ::parent:htmlContent, nPos, .T. )
    ENDIF
@@ -1021,7 +1021,7 @@ METHOD DELETE()  CLASS THtmlNode
 
 METHOD firstNode( lRoot ) CLASS THtmlNode
 
-   IF ValType( lRoot ) <> "L"
+   IF ! HB_ISLOGICAL( lRoot )
       lRoot := .F.
    ENDIF
 
@@ -1039,7 +1039,7 @@ METHOD lastNode( lRoot ) CLASS THtmlNode
 
    LOCAL aNodes
 
-   IF ValType( lRoot ) <> "L"
+   IF ! HB_ISLOGICAL( lRoot )
       lRoot := .F.
    ENDIF
    IF ::htmlTagName == "_text_"
@@ -1120,7 +1120,7 @@ METHOD toString( nIndent ) CLASS THtmlNode
       ENDIF
    ENDIF
 
-   IF ValType( ::htmlContent ) == "A"
+   IF HB_ISARRAY( ::htmlContent )
 
 #ifdef FOR_EACH_NESTING_LIMIT_IS_ONLY_16_AND_FAR_TOO_SMALL
       imax := Len( ::htmlContent )
@@ -1140,7 +1140,7 @@ METHOD toString( nIndent ) CLASS THtmlNode
       NEXT
 #endif
 
-   ELSEIF ValType( ::htmlContent ) == "C"
+   ELSEIF HB_ISSTRING( ::htmlContent )
       cHtml += ::htmlContent
    ENDIF
 
@@ -1167,7 +1167,7 @@ METHOD attrToString() CLASS THtmlNode
    IF ::htmlAttributes == NIL
       cAttr := ""
 
-   ELSEIF ValType( ::htmlAttributes ) == "C"
+   ELSEIF HB_ISSTRING( ::htmlAttributes )
       cAttr := " " + ::htmlAttributes
 
    ELSE
@@ -1306,7 +1306,7 @@ METHOD getAttribute( cName ) CLASS THtmlNode
    LOCAL hHash := ::getAttributes()
    LOCAL cValue
 
-   IF ValType( hHash ) <> "H"
+   IF ! HB_ISHASH( hHash )
       RETURN hHash
    ENDIF
 
@@ -1334,7 +1334,7 @@ METHOD getAttributes() CLASS THtmlNode
       ::htmlAttributes := Hash()
       HSetCaseMatch( ::htmlAttributes, .F. )
 
-   ELSEIF ValType( ::htmlAttributes ) == "C"
+   ELSEIF HB_ISSTRING( ::htmlAttributes )
       IF ::htmlAttributes == "/"
          ::htmlAttributes := Hash()
          HSetCaseMatch( ::htmlAttributes, .F. )
@@ -1452,7 +1452,7 @@ METHOD setAttribute( cName, cValue ) CLASS THtmlNode
    LOCAL nType
    LOCAL hHash := ::getAttributes()
 
-   IF ValType( hHash ) <> "H"
+   IF ! HB_ISHASH( hHash )
       // Tag doesn't have any attribute
       RETURN ::error( "Invalid HTML attribute for: <" + ::htmlTagName + ">", ::className(), cName, EG_ARG, { cName, cValue } )
    ENDIF
@@ -1600,7 +1600,7 @@ METHOD findNodesByTagName( cName, nOrdinal ) CLASS THtmlNode
       ENDIF
    NEXT
 
-   IF ValType( nOrdinal ) == "N"
+   IF HB_ISNUMERIC( nOrdinal )
       IF nOrdinal < 1 .OR. nOrdinal > Len( aRet )
          RETURN NIL
       ENDIF
@@ -1711,7 +1711,7 @@ STATIC FUNCTION CutStr( cCut, cString )
 
 FUNCTION THtmlInit( lInit )
 
-   IF ValType( lInit ) == "L" .AND. .NOT. lInit
+   IF HB_ISLOGICAL( lInit ) .AND. .NOT. lInit
       saHtmlAttr         := NIL
       shTagTypes         := NIL
       saHtmlAnsiEntities := NIL

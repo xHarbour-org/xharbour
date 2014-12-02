@@ -525,7 +525,7 @@ STATIC FUNCTION AR_GOTO( nWA, nRecord )
       aWAData[ WADATA_BOF ]   := .F.
       aWAData[ WADATA_EOF ]   := .T.
       aWAData[ WADATA_RECNO ] := nRecCount + 1
-   ENDIF 
+   ENDIF
 
 	/* Modifyed By Marcio xHarbour
    IF nRecord >= 1 .AND. nRecord <= nRecCount
@@ -636,7 +636,7 @@ STATIC FUNCTION AR_GOBOTTOM( nWA )
             aWAData[ WADATA_ORDRECNO ] := 0
             nResult := AR_GOTO( nWA, 0 )
          ELSE
-            aWAData[ WADATA_ORDRECNO ] := Len( ATail( aIndexes[ nIndex, INDEX_RECORDS ] ) ) 				
+            aWAData[ WADATA_ORDRECNO ] := Len( ATail( aIndexes[ nIndex, INDEX_RECORDS ] ) )
             nResult := AR_GOTO( nWA, ATail( aIndexes[ nIndex, INDEX_RECORDS ] )[ INDEXKEY_RECORD ] )
          ENDIF
       ELSE
@@ -653,14 +653,14 @@ STATIC FUNCTION AR_GOBOTTOM( nWA )
    AR_UNLOCK( nWA )
 
    RETURN nResult
-	
+
 
 STATIC FUNCTION AR_RECNO( nWA, nRecNo )          // Addedy by Marcio
 
    nRecNo := USRRDD_AREADATA( nWA )[ WADATA_RECNO ]
 
    RETURN SUCCESS
-	
+
 
 STATIC FUNCTION AR_SETFILTER( nWa, aDbFilterInfo )
 
@@ -1283,9 +1283,9 @@ STATIC FUNCTION AR_ORDCREATE( nWA, aOrderCreate )
          NIL, ; /* #define UR_ORC_BWHILE         5   */
          NIL, ; /* #define UR_ORC_BEVAL          6   */
          0, ;   /* #define UR_ORC_STEP           7   */
-         0, ;   /* #define UR_ORC_STARTREC       8   */ 
+         0, ;   /* #define UR_ORC_STARTREC       8   */
          0, ;   /* #define UR_ORC_NEXT           9   */
-         0, ;   /* #define UR_ORC_RECORD         10  */  
+         0, ;   /* #define UR_ORC_RECORD         10  */
          .F., ; /* #define UR_ORC_REST           11  */
          .F., ; /* #define UR_ORC_DESCEND        12  */
          .F., ; /* #define UR_ORC_SCOPED         13  */
@@ -1784,7 +1784,7 @@ STATIC FUNCTION EmptyValue( cType, nLen, nDec )
 
    // hb_default( @nLen, 0 )
    // hb_default( @nDec, 0 )
-	
+
    DEFAULT nLen TO 0
    DEFAULT nDec TO 0
 
@@ -1855,7 +1855,7 @@ STATIC FUNCTION hb_Decode( ... )
 
                /* Check if array has a default value, this will be last value and has a value */
                /* different from an array */
-               IF ! HB_ISARRAY( ValType( xDefault[ nLen ] ) )
+               IF ! HB_ISARRAY( xDefault[ nLen ] )
                   aParams := Array( ( nLen - 1 ) * 2 )
 
                   n := 1
@@ -1942,9 +1942,8 @@ STATIC FUNCTION hb_Decode( ... )
 STATIC FUNCTION DecEmptyValue( xVal )
 
    LOCAL xRet
-   LOCAL cType := ValType( xVal )
 
-   SWITCH cType
+   SWITCH ValType( xVal )
    CASE "C"  /* Char */
    CASE "M"  /* Memo */
       xRet := ""
@@ -2054,7 +2053,7 @@ STATIC FUNCTION Seek( xSeek, lSoft, lLast, aIndexInfo, nRec )
          bAfter  := {|| xSeek < aIndex[ nPos, INDEXKEY_KEY ] }
          bAjust  := {|| ! aIndex[ nPos, INDEXKEY_KEY ] <= xSeek }
       ELSE
-         bFirst  := {|| aIndex[ 2, INDEXKEY_KEY ] <= xSeek }			
+         bFirst  := {|| aIndex[ 2, INDEXKEY_KEY ] <= xSeek }
          bBefore := {|| ! aIndex[ nPos, INDEXKEY_KEY ] <= xSeek }
          bAfter  := {|| xSeek > aIndex[ nPos, INDEXKEY_KEY ] }
          bAjust  := {|| ! aIndex[ nPos, INDEXKEY_KEY ] >= xSeek }
@@ -2110,7 +2109,7 @@ STATIC FUNCTION Seek( xSeek, lSoft, lLast, aIndexInfo, nRec )
       ENDIF
       EXIT
 
-   END  //SWITCH
+   ENDSWITCH
 
    RETURN nPos
 

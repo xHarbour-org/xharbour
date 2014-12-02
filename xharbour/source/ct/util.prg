@@ -95,12 +95,12 @@ Return the ammout of times that c1 occurs into c2
 */
    LOCAL nRet, nPos
 
-   IF ValType( c1 ) != "C" .OR. ValType( c2 ) != "C"
-      RETURN ( 0 )
+   IF !HB_ISSTRING( c1 ) .OR. !HB_ISSTRING( c2 )
+      RETURN 0
    ENDIF
 
-   IF Len( c1 ) = 0 .OR. Len( c2 ) = 0
-      RETURN ( 0 )
+   IF Len( c1 ) == 0 .OR. Len( c2 ) == 0
+      RETURN 0
    ENDIF
 
    nRet := 0
@@ -114,5 +114,5 @@ Return the ammout of times that c1 occurs into c2
          c2 := ""
       ENDIF
    ENDDO
-   
-   RETURN ( nRet )
+
+   RETURN nRet

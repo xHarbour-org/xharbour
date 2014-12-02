@@ -7,17 +7,17 @@
  *   CT3 Date & Time functions, part II: - ADDMONTH()
  *                                       - CTODOW()
  *                                       - CTOMONTH()
- *                                       - DAYSINMONTH() 
- *                                       - DAYSTOMONTH() 
- *                                       - DMY() 
- *                                       - DOY() 
- *                                       - ISLEAP() 
- *                                       - LASTDAYOM() 
- *                                       - MDY() 
- *                                       - NTOCDOW() 
- *                                       - NTOCMONTH() 
- *                                       - QUARTER() 
- *                                       - WEEK() 
+ *                                       - DAYSINMONTH()
+ *                                       - DAYSTOMONTH()
+ *                                       - DMY()
+ *                                       - DOY()
+ *                                       - ISLEAP()
+ *                                       - LASTDAYOM()
+ *                                       - MDY()
+ *                                       - NTOCDOW()
+ *                                       - NTOCMONTH()
+ *                                       - QUARTER()
+ *                                       - WEEK()
  *
  * Copyright 2002 Alan Secker <alansecker@globalnet.co.uk>
  * Copyright 2003 Martin Vogel <vogel@inttec.de>: Enhancements, internationalization, documentation headers
@@ -81,7 +81,7 @@ local nMonth
 local nYear
 local nLDOM
 
-//   if nmth > 70 
+//   if nmth > 70
 //      return ctod ("  /  /    ")
 //   endif
 //
@@ -95,22 +95,22 @@ local nLDOM
 //
 //   dEnd    := ctod (str (nOldday) + "/" + str(nMonth) + "/" + str (nNyear))
 //
-//   return dEnd  
+//   return dEnd
 
    if !(valtype (ddate) $ "DN")
       return ctod("")
    endif
 
-   if valtype (ddate) == "N"
+   if HB_ISNUMERIC( ddate )
       nmth := ddate
       ddate := date()
    endif
 
-   nmth = int (nmth)
+   nmth := int (nmth)
 
-   nDay = day (ddate)
-   nMonth = month (ddate)
-   nYear = year (ddate)
+   nDay   := day (ddate)
+   nMonth := month (ddate)
+   nYear  := year (ddate)
 
    nMonth += nmth
 
@@ -136,16 +136,16 @@ local nLDOM
    ddate := stod (strzero (nYear, 4) + strzero (nMonth, 2) + strzero (nDay, 2))
    return (ddate)
 
-  
+
 
 FUNCTION ctodow ( cDow )
 //local cWeek  := "SUNMONTUEWEDTHUFRISAT "
 //local nWk    := len (cWeek)
 //local cMatch := left (upper ( Alltrim (cDow)), 3)
-//local n 
+//local n
 //local nDay   := 0
 //
-//   for n = 1 to nWk step 3
+//   for n := 1 to nWk step 3
 //        if RTRIM (substr (cWeek, n, 3)) == cMatch
 //           nDay := INT (((n-1) / 3) + 1)
 //           exit
@@ -157,15 +157,15 @@ FUNCTION ctodow ( cDow )
 local nOrdinal := 0
 local bExact
 
-  if valtype (cDow) != "C"
+  if !HB_ISSTRING( cDow )
      return (0)
   endif
-  
-  bExact = set (_SET_EXACT, .F.)
-  cDow = upper (alltrim (cDow))
+
+  bExact := set (_SET_EXACT, .F.)
+  cDow   := upper (alltrim (cDow))
 
   do while nOrdinal < 7
-     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_DAY + nOrdinal))) = cDow
+     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_DAY + nOrdinal))) == cDow
 	set (_SET_EXACT, bExact)
 	return (nOrdinal+1)
      endif
@@ -181,13 +181,13 @@ FUNCTION ctomonth ( cDom )
 //local cMonth := "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC "
 //local nMnth  := len (cMonth)
 //local cMatch := left (upper ( Alltrim (cDom)), 3)
-//local n 
+//local n
 //local nDay   := 0
 
 local nOrdinal := 0
 local bExact
 
-//   for n = 1 to nMnth step 3
+//   for n := 1 to nMnth step 3
 //        if RTRIM (substr (cMonth, n, 3)) == cMatch
 //           nDay := INT (((n-1) / 3) + 1)
 //           exit
@@ -196,15 +196,15 @@ local bExact
 //
 //   return nDay
 
-  if valtype (cDom) != "C"
+  if !HB_ISSTRING( cDom )
      return (0)
   endif
-  
-  bExact = set (_SET_EXACT, .F.)
-  cDom = upper (alltrim (cDom))
+
+  bExact := set (_SET_EXACT, .F.)
+  cDom   := upper (alltrim (cDom))
 
   do while nOrdinal < 12
-     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_MONTH + nOrdinal))) = cDom
+     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_MONTH + nOrdinal))) == cDom
 	set (_SET_EXACT, bExact)
 	return (nOrdinal+1)
      endif
@@ -231,7 +231,7 @@ local nday
      case nMonth == 4 .or. nMonth == 6 .or. ;
           nMonth == 9 .or. nMonth == 11
           nday := 30
-     otherwise 
+     otherwise
           nday := 31
   endcase
 
@@ -240,38 +240,49 @@ local nday
 
 FUNCTION daystomonth ( nMonth, lLeap )
 
-local ndays := 0
+local ndays
 
-   if valtype(lLeap) != "L"
-      lLeap := .F.
-   endif
-
-   do case
-      case nMonth == 2
+   switch nMonth
+      case 2
            ndays :=  31     // + Jan 31
-      case nMonth == 3     
+	   exit
+      case 3
            ndays :=  59     // + Feb 28
-      case nMonth == 4
+	   exit
+      case 4
            ndays :=  90     // + Mar 31
-      case nMonth == 5
+	   exit
+      case 5
            ndays := 120     // + Apr 30
-      case nMonth == 6
+	   exit
+      case 6
            ndays := 151     // + May 31
-      case nMonth == 7
+	   exit
+      case 7
            ndays := 181     // + Jun 30
-      case nMonth == 8
+	   exit
+      case 8
            ndays := 212     // + Jul 31
-      case nMonth == 9
+	   exit
+      case 9
            ndays := 243     // + Aug 31
-      case nMonth == 10
+	   exit
+      case 10
            ndays := 273     // + Sep 30
-      case nMonth == 11
+	   exit
+      case 11
            ndays := 304     // + Oct 31
-      case nMonth == 12
+	   exit
+      case 12
            ndays := 334     // + Nov 30
-   endcase
-  
-   if (lLeap,  ndays ++, )
+	   exit
+      default
+	   ndays := 0
+   endswitch
+
+   if HB_ISLOGICAL( lLeap ) .and. lLeap
+      ndays++
+   endif
 
    return ndays
 
@@ -282,16 +293,16 @@ FUNCTION dmy ( ddate, lmode )
 //local nMonth  := month (dDate)
 //local nDay    :=   day (dDate)
 //local nYear   :=  year (dDate)
-local nMonth, nDay, nYear 
+local nMonth, nDay, nYear
 
 local cPeriod
 local cDate
-local cMonth 
+local cMonth
 
 local cYear
 local lSetCentury := __SETCENTURY()
 
-   if valtype (ddate) != "D"
+   if !HB_ISDATE( ddate )
       ddate := date ()
    endif
 
@@ -319,7 +330,7 @@ local nMonth  := month (dDate)
 local nDay    := day (dDate)
 local numdays
 
-   if valtype ( dDate ) != "D"
+   if !HB_ISDATE( dDate )
       dDate := date()
    endif
 
@@ -333,7 +344,7 @@ local numdays
    return numdays
 
 
-   
+
 FUNCTION isleap ( ddate )
 
 local nYear
@@ -351,23 +362,23 @@ local lRetval
 //   nMmyr  := nyear /1000
    nMmyr  := nYear /100
    nQdYr  := nYear / 4
-   
+
    do case
       case int (nCyYr) == nCyYr
            lRetVal := .T.
 
       case int (nMmyr) == nMmyr
            lRetVal := .F.
-           
+
       case int (nQdYr) == nQdYr
            lRetVal := .T.
 
       otherwise
            lRetVal := .F.
    endcase
-   
+
    return lRetVal
-   
+
 
 FUNCTION lastdayom ( xDate )
 
@@ -379,11 +390,11 @@ local lleap  := .F.
         case empty ( xDate)
              nMonth := month ( date() )
 
-        case valtype ( xDate ) == "D"
+        case HB_ISDATE( xDate )
              nMonth  := month (xdate)
              lleap := isleap ( xdate)
 
-        case valtype (xDate ) == "N"
+        case HB_ISNUMERIC( xDate )
              if xdate > 12
                 nmonth := 0
              else
@@ -397,7 +408,7 @@ local lleap  := .F.
 
      return ndays
 
- 
+
 
 FUNCTION mdy ( dDate )
 
@@ -405,13 +416,13 @@ local nMonth
 local nDay
 local nYear
 local cDate
-local cMonth 
+local cMonth
 
 local lSetCentury := __SETCENTURY()
 local cYear
 
 //   default dDate to date()
-   if valtype (ddate) != "D"
+   if !HB_ISDATE( ddate )
       ddate := date ()
    endif
 
@@ -426,15 +437,15 @@ local cYear
             ltrim ( str ( nDay )) + " " + ;
             ltrim ( cYear )
    //            ltrim ( str ( nYear ))
-   
+
    return cDate
 
 
 
 FUNCTION ntocdow ( nDay )
-   
+
 local cDay := ""
-   
+
    if nDay >= 1 .AND. nDay <= 7
      cDay := hb_langmessage (HB_LANG_ITEM_BASE_DAY + (nDay-1))
    endif
@@ -444,41 +455,14 @@ local cDay := ""
 
 
 FUNCTION ntocmonth ( nMonthNum )
-   
+
 local cMonth := ""
-   
+
    if nMonthNum >= 1 .AND. nMonthNum <= 12
-     cMonth := hb_langmessage (HB_LANG_ITEM_BASE_MONTH + (nMonthNum-1))
+     cMonth := hb_langmessage (HB_LANG_ITEM_BASE_MONTH + (nMonthNum - 1))
    endif
 
-//  do case
-//     case nMonthNum == 1
-//          cMonth := "January"
-//     case nMonthNum == 2
-//          cMonth := "February"
-//     case nMonthNum == 3
-//          cMonth := "March"
-//     case nMonthNum == 4
-//          cMonth := "April"
-//     case nMonthNum == 5
-//          cMonth := "May"
-//     case nMonthNum == 6
-//          cMonth := "June"
-//     case nMonthNum == 7
-//          cMonth := "July"
-//     case nMonthNum == 8
-//          cMonth := "August"
-//     case nMonthNum == 9
-//          cMonth := "September"
-//     case nMonthNum == 10
-//          cMonth := "October"
-//    case nMonthNum == 11
-//          cMonth := "November"
-//     case nMonthNum == 12
-//          cMonth := "December"
-//  endcase
-
-    return cMonth
+   return cMonth
 
 
 
@@ -511,14 +495,14 @@ local dDate2
 // local nleap
 
 //       do case
-//	  case valtype (dDate) == "D" .and. empty ( dDate)
+//	  case HB_ISDATE( dDate ) .and. empty ( dDate )
 //             return nDays
-//	     
+//
 //	  case empty (dDate)
 //             dDate := date()
 //       endcase
 
-     if valtype (dDate) == "D" .and. empty (dDate)
+     if HB_ISDATE( dDate ) .and. empty (dDate)
 	return 0
      endif
 
@@ -529,7 +513,7 @@ local dDate2
      nMonth  := month (dDate)
      nDay    :=   day (dDate)
 
-     if valtype (lSWN) != "L"
+     if !HB_ISLOGICAL( lSWN )
 	lSWN := .F.
      endif
 
@@ -539,17 +523,17 @@ local dDate2
        //     nleap := if (isleap (dDate), 1, nleap)
        //     ndays := daystomonth ( nMonth, nleap ) + nday
        nDays := daystomonth ( nMonth, isleap (dDate)) + nDay
-       
+
        nPart := nDays % 7
        nWeek := INT (nDays / 7)
-       
+
        nWeek := INT (if ( nPart > 0, ++ nWeek, nWeek))
 
      else
 	// ISO8601 week number
 	dDate2 := dDate + 3 - ((dow(dDate)+5) % 7)
-	nWeek := 1 + int ((dDate2 - boy (dDate2)) / 7) 
-	
+	nWeek := 1 + int ((dDate2 - boy (dDate2)) / 7)
+
      endif
 
      return nWeek

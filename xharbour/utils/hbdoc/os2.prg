@@ -68,14 +68,14 @@ CLASS TOs2
    DATA aLinkRef
    DATA nRef
    DATA aHeadRef
-   DATA aIndRef 
+   DATA aIndRef
    METHOD New( cFile )
    METHOD WritePar( cPar )
    METHOD WritePar2( cPar,ctag )
    METHOD WriteLink( cLink )
    METHOD ScanLink( cLink )
    METHOD ScanRef( cRef )
-   METHOD ScanInd( cRef )    
+   METHOD ScanInd( cRef )
    METHOD WriteJumpLink( cLink, cName, cText )
    METHOD CLOSE()
    METHOD WriteText( cPar )
@@ -94,7 +94,7 @@ METHOD New( cFile ) CLASS TOs2
       Self:nRef     := 1
    ENDIF
 
-   IF VALTYPE( cFile ) <> NIL .AND. VALTYPE( cFile ) == "C"
+   IF HB_ISSTRING( cFile )
       Self:cFile   := LOWER( cFile )
       Self:nHandle := FCREATE( Self:cFile )
    ENDIF
@@ -118,45 +118,44 @@ RETURN Self
 
 METHOD WritePar2( cBuffer,cTag,cStyle ) CLASS TOs2
    Local aLines
-   LOCAL nPos,cLine
+   LOCAL nPos, cLine
+
    Default cStyle to "Default"
-if at("-",cBuffer)>0
 
-Endif
-      cBuffer   := STRTRAN( cBuffer, '<b>', ':hp2.' )
-      cBuffer   := STRTRAN( cBuffer, '</b>', ':ehp2.' )
-      cBuffer   := STRTRAN( cBuffer, '<par>', '' )
-      cBuffer   := STRTRAN( cBuffer, '</par>', '' )
-      cBuffer   := self:DostoOs2Text(cBuffer)
+      cBuffer := STRTRAN( cBuffer, '<b>', ':hp2.' )
+      cBuffer := STRTRAN( cBuffer, '</b>', ':ehp2.' )
+      cBuffer := STRTRAN( cBuffer, '<par>', '' )
+      cBuffer := STRTRAN( cBuffer, '</par>', '' )
+      cBuffer := self:DostoOs2Text(cBuffer)
 
-      aLines:=FormatStringBuffer(cBuffer)
+      aLines := FormatStringBuffer(cBuffer)
 
-      For nPos:=1 to LEN(aLines)
-        cLine:=aLines[nPos]
-        If nPos==1
-            If !empty(cLine) .and. cStyle <>"Syntax"
-                FWRITE( Self:nHandle,cTag+  cLine  + CRLF)
-            elseIf !empty(cLine) .and. cStyle =="Syntax"
-                FWRITE( Self:nHandle,cTag+ ":hp2."+ cLine  +":ehp2." +CRLF)
+      For nPos := 1 to LEN(aLines)
+        cLine := aLines[nPos]
+        If nPos == 1
+            If !empty(cLine) .and. cStyle <> "Syntax"
+                FWRITE( Self:nHandle, cTag + cLine  + CRLF )
+            elseIf !empty(cLine) .and. cStyle == "Syntax"
+                FWRITE( Self:nHandle, cTag + ":hp2." + cLine + ":ehp2." + CRLF )
             Endif
         Else
 
-            If !empty(cLine) .and. cStyle <>"Syntax"
-                FWRITE( Self:nHandle, cLine  + CRLF)
-            elseIf !empty(cLine) .and. cStyle =="Syntax"
-                FWRITE( Self:nHandle, ":hp2."+ cLine  +":ehp2." +CRLF)
+            If !empty(cLine) .and. cStyle <> "Syntax"
+                FWRITE( Self:nHandle, cLine  + CRLF )
+            elseIf !empty(cLine) .and. cStyle == "Syntax"
+                FWRITE( Self:nHandle, ":hp2."+ cLine  +":ehp2." +CRLF )
             Endif
         Endif
       NEXT
 /*
 if cStyle=="Syntax"
     ? cBuffer
-endif    
+endif
          DO WHILE !lendPar
             IF nPos == 0
                cLine := SUBSTR( cBuffer, 1, 231 )
                nPos  := RAT( " ", cLine )
-               IF nPos > 0                 
+               IF nPos > 0
                   cLine := SUBSTR( cBuffer, 1, nPos )
                ENDIF
             If !empty(cLine) .and. cStyle <>"Syntax"
@@ -178,7 +177,7 @@ endif
                nPos := RAT( " ", cLine )
                IF nPos > 0
                   cLine :=  SUBSTR( cBuffer, curpos, nPos )
-                  nPos -= 1  
+                  nPos -= 1
                ELSE
                   IF cLine == "</par>"
                      cLine := ''
@@ -190,13 +189,13 @@ endif
             elseIf !empty(cLine) .and. cStyle =="Syntax"
                 FWRITE( Self:nHandle,cTag+ ":hp2."+ cLine  +":ehp2." +CRLF)
             Endif
-            
+
             ENDIF
 
             curPos += nPos
 ? Curpos
          ENDDO
-*/   
+*/
 
 
 
@@ -223,7 +222,7 @@ METHOD WriteTitle( cTopic, cTitle ,cCategory) CLASS TOs2
    Local lHead:=.F.
    LOCAL nrItem,nIItem
    LOCAL cRefCateg
-   LOCAL cIndCateg   
+   LOCAL cIndCateg
    cTopic := ALLTRIM( cTopic )
    cRefCateg:=SetCateg(cCategory )
    cIndCateg:=SetInd(cCategory)
@@ -237,11 +236,11 @@ METHOD WriteTitle( cTopic, cTitle ,cCategory) CLASS TOs2
    If Self:ScanInd(cIndCateg)==0
       niItem := ASCAN( Self:aIndRef, { | a | upper(a) == upper(cIndCateg )} )
       FWRITE( Self:nHandle, ':h1 ' + ::aIndRef[niItem] + "."+ UPPER( cCategory ) + CRLF)
-      lHead := .T.  
+      lHead := .T.
    ELSE             // Just in case that nItem>0 so the Link is already referenced
       niItem := ASCAN( Self:aIndRef, { | a | upper(a) == upper(cIndCateg) } )
    ENDIF
-   IF niItem>0 .AND.       lHead 
+   IF niItem>0 .AND.       lHead
       FWRITE( Self:nHandle, ':h2 '+ ' res=' + ALLTRIM( STR( nItem ) ) + '.' + cTopic  + CRLF  )
    elseIF     niItem>0 .AND.       !lHead
       FWRITE( Self:nHandle, ':h2 id='+ ::aIndRef[niItem] + ' res=' + ALLTRIM( STR( nItem ) ) + '.' + cTopic  + CRLF  )
@@ -283,7 +282,7 @@ METHOD WriteLink( cLink ) CLASS TOs2
 
    ENDIF
 
-   IF nItem = 0
+   IF nItem == 0
       nItem := Self:nRef
    ENDIF
 
@@ -363,7 +362,7 @@ METHOD WriteJumpTitle( cTitle, cTopic ) CLASS TOs2
 
    LOCAL cWrite
 
-cTitle = cTitle
+   HB_SYMBOL_UNUSED( cTitle )
 
    cTopic := ALLTRIM( HB_OEMTOANSI( cTopic ) )
 
@@ -374,51 +373,51 @@ cTitle = cTitle
    Self:WriteParBold( cTopic )
 
 RETURN Self
+
 METHOD WriteJumpLink( cLink, cText ) CLASS TOs2
 
    FWRITE( Self:nHandle, "       :link refid=" + ALLTRIM( HB_OEMTOANSI( cLink ) ) + "reftype=fn." + cLink + ":elink." + cText + CRLF )
 
 RETURN Self
 
-Static function SetCateg(cRef)
-Local cReturn
-cReturn:=Alltrim(left(cRef,5))
-cReturn+="X"
-Return cReturn
-Static function SetInd(cRef)
-Local cReturn
-cReturn:=Alltrim(left(cRef,4))
-cReturn+="Y"
-Return cReturn
+Static function SetCateg( cRef )
 
-Static FUNCTION FormatStringBuffer(cBuffer)
-Local nLen,nPos,aLine:={}
-Local cLine
-nLen:=Len(cBuffer)
+   Return Alltrim( left( cRef, 5 ) ) + "X"
 
-WHILE nLen>230
-    If nLen>230
-        cLine:=Substr(cBuffer,1,230)
-        nPos:=RAT(" ",cLine)
-        IF nPos>0
-            cLine:=Substr(cBuffer,1,nPos)
-            cBuffer:=Strtran(cBuffer,cLine,"")
+Static function SetInd( cRef )
+
+   Return Alltrim( left( cRef, 4 ) ) + "Y"
+
+Static FUNCTION FormatStringBuffer( cBuffer )
+   Local nLen, nPos, aLine := {}
+   Local cLine
+
+   nLen := Len(cBuffer)
+
+   WHILE nLen > 230
+      If nLen > 230
+         cLine := Substr(cBuffer, 1, 230)
+         nPos  := RAT(" ", cLine)
+         IF nPos>0
+            cLine   := Substr(cBuffer, 1, nPos)
+            cBuffer := Strtran(cBuffer, cLine, "")
             AADD(aLine,alltrim(cLine))
-            nLen:=Len(cBuffer)
-        Endif
-       if at('&minus.',cLine)>0 .or. at('&eq.',cLine)>0
-        nPos:=RAT(".",cLine)
-        IF nPos>0
-            cLine:=Substr(cBuffer,1,nPos)
-            cBuffer:=Strtran(cBuffer,cLine,"")
-            AADD(aLine,alltrim(cLine))
-            nLen:=Len(cBuffer)
-        Endif
-       Endif
-    Endif
-ENDDO
-IF nLen<=230
-    aadd(aLine,ALLTRIM(cBuffer))
-ENDIF
-RETURN aLine
+            nLen := Len(cBuffer)
+         Endif
+         if at('&minus.',cLine) > 0 .or. at('&eq.', cLine) > 0
+            nPos := RAT(".", cLine)
+            IF nPos>0
+               cLine   := Substr(cBuffer, 1, nPos)
+               cBuffer := Strtran(cBuffer, cLine, "")
+               AADD(aLine, alltrim(cLine))
+               nLen := Len(cBuffer)
+            Endif
+         Endif
+      Endif
+   ENDDO
+   IF nLen <= 230
+      aadd(aLine, ALLTRIM(cBuffer))
+   ENDIF
+
+   RETURN aLine
 *+ EOF: OS2.PRG

@@ -55,7 +55,7 @@ FUNCTION SHOWTIME( nRow, nCol, lNoSec, cColor, l12, lAmPm )
 
    STATIC s_hTimer := NIL
 
-   IF ValType( nRow ) == "N" .AND. nRow >= 0 .AND. nRow <= MaxRow( .T. )
+   IF HB_ISNUMERIC( nRow ) .AND. nRow >= 0 .AND. nRow <= MaxRow( .T. )
       IF s_hTimer != NIL
          hb_idleDel( s_hTimer )
       ENDIF

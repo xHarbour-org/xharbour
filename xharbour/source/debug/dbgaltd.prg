@@ -58,7 +58,7 @@ function ALTD( nAction )
       if SET( _SET_DEBUG ) .AND. TYPE( "__DBGALTDENTRY()" ) == "UI"
          &("__DBGALTDENTRY()")
       endif
-   elseif valtype( nAction ) == "N"
+   elseif HB_ISNUMERIC( nAction )
       if nAction == ALTD_DISABLE
          SET( _SET_DEBUG, .F. )
       elseif nAction == ALTD_ENABLE

@@ -576,7 +576,7 @@ METHOD DrawRows( nFrom, nTo, lHilite, lOut ) CLASS TAChoice
 
    LOCAL nCurOption
 
-   IF ValType( lOut ) != "L" .OR. lOut
+   IF !HB_ISLOGICAL( lOut ) .OR. lOut
       DispBegin()
       DO WHILE nFrom <= nTo
          nCurOption := ::nFirstRow + nFrom

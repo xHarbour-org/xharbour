@@ -62,7 +62,7 @@ FUNCTION KeyTime( nKey, cClockTime )
       pHandle := nil
    ENDIF
 
-   IF nKey != nil .AND. ValType( cClockTime ) = 'C'
+   IF nKey != nil .AND. HB_ISSTRING( cClockTime )
 
       nsKey := nKey
       cTime := cClockTime
@@ -84,7 +84,7 @@ STATIC FUNCTION doKeyTime()
    LOCAL nMn := Val( SubStr( ccTime, 4, 2 ) )
    LOCAL nSc := Val( SubStr( ccTime, 7, 2 ) )
 
-   IF nHour = 99
+   IF nHour == 99
       IF nHr > nLast
          __Keyboard( nsKey )
          nLast := nHr
@@ -93,7 +93,7 @@ STATIC FUNCTION doKeyTime()
             pHandle := nil
          ENDIF
       ENDIF
-   ELSEIF nMin = 99 .AND. nHr == nHour
+   ELSEIF nMin == 99 .AND. nHr == nHour
       IF nMn > nLast
          __Keyboard( nsKey )
          nLast := nMn
@@ -102,7 +102,7 @@ STATIC FUNCTION doKeyTime()
             pHandle := nil
          ENDIF
       ENDIF
-   ELSEIF nSec = 99 .AND. nHr == nHour .AND. nMn == nMin
+   ELSEIF nSec == 99 .AND. nHr == nHour .AND. nMn == nMin
       IF nSc > nLast
          __Keyboard( nsKey )
          nLast := nSc

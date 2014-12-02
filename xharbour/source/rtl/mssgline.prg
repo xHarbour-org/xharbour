@@ -88,9 +88,9 @@ METHOD New( nRow, nLeft, nRight, cColor ) CLASS MssgLine
    ::Right := nRight
    ::Color := cColor
 
-   ::Flag := ( ValType( nRow ) + ValType( nLeft ) + ValType( nRight ) == "NNN" )
+   ::Flag := HB_ISNUMERIC( nRow ) .AND. HB_ISNUMERIC( nLeft ) .AND. HB_ISNUMERIC( nRight )
 
-   IF !( ValType( cColor ) == "C" )
+   IF !HB_ISSTRING( cColor )
       ::Color := GetClrPair( SetColor(), 1 )
    ENDIF
 
@@ -148,8 +148,8 @@ ENDCLASS
 
 METHOD Show( oGet ) CLASS GetMssgLine
 
-   LOCAL cMsg := iif( ValType( oGet:Control ) == "O", ;
-      oGet:Control:Message, oGet:Message )
+   LOCAL cMsg := iif( HB_ISOBJECT( oGet:Control ), ;
+                      oGet:Control:Message, oGet:Message )
 
    IF !Empty( cMsg )
       ::super:Show( cMsg )
@@ -180,7 +180,7 @@ METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
    LOCAL nCurrent, cMsg := NIL
    LOCAL mlOldState := MSetCursor( .F. )
 
-   IF ( ValType( oMenu:lOldMsgFlag ) == "L" .AND. oMenu:lOldMsgFlag )
+   IF HB_ISLOGICAL( oMenu:lOldMsgFlag ) .AND. oMenu:lOldMsgFlag
       ::RestScreen()
    ENDIF
 

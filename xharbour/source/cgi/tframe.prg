@@ -67,7 +67,7 @@ CLASS THtmlFrameSet
       marginwidth, marginheight, cTarget, cScrolling )
 
 ENDCLASS
-   
+
 METHOD New( cFName, cTitle ) CLASS THtmlFrameSet
 
    LOCAL cStr := ""
@@ -103,7 +103,7 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
    cStr += CRLF() + " <FRAMESET "
 
-   IF aRows != NIL .AND. ValType( aRows ) == "A" .AND. !Empty( aRows )
+   IF HB_ISARRAY( aRows ) .AND. !Empty( aRows )
       cStr += ' rows="'
 
       FOR EACH cItem in aRows
@@ -119,7 +119,7 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
       cStr += '"'
    ENDIF
 
-   IF aCols != NIL .AND. ValType( aCols ) == "A" .AND. !Empty( aCols )
+   IF HB_ISARRAY( aCols ) .AND. !Empty( aCols )
 
       cStr += ' cols="'
 
@@ -224,7 +224,6 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
 
    cStr += ">" + CRLF()
 
-   ::cStr +=  cStr
+   ::cStr += cStr
 
    RETURN Self
-

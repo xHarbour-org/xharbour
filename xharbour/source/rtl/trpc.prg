@@ -287,7 +287,7 @@ RETURN Self
 
 METHOD SetCallable( oExec, oMeth ) CLASS tRPCFunction
    // If the callable is an object, we need to store the method
-   IF ValType( oExec ) == "O"
+   IF HB_ISOBJECT( oExec )
       ::aCall := Array( Len( ::aParameters ) + 3 )
       ::aCall[2] := oMeth
    ELSE
@@ -305,7 +305,7 @@ METHOD Run( aParams, oClient ) CLASS tRPCFunction
       RETURN NIL
    ENDIF
 
-   nStart := IIF( ValType( ::aCall[1] ) == "O", 3, 2 )
+   nStart := IIF( HB_ISOBJECT( ::aCall[1] ), 3, 2 )
 
    FOR nCount := 1 TO Len( aParams )
       ::aCall[ nStart ] := aParams[ nCount ]
@@ -329,7 +329,7 @@ RETURN .T.
 METHOD CheckTypes( aParams ) CLASS tRPCFunction
    LOCAL oElem, i := 0
 
-   IF ValType( aParams ) != 'A'
+   IF !HB_ISARRAY( aParams )
       RETURN .F.
    ENDIF
 
@@ -650,7 +650,7 @@ METHOD Run() CLASS tRPCServeCon
                nSafeStatus := RPCS_STATUS_ERROR
             ELSE
                HB_MutexLock( ::mtxBusy )
-               ::lCanceled = .T.
+               ::lCanceled := .T.
                HB_MutexUnlock( ::mtxBusy )
                InetSendAll( ::skRemote, "XHBR34")
             ENDIF
@@ -750,8 +750,8 @@ METHOD LaunchChallenge( cUserid, cPassword ) CLASS tRPCServeCon
       cChallenge[ nCount ] := Chr( HB_Random(0,255 ) )
    NEXT
 
-   ::nChallengeCRC = HB_Checksum( cChallenge )
-   cChallenge := HB_Crypt( cChallenge, ::cCryptKey )
+   ::nChallengeCRC := HB_Checksum( cChallenge )
+   cChallenge      := HB_Crypt( cChallenge, ::cCryptKey )
 
    InetSendAll( ::skRemote, "XHBR94" + HB_CreateLen8( Len( cChallenge ) ) + cChallenge )
 
@@ -965,7 +965,7 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
 
       CASE nMode == 1 // run in loop
          aSubst := AClone( aParams )
-         nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
+         nSubstPos := AScan( aParams, {|x| HB_ISSTRING( x ) .and. x == "$."} )
 
          SWITCH aDesc[1]
             CASE 'A' // all results
@@ -977,11 +977,11 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
                   ::SendResult( oRet, cFuncName )
                NEXT
                oRet := "Done"
-            EXIT
+               EXIT
 
             CASE 'C' // Vector of all results
                aRet := {}
-               ::lAllowProgress = .F.
+               ::lAllowProgress := .F.
                FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := nCount
@@ -996,10 +996,10 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
                IF oRet != NIL
                   oRet := aRet
                ENDIF
-            EXIT
+               EXIT
 
             CASE 'E' // Just send confirmation at end
-               ::lAllowProgress = .F.
+               ::lAllowProgress := .F.
                FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := nCount
@@ -1013,12 +1013,12 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
                IF oRet != NIL
                   oRet := "Done"
                ENDIF
-            EXIT
-         END
+               EXIT
+         ENDSWITCH
 
       CASE nMode == 2 // Run in a foreach loop
          aSubst := AClone( aParams )
-         nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
+         nSubstPos := AScan( aParams, {|x| HB_ISSTRING( x ) .and. x == "$."} )
 
          SWITCH aDesc[1]
             CASE 'A' // all results
@@ -1034,7 +1034,7 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
 
             CASE 'C' // Vector of all results
                aRet := {}
-               ::lAllowProgress = .F.
+               ::lAllowProgress := .F.
                FOR EACH oElem IN  aDesc[ 2 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := oElem
@@ -1052,7 +1052,7 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
             EXIT
 
             CASE 'E' // Just send confirmation at end
-               ::lAllowProgress = .F.
+               ::lAllowProgress := .F.
                FOR EACH oElem IN aDesc[ 2 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := oElem
@@ -1262,7 +1262,7 @@ METHOD Add( xFunction, cVersion, nLevel, oExec, oMethod )
    LOCAL nElem, lRet := .F.
    LOCAL oFunction
 
-   IF ValType( xFunction ) == "C"
+   IF HB_ISSTRING( xFunction )
       oFunction := TRpcFunction():New( xFunction, cVersion, nLevel, oExec, oMethod )
    ELSE
       oFunction := xFunction
@@ -1271,7 +1271,7 @@ METHOD Add( xFunction, cVersion, nLevel, oExec, oMethod )
    HB_MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| oFunction:cName == x:cName})
    IF nElem == 0
-      Aadd( ::aFunctions  , oFunction )
+      Aadd( ::aFunctions, oFunction )
       lRet := .T.
    ENDIF
    HB_MutexUnlock( ::mtxBusy )

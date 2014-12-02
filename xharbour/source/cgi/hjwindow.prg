@@ -300,7 +300,7 @@ METHOD Put() CLASS TJsWindow
       ::setFeatures()
    ENDIF
 
-   IF ValType( ::name ) != "C"
+   IF !HB_ISSTRING( ::name )
       ::name := "newWin"
    ENDIF
 
@@ -460,9 +460,7 @@ METHOD ImageURL( cImage, cUrl, nHeight, nBorder, ;
       ::QOut( '<A HREF=' + cUrl + '><IMG SRC="' + cImage + '"' + ;
          cStr + '></A>' )
    ELSE
-      ::QOut( '<IMG SRC="' + cImage + '"' + ;
-         cStr + '></A>' )
+      ::QOut( '<IMG SRC="' + cImage + '"' + cStr + '></A>' )
    ENDIF
 
    RETURN Self
-
