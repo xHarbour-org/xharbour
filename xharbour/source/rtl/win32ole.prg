@@ -49,9 +49,9 @@
  *
  */
 
-#ifndef __PLATFORM__Windows
-
 #include "common.ch"
+
+#ifndef __PLATFORM__Windows
 
   Function CreateObject()
   Return NIL

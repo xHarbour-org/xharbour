@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-02 14:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/win32ole.prg
+    ! add missing include
+
 2014-12-02 14:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/gtwvg/wvtclass.prg
   * contrib/gtwvg/wvtpaint.prg
