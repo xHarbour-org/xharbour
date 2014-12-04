@@ -118,7 +118,7 @@ FUNCTION sxNum( xKeyVal )
       xKeyVal := Val( xKeyVal )
       EXIT
    CASE "D"
-      xKeyVal := xKeyVal - CToD( "" )
+      xKeyVal := xKeyVal - SToD()
       EXIT
    CASE "L"
       xKeyVal := iif( xKeyVal, 1, 0 )
@@ -140,10 +140,10 @@ FUNCTION sxDate( xKeyVal )
       xKeyVal := CToD( xKeyVal )
       EXIT
    CASE "N"
-      xKeyVal := CToD( "" ) + xKeyVal
+      xKeyVal := SToD() + xKeyVal
       EXIT
    DEFAULT
-      xKeyVal := CToD( "" )
+      xKeyVal := SToD()
       EXIT
    END SWITCH
 

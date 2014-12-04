@@ -471,7 +471,7 @@ PROCEDURE HashAddMember( aName, cType, uInit, oObj )
       CASE "D" // DATE or DATETIME
 
          IF uInit == nil
-            uInit := iif( cType == "DATE", CToD( "" ), { ^ 0/0/0 } )
+            uInit := iif( cType == "DATE", SToD(), { ^ 0/0/0 } )
          ENDIF
 
          EXIT

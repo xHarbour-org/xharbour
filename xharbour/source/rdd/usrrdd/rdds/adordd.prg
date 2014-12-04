@@ -493,20 +493,20 @@ STATIC FUNCTION ADO_GETVALUE( nWA, nField, xValue )
          ELSEIF nType == HB_FT_DATE
             // Null values
             IF HB_ISNIL( xValue )
-                xValue := cToD( "" )
+                xValue := sToD()
             ENDIF
 #ifdef HB_FT_DATETIME
          ELSEIF nType == HB_FT_DATETIME
             // Null values
             IF HB_ISNIL( xValue )
-                xValue := cToD( "" )
+                xValue := sToD()
             ENDIF
 #endif
 #ifdef HB_FT_TIMESTAMP
          ELSEIF nType == HB_FT_TIMESTAMP
             // Null values
             IF HB_ISNIL( xValue )
-                xValue := cToD( "" )
+                xValue := sToD()
             ENDIF
 #endif
          ENDIF

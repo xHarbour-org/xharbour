@@ -3699,7 +3699,7 @@ switch aColInfo[ _TB_COLINFO_TYPE ]
       xValue := 0
       exit
    case 'D'
-      xValue := CTOD( "" )
+      xValue := STOD()
       exit
    case 'L'
       xValue := .F.
@@ -3776,4 +3776,3 @@ Return iif( lOK, aDefColor, aDef )
 FUNCTION TBrowseNew( nTop, nLeft, nBottom, nRight )
 *---------------------------------------------------*
 RETURN ( TBrowse():New( nTop, nLeft, nBottom, nRight ) )
-

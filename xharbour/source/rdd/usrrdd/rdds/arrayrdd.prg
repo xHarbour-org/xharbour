@@ -1792,7 +1792,7 @@ STATIC FUNCTION EmptyValue( cType, nLen, nDec )
    CASE cType == "C" .OR. cType == "M"
       xVal := Space( nLen )
    CASE cType == "D"
-      xVal := CToD( "" )
+      xVal := SToD()
    CASE cType == "L"
       xVal := .F.
    CASE cType == "N"
@@ -1949,7 +1949,7 @@ STATIC FUNCTION DecEmptyValue( xVal )
       xRet := ""
       EXIT
    CASE "D"  /* Date */
-      xRet := ctod("")
+      xRet := stod()
       EXIT
    CASE "L"  /* Logical */
       xRet := .F.

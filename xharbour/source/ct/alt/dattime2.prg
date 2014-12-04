@@ -82,7 +82,7 @@ local nYear
 local nLDOM
 
 //   if nmth > 70
-//      return ctod ("  /  /    ")
+//      return stod ()
 //   endif
 //
 //   nOldday := day (ddate)
@@ -98,7 +98,7 @@ local nLDOM
 //   return dEnd
 
    if !(valtype (ddate) $ "DN")
-      return ctod("")
+      return stod()
    endif
 
    if HB_ISNUMERIC( ddate )

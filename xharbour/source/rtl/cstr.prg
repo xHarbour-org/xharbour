@@ -483,7 +483,7 @@ FUNCTION ValToDate( xVal )
          Throw( ErrorNew( "VALTODATE", 0, 3103, ProcName(), "Unsupported type", { xVal } ) )
    END
 
-RETURN cToD( "" )
+RETURN sToD()
 
 //--------------------------------------------------------------//
 FUNCTION ValToHash( xVal )

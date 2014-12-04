@@ -403,7 +403,7 @@ FUNCTION HbMake_FileDate( cFileName )
 
    LOCAL aFiles := DIRECTORY( cFileName )
 
-RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 3 ], CTOD( '' ) )
+RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 3 ], STOD() )
 
 *------------------------------------
 FUNCTION HbMake_FileTime( cFileName )
@@ -416,7 +416,7 @@ RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 4 ], '' )
 *------------------------------
 FUNCTION TD2JUL( CTIME, DDATE )
 *------------------------------
-RETURN DDATE - CTOD( '01/01/1900' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
+RETURN DDATE - STOD( '19000101' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
 
 *---------------------
 STATIC FUNCTION TTOS( CTIME )

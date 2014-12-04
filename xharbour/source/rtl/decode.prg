@@ -253,7 +253,7 @@ STATIC FUNCTION EmptyValue( xVal )
       xRet := ""
       EXIT
    CASE 'D'  // Date
-      xRet := CToD( '' )
+      xRet := SToD()
       EXIT
    CASE 'L'  // Logical
       xRet := .F.

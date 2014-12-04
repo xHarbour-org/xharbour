@@ -2202,7 +2202,7 @@ METHOD DeleteAll() CLASS Get
       ::minus := .F.
       EXIT
    CASE "D"
-      xValue := CToD( "" )
+      xValue := SToD()
       ::BadDate := .F.
       EXIT
    CASE "T"
