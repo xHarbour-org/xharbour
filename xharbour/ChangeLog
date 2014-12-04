@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-04 22:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  + tests/omacro.prg
+    + this file tests support for passing object methods and vars
+      using macro syntax; borrow from harbour.
+      It really cause GPF during compiling!
+
 2014-12-04 15:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbexprb.c
     ! fixed GPF traps when optimizing 2nd parameter of __DBLIST();
