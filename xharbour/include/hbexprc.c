@@ -166,8 +166,10 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_GENPCODE1( hb_compGenPCode1, ( BYTE ) bOpEq );
 
       if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      {
          /* Now do the assignment - call pop message with one argument */
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      }
       else
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
    }
@@ -210,7 +212,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
              pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
-            bShort = TRUE;
+            bShort     = TRUE;
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
@@ -316,7 +318,10 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
       /* Push _message for the later assignment.  */
-      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
+      if( pObj->value.asMessage.pMacroMessage )
+         HB_EXPR_USE( pObj->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+      else
+         HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
@@ -325,7 +330,10 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
 
       /* Now push current value of variable */
-      HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+      if( pObj->value.asMessage.pMacroMessage )
+         HB_EXPR_USE( pObj->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+      else
+         HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
       if( pObj->ExprType == HB_ET_SEND )
       {
@@ -379,7 +387,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 #else
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
-         int iIncrement = 0, iLocal;
+         int  iIncrement = 0, iLocal;
          BOOL bShort;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
@@ -392,7 +400,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
              pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
-            bShort = TRUE;
+            bShort     = TRUE;
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
@@ -488,7 +496,10 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
       /* Push _message for later use */
-      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
+      if( pObj->value.asMessage.pMacroMessage )
+         HB_EXPR_USE( pObj->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+      else
+         HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
@@ -497,7 +508,10 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
 
       /* Now push current value of variable */
-      HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+      if( pObj->value.asMessage.pMacroMessage )
+         HB_EXPR_USE( pObj->value.asMessage.pMacroMessage, HB_EA_PUSH_PCODE );
+      else
+         HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
@@ -761,9 +775,9 @@ ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
 ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr )
 #endif
 {
-   HB_EXPR_PTR pNext;
+   HB_EXPR_PTR   pNext;
    HB_EXPR_PTR * pPrev;
-   ULONG ulCnt = 0;
+   ULONG         ulCnt = 0;
 
    /* NOTE: During optimalization an expression on the list can be
     * replaced by the new one
@@ -773,10 +787,10 @@ ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr )
    pExpr = pExpr->value.asList.pExprList;
    while( pExpr )
    {
-      pNext  = pExpr->pNext; /* store next expression in case the current  will be reduced */
+      pNext  = pExpr->pNext;    /* store next expression in case the current  will be reduced */
       pExpr  = HB_EXPR_USE( pExpr, HB_EA_REDUCE );
-      *pPrev = pExpr;   /* store a new expression into the previous one */
-      pExpr->pNext = pNext;  /* restore the link to next expression */
+      *pPrev = pExpr;           /* store a new expression into the previous one */
+      pExpr->pNext = pNext;     /* restore the link to next expression */
       pPrev  = &pExpr->pNext;
       pExpr  = pNext;
       ++ulCnt;
@@ -787,8 +801,8 @@ ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr )
 BOOL hb_compExprCheckMacroVar( char * szText )
 {
    char * pTmp = szText;
-   BOOL bTextSubst;
-   BOOL bMacroText = FALSE;
+   BOOL   bTextSubst;
+   BOOL   bMacroText = FALSE;
 
    while( ( pTmp = strchr( pTmp, '&' ) ) != NULL )
    {
@@ -809,6 +823,7 @@ BOOL hb_compExprCheckMacroVar( char * szText )
       {
 #if defined( HB_MACRO_SUPPORT )
          HB_SYMBOL_UNUSED( bMacroText );
+
          return TRUE;    /*there is no need to check all '&' occurences */
 #else
          /* There is a valid character after '&' that can be used in
@@ -819,8 +834,7 @@ BOOL hb_compExprCheckMacroVar( char * szText )
          char * pStart = pTmp;
          char cSave;
 
-         /* NOTE: This uses _a-zA-Z0-9 pattern to check for
-          * variable name
+         /* NOTE: This uses _a-zA-Z0-9 pattern to check for variable name
           */
          while( *pTmp && (*pTmp == '_' || (*pTmp >= 'A' && *pTmp <= 'Z') || (*pTmp >= 'a' && *pTmp <= 'z') || (*pTmp >= '0' && *pTmp <= '9')) )
             ++pTmp;
@@ -846,7 +860,7 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
 {
 #if defined( HB_MACRO_SUPPORT )
 
-   pLeft->value.asString.string = (char *) hb_xrealloc( pLeft->value.asString.string, pLeft->ulLength + pRight->ulLength + 1 );
+   pLeft->value.asString.string  = (char *) hb_xrealloc( pLeft->value.asString.string, pLeft->ulLength + pRight->ulLength + 1 );
    pLeft->value.asString.dealloc = TRUE;
    HB_MEMCPY( pLeft->value.asString.string + pLeft->ulLength, pRight->value.asString.string, (size_t) pRight->ulLength );
    pLeft->ulLength += pRight->ulLength;
@@ -857,7 +871,7 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    /* NOTE: compiler uses the hash table for storing identifiers and literals
     * Strings passed for reduction can be referenced by other expressions
     * then we cannot resize them or deallocate
-   */
+    */
    char *szString;
 
    szString = (char *) hb_xgrab( pLeft->ulLength + pRight->ulLength + 1 );
@@ -869,14 +883,14 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    if( pLeft->value.asString.dealloc )
       hb_xfree( pLeft->value.asString.string );
 
-   pLeft->value.asString.string = szString;
+   pLeft->value.asString.string  = szString;
    pLeft->value.asString.dealloc = TRUE;
 
    hb_compExprFree( pRight, HB_MACRO_PARAM );
 
 #endif
 
-   HB_SYMBOL_UNUSED( pMacro );    /* to suppress BCC warning */
+   HB_SYMBOL_UNUSED( pMacro );
 
    return pLeft;
 }
