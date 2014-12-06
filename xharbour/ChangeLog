@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-06 11:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/gencc1.c
+    ! bug in datetime pcode; minor formatting
+
 2014-12-05 17:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbexprc.c
     ! fixed GPF traps when compiling o:&macro things
