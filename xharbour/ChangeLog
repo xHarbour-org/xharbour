@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2014-12-06 13:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * make_gc.bat
+    ! reverted to previus version
+  + make_gc64.bat
+    ! .bat to build mingw 64 bits build  
+    
 2014-12-06 11:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/gencc1.c
     ! bug in datetime pcode; minor formatting

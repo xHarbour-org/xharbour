@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id$
+rem $Id: make_gc.bat 10057 2014-12-01 23:01:42Z lculik $
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR MINGW32
@@ -12,7 +12,7 @@ rem
 rem ============================================================================
 
 rem uncomment HB_ARCH to compile under Win64
-REM SET HB_ARCH=64
+SET HB_ARCH=64
 REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
@@ -27,9 +27,8 @@ REM SET HB_DIR_CURL=
 REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
-
-IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGW
-IF "%SUB_DIR%"=="" SET SUB_DIR=gc
+IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGw64
+IF "%SUB_DIR%"=="" SET SUB_DIR=gc64
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 IF "%BISON_DIR%"=="" SET BISON_DIR=C:/MSYS/1.0/bin
 
@@ -37,13 +36,13 @@ SET _PATH=%PATH%
 SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
 
 rem Added for MinGW 4.70 -mno-cygwin is no longer valid
-rem SET NO_CYGWIN=1
+SET NO_CYGWIN=1
 
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET DIR_SEP=/
+SET DIR_SEP=\
 if %HB_ARCHITECTURE%.==w32. SET DIR_SEP=\
 SET OBJEXT=%HB_ARCH%%HB_DEBUG%.o
 SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
@@ -120,7 +119,7 @@ rem=============================================================================
    SET HB_MT_DIR=%DIR_SEP%dll
    @CALL winmake\mdir.bat dllcreate
    mingw32-make.exe -f winmake\makefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
 rem=============================================================================
@@ -150,13 +149,13 @@ rem=============================================================================
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
    mingw32-make.exe -f winmake\makefile.gc  1>cont0_%SUB_DIR%.log 2>cont_%SUB_DIR%.log
-   if errorlevel 1 goto BUILD_ERR
+   if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_THREAD_SUPPORT=1
    REM SET HB_MT=mt
    REM SET HB_MT_DIR=
    REM mingw32-make.exe -f winmake\makefile.gc  1>>cont0_%SUB_DIR%.log 2>>cont_%SUB_DIR%.log
-   REM if errorlevel 1 goto BUILD_ERR
+   REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
