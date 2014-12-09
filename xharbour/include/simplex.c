@@ -396,7 +396,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
             { \
                sSelf[0] = chrRead; \
                iSelfLen = 1; \
-               chrSelf = ( unsigned char ) LEX_CASE( *szBuffer ); \
+               chrSelf  = ( unsigned char ) LEX_CASE( *szBuffer ); \
                \
                while( aSelfs[i].sWord[iSelfLen] ) \
                { \
@@ -418,7 +418,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                if( aSelfs[i].sWord[iSelfLen] == '\0' ) \
                { \
                   /* Moving to next postion after the Self Contained Word. */ \
-                  szBuffer += ( iSelfLen - 1 ); \
+                  szBuffer  += ( iSelfLen - 1 ); \
                   s_szBuffer = szBuffer; \
                   \
                   sSelf[ iSelfLen ] = '\0'; \
@@ -622,7 +622,7 @@ int SimpLex_GetNextToken( void )
             {
                iLastLen = 1;
 
-               while( iSize && acOmmit[(int) *szBuffer] )
+               while( iSize && acOmmit[(unsigned char) *szBuffer] )
                {
                   iSize--; szBuffer++; iLastLen++;
                }
@@ -833,7 +833,7 @@ int SimpLex_GetNextToken( void )
                {
                    DEBUG_INFO( printf( "Reducing NewLine '%c'\n", chrRead ) );
                    bIgnoreWords = FALSE;
-                   bNewLine = TRUE;
+                   bNewLine     = TRUE;
 
                    return (int) chrRead;
                }
@@ -1036,7 +1036,7 @@ static int Reduce( int iToken )
       register unsigned int iMax = (unsigned int) aRuleNodes[ iToken ].iMax;
       register unsigned int iTentative = 0;
 
-      iRule = (unsigned int) aRuleNodes[ iToken ].iMin;
+      iRule    = (unsigned int) aRuleNodes[ iToken ].iMin;
       iMatched = 1;
 
       DEBUG_INFO( printf( "Scaning Prospects %i-%i at Pos: 0 for Token: %i\n", iRule, iMax -1, iToken ) );
@@ -1058,7 +1058,7 @@ static int Reduce( int iToken )
             if( iHold )
             {
                 iHold--;
-                iToken = aiHold[ iHold ];
+                iToken       = aiHold[ iHold ];
                 bIgnoreWords = FALSE;
                 if( iToken > 0 && iToken < 256 )
                    if( acNewLine[iToken] ) bNewLine = TRUE;
@@ -1202,8 +1202,8 @@ void SimpLex_CheckWords( void )
 #ifdef USE_KEYWORDS
    if( bNewLine )
    {
-      i      = aKeyNodes[ (int) sToken[0] ].iMin;
-      iMax   = aKeyNodes[ (int) sToken[0] ].iMax + 1;
+      i      = aKeyNodes[ (unsigned char) sToken[0] ].iMin;
+      iMax   = aKeyNodes[ (unsigned char) sToken[0] ].iMax + 1;
       aCheck = (LEX_WORD *) &(aKeys[0]);
 #ifdef DEBUG_LEX
       sDesc  = (char *) sKeyDesc;
@@ -1212,8 +1212,8 @@ void SimpLex_CheckWords( void )
    else
 #endif
    {
-      i      = aWordNodes[ (int) sToken[0] ].iMin;
-      iMax   = aWordNodes[ (int) sToken[0] ].iMax + 1;
+      i      = aWordNodes[ (unsigned char) sToken[0] ].iMin;
+      iMax   = aWordNodes[ (unsigned char) sToken[0] ].iMax + 1;
       aCheck = (LEX_WORD *) &( aWords[0] );
 #ifdef DEBUG_LEX
       sDesc  = (char *) sWordDesc;
@@ -1464,7 +1464,7 @@ void SimpLex_CheckWords( void )
                   iLen = (int) strlen( sStart );
 
                s_szBuffer -= iLen;
-               iSize += iLen;
+               iSize      += iLen;
 
                DEBUG_INFO( printf( "Rewinded iLen:%i held: %i token [%s] to [%s]\n", iLen, iHold, sWord2Check, s_szBuffer ) );
             }
@@ -1481,7 +1481,7 @@ void SimpLex_CheckWords( void )
             int iNextToken;
 
             bRecursive = TRUE;
-            cSpacer = chrRead;
+            cSpacer    = chrRead;
 
             DEBUG_INFO( printf( "Getting next Token...\n" ) );
 

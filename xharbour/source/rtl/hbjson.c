@@ -98,23 +98,25 @@
 
 typedef struct
 {
-   char * pBuffer;
-   char * pHead;
+   char  * pBuffer;
+   char  * pHead;
    HB_SIZE nAlloc;
    void ** pId;
    HB_SIZE nAllocId;
-   BOOL fHuman;
+   BOOL    fHuman;
    int     iEolLen;
    const char * szEol;
 } HB_JSON_ENCODE_CTX, * PHB_JSON_ENCODE_CTX;
 
 
+#if 0
 #if defined( HB_OS_UNIX ) && ! defined( HB_EOL_CRLF )
-static const char s_szEol[ 2 ] = { HB_CHAR_LF, 0 };
-static const int  s_iEolLen      = 1;
+  static const char s_szEol[ 2 ] = { HB_CHAR_LF, 0 };
+  static const int  s_iEolLen    = 1;
 #else
-static const char s_szEol[ 3 ]   = { HB_CHAR_CR, HB_CHAR_LF, 0 };
-static const int  s_iEolLen = 2;
+  static const char s_szEol[ 3 ] = { HB_CHAR_CR, HB_CHAR_LF, 0 };
+  static const int  s_iEolLen    = 2;
+#endif
 #endif
 
 #define INDENT_SIZE 2
@@ -125,9 +127,9 @@ static void _hb_jsonCtxAdd( PHB_JSON_ENCODE_CTX pCtx, const char * szString, HB_
    {
       HB_SIZE nSize = pCtx->pHead - pCtx->pBuffer;
 
-      pCtx->nAlloc   += ( pCtx->nAlloc << 1 ) + nLen;
-      pCtx->pBuffer  = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
-      pCtx->pHead    = pCtx->pBuffer + nSize;
+      pCtx->nAlloc += ( pCtx->nAlloc << 1 ) + nLen;
+      pCtx->pBuffer = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
+      pCtx->pHead   = pCtx->pBuffer + nSize;
    }
    if( szString )
    {
@@ -145,14 +147,13 @@ static void _hb_jsonCtxAddIndent( PHB_JSON_ENCODE_CTX pCtx, HB_SIZE nCount )
    {
       HB_SIZE nSize = pCtx->pHead - pCtx->pBuffer;
 
-      pCtx->nAlloc   += ( pCtx->nAlloc << 1 ) + nCount;
-      pCtx->pBuffer  = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
-      pCtx->pHead    = pCtx->pBuffer + nSize;
+      pCtx->nAlloc += ( pCtx->nAlloc << 1 ) + nCount;
+      pCtx->pBuffer = ( char * ) hb_xrealloc( pCtx->pBuffer, pCtx->nAlloc );
+      pCtx->pHead   = pCtx->pBuffer + nSize;
    }
    hb_xmemset( pCtx->pHead, ' ',  nCount );
    pCtx->pHead += nCount;
 }
-   
 
 static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
                             HB_SIZE nLevel, BOOL fEOL )
@@ -160,7 +161,7 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
    /* Protection against recursive structures */
    if( ( HB_IS_ARRAY( pValue ) || HB_IS_HASH( pValue ) ) && hb_itemSize( pValue ) > 0 )
    {
-      void *   id = HB_IS_HASH( pValue ) ? hb_hashId( pValue ) : hb_arrayId( pValue );
+      void *  id = HB_IS_HASH( pValue ) ? hb_hashId( pValue ) : hb_arrayId( pValue );
       HB_SIZE nIndex;
 
       for( nIndex = 0; nIndex < nLevel; nIndex++ )
@@ -189,8 +190,8 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
 
    if( HB_IS_STRING( pValue ) )
    {
-      const char *   szString = hb_itemGetCPtr( pValue );
-      HB_SIZE        nPos, nPos2, nLen = hb_itemGetCLen( pValue );
+      const char * szString = hb_itemGetCPtr( pValue );
+      HB_SIZE      nPos, nPos2, nLen = hb_itemGetCLen( pValue );
 
       _hb_jsonCtxAdd( pCtx, "\"", 1 );
 
@@ -261,9 +262,9 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
    }
    else if( HB_IS_NUMERIC( pValue ) )
    {
-      char     buf[ 64 ];
-      int      iDec;
-      double   dblValue = hb_itemGetNDDec( pValue, &iDec );
+      char   buf[ 64 ];
+      int    iDec;
+      double dblValue = hb_itemGetNDDec( pValue, &iDec );
 
       hb_snprintf( buf, sizeof( buf ), "%.*f", iDec, dblValue );
       _hb_jsonCtxAdd( pCtx, buf, strlen( buf ) );
@@ -293,7 +294,7 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
    {
       char szBuffer[ 19 ];
       hb_datetimeDecStr( szBuffer + 1, hb_itemGetDL( pValue ), hb_itemGetT( pValue ) );
-      szBuffer[ 0 ] = '\"';
+      szBuffer[  0 ] = '\"';
       szBuffer[ 18 ] = '\"';
       _hb_jsonCtxAdd( pCtx, szBuffer, 19 );
    }
@@ -398,7 +399,6 @@ static void _hb_jsonEncode( PHB_ITEM pValue, PHB_JSON_ENCODE_CTX pCtx,
    }
 }
 
-
 static const char * _skipws( const char * szSource )
 {
    while( *szSource == ' ' || *szSource == '\t' || *szSource == '\n' || *szSource == '\r' )
@@ -410,7 +410,7 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
 {
    if( *szSource == '\"' )
    {
-      char *   szDest, * szHead;
+      char *  szDest, * szHead;
       HB_SIZE nAlloc = 16;
 
       szHead = szDest = ( char * ) hb_xgrab( nAlloc );
@@ -420,9 +420,9 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
          if( szHead + 6 >= szDest + nAlloc )
          {
             HB_SIZE nLen = szHead - szDest;
-            nAlloc   += nAlloc << 1;
-            szDest   = ( char * ) hb_xrealloc( szDest, nAlloc );
-            szHead   = szDest + nLen;
+            nAlloc += nAlloc << 1;
+            szDest  = ( char * ) hb_xrealloc( szDest, nAlloc );
+            szHead  = szDest + nLen;
          }
          if( *szSource == '\\' )
          {
@@ -430,28 +430,28 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
             switch( *szSource )
             {
                case '\"':
-                  *szHead++   = '\"';
+                  *szHead++ = '\"';
                   break;
                case '\\':
-                  *szHead++   = '\\';
+                  *szHead++ = '\\';
                   break;
                case '/':
-                  *szHead++   = '/';
+                  *szHead++ = '/';
                   break;
                case 'b':
-                  *szHead++   = '\b';
+                  *szHead++ = '\b';
                   break;
                case 'f':
-                  *szHead++   = '\f';
+                  *szHead++ = '\f';
                   break;
                case 'n':
-                  *szHead++   = '\n';
+                  *szHead++ = '\n';
                   break;
                case 'r':
-                  *szHead++   = '\r';
+                  *szHead++ = '\r';
                   break;
                case 't':
-                  *szHead++   = '\t';
+                  *szHead++ = '\t';
                   break;
                case 'u':
                {
@@ -474,8 +474,8 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
                      hb_xfree( szDest );
                      return NULL;
                   }
-                  *szHead++   = hb_cdpGetChar( hb_cdppage(), TRUE, ( wchar_t ) val );
-                  szSource    += 3;
+                  *szHead++ = hb_cdpGetChar( hb_cdppage(), TRUE, ( wchar_t ) val );
+                  szSource += 3;
                   break;
                }
                default:
@@ -500,10 +500,10 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
    {
       /* NOTE: this function is much less strict to number format than
                JSON syntax definition. This is allowed behaviour [Mindaugas] */
-      HB_MAXINT nValue = 0;
-      double   dblValue = 0;
-      BOOL     fNeg, fDbl = FALSE;
-      int iDec = 0;
+      HB_MAXINT nValue   = 0;
+      double    dblValue = 0;
+      BOOL      fNeg, fDbl = FALSE;
+      int       iDec = 0;
 
       fNeg = *szSource == '-';
       if( fNeg )
@@ -531,8 +531,8 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
       }
       if( *szSource == 'e' || *szSource == 'E' )
       {
-         BOOL  fNegExp;
-         int   iExp = 0;
+         BOOL fNegExp;
+         int  iExp = 0;
 
          szSource++;
          fNegExp = *szSource == '-';
@@ -549,7 +549,7 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
             dblValue = ( double ) nValue;
             fDbl     = TRUE;
          }
-         if ( fNegExp )
+         if( fNegExp )
             iDec += iExp;
          dblValue = hb_numExpConv( dblValue, fNegExp ? iExp : -iExp );
       }
@@ -617,10 +617,10 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
       szSource = _skipws( szSource + 1 );
       if( *szSource != '}' )
       {
-         PHB_ITEM pItemKey    = hb_itemNew( NULL );
-         PHB_ITEM pItemValue  = hb_itemNew( NULL );
+         PHB_ITEM pItemKey   = hb_itemNew( NULL );
+         PHB_ITEM pItemValue = hb_itemNew( NULL );
 
-         for(;; )
+         for( ;; )
          {
             /* Do we need to check if key does not exist yet? */
             if( ( szSource = _hb_jsonDecode( szSource, pItemKey ) ) == NULL ||
@@ -661,9 +661,9 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
 
 char * hb_jsonEncode( PHB_ITEM pValue, HB_SIZE * pnLen, BOOL fHuman )
 {
-   PHB_JSON_ENCODE_CTX  pCtx;
-   char *               szRet;
-   HB_SIZE              nLen;
+   PHB_JSON_ENCODE_CTX pCtx;
+   char *              szRet;
+   HB_SIZE             nLen;
 
    pCtx           = ( PHB_JSON_ENCODE_CTX ) hb_xgrab( sizeof( HB_JSON_ENCODE_CTX ) );
    pCtx->nAlloc   = 16;
@@ -671,16 +671,16 @@ char * hb_jsonEncode( PHB_ITEM pValue, HB_SIZE * pnLen, BOOL fHuman )
    pCtx->nAllocId = 8;
    pCtx->pId      = ( void ** ) hb_xgrab( sizeof( void * ) * pCtx->nAllocId );
    pCtx->fHuman   = fHuman;
-   pCtx->szEol = hb_setGetEOL();
+   pCtx->szEol    = hb_setGetEOL();
    if( ! pCtx->szEol || ! pCtx->szEol[ 0 ] )
       pCtx->szEol = hb_conNewLine();
    pCtx->iEolLen = ( int ) strlen( pCtx->szEol );
 
    _hb_jsonEncode( pValue, pCtx, 0, FALSE );
 
-   nLen           = pCtx->pHead - pCtx->pBuffer;
-   szRet          = ( char * ) hb_xrealloc( pCtx->pBuffer, nLen + 1 );
-   szRet[ nLen ]  = '\0';
+   nLen          = pCtx->pHead - pCtx->pBuffer;
+   szRet         = ( char * ) hb_xrealloc( pCtx->pBuffer, nLen + 1 );
+   szRet[ nLen ] = '\0';
    hb_xfree( pCtx->pId );
    hb_xfree( pCtx );
    if( pnLen )
@@ -690,8 +690,8 @@ char * hb_jsonEncode( PHB_ITEM pValue, HB_SIZE * pnLen, BOOL fHuman )
 
 HB_SIZE hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
 {
-   PHB_ITEM       pItem = pValue ? pValue : hb_itemNew( NULL );
-   const char *   sz;
+   PHB_ITEM     pItem = pValue ? pValue : hb_itemNew( NULL );
+   const char * sz;
 
    sz = szSource ? _hb_jsonDecode( _skipws( szSource ), pItem ) : NULL;
    if( ! pValue )
@@ -700,7 +700,6 @@ HB_SIZE hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
       return sz - szSource;
    return 0;
 }
-
 
 /* Harbour level API functions */
 
@@ -711,8 +710,8 @@ HB_FUNC( HB_JSONENCODE )
    if( pItem )
    {
       HB_SIZE  nLen;
+      char   * szRet = hb_jsonEncode( pItem, &nLen, hb_parl( 2 ) );
 
-      char * szRet = hb_jsonEncode( pItem, &nLen, hb_parl( 2 ) );
       hb_retclen_buffer( szRet, nLen );
    }
 }
