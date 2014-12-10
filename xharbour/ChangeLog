@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-10 23:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbdefs.h
+    ! fix to compile under OpenWatcom
+  * source/compiler/genc.c
+    ! typo in obtaining never used static function
+
 2014-12-09 15:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/simplex.c
     ! prevent accessing arrays with negative index

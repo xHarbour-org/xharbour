@@ -1038,8 +1038,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             {
                fprintf( yyc, " | HB_FS_LOCAL" );
 
-               if( ( ( pSym->cScope & HB_FS_INIT ) == 0 &&
-                     ( pSym->cScope & HB_FS_EXIT ) == 0 &&
+               if( ( ! ( pSym->cScope & HB_FS_INIT & ~HB_FS_STATIC ) &&
+                     ! ( pSym->cScope & HB_FS_EXIT & ~HB_FS_STATIC ) &&
                      ( pSym->cScope & HB_FS_STATIC ) == HB_FS_STATIC ) &&
                    ! hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_STATIC_UNUSED, pSym->szName, NULL );

@@ -127,7 +127,6 @@
 #endif
 
 
-
    /* workaround for BCC 5.8 bug */
    #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
       #undef INT32_MIN
@@ -660,7 +659,7 @@ typedef unsigned long HB_COUNTER;
 #  else
 #     define HB_SIZE_MAX    ULONGLONG_MAX
 #  endif
-#else
+#elif ! defined( __WATCOMC__ )
 #  if defined( HB_SIZE_SIGNED )
 #     define HB_SIZE_MAX    LONG_MAX
 #  else
