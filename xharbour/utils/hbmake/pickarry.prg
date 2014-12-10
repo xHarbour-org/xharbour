@@ -244,7 +244,7 @@ LOCAL THEKEY := Lastkey()
    ENDIF
 
 RETURN ( RETVAL )
-
+/*
 *------------------------------
 STATIC FUNCTION GetFiles( aIn )
 *-------------------------------
@@ -259,4 +259,4 @@ LOCAL cItem := ""
       AAdd( aRet, Substr( cItem, 1, At( ' ', cItem ) ) )
    NEXT
 
-RETURN aRet
+RETURN aRet */

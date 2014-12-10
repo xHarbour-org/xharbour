@@ -3361,7 +3361,7 @@ STATIC PROCEDURE SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
    RETURN
 
-
+/*
 STATIC PROCEDURE StripUntil( pcLine, i, cChar )
 
    LOCAL j
@@ -3379,7 +3379,7 @@ STATIC PROCEDURE StripUntil( pcLine, i, cChar )
    ENDIF
 
    RETURN
-
+*/
 
 FUNCTION __DbgColors()
    RETURN s_oDebugger:GetColors()

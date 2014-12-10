@@ -1391,6 +1391,7 @@ aadd(aTitable,aItems3)
 aadd(aFoiTable,aItems4)
 
 return nil
+/*
 static function getArray(aItems,aItems2,Aitems3,aItems4)
 local nSize
 nSize:=Len(aItems)
@@ -1404,6 +1405,6 @@ if nSize<Len(aitems4)
 nSize:=Len(aItems4)   
 endif
 Return nSize
-
+*/
 
 *+ EOF: GENNG.PRG

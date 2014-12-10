@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-10 22:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\debug\debugger.prg
+    ! commented out not used function StripUntil()
+
+  * utils\hbdoc\genpdf1.prg
+    ! commented out not used function getArray()
+
+  * utils\hbmake\pickarry.prg
+    ! commented out not used function GetFiles()
+
 2014-12-10 23:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbdefs.h
     ! fix to compile under OpenWatcom
