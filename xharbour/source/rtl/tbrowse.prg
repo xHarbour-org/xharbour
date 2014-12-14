@@ -1213,6 +1213,10 @@ Default nMode to 0    // first configuration
                 aCol[ _TB_COLINFO_PICT ] := '@D'
              endif
 
+             if aCol[ _TB_COLINFO_TYPE ] == 'T' .and. empty( aCol[ _TB_COLINFO_PICT ] ) .AND.  HB_IsTimeStamp( xVal )
+                aCol[ _TB_COLINFO_PICT ] := '@D'
+             endif             
+
              aCol[ _TB_COLINFO_LCOLSEP ] := aCol[ _TB_COLINFO_WIDTH ] > 0
 
           endif
@@ -2970,7 +2974,10 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
       DispOut( Space( Int( ( nWidth - nLen ) / 2 ) ), cColorBKG )
       exit
    case "T"
-      DispOut(Ttoc( xValue ))
+
+      DispOut( PadR( Transform( xValue, aColsInfo[ _TB_COLINFO_PICT ] ), nLen ), cColor )
+      DispOut( Space( nWidth - nLen ), cColorBKG )
+      
       exit
    default
       DispOut( Space( nWidth ), cColor )
