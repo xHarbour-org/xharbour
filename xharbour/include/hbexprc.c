@@ -77,9 +77,9 @@ extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of
 /* ************************************************************************* */
 
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprDelOperator( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+void hb_compExprDelOperator( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
+void hb_compExprDelOperator( PHB_EXPR pExpr )
 #endif
 {
    if( pExpr->value.asOperator.pLeft )
@@ -94,16 +94,16 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
  * pExpr is an expression created by hb_compExprNew<operator>Eq functions
  */
 #if defined( HB_MACRO_SUPPORT )
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
+   void hb_compExprPushOperEq( PHB_EXPR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
 #else
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
+   void hb_compExprPushOperEq( PHB_EXPR pSelf, HB_PCODE bOpEq )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
     */
    if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
-      HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
+      PHB_EXPR pObj = pSelf->value.asOperator.pLeft;
 
       /* Push _message for the later assignment.  */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
@@ -306,16 +306,16 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
  * used standalone as a statement (it cannot leave the value on the stack)
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
+void hb_compExprUseOperEq( PHB_EXPR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
 #else
-void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
+void hb_compExprUseOperEq( PHB_EXPR pSelf, HB_PCODE bOpEq )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
     */
    if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
-      HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
+      PHB_EXPR pObj = pSelf->value.asOperator.pLeft;
 
       /* Push _message for the later assignment.  */
       if( pObj->value.asMessage.pMacroMessage )
@@ -484,16 +484,16 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 /* Generates the pcodes for pre- increment/decrement expressions
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper, HB_MACRO_DECL )
+void hb_compExprPushPreOp( PHB_EXPR pSelf, BYTE bOper, HB_MACRO_DECL )
 #else
-void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
+void hb_compExprPushPreOp( PHB_EXPR pSelf, BYTE bOper )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
     */
    if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
-      HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
+      PHB_EXPR pObj = pSelf->value.asOperator.pLeft;
 
       /* Push _message for later use */
       if( pObj->value.asMessage.pMacroMessage )
@@ -576,9 +576,9 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 /* Generates the pcodes for post- increment/decrement expressions
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper, HB_MACRO_DECL )
+void hb_compExprPushPostOp( PHB_EXPR pSelf, BYTE bOper, HB_MACRO_DECL )
 #else
-void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
+void hb_compExprPushPostOp( PHB_EXPR pSelf, BYTE bOper )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
@@ -643,9 +643,9 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
  * used standalone as a statement
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper, HB_MACRO_DECL )
+void hb_compExprUsePreOp( PHB_EXPR pSelf, BYTE bOper, HB_MACRO_DECL )
 #else
-void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
+void hb_compExprUsePreOp( PHB_EXPR pSelf, BYTE bOper )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
@@ -699,12 +699,12 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
  * expression->&macro or &macro->expression or &macro->&macro
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction, HB_MACRO_DECL )
+void hb_compExprUseAliasMacro( PHB_EXPR pAliasedVar, BYTE bAction, HB_MACRO_DECL )
 #else
-void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
+void hb_compExprUseAliasMacro( PHB_EXPR pAliasedVar, BYTE bAction )
 #endif
 {
-   HB_EXPR_PTR pAlias, pVar;
+   PHB_EXPR pAlias, pVar;
 
    /* Alias->Var
     */
@@ -770,14 +770,14 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
  * pExpr is the first expression on the list
  */
 #if defined( HB_MACRO_SUPPORT )
-ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+ULONG hb_compExprReduceList( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr )
+ULONG hb_compExprReduceList( PHB_EXPR pExpr )
 #endif
 {
-   HB_EXPR_PTR   pNext;
-   HB_EXPR_PTR * pPrev;
-   ULONG         ulCnt = 0;
+   PHB_EXPR   pNext;
+   PHB_EXPR * pPrev;
+   ULONG      ulCnt = 0;
 
    /* NOTE: During optimalization an expression on the list can be
     * replaced by the new one
@@ -785,6 +785,7 @@ ULONG hb_compExprReduceList( HB_EXPR_PTR pExpr )
 
    pPrev = &pExpr->value.asList.pExprList;
    pExpr = pExpr->value.asList.pExprList;
+
    while( pExpr )
    {
       pNext  = pExpr->pNext;    /* store next expression in case the current  will be reduced */
@@ -856,7 +857,7 @@ BOOL hb_compExprCheckMacroVar( char * szText )
  *
  * pExpr is the first expression on the list
  */
-HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight, HB_MACRO_DECL )
+PHB_EXPR hb_compExprReducePlusStrings( PHB_EXPR pLeft, PHB_EXPR pRight, HB_MACRO_DECL )
 {
 #if defined( HB_MACRO_SUPPORT )
 

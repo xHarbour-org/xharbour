@@ -185,30 +185,30 @@ typedef struct HB_EXPR_
    {
       struct
       {
-         char *szName;      /* variable name */
-         char *szNamespace;
+         char * szName;                /* variable name */
+         char * szNamespace;
       } asSymbol;
 
-      BOOL asLogical;      /* logical value */
+      BOOL asLogical;                  /* logical value */
       struct
       {
-         USHORT  type;     /* type of datetime */
-         long    date;     /* date value */
-         long    time;     /* time value */
+         USHORT type;                  /* type of datetime */
+         long   date;                  /* date value */
+         long   time;                  /* time value */
       } asDate;
       struct
       {
-         char *string;      /* literal strings */
-         BOOL dealloc;      /* automatic deallocate on expresion deletion */
+         char * string;                /* literal strings */
+         BOOL   dealloc;               /* automatic deallocate on expresion deletion */
       } asString;
       struct
       {
-        struct HB_EXPR_ *pMacro;  /* macro variable */
-        char *szName;             /* variable name  */
-      } asRTVar;      /* PUBLIC or PRIVATE variable declaration */
+        struct HB_EXPR_ * pMacro;      /* macro variable */
+        char *            szName;      /* variable name  */
+      } asRTVar;                       /* PUBLIC or PRIVATE variable declaration */
       struct
       {
-         HB_LONG lVal;               /* integer value */
+         HB_LONG lVal;                 /* integer value */
          double dVal;                  /* double value */
          unsigned char bWidth;         /* unsigned char used intentionally */
          unsigned char bDec;           /* unsigned char used intentionally */
@@ -216,55 +216,55 @@ typedef struct HB_EXPR_
       } asNum;
       struct
       {
-         unsigned char cMacroOp;       /* macro operator */
-         unsigned char SubType;        /* context in which macro is used */
-         char * szMacro;               /* identifier after the macro operator */
-         struct HB_EXPR_ *pExprList;   /* list elements if &(...) was used */
-         struct HB_EXPR_ *pFunCall;    /* pointer to a function if used as function's call argument */
+         unsigned char     cMacroOp;   /* macro operator */
+         unsigned char     SubType;    /* context in which macro is used */
+         char *            szMacro;    /* identifier after the macro operator */
+         struct HB_EXPR_ * pExprList;  /* list elements if &(...) was used */
+         struct HB_EXPR_ * pFunCall;   /* pointer to a function if used as function's call argument */
       } asMacro;
       struct
       {
-         struct HB_EXPR_ *pExprList;    /* list elements */
-         struct HB_EXPR_ *pIndex;       /* array index, others */
-         BOOL bByRef;
-         HB_PCODE PopOp;
+         struct HB_EXPR_ * pExprList;  /* list elements */
+         struct HB_EXPR_ * pIndex;     /* array index, others */
+         BOOL              bByRef;
+         HB_PCODE          PopOp;
       } asList;
       struct
       {
-         struct HB_EXPR_ *pAlias;      /* alias expression */
-         struct HB_EXPR_ *pVar;        /* aliased variable or macro */
-         struct HB_EXPR_ *pExpList;    /* aliased expression list */
+         struct HB_EXPR_ * pAlias;     /* alias expression */
+         struct HB_EXPR_ * pVar;       /* aliased variable or macro */
+         struct HB_EXPR_ * pExpList;   /* aliased expression list */
       } asAlias;
       struct
       {
-         struct HB_EXPR_ *pFunName;     /* function name */
-         struct HB_EXPR_ *pParms;       /* function call parameters */
+         struct HB_EXPR_ * pFunName;   /* function name */
+         struct HB_EXPR_ * pParms;     /* function call parameters */
       } asFunCall;
       struct
       {
-         struct HB_EXPR_ *pObject;     /* object */
-         char * szMessage;             /* message */
-         struct HB_EXPR_ *pParms;      /* method parameters */
-         BOOL bByRef;
-         struct HB_EXPR_ *pMacroMessage;
+         struct HB_EXPR_ * pObject;    /* object */
+         char *            szMessage;             /* message */
+         struct HB_EXPR_ * pParms;     /* method parameters */
+         BOOL              bByRef;
+         struct HB_EXPR_ * pMacroMessage;
       } asMessage;
       struct
       {
-         struct HB_EXPR_ *pLeft;       /* object */
-         struct HB_EXPR_ *pRight;      /* object */
+         struct HB_EXPR_ * pLeft;      /* object */
+         struct HB_EXPR_ * pRight;     /* object */
       } asOperator;
       struct
       {
-         BYTE   *pCode;                  /* pre-generated code */
-         HB_SIZE ulLen;                  /* length of pCode */
+         BYTE *  pCode;                /* pre-generated code */
+         HB_SIZE ulLen;                /* length of pCode */
       } asExtBlock;
    } value;
-   HB_SIZE ulLength;
-   HB_SIZE Counter;
-   unsigned char ExprType;  /* internal expression type */
-   USHORT ValType;          /* language level value type */
-   struct HB_EXPR_ *pNext;  /* next expression in the list of expressions */
-} HB_EXPR, *HB_EXPR_PTR;
+   HB_SIZE           ulLength;
+   HB_SIZE           Counter;
+   unsigned char     ExprType;         /* internal expression type */
+   USHORT            ValType;          /* language level value type */
+   struct HB_EXPR_ * pNext;            /* next expression in the list of expressions */
+} HB_EXPR, * PHB_EXPR;
 
 /* Definitions of function templates used in expression's message
  * handling
@@ -272,16 +272,17 @@ typedef struct HB_EXPR_
 #ifdef HB_MACRO_SUPPORT
 /* Compilation for macro compiler
  */
-#define  HB_EXPR_FUNC( proc )  HB_EXPR_PTR proc( HB_EXPR_PTR pSelf, int iMessage, void * pMacro )
-typedef  HB_EXPR_FUNC( HB_EXPR_FUNC_ );
-typedef  HB_EXPR_FUNC_ *HB_EXPR_FUNC_PTR;
+#define  HB_EXPR_FUNC( proc )  PHB_EXPR proc( PHB_EXPR pSelf, int iMessage, void * pMacro )
 
-extern HB_EXPR_FUNC_PTR hb_comp_ExprTable[];
+typedef  HB_EXPR_FUNC( HB_EXPR_FUNC_ );
+typedef  HB_EXPR_FUNC_ * PHB_EXPR_FUNC;
+
+extern PHB_EXPR_FUNC hb_comp_ExprTable[];
 
 #define  HB_EXPR_USE( pSelf, iMessage )  \
          hb_comp_ExprTable[ (pSelf)->ExprType ]( (pSelf), (iMessage), pMacro )
 
-typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage, void * pMacro );
+typedef  PHB_EXPR HB_EXPR_ACTION( PHB_EXPR pSelf, int iMessage, void * pMacro );
 
 #define HB_EXPR_PCODE0( action ) action( pMacro )
 #define HB_EXPR_PCODE1( action, p1 ) action( (p1), pMacro )
@@ -303,16 +304,17 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage, void * pMa
 #define HB_EXPR_ISEQUAL_IDS( szIdentifier1, szIdentifier2 ) ( szIdentifier1 == szIdentifier2 )
 #define HB_EXPR_ISBUILTIN_ID( szIdentifier, BuiltInName ) HB_EXPR_ISEQUAL_IDS( szIdentifier, hb_compExpr_IDs. BuiltInName )
 
-#define  HB_EXPR_FUNC( proc )  HB_EXPR_PTR proc( HB_EXPR_PTR pSelf, int iMessage )
-typedef  HB_EXPR_FUNC( HB_EXPR_FUNC_ );
-typedef  HB_EXPR_FUNC_ *HB_EXPR_FUNC_PTR;
+#define HB_EXPR_FUNC( proc )  PHB_EXPR proc( PHB_EXPR pSelf, int iMessage )
 
-extern HB_EXPR_FUNC_PTR hb_comp_ExprTable[];
+typedef HB_EXPR_FUNC( HB_EXPR_FUNC_ );
+typedef HB_EXPR_FUNC_ * PHB_EXPR_FUNC;
 
-#define  HB_EXPR_USE( pSelf, iMessage )  \
-         hb_comp_ExprTable[ (pSelf)->ExprType ]( (pSelf), (iMessage) )
+extern PHB_EXPR_FUNC hb_comp_ExprTable[];
 
-typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
+#define HB_EXPR_USE( pSelf, iMessage )  \
+        hb_comp_ExprTable[ (pSelf)->ExprType ]( (pSelf), (iMessage) )
+
+typedef PHB_EXPR HB_EXPR_ACTION( PHB_EXPR pSelf, int iMessage );
 
 #define HB_EXPR_PCODE0( action ) action( )
 #define HB_EXPR_PCODE1( action, p1 ) action( (p1) )
@@ -333,126 +335,126 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
 #define HB_EXPR_ISEQUAL_SYMBOLS( Exp1, Exp2 )  HB_EXPR_ISEQUAL_IDS( Exp1->value.asSymbol.szName, Exp2->value.asSymbol.szName )
 #define HB_EXPR_ISBUILTIN_SYMBOL( Exp1, BuiltInName ) HB_EXPR_ISBUILTIN_ID( Exp1->value.asSymbol.szName, BuiltInName )
 
-HB_EXPR_PTR hb_compExprNew( int );
-HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *, HB_SIZE );
-HB_EXPR_PTR hb_compExprNewEmpty( void );
-HB_EXPR_PTR hb_compExprNewNil( void );
-HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );
-HB_EXPR_PTR hb_compExprNewLong( HB_LONG );
-HB_EXPR_PTR hb_compExprNewString( char *, HB_SIZE, BOOL );
-HB_EXPR_PTR hb_compExprNewLogical( int );
-HB_EXPR_PTR hb_compExprNewDate( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, int, int * );
-HB_EXPR_PTR hb_compExprNewDateTimeVal( long, long, USHORT );
-HB_EXPR_PTR hb_compExprNewSelf( void );
-HB_EXPR_PTR hb_compExprNewCodeBlock( void );
-HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewVar( char * );
-HB_EXPR_PTR hb_compExprNewAliasVar( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewAliasExpr( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMacro( HB_EXPR_PTR, unsigned char, char * );
-HB_EXPR_PTR hb_compExprNewFunName( char * );
-HB_EXPR_PTR hb_compExprNewRTVar( char *, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewAlias( char * );
-HB_EXPR_PTR hb_compExprNewEQ( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewNE( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewLT( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewLE( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewGT( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewGE( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewIN( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewLike( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMatch( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPlus( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMinus( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMult( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewDiv( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMod( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPower( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewAssign( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewEqual( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPlusEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMinusEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMultEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewDivEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewModEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewExpEq( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPostInc( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPostDec( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPreInc( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewPreDec( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewAnd( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewOr( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewNot( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewBitAnd( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewBitOr( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewBitXOr( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewBitShiftR( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewBitShiftL( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewNegate( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewVarRef( char * );
-HB_EXPR_PTR hb_compExprNewMemVarRef( char * );
-HB_EXPR_PTR hb_compExprNewFunRef( char * );
-HB_EXPR_PTR hb_compExprNewCodeblockExpr( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewFunCallArg( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewSend( HB_EXPR_PTR, char * );
-HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewWithSend( char * );
-HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewWithMethodCall( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewList( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewArgList( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprAddListExpr( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewIIF( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprReduce( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprAssign( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprEqual( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprClone( HB_EXPR_PTR pSrc );
-HB_ULONG hb_compExprListLen( HB_EXPR_PTR );
-void hb_compExprClear( HB_EXPR_PTR );
-char * hb_compExprDescription( HB_EXPR_PTR );
-int hb_compExprType( HB_EXPR_PTR );
+PHB_EXPR hb_compExprNew              ( int );
+PHB_EXPR hb_compExprNewExtBlock      ( BYTE *, HB_SIZE );
+PHB_EXPR hb_compExprNewEmpty         ( void );
+PHB_EXPR hb_compExprNewNil           ( void );
+PHB_EXPR hb_compExprNewDouble        ( double, BYTE, BYTE );
+PHB_EXPR hb_compExprNewLong          ( HB_LONG );
+PHB_EXPR hb_compExprNewString        ( char *, HB_SIZE, BOOL );
+PHB_EXPR hb_compExprNewLogical       ( int );
+PHB_EXPR hb_compExprNewDate          ( PHB_EXPR, PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewDateTime      ( PHB_EXPR, PHB_EXPR, PHB_EXPR, PHB_EXPR, PHB_EXPR, PHB_EXPR, int, int * );
+PHB_EXPR hb_compExprNewDateTimeVal   ( long, long, USHORT );
+PHB_EXPR hb_compExprNewSelf          ( void );
+PHB_EXPR hb_compExprNewCodeBlock     ( void );
+PHB_EXPR hb_compExprNewArray         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewVar           ( char * );
+PHB_EXPR hb_compExprNewAliasVar      ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewAliasExpr     ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewMacro         ( PHB_EXPR, unsigned char, char * );
+PHB_EXPR hb_compExprNewFunName       ( char * );
+PHB_EXPR hb_compExprNewRTVar         ( char *, PHB_EXPR );
+PHB_EXPR hb_compExprNewAlias         ( char * );
+PHB_EXPR hb_compExprNewEQ            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewNE            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewLT            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewLE            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewGT            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewGE            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewIN            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewLike          ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMatch         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPlus          ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMinus         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMult          ( PHB_EXPR );
+PHB_EXPR hb_compExprNewDiv           ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMod           ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPower         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewAssign        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewEqual         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPlusEq        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMinusEq       ( PHB_EXPR );
+PHB_EXPR hb_compExprNewMultEq        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewDivEq         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewModEq         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewExpEq         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPostInc       ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPostDec       ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPreInc        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewPreDec        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewAnd           ( PHB_EXPR );
+PHB_EXPR hb_compExprNewOr            ( PHB_EXPR );
+PHB_EXPR hb_compExprNewNot           ( PHB_EXPR );
+PHB_EXPR hb_compExprNewBitAnd        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewBitOr         ( PHB_EXPR );
+PHB_EXPR hb_compExprNewBitXOr        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewBitShiftR     ( PHB_EXPR );
+PHB_EXPR hb_compExprNewBitShiftL     ( PHB_EXPR );
+PHB_EXPR hb_compExprNewNegate        ( PHB_EXPR );
+PHB_EXPR hb_compExprNewVarRef        ( char * );
+PHB_EXPR hb_compExprNewMemVarRef     ( char * );
+PHB_EXPR hb_compExprNewFunRef        ( char * );
+PHB_EXPR hb_compExprNewCodeblockExpr ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewFunCallArg    ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewSend          ( PHB_EXPR, char * );
+PHB_EXPR hb_compExprNewSendExp       ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewMethodCall    ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewWithSend      ( char * );
+PHB_EXPR hb_compExprNewWithSendExp   ( PHB_EXPR );
+PHB_EXPR hb_compExprNewWithMethodCall( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewList          ( PHB_EXPR );
+PHB_EXPR hb_compExprNewArgList       ( PHB_EXPR );
+PHB_EXPR hb_compExprAddListExpr      ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprNewIIF           ( PHB_EXPR );
+PHB_EXPR hb_compExprReduce           ( PHB_EXPR );
+PHB_EXPR hb_compExprAssign           ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprEqual            ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprAssignStatic     ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprClone            ( PHB_EXPR pSrc );
+HB_ULONG hb_compExprListLen          ( PHB_EXPR );
+void     hb_compExprClear            ( PHB_EXPR );
+char *   hb_compExprDescription      ( PHB_EXPR );
+int      hb_compExprType             ( PHB_EXPR );
 
-void hb_compExprFree( HB_EXPR_PTR, HB_MACRO_DECL );
-void hb_compExprErrorType( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprListStrip( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprListStripSingle( HB_EXPR_PTR, HB_MACRO_DECL );
-BOOL hb_compExprCheckMacroVar( char * );
-void hb_compExprCBVarDel( PHB_CBVAR );
-HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR, HB_EXPR_PTR, HB_MACRO_DECL );
+void     hb_compExprFree             ( PHB_EXPR, HB_MACRO_DECL );
+void     hb_compExprErrorType        ( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprListStrip        ( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprListStripSingle  ( PHB_EXPR, HB_MACRO_DECL );
+BOOL     hb_compExprCheckMacroVar    ( char * );
+void     hb_compExprCBVarDel         ( PHB_CBVAR );
+PHB_EXPR hb_compExprReducePlusStrings( PHB_EXPR, PHB_EXPR, HB_MACRO_DECL );
 
-extern BOOL hb_compExprReduceUPPER( HB_EXPR_PTR, HB_MACRO_DECL );
+extern BOOL hb_compExprReduceUPPER( PHB_EXPR, HB_MACRO_DECL );
 
-HB_EXPR_PTR hb_compExprNewNamespaceFunName( char *, char * );
-HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char *, char * );
+PHB_EXPR hb_compExprNewNamespaceFunName( char *, char * );
+PHB_EXPR hb_compExprNewNamespaceFunRef ( char *, char * );
 
 #ifdef HB_MACRO_SUPPORT
 
-HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR, HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR, HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprGenPush( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR, HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR, char *, HB_MACRO_DECL );
-void hb_compExprDelete( HB_EXPR_PTR, HB_MACRO_DECL );
-HB_EXPR_PTR hb_compExprSetGetBlock( HB_EXPR_PTR pExpr, HB_MACRO_DECL  );
+PHB_EXPR hb_compExprNewArrayAt  ( PHB_EXPR, PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprSetOperand  ( PHB_EXPR, PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprGenPop      ( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprGenPush     ( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprGenStatement( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprNewFunCall  ( PHB_EXPR, PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprCBVarAdd    ( PHB_EXPR, char *, HB_MACRO_DECL );
+void     hb_compExprDelete      ( PHB_EXPR, HB_MACRO_DECL );
+PHB_EXPR hb_compExprSetGetBlock ( PHB_EXPR pExpr, HB_MACRO_DECL  );
 
 #else
 
-void hb_compExprINIT( void );
+void     hb_compExprINIT( void );
 
-HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprGenPush( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR, HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR, char *, BYTE );
-void hb_compExprDelete( HB_EXPR_PTR );
-HB_EXPR_PTR hb_compExprSetGetBlock( HB_EXPR_PTR pExpr );
+PHB_EXPR hb_compExprNewArrayAt  ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprSetOperand  ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprGenPop      ( PHB_EXPR );
+PHB_EXPR hb_compExprGenPush     ( PHB_EXPR );
+PHB_EXPR hb_compExprGenStatement( PHB_EXPR );
+PHB_EXPR hb_compExprNewFunCall  ( PHB_EXPR, PHB_EXPR );
+PHB_EXPR hb_compExprCBVarAdd    ( PHB_EXPR, char *, BYTE );
+void     hb_compExprDelete      ( PHB_EXPR );
+PHB_EXPR hb_compExprSetGetBlock ( PHB_EXPR pExpr );
 
 #endif
 

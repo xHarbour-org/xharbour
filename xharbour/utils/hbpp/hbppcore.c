@@ -148,7 +148,7 @@ static void   SearnRep( char *, char *, int, char *, int * );
 static int    ReplacePattern( char, char *, int, char *, int );
 static void   pp_rQuotes( char *, char * );
 static int    md_strAt( char *, int, char *, BOOL, BOOL, BOOL, BOOL );
-static char * PrevSquare( char * , char *, int * );
+static char * PrevSquare( char *, char *, int * );
 static int    stroncpy( char *, char *, int );
 static int    strincpy( char *, char * );
 static BOOL   MatchToken( char **, char **, BOOL );
@@ -279,7 +279,7 @@ const char * hb_pp_szWarnings[] =
    "1Overloaded #define %s"
 };
 
-void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
+void hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet )
 {
    static COMMANDS sC___IIF = { 0, "IF", "(\16\1A00\17,\16\1B00\17,\16\1C00\17 )", "IIF(\1A00,\1B00,\1C00 )", NULL };
 
@@ -314,24 +314,24 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
                /*
                {
                   COMMANDS * stcmd;
-                  DEFINES * stdef;
+                  DEFINES  * stdef;
 
                   stcmd = hb_pp_topCommand;
-                  while ( stcmd )
+                  while( stcmd )
                   {
                       printf( "Command: %s Pattern: %s\n", stcmd->name, stcmd->mpatt );
                       stcmd = stcmd->last;
                   }
 
                   stcmd = hb_pp_topTranslate;
-                  while ( stcmd )
+                  while( stcmd )
                   {
                       printf( "Translate: %s \nPattern: %s\n", stcmd->name, stcmd->mpatt );
                       stcmd = stcmd->last;
                   }
 
                   stdef = hb_pp_topDefine;
-                  while ( stdef && s_kolAddDefs > 3 )
+                  while( stdef && s_kolAddDefs > 3 )
                   {
                       printf( "Define: %s Value: %s\n", stdef->name, stdef->value );
                       stdef = stdef->last;
@@ -340,12 +340,10 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
                }
                */
 
-               if ( s_kolAddComs || s_kolAddTras || s_kolAddDefs > 3 )
+               if( s_kolAddComs || s_kolAddTras || s_kolAddDefs > 3 )
                {
                   if( ! hb_comp_bQuiet )
-                  {
                      printf( "Loaded: %i Commands, %i Translates, %i Defines from: %s\n", s_kolAddComs, s_kolAddTras, s_kolAddDefs - 3, szFileName );
-                  }
                }
                else
                {
@@ -378,9 +376,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
       else
       {
          if( ! hb_comp_bQuiet )
-         {
             printf( "Standard command definitions excluded.\n" );
-         }
 
          hb_pp_Init();
       }
@@ -464,13 +460,9 @@ char * hb_ppPlatform( void )
          if( regs.h.al != 0x00 && regs.h.al != 0x80 )
          {
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
-            {
                hb_snprintf( szName, sizeof( szName ), " (Windows 2.x)" );
-            }
             else
-            {
                hb_snprintf( szName, sizeof( szName ), " (Windows %d.%02d)", regs.h.al, regs.h.ah );
-            }
 
             strcat( szPlatform, szName );
          }
@@ -483,9 +475,7 @@ char * hb_ppPlatform( void )
          HB_DOS_INT86( 0x21, &regs, &regs );
 
          if( regs.HB_XREGS.bx == 0x3205 )
-         {
             strcat( szPlatform, " (Windows NT/2000)" );
-         }
       }
 
       /* Host OS detection: OS/2 */
@@ -497,13 +487,9 @@ char * hb_ppPlatform( void )
          if( regs.h.al >= 10 )
          {
             if( regs.h.al == 20 && regs.h.ah > 20 )
-            {
                hb_snprintf( szName, sizeof( szName ), " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
-            }
             else
-            {
                hb_snprintf( szName, sizeof( szName ), " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
-            }
 
             strcat( szPlatform, szName );
          }
@@ -558,38 +544,24 @@ char * hb_ppPlatform( void )
             case VER_PLATFORM_WIN32_WINDOWS:
 
                if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
-               {
                   strcat( szName, " 95" );
-               }
                else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
-               {
                   strcat( szName, " 98" );
-               }
                else
-               {
                   strcat( szName, " ME" );
-               }
 
                break;
 
             case VER_PLATFORM_WIN32_NT:
 
                if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
-               {
                   strcat( szName, " Server 2003" );
-               }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
-               {
                   strcat( szName, " XP" );
-               }
                else if( osVer.dwMajorVersion == 5 )
-               {
                   strcat( szName, " 2000" );
-               }
                else
-               {
                   strcat( szName, " NT" );
-               }
 
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
@@ -606,17 +578,11 @@ char * hb_ppPlatform( void )
                      if( osVerEx.wProductType == VER_NT_WORKSTATION )
                      {
                         if( osVerEx.dwMajorVersion == 4 )
-                        {
                            strcat( szName, " Workstation 4.0" );
-                        }
                         else if( osVerEx.wSuiteMask & VER_SUITE_PERSONAL )
-                        {
                            strcat( szName, " Home Edition" );
-                        }
                         else
-                        {
                            strcat( szName, " Professional" );
-                        }
                      }
 
                      /* server type */
@@ -626,49 +592,31 @@ char * hb_ppPlatform( void )
                         if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 2 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-                           {
                               strcat( szName, " Datacenter Edition" );
-                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                           {
                               strcat( szName, " Enterprise Edition" );
-                           }
                            else if( osVerEx.wSuiteMask == VER_SUITE_BLADE )
-                           {
                               strcat( szName, " Web Edition" );
-                           }
                            else
-                           {
                               strcat( szName, " Standard Edition" );
-                           }
                         }
 
                         else if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 0 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-                           {
                               strcat( szName, " Datacenter Server" );
-                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                           {
                               strcat( szName, " Advanced Server" );
-                           }
                            else
-                           {
                               strcat( szName, " Server" );
-                           }
                         }
 
                         else
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                           {
                               strcat( szName, " Server 4.0, Enterprise Edition" );
-                           }
                            else
-                           {
                               strcat( szName, " Server 4.0" );
-                           }
                         }
                      }
                   }
@@ -767,11 +715,11 @@ void hb_pp_Init( void )
       pSrc = szPlatform;
       pDst = sOS + strlen( sOS );
 
-      while ( *pSrc && *pSrc != ' ' )
+      while( *pSrc && *pSrc != ' ' )
       {
-         if ( *pSrc == '_' || ( *pSrc >= 'A' && *pSrc <= 'Z' )
-                           || ( *pSrc >= 'a' && *pSrc <= 'z' )
-                           || ( *pSrc >= '0' && *pSrc <= '9' ) )
+         if( *pSrc == '_' || ( *pSrc >= 'A' && *pSrc <= 'Z' )
+                          || ( *pSrc >= 'a' && *pSrc <= 'z' )
+                          || ( *pSrc >= '0' && *pSrc <= '9' ) )
          {
             *pDst++ = *pSrc;
          }
@@ -781,9 +729,9 @@ void hb_pp_Init( void )
 
       pDst = sVer;
       *pDst++ = '"';
-      if ( *pSrc == ' ' )
+      if( *pSrc == ' ' )
       {
-         while ( *(++pSrc) )
+         while( *(++pSrc) )
             *pDst++ = *pSrc;
       }
       *pDst++ = '"';
@@ -2519,7 +2467,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
      if( *ptri == '\0' )
      {
-        if ( ipos == 0 )
+        if( ipos == 0 )
         {
            break;
         }
@@ -2985,7 +2933,7 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
 
   HB_TRACE(HB_TR_DEBUG, ("WorkCommand(%s, %s, %p)", ptri, ptro, stcmd));
 
-  //printf( "Command Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", stcmd->name, stcmd->mpatt, stcmd->value , ptri );
+  //printf( "Command Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", stcmd->name, stcmd->mpatt, stcmd->value, ptri );
 
   lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
   s_Repeate = 0;
@@ -3009,7 +2957,7 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
 
   HB_TRACE(HB_TR_DEBUG, ("WorkTranslate(%s, %s, %p, %p)", ptri, ptro, sttra, lens));
 
-  //printf( "Translate Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", sttra->name, sttra->mpatt, sttra->value , ptri );
+  //printf( "Translate Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", sttra->name, sttra->mpatt, sttra->value, ptri );
 
   lenres = hb_pp_strocpy( ptro, sttra->value );
   s_Repeate = 0;
@@ -4009,7 +3957,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             }
 
             /* Modified by Giancarlo Niccolai 2003-06-20 */
-            if ( IS_ESC_STRING( **ptri ) )
+            if( IS_ESC_STRING( **ptri ) )
             {
                (*ptri)++;
                lens++;
@@ -5728,13 +5676,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
 static int ReplacePattern( char patttype, char * expreal, int lenreal, char * ptro, int lenres )
 {
-  int rmlen = lenreal, ifou, lenitem, i;
-  char sQuotes[ 4 ] = "\"\",";
-  char *pTemp;
+  int    rmlen = lenreal, ifou, lenitem, i;
+  char   sQuotes[ 4 ] = "\"\",";
+  char * pTemp;
 
   HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
 
-  if (lenreal)
+  if( lenreal )
   {
      lenreal--;
      while( expreal[ lenreal ] == ' ' )
@@ -6978,7 +6926,7 @@ static int strotrim( char * stroka, int iContext )
                     {
                        char *pTmp = strchr( pString, ']' );
 
-                       if ( pTmp )
+                       if( pTmp )
                        {
                           pTmp++;
 
@@ -7077,13 +7025,9 @@ static int NextWord( char ** sSource, char * sDest, BOOL lLower )
 
 static int NextName( char ** sSource, char * sDest )
 {
-  /* Ron Pinkas added 2000-11-08 */
   char cLastChar = ( s_bArray ? 'a' : ' ' ), *pString = NULL, *pTmp;
-  /* END - Ron Pinkas added 2000-11-08 */
-
-  int lenName = 0, State = STATE_NORMAL;
-
-  BOOL bReturn = FALSE;
+  int  lenName   = 0, State = STATE_NORMAL;
+  BOOL bReturn   = FALSE;
 
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("NextName(%p, %s)", sSource, sDest));
 
@@ -7092,15 +7036,13 @@ static int NextName( char ** sSource, char * sDest )
      printf( "NextName() In: >%s<\n", *sSource );
   #endif
 
-  while ( **sSource == ' ' )
+  while( **sSource == ' ' )
   {
      (*sSource)++;
   }
 
   if( ! isalpha( ( BYTE ) **sSource ) )
-  {
      s_bNewLine = FALSE;
-  }
 
   while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ( ( ! isalpha( ( BYTE ) **sSource ) ) || IS_ESC_STRING( **sSource ) ) ) ) )
   {
@@ -7960,7 +7902,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
 
       goto Done;
    }
-   else if ( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~\16\17", sLine[0] ) )
+   else if( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~\16\17", sLine[0] ) )
    {
       sToken[0] = sLine[0];
       sToken[1] = '\0';

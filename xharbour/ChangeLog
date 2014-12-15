@@ -8,6 +8,54 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-15 14:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/harboury.h
+  * include/hbapierr.h
+  * include/hbapilng.h
+  * include/hbcomp.h
+  * include/hbdefs.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * include/hbexprop.h
+  * include/hbgtcore.h
+  * include/hbhash.h
+  * include/hbmacro.h
+  * include/macroy.h
+  * source/common/expropt1.c
+  * source/common/expropt2.c
+  * source/common/hbhash.c
+  * source/compiler/gencc.c
+  * source/compiler/gencc1.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+  * source/compiler/hbdead.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbgenerr.c
+  * source/compiler/hbident.c
+  * source/compiler/hblbl.c
+  * source/compiler/hbpcode.c
+  * source/compiler/hbstripl.c
+  * source/macro/macro.y
+  * source/macro/macroyy.c
+  * source/rtl/hbserv.c
+  * utils/hbpp/hbppcore.c
+  * utils/hbpp/hbppdef.h
+  * contrib/hbcurl/hbcurl.c
+  * doc/en/hb_macro.txt
+    * HB_*_PTR pointer types renamed to PHB_*
+
+  * contrib/hbhpdf/hpdf_image_png.c
+  * contrib/hbsqlit3/config.h
+  * contrib/hbsqlit3/xhbsqlite3.c
+  * contrib/hbxdiff/xalloc.c
+  * contrib/pdflite/font/ft_cid.c
+  * contrib/pdflite/tiff/tif_fax3.c
+  * contrib/tipssl/inetssl.c
+  * source/rtl/hbsrlraw.c
+    ! pacify warnings; some clean up
+
 2014-12-14 23:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * source/vm/fm.c
     ! changed fixed hb_sprintf format %li with %" HB_PFS "i to make mingw happy

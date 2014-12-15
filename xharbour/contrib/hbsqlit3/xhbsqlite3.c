@@ -92,7 +92,7 @@ static int  busy_handler( void *, int );
 static int  progress_handler( void * );
 static int  hook_commit( void * );
 static void hook_rollback( void * );
-static void func( sqlite3_context *, int, sqlite3_value ** );
+//static void func( sqlite3_context *, int, sqlite3_value ** );
 
 typedef struct
 {

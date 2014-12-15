@@ -107,7 +107,7 @@
 
 #define HB_MAX_PENDING_MACRO_EXP 16
 
-static HB_EXPR_PTR s_Pending[ HB_MAX_PENDING_MACRO_EXP ];
+static PHB_EXPR s_Pending[ HB_MAX_PENDING_MACRO_EXP ];
 static int s_iPending;
 
 /* This is workaround of yyparse() declaration bug in bison.simple
@@ -187,7 +187,7 @@ extern void yyerror( char * ); /* parsing error management function */
       unsigned char bDec; /* to hold the number of decimal points in the value */
       char * szValue;
    } valDouble;
-   HB_EXPR_PTR asExpr;
+   PHB_EXPR asExpr;
    void * pVoid;        /* to hold any memory structure we may need */
 };
 
@@ -342,10 +342,8 @@ Main : Expression '\n'  {
 
                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
-                           while ( s_iPending )
-                           {
+                           while( s_iPending )
                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
-                           }
 
                            if( $1 == $2 )
                            {
@@ -368,10 +366,8 @@ Main : Expression '\n'  {
                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
                            hb_compExprDelete( $1, HB_MACRO_PARAM );
 
-                           while ( s_iPending )
-                           {
+                           while( s_iPending )
                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
-                           }
 
                            if( yychar == IDENTIFIER && yylval.string )
                            {
@@ -388,10 +384,8 @@ Main : Expression '\n'  {
 
                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
-                           while ( s_iPending )
-                           {
+                           while( s_iPending )
                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
-                           }
 
                            if( yychar == IDENTIFIER && yylval.string )
                            {
@@ -709,9 +703,7 @@ FunCall     : IdentName '(' ArgList ')'   {
                                             HB_MACRO_CHECK( $$ );
 
                                             if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
-                                            {
                                                s_iPending--;
-                                            }
                                           }
             | IdentName '(' error        {
                                             hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
@@ -722,10 +714,8 @@ FunCall     : IdentName '(' ArgList ')'   {
                                                yylval.string = NULL;
                                             }
 
-                                            while ( s_iPending )
-                                            {
+                                            while( s_iPending )
                                                hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
-                                            }
 
                                             YYABORT;
                                           }
@@ -735,9 +725,7 @@ ArgList    : Argument                     {
                                             $$ = hb_compExprNewArgList( $1 );
 
                                             if( s_iPending <= HB_MAX_PENDING_MACRO_EXP )
-                                            {
                                                s_Pending[ s_iPending++ ] = $$;
-                                            }
                                           }
            | ArgList ',' Argument         { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
@@ -1109,10 +1097,8 @@ PareExpList : ExpList ')'                 { $$ = $1; }
 
                                             hb_compExprDelete( $1, HB_MACRO_PARAM );
 
-                                            while ( s_iPending )
-                                            {
+                                            while( s_iPending )
                                                hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
-                                            }
 
                                             if( yychar == IDENTIFIER && yylval.string )
                                             {

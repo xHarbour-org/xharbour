@@ -57,12 +57,14 @@
 typedef void HB_STRIP_INFO, * PHB_STRIP_INFO;
 
 #define HB_STRIP_FUNC( func ) HB_PCODE_FUNC( func, PHB_STRIP_INFO )
+
 typedef HB_STRIP_FUNC ( HB_STRIP_FUNC_ );
 typedef HB_STRIP_FUNC_ * PHB_STRIP_FUNC;
 
 static HB_STRIP_FUNC( hb_p_line )
 {
    HB_SYMBOL_UNUSED( cargo );
+
    if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_LINE ||
        pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
    {
@@ -75,6 +77,7 @@ static HB_STRIP_FUNC( hb_p_line )
 static HB_STRIP_FUNC( hb_p_baseline )
 {
    HB_SYMBOL_UNUSED( cargo );
+
    if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
    {
       hb_compNOOPfill( pFunc, lPCodePos, 3, FALSE, FALSE );
@@ -86,6 +89,7 @@ static HB_STRIP_FUNC( hb_p_baseline )
 static HB_STRIP_FUNC( hb_p_lineoffset )
 {
    HB_SYMBOL_UNUSED( cargo );
+
    if( pFunc->pCode[ lPCodePos + 2 ] == HB_P_BASELINE ||
        pFunc->pCode[ lPCodePos + 2 ] == HB_P_LINEOFFSET )
    {
@@ -95,8 +99,7 @@ static HB_STRIP_FUNC( hb_p_lineoffset )
    return 2;
 }
 
-/* NOTE: The  order of functions have to match the order of opcodes
- *       mnemonics
+/* NOTE: The order of functions have to match the order of opcodes mnemonics
  */
 static PHB_STRIP_FUNC s_stripLines_table[] =
 {
@@ -287,5 +290,5 @@ void hb_compStripFuncLines( PFUNCTION pFunc )
 {
    assert( HB_P_LAST_PCODE == sizeof( s_stripLines_table ) / sizeof( PHB_STRIP_FUNC ) );
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_stripLines_table, NULL );
+   hb_compPCodeEval( pFunc, ( PHB_PCODE_FUNC * ) s_stripLines_table, NULL );
 }

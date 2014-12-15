@@ -76,7 +76,7 @@ HB_EXTERN_BEGIN
 typedef struct _HB_LANG
 {
    const void * pItemList[ HB_LANG_ITEM_MAX_ ];
-} HB_LANG, * PHB_LANG, * HB_LANG_PTR;
+} HB_LANG, * PHB_LANG;
 
 /* Supported language list management */
 

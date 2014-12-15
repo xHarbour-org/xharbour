@@ -79,7 +79,7 @@ static void hb_createlen8( BYTE * ret, HB_LONG uRet )
    for( i = 7; i >= 0; i-- )
    {
       ret[ i ] = ( BYTE ) ( uRet & 0xff );
-      uRet     >>= 8;
+      uRet   >>= 8;
    }
 }
 
@@ -94,8 +94,8 @@ HB_FUNC( HB_CREATELEN8 )
    }
    else if( ISBYREF( 1 ) && ISCHAR( 1 ) && ISNUM( 2 ) )
    {
-      char *   buffer;
-      HB_SIZE  ulLen;
+      char *  buffer;
+      HB_SIZE ulLen;
 
       if( hb_itemGetWriteCL( hb_param( 1, HB_IT_STRING ), &buffer, &ulLen ) && ulLen >= 8 )
          hb_createlen8( ( BYTE * ) buffer, hb_parnint( 2 ) );
@@ -107,8 +107,8 @@ HB_FUNC( HB_CREATELEN8 )
  */
 static HB_LONG hb_getlen8( BYTE * cStr )
 {
-   int      i, iShift;
-   HB_LONG  ulRet = 0;
+   int     i, iShift;
+   HB_LONG ulRet = 0;
 
    for( i = 7, iShift = 0; i >= 0; i--, iShift += 8 )
       ulRet += ( ( HB_LONG ) cStr[ i ] ) << iShift;
@@ -131,8 +131,8 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
-   BYTE *   cRet;
-   ULONG    ulRet;
+   BYTE * cRet;
+   ULONG  ulRet;
 
    if( pItem == NULL )
    {
@@ -149,51 +149,51 @@ HB_FUNC( HB_SERIALIZESIMPLE )
    {
       PHB_VALUE pValue;
 
-      pValue   = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
-                 pItem->item.asMemvar.value;
-      pItem    = pValue->pVarItem;
+      pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
+               pItem->item.asMemvar.value;
+      pItem  = pValue->pVarItem;
    }
 
    switch( pItem->type )
    {
       case HB_IT_STRING:
       case HB_IT_MEMOFLAG | HB_IT_STRING:
-         ulRet       = ( ULONG ) ( pItem->item.asString.length + 9 );
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'C';
+         ulRet     = ( ULONG ) ( pItem->item.asString.length + 9 );
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
          HB_MEMCPY( cRet + 9, pItem->item.asString.value, ( size_t ) pItem->item.asString.length );
          break;
 
       case HB_IT_LOGICAL:
-         ulRet       = 2;
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'L';
-         cRet[ 1 ]   = ( BYTE ) ( pItem->item.asLogical.value ? 'T' : 'F' );
+         ulRet     = 2;
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'L';
+         cRet[ 1 ] = ( BYTE ) ( pItem->item.asLogical.value ? 'T' : 'F' );
          break;
 
       case HB_IT_INTEGER:
-         ulRet       = 10;
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'N';
-         cRet[ 1 ]   = ( BYTE ) 'I';
+         ulRet     = 10;
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'N';
+         cRet[ 1 ] = ( BYTE ) 'I';
          hb_createlen8( cRet + 2, pItem->item.asInteger.value );
          break;
 
       case HB_IT_LONG:
-         ulRet       = HB_LONG_LENGTH( pItem->item.asLong.value );
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'N';
-         cRet[ 1 ]   = ( ulRet == 20 ) ? ( BYTE ) 'X' : ( BYTE ) 'L';
+         ulRet     = HB_LONG_LENGTH( pItem->item.asLong.value );
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'N';
+         cRet[ 1 ] = ( ulRet == 20 ) ? ( BYTE ) 'X' : ( BYTE ) 'L';
 
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
          break;
 
       case HB_IT_DOUBLE:
-         ulRet       = 2 + sizeof( double );
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'N';
-         cRet[ 1 ]   = ( BYTE ) 'D';
+         ulRet     = 2 + sizeof( double );
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'N';
+         cRet[ 1 ] = ( BYTE ) 'D';
          HB_MEMCPY( cRet + 2, &( pItem->item.asDouble.value ), sizeof( double ) );
          break;
 
@@ -201,25 +201,25 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       case HB_IT_TIMEFLAG:
          if( pItem->item.asDate.time == 0 )
          {
-            ulRet       = 9;
-            cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-            cRet[ 0 ]   = ( BYTE ) 'D';
+            ulRet     = 9;
+            cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+            cRet[ 0 ] = ( BYTE ) 'D';
             hb_createlen8( cRet + 1, pItem->item.asDate.value );
          }
          else
          {
             double dDateTime = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-            ulRet       = 1 + sizeof( double );
-            cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-            cRet[ 0 ]   = ( BYTE ) 'T';
+            ulRet     = 1 + sizeof( double );
+            cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+            cRet[ 0 ] = ( BYTE ) 'T';
             HB_MEMCPY( cRet + 1, &( dDateTime ), sizeof( double ) );
          }
          break;
 
       case HB_IT_NIL:
-         ulRet       = 1;
-         cRet        = ( BYTE * ) hb_xgrab( ulRet + 1 );
-         cRet[ 0 ]   = ( BYTE ) 'Z';
+         ulRet     = 1;
+         cRet      = ( BYTE * ) hb_xgrab( ulRet + 1 );
+         cRet[ 0 ] = ( BYTE ) 'Z';
          break;
 
       /* not implemented ? */
@@ -329,54 +329,54 @@ ULONG hb_serialNextRaw( const char * cBuf )
          return 1 + sizeof( double );
 
       case 'A':
-         ulData   = ulNext = 9;
-         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
+         ulData  = ulNext = 9;
+         ulCount = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
 
          while( ulCount > 0 )
          {
-            cBuf     += ulNext;
-            ulNext   = hb_serialNextRaw( cBuf );
-            ulData   += ulNext;
+            cBuf   += ulNext;
+            ulNext  = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
             ulCount--;
          }
          return ulData;
 
       case 'H':
-         ulData   = ulNext = 9;
-         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
+         ulData  = ulNext = 9;
+         ulCount = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
 
          while( ulCount > 0 )
          {
-            cBuf     += ulNext;
-            ulNext   = hb_serialNextRaw( cBuf );
-            cBuf     += ulNext;
-            ulData   += ulNext;
-            ulNext   = hb_serialNextRaw( cBuf );
-            ulData   += ulNext;
+            cBuf   += ulNext;
+            ulNext  = hb_serialNextRaw( cBuf );
+            cBuf   += ulNext;
+            ulData += ulNext;
+            ulNext  = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
             ulCount--;
          }
          return ulData;
 
       case 'O':
-         ulNext   = 9;
-         ulCount  = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
+         ulNext  = 9;
+         ulCount = ( ULONG ) hb_getlen8( ( BYTE * ) ( cBuf + 1 ) );
          /* remove class name
           */
-         ulNext   += hb_serialNextRaw( ( char * ) ( cBuf + 9 ) );
-         ulData   = ulNext;
+         ulNext += hb_serialNextRaw( ( char * ) ( cBuf + 9 ) );
+         ulData  = ulNext;
 
          while( ulCount > 0 )
          {
             /* remove property name
              */
-            cBuf     += ulNext;
-            ulNext   = hb_serialNextRaw( cBuf );
-            ulData   += ulNext;
+            cBuf   += ulNext;
+            ulNext  = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
             /* remove property value
              */
-            cBuf     += ulNext;
-            ulNext   = hb_serialNextRaw( cBuf );
-            ulData   += ulNext;
+            cBuf   += ulNext;
+            ulNext  = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
             ulCount--;
          }
          return ulData;
@@ -438,15 +438,15 @@ HB_FUNC( HB_DESERIALBEGIN )
 HB_FUNC( HB_DESERIALIZEARRAY )
 {
    HB_SIZE      i, lArrayLen, lNext;
-   const char * cBuf      = hb_parc( 2 );
-   HB_SIZE      lLen      = hb_parclen( 2 );
-   PHB_ITEM     pArray    = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM     pMaxLen   = hb_param( 3, HB_IT_ANY );
-   PHB_ITEM     pRObj     = hb_param( 4, HB_IT_ANY );
-   PHB_ITEM     pRHash    = hb_param( 5, HB_IT_ANY );
-   PHB_ITEM     pRArray   = hb_param( 6, HB_IT_ANY );
-   PHB_ITEM     pRBlock   = hb_param( 7, HB_IT_ANY );
-   PHB_DYNS     pHB_Deserialize   = hb_dynsymFind( "HB_DESERIALIZE" );
+   const char * cBuf    = hb_parc( 2 );
+   ULONG        lLen    = hb_parclen( 2 );
+   PHB_ITEM     pArray  = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM     pMaxLen = hb_param( 3, HB_IT_ANY );
+   PHB_ITEM     pRObj   = hb_param( 4, HB_IT_ANY );
+   PHB_ITEM     pRHash  = hb_param( 5, HB_IT_ANY );
+   PHB_ITEM     pRArray = hb_param( 6, HB_IT_ANY );
+   PHB_ITEM     pRBlock = hb_param( 7, HB_IT_ANY );
+   PHB_DYNS     pHB_Deserialize = hb_dynsymFind( "HB_DESERIALIZE" );
 
    if( pArray && cBuf && pHB_Deserialize )
    {
@@ -485,8 +485,8 @@ HB_FUNC( HB_DESERIALIZEARRAY )
          hb_arraySetForward( pArray, i, hb_stackReturnItem() );
 
          lNext = hb_serialNextRaw( cBuf );
-         cBuf  += lNext;
-         lLen  -= lNext;
+         cBuf += lNext;
+         lLen -= lNext;
 
          if( lLen < 0 )
             lLen = 0;
@@ -494,4 +494,3 @@ HB_FUNC( HB_DESERIALIZEARRAY )
    }
    hb_retnl( ( LONG ) ( hb_parclen( 2 ) - lLen ) );
 }
-

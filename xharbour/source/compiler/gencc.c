@@ -32,8 +32,9 @@
 extern void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc );
 
 #define HB_GENC_FUNC( func )  HB_PCODE_FUNC( func, PHB_LABEL_INFO )
+
 typedef HB_GENC_FUNC ( HB_GENC_FUNC_ );
-typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
+typedef HB_GENC_FUNC_ * PHB_GENC_FUNC;
 
 #define HB_GENC_GETLABEL( l ) ( l < pFunc->lPCodePos ? cargo->pulLabels[ l ] : 0 )
 
@@ -1542,9 +1543,9 @@ static HB_GENC_FUNC( hb_p_pushwith )
 
 static HB_GENC_FUNC( hb_p_pushstrhidden )
 {
-   USHORT   usLen       = HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] );
-   BYTE     bType       = pFunc->pCode[ lPCodePos + 3 ];
-   USHORT   usBufferLen = HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 4 ] );
+   USHORT usLen       = HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] );
+   BYTE   bType       = pFunc->pCode[ lPCodePos + 3 ];
+   USHORT usBufferLen = HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 4 ] );
 
    HB_GENC_LABEL();
 
@@ -1784,8 +1785,8 @@ static HB_GENC_FUNC( hb_p_endblock )
 
 static HB_GENC_FUNC( hb_p_pushdatetime )
 {
-   LONG  lVal1 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 1 ] );
-   LONG  lVal2 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 5 ] );
+   LONG lVal1 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 1 ] );
+   LONG lVal2 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 5 ] );
 
    HB_GENC_LABEL();
 
@@ -1819,10 +1820,9 @@ static HB_GENC_FUNC( hb_p_divertof )
    return 1;
 }
 
-/* NOTE: The  order of functions have to match the order of opcodes
- *       mnemonics
+/* NOTE: The order of functions have to match the order of opcodes mnemonics
  */
-static HB_GENC_FUNC_PTR s_verbose_table[] = {
+static PHB_GENC_FUNC s_verbose_table[] = {
    hb_p_and,                                          /* HB_P_AND,                  */
    hb_p_arraypush,                                    /* HB_P_ARRAYPUSH,            */
    hb_p_arraypop,                                     /* HB_P_ARRAYPOP,             */
@@ -2011,7 +2011,7 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
    HB_LABEL_INFO label_info;
 
    /* Make sure that table is correct */
-   assert( HB_P_LAST_PCODE == sizeof( s_verbose_table ) / sizeof( HB_GENC_FUNC_PTR ) );
+   assert( HB_P_LAST_PCODE == sizeof( s_verbose_table ) / sizeof( PHB_GENC_FUNC ) );
 
    label_info.yyc          = yyc;
    label_info.fVerbose     = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
@@ -2033,41 +2033,29 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
    fprintf( yyc, "{\n" );
 
    if( label_info.fCondJump )
-   {
       fprintf( yyc, "   BOOL fValue;\n\n" );
-   }
    else
-   {
       fprintf( yyc, "\n" );
-   }
 
    if( pFunc->cScope & HB_FS_CRITICAL )
-   {
       fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
-   }
 
    fprintf( yyc, "   do {\n" );
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &label_info );
+   hb_compPCodeEval( pFunc, ( PHB_PCODE_FUNC * ) s_verbose_table, ( void * ) &label_info );
 
    fprintf( yyc, "   } while ( 0 );\n" );
 
 
    if( label_info.fEndProc )
-   {
       fprintf( yyc, "labEND:\n" );
-   }
 
    if( pFunc->cScope & HB_FS_CRITICAL )
-   {
       fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
-   }
 
    fprintf( yyc, "\n   hb_xvmExitProc();\n" );
    fprintf( yyc, "}\n" );
 
    if( label_info.pulLabels )
-   {
       hb_xfree( label_info.pulLabels );
-   }
 }

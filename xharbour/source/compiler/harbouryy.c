@@ -1,19 +1,19 @@
 /* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison implementation for Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,7 +26,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -181,10 +181,10 @@ static void hb_compLoopHere( void );
 static void * hb_compElseIfGen( void * pFirstElseIf, HB_SIZE ulOffset ); /* generates a support structure for elseifs pcode fixups */
 static void hb_compElseIfFix( void * pIfElseIfs ); /* implements the ElseIfs pcode fixups */
 
-static void hb_compRTVariableAdd( HB_EXPR_PTR, BOOL );
+static void hb_compRTVariableAdd( PHB_EXPR, BOOL );
 static void hb_compRTVariableGen( char * );
 
-static void hb_compVariableDim( char *, HB_EXPR_PTR );
+static void hb_compVariableDim( char *, PHB_EXPR );
 
 #ifdef HARBOUR_YYDEBUG
    #define YYDEBUG        1 /* Parser debug information support */
@@ -212,34 +212,34 @@ typedef struct _LOOPEXIT
 
 typedef struct HB_RTVAR_
 {
-   HB_EXPR_PTR pVar;
-   BOOL bPopValue;
-   struct HB_RTVAR_ *pNext;
-   struct HB_RTVAR_ *pPrev;
-} HB_RTVAR, *HB_RTVAR_PTR; /* support structure for PUBLIC and PRIVATE statements */
+   PHB_EXPR           pVar;
+   BOOL               bPopValue;
+   struct HB_RTVAR_ * pNext;
+   struct HB_RTVAR_ * pPrev;
+} HB_RTVAR, * PHB_RTVAR;     /* support structure for PUBLIC and PRIVATE statements */
 
-USHORT hb_comp_wSeqCounter      = 0;
-USHORT hb_comp_wForCounter      = 0;
-USHORT hb_comp_wIfCounter       = 0;
-USHORT hb_comp_wWhileCounter    = 0;
-USHORT hb_comp_wCaseCounter     = 0;
-USHORT hb_comp_wWithObjCounter  = 0;
-USHORT hb_comp_wFinallyCounter  = 0;
+USHORT hb_comp_wSeqCounter     = 0;
+USHORT hb_comp_wForCounter     = 0;
+USHORT hb_comp_wIfCounter      = 0;
+USHORT hb_comp_wWhileCounter   = 0;
+USHORT hb_comp_wCaseCounter    = 0;
+USHORT hb_comp_wWithObjCounter = 0;
+USHORT hb_comp_wFinallyCounter = 0;
 
 HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
 USHORT hb_comp_wSwitchCounter   = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
 
-static HB_RTVAR_PTR hb_comp_rtvars   = NULL;
+static PHB_RTVAR    hb_comp_rtvars   = NULL;
 static PTR_LOOPEXIT hb_comp_pLoops   = NULL;
 static PELSEIF      hb_comp_pElseIfs = NULL;
 
 static BOOL bTrancuateBaseArray = FALSE;
-static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray, pGetFunction;
+static PHB_EXPR pGetArgList, pBaseArrayName = NULL, pGetVarArray, pGetFunction;
 
 static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
-static HB_EXPR_PTR pBlockSimple;
+static PHB_EXPR pBlockSimple;
 
 static int s_iLastControlLine = 0, s_iControlLevel = 0;
 
@@ -253,17 +253,17 @@ BOOL   hb_comp_bVarParams = FALSE;
 
 typedef struct _LOCALPARAM
 {
-  char *szName;
-  char cType;
-  struct _LOCALPARAM *pNext;
+  char *               szName;
+  char                 cType;
+  struct _LOCALPARAM * pNext;
 } LOCALPARAM, *PLOCALPARAM;
 
 PLOCALPARAM hb_comp_LocalParams = NULL;
 
 typedef struct _BLOCKSLIST
 {
-  HB_EXPR_PTR pBlock;
-  struct _BLOCKSLIST *pOuter;
+  PHB_EXPR             pBlock;
+  struct _BLOCKSLIST * pOuter;
 } BLOCKSLIST, *PBLOCKSLIST;
 
 PBLOCKSLIST hb_comp_BlocksList = NULL;
@@ -459,7 +459,7 @@ typedef union YYSTYPE
    char *      string;     /* to hold a string returned by lex */
    int         iNumber;    /* to hold a temporary integer number */
    HB_LONG     lNumber;    /* to hold a temporary long number */
-   HB_EXPR_PTR asExpr;
+   PHB_EXPR asExpr;
    void * pVoid;           /* to hold any memory structure we may need */
    struct
    {
@@ -6074,7 +6074,7 @@ yyreduce:
   case 199:
 
     {
-                           HB_EXPR_PTR pPlus = NULL, pLeft = NULL, pRight, pDestExpr;
+                           PHB_EXPR pPlus = NULL, pLeft = NULL, pRight, pDestExpr;
                            char *pPosition = (yyvsp[(1) - (1)].string), *pStart, *sToken;
                            BOOL bVar;
 
@@ -8383,7 +8383,7 @@ yyreduce:
 
                         if( bSetGet )
                         {
-                           HB_EXPR_PTR pSetGetBlock, pGetVar = hb_compExprClone( (yyvsp[(2) - (3)].asExpr) ), pIsNil, pIfList, pIIF;
+                           PHB_EXPR pSetGetBlock, pGetVar = hb_compExprClone( (yyvsp[(2) - (3)].asExpr) ), pIsNil, pIfList, pIIF;
 
                            pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( hb_compExpr_IDs._1 ) ), hb_compExprNewNil() );
 
@@ -8414,7 +8414,7 @@ yyreduce:
 
                      case HB_ET_ARRAYAT:
                      {
-                        HB_EXPR_PTR pArrayVar, pSetGetBlock;
+                        PHB_EXPR pArrayVar, pSetGetBlock;
 
                         bTrancuateBaseArray = TRUE;
 
@@ -8468,7 +8468,7 @@ yyreduce:
   case 625:
 
     { /* $6 */
-                  HB_EXPR_PTR pVarName;
+                  PHB_EXPR pVarName;
 
                   switch( (yyvsp[(2) - (5)].asExpr)->ExprType )
                   {
@@ -8553,7 +8553,7 @@ yyreduce:
 
                   if( pGetVarArray )
                   {
-                    HB_EXPR_PTR pArrayVar, pIndex, pTmp;
+                    PHB_EXPR pArrayVar, pIndex, pTmp;
 
                     // We need to scan the Array backwards and build a list of the Index Expressions.
                     pArrayVar = pGetVarArray->value.asList.pExprList;
@@ -8643,7 +8643,7 @@ yyreduce:
                   {
                      if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
                      {
-                        HB_EXPR_PTR pMacroVar, pBlockString;
+                        PHB_EXPR pMacroVar, pBlockString;
 
                         pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
                         pBlockString = hb_compExprNewString( "{||", 3, FALSE );
@@ -8751,7 +8751,7 @@ yyreduce:
   case 644:
 
     { hb_comp_iVarScope = VS_LOCAL;
-                                                    (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (0)].asExpr), NULL , hb_comp_cVarType );
+                                                    (yyval.asExpr) = hb_compExprCBVarAdd( (yyvsp[(0) - (0)].asExpr), NULL, hb_comp_cVarType );
                                                     hb_comp_cVarType = ' ';
                                                   }
     break;
@@ -11397,8 +11397,8 @@ static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
 {
    PELSEIF pElseIf = ( PELSEIF ) hb_xgrab( sizeof( _ELSEIF ) ), pLast;
 
-   pElseIf->ulOffset = ulOffset;
-   pElseIf->pNext = NULL;
+   pElseIf->ulOffset   = ulOffset;
+   pElseIf->pNext      = NULL;
    pElseIf->pPrevGroup = NULL;
 
    if( pFirst )
@@ -11406,18 +11406,14 @@ static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
       pLast = ( PELSEIF ) pFirst;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
       pLast->pNext = pElseIf;
    }
    else
    {
       if( hb_comp_pElseIfs )
-      {
          pElseIf->pPrevGroup = hb_comp_pElseIfs;
-      }
 
       hb_comp_pElseIfs = pElseIf;
 
@@ -11457,25 +11453,23 @@ void hb_compReleaseElseIfs( void )
    }
 }
 
-static void hb_compRTVariableAdd( HB_EXPR_PTR pVar, BOOL bPopInitValue )
+static void hb_compRTVariableAdd( PHB_EXPR pVar, BOOL bPopInitValue )
 {
-   HB_RTVAR_PTR pRTvar = ( HB_RTVAR_PTR ) hb_xgrab( sizeof( HB_RTVAR ) );
+   PHB_RTVAR pRTvar = ( PHB_RTVAR ) hb_xgrab( sizeof( HB_RTVAR ) );
 
-   pRTvar->pVar = pVar;
+   pRTvar->pVar      = pVar;
    pRTvar->bPopValue = bPopInitValue;
-   pRTvar->pNext = NULL;
-   pRTvar->pPrev = NULL;
+   pRTvar->pNext     = NULL;
+   pRTvar->pPrev     = NULL;
 
    if( hb_comp_rtvars )
    {
-      HB_RTVAR_PTR pLast = hb_comp_rtvars;
+      PHB_RTVAR pLast = hb_comp_rtvars;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
-      pLast->pNext = pRTvar;
+      pLast->pNext  = pRTvar;
       pRTvar->pPrev = pLast;
    }
    else
@@ -11486,9 +11480,9 @@ static void hb_compRTVariableAdd( HB_EXPR_PTR pVar, BOOL bPopInitValue )
 
 static void hb_compRTVariableGen( char * szCreateFun )
 {
-   USHORT usCount = 0;
-   HB_RTVAR_PTR pVar = hb_comp_rtvars;
-   HB_RTVAR_PTR pDel;
+   USHORT    usCount = 0;
+   PHB_RTVAR pVar = hb_comp_rtvars;
+   PHB_RTVAR pDel;
 
    /* generate the function call frame */
    hb_compGenPushFunCall( szCreateFun, NULL );
@@ -11507,25 +11501,17 @@ static void hb_compRTVariableGen( char * szCreateFun )
 
    /* call function that will create either PUBLIC or PRIVATE variables */
    if( usCount > 255 )
-   {
       hb_compGenPCode3( HB_P_DO, HB_LOBYTE( usCount ), HB_HIBYTE( usCount ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenPCode2( HB_P_DOSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
-   }
 
    /* pop initial values */
    while( pVar )
    {
       if( pVar->bPopValue )
-      {
          hb_compExprDelete( hb_compExprGenPop( pVar->pVar ) );
-      }
       else
-      {
          hb_compExprDelete( pVar->pVar );
-      }
 
       pDel = pVar;
       pVar = pVar->pPrev;
@@ -11536,7 +11522,7 @@ static void hb_compRTVariableGen( char * szCreateFun )
    hb_comp_rtvars = NULL;
 }
 
-static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
+static void hb_compVariableDim( char * szName, PHB_EXPR pInitValue )
 {
   if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
   {
@@ -11548,9 +11534,9 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else if( hb_comp_iVarScope == VS_STATIC )
   {
-     USHORT uCount = (USHORT) hb_compExprListLen( pInitValue );
-     HB_EXPR_PTR pVar = hb_compExprNewVar( szName );
-     HB_EXPR_PTR pAssign;
+     USHORT   uCount = (USHORT) hb_compExprListLen( pInitValue );
+     PHB_EXPR pVar = hb_compExprNewVar( szName );
+     PHB_EXPR pAssign;
 
      /* create a static variable */
      hb_compVariableAdd( szName, 'A' );
@@ -11569,9 +11555,9 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else if( hb_comp_iVarScope == VS_GLOBAL )
   {
-     USHORT uCount = (USHORT) hb_compExprListLen( pInitValue );
-     HB_EXPR_PTR pVar = hb_compExprNewVar( szName );
-     HB_EXPR_PTR pAssign;
+     USHORT   uCount = (USHORT) hb_compExprListLen( pInitValue );
+     PHB_EXPR pVar = hb_compExprNewVar( szName );
+     PHB_EXPR pAssign;
 
      /* create a global variable */
      hb_compVariableAdd( szName, 'A' );
@@ -11605,7 +11591,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
 
 void hb_compReleaseRTVars( void )
 {
-   HB_RTVAR_PTR pVar;
+   PHB_RTVAR pVar;
 
    while( hb_comp_rtvars )
    {

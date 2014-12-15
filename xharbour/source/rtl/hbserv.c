@@ -92,7 +92,7 @@
 
 HB_EXTERN_BEGIN
 extern PHB_FUNC  pHVMFuncService;
-extern void      hb_service_signalHandlerQuit( HB_FUNC_PTR );
+extern void      hb_service_signalHandlerQuit( PHB_FUNC );
 extern void      hb_service_threadCancel( void );
 extern void      hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack );
 extern PHB_STACK hb_service_ConsoleHandlerRoutineInit( void );
@@ -253,16 +253,12 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
    /*s_serviceSetHBSig();*/
 
    /* TODO
-    * if ( uiSig != HB_SIGNAL_UNKNOWN )
+    * if( uiSig != HB_SIGNAL_UNKNOWN )
     * {
-    * if ( sa_oldAction[ sig ].sa_flags & SA_SIGINFO )
-    * {
-    *    sa_oldAction[ sig ].sa_sigaction( sig, info, v );
-    * }
-    * else
-    * {
-    *    sa_oldAction[ sig ].sa_handler( sig );
-    * }
+    *    if( sa_oldAction[ sig ].sa_flags & SA_SIGINFO )
+    *       sa_oldAction[ sig ].sa_sigaction( sig, info, v );
+    *    else
+    *       sa_oldAction[ sig ].sa_handler( sig );
     * }
     */
 }
@@ -273,9 +269,9 @@ static void s_signalHandler( int sig, siginfo_t * info, void * v )
 #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_OS2 )
 static void * s_signalListener( void * my_stack )
 {
-   static BOOL bFirst   = TRUE;
+   static BOOL bFirst = TRUE;
    sigset_t    passall;
-   HB_STACK *  pStack   = ( HB_STACK * ) my_stack;
+   HB_STACK *  pStack = ( HB_STACK * ) my_stack;
 
 #if defined( HB_OS_BSD )
    int         sig;
@@ -367,11 +363,11 @@ static void s_serviceSetHBSig( void );
 
 /* message filter hook for user generated signals
  */
-static HHOOK   s_hMsgHook     = NULL;
+static HHOOK s_hMsgHook = NULL;
 
 /* old error mode
  */
-static UINT    s_uiErrorMode  = 0;
+static UINT s_uiErrorMode = 0;
 
 /*
  * implementation of the signal translation table
@@ -610,8 +606,8 @@ static void s_serviceSetHBSig( void )
 #else
    /* using more descriptive sa_action instead of sa_handler
     */
-   act.sa_handler    = NULL;              /* if act.sa.. is a union, we just clean this */
-   act.sa_sigaction  = s_signalHandler;   /* this is what matters */
+   act.sa_handler   = NULL;              /* if act.sa.. is a union, we just clean this */
+   act.sa_sigaction = s_signalHandler;   /* this is what matters */
    /* block al signals, we don't want to be interrupted.
     * sigfillset( &act.sa_mask );
     */
@@ -623,11 +619,11 @@ static void s_serviceSetHBSig( void )
    act.sa_flags   = SA_NOCLDSTOP | SA_SIGINFO;
 #endif
 
-   sigaction( SIGHUP, &act, NULL );
+   sigaction( SIGHUP , &act, NULL );
    sigaction( SIGQUIT, &act, NULL );
-   sigaction( SIGILL, &act, NULL );
+   sigaction( SIGILL , &act, NULL );
    sigaction( SIGABRT, &act, NULL );
-   sigaction( SIGFPE, &act, NULL );
+   sigaction( SIGFPE , &act, NULL );
    sigaction( SIGSEGV, &act, NULL );
    sigaction( SIGTERM, &act, NULL );
    sigaction( SIGUSR1, &act, NULL );
@@ -770,8 +766,8 @@ HB_FUNC( HB_STARTSERVICE )
 
    /* let's begin
     */
-   sb_isService      = TRUE;
-   pHVMFuncService   = ( PHB_FUNC ) hb_isService;
+   sb_isService    = TRUE;
+   pHVMFuncService = ( PHB_FUNC ) hb_isService;
 
    /* in windows, we just detach from console
     */

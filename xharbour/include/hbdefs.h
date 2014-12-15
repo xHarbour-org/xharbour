@@ -85,9 +85,9 @@
       #define HAVE_INTTYPES_H        1
       #undef  HAVE_STDINT_H
       #define HAVE_STDINT_H          1
-        
+
    #  include <stdint.h>
-   #if defined( _MSC_VER )   
+   #if defined( _MSC_VER )
       #  if defined( _MSC_VER ) && _MSC_VER >= 1400
          #  include <intrin.h>
       #  endif
@@ -102,15 +102,15 @@
          #if ( _MSC_VER > 1400 )
             #define HAVE_INTSAFE_H   1
          #endif
-      #endif      
+      #endif
    #else
       #undef  HAVE_STDINT_H
       #define HAVE_STDINT_H          0
       #undef  HAVE_INTTYPES_H
       #define HAVE_INTTYPES_H        0
       #undef  INT64_MAX
-      
-   #endif   
+
+   #endif
    /* NOTE: Hack to avoid collision between stdint.h and unistd.h. [vszakats] */
    #  if defined( HB_OS_VXWORKS ) && defined( _INTPTR ) && ! defined( _INTPTR_T )
    #     define _INTPTR_T
@@ -148,8 +148,8 @@
     typedef unsigned __int32 uint32_t;
     typedef unsigned __int64 uint64_t;
     typedef int32_t intptr_t;
-    typedef uint32_t uintptr_t;    
-    
+    typedef uint32_t uintptr_t;
+
 #  endif
 
 #if (_MSC_VER < 1300) && !defined(HAVE_STDINT_H)
@@ -1188,7 +1188,7 @@ typedef unsigned long HB_COUNTER;
             (( BYTE * )( p ))[ 2 ] = u.buffer[ 5 ]; \
             (( BYTE * )( p ))[ 1 ] = u.buffer[ 6 ]; \
             (( BYTE * )( p ))[ 0 ] = u.buffer[ 7 ]; \
-         } while ( 0 )
+         } while( 0 )
 #define HB_PUT_STD_DOUBLE( p, d )    \
          do { \
             union { \
@@ -1204,7 +1204,7 @@ typedef unsigned long HB_COUNTER;
             (( BYTE * )( p ))[ 5 ] = u.buffer[ 5 ]; \
             (( BYTE * )( p ))[ 6 ] = u.buffer[ 6 ]; \
             (( BYTE * )( p ))[ 7 ] = u.buffer[ 7 ]; \
-         } while ( 0 )
+         } while( 0 )
 
 #  if ! defined( HB_STRICT_ALIGNMENT ) && defined( HB_LITTLE_ENDIAN )
 
@@ -1238,13 +1238,13 @@ typedef unsigned long HB_COUNTER;
    #define HB_PUT_LE_UINT16( p, w )    do { \
                                          (( BYTE * )( p ))[0] = ( BYTE )( w ); \
                                          (( BYTE * )( p ))[1] = ( BYTE )( (w) >>  8 ); \
-                                       } while ( 0 )
+                                       } while( 0 )
    #define HB_PUT_LE_UINT32( p, l )    do { \
                                          (( BYTE * )( p ))[ 0 ] = ( BYTE )( l ); \
                                          (( BYTE * )( p ))[ 1 ] = ( BYTE )( (l) >>  8 ); \
                                          (( BYTE * )( p ))[ 2 ] = ( BYTE )( (l) >> 16 ); \
                                          (( BYTE * )( p ))[ 3 ] = ( BYTE )( (l) >> 24 ); \
-                                       } while ( 0 )
+                                       } while( 0 )
    #define HB_PUT_LE_UINT64( p, q )    do { \
                                          (( BYTE * )( p ))[ 0 ] = ( BYTE )( q ); \
                                          (( BYTE * )( p ))[ 1 ] = ( BYTE )( (q) >>  8 ); \
@@ -1254,7 +1254,7 @@ typedef unsigned long HB_COUNTER;
                                          (( BYTE * )( p ))[ 5 ] = ( BYTE )( (q) >> 40 ); \
                                          (( BYTE * )( p ))[ 6 ] = ( BYTE )( (q) >> 48 ); \
                                          (( BYTE * )( p ))[ 7 ] = ( BYTE )( (q) >> 56 ); \
-                                       } while ( 0 )
+                                       } while( 0 )
 #endif
 
 #  if ! defined( HB_STRICT_ALIGNMENT ) && defined( HB_BIG_ENDIAN )
@@ -1289,13 +1289,13 @@ typedef unsigned long HB_COUNTER;
    #define HB_PUT_BE_UINT16( p, w )    do { \
                                          (( BYTE * )( p ))[0] = ( BYTE )( (w) >>  8 ); \
                                          (( BYTE * )( p ))[1] = ( BYTE )( w ); \
-                                       } while ( 0 )
+                                       } while( 0 )
    #define HB_PUT_BE_UINT32( p, l )    do { \
                                          (( BYTE * )( p ))[ 0 ] = ( BYTE )( (l) >> 24 ); \
                                          (( BYTE * )( p ))[ 1 ] = ( BYTE )( (l) >> 16 ); \
                                          (( BYTE * )( p ))[ 2 ] = ( BYTE )( (l) >>  8 ); \
                                          (( BYTE * )( p ))[ 3 ] = ( BYTE )( l ); \
-                                       } while ( 0 )
+                                       } while( 0 )
    #define HB_PUT_BE_UINT64( p, q )    do { \
                                          (( BYTE * )( p ))[ 0 ] = ( BYTE )( (q) >> 56 ); \
                                          (( BYTE * )( p ))[ 1 ] = ( BYTE )( (q) >> 48 ); \
@@ -1305,7 +1305,7 @@ typedef unsigned long HB_COUNTER;
                                          (( BYTE * )( p ))[ 5 ] = ( BYTE )( (q) >> 16 ); \
                                          (( BYTE * )( p ))[ 6 ] = ( BYTE )( (q) >>  8 ); \
                                          (( BYTE * )( p ))[ 7 ] = ( BYTE )( q ); \
-                                       } while ( 0 )
+                                       } while( 0 )
 #endif
 
 #endif /* ! __GNUC__ */
@@ -1364,7 +1364,7 @@ typedef unsigned long HB_COUNTER;
          ( ( BYTE * ) ( d ) )[ 5 ] = ( ( const BYTE * ) ( o ) )[ 5 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( d ) )[ 6 ] = ( ( const BYTE * ) ( o ) )[ 6 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( d ) )[ 7 ] = ( ( const BYTE * ) ( o ) )[ 7 ] ^ ( BYTE ) 0xFF; \
-      } } while ( 0 )
+      } } while( 0 )
 
    #define HB_DBL2ORD( d, o )       do { \
       if ( *( d ) >= 0.0 ) { \
@@ -1386,7 +1386,7 @@ typedef unsigned long HB_COUNTER;
          ( ( BYTE * ) ( o ) )[ 5 ] = ( ( const BYTE * ) ( d ) )[ 5 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 6 ] = ( ( const BYTE * ) ( d ) )[ 6 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 7 ] = ( ( const BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0xFF; \
-      } } while ( 0 )
+      } } while( 0 )
 
 #else /* HB_LITTLE_ENDIAN */
 
@@ -1409,7 +1409,7 @@ typedef unsigned long HB_COUNTER;
          ( ( BYTE * ) ( d ) )[ 5 ] = ( ( const BYTE * ) ( o ) )[ 2 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( d ) )[ 6 ] = ( ( const BYTE * ) ( o ) )[ 1 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( d ) )[ 7 ] = ( ( const BYTE * ) ( o ) )[ 0 ] ^ ( BYTE ) 0xFF; \
-      } } while ( 0 )
+      } } while( 0 )
 
    #define HB_DBL2ORD( d, o )       do { \
       if ( *( d ) >= 0.0 ) { \
@@ -1431,7 +1431,7 @@ typedef unsigned long HB_COUNTER;
          ( ( BYTE * ) ( o ) )[ 5 ] = ( ( const BYTE * ) ( d ) )[ 2 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 6 ] = ( ( const BYTE * ) ( d ) )[ 1 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 7 ] = ( ( const BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0xFF; \
-      } } while ( 0 )
+      } } while( 0 )
 #  endif
 
 #endif /* ! defined( HB_FORCE_IEEE754_DOUBLE ) */
@@ -1566,7 +1566,6 @@ typedef unsigned long HB_COUNTER;
 #endif
 
 typedef HARBOUR ( * PHB_FUNC )( void );
-typedef PHB_FUNC HB_FUNC_PTR;
 
 #if defined( __EXPORT__ )
    #if defined( __RSXNT__ )

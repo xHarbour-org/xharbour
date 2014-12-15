@@ -203,7 +203,7 @@ ReadTransparentPaletteData  (HPDF_Dict    image,
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
-				for (; i >= 0; i--) {
+				for (; i != 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
 				}
 				HPDF_FreeMem (image->mmgr, row_ptr);
@@ -267,7 +267,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
-				for (; i >= 0; i--) {
+				for (; i != 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
 				}
 				HPDF_FreeMem (image->mmgr, row_ptr);

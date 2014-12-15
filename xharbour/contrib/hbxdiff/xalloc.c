@@ -27,7 +27,7 @@
 
 
 
-static memallocator_t xmalt = {NULL, NULL, NULL};
+static memallocator_t xmalt = {NULL, NULL, NULL, NULL};
 
 
 

@@ -58,11 +58,12 @@
 typedef struct HB_stru_fix_info
 {
    USHORT iNestedCodeblock;
-} HB_FIX_INFO, * HB_FIX_INFO_PTR;
+} HB_FIX_INFO, * PHB_FIX_INFO;
 
-#define HB_FIX_FUNC( func ) HB_PCODE_FUNC( func, HB_FIX_INFO_PTR )
+#define HB_FIX_FUNC( func ) HB_PCODE_FUNC( func, PHB_FIX_INFO )
+
 typedef HB_FIX_FUNC ( HB_FIX_FUNC_ );
-typedef HB_FIX_FUNC_ * HB_FIX_FUNC_PTR;
+typedef HB_FIX_FUNC_ * PHB_FIX_FUNC;
 
 
 static HB_FIX_FUNC( hb_p_endblock )
@@ -76,26 +77,26 @@ static HB_FIX_FUNC( hb_p_endblock )
 
 static HB_FIX_FUNC( hb_p_pushblock )
 {
-   USHORT   wVar;
-   HB_SIZE  ulStart = lPCodePos;
+   USHORT  wVar;
+   HB_SIZE ulStart = lPCodePos;
 
    ++cargo->iNestedCodeblock;
 
-   wVar        = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
+   wVar = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
 
    /* opcode + codeblock size + number of parameters + number of local variables */
-   lPCodePos   += 7;
+   lPCodePos += 7;
 
    /* fix local variable's reference */
    while( wVar-- )
    {
-      BYTE *   pLocal   = &( pFunc->pCode[ lPCodePos ] );
-      USHORT   wLocal   = HB_PCODE_MKUSHORT( pLocal );
+      BYTE * pLocal = &( pFunc->pCode[ lPCodePos ] );
+      USHORT wLocal = HB_PCODE_MKUSHORT( pLocal );
 
-      wLocal      += pFunc->wParamCount;
+      wLocal     += pFunc->wParamCount;
       pLocal[ 0 ] = HB_LOBYTE( wLocal );
       pLocal[ 1 ] = HB_HIBYTE( wLocal );
-      lPCodePos   += 2;
+      lPCodePos  += 2;
    }
 
    return lPCodePos - ulStart;
@@ -117,12 +118,12 @@ static HB_FIX_FUNC( hb_p_poplocal )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
+      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT  iVar = HB_PCODE_MKSHORT( pVar );
 
-      iVar        += pFunc->wParamCount;
-      pVar[ 0 ]   = HB_LOBYTE( iVar );
-      pVar[ 1 ]   = HB_HIBYTE( iVar );
+      iVar     += pFunc->wParamCount;
+      pVar[ 0 ] = HB_LOBYTE( iVar );
+      pVar[ 1 ] = HB_HIBYTE( iVar );
 
       if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
       {
@@ -140,12 +141,12 @@ static HB_FIX_FUNC( hb_p_pushlocal )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
+      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT  iVar = HB_PCODE_MKSHORT( pVar );
 
-      iVar        += pFunc->wParamCount;
-      pVar[ 0 ]   = HB_LOBYTE( iVar );
-      pVar[ 1 ]   = HB_HIBYTE( iVar );
+      iVar     += pFunc->wParamCount;
+      pVar[ 0 ] = HB_LOBYTE( iVar );
+      pVar[ 1 ] = HB_HIBYTE( iVar );
 
       if( HB_LIM_INT8( iVar ) && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
       {
@@ -163,12 +164,12 @@ static HB_FIX_FUNC( hb_p_pushlocalref )
     */
    if( cargo->iNestedCodeblock == 0 )
    {
-      BYTE *   pVar  = &pFunc->pCode[ lPCodePos + 1 ];
-      SHORT    iVar  = HB_PCODE_MKSHORT( pVar );
+      BYTE * pVar = &pFunc->pCode[ lPCodePos + 1 ];
+      SHORT  iVar = HB_PCODE_MKSHORT( pVar );
 
-      iVar        += pFunc->wParamCount;
-      pVar[ 0 ]   = HB_LOBYTE( iVar );
-      pVar[ 1 ]   = HB_HIBYTE( iVar );
+      iVar     += pFunc->wParamCount;
+      pVar[ 0 ] = HB_LOBYTE( iVar );
+      pVar[ 1 ] = HB_HIBYTE( iVar );
    }
 
    return 3;
@@ -192,8 +193,8 @@ static HB_FIX_FUNC( hb_p_poplocalnear )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -217,8 +218,8 @@ static HB_FIX_FUNC( hb_p_pushlocalnear )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -242,8 +243,8 @@ static HB_FIX_FUNC( hb_p_pushlocalnearinc )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -267,8 +268,8 @@ static HB_FIX_FUNC( hb_p_pushlocalneardec )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -292,8 +293,8 @@ static HB_FIX_FUNC( hb_p_localnearinc )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -317,8 +318,8 @@ static HB_FIX_FUNC( hb_p_localneardec )
 
       if( ! HB_LIM_INT8( iVar ) )
       {
-         char  sTemp[ 16 ];
-         char  sTemp2[ 16 ];
+         char sTemp[ 16 ];
+         char sTemp2[ 16 ];
 
          hb_snprintf( sTemp, sizeof( sTemp ), "%i", pFunc->wParamCount );
          hb_snprintf( sTemp2, sizeof( sTemp2 ), "%i", iVar );
@@ -493,16 +494,16 @@ static HB_FIX_FUNC( hb_p_false )
                      pFunc->pCode[ lPCodePos + 1 ] = HB_P_JUMPFAR;
                      break;
                   case HB_P_POP:
-                     iCount                        = 2;
+                     iCount = 2;
                      break;
                   case HB_P_JUMPTRUENEAR:
-                     iCount                        = 3;
+                     iCount = 3;
                      break;
                   case HB_P_JUMPTRUE:
-                     iCount                        = 4;
+                     iCount = 4;
                      break;
                   case HB_P_JUMPTRUEFAR:
-                     iCount                        = 5;
+                     iCount = 5;
                      break;
                }
                hb_compNOOPfill( pFunc, lPCodePos, iCount, FALSE, FALSE );
@@ -543,16 +544,16 @@ static HB_FIX_FUNC( hb_p_true )
                      pFunc->pCode[ lPCodePos + 1 ] = HB_P_JUMPFAR;
                      break;
                   case HB_P_POP:
-                     iCount                        = 2;
+                     iCount = 2;
                      break;
                   case HB_P_JUMPFALSENEAR:
-                     iCount                        = 3;
+                     iCount = 3;
                      break;
                   case HB_P_JUMPFALSE:
-                     iCount                        = 4;
+                     iCount = 4;
                      break;
                   case HB_P_JUMPFALSEFAR:
-                     iCount                        = 5;
+                     iCount = 5;
                      break;
                }
                hb_compNOOPfill( pFunc, lPCodePos, iCount, FALSE, FALSE );
@@ -572,28 +573,28 @@ static HB_FIX_FUNC( hb_p_not )
       switch( pFunc->pCode[ lPCodePos + 1 ] )
       {
          case HB_P_NOT:
-            opcode   = HB_P_NOOP;
+            opcode = HB_P_NOOP;
             break;
          case HB_P_JUMPTRUENEAR:
-            opcode   = HB_P_JUMPFALSENEAR;
+            opcode = HB_P_JUMPFALSENEAR;
             break;
          case HB_P_JUMPTRUE:
-            opcode   = HB_P_JUMPFALSE;
+            opcode = HB_P_JUMPFALSE;
             break;
          case HB_P_JUMPTRUEFAR:
-            opcode   = HB_P_JUMPFALSEFAR;
+            opcode = HB_P_JUMPFALSEFAR;
             break;
          case HB_P_JUMPFALSENEAR:
-            opcode   = HB_P_JUMPTRUENEAR;
+            opcode = HB_P_JUMPTRUENEAR;
             break;
          case HB_P_JUMPFALSE:
-            opcode   = HB_P_JUMPTRUE;
+            opcode = HB_P_JUMPTRUE;
             break;
          case HB_P_JUMPFALSEFAR:
-            opcode   = HB_P_JUMPTRUEFAR;
+            opcode = HB_P_JUMPTRUEFAR;
             break;
          default:
-            opcode   = HB_P_LAST_PCODE;
+            opcode = HB_P_LAST_PCODE;
             break;
       }
 
@@ -613,9 +614,9 @@ static HB_FIX_FUNC( hb_p_jumpfar )
 {
    if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
-      HB_SIZE  ulNewPos = lPCodePos + lOffset;
+      BYTE *  pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG    lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -650,9 +651,9 @@ static HB_FIX_FUNC( hb_p_jumpfalsefar )
 {
    if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
-      HB_SIZE  ulNewPos = lPCodePos + lOffset;
+      BYTE *  pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG    lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -669,9 +670,9 @@ static HB_FIX_FUNC( hb_p_jumptruefar )
 {
    if( cargo->iNestedCodeblock == 0 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_OPTJUMP ) )
    {
-      BYTE *   pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
-      LONG     lOffset  = HB_PCODE_MKINT24( pAddr );
-      HB_SIZE  ulNewPos = lPCodePos + lOffset;
+      BYTE *  pAddr    = &pFunc->pCode[ lPCodePos + 1 ];
+      LONG    lOffset  = HB_PCODE_MKINT24( pAddr );
+      HB_SIZE ulNewPos = lPCodePos + lOffset;
 
       switch( pFunc->pCode[ ulNewPos ] )
       {
@@ -684,10 +685,9 @@ static HB_FIX_FUNC( hb_p_jumptruefar )
    return 4;
 }
 
-/* NOTE: The  order of functions have to match the order of opcodes
- *       mnemonics
+/* NOTE: The order of functions have to match the order of opcodes mnemonics
  */
-static HB_FIX_FUNC_PTR s_fixlocals_table[] =
+static PHB_FIX_FUNC s_fixlocals_table[] =
 {
    NULL,                                              /* HB_P_AND,                  */
    NULL,                                              /* HB_P_ARRAYPUSH,            */
@@ -878,7 +878,7 @@ void hb_compFixFuncPCode( PFUNCTION pFunc )
 
    fix_info.iNestedCodeblock = 0;
 
-   assert( HB_P_LAST_PCODE == sizeof( s_fixlocals_table ) / sizeof( HB_FIX_FUNC_PTR ) );
+   assert( HB_P_LAST_PCODE == sizeof( s_fixlocals_table ) / sizeof( PHB_FIX_FUNC ) );
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_fixlocals_table, ( void * ) &fix_info );
+   hb_compPCodeEval( pFunc, ( PHB_PCODE_FUNC * ) s_fixlocals_table, ( void * ) &fix_info );
 }

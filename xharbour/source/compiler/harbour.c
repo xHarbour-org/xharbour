@@ -168,7 +168,7 @@ BOOL           hb_comp_bSyntaxCheckOnly   = FALSE;          /* syntax check only
 int            hb_comp_iLanguage          = LANG_C;         /* default Harbour generated output language */
 int            hb_comp_iJumpOptimize      = 1;
 char *         hb_comp_szDeclaredFun      = NULL;
-char *         hb_Command_Line;  /* Switches to be documented in generated C file */
+char *         hb_Command_Line;                             /* Switches to be documented in generated C file */
 PHB_EXPR_LIST  hb_comp_exprs              = NULL;           /* expressions list */
 
 /* FILE *      hb_comp_errFile            = NULL;
@@ -636,7 +636,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    BOOL        bUsed = FALSE;
 
 #if defined( HB_AVOID_RESERVED_WORDS )
-   if ( ! hb_comp_bUsePPReservedWord && szVarName && hb_compReservedPPName( szVarName ) )
+   if( ! hb_comp_bUsePPReservedWord && szVarName && hb_compReservedPPName( szVarName ) )
    {
        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_USE_RESERVED_NAME, szVarName, NULL );
        return;
@@ -1709,7 +1709,7 @@ static void hb_compDeclaredInit( void )
 
 void _hb_compDeclaredInit( void )
 {
-   if (!hb_bcompDeclaredInit )
+   if( ! hb_bcompDeclaredInit )
    {
       hb_bcompDeclaredInit = TRUE;
       hb_compDeclaredInit();
@@ -2170,7 +2170,7 @@ void hb_compGenBreak( void )
    hb_compGenPushNil();
 }
 
-void hb_compGenWithObject( HB_EXPR_PTR pObject )
+void hb_compGenWithObject( PHB_EXPR pObject )
 {
    hb_compExprDelete( hb_compExprGenPush( pObject ) );
    hb_compGenPCode1( HB_P_WITHOBJECT );
@@ -2363,7 +2363,7 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
    {
       if( pVars->szName == szVarName )
       {
-         /* if ( hb_comp_iWarnings < 3 )
+         /* if( hb_comp_iWarnings < 3 )
           */
          {
             pVars->iUsed |= VU_USED;
@@ -5208,20 +5208,20 @@ void hb_compCodeBlockStart( void )
    hb_comp_functions.pLast = pBlock;
 }
 
-HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
+PHB_EXPR hb_compCodeBlockEnd( BOOL bExt )
 {
-   PFUNCTION   pCodeblock;    /* pointer to the current codeblock */
-   PFUNCTION   pFunc;         /* pointer to a function that owns a codeblock */
-   char *      pFuncName;     /* name (if one exists) of the function that owns a codeblock */
-   USHORT      wSize;
-   USHORT      wLocals = 0;   /* number of referenced local variables */
-   USHORT      wLocalsCnt, wLocalsLen;
-   USHORT      wPos;
-   int         iLocalPos;
-   PVAR        pVar, pFree;
+   PFUNCTION pCodeblock;    /* pointer to the current codeblock */
+   PFUNCTION pFunc;         /* pointer to a function that owns a codeblock */
+   char *    pFuncName;     /* name (if one exists) of the function that owns a codeblock */
+   USHORT    wSize;
+   USHORT    wLocals = 0;   /* number of referenced local variables */
+   USHORT    wLocalsCnt, wLocalsLen;
+   USHORT    wPos;
+   int       iLocalPos;
+   PVAR      pVar, pFree;
 
-   HB_EXPR_PTR pExtBlock;
-   PFUNCTION   pFunExtBlock = NULL;
+   PHB_EXPR  pExtBlock;
+   PFUNCTION pFunExtBlock = NULL;
 
    hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
    //hb_compFixFuncPCode( hb_comp_functions.pLast );
@@ -6245,10 +6245,10 @@ static int hb_compCompile( char * szPrg )
 
                   while( pSymb )
                   {
-                     if ( strlen( pSymb->szName ) > 0 && !szFirst )
+                     if( strlen( pSymb->szName ) > 0 && !szFirst )
                         szFirst = pSymb->szName;
 
-                     if ( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4 && !szMain )
+                     if( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4 && ! szMain )
                         szMain = pSymb->szName;
 
                      pSymb = pSymb->pNext;
@@ -6263,13 +6263,13 @@ static int hb_compCompile( char * szPrg )
 
                      while( pSymb )
                      {
-                        if ( strcmp( pSymb->szName, szFirst ) == 0 && ( int ) strlen( pSymb->szName ) == iLenFirst && bFirst )
+                        if( strcmp( pSymb->szName, szFirst ) == 0 && ( int ) strlen( pSymb->szName ) == iLenFirst && bFirst )
                         {
                            pSymb->cScope  &= ~HB_FS_FIRST;
                            bFirst = FALSE;
                         }
 
-                        if ( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4  )
+                        if( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4  )
                            pSymb->cScope  |= HB_FS_FIRST;
 
                         pSymb = pSymb->pNext;

@@ -15,6 +15,10 @@
       #pragma warn -use                 /* '%s' is declared but never used           */
    #elif defined( __MINGW32__ )
       #pragma GCC diagnostic ignored "-Warray-bounds"
+      #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+      #pragma GCC diagnostic ignored "-Wunused-parameter"
+      #pragma GCC diagnostic ignored "-Wunused-function"
+      #pragma GCC diagnostic ignored "-Wsign-compare"
    #elif defined( __WATCOMC__ )
       #pragma disable_message ( 201 )
       #pragma disable_message ( 136 )

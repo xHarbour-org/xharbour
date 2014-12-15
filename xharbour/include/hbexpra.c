@@ -193,9 +193,9 @@ void hb_compExprINIT( void )
 /* Delete all components and delete self
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprDelete( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+void hb_compExprDelete( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-void hb_compExprDelete( HB_EXPR_PTR pExpr )
+void hb_compExprDelete( PHB_EXPR pExpr )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprDelete()"));
@@ -227,7 +227,7 @@ void hb_compExprDelete( HB_EXPR_PTR pExpr )
 
 /* Delete all components and delete self
  */
-void hb_compExprFree( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+void hb_compExprFree( PHB_EXPR pExpr, HB_MACRO_DECL )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprFree()"));
 
@@ -239,7 +239,7 @@ void hb_compExprFree( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
 #endif
 }
 
-void hb_compExprErrorType( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+void hb_compExprErrorType( PHB_EXPR pExpr, HB_MACRO_DECL )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprErrorType()"));
    hb_compErrorType( pExpr );
@@ -267,9 +267,9 @@ static PHB_CBVAR hb_compExprCBVarNew( char * szVarName, BYTE bType )
 /* Add a new local variable declaration
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, HB_MACRO_DECL )
+PHB_EXPR hb_compExprCBVarAdd( PHB_EXPR pCB, char * szVarName, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
+PHB_EXPR hb_compExprCBVarAdd( PHB_EXPR pCB, char * szVarName, BYTE bType )
 #endif
 {
    PHB_CBVAR pVar;
@@ -301,9 +301,9 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
    }
    else
 #ifdef HB_MACRO_SUPPORT
-      pCB->value.asList.pIndex = ( HB_EXPR_PTR ) hb_compExprCBVarNew( szVarName, ' ' );
+      pCB->value.asList.pIndex = ( PHB_EXPR ) hb_compExprCBVarNew( szVarName, ' ' );
 #else
-      pCB->value.asList.pIndex = ( HB_EXPR_PTR ) hb_compExprCBVarNew( szVarName, bType );
+      pCB->value.asList.pIndex = ( PHB_EXPR ) hb_compExprCBVarNew( szVarName, bType );
 #endif
 
    return pCB;
@@ -313,10 +313,10 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
  *
  * pIIF is a list of three expressions
  */
-HB_EXPR_PTR hb_compExprNewIIF( HB_EXPR_PTR pExpr )
+PHB_EXPR hb_compExprNewIIF( PHB_EXPR pExpr )
 {
 #ifndef HB_MACRO_SUPPORT
-   HB_EXPR_PTR pTmp;
+   PHB_EXPR pTmp;
 
    pExpr->ExprType = HB_ET_IIF;
 
@@ -336,12 +336,12 @@ HB_EXPR_PTR hb_compExprNewIIF( HB_EXPR_PTR pExpr )
 /* Create function call
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms, HB_MACRO_DECL )
+PHB_EXPR hb_compExprNewFunCall( PHB_EXPR pName, PHB_EXPR pParms, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
+PHB_EXPR hb_compExprNewFunCall( PHB_EXPR pName, PHB_EXPR pParms )
 #endif
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    if( pName->ExprType == HB_ET_FUNNAME )
    {
@@ -403,9 +403,9 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
 /* Create a new symbol used in function calls
  */
-HB_EXPR_PTR hb_compExprNewFunName( char * szName )
+PHB_EXPR hb_compExprNewFunName( char * szName )
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunName(%s)", szName));
 
@@ -415,9 +415,9 @@ HB_EXPR_PTR hb_compExprNewFunName( char * szName )
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName )
+PHB_EXPR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName )
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunRef(%s)", szFunName));
 
@@ -428,9 +428,9 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName 
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
+PHB_EXPR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewNamespaceFunName(%s, %s)", szNamespace, szName));
 
@@ -446,12 +446,12 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
  *    array[ idx1, idx2 ] => ( array[ idx1 ] )[ idx2 ]
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex, HB_MACRO_DECL )
+PHB_EXPR hb_compExprNewArrayAt( PHB_EXPR pArray, PHB_EXPR pIndex, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
+PHB_EXPR hb_compExprNewArrayAt( PHB_EXPR pArray, PHB_EXPR pIndex )
 #endif
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewArrayAt()"));
 
@@ -486,13 +486,13 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
 
 #ifndef HB_MACRO_SUPPORT
 
-BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pFunc, HB_EXPR_PTR pStaticVar );
+BOOL hb_compCanUseAsConstant( PHB_EXPR pFunc, PHB_EXPR pStaticVar );
 
-static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_PTR pRightExpr )
+static void hb_compExprCheckStaticInitializers( PHB_EXPR pStaticVar, PHB_EXPR pRightExpr )
 {
-   HB_EXPR_PTR pElem;
-   HB_EXPR_PTR pNext;
-   HB_EXPR_PTR * pPrev;
+   PHB_EXPR pElem;
+   PHB_EXPR pNext;
+   PHB_EXPR * pPrev;
 
    if( pRightExpr == NULL )
       return;
@@ -526,7 +526,7 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_
  TODO: There are other valid initializers that are currently disallowed, f.e.:
        STATIC x := {1}[1]
  */
-BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pInit, HB_EXPR_PTR pStaticVar )
+BOOL hb_compCanUseAsConstant( PHB_EXPR pInit, PHB_EXPR pStaticVar )
 {
    if( pInit->ExprType != HB_ET_FUNCALL )
       return FALSE;
@@ -549,9 +549,9 @@ BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pInit, HB_EXPR_PTR pStaticVar )
  * pLeftExpr - is a variable name
  * pRightExpr - can be an expression of any type
  */
-HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR pLeftExpr, HB_EXPR_PTR pRightExpr )
+PHB_EXPR hb_compExprAssignStatic( PHB_EXPR pLeftExpr, PHB_EXPR pRightExpr )
 {
-   HB_EXPR_PTR pExpr;
+   PHB_EXPR pExpr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprAssignStatic()"));
 
@@ -596,9 +596,9 @@ HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR pLeftExpr, HB_EXPR_PTR pRightEx
 /* Sets the argument of an operation found previously
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem, HB_MACRO_DECL )
+PHB_EXPR hb_compExprSetOperand( PHB_EXPR pExpr, PHB_EXPR pItem, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
+PHB_EXPR hb_compExprSetOperand( PHB_EXPR pExpr, PHB_EXPR pItem )
 #endif
 {
    BYTE ucRight;
@@ -684,9 +684,9 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
  * NOTE: It doesn't not leave any value on the eval stack
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+PHB_EXPR hb_compExprGenStatement( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR pExpr )
+PHB_EXPR hb_compExprGenStatement( PHB_EXPR pExpr )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprGenStatement(%i)", pExpr->ExprType));
@@ -702,9 +702,9 @@ HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR pExpr )
  * NOTE: It pushes a value on the stack and leaves this value on the stack
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprGenPush( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+PHB_EXPR hb_compExprGenPush( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprGenPush( HB_EXPR_PTR pExpr )
+PHB_EXPR hb_compExprGenPush( PHB_EXPR pExpr )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprGenPush(%i)", pExpr->ExprType));
@@ -717,9 +717,9 @@ HB_EXPR_PTR hb_compExprGenPush( HB_EXPR_PTR pExpr )
 /* Generates pcode to pop an expressions
  */
 #ifdef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
+PHB_EXPR hb_compExprGenPop( PHB_EXPR pExpr, HB_MACRO_DECL )
 #else
-HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR pExpr )
+PHB_EXPR hb_compExprGenPop( PHB_EXPR pExpr )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprGenPop(%i)", pExpr->ExprType));
@@ -747,7 +747,7 @@ void hb_compExprCBVarDel( PHB_CBVAR pVars )
 }
 
 #ifndef HB_MACRO_SUPPORT
-HB_EXPR_PTR hb_compExprReduce( HB_EXPR_PTR pExpr )
+PHB_EXPR hb_compExprReduce( PHB_EXPR pExpr )
 {
   return hb_compExprListStrip( HB_EXPR_USE( pExpr, HB_EA_REDUCE ), NULL );
 }

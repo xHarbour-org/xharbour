@@ -75,7 +75,7 @@ typedef struct _DEFINES
 struct _COMMANDS;
 typedef struct _COMMANDS
 {
-   int com_or_xcom;
+   int    com_or_xcom;
    char * name;
    char * mpatt;
    char * value;
@@ -90,10 +90,11 @@ typedef struct _COMMANDS
 /* PPCORE.C exported functions and variables */
 
 #define HB_INCLUDE_FUNC_( hbFunc ) BOOL hbFunc( char *, HB_PATHNAMES * )
-typedef HB_INCLUDE_FUNC_( HB_INCLUDE_FUNC );
-typedef HB_INCLUDE_FUNC * HB_INCLUDE_FUNC_PTR;
 
-extern void   hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet );
+typedef HB_INCLUDE_FUNC_( HB_INCLUDE_FUNC );
+typedef HB_INCLUDE_FUNC * PHB_INCLUDE_FUNC;
+
+extern void   hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet );
 extern int    hb_pp_ReadRules( void );
 extern void   hb_pp_Init( void );
 extern void   hb_pp_Free( void );
@@ -147,11 +148,8 @@ extern void hb_pp_ParsePragma( char * szline, BOOL bValidCode );
 #define STATE_EXPRES    8
 #define STATE_EXPRES_ID 9
 #define STATE_BRACKET   10
-/* Added by Giancarlo Niccolai 2003-05-20*/
 #define STATE_QUOTE4    11  /* escaped quote */
-/* END */
 
 HB_EXTERN_END
 
 #endif /* HB_PP_H_ */
-

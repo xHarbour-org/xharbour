@@ -126,7 +126,7 @@ typedef struct _HB_CURL
 
    PHB_ITEM pProgressCallback;
 
-   HB_HASH_TABLE_PTR pHash;
+   PHB_HASH_TABLE pHash;
 
 } HB_CURL, * PHB_CURL;
 
@@ -222,7 +222,7 @@ static char * hb_curl_strdup( const char * s )
 static void * hb_curl_calloc( size_t nelem, size_t elsize )
 {
    size_t size = nelem * elsize;
-   void * ptr = hb_xgrab( size );
+   void * ptr  = hb_xgrab( size );
 
    memset( ptr, '\0', size );
 
@@ -2155,9 +2155,9 @@ HB_FUNC( CURL_VERSION_INFO )
       hb_arraySetNI( pArray, 10, 0 );
 #endif
 #if defined( CURLVERSION_THIRD )
-      hb_arraySetC(  pArray, 11, data->age >= CURLVERSION_THIRD ? data->libidn : NULL );
+      hb_arraySetC( pArray, 11, data->age >= CURLVERSION_THIRD ? data->libidn : NULL );
 #else
-      hb_arraySetC(  pArray, 11, NULL );
+      hb_arraySetC( pArray, 11, NULL );
 #endif
 #if defined( CURLVERSION_FOURTH )
       hb_arraySetNI( pArray, 12, data->age >= CURLVERSION_FOURTH ? data->iconv_ver_num : 0 ); /* Same as '_libiconv_version' if built with HAVE_ICONV */
@@ -2165,13 +2165,13 @@ HB_FUNC( CURL_VERSION_INFO )
       hb_arraySetNI( pArray, 12, 0 );
 #endif
 #if defined( CURLVERSION_FOURTH ) && LIBCURL_VERSION_NUM >= 0x071001 /* Just a guess. It's not documented in which libcurl version this member got added. */
-      hb_arraySetC(  pArray, 13, data->age >= CURLVERSION_FOURTH ? data->libssh_version : NULL ); /* human readable string */
+      hb_arraySetC( pArray, 13, data->age >= CURLVERSION_FOURTH ? data->libssh_version : NULL ); /* human readable string */
 #else
-      hb_arraySetC(  pArray, 13, NULL ); /* human readable string */
+      hb_arraySetC( pArray, 13, NULL ); /* human readable string */
 #endif
       {
          PHB_ITEM pProtocols;
-         int nCount = 0;
+         int      nCount = 0;
          const char * const * prot = data->protocols;
 
          while( *( prot++ ) )

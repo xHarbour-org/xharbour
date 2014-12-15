@@ -285,12 +285,12 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char *msg, int length, int *iR
 
 int can_read(int socket, int timeout)
 {
-   int            r = 0;
+   int            r;
    fd_set         rset;
    struct timeval tv;
 
    FD_ZERO(&rset);
-   FD_SET(socket, &rset);
+   FD_SET((UINT)socket, &rset);
    tv.tv_sec = timeout / 1000;
    tv.tv_usec = (timeout % 1000) * 1000;
 
@@ -1238,7 +1238,7 @@ static void s_inetRecvPattern(char *szFuncName, char *szPattern)
    int                  iAllocated,
                         iBufferSize,
                         iMax;
-   int                  iLen = 0;
+   int                  iLen;
    int                  iPos = 0,
                         iTimeElapsed;
    ULONG                ulPatPos;
@@ -1489,11 +1489,10 @@ HB_FUNC( INETSSLRECVENDBLOCK )
          Buffer = (char *) hb_xrealloc(Buffer, iAllocated);
       }
 
-      iLen = 0;
-
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
 
+      //iLen = 0;
       //if( hb_selectReadSocket( Socket ) )
       iLen = hb_inetSSLRead(Socket, &cChar, 1, &Socket->errorCode);
       if (iLen > 0)
@@ -1713,12 +1712,12 @@ static void s_inetSendInternal(char *szFuncName, int iMode)
          iBufferLen = iSend;
       }
 
-      iLen = 0;
-
+      //iLen = 0;
       //if( hb_selectWriteSocket( Socket ) )
       //{
-      // iLen = send( Socket->com, Buffer + iSent, iBufferLen, MSG_NOSIGNAL );
-      //      }
+      //   iLen = send( Socket->com, Buffer + iSent, iBufferLen, MSG_NOSIGNAL );
+      //}
+
       iLen = hb_inetSSLWrite(Socket, Buffer + iSent, iBufferLen,
                              &Socket->errorCode);
       if (iLen > 0)
@@ -2116,8 +2115,8 @@ HB_FUNC( INETSSLCONNECT )
    struct hostent       *Host;
    int                  iPort;
    int                  iRetries = 0;
-   int                  iRet = 0;
-   int                  iRet2 = 0;
+   int                  iRet;
+   int                  iRet2;
 //    int                  iErr = 0;
 
    if (szHost == NULL || !ISNUM(2) || (Socket == NULL && !ISNIL(3)) ||
@@ -2172,9 +2171,8 @@ HB_FUNC( INETSSLCONNECT )
          hb_socketConnect(Socket);
          hb_socketSetNonBlocking(Socket);
          SSL_set_bio(Socket->pSSL, Socket->pBio, Socket->pBio);
-         iRet = SSL_set_fd(Socket->pSSL, (int)Socket->com);
+         SSL_set_fd(Socket->pSSL, (int)Socket->com);
          SSL_set_connect_state(Socket->pSSL);
-         iRet2 = 0;
 
          iRet2 = SSL_connect(Socket->pSSL);
          iRet = SSL_get_error(Socket->pSSL, iRet2);

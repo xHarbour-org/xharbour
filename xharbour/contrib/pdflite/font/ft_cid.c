@@ -45,7 +45,7 @@ static const fnt_cmap_info fnt_predefined_cmaps[] =
     { "UniJIS-UCS2-H",    cc_japanese, 2, PDC_1_3, 2, 4, 4, 6, 0},
     { "UniJIS-UCS2-V",    cc_japanese, 2, PDC_1_3, 2, 4, 4, 6, 1},
     { "UniJIS-UCS2-HW-H", cc_japanese,-2, PDC_1_3, 2, 4, 4, 6, 0},
-    { "UniJIS-UCS2-HW-V", cc_japanese -2, PDC_1_3, 2, 4, 4, 6, 1},
+    { "UniJIS-UCS2-HW-V", cc_japanese,-2, PDC_1_3, 2, 4, 4, 6, 1},
     { "UniJIS-UTF16-H",   cc_japanese, 2, PDC_1_5, 0, 0, 5, 6, 0},
     { "UniJIS-UTF16-V",   cc_japanese, 2, PDC_1_5, 0, 0, 5, 6, 1},
 
@@ -196,7 +196,6 @@ fnt_get_supplement(fnt_cmap_info *cmapinfo, int compatibility)
  * Adobe Technical Note #5079 (GB1)
  * Adobe Technical Note #5080 (CNS1)
  * Adobe Technical Note #5093 (Korea1)
- *
  */
 
 int
@@ -298,4 +297,3 @@ fnt_get_maxcid(int charcoll, int supplement)
         return 0;
     }
 }
-
