@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-14 23:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * source/vm/fm.c
+    ! changed fixed hb_sprintf format %li with %" HB_PFS "i to make mingw happy
+  + config/w32/mingw64.cf
+    ! config for mingw 64 bit compile
+  + make_mingw64.sh
+    ! shell script for mingw 64 bits compile with msys  
+        
 2014-12-14 15:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * source/rtl/tbrowse.prg
     ! minor fix on display datetime fields

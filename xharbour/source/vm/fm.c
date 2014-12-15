@@ -913,7 +913,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( buffer, sizeof( buffer ), "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
+      hb_snprintf( buffer, sizeof( buffer ), "Total %" HB_PFS "i allocations (%" HB_PFS "i reallocation), of which %" HB_PFS "i freed.", s_lAllocations, s_lReAllocations, s_lFreed );
 
       if( hLog )
       {
@@ -942,7 +942,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( buffer, sizeof( buffer ), "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
+      hb_snprintf( buffer, sizeof( buffer ), "Highest total allocated %" HB_PFS "i bytes in %" HB_PFS "i blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
 
       if( hLog )
          fprintf( hLog, "%s\n", buffer );
@@ -952,7 +952,7 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       if( s_lMemoryBlocks )
       {
          hb_conOutErr( hb_conNewLine(), 0 );
-         hb_snprintf( buffer, sizeof( buffer ), "WARNING! Memory allocated but not released: %li bytes (%li blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
+         hb_snprintf( buffer, sizeof( buffer ), "WARNING! Memory allocated but not released: %" HB_PFS "i bytes (%" HB_PFS "i blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
 
          if( hLog )
             fprintf( hLog, "%s\n", buffer );
@@ -1308,7 +1308,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
             USHORT      ui;
             PHB_MEMINFO pMemBlock;
 
-            TraceLog( NULL, "Total %li allocations (%li reallocation), of which %li freed.\n", s_lAllocations, s_lReAllocations, s_lFreed );
+            TraceLog( NULL, "Total %" HB_PFS "i allocations (%" HB_PFS "i reallocation), of which %" HB_PFS "i freed.\n", s_lAllocations, s_lReAllocations, s_lFreed );
             TraceLog( NULL, "--------------------------------------------------------------------------------------\n" );
 
             for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock, ++ui )

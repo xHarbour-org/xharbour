@@ -1,0 +1,164 @@
+#
+# $Id: mingw32.cf 9858 2012-12-06 01:40:02Z druzus $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+OBJ_EXT = .o
+EXE_EXT = .exe
+LIB_PREF = lib
+LIB_EXT = .a
+
+CC = $(CCPREFIX)gcc
+CC_IN = -c
+CC_OUT = -o
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE) -m64 -DHB_OS_WIN_64 -DNODLL -W -Wall -fomit-frame-pointer  -O3 -c -fno-strict-aliasing -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration 
+CFLAGS = -Wall -W
+ifeq ($(HB_LEX),SIMPLEX)
+CFLAGS += -DSIMPLEX
+endif
+
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+CFLAGS+= -DHB_THREAD_SUPPORT
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CFLAGS+= -DHB_THREAD_SUPPORT
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+endif
+endif
+
+
+LD = $(CCPREFIX)gcc
+LD_OUT = -o
+LINKPATHS =
+LDLIBS =
+
+# Add all libraries specified in CONTRIBS and LIBS.
+ifeq ($(HB_LIB_COMPILE),)
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+
+#Adding MT libs on need
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
+endif
+
+else
+LINKPATHS += -L$(HB_LIB_COMPILE)
+endif
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
+LDLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
+
+LDLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
+LDLIBS += $(foreach lib, $(LIBS), -l$(lib))
+
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rddmt,$(LIBS)),rddmt)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR)_mt)
+LDLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
+else
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
+LDLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
+endif
+
+# Add the specified GT driver library and other RTLs
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += $(foreach gt, $(HB_GT_LIBS), -L$(TOP)$(ROOT)source/rtl/$(gt)/$(ARCH_DIR))
+LDLIBS += $(foreach gt, $(HB_GT_LIBS), -l$(gt))
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
+LDLIBS += -lpcrepos
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/zlib/$(ARCH_DIR)
+LDLIBS += -lzlib
+
+LINKPATHS += -L$(TOP)$(ROOT)source/vm/mainstd/$(ARCH_DIR)
+
+endif
+
+# HB_SCREEN_LIB: empty, or one of ncurses, slang
+# HB_SCREEN_LIB=ncurses
+# HB_SCREEN_LIB=slang
+
+ifneq ($(HB_SCREEN_LIB),)
+LDLIBS += -l$(HB_SCREEN_LIB)
+endif
+
+# Add the optional user path(s)
+ifneq ($(LNK_USR_PATH),)
+LINKPATHS += $(foreach path, $(LNK_USR_PATH), -L$(path))
+endif
+
+# Add the optional user libarary (or libraries)
+ifneq ($(LNK_USR_LIB),)
+LDLIBS += $(foreach lib, $(LNK_USR_LIB), -l$(lib))
+endif
+
+SYSLIBS = -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 \
+          -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32
+
+# NOTE: The empty line directly before 'endef' HAVE TO exist!
+# It causes that every echo command will be separated by LF
+define lib_object
+echo. ADDMOD $(file) >> __lib__.tmp
+
+endef
+
+# We have to use script to overcome the DOS limit of max 128 characters
+# in command line
+define create_library
+echo. CREATE $@ > __lib__.tmp
+$(foreach file, $(^F), $(lib_object))
+echo. SAVE >> __lib__.tmp
+echo. END >> __lib__.tmp
+$(AR) $(ARFLAGS) -M < __lib__.tmp
+endef
+
+# NOTE: The empty line below HAVE TO exist!
+define link_file
+echo. $(file) >> __link__.tmp
+
+endef
+
+define link_exe_file
+echo. $(LDFLAGS) $(L_USR) $(LD_OUT)$@ > __link__.tmp
+$(foreach file, $(LINKPATHS), $(link_file))
+$(foreach file, $(^F), $(link_file))
+echo. -Wl,--start-group >> __link__.tmp
+$(foreach file, $(LDLIBS), $(link_file))
+echo. -Wl,--end-group >> __link__.tmp
+$(foreach file, $(SYSLIBS), $(link_file))
+-$(LD) __link__.tmp
+endef
+
+LDFLAGS = 
+
+AR = $(CCPREFIX)ar
+ARFLAGS = $(A_USR)
+
+RANLIB = $(CCPREFIX)ranlib
+
+
+ifeq ($(SHLVL),) # COMMAND.COM - length of command line is limited
+ifneq ($(OS),Windows_NT)
+AR_RULE = $(create_library)
+LD_RULE = $(link_exe_file)
+endif
+endif
+
+ifeq ($(AR_RULE),)
+AR_RULE = $(AR) $(ARFLAGS) cr $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
+# our libs have a lot of cross referenced now and we have to group them
+# until we won't have cleaned them
+LINKLIBS = $(LINKPATHS) -Wl,--start-group $(LDLIBS) -Wl,--end-group $(SYSLIBS)
+endif
+
+include $(TOP)$(ROOT)config/rules.cf
