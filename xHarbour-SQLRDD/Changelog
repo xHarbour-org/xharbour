@@ -8,14 +8,62 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-
+2014-12-15 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/pgs.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+    ! some log renamed from oci.log to pgs.log
+  * source/firebird.c
+    ! when ISC_INT64_FORMAT macro is not defined, set to PFLL
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! unused variables commented
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+    ! added the variables
+    ! LONG lType,lLen, lDec; to FBLINEPROCESSED function
+    % using hb_snprintf insted of sprintf
+  * source/utils.prg
+    % ! use HB_IS*() instead of valtype() where aplicable
+  * source/mysql.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+  * source/sqlrdd1.c
+    ! changed SELF_XXXXX( (AREAP) yyyyy)  with SELF_XXXX( &yyyyy->area )
+    ! changed SUPER_XXXXX( (AREAP) yyyyy) with SUPER_XXXX( &yyyyy->area )
+    ! changed some ULONG with HB_ULONG where aplicable
+  * source/sqlrdd1.h    
+    ! changed ULONG ulhRecno to HB_ULONG ulhRecno
+    ! changed ULONG ulhDeleted to HB_ULONG ulhDeleted
+  * source/sqlorax.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+  * source/sqlprototype.h
+    ! changed signature  from PHB_ITEM sr_escapeNumber( char *FromBuffer, ULONG len, ULONG dec, PHB_ITEM pRet ); to PHB_ITEM sr_escapeNumber( char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pRet );  
+  * source/sqlsrodbc.c
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null      
+  * source/sqlact.c
+    ! ULONG -> HB_SIZE
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+  * source/sqlrdd2.prg
+    ! cleaned unused variables
+        
+      
 2014-10-07 00:29 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * source/sqlact.c
   * source/sqllex.c
     + Added #define WIN32_LEAN_AND_MEAN to protect against inlusion of winsock2.h
       due to #define conflict of GROUP with sqly.h
 
-2014-07-07 11:06   UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+2014-07-07 11:06 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlex1.c
     ! added cast to line 2205
     ! fixed parameter passing on line  462

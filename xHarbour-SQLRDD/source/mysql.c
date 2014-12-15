@@ -48,8 +48,8 @@ typedef MYSQL_SESSION * PMYSQL_SESSION;
 
 HB_FUNC( MYSCONNECT )
 {
-   PMYSQL_SESSION session = (PMYSQL_SESSION) hb_xgrab( sizeof( MYSQL_SESSION ) );
-
+//    PMYSQL_SESSION session = (PMYSQL_SESSION) hb_xgrab( sizeof( MYSQL_SESSION ) );
+   PMYSQL_SESSION session  = (PMYSQL_SESSION) hb_xgrabz( sizeof( MYSQL_SESSION ) );
    const char *szHost=hb_parc(1);
    const char *szUser=hb_parc(2);
    const char *szPass=hb_parc(3);
@@ -58,7 +58,7 @@ HB_FUNC( MYSCONNECT )
    UINT uiTimeout = ISNUM(7) ? hb_parnl(7) : 3600 ;
    BOOL lCompress = ISLOG(8) ?  hb_parl(8) : 0 ;
    mysql_library_init(0,NULL,NULL);
-   memset( session, 0, sizeof( MYSQL_SESSION ) );
+//    memset( session, 0, sizeof( MYSQL_SESSION ) );
 
    session->dbh    = mysql_init( ( MYSQL * ) 0 );
    session->ifetch = -2;
@@ -186,18 +186,18 @@ HB_FUNC( MYSFETCH )     /* MYSFetch( ConnHandle,ResultSet ) => nStatus */
 
 //-----------------------------------------------------------------------------//
 
-void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
+void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
 {
    LONG lType;
-   LONG lLen, lDec;
+   HB_SIZE lLen, lDec;
    PHB_ITEM pTemp;
 
    HB_SYMBOL_UNUSED( bQueryOnly );
    HB_SYMBOL_UNUSED( ulSystemID );
 
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
-   lLen  = ( LONG ) hb_arrayGetNL( pField, FIELD_LEN );
-   lDec  = ( LONG ) hb_arrayGetNL( pField, FIELD_DEC );
+   lLen  = hb_arrayGetNL( pField, FIELD_LEN );
+   lDec  = hb_arrayGetNL( pField, FIELD_DEC );
 
    if( lLenBuff <= 0 )     // database content is NULL
    {
@@ -243,11 +243,11 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 #endif
          case SQL_DATETIME:
          {
-#ifdef __XHARBOUR__
-            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-#else
+// #ifdef __XHARBOUR__
+//             hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+// #else
             hb_itemPutTDT( pItem, 0, 0 );
-#endif
+// #endif
             break;
          }
 
@@ -261,12 +261,12 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
       {
          case SQL_CHAR:
          {
-            LONG lPos;
+            HB_SIZE lPos;
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-            memset( szResult, ' ', ( LONG )  lLen  );
-            hb_xmemcpy( szResult, bBuffer, ( LONG ) (lLen < lLenBuff ? lLen : lLenBuff ) );
+            memset( szResult, ' ',   lLen  );
+            hb_xmemcpy( szResult, bBuffer,  (lLen < lLenBuff ? lLen : lLenBuff ) );
 
-            for( lPos = ( LONG ) lLenBuff; lPos < lLen; lPos++ )
+            for( lPos =  lLenBuff; lPos < lLen; lPos++ )
             {
                szResult[ lPos ] = ' ';
             }
@@ -335,7 +335,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
                   PHB_ITEM pLangItem = hb_itemNew( NULL );
-                  ULONG ulPos;
+                  HB_SIZE ulPos;
                   if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
@@ -374,24 +374,27 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          {
 #ifdef __XHARBOUR__
             //hb_retdts(bBuffer);
-            char dt[17];
-            dt[0] = bBuffer[0];
-            dt[1] = bBuffer[1];
-            dt[2] = bBuffer[2];
-            dt[3] = bBuffer[3];
-            dt[4] = bBuffer[5];
-            dt[5] = bBuffer[6];
-            dt[6] = bBuffer[8];
-            dt[7] = bBuffer[9];
-            dt[8] = bBuffer[11];
-            dt[9] = bBuffer[12];
-            dt[10] = bBuffer[14];
-            dt[11] = bBuffer[15];
-            dt[12] = bBuffer[17];
-            dt[13] = bBuffer[18];
-            dt[14] = '\0';
-
-            hb_itemPutDTS( pItem, dt );
+//             char dt[17];
+//             dt[0] = bBuffer[0];
+//             dt[1] = bBuffer[1];
+//             dt[2] = bBuffer[2];
+//             dt[3] = bBuffer[3];
+//             dt[4] = bBuffer[5];
+//             dt[5] = bBuffer[6];
+//             dt[6] = bBuffer[8];
+//             dt[7] = bBuffer[9];
+//             dt[8] = bBuffer[11];
+//             dt[9] = bBuffer[12];
+//             dt[10] = bBuffer[14];
+//             dt[11] = bBuffer[15];
+//             dt[12] = bBuffer[17];
+//             dt[13] = bBuffer[18];
+//             dt[14] = '\0';
+// 
+//             hb_itemPutDTS( pItem, dt );
+            long lJulian, lMilliSec;
+            hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );
 #else
             long lJulian, lMilliSec;
             hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );

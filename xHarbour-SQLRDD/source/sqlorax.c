@@ -501,18 +501,20 @@ HB_FUNC( SQLO_CLOSESTMT )
 
 //-----------------------------------------------------------------------------//
 
-void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
+void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
 {
    LONG lType;
-   LONG lLen, lDec;
+// LONG lLen, lDec;
+   HB_SIZE lLen;
+   HB_SIZE lDec; 
    PHB_ITEM pTemp;
 
    HB_SYMBOL_UNUSED( bQueryOnly );
    HB_SYMBOL_UNUSED( ulSystemID );
 
    lType = ( LONG ) hb_arrayGetNL( pField, 6 );
-   lLen  = ( LONG ) hb_arrayGetNL( pField, 3 );
-   lDec  = ( LONG ) hb_arrayGetNL( pField, 4 );
+   lLen  = hb_arrayGetNL( pField, 3 );
+   lDec  = hb_arrayGetNL( pField, 4 );
 
    if( lLenBuff <= 0 )     // database content is NULL
    {
@@ -522,14 +524,14 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
          case SQL_NUMERIC:
          case SQL_FAKE_NUM:
          {
             char szResult[2] = { ' ', '\0' };
-            sr_escapeNumber( szResult, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( szResult, lLen,  lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -558,11 +560,11 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
 #endif
          case SQL_DATETIME:
          {
-#ifdef __XHARBOUR__
-            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-#else
+// #ifdef __XHARBOUR__
+//             hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+// #else
             hb_itemPutTDT( pItem, 0, 0 );
-#endif
+// #endif
             break;
          }
 
@@ -576,20 +578,20 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
       {
          case SQL_CHAR:
          {
-            LONG lPos;
+            HB_SIZE lPos;
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-            hb_xmemcpy( szResult, bBuffer, ( LONG ) (lLen < lLenBuff ? lLen : lLenBuff ) );
+            hb_xmemcpy( szResult, bBuffer,  (lLen < lLenBuff ? lLen : lLenBuff ) );
 
-            for( lPos = ( LONG ) lLenBuff; lPos < lLen; lPos++ )
+            for( lPos =  lLenBuff; lPos < lLen; lPos++ )
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
          case SQL_NUMERIC:
          {
-            sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );
+            sr_escapeNumber( bBuffer,  lLen,  lDec, pItem );
             break;
          }
          case SQL_DATE:
@@ -650,7 +652,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
                   PHB_ITEM pLangItem = hb_itemNew( NULL );
-                  ULONG ulPos;
+                  HB_SIZE ulPos;
                   if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
@@ -668,7 +670,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
 
             else
             {
-               hb_itemPutCL( pItem, bBuffer, (ULONG) lLenBuff );
+               hb_itemPutCL( pItem, bBuffer,  lLenBuff );
             }
             break;
          }
@@ -689,25 +691,28 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBu
          {
 #ifdef __XHARBOUR__
             //hb_retdts(bBuffer);
-            char dt[18];
-            
-            dt[0] = bBuffer[0];
-            dt[1] = bBuffer[1];
-            dt[2] = bBuffer[2];
-            dt[3] = bBuffer[3];
-            dt[4] = bBuffer[4];
-            dt[5] = bBuffer[5];
-            dt[6] = bBuffer[6];
-            dt[7] = bBuffer[7];
-            dt[8] = bBuffer[9];
-            dt[9] = bBuffer[10];
-            dt[10] = bBuffer[12];
-            dt[11] = bBuffer[13];
-            dt[12] = bBuffer[15];
-            dt[13] = bBuffer[16];
-            dt[14] = '\0';
-
-            hb_itemPutDTS( pItem, dt );
+//             char dt[18];
+//             
+//             dt[0] = bBuffer[0];
+//             dt[1] = bBuffer[1];
+//             dt[2] = bBuffer[2];
+//             dt[3] = bBuffer[3];
+//             dt[4] = bBuffer[4];
+//             dt[5] = bBuffer[5];
+//             dt[6] = bBuffer[6];
+//             dt[7] = bBuffer[7];
+//             dt[8] = bBuffer[9];
+//             dt[9] = bBuffer[10];
+//             dt[10] = bBuffer[12];
+//             dt[11] = bBuffer[13];
+//             dt[12] = bBuffer[15];
+//             dt[13] = bBuffer[16];
+//             dt[14] = '\0';
+// 
+//             hb_itemPutDTS( pItem, dt );
+            long lJulian, lMilliSec;
+            hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );            
 #else
             long lJulian, lMilliSec;
             hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
@@ -762,7 +767,7 @@ HB_FUNC( SQLO_LINEPROCESSED )
    const unsigned int * lens;
    LONG lIndex;
    PHB_ITEM temp;
-   USHORT i, cols;
+   HB_SIZE i, cols;
    PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
    BOOL  bQueryOnly = hb_parl( 4 );
    ULONG ulSystemID = hb_parnl( 5 );
@@ -807,7 +812,7 @@ HB_FUNC( ORACLEWRITEMEMO )
 
    PHB_ITEM pArray = hb_param( 5, HB_IT_ARRAY );
 
-   ULONG uiLen, uiSize;
+   HB_SIZE uiLen, uiSize;
 
    uiLen = hb_arrayLen( pArray );
 
@@ -1355,8 +1360,9 @@ HB_FUNC( ORACLEBINDALLOC )
    if ( session )
    {
       iBind = hb_parni( 2 ) ;
-      session->pLink = ( ORA_BIND_COLS * ) hb_xgrab( sizeof( ORA_BIND_COLS ) * iBind );
-      memset(session->pLink,0,sizeof( ORA_BIND_COLS ) * iBind );      
+//       session->pLink = ( ORA_BIND_COLS * ) hb_xgrab( sizeof( ORA_BIND_COLS ) * iBind );
+//       memset(session->pLink,0,sizeof( ORA_BIND_COLS ) * iBind );      
+      session->pLink = (ORA_BIND_COLS * ) hb_xgrabz( sizeof(ORA_BIND_COLS ) * iBind  ); 
       session->ubBindNum = iBind;
    }
    hb_retni( 1 );

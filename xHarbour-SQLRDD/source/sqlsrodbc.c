@@ -277,17 +277,17 @@ HB_FUNC( SR_FETCH )
 
 //-----------------------------------------------------------------------------//
 
-void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
+void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
 {	
    LONG lType;
-   LONG lLen, lDec;
+   HB_SIZE lLen, lDec;
    char * cType;
    PHB_ITEM pTemp;
 
    cType  = ( char * ) hb_arrayGetCPtr(pField, FIELD_TYPE );
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
-   lLen  = ( LONG ) hb_arrayGetNL( pField, FIELD_LEN );
-   lDec  = ( LONG ) hb_arrayGetNL( pField, FIELD_DEC );
+   lLen  = hb_arrayGetNL( pField, FIELD_LEN );
+   lDec  = hb_arrayGetNL( pField, FIELD_DEC );
 
    if( lLenBuff <= 0 )     // database content is NULL
    {
@@ -301,7 +301,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
-            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -320,7 +320,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             else
             {
                char szResult[2] = { ' ', '\0' };
-               sr_escapeNumber( szResult, (ULONG) lLen, (ULONG) lDec, pItem );
+               sr_escapeNumber( szResult,  lLen,  lDec, pItem );
             }
             break;
          }
@@ -338,17 +338,17 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             {
                char * szResult = ( char * ) hb_xgrab( 26 + 1 );
                hb_xmemset( szResult, ' ', lLen );
-               hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
+               hb_itemPutCLPtr( pItem, szResult,  lLen );
             }
             else
             {
                if( ( ulSystemID == SYSTEMID_POSTGR ) || ( ulSystemID == SYSTEMID_ORACLE )|| ( ulSystemID == SYSTEMID_FIREBR )||( ulSystemID == SYSTEMID_MYSQL )  || (  ulSystemID ==SYSTEMID_MSSQL7  && sr_lsql2008newTypes() ) )  
                {
-#ifdef __XHARBOUR__
-                  hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-#else
+// #ifdef __XHARBOUR__
+//                   hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
+// #else
                   hb_itemPutTDT( pItem, 0, 0 );
-#endif
+// #endif
                }
                else
                {
@@ -407,15 +407,15 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
          case SQL_WCHAR:
          case SQL_GUID:
          {
-            LONG lPos;
+            HB_SIZE lPos;
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-            hb_xmemcpy( szResult, bBuffer, ( LONG ) (lLen < lLenBuff ? lLen : lLenBuff ) );
+            hb_xmemcpy( szResult, bBuffer,  (lLen < lLenBuff ? lLen : lLenBuff ) );
 
-            for( lPos = ( LONG ) lLenBuff; lPos < lLen; lPos++ )
+            for( lPos =  lLenBuff; lPos < lLen; lPos++ )
             {
                szResult[ lPos ] = ' ';
             }
-            hb_itemPutCLPtr( pItem, szResult, (ULONG) lLen );
+            hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -433,7 +433,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             }
             else
             {
-               sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );
+               sr_escapeNumber( bBuffer,  lLen,  lDec, pItem );
             }
             break;
          }
@@ -458,33 +458,36 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
             }
             else if ( ulSystemID == SYSTEMID_IBMDB2 && (lType == SQL_TIMESTAMP || lType == SQL_TYPE_TIMESTAMP) )
             {
-               hb_itemPutCL( pItem, bBuffer, (ULONG) lLenBuff );
+               hb_itemPutCL( pItem, bBuffer,  lLenBuff );
                break;
             }
             else if ( ( (ulSystemID == SYSTEMID_POSTGR ) || ( ulSystemID == SYSTEMID_ORACLE ) || ( ulSystemID == SYSTEMID_FIREBR )||( ulSystemID == SYSTEMID_MYSQL )  || (  ulSystemID ==SYSTEMID_MSSQL7  && sr_lsql2008newTypes() ) ) && (lType == SQL_TIMESTAMP|| lType == SQL_TYPE_TIMESTAMP) )
             {
 #ifdef __XHARBOUR__
-               char dt1[18];
-               dt1[0] = bBuffer[0];
-               dt1[1] = bBuffer[1];
-               dt1[2] = bBuffer[2];
-               dt1[3] = bBuffer[3];
-               dt1[4] = bBuffer[5];
-               dt1[5] = bBuffer[6];
-               dt1[6] = bBuffer[8];
-               dt1[7] = bBuffer[9];
-               dt1[8] = bBuffer[11];
-               dt1[9] = bBuffer[12];
-               dt1[10] = bBuffer[14];
-               dt1[11] = bBuffer[15];
-               dt1[12] = bBuffer[17];
-               dt1[13] = bBuffer[18];
-               dt1[14] = '\0';
-               hb_itemPutDTS( pItem, dt1 );
+//                char dt1[18];
+//                dt1[0] = bBuffer[0];
+//                dt1[1] = bBuffer[1];
+//                dt1[2] = bBuffer[2];
+//                dt1[3] = bBuffer[3];
+//                dt1[4] = bBuffer[5];
+//                dt1[5] = bBuffer[6];
+//                dt1[6] = bBuffer[8];
+//                dt1[7] = bBuffer[9];
+//                dt1[8] = bBuffer[11];
+//                dt1[9] = bBuffer[12];
+//                dt1[10] = bBuffer[14];
+//                dt1[11] = bBuffer[15];
+//                dt1[12] = bBuffer[17];
+//                dt1[13] = bBuffer[18];
+//                dt1[14] = '\0';
+//                hb_itemPutDTS( pItem, dt1 );
 #else
                long lJulian, lMilliSec;
                hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
                hb_itemPutTDT( pItem, lJulian, lMilliSec );
+            long lJulian, lMilliSec;
+            hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
+            hb_itemPutTDT( pItem, lJulian, lMilliSec );               
 #endif
                break;
             }
@@ -550,7 +553,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() && bTranslate )
                {
                   PHB_ITEM pLangItem = hb_itemNew( NULL );
-                  ULONG ulPos;
+                  HB_SIZE ulPos;
                   if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )
@@ -608,11 +611,12 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuf
 
 HB_FUNC( SR_ODBCLINEPROCESSED )
 {
-   LONG lLen,  lInitBuff, lIndex;
-   SQLLEN lLenOut;
-   PTR  bBuffer, bOut;
-   RETCODE wResult;
-   int iReallocs;
+//    LONG lLen,  lInitBuff, lIndex;
+    LONG lLen, lIndex;
+//    SQLLEN lLenOut;
+//    PTR  bBuffer, bOut;
+//    RETCODE wResult;
+//    int iReallocs;
    PHB_ITEM temp;
    int i, cols;
    PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
@@ -656,7 +660,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       {
 	      
 
-          LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( pFields, i ), FIELD_DOMAIN );
+//           LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( pFields, i ), FIELD_DOMAIN );
 //         TraceLog("field.log"," campo %s tipo %lu \n", hb_arrayGetCPtr( hb_arrayGetItemPtr( pFields, i ), 1 ),lType);
          odbcGetData( ( HSTMT ) hb_parptr( 1 ), hb_arrayGetItemPtr( pFields, i ),temp,  bQueryOnly, ulSystemID, bTranslate,lIndex  );
 	              
@@ -672,7 +676,10 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
 
 HB_FUNC( SR_ODBCGETLINES ) // ( ::hStmt, nLenBuff, aFields, aCache, nSystemID, lTranslate, nCurrentFetch, aInfo, nDirection, hnRecno, lFetchAll, aFetch, uRecord, nPos )
 {
-   LONG lLen, lLenOut, lInitBuff, lIndex;
+//    LONG lLen, lLenOut, lInitBuff, lIndex;
+   LONG   lInitBuff, lIndex;
+   HB_SIZE lLen;
+   SQLLEN lLenOut;
    PTR  bBuffer, bOut;
    RETCODE wResult, wReturn = SQL_ERROR;
    int iReallocs;
@@ -706,14 +713,14 @@ HB_FUNC( SR_ODBCGETLINES ) // ( ::hStmt, nLenBuff, aFields, aCache, nSystemID, l
       hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
    }
 
-   lLen       = ( LONG )( hb_pcount() > 1 ? hb_parnl( 2 ) : 4096 );
+   lLen       = ( hb_pcount() > 1 ? hb_parnl( 2 ) : 4096 );
 
    if( lLen <= 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "SR_ODBCLINEPROCESSED", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
    }
 
-   bBuffer = hb_xgrab( (ULONG) lLen+1 );
+   bBuffer = hb_xgrab(  lLen+1 );
 
    for( line = 1; line <= iCurrFetch; line++ )
    {
@@ -793,10 +800,10 @@ HB_FUNC( SR_ODBCGETLINES ) // ( ::hStmt, nLenBuff, aFields, aCache, nSystemID, l
                   if( lLenOut >= lInitBuff )
                   {
                      /* data right truncated! */
-                     bOut    = ( char * ) hb_xgrab( (ULONG) lLenOut + 1 );
+                     bOut    = ( char * ) hb_xgrab(  lLenOut + 1 );
                      lLen = lLenOut + 3;
                      strcpy( (char *) bOut, (char *) bBuffer );
-                     bBuffer = ( char * ) hb_xrealloc( bBuffer, (ULONG) lLen );
+                     bBuffer = ( char * ) hb_xrealloc( bBuffer,  lLen );
                      iReallocs++;
                   }
                   else
@@ -925,21 +932,32 @@ HB_FUNC( SR_DESCRIB )
     SQLSMALLINT      lLen      = ( SQLSMALLINT ) hb_parni( 4 );   
     SQLSMALLINT wBufLen   = ( SQLSMALLINT)hb_parni( 5 );
     SQLSMALLINT wDataType = ( SQLSMALLINT)hb_parni( 6 );
-    SQLULEN     wColSize = hb_parni( 7 );
+    SQLULEN     wColSize = hb_parnint( 7 );
     SQLSMALLINT wDecimals = ( SQLSMALLINT)hb_parni( 8 );
     SQLSMALLINT wNullable = ( SQLSMALLINT) hb_parni( 9 );
-    SQLTCHAR   bBuffer[128]={0};
+//     SQLTCHAR   bBuffer[128]={0};
+
+    SQLTCHAR *  bBuffer;
+    RETCODE     wResult  ;
+    ULONG ulSystemID = hb_parnl( 10 ) ;
+
+    if( lLen <= 0 )
+         lLen = 64;
+
+    bBuffer      = ( SQLTCHAR * ) hb_xgrab( lLen * sizeof( SQLTCHAR ) );
+    bBuffer[ 0 ] = '\0';
+
 //    TraceLog("field.log" , "entrou  bBuffer %s  wBufLen %lu   wDataType %lu   wColSize %lu wDecimals %lu wNullable %lu \n",bBuffer, wBufLen,   wDataType, wColSize,wDecimals, wNullable );
-    RETCODE     wResult   = SQLDescribeCol( ( HSTMT ) hb_parptr( 1 ), 
+    wResult   = SQLDescribeCol( ( HSTMT ) hb_parptr( 1 ), 
                                             ( SQLUSMALLINT )  hb_parni( 2 ),
                                             ( SQLTCHAR * )    bBuffer, 
-                                            ( SQLSMALLINT )   sizeof( bBuffer), 
+                                            ( SQLSMALLINT )   lLen, 
                                             ( SQLSMALLINT * ) &wBufLen,
                                             ( SQLSMALLINT * ) &wDataType, 
                                             ( SQLULEN * )     &wColSize, 
                                             ( SQLSMALLINT * ) &wDecimals,
                                             ( SQLSMALLINT * ) &wNullable );
-    ULONG ulSystemID = hb_parnl( 10 ) ;
+    
     if( wDataType == -8  && ulSystemID == SYSTEMID_MYSQL)     // MySQL ODBC Bug
     {
       odbcErrorDiagRTE( ( SQLHSTMT ) hb_parptr( 1 ), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__ );
@@ -948,16 +966,16 @@ HB_FUNC( SR_DESCRIB )
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
        hb_storclen( ( LPSTR ) bBuffer,
-                    ( int ) wBufLen, 3 );
+                    ( HB_SIZE ) wBufLen, 3 );
        hb_storni( ( int ) wBufLen, 5 );
        hb_storni( ( int ) wDataType, 6 );
-       hb_stornint((USHORT)  wColSize, 7 );
-       hb_storni( ( USHORT ) wDecimals, 8 );
-       hb_storni( ( USHORT ) wNullable, 9 );
+       hb_stornint(  wColSize, 7 );
+       hb_storni( ( int ) wDecimals, 8 );
+       hb_storni( ( int ) wNullable, 9 );
 //TraceLog("field.log" , "  bBuffer %s  wBufLen %lu   wDataType %lu   wColSize %lu wDecimals %lu wNullable %i \n",bBuffer, wBufLen,   wDataType, wColSize,wDecimals, (USHORT)wNullable );
     }
 
-    //hb_xfree(  bBuffer );
+    hb_xfree(  bBuffer );
     hb_retni( wResult );
 }
 
@@ -965,20 +983,20 @@ HB_FUNC( SR_DESCRIB )
 
 HB_FUNC( SR_COLATTRIBUTE )
 {
-    LONG        lLen      = hb_parnl( 5 );
-    PTR         bBuffer   = hb_xgrab( lLen );
+    SQLSMALLINT        lLen      = hb_parni( 5 );
+    char *         bBuffer   = hb_xgrab( lLen );
     SQLSMALLINT wBufLen   = hb_parni( 6 );
-    SQLLEN      wNumPtr   = hb_parni( 7 );
-    RETCODE     wResult   = SQLColAttribute( ( SQLHSTMT ) hb_parptr( 1 ), hb_parni( 2 ), hb_parni( 3 ),
-                                             (unsigned char*) bBuffer, hb_parni( 5 ), &wBufLen,
-                                             &wNumPtr );
+    SQLLEN      wNumPtr   = (SQLLEN)hb_parnint( 7 );
+    RETCODE     wResult   = SQLColAttribute( ( SQLHSTMT ) hb_parptr( 1 ), ( SQLUSMALLINT )hb_parni( 2 ), ( SQLUSMALLINT )hb_parni( 3 ),
+                                             ( SQLPOINTER ) bBuffer, hb_parni( 5 ), ( SQLSMALLINT * )&wBufLen,
+                                             (SQLLEN* )&wNumPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
 //       hb_storclen( ( LPSTR ) bBuffer,
 //                    ( int ) wBufLen, 4 );
 //       hb_stornl( ( LONG ) wBufLen, 6 );
-       hb_stornl( ( LONG ) wNumPtr, 7 );
+       hb_stornint(  wNumPtr, 7 );
     }
 
     hb_xfree( ( PTR ) bBuffer );
@@ -989,26 +1007,26 @@ HB_FUNC( SR_COLATTRIBUTE )
 
 HB_FUNC( SR_ERROR )
 {
-   BYTE bBuffer1[ 256 ]={0}, szErrorMsg[ 256 ]={0};
+   SQLTCHAR    bBuffer1[ 256 ]={0}, szErrorMsg[ 256 ]={0};
    SQLINTEGER lError;
-   SWORD wLen;
+   SQLSMALLINT wLen;
 
    hb_retni( SQLError( ( SQLHENV  ) hb_parptr( 1 ), (  SQLHDBC  ) hb_parptr( 2 ),
-                       ( SQLHSTMT ) hb_parptr( 3 ), bBuffer1, &lError,
-                       szErrorMsg, 256, &wLen ) );
+                       ( SQLHSTMT ) hb_parptr( 3 ), ( SQLTCHAR *)bBuffer1, ( SQLINTEGER * )&lError,
+                       ( SQLTCHAR *) szErrorMsg, ( SQLSMALLINT ) HB_SIZEOFARRAY( szErrorMsg ), ( SQLSMALLINT * )&wLen ) );
 
    hb_storc( (char *) bBuffer1, 4 );
    hb_stornl( lError, 5 );
-   hb_storc( (char *) szErrorMsg, 6 );
+   hb_storclen( (char *) szErrorMsg,wLen, 6 );
 }
 
 //-----------------------------------------------------------------------------//
 
 HB_FUNC( SR_GETINFO )
 {
-   BYTE bBuffer[ 512 ]={0};
+   char bBuffer[ 512 ]={0};
    SQLSMALLINT wLen;
-   RETCODE wResult = SQLGetInfo( (  SQLHDBC  ) hb_parptr( 1 ), ( UWORD ) hb_parnl( 2 ), bBuffer, 512, &wLen );
+   RETCODE wResult = SQLGetInfo( (  SQLHDBC  ) hb_parptr( 1 ),  ( SQLUSMALLINT )  hb_parnl( 2 ), ( SQLPOINTER )bBuffer, ( SQLSMALLINT ) 512, ( SQLSMALLINT *) &wLen );
 
    hb_storclen( (char *) bBuffer, wLen, 3 );
    hb_retni( wResult );
@@ -1018,36 +1036,76 @@ HB_FUNC( SR_GETINFO )
 
 HB_FUNC( SR_SETCONNECTATTR )
 {
-   hb_retnl( ( LONG ) SQLSetConnectAttr( (  SQLHDBC  ) hb_parptr( 1 ), ( UWORD ) hb_parnl( 2 ),
-           ( ULONG ) ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parcx( 3 ) : ( SQLPOINTER ) hb_parnl( 3 ), hb_parni( 4 ) ) );
+//    hb_retnl( ( LONG ) SQLSetConnectAttr( (  SQLHDBC  ) hb_parptr( 1 ), ( UWORD ) hb_parnl( 2 ),
+//            ( ULONG ) ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parcx( 3 ) : ( SQLPOINTER ) hb_parnl( 3 ), hb_parni( 4 ) ) );
+#if ODBCVER >= 0x0300
+   hb_retni(  SQLSetConnectAttr( (  SQLHDBC  ) hb_parptr( 1 ), ( SQLINTEGER ) hb_parnl( 2 ),
+           ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parc( 3 ) : ( SQLPOINTER ) ( HB_PTRUINT ) hb_parnint( 3 ), 
+           ISCHAR( 3 ) ? ( SQLINTEGER ) hb_parclen( 3 ) : ( SQLINTEGER ) SQL_IS_INTEGER ) ) ;
+#else
+   hb_retni( SQLSetConnectOption( (  SQLHDBC  ) hb_parptr( 1 ),
+                                     ( SQLUSMALLINT ) hb_parni( 2 ),
+                                     ISCHAR( 3 ) ? ( SQLULEN ) hb_parc( 3 ) : ( SQLULEN ) hb_parnl( 3 ) ) );
+#endif           
+
 }
 
 //-----------------------------------------------------------------------------//
 
 HB_FUNC( SR_SETCONNECTOPTION )
 {
-   hb_retnl( ( LONG ) SQLSetConnectOption( (  SQLHDBC  ) hb_parptr( 1 ), ( UWORD ) hb_parnl( 2 ),
-           ( ULONG ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parnl( 3 ) ) );
+#if ODBCVER >= 0x0300
+      hb_retni( SQLSetConnectAttr( (  SQLHDBC  ) hb_parptr( 1 ),
+                                   ( SQLINTEGER ) hb_parnl( 2 ),
+                                   ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parc( 3 ) : ( SQLPOINTER ) ( HB_PTRUINT ) hb_parnint( 3 ),
+                                   ISCHAR( 3 ) ? ( SQLINTEGER ) hb_parclen( 3 ) : ( SQLINTEGER ) SQL_IS_INTEGER ) );
+	
+#else	
+   hb_retni(  SQLSetConnectOption( (  SQLHDBC  ) hb_parptr( 1 ), ( SQLINTEGER ) hb_parnl( 2 ),
+           ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parc( 3 ) : ( SQLPOINTER ) ( HB_PTRUINT ) hb_parnint( 3 ) ) );
+#endif           
 }
 
 //-----------------------------------------------------------------------------//
 
 HB_FUNC( SR_SETSTMTOPTION )
 {
-   hb_retnl( ( LONG ) SQLSetStmtOption( ( SQLHSTMT ) hb_parptr( 1 ), ( UWORD ) hb_parnl( 2 ),
-           ( ULONG ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parnl( 3 ) ) );
+#if ODBCVER >= 0x0300
+      hb_retni( SQLSetStmtAttr( ( SQLHSTMT ) hb_parptr( 1 ),
+                                ( SQLINTEGER ) hb_parnl( 2 ),
+                                ISCHAR( 3 ) ? ( SQLPOINTER ) hb_parc( 3 ) : ( SQLPOINTER ) ( HB_PTRUINT ) hb_parnint( 3 ),
+                                ISCHAR( 3 ) ? ( SQLINTEGER ) hb_parclen( 3 ) : ( SQLINTEGER ) SQL_IS_INTEGER ) );
+#else
+   hb_retni( SQLSetStmtOption( ( SQLHSTMT ) hb_parptr( 1 ),
+                                  ( SQLINTEGER ) hb_parnl( 2 ),
+                                  ISCHAR( 3 ) ? ( SQLULEN ) hb_parc( 3 ) : ( SQLULEN ) hb_parnl( 3 ) ) );
+#endif
+
 }
 
 //-----------------------------------------------------------------------------//
 
 HB_FUNC( SR_GETCONNECTOPTION )
 {
+	#if ODBCVER >= 0x0300
+	      SQLPOINTER buffer[ 512 ];
+	      SQLINTEGER lLen = 0;
+	      buffer[ 0 ] = '\0';
+	      hb_retni( SQLGetConnectAttr( (  SQLHDBC  ) hb_parptr( 1 ),
+	                                   ( SQLINTEGER ) hb_parnl( 2 ),
+	                                   ( SQLPOINTER ) buffer,
+	                                   ( SQLINTEGER ) sizeof( buffer ),
+	                                   ( SQLINTEGER * ) &lLen ) );
+	      hb_storclen( ( char * ) buffer, lLen, 3 );
+	#else
+	
    BYTE bBuffer[ 512 ]={0};
-   RETCODE wResult = SQLGetConnectOption( (  SQLHDBC  ) hb_parptr( 1 ), hb_parni( 2 ), bBuffer );
+      RETCODE wResult = SQLGetConnectOption( (  SQLHDBC  ) hb_parptr( 1 ), (SQLSMALLINT)hb_parni( 2 ), ( SQLPOINTER )bBuffer );
    if( wResult == SQL_SUCCESS )
       hb_storclen( (char *) bBuffer, 512, 3 );
 
    hb_retni( wResult );
+   #endif   
 }
 
 //-----------------------------------------------------------------------------//
@@ -1171,17 +1229,17 @@ HB_FUNC( SR_ODBCWRITEMEMO )
 void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate,USHORT ui  )
 {
    LONG lType;
-   LONG lDec,lLen;
+   HB_SIZE  lDec,lLen;
    char * cType;
-   PHB_ITEM pTemp;  
+//    PHB_ITEM pTemp;  
    SQLLEN iLen;
    SQLLEN lLenOut;
    RETCODE res;   
 
    cType  = ( char * ) hb_arrayGetCPtr(pField, FIELD_TYPE );
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
-   lLen  = ( LONG ) hb_arrayGetNL( pField, FIELD_LEN );
-   lDec  = ( LONG ) hb_arrayGetNL( pField, FIELD_DEC );          
+   lLen  = hb_arrayGetNL( pField, FIELD_LEN );
+   lDec  = hb_arrayGetNL( pField, FIELD_DEC );          
             iLen     = SQL_NULL_DATA;
           switch (lType )
           {

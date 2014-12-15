@@ -72,15 +72,15 @@ Return NIL
 
 Function SR_Val2Char(a,n1,n2)
    Do Case
-   Case valtype(a) == "C"
+   Case HB_ISSTRING(a) 
       Return a
-   Case valtype(a) == "N" .and. n1 != NIL .and. n2 != NIL
+   Case HB_ISNUMERIC(a) .and. n1 != NIL .and. n2 != NIL
       Return Str(a,n1,n2)
-   Case valtype(a) == "N"
+   Case HB_ISNUMERIC(a)
       Return Str(a)
-   Case valtype(a) == "D"
+   Case HB_ISDATE(a)
       Return dtoc(a)
-   Case valtype(a) == "L"
+   Case HB_ISLOGICAL(a) 
       Return if(a,".T.",".F.")
    EndCase
 Return ""
@@ -129,7 +129,7 @@ return nil
 Function SR_FilterStatus(lEnable)
 
    If IS_SQLRDD
-      If valtype( lEnable ) == "L"
+      If HB_ISLOGICAL( lEnable ) 
          Return (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):lDisableFlts := !lEnable
       Else
          Return (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):lDisableFlts
@@ -353,7 +353,7 @@ Function SR_SetReverseIndex( nIndex, lSet )
 
    If IS_SQLRDD .and. nIndex > 0 .and. nIndex <= len( (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex )
       lOldSet := (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex[ nIndex, DESCEND_INDEX_ORDER ]
-      If valtype( lSet ) == "L"
+      If HB_ISLOGICAL( lSet ) 
          (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex[ nIndex, DESCEND_INDEX_ORDER ] := lSet
       EndIf
    EndIf
@@ -432,7 +432,7 @@ Function SR_SetCreateAsHistoric( l )
 
    Local lOld := lCreateAsHistoric
 
-   If valtype( l ) == "L"
+   If HB_ISLOGICAL( l ) 
       lCreateAsHistoric := l
    EndIf
 
@@ -642,13 +642,13 @@ Function SR_ShowVector( a )
 
    local cRet := "", i
 
-   If valtype(a) == "A"
+   If HB_ISARRAY(a) 
 
       cRet := "{"
 
       For i = 1 to len(a)
 
-         If valtype(a[i]) == "A"
+         If HB_ISARRAY(a[i]) 
             cRet += SR_showvector(a[i]) + if( i == len(a), "", "," ) + CRLF
          Else
             cRet += SR_Val2CharQ(a[i]) + if( i == len(a), "", "," )
@@ -900,7 +900,7 @@ Function SR_SetFilter( cFlt )
       If !Empty( cFlt )
          oWA:cFilter := cFlt
          oWA:Refresh()
-      ElseIf valtype( cFlt ) == "C"
+      ElseIf HB_ISSTRING( cFlt ) 
          oWA:cFilter := ''
       EndIf
    EndIf
@@ -1058,7 +1058,7 @@ Function SR_BeginTransaction(nCnn)
 
    local oCnn
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1085,7 +1085,7 @@ Function SR_CommitTransaction(nCnn)
 
    local oCnn
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1108,7 +1108,7 @@ Function SR_SetAppSite( nCnn, cSite )
 
    local oCnn, cOld
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1129,7 +1129,7 @@ Function SR_SetConnectionLogChanges( nCnn, nOpt )
 
    local oCnn, nOld
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1150,7 +1150,7 @@ Function SR_SetAppUser( nCnn, cUsername )
 
    local oCnn, cOld
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1171,7 +1171,7 @@ Function SR_SetALockWait( nCnn, nSeconds )
 
    local oCnn, nOld
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1190,7 +1190,7 @@ Function SR_RollBackTransaction(nCnn)
 
    local oCnn
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1213,7 +1213,7 @@ Function SR_TransactionCount(nCnn)
 
    local oCnn
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1231,7 +1231,7 @@ Function SR_EndTransaction(nCnn)
 
    local oCnn
 
-   If valtype(nCnn) == "O"
+   If HB_ISOBJECT( nCnn )
       oCnn := nCnn
    Else
       oCnn := SR_GetConnection( nCnn )
@@ -1951,9 +1951,9 @@ FUNCTION SR_SetFieldDefault( cTable, cField, cDefault )
    LOCAL oCnn
    LOCAL cSql := "ALTER TABLE "+ cTable + " ALTER COLUMN " +cField +" SET DEFAULT "
    oCnn := SR_GetConnection(  )
-   IF VALTYPE( cDefault ) == "N"
+   IF HB_ISNUMERIC( cDefault ) 
       cSql += Alltrim( str( cDefault ) )
-   ELSEIF Valtype( cDefault ) == "C"
+   ELSEIF HB_ISSTRING( cDefault )
       IF Empty( cDefault) 
          cSql += "''"
       ELSE

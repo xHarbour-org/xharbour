@@ -345,12 +345,12 @@ static HB_ERRCODE sqlBof( SQLAREAP thiswa, BOOL * bof )
 {
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel )
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    thiswa->area.fBof = hb_arrayGetL( thiswa->aInfo, AINFO_BOF );
    *bof = thiswa->area.fBof;
 
@@ -365,12 +365,12 @@ static HB_ERRCODE sqlEof( SQLAREAP thiswa, BOOL * eof )
 {
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel )
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
 
    if (hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT ) && hb_arrayGetL( thiswa->aInfo, AINFO_HOT ) )
    {
@@ -393,7 +393,7 @@ static HB_ERRCODE sqlFound( SQLAREAP thiswa, BOOL * found )
 {
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
 
    thiswa->area.fFound = hb_arrayGetL( thiswa->aInfo, AINFO_FOUND );
@@ -442,11 +442,11 @@ static HB_ERRCODE sqlGoBottom( SQLAREAP thiswa )
    thiswa->area.fBof = hb_arrayGetL( thiswa->aInfo, AINFO_BOF );
    hb_itemRelease( eofat );
 
-   SELF_SKIPFILTER( ( AREAP ) thiswa, -1 );
+   SELF_SKIPFILTER( &thiswa->area, -1 );
 
    if( thiswa->area.lpdbRelations )
    {
-      return SELF_SYNCCHILDREN( ( AREAP ) thiswa );
+      return SELF_SYNCCHILDREN( &thiswa->area );
    }
    else
    {
@@ -495,7 +495,7 @@ static HB_ERRCODE sqlGoToId( SQLAREAP thiswa, PHB_ITEM pItem )
 
    if( HB_IS_NUMERIC( pItem ) )
    {
-      return SELF_GOTO( (AREAP) thiswa, (LONG) hb_itemGetNL( pItem ) );
+      return SELF_GOTO( &thiswa->area, (LONG) hb_itemGetNL( pItem ) );
    }
    else
    {
@@ -548,11 +548,11 @@ static HB_ERRCODE sqlGoTop( SQLAREAP thiswa )
    thiswa->area.fEof = hb_arrayGetL( thiswa->aInfo, AINFO_EOF );
    thiswa->area.fBof = hb_arrayGetL( thiswa->aInfo, AINFO_BOF );
 
-   SELF_SKIPFILTER( ( AREAP ) thiswa, 1 );
+   SELF_SKIPFILTER( &thiswa->area, 1 );
 
    if( thiswa->area.lpdbRelations )
    {
-      return SELF_SYNCCHILDREN( ( AREAP ) thiswa );
+      return SELF_SYNCCHILDREN( &thiswa->area );
    }
    else
    {
@@ -701,7 +701,7 @@ static HB_ERRCODE sqlSeek( SQLAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL 
 
    if (( hb_setGetDeleted() || thiswa->area.dbfi.itmCobExpr != NULL ) && !thiswa->area.fEof )
    {
-      retvalue = SELF_SKIPFILTER( ( AREAP ) thiswa, ( bFindLast ? -1 : 1 ) );
+      retvalue = SELF_SKIPFILTER( &thiswa->area, ( bFindLast ? -1 : 1 ) );
 
       if ( thiswa->area.fEof )
       {
@@ -711,7 +711,7 @@ static HB_ERRCODE sqlSeek( SQLAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL 
       }
       else
       {
-         if ( sqlKeyCompare( ( AREAP ) thiswa, pKey, FALSE ) != 0 )
+         if ( sqlKeyCompare( &thiswa->area, pKey, FALSE ) != 0 )
          {
             thiswa->area.fFound = TRUE;
             hb_itemPutL( pItem, thiswa->area.fFound );
@@ -738,7 +738,7 @@ static HB_ERRCODE sqlSeek( SQLAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL 
 
    if( thiswa->area.lpdbRelations && retvalue == HB_SUCCESS )
    {
-      return SELF_SYNCCHILDREN( ( AREAP ) thiswa );
+      return SELF_SYNCCHILDREN( &thiswa->area );
    }
    else
    {
@@ -756,22 +756,22 @@ static HB_ERRCODE sqlSkip( SQLAREAP thiswa, LONG lToSkip )
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if ( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
-   if( SELF_GOCOLD( ( AREAP ) thiswa ) == HB_FAILURE )
+   if( SELF_GOCOLD( &thiswa->area ) == HB_FAILURE )
    {
       return( HB_FAILURE );
    }
 
    thiswa->area.fTop = thiswa->area.fBottom = FALSE;
 
-   ret = SUPER_SKIP( ( AREAP ) thiswa, lToSkip );     // This will call SKIPRAW
+   ret = SUPER_SKIP( &thiswa->area, lToSkip );     // This will call SKIPRAW
 
    hb_arraySetL( thiswa->aInfo, AINFO_BOF, thiswa->area.fBof );
    hb_arraySetL( thiswa->aInfo, AINFO_EOF, thiswa->area.fEof );
@@ -812,7 +812,7 @@ HB_ERRCODE sqlSkipFilter( SQLAREAP thiswa, LONG lUpDown )
          pResult = hb_vmEvalBlock( thiswa->area.dbfi.itmCobExpr );
          if( HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult ) )
          {
-            SELF_SKIPRAW( (AREAP) thiswa, lUpDown );
+            SELF_SKIPRAW( &thiswa->area, lUpDown );
             continue;
          }
       }
@@ -820,10 +820,10 @@ HB_ERRCODE sqlSkipFilter( SQLAREAP thiswa, LONG lUpDown )
       /* SET DELETED */
       if( hb_setGetDeleted() )
       {
-         SELF_DELETED( (AREAP) thiswa, &bDeleted );
+         SELF_DELETED( &thiswa->area, &bDeleted );
          if( bDeleted )
          {
-            SELF_SKIPRAW( (AREAP) thiswa, lUpDown );
+            SELF_SKIPRAW( &thiswa->area, lUpDown );
             continue;
          }
       }
@@ -835,7 +835,7 @@ HB_ERRCODE sqlSkipFilter( SQLAREAP thiswa, LONG lUpDown )
       if( lUpDown < 0 )
       {
          thiswa->area.fEof = FALSE;
-         uiError = SELF_GOTOP( (AREAP) thiswa );
+         uiError = SELF_GOTOP( &thiswa->area );
 
          hb_objSendMessage( thiswa->oWorkArea, s_pSym_SETBOF, 0 );
 
@@ -870,7 +870,7 @@ static HB_ERRCODE ConcludeSkipraw( SQLAREAP thiswa, LONG lToSkip )
 
    if( thiswa->area.lpdbRelations )
    {
-      return SELF_SYNCCHILDREN( ( AREAP ) thiswa );
+      return SELF_SYNCCHILDREN( &thiswa->area );
    }
    else
    {
@@ -894,7 +894,7 @@ static HB_ERRCODE sqlSkipRaw( SQLAREAP thiswa, LONG lToSkip )
 
    if( (bEof && bBof) && lToSkip == -1 )
    {
-      return SELF_GOBOTTOM( (AREAP) thiswa );         // <===========| RETURNING
+      return SELF_GOBOTTOM( &thiswa->area );         // <===========| RETURNING
    }
 
    if( (bEof && bBof) || lToSkip == 0 )
@@ -960,7 +960,7 @@ static HB_ERRCODE sqlSkipRaw( SQLAREAP thiswa, LONG lToSkip )
             {
                if( bEof )
                {
-                  SELF_GOBOTTOM( (AREAP) thiswa );
+                  SELF_GOBOTTOM( &thiswa->area );
                   return ConcludeSkipraw( thiswa, lToSkip );
                }
                lFound = searchCacheBWD( thiswa, 1 );
@@ -1020,11 +1020,11 @@ static HB_ERRCODE sqlSkipRaw( SQLAREAP thiswa, LONG lToSkip )
                if( iTemCompEqual( hb_arrayGetItemPtr( thiswa->aInfo, AINFO_EOF_AT ),
                                   hb_arrayGetItemPtr( thiswa->aInfo, AINFO_RECNO ) ) )
                {
-                  SELF_GOTOID( (AREAP) thiswa, hb_arrayGetItemPtr( thiswa->aInfo, AINFO_EOF_AT ) );
+                  SELF_GOTOID( &thiswa->area, hb_arrayGetItemPtr( thiswa->aInfo, AINFO_EOF_AT ) );
                }
                else
                {
-                  SELF_GOBOTTOM( (AREAP) thiswa );
+                  SELF_GOBOTTOM( &thiswa->area );
                }
                return ConcludeSkipraw( thiswa, lToSkip );
             }
@@ -1156,7 +1156,7 @@ static HB_ERRCODE sqlAppend( SQLAREAP thiswa )
 static HB_ERRCODE sqlCreateFields( SQLAREAP thiswa, PHB_ITEM pStruct )
 {
    thiswa->aCreate = pStruct;
-   return SUPER_CREATEFIELDS( ( AREAP ) thiswa, pStruct );
+   return SUPER_CREATEFIELDS( &thiswa->area, pStruct );
 }
 
 /*------------------------------------------------------------------------*/
@@ -1165,13 +1165,13 @@ static HB_ERRCODE sqlDeleteRec( SQLAREAP thiswa )
 {
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
 
    if (hb_arrayGetL( thiswa->aInfo, AINFO_HOT ))
@@ -1190,11 +1190,11 @@ static HB_ERRCODE sqlDeleted( SQLAREAP thiswa, BOOL * isDeleted )
 {
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -1246,11 +1246,11 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
    pField = thiswa->area.lpFields + fieldNum - 1;
@@ -1285,7 +1285,7 @@ static HB_ERRCODE sqlGetValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    }
    else if( HB_IS_HASH( itemTemp ) && sr_isMultilang() )
    {
-      LPFIELD pField = thiswa->area.lpFields + fieldNum - 1;
+       pField = thiswa->area.lpFields + fieldNum - 1;
 
       if( pField->uiType == HB_FT_MEMO )
       {
@@ -1404,13 +1404,13 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
 
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
 
    fieldindex = (USHORT)thiswa->uiBufferIndex[fieldNum - 1];
@@ -1515,7 +1515,7 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
       char type_err[128];
       sprintf( type_err, "data type origin: %i - data type target %i", hb_itemType( value ), hb_itemType( pDest ) );
       hb_itemRelease( pDest );
-      commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, type_err );
+      commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, type_err );
       return ( HB_FAILURE );
 #endif
    }
@@ -1536,11 +1536,11 @@ static HB_ERRCODE sqlRecall( SQLAREAP thiswa )
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -1551,21 +1551,21 @@ static HB_ERRCODE sqlRecall( SQLAREAP thiswa )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, ULONG * recCount )
+static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, HB_ULONG * recCount )
 {
 
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
 
    if (hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT ) && hb_arrayGetL( thiswa->aInfo, AINFO_HOT ) )
    {
-      *recCount = (ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ) + 1);
+      *recCount = (HB_ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ) + 1);
    }
    else
    {
-      *recCount = (ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ));
+      *recCount = (HB_ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ));
    }
 
    // TraceLog( NULL, "sqlRecCount, returning %i\n", *recCount );
@@ -1579,26 +1579,26 @@ static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, ULONG * recCount )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRecNo( SQLAREAP thiswa, ULONG * recno )
+static HB_ERRCODE sqlRecNo( SQLAREAP thiswa, HB_ULONG * recno )
 {
 #ifdef SQLRDD_NWG_SPECIFIC
    if( hb_arrayGetNL( thiswa->aInfo, hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT ) ) )
    {
-      commonError( (AREAP) thiswa, EG_ARG, ESQLRDD_NOT_COMMITED_YET, NULL );
+      commonError( &thiswa->area, EG_ARG, ESQLRDD_NOT_COMMITED_YET, NULL );
       return ( HB_FAILURE );
    }
 #endif
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
-   *recno = (ULONG) hb_arrayGetNL( thiswa->aInfo, AINFO_RECNO );
+   *recno = (HB_ULONG) hb_arrayGetNL( thiswa->aInfo, AINFO_RECNO );
 
    // TraceLog( NULL, "sqlRecNo %i\n", hb_arrayGetNI( thiswa->aInfo, AINFO_RECNO ) );
 
@@ -1611,11 +1611,11 @@ static HB_ERRCODE sqlRecId( SQLAREAP thiswa, PHB_ITEM recno )
 {
    if( thiswa->lpdbPendingRel )
    {
-      SELF_FORCEREL( ( AREAP ) thiswa );
+      SELF_FORCEREL( &thiswa->area );
    }
    else if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -1639,7 +1639,7 @@ static HB_ERRCODE sqlSetFieldExtent( SQLAREAP thiswa, USHORT uiFieldExtent )
 {
    HB_TRACE(HB_TR_DEBUG, ("sqlSetFieldExtent(%p, %hu)", thiswa, uiFieldExtent));
 
-   if( SUPER_SETFIELDEXTENT( ( AREAP ) thiswa, uiFieldExtent ) == HB_FAILURE )
+   if( SUPER_SETFIELDEXTENT( &thiswa->area, uiFieldExtent ) == HB_FAILURE )
    {
       return HB_FAILURE;
    }
@@ -1654,11 +1654,12 @@ static HB_ERRCODE sqlSetFieldExtent( SQLAREAP thiswa, USHORT uiFieldExtent )
       uiFieldExtent++;
    }
 
-   thiswa->uiBufferIndex = (int *) hb_xgrab( uiFieldExtent * sizeof( int ) );
-   thiswa->uiFieldList   = (int *) hb_xgrab( uiFieldExtent * sizeof( int ) );
-   memset( thiswa->uiBufferIndex, 0, uiFieldExtent * sizeof( int ) );
-   memset( thiswa->uiFieldList,   0, uiFieldExtent * sizeof( int ) );
-
+//    thiswa->uiBufferIndex = (int *) hb_xgrab( uiFieldExtent * sizeof( int ) );
+//    thiswa->uiFieldList   = (int *) hb_xgrab( uiFieldExtent * sizeof( int ) );
+//    memset( thiswa->uiBufferIndex, 0, uiFieldExtent * sizeof( int ) );
+//    memset( thiswa->uiFieldList,   0, uiFieldExtent * sizeof( int ) );
+   thiswa->uiBufferIndex = (int *) hb_xgrabz( uiFieldExtent * sizeof( int ) );
+   thiswa->uiFieldList   = (int *) hb_xgrabz( uiFieldExtent * sizeof( int ) );
    return HB_SUCCESS;
 }
 
@@ -1683,15 +1684,15 @@ static HB_ERRCODE sqlClose( SQLAREAP thiswa )
    }
    else
    {
-      return SUPER_CLOSE( (AREAP) thiswa );
+      return SUPER_CLOSE( &thiswa->area );
    }
 
-   uiError = SUPER_CLOSE( (AREAP) thiswa );
+   uiError = SUPER_CLOSE( &thiswa->area );
 
 /*
    else
    {
-      commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+      commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
       return HB_FAILURE;
    }
 */
@@ -1815,25 +1816,25 @@ static HB_ERRCODE sqlCreate( SQLAREAP thiswa, LPDBOPENINFO pCreateInfo )
    }
 
    /* If successful call SUPER_CREATE to finish system jobs */
-   errCode = SUPER_CREATE( ( AREAP ) thiswa, pCreateInfo );
+   errCode = SUPER_CREATE( &thiswa->area, pCreateInfo );
 
    hb_objSendMsg( thiswa->oWorkArea, "LISAM", 0 );
    thiswa->isam = hb_itemGetL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNRECNO", 0 );
-   thiswa->ulhRecno = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhRecno = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNDELETED", 0 );
-   thiswa->ulhDeleted = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhDeleted = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    if( errCode != HB_SUCCESS )
    {
-      SELF_CLOSE( ( AREAP ) thiswa );
+      SELF_CLOSE( &thiswa->area );
       return errCode;
    }
    else
    {
-      SELF_GOTOP( ( AREAP ) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -1899,12 +1900,12 @@ static HB_ERRCODE sqlInfo( SQLAREAP thiswa, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_BOF:
-         SELF_BOF( (AREAP) thiswa, &flag );
+         SELF_BOF( &thiswa->area, &flag );
          hb_itemPutL( pItem, flag );
          break;
 
       case DBI_EOF:
-         SELF_EOF( (AREAP) thiswa, &flag );
+         SELF_EOF( &thiswa->area, &flag );
          hb_itemPutL( pItem, flag );
          break;
 
@@ -1915,7 +1916,7 @@ static HB_ERRCODE sqlInfo( SQLAREAP thiswa, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+            commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return HB_FAILURE;
          }
          hb_itemForwardValue( pItem, hb_stackReturnItem() );
@@ -1937,7 +1938,7 @@ static HB_ERRCODE sqlInfo( SQLAREAP thiswa, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+            commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return HB_FAILURE;
          }
          hb_itemForwardValue( pItem, hb_stackReturnItem() );
@@ -1951,7 +1952,7 @@ static HB_ERRCODE sqlInfo( SQLAREAP thiswa, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+            commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return HB_FAILURE;
          }
          hb_itemForwardValue( pItem, hb_stackReturnItem() );
@@ -2083,7 +2084,7 @@ void startSQLRDDSymbols()
 
 static HB_ERRCODE sqlNewArea( SQLAREAP thiswa )
 {
-   if( SUPER_NEW( ( AREAP ) thiswa ) == HB_FAILURE )
+   if( SUPER_NEW( &thiswa->area ) == HB_FAILURE )
    {
       return HB_FAILURE;
    }
@@ -2122,11 +2123,11 @@ static HB_ERRCODE sqlOpen( SQLAREAP thiswa, LPDBOPENINFO pOpenInfo )
       hb_xfree( pFileName );
    }
 
-   errCode = SUPER_OPEN( ( AREAP ) thiswa, pOpenInfo );
+   errCode = SUPER_OPEN( &thiswa->area, pOpenInfo );
 
    if( errCode != HB_SUCCESS )
    {
-      SELF_CLOSE( ( AREAP ) thiswa );
+      SELF_CLOSE( &thiswa->area );
       return errCode;
    }
 
@@ -2220,10 +2221,10 @@ static HB_ERRCODE sqlOpen( SQLAREAP thiswa, LPDBOPENINFO pOpenInfo )
    }
 
    hb_objSendMsg( thiswa->oWorkArea, "HNRECNO", 0 );
-   thiswa->ulhRecno = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhRecno = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNDELETED", 0 );
-   thiswa->ulhDeleted = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhDeleted = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    if( hb_setGetAutOpen() )
    {
@@ -2233,7 +2234,7 @@ static HB_ERRCODE sqlOpen( SQLAREAP thiswa, LPDBOPENINFO pOpenInfo )
       }
       else
       {
-         commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+         commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
          return HB_FAILURE;
       }
 
@@ -2271,7 +2272,7 @@ static HB_ERRCODE sqlPack( SQLAREAP thiswa )
    // TraceLog( NULL, "sqlPack\n" );
 
    hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLPACK, 0 );
-   SELF_GOTOP( (AREAP) thiswa );
+   SELF_GOTOP( &thiswa->area );
    return ( HB_SUCCESS );
 }
 
@@ -2310,10 +2311,10 @@ HB_ERRCODE sqlChildEnd( SQLAREAP thiswa, LPDBRELINFO pRelInfo )
    HB_TRACE(HB_TR_DEBUG, ("sqlChildEnd(%p, %p)", thiswa, pRelInfo));
 
    if( thiswa->lpdbPendingRel == pRelInfo )
-      uiError = SELF_FORCEREL( ( AREAP ) thiswa );
+      uiError = SELF_FORCEREL( &thiswa->area );
    else
       uiError = HB_SUCCESS;
-   SUPER_CHILDEND( ( AREAP ) thiswa, pRelInfo );
+   SUPER_CHILDEND( &thiswa->area, pRelInfo );
    return uiError;
 }
 
@@ -2327,12 +2328,12 @@ HB_ERRCODE sqlChildStart( SQLAREAP thiswa, LPDBRELINFO pRelInfo )
 
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
-   SELF_CHILDSYNC( ( AREAP ) thiswa, pRelInfo );
-   return SUPER_CHILDSTART( ( AREAP ) thiswa, pRelInfo );
+   SELF_CHILDSYNC( &thiswa->area, pRelInfo );
+   return SUPER_CHILDSTART( &thiswa->area, pRelInfo );
 }
 
 /*------------------------------------------------------------------------*/
@@ -2344,7 +2345,7 @@ HB_ERRCODE sqlChildSync( SQLAREAP thiswa, LPDBRELINFO pRelInfo )
    // TraceLog( NULL, "sqlChildSync\n" );
 
    thiswa->lpdbPendingRel = pRelInfo;
-   SELF_SYNCCHILDREN( ( AREAP ) thiswa );
+   SELF_SYNCCHILDREN( &thiswa->area );
 
    return HB_SUCCESS;
 }
@@ -2370,7 +2371,7 @@ HB_ERRCODE sqlForceRel( SQLAREAP thiswa )
    {
       lpdbPendingRel = thiswa->lpdbPendingRel;
       thiswa->lpdbPendingRel = NULL;
-      uiError = SELF_RELEVAL( ( AREAP ) thiswa, lpdbPendingRel );
+      uiError = SELF_RELEVAL( &thiswa->area, lpdbPendingRel );
       thiswa->firstinteract = 0;
       thiswa->wasdel = 0;
       return uiError;
@@ -2531,7 +2532,7 @@ HB_ERRCODE sqlOrderCondition( SQLAREAP thiswa, LPDBORDERCONDINFO lpdbOrdCondInfo
    hb_itemRelease( pItemRest );
    hb_itemRelease( pItemDesc );
 
-   SUPER_ORDSETCOND( (AREAP) thiswa, lpdbOrdCondInfo );
+   SUPER_ORDSETCOND( &thiswa->area, lpdbOrdCondInfo );
    return HB_SUCCESS;
 }
 
@@ -2543,7 +2544,7 @@ static HB_ERRCODE sqlOrderCreate( SQLAREAP thiswa, LPDBORDERCREATEINFO pOrderInf
 
    // TraceLog( NULL, "sqlOrderCreate\n" );
 
-   if( SELF_GOCOLD( ( AREAP ) thiswa ) == HB_FAILURE )
+   if( SELF_GOCOLD( &thiswa->area ) == HB_FAILURE )
    {
       return( HB_FAILURE );
    }
@@ -2590,7 +2591,7 @@ static HB_ERRCODE sqlOrderDestroy( SQLAREAP thiswa, LPDBORDERINFO pOrderInfo )
 
    // TraceLog( NULL, "sqlOrderDestroy\n" );
 
-   if( SELF_GOCOLD( ( AREAP ) thiswa ) == HB_FAILURE )
+   if( SELF_GOCOLD( &thiswa->area ) == HB_FAILURE )
    {
       return( HB_FAILURE );
    }
@@ -2637,7 +2638,7 @@ static PHB_ITEM loadTag( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
       }
       else
       {
-         commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+         commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
          return NULL;
       }
 
@@ -2669,7 +2670,7 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
          }
          else
          {
-            commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+            commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return NULL;
          }
       }
@@ -2682,7 +2683,7 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
          else
          {
             hb_itemRelease( pOrder) ;
-            commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+            commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
             return NULL;
          }
       }
@@ -2696,7 +2697,7 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
       else
       {
          hb_itemRelease( pOrder );
-         commonError( ( AREAP ) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+         commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
          return NULL;
       }
    }
@@ -2705,7 +2706,7 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
 
    if( * lorder )
    {
-      pTag = hb_itemArrayGet( thiswa->aOrders, (ULONG) * lorder );
+      pTag = hb_itemArrayGet( thiswa->aOrders, (HB_ULONG) * lorder );
    }
 
    hb_itemRelease( pOrder );
@@ -2764,13 +2765,13 @@ static HB_ERRCODE sqlOrderInfo( SQLAREAP thiswa, USHORT uiIndex, LPDBORDERINFO p
          case DBOI_KEYCOUNTRAW:
          {
             ULONG ulRecCount = 0;
-            SELF_RECCOUNT( ( AREAP ) thiswa, &ulRecCount );
-            hb_itemPutNI( pInfo->itmResult, (int) ulRecCount );
+            SELF_RECCOUNT( &thiswa->area, &ulRecCount );
+            hb_itemPutNL( pInfo->itmResult,  ulRecCount );
             break;
          }
          case DBOI_KEYCOUNT:
             hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLKEYCOUNT, 0 );
-            hb_itemPutNI( pInfo->itmResult, hb_itemGetNI( hb_stackReturnItem() ) );
+            hb_itemPutNL( pInfo->itmResult, hb_itemGetNL( hb_stackReturnItem() ) );
             break;
 
          case DBOI_CONDITION:
@@ -2984,7 +2985,7 @@ static HB_ERRCODE sqlOrderInfo( SQLAREAP thiswa, USHORT uiIndex, LPDBORDERINFO p
             {
                if( thiswa->firstinteract )
                {
-                  SELF_GOTOP( (AREAP) thiswa );
+                  SELF_GOTOP( &thiswa->area );
                   thiswa->firstinteract = 0;
                }
 
@@ -3014,7 +3015,7 @@ static HB_ERRCODE sqlOrderInfo( SQLAREAP thiswa, USHORT uiIndex, LPDBORDERINFO p
          case DBOI_KEYCOUNTRAW:
          {
             ULONG ulRecCount = 0;
-            SELF_RECCOUNT( ( AREAP ) thiswa, &ulRecCount );
+            SELF_RECCOUNT( &thiswa->area, &ulRecCount );
             hb_itemPutND( pInfo->itmResult,ulRecCount );
             break;
          }
@@ -3025,7 +3026,7 @@ static HB_ERRCODE sqlOrderInfo( SQLAREAP thiswa, USHORT uiIndex, LPDBORDERINFO p
          case DBOI_POSITION:
          case DBOI_KEYNORAW:
             hb_itemPutND( pInfo->itmResult, 0 );
-            SELF_RECID( ( AREAP ) thiswa, pInfo->itmResult );
+            SELF_RECID( &thiswa->area, pInfo->itmResult );
             break;
          case DBOI_ISCOND:
          case DBOI_ISDESC:
@@ -3063,7 +3064,7 @@ static HB_ERRCODE sqlClearFilter( SQLAREAP thiswa )
       hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLCLEARFILTER, 0 );
       thiswa->sqlfilter = FALSE;
    }
-   return SUPER_CLEARFILTER( ( AREAP ) thiswa );
+   return SUPER_CLEARFILTER( &thiswa->area );
 }
 
 /*------------------------------------------------------------------------*/
@@ -3090,7 +3091,7 @@ static HB_ERRCODE sqlFilterText( SQLAREAP thiswa, PHB_ITEM pFilter )
    }
    else
    {
-      return SUPER_FILTERTEXT( ( AREAP ) thiswa, pFilter );
+      return SUPER_FILTERTEXT( &thiswa->area, pFilter );
    }
 }
 
@@ -3117,13 +3118,13 @@ static HB_ERRCODE sqlScopeInfo( SQLAREAP thiswa, USHORT nScope, PHB_ITEM pItem )
       }
       else
       {
-         commonError( (AREAP) thiswa, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
+         commonError( &thiswa->area, EG_DATATYPE, ESQLRDD_DATATYPE, NULL );
          return HB_FAILURE;
       }
       lorder = hb_itemGetNL( hb_stackReturnItem() );
       if( lorder )
       {
-         pTag  = hb_itemArrayGet( thiswa->aOrders, (ULONG) lorder );
+         pTag  = hb_itemArrayGet( thiswa->aOrders, (HB_ULONG) lorder );
          pTemp = hb_itemArrayGet( pTag, ( nScope ? BOTTOM_SCOPE : TOP_SCOPE ) );
          hb_itemCopy( pItem, pTemp );
          hb_itemRelease( pTag );
@@ -3143,13 +3144,13 @@ static HB_ERRCODE sqlSetFilter( SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo )
 
    if( thiswa->lpdbPendingRel )
    {
-      if( SELF_FORCEREL( (AREAP) thiswa ) != HB_SUCCESS )
+      if( SELF_FORCEREL( &thiswa->area ) != HB_SUCCESS )
          return HB_FAILURE;
    }
 
    // Try to translate the filter expression into a valid SQL statement
 
-   SUPER_CLEARFILTER( ( AREAP ) thiswa );
+   SUPER_CLEARFILTER( &thiswa->area );
 
    filtertext = hb_itemNew( pFilterInfo->abFilterText );
 
@@ -3164,7 +3165,7 @@ static HB_ERRCODE sqlSetFilter( SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo )
    }
    else
    {
-      return SUPER_SETFILTER( ( AREAP ) thiswa, pFilterInfo );
+      return SUPER_SETFILTER( &thiswa->area, pFilterInfo );
    }
 }
 
@@ -3222,7 +3223,7 @@ static HB_ERRCODE sqlLocate( SQLAREAP thiswa, BOOL fContinue )
 {
    HB_ERRCODE err;
 
-   err = SUPER_LOCATE( (AREAP) thiswa, fContinue );
+   err = SUPER_LOCATE( &thiswa->area, fContinue );
    hb_arraySetL( thiswa->aInfo, AINFO_FOUND, thiswa->area.fFound );
 
    return ( err );
@@ -3246,7 +3247,7 @@ static HB_ERRCODE sqlLock( SQLAREAP thiswa, LPDBLOCKINFO pLockInfo )
 
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -3301,7 +3302,7 @@ static HB_ERRCODE sqlUnLock( SQLAREAP thiswa, PHB_ITEM pRecNo )
 
    if( thiswa->firstinteract )
    {
-      SELF_GOTOP( (AREAP) thiswa );
+      SELF_GOTOP( &thiswa->area );
       thiswa->firstinteract = 0;
    }
 
@@ -3406,7 +3407,7 @@ BOOL sqlExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+static HB_ERRCODE sqlRddInfo( LPRDDNODE pRDD, USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("sqlRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
@@ -3463,7 +3464,7 @@ static BOOL ProcessFields( SQLAREAP thiswa )
       return(FALSE);
    }
 
-   SELF_SETFIELDEXTENT( (AREAP) thiswa, (USHORT)numFields );
+   SELF_SETFIELDEXTENT( &thiswa->area, (USHORT)numFields );
 
    for ( i = 1; i <= (USHORT)numFields; i++ )
    {
@@ -3537,7 +3538,7 @@ static BOOL ProcessFields( SQLAREAP thiswa )
 
       // Add the field
 
-      if ( SELF_ADDFIELD( ( AREAP ) thiswa, (LPDBFIELDINFO)&field ) != HB_SUCCESS )
+      if ( SELF_ADDFIELD( &thiswa->area, (LPDBFIELDINFO)&field ) != HB_SUCCESS )
       {
          HB_TRACE( HB_TR_ALWAYS, ("SQLRDD: Could not add field: %i", i));
       }
@@ -3607,7 +3608,7 @@ void commonError( AREAP thiswa, USHORT uiGenCode, USHORT uiSubCode, char* filena
       hb_errPutFileName( pError, filename );
    }
 
-   SUPER_ERROR( ( AREAP ) thiswa, pError );
+   SUPER_ERROR(  thiswa, pError );
 
    hb_itemRelease( pError );
 

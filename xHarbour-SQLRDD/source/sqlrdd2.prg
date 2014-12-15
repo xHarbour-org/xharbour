@@ -1992,7 +1992,7 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
    Case cType == "L"
       return if(uData,"1","0")
    OtherWise
-      if valtype( uData ) =="A" .and. SR_SetSerializeArrayAsJson()
+      if HB_ISARRAY( uData )  .and. SR_SetSerializeArrayAsJson()
          cRet := hb_jsonencode(uData,.f.)
          return ::Quoted( cRet, trim, nLen, nDec, nTargetDB )
       ENDIF
@@ -2108,7 +2108,7 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
       RETURN [']+cRet+[']
     
    OtherWise
-      if valtype( uData ) =="A" .and. SR_SetSerializeArrayAsJson()
+      if HB_ISARRAY( uData )  .and. SR_SetSerializeArrayAsJson()
          cRet := hb_jsonencode(uData,.f.)
          return ::Quoted( cRet, .f., , , nTargetDB )
       ENDIF
@@ -7248,7 +7248,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
             If cQot == "NULL"
                If valtype( uKey ) == "N"
                   cRet := "( " + cRet + " OR " + cNam + " = 0 )"
-               ElseIf valtype( uKey ) == "D"
+               ElseIf HB_ISDATE( uKey ) //valtype( uKey ) == "D"
                   cRet := "( " + cRet + " OR " + cNam + " <= " + ::QuotedNull(stod("19000101"),, nFLen, nFDec,, lNull) + " )"
                EndIf
             EndIf
@@ -7352,7 +7352,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
          For nScoping = TOPSCOPE to BOTTOMSCOPE
 
             uKey      := ::aIndex[::aInfo[ AINFO_INDEXORD ], TOP_SCOPE + nScoping]
-            IF ValType( uKey ) == "C"
+            IF HB_ISSTRING( uKey ) //ValType( uKey ) == "C"
                if uKey[ -1 ] == "|"
                   uKey := Left( uKey, len(uKey)-1)
                endif
@@ -7374,7 +7374,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
                   If cQot == "NULL"
                      If valtype( uKey ) == "N"
                         cRet := "( " + cRet + " OR " + cNam + " >= 0 )"
-                     ElseIf valtype( uKey ) == "D"
+                     ElseIf HB_ISDATE( uKey ) //valtype( uKey ) == "D"
                         cRet := "( " + cRet + " OR " + cNam + " >= " + ::QuotedNull(stod("19000101"),, nFLen, nFDec,, lNull) + " )"
                      EndIf
                   EndIf
@@ -7390,7 +7390,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
                   If cQot == "NULL"
                      If valtype( uKey ) == "N"
                         cRet2 := "( " + cRet2 + " OR " + cNam + " <= 0 )"
-                     ElseIf valtype( uKey ) == "D"
+                     ElseIf HB_ISDATE( uKey ) //valtype( uKey ) == "D"
                         cRet2 := "( " + cRet2 + " OR " + cNam + " <= " + ::QuotedNull(stod("19000101"),, nFLen, nFDec,, lNull) + " )"
                      EndIf
                   EndIf
@@ -7402,7 +7402,7 @@ METHOD sqlSetScope( nType, uValue ) CLASS SR_WORKAREA
                   endif
                EndIf
 
-            ElseIf ValType(uKey) == "C"
+            ElseIf HB_ISSTRING( ukey ) //ValType(uKey) == "C"
 
                ::aQuoted   := {}
                ::aDat      := {}
@@ -7792,7 +7792,7 @@ Static Function aOrd( x, y, aPos )
    Local cStr2 := ""
 
    For i = 1 to len( aPos )
-      If valtype( x[aPos[i]] ) == "D"
+      If HB_ISDATE( x[aPos[i]] ) 
          cStr1 += dtos( x[aPos[i]] )
          cStr2 += dtos( y[aPos[i]] )
       Else
@@ -9766,7 +9766,7 @@ Return cRet
 Function SR_CleanTabInfoCache()
    local oCnn := SR_GetConnection()
 
-   If valtype( oCnn ) == "O"
+   If HB_ISOBJECT( oCnn )
       oCnn:aTableInfo := { => }
    EndIf
 Return NIL
@@ -9849,7 +9849,7 @@ Function SR_UseSequences( oCnn )
 
    DEFAULT oCnn := SR_GetConnection()
 
-   If valtype( oCnn ) == "O"
+   If HB_ISOBJECT( oCnn )
       Return oCnn:lUseSequences
    EndIf
 
@@ -9862,7 +9862,7 @@ Function SR_SetUseSequences( lOpt, oCnn )
    local lOld := .T.
    DEFAULT oCnn := SR_GetConnection()
 
-   If valtype( oCnn ) == "O"
+   If HB_ISOBJECT( oCnn ) 
       lOld := oCnn:lUseSequences
       oCnn:lUseSequences := lOpt
    EndIf
@@ -10003,7 +10003,7 @@ Local aItem
 local theData 
 hhash['Type'] := valtype( a ) 
 
-if valtype( a ) == "A"
+if HB_ISARRAY( a ) 
    hhash['Len']  := Alltrim( Str( Len( a ) ) )
    hhash['Type'] := valtype( a ) 
    aadd(aFather, nStartId)
@@ -10025,11 +10025,11 @@ if valtype( a ) == "A"
    adel(aPos,len( aPos ),.t.)
    oNode:addbelow(oNode1)
 else
-   if valtype( a ) == 'N'
+   if HB_ISNUMERIC( a ) 
       hHash['Value']:= Alltrim( str( a ) )
-   elseif valtype( a ) == 'L'
+   elseif HB_ISLOGICAL( a )
       hHash['Value']:= if(a,'T','F')
-   elseif valtype( a ) == 'D'
+   elseif HB_ISDATE( a ) 
       hHash['Value']:= dtos(a)
    ELSE 
       hHash['Value']:= a

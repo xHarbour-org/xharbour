@@ -56,8 +56,8 @@ typedef struct _SQLAREA
    PHB_ITEM aEmptyBuff;     /* Empty buffer to be in eof()+1 */
    PHB_ITEM aSelectList;
 
-   ULONG ulhRecno;          /* Recno position in field list */
-   ULONG ulhDeleted;        /* Deleted position in field list */
+   HB_ULONG ulhRecno;          /* Recno position in field list */
+   HB_ULONG ulhDeleted;        /* Deleted position in field list */
 
    int * uiBufferIndex;     /* Field offset in fields array */
    int * uiFieldList;       /* Keeps a field list for SELECT statements */

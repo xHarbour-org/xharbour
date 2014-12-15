@@ -7,7 +7,7 @@
 
 HB_FUNC_EXTERN( SR_DESERIALIZE );
 
-PHB_ITEM sr_escapeNumber( char *FromBuffer, ULONG len, ULONG dec, PHB_ITEM pRet );
+PHB_ITEM sr_escapeNumber( char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pRet );
 PHB_ITEM sr_getBaseLang( PHB_ITEM );
 PHB_ITEM sr_getSecondLang( PHB_ITEM );
 PHB_ITEM sr_getRootLang( PHB_ITEM );

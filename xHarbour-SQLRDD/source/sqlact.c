@@ -28,15 +28,17 @@ int sql_yyparse( void* stmt );
 
 HB_FUNC( SR_SQLPARSE )     /* SqlParse( cCommand, @nError, @nErrorPos ) */
 {
-   ULONG uLenPhrase = hb_parclen( 1 );
+   HB_SIZE uLenPhrase = hb_parclen( 1 );
 
    if( uLenPhrase )
    {
-      sql_stmt * stmt = (sql_stmt *) hb_xgrab( sizeof( sql_stmt ) );
+//       sql_stmt * stmt = (sql_stmt *) hb_xgrab( sizeof( sql_stmt ) );
+      sql_stmt * stmt  = (sql_stmt *) hb_xgrabz( sizeof( sql_stmt ) );
+
       const char * sqlPhrase;
       const char * sqlIniPos;
 
-      memset( stmt, 0, sizeof( sql_stmt ) );
+//       memset( stmt, 0, sizeof( sql_stmt ) );
       sqlIniPos = sqlPhrase = hb_parc( 1 );
 
       if( SqlParse( stmt, sqlPhrase, PARSE_ALL_QUERY ) )
@@ -361,7 +363,7 @@ HB_FUNC( SR_HEXTOSTR )
 
 //---------------------------------------------------------------------------//
 
-static ULONG escape_mysql( char *to, const char *from, ULONG length )
+static HB_SIZE escape_mysql( char *to, const char *from, HB_SIZE length )
 {
   const char *to_start=to;
   const char *end;
@@ -402,10 +404,10 @@ static ULONG escape_mysql( char *to, const char *from, ULONG length )
     }
   }
   *to=0;
-  return (ULONG) (to-to_start);
+  return (HB_SIZE) (to-to_start);
 }
 
-static ULONG escape_single( char *to, const char *from, ULONG length )
+static HB_SIZE escape_single( char *to, const char *from, HB_SIZE length )
 {
   const char *to_start=to;
   const char *end;
@@ -422,33 +424,10 @@ static ULONG escape_single( char *to, const char *from, ULONG length )
     }
   }
   *to=0;
-  return (ULONG) (to-to_start);
+  return (HB_SIZE) (to-to_start);
 }
 
-static ULONG escape_firebird( char *to, const char *from, ULONG length )
-{
-  const char *to_start=to;
-  const char *end;
-  for (end=from+length; from != end ; from++)
-  {
-    switch (*from)
-    {
-    case '\'':
-      *to++= '\'';
-      *to++= '\'';
-      break;
-    case 0:
-      *to++= ' ';
-      break;
-    default:
-      *to++= *from;
-    }
-  }
-  *to=0;
-  return (ULONG) (to-to_start);
-}
-
-static ULONG escape_db2( char *to, const char *from, ULONG length )
+static HB_SIZE escape_firebird( char *to, const char *from, HB_SIZE length )
 {
   const char *to_start=to;
   const char *end;
@@ -468,36 +447,10 @@ static ULONG escape_db2( char *to, const char *from, ULONG length )
     }
   }
   *to=0;
-  return (ULONG) (to-to_start);
+  return (HB_SIZE) (to-to_start);
 }
 
-static ULONG escape_pgs( char *to, const char *from, ULONG length )
-{
-  const char *to_start=to;
-  const char *end;
-  for (end=from+length; from != end ; from++)
-  {
-    switch (*from)
-    {
-    case '\'':
-      *to++= '\'';
-      *to++= '\'';
-      break;
-    case '\\':
-      *to++= '\\';
-      *to++= '\\';
-      break;
-    case 0:
-      break;
-    default:
-      *to++= *from;
-    }
-  }
-  *to=0;
-  return (ULONG) (to-to_start);
-}
-
-static ULONG escape_oci( char *to, const char *from, ULONG length )
+static HB_SIZE escape_db2( char *to, const char *from, HB_SIZE length )
 {
   const char *to_start=to;
   const char *end;
@@ -510,6 +463,55 @@ static ULONG escape_oci( char *to, const char *from, ULONG length )
       *to++= '\'';
       break;
     case 0:
+      *to++= ' ';
+      break;
+    default:
+      *to++= *from;
+    }
+  }
+  *to=0;
+  return (HB_SIZE) (to-to_start);
+}
+
+static HB_SIZE escape_pgs( char *to, const char *from, HB_SIZE length )
+{
+  const char *to_start=to;
+  const char *end;
+  for (end=from+length; from != end ; from++)
+  {
+    switch (*from)
+    {
+    case '\'':
+      *to++= '\'';
+      *to++= '\'';
+      break;
+//     case '\\':
+//       *to++= '\\';
+//       *to++= '\\';
+//       break;
+    case 0:
+      break;
+    default:
+      *to++= *from;
+    }
+  }
+  *to=0;
+  return (HB_SIZE) (to-to_start);
+}
+
+static HB_SIZE escape_oci( char *to, const char *from, HB_SIZE length )
+{
+  const char *to_start=to;
+  const char *end;
+  for (end=from+length; from != end ; from++)
+  {
+    switch (*from)
+    {
+    case '\'':
+      *to++= '\'';
+      *to++= '\'';
+      break;
+    case 0:
       break;
 
     default:
@@ -518,13 +520,13 @@ static ULONG escape_oci( char *to, const char *from, ULONG length )
 
   }
   *to=0;
-  return (ULONG) (to-to_start);
+  return (HB_SIZE) (to-to_start);
 }
 
 HB_FUNC( SR_ESCAPESTRING )
 {
    const char *FromBuffer;
-   int iSize;
+   HB_SIZE iSize;
    int idatabase;
    char *ToBuffer;
 
@@ -580,7 +582,7 @@ HB_FUNC( SR_ESCAPESTRING )
    }
 }
 
-char * QuoteTrimEscapeString( const char * FromBuffer, ULONG iSize, int idatabase, BOOL bRTrim, ULONG * iSizeOut )
+char * QuoteTrimEscapeString( const char * FromBuffer, HB_SIZE iSize, int idatabase, BOOL bRTrim, HB_SIZE * iSizeOut )
 {
    char * ToBuffer;
 
@@ -639,9 +641,10 @@ HB_FUNC( SR_ESCAPENUM )
    const char *FromBuffer;
    char *ToBuffer;
    char SciNot[5] = {'\0','\0','\0','\0','\0'};
-   int iSize, iPos, iDecPos;
+   HB_SIZE iSize,iPos;
+   int iDecPos;
    BOOL bInteger = TRUE;
-   ULONG len, dec;
+   HB_SIZE len, dec;
    double dMultpl;
 
    iSize= hb_parclen(1);
@@ -774,11 +777,12 @@ HB_FUNC( SR_ESCAPENUM )
    hb_xfree( ToBuffer );
 }
 
-PHB_ITEM sr_escapeNumber( char *FromBuffer, ULONG len, ULONG dec, PHB_ITEM pRet )
+PHB_ITEM sr_escapeNumber( char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pRet )
 {
    char *ToBuffer;
    char SciNot[5] = {'\0','\0','\0','\0','\0'};
-   int iSize, iPos, iDecPos;
+   HB_SIZE iSize, iPos;
+   int iDecPos;
    BOOL bInteger = TRUE;
    double dMultpl;
 
@@ -911,7 +915,7 @@ HB_FUNC( SR_DBQUALIFY )
    {
       char * szOut;
       const char * pszBuffer;
-      ULONG ulLen, i;
+      HB_SIZE ulLen, i;
 
       pszBuffer = hb_itemGetCPtr( pText );
       ulLen = hb_itemGetCLen( pText );
@@ -1017,45 +1021,6 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 {
    switch( hb_itemType( pItem ) )
    {
-#ifdef __XHARBOUR__
-      case HB_IT_ARRAY:
-         return( pItem->item.asArray.value->ulLen == 0 );
-
-      case HB_IT_STRING:
-      case HB_IT_MEMO:
-         return( hb_strEmpty( pItem->item.asString.value, pItem->item.asString.length ) );
-
-      case HB_IT_INTEGER:
-         return( pItem->item.asInteger.value == 0 );
-
-      case HB_IT_LONG:
-         return( pItem->item.asLong.value == 0l );
-
-      case HB_IT_DOUBLE:
-         return( pItem->item.asDouble.value == 0.0 );
-
-      case HB_IT_DATE:
-#ifdef SQLRDD_COMPAT_PRE_1_1
-         return( pItem->item.asDate.value == 0 );
-#else
-         return( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
-#endif
-      case HB_IT_TIMEFLAG:
-         return( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
-
-      case HB_IT_POINTER:
-         return( pItem->item.asPointer.value == NULL );
-
-      case HB_IT_LOGICAL:
-         return( ! pItem->item.asLogical.value );
-
-      case HB_IT_BLOCK:
-         return( FALSE );
-
-      case HB_IT_HASH:
-         return( pItem->item.asHash.value->ulTotalLen == 0 );
-
-#else
       case HB_IT_ARRAY:
          return hb_arrayLen( pItem ) == 0;
 
@@ -1074,7 +1039,16 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 
       case HB_IT_DOUBLE:
          return hb_itemGetND( pItem ) == 0.0;
-
+#ifdef __XHARBOUR__
+      case HB_IT_DATE:
+#ifdef SQLRDD_COMPAT_PRE_1_1
+         return( hb_itemGetDL(pItem)== 0 );
+#else
+         return( hb_itemGetDL(pItem) == 0 && hb_itemGetT( pItem ) == 0 );
+#endif
+      case HB_IT_TIMEFLAG:
+         return( hb_itemGetDL(pItem) == 0 && hb_itemGetT( pItem ) == 0 );
+#else
       case HB_IT_DATE:
          return hb_itemGetDL( pItem ) == 0;
 
@@ -1084,6 +1058,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
          hb_itemGetTDT( pItem, &lDate, &lTime );
          return lDate == 0 && lTime == 0;
       }
+#endif      
       case HB_IT_LOGICAL:
          return ! hb_itemGetL( pItem );
 
@@ -1092,7 +1067,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 
       case HB_IT_POINTER:
          return hb_itemGetPtr( pItem ) == NULL;
-
+#ifndef __XHARBOUR__
       case HB_IT_SYMBOL:
       {
          PHB_SYMB pSym = hb_itemGetSymbol( pItem );
@@ -1112,7 +1087,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
 char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, BOOL bNullable, int nSystemID, BOOL bTCCompat, BOOL bMemo, BOOL * bNullArgument )
 {
    char * sValue, sDate[9];
-   ULONG iSizeOut;
+   HB_SIZE iSizeOut;
    int iTrim, iPos, iSize;
    sValue = NULL;
 
