@@ -39,6 +39,7 @@
  *   TIFFReadDirectory, so as to eliminate current possibly repetitive lookup.
  */
 
+#include "config.h"
 #include "tiffiop.h"
 
 #define IGNORE 0          /* tag placeholder used below */

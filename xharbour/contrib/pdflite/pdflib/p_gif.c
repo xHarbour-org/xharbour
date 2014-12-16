@@ -31,6 +31,7 @@
 /* |   provided "as is" without express or implied warranty.           | */
 /* +-------------------------------------------------------------------+ */
 
+#include "config.h"
 #include "p_intern.h"
 #include "p_color.h"
 #include "p_image.h"

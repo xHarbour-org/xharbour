@@ -27,6 +27,7 @@
 /* For checking the beta expiration date */
 #include <time.h>
 
+#include "config.h"
 #include "p_intern.h"
 #include "p_image.h"
 #include "p_page.h"

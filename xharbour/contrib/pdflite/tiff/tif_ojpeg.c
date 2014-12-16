@@ -7,6 +7,7 @@
    #pragma warn (disable:2030)
 #endif
 
+#include "config.h"
 #include "pdflite_tiffiop.h"
 #ifdef OJPEG_SUPPORT
 

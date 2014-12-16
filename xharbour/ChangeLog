@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-16 21:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * make_bc.bat
+    ! dot not try build DLL when HB_DEBUG=d
+
+  * winmake/makefile.gc
+    + add hbssl library for mingw
+
+  * include/cinterface.h
+    ! fix for mingw32
+
+  * source/rtl/hbsrlraw.c
+  + contrib/pdflite/include/config.h
+  * contrib/pdflite/pdcore/pc_contain.c
+  * contrib/pdflite/pdcore/pc_string.c
+  * contrib/pdflite/pdflib/p_document.c
+  * contrib/pdflite/pdflib/p_gif.c
+  * contrib/pdflite/pdflib/p_object.c
+  * contrib/pdflite/tiff/tif_fax3.c
+  * contrib/pdflite/tiff/tif_jpeg.c
+  * contrib/pdflite/tiff/tif_ojpeg.c
+  + contrib/tiff/config.h
+  * contrib/tiff/tif_dirread.c
+    ! pacify warnings
+
 2014-12-15 14:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/harboury.h
   * include/hbapierr.h

@@ -14,6 +14,8 @@
 #ifndef CINTERFACE_H_
 #define CINTERFACE_H_
 
+#if ! defined( __MINGW32__ )
+
 #if !defined( NTDDI_VERSION ) && !defined( _WIN32_WINNT )
    #define NTDDI_VERSION 0x05010000
    #define _WIN32_WINNT 0x0501 
@@ -27,7 +29,7 @@
    #define _USING_V110_SDK71_
 #endif
 
-#if ( defined( __MINGW32__ ) || defined(__MINGW64__)) && (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ == 2)
+#if defined(__MINGW64__) && (__GNUC__ == 4 && __GNUC_MINOR__ == 8 && __GNUC_PATCHLEVEL__ == 2)
    #include <initguid.h>
 #endif
 
@@ -132,6 +134,8 @@ PSDK code.
    #define __MIDL_CONST _PRESET___MIDL_CONST 
 #endif
 
-#endif // defined( __cplusplus) && defined( CINTERFACE)
+#endif  //__cplusplus
 
-#endif  // HB_OLE_H_
+#endif  //__MINGW32__
+
+#endif  //CINTERFACE_H_

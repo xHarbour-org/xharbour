@@ -31,6 +31,7 @@
 #define PDFLIB_ALIGN16
 #endif
 
+#include "config.h"
 #include "pdflite_tiffiop.h"
 #ifdef JPEG_SUPPORT
 

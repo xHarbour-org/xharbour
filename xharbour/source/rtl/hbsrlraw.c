@@ -439,7 +439,7 @@ HB_FUNC( HB_DESERIALIZEARRAY )
 {
    HB_SIZE      i, lArrayLen, lNext;
    const char * cBuf    = hb_parc( 2 );
-   ULONG        lLen    = hb_parclen( 2 );
+   LONG         lLen    = hb_parclen( 2 );
    PHB_ITEM     pArray  = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM     pMaxLen = hb_param( 3, HB_IT_ANY );
    PHB_ITEM     pRObj   = hb_param( 4, HB_IT_ANY );

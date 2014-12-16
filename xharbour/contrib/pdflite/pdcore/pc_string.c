@@ -18,6 +18,7 @@
 
 #include <string.h>
 
+#include "config.h"
 #include "pc_util.h"
 #include "pc_string.h"
 #include "pc_ctype.h"

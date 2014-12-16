@@ -18,6 +18,7 @@
 
 #define P_OBJECT_C
 
+#include "config.h"
 #include "p_intern.h"
 #include "p_image.h"
 

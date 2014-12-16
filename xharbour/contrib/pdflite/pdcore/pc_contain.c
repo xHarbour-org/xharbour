@@ -16,6 +16,7 @@
  *
  */
 
+#include "config.h"
 #include "pc_util.h"
 #include "pc_contain.h"
 

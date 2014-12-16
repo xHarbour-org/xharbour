@@ -25,6 +25,7 @@
  * OF THIS SOFTWARE.
  */
 
+#include "config.h"
 #include "pdflite_tiffiop.h"
 #ifdef CCITT_SUPPORT
 /*
