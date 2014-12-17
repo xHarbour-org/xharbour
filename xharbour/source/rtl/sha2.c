@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 
-#if ( defined( __POCC__ ) && __POCC__ >= 600 )  /* Trick to avoid Pelles C 6.00.6 compiler internal error. [vszakats] */
+#if ( defined( __POCC__ ) && __POCC__ >= 600 )  /* Trick to avoid Pelles C 6.00.6 compiler internal error. */
 #define UNROLL_LOOPS                            /* Enable loops unrolling */
 #endif
 
@@ -133,7 +133,7 @@
    }
 
 #if defined( __BORLANDC__ )
-#  if __BORLANDC__ >= 1328
+#  if __BORLANDC__ >= 0x530
 #     define _ULL( num )   num##ui64
 #  else
 #     define _ULL( num )   num

@@ -85,7 +85,7 @@
 #include "hbmemory.ch"
 #include "hbinit.h"
 
-#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 1568 ) )
+#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 0x620 ) )
 /* Disabled: Borland C 6.2 internal error when compiling dlmalloc.c */
    #if defined( HB_FM_DL_ALLOC )
       #undef HB_FM_DL_ALLOC
@@ -805,7 +805,7 @@ void hb_xautorelease( void * pMem )            /* set memory to autorelease */
 }
 
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is
-         not defined, don't use it for final code [vszakats] */
+         not defined, don't use it for final code */
 
 HB_SIZE hb_xsize( void * pMem ) /* returns the size of an allocated memory block */
 {
@@ -1109,7 +1109,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_xquery(%hu)", uiMode ) );
 
-   /* TODO: Return the correct values instead of 9999 [vszakats] */
+   /* TODO: Return the correct values instead of 9999 */
 
    switch( uiMode )
    {

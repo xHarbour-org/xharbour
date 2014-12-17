@@ -225,16 +225,16 @@ ULONG hb_fsGetFileAttributes( const char * szFile )
    {
       int iAttri = 0;
 
-         #if defined( __BORLANDC__ ) && ( __BORLANDC__ >= 1280 )
+      #if defined( __BORLANDC__ ) && ( __BORLANDC__ >= 0x500 )
       /* NOTE: _chmod(  f, 0  ) => Get attribs
                _chmod(  f, 1, n  ) => Set attribs
                chmod(  ) though, _will_ change the attributes */
-      iAttri   = _rtl_chmod(  szFile, 0, 0  );
-         #elif defined( __BORLANDC__ )
-      iAttri   = _chmod(  szFile, 0, 0  );
-         #elif defined( __DJGPP__ )
-      iAttri   = _chmod(  szFile, 0  );
-         #endif
+      iAttri = _rtl_chmod(  szFile, 0, 0  );
+      #elif defined( __BORLANDC__ )
+      iAttri = _chmod(  szFile, 0, 0  );
+      #elif defined( __DJGPP__ )
+      iAttri = _chmod(  szFile, 0  );
+      #endif
 
       return ( ULONG ) iAttri;
    }

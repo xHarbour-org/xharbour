@@ -70,7 +70,7 @@
 #if defined( __XCC__ ) || defined( __POCC__ ) || defined( __LCC__ ) || \
     defined( __MINGW32__ ) || defined( __DMC__ ) || defined( __TINYC__ ) || \
     ( defined( _MSC_VER ) && _MSC_VER >= 1600 ) || \
-    ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 ) || \
+    ( defined( __BORLANDC__ ) && __BORLANDC__ >= 0x582 ) || \
     ( defined( __WATCOMC__ ) && __WATCOMC__ >= 1270 ) || \
     ( ( defined( __GNUC__ ) || defined( __SUNPRO_C ) || defined( __SUNPRO_CC ) ) && \
       ( defined( _ISOC99_SOURCE ) || defined( _STDC_C99 ) || \
@@ -81,10 +81,10 @@
         defined( HB_OS_BSD ) || defined( HB_OS_SUNOS ) || \
         defined( HB_OS_BEOS ) || defined( HB_OS_QNX ) || \
         defined( HB_OS_VXWORKS ) || defined( HB_OS_MINIX ) ) )
-      #undef  HAVE_INTTYPES_H
-      #define HAVE_INTTYPES_H        1
-      #undef  HAVE_STDINT_H
-      #define HAVE_STDINT_H          1
+   #undef  HAVE_INTTYPES_H
+   #define HAVE_INTTYPES_H           1
+   #undef  HAVE_STDINT_H
+   #define HAVE_STDINT_H             1
 
    #  include <stdint.h>
    #if defined( _MSC_VER )
@@ -111,7 +111,7 @@
       #undef  INT64_MAX
 
    #endif
-   /* NOTE: Hack to avoid collision between stdint.h and unistd.h. [vszakats] */
+   /* NOTE: Hack to avoid collision between stdint.h and unistd.h. */
    #  if defined( HB_OS_VXWORKS ) && defined( _INTPTR ) && ! defined( _INTPTR_T )
    #     define _INTPTR_T
    #  endif
@@ -128,7 +128,7 @@
 
 
    /* workaround for BCC 5.8 bug */
-   #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1410 )
+   #if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 0x582 )
       #undef INT32_MIN
       #define INT32_MIN ((int32_t) (-INT32_MAX-1))
       #undef INT64_MIN
@@ -539,7 +539,7 @@
  * without it they cut the number to LONG
  */
 #if defined( __BORLANDC__ )
-#  if __BORLANDC__ >= 1328
+#  if __BORLANDC__ >= 0x530
 #     define HB_LL( num )           num##i64
 #     define HB_ULL( num )          num##ui64
 #  else
@@ -1643,7 +1643,7 @@ typedef HARBOUR ( * PHB_FUNC )( void );
 /* NOTE: The prefix is "HB_FUN_" currently, this is needed to
          avoid collision with any other declared symbol.
          Note that "HB_" is not enough, since the Harbour internals
-         are also prefixed with HB_. [vszakats] */
+         are also prefixed with HB_. */
 
 #define HB_FUNCNAME( funcname )        HB_FUN_##funcname
 #define HB_INIT_FUNCNAME( funcname )   HB_FUN_init_##funcname

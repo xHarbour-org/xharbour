@@ -151,7 +151,7 @@ extern BOOL hb_FDIDestroy( HFDI hfdi );
    #define ERROR_NO  ( * _errno() )
 #endif
 
-#if defined( __BORLANDC__ ) && ( __BORLANDC__ <= 1424 )
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ <= 0x590 )
    #define _OPEN( a, b, c )   _open( a, b )
 #else
    #define _OPEN( a, b, c )   _open( a, b, c )

@@ -100,7 +100,7 @@
 #if ! defined( __DJGPP__ )
 #  include <math.h>                                                                                      /* For log() */
 #endif
-#if ( defined( _MSC_VER ) || ( __BORLANDC__ > 1040 ) || defined( __WATCOMC__ ) ) && ! defined( __DMC__ ) /* Use this only above Borland C++ 3.1 */
+#if ( defined( _MSC_VER ) || ( __BORLANDC__ > 0x410 ) || defined( __WATCOMC__ ) ) && ! defined( __DMC__ ) /* Use this only above Borland C++ 3.1 */
 #  include <float.h>                                                                                     /* for _finite() and _isnan() */
 #endif
 
@@ -236,7 +236,7 @@ void hb_itemSetCMemo( PHB_ITEM pItem )
       pItem->type |= HB_IT_MEMOFLAG;
 }
 
-/* NOTE: The caller should free the pointer if it's not NULL. [vszakats] */
+/* NOTE: The caller should free the pointer if it's not NULL. */
 
 char * hb_itemGetC( PHB_ITEM pItem )
 {
@@ -254,8 +254,7 @@ char * hb_itemGetC( PHB_ITEM pItem )
    return NULL;
 }
 
-/* NOTE: Caller should not modify the buffer returned by this function.
-         [vszakats] */
+/* NOTE: Caller should not modify the buffer returned by this function. */
 
 char * hb_itemGetCPtr( PHB_ITEM pItem )
 {
@@ -311,8 +310,7 @@ BOOL hb_itemFreeC( char * szText )
 /* NOTE: Clipper is buggy and will not append a trailing zero, although
          the NG says that it will. Check your buffers, since what may have
          worked with Clipper could overrun the buffer with Harbour.
-         The correct buffer size is 9 bytes: char szDate[ 9 ]
-         [vszakats] */
+         The correct buffer size is 9 bytes: char szDate[ 9 ] */
 
 char * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
 {
@@ -889,7 +887,7 @@ PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
 
    if( iWidth <= 0 || iWidth > 99 )
    {
-#if defined( __BORLANDC__ ) && ( __BORLANDC__ > 1040 ) /* Use this only above Borland C++ 3.1 */
+#if defined( __BORLANDC__ ) && ( __BORLANDC__ > 0x410 ) /* Use this only above Borland C++ 3.1 */
       /* Borland C compiled app crashes if a "NaN" double is compared with another double [martin vogel] */
       if( _isnan( dNumber ) )
          iWidth = 20;
@@ -1735,7 +1733,7 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          TRUE, this trick is required to stay thread safe, while minimize
          memory allocation and buffer copying.
          As a side effect the caller should never modify the returned buffer
-         since it may point to a constant value. [vszakats] */
+         since it may point to a constant value. */
 
 char * hb_itemString( PHB_ITEM pItem, HB_SIZE * ulLen, BOOL * bFreeReq )
 {

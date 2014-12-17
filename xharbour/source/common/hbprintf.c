@@ -114,7 +114,7 @@
 
 /* few macros for some platform dependent floating point functions/macros */
 
-#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 1410 ) || \
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 0x582 ) || \
    ( defined( __WATCOMC__ ) && __WATCOMC__ < 1270 ) || \
    ( defined( __DJGPP__ ) && \
    ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) ) ) || \
@@ -1316,7 +1316,7 @@ if( params.arglst != argbuf )
 
 #undef _HB_SNPRINTF_ADD_EOS
 
-/* NOTE: The full size of the buffer is expected as nSize. [vszakats] */
+/* NOTE: The full size of the buffer is expected as nSize. */
 int hb_vsnprintf( char * buffer, size_t nSize, const char * format, va_list arglist )
 {
    ULONG result;

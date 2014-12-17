@@ -77,7 +77,7 @@ them both to 0; an emulation function will be used. */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #ifndef HAVE_INTTYPES_H
-#if    ( defined( __BORLANDC__ ) && __BORLANDC__ ==1361 ) 
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 0x582 )
 #define HAVE_INTTYPES_H 0
 #else
 #define HAVE_INTTYPES_H 1
@@ -118,7 +118,8 @@ them both to 0; an emulation function will be used. */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #ifndef HAVE_STDINT_H
-#if    ( defined( __BORLANDC__ ) && __BORLANDC__ ==1361 ) 
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 0x582 ) || \
+    ( defined( _MSC_VER ) && _MSC_VER < 1600 )
 #define HAVE_STDINT_H 0
 #else
 #define HAVE_STDINT_H 1

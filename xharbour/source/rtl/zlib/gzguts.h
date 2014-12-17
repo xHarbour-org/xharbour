@@ -28,7 +28,7 @@
 #endif
 #if defined( HB_OS_UNIX ) || defined( HB_OS_LINUX)
    #include <unistd.h>
-#endif   
+#endif
 #include <stdio.h>
 #include "zlib.h"
 #ifdef STDC
@@ -69,7 +69,7 @@
 #  endif
 #endif
 
-#if defined(MSDOS) && defined(__BORLANDC__) && (BORLANDC > 0x410)
+#if defined(MSDOS) && defined(__BORLANDC__) && (__BORLANDC__ > 0x410)
 #  ifndef HAVE_VSNPRINTF
 #    define HAVE_VSNPRINTF
 #  endif

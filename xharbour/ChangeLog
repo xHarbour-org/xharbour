@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-17 14:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/pcre/config.generic.h 
+    ! fix for compile with msvc
+
+  * include/hbdefs.h
+  * include/hbmath.h
+  * contrib/firebird/firebird.c
+  * contrib/hbcab/cabinet.h
+  * contrib/hbxdiff/config.h
+  * contrib/sddfb/sddfb.c
+  * source/rtl/sha2.c
+  * source/rtl/zlib/gzguts.h
+  * source/vm/itemapi.c
+  * source/vm/fm.c
+  * source/ct/files.c
+  * source/common/hbprintf.c
+  * source/compiler/comptool.c
+  * utils/misc/hbrc.c
+    * show "human" BCC version
+
 2014-12-16 21:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * make_bc.bat
     ! dot not try build DLL when HB_DEBUG=d

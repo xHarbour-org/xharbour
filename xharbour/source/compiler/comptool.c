@@ -50,7 +50,7 @@ extern void cleansPair( void );
 /* remove this 'undef' when number of memory leaks will be reduced to
    reasonable size */
 
-#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 1568 ) )
+#if ( defined( __BORLANDC__ ) && ( __BORLANDC__ == 0x620 ) )
 /* Disabled: Borland C 6.2 internal error when compiling dlmalloc.c */
    #if defined( HB_FM_DL_ALLOC )
       #undef HB_FM_DL_ALLOC
@@ -485,7 +485,7 @@ void hb_xexitEx( void )
 
 
 /* NOTE: Use as minimal calls from here, as possible.
-         Don't allocate memory from this function. [vszakats] */
+         Don't allocate memory from this function. */
 void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
 {
    char buffer[ 1024 ];
