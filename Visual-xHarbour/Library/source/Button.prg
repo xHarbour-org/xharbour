@@ -331,33 +331,36 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          SetBkColor( dis:hDC, ::BackColor )
          _DrawFocusRect( dis:hDC, { dis:rcItem:Left + 4, dis:rcItem:Top + 4, dis:rcItem:Right - 4, dis:rcItem:Bottom - 4 } )
       ENDIF
-      SetBkMode( dis:hDC, TRANSPARENT )
+      IF ! EMPTY( ::xText )
+         SetBkMode( dis:hDC, TRANSPARENT )
+         SetTextColor( dis:hDC, GetThemeSysColor( ::hWnd, TMT_BTNTEXT ) )
 
-      SetTextColor( dis:hDC, GetThemeSysColor( ::hWnd, TMT_BTNTEXT ) )
-
-      IF ::Application != NIL .AND. lDisabled
-         OffSet( @aTextRect, 1, 1 )
-         SetTextColor( dis:hDC, ::System:Colors:BtnHighlight )
-         _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
-         OffSet( @aTextRect, -1, -1 )
-         SetTextColor( dis:hDC, ::System:Colors:GrayText )
-       ELSE
-         SetTextColor( dis:hDC, ::ForeColor )
+         IF ::Application != NIL .AND. lDisabled
+            OffSet( @aTextRect, 1, 1 )
+            SetTextColor( dis:hDC, ::System:Colors:BtnHighlight )
+            _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
+            OffSet( @aTextRect, -1, -1 )
+            SetTextColor( dis:hDC, ::System:Colors:GrayText )
+          ELSE
+            SetTextColor( dis:hDC, ::ForeColor )
+         ENDIF
       ENDIF
       IF ::MenuArrow .AND. ::ContextMenu != NIL
          ::DrawArrow( dis:hDC, {aTextRect[3]-22,aTextRect[2],aTextRect[3],aTextRect[4]} )
          aTextRect[1] := 6
          nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
       ENDIF
-      IF ::xMultiLine
-         _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
-         aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
-         nTextFlags := DT_CENTER | DT_VCENTER
+      IF ! EMPTY( ::xText )
+         IF ::xMultiLine
+            _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
+            aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
+            nTextFlags := DT_CENTER | DT_VCENTER
+         ENDIF
+         _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
       ENDIF
-      _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
    ENDIF
 
-RETURN NIL
+RETURN 0
 
 METHOD OnParentCommand( nId, nCode, nlParam ) CLASS Button
    LOCAL pt

@@ -1825,77 +1825,88 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
    END
 
-   WITH OBJECT ::Application:DebugWindow := DebugTab( Self )
+   WITH OBJECT ::Application:DebugWindow := Panel( Self )
       :Width         := 680
-      :Height        := ( 200 * 4 ) / LOWORD( GetDialogBaseUnits() )
-      :TabPosition   := 4
+      :Name          := "DebugWindow"
+      :Height        := 150
       :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::StatusBar1
       :Dock:Right    := ::Panel1
       :Dock:Margin   := 3
-      :TabStop       := .F.
       :Visible       := .F.
+      :Text          := "Build"
+      :AllowClose    := .T.
+      :OnWMClose     := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F. ), o:Redock() ) }
       :Create()
 
-      WITH OBJECT TabPage( :this )
-         :Caption := "Build"
+      WITH OBJECT DebugTab( :this )
+         :TabPosition      := 4
+         :Dock:Left        := :Parent
+         :Dock:Bottom      := :Parent
+         :Dock:Right       := :Parent
+         :Dock:Top         := :Parent
+         :Dock:RightMargin := -1
+         :TabStop          := .F.
          :Create()
 
-         DebugBuild( :this )
-
-         WITH OBJECT ::DebugBuild1
-            :Height      := 150
-            :ForeColor   := C_BLACK
-            :BackColor   := C_WHITE
-            :Dock:Margin := 0
-            :Dock:Left   := :Parent
-            :Dock:Top    := :Parent
-            :Dock:Bottom := :Parent
-            :Dock:Right  := :Parent
-            :ExStyle     := 0
+         WITH OBJECT TabPage( :this )
+            :Caption := "Build"
             :Create()
+
+            DebugBuild( :this )
+
+            WITH OBJECT ::DebugBuild1
+               :Height      := 150
+               :ForeColor   := C_BLACK
+               :BackColor   := C_WHITE
+               :Dock:Left   := :Parent
+               :Dock:Top    := :Parent
+               :Dock:Bottom := :Parent
+               :Dock:Right  := :Parent
+               :ExStyle     := 0
+               :Create()
+            END
+
          END
 
-      END
-
-      WITH OBJECT TabPage( :this )
-         :Caption := "Errors"
-         :Create()
-         WITH OBJECT ::Application:ErrorView := ErrorListView( :this )
-            :ClientEdge    := .F.
-            :StaticEdge    := .f.
-            :Dock:Left     := :Parent
-            :Dock:Top      := :Parent
-            :Dock:Right    := :Parent
-            :Dock:Bottom   := :Parent
-            :Dock:Margin   := 0
-            :ExStyle       := 0
-            :ViewStyle     := 1
-            :FullRowSelect := .T.
+         WITH OBJECT TabPage( :this )
+            :Caption := "Errors"
             :Create()
-            ListViewColumn( :this, "Source File", 150,, .T. )
-            ListViewColumn( :this, "Line",         70,, .T. )
-            ListViewColumn( :this, "Type",         70,, .T. )
-            ListViewColumn( :this, "Description", 350,, .T. )
+            WITH OBJECT ::Application:ErrorView := ErrorListView( :this )
+               :ClientEdge    := .F.
+               :StaticEdge    := .f.
+               :Dock:Left     := :Parent
+               :Dock:Top      := :Parent
+               :Dock:Right    := :Parent
+               :Dock:Bottom   := :Parent
+               :ExStyle       := 0
+               :ViewStyle     := 1
+               :FullRowSelect := .T.
+               :Create()
+               ListViewColumn( :this, "Source File", 150,, .T. )
+               ListViewColumn( :this, "Line",         70,, .T. )
+               ListViewColumn( :this, "Type",         70,, .T. )
+               ListViewColumn( :this, "Description", 350,, .T. )
+            END
          END
-      END
 
-      WITH OBJECT TabPage( :this )
-         :Caption := "Log"
-         :Create()
-         WITH OBJECT ::Application:BuildLog := EditBox( :this )
-            :ClientEdge     := .F.
-            :StaticEdge     := .f.
-            :Dock:Margin    := 0
-            :Dock:Left      := :Parent
-            :Dock:Top       := :Parent
-            :Dock:Right     := :Parent
-            :Dock:Bottom    := :Parent
-            :MultiLine      := .T.
-            :ReadOnly       := .T.
-            :HorzScroll     := .T.
-            :VertScroll     := .T.
+         WITH OBJECT TabPage( :this )
+            :Caption := "Log"
             :Create()
+            WITH OBJECT ::Application:BuildLog := EditBox( :this )
+               :ClientEdge     := .F.
+               :StaticEdge     := .f.
+               :Dock:RightMargin := -1
+               :Dock:Left      := :Parent
+               :Dock:Top       := :Parent
+               :Dock:Right     := :Parent
+               :Dock:Bottom    := :Parent
+               :MultiLine      := .T.
+               :ReadOnly       := .T.
+               :HorzScroll     := .T.
+               :VertScroll     := .T.
+               :Create()
+            END
          END
       END
       :Visible := .F.
@@ -3288,8 +3299,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       ::LoadForm( oWin:Cargo, @aErrors,, .T., oWin )
 
       IF !EMPTY( aErrors )
-         ::Application:DebugWindow:Visible := .T.
-         ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+         ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
          ::Application:ErrorView:ProcessErrors( aErrors )
          ::Application:ErrorView:Parent:Select()
          ::Application:Yield()
@@ -3529,8 +3539,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:SourceEditor:Caption := ""
    IF lCloseErrors
       ::Application:MainForm:DebugBuild1:ResetContent()
-      ::Application:DebugWindow:Hide()
-      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
    ::Application:CloseMenu:Enabled := .F.
 
@@ -3740,8 +3749,7 @@ METHOD Open( cProject ) CLASS Project
 
    IF ::Application:DebugWindow:Visible
       ::Application:ErrorView:ResetContent()
-      ::Application:DebugWindow:Visible := .F.
-      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
 
    DEFAULT cProject TO ""
@@ -3901,8 +3909,7 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 80
 
    IF !EMPTY( aErrors )
-      ::Application:DebugWindow:Visible := .T.
-      ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
       ::Application:ErrorView:ProcessErrors( aErrors )
       ::Application:ErrorView:Parent:Select()
       ::Application:Yield()
@@ -4102,8 +4109,9 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
 
    ::Application:ObjectTree:Set( oForm )
 
-   ::Application:FileExplorer:AddSource( oForm:Editor )
-
+   IF oForm:Editor:TreeItem == NIL
+      ::Application:FileExplorer:AddSource( oForm:Editor )
+   ENDIF
    oForm:__lLoading := .F.
 RETURN .T.
 
@@ -5172,9 +5180,9 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                    xValue2 := NIL
                 ENDIF
              ENDIF
-             //IF ValType( xValue1 ) == "O" .AND. ValType( xValue2 ) == "C"
-             //   xValue1 := xValue1:Name
-             //ENDIF
+             IF ValType( xValue1 ) == "O" .AND. ValType( xValue2 ) == "C"
+                __ChkComponent( xValue1:Form, @xValue2 )
+             ENDIF
              IF !( xValue1 == xValue2 )
                 IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name )
 
@@ -5398,8 +5406,7 @@ METHOD Run( lRunOnly ) CLASS Project
                   ShellExecute( GetActiveWindow(), "open", cExe, ::Properties:Parameters, , SW_SHOW )
                ENDIF
 
-               ::Application:DebugWindow:Hide()
-               ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+               ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
             ENDIF
 
           ELSEIF ::Properties:TargetType == 4
@@ -5491,8 +5498,7 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
       FERASE( cExe )
    ENDIF
 
-   ::Application:DebugWindow:Visible := .T.
-   ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+   ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
 
    ::Application:ErrorView:ResetContent()
 
@@ -5748,7 +5754,7 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
       AADD( aErrors, { cFile, "0", "I/O Error", cDesc } )
    ENDIF
 
-   oApp:DebugWindow:Show()
+   oApp:DebugWindow:Visible := oApp:Props[ "ViewDebugBuildItem" ]:Checked := .T.
    oApp:Yield()
    oApp:ErrorView:ProcessErrors( aErrors )
    oApp:ErrorView:Parent:Select()

@@ -18,10 +18,10 @@
 
 CLASS MDIClient INHERIT Window
 
-   PROPERTY AlignLeft
-   PROPERTY AlignTop
-   PROPERTY AlignRight
-   PROPERTY AlignBottom
+   PROPERTY AlignLeft    ROOT "Layout"
+   PROPERTY AlignTop     ROOT "Layout"
+   PROPERTY AlignRight   ROOT "Layout"
+   PROPERTY AlignBottom  ROOT "Layout"
    PROPERTY WindowsMenu  DEFAULT .T.
    PROPERTY BackColor    ROOT "Colors" GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
    PROPERTY ForeColor    ROOT "Colors" GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor );
@@ -106,6 +106,10 @@ METHOD Init( oParent ) CLASS MDIClient
    ::ExStyle     := WS_EX_CLIENTEDGE
    ::WindowStyle := 4
 
+   IF ::Parent != NIL .AND.::Parent:DesignMode
+      __SetInitialValues( Self )
+   ENDIF
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -115,9 +119,6 @@ METHOD Create() CLASS MDIClient
    ::__ClientStruct := (struct CLIENTCREATESTRUCT)
    ::__ClientStruct:hWindowMenu  := ::WindowMenu
    ::__ClientStruct:idFirstChild := ::FirstChild
-   IF ::Parent != NIL .AND.::Parent:DesignMode
-      __SetInitialValues( Self )
-   ENDIF
    ::ClipChildren := .T.
    ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, , ::Style, ::Left, ::Top, ::Width, ::Height, ::Parent:hWnd, 0, ::Parent:Instance, ::__ClientStruct )
    ShowWindow( ::hWnd, SW_SHOW )

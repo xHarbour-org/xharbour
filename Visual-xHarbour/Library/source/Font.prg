@@ -79,7 +79,7 @@ CLASS Font
    METHOD AddResource(c) INLINE AddFontResource( c )//, FR_PRIVATE | FR_NOT_ENUM )
    METHOD EnumFamilies()
    METHOD EnumFamiliesProc()
-   METHOD Destroy()
+   METHOD Destroy()      INLINE ::Delete()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -162,10 +162,6 @@ METHOD Delete() CLASS Font
       ::Handle := NIL
    ENDIF
 RETURN .T.
-
-METHOD Destroy() CLASS Font
-   ::Delete()
-RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 

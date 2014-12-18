@@ -241,6 +241,8 @@ METHOD SetTabOrder( nTabOrder ) CLASS Object
    IF nTabOrder > 0 .AND. nTabOrder != ::xTabOrder
       IF nTabOrder == 1
          hAfter := HWND_TOP
+       ELSEIF nTabOrder >= LEN( ::Parent:Children )
+         hAfter := HWND_BOTTOM
        ELSE
          hAfter := ::Parent:Children[ nTabOrder-1 ]:hWnd
       ENDIF

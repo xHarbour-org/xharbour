@@ -291,12 +291,15 @@ METHOD OnMouseActivate( nwParam, nlParam ) CLASS Control
    ::Super:OnMouseActivate( nwParam, nlParam )
 
    IF LoWord(nlParam) == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
-      FOR EACH oChild IN ::Parent:Children
-          IF oChild:Active
-             oChild:Active := FALSE
-             oChild:InvalidateRect( {0,0, oChild:ClientWidth,14}, FALSE )
-          ENDIF
-      NEXT
+      TRY
+         FOR EACH oChild IN ::Parent:Children
+             IF oChild:Active
+                oChild:Active := FALSE
+                oChild:InvalidateRect( {0,0, oChild:ClientWidth,14}, FALSE )
+             ENDIF
+         NEXT
+      CATCH
+      END
    ENDIF
 RETURN NIL
 

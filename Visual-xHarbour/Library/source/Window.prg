@@ -1209,7 +1209,7 @@ RETURN Self
 METHOD RegisterDocking() CLASS Window
    IF ::Dock != NIL
       IF ::Parent != NIL
-         IF ( ::Dock:Left != NIL .OR. ::Dock:Top != NIL .OR. ::Dock:Right != NIL .OR. ::Dock:Bottom != NIL ) .AND. ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
+         IF ( ::Dock:Left != NIL .OR. ::Dock:Top != NIL .OR. ::Dock:Right != NIL .OR. ::Dock:Bottom != NIL .OR. ::ClsName == "ToolStripContainer" ) .AND. ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
             AADD( ::Parent:__aDock, Self )
          ENDIF
       ENDIF
@@ -1569,7 +1569,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
-   LOCAL x, y, aChildren, hDef, oChild, cProp, n
+   LOCAL x, y, aChildren, hDef, oChild, cProp
 
    ::__lSizeChanged := .T.
 
@@ -1612,23 +1612,23 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
 
          IF ! ::DesignMode
             cProp := ::MDIClient:AlignLeft
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-               ::MDIClient:AlignLeft := aChildren[n]
+            IF VALTYPE( cProp ) == "C"
+               ::MDIClient:AlignLeft := ::__hObjects[ cProp ]
             ENDIF
 
             cProp := ::MDIClient:AlignTop
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-               ::MDIClient:AlignTop := aChildren[n]
+            IF VALTYPE( cProp ) == "C"
+               ::MDIClient:AlignTop := ::__hObjects[ cProp ]
             ENDIF
 
             cProp := ::MDIClient:AlignRight
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-               ::MDIClient:AlignRight := aChildren[n]
+            IF VALTYPE( cProp ) == "C"
+               ::MDIClient:AlignRight := ::__hObjects[ cProp ]
             ENDIF
 
             cProp := ::MDIClient:AlignBottom
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( aChildren, {|o| o:Name == cProp } ) ) > 0
-               ::MDIClient:AlignBottom := aChildren[n]
+            IF VALTYPE( cProp ) == "C"
+               ::MDIClient:AlignBottom := ::__hObjects[ cProp ]
             ENDIF
          ENDIF
 
@@ -3268,6 +3268,7 @@ RETURN NIL
 
 METHOD DockIt() CLASS Window
    IF ::IsWindow() .AND. ::Parent != NIL
+      ::RegisterDocking()
       ::Parent:UpdateWindow()
       ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
    ENDIF

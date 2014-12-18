@@ -88,7 +88,6 @@
 #define TMT_BORDERCOLORHINT         3822
 #define TMT_ACCENTCOLORHINT         3823
 
-
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
@@ -113,7 +112,8 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY HighlightColor       ROOT "Colors"
    PROPERTY HighlightTextColor   ROOT "Colors"
 
-   PROPERTY HoverRow                                                                                DEFAULT .T.
+   PROPERTY HoverRow             ROOT "Behavior"                                                    DEFAULT .T.
+   PROPERTY SimpleRowDrag        ROOT "Behavior"                                                    DEFAULT .F.
 
    PROPERTY Columns
    PROPERTY AllowDragRecords                                                                        DEFAULT .F.
@@ -225,6 +225,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA __nHotHeader            PROTECTED
    DATA __cEditText             PROTECTED
    DATA __aEditCol              PROTECTED
+   DATA __nXold                 PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -684,8 +685,8 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
                   ::__DisplayData( nDragPos-1, , nDragPos+1,  )
                   ImageListDragShowNolock(.T.)
                ENDIF
-
-               ImageListDragMove( 0, nTop )
+               ImageListDragMove( x-::__nXold, nTop )
+               ::UpdateWindow()
 
             ELSEIF wParam != MK_LBUTTON .AND. ::__HoverBackColor != NIL
 
@@ -1080,7 +1081,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
       RETURN 0
    ENDIF
 
-   IF ::AnchorColumn > 0 .AND. LEN( ::Children ) >= ::AnchorColumn .AND. ( ::__DataWidth <> ::ClientWidth )
+   IF ! ::DesignMode .AND. ::AnchorColumn > 0 .AND. LEN( ::Children ) >= ::AnchorColumn .AND. ( ::__DataWidth <> ::ClientWidth )
       ::Children[ ::AnchorColumn ]:xWidth := ( ::ClientWidth - ::__DataWidth ) + ::Children[ ::AnchorColumn ]:xWidth
       ::__GetDataWidth()
       ::__DisplayData()
@@ -1421,6 +1422,8 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    (nwParam)
    ::RowCountUsable  := MIN( Int(  ::__DataHeight/::ItemHeight ), ::RowCount )
 
+   ::__nXold := xPos
+
    nClickRow  := Ceiling((yPos-::__GetHeaderHeight()) /::ItemHeight)
    IF nClickRow < 1
       ::SetCapture()
@@ -1559,7 +1562,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
        ENDIF
    NEXT
 
-   IF ::AllowDragRecords .AND. nClickRow == ::RowPos .AND. nClickCol == ::ColPos
+   IF ::AllowDragRecords .AND. ( nClickRow == ::RowPos .OR. ::SimpleRowDrag ) .AND. ( nClickCol == ::ColPos .OR. ::FullRowSelect )
       ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
    ENDIF
 
@@ -4308,6 +4311,13 @@ METHOD Create() CLASS GridColumn
    END
    ExecuteEvent( "OnCreate", Self )
    ::Parent:Update()
+   WITH OBJECT ::Parent
+      IF ! :DesignMode .AND. :AnchorColumn == LEN( :Children )
+         :Children[ :AnchorColumn ]:xWidth := ( :ClientWidth - :__DataWidth ) + :Children[ :AnchorColumn ]:xWidth
+         :__GetDataWidth()
+         :__DisplayData()
+      ENDIF
+   END
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------------------------------
