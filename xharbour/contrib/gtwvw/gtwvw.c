@@ -107,7 +107,6 @@
 #include "hbgfxdef.ch"
 #define     SubclassWindow(hwnd, lpfn)       \
               ((WNDPROC)SetWindowLongPtr((hwnd), GWLP_WNDPROC, (LPARAM)(WNDPROC)(lpfn)))
-#define hb_xgrabz( n )        memset( hb_xgrab( ( n ) ), 0, ( n ) )
 /*-------------------------------------------------------------------*/
 
 /* settable by user: ****************************************************/
@@ -3160,7 +3159,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
   pWindowData = s_pWvwData->s_pWindows[usWinNum];
   
-  TraceLog("gt.log","HWND hWnd %p, UINT message %lu , WPARAM wParam %lu , LPARAM lParam %p\n", hWnd, message,  wParam, lParam);
+  //TraceLog("gt.log","HWND hWnd %p, UINT message %lu , WPARAM wParam %lu , LPARAM lParam %p\n", hWnd, message,  wParam, lParam);
 
   switch ( message )
   {
@@ -3178,7 +3177,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
       BOOL bTopMost = (s_pWvwData->s_usNumWindows==usWinNum+1);
       int  iEvent = (int) HIWORD(wParam);
       int  iId    = (int) LOWORD(wParam);
-      TraceLog("gt.log", "wm_command iEvent %i iId %i \n",iEvent,iId);
+//       TraceLog("gt.log", "wm_command iEvent %i iId %i \n",iEvent,iId);
 
       if (iId < WVW_ID_BASE_PUSHBUTTON )
       {

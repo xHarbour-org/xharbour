@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-17 22:20 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * contrib/gtwvw/gtwvw.c
+    ! removed hb_xgrabz. define
+    ! removed redundant tracelog function call
+  * contrib/gtwvw/samples/wvwtest9.prg
+    ! minor fix to link with newer gtwvw lib
+    
 2014-12-17 14:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/pcre/config.generic.h 
     ! fix for compile with msvc

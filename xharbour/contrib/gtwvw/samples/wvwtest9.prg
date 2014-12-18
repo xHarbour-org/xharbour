@@ -31,7 +31,7 @@
 #include "inkey.ch"
 #include "common.ch"
 #include "setcurs.ch"
-#include "..\..\what32\include\winuser.ch"  // from what32 contrib
+#include "winuser.ch"  // from what32 contrib
 
 #DEFINE CRLF chr(13)+chr(10)
 
@@ -109,7 +109,7 @@ local ch
    endif
    nMaxRow := maxrow(); nMaxCol := maxcol()
 
-   if wvw_SBcreate() > 0 .and.;
+   if !empty(wvw_SBcreate() ) .and.;
       wvw_SBaddPart(, "99:99:99") > 0
       wvw_SetTimer(, 1000)
    endif
@@ -837,7 +837,7 @@ local ldefault
 
    hWndTB := wvw_tbcreate(nWinNum, lDisplayText, NIL, nSysBitmap)
 
-   if hWndTB==0
+   if empty( hWndTB )
       lboxmessage("FAILED create toolbar")
       return NIL
    endif
