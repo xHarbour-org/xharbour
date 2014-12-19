@@ -270,6 +270,10 @@ RETURN Self
 METHOD OnStart() CLASS XHDebuggerGUI
   TRY
      ::oApp:DebugWindow:Hide()
+     TRY
+        ::oApp:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+     CATCH
+     END
      IF ::oApp:IdeActive
         IF ::hHook != NIL
            UnhookWindowsHookEx( ::hHook )
