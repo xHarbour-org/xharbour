@@ -317,7 +317,7 @@ void * hb_xalloc( HB_SIZE ulSize )         /* allocates fixed memory, returns NU
 {
    PHB_MEMINFO pMem;
 
-   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xalloc(%lu)", ulSize ) );
+   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xalloc(%" HB_PFS "u)", ulSize ) );
 
    if( ulSize == 0 )
       hb_errInternal( HB_EI_XALLOCNULLSIZE, NULL, NULL, NULL );
@@ -413,7 +413,7 @@ void * hb_xgrab( HB_SIZE ulSize )         /* allocates fixed memory, exits on fa
 {
    PHB_MEMINFO pMem;
 
-   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xgrab(%lu)", ulSize ) );
+   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xgrab(%" HB_PFS "u)", ulSize ) );
 
    if( ulSize == 0 )
       hb_errInternal( HB_EI_XGRABNULLSIZE, NULL, NULL, NULL );
@@ -508,7 +508,7 @@ void * hb_xrealloc( void * pMem, HB_SIZE ulSize )
 #else
 void * hb_xrealloc( void * pMem, HB_SIZE ulSize )       /* reallocates memory */
 {
-   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xrealloc(%p, %lu)", pMem, ulSize ) );
+   HB_TRACE_FM( HB_TR_DEBUG, ( "hb_xrealloc(%p, %" HB_PFS "u)", pMem, ulSize ) );
 
 #if 0
    /* disabled to make hb_xrealloc() ANSI-C realloc() compatible */
@@ -964,14 +964,14 @@ void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock, ++ui )
       {
-         HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %lu) %s(%i), \"%s\"", ui,
+         HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %" HB_PFS "u) %s(%i), \"%s\"", ui,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                   pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                                   hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                               HB_MIN(  pMemBlock->ulSize, HB_MAX_MEM2STR_BLOCK ) ) ) );
 
          if( hLog )
-            fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n", ui - 1,
+            fprintf( hLog, "Block %i %p (size %" HB_PFS "u) %s(%i), \"%s\"\n", ui - 1,
                      ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                      pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                      hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
@@ -1037,7 +1037,7 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, HB_SIZE ulLen )
    /* blocks overlapped? use memmove. */
    assert( pDestArg >= pSourceArg + ulLen || pSourceArg >= pDestArg + ulLen );
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_xmemcpy(%p, %p, %lu)", pDestArg, pSourceArg, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_xmemcpy(%p, %p, %" HB_PFS "u)", pDestArg, pSourceArg, ulLen ) );
 
    pDest       = ( BYTE * ) pDestArg;
    pSource     = ( BYTE * ) pSourceArg;
@@ -1075,7 +1075,7 @@ void * hb_xmemset( void * pDestArg, int iFill, HB_SIZE ulLen )
    assert( pDestArg != NULL );
    assert( ulLen > 0 );
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_xmemset(%p, %d, %lu)", pDestArg, iFill, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_xmemset(%p, %d, %" HB_PFS "u)", pDestArg, iFill, ulLen ) );
 
    pDest       = ( BYTE * ) pDestArg;
    ulRemaining = ulLen;
@@ -1313,7 +1313,7 @@ HB_SIZE hb_xquery( USHORT uiMode )
 
             for( ui = 1, pMemBlock = s_pFirstBlock; pMemBlock; pMemBlock = pMemBlock->pNextBlock, ++ui )
             {
-               TraceLog( NULL, "Block %i %p (size %lu) %s(%i), \"%s\"\n", ui,
+               TraceLog( NULL, "Block %i %p (size %" HB_PFS "u) %s(%i), \"%s\"\n", ui,
                          ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                          pMemBlock->ulSize, pMemBlock->szProcName, pMemBlock->uiProcLine,
                          hb_mem2str( membuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,  pMemBlock->ulSize ) );
