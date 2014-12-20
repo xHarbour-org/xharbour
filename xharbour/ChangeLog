@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-20 12:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  + contrib/gtwvw/samples/winuser.ch
+    ! added include file for wvwtest9.prg sample
+  ! contrib/gtwvw/samples/inpfocus.prg 
+    ! minor fix to link with newer gtwvw lib
+    
 2014-12-19 12:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * source/vm/fm.c
     ! changed fixed hb_sprintf format %lu with %" HB_PFS "u to make mingw happy

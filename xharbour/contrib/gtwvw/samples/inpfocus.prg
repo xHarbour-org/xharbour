@@ -83,7 +83,7 @@ local ldefault
 
    hWndTB := wvw_tbcreate(nWinNum, lDisplayText, NIL, nSysBitmap)
 
-   if hWndTB==0
+   if empty(hWndTB)
       wvw_messagebox(nWinNum, "FAILED to create toolbar", "Error", MB_OK+MB_ICONEXCLAMATION)
       return .f.
    endif
@@ -100,7 +100,7 @@ local ldefault
 
    wvw_sbdestroy(nWinNum)   //just in case
    hWndSB := wvw_sbcreate(nWinNum)
-   if hWndSB==0
+   if empty(hWndSB)
       wvw_messagebox(nWinNum, "FAILED to create statusbar", "Error", MB_OK+MB_ICONEXCLAMATION)
       return .f.
    endif
