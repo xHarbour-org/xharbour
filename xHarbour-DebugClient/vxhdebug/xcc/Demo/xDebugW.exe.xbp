@@ -38,6 +38,6 @@ MYRC_FLAGS =
 [vxhd.lib]
 [vxh.lib]
 [tproject.lib]
-[xEditVXH.lib]
+[Editor.lib]
 [ActiveX.lib]
 [Ole.Lib]
