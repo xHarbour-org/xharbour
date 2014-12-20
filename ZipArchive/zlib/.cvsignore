@@ -6,3 +6,5 @@ zlib.lib
 .DS_Store
 ._*
 ZLib.lib
+vc120.idb
+vc120.pdb

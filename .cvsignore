@@ -9,3 +9,5 @@ ZipArchive_STL.vcproj.*.user
 .DS_Store
 ._*
 ZipArchive.lib
+vc120.pdb
+vc120.idb
