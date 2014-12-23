@@ -107,7 +107,7 @@ FUNCTION NTOCOLOR( nColor, lChar )
 
 STATIC FUNCTION n2c( nColor )
 
-   SWITCH nColor
+   SWITCH INT( nColor )
    CASE 0
       RETURN "N"
    CASE 1

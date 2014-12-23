@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-23 22:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/ct/color.prg
+    ! Fix bug, thanks to Michael Hagl
+
 2014-12-23 21:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/harbour.c
   * source/compiler/harbour.sly
