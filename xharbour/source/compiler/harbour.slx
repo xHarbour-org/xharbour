@@ -98,14 +98,14 @@
 static int iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
 static unsigned char iIdentifier = 0;
-static char *sIdOnHold, *s_sLastBlock = NULL;
+static char *        sIdOnHold, * s_sLastBlock = NULL;
 
-//static char *sTextFunction, *sTextReset;
+//static char * sTextFunction, * sTextReset;
 
 char * hb_comp_SLX_LastBlock( BOOL bReset );
 
-static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * lVal, double * dVal, int * iDec, int * iWidth, BOOL* pbError );
-static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
+static int hb_comp_SLX_Str2Num( char * szNum, HB_LONG * lVal, double * dVal, int * iDec, int * iWidth, BOOL * pbError );
+static int hb_comp_SLX_ElementToken( char * szToken, unsigned int iTokenLen );
 static int hb_comp_SLX_InterceptAction( int iRet );
 static int hb_comp_SLX_CustomAction( int x );
 
@@ -234,7 +234,7 @@ SELF_CONTAINED_WORDS_ARE {
 /* KEYWORDS are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
 #define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, ENUM, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, NAMESPACE PARAMETERS, PROCEDURE, STATIC */
-#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDSWITCH, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
+#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDSWITCH, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY */
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH WITH_NAMESPACE */
 #define REJECT_OP        707
 
@@ -511,7 +511,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( REJECT_OP      , MODEQ       , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , ')'         , 0      , 0          ) PASS_THROUGH(),
                  /* IF_SEQUENCE_IS( REJECT_OP      , '('         , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( REJECT_OP      , '['         , 0      , 0          ) PASS_THROUGH(), DONT uncomment!!!*/
+                    IF_SEQUENCE_IS( REJECT_OP      , '['         , 0      , 0          ) PASS_THROUGH(), DONT uncomment!!! */
                     IF_SEQUENCE_IS( REJECT_OP      , '='         , 0      , 0          ) PASS_THROUGH(),
                  /* IF_SEQUENCE_IS( REJECT_OP      , ':'         , 0      , 0          ) PASS_THROUGH(), */
                     IF_SEQUENCE_IS( REJECT_OP      , 0           , 0      , 0          ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , 0             ),
@@ -632,7 +632,7 @@ LANGUAGE_RULES_ARE {
    #define STREAM_EXCEPTION( sPair, cChar ) \
               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
               aiHold[ iHold++ ] = '\n'; \
-              yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
+              hb_comp_yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
               aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ;
 
 #undef STREAM_APPEND
@@ -746,11 +746,11 @@ LANGUAGE_RULES_ARE {
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + 1; \
             iSize -= (unsigned int) ( s_szBuffer - szBuffer ); \
-            yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
-            yylval.valChar.length = iLen; \
-            yylval.valChar.dealloc = FALSE; \
+            hb_comp_yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
+            hb_comp_yylval.valChar.length = iLen; \
+            hb_comp_yylval.valChar.dealloc = FALSE; \
             \
-            /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
+            /* printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer ); */ \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE ; \
          } \
@@ -759,9 +759,9 @@ LANGUAGE_RULES_ARE {
             szBuffer--; \
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
-            yylval.valChar.string = hb_compIdentifierNew( szBuffer, TRUE ); \
-            yylval.valChar.length = (int) strlen( szBuffer ); \
-            yylval.valChar.dealloc = FALSE; \
+            hb_comp_yylval.valChar.string = hb_compIdentifierNew( szBuffer, TRUE ); \
+            hb_comp_yylval.valChar.length = (int) strlen( szBuffer ); \
+            hb_comp_yylval.valChar.dealloc = FALSE; \
             iSize = 0; \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
@@ -771,7 +771,7 @@ LANGUAGE_RULES_ARE {
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == SELF || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || \
                                    iLastToken == ')' || iLastToken == '}' || iLastToken == LITERAL || iLastToken == WANTS_EOL || iLastToken == WANTS_ID || \
-                                   iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || \
+                                   iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /* iLastToken == SELF || */ iLastToken == QSELF || \
                                    iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL /* || iLastToken == HB_TEXT */ )
 
 /* Support Functions. */
@@ -792,7 +792,7 @@ static int hb_comp_SLX_InterceptAction( int iRet )
             iIdentifier--;
          }
       }
-      else if( yylval.string == NULL )
+      else if( hb_comp_yylval.string == NULL )
       {
          //yytext = sToken;
          yyleng = (int) strlen( yytext );
@@ -812,19 +812,19 @@ static int hb_comp_SLX_InterceptAction( int iRet )
       else if( iRet == WANTS_VAR )
          { iRet = iWantsVAR; }
       else if( iRet == REJECT_OP )
-         { yylval.string = hb_compIdentifierNew( (char*) yytext, TRUE ); iRet = IDENTIFIER; }
+         { hb_comp_yylval.string = hb_compIdentifierNew( (char *) yytext, TRUE ); iRet = IDENTIFIER; }
       else
          { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, hb_comp_iLine - 1 ); hb_comp_iErrorCount++; }
    }
 
    #ifdef SHOW_LEX_TOKENS
-     if( iRet == IDENTIFIER )       { printf( "   IDENTIFIER = \"%s\"\n", yylval.string  ); }
-     else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\" (%d)\n", yylval.valChar.string, yylval.valChar.length  ); }
-     else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", yylval.string  ); }
-     else if( iRet == MACROTEXT )   { printf( "   MACROTEXT = \"%s\"\n", yylval.string  ); }
-     else if( iRet == NUM_INTEGER ) { printf( "   INTEGER = %i\n", yylval.valInteger.iNumber  ); }
-     else if( iRet == NUM_LONG )    { printf( "   INTEGER = %li\n", yylval.valLong.lNumber  ); }
-     else if( iRet == NUM_DOUBLE )  { printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  ); }
+     if( iRet == IDENTIFIER )       { printf( "   IDENTIFIER = \"%s\"\n", hb_comp_yylval.string  ); }
+     else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\" (%d)\n", hb_comp_yylval.valChar.string, hb_comp_yylval.valChar.length  ); }
+     else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", hb_comp_yylval.string  ); }
+     else if( iRet == MACROTEXT )   { printf( "   MACROTEXT = \"%s\"\n", hb_comp_yylval.string  ); }
+     else if( iRet == NUM_INTEGER ) { printf( "   INTEGER = %i\n", hb_comp_yylval.valInteger.iNumber  ); }
+     else if( iRet == NUM_LONG )    { printf( "   INTEGER = %li\n", hb_comp_yylval.valLong.lNumber  ); }
+     else if( iRet == NUM_DOUBLE )  { printf( "   DOUBLE = %f\n", hb_comp_yylval.valDouble.dNumber  ); }
      else if( iRet < 256 )
      {
         if( iRet == '\n' || iRet == ';' ) { printf( "***END LINE %i\n", hb_comp_iLine - 1  ); }
@@ -839,13 +839,13 @@ static int hb_comp_SLX_InterceptAction( int iRet )
    return iRet;
 }
 
-static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
+static int hb_comp_SLX_ElementToken( char * szToken, unsigned int iTokenLen )
 {
-   extern char *yytext;
-   extern int yyleng;
+   extern char * yytext;
+   extern int    yyleng;
 
-   char* tmpPtr;
-   int   iElement;
+   char * tmpPtr;
+   int    iElement;
 
    #if 0
    /*
@@ -924,7 +924,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                /* Remove the '&'. */
                yyleng--;
 
-               yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
+               hb_comp_yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
                iElement = MACROVAR;
             }
             else if( tmpPtr == yytext + yyleng - 1 )
@@ -935,7 +935,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yyleng -= 2;
                yytext[yyleng + 1] = '\0';
 
-               yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
+               hb_comp_yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
                iElement = MACROVAR;
             }
             else
@@ -943,7 +943,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                /*
                yytext = hb_compIdentifierNew( yytext, TRUE );
                */
-               yylval.string = hb_strdup( yytext );
+               hb_comp_yylval.string = hb_strdup( yytext );
                iElement = MACROTEXT;
             }
          }
@@ -952,7 +952,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             /*
             yytext = hb_compIdentifierNew( yytext, TRUE );
             */
-            yylval.string = hb_strdup( yytext );
+            hb_comp_yylval.string = hb_strdup( yytext );
             iElement = MACROTEXT;
          }
       }
@@ -984,7 +984,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
          {
             iIdentifier++;
             DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
-            yylval.string = hb_compIdentifierNew( yytext, TRUE );
+            hb_comp_yylval.string = hb_compIdentifierNew( yytext, TRUE );
             iElement = IDENTIFIER;
          }
       }
@@ -998,9 +998,9 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       int iDec, iWidth;
       BOOL bError = FALSE;
 
-      //yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
-      //yylval.string[0] = 0;
-      yylval.string = NULL;
+      //hb_comp_yylval.string = (char *) hb_xgrab( TOKEN_SIZE );
+      //hb_comp_yylval.string[0] = 0;
+      hb_comp_yylval.string = NULL;
 
       iElement = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth, &bError );
 
@@ -1011,21 +1011,21 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       }
       else if ( iElement == NUM_DOUBLE )
       {
-         yylval.valDouble.dNumber = dNumber;
-         yylval.valDouble.bDec = ( UCHAR ) iDec;
-         yylval.valDouble.bWidth = ( UCHAR ) iWidth;
-         yylval.valDouble.szValue = yytext;
+         hb_comp_yylval.valDouble.dNumber = dNumber;
+         hb_comp_yylval.valDouble.bDec = ( UCHAR ) iDec;
+         hb_comp_yylval.valDouble.bWidth = ( UCHAR ) iWidth;
+         hb_comp_yylval.valDouble.szValue = yytext;
       }
       else if( HB_LIM_INT16( lNumber ) )
       {
-         yylval.valInteger.iNumber = ( int ) lNumber;
-         yylval.valInteger.szValue = yytext;
+         hb_comp_yylval.valInteger.iNumber = ( int ) lNumber;
+         hb_comp_yylval.valInteger.szValue = yytext;
          iElement = NUM_INTEGER;
       }
       else
       {
-         yylval.valLong.lNumber = lNumber;
-         yylval.valLong.szValue = yytext;
+         hb_comp_yylval.valLong.lNumber = lNumber;
+         hb_comp_yylval.valLong.szValue = yytext;
       }
       iElement += DONT_REDUCE;
    }
@@ -1035,7 +1035,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iElement;
 }
 
-static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
+static int hb_comp_SLX_Str2Num( char * szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL * pbError )
 {
    BOOL fDbl;
 
@@ -1045,7 +1045,7 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 
 static int hb_comp_SLX_CustomAction( int x )
 {
-   char *pTmp;
+   char * pTmp;
 
    DEBUG_INFO( printf( "Custom Action for %i after: %i\n", x, iLastToken ) );
 
@@ -1061,7 +1061,7 @@ static int hb_comp_SLX_CustomAction( int x )
       }
       else
       {
-         yylval.string = hb_compIdentifierNew( sToken, TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( sToken, TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "HB_AFTER_EXP, Primary Identifier %s Increased to: %i\n", sToken, iIdentifier ) );
          return IDENTIFIER;
@@ -1093,14 +1093,14 @@ static int hb_comp_SLX_CustomAction( int x )
    {
       case HB_IDENTIFIER :
          bIgnoreWords = FALSE;
-         yylval.string = hb_compIdentifierNew( yytext, TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( yytext, TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_SELF :
          aiHold[ iHold++ ] = ':' + DONT_REDUCE ;
-         yylval.string = hb_compIdentifierNew( "SELF", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "SELF", TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "HB_SELF, Primary Identifier %s Increased to: %i\n", "SELF", iIdentifier ) );
          return IDENTIFIER;
@@ -1176,10 +1176,10 @@ static int hb_comp_SLX_CustomAction( int x )
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
-         yylval.valChar.string = (char *) hb_xgrab( iPairLen + 1 );
-         HB_MEMCPY( yylval.valChar.string, sPair, iPairLen + 1);
-         yylval.valChar.length = iPairLen;
-         yylval.valChar.dealloc = TRUE;
+         hb_comp_yylval.valChar.string = (char *) hb_xgrab( iPairLen + 1 );
+         HB_MEMCPY( hb_comp_yylval.valChar.string, sPair, iPairLen + 1);
+         hb_comp_yylval.valChar.length = iPairLen;
+         hb_comp_yylval.valChar.dealloc = TRUE;
          return LITERAL + DONT_REDUCE;
 
       case HB_INIT_PROC :
@@ -1261,7 +1261,7 @@ static int hb_comp_SLX_CustomAction( int x )
                }
                else
                {
-                  yylval.string = hb_compIdentifierNew( "IN", TRUE );
+                  hb_comp_yylval.string = hb_compIdentifierNew( "IN", TRUE );
                   iIdentifier++;
                   DEBUG_INFO( printf( "HB_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
                   return IDENTIFIER;
@@ -1302,7 +1302,7 @@ static int hb_comp_SLX_CustomAction( int x )
                IS_OP( iLastToken )
              )
            {
-              yylval.string = hb_compIdentifierNew( "IN", TRUE );
+              hb_comp_yylval.string = hb_compIdentifierNew( "IN", TRUE );
               iIdentifier++;
               DEBUG_INFO( printf( "HB_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
               return IDENTIFIER;
@@ -1320,7 +1320,7 @@ static int hb_comp_SLX_CustomAction( int x )
          }
          else
          {
-            yylval.string = hb_compIdentifierNew( "AM", TRUE );
+            hb_comp_yylval.string = hb_compIdentifierNew( "AM", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_H12AM, Primary Identifier %s Increased to: %i\n", "AM", iIdentifier ) );
             return IDENTIFIER;
@@ -1333,7 +1333,7 @@ static int hb_comp_SLX_CustomAction( int x )
          }
          else
          {
-            yylval.string = hb_compIdentifierNew( "PM", TRUE );
+            hb_comp_yylval.string = hb_compIdentifierNew( "PM", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_H12PM, Primary Identifier %s Increased to: %i\n", "PM", iIdentifier ) );
             return IDENTIFIER;
@@ -1348,7 +1348,7 @@ static int hb_comp_SLX_CustomAction( int x )
          }
          else
          {
-            yylval.string = hb_compIdentifierNew( "WITH", TRUE );
+            hb_comp_yylval.string = hb_compIdentifierNew( "WITH", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_WITH, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
             return IDENTIFIER;
@@ -1356,14 +1356,14 @@ static int hb_comp_SLX_CustomAction( int x )
 
       case _WITH_ID_CR :
          aiHold[ iHold++ ] = '\n' + DONT_REDUCE;
-         yylval.string = hb_compIdentifierNew( "WITH", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "WITH", TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "_WITH_ID_CR, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
 
       case _WITH_ID_SEMI :
          aiHold[ iHold++ ] = ';' + DONT_REDUCE;
-         yylval.string = hb_compIdentifierNew( "WITH", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "WITH", TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "_WITH_ID_SEMI, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
@@ -1371,20 +1371,20 @@ static int hb_comp_SLX_CustomAction( int x )
       case HB_DO_WHILE_ID :
          iIdentifier++;
          DEBUG_INFO( printf( "HB_DO_WHILE_ID, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
-         yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
          aiHold[ iHold++ ] = IDENTIFIER + DONT_REDUCE;
          return DO + DONT_REDUCE;
 
       case HB_DO_WHILE_WITH :
          aiHold[ iHold++ ] = WITH + DONT_REDUCE;
-         yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "WHILE", TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "HB_DO_WHILE_WITH, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
          aiHold[ iHold++ ] = IDENTIFIER + DONT_REDUCE;
          return DO + DONT_REDUCE;
 
       case HB_DO_CASE_ID :
-         yylval.string = hb_compIdentifierNew( "CASE", TRUE );
+         hb_comp_yylval.string = hb_compIdentifierNew( "CASE", TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "HB_DO_CASE_ID, Primary Identifier %s Increased to: %i\n", "CASE", iIdentifier ) );
          aiHold[ iHold++ ] = IDENTIFIER + DONT_REDUCE;
@@ -1395,7 +1395,7 @@ static int hb_comp_SLX_CustomAction( int x )
          return  0;
 
       case HB_ID_ON_HOLD :
-         yylval.string = sIdOnHold;
+         hb_comp_yylval.string = sIdOnHold;
          iIdentifier++;
          DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s - Increased to: %i\n", sIdOnHold, iIdentifier ) );
          return IDENTIFIER;
@@ -1420,22 +1420,18 @@ static int hb_comp_SLX_CustomAction( int x )
    return x;
 }
 
-int yy_lex_input( char **buffer )
+int yy_lex_input( char ** buffer )
 {
-   ULONG ulLen;
+   ULONG  ulLen;
    char * szLine;
 
    szLine = hb_pp_nextLine( hb_comp_PP, &ulLen );
    hb_comp_iLine++; //= hb_pp_line( hb_comp_PP ) + 1;
 
    if( szLine && ulLen )
-   {
       *buffer = szLine;
-   }
    else
-   {
       *buffer = NULL;
-   }
 
    //printf( "[%i]>%s<]\n", hb_comp_iLine, *buffer );
 
@@ -1450,13 +1446,11 @@ char * hb_comp_SLX_LastBlock( BOOL bReset )
    }
    else
    {
-      char *pTmp = (char *) s_sLastBlock + 1;
+      char * pTmp = (char *) s_sLastBlock + 1;
 
       /* Skip White Space. */
       while( isspace( (BYTE) *pTmp ) )
-      {
          pTmp++;
-      }
 
       *pTmp = '|';
 

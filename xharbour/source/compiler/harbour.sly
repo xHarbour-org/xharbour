@@ -1,3 +1,5 @@
+%name-prefix "hb_comp_yy"
+
 %{
 /*
  * $Id$
@@ -82,28 +84,26 @@
 #undef YYMALLOC
 #define YYMALLOC malloc
 
-extern FILE *yyin;      /* currently yacc parsed file */
-extern char *yytext;
+extern FILE * yyin;           /* currently yacc parsed file */
+extern char * yytext;
 
 #ifdef __cplusplus
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
-extern YY_BUFFER_STATE yy_create_buffer( FILE *, int ); /* yacc functions to manage multiple files */
-extern void yy_switch_to_buffer( YY_BUFFER_STATE ); /* yacc functions to manage multiple files */
-extern void yy_delete_buffer( YY_BUFFER_STATE ); /* yacc functions to manage multiple files */
+extern YY_BUFFER_STATE yy_create_buffer( FILE *, int );         /* yacc functions to manage multiple files */
+extern void            yy_switch_to_buffer( YY_BUFFER_STATE );  /* yacc functions to manage multiple files */
+extern void            yy_delete_buffer( YY_BUFFER_STATE );     /* yacc functions to manage multiple files */
+//extern "C" int yywrap( void );
 #else
-extern void * yy_create_buffer( FILE *, int ); /* yacc functions to manage multiple files */
-extern void yy_switch_to_buffer( void * ); /* yacc functions to manage multiple files */
-extern void yy_delete_buffer( void * ); /* yacc functions to manage multiple files */
+extern void * yy_create_buffer( FILE *, int );  /* yacc functions to manage multiple files */
+extern void   yy_switch_to_buffer( void * );    /* yacc functions to manage multiple files */
+extern void   yy_delete_buffer( void * );       /* yacc functions to manage multiple files */
+//extern int  yywrap( void );                   /* manages the EOF of current processed file */
 #endif
 
-/* lex & yacc related prototypes */
-extern int yyparse( void );    /* main yacc parsing function */
-extern void yyerror( char * ); /* parsing error management function */
-extern int yylex( void );      /* main lex token function, called by yyparse() */
 #ifdef __cplusplus
-extern "C" int yywrap( void );
+
 #else
-extern int yywrap( void );     /* manages the EOF of current processed file */
+
 #endif
 
 static void hb_compLoopStart( BOOL );
@@ -114,7 +114,7 @@ static void hb_compLoopExit( void );
 static void hb_compLoopHere( void );
 
 static void * hb_compElseIfGen( void * pFirstElseIf, HB_SIZE ulOffset ); /* generates a support structure for elseifs pcode fixups */
-static void hb_compElseIfFix( void * pIfElseIfs ); /* implements the ElseIfs pcode fixups */
+static void   hb_compElseIfFix( void * pIfElseIfs );                     /* implements the ElseIfs pcode fixups */
 
 static void hb_compRTVariableAdd( PHB_EXPR, BOOL );
 static void hb_compRTVariableGen( char * );
@@ -122,7 +122,7 @@ static void hb_compRTVariableGen( char * );
 static void hb_compVariableDim( char *, PHB_EXPR );
 
 #ifdef HARBOUR_YYDEBUG
-   #define YYDEBUG        1 /* Parser debug information support */
+   #define YYDEBUG        1             /* Parser debug information support */
 #endif
 
 typedef struct __ELSEIF
@@ -130,7 +130,7 @@ typedef struct __ELSEIF
    HB_SIZE ulOffset;
    struct __ELSEIF * pNext;
    struct __ELSEIF * pPrevGroup;
-} _ELSEIF, * PELSEIF;      /* support structure for else if pcode fixups */
+} _ELSEIF, * PELSEIF;                   /* support structure for else if pcode fixups */
 
 typedef struct _LOOPEXIT
 {
@@ -143,7 +143,7 @@ typedef struct _LOOPEXIT
    struct _LOOPEXIT * pLoopList;
    struct _LOOPEXIT * pExitList;
    struct _LOOPEXIT * pNext;
-} LOOPEXIT, * PTR_LOOPEXIT;  /* support structure for EXIT and LOOP statements */
+} LOOPEXIT, * PTR_LOOPEXIT;             /* support structure for EXIT and LOOP statements */
 
 typedef struct HB_RTVAR_
 {
@@ -151,18 +151,18 @@ typedef struct HB_RTVAR_
    BOOL               bPopValue;
    struct HB_RTVAR_ * pNext;
    struct HB_RTVAR_ * pPrev;
-} HB_RTVAR, * PHB_RTVAR;     /* support structure for PUBLIC and PRIVATE statements */
+} HB_RTVAR, * PHB_RTVAR;                /* support structure for PUBLIC and PRIVATE statements */
 
-USHORT hb_comp_wSeqCounter      = 0;
-USHORT hb_comp_wForCounter      = 0;
-USHORT hb_comp_wIfCounter       = 0;
-USHORT hb_comp_wWhileCounter    = 0;
-USHORT hb_comp_wCaseCounter     = 0;
-USHORT hb_comp_wWithObjCounter  = 0;
-USHORT hb_comp_wFinallyCounter  = 0;
+USHORT hb_comp_wSeqCounter     = 0;
+USHORT hb_comp_wForCounter     = 0;
+USHORT hb_comp_wIfCounter      = 0;
+USHORT hb_comp_wWhileCounter   = 0;
+USHORT hb_comp_wCaseCounter    = 0;
+USHORT hb_comp_wWithObjCounter = 0;
+USHORT hb_comp_wFinallyCounter = 0;
 
 HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
-USHORT hb_comp_wSwitchCounter   = 0;
+USHORT hb_comp_wSwitchCounter  = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
 
@@ -170,10 +170,10 @@ static PHB_RTVAR    hb_comp_rtvars   = NULL;
 static PTR_LOOPEXIT hb_comp_pLoops   = NULL;
 static PELSEIF      hb_comp_pElseIfs = NULL;
 
-static BOOL bTrancuateBaseArray = FALSE;
+static BOOL     bTrancuateBaseArray = FALSE;
 static PHB_EXPR pGetArgList, pBaseArrayName = NULL, pGetVarArray, pGetFunction;
 
-static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
+static BOOL     s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
 static PHB_EXPR pBlockSimple;
 
 static int s_iLastControlLine = 0, s_iControlLevel = 0;
@@ -188,10 +188,10 @@ BOOL   hb_comp_bVarParams = FALSE;
 
 typedef struct _LOCALPARAM
 {
-  char *szName;
-  char cType;
-  struct _LOCALPARAM *pNext;
-} LOCALPARAM, *PLOCALPARAM;
+  char *               szName;
+  char                 cType;
+  struct _LOCALPARAM * pNext;
+} LOCALPARAM, * PLOCALPARAM;
 
 PLOCALPARAM hb_comp_LocalParams = NULL;
 
@@ -205,33 +205,33 @@ PBLOCKSLIST hb_comp_BlocksList = NULL;
 
 static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 );
 
-static void hb_compDebugStart( void ) { };
+static void hb_compDebugStart( void ) {};
 
 %}
 
 %union                     /* special structure used by lex and yacc to share info */
 {
-   char *      string;     /* to hold a string returned by lex */
-   int         iNumber;    /* to hold a temporary integer number */
-   HB_LONG     lNumber;    /* to hold a temporary long number */
+   char *      string;     /* to hold a string returned by lex         */
+   int         iNumber;    /* to hold a temporary integer number       */
+   HB_LONG     lNumber;    /* to hold a temporary long number          */
    PHB_EXPR    asExpr;
-   void * pVoid;           /* to hold any memory structure we may need */
+   void *      pVoid;      /* to hold any memory structure we may need */
    struct
    {
-      int      iNumber;    /* to hold a number returned by lex */
+      int      iNumber;    /* to hold a number returned by lex         */
       char *   szValue;
    } valInteger;
    struct
    {
-      HB_LONG  lNumber;    /* to hold a long number returned by lex */
+      HB_LONG  lNumber;    /* to hold a long number returned by lex    */
       char *   szValue;
    } valLong;
    struct
    {
-      double   dNumber;    /* to hold a double number returned by lex */
+      double   dNumber;    /* to hold a double number returned by lex                     */
                            /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
-      UCHAR    bWidth;     /* to hold the width of the value */
-      UCHAR    bDec;       /* to hold the number of decimal points in the value */
+      UCHAR    bWidth;     /* to hold the width of the value                              */
+      UCHAR    bDec;       /* to hold the number of decimal points in the value           */
       char *   szValue;
    } valDouble;
    struct
@@ -241,6 +241,15 @@ static void hb_compDebugStart( void ) { };
       BOOL     dealloc;
    } valChar;
 };
+
+%{
+/* This must be placed after the above union - the union is
+ * typedef-ined to YYSTYPE
+ */
+extern int  yylex( void );       /* main lex token function, called by yyparse() */
+extern void yyerror( char * );   /* parsing error management function */
+%}
+
 
 %token FUNCTION PROCEDURE IDENTIFIER RETURN NIL NUM_DOUBLE INASSIGN NUM_INTEGER NUM_LONG
 %token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE NULLVALUE
@@ -267,17 +276,17 @@ static void hb_compDebugStart( void ) { };
 %token NAMESPACE RUNTIME_NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE EXTERNAL_NAMESPACE_MEMBER IMPLEMENTS_NAMESPACE
 %token DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
 
-/*the lowest precedence*/
-/*postincrement and postdecrement*/
+/* the lowest precedence */
+/* postincrement and postdecrement */
 %left  POST
 
-/*assigment - from right to left*/
+/* assigment - from right to left */
 %right INASSIGN
 %right PLUSEQ MINUSEQ
 %right MULTEQ DIVEQ MODEQ
 %right EXPEQ
 
-/*logical operators*/
+/* logical operators */
 %right OR
 %right AND
 %right NOT
@@ -287,24 +296,24 @@ static void hb_compDebugStart( void ) { };
 %right BITXOR
 %right BITAND
 
-/*relational operators*/
+/* relational operators */
 %right '=' EQ NE1 NE2
 %right '<' '>' LE GE '$' LIKE MATCH
 
 /* Bit shift */
 %right BITSHIFTR BITSHIFTL
 
-/*mathematical operators*/
+/* mathematical operators */
 %right  '+' '-'
 %right  '*' '/' '%'
 %right  POWER
 %right  UNARY
-/*preincrement and predecrement*/
+/* preincrement and predecrement */
 %right  PRE
-/*special operators*/
-%right  ALIASOP '&' '@'
-%right  '\n' ';' ','
-/*the highest precedence*/
+/* special operators */
+/* %right  ALIASOP '&' '@' */
+/* %right  '\n' ';' ',' */
+/* the highest precedence */
 
 %type <string>  IdentName IDENTIFIER MACROVAR MACROTEXT CompTimeStr
 %type <valChar> LITERAL
@@ -364,8 +373,8 @@ static void hb_compDebugStart( void ) { };
 
 %%
 
-Main       : { hb_compLinePush(); } Source       { }
-           | /* empty file */
+Main       : { hb_compLinePush(); } Source       {}
+           | %empty
            ;
 
 Source     : Crlf
@@ -520,7 +529,7 @@ Function   : FunScope FUNCTION  IdentName
              }
            ;
 
-FunScope   :                  { $$ = HB_FS_PUBLIC; }
+FunScope   : %empty           { $$ = HB_FS_PUBLIC; }
            | STATIC           { $$ = HB_FS_STATIC; }
            | UTILITY          { $$ = ( HB_FS_UTILITY | HB_FS_PUBLIC ); }
            | UTILITY STATIC   { $$ = ( HB_FS_UTILITY | HB_FS_STATIC ); }
@@ -530,13 +539,13 @@ FunScope   :                  { $$ = HB_FS_PUBLIC; }
            | CRITICAL_STATIC  { $$ = ( HB_FS_CRITICAL | HB_FS_STATIC ); }
            ;
 
-Params     :
+Params     : %empty
            | '(' ')'
            | '(' { hb_comp_iVarScope = VS_PARAMETER; } ParamList ')'
            | '(' EPSILON ')'                                         { hb_comp_bVarParams = TRUE; }
            ;
 
-AsType     : /* not specified */           { hb_comp_cVarType = ' '; }
+AsType     : %empty                        { hb_comp_cVarType = ' '; }
            | StrongType
            ;
 
@@ -585,7 +594,7 @@ ParamList  : IdentName AsType                {
                                              }
            ;
 
-ImplementsNamespace : /* Empty */                    { $$ = NULL; }
+ImplementsNamespace : %empty                         { $$ = NULL; }
                     | IMPLEMENTS_NAMESPACE IdentName
                                                      {
                                                        PNAMESPACE pNamespace;
@@ -610,11 +619,11 @@ ImplementsNamespace : /* Empty */                    { $$ = NULL; }
                     ;
 
 /* NOTE: This allows the use of Expression as a statement.
- *    The Expression is validated later in reduction phase of
- *    hb_compExprGenStatement(). With this solution we don't have to
- *    stop compilation if invalid syntax will be used.
+ *       The Expression is validated later in reduction phase of
+ *       hb_compExprGenStatement(). With this solution we don't have to
+ *       stop compilation if invalid syntax will be used.
  */
-Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
+Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   {}
            | WithObject CrlfStmnt   {}
            | FunCall CrlfStmnt      { hb_compExprDelete( hb_compExprGenStatement( $1 ) ); }
            | AliasExpr CrlfStmnt    { hb_compExprDelete( hb_compExprGenStatement( $1 ) ); }
@@ -624,12 +633,12 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                                          hb_compExprDelete( hb_compExprGenStatement( $1 ) );
                                       else
                                          hb_compExprDelete( hb_compErrorSyntax( $1 ) );
-                                     }
+                                    }
            | MacroExpr CrlfStmnt    { if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) )
                                          hb_compExprDelete( hb_compExprGenStatement( $1 ) );
                                       else
                                          hb_compExprDelete( hb_compErrorSyntax( $1 ) );
-                                     }
+                                    }
            | PareExpList CrlfStmnt  { hb_compExprDelete( hb_compExprGenStatement( $1 ) ); }
            | ExprPreOp CrlfStmnt    { hb_compExprDelete( hb_compExprGenStatement( $1 ) ); }
            | ExprPostOp CrlfStmnt   { hb_compExprDelete( hb_compExprGenStatement( $1 ) ); }
@@ -652,7 +661,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         }
                         hb_compGenPCode1( HB_P_ENDPROC );
                         if( (hb_comp_functions.pLast->bFlags & FUN_PROCEDURE) == 0 )
-                        { /* return from a function without a return value */
+                        {  /* return from a function without a return value */
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NO_RETURN_VALUE, NULL, NULL );
                         }
                         hb_comp_functions.pLast->bFlags |= FUN_WITH_RETURN;
@@ -675,7 +684,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         hb_compGenPCode2( HB_P_RETVALUE, HB_P_ENDPROC, ( BOOL ) 1 );
 
                         if( hb_comp_functions.pLast->bFlags & FUN_PROCEDURE )
-                        { /* procedure returns a value */
+                        {  /* procedure returns a value */
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_PROC_RETURN_VALUE, NULL, NULL );
                         }
 
@@ -697,8 +706,8 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                                   if( hb_comp_szAnnounce == NULL )
                                   {
                                      /* check for reserved name
-                                     * NOTE: Clipper doesn't check for it
-                                     */
+                                      * NOTE: Clipper doesn't check for it
+                                      */
                                      char * szFunction = hb_compReservedName( $2 );
 
                                      if( szFunction )
@@ -741,25 +750,25 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
              }
            ;
 
-DivertFlags: /* No Flags */ { $$ = hb_compExprNewLong(0); }
-           | FLAGS Expression { $$ = $2; }
+DivertFlags: %empty            { $$ = hb_compExprNewLong(0); }
+           | FLAGS Expression  { $$ = $2; }
            ;
 
 CrlfStmnt  : { hb_compLinePushIfInside(); } Crlf
            ;
 
-LineStat   : Crlf          { $<lNumber>$ = 0; }
-           | Line          { $<lNumber>$ = 0; }
-           | Statement     { $<lNumber>$ = 1; }
-           | Declaration   { $<lNumber>$ = 1; }
-           | ControlError  { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
+LineStat   : Crlf              { $<lNumber>$ = 0; }
+           | Line              { $<lNumber>$ = 0; }
+           | Statement         { $<lNumber>$ = 1; }
+           | Declaration       { $<lNumber>$ = 1; }
+           | ControlError      { char LineAsString[32]; hb_snprintf( LineAsString, sizeof( LineAsString ), "at line %i", s_iLastControlLine - 1 ); hb_compYYError( 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
            ;
 
 ControlError : FunScope2 FUNCTION  IdentName Params Crlf {}
              | FunScope2 PROCEDURE IdentName Params Crlf {}
              ;
 
-FunScope2  :
+FunScope2  : %empty
            | STATIC
            | INIT
            | EXIT
@@ -767,41 +776,43 @@ FunScope2  :
            | CRITICAL_STATIC
            ;
 
-Statements : LineStat                  { $<lNumber>$ = $<lNumber>1; }
-           | Statements LineStat       { $<lNumber>$ += $<lNumber>2; }
+Statements : LineStat                 { $<lNumber>$ = $<lNumber>1; }
+           | Statements LineStat      { $<lNumber>$ += $<lNumber>2; }
            ;
 
-ExtList    : IdentName                      { hb_compExternAdd( $1, NULL, (HB_SYMBOLSCOPE) 0 ); }
-           | NamespacePath IdentName        { hb_compExternAdd( $2, $1, (HB_SYMBOLSCOPE) 0 ); }
-           | ExtList ',' IdentName          { hb_compExternAdd( $3, NULL, (HB_SYMBOLSCOPE) 0 ); }
+ExtList    : IdentName                { hb_compExternAdd( $1, NULL, (HB_SYMBOLSCOPE) 0 ); }
+           | NamespacePath IdentName  { hb_compExternAdd( $2, $1,   (HB_SYMBOLSCOPE) 0 ); }
+           | ExtList ',' IdentName    { hb_compExternAdd( $3, NULL, (HB_SYMBOLSCOPE) 0 ); }
            | ExtList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, (HB_SYMBOLSCOPE) 0 ); }
            ;
 
 DynList    : IdentName                           { hb_compExternAdd( $1, NULL, HB_FS_DEFERRED ); }
-           | NamespacePath IdentName             { hb_compExternAdd( $2, $1, HB_FS_DEFERRED ); }
+           | NamespacePath IdentName             { hb_compExternAdd( $2, $1,   HB_FS_DEFERRED ); }
            | DynList ',' IdentName               { hb_compExternAdd( $3, NULL, HB_FS_DEFERRED ); }
-           | DynList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, HB_FS_DEFERRED ); }
+           | DynList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3,   HB_FS_DEFERRED ); }
            ;
 
-IdentName  : IDENTIFIER       { $$ = $1; }
+IdentName  : IDENTIFIER               { $$ = $1; }
            ;
 
 /* Numeric values
  */
-NumValue   : NUM_DOUBLE          { $$ = hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ); }
-           | NUM_INTEGER         { $$ = hb_compExprNewLong( $1.iNumber ); }
-           | NUM_LONG            { $$ = hb_compExprNewLong( $1.lNumber ); }
+NumValue   : NUM_DOUBLE               { $$ = hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ); }
+           | NUM_INTEGER              { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | NUM_LONG                 { $$ = hb_compExprNewLong( $1.lNumber ); }
            ;
 
-NumAlias   : NUM_INTEGER  ALIASOP      { $$ = hb_compExprNewLong( $1.iNumber ); }
-           | NUM_LONG     ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
-           | NUM_DOUBLE   ALIASOP      { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
+NumAlias   : NUM_INTEGER  ALIASOP     { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | NUM_LONG     ALIASOP     { $$ = hb_compExprNewLong( $1.lNumber ); }
+           | NUM_DOUBLE   ALIASOP     { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
            ;
 
 /* NULL flag
+ */
+/*
+NullValue  : NULLVALUE                { $$ = hb_compExprNewNull(); }
+           ;
 */
-//NullValue  : NULLVALUE                { $$ = hb_compExprNewNull(); }
-//;
 
 /* NIL value
  */
@@ -834,30 +845,30 @@ LiteralValue : LITERAL                {
                                       }
              ;
 
-LiteralAlias : LiteralValue ALIASOP       { $$ = $1; }
+LiteralAlias : LiteralValue ALIASOP   { $$ = $1; }
              ;
 
 /* Codeblock value
  */
-CodeBlockAlias : CodeBlock ALIASOP     { $$ = $1; }
-;
+CodeBlockAlias : CodeBlock ALIASOP    { $$ = $1; }
+               ;
 
 /* Logical value
  */
-Logical    : TRUEVALUE                    { $$ = hb_compExprNewLogical( TRUE ); }
-           | FALSEVALUE                   { $$ = hb_compExprNewLogical( FALSE ); }
+Logical    : TRUEVALUE                { $$ = hb_compExprNewLogical( TRUE ); }
+           | FALSEVALUE               { $$ = hb_compExprNewLogical( FALSE ); }
            ;
 
-LogicalAlias : Logical ALIASOP      { $$ = $1; }
-;
+LogicalAlias : Logical ALIASOP        { $$ = $1; }
+             ;
 
 /* SELF value and expressions
  */
-SelfValue  : SELF             { $$ = hb_compExprNewSelf(); }
-;
+SelfValue  : SELF                     { $$ = hb_compExprNewSelf(); }
+           ;
 
-SelfAlias  : SelfValue ALIASOP         { $$ = $1; }
-;
+SelfAlias  : SelfValue ALIASOP        { $$ = $1; }
+           ;
 
 /* Literal date, time & datetime
  */
@@ -870,7 +881,7 @@ Date       : '{' POWER NumValue '/' NumValue '/' NumValue '}'
            ;
 
 DateAlias  : Date ALIASOP         { $$ = $1; }
-;
+           ;
 
 DateTime   : '{' POWER NumValue '/' NumValue '/' NumValue NumValue ':' NumValue ':' NumValue '}'
                               { int iOk = 0;
@@ -1019,7 +1030,7 @@ DateTime   : '{' POWER NumValue '/' NumValue '/' NumValue NumValue ':' NumValue 
 ;
 
 DateTimeAlias : DateTime ALIASOP         { $$ = $1; }
-;
+              ;
 
 
 /* Literal array
@@ -1036,16 +1047,16 @@ HashList   : /* nothing => nil */ HASHOP /* nothing => nil */    { $$ = NULL; }
            ;
 
 ArrayAlias  : Array ALIASOP            { $$ = $1; }
-;
+            ;
 
 /* Literal array access
  */
 ArrayAt     : Array ArrayIndex        { $$ = $2; }
             | LiteralValue ArrayIndex { $$ = $2; }
-;
+            ;
 
 ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
-;
+             ;
 
 /* Variables
  */
@@ -1079,7 +1090,7 @@ Variable    : IdentName         {
 ;
 
 VarAlias    : IdentName ALIASOP      { $$ = hb_compExprNewAlias( $1 ); }
-;
+            ;
 
 /* Macro variables
  */
@@ -1209,16 +1220,16 @@ MacroText   : MACROTEXT {
                          }
             ;
 
-MacroVarAlias  : MacroVar ALIASOP   { $$ = $1; }
-;
+MacroVarAlias : MacroVar ALIASOP   { $$ = $1; }
+              ;
 
 /* Macro expressions
  */
 MacroExpr  : '&' PareExpList       { $$ = hb_compExprNewMacro( $2, 0, NULL ); }
-;
+           ;
 
 MacroExprAlias : MacroExpr ALIASOP     { $$ = $1; }
-;
+               ;
 
 /* Aliased variables
  */
@@ -1310,8 +1321,7 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             ;
 
 VariableAtAlias : VariableAt ALIASOP      { $$ = $1; }
-;
-
+                ;
 
 NamespacePath : NamespaceName '.'           { $$ = $1; }
               | NamespacePath IdentName '.' { /* IdentName not NamespaceName is intentional - we don't want Global -> except when 1st! */
@@ -1328,7 +1338,7 @@ NamespacePath : NamespaceName '.'           { $$ = $1; }
                                                  $$ = hb_compIdentifierNew( szNamespace, FALSE );
                                               }
                                             }
-           ;
+              ;
 
 /* Function call
  */
@@ -1420,7 +1430,7 @@ DummyArgument : EmptyExpression                    { hb_compExprDelete($1); }
               ;
 
 FunCallAlias : FunCall ALIASOP        { $$ = $1; }
-;
+             ;
 
 /* Object's instance variable
  */
@@ -1464,14 +1474,13 @@ WithData    : ':' SendId                 {
                                             }
                                             $$ = hb_compExprNewWithSendExp( $2 );
                                          }
-           ;
+            ;
 
 ObjectDataAlias : ObjectData ALIASOP     { $$ = $1; }
                 ;
 
 /* Object's method
  */
-
 ObjectMethod : ObjectData '(' ArgList ')'    { $$ = hb_compExprNewMethodCall( $1, $3 ); }
              ;
 
@@ -1485,7 +1494,7 @@ WithMethod   : WithData '(' ArgList ')'  {
              ;
 
 ObjectMethodAlias : ObjectMethod ALIASOP        { $$ = $1; }
-;
+                  ;
 
 /* NOTE: We have to distinguish IdentName here because it is repeated
  * in DoArgument (a part of DO <proc> WITH .. statement)
@@ -1530,25 +1539,25 @@ SimpleExpression :
            | ExprRelation                     { $$ = $1; }
            ;
 
-Expression : Variable         { $$ = $1; }
-           | SimpleExpression { $$ = $1; }
-           | PareExpList      { $$ = $1; }
-           | Variable         { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
-           | PareExpList      { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
+Expression : Variable          { $$ = $1; }
+           | SimpleExpression  { $$ = $1; }
+           | PareExpList       { $$ = $1; }
+           | Variable          { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
+           | PareExpList       { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            ;
 
-EmptyExpression: /* nothing => nil */        { $$ = hb_compExprNewEmpty(); }
-           | Expression
-           ;
+EmptyExpression : %empty       { $$ = hb_compExprNewEmpty(); }
+                | Expression
+                ;
 
-LValue      : IdentName                     { $$ = hb_compExprNewVar( $1 ); }
+LValue      : IdentName        { $$ = hb_compExprNewVar( $1 ); }
             | AliasVar
             | MacroVar
             | MacroExpr
             | ObjectData
             | WithData
             | VariableAt
-            | PareExpList        { $$ = hb_compExprListStrip( $1, NULL ); }
+            | PareExpList      { $$ = hb_compExprListStrip( $1, NULL ); }
             ;
 
 /* NOTE: PostOp can be used in one context only - it uses $0 rule
@@ -1838,11 +1847,11 @@ ExprRelation: Expression EQ    Expression  { $$ = hb_compExprSetOperand( hb_comp
             | Expression MATCH Expression  { $$ = hb_compExprSetOperand( hb_compExprNewMatch( $1 ), $3 ); }
             ;
 
-ArrayIndex : IndexList ']'                   { $$ = $1; }
-           ;
+ArrayIndex  : IndexList ']'                { $$ = $1; }
+            ;
 
 /* NOTE: $0 represents the expression before ArrayIndex
- *    Don't use ArrayIndex in other context than as an array index!
+ *       Don't use ArrayIndex in other context than as an array index!
  */
 IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr>0, $2 ); }
            | IndexList ',' Expression     { $$ = hb_compExprNewArrayAt( $1, $3 ); }
@@ -1966,7 +1975,7 @@ Get        : _Get_ LValue ','
                }
 
              EmptyExpression
-               { /* $6 */
+               {  /* $6 */
                   PHB_EXPR pVarName;
 
                   switch( $2->ExprType )
@@ -1991,8 +2000,8 @@ Get        : _Get_ LValue ','
                         else
                         {
                            /*
-                              Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
-                              hb_compYYError( 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
+                            * Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
+                            * hb_compYYError( 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
                             */
                            pVarName = hb_compExprClone( $5 );
                         }
@@ -2032,17 +2041,17 @@ Get        : _Get_ LValue ','
 
              ',' EmptyExpression
                { /* $9 */
-                  hb_compExprAddListExpr( pGetArgList, $8 ); /* Picture    */
+                  hb_compExprAddListExpr( pGetArgList, $8 );       /* Picture    */
                }
 
              ',' EmptyExpression
                { /* $12 */
-                  hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */
+                  hb_compExprAddListExpr( pGetArgList, $11 );      /* ValidBlock */
                }
 
              ',' EmptyExpression
                { /* $15 */
-                  hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */
+                  hb_compExprAddListExpr( pGetArgList, $14 );      /* WhenBlock  */
 
                   if( pGetVarArray )
                   {
@@ -2069,7 +2078,7 @@ Get        : _Get_ LValue ','
                }
 
              GetAExt ')'
-               { /* $17 */
+               {  /* $17 */
                   if( pGetFunction == NULL )
                   {
                      pGetFunction = hb_compExprNewFunName( hb_compExpr_IDs.__GET );
@@ -2091,7 +2100,7 @@ GetArgList : Argument                     { $$ = hb_compExprAddListExpr( pGetArg
            | GetArgList ',' Argument      { $$ = hb_compExprAddListExpr( pGetArgList, $3 ); }
            ;
 
-GetAExt    : { /* Nothing*/ }
+GetAExt    : %empty                       {}
            | ',' GetArgList
            ;
 
@@ -2195,7 +2204,7 @@ CodeBlock2  : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAME
                }
             ;
 
-ExtBlockParams : /* empty list */
+ExtBlockParams : %empty
                | ParamList
                  {
                    while( hb_comp_LocalParams )
@@ -2219,9 +2228,8 @@ BlockExpList : Expression                  { pBlockSimple = $1;   $$ = hb_compEx
 /* NOTE: This is really not needed however it allows the use of $-2 item
  * in BlockExpList to refer the same rule defined in Codeblock
  */
-
 BlockVarList : IdentName AsType                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1,    hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-             |                                    { hb_comp_iVarScope = VS_LOCAL;
+             | %empty                             { hb_comp_iVarScope = VS_LOCAL;
                                                     $$ = hb_compExprCBVarAdd( $<asExpr>0, NULL, hb_comp_cVarType );
                                                     hb_comp_cVarType = ' ';
                                                   }
@@ -2255,16 +2263,16 @@ PareExpList : PareExpList1        { $$ = $1; }
             ;
 
 PareExpListAlias : PareExpList ALIASOP     { $$ = $1; }
-;
+                 ;
 
 ExpList1   : '(' Argument    { $$ = hb_compExprNewList( $2 ); }
-;
+           ;
 
 ExpList2   : ExpList1 ',' Argument    { $$ = hb_compExprAddListExpr( $1, $3 ); }
-;
+           ;
 
 ExpList3   : ExpList2 ',' Argument    { $$ = hb_compExprAddListExpr( $1, $3 ); }
-;
+           ;
 
 ExpList    : ExpList3 ',' Argument { $$ = hb_compExprAddListExpr( $1, $3 ); }
            | ExpList  ',' Argument { $$ = hb_compExprAddListExpr( $1, $3 ); }
@@ -2327,7 +2335,8 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                   {
                      /* hb_comp_pGlobals can be NULL after a "Misplaced GLOBAL"
                       * error in hb_compVariableAdd() call above.
-                      * hb_compGenGlobalName() does not expect such situation */
+                      * hb_compGenGlobalName() does not expect such situation
+                      */
                      if( hb_comp_pGlobals )
                      {
                         hb_compGlobalsDefStart();   /* switch to globals pcode buffer */
@@ -2529,7 +2538,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
              }
            ;
 
-DecList    : /* Nothing */ {}
+DecList    : %empty            {}
            | FormalList
            | OptList
            | FormalList ',' OptList
@@ -2574,32 +2583,32 @@ IfEndif    : IfBegin EndIf                    { hb_compGenJumpHere( $1 ); s_iCon
            | IfBegin IfElseIf IfElse EndIf    { hb_compGenJumpHere( $1 ); hb_compElseIfFix( $2 ); s_iControlLevel--; }
            ;
 
-EmptyStats : /* empty */           { $<lNumber>$ = 0; }
-           | Statements       { $<lNumber>$ = $<lNumber>1; }
+EmptyStats : %empty        { $<lNumber>$ = 0; }
+           | Statements    { $<lNumber>$ = $<lNumber>1; }
            ;
 
 IfBegin    : IF Expression {
-                              ++hb_comp_wIfCounter; hb_compLinePush();
+                             ++hb_comp_wIfCounter; hb_compLinePush();
 
-                              if( s_iControlLevel++ == 0 )
-                              {
-                                 s_iLastControlLine = hb_comp_iLine ;
-                              }
+                             if( s_iControlLevel++ == 0 )
+                             {
+                                s_iLastControlLine = hb_comp_iLine ;
+                             }
                            }
              Crlf
                            {
-                              hb_compExprDelete( hb_compExprGenPush( $2 ) ); $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
+                             hb_compExprDelete( hb_compExprGenPush( $2 ) ); $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                            }
              EmptyStats
                            { $$ = (int) hb_compGenJump( 0 ); hb_compGenJumpHere( $<iNumber>5 ); }
            ;
 
-IfElse     : ELSE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
+IfElse     : ELSE Crlf { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; }
                 EmptyStats
            ;
 
-IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
-                { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
+                { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( $3 ) );
                   $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                 }
@@ -2608,8 +2617,8 @@ IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_co
                   hb_compGenJumpHere( $<iNumber>5 );
                 }
 
-           | IfElseIf ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
-                { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+           | IfElseIf ELSEIF { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; hb_compLinePush(); } Expression Crlf
+                { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   hb_compExprDelete( hb_compExprGenPush( $4 ) );
                   $<iNumber>$ = (int) hb_compGenJumpFalse( 0 );
                 }
@@ -2619,8 +2628,8 @@ IfElseIf   : ELSEIF { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; hb_co
                 }
            ;
 
-EndIf      : ENDIF    { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE ); }
-           | END      { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE ); }
+EndIf      : ENDIF    { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE ); }
+           | END      { --hb_comp_wIfCounter; hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE ); }
            ;
 
 DoCase     : DoCaseBegin
@@ -2643,13 +2652,13 @@ DoCase     : DoCaseBegin
 EndCase    : ENDCASE
                      {
                         --hb_comp_wCaseCounter;
-                        hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                        hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
                         s_iControlLevel--;
                      }
            | END
                      {
                         --hb_comp_wCaseCounter;
-                        hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                        hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
                         s_iControlLevel--;
                      }
            ;
@@ -2667,13 +2676,13 @@ DoCaseStart : DOCASE {
               Crlf
             ;
 
-DoCaseBegin : DoCaseStart            { }
+DoCaseBegin : DoCaseStart            {}
             | DoCaseStart Statements {
-                        if( $<lNumber>2 > 0 )
-                        {
-                           hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
-                        }
-                     }
+                                        if( $<lNumber>2 > 0 )
+                                        {
+                                           hb_compYYError( 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL );
+                                        }
+                                     }
            ;
 
 Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expression Crlf
@@ -2683,7 +2692,7 @@ Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expres
                }
              EmptyStats
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $$ = hb_compElseIfGen( 0, hb_compGenJump( 0 ) );
                   hb_compGenJumpHere( $<iNumber>5 );
                }
@@ -2695,7 +2704,7 @@ Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expres
                }
              EmptyStats
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $$ = hb_compElseIfGen( $1, hb_compGenJump( 0 ) );
                   hb_compGenJumpHere( $<iNumber>6 );
                }
@@ -2703,7 +2712,7 @@ Cases      : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Expres
 
 Otherwise  : OTHERWISE { hb_compLinePushIfDebugger(); } Crlf
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   hb_comp_bDontGenLineNum = FALSE;
                }
 
@@ -2743,16 +2752,16 @@ EndSwitch  : EndSwitchID
                      LONG lOffset;
 
                      /*
-                        We must REMOVE the unconditional JUMP instruction at the end of the preceding
-                        CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
+                      * We must REMOVE the unconditional JUMP instruction at the end of the preceding
+                      * CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
                       */
                      hb_comp_functions.pLast->lPCodePos -= 4;
                      hb_comp_functions.pLast->iJumps--;
                      hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter ] = 0;
 
                      /*
-                        We must RE-correct the prior CASE Jump, since we removed 4 bytes.
-                        $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
+                      * We must RE-correct the prior CASE Jump, since we removed 4 bytes.
+                      * $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
                       */
                      switch( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 - 1 ) ] )
                      {
@@ -2778,7 +2787,7 @@ EndSwitch  : EndSwitchID
                      }
                   }
 
-                  hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                  hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
 
                   s_iControlLevel--;
                }
@@ -2803,7 +2812,7 @@ SwitchBegin : SWITCH Expression {  hb_comp_bDontGenLineNum = FALSE; hb_compLineP
                WhiteSpace
             ;
 
-WhiteSpace : /* Empty */
+WhiteSpace : %empty
            | EmptyLines
            ;
 
@@ -2821,7 +2830,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
                }
              EmptyStats
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
 
                   //$$ = hb_compElseIfGen( 0, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
 
@@ -2846,7 +2855,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
                }
              EmptyStats
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
 
                   //$$ = hb_compElseIfGen( $1, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
 
@@ -2905,16 +2914,16 @@ Default    : DEFAULT
                      LONG lOffset;
 
                      /*
-                        We must REMOVE the unconditional JUMP instruction at the end of the preceding
-                        CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
+                      * We must REMOVE the unconditional JUMP instruction at the end of the preceding
+                      * CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
                       */
                      hb_comp_functions.pLast->lPCodePos -= 4;
                      hb_comp_functions.pLast->iJumps--;
                      hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = 0;
 
                      /*
-                        We must RE-correct the prior CASE Jump, since we removed 4 bytes.
-                        $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
+                      * We must RE-correct the prior CASE Jump, since we removed 4 bytes.
+                      * $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
                       */
                      switch( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 - 1 ) ] )
                      {
@@ -2954,7 +2963,7 @@ Default    : DEFAULT
                      hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = 0;
                   }
 
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   */
                }
            ;
@@ -2985,7 +2994,7 @@ DoWhile    : WhileBegin Expression Crlf
                   }
                   --hb_comp_wWhileCounter;
                   hb_compLoopEnd();
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_WITH_RETURN;
                 }
            ;
 
@@ -3002,30 +3011,30 @@ WhileBegin : WHILE {
                    }
            ;
 
-EndWhile   : END   { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; s_iControlLevel--; }
-           | ENDDO { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; s_iControlLevel--; }
+EndWhile   : END   { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; s_iControlLevel--; }
+           | ENDDO { hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; s_iControlLevel--; }
            ;
 
-ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
+ForNext    : FOR LValue ForAssign Expression                         /* 1  2  3  4 */
                {
                   hb_compLinePush();
                   hb_compDebugStart();
-                  ++hb_comp_wForCounter;              /* 5 */
+                  ++hb_comp_wForCounter;                             /* 5 */
                   $<asExpr>$ = hb_compExprGenStatement( hb_compExprAssign( hb_compExprClone( $2 ), $4 ) );
                }
-             TO Expression StepExpr                   /* 6  7  8 */
+             TO Expression StepExpr                                  /* 6  7  8 */
                {
                   hb_compLoopStart( TRUE );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 9 */
-                  $2 = hb_compExprGenPush( $2 );              /* counter */
-                  $7 = hb_compExprGenPush( $7 );              /* end */
+                  $2 = hb_compExprGenPush( $2 );                     /* counter */
+                  $7 = hb_compExprGenPush( $7 );                     /* end */
 
                   if( $<asExpr>8 )
                   {
-                     $<asExpr>8 = hb_compExprGenPush( $<asExpr>8 );   /* step */
+                     $<asExpr>8 = hb_compExprGenPush( $<asExpr>8 );  /* step */
                   }
                }
-             Crlf                                     /* 10 */
+             Crlf                                                    /* 10 */
                {
                   if( $<asExpr>8 )
                   {
@@ -3036,14 +3045,14 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                      hb_compGenPCode1( HB_P_LESSEQUAL );
                   }
 
-                  $<lNumber>$ = hb_compGenJumpFalse( 0 );   /* 11 */
+                  $<lNumber>$ = hb_compGenJumpFalse( 0 );            /* 11 */
 
                   if( s_iControlLevel++ == 0 )
                   {
                      s_iLastControlLine = hb_comp_iLine;
                   }
                }
-             ForStatements                            /* 12 */
+             ForStatements                                           /* 12 */
                {
                   short iStep, iLocal;
 
@@ -3096,15 +3105,15 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                   hb_compLoopEnd();
 
                   hb_compExprDelete( $2 );
-                  hb_compExprDelete( $<asExpr>5 ); /* Deletes $5, hb_compExprClone( $2 ), $4 */
+                  hb_compExprDelete( $<asExpr>5 );     /* Deletes $5, hb_compExprClone( $2 ), $4 */
                   hb_compExprDelete( $7 );
 
                   if( $<asExpr>8 )
                   {
-                     hb_compExprDelete( $<asExpr>8 ); /* Deletes hb_compExprClone( $2 ), and original $8 */
+                     hb_compExprDelete( $<asExpr>8 );  /* Deletes hb_compExprClone( $2 ), and original $8 */
                   }
 
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_WITH_RETURN;
                }
            ;
 
@@ -3112,7 +3121,7 @@ ForAssign  : '='
            | INASSIGN
            ;
 
-StepExpr   : /* default step expression */       { $<asExpr>$ = NULL; }
+StepExpr   : %empty                              { $<asExpr>$ = NULL; }         /* default step expression */
            | STEP Expression                     { $<asExpr>$ = hb_compExprReduce( $2 ); }
            ;
 
@@ -3134,7 +3143,7 @@ ForStatements : EmptyStats NEXT                  { hb_compLinePush();
                                                    s_iControlLevel--; }
               ;
 
-ForEach    : FOREACH IdentName  /* 1  2 */
+ForEach    : FOREACH IdentName                                       /* 1  2 */
                {  /* 3 */
                   hb_compLinePush();
                   hb_compDebugStart();
@@ -3142,31 +3151,31 @@ ForEach    : FOREACH IdentName  /* 1  2 */
                   //$2->ExprType = HB_ET_VARREF; hb_compExprGenPush( $2 );
                   hb_compExprDelete( hb_compExprGenPush( hb_compExprNewVarRef( $2 ) ) );
                }
-             IN Expression /* 4 5 */
-               { /* 6 */
+             IN Expression                                           /* 4 5 */
+               {  /* 6 */
                   hb_compExprDelete( hb_compExprGenPush( $5 ) );
                   hb_compGenPCode1( HB_P_FOREACH );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 6 */
                   hb_compGenPCode1( HB_P_ENUMERATE );
                   hb_compLoopStart( TRUE );
                }
-             Crlf                                     /* 7 */
-               { /* 8 */
-                  $<lNumber>$ = hb_compGenJumpFalse( 0 );   /* 8 */
+             Crlf                                                    /* 7 */
+               {  /* 8 */
+                  $<lNumber>$ = hb_compGenJumpFalse( 0 );            /* 8 */
 
                   if( s_iControlLevel++ == 0 )
                   {
                      s_iLastControlLine = hb_comp_iLine;
                   }
                }
-             ForStatements                            /* 9 */
+             ForStatements                                           /* 9 */
                {
                   hb_compLoopHere();
                   hb_compGenJump( $<lNumber>6 - hb_comp_functions.pLast->lPCodePos );
                   hb_compGenJumpHere( $<lNumber>8 );
                   hb_compLoopEnd();
                   hb_compGenPCode1( HB_P_ENDENUMERATE );
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_WITH_RETURN;
                }
            ;
 
@@ -3200,9 +3209,9 @@ BeginSeq   : BEGINSEQ {
                 Crlf
                 EmptyStats
                 {
-                  /* Set jump address for HB_P_SEQBEGIN opcode - this address
-                   * will be used in BREAK code if there is no RECOVER clause
-                   */
+                   /* Set jump address for HB_P_SEQBEGIN opcode - this address
+                    * will be used in BREAK code if there is no RECOVER clause
+                    */
                    hb_compGenJumpHere( $<lNumber>2 );
                    $<lNumber>$ = hb_compSequenceEnd();
                 }
@@ -3214,7 +3223,7 @@ BeginSeq   : BEGINSEQ {
                    if( $<lNumber>6 )
                       hb_compGenJumpThere( $<lNumber>2, $<lNumber>6 );
                    else if( hb_comp_wSeqCounter )
-                     --hb_comp_wSeqCounter;
+                      --hb_comp_wSeqCounter;
                 }
              END
              {
@@ -3226,19 +3235,19 @@ BeginSeq   : BEGINSEQ {
 
                 hb_compSequenceFinish( (ULONG)$<lNumber>2, (int)$<lNumber>4 );
 
-                hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
                 s_iControlLevel--;
              }
            ;
 
-RecoverSeq : /* no recover */  { $<lNumber>$ = 0; hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
+RecoverSeq : %empty         { $<lNumber>$ = 0; hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE; }   /* no recover */
            | RecoverEmpty Crlf EmptyStats
            | RecoverUsing Crlf EmptyStats
            ;
 
 RecoverEmpty : RECOVER
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   if( hb_comp_wSeqCounter )
                      --hb_comp_wSeqCounter;
@@ -3249,7 +3258,7 @@ RecoverEmpty : RECOVER
 
 RecoverUsing : RECOVERUSING IdentName
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   if( hb_comp_wSeqCounter )
                      --hb_comp_wSeqCounter;
@@ -3287,7 +3296,7 @@ Try          : TRY           /* 1 */
                FinallyTry    /* 8 */
                {             /* 9 */
                   long lLoopCount = hb_compLoopCount();
-                  hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                  hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
                   if( $<lNumber>8 )
                   {
                      if( $<lNumber>3 != lLoopCount )
@@ -3298,8 +3307,8 @@ Try          : TRY           /* 1 */
                      --hb_comp_wFinallyCounter;
                      if( $<lNumber>6 == 0 )
                         hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
-                     /* replace END address with FINALLY address in
-                        HB_P_ENDFINALLY opcode */
+
+                     /* replace END address with FINALLY address in HB_P_ENDFINALLY opcode */
                      hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 );
 
                      if( $<lNumber>6 )
@@ -3327,7 +3336,7 @@ Try          : TRY           /* 1 */
                   }
 
                   //hb_compTryFinish( $<lNumber>2, $<iNumber>4 );
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_WITH_RETURN;
 
                   s_iControlLevel--;
                }
@@ -3335,26 +3344,26 @@ Try          : TRY           /* 1 */
              ;
 
 
-FinallyTry  : /* no finally */    { $<lNumber>$ = 0; }
-            | Finally Crlf EmptyStats
-            ;
+FinallyTry   : %empty                      { $<lNumber>$ = 0; }     /* no finally */
+             | Finally Crlf EmptyStats
+             ;
 
 Finally      : FINALLY
                {
-                  hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                  hb_comp_functions.pLast->bFlags &= ~( FUN_WITH_RETURN | FUN_BREAK_CODE );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   ++hb_comp_wFinallyCounter;
                   hb_compGenPCode1( HB_P_FINALLY );
                }
              ;
 
-Catch        : /* no recover */  { $<lNumber>$ = 0; }
+Catch        : %empty                      { $<lNumber>$ = 0; }     /* no recover */
              | CatchError Crlf EmptyStats
              ;
 
 CatchError   : CATCH IdentName
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   if( hb_comp_wSeqCounter )
                      --hb_comp_wSeqCounter;
@@ -3364,7 +3373,7 @@ CatchError   : CATCH IdentName
                }
              | CATCH
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  hb_comp_functions.pLast->bFlags &= ~FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   if( hb_comp_wSeqCounter )
                      --hb_comp_wSeqCounter;
@@ -3646,10 +3655,10 @@ int hb_compYACCMain( char * szName )
    if( hb_comp_bStartProc )
       hb_compFunctionAdd( hb_strupr( hb_strdup( szName ) ), HB_FS_PUBLIC, FUN_PROCEDURE );
    else
-         /* Don't pass the name of module if the code for starting procedure
-         * will be not generated. The name cannot be placed as first symbol
-         * because this symbol can be used as function call or memvar's name.
-         */
+      /* Don't pass the name of module if the code for starting procedure
+       * will be not generated. The name cannot be placed as first symbol
+       * because this symbol can be used as function call or memvar's name.
+       */
       hb_compFunctionAdd( hb_strupr( hb_strdup( "" ) ), HB_FS_PUBLIC, FUN_PROCEDURE );
 
    yyparse();
@@ -3664,15 +3673,15 @@ int hb_compYACCMain( char * szName )
       PCOMSYMBOL pSym;
 
       /* Fix the number of static variables */
-      hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
-      hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
+      hb_comp_pInitFunc->pCode[ 3 ]   = HB_LOBYTE( hb_comp_iStaticCnt );
+      hb_comp_pInitFunc->pCode[ 4 ]   = HB_HIBYTE( hb_comp_iStaticCnt );
       hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
 
       pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL, NULL, SYMF_FUNCALL );
       pSym->cScope |= hb_comp_pInitFunc->cScope;
 
       hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
-      hb_comp_functions.pLast = hb_comp_pInitFunc;
+      hb_comp_functions.pLast        = hb_comp_pInitFunc;
 
       hb_compGenPCode1( HB_P_ENDPROC );
       ++hb_comp_functions.iCount;
@@ -3682,15 +3691,17 @@ int hb_compYACCMain( char * szName )
       hb_compAnnounce( hb_comp_szAnnounce );
 
    /* Close processed file (it is opened in hb_compInclude() function )
-   */
+    */
    fclose( yyin );
 
    while( hb_comp_files.pLast )
    {
      PFILE pFile = hb_comp_files.pLast;
+
      if( pFile->pBuffer )
         hb_xfree( (void *) pFile->pBuffer );
      hb_xfree( (void *) pFile->szFileName );
+
      hb_comp_files.pLast = pFile->pPrev;
      hb_xfree( pFile );
    }
@@ -3771,12 +3782,12 @@ void yyerror( char * s )
          }
 
          /*
-          hb_comp_wForCounter
-          hb_comp_wIfCounter
-          hb_comp_wWhileCounter
-          hb_comp_wCaseCounter
-          hb_comp_wWithObjCounter
-          hb_comp_wSwitchCounter
+          * hb_comp_wForCounter
+          * hb_comp_wIfCounter
+          * hb_comp_wWhileCounter
+          * hb_comp_wCaseCounter
+          * hb_comp_wWithObjCounter
+          * hb_comp_wSwitchCounter
           */
 
           hb_comp_pLoops = NULL;
@@ -3824,12 +3835,12 @@ BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearch )
    }
 
    pFile = ( PFILE ) hb_xgrab( sizeof( _FILE ) );
-   pFile->handle = yyin;
-   pFile->pBuffer = hb_xgrab( HB_PP_BUFF_SIZE );
-   pFile->iBuffer = pFile->lenBuffer = 10;
+   pFile->handle     = yyin;
+   pFile->pBuffer    = hb_xgrab( HB_PP_BUFF_SIZE );
+   pFile->iBuffer    = pFile->lenBuffer = 10;
    pFile->szFileName = szFileName;
-   pFile->iLine = 0;
-   pFile->pPrev = hb_comp_files.pLast;
+   pFile->iLine      = 0;
+   pFile->pPrev      = hb_comp_files.pLast;
 
    hb_comp_files.pLast = pFile;
 
@@ -3849,6 +3860,7 @@ int yywrap( void )   /* handles the EOF of the currently processed file */
    {
       hb_xfree( hb_comp_files.pLast->pBuffer );
       hb_comp_files.pLast->pBuffer = NULL;
+
       return 1;      /* we have reached the main EOF */
    }
 
@@ -3877,12 +3889,12 @@ static void hb_compLoopStart( BOOL fCanLoop )
    else
       hb_comp_pLoops = pLoop;
 
-   pLoop->ulOffset        = hb_comp_functions.pLast->lPCodePos;  /* store the start position */
-   pLoop->fCanLoop        = fCanLoop;   /* can we use LOOP inside */
+   pLoop->ulOffset        = hb_comp_functions.pLast->lPCodePos;  /* store the start position          */
+   pLoop->fCanLoop        = fCanLoop;                            /* can we use LOOP inside            */
    pLoop->iLine           = hb_comp_iLine;
-   pLoop->wSeqCounter     = hb_comp_wSeqCounter;      /* store current SEQUENCE counter */
-   pLoop->wWithObjCounter = hb_comp_wWithObjCounter;  /* store current WITH OBJECT counter */
-   pLoop->wFinallyCounter = hb_comp_wFinallyCounter;  /* store current FINALLY counter */
+   pLoop->wSeqCounter     = hb_comp_wSeqCounter;                 /* store current SEQUENCE counter    */
+   pLoop->wWithObjCounter = hb_comp_wWithObjCounter;             /* store current WITH OBJECT counter */
+   pLoop->wFinallyCounter = hb_comp_wFinallyCounter;             /* store current FINALLY counter     */
 
    pLoop->pExitList       = NULL;
    pLoop->pLoopList       = NULL;
@@ -3951,9 +3963,9 @@ static void hb_compLoopLoop( void )
       if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
          /* Attempt to LOOP from BEGIN/END sequence
-         * Current SEQUENCE counter is different then at the beginning of loop
-         * Notice that LOOP is allowed in RECOVER code.
-         */
+          * Current SEQUENCE counter is different then at the beginning of loop
+          * Notice that LOOP is allowed in RECOVER code.
+          */
          hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "LOOP", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
@@ -3967,12 +3979,10 @@ static void hb_compLoopLoop( void )
          USHORT wWithObjCounter = pLast->wWithObjCounter;
 
          pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
-         pLoop->pLoopList = NULL;
 
+         pLoop->pLoopList = NULL;
          while( pLast->pLoopList )
-         {
             pLast = pLast->pLoopList;
-         }
 
          pLast->pLoopList = pLoop;
 
@@ -4008,9 +4018,9 @@ static void hb_compLoopExit( void )
       if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
          /* Attempt to EXIT from BEGIN/END sequence
-         * Current SEQUENCE counter is different then at the beginning of loop
-         * Notice that LOOP is allowed in RECOVER code.
-         */
+          * Current SEQUENCE counter is different then at the beginning of loop
+          * Notice that LOOP is allowed in RECOVER code.
+          */
          hb_compYYError( 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT", NULL );
       }
       else if( pLast->wFinallyCounter != hb_comp_wFinallyCounter )
@@ -4024,9 +4034,11 @@ static void hb_compLoopExit( void )
          USHORT wWithObjCounter = pLast->wWithObjCounter;
 
          pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+
          pLoop->pExitList = NULL;
          while( pLast->pExitList )
-         pLast = pLast->pExitList;
+            pLast = pLast->pExitList;
+
          pLast->pExitList = pLoop;
 
          while( wWithObjCounter < hb_comp_wWithObjCounter )
@@ -4051,9 +4063,7 @@ static void hb_compLoopHere( void )
    if( pLoop )
    {
       while( pLoop->pNext )
-      {
          pLoop = pLoop->pNext;
-      }
 
       pLast = pLoop;
       pLoop = pLoop->pLoopList;
@@ -4063,6 +4073,7 @@ static void hb_compLoopHere( void )
          hb_compGenJumpHere( pLoop->ulOffset + 1 );
          pFree = pLoop;
          pLoop = pLoop->pLoopList;
+
          hb_xfree( ( void * ) pFree );
       }
 
@@ -4091,12 +4102,14 @@ static void hb_compLoopEnd( void )
          hb_compGenJumpHere( pExit->ulOffset + 1 );
          pFree = pExit;
          pExit = pExit->pExitList;
+
          hb_xfree( ( void * ) pFree );
       }
 
       pLast->pNext = NULL;
       if( pLoop == hb_comp_pLoops )
          hb_comp_pLoops = NULL;
+
       hb_xfree( ( void * ) pLoop );
    }
 }
@@ -4110,17 +4123,20 @@ void hb_compReleaseLoops( void )
       pLoop = hb_comp_pLoops;
       while( pLoop->pExitList )
       {
-         pFree = pLoop->pExitList;
+         pFree            = pLoop->pExitList;
          pLoop->pExitList = pFree->pExitList;
+
          hb_xfree( ( void * ) pFree );
       }
       while( pLoop->pLoopList )
       {
-         pFree = pLoop->pLoopList;
+         pFree            = pLoop->pLoopList;
          pLoop->pLoopList = pFree->pLoopList;
+
          hb_xfree( ( void * ) pFree );
       }
       hb_comp_pLoops = pLoop->pNext;
+
       hb_xfree( ( void * ) pLoop );
    }
 }
@@ -4129,8 +4145,8 @@ static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
 {
    PELSEIF pElseIf = ( PELSEIF ) hb_xgrab( sizeof( _ELSEIF ) ), pLast;
 
-   pElseIf->ulOffset = ulOffset;
-   pElseIf->pNext = NULL;
+   pElseIf->ulOffset   = ulOffset;
+   pElseIf->pNext      = NULL;
    pElseIf->pPrevGroup = NULL;
 
    if( pFirst )
@@ -4138,18 +4154,14 @@ static void * hb_compElseIfGen( void * pFirst, HB_SIZE ulOffset )
       pLast = ( PELSEIF ) pFirst;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
       pLast->pNext = pElseIf;
    }
    else
    {
       if( hb_comp_pElseIfs )
-      {
          pElseIf->pPrevGroup = hb_comp_pElseIfs;
-      }
 
       hb_comp_pElseIfs = pElseIf;
 
@@ -4177,13 +4189,14 @@ void hb_compReleaseElseIfs( void )
 
    while( hb_comp_pElseIfs )
    {
-      pElseIf = hb_comp_pElseIfs;
+      pElseIf          = hb_comp_pElseIfs;
       hb_comp_pElseIfs = pElseIf->pPrevGroup;
 
       while( pElseIf )
       {
-         pDel = pElseIf;
+         pDel    = pElseIf;
          pElseIf = pElseIf->pNext;
+
          hb_xfree( pDel );
       }
    }
@@ -4237,25 +4250,17 @@ static void hb_compRTVariableGen( char * szCreateFun )
 
    /* call function that will create either PUBLIC or PRIVATE variables */
    if( usCount > 255 )
-   {
       hb_compGenPCode3( HB_P_DO, HB_LOBYTE( usCount ), HB_HIBYTE( usCount ), ( BOOL ) 1 );
-   }
    else
-   {
       hb_compGenPCode2( HB_P_DOSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
-   }
 
    /* pop initial values */
    while( pVar )
    {
       if( pVar->bPopValue )
-      {
          hb_compExprDelete( hb_compExprGenPop( pVar->pVar ) );
-      }
       else
-      {
          hb_compExprDelete( pVar->pVar );
-      }
 
       pDel = pVar;
       pVar = pVar->pPrev;

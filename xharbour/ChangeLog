@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-23 21:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/harbour.slx
+  * source/compiler/harbouryy.c
+  * source/compiler/hbslex.c
+
+  * source/macro/macro.y
+  * source/macro/macroyy.c
+  * source/macro/macroslx.c
+
+  * include/harboury.h
+  * include/macroy.h
+    ! regenerated using Bison 3.0.2
+
+  * winmake/makefile.bc
+    ! pacify BCC irrelevant warning
+
 2014-12-20 12:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   + contrib/gtwvw/samples/winuser.ch
     ! added include file for wvwtest9.prg sample

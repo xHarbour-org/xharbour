@@ -52,7 +52,7 @@
 
 #define HB_MACRO_SUPPORT
 
-#define yylex hb_complex
+#define yylex hb_macro_yylex
 
 #include <stdio.h>
 #include <stdlib.h>

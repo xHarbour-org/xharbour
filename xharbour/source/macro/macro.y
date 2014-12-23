@@ -1,4 +1,8 @@
-%pure_parser
+%pure-parser
+%parse-param { PHB_MACRO pMacro }
+%lex-param   { PHB_MACRO pMacro }
+%name-prefix "hb_macro_yy"
+
 %{
 /*
  * $Id$
@@ -91,7 +95,6 @@
    #pragma warn -rch
 #endif
 
-
 /* NOTE: these symbols are used internally in bison.simple
  */
 #ifndef hb_xgrab
@@ -108,30 +111,10 @@
 #define HB_MAX_PENDING_MACRO_EXP 16
 
 static PHB_EXPR s_Pending[ HB_MAX_PENDING_MACRO_EXP ];
-static int s_iPending;
-
-/* This is workaround of yyparse() declaration bug in bison.simple
-*/
-
-#if !defined(__GNUC__) && !defined(__IBMCPP__)
-   #if 0
-      /* This makes BCC 551 fail with Bison 1.30, even with the
-         supplied harbour.simple file, which makes Bison 1.30 blow.
-         [vszakats] */
-      void __yy_memcpy ( char*, const char*, unsigned int ); /* to satisfy Borland compiler */
-   #endif
-#endif
+static int      s_iPending;
 
 /* yacc/lex related definitions
  */
-#undef YYPARSE_PARAM
-#define YYPARSE_PARAM HB_MACRO_PARAM    /* parameter passed to yyparse function - it have to be of 'void *' type */
-#undef YYLEX_PARAM
-#define YYLEX_PARAM   ( (PHB_MACRO)YYPARSE_PARAM ) /* additional parameter passed to yylex */
-
-extern int yyparse( void * );   /* to make happy some purist compiler */
-
-extern void yyerror( char * ); /* parsing error management function */
 
 /* Standard checking for valid expression creation
  */
@@ -159,11 +142,11 @@ extern void yyerror( char * ); /* parsing error management function */
 #endif
 %}
 
-%union                  /* special structure used by lex and yacc to share info */
+%union                      /* special structure used by lex and yacc to share info */
 {
-   char *    string;       /* to hold a string returned by lex */
-   int       iNumber;      /* to hold a temporary integer number */
-   HB_LONG   lNumber;      /* to hold a temporary long number */
+   char *      string;      /* to hold a string returned by lex */
+   int         iNumber;     /* to hold a temporary integer number */
+   HB_LONG     lNumber;     /* to hold a temporary long number */
    struct
    {
       char *   string;
@@ -171,38 +154,35 @@ extern void yyerror( char * ); /* parsing error management function */
    } valChar;
    struct
    {
-      int    iNumber;      /* to hold a number returned by lex */
-      char * szValue;
+      int      iNumber;     /* to hold a number returned by lex */
+      char *   szValue;
    } valInteger;
    struct
    {
-      HB_LONG   lNumber;   /* to hold a long number returned by lex */
-      char *    szValue;
+      HB_LONG  lNumber;     /* to hold a long number returned by lex */
+      char *   szValue;
    } valLong;
    struct
    {
-      double dNumber;   /* to hold a double number returned by lex */
-      /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
+      double   dNumber;     /* to hold a double number returned by lex */
+                            /* NOTE: Intentionally using "unsigned char" instead of "BYTE" */
       unsigned char bWidth; /* to hold the width of the value */
-      unsigned char bDec; /* to hold the number of decimal points in the value */
-      char * szValue;
+      unsigned char bDec;   /* to hold the number of decimal points in the value */
+      char *   szValue;
    } valDouble;
-   PHB_EXPR asExpr;
-   void * pVoid;        /* to hold any memory structure we may need */
+   PHB_EXPR    asExpr;
+   void *      pVoid;       /* to hold any memory structure we may need */
 };
 
 %{
+
 /* This must be placed after the above union - the union is
  * typedef-ined to YYSTYPE
  */
-int yylex( YYSTYPE *, PHB_MACRO );
-%}
+extern int  yylex( YYSTYPE *, PHB_MACRO );    /* main lex token function, called by yyparse() */
+extern int  yyparse( PHB_MACRO );             /* main yacc parsing function                   */
+extern void yyerror( PHB_MACRO, char * );     /* parsing error management function            */
 
-%{
-#ifdef __WATCOMC__
-/* disable warnings for unreachable code */
-#pragma warning 13 9
-#endif
 %}
 
 %token IDENTIFIER NIL NUM_DOUBLE INASSIGN NUM_LONG
@@ -214,15 +194,15 @@ int yylex( YYSTYPE *, PHB_MACRO );
 %token CBMARKER
 %token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
 
-/*the lowest precedence*/
-/*postincrement and postdecrement*/
+/* the lowest precedence */
+/* postincrement and postdecrement */
 %left   POST
-/*assigment - from right to left*/
+/* assigment - from right to left */
 %right  INASSIGN
 %right  PLUSEQ MINUSEQ
 %right  MULTEQ DIVEQ MODEQ
 %right  EXPEQ
-/*logical operators*/
+/* logical operators */
 %right  OR
 %right  AND
 %right  NOT
@@ -232,63 +212,63 @@ int yylex( YYSTYPE *, PHB_MACRO );
 %right  BITXOR
 %right  BITAND
 
-/*relational operators*/
+/* relational operators */
 %right '=' EQ NE1 NE2
 %right '<' '>' LE GE '$' LIKE MATCH
 
 /* Bit shift */
 %right BITSHIFTR BITSHIFTL
 
-/*mathematical operators*/
+/* mathematical operators */
 %right  '+' '-'
 %right  '*' '/' '%'
 %right  POWER
 %right  UNARY
 
-/*preincrement and predecrement*/
+/* preincrement and predecrement */
 %right  PRE
 
-/*special operators*/
-%right  ALIASOP '&' '@'
-%right  ','
-/*the highest precedence*/
+/* special operators */
+/* %right  ALIASOP '&' '@' */
+/* %right  ',' */
+/* the highest precedence */
 
-%type <string>  IdentName IDENTIFIER MACROVAR MACROTEXT
-%type <valChar>    LITERAL
-%type <valDouble>  NUM_DOUBLE
-%type <valLong>    NUM_LONG
-%type <asExpr>  ByRefArg Argument ArgList BlockExpList BlockVarList BlockNoVar SendId
-%type <asExpr>  NumValue NumAlias
-%type <asExpr>  NilValue
-%type <asExpr>  LiteralValue
-%type <asExpr>  CodeBlock
-%type <asExpr>  Logical
-%type <asExpr>  SelfValue
-%type <asExpr>  Array
-%type <asExpr>  ArrayAt
-%type <asExpr>  Date
-%type <asExpr>  DateTime
-%type <asExpr>  Variable VarAlias
-%type <asExpr>  MacroVar MacroVarAlias
-%type <asExpr>  MacroExpr MacroExprAlias
-%type <asExpr>  AliasId AliasVar AliasExpr
-%type <asExpr>  VariableAt
-%type <asExpr>  FunCall
-%type <asExpr>  ObjectData
-%type <asExpr>  ObjectMethod
-%type <asExpr>  IfInline
-%type <asExpr>  ExpList PareExpList PareExpListAlias AsParamList RootParamList
-%type <asExpr>  Expression SimpleExpression LeftExpression
-%type <asExpr>  EmptyExpression
-%type <asExpr>  ExprAssign ExprOperEq ExprPreOp ExprPostOp
-%type <asExpr>  ExprMath ExprBool ExprRelation ExprUnary
-%type <asExpr>  ExprPlusEq ExprMinusEq ExprMultEq ExprDivEq ExprModEq ExprExpEq
-%type <asExpr>  ArrayIndex IndexList
-%type <asExpr>  FieldAlias FieldVarAlias
-%type <asExpr>  PostOp
-%type <asExpr>  WithData WithMethod
-%type <asExpr>  Hash HashList
-%type <string>  NamespacePath
+%type <string>    IdentName IDENTIFIER MACROVAR MACROTEXT
+%type <valChar>   LITERAL
+%type <valDouble> NUM_DOUBLE
+%type <valLong>   NUM_LONG
+%type <asExpr>    ByRefArg Argument ArgList BlockExpList BlockVarList BlockNoVar SendId
+%type <asExpr>    NumValue NumAlias
+%type <asExpr>    NilValue
+%type <asExpr>    LiteralValue
+%type <asExpr>    CodeBlock
+%type <asExpr>    Logical
+%type <asExpr>    SelfValue
+%type <asExpr>    Array
+%type <asExpr>    ArrayAt
+%type <asExpr>    Date
+%type <asExpr>    DateTime
+%type <asExpr>    Variable VarAlias
+%type <asExpr>    MacroVar MacroVarAlias
+%type <asExpr>    MacroExpr MacroExprAlias
+%type <asExpr>    AliasId AliasVar AliasExpr
+%type <asExpr>    VariableAt
+%type <asExpr>    FunCall
+%type <asExpr>    ObjectData
+%type <asExpr>    ObjectMethod
+%type <asExpr>    IfInline
+%type <asExpr>    ExpList PareExpList PareExpListAlias AsParamList RootParamList
+%type <asExpr>    Expression SimpleExpression LeftExpression
+%type <asExpr>    EmptyExpression
+%type <asExpr>    ExprAssign ExprOperEq ExprPreOp ExprPostOp
+%type <asExpr>    ExprMath ExprBool ExprRelation ExprUnary
+%type <asExpr>    ExprPlusEq ExprMinusEq ExprMultEq ExprDivEq ExprModEq ExprExpEq
+%type <asExpr>    ArrayIndex IndexList
+%type <asExpr>    FieldAlias FieldVarAlias
+%type <asExpr>    PostOp
+%type <asExpr>    WithData WithMethod
+%type <asExpr>    Hash HashList
+%type <string>    NamespacePath
 %%
 
 Main : Expression '\n'  {
@@ -396,16 +376,16 @@ Main : Expression '\n'  {
                         }
      ;
 
-IdentName  : IDENTIFIER      { $$ = $1; $1 = NULL; }
+IdentName  : IDENTIFIER       { $$ = $1; $1 = NULL; }
            ;
 
 /* Numeric values
  */
-NumValue   : NUM_DOUBLE      { $$ = hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ); }
-           | NUM_LONG        { $$ = hb_compExprNewLong( $1.lNumber ); }
+NumValue   : NUM_DOUBLE       { $$ = hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ); }
+           | NUM_LONG         { $$ = hb_compExprNewLong( $1.lNumber ); }
            ;
 
-NumAlias   : NUM_LONG ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
+NumAlias   : NUM_LONG ALIASOP { $$ = hb_compExprNewLong( $1.lNumber ); }
 ;
 
 /* NIL value
@@ -531,13 +511,11 @@ Array      : '{' ArgList '}'     {
                                    $$ = hb_compExprNewArray( $2 );
 
                                    if( s_iPending && s_Pending[ s_iPending - 1 ] == $2 )
-                                   {
                                       s_iPending--;
-                                   }
                                  }
            ;
 
-Hash       : '{' HashList '}'         { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_strdup( "HASH" ) ), $2, HB_MACRO_PARAM ); }
+Hash       : '{' HashList '}'    { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_strdup( "HASH" ) ), $2, HB_MACRO_PARAM ); }
            ;
 
 HashList   : /* nothing => nil */ HASHOP /* nothing => nil */    { $$ = NULL; }
@@ -552,10 +530,10 @@ ArrayAt     : Array ArrayIndex   { $$ = $2; }
 
 /* Variables
  */
-Variable    : IdentName            { $$ = hb_compExprNewVar( $1 ); }
+Variable    : IdentName          { $$ = hb_compExprNewVar( $1 ); }
             ;
 
-VarAlias    : IdentName ALIASOP    { $$ = hb_compExprNewAlias( $1 ); }
+VarAlias    : IdentName ALIASOP  { $$ = hb_compExprNewAlias( $1 ); }
             ;
 
 /* Macro variables - this can signal compilation errors
@@ -685,18 +663,14 @@ FunCall     : IdentName '(' ArgList ')'   {
                                             HB_MACRO_CHECK( $$ );
 
                                             if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
-                                            {
                                                s_iPending--;
-                                            }
                                           }
             | NamespacePath IdentName '(' ArgList ')' {
                                                         $$ = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( $1, $2 ), $4, HB_MACRO_PARAM );
                                                         HB_MACRO_CHECK( $$ );
 
                                                         if( s_iPending && s_Pending[ s_iPending - 1 ] == $4 )
-                                                        {
                                                            s_iPending--;
-                                                        }
                                                       }
             | MacroVar '(' ArgList ')'    {
                                             $$ = hb_compExprNewFunCall( $1, $3, HB_MACRO_PARAM );
@@ -740,7 +714,7 @@ Argument   : EmptyExpression           { $$ = $1; }
                                              case HB_ET_VARIABLE:
                                                $$ = $2;
                                                $$->ExprType = HB_ET_VARREF;
-                                               $$->ValType = HB_EV_VARREF;
+                                               $$->ValType  = HB_EV_VARREF;
                                                break;
 
                                              case HB_ET_ALIASVAR:
@@ -774,7 +748,7 @@ Argument   : EmptyExpression           { $$ = $1; }
                                                 hb_compExprDelete( $2, HB_MACRO_PARAM  );
 
                                                 $$->ExprType = HB_ET_FUNREF;
-                                                $$->ValType = HB_EV_FUNREF;
+                                                $$->ValType  = HB_EV_FUNREF;
                                                 break;
 
                                              case HB_ET_SEND:
@@ -812,7 +786,7 @@ ObjectData  : LeftExpression ':' SendId        { $$ = hb_compExprNewSendExp( $1,
 WithData    : ':' SendId                 {
                                             $$ = hb_compExprNewWithSendExp( $2 );
                                          }
-           ;
+            ;
 
 /* Object's method
  */
@@ -820,77 +794,74 @@ ObjectMethod : ObjectData '(' ArgList ')'    {
                                                $$ = hb_compExprNewMethodCall( $1, $3 );
 
                                                if( s_iPending && s_Pending[ s_iPending - 1 ] == $3 )
-                                               {
                                                   s_iPending--;
-                                               }
                                              }
-            ;
+             ;
 
 WithMethod   : WithData '(' ArgList ')'  {
                                             $$ = hb_compExprNewWithMethodCall( $1, $3 );
                                          }
              ;
 
-SimpleExpression :
-             NumValue
-           | NilValue                         { $$ = $1; }
-           | LiteralValue                     { $$ = $1; }
-           | CodeBlock                        { $$ = $1; }
-           | Logical                          { $$ = $1; }
-           | Date                             { $$ = $1; }
-           | DateTime                         { $$ = $1; }
-           | SelfValue                        { $$ = $1; }
-           | Array                            { $$ = $1; }
-           | Hash                             { $$ = $1; }
-           | ArrayAt                          { $$ = $1; }
-           | AliasVar                         { $$ = $1; }
-           | MacroVar                         { $$ = $1; }
-           | MacroExpr                        { $$ = $1; }
-           | Variable                         { $$ = $1; }
-           | VariableAt                       { $$ = $1; }
-           | FunCall                          { $$ = $1; }
-           | IfInline                         { $$ = $1; }
-           | ObjectData                       { $$ = $1; }
-           | ObjectMethod                     { $$ = $1; }
-           | WithData                         { $$ = $1; }
-           | WithMethod                       { $$ = $1; }
-           | AliasExpr                        { $$ = $1; }
-           | ExprAssign                       { $$ = $1; }
-           | ExprOperEq                       { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
-           | ExprPostOp                       { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
-           | ExprPreOp                        { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
-           | ExprUnary                        { $$ = $1; }
-           | ExprMath                         { $$ = $1; }
-           | ExprBool                         { $$ = $1; }
-           | ExprRelation                     { $$ = $1; }
-;
+SimpleExpression : NumValue
+                 | NilValue              { $$ = $1; }
+                 | LiteralValue          { $$ = $1; }
+                 | CodeBlock             { $$ = $1; }
+                 | Logical               { $$ = $1; }
+                 | Date                  { $$ = $1; }
+                 | DateTime              { $$ = $1; }
+                 | SelfValue             { $$ = $1; }
+                 | Array                 { $$ = $1; }
+                 | Hash                  { $$ = $1; }
+                 | ArrayAt               { $$ = $1; }
+                 | AliasVar              { $$ = $1; }
+                 | MacroVar              { $$ = $1; }
+                 | MacroExpr             { $$ = $1; }
+                 | Variable              { $$ = $1; }
+                 | VariableAt            { $$ = $1; }
+                 | FunCall               { $$ = $1; }
+                 | IfInline              { $$ = $1; }
+                 | ObjectData            { $$ = $1; }
+                 | ObjectMethod          { $$ = $1; }
+                 | WithData              { $$ = $1; }
+                 | WithMethod            { $$ = $1; }
+                 | AliasExpr             { $$ = $1; }
+                 | ExprAssign            { $$ = $1; }
+                 | ExprOperEq            { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
+                 | ExprPostOp            { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
+                 | ExprPreOp             { HB_MACRO_IFENABLED( $$, $1, HB_SM_HARBOUR ); }
+                 | ExprUnary             { $$ = $1; }
+                 | ExprMath              { $$ = $1; }
+                 | ExprBool              { $$ = $1; }
+                 | ExprRelation          { $$ = $1; }
+                 ;
 
-Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ); }
-           | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ); }
-;
+Expression       : SimpleExpression      { $$ = $1; HB_MACRO_CHECK( $$ ); }
+                 | PareExpList           { $$ = $1; HB_MACRO_CHECK( $$ ); }
+                 ;
 
-RootParamList : Argument ',' {
-                                if( !(HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST) )
-                                {
-                                   HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
-                                   hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
-                                   hb_compExprDelete( $1, HB_MACRO_PARAM );
-                                   YYABORT;
-                                }
-                             }
-                Argument     {
-                                HB_MACRO_DATA->iListElements = 1;
-                                $$ = hb_compExprAddListExpr( ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( $1 ) : hb_compExprNewArgList( $1 ), $4 );
-                             }
-              ;
+RootParamList  : Argument ',' {
+                                 if( !(HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST) )
+                                 {
+                                    HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
+                                    hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+                                    hb_compExprDelete( $1, HB_MACRO_PARAM );
+                                    YYABORT;
+                                 }
+                              }
+                 Argument     {
+                                 HB_MACRO_DATA->iListElements = 1;
+                                 $$ = hb_compExprAddListExpr( ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( $1 ) : hb_compExprNewArgList( $1 ), $4 );
+                              }
+               ;
 
-AsParamList : RootParamList             { $$ = $1; }
-            | AsParamList ',' Argument  { HB_MACRO_DATA->iListElements++; $$ = hb_compExprAddListExpr( $1, $3 ); }
-            ;
+AsParamList    : RootParamList            { $$ = $1; }
+               | AsParamList ',' Argument { HB_MACRO_DATA->iListElements++; $$ = hb_compExprAddListExpr( $1, $3 ); }
+               ;
 
-EmptyExpression: /* nothing => nil */        { $$ = hb_compExprNewEmpty(); }
-            | Expression
-            ;
+EmptyExpression: %empty                   { $$ = hb_compExprNewEmpty(); }
+               | Expression
+               ;
 
 LeftExpression : NumValue
                | NilValue
@@ -919,14 +890,14 @@ LeftExpression : NumValue
                ;
 
 /* NOTE: PostOp can be used in one context only - it uses $0 rule
- *    (the rule that stands before PostOp)
+ *       (the rule that stands before PostOp)
  */
 PostOp      : INC    { $$ = hb_compExprNewPostInc( $<asExpr>0 ); }
             | DEC    { $$ = hb_compExprNewPostDec( $<asExpr>0 ); }
             ;
 
 /* NOTE: We cannot use 'Expression PostOp' because it caused
- * shift/reduce conflicts
+ *       shift/reduce conflicts
  */
 ExprPostOp  : LeftExpression PostOp %prec POST  { $$ = $2; }
             ;
@@ -1022,16 +993,16 @@ ExprRelation: Expression EQ    Expression   { $$ = hb_compExprSetOperand( hb_com
             | Expression MATCH Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMatch( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ArrayIndex : IndexList ']'                   { $$ = $1; }
-           ;
+ArrayIndex  : IndexList ']'                 { $$ = $1; }
+            ;
 
 /* NOTE: $0 represents the expression before ArrayIndex
- *    Don't use ArrayIndex in other context than as an array index!
+ *       Don't use ArrayIndex in other context than as an array index!
  */
-IndexList   : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr>0, $2, HB_MACRO_PARAM ); }
-            | IndexList ',' Expression     { $$ = hb_compExprNewArrayAt( $1, $3, HB_MACRO_PARAM ); }
-            | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4, HB_MACRO_PARAM ); }
-            ;
+IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr>0, $2, HB_MACRO_PARAM ); }
+           | IndexList ',' Expression     { $$ = hb_compExprNewArrayAt( $1, $3, HB_MACRO_PARAM ); }
+           | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4, HB_MACRO_PARAM ); }
+           ;
 
 CodeBlock  : '{' CBMARKER
                   {
@@ -1047,9 +1018,7 @@ CodeBlock  : '{' CBMARKER
                     $$ = $<asExpr>3;
 
                     if( s_iPending && s_Pending[ s_iPending - 1 ] == $$ )
-                    {
                        s_iPending--;
-                    }
                   }
            | '{' CBMARKER
                   {
@@ -1065,9 +1034,7 @@ CodeBlock  : '{' CBMARKER
                     $$ = $<asExpr>3;
 
                     if( s_iPending && s_Pending[ s_iPending - 1 ] == $$ )
-                    {
                        s_iPending--;
-                    }
                   }
            ;
 
@@ -1080,15 +1047,15 @@ BlockExpList: Expression                  { $$ = hb_compExprAddListExpr( $<asExp
 /* NOTE: This is really not needed however it allows the use of $-2 item
  * in BlockExpList to refer the same rule defined in Codeblock
  */
-BlockNoVar : /* empty list */    { $$ = NULL; }
-;
-
-BlockVarList: IdentName                  { $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, HB_MACRO_PARAM ); }
-            | BlockVarList ',' IdentName { $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, HB_MACRO_PARAM ); HB_MACRO_CHECK( $$ ); }
+BlockNoVar  : %empty                      { $$ = NULL; }
             ;
 
-ExpList     : '(' EmptyExpression          { $$ = hb_compExprNewList( $2 ); }
-            | ExpList ',' EmptyExpression  { $$ = hb_compExprAddListExpr( $1, $3 ); }
+BlockVarList: IdentName                   { $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, HB_MACRO_PARAM ); }
+            | BlockVarList ',' IdentName  { $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, HB_MACRO_PARAM ); HB_MACRO_CHECK( $$ ); }
+            ;
+
+ExpList     : '(' EmptyExpression         { $$ = hb_compExprNewList( $2 ); }
+            | ExpList ',' EmptyExpression { $$ = hb_compExprAddListExpr( $1, $3 ); }
             ;
 
 PareExpList : ExpList ')'                 { $$ = $1; }
@@ -1110,7 +1077,7 @@ PareExpList : ExpList ')'                 { $$ = $1; }
                                           }
             ;
 
-PareExpListAlias : PareExpList ALIASOP     { $$ = $1; }
+PareExpListAlias : PareExpList ALIASOP    { $$ = $1; }
                          ;
 
 IfInline   : IIF '(' Expression ',' EmptyExpression ','
@@ -1133,7 +1100,6 @@ IfInline   : IIF '(' Expression ',' EmptyExpression ','
              ')'
              { $$ = hb_compExprNewIIF( hb_compExprAddListExpr( $<asExpr>6, hb_compExprNew( HB_ET_NONE ) ) ); }
            ;
-
 %%
 
 #ifdef __WATCOMC__
@@ -1147,12 +1113,12 @@ IfInline   : IIF '(' Expression ',' EmptyExpression ','
 
 int hb_macroYYParse( PHB_MACRO pMacro )
 {
-   int iResult;
+   int    iResult;
    void * lexBuffer;
 
    /* AJ: Replace hard coded MT related codes with API to make this file
-      common to ST and MT modes
-   */
+    * common to ST and MT modes
+    */
    #if 0
       #ifdef HB_THREAD_SUPPORT
          HB_CRITICAL_LOCK( hb_macroMutex );
@@ -1161,21 +1127,21 @@ int hb_macroYYParse( PHB_MACRO pMacro )
       hb_threadLock( HB_MACROMUTEX  );
    #endif
 
-   // Reset
+   /* Reset
+    */
    s_iPending = 0;
 
    lexBuffer = hb_compFlexNew( pMacro );
 
    pMacro->status = HB_MACRO_CONT;
-   /* NOTE: bison requires (void *) pointer
-    */
-   iResult = yyparse( ( void * ) pMacro );
+
+   iResult = yyparse( pMacro );
 
    hb_compFlexDelete( lexBuffer );
 
    /* AJ: Replace hard coded MT related codes with API to make this file
-      common to ST and MT modes
-   */
+    * common to ST and MT modes
+    */
    #if 0
       #ifdef HB_THREAD_SUPPORT
          HB_CRITICAL_UNLOCK( hb_macroMutex );
@@ -1189,7 +1155,8 @@ int hb_macroYYParse( PHB_MACRO pMacro )
 
 /* ************************************************************************* */
 
-void yyerror( char * s )
+void yyerror( PHB_MACRO pMacro, char * s )
 {
+   HB_SYMBOL_UNUSED( pMacro );
    HB_SYMBOL_UNUSED( s );
 }

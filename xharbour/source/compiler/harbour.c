@@ -225,7 +225,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * bSkipGen );
 /* -m Support */
 static BOOL hb_compAutoOpenFind( char * szName );
 
-extern int yyparse( void );    /* main yacc parsing function */
+extern int hb_comp_yyparse( void );    /* main yacc parsing function */
 
 extern void hb_compReleaseRTVars( void );
 extern void hb_compReleaseLoops( void );
@@ -5958,7 +5958,7 @@ static int hb_compCompile( char * szPrg )
 
             hb_compExprINIT();
 
-            yyparse();
+            hb_comp_yyparse();
 
             if( hb_comp_bPPO && hb_comp_yyppo )
             {
@@ -6589,7 +6589,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
                int   i  = hb_comp_iExitLevel;
                BOOL  b  = hb_comp_bAnyWarning;
 
-               yyparse();
+               hb_comp_yyparse();
 
                hb_comp_iExitLevel   = ( i > hb_comp_iExitLevel ? i : hb_comp_iExitLevel );
                hb_comp_bAnyWarning  = b || hb_comp_bAnyWarning;
@@ -6696,8 +6696,8 @@ static int hb_compProcessRSPFile( char * szRspName )
 
    szRspName++;
 
-   inFile   = hb_fopen( szRspName, "r" );
-   i        = 0;
+   inFile = hb_fopen( szRspName, "r" );
+   i      = 0;
 
    if( ! inFile )
    {

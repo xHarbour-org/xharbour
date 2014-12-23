@@ -2,7 +2,7 @@
  * $Id$
  */
 
-/* harbour.slx version: 1.96 */
+#define yylex hb_comp_yylex
 
 #include "hbcomp.h"
 #include "harboury.h"
