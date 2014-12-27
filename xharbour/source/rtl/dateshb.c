@@ -371,7 +371,7 @@ HB_FUNC( CTOD )
    {
       int d_value  = 0, m_value = 0, y_value = 0;
 
-      hb_datectod( pszDate->item.asString.value, &d_value, &m_value, &y_value );
+      hb_datectod( hb_itemGetCPtr( pszDate ), &d_value, &m_value, &y_value );
 
       hb_retd( y_value, m_value, d_value );
 
@@ -390,7 +390,7 @@ HB_FUNC( DTOC )
       char  szDate[ 9 ];
       char  szFormatted[ 11 ];
 
-      hb_retc( hb_dateFormat( hb_dateDecStr( szDate, pDTOC->item.asDate.value ), szFormatted, hb_setGetDateFormat() ) );
+      hb_retc( hb_dateFormat( hb_dateDecStr( szDate, hb_itemGetDL( pDTOC ) ), szFormatted, hb_setGetDateFormat() ) );
       return;
    }
 
@@ -405,7 +405,7 @@ HB_FUNC( DTOS )
    {
       char szDate[ 9 ];
 
-      hb_retc( hb_dateDecStr( szDate, pszDate->item.asDate.value ) );
+      hb_retc( hb_dateDecStr( szDate, hb_itemGetDL( pszDate ) ) );
       return;
    }
 
@@ -420,15 +420,15 @@ HB_FUNC( STOD )
    {
       BOOL bOk = FALSE;
 
-      if( pDate->item.asString.length == 8 )
+      if( hb_itemGetCLen( pDate ) == 8 )
       {
-         hb_retds( pDate->item.asString.value );
+         hb_retds( hb_itemGetCPtr( pDate) );
          bOk = TRUE;
       }
-      else if( pDate->item.asString.length > 8 )
+      else if( hb_itemGetCLen( pDate ) > 8 )
       {
          char szDate[ 9 ];
-         HB_MEMCPY( szDate, pDate->item.asString.value, 8 );
+         HB_MEMCPY( szDate, hb_itemGetCPtr( pDate ), 8 );
          szDate[ 8 ] = '\0';
          hb_retds( szDate );
          bOk = TRUE;
@@ -449,7 +449,7 @@ HB_FUNC( YEAR )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
 
       hb_retnllen( iYear, 5 );
       return;
@@ -466,7 +466,7 @@ HB_FUNC( MONTH )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
 
       hb_retnilen( iMonth, 3 );
       return;
@@ -483,7 +483,7 @@ HB_FUNC( DAY )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
 
       hb_retnilen( iDay, 3 );
       return;
@@ -532,7 +532,7 @@ HB_FUNC( DOW )
 
    if( pDate )
    {
-      hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
+      hb_retnilen( hb_dateJulianDOW( hb_itemGetDL( pDate ) ), 3 );
       return;
    }
 
@@ -609,7 +609,7 @@ HB_FUNC( HOUR )
    {
       int iHour;
 
-      hb_timeDecode( pDateTime->item.asDate.time, &iHour, NULL, NULL );
+      hb_timeDecode( hb_itemGetT( pDateTime), &iHour, NULL, NULL );
 
       hb_retnilen( iHour, 2 );
       return;
@@ -626,7 +626,7 @@ HB_FUNC( MINUTE )
    {
       int iMinute;
 
-      hb_timeDecode( pDateTime->item.asDate.time, NULL, &iMinute, NULL );
+      hb_timeDecode( hb_itemGetT( pDateTime), NULL, &iMinute, NULL );
 
       hb_retnilen( iMinute, 2 );
       return;
@@ -643,7 +643,7 @@ HB_FUNC( SECS )
    {
       double dSeconds;
 
-      hb_timeDecode( pDateTime->item.asDate.time, NULL, NULL, &dSeconds );
+      hb_timeDecode( hb_itemGetT( pDateTime), NULL, NULL, &dSeconds );
 
       hb_retndlen( dSeconds, 3 + HB_DATETIMEDECIMALS, HB_DATETIMEDECIMALS );
       return;
@@ -658,7 +658,7 @@ HB_FUNC( CTOT )
 
    if( pzCTOT )
    {
-      int     len      = ( int ) pzCTOT->item.asString.length;
+      int     len      = ( int ) hb_itemGetCLen( pzCTOT );
       int     d_value  = 0, m_value = 0, y_value = 0;
       int     h_value  = 0, n_value = 0, fin;
       double  s_value  = 0;
@@ -671,7 +671,7 @@ HB_FUNC( CTOT )
          y_value  = 1899;
       }
       else
-         fin = hb_datectod( pzCTOT->item.asString.value, &d_value, &m_value, &y_value );
+         fin = hb_datectod( hb_itemGetCPtr( pzCTOT ), &d_value, &m_value, &y_value );
 
       if( fin < len )
       {
@@ -679,7 +679,7 @@ HB_FUNC( CTOT )
 
          len            -= fin;
          memset( szTime, ' ', 12 );
-         HB_MEMCPY( szTime, pzCTOT->item.asString.value + fin + 1, ( len > 12 ? 12 : len ) );
+         HB_MEMCPY( szTime, hb_itemGetCPtr( pzCTOT ) + fin + 1, ( len > 12 ? 12 : len ) );
          szTime[ 12 ]   = '\0';
          hb_timectot( szTime, &h_value, &n_value, &s_value );
       }
@@ -696,14 +696,14 @@ HB_FUNC( STOT )
 {
    PHB_ITEM pSTOT = hb_param( 1, HB_IT_STRING );
 
-   if ( pSTOT && pSTOT->item.asString.length >= 8 )
+   if ( pSTOT && hb_itemGetCLen( pSTOT ) >= 8 )
    {
       long lDate    = 0, lTime = 0;
       char szTime[ 19 ];
 
       memset( szTime, ' ', 18 );
       szTime[ 18 ] = '\0';
-      HB_MEMCPY( szTime, pSTOT->item.asString.value, ( pSTOT->item.asString.length > 18 ? 18 : pSTOT->item.asString.length ) );
+      HB_MEMCPY( szTime, hb_itemGetCPtr( pSTOT ), ( hb_itemGetCLen( pSTOT ) > 18 ? 18 : hb_itemGetCLen( pSTOT ) ) );
       hb_datetimeEncStr( szTime, &lDate, &lTime );
 
       hb_retdtl( lDate, lTime );

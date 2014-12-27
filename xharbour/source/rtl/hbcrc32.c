@@ -79,7 +79,7 @@ HB_FUNC( HB_CRC32 )
       ulSum = ( ULONG ) hb_parnl( 2 );
    }
 
-   hb_retnint( crc32( ulSum, ( const BYTE * ) pString->item.asString.value,
-                      ( uInt ) pString->item.asString.length ) );
+   hb_retnint( crc32( ulSum, ( const BYTE * ) hb_itemGetCPtr( pString ),
+                      ( uInt ) hb_itemGetCLen( pString ) ) );
 }
 

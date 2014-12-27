@@ -65,7 +65,7 @@
 HB_FUNC( HB_CHECKSUM )
 {
    PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
-   ULONG    ulSum    = 0;
+   HB_U32    ulSum    = 0;
 
    if( pString == NULL )
    {
@@ -75,10 +75,10 @@ HB_FUNC( HB_CHECKSUM )
 
    if( ISNUM( 2 ) )
    {
-      ulSum = ( ULONG ) hb_parnl( 2 );
+      ulSum =  hb_parns( 2 );
    }
 
-   hb_retnd( ( LONG )
-             adler32( ulSum, ( const BYTE * ) pString->item.asString.value, ( uInt ) pString->item.asString.length ) );
+   hb_retnint( ( HB_U32 )
+             adler32( ulSum, ( const BYTE * ) hb_itemGetCPtr( pString ), ( uInt ) hb_itemGetCLen( pString ) ) );
 }
 

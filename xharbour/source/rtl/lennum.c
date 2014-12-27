@@ -70,6 +70,6 @@ HB_FUNC( LENNUM )
       }
    }
 
-   hb_retnl( ( LONG ) ulLen );
+   hb_retns(  ulLen );
 }
 

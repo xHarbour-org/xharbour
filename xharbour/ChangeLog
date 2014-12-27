@@ -8,7 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2014-12-23 23:55 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-27 11:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * source/rtl/dateshb.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/datec.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/oemansi.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/hbcrc32.c  
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/lennum.c
+    ! using hb_retns insted id hb_retnl with cast to (LONG) for HB_SIZE type variable
+  * source/rtl/left.c
+    ! HB_ISIZ lLeft = (HB_ISIZ) hb_itemGetNL( pNum ); -> HB_ISIZ lLeft               = hb_itemGetNS( pNum );
+  * source/rtl/hardcr.c  
+    ! changed to use itemapi insted of direct structure manipulation          
+  * source/rtl/hbchksum.c
+    ! ULONG -> HB_U32 where aplicable
+    ! changed to use itemapi insted of direct structure manipulation          
+        
+2014-12-26 23:55 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * source/rtl/binnumx.c
     ! changed to use itemapi insted of direct structure manipulation        
     ! ULONG  -> HB_SIZE where aplicable

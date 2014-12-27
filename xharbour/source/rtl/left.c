@@ -63,7 +63,7 @@ HB_FUNC( LEFT )
    if( pText && pNum )
    {
       char * sLeft, * sString   = hb_itemGetCPtr( pText ) ;
-      HB_ISIZ  lLeft            = (HB_ISIZ)hb_itemGetNL( pNum );
+      HB_ISIZ lLeft               = hb_itemGetNS( pNum );
       HB_SIZE ulLen             = hb_itemGetCLen( pText) ;
 
       HB_TRACE( HB_TR_DEBUG, ( "Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
