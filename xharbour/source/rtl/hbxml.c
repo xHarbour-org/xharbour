@@ -1716,7 +1716,7 @@ static MXML_STATUS mxml_node_read( MXML_REFIL * ref, PHB_ITEM pNode, PHB_ITEM do
 static void mxml_node_write_attributes( MXML_OUTPUT * out, PHB_ITEM pAttr, HB_SIZE style )
 {
    HB_SIZE           iLen = hb_hashLen( pAttr );
-   ULONG             i;
+   HB_SIZE            i;
    HBXML_ATTRIBUTE   hbAttr;
 
    for( i = 1; i <= iLen; i++ )
@@ -2248,7 +2248,7 @@ static int mxml_refil_getc( MXML_REFIL * ref )
    {
    ref->sparechar = chr;
    }
- */
+ */	
 
 /**
  * Useful "fill" function that reads from a file handle
@@ -2257,9 +2257,9 @@ static int mxml_refil_getc( MXML_REFIL * ref )
 static void mxml_refill_from_handle_func( MXML_REFIL * ref )
 {
    HB_FHANDLE  fh = ( HB_FHANDLE ) ref->u.hFile;
-   int         len;
+   HB_ISIZ         len;
 
-   len = ( int ) hb_fsReadLarge( fh, ( BYTE * ) ref->buffer, ( ULONG ) ref->bufsize );
+   len =  hb_fsReadLarge( fh, ( BYTE * ) ref->buffer, ref->bufsize );
 
    if( len == -1 )
    {

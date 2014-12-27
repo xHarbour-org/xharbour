@@ -144,8 +144,8 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {
-      ULONG ulPos    = 0;
-      ULONG ulSubPos = 0;
+      HB_SIZE ulPos    = 0;
+      HB_SIZE ulSubPos = 0;
 
       while( ulPos < ulLen && ulSubPos < ulSubLen )
       {

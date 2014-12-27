@@ -62,9 +62,9 @@ HB_FUNC( LEFT )
 
    if( pText && pNum )
    {
-      char * sLeft, * sString   = pText->item.asString.value;
-      LONG  lLeft               = hb_itemGetNL( pNum );
-      HB_SIZE ulLen             = pText->item.asString.length;
+      char * sLeft, * sString   = hb_itemGetCPtr( pText ) ;
+      HB_ISIZ  lLeft            = (HB_ISIZ)hb_itemGetNL( pNum );
+      HB_SIZE ulLen             = hb_itemGetCLen( pText) ;
 
       HB_TRACE( HB_TR_DEBUG, ( "Left( '%s', %i ) %i", sString, lLeft, ulLen ) );
 
@@ -75,7 +75,7 @@ HB_FUNC( LEFT )
          hb_retclen( "", 0 );
          return;
       }
-      else if( ( ULONG ) lLeft >= ulLen )
+      else if( ( HB_SIZE ) lLeft >= ulLen )
       {
          /* No need to retain the 1st parameter - Recycle.
           */

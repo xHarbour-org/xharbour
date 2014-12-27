@@ -57,8 +57,8 @@
 
 static char * hb_strMemotran( char * pszResult, HB_SIZE * ulResultLen, const char * pszString, HB_SIZE ulStringLen, char cHardcr, char cSoftcr )
 {
-   ULONG ulStringPos = 0;
-   ULONG ulResultPos = 0;
+   HB_SIZE ulStringPos = 0;
+   HB_SIZE ulResultPos = 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_strMemotran(%s, %p, %s, %lu, %x, %x)", pszResult, ulResultLen, pszString, ulStringLen, cHardcr, cSoftcr ) );
 

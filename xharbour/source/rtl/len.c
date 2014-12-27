@@ -70,7 +70,7 @@ HB_FUNC( LEN )
          // hb_retnl( hb_itemGetCLen( pItem ) );
          /* hb_itemGetCLen() previously checked if pItem is a string.
             this is an unnecessary redundancy */
-         hb_retns( pItem->item.asString.length );
+         hb_retns( hb_itemGetCLen( pItem ) );
          return;
       }
       else if( HB_IS_HASH( pItem ) )
@@ -78,7 +78,7 @@ HB_FUNC( LEN )
          // hb_retnl( hb_itemGetCLen( pItem ) );
          /* hb_itemGetCLen() previously checked if pItem is a string.
             this is an unnecessary redundancy */
-         hb_retns( pItem->item.asHash.value->ulTotalLen );
+         hb_retns( hb_hashLen( pItem ) );
          return;
       }
       else if( HB_IS_ARRAY( pItem ) )
@@ -86,7 +86,7 @@ HB_FUNC( LEN )
          // hb_retnl( hb_arrayLen( pItem ) );
          /* hb_arrayLen() previously checked if pItem is an array.
             this is an unnecessary redundancy */
-         hb_retns( pItem->item.asArray.value->ulLen );
+         hb_retns( hb_arrayLen( pItem ));
          return;
       }
    }

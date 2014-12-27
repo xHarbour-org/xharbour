@@ -8,6 +8,45 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-23 23:55 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * source/rtl/binnumx.c
+    ! changed to use itemapi insted of direct structure manipulation        
+    ! ULONG  -> HB_SIZE where aplicable
+  * source/rtl/mtran.c
+    ! ULONG  -> HB_SIZE where aplicable      
+  * source/rtl/at.c
+    ! ULONG  -> HB_SIZE where aplicable      
+  * source/rtl/hbntos.c
+    ! ULONG  -> HB_SIZE where aplicable          
+  * source/rtl/hbxml.c   
+    ! ULONG  -> HB_ISIZ where aplicable          
+    ! int  -> HB_SIZE where aplicable          
+  * source/rtl/padr.c
+    ! ULONG  -> HB_ISIZ where aplicable              
+  * source/rtl/hbcompsr.c
+    ! LONG  -> HB_SIZE where aplicable                     
+  * source/rtl/soundex.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/strpeek.c
+    ! changed to use itemapi insted of direct structure manipulation            
+    ! ULONG  -> HB_SIZE where aplicable          
+    ! ULONG  -> HB_ISIZ where aplicable          
+  * source/rtl/len.c
+    ! changed to use itemapi insted of direct structure manipulation        
+  * source/rtl/left.c
+    ! changed to use itemapi insted of direct structure manipulation             
+    ! LONG  -> HB_ISIZ where aplicable 
+  * source/rtl/empty.c
+    ! changed to use itemapi insted of direct structure manipulation                       
+  * source/compiler/hbusage.c
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbrun/hbrun.prg
+  * utils/hbtest/hbtest.prg
+  * winmake/compile.mak
+    ! bump copyright year to 2015
+
 2014-12-23 22:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/ct/color.prg
     ! Fix bug, thanks to Michael Hagl

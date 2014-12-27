@@ -70,8 +70,8 @@ HB_FUNC( SOUNDEX )
 
    if( pString )
    {
-      char *   pszString   = pString->item.asString.value;
-      HB_SIZE  ulLen       = pString->item.asString.length;
+      char *   pszString   = hb_itemGetCPtr( pString );
+      HB_SIZE  ulLen       = hb_itemGetCLen( pString );
       HB_SIZE  nPos        = 0;
       HB_SIZE  nResultPos  = 0;
       char     cCharPrev   = '0';

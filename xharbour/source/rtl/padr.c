@@ -65,23 +65,23 @@ HB_FUNC( PADR )
 
    if( szText )
    {
-      LONG lLen = hb_itemGetNL( pPad );
+      HB_ISIZ lLen = (HB_ISIZ) hb_itemGetNL( pPad );
 
-      if( lLen > ( LONG ) ulSize )
+      if( lLen >  (HB_ISIZ) ulSize )
       {
          PHB_ITEM pszPad   = hb_param( 3, HB_IT_STRING );
          char *   szResult = ( char * ) hb_xgrab( lLen + 1 );
-         LONG     lPos;
+         HB_ISIZ  lPos;
          char     cPad;
 
-         hb_xmemcpy( szResult, szText, ( LONG ) ulSize );
+         hb_xmemcpy( szResult, szText,  ulSize );
 
          cPad = pszPad ? *( pszPad->item.asString.value ) : ' ' ;
 
-         for( lPos = ( LONG ) ulSize; lPos < lLen; lPos++ )
+         for( lPos =  ulSize; lPos < lLen; lPos++ )
             szResult[ lPos ] = cPad;
 
-         hb_retclenAdopt( szResult, ( ULONG ) lLen );
+         hb_retclenAdopt( szResult,  lLen );
       }
       else
       {

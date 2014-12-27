@@ -66,7 +66,7 @@ HB_FUNC( EMPTY )
    switch( pItem->type )
    {
       case HB_IT_ARRAY:
-         hb_retl( pItem->item.asArray.value->ulLen == 0 );
+         hb_retl( hb_arrayLen( pItem ) == 0 );
          break;
 
       case HB_IT_STRING:
@@ -75,31 +75,31 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_INTEGER:
-         hb_retl( pItem->item.asInteger.value == 0 );
+         hb_retl( hb_itemGetNI( pItem ) == 0 );
          break;
 
       case HB_IT_LONG:
-         hb_retl( pItem->item.asLong.value == 0l );
+         hb_retl( hb_itemGetNL( pItem ) == 0l );
          break;
 
       case HB_IT_DOUBLE:
-         hb_retl( pItem->item.asDouble.value == 0.0 );
+         hb_retl( hb_itemGetND( pItem ) == 0.0 );
          break;
 
       case HB_IT_DATE:
-         hb_retl( pItem->item.asDate.value == 0 );
+         hb_retl( hb_itemGetDL( pItem ) == 0 );
          break;
 
       case HB_IT_TIMEFLAG:
-         hb_retl( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
+         hb_retl( hb_itemGetDL( pItem ) == 0 && hb_itemGetT( pItem )== 0 );
          break;
 
       case HB_IT_POINTER:
-         hb_retl( pItem->item.asPointer.value == NULL );
+         hb_retl(  hb_itemGetPtr( pItem ) == NULL );
          break;
 
       case HB_IT_LOGICAL:
-         hb_retl( ! pItem->item.asLogical.value );
+         hb_retl( ! hb_itemGetL( pItem ) );
          break;
 
       case HB_IT_BLOCK:
@@ -107,7 +107,7 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_HASH:
-         hb_retl( pItem->item.asHash.value->ulTotalLen == 0 );
+         hb_retl( hb_hashLen( pItem ) == 0 );
          break;
 
       default:
