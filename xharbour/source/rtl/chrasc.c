@@ -79,11 +79,11 @@ HB_FUNC( CHR )
 /* converts a character value to an ASCII code */
 HB_FUNC( ASC )
 {
-   PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   const char * szValue = hb_parc( 1 ) ;   
 
-   if( pText )
+   if( szValue )
    {
-      hb_retni( ( pText->item.asString.length > 0 ) ? ( BYTE ) *pText->item.asString.value : 0 );
+      hb_retni( ( hb_parclen( 1 ) > 0 ) ? ( BYTE ) *szValue : 0 );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1107, NULL, "ASC", 1, hb_paramError( 1 ) );

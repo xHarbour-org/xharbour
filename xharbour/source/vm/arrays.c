@@ -815,6 +815,19 @@ BOOL hb_arraySetDL( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate )
    return FALSE;
 }
 
+BOOL hb_arraySetTDT( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate, long lMilliSec  )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_arraySetTDT(%p, %lu, %ld, %ld )", pArray, ulIndex, lDate, lMilliSec ) );
+
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      hb_itemPutTDT( pArray->item.asArray.value->pItems + ulIndex - 1, lDate, lMilliSec );
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
 BOOL hb_arraySetL( PHB_ITEM pArray, HB_SIZE ulIndex, BOOL fValue )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_arraySetL(%p, %lu, %d)", pArray, ulIndex, fValue ) );

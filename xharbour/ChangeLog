@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-28 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * include/hbapi.h
+    ! added hb_xreallocz like hb_xgrabz
+  * source/rtl/hbgtcore.c
+    ! using hb_xgrabz insted of hb_xgrab/memset where aplicacle  
+    ! using hb_xreallocz insted of hb_xreallocz/memset where aplicacle  
+  * contrib/gtwvw/wvwpush.c  
+    ! removed redundant tracelog function call
+  * source/rtl/chrasc.c
+    ! changed to use itemapi insted of direct structure manipulation            
+  * contrib/rdd_ads/adsfunc.c
+    ! added ADSSTMTSETTABLEREADONLY function
+    ! updated ADSCREATESQLSTATEMENT  to include  an 4th parameter to tell if cursor is readonly or readwrite
+    ! updated some functions by moving the #ifdef ADS_LIB_VERSION to the inside the function body as also added new functions 
+  * source/vm/arrays.c
+    ! added BOOL hb_arraySetTDT( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate, long lMilliSec  ) borrow from harbour     
+  * contrib/tipssl/httpcln.prg
+    ! minor fix to close method . thanks for Anatole Kolotovkin for reporting the problem    
+        
 2014-12-27 11:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * source/rtl/dateshb.c
     ! changed to use itemapi insted of direct structure manipulation        

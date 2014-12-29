@@ -151,7 +151,7 @@ HB_FUNC( WVW_PBCREATE)
                           iOffTop, iOffLeft, iOffBottom, iOffRight,
                           dStretch, bMap3Dcolors,
                           BS_PUSHBUTTON );
-   TraceLog("gt.log","push id %i\n",uiPBid);
+//    TraceLog("gt.log","push id %i\n",uiPBid);
    hb_retnl( (LONG) uiPBid );
 }
 

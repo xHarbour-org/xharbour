@@ -639,6 +639,7 @@ extern HB_EXPORT HB_TYPE   hb_arrayGetType( PHB_ITEM pArray, HB_SIZE ulIndex ); 
 extern HB_EXPORT BOOL      hb_arraySetForward( PHB_ITEM pArray, HB_SIZE ulIndex, PHB_ITEM pItem ); /* sets an array element by forwarding it's value */
 extern HB_EXPORT BOOL      hb_arraySetDS( PHB_ITEM pArray, HB_SIZE ulIndex, char * szDate );
 extern HB_EXPORT BOOL      hb_arraySetDL( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate );
+extern HB_EXPORT BOOL      hb_arraySetTDT( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate, long lMilliSec  );
 extern HB_EXPORT BOOL      hb_arraySetL( PHB_ITEM pArray, HB_SIZE ulIndex, BOOL fValue );
 extern HB_EXPORT BOOL      hb_arraySetNI( PHB_ITEM pArray, HB_SIZE ulIndex, int iNumber );
 extern HB_EXPORT BOOL      hb_arraySetNL( PHB_ITEM pArray, HB_SIZE ulIndex, long lNumber );
@@ -1031,6 +1032,7 @@ extern HB_EXPORT void    hb_strtohex( const char * pSource, HB_SIZE size, char *
 extern HB_EXPORT void   hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * iWord );
 extern HB_EXPORT int    hb_arrayMode( void );
 #define hb_xgrabz( n )        memset( hb_xgrab( ( n ) ), 0, ( n ) )
+#define hb_xreallocz( p, n )     memset( hb_xrealloc	( ( p ) ,( n ) ), 0, ( n ) )
 #define hb_xmemdup( p, n )    memcpy( hb_xgrab( ( n ) ), ( p ), ( n ) )
 
 #include "local.h"

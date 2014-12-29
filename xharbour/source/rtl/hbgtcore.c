@@ -115,10 +115,10 @@ static void * hb_gt_def_New( PHB_GT pGT )
    pGT->screenBuffer =
       ( PHB_SCREENCELL ) hb_xgrab( sizeof( HB_SCREENCELL ) * ulSize );
    pGT->prevBuffer   =
-      ( PHB_SCREENCELL ) hb_xgrab( sizeof( HB_SCREENCELL ) * ulSize );
+      ( PHB_SCREENCELL ) hb_xgrabz( sizeof( HB_SCREENCELL ) * ulSize );
    pGT->pLines       = ( BOOL * ) hb_xgrab( sizeof( BOOL ) * pGT->iHeight );
 
-   memset( pGT->prevBuffer, 0, sizeof( HB_SCREENCELL ) * ulSize );
+//    memset( pGT->prevBuffer, 0, sizeof( HB_SCREENCELL ) * ulSize );
    for( i = 0; i < pGT->iHeight; ++i )
       pGT->pLines[ i ] = TRUE;
 
@@ -1945,16 +1945,16 @@ static BOOL hb_gt_def_Resize( PHB_GT pGT, int iRows, int iCols )
          }
 
          pGT->screenBuffer =
-            ( PHB_SCREENCELL ) hb_xrealloc( pGT->screenBuffer,
+            ( PHB_SCREENCELL ) hb_xreallocz( pGT->screenBuffer,
                                             sizeof( HB_SCREENCELL ) * ulLen );
          pGT->prevBuffer   =
-            ( PHB_SCREENCELL ) hb_xrealloc( pGT->prevBuffer,
+            ( PHB_SCREENCELL ) hb_xreallocz( pGT->prevBuffer,
                                             sizeof( HB_SCREENCELL ) * ulLen );
          pGT->pLines       = ( BOOL * ) hb_xrealloc( pGT->pLines,
                                                      sizeof( BOOL ) * iRows );
 
-         memset( pGT->screenBuffer, 0, sizeof( HB_SCREENCELL ) * ulLen );
-         memset( pGT->prevBuffer, 0, sizeof( HB_SCREENCELL ) * ulLen );
+//          memset( pGT->screenBuffer, 0, sizeof( HB_SCREENCELL ) * ulLen );
+//          memset( pGT->prevBuffer, 0, sizeof( HB_SCREENCELL ) * ulLen );
          for( i = 0; i < iRows; ++i )
             pGT->pLines[ i ] = TRUE;
          for( ulIndex = 0; ulIndex < ulLen; ++ulIndex )
@@ -3160,8 +3160,9 @@ BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
             pFuncTable = &s_gtCoreFunc;
          if( ! s_curGT )
          {
-            s_curGT = ( PHB_GT_BASE ) hb_xgrab( sizeof( HB_GT_BASE ) );
-            memset( s_curGT, 0, sizeof( HB_GT_BASE ) );
+             s_curGT = ( PHB_GT_BASE ) hb_xgrabz( sizeof( HB_GT_BASE ) );
+//             memset( s_curGT, 0, sizeof( HB_GT_BASE ) );
+
          }
          s_curGT->pFuncTable = pFuncTable;
          return TRUE;
@@ -3184,8 +3185,8 @@ BOOL hb_gtLoad( const char * szGtName, PHB_GT_FUNCS pFuncTable )
 
          if( ! s_curGT )
          {
-            s_curGT = ( PHB_GT_BASE ) hb_xgrab( sizeof( HB_GT_BASE ) );
-            memset( s_curGT, 0, sizeof( HB_GT_BASE ) );
+            s_curGT = ( PHB_GT_BASE ) hb_xgrabz( sizeof( HB_GT_BASE ) );
+//             memset( s_curGT, 0, sizeof( HB_GT_BASE ) );
          }
          s_curGT->pFuncTable = pFuncTable;
 
