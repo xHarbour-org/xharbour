@@ -2618,7 +2618,7 @@ ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 ulRetVal = AdsSetDate( pArea->hStatement,
 	(UNSIGNED8*) hb_parc(1),
 	(UNSIGNED8*) hb_parc(2), 
-	(UNSIGNED32)hb_parclen(2) );
+	(UNSIGNED16) hb_parclen(2) );
 hb_retl( ulRetVal == AE_SUCCESS );
 }
 
@@ -2723,7 +2723,7 @@ HB_FUNC( ADSBUILDRAWKEY )
    UNSIGNED8 aucKey[ADS_MAX_KEY_LENGTH];
    UNSIGNED16 auclen = sizeof( aucKey );
    ulRetVal = AdsBuildRawKey( (hb_parnl(1)==0) ? pArea->hOrdCurrent : hb_parnl(1),  aucKey , &auclen  );
-   hb_storc( ulRetVal == AE_SUCCESS ? ( UNSIGNED8  * ) aucKey : ( UNSIGNED8  * )NULL, 2 );
+   hb_storc( ulRetVal == AE_SUCCESS ? ( UNSIGNED8  * ) aucKey : ( UNSIGNED8  * )"", 2 );
    hb_storni(ulRetVal == AE_SUCCESS ? auclen : 0 , 3 );
    hb_retl( ulRetVal == AE_SUCCESS );
 }
