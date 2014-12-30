@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2014-12-29 22:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+  * contrib/rdd_ads/adsfunc.c
+    ! added  cast to make msvc happy
+    
 2014-12-29 10:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
   * contrib/rdd_ads/adsfunc.c
     ! fixed two cast to make msvc happy
