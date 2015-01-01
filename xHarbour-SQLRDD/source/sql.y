@@ -1,6 +1,8 @@
 %pure_parser
 %name-prefix="sql_yy"
 %expect 1
+%parse-param { void * stmt }
+%lex-param   { void * stmt }
 
 %{
    /*
@@ -44,11 +46,9 @@
 }
 
 %{
-   #define YYPARSE_PARAM stmt
-   #define YYLEX_PARAM stmt
-   int sql_yyerror(const char * msg);
-   int sql_yyparse(void * stmt);
-   int sql_yylex(YYSTYPE* yylvaluep, void* s);
+   int yyerror(void * stmt,const char * msg);
+   int yyparse(void * stmt);
+   int yylex(YYSTYPE* yylvaluep, void* s);
 %}
 
 %token ERRORVAL

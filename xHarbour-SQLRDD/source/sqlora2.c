@@ -26,6 +26,7 @@
 #define MAX_CONNECTIONS    50
 #define MAX_CURSORS        65535
 #define MAX_COLUMNS        1024
+#define LOGFILE               "oci2.log"
 enum sqlo_iStatus_codes {
   SQLO_SUCCESS             = 0,   /**< General success code (maps to OCI_SUCCESS) */
   SQLO_ERROR               = -1,      /**< General error code (maps to OCI_ERROR) */
@@ -141,7 +142,6 @@ HB_FUNC( SQLO_CONNECT )
 
    if (SQLO_SUCCESS != session->iStatus)
    {
-      TraceLog( "sqlerror.log", "Erro apos chamar OCI_Initialize \n");
       hb_retni( SQL_ERROR );
    }
 
@@ -280,7 +280,7 @@ HB_FUNC( SQLO_COMMIT )
    {
 	  
       session->iStatus = OCI_Commit(session->cn) ? 0 : -1;
-      TraceLog("ret.log", " commit %i\n", session->iStatus );
+
       if( SQLO_SUCCESS == session->iStatus )
       {
          hb_retni( SQL_SUCCESS );
@@ -329,7 +329,7 @@ HB_FUNC( SQLO_EXECDIRECT )
    if( session )
    {
       session->stmt = OCI_StatementCreate(session->cn);
-      TraceLog("ret.log"," SQLO_EXECDIRECT statement criado %p query %s\n", session->stmt,stm ) ;
+
       if ( OCI_ExecuteStmt( session->stmt,stm ))
       {
 
@@ -339,7 +339,7 @@ HB_FUNC( SQLO_EXECDIRECT )
       {
           hb_retni( SQL_ERROR );
       }
-      TraceLog("ret.log","SQLO_EXECDIRECT liberei statement %p\n", session->stmt ) ;
+
       OCI_StatementFree( session->stmt ) ;         
    }
    else
@@ -359,7 +359,7 @@ HB_FUNC( SQLO_EXECUTE )
       if (lStmt )
       {
          OCI_SetPrefetchSize(session->stmt,100 ) ;
-         TraceLog("ret.log"," SQLO_EXECUTE statement criado %p query %s lstmt %i \n", session->stmt,stm,lStmt ) ;
+
          if ( ! OCI_Execute(session->stmt) ) 
          {
 
@@ -380,7 +380,7 @@ HB_FUNC( SQLO_EXECUTE )
          //OCI_SetFetchMode( session->stmt,OCI_SFM_SCROLLABLE);
          //OCI_SetFetchSize(session->stmt,100);
          OCI_SetPrefetchSize(session->stmt,100 ) ;
-         TraceLog("ret.log"," SQLO_EXECUTE statement criado %p query %s lstmt %i \n", session->stmt,stm,lStmt ) ;
+
          if ( !OCI_ExecuteStmt( session->stmt,stm ))
          {
             session->numcols = 0;
@@ -859,7 +859,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
          }
 
          default:
-            TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
    else
@@ -1039,7 +1039,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
          }
 
          default:
-            TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
 }

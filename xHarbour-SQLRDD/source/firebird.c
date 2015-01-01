@@ -771,8 +771,7 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
          case IB_SQL_LONG:
          case IB_SQL_INT64:
          case IB_SQL_SHORT:
-            p = data;
-            
+         {            
                ISC_INT64 value = 0;
                short field_width = 0, dscale;
                switch (dtype)
@@ -840,16 +839,16 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
                }
             
             hb_storc( data, 3 );
+        }
             break;
 
          case IB_SQL_FLOAT:
-            p = data;
             hb_snprintf( data, sizeof( data ), "%15g ", *(float ISC_FAR *) (var->sqldata));
             hb_storc( data, 3 );
             break;
 
          case IB_SQL_DOUBLE:
-            p = data;
+            
             hb_snprintf( data, sizeof( data ), "%24f ", *(double ISC_FAR *) (var->sqldata));
             hb_storc( data, 3 );
             break;
@@ -1379,10 +1378,11 @@ HB_FUNC( FBLINEPROCESSED )
 
                case IB_SQL_LONG:
                case IB_SQL_INT64:
-               case IB_SQL_SHORT:
-               {                                    
-                     ISC_INT64 value = 0;
+               case IB_SQL_SHORT:               
+               {
+                     ISC_INT64 value ;
                      short field_width = 0, dscale;
+                     value =0;
                      switch (dtype)
                      {
                      case IB_SQL_SHORT:
@@ -1462,11 +1462,11 @@ HB_FUNC( FBLINEPROCESSED )
                   
                   
                   hb_arraySetForward( pRet, icol , temp );
-              }  
+}              
                   break;
 
                case IB_SQL_FLOAT:
-//                   p = data;
+//                   
                   
 //                   hb_snprintf( data, sizeof( data ), "%15g ", *(float ISC_FAR *) (var->sqldata));
 //                   TraceLog("fb.log","valor float = %lf data %s\n",*(float ISC_FAR *) (var->sqldata),data);
@@ -1476,7 +1476,7 @@ HB_FUNC( FBLINEPROCESSED )
                   break;
 
                case IB_SQL_DOUBLE:
-//                   p = data;
+//                   
                   
 //                   hb_snprintf( data, sizeof( data ), "%24f ", *(double ISC_FAR *) (var->sqldata));
 //                   TraceLog("fb.log","valor double = %lf data %s\n",*(float ISC_FAR *) (var->sqldata),data);
@@ -1551,7 +1551,7 @@ HB_FUNC( FBLINEPROCESSED )
                case IB_SQL_TYPE_DATE:
                   isc_decode_sql_date ( ( ISC_DATE ISC_FAR * ) var->sqldata, &times );
                   hb_snprintf( date_s, sizeof( date_s ), "%04d-%02d-%02d", times.tm_year + 1900, times.tm_mon + 1, times.tm_mday );
-                  p = data;
+                  
                   hb_snprintf( data, sizeof( data ), "%*s ", 8, date_s );
                   FBFieldGet( hb_arrayGetItemPtr( pFields, icol ), temp, (char * ) data, strlen( data ), bQueryOnly, ulSystemID, bTranslate );
                   hb_arraySetForward( pRet, icol , temp );

@@ -89,7 +89,7 @@ HB_FUNC( SQLO_CONNECT )
 
    if (SQLO_SUCCESS != session->status)
    {
-      // TraceLog( "sqlerror.log", "Error %i in Oracle enviroment (is ORACLE_HOME env var defined?).\n", session->status );
+
       hb_retni( SQL_ERROR );
    }
 
@@ -219,7 +219,7 @@ HB_FUNC( SQLO_EXECUTE )
    if( session )
    {
 
-      // TraceLog( "oci.log", "Statement: %s\n", hb_parcx(2) );
+
       if (lStmt )
       {
 
@@ -830,7 +830,7 @@ HB_FUNC( ORACLEWRITEMEMO )
          const char * sMemo  = hb_arrayGetCPtr( pFieldDesc, 2 );
          const char * sField = hb_arrayGetCPtr( pFieldDesc, 1 );
          sprintf( szSql, "UPDATE %s SET %s = EMPTY_CLOB() WHERE %s = %lu RETURNING %s INTO :b1", sTable, sField, sRecnoName, ulRecno, sField );
-         //TraceLog( "memo.log", "len %i de %i, frase: %s\n", uiSize, uiLen, szSql );
+
          sth = sqlo_prepare( session->dbh, szSql );
          sqlo_alloc_lob_desc( session->dbh, &loblp );
          sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0);
@@ -1411,19 +1411,19 @@ HB_FUNC( ORACLE_EXECCURSOR )
   int ret = 1 ; 
    /* execute the PL/SQL block */
    if (SQLO_SUCCESS != sqlo_execute(session->stmtParam, 1)) {
-      //TraceLog( "testesql.log", "erro in init 1  %1\n", 1 ); 
+
       hb_retni( SQL_ERROR );
       return;
    }
    /* execute the refcursor */
    if (SQLO_SUCCESS != sqlo_execute(session->stmtParamRes, 1)) {
-     //TraceLog( "testesql.log", "erro in init 2 %1\n", 2 ); 
+
      hb_retni( SQL_ERROR );
      return ;
    }
 
    session->numcols = sqlo_ncols( session->stmtParamRes, 0 );               
-   //TraceLog( "testesql.log", "Coluns in init %1\n", session->numcols );  
+   
 
    hb_retni( ret );
 }

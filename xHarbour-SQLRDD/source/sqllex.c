@@ -743,12 +743,13 @@ int sqlyylex(YYSTYPE* lvalp, void* s) {
    return *stmt->queryPtr++;
 }
 
-int sql_yyerror(const char* msg)
+int sql_yyerror(void * stmt,const char* msg)
 {
    #ifdef YYDEBUG
-      printf("Parse Error %s\n", msg);
+      printf("Parse Error %p  %s\n",stmt, msg);
    #else
       HB_SYMBOL_UNUSED( msg );
+      HB_SYMBOL_UNUSED( stmt );
    #endif
 
    return 1;

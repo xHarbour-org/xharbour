@@ -18,6 +18,7 @@
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMXML = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
+#define LOGFILE               "pgs.log"
 typedef struct _PSQL_SESSION
 {
    int status;                   // Execution return value
@@ -418,7 +419,7 @@ HB_FUNC( PGSQUERYATTR )     /* PGSQueryAttr( ResultSet ) => aStruct */
             break;
             
          default:
-            TraceLog( "sqlerror.log", "Strange data type returned in query: %i\n", type );
+            TraceLog( LOGFILE, "Strange data type returned in query: %i\n", type );
             break;
       }
 
@@ -455,7 +456,7 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
 
    if (PQresultStatus( stmtTemp ) != PGRES_TUPLES_OK)
    {
-      TraceLog( "sqlerror.log", "Query error : %i - %s\n", PQresultStatus( stmtTemp ), PQresStatus(PQresultStatus( stmtTemp )) );
+      TraceLog( LOGFILE, "Query error : %i - %s\n", PQresultStatus( stmtTemp ), PQresStatus(PQresultStatus( stmtTemp )) );
       PQclear( stmtTemp );
    }
 
@@ -601,7 +602,7 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
             
             
          default:
-            TraceLog( "sqlerror.log", "Strange data type returned: %i\n", type );
+            TraceLog( LOGFILE, "Strange data type returned: %i\n", type );
             break;
       }
 
@@ -689,7 +690,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
          }
 
          default:
-            TraceLog( "oci.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
    else
@@ -876,7 +877,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
             break;
          }
          default:
-            TraceLog( "pgs.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
 }

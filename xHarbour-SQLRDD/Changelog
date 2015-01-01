@@ -8,6 +8,22 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-01-01 11:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/pgs.c
+  * source/mysql.c
+  * source\sqlora.c
+  * source\sqlora2.c
+  * source\sqlorax.c
+  * source\sqlsrodbc.c  
+  * changed all TraceLog( "oci.log"),TraceLog( "pgs.log"),TraceLog( "fb.log"),TraceLog( "mysql.log") to TraceLog( LOGFILE )
+  
+  * source\firebird.c
+    ! minor fix on compile
+  * source\sqllex.c
+     int sql_yyerror(const char* msg) -> int sql_yyerror(void * stmt,const char* msg) to make newer bison version happy
+  * source\sql.y
+    ! changed to make bison 2.5 or newer happy
+    
 2014-12-15 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/pgs.c
     ! using hb_xgrabz insted of hb_xgrab follow by memset

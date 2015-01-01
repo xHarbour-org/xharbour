@@ -55,6 +55,7 @@
 #define SQL_GUID                            -11
 #endif
 
+#define LOGFILE               "odbc.log"
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 void odbcErrorDiagRTE( SQLHSTMT hStmt, char * routine, char * szSql, SQLRETURN res, int line, char * module );
@@ -394,7 +395,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
          }
 #endif
          default:
-            TraceLog( "odbc.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
    else
@@ -602,7 +603,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
          }
 #endif
          default:
-            TraceLog( "odbc.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
 }
@@ -659,14 +660,9 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       else
       {
 	      
-
-//           LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( pFields, i ), FIELD_DOMAIN );
-//         TraceLog("field.log"," campo %s tipo %lu \n", hb_arrayGetCPtr( hb_arrayGetItemPtr( pFields, i ), 1 ),lType);
-         odbcGetData( ( HSTMT ) hb_parptr( 1 ), hb_arrayGetItemPtr( pFields, i ),temp,  bQueryOnly, ulSystemID, bTranslate,lIndex  );
-	              
-                        hb_arraySetForward( pRet, i, temp );
-                     
-        	         }
+         odbcGetData( ( HSTMT ) hb_parptr( 1 ), hb_arrayGetItemPtr( pFields, i ),temp,  bQueryOnly, ulSystemID, bTranslate,lIndex  );	              
+         hb_arraySetForward( pRet, i, temp );                     
+      }
       hb_itemRelease( temp );
    }
 //    hb_xfree( ( PTR ) bBuffer );
@@ -947,7 +943,7 @@ HB_FUNC( SR_DESCRIB )
     bBuffer      = ( SQLTCHAR * ) hb_xgrab( lLen * sizeof( SQLTCHAR ) );
     bBuffer[ 0 ] = '\0';
 
-//    TraceLog("field.log" , "entrou  bBuffer %s  wBufLen %lu   wDataType %lu   wColSize %lu wDecimals %lu wNullable %lu \n",bBuffer, wBufLen,   wDataType, wColSize,wDecimals, wNullable );
+
     wResult   = SQLDescribeCol( ( HSTMT ) hb_parptr( 1 ), 
                                             ( SQLUSMALLINT )  hb_parni( 2 ),
                                             ( SQLTCHAR * )    bBuffer, 
@@ -972,7 +968,7 @@ HB_FUNC( SR_DESCRIB )
        hb_stornint(  wColSize, 7 );
        hb_storni( ( int ) wDecimals, 8 );
        hb_storni( ( int ) wNullable, 9 );
-//TraceLog("field.log" , "  bBuffer %s  wBufLen %lu   wDataType %lu   wColSize %lu wDecimals %lu wNullable %i \n",bBuffer, wBufLen,   wDataType, wColSize,wDecimals, (USHORT)wNullable );
+
     }
 
     hb_xfree(  bBuffer );
@@ -1147,7 +1143,7 @@ void odbcErrorDiag( SQLHSTMT hStmt, char * routine, char * szSql, int line )
       i++;
    }
 
-   TraceLog( "sqlerror.log", "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line, SqlState, Msg, szSql );
+   //TraceLog( LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line, SqlState, Msg, szSql );
 }
 
 //-----------------------------------------------------------------------------//
@@ -1262,10 +1258,10 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                res = SQLGetData( ( HSTMT ) hStmt, ui, SQL_CHAR  ,  buffer, 0, &lLenOut  );                              
                if( SQL_SUCCEEDED( res   ) )
                {               
-//                  TraceLog("field.log" , "odbcGetData lenout %i fonte __LINE__ %lu __FILE__ %s   \n",(int)lLenOut,__LINE__, __FILE__ );
+
                   if( (int)lLenOut == SQL_NULL_DATA  || lLenOut == 0)
 	              {
-//	                     TraceLog("field.log" , "odbcGetData %lu chamei a odbcFieldGet  com %p %p  %llu %lu %lu %lu \n",__LINE__,pField, pItem, -1, bQueryOnly, ulSystemID, bTranslate );
+
 		             odbcFieldGet(pField, pItem, NULL, -1, bQueryOnly, ulSystemID, bTranslate );
 	              }
                   else if( lLenOut > 0 )
