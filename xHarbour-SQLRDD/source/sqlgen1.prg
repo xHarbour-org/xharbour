@@ -330,6 +330,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
                cSql += "CURRENT_DATE "
                Exit
             CASE SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
                cSql += "CURDATE() "
                Exit
             DEFAULT
@@ -371,6 +372,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
                Exit
             CASE SYSTEMID_POSTGR
             CASE SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
                cSql += "COALESCE("
                Exit
             DEFAULT
@@ -455,6 +457,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
                cSql += "FIRST " + ltrim(str(uData)) + " "
                Exit
             Case SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
             Case SYSTEMID_POSTGR
                cTrailler := " LIMIT " + ltrim(str(uData)) + " "
                Exit
@@ -895,6 +898,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
             CASE SYSTEMID_ORACLE
             CASE SYSTEMID_POSTGR
             CASE SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
                cSql += " || "
                Exit
             END
@@ -1188,7 +1192,7 @@ Function SR_SQLQuotedString( uData, nSystemID, lNotNull )
       return [']+transform(DtoS(uData) ,'@R 9999/99/99')+[']
    Case cType == "D" .and. nSystemID == SYSTEMID_CACHE
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
-   Case cType == "D" .and. nSystemID == SYSTEMID_MYSQL
+   Case cType == "D" .and. ( nSystemID == SYSTEMID_MYSQL .or. nSystemID == SYSTEMID_MARIADB )
       return ([str_to_date( '] + dtos(uData) + [', '%Y%m%d' )])
    Case cType == "D"
       return (['] + dtos(uData) + ['])

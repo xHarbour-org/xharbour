@@ -17,11 +17,11 @@
 
 #define  DEBUGSESSION                .F.
 #define ARRAY_BLOCK                  500
-#define MINIMAL_MYSQL_SUPPORTED  40105
+#define MINIMAL_MYSQL_SUPPORTED  50100
 
 /*------------------------------------------------------------------------*/
 
-CLASS SR_MYSQL FROM SR_CONNECTION
+CLASS SR_MARIA FROM SR_CONNECTION
 
    DATA aCurrLine
 
@@ -43,7 +43,7 @@ ENDCLASS
 
 /*------------------------------------------------------------------------*/
 
-METHOD MoreResults( aArray, lTranslate )  CLASS SR_MYSQL
+METHOD MoreResults( aArray, lTranslate )  CLASS SR_MARIA
    local nRet
    (aArray)
    (lTranslate)
@@ -52,7 +52,7 @@ Return nRet
 
 /*------------------------------------------------------------------------*/
 
-METHOD Getline( aFields, lTranslate, aArray )  CLASS SR_MYSQL
+METHOD Getline( aFields, lTranslate, aArray )  CLASS SR_MARIA
 
    Local i
 
@@ -78,7 +78,7 @@ Return aArray
 
 /*------------------------------------------------------------------------*/
 
-METHOD FieldGet( nField, aFields, lTranslate ) CLASS SR_MYSQL
+METHOD FieldGet( nField, aFields, lTranslate ) CLASS SR_MARIA
    If ::aCurrLine == NIL
       DEFAULT lTranslate := .T.
       ::aCurrLine := array( LEN( aFields ) )
@@ -89,7 +89,7 @@ return ::aCurrLine[nField]
 
 /*------------------------------------------------------------------------*/
 
-METHOD FetchRaw( lTranslate, aFields ) CLASS SR_MYSQL
+METHOD FetchRaw( lTranslate, aFields ) CLASS SR_MARIA
 
    ::nRetCode := SQL_ERROR
    DEFAULT aFields    := ::aFields
@@ -106,7 +106,7 @@ Return ::nRetCode
 
 /*------------------------------------------------------------------------*/
 
-METHOD FreeStatement() CLASS SR_MYSQL
+METHOD FreeStatement() CLASS SR_MARIA
    If ::hStmt != NIL
       MYSClear ( ::hDbc )
    EndIf
@@ -115,7 +115,7 @@ Return NIL
 
 /*------------------------------------------------------------------------*/
 
-METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName ) CLASS SR_MYSQL
+METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName ) CLASS SR_MARIA
 
    local nType := 0, nLen := 0, nNull := 0
    local aFields := {}
@@ -168,7 +168,7 @@ return aFields
 
 /*------------------------------------------------------------------------*/
 
-METHOD LastError() CLASS SR_MYSQL
+METHOD LastError() CLASS SR_MARIA
 
    If ::hStmt != NIL
       Return "(" + alltrim(str( ::nRetCode ) ) + ") " + MYSResStatus( ::hDbc ) + " - " + MYSErrMsg( ::hDbc )
@@ -179,11 +179,11 @@ Return "(" + alltrim(str( ::nRetCode ) ) + ") " + MYSErrMsg( ::hDbc )
 /*------------------------------------------------------------------------*/
 
 METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
-            cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout ) CLASS SR_MYSQL
+            cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit, nTimeout ) CLASS SR_MARIA
 
    local hEnv := 0, hDbc := 0
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
-
+   Local nVersionMajor,nVersionMinor
    Local nVersionp
    
    
@@ -208,20 +208,20 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       ::nRetCode = nRet
       ::nSystemID := 0
       SR_MsgLogFile( "Connection Error" )
-      nVersionp := MINIMAL_MYSQL_SUPPORTED -100
+      nVersionp := 4      
       Return Self
    else
       ::cConnect  = cConnect
       ::hStmt     = NIL
       ::hDbc      = hDbc
-      cTargetDB   = "MySql Native"
+      cTargetDB   = "MARIADB Native"
       cSystemVers = alltrim( str( MYSVERS( hDbc ) ) )
       nVersionp  := MYSVERS( hDbc )     
-
+                              
    EndIf
 
    If (!::lQueryOnly) .and. nVersionp < MINIMAL_MYSQL_SUPPORTED
-      SR_MsgLogFile( "Connection Error: MySQL version not supported : " + cSystemVers + " / minimun is " + str(MINIMAL_MYSQL_SUPPORTED) )
+      SR_MsgLogFile( "Connection Error: MariaDB version not supported : " + cSystemVers + " / minimun is " + str(MINIMAL_MYSQL_SUPPORTED) )
       ::End()
       ::nSystemID := 0
       ::nRetCode  := -1
@@ -230,16 +230,16 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
 
    ::cSystemName := cTargetDB
    ::cSystemVers := cSystemVers
-   ::nSystemID   := SYSTEMID_MYSQL
+   ::nSystemID   := SYSTEMID_MARIADB
    ::cTargetDB   := Upper( cTargetDB )
    ::uSid        := MYSGETCONNID( hDbc )
-
+   ::lMariaDb    :=.t.
 
 return Self
 
 /*------------------------------------------------------------------------*/
 
-METHOD End() CLASS SR_MYSQL
+METHOD End() CLASS SR_MARIA
 
    ::Commit( .T. )
    ::FreeStatement()
@@ -252,19 +252,19 @@ return Super:End()
 
 /*------------------------------------------------------------------------*/
 
-METHOD Commit( lNoLog ) CLASS SR_MYSQL
+METHOD Commit( lNoLog ) CLASS SR_MARIA
    Super:Commit( lNoLog )
 Return ( ::nRetCode := MYSCommit( ::hDbc ) )
 
 /*------------------------------------------------------------------------*/
 
-METHOD RollBack() CLASS SR_MYSQL
+METHOD RollBack() CLASS SR_MARIA
    Super:RollBack()
 Return ( ::nRetCode := MYSRollBack( ::hDbc ) )
 
 /*------------------------------------------------------------------------*/
 
-METHOD ExecuteRaw( cCommand ) CLASS SR_MYSQL
+METHOD ExecuteRaw( cCommand ) CLASS SR_MARIA
 
    If upper(left(ltrim(cCommand), 6)) == "SELECT" .or. upper(left(ltrim(cCommand), 5)) == "SHOW "
       ::lResultSet := .T.
@@ -277,5 +277,5 @@ Return MYSResultStatus( ::hDbc )
 
 /*------------------------------------------------------------------------*/
 
-METHOD GetAffectedRows() CLASS SR_MYSQL
+METHOD GetAffectedRows() CLASS SR_MARIA
 return MYSAFFECTEDROWS( ::hDbc )

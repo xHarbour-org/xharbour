@@ -258,6 +258,7 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
       IF Len( aDirect ) > 0 .and.;
        ( oWA:oSql:nSystemID == SYSTEMID_FIREBR .or. ;
          oWA:oSql:nSystemID == SYSTEMID_MYSQL  .or. ;
+         oWA:oSql:nSystemID == SYSTEMID_MARIADB  .or. ;
          oWA:oSql:nSystemID == SYSTEMID_ORACLE .or. ;
          oWA:oSql:nSystemID == SYSTEMID_MSSQL6 .or. ;
          oWA:oSql:nSystemID == SYSTEMID_MSSQL7 .or. ;

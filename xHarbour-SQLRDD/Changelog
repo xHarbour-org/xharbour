@@ -8,21 +8,50 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2015-01-01 11:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+2015-01-04 18:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  + source/sqlmaria.prg
+    ! class for mariadb
+  * sql.files
+    ! added srmaria.prg to list of dependencies
+  * Include/sqlextern.ch
+    ! added SR_MARIADB to list of requests
+  * Include/sqlrdd.ch  
+    + added define for CONNECT_MARIA_XXXX starting at 7
+    + added define for SYSTEMID_MARIADB as 19
+  * source/sqlrdd.ch  
+  * source/hbsql.ch  
+  * source/sqlrddsetup.ch    
+    + added define for SYSTEMID_MARIADB as 19  
   * source/pgs.c
   * source/mysql.c
   * source\sqlora.c
   * source\sqlora2.c
   * source\sqlorax.c
   * source\sqlsrodbc.c  
-  * changed all TraceLog( "oci.log"),TraceLog( "pgs.log"),TraceLog( "fb.log"),TraceLog( "mysql.log") to TraceLog( LOGFILE )
-  
+  * changed all TraceLog( "oci.log"),TraceLog( "pgs.log"),TraceLog( "fb.log"),TraceLog( "mysql.log") to TraceLog( LOGFILE )  
   * source\firebird.c
     ! minor fix on compile
   * source\sqllex.c
      int sql_yyerror(const char* msg) -> int sql_yyerror(void * stmt,const char* msg) to make newer bison version happy
   * source\sql.y
     ! changed to make bison 2.5 or newer happy
+  * source/sqlmy.prg  
+    ! changed MINIMAL_MYSQL_SUPPORTED define from character to numeric
+    ! test for minimum version is againt the numeric version
+  * source/utils.prg
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlrdd0.prg
+    source/sqlrdd2.prg    
+    source/sqlgen1.prg  
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlact.c
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlconnection.prg
+    ! added test to SYSTEMID_MARIADB 
+    ! in method Connect, added test For "MARIA" on connect string to connect to mariadb
+    
+  
+    
     
 2014-12-15 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/pgs.c

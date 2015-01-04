@@ -548,6 +548,7 @@ HB_FUNC( SR_ESCAPESTRING )
          switch (idatabase)
          {
          case SYSTEMID_MYSQL:
+         case SYSTEMID_MARIADB:
             iSize = escape_mysql( ToBuffer, FromBuffer, iSize );
             break;
          case SYSTEMID_FIREBR:
@@ -594,6 +595,7 @@ char * QuoteTrimEscapeString( const char * FromBuffer, HB_SIZE iSize, int idatab
    switch (idatabase)
    {
    case SYSTEMID_MYSQL:
+   case SYSTEMID_MARIADB:
       iSize = escape_mysql( ToBuffer, FromBuffer, iSize );
       break;
    case SYSTEMID_FIREBR:
@@ -939,7 +941,7 @@ HB_FUNC( SR_DBQUALIFY )
          szOut[i+1] = '"';
          break;
       case SYSTEMID_INGRES:
-      case SYSTEMID_POSTGR:
+      case SYSTEMID_POSTGR:      
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ )
          {
@@ -957,6 +959,7 @@ HB_FUNC( SR_DBQUALIFY )
          break;
       case SYSTEMID_MYSQL:
       case SYSTEMID_OTERRO:
+      case SYSTEMID_MARIADB:
          szOut[0] = '`';
          for( i = 0; i < ulLen; i++ )
          {

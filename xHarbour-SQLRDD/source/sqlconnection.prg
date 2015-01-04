@@ -42,6 +42,7 @@ CLASS SR_CONNECTION
    DATA lSqlServer2008 AS LOGICAL INIT .F. 
    DATA lPostgresql8   AS LOGICAL INIT .F.  // do we have postgressql >= 8.3
    DATA lPostgresql83  AS LOGICAL INIT .F.  // do we have postgressql >= 8.3
+   DATA lMariaDb       AS LOGICAL INIT .F.  // do we have mariadb 
    DATA oHashActiveWAs
 
    DATA aTableInfo      INIT { => }
@@ -250,6 +251,7 @@ METHOD ListCatTables( cOwner )   CLASS SR_CONNECTION
       EndIf
       Exit
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
       ::exec( "show tables", .T., .T., @aRet )
       Exit
    Case SYSTEMID_ADABAS
@@ -726,6 +728,8 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
       EndIf
    Case "MYSQL" $ cTargetDB .and.  SubStr( alltrim(::cSystemVers), 1, 3 ) >= "4.1"
       ::nSystemID := SYSTEMID_MYSQL
+   Case "MARIADB" $ cTargetDB
+      ::nSystemID := SYSTEMID_MARIADB
    Case "FIREBIRD" $ cTargetDb .or. "INTERBASE" $ cTargetdb
       ::nSystemID := SYSTEMID_FIREBR
    Case "INTERSYSTEMS CACHE" $ cTargetDb
@@ -1011,7 +1015,7 @@ METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
             ::cDSN   += aToken[2]
          Case cBuff == "DBS"
             ::cDBS   += aToken[2]
-         Case cBuff == "HST" .or. cBuff == "OCI" .or. cBuff == "MYSQL" .or. cBuff == "PGS" .or. cBuff == "SERVER"
+         Case cBuff == "HST" .or. cBuff == "OCI" .or. cBuff == "MYSQL" .or. cBuff == "PGS" .or. cBuff == "SERVER" .or. cBuff == "MARIA"
             ::cHost   += aToken[2]
          Case cBuff == "PRT"
             ::cPort   := Val(sr_val2char(aToken[2]))

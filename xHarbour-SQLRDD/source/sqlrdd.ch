@@ -28,6 +28,7 @@
 #define CONNECT_POSTGRES               4
 #define CONNECT_ORACLE                 5
 #define CONNECT_FIREBIRD               6
+#define CONNECT_MARIA                  7
 
 #define CONNECT_QUERY_ONLY           100
 #define CONNECT_NOEXLOCK              50
@@ -38,6 +39,7 @@
 #define CONNECT_POSTGRES_QUERY_ONLY    4 + CONNECT_QUERY_ONLY
 #define CONNECT_ORACLE_QUERY_ONLY      5 + CONNECT_QUERY_ONLY
 #define CONNECT_FIREBIRD_QUERY_ONLY    6 + CONNECT_QUERY_ONLY
+#define CONNECT_MARIA_QUERY_ONLY       7 + CONNECT_QUERY_ONLY
 
 #define CONNECT_ODBC_NOEXLOCK          1 + CONNECT_NOEXLOCK
 #define CONNECT_RPC_NOEXLOCK           2 + CONNECT_NOEXLOCK
@@ -45,6 +47,7 @@
 #define CONNECT_POSTGRES_NOEXLOCK      4 + CONNECT_NOEXLOCK
 #define CONNECT_ORACLE_NOEXLOCK        5 + CONNECT_NOEXLOCK
 #define CONNECT_FIREBIRD_NOEXLOCK      6 + CONNECT_NOEXLOCK
+#define CONNECT_MARIA_NOEXLOCK         7 + CONNECT_NOEXLOCK
 
 #define CONNECT_CUSTOM               999
 
@@ -84,6 +87,7 @@
 #define SYSTEMID_OTERRO               16
 #define SYSTEMID_PERVASIVE            17
 #define SYSTEMID_AZURE                18
+#define SYSTEMID_MARIADB              19
 
 #define LASTREC_POS             99999998
 

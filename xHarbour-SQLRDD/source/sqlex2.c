@@ -67,6 +67,7 @@ char * QualifyName( char * szName, SQLEXAREAP thiswa )
       case SYSTEMID_INGRES:
       case SYSTEMID_POSTGR:
       case SYSTEMID_MYSQL:
+      case SYSTEMID_MARIADB:
       case SYSTEMID_OTERRO:
       case SYSTEMID_INFORM:
          szName[i] = tolower( (BYTE) szName[i] );

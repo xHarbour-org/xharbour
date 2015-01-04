@@ -34,6 +34,7 @@
 static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 static int iConnectionCount = 0;
+#define LOGFILE               "mysql.log"
 typedef struct _MYSQL_SESSION
 {
    int status;                   // Execution return value
@@ -252,7 +253,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
          }
 
          default:
-            TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
    else
@@ -404,7 +405,7 @@ void MSQLFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
          }
 
          default:
-            TraceLog( "mysql.log", "Invalid data type detected: %i\n", lType );
+            TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
    }
 }
@@ -711,7 +712,7 @@ HB_FUNC( MYSQUERYATTR )
          hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_NUMERIC ) );
          break;
       default:
-         TraceLog( "sqlerror.log", "Invalid data type in query : %i\n", type );
+         TraceLog( LOGFILE, "Invalid data type in query : %i\n", type );
       }
 
       /* Nullable */
@@ -750,7 +751,7 @@ HB_FUNC( MYSTABLEATTR )
 
    if ( !session->stmt )
    {
-      TraceLog( "sqlerror.log", "Query error : %i - %s\n", mysql_errno( session->dbh ), mysql_error( session->dbh ) );
+      TraceLog( LOGFILE, "Query error : %i - %s\n", mysql_errno( session->dbh ), mysql_error( session->dbh ) );
    }
 
    ret   = hb_itemNew( NULL );

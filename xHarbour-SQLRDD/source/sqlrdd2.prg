@@ -663,7 +663,7 @@ METHOD LoadRegisteredTags()  CLASS SR_WORKAREA
 
          Exit
       Case SYSTEMID_MYSQL
-
+      Case SYSTEMID_MARIADB
          aRet:= {}
          ::oSql:exec( "show index from "+ ::cFileName , .F., .T., @aRet )
 
@@ -1212,6 +1212,7 @@ METHOD LockTable( lCheck4ExcLock, lFLock ) CLASS SR_WORKAREA
    Switch ::oSql:nSystemID
    Case SYSTEMID_IBMDB2
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
    Case SYSTEMID_SYBASE
       Exit
 
@@ -1290,6 +1291,7 @@ METHOD UnlockTable(lClosing) CLASS SR_WORKAREA
    Switch ::oSql:nSystemID
    Case SYSTEMID_IBMDB2
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
    Case SYSTEMID_SYBASE
       Exit
 
@@ -2648,6 +2650,7 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                End
                Exit
             Case SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
                ::oSql:FreeStatement()
                aRet := {}
                ::oSql:exec( "SELECT LAST_INSERT_ID()",.F.,.T.,@aRet )
@@ -3240,6 +3243,7 @@ METHOD IniFields(lReSelect, lLoadCache, aInfo) CLASS SR_WORKAREA
       Switch ::oSQL:nSystemID
       Case SYSTEMID_IBMDB2
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
       Case SYSTEMID_SYBASE
          Exit
 
@@ -3670,7 +3674,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
          Else
             For i = 1 to len( ::aQuoted )
                Do Case
-               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "C" .and. valtype( ::aDat[i] ) == "C" .and. (::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_AZURE)
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "C" .and. valtype( ::aDat[i] ) == "C" .and. (::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .or. ::oSql:nSystemID == SYSTEMID_AZURE)
                   ::aInfo[ AINFO_FOUND ] := ( Upper(::aLocalBuffer[::aPosition[i]]) = Upper(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "N" .and. valtype( ::aDat[i] ) == "C"
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = val(::aDat[i]) )
@@ -3859,6 +3863,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
                            cTemp := StrTran( cTemp, "%", "!%" )
                            Exit
                         Case SYSTEMID_MYSQL
+                        Case SYSTEMID_MARIADB
                            cTemp := StrTran( cTemp, "%", "\%" )
                            cTemp := StrTran( cTemp, "_", "\_" )
                            Exit
@@ -3945,7 +3950,7 @@ METHOD sqlSeek( uKey, lSoft, lLast ) CLASS SR_WORKAREA
          Else
             For i = 1 to len( ::aQuoted )
                Do Case
-               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "C" .and. valtype( ::aDat[i] ) == "C" .and. (::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_AZURE)
+               Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "C" .and. valtype( ::aDat[i] ) == "C" .and. (::oSql:nSystemID == SYSTEMID_MSSQL7 .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .or. ::oSql:nSystemID == SYSTEMID_AZURE)
                   ::aInfo[ AINFO_FOUND ] := ( Upper(::aLocalBuffer[::aPosition[i]]) = Upper(::aDat[i]) )
                Case valtype( ::aLocalBuffer[::aPosition[i]] ) == "N" .and. valtype( ::aDat[i] ) == "C"
                   ::aInfo[ AINFO_FOUND ] := ( ::aLocalBuffer[::aPosition[i]] = val(::aDat[i]) )
@@ -5086,7 +5091,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
             cSql += " default ' '"
          EndIf
 
-      Case aCreate[i,FIELD_TYPE] == "C" .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+      Case aCreate[i,FIELD_TYPE] == "C" .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
          If aCreate[i,FIELD_LEN] > 255
             cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
          Else
@@ -5134,7 +5139,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
             cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
          EndIf
 
-      Case (aCreate[i,FIELD_TYPE] == "D") .and. (::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_SQLBAS .or. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_INGRES .or. ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_FIREBR .or. ::oSql:nSystemID == SYSTEMID_CACHE)
+      Case (aCreate[i,FIELD_TYPE] == "D") .and. (::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_SQLBAS .or. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_INGRES .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .or. ::oSql:nSystemID == SYSTEMID_FIREBR .or. ::oSql:nSystemID == SYSTEMID_CACHE)
          cSql := cSql + "DATE"
 
       Case (aCreate[i,FIELD_TYPE] == "D") .and. ::oSql:nSystemID == SYSTEMID_SYBASE
@@ -5160,7 +5165,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  .or. ::oSql:nSystemID == SYSTEMID_ADABAS )
          cSql := cSql + "BOOLEAN"
 
-      Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_MYSQL )
+      Case (aCreate[i,FIELD_TYPE] == "L") .and. (( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) )
          cSql := cSql + "TINYINT"
 
       Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_IBMDB2 .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
@@ -5195,7 +5200,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Case (aCreate[i,FIELD_TYPE] == "M") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .or. ::oSql:nSystemID == SYSTEMID_AZURE .OR. ::oSql:nSystemID == SYSTEMID_POSTGR .OR. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_CACHE)
          cSql := cSql + "TEXT"
 
-      Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+      Case (aCreate[i,FIELD_TYPE] == "M") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
          cSql := cSql + cMySqlMemoDataType
 
       Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_ADABAS
@@ -5234,9 +5239,9 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_POSTGR
          cSql := cSql + "NUMERIC (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ")  default 0 " + IF(lNotNull, " NOT NULL ", "")
 
-      Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL .and. cField == ::cRecnoName
+      Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .and. cField == ::cRecnoName
          cSql := cSql + "BIGINT (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-      Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+      Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
          cSql := cSql + cMySqlNumericDataType + " (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ") " + IF(lNotNull, " NOT NULL ", "")
 
       Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_ORACLE .and. cField == ::cRecnoName
@@ -5299,7 +5304,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          cSql := cSql + 'TIMESTAMP '   
       CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  ) // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
          cSql := cSql + 'DATETIME NULL '   
-      CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
+      CASE (aCreate[i,FIELD_TYPE] == "T") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )  
          cSql := cSql + 'DATETIME '   
       CASE (aCreate[i,FIELD_TYPE] == "V") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )    
  	         cSql := cSql + ' VARBINARY(MAX) '   
@@ -5322,12 +5327,18 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
    //If ::oSql:nSystemID == SYSTEMID_MYSQL
         //cSql += " Type=InnoDb "
    //ENDIF
+            
+   IF ::oSql:nSystemID == SYSTEMID_MARIADB
+      cSql += " Engine=InnoDb "
+   ENDIF   
+   
    IF ::oSql:nSystemID == SYSTEMID_MYSQL
-        if Val( Substr( ::oSql:cSystemVers, 1, 3 ) ) < 505
-           cSql += " Type=InnoDb "
-        else
-           cSql += " Engine=InnoDb "
-        Endif
+      if Val( Substr( ::oSql:cSystemVers, 1, 3 ) ) < 505 
+         cSql += " Type=InnoDb "
+      else
+         cSql += " Engine=InnoDb "
+      Endif
+
    ENDIF   
 
    If ::oSql:nSystemID == SYSTEMID_ORACLE .and. !Empty( SR_SetTblSpaceData() )
@@ -5421,7 +5432,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       cSql := ""
 
       Do Case
-      Case (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_FIREBR  .OR. ::oSql:nSystemID == SYSTEMID_MYSQL .OR. ::oSql:nSystemID ==SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_AZURE)
+      Case (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_FIREBR  .OR. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .OR. ::oSql:nSystemID ==SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_AZURE)
          cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY( cTblName, ::oSql:nSystemID ) + " ADD CONSTRAINT " + cTblName + "_PK PRIMARY KEY ("
          For i = 1 to len( aPk )
             cSql += if( i == 1, "", ", " )
@@ -5528,6 +5539,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
       Exit
    Case SYSTEMID_POSTGR
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB   
       ::Optmizer_1e  := " LIMIT 1"
       ::Optmizer_ne  := { |x| " LIMIT " + str(x+2,5) }
       Exit
@@ -5900,6 +5912,7 @@ METHOD sqlOpenArea( cFileName, nArea, lShared, lReadOnly, cAlias, nDBConnection 
          Exit
       Case SYSTEMID_POSTGR
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB      
          ::Optmizer_1e  := " LIMIT 1"
          ::Optmizer_ne  := { |x| " LIMIT " + str(x+2,5) }
          Exit
@@ -6886,7 +6899,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
       /* Drop the index */
 
       If !Empty(AllTrim(cConstraintName))
-         If ::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_MYSQL
+         If ::oSql:nSystemID == SYSTEMID_ORACLE .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             ::DropConstraint(::cFileName,AllTrim(cConstraintName),.T.)
          Endif
       Endif
@@ -6909,6 +6922,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
          lRet := ::oSql:exec( cSql, .T. ) == SQL_SUCCESS .or. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
          Exit
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
          For Each cName in aOldPhisNames
             ::oSql:exec( "DROP INDEX " + cName + " ON " + ::cQualifiedTableName + if(::oSql:lComments," /* Create Index */",""), .F. )
          Next
@@ -7015,7 +7029,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
       /* Drop the index */
 
       If !Empty(AllTrim(cConstraintName))
-         If ::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_MYSQL
+         If ::oSql:nSystemID == SYSTEMID_ORACLE .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             ::DropConstraint(::cFileName,AllTrim(cConstraintName),.T.)
          Endif
       Endif
@@ -7038,6 +7052,7 @@ METHOD sqlOrderCreate( cIndexName, cColumns, cTag, cConstraintName, cTargetTable
          lRet := ::oSql:exec( cSql, .T. ) == SQL_SUCCESS .or. ::oSql:nRetCode == SQL_SUCCESS_WITH_INFO
          Exit
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
          For Each cName in aOldPhisNames
             ::oSql:exec( "DROP INDEX " + cName + " ON " + ::cQualifiedTableName + if(::oSql:lComments," /* Create Index */",""), .F. )
          Next
@@ -7631,6 +7646,7 @@ METHOD sqlLock( nType, uRecord ) CLASS SR_WORKAREA
 
    Case SYSTEMID_IBMDB2
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
 
       If nType < 3
          If ::oSql:Exec( "SELECT * FROM " + ::cQualifiedTableName + if( nType < 3, " WHERE "+SR_DBQUALIFY( ::cRecnoName, ::oSql:nSystemID )+" = " + ::Quoted( uRecord,, 15, 0 ), "" ) + " FOR UPDATE" + ::oSql:cLockWait ;
@@ -8305,6 +8321,7 @@ METHOD DropColRules( cColumn, lDisplayErrorMessage, aDeletedIndexes )  CLASS SR_
                nRet := ::oSql:exec( "DROP INDEX " + ::cQualifiedTableName + "." + cPhisicalName + if(::oSql:lComments," /* Drop index before drop column */",""), lDisplayErrorMessage )
                Exit
             Case SYSTEMID_MYSQL
+            Case SYSTEMID_MARIADB
                nRet := ::oSql:exec( "DROP INDEX " + cPhisicalName + " ON " + ::cQualifiedTableName + if(::oSql:lComments," /* Drop index before drop column */",""), lDisplayErrorMessage )
                Exit
             CASE SYSTEMID_ORACLE
@@ -8382,6 +8399,7 @@ METHOD DropColumn( cColumn, lDisplayErrorMessage, lRemoveFromWA )  CLASS SR_WORK
    Case SYSTEMID_INFORM
    Case SYSTEMID_IBMDB2
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
    Case SYSTEMID_POSTGR
    Case SYSTEMID_CACHE
    Case SYSTEMID_AZURE
@@ -8533,7 +8551,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
                cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
             EndIf
 
-         Case aCreate[i,FIELD_TYPE] == "C" .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case aCreate[i,FIELD_TYPE] == "C" .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             If aCreate[i,FIELD_LEN] > 255
                cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
             Else
@@ -8581,7 +8599,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
                cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ")" + IF(lNotNull, " NOT NULL", "")
             EndIf
 
-         Case (aCreate[i,FIELD_TYPE] == "D") .and. (::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_SQLBAS .or. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_INGRES .or. ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_FIREBR .or. ::oSql:nSystemID == SYSTEMID_CACHE)
+         Case (aCreate[i,FIELD_TYPE] == "D") .and. (::oSql:nSystemID == SYSTEMID_ORACLE .or. ::oSql:nSystemID == SYSTEMID_SQLBAS .or. ::oSql:nSystemID == SYSTEMID_INFORM .or. ::oSql:nSystemID == SYSTEMID_INGRES .or. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .or. ::oSql:nSystemID == SYSTEMID_FIREBR .or. ::oSql:nSystemID == SYSTEMID_CACHE)
             cSql := cSql + "DATE"
 
          Case (aCreate[i,FIELD_TYPE] == "D") .and. ::oSql:nSystemID == SYSTEMID_SYBASE
@@ -8602,7 +8620,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
          Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  .or. ::oSql:nSystemID == SYSTEMID_ADABAS )
             cSql := cSql + "BOOLEAN"
 
-         Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_MYSQL )
+         Case (aCreate[i,FIELD_TYPE] == "L") .and. (( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) )
             cSql := cSql + "TINYINT"
 
          Case (aCreate[i,FIELD_TYPE] == "L") .and. (::oSql:nSystemID == SYSTEMID_IBMDB2 .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
@@ -8633,7 +8651,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
          Case (aCreate[i,FIELD_TYPE] == "M") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_POSTGR .OR. ::oSql:nSystemID == SYSTEMID_INFORM .OR. ::oSql:nSystemID == SYSTEMID_CACHE .or. ::oSql:nSystemID == SYSTEMID_AZURE)
             cSql := cSql + "TEXT"
 
-         Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case (aCreate[i,FIELD_TYPE] == "M") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             cSql := cSql + cMySqlMemoDataType
 
          Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_ADABAS
@@ -8672,9 +8690,9 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
          Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_POSTGR
             cSql := cSql + "NUMERIC (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ")  default 0 " + IF(lNotNull, " NOT NULL ", "")
 
-         Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL .and. cField == ::cRecnoName
+         Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .and. cField == ::cRecnoName
             cSql := cSql + "BIGINT (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             cSql := cSql + cMySqlNumericDataType + " (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ") " + IF(lNotNull, " NOT NULL ", "")
 
          Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_ORACLE .and. cField == ::cRecnoName
@@ -8737,7 +8755,7 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
             cSql := cSql + 'TIMESTAMP '   
          CASE (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  ) // .AND. ::OSQL:lSqlServer2008 .AND. SR_Getsql2008newTypes()
             cSql := cSql + 'DATETIME NULL '   
-         CASE (aCreate[i,FIELD_TYPE] == "T") .and. ::oSql:nSystemID == SYSTEMID_MYSQL  
+         CASE (aCreate[i,FIELD_TYPE] == "T") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )  
             cSql := cSql + 'DATETIME '   
          CASE (aCreate[i,FIELD_TYPE] == "V") .and. (::oSql:nSystemID == SYSTEMID_MSSQL7  )    
  	         cSql := cSql + ' VARBINARY(MAX) '   
@@ -8884,7 +8902,7 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
          IF ::oSql:nSystemID == SYSTEMID_POSTGR .or. ::oSql:nSystemID == SYSTEMID_FIREBR            
             cSql := cSql + " ALTER " + SR_DBQUALIFY( alltrim( cField  ), ::oSql:nSystemID ) + " TYPE "
             
-         elseif ::oSql:nSystemID == SYSTEMID_MYSQL
+         elseif ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             cSql := cSql + " MODIFY COLUMN " + SR_DBQUALIFY( alltrim( cField  ), ::oSql:nSystemID )
          ELSEIF ::oSql:nSystemID == SYSTEMID_ORACLE
             cSql := cSql + " MODIFY (" + SR_DBQUALIFY( alltrim( cField  ), ::oSql:nSystemID )
@@ -8942,7 +8960,7 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
                cSql := cSql + "CHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
             EndIf
 
-         Case aCreate[i,FIELD_TYPE] == "C" .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case aCreate[i,FIELD_TYPE] == "C" .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             If aCreate[i,FIELD_LEN] > 255
                cSql := cSql + "VARCHAR (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") " + IF(lNotNull, " NOT NULL", "")
             Else
@@ -9000,7 +9018,7 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
          Case (aCreate[i,FIELD_TYPE] == "M") .and. (::oSql:nSystemID == SYSTEMID_MSSQL6 .OR. ::oSql:nSystemID == SYSTEMID_MSSQL7  .OR. ::oSql:nSystemID == SYSTEMID_POSTGR .OR. ::oSql:nSystemID == SYSTEMID_INFORM .OR. ::oSql:nSystemID == SYSTEMID_CACHE .or. ::oSql:nSystemID == SYSTEMID_AZURE)
             cSql := cSql + "TEXT"
 
-         Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case (aCreate[i,FIELD_TYPE] == "M") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             cSql := cSql + cMySqlMemoDataType
 
          Case (aCreate[i,FIELD_TYPE] == "M") .and. ::oSql:nSystemID == SYSTEMID_ADABAS
@@ -9054,9 +9072,9 @@ METHOD AlterColumnsDirect( aCreate, lDisplayErrorMessage, lBakcup,aRemove ) CLAS
                cSql3 := cSql3 + " NOT NULL "
             endif  
 
-         Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL .and. cField == ::cRecnoName
+         Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB ) .and. cField == ::cRecnoName
             cSql := cSql + "BIGINT (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + ") NOT NULL UNIQUE AUTO_INCREMENT "
-         Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case (aCreate[i,FIELD_TYPE] == "N") .and. ( ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
             cSql := cSql + cMySqlNumericDataType + " (" + LTrim( Str(aCreate[i,FIELD_LEN],9,0)) + "," + LTrim( Str (aCreate[i,FIELD_DEC])) + ") " + IF(lNotNull, " NOT NULL ", "")
 
          Case (aCreate[i,FIELD_TYPE] == "N") .and. ::oSql:nSystemID == SYSTEMID_ORACLE .and. cField == ::cRecnoName
@@ -9369,7 +9387,7 @@ METHOD AddRuleNotNull( cColumn ) CLASS SR_WORKAREA
             Else
                nRet := SQL_ERROR
             EndIf
-         Case ::oSql:nSystemID == SYSTEMID_MYSQL
+         Case ::oSql:nSystemID == SYSTEMID_MYSQL .or. ::oSql:nSystemID == SYSTEMID_MARIADB
 
             If ::aFields[nCol,2] == "C"
                If ::aFields[nCol,3] > 255
@@ -9430,7 +9448,7 @@ METHOD DropRuleNotNull( cColumn ) CLASS SR_WORKAREA
       Do Case
       Case ::oSql:nSystemID == SYSTEMID_IBMDB2
 
-      Case ::oSql:nSystemID == SYSTEMID_MYSQL
+      Case ::oSql:nSystemID == SYSTEMID_MYSQL .or.  ::oSql:nSystemID == SYSTEMID_MARIADB
 
          If ::aFields[nCol,2] == "C"
             cType := "CHAR (" + str(::aFields[nCol,3],3) + ")"
@@ -9529,6 +9547,7 @@ METHOD DropConstraint( cTable, cConstraintName, lFKs, cConstrType ) CLASS SR_WOR
             cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP CONSTRAINT " + cConstraintName + if(::oSql:lComments," /* Create Constraint */","")
             Exit
          Case SYSTEMID_MYSQL
+         Case SYSTEMID_MARIADB
             If AllTrim(cConstrType) == "PK"
                cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cTable,::oSql:nSystemID) + " DROP PRIMARY KEY " + if(::oSql:lComments," /* Create Constraint */","")
             Else
@@ -9634,6 +9653,7 @@ METHOD CreateConstraint( cSourceTable, aSourceColumns, cTargetTable, aTargetColu
       Case SYSTEMID_MSSQL7
       Case SYSTEMID_SYBASE
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
       Case SYSTEMID_AZURE	
          If lPk
             cSql := "ALTER TABLE " + ::cOwner + SR_DBQUALIFY(cSourceTable,::oSql:nSystemID) + " ADD CONSTRAINT " + cConstraintName + " PRIMARY KEY (" + cTargetColumns + ")"
@@ -9907,6 +9927,7 @@ Function SR_TCNextRecord( oWA )
       Exit
    Case SYSTEMID_POSTGR
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
       oWA:exec( "SELECT coalesce(max(R_E_C_N_O_),0) + 1 AS R_E_C_N_O_ FROM " + SR_DBQUALIFY( oWA:cFileName, oWA:oSql:nSystemID ),.F.,.T.,@aRet )
       Exit
    End

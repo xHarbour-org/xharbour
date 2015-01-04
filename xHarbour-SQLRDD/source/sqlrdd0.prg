@@ -382,6 +382,15 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect2 := &( "SR_FIREBIRD()" )
 #endif
       Exit
+   Case CONNECT_MARIA
+   Case CONNECT_MARIA_NOEXLOCK
+#ifndef MYSQLRDD
+      oConnect  := &( "SR_MARIA()" )
+      oConnect2 := &( "SR_MARIA()" )
+#endif
+      Exit
+      
+      
    Case CONNECT_ODBC_QUERY_ONLY
 #ifndef MYSQLRDD
       oConnect  := &( "SR_ODBC()" )
@@ -407,6 +416,12 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
    Case CONNECT_FIREBIRD_QUERY_ONLY
 #ifndef MYSQLRDD
       oConnect  := &( "SR_FIREBIRD()" )
+      oConnect:lQueryOnly := .T.
+#endif
+      Exit
+   Case CONNECT_MARIA_QUERY_ONLY
+#ifndef MYSQLRDD
+      oConnect  := &( "SR_MARIA()" )
       oConnect:lQueryOnly := .T.
 #endif
       Exit
@@ -614,6 +629,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
          Exit
 
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
          oCnn:exec( "set session autocommit=0;" )
          oCnn:exec( "set session sql_mode = 'PIPES_AS_CONCAT'" )
          oCnn:exec( "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED" )
@@ -782,6 +798,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
          Exit
       Case SYSTEMID_IBMDB2
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
       Case SYSTEMID_ADABAS
       Case SYSTEMID_INGRES
       Case SYSTEMID_INFORM
@@ -899,6 +916,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
          oConnect:exec( "CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ DECIMAL(12) NOT NULL, WPID_ DECIMAL(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ CLOB (64000) " + If( "DB2/400" $ oCOnnect:cSystemName, "",  " NOT LOGGED COMPACT") + ", CALLSTACK_ CLOB (4000) " + If( "DB2/400" $ oCOnnect:cSystemName, "",  " NOT LOGGED COMPACT") + ", SITE_ CHAR(10), FREE1_ CHAR(50) )",.F. )
          Exit
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
          oConnect:exec( "CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOGCHG (SPID_ BIGINT(12) NOT NULL, WPID_ BIGINT(12), TYPE_ CHAR(2), APPUSER_ CHAR(50), TIME_ CHAR(16), QUERY_ MEDIUMBLOB, CALLSTACK_ MEDIUMBLOB, SITE_ CHAR(10), FREE1_ CHAR(50) )",.F. )
          Exit
       Case SYSTEMID_ADABAS
@@ -987,6 +1005,7 @@ Static Function SR_SetEnvMinimal( oConnect )
       Exit
 
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
       oCnn:exec( "set session autocommit=0;", .F. )
       oCnn:exec( "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED", .F. )
       Exit
@@ -1503,6 +1522,7 @@ Function SR_DropIndex( cIndexName, cOwner )
          oCnn:exec( "DROP INDEX " + cOwner + SR_DBQUALIFY( cFileName, oCnn:nSystemID ) + "." + cPhisicalName, .F. )
          Exit
       Case SYSTEMID_MYSQL
+      Case SYSTEMID_MARIADB
          oCnn:exec( "DROP INDEX " + cPhisicalName + " ON " + cOwner + SR_DBQUALIFY( cFileName, oCnn:nSystemID ) + if(oCnn:lComments," /* DROP Index */",""), .F. )
          Exit
       Case SYSTEMID_ORACLE
@@ -1662,6 +1682,7 @@ Function SR_RenameTable( cTable, cNewName, cOwner )
    Case SYSTEMID_POSTGR
    Case SYSTEMID_ORACLE
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
 
       IF oCnn:nSystemID == SYSTEMID_POSTGR
          nRet := oCnn:exec( "ALTER TABLE " + cOwner +SR_DBQUALIFY(cTable+"_sq",oCnn:nSystemID) + " RENAME TO " + cOwner + SR_DBQUALIFY(cNewName+"_sq",oCnn:nSystemID), .F. )
@@ -1962,6 +1983,7 @@ Function SR_ListLocks( oCnn, lAll )
       oCnn:oSqlTransact:exec( "DELETE FROM " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE convert( CHAR(10), SPID_ ) + convert( CHAR(23), LOGIN_TIME_, 21 ) NOT IN (SELECT convert( CHAR(10), SPID) + CONVERT( CHAR(23), LOGIN_TIME, 21 ) FROM MASTER.DBO.SYSPROCESSES)",.F. )
       Exit
    Case SYSTEMID_MYSQL
+   Case SYSTEMID_MARIADB
       Exit
    Case SYSTEMID_POSTGR
       oCnn:oSqlTransact:exec( "DELETE FROM  " + SR_GetToolsOwner() + "SR_MGMNTLOCKS WHERE SPID_ NOT IN (select pg_stat_get_backend_pid(pg_stat_get_backend_idset()))", .F. )
@@ -1996,6 +2018,8 @@ Function SR_DetectDBFromDSN( cConnect )
          Return CONNECT_POSTGRES
       Case cBuff == "MYSQL"
          Return CONNECT_MYSQL
+      Case cBuff == "MARIA"
+         Return CONNECT_MARIA
       Case cBuff == "FB" .or. cBuff == "FIREBIRD" .or. cBuff == "IB"
          Return CONNECT_FIREBIRD
       Case cBuff == "DSN" .or. cBuff == "DRIVER"

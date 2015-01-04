@@ -204,6 +204,7 @@ void setResultSetLimit( SQLEXAREAP thiswa, int iRows )
       break;
    case SYSTEMID_POSTGR:
    case SYSTEMID_MYSQL:
+   case SYSTEMID_MARIADB:
       fmt1 = "";
       fmt2 = "LIMIT %i";
       break;
