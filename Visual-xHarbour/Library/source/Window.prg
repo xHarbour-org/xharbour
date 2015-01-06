@@ -1588,9 +1588,10 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
          hDef := BeginDeferWindowPos( LEN( aChildren ) )
          FOR EACH oChild IN aChildren
              IF VALTYPE( oChild ) == "O"
-                oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
                 IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
                    oChild:CenterWindow()
+                 ELSE
+                   oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
                 ENDIF
                 oChild:UpdateWindow()
              ENDIF
@@ -3534,7 +3535,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDDO
       ENDIF
 
-      IF !::__Splitting
+      IF ! ::__Splitting
          // Get Standard positions
          ::xLeft := IIF( ::Anchor:Left .AND. ::Parent:__aCltRect != NIL .AND. x != NIL, x - (::Parent:__aCltRect[3] - ::xLeft), ::xLeft )
          IF ::Anchor:Top .AND. ::Dock:Bottom != NIL
@@ -3600,11 +3601,14 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
           ELSE // resize to the right
             IF oRight:hWnd == ::Parent:hWnd
-               ::xWidth := oRight:ClientWidth - ::xLeft - ::Dock:RightMargin - 1
+               ::xWidth := oRight:ClientWidth - ::xLeft - ::Dock:RightMargin
              ELSEIF oRight:IsChild
                nMargin := ::Dock:RightMargin
                IF oRight:LeftSplitter != NIL
                   nMargin := MAX( nMargin, oRight:LeftSplitter:Weight )
+               ENDIF
+               IF ::__xCtrlName == "TabControl"
+                  nMargin -= 2
                ENDIF
                ::xWidth := oRight:xLeft - ::xLeft - nMargin //::Dock:RightMargin - //IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
             ENDIF
@@ -3689,7 +3693,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             nHeight := ::xHeight
          ENDIF
 
-         IF .T. //lMoveNow .OR. !::DeferRedraw .OR. hDef == NIL
+         IF lMoveNow .OR. !::DeferRedraw .OR. hDef == NIL
             n := SWP_NOOWNERZORDER | SWP_NOZORDER
             IF ::DeferRedraw
                n := n | SWP_NOACTIVATE | SWP_DEFERERASE
@@ -4057,7 +4061,6 @@ METHOD SetMargins( cMargins ) CLASS __WindowDock
    IF ::DesignMode .AND. ::Application:ObjectManager != NIL
       ::Application:ObjectManager:PostMessage( WM_USER + 4767 )
    ENDIF
-
 RETURN Self
 
 METHOD Update() CLASS __WindowDock
@@ -4075,6 +4078,7 @@ METHOD SetDock( x ) CLASS __WindowDock
    IF x != NIL
       ::Type += x
    ENDIF
+   ::Owner:RegisterDocking()
    ::Update()
 RETURN Self
 

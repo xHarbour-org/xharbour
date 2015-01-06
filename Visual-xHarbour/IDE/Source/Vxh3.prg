@@ -129,21 +129,20 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 
-METHOD OnNCPaint( nwParam, nlParam ) CLASS FormEditor
-   LOCAL aRect, n := ::CtrlMask:CurForm:SelPointSize
-   LOCAL rc := (struct RECT)
-   ( nlParam )
-   IF !EMPTY( ::CtrlMask:CurForm:Selected )
-      aRect := ::CtrlMask:CurForm:GetSelRect()
-      IF EMPTY(aRect)
-         aRect := {0,0,0,0}
-      ENDIF
-      rc:left   := aRect[1]+n
-      rc:top    := aRect[2]+n
-      rc:right  := aRect[3]-n
-      rc:bottom := aRect[4]-n
-   ENDIF
+METHOD OnNCPaint( nwParam ) CLASS FormEditor
+   LOCAL rc, aRect, n := ::CtrlMask:CurForm:SelPointSize
    IF ::Application:ShowRulers
+      rc := (struct RECT)
+      IF !EMPTY( ::CtrlMask:CurForm:Selected )
+         aRect := ::CtrlMask:CurForm:GetSelRect()
+         IF EMPTY(aRect)
+            aRect := {0,0,0,0}
+         ENDIF
+         rc:left   := aRect[1]+n
+         rc:top    := aRect[2]+n
+         rc:right  := aRect[3]-n
+         rc:bottom := aRect[4]-n
+      ENDIF
       PaintRulers( ::hWnd,;
                    nwParam,;
                    ::RulerWeight,;

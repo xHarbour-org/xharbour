@@ -1699,6 +1699,18 @@ HB_FUNC( SETTEXTCOLOR )
 }
 
 //-------------------------------------------------------------------------------------------------
+HB_FUNC( SETDCPENCOLOR )
+{
+   hb_retnl( (LONG) SetDCPenColor( (HDC) hb_parnl(1), (COLORREF) hb_parnl(2) ) );
+}
+
+//-------------------------------------------------------------------------------------------------
+//HB_FUNC( SETDCBRUSHCOLOR )
+//{
+//   hb_retnl( (LONG) SetDCBrushColor( (HDC) hb_parnl(1), (COLORREF) hb_parnl(2) ) );
+//}
+
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( SELECTOBJECT )
 {
    hb_retnl( (LONG) SelectObject( (HDC) hb_parnl(1), (HGDIOBJ) hb_parnl(2) ) );
@@ -10857,4 +10869,35 @@ HB_FUNC( ISCARET )
 {
    POINT lpPoint;
    hb_retl( GetCaretPos( &lpPoint ) );
+}
+
+HB_FUNC( EXTCREATEPEN )
+{
+   PHB_ITEM pStructure = hb_pureparam( 3, HB_IT_ANY );
+   PHB_ITEM pArray = hb_param( 4, HB_IT_ARRAY );
+
+   if( pStructure && HB_IS_OBJECT( pStructure ) )
+   {
+      LOGBRUSH *lplb;
+      DWORD *pStyle;
+      int iCount = pArray->item.asArray.value->ulLen;
+
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_itemPushForward( pStructure );
+      hb_vmSend(0);
+
+      lplb = (LOGBRUSH *) hb_parc(-1);
+
+      pStyle  = (DWORD*) hb_xgrab( iCount * sizeof(DWORD) );
+
+      int i;
+      for ( i = 0; i < iCount; i++ )
+      {
+          *(pStyle+i) = hb_arrayGetNI( pArray, i+1 );
+      }
+
+      hb_retnl( (long) ExtCreatePen( (DWORD) hb_parnl(1), (DWORD) hb_parnl(2), lplb, (DWORD) iCount, pStyle ) );
+
+      hb_xfree( (void *) pStyle );
+   }
 }

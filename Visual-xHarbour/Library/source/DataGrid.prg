@@ -4185,7 +4185,7 @@ CLASS GridColumn INHERIT Object
    METHOD GetRectangle()             INLINE { ::Left, ::Top, ::Left + ::Width, ::Top + ::Height }
    METHOD GetChildFromPoint()        INLINE Self
    METHOD SetSize()                  INLINE Self
-   METHOD __OnparentSize()           INLINE 0
+   METHOD __OnParentSize()           INLINE 0
    METHOD Refresh()                  INLINE ::Parent:__DisplayData(, ::xPosition,, ::xPosition )
    METHOD GetEditValue()             INLINE ::Parent:__CurControl:oGet:VarGet()
    METHOD SetWindowPos(h, x, y, cx ) INLINE (h), (x), (y), ::Width := cx, ::Parent:Update()

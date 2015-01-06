@@ -346,6 +346,7 @@ CLASS IDE_MainForm FROM WinForm
    METHOD OnSetFocus()
    METHOD OnNCActivate(n) INLINE IIF( ::Application:Project:CurrentForm != NIL, (::CallWindowProc(), ::Application:Project:CurrentForm:InActive := n==0, IIF( n <> 0, ::Application:Project:CurrentForm:UpdateSelection(),), ::Application:Project:CurrentForm:RedrawWindow(,, RDW_FRAME|RDW_INVALIDATE|RDW_UPDATENOW ) ), ),  ::SetKeyStatus( VK_CAPITAL ), NIL
    METHOD OnNavigateError()
+   METHOD OnDocumentComplete()
    METHOD EnableSearchMenu()
 ENDCLASS
 
@@ -369,6 +370,11 @@ METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLA
                     '</html>' + CRLF
    Sender:Navigate( "About:blank" )
    Sender:Document:Write( cBuffer )
+RETURN NIL
+
+METHOD OnDocumentComplete( Sender ) CLASS IDE_MainForm
+   Sender:Document:Body:scroll := "no"
+   Sender:Document:Body:Style:OverflowY := "hidden"
 RETURN NIL
 
 
@@ -1639,7 +1645,7 @@ METHOD Init() CLASS IDE_MainForm
          END
       ENDIF
 
-      WITH OBJECT ::Application:ObjectTab := TabStrip( :this )
+      WITH OBJECT ::Application:ObjectTab := TabControl( :this )
          :Dock:Left   := :Parent
          :Dock:Top    := ::Application:Props[ "ComboSelect" ]
          :Dock:Right  := :Parent
@@ -1845,7 +1851,6 @@ METHOD Init() CLASS IDE_MainForm
          :Dock:Bottom      := :Parent
          :Dock:Right       := :Parent
          :Dock:Top         := :Parent
-         :Dock:RightMargin := -1
          :TabStop          := .F.
          :Create()
 
@@ -1939,10 +1944,8 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    // TabControl
-   WITH OBJECT ::Application:MainTab := TabStrip( Self )
-      :Width       := 680
-      :Height      := 300
-      :Dock:Margin := 3
+   WITH OBJECT ::Application:MainTab := TabControl( Self )
+      :Dock:Margin := 2
       :Dock:Left   := ::Application:ToolBox
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
       :Dock:Right  := ::Panel1
@@ -1970,17 +1973,19 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
 
       WITH OBJECT ::Application:Props[ "StartTabPage" ] := StartTabPage( :this )
-         :Caption      := "Start Page"
+         :Text         := "Start Page"
+         :TabBackColor := RGB(0,122,204)
+         :TabTextColor := RGB(255,255,255)
+         :TopMargin    := 2
          :Create()
 
          WITH OBJECT StartPagePanel( :this )
             :ImageList  := ::Application:MainForm:ToolStrip1:ImageList
             :BackColor  := C_WHITE
-            :Left   := 10
-            :Top    := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
-            :Width  := ::Application:StartPageBrushes:RecentBk[2]
-            :Height := ::Application:StartPageBrushes:RecentBk[3]
-
+            :Left       := 10
+            :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
+            :Width      := ::Application:StartPageBrushes:RecentBk[2]
+            :Height     := ::Application:StartPageBrushes:RecentBk[3]
             :Cursor     := IDC_HAND
             :HorzScroll := .T.
             :VertScroll := .T.
@@ -2012,69 +2017,74 @@ METHOD Init() CLASS IDE_MainForm
             :nPanel     := 1
             :ImageList  := ::ToolStrip1:ImageList
             :BackColor  := C_WHITE
-
             :Left       := 300
             :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
             :Width      := ::Application:StartPageBrushes:NewsBk[2]
             :Height     := ::Application:StartPageBrushes:NewsBk[3]
-
             :Cursor     := IDC_HAND
             :HorzScroll := .T.
             :VertScroll := .T.
             :Create()
+
             WITH OBJECT WebBrowser( :this )
                :ControlParent := .T.
-               :Left    := 6
-               :Top     := 28
-               :Width   := :Parent:Width - 12
-               :height  := :Parent:height - 76
-               :Url     := __NEWS_URL__
+               :Left          := 6
+               :Top           := 28
+               :Width         := :Parent:Width - 12
+               :height        := :Parent:height - 76
+               :Url           := __NEWS_URL__
                :EventHandler[ "NavigateError" ] := "OnNavigateError"
+               :EventHandler[ "DocumentComplete" ] := "OnDocumentComplete"
                :Create()
             END
          END
       END
 
       WITH OBJECT XHDN_Page( :this )
-         :Caption   := "xHarbour Developers Network"
+         :Text    := "xHarbour Developers Network"
+         :TabBackColor := RGB(0,122,204)
+         :TabTextColor := RGB(255,255,255)
+         :TopMargin    := 2
          :Create()
-         :ActiveX := WebBrowser( :this )
-         :ActiveX:Url := __XHDN_URL__
-         :ActiveX:ControlParent := .T.
-         :ActiveX:DockToParent()
-         :ActiveX:EventHandler[ "NavigateError" ] := "OnNavigateError"
-         :ActiveX:Create()
+
+         WITH OBJECT :ActiveX := WebBrowser( :this )
+            :Url := __XHDN_URL__
+            :ControlParent := .T.
+            :DockToParent()
+            :EventHandler[ "NavigateError" ] := "OnNavigateError"
+            :Create()
+         END
       END
 
       WITH OBJECT ::Application:EditorPage := TabPage( :this )
-         :Caption          := "Source Code Editor"
-         :BackColor        := ::System:Color:White
-
-         :OnWMShowWindow   := {|| OnShowEditors() }
-         :OnWMSetFocus     := {|| ::Application:SourceEditor:SetFocus() }
-
+         :Caption        := "Source Code Editor"
+         :BackColor      := ::Application:IniFile:ReadColor( "Colors", "BackGround", ::System:Color:White )
+         :OnWMShowWindow := {|| OnShowEditors() }
+         :OnWMSetFocus   := {|| ::Application:SourceEditor:SetFocus() }
+         :TabBackColor   := RGB(0,122,204)
+         :TabTextColor   := RGB(255,255,255)
+         :TopMargin      := 2
          :Create()
-         WITH OBJECT ::Application:SourceEditor := SourceEditor( :this )
-            :Left             := 400
-            :Top              := 100
-            :Width            := 200
-            :Height           := 250
-            :Dock:Left        := :Parent
-            :Dock:Bottom      := :Parent
-            :Dock:Right       := :Parent
-            :Dock:Top         := :Parent
-            :Create()
-            :Disable()
-         END
 
+         WITH OBJECT ::Application:SourceEditor := SourceEditor( :this )
+            :Dock:Left   := :Parent
+            :Dock:Bottom := :Parent
+            :Dock:Right  := :Parent
+            :Dock:Top    := :Parent
+            :Enabled     := .F.
+            :Create()
+         END
       END
 
       WITH OBJECT ::Application:DesignPage := TabPage( :this )
-         :Caption   := "Form Designer"
-         :BackColor := ::System:Color:White
-         :Enabled   := .F.
-         :Create()
+         :Caption        := "Form Designer"
+         :BackColor      := ::System:Color:White
+         :Enabled        := .F.
          :OnWMShowWindow := {|o| OnShowDesigner(o) }
+         :TabBackColor   := RGB(0,122,204)
+         :TabTextColor   := RGB(255,255,255)
+         :TopMargin      := 2
+         :Create()
 
          WITH OBJECT FormEditor( :this )
             :Dock:Left   := :Parent
@@ -2347,10 +2357,10 @@ RETURN oApp:Project:CurrentForm
 
 CLASS XHDN_Page INHERIT TabPage
    DATA ActiveX
-   METHOD OnSize(w,l) INLINE Super:OnSize( w, l ), IIF( ::ActiveX != NIL, (::ActiveX:Left   := 2,;
-                                                  ::ActiveX:Top    := 2,;
-                                                  ::ActiveX:Width  := ::ClientWidth - 4,;
-                                                  ::ActiveX:Height := ::ClientHeight - 4 ),), 0
+//   METHOD OnSize(w,l) INLINE Super:OnSize( w, l ), IIF( ::ActiveX != NIL, (::ActiveX:Left := 0,;
+//                                                  ::ActiveX:Top    := 0,;
+//                                                  ::ActiveX:Width  := ::ClientWidth,;
+//                                                  ::ActiveX:Height := ::ClientHeight ),), 0
 ENDCLASS
 
 CLASS Project

@@ -38,6 +38,12 @@
 #define ETDT_USETABTEXTURE  0x00000004
 #define ETDT_ENABLETAB      (ETDT_ENABLE | ETDT_USETABTEXTURE)
 
+typedef struct tagLOGBRUSH {;
+   UINT      lbStyle;
+   COLORREF  lbColor;
+   ULONG_PTR lbHatch;
+} LOGBRUSH;
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabControl INHERIT Control
@@ -174,7 +180,6 @@ CLASS TabControl INHERIT Control
 
    METHOD OnLButtonDown()
 
-   METHOD __OnParentSize()
    METHOD __SetTabPosition()
    METHOD SelectPage()
 ENDCLASS
@@ -321,7 +326,7 @@ RETURN Self
 METHOD OnSize(w,l) CLASS TabControl
    LOCAL oPage
    Super:OnSize(w,l)
-   IF ::IsWindowVisible() .AND. ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
+   IF /*::IsWindowVisible() .AND.*/ ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
       IF oPage != NIL
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
@@ -426,11 +431,6 @@ METHOD HitTest( x, y, nFlags ) CLASS TabControl
 RETURN SendMessage( ::hWnd, TCM_HITTEST, 0, tch )+1
 
 //-----------------------------------------------------------------------------------------------
-METHOD __OnParentSize( x, y, hDef ) CLASS TabControl
-   ::Super:__OnParentSize( x, y, @hDef )
-RETURN hDef
-
-//-----------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, nlParam ) CLASS TabControl
    LOCAL aItem
 
@@ -470,7 +470,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
-   LOCAL aItem, oPage, hWnd, rc, tci, hDC
+   LOCAL aItem, oPage, hWnd, rc, tci, hDC, nColor, hPen, pBrush
    LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
    IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
       RETURN NIL
@@ -526,7 +526,9 @@ METHOD OnPaint() CLASS TabControl
     ELSE
       _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
    ENDIF
-
+   IF nSel > 0 .AND. ::Children[ nSel ]:__TabBrush != NIL .AND. ::Children[ nSel ]:TopMargin > 0
+      _FillRect( hMemDC, { aRect[1]+IIF(nSel>1,1,0), aRect[2]+1, aRect[3]-3, aRect[2]+::Children[ nSel ]:TopMargin+1 }, ::Children[ nSel ]:__TabBrush )
+   ENDIF
    nItems := ::GetItemCount()
    IF ( ::ShowTabs .OR. ::DesignMode ) .AND. nItems > 0
       FOR n := nItems TO 1 STEP -1
@@ -572,10 +574,12 @@ METHOD OnPaint() CLASS TabControl
 
       aItem[1]-= 2
       aItem[3]+= 2
-      aItem[2]-=1
-      aItem[4]+=2
+      aItem[2]-= 1
+      aItem[4]+= 2
+
       nPart  := TABP_TABITEM
       nState := TIS_SELECTED
+
       IF nSel == 1
          nPart  := TABP_TOPTABITEMLEFTEDGE
        ELSEIF aItem[3] == aRect[3]
@@ -583,7 +587,11 @@ METHOD OnPaint() CLASS TabControl
       ENDIF
 
       IF ::ShowTabs
-         DrawThemeBackground( ::System:hTabTheme, hMemDC, nPart, nState, aItem, aItem )
+         IF ::Children[ nSel ]:__TabBrush != NIL
+            _FillRect( hMemDC, aItem, ::Children[ nSel ]:__TabBrush )
+          ELSE
+            DrawThemeBackground( ::System:hTabTheme, hMemDC, nPart, nState, aItem, aItem )
+         ENDIF
       ENDIF
       aItem[4]-=2
       n := nSel
@@ -599,16 +607,32 @@ METHOD OnPaint() CLASS TabControl
       tci:cchTextMax := 255
       SendMessage( ::hWnd, TCM_GETITEM, n-1, @tci )
 
-      IF !EMPTY( tci:pszText )
-         SetTextColor( hMemDC, IIF( oPage != NIL, oPage:ForeColor, ::ForeColor ) )
+      IF ! EMPTY( tci:pszText )
+         nColor := GetTextColor( hMemDC )
+         SetTextColor( hMemDC, IIF( oPage == NIL, ::ForeColor, IIF( oPage:TabTextColor != NIL, oPage:TabTextColor, IIF( oPage:ForeColor != NIL, oPage:ForeColor, ::ForeColor ) ) ) )
          SetBkMode( hMemDC, TRANSPARENT )
          hOldFont := SelectObject( hMemDC, ::Font:Handle )
          _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
          SelectObject( hMemDC, hOldFont )
+         SetTextColor( hMemDC, nColor )
       ENDIF
       IF !::FocusNever .AND. ::HasFocus
          aRect := ::GetItemRect( nSel )
-         _DrawFocusRect( hMemDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
+         IF nSel > 0 .AND. ::Children[ nSel ]:__TabBrush != NIL
+
+            pBrush := (struct LOGBRUSH)
+            pBrush:lbStyle := BS_SOLID
+            pBrush:lbColor := RGB(195,195,195) //DIB_RGB_COLORS
+            pBrush:lbHatch := NIL
+
+            hPen := SelectObject( hMemDC, ExtCreatePen( PS_GEOMETRIC | PS_USERSTYLE, 1, pBrush, {1,2} ) )
+            SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
+
+            Rectangle( hMemDC, aRect[1], aRect[2]+2, aRect[3], aRect[4] )
+            DeleteObject( SelectObject( hMemDC, hPen ) )
+         ELSE
+            _DrawFocusRect( hMemDC, { aRect[1],aRect[2]+2,aRect[3],aRect[4]} )
+         ENDIF
       ENDIF
 
    ENDIF
@@ -807,7 +831,10 @@ CLASS TabPage INHERIT Dialog
    PROPERTY VertScrollSize SET ::__SetVertScrollSize(v) DEFAULT 0
    PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
    PROPERTY Text           SET ::__SetCaption(v)
-   PROPERTY Theming  ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
+   PROPERTY Theming        ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
+
+   PROPERTY TabBackColor   ROOT "Colors"     SET ::__SetTabColor(v)
+   PROPERTY TabTextColor   ROOT "Colors"
 
    PROPERTY TopMargin      DEFAULT 0
    PROPERTY LeftMargin     DEFAULT 0
@@ -820,6 +847,7 @@ CLASS TabPage INHERIT Dialog
    DATA ItemSize           EXPORTED
    DATA LastFocus          EXPORTED
    DATA __xCtrlName        EXPORTED
+   DATA __TabBrush         EXPORTED
 
    DATA MinWidth           EXPORTED  INIT 0
    DATA MinHeight          EXPORTED  INIT 0
@@ -886,6 +914,7 @@ CLASS TabPage INHERIT Dialog
    METHOD __CreateProperty()
    METHOD __SetVisible()
    METHOD __CreateBkBrush()
+   METHOD __SetTabColor()
    METHOD __ResetHandle()  INLINE ::hWnd := NIL, ::__nProc := NIL, ::Template := NIL
    METHOD OnMouseLeave(n,l) INLINE ::Super:OnMouseLeave(n,l), ::InvalidateRect(, .F. ), NIL
    METHOD OnEraseBkgnd()
@@ -975,6 +1004,16 @@ METHOD Init( oParent, acResource ) CLASS TabPage
                                { "OnSetCursor"        , "", "" },;
                                { "OnSetFont"          , "", "" },;
                                { "OnShowWindow"       , "", "" } } } }
+   ENDIF
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __SetTabColor( nColor ) CLASS TabPage
+   IF ::__TabBrush != NIL
+      DeleteObject( ::__TabBrush )
+   ENDIF
+   IF nColor != NIL
+      ::__TabBrush := CreateSolidBrush( nColor )
    ENDIF
 RETURN Self
 
@@ -1210,6 +1249,9 @@ METHOD Delete() CLASS TabPage
    oParent:SetCurSel( MIN( oParent:CurSel, oParent:GetItemCount() ) )
    IF oParent:CurSel > 0 .AND. oParent:GetItemCount() >= oParent:CurSel
       oParent:GetItemObject():ShowTab()
+   ENDIF
+   IF ::__TabBrush != NIL
+      DeleteObject( ::__TabBrush )
    ENDIF
 RETURN Self
 
