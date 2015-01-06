@@ -289,7 +289,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
    lLen  = hb_arrayGetNL( pField, FIELD_LEN );
    lDec  = hb_arrayGetNL( pField, FIELD_DEC );
-   TraceLog("aaa.log", " lLenBuff %lu lLenBuff2 %lu\n", lLenBuff,( HB_SIZE) lLenBuff); 
+
    if( (HB_ISIZ)lLenBuff <= 0 )     // database content is NULL
    {
       switch( lType )
