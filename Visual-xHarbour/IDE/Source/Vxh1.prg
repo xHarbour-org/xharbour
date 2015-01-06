@@ -6107,7 +6107,9 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
                      IF x > LEN( ::Application:Project:Forms )
                         x--
                      ENDIF
-                     ::Application:Project:SelectWindow( ::Application:Project:Forms[x],, .T. )
+                     IF LEN( ::Application:Project:Forms ) >= x
+                        ::Application:Project:SelectWindow( ::Application:Project:Forms[x],, .T. )
+                     ENDIF
                   ENDIF
 
                ENDIF

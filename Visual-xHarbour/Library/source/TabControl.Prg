@@ -899,7 +899,7 @@ CLASS TabPage INHERIT Dialog
    METHOD OnGetDlgCode()   INLINE DLGC_WANTMESSAGE
    METHOD Destroy()        INLINE ::Delete()
    METHOD HideTab()        INLINE ShowWindow( ::hWnd, SW_HIDE ), ::UpdateWindow()//Super:Hide()
-   METHOD ShowTab()        INLINE ShowWindow( ::hWnd, SW_SHOW ), ::UpdateWindow()//Super:Show()
+   METHOD ShowTab()        INLINE IIF( ::TopMargin > 0, ::Parent:Redraw(),), ShowWindow( ::hWnd, SW_SHOW ), ::UpdateWindow()//Super:Show()
    METHOD OnHotKey()       INLINE ::Select(), NIL
    METHOD OnCtlColorDlg()
    METHOD Delete()
