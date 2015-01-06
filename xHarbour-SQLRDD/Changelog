@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-01-06 09:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! minor fix to odbcFieldGet function declaration
+  * source/sqlex.h
+    ! change to reflect the function signature changed on sqlsrodbc.c
+      
 2015-01-04 18:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   + source/sqlmaria.prg
     ! class for mariadb

@@ -278,7 +278,7 @@ HB_FUNC( SR_FETCH )
 
 //-----------------------------------------------------------------------------//
 
-void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
+void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
 {	
    LONG lType;
    HB_SIZE lLen, lDec;
@@ -289,8 +289,8 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLen
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
    lLen  = hb_arrayGetNL( pField, FIELD_LEN );
    lDec  = hb_arrayGetNL( pField, FIELD_DEC );
-
-   if( lLenBuff <= 0 )     // database content is NULL
+   TraceLog("aaa.log", " lLenBuff %lu lLenBuff2 %lu\n", lLenBuff,( HB_SIZE) lLenBuff); 
+   if( (HB_ISIZ)lLenBuff <= 0 )     // database content is NULL
    {
       switch( lType )
       {
