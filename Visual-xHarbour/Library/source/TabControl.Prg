@@ -526,9 +526,12 @@ METHOD OnPaint() CLASS TabControl
     ELSE
       _DrawFrameControl( hMemDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
    ENDIF
-   IF nSel > 0 .AND. ::Children[ nSel ]:__TabBrush != NIL .AND. ::Children[ nSel ]:TopMargin > 0
-      _FillRect( hMemDC, { aRect[1]+IIF(nSel>1,1,0), aRect[2]+1, aRect[3]-3, aRect[2]+::Children[ nSel ]:TopMargin+1 }, ::Children[ nSel ]:__TabBrush )
+
+   oPage := ::GetItemObject()
+   IF oPage != NIL .AND. oPage:__TabBrush != NIL .AND. oPage:TopMargin > 0
+      _FillRect( hMemDC, { aRect[1]+IIF(nSel>1,1,0), aRect[2]+1, aRect[3]-3, aRect[2]+oPage:TopMargin+1 }, oPage:__TabBrush )
    ENDIF
+
    nItems := ::GetItemCount()
    IF ( ::ShowTabs .OR. ::DesignMode ) .AND. nItems > 0
       FOR n := nItems TO 1 STEP -1
