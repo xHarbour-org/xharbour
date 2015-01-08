@@ -573,6 +573,7 @@ METHOD OnPaint() CLASS TabControl
           ENDIF
       NEXT
 
+      oPage := ::GetItemObject()
       aItem := ::GetItemRect( nSel )
 
       aItem[1]-= 2
@@ -590,8 +591,8 @@ METHOD OnPaint() CLASS TabControl
       ENDIF
 
       IF ::ShowTabs
-         IF ::Children[ nSel ]:__TabBrush != NIL
-            _FillRect( hMemDC, aItem, ::Children[ nSel ]:__TabBrush )
+         IF oPage:__TabBrush != NIL
+            _FillRect( hMemDC, aItem, oPage:__TabBrush )
           ELSE
             DrawThemeBackground( ::System:hTabTheme, hMemDC, nPart, nState, aItem, aItem )
          ENDIF
@@ -621,11 +622,11 @@ METHOD OnPaint() CLASS TabControl
       ENDIF
       IF !::FocusNever .AND. ::HasFocus
          aRect := ::GetItemRect( nSel )
-         IF nSel > 0 .AND. ::Children[ nSel ]:__TabBrush != NIL
+         IF nSel > 0 .AND. oPage:__TabBrush != NIL
 
             pBrush := (struct LOGBRUSH)
             pBrush:lbStyle := BS_SOLID
-            pBrush:lbColor := RGB(195,195,195) //DIB_RGB_COLORS
+            pBrush:lbColor := oPage:TabTextColor //DIB_RGB_COLORS
             pBrush:lbHatch := NIL
 
             hPen := SelectObject( hMemDC, ExtCreatePen( PS_GEOMETRIC | PS_USERSTYLE, 1, pBrush, {1,2} ) )
