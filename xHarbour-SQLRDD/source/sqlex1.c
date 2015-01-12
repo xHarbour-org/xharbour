@@ -385,12 +385,12 @@ static HB_ERRCODE getMissingColumn( SQLEXAREAP thiswa, PHB_ITEM pFieldData, LONG
    char * colName;
    char sSql[DEFAULT_INDEX_COLUMN_MAX_LEN];
    HB_ERRCODE res;
-   LONG lLen, lLenOut, lInitBuff ;
-   char *  bBuffer;
-   char *bOut=NULL;
-   int     iReallocs  = 0;
-   int iError = 0;
-   char        buffer[ 2 ];
+//    LONG lLen, lLenOut, lInitBuff ;
+//    char *  bBuffer;
+//    char *bOut=NULL;
+//    int     iReallocs  = 0;
+//    int iError = 0;
+//    char        buffer[ 2 ];
    LONG lType;
 
    pFieldStruct = hb_arrayGetItemPtr( thiswa->aFields, lFieldPosDB );
@@ -1302,7 +1302,8 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
    LONG lType;
    char cType;
    COLUMNBINDP BindStructure;
-   BOOL bNullable, bMultiLang, bIsMemo;
+//    BOOL bNullable, bMultiLang, bIsMemo;
+   BOOL  bMultiLang;
 
    iCols = (int) hb_arrayLen( thiswa->aFields );
 
@@ -2000,13 +2001,14 @@ BOOL getColumnList( SQLEXAREAP thiswa )
 static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 {
    SQLRETURN res;
-   LONG lLenOut, lLen, lInitBuff, lCurrRecord;
-   ULONG lPos;
+//    LONG lLenOut, lLen, lInitBuff, lCurrRecord;
+   LONG lCurrRecord;
+   HB_SIZE lPos;
    BOOL bTranslate;
 //   PTR bBuffer, bOut;
-   char * bBuffer;
-   char * bOut=NULL;
-   USHORT i, iReallocs, iIndex, iEnd, iRow;
+//    char * bBuffer;
+//    char * bOut=NULL;
+   USHORT i,  iIndex, iEnd, iRow;
    PHB_ITEM aRecord, pKey;
    PHB_ITEM temp;
 //   HB_ITEM temp;
@@ -2203,14 +2205,14 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
       for( i=1; i <= thiswa->area.uiFieldCount; i++ )
       {
 	     
-	     bBuffer = (char*)hb_xgrab(COLUMN_BLOCK_SIZE + 1 ); 
-	     lLen    = COLUMN_BLOCK_SIZE;
-	     memset( bBuffer, 0, COLUMN_BLOCK_SIZE ) ; 
-         bOut       = NULL;
-         lInitBuff  = lLen;
-         lLenOut    = 0;
-         iReallocs  = 0;
-         //temp.type = HB_IT_NIL;        // I know this is not a good practice, but we save tons of allocs.
+// 	     bBuffer = (char*)hb_xgrab(COLUMN_BLOCK_SIZE + 1 ); 
+// 	     lLen    = COLUMN_BLOCK_SIZE;
+// 	     memset( bBuffer, 0, COLUMN_BLOCK_SIZE ) ; 
+//          bOut       = NULL;
+//          lInitBuff  = lLen;
+//          lLenOut    = 0;
+//          iReallocs  = 0;
+//          //temp.type = HB_IT_NIL;        // I know this is not a good practice, but we save tons of allocs.
                                        // please keep as is. ML.
          temp = hb_itemNew( NULL);
 
@@ -2221,7 +2223,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
          }
          else
          {
-	        LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
+// 	        LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
             ++iIndex;
 	        odbcGetData( ( HSTMT )thiswa->hStmtBuffer,hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ),temp,  0,  thiswa->nSystemID, bTranslate,iIndex  );
                            hb_arraySetForward( aRecord, i, temp );
@@ -2777,8 +2779,9 @@ static HB_ERRCODE sqlExGoTop( SQLEXAREAP thiswa )
 static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast )
 {
    int queryLevel;
-   USHORT iIndex, i;
-   HB_ERRCODE res, retvalue = HB_SUCCESS;
+   USHORT iIndex;
+   HB_SIZE i;
+   HB_ERRCODE retvalue = HB_SUCCESS;
    PHB_ITEM pNewKey = NULL;
    HSTMT hStmt = NULL;
 
@@ -2847,10 +2850,10 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
    if ( getPreparedSeek( thiswa, queryLevel, &iIndex, &hStmt ) == HB_SUCCESS )     // Fetch line from database, read RECNO and DELETED
    {
       // Create a line array to hold the record
-      LONG lLenOut, lLen, lInitBuff;
+//       LONG lLenOut, lLen, lInitBuff;
       BOOL bTranslate;
-      PTR bBuffer, bOut;
-      USHORT iReallocs;
+//       PTR bBuffer, bOut;
+//       USHORT iReallocs;
       PHB_ITEM temp;
       //HB_ITEM temp;
       int iComp;
@@ -2883,7 +2886,7 @@ static HB_ERRCODE sqlExSeek( SQLEXAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, B
          }
          else
          {
-     	    LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
+//      	    LONG lType = ( LONG ) hb_arrayGetNL( hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ), FIELD_DOMAIN );
             ++iIndex;
 	        odbcGetData( ( HSTMT )hStmt,hb_arrayGetItemPtr( thiswa->aFields, thiswa->uiBufferIndex[i-1] ),temp,  0,  thiswa->nSystemID, bTranslate,iIndex  );
                     hb_arraySetForward( aRecord, i, temp );                 
@@ -3375,7 +3378,7 @@ static HB_ERRCODE sqlExFlush( SQLEXAREAP thiswa )
 static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM value  )
 {
    PHB_ITEM itemTemp, itemTemp3;
-   ULONG ulPos;
+   HB_SIZE ulPos;
 
    if( thiswa->lpdbPendingRel )
    {
@@ -3420,7 +3423,7 @@ static HB_ERRCODE sqlExGetValue( SQLEXAREAP thiswa, USHORT fieldNum, PHB_ITEM va
                if( HB_IS_HASH( pTemp ) && sr_isMultilang() )
                {
                   PHB_ITEM pLangItem = hb_itemNew( NULL );
-                  ULONG ulPos;
+                  HB_SIZE ulPos;
                   if( hb_hashScan( pTemp, sr_getBaseLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getSecondLang( pLangItem ), &ulPos ) ||
                       hb_hashScan( pTemp, sr_getRootLang( pLangItem ), &ulPos ) )

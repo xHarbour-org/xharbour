@@ -11,11 +11,20 @@ YACC_SOURCE=sql.y
 #	hbapiitm.h \
 
 C_SOURCES=\
-odbc.c \
-pgs.c \
-sqlact.c \
-sqllex.c \
-sqlrdd1.c \
+	firebird.c \
+	mysql.c \
+	pgs.c \
+	sqlact.c \
+	sqllex.c \
+	sqlora.c \
+	sqlorax.c \
+	sqlrdd1.c \
+	sqlsrodbc.c \
+	sqlex1.c \
+	sqlex2.c \
+	sqlex3.c \
+	sqly.c \
+
 
 #mysql.c \
 #oracle.c \
@@ -30,15 +39,29 @@ LIBNAME=sql
 
 PRG_SOURCES= \
 sqlconnection.prg \
-sqlgen1.prg \
-sqlodbc.prg \
-sqlpgs.prg \
-sqlrdd0.prg \
-sqlrdd2.prg \
-utils.prg \
-utilslang.prg \
+	sqlfirebird.prg \
+	sqlgen1.prg \
+	sqlmy.prg \
+	sqlodbc.prg \
+	sqloracle.prg \
+	sqlpgs.prg \
+	sqlrdd0.prg \
+	sqlrdd2.prg \
+	utils.prg \
+	utilslang.prg \
+	exprtransl.prg \
+	exprparser.prg \
+	exprsimpl.prg \
+	exprobjs.prg \
+	exprrelation.prg \
+	exprudf.prg \
+	sqlmaria.prg \
+
+
 
 #sqloracle.prg \
 #sqlmy.prg \
 
 include $(TOP)$(ROOT)config/lib.cf
+
+CFLAGS += -I. -I../.. -I../../Include 

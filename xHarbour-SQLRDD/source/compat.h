@@ -34,8 +34,9 @@
 
 //   #define HB_ISLOG(x)        ISLOG(x)
 //    #define HB_ISNUM(x)        ISNUM(x)
-
+   #ifdef SQLRDD_COMPAT_PRE_1_1
    typedef ULONG              HB_SIZE;
+   #endif
    typedef BOOL               HB_BOOL;
 
    typedef HB_LONG            HB_MAXINT;

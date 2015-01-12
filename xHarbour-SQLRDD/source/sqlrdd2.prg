@@ -6420,7 +6420,7 @@ METHOD sqlOrderDestroy( uOrder, cBag ) CLASS SR_WORKAREA
 
    Local nOrder := 0 //, i , aInd
 
-   //(cBag) // to remove warning
+   (cBag) // to remove warning
    //(uOrder)
    
 
@@ -9963,7 +9963,7 @@ Return SQL_SERIALIZED_SIGNATURE + str(len(cMemo),10) + cMemo
 STATIC FUNCTION OracleMinVersion( cString )                                                         
                                                                                                     
 STATIC s_reEnvVar                                                                                   
-LOCAL cMatch, nStart, nLen, cVar                                                                    
+LOCAL cMatch, nStart, nLen
 Local cTemp := cString                                                                              
                                                                                                     
    IF s_reEnvVar == NIL                                                                             
@@ -9988,11 +9988,11 @@ return cRet
 REQUEST SR_FROMXML,SR_arraytoXml
 
 function SR_arraytoXml( a )
-Local cItem
+* Local cItem
 Local hHash
 LOCAL oXml := TXmlDocument():new() // Cria um objeto Xml
 Local oNode
-Local oNode1
+* Local oNode1
 Local aItem
 nPosData:=0
 hhash := hash()
@@ -10019,9 +10019,9 @@ return oXml
 static function AddNode( a,oNode)
 Local oNode1
 Local hHash := Hash()
-Local oNode2
+* Local oNode2
 Local aItem
-local theData 
+* local theData 
 hhash['Type'] := valtype( a ) 
 
 if HB_ISARRAY( a ) 
@@ -10065,8 +10065,8 @@ return  nil
 
 function SR_fromXml(oDoc, aRet,nLen,c)
 Local oNode
-Local Curnode
-Local nId
+* Local Curnode
+* Local nId
 Local CurPos 
 Local nStart :=0
 
@@ -10150,7 +10150,7 @@ FUNCTION SR_SetOracleSyntheticVirtual( l )
    lOracleSyntheticVirtual := l
 RETURN NIL   
 
-FUNCTION SR_GetOracleSyntheticVirtual( l )
+FUNCTION SR_GetOracleSyntheticVirtual(  )
    
 RETURN lOracleSyntheticVirtual
 

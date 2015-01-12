@@ -8,6 +8,30 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-01-12 19:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! if using ODBCVER >= 0x0300 calling SQLAllocHandle insted of deprecated SQLAllocStmt
+  * source/sql.y
+    ! %pure_parser ->  %pure-parser
+    ! %name-prefix="sql_yy" ->  %name-prefix "sql_yy"
+  * source/utils.prg
+    ! Cleaned unused variables
+  * source/sqlrdd2.prg
+    ! Cleaned unused variables
+  * source/sqloracle.prg  
+    ! Cleaned unused variables
+  * source/sqlgen1.prg    
+    ! Cleaned unused variables  
+  * source/compat.h
+    ! protected typedef of HB_SIZE With SQLRDD_COMPAT_PRE_1_1 define
+  * source/Makefile
+    ! update to include all dependencies
+  * source/sqlex1.c 
+    ! ULONG -> HB_SIZE where aplicable     
+    ! Cleaned unused variables  
+  * source/sqlex2.c      
+    ! ULONG -> HB_SIZE where aplicable
+        
 2015-01-06 09:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlsrodbc.c
     ! minor fix to odbcFieldGet function declaration
@@ -55,10 +79,7 @@
   * source/sqlconnection.prg
     ! added test to SYSTEMID_MARIADB 
     ! in method Connect, added test For "MARIA" on connect string to connect to mariadb
-    
-  
-    
-    
+              
 2014-12-15 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/pgs.c
     ! using hb_xgrabz insted of hb_xgrab follow by memset

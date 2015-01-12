@@ -700,6 +700,7 @@ Return "NIL"
 /*------------------------------------------------------------------------*/
 
 Function SR_BlankVar( cType, nLen, nDec )
+Local nVal
 
    (nDec) // To remove warning
 
@@ -711,6 +712,33 @@ Function SR_BlankVar( cType, nLen, nDec )
    Case cType = "D"
       Return ctod('')
    Case cType = "N"
+      if nDec >0
+         switch ndec
+         case 1
+            nVal := 0.0
+            exit
+         case 2
+         nVal := 0.00
+         exit
+         case 3
+         nVal :=0.000
+         exit
+         case 4
+         nVal :=0.0000
+         exit
+         case 5
+         nVal :=0.00000
+         exit
+         case 6
+         nVal :=0.000000
+         exit
+         default
+
+         nVal := 0.00
+         exit
+         end
+         return nVal
+      endif
       return 0
    Case cType == 'T'
       return datetime(0,0,0,0,0,0,0)   
@@ -1921,7 +1949,7 @@ HB_FUNC( SR_PHFILE )
 #PRAGMA ENDDUMP
 
 function sr_AddToFilter( nRecNo )
-   Local oWA, uRet
+   Local oWA
 
    If IS_SQLRDD
       oWA := (Select())->(dbInfo( DBI_INTERNAL_OBJECT ))

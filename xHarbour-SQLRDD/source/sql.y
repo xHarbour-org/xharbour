@@ -1,5 +1,5 @@
-%pure_parser
-%name-prefix="sql_yy"
+%pure-parser
+%name-prefix "sql_yy"
 %expect 1
 %parse-param { void * stmt }
 %lex-param   { void * stmt }

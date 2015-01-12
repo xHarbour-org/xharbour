@@ -913,7 +913,7 @@ HB_ERRCODE CreateUpdateStmt( SQLEXAREAP thiswa )
 HB_ERRCODE ExecuteUpdateStmt( SQLEXAREAP thiswa )
 {
    PHB_ITEM pKey, aRecord;
-   ULONG lPos;
+   HB_SIZE lPos;
    SQLRETURN res;
 
    // Feed current record to bindings

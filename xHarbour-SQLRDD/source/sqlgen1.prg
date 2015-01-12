@@ -1495,7 +1495,7 @@ Function SR_TableAttr( cTableName, nSystemID )
 
    /* Translates "c:\data\accounts\chart.dbf" to "DATA_ACCONTS_CHART" */
 
-   local aRet, cOwner := "", cName1, cName2, cSlash
+   local aRet, cOwner := "",  cSlash
 
    if cTableName[2] == ":"
       /* Remove drive letter */

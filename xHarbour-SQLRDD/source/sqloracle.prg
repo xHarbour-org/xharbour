@@ -462,6 +462,8 @@ METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords,
    
    DEFAULT nMaxRecords TO 999999999999
    DEFAULT cVar To ":c1"
+   (nlogMode)
+   (ncols)
      
    ::AllocStatement()
 
@@ -674,7 +676,7 @@ METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords,
 return  0  
 
 function  ExecuteSP( cComm, aReturn  ) 
-   Local i, n
+
    Local nError := 0
    local oConn := SR_GetConnection()
    

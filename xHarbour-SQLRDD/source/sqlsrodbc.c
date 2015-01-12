@@ -162,9 +162,14 @@ HB_FUNC( SR_UNINSTALLDSN )
 HB_FUNC( SR_ALLOCEN )
 {
    SQLHENV hEnv;
-   RETCODE ret = SQLAllocEnv( &hEnv );
+   #if ODBCVER >= 0x0300
+      RETCODE ret= SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv ) ;   
+   #else
+      RETCODE ret = SQLAllocEnv( &hEnv );
+   #endif   
 
-   SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+//    SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
+   SQLSetEnvAttr( hEnv, SQL_ATTR_ODBC_VERSION, ( SQLPOINTER ) SQL_OV_ODBC3, SQL_IS_UINTEGER );
 
    hb_storptr( ( void* ) hEnv, 1 );
    hb_retni( ret );
@@ -240,7 +245,12 @@ HB_FUNC( SR_ALLOCST )
    SQLHDBC  hdbc  = ( SQLHDBC ) hb_parptr( 1 );
    
  //  hb_retni( SQLAllocStmt( ( HDBC ) hb_parptr( 1 ), &hStmt ) );
+#if ODBCVER >= 0x0300 
    hb_retni( SQLAllocHandle( SQL_HANDLE_STMT, hdbc, &hStmt ) );
+#else
+   hb_retni( SQLAllocStmt( hdbc, &hStmt ) ) )
+#endif
+   
    hb_storptr( ( void* ) hStmt, 2 );
 }
 
@@ -251,7 +261,11 @@ HB_FUNC( SR_FREESTM )
 	SQLHSTMT  p =  ( SQLHSTMT ) hb_parptr( 1 ) ;
 	if (p ) 
 	{
+#if ODBCVER >= 0x0300		
 	   hb_retni( SQLFreeHandle( SQL_HANDLE_STMT, p )); 
+#else
+       hb_retni( SQLFreeStmt( p, SQL_DROP ) ); 
+#endif	   
 	   return ;
     }
     hb_retni( -1) ;   
@@ -953,7 +967,6 @@ HB_FUNC( SR_DESCRIB )
                                             ( SQLULEN * )     &wColSize, 
                                             ( SQLSMALLINT * ) &wDecimals,
                                             ( SQLSMALLINT * ) &wNullable );
-    
     if( wDataType == -8  && ulSystemID == SYSTEMID_MYSQL)     // MySQL ODBC Bug
     {
       odbcErrorDiagRTE( ( SQLHSTMT ) hb_parptr( 1 ), "SQLCONNECT", "MySQL Driver version 5 is not compatible with SQLRDD", 0, __LINE__, __FILE__ );
@@ -1129,7 +1142,7 @@ HB_FUNC( SR_MORERESULTS ) // hEnv, hDbc
 
 void odbcErrorDiag( SQLHSTMT hStmt, char * routine, char * szSql, int line )
 {
-   SQLCHAR       SqlState[6]={0}, Msg[2048]={0};
+   SQLTCHAR       SqlState[6]={0}, Msg[2048]={0};
    SQLINTEGER    NativeError = 0;
    SQLSMALLINT   i, MsgLen = 0;
 
@@ -1137,8 +1150,8 @@ void odbcErrorDiag( SQLHSTMT hStmt, char * routine, char * szSql, int line )
    Msg[0] = '\0';
 
    i = 1;
-   while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, i, SqlState, &NativeError,
-            Msg, sizeof(Msg), &MsgLen)) != SQL_NO_DATA)
+   while ((SQLGetDiagRec(SQL_HANDLE_STMT, hStmt,( SQLSMALLINT ) i, ( SQLTCHAR * )SqlState, ( SQLINTEGER * )&NativeError,
+            ( SQLTCHAR * )Msg, ( SQLSMALLINT )sizeof(Msg),( SQLSMALLINT * ) &MsgLen)) != SQL_NO_DATA)
    {
       i++;
    }
@@ -1175,7 +1188,11 @@ HB_FUNC( SR_ODBCWRITEMEMO )
 
    if ( hDbc && uiLen > 0 )
    {
-      SQLAllocStmt( hDbc, &hStmt );
+#if ODBCVER >= 0x0300 
+    SQLAllocHandle( SQL_HANDLE_STMT, hDbc, &hStmt ) );
+#else	  
+    SQLAllocStmt( hDbc, &hStmt );
+#endif      
       for( uiSize = 0; uiSize < uiLen; uiSize++ )
       {
          PHB_ITEM pFieldDesc = hb_arrayGetItemPtr( pArray, uiSize + 1 );
@@ -1225,18 +1242,18 @@ HB_FUNC( SR_ODBCWRITEMEMO )
 void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate,USHORT ui  )
 {
    LONG lType;
-   HB_SIZE  lDec,lLen;
+   HB_SIZE  lDec,lLen	;
    char * cType;
 //    PHB_ITEM pTemp;  
    SQLLEN iLen;
    SQLLEN lLenOut;
-   RETCODE res;   
+   SQLRETURN res;   
 
    cType  = ( char * ) hb_arrayGetCPtr(pField, FIELD_TYPE );
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
    lLen  = hb_arrayGetNL( pField, FIELD_LEN );
    lDec  = hb_arrayGetNL( pField, FIELD_DEC );          
-            iLen     = SQL_NULL_DATA;
+   iLen     = SQL_NULL_DATA;
           switch (lType )
           {
 	     case SQL_CHAR:
@@ -1258,7 +1275,7 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                res = SQLGetData( ( HSTMT ) hStmt, ui, SQL_CHAR  ,  buffer, 0, &lLenOut  );                              
                if( SQL_SUCCEEDED( res   ) )
                {               
-
+	
                   if( (int)lLenOut == SQL_NULL_DATA  || lLenOut == 0)
 	              {
 
@@ -1267,17 +1284,16 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                   else if( lLenOut > 0 )
                   {
 	              
-	             char * val = ( char * ) hb_xgrab( lLenOut+1   );
-                     res = 0;
+	                 char * val = ( char * ) hb_xgrab( lLenOut+1   );
                      res = SQLGetData(  ( HSTMT ) hStmt, ui, SQL_CHAR, val, lLenOut+1 , &lLenOut ) ;                     
                      if( SQL_SUCCEEDED( res ) )
                      {
                         odbcFieldGet( pField, pItem, (char * ) val, lLenOut, bQueryOnly, ulSystemID, bTranslate );
 //                         hb_arraySetForward( pRet, i, temp );                     
-        	     }
-        	    if ( val )  
-    	             hb_xfree( val );                     
-                  }
+        	         }
+        	         if ( val )  
+    	                hb_xfree( val );                     
+                     }
                }    
                break;
             }
@@ -1308,9 +1324,9 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
 		        else
 		        {		           
 			      #ifdef __XHARBOUR__
-			      LONGLONG val = 0;
+			         LONGLONG val = 0;
 			      #else  
-                  HB_I64 val = 0;
+                     HB_I64 val = 0;
                   #endif
                   if( SQL_SUCCEEDED( res = SQLGetData( hStmt, ui, SQL_C_SBIGINT, &val, sizeof( val ), &iLen ) ) )
                   {
@@ -1345,7 +1361,7 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                }
                if (  (int)iLen ==  SQL_NULL_DATA )
                {
-	               hb_itemPutNIntLen( pItem, 0, lLen );
+	               hb_itemPutNDLen( pItem, 0.0, lLen, lDec );
                }
 
 	            
