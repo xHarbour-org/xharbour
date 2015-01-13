@@ -1189,7 +1189,7 @@ HB_FUNC( SR_ODBCWRITEMEMO )
    if ( hDbc && uiLen > 0 )
    {
 #if ODBCVER >= 0x0300 
-    SQLAllocHandle( SQL_HANDLE_STMT, hDbc, &hStmt ) );
+    SQLAllocHandle( SQL_HANDLE_STMT, hDbc, &hStmt ) ;
 #else	  
     SQLAllocStmt( hDbc, &hStmt );
 #endif      

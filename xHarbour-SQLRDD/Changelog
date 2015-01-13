@@ -7,7 +7,10 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2015-01-13 09:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! minor fix to previus commit 
+    
 2015-01-12 19:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlsrodbc.c
     ! if using ODBCVER >= 0x0300 calling SQLAllocHandle insted of deprecated SQLAllocStmt
