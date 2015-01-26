@@ -590,7 +590,9 @@ METHOD Init() CLASS MainForm
       :Dock:Top     := ::ToolStripContainer1
       :Dock:Right   := ::Application:Props:PropEditor
       :Dock:Bottom  := ::Application:Props:Components
+      :Dock:Margin  := 2
       :Create()
+
       WITH OBJECT ::Application:Props[ "ReportPageTab" ] := TabPage( :this )
          :Caption    := "Report Page"
          :HorzScroll := .T.
@@ -1334,32 +1336,35 @@ METHOD ResetQuickOpen( cFile ) CLASS Report
    // IniFile Recently open projects
    aEntries := oApp:IniFile:ReadArray( "Recent" )
 
-   WHILE LEN( aEntries ) > 19
-      ADEL( aEntries, 1, .T. )
-   ENDDO
-
-   IF !EMPTY( cFile )
-      IF ( n := ASCAN( aEntries, {|c| UPPER(c) == UPPER(cFile) } ) ) > 0
-         ADEL( aEntries, n, .T. )
-      ENDIF
-      AINS( aEntries, 1, cFile, .T. )
+   IF ! EMPTY( aEntries ) .AND. cFile != NIL .AND. aEntries[1] == cFile
+      RETURN NIL
    ENDIF
 
-   oApp:IniFile:Write( "Recent", aEntries )
+   AEVAL( aEntries, {|c| oApp:IniFile:DelEntry( "Recent", c ) } )
 
-   // Reset Open Dropdown menu
-   WITH OBJECT oApp:Props[ "OpenBttn" ]   // Open Button
-      AEVAL( :Children, {|o| o:Destroy()} )
-      FOR EACH cProject IN aEntries
-          IF !EMPTY( cProject )
+   IF cFile != NIL .AND. ( n := ASCAN( aEntries, {|c| c == cFile } ) ) > 0
+      ADEL( aEntries, n, .T. )
+   ENDIF
+   IF cFile != NIL .AND. FILE( cFile )
+      aIns( aEntries, 1, cFile, .T. )
+      IF LEN( aEntries )>=20
+         ASIZE( aEntries, 20 )
+      ENDIF
+   ENDIF
+
+   FOR n := 1 TO LEN( aEntries )
+       WITH OBJECT oApp:Props[ "OpenBttn" ]
+          IF :Children == NIL .OR. LEN( :Children ) < n
              oItem := MenuStripItem( :this )
-             oItem:GenerateMember := .F.
-             oItem:Caption := cProject
-             oItem:Action  := {|o| oApp:Report:Open( o:Caption ) }
              oItem:Create()
+           ELSE
+             oItem := :Children[n]
           ENDIF
-      NEXT
-   END
-
+       END
+       oItem:Caption := aEntries[n]
+       oItem:Action  := {|o| oApp:Report:Open( o:Caption ) }
+   NEXT
+   oApp:IniFile:Write( "Recent", aEntries )
 RETURN Self
+
 #endif
