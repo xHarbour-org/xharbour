@@ -69,9 +69,9 @@ METHOD Init( hParam ) CLASS Debugger
 
     // Global var to tel app's that VXH is in designmode
    //::IdeActive := TRUE
-   
+
    #ifdef XDEBUG_DEMO
-   
+
     MessageBox( GetActiveWindow(), "Thank you for evaluating Visual xDebugger." + CRLF + CRLF + ;
                                    "Copyright (c) 2006-"+Str(Year(Date()))+" xHarbour.com Inc." + CRLF + ;
                                    "http://www.xHarbour.com" + CRLF ;
@@ -81,7 +81,7 @@ METHOD Init( hParam ) CLASS Debugger
   //::System:CurrentScheme:AutoScheme := .F.
   //::System:CurrentScheme:ColorScheme := "Classic"
   //::System:CurrentScheme:Load()
-  
+
   ::Project := Project( NIL )
 
   ::MainWindow := MainWindow():Init()
@@ -250,7 +250,7 @@ METHOD Init() CLASS MainWindow
          WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 1
             :Text             := "Open"
-            :ImageAlign       := DT_CENTER            
+            :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Open() }
             :DropDown         := 2
             :ShortCutKey:Ctrl := .T.
@@ -261,7 +261,7 @@ METHOD Init() CLASS MainWindow
 
          WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
             :ImageIndex := 2
-            :ImageAlign := DT_CENTER            
+            :ImageAlign := DT_CENTER
             :Text       := "Close"
             :Action     := {||::Application:Project:Close() }
             :Create()
@@ -270,7 +270,7 @@ METHOD Init() CLASS MainWindow
          WITH OBJECT ::Application:Props[ "SaveBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 3
             :Text             := "Save"
-            :ImageAlign       := DT_CENTER            
+            :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Save() }
             :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
@@ -337,6 +337,7 @@ METHOD Init() CLASS MainWindow
       :ShowSelAlways := .T.
       :Dock:Margin   := 2
       :StaticEdge    := .F.
+      :ClientEdge    := .F.
       :Dock:Right    := :Parent
       :Dock:Top      := ::Application:Props[ "ToolStripContainer" ]
       :Dock:Bottom   := ::Application:DebuggerPanel
@@ -424,7 +425,7 @@ METHOD Find() CLASS Project
 
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
-      
+
       cSel := ::Application:SourceEditor:Source:GetSelText()
       IF ! EMPTY( cSel )
          ::__cFindText := cSel
@@ -776,7 +777,7 @@ RETURN lRet
 
 METHOD Open( cFile ) CLASS Project
    LOCAL oFile
-   
+
    IF ! FILE( cFile )
       oFile := CFile( "" )
 
