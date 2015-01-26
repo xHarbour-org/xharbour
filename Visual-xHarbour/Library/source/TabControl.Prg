@@ -567,7 +567,7 @@ METHOD OnPaint() CLASS TabControl
                 hOldFont := SelectObject( hMemDC, ::Font:Handle )
 
                 //aSize    := _GetTextExtentPoint32( hMemDC, tci:pszText  )
-                _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+                _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE )
                 SelectObject( hMemDC, hOldFont )
              ENDIF
           ENDIF
@@ -1063,7 +1063,7 @@ METHOD Create() CLASS TabPage
 
    ::Super:Create()
    tci:lParam := ::hWnd
-   ::EnableThemeDialogTexture( IIF( ::Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
+   ::EnableThemeDialogTexture( IIF( ::Parent:Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
 
    IF ::VertScrollSize > 0
       ::OriginalRect[4] := ::VertScrollSize
@@ -1163,8 +1163,8 @@ METHOD __CreateBkBrush( hDC ) CLASS TabPage
 
       IF ::xBackColor != NIL
          hBrush := CreateSolidBrush( ::xBackColor )
-       ELSEIF ! ::Theming
-         DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
+       ELSEIF ! ::Parent:Theming
+         hBrush := GetSysColorBrush( COLOR_BTNFACE )
       ENDIF
 
       IF hBrush == NIL .AND. ::Application:OsVersion:dwMajorVersion >= 5
@@ -1303,28 +1303,25 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
 
    SendMessage( ::Parent:hWnd, TCM_ADJUSTRECT, 0, @rc )
 
-   IF ::Application:ThemeActive .AND. ::Theming
-      rc:Top    -= 1
-      rc:Left   -= 3
-      rc:Right  += 1
-      rc:Bottom += 1
-      IF ::Application:OsVersion:dwMajorVersion > 5
-         rc:Bottom += 1
-      ENDIF
-    ELSE
+   IF ::Application:ThemeActive .AND. ::Parent:Theming
       rc:Left   -= 3
       rc:Top    -= 1
       rc:Right  += 1
       rc:Bottom += 2
+    ELSE
+      rc:Left   -= 2
+      rc:Top    -= 1
+      rc:Right  += 2
+      rc:Bottom += 2
       IF ::Parent:Style & TCS_VERTICAL == TCS_VERTICAL
-         rc:Top  -= 2
-         IF ::Parent:Style & TCS_BOTTOM == 0
+         rc:Top  -= 1
+         IF ::Parent:Style & TCS_BOTTOM == 0 // Left
             rc:Left  += 2
           ELSE
             rc:Right -= 2
          ENDIF
        ELSEIF ::Parent:Style & TCS_BOTTOM == TCS_BOTTOM
-         rc:Top    -= 2
+         rc:Top    -= 1
          rc:Bottom -= 2
       ENDIF
    ENDIF
@@ -1372,6 +1369,7 @@ METHOD Select() CLASS TabPage
    ENDIF
    ::Parent:SetCurSel( ::__GetPosition() )
    ::__OnParentSize( ::ClientWidth, ::ClientHeight )
+   ::Parent:Redraw()
    //   ::Parent:Redraw()
 RETURN Self
 
@@ -1518,6 +1516,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
    LOCAL d, hRgn, aRect, n := 0, aItem := ::GetItemRect( nSel )
    LOCAL x, y, hOldFont, hBrush, hOldPen, tci, lGrad := .F., lVert := .F.
    LOCAL oPage
+   DEFAULT lCurSel TO .T.
    IF lCurSel
       n := 1
    ENDIF
@@ -1557,6 +1556,7 @@ METHOD DrawTabStripItem( hDC, lCurSel, nSel ) CLASS TabStrip
                       { aItem[3]- 6,   aItem[4]-3 },;
                       { aItem[3]+ d+n, aItem[2]-n } }
    ENDCASE
+   DEFAULT nSel TO ::CurSel
    oPage := ::GetItemObject( nSel )
    hRgn := _CreatePolygonRgn( aRect, ALTERNATE )
    IF hRgn != NIL

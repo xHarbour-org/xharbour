@@ -103,7 +103,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD StickRight()
    METHOD StickBottom()
    METHOD DrawStickyLines()
-   METHOD Refresh()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD Refresh()              INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD OnNCDestroy()
@@ -353,8 +353,8 @@ METHOD OnPaint() CLASS WindowEdit
 
    ENDIF
    ::__PaintBakgndImage( hDC )
-   ValidateRect( ::hWnd )
    ::EndPaint()
+   ValidateRect( ::hWnd )
 RETURN 0
 
 //----------------------------------------------------------------------------

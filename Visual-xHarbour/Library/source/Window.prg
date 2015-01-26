@@ -1918,22 +1918,24 @@ METHOD OnNCDestroy() CLASS Window
          ADEL( ::Parent:__aDock, n, .T. )
       ENDIF
 
-      FOR n := 1 TO LEN( ::Parent:Children )
-          IF __objHasMsg( ::Parent:Children[n], "Dock" ) .AND. ::Parent:Children[n]:Dock != NIL
-             IF VALTYPE(::Parent:Children[n]:Dock:Left)=="O" .AND. ::Parent:Children[n]:Dock:Left:hWnd == ::hWnd
-                ::Parent:Children[n]:Dock:Left := NIL
+      IF ::Parent:Children != NIL
+         FOR n := 1 TO LEN( ::Parent:Children )
+             IF __objHasMsg( ::Parent:Children[n], "Dock" ) .AND. ::Parent:Children[n]:Dock != NIL
+                IF VALTYPE(::Parent:Children[n]:Dock:Left)=="O" .AND. ::Parent:Children[n]:Dock:Left:hWnd == ::hWnd
+                   ::Parent:Children[n]:Dock:Left := NIL
+                ENDIF
+                IF VALTYPE(::Parent:Children[n]:Dock:Top)=="O" .AND. ::Parent:Children[n]:Dock:Top:hWnd == ::hWnd
+                   ::Parent:Children[n]:Dock:Top := NIL
+                ENDIF
+                IF VALTYPE(::Parent:Children[n]:Dock:Right)=="O" .AND. ::Parent:Children[n]:Dock:Right:hWnd == ::hWnd
+                   ::Parent:Children[n]:Dock:Right := NIL
+                ENDIF
+                IF VALTYPE(::Parent:Children[n]:Dock:Bottom)=="O" .AND. ::Parent:Children[n]:Dock:Bottom:hWnd == ::hWnd
+                   ::Parent:Children[n]:Dock:Bottom := NIL
+                ENDIF
              ENDIF
-             IF VALTYPE(::Parent:Children[n]:Dock:Top)=="O" .AND. ::Parent:Children[n]:Dock:Top:hWnd == ::hWnd
-                ::Parent:Children[n]:Dock:Top := NIL
-             ENDIF
-             IF VALTYPE(::Parent:Children[n]:Dock:Right)=="O" .AND. ::Parent:Children[n]:Dock:Right:hWnd == ::hWnd
-                ::Parent:Children[n]:Dock:Right := NIL
-             ENDIF
-             IF VALTYPE(::Parent:Children[n]:Dock:Bottom)=="O" .AND. ::Parent:Children[n]:Dock:Bottom:hWnd == ::hWnd
-                ::Parent:Children[n]:Dock:Bottom := NIL
-             ENDIF
-          ENDIF
-      NEXT
+         NEXT
+      ENDIF
    ENDIF
 
    IF ::Drawing != NIL
@@ -3607,8 +3609,8 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                IF oRight:LeftSplitter != NIL
                   nMargin := MAX( nMargin, oRight:LeftSplitter:Weight )
                ENDIF
-               IF ::__xCtrlName == "TabControl"
-                  nMargin -= 2
+               IF ::__xCtrlName == "TabControl" .AND. ::Theming .AND. ::Application:ThemeActive
+                  nMargin -= 2 // Theme shadow?
                ENDIF
                ::xWidth := oRight:xLeft - ::xLeft - nMargin //::Dock:RightMargin - //IIF( oRight:LeftSplitter != NIL, oRight:LeftSplitter:Weight, 0 )
             ENDIF

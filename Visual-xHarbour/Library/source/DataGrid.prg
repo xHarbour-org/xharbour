@@ -324,7 +324,8 @@ CLASS DataGrid INHERIT TitleControl
    METHOD CreateDragImage()
    METHOD GetRecordCount()
    METHOD DeselectAll()
-   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD ResetSearch()    INLINE ::KillTimer( 10 ), ::__cSearch := ""
+   METHOD ResetFrame()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
 ENDCLASS
 
 METHOD Init( oParent ) CLASS DataGrid
@@ -1817,11 +1818,13 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
 
    DO CASE
       CASE nwParam==VK_INSERT
+           ::ResetSearch()
            ::AutoUpdate := ::__nUpdtTimer
            Set( _SET_INSERT, ! Set( _SET_INSERT ) )
            RETURN 0
 
       CASE nwParam==VK_TAB
+           ::ResetSearch()
            lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
            IF ( h := GetNextDlgTabItem( ::Form:hWnd , ::hWnd, lShift ) ) # 0
               SetFocus(h)
@@ -1831,6 +1834,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
            ENDIF
 
       CASE nwParam==VK_UP
+           ::ResetSearch()
            nKey := GRID_UP
            ::Up( nCount )
            ::CurPos--
@@ -1838,47 +1842,75 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
            lVUpdate := .T.
 
       CASE nwParam==VK_DOWN
+           ::ResetSearch()
            nKey := GRID_DOWN
            ::Down( nCount )
            ::CurPos++
            lVUpdate := .T.
 
       CASE nwParam == VK_NEXT
+           ::ResetSearch()
            ::PageDown( nCount )
            ::CurPos += ::RowCountUsable
            lVUpdate := .T.
 
       CASE nwParam == VK_PRIOR
+           ::ResetSearch()
            ::PageUp( nCount )
            ::CurPos -= ::RowCountUsable
            lVUpdate := .T.
 
       CASE nwParam == VK_END
+           ::ResetSearch()
            ::End( .F. )
            ::CurPos := ::GetRecordCount()
            lVUpdate := .T.
 
       CASE nwParam == VK_HOME
+           ::ResetSearch()
            ::Home()
            ::CurPos := 1
            lVUpdate := .T.
 
       CASE nwParam == VK_LEFT
+           ::ResetSearch()
            nKey := GRID_LEFT
            ::ArrowLeft()
 
       CASE nwParam == VK_RIGHT
+           ::ResetSearch()
            nKey := GRID_RIGHT
            ::ArrowRight()
 
       CASE nwParam == VK_SPACE
            nKey := GRID_SPACE
-           IF ::TagRecords
+
+           IF ! EMPTY( ::__cSearch )
+              ::KillTimer( 10 )
+              ::__cSearch += CHR( nwParam )
+
+              nRec    := ::DataSource:recno()
+              cSearch := ""
+              IF ::bSearchKey != NIL
+                 cSearch := EVAL( ::bSearchKey, Self )
+              ENDIF
+              IF ::DataSource:Seek( cSearch + ::__cSearch )
+                 ::Update()
+                 ::OnRowChanged()
+                 ExecuteEvent( "OnRowChanged", Self )
+               ELSE
+                 ::DataSource:Goto( nRec )
+                 ExecuteEvent( "OnSearchNotFound", Self )
+              ENDIF
+              ::SetTimer( 10, 2000 )
+
+            ELSEIF ::TagRecords
               IF ( nPos := ASCAN( ::aTagged, ::DataSource:Recno() ) ) == 0
                  AADD( ::aTagged, ::DataSource:Recno() )
                ELSE
                  ADEL( ::aTagged, nPos, .T. )
               ENDIF
+
            ENDIF
 
       OTHERWISE
@@ -1913,6 +1945,8 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
                  ENDIF
                  ::SetTimer( 10, 2000 )
               ENDIF
+           ELSE
+              ::ResetSearch()
            ENDIF
    ENDCASE
    IF lVUpdate
@@ -3846,28 +3880,39 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------------------------------
 
 METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
-   LOCAL aRect, x, xValue, nAlign, oSelf := Self
+   LOCAL aRect, x, xValue, nAlign, oSelf := Self, nCol := ::ColPos
    (xPos)
    (yPos)
 
-   IF ::__CurControl == NIL .AND. ( ::ColPos > 0 .OR. ::FullRowSelect )
-      IF ::Children[::ColPos]:Representation == 3 .AND. nMessage == GRID_LCLICK .OR. nwParam IN {VK_SPACE,VK_RETURN}
-         xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ ::ColPos ][ 1 ]
+   IF ::__CurControl == NIL .AND. ( nCol > 0 .OR. ::FullRowSelect )
+      IF ::FullRowSelect
+         nCol := ASCAN( ::Children, {|o|o:Representation==3} )
+         IF nCol == 0
+            nCol := ::ColPos
+         ENDIF
+      ENDIF
+      IF ::Children[nCol]:Representation == 3 .AND. nMessage == GRID_LCLICK .OR. nwParam IN {VK_SPACE,VK_RETURN}
+         xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ nCol ][ 1 ]
          IF VALTYPE( xValue ) == "L"
             IF nwParam IN {VK_SPACE,VK_RETURN} .AND. n == 0
                RETURN Self
             ENDIF
-            IF HGetPos( ::Children[::ColPos]:EventHandler, "OnSave" ) > 0
-               xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ ::ColPos ][ 1 ]
-               ::Form:&( ::Children[::ColPos]:EventHandler[ "OnSave" ] )( Self, ! xValue, nwParam )
-               ::__FillRow( ::RowPos )
-               ::__DisplayData( ::RowPos, ::ColPos, ::RowPos, ::ColPos )
+            IF HGetPos( ::Children[nCol]:EventHandler, "OnSave" ) > 0
+               xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ nCol ][ 1 ]
+               ::Form:&( ::Children[nCol]:EventHandler[ "OnSave" ] )( Self, ! xValue, nwParam )
+               ::UpdateRow()
                RETURN Self
             ENDIF
          ENDIF
       ENDIF
-      IF ::Children[::ColPos]:Control != NIL .AND. ::Children[::ColPos]:ControlAccessKey & nMessage != 0
-         ::__CurControl := EVAL( ::Children[::ColPos]:Control, Self, ::DataSource:Recno() )
+      IF ::FullRowSelect
+         nCol := ASCAN( ::Children, {|o|o:Control != NIL .AND. o:ControlAccessKey & nMessage != 0 } )
+         IF nCol == 0
+            nCol := ::ColPos
+         ENDIF
+      ENDIF
+      IF ::Children[nCol]:Control != NIL .AND. ::Children[nCol]:ControlAccessKey & nMessage != 0
+         ::__CurControl := EVAL( ::Children[nCol]:Control, Self, ::DataSource:Recno() )
          aRect := ::GetItemRect()
          IF aRect == NIL
             RETURN Self
