@@ -590,7 +590,7 @@ METHOD OnPaint() CLASS TabControl
          nPart  := TABP_TOPTABITEMRIGHTEDGE
       ENDIF
 
-      IF ::ShowTabs
+      IF ::ShowTabs .AND. oPage != NIL
          IF oPage:__TabBrush != NIL
             _FillRect( hMemDC, aItem, oPage:__TabBrush )
           ELSE
