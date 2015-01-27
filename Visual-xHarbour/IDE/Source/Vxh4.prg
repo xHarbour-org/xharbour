@@ -1144,9 +1144,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           ENDIF
           FOR EACH aObj IN aSel
               n := ASCAN( aObjs, {|a| a[1]==aObj[1]:ClsName} )
-              IF ASCAN( aObjs[n][2], {|a| a[1]==cProp}) == 0
-                 cProp := NIL
-                 EXIT
+              IF n > 0
+                 IF ASCAN( aObjs[n][2], {|a| a[1]==cProp}) == 0
+                    cProp := NIL
+                    EXIT
+                 ENDIF
               ENDIF
           NEXT
           IF cProp == NIL
