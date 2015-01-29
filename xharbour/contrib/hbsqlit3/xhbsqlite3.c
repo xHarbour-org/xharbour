@@ -1059,16 +1059,33 @@ HB_FUNC( SQLITE3_COMPLETE )
 	hb_strfree( hSQLText );
 }
 
-HB_FUNC( SQLITE3_ENABLE_LOAD_EXTENSION )
+HB_FUNC( SQLITE3_LOAD_EXTENSION )
 {
+#ifndef SQLITE_OMIT_LOAD_EXTENSION
    HB_SQLITE3 * pHbSqlite3 = ( HB_SQLITE3 * ) hb_sqlite3_param( 1, HB_SQLITE3_DB, TRUE );
 
    if( pHbSqlite3 && pHbSqlite3->db )
-   {
-      hb_retni( sqlite3_enable_load_extension( pHbSqlite3->db, hb_parl( 2 ) ) );
-   }
+      hb_retni( sqlite3_load_extension( pHbSqlite3->db, hb_parc( 2 ), 0, 0 ) );
    else
       hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
+#else
+   hb_retni( -1 );
+#endif /* SQLITE_OMIT_LOAD_EXTENSION */
+
+}
+
+HB_FUNC( SQLITE3_ENABLE_LOAD_EXTENSION )
+{
+#ifndef SQLITE_OMIT_LOAD_EXTENSION
+   HB_SQLITE3 * pHbSqlite3 = ( HB_SQLITE3 * ) hb_sqlite3_param( 1, HB_SQLITE3_DB, TRUE );
+
+   if( pHbSqlite3 && pHbSqlite3->db )
+      hb_retni( sqlite3_enable_load_extension( pHbSqlite3->db, hb_parl( 2 ) ) );
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, 1, hb_paramError( 1 ) );
+#else
+   hb_retni( -1 );
+#endif /* SQLITE_OMIT_LOAD_EXTENSION */
 }
 
 HB_FUNC( SQLITE3_ENABLE_SHARED_CACHE )

@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-01-29 08:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * contrib/hbsqlit3/xhbsqlite3.c
+    + add function HB_FUNC( SQLITE3_LOAD_EXTENSION )
+      addendum by César Lozada
+
 2015-01-14 14:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/pcre/config.generic.h 
     ! another fix for compile with msvc
