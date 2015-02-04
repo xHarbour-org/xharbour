@@ -72,7 +72,7 @@
    #include <dirent.h>
    #include <stdafx.h>
 #endif
-#ifdef (HB_OS_WIN)
+
 #include <time.h>
 
 #ifdef HB_EXTERN_C
