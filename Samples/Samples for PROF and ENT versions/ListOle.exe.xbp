@@ -31,4 +31,4 @@ MYPRG_FLAGS =
 
 #[ole.lib]
 
-[oleserver.lib]
+[ole.lib]
