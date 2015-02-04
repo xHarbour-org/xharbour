@@ -53,8 +53,8 @@
 
 #ifndef _HB_APIZLIB_H_
 #define _HB_APIZLIB_H_
-#ifndef HB_OS_WIN_32_USED
-   #define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_USED
+   #define HB_OS_WIN_USED
 #endif
 #ifndef  HB_OS_WIN
 #define HB_OS_WIN
@@ -72,6 +72,7 @@
    #include <dirent.h>
    #include <stdafx.h>
 #endif
+#ifdef (HB_OS_WIN)
 #include <time.h>
 
 #ifdef HB_EXTERN_C

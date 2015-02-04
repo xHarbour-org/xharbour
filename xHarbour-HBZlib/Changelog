@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-04 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * hbzip.h
+    ! HB_OS_WIN_32_USED  ->  HB_OS_WIN_USED
+    
 2010-06-02 15:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * zip_xhb.c
     ! fixed problem on GetCurrentFileSize in windows Section( was not closing handle from find first)
