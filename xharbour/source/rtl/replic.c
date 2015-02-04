@@ -63,12 +63,12 @@ HB_FUNC( REPLICATE )
 
    if( pText && pNum )
    {
-      HB_ISIZ lTimes = hb_itemGetNL( pNum );
+      HB_SIZE lTimes = hb_itemGetNS( pNum );
 
       if( lTimes > 0 )
       {
          HB_SIZE ulLen =  hb_itemGetCLen( pText);
-            if( ( ulLen *  lTimes ) <  UINT_MAX )
+         if( (LONGLONG)( (LONGLONG)ulLen *  (LONGLONG)lTimes ) < UINT_MAX)
          {
             char *  szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
             char *  szPtr    = szResult;

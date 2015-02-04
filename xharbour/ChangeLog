@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-04 14:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/replic.c
+    ! fix to gpf (ulLen *  lTimes ) < UINT_MAX -> (LONGLONG)((LONGLONG)ulLen *  (LONGLONG)lTimes ) < UINT_MAX 
+      since the calculation of ullen*ltimes depending of the value is > UINT_MAX
+
 2015-01-29 08:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbsqlit3/xhbsqlite3.c
     + add function HB_FUNC( SQLITE3_LOAD_EXTENSION )
