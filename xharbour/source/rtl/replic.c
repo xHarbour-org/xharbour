@@ -73,7 +73,7 @@ HB_FUNC( REPLICATE )
             char *  szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
             char *  szPtr    = szResult;
             char *  szText   = ( char *) hb_itemGetCPtr( pText );
-            HB_ISIZ    i;
+            HB_SIZE    i;
 
             for( i = 0; i < lTimes; i++ )
                {
