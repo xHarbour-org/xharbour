@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-06 22:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/ttopbar.prg
+    ! Fixed a typo in my previous change
+
 2015-02-04 14:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/replic.c
     ! fix to gpf (ulLen *  lTimes ) < UINT_MAX -> (LONGLONG)((LONGLONG)ulLen *  (LONGLONG)lTimes ) < UINT_MAX 

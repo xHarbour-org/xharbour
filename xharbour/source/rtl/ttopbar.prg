@@ -963,7 +963,7 @@ METHOD PushMenu( lSelect ) CLASS TopBarMenu
    IF !HB_ISOBJECT( oNewMenu )
    ELSEIF oNewMenu:IsPopUp
 
-      IF !HB_ISNUMERIC( lSelect )
+      IF !HB_ISLOGICAL( lSelect )
          lSelect := .F.
       ENDIF
 
