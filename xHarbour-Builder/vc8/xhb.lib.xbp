@@ -19,4 +19,4 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\lib\vc8
 
-#include "stdlib.files.inc"
+#include "..\stdlib.files.inc"
