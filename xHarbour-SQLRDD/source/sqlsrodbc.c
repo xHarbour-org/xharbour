@@ -992,8 +992,8 @@ HB_FUNC( SR_DESCRIB )
 
 HB_FUNC( SR_COLATTRIBUTE )
 {
-    SQLSMALLINT        lLen      = hb_parni( 5 );
-    char *         bBuffer   = hb_xgrab( lLen );
+    SQLSMALLINT lLen      = hb_parni( 5 );
+    char *      bBuffer   = (char *) hb_xgrab( lLen );
     SQLSMALLINT wBufLen   = hb_parni( 6 );
     SQLLEN      wNumPtr   = (SQLLEN)hb_parnint( 7 );
     RETCODE     wResult   = SQLColAttribute( ( SQLHSTMT ) hb_parptr( 1 ), ( SQLUSMALLINT )hb_parni( 2 ), ( SQLUSMALLINT )hb_parni( 3 ),

@@ -35,6 +35,7 @@
 [source\ExprUDF.prg]
 
 [source\sqlact.c]
+MYDEFINES = HB_API_MACROS
 
 [source\firebird.c]
 
