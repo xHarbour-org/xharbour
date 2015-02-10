@@ -63,7 +63,7 @@ HB_FUNC( REPLICATE )
 
    if( pText && pNum )
    {
-      HB_SIZE lTimes = hb_itemGetNS( pNum );
+      HB_ISIZ lTimes = hb_itemGetNS( pNum );
 
       if( lTimes > 0 )
       {
@@ -73,7 +73,7 @@ HB_FUNC( REPLICATE )
             char *  szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
             char *  szPtr    = szResult;
             char *  szText   = ( char *) hb_itemGetCPtr( pText );
-            HB_SIZE    i;
+            HB_ISIZ    i;
 
             for( i = 0; i < lTimes; i++ )
                {
