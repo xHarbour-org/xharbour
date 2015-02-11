@@ -51,6 +51,9 @@ extern "C" {
 /*#define HAVE_BZIP2*/
 
 #ifndef _ZLIB_H
+   #if ! defined( HB_OS_UNIX ) || defined(HB_OS_WIN) 
+      #  undef _LARGEFILE64_SOURCE
+   #endif      
 #include "zlib.h"
 #endif
 

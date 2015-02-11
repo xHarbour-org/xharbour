@@ -824,9 +824,9 @@ extern BOOL      hb_cmdargCheck( const char * pszName ); /* Check if a given int
 extern char *    hb_cmdargString( const char * pszName ); /* Returns the string value of an internal switch (like //TEMPPATH:"C:\") */
 extern int       hb_cmdargNum( const char * pszName ); /* Returns the numeric value of an internal switch (like //F:90) */
 extern void      hb_cmdargProcessVM( void ); /* Check for command line internal arguments */
-#if defined( HB_OS_WIN ) && defined( HB_OS_WIN_USED )
-extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow ); /* Set WinMain() parameters */
-extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow ); /* Retrieve WinMain() parameters */
+#if defined( HB_OS_WIN )
+extern HB_EXPORT void hb_winmainArgInit( void * hInstance,  void * hPrevInstance, int iCmdShow ); /* Set WinMain() parameters */
+extern HB_EXPORT BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow ); /* Retrieve WinMain() parameters */
 #endif
 
 /* Codeblock management */

@@ -53,9 +53,11 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define HB_OS_WIN_USED
 #include "hbgtcore.h"
+#if defined( HB_OS_WIN )
 
+   #include <windows.h>
+#endif   
 #if defined( __POCC__ )
 #include "wchar.h"
 #endif

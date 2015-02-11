@@ -296,7 +296,7 @@ HB_FUNC( FREADSTR )
 HB_FUNC( CURDIR )
 {
    char           szBuffer[ HB_PATH_MAX ];
-   int         uiDrive = 0;
+   USHORT         uiDrive = 0;
    const char *   szDrive;
 
    szDrive = hb_parc( 1 );

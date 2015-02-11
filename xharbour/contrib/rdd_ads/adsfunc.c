@@ -49,9 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-#ifndef HB_OS_WIN_USED
-#define HB_OS_WIN_USED
-#endif
 
 #include "hbvm.h"
 #include "hbapi.h"

@@ -52,21 +52,35 @@
 
 #include "hbapirdd.h"
 
-#if defined( HB_OS_WIN ) && !defined( WIN32 )
-   #define WIN32
-#endif
-#if !defined( unix ) && ( defined( __LINUX__ ) || defined( HB_OS_LINUX ) )
-   #define unix
+#if defined( HB_OS_WIN )
+   #include <windows.h>
 #endif
 
-#if defined( __WATCOMC__ ) || defined( __LCC__ )
+#if ! defined( WIN32 ) && defined( HB_OS_WIN )
+   #define WIN32
+#endif
+#if ! defined( unix ) && defined( HB_OS_UNIX )
+   #define unix
+#endif
+#if ! defined( x64 ) && defined( HB_ARCH_64BIT )
+   #define x64
+#endif
+#if defined( __WATCOMC__ ) || defined( __LCC__ ) || ( defined( __MINGW32__ ) && ! defined( _declspec ) )
    #define _declspec( dllexport ) __declspec( dllexport )
 #endif
 
 #include "ace.h"
 
 /* Autodetect ACE version. */
-#if   defined( ADS_KEEP_AOF_PLAN )
+#if   defined( ADS_GET_FORMAT_WEB )
+   #define _ADS_LIB_VERSION  1100 /* or upper */
+#elif defined( ADS_GET_UTF8 )
+   #define _ADS_LIB_VERSION  1010
+#elif defined( ADS_DEFAULT_SQL_TIMEOUT )
+   #define _ADS_LIB_VERSION  1000
+#elif defined( DANISH_ADS_CS_AS_1252 )
+   #define _ADS_LIB_VERSION  910
+#elif   defined( ADS_KEEP_AOF_PLAN )
    #define _ADS_LIB_VERSION 910 /* or upper */
 #elif defined( ADS_NOTIFICATION_CONNECTION )
    #define _ADS_LIB_VERSION 900
@@ -138,6 +152,12 @@
 #define RDDI_REFRESHCOUNT     101
 
 HB_EXTERN_BEGIN
+
+
+#if ADS_LIB_VERSION >= 600
+/* NOTE: Undocumented ACE function. */
+UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8 * pucFileName );
+#endif
 
 /*
  *  ADS WORKAREA
@@ -217,8 +237,8 @@ extern ADSAREAP   hb_adsGetWorkAreaPointer( void );
 
 #ifdef ADS_USE_OEM_TRANSLATION
    extern BOOL   hb_ads_bOEM;
-   extern char * hb_adsOemToAnsi( const char * pcString, ULONG ulLen );
-   extern char * hb_adsAnsiToOem( const char * pcString, ULONG ulLen );
+   extern char * hb_adsOemToAnsi( const char * pcString, HB_SIZE ulLen );
+   extern char * hb_adsAnsiToOem( const char * pcString, HB_SIZE ulLen );
    void hb_adsOemAnsiFree( char * pcString );
 
    typedef UNSIGNED32 (WINAPI *ADSSETFIELDRAW_PTR)( ADSHANDLE hObj,

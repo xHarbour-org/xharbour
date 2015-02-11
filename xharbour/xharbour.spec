@@ -55,12 +55,17 @@
 %endif
 %endif
 
+%define hb_ldconf %([ -d /etc/ld.so.conf.d ] && echo /etc/ld.so.conf.d)
+%if "%{hb_ldconf}" == ""
+%undefine hb_ldconf
+%endif
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  1.1.0
+%define version  1.2.3
 %define releasen 0
 %define hb_pref  xhb
+%define hb_etcdir /etc/%{name}
 %define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-O3"
@@ -299,23 +304,22 @@ case "`uname -m`" in
         ;;
 esac
 
-make -r
+make %{?_smp_mflags}
 
 # build contrib libraries
 for l in %{hb_ctrb}
 do
     (cd "contrib/$l"
-     make -r)
+     make -r %{?_smp_mflags})
 done
 
 ######################################################################
 ## Install.
 ######################################################################
 
-%install
-
 # Install harbour itself.
 
+%install
 %{hb_env}
 case "`uname -m`" in
     *[_@]64)
@@ -334,13 +338,13 @@ mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
 
-make -r -i install
+make install %{?_smp_mflags}
 
 # install contrib libraries
 for l in %{hb_ctrb}
 do
     (cd "contrib/$l"
-     make -r -i install)
+     make -r -i install %{?_smp_mflags})
 done
 
 [ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
@@ -390,7 +394,7 @@ then
     do
         (cd "utils/${utl}"
          rm -fR "./${HB_ARCHITECTURE}"
-         make -r install
+         make -r install %{?_smp_mflags}
          strip "${HB_BIN_INSTALL}/${utl}")
     done
 fi
@@ -603,10 +607,11 @@ rm -rf $RPM_BUILD_ROOT
 %{?_with_pgsql: %{_libdir}/%{name}/libhbpg*.a}
 
 %files lib
-%defattr(-,root,root,755)
+%defattr(755,root,root,755)
 %dir %{_libdir}/%{name}
-%{_libdir}/%{name}/*.so
-%{_libdir}/*.so
+%{_libdir}/%{name}/libxharbour*.so*
+%{!?hb_ldconf:%{_libdir}/libxharbour*.so*}
+%attr(644,root,root) %{?hb_ldconf:%{hb_ldconf}/%{name}.conf}
 
 %files pp
 %defattr(-,root,root,755)

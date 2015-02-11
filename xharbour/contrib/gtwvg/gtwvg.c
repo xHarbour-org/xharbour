@@ -83,9 +83,6 @@
  */
 //----------------------------------------------------------------------//
 
-#ifndef HB_OS_WIN_USED
-   #define HB_OS_WIN_USED
-#endif
 
 #if !defined( HB_VM_ALL )
    #define _HB_API_INTERNAL_ /* for hb_stack_ready, should be eliminated later */

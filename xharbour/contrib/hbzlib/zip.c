@@ -49,18 +49,40 @@
  * If you do not wish that,  delete this exception notice.
  *
  */
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
 
-#include <hbzip2.h>
+
+
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbinit.h"
-#if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+#if ! defined( HB_OS_UNIX ) 
+#  undef _LARGEFILE64_SOURCE
+#endif
+
+#include <hbzip2.h>
+#if defined( HB_OS_UNIX )
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
    #include <dirent.h>
 #endif
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
+
 extern PHB_ITEM   ZipArray;
 static PHB_ITEM   FileToZip;
 static PHB_ITEM   ExcludeFile;
@@ -734,16 +756,16 @@ HB_FUNC( HB_UNZIPFILE )
                else if( HB_IS_ARRAY( pUnzip ) )
                {
                   int      uiZ, uiZLen = hb_arrayLen( pUnzip );
-                  char *   szUnzip;
+
 
                   for( uiZ = 0; uiZ < uiZLen; uiZ++ )
                   {
-                     szUnzip = hb_arrayGetC( pUnzip, uiZ + 1 );
+	                 char *   szUnzip = hb_arrayGetC( pUnzip, uiZ + 1 );
 
                      if( szUnzip )
                      {
                         UnzipCreateArray( szZipFileName, szUnzip, 1 );
-                        hb_xfree( szUnzip );
+                        //hb_xfree( szUnzip );
                      }
                   }
                }
@@ -1050,13 +1072,18 @@ HB_FUNC_EXIT( HBZIPCLEANUP )
    }
 }
 
-#if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+#if defined( HB_OS_UNIX )
 
 int GetFileAttributes( char * szEntry )
 {
+#     if defined( HB_USE_LARGEFILE64 )
+         struct stat64 sStat;
+         stat64( szEntry, &sStat );
+#     else	
    struct stat sStat;
 
    stat( szEntry, &sStat );
+#endif   
    return ( int ) sStat.st_mode;
 }
 void SetFileAttributes( char * szEntry, ULONG ulAttr )

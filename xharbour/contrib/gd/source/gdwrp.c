@@ -57,10 +57,6 @@
  */
 
 /* NOTE: we need this to prevent base types redefinition */
-#define _CLIPDEFS_H
-#if defined(HB_OS_WIN_USED)
-   #include <windows.h>
-#endif
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -69,6 +65,14 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 //#include "hrbdll.h"
+
+#if defined( HB_OS_WIN )
+# include <cinterface.h>
+#  include <windows.h>
+#  if ! defined( _WINDOWS_ )
+#     define _WINDOWS_
+#  endif
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

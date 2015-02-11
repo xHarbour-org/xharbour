@@ -50,10 +50,13 @@
  */
 
 
-#define HB_OS_WIN_USED
+
 #include <hbapi.h>
 #include <stdio.h>
-
+#if defined( HB_OS_WIN )
+   #include "cinterface.h"
+   #include <windows.h>
+#endif   
 HB_FUNC(GETUSERLANG)
 {
    long lRet ;

@@ -61,7 +61,9 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\Common7\Tools\
    IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
    IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
-   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\
+   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
+   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\x86\
+   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.1\Bin\x86\
    GOTO FIND_BISON
 
 :SET_VC2012
@@ -125,6 +127,8 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 SET SUB_DIR=vc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
+echo "%CC_DIR%"
+echo "%RC_DIR%"
 SET _PATH=%PATH%
 IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
 set PATH "%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%

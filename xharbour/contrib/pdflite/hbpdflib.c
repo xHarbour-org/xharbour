@@ -54,12 +54,14 @@
    #pragma warning (disable:4995)
 #endif
 
-#define HB_OS_WIN_USED
 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
 #include "pdflib.h"
+#if defined( HB_OS_WIN )
+   #include "windows.h"
+#endif
 
 static PDF* pPDFLib = NULL;
 

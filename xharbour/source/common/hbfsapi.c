@@ -50,12 +50,10 @@
  *
  */
 
-/* OS2 */
-#define INCL_DOSFILEMGR /* File Manager values */
-#define INCL_DOSERRORS  /* DOS error values    */
-
-/* W32 */
-#define HB_OS_WIN_USED
+/* *nix */ 
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -67,6 +65,7 @@
 #endif
 
 #if defined( HB_OS_WIN )
+   #include <windows.h>
    #if ! defined( INVALID_FILE_ATTRIBUTES )
       #define INVALID_FILE_ATTRIBUTES  ( ( DWORD ) -1 )
    #endif
@@ -74,6 +73,8 @@
       #define FILE_ATTRIBUTE_DEVICE    0x00000040
    #endif
 #elif defined( HB_OS_OS2 )
+   #define INCL_DOSFILEMGR
+   #define INCL_DOSERRORS
    #include <os2.h>
    #include <stdio.h>
 #elif defined( HB_OS_UNIX )
@@ -82,6 +83,19 @@
 #endif
 #if ! defined( HB_WIN32_IO )
    #include <errno.h>
+#endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
 #endif
 
 /* NOTE: Not really belongs here, but until we can't find a better place
@@ -326,11 +340,14 @@ BOOL hb_fsNameExists( const char * pszFileName )
                                  &fs3, sizeof( fs3 ) ) == NO_ERROR;
    }
 #elif defined( HB_OS_UNIX )
-   {
+#     if defined( HB_USE_LARGEFILE64 )
+         struct stat64 statbuf;
+         fExist = stat64( pszFileName, &statbuf ) == 0;
+#     else
       struct stat statbuf;
 
       fExist = stat( pszFileName, &statbuf ) == 0;
-   }
+#     endif      
 #else
    {
       int TODO; /* To force warning */
@@ -385,12 +402,16 @@ BOOL hb_fsFileExists( const char * pszFileName )
                ( fs3.attrFile & FILE_DIRECTORY ) == 0;
    }
 #elif defined( HB_OS_UNIX )
-   {
+#     if defined( HB_USE_LARGEFILE64 )
+         struct stat64 statbuf;
+         fExist = stat64( pszFileName, &statbuf ) == 0 &&
+                  S_ISREG( statbuf.st_mode );
+#     else
       struct stat statbuf;
 
       fExist = stat( pszFileName, &statbuf ) == 0 &&
                S_ISREG( statbuf.st_mode );
-   }
+#     endif               
 #else
    {
       int TODO; /* To force warning */
@@ -444,12 +465,16 @@ BOOL hb_fsDirExists( const char * pszDirName )
                ( fs3.attrFile & FILE_DIRECTORY ) != 0;
    }
 #elif defined( HB_OS_UNIX )
-   {
+#     if defined( HB_USE_LARGEFILE64 )
+         struct stat64 statbuf;
+         fExist = stat64( pszDirName, &statbuf ) == 0 &&
+                  S_ISDIR( statbuf.st_mode );
+#     else
       struct stat statbuf;
 
       fExist = stat( pszDirName, &statbuf ) == 0 &&
                S_ISDIR( statbuf.st_mode );
-   }
+#     endif               
 #else
    {
       int TODO; /* To force warning */

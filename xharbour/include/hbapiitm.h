@@ -134,6 +134,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutCPtr    ( PHB_ITEM pItem, char * szText, H
 
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRaw    ( PHB_ITEM pItem, char * szText, HB_SIZE ulLen );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCRawStatic( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen );
+extern HB_EXPORT PHB_ITEM   hb_itemPutCStatic( PHB_ITEM pItem, const char * szText );
 extern HB_EXPORT PHB_ITEM   hb_itemPutCL      ( PHB_ITEM pItem, const char * szText, HB_SIZE ulLen );
 extern HB_EXPORT void       hb_itemSetCMemo   ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM   hb_itemPutD       ( PHB_ITEM pItem, int iYear, int iMonth, int iDay );

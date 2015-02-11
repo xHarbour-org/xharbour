@@ -17,13 +17,14 @@
  * It is provided "as is" without express or implied warranty.
  *
  */
-
+#include "hbdefs.h"
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf_image.h"
+#include "string.h"
 
 #ifndef LIBHPDF_HAVE_NOPNGLIB
-#if defined(HB_OS_UNIX)
+#if !defined(HB_OS_WIN)
 #include <png.h>
 #else
 #include <pngpriv.h>

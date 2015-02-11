@@ -61,9 +61,12 @@
 /* NOTE: User programs should never call this layer directly! */
 
 
-#define HB_OS_WIN_USED
-#include "hbgtcore.h"
 
+#include "hbgtcore.h"
+#if defined( HB_OS_WIN )
+
+   #include <windows.h>
+#endif   
 #if defined( HB_OS_WIN )
 
 #if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \

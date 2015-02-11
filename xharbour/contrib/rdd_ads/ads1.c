@@ -52,7 +52,7 @@
 
 #define HB_NEEDS_ACE
 
-#define HB_OS_WIN_USED
+
 
 #define HB_SET_IMPORT
 #define SUPERTABLE ( &adsSuper )

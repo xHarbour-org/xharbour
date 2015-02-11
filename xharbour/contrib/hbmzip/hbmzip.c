@@ -50,6 +50,9 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
 
 #define INCL_DOSFILEMGR
 
@@ -58,6 +61,11 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
+
+#if ! defined( HB_OS_UNIX ) 
+#  undef _LARGEFILE64_SOURCE
+#endif
+
 #include "zip.h"
 #include "unzip.h"
 
@@ -79,6 +87,20 @@
       #endif
    #endif
 #endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
+
 
 #define HB_Z_IOBUF_SIZE       ( 1024 * 16 )
 #define hb_storclen_buffer    hb_storclenAdopt
@@ -618,7 +640,7 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
    BOOL          fError;
    BOOL          fText;
    ULONG         ulCRC;
-
+   ulExtAttr = 0;
    if( szName )
    {
       /* change path separators to '/' */
@@ -671,12 +693,15 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
    }
 #elif defined( HB_OS_UNIX )
    {
-      struct stat statbuf;
+
       struct tm   st;
-
-      ulExtAttr = 0;
-
+#  if defined( HB_USE_LARGEFILE64 )
+      struct stat64 statbuf;
+      if( stat64( szFileName, &statbuf ) == 0 )
+#  else
+      struct stat statbuf;
       if( stat( szFileName, &statbuf ) == 0 )
+#  endif      
       {
          if( S_ISDIR( statbuf.st_mode ) )
          {

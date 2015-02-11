@@ -509,16 +509,23 @@ $hb_collect contrib/hbmagic/tests
 $hb_collect contrib/hbmagic/tests/hbmagit.prg
 #contrib/curl
 $hb_collect contrib/hbcurl/*.[ch]
+$hb_collect contrib/hbcurl/*.ch
 $hb_collect contrib/hbcurl/Makefile
 
 #config/tiff
 $hb_collect contrib/tiff/*.[ch]
+$hb_collect contrib/tiff/*.c
+$hb_collect contrib/tiff/*.h
 $hb_collect contrib/tiff/Makefile
 #jpeg
 $hb_collect contrib/jpeg/*.[ch]
+$hb_collect contrib/jpeg/*.c
+$hb_collect contrib/jpeg/*.h
 $hb_collect contrib/jpeg/Makefile
 #png
 $hb_collect contrib/png/*.[ch]
+$hb_collect contrib/png/*.c
+$hb_collect contrib/png/*.h
 $hb_collect contrib/png/Makefile
 }
 

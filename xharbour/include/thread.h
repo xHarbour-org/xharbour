@@ -80,7 +80,7 @@ typedef struct _HB_STACKRDD_TLS
       #define _WIN32_WINNT 0x0403
       /* #define _WIN32_WINNT 0x0400 */
    #endif
-   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+//    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
 
    /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
    #define WIN32_LEAN_AND_MEAN

@@ -53,7 +53,7 @@
  */
 
 #if ! defined( _LARGEFILE64_SOURCE )
-#  define _LARGEFILE64_SOURCE
+#  define _LARGEFILE64_SOURCE  1
 #endif
 
 #include "hbapi.h"
@@ -72,7 +72,7 @@
  * on 32bit machines.
  */
       #define HB_USE_LARGEFILE64
-   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
       #define HB_USE_LARGEFILE64
    #endif
 #endif

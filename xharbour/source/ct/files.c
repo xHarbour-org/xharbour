@@ -55,8 +55,10 @@
  *
  */
 
-/* W32 */
-#define HB_OS_WIN_USED
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
+
 
 #if defined( __POCC__ )
    #pragma warn(push)
@@ -76,7 +78,7 @@
  * on 32bit machines.
  */
       #define HB_USE_LARGEFILE64
-   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
       #define HB_USE_LARGEFILE64
    #endif
 #endif
@@ -125,6 +127,7 @@ static struct ffblk fsOldFiles;
 #endif
 
 #if ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
+#include "windows.h"
 static HANDLE           hLastFind;
 static WIN32_FIND_DATA  Lastff32;
 static LPTSTR GetDate( FILETIME * rTime );
@@ -469,11 +472,12 @@ HB_FUNC( FILESIZE )
 {
    #if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
    {
-      HB_LONG           dwFileSize;
+      HB_FOFFSET        dwFileSize = 0;
       LPCTSTR           szFile;
       DWORD             dwFlags = FILE_ATTRIBUTE_ARCHIVE;
       HANDLE            hFind;
       WIN32_FIND_DATA   hFilesFind;
+              
 
       int               iAttr;
       if( hb_pcount() >= 1 )
@@ -508,14 +512,15 @@ HB_FUNC( FILESIZE )
          {
             if( dwFlags & hFilesFind.dwFileAttributes )
             {
-               if( hFilesFind.nFileSizeHigh > 0 )
-               {
-                  hb_retnint( ( hFilesFind.nFileSizeHigh * ( MAXDWORD + 1 ) ) + hFilesFind.nFileSizeLow );
-               }
-               else
-               {
-                  hb_retnint( hFilesFind.nFileSizeLow );
-               }
+	           dwFileSize = ( HB_FOFFSET ) hFilesFind.nFileSizeLow + ( ( HB_FOFFSET ) hFilesFind.nFileSizeHigh << 32 ); 
+//                if( hFilesFind.nFileSizeHigh > 0 )               
+//                {
+                  hb_retnint( dwFileSize);
+//                }
+//                else
+//                {
+//                   hb_retnint( hFilesFind.nFileSizeLow );
+//                }
             }
             else
             {
@@ -532,7 +537,8 @@ HB_FUNC( FILESIZE )
       {
          if( Lastff32.nFileSizeHigh > 0 )
          {
-            dwFileSize = ( Lastff32.nFileSizeHigh * ( MAXDWORD + 1 ) ) + Lastff32.nFileSizeLow;
+            
+            dwFileSize = ( HB_FOFFSET ) Lastff32.nFileSizeLow + ( ( HB_FOFFSET ) Lastff32.nFileSizeHigh << 32 ); 
          }
          else
          {
@@ -585,7 +591,7 @@ HB_FUNC( FILESIZE )
          const char *   szFile   = hb_parcx( 1 );
          USHORT         ushbMask = FA_ARCH;
          USHORT         usFileAttr;
-#if  defined( __USE_LARGEFILE64 )
+#if  defined( HB_USE_LARGEFILE64 )
          struct stat64  sStat;
 #else
          struct stat    sStat;
@@ -595,7 +601,7 @@ HB_FUNC( FILESIZE )
          {
             ushbMask = hb_parni( 2 );
          }
-#if  defined( __USE_LARGEFILE64 )
+#if  defined( __USE_LARGEFILE64 ) || defined (HB_USE_LARGEFILE64 )
          if( stat64( szFile, &sStat  ) != -1 )
 #else
          if( stat( szFile, &sStat  ) != -1 )
@@ -732,7 +738,11 @@ HB_FUNC( FILEDATE )
       if( hb_pcount() > 0 )
       {
          const char *   szFile   = hb_parcx( 1 );
+#if  defined( HB_USE_LARGEFILE64 )
+         struct stat64  sStat;
+#else        
          struct stat    sStat;
+#endif         
          time_t         tm_t     = 0;
          char           szDate[ 9 ];
          struct tm *    filedate;
@@ -741,8 +751,11 @@ HB_FUNC( FILEDATE )
 
          if( ISNUM( 2 ) )
             ushbMask = hb_parni( 2 );
-
+#if  defined( HB_USE_LARGEFILE64 )
+         if( stat64( szFile, &sStat ) != -1 )
+#else
          if( stat( szFile, &sStat ) != -1 )
+#endif         
          {
             tm_t        = sStat.st_mtime;
             filedate    = localtime( &tm_t );
@@ -891,12 +904,19 @@ HB_FUNC( FILETIME )
 
    {
       const char *   szFile   = hb_parcx( 1 );
+#if  defined( HB_USE_LARGEFILE64 )
+      struct stat64    sStat;
+#else      
       struct stat    sStat;
+#endif      
       time_t         tm_t     = 0;
       char           szTime[ 9 ];
       struct tm *    ft;
-
+#  if defined( HB_USE_LARGEFILE64 )
+      stat64( szFile, &sStat );
+#else
       stat( szFile, &sStat );
+#endif      
       tm_t  = sStat.st_mtime;
       ft    = localtime( &tm_t );
       hb_snprintf( szTime, sizeof( szTime ), "%02d:%02d:%02d", ft->tm_hour, ft->tm_min, ft->tm_sec );

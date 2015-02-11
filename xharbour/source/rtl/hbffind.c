@@ -53,7 +53,7 @@
  */
 
 #if ! defined( _LARGEFILE64_SOURCE )
-#  define _LARGEFILE64_SOURCE
+#  define _LARGEFILE64_SOURCE  1
 #endif
 
 #define INCL_DOSFILEMGR
@@ -194,7 +194,7 @@ typedef void HB_FFIND_INFO, * PHB_FFIND_INFO;
  * on 32bit machines.
  */
       #define HB_USE_LARGEFILE64
-   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
       #define HB_USE_LARGEFILE64
    #endif
 #endif

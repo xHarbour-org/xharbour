@@ -101,8 +101,8 @@
 #if ! defined( _LARGEFILE64_SOURCE )
 #  define _LARGEFILE64_SOURCE 1
 #endif
-#if ! defined( _XOPEN_SOURCE )
-#  define _XOPEN_SOURCE       500
+#if ! defined( _GNU_SOURCE )
+#  define _GNU_SOURCE
 #endif
 
 /* OS2 */
@@ -111,9 +111,6 @@
 #define INCL_DOSDATETIME      /* DATETIME functions  */
 
 /* W32 */
-#ifndef HB_OS_WIN_USED
-   #define HB_OS_WIN_USED
-#endif
 
 #define HB_THREAD_OPTIMIZE_STACK
 
@@ -249,7 +246,7 @@ extern int fdatasync( int fildes );
  * on 32bit machines.
  */
       #define HB_USE_LARGEFILE64
-   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
       #define HB_USE_LARGEFILE64
    #endif
 #endif
@@ -2070,13 +2067,21 @@ BOOL hb_fsGetFileTime( const char * pszFileName, LONG * plJulian, LONG * plMilli
    }
 #elif defined( HB_OS_UNIX ) || defined( HB_OS_OS2 ) || defined( HB_OS_DOS ) || defined( __GNUC__ )
    {
+#if defined( HB_USE_LARGEFILE64 )
+      struct stat64 sStat;
+#else	   
       struct stat sStat;
+#endif      
       char *      pszFree;
 
       pszFileName = hb_fsNameConv( pszFileName, &pszFree );
 
       hb_vmUnlock();
+#if defined( HB_USE_LARGEFILE64 )      
+      if( stat64( pszFileName, &sStat ) == 0 )
+#else
       if( stat( pszFileName, &sStat ) == 0 )
+#endif      
       {
          time_t      ftime;
          struct tm   ft;
@@ -2172,10 +2177,20 @@ BOOL hb_fsGetAttr( const char * pszFileName, ULONG * pulAttr )
    }
 #elif defined( HB_OS_UNIX )
    {
+
+#if defined( HB_USE_LARGEFILE64 )
+      struct stat64 sStat;
+#else	   
       struct stat sStat;
+#endif      
+      
 
       hb_vmUnlock();
+#if defined( HB_USE_LARGEFILE64 )      
+      if( stat64( pszFileName, &sStat ) == 0 )
+#else
       if( stat( pszFileName, &sStat ) == 0 )
+#endif      
       {
          *pulAttr = hb_fsAttrFromRaw( sStat.st_mode );
          fResult  = TRUE;

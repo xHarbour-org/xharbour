@@ -69,7 +69,7 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #ifndef _HB_API_INTERNAL_
    #define _HB_API_INTERNAL_
@@ -82,6 +82,9 @@
 #include "hb_io.h"
 #include "thread.h"
 
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif   
 HB_EXTERN_BEGIN
 extern void hb_console_safe_lock( void );
 extern void hb_console_safe_unlock( void );

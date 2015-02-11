@@ -50,7 +50,7 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -63,7 +63,8 @@ static char *  argv     = "";
 static int     s_argc   = 0;
 static char ** s_argv   = &argv;
 
-#if defined( HB_OS_WIN ) && defined( HB_OS_WIN_USED )
+#if defined( HB_OS_WIN )
+#include "windows.h"
 
 HB_EXTERN_BEGIN
 
@@ -74,27 +75,27 @@ BOOL     s_WinMainParam    = FALSE;
 
 #if defined( HB_VM_ALL )
    #if defined( _MSC_VER ) || defined( __DMC__ )
-      extern HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
-      extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow );
+      extern HB_EXPORT void hb_winmainArgInit( void * hInstance, void * hPrevInstance, int iCmdShow );
+      extern HB_EXPORT BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow );
    #endif
 #endif
 
 HB_EXTERN_END
 
-void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
+void hb_winmainArgInit( void * hInstance, void * hPrevInstance, int iCmdShow )
 {
-   hb_hInstance      = hInstance;
-   hb_hPrevInstance  = hPrevInstance;
+   hb_hInstance      = ( HANDLE ) hInstance;
+   hb_hPrevInstance  = ( HANDLE ) hPrevInstance;
    hb_iCmdShow       = iCmdShow;
    s_WinMainParam    = TRUE;
 }
 
-BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow )
+BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow )
 {
    if( phInstance )
-      *phInstance = hb_hInstance;
+      *( ( HANDLE * ) phInstance  )= hb_hInstance;
    if( phPrevInstance )
-      *phPrevInstance = hb_hPrevInstance;
+      *( ( HANDLE * ) phPrevInstance ) = hb_hPrevInstance;
    if( piCmdShow )
       *piCmdShow = hb_iCmdShow;
 

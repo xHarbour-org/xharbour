@@ -51,20 +51,52 @@
  *
  */
 
-#ifndef HB_OS_WIN_USED
-   #define HB_OS_WIN_USED
+/* *nixes */
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
+#if ! defined( _GNU_SOURCE )
+#  define _GNU_SOURCE
 #endif
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbmath.h"
 #include "hbset.h"
-
+#if defined( HB_OS_WIN )   
+   #include <windows.h>
+#endif   
 #if defined( HB_OS_UNIX )
 #include <stdlib.h>
 #include <unistd.h>  /* We need for mkstemp() on BSD */
 #endif
 
+#if ( defined( HB_OS_LINUX ) && ( ! defined( __WATCOMC__ ) || __WATCOMC__ >= 1280 ) ) || \
+    defined( HB_OS_BSD ) || defined( HB_OS_DARWIN ) || defined( HB_OS_SUNOS )
+#  define HB_HAS_MKSTEMP
+#  if ( defined( HB_OS_BSD ) && ! defined( __NetBSD__ ) ) || defined( HB_OS_DARWIN )
+#     define HB_HAS_MKSTEMPS
+#  elif defined( HB_OS_LINUX ) && \
+        ( defined( _BSD_SOURCE ) || defined( _SVID_SOURCE ) ) && \
+        defined( __GLIBC_PREREQ )
+#     if __GLIBC_PREREQ( 2, 12 )
+#        define HB_HAS_MKSTEMPS
+#     endif
+#  endif
+#endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE ) && ! defined( __WATCOMC__ )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
 #if ! defined( HB_WIN32_IO )
 static BOOL fsGetTempDirByCase( char * pszName, const char * pszTempDir, HB_BOOL fTrans )
 {
@@ -166,15 +198,35 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
       if( iLen > ( HB_PATH_MAX - 1 ) - 6 )
          return FS_ERROR;
 
-#if ! defined( __WATCOMC__ ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_BSD ) )
+#if defined( HB_HAS_MKSTEMP )
       if( hb_setGetFileCase() != HB_SET_CASE_LOWER &&
           hb_setGetFileCase() != HB_SET_CASE_UPPER &&
           hb_setGetDirCase() != HB_SET_CASE_LOWER &&
-          hb_setGetDirCase() != HB_SET_CASE_UPPER &&
-          pszExt == NULL )
+          hb_setGetDirCase() != HB_SET_CASE_UPPER 
+      #if ! defined( HB_HAS_MKSTEMPS )	          
+                && ( pszExt == NULL || *pszExt == 0 )
+      #endif 
+      )
       {
          hb_strncat( pszName, "XXXXXX", HB_PATH_MAX - 1 );
+         #if defined( HB_HAS_MKSTEMPS )
+                  if( pszExt && *pszExt )
+                  {
+                     hb_strncat( pszName, pszExt, HB_PATH_MAX - 1 );
+                  #if defined( HB_USE_LARGEFILE64 )
+                              fd = ( HB_FHANDLE ) mkstemps64( pszName, ( int ) strlen( pszExt ) );
+                  #else
+                              fd = ( HB_FHANDLE ) mkstemps( pszName, ( int ) strlen( pszExt ) );
+                  #endif
+                  }
+                  else
+         #endif
+         #if defined( HB_USE_LARGEFILE64 )
+                     fd = ( HB_FHANDLE ) mkstemp64( pszName );
+         #else
          fd = ( HB_FHANDLE ) mkstemp( pszName );
+         #endif
+
          hb_fsSetIOError( fd != ( HB_FHANDLE ) -1, 0 );
       }
       else

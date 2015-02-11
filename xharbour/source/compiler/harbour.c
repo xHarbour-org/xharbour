@@ -51,7 +51,7 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbcomp.h"
 #include "hbhash.h"
@@ -63,6 +63,10 @@
 #include "hbverbld.h"
 #include "hbapierr.h"
 #include "pragma.h"
+
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif
 
 #if defined( HB_OS_DOS ) && defined( __BORLANDC__ )
    #include <limits.h>

@@ -63,7 +63,6 @@
    #else
        #if defined( HB_OS_WIN )
          #undef OPENSSL_SYS_WIN32
-         #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
          #include "cinterface.h"

@@ -54,6 +54,11 @@
 /* this has to be declared before hbapifs.h is included */
 #define _HB_FILE_INTERNAL_
 
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
+
+
 #include "hbapi.h"
 #include "hbinit.h"
 #include "hbapifs.h"
@@ -71,6 +76,24 @@ HB_EXTERN_END
 #  include <sys/stat.h>
 #endif
 
+#if defined( HB_OS_UNIX )
+#  include <sys/types.h>
+#  include <sys/stat.h>
+#  include <unistd.h>
+#endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
 #define HB_FLOCK_RESIZE 16
 
 typedef struct
@@ -321,7 +344,11 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
 #endif
    PHB_FILE pFile = NULL;
 #if defined( HB_OS_UNIX )
+    #  if defined( HB_USE_LARGEFILE64 )
+       struct stat64 statbuf;
+    #  else
    struct stat statbuf;
+    #endif   
    BOOL        fResult;
 #endif
    BOOL        fShared, fReadonly;
@@ -336,7 +363,11 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
 
 #if defined( HB_OS_UNIX )
    hb_vmUnlock();
+   #if defined( HB_USE_LARGEFILE64 )
+      fResult = stat64( ( char * ) pszFile, &statbuf ) == 0;
+   #else   
    fResult = stat( ( char * ) pszFile, &statbuf ) == 0;
+   #endif
    hb_fsSetIOError( fResult, 0 );
    hb_vmLock();
 
@@ -385,7 +416,11 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
          ULONG device = 0, inode = 0;
 #if defined( HB_OS_UNIX )
          hb_vmUnlock();
+         #  if defined( HB_USE_LARGEFILE64 )
+            if( fstat64( hFile, &statbuf ) == 0 )
+         #  else         
          if( fstat( hFile, &statbuf ) == 0 )
+         #endif         
          {
             device   = ( ULONG ) statbuf.st_dev;
             inode    = ( ULONG ) statbuf.st_ino;

@@ -45,12 +45,14 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 #include <time.h>
 
 #include "hbcomp.h"
 #include "hbexemem.h"
-
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif
 static char *  argv     = "";
 static char ** s_argv   = &argv;
 

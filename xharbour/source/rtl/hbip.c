@@ -78,6 +78,7 @@
 #if defined( HB_OS_WIN )
 //    #define _WINSOCKAPI_    /* Prevents inclusion of Winsock.h in Windows.h */
    #define HB_SOCKET_T     SOCKET
+   #  define socklen_t int
    #include <winsock2.h>
    #include <windows.h>
 
@@ -206,23 +207,23 @@ void hb_ipCleanup( void )
 void hb_ipSetBufSize( HB_SOCKET_T hSocket, int iBufSend, int iBufRecv )
 {
    int   value;
-   int   len = sizeof( value );
+   socklen_t len = sizeof( value );
 
-   if( iBufSend && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) &len ) )
+   if( iBufSend && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &value, ( socklen_t * ) &len ) )
    {
       if( value < iBufSend )
       {
          value = iBufSend;
-         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char const * ) ( SOCKOPT4 ) &value, ( int ) sizeof( value ) );
+         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char const * ) ( SOCKOPT4 ) &value, ( socklen_t ) sizeof( value ) );
       }
    }
 
-   if( iBufRecv && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) &len ) )
+   if( iBufRecv && ! getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( socklen_t * ) &len ) )
    {
       if( value < iBufRecv )
       {
          value = iBufRecv;
-         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char const * ) ( SOCKOPT4 ) &value, ( int ) sizeof( value ) );
+         setsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char const * ) ( SOCKOPT4 ) &value, ( socklen_t ) sizeof( value ) );
       }
    }
    // getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_RCVBUF, ( char * ) ( SOCKOPT4 ) &value, ( int * ) len );
@@ -477,9 +478,9 @@ int hb_ipSend( HB_SOCKET_T hSocket, char * szBuffer, int iSend, int timeout )
 {
    int   iSent, iBufferLen;
    int   iBufferMax;
-   int   iLen = sizeof( iBufferMax );
+   socklen_t   iLen = sizeof( iBufferMax );
 
-   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &iBufferMax, ( int * ) &iLen );
+   getsockopt( ( unsigned ) hSocket, ( int ) SOL_SOCKET, ( int ) SO_SNDBUF, ( char * ) ( SOCKOPT4 ) &iBufferMax, ( socklen_t * ) &iLen );
 
    iSent = iLen = 0;
 
@@ -878,7 +879,7 @@ void hb_ip_rfd_set( HB_SOCKET_T hSocket )
    HB_SOCKET_ZERO_ERROR();
 
    FD_SET( hSocket, &rd_fds );
-   rd_maxfd = ( rd_maxfd > hSocket ) ? rd_maxfd : ( unsigned int ) hSocket;
+   rd_maxfd = ( rd_maxfd > ( unsigned int )hSocket ) ? rd_maxfd : ( unsigned int ) hSocket;
 }
 
 void hb_ip_rfd_clr( HB_SOCKET_T hSocket )

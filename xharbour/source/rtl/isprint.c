@@ -61,13 +61,16 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbset.h"
 #include "hbapiitm.h"
+#if defined( HB_OS_WIN )
 
+   #include <windows.h>
+#endif   
 #if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
 
 #include <stdio.h>

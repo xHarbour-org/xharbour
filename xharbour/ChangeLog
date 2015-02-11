@@ -7,7 +7,152 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2015-02-11 19:15 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * bin/pack_src.sh
+    ! added some missing source to compress    
+  * contrib/freeimage/fi_wrp.c
+    ! removed define HB_OS_WIN_USED
+    ! include of windows.h is now inside HB_OS_WIN block
+  * contrib/freeimage/fi_winfu.c
+    ! removed define HB_OS_WIN_USED
+    ! include of windows.h is now inside HB_OS_WIN block  
+  * contrib/gtwvg/gtwvg.c  
+  * contrib/gtwvg/wvwcore.c  
+  * contrib/gtwvg/wvwutils.c  
+    ! removed define HB_OS_WIN_USED    
+  * contrib/hbcurl/Makefile 
+    ! Added CFLAGS to increment -I../..
+  * contrib/hbhpdf/harupdf.c
+    ! synced with harbour where possible
+  * contrib/hbmzip/hbmzip.c 
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+  * contrib/hbzlib/zip.c
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! in GetFileAttributes under *nix compilation  call to stat function change to test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat    
+  * contrib/libnf/getenvrn.c
+    ! removed define HB_OS_WIN_USED    
+  * contrib/rdd_ads/rddads.h
+    ! windows.h is now included inside HB_OS_WIN define block
+    ! define x64 when HB_ARCH_64BIT is defined 
+    ! small change on the #define for unix
+    ! added defined to detect Ads version 10 or newer
+    ! added missing entry point for AdsDeleteFile all change borrow from harbour    
+  * contrib/rdd_ads/adsmgmnt.c
+    contrib/rdd_ads/adsfunc.c
+    contrib/rdd_ads/ads1.c
+    contrib/rdd_ads/ace32.c
+    ! removed define HB_OS_WIN_USED    
+  * contrib/tipssl/inetssl.h  
+    ! removed  #define _WINSOCKAPI_
+  * include/hbapi.h
+    ! changed in hb_winmainArgInit and hb_winmainArgGet to use void type insted of winapi HANDLE type
+  * include/hbapiitm.h
+    ! Added missing prototype for hb_itemPutCStatic  
+  * include/hbdate.h
+    ! added detection for HB_HAS_LOCALTIME_R when compiling under *nix borrow from harbour
+    ! added prototype for hb_timeStampGetLocal and hb_timeStampGet functions   
+  * include/thread.h
+  * include/hbatomic.h
+  * include/hbdefs.h
+    ! removed  #define _WINSOCKAPI_  
+  * source/common/hbdate.c    
+    ! added hb_timeStampGetLocal and hb_timeStampGet ( borrow from harbour )
+  * source/common/hbfsapi.c
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    - removed define to HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block 
+    ! moved #define INCL_DOSFILEMGR and  #define INCL_DOSERRORS   to inside HB_OS_OS2 Block
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+  * source/common/hbgete.c
+    ! added HB_SYMBOL_UNUSED( fSys ); in hb_setenv under *nix compilation  
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block           
+    ! added support to set envvar under *nix compilation in hb_setenv    
+  * source/common/hbmem.c  
+    ! protected LITTLE_ENDIAN defined inside # if !defined(LITTLE_ENDIAN)          
+  * source/common/hbver.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block                
+    ! include for zlib,pcre,tiff,jpeg,png,dlmalloc moved to be bellow defined (HB_OS_XXXX) blocks 
+  * source/ct/files.c
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+    ! removed define HB_OS_WIN_USED
+  * source/compiler/harbour.c  
+  * source/compiler/cmdcheck.c  
+  * source/compiler/genc.c  
+    - removed define to HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block   
+  * source/compiler/comptool.c  
+    - removed define to HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block  
+  * source/odbc/odbc.c
+    ! some changes to compile under *nix 64bit
+    ! removed redefinition os SQLLEN when not defining HB_OS_WIN_64, this break 64 bits *nix compile      
+    ! when #if ODBCVER >= 0x0300 id defined using SQLSetConnectAttr insted of SQLSetConnectOption,
+      SQLSetStmtAttr insted of SQLSetStmtOption, SQLGetConnectAttr insted of SQLGetConnectOption,
+      SQLGetStmtAttr insted of SQLGetStmtOption
+  * source/rtl/console.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block     
+  * source/rtl/copyfile.c        
+    ! when compiling for *nix call to fstat  function changed  test to call fstat64 when  HB_USE_LARGEFILE64 is defined otherwise call fstat  
+    ! define BUFFER_SIZE to 8192 only when HB_C52_STRICT is defined otherwise use 64k buffer borrow from harbour                
+  * source/rtl/filebuf.c    
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat  
+  * source/rtl/filesys.c  
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat  
+    ! some adjust when defining HB_USE_LARGEFILE64  
+    ! removed define HB_OS_WIN_USED
+  * source/rtl/fssize.c
+    ! some adjust on define _LARGEFILE64_SOURCE under *nix      
+  * source/rtl/fstemp.c
+    ! some adjust on define _LARGEFILE64_SOURCE under *nix
+    ! adjust to call mkstemps64/mkstemps/mkstemp64/mkstemp when linux 64bits compilation is done borrow from harbour
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block         
+  * source/rtl/gtclip.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block     
+  * source/rtl/gtkbstat.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block     
+  * source/rtl/gttone.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block           
+  * source/rtl/hbffind.c
+    ! some adjust on define _LARGEFILE64_SOURCE under *nix  
+  * source/rtl/hbip.c
+    ! added #define socklen_t int to HB_OS_WIN Define block
+    ! in function  hb_ipSetBufSize change int to socklen_t to make *nix happy
+    ! in function hb_ipSend change int to socklen_t to make *nix happy
+  * source/rtl/idle.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block 
+  * source/rtl/isprint.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block           
+  *  source/rtl/net.c
+    ! added HB_SYMBOL_UNUSED( bGetUser ); when compiling for dos/*nix/os2
+  * source/rtl/philes.c
+    ! adjust HB_OPENPROCESS hb_stornint return values to include the * in front of variable name   
+    ! in CURDIR function changed int uiDrive to USHORT uiDrive;
+  * source/rtl/gttrm/gttrm.c
+    ! BYTE -> char  
+    ! functions  with BYTE parameter changes to const char parameters
+  * source/vm/cmdarg.c
+    ! changed in hb_winmainArgInit and hb_winmainArgGet to use void type insted of winapi HANDLE type
+    ! moved windows.h request to inside HB_OS_WIN Block
+    ! removed define HB_OS_WIN_USED
+  ! utils/hbmake/hbmlang.c
+    ! removed define HB_OS_WIN_USED
+    + added include to windows.h inside HB_OS_WIN define block               
+  * utils/hbfilere/hbfilere.c  
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat      
+      
 2015-02-10 14:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\replic.c
     ! restored type of variable i to HB_ISIZ

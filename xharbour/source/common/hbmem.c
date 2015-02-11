@@ -63,7 +63,9 @@
 *******************************************************************/
 
 #if defined( HB_LITTLE_ENDIAN ) /* Added for xHarbour */
+   #if !defined ( LITTLE_ENDIAN ) 
    #define LITTLE_ENDIAN
+   #endif
 #endif
 #define INDEXED_COPY
 

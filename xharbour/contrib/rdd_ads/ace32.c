@@ -50,9 +50,6 @@
  *
  */
 
-#ifndef HB_OS_WIN_USED
-#define HB_OS_WIN_USED
-#endif
 
 #include "rddads.h"
 

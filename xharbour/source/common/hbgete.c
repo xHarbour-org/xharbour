@@ -54,12 +54,20 @@
          so badly when used from a Windows DLL. */
 
 /* For OS/2 */
-#define INCL_DOSMISC
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbexemem.h"
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#elif defined( HB_OS_OS2 )
+   #define INCL_DOSMISC
+   #define INCL_ERRORS
+   #include <os2.h>
+#elif defined( __FreeBSD__ )
+   #include <sys/param.h>
+#endif
 
 #if defined( __HB_COMPILER__ )
    #include "hbcomp.h"
@@ -154,6 +162,43 @@ HB_BOOL hb_setenv( const char * szName, const char * szValue, HB_BOOL fSys )
    }
 
    return fSuccess;
+#elif defined( _BSD_SOURCE ) || _POSIX_C_SOURCE >= 200112L || \
+   _XOPEN_SOURCE >= 600 || \
+   defined( __WATCOMC__ ) || defined( __DJGPP__ ) || \
+   defined( HB_OS_SUNOS ) || defined( HB_OS_BSD ) || \
+   defined( HB_OS_DARWIN ) || defined( HB_OS_BEOS ) || \
+   defined( HB_OS_QNX ) || defined( HB_OS_VXWORKS ) || \
+   defined( HB_OS_CYGWIN ) || defined( HB_OS_MINIX ) || \
+   defined( HB_OS_ANDROID )
+   {
+      BOOL fResult;
+      HB_SYMBOL_UNUSED( fSys );
+      if( szValue )
+      {
+         fResult = setenv( szName, szValue, 1 ) == 0;
+      }
+      else
+      {
+#  if ( defined( __DJGPP__ ) && \
+        ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ < 4 ) ) ) || \
+      defined( __WATCOMC__ )
+         szValue = getenv( szName );
+         if( szValue && *szValue )
+            fResult = setenv( szName, "", 1 ) == 0;
+         else
+            fResult = HB_TRUE;
+#  elif defined( __OpenBSD__ ) || defined( HB_OS_QNX ) || \
+        ( defined( __FreeBSD_version ) && __FreeBSD_version < 700050 ) || \
+        ( defined( HB_OS_DARWIN ) && !( defined( __DARWIN_UNIX03 ) && __DARWIN_UNIX03 ) )
+         unsetenv( szName );
+         fResult = HB_TRUE;
+#  else
+         fResult = unsetenv( szName ) == 0;
+#  endif
+      }
+
+      return fResult;
+   }
 
 #else
 

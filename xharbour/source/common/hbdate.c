@@ -91,7 +91,6 @@
  *
  */
 
-#define HB_OS_WIN_USED
 
 #include <time.h>
 
@@ -99,6 +98,23 @@
 #include "hbdate.h"
 #include "hbmath.h"
 #include "hbcomp.h"
+
+
+#include <time.h>
+#if defined( HB_OS_UNIX ) || defined( HB_OS_OS2 )
+#  include <sys/time.h>
+#elif defined( HB_OS_WIN )
+#  include <windows.h>
+#else
+#  include <sys/timeb.h>
+#  if defined( _MSC_VER )
+#     define timeb _timeb
+#     define ftime _ftime
+#  endif
+#  ifndef TIME_ZONE_ID_INVALID
+#     define TIME_ZONE_ID_INVALID ( DWORD ) 0xFFFFFFFF
+#  endif
+#endif
 
 #ifdef HB_C52_STRICT
    #define HB_DATE_YEAR_LIMIT 2999
@@ -1308,6 +1324,74 @@ void hb_comp_datetimeEncode( long * plDate, long * plTime, int iYear, int iMonth
                              int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
 {
    hb_datetimeEncode( plDate, plTime, iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk );
+}
+
+
+void hb_timeStampGetLocal( int * piYear, int * piMonth, int * piDay,
+                           int * piHour, int * piMinutes,
+                           int * piSeconds, int * piMSec )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampGetLocal(%p,%p,%p,%p,%p,%p,%p)", piYear, piMonth, piDay, piHour, piMinutes, piSeconds, piMSec ) );
+
+#if defined( HB_OS_WIN )
+   {
+      SYSTEMTIME st;
+
+      GetLocalTime( &st );
+
+      *piYear    = st.wYear;
+      *piMonth   = st.wMonth;
+      *piDay     = st.wDay;
+      *piHour    = st.wHour;
+      *piMinutes = st.wMinute;
+      *piSeconds = st.wSecond;
+      *piMSec    = st.wMilliseconds;
+   }
+#else
+   {
+      struct tm st;
+      time_t seconds, millisecs;
+
+#  if defined( HB_OS_UNIX ) || defined( HB_OS_OS2 )
+      struct timeval tv;
+      gettimeofday( &tv, NULL );
+      seconds = tv.tv_sec;
+      millisecs = tv.tv_usec / 1000;
+#  else
+      struct timeb tb;
+      ftime( &tb );
+      seconds = tb.time;
+      millisecs = tb.millitm;
+#  endif
+
+#  if defined( HB_HAS_LOCALTIME_R )
+      localtime_r( &seconds, &st );
+#  else
+      st = *localtime( &seconds );
+#  endif
+
+      *piYear    = st.tm_year + 1900;
+      *piMonth   = st.tm_mon + 1;
+      *piDay     = st.tm_mday;
+      *piHour    = st.tm_hour;
+      *piMinutes = st.tm_min;
+      *piSeconds = st.tm_sec;
+      *piMSec    = millisecs;
+   }
+#endif
+}
+
+/* return local timestamp */
+void hb_timeStampGet( long * plJulian, long * plMilliSec )
+{
+   int iYear, iMonth, iDay, iHour, iMinute, iSeconds, iMillisec;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_timeStampGet(%p,%p)", plJulian, plMilliSec ) );
+
+   hb_timeStampGetLocal( &iYear, &iMonth, &iDay,
+                         &iHour, &iMinute, &iSeconds, &iMillisec );
+   *plJulian   = hb_dateEncode( iYear, iMonth, iDay );
+   *plMilliSec = hb_timeEncode( iHour, iMinute, iSeconds );
 }
 
 /*-------------------------------------------------------------------------------*/

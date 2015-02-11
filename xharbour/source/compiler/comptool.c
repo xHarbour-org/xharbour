@@ -25,7 +25,7 @@
  * their web site at http://www.gnu.org/).
  *
  */
-#define HB_OS_WIN_USED
+
 
 #include "hbcomp.h"
 #include "hbset.h"
@@ -33,6 +33,10 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbmemory.ch"
+
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif
 
 static int  s_iFileCase = HB_SET_CASE_MIXED;
 static int  s_iDirCase  = HB_SET_CASE_MIXED;

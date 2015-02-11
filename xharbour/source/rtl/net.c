@@ -104,7 +104,7 @@
 void hb_netname( char * pszNetName, BOOL bGetUser )
 {
 #if defined( HB_OS_OS2 ) || defined( HB_OS_UNIX )
-
+   HB_SYMBOL_UNUSED( bGetUser );
    #if defined( __WATCOMC__ )
    pszNetName        = hb_getenv( "HOSTNAME" );
    #else
@@ -113,7 +113,7 @@ void hb_netname( char * pszNetName, BOOL bGetUser )
    #endif
 
 #elif defined( HB_OS_DOS )
-
+   HB_SYMBOL_UNUSED( bGetUser );
    #if defined( __DJGPP__ ) || defined( __RSX32__ ) || defined( __GNUC__ )
    pszNetName[ 0 ]   = '\0';
    gethostname( pszNetName, MAXGETHOSTNAME );

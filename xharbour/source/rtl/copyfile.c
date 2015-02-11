@@ -50,6 +50,10 @@
  *
  */
 
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE
+#endif
+ 
 #include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
@@ -62,7 +66,26 @@
    #include <windows.h>
 #endif
 
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE ) 
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
+
+
+#ifdef HB_C52_STRICT
 #define BUFFER_SIZE 8192
+#else
+   #define BUFFER_SIZE  65536
+#endif
+
 
 static void blockeval( EVALINFO, PHB_ITEM, ULONG );
 
@@ -101,8 +124,13 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
       if( fhndDest != FS_ERROR )
       {
 #if defined( HB_OS_UNIX )
+#  if defined( HB_USE_LARGEFILE64 )
+         struct stat64              struFileInfo;
+         int                        iSuccess = fstat64( fhndSource, &struFileInfo );
+#else
          struct stat                struFileInfo;
          int                        iSuccess = fstat( fhndSource, &struFileInfo );
+#endif         
 #elif ( defined( HB_OS_WIN ) || defined( __MINGW32__ ) ) && ! defined( __CYGWIN__ )
          BY_HANDLE_FILE_INFORMATION hFileInfo;
          BOOL                       bSuccess = GetFileInformationByHandle( ( HANDLE ) fhndSource, &hFileInfo );
@@ -119,7 +147,7 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
             hb_evalNew( &info, block );
          }
 
-         while( ( usRead = hb_fsRead( fhndSource, buffer, BUFFER_SIZE ) ) != 0 )
+         while( ( usRead = hb_fsRead( fhndSource, buffer, (USHORT)BUFFER_SIZE ) ) != 0 )
          {
             while( hb_fsWrite( fhndDest, buffer, usRead ) != usRead )
             {

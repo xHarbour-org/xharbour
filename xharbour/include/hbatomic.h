@@ -56,7 +56,7 @@
 #include "hbdefs.h"
 
 #if defined( HB_OS_WIN )
-#  define _WINSOCKAPI_   /* Prevents inclusion of Winsock.h in Windows.h */
+// #  define _WINSOCKAPI_   /* Prevents inclusion of Winsock.h in Windows.h */
 // Don't move, must precede any #include of Windows to fix CINTERFACE support in guiddef.h and propkeydef.h!!!
 #  include "cinterface.h"
 #  include <windows.h>

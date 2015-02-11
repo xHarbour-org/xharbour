@@ -73,7 +73,7 @@
  */
 
 #define __PICK_DLMALLOC_VERSION
-#define HB_OS_WIN_USED
+
 
 #if defined( __POCC__ )
    #pragma warn(push)
@@ -86,23 +86,10 @@
 #include "hbmemory.ch"
 #include "hbexemem.h"
 
-#if defined(__XCC__)
-#include "source/vm/dlmalloc.c"
-#include "contrib/tiff/tiffvers.h"
-#include "contrib/jpeg/jpeglib.h"
-#include "contrib/png/png.h"
-#include "source/rtl/pcre/pcre.h.generic"
-#include "source/rtl/zlib/zlib.h"
-#else
-#include "../source/vm/dlmalloc.c"
-#include "../contrib/tiff/tiffvers.h"
-#include "../contrib/jpeg/jpeglib.h"
-#include "../contrib/png/png.h"
-#include "../source/rtl/pcre/pcre.h"
-#include "../source/rtl/zlib/zlib.h"
-#endif
 
 #if defined( HB_OS_WIN )
+#define WIN32_LEAN_AND_MEAN
+   #include <windows.h>
 
    #include <ctype.h>
    #include "hbwbase.h"
@@ -122,6 +109,22 @@
 #elif defined( HB_OS_UNIX ) && ! defined( __CEGCC__ )
    #include <sys/utsname.h>
 
+#endif
+
+#if defined(__XCC__)
+#include "source/vm/dlmalloc.c"
+#include "contrib/tiff/tiffvers.h"
+#include "contrib/jpeg/jpeglib.h"
+#include "contrib/png/png.h"
+#include "source/rtl/pcre/pcre.h.generic"
+#include "source/rtl/zlib/zlib.h"
+#else
+#include "../source/vm/dlmalloc.c"
+#include "../contrib/tiff/tiffvers.h"
+#include "../contrib/jpeg/jpeglib.h"
+#include "../contrib/png/png.h"
+#include "../source/rtl/pcre/pcre.h"
+#include "../source/rtl/zlib/zlib.h"
 #endif
 
 #include <time.h>

@@ -57,7 +57,7 @@
  */
 
 /* NOTE: we need this to prevent base types redefinition */
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -65,10 +65,12 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 
-#if defined( HB_OS_WIN ) && ! ( defined( HB_OS_WIN_CE ) && defined( __POCC__ ) )
-
-#if !defined( _WINDOWS_ ) && ( defined( __GNUC__ ) || defined( __POCC__ ) || defined( __XCC__ ) ) || defined( __WATCOMC__ )
+#if defined( HB_OS_WIN )
+#  include <cinterface.h>
+#  include <windows.h>
+#  if ! defined( _WINDOWS_ )
    #define _WINDOWS_
+#endif
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -233,4 +235,4 @@ HB_FUNC( FI_WINDRAW )
 
 // --------------------------------------------------------------------------
 
-#endif // ( defined(HB_OS_WIN) || defined(__WIN32__) )
+

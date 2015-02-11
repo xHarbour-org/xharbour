@@ -59,11 +59,28 @@
 //struct _HB_FILE;
 //typedef struct _HB_FILE * PHB_FILE;
 
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE
+#endif
+
 #include "hbfilere.h"
 
 #ifdef __POCC__
    #if __POCC__ >= 0600
       const unsigned char sockaddr_size[AF_MAX];
+   #endif
+#endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+/*
+ * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+ * define and efectively enables lseek64/flock64/ftruncate64 functions
+ * on 32bit machines.
+ */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
    #endif
 #endif
 
@@ -677,7 +694,11 @@ static void filere_ExtOpen( PUSERSTRU pUStru, BYTE * szData )
    PHB_FILE pFile = NULL;
    BOOL fShared;
    BOOL fResult;
+#if defined( HB_USE_LARGEFILE64 )
+   struct stat64 statbuf;
+#else	      
    struct stat statbuf;
+#endif
 
    // Reading params
    ptr = hb_strToken( szData, strlen( ( char * ) szData ), 4, &ulSize );
@@ -711,7 +732,11 @@ static void filere_ExtOpen( PUSERSTRU pUStru, BYTE * szData )
 
    // Clear error
    hb_fsSetError( 0 );
+#  if defined( HB_USE_LARGEFILE64 )
+   fResult = stat64( ( char * ) pFilename, &statbuf ) == 0;
+#else   
    fResult = stat( ( char * ) pFilename, &statbuf ) == 0;
+#endif   
    hb_fsSetIOError( fResult, 0 );
 
    if( fResult )

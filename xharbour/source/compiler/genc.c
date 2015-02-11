@@ -25,7 +25,7 @@
  * their web site at http://www.gnu.org/).
  *
  */
-#define HB_OS_WIN_USED
+
 
 #include <assert.h>
 #include <time.h>
@@ -33,6 +33,9 @@
 #include "hbcomp.h"
 #include "hbdate.h"
 #include "hbexemem.h"
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif
 
 extern void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc );
 extern void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );

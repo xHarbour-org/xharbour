@@ -2166,13 +2166,13 @@ static void hb_gt_xwc_WndProc( PXWND_DEF wnd, XEvent * evt )
 #ifdef XWC_DEBUG
                   printf( "UTF8String='%s'\r\n", text.value ); fflush( stdout );
 #endif
-                  nItem                = hb_cdpUTF8StringLength( text.value, text.nitems );
+                  nItem                = hb_cdpUTF8StringLength((const char *) text.value, text.nitems );
                   if( wnd->ClipboardData != NULL )
                      hb_xfree( wnd->ClipboardData );
                   wnd->ClipboardData   = ( unsigned char * ) hb_xgrab( nItem + 1 );
                   wnd->ClipboardSize   = nItem;
-                  hb_cdpUTF8ToStrn( wnd->hostCDP, FALSE, text.value, text.nitems,
-                                    wnd->ClipboardData, nItem + 1 );
+                  hb_cdpUTF8ToStrn( wnd->hostCDP, FALSE, (const char *)text.value, text.nitems,
+                                    (char *)wnd->ClipboardData, nItem + 1 );
                   wnd->ClipboardTime   = evt->xselection.time;
                   wnd->ClipboardRcvd   = TRUE;
                }
@@ -2278,7 +2278,7 @@ static void hb_gt_xwc_WndProc( PXWND_DEF wnd, XEvent * evt )
 #ifndef HB_CDP_SUPPORT_OFF
          else if( req->target == s_atomUTF8String )
          {
-            ULONG    ulLen    = hb_cdpStringInUTF8Length( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize );
+            HB_SIZE    ulLen    = hb_cdpStringInUTF8Length( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize );
             BYTE *   pBuffer  = ( BYTE * ) hb_xgrab( ulLen + 1 );
 
             hb_cdpStrnToUTF8( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );

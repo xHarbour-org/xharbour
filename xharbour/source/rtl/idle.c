@@ -68,7 +68,7 @@
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */
 #define INCL_DOSPROCESS
 #define INCL_NOPMAPI
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -78,6 +78,9 @@
 #include "hbdate.h"
 #include "error.ch"
 #include "thread.h"
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif   
 #if defined( HB_OS_UNIX )
    #include <sys/times.h>
    #include <unistd.h>

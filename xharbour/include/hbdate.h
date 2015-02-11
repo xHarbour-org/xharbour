@@ -107,12 +107,21 @@ extern HB_EXPORT double   hb_datetimePack( long lDate, long lTime );
 extern HB_EXPORT double   hb_datetimePackInSec( long lJulian, long lTime );
 
 extern HB_EXPORT void     hb_timeStampUnpackDT( double dTimeStamp, long * plJulian, long * plMilliSec );
-
+extern HB_EXPORT void     hb_timeStampGetLocal( int * piYear, int * piMonth, int * piDay,int * piHour, int * piMinutes,int * piSeconds, int * piMSec );
+extern HB_EXPORT void     hb_timeStampGet( long * plJulian, long * plMilliSec );
 HB_EXTERN_END
 
 #define HB_MINUTES_PER_DAY    ( 24 * 60 )
 #define HB_SECONDS_PER_DAY    ( HB_MINUTES_PER_DAY * 60 )
 #define HB_MILLISECS_PER_DAY  ( HB_SECONDS_PER_DAY * 1000 )
 #define HB_TIMEDIFF_DEC       6
+
+#if ( defined( _POSIX_C_SOURCE ) || defined( _XOPEN_SOURCE ) || \
+      defined( _BSD_SOURCE ) || defined( _SVID_SOURCE ) || \
+      defined( HB_OS_SUNOS ) || defined( HB_OS_BEOS ) || \
+      defined( HB_OS_ANDROID ) ) && \
+   ! defined( HB_OS_DARWIN_5 ) && ! defined( HB_HAS_LOCALTIME_R )
+#  define HB_HAS_LOCALTIME_R
+#endif
 
 #endif /* HB_DATE_H_ */
