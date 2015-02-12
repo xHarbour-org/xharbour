@@ -472,7 +472,7 @@ HB_FUNC( FILESIZE )
 {
    #if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
    {
-      HB_FOFFSET        dwFileSize = 0;
+      HB_FOFFSET        dwFileSize;
       LPCTSTR           szFile;
       DWORD             dwFlags = FILE_ATTRIBUTE_ARCHIVE;
       HANDLE            hFind;

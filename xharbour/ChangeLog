@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2015-02-12 11:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\ct\files.c
+    ! removed dwFileSize unused initialization in HB_FUNC( FILESIZE )
+  * contrib\hbmzip\hbmzip.c
+    ! removed ulExtAttr unused initialization in hb_zipStoreFile for Windows build
+
 2015-02-11 19:15 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * bin/pack_src.sh
     ! added some missing source to compress    

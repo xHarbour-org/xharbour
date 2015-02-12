@@ -640,7 +640,11 @@ static int hb_zipStoreFile( zipFile hZip, const char* szFileName, const char* sz
    BOOL          fError;
    BOOL          fText;
    ULONG         ulCRC;
+
+#if ! defined( HB_OS_WIN )
    ulExtAttr = 0;
+#endif
+
    if( szName )
    {
       /* change path separators to '/' */
