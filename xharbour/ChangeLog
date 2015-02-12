@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-12 17:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * contrib/hbzlib/zip.c
+    ! added missing include "windows.h" to HB_OS_WIN block
+    ! changed * nix detection from  #if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX ) to #if defined(HB_OS_UNIX)
+  * contrib/hbzlib/zipcentraldir.cpp
+    ! changed * nix detection from  #if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX ) to #if defined(HB_OS_UNIX)
+
 2015-02-12 11:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\ct\files.c
     ! removed dwFileSize unused initialization in HB_FUNC( FILESIZE )

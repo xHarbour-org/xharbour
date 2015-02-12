@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "zipcentraldir.h"
 #include "ziparchive.h"
-#if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+#if defined( HB_OS_UNIX )
 #include "Linux/ZipFileMapping.h"
 #else
 #include "zipfilemapping.h"

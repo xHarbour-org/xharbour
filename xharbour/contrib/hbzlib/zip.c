@@ -70,6 +70,9 @@
    #include <fcntl.h>
    #include <dirent.h>
 #endif
+#if define(HB_OS_WIN)
+   #include <windows.h>
+#endif   
 #if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
    #if defined( __USE_LARGEFILE64 )
       /*
@@ -101,7 +104,7 @@ PHB_ITEM          ChangeDiskBlock;
 extern int Wild2RegEx( const char * sWild, char * sRegEx, BOOL bMatchCase );
 extern void hb_fsDirectory( PHB_ITEM pDir, const char * szSkleton, const char * szAttributes, BOOL bDirOnly, BOOL bFullPath );
 
-#if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+#if defined(HB_OS_UNIX)
 extern int GetFileAttributes( char * szEntry );
 extern void SetFileAttributes( char * szEntry, ULONG ulAttr );
 #endif
@@ -394,7 +397,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE * pCurDir, BOOL bFullPath )   
                   Temp  = hb_itemNew( NULL );
                   hb_arrayAddForward( FileAttribs, hb_itemPutNI( Temp, GetFileAttributes( szEntry ) ) );
                   hb_itemRelease( Temp );
-                  #if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+                  #if defined( HB_OS_UNIX ) 
                   SetFileAttributes( szEntry, 0777 );
                   #else
                   SetFileAttributes( szEntry, FA_ARCH );
@@ -427,7 +430,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE * pCurDir, BOOL bFullPath )   
             hb_arrayAddForward( FileAttribs, Temp );
             hb_itemRelease( Temp );
 
-                  #if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX )
+                  #if defined( HB_OS_UNIX )
             SetFileAttributes( szArrEntry, 0777 );
                   #else
             SetFileAttributes( szArrEntry, FA_ARCH );
