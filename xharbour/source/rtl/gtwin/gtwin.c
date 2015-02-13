@@ -77,15 +77,20 @@
 /* TODO: include any standard headers here */
 /* *********************************************************************** */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbgtcore.h"
 #include "hbinit.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
+
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
+#endif
+
+#if defined(HB_OS_WIN)
+#include "windows.h"
 #endif
 
 #if ! defined( HB_NO_WIN_CONSOLE )

@@ -63,6 +63,10 @@
 #  undef _LARGEFILE64_SOURCE
 #endif
 
+#if defined(HB_OS_WIN)
+   #include <windows.h>
+#endif     
+
 #include <hbzip2.h>
 #if defined( HB_OS_UNIX )
    #include <sys/types.h>
@@ -70,9 +74,6 @@
    #include <fcntl.h>
    #include <dirent.h>
 #endif
-#if defined(HB_OS_WIN)
-   #include <windows.h>
-#endif   
 #if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
    #if defined( __USE_LARGEFILE64 )
       /*

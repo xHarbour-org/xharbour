@@ -51,7 +51,10 @@
  *
  */
 
-#define HB_OS_WIN_USED
+#if ! defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE  1
+#endif
+
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -69,6 +72,24 @@
       #define INVALID_FILE_ATTRIBUTES ( ( DWORD ) ( -1 ) )
    #endif
 #endif
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
+
+#if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * defined and effectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
+
+
 
 static BOOL hb_fsFileStats(
    BYTE * pszFileName,
@@ -82,16 +103,24 @@ static BOOL hb_fsFileStats(
    BOOL fResult = FALSE;
 
 #if defined( HB_OS_UNIX )
+   #  if defined( HB_USE_LARGEFILE64 )
+         struct stat64 statbuf;
+   #  else
 
-   struct stat statbuf;
-
+         struct stat statbuf;
+   #  endif
+#if defined( HB_USE_LARGEFILE64 )
+   if( stat64( ( char * ) pszFileName, &statbuf ) == 0 )
+#else
    if( stat( ( char * ) pszFileName, &statbuf ) == 0 )
+#endif
+   
    {
       // determine if we can read/write/execute the file
       USHORT      usAttr, ushbAttr = 0;
       time_t      ftime;
-#if _POSIX_C_SOURCE >= 199506L
-      struct tm   tms;
+#if defined( HB_HAS_LOCALTIME_R )
+         struct tm tms;
 #endif
       struct tm * ptms;
 
@@ -153,7 +182,7 @@ static BOOL hb_fsFileStats(
       *llSize  = ( HB_FOFFSET ) statbuf.st_size;
 
       ftime    = statbuf.st_mtime;
-#if _POSIX_C_SOURCE >= 199506L && ! defined( HB_OS_DARWIN_5 )
+#if defined( HB_HAS_LOCALTIME_R )
       ptms     = localtime_r( &ftime, &tms );
 #else
       ptms     = localtime( &ftime );
@@ -164,7 +193,7 @@ static BOOL hb_fsFileStats(
       *lcTime  = ptms->tm_hour * 3600 + ptms->tm_min * 60 + ptms->tm_sec;
 
       ftime    = statbuf.st_atime;
-#if _POSIX_C_SOURCE >= 199506L && ! defined( HB_OS_DARWIN_5 )
+#if defined( HB_HAS_LOCALTIME_R )
       ptms     = localtime_r( &ftime, &tms );
 #else
       ptms     = localtime( &ftime );

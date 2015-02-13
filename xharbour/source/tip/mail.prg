@@ -625,6 +625,10 @@ METHOD attachFile( cFileName ) CLASS TipMail
    oAttach:SetFieldPart( "Content-Type", cMimeType )
    oAttach:SetFieldOption( "Content-Type", "name", cFname + cFext )
 
+   if lower(cFext) in ".png" .or. lower(cFext) in ".jpg" .or. lower(cFext) in ".jpeg"
+      oAttach:setFieldPart( "Content-Id",  cFname + cFext )
+   endif    
+   
    oAttach:SetFieldPart( "Content-Disposition", "attachment" )
    oAttach:SetFieldOption( "Content-Disposition", "filename", cFname + cFext )
 

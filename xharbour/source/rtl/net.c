@@ -61,10 +61,14 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbfast.h"
+
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
 
 #if defined( HB_OS_OS2 ) && defined( __GNUC__ )
 

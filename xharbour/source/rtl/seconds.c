@@ -50,7 +50,7 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #define INCL_DOS
 #define INCL_DOSPROFILE

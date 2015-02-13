@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2015-02-13 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * contrib/hbzlib/zip.c
+    ! minor change on my previys commit moved HB_OS_WIN block before include hbzip2.h
+  ! source/rtl/bkgtsks.c    
+  ! source/rtl/diskspac.c   
+  ! source/rtl/disksphb.c   
+  ! source/rtl/filestat.c   
+  ! source/rtl/fserror.c    
+  ! source/rtl/hbffind.c    
+  ! source/rtl/hboutdbg.c   
+  ! source/rtl/net.c        
+  ! source/rtl/oemansi.c    
+  ! source/rtl/seconds.c    
+  ! source/rtl/tprinter.c   
+  ! source/rtl/win_misc.c   
+  ! source/rtl/gtgui/gtgui.c
+  ! source/rtl/gtwin/gtwin.c
+    ! removed define HB_OS_WIN_USED
+    ! include of windows.h is now inside HB_OS_WIN block
+  ! source/rtl/filestat.c   
+    ! removed define HB_OS_WIN_USED
+    ! include of windows.h is now inside HB_OS_WIN block
+    ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 
+      is defined otherwise call stat          
+  ! source/tip/mail.prg
+    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg 
+      or .jpeg. this is usefull for htlm emails with images on email body
+  ! contrib/tipssl/mail.prg
+    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg 
+      or .jpeg. this is usefull for htlm emails with images on email body
+      
 2015-02-13 10:49 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbzlib\zip.c
     ! fixed a typo in previous commit (#if define -> #if defined)

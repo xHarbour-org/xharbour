@@ -53,11 +53,14 @@
 /* NOTE: These are Win32 specific, for other platforms it will return the
          passed parameter unchanged. */
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
 
 #ifdef HB_EXTENSION
 

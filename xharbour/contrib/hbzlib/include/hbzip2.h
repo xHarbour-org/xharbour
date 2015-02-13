@@ -61,7 +61,7 @@
 
 #ifndef HB_APIZLIB_H_
 #define HB_APIZLIB_H_
-#define HB_OS_WIN_USED
+
 #include <hbapiitm.h>
 #include <hbapifs.h>
 /* #include <hbapigt.h> */

@@ -58,12 +58,15 @@
 #define INCL_BASE
 #define INCL_DOSERRORS
 
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
 
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
 #if defined( HB_OS_BSD )
 #  include <sys/param.h>
 #  include <sys/mount.h>

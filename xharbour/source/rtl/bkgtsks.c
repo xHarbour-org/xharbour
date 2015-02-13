@@ -58,7 +58,7 @@
  *
  */
 
-#define HB_OS_WIN_USED
+
 
 #define HB_THREAD_OPTIMIZE_STACK
 #ifndef _HB_API_INTERNAL_
@@ -71,6 +71,10 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "error.ch"
+
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
 
 #if defined( HB_OS_UNIX )
 #if defined( HB_OS_DARWIN )

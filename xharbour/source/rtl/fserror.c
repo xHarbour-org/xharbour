@@ -50,14 +50,15 @@
  *
  */
 
-#ifndef HB_OS_WIN_USED
-   #define HB_OS_WIN_USED
-#endif
 
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbstack.h"
 #include "hb_io.h"
+#if defined(HB_OS_WIN)
+#include "windows.h"
+#endif
+
 #if ! ( defined( HB_WIN32_IO ) || defined( HB_OS_WIN ) )
 #  include <errno.h>
 #endif

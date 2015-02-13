@@ -54,7 +54,7 @@
 #define INCL_BASE
 #define INCL_DOSERRORS
 
-#define HB_OS_WIN_USED
+
 
 #include <ctype.h>
 
@@ -64,6 +64,9 @@
 
 #if defined( HB_OS_UNIX ) && ! ( defined( __WATCOMC__ ) || defined( __CEGCC__ ) )
    #include <sys/statvfs.h>
+#endif
+#if defined(HB_OS_WIN)
+#include "windows.h"
 #endif
 
 HB_FUNC( HB_DISKSPACE )

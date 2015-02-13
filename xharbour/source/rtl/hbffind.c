@@ -58,7 +58,7 @@
 
 #define INCL_DOSFILEMGR
 #define INCL_DOSERRORS
-#define HB_OS_WIN_USED
+
 
 #include "hbapi.h"
 #include "hbapifs.h"
@@ -147,7 +147,7 @@ typedef struct
 } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
 #elif defined( HB_OS_WIN )
-
+#include "windows.h"
 typedef struct
 {
    HANDLE hFindFile;
