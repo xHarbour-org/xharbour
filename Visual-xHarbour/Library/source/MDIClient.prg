@@ -26,7 +26,16 @@ CLASS MDIClient INHERIT Window
    PROPERTY BackColor    ROOT "Colors" GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
    PROPERTY ForeColor    ROOT "Colors" GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor );
                          SET IIF( ::IsWindow() .AND. ::IsWindowVisible(), ::InvalidateRect(), NIL )
-   PROPERTY ClientEdge   SET ::SetExStyle( WS_EX_CLIENTEDGE, v ) DEFAULT .T.
+
+   PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
+   DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
+
+   // Compatibility
+   ACCESS StaticEdge    INLINE ::Border == WS_EX_STATICEDGE
+   ASSIGN StaticEdge(l) INLINE ::Border := IIF(l,WS_EX_STATICEDGE,0)
+
+   ACCESS ClientEdge    INLINE ::Border == WS_EX_CLIENTEDGE
+   ASSIGN ClientEdge(l) INLINE ::Border := IIF(l,WS_EX_CLIENTEDGE,0)
 
    DATA WindowMenu         EXPORTED
    DATA FirstChild         EXPORTED
@@ -36,7 +45,7 @@ CLASS MDIClient INHERIT Window
    DATA Width              EXPORTED
    DATA Height             EXPORTED
    DATA Style              EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   DATA ExStyle            EXPORTED
+   DATA ExStyle            EXPORTED INIT 0
    DATA ClsName            EXPORTED
    DATA Name               EXPORTED
    DATA Center             EXPORTED
@@ -63,7 +72,6 @@ CLASS MDIClient INHERIT Window
 
 
    DATA Font               EXPORTED
-   ACCESS StaticEdge       INLINE ::ExStyle & WS_EX_STATICEDGE != 0
    ACCESS MDIChild         INLINE ::ExStyle & WS_EX_MDICHILD != 0
    ACCESS ControlParent    INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS Transparent      INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
@@ -87,6 +95,7 @@ CLASS MDIClient INHERIT Window
    METHOD SetBackColor()
    METHOD SetExStyle()
    METHOD __ControlProc()
+   METHOD __SetBorder()
    METHOD GetActive()
 ENDCLASS
 
@@ -103,7 +112,8 @@ METHOD Init( oParent ) CLASS MDIClient
 
    ::Parent      := oParent
    ::ClsName     := "MDIClient"
-   ::ExStyle     := WS_EX_CLIENTEDGE
+   ::Border      := WS_EX_CLIENTEDGE
+   ::__SetBorder( ::xBorder )
    ::WindowStyle := 4
 
    IF ::Parent != NIL .AND.::Parent:DesignMode
@@ -131,6 +141,28 @@ METHOD Create() CLASS MDIClient
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD __SetBorder( nBorder ) CLASS MDIClient
+   LOCAL nExStyle, nStyle
+
+   IF VALTYPE( nBorder ) == "L" // backward compatibility
+      nBorder := IIF( nBorder, WS_BORDER, 0 )
+   ENDIF
+
+   nStyle   := ::Style & NOT( WS_BORDER )
+   nExStyle := ::ExStyle & NOT( WS_EX_STATICEDGE )
+   nExStyle := nExStyle & NOT( WS_EX_CLIENTEDGE )
+
+   IF nBorder <> 0
+      IF nBorder == WS_BORDER
+         nStyle := nStyle | WS_BORDER
+      ELSE
+         nExStyle := nExStyle | nBorder
+      ENDIF
+   ENDIF
+   ::Style := nStyle
+   ::ExStyle := nExStyle
+RETURN nBorder
+
 
 METHOD MoveWindow( x, y, w, h, lRep ) CLASS MDIClient
    DEFAULT x    TO ::Left

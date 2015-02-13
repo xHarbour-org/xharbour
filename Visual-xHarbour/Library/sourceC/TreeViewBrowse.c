@@ -68,21 +68,21 @@ BOOL FolderTreeInsertItem(BOOL bRoot, TVINSERTSTRUCT* tvins, char szBuff[MAX_PAT
          tvi.mask |= TVIF_CHILDREN;
       }
    }
-   
+
    if (ulAttrs & SFGAO_GHOSTED)
    {
       tvi.mask |= LVIF_STATE;
       tvi.stateMask = LVIS_CUT;
       tvi.state = LVIS_CUT;
    }
-   
+
    if (ulAttrs & SFGAO_LINK)
    {
       tvi.mask |= LVIF_STATE;
       tvi.stateMask = LVIS_OVERLAYMASK;
       tvi.state = INDEXTOOVERLAYMASK(2);
    }
-   
+
    if (ulAttrs & SFGAO_SHARE)
    {
       tvi.mask |= LVIF_STATE;
@@ -184,6 +184,7 @@ HB_FUNC( FOLDERTREEINIT )
 
    himlSmall = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
    himlLarge = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
+
    if (himlSmall && himlLarge)
    {
       SendMessage( hTreeView, TVM_SETIMAGELIST, (WPARAM)LVSIL_NORMAL, (LPARAM)himlSmall);
@@ -199,7 +200,7 @@ HB_FUNC( FOLDERTREEINIT )
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
-void FolderTreePopulate( HWND hTreeView, TVITEM *tvi, UINT action )
+void FolderTree_Populate( HWND hTreeView, TVITEM *tvi )
 {
    LPTVITEMDATA* lptvid = NULL;
    HRESULT hr;
@@ -217,12 +218,16 @@ void FolderTreePopulate( HWND hTreeView, TVITEM *tvi, UINT action )
    lptvid = (LPTVITEMDATA*) pMalloc->lpVtbl->Alloc (pMalloc, sizeof (LPTVITEMDATA));
    if (! lptvid)
    {
+      pMalloc->lpVtbl->Release(pMalloc);
       return;
    }
 
    lptvid = (LPTVITEMDATA*)tvi->lParam;
    if(lptvid == NULL)
+   {
+      pMalloc->lpVtbl->Release(pMalloc);
       return;
+   }
 
    if(lptvid->bRoot)
    {
@@ -230,21 +235,27 @@ void FolderTreePopulate( HWND hTreeView, TVITEM *tvi, UINT action )
    }
    else
    {
-      hr = lptvid->lpsfParent->lpVtbl->BindToObject(lptvid->lpsfParent , lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &psfProgFiles);
+      hr = lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &psfProgFiles);
       if(FAILED(hr))
+      {
+         pMalloc->lpVtbl->Release(pMalloc);
          return;
+      }
    }
 
-   hr = psfProgFiles->lpVtbl->EnumObjects(psfProgFiles, NULL,SHCONTF_FOLDERS | SHCONTF_NONFOLDERS | SHCONTF_INCLUDEHIDDEN, &ppenum);
+   hr = psfProgFiles->lpVtbl->EnumObjects(psfProgFiles, NULL,SHCONTF_FOLDERS | SHCONTF_NONFOLDERS /*| SHCONTF_INCLUDEHIDDEN*/, &ppenum);
    if(FAILED(hr))
+   {
+      pMalloc->lpVtbl->Release(pMalloc);
       return;
+   }
 
    SetCursor(LoadCursor(NULL,IDC_WAIT));
    SendMessage(hTreeView, WM_SETREDRAW, FALSE, 0L);
-//   if( action == TVE_COLLAPSE )
-      FolderTreeDeleteChildren(tvi->hItem, hTreeView);
 
-   while( ( hr = ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1 )
+   FolderTreeDeleteChildren(tvi->hItem, hTreeView);
+
+   while( ppenum && ( hr = ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1 )
    {
       char szBuff[MAX_PATH];
       TVINSERTSTRUCT tvins;
@@ -294,11 +305,11 @@ HB_FUNC( FOLDERTREEUPDATE )
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( FOLDERTREEPOPULATETREE )
+HB_FUNC( FOLDERTREEPOPULATE )
 {
    LPARAM lParam = (LPARAM) hb_parnl(2);
    TVITEM tvi = ((NM_TREEVIEW*)lParam)->itemNew;
-   FolderTreePopulate( (HWND) hb_parnl(1), &tvi, ((NM_TREEVIEW*)lParam)->action );
+   FolderTree_Populate( (HWND) hb_parnl(1), &tvi );
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -309,7 +320,7 @@ HB_FUNC( FOLDERTREESHOWSTDMENU )
    BOOL bShowMenu = hb_parl(3);
 
    TVITEM tvi;
-   
+
    HRESULT hr;
    HMENU hMenuPopup;
    IContextMenu *icm;
@@ -318,7 +329,7 @@ HB_FUNC( FOLDERTREESHOWSTDMENU )
    UINT  id;
    static POINT pt;
    CMINVOKECOMMANDINFO  ici;
-   
+
    ZeroMemory(&tvi, sizeof(tvi));
    tvi.mask = TVIF_PARAM | TVIF_HANDLE;
    tvi.hItem = TreeView_GetSelection( hWnd );
@@ -397,8 +408,14 @@ HB_FUNC( FOLDERTREEGETPATH )
    tvi.hItem = TreeView_GetSelection( hWnd );
    TreeView_GetItem( hWnd, &tvi );
 
-   SHGetPathFromIDList( ((LPTVITEMDATA*)tvi.lParam)->lpifq, lpBuffer);
-   hb_retc( lpBuffer );
+   if( SHGetPathFromIDList( ((LPTVITEMDATA*)tvi.lParam)->lpifq, lpBuffer) )
+   {
+      hb_retc( lpBuffer );
+   }
+   else
+   {
+      hb_retnl( (long) ((LPTVITEMDATA*)tvi.lParam)->lpifq );
+   }
 }
 
 HB_FUNC( FOLDERTREEGETIDLIST )
@@ -408,8 +425,20 @@ HB_FUNC( FOLDERTREEGETIDLIST )
    TVITEM tvi;
    tvi.mask = TVIF_PARAM | TVIF_HANDLE;
    tvi.hItem = TreeView_GetSelection( hWnd );
-   TreeView_GetItem( hWnd, &tvi );
+   if( TreeView_GetItem( hWnd, &tvi ) )
+   {
+      hb_retnl( (LONG) (((LPTVITEMDATA*)tvi.lParam)->lpifq) );
+   }
+}
 
-   hb_retnl( (LONG) (((LPTVITEMDATA*)tvi.lParam)->lpifq) );
+HB_FUNC( FOLDERTREEIDLIST )
+{
+   LPARAM lParam = (LPARAM) hb_parnl(1);
+   NM_TREEVIEW *pTree = (NM_TREEVIEW*)lParam;
+   if( pTree->action == 1 )
+   {
+      TVITEM tvi = pTree->itemNew;
+      hb_retnl( (LONG) (((LPTVITEMDATA*)tvi.lParam)->lpifq) );
+   }
 }
 

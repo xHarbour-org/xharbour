@@ -91,7 +91,6 @@
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
-   PROPERTY Border                        SET ::SetStyle( WS_BORDER, v )                            DEFAULT .T.
    PROPERTY ItemHeight                                                                              DEFAULT 18
    PROPERTY FullRowSelect                                                                           DEFAULT .F.
    PROPERTY ShadowRow                                                                               DEFAULT .T.
@@ -333,7 +332,8 @@ METHOD Init( oParent ) CLASS DataGrid
    ::ClsName                 := "DataGrid"
    ::__SysBackColor          := GetSysColor( COLOR_WINDOW )
    ::BackColor               := GetSysColor( COLOR_WINDOW )
-   ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER
+   ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Border                  := WS_BORDER
    ::Super:Init( oParent )
    ::Width                   := 340
    ::Height                  := 240

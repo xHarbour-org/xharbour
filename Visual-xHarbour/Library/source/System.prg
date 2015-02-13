@@ -114,6 +114,8 @@ CLASS System
    DATA hHeaderTheme            EXPORTED
    DATA hTabTheme               EXPORTED
 
+   DATA Border                  EXPORTED
+
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
    ACCESS LastError     INLINE ::__GetLastError()
@@ -250,6 +252,13 @@ METHOD Init() CLASS System
       ::CurrentScheme := ProfessionalColorTable()
    ENDIF
    ::CurrentScheme:Load()
+
+   ::Border := {=>}
+   HSetCaseMatch( ::Border, .F. )
+   ::Border[ "None" ]    := 0
+   ::Border[ "Single" ]  := WS_BORDER
+   ::Border[ "Sunken" ]  := WS_EX_STATICEDGE
+   ::Border[ "Fixed3D" ] := WS_EX_CLIENTEDGE
 
    ::__ToolStripFlags := {=>}
    HSetCaseMatch( ::__ToolStripFlags, .F. )
@@ -519,6 +528,7 @@ METHOD Init() CLASS System
    ::Folders["InternetCache"]         := CSIDL_INTERNET_CACHE
    ::Folders["LocalApplicationData"]  := CSIDL_LOCAL_APPDATA
    ::Folders["MyComputer"]            := CSIDL_DRIVES
+   ::Folders["ThisPC"]                := CSIDL_DRIVES
    ::Folders["MyMusic"]               := CSIDL_MYMUSIC
    ::Folders["MyPictures"]            := CSIDL_MYPICTURES
    ::Folders["MyDocuments"]           := CSIDL_PERSONAL

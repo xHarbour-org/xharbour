@@ -33,6 +33,15 @@ typedef struct
    LPSHELLFOLDER pRoot;
 }LVITEMDATA, *LPLVITEMDATA;
 
+typedef struct {
+   BOOL bRoot;
+   LPSHELLFOLDER lpsfParent;
+   LPITEMIDLIST  lpi;
+   LPITEMIDLIST  lpifq;
+   ULONG         ulAttribs;
+   LPSHELLFOLDER pRoot;
+}LPTVITEMDATA;
+
 enum SubItems
 {
    SUBITEM_NAME, SUBITEM_SIZE, SUBITEM_TYPE, SUBITEM_MODIFIED
@@ -72,9 +81,6 @@ enum SubItems
 
 int  giRowCtr = 0;
 
-static LPSHELLFOLDER lpShell;
-static LPSHELLFOLDER lpPrev;
-
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 HB_FUNC( LISTVIEWBROWSEINIT )
 {
@@ -90,17 +96,14 @@ HB_FUNC( LISTVIEWBROWSEINIT )
 
    s_bShowFolders = hb_parl(4);
 
-//   LPITEMIDLIST pidl = NULL;
-
    himlSmall = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
    himlLarge = (HIMAGELIST)SHGetFileInfo( TEXT("C:\\"), 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
 
    if (himlSmall && himlLarge)
    {
-      SendMessage(hwnd, LVM_SETIMAGELIST, (WPARAM)LVSIL_SMALL, (LPARAM)himlSmall);
-      SendMessage(hwnd, LVM_SETIMAGELIST, (WPARAM)LVSIL_NORMAL, (LPARAM)himlLarge);
+      SendMessage( hwnd, LVM_SETIMAGELIST, (WPARAM)LVSIL_SMALL, (LPARAM)himlSmall);
+      SendMessage( hwnd, LVM_SETIMAGELIST, (WPARAM)LVSIL_NORMAL, (LPARAM)himlLarge);
    }
-
 
    ListView_DeleteAllItems(hwnd);
    lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -119,7 +122,6 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
 {
    LPMALLOC lpMalloc;
    LPLVITEMDATA lptvid = NULL;
-//   LPITEMIDLIST pidl = NULL;
    LV_ITEM lvi;
 
    lvi.mask     = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
@@ -128,7 +130,6 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
    lvi.pszText  = LPSTR_TEXTCALLBACK;
 
    lpsf->lpVtbl->AddRef(lpsf);
-
 
    SHGetMalloc(&lpMalloc);
    lptvid = (LPLVITEMDATA) lpMalloc->lpVtbl->Alloc (lpMalloc, sizeof (LVITEMDATA));
@@ -140,123 +141,33 @@ BOOL ListViewBrowseInsertItem( HWND hWndListView, LPSHELLFOLDER lpsf, LPITEMIDLI
 
    lvi.iImage = GetNormalIcon(lptvid->lpifq);
    lvi.lParam = (LPARAM)lptvid;
-
-   ListView_InsertItem (hWndListView, &lvi);
    lpMalloc->lpVtbl->Release(lpMalloc);
 
+   ListView_InsertItem (hWndListView, &lvi);
    return TRUE;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-void FolderListPopulate(HWND hWndListView, LPARAM lParam )
+HB_FUNC( FOLDERLISTPOPULATEBYID )
 {
-   LPLVITEMDATA lptvid = NULL;
-   HRESULT hr;
-//   LPITEMIDLIST pidlItems = NULL;
-   LPSHELLFOLDER pFolder = NULL;
-   LPMALLOC pMalloc;
+   LPSHELLFOLDER lpsf = NULL;
+   LPSHELLFOLDER pRoot = NULL;
+   SHGetDesktopFolder (&lpsf);
+   BOOL bRoot = ISNIL(3)?FALSE:hb_parl(3);
 
-   hr = SHGetMalloc(&pMalloc);
-
-   if(FAILED(hr))
-      return;
-
-   lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc (  pMalloc, sizeof (LVITEMDATA));
-
-   if (! lptvid)
+   if( ! bRoot )
    {
-      return;
-   }
-
-   lptvid = (LPLVITEMDATA)lParam;
-   if(lptvid == NULL)
-      return;
-
-   if(lptvid->bRoot)
-   {
-      pFolder = lptvid->lpsfParent;
+      LPITEMIDLIST lpi = (LPITEMIDLIST) hb_parnl(2);
+      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pRoot);
+      FolderListSet( (HWND) hb_parnl(1), pRoot, lpi );
    }
    else
    {
-      hr = lptvid->lpsfParent->lpVtbl->BindToObject(lptvid->lpsfParent , lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
-      if(FAILED(hr))
-         return;
+      LPITEMIDLIST lpi;
+      SHGetSpecialFolderLocation( NULL, CSIDL_DESKTOP, &lpi);
+      FolderListSet( (HWND) hb_parnl(1), lpsf, lpi );
    }
-
-   FolderListSet( hWndListView, pFolder, lptvid->lpifq);
-   pMalloc->lpVtbl->Release(pMalloc);
-}
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( LISTVIEWBROWSEGOUP )
-{
-//   LPITEMIDLIST lpi = NULL;
-   HWND hWnd = (HWND) hb_parnl(1);
-   LPARAM lParam = (LPARAM) hb_parnl(2);
-   LPMALLOC pMalloc;
-   LPLVITEMDATA lptvid;
-   LVITEM lvi;
-   LPSHELLFOLDER pFolder;
-   //HRESULT hr;
-
-   ZeroMemory(&lvi, sizeof(lvi));
-   ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
-
-   SHGetMalloc( &pMalloc );
-
-   lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
-   lptvid = (LPLVITEMDATA)lvi.lParam;
-
-   lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
-
-   FolderListSet( hWnd, pFolder, lptvid->lpi);
-
-   if( pFolder )
-      pFolder->lpVtbl->Release(pFolder);
-
-   pMalloc->lpVtbl->Release( pMalloc );
-}
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( LISTVIEWBROWSEPOPULATEBYID )
-{
-   //LPSHELLFOLDER lpsf = (LPSHELLFOLDER) hb_parnl(3);
-   FolderListSet( (HWND) hb_parnl(1), lpShell, (LPITEMIDLIST) hb_parnl(2) );
-}
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( LISTVIEWBROWSEPOPULATE )
-{
-   //LPITEMIDLIST lpi = NULL;
-   HWND hWnd = (HWND) hb_parnl(1);
-   LPARAM lParam = (LPARAM) hb_parnl(2);
-   LPMALLOC pMalloc;
-   LPLVITEMDATA lptvid;
-   LVITEM lvi;
-   LPSHELLFOLDER pFolder;
-   
-   ZeroMemory(&lvi, sizeof(lvi));
-   ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
-
-   SHGetMalloc( &pMalloc );
-
-   lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
-   lptvid = (LPLVITEMDATA)lvi.lParam;
-
-   lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
- 
-   FolderListSet( hWnd, pFolder, lptvid->lpifq);
-
-   if( pFolder )
-      pFolder->lpVtbl->Release(pFolder);
-
-   pMalloc->lpVtbl->Release( pMalloc );
-}
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( LISTVIEWBROWSEGETPARENTID )
-{
-   hb_retnl( (long) lpShell );
+   lpsf->lpVtbl->Release( lpsf );
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -276,15 +187,16 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
 
    SHGetDesktopFolder( &lpsf );
 
-
-   if( s_bShowFolders || pFolder == lpsf )
+   if( s_bShowFolders )
    {
       pFolder->lpVtbl->EnumObjects(pFolder, NULL,SHCONTF_FOLDERS, &ppenum);
-      while( ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
+      while( ppenum && ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
       {
          ULONG uAttr = SFGAO_FOLDER;
          pFolder->lpVtbl->GetAttributesOf(pFolder, 1, (LPCITEMIDLIST *) &pidlItems, &uAttr);
-         if ( (uAttr & SFGAO_FOLDER) )
+         SHGetDataFromIDList(pFolder, pidlItems, SHGDFIL_FINDDATA , &fd, sizeof(WIN32_FIND_DATA));
+
+         if( fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY || (lpsf == pFolder) )
          {
             ListViewBrowseInsertItem( hWndListView, pFolder, pidlItems, lpi, uAttr);
          }
@@ -294,7 +206,7 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
    if( pFolder != lpsf )
    {
       pFolder->lpVtbl->EnumObjects(pFolder, NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &ppenum);
-      while( ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
+      while( ppenum && ( ppenum->lpVtbl->Next(ppenum, 1,&pidlItems, &celtFetched) ) == S_OK && celtFetched == 1)
       {
          ULONG uAttr = SFGAO_STREAM;
          pFolder->lpVtbl->GetAttributesOf(pFolder, 1, (LPCITEMIDLIST *) &pidlItems, &uAttr);
@@ -306,8 +218,6 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
          }
       }
    }
-   lpPrev = lpShell;
-   lpShell = pFolder;
 
    SetCursor(LoadCursor(NULL,IDC_ARROW));
    SendMessage(hWndListView, WM_SETREDRAW, TRUE, 0L);
@@ -316,79 +226,40 @@ void FolderListSet(HWND hWndListView, LPSHELLFOLDER pFolder, LPITEMIDLIST lpi)
    lpsf->lpVtbl->Release( lpsf );
 }
 
-HB_FUNC( FOLDERLISTGETPATH )
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+HB_FUNC( FOLDERFROMIDLIST )
 {
-   HWND hWnd = (HWND) hb_parnl(1);
-   LPARAM lParam = (LPARAM) hb_parnl(2);
-   LVITEM lvi;
-   ZeroMemory(&lvi, sizeof(lvi));
-   ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
-
-   LPMALLOC pMalloc;
-   LPLVITEMDATA lptvid = NULL;
-   SHGetMalloc( &pMalloc );
-   lptvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
-   lptvid = (LPLVITEMDATA)lvi.lParam;
-
    char lpBuffer[ MAX_PATH + 1 ];
-   SHGetPathFromIDList( lptvid->lpifq, lpBuffer);
-
+   SHGetPathFromIDList( (LPITEMIDLIST) hb_parnl(1), lpBuffer);
    hb_retc( lpBuffer );
-
-   pMalloc->lpVtbl->Release( pMalloc );
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-HB_FUNC( FOLDERLISTSETFOLDER )
+HB_FUNC( FOLDERIDFROMFOLDERNAME )
 {
-   OLECHAR olePath[MAX_PATH];
-   ULONG chEaten;
-   ULONG dwAttributes;
-   LPITEMIDLIST lpi = (LPITEMIDLIST) hb_parnl(4);
-   int iFolder = hb_parni(3);
-   LPSHELLFOLDER lpsf;
-   LPSHELLFOLDER pFolder = NULL;
-   char *cFolder = (char*) hb_parc(2);
-
-   SHGetDesktopFolder (&lpsf);
+   LPITEMIDLIST lpi;
+   char *cFolder = (char*) hb_parc(1);
+   int iFolder = hb_parni(2);
 
    if( cFolder != NULL )
    {
+      LPSHELLFOLDER lpsf;
+      OLECHAR olePath[MAX_PATH];
+      ULONG chEaten;
+      ULONG dwAttributes;
       MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, cFolder, -1, olePath, MAX_PATH);
+      SHGetDesktopFolder (&lpsf);
       lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
-      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+      lpsf->lpVtbl->Release( lpsf );
+
    }
    else
    {
-      if( lpi == NULL )
-      {
-         SHGetSpecialFolderLocation( NULL, iFolder, &lpi);
-      }
+      SHGetSpecialFolderLocation( NULL, iFolder, &lpi);
    }
-
-   if( lpi )
-   {
-      if( (cFolder == NULL) && (iFolder == CSIDL_DESKTOP) )
-      {
-         FolderListSet( (HWND) hb_parnl(1), lpsf, lpi );
-      }
-      else
-      {
-         if( pFolder == NULL )
-         {
-            lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
-         }
-         FolderListSet( (HWND) hb_parnl(1), pFolder, lpi );
-      }
-      hb_retnl( (long) lpi );
-   }
-
-   if( pFolder != NULL )
-   {
-      pFolder->lpVtbl->Release(pFolder);
-   }
-   lpsf->lpVtbl->Release(lpsf);
+   hb_retnl( (long) lpi );
 }
+
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 void ListViewBrowseOnViewStyle(HWND hWndListView, UINT uiStyle, HWND hWndMain)
@@ -637,33 +508,113 @@ Done:
    hb_retl( TRUE );
 }
 
-/*
-int CALLBACK ListViewCompareProc(LPARAM lParam1,
-                                 LPARAM lParam2,
-                                 LPARAM lParamSort)
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+HB_FUNC( FOLDERBROWSEPOPULATE )
 {
-    LPLVITEMDATA lplvid1=(LPLVITEMDATA)lParam1;
-    LPLVITEMDATA lplvid2=(LPLVITEMDATA)lParam2;
-    char      szTemp1[MAX_PATH];
-    char      szTemp2[MAX_PATH];
-    int       iResult = 1;
+   HWND hWnd = (HWND) hb_parnl(1);
+   LPARAM lParam = (LPARAM) hb_parnl(2);
+   LVITEM lvi;
+   LPMALLOC pMalloc;
+   LPLVITEMDATA lplvid = NULL;
+   LPSHELLFOLDER pFolder;
 
-    if( lplvid1 && lplvid2)
-    {
-       if(  (lplvid1 -> ulAttribs & SFGAO_FOLDER) &&
-           !(lplvid2 -> ulAttribs & SFGAO_FOLDER) )
-              return -1;
+   ZeroMemory(&lvi, sizeof(lvi));
+   ListViewBrowseGetSelectedItem( hWnd, (LPNMHDR)lParam , &lvi);
 
-       if( !(lplvid1 -> ulAttribs & SFGAO_FOLDER) &&
-            (lplvid2 -> ulAttribs & SFGAO_FOLDER) )
-              return 1;
+   SHGetMalloc( &pMalloc );
 
-       GetName(lplvid1 -> lpsfParent, lplvid1 -> lpi, SHGDN_NORMAL, szTemp1) ;
-       GetName(lplvid2 -> lpsfParent, lplvid2 -> lpi, SHGDN_NORMAL, szTemp2) ;
+   lplvid = (LPLVITEMDATA) pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
+   lplvid = (LPLVITEMDATA)lvi.lParam;
 
-       iResult = lstrcmpi(szTemp1, szTemp2) ;
-    }
+   lplvid->lpsfParent->lpVtbl->BindToObject( lplvid->lpsfParent, lplvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+   FolderListSet( hWnd, pFolder, lplvid->lpifq);
+   hb_retnl( (long)lplvid->lpifq);
 
-    return iResult;
+   pFolder->lpVtbl->Release(pFolder);
+   pMalloc->lpVtbl->Release(pMalloc);
 }
-*/
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+HB_FUNC( LISTVIEWBROWSEPOPULATEFROMTREE )
+{
+   HWND hWnd = (HWND) hb_parnl(1);
+   LPARAM lParam = (LPARAM) hb_parnl(2);
+   LPMALLOC pMalloc;
+   LPTVITEMDATA* lptvid = NULL;
+   LPSHELLFOLDER pFolder;
+   TVITEM tvi = ((NM_TREEVIEW*)lParam)->itemNew;
+
+   SHGetMalloc( &pMalloc );
+
+   lptvid = (LPTVITEMDATA*)pMalloc->lpVtbl->Alloc( pMalloc, sizeof (LVITEMDATA) );
+   lptvid = (LPTVITEMDATA*)tvi.lParam;
+
+   if(lptvid->bRoot)
+   {
+      LPITEMIDLIST lpi;
+      SHGetDesktopFolder(&pFolder);
+      SHGetSpecialFolderLocation( NULL, CSIDL_DESKTOP, &lpi);
+      FolderListSet( hWnd, pFolder, lpi );
+      hb_retnl( (long)lpi);
+   }
+   else
+   {
+      lptvid->lpsfParent->lpVtbl->BindToObject( lptvid->lpsfParent, lptvid->lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+      FolderListSet( hWnd, pFolder, lptvid->lpifq);
+      hb_retnl( (long)lptvid->lpifq);
+   }
+   pFolder->lpVtbl->Release(pFolder);
+   pMalloc->lpVtbl->Release(pMalloc);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+HB_FUNC( FOLDERLISTSETFOLDER )
+{
+   OLECHAR olePath[MAX_PATH];
+   ULONG chEaten;
+   ULONG dwAttributes;
+   LPITEMIDLIST lpi = (LPITEMIDLIST) hb_parnl(4);
+   int iFolder = hb_parni(3);
+   LPSHELLFOLDER lpsf;
+   LPSHELLFOLDER pFolder = NULL;
+   char *cFolder = (char*) hb_parc(2);
+
+   SHGetDesktopFolder (&lpsf);
+
+   if( cFolder != NULL )
+   {
+      MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, cFolder, -1, olePath, MAX_PATH);
+      lpsf->lpVtbl->ParseDisplayName(lpsf,NULL,NULL,olePath,&chEaten,&lpi,&dwAttributes);
+      lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+   }
+   else
+   {
+      if( lpi == NULL )
+      {
+         SHGetSpecialFolderLocation( NULL, iFolder, &lpi);
+      }
+   }
+
+   if( lpi )
+   {
+      if( (cFolder == NULL) && (iFolder == CSIDL_DESKTOP) )
+      {
+         FolderListSet( (HWND) hb_parnl(1), lpsf, lpi );
+      }
+      else
+      {
+         if( pFolder == NULL )
+         {
+            lpsf->lpVtbl->BindToObject( lpsf, lpi, NULL, &IID_IShellFolder, (LPVOID *) &pFolder);
+         }
+         FolderListSet( (HWND) hb_parnl(1), pFolder, lpi );
+      }
+      hb_retnl( (long) lpi );
+   }
+
+   if( pFolder != NULL )
+   {
+      pFolder->lpVtbl->Release(pFolder);
+   }
+   lpsf->lpVtbl->Release(lpsf);
+}

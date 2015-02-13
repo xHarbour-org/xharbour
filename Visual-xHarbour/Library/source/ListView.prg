@@ -135,9 +135,9 @@ METHOD Init( oParent ) CLASS ListView
    ::Super:Init( oParent )
    ::Width        := 245
    ::Height       := 153
-   ::ClientEdge   := .T.
+   ::Border       := WS_EX_CLIENTEDGE
    IF ::DesignMode
-      __SetInitialValues( Self, "ClientEdge", .T. )
+      __SetInitialValues( Self, "Border", WS_EX_CLIENTEDGE )
    ENDIF
    ::ClipSiblings := .T.
    ::TabStop      := .T.

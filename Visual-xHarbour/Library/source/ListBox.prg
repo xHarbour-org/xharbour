@@ -48,7 +48,6 @@ CLASS ListBox FROM TitleControl
    PROPERTY WantKeyboardInput SET ::SetStyle( LBS_WANTKEYBOARDINPUT, v )          DEFAULT .F.
    PROPERTY DisableNoScroll   SET ::SetStyle( LBS_DISABLENOSCROLL, v )            DEFAULT .F.
    PROPERTY HasStrings        SET ::SetStyle( LBS_HASSTRINGS, v )                 DEFAULT .T.
-   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )                      DEFAULT .F.
    PROPERTY OwnerDraw         SET ::SetDrawStyle(v)                               DEFAULT 1
    PROPERTY ItemToolTips      SET ::__SetItemToolTips(v)                          DEFAULT .F.
 

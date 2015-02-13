@@ -52,10 +52,8 @@ CLASS ToolStripContainer INHERIT Control
    DATA BackColor        EXPORTED
    DATA ForeColor        EXPORTED
    DATA TabOrder         EXPORTED
-   DATA ClientEdge       EXPORTED INIT .F.
    DATA ClipChildren     EXPORTED INIT .T.
    DATA ClipSiblings     EXPORTED INIT .T.
-   DATA StaticEdge       EXPORTED INIT .F.
    DATA TabStop          EXPORTED
    DATA Transparent      EXPORTED INIT .F.
    DATA Visible          EXPORTED INIT .T.
@@ -337,10 +335,8 @@ CLASS ToolStrip INHERIT Control
    DATA BackColor      EXPORTED
    DATA ForeColor      EXPORTED
    DATA TabOrder       EXPORTED
-   DATA ClientEdge     EXPORTED INIT .F.
    DATA ClipChildren   EXPORTED INIT .T.
    DATA ClipSiblings   EXPORTED INIT .T.
-   DATA StaticEdge     EXPORTED INIT .F.
    DATA TabStop        EXPORTED
    DATA Transparent    EXPORTED INIT .F.
    DATA Visible        EXPORTED INIT .T.
@@ -1402,10 +1398,8 @@ CLASS ToolStripItem INHERIT Control
    DATA BackColor          EXPORTED
    DATA ForeColor          EXPORTED
 //   DATA TabOrder           EXPORTED
-   DATA ClientEdge         EXPORTED  INIT .F.
    DATA ClipChildren       EXPORTED  INIT .T.
    DATA ClipSiblings       EXPORTED  INIT .T.
-   DATA StaticEdge         EXPORTED  INIT .F.
    DATA TabStop            EXPORTED
    DATA Transparent        EXPORTED  INIT .F.
    DATA Visible            EXPORTED  INIT .T.

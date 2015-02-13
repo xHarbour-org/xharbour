@@ -47,9 +47,6 @@ CLASS Label INHERIT Control
 
    ASSIGN SunkenText(l)  INLINE IIF( l, ::xTextShadowColor := RGB( 255, 255, 255 ),)
 
-   DATA ClientEdge     EXPORTED INIT .F.
-   DATA StaticEdge     EXPORTED INIT .F.
-
    DATA __CurColor     PROTECTED
 
    METHOD Init()  CONSTRUCTOR
@@ -267,11 +264,9 @@ CLASS Line INHERIT CONTROL
    DATA ForeColor          EXPORTED
    DATA AllowClose         EXPORTED
    DATA AllowUndock        EXPORTED
-   DATA ClientEdge         EXPORTED
    DATA ClipChildren       EXPORTED
    DATA ClipSiblings       EXPORTED
    DATA OwnerDraw          EXPORTED  INIT .F.
-   DATA StaticEdge         EXPORTED
    //DATA Transparent        EXPORTED
 
    DATA AcceptFiles        EXPORTED  INIT .F.

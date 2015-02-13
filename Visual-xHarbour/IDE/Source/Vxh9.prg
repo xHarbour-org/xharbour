@@ -619,7 +619,7 @@ METHOD Init( oParent ) CLASS FileExplorer
    LOCAL cExt, shfi := (struct SHFILEINFO)
 
    Super:Init( oParent )
-
+   ::Border := 0
    ::ImageList := ImageList( Self, 16, 16 ):Create()
 
    SHGetFileInfo( GetModuleFileName(), FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )

@@ -105,8 +105,6 @@ RETURN
 
 CLASS ActiveX INHERIT ToleAuto, TitleControl
 
-   PROPERTY StaticEdge    ROOT "Appearance" SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F. HELP "Creates a window with a three-dimensional border style intended to be used for items that do not accept user input."
-   PROPERTY ClientEdge    ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F. HELP "Specifies that a window has a 3D look — that is, a border with a sunken edge."
    PROPERTY ControlParent ROOT "Behavior"   SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F. HELP "Allows the user to navigate among the child windows of the window by using the TAB key."
    PROPERTY ClipChildren  ROOT "Behavior"   SET ::SetStyle( WS_CLIPCHILDREN, v )       DEFAULT .T. HELP "Excludes the area occupied by child windows when you draw within the parent window. Used when you create the parent window."
    PROPERTY ClipSiblings  ROOT "Behavior"   SET ::SetStyle( WS_CLIPSIBLINGS, v )       DEFAULT .T. HELP "Clips child windows relative to each other; that is, when a particular child window receives a paint message"

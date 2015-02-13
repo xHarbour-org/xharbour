@@ -15,7 +15,6 @@
 CLASS FreeImage INHERIT Panel, FreeImageRenderer
    PROPERTY Transparent SET ::Update()                 DEFAULT .F.
    PROPERTY Alignment   SET ::Update()                 DEFAULT 1
-   PROPERTY Border      SET ::SetStyle( WS_BORDER, v ) DEFAULT .F.
 
    ACCESS DesignMode    INLINE IIF( ::Parent != NIL, ::Parent:DesignMode, .F. )
 

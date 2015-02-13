@@ -54,8 +54,6 @@ CLASS ToolTip INHERIT Window
    DATA ToolTip          EXPORTED
 
    ACCESS Visible        INLINE ::Style & WS_VISIBLE != 0
-   ACCESS ClientEdge     INLINE ::ExStyle & WS_EX_CLIENTEDGE != 0
-   ACCESS StaticEdge     INLINE ::ExStyle & WS_EX_STATICEDGE != 0
    ACCESS Transparent    INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
 
    ACCESS Child          INLINE ::Style & WS_CHILD != 0

@@ -35,7 +35,6 @@ CLASS ProgressBar FROM Control
    PROPERTY BackColor       ROOT "Colors" SET ::SetBkColor( v )             DEFAULT GetSysColor( COLOR_BTNFACE )
    PROPERTY Step            SET ::SetStep( v )                DEFAULT 10
    PROPERTY Vertical        SET ::SetStyle( PBS_VERTICAL, v ) DEFAULT .F.
-   PROPERTY Border          SET ( ::SetStyle( WS_BORDER, v ), ::SetPosition( ::xPosition ) ) DEFAULT .F.
 
    DATA AllowUnDock     EXPORTED INIT FALSE
    DATA AllowClose      EXPORTED INIT FALSE

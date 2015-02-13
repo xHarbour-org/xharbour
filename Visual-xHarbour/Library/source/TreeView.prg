@@ -113,7 +113,7 @@ METHOD Init( oParent ) CLASS TreeView
    ::ClsName := "SysTreeView32"
    ::Level   := -1
    ::Style   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ClientEdge := .T.
+   ::Border  := WS_EX_CLIENTEDGE
    DEFAULT ::__xCtrlName TO "TreeView"
 
    ::Super:Init( oParent )

@@ -31,7 +31,6 @@ CLASS Button INHERIT Control
    PROPERTY ImageAlign    ROOT "Appearance"                                      DEFAULT __GetSystem():TextAlignment:Center
    PROPERTY MenuArrow     ROOT "Appearance"                                      DEFAULT .F.
    PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)               DEFAULT  0
-   PROPERTY Border        ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )       DEFAULT .F.
 
    PROPERTY ShortCutKey   ROOT "Behavior"
    PROPERTY Group         ROOT "Behavior"   SET ::SetStyle( WS_GROUP, v )        DEFAULT .F.

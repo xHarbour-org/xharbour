@@ -54,7 +54,6 @@ CLASS CheckBox INHERIT Control
    PROPERTY Group       ROOT "Behavior"   SET ::SetStyle(WS_GROUP,v)  DEFAULT .F.
    PROPERTY CheckStyle  ROOT "Behavior"   SET ::SetCheckStyle(v)      DEFAULT 1
    PROPERTY State       ROOT "Behavior"   SET ::SetState(v)           DEFAULT BST_UNCHECKED
-   PROPERTY Border      ROOT "Appearance" SET ::SetStyle(WS_BORDER,v) DEFAULT .F.
    PROPERTY AutoSize    ROOT "Behavior"   SET ::__SetSize(v)          DEFAULT .F.
    PROPERTY RightAlign  ROOT "Appearance"                             DEFAULT .F.
    PROPERTY BoxSize     ROOT "Appearance"                             DEFAULT 15

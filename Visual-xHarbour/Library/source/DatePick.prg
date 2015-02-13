@@ -25,7 +25,6 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY Parse             SET ::SetStyle( DTS_APPCANPARSE, v )  DEFAULT .F.
    PROPERTY Format            SET ::SetFormat(v)                    DEFAULT __GetSystem():DateTimeFormat:Short
    PROPERTY CustomFormat      SET ::SetCustomFormat(v)
-   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )        DEFAULT .F.
 
    PROPERTY ShowNone          SET ::SetStyle( DTS_SHOWNONE, v )     DEFAULT .F.
    PROPERTY RightAlign        SET ::SetStyle( DTS_RIGHTALIGN, v )   DEFAULT .F.

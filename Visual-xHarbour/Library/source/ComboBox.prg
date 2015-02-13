@@ -65,7 +65,6 @@ CLASS ComboBox FROM Control
 
    //-----------------------------------------------------------
 
-   PROPERTY Border              ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )             DEFAULT .F.
    PROPERTY SelectionHeight     ROOT "Appearance" SET ::SetItemHeight( -1, v )               DEFAULT 15
    PROPERTY Sort                ROOT "Appearance" SET ::SetStyle( CBS_SORT, v )              DEFAULT .F.
    PROPERTY UpperCase           ROOT "Appearance" SET ::SetStyle( CBS_UPPERCASE, v )         DEFAULT .F.
@@ -73,7 +72,6 @@ CLASS ComboBox FROM Control
    PROPERTY HasStrings          ROOT "Appearance" SET ::SetStyle( CBS_HASSTRINGS, v )        DEFAULT .F.
    PROPERTY OemConvert          ROOT "Appearance" SET ::SetStyle( CBS_OEMCONVERT, v )        DEFAULT .F.
    PROPERTY ItemHeight          ROOT "Appearance" SET ::SetItemHeight( 1, v )
-   PROPERTY ClientEdge          ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.
    PROPERTY ItemToolTips        ROOT "Appearance" SET ::__SetItemToolTips(v)                 DEFAULT .F.
    PROPERTY Flat                ROOT "Appearance"                                            DEFAULT .F.
 
@@ -223,7 +221,6 @@ METHOD Create() CLASS ComboBox
       ::SetItemHeight( -1, ::xSelectionHeight )
       ::SetItemHeight( 2, ::xItemHeight )
       ::SendMessage( CB_SETMINVISIBLE, ::xHeight/::xItemHeight )
-      ::ClientEdge := ::xClientEdge
    ENDIF
 
    IF ::ItemToolTips
@@ -1019,7 +1016,6 @@ RETURN 0
 CLASS ComboBoxEx INHERIT ComboBox
    PROPERTY ImageList GET __ChkComponent( Self, @::xImageList ) SET ::SetImageList(v)
 
-   DATA ClientEdge EXPORTED INIT .F.
    DATA hControl   EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -1043,7 +1039,6 @@ RETURN Self
 
 METHOD Create() CLASS ComboBoxEx
    LOCAL h
-   ::ClientEdge  := .F.
    ::Super:Create()
    IF ::ImageList != NIL
       ::SetImageList( ::ImageList )

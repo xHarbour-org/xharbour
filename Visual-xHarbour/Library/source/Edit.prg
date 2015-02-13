@@ -41,8 +41,6 @@ CLASS EditBox INHERIT Control
    PROPERTY Layout            ROOT "Appearance" SET ::__SetLayout(v)                       DEFAULT 1
    PROPERTY Password          ROOT "Appearance" SET ::SetStyle( ES_PASSWORD, v )           DEFAULT .F.
    PROPERTY Case              ROOT "Appearance" SET ::SetCase(v)                           DEFAULT 1
-   PROPERTY Border            ROOT "Appearance" SET ::SetStyle( WS_BORDER, v )             DEFAULT !__GetApplication():IsThemedXP
-   PROPERTY ClientEdge        ROOT "Appearance" SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .T.
    PROPERTY CueBanner         ROOT "Appearance" SET ::SetCueBanner(v)
    PROPERTY ImageIndex        ROOT "Appearance" SET ::__SetImageIndex(v)                   DEFAULT 0
 
@@ -202,11 +200,12 @@ METHOD Init( oParent ) CLASS EditBox
    ::ClsName   := "Edit"
    ::ThemeName := "EDIT"
 
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
+   ::Border       := WS_EX_CLIENTEDGE
+
    ::Super:Init( oParent )
    ::Width        := 80
    ::Height       := 22
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
-   ::ExStyle      := WS_EX_CLIENTEDGE
 
    IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
@@ -293,12 +292,6 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS EditBox
    LOCAL pWi, n
-   //IF ::Transparent
-   //   ::Parent:__RegisterTransparentControl( Self )
-   //   IF ( ::ExStyle & WS_EX_CLIENTEDGE ) == 0
-   //      ::__BackMargin -= 2
-   //   ENDIF
-   //ENDIF
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
@@ -375,7 +368,7 @@ METHOD __UpdateDataGrid() CLASS EditBox
          :NoActivate  := .T.
          :ShadowRow   := .F.
          :ShowGrid    := .F.
-         :StaticEdge  := .F.
+         :Border      := WS_BORDER
          :ShowSelectionBorder := .F.
 
          :OnWMKeyDown := {|o, nKey| ::__ChkGridKeys( o, nKey ) }

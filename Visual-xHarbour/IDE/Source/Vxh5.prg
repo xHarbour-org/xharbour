@@ -50,8 +50,7 @@ METHOD Init( oParent ) CLASS DebugBuild
    ::Super:Init( oParent )
    ::HorzScroll   := .T.
    ::VertScroll   := .T.
-   ::ClientEdge   := .F.
-   ::StaticEdge   := .T.
+   ::Border       := WS_EX_STATICEDGE
    ::ClipChildren := .F.
    ::ClipSiblings := .F.
    ::HasStrings   := .T.
@@ -76,7 +75,7 @@ ENDCLASS
 METHOD ProcessErrors( aErrors ) CLASS ErrorListView
    LOCAL n
    ::ResetContent()
-   
+
    FOR n := 1 TO LEN( aErrors )
        ::InsertItem( aErrors[n][1],, n )
        ::SetItemText( n, 1, aErrors[n][2] )

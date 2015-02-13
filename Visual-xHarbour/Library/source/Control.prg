@@ -28,6 +28,16 @@ CLASS Control INHERIT Window
    PROPERTY Text           ROOT "Appearance" GET IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) SET ::SetWindowText( v ) DEFAULT ""
    PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+   PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
+   DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
+
+
+   // Compatibility
+   ACCESS StaticEdge    INLINE ::Border == WS_EX_STATICEDGE
+   ASSIGN StaticEdge(l) INLINE ::Border := IIF(l,WS_EX_STATICEDGE,0)
+
+   ACCESS ClientEdge    INLINE ::Border == WS_EX_CLIENTEDGE
+   ASSIGN ClientEdge(l) INLINE ::Border := IIF(l,WS_EX_CLIENTEDGE,0)
 
    ACCESS xCaption       INLINE ::xText
    ASSIGN xCaption(c)    INLINE ::xText := c
@@ -43,7 +53,6 @@ CLASS Control INHERIT Window
    DATA IsValid           EXPORTED INIT TRUE
    DATA EmptyLeft         EXPORTED INIT 0
    DATA ToolBarPos        EXPORTED INIT 1
-   DATA AutoClose         EXPORTED INIT .T.
    DATA ShowMode          EXPORTED INIT 1
    DATA Modal             EXPORTED INIT .F.
    DATA __IdeImageIndex   EXPORTED INIT 3
@@ -55,7 +64,6 @@ CLASS Control INHERIT Window
 
    DATA __hParBrush       PROTECTED
    DATA BackInfo          PROTECTED
-   DATA Center            PROTECTED INIT .F.
    DATA __DockParent      PROTECTED
 
    ACCESS Child           INLINE ::Style & WS_CHILD != 0
@@ -78,18 +86,45 @@ CLASS Control INHERIT Window
    METHOD OnEnterSizeMove()
    METHOD OnExitSizeMove()
 
-   METHOD Redraw() INLINE /*::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER),*/;
-                          ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
-   METHOD IsComponent( oComp ) INLINE ::HasMessage( oComp:__xCtrlName ) .AND. &("HB_QSELF():"+oComp:__xCtrlName) == oComp
-   METHOD Hide() INLINE IIF( ::__DockParent != NIL, ::__DockParent:Hide(), ::Super:Hide() )
-   METHOD Show() INLINE IIF( ::__DockParent != NIL, ::__DockParent:Show(), ::Super:Show( SW_SHOW ) )
+   METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD __Enable( lEnable )
    METHOD GetBkBrush()
    METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
    METHOD DrawArrow()
-
+   METHOD __SetBorder()
+   METHOD Show()
+   METHOD Hide()
    //METHOD __UnSubClass()
 ENDCLASS
+
+METHOD __SetBorder( nBorder ) CLASS Control
+   LOCAL nExStyle, nStyle
+
+   IF VALTYPE( nBorder ) == "L" // backward compatibility
+      nBorder := IIF( nBorder, WS_BORDER, 0 )
+   ENDIF
+
+   nStyle   := ::Style & NOT( WS_BORDER )
+   nExStyle := ::ExStyle & NOT( WS_EX_STATICEDGE )
+   nExStyle := nExStyle & NOT( WS_EX_CLIENTEDGE )
+
+   IF nBorder <> 0
+      IF nBorder == WS_BORDER
+         nStyle := nStyle | WS_BORDER
+      ELSE
+         nExStyle := nExStyle | nBorder
+      ENDIF
+   ENDIF
+   ::Style := nStyle
+   ::ExStyle := nExStyle
+
+   ::SetWindowLong( GWL_STYLE, ::Style )
+   ::SetWindowLong( GWL_EXSTYLE, ::ExStyle )
+   IF ::IsWindowVisible()
+      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   ENDIF
+RETURN nBorder
 
 METHOD __Enable( lEnable ) CLASS Control
    IF ::hWnd != NIL .AND. ::__xCtrlName != "Button"
@@ -120,7 +155,7 @@ RETURN Self
 
 METHOD Create( hParent ) CLASS Control
    ::xTop := MAX( ::xTop, ::Parent:TopMargin)
-
+   ::__SetBorder( ::xBorder )
    IF ::IsContainer
       ::__IdeImageIndex := 1
    ENDIF
@@ -178,6 +213,62 @@ METHOD Create( hParent ) CLASS Control
       ENDIF
    ENDIF
 
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------
+METHOD Hide() CLASS Control
+   IF ::__DockParent != NIL
+      RETURN ::__DockParent:Hide()
+   ENDIF
+   IF ::hWnd != NIL
+      ShowWindow( ::hWnd, SW_HIDE )
+   ENDIF
+   IF ::LeftSplitter != NIL
+      ::LeftSplitter:Hide()
+   ENDIF
+   IF ::TopSplitter != NIL
+      ::TopSplitter:Hide()
+   ENDIF
+   IF ::RightSplitter != NIL
+      ::RightSplitter:Hide()
+   ENDIF
+   IF ::BottomSplitter != NIL
+      ::BottomSplitter:Hide()
+   ENDIF
+   ::Style := ::Style & NOT( WS_VISIBLE )
+   IF ::hWnd != NIL
+      ::Parent:SendMessage( WM_SIZE, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
+   ENDIF
+RETURN Self
+
+//---------------------------------------------------------------------------------------------------
+METHOD Show( nShow ) CLASS Control
+   DEFAULT nShow TO SW_SHOW
+   IF ::__DockParent != NIL
+      RETURN ::__DockParent:Show( nShow )
+   ENDIF
+
+   IF nShow == SW_HIDE
+      RETURN ::Hide()
+   ENDIF
+
+   IF ::hWnd != NIL
+      ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
+   ENDIF
+   IF ::LeftSplitter != NIL
+      ::LeftSplitter:Show()
+   ENDIF
+   IF ::TopSplitter != NIL
+      ::TopSplitter:Show()
+   ENDIF
+   IF ::RightSplitter != NIL
+      ::RightSplitter:Show()
+   ENDIF
+   IF ::BottomSplitter != NIL
+      ::BottomSplitter:Show()
+   ENDIF
+   ::Style := ::Style | WS_VISIBLE
+   ::Parent:SendMessage( WM_SIZE, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -382,6 +473,7 @@ CLASS TitleControl INHERIT Control
    PROPERTY MenuArrow                      DEFAULT .F.
 
    DATA __lActive            EXPORTED  INIT .F.
+   DATA OnWMClose            EXPORTED
 
    DATA __aCaptionRect       PROTECTED
    DATA __lPinPushed         PROTECTED INIT .F.

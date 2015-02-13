@@ -44,8 +44,7 @@ CLASS RadioButton INHERIT Control
 
    //PROPERTY Transparent   SET ::__SetTransp(v)              DEFAULT .F.
    PROPERTY Group         SET ::SetStyle( WS_GROUP, v )     DEFAULT .F.
-   PROPERTY OwnerDraw     SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.           
-   PROPERTY Border        SET ::SetStyle( WS_BORDER, v )    DEFAULT .F.           
+   PROPERTY OwnerDraw     SET ::SetStyle( BS_OWNERDRAW, v ) DEFAULT .F.
    PROPERTY InitialState  SET ::__SetInitialState( v )      DEFAULT BST_UNCHECKED
 
    DATA DefaultButton INIT .F.
@@ -59,11 +58,11 @@ CLASS RadioButton INHERIT Control
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()             INLINE ::Super:Create(), ::SendMessage( BM_SETCHECK, ::xInitialState, 0 )
-   
+
    METHOD OnDestroy()          INLINE Super:OnDestroy(), ::CloseThemeData(), Self
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnParentNotify()
-   
+
    METHOD GetState()
    METHOD SetState(nState)     INLINE ::SendMessage( BM_SETCHECK, nState, 0 )
    METHOD __SetInitialState()
@@ -84,7 +83,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetInitialState( nState ) CLASS RadioButton
-   LOCAL lChecked 
+   LOCAL lChecked
    IF ::IsWindow()
       ::SendMessage( BM_SETCHECK, nState, 0 )
    ENDIF
@@ -208,7 +207,7 @@ METHOD OnCtlColorStatic( nwParam ) CLASS RadioButton
    IF ::ForeColor != NIL
       SetTextColor( nwParam, ::ForeColor )
    ENDIF
-   
+
    nBack := ::BackColor
    DEFAULT nBack TO ::Parent:BackColor
    IF nBack != NIL

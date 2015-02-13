@@ -30,7 +30,6 @@ CLASS MonthCalendar INHERIT TitleControl
    PROPERTY NoToday           SET ::SetStyle( MCS_NOTODAY, v )       DEFAULT .F.
    PROPERTY NoTodayCircle     SET ::SetStyle( MCS_NOTODAYCIRCLE, v ) DEFAULT .F.
    PROPERTY WeekNumbers       SET ::SetStyle( MCS_WEEKNUMBERS, v )   DEFAULT .F.
-   PROPERTY Border            SET ::SetStyle( WS_BORDER, v )         DEFAULT .F.
    PROPERTY Date              SET ::SetCurSel(v)                     DEFAULT DATE()
    PROPERTY Today             SET ::SetToday(v)                      DEFAULT DATE()
    PROPERTY BackColor         ROOT "Colors" SET ::SetCalendarColor( MCSC_MONTHBK, v )

@@ -84,34 +84,34 @@ LPITEMIDLIST Concatenate( LPMALLOC pMalloc, LPCITEMIDLIST pidl1, LPCITEMIDLIST p
 {
    LPITEMIDLIST   pidlNew;
    UINT           cb1, cb2;
-   
+
    if(!pidl1 && !pidl2)
    {
       return NULL;
    }
-   
+
    if(!pidl1)
    {
       pidlNew = Copy(pMalloc , pidl2);
       return pidlNew;
    }
-   
+
    if(!pidl2)
    {
       pidlNew = Copy(pMalloc, pidl1);
       return pidlNew;
    }
-   
+
    cb1 = GetSize(pidl1) - sizeof(ITEMIDLIST);
    cb2 = GetSize(pidl2);
    pidlNew = (LPITEMIDLIST)pMalloc->lpVtbl->Alloc(pMalloc, cb1 + cb2);
-   
+
    if(pidlNew)
    {
       CopyMemory(pidlNew, pidl1, cb1);
       CopyMemory(((LPBYTE)pidlNew) + cb1, pidl2, cb2);
    }
-   
+
    return pidlNew;
 }
 
@@ -150,20 +150,20 @@ LPITEMIDLIST Copy(LPMALLOC pMalloc , LPCITEMIDLIST pidlSource)
 {
    LPITEMIDLIST pidlTarget;
    UINT cbSource;
-   
+
    if( NULL == pidlSource )
    {
       return (NULL);
    }
-   
+
    cbSource = GetSize(pidlSource);
    pidlTarget = (LPITEMIDLIST)pMalloc->lpVtbl->Alloc(pMalloc, cbSource);
-   
+
    if(!pidlTarget)
    {
       return (NULL);
    }
-   
+
    CopyMemory(pidlTarget, pidlSource, cbSource);
    return pidlTarget;
 }
@@ -171,7 +171,5 @@ LPITEMIDLIST Copy(LPMALLOC pMalloc , LPCITEMIDLIST pidlSource)
 //--------------------------------------------------------------------------------------------------------------
 int GetNormalIcon(LPITEMIDLIST lpifq)
 {
-   int nIconIndex;
-   nIconIndex = GetIcon(lpifq, SHGFI_PIDL | CSIDL_DESKTOP | SHGFI_ICON | SHGFI_SYSICONINDEX | SHGFI_SMALLICON );
-   return nIconIndex;
+   return GetIcon(lpifq, SHGFI_PIDL | CSIDL_DESKTOP | SHGFI_ICON | SHGFI_SYSICONINDEX | SHGFI_SMALLICON );
 }

@@ -60,10 +60,8 @@ CLASS Splitter INHERIT Control
       DATA Dock
       DATA Anchor
       DATA TabStop
-      DATA StaticEdge
       DATA Visible
       DATA ClipSiblings
-      DATA ClientEdge
       DATA Transparent
       DATA ClipChildren
       DATA ContextMenu

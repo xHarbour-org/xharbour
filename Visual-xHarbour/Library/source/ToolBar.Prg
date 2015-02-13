@@ -105,7 +105,6 @@ CLASS ToolBar INHERIT Control
    PROPERTY DrawArrows         SET ::SetExtStyle( TBSTYLE_EX_DRAWDDARROWS, v )       DEFAULT .T.
    PROPERTY MixedButtons       SET ::SetExtStyle( TBSTYLE_EX_MIXEDBUTTONS, v )       DEFAULT .F.
    PROPERTY HideClippedButtons SET ::SetExtStyle( TBSTYLE_EX_HIDECLIPPEDBUTTONS, v ) DEFAULT .F.
-   PROPERTY Border             SET ::SetStyle( WS_BORDER, v )                        DEFAULT .F.
    PROPERTY BitmapWidth        SET ::_SetBitmapSize(v)                               DEFAULT -1
    PROPERTY BitmapHeight       SET ::_SetBitmapSize(v)                               DEFAULT -1
 
@@ -113,8 +112,6 @@ CLASS ToolBar INHERIT Control
       DATA Caption
       DATA ClipChildren  INIT .T.
       DATA ClipSiblings  INIT .T.
-      DATA StaticEdge    INIT .F.
-      DATA ClientEdge    INIT .F.
       DATA TabStop       INIT .F.
 
    DATA Banner           EXPORTED

@@ -57,7 +57,6 @@ METHOD Init( oParent ) CLASS RichTextBox
    ::Height      := 80
    ::xWantReturn := .T.
    ::xMultiLine  := .T.
-   ::xClientEdge := .F.
    ::Style       := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | ES_WANTRETURN | ES_MULTILINE
    ::ClsName     := RICHEDIT_CLASS
 RETURN Self
@@ -68,9 +67,6 @@ METHOD Create() CLASS RichTextBox
    ::System:LoadRichEd()
 
    ::Super:Create()
-   IF !::xClientEdge
-      ::ClientEdge := .F.
-   ENDIF
    ::__EditStreamPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "EditStreamCallback" ), Self )
    es:pfnCallback := ::__EditStreamPtr
    ::SendMessage( EM_STREAMIN, SF_TEXT, es )
@@ -80,7 +76,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD SetCase( nCase ) CLASS RichTextBox
    DEFAULT nCase TO ::Case
-   
+
    SWITCH nCase
       CASE 2
          ::SendMessage( EM_SETEDITSTYLE, SES_UPPERCASE, SES_UPPERCASE  )
@@ -90,7 +86,7 @@ METHOD SetCase( nCase ) CLASS RichTextBox
          EXIT
    END
 RETURN Self
-   
+
 //-----------------------------------------------------------------------------------------------
 METHOD FindText( cText, nOpt ) CLASS RichTextBox
    LOCAL ft := (struct FINDTEXT)

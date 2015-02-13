@@ -1565,10 +1565,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:ToolBox := ToolBox( Self )
       :Text             := "ToolBox"
 
-      :StaticEdge       := .F.
-      :ClientEdge       := .F.
-      :Border           := .T.
-      :Flat             := .T.
+      :Border           := WS_BORDER
       :AllowUndock      := .T.
       :AllowClose       := .T.
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewToolBoxItem" ]:Checked := .F. ), o:Redock() ) }
@@ -1878,8 +1875,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption := "Errors"
             :Create()
             WITH OBJECT ::Application:ErrorView := ErrorListView( :this )
-               :ClientEdge    := .F.
-               :StaticEdge    := .f.
+               :Border        := 0
                :Dock:Left     := :Parent
                :Dock:Top      := :Parent
                :Dock:Right    := :Parent
@@ -1899,8 +1895,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption := "Log"
             :Create()
             WITH OBJECT ::Application:BuildLog := EditBox( :this )
-               :ClientEdge     := .F.
-               :StaticEdge     := .f.
+               :Border         := 0
                :Dock:RightMargin := -1
                :Dock:Left      := :Parent
                :Dock:Top       := :Parent

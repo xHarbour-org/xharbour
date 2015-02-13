@@ -113,7 +113,7 @@ METHOD Init( oParent ) CLASS ObjManager
 
    DEFAULT ::__xCtrlName  TO "ObjManager"
    ::Super:Init( oParent )
-
+   ::Border := 0
    ::Colors := {}
    FOR EACH cColor IN ::System:Color:Keys
        AADD( ::Colors, { ::System:Color[ cColor ], cColor } )
@@ -730,7 +730,7 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
 
    IF cProp2 != NIL .AND. cProp2 == "Dock" .AND. AT( "Margin", cProp ) == 0 .AND. AT( "RightProportional", cProp ) == 0
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
-    ELSEIF cProp IN {"ActiveMenuBar","Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ActiveMenuBar","Buddy","FolderView","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       xValue := oItem:ColItems[1]:Value[2][ xValue ]
    ENDIF
 
@@ -803,7 +803,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          oItem:ColItems[1]:Value[2][1] := NIL
       ENDIF
 
-    ELSEIF cProp IN {"ActiveMenuBar","Buddy","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
+    ELSEIF cProp IN {"ActiveMenuBar","Buddy","FolderView","ImageList","HotImageList","BandChild","DataSource","ImageListSmall","HeaderMenu","ButtonMenu","ContextMenu","PageChild","Socket","BindingSource","SqlConnector"}
       TRY
          IF VALTYPE( xValue ) == "O" .AND. xValue:ComponentType == "DataSource" .AND. !xValue:IsOpen
             xValue:Create()
@@ -1343,6 +1343,23 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                      xProp := NIL
                   ENDIF
 
+             CASE cProp == "FolderView"
+                  aCol[1]:Value := { "", { NIL } }
+
+                  FOR EACH Child IN ::ActiveObject:Parent:Children
+                      IF Child:__xCtrlName == "FolderList"
+                         AADD( aCol[1]:Value[2], Child )
+                      ENDIF
+                  NEXT
+
+                  IF xValue != NIL
+                     aCol[1]:Value[1] := xValue:Name
+                  ENDIF
+
+                  aCol[1]:ColType  := UPPER( cProp )
+                  xValue := NIL
+
+
              CASE cProp IN { "Buddy", "PageChild" }
                   aCol[1]:Value := { "", { NIL } }
 
@@ -1755,7 +1772,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top         := rc:top+1
                        :Width       := ::Columns[ nCol ][ 1 ]+2 - IIF( cType == "ICONS", 20, 0 )
                        :Height      := rc:bottom-rc:top-1
-                       :ClientEdge  := .F.
+                       :Border      := 0
                        :Style       := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
 
                        GetRealKeyName(::ActiveObject:ShortcutKey:Key, @cText, 40)
@@ -1901,12 +1918,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
                     ::ActiveControl := IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) )
                     WITH OBJECT ::ActiveControl
-                       :ClientEdge := .F.
                        :Left   := nLeft-1
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 200
-                       :Border := .F.
+                       :Border := 0
 
                        IF cType != "IMAGEINDEX"
                           :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
@@ -2067,7 +2083,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        ENDIF
                     END
 
-               CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","PAGECHILD","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY" }
+               CASE cType IN { "ACTIVEMENUBAR", "IMAGELIST","PAGECHILD","BANDCHILD","DATASOURCE","HEADERMENU","BUTTONMENU","CONTEXTMENU","SOCKET","BINDINGSOURCE","SQLCONNECTOR","BUDDY","FOLDERVIEW" }
                     ::ActiveControl := ObjCombo( Self )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -2211,7 +2227,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top+1
                        :Width  := ::Columns[ nCol ][ 1 ]+2 - IIF( cType == "ICONS", 20, 0 )
                        :Height := rc:bottom-rc:top-1
-                       :SetExStyle( WS_EX_CLIENTEDGE, .F. )
+                       :Border := 0
                        :Style := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
 
                        IF oItem:Caption == "Path" .OR. oItem:Caption IN {"SelectedPath","DefaultPath","Default","IncludePath","SourcePath"} .OR. oItem:Owner:Caption == "Target Folder"
@@ -2263,11 +2279,10 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Width  := ::Columns[ nCol ][ 1 ]+2
                        :Height := rc:bottom-rc:top-1
 
-                       :ClientEdge  := .F.
                        :Alignment   := 3
                        :MultiLine   := .T.
                        :AutoHScroll := .T.
-                       :Border      := .F.
+                       :Border      := 0
                        :Cargo       := :Caption
                        :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
                                                                         oPar  := o:Parent,;
@@ -3195,7 +3210,6 @@ __aProps["C"] := { { "ContextMenu",             "Behavior" },;
                    { "CLOSE_Button",            "CommonButtons" },;
                    { "CANCEL_Button",           "CommonButtons" },;
                    { "CaptionBar",              "Style" },;
-                   { "ClientEdge",              "Style" },;
                    { "ClipChildren",            "Style" },;
                    { "ClipSiblings",            "Style" },;
                    { "ControlParent",           "Style" },;
@@ -3501,7 +3515,6 @@ __aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
                    { "SetErrorlog",             "Set" },;
                    { "SmallIcon",               "Style" },;
                    { "Sort",                    "Style" },;
-                   { "StaticEdge",              "Style" },;
                    { "SysMenu",                 "Style" },;
                    { "Shared",                  "" },;
                    { "StrikeOut",               "" },;

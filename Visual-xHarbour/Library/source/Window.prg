@@ -144,7 +144,8 @@ static aMessages := {;
                     { WM_NCMBUTTONDBLCLK, "OnNCMButtonDblClk" },;
                     { WM_NCXBUTTONUP,     "OnNCXButtonUp"     },;
                     { WM_NCXBUTTONDOWN,   "OnNCXButtonDown"   },;
-                    { WM_NCXBUTTONDBLCLK, "OnNCXButtonDblClk" };
+                    { WM_NCXBUTTONDBLCLK, "OnNCXButtonDblClk" },;
+                    { WM_CLOSE,           "OnClose"           } ;
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -162,15 +163,11 @@ CLASS Window INHERIT Object
    PROPERTY Height        ROOT "Size"     SET ::__SetSizePos( 4, v )
 
    PROPERTY Cursor                        SET ::__SetWindowCursor(v)                 DEFAULT IDC_ARROW PROTECTED
-   PROPERTY StaticEdge                    SET ::SetExStyle( WS_EX_STATICEDGE, v )    DEFAULT .F.       PROTECTED
-   PROPERTY ClientEdge                    SET ::SetExStyle( WS_EX_CLIENTEDGE, v )    DEFAULT .F.       PROTECTED
    PROPERTY ControlParent                 SET ::SetExStyle( WS_EX_CONTROLPARENT, v ) DEFAULT .F.       PROTECTED
 
    PROPERTY Visible                       SET ::SetStyle( WS_VISIBLE, v )          DEFAULT .T.
    PROPERTY Enabled                       SET ::SetStyle( WS_DISABLED, v )         DEFAULT .T.
-   PROPERTY Border                        SET ::SetStyle( WS_BORDER, v )           DEFAULT .F.
 
-   PROPERTY Center                        SET ::CenterWindow(v)                    DEFAULT .F.
    PROPERTY ClipChildren                  SET ::SetStyle( WS_CLIPCHILDREN, v )     DEFAULT .T.
    PROPERTY ClipSiblings                  SET ::SetStyle( WS_CLIPSIBLINGS, v )     DEFAULT .T.
    PROPERTY AcceptFiles                   SET ::SetExStyle( WS_EX_ACCEPTFILES, v ) DEFAULT .F.
@@ -182,17 +179,13 @@ CLASS Window INHERIT Object
    PROPERTY ToolTip
 
    METHOD MessageWait()
-   METHOD CenterWindow()
    METHOD Animate()
-   METHOD Show()
    METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
 
    METHOD Destroy()
    METHOD Disable()               INLINE ::Enabled := .F.
    METHOD Enable()                INLINE ::Enabled := .T.
    METHOD Close()
-
-   METHOD Hide()
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -316,7 +309,6 @@ CLASS Window INHERIT Object
    ASSIGN Alignment(n)         INLINE   ::SetAlignment(n)
 
    // Compatibility --------------------------
-   DATA AnimationStyle         EXPORTED INIT 0
    DATA VertScrollSize         EXPORTED INIT 0
    DATA HorzScrollSize         EXPORTED INIT 0
    // ----------------------------------------
@@ -327,7 +319,6 @@ CLASS Window INHERIT Object
    DATA HorzScrollPos          EXPORTED INIT 0
    DATA Anchor                 EXPORTED
    DATA Modal        AS LOGIC  EXPORTED INIT .F.
-   DATA Flat                   EXPORTED INIT .F.
    DATA AutoDock               EXPORTED INIT .T.
    DATA Dock                   EXPORTED AS OBJECT
    DATA HelpInfo               EXPORTED
@@ -361,7 +352,6 @@ CLASS Window INHERIT Object
    DATA OnWMInitDialog         EXPORTED
    DATA OnWMPaste              EXPORTED
    DATA OnWMGetDlgCode         EXPORTED
-   DATA OnWMClose              EXPORTED
    DATA OnWMLButtonDblClk      EXPORTED
 
    DATA Siv                    PROTECTED
@@ -501,7 +491,6 @@ CLASS Window INHERIT Object
    METHOD OnChildGetDlgCode()   VIRTUAL
    METHOD OnChar()              VIRTUAL
    METHOD OnSysChar()           VIRTUAL
-   METHOD OnClose()             VIRTUAL
    METHOD OnGetMinMaxInfo()     VIRTUAL
    METHOD OnHotKey()            VIRTUAL
    METHOD OnParentDrawItem()    VIRTUAL
@@ -1104,9 +1093,6 @@ METHOD Create( oParent ) CLASS Window
    IF ! ::Theming
       SetWindowTheme( ::hWnd, "", "" )
    ENDIF
-   IF ::Center
-      ::CenterWindow()
-   ENDIF
 
    ::__SubClass()
 
@@ -1409,7 +1395,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
    IF nStyle == WS_DISABLED
       lAdd := !lAdd
    ENDIF
-   TRY
+   //TRY
       IF lAdd
          ::Style := ::Style | nStyle
        ELSE
@@ -1438,8 +1424,8 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
             ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
          ENDIF
       ENDIF
-   CATCH
-   END
+   //CATCH
+   //END
 RETURN self
 
 //-----------------------------------------------------------------------------------------------
@@ -2107,7 +2093,7 @@ RETURN nRet
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
-   LOCAL pt, code, nAnimation, nMess, mis, dis
+   LOCAL pt, code, nMess, mis, dis
 
    DEFAULT ::hWnd TO hWnd
 
@@ -2248,32 +2234,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnChar", Self, nwParam, nlParam )
               ODEFAULT nRet TO ::OnChar( nwParam, nlParam )
               ODEFAULT nRet TO __Evaluate( ::OnWMChar, Self, nwParam, nlParam, nRet )
-              EXIT
-
-         CASE WM_CLOSE
-              IF ! ::Modal
-                 nRet := ExecuteEvent( "OnClose", Self )
-                 ODEFAULT nRet TO ::OnClose( nwParam )
-                 ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
-              ENDIF
-              IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ! ::DesignMode
-                 nAnimation := ::AnimationStyle
-                 DO CASE
-                    CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
-                         nAnimation := ::System:WindowAnimation:SlideHorzNegative
-
-                    CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
-                         nAnimation := ::System:WindowAnimation:SlideHorzPositive
-
-                    CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
-                         nAnimation := ::System:WindowAnimation:SlideVertNegative
-
-                    CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
-                         nAnimation := ::System:WindowAnimation:SlideVertPositive
-                 ENDCASE
-                 ::Animate( 1000, AW_HIDE | nAnimation )
-              ENDIF
-              ::Application:DoEvents()
               EXIT
 
          CASE WM_INITMENU
@@ -3007,39 +2967,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    ENDIF
 RETURN ::__WinProc(hWnd, nMsg, nwParam, nlParam)
 
-//-----------------------------------------------------------------------------------------------
-
-METHOD CenterWindow( lDesk ) CLASS Window
-   LOCAL oWin, aRect
-   DEFAULT lDesk TO .F.
-   IF ::hWnd == NIL .OR. ::DesignMode
-      RETURN Self
-   ENDIF
-   IF ::Parent != NIL .AND. !lDesk
-      ::GetWindowRect()
-
-      IF ::IsChild()
-         aRect := _GetClientRect( ::Parent:hWnd )
-         ::xLeft := ( ( aRect[3] - ::xWidth ) / 2 )
-         ::xTop  := ( ( aRect[4] - ::xHeight ) / 2 )
-       ELSE
-         aRect := _GetWindowRect( ::Parent:hWnd )
-         ::xLeft := ( ( aRect[1] + aRect[3] ) / 2 ) - ( ::xWidth / 2 )
-         ::xTop  := ( ( aRect[2] + aRect[4] ) / 2 ) - ( ::xHeight / 2 )
-      ENDIF
-    ELSE
-      IF ::__hParent != NIL
-         oWin  := ::__hParent
-       ELSE
-         oWin  := GetDeskTopWindow()
-      ENDIF
-      aRect := _GetWindowRect( oWin )
-      ::GetWindowRect()
-      ::xLeft := ( ( aRect[1] + aRect[3] ) / 2 ) - ( ::xWidth / 2 )
-      ::xTop  := ( ( aRect[2] + aRect[4] ) / 2 ) - ( ::xHeight / 2 )
-   ENDIF
-   ::MoveWindow()
-RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
@@ -3277,86 +3204,9 @@ METHOD DockIt() CLASS Window
    ENDIF
 RETURN Self
 
-//------------------------------------------------------------------------------------------------------
-
-METHOD Hide() CLASS Window
-   LOCAL nAnimation
-   IF ::hWnd != NIL
-      IF ::AnimationStyle != NIL .AND. ::AnimationStyle <> 0 .AND. ! ::DesignMode
-         nAnimation := ::AnimationStyle
-         DO CASE
-            CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
-                 nAnimation := ::System:WindowAnimation:SlideHorzNegative
-
-            CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
-                 nAnimation := ::System:WindowAnimation:SlideHorzPositive
-
-            CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
-                 nAnimation := ::System:WindowAnimation:SlideVertNegative
-
-            CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
-                 nAnimation := ::System:WindowAnimation:SlideVertPositive
-         ENDCASE
-         RETURN ::Animate( 1000, AW_HIDE | nAnimation )
-      ENDIF
-      ShowWindow( ::hWnd, SW_HIDE )
-   ENDIF
-   IF ::LeftSplitter != NIL
-      ::LeftSplitter:Hide()
-   ENDIF
-   IF ::TopSplitter != NIL
-      ::TopSplitter:Hide()
-   ENDIF
-   IF ::RightSplitter != NIL
-      ::RightSplitter:Hide()
-   ENDIF
-   IF ::BottomSplitter != NIL
-      ::BottomSplitter:Hide()
-   ENDIF
-   ::Style := ::Style & NOT( WS_VISIBLE )
-   IF ::Parent != NIL
-      ::Parent:SendMessage( WM_SIZE, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
-   ENDIF
-RETURN Self
-
 METHOD Animate( nSpeed, nFlags ) CLASS Window
    AnimateWindow( ::hWnd, nSpeed, nFlags )
    ::xVisible := ( nFlags & AW_HIDE ) == 0
-RETURN Self
-
-METHOD Show( nShow ) CLASS Window
-   DEFAULT nShow TO SW_SHOW
-
-   IF nShow == SW_HIDE
-      RETURN ::Hide()
-   ENDIF
-
-   IF ::hWnd != NIL
-      IF ::AnimationStyle != NIL .AND. ::AnimationStyle <> 0 .AND. ! ::DesignMode
-         ::SendMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
-         ::UpdateChildren()
-         ::Animate( 1000, ::AnimationStyle )
-         ::UpdateChildren()
-       ELSE
-         ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
-      ENDIF
-   ENDIF
-   IF ::LeftSplitter != NIL
-      ::LeftSplitter:Show()
-   ENDIF
-   IF ::TopSplitter != NIL
-      ::TopSplitter:Show()
-   ENDIF
-   IF ::RightSplitter != NIL
-      ::RightSplitter:Show()
-   ENDIF
-   IF ::BottomSplitter != NIL
-      ::BottomSplitter:Show()
-   ENDIF
-   ::Style := ::Style | WS_VISIBLE
-   IF ::IsChild .AND. ::Parent != NIL
-      ::Parent:SendMessage( WM_SIZE, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
-   ENDIF
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------
@@ -4577,7 +4427,7 @@ CLASS WinForm INHERIT Window
    PROPERTY MDIChild             GET IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild );
                                  SET ( IIF( ::DesignMode .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F.
    PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F.
-
+   PROPERTY Center               SET ::CenterWindow(v)                     DEFAULT .F.
 
    //compatibility ONLY, forms do not set "Border" property
    ACCESS TopMost              INLINE ::AlwaysOnTop
@@ -4593,6 +4443,7 @@ CLASS WinForm INHERIT Window
 
    DATA __lLoading             EXPORTED INIT .F.
    DATA __aPostCreateProc      EXPORTED INIT {}
+   DATA OnWMClose              EXPORTED
 
    ACCESS Form                 INLINE Self
 
@@ -4643,9 +4494,10 @@ CLASS WinForm INHERIT Window
 
    METHOD SetImageList()
    METHOD SetBackColor()
+   METHOD CenterWindow()
 
    METHOD OnNCDestroy()
-
+   METHOD OnClose()
    METHOD OnSysCommand()
    METHOD SetInstance()
    METHOD Redraw()                          INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
@@ -4653,6 +4505,7 @@ CLASS WinForm INHERIT Window
    METHOD InvalidateRect(a,l)               INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
    METHOD __CreateProperty()
    METHOD RegisterDocking()                 INLINE NIL
+   METHOD Hide()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -4762,6 +4615,95 @@ METHOD Create( hoParent ) CLASS WinForm
    IF ::ActiveMenuBar != NIL
       ::__SetActiveMenuBar( ::ActiveMenuBar )
    ENDIF
+   IF ::Center .AND. ! ::DesignMode
+      ::CenterWindow()
+   ENDIF
+RETURN Self
+
+//------------------------------------------------------------------------------------------------------
+METHOD Hide() CLASS WinForm
+   LOCAL nAnimation
+   IF ::hWnd != NIL
+      IF ::AnimationStyle != NIL .AND. ::AnimationStyle <> 0 .AND. ! ::DesignMode
+         nAnimation := ::AnimationStyle
+         DO CASE
+            CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
+                 nAnimation := ::System:WindowAnimation:SlideHorzNegative
+
+            CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
+                 nAnimation := ::System:WindowAnimation:SlideHorzPositive
+
+            CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
+                 nAnimation := ::System:WindowAnimation:SlideVertNegative
+
+            CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
+                 nAnimation := ::System:WindowAnimation:SlideVertPositive
+         ENDCASE
+         RETURN ::Animate( 1000, AW_HIDE | nAnimation )
+      ENDIF
+      ShowWindow( ::hWnd, SW_HIDE )
+   ENDIF
+   ::Style := ::Style & NOT( WS_VISIBLE )
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnClose( nwParam, nlParam ) CLASS WinForm
+   LOCAL nRet, nAnimation
+   IF ! ::Modal
+      nRet := ExecuteEvent( "OnClose", Self )
+      ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
+   ENDIF
+   IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ! ::DesignMode
+      nAnimation := ::AnimationStyle
+      DO CASE
+         CASE nAnimation == ::System:WindowAnimation:SlideHorzPositive
+              nAnimation := ::System:WindowAnimation:SlideHorzNegative
+
+         CASE nAnimation == ::System:WindowAnimation:SlideHorzNegative
+              nAnimation := ::System:WindowAnimation:SlideHorzPositive
+
+         CASE nAnimation == ::System:WindowAnimation:SlideVertPositive
+              nAnimation := ::System:WindowAnimation:SlideVertNegative
+
+         CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
+              nAnimation := ::System:WindowAnimation:SlideVertPositive
+      ENDCASE
+      ::Animate( 1000, AW_HIDE | nAnimation )
+   ENDIF
+   ::Application:DoEvents()
+RETURN nRet
+
+//-----------------------------------------------------------------------------------------------
+METHOD CenterWindow( lDesk ) CLASS WinForm
+   LOCAL oWin, aRect
+   DEFAULT lDesk TO .F.
+   IF ::hWnd == NIL .OR. ::DesignMode
+      RETURN Self
+   ENDIF
+   IF ::Parent != NIL .AND. !lDesk
+      ::GetWindowRect()
+
+      IF ::IsChild()
+         aRect := _GetClientRect( ::Parent:hWnd )
+         ::xLeft := ( ( aRect[3] - ::xWidth ) / 2 )
+         ::xTop  := ( ( aRect[4] - ::xHeight ) / 2 )
+       ELSE
+         aRect := _GetWindowRect( ::Parent:hWnd )
+         ::xLeft := ( ( aRect[1] + aRect[3] ) / 2 ) - ( ::xWidth / 2 )
+         ::xTop  := ( ( aRect[2] + aRect[4] ) / 2 ) - ( ::xHeight / 2 )
+      ENDIF
+    ELSE
+      IF ::__hParent != NIL
+         oWin  := ::__hParent
+       ELSE
+         oWin  := GetDeskTopWindow()
+      ENDIF
+      aRect := _GetWindowRect( oWin )
+      ::GetWindowRect()
+      ::xLeft := ( ( aRect[1] + aRect[3] ) / 2 ) - ( ::xWidth / 2 )
+      ::xTop  := ( ( aRect[2] + aRect[4] ) / 2 ) - ( ::xHeight / 2 )
+   ENDIF
+   ::MoveWindow()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -5023,22 +4965,7 @@ METHOD Show( nShow ) CLASS WinForm
          ENDIF
       ENDIF
    ENDIF
-   IF ::LeftSplitter != NIL
-      ::LeftSplitter:Show()
-   ENDIF
-   IF ::TopSplitter != NIL
-      ::TopSplitter:Show()
-   ENDIF
-   IF ::RightSplitter != NIL
-      ::RightSplitter:Show()
-   ENDIF
-   IF ::BottomSplitter != NIL
-      ::BottomSplitter:Show()
-   ENDIF
    ::Style := ::Style | WS_VISIBLE
-   IF ::Parent != NIL
-      ::Parent:SendMessage( WM_SIZE, 0, MAKELONG( ::Parent:ClientWidth, ::Parent:ClientHeight ) )
-   ENDIF
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

@@ -79,11 +79,9 @@ CLASS DataTable INHERIT Component
    DATA Dock               EXPORTED
    DATA Width              EXPORTED
    DATA Height             EXPORTED
-   DATA ClientEdge         EXPORTED
    DATA ClipChildren       EXPORTED
    DATA ClipSiblings       EXPORTED
    DATA OwnerDraw          EXPORTED  INIT .F.
-   DATA StaticEdge         EXPORTED
    DATA Transparent        EXPORTED
    DATA Visible            EXPORTED
 

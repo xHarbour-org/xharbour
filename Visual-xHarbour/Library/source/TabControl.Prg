@@ -885,8 +885,6 @@ CLASS TabPage INHERIT Dialog
    ACCESS TabStop          INLINE ::Style & WS_TABSTOP != 0
    ACCESS ClipSiblings     INLINE ::Style & WS_CLIPSIBLINGS != 0
    ACCESS CaptionBar       INLINE ::Style & WS_CAPTION != 0
-   ACCESS StaticEdge       INLINE ::ExStyle & WS_EX_STATICEDGE != 0
-   ACCESS ClientEdge       INLINE ::ExStyle & WS_EX_CLIENTEDGE != 0
    ACCESS ClipChildren     INLINE ::Style & WS_CLIPCHILDREN != 0
    ACCESS Transparent      INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
    ACCESS FrameStyle       INLINE ::xFrameStyle
@@ -1421,7 +1419,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabStrip INHERIT TabControl
-   DATA Border, AllowMaximize, ClientEdge, StaticEdge, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
+   DATA Border, AllowMaximize, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19

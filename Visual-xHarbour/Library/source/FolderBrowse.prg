@@ -72,6 +72,9 @@ CLASS FolderTree INHERIT TreeView
    PROPERTY AllowShellMenu                      DEFAULT .T.
    PROPERTY SysFolder      SET ::__SetFolder(v) DEFAULT __GetSystem():Folders:Desktop
    PROPERTY Folder         SET ::__SetFolder(v)
+   PROPERTY Explorer       ROOT "Appearance" SET ::__SetExpTheme(v) DEFAULT .T.
+
+   PROPERTY FolderView     ROOT "Behavior" GET __ChkComponent( Self, @::xFolderView )
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -79,6 +82,7 @@ CLASS FolderTree INHERIT TreeView
    METHOD Update()
    METHOD GetPath()                 INLINE FolderTreeGetPath( ::hWnd )
    METHOD GetSysFolder()
+   METHOD __SetExpTheme()
    METHOD __SetFolder( cPath ) INLINE IIF( ::hWnd != NIL, ( ::ResetContent(), IIF( cPath == ::SysFolder, cPath := NIL, ), FolderTreeInit( ::hWnd, ::SysFolder, cPath ) ), )
 ENDCLASS
 
@@ -106,17 +110,34 @@ RETURN Self
 
 METHOD Create() CLASS FolderTree
    Super:Create()
+   ::__SetExpTheme()
    RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
 
    FolderTreeInit( ::hWnd, ::SysFolder, IIF( EMPTY( ::Folder ), NIL, ::Folder ) )
 RETURN Self
 
+METHOD __SetExpTheme( lSet ) CLASS FolderTree
+   DEFAULT lSet TO ::xExplorer
+   ::HasLines := ! lSet
+   IF lSet
+      ::HasButtons := .T.
+   ENDIF
+   SetWindowTheme( ::hWnd, IIF( lSet, "explorer", "treeview" ) )
+RETURN Self
+
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS FolderTree
    Super:OnParentNotify( nwParam, nlParam, hdr )
    IF hdr:hwndFrom == ::hWnd
+
       IF hdr:code == TVN_ITEMEXPANDING
-         FolderTreePopulateTree( ::hWnd, nlParam )
+         FolderTreePopulate( ::hWnd, nlParam )
+
+       ELSEIF hdr:code == TVN_SELCHANGED
+         IF ::FolderView != NIL
+            ::FolderView:PopulateFromTree( nlParam )
+         ENDIF
+
        ELSEIF hdr:code == NM_RCLICK .AND. ::AllowShellMenu
          FolderTreeShowStdMenu( ::hWnd, nlParam, .T. )
       ENDIF
@@ -153,9 +174,8 @@ CLASS FolderList INHERIT ListView
    DATA SelFolder       EXPORTED  INIT ""
 
    DATA __aColumns      PROTECTED
-   DATA __LastFolderID  PROTECTED
+   DATA __nCurFolderID  PROTECTED
    DATA __LastRegEntry  PROTECTED
-   DATA __LastParent    PROTECTED
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
@@ -164,10 +184,8 @@ CLASS FolderList INHERIT ListView
    METHOD __SetFolder()
    METHOD OnUserMsg()
    METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
-   METHOD OpenSelFile(cFile) INLINE ShellExecute( GetActiveWindow(), "open", cFile )
-   METHOD OpenSelFolder()
-   METHOD Open()             INLINE IIF( !EMPTY( ::SelFile ), ::OpenSelFile( ::SelFile ), ::OpenSelFolder() )
-   METHOD GoUp()             INLINE ListViewBrowseGoUp( ::hWnd, ::__LastFolderID )
+   METHOD PopulateByID()
+   METHOD PopulateFromTree()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FolderList
@@ -187,23 +205,23 @@ METHOD Create() CLASS FolderList
    ::__aColumns := {}
    ListViewBrowseInit( ::hWnd, ::SysFolder, IIF( EMPTY( ::Folder ), NIL, ::Folder ), ::ShowFolders )
    IF !EMPTY( ::Folder )
-      ::__SetFolder( ::Folder, .F. )
+      ::__SetFolder( ::Folder )
     ELSE
-      ::__SetFolder( ::SysFolder, .T. )
+      ::__SetFolder( ::SysFolder )
    ENDIF
 RETURN Self
 
 METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS FolderList
    (hWnd, nwParam, nlParam)
-   IF /*! ::DesignMode .AND.*/ nMsg == WM_USER + 15 .AND. ::__LastFolderID != NIL
-      ListViewBrowsePopulateByID( ::hWnd, ::__LastFolderID, ::__LastParent )
+   IF ! ::DesignMode .AND. nMsg == WM_USER + 15 .AND. ::__nCurFolderID != NIL
+      FolderListPopulateByID( ::hWnd, ::__nCurFolderID  )
       RETURN 0
    ENDIF
 RETURN NIL
 
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS FolderList
-   LOCAL nSubItem, iFile, lvi, n
+   LOCAL nSubItem
 
    IF hdr:code == LVN_GETDISPINFO
       ListBrowseSetDisplayInfo( nlParam )
@@ -211,7 +229,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS FolderList
     ELSEIF hdr:code == NM_RCLICK .AND. ::AllowShellMenu
       ListViewShowStdMenu( ::hWnd, nlParam )
 
-    ELSEIF hdr:code == NM_DBLCLK .OR. hdr:code == NM_RETURN
+    ELSEIF hdr:code == NM_DBLCLK
+      ::Populate( nlParam )
+
+    ELSEIF hdr:code == NM_RETURN
       ExecuteEvent( "OnReturn", Self )
 
     ELSEIF hdr:code == LVN_COLUMNCLICK
@@ -227,96 +248,53 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS FolderList
       RETURN 0
     ELSEIF hdr:code == LVN_ITEMCHANGED
       IF ( __ListViewGetNewState( nlParam ) & LVIS_FOCUSED ) == LVIS_FOCUSED
-         ::SelFile := FolderListGetPath( ::hWnd, nlParam, @n )
-         IF IsDir( ::SelFile )
-            ::SelFolder := ::SelFile
-            ::SelFile   := ""
-
-          ELSEIF EMPTY( ::SelFile )
-            iFile := SendMessage( ::hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED )
-
-            lvi := (struct LVITEM)
-            lvi:iSubItem   := 0
-            lvi:cchTextMax := 512
-            lvi:pszText    := SPACE( 512 )
-
-            SendMessage( ::hWnd, LVM_GETITEMTEXT, iFile, @lvi )
-
-            ::SelFolder := Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 )
-            ::SelFile   := ""
-
-          ELSEIF !FILE( ::SelFile )
-            ::SelFile   := ""
-            ::SelFolder := ""
-
-          ELSE
-            ::SelFolder := ""
-         ENDIF
       ENDIF
     ELSE
       Super:OnParentNotify( nwParam, nlParam )
    ENDIF
 RETURN 0
 
-METHOD OpenSelFolder() CLASS FolderList
-   LOCAL cFolder
-   IF !EMPTY( ::SelFolder )
-      IF AT( "\", ::SelFolder ) == 0
-         ::xFolder := ::SelFolder
-         ::Populate( ::Parent:lParam )
-       ELSE
-         ::xFolder := cFolder
-         ::__SetFolder( ::SelFolder, .F. )
-      ENDIF
+METHOD __SetFolder( cFolder ) CLASS FolderList
+   LOCAL nSpecialFolder
+   IF VALTYPE( cFolder ) == "N"
+      nSpecialFolder := cFolder
+      cFolder := NIL
    ENDIF
+   ::PopulateByID( FolderIDFromFolderName( cFolder, nSpecialFolder ) )
 RETURN Self
 
-METHOD __SetFolder( cFolder, lSystem ) CLASS FolderList
-   LOCAL nId, n
-   DEFAULT lSystem TO .F.
+METHOD PopulateByID( nID ) CLASS FolderList
+   LOCAL lRoot, cFolder
+   IF nID != NIL
+      cFolder := FolderFromIDList( nID )
+      lRoot := ! Empty( cFolder ) .AND. Upper( Right( cFolder, 7 ) ) == "DESKTOP"
 
-   TRY
-      cFolder := ::System:Folders[ cFolder ]
-      lSystem := .T.
-   CATCH
-   END
-
-   IF !lSystem .AND. EMPTY( cFolder )
-      lSystem := .T.
-      cFolder := ::SysFolder
-   ENDIF
-
-   IF ::__LastRegEntry != NIL
-      UnregisterNotify( ::__LastRegEntry )
-      ::__LastRegEntry := NIL
-   ENDIF
-
-   IF lSystem
-      nId     := cFolder
-      cFolder := NIL
-
-      IF ( n := FolderListSetFolder( ::hWnd, cFolder, nId ) ) == NIL
-         RETURN Self
+      IF ::__LastRegEntry != NIL
+         UnregisterNotify( ::__LastRegEntry )
       ENDIF
-      ::__LastFolderID := n
-      ::__LastRegEntry := RegisterNotifyFolderID( ::hWnd, ::__LastFolderID, WM_USER + 15 )
-    ELSE
-      IF ( n := FolderListSetFolder( ::hWnd, cFolder, nId ) ) == NIL
-         RETURN Self
-      ENDIF
-      ::__LastFolderID := n
-      ::__LastRegEntry := RegisterNotify( ::hWnd, cFolder, WM_USER + 15 )
+      FolderListPopulateByID( ::hWnd, nID, lRoot )
+      ::__nCurFolderID := nID
+      ::__LastRegEntry := RegisterNotifyFolderID( ::hWnd, nID, WM_USER + 15 )
    ENDIF
-   ::__LastParent   := ListViewBrowseGetParentId()
 RETURN Self
 
 METHOD Populate( nlParam ) CLASS FolderList
+//   ::PopulateByID( FolderTreeIDList( nlParam ) )
+   LOCAL nID
    IF ::__LastRegEntry != NIL
       UnregisterNotify( ::__LastRegEntry )
    ENDIF
-   ::__LastFolderID := ::__LastParent
+   nID := FolderBrowsePopulate( ::hWnd, nlParam )
+   ::__nCurFolderID := nID
+   ::__LastRegEntry := RegisterNotifyFolderID( ::hWnd, nID, WM_USER + 15 )
+RETURN Self
 
-   ListViewBrowsePopulate( ::hWnd, nlParam )
-   ::__LastParent   := ListViewBrowseGetParentId()
-   ::__LastRegEntry := RegisterNotifyFolderID( ::hWnd, ::__LastFolderID, WM_USER + 15 )
+METHOD PopulateFromTree( nlParam ) CLASS FolderList
+   LOCAL nID
+   IF ::__LastRegEntry != NIL
+      UnregisterNotify( ::__LastRegEntry )
+   ENDIF
+   nID := ListViewBrowsePopulateFromTree( ::hWnd, nlParam )
+   ::__nCurFolderID := nID
+   ::__LastRegEntry := RegisterNotifyFolderID( ::hWnd, nID, WM_USER + 15 )
 RETURN Self

@@ -43,8 +43,6 @@ CLASS StatusBar INHERIT Control
       DATA AllowUndock   INIT .F.
       DATA Dock
       DATA Anchor
-      DATA ClientEdge    INIT .F.
-      DATA StaticEdge    INIT .F.
       DATA TabStop       INIT .F.
       DATA Transparent   INIT .F.
       DATA ClipChildren  INIT .F.
@@ -234,8 +232,6 @@ CLASS StatusBarPanel INHERIT Control
       DATA AllowUndock   INIT .F.
       DATA Dock
       DATA Anchor
-      DATA ClientEdge    INIT .F.
-      DATA StaticEdge    INIT .F.
       DATA TabStop       INIT .F.
       DATA Transparent   INIT .F.
       DATA Visible       INIT .T.
