@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-13 10:49 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbzlib\zip.c
+    ! fixed a typo in previous commit (#if define -> #if defined)
+  * source\vm\initsymb.c
+    ! fixed an old typo (REPLICATE -> RIGHT)
+
 2015-02-12 17:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/hbzlib/zip.c
     ! added missing include "windows.h" to HB_OS_WIN block

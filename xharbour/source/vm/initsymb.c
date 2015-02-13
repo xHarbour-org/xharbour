@@ -162,7 +162,7 @@ static HB_SYMB symbols[] = {
    { "RECCOUNT",  { HB_FS_PUBLIC }, { HB_FUNCNAME( RECCOUNT )  }, NULL },
    { "RECNO",     { HB_FS_PUBLIC }, { HB_FUNCNAME( RECNO )     }, NULL },
    { "REPLICATE", { HB_FS_PUBLIC }, { HB_FUNCNAME( REPLICATE ) }, NULL },
-   { "RIGHT",     { HB_FS_PUBLIC }, { HB_FUNCNAME( REPLICATE ) }, NULL },
+   { "RIGHT",     { HB_FS_PUBLIC }, { HB_FUNCNAME( RIGHT )     }, NULL },
    { "RLOCK",     { HB_FS_PUBLIC }, { HB_FUNCNAME( RLOCK )     }, NULL },
    { "ROUND",     { HB_FS_PUBLIC }, { HB_FUNCNAME( ROUND )     }, NULL },
    { "ROW",       { HB_FS_PUBLIC }, { HB_FUNCNAME( ROW )       }, NULL },

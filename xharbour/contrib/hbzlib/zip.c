@@ -70,7 +70,7 @@
    #include <fcntl.h>
    #include <dirent.h>
 #endif
-#if define(HB_OS_WIN)
+#if defined(HB_OS_WIN)
    #include <windows.h>
 #endif   
 #if ! defined( HB_USE_LARGEFILE64 ) && defined( HB_OS_UNIX )
