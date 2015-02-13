@@ -67,16 +67,16 @@
 
 HB_FILE_VER( "$Id$" )
 
-#if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
-   #define FILE_ATTRIBUTE_ENCRYPTED             0x00000040
-#endif
-
 #if ! defined( FILE_ATTRIBUTE_SPARSE_FILE )
    #define FILE_ATTRIBUTE_SPARSE_FILE           0x00000200
 #endif
 
 #if ! defined( FILE_ATTRIBUTE_REPARSE_POINT )
    #define FILE_ATTRIBUTE_REPARSE_POINT         0x00000400
+#endif
+
+#if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
+   #define FILE_ATTRIBUTE_ENCRYPTED             0x00004000
 #endif
 
 #if ! defined( FILE_ATTRIBUTE_NOT_CONTENT_INDEXED )

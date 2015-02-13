@@ -9,6 +9,12 @@
 */
 
 
+2015-02-13 13:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\filestat.c
+    ! include of windows.h is now inside HB_OS_WIN block (it wasn't)
+  * source\rtl\hbffind.c
+    ! fixed definition of FILE_ATTRIBUTE_ENCRYPTED
+
 2015-02-13 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * contrib/hbzlib/zip.c
     ! minor change on my previys commit moved HB_OS_WIN block before include hbzip2.h
