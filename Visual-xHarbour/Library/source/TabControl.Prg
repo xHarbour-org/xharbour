@@ -1058,7 +1058,7 @@ METHOD Create() CLASS TabPage
    IF ::Parent:hWnd == NIL
       ::Parent:Create()
    ENDIF
-
+   ::Border := 0
    ::Super:Create()
    tci:lParam := ::hWnd
    ::EnableThemeDialogTexture( IIF( ::Parent:Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
