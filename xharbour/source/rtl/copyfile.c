@@ -83,7 +83,7 @@
 #ifdef HB_C52_STRICT
 #define BUFFER_SIZE 8192
 #else
-   #define BUFFER_SIZE  65536
+   #define BUFFER_SIZE  65535
 #endif
 
 
@@ -146,9 +146,11 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
          {
             hb_evalNew( &info, block );
          }
-
+          usRead = hb_fsRead( fhndSource, buffer, (USHORT)BUFFER_SIZE ) ;     
+          TraceLog("aaa.log","handle %lu buf %s usread %lu\n", fhndSource,buffer,usRead);
          while( ( usRead = hb_fsRead( fhndSource, buffer, (USHORT)BUFFER_SIZE ) ) != 0 )
          {
+	        TraceLog("aaa.log","handle %lu buf %s usread %lu\n", fhndSource,buffer,usRead);
             while( hb_fsWrite( fhndDest, buffer, usRead ) != usRead )
             {
                USHORT uiAction = hb_errRT_BASE_Ext1( EG_WRITE, 2016, NULL, szDest, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );

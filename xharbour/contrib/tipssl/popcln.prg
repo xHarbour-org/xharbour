@@ -115,7 +115,7 @@ METHOD Open( cUrl ) CLASS tIPClientPOP
       RETURN .F.
    ENDIF
    IF ::lSSL
-      InetSSLSetTimeout( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ENDIF
@@ -150,7 +150,7 @@ RETURN ::GetOk()
 
 METHOD Close() CLASS tIPClientPOP
    IF ::lSSL
-      InetSSLSetTimeOut( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeOut( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    ENDIF

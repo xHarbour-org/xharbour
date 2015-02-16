@@ -49,8 +49,8 @@
 *
 */
 
-#ifndef HB_INET_H_
-   #define HB_INET_H_
+#ifndef HB_INETSSL_H_
+   #define HB_INETSSL_H_
 
    #include "hbdefs.h"
    #include "hbvm.h"
@@ -126,11 +126,11 @@
       } HB_SSL_SOCKET_STRUCT;
 
 #if !defined(HB_OS_UNIX)
-      typedef struct _CPINGREPLY
+      typedef struct _CPINGREPLYSSL
       {
           IN_ADDR  Address;           /* The IP address of the replier */
           ULONG    RTT;               /* Round Trip time in Milliseconds */
-      } HB_PINGREPLY;
+      } HB_PINGREPLYSSL;
 #endif
       #define HB_SSLPARSOCKET( n )     ( ( HB_SSL_SOCKET_STRUCT * ) hb_parptrGC( hb_inetSocketFinalize, n ) )
 

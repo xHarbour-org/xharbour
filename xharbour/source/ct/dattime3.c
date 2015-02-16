@@ -50,20 +50,15 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-#define HB_OS_WIN_USED
+#ifndef _SVID_SOURCE
+#   define _SVID_SOURCE
+#endif
 
 #include "hbapi.h"
 #include "hbdate.h"
 #if defined( HB_OS_WIN )
 #   include <windows.h>
 #   include <winbase.h>
-#elif defined( HB_OS_UNIX )
-/* stime exists only in SVr4, SVID, X/OPEN and Linux */
-#   ifndef _SVID_SOURCE
-#      define _SVID_SOURCE
-#   endif
-#endif
 #include <time.h>
 
 /* TODO: make it MT safe */

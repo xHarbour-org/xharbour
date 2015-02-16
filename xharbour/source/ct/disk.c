@@ -74,7 +74,7 @@
    #include <windows.h>
    #include <winbase.h>
    #include <shellapi.h>
-   #define HB_OS_WIN_USED
+
 #elif defined( HB_OS_DOS )
    #include <dos.h>
 #endif

@@ -225,17 +225,10 @@ static const char * hb_mlGetParams( int iParAdd, HB_SIZE * pulLen,
 
    if( pszString )
    {
-      if( ISNUM( 2 ) )
-      {
-         if( hb_parnd( 2 ) <= 0 )
-            return NULL;
-         *pulLineLength = hb_parnl( 2 );
-      }
-      else
-         *pulLineLength = 79;
+      *pulLineLength = hb_parnsdef( 2, 79 );
       *pulLen     = hb_parclen( 1 );
-      *pulTabSize = ISNUM( 3 + iParAdd ) ? hb_parnl( 3 + iParAdd ) : 4;
-      *pfWordWrap = ISLOG( 4 + iParAdd ) ? hb_parl( 4 + iParAdd ) : TRUE;
+      *pulTabSize = hb_parnldef( 3 + iParAdd ,4); //ISNUM( 3 + iParAdd ) ? hb_parnl( 3 + iParAdd ) : 4;
+      *pfWordWrap = hb_parldef( 4 + iParAdd, TRUE) ;//ISLOG( 4 + iParAdd ) ? hb_parl( 4 + iParAdd ) : TRUE;
       *pEOLs      = hb_mlGetEOLs( 5 + iParAdd, piEOLs );
 #ifdef HB_C52_STRICT
       if( *pulLineLength > 254 )
@@ -259,8 +252,8 @@ HB_FUNC( MEMOLINE )
                                               &ulTabSize, &fWordWrap,
                                               &pEOLs, &iEOLs );
    char *         szLine;
-   ULONG          ulLine   = hb_parnl( 3 );
-   HB_SIZE        ulEnd, ulOffset = ISNUM( 7 ) ? hb_parnl( 7 ) - 1 : 0;
+   HB_ISIZ        ulLine   = hb_parns( 3 );
+   HB_SIZE        ulEnd, ulOffset = ISNUM( 7 ) ? hb_parns( 7 ) - 1 : 0;
    HB_SIZE        ulCols   = 0;
 
    if( ! pszString )
@@ -284,7 +277,7 @@ HB_FUNC( MEMOLINE )
 
    if( ulOffset < ulLen )
    {
-      ULONG ulCol = 0;
+      HB_SIZE ulCol = 0;
       ulEnd    = hb_mlGetLine( pszString, ulLen, ulOffset,
                                ulLineLength, ulTabSize, 0, fWordWrap,
                                pEOLs, iEOLs, &ulCols, NULL );
@@ -328,7 +321,7 @@ HB_FUNC( MEMOLINE )
 
    if( ISBYREF( 7 ) )
    {
-      hb_stornl( ( LONG ) ulEnd + 1, 7 );
+      hb_storns(  ulEnd + 1, 7 );
    }
 
 }
@@ -357,7 +350,7 @@ HB_FUNC( MLCOUNT )
       }
       hb_xfree( pEOLs );
    }
-   hb_retnl( ( LONG ) ulLines );
+   hb_retns(  ulLines );
 }
 
 HB_FUNC( MLPOS )
@@ -369,7 +362,7 @@ HB_FUNC( MLPOS )
    const char *   pszString   = hb_mlGetParams( 1, &ulLen, &ulLineLength,
                                                 &ulTabSize, &fWordWrap,
                                                 &pEOLs, &iEOLs );
-   HB_SIZE        ulLine      = hb_parnl( 3 );
+   HB_SIZE        ulLine      = hb_parns( 3 );
    HB_SIZE        ulOffset    = 0;
    HB_SIZE        ulCols      = 0;
 
@@ -385,7 +378,7 @@ HB_FUNC( MLPOS )
          ++ulOffset;
       hb_xfree( pEOLs );
    }
-   hb_retnl( ( LONG ) ulOffset );
+   hb_retns(  ulOffset );
 }
 
 HB_FUNC( MLCTOPOS )
@@ -397,8 +390,8 @@ HB_FUNC( MLCTOPOS )
    const char *   pszString   = hb_mlGetParams( 2, &ulLen, &ulLineLength,
                                                 &ulTabSize, &fWordWrap,
                                                 &pEOLs, &iEOLs );
-   HB_SIZE        ulLine      = hb_parnl( 3 );
-   HB_SIZE        ulCol       = hb_parnl( 4 );
+   HB_SIZE        ulLine      = hb_parns( 3 );
+   HB_SIZE        ulCol       = hb_parns( 4 );
    HB_SIZE        ulOffset    = 0;
    HB_SIZE        ulCols      = 0;
 
@@ -418,7 +411,7 @@ HB_FUNC( MLCTOPOS )
       hb_xfree( pEOLs );
    }
    ++ulOffset;
-   hb_retnl( ( LONG ) ulOffset );
+   hb_retns(  ulOffset );
 }
 
 HB_FUNC( MPOSTOLC )
@@ -430,7 +423,7 @@ HB_FUNC( MPOSTOLC )
    const char *   pszString   = hb_mlGetParams( 1, &ulLen, &ulLineLength,
                                                 &ulTabSize, &fWordWrap,
                                                 &pEOLs, &iEOLs );
-   HB_SIZE        ulPos       = hb_parnl( 3 );
+   HB_SIZE        ulPos       = hb_parns( 3 );
    HB_SIZE        ulOffset    = 0;
    HB_SIZE        ulLine      = 0;
    HB_SIZE        ulCol       = 0;
@@ -480,6 +473,6 @@ HB_FUNC( MPOSTOLC )
       hb_xfree( pEOLs );
    }
    hb_reta( 2 );
-   hb_stornl( ( LONG ) ulLine, -1, 1 );
-   hb_stornl( ( LONG ) ulCol, -1, 2 );
+   hb_storns( ulLine, -1, 1 );
+   hb_storns( ulCol, -1, 2 );
 }

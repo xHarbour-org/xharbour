@@ -62,7 +62,7 @@
 
 HB_FUNC( CGIREAD )
 {
-   ULONG    cgilen;
+   HB_SIZE    cgilen;
    int      n;
    char *   cgistr, * temp;
 
@@ -106,15 +106,15 @@ HB_FUNC( CGIREAD )
 
 HB_FUNC( CGIWRITE )
 {
-   ULONG    len;
+   HB_SIZE    len;
    PHB_ITEM phbstr = hb_param( 1, HB_IT_STRING );
 
 #ifdef HB_OS_WIN
    if( phbstr )
-      WriteFile( GetStdHandle( STD_OUTPUT_HANDLE ), phbstr->item.asString.value, phbstr->item.asString.length, &len, NULL );
+      WriteFile( GetStdHandle( STD_OUTPUT_HANDLE ), hb_itemGetCPtr( phbstr ) , hb_itemGetCLen( phbstr ) , &len, NULL );
 #else
    if( phbstr )
-      fwrite( phbstr->item.asString.value, sizeof( char ), phbstr->item.asString.length, stdout );
+      fwrite( hb_itemGetCPtr( phbstr ) , sizeof( char ), hb_itemGetCLen( phbstr ) , stdout );
 #endif
 }
 

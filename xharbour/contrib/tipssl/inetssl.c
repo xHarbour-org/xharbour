@@ -61,6 +61,7 @@
 
 #define _HB_API_INTERNAL_
 #include "inetssl.h"
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
@@ -240,8 +241,9 @@ int hb_inetSSLWrite(HB_SSL_SOCKET_STRUCT *Socket, char *msg, int length, int *iR
    do
    {
       ret = SSL_write(Socket->pSSL, msg, length);
-      sslerr = SSL_get_error(Socket->pSSL, ret);
 
+      sslerr = SSL_get_error(Socket->pSSL, ret);
+      
       if (ret > 0)
       {
          r = 1;
@@ -712,6 +714,7 @@ HB_FUNC(INETSSLCREATE)
    }
 
    //  SSL_CTX_set_info_callback( Socket->pCTX, apps_ssl_info_callback );
+   if ( ISLOG(4))
    Socket->pBio = BIO_new_socket((int)(Socket->com), BIO_NOCLOSE);
 
    Socket->pSSL = SSL_new(Socket->pCTX);
@@ -2167,6 +2170,7 @@ HB_FUNC( INETSSLCONNECT )
 
          HB_STACK_UNLOCK;
          HB_TEST_CANCEL_ENABLE_ASYN;
+         
 
          hb_socketConnect(Socket);
          hb_socketSetNonBlocking(Socket);
@@ -2179,7 +2183,7 @@ HB_FUNC( INETSSLCONNECT )
          while
          (
             iRet == SSL_ERROR_WANT_READ ||
-            iRet2 == SSL_ERROR_WANT_WRITE ||
+            iRet == SSL_ERROR_WANT_WRITE ||
             iRetries < 10
          )
          {
@@ -2590,4 +2594,69 @@ HB_FUNC( INITSSLRANDFILE )
 
    hb_retl(1);
 }
+
+HB_FUNC( INETSSLCONNECTFROMFD )
+{
+   int fd               = hb_parnint(1);
+   HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET(3);
+   PHB_ITEM             pSocket = NULL;
+   struct hostent       *Host;
+   int                  iPort;
+   int                  iRetries = 0;
+   int                  iRet;
+   int                  iRet2;
+
+   if (Socket != NULL)
+   {
+      HB_SOCKET_ZERO_ERROR(Socket);
+   }
+   else
+   {
+      HB_SSL_SOCKET_INIT(Socket, pSocket);
+   }
+
+   HB_STACK_UNLOCK;
+   HB_TEST_CANCEL_ENABLE_ASYN;
+
+   HB_DISABLE_ASYN_CANC;
+   HB_STACK_LOCK;
+   if (Socket->pCTX == NULL )
+      Socket->pCTX= SSL_CTX_new( SSLv23_method());
+      
+   /* error had been set by get hosts */
+      /* Creates comm socket */
+      Socket->com = (int) fd;
+      
+      if (Socket->com == (HB_SOCKET_T) - 1)
+      {
+         HB_SOCKET_SET_ERROR(Socket);
+      }
+      else
+      {
+         iPort = htons((u_short) hb_parni(2));
+
+         HB_STACK_UNLOCK;
+         HB_TEST_CANCEL_ENABLE_ASYN;
+
+         SSL_set_mode( Socket->pSSL, 4 );
+
+         SSL_set_fd(Socket->pSSL, (int)Socket->com);
+
+
+         iRet2 = SSL_connect(Socket->pSSL);
+         
+         iRet = SSL_get_error(Socket->pSSL, iRet2);
+
+         if (iRet2 < 1) HB_SOCKET_SET_ERROR2(Socket, -1, "Timeout");
+
+         HB_DISABLE_ASYN_CANC;
+         HB_STACK_LOCK;
+      }
+   
+   if (pSocket)      
+      hb_itemReturnRelease(pSocket);
+   else
+      hb_itemReturn(hb_param(3, HB_IT_ANY));
+}
+
 #endif

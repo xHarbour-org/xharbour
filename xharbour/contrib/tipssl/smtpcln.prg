@@ -57,12 +57,17 @@
 
 #include "hbclass.ch"
 #include "tip.ch"
-
+#include "common.ch"
 /**
 * Inet service manager: smtp
 */
 
 CLASS tIPClientSMTP FROM tIPClient
+
+  Data lStartTls  INIT .F.   
+  Data lAuthLogin INIT .F.
+  Data lAuthPlain INIT .F.
+  Data lTls       INIT .F.
 
    METHOD New( oUrl, lTrace, oCredentials,CAFile,CaPath )
    METHOD Open()
@@ -80,7 +85,10 @@ CLASS tIPClientSMTP FROM tIPClient
    METHOD AUTHplain( cUser, cPass) // Auth by plain method
    METHOD ServerSuportSecure(lAuthp,lAuthl) 
    DESTRUCTOR smtpClnDestructor
+   METHOD DetectSecurity()
    METHOD sENDMail
+   METHOD StartTLS()
+   method ActivateSSL
    HIDDEN:
    DATA isAuth INIT .F.
 ENDCLASS
@@ -112,7 +120,7 @@ METHOD Open( cUrl ) CLASS tIPClientSMTP
       RETURN .F.
    ENDIF
    IF ::lSSL
-      InetSSLSetTimeout( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ENDIF
@@ -130,7 +138,7 @@ METHOD GetOk() CLASS tIPClientSMTP
    LOCAL nLen
 
    ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 512 )
-   IF ::InetErrorCode( ::SocketCon ) != 0 .or. Substr( ::cReply, 1, 1 ) == '5'
+   IF ::InetErrorCode( ::SocketCon ) != 0  .or. ! HB_ISSTRING( ::cReply ) .OR. Substr( ::cReply, 1, 1 ) == '5'
       RETURN .F.
    ENDIF
 RETURN .T.
@@ -138,7 +146,7 @@ RETURN .T.
 
 METHOD Close() CLASS tIPClientSMTP
    IF ::lSSL
-      InetSSLSetTimeOut( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeOut( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    ENDIF
@@ -181,22 +189,18 @@ RETURN ::GetOk()
 
 
 
-METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
+METHOD OpenSecure( cUrl,lSsl ) CLASS tIPClientSMTP
 
-   Local cUser
+   Local cUser,lOk := .f.
+   Default lSSl to .f.
 
    IF .not. ::super:Open( cUrl )
       RETURN .F.
    ENDIF
    IF ::lSSL
-      InetSSLSetTimeout( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   ENDIF
-
-   IF "smtp.live.com" in ::ourl:cServer
-      ::InetSENDall( ::SocketCon, "STARTTLS " + ::cCRLF )
-      ::getok()
    ENDIF
 
    cUser := ::oUrl:cuserid
@@ -207,7 +211,16 @@ METHOD OpenSecure( cUrl ) CLASS tIPClientSMTP
       ::InetSENDall( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
    ENDIF   
 
-RETURN ::getOk()
+   lok := ::DetectSecurity()
+   
+   IF ! lSSL .and. !::lSSL
+     if lok
+       lok := ::StartTLS()
+     endif  
+   ENDIF
+   
+RETURN lOk  
+
 
 METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
 
@@ -330,3 +343,58 @@ PROCEDURE smtpClnDestructor CLASS TIpClientSmtp
 
 
 RETURN
+
+METHOD StartTLS()  CLASS TIpClientSmtp
+   ::inetSendAll( ::SocketCon, "STARTTLS" + ::cCRLF )
+   if ::GetOk()
+     ::lSsl := .t.
+     ::ActivateSSL(Self)
+   else
+    RETURN .F.  
+   endif 
+
+   RETURN .T. 
+
+
+METHOD DetectSecurity()  CLASS TIpClientSmtp
+Local lok
+
+     DO WHILE .T.
+       IF ! (lok := ::GetOk())
+         EXIT
+       ENDIF
+       IF ::cReply == NIL
+         EXIT
+       ENDIF  
+       IF "LOGIN" $ ::cReply
+         ::lAuthLogin := .T.
+       ENDIF  
+       IF "PLAIN" $ ::cReply
+         ::lAuthPlain := .T.
+       ENDIF  
+       IF "STARTTLS" $ ::cReply
+         ::lTLS := .T.
+         ::lAuthLogin := .T.
+         ::lAuthPlain := .T.
+       ENDIF  
+       IF Left( ::cReply, 4 ) == "250-"
+         LOOP
+       ELSEIF Left( ::cReply, 4 ) == "250 "
+         EXIT
+       ENDIF
+     ENDDO
+   RETURN lOk
+   
+METHOD ActivateSSL  CLASS TIpClientSmtp
+LOCAL SocketCon,SocketConNew
+
+   
+   SocketCon := ::SocketCon   
+   ::SocketSSLCon := InetSSLCreate( , ::CAFile, ::CaPath )
+
+   InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )   
+   INETSSLCONNECTFROMFD( InetFD(::SocketCon), ::oUrl:nPort, ::SocketSSLCon )   
+   ::SocketConOld := SocketCon
+   
+RETURN .T.
+

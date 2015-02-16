@@ -89,18 +89,19 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
 {
    if( szText )
    {
-      int iLen = ( int ) strlen( szText );
+      HB_ISIZ iLen = ( int ) strlen( szText );
 
       if( iLen > 0 )
       {
-         HB_ITEM_NEW( Temp );
-         int      i        = 0, word_count = 0;
+         PHB_ITEM  Temp = hb_itemNew( NULL );
+         HB_ISIZ      i        = 0;
+         int word_count = 0;
          /* booked enough memory */
          char *   szResult = ( char * ) hb_xgrab( iLen + 1 );
 
          while( i < iLen )
          {
-            int ui = 0;
+            HB_ISIZ ui = 0;
 
             hb_xmemset( szResult, ' ', ( size_t ) ( iLen + 1 ) );
 
@@ -129,7 +130,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
                      szResult[ ++ui ] = szText[ i ];
                }
                word_count++;
-               hb_arrayAddForward( pReturn, hb_itemPutC( &Temp, szResult ) );
+               hb_arrayAddForward( pReturn, hb_itemPutC( Temp, szResult ) );
             }
             /* delimiter found */
             else if( szText[ i ] == iDelimiter )
@@ -168,7 +169,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
                }
                word_count++;
                szResult[ ui + 1 ] = '\0';
-               hb_arrayAddForward( pReturn, hb_itemPutC( &Temp, szResult ) );
+               hb_arrayAddForward( pReturn, hb_itemPutC( Temp, szResult ) );
             }
             else
             {
@@ -203,7 +204,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
                }
                word_count++;
                szResult[ ui + 1 ] = '\0';
-               hb_arrayAddForward( pReturn, hb_itemPutC( &Temp, szResult ) );
+               hb_arrayAddForward( pReturn, hb_itemPutC( Temp, szResult ) );
             }
 
             i++;
@@ -215,12 +216,12 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
          if( szText[ iLen - 1 ] == iDelimiter )
          {
             word_count++;
-            hb_arrayAddForward( pReturn, hb_itemPutC( &Temp, "" ) );
+            hb_arrayAddForward( pReturn, hb_itemPutC( Temp, "" ) );
          }
 
          /* store number of words */
          *iWord = word_count;
-
+         hb_itemRelease( temp ) ;
          /* clean up */
          hb_xfree( szResult );
       }
@@ -316,22 +317,28 @@ HB_FUNC( FPARSE )
    PHB_ITEM pSrc     = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pDelim   = hb_param( 2, HB_IT_STRING );
 
-   HB_ITEM_NEW( Array );
-   HB_ITEM_NEW( Item );
+   PHB_ITEM  Array ;
+   PHB_ITEM  Item ;
    char *   string;
    char **  tokens;
    int      iToken, iCharCount = 0;
    BYTE     nByte;
 
    /* file parameter correctly passed */
-   if( ! pSrc || pSrc->item.asString.length == 0 )
+   if( ! pSrc )
+   {
+      hb_reta( 0 );
+      return;
+   }
+
+   if( hb_itemGetCLen( pSrc ) == 0 )
    {
       hb_reta( 0 );
       return;
    }
 
    /* open file for read */
-   inFile = hb_fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( (char *) hb_itemGetCPtr( pSrc ), "r" );
 
    /* return empty array on failure */
    if( ! inFile )
@@ -341,10 +348,13 @@ HB_FUNC( FPARSE )
    }
 
    /* default delimiter to comma, chr(44) */
-   nByte = pDelim ? ( BYTE ) pDelim->item.asString.value[ 0 ] : ( BYTE ) 44;
+   nByte = pDelim ? ( BYTE ) hb_itemGetCPtr( pDelim )[ 0 ] : ( BYTE ) ',';
 
    /* the main array */
-   hb_arrayNew( &Array, 0 );
+   Array  = hb_itemArrayNew( 0 );
+   Item  = hb_itemNew( NULL );
+
+   
 
    /* book memory for line to read */
    string = ( char * ) hb_xgrab( MAX_READ + 1 );
@@ -358,14 +368,14 @@ HB_FUNC( FPARSE )
       tokens = hb_tokensplit( string, nByte, iCharCount, &iWord );
 
       /* prepare empty array */
-      hb_arrayNew( &Item, iWord );
+      hb_arrayNew( Item, iWord );
 
       /* add parsed text to array */
       for( iToken = 0; tokens[ iToken ]; iToken++ )
-         hb_arraySetC( &Item, iToken + 1, tokens[ iToken ] );
+         hb_arraySetC( Item, iToken + 1, tokens[ iToken ] );
 
       /* add array containing parsed text to main array */
-      hb_arrayAddForward( &Array, &Item );
+      hb_arrayAddForward( Array, Item );
 
       /* clean up */
       tokens--;
@@ -374,7 +384,9 @@ HB_FUNC( FPARSE )
    }
 
    /* return main array */
-   hb_itemReturnForward( &Array );
+   hb_itemReturnRelease( Array );
+   hb_itemRelease( Item);
+   
 
    /* clean up */
    hb_xfree( string );
@@ -387,21 +399,28 @@ HB_FUNC( FPARSEEX )
    PHB_ITEM pSrc     = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pDelim   = hb_param( 2, HB_IT_STRING );
 
-   HB_ITEM_NEW( Array );
-   HB_ITEM_NEW( SubArray );
+   PHB_ITEM  Array = hb_itemNew( NULL );
+   PHB_ITEM  SubArray = hb_itemNew( NULL );
    char *   string;
    int      iCharCount = 0;
    BYTE     nByte;
 
    /* file parameter correctly passed */
-   if( ! pSrc || pSrc->item.asString.length == 0 )
+   if( ! pSrc )
    {
       hb_reta( 0 );
       return;
    }
 
+   if( hb_itemGetCLen( pSrc ) == 0 )
+   {
+      hb_reta( 0 );
+      return;
+   }
+   
+
    /* open file for read */
-   inFile = hb_fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( (char *) hb_itemGetCPtr( pSrc ), "r" );
 
    /* return empty array on failure */
    if( ! inFile )
@@ -411,10 +430,11 @@ HB_FUNC( FPARSEEX )
    }
 
    /* default delimiter to comma, chr(44) */
-   nByte = pDelim ? ( BYTE ) pDelim->item.asString.value[ 0 ] : ( BYTE ) 44;
+   nByte = pDelim ? ( BYTE ) hb_itemGetCPtr( pDelim )[ 0 ] : ( BYTE ) ',';
 
    /* the main array */
-   hb_arrayNew( &Array, 0 );
+   Array    = hb_itemArrayNew( 0 );
+   SubArray = hb_itemNew( NULL );
 
    /* book memory for line to read */
    string = ( char * ) hb_xgrab( MAX_READ + 1 );
@@ -424,16 +444,18 @@ HB_FUNC( FPARSEEX )
    {
       /* parse the read line */
       int iWord = 0;
-      hb_arrayNew( &SubArray, 0 );
 
-      hb_ParseLine( &SubArray, string, nByte, &iWord );
+      hb_arrayNew( SubArray, 0 ); 
+      hb_ParseLine( SubArray, string, nByte, &iWord );
 
       /* add array containing parsed text to main array */
-      hb_arrayAddForward( &Array, &SubArray );
+      hb_arrayAddForward( Array, SubArray );
+      
    }
 
    /* return main array */
-   hb_itemReturnForward( &Array );
+   hb_itemReturnRelease( Array );
+   hb_itemRelease( SubArray );
 
    /* clean up */
    hb_xfree( string );
@@ -448,22 +470,28 @@ HB_FUNC( FWORDCOUNT )
    char **  tokens;
    int      iCharCount  = 0;
    BYTE     nByte       = ' ';
-   ULONG    ulWordCount = 0;
+   HB_SIZE    ulWordCount = 0;
 
    /* file parameter correctly passed */
-   if( ! pSrc || pSrc->item.asString.length == 0 )
+   if( ! pSrc )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
+      return;
+   }
+
+   if( hb_itemGetCLen( pSrc ) == 0 )
+   {
+      hb_retns( 0 );
       return;
    }
 
    /* open file for read */
-   inFile = hb_fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( (char *) hb_itemGetCPtr( pSrc ), "r" );
 
    /* return 0 on failure */
    if( ! inFile )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
       return;
    }
 
@@ -486,7 +514,7 @@ HB_FUNC( FWORDCOUNT )
    }
 
    /* return number of words */
-   hb_retnl( ulWordCount );
+   hb_retns( ulWordCount );
 
    /* clean up */
    hb_xfree( string );
@@ -497,23 +525,29 @@ HB_FUNC( FLINECOUNT )
 {
    FILE *   inFile;
    PHB_ITEM pSrc        = hb_param( 1, HB_IT_STRING );
-   ULONG    ulLineCount = 0;
+   HB_SIZE    ulLineCount = 0;
    int      ch;
 
    /* file parameter correctly passed */
-   if( ! pSrc || pSrc->item.asString.length == 0 )
+   if( ! pSrc )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
+      return;
+   }
+
+   if( hb_itemGetCLen( pSrc ) == 0 )
+   {
+      hb_retns( 0 );
       return;
    }
 
    /* open file for read */
-   inFile = hb_fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( (char *) hb_itemGetCPtr( pSrc ), "r" );
 
    /* return 0 on failure */
    if( ! inFile )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
       return;
    }
 
@@ -525,7 +559,7 @@ HB_FUNC( FLINECOUNT )
    }
 
    /* return number of lines */
-   hb_retnl( ulLineCount );
+   hb_retns( ulLineCount );
 
    /* clean up */
    fclose( inFile );
@@ -535,23 +569,29 @@ HB_FUNC( FCHARCOUNT )
 {
    FILE *   inFile;
    PHB_ITEM pSrc     = hb_param( 1, HB_IT_STRING );
-   ULONG    ulResult = 0;
+   HB_SIZE    ulResult = 0;
    int      ch;
 
    /* file parameter correctly passed */
-   if( ! pSrc || pSrc->item.asString.length == 0 )
+   if( ! pSrc )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
+      return;
+   }
+
+   if( hb_itemGetCLen( pSrc ) == 0 )
+   {
+      hb_retns( 0 );
       return;
    }
 
    /* open file for read */
-   inFile = hb_fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( (char *) hb_itemGetCPtr( pSrc ), "r" );
 
    /* return 0 on failure */
    if( ! inFile )
    {
-      hb_retni( 0 );
+      hb_retns( 0 );
       return;
    }
 
@@ -571,7 +611,7 @@ HB_FUNC( FCHARCOUNT )
    }
 
    /* return number of characters */
-   hb_retnl( ulResult );
+   hb_retns( ulResult );
 
    /* clean up */
    fclose( inFile );
@@ -579,21 +619,21 @@ HB_FUNC( FCHARCOUNT )
 
 HB_FUNC( FPARSELINE )
 {
-   HB_ITEM_NEW( Return );
-   int iWords = 0;
+   PHB_ITEM  Return  ;
+   HB_ISIZ iWords = 0;
 
-   hb_arrayNew( &Return, 0 );
+   Return = hb_itemArrayNew( 0 );
 
    if( ISCHAR( 1 ) )
    {
       PHB_ITEM pDelim = hb_param( 2, HB_IT_STRING );
 
-      hb_ParseLine( &Return, hb_parcx( 1 ), pDelim ? pDelim->item.asString.value[ 0 ] : ( int ) ',', &iWords );
+      hb_ParseLine( Return, hb_parcx( 1 ), pDelim ? hb_itemGetCPtr( pDelim )[ 0 ] : ( int ) ',', &iWords );
    }
 
-   hb_itemReturnForward( &Return );
+   hb_itemReturnRelease( Return );
 
    if( hb_pcount() >= 3 )
-      hb_stornl( iWords, 3 );
+      hb_storns( iWords, 3 );
 
 }

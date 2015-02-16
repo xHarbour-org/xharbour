@@ -64,7 +64,7 @@
 
 typedef struct HB_SETKEY_
 {
-   SHORT iKeyCode;
+   int iKeyCode;
    PHB_ITEM pAction;
    PHB_ITEM pIsActive;
    struct HB_SETKEY_ * next;
@@ -98,7 +98,7 @@ void hb_setkeyExit( void )
    s_sk_list = NULL;
 }
 
-static PHB_SETKEY sk_findkey( SHORT iKeyCode, PHB_SETKEY * sk_list_end )
+static PHB_SETKEY sk_findkey( int iKeyCode, PHB_SETKEY * sk_list_end )
 {
    PHB_SETKEY sk_list_tmp;
 
@@ -112,7 +112,7 @@ static PHB_SETKEY sk_findkey( SHORT iKeyCode, PHB_SETKEY * sk_list_end )
    return sk_list_tmp;
 }
 
-static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIsActive )
+static void sk_add( BOOL bReturn, int iKeyCode, PHB_ITEM pAction, PHB_ITEM pIsActive )
 {
    if( iKeyCode )
    {
@@ -195,7 +195,7 @@ HB_FUNC( SETKEY )
          PHB_SETKEY sk_list_tmp, sk_list_end;
 
          /* sk_list_end is not used in this context */
-         sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
+         sk_list_tmp = sk_findkey(  hb_itemGetNI( pKeyCode ), &sk_list_end );
 
          if( sk_list_tmp )
          {
@@ -215,7 +215,7 @@ HB_FUNC( SETKEY )
       {
          /* Set a SETKEY value */
 
-         sk_add( TRUE, ( SHORT ) hb_itemGetNI( pKeyCode ),
+         sk_add( TRUE,  hb_itemGetNI( pKeyCode ),
                  hb_param( 2, HB_IT_BLOCK ),
 #if defined( HB_EXTENSION )
                  hb_param( 3, HB_IT_BLOCK ) );
@@ -239,10 +239,10 @@ HB_FUNC( HB_SETKEYARRAY )
    {
       PHB_ITEM pIsActive   = hb_param( 3, HB_IT_BLOCK );
       HB_SIZE  nLen        = hb_arrayLen( pKeyCodeArray );
-      ULONG    nPos;
+      HB_SIZE  nPos;
 
       for( nPos = 1; nPos <= nLen; nPos++ )
-         sk_add( FALSE, ( SHORT ) hb_arrayGetNI( pKeyCodeArray, nPos ), pAction, pIsActive );
+         sk_add( FALSE,  hb_arrayGetNI( pKeyCodeArray, nPos ), pAction, pIsActive );
    }
 }
 
@@ -255,7 +255,7 @@ HB_FUNC( HB_SETKEYGET )
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
       /* sk_list_end is not used in this context */
-      sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
+      sk_list_tmp = sk_findkey(  hb_itemGetNI( pKeyCode ), &sk_list_end );
 
       if( sk_list_tmp )
       {
@@ -329,7 +329,7 @@ HB_FUNC( HB_SETKEYSAVE )
          {
             PHB_ITEM itmKeyElements = hb_arrayGetItemPtr( pParam, nitem );
 
-            sk_add( FALSE, ( SHORT ) hb_arrayGetNI( itmKeyElements, 1 ),
+            sk_add( FALSE,  hb_arrayGetNI( itmKeyElements, 1 ),
                     hb_arrayGetItemPtr( itmKeyElements, 2 ),
                     hb_arrayGetItemPtr( itmKeyElements, 3 ) );
          }
@@ -347,7 +347,7 @@ HB_FUNC( HB_SETKEYCHECK )
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
       /* sk_list_end is not used in this context */
-      sk_list_tmp = sk_findkey( ( SHORT ) hb_itemGetNI( pKeyCode ), &sk_list_end );
+      sk_list_tmp = sk_findkey(  hb_itemGetNI( pKeyCode ), &sk_list_end );
 
       if( sk_list_tmp )
       {
