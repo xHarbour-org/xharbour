@@ -386,7 +386,7 @@ Local lok
    RETURN lOk
    
 METHOD ActivateSSL  CLASS TIpClientSmtp
-LOCAL SocketCon,SocketConNew
+LOCAL SocketCon
 
    
    SocketCon := ::SocketCon   

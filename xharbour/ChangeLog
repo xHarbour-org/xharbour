@@ -9,6 +9,10 @@
 */
 
 
+2015-02-17 16:27 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\tipssl\smtpcln.prg
+    ! removed unused variable SocketConNew
+
 2015-02-17 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
   * source/rtl/fparse.c
     ! minor fix from previus commit
