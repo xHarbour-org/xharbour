@@ -24,8 +24,6 @@
 
 CLASS Label INHERIT Control
    PROPERTY Alignment                     SET ::Redraw(v)      DEFAULT DT_LEFT
-   PROPERTY Border                        SET ::Redraw(v)      DEFAULT 0
-   //PROPERTY Transparent                   SET ::__SetTransp(v) DEFAULT .F.
    PROPERTY NoPrefix                      SET ::Redraw(v)      DEFAULT .F.
    PROPERTY VertCenter                    SET ::Redraw(v)      DEFAULT .F.
    PROPERTY TextShadowColor ROOT "Colors" SET ::InvalidateRect()
@@ -61,7 +59,8 @@ CLASS Label INHERIT Control
    METHOD OnLButtonUp()
    METHOD OnTimer()
    METHOD SetForeColor()
-   METHOD Redraw() INLINE IIF( ::IsWindow(), ::InvalidateRect(,.F.),)
+   METHOD Redraw()             INLINE IIF( ::IsWindow(), ::InvalidateRect(,.F.),)
+   METHOD __SetBorder()        INLINE ::Refresh()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
