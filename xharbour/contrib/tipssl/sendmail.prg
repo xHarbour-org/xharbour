@@ -87,13 +87,10 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
    LOCAL lConnectPlain := .F.
    LOCAL lReturn       := .T.
-   LOCAL lAuthLogin    := .F.
-   LOCAL lAuthPlain    := .F.
    LOCAL lConnect      := .T.
    LOCAL oPop
    LOCAL aData := {}, nCount
    LOCAL cTemp
-   Local lStartTls := .f.
 
    DEFAULT cUser       TO ""
    DEFAULT cPass       TO ""
@@ -178,7 +175,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
          IF oPop:Open()
             oPop:Close()
          ENDIF
-      CATCH e
+      CATCH
          lReturn := .F.
       END
 
