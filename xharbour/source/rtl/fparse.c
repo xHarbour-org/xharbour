@@ -399,8 +399,8 @@ HB_FUNC( FPARSEEX )
    PHB_ITEM pSrc     = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pDelim   = hb_param( 2, HB_IT_STRING );
 
-   PHB_ITEM  Array = hb_itemNew( NULL );
-   PHB_ITEM  SubArray = hb_itemNew( NULL );
+   PHB_ITEM  Array;
+   PHB_ITEM  SubArray;
    char *   string;
    int      iCharCount = 0;
    BYTE     nByte;

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-17 19:46 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\fparse.c
+    ! removed SubArray unused initialization in HB_FUNC( FPARSEEX )
+    ! removed Array unused initialization in HB_FUNC( FPARSEEX )
 
 2015-02-17 19:15 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\tipssl\smtpcln.prg
