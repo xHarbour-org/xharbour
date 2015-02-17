@@ -28,7 +28,8 @@ CLASS Control INHERIT Window
    PROPERTY Text           ROOT "Appearance" GET IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) SET ::SetWindowText( v ) DEFAULT ""
    PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
-   PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
+   PROPERTY Border         ROOT "Appearance" GET ( IIF( VALTYPE(::xBorder)=="L", ::xBorder := IIF( ::xBorder, WS_BORDER, 0 ),), ::xBorder );
+                                             SET ::__SetBorder(v)      DEFAULT 0
    DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
 
 
@@ -77,7 +78,6 @@ CLASS Control INHERIT Window
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
-   METHOD OnMouseActivate()
    METHOD Disable()             INLINE ::Enabled := .F.
    METHOD Enable()              INLINE ::Enabled := .T.
    METHOD OnSize()
@@ -99,7 +99,6 @@ ENDCLASS
 
 METHOD __SetBorder( nBorder ) CLASS Control
    LOCAL nExStyle, nStyle
-
    IF VALTYPE( nBorder ) == "L" // backward compatibility
       nBorder := IIF( nBorder, WS_BORDER, 0 )
    ENDIF
@@ -149,6 +148,7 @@ METHOD Init( oParent, lInitValues ) CLASS Control
    ::Super:Init( oParent, lInitValues )
    ::Id := ::Form:GetNextControlId()
    oParent := NIL
+   __SetInitialValues( Self, "Border", ::xBorder )
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -156,6 +156,7 @@ RETURN Self
 METHOD Create( hParent ) CLASS Control
    ::xTop := MAX( ::xTop, ::Parent:TopMargin)
    ::__SetBorder( ::xBorder )
+
    IF ::IsContainer
       ::__IdeImageIndex := 1
    ENDIF
@@ -372,25 +373,6 @@ METHOD OnMove( x, y ) CLASS Control
       IF ::BottomSplitter != NIL
          ::BottomSplitter:OnParentMove( x, y )
       ENDIF
-   ENDIF
-RETURN NIL
-
-//---------------------------------------------------------------------------------------------------
-
-METHOD OnMouseActivate( nwParam, nlParam ) CLASS Control
-   LOCAL oChild
-   ::Super:OnMouseActivate( nwParam, nlParam )
-
-   IF LoWord(nlParam) == 1 .AND. LEFT( ::ClsName, 11 ) != "Splitter" .AND. ::ClsName != "OptionBar"
-      TRY
-         FOR EACH oChild IN ::Parent:Children
-             IF oChild:Active
-                oChild:Active := FALSE
-                oChild:InvalidateRect( {0,0, oChild:ClientWidth,14}, FALSE )
-             ENDIF
-         NEXT
-      CATCH
-      END
    ENDIF
 RETURN NIL
 
