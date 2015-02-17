@@ -145,7 +145,7 @@ static aMessages := {;
                     { WM_NCXBUTTONUP,     "OnNCXButtonUp"     },;
                     { WM_NCXBUTTONDOWN,   "OnNCXButtonDown"   },;
                     { WM_NCXBUTTONDBLCLK, "OnNCXButtonDblClk" },;
-                    { WM_CLOSE,           "OnClose"           } ;
+                    { WM_CLOSE,           "__OnClose"         } ;
                     }
 
 //-----------------------------------------------------------------------------------------------
@@ -469,7 +469,6 @@ CLASS Window INHERIT Object
    METHOD Refresh()
    METHOD ReCreate()
    METHOD GetHeight()             INLINE ::xHeight
-   METHOD IsChildren()
    METHOD DockIt()
    METHOD UpdateLayout()          INLINE ::PostMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
 
@@ -636,6 +635,7 @@ CLASS Window INHERIT Object
    METHOD OnNCDestroy()
    METHOD OnEraseBkGnd()
    METHOD __CreateBkBrush() VIRTUAL
+   METHOD __OnClose()       VIRTUAL
 ENDCLASS
 
 PROCEDURE __WinDestruct CLASS Window
@@ -1303,22 +1303,6 @@ METHOD IsCovered( nTopClip) CLASS Window
    ENDIF
 RETURN FALSE
 
-//-----------------------------------------------------------------------------------------------
-
-METHOD IsChildren( hWnd ) CLASS Window
-
-   LOCAL oChild
-
-   IF ::hWnd == hWnd
-      RETURN Self
-   ENDIF
-   FOR EACH oChild IN ::Children
-      IF oChild:IsChildren( hWnd ) != NIL
-         RETURN oChild
-      ENDIF
-   NEXT
-
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
@@ -4497,7 +4481,7 @@ CLASS WinForm INHERIT Window
    METHOD CenterWindow()
 
    METHOD OnNCDestroy()
-   METHOD OnClose()
+   METHOD __OnClose()
    METHOD OnSysCommand()
    METHOD SetInstance()
    METHOD Redraw()                          INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
@@ -4647,7 +4631,7 @@ METHOD Hide() CLASS WinForm
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnClose( nwParam, nlParam ) CLASS WinForm
+METHOD __OnClose( nwParam, nlParam ) CLASS WinForm
    LOCAL nRet, nAnimation
    IF ! ::Modal
       nRet := ExecuteEvent( "OnClose", Self )
