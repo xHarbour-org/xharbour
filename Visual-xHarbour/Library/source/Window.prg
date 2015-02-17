@@ -635,7 +635,7 @@ CLASS Window INHERIT Object
    METHOD OnNCDestroy()
    METHOD OnEraseBkGnd()
    METHOD __CreateBkBrush() VIRTUAL
-   METHOD __OnClose()       VIRTUAL
+   METHOD OnClose()         VIRTUAL
 ENDCLASS
 
 PROCEDURE __WinDestruct CLASS Window
