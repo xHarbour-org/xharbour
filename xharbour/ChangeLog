@@ -9,6 +9,14 @@
 */
 
 
+2015-02-17 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
+  * source/rtl/fparse.c
+    ! minor fix from previus commit
+    temp -> Temp
+    HB_ISIZ iWords -> int iWords
+  * source/ct/dattime3.c
+    ! fixed missing #endif
+      
 2015-02-17 10:31 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
   * source/vm/inet.c
     ! changed inetfd -> HB_INETFD
@@ -46,7 +54,7 @@
     ! moved _SVID_SOURCE define to outside HB_OS_UNIX block    
   * source/rtl/copyfile.c
     ! fixed an minor typo on previus commit    #define BUFFER_SIZE  65536 ->   #define BUFFER_SIZE  65535  
-  * source/rtl/fparse.prg
+  * source/rtl/fparse.c
     ! changed to use itemapi insted of direct structure manipulation                
     ! int -> HB_ISIZ where aplicable
     ! hb_retni -> hb_retns where aplicable

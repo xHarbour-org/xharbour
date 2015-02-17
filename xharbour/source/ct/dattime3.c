@@ -59,6 +59,7 @@
 #if defined( HB_OS_WIN )
 #   include <windows.h>
 #   include <winbase.h>
+#endif
 #include <time.h>
 
 /* TODO: make it MT safe */

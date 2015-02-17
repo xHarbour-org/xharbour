@@ -221,7 +221,7 @@ void hb_ParseLine( PHB_ITEM pReturn, const char * szText, int iDelimiter, int * 
 
          /* store number of words */
          *iWord = word_count;
-         hb_itemRelease( temp ) ;
+         hb_itemRelease( Temp ) ;
          /* clean up */
          hb_xfree( szResult );
       }
@@ -620,7 +620,7 @@ HB_FUNC( FCHARCOUNT )
 HB_FUNC( FPARSELINE )
 {
    PHB_ITEM  Return  ;
-   HB_ISIZ iWords = 0;
+   int iWords = 0;
 
    Return = hb_itemArrayNew( 0 );
 
