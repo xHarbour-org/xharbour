@@ -38,9 +38,10 @@
    typedef ULONG              HB_SIZE;
    #endif
    typedef BOOL               HB_BOOL;
-
+   #ifdef SQLRDD_COMPAT_PRE_1_1
    typedef HB_LONG            HB_MAXINT;
    typedef HB_ULONG           HB_MAXUINT;
+   #endif
 
    // Support for old xHarbour versions
    #ifndef HB_FT_STRING

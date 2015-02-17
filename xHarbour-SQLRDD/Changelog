@@ -7,6 +7,21 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2015-02-17 20:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   + source/sqlex1ora.c
+   + source/sqlex2ora.c
+   + source/sqlex3ora.c
+   + source/sqlexora.h
+   + source/sqlorastru.h  
+     ! sources for sqlexOra version for native sqlex for oracle. work in progress   
+   ! source\compat.h
+     ! typedef to HB_LONG and HB_ULONG protected by #ifdef SQLRDD_COMPAT_PRE_1_1
+   ! source\sqlora2.c
+     ! updated to some function for better integration with sqlexora
+   ! source\sqlsrodbc.c 
+     ! fixed minor typo
+
 2015-01-13 09:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
   * source/sqlsrodbc.c
     ! minor fix to previus commit 

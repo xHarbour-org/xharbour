@@ -496,10 +496,11 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
 //                dt1[13] = bBuffer[18];
 //                dt1[14] = '\0';
 //                hb_itemPutDTS( pItem, dt1 );
-#else
                long lJulian, lMilliSec;
                hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
                hb_itemPutTDT( pItem, lJulian, lMilliSec );
+
+#else
             long lJulian, lMilliSec;
             hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
             hb_itemPutTDT( pItem, lJulian, lMilliSec );               

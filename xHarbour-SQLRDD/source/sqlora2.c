@@ -4,12 +4,7 @@
 * All Rights Reserved
 */
 
-#include "compat.h"
-
-#include "sqlrddsetup.ch"
-#include "sqlprototypes.h"
-#include "sqlodbc.ch"
-#include "ocilib.h"
+#include "sqlorastru.h"
 
 #if !defined(__GNUC__) && defined(WIN32)
 #define inline __inline
@@ -42,24 +37,10 @@ static PHB_DYNS s_pSym_SR_DESERIALIZE = NULL;
 static PHB_DYNS s_pSym_SR_FROMJSON = NULL;
 
 
+
 // static  OCI_ConnPool *pool=NULL;
 //-----------------------------------------------------------------------------//
 
-
-typedef struct _ORA_BIND_COLS
-{
-   char * col_name;	
-   char *bindname;
-   int iType;
-   short sVal;
-   double  dValue;
-   unsigned int  ulValue;
-   char sDate[ 7 ];  
-   HB_LONG iValue;
-   HB_LONG lValue; 
-   OCI_Date *date;  
-   int iFieldSize;
-} ORA_BIND_COLS ;
 
 
 
@@ -81,20 +62,20 @@ typedef struct _ORA_BIND_COLS
 //    sqlo_stmt_handle_t stmtParamRes;
 // 
 //} OCI_ORASESSION;
-typedef struct _OCI_ORASESSION
-{
-	OCI_Connection *cn;    
-    OCI_Statement *stmt ;
-    OCI_Statement *stmtParamRes;
-    OCI_Resultset *rs;
-    int iStatus;                   // Execution return value
-    int numcols;                  // Result set columns
-    char server_version[255];
-
-   ORA_BIND_COLS *  pLink;
-   unsigned int   ubBindNum;
-} OCI_ORASESSION;	
-typedef OCI_ORASESSION * POCI_ORASESSION;
+// typedef struct _OCI_ORASESSION
+// {
+// 	OCI_Connection *cn;    
+//     OCI_Statement *stmt ;
+//     OCI_Statement *stmtParamRes;
+//     OCI_Resultset *rs;
+//     int iStatus;                   // Execution return value
+//     int numcols;                  // Result set columns
+//     char server_version[1024];
+// 
+//    ORA_BIND_COLS *  pLink;
+//    unsigned int   ubBindNum;
+// } OCI_ORASESSION;	
+// typedef OCI_ORASESSION * POCI_ORASESSION;
 
 static USHORT OCI_initilized = 0;
 
@@ -213,7 +194,7 @@ HB_FUNC( SQLO_DISCONNECT )
       OCI_ConnectionFree( session->cn );
 
       OCI_initilized--;
-      if( !OCI_initilized )
+      if( OCI_initilized == 0 )
       {
 	// 	      if (pool ) 
 	// 	         OCI_PoolFree(pool);
@@ -423,12 +404,12 @@ HB_FUNC( ORACLEINBINDPARAM )
    if ( Stmt)
    {
   
-      Stmt->pLink[iPos].bindname = (char *) hb_xgrab( sizeof(char) * 10);
-      memset(Stmt->pLink[iPos].bindname,'\0',10 * sizeof(char));
+      Stmt->pLink[iPos].bindname = (char *) hb_xgrabz(  sizeof(char) * 10);
+//      memset(Stmt->pLink[iPos].bindname,'\0',10 * sizeof(char));
       sprintf(Stmt->pLink[iPos].bindname,":%i",iParamNum);
       Stmt->pLink[iPos].iFieldSize=iFieldSize;
 
-      Stmt->pLink[iPos].sVal = isNull ? -1 : 0;;
+      Stmt->pLink[iPos].sVal = isNull ? -1 : 0;
       Stmt->pLink[iPos].iType = iParamType;
       switch (Stmt->pLink[iPos].iType)
       {
@@ -436,7 +417,7 @@ HB_FUNC( ORACLEINBINDPARAM )
          {
              if (ISNUM( 6 ) )
              {
-                Stmt->pLink[ iPos ].ulValue = hb_parnl( 6 );
+                Stmt->pLink[ iPos ].ulValue = hb_parnll( 6 );
                ret =  OCI_BindUnsignedInt( Stmt->stmt,Stmt->pLink[iPos].bindname,&Stmt->pLink[ iPos ].ulValue ) ;
                
              }  
@@ -481,7 +462,7 @@ HB_FUNC( ORACLEINBINDPARAM )
          {
              if (ISNUM( 6 ) )
              {
-                Stmt->pLink[ iPos ].iValue = hb_parl( 6 );
+                Stmt->pLink[ iPos ].lValue = hb_parnll( 6 );
                 OCI_BindBigInt( Stmt->stmt,Stmt->pLink[iPos].bindname,&Stmt->pLink[ iPos ].lValue ) ;
              }
              else
@@ -566,8 +547,8 @@ HB_FUNC( ORACLEINBINDPARAM )
 
          default :
          {
-            Stmt->pLink[iPos].col_name = (char *) hb_xgrab( sizeof(char) * (iFieldSize + 1));
-            memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize+1) * sizeof(char));
+            Stmt->pLink[iPos].col_name = (char *) hb_xgrabz( sizeof(char) * (iFieldSize + 1));
+//            memset(Stmt->pLink[iPos].col_name,'\0',(iFieldSize+1) * sizeof(char));
          
          
             if ( ISCHAR( 6 ) )
@@ -615,7 +596,7 @@ HB_FUNC( ORACLEGETBINDDATA)
       iPos = hb_itemGetNI( p1 );
       if( p->pLink[ iPos - 1 ].iType == 2)
       {
-          hb_retnint(p->pLink[ iPos - 1 ].ulValue);
+          hb_retnll(p->pLink[ iPos - 1 ].ulValue);
       }
       else if( p->pLink[ iPos - 1 ].iType == 4 )
       {
@@ -625,7 +606,7 @@ HB_FUNC( ORACLEGETBINDDATA)
       else if( p->pLink[ iPos - 1 ].iType == 5 )
       {
 
-         hb_retnint(p->pLink[ iPos - 1 ].lValue);
+         hb_retnll(p->pLink[ iPos - 1 ].lValue);
       }      
       else if( p->pLink[ iPos - 1 ].iType == 8)
       {
@@ -729,8 +710,8 @@ HB_FUNC( ORACLEBINDALLOC )
    if ( session )
    {
       iBind = hb_parni( 2 ) ;
-      session->pLink = ( ORA_BIND_COLS * ) hb_xgrab( sizeof( ORA_BIND_COLS ) * iBind );
-      memset(session->pLink,0,sizeof( ORA_BIND_COLS ) * iBind );      
+      session->pLink = ( ORA_BIND_COLS * ) hb_xgrabz(  sizeof( ORA_BIND_COLS ) * iBind );
+//      memset(session->pLink,0,sizeof( ORA_BIND_COLS ) * iBind );      
       session->ubBindNum = iBind;
    }
    hb_retni( 1 );
@@ -803,6 +784,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
+            szResult[ lLen ] = '\0';
             hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
@@ -841,13 +823,13 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
             break;
          }
 
-#ifdef SQLRDD_TOPCONN
-         case SQL_FAKE_DATE:
-         {
-            hb_itemPutDS( pItem, bBuffer );
-            break;
-         }
-#endif
+//#ifdef SQLRDD_TOPCONN
+//         case SQL_FAKE_DATE:
+//         {
+//            hb_itemPutDS( pItem, bBuffer );
+//            break;
+//         }
+//#endif
          case SQL_DATETIME:
          {
 #ifdef __XHARBOUR__
@@ -874,9 +856,8 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
             uiLen = OCI_GetDataLength(rs,iField);
 
             hb_xmemcpy( szResult,(char*)OCI_GetString(rs,iField ),uiLen ) ;
-
-            //hb_itemPutCLPtr( pItem, szResult, (ULONG) uiLen );
-            hb_itemPutCLPtr( pItem, szResult,  lLen );
+            szResult[ lLen ] =  '\0';
+            hb_itemPutCPtr( pItem, szResult,  lLen );
             break;
          }
          case SQL_NUMERIC:
@@ -885,18 +866,18 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
 //             sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );            
             if (lDec > 0 ) 
             {
-               double d = OCI_GetDouble(rs, iField );               
-               hb_itemPutND( pItem,d ) ;               
+
+               hb_itemPutNDLen( pItem,    OCI_GetDouble(rs, iField ) ,lLen,lDec ) ;               
             }
             else
             {
-	            HB_LONG p = OCI_GetUnsignedBigInt(rs,iField);
-	            hb_itemPutNIntLen(pItem,p,lLen); 
+	            hb_itemPutNIntLen(pItem,OCI_GetBigInt(rs,iField),lLen); 
 	         }
             break;
          }
          case SQL_DATE:
          {
+         /*
             char dt[9];
             char * bBuffer = (char*)OCI_GetString( rs, iField );
                         
@@ -923,6 +904,14 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
                dt[8] = '\0';
             }               
             hb_itemPutDS( pItem, dt );
+            break;
+            */
+            OCI_Date *date = OCI_GetDate(rs,iField);
+            int  year, month, day;
+            
+            OCI_DateGetDate(date,&year,&month,&day);
+            hb_itemPutD(pItem,year,month,day);
+            OCI_DateFree(date);
             break;
          }
          case SQL_LONGVARCHAR:
@@ -999,42 +988,25 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
             break;
          }
 
-#ifdef SQLRDD_TOPCONN
-         case SQL_FAKE_DATE:
-         {
-            hb_itemPutDS( pItem, bBuffer );
-            break;
-         }
-#endif
+//#ifdef SQLRDD_TOPCONN
+//         case SQL_FAKE_DATE:
+//         {
+//            hb_itemPutDS( pItem, bBuffer ); 
+//            break;
+//         }
+//#endif
          case SQL_DATETIME:
          {
-         char *bBuffer = (char*)OCI_GetString( rs, iField );
-#ifdef __XHARBOUR__
+	        OCI_Timestamp * pTime =     OCI_GetTimestamp( rs, iField );
+
+
             //hb_retdts(bBuffer);
-            char dt[18];
+            int iYear,iMonth, iDay, iHour, iMin,  dSec,fsec;
+//           DebugBreak();            
 
-            dt[0] = bBuffer[0];
-            dt[1] = bBuffer[1];
-            dt[2] = bBuffer[2];
-            dt[3] = bBuffer[3];
-            dt[4] = bBuffer[5];
-            dt[5] = bBuffer[6];
-            dt[6] = bBuffer[8];
-            dt[7] = bBuffer[9];
-            dt[8] = bBuffer[11];
-            dt[9] = bBuffer[12];
-            dt[10] = bBuffer[14];
-            dt[11] = bBuffer[15];
-            dt[12] = bBuffer[17];
-            dt[13] = bBuffer[18];
-            dt[14] = '\0';
-
-            hb_itemPutDTS( pItem, dt );
-#else
-            long lJulian, lMilliSec;
-            hb_timeStampStrGetDT( bBuffer, &lJulian, &lMilliSec );
-            hb_itemPutTDT( pItem, lJulian, lMilliSec );
-#endif
+            OCI_TimestampGetDateTime(pTime,&iYear,&iMonth, &iDay, &iHour, &iMin,  &dSec,&fsec);
+            hb_itemPutDT( pItem,iYear,iMonth, iDay, iHour, iMin,  (double)dSec,0 );
+            OCI_TimestampFree( pTime );
             break;
          }
 
@@ -1493,3 +1465,4 @@ OCI_Connection * GetConnection( OCI_ORASESSION *  p )
 {
 	return p->cn;
 }	
+

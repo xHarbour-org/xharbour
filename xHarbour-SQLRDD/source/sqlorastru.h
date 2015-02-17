@@ -1,0 +1,47 @@
+#ifndef _SQL_ORASTRU_H
+#define _SQL_ORASTRU_H
+
+#include "compat.h"
+
+#include "sqlrddsetup.ch"
+#include "sqlprototypes.h"
+#include "sqlodbc.ch"
+#include "ocilib.h"
+
+
+#if !defined(__GNUC__) && defined(WIN32)
+#define inline __inline
+
+#endif
+
+typedef struct _ORA_BIND_COLS
+{
+   char * col_name;	
+   char *bindname;
+   int iType;
+   short sVal;
+   double  dValue;
+   unsigned int  ulValue;
+   char sDate[ 7 ];  
+   LONGLONG iValue;
+   LONGLONG lValue; 
+   OCI_Date *date;  
+   int iFieldSize;
+} ORA_BIND_COLS ;
+
+typedef struct _OCI_ORASESSION
+{
+	OCI_Connection *cn;    
+    OCI_Statement *stmt ;
+    OCI_Statement *stmtParamRes;
+    OCI_Resultset *rs;
+    int iStatus;                   // Execution return value
+    int numcols;                  // Result set columns
+    char server_version[1024];
+
+   ORA_BIND_COLS *  pLink;
+   unsigned int   ubBindNum;
+} OCI_ORASESSION;	
+typedef OCI_ORASESSION * POCI_ORASESSION;
+
+#endif
