@@ -4635,6 +4635,7 @@ METHOD __OnClose( nwParam, nlParam ) CLASS WinForm
    LOCAL nRet, nAnimation
    IF ! ::Modal
       nRet := ExecuteEvent( "OnClose", Self )
+      ODEFAULT nRet TO ::OnClose( nwParam )
       ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
    ENDIF
    IF nRet == NIL .AND. ::AnimationStyle != 0 .AND. ! ::DesignMode
