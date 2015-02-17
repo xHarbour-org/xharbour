@@ -2079,7 +2079,7 @@ HB_FUNC( INETISSOCKET )
    hb_retl( HB_PARSOCKET( 1 ) != NULL );
 }
 
-HB_FUNC( INETFD )
+HB_FUNC( HB_INETFD )
 {
    HB_SOCKET_STRUCT *   Socket   = HB_PARSOCKET( 1 );
 

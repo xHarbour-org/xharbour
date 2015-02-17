@@ -9,6 +9,10 @@
 */
 
 
+2015-02-17 10:31 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
+  * source/vm/inet.c
+    ! changed inetfd -> HB_INETFD
+    
 2015-02-16 17:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
   * contrib/tipssl/client.prg
     ! added SocketSSLCon data so when ssl connection is done it use this variable
