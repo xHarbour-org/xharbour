@@ -191,7 +191,7 @@ RETURN ::GetOk()
 
 METHOD OpenSecure( cUrl,lSsl ) CLASS tIPClientSMTP
 
-   Local cUser,lOk := .f.
+   Local cUser,lOk
    Default lSSl to .f.
 
    IF .not. ::super:Open( cUrl )
