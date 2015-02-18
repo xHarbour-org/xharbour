@@ -323,7 +323,6 @@ METHOD Create() CLASS ToolBar
    ::SetPadding( 1, ::xHorzPadding )
    ::SetPadding( 2, ::xVertPadding )
    ::_SetBitmapSize()
-   ::Border := ::xBorder .AND. ( !::Theming .OR. !::Application:IsThemedXP )
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
