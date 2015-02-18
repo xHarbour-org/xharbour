@@ -2600,9 +2600,9 @@ HB_FUNC( INETSSLCONNECTFROMFD )
    int fd               = hb_parnint(1);
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET(3);
    PHB_ITEM             pSocket = NULL;
-   struct hostent       *Host;
+//   struct hostent       *Host;
    int                  iPort;
-   int                  iRetries = 0;
+//   int                  iRetries = 0;
    int                  iRet;
    int                  iRet2;
 

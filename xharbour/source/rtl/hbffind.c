@@ -65,23 +65,6 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id$" )
-
-#if ! defined( FILE_ATTRIBUTE_SPARSE_FILE )
-   #define FILE_ATTRIBUTE_SPARSE_FILE           0x00000200
-#endif
-
-#if ! defined( FILE_ATTRIBUTE_REPARSE_POINT )
-   #define FILE_ATTRIBUTE_REPARSE_POINT         0x00000400
-#endif
-
-#if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
-   #define FILE_ATTRIBUTE_ENCRYPTED             0x00004000
-#endif
-
-#if ! defined( FILE_ATTRIBUTE_NOT_CONTENT_INDEXED )
-   #define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED   0x00002000
-#endif
 
 /* ------------------------------------------------------------- */
 
@@ -148,6 +131,7 @@ typedef struct
 
 #elif defined( HB_OS_WIN )
 #include "windows.h"
+
 typedef struct
 {
    HANDLE hFindFile;
@@ -172,6 +156,7 @@ typedef struct
 #if ! defined( __WATCOMC__ )
    #include <fnmatch.h>
 #endif
+
 typedef struct
 {
    DIR * dir;
@@ -199,7 +184,25 @@ typedef void HB_FFIND_INFO, * PHB_FFIND_INFO;
    #endif
 #endif
 
-/* Internal funtion , Convert Windows Error Values to Dos Error Values */
+#if defined( HB_OS_WIN ) && defined( HB_EXTENSION )
+   #if ! defined( FILE_ATTRIBUTE_SPARSE_FILE )
+      #define FILE_ATTRIBUTE_SPARSE_FILE           0x00000200
+   #endif
+
+   #if ! defined( FILE_ATTRIBUTE_REPARSE_POINT )
+      #define FILE_ATTRIBUTE_REPARSE_POINT         0x00000400
+   #endif
+
+   #if ! defined( FILE_ATTRIBUTE_NOT_CONTENT_INDEXED )
+      #define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED   0x00002000
+   #endif
+
+   #if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
+      #define FILE_ATTRIBUTE_ENCRYPTED             0x00004000
+   #endif
+#endif
+
+/* Internal funtion, Convert Windows Error Values to Dos Error Values */
 #ifdef HB_OS_WIN
 
 FILETIME GetOldesFile( const char * szPath )

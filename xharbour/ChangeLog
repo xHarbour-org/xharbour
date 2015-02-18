@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-18 17:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbdefs.h
+    ! define HB_UINT_MAX
+  * source/rtl/hbffind.c
+  * contrib/tipssl/inetssl.c
+    ! fix to compile under OpenWatcom
+
 2015-02-17 20:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\tipssl\sendmail.prg
     ! removed not declared and not used variable e
@@ -28,120 +35,120 @@
   * contrib\tipssl\smtpcln.prg
     ! removed unused variable SocketConNew
 
-2015-02-17 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
+2015-02-17 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/fparse.c
     ! minor fix from previus commit
     temp -> Temp
     HB_ISIZ iWords -> int iWords
   * source/ct/dattime3.c
     ! fixed missing #endif
-      
-2015-02-17 10:31 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
+
+2015-02-17 10:31 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/vm/inet.c
     ! changed inetfd -> HB_INETFD
-    
-2015-02-16 17:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>    
+
+2015-02-16 17:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/tipssl/client.prg
     ! added SocketSSLCon data so when ssl connection is done it use this variable
     ! updated all method that recieve SocketCon Parameter to use ::SocketSSLCon or ::SocketCon if lSsl is true
   * contrib/tipssl/inetssl.c
     + added function INETSSLCONNECTFROMFD() this connect to ssl with an already non ssl socked.
-    ! typo iRet2 == SSL_ERROR_WANT_WRITE  -> iRet == SSL_ERROR_WANT_WRITE 
+    ! typo iRet2 == SSL_ERROR_WANT_WRITE  -> iRet == SSL_ERROR_WANT_WRITE
   * contrib/tipssl/inetssl.h
     ! Changed HB_INET_H_ to HB_INETSSL_H_
-    ! changed struct _CPINGREPLY to _CPINGREPLYSSL  
+    ! changed struct _CPINGREPLY to _CPINGREPLYSSL
   * contrib/tipssl/popcln.prg
     ! updated method close and open do use ::SocketSSLCon insted of ::SocketCon is lssl is set
   * contrib/tipssl/sendmail.prg
     ! updated HB_SetMimeType to include new extension as well group same mime type in one place
-    ! use HB_IS*() instead of valtype()    
+    ! use HB_IS*() instead of valtype()
     ! updated to use the variable lStartTls , lAuthLogin, lAuthPlain, lTls returned from opensecure method
   * contrib/tipssl/smtpcln.prg
     + added datas lStartTls , lAuthLogin, lAuthPlain, lTls  to check is STARTTLS is needed
-    + added METHOD DetectSecurity(),StartTLS(),ActivateSSL Ideia borrow from harbour    
+    + added METHOD DetectSecurity(),StartTLS(),ActivateSSL Ideia borrow from harbour
   * contrib/tipssl/test.prg
     ! updated to demostrate how to connect to gmail port 587 and outlook port 587 ( tls support )
   * source/ct/ctnet.c
     ! removed define HB_OS_WIN_USED
-  * source/ct/dattime3.c  
+  * source/ct/dattime3.c
     ! removed define HB_OS_WIN_USED
     ! moved _SVID_SOURCE define to outside HB_OS_UNIX block
-  * source/ct/disk.c  
-    ! removed define HB_OS_WIN_USED    
-  * source/ct/settime.c  
+  * source/ct/disk.c
     ! removed define HB_OS_WIN_USED
-    ! moved _SVID_SOURCE define to outside HB_OS_UNIX block    
+  * source/ct/settime.c
+    ! removed define HB_OS_WIN_USED
+    ! moved _SVID_SOURCE define to outside HB_OS_UNIX block
   * source/rtl/copyfile.c
-    ! fixed an minor typo on previus commit    #define BUFFER_SIZE  65536 ->   #define BUFFER_SIZE  65535  
+    ! fixed an minor typo on previus commit    #define BUFFER_SIZE  65536 ->   #define BUFFER_SIZE  65535
   * source/rtl/fparse.c
-    ! changed to use itemapi insted of direct structure manipulation                
+    ! changed to use itemapi insted of direct structure manipulation
     ! int -> HB_ISIZ where aplicable
     ! hb_retni -> hb_retns where aplicable
     ! hb_storni -> hb_storns where aplicable
   * source/rtl/mlcfunc.c
     ! hb_retni -> hb_retns where aplicable
     ! hb_parnl -> hb_parns where aplicable
-    ! hb_storni -> hb_storns where aplicable     
-    ! hb_stornl -> hb_storns where aplicable     
-    ! ULONG     -> HB_SIZE where aplicable 
-    ! ULONG     -> HB_ISIZ where aplicable 
+    ! hb_storni -> hb_storns where aplicable
+    ! hb_stornl -> hb_storns where aplicable
+    ! ULONG     -> HB_SIZE where aplicable
+    ! ULONG     -> HB_ISIZ where aplicable
     ! ISNUM(x) ? y : z -> hb_parnsdef( x, z )
     ! ISLOG(x) ? y : z -> hb_parldef( x, z )
   * source/rtl/samples.c
-    ! ULONG -> long  
-    ! USHORT -> int 
+    ! ULONG -> long
+    ! USHORT -> int
     ! casts to USHORT changed to int
-  * source/rtl/setkey.c  
-    ! in structure HB_SETKEY_ change SHORT iKeyCode -> int iKeyCode 	
+  * source/rtl/setkey.c
+    ! in structure HB_SETKEY_ change SHORT iKeyCode -> int iKeyCode
     ! removed ( SHORT ) typecast on integer values
     ! in all functions change SHORT iKeyCode to int iKeyCode
-    ! ULONG     -> HB_SIZE where aplicable 
+    ! ULONG     -> HB_SIZE where aplicable
   * source/rtl/gtcgi/cgiread.c
     ! ULONG -> HB_SIZE
-    ! changed to use itemapi insted of direct structure manipulation                
+    ! changed to use itemapi insted of direct structure manipulation
   * source/tip/sendmail.prg
     ! updated HB_SetMimeType to include new extension as well group same mime type in one place
   * source/vm/inet.c
-    + added INETFD function to return the socked handle      
-    
+    + added INETFD function to return the socked handle
+
 2015-02-13 13:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\filestat.c
     ! include of windows.h is now inside HB_OS_WIN block (it wasn't)
   * source\rtl\hbffind.c
     ! fixed definition of FILE_ATTRIBUTE_ENCRYPTED
 
-2015-02-13 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+2015-02-13 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/hbzlib/zip.c
     ! minor change on my previys commit moved HB_OS_WIN block before include hbzip2.h
-  ! source/rtl/bkgtsks.c    
-  ! source/rtl/diskspac.c   
-  ! source/rtl/disksphb.c   
-  ! source/rtl/filestat.c   
-  ! source/rtl/fserror.c    
-  ! source/rtl/hbffind.c    
-  ! source/rtl/hboutdbg.c   
-  ! source/rtl/net.c        
-  ! source/rtl/oemansi.c    
-  ! source/rtl/seconds.c    
-  ! source/rtl/tprinter.c   
-  ! source/rtl/win_misc.c   
+  ! source/rtl/bkgtsks.c
+  ! source/rtl/diskspac.c
+  ! source/rtl/disksphb.c
+  ! source/rtl/filestat.c
+  ! source/rtl/fserror.c
+  ! source/rtl/hbffind.c
+  ! source/rtl/hboutdbg.c
+  ! source/rtl/net.c
+  ! source/rtl/oemansi.c
+  ! source/rtl/seconds.c
+  ! source/rtl/tprinter.c
+  ! source/rtl/win_misc.c
   ! source/rtl/gtgui/gtgui.c
   ! source/rtl/gtwin/gtwin.c
     ! removed define HB_OS_WIN_USED
     ! include of windows.h is now inside HB_OS_WIN block
-  ! source/rtl/filestat.c   
+  ! source/rtl/filestat.c
     ! removed define HB_OS_WIN_USED
     ! include of windows.h is now inside HB_OS_WIN block
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
-    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 
-      is defined otherwise call stat          
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64
+      is defined otherwise call stat
   ! source/tip/mail.prg
-    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg 
+    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg
       or .jpeg. this is usefull for htlm emails with images on email body
   ! contrib/tipssl/mail.prg
-    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg 
+    ! in method attachfile, added Content-Id tag to attach file when extension of file is .png,.jpg
       or .jpeg. this is usefull for htlm emails with images on email body
-      
+
 2015-02-13 10:49 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbzlib\zip.c
     ! fixed a typo in previous commit (#if define -> #if defined)
@@ -163,41 +170,41 @@
 
 2015-02-11 19:15 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * bin/pack_src.sh
-    ! added some missing source to compress    
+    ! added some missing source to compress
   * contrib/freeimage/fi_wrp.c
     ! removed define HB_OS_WIN_USED
     ! include of windows.h is now inside HB_OS_WIN block
   * contrib/freeimage/fi_winfu.c
     ! removed define HB_OS_WIN_USED
-    ! include of windows.h is now inside HB_OS_WIN block  
-  * contrib/gtwvg/gtwvg.c  
-  * contrib/gtwvg/wvwcore.c  
-  * contrib/gtwvg/wvwutils.c  
-    ! removed define HB_OS_WIN_USED    
-  * contrib/hbcurl/Makefile 
+    ! include of windows.h is now inside HB_OS_WIN block
+  * contrib/gtwvg/gtwvg.c
+  * contrib/gtwvg/wvwcore.c
+  * contrib/gtwvg/wvwutils.c
+    ! removed define HB_OS_WIN_USED
+  * contrib/hbcurl/Makefile
     ! Added CFLAGS to increment -I../..
   * contrib/hbhpdf/harupdf.c
     ! synced with harbour where possible
-  * contrib/hbmzip/hbmzip.c 
+  * contrib/hbmzip/hbmzip.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
     ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
   * contrib/hbzlib/zip.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
-    ! in GetFileAttributes under *nix compilation  call to stat function change to test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat    
+    ! in GetFileAttributes under *nix compilation  call to stat function change to test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
   * contrib/libnf/getenvrn.c
-    ! removed define HB_OS_WIN_USED    
+    ! removed define HB_OS_WIN_USED
   * contrib/rdd_ads/rddads.h
     ! windows.h is now included inside HB_OS_WIN define block
-    ! define x64 when HB_ARCH_64BIT is defined 
+    ! define x64 when HB_ARCH_64BIT is defined
     ! small change on the #define for unix
     ! added defined to detect Ads version 10 or newer
-    ! added missing entry point for AdsDeleteFile all change borrow from harbour    
+    ! added missing entry point for AdsDeleteFile all change borrow from harbour
   * contrib/rdd_ads/adsmgmnt.c
     contrib/rdd_ads/adsfunc.c
     contrib/rdd_ads/ads1.c
     contrib/rdd_ads/ace32.c
-    ! removed define HB_OS_WIN_USED    
-  * contrib/tipssl/inetssl.h  
+    ! removed define HB_OS_WIN_USED
+  * contrib/tipssl/inetssl.h
     ! removed  #define _WINSOCKAPI_
   * include/hbapi.h
     ! changed in hb_winmainArgInit and hb_winmainArgGet to use void type insted of winapi HANDLE type

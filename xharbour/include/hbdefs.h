@@ -492,6 +492,7 @@
 #if defined( HB_CLIPPER_INT_ITEMS )
 #  define HB_INT_MAX             SHRT_MAX
 #  define HB_INT_MIN             SHRT_MIN
+#  define HB_UINT_MAX            USHRT_MAX
 #  define HB_LONG_MAX            LONG_MAX
 #  define HB_LONG_MIN            LONG_MIN
 #  define HB_ULONG_MAX           ULONG_MAX
@@ -501,6 +502,7 @@
 #elif !defined( HB_LONG_LONG_OFF ) && ULONG_MAX == UINT_MAX
 #  define HB_INT_MAX             INT_MAX
 #  define HB_INT_MIN             INT_MIN
+#  define HB_UINT_MAX            UINT_MAX
 #  define HB_LONG_MAX            LONGLONG_MAX
 #  define HB_LONG_MIN            LONGLONG_MIN
 #  define HB_ULONG_MAX           ULONGLONG_MAX
@@ -509,6 +511,7 @@
 #else
 #  define HB_INT_MAX             INT_MAX
 #  define HB_INT_MIN             INT_MIN
+#  define HB_UINT_MAX            UINT_MAX
 #  define HB_LONG_MAX            LONG_MAX
 #  define HB_LONG_MIN            LONG_MIN
 #  define HB_ULONG_MAX           ULONG_MAX
