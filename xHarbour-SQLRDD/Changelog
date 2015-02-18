@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-17 22:40 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlex1ora.c
+     ! Minor fix to hb_xgrab
+     
 2015-02-17 20:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    + source/sqlex1ora.c
    + source/sqlex2ora.c

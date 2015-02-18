@@ -4813,7 +4813,7 @@ static int sqlKeyCompareEx( SQLEXORAAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    if( HB_IS_DATE( pKey ) )
    {
       len2 = 8;
-      valbuf = ( char * ) hb_xgrab( __LINE__,__FILE__, 9 );
+      valbuf = ( char * ) hb_xgrab( 9 );
       val2 = hb_itemGetDS( pKey, valbuf );
    }
    else if( HB_IS_NUMBER( pKey ) )
