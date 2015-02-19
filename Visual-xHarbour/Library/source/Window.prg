@@ -636,6 +636,7 @@ CLASS Window INHERIT Object
    METHOD OnEraseBkGnd()
    METHOD __CreateBkBrush() VIRTUAL
    METHOD OnClose()         VIRTUAL
+   METHOD __OnClose()       VIRTUAL
 ENDCLASS
 
 PROCEDURE __WinDestruct CLASS Window
@@ -1379,37 +1380,34 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
    IF nStyle == WS_DISABLED
       lAdd := !lAdd
    ENDIF
-   //TRY
-      IF lAdd
-         ::Style := ::Style | nStyle
-       ELSE
-         ::Style := ::Style & NOT( nStyle )
-      ENDIF
-      IF ::IsWindow()
-         SWITCH nStyle
-            CASE WS_VISIBLE
-                 IF ::DesignMode
-                    BREAK
-                 ENDIF
-                 IF lAdd
-                    ::Show()
-                  ELSE
-                    ::Hide()
-                 ENDIF
-                 EXIT
-            CASE WS_DISABLED
-                 EnableWindow( ::hWnd, lAdd )
-                 EXIT
+   IF lAdd
+      ::Style := ::Style | nStyle
+    ELSE
+      ::Style := ::Style & NOT( nStyle )
+   ENDIF
+   IF ::IsWindow()
+      SWITCH nStyle
+         CASE WS_VISIBLE
+              IF ::DesignMode
+                 RETURN self
+              ENDIF
+              IF lAdd
+                 ::Show()
+               ELSE
+                 ::Hide()
+              ENDIF
+              EXIT
+         CASE WS_DISABLED
+              EnableWindow( ::hWnd, lAdd )
+              EXIT
 
-         END
-         ::SetWindowLong( GWL_STYLE, ::Style )
-         IF ::IsWindowVisible()
-            ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
-            ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-         ENDIF
+      END
+      ::SetWindowLong( GWL_STYLE, ::Style )
+      IF ::IsWindowVisible()
+         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
       ENDIF
-   //CATCH
-   //END
+   ENDIF
 RETURN self
 
 //-----------------------------------------------------------------------------------------------
