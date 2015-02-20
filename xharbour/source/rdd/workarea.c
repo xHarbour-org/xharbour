@@ -1305,7 +1305,7 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
    }
 
    /* Delete the new record */
-   if( bDeleted )
+   if( bDeleted && hb_setGetDeleted() )
       return SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
 
    return HB_SUCCESS;

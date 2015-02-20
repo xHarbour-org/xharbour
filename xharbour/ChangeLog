@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-20 22:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rdd/workarea.c
+    ! COPY TO ... SDF/DELIMITED make CA-Cl*pper compatible on deleted records
+      thanks to Joe for reporting the problem    
+
 2015-02-18 17:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbdefs.h
     ! define HB_UINT_MAX
