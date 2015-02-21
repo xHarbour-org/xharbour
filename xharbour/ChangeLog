@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-21 10:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/hbwinole.c
+    + added function IsOLEObjectRegistered( cOleName | cCLSID )  -> lRegistered
+
 2015-02-20 22:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rdd/workarea.c
     ! COPY TO ... SDF/DELIMITED make CA-Cl*pper compatible on deleted records

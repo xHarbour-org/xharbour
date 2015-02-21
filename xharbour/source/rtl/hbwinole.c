@@ -1522,6 +1522,30 @@ HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] [, cLicense] )
 }
 
 //---------------------------------------------------------------------------//
+HB_FUNC( ISOLEOBJECTREGISTERED ) // ( cOleName | cCLSID )
+{
+   HRESULT hr = REGDB_E_CLASSNOTREG;
+   LPSTR   szFilename = (LPSTR) hb_parcx( 1 );
+   LPWSTR  wzFilename;
+
+   wzFilename = hb_oleAnsiToWide( szFilename );
+
+   if( wzFilename )
+   {
+      CLSID clsid;
+
+      if( szFilename[ 0 ] == '{' )
+         hr = CLSIDFromString( wzFilename, &clsid );    //NOERROR == 0
+      else
+         hr = CLSIDFromProgID( wzFilename, &clsid );    //S_OK == 0
+
+      hb_xfree( wzFilename );
+   }
+
+   hb_retl( hr == 0 );
+}
+
+//---------------------------------------------------------------------------//
 HB_FUNC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
 {
    BSTR     bstrClassID;
