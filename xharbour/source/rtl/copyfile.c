@@ -81,7 +81,7 @@
 
 
 #ifdef HB_C52_STRICT
-#define BUFFER_SIZE 8192
+   #define BUFFER_SIZE 8192
 #else
    #define BUFFER_SIZE  65535
 #endif
@@ -136,9 +136,10 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
          BOOL                       bSuccess = GetFileInformationByHandle( ( HANDLE ) fhndSource, &hFileInfo );
 #endif
          BYTE *                     buffer;
-         USHORT                     usRead;
+         HB_SIZE                    usRead;
+         HB_SIZE                    usRead1;
 
-         buffer   = ( BYTE * ) hb_xgrab( BUFFER_SIZE );
+         buffer   = ( BYTE * ) hb_xgrab( BUFFER_SIZE +1);
 
          bRetVal  = TRUE;
 
@@ -146,12 +147,10 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
          {
             hb_evalNew( &info, block );
          }
-          usRead = hb_fsRead( fhndSource, buffer, (USHORT)BUFFER_SIZE ) ;     
-          TraceLog("aaa.log","handle %lu buf %s usread %lu\n", fhndSource,buffer,usRead);
-         while( ( usRead = hb_fsRead( fhndSource, buffer, (USHORT)BUFFER_SIZE ) ) != 0 )
+         while( ( usRead = hb_fsReadLarge( fhndSource, buffer, BUFFER_SIZE ) ) != 0 )
          {
-	        TraceLog("aaa.log","handle %lu buf %s usread %lu\n", fhndSource,buffer,usRead);
-            while( hb_fsWrite( fhndDest, buffer, usRead ) != usRead )
+	        
+            while( ( usRead1 = hb_fsWriteLarge( fhndDest, buffer, usRead ) ) != usRead )
             {
                USHORT uiAction = hb_errRT_BASE_Ext1( EG_WRITE, 2016, NULL, szDest, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 0 );
 
@@ -161,13 +160,13 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
                   break;
                }
             }
-
+            
             if( block )
             {
                blockeval( info, block, usRead );
             }
          }
-
+            
          hb_xfree( buffer );
 
          if( block )

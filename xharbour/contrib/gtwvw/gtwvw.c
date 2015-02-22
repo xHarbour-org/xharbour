@@ -364,6 +364,8 @@ static int  s_iOldCurStyle;
 
 static FHANDLE s_iStdIn, s_iStdOut, s_iStdErr;
 
+static BOOL s_bSizeIsReady = FALSE;
+static BOOL s_bIsReady = FALSE;
 static int           s_GtId;
 static HB_GT_FUNCS   SuperTable;
 #define HB_GTSUPER   (&SuperTable)
@@ -423,10 +425,10 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    
    if ( bStartMode )
    { 
-      s_pWvwData = (WVW_DATA*) hb_xgrab( sizeof (WVW_DATA ) ) ;
-      memset( s_pWvwData, 0, sizeof( WVW_DATA ) ) ;
-      s_pWvwData->s_sApp = (APP_DATA *) hb_xgrab( sizeof( APP_DATA ) );
-      memset(s_pWvwData->s_sApp, 0, sizeof( APP_DATA ) ) ;
+      s_pWvwData = (WVW_DATA*) hb_xgrabz( sizeof (WVW_DATA ) ) ;
+//       memset( s_pWvwData, 0, sizeof( WVW_DATA ) ) ;
+      s_pWvwData->s_sApp = (APP_DATA *) hb_xgrabz( sizeof( APP_DATA ) );
+//       memset(s_pWvwData->s_sApp, 0, sizeof( APP_DATA ) ) ;
       s_pWvwData->pGT = pGT;
       s_pWvwData->s_uiPaintRefresh = 100;  
       s_pWvwData->s_bMainCoordMode = FALSE;  
@@ -3134,6 +3136,159 @@ static void xUserTimerNow( UINT usWinNum, HWND hWnd, UINT message, WPARAM wParam
 
 /*-------------------------------------------------------------------*/
 
+static const  char *MsgTrans(WPARAM message)
+{
+switch (message)
+{
+case WM_NULL                      : return "WM_NULL                  ";
+case WM_CREATE                    : return "WM_CREATE                ";
+case WM_DESTROY                   : return "WM_DESTROY               ";
+case WM_MOVE                      : return "WM_MOVE                  ";
+case WM_SIZE                      : return "WM_SIZE                  ";
+case WM_ACTIVATE                  : return "WM_ACTIVATE              ";
+case WM_SETFOCUS                  : return "WM_SETFOCUS              ";
+case WM_KILLFOCUS                 : return "WM_KILLFOCUS             ";
+case WM_ENABLE                    : return "WM_ENABLE                ";
+case WM_SETREDRAW                 : return "WM_SETREDRAW             ";
+case WM_SETTEXT                   : return "WM_SETTEXT               ";
+case WM_GETTEXT                   : return "WM_GETTEXT               ";
+case WM_GETTEXTLENGTH             : return "WM_GETTEXTLENGTH         ";
+case WM_PAINT                     : return "WM_PAINT                 ";
+case WM_CLOSE                     : return "WM_CLOSE                 ";
+case WM_QUERYENDSESSION           : return "WM_QUERYENDSESSION       ";
+case WM_QUERYOPEN                 : return "WM_QUERYOPEN             ";
+case WM_ENDSESSION                : return "WM_ENDSESSION            ";
+case WM_QUIT                      : return "WM_QUIT                  ";
+case WM_ERASEBKGND                : return "WM_ERASEBKGND            ";
+case WM_SYSCOLORCHANGE            : return "WM_SYSCOLORCHANGE        ";
+case WM_SHOWWINDOW                : return "WM_SHOWWINDOW            ";
+case WM_WININICHANGE              : return "WM_WININICHANGE          ";
+case WM_DEVMODECHANGE             : return "WM_DEVMODECHANGE         ";
+case WM_ACTIVATEAPP               : return "WM_ACTIVATEAPP           ";
+case WM_FONTCHANGE                : return "WM_FONTCHANGE            ";
+case WM_TIMECHANGE                : return "WM_TIMECHANGE            ";
+case WM_CANCELMODE                : return "WM_CANCELMODE            ";
+case WM_SETCURSOR                 : return "WM_SETCURSOR             ";
+case WM_MOUSEACTIVATE             : return "WM_MOUSEACTIVATE         ";
+case WM_CHILDACTIVATE             : return "WM_CHILDACTIVATE         ";
+case WM_QUEUESYNC                 : return "WM_QUEUESYNC             ";
+case WM_GETMINMAXINFO             : return "WM_GETMINMAXINFO         ";
+case WM_PAINTICON                 : return "WM_PAINTICON             ";
+case WM_ICONERASEBKGND            : return "WM_ICONERASEBKGND        ";
+case WM_NEXTDLGCTL                : return "WM_NEXTDLGCTL            ";
+case WM_SPOOLERSTATUS             : return "WM_SPOOLERSTATUS         ";
+case WM_DRAWITEM                  : return "WM_DRAWITEM              ";
+case WM_MEASUREITEM               : return "WM_MEASUREITEM           ";
+case WM_DELETEITEM                : return "WM_DELETEITEM            ";
+case WM_VKEYTOITEM                : return "WM_VKEYTOITEM            ";
+case WM_CHARTOITEM                : return "WM_CHARTOITEM            ";
+case WM_SETFONT                   : return "WM_SETFONT               ";
+case WM_GETFONT                   : return "WM_GETFONT               ";
+case WM_SETHOTKEY                 : return "WM_SETHOTKEY             ";
+case WM_GETHOTKEY                 : return "WM_GETHOTKEY             ";
+case WM_QUERYDRAGICON             : return "WM_QUERYDRAGICON         ";
+case WM_COMPAREITEM               : return "WM_COMPAREITEM           ";
+case WM_GETOBJECT                 : return "WM_GETOBJECT             ";
+case WM_COMPACTING                : return "WM_COMPACTING            ";
+case WM_COMMNOTIFY                : return "WM_COMMNOTIFY            ";
+case WM_WINDOWPOSCHANGING         : return "WM_WINDOWPOSCHANGING     ";
+case WM_WINDOWPOSCHANGED          : return "WM_WINDOWPOSCHANGED      ";
+case WM_POWER                     : return "WM_POWER                 ";
+case WM_COPYDATA                  : return "WM_COPYDATA              ";
+case WM_CANCELJOURNAL             : return "WM_CANCELJOURNAL         ";
+case WM_NOTIFY                    : return "WM_NOTIFY                ";
+case WM_INPUTLANGCHANGEREQUEST    : return "WM_INPUTLANGCHANGEREQUEST";
+case WM_INPUTLANGCHANGE           : return "WM_INPUTLANGCHANGE       ";
+case WM_TCARD                     : return "WM_TCARD                 ";
+case WM_HELP                      : return "WM_HELP                  ";
+case WM_USERCHANGED               : return "WM_USERCHANGED           ";
+case WM_NOTIFYFORMAT              : return "WM_NOTIFYFORMAT          ";
+case WM_CONTEXTMENU               : return "WM_CONTEXTMENU           ";
+case WM_STYLECHANGING             : return "WM_STYLECHANGING         ";
+case WM_STYLECHANGED              : return "WM_STYLECHANGED          ";
+case WM_DISPLAYCHANGE             : return "WM_DISPLAYCHANGE         ";
+case WM_GETICON                   : return "WM_GETICON               ";
+case WM_SETICON                   : return "WM_SETICON               ";
+case WM_NCCREATE                  : return "WM_NCCREATE              ";
+case WM_NCDESTROY                 : return "WM_NCDESTROY             ";
+case WM_NCCALCSIZE                : return "WM_NCCALCSIZE            ";
+case WM_NCHITTEST                 : return "WM_NCHITTEST             ";
+case WM_NCPAINT                   : return "WM_NCPAINT               ";
+case WM_NCACTIVATE                : return "WM_NCACTIVATE            ";
+case WM_GETDLGCODE                : return "WM_GETDLGCODE            ";
+case WM_SYNCPAINT                 : return "WM_SYNCPAINT             ";
+case WM_NCMOUSEMOVE               : return "WM_NCMOUSEMOVE           ";
+case WM_NCLBUTTONDOWN             : return "WM_NCLBUTTONDOWN         ";
+case WM_NCLBUTTONUP               : return "WM_NCLBUTTONUP           ";
+case WM_NCLBUTTONDBLCLK           : return "WM_NCLBUTTONDBLCLK       ";
+case WM_NCRBUTTONDOWN             : return "WM_NCRBUTTONDOWN         ";
+case WM_NCRBUTTONUP               : return "WM_NCRBUTTONUP           ";
+case WM_NCRBUTTONDBLCLK           : return "WM_NCRBUTTONDBLCLK       ";
+case WM_NCMBUTTONDOWN             : return "WM_NCMBUTTONDOWN         ";
+case WM_NCMBUTTONUP               : return "WM_NCMBUTTONUP           ";
+case WM_NCMBUTTONDBLCLK           : return "WM_NCMBUTTONDBLCLK       ";
+case WM_NCXBUTTONDOWN             : return "WM_NCXBUTTONDOWN         ";
+case WM_NCXBUTTONUP               : return "WM_NCXBUTTONUP           ";
+case WM_NCXBUTTONDBLCLK           : return "WM_NCXBUTTONDBLCLK       ";
+
+case WM_KEYDOWN                   : return "WM_KEYDOWN               ";
+case WM_KEYUP                     : return "WM_KEYUP                 ";
+case WM_CHAR                      : return "WM_CHAR                  ";
+case WM_DEADCHAR                  : return "WM_DEADCHAR              ";
+case WM_SYSKEYDOWN                : return "WM_SYSKEYDOWN            ";
+case WM_SYSKEYUP                  : return "WM_SYSKEYUP              ";
+case WM_SYSCHAR                   : return "WM_SYSCHAR               ";
+case WM_SYSDEADCHAR               : return "WM_SYSDEADCHAR           ";
+case WM_KEYLAST                   : return "WM_KEYLAST               ";
+case WM_IME_STARTCOMPOSITION      : return "WM_IME_STARTCOMPOSITION  ";
+case WM_IME_ENDCOMPOSITION        : return "WM_IME_ENDCOMPOSITION    ";
+case WM_IME_COMPOSITION           : return "WM_IME_COMPOSITION       ";
+
+case WM_INITDIALOG                : return "WM_INITDIALOG            ";
+case WM_COMMAND                   : return "WM_COMMAND               ";
+case WM_SYSCOMMAND                : return "WM_SYSCOMMAND            ";
+case WM_TIMER                     : return "WM_TIMER                 ";
+case WM_HSCROLL                   : return "WM_HSCROLL               ";
+case WM_VSCROLL                   : return "WM_VSCROLL               ";
+case WM_INITMENU                  : return "WM_INITMENU              ";
+case WM_INITMENUPOPUP             : return "WM_INITMENUPOPUP         ";
+case WM_MENUSELECT                : return "WM_MENUSELECT            ";
+case WM_MENUCHAR                  : return "WM_MENUCHAR              ";
+case WM_ENTERIDLE                 : return "WM_ENTERIDLE             ";
+case WM_MENURBUTTONUP             : return "WM_MENURBUTTONUP         ";
+case WM_MENUDRAG                  : return "WM_MENUDRAG              ";
+case WM_MENUGETOBJECT             : return "WM_MENUGETOBJECT         ";
+case WM_UNINITMENUPOPUP           : return "WM_UNINITMENUPOPUP       ";
+case WM_MENUCOMMAND               : return "WM_MENUCOMMAND           ";
+case WM_CHANGEUISTATE             : return "WM_CHANGEUISTATE         ";
+case WM_UPDATEUISTATE             : return "WM_UPDATEUISTATE         ";
+case WM_QUERYUISTATE              : return "WM_QUERYUISTATE          ";
+
+case WM_CTLCOLORMSGBOX            : return "WM_CTLCOLORMSGBOX        ";
+case WM_CTLCOLOREDIT              : return "WM_CTLCOLOREDIT          ";
+case WM_CTLCOLORLISTBOX           : return "WM_CTLCOLORLISTBOX       ";
+case WM_CTLCOLORBTN               : return "WM_CTLCOLORBTN           ";
+case WM_CTLCOLORDLG               : return "WM_CTLCOLORDLG           ";
+case WM_CTLCOLORSCROLLBAR         : return "WM_CTLCOLORSCROLLBAR     ";
+case WM_CTLCOLORSTATIC            : return "WM_CTLCOLORSTATIC        ";
+
+case WM_MOUSEMOVE                 : return "WM_MOUSEMOVE             ";
+case WM_LBUTTONDOWN               : return "WM_LBUTTONDOWN           ";
+case WM_LBUTTONUP                 : return "WM_LBUTTONUP             ";
+case WM_LBUTTONDBLCLK             : return "WM_LBUTTONDBLCLK         ";
+case WM_RBUTTONDOWN               : return "WM_RBUTTONDOWN           ";
+case WM_RBUTTONUP                 : return "WM_RBUTTONUP             ";
+case WM_RBUTTONDBLCLK             : return "WM_RBUTTONDBLCLK         ";
+case WM_MBUTTONDOWN               : return "WM_MBUTTONDOWN           ";
+case WM_MBUTTONUP                 : return "WM_MBUTTONUP             ";
+case WM_MBUTTONDBLCLK             : return "WM_MBUTTONDBLCLK         ";
+case WM_MOUSEWHEEL                : return "WM_MOUSEWHEEL            ";
+default: 
+   return "semnada";
+}
+      return "semnada2";
+}      		
+
 static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 
@@ -3159,7 +3314,7 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
   pWindowData = s_pWvwData->s_pWindows[usWinNum];
   
-  //TraceLog("gt.log","HWND hWnd %p, UINT message %lu , WPARAM wParam %lu , LPARAM lParam %p\n", hWnd, message,  wParam, lParam);
+//   TraceLog("gt.log","HWND hWnd %p, UINT message %s %lu , WPARAM wParam %lu , LPARAM lParam %p\n", hWnd, MsgTrans(message), message,  wParam, lParam);
 
   switch ( message )
   {
@@ -3873,16 +4028,16 @@ static LRESULT CALLBACK hb_gt_wvwWndProc( HWND hWnd, UINT message, WPARAM wParam
 
     case WM_SIZE:
     {
-
-      if (hb_wvw_Size_Ready( 0 ))
+//    TraceLog("gt.log","HWND hWnd %p, UINT message %s %lu , WPARAM wParam %lu , LPARAM lParam %p\n", hWnd, MsgTrans(message), message,  wParam, lParam);
+      if (hb_wvw_Size_Ready( FALSE ))
       {
 
          hb_gt_wvwResetWindowSize( pWindowData, hWnd );
 
-         if ( s_pWvwData->s_sApp->pSymWVW_SIZE )
+         if ( s_pWvwData->s_sApp->pSymWVW_SIZE  && hb_vmRequestReenter())
          {
-           if( hb_vmRequestReenter() )
-           {
+ 
+           
               hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_SIZE );
               hb_vmPushNil();
               hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -3895,7 +4050,7 @@ hb_vmPushPointer( hWnd );
               hb_vmDo( 5 );
               hb_vmRequestRestore();
            }
-         }
+         
 
          return( 0 );
       }
@@ -3903,13 +4058,11 @@ hb_vmPushPointer( hWnd );
 
     case WM_MOVE:
     {
-      if (hb_wvw_Move_Ready( 0 ))
+      if (hb_wvw_Move_Ready( FALSE ))
       {
 
-         if (s_pWvwData->s_sApp->pSymWVW_MOVE )
+         if (s_pWvwData->s_sApp->pSymWVW_MOVE && hb_vmRequestReenter())
          {
-           if( hb_vmRequestReenter() )
-           {
               hb_vmPushDynSym( s_pWvwData->s_sApp->pSymWVW_MOVE );
               hb_vmPushNil();
               hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -3918,7 +4071,7 @@ hb_vmPushPointer( hWnd );
               hb_vmPushPointer((void*)   lParam  );            
               hb_vmDo( 3 );
               hb_vmRequestRestore();
-           }
+
          }
          return( 0 );
       }
@@ -3946,8 +4099,10 @@ hb_vmPushPointer( hWnd );
 
     case WM_SYSCOMMAND: /* handle system menu items */  /*SP-ADDED*/
     {
+// 	   TraceLog("gt.log" , " cheguei syscommand  LOWORD(wParam) %lu \n" , LOWORD(wParam));
        switch ( LOWORD(wParam) )
        {
+/*	       
           case SC_MAXIMIZE:
           {
              SetWindowLongPtr( pWindowData->hWnd, GWL_STYLE, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_THICKFRAME );
@@ -3958,6 +4113,28 @@ hb_vmPushPointer( hWnd );
              ShowWindow( pWindowData->hWnd, SW_NORMAL );
              return 0;
           }
+          case SC_MINIMIZE:
+          {
+             SetWindowLongPtr( pWindowData->hWnd, GWL_STYLE, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MAXIMIZEBOX|WS_THICKFRAME );
+             SetWindowPos( pWindowData->hWnd, NULL, 0, 0, 0, 0,
+                                       SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_DEFERERASE );
+
+             ShowWindow( pWindowData->hWnd, SW_HIDE );
+             ShowWindow( pWindowData->hWnd, SW_NORMAL );
+             return 0;
+          }
+          case SC_RESTORE:
+          {
+             SetWindowLongPtr( pWindowData->hWnd, GWL_STYLE, WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MAXIMIZEBOX|WS_THICKFRAME|WS_MINIMIZEBOX );
+             SetWindowPos( pWindowData->hWnd, NULL, 0, 0, 0, 0,
+                                       SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_DEFERERASE );
+
+             ShowWindow( pWindowData->hWnd, SW_HIDE );
+             ShowWindow( pWindowData->hWnd, SW_NORMAL );
+             return 0;
+          }
+          
+  */        
           case SYS_EV_MARK:
           {
              pWindowData->bBeginMarked = TRUE;
@@ -4017,26 +4194,23 @@ hb_vmPushPointer( hWnd );
 
 /*-------------------------------------------------------------------*/
 static BOOL hb_wvw_Move_Ready( BOOL b_p_IsReady )
-{
-   static BOOL s_bIsReady = FALSE;
-
+{   
    if (b_p_IsReady)
    {
       s_bIsReady = b_p_IsReady;
    }
-   return(s_bIsReady);
+   return s_bIsReady;
 }
 
 /*-------------------------------------------------------------------*/
 static BOOL hb_wvw_Size_Ready( BOOL b_p_SizeIsReady )
 {
-   static BOOL s_bSizeIsReady = FALSE;
-
+   
    if ( b_p_SizeIsReady )
    {
       s_bSizeIsReady = b_p_SizeIsReady;
    }
-   return( s_bSizeIsReady );
+   return  s_bSizeIsReady ;
 }
 
 /*-------------------------------------------------------------------*/
@@ -5630,8 +5804,8 @@ static void hb_gt_wvwWindowPrologue( void )
 
   s_pWvwData->s_usNumWindows++;
   uiWindow = s_pWvwData->s_usNumWindows ;
-  s_pWvwData->s_pWindows[ uiWindow - 1] = (WIN_DATA *) hb_xgrab( sizeof( WIN_DATA ) );
-  memset( s_pWvwData->s_pWindows[ uiWindow - 1], 0, sizeof( WIN_DATA ) ) ;
+  s_pWvwData->s_pWindows[ uiWindow - 1] = (WIN_DATA *) hb_xgrabz( sizeof( WIN_DATA ) );
+//   memset( s_pWvwData->s_pWindows[ uiWindow - 1], 0, sizeof( WIN_DATA ) ) ;
 
 }
 
@@ -8030,28 +8204,21 @@ HB_FUNC( WVW_GET_HND_WINDOW )
 
 HB_FUNC( WVW_MOVE_READY )
 {
-   BOOL bIsReady;
 
-   bIsReady = hb_wvw_Move_Ready(0);
+   hb_retl( hb_wvw_Move_Ready(0) );
 
-   if (ISLOG(1))
-   {
-      bIsReady = hb_wvw_Move_Ready(hb_parl(1));
-   }
-   hb_retl(bIsReady);
+   if ( ISLOG( 1 ) )
+       hb_wvw_Move_Ready( hb_parl( 1 ) );
+
 }
 
 HB_FUNC( WVW_SIZE_READY )
 {
-   BOOL bIsReady;
+   hb_retl( hb_wvw_Size_Ready( 0 ) );
 
-   bIsReady = hb_wvw_Size_Ready( 0 );
+   if ( ISLOG( 1 ) )
+      hb_wvw_Size_Ready( hb_parl( 1 ) );
 
-   if (ISLOG(1))
-   {
-      bIsReady = hb_wvw_Size_Ready(hb_parl(1));
-   }
-   hb_retl(bIsReady);
 }
 
 
@@ -9697,8 +9864,8 @@ void AddBitmapHandle( const char * szFileName, HBITMAP hBitmap, int iWidth, int 
   BITMAP_HANDLE * pbhNew;// = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
 //  memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
 
-  pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
-  memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
+  pbhNew = (BITMAP_HANDLE *) hb_xgrabz( sizeof( BITMAP_HANDLE ) );
+//   memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
 
   strcpy(pbhNew->szFilename, szFileName);
   pbhNew->hBitmap = hBitmap;
@@ -9743,8 +9910,8 @@ static IPicture * FindPictureHandle( const char * szFileName, int * piWidth, int
 
 static void AddPictureHandle( const char * szFileName, IPicture * iPicture, int iWidth, int iHeight)
 {
-  PICTURE_HANDLE * pphNew = (PICTURE_HANDLE *) hb_xgrab( sizeof( PICTURE_HANDLE ) );
-  memset( pphNew, 0 ,sizeof( PICTURE_HANDLE ) );
+  PICTURE_HANDLE * pphNew = (PICTURE_HANDLE *) hb_xgrabz( sizeof( PICTURE_HANDLE ) );
+//   memset( pphNew, 0 ,sizeof( PICTURE_HANDLE ) );
   strcpy(pphNew->szFilename, szFileName);
   pphNew->iPicture = iPicture;
   pphNew->iWidth = iWidth;
@@ -9791,8 +9958,8 @@ static HBITMAP FindUserBitmapHandle( const char * szFileName, int * piWidth, int
 
 static void AddUserBitmapHandle( const char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
 {
-  BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
-  memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
+  BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrabz( sizeof( BITMAP_HANDLE ) );
+//   memset( pbhNew, 0, sizeof( BITMAP_HANDLE ) );
 
   strcpy(pbhNew->szFilename, szFileName);
   pbhNew->hBitmap = hBitmap;
