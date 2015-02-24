@@ -88,26 +88,25 @@ static UINT32 hb_sxNextSeed( UINT32 ulSeed, const char * pKeyVal, UINT16 * puiKe
    uiSeedHi = ( UINT16 ) ( ulTemp1 + ulTemp2 );
    ulSeed   = ( ( UINT32 ) uiSeedHi << 16 ) + ( UINT32 ) uiSeedLo;
    uiSeedHi |= 1;
-   *puiKey  = uiSeedHi + HB_GET_LE_UINT16( pKeyVal );
+   *puiKey  = ( UINT16 ) ( uiSeedHi + HB_GET_LE_UINT16( pKeyVal ) );
    return ulSeed;
 }
 
 void hb_sxEnCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG ulLen )
 {
-   UINT32   ulSeed;
-   UINT16   uiKey;
-   UCHAR    ucChar, ucShft;
-   ULONG    ul;
-   int      i;
+   UINT32 ulSeed;
+   UINT16 uiKey;
+   UCHAR  ucChar, ucShft;
+   ULONG  ul;
+   int    i;
 
    ulSeed = hb_sxInitSeed( pKeyVal, &uiKey );
    for( ul = 0, i = 0; ul < ulLen; ul++ )
    {
-      ucChar      = ( UCHAR ) pSrc[ ul ];
-      ucShft      = ( UCHAR ) ( uiKey & 0x07 );
-      pDst[ ul ]  = ( ( ucChar >> ucShft ) + ( ucChar << ( 8 - ucShft ) ) +
-                      ( uiKey & 0xFF ) );
-      ulSeed      = hb_sxNextSeed( ulSeed, &pKeyVal[ i ], &uiKey );
+      ucChar     = ( UCHAR ) pSrc[ ul ];
+      ucShft     = ( UCHAR ) ( uiKey & 0x07 );
+      pDst[ ul ] = ( ( ucChar >> ucShft ) + ( ucChar << ( 8 - ucShft ) ) + ( uiKey & 0xFF ) );
+      ulSeed     = hb_sxNextSeed( ulSeed, &pKeyVal[ i ], &uiKey );
       if( ++i == 7 )
          i = 0;
    }
@@ -115,19 +114,19 @@ void hb_sxEnCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG u
 
 void hb_sxDeCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG ulLen )
 {
-   UINT32   ulSeed;
-   UINT16   uiKey;
-   UCHAR    ucChar, ucShft;
-   ULONG    ul;
-   int      i;
+   UINT32 ulSeed;
+   UINT16 uiKey;
+   UCHAR  ucChar, ucShft;
+   ULONG  ul;
+   int    i;
 
    ulSeed = hb_sxInitSeed( pKeyVal, &uiKey );
    for( ul = 0, i = 0; ul < ulLen; ul++ )
    {
-      ucChar      = ( UCHAR ) pSrc[ ul ] - ( uiKey & 0xFF );
-      ucShft      = ( UCHAR ) ( uiKey & 0x07 );
-      pDst[ ul ]  = ( ( ucChar << ucShft ) + ( ucChar >> ( 8 - ucShft ) ) );
-      ulSeed      = hb_sxNextSeed( ulSeed, &pKeyVal[ i ], &uiKey );
+      ucChar     = ( UCHAR ) pSrc[ ul ] - ( uiKey & 0xFF );
+      ucShft     = ( UCHAR ) ( uiKey & 0x07 );
+      pDst[ ul ] = ( char ) ( ( ucChar << ucShft ) + ( ucChar >> ( 8 - ucShft ) ) );
+      ulSeed     = hb_sxNextSeed( ulSeed, &pKeyVal[ i ], &uiKey );
       if( ++i == 7 )
          i = 0;
    }
@@ -135,8 +134,8 @@ void hb_sxDeCrypt( const char * pSrc, char * pDst, const char * pKeyVal, ULONG u
 
 static BOOL _hb_sxGetKey( PHB_ITEM pKeyItem, char * pKeyVal )
 {
-   BOOL     fResult  = FALSE;
-   PHB_ITEM pItem    = NULL;
+   BOOL     fResult = FALSE;
+   PHB_ITEM pItem   = NULL;
    ULONG    ulKey;
 
    if( ! ( hb_itemType( pKeyItem ) & HB_IT_STRING ) )

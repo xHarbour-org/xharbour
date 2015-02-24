@@ -141,20 +141,19 @@ HB_FUNC( NUMNOTX )
 
 HB_FUNC( NUMROLX )
 {
-   LONG     lNum1, lNumBak, lPattern, lTestRol;
-   USHORT   usBytes, usFor, usNum2;
+   LONG   lNum1, lNumBak, lPattern, lTestRol;
+   USHORT usBytes, usFor, usNum2;
 
    if( ISNUM( 2 ) || ISCHAR( 2 ) )
    {
-      lNum1    = __getparam( 2 );            /* Number to do ROL */
-      usNum2   = ( USHORT ) __getparam( 3 ); /* Iterations       */
+      lNum1  = __getparam( 2 );            /* Number to do ROL */
+      usNum2 = ( USHORT ) __getparam( 3 ); /* Iterations       */
 
       sizeofbits( &usBytes, &lPattern, &lTestRol );
 
-      usNum2   = usNum2 % usBytes;        /* Set usNum2 < usBytes  */
+      usNum2  = usNum2 % usBytes;          /* Set usNum2 < usBytes */
 
-      lNumBak  = lNum1 & lPattern;        /* lNumBak contain the section
-                                             to doesn't ROL               */
+      lNumBak = lNum1 & lPattern;          /* lNumBak contain the section to doesn't ROL */
 
       for( usFor = 1; usFor <= usNum2; usFor++ )
       {
@@ -177,8 +176,8 @@ HB_FUNC( NUMROLX )
 
 HB_FUNC( NUMMIRRX )
 {
-   LONG     lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
-   USHORT   usBytes, usFor;
+   LONG   lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
+   USHORT usBytes, usFor;
 
    if( ISNUM( 2 ) || ISCHAR( 2 ) )
    {
@@ -192,7 +191,6 @@ HB_FUNC( NUMMIRRX )
       {
          if( lNum1 & 1 )
          {
-
             lMirror  = lMirror << 1;   /* if the LSB of lNum1 == 1 then */
             lMirror  = lMirror | 1;    /* set the LSB of lMirror = 1    */
          }
@@ -200,7 +198,6 @@ HB_FUNC( NUMMIRRX )
             lMirror = lMirror << 1;
 
          lNum1 = lNum1 >> 1;
-
       }
       lMirror = ( lMirror & ( ~lPattern ) ) | lNumBak;
 
@@ -258,49 +255,41 @@ static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 
          lNum1 = __getparam( 2 );
 
          if( iPCount == 2 )
-            /*  If unary operation: NOT                           */
+            /*  If unary operation: NOT */
             lNumOp = ( *operation )( lNum1, 0 );
-
          else
          {
-
             for( iFor = 3; iFor <= iPCount; iFor++ )
             {
                if( ISNUM( iFor ) || ISCHAR( iFor ) )
                {
                   lNum2 = __getparam( iFor );
 
-
-                  /*  Call to operation: AND, OR, XOR                   */
+                  /*  Call to operation: AND, OR, XOR */
                   lNumOp = ( *operation )( lNum1, lNum2 );
-
                }
                else
                {
-                  /*  If error in parameter then return -1              */
+                  /*  If error in parameter then return -1 */
                   *pbOk = FALSE;
                   return -1;
                }
-
                /*  Copy result to first parameter if multi operation */
                lNum1 = lNumOp;
             }
-
          }
-
       }
       else
       {
-
-         /*  If error in parameter then return -1              */
+         /*  If error in parameter then return -1 */
          *pbOk = FALSE;
          return -1;
       }
 
       /*  Return result of operation */
-      lNumOp   = ( lNumOp & lTestMSB ) ? lNumOp | lPattern : lNumOp & ( ~lPattern );
+      lNumOp = ( lNumOp & lTestMSB ) ? lNumOp | lPattern : lNumOp & ( ~lPattern );
 
-      *pbOk    = TRUE;
+      *pbOk  = TRUE;
 
       return lNumOp;
    }
@@ -313,14 +302,11 @@ static LONG __numfun( int iPCount, LONG ( * operation )( LONG wNum1, LONG wNum2 
 
 static void sizeofbits( USHORTP pusBytes, LONG * plPattern, LONG * plTestMSB )
 {
-
-   *pusBytes = ( ( ISNIL( 1 ) || hb_parni( 1 ) == 0 ) ? sizeof( int ) * 8
-                 : ( USHORT ) hb_parni( 1 ) );
+   *pusBytes = ( USHORT ) ( ( ISNIL( 1 ) || hb_parni( 1 ) == 0 ) ? sizeof( int ) * 8 : hb_parni( 1 ) );
 
    if( *pusBytes > sizeof( LONG ) * 8 )
       *pusBytes = *pusBytes % ( sizeof( LONG ) * 8 );
 
-   *plPattern  = *pusBytes == ( sizeof( LONG ) * 8 ) ? 0 : ( -1 ) << *pusBytes;
-   *plTestMSB  = *pusBytes == 0 ? 0 : 1 << ( *pusBytes - 1 );
+   *plPattern = *pusBytes == ( sizeof( LONG ) * 8 ) ? 0 : ( -1 ) << *pusBytes;
+   *plTestMSB = *pusBytes == 0 ? 0 : 1 << ( *pusBytes - 1 );
 }
-

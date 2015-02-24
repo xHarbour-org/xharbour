@@ -638,7 +638,7 @@ UCHAR hb_cdpGetChar( PHB_CODEPAGE cdp, BOOL fCtrl, USHORT uc )
          }
       }
    }
-   return uc >= 0x100 ? '?' : ( UCHAR ) uc;
+   return uc >= 0x100 ? ( UCHAR ) '?' : ( UCHAR ) uc;
 }
 
 char * hb_cdpUTF8StringSubstr( const char * pSrc, HB_SIZE ulLen,
@@ -801,7 +801,7 @@ HB_SIZE hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp, BOOL fCtrl,
                      }
                   }
                }
-               pDst[ ulD ] = uc >= 0x100 ? '?' : ( UCHAR ) uc;
+               pDst[ ulD ] = uc >= 0x100 ? ( UCHAR ) '?' : ( UCHAR ) uc;
             }
             ++ulD;
          }

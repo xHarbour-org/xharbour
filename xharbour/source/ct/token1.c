@@ -80,14 +80,14 @@ static UCHAR ct__HB_TOUPPER( UCHAR c )
 {
    PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
 
-   return __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : HB_TOUPPER( c );
+   return __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : ( UCHAR ) HB_TOUPPER( c );
 }
 
 static UCHAR ct__HB_TOLOWER( UCHAR c )
 {
    PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
 
-   return __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : HB_TOLOWER( c );
+   return __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : ( UCHAR ) HB_TOLOWER( c );
 }
 
 #endif
@@ -127,8 +127,9 @@ static void do_token1( int iSwitch )
       case DO_TOKEN1_TOKENUPPER:
       {
          iParamCheck = ( ISCHAR( 1 ) );
-      }; break;
 
+         break;
+      }
    }
 
    if( iParamCheck )
@@ -156,8 +157,8 @@ static void do_token1( int iSwitch )
       }
       else
       {
-         pcSeparatorStr    = ( char * ) spcSeparatorStr;
-         sSeparatorStrLen  = ssSeparatorStrLen;
+         pcSeparatorStr   = ( char * ) spcSeparatorStr;
+         sSeparatorStrLen = ssSeparatorStrLen;
       }
 
       /* token counter */
@@ -195,13 +196,10 @@ static void do_token1( int iSwitch )
          if( sStrLen == 0 )
          {
             if( iNoRef )
-            {
                hb_retl( 0 );
-            }
             else
-            {
                hb_retc( "" );
-            }
+
             return;
          }
          pcRet = ( char * ) hb_xgrab( sRetStrLen = sStrLen );
@@ -250,6 +248,7 @@ static void do_token1( int iSwitch )
                case DO_TOKEN1_TOKEN:
                {
                   char cRet;
+
                   hb_retc( "" );
                   if( ISBYREF( 5 ) )
                   {
@@ -261,17 +260,23 @@ static void do_token1( int iSwitch )
                      cRet = ( char ) siPostSeparator;
                      hb_storclen( &cRet, ( siPostSeparator != -1 ? 1 : 0 ), 6 );
                   }
-               }; break;
+
+                  break;
+               }
 
                case DO_TOKEN1_NUMTOKEN:
                {
                   hb_retnl( ulToken );
-               }; break;
+
+                  break;
+               }
 
                case DO_TOKEN1_ATTOKEN:
                {
                   hb_retnl( 0 );
-               }; break;
+
+                  break;
+               }
 
                case DO_TOKEN1_TOKENLOWER:
                case DO_TOKEN1_TOKENUPPER:
@@ -289,8 +294,9 @@ static void do_token1( int iSwitch )
                      hb_storclen( pcRet, sRetStrLen, 1 );
                   }
                   hb_xfree( pcRet );
-               }; break;
 
+                  break;
+               }
             }
             return;
          }
@@ -307,14 +313,18 @@ static void do_token1( int iSwitch )
                if( pcSubStr != pc ) /* letters can be tokenizers, too,
                                           but they should not be lowercase'd */
                   *( pcRet + ( pcSubStr - pcString ) ) = TOLOWER( *pcSubStr );
-            }; break;
+
+               break;
+            }
 
             case DO_TOKEN1_TOKENUPPER:
             {
                if( pcSubStr != pc ) /* letters can be tokenizers, too,
                                           but they should not be uppercase'd */
                   *( pcRet + ( pcSubStr - pcString ) ) = TOUPPER( *pcSubStr );
-            }; break;
+
+               break;
+            }
 
             default:
                break;
@@ -383,12 +393,15 @@ static void do_token1( int iSwitch )
                hb_storclen( &cRet, ( siPostSeparator != -1 ? 1 : 0 ), 6 );
             }
 
-         }; break;
+            break;
+         }
 
          case DO_TOKEN1_NUMTOKEN:
          {
             hb_retnl( ulToken );
-         }; break;
+
+            break;
+         }
 
          case DO_TOKEN1_ATTOKEN:
          {
@@ -397,7 +410,9 @@ static void do_token1( int iSwitch )
                hb_retnl( ( LONG ) ( pcSubStr - pcString + 1 ) );
             else
                hb_retnl( 0 );
-         }; break;
+
+            break;
+         }
 
          case DO_TOKEN1_TOKENLOWER:
          case DO_TOKEN1_TOKENUPPER:
@@ -415,8 +430,9 @@ static void do_token1( int iSwitch )
                hb_storclen( pcRet, sRetStrLen, 1 );
             }
             hb_xfree( pcRet );
-         }; break;
 
+            break;
+         }
       }
 
    }
@@ -467,7 +483,10 @@ static void do_token1( int iSwitch )
                   hb_retl( 0 );
                }
             }
-         }; break;
+
+            break;
+         }
+
 
          case DO_TOKEN1_TOKENLOWER:
          case DO_TOKEN1_TOKENUPPER:
@@ -500,13 +519,16 @@ static void do_token1( int iSwitch )
                   hb_retl( 0 );
                }
             }
-         }; break;
+
+            break;
+         }
 
          case DO_TOKEN1_NUMTOKEN:
          case DO_TOKEN1_ATTOKEN:
          {
             PHB_ITEM pSubst         = NULL;
             int      iArgErrorMode  = ct_getargerrormode();
+
             if( iArgErrorMode != CT_ARGERR_IGNORE )
             {
                pSubst = ct_error_subst( ( USHORT ) iArgErrorMode, EG_ARG,
@@ -527,7 +549,9 @@ static void do_token1( int iSwitch )
             {
                hb_retnl( 0 );
             }
-         }; break;
+
+            break;
+         }
       }
    }
 
@@ -571,9 +595,7 @@ HB_FUNC( TOKENSEP )
          hb_retclen( &cRet, 1 );
       }
       else
-      {
          hb_retc( "" );
-      }
    }
    else
    {
@@ -589,4 +611,3 @@ HB_FUNC( TOKENSEP )
       }
    }
 }
-

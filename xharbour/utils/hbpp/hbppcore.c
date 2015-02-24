@@ -1972,7 +1972,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            rmlen = i - ipos + 1;
 
            /* Convert match marker into inner format */
-           lastchar = (lastchar == 'Z' ) ? 'a' : ( (char) ( (BYTE) lastchar + 1 ) );
+           lastchar = (lastchar == 'Z' ) ? ( char ) 'a' : ( ( char ) ( (BYTE) lastchar + 1 ) );
 
            expreal[1] = lastchar;
            expreal[2] = exptype;

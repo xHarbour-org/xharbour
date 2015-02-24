@@ -65,11 +65,12 @@ HB_FUNC( COMPLEMENT )
 
          if( ulLen > 0 )
          {
-            char * szBuffer = ( char * ) hb_xgrab( ulLen + 1 ), * szSrc = hb_itemGetCPtr( pItem );
+            char * szBuffer = ( char * ) hb_xgrab( ulLen + 1 );
+            char * szSrc    = hb_itemGetCPtr( pItem );
 
             for( ulPos = 0; ulPos < ulLen; ulPos++ )
             {
-               szBuffer[ ulPos ] = ~szSrc[ ulPos ];
+               szBuffer[ ulPos ] = ( char ) ~szSrc[ ulPos ];
             }
 
             hb_retclen_buffer( szBuffer, ulLen );

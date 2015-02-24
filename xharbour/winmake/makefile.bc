@@ -88,6 +88,11 @@ COMPILERLIBS   =\
 
 !if ("$(WARNINGFLAGS)"=="")
 WARNINGFLAGS =-w -w-8027 -w-8071 -w-8121
+
+!if ("$(HB_DEBUG)"=="d")
+WARNINGFLAGS =-w -w-8027 -w-8080 -w-8121
+!endif
+
 !endif
 
 !include winmake\common3.mak

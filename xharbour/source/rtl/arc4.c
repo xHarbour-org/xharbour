@@ -144,11 +144,11 @@ static _HB_INLINE_ void arc4_addrandom( const HB_U8 * dat, int datlen )
    rs.i--;
    for( n = 0; n < 256; ++n )
    {
-      rs.i           = ( rs.i + 1 );
-      si             = rs.s[ rs.i ];
-      rs.j           = rs.j + si + dat[ n % datlen ];
-      rs.s[ rs.i ]   = rs.s[ rs.j ];
-      rs.s[ rs.j ]   = si;
+      rs.i         = ( rs.i + 1 );
+      si           = rs.s[ rs.i ];
+      rs.j         = ( HB_U8 ) ( rs.j + si + dat[ n % datlen ] );
+      rs.s[ rs.i ] = rs.s[ rs.j ];
+      rs.s[ rs.j ] = si;
    }
    rs.j = rs.i;
 }
@@ -216,11 +216,11 @@ static int arc4_seed_sysctl_linux( void )
     * even if /dev/urandom is inaccessible for some reason (e.g., we're
     * running in a chroot).
     */
-   int            mib[] = { CTL_KERN, KERN_RANDOM, RANDOM_UUID };
-   HB_U8          buf[ ADD_ENTROPY ];
-   size_t         len, n;
-   unsigned int   i;
-   int            any_set;
+   int          mib[] = { CTL_KERN, KERN_RANDOM, RANDOM_UUID };
+   HB_U8        buf[ ADD_ENTROPY ];
+   size_t       len, n;
+   unsigned int i;
+   int          any_set;
 
    memset( buf, 0, sizeof( buf ) );
 
@@ -257,10 +257,10 @@ static int arc4_seed_sysctl_bsd( void )
     * This can work even if /dev/urandom is inaccessible for some reason
     * (e.g., we're running in a chroot).
     */
-   int      mib[] = { CTL_KERN, KERN_ARND };
-   HB_U8    buf[ ADD_ENTROPY ];
-   size_t   len, n;
-   int      i, any_set;
+   int    mib[] = { CTL_KERN, KERN_ARND };
+   HB_U8  buf[ ADD_ENTROPY ];
+   size_t len, n;
+   int    i, any_set;
 
    memset( buf, 0, sizeof( buf ) );
 
@@ -388,9 +388,9 @@ static int arc4_seed_urandom( void )
       "/dev/random",
       NULL
    };
-   HB_U8                buf[ ADD_ENTROPY ];
-   int                  fd, i;
-   HB_SIZE              n;
+   HB_U8   buf[ ADD_ENTROPY ];
+   int     fd, i;
+   HB_SIZE n;
 
    for( i = 0; filenames[ i ]; ++i )
    {
@@ -537,12 +537,12 @@ static _HB_INLINE_ HB_U8 arc4_getbyte( void )
 {
    HB_U8 si, sj;
 
-   rs.i           = rs.i + 1;
-   si             = rs.s[ rs.i ];
-   rs.j           = rs.j + si;
-   sj             = rs.s[ rs.j ];
-   rs.s[ rs.i ]   = sj;
-   rs.s[ rs.j ]   = si;
+   rs.i         = rs.i + 1;
+   si           = rs.s[ rs.i ];
+   rs.j         = ( HB_U8 ) ( rs.j + si );
+   sj           = rs.s[ rs.j ];
+   rs.s[ rs.i ] = sj;
+   rs.s[ rs.j ] = si;
 
    return rs.s[ ( si + sj ) & 0xff ];
 }
@@ -551,10 +551,10 @@ static _HB_INLINE_ HB_U32 arc4_getword( void )
 {
    HB_U32 val;
 
-   val   = arc4_getbyte() << 24;
-   val   |= arc4_getbyte() << 16;
-   val   |= arc4_getbyte() << 8;
-   val   |= arc4_getbyte();
+   val  = arc4_getbyte() << 24;
+   val |= arc4_getbyte() << 16;
+   val |= arc4_getbyte() << 8;
+   val |= arc4_getbyte();
 
    return val;
 }

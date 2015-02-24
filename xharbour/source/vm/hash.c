@@ -72,13 +72,13 @@
 
 static int s_memicmp( char * pStr1, HB_SIZE ulLen1, char * pStr2, HB_SIZE ulLen2, BOOL fCase )
 {
-   HB_SIZE        ul, ulLen;
-   unsigned char  c1, c2;
-   int            ret;
+   HB_SIZE       ul, ulLen;
+   unsigned char c1, c2;
+   int           ret;
 
    ulLen = ulLen1 < ulLen2 ? ulLen1 : ulLen2;
 
-   ret   = 0;
+   ret = 0;
 
    if( fCase )
    {
@@ -98,8 +98,8 @@ static int s_memicmp( char * pStr1, HB_SIZE ulLen1, char * pStr2, HB_SIZE ulLen2
    {
       for( ul = 0; ul < ulLen; ul++ )
       {
-         c1 = HB_TOUPPER( ( unsigned char ) pStr1[ ul ] );
-         c2 = HB_TOUPPER( ( unsigned char ) pStr2[ ul ] );
+         c1 = ( unsigned char ) HB_TOUPPER( ( unsigned char ) pStr1[ ul ] );
+         c2 = ( unsigned char ) HB_TOUPPER( ( unsigned char ) pStr2[ ul ] );
 
          if( c1 != c2 )
          {
@@ -128,8 +128,8 @@ static int s_hashOrderComplex( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bCase )
       {
          if( pFirst->type == HB_IT_DOUBLE || pSecond->type == HB_IT_DOUBLE )
          {
-            double   d1 = hb_itemGetND( pFirst );
-            double   d2 = hb_itemGetND( pSecond );
+            double d1 = hb_itemGetND( pFirst );
+            double d2 = hb_itemGetND( pSecond );
 
             if( d1 < d2 )
                return -1;

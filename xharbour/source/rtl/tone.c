@@ -86,15 +86,15 @@ HB_FUNC( HB_TONE )
 void _winTone( UINT uFrequency, double dwDuration, BOOL bSmoothing, UINT uVolume )
 {
    WAVEFORMATEX wfx;
-   HWAVEOUT hWaveOut = NULL;
+   HWAVEOUT     hWaveOut = NULL;
 
-   wfx.wFormatTag = WAVE_FORMAT_PCM;
-   wfx.nChannels = 1;
-   wfx.nSamplesPerSec = SAMPLING_RATE;
+   wfx.wFormatTag      = WAVE_FORMAT_PCM;
+   wfx.nChannels       = 1;
+   wfx.nSamplesPerSec  = SAMPLING_RATE;
    wfx.nAvgBytesPerSec = SAMPLING_RATE;
-   wfx.nBlockAlign = 1;
-   wfx.wBitsPerSample = 8;
-   wfx.cbSize = 0;
+   wfx.nBlockAlign     = 1;
+   wfx.wBitsPerSample  = 8;
+   wfx.cbSize          = 0;
 
    /*
    WAVE_MAPPER is the most commonly used device
@@ -104,13 +104,13 @@ void _winTone( UINT uFrequency, double dwDuration, BOOL bSmoothing, UINT uVolume
     */
    if( waveOutOpen( &hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL ) == MMSYSERR_NOERROR )
    {
-      char amp = uVolume;
-      int i;
-      unsigned char* buffer = (unsigned char*) hb_xgrab( (ULONG) dwDuration );
-      double dKoef = uFrequency * 2 * 3.1416 / SAMPLING_RATE;
-      WAVEHDR wh;
+      char            amp = ( char ) uVolume;
+      int             i;
+      unsigned char * buffer = (unsigned char*) hb_xgrab( (ULONG) dwDuration );
+      double          dKoef  = uFrequency * 2 * 3.1416 / SAMPLING_RATE;
+      WAVEHDR         wh;
 
-      if ( buffer )
+      if( buffer )
       {
          wh.lpData = (LPSTR) buffer;
          wh.dwBufferLength = (DWORD) dwDuration;
@@ -122,7 +122,7 @@ void _winTone( UINT uFrequency, double dwDuration, BOOL bSmoothing, UINT uVolume
             wh.dwFlags = WHDR_BEGINLOOP | WHDR_ENDLOOP | WHDR_PREPARED;
             wh.dwLoops = 1;
 
-            if ( bSmoothing )
+            if( bSmoothing )
             {
                /*
                 * Manipulating data to smooth sound from clicks at the start
@@ -165,7 +165,7 @@ void _winTone( UINT uFrequency, double dwDuration, BOOL bSmoothing, UINT uVolume
             /*
              * Play the sound here
              */
-            if ( waveOutWrite( hWaveOut, &wh, sizeof(WAVEHDR) ) == MMSYSERR_NOERROR )
+            if( waveOutWrite( hWaveOut, &wh, sizeof(WAVEHDR) ) == MMSYSERR_NOERROR )
             {
                /*
                 * Wait until the sound is finished

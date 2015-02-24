@@ -491,7 +491,7 @@ static void hb_hsxHashStr( const char * pStr, ULONG ulLen, BYTE * pKey, int iKey
          iBitNum  = hb_hsxHashVal( c1, c2, iKeyBits, fNoCase, iFilter, fUseHash );
          if( iBitNum-- )
          {
-            pKey[ iBitNum >> 3 ] |= 0x80 >> ( iBitNum & 7 );
+            pKey[ iBitNum >> 3 ] |= ( BYTE ) ( 0x80 >> ( iBitNum & 7 ) );
          }
          c1 = c2;
       }
@@ -1436,8 +1436,9 @@ static int hb_hsxCreate( const char * szFile, int iBufSize, int iKeySize,
       ulBufSize = HSXMINBUF_LEN;
    else if( ulBufSize > HSXMAXBUF_LEN )
       ulBufSize = HSXMAXBUF_LEN;
-   uiRecordSize   = ( USHORT ) 0x08 << iKeySize;
-   ulBufSize      /= uiRecordSize;
+
+   uiRecordSize = ( USHORT ) ( 0x08 << iKeySize );
+   ulBufSize   /= uiRecordSize;
    if( ulBufSize == 0 )
       ulBufSize = 1;
 

@@ -103,7 +103,7 @@ static void do_charop( int iMode )
          /* NOT */
          case DO_CHAROP_CHARNOT:
             for( sPos = 0; sPos < sStrLen; ++sPos )
-               pucResult[ sPos ] = ~pucString[ sPos ];
+               pucResult[ sPos ] = ( unsigned char ) ~pucString[ sPos ];
             break;
 
          /* SHL */
@@ -115,7 +115,7 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             else
                for( sPos = 0; sPos < sStrLen; ++sPos )
-                  pucResult[ sPos ] = pucString[ sPos ] << iSHL;
+                  pucResult[ sPos ] = ( unsigned char ) ( pucString[ sPos ] << iSHL );
             break;
          }
 
@@ -128,7 +128,7 @@ static void do_charop( int iMode )
                hb_xmemcpy( pucResult, pucString, (size_t) sStrLen );
             else
                for( sPos = 0; sPos < sStrLen; ++sPos )
-                  pucResult[ sPos ] = pucString[ sPos ] >> iSHR;
+                  pucResult[ sPos ] = ( unsigned char ) ( pucString[ sPos ] >> iSHR );
             break;
          }
 

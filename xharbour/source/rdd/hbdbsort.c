@@ -60,7 +60,7 @@ BOOL hb_dbQSortInit( LPDBQUICKSORT pQuickSort, LPDBSORTINFO pSortInfo, USHORT ui
       return FALSE;
 
    /* Alloc buffers */
-   pQuickSort->uiMaxRecords   = USHRT_MAX / uiRecordLen;
+   pQuickSort->uiMaxRecords   = ( USHORT ) ( USHRT_MAX / uiRecordLen );
    pQuickSort->pBuffer        = ( BYTE * ) hb_xgrab( pQuickSort->uiMaxRecords * uiRecordLen );
    pQuickSort->pSwapBufferA   = ( BYTE * ) hb_xgrab( uiRecordLen );
    pQuickSort->pSwapBufferB   = ( BYTE * ) hb_xgrab( uiRecordLen );

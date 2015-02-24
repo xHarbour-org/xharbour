@@ -66,7 +66,7 @@
 #if defined( HB_OS_WIN )
 
    #include <windows.h>
-#endif   
+#endif
 #if defined( HB_OS_WIN )
 
 #if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \
@@ -125,7 +125,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
    #if defined( __BORLANDC__ ) || defined( __DMC__ )
 
    _DX   = usPort;
-   _AL   = usVal;
+   _AL   = ( BYTE ) usVal;
    __emit__( 0xEE );         /* ASM OUT DX, AL */
 
    #elif (( defined( __XCC__ ) || defined( __POCC__ ) ) && defined( _M_IX86 )) ||\

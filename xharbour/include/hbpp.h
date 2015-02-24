@@ -223,7 +223,7 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 #define HB_PP_TOKEN_STATIC       0x4000
 #define HB_PP_TOKEN_PREDEFINED   0x8000
 
-#define HB_PP_TOKEN_SETTYPE(t,n) do{ (t)->type = ( (t)->type & 0xff00 ) | (n); } while(0)
+#define HB_PP_TOKEN_SETTYPE(t,n) do{ (t)->type = ( (t)->type & ( USHORT ) 0xff00 ) | (n); } while(0)
 
 #define HB_PP_TOKEN_ALLOC(t)     ( ( (t) & HB_PP_TOKEN_STATIC ) == 0 )
 #define HB_PP_TOKEN_ISPREDEF(t)  ( ( (t)->type & HB_PP_TOKEN_PREDEFINED ) != 0 )
@@ -492,9 +492,8 @@ HB_PP_MARKERLST, * PHB_PP_MARKERLST;
 
 typedef struct
 {
-   USHORT   canrepeat;
-   /* filled when pattern matches for substitution, cleared after */
-   USHORT   matches;
+   USHORT         canrepeat;
+   USHORT         matches;          /* filled when pattern matches for substitution, cleared after */
    PHB_PP_RESULT  pResult;
 }
 HB_PP_MARKER, * PHB_PP_MARKER;
@@ -506,7 +505,7 @@ typedef struct _HB_PP_RULE
    PHB_PP_TOKEN   pResult;          /* result patern or NULL */
    USHORT         mode;             /* comparison mode HB_PP_CMP_* */
    USHORT         markers;          /* number of markers in marker table */
-   /* filled when pattern matches for substitution, cleared after */
+                                    /* filled when pattern matches for substitution, cleared after */
    PHB_PP_MARKER  pMarkers;         /* marker table */
    PHB_PP_TOKEN   pNextExpr;        /* next expression after match pattern */
 }
@@ -514,47 +513,46 @@ HB_PP_RULE, * PHB_PP_RULE;
 
 typedef struct _HB_PP_DEFRULE
 {
-   PHB_PP_TOKEN   pMatch;
-   PHB_PP_TOKEN   pResult;
-   USHORT         mode;
-   USHORT         markers;
-   HB_SIZE          repeatbits;
+   PHB_PP_TOKEN pMatch;
+   PHB_PP_TOKEN pResult;
+   USHORT       mode;
+   USHORT       markers;
+   HB_SIZE      repeatbits;
 }
 HB_PP_DEFRULE, * PHB_PP_DEFRULE;
 
 typedef struct
 {
-   char *   name;       /* input name */
-   HB_SIZE    len;        /* input name length */
-   char *   value;      /* output name */
-   USHORT   type;       /* HB_PP_TOKEN_* */
+   char *  name;                    /* input name */
+   HB_SIZE len;                     /* input name length */
+   char *  value;                   /* output name */
+   USHORT  type;                    /* HB_PP_TOKEN_* */
 }
 HB_PP_OPERATOR, * PHB_PP_OPERATOR;
 
 typedef struct
 {
-   char *   pBufPtr;
-   HB_SIZE    ulLen;
-   HB_SIZE    ulAllocated;
+   char *  pBufPtr;
+   HB_SIZE ulLen;
+   HB_SIZE ulAllocated;
 }
 HB_MEM_BUFFER, * PHB_MEM_BUFFER;
 
 typedef struct _HB_PP_FILE
 {
-   char *   szFileName;          /* input file name */
-   FILE *   file_in;             /* input file handle */
-   PHB_PP_TOKEN pTokenList;      /* current line decoded to tokens */
-   int      iCurrentLine;        /* current line in file */
-   int      iLastLine;           /* last non empty generated line */
-   int      iLastDisp;           /* last shown line number */
-   int      iTokens;             /* number of decoded tokens */
-   BOOL     fGenLineInfo;        /* #line information should be generated */
-   BOOL     fEof;                /* the end of file reached */
+   char *       szFileName;         /* input file name */
+   FILE *       file_in;            /* input file handle */
+   PHB_PP_TOKEN pTokenList;         /* current line decoded to tokens */
+   int          iCurrentLine;       /* current line in file */
+   int          iLastLine;          /* last non empty generated line */
+   int          iLastDisp;          /* last shown line number */
+   int          iTokens;            /* number of decoded tokens */
+   BOOL         fGenLineInfo;       /* #line information should be generated */
+   BOOL         fEof;               /* the end of file reached */
+   const char * pLineBuf;           /* buffer for parsing external lines */
+   HB_SIZE      ulLineBufLen;       /* size of external line buffer */
 
-   const char * pLineBuf;        /* buffer for parsing external lines */
-   HB_SIZE    ulLineBufLen;        /* size of external line buffer */
-
-   struct _HB_PP_FILE * pPrev;   /* previous file, the one which included this file */
+   struct _HB_PP_FILE * pPrev;      /* previous file, the one which included this file */
 }
 HB_PP_FILE, * PHB_PP_FILE;
 
@@ -563,77 +561,77 @@ HB_PP_FILE, * PHB_PP_FILE;
 typedef struct
 {
    /* common for all included files */
-   PHB_PP_OPERATOR pOperators;   /* user defined operators */
-   PHB_PP_RULE    pDefinitions;  /* #define table */
-   PHB_PP_RULE    pTranslations; /* #[x]translate table */
-   PHB_PP_RULE    pCommands;     /* #[x]command table */
-   int            iOperators;    /* number of user defined operators */
-   int            iDefinitions;  /* number of rules in pDefinitions */
-   int            iTranslations; /* number of rules in pTranslations */
-   int            iCommands;     /* number of rules in pCommands */
-   BYTE           pMap[ HB_PP_HASHID_MAX ]; /* translation map */
+   PHB_PP_OPERATOR pOperators;      /* user defined operators */
+   PHB_PP_RULE     pDefinitions;    /* #define table */
+   PHB_PP_RULE     pTranslations;   /* #[x]translate table */
+   PHB_PP_RULE     pCommands;       /* #[x]command table */
+   int             iOperators;      /* number of user defined operators */
+   int             iDefinitions;    /* number of rules in pDefinitions */
+   int             iTranslations;   /* number of rules in pTranslations */
+   int             iCommands;       /* number of rules in pCommands */
+   BYTE            pMap[ HB_PP_HASHID_MAX ]; /* translation map */
 
-   PHB_PP_TOKEN   pTokenOut;     /* preprocessed tokens */
-   PHB_PP_TOKEN * pNextTokenPtr; /* pointer to the last NULL pointer in token list */
+   PHB_PP_TOKEN    pTokenOut;       /* preprocessed tokens */
+   PHB_PP_TOKEN *  pNextTokenPtr;   /* pointer to the last NULL pointer in token list */
 
-   PHB_MEM_BUFFER pDumpBuffer;   /* buffer for dump output */
-   PHB_MEM_BUFFER pOutputBuffer; /* buffer for preprocessed line */
+   PHB_MEM_BUFFER  pDumpBuffer;     /* buffer for dump output */
+   PHB_MEM_BUFFER  pOutputBuffer;   /* buffer for preprocessed line */
 
-   int      iLineTot;            /* total number of parsed lines */
-   int      iCycle;              /* translation counter */
-   int      iMaxCycles;          /* maximum number of translations */
-   int      iHideStrings;        /* hidden string mode */
-   BOOL     fTracePragmas;       /* display information about set pragmas */
-   BOOL     fWritePreprocesed;   /* write preprocessed data to file (.ppo) */
-   BOOL     fWriteTrace;         /* write translation to file (.ppt) */
+   int             iLineTot;        /* total number of parsed lines */
+   int             iCycle;          /* translation counter */
+   int             iMaxCycles;      /* maximum number of translations */
+   int             iHideStrings;    /* hidden string mode */
+   BOOL            fTracePragmas;   /* display information about set pragmas */
+   BOOL            fWritePreprocesed; /* write preprocessed data to file (.ppo) */
+   BOOL            fWriteTrace;     /* write translation to file (.ppt) */
 
-   HB_PATHNAMES * pIncludePath;  /* search path(s) for included files */
+   HB_PATHNAMES *  pIncludePath;    /* search path(s) for included files */
 
-   char *   szOutFileName;       /* output file name */
-   FILE *   file_out;            /* output file handle */
-   char *   szTraceFileName;     /* trace output file name */
-   FILE *   file_trace;          /* trace output file handle */
+   char *          szOutFileName;   /* output file name */
+   FILE *          file_out;        /* output file handle */
+   char *          szTraceFileName; /* trace output file name */
+   FILE *          file_trace;      /* trace output file handle */
 
-   BOOL     fQuiet;              /* do not show standard information */
-   BOOL     fEscStr;             /* use \ in strings as escape character */
-   BOOL     fError;              /* indicates error in last operation */
-   int      iErrors;             /* number of error during preprocessing */
-   int      iCondCompile;        /* current conditional compilation flag, when not 0 disable preprocessing and output */
-   int      iCondCount;          /* number of nested #if[n]def directive */
-   int      iCondStackSize;      /* size of conditional compilation stack */
-   int *    pCondStack;          /* conditional compilation stack */
+   BOOL            fQuiet;          /* do not show standard information */
+   BOOL            fEscStr;         /* use \ in strings as escape character */
+   BOOL            fError;          /* indicates error in last operation */
+   int             iErrors;         /* number of error during preprocessing */
+   int             iCondCompile;    /* current conditional compilation flag, when not 0 disable preprocessing and output */
+   int             iCondCount;      /* number of nested #if[n]def directive */
+   int             iCondStackSize;  /* size of conditional compilation stack */
+   int *           pCondStack;      /* conditional compilation stack */
 
    /* used to divide line per tokens and tokens manipulations */
-   PHB_MEM_BUFFER pBuffer;       /* buffer for input and output line */
-   int      iSpaces;             /* leading spaces for next token */
-   int      iSpacesNL;           /* leading spaces ';' token (fCanNextLine) if it will not be line concatenator */
-   int      iSpacesMin;          /* minimal number of leading spaces for next token */
-   int      iLastType;           /* last token type */
-   BOOL     fCanNextLine;        /* ';' token found and we do not know yet if it's command separator or line concatenator */
-   BOOL     fDirective;          /* # directives is parsed */
-   BOOL     fNewStatement;       /* set to TRUE at line begining or after each ';' token */
-   PHB_PP_TOKEN   pFuncOut;      /* function used for each line in HB_PP_STREAM_* dumping */
-   PHB_PP_TOKEN   pFuncEnd;      /* end function for HB_PP_STREAM_* dumping */
-   PHB_MEM_BUFFER pStreamBuffer; /* buffer for stream output */
-   int      iStreamDump;         /* stream output, see HB_PP_STREAM_* */
-   int      iDumpLine;           /* line where current dump output begins */
-   int      iInLineCount;        /* number of hb_inLine() functions */
-   int      iInLineState;        /* hb_inLine() state */
-   int      iInLineBraces;       /* braces counter for hb_inLine() */
-   int      iNestedBlock;        /* nested extended block counter */
-   int      iBlockState;         /* state of extended block declaration */
+   PHB_MEM_BUFFER  pBuffer;         /* buffer for input and output line */
+   int             iSpaces;         /* leading spaces for next token */
+   int             iSpacesNL;       /* leading spaces ';' token (fCanNextLine) if it will not be line concatenator */
+   int             iSpacesMin;      /* minimal number of leading spaces for next token */
+   int             iLastType;       /* last token type */
+   BOOL            fCanNextLine;    /* ';' token found and we do not know yet if it's command separator or line concatenator */
+   BOOL            fDirective;      /* # directives is parsed */
+   BOOL            fNewStatement;   /* set to TRUE at line begining or after each ';' token */
+   PHB_PP_TOKEN    pFuncOut;        /* function used for each line in HB_PP_STREAM_* dumping */
+   PHB_PP_TOKEN    pFuncEnd;        /* end function for HB_PP_STREAM_* dumping */
+   PHB_MEM_BUFFER  pStreamBuffer;   /* buffer for stream output */
+   int             iStreamDump;     /* stream output, see HB_PP_STREAM_* */
+   int             iDumpLine;       /* line where current dump output begins */
+   int             iInLineCount;    /* number of hb_inLine() functions */
+   int             iInLineState;    /* hb_inLine() state */
+   int             iInLineBraces;   /* braces counter for hb_inLine() */
+   int             iNestedBlock;    /* nested extended block counter */
+   int             iBlockState;     /* state of extended block declaration */
 
-   PHB_PP_FILE pFile;            /* currently preprocessed file structure */
-   int      iFiles;              /* number of open files */
+   PHB_PP_FILE     pFile;           /* currently preprocessed file structure */
+   int             iFiles;          /* number of open files */
 
-   void *   cargo;               /* parameter passed to user functions */
-   PHB_PP_OPEN_FUNC  pOpenFunc;  /* function to open files */
-   PHB_PP_CLOSE_FUNC pCloseFunc; /* function to close files */
-   PHB_PP_ERROR_FUNC pErrorFunc; /* function to generate errors */
-   PHB_PP_DISP_FUNC  pDispFunc;  /* function to redirect stdout messages */
-   PHB_PP_DUMP_FUNC  pDumpFunc;  /* function for catching #pragma dump data */
-   PHB_PP_INLINE_FUNC pInLineFunc; /* function for hb_inLine(...) {...} blocks */
-   PHB_PP_SWITCH_FUNC pSwitchFunc; /* function for compiler switches with #pragma ... */
+   void *   cargo;                  /* parameter passed to user functions */
+   PHB_PP_OPEN_FUNC   pOpenFunc;    /* function to open files */
+   PHB_PP_CLOSE_FUNC  pCloseFunc;   /* function to close files */
+   PHB_PP_ERROR_FUNC  pErrorFunc;   /* function to generate errors */
+   PHB_PP_DISP_FUNC   pDispFunc;    /* function to redirect stdout messages */
+   PHB_PP_DUMP_FUNC   pDumpFunc;    /* function for catching #pragma dump data */
+   PHB_PP_INLINE_FUNC pInLineFunc;  /* function for hb_inLine(...) {...} blocks */
+   PHB_PP_SWITCH_FUNC pSwitchFunc;  /* function for compiler switches with #pragma ... */
 
    int aaSwitchState[ 'z' ][ HB_PP_MAX_SWITCH_STATES + 1 ];
    int iPushPop;

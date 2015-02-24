@@ -4207,10 +4207,10 @@ static void hb_compPCodeEnumAssignedUnused( PFUNCTION pFunc, PHB_OPT_LOCAL pLoca
       else if( pFunc->pCode[ nPos ] == HB_P_BASELINE )
          nLine = nBase = HB_PCODE_MKUSHORT( &pFunc->pCode[ nPos + 1 ] );
       else if( pFunc->pCode[ nPos ] == HB_P_LINEOFFSET )
-         nLine = nBase + pFunc->pCode[ nPos + 1 ];
+         nLine = nBase + ( SHORT ) pFunc->pCode[ nPos + 1 ];
 
       nPredPos = nPos;
-      nPos += hb_compPCodeSize( pFunc, nPos );
+      nPos    += hb_compPCodeSize( pFunc, nPos );
    }
    hb_xfree( pMap );
 }

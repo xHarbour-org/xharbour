@@ -441,7 +441,7 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
          case 'Q':
             pFieldInfo.uiType = HB_FT_VARLENGTH;
-            pFieldInfo.uiLen  = uiLen > 255 ? 255 : ( uiLen == 0 ? 1 : uiLen );
+            pFieldInfo.uiLen  = ( USHORT ) ( uiLen > 255 ? 255 : ( uiLen == 0 ? 1 : uiLen ) );
             break;
 
          case 'M':
@@ -451,7 +451,7 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
          case 'V':
             pFieldInfo.uiType = HB_FT_ANY;
-            pFieldInfo.uiLen  = ( uiLen < 3 || uiLen == 5 ) ? 6 : uiLen;
+            pFieldInfo.uiLen  = ( USHORT ) ( ( uiLen < 3 || uiLen == 5 ) ? 6 : uiLen );
             break;
 
          case 'P':

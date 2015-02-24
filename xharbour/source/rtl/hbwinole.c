@@ -1522,7 +1522,7 @@ HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] [, cLicense] )
 }
 
 //---------------------------------------------------------------------------//
-static HRESULT GetObjectCLSID( LPSTR lpszOle, LPCLSID rclsid, LPSTR * lpszclsid )
+static HRESULT GetObjectCLSID( LPSTR lpszOle, LPCLSID rclsid, LPSTR * lpszRet )
 {
    HRESULT hr = REGDB_E_CLASSNOTREG;
    LPWSTR  lpwz;
@@ -1538,11 +1538,19 @@ static HRESULT GetObjectCLSID( LPSTR lpszOle, LPCLSID rclsid, LPSTR * lpszclsid 
 
       hb_xfree( lpwz );
 
-      if( hr == 0 && StringFromCLSID( rclsid, &lpwz ) == S_OK )
+      if( hr == 0 )
       {
-         *lpszclsid = hb_oleWideToAnsi( lpwz );
+         if( lpszOle[ 0 ] == '{' )
+            hr = ProgIDFromCLSID( rclsid, &lpwz );  /* S_OK */
+         else
+            hr = StringFromCLSID( rclsid, &lpwz );  /* S_OK */
 
-         CoTaskMemFree( lpwz );
+         if( hr == S_OK && lpwz )
+         {
+            *lpszRet = hb_oleWideToAnsi( lpwz );
+
+            CoTaskMemFree( lpwz );
+         }
       }
    }
 
@@ -1550,35 +1558,35 @@ static HRESULT GetObjectCLSID( LPSTR lpszOle, LPCLSID rclsid, LPSTR * lpszclsid 
 }
 
 //---------------------------------------------------------------------------//
-HB_FUNC( ISOLEOBJECTREGISTERED ) // ( cOleName | cCLSID [, @cCLSID] )
+HB_FUNC( ISOLEOBJECTREGISTERED ) // ( cOleName|cCLSID [, @cCLSID|@cOleName] )
 {
    HRESULT hr;
-   LPSTR   szOLE   = (LPSTR) hb_parcx( 1 );
-   LPSTR   szCLSID = NULL;
+   LPSTR   szOLE = (LPSTR) hb_parcx( 1 );
+   LPSTR   szRET = NULL;
    CLSID   clsid;
 
-   hr = GetObjectCLSID( szOLE, &clsid, &szCLSID );
+   hr = GetObjectCLSID( szOLE, &clsid, &szRET );
 
-   if( hr == 0 && szCLSID )
+   if( hr == 0 )
    {
       if( ISBYREF( 2 ) )
-         hb_storclenAdopt( szCLSID, strlen( szCLSID ), 2 );
+         hb_storclenAdopt( szRET, strlen( szRET ), 2 );
       else
-         hb_xfree( szCLSID );
+         hb_xfree( szRET );
    }
 
    hb_retl( hr == 0 );
 }
 
 //---------------------------------------------------------------------------//
-HB_FUNC( ISOLEOBJECTACTIVE ) // ( cOleName | cCLSID [, @cCLSID] )
+HB_FUNC( ISOLEOBJECTACTIVE ) // ( cOleName|cCLSID [, @cCLSID|@cOleName] )
 {
    HRESULT hr;
-   LPSTR   szOLE   = (LPSTR) hb_parcx( 1 );
-   LPSTR   szCLSID = NULL;
+   LPSTR   szOLE = (LPSTR) hb_parcx( 1 );
+   LPSTR   szRET = NULL;
    CLSID   clsid;
 
-   hr = GetObjectCLSID( szOLE, &clsid, &szCLSID );
+   hr = GetObjectCLSID( szOLE, &clsid, &szRET );
 
    if( hr == 0 )
    {
@@ -1587,9 +1595,9 @@ HB_FUNC( ISOLEOBJECTACTIVE ) // ( cOleName | cCLSID [, @cCLSID] )
       hr = GetActiveObject( &clsid, NULL, &pUnk );
 
       if( ISBYREF( 2 ) )
-         hb_storclenAdopt( szCLSID, strlen( szCLSID ), 2 );
+         hb_storclenAdopt( szRET, strlen( szRET ), 2 );
       else
-         hb_xfree( szCLSID );
+         hb_xfree( szRET );
    }
 
    hb_retl( hr == 0 );

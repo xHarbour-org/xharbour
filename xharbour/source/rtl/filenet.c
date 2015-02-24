@@ -72,7 +72,7 @@
 // #include "hbstack.h"
 #include "hbvm.h"
 #include "hbipapi.h"
-#include "thread.h" 
+#include "thread.h"
 #include "directry.ch"
 
 #if ! defined( HB_OS_WIN_CE )
@@ -86,7 +86,7 @@
 
 #define HB_FLOCK_RESIZE 16
 
-#define HB_LENGTH_ACK   4 
+#define HB_LENGTH_ACK   4
 static char       szDataACK[ HB_LENGTH_ACK ];
 
 static PHB_FILE   s_openFiles = NULL;
@@ -927,12 +927,12 @@ HB_SIZE hb_fileNetReadAt( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize, HB_FOF
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1004 );
       if( ulLen )
       {
-         char *   ptrBuf;
-         USHORT   uiError;
+         char * ptrBuf;
+         USHORT uiError;
 
-         ptrBuf   = szBuffer + HB_LENGTH_ACK;
-         ulRead   = ulLen - 3;
-         uiError  = HB_GET_BE_UINT32( ptrBuf );
+         ptrBuf  = szBuffer + HB_LENGTH_ACK;
+         ulRead  = ulLen - 3;
+         uiError = ( USHORT ) HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
             HB_MEMCPY( pBuffer, ptrBuf + 4, ( size_t ) ulRead );
@@ -967,12 +967,12 @@ HB_SIZE hb_fileNetReadLarge( PHB_FILE pFile, void * pBuffer, HB_SIZE ulSize )
       ulLen = hb_NetSingleSendRecv( pFile->hSocket, szData, nSend + HB_LENGTH_ACK, 1008 );
       if( ulLen )
       {
-         char *   ptrBuf;
-         USHORT   uiError;
+         char * ptrBuf;
+         USHORT uiError;
 
-         ptrBuf   = szBuffer + HB_LENGTH_ACK;
-         ulRead   = ulLen - 3;
-         uiError  = HB_GET_BE_UINT32( ptrBuf );
+         ptrBuf  = szBuffer + HB_LENGTH_ACK;
+         ulRead  = ulLen - 3;
+         uiError = ( USHORT ) HB_GET_BE_UINT32( ptrBuf );
          hb_fsSetError( uiError );
          if( ulRead )
             HB_MEMCPY( pBuffer, ptrBuf + 4, ( size_t ) ulRead );
@@ -1588,11 +1588,10 @@ static void hb_FileNetGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHO
 
 void hb_FileNetDirectory( PHB_ITEM pDir, const char * szSkleton, const char * szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
-   USHORT      uiMask, uiMaskNoLabel;
-   char *      szDirSpec;
-
-   PHB_FNAME   fDirSpec = NULL;
-   char *      pszFree  = NULL;
+   PHB_FNAME fDirSpec = NULL;
+   USHORT    uiMask, uiMaskNoLabel;
+   char *    szDirSpec;
+   char *    pszFree  = NULL;
 
    /* Get the passed attributes and convert them to Harbour Flags */
 
@@ -1618,7 +1617,7 @@ void hb_FileNetDirectory( PHB_ITEM pDir, const char * szSkleton, const char * sz
 
    if( szAttributes && strlen( szAttributes ) > 0 )
    {
-      if( ( uiMask |= hb_fsAttrEncode( szAttributes ) ) & HB_FA_LABEL )
+      if( ( uiMask |= ( USHORT ) hb_fsAttrEncode( szAttributes ) ) & HB_FA_LABEL )
       {
          /* NOTE: This is Clipper Doc compatible. (not operationally) */
          uiMask = HB_FA_LABEL;
@@ -1647,8 +1646,8 @@ void hb_FileNetDirectory( PHB_ITEM pDir, const char * szSkleton, const char * sz
 
    if( uiMask == HB_FA_LABEL )
    {
-      uiMaskNoLabel  |= hb_fsAttrEncode( szAttributes );
-      uiMaskNoLabel  &= ~HB_FA_LABEL;
+      uiMaskNoLabel |= ( USHORT ) hb_fsAttrEncode( szAttributes );
+      uiMaskNoLabel &= ~HB_FA_LABEL;
       hb_FileNetGrabDirectory( pDir, ( const char * ) szDirSpec, uiMaskNoLabel, fDirSpec, bFullPath, bDirOnly );
    }
 

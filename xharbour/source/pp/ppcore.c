@@ -425,6 +425,7 @@ static void hb_pp_tokenFree( PHB_PP_TOKEN pToken )
       while( pToken->pMTokens )
       {
          PHB_PP_TOKEN pMTokens = pToken->pMTokens;
+
          pToken->pMTokens = pMTokens->pNext;
          hb_pp_tokenFree( pMTokens );
       }
@@ -439,6 +440,7 @@ static void hb_pp_tokenListFree( PHB_PP_TOKEN * pTokenPtr )
       do
       {
          PHB_PP_TOKEN pToken = *pTokenPtr;
+
          *pTokenPtr = pToken->pNext;
          hb_pp_tokenFree( pToken );
       }
@@ -453,9 +455,10 @@ static void hb_pp_tokenListFreeCmd( PHB_PP_TOKEN * pTokenPtr, PHB_PP_STATE pStat
    while( *pTokenPtr && ! fStop )
    {
       PHB_PP_TOKEN pToken = *pTokenPtr;
-      *pTokenPtr  = pToken->pNext;
-      fStop       = HB_PP_TOKEN_ISEOC( pToken );
-      fLine       = HB_PP_TOKEN_ISEOL( pToken ) && ( pToken->type & HB_PP_TOKEN_LINECOUNTER );
+
+      *pTokenPtr = pToken->pNext;
+      fStop      = HB_PP_TOKEN_ISEOC( pToken );
+      fLine      = HB_PP_TOKEN_ISEOL( pToken ) && ( pToken->type & HB_PP_TOKEN_LINECOUNTER );
       hb_pp_tokenFree( pToken );
    }
 
@@ -470,10 +473,10 @@ static int hb_pp_tokenMoveCommand( PHB_PP_TOKEN * pDestPtr, PHB_PP_TOKEN * pSrcP
 
    while( *pSrcPtr )
    {
-      pToken      = *pSrcPtr;
-      *pSrcPtr    = pToken->pNext;
-      *pDestPtr   = pToken;
-      pDestPtr    = &pToken->pNext;
+      pToken    = *pSrcPtr;
+      *pSrcPtr  = pToken->pNext;
+      *pDestPtr = pToken;
+      pDestPtr  = &pToken->pNext;
       if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EOL )
          ++iLines;
       if( HB_PP_TOKEN_ISEOC( pToken ) )
@@ -1636,7 +1639,7 @@ static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
 
          hb_membufAddCh( pBuffer, ch );
          hb_membufAddData( pBuffer, pToken->value, pToken->len );
-         hb_membufAddCh( pBuffer, ch == '[' ? ']' : ch );
+         hb_membufAddCh( pBuffer, ch == '[' ? ( char ) ']' : ch );
       }
    }
    else
@@ -1666,8 +1669,7 @@ static BOOL hb_pp_tokenValueCmp( PHB_PP_TOKEN pToken, char * szValue, USHORT mod
    return FALSE;
 }
 
-static BOOL hb_pp_tokenEqual( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pMatch,
-                              USHORT mode )
+static BOOL hb_pp_tokenEqual( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pMatch, USHORT mode )
 {
    return pToken == pMatch ||
           ( mode != HB_PP_CMP_ADDR &&
@@ -2102,10 +2104,13 @@ static PHB_PP_TOKEN hb_pp_streamFuncGet( PHB_PP_TOKEN pToken, PHB_PP_TOKEN * pFu
        ! HB_PP_TOKEN_ISEOC( pToken->pNext ) )
    {
       PHB_PP_TOKEN * pStartPtr, * pEndPtr, pStart, pNext;
+
       pStartPtr = pEndPtr = &pToken->pNext;
       while( ! HB_PP_TOKEN_ISEOC( *pEndPtr ) &&
              HB_PP_TOKEN_TYPE( ( *pEndPtr )->type ) != HB_PP_TOKEN_PIPE )
+      {
          pEndPtr = &( *pEndPtr )->pNext;
+      }
 
       pToken      = *pEndPtr;
       *pEndPtr    = NULL;
@@ -2892,8 +2897,7 @@ static void hb_pp_defineNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, BOOL fDir
    }
 }
 
-static BOOL hb_pp_tokenUnQuotedGet( PHB_PP_TOKEN ** pTokenPtr, BOOL * pfQuoted,
-                                    BOOL fFree )
+static BOOL hb_pp_tokenUnQuotedGet( PHB_PP_TOKEN ** pTokenPtr, BOOL * pfQuoted, BOOL fFree )
 {
    PHB_PP_TOKEN pToken = **pTokenPtr;
 
@@ -2930,9 +2934,9 @@ static BOOL hb_pp_tokenUnQuotedGet( PHB_PP_TOKEN ** pTokenPtr, BOOL * pfQuoted,
 static BOOL hb_pp_matchMarkerNew( PHB_PP_TOKEN * pTokenPtr,
                                   PHB_PP_MARKERLST * pMarkerListPtr )
 {
-   USHORT         type        = HB_PP_TOKEN_NUL;
-   PHB_PP_TOKEN   pMarkerId   = NULL, pMTokens = NULL;
-   BOOL           fQuoted;
+   USHORT       type      = HB_PP_TOKEN_NUL;
+   PHB_PP_TOKEN pMarkerId = NULL, pMTokens = NULL;
+   BOOL         fQuoted;
 
    /* At start pTokenPtr points to '<' token */
 
@@ -2970,6 +2974,7 @@ static BOOL hb_pp_matchMarkerNew( PHB_PP_TOKEN * pTokenPtr,
                if( hb_pp_tokenUnQuotedGet( &pTokenPtr, &fQuoted, TRUE ) )
                {
                   PHB_PP_TOKEN pLast = NULL;
+
                   do
                   {
                      if( HB_PP_TOKEN_TYPE( ( *pTokenPtr )->type ) == HB_PP_TOKEN_GT && ! fQuoted )
@@ -3094,6 +3099,7 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
    if( HB_PP_TOKEN_TYPE( ( *pTokenPtr )->type ) == HB_PP_TOKEN_BACKSLASH )
    {
       PHB_PP_TOKEN pToken = *pTokenPtr;
+
       *pTokenPtr  = pToken->pNext;
       hb_pp_tokenFree( pToken );
       fQuoted     = TRUE;
@@ -3112,11 +3118,11 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
       {
          if( HB_PP_TOKEN_TYPE( ( *pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
          {
-            PHB_PP_TOKEN   pEscaped = hb_pp_tokenNew( "<", 1, ( *pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
-            PHB_PP_TOKEN   pLT      = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, ( *pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pLT      = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
 
-            pEscaped->pNext   = pLT;
-            pLT->pNext        = ( *pTokenPtr )->pNext;
+            pEscaped->pNext = pLT;
+            pLT->pNext      = ( *pTokenPtr )->pNext;
 
             hb_pp_tokenFree( *pTokenPtr );
             *pTokenPtr        = pEscaped;
@@ -3159,6 +3165,7 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
          else if( HB_PP_TOKEN_TYPE( ( *pTokenPtr )->type ) == HB_PP_TOKEN_LEFT_SB )
          {
             PHB_PP_TOKEN * pStopOptPtr = NULL;
+
             if( ! ( *pTokenPtr )->pNext )
             {
                /* assign pOptional only to force error below */
@@ -3176,9 +3183,10 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
             else
             {
                PHB_PP_TOKEN pToken, pOptTok = ( *pTokenPtr )->pNext;
-               pToken                  = *pStopOptPtr;
-               *pStopOptPtr            = NULL;
-               ( *pTokenPtr )->pNext   = pToken->pNext;
+
+               pToken                = *pStopOptPtr;
+               *pStopOptPtr          = NULL;
+               ( *pTokenPtr )->pNext = pToken->pNext;
                hb_pp_tokenFree( pToken );
                /* create new optional match marker */
                HB_PP_TOKEN_SETTYPE( *pTokenPtr, HB_PP_MMARKER_OPTIONAL );
@@ -3223,9 +3231,9 @@ static BOOL hb_pp_resultMarkerNew( PHB_PP_STATE pState,
                                    BOOL fDump, BOOL fOptional,
                                    USHORT * pusPCount, USHORT spaces )
 {
-   USHORT         type        = HB_PP_TOKEN_NUL, rtype;
-   PHB_PP_TOKEN   pMarkerId   = NULL, pToken;
-   BOOL           fQuoted;
+   USHORT       type      = HB_PP_TOKEN_NUL, rtype;
+   PHB_PP_TOKEN pMarkerId = NULL, pToken;
+   BOOL         fQuoted;
 
    /* At start pTokenPtr points to '<' token */
    if( hb_pp_tokenUnQuotedGet( &pTokenPtr, &fQuoted, TRUE ) && ! fQuoted )
@@ -3329,13 +3337,16 @@ static BOOL hb_pp_resultMarkerNew( PHB_PP_STATE pState,
             pMrkLst->index = ++( *pusPCount );
          if( ! fOptional )
             pMrkLst->canrepeat = FALSE;
+
          HB_PP_TOKEN_SETTYPE( pMarkerId, type );
          pMarkerId->index  = pMrkLst->index;
          pMarkerId->spaces = spaces;
+
          /* free the trailing '>' marker token */
-         pToken            = *pTokenPtr;
-         *pTokenPtr        = pToken->pNext;
+         pToken     = *pTokenPtr;
+         *pTokenPtr = pToken->pNext;
          hb_pp_tokenFree( pToken );
+
          return TRUE;
       }
    }
@@ -3404,8 +3415,8 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                                 USHORT mode, BOOL fCommand, BOOL fDirect,
                                 BOOL fDelete )
 {
-   PHB_PP_TOKEN   pResult, pMatch, pStart, pLast;
-   BOOL           fValid = FALSE;
+   PHB_PP_TOKEN pResult, pMatch, pStart, pLast;
+   BOOL         fValid = FALSE;
 
 #ifdef HB_C52_STRICT
    HB_SYMBOL_UNUSED( fDirect );
@@ -3509,8 +3520,8 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                {
                   if( HB_PP_TOKEN_TYPE( ( *pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
                   {
-                     PHB_PP_TOKEN   pEscaped = hb_pp_tokenNew( "<", 1, ( *pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
-                     PHB_PP_TOKEN   pLT      = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, ( *pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pLT      = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
 
                      pEscaped->pNext   = pLT;
                      pLT->pNext        = ( *pTokenPtr )->pNext;
@@ -3722,10 +3733,10 @@ static BOOL hb_pp_tokenStopExtBlock( PHB_PP_TOKEN * pTokenPtr )
 static BOOL hb_pp_tokenSkipExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_TOKEN pStop,
                                 USHORT mode, BOOL * pfStop )
 {
-   USHORT         curtype, prevtype = 0, lbrtype = 0, rbrtype = 0;
-   PHB_PP_TOKEN   pToken   = *pTokenPtr, pPrev;
-   int            iBraces  = 0;
-   BOOL           fMatch;
+   USHORT       curtype, prevtype = 0, lbrtype = 0, rbrtype = 0;
+   PHB_PP_TOKEN pToken   = *pTokenPtr, pPrev;
+   int          iBraces  = 0;
+   BOOL         fMatch;
 
    if( pfStop )
       *pfStop = FALSE;
@@ -3861,8 +3872,8 @@ static BOOL hb_pp_tokenCanStartExp( PHB_PP_TOKEN pToken )
 static BOOL hb_pp_tokenMatch( PHB_PP_TOKEN pMatch, PHB_PP_TOKEN * pTokenPtr,
                               PHB_PP_TOKEN pStop, USHORT mode )
 {
-   BOOL     fMatch = FALSE;
-   USHORT   type;
+   BOOL   fMatch = FALSE;
+   USHORT type;
 
    type = HB_PP_TOKEN_TYPE( pMatch->type );
    if( type == HB_PP_MMARKER_REGULAR )
@@ -4031,9 +4042,9 @@ static BOOL hb_pp_patternMatch( PHB_PP_TOKEN pMatch, PHB_PP_TOKEN * pTokenPtr,
                                 PHB_PP_TOKEN pStop,
                                 USHORT mode, PHB_PP_RULE pRule )
 {
-   PHB_PP_TOKEN   pToken      = *pTokenPtr;
-   PHB_PP_TOKEN   pFirst;
-   BOOL           fOverflow   = FALSE;
+   PHB_PP_TOKEN pToken    = *pTokenPtr;
+   PHB_PP_TOKEN pFirst;
+   BOOL         fOverflow = FALSE;
 
    while( pMatch && ! HB_PP_TOKEN_ISEOS( pToken ) )
    {
@@ -4101,8 +4112,7 @@ static BOOL hb_pp_patternMatch( PHB_PP_TOKEN pMatch, PHB_PP_TOKEN * pTokenPtr,
    return FALSE;
 }
 
-static BOOL hb_pp_patternCmp( PHB_PP_RULE pRule, PHB_PP_TOKEN pToken,
-                              BOOL fCommand )
+static BOOL hb_pp_patternCmp( PHB_PP_RULE pRule, PHB_PP_TOKEN pToken, BOOL fCommand )
 {
    PHB_PP_TOKEN pFirst = pToken;
 
@@ -4149,8 +4159,8 @@ static PHB_PP_TOKEN * hb_pp_matchResultLstAdd( PHB_PP_STATE pState,
                                                PHB_PP_TOKEN pToken,
                                                PHB_PP_TOKEN pStop )
 {
-   PHB_PP_TOKEN   pNext;
-   BOOL           fFirst = TRUE, fStop = FALSE;
+   PHB_PP_TOKEN pNext;
+   BOOL         fFirst = TRUE, fStop = FALSE;
 
    while( TRUE )
    {
@@ -4296,9 +4306,9 @@ static PHB_PP_TOKEN * hb_pp_matchResultAdd( PHB_PP_STATE pState,
                                             PHB_PP_RULE pRule, PHB_PP_TOKEN * pResultPtr,
                                             PHB_PP_TOKEN pMatch, USHORT usMatch )
 {
-   PHB_PP_RESULT  pMarkerResult = hb_pp_matchResultGet( pRule, usMatch, pMatch->index );
-   PHB_PP_TOKEN   pToken, pStop;
-   BOOL           fSpaces, fFirst;
+   PHB_PP_RESULT pMarkerResult = hb_pp_matchResultGet( pRule, usMatch, pMatch->index );
+   PHB_PP_TOKEN  pToken, pStop;
+   BOOL          fSpaces, fFirst;
 
    if( HB_PP_TOKEN_TYPE( pMatch->type ) == HB_PP_RMARKER_REGULAR )
    {
@@ -4382,10 +4392,10 @@ static PHB_PP_TOKEN * hb_pp_matchResultAdd( PHB_PP_STATE pState,
    return pResultPtr;
 }
 
-static PHB_PP_TOKEN *  hb_pp_patternStuff( PHB_PP_STATE pState,
-                                           PHB_PP_RULE pRule, USHORT usMatch,
-                                           PHB_PP_TOKEN pResultPattern,
-                                           PHB_PP_TOKEN * pResultPtr )
+static PHB_PP_TOKEN * hb_pp_patternStuff( PHB_PP_STATE pState,
+                                          PHB_PP_RULE pRule, USHORT usMatch,
+                                          PHB_PP_TOKEN pResultPattern,
+                                          PHB_PP_TOKEN * pResultPtr )
 {
    while( pResultPattern )
    {
@@ -4395,8 +4405,9 @@ static PHB_PP_TOKEN *  hb_pp_patternStuff( PHB_PP_STATE pState,
       }
       else if( HB_PP_TOKEN_TYPE( pResultPattern->type ) == HB_PP_RMARKER_OPTIONAL )
       {
-         USHORT         usMaxMatch  = 0, matches;
-         PHB_PP_TOKEN   pToken      = pResultPattern->pMTokens;
+         USHORT       usMaxMatch = 0, matches;
+         PHB_PP_TOKEN pToken     = pResultPattern->pMTokens;
+
          while( pToken )
          {
             if( pToken->index )
@@ -4429,8 +4440,8 @@ static char * hb_pp_tokenListStr( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pStop,
                                   BOOL fStop, PHB_MEM_BUFFER pBuffer,
                                   BOOL fQuote, BOOL fEol )
 {
-   USHORT   ltype    = HB_PP_TOKEN_NUL;
-   BOOL     fSpaces  = FALSE;
+   USHORT ltype   = HB_PP_TOKEN_NUL;
+   BOOL   fSpaces = FALSE;
 
    hb_membufFlush( pBuffer );
    while( pToken && ( fStop ? pToken != pStop : ! HB_PP_TOKEN_ISEOC( pToken ) ) )
@@ -4521,9 +4532,9 @@ static void hb_pp_processCondDefined( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
 static BOOL hb_pp_processDefine( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
 {
    PHB_PP_TOKEN * pPrevPtr;
-   BOOL           fSubst   = FALSE, fRepeat;
-   int            iCycle   = 0;
    PHB_PP_RULE    pRule;
+   BOOL           fSubst = FALSE, fRepeat;
+   int            iCycle = 0;
 
    do
    {
@@ -4581,8 +4592,8 @@ static BOOL hb_pp_processDefine( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
 static BOOL hb_pp_processTranslate( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
 {
    PHB_PP_TOKEN * pTokenPtr;
-   BOOL           fSubst   = FALSE, fRepeat;
-   int            iCycle   = 0;
+   BOOL           fSubst = FALSE, fRepeat;
+   int            iCycle = 0;
 
    do
    {
@@ -4624,8 +4635,8 @@ static BOOL hb_pp_processTranslate( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPt
 static BOOL hb_pp_processCommand( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
 {
    PHB_PP_RULE pRule;
-   BOOL        fSubst   = FALSE, fRepeat = TRUE;
-   int         iCycle   = 0;
+   BOOL        fSubst = FALSE, fRepeat = TRUE;
+   int         iCycle = 0;
 
    while( fRepeat && ! HB_PP_TOKEN_ISEOC( *pFirstPtr ) &&
           pState->pMap[ HB_PP_HASHID( *pFirstPtr ) ] & HB_PP_COMMAND )
@@ -4692,8 +4703,8 @@ static BOOL hb_pp_processCommand( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr 
 
 static BOOL hb_pp_concatenateKeywords( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
 {
-   PHB_PP_TOKEN   pToken   = *pFirstPtr, pNext;
-   BOOL           fChanged = FALSE;
+   PHB_PP_TOKEN pToken   = *pFirstPtr, pNext;
+   BOOL         fChanged = FALSE;
 
    while( pToken && pToken->pNext )
    {
@@ -4936,8 +4947,9 @@ static PHB_PP_TOKEN hb_pp_calcValue( PHB_PP_TOKEN pToken, int iPrecedense,
    while( ! ( *pfError || HB_PP_TOKEN_ISEOC( pToken ) ||
               HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_RIGHT_PB ) )
    {
-      int            iNextOper, iNextPrec;
-      PHB_PP_TOKEN   pNext;
+      PHB_PP_TOKEN pNext;
+      int          iNextOper, iNextPrec;
+
       pNext = hb_pp_calcPrecedence( pToken, &iNextOper, &iNextPrec );
       if( iNextPrec < HB_PP_PREC_LOG )
          *pfError = TRUE;
@@ -4993,8 +5005,7 @@ static void hb_pp_conditionPush( PHB_PP_STATE pState, BOOL fCond )
                                                   ( fCond ? 0 : HB_PP_COND_ELSE );
 }
 
-static void hb_pp_condCompile( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
-                               BOOL fNot )
+static void hb_pp_condCompile( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, BOOL fNot )
 {
    if( ! pToken || HB_PP_TOKEN_TYPE( pToken->type ) != HB_PP_TOKEN_KEYWORD ||
        ! HB_PP_TOKEN_ISEOC( pToken->pNext ) )
@@ -5172,9 +5183,9 @@ static void hb_pp_preprocessToken( PHB_PP_STATE pState )
          /* Store it here to avoid possible problems after #INCLUDE */
          PHB_PP_TOKEN * pFreePtr = &pState->pFile->pTokenList;
 
-         pToken   = pState->pFile->pTokenList;
-         fDirect  = HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_DIRECTIVE;
-         pToken   = pToken->pNext;
+         pToken  = pState->pFile->pTokenList;
+         fDirect = HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_DIRECTIVE;
+         pToken  = pToken->pNext;
          if( ! pToken )
          {
             fError = TRUE;
@@ -5462,6 +5473,7 @@ PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState )
    if( pState->pTokenOut )
    {
       PHB_PP_TOKEN pToken = pState->pTokenOut;
+
       pState->pTokenOut = pToken->pNext;
       hb_pp_tokenFree( pToken );
    }
@@ -5915,8 +5927,8 @@ BOOL hb_pp_eof( PHB_PP_STATE pState )
 void hb_pp_addDefine( PHB_PP_STATE pState, const char * szDefName,
                       const char * szDefValue )
 {
-   PHB_PP_TOKEN   pMatch, pResult, pToken;
-   PHB_PP_FILE    pFile;
+   PHB_PP_TOKEN pMatch, pResult, pToken;
+   PHB_PP_FILE  pFile;
 
    pState->fError             = FALSE;
 
@@ -6009,9 +6021,9 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
 {
    if( pState->pFile )
    {
-      PHB_PP_TOKEN   pToken;
-      BOOL           fError = FALSE;
-      USHORT         ltype;
+      PHB_PP_TOKEN pToken;
+      BOOL         fError = FALSE;
+      USHORT       ltype;
 
       if( ! pState->pOutputBuffer )
          pState->pOutputBuffer = hb_membufNew();
@@ -6060,11 +6072,11 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
  */
 char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, HB_SIZE * pulLen )
 {
-   PHB_PP_TOKEN   pToken;
-   PHB_PP_FILE    pFile;
-   BOOL           fError = FALSE;
-   USHORT         ltype;
-   HB_SIZE        ulLen;
+   PHB_PP_TOKEN pToken;
+   PHB_PP_FILE  pFile;
+   BOOL         fError = FALSE;
+   USHORT       ltype;
+   HB_SIZE      ulLen;
 
    if( ! pState->pOutputBuffer )
       pState->pOutputBuffer = hb_membufNew();
@@ -6242,6 +6254,7 @@ void hb_pp_tokenToString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_LEFT_SB )
    {
       PHB_PP_TOKEN pTok, pFirst, pLast = NULL;
+
       pFirst = pTok = pToken->pNext;
       while( ! HB_PP_TOKEN_ISEOL( pTok ) )
       {
@@ -6303,8 +6316,8 @@ char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
    hb_membufFlush( pState->pBuffer );
    if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_LEFT_CB )
    {
-      USHORT   ltype    = HB_PP_TOKEN_NUL;
-      int      iBraces  = 0;
+      USHORT ltype   = HB_PP_TOKEN_NUL;
+      int    iBraces = 0;
       do
       {
          hb_pp_tokenStr( pToken, pState->pBuffer, FALSE, TRUE, ltype );

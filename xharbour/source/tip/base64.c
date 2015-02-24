@@ -53,7 +53,7 @@ char * Base64Encode( const unsigned char * pcCode, unsigned int uCodeLen )
       }
       pRet[ j++ ] = XTYPAD;
    }
-   
+
    pRet[ j ] = '\0';
 
    return pRet;
@@ -99,7 +99,7 @@ unsigned char * Base64Decode( const char * pcszInput, unsigned int * puOutLen )
    {
       *pTmp++ = ( ( ptr[ 0 ] << 2 ) | ( ptr[ 1 ] >> 4 ) );
       *pTmp++ = ( ( ptr[ 1 ] << 4 ) | ( ptr[ 2 ] >> 2 ) );
-      *pTmp++ = ( ( ptr[ 2 ] << 6 ) |   ptr[ 3 ] );
+      *pTmp++ = ( unsigned char ) ( ( ptr[ 2 ] << 6 ) |   ptr[ 3 ] );
       ptr    += 4;
    }
 

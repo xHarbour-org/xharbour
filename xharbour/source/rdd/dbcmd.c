@@ -912,7 +912,7 @@ HB_FUNC( DBUSEAREA )
 {
    HB_THREAD_STUB
    hb_retl( hb_rddOpenTable ( hb_parc( 3 ), hb_parc( 2 ),
-                              hb_parl( 1 ) ? 0 : ( USHORT ) hb_rddGetCurrentWorkAreaNumber(),
+                              hb_parl( 1 ) ? ( USHORT ) 0 : ( USHORT ) hb_rddGetCurrentWorkAreaNumber(),
                               hb_parc( 4 ), ISLOG( 5 ) ? hb_parl( 5 ) : ! hb_setGetExclusive(),
                               hb_parl( 6 ), hb_parc( 7 ), hb_parnl( 8 ), NULL, NULL ) == HB_SUCCESS );
 }

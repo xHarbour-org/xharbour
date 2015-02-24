@@ -10190,8 +10190,9 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
 
                              if( pModuleSymbol->pDynSym == pDynSym && ( ( pModuleSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) /* && pModuleSymbol->value.pFunPtr == NULL */ )
                              {
-                                pModuleSymbol->scope.value    = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( hSymScope & HB_FS_PCODEFUNC );
-                                pModuleSymbol->value.pFunPtr  = pSymbol->value.pFunPtr;
+
+                                pModuleSymbol->scope.value   = ( HB_SYMBOLSCOPE ) ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( hSymScope & HB_FS_PCODEFUNC );
+                                pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
 #ifdef DEBUG_SYMBOLS
                                 TraceLog( NULL, "Resolved Deferred: '%s'\n", pSymbol->szName );
 #endif /* DEBUG_SYMBOLS */
@@ -10210,8 +10211,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
                  {
                     if( ( pSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pSymbol->value.pFunPtr == NULL */ )
                     {
-                       pSymbol->scope.value    = ( hSymScope & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
-                       pSymbol->value.pFunPtr  = pDynSym->pSymbol->value.pFunPtr;
+                       pSymbol->scope.value   = ( HB_SYMBOLSCOPE ) ( hSymScope & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                       pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
                     }
                  }
 

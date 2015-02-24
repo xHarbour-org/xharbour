@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-02-24 15:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * include/hbpp.h
+  * source/compiler/harbour.c  
+  * source/compiler/ppcomp.c
+  * source/pp/ppcore.c
+  * source/rtl/arc4.c
+  * source/rtl/cdpapi.c
+  * source/rtl/filenet.c
+  * source/rtl/gttone.c
+  * source/rtl/strcase.c
+  * source/rtl/tone.c
+  * source/rtl/transfrm.c
+  * source/rdd/dbcmd.c
+  * source/rdd/hbdbsort.c
+  * source/rdd/workarea.c
+  * source/rdd/hbsix/sxcrypt.c
+  * source/rdd/hsx/hsx.c
+  * source/tip/base64.c
+  * source/vm/classes.c
+  * source/vm/hash.c
+  * source/vm/hvm.c
+  * source/ct/bit1.c
+  * source/ct/bit3.c
+  * source/ct/charop.c
+  * source/ct/misc2.c
+  * source/ct/token1.c
+  * utils/hbpp/hbppcore.c
+    ! eliminate conversion warning
+  * winmake/makefile.bc
+    ! pacify BCC irrelevant warning when HB_DEBUG=d
+  * source/rtl/hbwinole.c
+    * minor change on my previous commit
+
 2015-02-23 18:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/hbwinole.c
     + added parameter IsOLEObjectRegistered( <cOleName> | <cCLSID> [, @<cCLSID>] )  -> lRegistered
