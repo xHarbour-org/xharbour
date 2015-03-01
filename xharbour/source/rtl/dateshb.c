@@ -721,3 +721,46 @@ HB_FUNC( HMS2D )
 
    hb_retnd( hb_timeEncode( iHour, iMin, dSec ) );
 }
+
+
+HB_FUNC( HB_TSTOSTR )
+{
+   long lDate, lTime;
+
+   if( hb_partdt( &lDate, &lTime, 1 ) )
+   {
+      char szBuffer[ 24 ];
+
+      hb_dateTimeStampStr( szBuffer, lDate, lTime );
+      if( hb_parl( 2 ) )
+      {
+         if( lTime == 0 )
+         {
+            if( lDate == 0 )
+               hb_retc_const( "00:00" );
+            else
+               hb_retclen( szBuffer, 10 );
+         }
+         else
+         {
+            int i = 23;
+            while( szBuffer[ i - 1 ] == '0' )
+               --i;
+            if( szBuffer[ i - 1 ] == '.' )
+            {
+               --i;
+               if( szBuffer[ i - 1 ] == '0' && szBuffer[ i - 2 ] == '0' )
+                  i -= 3;
+            }
+            if( lDate == 0 )
+               hb_retclen( szBuffer + 11, i - 11 );
+            else
+               hb_retclen( szBuffer, i );
+         }
+      }
+      else
+         hb_retclen( szBuffer, 23 );
+   }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+}

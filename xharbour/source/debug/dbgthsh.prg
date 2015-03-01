@@ -327,6 +327,8 @@ STATIC FUNCTION HashBrowseSkip( nPos, oBrwSets )
 
 STATIC FUNCTION HashKeyString( hHash, nAt )
 
+return __dbgValToStr( HGetKeyAt( hHash, nAt ) )
+/*
    LOCAL xVal  := HGetKeyAt( hHash, nAt )
 
    SWITCH ValType( xVal )
@@ -339,3 +341,4 @@ STATIC FUNCTION HashKeyString( hHash, nAt )
    ENDSWITCH
 
    RETURN AllTrim( CStr( xVal ) )
+*/

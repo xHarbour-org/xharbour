@@ -8,6 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-01 15:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  + tests/tstime.prg
+    ! test to show field types @ and T with size 4( hour)
+  * include/hbextern.ch
+    ! added function HB_TSTOSTR,DATETIME,TTOS,TTOC to external declaration
+  * include/hbapi.h 
+    ! added declaration for hb_partdt borrow from harbour
+    ! added declaration for hb_stor borrow from harbour
+  * source/debug/debugger.prg
+    ! updated __dbgValToStr on how it show Timestamp/date/numeric and H types     
+      Date now use Left( hb_TSToStr( uVal, .F. ), 10 ) insted of dtoc(uVal)
+      Timestamp now use HB_TSTOSTR( uval, .T. ) insted of ttos( uVal )
+      Hash now use "{ => }" insted of "Hash of " + RTrim( Str( Len( uVal ) ) ) + " elements"
+      Number using hb_ntos( uVal ) insted of RTrim( Str( uVal ) ) ideia borrow from harbour
+  * source/debug/dbgthsh.prg
+    ! function HashKeyString optimized to use __dbgValToExp insted of getvalue of hash and return passing 
+      to cstr function. ideia borrow from harbour
+  * source/dbf/dbf1.c
+    ! on hb_dbfPutValue added variable  BYTE * ptr;
+    ! added HB_FT_TIME to on case of HB_FT_DATETIME and  HB_FT_TIMESTAMP 
+    ! fix when writting timestamp field where only is needed the hour part ( field type T with size 4 )
+  * source/rtl/dateshb.c  
+    + function  HB_TSTOSTR. borrow from harbour 
+  * source/rtl/tbrowse.prg  
+    ! using HB_TSTOSTR() insted ttoc to display timestamp values
+  * source/vm/extend.c
+    ! added hb_stoc() function borrow from harbour
+    ! added hb_partdt function borrow from harbour  
+                
 2015-02-24 15:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbpp.h
   * source/compiler/harbour.c  

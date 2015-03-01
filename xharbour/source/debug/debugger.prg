@@ -1246,7 +1246,7 @@ METHOD EditVar( nVar ) CLASS HBDebugger
 
    uVarValue := ::VarGetValue( ::aVars[ nVar ] )
 
-   IF ValType( uVarValue ) $ "AHOP"
+   IF ValType( uVarValue ) $ "AHOPB"
       ::InputBox( cVarName, uVarValue, NIL, .F. )
    ELSE
       cVarStr := ::InputBox( cVarName, __dbgValToStr( uVarValue ),;
@@ -3534,12 +3534,13 @@ FUNCTION __dbgValToStr( uVal )
    CASE cType == "A" ; RETURN "{ ... }"
    CASE cType $ "CM" ; RETURN '"' + uVal + '"'
    CASE cType == "L" ; RETURN iif( uVal, ".T.", ".F." )
-   CASE cType == "D" ; RETURN DToC( uVal )
+   CASE cType == "D" ; RETURN Left( hb_TSToStr( uVal, .F. ), 10 ) //DToC( uVal )
    CASE cType == "N" ; RETURN RTrim( Str( uVal ) )
    CASE cType == "O" ; RETURN "Class " + uVal:ClassName() + " object"
-   CASE cType == "H" ; RETURN "Hash of " + RTrim( Str( Len( uVal ) ) ) + " elements"
+   CASE cType == "H" ; RETURN "{ => }"
    CASE cType == "P" ; RETURN "Pointer"
-   Case ctype == "T" ; return TTOS(uVal)
+*    Case ctype == "T" ; return TTOS(uVal)
+   case cType == "T" ; return HB_TSTOSTR( uval, .T. )
    ENDCASE
 
    RETURN "U"

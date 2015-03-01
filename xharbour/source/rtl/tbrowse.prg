@@ -2975,7 +2975,7 @@ LOCAL cColor, cColorBKG, aCellColor, nColorIndex, nCursor
       exit
    case "T"
 
-      DispOut( PadR( Transform( xValue, aColsInfo[ _TB_COLINFO_PICT ] ), nLen ), cColor )
+      DispOut( HB_TSTOSTR(xValue,.t.), cColor )
       DispOut( Space( nWidth - nLen ), cColorBKG )
       
       exit
@@ -3663,7 +3663,8 @@ STATIC FUNCTION LenVal( xVal, cType, cPict )
          nLen := Len( Transform( xVal, cPict ) )
          exit
       Case "T" 
-         nLen := len( ttoc(datetime(0,0,0,0,0,0,0)))   
+*          nLen := len( ttoc(datetime(0,0,0,0,0,0,0)))   
+          nLen := len( HB_TSTOSTR( xval, .T. ) )
          exit
       default
          nLen := 0

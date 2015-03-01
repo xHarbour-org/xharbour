@@ -415,6 +415,7 @@ extern HB_EXPORT char *       hb_pardsbuff( char * szDate, int iParam, ... ); /*
 extern HB_EXPORT char *       hb_pardtsbuff( char * szDateTime, int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
 extern HB_EXPORT long         hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
 extern HB_EXPORT long         hb_part( int iParam, ... ); /* retrieve a time part from a datetime as long in milliseconds */
+extern HB_EXPORT BOOL         hb_partdt( long * plJulian, long * plMilliSec, int iParam );
 extern HB_EXPORT double       hb_pardtd( int iParam, ... ); /* retrieve a datetime as double - number of days from Julian's day plus time as decimal part of date */
 extern HB_EXPORT double       hb_pardtsec( int iParam, ... ); /* retrieve a datetime as double - number of seconds from Julian's day plus time */
 extern HB_EXPORT HB_SIZE      hb_parinfa( int iParamNum, HB_SIZE uiArrayIndex ); /* retrieve length or element type of an array parameter */

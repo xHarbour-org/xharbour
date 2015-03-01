@@ -1778,3 +1778,27 @@ int hb_storns( HB_ISIZ nValue, int iParam, ... )
 
    return 0;
 }
+
+
+BOOL hb_partdt( long * plJulian, long * plMilliSec, int iParam )
+{
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_partdt(%p,%p,%d)", plJulian, plMilliSec, iParam ) );
+
+   if( iParam >= -1 && iParam <= hb_pcount() )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+         pItem = hb_itemUnRef( pItem );
+
+      if( HB_IS_DATETIME( pItem ) )
+      {
+         *plJulian = pItem->item.asDate.value;
+         *plMilliSec = pItem->item.asDate.time;
+         return TRUE;
+      }
+   }
+
+   return FALSE;
+}
