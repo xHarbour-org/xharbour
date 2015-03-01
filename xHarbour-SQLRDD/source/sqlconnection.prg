@@ -108,6 +108,7 @@ CLASS SR_CONNECTION
    DATA lClustered AS LOGICAL INIT .F. READONLY
    //culik 30/12/2011 adicionado para indicar se e  sqlserver versao 2008 ou superior
    DATA lSqlServer2008 AS LOGICAL INIT .F. 
+   DATA lOracle12      AS LOGICAL INIT .F.  // do we have Oracle >= 12.0
    
    DATA lBind Init .f.
    DATA cSqlPrepare INIT ""
@@ -1104,7 +1105,11 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
    case nType == SQL_DATE .or. nType == SQL_TYPE_DATE
       cType = "D"
    case nType == SQL_TIME
+      if (::nSystemID == SYSTEMID_POSTGR .or. ::nSystemID == SYSTEMID_MYSQL  .or. ::nSystemID == SYSTEMID_MARIADB)
+         cType := "T"
+      else
       cType := "C"
+      endif
    case nType == SQL_LONGVARCHAR .or.  nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB .or.  ntype == SQL_LONGVARBINARY .or. (nType == SQL_VARBINARY .and. ::nSystemID != SYSTEMID_MSSQL7) 
       cType := "M"
    case nType == SQL_VARBINARY  .and. ::nSystemID == SYSTEMID_MSSQL7

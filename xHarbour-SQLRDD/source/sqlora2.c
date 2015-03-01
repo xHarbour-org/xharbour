@@ -107,7 +107,7 @@ HB_FUNC( SQLO_CONNECT )
 //    memset( session, 0, sizeof( OCI_ORASESSION ) );
    if (!OCI_initilized)
    {
-   if (!OCI_Initialize(NULL, NULL, OCI_ENV_CONTEXT))
+   if (!OCI_Initialize(NULL, NULL,  OCI_ENV_DEFAULT | OCI_ENV_CONTEXT | OCI_ENV_THREADED  )) //  OCI_ENV_CONTEXT))
 	      session->iStatus = SQLO_ERROR;
 	   else
 	   {
@@ -832,11 +832,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
 //#endif
          case SQL_DATETIME:
          {
-#ifdef __XHARBOUR__
-            hb_itemPutDT( pItem, 0, 0, 0, 0, 0, 0, 0 );
-#else
             hb_itemPutTDT( pItem, 0, 0 );
-#endif
             break;
          }
 
@@ -862,8 +858,6 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
          }
          case SQL_NUMERIC:
          {
-// 	         char * bBuffer = (char*)OCI_GetString( rs, iField );
-//             sr_escapeNumber( bBuffer, (ULONG) lLen, (ULONG) lDec, pItem );            
             if (lDec > 0 ) 
             {
 
@@ -877,35 +871,6 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly
          }
          case SQL_DATE:
          {
-         /*
-            char dt[9];
-            char * bBuffer = (char*)OCI_GetString( rs, iField );
-                        
-            dt[0] = bBuffer[0];
-            dt[1] = bBuffer[1];
-            dt[2] = bBuffer[2];
-            dt[3] = bBuffer[3];
-            dt[4] = bBuffer[4];
-            dt[5] = bBuffer[5];
-            dt[6] = bBuffer[6];
-            dt[7] = bBuffer[7];
-            dt[8] = '\0';
-            
-            if ( strcmp( dt, "19000101")  == 0 )
-            {
-               dt[0] = ' ';
-               dt[1] = ' ';
-               dt[2] = ' ';
-               dt[3] = ' ';
-               dt[4] = ' ';
-               dt[5] = ' ';
-               dt[6] = ' ';
-               dt[7] = ' ';
-               dt[8] = '\0';
-            }               
-            hb_itemPutDS( pItem, dt );
-            break;
-            */
             OCI_Date *date = OCI_GetDate(rs,iField);
             int  year, month, day;
             

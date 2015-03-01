@@ -292,7 +292,7 @@ void CreateInsertStmtOra( SQLEXORAAREAP thiswa )
          }
          case 'T':
          {
-	         //DebugBreak();
+	         
             InsertRecord->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
             break;
          }         
@@ -431,7 +431,7 @@ HB_ERRCODE BindInsertColumnsOra( SQLEXORAAREAP thiswa )
             }
             case SQL_C_TYPE_TIMESTAMP: 
             {
-               //DebugBreak();
+               
                InsertRecord->lIndPtr = 0;
 //                res = SQLBindParameter( thiswa->hStmtInsert, iBind, SQL_PARAM_INPUT,
 //                                        SQL_C_TYPE_TIMESTAMP,
@@ -440,7 +440,7 @@ HB_ERRCODE BindInsertColumnsOra( SQLEXORAAREAP thiswa )
 //                                        0,
 //                                        &(InsertRecord->asTimestamp), 0, &(InsertRecord->lIndPtr) );
                InsertRecord->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-               OCI_DateSetDateTime(InsertRecord->asDate2,InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month, InsertRecord->asTimestamp.day,InsertRecord->asTimestamp.hour,InsertRecord->asTimestamp.minute,InsertRecord->asTimestamp.second) ;
+//                OCI_DateSetDateTime(InsertRecord->asDate2,InsertRecord->asTimestamp.year, InsertRecord->asTimestamp.month, InsertRecord->asTimestamp.day,InsertRecord->asTimestamp.hour,InsertRecord->asTimestamp.minute,InsertRecord->asTimestamp.second) ;
                res=OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate2);
                break;
             }
@@ -454,7 +454,7 @@ HB_ERRCODE BindInsertColumnsOra( SQLEXORAAREAP thiswa )
 //                                        0,
 //                                        &(InsertRecord->asDate), 0, &(InsertRecord->lIndPtr) );
                InsertRecord->asDate1 = OCI_DateCreate(GetConnection(thiswa->hDbc));
-               OCI_DateSetDate(InsertRecord->asDate1,InsertRecord->asDate.year, InsertRecord->asDate.month, InsertRecord->asDate.day) ;
+
                res=OCI_BindDate(thiswa->hStmtInsert, InsertRecord->szBindName, InsertRecord->asDate1);
                break;
             }
@@ -573,7 +573,14 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
    {
       if ( InsertRecord->iCType == SQL_C_BINARY )
       {
+
+// 	      TraceLog("ccc.log" , "escrevendo lob  InsertRecord->asChar.value %s InsertRecord->asChar.size %lu \n " ,InsertRecord->asChar.value,InsertRecord->asChar.size);
+	      res = OCI_LobSeek(InsertRecord->lob1, 0, OCI_SEEK_SET); 
 	      res =OCI_LobWrite(InsertRecord->lob1, (void*)InsertRecord->asChar.value,  InsertRecord->asChar.size  );
+      }
+      if (InsertRecord->lIndPtr     == SQL_NULL_DATA )
+      {
+            OCI_BindSetNull(  OCI_GetBind(thiswa->hStmtInsert, i ) );	      
       }
 	  InsertRecord++;
    }
@@ -629,6 +636,7 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
             return HB_FAILURE;
          }
 
+         OCI_AllowRebinding(thiswa->hStmtNextval,1);
          res = OCI_Prepare(  thiswa->hStmtNextval,  (ident));
          if ( !res )
          {
@@ -655,21 +663,21 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
       if ( rs ==  NULL )
       {
          OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res, __LINE__, __FILE__ );
-         thiswa->hStmtNextval=NULL;
+//          thiswa->hStmtNextval=NULL;
          return (HB_FAILURE);
       }
 
       res = OCI_FetchNext(rs);
-//       res = SQLGetData( thiswa->hStmtNextval, 1, SQL_C_ULONG, &(thiswa->recordList[0]), sizeof( SQL_C_ULONG ), NULL );
+
       thiswa->recordList[0]= OCI_GetUnsignedBigInt( rs,1 ) ;
-//       if ( CHECK_SQL_N_OK( res ) )
+
       if (thiswa->recordList[0] == 0)
       {
          OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res, __LINE__, __FILE__ );
-         thiswa->hStmtNextval=NULL;
+
          return (HB_FAILURE);
       }
-      OCI_StatementFree( thiswa->hStmtNextval);
+
       break;
    }
    case SYSTEMID_CACHE:
@@ -677,15 +685,13 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
    default:
    ;
    }
-   thiswa->hStmtNextval =NULL;
+
    thiswa->deletedList[0] = ' '; 
    thiswa->recordListPos  = 0;
    thiswa->recordListSize = 1;
    hb_arraySetNL( thiswa->sqlarea.aInfo, AINFO_RCOUNT, thiswa->recordList[0] );
    thiswa->lLastRec      = thiswa->recordList[0] + 1;
 
-//    OCI_StatementFree( thiswa->hStmtInsert ); 
-//    thiswa->hStmtInsert = NULL;
    
    return (HB_SUCCESS);
 }
@@ -840,7 +846,7 @@ iBind++;
             }
             case SQL_C_TYPE_TIMESTAMP:
             {
-	           //DebugBreak();
+	           
 	           sprintf(szBindName,":%i",iBind ); 
 //                CurrRecord->lIndPtr = 0;
 //                res = SQLBindParameter( thiswa->hStmtUpdate, iBind, SQL_PARAM_INPUT,

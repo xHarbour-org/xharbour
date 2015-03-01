@@ -64,10 +64,11 @@ HB_FUNC_EXTERN( SQLRDD );
 static HB_SIZE pageReadSize   = PAGE_READ_SIZE;
 static HB_SIZE bufferPoolSize = BUFFER_POOL_SIZE;
 
-static BOOL CreateSkipStmt( SQLEXORAAREAP thiswa );
+static BOOL CreateSkipStmtOra( SQLEXORAAREAP thiswa );
 static int bOldReverseIndex  = 0;
 static int sqlKeyCompareEx( SQLEXORAAREAP thiswa, PHB_ITEM pKey, BOOL fExact );
 extern void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate,OCI_Resultset * rs );
+extern HB_ERRCODE FeedSeekStmtOra( SQLEXORAAREAP thiswa, int queryLevel  );
 HB_EXTERN_BEGIN
    extern  PHB_ITEM loadTagDefault( SQLEXORAAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder );
 HB_EXTERN_END
@@ -413,7 +414,7 @@ static HB_ERRCODE getMissingColumn( SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, L
          return (HB_FAILURE);
       }
    }
-// DebugBreak();
+
    thiswa->lCurrentRecord = GetCurrentRecordNumOra( thiswa );     // Feed bound parameter
 
 //    res = sqlExOraecute( thiswa->colStmt[lFieldPosDB - 1] );
@@ -462,7 +463,7 @@ static HB_ERRCODE getMissingColumn( SQLEXORAAREAP thiswa, PHB_ITEM pFieldData, L
 //    }
 
 //    OCI_StatementFree( thiswa->colStmt[lFieldPosDB - 1].pStmt  );
-   thiswa->colStmt[lFieldPosDB - 1].pStmt = NULL;  
+//    thiswa->colStmt[lFieldPosDB - 1].pStmt = NULL;  
 //    hb_xfree( bBuffer );
    return HB_SUCCESS;
 }
@@ -559,26 +560,8 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
             BindStructure->asChar.value[ nTrim ] = '\0';
             BindStructure->lIndPtr               = SQL_NTS;
 
-            // Pointer may be changed during realloc, so parameter should be re-bound
-// //             res = SQLBindParameter( hStmt,
-//                                     BindStructure->iParNum,
-//                                     SQL_PARAM_INPUT,
-//                                     SQL_C_CHAR,
-//                                     SQL_LONGVARCHAR,
-//                                     BindStructure->asChar.size_alloc,
-//                                     0,
-//                                     BindStructure->asChar.value,
-//                                     0,
-//                                     &(BindStructure->lIndPtr) );
-//              res =OCI_BindString(hStmt,BindStructure->szBindName,BindStructure->asChar.value, BindStructure->ColumnSize  ) ;
-// 
-//          if (!res )
-//          {
-//                OraErrorDiagRTE( hStmt, "SetBindValue", "", res, __LINE__, __FILE__ );
-//                return HB_FAILURE;
-//             }
-//             break;
          }
+//          TraceLog("ccc.log" , "escrevendo lob pszText %s BindStructure->asChar.value %s nTrim %lu BindStructure->asChar.size %lu \n ", pszText,BindStructure->asChar.value,nTrim,BindStructure->asChar.size);
 
          if( nTrim == 0 )
          {
@@ -590,7 +573,8 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
             BindStructure->asChar.value[ nTrim ] = '\0';
          }
          BindStructure->asChar.size = nTrim;
-         OCI_LobWrite(BindStructure->lob1, (void*)BindStructure->asChar.value,  BindStructure->asChar.size  );
+//          OCI_LobTruncate(BindStructure->lob1,0);
+//           OCI_LobWrite(BindStructure->lob1, (void*)BindStructure->asChar.value,  BindStructure->asChar.size  );
          break;
       }
       case SQL_C_NUMERIC:
@@ -659,6 +643,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
          BindStructure->asDate.year  = (unsigned int) iYear;
          BindStructure->asDate.month = (unsigned int) iMonth;
          BindStructure->asDate.day   = (unsigned int) iDay;
+         OCI_DateSetDate(BindStructure->asDate1,BindStructure->asDate.year, BindStructure->asDate.month, BindStructure->asDate.day) ;         
          break;
       }
       case SQL_C_TYPE_TIMESTAMP:
@@ -666,7 +651,7 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
          int iYear, iMonth, iDay;
          int iHour, iMinute;
          BOOL bEmpty = SR_itemEmpty( pFieldData );
-//DebugBreak();
+
          if( (!bEmpty) && BindStructure->isBoundNULL && hStmt )     // Param was NULL, should be re-bound
          {
             BindStructure->isBoundNULL  = FALSE;
@@ -685,19 +670,6 @@ HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_
 
          {
 #ifdef __XHARBOUR__
-            // hb_dateDecode( pFieldData->item.asDate.value, &iYear, &iMonth, &iDay );
-            //hb_timeDecode( pFieldData->item.asDate.time, piHour, piMin, pdSec );         
-            //DebugBreak();
-//             double seconds;
-//             hb_datetimeDecode(pFieldData->item.asDate.value,  pFieldData->item.asDate.time,
-//                               &iYear, &iMonth, &iDay,
-//                               &iHour, &iMinute, &seconds );
-//             long lJulian, lMilliSec;
-//             int seconds, millisec;
-//             
-//             hb_itemGetDTL( pFieldData, &lJulian, &lMilliSec );
-//             hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
-//             hb_timeDecode( lMilliSec, &iHour, &iMinute, &seconds ); 
             double seconds;
             hb_datetimeDecode(pFieldData->item.asDate.value,  pFieldData->item.asDate.time,
                               &iYear, &iMonth, &iDay,
@@ -754,7 +726,6 @@ HB_ERRCODE SetBindEmptylValue( COLUMNBINDORAP BindStructure )
       }
       case SQL_C_TYPE_TIMESTAMP:
       {
-	      //DebugBreak();
          if( !BindStructure->isBoundNULL )
          {
             BindStructure->lIndPtr     = SQL_NULL_DATA;
@@ -877,12 +848,13 @@ void ReleaseColStatementsOra( SQLEXORAAREAP thiswa, int iCols )
 // 	     OCI_Statement *hStmt = (OCI_Statement*)thiswa->colStmt;
          if ( thiswa->colStmt[i].pStmt )
          {
-	         
             OCI_StatementFree(thiswa->colStmt[i].pStmt); 
 //             thiswa->colStmt = NULL;
          }
        }
        hb_xfree( thiswa->colStmt );
+       thiswa->colStmt = NULL;
+       
    }
 }
 
@@ -960,7 +932,7 @@ static void BindAllIndexStmts( SQLEXORAAREAP thiswa )
       // Natural order
 
       IndexBind = thiswa->IndexBindings[0];
-      hStmt     = thiswa->hStmtSkip ;//thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
+      hStmt     = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
       sSql      = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql : IndexBind->SkipBwdSql;
 
       BindStructure = GetBindStructOra( thiswa, IndexBind );
@@ -984,7 +956,7 @@ static void BindAllIndexStmts( SQLEXORAAREAP thiswa )
 
       for (iCol = 1; iCol <= thiswa->indexColumns; iCol++)
       {
-         hStmt          = thiswa->hStmtSkip ; //thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
+         hStmt          = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
          sSql           = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql : IndexBind->SkipBwdSql;
          IndexBindParam = thiswa->IndexBindings[ thiswa->sqlarea.hOrdCurrent ];
          iBind          = 1;
@@ -1025,7 +997,6 @@ static void BindAllIndexStmts( SQLEXORAAREAP thiswa )
                   }
                   case SQL_C_TYPE_TIMESTAMP:
                   {
-                     //DebugBreak();
                   BindStructure->asDate2 = OCI_DateCreate(GetConnection(thiswa->hDbc));
                   OCI_DateSetDateTime(BindStructure->asDate2,BindStructure->asTimestamp.year, BindStructure->asTimestamp.month, BindStructure->asTimestamp.day,BindStructure->asTimestamp.hour,BindStructure->asTimestamp.minute,BindStructure->asTimestamp.second) ;
                   res=OCI_BindDate(hStmt, BindStructure->szBindName, BindStructure->asDate2);
@@ -1112,7 +1083,7 @@ static void FeedCurrentRecordToBindings( SQLEXORAAREAP thiswa )
             if( BindStructure->isNullable && BindStructure->isArgumentNull )
             {
                // It is STILL NULL, so no problem
-               OCI_Statement *hStmt = thiswa->hStmtSkip ;//thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
+               OCI_Statement *hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
                SetBindValue( pFieldData, BindStructure, hStmt );
             }
             else if( !BindStructure->isNullable )
@@ -1126,14 +1097,14 @@ static void FeedCurrentRecordToBindings( SQLEXORAAREAP thiswa )
                // but query in NOT prepared for NULL values. So we must RE-PREPARE all queries
 
                thiswa->bConditionChanged1 = TRUE;
-               CreateSkipStmt( thiswa );
+               CreateSkipStmtOra( thiswa );
                BindAllIndexStmts( thiswa );
                FeedCurrentRecordToBindings( thiswa );     // Recursive call
             }
          }
          else
          {
-            OCI_Statement *hStmt = thiswa->hStmtSkip ; //thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
+            OCI_Statement *hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
             SetBindValue( pFieldData, BindStructure, hStmt );
          }
 
@@ -1408,10 +1379,6 @@ void SetCurrRecordStructureOra( SQLEXORAAREAP thiswa )
            
          case 'D':
          {
-//             BindStructure->iCType          = lType;    // DATE or TIMESTAMP
-// 	        if ( thiswa->nSystemID = SYSTEMID_ORACLE )
-// 	           BindStructure->iCType          = SQL_C_TYPE_TIMESTAMP;        // May be DATE or TIMESTAMP
-// 	        else
                BindStructure->iCType          = SQL_C_TYPE_DATE;        // May be DATE or TIMESTAMP 
 
             break;
@@ -1599,6 +1566,7 @@ HB_ERRCODE getWorkareaParamsOra( SQLEXORAAREAP thiswa )
       thiswa->sDeletedName    = getMessageC( thiswa->sqlarea.oWorkArea, "CDELETEDNAME" );
       thiswa->iTCCompat       = getMessageNI( thiswa->sqlarea.oWorkArea, "NTCCOMPAT" );
       thiswa->bHistoric       = getMessageL( thiswa->sqlarea.oWorkArea, "LHISTORIC" );
+      thiswa->bOracle12       = getMessageL( thiswa->oSql, "LORACLE12" );
 
       thiswa->sRecnoName   = QualifyName( thiswa->sRecnoName, thiswa );
       thiswa->sDeletedName = QualifyName( thiswa->sDeletedName, thiswa );
@@ -1638,7 +1606,7 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
    // not nedded 
    //IndexBind += (thiswa->indexLevel - 1);    // Place Offset
 
-   hStmt = thiswa->hStmtSkip ; //thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
+   hStmt = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdStmt : IndexBind->SkipBwdStmt;
    sSql  = thiswa->recordListDirection == LIST_FORWARD ? IndexBind->SkipFwdSql : IndexBind->SkipBwdSql;
 
    res = OCI_Execute( hStmt );
@@ -1650,8 +1618,7 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
    {
       OraErrorDiagRTE( hStmt, "getPreparedRecordList", sSql, res, __LINE__, __FILE__ );
       OCI_StatementFree( hStmt );
-      IndexBind->SkipFwdStmt  = NULL;             
-      IndexBind->SkipBwdStmt  = NULL;       
+
       return (HB_FAILURE);
    }
 
@@ -1673,15 +1640,15 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
          // Ops, where are previously retrieved record ?
          // Run query again and try to find it in result
          // set since it can be deleted by other user - MISSING!!!
-         OCI_StatementFree(thiswa->hStmtSkip);
-         thiswa->hStmtSkip = NULL; 
+//          OCI_StatementFree(thiswa->hStmtSkip);
+//          thiswa->hStmtSkip = NULL; 
          return HB_RETRY;
       }
       
       if (!OCI_FetchNext(rs))
       {
-         OCI_StatementFree(thiswa->hStmtSkip);
-         thiswa->hStmtSkip = NULL; 
+//          OCI_StatementFree(thiswa->hStmtSkip);
+//          thiswa->hStmtSkip = NULL; 
          return HB_RETRY;
       }
 
@@ -1732,15 +1699,8 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
          }
          break;
       }
-//       res = SQLGetData( hStmt, 1, SQL_C_ULONG, &(thiswa->recordList[i]), sizeof( SQL_C_ULONG ), NULL );
+
       thiswa->recordList[i]= OCI_GetUnsignedBigInt( rs,1 ) ;
-//       ////TraceLog("aaa.log", "getPreparedRecordList 2 registro %i pego %lu\n",i,thiswa->recordList[i]);
-//       if( res == SQL_ERROR )
-//       {
-//          
-//          OCI_StatementFree( hStmt);
-//          return (HB_FAILURE);
-//       }
 
       recordListChanged++;
 
@@ -1748,12 +1708,12 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
       {
          char szValue[2];
          unsigned int uiLen;
-        //       res = SQLGetData( * hStmt, 2, SQL_C_CHAR, szValue, 2, NULL );
+
          if ( OCI_GetString(rs,2 ) == NULL )
          {
 	         
-         OCI_StatementFree(thiswa->hStmtSkip);
-         thiswa->hStmtSkip = NULL; 
+//          OCI_StatementFree(thiswa->hStmtSkip);
+//          thiswa->hStmtSkip = NULL; 
             return (HB_FAILURE);
          }
          else
@@ -1777,8 +1737,8 @@ static HB_ERRCODE getPreparedRecordList( SQLEXORAAREAP thiswa, int iMax ) // Ret
       }
    }
 
-   OCI_StatementFree(thiswa->hStmtSkip);
-         thiswa->hStmtSkip = NULL; 
+//    OCI_StatementFree(thiswa->hStmtSkip);
+//          thiswa->hStmtSkip = NULL; 
    if( recordListChanged )
    {
       thiswa->recordListSize = (ULONG) i;
@@ -2065,7 +2025,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXORAAREAP thiswa, BOOL bUpdateDeleted 
    PHB_ITEM temp;
    OCI_Resultset  *rs     ;
    char * szEnd;
-//    DebugBreak();
+
 //   HB_ITEM temp;
 
    // To do: Must check if buffer pool have to be clared due to change in
@@ -2104,7 +2064,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXORAAREAP thiswa, BOOL bUpdateDeleted 
 
       thiswa->bConditionChanged2 = TRUE;     // SEEK statements are no longer valid - column list has changed!
       memset(thiswa->sSqlBuffer , 0 , MAX_SQL_QUERY_LEN / 5  * sizeof( char ) );
-//       DebugBreak();
+
       if( thiswa->bIsSelect )
       {
          sprintf( thiswa->sSqlBuffer, "SELECT %s FROM (%s) A WHERE A.%c%s%c IN ( :1", thiswa->sFields, thiswa->sqlarea.szDataFileName, OPEN_QUALIFIER( thiswa ), thiswa->sRecnoName, CLOSE_QUALIFIER( thiswa )); 
@@ -2313,13 +2273,13 @@ static HB_ERRCODE updateRecordBuffer( SQLEXORAAREAP thiswa, BOOL bUpdateDeleted 
 
       // Add new array to Buffer Pool
 #ifdef __XHARBOUR__
-               if( s_pSym_TODATA  == NULL )
-               {
-                  hb_dynsymLock();
-                  s_pSym_TODATA = hb_dynsymFindName( "TODATA" );
-                  hb_dynsymUnlock();
-                  if ( s_pSym_TODATA  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
-               }
+//                if( s_pSym_TODATA  == NULL )
+//                {
+//                   hb_dynsymLock();
+//                   s_pSym_TODATA = hb_dynsymFindName( "TODATA" );
+//                   hb_dynsymUnlock();
+//                   if ( s_pSym_TODATA  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
+//                }
 //                 hb_vmPushDynSym( s_pSym_TODATA );
 //                 hb_vmPushNil();
 //                 hb_vmPush( aRecord );
@@ -2455,9 +2415,18 @@ HB_ERRCODE prepareRecordListQueryOra( SQLEXORAAREAP thiswa )
 //    res = SQLAllocStmt( ( HDBC ) thiswa->hDbc, &hPrep );
 //    hPrep=OCI_StatementCreate( GetConnection(thiswa->hDbc) );
    if ( thiswa->recordListDirection == LIST_FORWARD )
-      thiswa->hStmtSkip = OCI_StatementCreate( GetConnection(thiswa->hDbc) );
+   {
+      IndexBind->SkipFwdStmt = OCI_StatementCreate( GetConnection(thiswa->hDbc) );
+      OCI_AllowRebinding(IndexBind->SkipFwdStmt,1);
+   }
    else
-      thiswa->hStmtSkip = OCI_StatementCreate( GetConnection(thiswa->hDbc) );
+   {
+      IndexBind->SkipBwdStmt = OCI_StatementCreate( GetConnection(thiswa->hDbc) );
+      OCI_AllowRebinding(IndexBind->SkipBwdStmt,1);
+   }
+
+      
+      
       
 
 
@@ -2469,10 +2438,10 @@ HB_ERRCODE prepareRecordListQueryOra( SQLEXORAAREAP thiswa )
 // if ( CHECK_SQL_N_OK( SQLPrepare( hPrep, (char *) (thiswa->sSql), SQL_NTS ) ) )
 
 //    res = OCI_Prepare( hPrep, (char *) thiswa->sSql );
-//    if ( thiswa->recordListDirection == LIST_FORWARD )
-      res = OCI_Prepare(thiswa->hStmtSkip , (char *) thiswa->sSql );
-//    else
-//       res = OCI_Prepare(IndexBind->SkipBwdStmt , (char *) thiswa->sSql );
+    if ( thiswa->recordListDirection == LIST_FORWARD )
+      res = OCI_Prepare(IndexBind->SkipFwdStmt , (char *) thiswa->sSql );
+    else
+       res = OCI_Prepare(IndexBind->SkipBwdStmt , (char *) thiswa->sSql );
    
    if (!res)
    {
@@ -2499,10 +2468,10 @@ HB_ERRCODE prepareRecordListQueryOra( SQLEXORAAREAP thiswa )
  
 /*------------------------------------------------------------------------*/
 
-static BOOL CreateSkipStmt( SQLEXORAAREAP thiswa )
+static BOOL CreateSkipStmtOra( SQLEXORAAREAP thiswa )
 {
    PHB_ITEM pColumns, pIndexRef;
-//    INDEXBINDORAP IndexBind;
+   INDEXBINDORAP IndexBind;
    int i;
 
    // Note about this IF: I assume that if query is prepared for level 1 (without changing IndexBind offset),
@@ -2537,32 +2506,32 @@ static BOOL CreateSkipStmt( SQLEXORAAREAP thiswa )
 
       // Now we should bind all index columns to be used by SKIP
 
-//       IndexBind = thiswa->IndexBindings[ thiswa->sqlarea.hOrdCurrent ];
+       IndexBind = thiswa->IndexBindings[ thiswa->sqlarea.hOrdCurrent ];
 
       // Free the statements we are about to recreate
       
-      if ( thiswa->hStmtSkip )
-      {
-         OCI_StatementFree( thiswa->hStmtSkip ) ;
-         thiswa->hStmtSkip = NULL;
-      }
+//       if ( thiswa->hStmtSkip )
+//       {
+//          OCI_StatementFree( thiswa->hStmtSkip ) ;
+//          thiswa->hStmtSkip = NULL;
+//       }
       
 
-//       for ( i=1; i <= thiswa->indexColumns; i++ )
-//       {
-//          if ( IndexBind->SkipFwdStmt )
-//          {
-//             OCI_StatementFree( IndexBind->SkipFwdStmt);
-//             IndexBind->SkipFwdStmt = NULL;
-//          }
-// 
-//          if ( IndexBind->SkipBwdStmt )
-//          {
-//             OCI_StatementFree( IndexBind->SkipBwdStmt);
-//             IndexBind->SkipBwdStmt = NULL;
-//          }
-//          IndexBind++;
-//       }
+      for ( i=1; i <= thiswa->indexColumns; i++ )
+      {
+         if ( IndexBind->SkipFwdStmt )
+         {
+            OCI_StatementFree( IndexBind->SkipFwdStmt);
+            IndexBind->SkipFwdStmt = NULL;
+      }
+      
+         if ( IndexBind->SkipBwdStmt )
+         {
+            OCI_StatementFree( IndexBind->SkipBwdStmt);
+            IndexBind->SkipBwdStmt = NULL;
+         }
+         IndexBind++;
+      }
 
       getOrderByExpressionOra( thiswa, FALSE );
       setResultSetLimitOra( thiswa, RECORD_LIST_SIZE );
@@ -2608,7 +2577,7 @@ static HB_ERRCODE sqlExOraBof( SQLEXORAAREAP thiswa, BOOL * bof )
 
 static HB_ERRCODE sqlExOraEof( SQLEXORAAREAP thiswa, BOOL * eof )
 {
-//   DebugBreak();	
+
    if( thiswa->sqlarea.firstinteract )
    {
       SELF_GOTOP( &thiswa->sqlarea.area );
@@ -2974,7 +2943,10 @@ static HB_ERRCODE sqlExOraSeek( SQLEXORAAREAP thiswa, BOOL bSoftSeek, PHB_ITEM p
       BindSeekStmtora( thiswa, queryLevel );          // Bind parameters to IndexBind structure
 
    }
-
+   else 
+   {	  
+      FeedSeekStmtOra( thiswa ,queryLevel);          // Bind parameters to IndexBind structure
+   }   
    thiswa->bConditionChanged2 = FALSE;
 
    if ( getPreparedSeekora( thiswa, queryLevel, &iIndex, &hStmt,&rs ) == HB_SUCCESS )     // Fetch line from database, read RECNO and DELETED
@@ -2995,37 +2967,49 @@ static HB_ERRCODE sqlExOraSeek( SQLEXORAAREAP thiswa, BOOL bSoftSeek, PHB_ITEM p
 
       for( i=1; i <= thiswa->sqlarea.area.uiFieldCount; i++ )
       {
-
+ 	     PHB_ITEM pF = hb_arrayGetItemPtr( thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i-1]  );
          temp=hb_itemNew(NULL) ;
          //temp.type = HB_IT_NIL;        // I know this is not a good practice, but we save tons of allocs.
                                        // please keep as is. ML.
 
-         if( (thiswa->sqlarea.uiFieldList[i-1] == 0) && thiswa->sqlarea.iFieldListStatus != FIELD_LIST_LEARNING )
-         {
-            hb_arraySetForward( aRecord, i, temp );     // Field is temporaly NIL since it's have never
-                                                         // been needed in current WA. Will be filled on demand 
-         }
-         else
-         {   
+//         if( (thiswa->sqlarea.uiFieldList[i-1] == 0) && thiswa->sqlarea.iFieldListStatus != FIELD_LIST_LEARNING )
+//         {
+//            hb_arraySetForward( aRecord, i, temp );     // Field is temporaly NIL since it's have never
+//                                                         // been needed in current WA. Will be filled on demand 
+//         }
+//         else
+//         {   
 // 	         PHB_ITEM pF = hb_arrayGetItemPtr( thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i-1]  );
 	         
-               if( s_pSym_TODATA  == NULL )
-               {
-                  hb_dynsymLock();
-                  s_pSym_TODATA = hb_dynsymFindName( "TODATA" );
-                  hb_dynsymUnlock();
-                  if ( s_pSym_TODATA  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
-               }
+//                if( s_pSym_TODATA  == NULL )
+//                {
+//                   hb_dynsymLock();
+//                   s_pSym_TODATA = hb_dynsymFindName( "TODATA" );
+//                   hb_dynsymUnlock();
+//                   if ( s_pSym_TODATA  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
+//                }
 //                hb_vmPushDynSym( s_pSym_TODATA );
 //                hb_vmPushNil();
 //                hb_vmPush( thiswa->aFields );
 //                hb_vmDo( 1 );
 	         
-//              ////TraceLog("aaa.log", "Valor stringzado %s pos i %i index %lu campo %s \n",OCI_GetString(rs,iIndex+1),i,iIndex+1,hb_arrayGetC(pF,1));
+//              TraceLog("ccc.log", "Valor stringzado %s pos i %i index %lu campo %s \n",OCI_GetString(rs,iIndex+1),i,iIndex+1,hb_arrayGetC(pF,1)); 
              SQLO_FieldGet( hb_arrayGetItemPtr( thiswa->aFields, thiswa->sqlarea.uiBufferIndex[i-1]  ), temp, ++iIndex           , 0, thiswa->nSystemID, bTranslate , rs);                  	                       
              hb_arraySetForward( aRecord, i, temp );                  
             
-         }
+  //       }
+//                if( s_pSym_TODATA  == NULL )
+//                {
+//                   hb_dynsymLock();
+//                   s_pSym_TODATA = hb_dynsymFindName( "TODATA" );
+//                   hb_dynsymUnlock();
+//                   if ( s_pSym_TODATA  == NULL ) printf( "Could not find Symbol SR_DESERIALIZE\n" );
+//                }
+//                 hb_vmPushDynSym( s_pSym_TODATA );
+//                 hb_vmPushNil();
+//                 hb_vmPush( aRecord );
+//                 hb_vmDo( 1 );
+         
 
       }
 //       hb_xfree( ( char*) bBuffer );
@@ -3287,11 +3271,11 @@ static HB_ERRCODE sqlExOraSkipRaw( SQLEXORAAREAP thiswa, LONG lToSkip )
 
       // Set binding structures and SQL stmts for
       // SKIP and SEEK over current index order
-//       DebugBreak(); 
-      if (!CreateSkipStmt( thiswa ))
+
+      if (!CreateSkipStmtOra( thiswa ))
       {
          // If queries were not re-createds and re-prepared, we should
-         // feed bind structures with current record information (CreateSkipStmt
+         // feed bind structures with current record information (CreateSkipStmtOra
          // does it in getWhereExpressionOra() if queries were re-prepared
 
          FeedCurrentRecordToBindings( thiswa );
@@ -4036,7 +4020,7 @@ static HB_ERRCODE sqlExOraClose( SQLEXORAAREAP thiswa )
 static HB_ERRCODE sqlExOraCreate( SQLEXORAAREAP thiswa, LPDBOPENINFO OpenInfo )
 {
    HB_ERRCODE err;
-//    DebugBreak();
+
    err = SUPER_CREATE( &thiswa->sqlarea.area, OpenInfo ); 
 
    return err;
@@ -4849,6 +4833,7 @@ static int sqlKeyCompareEx( SQLEXORAAREAP thiswa, PHB_ITEM pKey, BOOL fExact )
             iResult = -1;
       }
       else
+        
          iResult = 0;
    }
    else

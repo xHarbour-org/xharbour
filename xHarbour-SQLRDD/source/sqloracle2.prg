@@ -239,6 +239,10 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    local hEnv := 0, hDbc := 0
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
    Local aRet := {}
+   Local aVersion
+   Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
+   Local cString
+
 
    (cDSN)
    (cUser)
@@ -279,11 +283,22 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    ::nSystemID    := SYSTEMID_ORACLE
    ::cTargetDB    := Upper( cTargetDB )
 
+   aRet :={{cSystemVers}}
+   cMatch := HB_AtX( s_reEnvVar, cSystemVers, , @nStart, @nLen )         
+   if !empty(cMatch )
+      aVersion      := hb_atokens( cMatch, "." )
+   else
+      aVersion      := hb_atokens( strtran(Upper(aRet[1,1]),"ORACLE ",""), "." )
+   endif
+   
+   
    ::exec( "select sid from " + If(::lCluster, "g", "" ) + "v$session where AUDSID = sys_context('USERENV','sessionid')", .T., .T., @aRet )
 
    If len( aRet ) > 0
       ::uSid := val(str(aRet[1,1],8,0))
    EndIf
+   SQLO_SETSTATEMENTCACHESIZE(hdbc,50)
+   ::lOracle12 :=( Val( aversion[ 1 ] ) == 12 ) 
 
 Return Self
 

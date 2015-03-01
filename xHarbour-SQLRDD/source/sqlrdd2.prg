@@ -1979,8 +1979,13 @@ METHOD Quoted( uData, trim, nLen, nDec, nTargetDB, lSynthetic )   CLASS SR_WORKA
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
    Case cType == "D" 
       return ['] + dtos(uData) + [']
-   case ctype == "T"  .and. ::oSql:nSystemID == SYSTEMID_POSTGR  
-      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
+   case ctype == "T"  .and. ( ::oSql:nSystemID == SYSTEMID_POSTGR   .or.  ::oSql:nSystemID == SYSTEMID_MYSQL  .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
+      if nLen == 4
+         return ['] + HB_TSTOSTR( udata, .t.) + [']
+      endif
+    
+      //return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
+      return ['] + HB_TSTOSTR( uData ) + [']
    case ctype == "T" .and.  ::oSql:nSystemID == SYSTEMID_ORACLE
       return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
    Case cType == "N" .and. nLen == NIL
@@ -2078,12 +2083,16 @@ METHOD QuotedNull( uData, trim, nLen, nDec, nTargetDB, lNull, lMemo )   CLASS SR
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
    Case cType == "D" .and. (!lMemo)
       return ['] + dtos(uData) + [']
-   case ctype == "T"  .and. ::oSql:nSystemID == SYSTEMID_POSTGR  
+   case ctype == "T"  .and. ( ::oSql:nSystemID == SYSTEMID_POSTGR   .or.  ::oSql:nSystemID == SYSTEMID_MYSQL  .or. ::oSql:nSystemID == SYSTEMID_MARIADB )
       IF Empty( uData) 
          RETURN 'NULL'
       ENDIF 
 
-      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']      
+      if nLen == 4
+         return ['] + HB_TSTOSTR( udata, .t.) + [']
+      endif
+      //return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']      
+      return ['] + HB_TSTOSTR( uData ) + [']
    case ctype == "T" .and.  ::oSql:nSystemID == SYSTEMID_ORACLE
       IF Empty( uData) 
          RETURN 'NULL'
@@ -5297,8 +5306,12 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          EndIf
       // including xml data type
       // postgresql datetime
-      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  )
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR .or. ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+         if aCreate[i,FIELD_LEN] == 4
+             cSql := cSql + 'time without time zone '
+         else
          cSql := cSql + 'timestamp without time zone '
+         endif
       // oracle datetime
       Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
          cSql := cSql + 'TIMESTAMP '   
@@ -8748,8 +8761,12 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
             EndIf
          // including xml data type
          // postgresql datetime
-         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR  )
-            cSql := cSql + 'timestamp without time zone '
+         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR .or. ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+            if aCreate[i,FIELD_LEN] == 4
+               cSql := cSql + 'time without time zone '
+            else
+               cSql := cSql + 'timestamp without time zone '
+            endif            
          // oracle datetime
          Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
             cSql := cSql + 'TIMESTAMP '   
@@ -9985,7 +10002,7 @@ next
 cRet := Substr( cRet, 1, Len( cRet ) - 1 ) + " ) ) "
 return cRet
 
-REQUEST SR_FROMXML,SR_arraytoXml
+REQUEST SR_FROMXML,SR_arraytoXml,SR_DESERIALIZE
 
 function SR_arraytoXml( a )
 * Local cItem

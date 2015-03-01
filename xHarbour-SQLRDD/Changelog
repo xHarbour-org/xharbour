@@ -8,6 +8,37 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-01 16:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/mysql.c
+     ! moved case MYSQL_TIME_TYPE: to be alone to define time type as SQL_TIME
+     ! updated MSQLFieldGet to correct return time values under SQL_TIME  
+   ! source/pgs.c  
+     ! moved case TIMEOID: to be alone to define time type as SQL_TIME
+     ! updated PGSFieldGet to correct return time values under SQL_TIME  
+   ! source/sqlact.c
+     ! fixed minor typo on escape_pgs  
+   ! source/sqlconnection.prg
+     ! added lOracle12 data to class
+     ! on method SQLType return "T" when nType == SQL_TIME when nSystemID is SYSTEMID_MYSQL or SYSTEMID_MARIADB or SYSTEMID_POSTGR
+   ! source/sqlrdd2.prg
+     ! updated method Quoted to return Time Part when field type is T and len is 4  
+     ! updated method QuotedNull to return Time Part when field type is T and len is 4  
+     ! using HB_TSTOSTR to format datetime to send to database insted of transform(ttos()) 
+     ! updated sqlcreate method to send 'time without time zone ' when field type is T and len is 4 under postgresql/mariadb/mysql
+   ! source/sqlex1ora.c
+   ! source/sqlex2ora.c
+   ! source/sqlex3ora.c
+   ! source/sqlexora.h
+   ! source/sqlorastru.h  
+   ! source/sqloracle2.prg
+   ! source/sqlora2.c
+     ! some updated for SQLEXORA RDD   
+   ! source/sqlex1.c
+     ! using hb_xgrabz insted hb_xgrab where aplicable
+   ! source/sqlrdd1.c
+     ! added HB_IS_TIMEFLAG and HB_IS_DATATIME To allow save time values 
+   
+   
 2015-02-17 22:40 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/sqlex1ora.c
 

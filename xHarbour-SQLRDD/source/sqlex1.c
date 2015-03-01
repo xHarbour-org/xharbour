@@ -1354,8 +1354,8 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
       {
          case 'C':
          {
-            BindStructure->asChar.value      = (SQLCHAR *) hb_xgrab(BindStructure->ColumnSize + 1 );
-            memset(BindStructure->asChar.value ,0, BindStructure->ColumnSize + 1 ); // Culik Zero all memory
+            BindStructure->asChar.value      = (SQLCHAR *) hb_xgrabz(BindStructure->ColumnSize + 1 );
+//             memset(BindStructure->asChar.value ,0, BindStructure->ColumnSize + 1 ); // Culik Zero all memory
             BindStructure->asChar.size_alloc = BindStructure->ColumnSize + 1;
             BindStructure->iCType            = SQL_C_CHAR;
             BindStructure->asChar.size       = 0;
@@ -1364,8 +1364,8 @@ void SetCurrRecordStructure( SQLEXAREAP thiswa )
          case 'M':
          {
             BindStructure->iCType            = SQL_C_BINARY;
-            BindStructure->asChar.value      = (SQLCHAR *) hb_xgrab(INITIAL_MEMO_ALLOC );
-            memset(BindStructure->asChar.value ,0, INITIAL_MEMO_ALLOC ); // Culik Zero all memory
+            BindStructure->asChar.value      = (SQLCHAR *) hb_xgrabz(INITIAL_MEMO_ALLOC );
+//             memset(BindStructure->asChar.value ,0, INITIAL_MEMO_ALLOC ); // Culik Zero all memory
             BindStructure->asChar.size_alloc = INITIAL_MEMO_ALLOC;
             BindStructure->asChar.size       = 0;
             BindStructure->asChar.value[0]   = '\0';

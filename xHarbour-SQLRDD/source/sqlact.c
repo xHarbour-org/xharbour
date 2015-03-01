@@ -485,10 +485,10 @@ static HB_SIZE escape_pgs( char *to, const char *from, HB_SIZE length )
       *to++= '\'';
       *to++= '\'';
       break;
-//     case '\\':
-//       *to++= '\\';
-//       *to++= '\\';
-//       break;
+    case '\\':
+      *to++= '\\';
+      *to++= '\\';
+      break;
     case 0:
       break;
     default:

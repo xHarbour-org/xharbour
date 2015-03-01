@@ -73,7 +73,7 @@
 #define PAGE_READ_SIZE                        50
 #define BUFFER_POOL_SIZE                     250
 #define DEFAULT_INDEX_COLUMN_MAX_LEN         200
-#define INITIAL_MEMO_ALLOC                  1024
+#define INITIAL_MEMO_ALLOC                  128
 
 //                           0 1 2 34 5 6 7 8 9 0 1 23 4 5 67 8 9
 static char * openQuotes  = "\"\"\"[\"\"\"\"\"\"\"\"`\"\"\"`\"\"\"";

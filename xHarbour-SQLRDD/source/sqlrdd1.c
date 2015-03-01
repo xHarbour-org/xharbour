@@ -1454,6 +1454,7 @@ static HB_ERRCODE sqlPutValue( SQLAREAP thiswa, USHORT fieldNum, PHB_ITEM value 
    //}
    if( (HB_IS_NUMBER( pDest ) && HB_IS_NUMBER( value )) || (HB_IS_STRING( pDest ) && HB_IS_STRING( value )) ||
        (HB_IS_LOGICAL( pDest ) && HB_IS_LOGICAL( value )) || (HB_IS_DATE( pDest ) && HB_IS_DATE( value )) ||
+       (HB_IS_TIMEFLAG( pDest ) && HB_IS_DATETIME( value )) ||
        (HB_IS_DATETIME( pDest ) && HB_IS_DATETIME( value )))
    {
 
@@ -3519,11 +3520,19 @@ static BOOL ProcessFields( SQLAREAP thiswa )
       // new field type
       case 't':
       case 'T':
+     if( field.uiLen == 4 )            
+     {
+         field.uiType = HB_FT_TIME;
+     }
+     else
+     {
 #ifdef __XHARBOUR__
          field.uiType = HB_FT_DATETIME;
 #else
          field.uiType = HB_FT_TIMESTAMP;
 #endif
+	 }
+
          break;
       default:
          field.uiType =HB_IT_NIL;

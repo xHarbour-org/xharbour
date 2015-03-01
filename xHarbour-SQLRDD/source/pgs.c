@@ -599,7 +599,13 @@ HB_FUNC( PGSTABLEATTR )     /* PGSTableAttr( ConnHandle, cTableName ) => aStruct
             hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
             hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_DATETIME ) );
             break;
-            
+         case TIMEOID:
+            hb_itemPutC( temp, "T" );
+            hb_arraySetForward( atemp, FIELD_TYPE, temp );
+            hb_arraySetForward( atemp, FIELD_LEN, hb_itemPutNI( temp, 4 ) );
+            hb_arraySetForward( atemp, FIELD_DEC, hb_itemPutNI( temp, 0 ) );
+            hb_arraySetForward( atemp, FIELD_DOMAIN, hb_itemPutNI( temp, SQL_TIME ) );         
+         break;
             
          default:
             TraceLog( LOGFILE, "Strange data type returned: %i\n", type );
@@ -636,6 +642,10 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
    lType = ( LONG ) hb_arrayGetNL( pField, 6 );
    lLen  = hb_arrayGetNL( pField, 3 );
    lDec  = hb_arrayGetNL( pField, 4 );
+
+   
+   
+	   
 
    if( lLenBuff <= 0 )     // database content is NULL
    {
@@ -688,6 +698,12 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
 //#endif
             break;
          }
+         case SQL_TIME:
+         {
+	         hb_itemPutTDT( pItem, 0, 0 );
+	         break;
+         }
+         
 
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
@@ -831,7 +847,7 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
          case SQL_BIT:
          {
             hb_itemPutL( pItem, bBuffer[0] == 't' ? TRUE : FALSE );
-//            hb_itemPutL( pItem, hb_strValInt( bBuffer, &iOverflow ) > 0  ? TRUE : FALSE );
+
             break;
          }
 
@@ -845,27 +861,6 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
          case SQL_DATETIME:
          {
 #ifdef __XHARBOUR__
-            //hb_retdts(bBuffer);
-//
-//            char dt[18];
-//
-//            dt[0] = bBuffer[0];
-//            dt[1] = bBuffer[1];
-//            dt[2] = bBuffer[2];
-//            dt[3] = bBuffer[3];
-//            dt[4] = bBuffer[5];
-//            dt[5] = bBuffer[6];
-//            dt[6] = bBuffer[8];
-//            dt[7] = bBuffer[9];
-//            dt[8] = bBuffer[11];
-//            dt[9] = bBuffer[12];
-//            dt[10] = bBuffer[14];
-//            dt[11] = bBuffer[15];
-//            dt[12] = bBuffer[17];
-//            dt[13] = bBuffer[18];
-//            dt[14] = '\0';
-//
-//            hb_itemPutDTS( pItem, dt );
             long lJulian, lMilliSec;
             hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
             hb_itemPutTDT( pItem, lJulian, lMilliSec );
@@ -876,6 +871,14 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
 #endif
             break;
          }
+         case SQL_TIME:
+         {
+	        long  lMilliSec;
+            lMilliSec = hb_timeEncStr( bBuffer );         
+            hb_itemPutTDT( pItem, 0, lMilliSec );    
+            break;
+         }
+         
          default:
             TraceLog( LOGFILE, "Invalid data type detected: %i\n", lType );
       }
