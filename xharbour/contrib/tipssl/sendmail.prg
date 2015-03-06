@@ -55,7 +55,7 @@
 #include "common.ch"
 
 
-FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth, lNoAuth, nTimeOut, cReplyTo, lSSL, CaFile, CAPath )
+FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth, lNoAuth, nTimeOut, cReplyTo, lSSL, CaFile, CAPath,lTls)
    /*
    cServer    -> Required. IP or domain name of the mail server
    nPort      -> Optional. Port used my email server
@@ -104,6 +104,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    DEFAULT nTimeOut    TO 3000
    DEFAULT cReplyTo    TO ""
    DEFAULT lSSL        TO .F.
+   DEFAULT lTls        TO .F.
    
    IF HB_ISSTRING( aFiles )
       cTemp := aFiles
@@ -246,7 +247,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
 
    IF !lNoAuth
 
-      IF oInMail:Opensecure()
+      IF oInMail:Opensecure(,lSSl)
 
          IF oInmail:lAuthLogin
             IF !oInMail:Auth( StrTran( cUser, "&at;", "@" ), cPass )

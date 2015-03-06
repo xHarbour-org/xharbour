@@ -251,7 +251,8 @@ PHB_ITEM hb_itemPutStrUTF8( PHB_ITEM pItem, const char * pStr )
    nDest    = hb_cdpStringInUTF8Length( cdp, FALSE, pStr, nLen );
    pszDest  = ( char * ) hb_xgrab( nDest + 1 );
 
-   hb_cdpStrnToUTF8n( cdp, FALSE, pStr, nLen, pszDest, nDest + 1 );
+//    hb_cdpStrnToUTF8n( cdp, FALSE, pStr, nLen, pszDest, nDest + 1 );
+   hb_cdpUTF8ToStrn (cdp, FALSE, pStr, nLen, pszDest, nDest + 1 );
 
    return hb_itemPutCLPtr( pItem, pszDest, nDest );
 }

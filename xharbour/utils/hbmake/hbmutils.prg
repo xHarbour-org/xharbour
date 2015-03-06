@@ -627,7 +627,11 @@ FUNCTION GetLibs( lGcc, cDir )
 *-----------------------------
 
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
-   LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
+#ifdef __ARCH64BIT__   
+   LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib64/xharbour/*.a' ), lGcc )
+#else
+LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
+#endif   
    LOCAL cExt := iif(lGcc,".a",".lib")
 
 
@@ -705,10 +709,10 @@ FUNCTION CreateLink()
     LOCAL nHandle := FCreate("hbtemp.c")
     
     FWrite( nHandle, '#include "hbapi.h"' + HB_OsNewLine())
-    FWrite( nHandle, 'extern HB_FUNC( HB_GT_CRS );' + HB_OsNewLine())
+    FWrite( nHandle, 'extern HB_FUNC( HB_GT_TRM );' + HB_OsNewLine())
     FWrite( nHandle, 'void hb_lnk_ForceLink_build( void )' + HB_OsNewLine())
     FWrite( nHandle, '{' + HB_OsNewLine())
-    FWrite( nHandle, '   HB_FUNCNAME( HB_GT_CRS )();' + HB_OsNewLine())
+    FWrite( nHandle, '   HB_FUNCNAME( HB_GT_TRM )();' + HB_OsNewLine())
     FWrite( nHandle, '}' + HB_OsNewLine())
     FClose( nHandle )
     

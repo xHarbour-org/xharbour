@@ -1659,7 +1659,7 @@ FUNCTION CreateScript( cFile, lCreateAndCompile )
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlmt -lpcrepos -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
 //   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtsln -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
-   LOCAL cHarbDll         := "harbour.lib"
+   LOCAL cHarbDll         := "xharbour.lib"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
    LOCAL cSystemLibs      := If( s_lUnix, "", "-lncurses " ) + "-lslang " + If( s_lUnix, "", "-lgpm " ) + " -lpthread -lm"
 
@@ -2082,7 +2082,11 @@ While .t.
 
    IF lUseXharbourDll
       cDefLibGccLibs := cHARso
-      cDefaultLibs   := cHarbDll + " dllmain.lib "
+      if s_lasdll
+         cDefaultLibs   := cHarbDll + " dllmain.lib "
+      else
+         cDefaultLibs   := " use_dll.lib " + cHarbDll 
+      endif
    ENDIF
 
    IF lFwh
@@ -3133,7 +3137,11 @@ Endif // Create and compile
    ELSEIF s_lGcc
 
       FWrite( nSFhandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )+ " "  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
+      #ifdef __ARCH64BIT__
+      FWrite( nSFhandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" ) +  IIF( "Unix" in cOs , " -L/usr/lib64/xharbour ", "" ) + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
+      #else
       FWrite( nSFhandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" ) +  IIF( "Unix" in cOs , " -L/usr/lib/xharbour ", "" ) + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
+      #endif
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
       FWrite( nSFhandle, "LFLAGS = " + if(!s_lLinux," ","-Wl,--noinhibit-exec ") + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui .and. !s_lMinGW, " `pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","")  + iif(lhwgui .and. s_lMinGW," -mwindows " ,"" )+  iif(s_lLinux .and. s_lmt ," -mt "," "  ) +CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )
@@ -4577,7 +4585,11 @@ FUNCTION CreateScriptLib( cFile )
    ELSEIF s_lGcc
 
       FWrite( nSFhandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour  -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include " ) + " $(SHELL)  -c -Wall" + CRLF )
+      #ifdef __ARCH64BIT__
+      FWrite( nSFhandle, "CFLAG2 = " + IIF( s_lLinux , "-L /usr/lib64/xharbour", " -L $(HB_DIR)/lib" ) + CRLF )
+      #else
       FWrite( nSFhandle, "CFLAG2 = " + IIF( s_lLinux , "-L /usr/lib/xharbour", " -L $(HB_DIR)/lib" ) + CRLF )
+      #endif
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
       FWrite( nSFhandle, "LFLAGS = " + CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )

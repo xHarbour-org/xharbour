@@ -189,10 +189,10 @@ RETURN ::GetOk()
 
 
 
-METHOD OpenSecure( cUrl,lSsl ) CLASS tIPClientSMTP
+METHOD OpenSecure( cUrl,lSSL ) CLASS tIPClientSMTP
 
    Local cUser,lOk
-   Default lSSl to .f.
+   Default lSSL to .F.
 
    IF .not. ::super:Open( cUrl )
       RETURN .F.
@@ -213,9 +213,11 @@ METHOD OpenSecure( cUrl,lSsl ) CLASS tIPClientSMTP
 
    lok := ::DetectSecurity()
    
-   IF ! lSSL .and. !::lSSL
+   IF ! lSSL
      if lok
-       lok := ::StartTLS()
+       if ::lTLS 
+          lok := ::StartTLS()
+       endif
      endif  
    ENDIF
    
