@@ -4000,6 +4000,11 @@ METHOD SetAnchor( nPos, lSet ) CLASS __AnchorSet
          ENDIF
       END
    ENDIF
+   IF lSet
+      IF ASCAN( ::Owner:Parent:__aDock, {|o| o:hWnd == ::Owner:hWnd} ) == 0
+         AADD( ::Owner:Parent:__aDock, ::Owner )
+      ENDIF
+   ENDIF
 RETURN Self
 
 
