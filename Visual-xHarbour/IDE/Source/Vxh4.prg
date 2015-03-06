@@ -2780,7 +2780,7 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    ::Application:SourceEditor:SetFocus()
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
 
-   ::Application:MainForm:ToolBox1:Enabled := .F.
+   ::Application:ToolBox:Enabled := .F.
 RETURN Self
 
 //------------------------------------------------------------------------------------------
