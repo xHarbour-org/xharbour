@@ -26,7 +26,7 @@ ENDCLASS
 METHOD Init( oParent, oMenu ) CLASS MenuEditor
 
    ::MenuObject   := oMenu
-   
+
    DEFAULT ::__xCtrlName  TO "MenuEditor"
    ::Super:Init( oParent )
    ::Caption    := "Menu Editor"
@@ -38,7 +38,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS MenuEditor
-
+   LOCAL oBar
    ::ThickFrame := .T.
    ::CenterWindow()
    CoolBar( Self )
@@ -52,8 +52,7 @@ METHOD OnInitDialog() CLASS MenuEditor
          :Break()
          :AllowUndock := .T.
 
-         ToolBar( :this )
-         WITH OBJECT :ToolBar1
+         WITH OBJECT oBar := ToolBar( :this )
             :Create()
 
             :AddBitmap( -1, IDB_STD_SMALL_COLOR )
@@ -71,7 +70,7 @@ METHOD OnInitDialog() CLASS MenuEditor
          END
 
          :SetChevron()
-         :SetChild( :ToolBar1 )
+         :SetChild( oBar )
       END
 
    END
@@ -94,7 +93,7 @@ METHOD OnInitDialog() CLASS MenuEditor
       :Dock:Right    := :Parent
       :Create()
       :DockIt()
-   
+
       TabControl( :this )
       WITH OBJECT :TabControl1
          :Width         := 252
@@ -178,13 +177,13 @@ METHOD OnInitDialog() CLASS MenuEditor
       :AutoDock    := .F.
       :Create()
       :DockIt()
-      
+
       :ResetTree()
       :Parent:ItemManager:ResetContent()
 
    END
    ::MoveWindow()
-   
+
 RETURN NIL
 
 //------------------------------------------------------------------------------------------

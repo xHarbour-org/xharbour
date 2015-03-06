@@ -36,7 +36,7 @@ CLASS LinkLabel INHERIT Control
    PROPERTY VisitedColor SET ::SetVisitedColor(v) DEFAULT RGB(128,0,128)
    PROPERTY AutoSize     SET ::SetWindowText(v)   DEFAULT .T.
    PROPERTY ImageIndex   SET ::SetImageIndex(v)   DEFAULT 0
-   PROPERTY Alignment    SET ::Refresh()          DEFAULT 1
+   PROPERTY Alignment    SET ::Redraw()           DEFAULT 1
    PROPERTY SelBackColor SET ::SetSelColor(v)
 
    DATA __lSelected     PROTECTED INIT .F.
@@ -201,11 +201,7 @@ METHOD SetLinkColor( nColor, lRepaint ) CLASS LinkLabel
    DEFAULT lRepaint TO .T.
    ::xForeColor := nColor
    IF ::IsWindowVisible()
-      IF lRepaint
-         ::Refresh()
-       ELSE
-         ::InValidateRect()
-      ENDIF
+      ::Redraw()
    ENDIF
 RETURN SELF
 
@@ -213,11 +209,7 @@ METHOD SetVisitedColor( nColor, lRepaint ) CLASS LinkLabel
    DEFAULT lRepaint TO .T.
    ::xVisitedColor := nColor
    IF ::IsWindowVisible()
-      IF lRepaint
-         ::Refresh()
-       ELSE
-         ::InValidateRect()
-      ENDIF
+      ::Redraw()
    ENDIF
 RETURN SELF
 

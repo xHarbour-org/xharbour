@@ -412,7 +412,7 @@ METHOD __UpdateDataGrid() CLASS EditBox
 
    nRecs := MIN( nRecs, LEN( ::__oDataGrid:DataSource:Table ) )
 
-   ::__oDataGrid:Height := MIN( (nRecs * ::__oDataGrid:ItemHeight), ::Parent:ClientHeight - ::__oDataGrid:Top )
+   ::__oDataGrid:Height := MIN( (nRecs * ::__oDataGrid:ItemHeight)+2, ::Parent:ClientHeight - ::__oDataGrid:Top )
    IF ::__oDataGrid:Height < ::__oDataGrid:ItemHeight
       ::__oDataGrid:Height := 0
    ENDIF

@@ -74,7 +74,7 @@ CLASS Object
 
    ACCESS ColorScheme          INLINE IIF( ::DesignMode, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
 
-   ACCESS Application          INLINE IIF( ::__InstApp != NIL, ::__InstApp, __GetApplication() )
+   ACCESS Application          INLINE __GetApplication()
    ACCESS System               INLINE __GetSystem()
 
    DATA Events                 EXPORTED
@@ -177,7 +177,7 @@ RETURN SELF
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD GetControlName( cName ) CLASS Object
    LOCAL cProp, n := 1, lComp := .T., oForm := ::Form
-   IF ::Application:GenerateMembers
+   IF ::Application:GenerateMembers .OR. ::Form:GenerateMembers .OR. ::DesignMode
       WHILE ::Application != NIL .AND. oForm != NIL .AND. oForm:__hObjects != NIL
          cProp := cName + XSTR( n )
          IF hGetPos( oForm:__hObjects, cProp ) == 0
@@ -192,7 +192,7 @@ RETURN n
 METHOD __SetAsProperty( cName, oObj ) CLASS Object
    LOCAL n
 
-   IF oObj:ClsName == TOOLTIPS_CLASS .OR. ::__hObjects == NIL .OR. (::Application != NIL .AND. !::Application:GenerateMembers)
+   IF oObj:ClsName == TOOLTIPS_CLASS .OR. ::__hObjects == NIL .OR. (::Application != NIL .AND. ( ! ::Application:GenerateMembers .OR. ! ::Form:GenerateMembers ) .AND. ! ::DesignMode )
       RETURN Self
    ENDIF
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"

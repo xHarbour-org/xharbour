@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------------------------
 
-CLASS FormEditor INHERIT Control
+CLASS FormEditor INHERIT TabPage
    DATA RulerWeight   EXPORTED INIT 26
    DATA RulerBorder   EXPORTED INIT  5
    DATA RulerFont     PROTECTED
@@ -39,6 +39,7 @@ CLASS FormEditor INHERIT Control
    DATA RulerBkBrush  EXPORTED INIT GetStockObject( WHITE_BRUSH )
    DATA RulerBrush    EXPORTED
    DATA CtrlMask      EXPORTED
+   ACCESS CurForm           INLINE ::Application:Project:CurrentForm
 
    METHOD Init() CONSTRUCTOR
    METHOD OnDestroy()                INLINE   ::Super:OnDestroy(),;
@@ -51,9 +52,9 @@ CLASS FormEditor INHERIT Control
    METHOD OnNCCalcSize()
    METHOD OnNCPaint()
    METHOD OnNCRButtonDown()
-   METHOD OnNCHitTest()
+   //METHOD OnNCHitTest()
    METHOD OnVertScroll()
-   METHOD OnHorzScroll(n)            INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CtrlMask:CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
+   METHOD OnHorzScroll(n)            INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD UpdateScroll()
 ENDCLASS
 
@@ -61,18 +62,10 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS FormEditor
    ::__xCtrlName   := "FormEditor"
-   ::ClassBrush    := GetStockObject( WHITE_BRUSH )
    ::Super:Init( oParent )
-   ::ClsName       := "DLGEDT"
-   ::__IsStandard  := .F.
-   ::__IsControl   := .F.
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle       := WS_EX_NOACTIVATE
    ::VertScroll    := .T.
    ::HorzScroll    := .T.
-   ::Dock:Margin   := 0
-   ::xLeft         := 10
-   ::xTop          := 10
    ::RulerFont     := __FontCreate( "Tahoma", 8 )
    ::RulerVertFont := __FontCreate( "Tahoma", 8,,, .T. )
    ::RulerBrush    := ::System:CurrentScheme:Brush:ToolStripPanelGradientEnd
@@ -84,19 +77,20 @@ METHOD Create() CLASS FormEditor
    Super:Create()
    ::OriginalRect[3] := ::Width
    ::OriginalRect[4] := ::Height
-   ::DockIt()
+   //::DockIt()
    ::CtrlMask := ControlMask( Self )
    ::CtrlMask:Create()
 RETURN Self
 
 METHOD UpdateScroll() CLASS FormEditor
-   IF ::CtrlMask:CurForm != NIL .AND. IsWindow( ::CtrlMask:CurForm:hWnd )
-      ::OriginalRect[3] := ::CtrlMask:CurForm:Width  + 30
-      ::OriginalRect[4] := ::CtrlMask:CurForm:Height + 30
-
-      ::CtrlMask:xWidth  := MAX( ::OriginalRect[3], ::Width )
-      ::CtrlMask:xHeight := MAX( ::OriginalRect[4], ::Height )
-      ::CtrlMask:MoveWindow()
+   IF ::CurForm != NIL .AND. IsWindow( ::CurForm:hWnd )
+      ::OriginalRect[3] := ::CurForm:Width  + 30
+      ::OriginalRect[4] := ::CurForm:Height + 30
+      IF ::CtrlMask != NIL
+         ::CtrlMask:xWidth  := MAX( ::OriginalRect[3], ::ClientWidth )
+         ::CtrlMask:xHeight := MAX( ::OriginalRect[4], ::ClientHeight )
+         ::CtrlMask:MoveWindow()
+      ENDIF
       ::__SetScrollBars()
    ENDIF
 RETURN NIL
@@ -106,8 +100,8 @@ METHOD OnVertScroll(n) CLASS FormEditor
    IF n == SB_THUMBPOSITION
       ::CtrlMask:Top := 0
       ::Redraw()
-      IF ::CtrlMask:CurForm != NIL
-         ::CtrlMask:CurForm:UpdateSelection()
+      IF ::CurForm != NIL
+         ::CurForm:UpdateSelection()
       ENDIF
    ENDIF
 RETURN NIL
@@ -130,11 +124,11 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnNCPaint( nwParam ) CLASS FormEditor
-   LOCAL rc, aRect, n := ::CtrlMask:CurForm:SelPointSize
+   LOCAL rc, aRect, n := ::CurForm:SelPointSize
    IF ::Application:ShowRulers
       rc := (struct RECT)
-      IF !EMPTY( ::CtrlMask:CurForm:Selected )
-         aRect := ::CtrlMask:CurForm:GetSelRect()
+      IF !EMPTY( ::CurForm:Selected )
+         aRect := ::CurForm:GetSelRect()
          IF EMPTY(aRect)
             aRect := {0,0,0,0}
          ENDIF
@@ -177,7 +171,7 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oItem:Check( ::Application:RulerType == 1 )
       oItem:Action  := {||::Application:RulerType := 1,;
                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 1 ),;
-                          ::Application:MainForm:FormEditor1:Refresh() }
+                          ::Application:DesignPage:Refresh() }
       oItem:Create()
 
       oItem := CMenuItem( oMenu )
@@ -189,7 +183,7 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
       oItem:Check( ::Application:RulerType == 2 )
       oItem:Action  := {||::Application:RulerType := 2,;
                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 2 ),;
-                          ::Application:MainForm:FormEditor1:Refresh() }
+                          ::Application:DesignPage:Refresh() }
       oItem:Create()
 
       oMenu:Context()
@@ -197,9 +191,9 @@ METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
    ENDIF
 RETURN NIL
 
-METHOD OnNCHitTest() CLASS FormEditor
-   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, ::wParam, ::lParam )
-RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
+//METHOD OnNCHitTest() CLASS FormEditor
+//   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, ::wParam, ::lParam )
+//RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
 
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------

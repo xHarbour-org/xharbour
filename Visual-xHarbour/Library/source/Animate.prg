@@ -15,9 +15,17 @@
 #include "debug.ch"
 #include "colors.ch"
 
+static hAvi
+
+EXIT PROCEDURE __CleanUpAnimation
+   IF hAvi != NIL
+      FreeLibrary( hAvi )
+   ENDIF
+RETURN
+
 //-----------------------------------------------------------------------------------------------
 // 150 = Shell Move File Flying papers
-CLASS Animation INHERIT TitleControl
+CLASS Animation INHERIT Control
 
    PROPERTY ImageName       ROOT "Appearance" SET ::__SetImageName(@v)
    PROPERTY Transparent     ROOT "Appearance" SET ::SetStyle( ACS_TRANSPARENT, v ) DEFAULT .F. PROTECTED
@@ -29,15 +37,26 @@ CLASS Animation INHERIT TitleControl
    DATA FromFrame EXPORTED INIT 0
    DATA ToFrame   EXPORTED INIT -1
 
-   // 161
-   DATA SysAnimations EXPORTED INIT {"FileMove", "FileCopy", "FileRecycle", "EmptyRecycle", "FileDel", "FileNuke", "Web-Search" }
+   DATA EnumSystemAnimation EXPORTED INIT { {"None", "Search flashlight",;
+                                                     "Search documents",;
+                                                     "Search computer",;
+                                                     "Move files",;
+                                                     "Copy files",;
+                                                     "Delete files",;
+                                                     "Empty trash",;
+                                                     "Empty folder",;
+                                                     "Check files",;
+                                                     "Search internet",;
+                                                     "Move files",;
+                                                     "Copy files",;
+                                                     "Empty folder",;
+                                                     "Download files"},;
+                                            {0, 150,151,152,160,161,162,163,164,165,166,167,168,169,170} }
    EXPORTED:
       DATA ImageList
       DATA ImageIndex
       DATA ClipChildren
       DATA ClipSiblings
-      DATA TabStop
-      DATA Border
       DATA __ExplorerFilter INIT {;
                                   { "Video for Windows (*.avi)", "*.avi" };
                                   }
@@ -69,15 +88,12 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Open( cFile ) CLASS Animation
-   LOCAL hAvi
-   ::xImageName := cFile
    IF ::hWnd != NIL
-      IF !EMPTY( ::xImageName )
-         SendMessage( ::hWnd, ACM_OPEN, ::AppInstance, ::xImageName )
+      IF !EMPTY( cFile ) .AND. VALTYPE( cFile ) == "C"
+         SendMessage( ::hWnd, ACM_OPEN, ::AppInstance, cFile )
        ELSEIF ::SystemAnimation >= 0
-         hAvi := LoadLibrary( "Shell32.dll" )
-         SendMessage( ::hWnd, ACM_OPEN, hAvi, ::SystemAnimation )
-         FreeLibrary( hAvi )
+         DEFAULT hAvi TO LoadLibrary( "Shell32.dll" )
+         SendMessage( ::hWnd, ACM_OPEN, hAvi, MAKEINTRESOURCE(::SystemAnimation) )
       ENDIF
    ENDIF
 RETURN Self

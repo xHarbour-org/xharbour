@@ -82,6 +82,7 @@ INIT PROCEDURE __SetAutoClassInit
    InitCommonControlsEx( ICC_USEREX_CLASSES )
    InitCommonControlsEx( ICC_LINK_CLASS )
    InitCommonControlsEx( ICC_INTERNET_CLASSES )
+   InitCommonControlsEx( ICC_ANIMATE_CLASS )
    __SetClassAutoInit( .T. )
 RETURN
 

@@ -102,6 +102,15 @@ CLASS IDE INHERIT Application
    DATA EditorProps           EXPORTED INIT {=>}
 
    DATA ToolBox               EXPORTED
+   DATA StatusBar             EXPORTED
+   DATA DebugBuild            EXPORTED
+
+   DATA StandardBar           EXPORTED
+   DATA BuildBar              EXPORTED
+   DATA EditBar               EXPORTED
+   DATA ToolBoxBar            EXPORTED
+   DATA AlignBar              EXPORTED
+
    DATA ObjectManager         EXPORTED
    DATA EventManager          EXPORTED
 
@@ -119,6 +128,7 @@ CLASS IDE INHERIT Application
    DATA ShowRulers            EXPORTED INIT .T.
    DATA ShowDocking           EXPORTED INIT .F.
    DATA ShowObjExplorerPanel  EXPORTED INIT .T.
+   DATA ShowObjectProps       EXPORTED INIT .T.
 
    DATA RulerType             EXPORTED INIT 1
    DATA ShowTip               EXPORTED
@@ -152,7 +162,6 @@ CLASS IDE INHERIT Application
    DATA RunMode               EXPORTED
 
    DATA CurCursor             EXPORTED
-   DATA ToolBoxBar            EXPORTED
 
    DATA StartPageBrushes      EXPORTED
    DATA aoLinks               EXPORTED INIT {}
@@ -250,6 +259,8 @@ METHOD Init( ... ) CLASS IDE
    ::ShowRulers           := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) == 1
    ::ShowDocking          := ::IniFile:ReadInteger( "General", "ShowDocking", 0 ) == 1
    ::ShowObjExplorerPanel := ::IniFile:ReadInteger( "General", "ShowObjExplorerPanel", 1 )== 1
+   ::ShowObjectProps      := ::IniFile:ReadInteger( "General", "ShowObjectProps", 0 )== 1
+
    ::ShowGrid             := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
    ::RulerType            := ::IniFile:ReadInteger( "General", "RulerType", 1 )
    ::DisableWhenRunning   := ::IniFile:ReadLogical( "General", "DisableWhenRunning", .F. )
@@ -303,18 +314,19 @@ RETURN Self
 METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
    LOCAL n
    DEFAULT lOrder TO .F.
-   WITH OBJECT ::MainForm
-      :ToolStrip1:Enabled := lEnabled
-      :ToolStrip2:Enabled := lEnabled
-      :ToolStrip3:Enabled := lEnabled
-      :ToolStrip4:Enabled := lEnabled
+   ::Application:StandardBar:Enabled := lEnabled
+   ::Application:EditBar:Enabled     := lEnabled
+   ::Application:BuildBar:Enabled    := lEnabled
+   ::Application:ToolBoxBar:Enabled  := lEnabled
+   ::Application:AlignBar:Enabled    := lEnabled
 
+   WITH OBJECT ::MainForm
       IF lOrder
          FOR n := 1 TO LEN( :ToolStrip5:Children )-1
-             :ToolStrip5:Children[n]:Enabled := lEnabled
+             ::Application:AlignBar:Children[n]:Enabled := lEnabled
          NEXT
        ELSE
-         :ToolStrip5:Enabled := lEnabled
+         ::Application:AlignBar:Enabled := lEnabled
       ENDIF
 
       :MenuStrip1:Enabled := lEnabled
@@ -383,8 +395,8 @@ METHOD OnSetFocus() CLASS IDE_MainForm
       ::Application:SourceEditor:SetFocus()
     ELSE
       TRY
-         IF ::Application:MainForm:FormEditor1:CtrlMask != NIL
-            ::Application:MainForm:FormEditor1:CtrlMask:SetFocus()
+         IF ::Application:DesignPage:CtrlMask != NIL
+            ::Application:DesignPage:CtrlMask:SetFocus()
          ENDIF
       CATCH
       END
@@ -430,7 +442,7 @@ METHOD OnClose() CLASS IDE_MainForm
       ENDIF
 
       ::Application:IniFile:WriteNumber( "ObjectTab",     "Height", Round( ( ::Application:ObjectTab:Height / aSize[4] ) * 100, 0 ) )
-      ::Application:IniFile:WriteNumber( "ObjectManager", "Width",  Round( ( ::Panel1:Width / aSize[5] ) * 100, 0 ) )
+      ::Application:IniFile:WriteNumber( "ObjectManager", "Width",  Round( ( ::Application:Props[ "ObjectManagerPanel" ]:Width / aSize[5] ) * 100, 0 ) )
       ::Application:IniFile:WriteNumber( "ToolBox",       "Width",  Round( ( ::Application:ToolBox:Width / aSize[5] ) * 100, 0 ) )
 
       ::Application:IniFile:WriteNumber( "General", "RunMode", ::Application:RunMode )
@@ -509,6 +521,7 @@ RETURN NIL
 METHOD Init() CLASS IDE_MainForm
    LOCAL rc, oForm
    ::Super:Init()
+   ::GenerateMembers := .F.
 
    IF ::System:OS:Version >= 6.2
       ::BackColor  := RGB( 255, 255, 255 )
@@ -552,7 +565,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    // StatusBar section ----------------------
-   WITH OBJECT StatusBar( Self )
+   WITH OBJECT ::Application:StatusBar := StatusBar( Self )
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddIcon( "AMAIN" )
       :Create()
@@ -621,7 +634,7 @@ METHOD Init() CLASS IDE_MainForm
    ::Application:Props[ "MainToolBar" ] := ToolStripContainer( Self ):Create()
 
    //--------------------------------------
-   WITH OBJECT MenuStrip( ::ToolStripContainer1 )
+   WITH OBJECT MenuStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip  := .F.
       :Row       := 1
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1027,7 +1040,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption      := "Rulers"
             :ShortCutText := "Ctrl+Shift+R"
             :Action       := {|o| o:Checked := ( ::Application:ShowRulers := !::Application:ShowRulers ),;
-                                                 ::Application:MainForm:FormEditor1:Refresh(),;
+                                                 ::Application:DesignPage:Refresh(),;
                                                  ::Application:IniFile:WriteInteger( "General", "ShowRulers", IIF( ::Application:ShowRulers, 1, 0 ) ) }
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
@@ -1178,7 +1191,7 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
-   WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:StandardBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
       :Caption   := "Standard"
@@ -1225,7 +1238,7 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
-   WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:EditBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
       :Caption := "Edit"
@@ -1284,7 +1297,7 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
-   WITH OBJECT ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:BuildBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
       :Row     := 2
@@ -1338,7 +1351,7 @@ METHOD Init() CLASS IDE_MainForm
 
    END
 
-   WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
       :Row       := 3
@@ -1365,7 +1378,7 @@ METHOD Init() CLASS IDE_MainForm
       END
    END
 
-   WITH OBJECT ::Application:Props[ "AlignBar" ] := ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:AlignBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
       :Row       := 3
@@ -1474,7 +1487,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
 /*
-   WITH OBJECT ::Application:Props[ "FontBar" ] := ToolStrip( ::ToolStripContainer1 )
+   WITH OBJECT ::Application:Props[ "FontBar" ] := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       //:ShowChevron := .F.
       :Row       := 3
       :Caption   := "Alignment"
@@ -1575,7 +1588,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Margin      := 3
       :Dock:Left        := :Parent
       :Dock:Top         := ::Application:Props[ "MainToolBar" ]
-      :Dock:Bottom      := ::StatusBar1
+      :Dock:Bottom      := ::Application:StatusBar
 
       :FullRowSelect    := .T.
 
@@ -1604,7 +1617,7 @@ METHOD Init() CLASS IDE_MainForm
       :Width        := Round( ( :Parent:ClientWidth*::Application:Sizes["ObjectManagerWidth"])/100,0)
       :Height       := 300
       :Dock:Top     := ::Application:Props[ "MainToolBar" ]
-      :Dock:Bottom  := ::StatusBar1
+      :Dock:Bottom  := ::Application:StatusBar
       :Dock:Right   := :Parent
       :Dock:Margin  := 3
       :Create()
@@ -1656,80 +1669,82 @@ METHOD Init() CLASS IDE_MainForm
             :Caption   := "Properties"
             :Create()
 
-            WITH OBJECT ::Application:Props[ "ObjectProps" ] := Panel( :this )
-               :Height        := 50 //70
-               :MinHeight     := 50
-               :MaxHeight     := 150
-               :Dock:Margin   := 0
-               :Dock:Left     := :Parent
-               :Dock:Bottom   := :Parent
-               :Dock:Right    := :Parent
+            IF ::Application:ShowObjectProps
+               WITH OBJECT ::Application:Props[ "ObjectProps" ] := Panel( :this )
+                  :Height        := 50 //70
+                  :MinHeight     := 50
+                  :MaxHeight     := 150
+                  :Dock:Margin   := 0
+                  :Dock:Left     := :Parent
+                  :Dock:Bottom   := :Parent
+                  :Dock:Right    := :Parent
 
-               :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
-               :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
+                  :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
+                  :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
 
-               :Create()
-
-               WITH OBJECT Label( :this )
-                  :Left       := 5
-                  :Top        := 5
-                  :Width      := 70
-                  :Alignment  := DT_RIGHT
-                  :Caption    := "Control Name"
                   :Create()
+
+                  WITH OBJECT Label( :this )
+                     :Left       := 5
+                     :Top        := 5
+                     :Width      := 70
+                     :Alignment  := DT_RIGHT
+                     :Caption    := "Control Name"
+                     :Create()
+                  END
+
+                  WITH OBJECT Label( :this )
+                     :Left       := 90
+                     :Top        := 5
+                     :Width      := :Parent:ClientWidth - ::Label1:Width
+                     :Font:Bold  := .T.
+                     :Create()
+                  END
+
+                  WITH OBJECT Label( :this )
+                     :Left       := 5
+                     :Top        := 25
+                     :Width      := 70
+                     :Alignment  := DT_RIGHT
+                     :Caption    := "Object Type"
+                     :Create()
+                  END
+
+                  WITH OBJECT Label( :this )
+                     :Left       := 90
+                     :Top        := 25
+                     :Width      := :Parent:ClientWidth - ::Label1:Width
+                     :Font:Bold  := .T.
+                     :Create()
+                  END
+
+                  WITH OBJECT Label( :this )
+                     :Width      := :Parent:ClientWidth - ::Label1:Width
+                     :Dock:Left  := :Parent
+                     :Dock:Top   := :Parent
+                     :Font:Bold  := .T.
+                     :Visible    := .F.
+                     :Create()
+                  END
+
+                  WITH OBJECT Label( :this )
+                     :Dock:Left   := :Parent
+                     :Dock:Top    := ::Label5
+                     :Dock:Right  := :Parent
+                     :Dock:Bottom := :Parent
+                     :Font:Bold   := .F.
+                     :Visible     := .F.
+                     :Create()
+                  END
                END
 
-               WITH OBJECT Label( :this )
-                  :Left       := 90
-                  :Top        := 5
-                  :Width      := :Parent:ClientWidth - ::Label1:Width
-                  :Font:Bold  := .T.
+               WITH OBJECT Splitter( :this )
+                  :Owner    := ::Application:Props[ "ObjectProps" ]
+                  :ShowDragging := .T.
+                  :Position := 2
                   :Create()
                END
-
-               WITH OBJECT Label( :this )
-                  :Left       := 5
-                  :Top        := 25
-                  :Width      := 70
-                  :Alignment  := DT_RIGHT
-                  :Caption    := "Object Type"
-                  :Create()
-               END
-
-               WITH OBJECT Label( :this )
-                  :Left       := 90
-                  :Top        := 25
-                  :Width      := :Parent:ClientWidth - ::Label1:Width
-                  :Font:Bold  := .T.
-                  :Create()
-               END
-
-               WITH OBJECT Label( :this )
-                  :Width      := :Parent:ClientWidth - ::Label1:Width
-                  :Dock:Left  := :Parent
-                  :Dock:Top   := :Parent
-                  :Font:Bold  := .T.
-                  :Visible    := .F.
-                  :Create()
-               END
-
-               WITH OBJECT Label( :this )
-                  :Dock:Left   := :Parent
-                  :Dock:Top    := ::Label5
-                  :Dock:Right  := :Parent
-                  :Dock:Bottom := :Parent
-                  :Font:Bold   := .F.
-                  :Visible     := .F.
-                  :Create()
-               END
-            END
-
-            WITH OBJECT Splitter( :this )
-               :Owner    := ::Panel2
-               :ShowDragging := .T.
-               :Position := 2
-               :Create()
-            END
+            ENDIF
 
             // Object manager -------------
             WITH OBJECT ::Application:ObjectManager := ObjManager( :this )
@@ -1737,7 +1752,7 @@ METHOD Init() CLASS IDE_MainForm
                :Height        := 300
                :Dock:Top      := :Parent
                :Dock:Left     := :Parent
-               :Dock:Bottom   := ::Panel2
+               :Dock:Bottom   := IIF( ::Application:ShowObjectProps, ::Application:Props[ "ObjectProps" ], :Parent )
                :Dock:Right    := :Parent
 
                :FullRowSelect := .T.
@@ -1824,7 +1839,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT Splitter( Self )
-      :Owner := ::Panel1
+      :Owner := ::Application:Props[ "ObjectManagerPanel" ]
       :Create()
    END
 
@@ -1833,8 +1848,8 @@ METHOD Init() CLASS IDE_MainForm
       :Name          := "DebugWindow"
       :Height        := 150
       :Dock:Left     := ::Application:ToolBox
-      :Dock:Bottom   := ::StatusBar1
-      :Dock:Right    := ::Panel1
+      :Dock:Bottom   := ::Application:StatusBar
+      :Dock:Right    := ::Application:Props[ "ObjectManagerPanel" ]
       :Dock:Margin   := 3
       :Visible       := .F.
       :Text          := "Build"
@@ -1855,9 +1870,7 @@ METHOD Init() CLASS IDE_MainForm
             :Caption := "Build"
             :Create()
 
-            DebugBuild( :this )
-
-            WITH OBJECT ::DebugBuild1
+            WITH OBJECT ::Application:DebugBuild := DebugBuild( :this )
                :Height      := 150
                :ForeColor   := C_BLACK
                :BackColor   := C_WHITE
@@ -1926,7 +1939,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Left      := ::Application:ToolBox
       :Dock:Bottom    := ::Application:DebugWindow
       :Dock:Margin    := 3
-      :Dock:Right     := ::Panel1
+      :Dock:Right     := ::Application:Props[ "ObjectManagerPanel" ]
       :BackColor      := ::System:CurrentScheme:ToolStripPanelGradientEnd
       :OnWMClose      := {|o| o:Hide() }
       :Visible        := .F.
@@ -1943,7 +1956,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Margin := 2
       :Dock:Left   := ::Application:ToolBox
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
-      :Dock:Right  := ::Panel1
+      :Dock:Right  := ::Application:Props[ "ObjectManagerPanel" ]
       :Dock:Bottom := ::Application:DebuggerPanel
 
       :OnSelChanged := <|n,x,y|
@@ -1974,8 +1987,8 @@ METHOD Init() CLASS IDE_MainForm
          :TopMargin    := 2
          :Create()
 
-         WITH OBJECT StartPagePanel( :this )
-            :ImageList  := ::Application:MainForm:ToolStrip1:ImageList
+         WITH OBJECT ::Application:Props[ "StartTabPagePanel" ] := StartPagePanel( :this )
+            :ImageList  := ::Application:StandardBar:ImageList
             :BackColor  := C_WHITE
             :Left       := 10
             :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
@@ -2010,7 +2023,7 @@ METHOD Init() CLASS IDE_MainForm
 
          WITH OBJECT StartPagePanel( :this )
             :nPanel     := 1
-            :ImageList  := ::ToolStrip1:ImageList
+            :ImageList  := ::Application:StandardBar:ImageList
             :BackColor  := C_WHITE
             :Left       := 300
             :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
@@ -2071,7 +2084,7 @@ METHOD Init() CLASS IDE_MainForm
          END
       END
 
-      WITH OBJECT ::Application:DesignPage := TabPage( :this )
+      WITH OBJECT ::Application:DesignPage := FormEditor( :this )
          :Caption        := "Form Designer"
          :BackColor      := ::System:Color:White
          :Enabled        := .F.
@@ -2080,14 +2093,6 @@ METHOD Init() CLASS IDE_MainForm
          :TabTextColor   := RGB(255,255,255)
          :TopMargin      := 2
          :Create()
-
-         WITH OBJECT FormEditor( :this )
-            :Dock:Left   := :Parent
-            :Dock:Top    := :Parent
-            :Dock:Right  := :Parent
-            :Dock:Bottom := :Parent
-            :Create()
-         END
       END
 
    END
@@ -2546,9 +2551,9 @@ METHOD EditReset(n) CLASS Project
 
    lEnabled := n == 1 .AND. ::CurrentForm != NIL .AND. LEN( ::CurrentForm:Selected ) > 1
 
-   IF ::Application:Props[ "AlignBar" ]:Children != NIL
-      FOR i := 1 TO LEN( ::Application:Props[ "AlignBar" ]:Children )-2
-         ::Application:Props[ "AlignBar" ]:Children[i]:Enabled := lEnabled
+   IF ::Application:AlignBar:Children != NIL
+      FOR i := 1 TO LEN( ::Application:AlignBar:Children )-2
+         ::Application:AlignBar:Children[i]:Enabled := lEnabled
       NEXT
    ENDIF
    ::Application:Props[ "TabOrderBttn"  ]:Enabled := n == 1 .AND. ::CurrentForm != NIL .AND. CntChildren( ::CurrentForm ) > 1 .AND. LEN( ::CurrentForm:Selected ) == 1
@@ -2573,6 +2578,7 @@ METHOD NewProject() CLASS Project
 
    ::AppObject := Application():Init( .T. )
    ::AppObject:DesignMode := .T.
+
    __SetInitialValues( ::AppObject )
 
    ::Application:Props[ "CloseBttn" ]:Enable()   // Close Button
@@ -3357,7 +3363,7 @@ RETURN Self
 METHOD AddWindow( lReset, cFileName, lCustom, nPos ) CLASS Project
    LOCAL oWin, n
    DEFAULT lCustom TO .F.
-   oWin := WindowEdit( ::Application:MainForm:FormEditor1, cFileName, lReset, lCustom )
+   oWin := WindowEdit( ::Application:DesignPage, cFileName, lReset, lCustom )
 
    ::Properties:GUI := .T. // Force GUI so vxh.lib gets linked in
 
@@ -3475,11 +3481,6 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:ObjectManager:ResetContent()
    ::Application:ObjectManager:SetRedraw( .T. )
 
-   WITH OBJECT ::Application:MainForm
-      :Label2:Caption := ""
-      :Label4:Caption := ""
-   END
-
    ::Application:EventManager:SetRedraw( .F. )
    ::Application:EventManager:ResetContent()
    ::Application:EventManager:SetRedraw( .T. )
@@ -3543,7 +3544,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
 
    ::Application:SourceEditor:Caption := ""
    IF lCloseErrors
-      ::Application:MainForm:DebugBuild1:ResetContent()
+      ::Application:DebugBuild:ResetContent()
       ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
    ENDIF
    ::Application:CloseMenu:Enabled := .F.
@@ -5298,17 +5299,13 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ResetQuickOpen( cFile ) CLASS Project
-   LOCAL lMems, aEntries, n, oItem, nBkHeight, oLink, x, lLink := .T.
+   LOCAL aEntries, n, oItem, nBkHeight, oLink, x, lLink := .T.
 
    aEntries := ::Application:IniFile:GetSectionEntries( "Recent", .T. )
 
    IF ! EMPTY( aEntries ) .AND. cFile != NIL .AND. aEntries[1] == cFile
       RETURN NIL
    ENDIF
-
-   lMems := ::Application:GenerateMembers
-
-   ::Application:GenerateMembers := .F.
 
    // IniFile Recently open projects
 
@@ -5343,7 +5340,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
        IF lLink
           x := RAT( "\", aEntries[n] )
           IF LEN( ::Application:aoLinks ) < n
-             oLink := LinkLabel( ::Application:MainForm:Panel4 )
+             oLink := LinkLabel( ::Application:Props[ "StartTabPagePanel" ] )
              oLink:ImageIndex   := 32
              oLink:Caption      := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
              oLink:Left         := 30
@@ -5368,7 +5365,6 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
        ENDIF
    NEXT
    ::Application:IniFile:Write( "Recent", aEntries )
-   ::Application:GenerateMembers := lMems
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -5507,11 +5503,11 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
 
    ::Application:ErrorView:ResetContent()
 
-   ::Application:MainForm:DebugBuild1:ResetContent()
-   ::Application:MainForm:DebugBuild1:Parent:Select()
-   ::Application:MainForm:DebugBuild1:SetFocus()
-   ::Application:MainForm:DebugBuild1:AddItem( "Building: "+::Properties:Name )
-   ::Application:MainForm:DebugBuild1:Redraw()
+   ::Application:DebugBuild:ResetContent()
+   ::Application:DebugBuild:Parent:Select()
+   ::Application:DebugBuild:SetFocus()
+   ::Application:DebugBuild:AddItem( "Building: "+::Properties:Name )
+   ::Application:DebugBuild:Redraw()
    ::Application:MainForm:UpdateWindow()
 
    n := 1
@@ -5685,10 +5681,10 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
 
       ::Application:BuildLog:Caption := ""
 
-      bProgress := {|Module| ::Application:MainForm:DebugBuild1:AddItem( IIF( Module:nType != ::Properties:TargetType + 9, "Compiling "+Module:cFile+"...", "Linking "+Module:cFile ), .T. ),;
-                             ::Application:MainForm:DebugBuild1:SetHorizontalExtent( 1000 ),;
+      bProgress := {|Module| ::Application:DebugBuild:AddItem( IIF( Module:nType != ::Properties:TargetType + 9, "Compiling "+Module:cFile+"...", "Linking "+Module:cFile ), .T. ),;
+                             ::Application:DebugBuild:SetHorizontalExtent( 1000 ),;
                              ::Application:Props:StatusBarLog:Text := "Building: "+::Properties:Name+" - "+Module:cFile,;
-                             ::Application:MainForm:DebugBuild1:UpdateWindow(),;
+                             ::Application:DebugBuild:UpdateWindow(),;
                              ::Application:Yield() }
 
       bErrorHandler := {|oError|GUI_ErrorGrid( oError, MEMOREAD( cProject + ".log" ) )}
@@ -5706,9 +5702,9 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
    CATCH oErr
       OutputDebugString(ValToPrg(oErr))
       ::Application:Props:StatusBarLog:Text := "ERRORS!"
-      ::Application:MainForm:DebugBuild1:AddItem( "ERRORS!", .T. )
-      ::Application:MainForm:DebugBuild1:AddItem( oErr:Description+" "+oErr:Operation, .T. )
-      ::Application:MainForm:DebugBuild1:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
+      ::Application:DebugBuild:AddItem( "ERRORS!", .T. )
+      ::Application:DebugBuild:AddItem( oErr:Description+" "+oErr:Operation, .T. )
+      ::Application:DebugBuild:AddItem( oErr:Modulename+ " ("+LTrim(Str(oErr:ProcLine))+")", .T. )
       RETURN .F.
    END
 
@@ -5719,7 +5715,7 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
       FERASE( cProject + ".log" )
    ENDIF
 
-   ::Application:MainForm:DebugBuild1:AddItem( STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built", .T. )
+   ::Application:DebugBuild:AddItem( STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built", .T. )
 
    ::Application:Props:StatusBarLog:Text := STRTRAN( ::Properties:Name, aTargetTypes[ ::Properties:TargetType ] + ".xbp" )+ " Built"
    ::Built := .T.
@@ -6027,7 +6023,7 @@ METHOD SetAction( aActions, aReverse ) CLASS Project
 
                IF VALTYPE( aAction[7] ) == "C" .AND. aAction[7] == "Splitter" .AND. !EMPTY( aAction[9] )
                   x := ASCAN( aAction[9], {|a| a[1] == "POSITION"} )
-                  ::Application:MainForm:FormEditor1:CtrlMask:nSplitterPos := aAction[9][x][2]
+                  ::Application:DesignPage:CtrlMask:nSplitterPos := aAction[9][x][2]
                ENDIF
 
                o := ::Application:ToolBox:SetControl( aAction[7], aAction[2], aAction[3], aAction[4], aAction[6], nWidth, nHeight, aAction[5], @aAction[12], aAction[9], @oCtrl )
@@ -6250,7 +6246,7 @@ STATIC FUNCTION ReCreateChildren( oParent, aChildren )
 
        IF aChild[1] == "Splitter"
           n := ASCAN( aChild[6], {|a| a[1] == "POSITION"} )
-          oApp:MainForm:FormEditor1:CtrlMask:nSplitterPos := aChild[6][n][2]
+          oApp:DesignPage:CtrlMask:nSplitterPos := aChild[6][n][2]
        ENDIF
        oChild := oApp:ToolBox:SetControl( aChild[1], NIL, aChild[2], aChild[3], oParent, aChild[4], aChild[5], .F.,, aChild[6] )
 

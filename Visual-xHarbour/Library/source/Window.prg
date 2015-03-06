@@ -145,6 +145,7 @@ static aMessages := {;
                     { WM_NCXBUTTONUP,     "OnNCXButtonUp"     },;
                     { WM_NCXBUTTONDOWN,   "OnNCXButtonDown"   },;
                     { WM_NCXBUTTONDBLCLK, "OnNCXButtonDblClk" },;
+                    { WM_TIMER,           "OnTimer"           },;
                     { WM_CLOSE,           "__OnClose"         } ;
                     }
 
@@ -466,7 +467,8 @@ CLASS Window INHERIT Object
    METHOD CallWindowProc()        INLINE CallWindowProc( ::__nProc, ::hWnd, ::Msg, ::wParam, ::lParam )
    METHOD UpdateWindow()          INLINE UpdateWindow( ::hWnd ), Self
 
-   METHOD Refresh()
+   METHOD Show( nShow )           INLINE ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
+   METHOD Refresh()               INLINE ::InvalidateRect(,.T.)
    METHOD ReCreate()
    METHOD GetHeight()             INLINE ::xHeight
    METHOD DockIt()
@@ -868,17 +870,6 @@ METHOD __Register( cClass ) CLASS Window
    ENDIF
    ::__Registered := .F.
 RETURN(.T.)
-
-//-----------------------------------------------------------------------------------------------
-METHOD Refresh( lPaint ) CLASS Window
-   LOCAL oChild
-   ::InvalidateRect(,lPaint)
-   FOR EACH oChild IN ::Children
-       IF oChild != NIL //.AND. oChild:BackColor == NIL
-          oChild:Refresh( lPaint )
-       ENDIF
-   NEXT
-RETURN Self
 
 METHOD ReCreate() CLASS Window
    LOCAL Child
@@ -2073,7 +2064,7 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
-   LOCAL nRet, n, cBuffer, oObj, oChild, oItem, x, y, cBlock, i
+   LOCAL nRet, n, cBuffer, oObj, oChild, oItem, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
    LOCAL pt, code, nMess, mis, dis
 
@@ -2175,15 +2166,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          CASE WM_MOVE
               nRet := ExecuteEvent( "OnMove", Self )
-              ODEFAULT nRet TO ::OnMove( x, y )
-              EXIT
-
-         CASE WM_TIMER
-              nRet := ExecuteEvent( "OnTimer", Self )
-              ODEFAULT nRet TO ::OnTimer( nwParam, nlParam )
-              IF ( !::ClsName == TOOLTIPS_CLASS .AND. !::ClsName == ANIMATE_CLASS .AND. ( !::ClsName == PROGRESS_CLASS .OR. (::DesignMode .AND. ::Application:OsVersion:dwMajorVersion > 5) ) )
-                 RETURN 0
-              ENDIF
+              ODEFAULT nRet TO ::OnMove( nwParam, nlParam )
               EXIT
 
          CASE WM_CHILDACTIVATE
@@ -2525,39 +2508,45 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_NOTIFY
-              ::hdr := (struct NMHDR*) nlParam
+              IF ! ::DesignMode
+                 ::hdr := (struct NMHDR*) nlParam
 
-              nRet := ExecuteEvent( "OnNotify", Self )
-              nRet := ::OnNotify( nwParam, nlParam, code )
+                 nRet := ExecuteEvent( "OnNotify", Self )
+                 nRet := ::OnNotify( nwParam, nlParam, code )
 
-              IF nRet == NIL
-                 oCtrl := ObjFromHandle( ::hdr:hwndFrom )
-                 IF oCtrl != NIL
-                    IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
-                       nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
-                    END
-                    ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
-                    IF VALTYPE( nRet ) == "O"
-                       nRet := NIL
-                    ENDIF
-                 ENDIF
-
-                 IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
-                    IF ::ClsName != "DataGrid"
-                       FOR EACH oChild IN ::Children
-                           IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
-                              nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
-                           END
-                           IF __objHasMsg( oChild, "OnToolTipNotify" )
-                              ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
-                           ENDIF
-                       NEXT
+                 IF nRet == NIL
+                    oCtrl := ObjFromHandle( ::hdr:hwndFrom )
+                    IF oCtrl != NIL
+                       IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
+                          nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
+                       END
+                       ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
                        IF VALTYPE( nRet ) == "O"
                           nRet := NIL
                        ENDIF
                     ENDIF
-                 ENDIF
 
+                    IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
+                       IF ::ClsName != "DataGrid"
+                          IF __objHasMsg( Self, "OnToolTipNotify" )
+                             ODEFAULT nRet TO ::OnToolTipNotify( nwParam, nlParam, ::hdr )
+                          ELSE
+                             FOR EACH oChild IN ::Children
+                                 IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
+                                    nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
+                                 END
+                                 IF __objHasMsg( oChild, "OnToolTipNotify" )
+                                    ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
+                                 ENDIF
+                             NEXT
+                          ENDIF
+                          IF VALTYPE( nRet ) == "O"
+                             nRet := NIL
+                          ENDIF
+                       ENDIF
+                    ENDIF
+
+                 ENDIF
               ENDIF
               EXIT
 
@@ -4374,6 +4363,7 @@ CLASS WinForm INHERIT Window
    DATA __lResizeable            EXPORTED  INIT {.F.,.F.,.F.,.T.,.T.,.T.,.F.,.F.}
    DATA __lMoveable              EXPORTED  INIT .F.
 
+   PROPERTY GenerateMembers      DEFAULT .T.
    PROPERTY Modal                DEFAULT .F.
    PROPERTY UserVariables        DEFAULT ""
    PROPERTY ShowMode             DEFAULT 1

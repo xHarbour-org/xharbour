@@ -260,7 +260,7 @@ METHOD Create() CLASS ToolBox
     IF oReg:Open()
        n := 0
        aKeys := oReg:GetKeys()
-       
+
        FOR n := 1 TO LEN( aKeys )
           IF oReg:Open( aKeys[n][1] )
              cProgID := oReg:ProgID
@@ -696,7 +696,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       ::Application:Project:Modified := .T.
 
       IF cName == "Splitter"
-         IF ::Application:MainForm:FormEditor1:CtrlMask:nSplitterPos == NIL .OR. ::Application:MainForm:FormEditor1:CtrlMask:nSplitterPos == 0
+         IF ::Application:DesignPage:CtrlMask:nSplitterPos == NIL .OR. ::Application:DesignPage:CtrlMask:nSplitterPos == 0
             IF ::Application:Props[ "PointerBttn" ]:Checked
                TRY
                   ::ActiveItem:PointerItem:Select()
@@ -707,7 +707,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
             RETURN NIL
          ENDIF
          oControl := HB_Exec( hPointer, ,oParent:Parent )
-         oControl:Position := ::Application:MainForm:FormEditor1:CtrlMask:nSplitterPos
+         oControl:Position := ::Application:DesignPage:CtrlMask:nSplitterPos
          oControl:Owner := oParent
        ELSEIF cName == "CMenuItem" .AND. !EMPTY( aProps ) .AND. ( n := ASCAN( aProps, {|a| a[1]=="POSITION"} ) ) > 0
          oControl := HB_Exec( hPointer, , oParent,, aProps[n][2] )

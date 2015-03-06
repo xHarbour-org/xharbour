@@ -60,6 +60,7 @@ CLASS OptionBar INHERIT Control
    //METHOD OnMove()
    METHOD Undock()
    METHOD GetChildFromPoint()
+   METHOD OnToolTipNotify( nwParam, nlParam, hdr ) INLINE ::__ToolBar:OnToolTipNotify( nwParam, nlParam, hdr )
 ENDCLASS
 
 METHOD GetChildFromPoint( pt ) CLASS OptionBar

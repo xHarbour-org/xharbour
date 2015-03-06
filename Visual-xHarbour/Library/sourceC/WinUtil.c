@@ -5465,3 +5465,18 @@ HB_FUNC( GETDISPLAYWORKAREA )
    hb_itemRelease( element );
    hb_itemRelease( hb_itemReturnForward( aRect ) );
 }
+
+HB_FUNC( GETDEVMODEFIELDS )
+{
+   PDEVMODE dm = (PDEVMODE) GlobalLock( hb_parnl(1) );
+   hb_reta( 8 );
+   hb_storni( (long) dm->dmOrientation,   -1, 1 );
+   hb_storni( (long) dm->dmPaperSize,     -1, 2 );
+   hb_storni( (long) dm->dmPaperLength,   -1, 3 );
+   hb_storni( (long) dm->dmPaperWidth,    -1, 4 );
+   hb_storni( (long) dm->dmScale,         -1, 5 );
+   hb_storni( (long) dm->dmCopies,        -1, 6 );
+   hb_storni( (long) dm->dmDefaultSource, -1, 7 );
+   hb_storni( (long) dm->dmPrintQuality,  -1, 8 );
+   GlobalUnlock( hb_parnl(1) );
+}

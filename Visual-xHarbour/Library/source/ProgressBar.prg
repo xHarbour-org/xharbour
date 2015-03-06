@@ -45,7 +45,6 @@ CLASS ProgressBar FROM Control
 
    METHOD Init()    CONSTRUCTOR
    METHOD Create()
-
    METHOD DeltaPos( n )    INLINE ::SendMessage( PBM_DELTAPOS, n, 0 )
 
    METHOD SetRange(x,y)    INLINE IIF( ::IsWindow(), ::SendMessage( PBM_SETRANGE, 0, MAKELONG( x, y ) ), NIL )
@@ -59,6 +58,7 @@ CLASS ProgressBar FROM Control
    METHOD __SetMarqueeSeconds()
    METHOD OnUserMsg()
    METHOD SetMarquee( l )   INLINE ::Marquee := l, ::SendMessage( PBM_SETMARQUEE, l, ::xMarqueeSeconds ), ::Redraw()
+   METHOD OnTimer()         INLINE 0
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

@@ -14,6 +14,10 @@
 #include "debug.ch"
 #include "vxh.ch"
 
+#xcommand ODEFAULT <v> TO <x> [, <vN> TO <xN>]         ;
+       => IF <v> == nil .OR. VALTYPE( <v> ) == "O"; <v> := <x> ; END            ;
+          [; IF <vN> == nil ; <vN> := <xN> ; END]
+
 //-----------------------------------------------------------------------------------------------
 
 CLASS Control INHERIT Window
@@ -480,6 +484,7 @@ CLASS TitleControl INHERIT Control
    METHOD DrawPin()
    METHOD SetActive( l ) INLINE IIF( ::__lActive != l, ( ::__lActive := l, ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), ::UpdateWindow() ), )
    METHOD ResetFrame() VIRTUAL
+   METHOD __OnClose()
 ENDCLASS
 
 METHOD Create() CLASS TitleControl
@@ -488,6 +493,16 @@ METHOD Create() CLASS TitleControl
       ::ResetFrame()
    ENDIF
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD __OnClose( nwParam, nlParam ) CLASS TitleControl
+   LOCAL nRet := ExecuteEvent( "OnClose", Self )
+   ODEFAULT nRet TO ::OnClose( nwParam )
+   ODEFAULT nRet TO __Evaluate( ::OnWMClose, Self, nwParam, nlParam )
+   ::Application:DoEvents()
+RETURN nRet
+
+//---------------------------------------------------------------------------------------------------
 
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS TitleControl
    LOCAL nccs
@@ -586,11 +601,6 @@ METHOD OnNCHitTest( x, y ) CLASS TitleControl
       aPt := { x, y }
       _ScreenToClient( ::hWnd, @aPt )
       aPt[2]+=::__aCaptionRect[4]
-      IF ::ClsName == "DLGEDT"
-         aPt[1] += ::RullerWeight
-         aPt[2] += ::RullerWeight
-      ENDIF
-
       n := 0
       IF !::IsChild
          n := 1

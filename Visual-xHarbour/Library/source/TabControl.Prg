@@ -326,9 +326,9 @@ RETURN Self
 METHOD OnSize(w,l) CLASS TabControl
    LOCAL oPage
    Super:OnSize(w,l)
-   IF /*::IsWindowVisible() .AND.*/ ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
+   IF ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
-      IF oPage != NIL
+      IF oPage != NIL .AND. oPage:IsWindowVisible()
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
       ENDIF
    ENDIF

@@ -272,4 +272,4 @@ METHOD OnTimer( nTimer ) CLASS ToolTip
       ::KillTimer( 25 )
       ::Popup()
    ENDIF
-RETURN NIL
+RETURN 0

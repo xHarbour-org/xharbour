@@ -150,7 +150,7 @@ METHOD Init( oParent, cFileName, lNew, lCustom ) CLASS WindowEdit
          :oApp:Cargo := :Application:Project:AppObject
          :Application:Project:AppObject:TreeItem := :oApp
 
-         :Application:MainForm:FormEditor1:TreeItem := :oApp
+         :Application:DesignPage:TreeItem := :oApp
       ENDIF
    END
 
@@ -246,7 +246,9 @@ METHOD Show() CLASS WindowEdit
    IF ::Application:Project:CurrentForm != NIL
       ShowWindow( ::hWnd, SW_SHOW )
    ENDIF
-   ::CtrlMask:BringWindowToTop()
+   IF ::CtrlMask != NIL
+      ::CtrlMask:BringWindowToTop()
+   ENDIF
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -848,7 +850,7 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       ClientToScreen( oControl:Parent:hWnd, @Pt )
       IF !lMask
          ScreenToClient( ::hWnd, @Pt )
-       ELSE
+       ELSEIF ::CtrlMask != NIL
          ScreenToClient( ::CtrlMask:hWnd, @Pt )
       ENDIF
    ENDIF

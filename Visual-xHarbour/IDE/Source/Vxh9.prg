@@ -452,7 +452,7 @@ METHOD InitProject() CLASS ObjectTreeView
       ::oApp:Cargo := ::Application:Project:AppObject
       ::Application:Project:AppObject:TreeItem := ::oApp
 
-      ::Application:MainForm:FormEditor1:TreeItem := ::oApp
+      ::Application:DesignPage:TreeItem := ::oApp
    ENDIF
 
 RETURN Self
