@@ -5468,7 +5468,7 @@ HB_FUNC( GETDISPLAYWORKAREA )
 
 HB_FUNC( GETDEVMODEFIELDS )
 {
-   PDEVMODE dm = (PDEVMODE) GlobalLock( hb_parnl(1) );
+   PDEVMODE dm = (PDEVMODE) GlobalLock( (HGLOBAL) hb_parnl(1) );
    hb_reta( 8 );
    hb_storni( (long) dm->dmOrientation,   -1, 1 );
    hb_storni( (long) dm->dmPaperSize,     -1, 2 );
@@ -5478,5 +5478,5 @@ HB_FUNC( GETDEVMODEFIELDS )
    hb_storni( (long) dm->dmCopies,        -1, 6 );
    hb_storni( (long) dm->dmDefaultSource, -1, 7 );
    hb_storni( (long) dm->dmPrintQuality,  -1, 8 );
-   GlobalUnlock( hb_parnl(1) );
+   GlobalUnlock( (HGLOBAL) hb_parnl(1) );
 }
