@@ -1577,14 +1577,81 @@ typedef struct tagPSD {;
    LPPAGEPAINTHOOK lpfnPagePaintHook;
    LPCTSTR         lpPageSetupTemplateName;
    HGLOBAL         hPageSetupTemplate;
-} PAGESETUPDLG, *LPPAGESETUPDLG;
+} PAGESETUPDLG, *LPPAGESETUPDLG
 
-typedef struct tagDEVMODE {;
-    WORD wDriverOffset;
-    WORD wDeviceOffset;
-    WORD wOutputOffset;
-    WORD wDefault;
-} DEVMODE
+#if 0
+typedef struct { ;
+      SHORT dmOrientation;
+      SHORT dmPaperSize;
+      SHORT dmPaperLength;
+      SHORT dmPaperWidth;
+      SHORT dmScale;
+      SHORT dmCopies;
+      SHORT dmDefaultSource;
+      SHORT dmPrintQuality;
+    } _DEVMODE_NESTED1;
+
+typedef struct _devicemode {  ;
+  TCHAR dmDeviceName[CCHDEVICENAME];
+  WORD  dmSpecVersion;
+  WORD  dmDriverVersion;
+  WORD  dmSize;
+  WORD  dmDriverExtra;
+  DWORD dmFields;
+  struct _DEVMODE_NESTED1 s1;
+  SHORT dmColor;
+  SHORT dmDuplex;
+  SHORT dmYResolution;
+  SHORT dmTTOption;
+  SHORT dmCollate;
+  TCHAR dmFormName[CCHFORMNAME];
+  WORD  dmLogPixels;
+  DWORD dmBitsPerPel;
+  DWORD dmPelsWidth;
+  DWORD dmPelsHeight;
+    DWORD dmDisplayFlags;
+  DWORD dmDisplayFrequency;
+  DWORD dmICMMethod;
+  DWORD dmICMIntent;
+  DWORD dmMediaType;
+  DWORD dmDitherType;
+  DWORD dmReserved1;
+  DWORD dmReserved2;
+  DWORD dmPanningWidth;
+  DWORD dmPanningHeight;
+} DEVMODE, *PDEVMODE, *LPDEVMODE
+#else
+#define CCHDEVICENAME320   32
+#define CCHFORMNAME320     32
+typedef struct{;
+    BYTE    dmDeviceName[CCHDEVICENAME320];
+    WORD    dmSpecVersion;
+    WORD    dmDriverVersion;
+    WORD    dmSize;
+    WORD    dmDriverExtra;
+    DWORD   dmFields;
+    SHORT   dmOrientation;
+    SHORT   dmPaperSize;
+    SHORT   dmPaperLength;
+    SHORT   dmPaperWidth;
+    SHORT   dmScale;
+    SHORT   dmCopies;
+    SHORT   dmDefaultSource;
+    SHORT   dmPrintQuality;
+    SHORT   dmColor;
+    SHORT   dmDuplex;
+    SHORT   dmYResolution;
+    SHORT   dmTTOption;
+    SHORT   dmCollate;
+    BYTE    dmFormName[CCHFORMNAME320];
+    WORD    dmLogPixels;
+    DWORD   dmBitsPerPel;
+    DWORD   dmPelsWidth;
+    DWORD   dmPelsHeight;
+    DWORD   dmDisplayFlags;
+    DWORD   dmDisplayFrequency;
+} DEVMODE//320A
+#endif
 
 typedef struct tagCOMBOBOXINFO {;
     DWORD cbSize;
