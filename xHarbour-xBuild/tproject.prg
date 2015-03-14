@@ -1107,7 +1107,7 @@ METHOD Reset() CLASS TMakeObject
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
-                            ::Project:Auto_Libs += "sql.lib ace32.lib "
+                            ::Project:Auto_Libs += "sql.lib "
                          #else
                             ::Project:Auto_Libs += "libsqlrdd.a "
                             IF ::Project:lUseDll

@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-14 16:40 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
+  ! tproject.prg
+    ! removed ace32.lib from ::Project:Auto_Libs  when checking for sql.lib
+    
 2014-10-07 00:35 UTC-0450 Ron Pinkas <Ron in xHarbour.com>
   * gui.c
     * Use .ORG's new cinterface.h
