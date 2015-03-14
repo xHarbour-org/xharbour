@@ -424,12 +424,13 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
          {
             HB_SIZE lPos;
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-            hb_xmemcpy( szResult, bBuffer,  (lLen < lLenBuff ? lLen : lLenBuff ) );
+            hb_xmemcpy( szResult, bBuffer,  ((HB_ISIZ)lLen < lLenBuff ? lLen : lLenBuff ) );
 
             for( lPos =  lLenBuff; lPos < lLen; lPos++ )
             {
                szResult[ lPos ] = ' ';
             }
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
@@ -601,7 +602,7 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
          {
             if( bQueryOnly )
             {
-               hb_itemPutNI( pItem, hb_strVal( bBuffer, lLenBuff ) );
+               hb_itemPutNI( pItem, (int)hb_strVal( bBuffer, lLenBuff ) );
             }
             else
             {
@@ -628,7 +629,8 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
 HB_FUNC( SR_ODBCLINEPROCESSED )
 {
 //    LONG lLen,  lInitBuff, lIndex;
-    LONG lLen, lIndex;
+    LONG lLen;
+    USHORT lIndex;
 //    SQLLEN lLenOut;
 //    PTR  bBuffer, bOut;
 //    RETCODE wResult;
@@ -666,7 +668,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
    {
    
       temp       = hb_itemNew( NULL );
-      lIndex     = hb_arrayGetNL( hb_arrayGetItemPtr( pFields, i ), FIELD_ENUM );
+      lIndex     = (USHORT)hb_arrayGetNI( hb_arrayGetItemPtr( pFields, i ), FIELD_ENUM );
 
       if( lIndex == 0 )
       {
@@ -675,7 +677,7 @@ HB_FUNC( SR_ODBCLINEPROCESSED )
       else
       {
 	      
-         odbcGetData( ( HSTMT ) hb_parptr( 1 ), hb_arrayGetItemPtr( pFields, i ),temp,  bQueryOnly, ulSystemID, bTranslate,lIndex  );	              
+         odbcGetData( ( SQLHSTMT ) hb_parptr( 1 ), (PHB_ITEM)hb_arrayGetItemPtr( pFields, i ),(PHB_ITEM)temp,  (BOOL)bQueryOnly, (ULONG)ulSystemID, (BOOL)bTranslate,(USHORT)lIndex  );	              
          hb_arraySetForward( pRet, i, temp );                     
       }
       hb_itemRelease( temp );
@@ -798,7 +800,7 @@ HB_FUNC( SR_ODBCGETLINES ) // ( ::hStmt, nLenBuff, aFields, aCache, nSystemID, l
          {
             do
             {
-               wResult    = SQLGetData( ( SQLHSTMT ) hb_parptr( 1 ), lIndex, SQL_CHAR, ( PTR ) bBuffer, lLen, &lLenOut );
+               wResult    = SQLGetData( ( SQLHSTMT ) hb_parptr( 1 ), (SQLUSMALLINT)lIndex, (SQLSMALLINT)SQL_CHAR, ( PTR ) bBuffer, (SQLLEN)lLen, (SQLLEN*)&lLenOut );
                if( wResult == SQL_SUCCESS && iReallocs == 0 )
                {
                   odbcFieldGet( hb_arrayGetItemPtr( pFields, i ), temp, (char * ) bBuffer, lLenOut, 0, ulSystemID, bTranslate );
@@ -943,7 +945,7 @@ HB_FUNC( SR_DESCRIB )
     SQLSMALLINT      lLen      = ( SQLSMALLINT ) hb_parni( 4 );   
     SQLSMALLINT wBufLen   = ( SQLSMALLINT)hb_parni( 5 );
     SQLSMALLINT wDataType = ( SQLSMALLINT)hb_parni( 6 );
-    SQLULEN     wColSize = hb_parnint( 7 );
+    SQLULEN     wColSize =  ( SQLULEN )hb_parnint( 7 );
     SQLSMALLINT wDecimals = ( SQLSMALLINT)hb_parni( 8 );
     SQLSMALLINT wNullable = ( SQLSMALLINT) hb_parni( 9 );
 //     SQLTCHAR   bBuffer[128]={0};
@@ -993,12 +995,12 @@ HB_FUNC( SR_DESCRIB )
 
 HB_FUNC( SR_COLATTRIBUTE )
 {
-    SQLSMALLINT lLen      = hb_parni( 5 );
+    SQLSMALLINT lLen      = (SQLSMALLINT)hb_parni( 5 );
     char *      bBuffer   = (char *) hb_xgrab( lLen );
-    SQLSMALLINT wBufLen   = hb_parni( 6 );
+    SQLSMALLINT wBufLen   = (SQLSMALLINT)hb_parni( 6 );
     SQLLEN      wNumPtr   = (SQLLEN)hb_parnint( 7 );
     RETCODE     wResult   = SQLColAttribute( ( SQLHSTMT ) hb_parptr( 1 ), ( SQLUSMALLINT )hb_parni( 2 ), ( SQLUSMALLINT )hb_parni( 3 ),
-                                             ( SQLPOINTER ) bBuffer, hb_parni( 5 ), ( SQLSMALLINT * )&wBufLen,
+                                             ( SQLPOINTER ) bBuffer, (SQLSMALLINT)hb_parni( 5 ), ( SQLSMALLINT * )&wBufLen,
                                              (SQLLEN* )&wNumPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
@@ -1157,7 +1159,7 @@ void odbcErrorDiag( SQLHSTMT hStmt, char * routine, char * szSql, int line )
       i++;
    }
 
-   //TraceLog( LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line, SqlState, Msg, szSql );
+   TraceLog( LOGFILE, "Error at %s, local %i: State: %s - Message: %s\r\nOriginal SQL code:\n%s\n", routine, line, SqlState, Msg, szSql );
 }
 
 //-----------------------------------------------------------------------------//

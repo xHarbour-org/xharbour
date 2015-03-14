@@ -1552,7 +1552,7 @@ static HB_ERRCODE sqlRecall( SQLAREAP thiswa )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, HB_ULONG * recCount )
+static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, ULONG * recCount )
 {
 
    if( thiswa->lpdbPendingRel )
@@ -1562,11 +1562,11 @@ static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, HB_ULONG * recCount )
 
    if (hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT ) && hb_arrayGetL( thiswa->aInfo, AINFO_HOT ) )
    {
-      *recCount = (HB_ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ) + 1);
+      *recCount = (ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ) + 1);
    }
    else
    {
-      *recCount = (HB_ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ));
+      *recCount = (ULONG) (hb_arrayGetNL( thiswa->aInfo, AINFO_RCOUNT ));
    }
 
    // TraceLog( NULL, "sqlRecCount, returning %i\n", *recCount );
@@ -1580,7 +1580,7 @@ static HB_ERRCODE sqlRecCount( SQLAREAP thiswa, HB_ULONG * recCount )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRecNo( SQLAREAP thiswa, HB_ULONG * recno )
+static HB_ERRCODE sqlRecNo( SQLAREAP thiswa, ULONG * recno )
 {
 #ifdef SQLRDD_NWG_SPECIFIC
    if( hb_arrayGetNL( thiswa->aInfo, hb_arrayGetL( thiswa->aInfo, AINFO_ISINSERT ) ) )
@@ -1599,7 +1599,7 @@ static HB_ERRCODE sqlRecNo( SQLAREAP thiswa, HB_ULONG * recno )
       thiswa->firstinteract = 0;
    }
 
-   *recno = (HB_ULONG) hb_arrayGetNL( thiswa->aInfo, AINFO_RECNO );
+   *recno = (ULONG) hb_arrayGetNL( thiswa->aInfo, AINFO_RECNO );
 
    // TraceLog( NULL, "sqlRecNo %i\n", hb_arrayGetNI( thiswa->aInfo, AINFO_RECNO ) );
 
@@ -1823,10 +1823,10 @@ static HB_ERRCODE sqlCreate( SQLAREAP thiswa, LPDBOPENINFO pCreateInfo )
    thiswa->isam = hb_itemGetL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNRECNO", 0 );
-   thiswa->ulhRecno = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhRecno = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNDELETED", 0 );
-   thiswa->ulhDeleted = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhDeleted = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    if( errCode != HB_SUCCESS )
    {
@@ -2222,10 +2222,10 @@ static HB_ERRCODE sqlOpen( SQLAREAP thiswa, LPDBOPENINFO pOpenInfo )
    }
 
    hb_objSendMsg( thiswa->oWorkArea, "HNRECNO", 0 );
-   thiswa->ulhRecno = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhRecno = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    hb_objSendMsg( thiswa->oWorkArea, "HNDELETED", 0 );
-   thiswa->ulhDeleted = (HB_ULONG) hb_itemGetNL( hb_stackReturnItem() );
+   thiswa->ulhDeleted = (ULONG) hb_itemGetNL( hb_stackReturnItem() );
 
    if( hb_setGetAutOpen() )
    {
@@ -2707,7 +2707,7 @@ PHB_ITEM loadTagDefault( SQLAREAP thiswa, LPDBORDERINFO pInfo, LONG * lorder )
 
    if( * lorder )
    {
-      pTag = hb_itemArrayGet( thiswa->aOrders, (HB_ULONG) * lorder );
+      pTag = hb_itemArrayGet( thiswa->aOrders, (ULONG) * lorder );
    }
 
    hb_itemRelease( pOrder );
@@ -3125,7 +3125,7 @@ static HB_ERRCODE sqlScopeInfo( SQLAREAP thiswa, USHORT nScope, PHB_ITEM pItem )
       lorder = hb_itemGetNL( hb_stackReturnItem() );
       if( lorder )
       {
-         pTag  = hb_itemArrayGet( thiswa->aOrders, (HB_ULONG) lorder );
+         pTag  = hb_itemArrayGet( thiswa->aOrders, (ULONG) lorder );
          pTemp = hb_itemArrayGet( pTag, ( nScope ? BOTTOM_SCOPE : TOP_SCOPE ) );
          hb_itemCopy( pItem, pTemp );
          hb_itemRelease( pTag );
@@ -3408,7 +3408,7 @@ BOOL sqlExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 
 /*------------------------------------------------------------------------*/
 
-static HB_ERRCODE sqlRddInfo( LPRDDNODE pRDD, USHORT uiIndex, HB_ULONG ulConnect, PHB_ITEM pItem )
+static HB_ERRCODE sqlRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("sqlRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
@@ -3866,7 +3866,7 @@ HB_FUNC( SQLRDD_GETFUNCTABLE )
 static void hb_sqlrddRddInit( void * cargo )
 {
 
-   USHORT usResult;
+   int usResult;
    HB_SYMBOL_UNUSED( cargo );
 
    usResult = hb_rddRegister( "SQLRDD", RDT_FULL );

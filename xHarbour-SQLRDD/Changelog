@@ -8,6 +8,23 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-14 16:40  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/mysql.c
+     ! in function MYSAFFECTEDROWS change hb_retni to hb_retnll since variable type is ulongulong
+     ! added some cast to make msvc 12 happy
+   ! source/sqlsrodbc.c
+     ! added some missing type cast to make msvc 12 happy
+   ! source/sqlrdd1.c
+     ! in function hb_sqlrddRddInit changed USHORT usResult to int usResult
+     ! HB_ULONG to ULONG where necessary
+   + vc12/SQLRDD.xns
+   + vc12/mysql.lib.xbp
+   + vc12/mysqlmt.lib.xbp
+   + vc12/sql.lib.xbp
+   + vc12/sqlmt.lib.xbp
+   + vc12/xbuild.vc8.ini
+     ! makefiles for msvc 2012
+                 
 2015-03-01 16:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/mysql.c
      ! moved case MYSQL_TIME_TYPE: to be alone to define time type as SQL_TIME

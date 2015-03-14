@@ -509,7 +509,7 @@ HB_FUNC( MYSRESULTSTATUS )
    case CR_SERVER_GONE_ERROR:
    case CR_SERVER_LOST:
    case ER_NO_DB_ERROR:
-      ret = SQL_ERROR;
+      ret = (UINT)SQL_ERROR;
       break;
    }
    hb_retnl( (LONG) ret );
@@ -877,7 +877,7 @@ HB_FUNC( MYSAFFECTEDROWS )
    PMYSQL_SESSION session  = ( PMYSQL_SESSION ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    if( session )
    {
-      hb_retni( session->ulAffected_rows) ;
+      hb_retnll( session->ulAffected_rows) ;
       return;
    }   
    hb_retni( 0) ;
