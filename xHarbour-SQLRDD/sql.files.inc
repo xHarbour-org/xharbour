@@ -62,3 +62,5 @@ MYDEFINES = HB_API_MACROS
 [source\sqlex3.c]
 
 [source\sqlmaria.prg]
+[source\sqlora2.c]
+[source\sqloracle2.prg]

@@ -140,8 +140,8 @@ typedef struct tagTIMESTAMP_STRUCTORA {
 
 typedef struct _INDEXBINDORA
 {
-   LONG lFieldPosDB;                   // Relative field position in aFields
-   LONG hIndexOrder;                   // Index order
+   HB_LONG lFieldPosDB;                   // Relative field position in aFields
+   HB_LONG hIndexOrder;                   // Index order
    int  iLevel;                        // The current column in index
    int  iIndexColumns;                 // How many index columns in index
    OCI_Statement  * SkipFwdStmt;                  // Index stmt handle for SQL phrase in this level for FWD movment
@@ -163,8 +163,8 @@ typedef struct _COLUMNBINDORA
    int  iSQLType;                      // SQL data type of column
    int  iCType;                        // C data type of the argument. It determines
                                        // the as* member to be used, like xHB iTem API 'type'
-   LONG lFieldPosDB;                   // Relative field position in aFields
-   LONG lFieldPosWA;                   // Relative field position in aBuffer. NULL if RECNO or DELETED column
+   HB_LONG lFieldPosDB;                   // Relative field position in aFields
+   HB_LONG lFieldPosWA;                   // Relative field position in aBuffer. NULL if RECNO or DELETED column
    char szBindName[50];
    char * colName;                     // Fully qualified column name to be used in queries
    SQL_CHAR_STRUCT      asChar;        // Support for char data types
@@ -183,7 +183,7 @@ typedef struct _COLUMNBINDORA
    BOOL isNullable;                    // Is this column NULLABLE ?
    BOOL isArgumentNull;                // Value to be bound is NULL ?
    BOOL isBoundNULL;                   // Field was bound as NULL ?
-   unsigned int lIndPtr;                     // Buffer lenght pointer to be used in SQLBindParam()
+   int lIndPtr;                     // Buffer lenght pointer to be used in SQLBindParam()
    BOOL isMemo;                        // Field is MEMO ?
    BOOL isMultiLang;                   // Fiels is multi language ?
    OCI_Lob *lob1;
@@ -371,7 +371,7 @@ typedef struct _SQLEXORAAREA
    char specialMask[MAX_FIELDS]; /* Same of updateMask but for special cols (INDKEY_xx and FORKEY_xx) */
    BOOL bIndexTouchedInUpdate;   /* If any index column is affected by UPDATE */
    BOOL bIsSelect;               /* Table open is an select statement*/
-
+   BOOL bOracle12;
 } SQLEXORAAREA;
 
 typedef SQLEXORAAREA * LPSQLEXORAAREA;
@@ -391,11 +391,11 @@ void OraErrorDiagRTE( OCI_Statement *hStmt, char * routine, char * szSql, int re
 void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, LONG lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate );
 char * QuoteTrimEscapeString( char * FromBuffer, ULONG iSize, int idatabase, BOOL bRTrim, ULONG * iSizeOut );
 char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, BOOL bNullable, int nSystemID, BOOL bTCCompat, BOOL bMemo, BOOL * bNullArgument );
-BOOL SR_itemEmpty( PHB_ITEM pItem );
+BOOL SR_itemEmpty2( PHB_ITEM pItem );
 void commonError( AREAP ThisDb, USHORT uiGenCode, USHORT uiSubCode, char* filename );
-HB_ERRCODE SetBindEmptylValue( COLUMNBINDORAP BindStructure );
-HB_ERRCODE SetBindValue( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_Statement  * hStmt );
-char * QualifyName( char * szName, SQLEXORAAREAP thiswa );
+HB_ERRCODE SetBindEmptylValue2( COLUMNBINDORAP BindStructure );
+HB_ERRCODE SetBindValue2( PHB_ITEM pFieldData, COLUMNBINDORAP BindStructure, OCI_Statement  * hStmt );
+char * QualifyName2( char * szName, SQLEXORAAREAP thiswa );
 COLUMNBINDORAP GetBindStructOra( SQLEXORAAREAP thiswa, INDEXBINDORAP IndexBind );
 BOOL getColumnListOra( SQLEXORAAREAP thiswa );
 void SolveFiltersOra( SQLEXORAAREAP thiswa, BOOL bWhere );

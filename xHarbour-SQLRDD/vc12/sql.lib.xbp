@@ -1,7 +1,7 @@
 CINI = xbuild.vc8.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\source;\xbp\vc8\sql.lib;\xHarbour.com\xHarbour-SQLRDD\vc8\
+INCLUDEFOLDERS = ..\source;\xbp\vc12\sql.lib;.
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .F.
@@ -12,18 +12,18 @@ LPRG_DEBUG = .F.
 LUSEDLL = .F.
 MAPFILE = 
 MYC_FLAGS = 
-MYDEFINES = SQLRDD_TOPCONN 
+MYDEFINES = SQLRDD_TOPCONN;_USING_V110_SDK71_ 
 MYLINK_FLAGS = 
 MYPRG_FLAGS = 
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
-OUTPUTFOLDER = \xbp\vc8\sql.lib
+OUTPUTFOLDER = \xbp\vc12\sql.lib
 PRG_OUTPUTFOLDER = 
 RC_OUTPUTFOLDER = 
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = \xhb\lib\vc8
+TARGETFOLDER = \xhb\lib\vc12
 
 #include "..\sql.files.inc"
 [..\source\sqlex1ora.c]

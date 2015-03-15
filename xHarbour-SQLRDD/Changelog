@@ -8,6 +8,38 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-15 17:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! vc12/mysql.lib.xbp
+   ! vc12/mysqlmt.lib.xbp
+   ! vc12/sql.lib.xbp
+   ! vc12/sqlmt.lib.xbp
+     vc8 -> vc12
+   ! sql.files
+     ! added source\sqloracle2.prg and source\sqlora2.c  as dependencie
+   + dll/ociliba.dll
+     ! dll for ocilib version 4 used for sqlrdd oracle mode 2 connection
+   ! lib/ociliba.lib
+   ! lib/bc5/ociliba.lib
+     ! updated ocilib to version 4
+   ! source/ocilib.h      
+     ! updated to version 4
+   ! source/sqlora2.c
+     ! Changed all function names to have an 2 so SQLO_XXX is for version 2 SQLO2_xxx as also for oracle_xxx is now oracle_xxx2  
+   ! source/sqloracle2.prg
+     ! renamed class name to SR_ORACLE2 
+   ! source/sqlorastru.h
+     ! small updated
+   ! include/sqlrdd.ch
+   ! source/sqlrdd.ch    
+     ! added constant for CONNECT_ORACLE2 as 8, this indicate to use oracle conenction type 2 ( ocilib )
+   ! source/sqlrdd0.prg
+     ! in function SR_AddConnection added support for oracle connection type 2
+     ! in function SR_DetectDBFromDSN() added check for OCI2 to support oracle connection type 2
+   ! source/sqlex1ora.c    
+   ! source/sqlex2ora.c    
+   ! source/sqlex3ora.c    
+     ! some minor updated to avoid function colission between sqlex and sqlexora rdd
+          
 2015-03-14 16:40  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/mysql.c
      ! in function MYSAFFECTEDROWS change hb_retni to hb_retnll since variable type is ulongulong

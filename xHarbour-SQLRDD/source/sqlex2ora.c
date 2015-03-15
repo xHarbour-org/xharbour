@@ -47,7 +47,7 @@ static  PHB_DYNS s_pSym_Serial1 = NULL;   /* Pointer to serialization function *
 
 /*------------------------------------------------------------------------*/
 
-char * QualifyName( char * szName, SQLEXORAAREAP thiswa )
+char * QualifyName2( char * szName, SQLEXORAAREAP thiswa )
 {
    int i, len;
 
@@ -66,14 +66,14 @@ char * QualifyName( char * szName, SQLEXORAAREAP thiswa )
       case SYSTEMID_FIREBR:
       case SYSTEMID_IBMDB2:
       case SYSTEMID_ADABAS:
-         szName[i] = toupper( (BYTE) szName[i] );
+         szName[i] = (char)toupper( (int)szName[i] );
          break;
       case SYSTEMID_INGRES:
       case SYSTEMID_POSTGR:
       case SYSTEMID_MYSQL:
       case SYSTEMID_OTERRO:
       case SYSTEMID_INFORM:
-         szName[i] = tolower( (BYTE) szName[i] );
+         szName[i] = (char)tolower(  (int)szName[i] );
          break;
       }
    }
@@ -111,7 +111,7 @@ static void ResolveSpecialCols( SQLEXORAAREAP thiswa )
          //pIndIt = hb_arrayGetItemPtr( pIndex, INDEXMAN_COLUMNS );
          
 
-      if( !SR_itemEmpty( pIndIt ) )
+      if( !SR_itemEmpty2( pIndIt ) )
       {
          EVALINFO info;
          hb_evalNew( &info, hb_itemArrayGet( pIndex, INDEXMAN_KEY_CODEBLOCK ) );
@@ -129,7 +129,7 @@ static void ResolveSpecialCols( SQLEXORAAREAP thiswa )
       //pIndIt = hb_arrayGetItemPtr( pIndex, INDEXMAN_FOR_CODEBLOCK );
       pIndIt = hb_itemArrayGet( pIndex, INDEXMAN_FOR_CODEBLOCK );
 
-      if( !SR_itemEmpty( pIndIt ) )
+      if( !SR_itemEmpty2( pIndIt ) )
       {
          EVALINFO info;
          hb_evalNew( &info, hb_itemArrayGet( pIndex, INDEXMAN_FOR_CODEBLOCK ) );
@@ -217,7 +217,7 @@ void CreateInsertStmtOra( SQLEXORAAREAP thiswa )
       {
          temp = hb_strdup( (const char *) sFields );
          temp1 = hb_strdup( (const char *) sParams );
-         sprintf( sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER( thiswa ), QualifyName( colName, thiswa ), CLOSE_QUALIFIER( thiswa ) );
+         sprintf( sFields, "%s,%c%s%c", temp, OPEN_QUALIFIER( thiswa ), QualifyName2( colName, thiswa ), CLOSE_QUALIFIER( thiswa ) );
          sprintf( sParams,"%s, :%s ",temp1,colName);
 //          sParams[uiPos]   = ',';
 //          sParams[++uiPos] = ':';
@@ -236,7 +236,7 @@ void CreateInsertStmtOra( SQLEXORAAREAP thiswa )
       InsertRecord->lFieldPosDB     = i;
       InsertRecord->lFieldPosWA     = lFieldPosWA;
 	  InsertRecord->ColumnSize      = (unsigned int) hb_itemGetNI( pFieldLen );
-	  InsertRecord->DecimalDigits   = (unsigned int) hb_itemGetNI( pFieldDec );
+	  InsertRecord->DecimalDigits   = (unsigned short) hb_itemGetNI( pFieldDec );
       InsertRecord->isArgumentNull  = FALSE;
       InsertRecord->isMemo          = bIsMemo;
       InsertRecord->isMultiLang     = bMultiLang;
@@ -512,16 +512,16 @@ HB_ERRCODE FeedRecordColsOra( SQLEXORAAREAP thiswa, BOOL bUpdate )
       {
          if( i == (int)(thiswa->sqlarea.ulhDeleted) )
          {
-            SetBindEmptylValue( InsertRecord );     // Writes a ' ' to deleted flag
+            SetBindEmptylValue2( InsertRecord );     // Writes a ' ' to deleted flag
          }
          else if( i != (int)(thiswa->sqlarea.ulhRecno) )                // RECNO is never included in INSERT column list
          {
             // Get item value from Workarea
             pFieldData   = hb_arrayGetItemPtr( thiswa->sqlarea.aBuffer, i );
 
-            if( SR_itemEmpty( pFieldData ) && (!InsertRecord->isNullable) )
+            if( SR_itemEmpty2( pFieldData ) && (!InsertRecord->isNullable) )
             {
-               if( SetBindEmptylValue( InsertRecord ) == HB_FAILURE )
+               if( SetBindEmptylValue2( InsertRecord ) == HB_FAILURE )
                   return HB_FAILURE;
             }
             else
@@ -546,7 +546,7 @@ HB_ERRCODE FeedRecordColsOra( SQLEXORAAREAP thiswa, BOOL bUpdate )
                   SerializeMemo( pFieldData );
                }
 
-               if( SetBindValue( pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert ) == HB_FAILURE )
+               if( SetBindValue2( pFieldData, InsertRecord, bUpdate ? thiswa->hStmtUpdate : thiswa->hStmtInsert ) == HB_FAILURE )
                   return HB_FAILURE;
             }
          }
@@ -632,7 +632,7 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
          thiswa->hStmtNextval= OCI_StatementCreate(GetConnection(thiswa->hDbc));
          if ( thiswa->hStmtNextval == NULL )
          {
-            OraErrorDiagRTE( thiswa->hStmtNextval, "SQLAllocStmt", ident, res, __LINE__, __FILE__ );
+            OraErrorDiagRTE( thiswa->hStmtNextval, "SQLAllocStmt", ident, 0, __LINE__, __FILE__ );
             return HB_FAILURE;
          }
 
@@ -689,7 +689,7 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
    thiswa->deletedList[0] = ' '; 
    thiswa->recordListPos  = 0;
    thiswa->recordListSize = 1;
-   hb_arraySetNL( thiswa->sqlarea.aInfo, AINFO_RCOUNT, thiswa->recordList[0] );
+   hb_arraySetNLL( thiswa->sqlarea.aInfo, AINFO_RCOUNT, thiswa->recordList[0] );
    thiswa->lLastRec      = thiswa->recordList[0] + 1;
 
    
@@ -721,7 +721,7 @@ HB_ERRCODE CreateUpdateStmtOra( SQLEXORAAREAP thiswa )
    thiswa->hStmtUpdate =  OCI_StatementCreate(GetConnection(thiswa->hDbc));
    if ( thiswa->hStmtUpdate == NULL )
    {
-      OraErrorDiagRTE( thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, res, __LINE__, __FILE__ );
+      OraErrorDiagRTE( thiswa->hStmtUpdate, "CreateUpdateStmtOra", thiswa->sSql, 0, __LINE__, __FILE__ );
    }
    
    iCols        = (int) hb_arrayLen( thiswa->aFields );
@@ -978,7 +978,7 @@ HB_ERRCODE ExecuteUpdateStmtOra( SQLEXORAAREAP thiswa )
    // Update Buffer Pool if needed
 
    pKey    = hb_itemNew( NULL );
-   hb_itemPutNL( pKey, thiswa->recordList[thiswa->recordListPos] );
+   hb_itemPutNLL( pKey, thiswa->recordList[thiswa->recordListPos] );
 
    if ( hb_hashScan( thiswa->hBufferPool, pKey, &lPos  ) )
    {

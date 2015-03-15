@@ -346,7 +346,7 @@ HB_FUNC( SQLO_DESCRIBECOL ) // ( hStmt, nCol, @cName, @nDataType, @nColSize, @nD
 
    if( session )
    {
-      ncol = hb_parni(2)-1;
+      ncol = (USHORT)hb_parni(2)-1;
       stmtParamRes = session->stmtParamRes != -1 ? session->stmtParamRes : session->stmt;
       sqlo_describecol( stmtParamRes, ncol, &dType, &name, &namelen, &prec, &scale, &dbsize, &nullok );
       type = sqlo_sqldtype( dType );
@@ -983,10 +983,10 @@ HB_FUNC( ORACLEINBINDPARAM )
 	     PHB_ITEM pFieldData = hb_param(6,HB_IT_DATE);
          hb_dateDecode( hb_itemGetDL( pFieldData ), &iYear, &iMonth, &iDay );
 //         hb_dateStrPut( Stmt->pLink[ iPos ].sDate, iYear, iMonth, iDay );
-         Stmt->pLink[ iPos ].sDate[0]= (iYear / 100) + 100; // century
-         Stmt->pLink[ iPos ].sDate[1]= (iYear % 100) + 100; // year
-         Stmt->pLink[ iPos ].sDate[2]= iMonth;
-         Stmt->pLink[ iPos ].sDate[3]= iDay;
+         Stmt->pLink[ iPos ].sDate[0]= (char)(iYear / 100) + 100; // century
+         Stmt->pLink[ iPos ].sDate[1]= (char)(iYear % 100) + 100; // year
+         Stmt->pLink[ iPos ].sDate[2]= (char)iMonth;
+         Stmt->pLink[ iPos ].sDate[3]= (char)iDay;
          Stmt->pLink[ iPos ].sDate[4]= 1;
          Stmt->pLink[ iPos ].sDate[5]= 1;
          Stmt->pLink[ iPos ].sDate[6]= 1;         
@@ -1031,16 +1031,16 @@ HB_FUNC( ORACLEINBINDPARAM )
          
          #endif
 //         hb_dateStrPut( Stmt->pLink[ iPos ].sDate, iYear, iMonth, iDay );
-         Stmt->pLink[ iPos ].sDate[0]= (iYear / 100) + 100; // century
-         Stmt->pLink[ iPos ].sDate[1]= (iYear % 100) + 100; // year
-         Stmt->pLink[ iPos ].sDate[2]= iMonth;
-         Stmt->pLink[ iPos ].sDate[3]= iDay;
-         Stmt->pLink[ iPos ].sDate[4]= iHour+1;
-         Stmt->pLink[ iPos ].sDate[5]= iMin+1;
+         Stmt->pLink[ iPos ].sDate[0]= (char)(iYear / 100) + 100; // century
+         Stmt->pLink[ iPos ].sDate[1]= (char)(iYear % 100) + 100; // year
+         Stmt->pLink[ iPos ].sDate[2]= (char)iMonth;
+         Stmt->pLink[ iPos ].sDate[3]= (char)iDay;
+         Stmt->pLink[ iPos ].sDate[4]= (char)iHour+1;
+         Stmt->pLink[ iPos ].sDate[5]= (char)iMin+1;
 	     #ifdef __XHARBOUR__         
-         Stmt->pLink[ iPos ].sDate[6]= dSec+1;         
+         Stmt->pLink[ iPos ].sDate[6]= (char)dSec+1;         
          #else
-         Stmt->pLink[ iPos ].sDate[6]= iSeconds+1;         
+         Stmt->pLink[ iPos ].sDate[6]= (char)iSeconds+1;         
          #endif
       }    
 
@@ -1236,7 +1236,7 @@ HB_FUNC( ORACLE_PROCCURSOR )
 { 
   POCI_SESSION session= (POCI_SESSION) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
   sqlo_stmt_handle_t sth = SQLO_STH_INIT;
-  sqlo_stmt_handle_t st2h;                     /* handle of the ref cursor */
+  sqlo_stmt_handle_t st2h = SQLO_STH_INIT;                     /* handle of the ref cursor */
 
   int ret = SQL_ERROR ;
    
@@ -1373,7 +1373,7 @@ HB_FUNC( ORACLE_BINDCURSOR )
 { 
   POCI_SESSION session= (POCI_SESSION) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
   sqlo_stmt_handle_t sth = SQLO_STH_INIT;
-  sqlo_stmt_handle_t st2h;                     /* handle of the ref cursor */
+  sqlo_stmt_handle_t st2h = SQLO_STH_INIT;                     /* handle of the ref cursor */
 
   int ret = SQL_ERROR ;
    

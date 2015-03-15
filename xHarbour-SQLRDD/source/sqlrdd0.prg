@@ -375,6 +375,14 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect2 := &( "SR_ORACLE()" )
 #endif
       Exit
+   Case CONNECT_ORACLE2
+   Case CONNECT_ORACLE2_NOEXLOCK
+#ifndef MYSQLRDD
+      oConnect  := &( "SR_ORACLE2()" )
+      oConnect2 := &( "SR_ORACLE2()" )
+#endif
+      Exit
+      
    Case CONNECT_FIREBIRD
    Case CONNECT_FIREBIRD_NOEXLOCK
 #ifndef MYSQLRDD
@@ -403,6 +411,13 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect:lQueryOnly := .T.
 #endif
       Exit
+   Case CONNECT_ORACLE2_QUERY_ONLY
+#ifndef MYSQLRDD
+      oConnect  := &( "SR_ORACLE2()" )
+      oConnect:lQueryOnly := .T.
+#endif
+      Exit
+      
    Case CONNECT_MYSQL_QUERY_ONLY
       oConnect  := &( "SR_MYSQL()" )
       oConnect:lQueryOnly := .T.
@@ -2014,6 +2029,8 @@ Function SR_DetectDBFromDSN( cConnect )
       Do Case
       Case cBuff == "OCI"
          Return CONNECT_ORACLE
+      Case cBuff == "OCI2"
+         Return CONNECT_ORACLE2
       Case cBuff == "PGS"
          Return CONNECT_POSTGRES
       Case cBuff == "MYSQL"
