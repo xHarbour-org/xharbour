@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-18 22:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  ! contrib/gtwvw/gtwvw.c
+    ! in function hb_gt_wvw_Init added variables hInstance,hPrevInstance,iCmdShow and set then by calling hb_winmainArgGet
+    ! using s_pWvwData->hInstance insted of hb_hInstance where applicable
+  ! contrib/gtwvw/hbgtwvw.h
+    ! added hInstance member to wvw_data structure
+  ! include/hbgtcore.h
+    ! added HB_EXPORT to hb_gt_chrmapinit ,hb_gt_setClipboard,hb_gt_getClipboard,hb_gt_w32_setClipboard,hb_gt_w32_getClipboard,hb_gt_w32_getKbdState ,hb_gt_w32_setKbdState ,hb_gt_w32_tone, so this function are exported on dlls  
+  ! source/vm/cmdarg.c  
+    ! added HB_EXPORT to hb_hInstance variable
+    
 2015-03-06 11:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * contrib/tipssl/sendmail.prg
   * contrib/tipssl/smtpcln.prg  

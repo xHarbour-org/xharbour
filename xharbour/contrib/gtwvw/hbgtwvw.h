@@ -589,7 +589,7 @@ typedef struct wvw_data
  int  s_iMaxWrongButtonUp ;
  /* max number of s_iWrongButtonUp. If it goes higher than this number,
                                            the scrollbar is forced to stop */
-
+ HINSTANCE hInstance;
  TCHAR szAppName[13] ;
  TCHAR szSubWinName[25] ;
  BOOL  s_bSWRegistered ;

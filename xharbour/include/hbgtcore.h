@@ -604,15 +604,15 @@ extern HB_EXPORT void   hb_gtStartupInit( void );
 
 
 /* low level GT functions common to different GTs supported by RTL */
-extern int  hb_gt_chrmapinit  ( int *piTransTbl, const char *pszTerm, BOOL fSetACSC );
-extern BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen );
-extern BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE *pulLen );
+extern HB_EXPORT int  hb_gt_chrmapinit  ( int *piTransTbl, const char *pszTerm, BOOL fSetACSC );
+extern HB_EXPORT BOOL hb_gt_setClipboard( const char * szClipData, HB_SIZE ulLen );
+extern HB_EXPORT BOOL hb_gt_getClipboard( char ** pszClipData, HB_SIZE *pulLen );
 #if defined( HB_OS_WIN )
-extern BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLen );
-extern BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen );
-extern int  hb_gt_w32_getKbdState ( void );
-extern void hb_gt_w32_setKbdState ( int kbdShifts );
-extern void hb_gt_w32_tone( double dFrequency, double dDuration );
+extern HB_EXPORT BOOL hb_gt_w32_setClipboard( UINT uFormat, const char * szClipData, HB_SIZE ulLen );
+extern HB_EXPORT BOOL hb_gt_w32_getClipboard( UINT uFormat, char ** pszClipData, HB_SIZE *pulLen );
+extern HB_EXPORT int  hb_gt_w32_getKbdState ( void );
+extern HB_EXPORT void hb_gt_w32_setKbdState ( int kbdShifts );
+extern HB_EXPORT void hb_gt_w32_tone( double dFrequency, double dDuration );
 #endif /* HB_OS_WIN */
 #if defined( HB_OS_DOS ) || defined( HB_OS_WIN ) || defined( HB_OS_OS2 )
 extern int hb_gt_dos_keyCodeTranslate( int iKey );

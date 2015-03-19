@@ -357,7 +357,7 @@ static BOOL hb_gt_wvw_KeyEvent( WIN_DATA * pWindowData, UINT message, WPARAM wPa
 
 /* set in mainwin.c                                                  */
 /*                                                                   */
-extern int  hb_iCmdShow;
+// extern int  hb_iCmdShow;
 
 static int  s_iCursorStyle;
 static int  s_iOldCurStyle;
@@ -422,6 +422,10 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    /* FSG: filename var for application name */
    PHB_FNAME pFileName;
    USHORT i;
+   HINSTANCE hInstance;
+   HINSTANCE hPrevInstance;
+   int       iCmdShow;
+   
    
    if ( bStartMode )
    { 
@@ -462,6 +466,12 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    s_iStdOut = hFilenoStdout;
    s_iStdErr = hFilenoStderr;
 
+   if( ! hb_winmainArgGet( &hInstance, &hPrevInstance, &iCmdShow ) )
+   {
+      hInstance = GetModuleHandle( NULL );
+      iCmdShow  = 1;
+   }
+   
 
    s_iOldCurStyle = s_iCursorStyle = SC_NORMAL;
 
@@ -474,8 +484,10 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    hb_gt_wvwWindowPrologue( );
 
    hb_gtInitStatics(0, (LPCTSTR) s_pWvwData->szAppName, 0, 0, WVW_DEFAULT_ROWS-1, WVW_DEFAULT_COLS-1, pGT);
-
-   s_pWvwData->s_pWindows[0]->hWnd = hb_gt_wvwCreateWindow( ( HINSTANCE ) hb_hInstance, ( HINSTANCE ) hb_hPrevInstance,  "", hb_iCmdShow );
+   
+   s_pWvwData->hInstance = hInstance;
+   
+   s_pWvwData->s_pWindows[0]->hWnd = hb_gt_wvwCreateWindow( ( HINSTANCE ) hInstance, ( HINSTANCE ) hPrevInstance,  "", iCmdShow );
 
    if ( !s_pWvwData->s_pWindows[0]->hWnd )
    {
@@ -695,10 +707,10 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
 
     if ( s_pWvwData->s_bSWRegistered )
     {
-      UnregisterClass( s_pWvwData->szSubWinName,( HINSTANCE ) hb_hInstance );
+      UnregisterClass( s_pWvwData->szSubWinName,( HINSTANCE ) s_pWvwData->hInstance );
     }
 
-    UnregisterClass( s_pWvwData->szAppName,( HINSTANCE ) hb_hInstance );
+    UnregisterClass( s_pWvwData->szAppName,( HINSTANCE ) s_pWvwData->hInstance );
 
     for ( i = 0; i < WVW_PICTURES_MAX; i++ )
     {
@@ -4316,7 +4328,7 @@ static void hb_gt_wvwCreateToolTipWindow( WIN_DATA * pWindowData )
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           NULL,
                           ( HMENU ) NULL,
-                          ( HINSTANCE ) hb_hInstance,
+                          ( HINSTANCE ) s_pWvwData->hInstance,
                           NULL );
 
    SetWindowPos( hWndTT,
@@ -4333,7 +4345,7 @@ static void hb_gt_wvwCreateToolTipWindow( WIN_DATA * pWindowData )
    ti.uFlags    = TTF_SUBCLASS;
    ti.hwnd      = pWindowData->hWnd;
    ti.uId       = WVW_ID_BASE_TOOLTIP+pWindowData->byWinId;
-   ti.hinst     = ( HINSTANCE ) hb_hInstance;
+   ti.hinst     = ( HINSTANCE ) s_pWvwData->hInstance;
    ti.lpszText  = "";
    ti.rect.left = ti.rect.top = ti.rect.bottom = ti.rect.right = 0;
 
@@ -5868,7 +5880,7 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
       wndclass.lpfnWndProc   = hb_gt_wvwWndProc;
       wndclass.cbClsExtra    = 0;
       wndclass.cbWndExtra    = 0;
-      wndclass.hInstance     = (HINSTANCE) hb_hInstance;
+      wndclass.hInstance     = (HINSTANCE) s_pWvwData->hInstance;
       wndclass.hIcon         = NULL;
       wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
       wndclass.hbrBackground = NULL;

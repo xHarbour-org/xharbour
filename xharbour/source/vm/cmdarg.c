@@ -68,7 +68,7 @@ static char ** s_argv   = &argv;
 
 HB_EXTERN_BEGIN
 
-HANDLE   hb_hInstance      = 0;
+HB_EXPORT HANDLE   hb_hInstance      = 0; 
 HANDLE   hb_hPrevInstance  = 0;
 int      hb_iCmdShow       = 0;
 BOOL     s_WinMainParam    = FALSE;
