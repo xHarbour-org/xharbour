@@ -158,7 +158,6 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD Create( hParent ) CLASS Control
-   ::xTop := MAX( ::xTop, ::Parent:TopMargin)
    ::__SetBorder( ::xBorder )
 
    IF ::IsContainer

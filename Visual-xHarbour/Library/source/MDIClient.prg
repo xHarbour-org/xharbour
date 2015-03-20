@@ -30,6 +30,8 @@ CLASS MDIClient INHERIT Window
    PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
    DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
 
+   PROPERTY Margins      SET ::SetMargins(@v)
+
    // Compatibility
    ACCESS StaticEdge    INLINE ::Border == WS_EX_STATICEDGE
    ASSIGN StaticEdge(l) INLINE ::Border := IIF(l,WS_EX_STATICEDGE,0)
@@ -37,13 +39,14 @@ CLASS MDIClient INHERIT Window
    ACCESS ClientEdge    INLINE ::Border == WS_EX_CLIENTEDGE
    ASSIGN ClientEdge(l) INLINE ::Border := IIF(l,WS_EX_CLIENTEDGE,0)
 
-   DATA WindowMenu         EXPORTED
-   DATA FirstChild         EXPORTED
-   DATA Parent             EXPORTED
    DATA Left               EXPORTED
    DATA Top                EXPORTED
    DATA Width              EXPORTED
    DATA Height             EXPORTED
+
+   DATA WindowMenu         EXPORTED
+   DATA FirstChild         EXPORTED
+   DATA Parent             EXPORTED
    DATA Style              EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    DATA ExStyle            EXPORTED INIT 0
    DATA ClsName            EXPORTED
@@ -65,11 +68,15 @@ CLASS MDIClient INHERIT Window
    DATA TabOrder           EXPORTED
    DATA ForeColor          EXPORTED
    DATA ContextMenu        EXPORTED
-   DATA __SysBackColor       EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
-   DATA __SysForeColor       EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
+   DATA __SysBackColor     EXPORTED INIT GetSysColor( COLOR_APPWORKSPACE )
+   DATA __SysForeColor     EXPORTED INIT GetSysColor( COLOR_BTNTEXT )
    DATA BkBrush            EXPORTED
    DATA __IsInstance       EXPORTED INIT .F.
 
+   DATA LeftMargin         EXPORTED INIT 0
+   DATA TopMargin          EXPORTED INIT 0
+   DATA RightMargin        EXPORTED INIT 0
+   DATA BottomMargin       EXPORTED INIT 0
 
    DATA Font               EXPORTED
    ACCESS MDIChild         INLINE ::ExStyle & WS_EX_MDICHILD != 0
@@ -97,12 +104,12 @@ CLASS MDIClient INHERIT Window
    METHOD __ControlProc()
    METHOD __SetBorder()
    METHOD GetActive()
+   METHOD SetMargins()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS MDIClient
-
    ::Left   := 0
    ::Top    := 0
    ::Width  := 0
@@ -163,7 +170,7 @@ METHOD __SetBorder( nBorder ) CLASS MDIClient
    ::ExStyle := nExStyle
 RETURN nBorder
 
-
+/*
 METHOD MoveWindow( x, y, w, h, lRep ) CLASS MDIClient
    DEFAULT x    TO ::Left
    DEFAULT y    TO ::Top
@@ -177,6 +184,7 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS MDIClient
 
    MoveWindow( ::hWnd, ::Left, ::Top, ::Width, ::Height, lRep )
 RETURN Self
+*/
 
 METHOD SetBackColor( nColor, lRepaint ) CLASS MDIClient
 
@@ -251,3 +259,78 @@ METHOD GetActive() CLASS MDIClient
       RETURN ::Children[n]
    ENDIF
 RETURN NIL
+
+METHOD SetMargins( cMargins ) CLASS MDIClient
+   LOCAL n, aMargins := hb_atokens( cMargins, "," )
+   ::LeftMargin   := 0
+   ::TopMargin    := 0
+   ::RightMargin  := 0
+   ::BottomMargin := 0
+
+   IF LEN( aMargins ) == 1
+      ASIZE( aMargins, 4 )
+      FOR n := 2 TO 4
+          IF aMargins[n] == NIL
+             aMargins[n] := aMargins[1]
+          ENDIF
+      NEXT
+    ELSE
+      ASIZE( aMargins, 4 )
+      FOR n := 1 TO 4
+          IF aMargins[n] == NIL
+             aMargins[n] := "0"
+          ENDIF
+      NEXT
+   ENDIF
+
+   ::LeftMargin   := VAL( aMargins[1] )
+   ::TopMargin    := VAL( aMargins[2] )
+   ::RightMargin  := VAL( aMargins[3] )
+   ::BottomMargin := VAL( aMargins[4] )
+
+   cMargins := Alltrim( Str( ::LeftMargin ) )+ "," + Alltrim( Str( ::TopMargin ) ) + "," + Alltrim( Str( ::RightMargin ) ) + "," + Alltrim( Str( ::BottomMargin ) )
+
+   IF ::DesignMode .AND. ::Application:ObjectManager != NIL
+      ::Application:ObjectManager:PostMessage( WM_USER + 4765 )
+      ::MoveWindow()
+   ENDIF
+RETURN cMargins
+
+METHOD MoveWindow() CLASS MDIClient
+   LOCAL nLeft, nTop, nRight, nBottom, n
+   nLeft   := 0
+   nTop    := 0
+   nRight  := ::Parent:ClientWidth
+   nBottom := ::Parent:ClientHeight
+
+   IF VALTYPE( ::AlignLeft ) == "C" .AND. ( n := ASCAN( ::Parent:Children, {|o| o:Name == ::AlignLeft } ) ) > 0
+      ::AlignLeft := ::Parent:Children[n]
+   ENDIF
+   IF VALTYPE( ::AlignTop ) == "C" .AND. ( n := ASCAN( ::Parent:Children, {|o| o:Name == ::AlignTop } ) ) > 0
+      ::AlignTop := ::Parent:Children[n]
+   ENDIF
+   IF VALTYPE( ::AlignRight ) == "C" .AND. ( n := ASCAN( ::Parent:Children, {|o| o:Name == ::AlignRight } ) ) > 0
+      ::AlignRight := ::Parent:Children[n]
+   ENDIF
+   IF VALTYPE( ::AlignBottom ) == "C" .AND. ( n := ASCAN( ::Parent:Children, {|o| o:Name == ::AlignBottom } ) ) > 0
+      ::AlignBottom := ::Parent:Children[n]
+   ENDIF
+
+   IF ::IsWindow()
+      IF VALTYPE( ::AlignLeft ) == "O"
+         nLeft   := ::AlignLeft:Left + ::AlignLeft:Width + IIF( ::AlignLeft:RightSplitter != NIL, ::AlignLeft:RightSplitter:Weight, 0 )
+      ENDIF
+      IF VALTYPE( ::AlignTop ) == "O"
+         nTop    := ::AlignTop:Top + ::AlignTop:Height + IIF( ::AlignTop:BottomSplitter != NIL, ::AlignTop:BottomSplitter:Weight, 0 )
+      ENDIF
+      IF VALTYPE( ::AlignRight ) == "O"
+         nRight  := ::AlignRight:Left - IIF( ::AlignRight:LeftSplitter != NIL, ::AlignRight:LeftSplitter:Weight, 0 )
+      ENDIF
+      IF VALTYPE( ::AlignBottom ) == "O"
+         nBottom := ::AlignBottom:Top - IIF( ::AlignBottom:TopSplitter != NIL, ::AlignBottom:TopSplitter:Weight, 0 )
+      ENDIF
+
+      MoveWindow( ::hWnd, nLeft + ::LeftMargin, nTop + ::TopMargin,;
+                          nRight - nLeft - ::RightMargin - ::LeftMargin, nBottom - nTop - ::BottomMargin - ::TopMargin, .T. )
+   ENDIF
+RETURN Self

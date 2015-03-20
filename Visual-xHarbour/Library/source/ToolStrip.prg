@@ -3180,7 +3180,7 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
    IF ::DesignMode
-      GetWindowRect( ::Application:MainForm:FormEditor1:hWnd, @rc )
+      GetWindowRect( ::Application:DesignPage:hWnd, @rc )
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2
       nStyle := TPM_CENTERALIGN | TPM_LEFTBUTTON

@@ -526,14 +526,13 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
-   IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid .AND. ( ::Application:MaskEditKillFocusValid .OR. ::LastKey == VK_TAB )
+   ::oget:assign()
+   ::oget:updatebuffer()
+
+   IF ! ::Validating .AND. nwParam <> 0 .AND. ! ::InDataGrid .AND. ( ::Application:MaskEditKillFocusValid .OR. nlParam == NIL .OR. ::LastKey == VK_TAB )
       IF ::oGet:Type == "N" .AND. ::oGet:VarGet() == 0
          ::oget:VarPut( 0 )
       ENDIF
-
-      ::oget:assign()
-      ::oget:updatebuffer()
-
       IF ::oget:baddate()
          MessageBeep( MB_OK )
          ::oget:buffer:=dtoc(ctod( "" ))

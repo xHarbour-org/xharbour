@@ -121,7 +121,6 @@ RETURN Self
 
 METHOD OnDestroy() CLASS CoolBar
    AEVAL( ::Bands, {|o|IIF( o:Image != NIL, o:Image:Delete(), NIL )} )
-   ::Parent:TopMargin := 0
    ::Super:OnDestroy()
 RETURN SELF
 
@@ -234,23 +233,6 @@ METHOD BandFromhWnd( hWnd ) CLASS CoolBar
 RETURN iMax
 
 
-//----------------------------------------------------------------------------------------------------
-/*
-METHOD OnParentSize( x, y, hDef ) CLASS CoolBar
-
-   IF ::Vertical
-      ::Top    := 0//::Parent:TopMargin
-      ::Height := ::Parent:ClientHeight //- ::Parent:TopMargin
-      ::Parent:LeftMargin := ::Height
-     ELSE
-      ::Top   := 0
-      ::Width := ::Parent:ClientWidth
-      ::Height:= ::GetHeight()
-      ::Parent:TopMargin := ::Height-IIF( ::Application:IsThemedXP, 4, 0)
-   ENDIF
-   SetWindowPos( ::hWnd, , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE+SWP_NOOWNERZORDER+SWP_NOZORDER+SWP_DEFERERASE )
-RETURN Self
-*/
 //----------------------------------------------------------------------------------------------------
 
 METHOD OnParentNotify( nwParam, nlParam ) CLASS CoolBar

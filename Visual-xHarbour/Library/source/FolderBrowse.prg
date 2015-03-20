@@ -213,7 +213,7 @@ RETURN Self
 
 METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS FolderList
    (hWnd, nwParam, nlParam)
-   IF ! ::DesignMode .AND. nMsg == WM_USER + 15 .AND. ::__nCurFolderID != NIL
+   IF nMsg == WM_USER + 15 .AND. ::__nCurFolderID != NIL
       FolderListPopulateByID( ::hWnd, ::__nCurFolderID  )
       RETURN 0
    ENDIF

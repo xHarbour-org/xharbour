@@ -320,6 +320,8 @@ METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
    ::Application:ToolBoxBar:Enabled  := lEnabled
    ::Application:AlignBar:Enabled    := lEnabled
 
+   ::Application:Props:MainToolBar:Enabled := lEnabled
+
    WITH OBJECT ::MainForm
       IF lOrder
          FOR n := 1 TO LEN( :ToolStrip5:Children )-1
@@ -328,8 +330,6 @@ METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
        ELSE
          ::Application:AlignBar:Enabled := lEnabled
       ENDIF
-
-      :MenuStrip1:Enabled := lEnabled
 
       :ToolStripComboBox1:Enabled := lEnabled
    END
@@ -3221,7 +3221,7 @@ METHOD Find() CLASS Project
       ENDIF
       ::Application:SourceEditor:SetFocus()
 
-      ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
+      ::Application:Props:MainToolBar:OnSysKeyDown( VK_MENU )
 
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
@@ -3745,7 +3745,7 @@ METHOD Open( cProject ) CLASS Project
    EXTERN MDIChildWindow
 
    LOCAL n, Xfm, aChildren, oWait
-   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, cBin, nLine, aErrors, aEditors, cProp, cSourcePath
+   LOCAL hFile, cLine, oEditor, cSource, oProject, cFile, cBin, nLine, aErrors, aEditors, cSourcePath
 
    IF cProject != NIL .AND. !FILE( cProject )
       MessageBox( GetActiveWindow(), "File Not Found", "Open Project", MB_ICONEXCLAMATION )
@@ -3935,43 +3935,7 @@ METHOD Open( cProject ) CLASS Project
          oWait:Position := 90
 
          IF ::CurrentForm:MDIContainer
-            cProp := ::CurrentForm:MDIClient:AlignLeft
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( ::CurrentForm:Children, {|o| o:Name == cProp } ) ) > 0
-               ::CurrentForm:MDIClient:AlignLeft := ::CurrentForm:Children[n]
-            ENDIF
-
-            cProp := ::CurrentForm:MDIClient:AlignTop
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( ::CurrentForm:Children, {|o| o:Name == cProp } ) ) > 0
-               ::CurrentForm:MDIClient:AlignTop := ::CurrentForm:Children[n]
-            ENDIF
-
-            cProp := ::CurrentForm:MDIClient:AlignRight
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( ::CurrentForm:Children, {|o| o:Name == cProp } ) ) > 0
-               ::CurrentForm:MDIClient:AlignRight := ::CurrentForm:Children[n]
-            ENDIF
-
-            cProp := ::CurrentForm:MDIClient:AlignBottom
-            IF VALTYPE( cProp ) == "C" .AND. ( n := ASCAN( ::CurrentForm:Children, {|o| o:Name == cProp } ) ) > 0
-               ::CurrentForm:MDIClient:AlignBottom := ::CurrentForm:Children[n]
-            ENDIF
-
-            IF VALTYPE( ::CurrentForm:MDIClient:AlignLeft ) == "O"
-               ::CurrentForm:LeftMargin := ::CurrentForm:MDIClient:AlignLeft:Left + ::CurrentForm:MDIClient:AlignLeft:Width
-            ENDIF
-            IF VALTYPE( ::CurrentForm:MDIClient:AlignTop ) == "O"
-               ::CurrentForm:TopMargin := ::CurrentForm:MDIClient:AlignTop:Top + ::CurrentForm:MDIClient:AlignTop:Height
-            ENDIF
-            IF VALTYPE( ::CurrentForm:MDIClient:AlignRight ) == "O"
-               ::CurrentForm:RightMargin := ::CurrentForm:MDIClient:AlignRight:Left
-            ENDIF
-            IF VALTYPE( ::CurrentForm:MDIClient:AlignBottom ) == "O"
-               ::CurrentForm:BottomMargin := ::CurrentForm:MDIClient:AlignBottom:Top
-            ENDIF
-
-            MoveWindow( ::CurrentForm:MDIClient:hWnd, ::CurrentForm:LeftMargin,;
-                                                      ::CurrentForm:TopMargin,;
-                                                      ::CurrentForm:RightMargin - ::CurrentForm:LeftMargin,;
-                                                      ::CurrentForm:BottomMargin - ::CurrentForm:TopMargin, .T.)
+            ::CurrentForm:MDIClient:MoveWindow()
          ENDIF
 
          ::CurrentForm:Show():UpdateWindow()

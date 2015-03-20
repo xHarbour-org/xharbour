@@ -467,7 +467,7 @@ CLASS Window INHERIT Object
    METHOD CallWindowProc()        INLINE CallWindowProc( ::__nProc, ::hWnd, ::Msg, ::wParam, ::lParam )
    METHOD UpdateWindow()          INLINE UpdateWindow( ::hWnd ), Self
 
-   METHOD Show( nShow )           INLINE ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
+   METHOD Show( nShow )           INLINE ShowWindow( ::hWnd, IIF( ! ::DesignMode .AND. nShow != NIL, nShow, SW_SHOW ) )
    METHOD Refresh()               INLINE ::InvalidateRect(,.T.)
    METHOD ReCreate()
    METHOD GetHeight()             INLINE ::xHeight
@@ -1528,7 +1528,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Window
-   LOCAL x, y, aChildren, hDef, oChild, cProp
+   LOCAL x, y, aChildren, hDef, oChild
 
    ::__lSizeChanged := .T.
 
@@ -1564,50 +1564,8 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
    ENDIF
 
    TRY
-      IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL .AND. ::MDIClient:hWnd != NIL
-         ::LeftMargin   := 0
-         ::TopMargin    := 0
-         ::RightMargin  := ::ClientWidth
-         ::BottomMargin := ::ClientHeight
-
-         IF ! ::DesignMode
-            cProp := ::MDIClient:AlignLeft
-            IF VALTYPE( cProp ) == "C"
-               ::MDIClient:AlignLeft := ::__hObjects[ cProp ]
-            ENDIF
-
-            cProp := ::MDIClient:AlignTop
-            IF VALTYPE( cProp ) == "C"
-               ::MDIClient:AlignTop := ::__hObjects[ cProp ]
-            ENDIF
-
-            cProp := ::MDIClient:AlignRight
-            IF VALTYPE( cProp ) == "C"
-               ::MDIClient:AlignRight := ::__hObjects[ cProp ]
-            ENDIF
-
-            cProp := ::MDIClient:AlignBottom
-            IF VALTYPE( cProp ) == "C"
-               ::MDIClient:AlignBottom := ::__hObjects[ cProp ]
-            ENDIF
-         ENDIF
-
-         IF VALTYPE( ::MDIClient:AlignLeft ) == "O"
-            ::LeftMargin := ::MDIClient:AlignLeft:Left + ::MDIClient:AlignLeft:Width + IIF( ::MDIClient:AlignLeft:RightSplitter != NIL, ::MDIClient:AlignLeft:RightSplitter:Weight, 0 )
-         ENDIF
-         IF VALTYPE( ::MDIClient:AlignTop ) == "O"
-            ::TopMargin := ::MDIClient:AlignTop:Top + ::MDIClient:AlignTop:Height + IIF( ::MDIClient:AlignTop:BottomSplitter != NIL, ::MDIClient:AlignTop:BottomSplitter:Weight, 0 )
-         ENDIF
-         IF VALTYPE( ::MDIClient:AlignRight ) == "O"
-            ::RightMargin := ::MDIClient:AlignRight:Left - IIF( ::MDIClient:AlignRight:LeftSplitter != NIL, ::MDIClient:AlignRight:LeftSplitter:Weight, 0 )
-         ENDIF
-         IF VALTYPE( ::MDIClient:AlignBottom ) == "O"
-            ::BottomMargin := ::MDIClient:AlignBottom:Top - IIF( ::MDIClient:AlignBottom:TopSplitter != NIL, ::MDIClient:AlignBottom:TopSplitter:Weight, 0 )
-         ENDIF
-         MoveWindow( ::MDIClient:hWnd, ::LeftMargin,;
-                                       ::TopMargin,;
-                                       ::RightMargin - ::LeftMargin,;
-                                       ::BottomMargin - ::TopMargin, .T.)
+      IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL
+         ::MDIClient:MoveWindow()
       ENDIF
     CATCH
    END
@@ -2296,7 +2254,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_KILLFOCUS
-              nRet := ::OnKillFocus( nwParam )
+              nRet := ::OnKillFocus( nwParam, nlParam )
               ODEFAULT nRet TO __Evaluate( ::OnWMKillFocus, Self, nwParam, nlParam, nRet )
               ODEFAULT nRet TO nRet := ExecuteEvent( "OnKillFocus", Self )
 
@@ -2508,45 +2466,43 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_NOTIFY
-              IF ! ::DesignMode
-                 ::hdr := (struct NMHDR*) nlParam
+              ::hdr := (struct NMHDR*) nlParam
 
-                 nRet := ExecuteEvent( "OnNotify", Self )
-                 nRet := ::OnNotify( nwParam, nlParam, code )
+              nRet := ExecuteEvent( "OnNotify", Self )
+              nRet := ::OnNotify( nwParam, nlParam, code )
 
-                 IF nRet == NIL
-                    oCtrl := ObjFromHandle( ::hdr:hwndFrom )
-                    IF oCtrl != NIL
-                       IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
-                          nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
-                       END
-                       ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
+              IF nRet == NIL
+                 oCtrl := ObjFromHandle( ::hdr:hwndFrom )
+                 IF oCtrl != NIL
+                    IF HGetPos( oCtrl:EventHandler, "OnParentNotify" ) != 0
+                       nRet := ::&( oCtrl:EventHandler[ "OnParentNotify" ] )( oCtrl )
+                    END
+                    ODEFAULT nRet TO oCtrl:OnParentNotify( nwParam, nlParam, ::hdr )
+                    IF VALTYPE( nRet ) == "O"
+                       nRet := NIL
+                    ENDIF
+                 ENDIF
+
+                 IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
+                    IF ::ClsName != "DataGrid"
+                       IF __objHasMsg( Self, "OnToolTipNotify" )
+                          ODEFAULT nRet TO ::OnToolTipNotify( nwParam, nlParam, ::hdr )
+                       ELSE
+                          FOR EACH oChild IN ::Children
+                              IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
+                                 nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
+                              END
+                              IF __objHasMsg( oChild, "OnToolTipNotify" )
+                                 ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
+                              ENDIF
+                          NEXT
+                       ENDIF
                        IF VALTYPE( nRet ) == "O"
                           nRet := NIL
                        ENDIF
                     ENDIF
-
-                    IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
-                       IF ::ClsName != "DataGrid"
-                          IF __objHasMsg( Self, "OnToolTipNotify" )
-                             ODEFAULT nRet TO ::OnToolTipNotify( nwParam, nlParam, ::hdr )
-                          ELSE
-                             FOR EACH oChild IN ::Children
-                                 IF HGetPos( oChild:EventHandler, "OnToolTipNotify" ) != 0
-                                    nRet := ::&( oChild:EventHandler[ "OnToolTipNotify" ] )( oChild )
-                                 END
-                                 IF __objHasMsg( oChild, "OnToolTipNotify" )
-                                    ODEFAULT nRet TO oChild:OnToolTipNotify( nwParam, nlParam, ::hdr )
-                                 ENDIF
-                             NEXT
-                          ENDIF
-                          IF VALTYPE( nRet ) == "O"
-                             nRet := NIL
-                          ENDIF
-                       ENDIF
-                    ENDIF
-
                  ENDIF
+
               ENDIF
               EXIT
 
