@@ -2192,6 +2192,8 @@ HB_ISIZ hb_itemGetNS( PHB_ITEM pItem )
 
    if( pItem )
    {
+	  
+	      
       if( HB_IS_LONG( pItem ) )
          return ( HB_ISIZ ) pItem->item.asLong.value;
 
@@ -2200,6 +2202,10 @@ HB_ISIZ hb_itemGetNS( PHB_ITEM pItem )
 
       else if( HB_IS_DOUBLE( pItem ) )
          return ( HB_ISIZ ) pItem->item.asDouble.value;
+         
+	  else if( HB_IS_STRING( pItem ) )
+        if( pItem->item.asString.length == 1 )
+        return ( HB_ISIZ ) ( BYTE ) pItem->item.asString.value[ 0 ];         
    }
 
    return 0;

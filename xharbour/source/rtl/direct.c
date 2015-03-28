@@ -288,7 +288,7 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char * szFName, char * szAttributes, char * sRegEx )
 {
-   HB_SIZE ui, uiLen = pRecurse->item.asArray.value->ulLen;
+   HB_SIZE ui, uiLen = hb_arrayLen( pRecurse ) ;
 
    for( ui = 0; ui < uiLen; ui++ )
    {
@@ -404,7 +404,7 @@ HB_FUNC( DIRECTORYRECURSE )
 #endif
    char *      szAttributes;
 
-   if( pDirSpec && pDirSpec->item.asString.length < HB_PATH_MAX )
+   if( pDirSpec && hb_itemGetCLen( pDirSpec ) < HB_PATH_MAX )
    {
       szAttributes      = ( char * ) hb_xgrab( 3 + 1 );  // DHS
       hb_xmemset( szAttributes, 0, 4 );
@@ -412,18 +412,18 @@ HB_FUNC( DIRECTORYRECURSE )
 
       if( pAttribute )
       {
-         if( strpbrk( pAttribute->item.asString.value, "hH" ) != NULL )
+         if( strpbrk( hb_itemGetCPtr( pAttribute ), "hH" ) != NULL )
          {
             hb_xstrcat( szAttributes, "H", 0 );
          }
 
-         if( strpbrk( pAttribute->item.asString.value, "sS" ) != NULL )
+         if( strpbrk( hb_itemGetCPtr( pAttribute ), "sS" ) != NULL )
          {
             hb_xstrcat( szAttributes, "S", 0 );
          }
       }
 
-      if( ( fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value ) ) != NULL )
+      if( ( fDirSpec = hb_fsFNameSplit( hb_itemGetCPtr( pDirSpec ) ) ) != NULL )
       {
 #if defined( HB_OS_HAS_DRIVE_LETTER )
          if( fDirSpec->szDrive == NULL )

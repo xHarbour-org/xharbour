@@ -250,7 +250,7 @@ HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
 
        if (!hBitmapUnchecked)
        {
-         hBitmapUnchecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance,(LPCTSTR) MAKEINTRESOURCE( (WORD) hb_parni(4) ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+         hBitmapUnchecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(),(LPCTSTR) MAKEINTRESOURCE( (WORD) hb_parni(4) ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
          AddBitmapHandle(szResname, hBitmapUnchecked, iWidth, iHeight);
        }
      }
@@ -260,7 +260,7 @@ HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
 
        if (!hBitmapUnchecked)
        {
-         hBitmapUnchecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance, hb_parcx(4), IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+         hBitmapUnchecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(), hb_parcx(4), IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
          AddBitmapHandle(hb_parcx(4), hBitmapUnchecked , iWidth, iHeight);
        }
      }
@@ -276,7 +276,7 @@ HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
 
        if (!hBitmapChecked)
        {
-         hBitmapChecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance,(LPCTSTR) MAKEINTRESOURCE( (WORD) hb_parni(5) ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+         hBitmapChecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(),(LPCTSTR) MAKEINTRESOURCE( (WORD) hb_parni(5) ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
          AddBitmapHandle(szResname, hBitmapChecked, iWidth, iHeight);
        }
      }
@@ -286,7 +286,7 @@ HB_FUNC ( WVW_MENUITEM_SETBITMAPS )
 
        if (!hBitmapChecked)
        {
-         hBitmapChecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance, hb_parcx(5), IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+         hBitmapChecked = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(), hb_parcx(5), IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
          AddBitmapHandle(hb_parcx(5), hBitmapChecked , iWidth, iHeight);
        }
      }

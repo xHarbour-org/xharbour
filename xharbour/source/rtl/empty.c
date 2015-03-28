@@ -71,7 +71,7 @@ HB_FUNC( EMPTY )
 
       case HB_IT_STRING:
       case HB_IT_MEMO:
-         hb_retl( hb_strEmpty( pItem->item.asString.value, pItem->item.asString.length ) );
+         hb_retl( hb_strEmpty( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) ) );
          break;
 
       case HB_IT_INTEGER:

@@ -256,7 +256,7 @@ HB_FUNC( TRANSFORM )
          /* ======================================================= */
          if( ( uiPicFlags & PF_BRITISH ) && ( ulExpLen <= 3 ) )
          {
-            char * pTmp = pPic->item.asString.value;
+            char * pTmp = hb_itemGetCPtr( pPic );
 
             if( hb_stricmp( pTmp, "@E" ) == 0 || hb_stricmp( pTmp, "@E ." ) == 0 || hb_stricmp( pTmp, "@E ," ) == 0 )
             {
@@ -1146,7 +1146,7 @@ HB_FUNC( TRANSFORM )
          char  szDateTime[ 26 ];
          char  szDate[ 19 ];
 
-         hb_datetimeDecStr( szDate, pValue->item.asDate.value, pValue->item.asDate.time );
+         hb_datetimeDecStr( szDate, hb_itemGetDL( pValue) , hb_itemGetT( pValue ) );
          hb_retc( hb_datetimeFormat( szDate, szDateTime, hb_setGetDateFormat(), hb_setGetTimeFormat() ) );
       }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()

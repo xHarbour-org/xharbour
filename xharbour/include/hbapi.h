@@ -828,6 +828,7 @@ extern void      hb_cmdargProcessVM( void ); /* Check for command line internal 
 #if defined( HB_OS_WIN )
 extern HB_EXPORT void hb_winmainArgInit( void * hInstance,  void * hPrevInstance, int iCmdShow ); /* Set WinMain() parameters */
 extern HB_EXPORT BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow ); /* Retrieve WinMain() parameters */
+extern HB_EXPORT void * hb_winmainGetInstance( void ) ;
 #endif
 
 /* Codeblock management */

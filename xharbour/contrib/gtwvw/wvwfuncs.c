@@ -322,7 +322,7 @@ HB_FUNC( WIN_LOADICON )
 
    if ( ISNUM( 1 ) )
    {
-      hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 1 ) ) );
+      hIcon = LoadIcon( ( HINSTANCE ) hb_winmainGetInstance(), MAKEINTRESOURCE( hb_parni( 1 ) ) );
    }
    else
    {
@@ -349,13 +349,13 @@ HB_FUNC( WIN_LOADIMAGE )
    {
       case 0:
       {
-         hImage = LoadBitmap( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 1 ) ) );
+         hImage = LoadBitmap( ( HINSTANCE ) hb_winmainGetInstance(), MAKEINTRESOURCE( hb_parni( 1 ) ) );
       }
       break;
 
       case 1:
       {
-         hImage = LoadBitmap( ( HINSTANCE ) hb_hInstance, hb_parc( 1 ) );
+         hImage = LoadBitmap( ( HINSTANCE ) hb_winmainGetInstance(), hb_parc( 1 ) );
       }
       break;
 
@@ -858,7 +858,7 @@ HB_FUNC( LOADIMAGE )
 {
    if ( ISNUM( 2 ) )
       HB_RETHANDLE( 
-          LoadImage( ( HINSTANCE ) hb_hInstance,  //ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ),    // handle of the instance that contains the image
+          LoadImage( ( HINSTANCE ) hb_winmainGetInstance(),  //ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ),    // handle of the instance that contains the image
                   (LPCTSTR)MAKEINTRESOURCE(hb_parnl(2)),          // name or identifier of image
                   (UINT) hb_parni(3),           // type of image
                   hb_parni(4),                  // desired width
@@ -2058,7 +2058,7 @@ HB_FUNC( WVW_DLGSETICON )
 
    if ( ISNUM( 2 ) )
    {
-      hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 2 ) ) );
+      hIcon = LoadIcon( ( HINSTANCE ) hb_winmainGetInstance(), MAKEINTRESOURCE( hb_parni( 2 ) ) );
    }
    else
    {
@@ -2410,7 +2410,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
       if ( ISNUM( 3 ) )
       {
-         hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
+         hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_winmainGetInstance(),
                                       ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                         hb_parl( 2 ) ? p->s_pWindows[0]->hWnd : NULL,
                                       ( DLGPROC       ) hb_parptr( 3 ) );
@@ -2422,7 +2422,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
          {
             case 0:
             {
-               hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
+               hDlg = CreateDialog( ( HINSTANCE     ) hb_winmainGetInstance(),
                                                       hb_parc( 1 ),
                                                       hb_parl( 2 ) ? p->s_pWindows[0]->hWnd : NULL,
                                                       (DLGPROC) hb_gt_wvwDlgProcMLess );
@@ -2431,7 +2431,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
             case 1:
             {
-               hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
+               hDlg = CreateDialog( ( HINSTANCE     ) hb_winmainGetInstance(),
                                     MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                       hb_parl( 2 ) ? p->s_pWindows[0]->hWnd : NULL,
                                                       (DLGPROC) hb_gt_wvwDlgProcMLess );
@@ -2440,7 +2440,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
             case 2:
             {
-               hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
+               hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_winmainGetInstance(),
                                             ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                               hb_parl( 2 ) ? p->s_pWindows[0]->hWnd : NULL,
                                                              (DLGPROC) hb_gt_wvwDlgProcMLess );
@@ -2543,7 +2543,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    {
       case 0:
       {
-         iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
+         iResult = DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
                                                      hb_parc( 1 ),
                                                      hParent,
                                                      (DLGPROC) hb_gt_wvwDlgProcModal,
@@ -2553,7 +2553,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
 
       case 1:
       {
-         iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
+         iResult = DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
                            MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
                                                      hParent,
                                                      (DLGPROC) hb_gt_wvwDlgProcModal,
@@ -2563,7 +2563,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
 
       case 2:
       {
-         iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_hInstance,
+         iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_winmainGetInstance(),
                                            ( LPDLGTEMPLATE ) hb_parc( 1 ),
                                                              hParent,
                                                             (DLGPROC) hb_gt_wvwDlgProcModal,

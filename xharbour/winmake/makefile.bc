@@ -161,6 +161,12 @@ HARBOUR_DLL_OBJS=\
 	$(GTWVG_LIB_OBJS)
 !endif
 
+#!if ("$(HB_WVW)"=="1")
+HARBOUR_DLL_OBJS=\
+	$(HARBOUR_DLL_OBJS)\
+	$(GTWVW_LIB_OBJS)
+#!endif
+
 DLL_PROJECT=\
 	$(DLL_PROJECT)
 

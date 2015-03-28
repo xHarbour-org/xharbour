@@ -143,7 +143,7 @@ HB_FUNC( WVW_TBCREATE)
                                    WS_CHILD | WS_VISIBLE | dwStyle,
                                    WVW_ID_BASE_TOOLBAR+usWinNum,
                                    0,
-                                   (HINSTANCE) hb_hInstance,
+                                   (HINSTANCE) hb_winmainGetInstance(),
                                    0,
                                    NULL,
                                    0,

@@ -534,7 +534,7 @@ HB_FUNC( WVW_PGCREATE)
        iBottom-iTop+1,
        hWndParent,
        (HMENU) ( HB_PTRDIFF )uiPGid,
-       (HINSTANCE) hb_hInstance,
+       (HINSTANCE) hb_winmainGetInstance(),
        (LPVOID) NULL
    );
 

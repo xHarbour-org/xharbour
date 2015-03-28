@@ -77,6 +77,7 @@ BOOL     s_WinMainParam    = FALSE;
    #if defined( _MSC_VER ) || defined( __DMC__ )
       extern HB_EXPORT void hb_winmainArgInit( void * hInstance, void * hPrevInstance, int iCmdShow );
       extern HB_EXPORT BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow );
+      extern HB_EXPORT void * hb_winmainGetInstance( void ) ;
    #endif
 #endif
 
@@ -102,6 +103,10 @@ BOOL hb_winmainArgGet( void * phInstance, void * phPrevInstance, int * piCmdShow
    return s_WinMainParam;
 }
 
+void * hb_winmainGetInstance( void ) 
+{
+	return hb_hInstance ;
+}
 #endif
 
 void hb_cmdargInit( int argc, char * argv[] )

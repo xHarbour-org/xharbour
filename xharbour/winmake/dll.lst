@@ -617,8 +617,18 @@ gtwin
 
 ; GTWVT_LIB_OBJS
 ; Error: Unresolved external '_hb_stack_ready'
-;gtwvt
+gtwvt
 
 ; GTGUI_LIB_OJS
 gtgui
 gtdef
+gtwvw
+wvwcheck
+wvwdraw
+wvwedit
+wvwfuncs
+wvwmenu
+wvwpush
+wvwstbar
+wvwtbar
+

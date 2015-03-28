@@ -8,6 +8,42 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-28 16:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  ! winmake\makefile.bc
+  ! winmake\makefile.vc
+    ! added gtwvw to dll build
+  ! winmake\dll.lst
+    ! added gtwvw to list
+  ! include/hbapi.h
+    ! added hb_winmainGetInstance() to HB_OS_WIN section  
+  ! source/vm/itemapi.c
+    ! added return of numeric part in hb_itemGetNS when type is string and lenght is 1
+  ! source/vm/extend.c
+    ! added return of numeric part in hb_parns when type is string and lenght is 1 
+  ! source/vm/cmdarg.c
+    ! added hb_winmainGetInstance to return the instance	  
+  ! contrib\gtwvw\gtwvw.c 
+    ! changed hb_hInstance to s_pWvwData->hInstance   where applicable
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib\gtwvw\wvwcheck.c 
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib\gtwvw\wvwedit.c 
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib\gtwvw\wvwfuncs.c 
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
+  ! contrib\gtwvw\wvwmenu.c 
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
+  ! contrib\gtwvw\wvwstbar.c 
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib\gtwvw\wvwtbar.c
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
+  ! source/rtl/empty.c  
+    ! changed to use itemapi insted of direct structure manipulation
+  ! source/rtl/transform.c  
+    ! changed to use itemapi insted of direct structure manipulation
+  ! source/rtl/direct.c
+    ! changed to use itemapi insted of direct structure manipulation
+        
 2015-03-18 22:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   ! contrib/gtwvw/gtwvw.c
     ! in function hb_gt_wvw_Init added variables hInstance,hPrevInstance,iCmdShow and set then by calling hb_winmainArgGet

@@ -1739,6 +1739,8 @@ HB_ISIZ hb_parns( int iParam, ... )
 
          return hb_arrayGetNS( pItem, nArrayIndex );
       }
+      else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+         return ( HB_ISIZ ) ( BYTE ) pItem->item.asString.value[ 0 ];      
    }
 
    return 0;

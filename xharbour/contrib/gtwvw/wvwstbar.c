@@ -556,7 +556,7 @@ HB_FUNC( WVW_XBCREATE)
        iBottom-iTop+1,                         /* height */
        hWndParent,                   /* handle to main window */
        (HMENU)( HB_PTRDIFF ) uiXBid,           /* id for this scroll bar control */
-       (HINSTANCE) hb_hInstance,                  /* instance owning this window */
+       (HINSTANCE) hb_winmainGetInstance(),                  /* instance owning this window */
        (LPVOID) NULL           /* pointer not needed */
    );
 

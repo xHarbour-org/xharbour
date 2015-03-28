@@ -5919,7 +5919,7 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
        (pParentWindow==NULL ? NULL : pParentWindow->hWnd),  /*x parent window */
 
        NULL,                                                /*menu            */
-       (HINSTANCE) hb_hInstance,                            /*x instance      */
+       (HINSTANCE) s_pWvwData->hInstance,                            /*x instance      */
        NULL );                                              /*lpParam         */
 
     s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->hWnd = hWnd;
@@ -7189,11 +7189,11 @@ static HICON hb_gt_wvwSetWindowIcon( UINT usWinNum, int icon, const char *lpIcon
 
   if( lpIconName == NULL )
   {
-    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
+    hIcon = LoadIcon( ( HINSTANCE ) hb_winmainGetInstance(), MAKEINTRESOURCE( icon ) );
   }
   else
   {
-    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, lpIconName );
+    hIcon = LoadIcon( ( HINSTANCE ) hb_winmainGetInstance(), lpIconName );
   }
 
   if ( hIcon )
@@ -9627,7 +9627,7 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
 
       if (!hbmpx)
       {
-        hbmpx = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance,(LPCTSTR) MAKEINTRESOURCE( (WORD) iresimage ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+        hbmpx = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(),(LPCTSTR) MAKEINTRESOURCE( (WORD) iresimage ),IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
 
         AddBitmapHandle( szResname, hbmpx, iWidth, iHeight);
      //   AddBitmapHandle(iPicture, hbmpx, iWidth, iHeight);
@@ -9639,7 +9639,7 @@ HB_EXPORT IPicture * rr_LoadPictureFromResource( const char * resname,UINT iresi
 
       if (!hbmpx)
       {
-        hbmpx = (HBITMAP)LoadImage(( HINSTANCE ) hb_hInstance,resname,IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
+        hbmpx = (HBITMAP)LoadImage(( HINSTANCE ) hb_winmainGetInstance(),resname,IMAGE_BITMAP,0,0, LR_DEFAULTCOLOR);
         AddBitmapHandle(resname, hbmpx, iWidth, iHeight);
       }
     }
@@ -10028,7 +10028,7 @@ static HBITMAP hPrepareBitmap(char * szBitmap, UINT uiBitmap,
 
       if (!hBitmap)
       {
-         hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_hInstance,
+         hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_winmainGetInstance(),
                                szBitmap,
                                IMAGE_BITMAP,
                                iExpWidth,
@@ -10048,7 +10048,7 @@ static HBITMAP hPrepareBitmap(char * szBitmap, UINT uiBitmap,
 
       if (!hBitmap)
       {
-         hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_hInstance,
+         hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_winmainGetInstance(),
                                (LPCTSTR) MAKEINTRESOURCE( (WORD) uiBitmap ),
                                IMAGE_BITMAP,
                                iExpWidth,
@@ -11135,7 +11135,7 @@ UINT ButtonCreate( UINT usWinNum, USHORT usTop, USHORT usLeft, USHORT usBottom, 
        iBottom-iTop+1,                         /* height */
        hWndParent,                   /* handle to parent window */
        (HMENU)( HB_PTRDIFF ) uiPBid,           /* id for this button control */
-       (HINSTANCE) hb_hInstance,                  /* instance owning this window */
+       (HINSTANCE) s_pWvwData->hInstance,                  /* instance owning this window */
        (LPVOID) NULL           /* pointer not needed */
    );
 
