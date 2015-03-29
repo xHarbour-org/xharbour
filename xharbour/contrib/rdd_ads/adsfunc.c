@@ -75,9 +75,10 @@ int       hb_ads_iCharType = ADS_ANSI;
 BOOL      hb_ads_bTestRecLocks = FALSE;             /* Debug Implicit locks */
 ADSHANDLE hb_ads_hConnect = 0;
 
+BOOL hb_ads_bOEM = FALSE;
 #ifdef ADS_USE_OEM_TRANSLATION
 
-BOOL hb_ads_bOEM = FALSE;
+
 
 char * hb_adsOemToAnsi( const char * pszSrc, HB_SIZE nLen )
 {

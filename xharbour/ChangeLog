@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-03-29 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  ! contrib/rdd_ads/rddads.h
+    ! added  extern BOOL   hb_ads_bOEM; when ADS_USE_OEM_TRANSLATION if not defined
+  ! contrib/rdd_ads/adsfunc.c  
+    ! Moved BOOL hb_ads_bOEM = FALSE; to outside #ifdef ADS_USE_OEM_TRANSLATION block
+    
 2015-03-28 16:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   ! winmake\makefile.bc
   ! winmake\makefile.vc

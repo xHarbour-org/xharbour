@@ -271,6 +271,7 @@ extern ADSAREAP   hb_adsGetWorkAreaPointer( void );
 #  define hb_adsOemToAnsi( s, l )     ( ( char * ) ( s ) )
 #  define hb_adsAnsiToOem( s, l )     ( ( char * ) ( s ) )
 #  define hb_adsOemAnsiFree( s )
+   extern BOOL   hb_ads_bOEM;
 #endif
 
 HB_EXTERN_END
