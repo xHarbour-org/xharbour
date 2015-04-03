@@ -32,14 +32,14 @@ METHOD Init( oParent, oDebugger ) CLASS XHDebugConsole
   ::Super:Init( oParent )
   ::oDebugger := oDebugger
 
-  ::Caption     := "   Console  "
-  ::Height      := 300
-  ::Dock:Margin := 2
+  ::Caption        := "Console"
+  ::Height         := 300
+  ::Dock:Margin    := 2
   ::Dock:TopMargin := 4
-  ::Dock:Left   := ::Parent
-  ::Dock:Top    := ::Parent
-  ::Dock:Bottom := ::Parent
-  ::Dock:Right  := ::Parent
+  ::Dock:Left      := ::Parent
+  ::Dock:Top       := ::Parent
+  ::Dock:Bottom    := ::Parent
+  ::Dock:Right     := ::Parent
 RETURN Self
 
 
@@ -56,7 +56,7 @@ METHOD Create() CLASS XHDebugConsole
     :Dock:Right  := :Parent
     :Create()
   END
-  
+
   ::oOut := EditBox( Self )
   WITH OBJECT ::oOut
     :MultiLine := .T.
@@ -105,7 +105,7 @@ METHOD OnChildKeyDown( hwnd, nMsg, nWParam, nLParam ) CLASS XHDebugConsole
   (hWnd)
   (nMsg)
   (nLParam)
-  
+
   WITH OBJECT ::oInput
     IF nWParam == 13
       ::DoIt( )

@@ -28,7 +28,7 @@ METHOD Init( oParent, oDebugger ) CLASS XHDebugMonitor
   ::Super:Init( oParent )
   ::oDebugger := oDebugger
 
-  ::Caption := "   Monitor  "
+  ::Caption := "Monitor"
 
   ::Dock:Margin := 2
   ::Dock:TopMargin := 4
@@ -40,102 +40,100 @@ RETURN Self
 
 
 METHOD Create() CLASS XHDebugMonitor
-  LOCAL oAllGlobals
+  LOCAL oAllGlobals, oGlobal, oLocal, oPrivate, oPublic, oStatic
 
   ::Super:Create()
 
-  WITH OBJECT CheckBox( Self )
-    :Caption := "Global"
+  WITH OBJECT oGlobal := CheckBox( Self )
+    :Text        := "Global"
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Left := :Parent
-    :Dock:Top := :Parent
-    :Action := {|o| If( ::oDebugger:lShowGlobals := o:Checked, oAllGlobals:Enable(), oAllGlobals:Disable), ::oDebugger:SyncVars() }
+    :Dock:Left   := :Parent
+    :Dock:Top    := :Parent
+    :Action      := {|o| If( ::oDebugger:lShowGlobals := o:Checked, oAllGlobals:Enable(), oAllGlobals:Disable), ::oDebugger:SyncVars() }
     :Create()
   END
 
-  WITH OBJECT CheckBox( Self )
-    :Caption := "Local"
+  WITH OBJECT oLocal := CheckBox( Self )
+    :Text        := "Local"
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Left := :Form:CheckBox1
-    :Dock:Top := :Parent
-    :Action := {|o| ::oDebugger:lShowLocals := o:Checked, ::oDebugger:SyncVars() }
+    :Dock:Left   := oGlobal
+    :Dock:Top    := :Parent
+    :Action      := {|o| ::oDebugger:lShowLocals := o:Checked, ::oDebugger:SyncVars() }
     :Create()
   END
 
-  WITH OBJECT CheckBox( Self )
-    :Caption := "Private"
+  WITH OBJECT oPrivate := CheckBox( Self )
+    :Text        := "Private"
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Left := :Form:CheckBox2
-    :Dock:Top := :Parent
-    :Action := {|o| ::oDebugger:lShowPrivates := o:Checked, ::oDebugger:SyncVars() }
+    :Dock:Left   := oLocal
+    :Dock:Top    := :Parent
+    :Action      := {|o| ::oDebugger:lShowPrivates := o:Checked, ::oDebugger:SyncVars() }
     :Create()
   END
 
-  WITH OBJECT CheckBox( Self )
-    :Caption := "Public" 
+  WITH OBJECT oPublic := CheckBox( Self )
+    :Text        := "Public"
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Left := :Form:CheckBox3
-    :Dock:Top := :Parent
-    :Action := {|o| ::oDebugger:lShowPublics := o:Checked, ::oDebugger:SyncVars() }
+    :Dock:Left   := oPrivate
+    :Dock:Top    := :Parent
+    :Action      := {|o| ::oDebugger:lShowPublics := o:Checked, ::oDebugger:SyncVars() }
     :Create()
   END
 
-  WITH OBJECT CheckBox( Self )
-    :Caption := "Static"
+  WITH OBJECT oStatic := CheckBox( Self )
+    :Caption     := "Static"
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Left := :Form:CheckBox4
-    :Dock:Top := :Parent
-    :Action := {|o| ::oDebugger:lShowStatics := o:Checked, ::oDebugger:SyncVars() }
+    :Dock:Left   := oPublic
+    :Dock:Top    := :Parent
+    :Action      := {|o| ::oDebugger:lShowStatics := o:Checked, ::oDebugger:SyncVars() }
     :Create()
   END
 
   WITH OBJECT oAllGlobals := CheckBox( Self )
-    :Caption := "Show all GLOBALs"
-    :AutoSize := .T.
+    :Caption     := "Show all GLOBALs"
+    :AutoSize    := .T.
     :Transparent := .T.
     :Dock:Margin := 2
-    :Dock:Top := :Parent
-    :Dock:Right := :Parent
-    :Action := {|o| ::oDebugger:lShowAllGlobals := o:Checked, ::oDebugger:SyncVars() }
+    :Dock:Top    := :Parent
+    :Dock:Right  := :Parent
+    :Action      := {|o| ::oDebugger:lShowAllGlobals := o:Checked, ::oDebugger:SyncVars() }
     :Create()
     :Disable()
   END
 
   ::oGrid := DataGrid( Self )
   WITH OBJECT ::oGrid
-    //:FullRowSelect := .T.
     :DataSource := MemoryTable( ::Parent )
     WITH OBJECT :DataSource
       :Structure := { { "Scope", 'C', 8 }, { "Name", 'C', 30 }, { "Type", 'C', 1 }, { "Value", 'C', 55 } }
       :Create()
     END
-    
+
     :Action := {|o| ::Inspect( o:DataSource:Record ) }
-    
+
     :AutoAddColumns( .F. )
     WITH OBJECT ATail( :Children )
       :Picture := "@k"
       :Control := {|o, n| If( ::oGrid:DataSource:Table[ n ][ 3 ] $ "AHO", NIL, MaskEdit( o ) ) }
-      //:Control := {|o, n| If( ::Inspect( n ), NIL, /*Mask*/Edit( o ) ) }
       :ControlAccessKey := GRID_LCLICK
       :OnSave := {| , oGrid, xData| ::Save( oGrid:DataSource:Record, xData ) }
     END
-    
+
     :Dock:Margin := 2
     :Dock:TopMargin := 4
     :Dock:Left   := :Parent
-    :Dock:Top    := :Form:CheckBox1
+    :Dock:Top    := oGlobal
     :Dock:Bottom := :Parent
     :Dock:Right  := :Parent
     :Create()
-    
-  END  
-  
+
+  END
+
   ::DockIt()
 RETURN Self
 
@@ -157,12 +155,11 @@ RETURN .T.
 
 METHOD SetVars( aVars ) CLASS XHDebugMonitor
   LOCAL aVar, cValue
-  
+
   ::aVars := aVars
   ASize( ::oGrid:DataSource:Table, 0 )
   FOR EACH aVar IN ::aVars
       cValue := ::oDebugger:ReadVarValue( aVar )
-      view aVar[ _NAME ]
       AAdd( ::oGrid:DataSource:Table, { aVar[ _SCOPE ], aVar[ _NAME ], cValue[ 1 ], PadR( SubStr( cValue, 2 ), 256 ) } )
   NEXT
   ::oGrid:Update():Refresh()

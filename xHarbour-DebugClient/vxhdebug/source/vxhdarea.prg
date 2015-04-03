@@ -33,7 +33,7 @@ METHOD Init( oParent, oDebugger ) CLASS XHDebugWorkArea
   ::Super:Init( oParent )
   ::oDebugger := oDebugger
 
-  ::Caption := "   Work Areas  "
+  ::Caption := "Work Areas"
 
   ::Dock:Margin := 2
   ::Dock:TopMargin := 4
@@ -72,7 +72,7 @@ METHOD Create() CLASS XHDebugWorkArea
     :Create()
     :Hide()
   END
-  
+
   WITH OBJECT ::oAreaInfo := XHDebugList( Self )
     :Dock:Left := ::oAreaList
     :Dock:Top := :Parent
@@ -92,7 +92,7 @@ METHOD ShowUp() CLASS XHDebugWorkArea
   IF !::lDirty
     RETURN Self
   ENDIF
-  
+
   ::oDebugger:Do( ".areas" )
   ::aAreas := ::oDebugger:ReadAreas()
 
@@ -125,11 +125,11 @@ RETURN Self
 METHOD UpdateInfo() CLASS XHDebugWorkArea
   LOCAL nArea := ::oAreaList:GetCurSel(), nAreaNo
   LOCAL hInfo, aRecord, cString
-  
+
   IF Len( ::aAreas ) < 1 .OR. nArea == 0
     RETURN Self
   ENDIF
-  
+
   nAreaNo := ::aAreas[ nArea ][ _NUMBER ]
   hInfo := ::oDebugger:ReadWorkAreaInfo( nAreaNo )
   ::aStruct := hInfo[ "DbStruct" ]

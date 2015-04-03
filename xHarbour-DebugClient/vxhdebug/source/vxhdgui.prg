@@ -48,7 +48,7 @@ METHOD New() CLASS XHDebuggerGUI
     :Dock:Left   := :Parent
     :Dock:Top    := :Parent
     :Dock:Right  := :Parent
-    :Height      := 24
+    :Height      := 18
     :ShowChevron := .F.
     :Create()
     WITH OBJECT ::btnGo := ToolStripButton( :this )
@@ -111,11 +111,11 @@ METHOD New() CLASS XHDebuggerGUI
 
   ::oTab := TabControl( ::oApp:DebuggerPanel )
   WITH OBJECT ::oTab
-    :Dock:Top    := ::oToolBar
-    :Dock:Left   := :Parent
-    :Dock:Right  := :Parent
-    :Dock:Bottom := :Parent
-    :Dock:Margin := 3
+    :Dock:Top     := ::oToolBar
+    :Dock:Left    := :Parent
+    :Dock:Right   := :Parent
+    :Dock:Bottom  := :Parent
+    :Dock:Margins := "-1,0,-3,-2"
     :Create()
     :DockIt()
 
@@ -136,17 +136,7 @@ METHOD New() CLASS XHDebuggerGUI
 
     ::oSets := XHDebugSet( :this, Self )
     ::oSets:Create()
-/*
-    IF lSysColor
-       :BackColor   := :System:CurrentScheme:ToolStripPanelGradientBegin
-       ::oConsole:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-       ::oMonitor:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-       ::oCallStack:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-       ::oWatch:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-       ::oWorkArea:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-       ::oSets:BackColor := :System:CurrentScheme:ToolStripPanelGradientEnd
-    ENDIF
-*/
+
     ::aTabs := { ::oConsole, ::oMonitor, ::oCallStack, ::oWatch, ::oWorkArea, ::oSets }
 
     :OnSelChanged := {| , , new| IIF( ::socket != NIL .OR. new $ { 1, 3 }, ;
@@ -155,7 +145,6 @@ METHOD New() CLASS XHDebuggerGUI
   END /* ::oTab */
 
   ::Super:New()
-  //::oApp:OnFunctionKey := {|nKey, lParam| ::ProcessFnKey( nKey, lParam ) }
   IF !::oApp:IdeActive
      ::hHook := SetWindowsHookEx( WH_KEYBOARD, HB_ObjMsgPtr( Self, "DebugHookKeys" ), NIL, GetCurrentThreadId(), Self )
   ENDIF

@@ -24,17 +24,17 @@ ENDCLASS
 
 
 METHOD Init( oParent, oDebugger ) CLASS XHDebugSet
-  ::Super:Init( oParent )
-  ::oDebugger := oDebugger
+   ::Super:Init( oParent )
+   ::oDebugger := oDebugger
 
-  ::Caption := "   Set() Values  "
+   ::Text := "Set() Values"
 
-  ::Dock:Margin := 2
-  ::Dock:TopMargin := 4
-  ::Dock:Left   := ::Parent
-  ::Dock:Top    := ::Parent
-  ::Dock:Bottom := ::Parent
-  ::Dock:Right  := ::Parent
+   ::Dock:Margin    := 2
+   ::Dock:TopMargin := 4
+   ::Dock:Left      := ::Parent
+   ::Dock:Top       := ::Parent
+   ::Dock:Bottom    := ::Parent
+   ::Dock:Right     := ::Parent
 RETURN Self
 
 
@@ -51,6 +51,7 @@ METHOD Create() CLASS XHDebugSet
     END
     :AutoAddColumns( .F. )
     :Width := (3 + 20 + 40) * 7 + 3 * 3
+    :Border      := 0
     :Dock:Top    := :Parent
     :Dock:Left   := :Parent
     :Dock:Right  := :Parent
@@ -58,7 +59,7 @@ METHOD Create() CLASS XHDebugSet
     :Create()
     :Hide()
   END
-  
+
   ::DockIt()
 RETURN Self
 
@@ -69,17 +70,17 @@ METHOD ShowUp() CLASS XHDebugSet
   IF !::lDirty
     RETURN Self
   ENDIF
- 
+
   ::aTable := ::oDebugger:ReadSets()
   for i:=1 to len(::aTable)
     if valtype(::aTable[i][3]) == 'A'
       ::aTable[i][3] := CStr(::aTable[i][3] )
     endif
   next
-  
+
   ::oSetGrid:DataSource:Table := ::aTable
   ::oSetGrid:Update():Refresh()
   ::oSetGrid:Show()
-  
+
   ::lDirty := .F.
 RETURN Self

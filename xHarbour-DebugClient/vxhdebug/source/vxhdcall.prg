@@ -27,8 +27,8 @@ METHOD Init( oParent, oDebugger ) CLASS XHDebugCallStack
   ::Super:Init( oParent )
   ::oDebugger := oDebugger
 
-  ::Caption := "   Call Stack  "
-  
+  ::Caption := "Call Stack"
+
   ::Dock:Left := ::Parent
   ::Dock:Top := ::Parent
   ::Dock:Right := ::Parent
@@ -38,7 +38,7 @@ RETURN Self
 
 METHOD Create() CLASS XHDebugCallStack
   ::Super:Create()
-  
+
   WITH OBJECT ::oList := XHDebugList( Self )
     :Height := 150
     :ForeColor   := C_BLACK
@@ -52,14 +52,14 @@ METHOD Create() CLASS XHDebugCallStack
     :EventHandler[ "OnSelChange" ] := "ChangeFrame"
     :Create()
   END
-  
+
   ::DockIt()
 RETURN Self
 
 
 METHOD ChangeFrame() CLASS XHDebugCallStack
   LOCAL n := ::oList:GetCurSel() - 1
-  
+
   IF n >= 0
     ::oDebugger:Frame( n )
   ENDIF
@@ -68,7 +68,7 @@ RETURN Self
 
 METHOD SetCalls( aCalls ) CLASS XHDebugCallStack
   LOCAL i, aCall
-  
+
   ::aCalls := aCalls
   WITH OBJECT ::oList
     :ResetContent()
@@ -83,7 +83,7 @@ RETURN Self
 
 METHOD ShowUp() CLASS XHDebugCallStack
   IF ::lDirty
-    ::oDebugger:SyncCalls() 
+    ::oDebugger:SyncCalls()
     ::lDirty := .F.
   ENDIF
 RETURN Self
