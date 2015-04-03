@@ -314,24 +314,23 @@ RETURN Self
 METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
    LOCAL n
    DEFAULT lOrder TO .F.
-   ::Application:StandardBar:Enabled := lEnabled
-   ::Application:EditBar:Enabled     := lEnabled
-   ::Application:BuildBar:Enabled    := lEnabled
-   ::Application:ToolBoxBar:Enabled  := lEnabled
-   ::Application:AlignBar:Enabled    := lEnabled
+   ::StandardBar:Enabled := lEnabled
+   ::EditBar:Enabled     := lEnabled
+   ::BuildBar:Enabled    := lEnabled
+   ::ToolBoxBar:Enabled  := lEnabled
+   ::AlignBar:Enabled    := lEnabled
 
-   ::Application:Props:MainToolBar:Enabled := lEnabled
+   ::Props:MainToolBar:Enabled := lEnabled
 
    WITH OBJECT ::MainForm
       IF lOrder
          FOR n := 1 TO LEN( :ToolStrip5:Children )-1
-             ::Application:AlignBar:Children[n]:Enabled := lEnabled
+             ::AlignBar:Children[n]:Enabled := lEnabled
          NEXT
        ELSE
-         ::Application:AlignBar:Enabled := lEnabled
+         ::AlignBar:Enabled := lEnabled
       ENDIF
-
-      :ToolStripComboBox1:Enabled := lEnabled
+      ::Props:ToolStripComboBox:Enabled := lEnabled
    END
    IF lEnabled .AND. ::Project != NIL
       ::Project:EditReset()
@@ -1131,7 +1130,8 @@ METHOD Init() CLASS IDE_MainForm
 
          WITH OBJECT ::Application:Props[ "LinkItem" ] := MenuStripItem( :this )
             :Caption           := "&Link"
-            :ShortCutText      := "Ctrl+L"
+            :ShortCutText      := "Ctrl+Shift+L"
+            :ShortCutKey:Shift := .T.
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "L" )
             :Action            := {|| ::Application:Project:Build(, .T. ) }
@@ -1341,7 +1341,7 @@ METHOD Init() CLASS IDE_MainForm
 
       END
 
-      WITH OBJECT ToolStripComboBox( :this )
+      WITH OBJECT ::Application:Props[ "ToolStripComboBox" ] := ToolStripComboBox( :this )
          :Action := {|o|::Application:RunMode := o:GetCurSel()-1 }
          :Create()
          :AddItem( "Debug" )

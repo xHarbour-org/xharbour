@@ -98,7 +98,7 @@ CLASS Control INHERIT Window
    METHOD __SetBorder()
    METHOD Show()
    METHOD Hide()
-   //METHOD __UnSubClass()
+   METHOD Center()
 ENDCLASS
 
 METHOD __SetBorder( nBorder ) CLASS Control
@@ -136,14 +136,7 @@ METHOD __Enable( lEnable ) CLASS Control
       ::UpdateWindow()
    ENDIF
 RETURN lEnable
-/*
-METHOD __UnSubClass() CLASS Control
-   Super:__UnSubClass()
-   IF ::__pCallBackPtr != NIL
-      ::Parent:PostMessage( WM_VXH_FREECALLBACK, 0, ::__pCallBackPtr )
-   ENDIF
-RETURN Self
-*/
+
 //---------------------------------------------------------------------------------------------------
 
 METHOD Init( oParent, lInitValues ) CLASS Control
@@ -217,6 +210,20 @@ METHOD Create( hParent ) CLASS Control
       ENDIF
    ENDIF
 
+RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD Center() CLASS Control
+   LOCAL aRect
+   IF ::Parent == NIL .OR. ::hWnd == NIL .OR. ::DesignMode
+      RETURN Self
+   ENDIF
+   ::GetWindowRect()
+
+   aRect := _GetClientRect( ::Parent:hWnd )
+   ::xLeft := ( ( aRect[3] - ::xWidth ) / 2 )
+   ::xTop  := ( ( aRect[4] - ::xHeight ) / 2 )
+   ::MoveWindow()
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------

@@ -160,8 +160,8 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS Label
-   LOCAL hOldPen, nFlags, cText, hBrush, hFont, aText, hBkGnd, aRect := {0,0,::xWidth,::xHeight}
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC
+   LOCAL hOldPen, nFlags, cText, hBrush, hFont, hBkGnd, aRect := {0,0,::xWidth,::xHeight}
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC, rc
 
    hDC        := ::BeginPaint()
 
@@ -206,14 +206,19 @@ METHOD OnPaint() CLASS Label
       nFlags := nFlags | DT_NOPREFIX
    ENDIF
 
-   IF ::VertCenter
-      aText  := _GetTextExtentPoint32( hMemDC, ::xText )
-      aRect[2] := ( aRect[4]-aText[2] ) / 2
-      aRect[4] := aRect[2] + aText[2]
-   ENDIF
-
    cText := ::xText
    DEFAULT cText TO ""
+
+   IF ::VertCenter
+      rc := (struct RECT)
+      rc:left   := 0
+      rc:top    := 0
+      rc:right  := aRect[3]
+      rc:bottom := aRect[4]
+      DrawText( hMemDC, cText, @rc, DT_CALCRECT|DT_CENTER|DT_WORDBREAK )
+      aRect[2]  := ( aRect[4]-rc:bottom ) / 2
+      aRect[4]  := aRect[2] + rc:bottom
+   ENDIF
 
    IF ::xTextShadowColor != NIL
       aRect[1] += 1

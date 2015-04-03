@@ -1548,7 +1548,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
          FOR EACH oChild IN aChildren
              IF VALTYPE( oChild ) == "O"
                 IF oChild:__IsControl .AND. oChild:Anchor != NIL .AND. oChild:Anchor:Center
-                   oChild:CenterWindow()
+                   oChild:Center()
                  ELSE
                    oChild:__OnParentSize( x, y, @hDef, ,, ::__aCltRect[3], ::__aCltRect[4] )
                 ENDIF
@@ -2050,8 +2050,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          ::PreInitDialog()
       ENDIF
       cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
-      IF __ObjHasMsg( Self, cBlock ) .AND. VALTYPE( ::&cBlock ) == "B"
-         nRet := Eval( ::&cBlock, Self, nwParam, nlParam )
+      IF __ObjHasMsg( Self, cBlock ) .AND. __objSendMsg( Self, cBlock ) != NIL
+         nRet := hb_ExecFromArray( Self, cBlock, {Self, nwParam, nlParam} )
       ENDIF
       IF nRet == NIL
          nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
@@ -2703,17 +2703,12 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                           IF mii:wID != NIL .AND. mii:wID > 0 .AND. ( i := ASCAN( oMenu:aItems, {|o| o:ID == mii:wID } ) ) > 0
                              oItem := oMenu:aItems[ i ]
                            ELSE
-                             n := nwParam + 1
-                             FOR i := nwParam + 1 TO 1 STEP -1
+                             FOR i := nwParam + 1 TO LEN( oMenu:aItems )
                                  oItem := oMenu:aItems[ i ]
-                                 IF ! oItem:Visible
-                                    n++
+                                 IF oItem:Visible
+                                    EXIT
                                  ENDIF
                              NEXT
-                             oItem := oMenu:aItems[ n ]
-                             WHILE ! oItem:Visible .AND. n+1 <= LEN( oMenu:aItems ) // non-visible menuitems ARE in the array but do not exist as a menuitem
-                                oItem := oMenu:aItems[ n++ ]
-                             ENDDO
                           ENDIF
                        ENDIF
                      CATCH
@@ -3211,7 +3206,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oLeft == ::Parent:Name
             oLeft := ::Parent
           ELSE
-            oLeft := ::Form:&oLeft
+            oLeft := ::Form:__hObjects[ oLeft ]
          ENDIF
       ENDIF
       IF VALTYPE( oLeft ) == "B"
@@ -3223,7 +3218,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oTop == ::Parent:Name
             oTop := ::Parent
           ELSE
-            oTop := ::Form:&oTop
+            oTop := ::Form:__hObjects[ oTop ]
          ENDIF
       ENDIF
       IF VALTYPE( oTop ) == "B"
@@ -3235,7 +3230,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oRight == ::Parent:Name
             oRight := ::Parent
           ELSE
-            oRight := ::Form:&oRight
+            oRight := ::Form:__hObjects[ oRight ]
          ENDIF
       ENDIF
       IF VALTYPE( oRight ) == "B"
@@ -3247,7 +3242,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          IF oBottom == ::Parent:Name
             oBottom := ::Parent
           ELSE
-            oBottom := ::Form:&oBottom
+            oBottom := ::Form:__hObjects[ oBottom ]
          ENDIF
       ENDIF
       IF VALTYPE( oBottom ) == "B"
@@ -3262,7 +3257,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                   IF oLeft == ::Parent:Name
                      oLeft := ::Parent
                    ELSE
-                     oLeft := ::Form:&oLeft
+                     oLeft := ::Form:__hObjects[ oLeft ]
                   ENDIF
                ENDIF
             ENDIF
@@ -3277,7 +3272,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                   IF oTop == ::Parent:Name
                      oTop := ::Parent
                    ELSE
-                     oTop := ::Form:&oTop
+                     oTop := ::Form:__hObjects[ oTop ]
                   ENDIF
                ENDIF
             ENDIF
@@ -3292,7 +3287,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                   IF oRight == ::Parent:Name
                      oRight := ::Parent
                    ELSE
-                     oRight := ::Form:&oRight
+                     oRight := ::Form:__hObjects[ oRight ]
                   ENDIF
                ENDIF
             ENDIF
@@ -3307,7 +3302,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
                   IF oBottom == ::Parent:Name
                      oBottom := ::Parent
                    ELSE
-                     oBottom := ::Form:&oBottom
+                     oBottom := ::Form:__hObjects[ oBottom ]
                   ENDIF
                ENDIF
             ENDIF
@@ -3948,7 +3943,7 @@ METHOD SetAnchor( nPos, lSet ) CLASS __AnchorSet
                FOR EACH Item IN oItem:Owner:Items
                    IF ( n := ASCAN( aValue, Item:Caption ) ) > 0
                       cVar := Item:Caption
-                      Item:ColItems[1]:Value := :ActiveObject:Anchor:&cVar
+                      Item:ColItems[1]:Value := __objSendMsg( :ActiveObject:Anchor, cVar )
                    ENDIF
                NEXT
                :InvalidateRect(, .F. )
@@ -5273,14 +5268,14 @@ FUNCTION __SetInitialValues( oObj, cProp, xValue, lReset )
    IF oObj:DesignMode
       IF cProp != NIL
          IF __objHasMsg( oObj, "__a_"+cProp )
-             oObj:&("__a_"+cProp )[4] := IIF( xValue != NIL, xValue, __objSendMsg( oObj, cProp ) )
+             __objSendMsg( oObj, "__a_"+cProp )[4] := IIF( xValue != NIL, xValue, __objSendMsg( oObj, cProp ) )
          ENDIF
       ELSE
          DEFAULT lReset TO .F.
          aProperties := __clsGetPropertiesAndValues( oObj )
          FOR EACH aProperty IN aProperties
              IF __objHasMsg( oObj, "__a_"+aProperty[1] ) //.AND. VALTYPE( aProperty[2] ) != "O"
-                oObj:&("__a_"+aProperty[1] )[4] := IIF( lReset, NIL, __objSendMsg( oObj, aProperty[1] ) )
+                __objSendMsg( oObj, "__a_"+aProperty[1] )[4] := IIF( lReset, NIL, __objSendMsg( oObj, aProperty[1] ) )
              ENDIF
          NEXT
       ENDIF

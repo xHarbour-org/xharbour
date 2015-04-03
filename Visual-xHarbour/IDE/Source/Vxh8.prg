@@ -617,7 +617,7 @@ METHOD Init( oParent ) CLASS StrEditor
                                        oCtrl:Case := 2,;
                                        oCtrl }
       :ControlAccessKey := GRID_CHAR
-      :Alignment        := 3
+      :Alignment        := ALIGN_CENTER
       :OnSave           := {|oGrid, xData, nKey| oGrid:DataSave( "Type", xData, nKey ) }
       :Create()
    END
@@ -626,7 +626,7 @@ METHOD Init( oParent ) CLASS StrEditor
       :Caption          := "Field Size"
       :Data             := "hb_QSelf():DataSource:Fields:Size"
       :Width            := 70
-      :Alignment        := 2
+      :Alignment        := ALIGN_RIGHT
       :Control          := {|o, oCtrl| IIF( !(o:DataSource:Fields:Type $"DML"), ( oCtrl := EditBox( o ),;
                                                                                   oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
                                                                                   oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 255, 1 )},;
@@ -641,7 +641,7 @@ METHOD Init( oParent ) CLASS StrEditor
       :Caption          := "Decimals"
       :Data             := "hb_QSelf():DataSource:Fields:Decimals"
       :Width            := 70
-      :Alignment        := 2
+      :Alignment        := ALIGN_RIGHT
       :Control          := {|o, oCtrl| IIF( o:DataSource:Fields:Type == "N", ( oCtrl := EditBox( o ),;
                                                                                oCtrl:OnWMKeyDown := {|o,nKey| __SetEditKey( o, nKey )},;
                                                                                oCtrl:OnWMChar := {|o,nKey|ChkNumberChar( nKey, o, 15, 0 )},;
