@@ -67,14 +67,18 @@ static char * hb_strMemotran( char * pszResult, HB_SIZE * ulResultLen, const cha
       if( pszString[ ulStringPos ] == HB_CHAR_HARD1 &&
           pszString[ ulStringPos + 1 ] == HB_CHAR_HARD2 )
       {
-         pszResult[ ulResultPos++ ] = cHardcr;
-         ulStringPos                += 2;
+         if ( cHardcr )
+            pszResult[ ulResultPos++ ] = cHardcr;
+
+         ulStringPos += 2;
       }
       else if( pszString[ ulStringPos ] == HB_CHAR_SOFT1 &&
                pszString[ ulStringPos + 1 ] == HB_CHAR_SOFT2 )
       {
-         pszResult[ ulResultPos++ ] = cSoftcr;
-         ulStringPos                += 2;
+         if ( cSoftcr )
+            pszResult[ ulResultPos++ ] = cSoftcr;
+
+         ulStringPos += 2;
       }
       else
          pszResult[ ulResultPos++ ] = pszString[ ulStringPos++ ];
