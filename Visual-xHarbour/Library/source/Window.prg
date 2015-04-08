@@ -2024,7 +2024,7 @@ RETURN nRet
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
    LOCAL nRet, n, cBuffer, oObj, oChild, oItem, cBlock, i
    LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
-   LOCAL pt, code, nMess, mis, dis
+   LOCAL pt, code, nMess, mis, dis, bBlock
 
    DEFAULT ::hWnd TO hWnd
 
@@ -2050,8 +2050,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          ::PreInitDialog()
       ENDIF
       cBlock := Left( aMessages[nMess][2], 2 ) + "WM" + SubStr( aMessages[nMess][2], 3 )
-      IF __ObjHasMsg( Self, cBlock ) .AND. __objSendMsg( Self, cBlock ) != NIL
-         nRet := hb_ExecFromArray( Self, cBlock, {Self, nwParam, nlParam} )
+      IF __ObjHasMsg( Self, cBlock ) .AND. ( bBlock := __objSendMsg( Self, cBlock ) ) != NIL
+         nRet := Eval( bBlock, Self, nwParam, nlParam )
       ENDIF
       IF nRet == NIL
          nRet := hb_ExecFromArray( Self, aMessages[nMess][2], {nwParam, nlParam} )
