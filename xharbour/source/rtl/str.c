@@ -64,7 +64,7 @@ HB_FUNC( STR )
    BOOL     bValid   = FALSE;
    BOOL     bLtrim   = FALSE;
 
-   if( pNumber )
+   if( pNumber  && HB_IS_NUMBER( pNumber ))
    {
       int iParams = hb_pcount();
       bValid = TRUE;

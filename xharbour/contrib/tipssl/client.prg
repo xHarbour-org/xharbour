@@ -97,7 +97,7 @@ CLASS tIPClient
    DATA SocketCon
    DATA SocketSSLCon
    DATA SocketConOld
-   Data lTrace
+   Data lTrace  init .f.
    Data nHandle INIT -1
    Data lSSL  INIT .f.
 
@@ -256,7 +256,8 @@ METHOD Open( cUrl ) CLASS tIPClient
       ::SocketSSLCon := InetSSLCreate( , ::CAFile, ::CaPath ,.t.)
       InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )
    else
-      ::SocketCon := InetCreate()
+      ::SocketCon := InetCreate(::nConnTimeout)
+      Tracelog(::SocketCon)
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    endif
 
@@ -265,6 +266,7 @@ METHOD Open( cUrl ) CLASS tIPClient
          return .F.
       endif
    else
+      TRacelog(::oUrl:cServer, nPort, ::lSSL,::SocketCon,::SocketSSLCon)
       ::InetConnect( ::oUrl:cServer, nPort, if(!::lSSL,::SocketCon,::SocketSSLCon) )
 
       IF ::InetErrorCode( ::SocketCon ) != 0
@@ -503,7 +505,7 @@ RETURN ::nLastWrite
 METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
 
    Local nRet
-
+TraceLog(SocketCon, cData, nLen,::lSSl) 
    IF Empty( nLen )
       nLen := Len( cData )
    ENDIF
@@ -637,6 +639,7 @@ RETURN cMsg
 /* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
 METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
+TraceLog(cServer, nPort, SocketCon)
    if ::lSSL
       InetSSLConnect( cServer, nPort, SocketCon )
    else

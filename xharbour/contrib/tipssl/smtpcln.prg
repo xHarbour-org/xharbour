@@ -338,7 +338,7 @@ METHOD sENDMail( oTIpMail ) CLASS TIpClientSmtp
 RETURN ::data( oTIpMail:toString() )
 
 PROCEDURE smtpClnDestructor CLASS TIpClientSmtp
-   IF ::ltrace .and. ::nhandle > -1    
+   IF ::ltrace .and. ::nhandle > 0
       fClose( ::nHandle )
       ::nhandle := -1 
    ENDIF
@@ -389,13 +389,16 @@ Local lok
    
 METHOD ActivateSSL  CLASS TIpClientSmtp
 LOCAL SocketCon
-
+Local nSock
    
+   SSL_INIT()
+   INITSSLRANDFILE()
+
    SocketCon := ::SocketCon   
    ::SocketSSLCon := InetSSLCreate( , ::CAFile, ::CaPath )
-
    InetSSLSetTimeout( ::SocketSSLCon, ::nConnTimeout )   
-   INETSSLCONNECTFROMFD( InetFD(::SocketCon), ::oUrl:nPort, ::SocketSSLCon )   
+   nSock := HB_INETFD(::SocketCon)
+   INETSSLCONNECTFROMFD(nSock , ::oUrl:nPort, ::SocketSSLCon )   
    ::SocketConOld := SocketCon
    
 RETURN .T.
