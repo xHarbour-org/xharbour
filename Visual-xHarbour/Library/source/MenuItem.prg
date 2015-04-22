@@ -295,3 +295,6 @@ METHOD __AddMenuItem() CLASS MenuItem
    ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "MenuItem",,,1, {}, } }, ::Application:Project:aUndo )
 RETURN Self
 
+// Backwards compatibility
+CLASS CMenuItem INHERIT MenuItem
+ENDCLASS
