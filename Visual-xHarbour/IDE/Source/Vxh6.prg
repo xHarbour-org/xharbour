@@ -76,16 +76,16 @@ METHOD Init( oParent ) CLASS ToolBox
 
       WITH OBJECT ::ContextMenu := ContextMenu( Self )
          :Create()
-         WITH OBJECT CMenuItem( :this )
+         WITH OBJECT MenuItem( :this )
             :Text := "Add Custom Control"
             :Action  := {|| ::AddCustomControls(lPro) }
             :Create()
          END
-         WITH OBJECT CMenuItem( :this )
-            :Text := "-"
+         WITH OBJECT MenuItem( :this )
+            :Separator := .T.
             :Create()
          END
-         WITH OBJECT CMenuItem( :this )
+         WITH OBJECT MenuItem( :this )
             :Text := "Delete Custom Control"
             :Action  := {|| ::DeleteCustomControls(lPro) }
             :Create()

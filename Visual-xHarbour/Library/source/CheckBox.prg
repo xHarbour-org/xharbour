@@ -246,7 +246,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
                    ENDIF
                    nRet := CDRF_SKIPDEFAULT
            ENDCASE
-           SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
            RETURN nRet
 
    ENDCASE

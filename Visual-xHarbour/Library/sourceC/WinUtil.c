@@ -488,6 +488,11 @@ HB_FUNC( IMAGELISTMERGE )
    hb_retl( (BOOL) ImageList_Merge((HIMAGELIST) hb_parnl(1), hb_parni(2), (HIMAGELIST) hb_parnl(3), hb_parni(4), hb_parni(5), hb_parni(6) ) );
 }
 
+HB_FUNC( IMAGELISTDRAW )
+{
+   hb_retl( ImageList_Draw((HIMAGELIST) hb_parnl(1), hb_parni(2), (HDC) hb_parnl(3), hb_parni(4), hb_parni(5), (UINT) hb_parni(6) ) );
+}
+
 HB_FUNC( IMAGELISTDRAWEX )
 {
    hb_retl( ImageList_DrawEx((HIMAGELIST) hb_parnl(1), hb_parni(2), (HDC) hb_parnl(3), hb_parni(4), hb_parni(5), hb_parni(6), hb_parni(7),(COLORREF) hb_parnl(8), (COLORREF) hb_parnl(9), (UINT) hb_parni(10) ) );
@@ -3982,6 +3987,19 @@ HB_FUNC( MENUITEMINFOITEMDATA )
    }
 }
 
+HB_FUNC( __GETMENUITEMINFO )
+{
+   MENUITEMINFO mii;
+   mii.cbSize = sizeof( MENUITEMINFO );
+   mii.fMask  = MIIM_DATA | MIIM_STATE | MIIM_ID | MIIM_BITMAP;
+   if( GetMenuItemInfo( (HMENU) hb_parnl(1), (UINT) hb_parni(2), hb_parl(3), &mii ) )
+   {
+      hb_reta( 2 );
+      hb_storni( (long) mii.dwItemData,   -1, 1 );
+      hb_storni( (long) mii.hbmpItem,     -1, 2 );
+   }
+}
+
 HB_FUNC( MENUITEMINFOITEMID )
 {
    LPMENUITEMINFO mii = NULL;
@@ -5479,4 +5497,50 @@ HB_FUNC( GETDEVMODEFIELDS )
    hb_storni( (long) dm->dmDefaultSource, -1, 7 );
    hb_storni( (long) dm->dmPrintQuality,  -1, 8 );
    GlobalUnlock( (HGLOBAL) hb_parnl(1) );
+}
+
+#define ILS_ALPHA 0x0008
+
+HB_FUNC( CREATEIMAGELISTBITMAP )
+{
+   HIMAGELIST hImageList = (HIMAGELIST) hb_parnl(1);
+   HBITMAP hBitmap;
+   BITMAPINFO bi = { 0 };
+   bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+   bi.bmiHeader.biWidth = hb_parni(5);
+   bi.bmiHeader.biHeight = hb_parni(6);
+   bi.bmiHeader.biPlanes = 1;
+   bi.bmiHeader.biBitCount = 32;
+   bi.bmiHeader.biCompression = BI_RGB;
+   bi.bmiHeader.biSizeImage = 0;
+   bi.bmiHeader.biXPelsPerMeter = 0;
+   bi.bmiHeader.biYPelsPerMeter = 0;
+   bi.bmiHeader.biClrUsed = 0;
+   bi.bmiHeader.biClrImportant = 0;
+
+   hBitmap = CreateDIBSection( (HDC) hb_parnl(3), &bi, DIB_RGB_COLORS, NULL, NULL, 0 );
+
+   // Select bitmap into target DC and draw from image list to it
+   if(hBitmap != NULL)
+   {
+      HBITMAP hOldBmp = SelectObject((HDC) hb_parnl(4), hBitmap);
+
+      IMAGELISTDRAWPARAMS ildp = { 0 };
+      ildp.cbSize = sizeof(IMAGELISTDRAWPARAMS);
+      ildp.himl = hImageList;
+      ildp.i = hb_parni(2);
+      ildp.hdcDst = (HDC) hb_parnl(4);
+      ildp.x = 0;
+      ildp.y = 0;
+      ildp.cx = 0;
+      ildp.cy = 0;
+      ildp.xBitmap = 0;
+      ildp.yBitmap = 0;
+      ildp.fStyle = ILD_TRANSPARENT;
+      ildp.fState = ILS_ALPHA;
+      ildp.Frame = 255;
+      ImageList_DrawIndirect(&ildp);
+      SelectObject( (HDC) hb_parnl(3), hOldBmp);
+      hb_retnl( (LONG) hBitmap );
+   }
 }

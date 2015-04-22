@@ -782,7 +782,6 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS ToolBar
 
    DO CASE
       CASE nMsg == MBM_POPUPMENU
-
            IF ::nPressed < 0
               ::nPressed := SendMessage( hWnd, TB_BUTTONCOUNT ) - 1
               IF ::aItems[::nPressed+1]:Id == IDM_MDI_CLOSE
@@ -805,7 +804,7 @@ RETURN NIL
 
 METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolBar
 
-   LOCAL n, oChild, oButton, oItem, nRet
+   LOCAL n, oChild, oItem, nRet, dwItemData
 
    ::UpdateWindow()
 
@@ -824,11 +823,11 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolBar
          RETURN nRet
       ENDIF
 
-      FOR EACH oButton IN ::aItems
-          IF oButton:Menu != NIL .AND. ( oItem := oButton:Menu:GetItem( nId ) )!= NIL
-             RETURN __Evaluate( oItem:Action, oItem )
-          ENDIF
-      NEXT
+      dwItemData := MENUITEMINFOITEMDATA( nlParam, nId, ( nCode & MF_POPUP ) == MF_POPUP )
+
+      IF dwItemData != NIL .AND. dwItemData <> 0 .AND. ( oItem := __ObjFromPtr( dwItemData ) ) != NIL
+         RETURN __Evaluate( oItem:Action, oItem )
+      ENDIF
    ENDIF
 
    FOR EACH oChild IN ::Children
@@ -846,24 +845,21 @@ RETURN nRet
 
 METHOD OpenPopup( hWnd ) CLASS ToolBar
 
-   LOCAL n, oBtn, nHeight, hMonitor, mix
+   LOCAL n, oBtn, hMonitor, mix
    LOCAL rc := (struct RECT)
    LOCAL pt := (struct POINT)
-   LOCAL oItem
    DEFAULT hWnd TO ::hWnd
 
-   IF (n:=ASCAN( ::aItems,{|o| o:xPosition==::nPressed })) > 0
+   n := ::nPressed+1
+   //IF (n:=ASCAN( ::aItems,{|o| o:xPosition==::nPressed })) > 0
       oBtn  := ::aItems[n]
-
-      IF oBtn:Menu != NIL .AND. !EMPTY( oBtn:Menu:aItems )
+      IF ! EMPTY( oBtn:Children ) .OR. ::nPressed == 0
          SendMessage( hWnd, TB_GETITEMRECT, oBtn:xPosition, @rc )
          pt:x := rc:Left
          pt:y := rc:Bottom
          ClientToScreen( hWnd, @pt )
 
          //-----------------------------------------------------
-         oBtn:Menu:Style := TPM_LEFTALIGN+TPM_TOPALIGN
-
          IF ( hMonitor := MonitorFromPoint( pt, MONITOR_DEFAULTTONEAREST ) ) != 0
             mix := (struct MONITORINFOEX)
             mix:cbSize := mix:SizeOf()
@@ -871,85 +867,38 @@ METHOD OpenPopup( hWnd ) CLASS ToolBar
                pt:x := MAX( pt:x, mix:rcMonitor:Left )
             ENDIF
          ENDIF
-         oBtn:Menu:Left  := pt:x
-         oBtn:Menu:Top   := pt:y
-
-         oBtn:Menu:Create()
-
-         FOR EACH oItem IN oBtn:Menu:aItems
-             DeleteMenu( oItem:Menu:hMenu, oItem:Id, MF_BYCOMMAND )
-         NEXT
-
-         nHeight := 0
-         n := GetSystemMetrics( SM_CYMENUSIZE )
-         FOR EACH oItem IN oBtn:Menu:aItems
-            IF oItem:Visible .OR. ::DesignMode
-               oItem:Create()
-               nHeight += n
-            ENDIF
-         NEXT
-         //------------------------------------------------------
 
          SendMessage( hWnd, TB_PRESSBUTTON, oBtn:Id, MAKELONG(1,0) )
          UpdateWindow( hWnd )
          ::hWndHook := hWnd
 
          ::Application:__CurCoolMenu := Self
-         ::oMenu := oBtn:Menu
+         ::oMenu := oBtn
 
-         IF pt:y + nHeight + GetSystemMetrics( SM_CYMIN ) > GetSystemMetrics( SM_CYSCREEN )
-            pt:x := rc:Left
-            pt:y := rc:Top
-            ClientToScreen( hWnd, @pt )
-            oBtn:Menu:Top   := pt:y
-            oBtn:Menu:Style := TPM_LEFTALIGN+TPM_BOTTOMALIGN
-         ENDIF
-
-         oBtn:Menu:Context( ::hWnd )
+         oBtn:ShowMenu( pt:x, pt:y )
 
          ::hWndHook  := NIL
 
 
          SendMessage( hWnd, TB_PRESSBUTTON, oBtn:Id, MAKELONG(0,0) )
 
-         oBtn:Menu:Destroy()
-
          ::oMenu     := NIL
          ::MenuWnd   := NIL
 
          SendMessage( ::hWnd, TB_SETHOTITEM, ::nPressed, 0 )
       ENDIF
-   ENDIF
+   //ENDIF
 
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD CreateDropDown( nBtn, nLeft, nBottom, nStyle, hWnd, nTop ) CLASS ToolBar
-
-   LOCAL nHeight, oItem, oBtn := ::aItems[nBtn]
-
-   IF oBtn:Menu != NIL
+METHOD CreateDropDown( nBtn, nLeft, nBottom, nTop ) CLASS ToolBar
+   LOCAL oBtn := ::aItems[nBtn]
+   IF LEN( oBtn:Children ) > 0
       DEFAULT nTop TO nBottom
-      oBtn:Menu:Style := nStyle
-      oBtn:Menu:Left  := nLeft
-      oBtn:Menu:Top   := nBottom
-      oBtn:Menu:Create()
-      nHeight := 0
-      FOR EACH oItem IN oBtn:Menu:aItems
-         oItem:Create()
-         nHeight += GetSystemMetrics( SM_CYMENUSIZE )
-      NEXT
-
-      IF nBottom + nHeight + GetSystemMetrics( SM_CYMIN ) > GetSystemMetrics( SM_CYSCREEN )
-         oBtn:Menu:Top   := nTop
-         oBtn:Menu:Style := TPM_LEFTALIGN+TPM_BOTTOMALIGN
-      ENDIF
-
-      oBtn:Menu:Context( hWnd )
-      oBtn:Menu:Destroy()
+      oBtn:ShowMenu( nLeft, nBottom )
    ENDIF
-
 RETURN(1)
 
 
@@ -1063,14 +1012,12 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                               nTop  := ( ( tbcd:nmcd:rc:Bottom - GetSystemMetrics(SM_CYSMICON) ) / 2 )
                               DrawIconEx( tbcd:nmcd:hdc, 0, nTop, hIcon, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0,, DI_NORMAL )
                               DestroyIcon( hIcon )
-                              SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
                               RETURN CDRF_SKIPDEFAULT
 
                          CASE tbcd:nmcd:dwItemSpec == IDM_MDI_GAP
                               IF ::Application:OsVersion:dwMajorVersion < 5 .OR. !::Application:ThemeActive .OR. !::Theming
                                  FillRect( tbcd:nmcd:hdc, tbcd:nmcd:rc, GetSysColorBrush( COLOR_BTNFACE ) )
                               ENDIF
-                              SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT )
                               RETURN CDRF_SKIPDEFAULT
 
                          CASE tbcd:nmcd:dwItemSpec == IDM_MDI_MINIMIZE
@@ -1152,7 +1099,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                       ENDIF
                    ENDIF
            ENDCASE
-           SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
            RETURN nRet
 
       CASE hdr:code==TBN_DROPDOWN
@@ -1160,7 +1106,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
            Nmt:Pointer( nlParam )
            IF (n:=ASCAN( ::aItems,{|o| o:Id==nmt:iItem })) > 0
               oBtn  := ::aItems[n]
-              IF oBtn:Menu != NIL
+              IF LEN( oBtn:Children ) > 0
                  rc := (struct RECT)
                  cr := (struct RECT)
                  GetWindowRect( hdr:hwndFrom, @rc )
@@ -1168,7 +1114,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 
                  nDif  := cr:bottom - Nmt:rcButton:Bottom
 
-                 ::CreateDropDown( n, Nmt:rcButton:Left+rc:left, rc:bottom-nDif, TPM_LEFTALIGN+TPM_TOPALIGN,, rc:top )
+                 ::CreateDropDown( n, Nmt:rcButton:Left+rc:left, rc:bottom-nDif, rc:top )
 
                  RETURN 0
               ENDIF
@@ -1283,7 +1229,7 @@ RETURN(self)
 //-----------------------------------------------------------------------------------------------
 
 METHOD UpdateMenu( lShow ) CLASS ToolBar
-   LOCAL oBtn, oItem, hSysMenu, n, cText, nId, oMdi, nTab, nStyle
+   LOCAL oBtn, oMdi, nStyle
 
    oMdi := ::Form:MDIClient:GetActive()
    IF oMdi != NIL
@@ -1320,43 +1266,16 @@ METHOD UpdateMenu( lShow ) CLASS ToolBar
 
       // SysMenu
       oBtn := ToolButton( Self )
-      oBtn:Style := TBSTYLE_BUTTON //| TBSTYLE_DROPDOWN
-      oBtn:Id    := IDM_MDI_ICON
-      oBtn:Width := GetSystemMetrics( SM_CXSMICON )+3
-      oBtn:Menu  := MenuPopup( Self )
-      oBtn:Visible := oMdi:SysMenu
+      oBtn:Style    := TBSTYLE_BUTTON
+      oBtn:Id       := IDM_MDI_ICON
+      oBtn:Width    := GetSystemMetrics( SM_CXSMICON )+3
+      oBtn:Visible  := oMdi:SysMenu
       oBtn:AutoSize := .F.
       oBtn:Create( 0 )
 
       AADD( ::__aBtns, oBtn )
 
-      hSysMenu   := GetSystemMenu( oMdi:hWnd, .F. )
-
-      FOR n := 1 TO GetMenuItemCount( hSysMenu )
-
-          nId   := GetMenuItemId( hSysMenu, n-1 )
-          cText := GetMenuString( hSysMenu, n-1, MF_BYPOSITION )
-
-          IF EMPTY( ctext )
-             ctext := "-"
-             nId   := NIL
-          ENDIF
-          oItem := CMenuItem( oBtn )
-          IF ( nTab := AT( CHR(9), cText ) ) == 0
-             oItem:Caption := cText
-           ELSE
-             oItem:Caption := ALLTRIM( LEFT( cText, nTab-1 ) )
-             oItem:ShortCutText := SUBSTR( cText, nTab+1 )
-          ENDIF
-          oItem:Id      := nId
-          oItem:Action  := {|o| o:Form:__PrcMdiMenu( o:Id ) }
-
-          oItem:MenuItemInfo:cbSize := oItem:MenuItemInfo:SizeOf()
-          oItem:MenuItemInfo:fMask  := MIIM_CHECKMARKS | MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_SUBMENU | MIIM_TYPE
-          oItem:Type := MFT_OWNERDRAW
-          oItem:Enabled := GetMenuState( hSysMenu, n-1, MF_BYPOSITION ) & MF_DISABLED == 0
-          oItem:Create()
-      NEXT
+      oBtn:hMenu := GetSystemMenu( oMdi:hWnd, .F. )
 
       oBtn := ToolButton( Self )
       oBtn:Id       := IDM_MDI_GAP
@@ -1539,6 +1458,8 @@ CLASS ToolButton INHERIT Object
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
+   DATA hMenu                 EXPORTED
+
    DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
    DATA __lMoveable            EXPORTED INIT .F.
    DATA __lCopyCut             EXPORTED INIT .F.
@@ -1565,6 +1486,7 @@ CLASS ToolButton INHERIT Object
    METHOD GetRectangle() INLINE ::GetWindowRect()
    METHOD SetStyle()
    METHOD AddMenuItem()
+   METHOD __AddMenuItem()
    METHOD SetWidth()
    METHOD GetBitmap()    INLINE ::Parent:GetButtonBitmap( ::Id )
    METHOD Delete()
@@ -1580,6 +1502,7 @@ CLASS ToolButton INHERIT Object
    METHOD SetState()
    METHOD GetState() INLINE ::Parent:GetButtonInfo( ::Id, TBIF_STATE ):fsState
    METHOD SetPosition()
+   METHOD ShowMenu()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -1601,7 +1524,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create( nPos ) CLASS ToolButton
-   LOCAL tbbi, aRect, n := -1
+   LOCAL lpMenuInfo, tbbi, aRect, n := -1
 
    IF LEN( ::Parent:Children ) == 0 .AND. EMPTY( ::xCaption )
       ::xCaption := NIL
@@ -1723,20 +1646,46 @@ METHOD Create( nPos ) CLASS ToolButton
    ENDIF
    ::lCreated := .T.
 
-   IF ( ::xWholeDropDown .OR. ::xDropDown ) .AND. ::Menu == NIL
-      IF ::ContextMenu == NIL
-         ::Menu := MenuPopup( ::Parent )
-       ELSE
-         ::Menu := ::ContextMenu:Menu
-      ENDIF
-   ENDIF
+   //IF ( ::xWholeDropDown .OR. ::xDropDown ) .AND. ::Menu == NIL
+   //   IF ::ContextMenu == NIL
+   //      ::Menu := MenuPopup( ::Parent )
+   //    ELSE
+   //      ::Menu := ::ContextMenu:Menu
+   //   ENDIF
+   //ENDIF
+
    IF ! ::DesignMode .AND. ::ShortCut != NIL
       ::Form:AddAccelerator( ::ShortCut[1], ::ShortCut[2], ::Id )
    ENDIF
    IF ::DesignMode
       ::Application:ObjectTree:Set( Self )
+      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
+   ENDIF
+   IF ::DropDown
+      ::hMenu := CreatePopupMenu()
+
+      lpMenuInfo := (struct MENUINFO)
+
+      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      lpMenuInfo:fMask  := MIM_STYLE
+      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      SetMenuInfo( ::hMenu, lpMenuInfo )
    ENDIF
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD ShowMenu( x, y ) CLASS ToolButton
+   LOCAL nRes := 0
+   DEFAULT x TO ::Left
+   DEFAULT y TO ::Top
+   TrackPopupMenu( ::hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, x, y, 0, ::Parent:hWnd )
+RETURN nRes
+
+//-------------------------------------------------------------------------------------------------------
+METHOD __AddMenuItem() CLASS ToolButton
+   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "MenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+RETURN Self
+
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetPosition(n) CLASS ToolButton
@@ -1824,7 +1773,11 @@ METHOD Delete( lChildren, lDelProp ) CLASS ToolButton
    LOCAL aRect, tbbi, n := -1
    DEFAULT lDelProp  TO .T.
    DEFAULT lChildren TO .T.
-   aEval( ::Children, {|o| IIF( o == NIL, , o:Delete() ) } )
+   //FOR n := 1 TO LEN( ::Children )
+       //::Children[n]:Destroy()
+       //n--
+   //NEXT
+   //aEval( ::Children, {|o| IIF( o == NIL, , o:Delete() ) } )
    SendMessage( ::Parent:hWnd, TB_DELETEBUTTON, ::xPosition, 0 )
    ADEL( ::Parent:Children, ::xPosition+1, .T. )
    ADEL( ::Parent:aItems, ::xPosition+1, .T. )
@@ -1858,6 +1811,9 @@ METHOD Delete( lChildren, lDelProp ) CLASS ToolButton
          HDel( ::Form:__hObjects, ::Name )
       CATCH
       END
+   ENDIF
+   IF IsMenu( ::hMenu )
+      DestroyMenu( ::hMenu )
    ENDIF
 RETURN SELF
 
@@ -1992,7 +1948,7 @@ RETURN self
 
 METHOD AddMenuItem( cCaption, nId, bnAction, nImgInd, cAccel ) CLASS ToolButton
 
-   LOCAL oItem := CMenuItem( Self )
+   LOCAL oItem := MenuItem( Self )
    oItem:Id        := nId
    oItem:Caption   := cCaption
    oItem:ImageIndex:= nImgInd
@@ -2003,8 +1959,7 @@ RETURN oItem
 //-----------------------------------------------------------------------------------------------
 
 FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
-
-   LOCAL oBar, n,  o, nMenu, Item, pt, ms, nPushPos, hSubMenu, oApp := __GetApplication()
+   LOCAL oBar, n, nMenu, pt, ms, nPushPos, oApp := __GetApplication(), dwItemData
    static hMenu
    oBar := oApp:__CurCoolMenu
    IF oBar == NIL
@@ -2014,58 +1969,18 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
    pt := (struct POINT)
    DO CASE
       CASE ms:message == WM_MENUSELECT
-
            IF oBar:Chevron == NIL
-              oBar:SelPopup:= HiWord( ms:wParam ) & MF_POPUP != 0
-
               hMenu     := ms:lParam
-              //nMenu := oBar:nPressed+1
 
               nMenu := SendMessage( oBar:hWnd, TB_GETHOTITEM, 0, 0 )+1
               IF nMenu > 0
                  s_nMenu := nMenu
               ENDIF
 
-              hSubMenu := GetSubMenu( ms:lParam, LoWord( ms:wParam ) )
-              s_oItem := NIL
+              dwItemData := MENUITEMINFOITEMDATA( ms:lParam, LOWORD( ms:wParam ), ( HIWORD( ms:wParam ) & MF_POPUP ) == MF_POPUP )
 
-              IF s_nMenu != NIL .AND. s_nMenu > 0
-                 IF oBar:aItems[s_nMenu]:Menu != NIL
-                    IF oBar:SelPopup
-                       FOR EACH Item IN oBar:aItems[s_nMenu]:Menu:aItems
-                           IF hSubMenu == Item:hMenu
-                              o := Item
-                              EXIT
-                           ENDIF
-                           IF ( o := Item:GetMenuByHandle( hSubMenu ) ) != NIL
-                              EXIT
-                           ENDIF
-                       NEXT
-                     ELSE
-                       o := oBar:aItems[s_nMenu]:Menu:GetItem( LoWord( ms:wParam ) )
-                    ENDIF
-                    IF o!= NIL
-                       s_oItem := o
-                    ENDIF
-                    IF o!= NIL .AND. o:Message != NIL .AND. oBar:Parent:StatusBar != NIL
-                       oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .T., 0 )
-                       oBar:Parent:StatusBar:SendMessage( SB_SETTEXT, SB_SIMPLEID + SBT_NOBORDERS, " "+o:Message )
-                     ELSEIF oBar:Parent:StatusBar != NIL
-                       oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
-                    ENDIF
-                 ENDIF
-               ELSEIF oBar:Parent:StatusBar != NIL
-                 oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
-              ENDIF
-            ELSE
-              IF oBar:Parent:StatusBar != NIL
-                 n := ASCAN( oBar:Chevron:aItems, {|o|o:Id == LoWord( ms:wParam ) } )
-                 IF n > 0 .AND. oBar:Chevron:aItems[n]:Message != NIL
-                    oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .T., 0 )
-                    oBar:Parent:StatusBar:SendMessage( SB_SETTEXT, SB_SIMPLEID + SBT_NOBORDERS, " "+oBar:Chevron:aItems[n]:Message )
-                  ELSE
-                    oBar:Parent:StatusBar:SendMessage( SB_SIMPLE, .F., 0 )
-                 ENDIF
+              IF dwItemData != NIL .AND. dwItemData <> 0 .AND. ( s_oItem := __ObjFromPtr( dwItemData ) ) != NIL
+                 oBar:SelPopup := Len( s_oItem:Children ) > 0
               ENDIF
            ENDIF
 
@@ -2108,7 +2023,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
       CASE ms:message == WM_MOUSEMOVE
            IF oBar:Chevron == NIL
-              IF ! oBar:DesignMode .OR. ms:wParam & MK_LBUTTON == MK_LBUTTON
+              IF (! oBar:DesignMode ) .OR. ms:wParam & MK_LBUTTON == MK_LBUTTON
                  oBar:lKeyboard := .F.
                  pt:x := LoWord(ms:lparam)
                  pt:y := HiWord(ms:lparam)
@@ -2119,8 +2034,8 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
                  ENDIF
                  oBar:pRect := pt
                  n := SendMessage( ms:hwnd, TB_HITTEST, 0, pt)
-                 IF n!=oBar:nPressed .AND. n >= 0 .AND. n < SendMessage( oBar:hWndHook, TB_BUTTONCOUNT )
-                    IF !( oBar:oMenu == oBar:aItems[n+1]:Menu )
+                 IF n >= 0 .AND. n <> oBar:nPressed .AND. n < SendMessage( oBar:hWndHook, TB_BUTTONCOUNT )
+                    IF !( oBar:oMenu == oBar:aItems[n+1] )
                        IF oBar:aItems[n+1]:Id < IDM_MDI_GAP .AND. ! oBar:DesignMode
                           SendMessage( oBar:hWndHook, WM_CANCELMODE, 0, 0 )
                           oBar:nPressed := n
@@ -2146,7 +2061,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
               ENDIF
               DO CASE
                  CASE ms:wParam == VK_LEFT
-                      IF oBar:nPressed < 0 .OR. ( s_oItem != NIL .AND. s_oItem:Parent:__xCtrlName == "CMenuItem" ) .OR. oBar:DesignMode
+                      IF oBar:nPressed < 0 .OR. ( s_oItem != NIL .AND. s_oItem:Parent:__xCtrlName == "MenuItem" ) .OR. oBar:DesignMode
                          RETURN 0
                       ENDIF
                       oBar:nPressed--

@@ -23,7 +23,11 @@ CLASS ImageList INHERIT Component
    PROPERTY IconWidth   SET ::__RefreshHandle(v) DEFAULT 16
    PROPERTY IconHeight  SET ::__RefreshHandle(v) DEFAULT 16
    PROPERTY Palette     SET ::__RefreshHandle(v) DEFAULT ILC_COLOR32 //ILC_COLORDDB
-   PROPERTY MaskColor   SET ::__RefreshHandle(v)
+
+   DATA EnumPalette EXPORTED INIT { {"Color","Color DDB","Color 4","Color 8","Color 16","Color 24","Color 32"},;
+                                    {ILC_COLOR,ILC_COLORDDB,ILC_COLOR4,ILC_COLOR8,ILC_COLOR16,ILC_COLOR24,ILC_COLOR32} }
+
+   PROPERTY MaskColor   ROOT "Colors" SET ::__RefreshHandle(v)
 
    DATA Handle      EXPORTED
    DATA Events      EXPORTED INIT {  {"General", { { "OnCreate"     , "", "" } } } }
@@ -45,8 +49,8 @@ CLASS ImageList INHERIT Component
    METHOD DrawImage()
    METHOD FromToolBar( oBar ) INLINE ImageListDestroy( ::Handle ), ::Handle := oBar:SendMessage( TB_GETIMAGELIST, 0, 0 )
 
-   METHOD GetImage( nIndex )  INLINE ImageListGetIcon( ::Handle, nIndex-1, ILD_NORMAL )
-   METHOD GetBitmap( nIndex )
+   METHOD GetImage( nIndex, nType )  INLINE ImageListGetIcon( ::Handle, nIndex-1, IIF( nType == NIL, ILD_NORMAL, nType ) )
+   METHOD GetBitmap()
    METHOD __RefreshHandle()
    METHOD GetImages()
 
@@ -123,24 +127,12 @@ RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
 METHOD GetBitmap( nIndex ) CLASS ImageList
-   LOCAL hDibBmp, hMemDC, hMemBitmap, hOldBitmap, hDC := GetDC( 0 )
-
+   LOCAL hMemDC, hMemBitmap, hDC := GetDC( 0 )
    hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::IconWidth, ::IconHeight )
-   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
-   //DrawIconEx( hMemDC, 0, 0, ::GetImage( nIndex ), ::IconWidth, ::IconHeight, 0, NIL,  DI_NORMAL )
-
-   ::DrawImage( hMemDC, nIndex, 0, 0, ILD_TRANSPARENT )
-
-   hDibBmp    := CopyImage( hMemBitmap, IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_CREATEDIBSECTION )
-
-   SelectObject( hMemDC, hOldBitmap )
-   DeleteObject( hMemBitmap )
+   hMemBitmap := CreateImageListBitmap( ::Handle, nIndex-1, hDC, hMemDC, ::IconWidth, ::IconHeight )
    DeleteDC( hMemDC )
-
    ReleaseDC( 0, hDC )
-RETURN hDibBmp
+RETURN hMemBitmap
 
 //----------------------------------------------------------------------------------------------------
 
@@ -250,7 +242,7 @@ METHOD AddBitmap( cImage, nMask, hInst, nLoad ) CLASS ImageList
    DEFAULT nMask TO ::MaskColor
    IF ::MaskColor != NIL
       ImageListAddMasked( ::Handle, hBmp, ::MaskColor )
-     ELSE
+    ELSE
       ImageListAdd( ::Handle, hBmp, ::MaskColor )
    ENDIF
    DeleteObject( hBmp )
@@ -286,11 +278,11 @@ RETURN SELF
 #define ILS_SHADOW   0x00000002
 #define ILS_SATURATE 0x00000004
 
-METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled ) CLASS ImageList
-   LOCAL nFlags := ILD_TRANSPARENT
+METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled, nFlags, nRop ) CLASS ImageList
    LOCAL ildp   := (struct IMAGELISTDRAWPARAMS)
 
    DEFAULT lDisabled TO .F.
+   DEFAULT nFlags TO ILD_TRANSPARENT
 
    IF lDisabled
       nFlags := nFlags | ILS_SHADOW
@@ -305,14 +297,17 @@ METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled ) CLASS ImageList
    ildp:fStyle  := nFlags
    ildp:xBitmap := xBmp
    ildp:yBitmap := yBmp
+   ildp:dwRop   := nRop
+
    ImageListDrawIndirect( ildp )
 RETURN SELF
 
 //----------------------------------------------------------------------------------------------------
 
-METHOD DrawImage( hDC, nIndex, x, y, nFlags, nColor ) CLASS ImageList
+METHOD DrawImage( hDC, nIndex, x, y, nFlags, nColor, nBackColor ) CLASS ImageList
    DEFAULT nColor TO CLR_NONE
-   ImageListDrawEx( ::Handle, nIndex-1, hDC, x, y, 0, 0, CLR_NONE, nColor, nFlags )
+   DEFAULT nBackColor TO CLR_NONE
+   ImageListDrawEx( ::Handle, nIndex-1, hDC, x, y, 0, 0, nBackColor, nColor, nFlags )
 RETURN SELF
 
 //----------------------------------------------------------------------------------------------------

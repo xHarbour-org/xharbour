@@ -3164,17 +3164,17 @@
     #define MIIM_BITMAP             128
     #define MIIM_FTYPE              256
 
-    #define HBMMENU_CALLBACK            ((HBITMAP) -1)
-    #define HBMMENU_SYSTEM              ((HBITMAP)  1)
-    #define HBMMENU_MBAR_RESTORE        ((HBITMAP)  2)
-    #define HBMMENU_MBAR_MINIMIZE       ((HBITMAP)  3)
-    #define HBMMENU_MBAR_CLOSE          ((HBITMAP)  5)
-    #define HBMMENU_MBAR_CLOSE_D        ((HBITMAP)  6)
-    #define HBMMENU_MBAR_MINIMIZE_D     ((HBITMAP)  7)
-    #define HBMMENU_POPUP_CLOSE         ((HBITMAP)  8)
-    #define HBMMENU_POPUP_RESTORE       ((HBITMAP)  9)
-    #define HBMMENU_POPUP_MAXIMIZE      ((HBITMAP) 10)
-    #define HBMMENU_POPUP_MINIMIZE      ((HBITMAP) 11)
+    #define HBMMENU_CALLBACK            -1
+    #define HBMMENU_SYSTEM               1
+    #define HBMMENU_MBAR_RESTORE         2
+    #define HBMMENU_MBAR_MINIMIZE        3
+    #define HBMMENU_MBAR_CLOSE           5
+    #define HBMMENU_MBAR_CLOSE_D         6
+    #define HBMMENU_MBAR_MINIMIZE_D      7
+    #define HBMMENU_POPUP_CLOSE          8
+    #define HBMMENU_POPUP_RESTORE        9
+    #define HBMMENU_POPUP_MAXIMIZE      10
+    #define HBMMENU_POPUP_MINIMIZE      11
     //#endif // WINVER >= 0x0500
 
     //#if(WINVER >=   1024)

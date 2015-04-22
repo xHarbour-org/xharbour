@@ -322,16 +322,15 @@ METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
 
    ::Props:MainToolBar:Enabled := lEnabled
 
-   WITH OBJECT ::MainForm
-      IF lOrder
-         FOR n := 1 TO LEN( :ToolStrip5:Children )-1
-             ::AlignBar:Children[n]:Enabled := lEnabled
-         NEXT
-       ELSE
-         ::AlignBar:Enabled := lEnabled
-      ENDIF
-      ::Props:ToolStripComboBox:Enabled := lEnabled
-   END
+   IF lOrder
+      FOR n := 1 TO LEN( ::AlignBar:Children )-1
+          ::AlignBar:Children[n]:Enabled := lEnabled
+      NEXT
+    ELSE
+      ::AlignBar:Enabled := lEnabled
+   ENDIF
+   ::Props:ToolStripComboBox:Enabled := lEnabled
+
    IF lEnabled .AND. ::Project != NIL
       ::Project:EditReset()
    ENDIF
@@ -3085,7 +3084,7 @@ STATIC FUNCTION GetCtrlProps( oCtrl, aExclude )
        ENDIF
    NEXT
    TRY
-      IF oCtrl:__xCtrlName == "CMenuItem"
+      IF oCtrl:__xCtrlName == "MenuItem"
          oCtrl:Position := ASCAN( oCtrl:Parent:Children, {|o| o == oCtrl} )
          AADD( aProps, { "POSITION", oCtrl:Position } )
       ENDIF
@@ -4298,7 +4297,11 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                   cWithClassName := Left( aTokens[4], Len( aTokens[4] ) - 1 )
                ENDIF
 
-               IF UPPER( cWithClassName ) == "EDIT"
+               IF UPPER( cWithClassName ) == "CMENUITEM" //.AND. ( oObj:__xCtrlName IN { "ContextMenu", "MenuItem" } )
+                  cWithClassName := "MenuItem"
+                  ::CurrentForm:__lModified := .T.
+                  ::Modified := .T.
+                ELSEIF UPPER( cWithClassName ) == "EDIT"
                   cWithClassName := "EditBox"
                 ELSEIF UPPER( cWithClassName ) == "PICTURE"
                   cWithClassName := "PictureBox"

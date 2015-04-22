@@ -41,11 +41,10 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS TrackBar
    ::Super:OnParentNotify( nwParam, nlParam )
    IF ::BkBrush != NIL
       DO CASE
-         CASE ::Parent:hdr:code == NM_CUSTOMDRAW 
+         CASE ::Parent:hdr:code == NM_CUSTOMDRAW
               cd := (struct NMCUSTOMDRAW*) nlParam
               DO CASE
                  CASE cd:dwDrawStage == CDDS_PREPAINT
-                      SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_NOTIFYITEMDRAW )
                       RETURN CDRF_NOTIFYITEMDRAW
 
                  CASE cd:dwDrawStage == CDDS_ITEMPREPAINT
@@ -53,7 +52,6 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS TrackBar
                          CASE cd:dwItemSpec == TBCD_CHANNEL
                               _FillRect( cd:hdc, {0,0,::ClientWidth,::ClientHeight}, ::BkBrush )
                       ENDCASE
-                      SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_DODEFAULT )
                       RETURN CDRF_DODEFAULT
               ENDCASE
 

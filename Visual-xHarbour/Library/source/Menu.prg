@@ -327,16 +327,14 @@ METHOD __ResetImageList() CLASS MenuBar
    IF ::ImageList != NIL
       FOR EACH oSubMenu IN ::Children
           WITH OBJECT oSubMenu
-             IF :ImageIndex > 0 .AND. :__hBitmap == NIL
-                :__hBitmap := ::ImageList:GetBitmap( :ImageIndex, GetSysColorBrush( COLOR_MENU ) )
+             IF :ImageIndex > 0 .AND. ! :xChecked
+                DEFAULT :__hBitmap TO ::ImageList:GetBitmap( :ImageIndex, GetSysColorBrush( COLOR_MENU ) )
 
-                IF ! :xChecked
-                   mii := (struct MENUITEMINFO)
-                   mii:cbSize   := mii:SizeOf()
-                   mii:fMask    := MIIM_BITMAP
-                   mii:hbmpItem := :__hBitmap
-                   SetMenuItemInfo( ::hMenu, :Id, .F., mii )
-                ENDIF
+                mii := (struct MENUITEMINFO)
+                mii:cbSize   := mii:SizeOf()
+                mii:fMask    := MIIM_BITMAP
+                mii:hbmpItem := :__hBitmap
+                SetMenuItemInfo( ::hMenu, :Id, .F., mii )
              ENDIF
           END
       NEXT
@@ -371,66 +369,46 @@ RETURN oMenu
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
-//CLASS ContextMenu INHERIT MenuBar
-//ENDCLASS
 
-CLASS ContextMenu INHERIT Component
-   PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList )
-
-   DATA Menu            EXPORTED
-   DATA Text            EXPORTED INIT "ContextMenu"
-   DATA xImageList      EXPORTED
-
-   ACCESS Caption     INLINE ::Text
-   ASSIGN Caption(c)  INLINE ::Text := c
-
+CLASS ContextMenu INHERIT MenuBar
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD Show()
-   METHOD __AddMenuItem()
-   METHOD Cancel()    INLINE ::Parent:SendMessage( WM_CANCELMODE, 0, 0 )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ContextMenu
-   ::__hObjects     := Hash()
-   HSetCaseMatch( ::__hObjects, .F. )
-
-   DEFAULT ::__xCtrlName   TO "ContextMenu"
-   DEFAULT ::ComponentType TO "ContextMenu"
-   DEFAULT ::ClsName       TO "ContextMenu"
-   ::Parent := oParent
+   ::__xCtrlName   := "ContextMenu"
+   ::ComponentType := "ContextMenu"
+   ::ClsName       := "ContextMenu"
    Super:Init( oParent )
-   ::Parent := oParent
-   ::Menu := MenuPopup( ::Owner )
-   ::Menu:Style := TPM_LEFTALIGN | TPM_TOPALIGN
-   IF ::DesignMode
-      ::Menu:Style := TPM_CENTERALIGN | TPM_LEFTBUTTON
-      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
-   ENDIF
-   ::lCreated := .T.
-RETURN Self
 
-METHOD __AddMenuItem() CLASS ContextMenu
-   ::Application:Project:SetAction( { { 1, 0, 0, 0, .T., Self, "CMenuItem",,,1, {}, } }, ::Application:Project:aUndo )
+   IF ::DesignMode
+      ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
+      ::Application:ObjectTree:Set( Self )
+      ::lCreated := .T.
+   ENDIF
 RETURN Self
 
 METHOD Create() CLASS ContextMenu
-   ::lCreated := .T.
+   LOCAL lpMenuInfo := (struct MENUINFO)
+
+   ::hMenu := CreatePopupMenu()
+
+   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   lpMenuInfo:fMask  := MIM_STYLE
+   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   SetMenuInfo( ::hMenu, lpMenuInfo )
+
+   IF VALTYPE( ::xImageList ) == "C"
+      AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
+   ENDIF
 RETURN Self
 
-METHOD Show( x, y ) CLASS ContextMenu
-   LOCAL nRes := 0, oItem
-
-   ::Menu:Create()
-
-   FOR EACH oItem IN ::Menu:aItems
-       IF oItem:Visible .OR. ::DesignMode
-          oItem:Create()
-       ENDIF
-   NEXT
-
-   ::Menu:Left := x
-   ::Menu:Top  := y
-   nRes := ::Menu:Context()
-   ::Menu:Destroy()
+METHOD Show( x, y, nAlign ) CLASS ContextMenu
+   LOCAL nRes := 0
+   DEFAULT x TO ::Left
+   DEFAULT y TO ::Top
+   DEFAULT nAlign TO TPM_LEFTALIGN | TPM_TOPALIGN
+   TrackPopupMenu( ::hMenu, nAlign, x, y, 0, ::Parent:hWnd )
+   ::Application:DoEvents()
 RETURN nRes

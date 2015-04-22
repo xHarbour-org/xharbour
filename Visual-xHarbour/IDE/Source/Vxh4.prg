@@ -2366,6 +2366,20 @@ RETURN NIL
 
 FUNCTION InitEditText( oForm, oMan, cText )
    LOCAL oCancel, oOK, oEdit
+   WITH OBJECT oEdit := EditBox( oForm )
+      :Caption     := cText
+      :Dock:Left   := oForm
+      :Dock:Top    := oForm
+      :Dock:Right  := oForm
+      :Dock:Bottom := oForm
+      :Dock:BottomMargin := 27
+      :Height      := 160
+      :VertScroll  := .T.
+      :HorzScroll  := .T.
+      :WantReturn  := .T.
+      :Multiline   := .T.
+      :Create()
+   END
    WITH OBJECT oCancel := Button( oForm )
       :Caption     := "&Cancel"
       :Height      := 25
@@ -2383,20 +2397,7 @@ FUNCTION InitEditText( oForm, oMan, cText )
                           oForm:Close()}
       :Create()
    END
-   WITH OBJECT oEdit := EditBox( oForm )
-      :Caption     := cText
-      :Dock:Left   := oForm
-      :Dock:Top    := oForm
-      :Dock:Right  := oForm
-      :Dock:Bottom := oCancel
-      :Height      := 160
-      :VertScroll  := .T.
-      :HorzScroll  := .T.
-      :WantReturn   := .T.
-      :Multiline   := .T.
-      :Create()
-   END
-RETURN NIL
+RETURN 0
 
 STATIC FUNCTION CompileValue( cVal )
    IF !EMPTY( cVal )

@@ -944,6 +944,20 @@ HB_FUNC( STRINGPOINTER )
 }
 
 //-------------------------------------------------------------------------------------------------
+HB_FUNC( __GETOBJID )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+
+   if( pArray )
+   {
+      hb_retnl( (long) pArray->item.asLong.value );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 6001, NULL, "ArrayPtr", 1, hb_paramError( 1 ) );
+   }
+}
+//-------------------------------------------------------------------------------------------------
 HB_FUNC( LONGFROMPOINTER )
 {
    PHB_ITEM pPointer = hb_param( 1, HB_IT_ANY );
@@ -10900,4 +10914,9 @@ HB_FUNC( EXTCREATEPEN )
 
       hb_xfree( (void *) pStyle );
    }
+}
+
+HB_FUNC( DRAWMENUBAR )
+{
+   hb_retl( DrawMenuBar( (HWND) hb_parnl(1) ) );
 }

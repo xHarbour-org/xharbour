@@ -432,6 +432,9 @@ METHOD Init( oParent ) CLASS CoolBarBand
 
    ::__CreateProperty( "Band" )
    AADD( ::Parent:Bands, Self )
+   IF ::DesignMode
+      ::Application:ObjectTree:Set( Self )
+   ENDIF
 
    __SetInitialValues( Self )
 RETURN Self
@@ -716,32 +719,24 @@ METHOD OnChevronPushed( chev ) CLASS CoolBarBand
 
           IF oBtn:id <= IDM_MDI_ICON  .AND. pt:x + 2 >= ::BandChild:Chevron:Left
              IF oBtn:Style & BTNS_SEP == 0
-                oItem := CMenuItem( ::BandChild:Chevron )
-                oItem:Id      := oBtn:Id
-                DEFAULT oBtn:Caption TO ""
-                oItem:Caption := oBtn:Caption
-                IF oBtn:Menu != NIL
-                   oItem:ImageBkColor := oBtn:Menu:ImageBkColor
-                ENDIF
-                oItem:Style := 0
+                oItem := MenuItem( ::BandChild:Chevron )
+                oItem:Id := oBtn:Id
+                DEFAULT oBtn:Text TO ""
+                oItem:Text := oBtn:Caption
                 IF !::BandChild:__MenuBar
                    oItem:ImageIndex := oBtn:ImageIndex
-                   oItem:Style      := oBtn:Style
                    oItem:Action     := oBtn:Action
-                   oItem:Message    := oBtn:Message
                  ELSE
-                   oItem:ImageList := oBtn:Menu:ImageList
-                   oItem:aItems := ACLONE( oBtn:Menu:aItems )
-                   FOR EACH oSub IN oItem:aItems
-                       oSub:Menu := oItem
-                   NEXT
-                ENDIF
-
-                IF oItem:Style != NIL
-                   ::BandChild:lToolMenu := .T.
+                   oItem:ImageList := oBtn:ImageList
+                   oItem:Children  := ACLONE( oBtn:Children )
                 ENDIF
                 oItem:Enabled := oBtn:Enabled
                 oItem:Create()
+
+                FOR EACH oSub IN oItem:Children
+                    oSub:Parent := oItem
+                    oSub:ReCreate()
+                NEXT
              ENDIF
 
           ENDIF
@@ -750,6 +745,7 @@ METHOD OnChevronPushed( chev ) CLASS CoolBarBand
       ::BandChild:hWndHook := ::BandChild:hWnd
       ::Application:__CurCoolMenu := ::BandChild
       ::BandChild:Chevron:Context( ::BandChild:hWnd )
+      ::Application:DoEvents()
 
       IF !::BandChild:Chevron:CoolBar
          ::Application:__CurCoolMenu := NIL
@@ -759,7 +755,7 @@ METHOD OnChevronPushed( chev ) CLASS CoolBarBand
       ::BandChild:Chevron:Destroy()
       ::BandChild:hWndHook := NIL
       ::BandChild:Chevron  := NIL
-      ::BandChild:hHook    := NIL
+//      ::BandChild:hHook    := NIL
    ENDIF
 
 RETURN 1

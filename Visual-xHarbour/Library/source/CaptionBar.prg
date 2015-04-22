@@ -60,10 +60,10 @@ METHOD Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCrea
    ::Font:PitchAndFamily := VARIABLE_PITCH + FF_SWISS
    ::Font:Weight         := FW_BOLD
    ::Font:Quality        := ANTIALIASED_QUALITY
-   
+
    ::ClassBrush:= GetSysColorBrush( COLOR_BTNSHADOW )
    ::ForeColor := ::System:Colors:Window
-   
+
    ::LeftMargin:= 5
    IF lCreate
       ::Create()
@@ -115,7 +115,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------
 
-METHOD OnNCHitTest(x,y)
+METHOD OnNCHitTest(x,y) CLASS CaptionBar
    LOCAL aPt := {x,y}
    _ScreenToClient( ::hWnd, @aPt )
    IF !_PtInRect( {0, 0, ::LeftMargin+::TextWidth+20,::ClientHeight}, aPt )

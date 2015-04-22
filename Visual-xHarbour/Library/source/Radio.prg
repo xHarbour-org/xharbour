@@ -127,7 +127,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
 
                    IF hBkGnd == NIL
-                      SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
                       RETURN nRet
                    ENDIF
 
@@ -196,7 +195,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                    ENDIF
                    nRet := CDRF_SKIPDEFAULT
            ENDCASE
-           SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, nRet )
            RETURN nRet
 
    ENDCASE

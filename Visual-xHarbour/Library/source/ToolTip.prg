@@ -53,6 +53,10 @@ CLASS ToolTip INHERIT Window
 
    DATA ToolTip          EXPORTED
 
+
+   ACCESS Center         INLINE ::CenterTip
+   ASSIGN Center(l)      INLINE ::CenterTip := l
+
    ACCESS Visible        INLINE ::Style & WS_VISIBLE != 0
    ACCESS Transparent    INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
 
@@ -271,5 +275,6 @@ METHOD OnTimer( nTimer ) CLASS ToolTip
    IF nTimer == 25
       ::KillTimer( 25 )
       ::Popup()
+      RETURN 0
    ENDIF
-RETURN 0
+RETURN NIL

@@ -51,8 +51,8 @@ CLASS FormEditor INHERIT TabPage
    METHOD Refresh()                  INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD OnNCCalcSize()
    METHOD OnNCPaint()
-   METHOD OnNCRButtonDown()
-   //METHOD OnNCHitTest()
+   METHOD OnNCRButtonUp()
+   METHOD OnNCHitTest()
    METHOD OnVertScroll()
    METHOD OnHorzScroll(n)            INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD UpdateScroll()
@@ -119,7 +119,7 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS FormEditor
       nccs:rgrc[1]:Top    += ::RulerWeight
       nccs:CopyTo( nlParam )
    ENDIF
-RETURN NIL
+RETURN 0
 
 //---------------------------------------------------------------------------------------------------
 
@@ -154,46 +154,43 @@ METHOD OnNCPaint( nwParam ) CLASS FormEditor
                    ::RulerBrush,;
                    IIF( IsThemeActive(), 0, 1 ) )
    ENDIF
-RETURN NIL
+RETURN 0
 
-METHOD OnNCRButtonDown( n, x, y ) CLASS FormEditor
+METHOD OnNCRButtonUp( nwParam, nlParam ) CLASS FormEditor
    LOCAL oMenu, oItem
-   ( n )
+   ( nwParam )
    IF ::Application:ShowRulers
-      oMenu := MenuPopup( Self )
-      oMenu:Style        := TPM_LEFTALIGN | TPM_TOPALIGN
-      oMenu:Left         := x
-      oMenu:Top          := y
+      oMenu := ContextMenu( Self )
       oMenu:Create()
 
-      oItem := CMenuItem( oMenu )
-      oItem:Caption := "Inches"
-      oItem:Check( ::Application:RulerType == 1 )
+      oItem := MenuItem( oMenu )
+      oItem:Text := "Inches"
+      oItem:Checked := ::Application:RulerType == 1
       oItem:Action  := {||::Application:RulerType := 1,;
                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 1 ),;
                           ::Application:DesignPage:Refresh() }
       oItem:Create()
 
-      oItem := CMenuItem( oMenu )
-      oItem:Caption := "-"
+      oItem := MenuItem( oMenu )
+      oItem:Separator := .T.
       oItem:Create()
 
-      oItem := CMenuItem( oMenu )
-      oItem:Caption := "Centimeters"
-      oItem:Check( ::Application:RulerType == 2 )
+      oItem := MenuItem( oMenu )
+      oItem:Text := "Centimeters"
+      oItem:Checked :=  ::Application:RulerType == 2
       oItem:Action  := {||::Application:RulerType := 2,;
                           ::Application:AppIniFile:WriteInteger( "General", "RulerType", 2 ),;
                           ::Application:DesignPage:Refresh() }
       oItem:Create()
 
-      oMenu:Context()
-
+      oMenu:Show( LOWORD( nlParam ), HIWORD( nlParam ) )
+      oMenu:Destroy()
    ENDIF
-RETURN NIL
+RETURN 0
 
-//METHOD OnNCHitTest() CLASS FormEditor
-//   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, ::wParam, ::lParam )
-//RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
+METHOD OnNCHitTest( nwParam, nlParam ) CLASS FormEditor
+   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, nwParam, nlParam )
+RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
 
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -479,9 +476,9 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
    ENDIF
 RETURN NIL
 
-METHOD OnLButtonDown(n,x,y) CLASS ControlMask
+METHOD OnLButtonDown( nwParam, x, y ) CLASS ControlMask
    LOCAL pt, oControl, oPrj := ::Application:Project
-   ( n )
+   ( nwParam )
    ::SetFocus()
 
    IF ! ::lOrderMode .AND. ::CurForm != NIL .AND. ::CurForm:ControlSelect( x, y ) == -2
@@ -492,6 +489,7 @@ METHOD OnLButtonDown(n,x,y) CLASS ControlMask
       pt := (struct POINT)
       pt:x := x
       pt:y := y
+
       ClientToScreen( ::hWnd, @pt )
       oControl := ::CurForm:GetChildFromPoint( pt )
 
@@ -580,7 +578,7 @@ METHOD OnPaint() CLASS ControlMask
    IF ::Application:CurCursor == NIL
       SelectObject( hDC, GetStockObject( WHITE_BRUSH ) )
       FOR EACH aControl IN ::CurForm:Selected
-          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "CMENUITEM", "MENUSTRIPITEM"}
+          IF aControl[1]:Parent != NIL .AND. ! __clsParent( aControl[1]:ClassH, "COMPONENT" ) .AND. ! aControl[1]:ClassName IN {"MENUITEM", "MENUSTRIPITEM"}
              aPoints := ::CurForm:GetPoints( aControl[1] )
 
              FOR x := 1 TO LEN( aPoints )
@@ -716,20 +714,17 @@ METHOD OnContextMenu( x, y ) CLASS ControlMask
             n := ::Application:Cursor
 
             ::Application:Cursor := ::System:Cursor:Arrow
-            oMenu := MenuPopup( Self )
-            oMenu:Style        := TPM_LEFTALIGN+TPM_TOPALIGN
-            oMenu:Left         := x
-            oMenu:Top          := y
-
+            oMenu := ContextMenu( Self )
             oMenu:Create()
+
             FOR EACH Item IN ::CurForm:Selected[1][1]:__IdeContextMenuItems
-                oItem := CMenuItem( oMenu )
-                oItem:Caption := Item[1]
+                oItem := MenuItem( oMenu )
+                oItem:Text    := Item[1]
                 oItem:Action  := Item[2]
                 oItem:Cargo   := aPt
                 oItem:Create()
             NEXT
-            oMenu:Context()
+            oMenu:Show( x, y )
             ::Application:Cursor := n
 
          ENDIF

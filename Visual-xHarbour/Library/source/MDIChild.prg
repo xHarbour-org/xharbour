@@ -55,6 +55,25 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
+/*
+   LOCAL mcs := (struct MDICREATESTRUCT)
+
+   mcs:szClass := ::ClsName
+   mcs:x       := ::Left
+   mcs:y       := ::Top
+   mcs:cx      := ::Width
+   mcs:cy      := ::Height
+   mcs:hOwner  := ::Application:Instance
+   mcs:style   := 0
+   mcs:szTitle := ::Text
+
+   IF ! IsRegistered( ::Instance, ::ClsName )
+      ::__Register()
+   ENDIF
+
+   ::hWnd := SendMessage( ::Parent:hWnd, WM_MDICREATE, 0, mcs )
+*/
+
 METHOD Create() CLASS MDIChildWindow
    LOCAL oItem, nPos, o, n, cText
    ::ControlParent := .T.
@@ -65,6 +84,12 @@ METHOD Create() CLASS MDIChildWindow
 
    ::ExStyle := ::ExStyle | WS_EX_MDICHILD
    ::Super:Create()
+
+   ::Style := GetWindowLong( ::hWnd, GWL_STYLE )
+
+   ::SetStyle( WS_MAXIMIZEBOX, ::MaximizeBox )
+   ::SetStyle( WS_MINIMIZEBOX, ::MinimizeBox )
+   ::SetStyle( WS_SYSMENU, ::Sysmenu )
 
    AADD( ::Parent:Children, Self )
 
@@ -88,23 +113,23 @@ METHOD Create() CLASS MDIChildWindow
          o:MDIMenu := .T.
          o:Create( nPos )
 
-         oItem := CMenuItem( o )
+         oItem := MenuItem( o )
          oItem:Caption:= "Tile Horizontally"
          oItem:Action := {|o| o:Menu:Parent:Parent:MdiTileHorizontal() }
          oItem:Create()
-         oItem := CMenuItem( o )
+         oItem := MenuItem( o )
          oItem:Caption:= "Tile Vertically"
          oItem:Action := {|o| o:Menu:Parent:Parent:MdiTileVertical() }
          oItem:Create()
-         oItem := CMenuItem( o )
+         oItem := MenuItem( o )
          oItem:Caption:= "Cascade"
          oItem:Action := {|o| o:Menu:Parent:Parent:MdiCascade() }
          oItem:Create()
-         oItem := CMenuItem( o )
+         oItem := MenuItem( o )
          oItem:Caption:= "Arrange Icons"
          oItem:Action := {|o| o:Menu:Parent:Parent:MdiIconArrange() }
          oItem:Create()
-         oItem := CMenuItem( o )
+         oItem := MenuItem( o )
          oItem:Caption:= "-"
          oItem:Create()
       ENDIF
@@ -116,16 +141,16 @@ METHOD ResetMDIMenu() CLASS MDIChildWindow
    LOCAL oMenu, oChild, oItem, n
    IF ::__oCoolMenu != NIL .AND. ( n := ASCAN( ::__oCoolMenu:aItems, {|o| o:MDIMenu == .T. } ) ) > 0
       oMenu := ::__oCoolMenu:aItems[n]
-      FOR n := 1 TO LEN( oMenu:Menu:aItems )
+      FOR n := 1 TO LEN( oMenu:Children )
           IF n > 5
-             oMenu:Menu:aItems[n]:Delete()
+             oMenu:Children[n]:Delete()
              n--
           ENDIF
       NEXT
       n := 1
       FOR EACH oChild IN ::Parent:Children
           IF ! Empty( oChild:Text )
-             oItem := CMenuItem( oMenu )
+             oItem := MenuItem( oMenu )
              oItem:Caption:= "&"+ALLTRIM(STR(n))+" "+oChild:Text
              oItem:Cargo  := oChild
              oItem:Action := {|o| o:Cargo:MdiActivate() }

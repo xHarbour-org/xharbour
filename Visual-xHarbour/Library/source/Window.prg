@@ -1779,6 +1779,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
                oItem:Cancel()
             ENDIF
          ENDIF
+
       ENDIF
       IF nRet != NIL
          RETURN nRet
@@ -2022,9 +2023,9 @@ RETURN nRet
 
 //-----------------------------------------------------------------------------------------------
 METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
-   LOCAL nRet, n, cBuffer, oObj, oChild, oItem, cBlock, i
-   LOCAL lShow, hParent, oCtrl, aRect, aPt, mii, msg, oMenu, mmi, oForm
-   LOCAL pt, code, nMess, mis, dis, bBlock
+   LOCAL nRet, n, cBuffer, oObj, oChild, oItem, cBlock
+   LOCAL lShow, hParent, oCtrl, aRect, aPt, msg, mmi, oForm
+   LOCAL pt, code, nMess, mis, dis, bBlock, oMdi, aMenu
 
    DEFAULT ::hWnd TO hWnd
 
@@ -2277,7 +2278,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               mis := (struct MEASUREITEMSTRUCT*) nlParam
 
               IF mis:CtlType == ODT_MENU .AND. mis:itemData != NIL .AND. mis:itemData <> 0
-                 IF ( oCtrl := ArrayFromPointer( mis:itemData ) ) != NIL
+                 IF ( oCtrl := __ObjFromPtr( mis:itemData ) ) != NIL
                     IF __objHasMsg( oCtrl, "OnMeasureItem" )
                        nRet := oCtrl:OnMeasureItem( nwParam, nlParam, mis )
                      ELSE
@@ -2302,7 +2303,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_DRAWITEM
               dis := (struct DRAWITEMSTRUCT*) nlParam
               IF dis:CtlType == ODT_MENU .AND. dis:itemData != NIL .AND. dis:itemData <> 0
-                 IF ( oCtrl := ArrayFromPointer( dis:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
+                 IF ( oCtrl := __ObjFromPtr( dis:itemData ) ) != NIL .AND. VALTYPE( oCtrl ) == "O"
                     IF __objHasMsg( oCtrl, "OnMeasureItem" )
                        nRet := oCtrl:OnDrawItem( nwParam, nlParam, dis )
                      ELSE
@@ -2686,34 +2687,35 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ODEFAULT nRet TO ::OnMenuCommand( nwParam, nlParam )
               IF ::Application != NIL
 
-                 mii := (struct MENUITEMINFO)
-                 mii:cbSize := mii:SizeOf()
-                 mii:fMask  := MIIM_DATA | MIIM_ID
+                 IF ( aMenu := __GetMenuItemInfo( nlParam, nwParam, .T. ) ) != NIL
+                    IF aMenu[1] <> 0
+                       oItem := __ObjFromPtr( aMenu[1] )
 
-                 IF _GetMenuItemInfo( nlParam, nwParam, .T., mii:Value )
-                    mii:Devalue()
-                    IF mii:dwItemData != NIL .AND. mii:dwItemData <> 0
-                       oItem := ArrayFromPointer( mii:dwItemData )
+                    ELSEIF ::MdiContainer .AND. ( oMDI := ::MdiGetActive() ) != NIL
+                       IF nwParam == 8 //SC_NEXTWINDOW
+                          oMdi:MdiNext()
+
+                        ELSE
+                          SWITCH aMenu[2]
+                             CASE HBMMENU_POPUP_MINIMIZE
+                             CASE HBMMENU_MBAR_MINIMIZE
+                                  oMdi:Minimize()
+                                  EXIT
+
+                             CASE HBMMENU_POPUP_RESTORE
+                             CASE HBMMENU_MBAR_RESTORE
+                                  oMdi:Restore()
+                                  EXIT
+
+                             CASE HBMMENU_POPUP_CLOSE
+                             CASE HBMMENU_MBAR_CLOSE
+                                  oMdi:Close()
+                                  EXIT
+                          END
+                       ENDIF
                     ENDIF
                  ENDIF
 
-                 IF oItem == NIL
-                    TRY
-                       IF ( oMenu := ::Application:oCurMenu:GetMenuByHandle( nlParam ) ) != NIL
-                          IF mii:wID != NIL .AND. mii:wID > 0 .AND. ( i := ASCAN( oMenu:aItems, {|o| o:ID == mii:wID } ) ) > 0
-                             oItem := oMenu:aItems[ i ]
-                           ELSE
-                             FOR i := nwParam + 1 TO LEN( oMenu:aItems )
-                                 oItem := oMenu:aItems[ i ]
-                                 IF oItem:Visible
-                                    EXIT
-                                 ENDIF
-                             NEXT
-                          ENDIF
-                       ENDIF
-                     CATCH
-                    END
-                 ENDIF
               ENDIF
               IF oItem != NIL
                  TRY
@@ -2729,7 +2731,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     IF ::ClsName == "CCTL"
                        oForm := Self
                     ENDIF
-                    nRet := oForm:&( oItem:EventHandler[ "OnClick" ] )( oItem )
+                    nRet := hb_ExecFromArray( oForm, oItem:EventHandler[ "OnClick" ], {oItem} )
                   ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
                     EVAL( oItem:Action, oItem )
                   ELSE
@@ -2867,11 +2869,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
       nRet := NIL
    ENDIF
    IF nRet != NIL
-      IF ::Modal
+      IF ::__WindowStyle == WT_DIALOG //::Modal
          IF VALTYPE( nRet ) == "L"
             nRet := IIF( nRet, 1, 0 )
          ENDIF
-         SetWindowLong( ::hWnd, DWL_MSGRESULT, nRet )
+         SetWindowLong( hWnd, DWL_MSGRESULT, nRet )
       ENDIF
       RETURN( nRet )
    ENDIF
@@ -4660,6 +4662,9 @@ RETURN NIL
 METHOD __SetActiveMenuBar( oMenu ) CLASS WinForm
    IF ::hWnd != NIL .AND. VALTYPE( oMenu ) != "C"
       SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) )
+      IF oMenu != NIL
+         DrawMenuBar( ::hWnd )
+      ENDIF
    ENDIF
 RETURN Self
 
@@ -4902,6 +4907,7 @@ METHOD __PrcMdiMenu( nId ) CLASS WinForm
    LOCAL oMdi := ::MDIClient:GetActive()
 
    IF oMdi != NIL
+      view nID, SC_CLOSE
       DO CASE
          CASE nId == SC_MINIMIZE
               oMdi:Minimize()
@@ -4909,11 +4915,11 @@ METHOD __PrcMdiMenu( nId ) CLASS WinForm
          CASE nId == SC_NEXTWINDOW
               oMdi:MdiNext()
 
-         CASE nId == SC_RESTORE
+         CASE nId == 61589 // SC_RESTORE ???
               oMdi:MdiRestore()
 
          CASE nId == SC_CLOSE
-              oMdi:MdiClose()
+//              oMdi:MdiClose()
       ENDCASE
    ENDIF
 RETURN 0

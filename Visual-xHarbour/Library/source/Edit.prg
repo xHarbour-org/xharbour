@@ -734,11 +734,11 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
-   LOCAL nStyle, hRegion, hdc, n := 3
+   LOCAL nStyle, hRegion, hdc, nAlign, n := 3
    LOCAL rc, pt, x, y, aPt := {LOWORD( nlParam ),HIWORD( nlParam )}
 
    x := aPt[1]
-   y := aPt[1]
+   y := aPt[2]
 
    ::Super:OnNCLButtonDown( nwParam, nlParam )
 
@@ -818,21 +818,19 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
             pt:y := y
 
             ScreenToClient( ::hWnd, @pt )
-
             IF PtInRect( rc, pt )
-
                pt := (struct POINT)
                pt:x := ::left
                pt:y := ::top
 
                IF ::xLayout < 4
-                  ::ContextMenu:Menu:Style := TPM_RIGHTALIGN | TPM_TOPALIGN
+                  nAlign := TPM_RIGHTALIGN | TPM_TOPALIGN
                   pt:x := ::left + ::Width
                ENDIF
 
                ClientToScreen( ::Parent:hWnd, @pt )
 
-               ::ContextMenu:Show( pt:x, pt:y + ::Height - 1)
+               ::ContextMenu:Show( pt:x, pt:y + ::Height - 1, nAlign )
                RETURN 0
             ENDIF
          ENDIF

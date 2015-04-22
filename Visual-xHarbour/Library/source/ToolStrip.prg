@@ -2028,7 +2028,7 @@ static FUNCTION __ReleaseMenu( Self, hMenu )
           DeleteMenu( hMenu, 0, MF_BYPOSITION )
        ENDIF
        IF oItem:__pObjPtr != NIL
-          ReleaseArrayPointer( oItem:__pObjPtr )
+          __ObjRelPtr( oItem:__pObjPtr )
           oItem:__pObjPtr := NIL
        ENDIF
        __ReleaseMenu( oItem, oItem:__hMenu )
@@ -2061,7 +2061,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        mii:hbmpUnchecked := 0
        mii:dwTypeData    := oItem:Caption
        mii:hBmpItem      := NIL
-       mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
+       mii:dwItemData    := oItem:__pObjPtr := __ObjPtr( oItem )
 
        __InsertMenuStripItem( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
    NEXT
@@ -2343,7 +2343,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
       CASE WM_MENUSELECT
            mii_dwItemData := MENUITEMINFOITEMDATA( ms_lParam, LOWORD( ms_wParam ), ( HIWORD( ms_wParam ) & MF_POPUP ) == MF_POPUP )
            s_oCurrMenuItem := NIL
-           IF mii_dwItemData != NIL .AND. mii_dwItemData <> 0 .AND. ( s_oCurrMenuItem := ArrayFromPointer( mii_dwItemData ) ) != NIL
+           IF mii_dwItemData != NIL .AND. mii_dwItemData <> 0 .AND. ( s_oCurrMenuItem := __ObjFromPtr( mii_dwItemData ) ) != NIL
               __SetSubMenu( s_oCurrMenuItem, s_oCurrMenuItem:__hMenu )
               //__GetApplication():Project:CurrentForm:SelectControl( s_oCurrMenuItem, .F. )
               //__GetApplication():ObjectTree:Set( s_oCurrMenuItem )
@@ -3223,7 +3223,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    mii:wID           := oItem:Id
    mii:fType         := MFT_OWNERDRAW
    mii:fState        := IIF( oItem:Enabled, MFS_ENABLED, MFS_DISABLED )
-   mii:dwItemData    := oItem:__pObjPtr := ArrayPointer( oItem )
+   mii:dwItemData    := oItem:__pObjPtr := __ObjPtr( oItem )
 
    __InsertMenuStripItem( oParent:__hMenu, oItem:Position-1, .T., mii:fMask, mii:hSubMenu, mii:wID, oItem:Caption, mii:dwItemData, mii:fState )
 

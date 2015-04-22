@@ -16,6 +16,11 @@
 #include "error.ch"
 
 static __aObjects := {}
+static __aObjPtrs := {}
+
+//EXIT PROCEDURE Clean__aObjPtrs
+//   view len( __aObjPtrs )
+//RETURN
 
 CLASS Object
    PROPERTY GenerateMember ROOT "Object" DEFAULT .T.
@@ -350,3 +355,28 @@ METHOD ObjFromHandle( hWnd ) CLASS Object
        ENDIF
    NEXT
 RETURN oObj
+
+
+//---------------------------------------------------------------------------
+FUNCTION __ObjPtr( oObj )
+   LOCAL nPtr := __GetObjID( oObj )
+   LOCAL n := ASCAN( __aObjPtrs, {|a| a[2] == nPtr } )
+   IF n == 0
+      AADD( __aObjPtrs, { oObj, nPtr } )
+   ENDIF
+RETURN nPtr
+
+FUNCTION __ObjFromPtr( nPtr )
+   LOCAL n := ASCAN( __aObjPtrs, {|a| a[2] == nPtr} )
+   IF n > 0
+      RETURN __aObjPtrs[n][1]
+   ENDIF
+RETURN NIL
+
+FUNCTION __ObjRelPtr( nPtr )
+   LOCAL n := ASCAN( __aObjPtrs, {|a| a[2] == nPtr} )
+   IF n > 0
+      ADEL( __aObjPtrs, n, .T. )
+   ENDIF
+RETURN NIL
+

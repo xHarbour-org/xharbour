@@ -227,14 +227,12 @@ RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnLButtonDown( nwParam,x,y ) CLASS CoolMenu
+METHOD OnLButtonDown( nwParam ) CLASS CoolMenu
    LOCAL n
-   (x)
-   (y)
    IF nwParam != -1
       SetFocus( ::hWnd )
       n := SendMessage( ::hWnd, TB_GETHOTITEM, 0, 0 )
-     ELSE
+    ELSE
       n := 0
       ::nPressed := -1
    ENDIF
@@ -242,10 +240,11 @@ METHOD OnLButtonDown( nwParam,x,y ) CLASS CoolMenu
       IF ::Application:__hMenuHook == NIL
          ::nPressed := -1
       ENDIF
-      IF ::aItems[n+1]:Menu != NIL .AND. LEN(::aItems[n+1]:Menu:aItems) > 0
-         ::nPressed := n
-         ::lKeyboard:= .F.
-         ::SelPopup := .F.
+
+      IF LEN(::aItems[n+1]:Children ) > 0 .OR. n == 0
+         ::nPressed  := n
+         ::lKeyboard := .F.
+         ::SelPopup  := .F.
          ::OpenPopup( ::hWnd )
          RETURN 0
       ENDIF
@@ -272,8 +271,8 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 
-METHOD OnParentCommand( nId, nCode ) CLASS CoolMenu
-   LOCAL oBtn, n, oItem, oSub, nRet, oMdi
+METHOD OnParentCommand( nId ) CLASS CoolMenu
+   LOCAL oMdi
    IF ::Parent:MdiContainer
       oMdi := ::Parent:MDIClient:GetActive()
 
@@ -294,38 +293,6 @@ METHOD OnParentCommand( nId, nCode ) CLASS CoolMenu
       ENDIF
    ENDIF
 
-   IF nCode == 1
-      FOR EACH oBtn IN ::aItems
-          IF oBtn:Menu != NIL
-             IF ( n := ASCAN( oBtn:Menu:aItems, {|o|o:Id == nId} ) ) > 0
-                oItem := oBtn:Menu:aItems[n]
-              ELSE
-                FOR EACH oSub IN oBtn:Menu:aItems
-                    IF ( oItem := oSub:GetMenuById( nId ) )!= NIL
-                       n := 1
-                       EXIT
-                    ENDIF
-                NEXT
-             ENDIF
-
-             IF n > 0
-                TRY
-                   nRet := oItem:OnClick( oItem )
-                   nRet := __Evaluate( oItem:Action, oItem,,, nRet )
-                   nRet := oItem:Form:&( oItem:EventHandler[ "OnClick" ] )( oItem )
-                CATCH
-                END
-                RETURN 0
-             ENDIF
-          ENDIF
-      NEXT
-    ELSEIF ( n := ASCAN( ::Children, {|o| o:ID == nId} ) ) > 0
-      oBtn := ::Children[n]
-      IF HGetPos( oBtn:EventHandler, "OnClick" ) != 0
-         nRet := oBtn:Form:&( oBtn:EventHandler[ "OnClick" ] )( oBtn )
-         RETURN nRet
-      ENDIF
-   ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -333,7 +300,6 @@ RETURN NIL
 CLASS CoolMenuItem INHERIT ToolButton
    DATA BackColor             EXPORTED
    DATA ForeColor             EXPORTED
-   DATA Menu                  EXPORTED
    DATA Index                 EXPORTED
    DATA Item                  EXPORTED
    DATA DropDown              EXPORTED
@@ -351,19 +317,12 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA ImageIndex            EXPORTED INIT -2
    DATA __Temprect            EXPORTED
    DATA TreeItem              EXPORTED
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD __AddCoolMenuItem()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CoolMenuItem
-   LOCAL oSubItem
-   IF oParent:DesignMode .AND. oParent:__xCtrlName == "CoolMenuItem"
-      oSubItem := CMenuItem( oParent )
-      oSubItem:Caption := oSubItem:Name
-      oSubItem:__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| oSubItem:__AddCoolMenuItem() } } }
-      RETURN oSubItem
-   ENDIF
    ::IsMenuItem   := .T.
    ::__IsControl  := .F.
    ::__xCtrlName  := "CoolMenuItem"
@@ -373,11 +332,11 @@ METHOD Init( oParent ) CLASS CoolMenuItem
    IF oParent:DesignMode
       __SetInitialValues( Self )
    ENDIF
-   ::Menu := MenuPopup( ::Parent )
-   ::Menu:ThemeActive := ::Application:ThemeActive
 RETURN Self
 
 METHOD Create( nPos ) CLASS CoolMenuItem
+   LOCAL lpMenuInfo := (struct MENUINFO)
+
    DEFAULT ::xCaption TO ::Name
    DEFAULT nPos TO -1
 
@@ -394,13 +353,14 @@ METHOD Create( nPos ) CLASS CoolMenuItem
    IF ::Parent:Owner != NIL
       ::Parent:Owner:SetChevron()
    ENDIF
-   IF ::DesignMode
-      ::Application:ObjectTree:Set( Self )
-      ::__IdeContextMenuItems := { { "&Add CoolMenuItem", {|| ::__AddCoolMenuItem() } } }
+
+   IF ::hMenu == NIL
+      ::hMenu := CreatePopupMenu()
+
+      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      lpMenuInfo:fMask  := MIM_STYLE
+      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      SetMenuInfo( ::hMenu, lpMenuInfo )
    ENDIF
 RETURN Self
 
-//-------------------------------------------------------------------------------------------------------
-METHOD __AddCoolMenuItem() CLASS CoolMenuItem
-   ::Application:Project:SetAction( { { DG_ADDCONTROL, 0, 0, 0, .T., Self, "CoolMenuItem",,,1, {}, } }, ::Application:Project:aUndo )
-RETURN Self
