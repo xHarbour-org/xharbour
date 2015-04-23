@@ -52,7 +52,7 @@ CLASS FormEditor INHERIT TabPage
    METHOD OnNCCalcSize()
    METHOD OnNCPaint()
    METHOD OnNCRButtonUp()
-   METHOD OnNCHitTest()
+   //METHOD OnNCHitTest()
    METHOD OnVertScroll()
    METHOD OnHorzScroll(n)            INLINE IIF( n == SB_THUMBPOSITION, IIF( ::CurForm != NIL, ::CtrlMask:CurForm:UpdateSelection(),),),NIL
    METHOD UpdateScroll()
@@ -188,9 +188,9 @@ METHOD OnNCRButtonUp( nwParam, nlParam ) CLASS FormEditor
    ENDIF
 RETURN 0
 
-METHOD OnNCHitTest( nwParam, nlParam ) CLASS FormEditor
-   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, nwParam, nlParam )
-RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
+//METHOD OnNCHitTest( nwParam, nlParam ) CLASS FormEditor
+//   LOCAL uHitTest := DefWindowProc( ::hWnd, WM_NCHITTEST, nwParam, nlParam )
+//RETURN IIF( uHitTest==0, HTCAPTION, uHitTest )
 
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------

@@ -1646,14 +1646,6 @@ METHOD Create( nPos ) CLASS ToolButton
    ENDIF
    ::lCreated := .T.
 
-   //IF ( ::xWholeDropDown .OR. ::xDropDown ) .AND. ::Menu == NIL
-   //   IF ::ContextMenu == NIL
-   //      ::Menu := MenuPopup( ::Parent )
-   //    ELSE
-   //      ::Menu := ::ContextMenu:Menu
-   //   ENDIF
-   //ENDIF
-
    IF ! ::DesignMode .AND. ::ShortCut != NIL
       ::Form:AddAccelerator( ::ShortCut[1], ::ShortCut[2], ::Id )
    ENDIF
@@ -1661,7 +1653,7 @@ METHOD Create( nPos ) CLASS ToolButton
       ::Application:ObjectTree:Set( Self )
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
    ENDIF
-   IF ::DropDown
+   IF ( ::Style & BTNS_WHOLEDROPDOWN ==  BTNS_WHOLEDROPDOWN ) .OR. ( ::Style & BTNS_DROPDOWN == BTNS_DROPDOWN )
       ::hMenu := CreatePopupMenu()
 
       lpMenuInfo := (struct MENUINFO)
