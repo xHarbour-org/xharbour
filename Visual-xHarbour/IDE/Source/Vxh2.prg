@@ -64,6 +64,7 @@ CLASS WindowEdit INHERIT WinForm
    DATA lCustom             EXPORTED
    DATA __SelMoved          EXPORTED INIT .F.
    DATA __PrevSelRect       EXPORTED
+
    ACCESS CtrlMask          INLINE ::Parent:CtrlMask
 
    DATA __lModified         EXPORTED INIT .F.
@@ -267,13 +268,16 @@ METHOD UpdateSelection( nKey, lDes ) CLASS WindowEdit
    DEFAULT lDes TO .T.
    DEFAULT nKey TO -1
 
-   ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
-   ::CtrlMask:Clean( , .F., lDes )
+   TRY
+      ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      ::CtrlMask:Clean( , .F., lDes )
 
-   IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:hWnd == ::hWnd
-    ELSE
-      RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
-   ENDIF
+      IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:hWnd == ::hWnd
+       ELSE
+         RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN )
+      ENDIF
+   CATCH
+   END
 RETURN Self
 
 //----------------------------------------------------------------------------
