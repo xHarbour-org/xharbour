@@ -86,7 +86,6 @@ CLASS MDIClient INHERIT Window
    ACCESS ClipChildren     INLINE ::Style & WS_CLIPCHILDREN != 0
    ACCESS ClipSiblings     INLINE ::Style & WS_CLIPSIBLINGS != 0
 
-   ACCESS Border         INLINE ::Style & WS_BORDER != 0
    ACCESS PopUp          INLINE ::Style & WS_POPUP != 0
    ACCESS ThickFrame     INLINE ::Style & WS_THICKFRAME != 0
    ACCESS MaximizeBox    INLINE ::Style & WS_MAXIMIZEBOX != 0

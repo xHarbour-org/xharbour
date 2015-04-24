@@ -61,7 +61,6 @@ CLASS ToolTip INHERIT Window
    ACCESS Transparent    INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
 
    ACCESS Child          INLINE ::Style & WS_CHILD != 0
-   ACCESS Border         INLINE ::Style & WS_BORDER != 0
    ACCESS PopUp          INLINE ::Style & WS_POPUP != 0
    ACCESS ControlParent  INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer   INLINE ::xMdiContainer

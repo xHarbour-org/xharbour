@@ -881,7 +881,7 @@ CLASS TabPage INHERIT Dialog
    ACCESS ThickFrame       INLINE ::Style & WS_THICKFRAME != 0
    ACCESS MinimizeBox      INLINE ::Style & WS_MINIMIZEBOX != 0
    ACCESS MaximizeBox      INLINE ::Style & WS_MAXIMIZEBOX != 0
-   ACCESS Border           INLINE ::Style & WS_BORDER != 0
+
    ACCESS TabStop          INLINE ::Style & WS_TABSTOP != 0
    ACCESS ClipSiblings     INLINE ::Style & WS_CLIPSIBLINGS != 0
    ACCESS CaptionBar       INLINE ::Style & WS_CAPTION != 0
