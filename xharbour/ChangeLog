@@ -9,6 +9,17 @@
 */
 
 
+2015-01-05 14:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  ! source/vm/itemapi.c
+    ! in hb_itemStrCmp optimized for check is both parameters is same as also size is same
+  ! source/vm/hvm.c
+    ! in hb_vmEqual when  bExact  is set to true and both parameters is string, using also memcmp to compare strings    
+  ! tipssl\httpcln.prg
+    ! added data cLogfile
+    ! in method new use clogfile to create the log filename
+  ! source/common/hbstr.c
+    ! ULONG     -> HB_SIZE where aplicable  
+
 2015-04-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   ! source/rtl/str.c
     ! generate RTL when passing string with any size as parameter
@@ -15876,3 +15887,5 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
+
+    

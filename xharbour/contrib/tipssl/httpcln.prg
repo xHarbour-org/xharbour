@@ -73,6 +73,7 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA cConnetion   INIT "close"
    DATA cBoundary
    DATA aAttachments init {}
+   DATA cLogFile 
 
    METHOD New( oUrl,lTrace, oCredentials)
    METHOD Get( cQuery )
@@ -131,7 +132,8 @@ METHOD New( oUrl,lTrace, oCredentials, CAFile,CaPath ) CLASS tIPClientHTTP
          while file( cFile + alltrim( str( n, 4 ) ) + ".log")
            n++
          enddo
-         ::nHandle := fcreate( cFile + alltrim( str( n, 4 ) ) + ".log")
+         ::cLogFile := cFile + LTrim( Str( Int(n ) ) ) + ".log"
+         ::nHandle  := FCreate( ::cLogFile )         
       endif
    endif
 

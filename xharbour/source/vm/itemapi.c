@@ -1318,6 +1318,9 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
    ulLenFirst  = pFirst->item.asString.length;
    ulLenSecond = pSecond->item.asString.length;
 
+   if( szFirst == szSecond && ulLenFirst == ulLenSecond )
+      return 0;
+   
    if( ! bForceExact && hb_stackSetStruct()->HB_SET_EXACT )
    {
       /* SET EXACT ON and not using == */

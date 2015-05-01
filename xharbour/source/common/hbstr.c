@@ -1153,10 +1153,10 @@ char * hb_stripOutComments( char * buffer, BOOL bStripString )
 {
    if( buffer && *buffer )
    {
-      ULONG  ui    = ( ULONG ) strlen( buffer );
+      HB_SIZE  ui    = ( HB_SIZE ) strlen( buffer );
       char * szOut = ( char * ) hb_xgrab( ui + 1 );
-      ULONG  i;
-      ULONG  uu    = 0;
+      HB_SIZE  i;
+      HB_SIZE  uu    = 0;
       char   sCurrent;
 
       hb_xmemset( szOut, 0, ui + 1 );

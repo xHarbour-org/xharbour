@@ -4912,10 +4912,24 @@ static void hb_vmEqual( BOOL bExact )
    }
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
-      int i = hb_itemStrCmp( pItem1, pItem2, bExact );
+	  BOOL i; 
+	  if ( bExact ) 
+	  {
+         i = pItem1->item.asString.length == pItem2->item.asString.length &&
+                        ( pItem1->item.asString.value == pItem2->item.asString.value ||
+                          memcmp( pItem1->item.asString.value,
+                                  pItem2->item.asString.value,
+                                  pItem1->item.asString.length ) == 0 );
+		  
+	  }
+	  else
+	  {
+	  
+         i = hb_itemStrCmp( pItem1, pItem2, bExact ) == 0;
+      }
       hb_stackPop();
       hb_stackPop();
-      hb_vmPushLogical( i == 0 );
+      hb_vmPushLogical( i );
    }
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
    {
