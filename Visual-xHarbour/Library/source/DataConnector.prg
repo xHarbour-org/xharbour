@@ -19,8 +19,8 @@ CLASS SqlConnector INHERIT Component
 
 
    // Private use
-   DATA EnumServer       EXPORTED INIT { { "AutoDetect", "ODBC", "RPC", "MySQL", "Postgres", "Oracle", "Firebird" }, {0,1,2,3,4,5,6} }
-   DATA aIncLibs         EXPORTED INIT   { NIL, NIL, NIL, "libmysql.lib", "libpq", "oci", "fbclient_ms.lib" }
+   DATA EnumServer       EXPORTED INIT { { "AutoDetect", "ODBC", "RPC", "MySQL", "Postgres", "Oracle", "Firebird","MariaDb" }, {0,1,2,3,4,5,6,7} }
+   DATA aIncLibs         EXPORTED INIT   { NIL, NIL, NIL, "libmysql.lib", "libpq", "oci", "fbclient_ms.lib","libmysql.lib" }
    DATA Events           EXPORTED INIT {  {"General", { { "OnConnect"     , "", "" },;
                                                         { "OnDisconnect" , "", "" } } } }
 

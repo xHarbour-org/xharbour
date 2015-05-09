@@ -5841,7 +5841,11 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
              cText += "   REQUEST SR_MYSQL" + CRLF
              cText += "   REQUEST SR_FIREBIRD" + CRLF
            ELSE
-             cText += "   REQUEST SR_" + UPPER( oChild:EnumServer[1][ oChild:Server+1 ] )  + CRLF
+             IF UPPER( oChild:EnumServer[1][ oChild:Server+1 ] ) == "POSTGRES"
+                cText += "   REQUEST SR_PGS" + CRLF
+             ELSE
+                cText += "   REQUEST SR_" + UPPER( oChild:EnumServer[1][ oChild:Server+1 ] )  + CRLF
+             ENDIF
              IF oChild:aIncLibs[ oChild:Server+1 ] != NIL
                 AADD( ::__ExtraLibs, oChild:aIncLibs[ oChild:Server+1 ] )
              ENDIF

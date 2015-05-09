@@ -8,6 +8,12 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-05-09 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * IDE/Source/Vxh1.prg
+    ! On GenerateControl method, if Selected Database is POSTGRES, add the correct SR_XXXX REQUEST to generated code
+  * Library/source/DataConnector.prg    
+    ! Added Support for MariaDB By Adding to EnumServer Array as also it client library to aIncLibs
+    
 2014-10-07 00:11 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * Library/SourceC/ExplorBar.c
   * Library/SourceC/FastWinAPI.c
