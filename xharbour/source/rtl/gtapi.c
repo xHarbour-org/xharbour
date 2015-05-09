@@ -673,7 +673,7 @@ HB_ERRCODE hb_gtPutText( USHORT uiRow, USHORT uiCol,
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtPutText(%hu, %hu, %p, %lu, %d)", uiRow, uiCol, pStr, ulLength, iColor ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtPutText(%hu, %hu, %p, %" HB_PFS "u, %d)", uiRow, uiCol, pStr, ulLength, iColor ) );
 
    pGT = hb_gt_Base();
    if( pGT )
@@ -693,7 +693,7 @@ HB_ERRCODE hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, HB_SIZE ulLeng
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWriteAt(%hu, %hu, %p, %lu)", uiRow, uiCol, pStr, ulLength ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWriteAt(%hu, %hu, %p, %" HB_PFS "u)", uiRow, uiCol, pStr, ulLength ) );
 
    pGT = hb_gt_Base();
    if( pGT )
@@ -709,7 +709,7 @@ HB_ERRCODE hb_gtWrite( BYTE * pStr, HB_SIZE ulLength )
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWrite(%p, %lu)", pStr, ulLength ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWrite(%p, %" HB_PFS "u)", pStr, ulLength ) );
 
    pGT = hb_gt_Base();
    if( pGT )
@@ -725,7 +725,7 @@ HB_ERRCODE hb_gtWriteCon( BYTE * pStr, HB_SIZE ulLength )
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWriteCon(%p, %lu)", pStr, ulLength ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtWriteCon(%p, %" HB_PFS "u)", pStr, ulLength ) );
 
    pGT = hb_gt_Base();
    if( pGT )
@@ -864,7 +864,7 @@ HB_ERRCODE hb_gtOutStd( BYTE * pbyStr, HB_SIZE ulLen )
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtOutStd(%p, %lu)", pbyStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtOutStd(%p, %" HB_PFS "u)", pbyStr, ulLen ) );
 
    pGT = hb_gt_Base();
    if( pGT )
@@ -879,7 +879,7 @@ HB_ERRCODE hb_gtOutErr( BYTE * pbyStr, HB_SIZE ulLen )
 {
    PHB_GT pGT;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gtOutErr(%p, %lu)", pbyStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gtOutErr(%p, %" HB_PFS "u)", pbyStr, ulLen ) );
 
    pGT = hb_gt_Base();
    if( pGT )

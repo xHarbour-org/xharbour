@@ -692,7 +692,7 @@ METHOD WriteAll( cFile ) CLASS tIPClientHTTP
 METHOD CLOSE() CLASS TIPClientHTTP
 
    IF ::lSSL
-      InetSSLSetTimeOut( ::SocketCon, ::nConnTimeout )
+      InetSSLSetTimeOut( ::SocketSSLCon, ::nConnTimeout )
    ELSE
       InetSetTimeOut( ::SocketCon, ::nConnTimeout )
    ENDIF 

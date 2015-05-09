@@ -1250,24 +1250,25 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_waTransRec(%p, %p)", pArea, pTransInfo ) );
 
-   /* Record deleted? */
-   errCode = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
-   if( errCode != HB_SUCCESS )
-      return errCode;
 
    if( pTransInfo->uiFlags & DBTF_MATCH && pTransInfo->uiFlags & DBTF_PUTREC )
    {
-      errCode = SELF_GETREC( ( AREAP ) pArea, &pRecord );
+      /* Record deleted? */
+      errCode = SELF_DELETED(  pArea, &bDeleted );
       if( errCode != HB_SUCCESS )
          return errCode;
-
+	   
+      errCode = SELF_GETREC(  pArea, &pRecord );
+      if( errCode != HB_SUCCESS )
+         return errCode;
+	
       /* Append a new record */
-      errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );
+      errCode = SELF_APPEND(  pTransInfo->lpaDest, TRUE );
       if( errCode != HB_SUCCESS )
          return errCode;
 
       /* Copy record */
-      errCode = SELF_PUTREC( ( AREAP ) pTransInfo->lpaDest, pRecord );
+      errCode = SELF_PUTREC(  pTransInfo->lpaDest, pRecord );
    }
    else
    {
@@ -1275,8 +1276,18 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
       PHB_ITEM       pItem;
       USHORT         uiCount;
 
+      if( pTransInfo->uiFlags & DBTF_RECALL )
+         bDeleted = FALSE;
+      else
+      {
+         /* Record deleted? */
+         errCode = SELF_DELETED( pArea, &bDeleted );
+         if( errCode != HB_SUCCESS )
+            return errCode;
+      }
+      
       /* Append a new record */
-      errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );
+      errCode = SELF_APPEND(  pTransInfo->lpaDest, TRUE );
       if( errCode != HB_SUCCESS )
          return errCode;
 
@@ -1284,11 +1295,11 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
       pTransItem  = pTransInfo->lpTransItems;
       for( uiCount = pTransInfo->uiItemCount; uiCount; --uiCount )
       {
-         errCode = SELF_GETVALUE( ( AREAP ) pArea,
+         errCode = SELF_GETVALUE(  pArea,
                                   pTransItem->uiSource, pItem );
          if( errCode != HB_SUCCESS )
             break;
-         errCode = SELF_PUTVALUE( ( AREAP ) pTransInfo->lpaDest,
+         errCode = SELF_PUTVALUE(  pTransInfo->lpaDest,
                                   pTransItem->uiDest, pItem );
          if( errCode != HB_SUCCESS )
             break;
@@ -1300,15 +1311,21 @@ static HB_ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
    /* Delete the new record if copy fail */
    if( errCode != HB_SUCCESS )
    {
-      SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
+      SELF_DELETE(  pTransInfo->lpaDest );
       return errCode;
    }
+   else if( bDeleted )
+   {
+      /* Record with deleted flag */
+      if( pTransInfo->uiFlags & DBTF_RECALL )
+         errCode = SELF_RECALL( pTransInfo->lpaDest );
+      else
+         errCode = SELF_DELETE( pTransInfo->lpaDest );
+   }
 
-   /* Delete the new record */
-   if( bDeleted )
-      return SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
 
-   return HB_SUCCESS;
+   return errCode;
+
 }
 
 /*

@@ -56,7 +56,7 @@
 
 BOOL hb_strEmpty( const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strEmpty(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strEmpty(%s, %" HB_PFS "u)", szText, ulLen ) );
 
    while( ulLen-- )
    {

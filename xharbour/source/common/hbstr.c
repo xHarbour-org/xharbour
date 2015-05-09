@@ -93,12 +93,12 @@ const char * hb_szAscii[ 256 ] =
 
 HB_SIZE hb_strAt( const char * szSub, HB_SIZE ulSubLen, const char * szText, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strAt(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strAt(%s, %" HB_PFS "u, %s, %" HB_PFS "u)", szSub, ulSubLen, szText, ulLen ) );
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {
-      ULONG ulPos    = 0;
-      ULONG ulSubPos = 0;
+      HB_SIZE ulPos    = 0;
+      HB_SIZE ulSubPos = 0;
 
       while( ulPos < ulLen && ulSubPos < ulSubLen )
       {
@@ -153,7 +153,7 @@ char * hb_strdup( const char * pszText )
    char *  pszDup;
    HB_SIZE ulLen = strlen( pszText ) + 1;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strdup(%s, %ld)", pszText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strdup(%s, %" HB_PFS "d)", pszText, ulLen ) );
 
    pszDup = ( char * ) hb_xgrab( ulLen );
    HB_MEMCPY( pszDup, pszText, ( size_t ) ulLen );
@@ -166,7 +166,7 @@ char * hb_strndup( const char * pszText, HB_SIZE ulLen )
    char *  pszDup;
    HB_SIZE ul;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strndup(%s, %ld)", pszText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strndup(%s, %" HB_PFS "d)", pszText, ulLen ) );
 
    ul     = 0;
    pszDup = ( char * ) pszText;
@@ -182,9 +182,9 @@ char * hb_strndup( const char * pszText, HB_SIZE ulLen )
 
 HB_SIZE hb_strnlen( const char * pszText, HB_SIZE ulLen )
 {
-   ULONG ul = 0;
+   HB_SIZE ul = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strnlen(%s, %ld)", pszText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strnlen(%s, %" HB_PFS "d)", pszText, ulLen ) );
 
    while( ulLen-- && *pszText++ )
       ++ul;
@@ -215,7 +215,7 @@ char * hb_strduptrim( const char * pszText )
 
 HB_SIZE hb_strlentrim( const char * pszText )
 {
-   ULONG ul = 0;
+   HB_SIZE ul = 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_strlentrim(%s)", pszText ) );
 
@@ -292,10 +292,10 @@ int hb_symcmp( const char * s1, const char * s2 )
 /* warning: It is not case sensitive */
 int hb_strnicmp( const char * s1, const char * s2, HB_SIZE count )
 {
-   ULONG ulCount;
+   HB_SIZE ulCount;
    int   rc = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strnicmp(%s, %s, %lu)", s1, s2, count ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strnicmp(%s, %s, %" HB_PFS "u)", s1, s2, count ) );
 
    for( ulCount = 0; ulCount < count; ulCount++ )
    {
@@ -578,16 +578,18 @@ double hb_numExpConv( double dNum, int iExp )
 static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth, BOOL * pbError )
 {
    BOOL      fDbl  = FALSE, fDec = FALSE, fNeg, fHex = FALSE;
-   ULONG     ulPos = 0;
+   int       ulPos = 0,iLen;
    HB_MAXDBL dlVal = 0;
    int       c, iWidth, iDec = 0, iDecR = 0;
+   
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_str2number(%d, %p, %lu, %p, %p, %p, %p, %p)", ( int ) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth, pbError ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_str2number(%d, %p, %" HB_PFS "u, %p, %p, %p, %p, %p)", ( int ) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth, pbError ) );
 
-   while( ulPos < ulLen && isspace( ( BYTE ) szNum[ ulPos ] ) )
+   iLen = ( int ) ulLen;   
+   while( ulPos < iLen && isspace( ( BYTE ) szNum[ ulPos ] ) )
       ulPos++;
 
-   if( ulPos >= ulLen )
+   if( ulPos >= iLen )
    {
       fNeg = FALSE;
    }
@@ -606,13 +608,13 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
    *lVal = 0;
 
    /* Hex Number */
-   if( fPCode && ulPos + 1 < ulLen && szNum[ ulPos ] == '0' &&
+   if( fPCode && ulPos + 1 < iLen && szNum[ ulPos ] == '0' &&
        ( szNum[ ulPos + 1 ] == 'X' || szNum[ ulPos + 1 ] == 'x' ) )
    {
       ulPos += 2;
       iWidth = HB_DEFAULT_WIDTH;
       fHex   = TRUE;
-      for( ; ulPos < ulLen; ulPos++ )
+      for( ; ulPos < iLen; ulPos++ )
       {
          c = szNum[ ulPos ];
          if( c >= '0' && c <= '9' )
@@ -637,7 +639,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
 
       iWidth = ulPos;
 
-      for( ; ulPos < ulLen; ulPos++ )
+      for( ; ulPos < iLen; ulPos++ )
       {
          c = szNum[ ulPos ];
          if( c >= '0' && c <= '9' )
@@ -668,7 +670,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
          {
             if( pbError == NULL )
             {
-               while( ! fDec && ulPos < ulLen )
+               while( ! fDec && ulPos < iLen )
                {
                   if( szNum[ ulPos++ ] == '.' )
                      fDec = TRUE;
@@ -676,7 +678,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
                      iWidth++;
                }
                if( fDec )
-                  iDecR = ( int ) ( ulLen - ulPos );
+                  iDecR = ( int ) ( iLen - ulPos );
             }
             break;
          }
@@ -687,11 +689,11 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
    {
 
 #if 1
-      while( szNum[ ulLen ] == ' ' )
-         ulLen--;
+      while( szNum[ iLen ] == ' ' )
+         iLen--;
 #endif
 
-      if( ulPos + 1 == ulLen )
+      if( ulPos + 1 == iLen )
       {
          switch( szNum[ ulPos ] )
          {
@@ -705,7 +707,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
                break;
          }
       }
-      else if( ulPos + 2 == ulLen )
+      else if( ulPos + 2 == iLen )
       {
          char szSuffix[ 3 ];
 
@@ -716,7 +718,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
          if( strstr( "LULL", szSuffix ) ) //LU UL or LL
             ulPos += 2;
       }
-      else if( ulPos + 3 == ulLen )
+      else if( ulPos + 3 == iLen )
       {
          char szSuffix[ 4 ];
 
@@ -729,7 +731,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
             ulPos += 3;
       }
 
-      if( ulPos < ulLen )
+      if( ulPos < iLen )
          *pbError = TRUE;
    }
 
@@ -784,7 +786,7 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
          else
          {
             if( iDec + iDecR == 0 )
-               *piWidth = ( int ) ulLen;
+               *piWidth = ( int ) iLen;
             else if( iWidth == 0 )
                *piWidth = 1;
             else if( fNeg && iWidth == 1 && *dVal != 0 )
@@ -800,19 +802,19 @@ static BOOL hb_str2number( BOOL fPCode, const char * szNum, HB_SIZE ulLen, HB_LO
 
 BOOL hb_compStrToNum( const char * szNum, HB_SIZE ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_compStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_compStrToNum( %s, %" HB_PFS "u, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ) );
    return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth, NULL );
 }
 
 BOOL hb_compStrToNumErr( const char * szNum, HB_SIZE ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL * pbError )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_compStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth, pbError ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_compStrToNum( %s, %" HB_PFS "u, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth, pbError ) );
    return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth, pbError );
 }
 
 BOOL hb_valStrnToNum( const char * szNum, HB_SIZE ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_valStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_valStrToNum( %s, %" HB_PFS "u, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ) );
    return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, piDec, piWidth, NULL );
 }
 
@@ -824,7 +826,7 @@ BOOL hb_strToNum( const char * szNum, HB_LONG * plVal, double * pdVal )
 
 BOOL hb_strnToNum( const char * szNum, HB_SIZE ulLen, HB_LONG * plVal, double * pdVal )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strToNum(%s, %lu, %p, %p)", szNum, ulLen, plVal, pdVal ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strToNum(%s, %" HB_PFS "u, %p, %p)", szNum, ulLen, plVal, pdVal ) );
    return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, NULL, NULL, NULL );
 }
 
@@ -834,7 +836,7 @@ double hb_strVal( const char * szText, HB_SIZE ulLen )
    HB_LONG lVal;
    double  dVal;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strVal(%s, %lu)", szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strVal(%s, %" HB_PFS "u)", szText, ulLen ) );
 
    if( ! hb_str2number( FALSE, szText, ulLen, &lVal, &dVal, NULL, NULL, NULL ) )
       dVal = ( double ) lVal;
@@ -866,7 +868,7 @@ char * hb_strncpy( char * pDest, const char * pSource, HB_SIZE ulLen )
 {
    char * pBuf = pDest;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpy(%p, %s, %lu)", pDest, pSource, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpy(%p, %s, %" HB_PFS "u)", pDest, pSource, ulLen ) );
 
    pDest[ ulLen ] = '\0';
 
@@ -888,7 +890,7 @@ char * hb_strncat( char * pDest, const char * pSource, HB_SIZE ulLen )
 {
    char * pBuf = pDest;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strncat(%p, %s, %lu)", pDest, pSource, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncat(%p, %s, %" HB_PFS "u)", pDest, pSource, ulLen ) );
 
    pDest[ ulLen ] = '\0';
 
@@ -921,7 +923,7 @@ char * hb_strncpyUpper( char * pDest, const char * pSource, HB_SIZE ulLen )
 {
    char * pBuf = pDest;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyUpper(%p, %s, %lu)", pDest, pSource, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyUpper(%p, %s, %" HB_PFS "u)", pDest, pSource, ulLen ) );
 
    pDest[ ulLen ] = '\0';
 
@@ -949,9 +951,9 @@ char * hb_strncpyUpper( char * pDest, const char * pSource, HB_SIZE ulLen )
 char * hb_strncpyUpperTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
 {
    char * pBuf = pDest;
-   ULONG  ulSLen;
+   HB_SIZE  ulSLen;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyUpperTrim(%p, %s, %lu)", pDest, pSource, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyUpperTrim(%p, %s, %" HB_PFS "u)", pDest, pSource, ulLen ) );
 
    ulSLen = 0;
    while( ulSLen < ulLen && pSource[ ulSLen ] )
@@ -986,9 +988,9 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
 char * hb_strncpyTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
 {
    char * pBuf = pDest;
-   ULONG  ulSLen;
+   HB_SIZE  ulSLen;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyTrim(%p, %s, %lu)", pDest, pSource, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyTrim(%p, %s, %" HB_PFS "u)", pDest, pSource, ulLen ) );
 
    ulSLen = 0;
    while( ulSLen < ulLen && pSource[ ulSLen ] )
@@ -1233,7 +1235,7 @@ char * hb_strerror( int errNum )
 /* 'pDest' must be double the size of 'size' */
 void hb_strtohex( const char * pSource, HB_SIZE size, char * pDest )
 {
-   ULONG i;
+   HB_SIZE i;
 
    for( i = 0; i < size; i++ )
    {

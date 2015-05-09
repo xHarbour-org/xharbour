@@ -1905,7 +1905,7 @@ HB_FUNC( __DBARRANGE )
    if( pArea )
    {
       USHORT      uiNewArea, uiCount, uiDest;
-      ULONG       ulSize;
+      HB_SIZE     ulSize;
       char *      szFieldLine, * szPos;
       PHB_ITEM    pStruct, pFields;
       DBSORTINFO  dbSortInfo;
@@ -1965,6 +1965,9 @@ HB_FUNC( __DBARRANGE )
       dbSortInfo.dbtri.dbsci.fIncludeDeleted          = TRUE;
 
       pFields                                         = hb_param( 8, HB_IT_ARRAY );
+         /* do not transfer record deleted flag to destination area */
+      dbSortInfo.dbtri.uiFlags |= DBTF_RECALL;
+      
       dbSortInfo.uiItemCount                          = pFields ? ( USHORT ) hb_arrayLen( pFields ) : 0;
       if( dbSortInfo.uiItemCount > 0 )
       {
@@ -1972,7 +1975,7 @@ HB_FUNC( __DBARRANGE )
          ulSize               = 0;
          for( uiCount = 1; uiCount <= dbSortInfo.uiItemCount; ++uiCount )
          {
-            ULONG ulLine = ( ULONG ) hb_arrayGetCLen( pFields, uiCount );
+            HB_SIZE ulLine =  hb_arrayGetCLen( pFields, uiCount );
             if( ulLine > ulSize )
                ulSize = ulLine;
          }

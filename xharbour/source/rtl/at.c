@@ -140,7 +140,7 @@ HB_SIZE hb_AtSkipStrings( const char * szSub, HB_SIZE ulSubLen, const char * szT
 {
    char cLastChar = ' ';
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_AtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_AtSkipStrings(%s, %" HB_PFS "u, %s, %" HB_PFS "u)", szSub, ulSubLen, szText, ulLen ) );
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {

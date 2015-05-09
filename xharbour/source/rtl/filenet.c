@@ -347,11 +347,11 @@ static BOOL hb_fileNetUnlock( PHB_FILE pFile, BOOL * pfLockFS,
 
 static char * hb_strToken( char * szText, HB_SIZE ulText, HB_SIZE ulIndex, HB_SIZE * pulLen )
 {
-   ULONG ulStart;
-   ULONG ulEnd       = 0;
-   ULONG ulCounter   = 0;
+   HB_SIZE ulStart;
+   HB_SIZE ulEnd       = 0;
+   HB_SIZE ulCounter   = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_strToken(%s, %lu, %lu, %d, %p)", szText, ulText, ulIndex, pulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strToken(%s, %" HB_PFS "u, %" HB_PFS "u, %d, %p)", szText, ulText, ulIndex, pulLen ) );
 
    do
    {

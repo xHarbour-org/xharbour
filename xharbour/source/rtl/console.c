@@ -203,7 +203,7 @@ HB_FUNC( HB_OSNEWLINE )
 /* Output an item to STDOUT */
 void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutStd(%s, %lu)", pStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutStd(%s, %" HB_PFS "u)", pStr, ulLen ) );
 
    if( ulLen == 0 )
       ulLen = strlen( pStr );
@@ -218,7 +218,7 @@ void hb_conOutStd( const char * pStr, HB_SIZE ulLen )
 /* Output an item to STDERR */
 void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutErr(%s, %lu)", pStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutErr(%s, %" HB_PFS "u)", pStr, ulLen ) );
 
 #ifdef HB_OS_WIN
    OutputDebugString( pStr );
@@ -240,7 +240,7 @@ void hb_conOutErr( const char * pStr, HB_SIZE ulLen )
 /* Output an item to the screen and/or printer and/or alternate */
 void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutAlt(%s, %lu)", pStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutAlt(%s, %" HB_PFS "u)", pStr, ulLen ) );
 
    if( hb_setGetConsole() )
       hb_gtWriteCon( ( BYTE * ) pStr, ulLen );
@@ -274,7 +274,7 @@ void hb_conOutAlt( const char * pStr, HB_SIZE ulLen )
 /* Output an item to the screen and/or printer */
 static void hb_conOutDev( const char * pStr, HB_SIZE ulLen )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutDev(%s, %lu)", pStr, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_conOutDev(%s, %" HB_PFS "u)", pStr, ulLen ) );
 
    if( hb_setGetPrintHan() != FS_ERROR &&
        hb_stricmp( hb_setGetDevice(), "PRINTER" ) == 0 )

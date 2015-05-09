@@ -2603,7 +2603,7 @@ HB_SIZE hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount )
    HB_THREAD_STUB
    ULONG ulRead;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsReadLarge(%p, %p, %lu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsReadLarge(%p, %p, %" HB_PFS "u)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount ) );
 
 #if defined( HB_FS_FILE_IO )
 
@@ -2684,7 +2684,7 @@ HB_SIZE hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE ulC
    HB_THREAD_STUB
    ULONG ulWritten;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsWriteLarge(%p, %p, %lu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsWriteLarge(%p, %p, %" HB_PFS "u)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount ) );
 
 #if defined( HB_FS_FILE_IO )
 
@@ -2845,7 +2845,7 @@ HB_SIZE hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE ulCoun
    HB_THREAD_STUB
    ULONG ulWritten;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsWriteAt(%p, %p, %lu, %" PFHL "i)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount, llOffset ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsWriteAt(%p, %p, %" HB_PFS "u, %" PFHL "i)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount, llOffset ) );
 
 #if defined( HB_FS_FILE_IO )
 
@@ -3033,7 +3033,7 @@ BOOL hb_fsLock( HB_FHANDLE hFileHandle, HB_SIZE ulStart,
    static BOOL s_bInit = 0, s_bWinNt;
 #endif
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsLock(%p, %lu, %lu, %hu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, ulStart, ulLength, uiMode ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsLock(%p, %" HB_PFS "u, %" HB_PFS "u, %hu)", ( void * ) ( HB_PTRDIFF ) hFileHandle, ulStart, ulLength, uiMode ) );
 
    hb_vmUnlock();
 

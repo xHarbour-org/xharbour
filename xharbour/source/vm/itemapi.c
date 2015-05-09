@@ -1384,17 +1384,10 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
       if( ulLenFirst != ulLenSecond )
       {
          if( bForceExact )
-         {
-            iRet = 1;
-
-            if( ulLenFirst < ulLenSecond )
-               iRet = -1;
-         }
+            iRet = ( ulLenFirst < ulLenSecond ) ? -1 : 1;
          else
-         {
-            if( ulLenSecond )
-               iRet = -1;
-         }
+            iRet = ( ulLenSecond == 0 ) ? 0 : -1;
+         
       }
       /* Both empty => Equal!, iRet = 0 */
    }

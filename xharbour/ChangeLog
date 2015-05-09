@@ -9,20 +9,71 @@
 */
 
 
+2015-05-09 17:55 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * contrib/tipssl/httpcln.prg
+    ! minor fix on CLOSE method
+  * include/hbapi.h
+    ! hb_strLTrim Added const to function signature      
+  * include/hbapirdd.h
+    ! added defined to DBTF_CPYCTR and DBTF_RECALL borrow from harbour
+  * source/common/expropt1.c
+    ! in hb_compExprNewString change direct %lu with %" HB_PFS " to make some c compiler happy
+  * source/common/hbstr.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+    ! on HB_TRACE changed direct %ld with %" HB_PFS "d to make some c compiler happy
+    ! ULONG -> HB_SIZE when applicable
+  * source/rdd/dbcmd.c
+    ! in function __DBARRANGE ULONG -> HB_SIZE where aplicable  
+    ! Removed unnecessary cast to ULONG     
+  * source/rdd/workarea.c
+    ! fixed wrong behavior on deleted records in hb_waTransRec() Fix ideia borrow from harbour  
+  * source/rtl/at.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+  ! source/rtl/console.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+  ! source/rtl/descend.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy    
+  ! source/rtl/filenet.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy        
+    ! ULONG -> HB_SIZE when applicable
+  ! source/rtl/filesys.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy            
+  ! source/rtl/gtapi.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                
+  ! source/rtl/hardcr.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                    
+  ! source/rtl/hbgtcore.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                        
+  ! source/rtl/inkey.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+  ! source/rtl/inkeyapi.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+  ! source/rtl/mtran.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+  ! source/rtl/strings.c
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+  * source/rtl/trim.c  
+    ! hb_strLTrim Added const to function signature
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+    ! added const to declaration of variable szText in LTRIM and ALLTRIM function          
+  * source/vm/itemapi.c
+    ! just an minor refine on last commit on hb_itemStrCmp if len of bothstring is 0 and string is same return 0    
+      
 2015-05-05 11:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rdd\workarea.c
+  * source/rdd/workarea.c
     ! fixed wrong behavior on deleted records in hb_waTransRec()
 
-2015-01-05 14:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-05-01 14:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
   ! source/vm/itemapi.c
     ! in hb_itemStrCmp optimized for check is both parameters is same as also size is same
   ! source/vm/hvm.c
     ! in hb_vmEqual when  bExact  is set to true and both parameters is string, using also memcmp to compare strings    
-  ! tipssl\httpcln.prg
+  ! tipssl/httpcln.prg
     ! added data cLogfile
     ! in method new use clogfile to create the log filename
   ! source/common/hbstr.c
-    ! ULONG     -> HB_SIZE where aplicable  
+    ! ULONG -> HB_SIZE where aplicable  
 
 2015-04-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   ! source/rtl/str.c
@@ -35,7 +86,7 @@
     
 
 2015-04-07 23:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\mtran.c
+  * source/rtl/mtran.c
     ! fixed replace when null string is specified
 
 
@@ -46,10 +97,10 @@
     ! Moved BOOL hb_ads_bOEM = FALSE; to outside #ifdef ADS_USE_OEM_TRANSLATION block
     
 2015-03-28 16:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
-  ! winmake\makefile.bc
-  ! winmake\makefile.vc
+  ! winmake/makefile.bc
+  ! winmake/makefile.vc
     ! added gtwvw to dll build
-  ! winmake\dll.lst
+  ! winmake/dll.lst
     ! added gtwvw to list
   ! include/hbapi.h
     ! added hb_winmainGetInstance() to HB_OS_WIN section  
@@ -59,20 +110,20 @@
     ! added return of numeric part in hb_parns when type is string and lenght is 1 
   ! source/vm/cmdarg.c
     ! added hb_winmainGetInstance to return the instance	  
-  ! contrib\gtwvw\gtwvw.c 
+  ! contrib/gtwvw/gtwvw.c 
     ! changed hb_hInstance to s_pWvwData->hInstance   where applicable
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib\gtwvw\wvwcheck.c 
+  ! contrib/gtwvw/wvwcheck.c 
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib\gtwvw\wvwedit.c 
+  ! contrib/gtwvw/wvwedit.c 
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib\gtwvw\wvwfuncs.c 
+  ! contrib/gtwvw/wvwfuncs.c 
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
-  ! contrib\gtwvw\wvwmenu.c 
+  ! contrib/gtwvw/wvwmenu.c 
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
-  ! contrib\gtwvw\wvwstbar.c 
+  ! contrib/gtwvw/wvwstbar.c 
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib\gtwvw\wvwtbar.c
+  ! contrib/gtwvw/wvwtbar.c
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
   ! source/rtl/empty.c  
     ! changed to use itemapi insted of direct structure manipulation
@@ -172,9 +223,9 @@
         IsOLEObjectActive( <cOleName> | <cCLSID> [, @<cCLSID>] )  -> lActive
 
 2015-02-22 20:54 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\copyfile.c
+  * source/rtl/copyfile.c
     ! removed not used variable usRead1
-  * contrib\gtwvw\gtwvw.c
+  * contrib/gtwvw/gtwvw.c
     ! removed unreachable code in MsgTrans
     ! commented out unused MsgTrans
 
@@ -201,23 +252,23 @@
     ! fix to compile under OpenWatcom
 
 2015-02-17 20:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * contrib\tipssl\sendmail.prg
+  * contrib/tipssl/sendmail.prg
     ! removed not declared and not used variable e
     ! removed not used variable lAuthLogin
     ! removed not used variable lAuthPlain
     ! removed not used variable lStartTls
 
 2015-02-17 19:46 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\fparse.c
+  * source/rtl/fparse.c
     ! removed SubArray unused initialization in HB_FUNC( FPARSEEX )
     ! removed Array unused initialization in HB_FUNC( FPARSEEX )
 
 2015-02-17 19:15 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * contrib\tipssl\smtpcln.prg
+  * contrib/tipssl/smtpcln.prg
     ! removed lOk unused initialization in METHOD OpenSecure
 
 2015-02-17 16:27 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * contrib\tipssl\smtpcln.prg
+  * contrib/tipssl/smtpcln.prg
     ! removed unused variable SocketConNew
 
 2015-02-17 11:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
@@ -297,9 +348,9 @@
     + added INETFD function to return the socked handle
 
 2015-02-13 13:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\filestat.c
+  * source/rtl/filestat.c
     ! include of windows.h is now inside HB_OS_WIN block (it wasn't)
-  * source\rtl\hbffind.c
+  * source/rtl/hbffind.c
     ! fixed definition of FILE_ATTRIBUTE_ENCRYPTED
 
 2015-02-13 09:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
@@ -335,9 +386,9 @@
       or .jpeg. this is usefull for htlm emails with images on email body
 
 2015-02-13 10:49 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * contrib\hbzlib\zip.c
+  * contrib/hbzlib/zip.c
     ! fixed a typo in previous commit (#if define -> #if defined)
-  * source\vm\initsymb.c
+  * source/vm/initsymb.c
     ! fixed an old typo (REPLICATE -> RIGHT)
 
 2015-02-12 17:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
@@ -348,9 +399,9 @@
     ! changed * nix detection from  #if defined( HB_OS_LINUX ) || defined( HB_OS_HPUX ) to #if defined(HB_OS_UNIX)
 
 2015-02-12 11:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\ct\files.c
+  * source/ct/files.c
     ! removed dwFileSize unused initialization in HB_FUNC( FILESIZE )
-  * contrib\hbmzip\hbmzip.c
+  * contrib/hbmzip/hbmzip.c
     ! removed ulExtAttr unused initialization in hb_zipStoreFile for Windows build
 
 2015-02-11 19:15 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
@@ -500,12 +551,12 @@
     ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat      
       
 2015-02-10 14:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\replic.c
+  * source/rtl/replic.c
     ! restored type of variable i to HB_ISIZ
     ! replaced type of variable lTimes to HB_ISIZ (was HB_SIZE)
 
 2015-02-06 22:33 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\replic.c
+  * source/rtl/replic.c
     ! replaced type of variable i to HB_SIZE (was HB_ISIZ)
 
 2015-02-06 22:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
@@ -763,13 +814,13 @@
     ! commented out not used function NMonth()
 
 2014-12-10 22:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\debug\debugger.prg
+  * source/debug/debugger.prg
     ! commented out not used function StripUntil()
 
-  * utils\hbdoc\genpdf1.prg
+  * utils/hbdoc/genpdf1.prg
     ! commented out not used function getArray()
 
-  * utils\hbmake\pickarry.prg
+  * utils/hbmake/pickarry.prg
     ! commented out not used function GetFiles()
 
 2014-12-10 23:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
@@ -1237,7 +1288,7 @@
     ! pacify warnings
 
 2014-10-20 21:34 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
-  * source\rtl\winos.prg
+  * source/rtl/winos.prg
     + OS_ISWIN81()
       
 2014-10-14 14:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
@@ -1578,7 +1629,7 @@
     ! exclude entry point modules from vm library to make MinGW dll builds happy
 
   * winmake/mdir.bat
-    ! clean make did not erase harbour.lib and dll\*.cxx; fixed
+    ! clean make did not erase harbour.lib and dll/*.cxx; fixed
 
   * winmake/dll.lst
     ! gtwvt.obj is excluded from harbour.dll build for BCC and Digital Mars
@@ -2021,11 +2072,11 @@
     ! disable creation of cgi.lib due to non-existent of functions:
     INFO_DBCLOSE, INFO_DBCONNECT, HGETVALUE, CRLF, HB_NUMTOHEX, HB_HEXTONUM
     READSTDINPUT, HB_PVALUE, THTMLBASE_DISPLAYHASH, THTMLBASE_DISPLAYVARS
-    Should no one fix this, contrib\cgilib will be removed from xHarbour repo
+    Should no one fix this, contrib/cgilib will be removed from xHarbour repo
 
 2013-01-15 15:40 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source\compiler\harbour.c
-  * source\compiler\harbour.sly
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
   * include/harboury.h
     ! fix many memory leaks on failure
 
@@ -5091,9 +5142,9 @@
     ! added contrib/png contrib/tiff and contrib/jpeg folders to compress to build .rpm
 
 2012-08-29 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\winros.prg
+  * source/rtl/winros.prg
     * added os_iswin8()
-  * source\common\hbver.c
+  * source/common/hbver.c
     * added support for Windows 8 and 2012 server
 
 2012-08-28 07:09 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -5191,7 +5242,7 @@
   * include/hberrors.h
     + Added HB_COMP_WARN_STATIC_UNUSED
   * source/compiler/hbgenerr.c
-    + Added : "1STATIC Function \'%s\' defined but never used"
+    + Added : "1STATIC Function /'%s/' defined but never used"
   * source/compiler/genc.c
     + Added logic to detect and warn of STATIC FUNCTION or HB_FUNC_STATIC defined but never used
 
@@ -7415,7 +7466,7 @@
   + contrib/hbmagic/tests
   + contrib/hbmagic/tests/hbmagit.prg
     + hbmagic file function borrowed from Harbour.
-    Will be built when (example): SET HB_DIR_MAGIC=C:\LIBMAGIC is setup
+    Will be built when (example): SET HB_DIR_MAGIC=C:/LIBMAGIC is setup
 
   + contrib/hbtinymt
   + contrib/hbtinymt/hbtinymt.c
@@ -7909,8 +7960,8 @@
   + contrib/sddpg/sddpg.c
     ! Postgre SQL Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
-         SET HB_DIR_POSTGRESQL=C:\POSTGRESQL\9.0
-      where PostGreSQL package was installed in C:\POSTGRESQL\9.0
+         SET HB_DIR_POSTGRESQL=C:/POSTGRESQL/9.0
+      where PostGreSQL package was installed in C:/POSTGRESQL/9.0
 
   + contrib/sddodbc
   + contrib/sddodbc/tests
@@ -7925,8 +7976,8 @@
   + contrib/sddoci/tests/test.prg
     ! Oracle (via OCILIB) Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
-         SET HB_DIR_OCILIB=C:\OCILIB
-      where OCILIB package was installed in C:\OCILIB
+         SET HB_DIR_OCILIB=C:/OCILIB
+      where OCILIB package was installed in C:/OCILIB
 
   + contrib/sddmy
   + contrib/sddmy/tests
@@ -7934,15 +7985,15 @@
   + contrib/sddmy/tests/test1.prg
     ! MySql Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
-         SET HB_DIR_MYSQL=C:\MYSQL
-      where MYSQL package was installed in C:\MYSQL
+         SET HB_DIR_MYSQL=C:/MYSQL
+      where MYSQL package was installed in C:/MYSQL
 
   + contrib/sddfb
   + contrib/sddfb/sddfb.c
     ! Firebird Database Driver borrowed from Harbour
       This will only be built with envar as follows (example):
-         SET HB_DIR_FIREBIRD=C:\FIREBIRD\2.5.0
-      where Firebird package was installed in C:\FIREBIRD\2.5.0
+         SET HB_DIR_FIREBIRD=C:/FIREBIRD/2.5.0
+      where Firebird package was installed in C:/FIREBIRD/2.5.0
 
   * winmake/common.mak
   * winmake/compile.mak
@@ -8148,8 +8199,8 @@
       The above stuffs are very good codebar libraries, thanks to Harbour Team.
       hbzebra.lib is built by default.
       hbcairo.lib will be built with an envar (for example):
-         SET HB_DIR_CAIRO=C:\CAIRO
-      where cairo package is installed in C:\CAIRO
+         SET HB_DIR_CAIRO=C:/CAIRO
+      where cairo package is installed in C:/CAIRO
       To run hbcairo example, you need the following external RT:
       -> freetype6.dll
       -> libcairo-2.dll
@@ -8169,15 +8220,15 @@
       /*
       Example:
 
-      SET DEFAULT TO C:\POS\DATA
+      SET DEFAULT TO C:/POS/DATA
       USE TEST.DBF NEW
-      COPY TO TEXT.TXT DELIMITED // will create TEXT.TXT in C:\POS\DATA
+      COPY TO TEXT.TXT DELIMITED // will create TEXT.TXT in C:/POS/DATA
 
       but:
 
-      SET DEFAULT TO C:\POS\DATA
+      SET DEFAULT TO C:/POS/DATA
       USE TEST.DBF NEW
-      COPY TO E:\TEMP\TEXT.TXT DELIMITED // will create TEXT.TXT in E:\TEMP
+      COPY TO E:/TEMP/TEXT.TXT DELIMITED // will create TEXT.TXT in E:/TEMP
       (file name contains explicit path, SET DEFAULT is overidden )
       */
 
@@ -8232,8 +8283,8 @@
   * winmake/makefile.wc
     ! -gc2 -> -gc0 for a bit of speed when compiling PRG files
     + enable creation of hbcurl.lib by setting (for example):
-      SET HB_DIR_CURL=C:\CURL
-      whereby C:\CURL is the folder containing CURL package
+      SET HB_DIR_CURL=C:/CURL
+      whereby C:/CURL is the folder containing CURL package
 
   * contrib/hbcurl/ftpupload.prg
   * contrib/hbcurl/gauge.c
@@ -8285,7 +8336,7 @@
   * winmake/makefile.dc
     ! modified to reflect the above changes
       Now, by default, all Windows builds no longer require Bison parser, thus
-      it is just enough to set compiler directory (eg. SET CC_DIR=C:\BORLAND)
+      it is just enough to set compiler directory (eg. SET CC_DIR=C:/BORLAND)
 
   * contrib/gtwvw/gtwvw.c
   * contrib/gtwvw/wvwfuncs.c
@@ -8596,9 +8647,9 @@
     ! Fix when get type is a DATETIME value
 
 2012-03-12 14:32 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
-  * source\rtl\zlib\gzlib.c
-  * source\rtl\zlib\gzread.c
-  * source\rtl\zlib\gzwrite.c
+  * source/rtl/zlib/gzlib.c
+  * source/rtl/zlib/gzread.c
+  * source/rtl/zlib/gzwrite.c
     ! Fixed compilation for MSVC and POCC
 
 2012-02-18 19:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
@@ -9588,7 +9639,7 @@
 
 2011-03-01 19:30 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
   * source/rtl/hbjson.c
-    ! fixed typo which caused that \uNNNN in strings were ignored
+    ! fixed typo which caused that /uNNNN in strings were ignored
       instead of being decoded (synched to Harbour code)
 
   * source/vm/fm.c
@@ -13332,12 +13383,12 @@
     % Minor optimization in HB_FUNC( EXTRACTLEADINGWS )
 
 2010-10-19 13:24 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * include\dbinfo.ch
-  * source\rdd\bmdbfcdx\bmdbfcdx1.c
-  * source\rdd\bmdbfcdx\redbfcdx1.c
-  * source\rdd\dbfcdx\dbfcdx1.c
-  * source\rdd\dbffpt\dbffpt1.c
-  * source\rtl\filenet.c
+  * include/dbinfo.ch
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/bmdbfcdx/redbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rtl/filenet.c
     * Added DBOI_TEMPORARY as 133  /* is index open in temporary mode */
     * Undo hb_snprintf because don't work at the sme way as sprintf, and
       client-server don't runs properly.
@@ -13349,7 +13400,7 @@
       file's attributes).
 
 2010-10-07 23:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\errorapi.c
+  * source/vm/errorapi.c
     * Pacified warning unreachable code in function hb_errLaunch()
 
 2010-10-07 09:05 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
@@ -13357,13 +13408,13 @@
     * xCC does not support fdopen
 
 2010-10-03 15:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\hbi18n.c
-  * source\rtl\hbip.c
+  * source/vm/hbi18n.c
+  * source/rtl/hbip.c
     * Pacified warnings
 
 2010-10-03 15:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\common\hbstr.c
-  * source\common\hbdate.c
+  * source/common/hbstr.c
+  * source/common/hbdate.c
     * Pacified warnings
 
 2010-10-03 16:31 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -13466,7 +13517,7 @@
       #if ADS_LIB_VERSION >= 600  -> #if ADS_LIB_VERSION > 600
 
 2010-09-15 23:23 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\direct.c
+  * source/rtl/direct.c
     * Fix casting
 
 2010-09-15 15:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
@@ -13602,7 +13653,7 @@
     + Added missing extended strings support, to hb_AtSkipStrings()
 
 2010-07-19 20:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\winreg.prg
+  * source/rtl/winreg.prg
     * added error checking to WinRegQueryValueEx()/GetRegistry()
 
 2010-06-18 17:48 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
@@ -13645,12 +13696,12 @@
     ! fixed problem on GetCurrentFileSize in windows Section( was not closing handle from find first)
 
 2010-05-26 09:01 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\common\hbver.c
+  * source/common/hbver.c
     * remove extra space on os() for Windows after "Windows" reported by Grzegorz on comp.lang.xharbour
       (missed on previous commit)
 
 2010-05-26 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\common\hbver.c
+  * source/common/hbver.c
     * fix "vista" workstation detection reported by Grzegorz on comp.lang.xharbour
 
 2010-05-22 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -13658,30 +13709,30 @@
     ! fixed poscursor method when called by dehilite before stabilize.
 
 2010-05-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * contrib\filemem\filemem.c
-  * include\dbinfo.ch
-  * include\fileio.ch
-  * include\hbapierr.h
-  * include\hbapifs.h
-  * include\hbapirdd.h
-  * source\rdd\dbcmd.c
-  * source\rdd\dbcmd53.c
-  * source\rdd\dbf1.c
-  * source\rdd\dbf1net.c
-  * source\rdd\dbfcdx\dbfcdx1.c
-  * source\rdd\hbdbsort.c
-  * source\rdd\wacore.c
-  * source\rdd\wafunc.c
-  * source\rdd\workarea.c
-  * source\rtl\filebuf.c
-  * source\rtl\filenet.c
-  * source\vm\errorapi.c
+  * contrib/filemem/filemem.c
+  * include/dbinfo.ch
+  * include/fileio.ch
+  * include/hbapierr.h
+  * include/hbapifs.h
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+  * source/rdd/dbcmd53.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbf1net.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/hbdbsort.c
+  * source/rdd/wacore.c
+  * source/rdd/wafunc.c
+  * source/rdd/workarea.c
+  * source/rtl/filebuf.c
+  * source/rtl/filenet.c
+  * source/vm/errorapi.c
     + Added flush method at file subsystem.
     * changed Whitespaces to align code.
     * changed USHORT or ULONG by HB_ERRCODE where nedded.
     + added hb_dbfErrorRT to reduce repeated code.
     + Added suport for dbf files with signature 0x32 Visual FoxPro, autoincrement enabled.
-  * include\blob.ch
+  * include/blob.ch
     ! fixed bug for bad type.
   ( the major part of this code is based on harbour code, but with little changes )
 
@@ -13709,16 +13760,16 @@
     ! fixed  MakePrimaryKeyWhere method from TMySQLRow class, to work correctly when table dont have primary key( fix provided by Sergio Kondo)
 
 2010-04-30 18:30 UTC-0700 Luis Krause <kaddath at shaw dot ca>
-  * contrib\rdd_ads\ace32.c
-  * contrib\rdd_ads\adsfunc.c
+  * contrib/rdd_ads/ace32.c
+  * contrib/rdd_ads/adsfunc.c
     + Guarded AdsIsConnectionAlive inside ADS_LIB_VERSION >= 800
       to allow to build rddads.lib for ADS 7.x
   * Fixed entry date for last commit (read 2010-12-29).
 
 2010-04-29 17:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\winos.prg
+  * source/rtl/winos.prg
     + added OS_ISWINXP_OR_LATER()
-  * source\common\hbver.c
+  * source/common/hbver.c
     * removed extra "Windows" & "Server" text and distinguish between "2003" & "2003 R2" versions
 
 2010-04-26 18:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -13757,7 +13808,7 @@
     ! Fixed path setting for MSVC 2008
 
 2010-04-04 11:30 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-  ! source\rtl\hbxml.c
+  ! source/rtl/hbxml.c
     ! fixed memory leak reported by Eduardo Motta
 
 2010-03-30 09:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -13810,17 +13861,17 @@
     * Update preburnt rules.
 
 2010-03-05 12:50 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-  ! source\common\hbver.c
+  ! source/common/hbver.c
     ! minor ajust to previus commit
 
 2010-03-03 13:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-  ! source\common\hbver.c
+  ! source/common/hbver.c
     ! added detection for windows 7 and windows 2008 server
 
 2010-02-18 15:20 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-  ! contrib\mysql\mysqlrdd.prg
-    contrib\mysql\tmysql.prg
-    contrib\mysql\tsqlbrw.prg
+  ! contrib/mysql/mysqlrdd.prg
+    contrib/mysql/tmysql.prg
+    contrib/mysql/tsqlbrw.prg
     ! fixed compilation warning
 
 2010-02-02 16:54 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
@@ -13899,7 +13950,7 @@
     /* All other make files should be fixed too! */
 
 2010-01-06 16:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\memvars.c
+  * source/vm/memvars.c
     * Fix Andi typo: memvar file name was shortened by one.
 
 2010-01-01 15:45 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -14506,7 +14557,7 @@
     ! updated to version 1.2.41
 
 2009-12-06 13:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\winos.prg
+  * source/rtl/winos.prg
     + OS_ISWINVISTA_OR_LATER() - .t. if osvi.dwMajorVersion >= 6
     * Update OS_NETREGOK() for Vista,Win2008 & Win7
          SMB2 is required to be turned off on Server
@@ -14535,7 +14586,7 @@
     ! pacify warnings under GCC 4.40
 
 2009-12-01 01:37 UTC-0800 Brian Hays <bhays/at/abacuslaw.com>
-  * contrib\rdd_ads\ads1.c
+  * contrib/rdd_ads/ads1.c
     + Added support for ordDescend's 3rd arg to dynamically change
       the index direction between ascending / descending.
       ONLY supported in ADS 9 and later.
@@ -14551,7 +14602,7 @@
     + add compiler build number if _MSC_BUILD is defined
 
 2009-12-01 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\winos.prg
+  * source/rtl/winos.prg
     + OS_ISUSERANADMIN() -> Returns .T. on Win2000 or later if logged in
       user has Administrator access
 
@@ -14565,7 +14616,7 @@
      is this functions was defined so it could go to infinite loop)
 
 2009-11-21 23:36 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\arrays.c
+  * source/vm/arrays.c
     - Removed unused variable pBaseArray from function hb_arrayFill()
 
 2009-11-21 16:14 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
@@ -14583,11 +14634,11 @@
     * Support negative argument in aIns() and aDel() protected by #ifndef HB_C52_STRICT
 
 2009-11-20 11:40 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
-  * source\rtl\winos.prg
+  * source/rtl/winos.prg
     + OS_Win7()
 
 2009-11-20 00:02 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * include\hbsetup.h
+  * include/hbsetup.h
     * Added HB_LEGACY_LEVEL2 by default to admit HB_OS_WIN_32_USED, _WIN64 and HB_WINCE changed by
       HB_OS_WIN_USED, HB_OS_WIN_64, HB_OS_WIN_CE on previous commit. Please don't use it any more.
 
@@ -14608,165 +14659,165 @@
     ! fixed compilation
 
 2009-11-15 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * include\hbxvm.h
+  * include/hbxvm.h
     * Added void as parameter to declaration of function hb_xvmExitProc()
 
 2009-11-09 09:51 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   * contrib\filemem\filemem.c
-   * contrib\firebird\firebird.c
-   * contrib\freeimage\source\fi_winfu.c
-   * contrib\freeimage\source\fi_wrp.c
-   * contrib\gd\include\gd.h
-   * contrib\gd\source\gdwrp.c
-   * contrib\gtwvg\gtwvg.c
-   * contrib\gtwvg\gtwvg.h
-   * contrib\gtwvg\wvtcore.c
-   * contrib\gtwvg\wvtutils.c
-   * contrib\gtwvw\samples\winapi.c
-   * contrib\hbmzip\hbmzip.c
-   * contrib\hbzlib\include\hbz.h
-   * contrib\hbzlib\include\hbzip2.h
-   * contrib\libnf\caplock.c
-   * contrib\libnf\descend.c
-   * contrib\libnf\getenvrn.c
-   * contrib\libnf\numlock.c
-   * contrib\libnf\origin.c
-   * contrib\mysql\mysql.c
-   * contrib\pgsql\postgres.c
-   * contrib\rdd_ads\ace32.c
-   * contrib\rdd_ads\ads1.c
-   * contrib\rdd_ads\adsfunc.c
-   * contrib\rdd_ads\adsmgmnt.c
-   * contrib\rdd_ads\rddads.h
-   * contrib\tipssl\inetssl.c
-   * contrib\tipssl\inetssl.h
-   * contrib\what32\_wintbar.c
-   * contrib\what32\source\_winbmp.c
-   * contrib\what32\source\_winbrsh.c
-   * contrib\what32\source\_winclpb.c
-   * contrib\what32\source\_wincret.c
-   * contrib\what32\source\_windate.c
-   * contrib\what32\source\_windc.c
-   * contrib\what32\source\_windir.c
-   * contrib\what32\source\_windlg.c
-   * contrib\what32\source\_windraw.c
-   * contrib\what32\source\_winfont.c
-   * contrib\what32\source\_wingdi.c
-   * contrib\what32\source\_winhead.c
-   * contrib\what32\source\_winilst.c
-   * contrib\what32\source\_winini.c
-   * contrib\what32\source\_winkbrd.c
-   * contrib\what32\source\_winmain.c
-   * contrib\what32\source\_winmeta.c
-   * contrib\what32\source\_winmmcap.c
-   * contrib\what32\source\_winmous.c
-   * contrib\what32\source\_winpen.c
-   * contrib\what32\source\_winrect.c
-   * contrib\what32\source\_winreg.c
-   * contrib\what32\source\_winrgn.c
-   * contrib\what32\source\_winsys.c
-   * contrib\what32\source\_wintbar.c
-   * contrib\what32\source\_wintext.c
-   * contrib\what32\source\_winview.c
-   * contrib\what32\source\_winwnd.c
-   * include\clipdefs.h
-   * include\hb_io.h
-   * include\hbapi.h
-   * include\hbapifs.h
-   * include\hbatomic.h
-   * include\hbdefs.h
-   * include\hbgtcore.h
-   * include\hbgtinfo.ch
-   * include\hbinit.h
-   * include\hbipapi.h
-   * include\hbole.h
-   * include\hbsetup.h
-   * include\hbwince.h
-   * include\inet.h
-   * include\thread.h
-   * source\common\hbdate.c
-   * source\common\hbfsapi.c
-   * source\common\hbgete.c
-   * source\common\hbver.c
-   * source\common\hbwince.c
-   * source\ct\ctnet.c
-   * source\ct\dattime3.c
-   * source\ct\disk.c
-   * source\ct\envparam.c
-   * source\ct\files.c
-   * source\ct\keyset.c
-   * source\ct\print.c
-   * source\ct\settime.c
-   * source\odbc\odbc.c
-   * source\pp\ppgen.c
-   * source\rdd\dbf1.c
-   * source\rdd\dbf1net.c
-   * source\rdd\dbfcdx\dbfcdx1.c
-   * source\rdd\dbfnsx\dbfnsx1.c
-   * source\rtl\bkgtsks.c
-   * source\rtl\cdpapi.c
-   * source\rtl\console.c
-   * source\rtl\copyfile.c
-   * source\rtl\diskspac.c
-   * source\rtl\disksphb.c
-   * source\rtl\dllcall.c
-   * source\rtl\file.c
-   * source\rtl\filebuf.c
-   * source\rtl\filenet.c
-   * source\rtl\filestat.c
-   * source\rtl\filesys.c
-   * source\rtl\fserror.c
-   * source\rtl\fssize.c
-   * source\rtl\fstemp.c
-   * source\rtl\gtalleg\ssf.h
-   * source\rtl\gtapi.c
-   * source\rtl\gtcgi\cgiread.c
-   * source\rtl\gtclip.c
-   * source\rtl\gtgui\gtdef.c
-   * source\rtl\gtgui\gtgui.c
-   * source\rtl\gtkbstat.c
-   * source\rtl\gtkeycod.c
-   * source\rtl\gtpca\gtpca.c
-   * source\rtl\gtstd\gtstd.c
-   * source\rtl\gtsys.c
-   * source\rtl\gttone.c
-   * source\rtl\gtwin\gtwin.c
-   * source\rtl\gtwvt\gtwvt.c
-   * source\rtl\gtwvt\gtwvt.h
-   * source\rtl\hbffind.c
-   * source\rtl\hbgtcore.c
-   * source\rtl\hbip.c
-   * source\rtl\hboutdbg.c
-   * source\rtl\hbrandom.c
-   * source\rtl\hbserv.c
-   * source\rtl\hbsyslog.c
-   * source\rtl\idle.c
-   * source\rtl\isprint.c
-   * source\rtl\net.c
-   * source\rtl\oemansi.c
-   * source\rtl\seconds.c
-   * source\rtl\set.c
-   * source\rtl\tprinter.c
-   * source\tip\utils.c
-   * source\vm\cmdarg.c
-   * source\vm\dynlibhb.c
-   * source\vm\errorapi.c
-   * source\vm\estack.c
-   * source\vm\fm.c
-   * source\vm\hvm.c
-   * source\vm\inet.c
-   * source\vm\maindll.c
-   * source\vm\maindlle.c
-   * source\vm\maindllh.c
-   * source\vm\maindllp.c
-   * source\vm\mainstd.c
-   * source\vm\mainwin.c
-   * source\vm\thread.c
-   * source\vm\usedll.c
-   * utils\hbfilere\hbfilere.c
-   * utils\hbfilere\hbfilere.h
-   * utils\hbmake\hbmlang.c
-   * utils\hbpp\hbppcore.c
+   * contrib/filemem/filemem.c
+   * contrib/firebird/firebird.c
+   * contrib/freeimage/source/fi_winfu.c
+   * contrib/freeimage/source/fi_wrp.c
+   * contrib/gd/include/gd.h
+   * contrib/gd/source/gdwrp.c
+   * contrib/gtwvg/gtwvg.c
+   * contrib/gtwvg/gtwvg.h
+   * contrib/gtwvg/wvtcore.c
+   * contrib/gtwvg/wvtutils.c
+   * contrib/gtwvw/samples/winapi.c
+   * contrib/hbmzip/hbmzip.c
+   * contrib/hbzlib/include/hbz.h
+   * contrib/hbzlib/include/hbzip2.h
+   * contrib/libnf/caplock.c
+   * contrib/libnf/descend.c
+   * contrib/libnf/getenvrn.c
+   * contrib/libnf/numlock.c
+   * contrib/libnf/origin.c
+   * contrib/mysql/mysql.c
+   * contrib/pgsql/postgres.c
+   * contrib/rdd_ads/ace32.c
+   * contrib/rdd_ads/ads1.c
+   * contrib/rdd_ads/adsfunc.c
+   * contrib/rdd_ads/adsmgmnt.c
+   * contrib/rdd_ads/rddads.h
+   * contrib/tipssl/inetssl.c
+   * contrib/tipssl/inetssl.h
+   * contrib/what32/_wintbar.c
+   * contrib/what32/source/_winbmp.c
+   * contrib/what32/source/_winbrsh.c
+   * contrib/what32/source/_winclpb.c
+   * contrib/what32/source/_wincret.c
+   * contrib/what32/source/_windate.c
+   * contrib/what32/source/_windc.c
+   * contrib/what32/source/_windir.c
+   * contrib/what32/source/_windlg.c
+   * contrib/what32/source/_windraw.c
+   * contrib/what32/source/_winfont.c
+   * contrib/what32/source/_wingdi.c
+   * contrib/what32/source/_winhead.c
+   * contrib/what32/source/_winilst.c
+   * contrib/what32/source/_winini.c
+   * contrib/what32/source/_winkbrd.c
+   * contrib/what32/source/_winmain.c
+   * contrib/what32/source/_winmeta.c
+   * contrib/what32/source/_winmmcap.c
+   * contrib/what32/source/_winmous.c
+   * contrib/what32/source/_winpen.c
+   * contrib/what32/source/_winrect.c
+   * contrib/what32/source/_winreg.c
+   * contrib/what32/source/_winrgn.c
+   * contrib/what32/source/_winsys.c
+   * contrib/what32/source/_wintbar.c
+   * contrib/what32/source/_wintext.c
+   * contrib/what32/source/_winview.c
+   * contrib/what32/source/_winwnd.c
+   * include/clipdefs.h
+   * include/hb_io.h
+   * include/hbapi.h
+   * include/hbapifs.h
+   * include/hbatomic.h
+   * include/hbdefs.h
+   * include/hbgtcore.h
+   * include/hbgtinfo.ch
+   * include/hbinit.h
+   * include/hbipapi.h
+   * include/hbole.h
+   * include/hbsetup.h
+   * include/hbwince.h
+   * include/inet.h
+   * include/thread.h
+   * source/common/hbdate.c
+   * source/common/hbfsapi.c
+   * source/common/hbgete.c
+   * source/common/hbver.c
+   * source/common/hbwince.c
+   * source/ct/ctnet.c
+   * source/ct/dattime3.c
+   * source/ct/disk.c
+   * source/ct/envparam.c
+   * source/ct/files.c
+   * source/ct/keyset.c
+   * source/ct/print.c
+   * source/ct/settime.c
+   * source/odbc/odbc.c
+   * source/pp/ppgen.c
+   * source/rdd/dbf1.c
+   * source/rdd/dbf1net.c
+   * source/rdd/dbfcdx/dbfcdx1.c
+   * source/rdd/dbfnsx/dbfnsx1.c
+   * source/rtl/bkgtsks.c
+   * source/rtl/cdpapi.c
+   * source/rtl/console.c
+   * source/rtl/copyfile.c
+   * source/rtl/diskspac.c
+   * source/rtl/disksphb.c
+   * source/rtl/dllcall.c
+   * source/rtl/file.c
+   * source/rtl/filebuf.c
+   * source/rtl/filenet.c
+   * source/rtl/filestat.c
+   * source/rtl/filesys.c
+   * source/rtl/fserror.c
+   * source/rtl/fssize.c
+   * source/rtl/fstemp.c
+   * source/rtl/gtalleg/ssf.h
+   * source/rtl/gtapi.c
+   * source/rtl/gtcgi/cgiread.c
+   * source/rtl/gtclip.c
+   * source/rtl/gtgui/gtdef.c
+   * source/rtl/gtgui/gtgui.c
+   * source/rtl/gtkbstat.c
+   * source/rtl/gtkeycod.c
+   * source/rtl/gtpca/gtpca.c
+   * source/rtl/gtstd/gtstd.c
+   * source/rtl/gtsys.c
+   * source/rtl/gttone.c
+   * source/rtl/gtwin/gtwin.c
+   * source/rtl/gtwvt/gtwvt.c
+   * source/rtl/gtwvt/gtwvt.h
+   * source/rtl/hbffind.c
+   * source/rtl/hbgtcore.c
+   * source/rtl/hbip.c
+   * source/rtl/hboutdbg.c
+   * source/rtl/hbrandom.c
+   * source/rtl/hbserv.c
+   * source/rtl/hbsyslog.c
+   * source/rtl/idle.c
+   * source/rtl/isprint.c
+   * source/rtl/net.c
+   * source/rtl/oemansi.c
+   * source/rtl/seconds.c
+   * source/rtl/set.c
+   * source/rtl/tprinter.c
+   * source/tip/utils.c
+   * source/vm/cmdarg.c
+   * source/vm/dynlibhb.c
+   * source/vm/errorapi.c
+   * source/vm/estack.c
+   * source/vm/fm.c
+   * source/vm/hvm.c
+   * source/vm/inet.c
+   * source/vm/maindll.c
+   * source/vm/maindlle.c
+   * source/vm/maindllh.c
+   * source/vm/maindllp.c
+   * source/vm/mainstd.c
+   * source/vm/mainwin.c
+   * source/vm/thread.c
+   * source/vm/usedll.c
+   * utils/hbfilere/hbfilere.c
+   * utils/hbfilere/hbfilere.h
+   * utils/hbmake/hbmlang.c
+   * utils/hbpp/hbppcore.c
      * Added some missing castings.
      * Changed HB_OS_WIN_32_USED by HB_OS_WIN_USED, for all common windows platforms 16,32,64,... versions.
      * Changed _WIN64 by HB_OS_WIN_64 for especific 64 bits versions
@@ -14847,7 +14898,7 @@
     ! fixed dirname to be ct compatible and added an parameter to specify the drive
 
 2009-10-28 15:28 UTC-0800 Augusto Infante <augusto.infante@xharbour.com>
-  * contrib\rdd_ads\adsfunc.c
+  * contrib/rdd_ads/adsfunc.c
     + Added wrapper to AdsIsConnectionAlive
       lAlive := AdsIsConnectionAlive( hConnection )
 
@@ -14871,7 +14922,7 @@
      ! fixed type cast to hb_fsOpen
 
 2009-10-22 18:30 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * include\std.ch
+  * include/std.ch
     * Added support for extended expression in command SET ERRORLOG TO
 
 2009-10-21 17:32 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
@@ -14927,13 +14978,13 @@
     ! Prevents GPF trap when HRB file contains unregistered symbols.
 
 2009-10-17 20:30 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
-  * source\tip\encoding\base64.c
-  * source\tip\encoding\uuencode.c
+  * source/tip/encoding/base64.c
+  * source/tip/encoding/uuencode.c
     ! Fixed for compiling with xCC
 
 2009-10-16 01:13 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
-  * include\hbapiitm.h
-  * source\vm\itemapi.c
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
     - Defed out buggy hb_itemPutCPtr2() and hb_itemPutCLPtr() - Missing support for pulHoldres
     + Added:
              #define hb_itemPutCLPtr( pItem, szText, ulLen ) hb_itemPutCPtr( pItem, szText, ulLen )
@@ -14958,7 +15009,7 @@
     ! Fixed GPF trap related to double release of VT_DISPATCH stored at OleValue
 
 2009-10-13 19:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\tprinter.c
+  * source/rtl/tprinter.c
     * alter hb_PrintFileRaw() to open printed file in FILE_SHARE_READ mode
 
 2009-10-11 13:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
@@ -14986,46 +15037,46 @@
       hbapifs.h ).
 
 2009-10-05 20:28 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
-  * source\rtl\filebuf.c
+  * source/rtl/filebuf.c
     - Removed static startup call to hb_vmAtInit( hb_filebuf_init, NULL );
     + Added callable void hb_filebufInit()
-  * source\vm\hvm.c
+  * source/vm/hvm.c
     + Added call to hb_filebufInit() in hb_vmInit()
      ! Fixed GPF trap related to utilization of hb_filebuf system by the init modue of other module
        (such as RDD), because execution order of hb_vmAtInit() functions is undetermined.
 
 2009-10-05 16:40 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * include\hbapierr.h
-  * include\hbinit.h
-  * include\hbrddbmc.h
-  * include\hbrddcdx.h
-  * include\hbrdddbf.h
-  * include\hbrdddbt.h
-  * include\hbrddfpt.h
-  * include\hbrddmdx.h
-  * include\hbrddnsx.h
-  * include\hbrddntx.h
-  * include\hbrddrec.h
-  * source\rdd\bmdbfcdx\bmdbfcdx1.c
-  * source\rdd\bmdbfcdx\redbfcdx1.c
-  * source\rdd\dbf1.c
-  * source\rdd\dbf1net.c
-  * source\rdd\dbfcdx\dbfcdx1.c
-  * source\rdd\dbffpt\dbffpt1.c
-  * source\rdd\dbffpt\redbffpt1.c
-  * source\rdd\dbfmdx\dbfmdx1.c
-  * source\rdd\dbfntx\dbfntx1.c
-  * source\vm\errorapi.c
+  * include/hbapierr.h
+  * include/hbinit.h
+  * include/hbrddbmc.h
+  * include/hbrddcdx.h
+  * include/hbrdddbf.h
+  * include/hbrdddbt.h
+  * include/hbrddfpt.h
+  * include/hbrddmdx.h
+  * include/hbrddnsx.h
+  * include/hbrddntx.h
+  * include/hbrddrec.h
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/bmdbfcdx/redbfcdx1.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbf1net.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+  * source/rdd/dbfmdx/dbfmdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/vm/errorapi.c
     * more pending casting and cleaning structures
 
   * makefile.bc
   * mdir.bat
   * common.mak
   * compile.mak
-  * contrib\Makefile
-  + contrib\filemem\filemem.c
-  + contrib\filemem\makefile
-  + contrib\filemem\tests\test.prg
+  * contrib/Makefile
+  + contrib/filemem/filemem.c
+  + contrib/filemem/makefile
+  + contrib/filemem/tests/test.prg
     + Added memory file subsytem developed by Mindaugas Kavaliauskas for harbour.
       the files with prefix "mem:" in his named will be opened and created in memory
       if filemem.lib is added and REQUEST HB_MEMIO.
@@ -15038,28 +15089,28 @@
     ! fix to reset ::lrectpainted data after stable.
 
 2009-10-01 19:04 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-  * source\rdd\usrrdd\rdds\ansirdd.prg
+  * source/rdd/usrrdd/rdds/ansirdd.prg
     ! fixed FieldGet value was empty always.
 
 2009-10-02 08:53 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
-  * source\vm\arrays.c
+  * source/vm/arrays.c
     ! Fixed hb_arrayDel() of last item
 
-  * utils\xbscript\xbs_harb.ch
+  * utils/xbscript/xbs_harb.ch
     * Minor addition to commented debug message
 
 2009-10-01 17:25 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   * source\rdd\usrrdd\rdds\ansirdd.prg
+   * source/rdd/usrrdd/rdds/ansirdd.prg
      - removed incorrect comments.
-   * source\rtl\filenet.c
+   * source/rtl/filenet.c
      * Changes nedded to activate REMOTE file server to all rdds : delim, sdf
        bmdbfcdx, dbfntx, dbfcdx, rmdbfcdx, sixcdx, bmsixcdx,...
 
 2009-10-01 10:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    * common.mak
    * compile.mak
-   * source\rdd\Makefile
-   + source\rdd\dbrename.c
+   * source/rdd/Makefile
+   + source/rdd/dbrename.c
      + Added DBRENAME( <cTableName>, <cIndexName>, <cNewName>, [<cRddName>], [<nConnection>] ) or
        DBRENAME( <cFileName>, <cNewFileName> )  to the famili of RDD functions DBDROP DBEXIST, that can admit
        to rename at server side the files, too at client side. It first was implemented only at filenet api with
@@ -15080,94 +15131,94 @@
       NET_CLOSECONNECTION( pSocket )
 
 2009-09-30 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   * contrib\rdd_ads\ads1.c
-   * contrib\rdd_ads\adsfunc.c
-   * contrib\rdd_ads\rddads.h
-   * include\hbapi.h
-   * include\hbapicdp.h
-   * include\hbapifs.h
-   * include\hbapirdd.h
-   * include\hbdbf.h
-   * include\hbdbsort.h
-   * include\hbrddbmc.h
-   * include\hbrddcdx.h
-   * include\hbrdddbf.h
-   * include\hbrdddel.h
-   * include\hbrddfpt.h
-   * include\hbrddmdx.h
-   * include\hbrddnsx.h
-   * include\hbrddntx.h
-   * include\hbrddrec.h
-   * include\hbrddsdf.h
-   * include\hbsxfunc.h
-   * include\thread.h
-   * include\usrrdd.ch
-   * source\common\hbdate.c
-   * source\common\hbfopen.c
-   * source\common\hbfsapi.c
-   * source\compiler\harbour.c
-   * source\compiler\hbgenerr.c
-   * source\compiler\ppcomp.c
-   * source\ct\disk.c
-   * source\ct\files.c
-   * source\ct\print.c
-   * source\ct\strfile.c
-   * source\macro\macro.y
-   * source\misc\hb_f.c
-   * source\pp\ppgen.c
-   * source\rdd\bmdbfcdx\bmdbfcdx1.c
-   * source\rdd\bmdbfcdx\redbfcdx1.c
-   * source\rdd\dbcmd.c
-   * source\rdd\dbf1.c
-   * source\rdd\dbf1net.c
-   * source\rdd\dbfcdx\dbfcdx1.c
-   * source\rdd\dbffpt\dbffpt1.c
-   * source\rdd\dbffpt\redbffpt1.c
-   * source\rdd\dbfmdx\dbfmdx1.c
-   * source\rdd\dbfnsx\dbfnsx1.c
-   * source\rdd\dbfntx\dbfntx1.c
-   * source\rdd\delim1.c
-   * source\rdd\hbdbsort.c
-   * source\rdd\hbsix\sxcompr.c
-   * source\rdd\hbsix\sxcrypt.c
-   * source\rdd\hbsix\sxdate.c
-   * source\rdd\hbsix\sxfname.c
-   * source\rdd\hbsix\sxord.c
-   * source\rdd\hbsix\sxsem.c
-   * source\rdd\hbsix\sxtable.c
-   * source\rdd\hbsix\sxutil.c
-   * source\rdd\hsx\hsx.c
-   * source\rdd\sdf1.c
-   * source\rdd\usrrdd\usrrdd.c
-   * source\rdd\wafunc.c
-   * source\rdd\workarea.c
-   * source\rtl\cdpapi.c
-   * source\rtl\copyfile.c
-   * source\rtl\dirdrive.c
-   * source\rtl\direct.c
-   * source\rtl\file.c
-   * source\rtl\filebuf.c
-   * source\rtl\filehb.c
-   * source\rtl\filenet.c
-   * source\rtl\filesys.c
-   * source\rtl\fssize.c
-   * source\rtl\fstemp.c
-   * source\rtl\hbip.c
-   * source\rtl\hbmd5.c
-   * source\rtl\memofile.c
-   * source\rtl\natmsg.c
-   * source\rtl\philes.c
-   * source\rtl\set.c
-   * source\rtl\spfiles.c
-   * source\rtl\trace.c
-   * source\tip\utils.c
-   * source\vm\hbi18n.c
-   * source\vm\macro.c
-   * source\vm\memvars.c
-   * source\vm\runner.c
-   * utils\hbfilere\hbfilere.c
-   * utils\hbfilere\hbfilere.h
-   * utils\hbpp\hbpp.c
+   * contrib/rdd_ads/ads1.c
+   * contrib/rdd_ads/adsfunc.c
+   * contrib/rdd_ads/rddads.h
+   * include/hbapi.h
+   * include/hbapicdp.h
+   * include/hbapifs.h
+   * include/hbapirdd.h
+   * include/hbdbf.h
+   * include/hbdbsort.h
+   * include/hbrddbmc.h
+   * include/hbrddcdx.h
+   * include/hbrdddbf.h
+   * include/hbrdddel.h
+   * include/hbrddfpt.h
+   * include/hbrddmdx.h
+   * include/hbrddnsx.h
+   * include/hbrddntx.h
+   * include/hbrddrec.h
+   * include/hbrddsdf.h
+   * include/hbsxfunc.h
+   * include/thread.h
+   * include/usrrdd.ch
+   * source/common/hbdate.c
+   * source/common/hbfopen.c
+   * source/common/hbfsapi.c
+   * source/compiler/harbour.c
+   * source/compiler/hbgenerr.c
+   * source/compiler/ppcomp.c
+   * source/ct/disk.c
+   * source/ct/files.c
+   * source/ct/print.c
+   * source/ct/strfile.c
+   * source/macro/macro.y
+   * source/misc/hb_f.c
+   * source/pp/ppgen.c
+   * source/rdd/bmdbfcdx/bmdbfcdx1.c
+   * source/rdd/bmdbfcdx/redbfcdx1.c
+   * source/rdd/dbcmd.c
+   * source/rdd/dbf1.c
+   * source/rdd/dbf1net.c
+   * source/rdd/dbfcdx/dbfcdx1.c
+   * source/rdd/dbffpt/dbffpt1.c
+   * source/rdd/dbffpt/redbffpt1.c
+   * source/rdd/dbfmdx/dbfmdx1.c
+   * source/rdd/dbfnsx/dbfnsx1.c
+   * source/rdd/dbfntx/dbfntx1.c
+   * source/rdd/delim1.c
+   * source/rdd/hbdbsort.c
+   * source/rdd/hbsix/sxcompr.c
+   * source/rdd/hbsix/sxcrypt.c
+   * source/rdd/hbsix/sxdate.c
+   * source/rdd/hbsix/sxfname.c
+   * source/rdd/hbsix/sxord.c
+   * source/rdd/hbsix/sxsem.c
+   * source/rdd/hbsix/sxtable.c
+   * source/rdd/hbsix/sxutil.c
+   * source/rdd/hsx/hsx.c
+   * source/rdd/sdf1.c
+   * source/rdd/usrrdd/usrrdd.c
+   * source/rdd/wafunc.c
+   * source/rdd/workarea.c
+   * source/rtl/cdpapi.c
+   * source/rtl/copyfile.c
+   * source/rtl/dirdrive.c
+   * source/rtl/direct.c
+   * source/rtl/file.c
+   * source/rtl/filebuf.c
+   * source/rtl/filehb.c
+   * source/rtl/filenet.c
+   * source/rtl/filesys.c
+   * source/rtl/fssize.c
+   * source/rtl/fstemp.c
+   * source/rtl/hbip.c
+   * source/rtl/hbmd5.c
+   * source/rtl/memofile.c
+   * source/rtl/natmsg.c
+   * source/rtl/philes.c
+   * source/rtl/set.c
+   * source/rtl/spfiles.c
+   * source/rtl/trace.c
+   * source/tip/utils.c
+   * source/vm/hbi18n.c
+   * source/vm/macro.c
+   * source/vm/memvars.c
+   * source/vm/runner.c
+   * utils/hbfilere/hbfilere.c
+   * utils/hbfilere/hbfilere.h
+   * utils/hbpp/hbpp.c
      * changed var types from BYTE to char and added const, to remove some compile warnings
        and to me more compatible with 3rd party libraries builded for harbour and xharbour.
        This changes don't take advantage at runtime but some protection at build xharbour time.
@@ -15282,21 +15333,21 @@
 
 2009-09-16 18:10 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
     * compile.mak
-    * utils\hbfilere\hbfilere.c
-    * utils\hbfilere\hbfilere.h
+    * utils/hbfilere/hbfilere.c
+    * utils/hbfilere/hbfilere.h
       + Added TransmitPackets that increase transfer speed. Remember that is needed to build
         with versions of borland 5.8 or newer, or msvc compiler.
-    * source\common\hbver.c
+    * source/common/hbver.c
       + Added recognision of more versions of borland compilers.
-    * source\rtl\hbip.c
+    * source/rtl/hbip.c
       - removed unneeded code.
-    * source\rtl\filenet.c
-    * source\rtl\session.c
-    * source\rdd\dbcmd.c
+    * source/rtl/filenet.c
+    * source/rtl/session.c
+    * source/rdd/dbcmd.c
       ! fixed some warnings.
 
 2009-09-16 20:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\idle.c
+  * source/rtl/idle.c
     + Added #include "thread.h" for hb_threadSleep()
 
 2009-09-16 16:00 UTC+0700 Andi Jahja <xharbour/AT/telkom/net/id>
@@ -15547,7 +15598,7 @@
     ! added the functions removed from gtwvw.c
 
 2009-08-30 14:58 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\tip\utils.c
+  * source/tip/utils.c
     - Removed unused initialization values for minutes and hours variables in
       function HB_FUNC( TIP_TIMESTAMP )
 
@@ -15807,7 +15858,7 @@
   * makefile.pc
     * commented "/alternatename" link flag. Needed only for PellesC 5.x
 
-  * utils\hbmake\hbmake.prg
+  * utils/hbmake/hbmake.prg
     * commented "/alternatename" link flag. Needed only for PellesC 5.x
 
 2009-08-11 09:00 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
@@ -15837,7 +15888,7 @@
     ! fixed to abort on K_LEFT and K_RIGHT keystrokes.
 
 2009-08-10 18:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source\rtl\win32prn.prg
+  * source/rtl/win32prn.prg
     + added TextOutW and TextOutWAt methods to print UNICODE
       changed contributed by Michael Ang
 
@@ -15867,7 +15918,7 @@
     http://www.slproweb.com/download/Win32OpenSSL-0_9_8k.exe and
     http://www.microsoft.com/downloads/details.aspx?familyid=9B2DA534-3E03-4391-8A4D-074B9F2BC1BF
     To get certificates from an site is easy
-    once openssl is instaled ( in my machine i've added v:\openssl\bin to my path envar do )
+    once openssl is instaled ( in my machine i've added v:/openssl/bin to my path envar do )
     openssl s_client -connect -showcerts
     for example
     to get yahoo pop3 certificate
@@ -15875,17 +15926,17 @@
     open the 2 file
     copy all content between -----BEGIN CERTIFICATE-----/-----END CERTIFICATE----- inclusive
     this lines to one file ( if more then one occurence, create an file to each one
-    save each file in openssl\bin\certs with .pem extension. in linux save the files to  /etc/ssl/certs
+    save each file in openssl/bin/certs with .pem extension. in linux save the files to  /etc/ssl/certs
 
     open an dos shell
     under windows do
 
-    go top openssl\bin\certs
+    go top openssl/bin/certs
     run openssl" x509 -hash -fingerprint -noout -in fileyousaved.pem
     copy fileyousave.pem to hash returned on command above
     example
     if you save the file as gmail.pem do
-    V:\OpenSSL\bin\PEM>..\openssl x509 -hash -fingerprint -noout -in gmail.pem
+    V:/OpenSSL/bin/PEM>../openssl x509 -hash -fingerprint -noout -in gmail.pem
     7f549ca4  <<---- NOTE this number
     SHA1 Fingerprint=51:21:45:CE:CE:99:19:87:7D:CE:3F:52:C0:31:0F:7E:FB:B4:6A:6F
     then copy gmail.pem to 7f549ca4.0

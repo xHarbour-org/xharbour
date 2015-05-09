@@ -369,7 +369,7 @@ PHB_EXPR hb_compExprNewString( char * szValue, HB_SIZE ulLen, BOOL fDealloc )
 {
    PHB_EXPR pExpr;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_compExprNewString(%s,%lu)", szValue, ulLen ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_compExprNewString(%s,%" HB_PFS "u)", szValue, ulLen ) );
 
    pExpr                         = hb_compExprNew( HB_ET_STRING );
    pExpr->value.asString.string  = szValue;
