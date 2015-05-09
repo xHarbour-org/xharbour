@@ -5053,10 +5053,14 @@ static void hb_vmNotEqual( void )
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       int i = hb_itemStrCmp( pItem1, pItem2, FALSE );
-      hb_stackPop();
-      hb_stackPop();
-      hb_vmPushLogical( i != 0 );
-   }
+      TraceLog("aaa.log"," i %i  string1 %s, string2 %s \n",i,hb_itemGetCPtr(pItem1),hb_itemGetCPtr(pItem2 ));
+      hb_stackPop();      
+      hb_itemClear( pItem1 );
+      
+      pItem1->type = HB_IT_LOGICAL;
+      pItem1->item.asLogical.value = i != 0;  
+      
+       }
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
    {
       pItem1->item.asLogical.value  = ( HB_ITEM_GET_NUMINTRAW( pItem1 ) !=
