@@ -8,6 +8,29 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-05-10 12:25 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlrdd2.prg
+     ! adjust to create time field under mysql
+   ! source/mysql.c
+     ! Moved MYSQL_TIMESTAMP_TYPE From "C" to create "T" field type  
+     ! removed unnecessary casts to ULONG
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'
+   ! source/pgs.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'
+   ! source/firebird.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'     
+   ! source/sqlmaria.prg
+     ! clear unused variables
+   ! source/sqloracle.prg  
+     ! clear unused variables
+   ! source/sqlora.c
+     ! added define HAVE_OCILOBWRITEAPPEND
+     ! ULONG -> HB_SIZE where aplicable
+     ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+     ! fixed some compilation warnings
+   ! source/sqlorax.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'     
+     
 2015-03-15 17:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! vc12/mysql.lib.xbp
    ! vc12/mysqlmt.lib.xbp

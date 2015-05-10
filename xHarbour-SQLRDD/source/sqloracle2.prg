@@ -241,7 +241,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    Local aRet := {}
    Local aVersion
    Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
-   Local cString
+//   Local cString
 
 
    (cDSN)
@@ -334,7 +334,7 @@ Return ( ::nRetCode := SQLO2_ROLLBACK( ::hDbc ) )
 /*------------------------------------------------------------------------*/
 
 METHOD ExecuteRaw( cCommand ) CLASS SR_ORACLE2
-   local nRet
+   local nRet, i
 
    If upper(left(ltrim(cCommand), 6)) == "SELECT"
       ::hStmt := ::hDBC
@@ -520,6 +520,8 @@ METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords,
    
    DEFAULT nMaxRecords TO 999999999999
    DEFAULT cVar To ":c1"
+   (ncols)
+   (nlogmode)
      
    ::AllocStatement()
 
@@ -732,7 +734,7 @@ METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords,
 return  0  
 
 function  ExecuteSP2( cComm, aReturn  ) 
-   Local i, n
+*    Local i, n
    Local nError := 0
    local oConn := SR_GetConnection()
    

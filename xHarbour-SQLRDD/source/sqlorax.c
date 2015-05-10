@@ -504,7 +504,6 @@ HB_FUNC( SQLO_CLOSESTMT )
 void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBuff, BOOL bQueryOnly, ULONG ulSystemID, BOOL bTranslate )
 {
    LONG lType;
-// LONG lLen, lDec;
    HB_SIZE lLen;
    HB_SIZE lDec; 
    PHB_ITEM pTemp;
@@ -524,6 +523,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLe
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
+            szResult[ lLen ] =  '\0';            
             hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }
@@ -586,6 +586,7 @@ void SQLO_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLe
             {
                szResult[ lPos ] = ' ';
             }
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult,  lLen );
             break;
          }

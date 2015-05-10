@@ -183,7 +183,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
 
    local hEnv := 0, hDbc := 0
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
-   Local nVersionMajor,nVersionMinor
+   
    Local nVersionp
    
    

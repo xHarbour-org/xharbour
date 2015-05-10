@@ -1055,6 +1055,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult, lLen );
             break;
          }
@@ -1120,7 +1121,9 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
             {
                szResult[ lPos ] = ' ';
             }
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult, lLen );
+            
             break;
          }
          case SQL_DOUBLE:
@@ -1209,7 +1212,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
 
             else
             {
-               hb_itemPutCL( pItem, bBuffer, (ULONG) lLenBuff );
+               hb_itemPutCL( pItem, bBuffer, lLenBuff );
             }
             break;
          }

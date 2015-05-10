@@ -655,7 +655,9 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
          {
             char * szResult = ( char * ) hb_xgrab( lLen + 1 );
             hb_xmemset( szResult, ' ', lLen );
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult, lLen );
+            
             break;
          }
          case SQL_NUMERIC:
@@ -723,7 +725,9 @@ void PGSFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenB
             {
                szResult[ lPos ] = ' ';
             }
+            szResult[ lLen ] =  '\0';
             hb_itemPutCLPtr( pItem, szResult, lLen );
+            
             break;
          }
          case SQL_NUMERIC:

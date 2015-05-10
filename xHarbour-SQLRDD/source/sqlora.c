@@ -87,6 +87,8 @@ const char * _sqlo_sqloraID="$Id$";
 
 #include "sqlora.h"
 #define HAVE_OCISTMTFETCH2
+#define HAVE_OCILOBWRITEAPPEND
+
 #if defined (__STDC__) || defined (_AIX) || defined(PROTOTYPES) ||\
             (defined (__mips) && defined (_SYSTYPE_SVR4)) ||\
              defined(WIN32) || defined(__cplusplus)\
@@ -907,7 +909,7 @@ int osncui __P((int handle));
  * END PROTOTYPES
  *--------------------------------------------------------------------------*/
 
-void * hb_xgrabDebug( int iline, ULONG ulSize )
+void * hb_xgrabDebug( int iline, HB_SIZE ulSize )
 {
    void * pmem;
 #ifndef DEBUG_XGRAB
@@ -915,12 +917,12 @@ void * hb_xgrabDebug( int iline, ULONG ulSize )
 #endif
    pmem = hb_xgrab(ulSize );
 #ifdef DEBUG_XGRAB
-   TraceLog( LOGFILE, "Pointer %p allocating %i bytes in line %i\n", pmem, ulSize, iline );
+   TraceLog( LOGFILE, "Pointer %p allocating %" HB_PFS "u bytes in line %i\n", pmem, ulSize, iline );
 #endif
    return (pmem);
 }
 
-void * hb_xreallocDebug( int iline, void * p, ULONG ulSize )
+void * hb_xreallocDebug( int iline, void * p, HB_SIZE ulSize )
 {
    void * pmem;
 #ifndef DEBUG_XGRAB
@@ -928,7 +930,7 @@ void * hb_xreallocDebug( int iline, void * p, ULONG ulSize )
 #endif
 
 #ifdef DEBUG_XGRAB
-   TraceLog( LOGFILE, "Pointer %p realloc %i bytes in line %i\n", p, ulSize, iline );
+   TraceLog( LOGFILE, "Pointer %p realloc %" HB_PFS "u bytes in line %i\n", p, ulSize, iline );
 #endif
    pmem = hb_xrealloc( p, ulSize );
 #ifdef DEBUG_XGRAB
@@ -1021,6 +1023,8 @@ DEFUN(_mutex_init, (mutex), sqlo_mutex_t * mutex)
 
 #    endif
 #  endif
+#else
+( void )mutex;
 #endif
 
   return status;
@@ -1052,6 +1056,8 @@ DEFUN(_mutex_lock, (mutex), sqlo_mutex_t * mutex)
 
      return (_winmutex_lock(*mutex));
 #  endif
+#else
+( void )mutex;
 #endif
 
   return OCI_SUCCESS;
@@ -1081,6 +1087,8 @@ DEFUN(_mutex_unlock, (mutex), sqlo_mutex_t * mutex)
      return (_winmutex_unlock( *mutex ));
 
 #  endif
+#else
+( void )mutex;
 #endif
 
   return(OCI_SUCCESS);
@@ -2564,7 +2572,7 @@ DEFUN(_save_oci_status, (dbp, action, object, lineno),
 #else
   /* just to keep lint happy */
   {
-      char c;
+      char c=0;
       len = 0;
       if ( len > 0) {
         c = *action;
@@ -5247,7 +5255,7 @@ DEFUN(sqlo_open,(dbh, stmt, argc, argv),
   int status;
   int ret;
   bool_t bmf = FALSE;                   /* flag indicates change in blocking mode */
-  unsigned int blocking;
+  unsigned int blocking=SQLO_STH_INIT;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_open", SQLO_INVALID_DB_HANDLE);
 
@@ -5332,7 +5340,7 @@ DEFUN(sqlo_open2,(sthp, dbh, stmt, argc, argv),
   sqlo_stmt_struct_ptr_t stp = NULL;
   int status;
   int ret;
-  unsigned int blocking;
+  unsigned int blocking=SQLO_STH_INIT;
   int real_sth;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_open2", SQLO_INVALID_DB_HANDLE);
@@ -7095,7 +7103,7 @@ DEFUN(sqlo_executeselect, (sth, iterations),
 {
   register sqlo_stmt_struct_ptr_t  stp;
   sqlo_db_struct_ptr_t dbp;
-  int Ret;
+//   int Ret;
 
   CHECK_STHANDLE(stp, sth, "sqlo_execute", SQLO_INVALID_STMT_HANDLE);
   assert( stp->dbp != NULL);
@@ -7450,7 +7458,7 @@ DEFUN(sqlo_set_blocking, (dbh, on),
 {
   sqlo_db_struct_ptr_t dbp;
   unsigned int new_mode;
-  unsigned int blocking;
+  unsigned int blocking=SQLO_STH_INIT;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_set_blocking", SQLO_INVALID_DB_HANDLE);
 
@@ -7524,7 +7532,7 @@ DEFUN(sqlo_break, (dbh), sqlo_db_handle_t dbh)
 {
   sqlo_db_struct_ptr_t  dbp;
 
-  unsigned int blocking;
+  unsigned int blocking=SQLO_STH_INIT;
 
   CHECK_DBHANDLE(dbp, dbh, "sqlo_break", SQLO_INVALID_DB_HANDLE);
 
@@ -8246,6 +8254,8 @@ DEFUN(sqlo_register_int_handler, (handle, signal_handler),
   status = osnsui(handle, signal_handler, (char *) NULL);
   return status;
 #else
+  ( void )handle; 
+  ( void )signal_handler;
   return (SQLO_ERROR);
 #endif
 }
@@ -8263,6 +8273,7 @@ DEFUN(sqlo_clear_int_handler, (handle), int handle )
   status = osncui(handle);
   return status;
 #else
+  ( void )handle;
   return (SQLO_ERROR);
 #endif
 }

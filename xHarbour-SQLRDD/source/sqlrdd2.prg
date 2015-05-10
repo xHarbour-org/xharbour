@@ -5306,12 +5306,19 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
          EndIf
       // including xml data type
       // postgresql datetime
-      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR .or. ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR )
          if aCreate[i,FIELD_LEN] == 4
-             cSql := cSql + 'time without time zone '
+             cSql := cSql + 'time  without time zone '
          else
-         cSql := cSql + 'timestamp without time zone '
+             cSql := cSql + 'timestamp  without time zone '
          endif
+      Case (aCreate[i,FIELD_TYPE] == "T") .and. ( ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+         if aCreate[i,FIELD_LEN] == 4
+             cSql := cSql + 'time '
+         else
+             cSql := cSql + 'DATETIME '
+         endif
+         
       // oracle datetime
       Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
          cSql := cSql + 'TIMESTAMP '   
@@ -5346,6 +5353,7 @@ METHOD sqlCreate( aStruct, cFileName, cAlias, nArea ) CLASS SR_WORKAREA
    ENDIF   
    
    IF ::oSql:nSystemID == SYSTEMID_MYSQL
+   
       if Val( Substr( ::oSql:cSystemVers, 1, 3 ) ) < 505 
          cSql += " Type=InnoDb "
       else
@@ -8761,12 +8769,19 @@ METHOD AlterColumns( aCreate, lDisplayErrorMessage, lBakcup ) CLASS SR_WORKAREA
             EndIf
          // including xml data type
          // postgresql datetime
-         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR .or. ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+         Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_POSTGR )
             if aCreate[i,FIELD_LEN] == 4
-               cSql := cSql + 'time without time zone '
+               cSql := cSql + 'time  without time zone '
             else
-               cSql := cSql + 'timestamp without time zone '
+               cSql := cSql + 'timestamp  without time zone '
             endif            
+         Case (aCreate[i,FIELD_TYPE] == "T") .and. ( ::osql:nSystemID == SYSTEMID_MYSQL  .or. ::osql:nSystemID == SYSTEMID_MARIADB )
+         if aCreate[i,FIELD_LEN] == 4
+             cSql := cSql + 'time '
+         else
+             cSql := cSql + 'DATETIME '
+         endif
+            
          // oracle datetime
          Case (aCreate[i,FIELD_TYPE] == "T") .and. (::oSql:nSystemID == SYSTEMID_ORACLE   .or. ::oSql:nSystemID == SYSTEMID_FIREBR)
             cSql := cSql + 'TIMESTAMP '   
