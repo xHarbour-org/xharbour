@@ -6686,7 +6686,12 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS RegOle
       RETURN 0
    ENDIF
 RETURN Super:OnKeyDown( nwParam, nlParam )
-
+#else
+   CLASS ListOle
+      METHOD Init() CONSTRUCTOR INLINE Self
+      METHOD Save()             INLINE Self
+      METHOD OnInitDialog()     INLINE Self
+   ENDCLASS
 #endif
 
 //------------------------------------------------------------------------------------------------------------------------------------
