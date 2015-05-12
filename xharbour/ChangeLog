@@ -9,6 +9,10 @@
 */
 
 
+2015-05-12 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  ! source/vm/hvm.c
+    ! minor fix on previus commit(removed tracelog call)   
+    
 2015-05-09 17:55 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * contrib/tipssl/httpcln.prg
     ! minor fix on CLOSE method

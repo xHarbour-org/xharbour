@@ -5053,7 +5053,7 @@ static void hb_vmNotEqual( void )
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
       int i = hb_itemStrCmp( pItem1, pItem2, FALSE );
-      TraceLog("aaa.log"," i %i  string1 %s, string2 %s \n",i,hb_itemGetCPtr(pItem1),hb_itemGetCPtr(pItem2 ));
+
       hb_stackPop();      
       hb_itemClear( pItem1 );
       
