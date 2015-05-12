@@ -1078,11 +1078,12 @@ METHOD Init() CLASS IDE_MainForm
             :ImageIndex   := IIF( :Parent:ImageList != NIL, :Parent:ImageList:Count, 0 )
             :BeginGroup   := .T.
             :Caption      := "Registered COM Objects"
-            :Action       := {||  ListOle( ::Application:MainForm ) }
             :ShortCutText := "F11"
             :ShortCutKey:Key := VK_F11
             #ifndef VXH_PROFESSIONAL
-             :Enabled     := .F.
+               :Enabled   := .F.
+            #else
+               :Action    := {||  ListOle( ::Application:MainForm ) }
             #endif
             :Create()
          END
@@ -6686,12 +6687,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS RegOle
       RETURN 0
    ENDIF
 RETURN Super:OnKeyDown( nwParam, nlParam )
-#else
-   CLASS ListOle
-      METHOD Init() CONSTRUCTOR INLINE Self
-      METHOD Save()             INLINE Self
-      METHOD OnInitDialog()     INLINE Self
-   ENDCLASS
+
 #endif
 
 //------------------------------------------------------------------------------------------------------------------------------------
