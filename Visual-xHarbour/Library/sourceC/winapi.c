@@ -327,9 +327,7 @@ static BOOL    (WINAPI *pWow64DisableWow64FsRedirection)(PVOID)                 
 static BOOL    (WINAPI *pWow64RevertWow64FsRedirection)(PVOID)                                                 = NULL;
 
 
-#ifdef TRACE_ARRAYPOINTER
-   static unsigned int s_uiArrayPointers = 0;
-#endif
+static unsigned int s_uiArrayPointers = 0;
 
 static void winapi_Exit( void * cargo )
 {
@@ -916,8 +914,9 @@ HB_FUNC( ARRAYPOINTER )
    {
       PHB_ITEM pCopy = hb_itemNew( pArray );
 
+      s_uiArrayPointers++;
+
       #ifdef TRACE_ARRAYPOINTER
-         s_uiArrayPointers++;
          TraceLog( NULL, "Copy: %p class: %s\n", (void *) pCopy, hb_objGetClsName( pCopy ) );
       #endif
       hb_retnl( (long) (void *) pCopy );
@@ -1009,9 +1008,7 @@ HB_FUNC( ARRAYFROMPOINTER )
 
    if( hb_parl( 2 ) )
    {
-      #ifdef TRACE_ARRAYPOINTER
-         s_uiArrayPointers--;
-      #endif
+      s_uiArrayPointers--;
 
       hb_itemReturnForward((PHB_ITEM) pVoid );
       hb_itemRelease( (PHB_ITEM) pVoid );
@@ -1023,6 +1020,10 @@ HB_FUNC( ARRAYFROMPOINTER )
    }
 }
 
+HB_FUNC( ARRAYPOINTERSCOUNT )
+{
+   hb_retni( s_uiArrayPointers );
+}
 //-------------------------------------------------------------------------------------------------
 HB_FUNC( RELEASEARRAYPOINTER )
 {
@@ -1048,10 +1049,13 @@ HB_FUNC( RELEASEARRAYPOINTER )
    }
 
    #ifdef TRACE_ARRAYPOINTER
-      TraceLog( NULL, "(%i) Release: %p class: %s\n", --s_uiArrayPointers, (void *) pVoid, hb_objGetClsName( (PHB_ITEM) pVoid ) );
+      TraceLog( NULL, "(%i) Release: %p class: %s\n", s_uiArrayPointers, (void *) pVoid, hb_objGetClsName( (PHB_ITEM) pVoid ) );
    #endif
 
-   hb_itemRelease( (PHB_ITEM) pVoid );
+   if( hb_itemRelease( (PHB_ITEM) pVoid ) )
+   {
+      s_uiArrayPointers--;
+   }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2823,42 +2827,21 @@ HB_FUNC( GETMENUITEMINFO )
 {
    PHB_ITEM pStructure = hb_param( 4, HB_IT_BYREF );
 
-   if( pStructure )
+   if( pStructure && HB_IS_OBJECT( pStructure ) )
    {
-      LPMENUITEMINFO pMii = (LPMENUITEMINFO) hb_xgrab( sizeof( MENUITEMINFO ) );
+      LPMENUITEMINFO pMii;
+
+      hb_vmPushSymbol( pVALUE->pSymbol );
+      hb_vmPush( pStructure );
+      hb_vmSend(0);
+
+      pMii = (LPMENUITEMINFO) ( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1 )->item.asString.value;
+
       if( GetMenuItemInfo( (HMENU) hb_parnl(1), (UINT) hb_parni( 2 ), hb_parl( 3 ), pMii ) )
       {
-         PHB_ITEM pByRef;
-
-         if( HB_IS_OBJECT( pStructure ) )
-         {
-            pByRef = NULL;
-         }
-         else
-         {
-            //HB_CStructure( "MSG" )
-            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
-            hb_vmPushNil();
-            hb_itemPushStaticString( "MENUITEMINFO", 12 );
-            hb_vmDo(1);
-
-            pByRef = pStructure;
-            pStructure = hb_stackReturnItem();
-         }
-
-         //::InternalBuffer := pRect
-         hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pMii, sizeof( MENUITEMINFO ) );
-
-         //::DeValue()
          hb_vmPushSymbol( pDEVALUE->pSymbol );
          hb_vmPush( pStructure );
          hb_vmSend(0);
-
-         if( pByRef )
-         {
-            hb_itemForwardValue( pByRef, pStructure );
-         }
-
          hb_retl( TRUE );
       }
       else

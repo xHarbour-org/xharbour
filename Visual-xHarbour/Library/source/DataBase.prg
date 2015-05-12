@@ -377,11 +377,15 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD DestroyFields() CLASS DataTable
    LOCAL aField, cField
-   FOR EACH aField IN ::Structure
-       cField := aField[1]
-       __clsDelMsg( ::__hClass,       cField )
-       __clsDelMsg( ::__hClass, "_" + cField )
-   NEXT
+   IF ::Structure != NIL
+      FOR EACH aField IN ::Structure
+          IF aField != NIL
+             cField := aField[1]
+             __clsDelMsg( ::__hClass,       cField )
+             __clsDelMsg( ::__hClass, "_" + cField )
+          ENDIF
+      NEXT
+   ENDIF
    ::__hClass := NIL
 RETURN Self
 
@@ -722,11 +726,15 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       IF ::Owner:__lMemory
          cFile := "mem:"+::Owner:Name
+         IF FILE( cFile )
+            cFile := "mem:"+::Owner:Alias
+         ENDIF
          IF EMPTY( ::Owner:Structure )
             RETURN ::Owner
          ENDIF
          nMemSel++
          Select( nMemSel )
+
          IF !FILE( cFile )
             TRY
                dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )

@@ -242,7 +242,7 @@ METHOD Init( oParent ) CLASS ToolBar
    ::Id              := 0
    ::aItems          := {}
    ::aReset          := {}
-   ::Id              := ::Form:GetNextControlId()
+   ::Id              := ::Form:ControlId++
    DEFAULT ::Application:__hMenuHook TO SetWindowsHookEx( WH_MSGFILTER, @__SysVxhMenuHook(), NIL, GetCurrentThreadId() )
 RETURN( Self )
 
@@ -1442,7 +1442,6 @@ CLASS ToolButton INHERIT Object
       DATA __IsInstance
       DATA __IdeImageIndex        INIT 3
       DATA Height
-      DATA MdiMenu                INIT .F.
       DATA EventHandler
       DATA nHScrollPos            INIT 0
       DATA VertScrollPos          INIT 0
@@ -1518,13 +1517,13 @@ METHOD Init( oParent ) CLASS ToolButton
    __SetInitialValues( Self )
    ::__CreateProperty()
 
-   ::Id := ::Form:GetNextControlId()
+   ::Id := ::Form:ControlId++
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create( nPos ) CLASS ToolButton
-   LOCAL lpMenuInfo, tbbi, aRect, n := -1
+   LOCAL /*lpMenuInfo,*/ tbbi, aRect, n := -1
 
    IF LEN( ::Parent:Children ) == 0 .AND. EMPTY( ::xCaption )
       ::xCaption := NIL
@@ -1656,12 +1655,11 @@ METHOD Create( nPos ) CLASS ToolButton
    IF ( ::Style & BTNS_WHOLEDROPDOWN ==  BTNS_WHOLEDROPDOWN ) .OR. ( ::Style & BTNS_DROPDOWN == BTNS_DROPDOWN )
       ::hMenu := CreatePopupMenu()
 
-      lpMenuInfo := (struct MENUINFO)
-
-      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-      lpMenuInfo:fMask  := MIM_STYLE
-      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-      SetMenuInfo( ::hMenu, lpMenuInfo )
+      //lpMenuInfo := (struct MENUINFO)
+      //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      //lpMenuInfo:fMask  := MIM_STYLE
+      //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      //SetMenuInfo( ::hMenu, lpMenuInfo )
    ENDIF
 RETURN Self
 

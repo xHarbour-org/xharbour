@@ -317,24 +317,6 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              ENDIF
           ENDIF
 
-          IF oItem:ColItems[n]:ColType == "STOPBITS"
-             IF ( nPos := hScan( ::System:StopBits, ::ActiveObject:StopBits ) ) > 0 .AND. LEN( cText ) >= nPos
-                cText := cText[ nPos ]
-             ENDIF
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "PARITY"
-             IF ( nPos := hScan( ::System:Parity, ::ActiveObject:Parity ) ) > 0 .AND. LEN( cText ) >= nPos
-                cText := cText[ nPos ]
-             ENDIF
-          ENDIF
-
-          IF oItem:ColItems[n]:ColType == "HANDSHAKE"
-             IF ( nPos := hScan( ::System:HandShake, ::ActiveObject:HandShake ) ) > 0 .AND. LEN( cText ) >= nPos
-                cText := cText[ nPos ]
-             ENDIF
-          ENDIF
-
           IF oItem:ColItems[n]:ColType == "OLEVERB"
              IF ( nPos := hScan( ::System:OleVerb, ::ActiveObject:OleVerb ) ) > 0 .AND. LEN( cText ) >= nPos
                 cText := cText[ nPos ]
@@ -1156,6 +1138,9 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           ENDIF
        ENDIF
        //------------------------------------------------------------------------------------------------------------------------------------------------------
+       IF Upper(cProp) IN ::ActiveObject:__aExcludeProperties
+          LOOP
+       ENDIF
        IF cProp == "RESOURCES" .AND. ::ActiveObject:ClsName == "Application"
           LOOP
        ENDIF
@@ -1458,33 +1443,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
              CASE cProp == "OleVerb"
                   aCol[1]:Value := ::System:OleVerb:Keys
                   aCol[1]:ColType  := "OLEVERB"
-                  xValue := NIL
-
-             CASE cProp == "HandShake"
-                  aCol[1]:Value   := ::System:HandShake:Keys
-                  aCol[1]:ColType := "HANDSHAKE"
-                  aCol[1]:Action  := {|o, n, oPar| n := o:GetCurSel()-1,;
-                                                     oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( HGetValueAt( ::System:HandShake, n+1 )  ) }
-                  xValue := NIL
-
-             CASE cProp == "Parity"
-                  aCol[1]:Value   := ::System:Parity:Keys
-                  aCol[1]:ColType := "PARITY"
-                  aCol[1]:Action  := {|o, n, oPar| n := o:GetCurSel()-1,;
-                                                     oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( HGetValueAt( ::System:Parity, n+1 )  ) }
-                  xValue := NIL
-
-             CASE cProp == "StopBits"
-                  aCol[1]:Value   := ::System:StopBits:Keys
-                  aCol[1]:ColType := "STOPBITS"
-                  aCol[1]:Action  := {|o, n, oPar| n := o:GetCurSel()-1,;
-                                                     oPar := o:Parent,;
-                                                     o:Destroy(),;
-                                                     oPar:SetValue( HGetValueAt( ::System:StopBits, n+1 )  ) }
                   xValue := NIL
 
              CASE cProp == "SysFolder"
@@ -1917,9 +1875,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "LVGALIGNMENT" .OR.;
                     cType == "SYSFOLDERS" .OR.;
                     cType == "OLEVERB" .OR.;
-                    cType == "HANDSHAKE" .OR.;
-                    cType == "PARITY" .OR.;
-                    cType == "STOPBITS" .OR.;
                     cType == "ANIMATIONSTYLE" .OR.;
                     ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
                     ::ActiveControl := IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) )
@@ -2038,15 +1993,6 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           :SetCurSel( ::ActiveObject:DropDown )
                         ELSEIF cType == "OLEVERB"
                           n := hScan( ::System:OleVerb, ::ActiveObject:OleVerb )
-                          :SetCurSel( n )
-                        ELSEIF cType == "HANDSHAKE"
-                          n := hScan( ::System:HandShake, ::ActiveObject:HandShake )
-                          :SetCurSel( n )
-                        ELSEIF cType == "PARITY"
-                          n := hScan( ::System:Parity, ::ActiveObject:Parity )
-                          :SetCurSel( n )
-                        ELSEIF cType == "STOPBITS"
-                          n := hScan( ::System:StopBits, ::ActiveObject:StopBits )
                           :SetCurSel( n )
                         ELSEIF cType == "SERVICES"
                           n := aScan( oItem:ColItems[nCol-1]:Value, ::ActiveObject:ServiceName )

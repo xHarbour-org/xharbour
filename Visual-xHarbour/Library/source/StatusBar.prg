@@ -306,7 +306,7 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Events := {}
    ::Index  := LEN( ::Parent:Children )
 
-   __SetObjPtr( Self )
+   __SetWindowObjPtr( Self )
 RETURN Self
 
 METHOD Create() CLASS StatusBarPanel

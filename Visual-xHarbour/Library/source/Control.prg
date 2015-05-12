@@ -143,7 +143,7 @@ METHOD Init( oParent, lInitValues ) CLASS Control
    ::__IsControl  := .T.
    ::__IsStandard := .T.
    ::Super:Init( oParent, lInitValues )
-   ::Id := ::Form:GetNextControlId()
+   ::Id := ::Form:ControlId++
    oParent := NIL
    __SetInitialValues( Self, "Border", ::xBorder )
 RETURN Self

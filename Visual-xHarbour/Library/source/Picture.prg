@@ -66,7 +66,8 @@ CLASS PictureBox INHERIT Panel
    METHOD SetImageName()
    METHOD SetBitmap( hBmp ) INLINE ::pPicture := PictureLoadBitmap( hBmp )
    METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE
-   METHOD OnEraseBkGnd()    //INLINE 1
+   METHOD OnEraseBkGnd()    INLINE 1
+   METHOD OnPaint()
    METHOD Update()          INLINE IIF( ::hWnd != NIL, ::InvalidateRect(), )
    METHOD Destroy()
    METHOD __CreateBkBrush()
@@ -255,10 +256,12 @@ METHOD __CreateBkBrush( hDC ) CLASS PictureBox
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD OnEraseBkGnd( hDC ) CLASS PictureBox
+METHOD OnPaint() CLASS PictureBox
+   LOCAL hDC := ::BeginPaint()
    ::__CreateBkBrush( hDC )
    _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-RETURN 1
+   ::EndPaint()
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD Destroy() CLASS PictureBox

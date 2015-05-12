@@ -77,6 +77,11 @@ CLASS SerialPort INHERIT Component
    PROPERTY DtrEnabled     SET ::__SetCommData( 2, v ) DEFAULT .F.
    PROPERTY RtsEnabled     SET ::__SetCommData( 1, v ) DEFAULT .F.
 
+   DATA EnumHandShake          EXPORTED  INIT { { "None","XOnOff","RequestToSend","RequestToSendXOnOff" }, {1,2,3,4} }
+   DATA EnumParity             EXPORTED  INIT { { "None","Odd","Even","Mark","Space" }, {0,1,2,3,4} }
+   DATA EnumStopBits           EXPORTED  INIT { { "None","One","Two","OnePointFive" }, {-1,0,2,1} }
+
+
    DATA Events                 EXPORTED  INIT {  {"Serial", { { "OnDataReceived"  , "", "" },;
                                                               { "OnError"         , "", "" },;
                                                               { "OnPinChanged"    , "", "" }} } }

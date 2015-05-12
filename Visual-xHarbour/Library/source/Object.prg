@@ -39,7 +39,7 @@ CLASS Object
 
    DATA __xCtrlName            EXPORTED
    DATA __lCreateAfterChildren EXPORTED INIT .F.
-
+   DATA __aExcludeProperties   EXPORTED INIT {}
    DATA __ForceSysColor        EXPORTED INIT .F.
    DATA __lCopyCut             EXPORTED INIT .T.
    DATA __IsControl            EXPORTED INIT .F.
@@ -104,7 +104,6 @@ CLASS Object
    METHOD Create()
    METHOD __InvalidMember()
    METHOD RemoveProperty()
-   METHOD ObjFromHandle()
    METHOD SetTabOrder()
 
    error HANDLER OnError()
@@ -282,80 +281,28 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
 
-FUNCTION __GetObj( nPos )
-RETURN __aObjects[nPos]
-
-FUNCTION __SetObjPtr( oObj, hWnd )
-   LOCAL n
-   IF hWnd != NIL
-      n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
-    ELSE
-      n := ASCAN( __aObjects, {|o|o==oObj} )
-   ENDIF
-   IF n == 0
-      AADD( __aObjects, oObj )
-   ENDIF
-RETURN NIL
-
-FUNCTION __ObjFromClassH( hClass )
-   LOCAL n := ASCAN( __aObjects, {|o|o:ClassH == hClass } )
-   IF n > 0
-      RETURN __aObjects[n]
-   ENDIF
-RETURN NIL
-
-FUNCTION __ObjFromPoint( pt )
-   LOCAL n, rc
-   n := ASCAN( __aObjects, <|o|
-                              rc := o:GetRect()
-                              RETURN ptInRect( rc, pt )
-                           > )
-   IF n > 0
-      RETURN __aObjects[n]
-   ENDIF
-RETURN NIL
-
-FUNCTION __ObjFromName( cName, oForm )
-   LOCAL n := ASCAN( __aObjects, {|o|o:ClsName == cName .AND. o:Form == oForm } )
-   IF n > 0
-      RETURN __aObjects[n]
-   ENDIF
-RETURN NIL
-
-FUNCTION ObjFromHandle( hWnd, lRemove )
-   LOCAL n := ASCAN( __aObjects, {|o|o:hWnd==hWnd} )
-   DEFAULT lRemove TO .F.
-   IF n > 0
-      IF lRemove
-         ADEL( __aObjects, n, .T. )
-       ELSE
-         RETURN __aObjects[n]
+FUNCTION __SetWindowObjPtr( oObj )
+   LOCAL nPtr
+   IF IsWindow( oObj:hWnd ) .AND. GetProp( oObj:hWnd, "WINOBJPTR" ) == 0
+      IF ( nPtr := ArrayPointer( oObj ) ) <> 0
+         SetProp( oObj:hWnd, "WINOBJPTR", nPtr )
       ENDIF
    ENDIF
 RETURN NIL
 
-FUNCTION TraceObj()
-   LOCAL n
-   FOR n := 1 TO LEN( __aObjects )
-       VIEW __aObjects[n]:Name, __aObjects[n]:ClsName
-   NEXT
-RETURN NIL
+FUNCTION ObjFromHandle( hWnd, lRemove )
+   LOCAL oObj, nPtr
+   DEFAULT lRemove TO .F.
 
-METHOD ObjFromHandle( hWnd ) CLASS Object
-   LOCAL n, oObj
-   IF ::hWnd == hWnd
-      RETURN Self
-   ENDIF
-   FOR n := 1 TO LEN( ::Children )
-       IF ::Children[n]:hWnd == hWnd
-          oObj := ::Children[n]
-          EXIT
+   IF IsWindow( hWnd ) .AND. ( nPtr := GetProp( hWnd, "WINOBJPTR" ) ) <> 0
+      IF ! lRemove
+         oObj := ArrayFromPointer( nPtr )
        ELSE
-          oObj := ::Children[n]:ObjFromHandle( hWnd )
-       ENDIF
-   NEXT
+         ReleaseArrayPointer( nPtr )
+         RemoveProp( hWnd, "WINOBJPTR" )
+      ENDIF
+   ENDIF
 RETURN oObj
-
 
 //---------------------------------------------------------------------------
 FUNCTION __ObjPtr( oObj )
@@ -377,6 +324,13 @@ FUNCTION __ObjRelPtr( nPtr )
    LOCAL n := ASCAN( __aObjPtrs, {|a| a[2] == nPtr} )
    IF n > 0
       ADEL( __aObjPtrs, n, .T. )
+   ENDIF
+RETURN NIL
+
+FUNCTION __ObjFromID( nID, hWnd )
+   LOCAL n := ASCAN( __aObjPtrs, {|a| a[1]:Form:hWnd == hWnd .AND. a[1]:Id == nID} )
+   IF n > 0
+      RETURN __aObjPtrs[n][1]
    ENDIF
 RETURN NIL
 

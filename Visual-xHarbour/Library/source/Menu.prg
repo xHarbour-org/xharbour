@@ -269,12 +269,12 @@ RETURN Self
 METHOD Create() CLASS MenuPopup
    LOCAL lpMenuInfo := (struct MENUINFO)
 
-   ::hMenu := CreatePopupMenu()
+   ::hMenu := CreateMenu()
 
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::hMenu, lpMenuInfo )
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::hMenu, lpMenuInfo )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -306,10 +306,10 @@ METHOD Create() CLASS MenuBar
 
    ::hMenu := CreateMenu()
 
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::hMenu, lpMenuInfo )
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::hMenu, lpMenuInfo )
 
    IF VALTYPE( ::xImageList ) == "C"
       AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
@@ -394,10 +394,10 @@ METHOD Create() CLASS ContextMenu
 
    ::hMenu := CreatePopupMenu()
 
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::hMenu, lpMenuInfo )
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::hMenu, lpMenuInfo )
 
    IF VALTYPE( ::xImageList ) == "C"
       AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )

@@ -724,8 +724,8 @@ METHOD __SetTheming( lSet ) CLASS Window
        ELSEIF ::ThemeName != NIL
          ::SetWindowTheme()
       ENDIF
+      AEVAL( ::Children, {|o|o:Theming := lSet } )
    ENDIF
-   AEVAL( ::Children, {|o|o:Theming := lSet } )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -1071,7 +1071,7 @@ METHOD Create( oParent ) CLASS Window
                        { ::ExStyle, ::ClsName, ::Caption, ::Style, ::Left, ::Top, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct } ) )
    ENDIF
 
-   __SetObjPtr( Self, ::hWnd )
+   __SetWindowObjPtr( Self )
 
    IF ::xCursor != IDC_ARROW
       ::__SetWindowCursor( ::xCursor )
@@ -1563,12 +1563,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS Window
       ::__aCltRect[4] := y
    ENDIF
 
-   TRY
-      IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL
-         ::MDIClient:MoveWindow()
-      ENDIF
-    CATCH
-   END
    IF ( nwParam == SIZE_MAXIMIZED .OR. nwParam == SIZE_RESTORED ) .AND. ( ::HorzScroll .OR. ::VertScroll )
       ::__SetScrollBars()
    ENDIF
@@ -1648,10 +1642,34 @@ RETURN NIL
 METHOD OnCommand( nwParam, nlParam ) CLASS Window
    LOCAL nCode, nId, nRet, oCtrl, lHandled, oForm, oChild, oItem
    nCode := HIWORD( nwParam )
-   nId   := ABS(LOWORD( nwParam ))
+   nId   := LOWORD( nwParam )
 
-   IF nCode == 0
-      nId := nwParam
+   IF nCode == 0 .AND. nlParam == 0
+      oItem := __ObjFromID( nID, ::hWnd )
+      IF oItem != NIL
+         IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
+            IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
+               oItem:Checked := ! oItem:Checked
+            ENDIF
+
+            oForm := oItem:Form
+            IF ::ClsName == "CCTL"
+               oForm := Self
+            ENDIF
+            nRet := hb_ExecFromArray( oForm, oItem:EventHandler[ "OnClick" ], {oItem} )
+          ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
+            EVAL( oItem:Action, oItem )
+          ELSE
+            ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
+            IF __objHasMsg( oItem, "OnClick" )
+               oItem:OnClick( oItem )
+            ENDIF
+         ENDIF
+         IF __objHasMsg( oItem, "Cancel" )
+            oItem:Cancel()
+         ENDIF
+         RETURN 0
+      ENDIF
    ENDIF
 
    IF ::Style & WS_CHILD == 0
@@ -2411,9 +2429,9 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_CTLCOLORSCROLLBAR
               nRet := ExecuteEvent( "OnCtlColorScrollBar", Self )
               ODEFAULT nRet TO ::OnCtlColorScrollBar( nwParam, nlParam )
-              IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                 nRet := ::Children[n]:OnCtlColorScrollBar( nwParam, nlParam )
-              ENDIF
+              //IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
+              //   nRet := ::Children[n]:OnCtlColorScrollBar( nwParam, nlParam )
+              //ENDIF
               EXIT
 
          CASE WM_CTLCOLORBTN
@@ -2440,8 +2458,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnCtlColorEdit", Self )
               ODEFAULT nRet TO ::OnCtlColorEdit( nwParam, nlParam )
               IF nRet == NIL
-                 IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                    nRet := ::Children[n]:OnCtlColorEdit( nwParam, nlParam )
+                 IF ( oObj := ObjFromHandle( nlParam ) ) != NIL
+                    nRet := oObj:OnCtlColorEdit( nwParam, nlParam )
                  ELSEIF ::__xCtrlName == "DataGrid" .AND. ::__CurControl != NIL
                     nRet := ::__CurControl:OnCtlColorEdit( nwParam, nlParam )
                  ENDIF
@@ -2460,8 +2478,8 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               nRet := ExecuteEvent( "OnCtlColorListBox", Self )
               ODEFAULT nRet TO ::OnCtlColorListBox( nwParam, nlParam )
               IF nRet == NIL
-                 IF ( n := ASCAN( ::Children, {|o|o:hWnd == nlParam} ) ) > 0
-                    nRet := ::Children[n]:OnCtlColorListBox( nwParam, nlParam )
+                 IF ( oObj := ObjFromHandle( nlParam ) ) != NIL
+                    nRet := oObj:OnCtlColorListBox( nwParam, nlParam )
                  ENDIF
               ENDIF
               EXIT
@@ -2685,43 +2703,14 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_MENUCOMMAND
               nRet := ExecuteEvent( "OnMenuCommand", Self )
               ODEFAULT nRet TO ::OnMenuCommand( nwParam, nlParam )
-              IF ::Application != NIL
 
-                 IF ( aMenu := __GetMenuItemInfo( nlParam, nwParam, .T. ) ) != NIL
-                    IF aMenu[1] <> 0
-                       oItem := __ObjFromPtr( aMenu[1] )
-
-                    ELSEIF ::MdiContainer .AND. ( oMDI := ::MdiGetActive() ) != NIL
-                       IF nwParam == 8 //SC_NEXTWINDOW
-                          oMdi:MdiNext()
-
-                        ELSE
-                          SWITCH aMenu[2]
-                             CASE HBMMENU_POPUP_MINIMIZE
-                             CASE HBMMENU_MBAR_MINIMIZE
-                                  oMdi:Minimize()
-                                  EXIT
-
-                             CASE HBMMENU_POPUP_RESTORE
-                             CASE HBMMENU_MBAR_RESTORE
-                                  oMdi:Restore()
-                                  EXIT
-
-                             CASE HBMMENU_POPUP_CLOSE
-                             CASE HBMMENU_MBAR_CLOSE
-                                  oMdi:Close()
-                                  EXIT
-                          END
-                       ENDIF
-                    ENDIF
+              IF ( aMenu := __GetMenuItemInfo( nlParam, nwParam, .T. ) ) != NIL
+                 IF aMenu[1] <> 0
+                    oItem := __ObjFromPtr( aMenu[1] )
                  ENDIF
-
               ENDIF
+
               IF oItem != NIL
-                 TRY
-                    oItem:Menu:ItemID := oItem:id
-                 CATCH
-                 END
                  IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
                     IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
                        oItem:Checked := ! oItem:Checked
@@ -2743,6 +2732,33 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                  IF __objHasMsg( oItem, "Cancel" )
                     oItem:Cancel()
                  ENDIF
+
+              ELSE
+
+                 IF ::MdiContainer .AND. ( oMDI := ::MdiGetActive() ) != NIL
+                    IF nwParam == 8 //SC_NEXTWINDOW
+                       oMdi:MdiNext()
+
+                     ELSE
+                       SWITCH aMenu[2]
+                          CASE HBMMENU_POPUP_MINIMIZE
+                          CASE HBMMENU_MBAR_MINIMIZE
+                               oMdi:Minimize()
+                               EXIT
+
+                          CASE HBMMENU_POPUP_RESTORE
+                          CASE HBMMENU_MBAR_RESTORE
+                               oMdi:Restore()
+                               EXIT
+
+                          CASE HBMMENU_POPUP_CLOSE
+                          CASE HBMMENU_MBAR_CLOSE
+                               oMdi:Close()
+                               EXIT
+                       END
+                    ENDIF
+                 ENDIF
+
               ENDIF
               oItem := NIL
               EXIT
@@ -4310,7 +4326,7 @@ CLASS WinForm INHERIT Window
    DATA Sizeable               EXPORTED INIT .T.  // to avoid crash loading old projects
 
    DATA Params                 EXPORTED
-   DATA ControlId              PROTECTED  INIT 101
+   DATA ControlId              EXPORTED  INIT 101
    DATA TabOrder               EXPORTED
    DATA DllInstance            EXPORTED
 
@@ -4380,7 +4396,6 @@ CLASS WinForm INHERIT Window
    METHOD Init() CONSTRUCTOR
 
    METHOD Create()
-   METHOD GetNextControlId()
 
    // MDI Messages
    METHOD MdiTileHorizontal( lTileDisable ) INLINE lTileDisable := IFNIL(lTileDisable,.F.,lTileDisable),;
@@ -4391,7 +4406,7 @@ CLASS WinForm INHERIT Window
                                                    SendMessage( ::MDIClient:hWnd, WM_MDICASCADE, IIF( !lTileDisable, MDITILE_SKIPDISABLED, 0 ) )
 
    METHOD MdiIconArrange()                  INLINE SendMessage( ::MDIClient:hWnd, WM_MDIICONARRANGE )
-   METHOD MdiNext()                         INLINE SendMessage( ::Application:MainForm:MDIClient:hWnd, WM_MDINEXT )
+   METHOD MdiNext()                         INLINE SendMessage( ::MDIClient:hWnd, WM_MDINEXT )
 
    METHOD MdiActivate()
    METHOD MdiDestroy()
@@ -4513,8 +4528,13 @@ METHOD Create( hoParent ) CLASS WinForm
       hoParent := ::__hParent
    ENDIF
 
-   IF ::DesignMode .AND. VALTYPE( ::xIcon ) == "A"
-      ::xIcon := ::xIcon[1]
+   IF ::DesignMode
+      IF VALTYPE( ::xIcon ) == "A"
+         ::xIcon := ::xIcon[1]
+      ENDIF
+      IF ::MDIChild
+         ::__aExcludeProperties := { "SHOWINTASKBAR", "MODAL", "SHOWMODE", "TOOLWINDOW", "CONTROLPARENT", "ANIMATIONSTYLE", "ALWAYSONTOP", "ACTIVEMENUBAR", "AUTOCLOSE", "BITMAPMASK", "BITMAPMASKCOLOR", "DLGMODALFRAME", "FRAMESTYLE" }
+      ENDIF
    ENDIF
 
    IF !::ShowInTaskBar .AND. ::Parent == NIL .AND. ! ::DesignMode .AND. ::Application:DllInstance == NIL
@@ -4614,7 +4634,7 @@ METHOD CenterWindow( lDesk ) CLASS WinForm
    IF ::Parent != NIL .AND. !lDesk
       ::GetWindowRect()
 
-      IF ::IsChild()
+      IF ::IsChild() .OR. ::xMDIChild
          aRect := _GetClientRect( ::Parent:hWnd )
          ::xLeft := ( ( aRect[3] - ::xWidth ) / 2 )
          ::xTop  := ( ( aRect[4] - ::xHeight ) / 2 )
@@ -4671,6 +4691,11 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS WinForm
    Super:OnSize( nwParam, nlParam )
+   ::ClientWidth  := LOWORD(nlParam)
+   ::ClientHeight := HIWORD(nlParam)
+   IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL
+      ::MDIClient:MoveWindow()
+   ENDIF
    IF ::IsWindowVisible() .AND. ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
       ::__CreateBkBrush()
@@ -4907,7 +4932,6 @@ METHOD __PrcMdiMenu( nId ) CLASS WinForm
    LOCAL oMdi := ::MDIClient:GetActive()
 
    IF oMdi != NIL
-      view nID, SC_CLOSE
       DO CASE
          CASE nId == SC_MINIMIZE
               oMdi:Minimize()
@@ -4915,22 +4939,14 @@ METHOD __PrcMdiMenu( nId ) CLASS WinForm
          CASE nId == SC_NEXTWINDOW
               oMdi:MdiNext()
 
-         CASE nId == 61589 // SC_RESTORE ???
+         CASE nId == SC_RESTORE
               oMdi:MdiRestore()
 
          CASE nId == SC_CLOSE
-//              oMdi:MdiClose()
+              oMdi:MdiClose()
       ENDCASE
    ENDIF
 RETURN 0
-
-//-----------------------------------------------------------------------------------------------
-METHOD GetNextControlId() CLASS WinForm
-   ::ControlId++
-   WHILE ASCAN( ::Children, {|o| o:Id == ::ControlId } ) > 0
-      ::ControlId++
-   END
-RETURN ::ControlId
 
 //-----------------------------------------------------------------------------------------------
 METHOD MdiActivate( oMdi ) CLASS WinForm

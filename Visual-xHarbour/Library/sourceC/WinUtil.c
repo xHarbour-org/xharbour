@@ -3990,8 +3990,10 @@ HB_FUNC( MENUITEMINFOITEMDATA )
 HB_FUNC( __GETMENUITEMINFO )
 {
    MENUITEMINFO mii;
+
    mii.cbSize = sizeof( MENUITEMINFO );
    mii.fMask  = MIIM_DATA | MIIM_STATE | MIIM_ID | MIIM_BITMAP;
+
    if( GetMenuItemInfo( (HMENU) hb_parnl(1), (UINT) hb_parni(2), hb_parl(3), &mii ) )
    {
       hb_reta( 2 );
@@ -4005,7 +4007,7 @@ HB_FUNC( MENUITEMINFOITEMID )
    LPMENUITEMINFO mii = NULL;
    mii->cbSize = sizeof( MENUITEMINFO );
    mii->fMask  = MIIM_ID;
-   if( GetMenuItemInfo( (HMENU) hb_parnl(1), hb_parni(2), TRUE, mii ) )
+   if( GetMenuItemInfo( (HMENU) hb_parnl(1), hb_parni(2), FALSE, mii ) )
    {
       hb_retni( (int) mii->wID );
    }

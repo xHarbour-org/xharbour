@@ -44,7 +44,6 @@ CLASS MDIClient INHERIT Window
    DATA Width              EXPORTED
    DATA Height             EXPORTED
 
-   DATA WindowMenu         EXPORTED
    DATA FirstChild         EXPORTED
    DATA Parent             EXPORTED
    DATA Style              EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
@@ -55,7 +54,6 @@ CLASS MDIClient INHERIT Window
    DATA MDIClient          EXPORTED
    DATA WindowStyle        EXPORTED
    DATA Tooltip            EXPORTED
-   DATA __ClientStruct     EXPORTED
    DATA TabStop            EXPORTED INIT .F.
    DATA Text               EXPORTED
 
@@ -113,8 +111,6 @@ METHOD Init( oParent ) CLASS MDIClient
    ::Top    := 0
    ::Width  := 0
    ::Height := 0
-   ::WindowMenu := 0
-   ::FirstChild := 100
 
    ::Parent      := oParent
    ::ClsName     := "MDIClient"
@@ -131,12 +127,13 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MDIClient
+   LOCAL ccs := (struct CLIENTCREATESTRUCT)
+   ccs:hWindowMenu  := 0
+   ccs:idFirstChild := 10001
+
    ::ControlParent := .T.
-   ::__ClientStruct := (struct CLIENTCREATESTRUCT)
-   ::__ClientStruct:hWindowMenu  := ::WindowMenu
-   ::__ClientStruct:idFirstChild := ::FirstChild
    ::ClipChildren := .T.
-   ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, , ::Style, ::Left, ::Top, ::Width, ::Height, ::Parent:hWnd, 0, ::Parent:Instance, ::__ClientStruct )
+   ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, , ::Style, ::Left, ::Top, ::Width, ::Height, ::Parent:hWnd, 0, ::Parent:Instance, ccs )
    ShowWindow( ::hWnd, SW_SHOW )
    ::__pCallBackPtr := WinCallBackPointer( HB_ObjMsgPtr( Self, "__ControlProc" ), Self )
    ::__nProc := SetWindowLong( ::hWnd, GWL_WNDPROC, ::__pCallBackPtr )
@@ -168,22 +165,6 @@ METHOD __SetBorder( nBorder ) CLASS MDIClient
    ::Style := nStyle
    ::ExStyle := nExStyle
 RETURN nBorder
-
-/*
-METHOD MoveWindow( x, y, w, h, lRep ) CLASS MDIClient
-   DEFAULT x    TO ::Left
-   DEFAULT y    TO ::Top
-   DEFAULT w    TO ::Width
-   DEFAULT h    TO ::Height
-   DEFAULT lRep TO ::IsWindowVisible()
-   ::Left  := x
-   ::Top   := y
-   ::width := w
-   ::height:= h
-
-   MoveWindow( ::hWnd, ::Left, ::Top, ::Width, ::Height, lRep )
-RETURN Self
-*/
 
 METHOD SetBackColor( nColor, lRepaint ) CLASS MDIClient
 
@@ -295,12 +276,13 @@ METHOD SetMargins( cMargins ) CLASS MDIClient
    ENDIF
 RETURN cMargins
 
-METHOD MoveWindow() CLASS MDIClient
-   LOCAL nLeft, nTop, nRight, nBottom, n
-   nLeft   := 0
-   nTop    := 0
-   nRight  := ::Parent:ClientWidth
-   nBottom := ::Parent:ClientHeight
+METHOD MoveWindow( nLeft, nTop, nWidth, nHeight ) CLASS MDIClient
+   LOCAL n
+
+   DEFAULT nLeft   TO 0
+   DEFAULT nTop    TO 0
+   DEFAULT nWidth  TO ::Parent:ClientWidth
+   DEFAULT nHeight TO ::Parent:ClientHeight
 
    IF VALTYPE( ::AlignLeft ) == "C" .AND. ( n := ASCAN( ::Parent:Children, {|o| o:Name == ::AlignLeft } ) ) > 0
       ::AlignLeft := ::Parent:Children[n]
@@ -323,13 +305,13 @@ METHOD MoveWindow() CLASS MDIClient
          nTop    := ::AlignTop:Top + ::AlignTop:Height + IIF( ::AlignTop:BottomSplitter != NIL, ::AlignTop:BottomSplitter:Weight, 0 )
       ENDIF
       IF VALTYPE( ::AlignRight ) == "O"
-         nRight  := ::AlignRight:Left - IIF( ::AlignRight:LeftSplitter != NIL, ::AlignRight:LeftSplitter:Weight, 0 )
+         nWidth  := ::AlignRight:Left - IIF( ::AlignRight:LeftSplitter != NIL, ::AlignRight:LeftSplitter:Weight, 0 )
       ENDIF
       IF VALTYPE( ::AlignBottom ) == "O"
-         nBottom := ::AlignBottom:Top - IIF( ::AlignBottom:TopSplitter != NIL, ::AlignBottom:TopSplitter:Weight, 0 )
+         nHeight := ::AlignBottom:Top - IIF( ::AlignBottom:TopSplitter != NIL, ::AlignBottom:TopSplitter:Weight, 0 )
       ENDIF
 
       MoveWindow( ::hWnd, nLeft + ::LeftMargin, nTop + ::TopMargin,;
-                          nRight - nLeft - ::RightMargin - ::LeftMargin, nBottom - nTop - ::BottomMargin - ::TopMargin, .T. )
+                          nWidth - nLeft - ::RightMargin - ::LeftMargin, nHeight - nTop - ::BottomMargin - ::TopMargin, .T. )
    ENDIF
 RETURN Self

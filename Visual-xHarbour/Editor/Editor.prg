@@ -1407,8 +1407,6 @@ METHOD Init() CLASS Settings
    ::ThickFrame    := .F.
    ::Name          := "Settings"
    ::Modal         := .T.
-   ::Left          := 10
-   ::Top           := 10
    ::Width         := 471
    ::Height        := 632
    ::Center        := .T.
@@ -2049,7 +2047,7 @@ METHOD OnInitDialog() CLASS Settings
       :EventHandler[ "OnClick" ] := "Apply"
       :Create()
    END //BUTTON
-RETURN 1
+RETURN 0
 
 //----------------------------------------------------------------------------------------------------
 METHOD DefBack_OnClick( Sender ) CLASS Settings

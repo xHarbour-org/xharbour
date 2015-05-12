@@ -1078,7 +1078,7 @@ METHOD Init() CLASS IDE_MainForm
             :ImageIndex   := IIF( :Parent:ImageList != NIL, :Parent:ImageList:Count, 0 )
             :BeginGroup   := .T.
             :Caption      := "Registered COM Objects"
-            :Action       := {|| ::Application:Project:AddActiveX() }
+            :Action       := {||  ListOle( ::Application:MainForm ) }
             :ShortCutText := "F11"
             :ShortCutKey:Key := VK_F11
             #ifndef VXH_PROFESSIONAL
@@ -2456,9 +2456,6 @@ CLASS Project
    METHOD Replace()
 
    METHOD SetAction()
-#ifdef VXH_PROFESSIONAL
-   METHOD AddActiveX()
-#endif
    METHOD ImportRes()
    METHOD ImportImages()
 
@@ -5957,13 +5954,6 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 RETURN cText
 
 //-------------------------------------------------------------------------------------------------------
-#ifdef VXH_PROFESSIONAL
-METHOD AddActiveX() CLASS Project
-   ListOle( ::Application:MainForm )
-RETURN Self
-#endif
-
-//-------------------------------------------------------------------------------------------------------
 METHOD SetAction( aActions, aReverse ) CLASS Project
    LOCAL x, n, o, nPos, aChildren, aAction, oCtrl, aCtrlProps, nWidth, nHeight
 
@@ -6481,25 +6471,62 @@ CLASS ListOle INHERIT Dialog
    DATA aOle    EXPORTED
    DATA aAddOn  EXPORTED
    METHOD Init( oParent ) CONSTRUCTOR
-   METHOD OnOk()
+   METHOD Save()
    METHOD OnInitDialog()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ListOle
    Super:Init( oParent )
-   ::Template := "OLELIST"
-   ::Modal    := .T.
-   ::Center   := .T.
-   ::aOle     := GetRegOle()
+   ::Modal     := .T.
+   ::Left      := 10
+   ::Top       := 10
+   ::Width     := 600
+   ::Height    := 530
+   ::Text      := "COM Objects"
+   ::MinHeight := 530
+   ::Center    := .T.
+   ::MinimizeBox   := .F.
+   ::MaximizeBox   := .F.
+   ::DlgModalFrame := .T.
    ::Create()
 RETURN Self
 
 METHOD OnInitDialog() CLASS ListOle
+   ::aOle := GetRegOle()
+
+   RegOle( Self )
+
+   WITH OBJECT ( Button( Self ) )
+      WITH OBJECT :Dock
+         :Right   := Self
+         :Bottom  := Self
+         :Margins := "5,5,80,5"
+      END
+      :Width  := 75
+      :Height := 24
+      :Text   := "OK"
+      :Action := {|| ::Save() }
+      :Create()
+   END
+
+   WITH OBJECT ( Button( Self ) )
+      WITH OBJECT :Dock
+         :Right   := Self
+         :Bottom  := Self
+         :Margins := "5,5,5,5"
+      END
+      :Width  := 75
+      :Height := 24
+      :Text   := "Cancel"
+      :Action := {|| ::Close( IDCANCEL ) }
+      :Create()
+   END //BUTTON
+
    WITH OBJECT PictureBox( Self )
       :Height          := 77
       :BackColor       := C_WHITE
       :Type            := "BMP"
-      :ImageName       := "Banner"
+      :ImageName       := "Banner2"
       :Dock:Margin     := 0
       :Dock:Left       := :Parent
       :Dock:Top        := :Parent
@@ -6507,14 +6534,12 @@ METHOD OnInitDialog() CLASS ListOle
       :Create()
    END
 
-   RegOle( Self )
-
    WITH OBJECT GroupBox( Self )
-      :Caption       := ::aOle[1][1]
-      :Dock:Margin   := 5
+      :Text          := ::aOle[1][1]
+      :Height        := 75
+      :Dock:Margins  := "5,5,5,34"
       :Dock:Left     := :Parent
-      :Dock:Top      := :Parent:DataGrid1
-      :Dock:Bottom   := :Parent:Button1
+      :Dock:Bottom   := :Parent
       :Dock:Right    := :Parent
       :Create()
       WITH OBJECT Label( :This )
@@ -6535,9 +6560,10 @@ METHOD OnInitDialog() CLASS ListOle
       END
       :MoveWindow()
    END
-RETURN 0
 
-METHOD OnOk() CLASS ListOle
+RETURN 1
+
+METHOD Save() CLASS ListOle
    LOCAL oTypeLib, cId
 
    ::Application:ToolBox:ComObjects := {}
@@ -6574,14 +6600,14 @@ METHOD Init( oParent ) CLASS RegOle
    ::Height        := 300
    ::ShowGrid      := .F.
    ::ItemHeight    := 17
-   //::Border        := .T.
    ::ShowHeaders   := .F.
-   ::Dock:Margin   := 0
+   ::Dock:TopMargin:= 78
    ::Dock:Left     := ::Parent
-   ::Dock:Top      := ::Parent:PictureBox1
+   ::Dock:Top      := ::Parent
    ::Dock:Right    := ::Parent
 
    ::AutoVertScroll:= .T.
+   ::AutoHorzScroll:= .F.
    ::FullRowSelect := .T.
 
    ::DataSource := MemoryTable( ::Parent )
@@ -6602,11 +6628,12 @@ METHOD Init( oParent ) CLASS RegOle
 
    ::Create()
    ::AutoAddColumns()
-   AEVAL( ::Children, {|o| o:Width := 200 } )
+   AEVAL( ::Children, {|o| o:Width := 250 } )
    ::Form:GridColumn1:Caption := ""
    ::Form:GridColumn1:Width   := 20
    ::Form:GridColumn1:Representation := 3
    ::Form:GridColumn1:SelOnlyRep := .F.
+   ::AnchorColumn := 4
    ::Update()
 
    ::SetFocus()
@@ -6620,13 +6647,11 @@ METHOD OnDestroy() CLASS RegOle
       ENDIF
       ::DataSource:Skip()
    ENDDO
-   ::Super:OnDestroy()
-RETURN NIL
+RETURN ::Super:OnDestroy()
 
 METHOD OnRowChanged() CLASS RegOle
    LOCAL hBmp, aBmp, cImage := ::Form:aOle[ ::DataSource:Recno() ][4]
    ::Form:GroupBox1:Caption := ::DataSource:Fields:Control
-   ::Form:GroupBox1:Redraw()
 
    IF VALTYPE( ::Form:aOle[ ::DataSource:Recno() ][4] ) == "C"
       aBmp := hb_aTokens( cImage, "," )
@@ -6641,8 +6666,9 @@ METHOD OnRowChanged() CLASS RegOle
    IF VALTYPE( hBmp ) == "N"
       DrawIconEx( ::Form:GroupBox1:Drawing:hDC, (::Form:GroupBox1:Height/2)-8, 20, hBmp, 32, 32, 0, NIL, DI_NORMAL )
    ENDIF
-   ::Form:Label1:Caption := "Version: " + ::Form:aOle[ ::DataSource:Recno() ][5]
-   ::Form:Label2:Caption := ::Form:aOle[ ::DataSource:Recno() ][6]
+   ::Form:Label1:Text := "Version: " + ::Form:aOle[ ::DataSource:Recno() ][5]
+   ::Form:Label2:Text := ::Form:aOle[ ::DataSource:Recno() ][6]
+   ::Form:GroupBox1:Redraw()
 RETURN NIL
 
 METHOD OnClick( nCol, nRow ) CLASS RegOle

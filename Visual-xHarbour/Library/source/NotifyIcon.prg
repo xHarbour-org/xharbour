@@ -82,7 +82,7 @@ RETURN Self
 METHOD SetVisible( lVisible ) CLASS NotifyIcon
    LOCAL lOpen, tray := (struct NOTIFYICONDATA)
    IF ! ::DesignMode
-      DEFAULT ::Id   TO ::Owner:GetNextControlId()
+      DEFAULT ::Id   TO ::Owner:ControlId++
       tray:cbSize           := NOTIFYICONDATA_V2_SIZE
       tray:hWnd             := ::Owner:hWnd
       tray:uID              := ::Id

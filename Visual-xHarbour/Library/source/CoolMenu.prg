@@ -28,21 +28,6 @@
 #define SM_CXSHADOW 4
 #define DG_ADDCONTROL             1
 //-------------------------------------------------------------------------------------------------------
-CLASS xCoolMenu INHERIT MenuBar
-   DATA Width  INIT 0
-   DATA Height INIT 0
-   DATA VertScrollSize INIT 0
-   DATA HorzScrollSize INIT 0
-   DATA List
-   DATA ToolTips
-   DATA HideClippedButtons INIT .F.
-   DATA BandChild
-ENDCLASS
-
-CLASS xCoolMenuItem INHERIT MenuItem
-   DATA Position INIT 0
-ENDCLASS
-
 CLASS CoolMenu INHERIT ToolBar
    PROPERTY HotImageList GET __ChkComponent( Self, @::xHotImageList )
    PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList )
@@ -60,7 +45,6 @@ CLASS CoolMenu INHERIT ToolBar
    METHOD GetItemCount()      INLINE LEN( ::aItems )
    METHOD OnParentCommand()
    METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE + DLGC_WANTCHARS + DLGC_WANTARROWS + DLGC_HASSETSEL
-//   METHOD OnKeyDown()
    METHOD OnMenuChar()
    METHOD OnSysChar()
    METHOD DeleteMenuItem()
@@ -275,7 +259,6 @@ METHOD OnParentCommand( nId ) CLASS CoolMenu
    LOCAL oMdi
    IF ::Parent:MdiContainer
       oMdi := ::Parent:MDIClient:GetActive()
-
       IF oMdi != NIL
          DO CASE
             CASE nId == IDM_MDI_MINIMIZE
@@ -290,6 +273,9 @@ METHOD OnParentCommand( nId ) CLASS CoolMenu
                  oMdi:MdiClose()
                  RETURN 0
          ENDCASE
+         IF nID <= 2
+            SendMessage( ::Parent:MDIClient:hWnd, IIF( nID == 2, WM_MDICASCADE, WM_MDITILE ), nID, 0 )
+         ENDIF
       ENDIF
    ENDIF
 
@@ -298,25 +284,31 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 
 CLASS CoolMenuItem INHERIT ToolButton
-   DATA BackColor             EXPORTED
-   DATA ForeColor             EXPORTED
-   DATA Index                 EXPORTED
-   DATA Item                  EXPORTED
-   DATA DropDown              EXPORTED
-   DATA WholeDropDown         EXPORTED
-   DATA ToolTip               EXPORTED
-   DATA Components            EXPORTED INIT {}
-   DATA SetChildren           EXPORTED INIT .T.
-   DATA Font                  EXPORTED
-   DATA MixedButtons          EXPORTED
-   DATA AutoSize              EXPORTED INIT .T.
-   DATA CheckGroup            EXPORTED INIT .F.
-   DATA ShowText              EXPORTED INIT .F.
-   DATA Check                 EXPORTED INIT .F.
-   DATA Width                 EXPORTED
-   DATA ImageIndex            EXPORTED INIT -2
-   DATA __Temprect            EXPORTED
-   DATA TreeItem              EXPORTED
+   PROPERTY MDIList     DEFAULT .F.
+
+   DATA BackColor       EXPORTED
+   DATA ForeColor       EXPORTED
+   DATA Index           EXPORTED
+   DATA Item            EXPORTED
+   DATA DropDown        EXPORTED
+   DATA WholeDropDown   EXPORTED
+   DATA ToolTip         EXPORTED
+   DATA Components      EXPORTED INIT {}
+   DATA SetChildren     EXPORTED INIT .T.
+   DATA Font            EXPORTED
+   DATA MixedButtons    EXPORTED
+   DATA AutoSize        EXPORTED INIT .T.
+   DATA CheckGroup      EXPORTED INIT .F.
+   DATA ShowText        EXPORTED INIT .F.
+   DATA Check           EXPORTED INIT .F.
+   DATA Width           EXPORTED
+   DATA ImageIndex      EXPORTED INIT -2
+   DATA __Temprect      EXPORTED
+   DATA TreeItem        EXPORTED
+
+   // compatibility
+   ACCESS MDIMenu      INLINE ::MDIList
+   ASSIGN MDIMenu(l)   INLINE ::MDIList := l
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -357,10 +349,10 @@ METHOD Create( nPos ) CLASS CoolMenuItem
    IF ::hMenu == NIL
       ::hMenu := CreatePopupMenu()
 
-      lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-      lpMenuInfo:fMask  := MIM_STYLE
-      lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-      SetMenuInfo( ::hMenu, lpMenuInfo )
+      //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+      //lpMenuInfo:fMask  := MIM_STYLE
+      //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+      //SetMenuInfo( ::hMenu, lpMenuInfo )
    ENDIF
 RETURN Self
 

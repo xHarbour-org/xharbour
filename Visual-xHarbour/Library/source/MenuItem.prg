@@ -27,13 +27,15 @@ CLASS MenuItem INHERIT Object
    PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList, .F. )
    PROPERTY ImageIndex                        DEFAULT 0
    PROPERTY ShortCutKey
-   PROPERTY Text        SET ::__ModifyMenu(v)
+   PROPERTY Text        SET ::__SetText(v)
    PROPERTY Enabled     SET ::__SetEnabled(v) DEFAULT .T.
    PROPERTY Checked     SET ::__SetChecked(v) DEFAULT .F.
    PROPERTY RadioCheck                        DEFAULT .F.
    PROPERTY Separator                         DEFAULT .F.
    PROPERTY RightJustified                    DEFAULT .F.
    PROPERTY Visible     SET ::__SetVisible(v) DEFAULT .T.
+   PROPERTY MDIList     DEFAULT .F.
+   PROPERTY Alignment   DEFAULT 0
 
    ACCESS Caption      INLINE ::Text
    ASSIGN Caption(c)   INLINE ::Text := c
@@ -47,8 +49,13 @@ CLASS MenuItem INHERIT Object
    DATA xImageList     EXPORTED
    DATA __hBitmap      EXPORTED
    DATA __pObjPtr      EXPORTED
+   DATA EnumAlignment  EXPORTED  INIT { { "Left", "Right" }, {0,MFT_RIGHTJUSTIFY} }
 
    DATA __mii          PROTECTED
+
+   // compatibility
+   ACCESS MDIMenu      INLINE ::MDIList
+   ASSIGN MDIMenu(l)   INLINE ::MDIList := l
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -58,7 +65,7 @@ CLASS MenuItem INHERIT Object
    METHOD __SetChecked()
    METHOD __ResetImageList()
    METHOD __SetVisible()
-   METHOD __ModifyMenu()  INLINE NIL
+   METHOD __SetText()
    METHOD Destroy()
    METHOD Delete()        INLINE ::Destroy()
    METHOD GetMenuById()
@@ -72,9 +79,9 @@ CLASS MenuItem INHERIT Object
    METHOD Check()         INLINE ::Checked := .T.
    METHOD Enable()        INLINE ::Enabled := .T.
    METHOD Disable()       INLINE ::Enabled := .F.
-   METHOD SetText()
    METHOD IsEnabled()     INLINE ::Enabled
    METHOD IsChecked()     INLINE ::Checked
+   METHOD SetText(cText)  INLINE ::__SetText(cText)
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuItem
@@ -84,7 +91,7 @@ METHOD Init( oParent ) CLASS MenuItem
    ::__IsControl  := .T.
    ::__IsStandard := .T.
    ::Parent       := oParent
-   ::Id           := ::Form:GetNextControlId()
+   ::Id           := ::Form:ControlId++
    IF ::DesignMode
       __SetInitialValues( Self )
    ENDIF
@@ -184,6 +191,10 @@ METHOD Create( lAdd ) CLASS MenuItem
    ENDIF
    ::hMenu := CreateMenu()
 
+   IF ::Alignment <> 0
+      ::__mii:fType := ::__mii:fType | ::Alignment
+   ENDIF
+
    IF ::Visible
       InsertMenuItem( ::Parent:hMenu, -1, .T., ::__mii )
    ENDIF
@@ -209,7 +220,7 @@ RETURN NIL
 
 METHOD __SetVisible( lVisible ) CLASS MenuItem
    LOCAL n, mii
-   IF ::hMenu != NIL
+   IF ::hMenu != NIL .AND. lVisible != ::xVisible
       n := ASCAN( ::Parent:Children, {|o| o:hMenu == ::hMenu } )
       IF lVisible
          IF ! IsMenu( ::hMenu )
@@ -241,33 +252,36 @@ METHOD __SetVisible( lVisible ) CLASS MenuItem
    ENDIF
 RETURN NIL
 
-METHOD __SetChecked() CLASS MenuItem
+METHOD __SetChecked( lCheck ) CLASS MenuItem
    LOCAL mii
-   IF ::__pObjPtr != NIL
+   IF ::__pObjPtr != NIL .AND. lCheck != ::xChecked
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
       mii:fMask    := MIIM_STATE | MIIM_BITMAP
-      mii:hbmpItem := IIF( ::xChecked, NIL, ::__hBitmap /*HBMMENU_CALLBACK*/ )
-      mii:fState   := IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
+      mii:hbmpItem := IIF( lCheck, NIL, ::__hBitmap /*HBMMENU_CALLBACK*/ )
+      mii:fState   := IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL
 
-METHOD __SetEnabled() CLASS MenuItem
+METHOD __SetEnabled( lEnabled ) CLASS MenuItem
    LOCAL mii
-   IF ::__pObjPtr != NIL
+   IF ::__pObjPtr != NIL .AND. lEnabled != ::xEnabled
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
       mii:fMask    := MIIM_STATE
-      mii:fState   := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED )
+      mii:fState   := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL
 
-METHOD SetText( cText ) CLASS MenuItem
-   ::Text := cText
-   ::__mii:dwTypeData := ::Text
-   SetMenuItemInfo( ::Parent:hMenu, ::Id, 0, ::__mii )
+METHOD __SetText( cText ) CLASS MenuItem
+   LOCAL cShort
+   IF ::__mii != NIL
+      cShort := ::ShortCutKey:GetShortcutText()
+      ::__mii:dwTypeData := cText + IIF( ! EMPTY(cShort), CHR(9) + cShort, "" )
+      SetMenuItemInfo( ::Parent:hMenu, ::Id, 0, ::__mii )
+   ENDIF
 RETURN SELF
 
 
@@ -280,15 +294,16 @@ METHOD Destroy() CLASS MenuItem
    IF ::__pObjPtr != NIL
       __ObjRelPtr( ::__pObjPtr )
    ENDIF
+   IF ( n := ASCAN( ::Parent:Children, {|o| o:hMenu == ::hMenu } ) ) > 0
+      ADEL( ::Parent:Children, n, .T. )
+   ENDIF
    IF IsMenu( ::hMenu )
       DestroyMenu( ::hMenu )
-   ENDIF
-   IF ( n := ASCAN( ::Parent:Children, {|o| o:Id == ::Id } ) ) > 0
-      ADEL( ::Parent:Children, n, .T. )
    ENDIF
    IF ::__hBitmap != NIL
       DeleteObject( ::__hBitmap )
    ENDIF
+   DeleteMenu( ::Parent:hMenu, ::Id, MF_BYCOMMAND )
 RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuItem

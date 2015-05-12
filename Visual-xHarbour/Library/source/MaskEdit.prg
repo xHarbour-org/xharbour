@@ -29,6 +29,7 @@ CLASS MaskEdit INHERIT EditBox
    DATA NoOverStrike     EXPORTED INIT .F.
    DATA oGet             EXPORTED
 
+   DATA Number           PROTECTED INIT .F.
    DATA CueBanner        PROTECTED
 
    DATA EnterNext        INIT .F.

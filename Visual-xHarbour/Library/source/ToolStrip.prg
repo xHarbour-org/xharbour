@@ -1731,7 +1731,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ToolStripButton
-   LOCAL lpMenuInfo, nAdd, aSize, n
+   LOCAL /*lpMenuInfo,*/ nAdd, aSize, n
    nAdd := 12
    IF !::Parent:__lIsMenu
       nAdd := ::Parent:ImagePadding * 2
@@ -1760,13 +1760,11 @@ METHOD Create() CLASS ToolStripButton
    ENDIF
    Super:Create()
    ::__hMenu := CreatePopupMenu()
-   lpMenuInfo := (struct MENUINFO)
-
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::__hMenu, lpMenuInfo )
-   lpMenuInfo := NIL
+   //lpMenuInfo := (struct MENUINFO)
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::__hMenu, lpMenuInfo )
 
 RETURN Self
 
@@ -3152,13 +3150,13 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ContextStrip
-   LOCAL lpMenuInfo := (struct MENUINFO)
+   //LOCAL lpMenuInfo := (struct MENUINFO)
    Super:Create()
    ::__hMenu := CreatePopupMenu()
-   lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   lpMenuInfo:fMask  := MIM_STYLE
-   lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   SetMenuInfo( ::__hMenu, lpMenuInfo )
+   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
+   //lpMenuInfo:fMask  := MIM_STYLE
+   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
+   //SetMenuInfo( ::__hMenu, lpMenuInfo )
    ::lCreated := .T.
    ::hWnd := ::Form:hWnd
    IF ::DesignMode

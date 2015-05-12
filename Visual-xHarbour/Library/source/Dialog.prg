@@ -166,7 +166,7 @@ METHOD PreInitDialog() CLASS Dialog
    ::__aCltRect   := { nLeft, nTop, ::xWidth, ::xHeight }
    ::OriginalRect := { nLeft, nTop, ::xWidth, ::xHeight }
 
-   __SetObjPtr( Self )
+   __SetWindowObjPtr( Self )
 
    IF ::Template != NIL
 
@@ -198,7 +198,7 @@ METHOD PreInitDialog() CLASS Dialog
             oCtrl:GetClientRect()
             oCtrl:GetWindowRect()
 
-            __SetObjPtr( oCtrl )
+            __SetWindowObjPtr( oCtrl )
 
             AADD( ::Children, oCtrl )
          ENDIF
@@ -225,7 +225,6 @@ METHOD Create( hParent ) CLASS Dialog
    ENDIF
 
    hParent := IIF( ::Parent == NIL, hParent, ::Parent:hWnd )
-   DEFAULT hParent TO GetDesktopWindow()
    DEFAULT ::EventHandler TO Hash()
 
    ::lEmpty   := ::Template == NIL
@@ -250,6 +249,7 @@ METHOD Create( hParent ) CLASS Dialog
       hParent := ::__TaskBarParent
    ENDIF
 
+   DEFAULT hParent TO GetActiveWindow()
    IF ::Modal
       IF ::Template == NIL
          ::Template := __GetTemplate( Self )
