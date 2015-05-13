@@ -230,12 +230,13 @@ METHOD __SetVisible( lVisible ) CLASS MenuItem
 
          mii := (struct MENUITEMINFO)
          mii:cbSize := mii:SizeOf()
-         mii:fMask  := 0
+         mii:fMask  := MIIM_STATE
+         mii:fState := IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
 
          IF ::ImageIndex > 0 .AND. VALTYPE( ::Parent:ImageList ) == "O" .AND. ! ::xChecked
             DEFAULT ::__hBitmap TO ::Parent:ImageList:GetBitmap( ::ImageIndex, GetSysColorBrush( COLOR_MENU ) )
             mii:fMask    := MIIM_BITMAP
-            mii:hbmpItem := ::__hBitmap //HBMMENU_CALLBACK
+            mii:hbmpItem := ::__hBitmap
          ENDIF
 
          IF LEN( ::Children ) > 0
