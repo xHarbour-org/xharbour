@@ -1647,6 +1647,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    IF nCode == 0 .AND. nlParam == 0
       oItem := __ObjFromID( nID, ::hWnd )
       IF oItem != NIL
+
          IF HGetPos( oItem:EventHandler, "OnClick" ) != 0
             IF oItem:ClsName == "MenuStripItem" .AND. oItem:Role == 2
                oItem:Checked := ! oItem:Checked
@@ -1657,13 +1658,8 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
                oForm := Self
             ENDIF
             nRet := hb_ExecFromArray( oForm, oItem:EventHandler[ "OnClick" ], {oItem} )
-          ELSEIF oItem:ClsName == "MenuStripItem" .AND. VALTYPE( oItem:Action ) == "B"
+          ELSEIF VALTYPE( oItem:Action ) == "B"
             EVAL( oItem:Action, oItem )
-          ELSE
-            ODEFAULT nRet TO __Evaluate( oItem:Action, oItem,,, nRet )
-            IF __objHasMsg( oItem, "OnClick" )
-               oItem:OnClick( oItem )
-            ENDIF
          ENDIF
          IF __objHasMsg( oItem, "Cancel" )
             oItem:Cancel()
@@ -2005,16 +2001,13 @@ METHOD OnNCDestroy() CLASS Window
    ::__aDock           := NIL
 
    IF ::Application != NIL
-      IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd .AND. ::Application:__hMutex != NIL
-         CloseHandle( ::Application:__hMutex )
-      ENDIF
-
-      IF !::IsChild .AND.;
-         ::Application:MainForm != NIL .AND.;
-         ::Application:MainForm:hWnd == ::hWnd .AND.;
-         ::__InstMsg != NIL .AND.;
-         ( ::__WindowStyle != 0 .OR. ::Parent == NIL .OR. ::Parent:ClsName == "DeskTop" )
-         PostQuitMessage(0)
+      IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd
+         IF ::Application:__hMutex != NIL
+            CloseHandle( ::Application:__hMutex )
+         ENDIF
+         IF ! ::DesignMode
+            PostQuitMessage(0)
+         ENDIF
       ENDIF
    ENDIF
    IF ::__TaskBarParent != NIL
