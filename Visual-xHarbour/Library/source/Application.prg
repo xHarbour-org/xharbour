@@ -540,9 +540,6 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Quit() CLASS Application
-   IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
-      ::MainForm:Destroy()
-   ENDIF
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
@@ -560,7 +557,11 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------
 METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
-      ::MainForm:Destroy()
+      IF ::MainForm:Modal .AND. IsWindowVisible( ::MainForm:hWnd )
+         ::MainForm:Close()
+       ELSE
+         ::MainForm:Destroy()
+      ENDIF
    ENDIF
    ::MainForm := NIL
    IF ::DllInstance == NIL
