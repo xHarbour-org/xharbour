@@ -356,6 +356,7 @@ CLASS Application
    DATA __lMoveable                    EXPORTED  INIT .F.
    DATA __lResizeable                  EXPORTED  INIT .F.
    DATA __lCopyCut                     EXPORTED  INIT .F.
+   DATA __aExcludeProperties           EXPORTED  INIT {}
    DATA __InstMsg                      PROTECTED
    DATA lExit                          PROTECTED INIT .F.
 
@@ -539,6 +540,9 @@ RETURN lRet
 
 //------------------------------------------------------------------------------------------------
 METHOD Quit() CLASS Application
+   IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
+      ::MainForm:Destroy()
+   ENDIF
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
@@ -556,11 +560,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------
 METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
-      IF ::MainForm:Modal
-         ::MainForm:Close()
-       ELSE
-         ::MainForm:Destroy()
-      ENDIF
+      ::MainForm:Destroy()
    ENDIF
    ::MainForm := NIL
    IF ::DllInstance == NIL
