@@ -389,7 +389,7 @@ CLASS Application
    METHOD AxTranslate()
    METHOD MessageBox()
    METHOD SaveResource()
-   METHOD Quit()
+   METHOD Quit() INLINE ::Exit()
    METHOD SaveCustomColors()
    METHOD LoadCustomColors()
 
@@ -539,29 +539,9 @@ METHOD SaveResource( ncRes, cFileName ) CLASS Application
 RETURN lRet
 
 //------------------------------------------------------------------------------------------------
-METHOD Quit() CLASS Application
-   IF ::DllInstance == NIL
-      s_lExit := .T.
-      PostQuitMessage(0)
-      AEVAL( ::ImageLists, {|o|o:Destroy()} )
-      IF ::__hMenuHook != NIL
-         UnhookWindowsHookEx( ::__hMenuHook )
-      ENDIF
-      IF ::__SocketInit
-         InetCleanUp()
-      ENDIF
-      QUIT
-   ENDIF
-RETURN NIL
-
-//------------------------------------------------------------------------------------------------
 METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
-      IF ::MainForm:Modal .AND. IsWindowVisible( ::MainForm:hWnd )
-         ::MainForm:Close()
-       ELSE
-         ::MainForm:Destroy()
-      ENDIF
+      ::MainForm:Destroy()
    ENDIF
    ::MainForm := NIL
    IF ::DllInstance == NIL
