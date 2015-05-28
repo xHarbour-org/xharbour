@@ -893,7 +893,7 @@ CLASS TabPage INHERIT Dialog
    ACCESS TabOrder         INLINE ::xTabOrder
    ACCESS TopMost          INLINE ::xTopMost
 
-   ACCESS Form             INLINE ::Parent:Form
+   ACCESS Form             INLINE IIF( ::Parent != NIL, ::Parent:Form, Self )
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
