@@ -22,6 +22,11 @@
 #define PBS_DEFAULTED    5
 #define BP_PUSHBUTTON    1
 
+#define BS_COMMANDLINK 0x0000000E
+
+#define BCM_FIRST 0x1600
+#define BCM_SETNOTE (BCM_FIRST + 0x0009)
+
 #define TMT_BTNTEXT   1619
 
 //-----------------------------------------------------------------------------------------------
@@ -428,3 +433,43 @@ METHOD OnMouseLeave() CLASS Button
    ::__lMouseHover := .F.
    ::InvalidateRect(, .F. )
 RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS CommandLink INHERIT Control
+   PROPERTY ShortCutKey   ROOT "Behavior"
+   PROPERTY Note          ROOT "behavior" SET ::__SetNote(v) DEFAULT ""
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+   METHOD __SetNote()
+   METHOD OnCtlColorBtn()
+ENDCLASS
+
+METHOD Init( oParent ) CLASS CommandLink
+   ::__xCtrlName := "CommandLink"
+   ::ClsName   := "Button"
+   DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_COMMANDLINK
+   ::Super:Init( oParent )
+   ::Width     := 180
+   ::Height    := 45
+   IF ::DesignMode
+      ::__PropFilter := { "ALLOWMAXIMIZE","BACKCOLOR", "FORECOLOR", "TRANSPARENT", "CLIPCHOLDREN", "CLIPSIBLINGS", "BORDER", "NOACTIVATE", "THEMING" }
+   ENDIF
+   ::ShortCutKey   := __MenuStripItemShortCut( Self )
+RETURN Self
+
+METHOD Create() CLASS CommandLink
+   Super:Create()
+   ::__SetNote( ::xNote )
+RETURN Self
+
+METHOD __SetNote( cNote ) CLASS CommandLink
+   IF ::IsWindow()
+      ::SendMessage( BCM_SETNOTE, 0, AnsiToWide(cNote) )
+   ENDIF
+RETURN Self
+
+METHOD OnCtlColorBtn( hDC ) CLASS CommandLink
+   LOCAL hBkGnd := ::Parent:BkBrush
+   SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+RETURN hBkGnd

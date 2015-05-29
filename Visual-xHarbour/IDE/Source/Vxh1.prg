@@ -309,6 +309,7 @@ METHOD Init( ... ) CLASS IDE
    ENDIF
 
    ::Run()
+   QUIT
 RETURN Self
 
 METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
@@ -318,9 +319,8 @@ METHOD EnableBars( lEnabled, lOrder ) CLASS IDE
    ::EditBar:Enabled     := lEnabled
    ::BuildBar:Enabled    := lEnabled
    ::ToolBoxBar:Enabled  := lEnabled
-   ::AlignBar:Enabled    := lEnabled
 
-   ::Props:MainToolBar:Enabled := lEnabled
+   ::Props:MainMenu:Enabled := lEnabled
 
    IF lOrder
       FOR n := 1 TO LEN( ::AlignBar:Children )-1
@@ -632,7 +632,7 @@ METHOD Init() CLASS IDE_MainForm
    ::Application:Props[ "MainToolBar" ] := ToolStripContainer( Self ):Create()
 
    //--------------------------------------
-   WITH OBJECT MenuStrip( ::Application:Props[ "MainToolBar" ] )
+   WITH OBJECT ::Application:Props[ "MainMenu" ] := MenuStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip  := .F.
       :Row       := 1
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1963,14 +1963,16 @@ METHOD Init() CLASS IDE_MainForm
                         (n)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:ToolBox:Enabled    := y > 3
-                        IF y > 3
-                           ::Application:Project:CurrentForm:Redraw()
-                           IF x == 3 .AND. y == 4
-                              ::Application:ObjectManager:Parent:Select()
-                           ENDIF
-                         ELSEIF y == 3
-                           ::Application:FileExplorer:Parent:Select()
-                        ENDIF
+
+                        //IF y > 3
+                        //   ::Application:Project:CurrentForm:Redraw()
+                        //   IF x == 3 .AND. y == 4
+                        //      ::Application:ObjectManager:Parent:Select()
+                        //   ENDIF
+                        // ELSEIF y == 3
+                        //   ::Application:FileExplorer:Parent:Select()
+                        //ENDIF
+
                         ::EnableSearchMenu( y == 3 )
                         IF y == 3
                            ::Application:SourceEditor:SetTimer( 1001, 2000 )
@@ -2265,16 +2267,16 @@ FUNCTION OnShowEditors()
 RETURN NIL
 
 FUNCTION SetControlCursor( oItem )
-   LOCAL cClass, n
+   LOCAL cClass
    LOCAL oApp := __GetApplication()
 
    oApp:ToolBox:ActiveItem := oItem
    oApp:MainForm:SelImgList  := oItem:Parent:ImageList
    oApp:MainForm:SelImgIndex := oItem:ImageIndex
-
    cClass := oItem:Caption
    oApp:CurCursor := IIF( cClass != "Pointer", cClass, NIL )
 
+/*
    IF oItem:Owner:Caption == "COM Objects"
       IF ( n := ASCAN( oApp:ToolBox:ComObjects, {|a| a[2] == cClass } ) ) > 0
          oApp:CurCursor := oApp:ToolBox:ComObjects[n]
@@ -2289,7 +2291,7 @@ FUNCTION SetControlCursor( oItem )
       NEXT
 
    ENDIF
-
+*/
    IF oApp:Project:CurrentForm != NIL
       oApp:Project:CurrentForm:CtrlMask:SetMouseShape( IIF( cClass != "Pointer", MCS_DRAGGING, MCS_ARROW ) )
    ENDIF
@@ -3322,7 +3324,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    ::CurrentForm:Show()
    ::CurrentForm:Validaterect()
    ::CurrentForm:UpdateWindow()
-   ::CurrentForm:Redraw()
+//   ::CurrentForm:Redraw()
    ::Application:DoEvents()
 
    ::CurrentForm:Parent:UpdateScroll()

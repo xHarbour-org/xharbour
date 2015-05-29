@@ -404,8 +404,8 @@ METHOD OnMeasureItem( nwParam, nlParam, mis ) CLASS ToolBar
    IF mis:CtlType == ODT_MENU
 
       IF ::Chevron != NIL
-         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==mis:itemID } ) ) > 0
-            RETURN ::Chevron:aItems[n]:MeasureItem( mis, nlParam )
+         IF ( n := ASCAN( ::Chevron:Children, {|o|o:Id==mis:itemID } ) ) > 0
+            RETURN ::Chevron:Children[n]:MeasureItem( mis, nlParam )
          ELSE
             FOR EACH oSub IN ::Chevron:Menu:aItems
                IF ( oItem := oSub:GetMenuById( mis:itemID ) )!= NIL
@@ -466,9 +466,9 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
 
       IF ::Chevron != NIL
          n := 0
-         IF ( n := ASCAN( ::Chevron:aItems, {|o|o:Id==dis:itemID } ) ) > 0
+         IF ( n := ASCAN( ::Chevron:Children, {|o|o:Id==dis:itemID } ) ) > 0
             oMenu:= ::Chevron
-            oItem:= ::Chevron:aItems[n]
+            oItem:= ::Chevron:Children[n]
             nPos := n
          ELSE
             FOR EACH oSub IN ::Chevron:Menu:aItems
@@ -1988,7 +1988,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
             ELSE
               IF ( nPushPos := MenuItemFromPoint( oBar:hWndHook, oBar:Chevron:hMenu, pt ) )>= 0
                   oBar:PushPos := { LoWord(ms:lparam), HiWord(ms:lparam) }
-                  oBar:Chevron:aItems[nPushPos+1]:SetText( oBar:Chevron:aItems[nPushPos+1]:Caption )
+                  oBar:Chevron:Children[nPushPos+1]:SetText( oBar:Chevron:Children[nPushPos+1]:Caption )
               ENDIF
               IF nPushPos < 0
                  oBar:nPressed := -1

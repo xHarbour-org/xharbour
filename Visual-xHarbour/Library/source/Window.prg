@@ -1643,8 +1643,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    LOCAL nCode, nId, nRet, oCtrl, lHandled, oForm, oChild, oItem
    nCode := HIWORD( nwParam )
    nId   := LOWORD( nwParam )
-
-   IF nCode == 0 .AND. nlParam == 0
+   IF nCode IN {0,1} .AND. nlParam == 0
       oItem := __ObjFromID( nID, ::hWnd )
       IF oItem != NIL
 

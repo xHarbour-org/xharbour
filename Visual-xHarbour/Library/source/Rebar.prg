@@ -673,89 +673,82 @@ METHOD OnChevronPushed( chev ) CLASS CoolBarBand
 
    // Will create the vertical toolbar ( custom menu )
    IF ::BandChild:ClsName == "ToolBarWindow32"
-      pt := (struct POINT)
-      rc := (struct RECT)
+      IF ::BandChild:Chevron == NIL
+         pt := (struct POINT)
+         rc := (struct RECT)
 
-      pt:x := chev:rc:Left
-      pt:y := chev:rc:Bottom
+         pt:x := chev:rc:Left
+         pt:y := chev:rc:Bottom
 
-      ::BandChild:ChevronRect := chev:rc
-      ::BandChild:MenuWindow  := 1
+         ::BandChild:ChevronRect := chev:rc
+         ::BandChild:MenuWindow  := 1
 
-      ClientToScreen( ::BandChild:Form:hWnd, @pt )
+         ClientToScreen( ::BandChild:Form:hWnd, @pt )
 
-      GetWindowRect( ::Parent:hWnd, @rc )
-      pt:x := rc:left + chev:rc:Left
-      pt:y := rc:top + chev:rc:Bottom
+         GetWindowRect( ::Parent:hWnd, @rc )
+         pt:x := rc:left + chev:rc:Left
+         pt:y := rc:top + chev:rc:Bottom
 
-      // Create the vertical bar
-      ::BandChild:Chevron              := MenuPopup( Self )
-      ::BandChild:Chevron:Style        := TPM_LEFTALIGN+TPM_TOPALIGN
-      ::BandChild:Chevron:Left         := pt:x + 2
-      ::BandChild:Chevron:Top          := pt:y + 2
-      ::BandChild:Chevron:ImageList    := ::BandChild:ImageList
-      ::BandChild:Chevron:HotImageList := ::BandChild:HotImageList
-      ::BandChild:Chevron:CoolBar      := ::BandChild:__MenuBar
-      ::BandChild:Chevron:Create()
-      ::BandChild:lToolMenu := .F.
+         // Create the vertical bar
+         ::BandChild:Chevron           := ContextMenu( Self )
+         ::BandChild:Chevron:Left      := pt:x + 2
+         ::BandChild:Chevron:Top       := pt:y + 2
+         ::BandChild:Chevron:ImageList := ::BandChild:ImageList
+         ::BandChild:Chevron:Create()
+         ::BandChild:lToolMenu := .F.
 
-      IF ::BandChild:Chevron:ImageList == NIL
-         nSize := ::BandChild:GetButtonSize()
-         ::BandChild:Chevron:ImageList := ImageList( ::BandChild )
-         ::BandChild:Chevron:ImageList:Destroy()
-         ::BandChild:Chevron:ImageList:Handle := ::BandChild:GetImageList()
-      ENDIF
+         IF ::BandChild:Chevron:ImageList == NIL
+            nSize := ::BandChild:GetButtonSize()
+            ::BandChild:Chevron:ImageList := ImageList( ::BandChild )
+            ::BandChild:Chevron:ImageList:Destroy()
+            ::BandChild:Chevron:ImageList:Handle := ::BandChild:GetImageList()
+         ENDIF
 
-      n := 1
-      FOR EACH oBtn IN ::BandChild:aItems
+         n := 1
+         FOR EACH oBtn IN ::BandChild:aItems
 
-          rcBtn := oBtn:GetRect()
+             rcBtn := oBtn:GetRect()
 
-          pt:x := ::BandChild:GetButtonsWidth( n )
-          pt:y := rcBtn:Bottom
-          n++
+             pt:x := ::BandChild:GetButtonsWidth( n )
+             pt:y := rcBtn:Bottom
+             n++
 
-          ClientToScreen( oBtn:Parent:hWnd, @pt )
+             ClientToScreen( oBtn:Parent:hWnd, @pt )
 
-          IF oBtn:id <= IDM_MDI_ICON  .AND. pt:x + 2 >= ::BandChild:Chevron:Left
-             IF oBtn:Style & BTNS_SEP == 0
-                oItem := MenuItem( ::BandChild:Chevron )
-                oItem:Id := oBtn:Id
-                DEFAULT oBtn:Text TO ""
-                oItem:Text := oBtn:Caption
-                IF !::BandChild:__MenuBar
+             IF oBtn:id <= IDM_MDI_ICON  .AND. pt:x + 2 >= ::BandChild:Chevron:Left .AND. oBtn:Visible
+                IF oBtn:Style & BTNS_SEP == 0
+                   DEFAULT oBtn:Text TO ""
+
+                   oItem := MenuItem( ::BandChild:Chevron )
+                   oItem:Text       := oBtn:Caption
                    oItem:ImageIndex := oBtn:ImageIndex
                    oItem:Action     := oBtn:Action
-                 ELSE
-                   oItem:ImageList := oBtn:ImageList
-                   oItem:Children  := ACLONE( oBtn:Children )
-                ENDIF
-                oItem:Enabled := oBtn:Enabled
-                oItem:Create()
+                   TRY
+                      oItem:EventHandler[ "OnClick" ] := oBtn:EventHandler[ "OnClick" ]
+                   CATCH
+                   END
+                   oItem:ImageList  := oBtn:ImageList
+                   oItem:Children   := ACLONE( oBtn:Children )
+                   oItem:Enabled    := oBtn:Enabled
+                   oItem:Create()
 
-                FOR EACH oSub IN oItem:Children
-                    oSub:Parent := oItem
-                    oSub:ReCreate()
-                NEXT
+                   FOR EACH oSub IN oItem:Children
+                       oSub:Parent := oItem
+                       oSub:ReCreate()
+                   NEXT
+                ENDIF
+
              ENDIF
 
-          ENDIF
-
-      NEXT
-      ::BandChild:hWndHook := ::BandChild:hWnd
-      ::Application:__CurCoolMenu := ::BandChild
-      ::BandChild:Chevron:Context( ::BandChild:hWnd )
-      ::Application:DoEvents()
-
-      IF !::BandChild:Chevron:CoolBar
-         ::Application:__CurCoolMenu := NIL
-//         UnhookWindowsHookEx( ::Application:hMenuHook )
+         NEXT
+         ::BandChild:Chevron:Show()
+         ::BandChild:Chevron:Destroy()
+         ::BandChild:Chevron  := NIL
+         ::BandChild:Redraw()
+      ELSE
+         SendMessage( ::BandChild:hWnd, WM_CANCELMODE, 0, 0 )
       ENDIF
 
-      ::BandChild:Chevron:Destroy()
-      ::BandChild:hWndHook := NIL
-      ::BandChild:Chevron  := NIL
-//      ::BandChild:hHook    := NIL
    ENDIF
 
 RETURN 1

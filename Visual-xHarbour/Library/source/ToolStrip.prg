@@ -54,7 +54,7 @@ CLASS ToolStripContainer INHERIT Control
    DATA TabOrder         EXPORTED
    DATA ClipChildren     EXPORTED INIT .T.
    DATA ClipSiblings     EXPORTED INIT .T.
-   DATA TabStop          EXPORTED
+   DATA TabStop          EXPORTED INIT .F.
    DATA Transparent      EXPORTED INIT .F.
    DATA Visible          EXPORTED INIT .T.
    DATA __aStrips        EXPORTED INIT {}
@@ -337,7 +337,7 @@ CLASS ToolStrip INHERIT Control
    DATA TabOrder       EXPORTED
    DATA ClipChildren   EXPORTED INIT .T.
    DATA ClipSiblings   EXPORTED INIT .T.
-   DATA TabStop        EXPORTED
+   DATA TabStop        EXPORTED INIT .F.
    DATA Transparent    EXPORTED INIT .F.
    DATA Visible        EXPORTED INIT .T.
 
@@ -1400,7 +1400,7 @@ CLASS ToolStripItem INHERIT Control
 //   DATA TabOrder           EXPORTED
    DATA ClipChildren       EXPORTED  INIT .T.
    DATA ClipSiblings       EXPORTED  INIT .T.
-   DATA TabStop            EXPORTED
+   DATA TabStop            EXPORTED  INIT .F.
    DATA Transparent        EXPORTED  INIT .F.
    DATA Visible            EXPORTED  INIT .T.
 

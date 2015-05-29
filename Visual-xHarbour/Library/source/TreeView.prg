@@ -105,6 +105,7 @@ CLASS TreeView FROM TitleControl
 
    METHOD MoveItem()
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD __Enable( lEnable ) INLINE EnableWindow( ::hWnd, lEnable )
 ENDCLASS
 
 //----------------------------------------------------------------------------//

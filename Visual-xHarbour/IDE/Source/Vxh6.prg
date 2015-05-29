@@ -145,6 +145,7 @@ METHOD Create() CLASS ToolBox
 
    //Advanced
    AADD( ::aButtons[3][2], { "ComboBoxEx", .T. } )
+   AADD( ::aButtons[3][2], { "CommandLink", .T. } )
    AADD( ::aButtons[3][2], { "CoolMenu", .T. } )
    AADD( ::aButtons[3][2], { "ListView", .T. } )
    AADD( ::aButtons[3][2], { "DataGrid", .T. } )
@@ -438,12 +439,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
            tvcd:Pointer( nlParam )
            DO CASE
               CASE tvcd:nmcd:dwDrawStage == CDDS_PREPAINT
-                   SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_NOTIFYITEMDRAW )
                    RETURN CDRF_NOTIFYITEMDRAW
 
               CASE tvcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
                    ::DrawItem( tvcd )
-                   SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT  )
                    RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
@@ -595,6 +594,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
    //Advanced
    EXTERN ComboBoxEx
    EXTERN CoolMenu
+   EXTERN CommandLink
    EXTERN ListView
    EXTERN DataGrid
    EXTERN TreeView

@@ -121,7 +121,7 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY ExtVertScrollBar                                                                        DEFAULT .F.
    PROPERTY MultipleSelection                                                                       DEFAULT .F.
    PROPERTY TagRecords                                                                              DEFAULT .F.
-
+   PROPERTY RightClickSelect                                                                        DEFAULT .F.
    PROPERTY ImageList           GET __ChkComponent( Self, @::xImageList )
    PROPERTY DataSource          GET __ChkComponent( Self, @::xDataSource ) SET ::__SetDataSource(v)
 
@@ -415,35 +415,48 @@ METHOD OnGetDlgCode( msg ) CLASS DataGrid
 RETURN DLGC_WANTMESSAGE
 
 METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHeader, nImgAlign, lSelected ) CLASS DataGrid
-   LOCAL z, nDif, aAlign, iLen, x, cx, pt := (struct POINT)
+   LOCAL z, rc, nDif, aAlign, iLen, x, cx, pt := (struct POINT)
 
-   FOR z := 1 TO LEN( aData )
-       aAlign := _GetTextExtentExPoint( hDC, ALLTRIM(aData[z]), aText[3]-aText[1]-nWimg, @iLen )
-       IF aAlign != NIL
-          nDif := (aAlign[1]) - (aText[3]-aText[1]-nWimg)
-          IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
-             aData[z] := ALLTRIM( LEFT( aData[z], iLen-2 ) )+ "..."
-          ENDIF
-          IF nAlign == ALIGN_LEFT
-             x := zLeft + 1 + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
-           ELSEIF nAlign == ALIGN_RIGHT
-             aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
-             x := nRight - aAlign[1]-4 - IIF( nImgAlign == ALIGN_RIGHT, nWimg, 0 ) + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
-           ELSEIF nAlign == ALIGN_CENTER
-             aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
-             x := zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
-          ENDIF
+   IF lHeader .AND. LEN( aData ) == 1 .AND. ::__GetHeaderHeight() > y*2 .AND. _GetTextExtentPoint32( hDC, ALLTRIM(aData[1]) )[1] > aText[3]-aText[1]
+      rc := (struct RECT)
+      rc:left   := aText[1]
+      rc:top    := aText[2]
+      rc:right  := aText[3]
+      rc:bottom := aText[4]
+      DrawText( hDC, aData[1], @rc, IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_CALCRECT|DT_WORDBREAK )
+      aText[2]  := ( aText[4]-rc:bottom ) / 2
+      aText[4]  := aText[2] + rc:bottom
 
-          cx := aText[3]-( aText[1]-zLeft )
-          IF ::Transparent .AND. ! lHeader .AND. ! lSelected
-             SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left-1, ::Parent:ClientHeight-::Top-::TitleHeight-1, @pt )
-             _FillRect( hDC, {aText[1],aText[2],cx,aText[4]}, ::Parent:BkBrush )
-             SetBrushOrgEx( hDC, pt:x, pt:y )
+      _DrawText( hDC, aData[1], aText, IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_WORDBREAK )
+    ELSE
+      FOR z := 1 TO LEN( aData )
+          aAlign := _GetTextExtentExPoint( hDC, ALLTRIM(aData[z]), aText[3]-aText[1]-nWimg, @iLen )
+          IF aAlign != NIL
+             nDif := (aAlign[1]) - (aText[3]-aText[1]-nWimg)
+             IF nDif > 0 .AND. !EMPTY( ALLTRIM( aData[z] ) )
+                aData[z] := ALLTRIM( LEFT( aData[z], iLen-2 ) )+ "..."
+             ENDIF
+             IF nAlign == ALIGN_LEFT
+                x := zLeft + 1 + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
+              ELSEIF nAlign == ALIGN_RIGHT
+                aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
+                x := nRight - aAlign[1]-4 - IIF( nImgAlign == ALIGN_RIGHT, nWimg, 0 ) + IIF( nImgAlign == ALIGN_LEFT, nWimg, 0 )
+              ELSEIF nAlign == ALIGN_CENTER
+                aAlign := _GetTextExtentPoint32( hDC, ALLTRIM(aData[z]) )
+                x := zLeft + ((nRight-zLeft)/2) - (aAlign[1]/2)
+             ENDIF
+
+             cx := aText[3]-( aText[1]-zLeft )
+             IF ::Transparent .AND. ! lHeader .AND. ! lSelected
+                SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left-1, ::Parent:ClientHeight-::Top-::TitleHeight-1, @pt )
+                _FillRect( hDC, {aText[1],aText[2],cx,aText[4]}, ::Parent:BkBrush )
+                SetBrushOrgEx( hDC, pt:x, pt:y )
+             ENDIF
+             _ExtTextOut( hDC, x, y, ETO_CLIPPED+IIF( z==1 .AND. ! lHeader .AND. ( lSelected .OR. ! ::Transparent ), ETO_OPAQUE, 0 ), {aText[1],aText[2],cx,aText[4]},aData[z])
+             y += aAlign[2]
           ENDIF
-          _ExtTextOut( hDC, x, y, ETO_CLIPPED+IIF( z==1 .AND. ! lHeader .AND. ( lSelected .OR. ! ::Transparent ), ETO_OPAQUE, 0 ), {aText[1],aText[2],cx,aText[4]},aData[z])
-          y += aAlign[2]
-       ENDIF
-   NEXT
+      NEXT
+   ENDIF
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------------------------------
