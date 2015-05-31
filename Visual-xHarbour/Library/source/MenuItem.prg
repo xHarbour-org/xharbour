@@ -219,10 +219,15 @@ METHOD Create( lAdd ) CLASS MenuItem
 RETURN NIL
 
 METHOD __SetVisible( lVisible ) CLASS MenuItem
-   LOCAL n, mii
+   LOCAL i, n, mii
    IF ::hMenu != NIL .AND. lVisible != ::xVisible
       n := ASCAN( ::Parent:Children, {|o| o:hMenu == ::hMenu } )
       IF lVisible
+         FOR i := 1 TO n-1
+             IF ! ::Parent:Children[i]:Visible
+                n--
+             ENDIF
+         NEXT
          IF ! IsMenu( ::hMenu )
             ::hMenu := CreateMenu()
          ENDIF
