@@ -210,7 +210,7 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
       {
          if( dwNeeded > 0 )
          {
-            ppi2 = ( PRINTER_INFO_2 * ) hb_xgrab(  dwNeeded );
+            ppi2 = ( PRINTER_INFO_2 * ) hb_xgrab( dwNeeded );
             if( ppi2 )
             {
                if( EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, ( LPBYTE ) ppi2, dwNeeded, &dwNeeded, &dwReturned ) && dwReturned > 0 )
@@ -318,7 +318,7 @@ BOOL hb_SetDefaultPrinter( LPTSTR pPrinterName )
       }
 
       /* Set default printer attribute for this printer. */
-      ppi2->Attributes  |= PRINTER_ATTRIBUTE_DEFAULT;
+      ppi2->Attributes |= PRINTER_ATTRIBUTE_DEFAULT;
       bFlag             = SetPrinter( hPrinter, 2, ( LPBYTE ) ppi2, 0 );
       if( ! bFlag )
       {
@@ -676,8 +676,8 @@ HB_FUNC( GETPRINTERS )
                                  hb_itemRelease( SubItems );
                               }
                            }
+                           ClosePrinter( hPrinter );
                         }
-                        CloseHandle( hPrinter );
                      }
                   }
                }
@@ -772,8 +772,8 @@ HB_FUNC( GETPRINTERS )
                                        hb_xfree( pPrinterInfo2 );
                                     }
                                  }
+                                 ClosePrinter( hPrinter );
                               }
-                              CloseHandle( hPrinter );
                            }
                         }
 /*
@@ -781,7 +781,7 @@ HB_FUNC( GETPRINTERS )
 *                         hb_arrayNew( &SubItems, 0 );
 *                         hb_itemPutC( &File, pPrinterEnum->pPrinterName );
 *                         hb_itemPutC( &Port, pPrinterEnum->pPortName );
-
+*
 *                         if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL)
 *                         {
 *                            hb_itemPutC( &Net,"LOCAL" );
@@ -798,8 +798,8 @@ HB_FUNC( GETPRINTERS )
 *                            }
 *                         }
 *
-*                         hb_arrayAddForward( &SubItems , &File ) ;
-*                         hb_arrayAddForward( &SubItems , &Port ) ;
+*                         hb_arrayAddForward( &SubItems, &File ) ;
+*                         hb_arrayAddForward( &SubItems, &Port ) ;
 *                         hb_arrayAddForward( &SubItems, &Net ) ;
 *                         hb_arrayAddForward( &ArrayPrinter , &SubItems );
 */

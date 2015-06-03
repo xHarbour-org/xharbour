@@ -70,7 +70,7 @@
 #if defined( HB_OS_WIN )
 
    #include <windows.h>
-#endif   
+#endif
 #if defined( HB_OS_WIN ) && ( ! defined( __RSXNT__ ) ) && ( ! defined( __CYGWIN__ ) )
 
 #include <stdio.h>
@@ -135,7 +135,7 @@ BOOL hb_printerIsReady( const char * pszPrinterName )
          if( bIsPrinter )
          {
             bIsPrinter = ( BOOL ) ! IsPrinterError( hPrinter );
-            CloseHandle( hPrinter );
+            ClosePrinter( hPrinter );
          }
       }
       else
@@ -167,11 +167,19 @@ HB_FUNC( ISPRINTER )
 {
 #if defined( HB_OS_WIN ) && ! defined( __RSXNT__ )
    {
-      char  DefaultPrinter[ MAXBUFFERSIZE ];
-      DWORD pdwBufferSize = MAXBUFFERSIZE;
+      const char * cPrinterName;
 
-      hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
-      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) DefaultPrinter ) );
+      if( ISCHAR( 1 ) )
+         cPrinterName = hb_parcx( 1 );
+      else
+      {
+         char  DefaultPrinter[ MAXBUFFERSIZE ];
+         DWORD pdwBufferSize = MAXBUFFERSIZE;
+
+         hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
+         cPrinterName = DefaultPrinter;
+      }
+      hb_retl( hb_printerIsReady( cPrinterName ) );
    }
 #else
    hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : ( char * ) "LPT1" ) );
@@ -331,18 +339,27 @@ DWORD hb_printerIsReadyn( const char * pszPrinterName )
    if( *pszPrinterName && OpenPrinter( ( LPSTR ) pszPrinterName, &hPrinter, NULL ) )
    {
       dwPrinter = IsPrinterErrorn( hPrinter );
-      CloseHandle( hPrinter );
+      ClosePrinter( hPrinter );
    }
    return dwPrinter;
 }
 
 HB_FUNC( XISPRINTER )
 {
-   char  DefaultPrinter[ MAXBUFFERSIZE ];
-   DWORD pdwBufferSize = MAXBUFFERSIZE;
+   const char * cPrinterName;
 
-   hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
-   hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : DefaultPrinter ) );
+   if( ISCHAR( 1 ) )
+      cPrinterName = hb_parcx( 1 );
+   else
+   {
+      char  DefaultPrinter[ MAXBUFFERSIZE ];
+      DWORD pdwBufferSize = MAXBUFFERSIZE;
+
+      hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize );
+      cPrinterName = DefaultPrinter;
+   }
+
+   hb_retnl( hb_printerIsReadyn( cPrinterName ) );
 }
 
 #endif

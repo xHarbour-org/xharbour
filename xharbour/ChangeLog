@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-06-03 13:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * source/rtl/isprint.c
+  * source/rtl/tprinter.c
+    ! Release printer handle
+
 2015-05-18 12:58 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * contrib/tipssl/client.prg
     ! Removed TraceLog's
