@@ -105,7 +105,7 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY ConvertOem                                                                              DEFAULT .F.
 
    PROPERTY SchemeHeader         ROOT "Appearance"                                                  DEFAULT .F.
-
+   PROPERTY WrapHeaderText       ROOT "Appearance"                                                  DEFAULT .F.
    PROPERTY GridColor            ROOT "Colors"                                                      DEFAULT RGB(196,192,192)
    PROPERTY HighlightBorderColor ROOT "Colors"
    PROPERTY HighlightColor       ROOT "Colors"
@@ -417,7 +417,7 @@ RETURN DLGC_WANTMESSAGE
 METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHeader, nImgAlign, lSelected ) CLASS DataGrid
    LOCAL z, rc, nDif, aAlign, iLen, x, cx, pt := (struct POINT)
 
-   IF lHeader .AND. LEN( aData ) == 1 .AND. ::__GetHeaderHeight() > y*2 .AND. _GetTextExtentPoint32( hDC, ALLTRIM(aData[1]) )[1] > aText[3]-aText[1]
+   IF lHeader .AND. ::WrapHeaderText .AND. LEN( aData ) == 1 .AND. ::__GetHeaderHeight() > y*2 .AND. _GetTextExtentPoint32( hDC, ALLTRIM(aData[1]) )[1] > aText[3]-aText[1]
       rc := (struct RECT)
       rc:left   := aText[1]
       rc:top    := aText[2]
