@@ -2493,8 +2493,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                        nRet := NIL
                     ENDIF
                  ENDIF
-
-                 IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code == TTN_NEEDTEXT
+                 IF nRet == NIL .AND. ::hdr != NIL .AND. ::hdr:code $ { TTN_GETDISPINFOW, TTN_GETDISPINFO }
                     IF ::ClsName != "DataGrid"
                        IF __objHasMsg( Self, "OnToolTipNotify" )
                           ODEFAULT nRet TO ::OnToolTipNotify( nwParam, nlParam, ::hdr )

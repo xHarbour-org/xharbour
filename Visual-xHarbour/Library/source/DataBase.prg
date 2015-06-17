@@ -724,28 +724,6 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          nServer := ::Owner:AdsSetServerType( ::Owner:ServerType )
       ENDIF
 
-      IF ::Owner:__lMemory
-         cFile := "mem:"+::Owner:Name
-         IF FILE( cFile )
-            cFile := "mem:"+::Owner:Alias
-         ENDIF
-         IF EMPTY( ::Owner:Structure )
-            RETURN ::Owner
-         ENDIF
-         nMemSel++
-         Select( nMemSel )
-
-         IF !FILE( cFile )
-            TRY
-               dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
-               dbCloseArea( nMemSel )
-               Select( nMemSel )
-            CATCH
-               RETURN ::Owner
-            END
-         ENDIF
-      ENDIF
-
       nAlias := 1
       cAlias := ::Owner:xAlias
       IF EMPTY( cAlias )
@@ -762,12 +740,32 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
           ELSE
             cAlias := &cAlias
          ENDIF
+         ::Owner:xAlias := cAlias
        ELSE
          IF Select( cAlias ) > 0
             WHILE Select( cAlias + XSTR( nAlias ) ) > 0
                nAlias ++
             ENDDO
             ::Owner:xAlias := cAlias + XSTR( nAlias )
+         ENDIF
+      ENDIF
+
+      IF ::Owner:__lMemory
+         cFile := "mem:"+::Owner:xAlias
+         IF EMPTY( ::Owner:Structure )
+            RETURN ::Owner
+         ENDIF
+         nMemSel++
+         Select( nMemSel )
+
+         IF !FILE( cFile )
+            TRY
+               dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
+               dbCloseArea( nMemSel )
+               Select( nMemSel )
+            CATCH
+               RETURN ::Owner
+            END
          ENDIF
       ENDIF
 
@@ -806,6 +804,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             RETURN .F.
          END
       END
+
       IF ! ::Owner:__lMemory .AND. NETERR()
          ::Owner:Error := oErr
          ExecuteEvent( "OnError", ::Owner )
@@ -824,7 +823,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       ::Owner:Area := Select()
       ::Owner:Structure := (::Owner:Area)->( dbStruct() )
-
+view ::Owner:Area
       AEVAL( ::Owner:Structure, {|,n| ASIZE( ::Owner:Structure[n], 4 )} )
 
       ::Owner:CreateFields()

@@ -291,9 +291,10 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
           IF ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
-             lReadOnly := oProperty:ReadOnly
+             lReadOnly := .f.
              TRY
                 SWITCH oProperty:VT
+                   CASE VT_DISPATCH
                    CASE VT_VOID
                         IF LEFT( oProperty:Arguments[1]:TypeDesc, 3 ) == "VT_"
                            cArg := oProperty:Arguments[1]:TypeDesc
@@ -311,16 +312,21 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
                         ENDIF
                         EXIT
 
+                   CASE VT_USERDEFINED
                    CASE VT_PTR
+                        lReadOnly := oProperty:ReadOnly
                         EXIT
                 END
                 IF oProperty:VT != VT_VOID
-                   DEFAULT xVal TO ::AxGet( cProp ) //::&cProp
+                   DEFAULT xVal TO ::AxGet( cProp )
                 ENDIF
              catch
                 xVal := NIL
+                lReadOnly := .T.
              END
-             __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
+             IF ! lReadOnly
+                __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
+             ENDIF
           ENDIF
 
       NEXT

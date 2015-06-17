@@ -797,7 +797,7 @@ METHOD Init() CLASS System
    ::hFont          := __GetMessageFont()
 
    ::hWindowTheme   := OpenThemeData(,"WINDOW")
-   ::hButtonTheme   := OpenThemeData(,"button")
+   ::hButtonTheme   := OpenThemeData(,"BUTTON")
    ::hHeaderTheme   := OpenThemeData(,"HEADER")
    ::hTabTheme      := OpenThemeData(,"TAB")
 RETURN Self

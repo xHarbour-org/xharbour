@@ -287,7 +287,6 @@ HB_FUNC( DRAWTHEMEBACKGROUND )
       {
          Array2Rect( pClip, &pRect1 );
       }
-
       if( hUxTheme )
       {
           fnDrawThemeBackground pfn = (fnDrawThemeBackground) GetProcAddress( hUxTheme, "DrawThemeBackground") ;

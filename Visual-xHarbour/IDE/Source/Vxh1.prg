@@ -2267,7 +2267,7 @@ FUNCTION OnShowEditors()
 RETURN NIL
 
 FUNCTION SetControlCursor( oItem )
-   LOCAL cClass
+   LOCAL cClass, n
    LOCAL oApp := __GetApplication()
 
    oApp:ToolBox:ActiveItem := oItem
@@ -2276,7 +2276,7 @@ FUNCTION SetControlCursor( oItem )
    cClass := oItem:Caption
    oApp:CurCursor := IIF( cClass != "Pointer", cClass, NIL )
 
-/*
+
    IF oItem:Owner:Caption == "COM Objects"
       IF ( n := ASCAN( oApp:ToolBox:ComObjects, {|a| a[2] == cClass } ) ) > 0
          oApp:CurCursor := oApp:ToolBox:ComObjects[n]
@@ -2291,7 +2291,7 @@ FUNCTION SetControlCursor( oItem )
       NEXT
 
    ENDIF
-*/
+
    IF oApp:Project:CurrentForm != NIL
       oApp:Project:CurrentForm:CtrlMask:SetMouseShape( IIF( cClass != "Pointer", MCS_DRAGGING, MCS_ARROW ) )
    ENDIF
@@ -4805,7 +4805,14 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
          '            language="*"'                                                      + CRLF +;
          '         />'                                                                   + CRLF +;
          '      </dependentAssembly>'                                                    + CRLF +;
-         '   </dependency>'                                                              + CRLF
+         '   </dependency>'                                                              + CRLF +;
+         '   <ms_asmv2:trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">'              + CRLF +;
+         '      <ms_asmv2:security>'                                                     + CRLF +;
+         '         <ms_asmv2:requestedPrivileges>'                                       + CRLF +;
+         '            <ms_asmv2:requestedExecutionLevel level="asInvoker" uiAccess="false"/>' + CRLF +;
+         '         </ms_asmv2:requestedPrivileges>'                                      + CRLF +;
+         '      </ms_asmv2:security>'                                                    + CRLF +;
+         '   </ms_asmv2:trustInfo>'                                                      + CRLF
    IF ::Properties:Compatibility
       oFile:FileBuffer += ;
          '   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">'         + CRLF +;

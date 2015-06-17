@@ -4103,6 +4103,11 @@ HB_FUNC( VXH_SETTOOLBARTOOLTIP )
    ttdi->lpszText = (LPSTR) hb_parc(2);
 }
 
+HB_FUNC( VXH_SETTOOLBARTOOLTIPW )
+{
+   NMTTDISPINFOW* ttdi = (NMTTDISPINFOW*) hb_parnl(1);
+   ttdi->lpszText = (LPWSTR) hb_oleAnsiToWide( hb_parc(2) );
+}
 
 HB_FUNC( SAVEBMP )
 {
@@ -5545,4 +5550,10 @@ HB_FUNC( CREATEIMAGELISTBITMAP )
       SelectObject( (HDC) hb_parnl(3), hOldBmp);
       hb_retnl( (LONG) hBitmap );
    }
+}
+
+
+HB_FUNC( VXH_GETNOTIFYCODE )
+{
+   hb_retnl( ((LPNMHDR)hb_parnl(1))->code );
 }

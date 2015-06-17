@@ -948,16 +948,20 @@ RETURN 0
 METHOD OnToolTipNotify( nwParam, nlParam, hdr ) CLASS ToolBar
    LOCAL n, cText
    (nwParam)
-   IF (n:=ASCAN(::aItems,{|btn| btn:oStruct:idCommand==hdr:idFrom})) > 0 .AND. hdr:code == TTN_NEEDTEXT
-      cText := ::aItems[n]:ToolTip
-      IF VALTYPE( cText ) == "B"
-         cText := EVAL( cText, Self )
+   IF hdr:code == TTN_GETDISPINFOW .OR. hdr:code == TTN_GETDISPINFO
+      IF (n:=ASCAN(::aItems,{|btn| btn:oStruct:idCommand==hdr:idFrom})) > 0
+         cText := ::aItems[n]:ToolTip
+         IF VALTYPE( cText ) == "B"
+            cText := EVAL( cText, Self )
+         ENDIF
+         IF hdr:code == TTN_GETDISPINFOW
+            VXH_SetToolBarToolTipW( nlParam, cText )
+          ELSEIF hdr:code == TTN_GETDISPINFO
+            VXH_SetToolBarToolTip( nlParam, cText )
+         ENDIF
+         RETURN 1
       ENDIF
-
-      VXH_SetToolBarToolTip( nlParam, cText )
-      RETURN 1
    ENDIF
-
 RETURN NIL
 
 
