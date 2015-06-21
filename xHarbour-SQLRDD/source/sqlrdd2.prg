@@ -2314,12 +2314,20 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
 		         For nInd = 1 to len( ::aIndexMgmnt )
 		            If !Empty( ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS] )
 		               cKey := (::cAlias)->( SR_ESCAPESTRING( eval(::aIndexMgmnt[nInd, INDEXMAN_KEY_CODEBLOCK]), ::oSql:nSystemID ) )
+		               if ::osql:nsystemID ==SYSTEMID_POSTGR
+		               cRet += ", " + SR_DBQUALIFY( "INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID ) + " = E'" + cKey + "' "
+		               else
 		               cRet += ", " + SR_DBQUALIFY( "INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID ) + " = '" + cKey + "' "
+		               endif
 		               ::aLocalBuffer[ ::aIndexMgmnt[nInd, INDEXMAN_SYNTH_COLPOS] ] := cKey
 		            EndIf
 		            If !Empty( ::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK] )
 		               cKey := (::cAlias)->( eval(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK]) )
+		               if ::osql:nsystemID ==SYSTEMID_POSTGR
+		               cRet += ", " + SR_DBQUALIFY( "INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS],2,3), ::oSql:nSystemID ) + " = E'" + cKey + "' "
+		               else
 		               cRet += ", " + SR_DBQUALIFY( "INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS],2,3), ::oSql:nSystemID ) + " = '" + cKey + "' "
+		               endif
 		               ::aLocalBuffer[ ::aIndexMgmnt[nInd, INDEXMAN_FOR_COLPOS] ] := cKey
 		            EndIf
 		         Next
@@ -2501,7 +2509,11 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                   cRet += if(!lFirst,", ","( ") + SR_DBQUALIFY( "INDKEY_" + ::aIndexMgmnt[nInd, INDEXMAN_COLUMNS], ::oSql:nSystemID )
                EndIf
                cKey := (::cAlias)->( SR_ESCAPESTRING(eval(::aIndexMgmnt[nInd, INDEXMAN_KEY_CODEBLOCK]), ::oSql:nSystemID ) )
-               cVal += if(!lFirst,", '","( '") + cKey + "'"
+               if ::osql:nsystemID ==SYSTEMID_POSTGR
+                  cVal += if(!lFirst,", E'","( E'") + cKey + "'"
+               else 
+                  cVal += if(!lFirst,", '","( '") + cKey + "'"
+               endif
                ::aLocalBuffer[ ::aIndexMgmnt[nInd, INDEXMAN_SYNTH_COLPOS] ] := cKey
             EndIf
             If !Empty( ::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK] )
@@ -2509,7 +2521,11 @@ METHOD WriteBuffer( lInsert, aBuffer ) CLASS SR_WORKAREA
                   cRet += if(!lFirst,", ","( ") + SR_DBQUALIFY( "INDFOR_" + SubStr(::aIndexMgmnt[nInd, INDEXMAN_FOR_EXPRESS],2,3), ::oSql:nSystemID )
                EndIf
                cKey := (::cAlias)->( eval(::aIndexMgmnt[nInd, INDEXMAN_FOR_CODEBLOCK]) )
-               cVal += if(!lFirst,", '","( '") + cKey + "'"
+               if ::osql:nsystemID ==SYSTEMID_POSTGR
+                  cVal += if(!lFirst,", E'","( E'") + cKey + "'"
+               else
+                  cVal += if(!lFirst,", '","( '") + cKey + "'"
+               endif
                ::aLocalBuffer[ ::aIndexMgmnt[nInd, INDEXMAN_FOR_COLPOS] ] := cKey
             EndIf
          Next
