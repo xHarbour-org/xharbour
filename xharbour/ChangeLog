@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-07-12 19:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * contrib/gtwvw/wvwfuncs.c
+    ! fix for addtooltipex
+    
 2015-06-03 13:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/isprint.c
   * source/rtl/tprinter.c

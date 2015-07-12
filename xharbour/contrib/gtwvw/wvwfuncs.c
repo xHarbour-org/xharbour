@@ -762,8 +762,11 @@ HB_FUNC( ADDTOOLTIPEX ) // changed by MAG
    }
    ti.uFlags = TTF_SUBCLASS | TTF_IDISHWND;
    ti.hwnd = pWindowData->hWnd;
-   ti.uId = (UINT) hb_parnl( 2 );
-   // ti.uId = (UINT) GetDlgItem( hWnd, hb_parni( 2 ) );
+    if ( ISPOINTER( 2 ) )
+      ti.uId = (UINT_PTR) hb_parptr( 2 );
+    else
+        ti.uId = (UINT_PTR) hb_parnl( 2 );
+
    ti.hinst = GetModuleHandle( NULL );
    ti.lpszText = (LPSTR) hb_parc( 3 );
 
