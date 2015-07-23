@@ -5557,3 +5557,12 @@ HB_FUNC( VXH_GETNOTIFYCODE )
 {
    hb_retnl( ((LPNMHDR)hb_parnl(1))->code );
 }
+
+HB_FUNC ( VXH_SETMENUBACKCOLOR )
+{
+   MENUINFO mi;
+   mi.cbSize   = sizeof(MENUINFO);
+   mi.fMask    = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+   mi.hbrBack  = (HBRUSH) hb_parnl(2);
+   hb_retl( SetMenuInfo( (HMENU) hb_parnl(1), &mi ) );
+}

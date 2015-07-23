@@ -995,8 +995,9 @@ METHOD Create( oParent ) CLASS Window
       DEFAULT ::ToolTip TO ToolTip( Self )
    ENDIF
 
-   ::xLeft   := IFNIL( ::xLeft  , 0            , ::xLeft  )
-   ::xTop    := IFNIL( ::xTop   , 0            , ::xTop   )
+   ::xLeft   := IIF( ::ClsName == "MDIChild" .AND. ::xLeft == 0, CW_USEDEFAULT, ::xLeft  )
+   ::xTop    := IIF( ::ClsName == "MDIChild" .AND. ::xTop == 0, CW_USEDEFAULT, ::xTop   )
+
    ::xWidth  := IFNIL( ::xWidth , CW_USEDEFAULT, ::xWidth )
    ::xHeight := IFNIL( ::xHeight, CW_USEDEFAULT, ::xheight)
 
@@ -4674,6 +4675,7 @@ METHOD __SetActiveMenuBar( oMenu ) CLASS WinForm
    IF ::hWnd != NIL .AND. VALTYPE( oMenu ) != "C"
       SetMenu( ::hWnd, IIF( oMenu != NIL, oMenu:hMenu, NIL ) )
       IF oMenu != NIL
+         oMenu:SetBackColor()
          DrawMenuBar( ::hWnd )
       ENDIF
    ENDIF

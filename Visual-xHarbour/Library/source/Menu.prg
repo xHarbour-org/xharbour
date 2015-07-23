@@ -267,24 +267,23 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS MenuPopup
-   LOCAL lpMenuInfo := (struct MENUINFO)
 
    ::hMenu := CreateMenu()
 
-   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   //lpMenuInfo:fMask  := MIM_STYLE
-   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   //SetMenuInfo( ::hMenu, lpMenuInfo )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 CLASS MenuBar INHERIT Component
+   PROPERTY BackColor   ROOT "Colors" SET ::SetBackColor(v)
    PROPERTY ImageList   GET __ChkComponent( Self, @::xImageList, .F. )
+   PROPERTY ApplyToSubMenus DEFAULT .T.
 
    DATA hMenu          EXPORTED
    DATA xImageList     EXPORTED
+
+   DATA __hBrush       PROTECTED
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -292,6 +291,8 @@ CLASS MenuBar INHERIT Component
    METHOD __ResetImageList()
    METHOD Destroy()
    METHOD GetMenuById()
+   METHOD SetBackColor()
+   METHOD InvalidateRect() INLINE DrawMenuBar( ::Owner:hWnd )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS MenuBar
@@ -301,15 +302,11 @@ METHOD Init( oParent ) CLASS MenuBar
    Super:Init( oParent )
 RETURN Self
 
+//-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS MenuBar
-   LOCAL lpMenuInfo := (struct MENUINFO)
-
    ::hMenu := CreateMenu()
 
-   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   //lpMenuInfo:fMask  := MIM_STYLE
-   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   //SetMenuInfo( ::hMenu, lpMenuInfo )
+   ::SetBackColor( ::xBackColor )
 
    IF VALTYPE( ::xImageList ) == "C"
       AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
@@ -317,6 +314,19 @@ METHOD Create() CLASS MenuBar
    IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add MenuItem", {|| ::__AddMenuItem() } } }
       ::Application:ObjectTree:Set( Self )
+   ENDIF
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD SetBackColor(n) CLASS MenuBar
+   IF ::hMenu != NIL
+      DEFAULT n TO ::xBackColor
+      IF ::__hBrush != NIL
+         DeleteObject( ::__hBrush )
+      ENDIF
+      ::__hBrush := CreateSolidBrush( n )
+
+      VXH_SetMenuBackColor( ::hMenu, ::__hBrush )
    ENDIF
 RETURN Self
 
@@ -348,6 +358,9 @@ METHOD Destroy() CLASS MenuBar
        n--
    NEXT
    DestroyMenu( ::hMenu )
+   IF ::__hBrush != NIL
+      DeleteObject( ::__hBrush )
+   ENDIF
 RETURN Self
 
 METHOD __AddMenuItem() CLASS MenuBar
@@ -390,14 +403,7 @@ METHOD Init( oParent ) CLASS ContextMenu
 RETURN Self
 
 METHOD Create() CLASS ContextMenu
-   LOCAL lpMenuInfo := (struct MENUINFO)
-
    ::hMenu := CreatePopupMenu()
-
-   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   //lpMenuInfo:fMask  := MIM_STYLE
-   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   //SetMenuInfo( ::hMenu, lpMenuInfo )
 
    IF VALTYPE( ::xImageList ) == "C"
       AADD( ::Parent:__aPostCreateProc, { Self, "__ResetImageList" } )
