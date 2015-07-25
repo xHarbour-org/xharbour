@@ -351,9 +351,10 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
          {
             if( ulSystemID == SYSTEMID_IBMDB2 )
             {
-               char * szResult = ( char * ) hb_xgrab( 26 + 1 );
-               hb_xmemset( szResult, ' ', lLen );
-               hb_itemPutCLPtr( pItem, szResult,  lLen );
+//                char * szResult = ( char * ) hb_xgrab( 26 + 1 );
+//                hb_xmemset( szResult, ' ', lLen );
+//                hb_itemPutCLPtr( pItem, szResult,  lLen );
+               hb_itemPutTDT( pItem, 0, 0 );
             }
             else
             {
@@ -474,7 +475,11 @@ void odbcFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_ISIZ lLen
             }
             else if ( ulSystemID == SYSTEMID_IBMDB2 && (lType == SQL_TIMESTAMP || lType == SQL_TYPE_TIMESTAMP) )
             {
-               hb_itemPutCL( pItem, bBuffer,  lLenBuff );
+//                hb_itemPutCL( pItem, bBuffer,  lLenBuff );
+               long lJulian, lMilliSec;
+               hb_dateTimeStampStrGet( bBuffer, &lJulian, &lMilliSec );
+               hb_itemPutTDT( pItem, lJulian, lMilliSec );
+
                break;
             }
             else if ( ( (ulSystemID == SYSTEMID_POSTGR ) || ( ulSystemID == SYSTEMID_ORACLE ) || ( ulSystemID == SYSTEMID_FIREBR )||( ulSystemID == SYSTEMID_MYSQL ) ||( ulSystemID ==  SYSTEMID_MARIADB )  || (  ulSystemID ==SYSTEMID_MSSQL7  && sr_lsql2008newTypes() ) ) && (lType == SQL_TIMESTAMP|| lType == SQL_TYPE_TIMESTAMP) )

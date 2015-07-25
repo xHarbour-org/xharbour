@@ -48,6 +48,10 @@ Static nSyntheticIndexMinimun      := 3
 
 Static lErrorOnGotoToInvalidRecord := .F.
 
+Static lUseNullsFirst              := .T.
+
+
+
 /*------------------------------------------------------------------------*/
 
 Procedure SR_Init
@@ -1087,6 +1091,15 @@ Function SR_ErrorOnGotoToInvalidRecord( l )
    EndIf
 Return lOld
 
+Function SR_UseNullsFirst( l ) 
+   Local lOld  := lUseNullsFirst
+   If l != NIL
+      lUseNullsFirst := l
+   EndIf
+Return lOld
+      
+   
+
 /*------------------------------------------------------------------------*/
 
 Function SR_TblMgmnt()
@@ -2065,7 +2078,8 @@ static HB_BOOL s_fSerializeArrayAsJson    = HB_FALSE;
 /* Culik added new global to tell if we are using sqlverser 2008 or newer */
 static HB_BOOL s_fSql2008newTypes         = HB_FALSE;
 
-static HB_BOOL s_iOldPgsBehavior             = HB_FALSE;
+static HB_BOOL s_iOldPgsBehavior          = HB_FALSE;
+static HB_BOOL s_fShortasNum              = HB_FALSE;  
 
 HB_BOOL HB_EXPORT sr_isMultilang( void )
 {
@@ -2194,6 +2208,18 @@ HB_FUNC(SETPGSOLDBEHAVIOR)
 }
 
 
+BOOL HB_EXPORT  sr_fShortasNum( void )
+{
+return s_fShortasNum;
+}
+HB_FUNC(SETFIREBIRDUSESHORTASNUM)
+{
+	int iOld = s_fShortasNum;
+	if (ISLOG( 1 ) )
+       s_fShortasNum= hb_parl( 1 ) ;
+    hb_retl( iOld ) ;
+
+}
 #pragma ENDDUMP
 
 /*------------------------------------------------------------------------*/

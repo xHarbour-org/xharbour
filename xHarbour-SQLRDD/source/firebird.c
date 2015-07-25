@@ -418,7 +418,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
          var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( float ) * 2 );
          break;
       case IB_SQL_TIMESTAMP:
-         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIMESTAMP ) + 10 );
+	         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIMESTAMP )  );
          break;
       case IB_SQL_ARRAY:
       case IB_SQL_QUAD:
@@ -426,7 +426,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
          var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_QUAD ) );
          break;
       case IB_SQL_TYPE_TIME:
-         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIME ) + 10 );
+         var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_TIME )  );
          break;
       case IB_SQL_TYPE_DATE:
          var->sqldata = (ISC_SCHAR *) hb_xgrab( sizeof ( ISC_DATE ) );
@@ -532,8 +532,8 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
 
          break;
       case IB_SQL_TYPE_TIME:
-         rettype = SQL_CHAR;
-         hb_storni( 13, 5 );
+         rettype = SQL_TIME;
+         hb_storni( 4L, 5 );
          hb_storni( 0, 6 );
 
          break;
@@ -545,10 +545,19 @@ HB_FUNC( FBDESCRIBECOL )   // FBDescribeCol( hStmt, nCol, @cName, @nType, @nLen,
          hb_storni( 0, 6 );
          break;
       case IB_SQL_SHORT:
-
-         rettype = SQL_SMALLINT;
-         hb_storni( var->sqllen, 1 );
-         hb_storni( var->sqlscale, 0 );
+         if (!sr_fShortasNum())
+         {
+            rettype = SQL_SMALLINT;
+            hb_storni( var->sqllen, 1 );
+            hb_storni( var->sqlscale, 0 );
+         }   
+         else 
+         {
+            rettype = SQL_NUMERIC;
+            hb_storni( 5, 1 );
+            hb_storni( var->sqlscale, 0 );
+	         
+         }
          break;
 
       case IB_SQL_LONG:
@@ -724,31 +733,13 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
                   times.tm_sec,
                   ( int ) ( ( ( ISC_TIMESTAMP * ) var->sqldata )->timestamp_time % 10000 ) );
 #ifdef __XHARBOUR__
-            {
-               char dt[18];
+{
+            long lJulian, lMilliSec;
+            hb_dateTimeStampStrGet(  date_s, &lJulian, &lMilliSec );
+//             hb_itemPutTDT( pItem, lJulian, lMilliSec );
+            hb_stordtl( lJulian, lMilliSec, 3 );
+}	            
 
-               dt[0] = date_s[0];
-               dt[1] = date_s[1];
-               dt[2] = date_s[2];
-               dt[3] = date_s[3];
-               dt[4] = date_s[5];
-               dt[5] = date_s[6];
-               dt[6] = date_s[8];
-               dt[7] = date_s[9];
-               dt[8] = date_s[10];
-               dt[9] = date_s[11];
-               dt[10] = date_s[12];
-               dt[11] = date_s[13];
-               dt[12] = date_s[14];
-               dt[13] = date_s[15];
-               dt[14] = date_s[16];
-               dt[15] = date_s[17];
-               dt[16] = date_s[18];
-               dt[17] = '\0';
-
-               hb_stordts( dt, 3 );
-               //hb_storc( date_s, 3 );
-            }
 #else
             {
                long lJulian, lMilliSec;
@@ -759,13 +750,20 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
             break;
 
          case IB_SQL_TYPE_TIME:
+         {
+         	long  lMilliSec;
             isc_decode_sql_time( ( ISC_TIME ISC_FAR * ) var->sqldata, &times );
             hb_snprintf( date_s, sizeof( date_s ), "%02d:%02d:%02d.%04d",
                   times.tm_hour,
                   times.tm_min,
                   times.tm_sec,
                   ( int ) ( ( *( ( ISC_TIME * ) var->sqldata ) ) % 10000 ) );
-            hb_storc( date_s, 3 );
+//             hb_storc( date_s, 3 );
+
+            lMilliSec = hb_timeEncStr( date_s );         
+//             hb_itemPutTDT( pItem, 0, lMilliSec );    
+            hb_stordtl(0,lMilliSec,3);
+}
             break;
 
          case IB_SQL_LONG:
@@ -1074,6 +1072,7 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
                hb_itemPutDS( pItem, dt );
             break;
          }
+         
          case SQL_LONGVARCHAR:
          {
             hb_itemPutCL( pItem, bBuffer, 0 );
@@ -1093,6 +1092,11 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
             break;
          }
 #endif
+         case SQL_TIME:
+         {
+	         hb_itemPutTDT( pItem, 0, 0 );
+	         break;	         
+	         }
          case SQL_DATETIME:
          {
 //#ifdef __XHARBOUR__
@@ -1232,6 +1236,14 @@ void FBFieldGet( PHB_ITEM pField, PHB_ITEM pItem, char * bBuffer, HB_SIZE lLenBu
             break;
          }
 #endif
+         case SQL_TIME:
+         {
+	        long  lMilliSec;
+            lMilliSec = hb_timeEncStr( bBuffer );         
+            hb_itemPutTDT( pItem, 0, lMilliSec );    
+            break;
+         }
+
          case SQL_DATETIME:
          {
 #ifdef __XHARBOUR__

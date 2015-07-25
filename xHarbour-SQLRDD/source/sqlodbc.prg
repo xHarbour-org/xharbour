@@ -296,9 +296,10 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          ENDIF    
          if ::nsystemId ==  SYSTEMID_MSSQL7
             if ( ntype == SQL_TYPE_DATE ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
+               nType := SQL_DATE
             elseif ( nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
          
-            elseif  (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES() .and.   !::lSqlServer2008 
+            elseif  (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES() //.and.   !::lSqlServer2008 
             nType := SQL_DATE
          endif   
          endif

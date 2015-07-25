@@ -1105,10 +1105,10 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
    case nType == SQL_DATE .or. nType == SQL_TYPE_DATE
       cType = "D"
    case nType == SQL_TIME
-      if (::nSystemID == SYSTEMID_POSTGR .or. ::nSystemID == SYSTEMID_MYSQL  .or. ::nSystemID == SYSTEMID_MARIADB)
+      if (::nSystemID == SYSTEMID_POSTGR .or. ::nSystemID == SYSTEMID_MYSQL  .or. ::nSystemID == SYSTEMID_MARIADB .or. ::nSystemID == SYSTEMID_FIREBR )
          cType := "T"
       else
-      cType := "C"
+         cType := "C"
       endif
    case nType == SQL_LONGVARCHAR .or.  nType == SQL_DB2_CLOB .or. nType == SQL_FAKE_LOB .or.  ntype == SQL_LONGVARBINARY .or. (nType == SQL_VARBINARY .and. ::nSystemID != SYSTEMID_MSSQL7) 
       cType := "M"
