@@ -1363,6 +1363,8 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
             case SQL_DOUBLE:
             {
                double val = 0.0;
+               if (lDec >0 )
+                     lLen -= (lDec + 1);
                if( SQL_SUCCEEDED( res = SQLGetData( hStmt, ui, SQL_C_DOUBLE, &val, sizeof( val ), &iLen ) ) )
                {
                     hb_itemPutNDLen( pItem, val, lLen, lDec );

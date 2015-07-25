@@ -873,7 +873,7 @@ void SQLO2_FieldGet( PHB_ITEM pField, PHB_ITEM pItem, int iField, BOOL bQueryOnl
          {
             if (lDec > 0 ) 
             {
-
+               lLen -= (lDec + 1);
                hb_itemPutNDLen( pItem,    OCI_GetDouble(rs, iField ) ,lLen,lDec ) ;               
             }
             else
