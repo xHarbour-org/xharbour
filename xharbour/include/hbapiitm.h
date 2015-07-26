@@ -193,6 +193,8 @@ extern HB_EXPORT PHB_ITEM   hb_itemClone    ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNS( PHB_ITEM pItem, HB_ISIZ nNumber );
 extern HB_EXPORT HB_ISIZ    hb_itemGetNS( PHB_ITEM pItem );
 
+extern HB_EXPORT BOOL hb_itemEqual( PHB_ITEM pItem1, PHB_ITEM pItem2 );
+
 /* helper function */
 extern HB_EXPORT PHB_ITEM   hb_itemapiCheck( PHB_ITEM pItem );
 

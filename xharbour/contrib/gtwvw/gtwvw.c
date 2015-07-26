@@ -1420,7 +1420,7 @@ static int hb_gt_wvw_ReadKey( PHB_GT pGT, int eventmask )
 /*   Copied from gtwin                                               */
 /*                                                                   */
 
-#if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined(__WATCOMC__) || defined(__MINGW32__)
+#if ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__) ) &&    !( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 
 static int hb_Inp9x( USHORT usPort )
 {
   USHORT usVal;
@@ -1611,7 +1611,7 @@ static void hb_gt_wvw_Tone( PHB_GT pGT, double dFrequency, double dDuration )
     if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
 
-       #if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__)
+       #if ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__) ) &&    !( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 
           gt_w9xTone( dFrequency, dDuration );
        #else
           gt_wNtTone( dFrequency, dDuration );

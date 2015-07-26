@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-07-25 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * include/hbapiitm.h
+    ! added hb_itemEqual Borrow from harbour
+  * source/vm/itemapi.h
+    ! added   hb_itemEqual Borrow from harbour
+  * source/tip/ftpcln.prg
+    ! removed call to getreply on method ls ( reported by Claudio H )
+  * source/rtl/gttone.c 
+    ! minor fix to compile under msvc 2015    (hb_Inp9x)
+  * contrib/gtwvw/gtwvw.c
+    !  minor fix to compile under msvc 2015  (hb_Inp9x)
+    
 2015-07-12 19:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * contrib/gtwvw/wvwfuncs.c
     ! fix for addtooltipex

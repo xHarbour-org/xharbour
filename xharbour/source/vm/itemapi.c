@@ -2206,3 +2206,58 @@ HB_ISIZ hb_itemGetNS( PHB_ITEM pItem )
 
    return 0;
 }
+
+BOOL hb_itemEqual( PHB_ITEM pItem1, PHB_ITEM pItem2 )
+{
+   BOOL fResult = 0;
+
+   if( HB_IS_NUMERIC( pItem1 ) )
+   {
+      if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+         fResult = HB_ITEM_GET_NUMINTRAW( pItem1 ) == HB_ITEM_GET_NUMINTRAW( pItem2 );
+      else
+         fResult = HB_IS_NUMERIC( pItem2 ) &&
+                   hb_itemGetND( pItem1 ) == hb_itemGetND( pItem2 );
+   }
+   else if( HB_IS_STRING( pItem1 ) )
+      fResult = HB_IS_STRING( pItem2 ) &&
+                pItem1->item.asString.length == pItem2->item.asString.length &&
+                memcmp( pItem1->item.asString.value,
+                        pItem2->item.asString.value,
+                        pItem1->item.asString.length ) == 0;
+
+   else if( HB_IS_NIL( pItem1 ) )
+      fResult = HB_IS_NIL( pItem2 );
+
+   else if( HB_IS_DATETIME( pItem1 ) )
+      if( HB_IS_TIMEFLAG( pItem1 ) && HB_IS_TIMEFLAG( pItem2 ) )         
+      fResult = HB_IS_DATETIME( pItem2 ) &&
+                pItem1->item.asDate.value == pItem2->item.asDate.value &&
+                pItem1->item.asDate.time == pItem2->item.asDate.time;
+      else
+      fResult = HB_IS_DATE( pItem2 ) &&
+                pItem1->item.asDate.value == pItem2->item.asDate.value ;
+                
+
+   else if( HB_IS_LOGICAL( pItem1 ) )
+      fResult = HB_IS_LOGICAL( pItem2 ) && ( pItem1->item.asLogical.value ?
+                pItem2->item.asLogical.value : ! pItem2->item.asLogical.value );
+
+   else if( HB_IS_ARRAY( pItem1 ) )
+      fResult = HB_IS_ARRAY( pItem2 ) &&
+                pItem1->item.asArray.value == pItem2->item.asArray.value;
+
+   else if( HB_IS_HASH( pItem1 ) )
+      fResult = HB_IS_HASH( pItem2 ) &&
+                pItem1->item.asHash.value == pItem2->item.asHash.value;
+
+   else if( HB_IS_POINTER( pItem1 ) )
+      fResult = HB_IS_POINTER( pItem2 ) &&
+                pItem1->item.asPointer.value == pItem2->item.asPointer.value;
+
+   else if( HB_IS_BLOCK( pItem1 ) )
+      fResult = HB_IS_BLOCK( pItem2 ) &&
+                pItem1->item.asBlock.value == pItem2->item.asBlock.value;
+
+   return fResult;
+}

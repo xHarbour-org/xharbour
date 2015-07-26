@@ -66,12 +66,13 @@
 #if defined( HB_OS_WIN )
 
    #include <windows.h>
-#endif
-#if defined( HB_OS_WIN )
 
+#undef HB_HAS_WIN9X_TONE
 #if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \
    ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-   defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
+     defined( __WATCOMC__ ) || defined( __MINGW32__ ) ) && \
+   !( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 
+#define HB_HAS_WIN9X_TONE    
 
 #if defined( _MSC_VER ) || defined( __WATCOMC__ )
    #include <conio.h>
@@ -259,7 +260,8 @@ void hb_gt_w32_tone( double dFrequency, double dDuration )
    {
       #if defined( HB_ARCH_32BIT ) && ! defined( _M_ARM ) && \
       ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-      defined( __WATCOMC__ ) || defined( __MINGW32__ ) )
+      defined( __WATCOMC__ ) || defined( __MINGW32__ ) )  && \
+   !( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 
       hb_gt_w9xTone( dFrequency, dDuration );
       #else
       hb_gt_wNtTone( dFrequency, dDuration );

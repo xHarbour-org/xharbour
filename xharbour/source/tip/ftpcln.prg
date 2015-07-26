@@ -739,11 +739,7 @@ METHOD LS( cSpec ) CLASS TIPClientFTP
    ENDIF
 
    ::InetSendAll( ::SocketCon, "NLST " + cSpec + ::cCRLF )
-   IF ::GetReply()
-      cStr := ::ReadAuxPort()
-   ELSE
-      cStr := ''
-   ENDIF
+   cStr := ::ReadAuxPort()
 
    RETURN cStr
 
