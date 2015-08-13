@@ -4281,13 +4281,14 @@ HB_FUNC( ENUMREGDLL )
                RegQueryValueEx(hKey, NULL,NULL,NULL,(LPBYTE)cVer,&dwSize);
                RegCloseKey(hKey);
             }
-            hb_arrayNew( &Item, 6 );
+            hb_arrayNew( &Item, 7 );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 1 ), cClass );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 2 ), cProgID );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 3 ), cClsID );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 4 ), cBmp );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 5 ), cVer );
             hb_itemPutC( hb_arrayGetItemPtr( &Item, 6 ), cPath );
+            hb_itemPutC( hb_arrayGetItemPtr( &Item, 7 ), cReg );
             hb_arrayAddForward( &Array, &Item );
          }
       }

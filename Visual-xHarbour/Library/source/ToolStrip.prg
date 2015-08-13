@@ -1347,6 +1347,7 @@ METHOD __UpdateWidth() CLASS ToolStrip
       ::MoveWindow()
       ::__nWidth := ::Width
    ENDIF
+   ::InvalidateRect()
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------

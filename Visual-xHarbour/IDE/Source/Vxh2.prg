@@ -89,7 +89,6 @@ CLASS WindowEdit INHERIT WinForm
    METHOD OnEraseBkGnd()
    METHOD OnUserMsg()
    METHOD OnSize()
-   METHOD OnNCPaint()
 
    METHOD ControlSelect()
    METHOD CheckMouse()
@@ -1849,101 +1848,3 @@ RETURN Self
 
 //----------------------------------------------------------------------------
 
-METHOD OnNCPaint() CLASS WindowEdit
-   LOCAL hdc, nState, hIcon, nCaption, cx, cy, x, y, nBorder, nColor, hFont, hOldFont, aStyle, aRect[4], aBttn, aSize[2]
-   IF ::Application:ThemeActive .AND. ::Theming .AND. ::IsWindowVisible()
-      IF ( !::CaptionBar .AND. ::FrameStyle == 2 ) .OR. ::lCustom
-         RETURN NIL
-      ENDIF
-      nBorder  := (::Width-::ClientWidth)/2
-      IF ::ToolWindow
-         aBttn    := { GetSystemMetrics(SM_CXSMSIZE), GetSystemMetrics(SM_CYSMSIZE) }
-         aStyle   := { WP_SMALLCAPTION, WP_SMALLFRAMELEFT, WP_SMALLFRAMERIGHT, WP_SMALLFRAMEBOTTOM, TMT_SMALLCAPTIONFONT, WP_SMALLCLOSEBUTTON }
-         nCaption := GetSystemMetrics(SM_CYSMCAPTION) + nBorder
-       ELSE
-         aBttn    := { GetSystemMetrics(SM_CXSIZE), GetSystemMetrics(SM_CYSIZE) }
-         aStyle   := { WP_CAPTION, WP_FRAMELEFT, WP_FRAMERIGHT, WP_FRAMEBOTTOM, TMT_CAPTIONFONT, WP_CLOSEBUTTON }
-         nCaption := GetSystemMetrics(SM_CYCAPTION) + nBorder
-      ENDIF
-      hdc      := GetWindowDC(::hWnd)
-      nState   := IIF( ::InActive, CS_INACTIVE, CS_ACTIVE )
-
-      _FillRect( hdc, { 0, 0, 5, 5 }, GetStockObject( WHITE_BRUSH ) )
-      _FillRect( hdc, { ::Width-5, 0, ::Width, 5 }, GetStockObject( WHITE_BRUSH ) )
-
-      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[1], nState, { 0, 0, ::Width, nCaption } )
-      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[2], nState, { 0, nCaption, nBorder, ::Height } )
-      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[3], nState, { ::Width-nBorder, nCaption, ::Width, ::Height } )
-      DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[4], nState, { 0, ::Height-nBorder, ::Width, ::Height } )
-
-      aSize := GetThemePartSize( ::System:hWindowTheme, hdc, aStyle[6], nState, { 3, 3, nCaption-5, nCaption-5 }, TS_TRUE )
-
-      aRect[1] := ::Width - aSize[1] - 6
-      aRect[2] := ( ( nCaption - aSize[2] ) / 2 ) + 1
-      aRect[3] := aRect[1] + aSize[1]
-      aRect[4] := aRect[2] + aSize[2]
-
-      IF ::SysMenu
-         nState := IIF( ::InActive, 5, CBS_NORMAL )
-         DrawThemeBackground( ::System:hWindowTheme, hdc, aStyle[6], nState, aRect )
-         aRect[1] -= (aSize[1]+2)
-         aRect[3] -= (aSize[1]+2)
-
-         IF ( ::MaximizeBox .OR. ::MinimizeBox ) .AND. !::ToolWindow
-            nState := IIF( ::InActive, MAXBS_INACTIVE, MAXBS_NORMAL )
-            IF !::MaximizeBox
-               nState := IIF( ::InActive, MAXBS_DISINACTIVE, MAXBS_DISABLED )
-            ENDIF
-            DrawThemeBackground( ::System:hWindowTheme, hdc, WP_MAXBUTTON, nState, aRect )
-            aRect[1] -= (aSize[1]+2)
-            aRect[3] -= (aSize[1]+2)
-
-            nState := IIF( ::InActive, MINBS_INACTIVE, MINBS_NORMAL )
-            IF !::MinimizeBox
-               nState := IIF( ::InActive, MINBS_DISINACTIVE, MINBS_DISABLED )
-            ENDIF
-            DrawThemeBackground( ::System:hWindowTheme, hdc, WP_MINBUTTON, nState, aRect )
-         ENDIF
-
-      ENDIF
-
-      IF ::ToolWindow .OR. !::SysMenu .OR. ( ::Modal .AND. ::DlgModalFrame )
-         cx := 0
-         x  := 0
-       ELSE
-         cx := GetSystemMetrics( SM_CXSMICON )
-         cy := GetSystemMetrics( SM_CYSMICON )
-         x  := 6
-         y  := ( nCaption - cy ) / 2
-         hIcon := ::GetIcon( ICON_SMALL )
-         IF EMPTY( hIcon )
-            hIcon := 65553
-         ENDIF
-         DrawIconEx( hdc, x, y+1, hIcon, cx, cy, 0, NIL, DI_NORMAL | DI_COMPAT )
-      ENDIF
-
-      SetBkMode( hdc, TRANSPARENT )
-      IF ( hFont := GetThemeSysFont( ::System:hWindowTheme, aStyle[5] ) ) != NIL
-         hOldFont := SelectObject( hdc, hFont )
-      ENDIF
-
-      IF ::Application:OsVersion:dwMajorVersion == 5
-         IF !::InActive
-            DrawThemeText( ::System:hWindowTheme, hdc, aStyle[1], nState, ::Caption, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE, { x+cx+4, IIF( !::ToolWindow, 1, 0 )+3, ::Width, nCaption } )
-         ENDIF
-      ENDIF
-
-      SetTextColor( hdc, GetThemeSysColor( ::System:hWindowTheme, COLOR_CAPTIONTEXT ) )
-      _DrawText( hdc, ::Caption, { x+cx+4, 3, ::Width, nCaption }, DT_END_ELLIPSIS | DT_VCENTER | DT_SINGLELINE )
-      SetTextColor( hdc, nColor )
-
-      IF hOldFont != NIL
-         SelectObject( hdc, hOldFont )
-         DeleteObject( hFont )
-      ENDIF
-
-      ReleaseDC( ::hWnd, hDC )
-
-      RETURN 0
-   ENDIF
-RETURN NIL
