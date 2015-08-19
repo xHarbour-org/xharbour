@@ -5390,7 +5390,7 @@ HB_FUNC( SYSTEMTIMETOLOCALTIME )
 
 HB_FUNC( KILLPROCESS )
 {
-   HANDLE WINAPI hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, 0 );
    PROCESSENTRY32 pEntry;
    pEntry.dwSize = sizeof( pEntry );
 
@@ -5415,7 +5415,7 @@ HB_FUNC( KILLPROCESS )
 HB_FUNC( ISPROCESSRUNNING )
 {
    BOOL bRet = FALSE;
-   HANDLE WINAPI hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, 0 ); //th32ProcessID [in] The process identifier of the process to be included in the snapshot. This parameter can be zero to indicate the current process
    PROCESSENTRY32 pEntry;
    pEntry.dwSize = sizeof( pEntry );
 
