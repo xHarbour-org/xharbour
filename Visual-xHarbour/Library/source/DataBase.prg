@@ -823,7 +823,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       ::Owner:Area := Select()
       ::Owner:Structure := (::Owner:Area)->( dbStruct() )
-view ::Owner:Area
+
       AEVAL( ::Owner:Structure, {|,n| ASIZE( ::Owner:Structure[n], 4 )} )
 
       ::Owner:CreateFields()
