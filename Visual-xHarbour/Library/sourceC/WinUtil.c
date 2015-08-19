@@ -5390,7 +5390,7 @@ HB_FUNC( SYSTEMTIMETOLOCALTIME )
 
 HB_FUNC( KILLPROCESS )
 {
-   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   HANDLE WINAPI hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
    PROCESSENTRY32 pEntry;
    pEntry.dwSize = sizeof( pEntry );
 
@@ -5415,7 +5415,7 @@ HB_FUNC( KILLPROCESS )
 HB_FUNC( ISPROCESSRUNNING )
 {
    BOOL bRet = FALSE;
-   HANDLE hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
+   HANDLE WINAPI hSnapShot = CreateToolhelp32Snapshot( TH32CS_SNAPALL, NULL );
    PROCESSENTRY32 pEntry;
    pEntry.dwSize = sizeof( pEntry );
 
