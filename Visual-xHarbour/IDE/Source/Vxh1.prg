@@ -34,8 +34,8 @@ static s_cVersion, s_cCopyright
 
 #define KEY_ALL_ACCESS              (0xF003F)
 
-#define VXH_Version      "8.3"
-#define VXH_BuildVersion "333"
+#define VXH_Version      "8.5"
+#define VXH_BuildVersion "340"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
