@@ -82,6 +82,7 @@
 #define HB_UCHAR                  UCHAR
 #define HB_FT_IMAGE               HB_FT_PICTURE
 #define HB_I64                    INT64
+#define HB_U64                    UINT64
 #define hb_gcMark                 hb_gcItemRef
 #define hb_vmAtQuit               hb_vmAtExit
 #define HB_FSNAMECONV             hb_fsNameConv
@@ -89,7 +90,7 @@
 #define hb_itemPutTS              hb_itemPutDTS
 #define HB_IS_TIMESTAMP           HB_IS_TIMEFLAG
 #define HB_CDP_ISBINSORT(cdp)     0
-
+#define hb_itemGetTDT             hb_itemGetDTL
 // #define HB_PFS                    PFLL
 
 #endif /* HB_COMPAT_H_ */

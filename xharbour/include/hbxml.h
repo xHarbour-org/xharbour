@@ -73,18 +73,18 @@
 
 /* Standard definitions */
 #ifdef HB_OS_MAC
-   #define MXML_LINE_TERMINATOR      '\r'
-   #define MXML_SOFT_LINE_TERMINATOR '\n'
+   #define MXML_LINE_TERMINATOR       '\r'
+   #define MXML_SOFT_LINE_TERMINATOR  '\n'
 #else
-   /*Notice, this works for unix AND windows */
-   #define MXML_LINE_TERMINATOR      '\n'
-   #define MXML_SOFT_LINE_TERMINATOR '\r'
+/*Notice, this works for unix AND windows */
+   #define MXML_LINE_TERMINATOR       '\n'
+   #define MXML_SOFT_LINE_TERMINATOR  '\r'
 #endif
 
-#define MXML_EOF                  -256
+#define MXML_EOF                      -256
 
-#define MXML_ALLOC_BLOCK      128
-#define MXML_MAX_DEPTH        64
+#define MXML_ALLOC_BLOCK              128
+#define MXML_MAX_DEPTH                64
 
 /* Styles */
 #define MXML_STYLE_NOINDENT      0 /* no indent nodes and insert new line after each node */
@@ -98,8 +98,8 @@
 
 typedef enum
 {
-   MXML_STATUS_ERROR=0,
-   MXML_STATUS_OK=1,
+   MXML_STATUS_ERROR = 0,
+   MXML_STATUS_OK    = 1,
    MXML_STATUS_MORE,
    MXML_STATUS_DONE,
    MXML_STATUS_UNDEFINED,
@@ -110,7 +110,7 @@ typedef enum
 typedef enum
 {
    MXML_ERROR_NONE = 0,
-   MXML_ERROR_IO = 1,
+   MXML_ERROR_IO   = 1,
    MXML_ERROR_NOMEM,
 
    MXML_ERROR_OUTCHAR,
@@ -130,7 +130,7 @@ typedef enum
 
 typedef enum
 {
-   MXML_TYPE_TAG=0,
+   MXML_TYPE_TAG = 0,
    MXML_TYPE_COMMENT,
    MXML_TYPE_PI,
    MXML_TYPE_DIRECTIVE,
@@ -143,30 +143,31 @@ typedef enum
 struct tag_mxml_refil;
 struct tag_mxml_output;
 
-typedef void (*MXML_REFIL_FUNC)( struct tag_mxml_refil *ref );
-typedef void (*MXML_OUTPUT_FUNC)( struct tag_mxml_output *out, const char *data, HB_SIZE len );
+typedef void ( *MXML_REFIL_FUNC )( struct tag_mxml_refil * ref );
+typedef void ( *MXML_OUTPUT_FUNC )( struct tag_mxml_output * out, const char * data, HB_ISIZ len );
 
 /*************************************************
    Structures holding the XML data
-**************************************************/
+ **************************************************/
+
 
 /* Refiller */
 
 typedef struct tag_mxml_refil
 {
    /* status variables */
-   MXML_STATUS status;
+   MXML_STATUS     status;
    MXML_ERROR_CODE error;
 
    /* buffer for reading data */
-   unsigned char *buffer;
-   HB_SIZE bufsize;  /* size of the whole buffer */
-   HB_SIZE buflen;   /* valid characters in the current buffer */
-   HB_SIZE bufpos;   /* current position */
+   unsigned char * buffer;
+   HB_ISIZ         bufsize; /* size of the whole buffer */
+   HB_ISIZ         buflen;  /* valid characters in the current buffer */
+   HB_ISIZ         bufpos;  /* current position */
 
-   /* length of the stream for implementing progress indicators */
-   LONG streampos;
-   LONG streamlen;
+   /* lenght of the stream for implementing progress indicators */
+   HB_ISIZ streampos;
+   HB_ISIZ streamlen;
 
    /* callback funcs */
    MXML_REFIL_FUNC refil_func;
@@ -186,15 +187,15 @@ typedef struct tag_mxml_refil
 typedef struct tag_mxml_output
 {
    /* status variables */
-   MXML_STATUS status;
+   MXML_STATUS     status;
    MXML_ERROR_CODE error;
 
    /* output operation */
-   MXML_OUTPUT_FUNC  output_func;
+   MXML_OUTPUT_FUNC output_func;
 
    /* data to implement progress indicators */
-   HB_SIZE node_count;
-   HB_SIZE node_done;
+   int node_count;
+   int node_done;
 
    /* data available for callback functions */
    union
@@ -205,29 +206,32 @@ typedef struct tag_mxml_output
 
 } MXML_OUTPUT;
 
-typedef struct tag_mxml_self_growing_string
+/* tag mxml self growing string */
+typedef struct
 {
-   char    *buffer;
-   HB_SIZE allocated;
-   HB_SIZE length;
+   char *  buffer;
+   HB_ISIZ allocated;
+   HB_ISIZ length;
 } MXML_SGS;
 
-typedef struct _hbxml_attribute {
+typedef struct
+{
    PHB_ITEM pName;
    PHB_ITEM pValue;
-} HBXML_ATTRIBUTE, *PHBXML_ATTRIBUTE;
+} HBXML_ATTRIBUTE, * PHBXML_ATTRIBUTE;
+
 
 /* Allocator and deletor functions are meant to be redeclared by includers */
 #ifndef MXML_ALLOCATOR
-   #define MXML_ALLOCATOR  hb_xgrab
+   #define MXML_ALLOCATOR    hb_xgrab
 #endif
 
 #ifndef MXML_DELETOR
-   #define MXML_DELETOR  hb_xfree
+   #define MXML_DELETOR      hb_xfree
 #endif
 
 #ifndef MXML_REALLOCATOR
-   #define MXML_REALLOCATOR hb_xrealloc
+   #define MXML_REALLOCATOR  hb_xrealloc
 #endif
 
 #endif

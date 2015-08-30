@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-08-30 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * contrib/hbsqlite3/xhbsqlite3.c
+    ! minor fix to compile under visual studio 2015
+  * contrib/hbzlib/zipplatform.cpp
+    ! minor fix to compile under visual studio 2015
+  * include/hbapi.h
+    ! added HB_IT_EVALITEM borrow from harbour
+  * include/hbapiitm.h
+    ! added hb_itemRawSwap borrow from harbour
+  * include/hbcompat.h
+    ! added HB_U64 and hb_itemGetTDT defined
+  * include/hbxml.h
+    ! some adjust on function declaration borrow from harbour
+  * source/rtl/hbxml.c
+    ! fixes borrow from harbour
+  * source/rtl/dllcall.c
+    ! adjust to return pointers insted of long values  
+  * source/vm/asort.c
+    ! new version borrow from harbour
+  * utils/hbmake/hbmlang.c
+    ! minor fix to compile under visual studio 2015
+  * source/rtl/achoice.prg
+    ! changed ISITEMSELECTABLE function to use itemapi insted of direct structure manipulation
+  * source/rtl/minmax.c
+    ! changed to use itemapi insted of direct structure manipulation
+  * source/vm/garbage.c
+    ! added   hb_gcDummyMark borrow from harbour
+                  
 2015-07-25 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * include/hbapiitm.h
     ! added hb_itemEqual Borrow from harbour

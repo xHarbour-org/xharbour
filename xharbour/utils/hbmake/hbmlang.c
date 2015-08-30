@@ -204,7 +204,7 @@ HB_FUNC(GETUSERLANG)
 
 #define B_BOXLINES      "ÚÄ¿³ÙÄÀ³"
 
-static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent );
+static void hb_gaugeUpdate( PHB_ITEM pArray, double fPercent );
 
 /* GaugeNew( <nRowTop>, <nColumnTop>, <nRowBottom>, <nColumnBottom>,
       [<cBackgroundColor>],
@@ -276,7 +276,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       hb_gtSetColorStr( szOldColor );
 
-      hb_gaugeUpdate( pArray, ( float ) hb_arrayGetND( pArray, B_PERCENT ) );
+      hb_gaugeUpdate( pArray,  hb_arrayGetND( pArray, B_PERCENT ) );
 
       hb_itemReturn( pArray );
    }
@@ -290,13 +290,13 @@ HB_FUNC( GAUGEUPDATE )
 
    if( pArray )
    {
-      hb_gaugeUpdate( pArray, ISNUM( 2 ) ? (float) hb_parnd( 2 ) : 0 );
+      hb_gaugeUpdate( pArray, ISNUM( 2 ) ?  hb_parnd( 2 ) : 0 );
 
       hb_itemReturn( pArray );
    }
 }
 
-static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
+static void hb_gaugeUpdate( PHB_ITEM pArray, double fPercent )
 {
    int iCenter = ( ( hb_arrayGetNL( pArray, B_RIGHT ) - hb_arrayGetNL( pArray, B_LEFT ) ) / 2 ) + 1;
    int iRatio = hb_arrayGetNL( pArray, B_RIGHT ) - hb_arrayGetNL( pArray, B_LEFT ) - 1;
@@ -316,7 +316,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
    if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
    {
       hb_snprintf( szPct, sizeof( szPct ), "%3.0f%%", fPercent * 100 );
-      hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
+      hb_gtWriteAt( (USHORT) hb_arrayGetNI( pArray, B_TOP ),
                     (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
    }
 

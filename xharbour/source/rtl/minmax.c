@@ -64,14 +64,23 @@ HB_FUNC( MAX )
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
-   if( HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
+   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      register LONG  ld1   = p1->item.asDate.value;
-      register LONG  ld2   = p2->item.asDate.value;
-      if( ld1 > ld2 || ( ld1 == ld2 && p1->item.asDate.time >= p2->item.asDate.time ) )
-         hb_itemReturn( p1 );
-      else
-         hb_itemReturn( p2 );
+      long l1 = hb_itemGetDL( p1 );
+      long l2 = hb_itemGetDL( p2 );
+
+      hb_retdl( l1 >= l2 ? l1 : l2 );
+      return;
+   }      
+   else if(  HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
+   {
+         if( HB_IS_DATE( p1 ) && hb_itemGetDL( p1 ) == hb_itemGetDL( p2 ) )
+            hb_itemReturn( p1 );
+         else if( HB_IS_DATE( p2 ) && hb_itemGetDL( p1 ) == hb_itemGetDL( p2 ) )
+            hb_itemReturn( p2 );
+         else
+            hb_itemReturn( hb_itemGetDTD( p1 ) >= hb_itemGetDTD( p2 ) ? p1 : p2 );
+         return;
    }
    else if( HB_IS_DATETIME( p1 ) || HB_IS_DATETIME( p2 ) )
    {
@@ -140,14 +149,30 @@ HB_FUNC( MIN )
    PHB_ITEM p2 = hb_param( 2, HB_IT_ANY );
 
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
-   if( HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
+   
+   if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      register LONG  ld1   = p1->item.asDate.value;
-      register LONG  ld2   = p2->item.asDate.value;
-      if( ld1 < ld2 || ( ld1 == ld2 && p1->item.asDate.time <= p2->item.asDate.time ) )
-         hb_itemReturn( p1 );
-      else
-         hb_itemReturn( p2 );
+      long l1 = hb_itemGetDL( p1 );
+      long l2 = hb_itemGetDL( p2 );
+
+      hb_retdl( l1 <= l2 ? l1 : l2 );
+      return;
+   }   
+   else if( HB_IS_DATETIME( p1 ) && HB_IS_DATETIME( p2 ) )
+   {
+//       register LONG  ld1   = p1->item.asDate.value;
+//       register LONG  ld2   = p2->item.asDate.value;
+//       if( ld1 < ld2 || ( ld1 == ld2 && p1->item.asDate.time <= p2->item.asDate.time ) )
+//          hb_itemReturn( p1 );
+//       else
+//          hb_itemReturn( p2 );
+         if( HB_IS_DATE( p1 ) && hb_itemGetDL( p1 ) == hb_itemGetDL( p2 ) )
+            hb_itemReturn( p1 );
+         else if( HB_IS_DATE( p2 ) && hb_itemGetDL( p1 ) == hb_itemGetDL( p2 ) )
+            hb_itemReturn( p2 );
+         else
+            hb_itemReturn( hb_itemGetDTD( p1 ) <= hb_itemGetDTD( p2 ) ? p1 : p2 );
+         return;
    }
    else if( HB_IS_DATETIME( p1 ) || HB_IS_DATETIME( p2 ) )
    {

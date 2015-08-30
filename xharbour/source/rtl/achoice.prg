@@ -637,7 +637,7 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
    {
       if( HB_IS_ARRAY( pSelect ) )
       {
-         if( uiItem >= 1 && uiItem <= pSelect->item.asArray.value->ulLen )
+         if( uiItem >= 1 && uiItem <= hb_arrayLen(pSelect)) // ->item.asArray.value->ulLen )
          {
             pSelectItem = hb_itemArrayGet( pSelect, uiItem );
             pSelect = pSelectItem;
@@ -645,12 +645,12 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
       }
 
       if( HB_IS_LOGICAL( pSelect ) )
-         bResult = pSelect->item.asLogical.value;
+         bResult = hb_itemGetL( pSelect ) ; //->item.asLogical.value;
       else if( HB_IS_STRING( pSelect ) )
       {
          PHB_MACRO pMacro;
 
-         pMacro = hb_macroCompile( pSelect->item.asString.value );
+         pMacro = hb_macroCompile( hb_itemGetCPtr(pSelect)); // ->item.asString.value );
 
          if( pMacro )
          {
@@ -659,7 +659,7 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
             pSelect = hb_stackItemFromTop( -1 );
 
             if( pSelect && HB_IS_LOGICAL( pSelect ) )
-               bResult = pSelect->item.asLogical.value;
+               bResult = hb_itemGetL( pSelect ) ; // ->item.asLogical.value;
 
             hb_stackPop();
          }
@@ -675,7 +675,7 @@ HB_FUNC_STATIC( ISITEMSELECTABLE )
          hb_itemRelease( pIndex );
 
          if( pSelect && HB_IS_LOGICAL( pSelect ) )
-            bResult = pSelect->item.asLogical.value;
+            bResult = hb_itemGetL( pSelect ) ; //->item.asLogical.value;
       }
 
       if( pSelectItem )

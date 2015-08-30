@@ -156,7 +156,8 @@ char * hb_parcstruct( int iParam, ... )
             hb_itemRelease( pItem );
          }
 
-         return hb_stackReturnItem()->item.asString.value;
+         //return hb_stackReturnItem()->item.asString.value;
+         return hb_itemGetCPtr( hb_stackReturnItem() ) ;
       }
    }
 
@@ -202,7 +203,7 @@ HB_FUNC( DLLPREPARECALL )
    }
    else if( ISNUM( 1 ) )
    {
-      xec->hDLL = ( HINSTANCE ) hb_parnl( 1 );
+      xec->hDLL = ( HINSTANCE ) hb_parptr( 1 );
    }
 
    if( ISNUM( 2 ) )
@@ -283,12 +284,12 @@ HB_FUNC( DLLPREPARECALL )
 
 HB_FUNC( LOADLIBRARY )
 {
-   hb_retnl( ( DWORD ) LoadLibraryA( ( LPCSTR ) hb_parcx( 1 ) ) );
+   hb_retptr( ( void* ) LoadLibraryA( ( LPCSTR ) hb_parcx( 1 ) ) );
 }
 
 HB_FUNC( FREELIBRARY )
 {
-   hb_retl( FreeLibrary( ( HMODULE ) hb_parnl( 1 ) ) );
+   hb_retl( FreeLibrary( ( HMODULE ) hb_parptr( 1 ) ) );
 }
 
 // compatibility
@@ -319,7 +320,7 @@ HB_FUNC( GETPROCADDRESS )
    LPVOID   lpProcAddr;
    char     cFuncName[ MAX_PATH ];
 
-   if( ( lpProcAddr = ( LPVOID ) GetProcAddress( ( HMODULE ) hb_parnl( 1 ),
+   if( ( lpProcAddr = ( LPVOID ) GetProcAddress( ( HMODULE ) hb_parptr( 1 ),
                                                  ISCHAR( 2 ) ? ( LPCSTR ) hb_parcx( 2 ) :
                                                  ( LPCSTR ) hb_parnl( 2 ) ) ) == 0 )
    {
@@ -328,7 +329,7 @@ HB_FUNC( GETPROCADDRESS )
          // try ANSI flavour ?
          hb_xstrcpy( cFuncName, hb_parc( 2 ), 0 );
          hb_xstrcat( cFuncName, "A", 0 );
-         lpProcAddr = ( LPVOID ) GetProcAddress( ( HMODULE ) hb_parnl( 1 ), cFuncName );
+         lpProcAddr = ( LPVOID ) GetProcAddress( ( HMODULE ) hb_parptr( 1 ), cFuncName );
       }
    }
 
@@ -706,10 +707,10 @@ HB_FUNC( DLLCALL )
    }
    else
    {
-      hInst = ( HINSTANCE ) hb_parnl( 1 );
+      hInst = ( HINSTANCE ) hb_parptr( 1 );
    }
 
-   if( hInst == NULL || ( DWORD ) hInst < 32 )
+   if( hInst == NULL ) // || ( DWORD ) hInst < 32 )
    {
       hb_ret();
       return;

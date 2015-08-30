@@ -68,32 +68,56 @@
 
 /* #define HB_ASORT_OPT_ITEMCOPY  - use hbsetup.h to enable/disable it*/
 
-static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
+static HB_BOOL hb_itemIsLess( PHB_BASEARRAY pBaseArray, PHB_ITEM pBlock,
+                              HB_SIZE nItem1, HB_SIZE nItem2 )
 {
+   PHB_ITEM pItem1 = pBaseArray->pItems + nItem1,
+            pItem2 = pBaseArray->pItems + nItem2;
+
    if( pBlock )
    {
-      hb_vmPushSymbol( &hb_symEval );
+      PHB_ITEM pRet;
+
+      /* protection against array resizing by user codeblock */
+      if( pBaseArray->ulLen <= nItem1 || pBaseArray->ulLen <= nItem2 )
+         return HB_FALSE;
+
+      hb_vmPushEvalSym();
       hb_vmPush( pBlock );
       hb_vmPush( pItem1 );
       hb_vmPush( pItem2 );
       hb_vmSend( 2 );
 
-      if( HB_IS_LOGICAL( &( HB_VM_STACK.Return ) ) )
-         return HB_VM_STACK.Return.item.asLogical.value;
+      pRet = hb_param( -1, HB_IT_ANY );
+
+      /* CA-Cl*pper always takes return value as logical item
+       * accepting 0, 1 as numeric representation of HB_FALSE/HB_TRUE
+       */
+      return ( HB_IS_LOGICAL( pRet ) || HB_IS_NUMERIC( pRet ) ) ?
+             hb_itemGetL( pRet ) : HB_TRUE;
    }
 
    /* Do native compare when no codeblock is supplied */
 
    if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
-      return hb_itemStrCmp( pItem1, pItem2, FALSE ) < 0;
+      return hb_itemStrCmp( pItem1, pItem2, HB_FALSE ) < 0;
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+      /* intentionally separate comparison for integer numbers
+         to avoid precision lose in 64bit integer to double conversion */
       return hb_itemGetNInt( pItem1 ) < hb_itemGetNInt( pItem2 );
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
       return hb_itemGetND( pItem1 ) < hb_itemGetND( pItem2 );
-   else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-      return ( hb_itemGetDL( pItem1 ) < hb_itemGetDL( pItem2 ) ) ||
-             ( hb_itemGetDL( pItem1 ) == hb_itemGetDL( pItem2 ) &&
-               hb_itemGetT( pItem1 ) < hb_itemGetT( pItem2 ) );
+   else if( HB_IS_TIMESTAMP( pItem1 ) && HB_IS_TIMESTAMP( pItem2 ) )
+   {
+      long lDate1, lTime1, lDate2, lTime2;
+
+      hb_itemGetTDT( pItem1, &lDate1, &lTime1 );
+      hb_itemGetTDT( pItem2, &lDate2, &lTime2 );
+      return lDate1 == lDate2 ? lTime1 < lTime2 : lDate1 < lDate2;
+   }
+   else if( HB_IS_DATETIME( pItem1 ) && HB_IS_DATETIME( pItem2 ) )
+      /* it's not exact comparison, compare only julian date */
+      return hb_itemGetDL( pItem1 ) < hb_itemGetDL( pItem2 );
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
       return hb_itemGetL( pItem1 ) < hb_itemGetL( pItem2 );
    else
@@ -101,147 +125,254 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
       /* NOTE: For non-matching types CA-Cl*pper sorts always like this:
                Array/Object Block String Logical Date Numeric NIL [jlalin] */
 
-      int   iWeight1;
-      int   iWeight2;
+      int iWeight1;
+      int iWeight2;
 
-      if( HB_IS_ARRAY( pItem1 ) )
-         iWeight1 = 1;
-      else if( HB_IS_BLOCK( pItem1 ) )
-         iWeight1 = 2;
-      else if( HB_IS_STRING( pItem1 ) )
-         iWeight1 = 3;
-      else if( HB_IS_LOGICAL( pItem1 ) )
-         iWeight1 = 4;
-      else if( HB_IS_DATE( pItem1 ) )
-         iWeight1 = 5;
-      else if( HB_IS_NUMERIC( pItem1 ) )
-         iWeight1 = 6;
-      else
-         iWeight1 = 7;
+      if( HB_IS_ARRAY( pItem1 ) ) iWeight1 = 1;
+      else if( HB_IS_BLOCK( pItem1 ) ) iWeight1 = 2;
+      else if( HB_IS_STRING( pItem1 ) ) iWeight1 = 3;
+      else if( HB_IS_LOGICAL( pItem1 ) ) iWeight1 = 4;
+      else if( HB_IS_DATETIME( pItem1 ) ) iWeight1 = 5;
+      else if( HB_IS_NUMERIC( pItem1 ) ) iWeight1 = 6;
+      else iWeight1 = 7;
 
-      if( HB_IS_ARRAY( pItem2 ) )
-         iWeight2 = 1;
-      else if( HB_IS_BLOCK( pItem2 ) )
-         iWeight2 = 2;
-      else if( HB_IS_STRING( pItem2 ) )
-         iWeight2 = 3;
-      else if( HB_IS_LOGICAL( pItem2 ) )
-         iWeight2 = 4;
-      else if( HB_IS_DATE( pItem2 ) )
-         iWeight2 = 5;
-      else if( HB_IS_NUMERIC( pItem2 ) )
-         iWeight2 = 6;
-      else
-         iWeight2 = 7;
+      if( HB_IS_ARRAY( pItem2 ) ) iWeight2 = 1;
+      else if( HB_IS_BLOCK( pItem2 ) ) iWeight2 = 2;
+      else if( HB_IS_STRING( pItem2 ) ) iWeight2 = 3;
+      else if( HB_IS_LOGICAL( pItem2 ) ) iWeight2 = 4;
+      else if( HB_IS_DATETIME( pItem2 ) ) iWeight2 = 5;
+      else if( HB_IS_NUMERIC( pItem2 ) ) iWeight2 = 6;
+      else iWeight2 = 7;
 
       return iWeight1 < iWeight2;
    }
 }
 
+#ifdef HB_CLP_STRICT
+
 /* partition array pItems[lb..ub] */
 
-static HB_ISIZ hb_arraySortQuickPartition( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
+static HB_ISIZ hb_arraySortQuickPartition( PHB_BASEARRAY pBaseArray, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
 {
-   HB_ISIZ i, j, p;
+   HB_ISIZ i, j;
 
    /* select pivot and exchange with 1st element */
-   p = lb + ( ( ub - lb ) >> 1 );
-
-   if( p != lb )
-      hb_itemSwap( pItems + lb, pItems + p );
+   i = lb + ( ( ub - lb ) >> 1 );
+   if( i != lb )
+      hb_itemRawSwap( pBaseArray->pItems + lb, pBaseArray->pItems + i );
 
    /* sort lb+1..ub based on pivot */
-   i  = lb + 1;
-   j  = ub;
+   i = lb + 1;
+   j = ub;
 
-   while( TRUE )
+   for( ;; )
    {
-      while( i < j && hb_itemIsLess( pItems + i, pItems + lb, pBlock ) )
+      while( i < j && hb_itemIsLess( pBaseArray, pBlock, i, lb ) )
          i++;
 
-      while( j >= i && hb_itemIsLess( pItems + lb, pItems + j, pBlock ) )
+      while( j >= i && hb_itemIsLess( pBaseArray, pBlock, lb, j ) )
          j--;
 
       if( i >= j )
          break;
 
       /* Swap the items */
-      hb_itemSwap( pItems + i, pItems + j );
+      hb_itemRawSwap( pBaseArray->pItems + i, pBaseArray->pItems + j );
       j--;
       i++;
    }
 
-   /* pivot belongs in pItems[j] */
-   if( j > lb )
-      hb_itemSwap( pItems + lb, pItems + j );
+   /* pivot belongs in pBaseArray->pItems[ j ] */
+   if( j > lb && pBaseArray->ulLen > ( HB_SIZE ) j )
+      hb_itemRawSwap( pBaseArray->pItems + lb, pBaseArray->pItems + j );
 
    return j;
 }
 
-/* sort array pItems[lb..ub] */
+/* sort array pBaseArray->pItems[lb..ub] */
 
-static void hb_arraySortQuick( PHB_ITEM pItems, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
+static void hb_arraySortQuick( PHB_BASEARRAY pBaseArray, HB_ISIZ lb, HB_ISIZ ub, PHB_ITEM pBlock )
 {
+   HB_ISIZ m;
+
    while( lb < ub )
    {
+      if( ( HB_SIZE ) ub >= pBaseArray->ulLen )
+      {
+         ub = pBaseArray->ulLen - 1;
+         if( lb >= ub )
+            break;
+      }
+
       /* partition into two segments */
-      HB_ISIZ m = hb_arraySortQuickPartition( pItems, lb, ub, pBlock );
+      m = hb_arraySortQuickPartition( pBaseArray, lb, ub, pBlock );
 
       /* sort the smallest partition to minimize stack requirements */
       if( m - lb <= ub - m )
       {
-         hb_arraySortQuick( pItems, lb, m - 1, pBlock );
+         hb_arraySortQuick( pBaseArray, lb, m - 1, pBlock );
          lb = m + 1;
       }
       else
       {
-         hb_arraySortQuick( pItems, m + 1, ub, pBlock );
+         hb_arraySortQuick( pBaseArray, m + 1, ub, pBlock );
          ub = m - 1;
       }
    }
 }
 
-BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pulStart, HB_SIZE * pulCount, PHB_ITEM pBlock )
+static void hb_arraySortStart( PHB_BASEARRAY pBaseArray, PHB_ITEM pBlock,
+                               HB_SIZE nStart, HB_SIZE nCount )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock ) );
+   hb_arraySortQuick( pBaseArray, nStart, nStart + nCount - 1, pBlock );
+}
 
-   /* TraceLog( NULL, "*** Sorting: %p ***\n", pArray );
-    */
+#else
+
+static HB_BOOL hb_arraySortDO( PHB_BASEARRAY pBaseArray, PHB_ITEM pBlock,
+                               HB_SIZE * pSrc, HB_SIZE * pBuf, HB_SIZE nCount )
+{
+   if( nCount > 1 )
+   {
+      HB_SIZE nCnt1, nCnt2, * pPtr1, * pPtr2, * pDst;
+      HB_BOOL fBuf1, fBuf2;
+
+      nCnt1 = nCount >> 1;
+      nCnt2 = nCount - nCnt1;
+      pPtr1 = &pSrc[ 0 ];
+      pPtr2 = &pSrc[ nCnt1 ];
+
+      fBuf1 = hb_arraySortDO( pBaseArray, pBlock, pPtr1, &pBuf[ 0 ], nCnt1 );
+      fBuf2 = hb_arraySortDO( pBaseArray, pBlock, pPtr2, &pBuf[ nCnt1 ], nCnt2 );
+      if( fBuf1 )
+         pDst = pBuf;
+      else
+      {
+         pDst = pSrc;
+         pPtr1 = &pBuf[ 0 ];
+      }
+      if( ! fBuf2 )
+         pPtr2 = &pBuf[ nCnt1 ];
+
+      while( nCnt1 > 0 && nCnt2 > 0 )
+      {
+         if( hb_itemIsLess( pBaseArray, pBlock, *pPtr2, *pPtr1 ) )
+         {
+            *pDst++ = *pPtr2++;
+            nCnt2--;
+         }
+         else
+         {
+            *pDst++ = *pPtr1++;
+            nCnt1--;
+         }
+      }
+      if( nCnt1 > 0 )
+      {
+         do
+            *pDst++ = *pPtr1++;
+         while( --nCnt1 );
+      }
+      else if( nCnt2 > 0 && fBuf1 == fBuf2 )
+      {
+         do
+            *pDst++ = *pPtr2++;
+         while( --nCnt2 );
+      }
+      return ! fBuf1;
+   }
+   return HB_TRUE;
+}
+
+static void hb_arraySortStart( PHB_BASEARRAY pBaseArray, PHB_ITEM pBlock,
+                               HB_SIZE nStart, HB_SIZE nCount )
+{
+   HB_SIZE * pBuffer, * pDest, * pPos, nPos, nTo;
+
+   pBuffer = ( HB_SIZE * ) hb_xgrab( sizeof( HB_SIZE ) * 2 * nCount );
+   for( nPos = 0; nPos < nCount; ++nPos )
+   {
+#ifdef __MINGW64__
+      /* added dummy function call to disable buggy optimization in MinGW64 */
+      hb_gcDummyMark( NULL );
+#endif
+      pBuffer[ nPos ] = nStart + nPos;
+   }
+
+   if( hb_arraySortDO( pBaseArray, pBlock, pBuffer, &pBuffer[ nCount ], nCount ) )
+      pPos = ( pDest = pBuffer ) + nCount;
+   else
+      pDest = ( pPos = pBuffer ) + nCount;
+
+   /* protection against array resizing by user codeblock */
+   if( nStart + nCount > pBaseArray->ulLen )
+   {
+      if( pBaseArray->ulLen > nStart )
+      {
+         for( nPos = nTo = 0; nPos < nCount; ++nPos )
+         {
+            if( pDest[ nPos ] < pBaseArray->ulLen )
+               pDest[ nTo++ ] = pDest[ nPos ];
+         }
+         nCount = nTo;
+      }
+      else
+         nCount = 0;
+   }
+
+   for( nPos = 0; nPos < nCount; ++nPos )
+      pPos[ pDest[ nPos ] - nStart ] = nPos;
+
+   for( nPos = 0; nPos < nCount; ++nPos )
+   {
+      if( nPos + nStart != pDest[ nPos ] )
+      {
+         hb_itemRawSwap( pBaseArray->pItems + nPos + nStart,
+                         pBaseArray->pItems + pDest[ nPos ] );
+         pDest[ pPos[ nPos ] ] = pDest[ nPos ];
+         pPos[ pDest[ nPos ] - nStart ] = pPos[ nPos ];
+      }
+   }
+
+   hb_xfree( pBuffer );
+}
+#endif /* HB_CLP_STRICT */
+
+HB_BOOL hb_arraySort( PHB_ITEM pArray, HB_SIZE * pnStart, HB_SIZE * pnCount, PHB_ITEM pBlock )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_arraySort(%p, %p, %p, %p)", pArray, pnStart, pnCount, pBlock ) );
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      PHB_BASEARRAY  pBaseArray  = pArray->item.asArray.value;
-      HB_SIZE        ulLen       = pBaseArray->ulLen;
-      HB_SIZE        ulStart;
-      HB_SIZE        ulCount;
-      HB_SIZE        ulEnd;
+      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
+      HB_SIZE ulLen = pBaseArray->ulLen;
+      HB_SIZE nStart;
+      HB_SIZE nCount;
 
-      if( pulStart && ( *pulStart >= 1 ) )
-         ulStart = *pulStart;
+      if( pnStart && *pnStart >= 1 )
+         nStart = *pnStart;
       else
-         ulStart = 1;
+         nStart = 1;
 
-      if( ulStart <= ulLen )
+      if( nStart <= ulLen )
       {
-         if( pulCount && *pulCount >= 1 && ( *pulCount <= ulLen - ulStart ) )
-            ulCount = *pulCount;
+         if( pnCount && *pnCount >= 1 && ( *pnCount <= ulLen - nStart ) )
+            nCount = *pnCount;
          else
-            ulCount = ulLen - ulStart + 1;
+            nCount = ulLen - nStart + 1;
 
-         if( ulStart + ulCount > ulLen )             /* check range */
-            ulCount = ulLen - ulStart + 1;
-
-         ulEnd = ulCount + ulStart - 2;
+         if( nStart + nCount > ulLen )             /* check range */
+            nCount = ulLen - nStart + 1;
 
          /* Optimize when only one or no element is to be sorted */
-         if( ulCount > 1 )
-            hb_arraySortQuick( pBaseArray->pItems, ulStart - 1, ulEnd, pBlock );
+         if( nCount > 1 )
+            hb_arraySortStart( pBaseArray, pBlock, nStart - 1, nCount );
       }
 
-      return TRUE;
+      return HB_TRUE;
    }
    else
-      return FALSE;
+      return HB_FALSE;
 }
 
 HB_FUNC( ASORT )
@@ -250,13 +381,13 @@ HB_FUNC( ASORT )
 
    if( pArray && ! hb_arrayIsObject( pArray ) )
    {
-      HB_SIZE  ulStart  = hb_parns( 2 );
-      HB_SIZE  ulCount  = hb_parns( 3 );
+      HB_SIZE nStart = hb_parns( 2 );
+      HB_SIZE nCount = hb_parns( 3 );
 
       hb_arraySort( pArray,
-                    ISNUM( 2 ) ? &ulStart : NULL,
-                    ISNUM( 3 ) ? &ulCount : NULL,
-                    hb_param( 4, HB_IT_BLOCK ) );
+                    HB_ISNUM( 2 ) ? &nStart : NULL,
+                    HB_ISNUM( 3 ) ? &nCount : NULL,
+                    hb_param( 4, HB_IT_EVALITEM ) );
 
       hb_itemReturn( pArray ); /* ASort() returns the array itself */
    }

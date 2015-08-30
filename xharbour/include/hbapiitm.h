@@ -215,6 +215,12 @@ extern HB_EXPORT PHB_ITEM   hb_itemapiCheck( PHB_ITEM pItem );
 
 #  define hb_itemRawCpy( dst, src )       do { *(dst) = *(src); } while( 0 )
 
+#  define hb_itemRawSwap( dst, src )      do { \
+                                             HB_ITEM temp; \
+                                             hb_itemRawCpy( &temp, dst ); \
+                                             hb_itemRawCpy( dst, src ); \
+                                             hb_itemRawCpy( src, &temp ); \
+                                          } while( 0 )
 #  define hb_itemRawMove( dst, src )      do { \
                                              hb_itemRawCpy( dst, src ); \
                                              (src)->type = HB_IT_NIL; \

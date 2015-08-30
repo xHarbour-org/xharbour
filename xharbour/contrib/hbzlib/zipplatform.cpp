@@ -178,7 +178,12 @@ bool ZipPlatform::SetFileModTime( LPCTSTR lpFileName, time_t ttime )
 
    ub.actime   = time( NULL );
    ub.modtime  = ttime == -1 ? time( NULL ) : ttime;   // if wrong file time, set it to the current
+#if ( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 	         
+   return utime( lpFileName, &ub ) == 0;
+#else
    return _tutime( lpFileName, &ub ) == 0;
+#endif   
+   
 }
 
 

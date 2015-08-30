@@ -57,6 +57,14 @@
  November 18, 2011 by R.Visscher <richard@irvis.com>
 -----------------------------------------------------------------------------------------*/
 
+#ifndef PFLL
+#  if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __MINGW32__ )
+#     define PFLL    "I64"
+#  else
+#     define PFLL    "ll"
+#  endif
+#endif
+
 #include "hbvm.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -295,7 +303,11 @@ static void SQL3ProfileLog( void * sFile, const char * sProfileMsg, sqlite3_uint
 
       if( hFile )
       {
-         fprintf( hFile, "%s - %"PFLL "d\n", sProfileMsg, int64 );
+      #if ( defined( _MSC_VER ) && _MSC_VER >= 1900 ) 	      
+         fprintf( hFile, "%s - %lld\n", sProfileMsg, int64 );
+      #else
+         fprintf( hFile, "%s - %"PFLL "d\n", sProfileMsg, int64 ); 
+      #endif   
          fclose( hFile );
       }
    }

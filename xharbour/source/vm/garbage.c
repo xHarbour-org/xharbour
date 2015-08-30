@@ -289,6 +289,11 @@ PHB_GARBAGE_FUNC hb_gcFunc( void * pBlock )
    return HB_GC_PTR( pBlock )->pFunc;
 }
 
+HB_GARBAGE_FUNC( hb_gcDummyMark )
+{
+   HB_SYMBOL_UNUSED( Cargo );
+}
+
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
 {
    /* Item was already released in hb_gcGripDrop() - then we have nothing
