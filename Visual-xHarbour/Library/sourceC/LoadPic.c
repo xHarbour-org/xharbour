@@ -90,6 +90,27 @@ IPicture *LoadResIcon( LPCTSTR cImage, OLE_XSIZE_HIMETRIC *cx, OLE_YSIZE_HIMETRI
 }
 
 //---------------------------------------------------------------------------------------------------
+IPicture *PictureFromIcon( HICON hIco, OLE_XSIZE_HIMETRIC *cx, OLE_YSIZE_HIMETRIC *cy )
+{
+   PICTDESC pd;
+   IPicture *pic = 0;
+   if( hIco )
+   {
+     //Create new IPicture interface
+     pd.cbSizeofstruct=sizeof(PICTDESC);
+     pd.picType=PICTYPE_ICON;
+     pd.icon.hicon=hIco;
+     OleCreatePictureIndirect(&pd,&IID_IPicture,TRUE,(LPVOID*)&pic);
+   }
+   if( pic )
+   {
+      pic->lpVtbl->get_Width( pic, cx);
+      pic->lpVtbl->get_Height( pic, cy);
+   }
+   return pic;
+}
+
+//---------------------------------------------------------------------------------------------------
 IPicture *LoadResImage( HINSTANCE hInst, LPCTSTR cImage, OLE_XSIZE_HIMETRIC *cx, OLE_YSIZE_HIMETRIC *cy, int iType )
 {
    PICTDESC pd;
@@ -271,6 +292,16 @@ Pictures *PictureLoadImageFromResource( HINSTANCE hInst, LPCSTR cResource, int i
 }
 
 //---------------------------------------------------------------------------------------------------
+Pictures *PictureLoadIcon( HICON hIco )
+{
+   Pictures *pPicture = (Pictures*) malloc( sizeof( Pictures) );
+
+   pPicture->Picture = PictureFromIcon( hIco, &pPicture->cx, &pPicture->cy );
+
+   return pPicture;
+}
+
+//---------------------------------------------------------------------------------------------------
 Pictures *PictureLoadBitmap( HBITMAP hBmp )
 {
    Pictures *pPicture = (Pictures*) malloc( sizeof( Pictures) );
@@ -418,6 +449,11 @@ HB_FUNC( PICTURELOADIMAGEFROMRESOURCE )
 HB_FUNC( PICTURELOADBITMAP )
 {
   hb_retnl( (LONG) PictureLoadBitmap( (HBITMAP) hb_parnl(1) ) );
+}
+
+HB_FUNC( PICTURELOADICON )
+{
+  hb_retnl( (LONG) PictureLoadIcon( (HICON) hb_parnl(1) ) );
 }
 
 HB_FUNC( PICTUREPAINT )

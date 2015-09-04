@@ -65,6 +65,7 @@ CLASS PictureBox INHERIT Panel
    METHOD Kill() INLINE IIF( ::pPicture != NIL .AND. ::pPicture > 0, PictureRemove( ::pPicture ), ), ::pPicture := NIL
    METHOD SetImageName()
    METHOD SetBitmap( hBmp ) INLINE ::pPicture := PictureLoadBitmap( hBmp )
+   METHOD SetIcon( hIcon )  INLINE ::pPicture := PictureLoadIcon( hIcon )
    METHOD OnGetDlgCode()    INLINE DLGC_WANTMESSAGE
    METHOD OnEraseBkGnd()    INLINE 1
    METHOD OnPaint()

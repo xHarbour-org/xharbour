@@ -35,7 +35,7 @@ static s_cVersion, s_cCopyright
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "8.5"
-#define VXH_BuildVersion "340"
+#define VXH_BuildVersion "341"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -6552,6 +6552,13 @@ METHOD OnInitDialog() CLASS ListOle
       :Dock:Bottom   := :Parent
       :Dock:Right    := :Parent
       :Create()
+      WITH OBJECT PictureBox( :This )
+         :Left     := 10
+         :Top      := 20
+         :Width    := 32
+         :Height   := 32
+         :Create()
+      END
       WITH OBJECT Label( :This )
          :Caption  := ::aOle[1][6]
          :Left     := 70
@@ -6672,10 +6679,8 @@ METHOD OnRowChanged() CLASS RegOle
          ENDIF
       ENDIF
    ENDIF
-   hBmp := ::Form:aOle[ ::DataSource:Recno() ][4]
-   IF VALTYPE( hBmp ) == "N"
-      DrawIconEx( ::Form:GroupBox1:Drawing:hDC, (::Form:GroupBox1:Height/2)-8, 20, hBmp, 32, 32, 0, NIL, DI_NORMAL )
-   ENDIF
+   ::Form:PictureBox2:SetIcon( ::Form:aOle[ ::DataSource:Recno() ][4] )
+
    ::Form:Label1:Text := "Version: " + ::Form:aOle[ ::DataSource:Recno() ][5]
    ::Form:Label2:Text := ::Form:aOle[ ::DataSource:Recno() ][6]
    ::Form:GroupBox1:Redraw()
