@@ -343,6 +343,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
       y := HIWORD( nlParam )
       ::ClientWidth  := x
       ::ClientHeight := y
+
       IF ::LeftSplitter != NIL
          ::LeftSplitter:__OnParentSize( x, y )
       ENDIF
@@ -381,14 +382,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
    ENDIF
    IF ::Parent:HorzScroll
       ::Parent:__SetScrollBars()
-   ENDIF
-   IF ::Parent != NIL
-      IF ::Parent:VertScroll
-         ::Parent:__SetScrollBars()
-      ENDIF
-      IF ::Parent:HorzScroll
-         ::Parent:__SetScrollBars()
-      ENDIF
    ENDIF
 RETURN NIL
 

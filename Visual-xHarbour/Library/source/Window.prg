@@ -3037,15 +3037,13 @@ RETURN aRect
 
 METHOD __SetScrollBars() CLASS Window
    STATIC lBusy := .F.
-   LOCAL nDelta, x, y
+   LOCAL nDelta
 
    // added variables
    LOCAL nWidth       := ::ClientWidth
    LOCAL nHeight      := ::ClientHeight
    LOCAL nVertSize    := ::ClientHeight
    LOCAL nHorzSize    := ::ClientWidth
-
-   ::GetClientRect()
 
    IF lBusy .OR. ::DesignMode
       //TraceLog( "Nested Recursion!" )
@@ -3055,9 +3053,6 @@ METHOD __SetScrollBars() CLASS Window
    ENDIF
 
    IF ::HorzScroll
-      x := ::ClientWidth
-      AEVAL( ::Children, {|o| x := Max(x,o:Left+o:Width) } )
-      ::OriginalRect[3] := x + ::HorzScrollPos
       IF nHorzSize > ::OriginalRect[3]
          IF nVertSize < ::OriginalRect[4]
             nHorzSize := ::ClientWidth
@@ -3068,9 +3063,6 @@ METHOD __SetScrollBars() CLASS Window
    ENDIF
 
    IF ::VertScroll
-      y := ::ClientHeight
-      AEVAL( ::Children, {|o| y := Max(y,o:Top+o:Height) } )
-      ::OriginalRect[4] := y + ::VertScrollPos
       IF nVertSize > ::OriginalRect[4]
          IF nHorzSize < ::OriginalRect[3]
             nVertSize := ::ClientHeight
@@ -4393,9 +4385,6 @@ CLASS WinForm INHERIT Window
    DATA __aPostCreateProc      EXPORTED INIT {}
    DATA OnWMClose              EXPORTED
 
-   DATA __pSubCallBackPtr      EXPORTED
-
-
    ACCESS Form                 INLINE Self
 
    METHOD Init() CONSTRUCTOR
@@ -4587,7 +4576,7 @@ METHOD Create( hoParent ) CLASS WinForm
          :VertScroll  := .T.
          :SetChildren := .F.
          :Modal       := .F.
-//         :BackColor   := RGB( 255, 255, 255 )
+         :BackColor   := ::BackColor
          :Create()
          :OriginalRect[4] := 0
       END
