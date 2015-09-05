@@ -178,6 +178,7 @@ METHOD Create( hParent ) CLASS Control
          hParent := ::Parent:__oDlg:hWnd
          ::xTop  -= ::Parent:VertScrollTopMargin
          ::Parent:__oDlg:OriginalRect[4] := Max( ::Top + ::Height, ::Parent:__oDlg:OriginalRect[4] )
+         ::Parent:__oDlg:OriginalRect[3] := Max( ::Left + ::Width, ::Parent:__oDlg:OriginalRect[3] )
       ENDIF
    ENDIF
    ::Super:Create( hParent )

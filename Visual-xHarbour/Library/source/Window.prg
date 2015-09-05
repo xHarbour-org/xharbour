@@ -4518,6 +4518,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create( hoParent ) CLASS WinForm
+   LOCAL lVertScroll, lHorzScroll
    IF ::__hParent != NIL
       hoParent := ::__hParent
    ENDIF
@@ -4539,9 +4540,14 @@ METHOD Create( hoParent ) CLASS WinForm
       hoParent := ::__TaskBarParent
    ENDIF
 
-   IF ::VertScrollTopMargin > 0 .AND. ! ::DesignMode .AND. ::VertScroll
-      ::VertScroll := .F.
-      ::HorzScroll := .F.
+   lVertScroll := ::VertScroll
+   lHorzScroll := ::HorzScroll
+
+   IF ! ::DesignMode
+      IF ::VertScrollTopMargin > 0
+         ::VertScroll := .F.
+         ::HorzScroll := .F.
+      ENDIF
    ENDIF
 
    Super:Create( hoParent )
@@ -4568,18 +4574,23 @@ METHOD Create( hoParent ) CLASS WinForm
       ::CenterWindow()
    ENDIF
 
-   IF ::VertScrollTopMargin > 0 .AND. ! ::DesignMode
-      ::__oDlg := Dialog( Self )
-      WITH OBJECT ::__oDlg
-         :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-         :ExStyle     := WS_EX_CONTROLPARENT
-         :VertScroll  := .T.
-         :SetChildren := .F.
-         :Modal       := .F.
-         :BackColor   := ::BackColor
-         :Create()
-         :OriginalRect[4] := 0
-      END
+   IF ! ::DesignMode
+      IF ::VertScrollTopMargin > 0
+         ::__oDlg := Dialog( Self )
+         WITH OBJECT ::__oDlg
+            :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+            :ExStyle     := WS_EX_CONTROLPARENT
+
+            :VertScroll  := lVertScroll
+            :HorzScroll  := lHorzScroll
+
+            :SetChildren := .F.
+            :Modal       := .F.
+            :BackColor   := ::BackColor
+            :Create()
+            :OriginalRect[4] := 0
+         END
+      ENDIF
    ENDIF
 RETURN Self
 
