@@ -338,7 +338,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnSize( nwParam, nlParam ) CLASS Control
-   LOCAL x, y
+   LOCAL x, y, oParent
    IF ::Super:OnSize( nwParam, nlParam ) == NIL
       x := LOWORD( nlParam )
       y := HIWORD( nlParam )
@@ -361,15 +361,18 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
    ENDIF
    x := NIL
    y := NIL
-   IF ::Parent:HorzScroll
-      WITH OBJECT ::Parent
+
+   oParent := IIF( ::Parent:__oDlg != NIL, ::Parent:__oDlg, ::Parent )
+
+   IF oParent:HorzScroll
+      WITH OBJECT oParent
          x := :ClientWidth
          y := :ClientHeight
          AEVAL( :Children, {|o| x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) } )
          :OriginalRect[3] := x + :HorzScrollPos
       END
    ENDIF
-   IF ::Parent:VertScroll
+   IF oParent:VertScroll
       WITH OBJECT ::Parent
          IF y == NIL
             y := :ClientHeight
@@ -378,11 +381,11 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
          :OriginalRect[4] := y + :VertScrollPos
       END
    ENDIF
-   IF ::Parent:VertScroll
-      ::Parent:__SetScrollBars()
+   IF oParent:VertScroll
+      oParent:__SetScrollBars()
    ENDIF
-   IF ::Parent:HorzScroll
-      ::Parent:__SetScrollBars()
+   IF oParent:HorzScroll
+      oParent:__SetScrollBars()
    ENDIF
 RETURN NIL
 

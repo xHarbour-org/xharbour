@@ -4581,6 +4581,8 @@ METHOD Create( hoParent ) CLASS WinForm
             :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
             :ExStyle     := WS_EX_CONTROLPARENT
 
+            :Top         := ::VertScrollTopMargin
+
             :VertScroll  := lVertScroll
             :HorzScroll  := lHorzScroll
 
