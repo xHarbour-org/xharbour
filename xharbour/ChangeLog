@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-09-05 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+  * include/hbdefs.h
+    * changed 32-bit reference counters in Win64 builds to 64-bit ones.
+      It resolves problems with data alignment in memory allocated by
+      hb_xgrab(). borrow from harbour
+
+  * src/vm/asort.c
+    * removed hack for MinGW64 build from new array sort code,
+      after switching to 64bit reference counters it should not
+      be longer necessary because allocated memory has 64bit alignment
+      borrow from harbour
+  * xharbour.spec
+    ! minor changes    
+
 2015-08-30 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * contrib/hbsqlite3/xhbsqlite3.c
     ! minor fix to compile under visual studio 2015

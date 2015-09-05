@@ -616,14 +616,22 @@
 /* type of HB_ITEM */
 /* typedef USHORT HB_TYPE; */
 typedef UINT32 HB_TYPE;
+typedef UINT32 HB_FATTR;
 
 /* type of reference counter */
-typedef unsigned long HB_COUNTER;
-#if ULONG_MAX <= UINT32_MAX
-#  define HB_COUNTER_SIZE     4
+
+#if defined( HB_OS_WIN_64 )
+   typedef ULONGLONG    HB_COUNTER;
+#  define HB_COUNTER_SIZE  8
 #else
-#  define HB_COUNTER_SIZE     8
+   typedef unsigned long   HB_COUNTER;
+#  if ULONG_MAX <= UINT32_MAX
+#     define HB_COUNTER_SIZE  4
+#  else
+#     define HB_COUNTER_SIZE  8
+#  endif
 #endif
+
 
 /* type for memory pointer diff */
 #if defined( HB_OS_WIN_64 )
@@ -662,7 +670,7 @@ typedef unsigned long HB_COUNTER;
 #  else
 #     define HB_SIZE_MAX    ULONGLONG_MAX
 #  endif
-#elif ! defined( __WATCOMC__ )
+#else
 #  if defined( HB_SIZE_SIGNED )
 #     define HB_SIZE_MAX    LONG_MAX
 #  else
@@ -681,8 +689,8 @@ typedef unsigned long HB_COUNTER;
 #define HB_DBLFL_PREC_FACTOR 1.0000000000000002;
 
 /* try to detect byte order if not explicitly set */
-#if !defined( HB_PDP_ENDIAN ) && !defined( HB_BIG_ENDIAN ) && \
-    !defined( HB_LITTLE_ENDIAN )
+#if ! defined( HB_PDP_ENDIAN ) && ! defined( HB_BIG_ENDIAN ) && \
+    ! defined( HB_LITTLE_ENDIAN )
 
    /* I intentionaly move the first two #if/#elif to the begining
       to avoid compiler error when this macro will be defined as
@@ -809,7 +817,7 @@ typedef unsigned long HB_COUNTER;
 #endif
 
 #if defined( HB_STRICT_ALIGNMENT )
-#  if !defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
+#  if ! defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
 #     define HB_ALLOC_ALIGNMENT     8
 #  endif
 #endif
@@ -1521,11 +1529,14 @@ typedef unsigned long HB_COUNTER;
 #define HB_MACRONAME_JOIN( m1, m2 )       HB_MACRONAME_JOIN_( m1, m2 )
 #define HB_MACRONAME_JOIN_( m1, m2 )      m1 ## m2
 
-#define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
-
 #define HB_SIZEOFARRAY( var )       ( sizeof( var ) / sizeof( *var ) )
 
 
+#if defined( __POCC__ ) || defined( __XCC__ )
+   #define HB_SYMBOL_UNUSED( symbol )  do if( symbol ) {;} while( 0 )
+#else
+   #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
+#endif
 
 /* ***********************************************************************
  * The name of starting procedure

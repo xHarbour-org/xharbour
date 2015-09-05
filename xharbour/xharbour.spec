@@ -72,6 +72,7 @@
 %define hb_lflag export L_USR="${CC_L_USR} %{?_with_static:-static}"
 %define hb_mt    export HB_MT=MT
 %define hb_gt    export HB_GT_LIB=gttrm
+%define shl_path  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}`pwd`/lib/${HB_PLATFORM}/${HB_COMPILER}${HB_BUILD_NAME}
 %define hb_defgt export HB_GT_DEFAULT="${HB_GT_DEFAULT}"
 %define hb_gpm   export HB_GPM_MOUSE=%{!?_without_gpm:yes}
 %define hb_sln   export HB_WITHOUT_GTSLN=%{?_without_gtsln:yes}
@@ -81,8 +82,9 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
+%define hb_edir  export HB_INSTALL_ETC=${RPM_BUILD_ROOT}%{hb_etcdir}
 %define hb_ctrb  %{!?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql} %{!?_without_libmisc:misc}
-%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln}  ;%{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} 
+%define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{shl_path} ; %{hb_gt} ; %{hb_defgt} ; %{hb_gpm} ; %{hb_sln}  ;%{hb_x11} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_edir}
 
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
@@ -350,7 +352,8 @@ done
 [ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
 [ "%{?_with_allegro:1}" ]  || rm -f $HB_LIB_INSTALL/libgtalleg.a
 [ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
-
+rm -fR %{!?hb_ldconf:$HB_INSTALL_ETC/ld.so.conf.d}
+rm -f %{?hb_ldconf:$RPM_BUILD_ROOT/%{_libdir}/*.so*}
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim.
