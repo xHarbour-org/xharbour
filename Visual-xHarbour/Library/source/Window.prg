@@ -4552,6 +4552,7 @@ METHOD Create( hoParent ) CLASS WinForm
 
    IF ::VertScrollTopMargin > 0 .AND. ! ::DesignMode .AND. ::VertScroll
       ::VertScroll := .F.
+      ::HorzScroll := .F.
    ENDIF
 
    Super:Create( hoParent )
