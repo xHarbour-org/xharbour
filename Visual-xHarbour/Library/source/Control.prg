@@ -368,15 +368,15 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
       WITH OBJECT oParent
          x := :ClientWidth
          y := :ClientHeight
-         AEVAL( :Children, {|o| x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) } )
+         AEVAL( ::Parent:Children, {|o| IIF( GetParent(o:hWnd)==oParent:hWnd, ( x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) ),) } )
          :OriginalRect[3] := x + :HorzScrollPos
       END
    ENDIF
    IF oParent:VertScroll
-      WITH OBJECT ::Parent
+      WITH OBJECT oParent
          IF y == NIL
             y := :ClientHeight
-            AEVAL( :Children, {|o| y := Max(y,o:Top+o:Height) } )
+            AEVAL( ::Parent:Children, {|o| IIF( GetParent(o:hWnd)==oParent:hWnd, y := Max(y,o:Top+o:Height),) } )
          ENDIF
          :OriginalRect[4] := y + :VertScrollPos
       END
