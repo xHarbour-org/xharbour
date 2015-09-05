@@ -151,6 +151,8 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD Create( hParent ) CLASS Control
+   LOCAL pt, rc
+
    ::__SetBorder( ::xBorder )
 
    IF ::IsContainer
@@ -161,7 +163,25 @@ METHOD Create( hParent ) CLASS Control
       ::Parent:AddControl( Self, ::ToolBarPos )
    ENDIF
 
+   IF ::Parent:__oDlg != NIL
+      pt := (struct POINT)
+      pt:x := ::xLeft
+      pt:y := ::xTop
+
+      rc := (struct RECT)
+      rc:left   := ::Parent:__oDlg:Left
+      rc:top    := ::Parent:__oDlg:Top
+      rc:right  := ::Parent:__oDlg:Width
+      rc:bottom := ::Parent:__oDlg:Top + ::Parent:__oDlg:Height
+
+      IF PtInRect( rc, pt )
+         hParent := ::Parent:__oDlg:hWnd
+         ::xTop  -= ::Parent:VertScrollTopMargin
+         ::Parent:__oDlg:OriginalRect[4] := Max( ::Top + ::Height, ::Parent:__oDlg:OriginalRect[4] )
+      ENDIF
+   ENDIF
    ::Super:Create( hParent )
+
    IF ::__OnInitCanceled
       RETURN NIL
    ENDIF
@@ -335,6 +355,32 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
       IF ::BottomSplitter != NIL
          ::BottomSplitter:__OnParentSize( x, y )
       ENDIF
+
+   ENDIF
+   x := NIL
+   y := NIL
+   IF ::Parent:HorzScroll
+      WITH OBJECT ::Parent
+         x := :ClientWidth
+         y := :ClientHeight
+         AEVAL( :Children, {|o| x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) } )
+         :OriginalRect[3] := x + :HorzScrollPos
+      END
+   ENDIF
+   IF ::Parent:VertScroll
+      WITH OBJECT ::Parent
+         IF y == NIL
+            y := :ClientHeight
+            AEVAL( :Children, {|o| y := Max(y,o:Top+o:Height) } )
+         ENDIF
+         :OriginalRect[4] := y + :VertScrollPos
+      END
+   ENDIF
+   IF ::Parent:VertScroll
+      ::Parent:__SetScrollBars()
+   ENDIF
+   IF ::Parent:HorzScroll
+      ::Parent:__SetScrollBars()
    ENDIF
    IF ::Parent != NIL
       IF ::Parent:VertScroll

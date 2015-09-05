@@ -301,6 +301,7 @@ CLASS Window INHERIT Object
    DATA __hParent                EXPORTED
    DATA __lKeyDown               EXPORTED INIT .F.
    DATA __PropFilter             EXPORTED INIT {}
+   DATA __oDlg                   EXPORTED
 
    ACCESS EnumCursor             INLINE ::System:GetEnumCursor()
 
@@ -4374,6 +4375,7 @@ CLASS WinForm INHERIT Window
                                  SET ( IIF( ::DesignMode .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F.
    PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F.
    PROPERTY Center               SET ::CenterWindow(v)                     DEFAULT .F.
+   PROPERTY VertScrollTopMargin  DEFAULT 0
 
    //compatibility ONLY, forms do not set "Border" property
    ACCESS TopMost              INLINE ::AlwaysOnTop
@@ -4390,6 +4392,9 @@ CLASS WinForm INHERIT Window
    DATA __lLoading             EXPORTED INIT .F.
    DATA __aPostCreateProc      EXPORTED INIT {}
    DATA OnWMClose              EXPORTED
+
+   DATA __pSubCallBackPtr      EXPORTED
+
 
    ACCESS Form                 INLINE Self
 
@@ -4545,6 +4550,10 @@ METHOD Create( hoParent ) CLASS WinForm
       hoParent := ::__TaskBarParent
    ENDIF
 
+   IF ::VertScrollTopMargin > 0 .AND. ! ::DesignMode .AND. ::VertScroll
+      ::VertScroll := .F.
+   ENDIF
+
    Super:Create( hoParent )
    IF ::__OnInitCanceled
       IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
@@ -4567,6 +4576,20 @@ METHOD Create( hoParent ) CLASS WinForm
    ENDIF
    IF ::Center .AND. ! ::DesignMode
       ::CenterWindow()
+   ENDIF
+
+   IF ::VertScrollTopMargin > 0 .AND. ! ::DesignMode
+      ::__oDlg := Dialog( Self )
+      WITH OBJECT ::__oDlg
+         :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+         :ExStyle     := WS_EX_CONTROLPARENT
+         :VertScroll  := .T.
+         :SetChildren := .F.
+         :Modal       := .F.
+//         :BackColor   := RGB( 255, 255, 255 )
+         :Create()
+         :OriginalRect[4] := 0
+      END
    ENDIF
 RETURN Self
 
@@ -4691,12 +4714,19 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS WinForm
-   Super:OnSize( nwParam, nlParam )
+
    ::ClientWidth  := LOWORD(nlParam)
    ::ClientHeight := HIWORD(nlParam)
+
+   IF ::__oDlg != NIL
+      ::__oDlg:MoveWindow( 0, ::VertScrollTopMargin, ::ClientWidth, ::ClientHeight - ::VertScrollTopMargin - IIF( ::StatusBar != NIL, ::StatusBar:Height, 0 ), .T. )
+   ENDIF
+
+   Super:OnSize( nwParam, nlParam )
    IF (nwParam == 0 .or. nwParam == 2) .AND. ::MDIContainer .AND. ::MDIClient != NIL
       ::MDIClient:MoveWindow()
    ENDIF
+
    IF ::IsWindowVisible() .AND. ::BackgroundImage != NIL .AND. !EMPTY( ::BackgroundImage:ImageName )
       ::CallWindowProc()
       ::__CreateBkBrush()
