@@ -4723,6 +4723,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS WinForm
 
    IF ::__oDlg != NIL
       ::__oDlg:MoveWindow( 0, ::VertScrollTopMargin, ::ClientWidth, ::ClientHeight - ::VertScrollTopMargin - IIF( ::StatusBar != NIL, ::StatusBar:Height, 0 ), .T. )
+      ::__oDlg:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
    ENDIF
 
    Super:OnSize( nwParam, nlParam )
