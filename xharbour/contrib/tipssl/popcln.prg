@@ -189,7 +189,7 @@ METHOD Read( nLen ) CLASS tIPClientPOP
       ENDIF
    ENDIF
 
-RETURN ::Retreive( Val (::oUrl:cFile ), nLen )
+RETURN ::Retrieve( Val (::oUrl:cFile ), nLen )
 
 
 
