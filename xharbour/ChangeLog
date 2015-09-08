@@ -8,11 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-09-08 14:38 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * include/hbdefs.h
+    * Commented OUT #if defined( __POCC__ ) || defined( __XCC__ )
+      for #define HB_SYMBOL_UNUSED()
+  * include/hbsetup.ch
+    * Added protection against double define HB_EXT_INKEY
+
 2015-09-06 17:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/contrib/tipssl/popcln.prg
     ! fixed wrong call to "Retreive" with "Retrieve" in method Read() (thanks to Claudio Voskian)
 
-2015-09-05 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-09-05 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbdefs.h
     * changed 32-bit reference counters in Win64 builds to 64-bit ones.
       It resolves problems with data alignment in memory allocated by
@@ -24,9 +31,9 @@
       be longer necessary because allocated memory has 64bit alignment
       borrow from harbour
   * xharbour.spec
-    ! minor changes    
+    ! minor changes
 
-2015-08-30 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-08-30 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/hbsqlite3/xhbsqlite3.c
     ! minor fix to compile under visual studio 2015
   * contrib/hbzlib/zipplatform.cpp
@@ -42,7 +49,7 @@
   * source/rtl/hbxml.c
     ! fixes borrow from harbour
   * source/rtl/dllcall.c
-    ! adjust to return pointers insted of long values  
+    ! adjust to return pointers insted of long values
   * source/vm/asort.c
     ! new version borrow from harbour
   * utils/hbmake/hbmlang.c
@@ -53,23 +60,23 @@
     ! changed to use itemapi insted of direct structure manipulation
   * source/vm/garbage.c
     ! added   hb_gcDummyMark borrow from harbour
-                  
-2015-07-25 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
+2015-07-25 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbapiitm.h
     ! added hb_itemEqual Borrow from harbour
   * source/vm/itemapi.h
     ! added   hb_itemEqual Borrow from harbour
   * source/tip/ftpcln.prg
     ! removed call to getreply on method ls ( reported by Claudio H )
-  * source/rtl/gttone.c 
+  * source/rtl/gttone.c
     ! minor fix to compile under msvc 2015    (hb_Inp9x)
   * contrib/gtwvw/gtwvw.c
     !  minor fix to compile under msvc 2015  (hb_Inp9x)
-    
-2015-07-12 19:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
+2015-07-12 19:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/gtwvw/wvwfuncs.c
     ! fix for addtooltipex
-    
+
 2015-06-03 13:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/isprint.c
   * source/rtl/tprinter.c
@@ -79,15 +86,15 @@
   * contrib/tipssl/client.prg
     ! Removed TraceLog's
 
-2015-05-12 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-05-12 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   ! source/vm/hvm.c
-    ! minor fix on previus commit(removed tracelog call)   
-    
-2015-05-09 17:55 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+    ! minor fix on previus commit(removed tracelog call)
+
+2015-05-09 17:55 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/tipssl/httpcln.prg
     ! minor fix on CLOSE method
   * include/hbapi.h
-    ! hb_strLTrim Added const to function signature      
+    ! hb_strLTrim Added const to function signature
   * include/hbapirdd.h
     ! added defined to DBTF_CPYCTR and DBTF_RECALL borrow from harbour
   * source/common/expropt1.c
@@ -97,169 +104,169 @@
     ! on HB_TRACE changed direct %ld with %" HB_PFS "d to make some c compiler happy
     ! ULONG -> HB_SIZE when applicable
   * source/rdd/dbcmd.c
-    ! in function __DBARRANGE ULONG -> HB_SIZE where aplicable  
-    ! Removed unnecessary cast to ULONG     
+    ! in function __DBARRANGE ULONG -> HB_SIZE where aplicable
+    ! Removed unnecessary cast to ULONG
   * source/rdd/workarea.c
-    ! fixed wrong behavior on deleted records in hb_waTransRec() Fix ideia borrow from harbour  
+    ! fixed wrong behavior on deleted records in hb_waTransRec() Fix ideia borrow from harbour
   * source/rtl/at.c
     ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/console.c
     ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/descend.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy    
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/filenet.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy        
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
     ! ULONG -> HB_SIZE when applicable
   ! source/rtl/filesys.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy            
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/gtapi.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/hardcr.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                    
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/hbgtcore.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                        
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/inkey.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/inkeyapi.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/mtran.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
   ! source/rtl/strings.c
-    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy                            
-  * source/rtl/trim.c  
+    ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+  * source/rtl/trim.c
     ! hb_strLTrim Added const to function signature
     ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
-    ! added const to declaration of variable szText in LTRIM and ALLTRIM function          
+    ! added const to declaration of variable szText in LTRIM and ALLTRIM function
   * source/vm/itemapi.c
-    ! just an minor refine on last commit on hb_itemStrCmp if len of bothstring is 0 and string is same return 0    
-      
+    ! just an minor refine on last commit on hb_itemStrCmp if len of bothstring is 0 and string is same return 0
+
 2015-05-05 11:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rdd/workarea.c
     ! fixed wrong behavior on deleted records in hb_waTransRec()
 
-2015-05-01 14:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-05-01 14:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
 
   ! source/vm/itemapi.c
     ! in hb_itemStrCmp optimized for check is both parameters is same as also size is same
   ! source/vm/hvm.c
-    ! in hb_vmEqual when  bExact  is set to true and both parameters is string, using also memcmp to compare strings    
+    ! in hb_vmEqual when  bExact  is set to true and both parameters is string, using also memcmp to compare strings
   ! tipssl/httpcln.prg
     ! added data cLogfile
     ! in method new use clogfile to create the log filename
   ! source/common/hbstr.c
-    ! ULONG -> HB_SIZE where aplicable  
+    ! ULONG -> HB_SIZE where aplicable
 
-2015-04-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-04-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   ! source/rtl/str.c
     ! generate RTL when passing string with any size as parameter
   ! contrib/tipssl/client.prg
     ! init lTrace  data as .F.
   ! contrib/tipssl/smtpcln.prg
-    ! minor fix on smtpClnDestructor  
-    ! minor fix on ActivateSSL method for port 25 handling on tls  
-    
+    ! minor fix on smtpClnDestructor
+    ! minor fix on ActivateSSL method for port 25 handling on tls
+
 
 2015-04-07 23:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/mtran.c
     ! fixed replace when null string is specified
 
 
-2015-03-29 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+2015-03-29 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   ! contrib/rdd_ads/rddads.h
     ! added  extern BOOL   hb_ads_bOEM; when ADS_USE_OEM_TRANSLATION if not defined
-  ! contrib/rdd_ads/adsfunc.c  
+  ! contrib/rdd_ads/adsfunc.c
     ! Moved BOOL hb_ads_bOEM = FALSE; to outside #ifdef ADS_USE_OEM_TRANSLATION block
-    
-2015-03-28 16:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
+2015-03-28 16:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   ! winmake/makefile.bc
   ! winmake/makefile.vc
     ! added gtwvw to dll build
   ! winmake/dll.lst
     ! added gtwvw to list
   ! include/hbapi.h
-    ! added hb_winmainGetInstance() to HB_OS_WIN section  
+    ! added hb_winmainGetInstance() to HB_OS_WIN section
   ! source/vm/itemapi.c
     ! added return of numeric part in hb_itemGetNS when type is string and lenght is 1
   ! source/vm/extend.c
-    ! added return of numeric part in hb_parns when type is string and lenght is 1 
+    ! added return of numeric part in hb_parns when type is string and lenght is 1
   ! source/vm/cmdarg.c
-    ! added hb_winmainGetInstance to return the instance	  
-  ! contrib/gtwvw/gtwvw.c 
+    ! added hb_winmainGetInstance to return the instance
+  ! contrib/gtwvw/gtwvw.c
     ! changed hb_hInstance to s_pWvwData->hInstance   where applicable
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib/gtwvw/wvwcheck.c 
+  ! contrib/gtwvw/wvwcheck.c
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib/gtwvw/wvwedit.c 
+  ! contrib/gtwvw/wvwedit.c
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
-  ! contrib/gtwvw/wvwfuncs.c 
-    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
-  ! contrib/gtwvw/wvwmenu.c 
-    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
-  ! contrib/gtwvw/wvwstbar.c 
+  ! contrib/gtwvw/wvwfuncs.c
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib/gtwvw/wvwmenu.c
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! contrib/gtwvw/wvwstbar.c
     ! changed hb_hInstance to hb_winmainGetInstance() where applicable
   ! contrib/gtwvw/wvwtbar.c
-    ! changed hb_hInstance to hb_winmainGetInstance() where applicable  
-  ! source/rtl/empty.c  
+    ! changed hb_hInstance to hb_winmainGetInstance() where applicable
+  ! source/rtl/empty.c
     ! changed to use itemapi insted of direct structure manipulation
-  ! source/rtl/transform.c  
+  ! source/rtl/transform.c
     ! changed to use itemapi insted of direct structure manipulation
   ! source/rtl/direct.c
     ! changed to use itemapi insted of direct structure manipulation
-        
-2015-03-18 22:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
+2015-03-18 22:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   ! contrib/gtwvw/gtwvw.c
     ! in function hb_gt_wvw_Init added variables hInstance,hPrevInstance,iCmdShow and set then by calling hb_winmainArgGet
     ! using s_pWvwData->hInstance insted of hb_hInstance where applicable
   ! contrib/gtwvw/hbgtwvw.h
     ! added hInstance member to wvw_data structure
   ! include/hbgtcore.h
-    ! added HB_EXPORT to hb_gt_chrmapinit ,hb_gt_setClipboard,hb_gt_getClipboard,hb_gt_w32_setClipboard,hb_gt_w32_getClipboard,hb_gt_w32_getKbdState ,hb_gt_w32_setKbdState ,hb_gt_w32_tone, so this function are exported on dlls  
-  ! source/vm/cmdarg.c  
+    ! added HB_EXPORT to hb_gt_chrmapinit ,hb_gt_setClipboard,hb_gt_getClipboard,hb_gt_w32_setClipboard,hb_gt_w32_getClipboard,hb_gt_w32_getKbdState ,hb_gt_w32_setKbdState ,hb_gt_w32_tone, so this function are exported on dlls
+  ! source/vm/cmdarg.c
     ! added HB_EXPORT to hb_hInstance variable
-    
-2015-03-06 11:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+
+2015-03-06 11:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/tipssl/sendmail.prg
-  * contrib/tipssl/smtpcln.prg  
+  * contrib/tipssl/smtpcln.prg
   * source/vm/strapi.c
-    ! in function  hb_itemPutStrUTF8 using hb_cdpUTF8ToStrn insted of hb_cdpStrnToUTF8n 
+    ! in function  hb_itemPutStrUTF8 using hb_cdpUTF8ToStrn insted of hb_cdpStrnToUTF8n
   * utils/hbmake/hbmake.prg
     ! harbour.lib->xharbour.lib
     ! some adjust to 64 bits version ( /usr/lib64/xharbour)
   ! utils/hbmake/hbmutils.prg
     ! some adjust to 64 bits version ( /usr/lib64/xharbour)
-        
+
 2015-03-01 15:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   + tests/tstime.prg
     ! test to show field types @ and T with size 4( hour)
   * include/hbextern.ch
     ! added function HB_TSTOSTR,DATETIME,TTOS,TTOC to external declaration
-  * include/hbapi.h 
+  * include/hbapi.h
     ! added declaration for hb_partdt borrow from harbour
     ! added declaration for hb_stor borrow from harbour
   * source/debug/debugger.prg
-    ! updated __dbgValToStr on how it show Timestamp/date/numeric and H types     
+    ! updated __dbgValToStr on how it show Timestamp/date/numeric and H types
       Date now use Left( hb_TSToStr( uVal, .F. ), 10 ) insted of dtoc(uVal)
       Timestamp now use HB_TSTOSTR( uval, .T. ) insted of ttos( uVal )
       Hash now use "{ => }" insted of "Hash of " + RTrim( Str( Len( uVal ) ) ) + " elements"
       Number using hb_ntos( uVal ) insted of RTrim( Str( uVal ) ) ideia borrow from harbour
   * source/debug/dbgthsh.prg
-    ! function HashKeyString optimized to use __dbgValToExp insted of getvalue of hash and return passing 
+    ! function HashKeyString optimized to use __dbgValToExp insted of getvalue of hash and return passing
       to cstr function. ideia borrow from harbour
   * source/dbf/dbf1.c
     ! on hb_dbfPutValue added variable  BYTE * ptr;
-    ! added HB_FT_TIME to on case of HB_FT_DATETIME and  HB_FT_TIMESTAMP 
+    ! added HB_FT_TIME to on case of HB_FT_DATETIME and  HB_FT_TIMESTAMP
     ! fix when writting timestamp field where only is needed the hour part ( field type T with size 4 )
-  * source/rtl/dateshb.c  
-    + function  HB_TSTOSTR. borrow from harbour 
-  * source/rtl/tbrowse.prg  
+  * source/rtl/dateshb.c
+    + function  HB_TSTOSTR. borrow from harbour
+  * source/rtl/tbrowse.prg
     ! using HB_TSTOSTR() insted ttoc to display timestamp values
   * source/vm/extend.c
     ! added hb_stoc() function borrow from harbour
-    ! added hb_partdt function borrow from harbour  
-                
+    ! added hb_partdt function borrow from harbour
+
 2015-02-24 15:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbpp.h
-  * source/compiler/harbour.c  
+  * source/compiler/harbour.c
   * source/compiler/ppcomp.c
   * source/pp/ppcore.c
   * source/rtl/arc4.c
@@ -308,7 +315,7 @@
     ! minor fix for 0 byte file created
   * contrib/gtwvw/gtwvw.c
     ! some fixed to correct resize windows if wvw_size function is present. reported by Claudio H
-    
+
 2015-02-21 10:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/hbwinole.c
     + added function IsOLEObjectRegistered( cOleName | cCLSID )  -> lRegistered
@@ -316,7 +323,7 @@
 2015-02-20 22:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rdd/workarea.c
     ! COPY TO ... SDF/DELIMITED make CA-Cl*pper compatible on deleted records
-      thanks to Joe for reporting the problem    
+      thanks to Joe for reporting the problem
 
 2015-02-18 17:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/hbdefs.h
@@ -519,99 +526,99 @@
   * include/hbapi.h
     ! changed in hb_winmainArgInit and hb_winmainArgGet to use void type insted of winapi HANDLE type
   * include/hbapiitm.h
-    ! Added missing prototype for hb_itemPutCStatic  
+    ! Added missing prototype for hb_itemPutCStatic
   * include/hbdate.h
     ! added detection for HB_HAS_LOCALTIME_R when compiling under *nix borrow from harbour
-    ! added prototype for hb_timeStampGetLocal and hb_timeStampGet functions   
+    ! added prototype for hb_timeStampGetLocal and hb_timeStampGet functions
   * include/thread.h
   * include/hbatomic.h
   * include/hbdefs.h
-    ! removed  #define _WINSOCKAPI_  
-  * source/common/hbdate.c    
+    ! removed  #define _WINSOCKAPI_
+  * source/common/hbdate.c
     ! added hb_timeStampGetLocal and hb_timeStampGet ( borrow from harbour )
   * source/common/hbfsapi.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
     - removed define to HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block 
+    + added include to windows.h inside HB_OS_WIN define block
     ! moved #define INCL_DOSFILEMGR and  #define INCL_DOSERRORS   to inside HB_OS_OS2 Block
     ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
   * source/common/hbgete.c
-    ! added HB_SYMBOL_UNUSED( fSys ); in hb_setenv under *nix compilation  
+    ! added HB_SYMBOL_UNUSED( fSys ); in hb_setenv under *nix compilation
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block           
-    ! added support to set envvar under *nix compilation in hb_setenv    
-  * source/common/hbmem.c  
-    ! protected LITTLE_ENDIAN defined inside # if !defined(LITTLE_ENDIAN)          
+    + added include to windows.h inside HB_OS_WIN define block
+    ! added support to set envvar under *nix compilation in hb_setenv
+  * source/common/hbmem.c
+    ! protected LITTLE_ENDIAN defined inside # if !defined(LITTLE_ENDIAN)
   * source/common/hbver.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block                
-    ! include for zlib,pcre,tiff,jpeg,png,dlmalloc moved to be bellow defined (HB_OS_XXXX) blocks 
+    + added include to windows.h inside HB_OS_WIN define block
+    ! include for zlib,pcre,tiff,jpeg,png,dlmalloc moved to be bellow defined (HB_OS_XXXX) blocks
   * source/ct/files.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
     ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
     ! removed define HB_OS_WIN_USED
-  * source/compiler/harbour.c  
-  * source/compiler/cmdcheck.c  
-  * source/compiler/genc.c  
+  * source/compiler/harbour.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/genc.c
     - removed define to HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block   
-  * source/compiler/comptool.c  
+    + added include to windows.h inside HB_OS_WIN define block
+  * source/compiler/comptool.c
     - removed define to HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block  
+    + added include to windows.h inside HB_OS_WIN define block
   * source/odbc/odbc.c
     ! some changes to compile under *nix 64bit
-    ! removed redefinition os SQLLEN when not defining HB_OS_WIN_64, this break 64 bits *nix compile      
+    ! removed redefinition os SQLLEN when not defining HB_OS_WIN_64, this break 64 bits *nix compile
     ! when #if ODBCVER >= 0x0300 id defined using SQLSetConnectAttr insted of SQLSetConnectOption,
       SQLSetStmtAttr insted of SQLSetStmtOption, SQLGetConnectAttr insted of SQLGetConnectOption,
       SQLGetStmtAttr insted of SQLGetStmtOption
   * source/rtl/console.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block     
-  * source/rtl/copyfile.c        
-    ! when compiling for *nix call to fstat  function changed  test to call fstat64 when  HB_USE_LARGEFILE64 is defined otherwise call fstat  
-    ! define BUFFER_SIZE to 8192 only when HB_C52_STRICT is defined otherwise use 64k buffer borrow from harbour                
-  * source/rtl/filebuf.c    
+    + added include to windows.h inside HB_OS_WIN define block
+  * source/rtl/copyfile.c
+    ! when compiling for *nix call to fstat  function changed  test to call fstat64 when  HB_USE_LARGEFILE64 is defined otherwise call fstat
+    ! define BUFFER_SIZE to 8192 only when HB_C52_STRICT is defined otherwise use 64k buffer borrow from harbour
+  * source/rtl/filebuf.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
-    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat  
-  * source/rtl/filesys.c  
-    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat  
-    ! some adjust when defining HB_USE_LARGEFILE64  
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+  * source/rtl/filesys.c
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+    ! some adjust when defining HB_USE_LARGEFILE64
     ! removed define HB_OS_WIN_USED
   * source/rtl/fssize.c
-    ! some adjust on define _LARGEFILE64_SOURCE under *nix      
+    ! some adjust on define _LARGEFILE64_SOURCE under *nix
   * source/rtl/fstemp.c
     ! some adjust on define _LARGEFILE64_SOURCE under *nix
     ! adjust to call mkstemps64/mkstemps/mkstemp64/mkstemp when linux 64bits compilation is done borrow from harbour
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block         
+    + added include to windows.h inside HB_OS_WIN define block
   * source/rtl/gtclip.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block     
+    + added include to windows.h inside HB_OS_WIN define block
   * source/rtl/gtkbstat.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block     
+    + added include to windows.h inside HB_OS_WIN define block
   * source/rtl/gttone.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block           
+    + added include to windows.h inside HB_OS_WIN define block
   * source/rtl/hbffind.c
-    ! some adjust on define _LARGEFILE64_SOURCE under *nix  
+    ! some adjust on define _LARGEFILE64_SOURCE under *nix
   * source/rtl/hbip.c
     ! added #define socklen_t int to HB_OS_WIN Define block
     ! in function  hb_ipSetBufSize change int to socklen_t to make *nix happy
     ! in function hb_ipSend change int to socklen_t to make *nix happy
   * source/rtl/idle.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block 
+    + added include to windows.h inside HB_OS_WIN define block
   * source/rtl/isprint.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block           
+    + added include to windows.h inside HB_OS_WIN define block
   *  source/rtl/net.c
     ! added HB_SYMBOL_UNUSED( bGetUser ); when compiling for dos/*nix/os2
   * source/rtl/philes.c
-    ! adjust HB_OPENPROCESS hb_stornint return values to include the * in front of variable name   
+    ! adjust HB_OPENPROCESS hb_stornint return values to include the * in front of variable name
     ! in CURDIR function changed int uiDrive to USHORT uiDrive;
   * source/rtl/gttrm/gttrm.c
-    ! BYTE -> char  
+    ! BYTE -> char
     ! functions  with BYTE parameter changes to const char parameters
   * source/vm/cmdarg.c
     ! changed in hb_winmainArgInit and hb_winmainArgGet to use void type insted of winapi HANDLE type
@@ -619,11 +626,11 @@
     ! removed define HB_OS_WIN_USED
   ! utils/hbmake/hbmlang.c
     ! removed define HB_OS_WIN_USED
-    + added include to windows.h inside HB_OS_WIN define block               
-  * utils/hbfilere/hbfilere.c  
+    + added include to windows.h inside HB_OS_WIN define block
+  * utils/hbfilere/hbfilere.c
     ! added define for _LARGEFILE64_SOURCE and HB_USE_LARGEFILE64 when compiling under *nix
-    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat      
-      
+    ! when compiling for *nix call to stat  function changed  test to call stat64 when  HB_USE_LARGEFILE64 is defined otherwise call stat
+
 2015-02-10 14:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/replic.c
     ! restored type of variable i to HB_ISIZ
@@ -639,7 +646,7 @@
 
 2015-02-04 14:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/replic.c
-    ! fix to gpf (ulLen *  lTimes ) < UINT_MAX -> (LONGLONG)((LONGLONG)ulLen *  (LONGLONG)lTimes ) < UINT_MAX 
+    ! fix to gpf (ulLen *  lTimes ) < UINT_MAX -> (LONGLONG)((LONGLONG)ulLen *  (LONGLONG)lTimes ) < UINT_MAX
       since the calculation of ullen*ltimes depending of the value is > UINT_MAX
 
 2015-01-29 08:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
@@ -648,85 +655,85 @@
       addendum by César Lozada
 
 2015-01-14 14:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source/rtl/pcre/config.generic.h 
+  * source/rtl/pcre/config.generic.h
     ! another fix for compile with msvc
 
-2014-12-29 22:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-29 22:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/rdd_ads/adsfunc.c
     ! added  cast to make msvc happy
-    
-2014-12-29 10:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+
+2014-12-29 10:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/rdd_ads/adsfunc.c
     ! fixed two cast to make msvc happy
-    
-2014-12-28 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+
+2014-12-28 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbapi.h
     ! added hb_xreallocz like hb_xgrabz
   * source/rtl/hbgtcore.c
-    ! using hb_xgrabz insted of hb_xgrab/memset where aplicacle  
-    ! using hb_xreallocz insted of hb_xreallocz/memset where aplicacle  
-  * contrib/gtwvw/wvwpush.c  
+    ! using hb_xgrabz insted of hb_xgrab/memset where aplicacle
+    ! using hb_xreallocz insted of hb_xreallocz/memset where aplicacle
+  * contrib/gtwvw/wvwpush.c
     ! removed redundant tracelog function call
   * source/rtl/chrasc.c
-    ! changed to use itemapi insted of direct structure manipulation            
+    ! changed to use itemapi insted of direct structure manipulation
   * contrib/rdd_ads/adsfunc.c
     ! added ADSSTMTSETTABLEREADONLY function
     ! updated ADSCREATESQLSTATEMENT  to include  an 4th parameter to tell if cursor is readonly or readwrite
-    ! updated some functions by moving the #ifdef ADS_LIB_VERSION to the inside the function body as also added new functions 
+    ! updated some functions by moving the #ifdef ADS_LIB_VERSION to the inside the function body as also added new functions
   * source/vm/arrays.c
-    ! added BOOL hb_arraySetTDT( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate, long lMilliSec  ) borrow from harbour     
+    ! added BOOL hb_arraySetTDT( PHB_ITEM pArray, HB_SIZE ulIndex, long lDate, long lMilliSec  ) borrow from harbour
   * contrib/tipssl/httpcln.prg
-    ! minor fix to close method . thanks for Anatole Kolotovkin for reporting the problem    
-        
-2014-12-27 11:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+    ! minor fix to close method . thanks for Anatole Kolotovkin for reporting the problem
+
+2014-12-27 11:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/dateshb.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/datec.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/oemansi.c
-    ! changed to use itemapi insted of direct structure manipulation        
-  * source/rtl/hbcrc32.c  
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
+  * source/rtl/hbcrc32.c
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/lennum.c
     ! using hb_retns insted id hb_retnl with cast to (LONG) for HB_SIZE type variable
   * source/rtl/left.c
     ! HB_ISIZ lLeft = (HB_ISIZ) hb_itemGetNL( pNum ); -> HB_ISIZ lLeft               = hb_itemGetNS( pNum );
-  * source/rtl/hardcr.c  
-    ! changed to use itemapi insted of direct structure manipulation          
+  * source/rtl/hardcr.c
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/hbchksum.c
     ! ULONG -> HB_U32 where aplicable
-    ! changed to use itemapi insted of direct structure manipulation          
-        
-2014-12-26 23:55 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+    ! changed to use itemapi insted of direct structure manipulation
+
+2014-12-26 23:55 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/binnumx.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
     ! ULONG  -> HB_SIZE where aplicable
   * source/rtl/mtran.c
-    ! ULONG  -> HB_SIZE where aplicable      
+    ! ULONG  -> HB_SIZE where aplicable
   * source/rtl/at.c
-    ! ULONG  -> HB_SIZE where aplicable      
+    ! ULONG  -> HB_SIZE where aplicable
   * source/rtl/hbntos.c
-    ! ULONG  -> HB_SIZE where aplicable          
-  * source/rtl/hbxml.c   
-    ! ULONG  -> HB_ISIZ where aplicable          
-    ! int  -> HB_SIZE where aplicable          
+    ! ULONG  -> HB_SIZE where aplicable
+  * source/rtl/hbxml.c
+    ! ULONG  -> HB_ISIZ where aplicable
+    ! int  -> HB_SIZE where aplicable
   * source/rtl/padr.c
-    ! ULONG  -> HB_ISIZ where aplicable              
+    ! ULONG  -> HB_ISIZ where aplicable
   * source/rtl/hbcompsr.c
-    ! LONG  -> HB_SIZE where aplicable                     
+    ! LONG  -> HB_SIZE where aplicable
   * source/rtl/soundex.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/strpeek.c
-    ! changed to use itemapi insted of direct structure manipulation            
-    ! ULONG  -> HB_SIZE where aplicable          
-    ! ULONG  -> HB_ISIZ where aplicable          
+    ! changed to use itemapi insted of direct structure manipulation
+    ! ULONG  -> HB_SIZE where aplicable
+    ! ULONG  -> HB_ISIZ where aplicable
   * source/rtl/len.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/left.c
-    ! changed to use itemapi insted of direct structure manipulation             
-    ! LONG  -> HB_ISIZ where aplicable 
+    ! changed to use itemapi insted of direct structure manipulation
+    ! LONG  -> HB_ISIZ where aplicable
   * source/rtl/empty.c
-    ! changed to use itemapi insted of direct structure manipulation                       
+    ! changed to use itemapi insted of direct structure manipulation
   * source/compiler/hbusage.c
   * utils/hbdoc/hbdoc.prg
   * utils/hbmake/hbmake.prg
@@ -758,25 +765,25 @@
   * winmake/makefile.bc
     ! pacify BCC irrelevant warning
 
-2014-12-20 12:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-20 12:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   + contrib/gtwvw/samples/winuser.ch
     ! added include file for wvwtest9.prg sample
-  ! contrib/gtwvw/samples/inpfocus.prg 
+  ! contrib/gtwvw/samples/inpfocus.prg
     ! minor fix to link with newer gtwvw lib
-    
-2014-12-19 12:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+
+2014-12-19 12:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/fm.c
     ! changed fixed hb_sprintf format %lu with %" HB_PFS "u to make mingw happy
-    
-2014-12-17 22:20 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+
+2014-12-17 22:20 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/gtwvw/gtwvw.c
     ! removed hb_xgrabz. define
     ! removed redundant tracelog function call
   * contrib/gtwvw/samples/wvwtest9.prg
     ! minor fix to link with newer gtwvw lib
-    
+
 2014-12-17 14:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
-  * source/rtl/pcre/config.generic.h 
+  * source/rtl/pcre/config.generic.h
     ! fix for compile with msvc
 
   * include/hbdefs.h
@@ -867,18 +874,18 @@
   * source/rtl/hbsrlraw.c
     ! pacify warnings; some clean up
 
-2014-12-14 23:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-14 23:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/fm.c
     ! changed fixed hb_sprintf format %li with %" HB_PFS "i to make mingw happy
   + config/w32/mingw64.cf
     ! config for mingw 64 bit compile
   + make_mingw64.sh
-    ! shell script for mingw 64 bits compile with msys  
-        
-2014-12-14 15:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+    ! shell script for mingw 64 bits compile with msys
+
+2014-12-14 15:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/tbrowse.prg
     ! minor fix on display datetime fields
-        
+
 2014-12-11 11:10 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/hbwinole.c
     ! define GUID_NULL for OpenWatcom
@@ -909,12 +916,12 @@
   * source/rtl/hbjson.c
     ! defined but not referenced symbols
 
-2014-12-06 13:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-06 13:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * make_gc.bat
     ! reverted to previus version
   + make_gc64.bat
-    ! .bat to build mingw 64 bits build  
-    
+    ! .bat to build mingw 64 bits build
+
 2014-12-06 11:15 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/compiler/gencc1.c
     ! bug in datetime pcode; minor formatting
@@ -946,10 +953,10 @@
   * utils/hbmake/hbmutils.prg
     ! use STOD instead of CTOD for constant values
 
-2014-12-02 20:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-02 20:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbdefs.h
     ! minor fix for double defined HB_SYMBOL_USED
-    
+
 2014-12-02 14:35 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/win32ole.prg
     ! add missing include
@@ -1026,79 +1033,79 @@
   * utils/hbformat/hbfmtcls.prg
     ! use HB_IS*() instead of valtype()
 
-2014-12-01 21:01 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-12-01 21:01 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * make_gc.bat
     ! adjust to allow 64 bits mingw compile
-    
-2014-12-01 21:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+
+2014-12-01 21:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbsetup.h
     ! minor fix when defining HB_OS_UNIX
-    
+
 2014-12-01 10:20 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * xharbour/source/rdd/hbsix/sxcompat.prg
     ! Fix bug, thanks to Claudio Voskian
 
-2014-11-29 22:40  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>   
+2014-11-29 22:40  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/filebuf.c
     % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset
   * source/rtl/filenet.c
-    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset  
+    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset
   * source/rtl/hbgtcore.c
-    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset where aplicable   
+    % optimized to use hb_xgrabz insted of  hb_xgrab follows by memset where aplicable
   * source/rtl/dbf2txt.c
     ! hb_strescape( const char * szInput, int lLen, const char * cDelim ) -> hb_strescape( const char * szInput, HB_ISIZ lLen, const char * cDelim )
     ! int -> HB_ISIZ where aplicable
     ! removed unnecessary casts
   * include/hbapi.h
     ! removed duplicated  hb_verPCode declaration
-        
+
 2014-11-29 19:48 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/winreg.prg
     ! pacify warning
 
-2014-11-29 15:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
+2014-11-29 15:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbapi.h
     ! added defines to hb_xgrabz and hb_xmemdup borrow from harbour
   * source/rtl/winreg.prg
     ! minor fix to previus commit
-      
-2014-11-27 11:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br> 
+
+2014-11-27 11:20  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/version.c
     ! moved externs to hbapi.h
-    ! changed to use itemapi insted of direct structure manipulation    
+    ! changed to use itemapi insted of direct structure manipulation
   * include/hbapi.h
     ! added new extends moved from source/rtl/version.c
   * source/rtl/winreg.prg
     ! Ajusted some functions return to return an pointer insted of an HB_SIZE
-  * source/rtl/valtype.c  
-    % optimized HB_ISARRAY to use hb_arrayIsObject insted of direct structure manipulation 
+  * source/rtl/valtype.c
+    % optimized HB_ISARRAY to use hb_arrayIsObject insted of direct structure manipulation
   * source/rtl/val.c
-    ! changed to use itemapi insted of direct structure manipulation    
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/type.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/txtline.c
     ! changed void hb_readLine()  -> static void hb_readLine()
     ! ULONG -> HB_SIZE
     ! changed LONG hb_tabexpand( const char * szString, char * szRet, HB_SIZE lEnd, USHORT uiTabLen )  -> static HB_ISIZ hb_tabexpand( const char * szString, char * szRet, HB_ISIZ lEnd, HB_SIZE uiTabLen )
     ! LONG -> HB_ISIZ
   * source/rtl/trim.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/substr.c
-    ! LONG -> HB_ISIZ   
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! LONG -> HB_ISIZ
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/strzero.c
     ! ULONG -> HB_SIZE
   * source/rtl/strmatch.c
     ! ULONG -> HB_SIZE
   * source/rtl/str.c
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! changed to use itemapi insted of direct structure manipulation
   * source/rtl/space.c
     ! long lLen -> HB_ISIZ lLen
   * source/rtl/right.c
-    ! LONG -> HB_ISIZ   
-    ! changed to use itemapi insted of direct structure manipulation        
-  * source/rtl/readline.c   
-    ! changed to use itemapi insted of direct structure manipulation        
+    ! LONG -> HB_ISIZ
+    ! changed to use itemapi insted of direct structure manipulation
+  * source/rtl/readline.c
+    ! changed to use itemapi insted of direct structure manipulation
     ! removed unnecessary last to (LONG) in call to hb_fsseek
     ! int -> HB_SIZE where aplicable
     ! USHORT -> HB_SIZE  where aplicable
@@ -1107,13 +1114,13 @@
     on HB_TRACE changed direct %lu with %" HB_PFS " to make some c compiler happy
   * source/rtl/replic.c
     ! minor fix on previus commit and using to test ulLen * lTimes < UINT_MAX since with ULONG_MAX on 64bits you get gpf
-  * source/rtl/strtran.c  
+  * source/rtl/strtran.c
     ! minor fix on previus commit
   * include/hbdefs.h
-    ! minor ajust to define of uintptr_t where not exist    
+    ! minor ajust to define of uintptr_t where not exist
   * source/rtl/filenet.c
     ! pacified some remaing warning   on 64bits compile
-      
+
 2014-11-24 21:30  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/httpcln.prg
     contrib/tipssl/httpcln.prg
@@ -1123,27 +1130,27 @@
   * include/hbjson.h
     ! added hbset.h as part of includes files
   * include/hbipapi.h
-    ! adjusted the order of winsock2.h in include file list  
+    ! adjusted the order of winsock2.h in include file list
   * include/arc4.h
     ! changed void hb_arc4random_buf( void * _buf, ULONG n ) --> void hb_arc4random_buf( void * _buf, HB_SIZE n )
   * source/rtl/arc4.c
     ! some sinc with harbour
       arc4_seed_win32 -> arc4_seed_win
-      in function arc4_seed_rand changed ULONG i -> HB_SIZE i     
-      changed void hb_arc4random_buf( void * _buf, ULONG n ) with void hb_arc4random_buf( void * _buf, HB_SIZE n )  
+      in function arc4_seed_rand changed ULONG i -> HB_SIZE i
+      changed void hb_arc4random_buf( void * _buf, ULONG n ) with void hb_arc4random_buf( void * _buf, HB_SIZE n )
   * source/rtl/replic.c
     ! optimized borrow the ideia from harbour
   * source/rtl/hbsha2hm.c
     ! ULONG -> HB_SIZE
     ! HB_SIZE_MAX -> ULONG_MAX
-  * source/rtl/json.c   
+  * source/rtl/json.c
     ! some sinc with harbour version
-  * source/rtl/accept.c                     
-    ! ULONG ulLen -> to HB_SIZE ulLen       
+  * source/rtl/accept.c
+    ! ULONG ulLen -> to HB_SIZE ulLen
   * source/rtl/binnum.c
     ! sinc with harbour version
   * source/rtl/strtran.c
-    ! sinc with harbour version    
+    ! sinc with harbour version
   * source/vm/fm.c
     ! changed  fixed hb_sprintf %li param with %" HB_PFS "i to make mingw happy
   * source/rtl/filenet.c
@@ -1155,7 +1162,7 @@
     ! USHORT ->HB_ERRCODE changed there aplicable
   * source/rtl/hbrand.c
     ! synced with harbour
-    
+
 2014-11-20 00:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/gtwvw/wvwfuncs.c
     ! pacify warning
@@ -1165,13 +1172,13 @@
     contrib/tipssl/httpcln.prg
     ! optimize LTrim( Str( Len( cData ) ) ) -> hb_ntos( Len( cData ) )
     ! minor fix to previus commit
-      
+
 2014-11-19 19:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/tip/httpcln.prg
     contrib/tipssl/httpcln.prg
     + Added method put,delete,header borrow from harbour
     + added method close to close logfile before calling the destructor
-    
+
 2014-11-17 09:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/hbsqlit3/sqlite3.c
   * contrib/hbsqlit3/sqlite3.h
@@ -1179,7 +1186,7 @@
     ! updated sqlite to version 3.8.7.1
   * contrib/hbsqlit3/xhbsqlite3.c
     ! some minor updates
-  * contrib/gtwvw/gtwvw.c  
+  * contrib/gtwvw/gtwvw.c
   * contrib/gtwvw/wvwcheck.c
   * contrib/gtwvw/wvwedit.c
   * contrib/gtwvw/wvwfuncs.c
@@ -1193,7 +1200,7 @@
       LOADIMAGE,LOADBITMAP,LOADBITMAPEX,OPENIMAGE,OPENBITMAP,CREATESOLIDBRUSH,CREATEHATCHBRUSH,CREATEFONT,LOADICON,WINDOW2BITMAP
       WVW_DLGSETICON,WVW_CREATEDIALOGDYNAMIC,WVW_CREATEFONT,WVW_SETPOPUPMENU,WVW_CREATEMENU,WVW_CREATEPOPUPMENU,WVW_GETMENU
       WVW_GETSYSTEMMENU,WVW_SBCREATE,WVW_TBCREATE
-  * contrib/gtwvw/hbgtwvw.h    
+  * contrib/gtwvw/hbgtwvw.h
     ! some new constants and defines updated to allow 64bits
 
 2014-11-09 10:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
@@ -1208,48 +1215,48 @@
       and also using HB_FM_GETSIG insted of HB_GET_LONG to get the signature
     ! in hb_mem2str changed type of uiSize parameter from UINT to HB_SIZE, as also change uiIndex and  uiPrintable variables types from UINT to HB_SIZE
     ! on functions calls to  hb_mem2str removed the cast to UINT on uiSize parameter
-  * contrib/xwt/src/xwt_win/xwt_win.c  
+  * contrib/xwt/src/xwt_win/xwt_win.c
     ! using SetWindowLongPtr with GWLP_USERDATA insted of SetWindowLong with GWL_USERDATA ( 64bits compilation)
-  * contrib/xwt/src/xwt_win/xwt_win.h 
+  * contrib/xwt/src/xwt_win/xwt_win.h
     ! using GetWindowLongPtr with GWLP_USERDATA insted of GetWindowLong with GWL_USERDATA ( 64bits compilation)
-  * contrib/xwt/src/xwt_win/xwt_win_framewnd.c  
+  * contrib/xwt/src/xwt_win/xwt_win_framewnd.c
     ! using SetWindowLongPtr with GWLP_USERDATA insted of SetWindowLong with GWL_USERDATA ( 64bits compilation)
   * source/rtl/regex.c
-    ! when  added cast to hb_size type to int when comparing with > 0 and  < 0 
+    ! when  added cast to hb_size type to int when comparing with > 0 and  < 0
   * contrib/tipssl/inetssl.h
     ! added include <cinterface.h>
-                  
+
 2014-11-05 11:32 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/cinterface.h
     ! minor fix on includes for mingw 4.8.2
-    
+
 2014-11-04 11:08 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
-  * source/rtl/pcre/config.generic.h 
+  * source/rtl/pcre/config.generic.h
     ! fix for compile with borland c++ 5.5.1
-    
+
 2014-11-04 09:15 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbdefs.h
     ! minor change to detect existence of stdint.h for borland c++ 5.5.1
-    
+
 2014-11-01 17:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/gtwvw/gtwvw.c
     ! in hb_gt_wvwDlgProcMLess change init of iType variable from NULL to 0. also inside WM_NCDESTROY init the variable s_pWvwData->s_sApp->iType[ iIndex ] with 0 insted of NULL
-    ! in hb_gt_wvwDlgProcModal change init of iType variable from NULL to 0. also inside WM_NCDESTROY init the variable s_pWvwData->s_sApp->iTypeModal[ iIndex ] with 0 insted of NULL 
+    ! in hb_gt_wvwDlgProcModal change init of iType variable from NULL to 0. also inside WM_NCDESTROY init the variable s_pWvwData->s_sApp->iTypeModal[ iIndex ] with 0 insted of NULL
     ! in hb_gtInitStatics init the s_pWvwData->s_sApp->iTypeModal array and s_pWvwData->s_sApp->iType array with 0 insted of NULL
-    ! on hb_gt_wvw_Info change the variable ulLen in the HB_GTI_CLIPBOARDDATA from ULONG to HB_SIZE       
+    ! on hb_gt_wvw_Info change the variable ulLen in the HB_GTI_CLIPBOARDDATA from ULONG to HB_SIZE
     ! in FindControlId changed return (UINT) NULL; to return (UINT) 0;
   * contrib/gtwvw/wvwedit.c
   * contrib/gtwvw/wvwpush.c
   * contrib/gtwvw/wvwstbar.c
   * contrib/gtwvw/wvwtbar.c
-    ! Changed  GWL_WNDPROC to  GWLP_WNDPROC 
+    ! Changed  GWL_WNDPROC to  GWLP_WNDPROC
     ! SetWindowLong to SetWindowLongPtr and (LONG) to (LONG_PTR)
-  * contrib/gtwvw/wvwfuncs.c  
+  * contrib/gtwvw/wvwfuncs.c
     ! hb_retni( NULL ) -> hb_retni( 0 );
     ! hb_retnl( NULL ) -> hb_retnl( 0 );
   * contrib/gtwvw/hbgtwvw.h
-    ! added some missing defines        
-    
+    ! added some missing defines
+
 2014-10-31 21:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/fm.c
     ! ajusted typecasts in hb_xmemset and hb_xmemcpy ( ULONG  to HB_SIZE)
@@ -1266,23 +1273,23 @@
   * source/vm/thread.c
     ! added #include <unistd.h> to HB_OS_UNIX define section
   * source/rtl/winos.prg
-    ! Added OS_ISWIN81 and OS_ISWIN8 functions when compiling for *nix platform   
+    ! Added OS_ISWIN81 and OS_ISWIN8 functions when compiling for *nix platform
   * source/vm/inet.c
-    ! adjusted inet.h position on include  
+    ! adjusted inet.h position on include
   * source/tip/utils.c
-    ! in function TIP_FILEMIMETYPE change HB_SIZE  iPos to HB_ISIZ  iPos  
+    ! in function TIP_FILEMIMETYPE change HB_SIZE  iPos to HB_ISIZ  iPos
   * source/rtl/philes.c
     ! in FWRITE  adjusted to use hb_retns insted of hb_retnl( ( LONG ) since hb_fsWriteLarge return HB_SIZE type
   * source/rtl/hbcomprs.c
-    ! Change static ULONG hb_zlibUncompressedSize to static HB_SIZE hb_zlibUncompressedSize  
+    ! Change static ULONG hb_zlibUncompressedSize to static HB_SIZE hb_zlibUncompressedSize
     ! change ULONG to HB_SIZE where aplicable
   * source/rtl/direct.c
     ! removed unnecessary cast to HB_LONG for   szDrvDelim[ 0 ] assingment
   * config/linux/gcc.cf
-    ! added -DMEMCPY_64BIT when targeting 64bits  
+    ! added -DMEMCPY_64BIT when targeting 64bits
   * include/cinterface.h
-    ! removed unnecessary #include initguid.h for mingw  
-    
+    ! removed unnecessary #include initguid.h for mingw
+
 
 2014-10-30 22:05 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * include/cinterface.h
@@ -1306,9 +1313,9 @@
     ! fix memory leak on preprocessing
 
 2014-10-27 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
-  * source/vm/macro.c 
+  * source/vm/macro.c
     ! added hb_macroClear borrow from harbour.
-    ! hb_macroDelete  optimized to use  now call hb_macroClear 
+    ! hb_macroDelete  optimized to use  now call hb_macroClear
     ! hb_macroGetType optimize to use hb_macroClear insted of hb_macroDelete
 
 2014-10-27 14:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
@@ -1318,27 +1325,27 @@
 2014-10-27 12:41 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/mtran.c
     ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
-  * source/rtl/hardcr.c  
+  * source/rtl/hardcr.c
     ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
   * source/rtl/mlcfunc.c
     ! removed unnecessary cast of (unsigned char) pszString[ ulOffset ]
   * source/rtl/txtline.c
-    ! removed unnecessary cast of ( unsigned char ) szText[ ulPos ]    
+    ! removed unnecessary cast of ( unsigned char ) szText[ ulPos ]
   * include/hbdefs.h
     ! removed the cast to char and unsigned char from the defines bellow
       #define HB_CHAR_HARD1
       #define HB_CHAR_HARD2
       #define HB_CHAR_SOFT1
       #define HB_CHAR_SOFT2
-      
+
 2014-10-27 12:25 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/inet.h
     ! changes to include of winsock2.h to make mingw happy
-  * source/rtl/hbip.c  
+  * source/rtl/hbip.c
     ! changes to include of winsock2.h to make mingw happy
   * source/vm/fm.c
     ! minor fix to make mingw happy
-    
+
 2014-10-25 22:45 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/hbzlib/include/zipcollections.h
     ! fixes to make mingw gcc 4.7 or newer happy
@@ -1350,7 +1357,7 @@
 2014-10-22 18:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/macro.c
     ! minor fix to previus commit
-     
+
 2014-10-22 16:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/vm/macro.c
     ! minor fix to hb_macroGetValue
@@ -1364,7 +1371,7 @@
 2014-10-20 21:34 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source/rtl/winos.prg
     + OS_ISWIN81()
-      
+
 2014-10-14 14:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * contrib/tipssl/mail.prg
   * source/tip/mail.prg
@@ -1376,10 +1383,10 @@
     ! fix hb_macroGetValue to allow >16k string macros
   * source/rtl/cdpapi.c
     ! minor fix on hb_cdpnDup3
-  * include/std.ch 
+  * include/std.ch
     ! added missing comma to sort command translation since the connection parameter was being passed as rdd position
   * source/cgi/thtm.prg
-    ! minor fix on new method when output is file creation  
+    ! minor fix on new method when output is file creation
 
 2014-10-10 11:22 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * make_vc
@@ -1396,7 +1403,7 @@
 
   * include/hbole.h
     * Moved CINTERFACE workaround to new cinterface.h
- 
+
   * include/hbatomic.h
   * include/hbdefs.h
   * include/hbstack.h
@@ -1418,7 +1425,7 @@
   * contrib/gtwvw/wvwstbar.c
   * contrib/gtwvw/wvwtbar.c
     * Moved replicated redundant code to header hbgtwvw.h
-    * Use new cinterface.h  
+    * Use new cinterface.h
 
 2014-10-03 16:27 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * make_vc.bat
@@ -1431,16 +1438,16 @@
 2014-08-12 21:10 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/gtwvt/gtwvt.c
     ! minor fix to compile under borland c++
-    
+
 2014-08-09 20:40 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * include/hbgtinfo.ch
     ! added new missing constants ( borrow from harbour)
   * source/rtl/gtwvt/gtwvt.c
   * source/rtl/gtwvt/gtwvt.h
     ! some sinc with harbour version with code adaption
-  * source/rdd/usrrdd/rdds/arrayrdd.prg  
+  * source/rdd/usrrdd/rdds/arrayrdd.prg
     ! some changes to allow index borrow from harbour ( thanks for marcio nts)
-    
+
 2014-08-07 10:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/rdd_ads/ads1.c
     ! add checking of hb_ads_bOEM in adsGetValue() and adsPutValue
@@ -1458,7 +1465,7 @@
 2014-07-18 11:00 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/zlib/gzguts.h
     ! minor fix for XCC
-    
+
 2014-07-17 21:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/zlib/gzguts.h
   * source/rtl/zlib/gzlib.c
@@ -1514,7 +1521,7 @@
 2014-04-29 16:30 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/win_misc.c
     ! minor fix for linux compile
-    
+
 2014-04-28 17:32 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/url.prg
     ! reverted the following change:
@@ -1607,11 +1614,11 @@
   * contrib/tipssl/client.prg
     source/tip/client.prg
     ! minor fix when nlen <0  and server return no lenght in response
-    
+
 2014-01-07 14:10  UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
-  * contrib/rdd_ads/adsfunc.c 
-    ! minor fix 
-    
+  * contrib/rdd_ads/adsfunc.c
+    ! minor fix
+
 2013-12-09 17:16 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * contrib/tipssl/sendmail.prg
     ! minor fix

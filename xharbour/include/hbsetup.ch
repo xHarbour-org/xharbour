@@ -88,7 +88,9 @@
 
 #ifdef HB_EXTENSION
    #ifndef HB_STD_INKEY
-      #define HB_EXT_INKEY        /* Enable Extended Inkey codes */
+      #ifndef HB_EXT_INKEY
+         #define HB_EXT_INKEY        /* Enable Extended Inkey codes */
+      #endif
    #endif
 #endif
 
