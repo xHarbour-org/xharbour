@@ -164,6 +164,7 @@ METHOD Create( hParent ) CLASS Control
    ENDIF
 
    IF ::Parent:__oDlg != NIL
+   VIEW "XXXXXXXXXXXX"
       pt := (struct POINT)
       pt:x := ::xLeft
       pt:y := ::xTop

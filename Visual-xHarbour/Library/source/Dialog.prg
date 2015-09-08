@@ -30,10 +30,13 @@ CLASS Dialog INHERIT WinForm
    PROPERTY Modal    DEFAULT .T.
 
    DATA Template
-   DATA MDIClient    PROTECTED
-   DATA MdiContainer PROTECTED INIT .F.
-   DATA Result       EXPORTED
-   DATA lEmpty       PROTECTED
+   DATA MDIClient     PROTECTED
+   DATA MdiContainer  PROTECTED INIT .F.
+   DATA Result        EXPORTED
+   DATA lEmpty        PROTECTED
+   DATA __lVertScroll PROTECTED INIT .F.
+   DATA __lhORZScroll PROTECTED INIT .F.
+
    ACCESS Form       INLINE IIF( ::Modal .OR. ::Parent == NIL, Self, ::Parent:Form )
 
    METHOD Init() CONSTRUCTOR
@@ -212,6 +215,26 @@ METHOD PreInitDialog() CLASS Dialog
    IF ::lEmpty //.AND. ::Modal
       ::SetDialogRect()
    ENDIF
+   IF ::Modal .AND. ! ::DesignMode
+      IF ::VertScrollTopMargin > 0
+         ::__oDlg := Dialog( Self )
+         WITH OBJECT ::__oDlg
+            :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+            :ExStyle     := WS_EX_CONTROLPARENT
+
+            :Top         := ::VertScrollTopMargin
+
+            :VertScroll  := ::__lVertScroll
+            :HorzScroll  := ::__lHorzScroll
+
+            :SetChildren := .F.
+            :Modal       := .F.
+            :BackColor   := ::BackColor
+            :Create()
+            :OriginalRect[4] := 0
+         END
+      ENDIF
+   ENDIF
    ::__SetScrollBars()
 RETURN Self
 
@@ -251,6 +274,16 @@ METHOD Create( hParent ) CLASS Dialog
 
    DEFAULT hParent TO GetActiveWindow()
    IF ::Modal
+      IF ! ::DesignMode .AND. ::VertScrollTopMargin > 0
+         ::__lVertScroll := ::VertScroll
+         ::__lHorzScroll := ::HorzScroll
+
+         ::VertScroll := .F.
+         ::HorzScroll := .F.
+      ENDIF
+
+
+
       IF ::Template == NIL
          ::Template := __GetTemplate( Self )
          ::Result := DialogBoxIndirect( ::Instance, ::Template, hParent, ::__pCallBackPtr )
