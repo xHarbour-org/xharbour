@@ -2020,11 +2020,8 @@ RETURN NIL
 METHOD OnEraseBkgnd( hDC ) CLASS Window
    LOCAL nRet, n
 
-   IF ::__lSizeChanged
-      ::GetClientRect()
-      ::__lSizeChanged := .F.
-   ENDIF
    IF ::BkBrush != NIL
+      ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
       nRet := 1
    ENDIF

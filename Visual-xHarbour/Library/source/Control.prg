@@ -164,7 +164,6 @@ METHOD Create( hParent ) CLASS Control
    ENDIF
 
    IF ::Parent:__oDlg != NIL
-   VIEW "XXXXXXXXXXXX"
       pt := (struct POINT)
       pt:x := ::xLeft
       pt:y := ::xTop
@@ -389,6 +388,9 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
    ENDIF
    IF oParent:HorzScroll
       oParent:__SetScrollBars()
+   ENDIF
+   IF ::Parent:__oDlg != NIL
+      ::Parent:__oDlg:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
    ENDIF
 RETURN NIL
 
