@@ -2023,7 +2023,8 @@ METHOD OnEraseBkgnd( hDC ) CLASS Window
    IF ::BkBrush != NIL
       ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-      nRet := 1
+      n := aScan( ::Children, {|o|o:ClsName == "ToolBarWindow32" .AND. ! o:Transparent} )
+      nRet := IIF( n > 0, 0, 1 )
    ENDIF
    IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
       ::Children[n]:PaintFocusRect( hDC )
