@@ -7727,7 +7727,7 @@ DEFUN(sqlo_lob_append_buffer, (dbh, loblp, loblen, bufp, bufl, piece),
 
   dbp->status = OCILobWriteAppend( dbp->svchp,
                                    dbp->errhp,
-                                   loblp,
+                                   (OCILobLocator *)loblp,
                                    &amtp,
                                    (dvoid *) bufp,
                                    (ub4) nbytes,

@@ -8,16 +8,21 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-09-18 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlora.c
+     ! Added missing cast
+     
 2015-07-25 19:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/sqlora2.c
    ! source/sqlsrodbc.c
      ! minor fix when retriving numeric data to correct set the number size  
+     
 2015-07-24 17:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/sqlodbc.prg 	
      ! minor fix to detect DATE Field when SqlServer is 2008 or newer and SR_GETSQL2008NEWTYPES() return .t.
    ! source/sqlprototypes.h
      ! added declaration to sr_fShortasNum 
-   ! source/sqlconnection.prg
+   ! source/sqlconnection.prg 
      ! adjusted sqltype method to return T for firebird also on datetime fields
    ! source/sqlsrodbc.c
      ! using hb_itemPutTDT insted of hb_itemPutCLPtr of empty string when returning empty date under DB2
