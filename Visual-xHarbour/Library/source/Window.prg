@@ -2023,8 +2023,7 @@ METHOD OnEraseBkgnd( hDC ) CLASS Window
    IF ::BkBrush != NIL
       ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-      n := aScan( ::Children, {|o|o:ClsName == "ToolBarWindow32" .AND. ! o:Transparent} )
-      nRet := IIF( n > 0, 0, 1 )
+      nRet := 1
    ENDIF
    IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
       ::Children[n]:PaintFocusRect( hDC )
@@ -2459,11 +2458,11 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_CTLCOLORDLG
-              nRet := ExecuteEvent( "OnCtlColorDlg", Self )
-              ODEFAULT nRet TO ::OnCtlColorDlg( nwParam, nlParam )
-              IF nRet == NIL .AND. ::BkBrush != NIL
-                 RETURN( ::BkBrush )
-              ENDIF
+//              nRet := ExecuteEvent( "OnCtlColorDlg", Self )
+//              ODEFAULT nRet TO ::OnCtlColorDlg( nwParam, nlParam )
+//              IF nRet == NIL .AND. ::BkBrush != NIL
+//                 RETURN( ::BkBrush )
+//              ENDIF
               EXIT
 
          CASE WM_CTLCOLORLISTBOX

@@ -316,7 +316,7 @@ RETURN Self
 
 FUNCTION __GetTemplate( oDlg )
    LOCAL dt := (struct DLGTEMPLATEX)
-   dt:style := oDlg:Style
+   dt:style := oDlg:Style | WS_CLIPCHILDREN
    dt:dwExtendedStyle := oDlg:ExStyle
    dt:x  := MulDiv( oDlg:Left,   4, LOWORD( GetDialogBaseUnits() ) )  //Int( ( oDlg:Left * 4 )  /LOWORD(GetDialogBaseUnits()) )
    dt:y  := MulDiv( oDlg:Top,    8, HIWORD( GetDialogBaseUnits() ) )  //Int( ( oDlg:Top * 4 )   /LOWORD(GetDialogBaseUnits()) )

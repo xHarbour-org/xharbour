@@ -95,7 +95,7 @@ CLASS ToolBar INHERIT Control
 
    PROPERTY List               SET ::SetStyle( TBSTYLE_LIST, v )                     DEFAULT .F.
    PROPERTY ToolTips           SET ::SetStyle( TBSTYLE_TOOLTIPS, v )                 DEFAULT .F.
-   PROPERTY Flat               SET ::SetStyle( TBSTYLE_FLAT, v )                     DEFAULT .T.
+   PROPERTY Flat               SET ::SetStyle( TBSTYLE_FLAT, v )                     DEFAULT .F.
    PROPERTY Transparent        SET ::SetStyle( TBSTYLE_TRANSPARENT, v )              DEFAULT .F.
    PROPERTY ImageList          GET __ChkComponent( Self, @::xImageList );
                                SET ::SetImageList(v)
@@ -224,7 +224,7 @@ METHOD Init( oParent ) CLASS ToolBar
    ::ClsName  := "ToolBarWindow32"
    DEFAULT ::__xCtrlName TO "ToolBar"
    ::Super:Init( oParent )
-   ::Style           :=  WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | CCS_NORESIZE | TBSTYLE_FLAT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style           :=  WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | CCS_NORESIZE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ThemeName       := "toolbar"
    ::__hTheme        := OpenThemeData(,"MENU")
    ::ToolTips        := .T.

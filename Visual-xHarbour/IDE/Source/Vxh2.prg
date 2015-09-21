@@ -323,7 +323,7 @@ RETURN Self
 
 METHOD OnEraseBkGnd( hDC ) CLASS WindowEdit
    IF ::Application:ShowGrid != 1
-      RETURN 0
+      RETURN 1
    ENDIF
    IF ::bkBrush != NIL
       _FillRect( hDC, { 0,0,::ClientWidth, ::ClientHeight }, ::bkBrush )
