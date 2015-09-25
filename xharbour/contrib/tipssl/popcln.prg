@@ -119,7 +119,7 @@ METHOD Open( cUrl ) CLASS tIPClientPOP
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ENDIF
-         
+
    IF ::GetOk()
       ::InetSENDall( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
       IF ::GetOK()
@@ -227,7 +227,7 @@ METHOD List() CLASS tIPClientPOP
 
    ::InetSENDall( ::SocketCon, "LIST" + ::cCRLF )
    IF .not. ::GetOk()
-      RETURN NIL
+      RETURN ""
    ENDIF
 
    cRet := ""
@@ -318,7 +318,7 @@ METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
    ::bEof := .F.
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
 
-      cBuffer :=  Space(1024) 
+      cBuffer :=  Space(1024)
 
       nRead := ::InetRecv( ::SocketCon, @cBuffer, 1024 )
 
@@ -363,12 +363,12 @@ METHOD countMail CLASS TIpClientPop
    IF ::isOpen
       ::reset()
       aMails := HB_ATokens( StrTran( ::list(), Chr(13),''), Chr(10) )
-      RETURN Len( aMails ) 
+      RETURN Len( aMails )
    ENDIF
 RETURN -1
 
 
-METHOD retrieveAll( lDelete )
+METHOD retrieveAll( lDelete, bAllBlock, bEachBlock )
    LOCAL aMails, i, imax, cMail
 
    IF Valtype( lDelete ) <> "L"
@@ -386,7 +386,11 @@ METHOD retrieveAll( lDelete )
       ::reset()
       cMail := ::retrieve( i )
       aMails[i] := TIpMail():new()
-      aMails[i]:fromString( cMail )
+      aMails[i]:fromString( cMail, , , bEachBlock  )
+
+      IF ValType( bAllBlock ) == 'B'
+         Eval( bAllBlock, i, iMax, aMails )
+      ENDIF
 
       IF lDelete
          ::reset()
@@ -397,9 +401,9 @@ METHOD retrieveAll( lDelete )
 RETURN aMails
 
 PROCEDURE popDestructor CLASS tIPClientPOP
-   IF ::ltrace .and. ::nhandle > -1    
+   IF ::ltrace .and. ::nhandle > -1
       fClose( ::nHandle )
-      ::nhandle := -1 
+      ::nhandle := -1
    ENDIF
 RETURN
 

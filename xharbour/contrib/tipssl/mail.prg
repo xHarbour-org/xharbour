@@ -95,7 +95,7 @@ CLASS TipMail
    METHOD isMultiPart()
    METHOD getMultiParts()
 
-   METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) 
+   METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC )
    METHOD attachFile( cFileName )
    METHOD detachFile( cPath )
    METHOD getFileName()
@@ -371,11 +371,12 @@ METHOD ToString() CLASS TipMail
 
 RETURN cRet
 
-METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
+METHOD FromString( cMail, cBoundary, nPos, bBlock ) CLASS TipMail
 
    LOCAL oSubSection, cSubBoundary
    LOCAL nLinePos, nSplitPos, nBodyPos
    LOCAL cValue, cLastField
+   LOCAL nLen
 
    IF Len( ::aAttachments ) > 0
       ::aAttachments := {}
@@ -398,6 +399,7 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
       cMail := ""
    ENDIF
 
+   nLen := Len( cMail )
    nLinePos := At( e"\r\n", cMail, nPos )
    DO WHILE nLinePos > nPos
       // going on with last field?
@@ -426,6 +428,10 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
       //Prevents malformed body to affect us
       IF cBoundary != NIL .and. At( "--"+cBoundary, cMail, nPos ) == 1
          RETURN 0
+      ENDIF
+
+      IF ValType( bBlock ) == 'B'
+         Eval( bBlock, nPos, nLen )
       ENDIF
    ENDDO
 
@@ -497,11 +503,20 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
             Instead of testing every single line of mail until we find next boundary, if there is a boundary we
             jump to it immediatly, this saves thousands of EOL test and makes splitting of a string fast
          */
-         nPos := iif( ! Empty( cSubBoundary ), At( "--" + cSubBoundary, cMail, nPos ), ;
-                      iif( ! Empty(cBoundary ), At( "--" + cBoundary, cMail, nPos ), nLinePos + 2 ) )
+         IF ! Empty( cSubBoundary )
+            nPos := Max( nLinePos + 2, At( "--" + cSubBoundary, cMail, nPos ) )
+         ELSEIF ! Empty(cBoundary )
+            nPos := Max( nLinePos + 2, At( "--" + cBoundary, cMail, nPos ) )
+         ELSE
+            nPos := nLinePos + 2
+         ENDIF
       ENDIF
 
       nLinePos := At( e"\r\n", cMail, nPos )
+
+      IF ValType( bBlock ) == 'B'
+         Eval( bBlock, nPos, nLen )
+      ENDIF
    ENDDO
 
    // set our body if needed
@@ -622,9 +637,9 @@ METHOD attachFile( cFileName ) CLASS TipMail
       cMimeType += "; charset=ISO-8859-1"
    ENDIF
 
-   if ".html" in Lower( cFext ) .OR. ".htm" in Lower( cFext ) .or. ".txt" in Lower( cFext )         
+   if ".html" in Lower( cFext ) .OR. ".htm" in Lower( cFext ) .or. ".txt" in Lower( cFext )
       oAttach := TipMail():New( cContent, "7bit" )
-   ELSE      
+   ELSE
       oAttach   := TIPMail():new( cContent, "base64" )
    ENDIF
 
@@ -632,10 +647,10 @@ METHOD attachFile( cFileName ) CLASS TipMail
 
    oAttach:setFieldPart  ( "Content-Type", cMimeType )
    oAttach:setFieldOption( "Content-Type", "name", cFname + cFext )
-   
+
    if lower(cFext) in ".png" .or. lower(cFext) in ".jpg" .or. lower(cFext) in ".jpeg"
       oAttach:setFieldPart( "Content-Id",  cFname + cFext )
-   endif    
+   endif
 
    oAttach:setFieldPart  ( "Content-Disposition", "attachment" )
    oAttach:setFieldOption( "Content-Disposition", "filename", cFname + cFext )

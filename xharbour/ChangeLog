@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-09-24 20:15 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * contrib/tipssl/mail.prg
+    ! Fixed bug in :FromString() which caused infinite looping
+    + Added support for optional progress block as 4th argument to :FromString()
+
+  * contrib/tipssl/popcln.prg
+    ! Fixed :List() to return "" instead of NIL
+    + Added support for optional bAllBlock and bEachBlock to :RetrieveAll()
+      as 2nd and 3rd arguments
+
 2015-09-08 14:38 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * include/hbdefs.h
     * Commented OUT #if defined( __POCC__ ) || defined( __XCC__ )
