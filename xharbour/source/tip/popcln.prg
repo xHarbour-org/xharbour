@@ -73,7 +73,7 @@ CLASS TIPClientPOP FROM TIPClient
    METHOD UIDL( nMsgId )         // Returns Unique ID of message n or list of unique IDs of all message inside maildrop
    METHOD GetOK()
    METHOD countMail()
-   METHOD retrieveAll( lDelete )
+   METHOD retrieveAll( lDelete, bAllBlock, bEachBlock )
    DESTRUCTOR PopClnDestructor()
 
 ENDCLASS
@@ -228,7 +228,7 @@ METHOD LIST() CLASS TIPClientPOP
 
    ::InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
    IF ! ::GetOK()
-      RETURN NIL
+      RETURN ""
    ENDIF
 
    cRet := ""
@@ -362,7 +362,7 @@ METHOD countMail() CLASS TIPClientPop
 
    RETURN - 1
 
-METHOD retrieveAll( lDelete ) CLASS TIPClientPop
+METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS TIPClientPop
 
    LOCAL aMails, i, imax, cMail
 
@@ -381,7 +381,11 @@ METHOD retrieveAll( lDelete ) CLASS TIPClientPop
       ::Reset()
       cMail     := ::Retrieve( i )
       aMails[i] := TipMail():New()
-      aMails[i]:fromString( cMail )
+      aMails[i]:fromString( cMail, , , bEachBlock )
+
+      IF ValType( bAllBlock ) == 'B'
+         Eval( bAllBlock, i, iMax, aMails )
+      ENDIF
 
       IF lDelete
          ::Reset()

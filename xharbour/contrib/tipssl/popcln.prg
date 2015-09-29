@@ -358,7 +358,7 @@ RETURN ::GetOk()
 
 
 
-METHOD countMail CLASS TIpClientPop
+METHOD countMail() CLASS tIPClientPOP
    LOCAL aMails
    IF ::isOpen
       ::reset()
@@ -368,7 +368,7 @@ METHOD countMail CLASS TIpClientPop
 RETURN -1
 
 
-METHOD retrieveAll( lDelete, bAllBlock, bEachBlock )
+METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS tIPClientPOP
    LOCAL aMails, i, imax, cMail
 
    IF Valtype( lDelete ) <> "L"

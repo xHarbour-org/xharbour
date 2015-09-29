@@ -73,7 +73,7 @@ CLASS TipMail
    METHOD GetRawBody()              INLINE ::cBody
    METHOD SetEncoder( cEncoder )
 
-   METHOD FromString( cMail, cBoundary, nPos )
+   METHOD FromString( cMail, cBoundary, nPos, bBlock )
    METHOD ToString()
 
    METHOD GetFieldPart( cField )
