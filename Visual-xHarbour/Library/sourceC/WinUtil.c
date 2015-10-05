@@ -107,6 +107,7 @@ typedef HRESULT (WINAPI *ATLAXCREATECONTROL)(LPCOLESTR, HWND, IStream*, IUnknown
 typedef HRESULT (WINAPI *ATLAXCREATECONTROLLIC)(LPCOLESTR, HWND, IStream*, IUnknown**, BSTR);
 typedef HRESULT (WINAPI *ATLAXGETHOST)(HWND, IUnknown**);
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+typedef BOOL (WINAPI *NAMEDPIPESERVERPROCESSID) (HANDLE, PULONG );
 
 
 void LoadAtlAx( void )
@@ -125,6 +126,16 @@ void LoadAtlAx( void )
    }
 }
 
+BOOL WINAPI GetNamedPipeServerProcessId( HANDLE Pipe, PULONG ServerProcessId )
+{
+   NAMEDPIPESERVERPROCESSID fnGetNamedPipeServerProcessId;
+   fnGetNamedPipeServerProcessId = (NAMEDPIPESERVERPROCESSID) GetProcAddress( GetModuleHandle( TEXT("kernel32") ), "GetNamedPipeServerProcessId");
+   if (NULL != fnGetNamedPipeServerProcessId)
+   {
+      return fnGetNamedPipeServerProcessId( &Pipe, ServerProcessId );
+   }
+   return FALSE;
+}
 
 HB_FUNC( BITMAPTOREGION )
 {
