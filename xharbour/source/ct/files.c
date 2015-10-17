@@ -306,7 +306,7 @@ HB_FUNC( SETFATTR )
 
    #elif defined( HB_OS_WIN )
    {
-      DWORD    dwFlags     = FILE_ATTRIBUTE_ARCHIVE;
+      DWORD    dwFlags     = 0;
       DWORD    dwLastError = ERROR_SUCCESS;
       LPCTSTR  cFile       = hb_parcx( 1 );
       int      iAttr       = hb_parni( 2 );
@@ -321,8 +321,8 @@ HB_FUNC( SETFATTR )
       if( iAttr & FA_SYSTEM )
          dwFlags |= FILE_ATTRIBUTE_SYSTEM;
 
-      if( iAttr & FA_NORMAL )
-         dwFlags |= FILE_ATTRIBUTE_NORMAL;
+      if( iAttr & FILE_ATTRIBUTE_ARCHIVE )
+         dwFlags |= FILE_ATTRIBUTE_ARCHIVE;
 
       lSuccess = SetFileAttributes( cFile, dwFlags );
 

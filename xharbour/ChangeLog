@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2015-10-17 15:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/ct/files.c
+    ! Fixed bug in SETFATTR() which prevented to clear the attribute flag
+
 2015-09-29 11:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/mail.prg
     ! Fixed bug in :FromString() which caused infinite looping
