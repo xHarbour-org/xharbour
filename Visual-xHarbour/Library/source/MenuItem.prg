@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: MenuItem.prg,v 1.148 2010/07/19 06:44:13 Augusto Infante Exp $
  */
 //------------------------------------------------------------------------------------------------------*
 //                                                                                                      *
@@ -264,8 +264,9 @@ METHOD __SetChecked( lCheck ) CLASS MenuItem
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
       mii:fMask    := MIIM_STATE | MIIM_BITMAP
-      mii:hbmpItem := IIF( lCheck, NIL, ::__hBitmap /*HBMMENU_CALLBACK*/ )
+      mii:hbmpItem := IIF( lCheck, NIL, ::__hBitmap )
       mii:fState   := IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED )
+      mii:fState   := IIF( ::Enabled, MFS_ENABLED, MFS_DISABLED ) | IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL
@@ -275,8 +276,9 @@ METHOD __SetEnabled( lEnabled ) CLASS MenuItem
    IF ::__pObjPtr != NIL .AND. lEnabled != ::xEnabled
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
-      mii:fMask    := MIIM_STATE
-      mii:fState   := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED )
+      mii:fMask    := MIIM_STATE | MIIM_BITMAP
+      mii:hbmpItem := IIF( ::xChecked, NIL, ::__hBitmap )
+      mii:fState   := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL
