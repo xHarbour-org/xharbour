@@ -201,7 +201,7 @@ HB_FUNC( DLLPREPARECALL )
       xec->cDLL   = hb_strdup( hb_parc( 1 ) );
       xec->hDLL   = LoadLibrary( xec->cDLL );
    }
-   else if( ISNUM( 1 ) )
+   else
    {
       xec->hDLL = ( HINSTANCE ) hb_parptr( 1 );
    }
