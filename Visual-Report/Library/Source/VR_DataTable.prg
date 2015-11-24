@@ -93,7 +93,7 @@ METHOD Configure() CLASS VrDataTable
    WITH OBJECT ::EditCtrl
       :FileName := ::FileName
       :Driver   := ::Driver
-      
+
       IF ::Driver != "SQLRDD"
          IF !EMPTY( ::Alias )
             :Alias := ::Alias
@@ -209,7 +209,7 @@ METHOD Configure() CLASS VrAdsDataTable
    WITH OBJECT ::EditCtrl
       :FileName := ::FileName
       :Driver   := ::Driver
-      
+
       IF !EMPTY( ::Alias )
          :Alias := ::Alias
          IF ::EditMode
