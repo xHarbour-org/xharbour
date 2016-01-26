@@ -191,7 +191,7 @@ CLASS EditBox INHERIT Control
    METHOD OnMouseMove()
    METHOD __SetAutoScroll()
    METHOD __SetMenuArrow()
-   METHOD SetValue( cValue )           INLINE ::Text := AllTrim(cValue)
+   METHOD SetValue( cValue )           INLINE ::Text := AllTrim(cValue), IIF( ValType(::bOnSetValue)=="B", Eval( ::bOnSetValue, Self, cValue ),)
    METHOD GetValue()                   INLINE AllTrim(::Text)
 ENDCLASS
 

@@ -286,6 +286,7 @@ METHOD Load( lAvoidNew ) CLASS DataTable
        xData := ::Connector:FieldGet( n )
        IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
           ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xData )
+          ::FieldCtrl[ ::Structure[n][1] ]:UpdateWindow()
        ELSE
           ::__aData[n] := xData
        ENDIF
@@ -345,7 +346,9 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
          cPath     := SUBSTR( cFileName, 1, n-1 )
          cFileName := SUBSTR( cFileName, n+1 )
 
-         IF dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver ) .AND. FILE( cPath + "\__" + cFileName )
+         dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver )
+
+         IF FILE( cPath + "\__" + cFileName )
             ::Close()
 
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )

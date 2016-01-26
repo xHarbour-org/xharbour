@@ -66,6 +66,7 @@ CLASS Control INHERIT Window
    DATA OnWMReDock        EXPORTED
 
    DATA SmallCaption      EXPORTED INIT .T.
+   DATA bOnSetValue       EXPORTED
 
    DATA __hParBrush       PROTECTED
    DATA BackInfo          PROTECTED
