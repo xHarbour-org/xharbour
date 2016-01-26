@@ -1073,13 +1073,17 @@ RETURN IIF( nRet == NIL, 0, nRet )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS EditBox
-   LOCAL h, lShift, pt
+   LOCAL h, lShift
+#ifdef VXH_PROFESSIONAL
+   LOCAL pt
+#endif
    ::LastKey := nKey
    IF nKey == VK_F1 .AND. IsKeyDown( VK_CONTROL ) .AND. HGetPos( ::EventHandler, "OnImageClick" ) > 0
       ExecuteEvent( "OnImageClick", Self )
       RETURN 0
    ENDIF
 
+#ifdef VXH_PROFESSIONAL
    IF nKey == VK_DOWN .AND. ::DropCalendar
       pt := (struct POINT)
       pt:x := ::Left
@@ -1095,7 +1099,8 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       END
       RETURN 0
    ENDIF
-
+#endif
+   
    IF ::Transparent
       ::InvalidateRect(, .F.)
    ENDIF
