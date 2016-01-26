@@ -164,8 +164,8 @@ CLASS ComboBox FROM Control
    METHOD __ResetEdit()
    METHOD __SetSizePos()
 
-   METHOD SetValue( nValue )           INLINE ::SetCurSel( nValue ), OutputDebugString( xStr(::Cursel) )
-   METHOD GetValue()                   INLINE ::GetCurSel(), OutputDebugString( xStr(::Cursel) ), ::Cursel
+   METHOD SetValue( nValue )           INLINE ::SetCurSel( nValue )
+   METHOD GetValue()                   INLINE ::GetCurSel()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------

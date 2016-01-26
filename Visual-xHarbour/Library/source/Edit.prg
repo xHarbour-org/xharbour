@@ -1111,15 +1111,14 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       ENDIF
    ENDIF
 
-   IF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      Eval( ::Form:bChanged, Self )
-   ENDIF
-
    IF ::DataSource != NIL .AND. ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0
       SWITCH nKey
          CASE VK_DELETE
             ::CallWindowProc()
             ::__UpdateDataGrid()
+            IF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+               Eval( ::Form:bChanged, Self )
+            ENDIF
             RETURN 0
 
          CASE VK_DOWN
@@ -1138,28 +1137,31 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnChar( nKey ) CLASS EditBox
-   LOCAL aKeys := {VK_BACK}
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      Eval( ::Form:bChanged, Self )
-   ENDIF
+   LOCAL lProc := .F., aKeys := {VK_BACK}
    IF ::DataSource != NIL .AND. ( ( nKey >= 32 .AND. nKey <= 168 ) .OR. ( nKey >= 224 .AND. nKey <= 253 ) .OR. ( nKey IN aKeys ) )
       ::CallWindowProc()
       ::__UpdateDataGrid()
-      RETURN 0
+      lProc := .T.
    ENDIF
-RETURN NIL
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      IF ! lProc
+         ::CallWindowProc()
+      ENDIF
+      Eval( ::Form:bChanged, Self )
+   ENDIF
+RETURN IIF( lProc, 0, NIL )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaste() CLASS EditBox
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      Eval( ::Form:bChanged, Self )
+      RETURN Eval( ::Form:bChanged, Self )
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnCut() CLASS EditBox
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      Eval( ::Form:bChanged, Self )
+      RETURN Eval( ::Form:bChanged, Self )
    ENDIF
 RETURN NIL
 
