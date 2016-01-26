@@ -1224,7 +1224,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer
+   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer, nLines
 
    IF cFile != NIL
       ::File := cFile

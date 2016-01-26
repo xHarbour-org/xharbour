@@ -2780,7 +2780,7 @@ METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManage
    ENDIF
 RETURN Self
 
-STATIC FUNCTION ChangePrgLine( cLine, cOldVal, cNewVal, lComment )
+/*STATIC FUNCTION ChangePrgLine( cLine, cOldVal, cNewVal, lComment )
    LOCAL cPrev := "", cWord := "", lRest := .T., cChar, nFor, cNewLine := ""
    nFor := 1
    FOR EACH cChar IN cLine
@@ -2812,7 +2812,7 @@ STATIC FUNCTION ChangePrgLine( cLine, cOldVal, cNewVal, lComment )
        nFor++
    NEXT
    cNewLine += cWord
-RETURN cNewLine
+RETURN cNewLine*/
 
 //------------------------------------------------------------------------------------------
 METHOD ResetEvents( aSel ) CLASS EventManager
@@ -3102,11 +3102,11 @@ ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-STATIC FUNCTION BrowseFile( o )
+/*STATIC FUNCTION BrowseFile( o )
    LOCAL n := o:GetCurSel()-1
    o:Parent:SetValue( n + 1 )
    o:Destroy()
-RETURN NIL
+RETURN NIL*/
 
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
    LOCAL oFile := CFile( oEdit:Text )
