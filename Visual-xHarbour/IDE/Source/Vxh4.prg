@@ -164,7 +164,6 @@ RETURN 1
 //---------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjManager
    LOCAL tvcd
-   ( nwParam )
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
            tvcd := (struct NMTVCUSTOMDRAW)
@@ -180,14 +179,14 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ObjManager
                    RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
-RETURN 0
+RETURN Super:OnParentNotify( nwParam, nlParam, hdr )
 
 METHOD DrawItem( tvcd ) CLASS ObjManager
    LOCAL n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
    LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, nfHeight := ABS( ::Font:Height )+3
    LOCAL nPos, cCap, cProp, nLevel, hDC, oItem, aRect, lVal
    LOCAL hIcon, lDisabled := .F.
-   LOCAL lEnabled, hBoldFont
+   LOCAL lEnabled, hBoldFont, oImageList
 
    rc       := tvcd:nmcd:rc
    oItem    := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
@@ -488,9 +487,15 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
                 DrawIconEx( hDC, x-20, y, ::ActiveObject:__hIcon, 16, 16,,,DI_NORMAL )
              ENDIF
           ENDIF
-          IF oItem:ColItems[n]:ColType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL .AND. ::ActiveObject:&cCap != NIL .AND. ::ActiveObject:&cCap > 0
-             hIcon := ::ActiveObject:Parent:ImageList:GetImage( ::ActiveObject:&cCap )
-             DrawIconEx( hDC, nLeft, y, hIcon, ::ActiveObject:Parent:ImageList:IconWidth, 16,,,DI_NORMAL )
+
+          oImageList := ::ActiveObject:ImageList
+          IF ::ActiveObject:Parent != NIL
+             DEFAULT oImageList TO ::ActiveObject:Parent:ImageList
+          ENDIF
+
+          IF oItem:ColItems[n]:ColType == "IMAGEINDEX" .AND. oImageList != NIL .AND. ::ActiveObject:&cCap != NIL .AND. ::ActiveObject:&cCap > 0
+             hIcon := oImageList:GetImage( ::ActiveObject:&cCap )
+             DrawIconEx( hDC, nLeft, y, hIcon, oImageList:IconWidth, 16,,,DI_NORMAL )
           ENDIF
 
           IF nColor != NIL .AND. cType != "L"
@@ -826,14 +831,14 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       ENDIF
 
       IF oItem:Owner:Caption == "COM Properties"
-         IF HGetPos( oObj:__OleVars, cProp ) != 0
+         IF HGetPos( oObj:__OleVars, cProp ) > 0
             IF VALTYPE( oObj:__OleVars[cProp][1] ) == "A"
                oObj:__OleVars[cProp][4] := xValue
              ELSE
                oObj:__OleVars[cProp][1] := xValue
             ENDIF
          ENDIF
-       ELSE
+       ELSEIF ::Application:Project:CurrentForm != NIL
          IF LEN( ::Application:Project:CurrentForm:Selected ) > 1
             FOR EACH aSel IN ::Application:Project:CurrentForm:Selected
                 IF cProp2 != NIL
@@ -875,9 +880,13 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
          ENDIF
       ENDIF
 
-      IF oItem:Owner:Caption == "Colors"
+      IF oItem:Owner:Caption == "Colors" .OR. oItem:ColItems[1]:Color != NIL
          oItem:ColItems[1]:Color := ::GetColorValues( oActiveObject, cProp, @xValue, oItem:ColItems[1]:Default )
          ::InvalidateRect(,.F.)
+         IF oItem:Owner:Caption == "COM Properties" .AND. HGetPos( oObj:__OleVars, cProp ) > 0
+            oObj:__OleVars[cProp][1] := oItem:ColItems[1]:Color
+            __ObjSendMsg( oObj, "_"+cProp, oItem:ColItems[1]:Color )
+         ENDIF
       ENDIF
 
       cVal := oItem:ColItems[1]:Value
@@ -980,32 +989,32 @@ RETURN Self
 
 METHOD SetPropDesc( oItem ) CLASS ObjManager
    LOCAL cHelp
-   IF oItem != NIL .AND. __ObjHasMsg( oItem, "ColItems" ) .AND. ::Form:HasProperty( "Label1" )
-      WITH OBJECT ::Form
-         IF !EMPTY( oItem:ColItems )
-            IF :Label1:Visible
-               :Label1:Visible := .F.
-               :Label2:Visible := .F.
-               :Label3:Visible := .F.
-               :Label4:Visible := .F.
+   IF oItem != NIL .AND. __ObjHasMsg( oItem, "ColItems" ) .AND. ::Application:ShowObjectProps
 
-               :Label5:Visible := .T.
-               :Label6:Visible := .T.
-            ENDIF
-
-            :Label5:Caption := oItem:ColItems[1]:Prop
-
-            IF oItem:Owner:Caption == "COM Properties" .AND. HGetPos( ::ActiveObject:__OleVars, :Label5:Caption ) != 0
-               cHelp := ::ActiveObject:__OleVars[ :Label5:Caption ][5]
-
-            ENDIF
-            DEFAULT cHelp TO "Visual xHarbour - Object Manager Property Description"
-            :Label6:Caption := cHelp
-          ELSE
-            :Label5:Caption := ""
-            :Label6:Caption := ""
+      IF !EMPTY( oItem:ColItems )
+         IF ::Application:Props[ "ObjPropsCtrlName" ]:Visible
+            ::Application:Props[ "ObjPropsCtrlName" ]:Visible := .F.
+            ::Application:Props[ "ObjPropsLabel2" ]:Visible := .F.
+            ::Application:Props[ "ObjPropsLabel3" ]:Visible := .F.
+            ::Application:Props[ "ObjPropsLabel4" ]:Visible := .F.
+            ::Application:Props[ "ObjPropsLabel5" ]:Visible := .T.
+            ::Application:Props[ "ObjPropsLabel6" ]:Visible := .T.
          ENDIF
-      END
+
+         ::Application:Props[ "ObjPropsLabel5" ]:Text := oItem:ColItems[1]:Prop
+
+         IF oItem:Owner:Caption == "COM Properties" .AND. HGetPos( ::ActiveObject:__OleVars, ::Application:Props[ "ObjPropsLabel5" ]:Text ) != 0
+            cHelp := ::ActiveObject:__OleVars[ ::Application:Props[ "ObjPropsLabel5" ]:Text ][5]
+         ELSE
+            cHelp := oItem:ColItems[1]:Help
+         ENDIF
+         DEFAULT cHelp TO "Visual xHarbour - Object Manager Property Description"
+         ::Application:Props[ "ObjPropsLabel6" ]:Text := cHelp
+       ELSE
+         ::Application:Props[ "ObjPropsLabel5" ]:Text := ""
+         ::Application:Props[ "ObjPropsLabel6" ]:Text := ""
+      ENDIF
+
    ENDIF
 RETURN Self
 
@@ -1014,7 +1023,7 @@ RETURN Self
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
    LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly, aObjs
-   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps
+   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps, cHelp
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1041,21 +1050,19 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       RETURN NIL
    ENDIF
 
-   IF ::Form:HasProperty( "Label1" )
-      IF ! ::Form:Label1:Visible
-         WITH OBJECT ::Form
-            :Label5:Visible := .F.
-            :Label6:Visible := .F.
+   IF ::Application:ShowObjectProps
+      IF ! ::Application:Props[ "ObjPropsCtrlName" ]:Visible
+         ::Application:Props[ "ObjPropsLabel5" ]:Visible := .F.
+         ::Application:Props[ "ObjPropsLabel6" ]:Visible := .F.
 
-            :Label1:Visible := .T.
-            :Label2:Visible := .T.
-            :Label3:Visible := .T.
-            :Label4:Visible := .T.
-         END
+         ::Application:Props[ "ObjPropsCtrlName" ]:Visible := .T.
+         ::Application:Props[ "ObjPropsLabel2" ]:Visible := .T.
+         ::Application:Props[ "ObjPropsLabel3" ]:Visible := .T.
+         ::Application:Props[ "ObjPropsLabel4" ]:Visible := .T.
       ENDIF
       IF ::ActiveObject != NIL
-         ::Form:Label2:Caption := ::ActiveObject:Name
-         ::Form:Label4:Caption := ::ActiveObject:__xCtrlName
+         ::Application:Props[ "ObjPropsLabel2" ]:Text := ::ActiveObject:Name
+         ::Application:Props[ "ObjPropsLabel4" ]:Text := ::ActiveObject:__xCtrlName
       ENDIF
    ENDIF
 
@@ -1065,9 +1072,9 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    ::ActiveObject := aSel[1][1]
 
-   IF ::Form:HasProperty( "Label2" )
-      ::Form:Label2:Caption := ::ActiveObject:Name
-      ::Form:Label4:Caption := ::ActiveObject:__xCtrlName
+   IF ::Application:ShowObjectProps
+      ::Application:Props[ "ObjPropsLabel2" ]:Text := ::ActiveObject:Name
+      ::Application:Props[ "ObjPropsLabel4" ]:Text := ::ActiveObject:__xCtrlName
    ENDIF
 
    ::Application:Props[ "ComboSelect" ]:SelectControl( ::ActiveObject )
@@ -1080,21 +1087,6 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
       ::Items[n]:Delete()
    NEXT
    ::ResetContent()
-
-   TRY
-      WITH OBJECT ::Form
-         :Label5:Hide()
-         :Label6:Hide()
-
-         :Label1:Show()
-         :Label2:Show()
-         :Label3:Show()
-         :Label4:Show()
-         :Label2:Caption := ::ActiveObject:Name
-         :Label4:Caption := ::ActiveObject:__xCtrlName
-      END
-   CATCH
-   END
 
    IF LEN( aSel ) > 1
       aProperties := {}
@@ -1213,12 +1205,13 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        ENDIF
 
        nDefault := NIL
+
        IF aProp[2] == "Colors" .AND. VALTYPE(xValue) != "L"
           cType  := "COLORREF"
           nColor := ::GetColorValues( ::ActiveObject, cProp, @xValue, @nDefault )
        ENDIF
 
-       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , , nDefault ) }
+       aCol := { TreeColItem( IIF( VALTYPE(xValue)=="O", "", xValue ), cType, , nColor, cProp, , , aProp[3], nDefault ) }
 
        IF __ObjHasMsg( ::ActiveObject, "Enum"+cProp )
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
@@ -1492,9 +1485,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
          oItem:Create()
 
          FOR EACH cProp IN ::ActiveObject:__OleVars:Keys
-             xValue := ::ActiveObject:__OleVars[cProp][1]
-             cType := VALTYPE( xValue )
+             xValue    := ::ActiveObject:__OleVars[cProp][1]
+             cType     := VALTYPE( xValue )
              lReadOnly := ::ActiveObject:__OleVars[cProp][3]
+             cHelp     := ::ActiveObject:__OleVars[ ::Application:Props[ "ObjPropsLabel5" ]:Text ][5]
 
              IF cType == "A"
                 cType := "ENUMERATION"
@@ -1502,8 +1496,20 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                 cType := "COLLECTION"
              ENDIF
 
-             aCol  := { TreeColItem( xValue, cType, , NIL, cProp,, lReadOnly ) }
-             oSub := oItem:AddItem( cProp, 0, aCol )
+             IF "Color" IN cProp
+                nDefault := GetSysColor( COLOR_BTNFACE )
+                nColor   := ::GetColorValues( ::ActiveObject, cProp, @xValue, @nDefault )
+                cType    := "COLORREF"
+             ENDIF
+
+             aCol     := { TreeColItem( xValue, cType, , nColor, cProp, , lReadOnly, cHelp, nDefault ) }
+             oSub     := oItem:AddItem( cProp, 0, aCol )
+             nColor   := NIL
+             nDefault := NIL
+
+//             IF "Color" IN cProp
+//                VIEW oSub:ColItems[1]:Default
+//             ENDIF
          NEXT
          oItem:SortChildren( .T. )
          oItem:Expand()
@@ -1567,7 +1573,7 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              aCol[1]:SetValue := ASCAN( xValue:Enum&cProp2[2], xValue:&cProp2,,, .T. )
              aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
                                                     oPar := ObjFromHandle(o:Parent:hWnd),;
-													             c := o:Cargo[1],;
+                                                    c := o:Cargo[1],;
                                                     o:Cargo[2]:ColItems[1]:SetValue := n+1,;
                                                     o:Destroy(),;
                                                     oPar:SetValue( xValue:Enum&c[2][n+1] ) }
@@ -1658,6 +1664,7 @@ METHOD GetColorValues( oObj, cProp, xValue, nDefault ) CLASS ObjManager
          xValue := "System Default..."
       ENDIF
    ENDIF
+
    IF nDefault == NIL
       nDefault := nColor
       IF VALTYPE( xValue ) != "C"
@@ -1679,7 +1686,7 @@ RETURN cText
 //--------------------------------------------------------------------------------------------------------------------------------
 
 METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
-   LOCAL oItem, rc, cType, n, cProp, cText, oFont, cFont, oSelf := Self
+   LOCAL oImageList, oItem, rc, cType, n, cProp, cText, oFont, cFont, oSelf := Self
    ( hWnd )
    IF nMsg == WM_USER + 4765
       IF ( oItem := ::GetSelected() ) != NIL .AND. ::ActiveObject:HasMessage( "MDIClient" ) .AND. ::ActiveObject:MDIClient != NIL
@@ -1744,7 +1751,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Caption     := cText
                        :Cargo       := ::ActiveObject:ShortcutKey:Key
 
-                       :OnWMKeyDown := {|o,n,l| CheckShortCutKeyDown(o,n,l,.T.)}
+                       :OnWMKeyDown := {|o,n| CheckShortCutKeyDown(o,n,::ActiveObject:ShortcutKey)}
                        :OnWMChar    := {|| 0}
                        :OnWMKillFocus := {|o,cText,oPar| cText := IIF( o:Cargo == NIL, 0, o:Cargo ),;
                                                          oPar  := o:Parent,;
@@ -1764,7 +1771,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := rc:bottom-rc:top+1
-                       :Border := .F.
+                       :Border := 0
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
                        :Create()
 
@@ -1791,7 +1798,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 70
-                       :Border := .F.
+                       :Border := 0
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
@@ -1820,7 +1827,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 200
-                       :Border := .F.
+                       :Border := 0
                        :Cargo  := oItem:Owner:Caption
                        :Owner  := ::ActiveObject
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
@@ -1846,7 +1853,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 200
-                       :Border := .F.
+                       :Border := 0
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
@@ -1876,7 +1883,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                     cType == "SYSFOLDERS" .OR.;
                     cType == "OLEVERB" .OR.;
                     cType == "ANIMATIONSTYLE" .OR.;
-                    ( cType == "IMAGEINDEX" .AND. ::ActiveObject:Parent:ImageList != NIL )
+                    ( cType == "IMAGEINDEX" .AND. ( ::ActiveObject:ImageList != NIL .OR. ::ActiveObject:Parent:ImageList != NIL ) )
                     ::ActiveControl := IIF( cType == "IMAGEINDEX", ComboBoxEx( Self ), ObjCombo( Self ) )
                     WITH OBJECT ::ActiveControl
                        :Left   := nLeft-1
@@ -1957,10 +1964,14 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                           NEXT
                         ELSEIF cType == "IMAGEINDEX"
                           :AddItem( "None", 0 )
-                          FOR n := 1 TO ::ActiveObject:Parent:ImageList:Count
+
+                          oImageList := ::ActiveObject:ImageList
+                          DEFAULT oImageList TO ::ActiveObject:Parent:ImageList
+
+                          FOR n := 1 TO oImageList:Count
                               :AddItem( XSTR(n), n )
                           NEXT
-                          :ImageList  := ::ActiveObject:Parent:ImageList
+                          :ImageList  := oImageList
                        ENDIF
 
                        IF cType == "IMAGEINDEX"
@@ -2011,7 +2022,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 70
-                       :Border := .F.
+                       :Border := 0
                        :Height := 200
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
@@ -2042,7 +2053,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 70
-                       :Border := .F.
+                       :Border := 0
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ), NIL }
@@ -2111,7 +2122,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Top    := rc:top
                        :Width  := ::Columns[ nCol ][ 1 ]+4
                        :Height := 70
-                       :Border := .F.
+                       :Border := 0
                        :Height := 200
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
@@ -2357,8 +2368,13 @@ STATIC FUNCTION CheckBtnClickPos( o, x, y )
    ENDIF
 RETURN NIL
 
-STATIC FUNCTION CheckShortCutKeyDown( o, n )
+STATIC FUNCTION CheckShortCutKeyDown( o, n, oShortcut )
    LOCAL nScanCode, cText, lAsc, aSys := { VK_CONTROL, VK_SHIFT, VK_MENU, VK_CAPITAL, VK_SCROLL }
+   IF ! oShortcut:Ctrl .AND. ! oShortcut:Alt .AND. ! oShortcut:Shift .AND. n == 27
+      o:Caption := ""
+      o:Cargo   := NIL
+      RETURN 0
+   ENDIF
    IF ASCAN( aSys, n ) == 0
 
       nScanCode := MapVirtualKey( n, 0 )
@@ -3085,513 +3101,6 @@ CLASS ObjObjManager INHERIT ObjManager
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------------------------
-
-INIT PROCEDURE GetPropArray()
-__aProps["A"] := { { "AutoHScroll",             "Style"     },;
-                   { "AutoVScroll",             "Style"     },;
-                   { "Alias",                   ""          },;
-                   { "Animate",                 ""          },;
-                   { "AutoRun",                 ""          },;
-                   { "ActiveMenuBar",           ""          },;
-                   { "AlwaysOnTop",             "Behavior"  },;
-                   { "AnchorColumn",            "Behavior"  },;
-                   { "AllowDragRecords",        "Behavior"  },;
-                   { "AllowCurrentPage",        "Behavior"  },;
-                   { "AllowPrintFile",          "Behavior"  },;
-                   { "AllowSelection",          "Behavior"  },;
-                   { "AllowSomePages",          "Behavior"  },;
-                   { "AnimationStyle",          "Behavior"  },;
-                   { "AddExtension",            "Behavior"  },;
-                   { "AllowMaximize",           "Behavior"  },;
-                   { "AutoOpen",                "Behavior"  },;
-                   { "AlignLeft",               "Behavior"  },;
-                   { "AlignTop",                "Behavior"  },;
-                   { "AlignRight",              "Behavior"  },;
-                   { "AlignBottom",             "Behavior"  },;
-                   { "AlignMask",               "Behavior"  },;
-                   { "AlignTop",                "Behavior"   },;
-                   { "AutoArrange",             "Behavior"   },;
-                   { "AutoClose",               "Behavior"   },;
-                   { "AutoColumns",             "Behavior"   },;
-                   { "AutoHorzScroll",          "Behavior"   },;
-                   { "AutoEditHorzScroll",      "Behavior"   },;
-                   { "AutoVertScroll",          "Behavior"   },;
-                   { "AcceptFiles",             "Behavior"   },;
-                   { "AllowDialogCancellation", "Behavior"   },;
-                   { "AnyColor",                "Colors"     },;
-                   { "ActiveLinkColor",         "Colors"     },;
-                   { "AllowClose",              "Position"   },;
-                   { "AllowUnDock",             "Position"   },;
-                   { "AutoLeft",                "Position"   },;
-                   { "AutoTop",                 "Position"   },;
-                   { "AutoSize",                "Size"       },;
-                   { "AdjustX",                 "Size"       },;
-                   { "AdjustY",                 "Size"       },;
-                   { "Anchor",                  "Size"       },;
-                   { "AutoHeight",              "Size"       },;
-                   { "AutoConnect",             "Connection" },;
-                   { "AutoWidth",               "Size"       } }
-
-__aProps["B"] := { { "BandChild",               ""           },;
-                   { "BaudRate",                ""           },;
-                   { "BlinkColor",              "Colors"     },;
-                   { "ButtonMenu",              "Behavior"   },;
-                   { "ButtonText",              "Appearance" },;
-                   { "BoldSelection",           "Appearance" },;
-                   { "BalloonTipIcon",          "Appearance" },;
-                   { "BalloonTipText",          "Appearance" },;
-                   { "BalloonTipTitle",         "Appearance" },;
-                   { "Border",                  "Appearance" },;
-                   { "BackgroundImage",         "Appearance" },;
-                   { "BitmapMask",              "Appearance" },;
-                   { "BitmapMaskColor",         "Appearance" },;
-                   { "BtnCheck",                "Behavior"   },;
-                   { "BindingSource",           "Connection" },;
-                   { "BlackAndWhite",           "Colors"     },;
-                   { "BackColor",               "Colors"     },;
-                   { "Binary",                  "Target Folder" },;
-                   { "Band",                    "Position"   },;
-                   { "BitmapWidth",             "Size"       },;
-                   { "BitmapHeight",            "Size"       },;
-                   { "Balloon",                 ""           },;
-                   { "Bottom",                  ""           },;
-                   { "BottomMargin",            ""           } }
-
-__aProps["C"] := { { "ContextMenu",             "Behavior" },;
-                   { "CheckPathExists",         "Behavior" },;
-                   { "CheckFileExists",         "Behavior" },;
-                   { "CLOSE_Button",            "CommonButtons" },;
-                   { "CANCEL_Button",           "CommonButtons" },;
-                   { "CaptionBar",              "Style" },;
-                   { "ClipChildren",            "Style" },;
-                   { "ClipSiblings",            "Style" },;
-                   { "ControlParent",           "Style" },;
-                   { "Color",                   "Colors" },;
-                   { "Cargo",                   "" },;
-                   { "CloseButton",             "" },;
-                   { "CloseOnClick",            "" },;
-                   { "ConnectionString",        "Connection" },;
-                   { "ContextArrow",            "" },;
-                   { "CompilerFlags",           "Build" },;
-                   { "CueBanner",               "Appearance" },;
-                   { "Caption",                 "Appearance" },;
-                   { "CheckBoxes",              "Appearance" },;
-                   { "Cursor",                  "Appearance" },;
-                   { "CleanBuild",              "Build" },;
-                   { "ConvertOem",              "Appearance" },;
-                   { "CenterImage",             "Image" },;
-                   { "ColorInactiveHeader",     "Appearance" },;
-                   { "CustomFormat",            "Appearance" },;
-                   { "CheckGroup",              "Behavior" },;
-                   { "CanBeMinimized",          "Behavior" },;
-                   { "CallbackTimer",           "Behavior" },;
-                   { "CreatePrompt",            "Behavior" },;
-                   { "CheckStyle",              "Behavior" },;
-                   { "CurSel",                  "Behavior" },;
-                   { "Color",                   "Colors" },;
-                   { "ColorScheme",             "Colors", } }
-
-__aProps["D"] := { { "DisableNoScroll",         "Style" },;
-                   { "DlgModalFrame",           "Style" },;
-                   { "DrawArrows",              "Style" },;
-                   { "DataSource",              "" },;
-                   { "DataSearchField",         "" },;
-                   { "DataSearchWidth",         "" },;
-                   { "DataSearchRecords",       "" },;
-                   { "Driver",                  "" },;
-                   { "DiscardNull",             "" },;
-                   { "DtrEnabled",              "" },;
-                   { "DataBits",                "" },;
-                   { "Definitions",             "Build" },;
-                   { "DefaultExt",              "Behavior" },;
-                   { "DragItems",               "Behavior" },;
-                   { "DeferenceLinks",          "Behavior" },;
-                   { "DropDownStyle",           "Behavior" },;
-                   { "DropCalendar",            "Behavior" },;
-                   { "DropDown",                "Behavior" },;
-                   { "DisableParent",           "Behavior" },;
-                   { "DefaultButton",           "Behavior" },;
-                   { "DefaultPath",             "Path" },;
-                   { "DebugInfo",               "Debugger" },;
-                   { "Dock",                    "Position", } }
-
-__aProps["E"] := { { "EditLabels",              "Style" },;
-                   { "Escapement",              "" },;
-                   { "EditBoxFocusBorder",      "Appearance" },;
-                   { "EnterNext",               "Behavior" },;
-                   { "Expanded",                "Behavior" },;
-                   { "ExtVertScrollBar",        "Behavior" },;
-                   { "ExtendedSel",             "Behavior" },;
-                   { "EnableHyperlinks",        "Behavior" },;
-                   { "ExpandFooterArea",        "Behavior" },;
-                   { "ExpandedByDefault",       "Behavior" },;
-                   { "Enabled",                 "Behavior", } }
-
-__aProps["F"] := { { "FullRow",                 "Style" },;
-                   { "FaceName",                "" },;
-                   { "Filter",                  "" },;
-                   { "FirstChild",              "" },;
-                   { "FieldPos",                "Behavior" },;
-                   { "FreezeColumn",            "Behavior" },;
-                   { "Flat",                    "Appearance" },;
-                   { "Font",                    "Appearance" },;
-                   { "FrameStyle",              "Appearance" },;
-                   { "FullRowSelect",           "Appearance" },;
-                   { "Format",                  "Appearance" },;
-                   { "FromPage",                "Behavior" },;
-                   { "Filter",                  "Behavior" },;
-                   { "FilterIndex",             "Behavior" },;
-                   { "FullOpen",                "Behavior" },;
-                   { "FullSelectOnClick",       "Behavior" },;
-                   { "ForeColor",               "Colors" },;
-                   { "Folder",                  "Path" },;
-                   { "FileName",                "Path", } }
-
-__aProps["G"] := { { "Grid",                    "Style" },;
-                   { "GridColor",               "Colors" },;
-                   { "GenerateMembers",         "Object" },;
-                   { "GenerateMember",          "Object", } }
-
-__aProps["H"] := { { "HasStrings",              "Style" },;
-                   { "Hidden",                  "Style" },;
-                   { "HideClippedButtons",      "Style" },;
-                   { "HeaderMenu",              "Behavior" },;
-                   { "HoverRow",                "Behavior" },;
-                   { "HandShake",               "" },;
-                   { "HideInvert",              "" },;
-                   { "HTMLBody",                "" },;
-                   { "HorzPadding",             "Appearance" },;
-                   { "HeaderFont",              "Appearance" },;
-                   { "HasButtons",              "Appearance" },;
-                   { "HasLines",                "Appearance" },;
-                   { "HotImageList",            "Appearance" },;
-                   { "HighlightCaption",        "Appearance" },;
-                   { "HorzScrollSize",          "Behavior" },;
-                   { "HorzScroll",              "Behavior" },;
-                   { "HighlightColor",          "Colors" },;
-                   { "HighlightBorderColor",    "Colors" },;
-                   { "HoverBorderColor",        "Colors" },;
-                   { "HoverBackColor",          "Colors" },;
-                   { "HoverForeColor",          "Colors" },;
-                   { "HighlightTextColor",      "Colors" },;
-                   { "Height",                  "Size" },;
-                   { "HeaderBackColor",         "Colors" },;
-                   { "HeaderForeColor",         "Colors" },;
-                   { "HeaderImageIndex",        "Appearance" },;
-                   { "HeaderHeight",            "Size" } }
-
-__aProps["I"] := { { "Icons",                   "Style" },;
-                   { "Italic",                  "" },;
-                   { "ImageType",               "Image" },;
-                   { "ImageName",               "Image" },;
-                   { "IconWidth",               "Size" },;
-                   { "IconHeight",              "Size" },;
-                   { "ImageListSmall",          "Appearance" },;
-                   { "Icon",                    "Appearance" },;
-                   { "ImageIndex",              "Appearance" },;
-                   { "ImageList",               "Appearance" },;
-                   { "InitialState",            "Appearance" },;
-                   { "ItemToolTips",            "Appearance" },;
-                   { "InitialDirectory",        "Behavior" },;
-                   { "Id",                      "Behavior" },;
-                   { "InvertedColors",          "Colors" },;
-                   { "ImageAlign",              "Layout" },;
-                   { "ImageAlignment",          "Layout" },;
-                   { "IncludePath",             "Path" },;
-                   { "IntegralHeight",          "Size" },;
-                   { "ItemHeight",              "Size" } }
-
-__aProps["J"] := {}
-
-__aProps["K"] := { { "KeepAspectRatio",         "Image" } }
-
-__aProps["L"] := { { "List",                    "Style" },;
-                   { "LowerCase",               "Style" },;
-                   { "LeftMargin",              "" },;
-                   { "LoadFromFile",            "Image" },;
-                   { "LinesAtRoot",             "Appearance" },;
-                   { "LocalPort",               "Connection" },;
-                   { "LinkColor",               "Colors" },;
-                   { "Left",                    "Position" } }
-
-__aProps["M"] := { { "MaximizeBox",             "Style" },;
-                   { "MDIChild",                "Style" },;
-                   { "MDIClient",               "Style" },;
-                   { "MDIContainer",            "Style" },;
-                   { "MemoType",                "" },;
-                   { "MinimizeBox",             "Style" },;
-                   { "MultiLine",               "Style" },;
-                   { "MimeFormatted",           "" },;
-                   { "MixedButtons",            "Style" },;
-                   { "MaskType",                "" },;
-                   { "MinTabWidth",             "Appearance" },;
-                   { "MenuArrow",               "Appearance" },;
-                   { "Message",                 "Appearance" },;
-                   { "MultiColumn",             "Appearance" },;
-                   { "MultiSelect",             "Behavior" },;
-                   { "MaskColor",               "Colors" },;
-                   { "MaxRange",                "Position" },;
-                   { "MinRange",                "Position" },;
-                   { "MaxHeight",               "Size" },;
-                   { "MaxWidth",                "Size" },;
-                   { "MinHeight",               "Size" },;
-                   { "MinWidth",                "Size" } }
-
-__aProps["N"] := { { "NoHideSel",               "Style" },;
-                   { "NoLabelWrap",             "Style" },;
-                   { "NoRedraw",                "Style" },;
-                   { "NoScroll",                "Style" },;
-                   { "NoSortHeader",            "Style" },;
-                   { "Notify",                  "Style" },;
-                   { "NoActivate",              "Style" },;
-                   { "NoColumnHeader",          "Appearance" },;
-                   { "NoHScroll",               "Behavior" },;
-                   { "NoToolTips",              "Behavior" },;
-                   { "NoDefaultRadioButton",    "Behavior" },;
-                   { "NO_Button",               "CommonButtons" },;
-                   { "Name",                    "Object" } }
-
-__aProps["O"] := { { "OemConvert",              "Style" },;
-                   { "OwnerData",               "Style" },;
-                   { "OwnerDraw",               "Style" },;
-                   { "OwnerDrawFixed",          "Style" },;
-                   { "Orientation",             "" },;
-                   { "OleVerb",                 "ActiveX" },;
-                   { "OfficeXPLook",            "Appearance" },;
-                   { "OwnerDrawFixed",          "Behavior" },;
-                   { "OwnerDrawVariable",       "Behavior" },;
-                   { "OK_Button",               "CommonButtons" },;
-                   { "Objects",                 "Target Folder" } }
-
-__aProps["P"] := { { "PopUp",                   "Style" },;
-                   { "PageChild",               "" },;
-                   { "PortName",                "" },;
-                   { "Parity",                  "" },;
-                   { "ParityReplace",           "" },;
-                   { "PaperSize",               "Appearance" },;
-                   { "PreventFullOpen",         "Behavior" },;
-                   { "PositionRelativeToWindow","Behavior" },;
-                   { "ProportionalLeft",        "Dock" },;
-                   { "ProportionalTop",         "Dock" },;
-                   { "Path",                    "Path" },;
-                   { "Position",                "Position" } }
-
-__aProps["Q"] := {}
-
-__aProps["R"] := { { "RadioCheck",              "Style" },;
-                   { "ReadOnly",                "Style" },;
-                   { "Report",                  "Style" },;
-                   { "ReadOnly",                "" },;
-                   { "Right",                   "" },;
-                   { "RightMargin",             "" },;
-                   { "ReadBufferSize",          "" },;
-                   { "ReadTimeOut",             "" },;
-                   { "ReceivedBytesThreshold",  "" },;
-                   { "RtsEnabled",              "" },;
-                   { "RETRY_Button",            "CommonButtons" },;
-                   { "RestoreDirectory",        "Behavior" },;
-                   { "RTLLayout",               "Behavior" },;
-                   { "ReadOnlyChecked",         "Behavior" },;
-                   { "RemoteIP",                "Connection" },;
-                   { "RemotePort",              "Connection" },;
-                   { "Resource",                "Target Folder" },;
-                   { "Resizable",               "Size" } }
-
-__aProps["S"] := { { "ScrollOnChildFocus",      "Behavior" },;
-                   { "SetAlternate",            "Set" },;
-                   { "SetCentury",              "Set" },;
-                   { "SetCancel",               "Set" },;
-                   { "SetDeleted",              "Set" },;
-                   { "SetDefault",              "Set" },;
-                   { "SetDecimals",             "Set" },;
-                   { "SetDateFormat",           "Set" },;
-                   { "SetEpoch",                "Set" },;
-                   { "SetExact",                "Set" },;
-                   { "SetExclusive",            "Set" },;
-                   { "SetFixed",                "Set" },;
-                   { "SetPath",                 "Set" },;
-                   { "SetSoftseek",             "Set" },;
-                   { "SetUnique",               "Set" },;
-                   { "SetDebug",                "Set" },;
-                   { "SetTypeahead",            "Set" },;
-                   { "SetCursor",               "Set" },;
-                   { "SetConsole",              "Set" },;
-                   { "SetAltfile",              "Set" },;
-                   { "SetDevice",               "Set" },;
-                   { "SetExtra",                "Set" },;
-                   { "SetExtrafile",            "Set" },;
-                   { "SetPrinter",              "Set" },;
-                   { "SetPrintfile",            "Set" },;
-                   { "SetMargin",               "Set" },;
-                   { "SetBell",                 "Set" },;
-                   { "SetConfirm",              "Set" },;
-                   { "SetEscape",               "Set" },;
-                   { "SetInsert",               "Set" },;
-                   { "SetExit",                 "Set" },;
-                   { "SetIntensity",            "Set" },;
-                   { "SetScoreboard",           "Set" },;
-                   { "SetDelimiters",           "Set" },;
-                   { "SetDelimchars",           "Set" },;
-                   { "SetWrap",                 "Set" },;
-                   { "SetMessage",              "Set" },;
-                   { "SetMcenter",              "Set" },;
-                   { "SetScrollbreak",          "Set" },;
-                   { "SetEventmask",            "Set" },;
-                   { "SetVideomode",            "Set" },;
-                   { "SetMblocksize",           "Set" },;
-                   { "SetMfileext",             "Set" },;
-                   { "SetStrictread",           "Set" },;
-                   { "SetOptimize",             "Set" },;
-                   { "SetAutopen",              "Set" },;
-                   { "SetAutorder",             "Set" },;
-                   { "SetAutoshare",            "Set" },;
-                   { "SetCount",                "Set" },;
-                   { "SetLanguage",             "Set" },;
-                   { "SetIdlerepeat",           "Set" },;
-                   { "SetTrace",                "Set" },;
-                   { "SetTracefile",            "Set" },;
-                   { "SetTracestack",           "Set" },;
-                   { "SetFilecase",             "Set" },;
-                   { "SetDircase",              "Set" },;
-                   { "SetDirseparator",         "Set" },;
-                   { "SetErrorloop",            "Set" },;
-                   { "SetOutputsafety",         "Set" },;
-                   { "SetDbflockscheme",        "Set" },;
-                   { "SetBackgroundtasks",      "Set" },;
-                   { "SetTrimfilename",         "Set" },;
-                   { "SetGtmode",               "Set" },;
-                   { "SetBackgroundtick",       "Set" },;
-                   { "SetPrinterjob",           "Set" },;
-                   { "SetHardcommit",           "Set" },;
-                   { "SetForceopt",             "Set" },;
-                   { "SetEol",                  "Set" },;
-                   { "SetErrorlog",             "Set" },;
-                   { "SmallIcon",               "Style" },;
-                   { "Sort",                    "Style" },;
-                   { "SysMenu",                 "Style" },;
-                   { "Shared",                  "" },;
-                   { "StrikeOut",               "" },;
-                   { "SystemCursor",            "" },;
-                   { "ServerType",              "" },;
-                   { "ServiceName",             "" },;
-                   { "StopBits",                "" },;
-                   { "SendUsing",               "" },;
-                   { "SMTPServer",              "" },;
-                   { "SMTPServerPort",          "" },;
-                   { "SMTPAuthenticate",        "" },;
-                   { "SMTPUseSSL",              "" },;
-                   { "SendUserName",            "" },;
-                   { "SendPassword",            "" },;
-                   { "Stretch",                 "Image" },;
-                   { "SelOnlyRep",              "Behavior" },;
-                   { "SunkenText",              "Appearance" },;
-                   { "ShowGrid",                "Appearance" },;
-                   { "ShortCutText",            "Appearance" },;
-                   { "Smooth",                  "Appearance" },;
-                   { "ShadowRow",               "Appearance" },;
-                   { "ShowChevron",             "Appearance" },;
-                   { "ShowHeaders",             "Appearance" },;
-                   { "ShowTabs",                "Appearance" },;
-                   { "ShowSelection",           "Appearance" },;
-                   { "ShowSelectionBorder",     "Appearance" },;
-                   { "Striping",                "Appearance" },;
-                   { "ShowInTaskBar",           "Behavior" },;
-                   { "SystemAnimation",         "Behavior" },;
-                   { "ShowPlacesBar",           "Behavior" },;
-                   { "ShortcutKey",             "Behavior" },;
-                   { "ShowHelp",                "Behavior" },;
-                   { "ShowNewFolderButton",     "Behavior" },;
-                   { "ShowDragging",            "Behavior" },;
-                   { "ShowMode",                "Behavior" },;
-                   { "ShowSelAlways",           "Behavior" },;
-                   { "ShortCut",                "Behavior" },;
-                   { "ShowHelp",                "Behavior" },;
-                   { "ShowReadOnly",            "Behavior" },;
-                   { "ShowProgressBar",         "Behavior" },;
-                   { "ShowMarqueeProgressBar",  "Behavior" },;
-                   { "SqlConnector",            "Connection" },;
-                   { "SolidColor",              "Colors" },;
-                   { "SelBackColor",            "Colors" },;
-                   { "SelForeColor",            "Colors" },;
-                   { "SysFolder",               "Path" },;
-                   { "SelectedPath",            "Path" },;
-                   { "SourcePath",              "Path" },;
-                   { "Source",                  "Target Folder" },;
-                   { "Source",                  "Target Folder" },;
-                   { "Step",                    "Position" },;
-                   { "State",                   "Behavior" },;
-                   { "SelectionHeight",         "Size" } }
-
-__aProps["T"] := { { "TabStop",                 "Style" },;
-                   { "TabOrder",                "Position" },;
-                   { "ThickFrame",              "Style" },;
-                   { "TitleHeight",             "Size" },;
-                   { "Transparent",             "Style" },;
-                   { "ToolWindow",              "Style" },;
-                   { "TopMost",                 "Style" },;
-                   { "Text",                    "Appearance" },;
-                   { "Title",                   "" },;
-                   { "TextShadowColor",         "Colors" },;
-                   { "TitleBackColorActive",    "Colors" },;
-                   { "TitleBackColorInactive",  "Colors" },;
-                   { "TopMargin",               "" },;
-                   { "TextBody",                "" },;
-                   { "TargetName",              "Build" },;
-                   { "ThemeActive",             "Build" },;
-                   { "TargetType",              "Build" },;
-                   { "Theming",                 "Appearance" },;
-                   { "ToolTip",                 "Appearance" },;
-                   { "ToolTipText",             "Appearance" },;
-                   { "ToolTipTitle",            "Appearance" },;
-                   { "TabStripStyle",           "Appearance" },;
-                   { "ToPage",                  "Behavior" },;
-                   { "Title",                   "Behavior" },;
-                   { "TaskBarProgress",         "Appearance" },;
-                   { "TransparentColor",        "Colors" },;
-                   { "TitleBackColor",          "Colors" },;
-                   { "TrailingTextColor",       "Colors" },;
-                   { "TitleForeColor",          "Colors" },;
-                   { "Top",                     "Position" },;
-                   { "TabPosition",             "Position" } }
-
-__aProps["U"] := { { "UpperCase",               "Style" },;
-                   { "UseTabStops",             "Style" },;
-                   { "Underline",               "" },;
-                   { "UseDLL",                  "Build" },;
-                   { "UseIconMain",             "Behavior" },;
-                   { "UseIconFooter",           "Behavior" },;
-                   { "UseCommandLinks",         "Behavior" },;
-                   { "UseCommandLinksNoIcon",   "Behavior" },;
-                   { "UserVariables",           "Object" } }
-
-__aProps["V"] := { { "Vertical",                "Style" },;
-                   { "Visible",                 "Style" },;
-                   { "VertPadding",             "Appearance" },;
-                   { "VertCenter",              "Appearance" },;
-                   { "VertScrollSize",          "Behavior" },;
-                   { "VertScroll",              "Behavior" },;
-                   { "VisitedColor",            "Colors" },;
-                   { "ViewStyle",               "Layout" },;
-                   { "Vertical",                "Layout" },;
-                   { "VerificationFlagChecked", "Behavior" },;
-                   { "VerticalGripper",         "Layout" } }
-
-__aProps["W"] := { { "WantKeyboardInput",       "Style" },;
-                   { "WantReturn",              "Style" },;
-                   { "Weight",                  "" },;
-                   { "WindowMenu",              "" },;
-                   { "WriteBufferSize",         "" },;
-                   { "WriteTimeOut",            "" },;
-                   { "WholeDropDown",           "Appearance" },;
-                   { "WindowsMenu",             "Appearance" },;
-                   { "Wrap",                    "Behavior" },;
-                   { "Width",                   "Size" } }
-
-__aProps["X"] := {}
-__aProps["Y"] := { { "YES_Button",              "CommonButtons" } }
-__aProps["Z"] := {}
-
-RETURN
 
 STATIC FUNCTION BrowseFile( o )
    LOCAL n := o:GetCurSel()-1

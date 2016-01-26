@@ -10,7 +10,7 @@
 //  This source file is an intellectual property of xHarbour.com Inc.                                   *
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
-       
+
 #ifdef VXH_ADS
 
 #include "vxh.ch"
@@ -43,11 +43,28 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS AdsDataTable
+   LOCAL n, xValue
    IF ::__lNew
       ::Append()
+   ELSEIF ::Shared
+      WHILE ! ::RecLock()
+         sleep(1000)
+      ENDDO
    ENDIF
-   AEVAL( ::__aData, {|,n| ::SetData(n) } )
-   IF ::__lNew .AND. ::Shared
+   FOR n := 1 TO LEN( ::Structure )
+       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
+          xValue := ::FieldCtrl[ ::Structure[n][1] ]:GetValue()
+          IF ::Structure[n][2] == "BINARY" .AND. File( xValue )
+             ::File2Blob( xValue, ::Structure[n][1] )
+          ELSE
+             (::Area)->( FieldPut( n, xValue ) )
+          ENDIF
+
+       ELSEIF ::__aData[n] != NIL
+          ::SetData(n)
+       ENDIF
+   NEXT
+   IF ::__lNew .OR. ::Shared
       ::Unlock()
    ENDIF
    ::__lNew := .F.

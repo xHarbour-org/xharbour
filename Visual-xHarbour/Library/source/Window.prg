@@ -109,6 +109,7 @@
 
 static aMessages := {;
                     { WM_SIZE,            "OnSize"            },;
+                    { WM_MOVE,            "OnMove"            },;
                     { WM_KEYDOWN,         "OnKeyDown"         },;
                     { WM_KEYUP,           "OnKeyUp"           },;
                     { WM_DROPFILES,       "OnDropFiles"       },;
@@ -156,7 +157,7 @@ CLASS Window INHERIT Object
    // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
    PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
    PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor ) SET ::SetForeColor(v)
-   PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu )
+   PROPERTY ContextMenu   ROOT "Behavior" GET __ChkComponent( Self, @::xContextMenu ) HELP "ContectMenu that will show on right click"
 
    PROPERTY Left          ROOT "Position" SET ::__SetSizePos( 1, v )
    PROPERTY Top           ROOT "Position" SET ::__SetSizePos( 2, v )
@@ -178,6 +179,8 @@ CLASS Window INHERIT Object
    PROPERTY Text                          SET ::SetWindowText(v)                   DEFAULT ""
    PROPERTY Font
    PROPERTY ToolTip
+
+   PROPERTY AllowDrop                                                              DEFAULT .F. HELP "Enables accepting dropped files from the file system"
 
    METHOD MessageWait()
    METHOD Animate()
@@ -302,6 +305,7 @@ CLASS Window INHERIT Object
    DATA __lKeyDown               EXPORTED INIT .F.
    DATA __PropFilter             EXPORTED INIT {}
    DATA __oDlg                   EXPORTED
+   DATA __hGridBmp               EXPORTED
 
    ACCESS EnumCursor             INLINE ::System:GetEnumCursor()
 
@@ -316,7 +320,7 @@ CLASS Window INHERIT Object
    // ----------------------------------------
 
    DATA Hidden                 EXPORTED INIT .F.
-   DATA FilesDroped            EXPORTED INIT {}
+   DATA DragDrop               EXPORTED INIT {=>}
    DATA VertScrollPos          EXPORTED INIT 0
    DATA HorzScrollPos          EXPORTED INIT 0
    DATA Anchor                 EXPORTED
@@ -475,7 +479,6 @@ CLASS Window INHERIT Object
    METHOD DockIt()
    METHOD UpdateLayout()          INLINE ::PostMessage( WM_SIZE, 0, MAKELONG( ::ClientWidth, ::ClientHeight ) )
 
-   METHOD PaintFocusRect()
    METHOD DockToParent()          INLINE ::Dock:Left   := ::Parent,;
                                          ::Dock:Top    := ::Parent,;
                                          ::Dock:Right  := ::Parent,;
@@ -483,6 +486,7 @@ CLASS Window INHERIT Object
                                          ::DockIt()
 
    METHOD HandleEvent( cEvent )   INLINE ExecuteEvent( cEvent, Self )
+   METHOD DockControls()          INLINE ::OnSize( 0, MAKELPARAM( ::ClientWidth, ::ClientHeight ) )
 
    METHOD SaveValues()
    METHOD RestoreValues()
@@ -1088,6 +1092,10 @@ METHOD Create( oParent ) CLASS Window
       SetWindowTheme( ::hWnd, "", "" )
    ENDIF
 
+   IF ::AllowDrop
+      ::DragAcceptFiles(.T.)
+   ENDIF
+
    ::__SubClass()
 
    nLeft := ::Left
@@ -1161,12 +1169,13 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------
 
-METHOD AddAccelerator( nVirtKey, nKey, nId ) CLASS Window
+METHOD AddAccelerator( nVirtKey, nKey, nId, bAction ) CLASS Window
    LOCAL n
    IF ( n := ASCAN( ::__Accelerators, {|a| a[1]==nVirtKey .AND. a[2]==nKey} ) ) > 0
       ::__Accelerators[n][3] := nId
+      ::__Accelerators[n][4] := bAction
     ELSE
-      AADD( ::__Accelerators, { nVirtKey, nKey, nId } )
+      AADD( ::__Accelerators, { nVirtKey, nKey, nId, bAction } )
    ENDIF
    IF ::Application != NIL .AND. ::__hAccelTable != NIL
       ::Application:DelAccelerators( ::hWnd, ::__hAccelTable )
@@ -1426,35 +1435,29 @@ FUNCTION ExecuteEvent( cEvent, oObj, xParam1, xParam2, xParam3, xParam4, xParam5
    LOCAL cFormEvent, nRet
 
    IF oObj:EventHandler != NIL .AND. HGetPos( oObj:EventHandler, cEvent ) > 0
-      cFormEvent := oObj:EventHandler[ cEvent ]
-      IF ! ( oObj == oObj:Form )
-         IF __objHasMsg( oObj, cFormEvent )
-            nRet := hb_ExecFromArray( oObj, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
-          ELSEIF __objHasMsg( oObj:Form, cFormEvent )
-            nRet := hb_ExecFromArray( oObj:Form, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
-          ELSEIF __objHasMsg( oObj:Parent, cFormEvent )
-            nRet := hb_ExecFromArray( oObj:Parent, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
-          ELSEIF oObj:Parent != NIL .AND. oObj:Parent:__xCtrlName == "TabPage"
-            nRet := hb_ExecFromArray( oObj:Parent:Parent:Form, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+      IF ( cFormEvent := oObj:EventHandler[ cEvent ] ) != NIL
+
+         IF Valtype( cFormEvent ) == "B"
+            RETURN Eval( cFormEvent, oObj, xParam1, xParam2, xParam3, xParam4, xParam5 )
          ENDIF
-       ELSE
-         nRet := hb_ExecFromArray( oObj, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+
+         IF ! ( oObj == oObj:Form )
+            IF __objHasMsg( oObj, cFormEvent )
+               nRet := hb_ExecFromArray( oObj, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+             ELSEIF __objHasMsg( oObj:Form, cFormEvent )
+               nRet := hb_ExecFromArray( oObj:Form, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+             ELSEIF __objHasMsg( oObj:Parent, cFormEvent )
+               nRet := hb_ExecFromArray( oObj:Parent, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+             ELSEIF oObj:Parent != NIL .AND. oObj:Parent:__xCtrlName == "TabPage"
+               nRet := hb_ExecFromArray( oObj:Parent:Parent:Form, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+            ENDIF
+          ELSE
+            nRet := hb_ExecFromArray( oObj, cFormEvent, {oObj, @xParam1, @xParam2, @xParam3, @xParam4, @xParam5} )
+         ENDIF
       ENDIF
    ENDIF
 RETURN nRet
 
-//-----------------------------------------------------------------------------------------------
-METHOD PaintFocusRect( hDC ) CLASS Window
-   LOCAL hOldPen := SelectObject( hDC, ::System:FocusPen )
-   LOCAL hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-   RoundRect( hDC, ::Left-2-::Parent:HorzScrollPos,;
-                   ::Top-2-::Parent:VertScrollPos,;
-                   ::Left+::Width+2-::Parent:HorzScrollPos,;
-                   ::Top+::Height+2-::Parent:VertScrollPos, 4, 4 )
-
-   SelectObject( hDC, hOldPen )
-   SelectObject( hDC, hOldBrush )
-RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 #define WM_THEMECHANGED   0x031A
@@ -1466,14 +1469,25 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnDropFiles( nwParam, nlParam ) CLASS Window
-   LOCAL nFiles, n, cFile
+   LOCAL nFiles, n, cFile, pt := (struct POINT)
    (nlParam)
-   ::FilesDroped := {}
-   nFiles := DragQueryFile( nwParam, 0xFFFFFFFF ) - 1
-   FOR n := 0 TO nFiles
-       DragQueryFile( nwParam, n, @cFile, MAX_PATH )
-       AADD( ::FilesDroped, cFile )
-   NEXT
+
+   nFiles := DragQueryFile( nwParam, 0xFFFFFFFF )
+
+   IF nFiles > 0
+      DragQueryPoint( nwParam, @pt )
+
+      ::DragDrop := {=>}
+      HSetCaseMatch( ::DragDrop, .F. )
+
+      ::DragDrop[ "Files"    ] := {}
+      ::DragDrop[ "Position" ] := pt
+
+      FOR n := 1 TO nFiles
+          DragQueryFile( nwParam, n-1, @cFile, MAX_PATH )
+          AADD( ::DragDrop:Files, cFile )
+      NEXT
+   ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
@@ -2001,32 +2015,29 @@ METHOD OnNCDestroy() CLASS Window
    ::__lInitialized    := .F.
    ::__aDock           := NIL
 
-   IF ::Application != NIL
-      IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd
-         IF ::Application:__hMutex != NIL
-            CloseHandle( ::Application:__hMutex )
-         ENDIF
-         IF ! ::DesignMode
-            PostQuitMessage(0)
-         ENDIF
-      ENDIF
-   ENDIF
    IF ::__TaskBarParent != NIL
       DestroyWindow( ::__TaskBarParent )
+   ENDIF
+
+   IF ! ::DesignMode
+      IF ::Application != NIL
+         IF ::Application:MainForm != NIL .AND. ::Application:MainForm:hWnd == ::hWnd
+            IF ::Application:__hMutex != NIL
+               CloseHandle( ::Application:__hMutex )
+            ENDIF
+            ::Application:Exit()
+         ENDIF
+      ENDIF
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkgnd( hDC ) CLASS Window
-   LOCAL nRet, n
-
+   LOCAL nRet
    IF ::BkBrush != NIL
       ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
       nRet := 1
-   ENDIF
-   IF ::Application:EditBoxFocusBorder .AND. ! Empty( ::Children ) .AND. ( n := aScan( ::Children, {|o|o:hWnd==GetFocus() .AND. o:ClsName == "Edit" } ) ) > 0
-      ::Children[n]:PaintFocusRect( hDC )
    ENDIF
 RETURN nRet
 
@@ -2130,11 +2141,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_MOVING
               nRet := ExecuteEvent( "OnMoving", Self )
               ODEFAULT nRet TO ::OnMoving( LoWord( nlParam ), HiWord( nlParam ) )
-              EXIT
-
-         CASE WM_MOVE
-              nRet := ExecuteEvent( "OnMove", Self )
-              ODEFAULT nRet TO ::OnMove( nwParam, nlParam )
               EXIT
 
          CASE WM_CHILDACTIVATE
@@ -2849,17 +2855,19 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                     ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
                  ENDIF
                ELSEIF nMsg >= WM_APP .AND. nMsg <= 49151
+                 TRY
+                    DO CASE
+                       CASE nMsg == WM_VXH_SHOWMODE
+                            ::ShowMode := ::__GetShowMode()
 
-                 DO CASE
-                    CASE nMsg == WM_VXH_SHOWMODE
-                         ::ShowMode := ::__GetShowMode()
+                       CASE nMsg == WM_VXH_DESTRUCTOBJECT
+                            hb_gcAll( .t. )
 
-                    CASE nMsg == WM_VXH_DESTRUCTOBJECT
-                         hb_gcAll( .t. )
-
-                    OTHERWISE
-                         ODEFAULT nRet TO ::OnSystemMessage( nMsg, nwParam, nlParam)
-                 ENDCASE
+                       OTHERWISE
+                            ODEFAULT nRet TO ::OnSystemMessage( nMsg, nwParam, nlParam)
+                    ENDCASE
+                 CATCH
+                 END
                ELSE
                  nRet := ExecuteEvent( "OnMessage", Self )
                  ODEFAULT nRet TO ::OnMessage( nMsg, nwParam, nlParam)
@@ -2959,15 +2967,6 @@ METHOD OnSetFocus() CLASS Window
             ::Parent:OnHScroll( SB_THUMBTRACK, ::Parent:HorzScrollPos + ( aRect[1] ), 0 )
          ENDIF
       ENDIF
-   ENDIF
-
-   IF ::Application:EditBoxFocusBorder .AND. ::ClsName == "Edit"
-      aRect := ::GetRectangle()
-      aRect[1] -= 3 + ::Parent:HorzScrollPos
-      aRect[2] -= 3 + ::Parent:VertScrollPos
-      aRect[3] += 3 + ::Parent:HorzScrollPos
-      aRect[4] += 3 + ::Parent:VertScrollPos
-      _InvalidateRect( ::Parent:hWnd, aRect )
    ENDIF
 RETURN nRet
 
@@ -4370,7 +4369,7 @@ CLASS WinForm INHERIT Window
    ACCESS TopMost              INLINE ::AlwaysOnTop
    ASSIGN TopMost(l)           INLINE ::AlwaysOnTop := l
 
-   DATA Border                 EXPORTED INIT .F.
+   DATA Border                 EXPORTED INIT 0
 
    //DATA Visible                EXPORTED  INIT .T.
    DATA MaskBitmap             EXPORTED
@@ -4381,6 +4380,8 @@ CLASS WinForm INHERIT Window
    DATA __lLoading             EXPORTED INIT .F.
    DATA __aPostCreateProc      EXPORTED INIT {}
    DATA OnWMClose              EXPORTED
+
+   DATA bChanged               EXPORTED
 
    ACCESS Form                 INLINE Self
 
@@ -4436,7 +4437,7 @@ CLASS WinForm INHERIT Window
    METHOD __OnClose()
    METHOD OnSysCommand()
    METHOD SetInstance()
-   METHOD Redraw()                          INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD Redraw( aRect )                   INLINE ::RedrawWindow( , aRect, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
    METHOD InvalidateRect(a,l)               INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
    METHOD __CreateProperty()
@@ -4863,10 +4864,11 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS Win
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __PaintBakgndImage( hDC ) CLASS WinForm
+METHOD __PaintBakgndImage( hDC, lBitBlt ) CLASS WinForm
    LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush
 
    DEFAULT hDC TO ::Drawing:hDC
+   DEFAULT lBitBlt TO .F.
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -4886,6 +4888,10 @@ METHOD __PaintBakgndImage( hDC ) CLASS WinForm
    ENDIF
 
    ::BkBrush   := CreatePatternBrush( hMemBitmap )
+
+   //IF lBitBlt
+   //   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   //ENDIF
 
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
@@ -5177,7 +5183,6 @@ METHOD SetOpacity( n ) CLASS WinForm
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-
 METHOD SetImageList() CLASS WinForm
    ::xImageList := __ChkComponent( Self, ::xImageList )
    __BrowseChildren( Self )

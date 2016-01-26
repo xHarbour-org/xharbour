@@ -85,10 +85,13 @@ METHOD Init( oOwner ) CLASS Component
       ENDIF
    ENDIF
 
+   IF ::Owner != NIL .AND. ::Owner:DesignMode
+      __SetInitialValues( Self )
+   ENDIF
+
    ::__CreateProperty()
 
    IF ::Owner != NIL .AND. ::Owner:DesignMode
-      __SetInitialValues( Self )
       IF oOwner:TreeItem == NIL
          ::Application:ObjectTree:Set( oOwner )
       ENDIF

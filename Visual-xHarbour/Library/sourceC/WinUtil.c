@@ -65,6 +65,8 @@
 #define _bcopy memcpy
 #define MAX_PATH_LEN    254
 
+#define SCI_SETPROPERTY 4004
+
 typedef struct
 {
    BOOL bRoot;
@@ -1184,31 +1186,22 @@ HB_FUNC( _GETCLASSNAME )
 HB_FUNC ( DRAWGRID )
 {
    HDC hDC          = (HDC) hb_parnl(1);
-   HDC hMemDC       = CreateCompatibleDC( hDC );
-   HBITMAP hBitmap  = (HBITMAP) hb_parnl(2);
-   int xGrid        = hb_parni(3);
-   int yGrid        = hb_parni(4);
-   int nWidth       = hb_parni(5);
-   int nHeight      = hb_parni(6);
-   int j;
-   DWORD dwraster     = hb_parnl(7);
-   HBITMAP hOldBmp;
-
-   hOldBmp = (HBITMAP) SelectObject( hMemDC, hBitmap );
-
-   j=0;
+   int xGrid        = hb_parni(2);
+   int yGrid        = hb_parni(3);
+   int nWidth       = hb_parni(4);
+   int nHeight      = hb_parni(5);
+   COLORREF cColor  = (COLORREF) hb_parnl(6);
+   int j=0;
    while (j < nHeight)
    {
       int i=0;
       while (i < nWidth)
       {
-         BitBlt( hDC, i, j, xGrid, yGrid, hMemDC, 0, 0, dwraster );
+         SetPixel( hDC, i, j, cColor );
          i += xGrid;
       }
       j += yGrid;
    }
-   SelectObject( hMemDC, hOldBmp );
-   DeleteDC( hMemDC );
 }
 
 
@@ -4486,7 +4479,7 @@ HB_FUNC( SENDEDITOR )
 
 HB_FUNC( SCISETPROPERTY )
 {
-   SendMessage( (HWND) hb_parnl(1), 4004, (WPARAM) hb_parc(2), (LPARAM)(LPCTSTR) hb_parc(3) );
+   SendMessage( (HWND) hb_parnl(1), SCI_SETPROPERTY, (WPARAM) hb_parc(2), (LPARAM)(LPCTSTR) hb_parc(3) );
 }
 
 HB_FUNC( SCIGETFOLD )

@@ -42,7 +42,7 @@ CLASS ToolStripContainer INHERIT Control
    PROPERTY Height       SET ::__SetSizePos( 4, v ) DEFAULT 0   NOTPUBLIC
 
    DATA ImageList        EXPORTED
-   DATA Border           EXPORTED INIT .T.
+   DATA Border           EXPORTED INIT WS_BORDER
    DATA Dock             EXPORTED
    DATA Anchor           EXPORTED
    DATA Cursor           EXPORTED
@@ -326,7 +326,7 @@ CLASS ToolStrip INHERIT Control
 
    ACCESS __lMoveable INLINE ::Parent:ClsName != "ToolStripContainer"
 
-   DATA Border         EXPORTED INIT .T.
+   DATA Border         EXPORTED INIT WS_BORDER
    //DATA Dock           EXPORTED
    DATA Anchor         EXPORTED
    DATA XPTheming      EXPORTED INIT .T.
@@ -1390,7 +1390,7 @@ CLASS ToolStripItem INHERIT Control
 
    // REMOVED PROPERTIES
    DATA Cursor             EXPORTED
-   DATA Border             EXPORTED  INIT .T.
+   DATA Border             EXPORTED  INIT WS_BORDER
    DATA Dock               EXPORTED
    DATA Anchor             EXPORTED
    DATA XPTheming          EXPORTED  INIT .T.
@@ -2036,15 +2036,30 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __SetSubMenu( Self, hMenu )
-   LOCAL mii, oItem
+   LOCAL mii, oItem, lEnabled
 
    FOR EACH oItem IN ::Children
        IF oItem:__pObjPtr != NIL
+/*
+          IF ValType( oItem:Enabled ) == "B"
+             mii := (struct MENUITEMINFO)
+             mii:cbSize := mii:SizeOf()
+             mii:fMask  := MIIM_STATE
+             mii:fState := IIF( Eval( oItem:Enabled ), MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED )
+             VIEW SetMenuItemInfo( ::hMenu, oItem:Id, .F., mii )
+          ENDIF
+*/
           EXIT
        ENDIF
 
        IF LEN( oItem:Children ) > 0
           oItem:__hMenu := CreateMenu()
+       ENDIF
+
+       IF ValType( oItem:Enabled ) == "B"
+          lEnabled := Eval( oItem:Enabled )
+        ELSE
+          lEnabled := oItem:Enabled
        ENDIF
 
        mii := {=>}
@@ -2055,7 +2070,7 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        ENDIF
        mii:wID           := oItem:Id
        mii:fType         := MFT_OWNERDRAW
-       mii:fState        := IIF( oItem:Enabled, MFS_ENABLED, MFS_DISABLED )
+       mii:fState        := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED )
        mii:hbmpChecked   := 0
        mii:hbmpUnchecked := 0
        mii:dwTypeData    := oItem:Caption
@@ -2447,7 +2462,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                   ENDIF
               NEXT
 
-              IF ( nItem := __GetHotItem( oMenu, nCurr, ms_wParam ) ) > 0
+              IF nCurr != NIL .AND. ( nItem := __GetHotItem( oMenu, nCurr, ms_wParam ) ) > 0
                  oItem := oMenu:Children[ nItem ]
 
                  IF s_lOpenMenu
@@ -3221,7 +3236,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    mii:hSubMenu      := oItem:__hMenu
    mii:wID           := oItem:Id
    mii:fType         := MFT_OWNERDRAW
-   mii:fState        := IIF( oItem:Enabled, MFS_ENABLED, MFS_DISABLED )
+   mii:fState        := IIF( ValType( oItem:Enabled ) == "B", Eval( oItem:Enabled ), IIF( oItem:Enabled, MFS_ENABLED, MFS_DISABLED ) )
    mii:dwItemData    := oItem:__pObjPtr := __ObjPtr( oItem )
 
    __InsertMenuStripItem( oParent:__hMenu, oItem:Position-1, .T., mii:fMask, mii:hSubMenu, mii:wID, oItem:Caption, mii:dwItemData, mii:fState )

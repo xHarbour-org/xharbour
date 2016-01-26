@@ -28,13 +28,19 @@ static s_cVersion, s_cCopyright
 #include "winuser.ch"
 #include "fileio.ch"
 
+#include "hbxml.ch"
+
+#define MXML_STYLE_INDENT        1
+#define MXML_STYLE_THREESPACES   4
+
+
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE      0x80000002
 #define HKEY_CURRENT_USER       0x80000001
 
 #define KEY_ALL_ACCESS              (0xF003F)
 
-#define VXH_Version      "8.5"
+#define VXH_Version      "2016"
 #define VXH_BuildVersion "350"
 
 #define MCS_ARROW    10
@@ -50,8 +56,11 @@ static s_cVersion, s_cCopyright
 #define DG_ALIGNSELECTION  7
 
 #define __XHDN_URL__ "http://www.xHarbour.com/xHDN"
-#define __NEWS_URL__ "http://www.xHarbour.com/News_VXH.asp"
+#define __NEWS_URL__ "http://www.xharbour.com/blog/"
+
 #xtranslate NTRIM( < n > ) = > ALLTRIM( STR( < n > ) )
+
+#define TITLE_COLOR RGB(0,122,204)
 
 #define __GENVERSIONINFO__
 INIT PROCEDURE __VXH_Start
@@ -120,7 +129,8 @@ CLASS IDE INHERIT Application
 
    DATA Project               EXPORTED
    DATA SourceEditor          EXPORTED
-   DATA DebugWindow           EXPORTED
+   DATA ResultPanel           EXPORTED
+   DATA FindInFilesList       EXPORTED
 
    DATA DebuggerPanel         EXPORTED
 
@@ -163,7 +173,6 @@ CLASS IDE INHERIT Application
 
    DATA CurCursor             EXPORTED
 
-   DATA StartPageBrushes      EXPORTED
    DATA aoLinks               EXPORTED INIT {}
 
    DATA AddOnPath             EXPORTED
@@ -206,7 +215,6 @@ METHOD Init( ... ) CLASS IDE
    HSetCaseMatch( ::EditorProps, .F. )
 
    ::__Vxh := .T.
-   ::StartPageBrushes := StartPageBrushes( NIL )
 
    REQUEST DBFNTX, DBFDBT, DBFCDX, DBFFPT, ADS, RMDBFCDX, SQLRDD, SR_ODBC, SR_MYSQL, SR_FIREBIRD, SQLEX
 
@@ -259,7 +267,7 @@ METHOD Init( ... ) CLASS IDE
    ::ShowRulers           := ::IniFile:ReadInteger( "General", "ShowRulers", 1 ) == 1
    ::ShowDocking          := ::IniFile:ReadInteger( "General", "ShowDocking", 0 ) == 1
    ::ShowObjExplorerPanel := ::IniFile:ReadInteger( "General", "ShowObjExplorerPanel", 1 )== 1
-   ::ShowObjectProps      := ::IniFile:ReadInteger( "General", "ShowObjectProps", 0 )== 1
+   ::ShowObjectProps      := ::IniFile:ReadInteger( "General", "ShowObjectProps", 1 )== 1
 
    ::ShowGrid             := ::IniFile:ReadInteger( "General", "ShowGrid", 0 )
    ::RulerType            := ::IniFile:ReadInteger( "General", "RulerType", 1 )
@@ -380,11 +388,13 @@ METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLA
                     '</html>' + CRLF
    Sender:Navigate( "About:blank" )
    Sender:Document:Write( cBuffer )
+   view "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 RETURN NIL
 
 METHOD OnDocumentComplete( Sender ) CLASS IDE_MainForm
-   Sender:Document:Body:scroll := "no"
-   Sender:Document:Body:Style:OverflowY := "hidden"
+//   Sender:Document:Body:scroll := "no"
+//   Sender:Document:Body:Style:Overflow := "hidden"
+   Sender:Navigate("javascript:window.scroll(0,13);")
 RETURN NIL
 
 
@@ -531,8 +541,8 @@ METHOD Init() CLASS IDE_MainForm
     ::Caption := "Visual xHarbour " + VXH_Version
    #endif
 
-   ::Application:ColorTable:TitleBackColorActive   := RGB( 255, 230, 151 )
-   ::Application:ColorTable:TitleBackColorInactive := RGB(  69,  89, 124 )
+   ::Application:ColorTable:TitleBackColorActive   := TITLE_COLOR //RGB( 255, 230, 151 )
+   ::Application:ColorTable:TitleBackColorInactive := TITLE_COLOR //RGB(  69,  89, 124 )
    ::Application:ColorTable:Clean()
 
    ::BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd
@@ -872,6 +882,16 @@ METHOD Init() CLASS IDE_MainForm
             :Action           := {|o| IIF( o:Enabled, ::Application:Project:Find(), ) }
             :Create()
          END
+         WITH OBJECT ::Application:Props[ "SearchFindFilesItem" ] := MenuStripItem( :this )
+            :Caption          := "Find &in files"
+            :ImageIndex       := ::System:StdIcons:Find
+            :ShortCutText     := "Ctrl+F5"
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := VK_F5
+            :Enabled          := .T.
+            :Action           := {|o| IIF( o:Enabled, ::Application:Project:FindInFiles(), ) }
+            :Create()
+         END
          WITH OBJECT ::Application:Props[ "SearchReplaceItem" ] := MenuStripItem( :this )
             :Caption          := "&Replace"
             :ImageIndex       := ::System:StdIcons:Replace
@@ -1010,17 +1030,15 @@ METHOD Init() CLASS IDE_MainForm
          WITH OBJECT ::Application:Props[ "ViewToolBoxItem" ] := MenuStripItem( :this )
             :Caption    := "&ToolBox"
             :BeginGroup := .T.
-            :Checked    := .T.
-            :Action     := {|o| IIF( o:Checked,;
-                                   ( o:Checked := .F., ::Application:ToolBox:Hide() ),;
-                                   ( o:Checked := .T., ::Application:ToolBox:Show() ) ) }
+            :Checked    := .F.
+            :Action     := {|o| o:Checked := ! o:Checked, ::Application:ToolBox:Visible := o:Checked }
             :Create()
          END
 
-         WITH OBJECT ::Application:Props[ "ViewDebugBuildItem" ] := MenuStripItem( :this )
-            :Caption    := "&Build Panel"
+         WITH OBJECT ::Application:Props[ "ViewResultPanelItem" ] := MenuStripItem( :this )
+            :Caption    := "&Results Panel"
             :Checked    := .F.
-            :Action     := {|o| o:Checked := ! o:Checked, ::Application:DebugWindow:Visible := o:Checked }
+            :Action     := {|o| o:Checked := ! o:Checked, ::Application:ResultPanel:Visible := o:Checked }
             :Create()
          END
 
@@ -1071,6 +1089,17 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Shift := .T.
             :ShortCutKey:Key   := ASC( "D" )
+            :Create()
+         END
+
+         WITH OBJECT ::Application:Props[ "ViewObjectProps" ] := MenuStripItem( :this )
+            :Checked      := ::Application:ShowObjExplorerPanel
+            :Caption      := "Show Quick Object Properties"
+            :Action       := <|o|
+                               o:Checked := ( ::Application:ShowObjectProps := ! ::Application:ShowObjectProps )
+                               ::Application:MainForm:MessageBox( "Changes will be applied the next time you run Visual xHarbour", "Object Explorer", MB_ICONEXCLAMATION )
+                               ::Application:IniFile:WriteInteger( "General", "ShowObjectProps", IIF( ::Application:ShowObjectProps, 1, 0 ) )
+                             >
             :Create()
          END
 
@@ -1579,6 +1608,8 @@ METHOD Init() CLASS IDE_MainForm
       :Text             := "ToolBox"
 
       :Border           := WS_BORDER
+      :BorderColor      := TITLE_COLOR
+
       :AllowUndock      := .T.
       :AllowClose       := .T.
       :OnWMClose        := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewToolBoxItem" ]:Checked := .F. ), o:Redock() ) }
@@ -1599,6 +1630,7 @@ METHOD Init() CLASS IDE_MainForm
       :HasLines         := .F.
       :DisableDragDrop  := .T.
 
+      :Visible          := .F.
       :Create()
    END
 
@@ -1637,11 +1669,12 @@ METHOD Init() CLASS IDE_MainForm
             :AllowUndock   := .T.
             //:DragItems     := .T.
             :Text          := "Object Explorer"
+            :Border        := WS_BORDER
+            :BorderColor   := TITLE_COLOR
             :Height        := 200
             :Dock:Left     := :Parent
             :Dock:Bottom   := :Parent
             :Dock:Right    := :Parent
-            :Border        := .T.
             :ExStyle       := 0
             :HasButtons    := .T.
             :ShowSelAlways := .T.
@@ -1663,6 +1696,8 @@ METHOD Init() CLASS IDE_MainForm
          :Height      := 400
          :BackColor        := ::System:CurrentScheme:ToolStripPanelGradientEnd
          :OnWMThemeChanged := {|o| o:BackColor := ::System:CurrentScheme:ToolStripPanelGradientEnd }
+         :Border        := WS_BORDER
+         :BorderColor   := TITLE_COLOR
          :Create()
 
          WITH OBJECT TabPage( :this )
@@ -1684,7 +1719,7 @@ METHOD Init() CLASS IDE_MainForm
 
                   :Create()
 
-                  WITH OBJECT Label( :this )
+                  WITH OBJECT ::Application:Props[ "ObjPropsCtrlName" ] := Label( :this )
                      :Left       := 5
                      :Top        := 5
                      :Width      := 70
@@ -1693,15 +1728,15 @@ METHOD Init() CLASS IDE_MainForm
                      :Create()
                   END
 
-                  WITH OBJECT Label( :this )
+                  WITH OBJECT ::Application:Props[ "ObjPropsLabel2" ] := Label( :this )
                      :Left       := 90
                      :Top        := 5
-                     :Width      := :Parent:ClientWidth - ::Label1:Width
+                     :Width      := :Parent:ClientWidth - ::Application:Props[ "ObjPropsCtrlName" ]:Width
                      :Font:Bold  := .T.
                      :Create()
                   END
 
-                  WITH OBJECT Label( :this )
+                  WITH OBJECT ::Application:Props[ "ObjPropsLabel3" ] := Label( :this )
                      :Left       := 5
                      :Top        := 25
                      :Width      := 70
@@ -1710,30 +1745,30 @@ METHOD Init() CLASS IDE_MainForm
                      :Create()
                   END
 
-                  WITH OBJECT Label( :this )
+                  WITH OBJECT ::Application:Props[ "ObjPropsLabel4" ] := Label( :this )
                      :Left       := 90
                      :Top        := 25
-                     :Width      := :Parent:ClientWidth - ::Label1:Width
+                     :Width      := :Parent:ClientWidth - ::Application:Props[ "ObjPropsCtrlName" ]:Width
                      :Font:Bold  := .T.
                      :Create()
                   END
 
-                  WITH OBJECT Label( :this )
-                     :Width      := :Parent:ClientWidth - ::Label1:Width
-                     :Dock:Left  := :Parent
-                     :Dock:Top   := :Parent
-                     :Font:Bold  := .T.
-                     :Visible    := .F.
+                  WITH OBJECT ::Application:Props[ "ObjPropsLabel5" ] := Label( :this )
+                     :Width        := :Parent:ClientWidth - ::Application:Props[ "ObjPropsCtrlName" ]:Width
+                     :Dock:Left    := :Parent
+                     :Dock:Top     := :Parent
+                     :Dock:Margins := "5"
+                     :Font:Bold    := .T.
                      :Create()
                   END
 
-                  WITH OBJECT Label( :this )
-                     :Dock:Left   := :Parent
-                     :Dock:Top    := ::Label5
-                     :Dock:Right  := :Parent
-                     :Dock:Bottom := :Parent
-                     :Font:Bold   := .F.
-                     :Visible     := .F.
+                  WITH OBJECT ::Application:Props[ "ObjPropsLabel6" ] := Label( :this )
+                     :Dock:Left    := :Parent
+                     :Dock:Top     := ::Application:Props[ "ObjPropsLabel5" ]
+                     :Dock:Right   := :Parent
+                     :Dock:Bottom  := :Parent
+                     :Dock:Margins := "5,0"
+                     :Font:Bold    := .F.
                      :Create()
                   END
                END
@@ -1843,21 +1878,21 @@ METHOD Init() CLASS IDE_MainForm
       :Create()
    END
 
-   WITH OBJECT ::Application:DebugWindow := Panel( Self )
+   WITH OBJECT ::Application:ResultPanel := Panel( Self )
       :Width         := 680
-      :Name          := "DebugWindow"
       :Height        := 150
       :Dock:Left     := ::Application:ToolBox
       :Dock:Bottom   := ::Application:StatusBar
       :Dock:Right    := ::Application:Props[ "ObjectManagerPanel" ]
       :Dock:Margin   := 3
       :Visible       := .F.
-      :Text          := "Build"
+      :BorderColor   := TITLE_COLOR
+      :Text          := "Results"
       :AllowClose    := .T.
-      :OnWMClose     := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F. ), o:Redock() ) }
+      :OnWMClose     := {|o| IIF( o:IsDocked, (o:Hide(), ::Application:Props[ "ViewResultPanelItem" ]:Checked := .F. ), o:Redock() ) }
       :Create()
 
-      WITH OBJECT DebugTab( :this )
+      WITH OBJECT ::Application:Props[ "DebugTab" ] := DebugTab( :this )
          :TabPosition      := 4
          :Dock:Left        := :Parent
          :Dock:Bottom      := :Parent
@@ -1889,13 +1924,10 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
             WITH OBJECT ::Application:ErrorView := ErrorListView( :this )
                :Border        := 0
-               :Dock:Left     := :Parent
-               :Dock:Top      := :Parent
-               :Dock:Right    := :Parent
-               :Dock:Bottom   := :Parent
                :ExStyle       := 0
                :ViewStyle     := 1
                :FullRowSelect := .T.
+               :DockToParent()
                :Create()
                ListViewColumn( :this, "Source File", 150,, .T. )
                ListViewColumn( :this, "Line",         70,, .T. )
@@ -1909,16 +1941,30 @@ METHOD Init() CLASS IDE_MainForm
             :Create()
             WITH OBJECT ::Application:BuildLog := EditBox( :this )
                :Border         := 0
-               :Dock:RightMargin := -1
-               :Dock:Left      := :Parent
-               :Dock:Top       := :Parent
-               :Dock:Right     := :Parent
-               :Dock:Bottom    := :Parent
                :MultiLine      := .T.
                :ReadOnly       := .T.
                :HorzScroll     := .T.
                :VertScroll     := .T.
+               :Dock:RightMargin := -1
+               :DockToParent()
                :Create()
+            END
+         END
+
+         WITH OBJECT TabPage( :this )
+            :Caption := "Find In Files"
+            :Create()
+            WITH OBJECT ::Application:FindInFilesList := FindInFilesListView( :this )
+               :Border        := 0
+               :ExStyle       := 0
+               :ViewStyle     := 1
+               :FullRowSelect := .T.
+               :ShowSelAlways := .T.
+               :DockToParent()
+               :Create()
+               ListViewColumn( :this, "File", 150,, .T. )
+               ListViewColumn( :this, "Line",  70, LVCFMT_RIGHT, .T. )
+               ListViewColumn( :this, "Text", 700,, .T. )
             END
          END
       END
@@ -1926,7 +1972,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    WITH OBJECT Splitter( Self )
-      :Owner := ::Application:DebugWindow
+      :Owner := ::Application:ResultPanel
       :Create()
    END
 
@@ -1935,9 +1981,10 @@ METHOD Init() CLASS IDE_MainForm
       :Width          := 680
       :Height         := 200
       :Text           := "Debugger"
-      :Border         := .T.
+      :Border         := WS_BORDER
+      :BorderColor    := TITLE_COLOR
       :Dock:Left      := ::Application:ToolBox
-      :Dock:Bottom    := ::Application:DebugWindow
+      :Dock:Bottom    := ::Application:ResultPanel
       :Dock:Margin    := 3
       :Dock:Right     := ::Application:Props[ "ObjectManagerPanel" ]
       :BackColor      := ::System:CurrentScheme:ToolStripPanelGradientEnd
@@ -1953,26 +2000,22 @@ METHOD Init() CLASS IDE_MainForm
 
    // TabControl
    WITH OBJECT ::Application:MainTab := TabControl( Self )
-      :Dock:Margin := 2
+      :Dock:Margin := 3
+      :Dock:RightMargin := 4
+      :Border      := WS_BORDER
+      :BorderColor := TITLE_COLOR
       :Dock:Left   := ::Application:ToolBox
       :Dock:Top    := ::Application:Props[ "MainToolBar" ]
       :Dock:Right  := ::Application:Props[ "ObjectManagerPanel" ]
       :Dock:Bottom := ::Application:DebuggerPanel
+      :BackColor := TITLE_COLOR
+      :ForeColor := RGB(255,255,255)
+      :ColorInactiveHeader := .T.
 
       :OnSelChanged := <|n,x,y|
                         (n)
                         ::Application:Project:EditReset( IIF( y > 3, 1, 0 ) )
                         ::Application:ToolBox:Enabled    := y > 3
-
-                        //IF y > 3
-                        //   ::Application:Project:CurrentForm:Redraw()
-                        //   IF x == 3 .AND. y == 4
-                        //      ::Application:ObjectManager:Parent:Select()
-                        //   ENDIF
-                        // ELSEIF y == 3
-                        //   ::Application:FileExplorer:Parent:Select()
-                        //ENDIF
-
                         ::EnableSearchMenu( y == 3 )
                         IF y == 3
                            ::Application:SourceEditor:SetTimer( 1001, 2000 )
@@ -1982,79 +2025,10 @@ METHOD Init() CLASS IDE_MainForm
                        >
       :Create()
 
-      WITH OBJECT ::Application:Props[ "StartTabPage" ] := StartTabPage( :this )
-         :Text         := "Start Page"
-         :TabBackColor := RGB(0,122,204)
-         :TabTextColor := RGB(255,255,255)
-         :TopMargin    := 2
-         :Create()
-
-         WITH OBJECT ::Application:Props[ "StartTabPagePanel" ] := StartPagePanel( :this )
-            :ImageList  := ::Application:StandardBar:ImageList
-            :BackColor  := C_WHITE
-            :Left       := 10
-            :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
-            :Width      := ::Application:StartPageBrushes:RecentBk[2]
-            :Height     := ::Application:StartPageBrushes:RecentBk[3]
-            :Cursor     := IDC_HAND
-            :HorzScroll := .T.
-            :VertScroll := .T.
-            :Create()
-
-            WITH OBJECT LinkLabel( :this )
-               :ImageIndex  := 23
-               :Caption     := "Open a Project"
-               :Left        := 30
-               :Top         := :Parent:Height - 45
-               :Action      := {|| ::Application:Project:Open() }
-               :Font:Bold   := .F.
-               :Create()
-            END
-
-            WITH OBJECT LinkLabel( :this )
-               :ImageIndex  := 21
-               :Caption     := "Create a New Project"
-               :Left        := 30
-               :Top         := :Parent:Height - 25
-               :Transparent := .T.
-               :Action      := {|| ::Application:Project:NewProject() }
-               :Font:Bold   := .F.
-               :Create()
-            END
-         END
-
-         WITH OBJECT StartPagePanel( :this )
-            :nPanel     := 1
-            :ImageList  := ::Application:StandardBar:ImageList
-            :BackColor  := C_WHITE
-            :Left       := 300
-            :Top        := ::Application:StartPageBrushes:HeaderBkGnd[3]+10
-            :Width      := ::Application:StartPageBrushes:NewsBk[2]
-            :Height     := ::Application:StartPageBrushes:NewsBk[3]
-            :Cursor     := IDC_HAND
-            :HorzScroll := .T.
-            :VertScroll := .T.
-            :Create()
-
-            WITH OBJECT WebBrowser( :this )
-               :ControlParent := .T.
-               :Left          := 6
-               :Top           := 28
-               :Width         := :Parent:Width - 12
-               :height        := :Parent:height - 76
-               :Url           := __NEWS_URL__
-               :EventHandler[ "NavigateError" ] := "OnNavigateError"
-               :EventHandler[ "DocumentComplete" ] := "OnDocumentComplete"
-               :Create()
-            END
-         END
-      END
+      ::Application:Props[ "StartTabPage" ] := StartTabPage( :this )
 
       WITH OBJECT XHDN_Page( :this )
          :Text    := "xHarbour Developers Network"
-         :TabBackColor := RGB(0,122,204)
-         :TabTextColor := RGB(255,255,255)
-         :TopMargin    := 2
          :Create()
 
          WITH OBJECT :ActiveX := WebBrowser( :this )
@@ -2071,9 +2045,6 @@ METHOD Init() CLASS IDE_MainForm
          :BackColor      := ::Application:IniFile:ReadColor( "Colors", "BackGround", ::System:Color:White )
          :OnWMShowWindow := {|| OnShowEditors() }
          :OnWMSetFocus   := {|| ::Application:SourceEditor:SetFocus() }
-         :TabBackColor   := RGB(0,122,204)
-         :TabTextColor   := RGB(255,255,255)
-         :TopMargin      := 2
          :Create()
 
          WITH OBJECT ::Application:SourceEditor := SourceEditor( :this )
@@ -2084,6 +2055,9 @@ METHOD Init() CLASS IDE_MainForm
             :Enabled     := .F.
             :Create()
          END
+
+         :TabBackColor := ::Application:SourceEditor:ColorBackground
+         :TabTextColor := ::Application:SourceEditor:ColorNormalText
       END
 
       WITH OBJECT ::Application:DesignPage := FormEditor( :this )
@@ -2091,9 +2065,6 @@ METHOD Init() CLASS IDE_MainForm
          :BackColor      := ::System:Color:White
          :Enabled        := .F.
          :OnWMShowWindow := {|o| OnShowDesigner(o) }
-         :TabBackColor   := RGB(0,122,204)
-         :TabTextColor   := RGB(255,255,255)
-         :TopMargin      := 2
          :Create()
       END
 
@@ -2161,87 +2132,140 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 
 CLASS StartTabPage INHERIT TabPage
-   METHOD OnEraseBkGnd()
-   METHOD OnPaint()
-   METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
+   DATA oPanel
+   METHOD Init() CONSTRUCTOR
 ENDCLASS
 
-METHOD OnPaint( hDC ) CLASS StartTabPage
-   hDC := ::BeginPaint()
-   ::OnEraseBkGnd( hDC )
-   ::EndPaint()
-RETURN 0
+METHOD Init( oParent ) CLASS StartTabPage
+   Super:Init( oParent )
+   ::Text := "Start Page"
+   ::TabBackColor := 2236448
+   ::TabTextColor := RGB(255,255,255)
+   ::BackColor    := 2236448
+   ::Create()
 
-METHOD OnEraseBkGnd( hDC ) CLASS StartTabPage
-   LOCAL hMemBitmap, hOldBitmap, hMemDC
+   WITH OBJECT ( LABEL( Self ) )
+      WITH OBJECT :Font
+         :FaceName             := "Tahoma"
+         :Quality              := 1
+         :PointSize            := 18
+      END
+      :ForeColor            := 16777215
+      :Left                 := 16
+      :Top                  := 24
+      :Width                := 257
+      :Height               := 33
+      :Text                 := "Visual xHarbour 2016"
+      :Create()
+   END //LABEL
 
-   hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
-   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+   WITH OBJECT ( LINE( Self ) )
+      :Left                 := 16
+      :Top                  := 80
+      :Color                := 11119017
+      :Lenght               := 265
+      :Sunken               := .F.
+      :Create()
+   END //LINE
 
-   _FillRect( hMemDC, { -::HorzScrollPos, 0, ::ClientWidth, ::ClientHeight}, GetStockObject( WHITE_BRUSH ) )
-   _FillRect( hMemDC, { -::HorzScrollPos, 0, MAX(::ClientWidth,::OriginalRect[3]), ::Application:StartPageBrushes:HeaderBkGnd[3]}, ::Application:StartPageBrushes:HeaderBkGnd[1] )
+   WITH OBJECT ( LABEL( Self ) )
+      WITH OBJECT :Font
+         :FaceName  := "Verdana"
+         :Quality   := 1
+         :PointSize := 10
+      END
+      :ForeColor := 16777215
+      :Left      := 16
+      :Top       := 104
+      :Width     := 57
+      :Height    := 22
+      :Text      := "Start"
+      :Create()
+   END //LABEL
 
-   PicturePaint( ::Application:StartPageBrushes:HeaderLogo[1], hMemDC, -::HorzScrollPos, 0 )
-   PicturePaint( ::Application:StartPageBrushes:BodyBkGnd[1], hMemDC,;
-                                                            MAX(::ClientWidth,::OriginalRect[3])-::Application:StartPageBrushes:BodyBkGnd[2] - ::HorzScrollPos,;
-                                                            MAX(::ClientHeight,::OriginalRect[4])-::Application:StartPageBrushes:BodyBkGnd[3] - ::VertScrollPos )
+   WITH OBJECT ( LINE( Self ) )
+      :Name      := "Line2"
+      :Left      := 16
+      :Top       := 200
+      :Color     := 11119017
+      :Lenght    := 265
+      :Sunken    := .F.
+      :Create()
+   END //LINE
 
-   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+   WITH OBJECT ( LinkLabel( Self ) )
+      WITH OBJECT :Font
+         :PointSize    := 10
+         :Underline    := .F.
+      END
+      :LinkColor       := 14456844
+      :VisitedColor    := 14456844
+      :ActiveLinkColor := 14456844
+      :FocusRect       := .F.
+      :Left            := 16
+      :Top             := 128
+      :Width           := 81
+      :Height          := 16
+      :Text            := "New Project"
+      :Action          := {|| ::Application:Project:NewProject() }
+      :Create()
+   END //LABEL
 
-   SelectObject( hMemDC,  hOldBitmap )
-   DeleteObject( hMemBitmap )
-   DeleteDC( hMemDC )
-RETURN 1
+   WITH OBJECT ( LinkLabel( Self ) )
+      WITH OBJECT :Font
+         :PointSize    := 10
+         :Underline    := .F.
+      END
+      :LinkColor       := 14456844
+      :VisitedColor    := 14456844
+      :ActiveLinkColor := 14456844
+      :FocusRect       := .F.
+      :Left            := 16
+      :Top             := 152
+      :Width           := 81
+      :Height          := 16
+      :Text            := "Open Project"
+      :Action          := {|| ::Application:Project:Open() }
+      :Create()
+   END //LABEL
 
-//-------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------------
+   WITH OBJECT ( LABEL( Self ) )
+      WITH OBJECT :Font
+         :FaceName  := "Verdana"
+         :Quality   := 1
+         :PointSize := 10
+      END
 
-CLASS StartPagePanel INHERIT Panel
-   DATA nPanel INIT 0
-   METHOD OnEraseBkGnd()
-   METHOD OnPaint()
-   METHOD OnSize(w,l)  INLINE ::Super:OnSize( w, l ), ::InvalidateRect(), NIL
-   METHOD Create()
-ENDCLASS
+      :ForeColor := 16777215
+      :Left      := 16
+      :Top       := 224
+      :Width     := 57
+      :Height    := 22
+      :Text      := "Recent"
+      :Create()
+   END //LABEL
 
-METHOD OnPaint() CLASS StartPagePanel
-   LOCAL hDC := ::BeginPaint()
-   ::OnEraseBkGnd( hDC )
-   ::EndPaint()
-RETURN 0
+   WITH OBJECT WebBrowser( Self )
+      :ControlParent   := .T.
+      :Left            := 297
+      :Top             := 0
+      :Width           := 300
+      :Height          := 649
+      :Dock:Left       := Self
+      :Dock:LeftMargin := 297
+      :Dock:Top        := Self
+      :Dock:Bottom     := Self
+      :Dock:Right      := Self
+      :Url             := __NEWS_URL__
+      :BrowserEmulation:= 0x2AF8
 
-METHOD Create() CLASS StartPagePanel
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hDC := ::Drawing:hDC
+      :EventHandler[ "NavigateError" ] := "OnNavigateError"
+      :EventHandler[ "DocumentComplete" ] := "OnDocumentComplete"
+      :Create()
+      :Silent := .T.
+   END
+RETURN Self
 
-   ::Super:Create()
-
-   IF ::BkBrush != NIL
-      DeleteObject( ::BkBrush )
-      ::BkBrush := NIL
-   ENDIF
-
-   hMemDC     := CreateCompatibleDC( hDC )
-   hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
-   hOldBitmap := SelectObject( hMemDC, hMemBitmap)
-
-   IF ::nPanel == 0
-      PicturePaint( ::Application:StartPageBrushes:RecentBk[1], hMemDC, 0, 0 )
-    ELSE
-      PicturePaint( ::Application:StartPageBrushes:NewsBk[1], hMemDC, 0, 0 )
-   ENDIF
-
-   ::BkBrush := CreatePatternBrush( hMemBitmap )
-
-   SelectObject( hMemDC,  hOldBitmap )
-   DeleteObject( hMemBitmap )
-   DeleteDC( hMemDC )
-RETURN NIL
-
-METHOD OnEraseBkGnd( hDC ) CLASS StartPagePanel
-   _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
-RETURN 1
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -2408,7 +2432,7 @@ CLASS Project
    METHOD SaveAs()
    METHOD Close()
    METHOD Open()
-   METHOD GenerateControl()
+   METHOD GenerateForm()
    METHOD GenerateProperties()
    METHOD GenerateChild()
    METHOD Build()
@@ -2456,6 +2480,7 @@ CLASS Project
    METHOD Undo()
    METHOD ReDo()
    METHOD Find()
+   METHOD FindInFiles() INLINE ::Find( .T. )
    METHOD Replace()
 
    METHOD SetAction()
@@ -2575,8 +2600,16 @@ METHOD NewProject() CLASS Project
    ENDIF
    ::aImages := {}
 
+   IF ! ::Application:ToolBox:Visible
+      ::Application:ToolBox:Visible := .T.
+      ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
+      ::Application:Props[ "StartTabPage" ]:DockControls()
+      ::Application:DoEvents()
+   ENDIF
+
    ::AppObject := Application():Init( .T. )
    ::AppObject:DesignMode := .T.
+   ::AppObject:__SetColorScheme(,.T.)
 
    __SetInitialValues( ::AppObject )
 
@@ -2608,6 +2641,7 @@ METHOD NewProject() CLASS Project
    ::Application:ProjectPrgEditor := Source( ::Application:SourceEditor )
    ::Application:ProjectPrgEditor:SetText( cProject )
    ::Application:ProjectPrgEditor:EmptyUndoBuffer()
+   ::Application:ProjectPrgEditor:FileName := ::Properties:Name +"_Main.prg"
    ::Application:ProjectPrgEditor:Modified := .T.
 
    ::Application:Props[ "NewFormProjItem"   ]:Enabled := .T.
@@ -2624,6 +2658,7 @@ METHOD NewProject() CLASS Project
    ::Application:EditorPage:Select()
    ::Application:SourceEditor:SetFocus()
    ::EditReset(1)
+
    EVAL( ::Application:MainTab:OnSelChanged, NIL, NIL, 3)
 
    ::Application:Props[ "ComboSelect" ]:Reset()
@@ -2634,16 +2669,17 @@ METHOD NewProject() CLASS Project
    ::Application:ProjectPrgEditor:TreeItem:Select()
    ::Application:CloseMenu:Enabled := .T.
    ::Application:SaveAsMenu:Enabled := .T.
+
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 
-METHOD SourceTabChanged( nCur, lTree ) CLASS Project
+METHOD SourceTabChanged( nCur, lTree, lMarkPrev ) CLASS Project
    IF nCur <= ::Application:SourceEditor:DocCount
       DEFAULT lTree TO .T.
-      ::Application:SourceEditor:Source := ::Application:SourceEditor:aDocs[ nCur ]
+      ::Application:SourceEditor:aDocs[ nCur ]:Select( lMarkPrev )
       IF ::Application:SourceEditor:Source:TreeItem != NIL
-         ::Application:FileExplorer:lSkipSelect := ! lTree
+         //::Application:FileExplorer:lSkipSelect := ! lTree
          ::Application:SourceEditor:Source:TreeItem:Select()
       ENDIF
       ::Application:Project:EditReset()
@@ -2934,6 +2970,7 @@ METHOD TabOrder( oBtn ) CLASS Project
       ::CurrentForm:Refresh()
       ::CurrentForm:Selected := ACLONE( ::aRealSelection )
       ::aRealSelection := NIL
+      ::CurrentForm:__lModified := .T.
    ENDIF
    WITH OBJECT ::CurrentForm
       :CtrlOldPt := NIL
@@ -3212,9 +3249,10 @@ METHOD SetEditMenuItems() CLASS Project
    ::Application:Props:EditRedoItem:Enabled := ::Application:Props:EditRedoBttn:Enabled := ::Application:SourceEditor:Source:CanRedo()
 RETURN Self
 
-METHOD Find() CLASS Project
+METHOD Find( lInFiles ) CLASS Project
    LOCAL cSel
-   IF ::Application:SourceEditor:IsWindowVisible()
+   DEFAULT lInFiles TO .F.
+   IF ::Application:SourceEditor:IsWindowVisible() .OR. lInFiles
       IF ::ReplaceDialog != NIL
          ::ReplaceDialog:Close()
       ENDIF
@@ -3224,6 +3262,8 @@ METHOD Find() CLASS Project
 
       ::FindDialog := FindTextDialog( ::Application:SourceEditor )
       ::FindDialog:Owner := ::Application:SourceEditor
+      ::FindDialog:Owner:FindInFiles := lInFiles
+
       cSel := ::Application:SourceEditor:Source:GetSelText()
       IF ! EMPTY( cSel )
          ::__cFindText := cSel
@@ -3309,7 +3349,7 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
       ::LoadForm( oWin:Cargo, @aErrors,, .T., oWin )
 
       IF !EMPTY( aErrors )
-         ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+         ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .T.
          ::Application:ErrorView:ProcessErrors( aErrors )
          ::Application:ErrorView:Parent:Select()
          ::Application:Yield()
@@ -3544,7 +3584,7 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:SourceEditor:Caption := ""
    IF lCloseErrors
       ::Application:DebugBuild:ResetContent()
-      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+      ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .F.
    ENDIF
    ::Application:CloseMenu:Enabled := .F.
 
@@ -3751,10 +3791,16 @@ METHOD Open( cProject ) CLASS Project
       ::ResetQuickOpen( cProject )
       RETURN Self
    ENDIF
-
-   IF ::Application:DebugWindow:Visible
+   IF ::Application:ResultPanel:Visible
       ::Application:ErrorView:ResetContent()
-      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+      ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .F.
+   ENDIF
+
+   IF ! ::Application:ToolBox:Visible
+      ::Application:ToolBox:Visible := .T.
+      ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
+      ::Application:Props[ "StartTabPage" ]:DockControls()
+      ::Application:DoEvents()
    ENDIF
 
    DEFAULT cProject TO ""
@@ -3858,6 +3904,8 @@ METHOD Open( cProject ) CLASS Project
 
    ::AppObject := Application():Init( .T. )
    ::AppObject:DesignMode := .T.
+   ::AppObject:__SetColorScheme(,.T.)
+
    __SetInitialValues( ::AppObject )
 
    oWait:Position := 30
@@ -3914,7 +3962,7 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 80
 
    IF !EMPTY( aErrors )
-      ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+      ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .T.
       ::Application:ErrorView:ProcessErrors( aErrors )
       ::Application:ErrorView:Parent:Select()
       ::Application:Yield()
@@ -4219,7 +4267,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                cValue    := SUBSTR( cLine, nPos )
 
                IF !__objHasMsg( oObj, cProperty )
-                  Throw( ErrorNew( "BASE", EG_NOVARMETHOD, 1005, oObj:Name + ":" + cProperty, "INVALID PROPERTY NAME", {xValue} ) )
+                  Throw( ErrorNew( "BASE", EG_NOVARMETHOD, 1005, cProperty, "INVALID PROPERTY NAME", {xValue} ) )
                ENDIF
 
                IF UPPER( LEFT( cValue, 23 ) ) == "APPLICATION:MAINWINDOW:"
@@ -4574,7 +4622,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm, oItem
+   LOCAL n, cWindow := "", oFile, oForm, oItem, oFrm, oXML, oEvents
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
 
@@ -4706,8 +4754,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       cWindow := '#include "vxh.ch"' + CRLF +;
                  "//---------------------------------------- End of system code ----------------------------------------//" + CRLF + CRLF
 
-      cWindow += ::GenerateControl( ::AppObject, "__", "Application", , , @aChildEvents, @nInsMetPos, .F. )
+//      oFrm  := TXmlDocument():new()
+
+      cWindow += ::GenerateForm( ::AppObject, "__", "Application", , @aChildEvents, @nInsMetPos, .F., oFrm )
       cWindow += CRLF
+
+//      oFrm:Write( cSourcePath + "\" + ::Properties:Name + "_XFM.prg", MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
 
       oFile:FileBuffer := cWindow
       oFile:Save()
@@ -4745,11 +4797,29 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
        ENDIF
 
        IF ::Forms[n]:__lModified .OR. lForce
+          aChildEvents := {}
+          (oXML,oEvents)
 
+
+//          oFrm := TXmlDocument():new()
+//          oXML := ::Forms[n]:GetXML( oFrm:oRoot, @aChildEvents )
+
+//          oEvents := TXmlNode():new( , "Event_Definition" )
+//          FOR EACH cEvent IN aChildEvents
+//              oEvents:AddBelow( TXmlNode():new( HBXML_TYPE_DATA,,, cEvent ) )
+//          NEXT
+//          oXML:NextInTree():InsertBefore( oEvents )
+//          oFrm:Write( cSourcePath + "\" + ::Forms[n]:Name + ".fxm", MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
+
+
+          oFrm := NIL
+          oXML := NIL
+          oEvents := NIL
           aChildEvents := {}
 
-          cWindow := ::GenerateControl( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), .F., n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom )
+          //oFrm  := TXmlDocument():new()
 
+          cWindow := ::GenerateForm( ::Forms[n], "", IIF( ::Forms[n]:MDIChild, "MDIChildWindow", IIF( ::Forms[n]:Modal, "Dialog", IIF( AT( "Window", ::Forms[n]:Name ) > 0, "Window", "WinForm" ) ) ), n, @aChildEvents, @nInsMetPos, ::Forms[n]:lCustom, oFrm )
           cChildEvents := ""
           FOR EACH cEvent IN aChildEvents
               IF AT( "METHOD "+cEvent+"()", cWindow+cChildEvents ) == 0
@@ -4759,6 +4829,8 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
           cText := SUBSTR( cWindow, nInsMetPos )
           cWindow := SUBSTR( cWindow, 1, nInsMetPos ) + cChildEvents + cText
+
+          //oFrm:Write( cSourcePath + "\" + ::Forms[n]:Name + ".frm", MXML_STYLE_INDENT | MXML_STYLE_THREESPACES )
 
           oFile := CFile( ::Forms[n]:Name + ".xfm" )
           oFile:Path := cSourcePath
@@ -4992,13 +5064,17 @@ FUNCTION AddResources( cExe, aResources )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
-   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild
-   ( cColon )
+METHOD GenerateChild( oCtrl, nTab, aChildEvents, cParent, oNode ) CLASS Project
+   LOCAL cText := "", oChild, Topic, Event, n, cProp, cChild, oObj
+
    IF !oCtrl:__CustomOwner
+      IF oNode != NIL
+         oObj := TXmlNode():new( , oCtrl:__xCtrlName )
+      ENDIF
+
       cText := SPACE( nTab ) + "WITH OBJECT ( " + IIF( oCtrl:ClassName == "CUSTOMCONTROL", UPPER( oCtrl:__xCtrlName ), oCtrl:ClassName ) + "( " + cParent + " ) )" + CRLF
 
-      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
+      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent, oObj )
 
       IF !Empty( oCtrl:Events )
          FOR EACH Topic IN oCtrl:Events
@@ -5014,7 +5090,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
       IF !oCtrl:__lCreateAfterChildren
          cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
          IF oCtrl:ClsName == "AtlAxWin"
-            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
+            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent, oObj )
             cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
          ENDIF
       ENDIF
@@ -5024,7 +5100,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
       IF oCtrl:Children != NIL
          FOR EACH oChild IN oCtrl:Children
              IF oChild:__xCtrlName != "DataGridHeader"
-                cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":", ":this", n )
+                cChild += ::GenerateChild( oChild, IIF( oCtrl:ClassName == "CUSTOMCONTROL", nTab, nTab+3 ), @aChildEvents, ":this", oObj )
              ENDIF
              n++
          NEXT
@@ -5036,7 +5112,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
       IF oCtrl:__lCreateAfterChildren
          cProp += SPACE( nTab+3 ) + ":Create()" + CRLF
          IF oCtrl:ClsName == "AtlAxWin"
-            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent )
+            ::GenerateProperties( oCtrl, nTab+3, ":",,, oCtrl:__OleVars, @cProp, cParent, oObj )
             cProp += SPACE( nTab+3 ) + ":Configure()" + CRLF
          ENDIF
       ENDIF
@@ -5048,8 +5124,13 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
       ENDIF
 
     ELSE
+
+      IF oNode != NIL
+         oObj := TXmlNode():new( , IIF( oCtrl:__OriginalName == NIL, oCtrl:Name, oCtrl:__OriginalName ) )
+      ENDIF
+
       cText := SPACE( nTab ) + "WITH OBJECT ::" + IIF( oCtrl:__OriginalName == NIL, oCtrl:Name, oCtrl:__OriginalName ) + CRLF
-      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent )
+      cProp := ::GenerateProperties( oCtrl, nTab + 3, ":",,,,, cParent, oObj )
 
       IF !Empty( oCtrl:Events )
          FOR EACH Topic IN oCtrl:Events
@@ -5070,7 +5151,7 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
 
          FOR EACH oChild IN oCtrl:Children
              IF oChild:__xCtrlName != "DataGridHeader" .AND. !oChild:__CustomOwner
-                cText += ::GenerateChild( oChild, nTab+3, @aChildEvents, ":", ":this", n )
+                cText += ::GenerateChild( oChild, nTab+3, @aChildEvents, ":this", oObj )
              ENDIF
              n++
          NEXT
@@ -5081,18 +5162,22 @@ METHOD GenerateChild( oCtrl, nTab, aChildEvents, cColon, cParent ) CLASS Project
       n := 1
       FOR EACH oChild IN oCtrl:Children
           IF oChild:__xCtrlName != "DataGridHeader" .AND. oChild:__CustomOwner
-             cText += ::GenerateChild( oChild, nTab, @aChildEvents, ":", ":this", n )
+             cText += ::GenerateChild( oChild, nTab, @aChildEvents, ":this", oObj )
           ENDIF
           n++
       NEXT
 
    ENDIF
+   IF oNode != NIL
+      oNode:addBelow( oObj )
+   ENDIF
+
 RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cText, cParent ) CLASS Project
-   LOCAL aProperties, aProperty, cProp, xValue1, cProps, xValue2
-   LOCAL lParent, cResImg, n, cArray, x
+METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cText, cParent, oObj ) CLASS Project
+   LOCAL aProperties, aProperty, cProp, xValue1, cProps, xValue2, oProp
+   LOCAL lParent, cResImg, n, cArray, x, oValue, cXMLValue, cXMLProp
 
    DEFAULT cPrev TO ""
    DEFAULT cText TO ""
@@ -5164,12 +5249,15 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                 __ChkComponent( xValue1:Form, @xValue2 )
              ENDIF
              IF !( xValue1 == xValue2 )
+                cXMLProp := cProp
                 IF VALTYPE(xValue1) == "O" .AND. __ObjHasMsg( xValue1, "Name" ) .AND. !EMPTY( xValue1:Name )
 
                    IF UPPER( LEFT( xValue1:Name, 9 ) ) != "::SYSTEM:"
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp(xValue1:Name)+ CRLF
+                      cXMLValue := ValToPrgExp(xValue1:Name)
                     ELSE
                       cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + xValue1:Name + CRLF
+                      cXMLValue := xValue1:Name
                    ENDIF
 
                  ELSEIF ( cProp == "Icon" .OR. cProp == "ImageName" .OR. cProp == "BitmapMask") .AND. VALTYPE( xValue1 ) == "C" .AND. ! oCtrl == ::AppObject
@@ -5187,8 +5275,10 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             cResImg := "_"+UPPER( STRTRAN( cResImg, " " ) )
                          ENDIF
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := { " + ValToPrgExp( xValue1 ) + "," + ValToPrgExp(cResImg) + " }"+ CRLF
+                         cXMLValue := "{" + ValToPrgExp( xValue1 ) + "," + ValToPrgExp(cResImg) + "}"
                        ELSE
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := { " + ValToPrgExp( xValue1 ) + ", }"+ CRLF
+                         cXMLValue := "{" + ValToPrgExp( xValue1 ) + ",}"
                       ENDIF
                    ENDIF
 
@@ -5197,12 +5287,16 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
 
                       IF cPrev == "Dock" .OR. cPrev == "Anchor"
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + IIF( xValue1:hWnd == oCtrl:Owner:Parent:hWnd, cColon + "Owner:Parent", "::" + xValue1:Name ) + CRLF
+                         cXMLValue := IIF( xValue1:hWnd == oCtrl:Owner:Parent:hWnd, cColon + "Owner:Parent", "::" + xValue1:Name )
+
                        ELSEIF cPrev == "MDIClient" .AND. ( cProp == "AlignLeft" .OR. cProp == "AlignTop" .OR. cProp == "AlignRight" .OR. cProp == "AlignBottom" )
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp( xValue1:Name ) + CRLF
+                         cXMLValue := ValToPrgExp( xValue1:Name )
 
                        ELSE
                          IF cProp == "Owner"
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := ::" + xValue1:Name + CRLF
+                            cXMLValue := "::"+xValue1:Name
                           ELSE
                             lParent := .F.
                             IF __clsParent( xValue1:ClassH, "COMPONENT" ) .OR. xValue1:ClsName IN { "FreeImageRenderer", "Font" }
@@ -5216,7 +5310,11 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             ENDIF
 
                             IF lParent
-                               cProps := ::GenerateProperties( xValue1, nTab+3, ":", cProp,,,,cParent )
+
+                               cXMLValue := NIL
+                               oProp := TXmlNode():new( , cProp )
+
+                               cProps := ::GenerateProperties( xValue1, nTab+3, ":", cProp,,,,cParent, oProp )
 
                                IF UPPER(cProp) == "BACKGROUNDIMAGE"
                                   cProp := "BackgroundImage := FreeImageRenderer( "+cParent+" )"
@@ -5225,6 +5323,10 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                                   cText += SPACE( nTab ) + "WITH OBJECT " + cColon + cProp + CRLF
                                   cText += cProps
                                   cText += SPACE( nTab ) + "END" + CRLF + CRLF
+
+                                  IF oObj != NIL
+                                     oObj:addBelow( oProp )
+                                  ENDIF
                                ENDIF
                             ENDIF
                          ENDIF
@@ -5233,13 +5335,20 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                       IF cProp IN {"Caption","Text"}
                          IF xValue1 != NIL .AND. Left( xValue1, 1 ) == "\"
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp( SubStr( xValue1, 2 ) ) + CRLF
+                            cXMLValue := ValToPrgExp( SubStr( xValue1, 2 ) )
+
                          ELSEIF xValue1 != NIL .AND. Left( xValue1, 1 ) == "("
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + xValue1 + CRLF
+                            cXMLValue := xValue1
+
                          ELSE
                             cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + ValToPrgExp( xValue1 ) + CRLF
+                            cXMLValue := ValToPrgExp( xValue1 )
+
                          ENDIF
                        ELSEIF VALTYPE( xValue1 ) != "A"
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + IIF( cProp == "FaceName", '"' + STRTRAN( xValue1, CHR(0) ) + '"', ValToPrgExp( xValue1 ) ) + CRLF
+                         cXMLValue := IIF( cProp == "FaceName", '"' + STRTRAN( xValue1, CHR(0) ) + '"', ValToPrgExp( xValue1 ) )
 
                        ELSEIF oCtrl:__xCtrlName == "MemoryTable" .OR. cProp == "Resources" .OR. ( cProp == "Structure" .AND. oCtrl:__xCtrlName == "MemoryDataTable" )
                          IF VALTYPE( xValue1 ) == "A"
@@ -5256,9 +5365,17 @@ METHOD GenerateProperties( oCtrl, nTab, cColon, cPrev, cProperty, hOleVars, cTex
                             cArray := ValToPrg( xValue1 )
                          ENDIF
                          cText += SPACE( nTab ) + cColon + PadR( cProp, MAX( LEN(cProp)+1, 20 ) ) + " := " + cArray + CRLF
+                         cXMLValue := cArray
                       ENDIF
                    ENDIF
                 ENDIF
+
+                IF oObj != NIL .AND. cXMLProp != NIL .AND. cXMLValue != NIL
+                   oValue := TXmlNode():new( HBXML_TYPE_TAG, cXMLProp, NIL, cXMLValue )
+                   oObj:addBelow( oValue )
+                ENDIF
+
+
              ENDIF
 
           ENDIF
@@ -5295,7 +5412,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
       ENDIF
    ENDIF
 
-   nBkHeight := 35
+   nBkHeight := 250
    // Reset StartPage and Open Dropdown menu
 
    FOR n := 1 TO LEN( aEntries )
@@ -5308,20 +5425,25 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
              oItem := :Children[n]
           ENDIF
        END
-       oItem:Caption := aEntries[n]
-       oItem:Action  := {|o| ::Application:Project:Open( o:Caption ) }
+       oItem:Text   := aEntries[n]
+       oItem:Action := {|o| ::Application:Project:Open( o:Caption ) }
 
        IF lLink
           x := RAT( "\", aEntries[n] )
           IF LEN( ::Application:aoLinks ) < n
-             oLink := LinkLabel( ::Application:Props[ "StartTabPagePanel" ] )
-             oLink:ImageIndex   := 32
-             oLink:Caption      := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
-             oLink:Left         := 30
-             oLink:Top          := nBkHeight + 2
-             oLink:Url          := aEntries[n]
-             oLink:Tooltip:Text := aEntries[n]
-             oLink:Action       := {|o| ::Application:Project:Open( o:Url ) }
+             oLink := LinkLabel( ::Application:Props[ "StartTabPage" ] )
+             oLink:ImageIndex      := 32
+             oLink:Caption         := SUBSTR( aEntries[n], x + 1, LEN( aEntries[n] )-x-4 )
+             oLink:Left            := 16
+             oLink:Top             := nBkHeight + 2
+             oLink:Url             := aEntries[n]
+             oLink:Tooltip:Text    := aEntries[n]
+             oLink:LinkColor       := 14456844
+             oLink:VisitedColor    := 14456844
+             oLink:ActiveLinkColor := 14456844
+             oLink:FocusRect       := .F.
+             oLink:Font:Underline  := .F.
+             oLink:Action          := {|o| ::Application:Project:Open( o:Url ) }
              oLink:Create()
              oLink:UpdateWIndow()
              AADD( ::Application:aoLinks, oLink )
@@ -5331,14 +5453,15 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
              oLink:Url          := aEntries[n]
              oLink:Tooltip:Text := aEntries[n]
           ENDIF
-       ENDIF
 
-       nBkHeight := oLink:Top + oLink:Height
-       IF nBkHeight > oLink:Parent:Height-( (oLink:Height*3 )*1.5)
-          lLink := .F.
+          nBkHeight := oLink:Top + oLink:Height
+          IF nBkHeight >= ::Application:Props[ "StartTabPage" ]:Height-oLink:Height
+             lLink := .F.
+          ENDIF
        ENDIF
    NEXT
    ::Application:IniFile:Write( "Recent", aEntries )
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -5381,7 +5504,7 @@ METHOD Run( lRunOnly ) CLASS Project
                   ShellExecute( GetActiveWindow(), "open", cExe, ::Properties:Parameters, , SW_SHOW )
                ENDIF
 
-               ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .F.
+               ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .F.
             ENDIF
 
           ELSEIF ::Properties:TargetType == 4
@@ -5473,7 +5596,7 @@ METHOD Build( lForce, lLinkOnly ) CLASS Project
       FERASE( cExe )
    ENDIF
 
-   ::Application:DebugWindow:Visible := ::Application:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+   ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .T.
 
    ::Application:ErrorView:ResetContent()
 
@@ -5729,7 +5852,7 @@ FUNCTION GUI_ErrorGrid( oError, cLog )
       AADD( aErrors, { cFile, "0", "I/O Error", cDesc } )
    ENDIF
 
-   oApp:DebugWindow:Visible := oApp:Props[ "ViewDebugBuildItem" ]:Checked := .T.
+   oApp:ResultPanel:Visible := oApp:Props[ "ViewResultPanelItem" ]:Checked := .T.
    oApp:Yield()
    oApp:ErrorView:ProcessErrors( aErrors )
    oApp:ErrorView:Parent:Select()
@@ -5744,11 +5867,10 @@ FUNCTION xBuild_GUI_SETERROR()
 RETURN .T.
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, nInsMetPos, lCustom ) CLASS Project
+METHOD GenerateForm( oWnd, cPrefix, cClsName, nID, aChildEvents, nInsMetPos, lCustom, oFrmDoc ) CLASS Project
    LOCAL cText
    LOCAL oChild, Event, n, cResImg, Topic, oCtrl, nPos
-   LOCAL cProperty, cChar, aImg
-   ( lChildren )
+   LOCAL cProperty, cChar, aImg, oForm, oProp
 
    cText := "//------------------------------------------------------------------------------------------------------------------------------------" + CRLF
 
@@ -5771,6 +5893,8 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
       ENDIF
       oWnd:Name := cProperty
    ENDIF
+
+   oForm := TXmlNode():new( , cClsName )
 
    cText += "CLASS "+ cPrefix + STRTRAN( oWnd:Name, " ", "_" ) + " INHERIT " + IIF( !lCustom, cClsName, "CustomControl" ) + CRLF
    cText += "   // Components declaration" + CRLF
@@ -5860,7 +5984,10 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
        ENDIF
 
        cText += "   WITH OBJECT ( " + oChild:__xCtrlName + "( Self ) )" + CRLF
-       cText += ::GenerateProperties( oChild, 6, ":",,,,, ":This" )
+
+       oProp := TXmlNode():new( , oChild:__xCtrlName )
+       cText += ::GenerateProperties( oChild, 6, ":",,,,, ":This", oProp )
+       oForm:addBelow( oProp )
 
        IF !Empty( oChild:Events )
           FOR EACH Topic IN oChild:Events
@@ -5898,7 +6025,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
        nPos := 1
        FOR EACH oCtrl IN oChild:Children
-           cText += ::GenerateChild( oCtrl, 6, @aChildEvents, ":", ":this", nPos )
+           cText += ::GenerateChild( oCtrl, 6, @aChildEvents, ":this" )
            nPos++
        NEXT
 
@@ -5906,10 +6033,8 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
    NEXT
 
    cText += "   // Properties declaration" + CRLF
-
-   cText += ::GenerateProperties( oWnd, 3, "::",,,,, "Self" )
+   cText += ::GenerateProperties( oWnd, 3, "::",,,,, "Self", oForm /*oProp*/ )
    cText += CRLF
-
    cText += "   ::Create()" + CRLF + CRLF
 
    cText += "   // Populate Children" + CRLF
@@ -5936,7 +6061,7 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
 
              cText += "   " + cPrefix + cProperty + "( Self )" + CRLF
            ELSE
-             cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
+             cText += ::GenerateChild( oChild, 3, @aChildEvents, "Self", oForm /*oCtrls*/ )
           ENDIF
           nPos++
       NEXT
@@ -5956,10 +6081,14 @@ METHOD GenerateControl( oWnd, cPrefix, cClsName, lChildren, nID, aChildEvents, n
       cText += "   // Populate Children" + CRLF
       nPos := 1
       FOR EACH oChild IN oWnd:Children
-          cText += ::GenerateChild( oChild, 3, @aChildEvents, "::", "Self", nPos )
+          cText += ::GenerateChild( oChild, 3, @aChildEvents, "Self", oForm /*oCtrls*/ )
           nPos++
       NEXT
       cText += "RETURN Self" + CRLF + CRLF
+   ENDIF
+
+   IF oFrmDoc != NIL
+      oFrmDoc:oRoot:addBelow( oForm )
    ENDIF
 RETURN cText
 
@@ -6741,69 +6870,9 @@ RETURN 0
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
-CLASS StartPageBrushes
-   DATA HeaderBkGnd  EXPORTED INIT {,,}
-   DATA HeaderLogo   EXPORTED INIT {,,}
-   DATA BodyBkGnd    EXPORTED INIT {,,}
-   DATA RecentBk     EXPORTED INIT {,,}
-   DATA NewsBk       EXPORTED INIT {,,}
-   METHOD Init() CONSTRUCTOR
-   METHOD Destroy()
-ENDCLASS
-
-METHOD Init() CLASS StartPageBrushes
-   LOCAL aSiz, hPict := LoadBitmap( GetModuleHandle(), "HEADERBK" )
-   aSiz := GetBmpSize( hPict )
-   ::HeaderBkGnd[1] := CreatePatternBrush( hPict )
-   ::HeaderBkGnd[2] := aSiz[1]
-   ::HeaderBkGnd[3] := aSiz[2]
-   DeleteObject( hPict )
-
-   hPict := PictureLoadFromResource( GetModuleHandle(), "HEADERLOGO", "JPG" )
-   aSiz := PictureGetSize( hPict )
-   ::HeaderLogo[1] := hPict
-   ::HeaderLogo[2] := aSiz[1]
-   ::HeaderLogo[3] := aSiz[2]
-
-   hPict := PictureLoadFromResource( GetModuleHandle(), "BODYBKGND", "GIF" )
-   aSiz := PictureGetSize( hPict )
-   ::BodyBkGnd[1] := hPict
-   ::BodyBkGnd[2] := aSiz[1]
-   ::BodyBkGnd[3] := aSiz[2]
-
-   hPict := PictureLoadFromResource( GetModuleHandle(), "RECENTBK", "JPG" )
-   aSiz := PictureGetSize( hPict )
-   ::RecentBk[1] := hPict
-   ::RecentBk[2] := aSiz[1]
-   ::RecentBk[3] := aSiz[2]
-
-   hPict := PictureLoadFromResource( GetModuleHandle(), "NEWSBK", "JPG" )
-   aSiz := PictureGetSize( hPict )
-   ::NewsBk[1] := hPict
-   ::NewsBk[2] := aSiz[1]
-   ::NewsBk[3] := aSiz[2]
-RETURN Self
-
-METHOD Destroy() CLASS StartPageBrushes
-   DeleteObject( ::HeaderBkGnd[1] )
-   PictureRemove( ::HeaderLogo[1] )
-   PictureRemove( ::BodyBkGnd[1] )
-   PictureRemove( ::RecentBk[1] )
-   PictureRemove( ::NewsBk[1] )
-RETURN Self
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------------------
-
 CLASS AboutVXH INHERIT Dialog
    DATA Panel      EXPORTED
-   DATA LinkLabel1 EXPORTED
    DATA BetaLabel  EXPORTED
-
-   DATA Red        EXPORTED INIT 255
-   DATA Green      EXPORTED INIT 255
-   DATA Blue       EXPORTED INIT 255
 
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
@@ -6824,7 +6893,7 @@ METHOD Init() CLASS AboutVXH
 RETURN Self
 
 METHOD OnInitDialog() CLASS AboutVXH
-   LOCAL oBtn, oLabel, n, aDev := { "Augusto R. Infante", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
+   LOCAL oLabel, n, aDev := { "Tom Lucas", "Phil Krylov", "Ron Pinkas", "Patrick Mast" }
 
    WITH OBJECT PictureBox( Self )
       :Dock:Margin := 0
@@ -6851,18 +6920,11 @@ METHOD OnInitDialog() CLASS AboutVXH
 
    END
 
-   WITH OBJECT ( oBtn := Button( Self ) )
-      :Dock:Bottom := Self
-      :Dock:Left   := Self
-      :Caption     := "&OK"
-      :Id          := IDCANCEL
-      :Create()
-   END
-
    WITH OBJECT ( LINKLABEL( Self ) )
       :Left           := 2
       :Dock:Bottom    := :Parent
       :Dock:Right     := :Parent
+      :Dock:Margin    := 5
       :Width          := 90
       :Height         := 15
       :FocusRect      := .F.
@@ -6874,11 +6936,13 @@ METHOD OnInitDialog() CLASS AboutVXH
    END
 
    WITH OBJECT ( ::Panel := PANEL( Self ) )
+      :BackColor   := RGB( 255,255,255 )
       :Dock:Margin := 0
       :Dock:Left   := Self
       :Dock:Top    := ::PictureBox1
       :Dock:Right  := Self
-      :Dock:Bottom := oBtn
+      :Dock:Bottom := Self
+      :Dock:BottomMargin := 30
       :Create()
       WITH OBJECT ( LABEL( :this ) )
          :Left           := 29
@@ -6909,7 +6973,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Top            := 30
          :Width          := 119
          :Height         := 16
-         :Caption        := "Augusto R. Infante"
+         :Caption        := "Tom Lucas"
          :Create()
       END
 

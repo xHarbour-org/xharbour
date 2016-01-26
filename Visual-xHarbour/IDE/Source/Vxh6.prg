@@ -142,6 +142,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[2][2], { "CheckBox", .T. } )
    AADD( ::aButtons[2][2], { "HeaderStrip", .T. } )
    AADD( ::aButtons[2][2], { "UpDown", .T. } )
+   AADD( ::aButtons[2][2], { "TrackBar", .T. } )
 
    //Advanced
    AADD( ::aButtons[3][2], { "ComboBoxEx", .T. } )
@@ -579,7 +580,7 @@ METHOD OnSelChanged( oItem ) CLASS ToolBox
 RETURN 0
 
 METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmpBtn, aProps, oCtrl ) CLASS ToolBox
-   EXTERN Button, UpDown
+   EXTERN Button, UpDown, TrackBar
    EXTERN EditBox
    EXTERN Label
    EXTERN Line

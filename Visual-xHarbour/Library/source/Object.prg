@@ -15,6 +15,11 @@
 #include "debug.ch"
 #include "error.ch"
 
+#include "hbxml.ch"
+
+#define MXML_STYLE_INDENT        1
+#define MXML_STYLE_THREESPACES   4
+
 static __aObjects := {}
 static __aObjPtrs := {}
 
@@ -69,7 +74,6 @@ CLASS Object
    DATA __InstApp              EXPORTED
    DATA xName                  EXPORTED
 
-
    //------------------------------------------------------
    DATA lDesignMode            EXPORTED INIT .F.
    ACCESS DesignMode           INLINE IIF( ::Form != NIL, ::Form:lDesignMode, .F. )
@@ -77,7 +81,7 @@ CLASS Object
    //------------------------------------------------------
 
 
-   ACCESS ColorScheme          INLINE IIF( ::DesignMode, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
+   ACCESS ColorScheme          INLINE IIF( ::DesignMode .AND. __GetApplication():Project:AppObject != NIL, __GetApplication():Project:AppObject:ColorTable, __GetApplication():ColorTable )
 
    ACCESS Application          INLINE __GetApplication()
    ACCESS System               INLINE __GetSystem()
@@ -94,6 +98,7 @@ CLASS Object
    METHOD HasProperty()
    METHOD __SetCtrlName()
    METHOD __ResetImageList()   VIRTUAL
+   METHOD Reload()             VIRTUAL
    METHOD GetControlName()
    METHOD __CreateProperty()
    METHOD __SetAsProperty()
@@ -105,6 +110,8 @@ CLASS Object
    METHOD __InvalidMember()
    METHOD RemoveProperty()
    METHOD SetTabOrder()
+
+   METHOD GetXML( oNode, aEvents ) INLINE Obj2XML( Self, oNode,, @aEvents )
 
    error HANDLER OnError()
 
@@ -124,7 +131,6 @@ METHOD OnError( ... ) CLASS Object
       ENDIF
     ELSEIF !EMPTY( cMsg )
       IF PCount() == 0
-
          IF ( __clsParent( ::ClassH, "CUSTOMCONTROL" ) .OR. __clsParent( ::Parent:ClassH, "CUSTOMCONTROL" ) )
             RETURN ::Form:&cMsg //::Form:__hObjects[ cMsg ]
          ENDIF
@@ -275,8 +281,6 @@ METHOD SetTabOrder( nTabOrder ) CLASS Object
    ENDIF
 RETURN Self
 
-
-
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -333,4 +337,95 @@ FUNCTION __ObjFromID( nID, hWnd )
       RETURN __aObjPtrs[n][1]
    ENDIF
 RETURN NIL
+
+//-----------------------------------------------------------------------------------------------------------------------------
+FUNCTION Obj2XML( oObj, oNode, cName, aEvents )
+   LOCAL xInit, cProp, oProp, aProperty, xValue, aProperties, oXML, n := 0
+   LOCAL oComponent, oComps, aEvent, aTopic, oEvents, oControls, oProperties, oCtrl
+
+   oXML := TXmlNode():new( , IIF( ! Empty(cName), cName, oObj:__xCtrlName ) )
+   aProperties := __ClsGetPropertiesAndValues( oObj )
+
+   IF __objHasMsg( oObj, "Components" )
+      FOR EACH oComponent IN oObj:Components
+          DEFAULT oComps TO TXmlNode():new( , "Components" )
+          Obj2XML( oComponent, oComps,, @aEvents )
+      NEXT
+      IF oComps != NIL
+         oXML:addBelow( oComps )
+      ENDIF
+   ENDIF
+
+   FOR EACH aProperty IN aProperties
+       cProp  := lower( aProperty[1] )
+       DEFAULT oProperties TO TXmlNode():new( , "Properties" )
+       xValue := __objSendMsg( oObj, cProp )
+       xInit  := NIL
+       IF __objHasMsg( oObj, "__a_" + cProp )
+          xInit := __objSendMsg( oObj, "__a_" + cProp )[4]
+          cProp := __objSendMsg( oObj, "__a_" + cProp )[1]
+       ENDIF
+       IF ValType( xValue ) == "O"
+
+          IF __objHasMsg( xValue, "lComponent" ) .AND. xValue:lComponent
+             oProp := TXmlNode():new( HBXML_TYPE_TAG, cProp, NIL, ValToPrgExp(xValue:Name) )
+             oProperties:addBelow( oProp )
+             n++
+           ELSE
+             Obj2XML( xValue, oProperties, cProp, @aEvents )
+          ENDIF
+
+        ELSEIF Valtype( xValue ) $ "CNDL"
+
+          IF xInit != xValue
+             oProp := TXmlNode():new( HBXML_TYPE_TAG, cProp, NIL, ValToPrgExp(xValue) )
+             oProperties:addBelow( oProp )
+             n++
+          ENDIF
+       ENDIF
+   NEXT
+
+   IF oProperties != NIL
+      oXML:addBelow( oProperties )
+   ENDIF
+
+   IF __objHasMsg( oObj, "Children" )
+      FOR EACH oCtrl IN oObj:Children
+          DEFAULT oControls TO TXmlNode():new( , "Controls" )
+          Obj2XML( oCtrl, oControls,, @aEvents )
+      NEXT
+      IF oControls != NIL
+         oXML:addBelow( oControls )
+      ENDIF
+   ENDIF
+
+   IF __objHasMsg( oObj, "Events" ) .AND. oObj:Events != NIL
+      FOR EACH aTopic IN oObj:Events
+          FOR EACH aEvent IN aTopic[2]
+              IF ! EMPTY( aEvent[2] )
+                 DEFAULT oEvents TO TXmlNode():new( , "Events" )
+                 oProp := TXmlNode():new( HBXML_TYPE_TAG, aEvent[1], NIL, ValToPrgExp( aEvent[2] ) )
+                 oEvents:addBelow( oProp )
+                 IF aEvents != NIL
+                    AADD( aEvents, aEvent[2] )
+                 ENDIF
+                 n++
+              ENDIF
+          NEXT
+      NEXT
+      IF oEvents != NIL
+         oXML:addBelow( oEvents )
+      ENDIF
+   ENDIF
+
+   IF oNode != NIL .AND. n > 0
+      oNode:addBelow( oXML )
+   ENDIF
+
+RETURN oXML
+
+
+//FUNCTION Xml2Prg( cFileXML )
+//   LOCAL ooDoc := TXmlDocument():New( cFileXML )
+//   oNode := oDoc:FindFirstRegEx( "Report" )
 

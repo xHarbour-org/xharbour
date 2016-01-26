@@ -66,6 +66,8 @@ CLASS MaskEdit INHERIT EditBox
 
    METHOD __GoToNextControl()
    METHOD __Validate()
+   METHOD SetValue( xValue )           INLINE ::Text := xValue
+   METHOD GetValue()                   INLINE ::Text
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -239,6 +241,9 @@ METHOD OnKeyDown( nwParam ) CLASS MaskEdit
       RETURN(0)
    ENDIF
 
+   IF nwParam == VK_DOWN .AND. ::DropCalendar
+      RETURN Super:OnKeyDown( nwParam )
+   ENDIF
 //   IF ValType( ::OnWMKeyDown ) == 'B'
 //      nRet := Eval( ::OnWMKeyDown, ::oGet, nwParam, nlParam )
 //      IF nRet != NIL

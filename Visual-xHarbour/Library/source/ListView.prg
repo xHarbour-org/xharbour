@@ -122,6 +122,7 @@ CLASS ListView INHERIT TitleControl
    METHOD SetForeColor()
    METHOD FindItem()
    METHOD GetSearchString()
+   METHOD GetSelection()
    METHOD __SetScrollBars()                INLINE Self
    METHOD __SetViewStyle()
 ENDCLASS
@@ -419,7 +420,7 @@ RETURN 0
 
 //--------------------------------------------------------------------------------------------------------
 
-METHOD InsertItem( cText, nImage, nRow, nGroup ) CLASS ListView
+METHOD InsertItem( cText, nImage, nRow, nGroup, lParam ) CLASS ListView
    LOCAL lvi := (struct LVWITEM)
 
    DEFAULT nImage TO 0
@@ -429,19 +430,58 @@ METHOD InsertItem( cText, nImage, nRow, nGroup ) CLASS ListView
       lvi:mask := lvi:mask | LVIF_GROUPID
       lvi:iGroupId   := nGroup
    ENDIF
+   IF lParam != NIL
+      lvi:mask := lvi:mask | LVIF_PARAM
+      lvi:lParam := lParam
+   ENDIF
    lvi:iItem      := nRow
    lvi:iSubItem   := 0
    lvi:iImage     := nImage
    lvi:pszText    := cText
-   lvi:cchTextMax := 256
-
-   SendMessage( ::hWnd, LVM_INSERTITEM, 0, lvi )
-return(self)
+   lvi:cchTextMax := MAX_PATH
+RETURN SendMessage( ::hWnd, LVM_INSERTITEM, 0, lvi ) + 1
 
 METHOD InsertItems() CLASS ListView
    ListViewDeleteAllItems(::hWnd)
    ListViewSetItemCount(::hWnd, LEN( ::Items ), LVSICF_NOINVALIDATEALL+LVSICF_NOSCROLL)
 return(self)
+
+METHOD GetSelection() CLASS ListView
+   LOCAL nSel, lvi, cRet, n, lParam
+   IF SendMessage( ::hWnd, LVM_GETSELECTEDCOUNT, 0, 0 ) > 0
+      nSel := SendMessage( ::hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED )
+
+      lvi := (struct LVITEM)
+      lvi:iItem := nSel
+      lvi:mask  := LVIF_PARAM
+      SendMessage( ::hWnd, LVM_GETITEM, 0, @lvi )
+      lParam := lvi:lParam
+
+      lvi := (struct LVITEM)
+      IF LEN( ::Columns ) > 0
+         cRet := {}
+         FOR n := 0 TO LEN( ::Columns )-1
+             lvi:iSubItem   := n
+             lvi:cchTextMax := MAX_PATH
+             lvi:pszText    := SPACE(MAX_PATH)
+             lvi:mask       := LVIF_TEXT
+             SendMessage( ::hWnd, LVM_GETITEMTEXT, nSel, @lvi )
+             AADD( cRet, Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 ) )
+         NEXT
+         IF ! Empty( lParam )
+            AADD( cRet, lParam )
+         ENDIF
+
+       ELSE
+         lvi:iSubItem   := 0
+         lvi:cchTextMax := MAX_PATH
+         lvi:pszText    := SPACE(MAX_PATH)
+         lvi:mask       := LVIF_TEXT
+         SendMessage( ::hWnd, LVM_GETITEMTEXT, nSel, @lvi )
+         cRet := Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 )
+      ENDIF
+   ENDIF
+RETURN cRet
 
 //----------------------------------------------------------------------------------------------
 

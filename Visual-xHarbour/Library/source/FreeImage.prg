@@ -53,7 +53,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS FreeImage
-   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush, nLeftBorder, nBorder
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
@@ -62,7 +62,16 @@ METHOD __CreateBkBrush( hDC ) CLASS FreeImage
    IF ::xBackColor != NIL
       hBrush := CreateSolidBrush( ::xBackColor )
    ENDIF
-   _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
+
+   IF ::Transparent .AND. ::Parent:BkBrush != NIL
+      nBorder     := (::Height - ( ::ClientHeight + IIF( ! Empty(::Text), ::TitleHeight, 0 ) ) ) / 2
+      nLeftBorder := (::Width-::ClientWidth)/2
+
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left-nLeftBorder, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight, 0 )-nBorder )
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::Parent:BkBrush )
+   ELSE
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
+   ENDIF
    IF hBrush != NIL
       DeleteObject( hBrush )
    ENDIF
@@ -109,6 +118,7 @@ CLASS FreeImageRenderer
    DATA lTransparentSet EXPORTED INIT .F.
    DATA Owner           EXPORTED
    DATA Type            EXPORTED
+   DATA ImageType       EXPORTED
    DATA Transparent     EXPORTED INIT .F.
    DATA ClsName         EXPORTED INIT "FreeImageRenderer"
    DATA __xCtrlName     EXPORTED INIT "FreeImage"
@@ -142,6 +152,10 @@ CLASS FreeImageRenderer
    METHOD LoadFromString()
    METHOD Destroy()            INLINE ::Owner := NIL, IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ), ), NIL
    METHOD SetMargins()
+
+   METHOD SetValue( cValue )   INLINE ::ImageName := "", ::LoadFromString( cValue )
+   METHOD GetValue()           INLINE ::__cData
+   METHOD Reload()             INLINE ::LoadFromString( ::__cData ), ::InvalidateRect()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -199,14 +213,19 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD LoadFromString( cData ) CLASS FreeImageRenderer
-   DEFAULT cData TO ::__cData
+   DEFAULT cData TO ""
+   ::__cData := cData
    IF ! EMPTY( cData )
-      ::__cData := cData
       IF ::hDIB != NIL
          FreeImageUnload( ::hDIB )
       ENDIF
       ::hDIB := FreeImageStringToDib( cData )
+      IF ::Owner:BkBrush != NIL
+         DeleteObject( ::Owner:BkBrush )
+      ENDIF
+      ::lTransparentSet := .F.
    ENDIF
+   AEVAL( ::Children, {|o| o:Reload()} )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
@@ -293,10 +312,12 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
    x -= ::Owner:HorzScrollPos
    y -= ::Owner:VertScrollPos
 
-   IF !::lTransparentSet
+   IF ! ::lTransparentSet
       ::lTransparentSet := .T.
+
       IF FreeImageIsTransparent( ::hDIB ) .OR. FreeImageHasBackgroundColor( ::hDIB )
-         IF ! ::KeepAspectRatio .AND. ! ::Stretch
+         IF .T. //! ::KeepAspectRatio .AND. ! ::Stretch
+
             hMemDC1     := CreateCompatibleDC( hMemDC )
             hMemBitmap1 := CreateCompatibleBitmap( hMemDC, cx, cy )
             hOldBitmap1 := SelectObject( hMemDC1, hMemBitmap1 )
@@ -357,7 +378,7 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
       DeleteObject( hMemBitmap1 )
       DeleteDC( hMemDC1 )
 
-    ELSE
+    ELSE //IF ! ::Transparent
       FreeImageDraw( ::hDIB, hMemDC, x, y, cx, cy )
    ENDIF
 
@@ -365,16 +386,16 @@ RETURN NIL
 
 //--------------------------------------------------------------------------------------------------------
 METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
-   LOCAL lOK := .F., cData, hBmp, hInst
+   LOCAL lOK := .F., hBmp, hInst
    hInst := ::Owner:AppInstance
    IF cType != "BMP" .AND. cType != "ICO"
 
-      cData := __ResourceToString( hInst, cResource, cType )
-      IF !EMPTY( cData )
+      ::__cData := __ResourceToString( hInst, cResource, cType )
+      IF !EMPTY( ::__cData )
          IF ::hDIB != NIL
             FreeImageUnload( ::hDIB )
          ENDIF
-         ::hDIB := FreeImageStringToDib( cData )
+         ::hDIB := FreeImageStringToDib( ::__cData )
          lOK := ::hDIB != NIL
       ENDIF
 
@@ -415,6 +436,9 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
    IF VALTYPE( cFile ) == "A"
       cFile := IIF( ::DesignMode .AND. VALTYPE( cFile[1] ) == "C", cFile[1], cFile[2] )
    ENDIF
+   IF ::Owner:BkBrush != NIL
+      DeleteObject( ::Owner:BkBrush )
+   ENDIF
    ::lTransparentSet := .F.
    IF ::hDIB != NIL
       FreeImageUnload( ::hDIB )
@@ -423,13 +447,16 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
    cPrev := ::xImageName
    IF !EMPTY( cFile )
       IF AT( ".", cFile ) > 0
-         ::hDIB := FreeImageLoad( FreeImageGetFileType( cFile ), cFile, 0 )
+         ::ImageType := FreeImageGetFileType( cFile )
+         ::hDIB := FreeImageLoad( ::ImageType, cFile, 0 )
+         ::__cData := MemoRead( cFile )
        ELSE
          DEFAULT cType TO RIGHT( UPPER( cFile ), 3 )
          ::LoadResource( cFile, cType )
       ENDIF
     ELSE
       ::xImageName := NIL
+      ::__cData := ""
    ENDIF
 
    IF ::DesignMode
@@ -442,6 +469,8 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
       ENDIF
    ENDIF
    ::Owner:InvalidateRect()
+   AEVAL( ::Owner:Children, {|o| o:Reload()} )
+
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
@@ -546,6 +575,17 @@ HB_FUNC( FREEIMAGECONVERTTO24BITS )
 }
 
 //--------------------------------------------------------------------------------------------------------
+HB_FUNC( FREEIMAGECONVERTTO32BITS )
+{
+   FIBITMAP *dib = NULL;
+   dib = FreeImage_ConvertTo32Bits( (FIBITMAP*) hb_parptr(1) );
+   if ( dib != NULL )
+   {
+      hb_retptr( dib );
+   }
+}
+
+//--------------------------------------------------------------------------------------------------------
 HB_FUNC( FREEIMAGEDRAW )
 {
    FIBITMAP *dib = (FIBITMAP *) hb_parptr(1);
@@ -592,6 +632,12 @@ HB_FUNC( FREEIMAGEGETHEIGHT )
 HB_FUNC( FREEIMAGEISTRANSPARENT )
 {
    hb_retl( FreeImage_IsTransparent( (FIBITMAP*) hb_parptr(1) ) );
+}
+
+//--------------------------------------------------------------------------------------------------------
+HB_FUNC( FREEIMAGESETTRANSPARENT )
+{
+   FreeImage_SetTransparent( (FIBITMAP*) hb_parptr(1), hb_parl(2) );
 }
 
 //--------------------------------------------------------------------------------------------------------

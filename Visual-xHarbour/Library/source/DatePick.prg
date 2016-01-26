@@ -36,6 +36,9 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY TitleForeColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLETEXT, v )
    PROPERTY TrailingTextColor ROOT "Colors" SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v )
 
+   METHOD SetValue( dDate )   INLINE ::Date := dDate
+   METHOD GetValue()          INLINE ::Date
+
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
    DATA OnDTNDropDown         EXPORTED
@@ -205,16 +208,20 @@ RETURN NIL
 METHOD SetSystemTime() CLASS DateTimePicker
    LOCAL st := (struct SYSTEMTIME)
 
-   st:wYear         := YEAR( ::xDate )
-   st:wMonth        := MONTH( ::xDate )
-   st:wDayOfWeek    := DOW( ::xDate )
-   st:wDay          := DAY( ::xDate )
+   IF Empty( ::xDate )
+      st := 0
+   ELSE
+      st:wYear         := YEAR( ::xDate )
+      st:wMonth        := MONTH( ::xDate )
+      st:wDayOfWeek    := DOW( ::xDate )
+      st:wDay          := DAY( ::xDate )
 
-   st:wHour         := VAL( SUBSTR( ::xTime, 1, 2 ) )
-   st:wMinute       := VAL( SUBSTR( ::xTime, 4, 2 ) )
-   st:wSecond       := VAL( SUBSTR( ::xTime, 7, 2 ) )
-   st:wMilliseconds := 0
-   SendMessage( ::hWnd, DTM_SETSYSTEMTIME, GDT_VALID, st )
+      st:wHour         := VAL( SUBSTR( ::xTime, 1, 2 ) )
+      st:wMinute       := VAL( SUBSTR( ::xTime, 4, 2 ) )
+      st:wSecond       := VAL( SUBSTR( ::xTime, 7, 2 ) )
+      st:wMilliseconds := 0
+   ENDIF
+   SendMessage( ::hWnd, DTM_SETSYSTEMTIME, IIF( Empty( ::xDate ), GDT_NONE, GDT_VALID ), st )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

@@ -60,6 +60,8 @@ CLASS TabControl INHERIT Control
    PROPERTY ShowTabs                                      DEFAULT .T.
    PROPERTY TabPosition         SET ::__SetTabPosition(v) DEFAULT 2
 
+   PROPERTY InactiveTabHotColor ROOT "Colors" HELP "Sets the background color when hovering on an inactive tab"
+
    DATA CurSel           EXPORTED  INIT 1
    DATA VertFont         EXPORTED
    DATA BoldFont         EXPORTED
@@ -327,7 +329,7 @@ METHOD OnSize(w,l) CLASS TabControl
    Super:OnSize(w,l)
    IF ::Cursel > 0 .AND. ::GetItemCount() >= ::Cursel
       oPage := ::GetItemObject()
-      IF oPage != NIL .AND. oPage:IsWindowVisible()
+      IF oPage != NIL
          oPage:__OnParentSize(LOWORD(w),HIWORD(w))
       ENDIF
    ENDIF
@@ -469,8 +471,9 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS TabControl
    LOCAL aRect, n, nSel, hBrush, nItems, nState, nPart
-   LOCAL aItem, oPage, hWnd, rc, tci, hDC, nColor, hPen, pBrush
-   LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE)
+   LOCAL aItem, oPage, hWnd, rc, tci, hDC, nColor, hPen, pBrush, hHotBrush
+   LOCAL hMemDC, hMemBitmap, hOldBitmap, hOldFont, sz := (struct SIZE), nBkMode
+
    IF ( !::Theming .OR. !IsThemeActive() ) .AND. ::ShowTabs
       RETURN NIL
    ENDIF
@@ -518,7 +521,12 @@ METHOD OnPaint() CLASS TabControl
       SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
    ENDIF
    DEFAULT hBrush TO GetSysColorBrush( COLOR_BTNFACE )
-   _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+   IF ::Border == 0
+      _FillRect( hMemDC, { ::ClientWidth-2, 0, ::ClientWidth, ::ClientHeight }, GetSysColorBrush( COLOR_BTNFACE ) )
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth-2, ::ClientHeight }, hBrush )
+    ELSE
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, hBrush )
+   ENDIF
 
    IF ::Theming .AND. IsThemeActive()
       DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_PANE, , aRect  )
@@ -533,6 +541,11 @@ METHOD OnPaint() CLASS TabControl
 
    nItems := ::GetItemCount()
    IF ( ::ShowTabs .OR. ::DesignMode ) .AND. nItems > 0
+
+      IF ::ColorInactiveHeader
+         hHotBrush := CreateSolidBrush( LightenColor( ::BackColor, 50 ) )
+      ENDIF
+
       FOR n := nItems TO 1 STEP -1
 
           IF n != nSel
@@ -546,7 +559,7 @@ METHOD OnPaint() CLASS TabControl
 
              aItem  := ::GetItemRect( n )
 
-             SetTextColor( hMemDC, IIF( oPage != NIL, oPage:ForeColor, ::ForeColor ) )
+             nColor := SetTextColor( hMemDC, IIF( oPage != NIL .AND. ! ::ColorInactiveHeader, oPage:ForeColor, ::ForeColor ) )
 
              nState := TIS_NORMAL
              aItem[2]+=1
@@ -555,7 +568,11 @@ METHOD OnPaint() CLASS TabControl
              ENDIF
 
              IF ::ShowTabs
-                DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                IF ! ::ColorInactiveHeader
+                   DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                ELSEIF nState == TIS_HOT
+                   _FillRect( hMemDC, aItem, hHotBrush )
+                ENDIF
                 IF ::ImageList != NIL .AND. oPage != NIL .AND. oPage:ImageIndex > 0
                    ::ImageList:DrawImage( hMemDC, oPage:ImageIndex, aItem[1]+6, aItem[2]+3, ILD_TRANSPARENT )
                    aItem[1]+=::ImageList:IconWidth + 6
@@ -569,9 +586,12 @@ METHOD OnPaint() CLASS TabControl
                 _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE )
                 SelectObject( hMemDC, hOldFont )
              ENDIF
+             SetTextColor( hMemDC, nColor )
           ENDIF
       NEXT
-
+      IF hHotBrush != NIL
+         DeleteObject( hHotBrush )
+      ENDIF
       oPage := ::GetItemObject()
       aItem := ::GetItemRect( nSel )
 
@@ -613,9 +633,10 @@ METHOD OnPaint() CLASS TabControl
       IF ! EMPTY( tci:pszText )
          nColor := GetTextColor( hMemDC )
          SetTextColor( hMemDC, IIF( oPage == NIL, ::ForeColor, IIF( oPage:TabTextColor != NIL, oPage:TabTextColor, IIF( oPage:ForeColor != NIL, oPage:ForeColor, ::ForeColor ) ) ) )
-         SetBkMode( hMemDC, TRANSPARENT )
+         nBkMode := SetBkMode( hMemDC, TRANSPARENT )
          hOldFont := SelectObject( hMemDC, ::Font:Handle )
          _DrawText( hMemDC, tci:pszText, aItem, DT_CENTER|DT_VCENTER|DT_SINGLELINE  )
+         SetBkMode( hMemDC, nBkMode )
          SelectObject( hMemDC, hOldFont )
          SetTextColor( hMemDC, nColor )
       ENDIF
@@ -674,7 +695,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
-   LOCAL nSel, lAllow, nOldSel, oCurPage, oSelPage
+   LOCAL nSel, lAllow, nOldSel, oCurPage, oSelPage, aRect
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == NM_CLICK
@@ -717,6 +738,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
               ::CurSel := nSel
 
               oCurPage := ::GetItemObject()
+              aRect := ::GetItemRect( nSel )
+              aRect[1] -= 2
+              aRect[2] -= 2
+              aRect[3] += 2
+              aRect[4] += 2
+              ::Redraw( aRect )
+
               IF oCurPage != NIL
                  oCurPage:__OnParentSize( ::ClientWidth, ::ClientHeight )
                  oCurPage:ShowTab()
@@ -747,9 +775,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
                  EVAL( ::OnSelChanged, Self, nOldSel, nSel )
               ENDIF
               ExecuteEvent( "OnTabChanged", Self )
-              IF ::__xCtrlName == "TabStrip"
-                 ::Invalidaterect()
-              ENDIF
               RETURN 0
            ENDIF
    ENDCASE
@@ -867,11 +892,6 @@ CLASS TabPage INHERIT Dialog
    DATA ShowMode           EXPORTED INIT 1
    DATA Center             EXPORTED INIT .F.
    DATA Icon               EXPORTED
-
-   ACCESS xCaption         INLINE ::xText
-   ASSIGN xCaption(c)      INLINE ::xText := c
-   ACCESS Caption          INLINE ::Text
-   ASSIGN Caption(c)       INLINE ::Text := c
 
    ACCESS ControlParent    INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer     INLINE ::xMdiContainer
@@ -1023,6 +1043,9 @@ METHOD OnEraseBkgnd( hDC ) CLASS TabPage
    IF ::BkBrush != NIL
       ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+      IF ::DesignMode .AND. ::Application:ShowGrid == 1
+         DrawGrid( hDC, ::Form:CtrlMask:xGrid, ::Form:CtrlMask:yGrid, ::ClientWidth, ::ClientHeight, RGB(0,0,0) )
+      ENDIF
    ENDIF
 RETURN 1
 
@@ -1289,14 +1312,14 @@ RETURN ::Super:OnCtlColorDlg( nwParam, nlParam )
 
 //-----------------------------------------------------------------------------------------------
 METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
-   LOCAL rc
+   LOCAL rc, aRect, nBorder := 0
    (x, y)
    rc := (struct RECT)
-   ::Parent:GetClientRect()
+   aRect := _GetClientRect( ::Parent:hWnd )
    rc:Left   := 0
    rc:Top    := 0
-   rc:Right  := ::Parent:ClientWidth
-   rc:Bottom := ::Parent:ClientHeight
+   rc:Right  := aRect[3]
+   rc:Bottom := aRect[4]
 
    SendMessage( ::Parent:hWnd, TCM_ADJUSTRECT, 0, @rc )
 
@@ -1353,7 +1376,10 @@ METHOD __OnParentSize( x, y, hDef ) CLASS TabPage
       ENDIF
    ENDIF
 
-   ::MoveWindow( ::Left, ::Top, ::Width, ::Height )
+   IF ::Parent:Border <> 0
+      nBorder := 1
+   ENDIF
+   ::MoveWindow( ::Left-nBorder, ::Top-nBorder, ::Width+(nBorder*4), ::Height+(nBorder*3) )
    ::__CreateBkBrush()
 
 RETURN hDef
@@ -1418,7 +1444,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 
 CLASS TabStrip INHERIT TabControl
-   DATA Border, AllowMaximize, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
+   DATA AllowMaximize, ClipChildren, ClipSiblings, NoActivate PROTECTED INIT .F.
    DATA Caption, AnimationStyle
    DATA BoldSelection    EXPORTED INIT .F.
    DATA ItemHeight       EXPORTED INIT 19

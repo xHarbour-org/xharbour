@@ -215,6 +215,7 @@ CLASS ToolBar INHERIT Control
    METHOD __OnParentSize()
    METHOD SetExtStyle()
    METHOD __AddButton()
+   METHOD SetStyle()
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -321,6 +322,21 @@ METHOD Create() CLASS ToolBar
    ::_SetBitmapSize()
 RETURN SELF
 
+//-----------------------------------------------------------------------------------------------
+METHOD SetStyle( nStyle, lAdd ) CLASS ToolBar
+   LOCAL cStyle := ""
+   DEFAULT lAdd TO .T.
+   IF lAdd
+      ::Style := ::Style | nStyle
+    ELSE
+      ::Style := ::Style & NOT( nStyle )
+   ENDIF
+   IF IsWindow( ::hWnd )
+      ::SendMessage( TB_SETSTYLE, 0, ::Style )
+      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+      ::InvalidateRect()
+   ENDIF
+RETURN self
 
 //-----------------------------------------------------------------------------------------------
 
@@ -1466,7 +1482,7 @@ CLASS ToolButton INHERIT Object
    DATA __lCreateAfterChildren EXPORTED INIT .F.
    DATA __TempRect             EXPORTED
    DATA xTabOrder              EXPORTED
-
+   DATA MDIList                EXPORTED INIT .F.
    DATA lCreated     PROTECTED INIT .F.
 
    METHOD Init()         CONSTRUCTOR

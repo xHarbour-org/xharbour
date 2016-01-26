@@ -1745,3 +1745,9 @@ typedef struct tagMDICREATESTRUCT {;
    DWORD   style;
    LPARAM  lParam;
 } MDICREATESTRUCT, *LPMDICREATESTRUCT;
+
+typedef struct tagTRBTHUMBPOSCHANGING {;
+   NMHDR hdr;
+   DWORD dwPos;
+   int   nReason;
+} NMTRBTHUMBPOSCHANGING;

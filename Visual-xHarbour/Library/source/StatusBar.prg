@@ -38,7 +38,7 @@ CLASS StatusBar INHERIT Control
       DATA Width         INIT 0
       DATA Left          INIT 0
       DATA Top           INIT 0
-      DATA Border        INIT .F.
+      DATA Border        INIT 0
       DATA AllowClose    INIT .F.
       DATA AllowUndock   INIT .F.
       DATA Dock
@@ -57,6 +57,7 @@ CLASS StatusBar INHERIT Control
    METHOD OnMouseMove()
    METHOD SetImageIndex()
    METHOD OnDestroy()      INLINE ::Super:OnDestroy(),  AEVAL( ::Children, {|o| ObjFromHandle( o:hWnd, .T. ) } )
+   METHOD OnDrawItem()
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------
@@ -115,10 +116,17 @@ METHOD Create() CLASS StatusBar
    ::SendMessage( SB_SETBKCOLOR, 0, ::xBackColor )
 RETURN Self
 
+//----------------------------------------------------------------------------------------------------
 METHOD SetImageIndex( n ) CLASS StatusBar
    IF ::ImageList != NIL .AND. ::hWnd != NIL
       ::SendMessage( SB_SETICON, 0, ::ImageList:GetImage( n ) )
    ENDIF
+RETURN NIL
+
+//----------------------------------------------------------------------------------------------------
+METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS StatusBar
+   Super:OnDrawItem( nwParam, nlParam, dis )
+           view "xxxxxxxxxxxx"
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
@@ -224,10 +232,10 @@ CLASS StatusBarPanel INHERIT Control
    PROPERTY Width        SET ( ::xWidth := v, ::Update() ) DEFAULT 0
 
    EXPORTED:
-      DATA Border        INIT .F.
+      DATA Border        INIT 0
       DATA ToolTip
       DATA Font
-      DATA Theming     INIT .F.
+      DATA Theming       INIT .F.
       DATA AllowClose    INIT .F.
       DATA AllowUndock   INIT .F.
       DATA Dock

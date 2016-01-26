@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Editor.prg,v 1.28 2015/05/12 08:35:49 Augusto Infante Exp $
  */
 
 GLOBAL EXTERNAL s_CurrentObject
@@ -19,24 +19,12 @@ GLOBAL EXTERNAL s_CurrentObject
 
 #define EOL Chr(13) + Chr(10)
 
-static hSciLib
-
-INIT PROCEDURE StartSci
-   hSciLib := LoadLibrary( "SciLexer.dll" )
-RETURN
-
-EXIT PROCEDURE FreeSci
-   FreeLibrary( hSciLib )
-   hSciLib := NIL
-RETURN
-
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------
 
 CLASS SourceEditor INHERIT TitleControl
-   DATA nLastTabTime  PROTECTED INIT Seconds()
-   DATA nLastTabPos   PROTECTED INIT 1
+   DATA pPrevSel      EXPORTED
    DATA xTabWidth     PROTECTED INIT 3
    ASSIGN TabWidth(n) INLINE ::xTabWidth := n, AEVAL( ::aDocs, {|o| o:SetTabWidth(o:Owner:TabWidth)} ), IIF( ::Source != NIL, ::Source:Select(),)
    ACCESS TabWidth    INLINE ::xTabWidth
@@ -87,45 +75,48 @@ CLASS SourceEditor INHERIT TitleControl
    DATA nDirection        EXPORTED
    DATA CaretLineVisible  EXPORTED
    DATA AutoIndent        EXPORTED
+   DATA TrimEOLSpaces     EXPORTED
 
    DATA EditMenuItems     EXPORTED
+   DATA FindInFiles       EXPORTED INIT .F.
+
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD GetEditor()
-   METHOD StyleClearAll()                 INLINE ::SendMessage( SCI_STYLECLEARALL, 0, 0 ), Self
+   METHOD StyleClearAll()                 INLINE SCI_SEND( SCI_STYLECLEARALL, 0, 0 ), Self
 
    METHOD StyleSetFont( cFont )           INLINE ::FontFaceName := cFont, SendEditorString( ::hWnd, SCI_STYLESETFONT, STYLE_DEFAULT, cFont ), Self
-   METHOD StyleSetBold( lBold )           INLINE ::FontBold := lBold, SendMessage( ::hWnd, SCI_STYLESETBOLD, STYLE_DEFAULT, lBold ), Self
-   METHOD StyleSetItalic( lItalic )       INLINE ::FontItalic := lItalic, SendMessage( ::hWnd, SCI_STYLESETITALIC, STYLE_DEFAULT, lItalic ), Self
+   METHOD StyleSetBold( lBold )           INLINE ::FontBold := lBold, SCI_SEND( SCI_STYLESETBOLD, STYLE_DEFAULT, lBold ), Self
+   METHOD StyleSetItalic( lItalic )       INLINE ::FontItalic := lItalic, SCI_SEND( SCI_STYLESETITALIC, STYLE_DEFAULT, lItalic ), Self
 
-   METHOD StyleGetFont( cFont )           INLINE cFont := SPACE(255), ::SendMessage( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
+   METHOD StyleGetFont( cFont )           INLINE cFont := SPACE(255), SCI_SEND( SCI_STYLEGETFONT, STYLE_DEFAULT, @cFont ), ALLTRIM(cFont)
 
-   METHOD StyleSetSize( nSize )           INLINE ::FontSize := nSize, ::SendMessage( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize ), Self
-   METHOD StyleGetSize( nSize )           INLINE ::SendMessage( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
+   METHOD StyleSetSize( nSize )           INLINE ::FontSize := nSize, SCI_SEND( SCI_STYLESETSIZE, STYLE_DEFAULT, nSize ), Self
+   METHOD StyleGetSize( nSize )           INLINE SCI_SEND( SCI_STYLEGETSIZE, STYLE_DEFAULT, @nSize ), nSize
 
-   METHOD SetLexer( nLexer )              INLINE ::SendMessage( SCI_SETLEXER, nLexer, 0 )
-   METHOD GetCurDoc()                     INLINE ::SendMessage( SCI_GETDOCPOINTER, 0, 0 )
+   METHOD SetLexer( nLexer )              INLINE SCI_SEND( SCI_SETLEXER, nLexer, 0 )
+   METHOD GetCurDoc()                     INLINE SCI_SEND( SCI_GETDOCPOINTER, 0, 0 )
 
-   METHOD SelectDocument( pDoc )          INLINE ::SendMessage( SCI_SETDOCPOINTER, 0, pDoc )
+   METHOD SelectDocument( pDoc )          INLINE SCI_SEND( SCI_SETDOCPOINTER, 0, pDoc )
    METHOD OnDestroy()
    METHOD OnParentNotify()
 
-   METHOD Colorise( nStart, nEnd )        INLINE ::SendMessage( SCI_COLOURISE, nStart, nEnd )
+   METHOD Colorise( nStart, nEnd )        INLINE SCI_SEND( SCI_COLOURISE, nStart, nEnd )
 
-   METHOD BookmarkAdd(nLine)              INLINE ::SendMessage( SCI_MARKERADD, nLine, MARKER_MASK )
-   METHOD BookmarkGet(nLine)              INLINE ::SendMessage( SCI_MARKERGET, nLine, MARKER_MASK )
-   METHOD BookmarkDel(nLine)              INLINE ::SendMessage( SCI_MARKERDELETE, nLine, MARKER_MASK )
-   METHOD BookmarkDelAll()                INLINE ::SendMessage( SCI_MARKERDELETEALL, MARKER_MASK, 0 )
+   METHOD BookmarkAdd(nLine)              INLINE SCI_SEND( SCI_MARKERADD, nLine, MARKER_MASK )
+   METHOD BookmarkGet(nLine)              INLINE SCI_SEND( SCI_MARKERGET, nLine, MARKER_MASK )
+   METHOD BookmarkDel(nLine)              INLINE SCI_SEND( SCI_MARKERDELETE, nLine, MARKER_MASK )
+   METHOD BookmarkDelAll()                INLINE SCI_SEND( SCI_MARKERDELETEALL, MARKER_MASK, 0 )
 
    METHOD ToggleBookmark()
-   METHOD BookmarkNext()                  INLINE ::SendMessage( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
-   METHOD BookmarkPrev()                  INLINE ::SendMessage( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
+   METHOD BookmarkNext()                  INLINE SCI_SEND( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
+   METHOD BookmarkPrev()                  INLINE SCI_SEND( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
 
-   METHOD GetTabWidth()                   INLINE ::SendMessage( SCI_GETTABWIDTH, 0, 0 )
+   METHOD GetTabWidth()                   INLINE SCI_SEND( SCI_GETTABWIDTH, 0, 0 )
 
-   METHOD StyleSetFore( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETFORE, nStyle, nColor )
-   METHOD StyleSetBack( nStyle, nColor )  INLINE ::SendMessage( SCI_STYLESETBACK, nStyle, nColor )
+   METHOD StyleSetFore( nStyle, nColor )  INLINE SCI_SEND( SCI_STYLESETFORE, nStyle, nColor )
+   METHOD StyleSetBack( nStyle, nColor )  INLINE SCI_SEND( SCI_STYLESETBACK, nStyle, nColor )
    METHOD OnTimer()
    METHOD CheckChanges()
    METHOD InvertCase()
@@ -133,7 +124,7 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD LowerCase()
    METHOD Capitalize()
    METHOD GotoDialog()                    INLINE GotoDialog( Self )
-   METHOD OnSetFocus()                    INLINE IIF( ::Application:MainForm:HasMessage("EnableSearchMenu"),::Application:MainForm:EnableSearchMenu( .T. ),), ::SendMessage( SCI_SETFOCUS, 1, 0 ), NIL
+   METHOD OnSetFocus()                    INLINE IIF( ::Application:MainForm:HasMessage("EnableSearchMenu"),::Application:MainForm:EnableSearchMenu( .T. ),), SCI_SEND( SCI_SETFOCUS, 1, 0 ), NIL
    METHOD OnFindNext()
    METHOD OnReplace()
    METHOD OnReplaceAll()
@@ -153,7 +144,7 @@ CLASS SourceEditor INHERIT TitleControl
 ENDCLASS
 
 METHOD Clean() CLASS SourceEditor
-   ::SendMessage( SCI_SETTEXT, 0, "" )
+   SCI_SEND( SCI_SETTEXT, 0, "" )
 RETURN NIL
 
 METHOD GetEditor( cFile ) CLASS SourceEditor
@@ -186,6 +177,7 @@ METHOD Init( oParent ) CLASS SourceEditor
    ::EventHandler[ "OnFindNext" ]   := "OnFindNext"
    ::EventHandler[ "OnReplace" ]    := "OnReplace"
    ::EventHandler[ "OnReplaceAll" ] := "OnReplaceAll"
+   ::EventHandler[ "OnFindClose" ]  := "OnFindClose"
 
    IF FILE( cSyntax )
       ::Keywords1 := STRTRAN( GetPrivateProfileSection( "Keywords1", cSyntax ), CHR(0), " " )
@@ -216,6 +208,8 @@ METHOD Init( oParent ) CLASS SourceEditor
 
    ::CaretLineVisible  := ::Application:IniFile:ReadInteger( "Settings", "CaretLineVisible", 1 )
    ::AutoIndent        := ::Application:IniFile:ReadInteger( "Settings", "AutoIndent", 1 )
+   ::TrimEOLSpaces     := 0 //::Application:IniFile:ReadInteger( "Settings", "TrimEOLSpaces", 0 )
+
 
    //IF ( n := ::Application:Props:FontList:FindString(, ::FontFaceName ) ) > 0
    //   ::Application:Props:FontList:SetCurSel(n)
@@ -229,8 +223,12 @@ RETURN Self
 METHOD Create() CLASS SourceEditor
    ::Super:Create()
 
-   ::SendMessage( SCI_SETLEXER, SCLEX_FLAGSHIP )
-   ::SendMessage( SCI_SETSTYLEBITS, ::SendMessage( SCI_GETSTYLEBITSNEEDED ) )
+   SCI_Init( ::hWnd )
+
+//   SCI_SEND( SCI_SETLEXER, SCLEX_CONTAINER )
+
+   SCI_SEND( SCI_SETLEXER, SCLEX_FLAGSHIP, 0 )
+   SCI_SEND( SCI_SETSTYLEBITS, SCI_SEND( SCI_GETSTYLEBITSNEEDED ) )
 
    ::StyleSetBack( STYLE_DEFAULT, ::ColorBackground )
    ::StyleSetFore( STYLE_DEFAULT, ::ColorNormalText )
@@ -241,6 +239,8 @@ METHOD Create() CLASS SourceEditor
    ::StyleSetItalic( ::FontItalic )
 
    ::StyleClearAll()
+
+
    ::InitLexer()
    ::xTabWidth := ::Application:IniFile:ReadInteger( "Settings", "TabSpacing", ::xTabWidth )
 
@@ -307,102 +307,103 @@ METHOD CheckChanges() CLASS SourceEditor
    ENDIF
 RETURN Self
 
+
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetColors() CLASS SourceEditor
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD,        ::ColorKeywords1 )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD2,       ::ColorKeywords2 )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD3,       ::ColorKeywords3 )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_KEYWORD4,       ::ColorKeywords4 )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_KEYWORD,  ::ColorKeywords1 )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_KEYWORD2, ::ColorKeywords2 )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_KEYWORD3, ::ColorKeywords3 )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_KEYWORD4, ::ColorKeywords4 )
 
-   ::SendMessage( SCI_SETCARETLINEBACK, ::ColorSelectedLine )
-   ::SendMessage( SCI_SETCARETLINEVISIBLE, ::CaretLineVisible )
+   SCI_SEND( SCI_SETCARETLINEBACK, ::ColorSelectedLine )
+   SCI_SEND( SCI_SETCARETLINEVISIBLE, ::CaretLineVisible )
 
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
 
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTDOC,     ::ColorComments  )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_COMMENTLINEDOC, ::ColorComments  )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_OPERATOR,       ::ColorOperators )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_STRING,         ::ColorStrings   )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_NUMBER,         ::ColorNumbers   )
-   ::SendMessage( SCI_STYLESETFORE, SCE_FS_PREPROCESSOR,   ::ColorPreprocessor )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_COMMENT,        ::ColorComments  )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_COMMENTLINE,    ::ColorComments  )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_COMMENTDOC,     ::ColorComments  )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_COMMENTLINEDOC, ::ColorComments  )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_OPERATOR,       ::ColorOperators )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_STRING,         ::ColorStrings   )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_NUMBER,         ::ColorNumbers   )
+   SCI_SEND( SCI_STYLESETFORE, SCE_FS_PREPROCESSOR,   ::ColorPreprocessor )
 
-   ::SendMessage( SCI_SETFOLDMARGINCOLOUR, 1, ::ColorBackground )
-   ::SendMessage( SCI_SETFOLDMARGINHICOLOUR, 1, ::ColorBackground )
+   SCI_SEND( SCI_SETFOLDMARGINCOLOUR, 1, ::ColorBackground )
+   SCI_SEND( SCI_SETFOLDMARGINHICOLOUR, 1, ::ColorBackground )
 
-   ::SendMessage( SCI_SETCARETFORE, ::ColorNormalText )
+   SCI_SEND( SCI_SETCARETFORE, ::ColorNormalText )
 
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB,     ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL,    ::ColorBackground )
-   ::SendMessage( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND,     ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDER,        ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPEN,    ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEROPENMID, ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERSUB,     ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERMIDTAIL, ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDERTAIL,    ::ColorBackground )
+   SCI_SEND( SCI_MARKERSETFORE, SC_MARKNUM_FOLDEREND,     ::ColorBackground )
 
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDER,        ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN,    ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB,     ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL,    ::ColorNormalText )
-   ::SendMessage( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND,     ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDER,        ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPEN,    ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEROPENMID, ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERSUB,     ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERMIDTAIL, ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDERTAIL,    ::ColorNormalText )
+   SCI_SEND( SCI_MARKERSETBACK, SC_MARKNUM_FOLDEREND,     ::ColorNormalText )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InitLexer() CLASS SourceEditor
    //LOCAL nKey := 9 + ( SCMOD_CTRL << 16 )
-   //::SendMessage( SCI_ASSIGNCMDKEY, nKey, SCN_CHARADDED )
+   //SCI_SEND( SCI_ASSIGNCMDKEY, nKey, SCN_CHARADDED )
 
-   SciSetProperty( ::hWnd, "fold", "1" )
-   SciSetProperty( ::hWnd, "fold", "1" )
-   SciSetProperty( ::hWnd, "fold.compact", "0" )
-   SciSetProperty( ::hWnd, "fold.comment", "1" )
-   SciSetProperty( ::hWnd, "fold.preprocessor", "0" )
-   SciSetProperty( ::hWnd, "fold.directive", "0" )
+   SCI_SEND( SCI_SETPROPERTY, "fold", "1" )
+   SCI_SEND( SCI_SETPROPERTY, "fold.compact", "0" )
+   SCI_SEND( SCI_SETPROPERTY, "fold.comment", "1" )
+   SCI_SEND( SCI_SETPROPERTY, "fold.preprocessor", "0" )
+   SCI_SEND( SCI_SETPROPERTY, "fold.directive", "0" )
+   SCI_SEND( SCI_SETPROPERTY, "strip.trailing.spaces", "1" )
 
-   SciSetKeywords( ::hWnd, 0, ::Keywords1 )
-   SciSetKeywords( ::hWnd, 1, ::Keywords2 )
-   SciSetKeywords( ::hWnd, 2, ::Keywords3 )
-   SciSetKeywords( ::hWnd, 3, ::Keywords4 )
+   SCI_SEND( SCI_SETKEYWORDS, 0, ::Keywords1 )
+   SCI_SEND( SCI_SETKEYWORDS, 1, ::Keywords2 )
+   SCI_SEND( SCI_SETKEYWORDS, 2, ::Keywords3 )
+   SCI_SEND( SCI_SETKEYWORDS, 3, ::Keywords4 )
 
-   ::SendMessage( SCI_SETCARETPERIOD, 500, 0 )
+   SCI_SEND( SCI_SETCARETPERIOD, 500, 0 )
 
-   ::SendMessage( SCI_SETCARETWIDTH, 2 )
-   ::SendMessage( SCI_SETCARETSTYLE, 1 )
+   SCI_SEND( SCI_SETCARETWIDTH, 2 )
+   SCI_SEND( SCI_SETCARETSTYLE, 1 )
 
-   ::SendMessage( SCI_SETMARGINWIDTHN, 1, 15 )
-   ::SendMessage( SCI_SETMARGINTYPEN,  1, SC_MARGIN_BACK )
+   SCI_SEND( SCI_SETMARGINWIDTHN, 1, 15 )
+   SCI_SEND( SCI_SETMARGINTYPEN,  1, SC_MARGIN_BACK )
 
    // Bookmark markers
-   ::SendMessage( SCI_MARKERDEFINE,  MARKER_MASK, SC_MARK_ARROW )
-   ::SendMessage( SCI_MARKERSETFORE, MARKER_MASK, RGB( 255, 0, 0 ) )
-   ::SendMessage( SCI_MARKERSETBACK, MARKER_MASK, RGB( 255, 0, 0 ) )
+   SCI_SEND( SCI_MARKERDEFINE,  MARKER_MASK, SC_MARK_ARROW )
+   SCI_SEND( SCI_MARKERSETFORE, MARKER_MASK, RGB( 255, 0, 0 ) )
+   SCI_SEND( SCI_MARKERSETBACK, MARKER_MASK, RGB( 255, 0, 0 ) )
 
-   ::SendMessage( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
-   ::SendMessage( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
-   ::SendMessage( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
-   ::SendMessage( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
+   SCI_SEND( SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL )
+   SCI_SEND( SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 15 )
+   SCI_SEND( SCI_SETMARGINMASKN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS )
+   SCI_SEND( SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1 )
 
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY )
-   ::SendMessage( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY )
-   ::SendMessage( SCI_USEPOPUP, 0 )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPEN,    SC_MARK_MINUS )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDER,        SC_MARK_PLUS  )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERSUB,     SC_MARK_EMPTY )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERTAIL,    SC_MARK_EMPTY )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEREND,     SC_MARK_EMPTY )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY )
+   SCI_SEND( SCI_MARKERDEFINE,  SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY )
+   SCI_SEND( SCI_USEPOPUP, 0 )
 
-   ::SendMessage( SCI_SETFOLDFLAGS, 16, 0)
+   SCI_SEND( SCI_SETFOLDFLAGS, 16, 0)
 
-   ::SendMessage( SCI_CLEARREGISTEREDIMAGES, 0, 0 )
+   SCI_SEND( SCI_CLEARREGISTEREDIMAGES, 0, 0 )
 
    SciRegisterPropertyImage( ::hWnd, 8 )
    SciRegisterMethodImage( ::hWnd, 7 )
    SciRegisterEventImage( ::hWnd, 6 )
 
-   ::SendMessage( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO | SC_MOD_CHANGEMARKER )
+   SCI_SEND( SCI_SETMODEVENTMASK, SC_MOD_CHANGEFOLD | SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT | SC_PERFORMED_UNDO | SC_PERFORMED_REDO | SC_MOD_CHANGEMARKER )
    ::SetColors()
 RETURN NIL
 
@@ -465,12 +466,12 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD ToggleRectSel() CLASS SourceEditor
-   ::SendMessage( SCI_SETSELECTIONMODE, SC_SEL_RECTANGLE, 0 )
+   SCI_SEND( SCI_SETSELECTIONMODE, SC_SEL_RECTANGLE, 0 )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
-   LOCAL nPos, nSecs, nSel
+   LOCAL nNext, nLast, lMarkPrev
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
@@ -483,27 +484,24 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
          ::Application:Project:Find()
       ENDIF
 
-    ELSEIF nKey == VK_TAB .AND. CheckBit( GetKeyState( VK_CONTROL ), 32768 )
-      nSel := ASCAN( ::aDocs, {|o|o:pSource==::xSource:pSource} )
+    ELSEIF nKey == VK_TAB
+      IF IsKeyDown( VK_SHIFT ) .AND. ! IsKeyDown( VK_CONTROL )
+         nNext := ASCAN( ::aDocs, {|o|o:pSource==::pPrevSel} )
 
-      DEFAULT ::nLastTabTime TO SECONDS()
+       ELSEIF IsKeyDown( VK_CONTROL )
+         nLast := ASCAN( ::aDocs, {|o|o:pSource==::Source:pSource} )
+         nNext := nLast + IIF( IsKeyDown( VK_SHIFT ), -1, 1 )
+         IF nNext > LEN( ::aDocs )
+            nNext := 1
+          ELSEIF nNext <= 0
+            nNext := LEN( ::aDocs )
+         ENDIF
+         lMarkPrev := .F.
 
-      nSecs := SECONDS() - ::nLastTabTime
-      IF nSecs < 1 .OR. ::nLastTabPos == nSel .OR. ABS( ::nLastTabPos - nSel ) == 1
-         nPos := nSel + IIF( CheckBit( GetKeyState( VK_SHIFT ), 32768 ), -1, 1 )
-       ELSE
-         nPos := ::nLastTabPos
       ENDIF
-      IF nPos > LEN( ::aDocs )
-         nPos := 1
+      IF nNext != NIL
+         ::Application:Project:SourceTabChanged( nNext, .F., lMarkPrev )
       ENDIF
-      IF nPos < 0
-         nPos := LEN( ::aDocs )
-      ENDIF
-
-      ::nLastTabTime := SECONDS()
-
-      ::Application:Project:SourceTabChanged( nPos, .F. )
    ENDIF
 RETURN NIL
 
@@ -514,14 +512,17 @@ METHOD OnKeyUp() CLASS SourceEditor
    IF ::Source != NIL
       lSel := ::Source:GetSelLen() > 0
 
-      ::Application:Project:EditReset()
+      IF lSel != ::Application:Props:EditCopyItem:Enabled
 
-      IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0 .AND. ::Application:Props[ "EditCopyItem" ]:Enabled
-         ::Application:Props:EditCopyItem:Enabled := lSel
-         ::Application:Props:EditCopyBttn:Enabled := lSel
-         ::Application:Props:EditCutItem:Enabled  := lSel
-         ::Application:Props:EditCutBttn:Enabled  := lSel
-         ::Application:Props:EditDelBttn:Enabled  := lSel
+         ::Application:Project:EditReset()
+
+         IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0 .AND. ::Application:Props[ "EditCopyItem" ]:Enabled
+            ::Application:Props:EditCopyItem:Enabled := lSel
+            ::Application:Props:EditCopyBttn:Enabled := lSel
+            ::Application:Props:EditCutItem:Enabled  := lSel
+            ::Application:Props:EditCutBttn:Enabled  := lSel
+            ::Application:Props:EditDelBttn:Enabled  := lSel
+         ENDIF
       ENDIF
    ENDIF
 RETURN NIL
@@ -533,6 +534,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
    (nwParam, nlParam)
    IF ::Source != NIL
       DO CASE
+//         CASE hdr:code == SCN_STYLENEEDED
+//              scn := (struct SCNOTIFICATION*) nlParam
+//              SCI_SEND( SCI_STARTSTYLING, 0, 0x1f )
+//              SCI_SEND( SCI_SETSTYLING, 50, 11 )
+
          CASE hdr:code == SCN_UPDATEUI
               scn := (struct SCNOTIFICATION*) nlParam
               n := ::Source:GetCurrentPos()
@@ -567,14 +573,14 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               scn := (struct SCNOTIFICATION*) nlParam
               IF scn:margin == MARGIN_SCRIPT_FOLD_INDEX
                  nLine := ::Source:LineFromPosition( scn:position )
-                 ::SendMessage( SCI_TOGGLEFOLD, nLine, 0 )
-                 ::SendMessage( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine )
-                 ::SendMessage( SCI_GOTOLINE, nLine )
+                 SCI_SEND( SCI_TOGGLEFOLD, nLine, 0 )
+                 SCI_SEND( SCI_ENSUREVISIBLEENFORCEPOLICY, nLine )
+                 SCI_SEND( SCI_GOTOLINE, nLine )
               ENDIF
 
          CASE hdr:code == SCN_CHARADDED
               IF s_CurrentObject != NIL
-                 ::Application:MainForm:MenuStrip1:OnSysKeyDown( VK_MENU )
+                 ::Application:Props:MainMenu:OnSysKeyDown( VK_MENU )
               ENDIF
 
               scn := (struct SCNOTIFICATION*) nlParam
@@ -600,15 +606,15 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                  IF cObj == ":"
                     nWrap := ::Application:EditorProps:WrapSearch
                     ::Application:EditorProps:WrapSearch := 0
-                    nPos     := ::SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-                    nVisLine := ::SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+                    nPos     := SCI_SEND( SCI_GETCURRENTPOS, 0, 0 )
+                    nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
 
                     cObj := ::GetWithObject()
 
                     ::Application:EditorProps:WrapSearch := nWrap
 
-                    ::SendMessage( SCI_GOTOPOS, nPos, 0 )
-                    ::SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+                    SCI_SEND( SCI_GOTOPOS, nPos, 0 )
+                    SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
                  ENDIF
                  IF LEN( cObj ) >= 2
                     IF LEFT(cObj,2) == "::"
@@ -682,10 +688,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                        FOR n := 1 TO LEN( aList )
                            cList += aList[n]+ IIF( n<LEN(aList)," ", "" )
                        NEXT
-                       ::SendMessage( SCI_AUTOCSETCANCELATSTART, 0 )
-                       ::SendMessage( SCI_AUTOCSETMAXHEIGHT, 15 )
-                       ::SendMessage( SCI_AUTOCSETIGNORECASE, 1 )
-                       ::SendMessage( SCI_AUTOCSHOW, 0, cList )
+                       SCI_SEND( SCI_AUTOCSETCANCELATSTART, 0 )
+                       SCI_SEND( SCI_AUTOCSETMAXHEIGHT, 15 )
+                       SCI_SEND( SCI_AUTOCSETIGNORECASE, 1 )
+                       SCI_SEND( SCI_AUTOCSHOW, 0, cList )
                     ENDIF
                  ENDIF
               ENDIF
@@ -760,6 +766,8 @@ METHOD OnDestroy() CLASS SourceEditor
 
    ::Application:IniFile:WriteInteger( "Settings", "CaretLineVisible", ::CaretLineVisible )
    ::Application:IniFile:WriteInteger( "Settings", "AutoIndent", ::AutoIndent )
+   ::Application:IniFile:WriteInteger( "Settings", "TrimEOLSpaces", ::TrimEOLSpaces )
+
    ::Application:IniFile:WriteInteger( "Settings", "TabSpacing", ::TabWidth )
 RETURN NIL
 
@@ -776,15 +784,55 @@ RETURN nFlags
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnFindNext( oFind ) CLASS SourceEditor
+   LOCAL oSource, hFile, cLine, nCol, nRow, nLine
+
    ::cFindWhat  := oFind:FindWhat
    ::nDirection := oFind:Direction
 
-   ::Application:Project:__cFindText := oFind:FindWhat
+   ::Application:Project:__cFindText := ::cFindWhat
 
-   ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
-   IF ! ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
-      ::MessageBox( "Cannot find literal text: " + oFind:FindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
-      oFind:SetFocus()
+   IF ! ::FindInFiles
+
+      ::Source:SetSearchFlags( ::GetSearchFlags( oFind ) )
+      IF ! ::FindNext( oFind:FindWhat, oFind:Direction == 0 )
+         ::MessageBox( "Cannot find literal text: " + oFind:FindWhat, "Visual xHarbour", MB_ICONEXCLAMATION )
+         oFind:SetFocus()
+      ENDIF
+
+    ELSE
+      oFind:Close()
+      ::FindInFiles := .F.
+      ::Application:FindInFilesList:ResetContent()
+      ::Application:ResultPanel:Visible := .T.
+      ::Application:FindInFilesList:Parent:Select()
+      FOR EACH oSource IN ::aDocs
+          IF ( hFile := FOpen( oSource:File ) ) >= 0
+             nLine := 1
+             DO WHILE HB_FReadLine( hFile, @cLine, Chr(13) + Chr(10) ) == 0
+                IF ! oFind:MatchCase
+                   nCol := AT( Upper(::cFindWhat), Upper(cLine) )
+                 ELSE
+                   nCol := AT( ::cFindWhat, cLine )
+                ENDIF
+
+                IF nCol > 0
+                   IF oFind:WholeWord .AND. ( ( nCol > 1 .AND. Upper(cLine[nCol-1]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ) .OR. Upper(cLine[ nCol + Len( ::cFindWhat )+1 ]) $ "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" )
+                      nCol := 0
+                   ENDIF
+                ENDIF
+
+                IF nCol > 0
+                   WITH OBJECT ::Application:FindInFilesList
+                      nRow := :InsertItem( oSource:FileName,,,, nCol )
+                      :SetItemText( nRow, 1, xStr( nLine ) )
+                      :SetItemText( nRow, 2, AllTrim( cLine ) )
+                   END
+                ENDIF
+                nLine ++
+             ENDDO
+             FClose( hFile )
+          ENDIF
+      NEXT
    ENDIF
 RETURN NIL
 
@@ -872,21 +920,21 @@ RETURN 0
 
 CLASS Source INHERIT ProjectFile
    ACCESS Application INLINE ::Owner:Application
-   DATA pSource   EXPORTED
-   DATA Owner     EXPORTED
-   DATA FileTime  EXPORTED
-   DATA Modified  EXPORTED INIT .F.
-   DATA FirstOpen EXPORTED INIT .T.
-   DATA SavedPos  EXPORTED INIT 0
-   DATA nVisLine  EXPORTED INIT 0
-   DATA Extension EXPORTED INIT "prg"
-   DATA lStyled   EXPORTED INIT .T.
-   DATA cObj      EXPORTED INIT ""
-   DATA nPrevLine EXPORTED
-   DATA PrevFile  EXPORTED
-   DATA __xCtrlName EXPORTED INIT "Source"
-   DATA __lSelected EXPORTED INIT .F.
-
+   DATA pSource      EXPORTED
+   DATA Owner        EXPORTED
+   DATA FileTime     EXPORTED
+   DATA Modified     EXPORTED INIT .F.
+   DATA FirstOpen    EXPORTED INIT .T.
+   DATA SavedPos     EXPORTED INIT 0
+   DATA nVisLine     EXPORTED INIT 0
+   DATA Extension    EXPORTED INIT "prg"
+   DATA lStyled      EXPORTED INIT .T.
+   DATA cObj         EXPORTED INIT ""
+   DATA nPrevLine    EXPORTED
+   DATA PrevFile     EXPORTED
+   DATA __xCtrlName  EXPORTED INIT "Source"
+   DATA __lSelected  EXPORTED INIT .F.
+   DATA __nSearchCol EXPORTED INIT 0
    // Compatibility with xedit for debugger ------------------------------------------------
    ACCESS cFile             INLINE ::FileName
    ACCESS cPath             INLINE IIF( ! EMPTY(::Path), ::Path + "\", "" )
@@ -914,7 +962,7 @@ CLASS Source INHERIT ProjectFile
 
    METHOD Select()
 
-   METHOD CreateDocument()                    INLINE ::Owner:SendMessage( SCI_CREATEDOCUMENT, 0, 0 )
+   METHOD CreateDocument()                    INLINE SCI_SEND( SCI_CREATEDOCUMENT, 0, 0 )
 
    METHOD GotoPosition( nPos )                INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
    METHOD GotoLine( nLine )                   INLINE ::nPrevLine := ::GetCurLine()+1, ::SendEditor( SCI_GOTOLINE, nLine, 0 )
@@ -936,11 +984,15 @@ CLASS Source INHERIT ProjectFile
    METHOD GoToPos( nPos )                     INLINE ::SendEditor( SCI_GOTOPOS, nPos, 0 )
    METHOD GetColumn( nPos )                   INLINE ::SendEditor( SCI_GETCOLUMN, nPos, 0 )
 
+   METHOD PositionFromPoint( x, y )           INLINE ::SendEditor( SCI_POSITIONFROMPOINT, x, y )
+
    METHOD LineFromPosition( nPos )            INLINE ::SendEditor( SCI_LINEFROMPOSITION, nPos, 0 )
    METHOD PositionFromLine( nLine )           INLINE ::SendEditor( SCI_POSITIONFROMLINE, nLine, 0 )
    METHOD LineLength( nLine )                 INLINE ::SendEditor( SCI_LINELENGTH, nLine, 0 )
 
    METHOD GetCurLine()                        INLINE ::SendEditor( SCI_LINEFROMPOSITION, ::GetCurrentPos(), 0 )
+   METHOD GetCurColumn()                      INLINE ::SendEditor( SCI_GETCOLUMN, ::GetCurrentPos(), 0 )
+
    METHOD GetSelectionMode()                  INLINE ::SendEditor( SCI_GETSELECTIONMODE, 0, 0 )
    METHOD GetSelections()                     INLINE ::SendEditor( SCI_GETSELECTIONS, 0, 0 )
 
@@ -954,15 +1006,15 @@ CLASS Source INHERIT ProjectFile
    METHOD BeginUndoAction()                   INLINE ::SendEditor( SCI_BEGINUNDOACTION, 0, 0 )
    METHOD EndUndoAction()                     INLINE ::SendEditor( SCI_ENDUNDOACTION, 0, 0 )
 
-   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, (::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource ),::__lSelected := .T.),)
+   METHOD ChkDoc()                            INLINE IIF( ::Owner:GetCurDoc() != ::pSource, (SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource ),::__lSelected := .T.),)
 
    METHOD FindText( nFlags, ttf )             INLINE ::SendEditor( SCI_FINDTEXT, nFlags, ttf )
    METHOD SearchNext( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHNEXT, nFlags, cText )
    METHOD SearchPrev( nFlags, cText )         INLINE ::SendEditor( SCI_SEARCHPREV, nFlags, cText )
    METHOD ReplaceSel( cText )                 INLINE ::SendEditor( SCI_REPLACESEL, 0, cText )
    METHOD GetSelLen()                         INLINE ::SendEditor( SCI_GETSELTEXT, 0, 0 )-1
-   METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( ::Owner:SendMessage( SCI_GETSELTEXT, 0, 0 ) ),;
-                                                                 ::Owner:SendMessage( SCI_GETSELTEXT, 0, cBuffer ),;
+   METHOD GetSelText( cBuffer )               INLINE ::ChkDoc(), cBuffer := SPACE( SCI_SEND( SCI_GETSELTEXT, 0, 0 ) ),;
+                                                                 SCI_SEND( SCI_GETSELTEXT, 0, cBuffer ),;
                                                                  ALLTRIM(LEFT(cBuffer,LEN(cBuffer)-1))
    METHOD SetSearchFlags( nFlags )            INLINE ::SendEditor( SCI_SETSEARCHFLAGS, nFlags )
    METHOD SetTargetStart( nStart )            INLINE ::SendEditor( SCI_SETTARGETSTART, nStart )
@@ -997,13 +1049,16 @@ CLASS Source INHERIT ProjectFile
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD Select() CLASS Source
-   ::Owner:nLastTabPos := ASCAN( ::Owner:aDocs, {|o| o:pSource==::Owner:Source:pSource } )
+METHOD Select( lMarkPrev ) CLASS Source
+   DEFAULT lMarkPrev TO .T.
+   IF lMarkPrev
+      ::Owner:pPrevSel := ::Owner:Source:pSource
+   ENDIF
    ::__lSelected := .T.
-   ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+   SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource )
    ::Owner:xSource := Self
    ::GotoPosition( ::SavedPos )
-   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
+   SCI_SEND( SCI_SETFIRSTVISIBLELINE, ::nVisLine, 0 )
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1011,15 +1066,15 @@ METHOD GetBookmarks() CLASS Source
    LOCAL n, nLines, nVisLine, nPos, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
 
    IF ! ( pSource == ::pSource )
-      nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-      nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      nPos     := SCI_SEND( SCI_GETCURRENTPOS, 0, 0 )
+      nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource )
       ::__lSelected := .T.
    ENDIF
 
-   nLines   := ::Owner:SendMessage( SCI_GETLINECOUNT, 0, 0 )
+   nLines   := SCI_SEND( SCI_GETLINECOUNT, 0, 0 )
    FOR n := 1 TO nLines
-       IF ( nLine := ::Owner:SendMessage( SCI_MARKERNEXT, n-1, 1<<MARKER_MASK ) ) >= 0
+       IF ( nLine := SCI_SEND( SCI_MARKERNEXT, n-1, 1<<MARKER_MASK ) ) >= 0
           cMarks += IIF( ! EMPTY(cMarks),"|","") + xStr(nLine)
           n := nLine+1
           LOOP
@@ -1029,9 +1084,9 @@ METHOD GetBookmarks() CLASS Source
    NEXT
 
    IF ! ( pSource == ::pSource )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
-      ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-      ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, pSource )
+      SCI_SEND( SCI_GOTOPOS, nPos, 0 )
+      SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
    ENDIF
 RETURN cMarks
 
@@ -1039,12 +1094,12 @@ RETURN cMarks
 METHOD SendEditor( nMsg, wParam, lParam ) CLASS Source
    LOCAL xReturn, pSource := ::Owner:GetCurDoc()
    IF ! ( pSource == ::pSource )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource )
       ::__lSelected := .T.
    ENDIF
-   xReturn := ::Owner:SendMessage( nMsg, wParam, lParam )
+   xReturn := SCI_SEND( nMsg, wParam, lParam )
    IF ! ( pSource == ::pSource )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
 RETURN xReturn
 
@@ -1093,8 +1148,8 @@ RETURN .F.
 METHOD Reload( cText ) CLASS Source
    LOCAL nPos, nVisLine, lReadOnly
    ::ChkDoc()
-   nPos        := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-   nVisLine    := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+   nPos        := SCI_SEND( SCI_GETCURRENTPOS, 0, 0 )
+   nVisLine    := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
    lReadOnly   := ::lReadOnly
    ::FirstOpen := .T.
    DEFAULT cText TO MemoRead( ::File, .F. )
@@ -1107,8 +1162,8 @@ METHOD Reload( cText ) CLASS Source
    ::FirstOpen := .F.
    ::GotoPosition( nPos )
 
-   ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-   ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+   SCI_SEND( SCI_GOTOPOS, nPos, 0 )
+   SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
 
    ::SetSavePoint()
 RETURN Self
@@ -1143,17 +1198,17 @@ METHOD GetText() CLASS Source
    LOCAL cText, nLen, pSource := ::Owner:GetCurDoc()
 
    IF ! ( ::pSource == pSource )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource )
       ::__lSelected := .T.
    ENDIF
 
-   nLen := ::Owner:SendMessage( SCI_GETLENGTH, 0, 0 )+1
+   nLen := SCI_SEND( SCI_GETLENGTH, 0, 0 )+1
    cText := SPACE( nLen )
-   ::Owner:SendMessage( SCI_GETTEXT, nLen, @cText )
+   SCI_SEND( SCI_GETTEXT, nLen, @cText )
    cText := STRTRAN( cText, CHR(0) )
 
    IF ! ( ::pSource == pSource )
-      ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
+      SCI_SEND( SCI_SETDOCPOINTER, 0, pSource )
    ENDIF
 RETURN cText
 
@@ -1161,15 +1216,15 @@ RETURN cText
 METHOD GetLine( nLine ) CLASS Source
    LOCAL cText, nLen
    ::ChkDoc()
-   nLen := ::Owner:SendMessage( SCI_LINELENGTH, nLine, 0 )+1
+   nLen := SCI_SEND( SCI_LINELENGTH, nLine, 0 )+1
    cText := SPACE( nLen )
-   ::Owner:SendMessage( SCI_GETLINE, nLine, @cText )
+   SCI_SEND( SCI_GETLINE, nLine, @cText )
    cText := STRTRAN( cText, CHR(0) )
 RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL hFile, cText, n, cBak, oFile
+   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer
 
    IF cFile != NIL
       ::File := cFile
@@ -1200,11 +1255,41 @@ METHOD Save( cFile ) CLASS Source
       ENDIF
 
       IF ( hFile := fCreate( ::File ) ) <> -1
-         cText := ::GetText()
+         ::SetSavePoint()
+
+         IF ::Owner:TrimEOLSpaces == 1
+            nCol     := ::GetCurColumn()
+            nLine    := ::GetCurLine()
+
+            nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+            nLines   := SCI_SEND( SCI_GETLINECOUNT, 0, 0 )
+
+            //WHILE At( " " + CRLF, cText ) > 0
+            //   cText := StrTran( cText, " " + CRLF, CRLF )
+            //ENDDO
+
+            cBuffer := ""
+            FOR n := 1 TO nLines
+                cBuffer += RTrim( ::GetLine( n-1 ), .T. ) + IIF( n < nLines, CRLF, "" )
+            NEXT
+            cText := cBuffer
+
+            ::SetText( cText )
+            //::GotoLine( nLine )
+
+            nPos := SCI_SEND( SCI_FINDCOLUMN, nLine, nCol )
+            SCI_SEND( SCI_GOTOPOS, nPos, 0 )
+
+            SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+          ELSE
+            cText := ::GetText()
+         ENDIF
+
          fWrite( hFile, cText, Len(cText) )
          fClose( hFile )
          ::FileTime := FileTime( ::File )
          ::Modified := .F.
+
       ENDIF
 
       n := RAT( "\", ::File )
@@ -1229,7 +1314,7 @@ RETURN ::SearchInTarget( Len( cText ), cText )
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD SetText( cText ) CLASS Source
    ::ChkDoc()
-   ::Owner:SendMessage( SCI_SETTEXT, 0, cText )
+   SCI_SEND( SCI_SETTEXT, 0, cText )
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -1245,10 +1330,10 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
    ENDIF
    //-------------------------------------------------------------
 //    pSource  := ::Owner:GetCurDoc()
-//    nPos     := ::Owner:SendMessage( SCI_GETCURRENTPOS, 0, 0 )
-//    nVisLine := ::Owner:SendMessage( SCI_GETFIRSTVISIBLELINE, 0, 0 )
+//    nPos     := SCI_SEND( SCI_GETCURRENTPOS, 0, 0 )
+//    nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
 //
-//    ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, ::pSource )
+//    SCI_SEND( SCI_SETDOCPOINTER, 0, ::pSource )
    //-------------------------------------------------------------
 
    DEFAULT lInSelection TO .F.
@@ -1358,9 +1443,9 @@ METHOD ReplaceAll( cFind, cReplace, nFlags, lInSelection ) CLASS Source
       ::Owner:PosFind := nPosFind
    ENDIF
 
-//    ::Owner:SendMessage( SCI_SETDOCPOINTER, 0, pSource )
-//    ::Owner:SendMessage( SCI_GOTOPOS, nPos, 0 )
-//    ::Owner:SendMessage( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+//    SCI_SEND( SCI_SETDOCPOINTER, 0, pSource )
+//    SCI_SEND( SCI_GOTOPOS, nPos, 0 )
+//    SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
 
 RETURN nReplacements
 
@@ -1419,414 +1504,414 @@ METHOD OnInitDialog() CLASS Settings
    WITH OBJECT ( TABSTRIP( Self ) )
       :Name                 := "TabStrip1"
       WITH OBJECT :Dock
-         :Left                 := Self
-         :Top                  := Self
-         :Right                := Self
-         :Bottom               := Self
-         :Margins              := "5,5,5,35"
+         :Left    := Self
+         :Top     := Self
+         :Right   := Self
+         :Bottom  := Self
+         :Margins := "5,5,5,35"
       END
 
-      :Left                 := 5
-      :Top                  := 5
-      :Width                := 453
-      :Height               := 560
+      :Left   := 5
+      :Top    := 5
+      :Width  := 453
+      :Height := 560
       :Create()
       WITH OBJECT ( TABPAGE( :this ) )
-         :Name                 := "EditorSettings"
-         :Text                 := "&Editor"
+         :Name := "EditorSettings"
+         :Text := "&Editor"
          :Create()
          WITH OBJECT ( GROUPBOX( :this ) )
-            :Name                 := "GroupBox1"
-            :Left                 := 10
-            :Top                  := 7
-            :Width                := 431
-            :Height               := 309
-            :Text                 := "Colors"
-            :ForeColor            := 0
+            :Name      := "GroupBox1"
+            :Left      := 10
+            :Top       := 7
+            :Width     := 431
+            :Height    := 309
+            :Text      := "Colors"
+            :ForeColor := 0
             :Create()
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Background"
-               :Left                 := 263
-               :Top                  := 16
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Background"
+               :Name   := "Background"
+               :Left   := 263
+               :Top    := 16
+               :Width  := 77
+               :Height := 22
+               :Text   := "Background"
                :EventHandler[ "OnClick" ] := "DefBack_OnClick"
                :Create()
             END //BUTTON
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "NormalText"
-               :Left                 := 345
-               :Top                  := 16
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "NormalText"
+               :Left   := 345
+               :Top    := 16
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 15
-               :Top                  := 19
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Default"
-               :Transparent          := .T.
-               :Alignment            := DT_RIGHT
+               :Left        := 15
+               :Top         := 19
+               :Width       := 96
+               :Height      := 16
+               :Text        := "Default"
+               :Transparent := .T.
+               :Alignment   := DT_RIGHT
                :Create()
             END //LABEL
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "NormalTextEdit"
-               :Left                 := 124
-               :Top                  := 17
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "Normal Text"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "NormalTextEdit"
+               :Left       := 124
+               :Top        := 17
+               :Width      := 129
+               :Height     := 22
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
+               :Text       := "Normal Text"
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "SelectedLine"
-               :Left                 := 263
-               :Top                  := 43
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Background"
+               :Name   := "SelectedLine"
+               :Left   := 263
+               :Top    := 43
+               :Width  := 77
+               :Height := 22
+               :Text   := "Background"
                :EventHandler[ "OnClick" ] := "DefBack_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "SelectedLineEdit"
-               :Left                 := 124
-               :Top                  := 44
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "Normal Text"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "SelectedLineEdit"
+               :Left       := 124
+               :Top        := 44
+               :Width      := 129
+               :Height     := 22
+               :Text       := "Normal Text"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 10
-               :Top                  := 46
-               :Width                := 101
-               :Height               := 16
-               :Text                 := "Current Line"
-               :Alignment            := DT_RIGHT
+               :Left       := 10
+               :Top        := 46
+               :Width      := 101
+               :Height     := 16
+               :Text       := "Current Line"
+               :Alignment  := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Numbers"
-               :Left                 := 345
-               :Top                  := 70
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Numbers"
+               :Left   := 345
+               :Top    := 70
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "NumbersEdit"
-               :Left                 := 124
-               :Top                  := 71
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "12345678"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "NumbersEdit"
+               :Left       := 124
+               :Top        := 71
+               :Width      := 129
+               :Height     := 22
+               :Text       := "12345678"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 74
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Numbers"
-               :Alignment            := DT_RIGHT
+               :Left      := 16
+               :Top       := 74
+               :Width     := 96
+               :Height    := 16
+               :Text      := "Numbers"
+               :Alignment := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Strings"
-               :Left                 := 345
-               :Top                  := 96
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Strings"
+               :Left   := 345
+               :Top    := 96
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "StringsEdit"
-               :Left                 := 124
-               :Top                  := 97
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := '"This is text"'
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "StringsEdit"
+               :Left       := 124
+               :Top        := 97
+               :Width      := 129
+               :Height     := 22
+               :Text       := '"This is text"'
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 100
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Strings"
-               :Alignment            := DT_RIGHT
+               :Left      := 16
+               :Top       := 100
+               :Width     := 96
+               :Height    := 16
+               :Text      := "Strings"
+               :Alignment := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Comments"
-               :Left                 := 345
-               :Top                  := 123
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Comments"
+               :Left   := 345
+               :Top    := 123
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "CommentsEdit"
-               :Left                 := 124
-               :Top                  := 124
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "// Comment"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "CommentsEdit"
+               :Left       := 124
+               :Top        := 124
+               :Width      := 129
+               :Height     := 22
+               :Text       := "// Comment"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 127
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Comments"
-               :Alignment            := DT_RIGHT
+               :Left      := 16
+               :Top       := 127
+               :Width     := 96
+               :Height    := 16
+               :Text      := "Comments"
+               :Alignment := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Operators"
-               :Left                 := 345
-               :Top                  := 149
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Operators"
+               :Left   := 345
+               :Top    := 149
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "OperatorsEdit"
-               :Left                 := 124
-               :Top                  := 150
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := ":="
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "OperatorsEdit"
+               :Left       := 124
+               :Top        := 150
+               :Width      := 129
+               :Height     := 22
+               :Text       := ":="
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 153
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Operators"
-               :Alignment            := DT_RIGHT
+               :Left      := 16
+               :Top       := 153
+               :Width     := 96
+               :Height    := 16
+               :Text      := "Operators"
+               :Alignment := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Preprocessor"
-               :Left                 := 345
-               :Top                  := 175
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Preprocessor"
+               :Left   := 345
+               :Top    := 175
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "PreprocessorEdit"
-               :Left                 := 124
-               :Top                  := 176
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "#include"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "PreprocessorEdit"
+               :Left       := 124
+               :Top        := 176
+               :Width      := 129
+               :Height     := 22
+               :Text       := "#include"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 179
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Preprocessor"
-               :Alignment            := DT_RIGHT
+               :Left      := 16
+               :Top       := 179
+               :Width     := 96
+               :Height    := 16
+               :Text      := "Preprocessor"
+               :Alignment := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Keywords1"
-               :Left                 := 345
-               :Top                  := 201
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name   := "Keywords1"
+               :Left   := 345
+               :Top    := 201
+               :Width  := 77
+               :Height := 22
+               :Text   := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "Keywords1Edit"
-               :Left                 := 124
-               :Top                  := 202
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "DO CASE"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "Keywords1Edit"
+               :Left       := 124
+               :Top        := 202
+               :Width      := 129
+               :Height     := 22
+               :Text       := "DO CASE"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 205
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Keywords 1"
-               :Alignment            := DT_RIGHT
+               :Left       := 16
+               :Top        := 205
+               :Width      := 96
+               :Height     := 16
+               :Text       := "Keywords 1"
+               :Alignment  := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Keywords2"
-               :Left                 := 345
-               :Top                  := 226
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name       := "Keywords2"
+               :Left       := 345
+               :Top        := 226
+               :Width      := 77
+               :Height     := 22
+               :Text       := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "Keywords2Edit"
-               :Left                 := 124
-               :Top                  := 227
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "Function / Method"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "Keywords2Edit"
+               :Left       := 124
+               :Top        := 227
+               :Width      := 129
+               :Height     := 22
+               :Text       := "Function/Method"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 230
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Keywords 2"
-               :Alignment            := DT_RIGHT
+               :Left       := 16
+               :Top        := 230
+               :Width      := 96
+               :Height     := 16
+               :Text       := "Keywords 2"
+               :Alignment  := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Keywords3"
-               :Left                 := 345
-               :Top                  := 251
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name       := "Keywords3"
+               :Left       := 345
+               :Top        := 251
+               :Width      := 77
+               :Height     := 22
+               :Text       := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "Keywords3Edit"
-               :Left                 := 124
-               :Top                  := 252
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "SendMessage"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "Keywords3Edit"
+               :Left       := 124
+               :Top        := 252
+               :Width      := 129
+               :Height     := 22
+               :Text       := "SendMessage"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 255
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Keywords 3"
-               :Alignment            := DT_RIGHT
+               :Left       := 16
+               :Top        := 255
+               :Width      := 96
+               :Height     := 16
+               :Text       := "Keywords 3"
+               :Alignment  := DT_RIGHT
                :Create()
             END //LABEL
 
             WITH OBJECT ( BUTTON( :this ) )
-               :Name                 := "Keywords4"
-               :Left                 := 345
-               :Top                  := 276
-               :Width                := 77
-               :Height               := 22
-               :Text                 := "Foreground"
+               :Name       := "Keywords4"
+               :Left       := 345
+               :Top        := 276
+               :Width      := 77
+               :Height     := 22
+               :Text       := "Foreground"
                :EventHandler[ "OnClick" ] := "DefFore_OnClick"
                :Create()
             END //BUTTON
 
-            WITH OBJECT ( EDITBOX( :this ) )
-               :Name                 := "Keywords4Edit"
-               :Left                 := 124
-               :Top                  := 277
-               :Width                := 129
-               :Height               := 22
-               :StaticEdge           := .T.
-               :ClientEdge           := .F.
-               :Text                 := "dbEval"
-               :ReadOnly             := .T.
+            WITH OBJECT ( Label( :this ) )
+               :Name       := "Keywords4Edit"
+               :Left       := 124
+               :Top        := 277
+               :Width      := 129
+               :Height     := 22
+               :Text       := "dbEval"
+               :Alignment  := DT_CENTER
+               :Border     := -1
+               :VertCenter := .T.
                :Create()
             END //EDITBOX
 
             WITH OBJECT ( LABEL( :this ) )
-               :Left                 := 16
-               :Top                  := 280
-               :Width                := 96
-               :Height               := 16
-               :Text                 := "Keywords 4"
-               :Alignment            := DT_RIGHT
+               :Left       := 16
+               :Top        := 280
+               :Width      := 96
+               :Height     := 16
+               :Text       := "Keywords 4"
+               :Alignment  := DT_RIGHT
                :Create()
             END //LABEL
 
@@ -1874,6 +1959,18 @@ METHOD OnInitDialog() CLASS Settings
                :State                := ::Application:SourceEditor:AutoIndent
                :Create()
             END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "TrimEOLSpaces"
+               :Left                 := 335
+               :Top                  := 22
+               :Width                := 86
+               :Height               := 15
+               :Text                 := "Trim spaces"
+               :State                := ::Application:SourceEditor:TrimEOLSpaces
+               :Create()
+            END //CHECKBOX
+
 
             WITH OBJECT ( LABEL( :this ) )
                :Left                 := 12
@@ -1994,6 +2091,43 @@ METHOD OnInitDialog() CLASS Settings
          END //GROUPBOX
 
       END //TABPAGE
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name := "GeneralSettings"
+         :Text := "&General"
+         :Create()
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Left   := 12
+            :Top    := 49
+            :Width  := 71
+            :Height := 16
+            :Text   := "Grid Size"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( UPDOWN( :this ) )
+            :Name   := "UpDown2"
+            :Left   := 128
+            :Top    := 46
+            :Width  := 18
+            :Height := 22
+            :Buddy  := "GridSize"
+            :Create()
+         END //UPDOWN
+
+         WITH OBJECT ( EDITBOX( :this ) )
+            :Name      := "GridSize"
+            :Left      := 90
+            :Top       := 46
+            :Width     := 40
+            :Height    := 22
+            :Alignment := 3
+            :Number    := .T.
+            :Text      := xStr( ::Application:IniFile:ReadInteger( "Settings", "GridSize", 4 ) )
+            :Create()
+         END //EDITBOX
+
+      END
 
    END //TABSTRIP
 
@@ -2120,11 +2254,12 @@ METHOD SetFonts( cName, lBold, lItalic, nSize ) CLASS Settings
    DEFAULT nSize   TO VAL( _GetWindowText( ::ComboFontSize:hEdit ) )
 
    FOR EACH oCtrl IN ::GroupBox1:Children
-       IF oCtrl:__xCtrlName == "EditBox"
+       IF oCtrl:__xCtrlName == "Label" .AND. oCtrl:VertCenter
           oCtrl:Font:FaceName  := cName
           oCtrl:Font:PointSize := nSize
           oCtrl:Font:Bold      := lBold
           oCtrl:Font:Italic    := lItalic
+          oCtrl:Redraw()
        ENDIF
    NEXT
 RETURN Self
@@ -2137,6 +2272,19 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------
 METHOD Apply() CLASS Settings
+   ::Application:IniFile:WriteInteger( "Settings", "GridSize", Val( ::GridSize:Text ) )
+
+   IF ::Application:DesignPage:CtrlMask != NIL
+      WITH OBJECT ::Application:DesignPage:CtrlMask
+         :xGrid := Val( ::GridSize:Text )
+         :yGrid := Val( ::GridSize:Text )
+         :InvalidateRect()
+      END
+      IF ::Application:Project:CurrentForm != NIL
+         ::Application:Project:CurrentForm:InvalidateRect()
+      ENDIF
+   ENDIF
+
    WITH OBJECT ::Application:SourceEditor
       :StyleSetFont( ::NormalTextEdit:Font:FaceName )
       :StyleSetSize( ::NormalTextEdit:Font:PointSize )
@@ -2158,6 +2306,8 @@ METHOD Apply() CLASS Settings
       :TabWidth          := VAL( ::TabSpacing:Text    )
       :CaretLineVisible  := ::CaretLine:GetState()
       :AutoIndent        := ::AutoIndent:GetState()
+      :TrimEOLSpaces     := ::TrimEOLSpaces:GetState()
+
       ::Application:EditorProps:WrapSearch := ::WrapSearch:GetState()
       ::Application:Props:WrapSearchItem:Checked := ::WrapSearch:GetState()==1
 
@@ -2165,6 +2315,10 @@ METHOD Apply() CLASS Settings
       :StyleSetFore( STYLE_DEFAULT, :ColorNormalText )
       :StyleClearAll()
       :SetColors()
+
+      ::Application:EditorPage:TabBackColor := :ColorBackground
+      ::Application:EditorPage:TabTextColor := :ColorNormalText
+      ::Application:MainTab:Redraw()
    END
 RETURN Self
 
@@ -2503,4 +2657,158 @@ ENDCLASS
 METHOD Init( cFile ) CLASS ProjectFile
    ::File := cFile
 RETURN Self
+
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+
+#pragma BEGINDUMP
+
+#include <windows.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include "item.api"
+#include "hbdefs.h"
+#include "hbvmpub.h"
+#include "hbinit.h"
+#include "hbapi.h"
+#include "hbfast.h"
+#include "hbvm.h"
+#include "hbapierr.h"
+#include "hbpcode.h"
+#include "hbstack.h"
+
+#define SCI_GETDIRECTFUNCTION 2184
+#define SCI_GETDIRECTPOINTER 2185
+
+static HMODULE hSciLib = NULL;
+static int (*fn)(void*,int,int,int);
+static void * ptr;
+static HWND hEditor;
+typedef VOID (WINAPI *STSPACES)(void);
+
+//--------------------------------------------------------------------------------------------------------
+HB_FUNC_INIT( SCILOAD )
+{
+   hSciLib = LoadLibrary( "SciLexer.dll" );
+}
+
+HB_FUNC_EXIT( SCIFREE )
+{
+   FreeLibrary( hSciLib );
+   hSciLib = NULL;
+}
+
+HB_FUNC( SCI_INIT )
+{
+   hEditor = (HWND) hb_parnl(1);
+   fn = (int (__cdecl *)(void *,int,int,int)) SendMessage( hEditor,SCI_GETDIRECTFUNCTION,0,0);
+   ptr = (void *) SendMessage(hEditor,SCI_GETDIRECTPOINTER,0,0);
+}
+
+//-------------------------------------------------------------------------------------------------
+static PHB_ITEM hb_pureparam( int iParam, LONG iMask )
+{
+   HB_THREAD_STUB
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) )
+   {
+      PHB_ITEM pItem = hb_stackItemFromBase( iParam  );
+
+      if( ( HB_TYPE ) iMask == HB_IT_ANY || pItem->type & ( HB_TYPE ) iMask )
+      {
+         return pItem;
+      }
+      else
+      {
+         if( (HB_TYPE) iMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
+         {
+            return pItem;
+         }
+      }
+   }
+
+   return NULL;
+}
+
+HB_FUNC( SCI_SEND )
+{
+   BOOL bByRef;
+   LPARAM lParam;
+   WPARAM wParam;
+
+   PHB_ITEM pLPARAM;
+   PHB_ITEM pWPARAM;
+
+   if( IsWindow( hEditor ) )
+   {
+      if( ISCHAR(2) )
+      {
+         pWPARAM = hb_pureparam( 2, HB_IT_ANY );
+         wParam = (WPARAM) hb_itemGetCPtr( pWPARAM );
+      }
+      else
+      {
+         wParam = ISNIL(2) ? 0 : hb_parni(2);
+      }
+
+      if( ISNIL(3) )
+      {
+         lParam = 0;
+      }
+      else
+      {
+         pLPARAM = hb_pureparam( 3, HB_IT_ANY );
+         if( pLPARAM )
+         {
+            if( HB_IS_BYREF( pLPARAM ) )
+            {
+               bByRef = TRUE;
+               pLPARAM = hb_itemUnRef( pLPARAM );
+            }
+            else
+            {
+               bByRef = FALSE;
+            }
+
+            if( HB_IS_STRING( pLPARAM ) )
+            {
+               lParam = (LPARAM) hb_itemGetCPtr( pLPARAM );
+            }
+            else if( HB_IS_NUMERIC( pLPARAM ) )
+            {
+               lParam = hb_itemGetNL( pLPARAM );
+            }
+            else if( HB_IS_LOGICAL( pLPARAM ) )
+            {
+               lParam = (LPARAM) hb_itemGetL( pLPARAM );
+            }
+            else if( HB_IS_NIL( pLPARAM ) )
+            {
+               lParam = 0;
+            }
+         }
+      }
+
+      hb_retnl( (long) fn(ptr,hb_parni(1),wParam,lParam) );
+
+      if( bByRef )
+      {
+         if( HB_IS_STRING( pLPARAM ) )
+         {
+            hb_storc( (char *) lParam, 3 );
+         }
+         else if( HB_IS_NUMERIC( pLPARAM ) )
+         {
+            hb_stornl( lParam, 3 );
+         }
+         else if( HB_IS_NIL( pLPARAM ) )
+         {
+            hb_stornl( lParam, 3 );
+         }
+      }
+   }
+}
 

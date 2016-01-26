@@ -31,9 +31,8 @@ CLASS Control INHERIT Window
    PROPERTY Enabled        ROOT "Behavior"   SET ::__Enable(v)                        DEFAULT .T.
    PROPERTY Text           ROOT "Appearance" GET IIF( ! ::IsWindow() .OR. ::__IsInstance, ::xText, _GetWindowText( ::hWnd ) ) SET ::SetWindowText( v ) DEFAULT ""
    PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
-   //-------------------------------------------------------------------------------------------------------------------------------------------------------
-   PROPERTY Border         ROOT "Appearance" GET ( IIF( VALTYPE(::xBorder)=="L", ::xBorder := IIF( ::xBorder, WS_BORDER, 0 ),), ::xBorder );
-                                             SET ::__SetBorder(v)      DEFAULT 0
+   PROPERTY BorderColor    ROOT "Colors" DEFAULT 0
+   PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
    DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
 
 
@@ -50,6 +49,7 @@ CLASS Control INHERIT Window
    ACCESS Caption        INLINE ::Text
    ASSIGN Caption(c)     INLINE ::Text := c
 
+   DATA ImageList         EXPORTED
    DATA IsContainer       EXPORTED INIT .F.
    DATA Value             EXPORTED
    DATA Options           EXPORTED
@@ -76,7 +76,7 @@ CLASS Control INHERIT Window
    ACCESS MdiContainer    INLINE ::xMdiContainer
    ASSIGN MdiContainer(l) INLINE ::xMdiContainer := l
    ACCESS DesignMode      INLINE IIF( ::Parent != NIL, ::Parent:DesignMode, .F. )
-
+   ACCESS Right           INLINE ::Left + ::Width
    ACCESS IsDocked        INLINE ::__Docked
 
    METHOD Init() CONSTRUCTOR
@@ -90,10 +90,11 @@ CLASS Control INHERIT Window
    METHOD OnEnterSizeMove()
    METHOD OnExitSizeMove()
 
-   METHOD Redraw() INLINE ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD Redraw( aRect ) INLINE ::RedrawWindow( aRect, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
    METHOD __Enable( lEnable )
    METHOD GetBkBrush()
    METHOD OnDestroy()          INLINE IIF( ::__hParBrush != NIL, DeleteObject( ::__hParBrush ),), Super:OnDestroy()
+   METHOD OnNCPaint()
    METHOD DrawArrow()
    METHOD __SetBorder()
    METHOD Show()
@@ -336,7 +337,6 @@ METHOD DrawArrow( hDC, aRect ) CLASS Control
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
-
 METHOD OnSize( nwParam, nlParam ) CLASS Control
    LOCAL x, y, oParent
    IF ::Super:OnSize( nwParam, nlParam ) == NIL
@@ -442,6 +442,10 @@ METHOD OnMove( x, y ) CLASS Control
          ::BottomSplitter:OnParentMove( x, y )
       ENDIF
    ENDIF
+   IF ::DesignMode
+      ::InvalidateRect()
+      RETURN 0
+   ENDIF
 RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
@@ -471,6 +475,22 @@ METHOD GetBkBrush() CLASS Control
    DEFAULT hBkGnd TO ::Parent:BkBrush
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
 RETURN hBkGnd
+
+METHOD OnNCPaint() CLASS Control
+   LOCAL hOldBrush, hPen, hDC
+   ::CallWindowProc()
+   IF ::BorderColor <> 0 .AND. ::Border <> 0
+      hDC       := GetWindowDC( ::hWnd )
+      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+      hPen      := SelectObject( hDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
+
+      Rectangle( hDC, 0, 0, ::Width, ::Height )
+
+      DeleteObject( SelectObject( hDC, hPen ) )
+      SelectObject( hDC, hOldBrush )
+      ReleaseDC( ::hWnd, hDC )
+   ENDIF
+RETURN 0
 
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
@@ -549,6 +569,7 @@ CLASS TitleControl INHERIT Control
    METHOD SetActive( l ) INLINE IIF( ::__lActive != l, ( ::__lActive := l, ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), ::UpdateWindow() ), )
    METHOD ResetFrame() VIRTUAL
    METHOD __OnClose()
+   METHOD OnPaint()
 ENDCLASS
 
 METHOD Create() CLASS TitleControl
@@ -613,7 +634,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ENDIF
       ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
-      hOldPen   := SelectObject( hDC, ::System:TitleBorderPen )
+      hOldPen   := SelectObject( hDC, ::ColorScheme:Pen:TitleBackColorActive )
       hOldBrush := SelectObject( hDC, IIF( ! ::__lActive, ::ColorScheme:Brush:TitleBackColorInactive, ::ColorScheme:Brush:TitleBackColorActive ) )
 
       Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
@@ -971,7 +992,7 @@ METHOD DrawClose( hDC ) CLASS TitleControl
    LOCAL hOld
    LOCAL aRect  := ::__aCloseRect
 
-   hOld := SelectObject( hDC, ::System:TitleBorderPen )
+   hOld := SelectObject( hDC, ::ColorScheme:Pen:TitleBackColorActive ) //::System:TitleBorderPen )
    IF ::__lCloseHover
       SelectObject( hDC, IIF( !::__lClosePushed, ::Application:ColorTable:Brush:MenuItemSelected, ::Application:ColorTable:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
@@ -1007,7 +1028,7 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
    LOCAL hOld, nLeft, nRight, nBottom
    LOCAL aRect  := ::__aPinRect
 
-   hOld := SelectObject( hDC, ::System:TitleBorderPen )
+   hOld := SelectObject( hDC, ::ColorScheme:Pen:TitleBackColorActive ) //::System:TitleBorderPen )
    IF ::__lPinHover
       SelectObject( hDC, IIF( ! ::__lPinPushed, ::Application:ColorTable:Brush:MenuItemSelected, ::Application:ColorTable:Brush:MenuItemSelectedGradientEnd ) )
       Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
@@ -1042,3 +1063,29 @@ METHOD DrawPin( hDC, n ) CLASS TitleControl
    SelectObject( hDC, hOld )
 
 RETURN Self
+
+METHOD OnPaint() CLASS TitleControl
+   LOCAL hDC, hMemDC, hBitmap, hOldBitmap
+   IF ::DesignMode .AND. ::IsContainer
+      hDC        := ::BeginPaint()
+
+      hMemDC     := CreateCompatibleDC( hDC )
+      hBitmap    := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+      hOldBitmap := SelectObject( hMemDC, hBitmap )
+
+      _FillRect( hMemDC, { 0,0,::ClientWidth, ::ClientHeight }, IIF( ::bkBrush != NIL, ::bkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
+
+      IF ::Application:ShowGrid == 1
+         DrawGrid( hMemDC, ::Form:CtrlMask:xGrid, ::Form:CtrlMask:yGrid, ::ClientWidth, ::ClientHeight, RGB(0,0,0) )
+      ENDIF
+
+      BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+      SelectObject( hMemDC, hOldBitmap )
+      DeleteObject( hBitmap )
+      DeleteDC( hMemDC )
+
+      ::EndPaint()
+      RETURN 0
+   ENDIF
+RETURN Super:OnPaint()

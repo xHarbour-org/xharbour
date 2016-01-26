@@ -136,7 +136,7 @@ METHOD Init( oParent ) CLASS ListBox
    ::ClsName      := "ListBox"
    DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    DEFAULT ::__xCtrlName TO "ListBox"
-   ::Border       := .T.
+   ::Border       := WS_EX_CLIENTEDGE
    ::Super:Init( oParent )
    ::Width        := 80
    ::Height       := 80

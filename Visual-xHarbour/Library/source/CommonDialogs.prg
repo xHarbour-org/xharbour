@@ -665,7 +665,7 @@ CLASS ReplaceTextDialog INHERIT CommonDialogs
 
    DATA FindWhat      EXPORTED  INIT ""
    DATA ReplaceWith   EXPORTED  INIT ""
-
+   DATA MultipleFiles EXPORTED  INIT .F.
    DATA WholeWord     EXPORTED  INIT .F.
    DATA MatchCase     EXPORTED  INIT .F.
    DATA Direction     EXPORTED  INIT 0
@@ -754,6 +754,7 @@ METHOD __WndProc( hWnd, nMsg, nwParam, nlParam ) CLASS ReplaceTextDialog
               CASE nwParam == IDCANCEL
                    //VXH_FreeCallBackPointer( ::__pCallBackPtr )
                    ::Application:MainForm:PostMessage( WM_VXH_FREECALLBACK, ::__pCallBackPtr )
+                   ::ExecuteEvent( "OnFindClose", hWnd )
            ENDCASE
    ENDCASE
 RETURN 0

@@ -23,6 +23,7 @@
 #define BP_PUSHBUTTON    1
 
 #define BS_COMMANDLINK 0x0000000E
+#define BS_SPLITBUTTON 0x0000000C
 
 #define BCM_FIRST 0x1600
 #define BCM_SETNOTE (BCM_FIRST + 0x0009)
@@ -42,6 +43,7 @@ CLASS Button INHERIT Control
    PROPERTY DefaultButton ROOT "Behavior"   SET ::SetStyle( BS_DEFPUSHBUTTON, v) DEFAULT .F.
    PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )     DEFAULT .T.
    PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v )    DEFAULT .F. PROTECTED
+   PROPERTY Split                           SET ::SetStyle( BS_SPLITBUTTON, v )  DEFAULT .F.
 
    DATA ImgInst           EXPORTED
    DATA ImageIndent       EXPORTED INIT 3

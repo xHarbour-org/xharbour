@@ -32,8 +32,6 @@ CLASS CoolMenu INHERIT ToolBar
    PROPERTY HotImageList GET __ChkComponent( Self, @::xHotImageList )
    PROPERTY ImageList    GET __ChkComponent( Self, @::xImageList )
 
-   DATA BackColor       EXPORTED
-   DATA ForeColor       EXPORTED
    DATA Editor          EXPORTED
 
    DATA hBackupColor    EXPORTED
@@ -82,7 +80,7 @@ METHOD Create() CLASS CoolMenu
    DEFAULT ::hBackupColor TO GetSysColor( COLOR_BTNTEXT )
    ::Super:Create()
 
-   ::Border          := .F.
+   ::Border          := 0
    ::SetBitmapSize( 0, ::Height-6)
    IF ( ::Application:OsVersion:dwMajorVersion >= 5 .AND. ::Theming )
       SetWindowTheme( ::hWnd, NIL, NIL )
@@ -286,8 +284,6 @@ RETURN NIL
 CLASS CoolMenuItem INHERIT ToolButton
    PROPERTY MDIList     DEFAULT .F.
 
-   DATA BackColor       EXPORTED
-   DATA ForeColor       EXPORTED
    DATA Index           EXPORTED
    DATA Item            EXPORTED
    DATA DropDown        EXPORTED
@@ -305,6 +301,8 @@ CLASS CoolMenuItem INHERIT ToolButton
    DATA ImageIndex      EXPORTED INIT -2
    DATA __Temprect      EXPORTED
    DATA TreeItem        EXPORTED
+
+   DATA __hBrush        EXPORTED
 
    // compatibility
    ACCESS MDIMenu      INLINE ::MDIList
@@ -349,6 +347,10 @@ METHOD Create( nPos ) CLASS CoolMenuItem
    IF ::hMenu == NIL
       ::hMenu := CreatePopupMenu()
 
+      IF ::Parent:BackColor != NIL
+         ::__hBrush := CreateSolidBrush( ::Parent:BackColor )
+         VXH_SetMenuBackColor( ::hMenu, ::__hBrush )
+      ENDIF
       //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
       //lpMenuInfo:fMask  := MIM_STYLE
       //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS

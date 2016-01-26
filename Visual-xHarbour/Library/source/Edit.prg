@@ -32,8 +32,6 @@
    #define VXH_PROFESSIONAL
 #endif
 
-static s_hFloatCalendar
-
 //-----------------------------------------------------------------------------------------------
 CLASS EditBox INHERIT Control
    PROPERTY Transparent       ROOT "Appearance"                                            DEFAULT .F.
@@ -42,6 +40,7 @@ CLASS EditBox INHERIT Control
    PROPERTY Password          ROOT "Appearance" SET ::SetStyle( ES_PASSWORD, v )           DEFAULT .F.
    PROPERTY Case              ROOT "Appearance" SET ::SetCase(v)                           DEFAULT 1
    PROPERTY CueBanner         ROOT "Appearance" SET ::SetCueBanner(v)
+   PROPERTY ImageList         ROOT "Appearance" GET __ChkComponent( Self, @::xImageList )
    PROPERTY ImageIndex        ROOT "Appearance" SET ::__SetImageIndex(v)                   DEFAULT 0
 
    PROPERTY DropCalendar      ROOT "Behavior"                                              DEFAULT .F.
@@ -60,15 +59,14 @@ CLASS EditBox INHERIT Control
    PROPERTY ContextMenu       ROOT "Behavior"   GET __ChkComponent( Self, @::xContextMenu ) SET ::__SetContextMenu(v)
    PROPERTY Alignment         ROOT "Behavior"   SET ::SetAlignment(v)                      DEFAULT 1
 
-   PROPERTY SelForeColor      ROOT "Colors"     SET ::__SetSelColor(v)
+   PROPERTY SelForeColor      ROOT "Colors"
    PROPERTY SelBackColor      ROOT "Colors"     SET ::__SetSelColor(v)
+   PROPERTY BorderColor       ROOT "Colors"
 
    PROPERTY DataSearchField   ROOT "Data"                                                  DEFAULT 1
    PROPERTY DataSearchWidth   ROOT "Data"                                                  DEFAULT 0
    PROPERTY DataSearchRecords ROOT "Data"                                                  DEFAULT 0
    PROPERTY DataSource        ROOT "Data"       GET __ChkComponent( Self, @::xDataSource )
-
-
 
    DATA EnumLayout                     EXPORTED INIT { { "None",;
                                                          "Text, Image, Arrow",;
@@ -78,7 +76,6 @@ CLASS EditBox INHERIT Control
                                                          "Arrow, Text, Image",;
                                                          "Arrow, Image, Text" }, {1,2,3,4,5,6,7} }
 
-   DATA ImageList                      EXPORTED
    DATA AllowUnDock                    EXPORTED INIT FALSE
    DATA AllowClose                     EXPORTED INIT FALSE
    DATA Button                         EXPORTED INIT .F.
@@ -100,7 +97,6 @@ CLASS EditBox INHERIT Control
    DATA __aImagePos                    PROTECTED INIT {0,0}
    DATA __oDataGrid                    PROTECTED
    DATA __BkCursor                     PROTECTED
-
    DATA __nImageSize                   PROTECTED INIT 0
    DATA __nArrowSize                   PROTECTED INIT 0
 
@@ -180,9 +176,12 @@ CLASS EditBox INHERIT Control
    METHOD OnKeyDown()
    METHOD OnGetDlgCode()
    METHOD OnKillFocus()
+
    METHOD OnSetFocus()                 INLINE ::InvalidateRect(,.F.), NIL
    METHOD OnLButtonDown()
    METHOD OnChar()
+   METHOD OnPaste()
+   METHOD OnCut()
    METHOD OnContextMenu()              INLINE IIF( ::MenuArrow, ( ::CallWindowProc(), 0 ), NIL )
    METHOD __SetLayout()
    METHOD __SetImageIndex()
@@ -192,6 +191,8 @@ CLASS EditBox INHERIT Control
    METHOD OnMouseMove()
    METHOD __SetAutoScroll()
    METHOD __SetMenuArrow()
+   METHOD SetValue( cValue )           INLINE ::Text := AllTrim(cValue)
+   METHOD GetValue()                   INLINE AllTrim(::Text)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -291,13 +292,15 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS EditBox
-   LOCAL pWi, n
+   LOCAL pWi, n, oImageList
    ::Super:Create()
    pWi := ::GetWindowInfo()
    ::__BackMargin += pWi:cxWindowBorders
 
    IF ::xLayout > 1 .OR. ::Button
-      IF ::Button .OR. ::DropCalendar .OR. ::MenuArrow .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
+      oImageList := ::ImageList
+      DEFAULT oImageList TO ::Parent:ImageList
+      IF ::Button .OR. /*::DropCalendar .OR.*/ ::MenuArrow .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 )
          ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
       ENDIF
    ENDIF
@@ -423,24 +426,6 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKillFocus() CLASS EditBox
-   LOCAL oObj, aRect
-   IF ::Application:EditBoxFocusBorder
-      oObj := ObjFromHandle( ::wParam )
-      IF oObj != NIL .AND. oObj:ClsName == "Edit"
-         aRect := oObj:GetRectangle()
-         aRect[1] -= 3 + ::Parent:HorzScrollPos
-         aRect[2] -= 3 + ::Parent:VertScrollPos
-         aRect[3] += 3 + ::Parent:HorzScrollPos
-         aRect[4] += 3 + ::Parent:VertScrollPos
-         _InvalidateRect( ::Parent:hWnd, aRect )
-      ENDIF
-      aRect := ::GetRectangle()
-      aRect[1] -= 3 + ::Parent:HorzScrollPos
-      aRect[2] -= 3 + ::Parent:VertScrollPos
-      aRect[3] += 3 + ::Parent:HorzScrollPos
-      aRect[4] += 3 + ::Parent:VertScrollPos
-      _InvalidateRect( ::Parent:hWnd, aRect )
-   ENDIF
    ::InvalidateRect(,.F.)
    IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN}
       ::__ChkGridKeys( NIL, VK_RETURN, .F. )
@@ -585,9 +570,13 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCMouseMove() CLASS EditBox
+   LOCAL oImageList
    ::Super:OnNCMouseMove()
    IF ::xLayout > 1 .AND. ::__BkCursor == NIL
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      oImageList := ::ImageList
+      DEFAULT oImageList TO ::Parent:ImageList
+
+      IF oImageList != NIL .AND. ::ImageIndex > 0
          ::__BkCursor := ::__hCursor
          DEFAULT ::__BkCursor TO 0
          ::Cursor := ::System:Cursor:LinkSelect
@@ -597,13 +586,15 @@ RETURN NIL
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
-   LOCAL n, nccs
+   LOCAL n, nccs, oImageList
    (nwParam)
    ::__nImageSize := 0
    ::__nArrowSize := 0
 
    IF ::xLayout > 1 .OR. ::Button
-      IF ::Button .OR. ::DropCalendar .OR. ::MenuArrow .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 )
+      oImageList := ::ImageList
+      DEFAULT oImageList TO ::Parent:ImageList
+      IF ::Button .OR. /*::DropCalendar .OR.*/ ::MenuArrow .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 )
          nccs := (struct NCCALCSIZE_PARAMS)
          nccs:Pointer( nlParam )
 
@@ -611,10 +602,10 @@ METHOD OnNCCalcSize( nwParam, nlParam ) CLASS EditBox
             nccs:rgrc[1]:right -= 16
           ELSE
             n := 2
-            IF valtype( ::Parent:ImageList ) == "O" .AND. ::ImageIndex > 0
-               ::__nImageSize := ::Parent:ImageList:IconWidth
+            IF valtype( oImageList ) == "O" .AND. ::ImageIndex > 0
+               ::__nImageSize := oImageList:IconWidth
             ENDIF
-            IF ::DropCalendar .OR. ::MenuArrow
+            IF /*::DropCalendar .OR.*/ ::MenuArrow
                ::__nArrowSize := 13
             ENDIF
             DO CASE
@@ -658,13 +649,10 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnNCPaint() CLASS EditBox
-   LOCAL aRect, nWidth := 0, hBrush, hdc, nLeft, nTop, hRegion, nStyle, n := 3
+   LOCAL aRect, nWidth := 0, hBrush, hdc, nLeft, nTop, hRegion, nStyle, n := 3, hOldPen, nColor, hOldBrush
+   LOCAL oImageList
 
    IF ::Button .OR. ( ::xLayout > 1 .AND. ( ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0 ) )
-
-
-//      _FillRect( hDC, { 1, 1, ::Width-1, ::Height-1 }, hBrush )
-
       nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
       IF nStyle & WS_EX_CLIENTEDGE == 0
          n := 0
@@ -714,20 +702,41 @@ METHOD OnNCPaint() CLASS EditBox
             aRect := { ::__aImagePos[1], 1, ::__aImagePos[1] + ::__aImagePos[2], ::Height-1 }
             hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
             hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
-            IF ::Parent:ImageList != NIL
-               nTop  := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
+
+            oImageList := ::ImageList
+            DEFAULT oImageList TO ::Parent:ImageList
+
+            IF oImageList != NIL
+               nTop  := ( ::Height - oImageList:IconHeight ) / 2
             ENDIF
             _FillRect( hDC, aRect, hBrush )
-            IF ::Parent:ImageList != NIL
-               ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, ::__aImagePos[1], nTop )
+            IF oImageList != NIL
+               oImageList:DrawImage( hDC, ::ImageIndex, ::__aImagePos[1], nTop )
             ENDIF
             ReleaseDC(::hWnd, hdc)
             DeleteObject( hRegion )
          ENDIF
 
       ENDIF
+   ENDIF
 
+   IF ::HasFocus
+      nColor := ::System:EditBoxBorderColor:Focus
+    ELSEIF ::__lMouseHover
+      nColor := ::System:EditBoxBorderColor:Hover
+   ENDIF
+   DEFAULT nColor TO ::BorderColor
+   DEFAULT nColor TO ::System:EditBoxBorderColor:Normal
 
+   IF nColor != NIL
+      hdc       := GetWindowDC( ::hWnd )
+      hOldPen   := SelectObject( hDC, CreatePen( PS_SOLID, 1, nColor ) )
+      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+      Rectangle( hDC, 0, 0, ::Width, ::Height )
+      SelectObject( hDC, hOldBrush )
+      DeleteObject( SelectObject( hDC, hOldPen ) )
+      ReleaseDC(::hWnd, hdc)
+      RETURN 0
    ENDIF
 
 RETURN NIL
@@ -746,7 +755,7 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
       RETURN NIL
    ENDIF
 
-   IF nwParam == HTHELP
+   IF nwParam == HTSYSMENU
       _ScreenToClient( ::hWnd, @aPt )
 
       IF ::Button
@@ -769,24 +778,19 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
 #ifdef VXH_PROFESSIONAL
 
        ELSEIF ::DropCalendar
-         IF s_hFloatCalendar != NIL
-            s_hFloatCalendar:Destroy()
-            s_hFloatCalendar := NIL
-            ::Application:DoEvents()
-          ELSE
-            pt := (struct POINT)
-            pt:x := ::Left
-            pt:y := ::Top + ::Height
-            ClientToScreen( ::Parent:hWnd, @pt )
-            WITH OBJECT ( s_hFloatCalendar := FloatCalendar( ::Parent ) )
-               :Left   := pt:x
-               :Top    := pt:y
-               :Width  := 200
-               :Height := 200
-               :Cargo  := Self
-               :Create()
-            END
-         ENDIF
+
+         pt := (struct POINT)
+         pt:x := ::Left
+         pt:y := ::Top + ::Height
+         ClientToScreen( ::Parent:hWnd, @pt )
+         WITH OBJECT ( FloatCalendar( ::Parent ) )
+            :Left   := pt:x
+            :Top    := pt:y
+            :Width  := 200
+            :Height := 200
+            :Cargo  := Self
+            :Create()
+         END
          RETURN 0
 #endif
 
@@ -883,7 +887,7 @@ METHOD OnNCHitTest( x, y ) CLASS EditBox
       _ScreenToClient( ::hWnd, @aPt )
 
       IF aPt[1] < 0 .OR. aPt[1] > ::ClientWidth
-         RETURN HTHELP
+         RETURN HTSYSMENU
       ENDIF
    ENDIF
 RETURN NIL
@@ -1069,10 +1073,26 @@ RETURN IIF( nRet == NIL, 0, nRet )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS EditBox
-   LOCAL h, lShift
+   LOCAL h, lShift, pt
    ::LastKey := nKey
    IF nKey == VK_F1 .AND. IsKeyDown( VK_CONTROL ) .AND. HGetPos( ::EventHandler, "OnImageClick" ) > 0
       ExecuteEvent( "OnImageClick", Self )
+      RETURN 0
+   ENDIF
+
+   IF nKey == VK_DOWN .AND. ::DropCalendar
+      pt := (struct POINT)
+      pt:x := ::Left
+      pt:y := ::Top + ::Height
+      ClientToScreen( ::Parent:hWnd, @pt )
+      WITH OBJECT ( FloatCalendar( ::Parent ) )
+         :Left   := pt:x
+         :Top    := pt:y
+         :Width  := 200
+         :Height := 200
+         :Cargo  := Self
+         :Create()
+      END
       RETURN 0
    ENDIF
 
@@ -1090,6 +1110,11 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
          ENDIF
       ENDIF
    ENDIF
+
+   IF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      Eval( ::Form:bChanged, Self )
+   ENDIF
+
    IF ::DataSource != NIL .AND. ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0
       SWITCH nKey
          CASE VK_DELETE
@@ -1108,11 +1133,15 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
             RETURN 0
       END
    ENDIF
+
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnChar( nKey ) CLASS EditBox
    LOCAL aKeys := {VK_BACK}
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      Eval( ::Form:bChanged, Self )
+   ENDIF
    IF ::DataSource != NIL .AND. ( ( nKey >= 32 .AND. nKey <= 168 ) .OR. ( nKey >= 224 .AND. nKey <= 253 ) .OR. ( nKey IN aKeys ) )
       ::CallWindowProc()
       ::__UpdateDataGrid()
@@ -1120,6 +1149,21 @@ METHOD OnChar( nKey ) CLASS EditBox
    ENDIF
 RETURN NIL
 
+//-----------------------------------------------------------------------------------------------
+METHOD OnPaste() CLASS EditBox
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      Eval( ::Form:bChanged, Self )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
+METHOD OnCut() CLASS EditBox
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      Eval( ::Form:bChanged, Self )
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 CLASS Edit INHERIT EditBox
 ENDCLASS
 
@@ -1131,7 +1175,7 @@ CLASS FloatCalendar INHERIT Window
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD FloatOnSelect()
-   METHOD FloatClose() INLINE ::Close(), s_hFloatCalendar := NIL
+   METHOD FloatClose() INLINE ::Close()
    METHOD FloatGetDlgCode() INLINE DLGC_WANTMESSAGE
 ENDCLASS
 
@@ -1155,10 +1199,17 @@ METHOD Init( oParent ) CLASS FloatCalendar
    ::Calendar:EventHandler[ "OnSelect" ]     := "FloatOnSelect"
    ::Calendar:EventHandler[ "OnKillFocus" ]  := "FloatClose"
    ::Calendar:EventHandler[ "OnGetDlgCode" ] := "FloatGetDlgCode"
+   ::Calendar:OnWMKeyDown := {|, nKey| IIF( nKey == VK_ESCAPE, ( ::Cargo:SetFocus(), ::Close() ), ) }
+
 RETURN Self
 
 METHOD Create() CLASS FloatCalendar
+   LOCAL pt := (struct POINT)
    Super:Create()
+
+   pt:x := ::Cargo:Left
+   pt:y := ::Cargo:Top + ::Cargo:Height
+   ClientToScreen( ::Cargo:Parent:hWnd, @pt )
 
    ::Calendar:Date    := CTOD( xStr( ::Cargo:Text ) )
    ::Calendar:Create()
@@ -1167,13 +1218,19 @@ METHOD Create() CLASS FloatCalendar
    ::xWidth  := ::Calendar:xWidth
    ::xHeight := ::Calendar:xHeight
 
+   IF ::Top + ::Height > GetSystemMetrics( SM_CYSCREEN )
+      ::Top := pt:y - ::Height - ::Cargo:Height
+   ENDIF
+
    ::MoveWindow()
    ::Show()
 RETURN Self
 
 METHOD FloatOnSelect() CLASS FloatCalendar
-   ::Cargo:Text := DTOC( ::Calendar:Date )
-   s_hFloatCalendar := NIL
+   ::Cargo:Text := IIF( ValType( ::Cargo:Text ) == "D", ::Calendar:Date, DTOC( ::Calendar:Date ) )
+   IF ::Cargo:Form != NIL .AND. ::Cargo:Form:HasMessage( "bChanged" ) .AND. ::Cargo:Form:bChanged != NIL
+      Eval( ::Cargo:Form:bChanged, Self )
+   ENDIF
    ::Close()
    ::Cargo:SetFocus()
 RETURN Self

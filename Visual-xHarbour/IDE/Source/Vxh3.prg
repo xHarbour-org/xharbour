@@ -203,8 +203,8 @@ CLASS ControlMask INHERIT Window
    DATA RubberBrush         PROTECTED
    DATA RubberBmp           PROTECTED
    DATA DrawBand            EXPORTED INIT .T.
-   DATA xGrid               EXPORTED
-   DATA yGrid               EXPORTED
+   DATA xGrid               EXPORTED INIT 8
+   DATA yGrid               EXPORTED INIT 8
    DATA hBmpGrid            EXPORTED
    DATA xBmpSize            EXPORTED
    DATA yBmpSize            EXPORTED
@@ -242,7 +242,7 @@ CLASS ControlMask INHERIT Window
                                     NIL
    METHOD Clean()
    METHOD OnContextMenu()
-   METHOD SetGridSize()
+//   METHOD SetGridSize()
    METHOD OnShowWindow()    INLINE ::CtrlMask:SetFocus()
    METHOD DrawOrder()
    METHOD SetMouseShape()
@@ -282,10 +282,11 @@ METHOD SetMouseShape( nPos )
 RETURN Self
 
 METHOD Create() CLASS ControlMask
-//   ::SetChildren := .F.
-   ::SetGridSize(6,6)
+
+   ::xGrid := ::yGrid := ::Application:IniFile:ReadInteger( "Settings", "GridSize", ::xGrid )
+
    ::Style   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ExStyle := WS_EX_TOPMOST | WS_EX_TRANSPARENT //| WS_EX_NOACTIVATE
+   ::ExStyle := WS_EX_TOPMOST | WS_EX_TRANSPARENT
    Super:Create()
    ::RubberBmp   := LoadImage( ::Application:Instance , "RUBBER", IMAGE_BITMAP )
    ::RubberBrush := CreatePatternBrush( ::RubberBmp )
@@ -293,22 +294,6 @@ METHOD Create() CLASS ControlMask
    ::hOrderFont   := __FontCreate( "Tahoma", 16 )
    SetTimer( ::hWnd, 2, 250 )
 RETURN Self
-
-METHOD SetGridSize(x,y) CLASS ControlMask
-   LOCAL xSize
-   LOCAL ySize
-   LOCAL cBits
-   ::xGrid:=IFNIL( x, ::xGrid, x )
-   ::yGrid:=IFNIL( y, ::yGrid, y )
-   cBits:= MakeGridTile(::xGrid,::yGrid,@xSize,@ySize)
-   IF !Empty(::hBmpGrid)
-      DeleteObject(::hBmpGrid)
-   ENDIF
-   ::hBmpGrid  := CreateBitmap( @xSize, ySize, 1, 1, cBits )
-   ::xBmpSize:=xSize
-   ::yBmpSize:=ySize
-RETURN(NIL)
-
 //----------------------------------------------------------------------------
 
 

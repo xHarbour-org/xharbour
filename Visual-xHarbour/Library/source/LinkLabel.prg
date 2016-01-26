@@ -29,15 +29,15 @@ CLASS LinkLabel INHERIT Control
    DATA EnumAlignment EXPORTED  INIT { { "Left", "Center", "Right" }, {1,2,3} }
 
    PROPERTY Url
-   PROPERTY ActiveLinkColor                       DEFAULT RGB(255,0,0)
+   PROPERTY ActiveLinkColor ROOT "Colors"         DEFAULT RGB(255,0,0)
    PROPERTY FocusRect                             DEFAULT .T.
    PROPERTY LinkVisited  SET ::InvalidateRect()   DEFAULT .F.
-   PROPERTY LinkColor    SET ::SetLinkColor(v)    DEFAULT RGB(0,0,255)
-   PROPERTY VisitedColor SET ::SetVisitedColor(v) DEFAULT RGB(128,0,128)
+   PROPERTY LinkColor    ROOT "Colors" SET ::SetLinkColor(v)    DEFAULT RGB(0,0,255)
+   PROPERTY VisitedColor ROOT "Colors" SET ::SetVisitedColor(v) DEFAULT RGB(128,0,128)
    PROPERTY AutoSize     SET ::SetWindowText(v)   DEFAULT .T.
    PROPERTY ImageIndex   SET ::SetImageIndex(v)   DEFAULT 0
    PROPERTY Alignment    SET ::Redraw()           DEFAULT 1
-   PROPERTY SelBackColor SET ::SetSelColor(v)
+   PROPERTY SelBackColor ROOT "Colors" SET ::SetSelColor(v)
 
    DATA __lSelected     PROTECTED INIT .F.
    DATA __lFocused      PROTECTED INIT .F.
@@ -80,7 +80,7 @@ METHOD Create() CLASS LinkLabel
 
    IF ::AutoSize
       ::__lResizeable   := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
-      aSize := ::Drawing:GetTextExtentPoint32( ::Caption )
+      aSize := ::Drawing:GetTextExtentPoint32( ::Text )
       ::xWidth := aSize[1]+4
       ::xHeight := aSize[2]+2
       IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
@@ -96,7 +96,7 @@ RETURN Self
 METHOD SetWindowText( cText ) CLASS LinkLabel
    LOCAL aSize
    IF VALTYPE( cText ) == "C"
-      ::xCaption := cText
+      ::xText := cText
    ENDIF
    IF ::hWnd != NIL .AND. !::__IsInstance
       IF VALTYPE( cText ) == "C"
@@ -104,7 +104,7 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
       ENDIF
       IF ::AutoSize
          ::__lResizeable   := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
-         aSize := ::Drawing:GetTextExtentPoint32( ::Caption )
+         aSize := ::Drawing:GetTextExtentPoint32( ::Text )
          ::xWidth := aSize[1]+4
          ::xHeight := aSize[2]+2
          IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
@@ -155,7 +155,7 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    SetTextColor( hDC, nColor )
    rc:Left+=2
 
-   DrawText( hDC, ::Caption, rc, (::Alignment-1)|DT_WORDBREAK )
+   DrawText( hDC, ::Text, rc, (::Alignment-1)|DT_WORDBREAK )
    IF ::__lFocused .AND. ::FocusRect
       rc:Left-=2
       DrawFocusRect( hDC, rc)
@@ -217,7 +217,7 @@ METHOD SetImageIndex() CLASS LinkLabel
    LOCAL aSize
    IF ::AutoSize
       ::__lResizeable   := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
-      aSize := ::Drawing:GetTextExtentPoint32( ::Caption )
+      aSize := ::Drawing:GetTextExtentPoint32( ::Text )
       ::xWidth := aSize[1]+4
       ::xHeight := aSize[2]+2
       IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0

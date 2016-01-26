@@ -228,7 +228,6 @@ CLASS Application
 
    PROPERTY Icon                   ROOT "Appearance" DEFAULT ""
    PROPERTY Cursor                 ROOT "Appearance"
-   PROPERTY EditBoxFocusBorder     ROOT "Appearance" DEFAULT .F.
 
    PROPERTY Version                ROOT "Data"       DEFAULT "1.0.0.0"
    PROPERTY Company                ROOT "Data"       DEFAULT ""
@@ -501,10 +500,11 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Application
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD __SetColorScheme(n) CLASS Application
+METHOD __SetColorScheme(n,lForce) CLASS Application
    LOCAL cScheme
    DEFAULT n TO ::ColorScheme
-   IF n <> ::ColorScheme .OR. ::__ColorTable == NIL
+   DEFAULT lForce TO .F.
+   IF n <> ::ColorScheme .OR. ::__ColorTable == NIL .OR. lForce
       cScheme := ::EnumColorScheme[1][n] + "ColorTable"
       IF ::EnumColorScheme[1][n] == "FlatGray"
          ::__ColorTable := &cScheme():Load()
@@ -543,7 +543,6 @@ METHOD Exit() CLASS Application
    IF VALTYPE( ::MainForm ) == "O" .AND. IsWindow( ::MainForm:hWnd )
       ::MainForm:Destroy()
    ENDIF
-   ::MainForm := NIL
    IF ::DllInstance == NIL
       s_lExit := .T.
       PostQuitMessage(0)
@@ -555,8 +554,15 @@ METHOD Exit() CLASS Application
       IF ::__SocketInit
          InetCleanUp()
       ENDIF
-      QUIT
+      AEVAL( ::ImageLists, {|o|o:Destroy()} )
+      IF ::__ColorTable != NIL
+         ::__ColorTable:Unload()
+      ENDIF
    ENDIF
+   ::MainForm := NIL
+   ::System:CurrentScheme:Unload()
+   ::ColorTable:Unload()
+   QUIT
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
@@ -599,23 +605,9 @@ METHOD Run( oWnd ) CLASS Application
 
    IF ! ::MainForm:Modal
       VXH_MainLoop( ::MainForm:hWnd, IIF( ::MDIClient == NIL, 0, ::MDIClient ), ::__Accelerators, ::AccelEnabled )
-
-      ::OnExit()
-
-      IF ::__hMenuHook != NIL
-         UnhookWindowsHookEx( ::__hMenuHook )
-      ENDIF
-      IF ::__SocketInit
-         InetCleanUp()
-      ENDIF
-      ::MainForm := NIL
-      AEVAL( ::ImageLists, {|o|o:Destroy()} )
-      IF ::__ColorTable != NIL
-         ::__ColorTable:Unload()
-      ENDIF
    ENDIF
-   ::System:CurrentScheme:Unload()
-   ::ColorTable:Unload()
+
+   ::Exit()
 RETURN 0
 
 //------------------------------------------------------------------------------------------------

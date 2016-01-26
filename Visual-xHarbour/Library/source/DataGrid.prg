@@ -101,7 +101,7 @@ CLASS DataGrid INHERIT TitleControl
    PROPERTY HeaderHeight                                                                            DEFAULT 20
    PROPERTY ShowSelection                                                                           DEFAULT .T.
    PROPERTY ShowSelectionBorder                                                                     DEFAULT .T.
-   PROPERTY AnchorColumn                                                                            DEFAULT 0
+   PROPERTY AnchorColumn                                                                            DEFAULT -1
    PROPERTY ConvertOem                                                                              DEFAULT .F.
 
    PROPERTY SchemeHeader         ROOT "Appearance"                                                  DEFAULT .F.
@@ -289,6 +289,7 @@ CLASS DataGrid INHERIT TitleControl
    MESSAGE OnTimer            METHOD __OnTimer()
 
    METHOD OnPaint()
+   METHOD OnNCPaint()
    METHOD OnHorzScroll()
    METHOD OnVertScroll()
 
@@ -358,6 +359,7 @@ METHOD Init( oParent ) CLASS DataGrid
                                           { "OnRowChanging",    "", "" },;
                                           { "OnRowChanged",     "", "" },;
                                           { "OnRowDragged",     "", "" },;
+                                          { "OnBeginDragging",  "", "nCol" },;
                                           { "OnSearchNotFound", "", "" },;
                                           { "OnColChanging",    "", "" },;
                                           { "OnColChanged",     "", "" } } }, .T. )
@@ -1083,7 +1085,7 @@ RETURN FALSE
 //---------------------------------------------------------------------------------
 
 METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
-   LOCAL lRefresh := .T.
+   LOCAL n, lRefresh := .T., aPerc := {}
    ::Super:OnSize( nwParam, nlParam )
    IF ::DataSource != NIL .AND. !::DataSource:IsOpen
       RETURN 0
@@ -1091,6 +1093,16 @@ METHOD OnSize( nwParam, nlParam ) CLASS DataGrid
 
    IF ! ::DesignMode .AND. ::AnchorColumn > 0 .AND. LEN( ::Children ) >= ::AnchorColumn .AND. ( ::__DataWidth <> ::ClientWidth )
       ::Children[ ::AnchorColumn ]:xWidth := ( ::ClientWidth - ::__DataWidth ) + ::Children[ ::AnchorColumn ]:xWidth
+      ::__GetDataWidth()
+      ::__DisplayData()
+
+   ELSEIF ! ::DesignMode .AND. ::AnchorColumn == 0
+      FOR n := 1 TO LEN( ::Children )
+          AADD( aPerc, ::Children[n]:Width / ::__DataWidth )
+      NEXT
+      FOR n := 1 TO LEN( aPerc )
+          ::Children[n]:xWidth := ::ClientWidth * aPerc[n]
+      NEXT
       ::__GetDataWidth()
       ::__DisplayData()
    ENDIF
@@ -1527,7 +1539,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    NEXT
 
    IF ::AllowDragRecords .AND. ( nClickRow == ::RowPos .OR. ::SimpleRowDrag ) .AND. ( nClickCol == ::ColPos .OR. ::FullRowSelect )
-      ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
+      IF ExecuteEvent( "OnBeginDragging", Self, nClickCol )
+         ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
+      ENDIF
    ENDIF
 
    nCol := ::ColPos
@@ -1926,6 +1940,29 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
       ::__Edit(0, 0, 0, nKey, nwParam )
    ENDIF
    ::AutoUpdate := ::__nUpdtTimer
+RETURN NIL
+
+//----------------------------------------------------------------------------------
+METHOD OnNCPaint( nwParam, nlParam ) CLASS DataGrid
+   LOCAL hdc, hOldPen, nColor, hOldBrush
+   Super:OnNCPaint( nwParam, nlParam )
+   nColor := ::System:EditBoxBorderColor:Normal
+   IF ::HasFocus
+      nColor := ::System:EditBoxBorderColor:Focus
+    ELSEIF ::__lMouseHover
+      nColor := ::System:EditBoxBorderColor:Hover
+   ENDIF
+
+   IF nColor != NIL
+      hdc       := GetWindowDC( ::hWnd )
+      hOldPen   := SelectObject( hDC, CreatePen( PS_SOLID, 1, nColor ) )
+      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
+      Rectangle( hDC, 0, 0, ::Width, ::Height )
+      SelectObject( hDC, hOldBrush )
+      DeleteObject( SelectObject( hDC, hOldPen ) )
+      ReleaseDC(::hWnd, hdc)
+      RETURN 0
+   ENDIF
 RETURN NIL
 
 //----------------------------------------------------------------------------------
@@ -4075,6 +4112,7 @@ CLASS GridColumn INHERIT Object
    DATA ControlHide                  EXPORTED  INIT FALSE
    DATA ShowControls                 EXPORTED  INIT FALSE
    DATA OnSave                       EXPORTED
+   DATA ImageList                    EXPORTED
 
    DATA Events                       EXPORTED
    DATA Cargo                        EXPORTED

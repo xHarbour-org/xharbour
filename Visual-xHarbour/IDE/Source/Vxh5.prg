@@ -50,11 +50,10 @@ METHOD Init( oParent ) CLASS DebugBuild
    ::Super:Init( oParent )
    ::HorzScroll   := .T.
    ::VertScroll   := .T.
-   ::Border       := WS_EX_STATICEDGE
    ::ClipChildren := .F.
    ::ClipSiblings := .F.
    ::HasStrings   := .T.
-   ::Border       := .F.
+   ::Border       := 0
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -90,44 +89,48 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------
 METHOD OnParentNotify() CLASS ErrorListView
-   LOCAL iFile, lvi, nLine, cFile, oEditor, nFor
+   LOCAL aSel, oEditor
 
-   SWITCH ::Parent:hdr:code
-      CASE NM_DBLCLK
-         //PopupEditor
-         IF SendMessage( ::hWnd, LVM_GETSELECTEDCOUNT, 0, 0 ) > 0
-            iFile := SendMessage( ::hWnd, LVM_GETNEXTITEM, -1, LVNI_SELECTED )
+   IF ::Parent:hdr:code == NM_DBLCLK
+      aSel := ::GetSelection()
 
-            lvi := (struct LVITEM)
-            lvi:iSubItem   := 0
-            lvi:cchTextMax := 512
-            lvi:pszText    := SPACE( 512 )
-
-            SendMessage( ::hWnd, LVM_GETITEMTEXT, iFile, @lvi )
-            cFile := Upper( Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 ) )
-
-            lvi:iSubItem   := 1
-            lvi:cchTextMax := 512
-            lvi:pszText    := SPACE( 512 )
-
-            SendMessage( ::hWnd, LVM_GETITEMTEXT, iFile, @lvi )
-            nLine := Val( Left( lvi:pszText, At( Chr(0), lvi:pszText ) - 1 ) )
-
-            nFor := 1
-
-            FOR EACH oEditor IN ::Application:SourceEditor:aDocs
-               IF Upper( oEditor:File ) == cFile
-                  ::Application:EditorPage:Select()
-                  oEditor:Select()
-                  oEditor:TreeItem:Select()
-                  oEditor:GoToLine( nLine-1 )
-                  ::Application:SourceEditor:SetFocus()
-                  EXIT
-               ENDIF
-               nFor++
-            NEXT
+      FOR EACH oEditor IN ::Application:SourceEditor:aDocs
+         IF Upper( oEditor:File ) == Upper( aSel[1] )
+            ::Application:EditorPage:Select()
+            oEditor:Select()
+            oEditor:TreeItem:Select()
+            oEditor:GoToLine( Val(aSel[2])-1 )
+            ::Application:SourceEditor:SetFocus()
+            EXIT
          ENDIF
-         EXIT
-   END
+      NEXT
+   ENDIF
+RETURN 0
+
+//------------------------------------------------------------------------------------------
+CLASS FindInFilesListView INHERIT ListView
+   METHOD OnParentNotify()
+  // METHOD OnNCCalcSize( nwParam, nlParam )  INLINE Super:OnNCCalcSize( nwParam, nlParam ), NIL
+ENDCLASS
+
+METHOD OnParentNotify() CLASS FindInFilesListView
+   LOCAL aSel, oEditor
+
+   IF ::Parent:hdr:code == NM_DBLCLK
+      aSel := ::GetSelection()
+
+      FOR EACH oEditor IN ::Application:SourceEditor:aDocs
+         IF Upper( oEditor:FileName ) == Upper( aSel[1] )
+            ::Application:EditorPage:Select()
+            oEditor:Select()
+            oEditor:TreeItem:Select()
+            oEditor:GotoPosition( oEditor:PositionFromLine( Val(aSel[2])-1 ) + aSel[4]-1 )
+            oEditor:SetSelection( oEditor:PositionFromLine( Val(aSel[2])-1 ) + aSel[4]-1, oEditor:PositionFromLine( Val(aSel[2])-1 ) + aSel[4]-1 + Len( ::Application:Project:__cFindText ) )
+
+            ::Application:SourceEditor:SetFocus()
+            EXIT
+         ENDIF
+      NEXT
+   ENDIF
 RETURN 0
 

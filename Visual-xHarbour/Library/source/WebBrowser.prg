@@ -48,7 +48,6 @@
 CLASS WebBrowser INHERIT ActiveX
    PROPERTY Url SET ::WebNavigate(v)
    PROPERTY BrowserEmulation  DEFAULT EMULATION_IE_07
-   PROPERTY ScrollBarsEnabled SET ::__SetScrollBars(v) DEFAULT .T.
 
    DATA EnumBrowserEmulation EXPORTED INIT { {"None",;
                                               "IE 8 Standards",;
@@ -74,7 +73,6 @@ CLASS WebBrowser INHERIT ActiveX
    METHOD Create()
    METHOD WebNavigate()
    METHOD OnGetDlgCode() INLINE DLGC_WANTALLKEYS
-   METHOD __SetScrollBars()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS WebBrowser
@@ -102,17 +100,7 @@ METHOD Create() CLASS WebBrowser
    Super:Create()
    IF ! EMPTY( ::Url )
       ::WebNavigate( ::Url )
-      ::__SetScrollBars( ::ScrollBarsEnabled )
    ENDIF
-RETURN Self
-
-METHOD __SetScrollBars( /*lScroll*/ ) CLASS WebBrowser
-//   TRY
-//      IF ::TOleAuto:document != NIL .AND. ::TOleAuto:document:body != NIL
-//         ::TOleAuto:document:body:scroll := if( lScroll, "yes", "no" )
-//      ENDIF
-//   CATCH
-//   END
 RETURN Self
 
 METHOD WebNavigate( Url ) CLASS WebBrowser

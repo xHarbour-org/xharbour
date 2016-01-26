@@ -39,6 +39,9 @@ INIT PROCEDURE __InitSystem
 RETURN
 
 EXIT PROCEDURE __SystemCleanup
+   AEVAL( oSystem:aBrushes, {|a|DeleteObject(a[2])} )
+   oSystem:aBrushes := NIL
+
    IF oSystem:hWindowTheme != NIL
       CloseThemeData( oSystem:hWindowTheme )
    ENDIF
@@ -52,9 +55,6 @@ EXIT PROCEDURE __SystemCleanup
       CloseThemeData( oSystem:hTabTheme )
    ENDIF
    oSystem:ImageList[ "StdSmall" ]:Destroy()
-   DeleteObject( oSystem:FocusPen )
-   DeleteObject( oSystem:TitleBackBrush )
-   DeleteObject( oSystem:TitleBorderPen )
    DeleteObject( oSystem:hFont )
    #ifdef VXH_PROFESSIONAL
       FreeExplorerBarInfo()
@@ -98,12 +98,7 @@ CLASS System
    DATA xLocalTime              PROTECTED
    DATA PageSetup               EXPORTED
    DATA PaperSize               EXPORTED
-   DATA FocusPen                EXPORTED
    DATA OsVersion               EXPORTED
-
-   DATA TitleBackBrush          EXPORTED
-
-   DATA TitleBorderPen          EXPORTED
 
    DATA hRich20                 EXPORTED
 
@@ -115,6 +110,8 @@ CLASS System
    DATA hTabTheme               EXPORTED
 
    DATA Border                  EXPORTED
+   DATA EditBoxBorderColor      EXPORTED
+   DATA aBrushes                EXPORTED INIT {}
 
    ACCESS LocalTime     INLINE ::GetLocalTime()
    ACCESS RootFolders   INLINE ::Folders
@@ -138,7 +135,19 @@ CLASS System
    METHOD GetEnumCursor()
    METHOD __GetLastError()
    METHOD TypeCast()
+   METHOD GetBrush()
 ENDCLASS
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD GetBrush( nColor ) CLASS System
+   LOCAL n, hBrush
+   IF ( n := ASCAN( ::aBrushes, {|a| a[1]==nColor} ) ) > 0
+      hBrush := ::aBrushes[n][2]
+    ELSE
+      hBrush := CreateSolidBrush( nColor )
+      AADD( ::aBrushes, { nColor, hBrush } )
+   ENDIF
+RETURN hBrush
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD __GetLastError() CLASS System
@@ -259,6 +268,12 @@ METHOD Init() CLASS System
    ::Border[ "Single" ]  := WS_BORDER
    ::Border[ "Sunken" ]  := WS_EX_STATICEDGE
    ::Border[ "Fixed3D" ] := WS_EX_CLIENTEDGE
+
+   ::EditBoxBorderColor := {=>}
+   HSetCaseMatch( ::EditBoxBorderColor, .F. )
+   ::EditBoxBorderColor[ "Normal" ]:= NIL
+   ::EditBoxBorderColor[ "Hover" ] := NIL
+   ::EditBoxBorderColor[ "Focus" ] := NIL
 
    ::__ToolStripFlags := {=>}
    HSetCaseMatch( ::__ToolStripFlags, .F. )
@@ -789,10 +804,6 @@ METHOD Init() CLASS System
    cBuffer := ::ExplorerBar:Value()
    ExplorerBarInfo( @cBuffer )
    ::ExplorerBar:Buffer( cBuffer )
-
-   ::FocusPen       := CreatePen( PS_SOLID, 3, RGB( 65, 160, 228 ) )
-   ::TitleBackBrush := CreateSolidBrush( RGB( 69, 89, 124 ) )
-   ::TitleBorderPen := CreatePen( PS_SOLID, 0, RGB( 45, 63, 92 ) )
 
    ::hFont          := __GetMessageFont()
 

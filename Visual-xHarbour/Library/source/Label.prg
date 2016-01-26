@@ -181,9 +181,6 @@ METHOD OnPaint() CLASS Label
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
    _FillRect( hMemDC, aRect, hBkGnd )
 
-   IF VALTYPE( ::Border ) == "L"
-      ::xBorder := -1
-   ENDIF
    IF ::xBorder <> 0
       IF ::xBorder == -1
          hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )

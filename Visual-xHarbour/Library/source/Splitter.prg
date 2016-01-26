@@ -42,6 +42,12 @@ CLASS Splitter INHERIT Control
    PROPERTY ShowDragging DEFAULT .F.
    PROPERTY Position
 
+
+   PROPERTY MinPos     DEFAULT 0
+   PROPERTY MaxPos     DEFAULT 0
+
+   DATA MaxBottom      EXPORTED
+
    EXPORTED:
       DATA ToolTip
       DATA Font
@@ -92,7 +98,7 @@ METHOD Init( oParent ) CLASS Splitter
    ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::ExStyle      := WS_EX_TRANSPARENT
    ::__IsStandard := .F.
-   ::Events       := {}
+   ::Events       := {  {"General", { { "OnPosChanged", "", "" } } } }
 RETURN Self
 
 METHOD __GetOwner() CLASS Splitter
@@ -183,8 +189,20 @@ METHOD SplitOn( x, y, lDirect )
       GetCursorPos( @pt )
       ScreenToClient( ::Parent:hWnd, @pt )
 
-      IF pt:x < ::MinLeft
-         pt:x := ::MinLeft
+      IF ::Position IN {1,3}
+         IF ::MaxPos > 0
+            pt:x := Min( pt:x, ::MaxPos )
+         ENDIF
+         IF ::MinPos > 0
+            pt:x := Max( pt:x, ::MinPos )
+         ENDIF
+       ELSE
+         IF ::MaxPos > 0
+            pt:y := Min( pt:y, ::MaxPos )
+         ENDIF
+         IF ::MinPos > 0
+            pt:y := Max( pt:y, ::MinPos )
+         ENDIF
       ENDIF
 
       SWITCH ::Position
@@ -284,6 +302,12 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS Splitter
       ENDIF
       SWITCH nPos
          CASE 1
+              IF ::MaxPos > 0
+                 pt:x := Min( pt:x, ::MaxPos )
+              ENDIF
+              IF ::MinPos > 0
+                 pt:x := Max( pt:x, ::MinPos )
+              ENDIF
               ::InvRect[1] := MAX( MIN( pt:x, ::Parent:ClientWidth - ::xWidth ), 0 )
               ::InvRect[2] := pt2:y
               ::InvRect[3] := ::InvRect[1] + ::xWidth
@@ -436,6 +460,7 @@ METHOD SetSizes() CLASS Splitter
       ENDIF
       ::Owner:__Splitting := .F.
       ::Parent:__Splitting := .F.
+      ExecuteEvent( "OnPosChanged", Self )
    ENDIF
 RETURN Self
 

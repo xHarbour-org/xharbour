@@ -86,7 +86,7 @@ CLASS WindowEdit INHERIT WinForm
    METHOD Show()
 
    METHOD OnPaint()
-   METHOD OnEraseBkGnd()
+   METHOD OnEraseBkGnd() INLINE 1
    METHOD OnUserMsg()
    METHOD OnSize()
 
@@ -107,14 +107,34 @@ CLASS WindowEdit INHERIT WinForm
    METHOD SetWindowText( cText ) INLINE ::Super:SetWindowText(cText), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD OnNCDestroy()
+   //METHOD OnNCCalcSize()
 ENDCLASS
+
+/*
+METHOD OnNCCalcSize( nwParam, nlParam ) CLASS WindowEdit
+   LOCAL nccs, n
+   (nwParam)
+
+   nccs := (struct NCCALCSIZE_PARAMS)
+   nccs:Pointer( nlParam )
+
+   n := GetSystemMetrics( SM_CXFRAME ) //( (nccs:rgrc[1]:Right-nccs:rgrc[1]:Left) - (nccs:rgrc[3]:Right-nccs:rgrc[3]:Left) ) / 2
+
+   nccs:rgrc[1]:Left   -= (n-1)
+   nccs:rgrc[1]:Right  += (n-1)
+   nccs:rgrc[1]:Bottom += (n-1)
+
+   nccs:CopyTo( nlParam )
+RETURN NIL
+*/
 
 METHOD OnSize( nwParam, nlParam ) CLASS WindowEdit
   Super:OnSize( nwParam, nlParam )
   IF ::IsWindowVisible()
-     ::Parent:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
+     ::Parent:RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN | RDW_NOERASE )
      ::Parent:UpdateScroll()
   ENDIF
+  ::__CreateBkBrush()
 RETURN NIL
 
 FUNCTION CntChildren( oObj )
@@ -226,6 +246,8 @@ METHOD Create() CLASS WindowEdit
    ::Style := ::Style | WS_CHILD
 
    ::Super:Create()
+   ::Refresh()
+   ::__CreateBkBrush()
    IF !::__lModified
       ::Hide()
    ENDIF
@@ -319,47 +341,31 @@ METHOD SelectControl( oControl, lTree ) CLASS WindowEdit
    ENDIF
 RETURN Self
 
-//----------------------------------------------------------------------------
-
-METHOD OnEraseBkGnd( hDC ) CLASS WindowEdit
-   IF ::Application:ShowGrid != 1
-      RETURN 1
-   ENDIF
-   IF ::bkBrush != NIL
-      _FillRect( hDC, { 0,0,::ClientWidth, ::ClientHeight }, ::bkBrush )
-      RETURN 1
-   ENDIF
-RETURN NIL
 
 //----------------------------------------------------------------------------
 
 METHOD OnPaint() CLASS WindowEdit
-   LOCAL nFColor, nBColor, hDC
-   LOCAL i       := 0
-   LOCAL j       := 0
+   LOCAL hDC, hMemDC, hBitmap, hOldBitmap
 
-   hDC := ::BeginPaint()
+   hDC        := ::BeginPaint()
+
+   hMemDC     := CreateCompatibleDC( hDC )
+   hBitmap    := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
+   hOldBitmap := SelectObject( hMemDC, hBitmap )
+
+   _FillRect( hMemDC, { 0,0,::ClientWidth, ::ClientHeight }, IIF( ::bkBrush != NIL, ::bkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
 
    IF ::Application:ShowGrid == 1
-
-      nBColor := SetBkColor( hDC, ::BackColor )
-      nFColor := SetTextColor( hDC, ::ForeColor )
-      SetBkMode( hDC, TRANSPARENT )
-      DrawGrid( hDC, ::CtrlMask:hBmpGrid, ::CtrlMask:xBmpSize, ::CtrlMask:yBmpSize, ::ClientWidth, ::ClientHeight, SRCCOPY )
-      SetTextColor( hDC, nFColor )
-      SetBkColor( hDC, nBColor )
-
-    ELSE
-      IF ::bkBrush != NIL
-         _FillRect( hDC, { 0,0,::ClientWidth, ::ClientHeight }, ::bkBrush )
-       ELSE
-         _FillRect( hDC, { 0,0,::ClientWidth, ::ClientHeight }, GetSysColorBrush( COLOR_BTNFACE ) )
-      ENDIF
-
+      DrawGrid( hMemDC, ::CtrlMask:xGrid, ::CtrlMask:yGrid, ::ClientWidth, ::ClientHeight, RGB(0,0,0) )
    ENDIF
-   ::__PaintBakgndImage( hDC )
+
+   BitBlt( hDC, 0, 0, ::ClientWidth, ::ClientHeight, hMemDC, 0, 0, SRCCOPY )
+
+   SelectObject( hMemDC, hOldBitmap )
+   DeleteObject( hBitmap )
+   DeleteDC( hMemDC )
+
    ::EndPaint()
-   ValidateRect( ::hWnd )
 RETURN 0
 
 //----------------------------------------------------------------------------
@@ -876,7 +882,7 @@ RETURN aPoints
 //----------------------------------------------------------------------------
 
 METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
-   LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect, xOld, yOld
+   LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect
    LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, nPlus, cClass, lLeft, lTop, lWidth, lHeight
    LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, aSnap, nSnap, hDef, nFor, aSelected
    ( nwParam )
@@ -927,7 +933,6 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
       ENDIF
       RETURN 0
    ENDIF
-
    IF LEN( ::Selected ) > 0 .AND. lRealUp .AND. ! __clsParent( ::Selected[1][1]:ClassH, "COMPONENT" ) .AND. ::Selected[1][1]:__xCtrlName != "Application"
       IF ::Selected[1][1]:__Temprect != NIL
          nLeft := ::Selected[1][1]:__Temprect[1]
@@ -1176,6 +1181,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
              ENDIF
          NEXT
          aSelRect := ::GetSelRect()
+
          ::SelInitPoint := NIL
          ::SelEndPoint  := NIL
          ::InvalidateRect( ,.F.)
@@ -1192,7 +1198,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
          IF EMPTY( ::Selected )
             ::Selected := { { Self } }
          ENDIF
-         ::Refresh()
+         //::Refresh()
          ReleaseCapture( ::CtrlMask:hWnd )
       ENDIF
 
@@ -1269,11 +1275,12 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
          aPt := { x, y }
          _ClientToScreen( ::CtrlMask:hWnd, @aPt )
          _ScreenToClient( aSelected[1][1]:Parent:hWnd, @aPt )
-         x := aPt[1]
-         y := aPt[2]
+         x  := aPt[1]
+         y  := aPt[2]
 
          DEFAULT ::CtrlOldPt TO { x, y }
-         IF ::CtrlOldPt[1] != x .OR. ::CtrlOldPt[2] != y
+
+         IF ::CtrlOldPt[1] <> x .OR. ::CtrlOldPt[2] <> y
 
             ::__lModified := .T.
             ::Application:Project:Modified := .T.
@@ -1289,15 +1296,6 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
                NEXT
                ::__SelMoved := .T.
             ENDIF
-
-            aRect := aSelected[1][1]:GetRectangle()
-
-            IF ::Application:ShowGrid == 1 .AND. aSelected[1][1]:hWnd != ::hWnd
-               aRect[1] := Snap( aRect[1], ::CtrlMask:xGrid )
-               aRect[2] := Snap( aRect[2], ::CtrlMask:xGrid )
-            ENDIF
-            xOld := x
-            yOld := y
 
             IF ::Application:ShowGrid == 1 .AND. aSelected[1][1]:hWnd != ::hWnd
                x  := Snap( x, ::CtrlMask:xGrid )
@@ -1407,22 +1405,29 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
                            DEFAULT aRect TO aControl[1]:GetRectangle()
 
                            IF ::Application:ShowGrid == 1 .AND. aSelected[1][1]:hWnd != ::hWnd
-                              aRect[1] := Snap( aRect[1], ::CtrlMask:xGrid )
-                              aRect[2] := Snap( aRect[2], ::CtrlMask:xGrid )
+                              pt2:x := aRect[1]
+                              pt2:y := aRect[2]
+                              ClientToScreen( ::hWnd, @pt2 )
+                              ScreenToClient( IIF( ::NewParent == NIL, aSelected[1][1]:Parent:hWnd, ::NewParent:hWnd ), @pt2 )
+
+                              pt2:x := Snap( pt2:x, ::CtrlMask:xGrid )
+                              pt2:y := Snap( pt2:y, ::CtrlMask:xGrid )
+
+                              ClientToScreen( IIF( ::NewParent == NIL, aSelected[1][1]:Parent:hWnd, ::NewParent:hWnd ), @pt2 )
+                              ScreenToClient( ::hWnd, @pt2 )
+                              aRect[1] := pt2:x
+                              aRect[2] := pt2:y
                            ENDIF
 
                            IF aControl[1]:__TempRect == NIL
                               aControl[1]:Left := aRect[1] + ( x - ::CtrlOldPt[1] ) + aSnap[1] + aSnap[3]
                               aControl[1]:Top  := aRect[2] + ( y - ::CtrlOldPt[2] ) + aSnap[2] + aSnap[4]
-                              //aControl[1]:MoveWindow()
                               DeferWindowPos( hDef, aControl[1]:hWnd, , aControl[1]:Left, aControl[1]:Top, aControl[1]:Width, aControl[1]:Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER )
                             ELSE
 
                               aRect[1] := aRect[1] + ( x - ::CtrlOldPt[1] ) + aSnap[1] + aSnap[3]
                               aRect[2] := aRect[2] + ( y - ::CtrlOldPt[2] ) + aSnap[2] + aSnap[4]
-
                               DeferWindowPos( hDef, aControl[1]:hWnd, , aRect[1], aRect[2], aControl[1]:Width, aControl[1]:Height, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER )
-                              //MoveWindow( aControl[1]:hWnd, aRect[1], aRect[2], aControl[1]:Width, aControl[1]:Height )
                            ENDIF
                         ENDIF
                     NEXT
@@ -1456,58 +1461,99 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
 
                CASE ::InRect == 1 // left top
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
-                    aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
-                    nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
-                    aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
+                       aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
+                       nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
+                       aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth  += ( aSelected[1][1]:xLeft - x )
+                       aSelected[1][1]:xLeft   := x
+                       aSelected[1][1]:xHeight += ( aSelected[1][1]:xTop - y )
+                       aSelected[1][1]:xTop    := y
+                    ENDIF
 
                CASE ::InRect == 2 // left
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
-                    aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
+                       aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth  += ( aSelected[1][1]:xLeft - x )
+                       aSelected[1][1]:xLeft   := x
+                    ENDIF
 
                CASE ::InRect == 3 // left bottom
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
-                    aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
-                    nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickLeft( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xLeft   := aSelected[1][1]:xLeft + ( x - ::CtrlOldPt[1] ) + nSnap
+                       aSelected[1][1]:xWidth  += ( ::CtrlOldPt[1] - x - nSnap )
+                       nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth  += ( aSelected[1][1]:xLeft - x )
+                       aSelected[1][1]:xLeft   := x
+                       aSelected[1][1]:xHeight := ( y - aSelected[1][1]:Top + 1 )
+                    ENDIF
 
                CASE ::InRect == 4 // bottom
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                     ELSE
+                       aSelected[1][1]:xHeight := ( y - aSelected[1][1]:Top + 1 )
+                    ENDIF
 
                CASE ::InRect == 5 // right bottom
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xWidth  += ( x - ::CtrlOldPt[1] + nSnap )
-                    nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xWidth  += ( x - ::CtrlOldPt[1] + nSnap )
+                       nSnap := ::StickBottom( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xHeight += ( y - ::CtrlOldPt[2] + nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth := ( x - aSelected[1][1]:Left + 1 )
+                       aSelected[1][1]:xHeight := ( y - aSelected[1][1]:Top + 1 )
+                    ENDIF
 
                CASE ::InRect == 6 // right
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xWidth  += ( x - ::CtrlOldPt[1] + nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xWidth += ( x - ::CtrlOldPt[1] + nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth := ( x - aSelected[1][1]:Left + 1 )
+                    ENDIF
 
                CASE ::InRect == 7 // right top
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
-                    aSelected[1][1]:xWidth  += ( x - ::CtrlOldPt[1] + nSnap )
-                    nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
-                    aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickRight( aSel, x - ::CtrlOldPt[1] )
+                       aSelected[1][1]:xWidth  += ( x - ::CtrlOldPt[1] + nSnap )
+                       nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
+                       aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
+                     ELSE
+                       aSelected[1][1]:xWidth  := ( x - aSelected[1][1]:Left + 1 )
+                       aSelected[1][1]:xHeight += ( aSelected[1][1]:xTop - y )
+                       aSelected[1][1]:xTop    := y
+                    ENDIF
 
                CASE ::InRect == 8 // top
                     aSel := ::GetSelRect(.T.,.F.)
-                    nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
-                    aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
-                    aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
-
+                    IF ::Application:ShowGrid == 2
+                       nSnap := ::StickTop( aSel, y - ::CtrlOldPt[2] )
+                       aSelected[1][1]:xTop    := aSelected[1][1]:xTop + ( y - ::CtrlOldPt[2] ) + nSnap
+                       aSelected[1][1]:xHeight += ( ::CtrlOldPt[2] - y - nSnap )
+                     ELSE
+                       aSelected[1][1]:xHeight += ( aSelected[1][1]:xTop - y )
+                       aSelected[1][1]:xTop    := y
+                    ENDIF
             ENDCASE
 
             IF ::InRect >= 1

@@ -163,6 +163,9 @@ CLASS ComboBox FROM Control
    METHOD __ComboBoxEditProc()
    METHOD __ResetEdit()
    METHOD __SetSizePos()
+
+   METHOD SetValue( nValue )           INLINE ::SetCurSel( nValue ), OutputDebugString( xStr(::Cursel) )
+   METHOD GetValue()                   INLINE ::GetCurSel(), OutputDebugString( xStr(::Cursel) ), ::Cursel
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -395,6 +398,10 @@ METHOD OnParentCommand( nId, nCode ) CLASS ComboBox
            nRet := __Evaluate( ::Action, Self,,,,)
            nRet := ExecuteEvent( "OnCBNSelEndOk", Self )
            nRet := 0
+           IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+              Eval( ::Form:bChanged, Self )
+           ENDIF
+
       CASE nCode == CBN_SELENDCANCEL
            __Evaluate( ::OnCBNSelEndCancel, Self,,,,)
 
@@ -599,7 +606,7 @@ METHOD Init( oParent ) CLASS DriveCombobox
    ::Super:Init( oParent )
    ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    IF !::Application:IsThemedXP
-      ::Border := .F.
+      ::Border := 0
    ENDIF
    shfi := (struct SHFILEINFO)
    ::HorzScroll := .T.

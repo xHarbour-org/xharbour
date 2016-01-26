@@ -250,8 +250,6 @@ METHOD Create() CLASS ActiveX
    IF !::Visible .AND. ! ::DesignMode
       ::Hide()
    ENDIF
-   //::Border := ::xBorder
-
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
@@ -288,13 +286,17 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
    WITH OBJECT oObj
       FOR EACH oProperty IN :Properties
           cProp := oProperty:Name
-          IF ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
+          IF ! oProperty:VT IN { VT_VARIANT, VT_DISPATCH, VT_PTR, VT_USERDEFINED } .AND.;
+             ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
              lReadOnly := .f.
              TRY
                 SWITCH oProperty:VT
+                   CASE VT_VARIANT
+                      exit
                    CASE VT_DISPATCH
+                      exit
                    CASE VT_VOID
                         IF LEFT( oProperty:Arguments[1]:TypeDesc, 3 ) == "VT_"
                            cArg := oProperty:Arguments[1]:TypeDesc
@@ -324,7 +326,10 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
                 xVal := NIL
                 lReadOnly := .T.
              END
-             IF ! lReadOnly
+          if "Optional" IN cProp
+            VIEW xVal
+          ENDIF
+             IF ! lReadOnly .AND. xVal != NIL
                 __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
              ENDIF
           ENDIF

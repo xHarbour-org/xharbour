@@ -86,13 +86,15 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS Panel
-   LOCAL hMemBitmap, hOldBitmap, hMemDC
-   IF ::xBackColor == NIL
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, nBorder, nLeftBorder
+   IF ::xBackColor == NIL .AND. ::Transparent
       hMemDC     := CreateCompatibleDC( hDC )
       hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
       hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+      nBorder    := (::Height - ( ::ClientHeight + IIF( ! Empty(::Text), ::TitleHeight, 0 ) ) ) / 2
+      nLeftBorder:= (::Width-::ClientWidth)/2
 
-      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight+1, 0 ) )
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left-nLeftBorder, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight, 0 )-nBorder )
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( ::Parent:BkBrush != NIL, ::Parent:BkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
 
       IF ::BkBrush != NIL

@@ -156,7 +156,7 @@ METHOD Write( cSection, acEntry, xValue ) CLASS IniFile
    ENDIF
 RETURN .T.
 
-   
+
 //--------------------------------------------------------------------------------------------------
 METHOD Read( cSection, cEntry, xDefault ) CLASS IniFile
    SWITCH ValType( xDefault )
@@ -205,11 +205,13 @@ RETURN GetPrivateProfileString( cSection, cEntry, xDefault, ::Name )
 
 //--------------------------------------------------------------------------------------------------
 METHOD ReadNumber( cSection, cEntry, xDefault ) CLASS IniFile
-   DEFAULT xDefault TO 0
+   LOCAL cValue
    IF Empty( ::Name )
-      RETURN VAL( GetProfileString(cSection, cEntry, STR( xDefault ) ) )
+      cValue := GetProfileString(cSection, cEntry, IIF( xDefault != NIL, STR( xDefault ), xDefault ) )
+    ELSE
+      cValue := GetPrivateProfileString(cSection, cEntry, IIF( xDefault != NIL, STR( xDefault ), xDefault ), ::Name )
    ENDIF
-RETURN VAL( GetPrivateProfileString(cSection, cEntry, STR( xDefault ), ::Name ) )
+RETURN IIF( ! Empty(cValue), VAL( cValue ), xDefault )
 
 //--------------------------------------------------------------------------------------------------
 METHOD ReadArray( cSection ) CLASS IniFile

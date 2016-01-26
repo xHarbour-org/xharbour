@@ -538,7 +538,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnSelChanged( oItem ) CLASS ObjectTreeView
    IF EMPTY( procname(10) ) .OR. procname(10) == "OBJECTTREEVIEW:ONLBUTTONDOWN"
-      IF ASCAN( ::Application:Project:Forms, {|o| o == oItem:Cargo:Form} ) > 0
+      IF ASCAN( ::Application:Project:Forms, {|o| oItem:Cargo != NIL .AND. o == oItem:Cargo:Form} ) > 0
          IF oItem:Cargo:Form:hWnd != ::Application:Project:CurrentForm:hWnd
             ::Application:Project:SelectWindow( oItem:Cargo:Form, ::hWnd )
          ENDIF
@@ -655,8 +655,18 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD GetImage( cFile )  CLASS FileExplorer
-   LOCAL n, cExt := RIGHT( cFile, LEN(cFile)-RAT( ".", cFile )+1 )
+   LOCAL shfi, n, cExt := RIGHT( cFile, LEN(cFile)-RAT( ".", cFile )+1 )
+
    n := ASCAN( ::aExt, {|c|lower(c)==lower(cExt)} )
+
+   IF n == 0
+      shfi := (struct SHFILEINFO)
+      SHGetFileInfo( cExt, FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+      ::ImageList:AddIcon( shfi:hIcon )
+      AADD( ::aExt, cExt )
+      n := Len(::aExt)
+   ENDIF
+
    IF n > 0
       n += 2
    ENDIF
@@ -671,13 +681,27 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS FileExplorer
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
-METHOD OnDropFiles() CLASS FileExplorer
-   LOCAL cFile
-   FOR EACH cFile IN ::FilesDroped
+METHOD OnDropFiles( nwParam ) CLASS FileExplorer
+   LOCAL cFile, oEditor, n, cExt, shfi := (struct SHFILEINFO)
+   Super:OnDropFiles( nwParam )
+   FOR EACH cFile IN ::DragDrop:Files
        IF RIGHT( lower( cFile ), 4 ) $ ".lib.obj"
-          ::Application:Project:AddBinary( cFile )
+          ::AddExtBinary( cFile )
         ELSE
-          ::Application:Project:AddSource( cFile )
+          IF ( n := RAT( ".", cFile ) ) > 0
+             cExt := SubStr( cFile, n )
+             IF ASCAN( ::aExt, {|c|lower(c)==lower(cExt)} ) == 0
+                SHGetFileInfo( cExt, FILE_ATTRIBUTE_NORMAL, @shfi, SHGFI_ICON|SHGFI_SMALLICON|SHGFI_USEFILEATTRIBUTES )
+                ::ImageList:AddIcon( shfi:hIcon )
+                AADD( ::aExt, cExt )
+             ENDIF
+          ENDIF
+
+          oEditor := Source( ::Application:SourceEditor )
+          oEditor:Open( cFile )
+          ::AddExtSource( oEditor )
+          ::Application:Project:SourceTabChanged( ::Application:SourceEditor:DocCount )
+          ::Application:SourceEditor:Parent:Select()
        ENDIF
    NEXT
 RETURN Self
@@ -749,60 +773,62 @@ METHOD OnRightClick() CLASS FileExplorer
    ScreenToClient( ::hWnd, @pt )
    oSel := ::HitTest( pt:x, pt:y )
 
-   oMenu := ContextStrip( Self )
-   oMenu:Create()
+   IF oSel != NIL
+      oMenu := ContextStrip( Self )
+      oMenu:Create()
 
-   IF oSel == ::Project
-      oItem            := MenuStripItem( oMenu )
-      oItem:Text       := "&New Form"
-      oItem:Action     := {|| ::Application:Project:AddWindow() }
-      oItem:Enabled    := ::Application:Props[ "NewFormItemEnabled" ]
-      oItem:Create()
-      oItem            := MenuStripItem( oMenu )
-      oItem:Text       := "&Add Existing Form"
-      oItem:Create()
-      oItem            := MenuStripItem( oMenu )
-      oItem:BeginGroup := .T.
-      oItem:Text       := "&New Custom Control"
-      oItem:Enabled    := ::Application:Props[ "CustControlEnabled"]
-      #ifdef VXH_ENTERPRISE
-      oItem:Action     := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(,,.T.),) }
-      #else
-      oItem:Action     := {|| MessageBox( , "Sorry, Custom Controls are available in the Enterprise edition only.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
-      #endif
-      oItem:Create()
+      IF oSel == ::Project
+         oItem            := MenuStripItem( oMenu )
+         oItem:Text       := "&New Form"
+         oItem:Action     := {|| ::Application:Project:AddWindow() }
+         oItem:Enabled    := ::Application:Props[ "NewFormItemEnabled" ]
+         oItem:Create()
+         oItem            := MenuStripItem( oMenu )
+         oItem:Text       := "&Add Existing Form"
+         oItem:Create()
+         oItem            := MenuStripItem( oMenu )
+         oItem:BeginGroup := .T.
+         oItem:Text       := "&New Custom Control"
+         oItem:Enabled    := ::Application:Props[ "CustControlEnabled"]
+         #ifdef VXH_ENTERPRISE
+         oItem:Action     := {|o| IIF( o:Enabled, ::Application:Project:AddWindow(,,.T.),) }
+         #else
+         oItem:Action     := {|| MessageBox( , "Sorry, Custom Controls are available in the Enterprise edition only.", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION ) }
+         #endif
+         oItem:Create()
 
-    ELSEIF oSel == ::ExtBinary
-      oItem            := MenuStripItem( oMenu )
-      oItem:Text       := "&Add existing file"
-      oItem:Action     := {|| ::Application:Project:AddFile(,.T.) }
-      oItem:Create()
+       ELSEIF oSel == ::ExtBinary
+         oItem            := MenuStripItem( oMenu )
+         oItem:Text       := "&Add existing file"
+         oItem:Action     := {|| ::Application:Project:AddFile(,.T.) }
+         oItem:Create()
 
-    ELSEIF oSel == ::ExtSource
-      oItem            := MenuStripItem( oMenu )
-      oItem:Text       := "&New file"
-      oItem:Action     := {|| ::Application:Project:NewSource() }
-      oItem:Create()
+       ELSEIF oSel == ::ExtSource
+         oItem            := MenuStripItem( oMenu )
+         oItem:Text       := "&New file"
+         oItem:Action     := {|| ::Application:Project:NewSource() }
+         oItem:Create()
 
-      oItem := MenuStripItem( oMenu )
-      oItem:BeginGroup := .T.
-      oItem:Text       := "&Add existing file"
-      oItem:Action     := {|| ::Application:Project:AddFile() }
-      oItem:Create()
+         oItem := MenuStripItem( oMenu )
+         oItem:BeginGroup := .T.
+         oItem:Text       := "&Add existing file"
+         oItem:Action     := {|| ::Application:Project:AddFile() }
+         oItem:Create()
+      ENDIF
+      IF oSel:Cargo != NIL .AND. oSel:Cargo:Form == NIL
+
+         oItem := MenuStripItem( oMenu )
+         oItem:Text    := "&Remove"
+         oItem:Action  := <||
+                           IF oSel:Cargo:Close()
+                              oSel:Delete()
+                              ::Application:Project:Modified := .T.
+                           ENDIF
+                           RETURN NIL
+                          >
+         oItem:Create()
+      ENDIF
+      GetCursorPos( @pt )
+      oMenu:Show( pt:x, pt:y )
    ENDIF
-   IF oSel:Cargo != NIL .AND. oSel:Cargo:Form == NIL
-
-      oItem := MenuStripItem( oMenu )
-      oItem:Text    := "&Remove"
-      oItem:Action  := <||
-                        IF oSel:Cargo:Close()
-                           oSel:Delete()
-                           ::Application:Project:Modified := .T.
-                        ENDIF
-                        RETURN NIL
-                       >
-      oItem:Create()
-   ENDIF
-   GetCursorPos( @pt )
-   oMenu:Show( pt:x, pt:y )
 RETURN NIL

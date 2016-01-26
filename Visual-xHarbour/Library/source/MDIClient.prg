@@ -32,13 +32,6 @@ CLASS MDIClient INHERIT Window
 
    PROPERTY Margins      SET ::SetMargins(@v)
 
-   // Compatibility
-   ACCESS StaticEdge    INLINE ::Border == WS_EX_STATICEDGE
-   ASSIGN StaticEdge(l) INLINE ::Border := IIF(l,WS_EX_STATICEDGE,0)
-
-   ACCESS ClientEdge    INLINE ::Border == WS_EX_CLIENTEDGE
-   ASSIGN ClientEdge(l) INLINE ::Border := IIF(l,WS_EX_CLIENTEDGE,0)
-
    DATA Left               EXPORTED
    DATA Top                EXPORTED
    DATA Width              EXPORTED

@@ -56,6 +56,8 @@ CLASS DataTable INHERIT Component
 
    DATA IDEButton          EXPORTED
    DATA Fields             EXPORTED
+   DATA FieldCtrl          EXPORTED  INIT {=>}
+
    DATA IndexOrder         EXPORTED  INIT 0
 
    DATA Border             EXPORTED
@@ -110,7 +112,7 @@ CLASS DataTable INHERIT Component
 
    DATA __aTmpStruct       PROTECTED
    DATA __lNew             PROTECTED INIT .F.
-   DATA __aData            PROTECTED INIT {}
+   DATA __aData            EXPORTED INIT {}
 
    DATA __hClass           PROTECTED
 
@@ -129,6 +131,7 @@ CLASS DataTable INHERIT Component
    METHOD Reindex()                           INLINE ::Connector:Reindex()
    METHOD Commit()                            INLINE ::Connector:Commit()
    METHOD RecLock()                           INLINE ::Connector:RecLock()
+   METHOD NetError()                          INLINE ::Connector:NetError()
    METHOD FileLock()                          INLINE ::Connector:FileLock()
    METHOD UnLock()                            INLINE ::Connector:UnLock()
    METHOD dbEval(b)                           INLINE ::Connector:dbEval(b)
@@ -139,11 +142,11 @@ CLASS DataTable INHERIT Component
    METHOD Deleted()                           INLINE ::Connector:Deleted()
    METHOD RecCount()                          INLINE ::Connector:RecCount()
    METHOD RecNo()                             INLINE ::Connector:RecNo()
-   METHOD GoTop()                             INLINE ::Cancel(), ::Connector:GoTop()
-   METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
-   METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()
-   METHOD Skip( n )                           INLINE ::Cancel(), ::Connector:Skip( n )
-   METHOD Close(lNotify)                      INLINE ::Cancel(), ::Connector:Close(), ::DestroyFields(),;
+   METHOD GoTop()                             INLINE ::Connector:GoTop()
+   METHOD GoTo( nRec )                        INLINE ::Connector:GoTo( nRec )
+   METHOD GoBottom()                          INLINE ::Connector:GoBottom()
+   METHOD Skip( n )                           INLINE ::Connector:Skip( n )
+   METHOD Close(lNotify)                      INLINE ::Connector:Close(), ::DestroyFields(),;
                                                                                       ::Connector := NIL,;
                                                                                       ::Structure := NIL,;
                                                                                       ::Fields := NIL,;
@@ -156,7 +159,7 @@ CLASS DataTable INHERIT Component
    METHOD SetOrder( nOrder )                  INLINE ::Connector:SetOrder( nOrder )
    METHOD Select( cAlias )                    INLINE ::Connector:Select( cAlias )
    METHOD SelectArea()                        INLINE ::Connector:SelectArea()
-   METHOD Delete()                            INLINE ::Cancel(), ::Connector:Delete()
+   METHOD Delete()                            INLINE ::Connector:Delete()
    METHOD Recall()                            INLINE ::Connector:Recall()
    METHOD Seek( xKey, lSoft )                 INLINE ::Connector:Seek( xKey, lSoft )
    METHOD Found()                             INLINE ::Connector:Found()
@@ -164,7 +167,7 @@ CLASS DataTable INHERIT Component
    METHOD CreateIndex( cName, xKey, lUnique ) INLINE ::Connector:CreateIndex( cName, xKey, lUnique )
 
    METHOD IndexOrd()                          INLINE ::Connector:IndexOrd()
-   METHOD Zap()                               INLINE ::Cancel(), ::Connector:Zap()
+   METHOD Zap()                               INLINE ::Connector:Zap()
    METHOD OrdCount()                          INLINE ::Connector:OrdCount()
    METHOD OrdName(n)                          INLINE ::Connector:OrdName(n)
    METHOD OrdNumber(cOrd,cBag)                INLINE ::Connector:OrdNumber(cOrd,cBag)
@@ -177,7 +180,7 @@ CLASS DataTable INHERIT Component
    METHOD Used()                              INLINE ::Connector:Used()
 
    METHOD FieldPut( nField, xVal )            INLINE IIF( ! Empty(::__aData), ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
-   METHOD FieldGet( nField,n )                INLINE IIF( ! Empty(::__aData) .AND. n==NIL, ::__aData[nField], ::Connector:FieldGet( nField ) )
+   METHOD FieldGet()
 
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
@@ -194,7 +197,6 @@ CLASS DataTable INHERIT Component
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
 
    METHOD CheckAlias()
-   METHOD AdsSetServerType(n)   VIRTUAL
 
    METHOD Destroy(lNotify)                    INLINE IIF( ::IsOpen, ::Close(lNotify),), ::Super:Destroy()
    METHOD __SetAlias()
@@ -218,7 +220,7 @@ ENDCLASS
 METHOD Blank() CLASS DataTable
    LOCAL xValue, n
    ::__lNew  := .T.
-   ::__aData := {}
+   ::__aData := Array( LEN( ::Structure ) )
    FOR n := 1 TO LEN( ::Structure )
        DO CASE
           CASE ::Structure[n][2] == "C"
@@ -232,17 +234,32 @@ METHOD Blank() CLASS DataTable
           OTHERWISE
                xValue := ""
        ENDCASE
-       AADD( ::__aData, xValue )
+       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
+          ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xValue )
+       ELSE
+          ::__aData[n] := xValue
+       ENDIF
    NEXT
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS DataTable
+   LOCAL n
    IF ::__lNew
       ::Append()
+   ELSEIF ::Shared
+      WHILE ! ::RecLock()
+         sleep(1000)
+      ENDDO
    ENDIF
-   AEVAL( ::__aData, {|,n| IIF( ::__aData[n] != NIL, (::Alias)->( FieldPut( n, ::__aData[n] ) ),) } )
-   IF ::__lNew .AND. ::Shared
+   FOR n := 1 TO LEN( ::Structure )
+       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
+          (::Area)->( FieldPut( n, ::FieldCtrl[ ::Structure[n][1] ]:GetValue() ) )
+       ELSEIF ::__aData[n] != NIL
+          (::Area)->( FieldPut( n, ::__aData[n] ) )
+       ENDIF
+   NEXT
+   IF ::__lNew .OR. ::Shared
       ::Unlock()
    ENDIF
    ::__lNew := .F.
@@ -250,15 +267,28 @@ METHOD Save() CLASS DataTable
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
+METHOD FieldGet( nField ) CLASS DataTable
+   IF Empty(::__aData) .OR. ::__aData[nField] == NIL
+      RETURN ::Connector:FieldGet( nField )
+   ENDIF
+RETURN ::__aData[nField]
+
+//-------------------------------------------------------------------------------------------------------
 METHOD Load( lAvoidNew ) CLASS DataTable
-   LOCAL n
+   LOCAL n, xData
    DEFAULT lAvoidNew TO .F.
    IF !lAvoidNew
       ::__lNew := .F.
    ENDIF
-   ::__aData := {}
+
+   ::__aData := Array( LEN( ::Structure ) )
    FOR n := 1 TO LEN( ::Structure )
-       AADD( ::__aData, ::FieldGet(n,1) )
+       xData := ::Connector:FieldGet( n )
+       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
+          ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xData )
+       ELSE
+          ::__aData[n] := xData
+       ENDIF
    NEXT
 RETURN Self
 
@@ -269,6 +299,7 @@ METHOD Init( oOwner ) CLASS DataTable
    ::ComponentType := "DataSource"
    ::Super:Init( oOwner )
    ::Connector := DataRdd( Self )
+   HSetCaseMatch( ::FieldCtrl, .F. )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -287,7 +318,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
-   LOCAL lChanged, n, cFileName, cPath, nServer, cMemo
+   LOCAL lChanged, n, cFileName, cPath, cMemo
    IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:__hObjects[ ::Socket ]
       IF ! ::DesignMode
@@ -299,7 +330,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
-             lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
+              lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
                          ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
                          ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
                          ::__aTmpStruct[n][4] != ::Structure[n][4]
@@ -314,13 +345,9 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
          cPath     := SUBSTR( cFileName, 1, n-1 )
          cFileName := SUBSTR( cFileName, n+1 )
 
-         dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver )
-
-         IF FILE( cPath + "\__" + cFileName )
-            IF ::__xCtrlName == "AdsDataTable"
-               nServer := ::AdsSetServerType( 1 )
-            ENDIF
+         IF dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver ) .AND. FILE( cPath + "\__" + cFileName )
             ::Close()
+
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
             cMemo := ::MemoExt()
 
@@ -335,9 +362,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             cFileName := Left( cFileName, n-1 ) + cMemo
             FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
 
-            IF nServer != NIL
-               ::AdsSetServerType( nServer )
-            ENDIF
+            ::Connector := DataRdd( Self )
             ::Connector:Create( lIgnoreAO )
          ENDIF
       ENDIF
@@ -348,7 +373,7 @@ RETURN Self
 METHOD CreateTable( aStruc, cFile ) CLASS DataTable
    DEFAULT cFile  TO ::FileName
    DEFAULT aStruc TO ::Structure
-   IF ! File( cFile ) .AND. ! Empty( aStruc )
+   IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
       ::Connector:CreateTable( cFile, aStruc, ::Driver )
 
     ELSEIF File( cFile ) .AND. ! Empty( aStruc )
@@ -532,6 +557,7 @@ CLASS DataRdd
    METHOD Reindex()                           INLINE (::Owner:Area)->( dbReindex() )
    METHOD Commit()                            INLINE (::Owner:Area)->( dbCommit() )
    METHOD RecLock()                           INLINE (::Owner:Area)->( RLOCK() )
+   METHOD NetError()                          INLINE (::Owner:Area)->( NETERR() )
    METHOD FileLock()                          INLINE (::Owner:Area)->( FLOCK() )
    METHOD UnLock()                            INLINE (::Owner:Area)->( dbUnlock() )
    METHOD UnLockAll()                         INLINE (::Owner:Area)->( dbUnlockAll() )
@@ -654,7 +680,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataRdd
    LOCAL nAlias, cAlias, oErr
-   LOCAL cEvent, n, nServer, cFile, lDef := .T.
+   LOCAL cEvent, n, cFile, lDef := .T.
    DEFAULT lIgnoreAO TO .F.
 
    IF VALTYPE( ::Owner:SqlConnector ) == "C"
@@ -720,10 +746,6 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ENDIF
       ENDIF
 
-      IF !::Owner:__lMemory .AND. ::Owner:Driver != NIL .AND. ::Owner:Driver != NIL .AND. UPPER( ::Owner:Driver ) $ "ADSCDXADSNTXADSADT" .AND. __objHasMsg( ::Owner, "ServerType" )
-         nServer := ::Owner:AdsSetServerType( ::Owner:ServerType )
-      ENDIF
-
       nAlias := 1
       cAlias := ::Owner:xAlias
       IF EMPTY( cAlias )
@@ -778,7 +800,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             //   6420  Unable to "discover" the Advantage Database Server
             IF MessageBox(0, "Error " + alltrim(str(oErr:SubCode)) + ": Advantage Server Not Found"+CHR(13)+;
                              "Use local server instead?", "Open Error", MB_YESNO | MB_ICONQUESTION ) == IDYES
-               n := ::Owner:AdsSetServerType(1)
+               //AdsSetServerType(1)
             ENDIF
          ENDIF
          IF oErr:GenCode == 18 .OR. oErr:GenCode == 17
@@ -797,9 +819,6 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ENDIF
          TRY
             dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
-            IF !::Owner:__lMemory .AND. n != NIL
-               ::Owner:AdsSetServerType(n)
-            ENDIF
          CATCH
             RETURN .F.
          END
@@ -809,10 +828,6 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ::Owner:Error := oErr
          ExecuteEvent( "OnError", ::Owner )
          RETURN .F.
-      ENDIF
-
-      IF ! ::Owner:__lMemory .AND. nServer != NIL
-         ::Owner:AdsSetServerType( nServer )
       ENDIF
 
       IF ! ::Owner:MemoType > 0

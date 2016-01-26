@@ -36,7 +36,7 @@ CLASS ProfessionalColorTable
    DATA MenuItemShadow                       EXPORTED INIT .F.
 
    DATA ColorScheme
-   DATA UseSystemColors                      EXPORTED INIT .F.   
+   DATA UseSystemColors                      EXPORTED INIT .F.
    DATA MenuStripeVisible                    EXPORTED INIT .T.
    DATA MenuCheckRectangle                   EXPORTED INIT .T.
    DATA MenuBarSeparated                     EXPORTED INIT .F.
@@ -68,7 +68,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Load( cScheme ) CLASS ProfessionalColorTable
-   
+
    IF ::AutoScheme .AND. cScheme == NIL
       ::GetCurrentStyle()
    ENDIF
@@ -311,7 +311,7 @@ METHOD Clean() CLASS ProfessionalColorTable
 RETURN Self
 
 METHOD GetCurrentStyle() CLASS ProfessionalColorTable
-   LOCAL cTheme, cColor, cSize 
+   LOCAL cTheme, cColor, cSize
    GetCurrentThemeName( @cTheme, @cColor, @cSize )
    DEFAULT cTheme TO ""
    ::Theme := cTheme
@@ -335,7 +335,52 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Load() CLASS FlatGrayColorTable
    ::UseSystemColors := .T.
-   
+
+   ::ButtonCheckedGradientBegin             := RGB( 197, 222, 245 )
+   ::ButtonCheckedGradientEnd               := RGB( 197, 222, 245 )
+   ::ButtonPressedGradientBegin             := RGB( 201, 224, 247 )
+   ::ButtonPressedGradientEnd               := RGB( 201, 224, 247 )
+   ::ButtonPressedBorder                    := RGB(  86, 157, 229 )
+   ::ButtonSelectedBorder                   := RGB( 126, 180, 234 )
+   ::ButtonSelectedGradientBegin            := RGB( 232, 242, 252 )
+   ::ButtonSelectedGradientEnd              := RGB( 232, 242, 252 )
+   ::GripDark                               := IIF( ::UseSystemColors, RGB(182, 182, 185), RGB(84, 84, 117) )
+   ::GripLight                              := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB(255, 255, 255) )
+   ::MenuBorder                             := IIF( ::UseSystemColors, RGB(126, 126, 129), RGB(124, 124, 148) )
+   ::MenuItemBorder                         := RGB( 120, 174, 229 )
+   ::MenuItemPressedGradientBegin           := RGB( 201, 224, 247 )
+   ::MenuItemPressedGradientEnd             := RGB( 201, 224, 247 )
+   ::MenuItemSelected                       := RGB( 209, 226, 242 )
+
+   ::MenuItemSelectedGradientBegin          := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 255, 222) )
+   ::MenuItemSelectedGradientEnd            := IIF( ::UseSystemColors, RGB(232, 233, 236), RGB(255, 203, 136) )
+
+   ::OverflowButtonGradientBegin            := IIF( ::UseSystemColors, RGB(233, 233, 235), RGB(186, 185, 206) )
+   ::OverflowButtonGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNSHADOW ), RGB(118, 116, 146) )
+   ::OverflowButtonGradientMiddle           := IIF( ::UseSystemColors, RGB(227, 226, 230), RGB(156, 155, 180) )
+   ::SeparatorDark                          := IIF( ::UseSystemColors, RGB(186, 186, 189), RGB(110, 109, 143) )
+   ::SeparatorLight                         := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNHIGHLIGHT ), RGB(255, 255, 255) )
+   ::MenuBackground                         := IIF( ::UseSystemColors, GetSysColor( COLOR_WINDOW ), RGB( 255, 255, 255 ) )
+   ::ToolStripBorder                        := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+   ::ToolStripGradientBegin                 := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+   ::ToolStripGradientEnd                   := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+   ::ToolStripGradientMiddle                := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+   ::ToolStripPanelGradientBegin            := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+   ::ToolStripPanelGradientEnd              := IIF( ::UseSystemColors, GetSysColor( COLOR_BTNFACE ), RGB( 255, 255, 255 ) )
+
+   ::MenuItemShadow                         := .F.
+   ::MenuBarSeparated                       := .T.
+   ::Clean()
+RETURN Self
+
+CLASS VSColorTable INHERIT ProfessionalColorTable
+   METHOD Load()
+ENDCLASS
+
+//-----------------------------------------------------------------------------------------------------------------------------
+METHOD Load() CLASS VSColorTable
+   ::UseSystemColors := .T.
+
    ::ButtonCheckedGradientBegin             := RGB( 197, 222, 245 )
    ::ButtonCheckedGradientEnd               := RGB( 197, 222, 245 )
    ::ButtonPressedGradientBegin             := RGB( 201, 224, 247 )

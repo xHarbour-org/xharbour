@@ -14,49 +14,37 @@
 #include "debug.ch"
 #include "vxh.ch"
 
+#define TRBN_FIRST (0-1501)
+#define TRBN_THUMBPOSCHANGING (TRBN_FIRST-1)
+#define TBS_TRANSPARENTBKGND 0x1000
+#define TBS_NOTIFYBEFOREMOVE 0x800
 
 //-----------------------------------------------------------------------------------------------
 
 CLASS TrackBar INHERIT Control
    METHOD Init()  CONSTRUCTOR
    METHOD OnParentNotify()
-   METHOD OnEraseBkGnd() INLINE 1
-   DATA OnNMReleasedCapture EXPORTED
 ENDCLASS
 
-METHOD Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCreate ) CLASS TrackBar
+METHOD Init( oParent ) CLASS TrackBar
    DEFAULT ::__xCtrlName TO "TrackBar"
-   DEFAULT nLeft   TO 0
-   DEFAULT nTop    TO 0
-   DEFAULT nWidth  TO 150
-   DEFAULT nHeight TO 30
-   ::ClsName  := "msctls_trackbar32" //TRACKBAR_CLASS
-   ::Super:Init( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight, nStyle, lCreate )
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + TBS_AUTOTICKS + TBS_ENABLESELRANGE
+   ::ClsName := TRACKBAR_CLASS
+   ::Super:Init( oParent )
+   ::Style  := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | TBS_AUTOTICKS | TBS_ENABLESELRANGE | TBS_NOTIFYBEFOREMOVE
+   ::Width  := 100
+   ::Height := 28
+   ::Events := ;
+            { ;
+            {"Position", {;
+                          { "OnPosChange", "", "nPosition, nReason" };
+            } } }
 RETURN Self
 
-
-METHOD OnParentNotify( nwParam, nlParam ) CLASS TrackBar
-   LOCAL cd
-   ::Super:OnParentNotify( nwParam, nlParam )
-   IF ::BkBrush != NIL
-      DO CASE
-         CASE ::Parent:hdr:code == NM_CUSTOMDRAW
-              cd := (struct NMCUSTOMDRAW*) nlParam
-              DO CASE
-                 CASE cd:dwDrawStage == CDDS_PREPAINT
-                      RETURN CDRF_NOTIFYITEMDRAW
-
-                 CASE cd:dwDrawStage == CDDS_ITEMPREPAINT
-                      DO CASE
-                         CASE cd:dwItemSpec == TBCD_CHANNEL
-                              _FillRect( cd:hdc, {0,0,::ClientWidth,::ClientHeight}, ::BkBrush )
-                      ENDCASE
-                      RETURN CDRF_DODEFAULT
-              ENDCASE
-
-         CASE ::Parent:hdr:code == NM_RELEASEDCAPTURE
-              __Evaluate( ::OnNMReleasedCapture, Self )
-      ENDCASE
+METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TrackBar
+   local tpc
+   (nwParam)
+   IF hdr:code == TRBN_THUMBPOSCHANGING
+      tpc := (struct NMTRBTHUMBPOSCHANGING *) nlParam
+      ExecuteEvent( "OnPosChange", Self, tpc:dwPos, tpc:nReason )
    ENDIF
 RETURN NIL

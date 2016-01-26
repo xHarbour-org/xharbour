@@ -318,3 +318,4 @@ METHOD GetPointSize() CLASS Font
    ENDIF
    DeleteDC( hDC )
 RETURN n
+
