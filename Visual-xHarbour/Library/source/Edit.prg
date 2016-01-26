@@ -1100,7 +1100,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       RETURN 0
    ENDIF
 #endif
-   
+
    IF ::Transparent
       ::InvalidateRect(, .F.)
    ENDIF
@@ -1151,6 +1151,7 @@ METHOD OnChar( nKey ) CLASS EditBox
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
       IF ! lProc
          ::CallWindowProc()
+         lProc := .T.
       ENDIF
       Eval( ::Form:bChanged, Self )
    ENDIF
