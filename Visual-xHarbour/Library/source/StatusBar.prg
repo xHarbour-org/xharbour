@@ -56,7 +56,7 @@ CLASS StatusBar INHERIT Control
    METHOD __OnParentSize()
    METHOD OnMouseMove()
    METHOD SetImageIndex()
-   METHOD OnDestroy()      INLINE ::Super:OnDestroy(),  AEVAL( ::Children, {|o| ObjFromHandle( o:hWnd, .T. ) } )
+//   METHOD OnDestroy()      INLINE ::Super:OnDestroy(),  AEVAL( ::Children, {|o| ObjFromHandle( o:hWnd, .T. ) } )
    METHOD OnDrawItem()
 ENDCLASS
 
@@ -126,7 +126,6 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------
 METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS StatusBar
    Super:OnDrawItem( nwParam, nlParam, dis )
-           view "xxxxxxxxxxxx"
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
@@ -314,7 +313,7 @@ METHOD Init( oParent ) CLASS StatusBarPanel
    ::Events := {}
    ::Index  := LEN( ::Parent:Children )
 
-   __SetWindowObjPtr( Self )
+   //__SetWindowObjPtr( Self )
 RETURN Self
 
 METHOD Create() CLASS StatusBarPanel
