@@ -1539,7 +1539,9 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    NEXT
 
    IF ::AllowDragRecords .AND. ( nClickRow == ::RowPos .OR. ::SimpleRowDrag ) .AND. ( nClickCol == ::ColPos .OR. ::FullRowSelect )
-      IF ExecuteEvent( "OnBeginDragging", Self, nClickCol )
+      lRes := ExecuteEvent( "OnBeginDragging", Self, nClickCol )
+      DEFAULT lRes TO .T.
+      IF lRes
          ::__nDragRec := ::__DisplayArray[ nClickRow ][2]
       ENDIF
    ENDIF

@@ -1046,8 +1046,9 @@ METHOD OnEraseBkgnd( hDC ) CLASS TabPage
       IF ::DesignMode .AND. ::Application:ShowGrid == 1
          DrawGrid( hDC, ::Form:CtrlMask:xGrid, ::Form:CtrlMask:yGrid, ::ClientWidth, ::ClientHeight, RGB(0,0,0) )
       ENDIF
+      RETURN 1
    ENDIF
-RETURN 1
+RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS TabPage
