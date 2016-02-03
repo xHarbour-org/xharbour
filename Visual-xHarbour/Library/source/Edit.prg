@@ -181,6 +181,7 @@ CLASS EditBox INHERIT Control
    METHOD OnLButtonDown()
    METHOD OnChar()
    METHOD OnPaste()
+   METHOD OnUndo()
    METHOD OnCut()
    METHOD OnContextMenu()              INLINE IIF( ::MenuArrow, ( ::CallWindowProc(), 0 ), NIL )
    METHOD __SetLayout()
@@ -1121,7 +1122,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
          CASE VK_DELETE
             ::CallWindowProc()
             ::__UpdateDataGrid()
-            IF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+            IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
                Eval( ::Form:bChanged, Self )
             ENDIF
             RETURN 0
@@ -1136,6 +1137,12 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
             ::__oDataGrid:Height := 0
             RETURN 0
       END
+
+   ELSEIF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      ::CallWindowProc()
+      Eval( ::Form:bChanged, Self )
+      RETURN 0
+
    ENDIF
 
 RETURN NIL
@@ -1149,6 +1156,9 @@ METHOD OnChar( nKey ) CLASS EditBox
       lProc := .T.
    ENDIF
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      IF IsKeyDown( VK_CONTROL ) .OR. IsKeyDown( VK_MENU )
+         RETURN NIL
+      ENDIF
       IF ! lProc
          ::CallWindowProc()
          lProc := .T.
@@ -1158,16 +1168,29 @@ METHOD OnChar( nKey ) CLASS EditBox
 RETURN IIF( lProc, 0, NIL )
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnUndo() CLASS EditBox
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      ::CallWindowProc()
+      Eval( ::Form:bChanged, Self )
+      RETURN 0
+   ENDIF
+RETURN NIL
+
+//-----------------------------------------------------------------------------------------------
 METHOD OnPaste() CLASS EditBox
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      RETURN Eval( ::Form:bChanged, Self )
+      ::CallWindowProc()
+      Eval( ::Form:bChanged, Self )
+      RETURN 0
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnCut() CLASS EditBox
    IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      RETURN Eval( ::Form:bChanged, Self )
+      ::CallWindowProc()
+      Eval( ::Form:bChanged, Self )
+      RETURN 0
    ENDIF
 RETURN NIL
 

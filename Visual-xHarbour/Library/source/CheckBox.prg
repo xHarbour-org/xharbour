@@ -86,6 +86,10 @@ CLASS CheckBox INHERIT Control
    METHOD __SetSize()
    //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD ResetFrame() INLINE    ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+
+   METHOD SetValue( lChecked )         INLINE ::State := IIF( lChecked, BST_CHECKED, BST_UNCHECKED )
+   METHOD GetValue()                   INLINE ::Checked()
+   METHOD OnParentCommand()
 ENDCLASS
 
 METHOD Init( oParent ) CLASS CheckBox
@@ -121,6 +125,12 @@ METHOD Create() CLASS CheckBox
    ::Height := MAX( 16, ::Height )
    ::SetState( ::xState )
 RETURN Self
+
+METHOD OnParentCommand() CLASS CheckBox
+   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      Eval( ::Form:bChanged, Self )
+   ENDIF
+RETURN NIL
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS CheckBox
    LOCAL nRet, cd, aRect, lDisabled, lSelected, lFocus, nColor, lHot

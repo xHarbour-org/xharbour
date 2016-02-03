@@ -324,6 +324,8 @@ CLASS ToolStrip INHERIT Control
    PROPERTY Width      ROOT "Position" SET ::__SetSizePos(3,v) DEFAULT 20  NOTPUBLIC
    PROPERTY Float      ROOT "Position" SET ::__SetFloat(v)     DEFAULT .F. NOTPUBLIC
 
+   PROPERTY Transparent      SET ::InvalidateRect() DEFAULT .F.
+
    ACCESS __lMoveable INLINE ::Parent:ClsName != "ToolStripContainer"
 
    DATA Border         EXPORTED INIT WS_BORDER
@@ -338,7 +340,6 @@ CLASS ToolStrip INHERIT Control
    DATA ClipChildren   EXPORTED INIT .T.
    DATA ClipSiblings   EXPORTED INIT .T.
    DATA TabStop        EXPORTED INIT .F.
-   DATA Transparent    EXPORTED INIT .F.
    DATA Visible        EXPORTED INIT .T.
 
    DATA __lIsMenu      EXPORTED INIT .F.
@@ -819,10 +820,14 @@ METHOD __CreateBkBrush() CLASS ToolStrip
    hMemBitmap := CreateCompatibleBitmap( hDC, ::xWidth, ::xHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   __GradientFill( hMemDC, ::__aVertex1, 2, ::__aMesh, 1, 1 )
-   __GradientFill( hMemDC, ::__aVertex2, 2, ::__aMesh, 1, 1 )
-   __GradientFill( hMemDC, ::__aVertex3, 2, ::__aMesh, 1, 1 )
-
+   IF ::Transparent .AND. ::Parent:BkBrush != NIL
+      SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
+      _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::Parent:BkBrush )
+   ELSE
+      __GradientFill( hMemDC, ::__aVertex1, 2, ::__aMesh, 1, 1 )
+      __GradientFill( hMemDC, ::__aVertex2, 2, ::__aMesh, 1, 1 )
+      __GradientFill( hMemDC, ::__aVertex3, 2, ::__aMesh, 1, 1 )
+   ENDIF
    IF ::Row > 0
       IF ::xShowChevron
          ::__DrawChevron( hMemDC, ::__ChevronWidth, ::ColorScheme:OverflowButtonGradientBegin,,,::ColorScheme:OverflowButtonGradientEnd )
@@ -845,15 +850,16 @@ METHOD __CreateBkBrush() CLASS ToolStrip
       ENDIF
    ENDIF
 
-   // Border
-   hOldPen := SelectObject( hMemDC, ::ColorScheme:Pen:ToolStripBorder )
-   MoveTo( hMemDC, 2,   ::Height-1   )
-   LineTo( hMemDC, ::Width-IIF( ::xShowChevron, ::__ChevronWidth, 2 ), ::Height-1  )
-
-   IF !::xShowChevron
-      MoveTo( hMemDC, ::Width-1,   2 )
-      LineTo( hMemDC, ::Width-1, ::Height-2  )
-      SetPixel( hMemDC, ::Width-2, ::Height-2, ::ColorScheme:ToolStripBorder )
+   IF ! ::Transparent .OR. ::Parent:BkBrush == NIL
+      // Border
+      hOldPen := SelectObject( hMemDC, ::ColorScheme:Pen:ToolStripBorder )
+      MoveTo( hMemDC, 2,   ::Height-1   )
+      LineTo( hMemDC, ::Width-IIF( ::xShowChevron, ::__ChevronWidth, 2 ), ::Height-1  )
+      IF !::xShowChevron
+         MoveTo( hMemDC, ::Width-1,   2 )
+         LineTo( hMemDC, ::Width-1, ::Height-2  )
+         SetPixel( hMemDC, ::Width-2, ::Height-2, ::ColorScheme:ToolStripBorder )
+      ENDIF
    ENDIF
 
    SelectObject( hMemDC, hOldPen )

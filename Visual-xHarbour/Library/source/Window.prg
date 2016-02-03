@@ -147,13 +147,14 @@ static aMessages := {;
                     { WM_NCXBUTTONDOWN,   "OnNCXButtonDown"   },;
                     { WM_NCXBUTTONDBLCLK, "OnNCXButtonDblClk" },;
                     { WM_TIMER,           "OnTimer"           },;
+                    { WM_UNDO,            "OnUndo"            },;
+                    { EM_UNDO,            "OnUndo"            },;
                     { WM_CLOSE,           "__OnClose"         } ;
                     }
 
 //-----------------------------------------------------------------------------------------------
 
 CLASS Window INHERIT Object
-
    // Object Manager properties ----------------------------------------------------------------------------------------------------------------------------
    PROPERTY BackColor     ROOT "Colors"   GET IIF( ::xBackColor == NIL, ::__SysBackColor, ::xBackColor ) SET ::SetBackColor(v)
    PROPERTY ForeColor     ROOT "Colors"   GET IIF( ::xForeColor == NIL, ::__SysForeColor, ::xForeColor ) SET ::SetForeColor(v)
@@ -2803,11 +2804,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
          CASE WM_CLEAR
               nRet := ExecuteEvent( "OnClear", Self )
               ODEFAULT nRet TO ::OnClear( nwParam, nlParam )
-              EXIT
-
-         CASE WM_UNDO
-              nRet := ExecuteEvent( "OnUndo", Self )
-              ODEFAULT nRet TO ::OnUndo( nwParam, nlParam )
               EXIT
 
          CASE WM_MDICHILDSIZED

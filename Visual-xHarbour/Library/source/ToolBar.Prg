@@ -804,7 +804,7 @@ METHOD OnUserMsg( hWnd, nMsg ) CLASS ToolBar
            IF ::nPressed >= SendMessage( hWnd, TB_BUTTONCOUNT )
               ::nPressed := 0
            ENDIF
-           IF ::aItems[::nPressed+1]:Enabled
+           IF ::aItems[::nPressed+1]:Enabled .AND. ! ::DesignMode
               ::OpenPopup( hWnd )
            ENDIF
            RETURN 0

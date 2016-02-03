@@ -20,9 +20,6 @@
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsDataTable INHERIT DataTable
-   PROPERTY ServerType ROOT "Behavior"  DEFAULT 1
-
-   DATA EnumServerType   EXPORTED  INIT { { "Local", "Remote", "Either" }, {1,2,3} }
 
    DATA xDriver          PROTECTED INIT "ADSCDX"
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable / Advantage (*.dbf,*.adt)", "*.dbf;*.adt" } }
@@ -94,6 +91,29 @@ METHOD FieldPut( nField, xVal ) CLASS AdsDataTable
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
+
+CLASS AdsServer INHERIT Component
+   PROPERTY Type ROOT "Behavior"  SET AdsSetServerType( v ) DEFAULT 1
+   DATA EnumType   EXPORTED  INIT { { "Local", "Remote", "Either" }, {1,2,3} }
+   METHOD Init() CONSTRUCTOR
+   METHOD Create()
+ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Init( oOwner ) CLASS AdsServer
+   DEFAULT ::__xCtrlName TO "AdsServer"
+   DEFAULT ::ClsName     TO "AdsServer"
+   ::ComponentType := "DataServer"
+   ::Super:Init( oOwner )
+RETURN Self
+
+METHOD Create() CLASS AdsServer
+   IF ! ::Owner:DesignMode
+      AdsSetServerType( ::Type )
+   ENDIF
+RETURN Self
 
 #pragma BEGINDUMP
    #pragma comment( lib, "ads.lib" )

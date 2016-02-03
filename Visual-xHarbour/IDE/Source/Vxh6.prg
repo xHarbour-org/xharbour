@@ -201,6 +201,7 @@ METHOD Create() CLASS ToolBox
    //AADD( ::aButtons[5][2], { "Database", .T. } )
    AADD( ::aButtons[5][2], { "DataTable", .T. } )
    //AADD( ::aButtons[5][2], { "SqlTable", .T. } )
+   AADD( ::aButtons[5][2], { "AdsServer", .T. } )
    AADD( ::aButtons[5][2], { "AdsDataTable", .T. } )
    AADD( ::aButtons[5][2], { "MemoryDataTable", lPro } )
 

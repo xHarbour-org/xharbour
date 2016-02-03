@@ -25,6 +25,8 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
    METHOD OnEraseBkGnd()
    METHOD Destroy()             INLINE ::Panel:Destroy()
    METHOD __CreateBkBrush()
+   METHOD SetValue( cValue )    INLINE ::LoadFromString( cValue )
+   METHOD GetValue()            INLINE ::__cData
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -53,27 +55,31 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS FreeImage
-   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush, nLeftBorder, nBorder
+   LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush, nLeftBorder, nBorder, lDC := hDC != NIL
+
+   IF ! lDC
+      hDC := GetDC( ::hWnd )
+   ENDIF
 
    hMemDC     := CreateCompatibleDC( hDC )
    hMemBitmap := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   IF ::xBackColor != NIL
-      hBrush := CreateSolidBrush( ::xBackColor )
-   ENDIF
-
    IF ::Transparent .AND. ::Parent:BkBrush != NIL
+
       nBorder     := (::Height - ( ::ClientHeight + IIF( ! Empty(::Text), ::TitleHeight, 0 ) ) ) / 2
       nLeftBorder := (::Width-::ClientWidth)/2
 
       SetBrushOrgEx( hMemDC, ::Parent:ClientWidth-::Left-nLeftBorder, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight, 0 )-nBorder )
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::Parent:BkBrush )
    ELSE
+      IF ::xBackColor != NIL
+         hBrush := CreateSolidBrush( ::xBackColor )
+      ENDIF
       _FillRect( hMemDC, { 0, 0, ::ClientWidth, ::ClientHeight }, IIF( hBrush != NIL, hBrush, GetSysColorBrush(COLOR_BTNFACE) ) )
-   ENDIF
-   IF hBrush != NIL
-      DeleteObject( hBrush )
+      IF hBrush != NIL
+         DeleteObject( hBrush )
+      ENDIF
    ENDIF
 
    ::Draw( hMemDC )
@@ -86,6 +92,10 @@ METHOD __CreateBkBrush( hDC ) CLASS FreeImage
    SelectObject( hMemDC,  hOldBitmap )
    DeleteObject( hMemBitmap )
    DeleteDC( hMemDC )
+
+   IF ! lDC
+      ReleaseDC( ::hWnd, hDC )
+   ENDIF
 
 RETURN NIL
 
@@ -153,9 +163,8 @@ CLASS FreeImageRenderer
    METHOD Destroy()            INLINE ::Owner := NIL, IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ), ), NIL
    METHOD SetMargins()
 
-   METHOD SetValue( cValue )   INLINE ::ImageName := "", ::LoadFromString( cValue )
-   METHOD GetValue()           INLINE ::__cData
    METHOD Reload()             INLINE ::LoadFromString( ::__cData ), ::InvalidateRect()
+   METHOD Rescale()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -212,29 +221,72 @@ METHOD Create() CLASS FreeImageRenderer
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
-METHOD LoadFromString( cData ) CLASS FreeImageRenderer
-   DEFAULT cData TO ""
-   ::__cData := cData
-   IF ! EMPTY( cData )
-      IF ::hDIB != NIL
-         FreeImageUnload( ::hDIB )
+METHOD Rescale() CLASS FreeImageRenderer
+   LOCAL cx, cy, nRatio, iy, nHeight, nWidth, tmp
+
+   cx := FreeImageGetWidth( ::hDIB )
+   cy := FreeImageGetHeight( ::hDIB )
+
+   IF ::KeepAspectRatio
+      nRatio := ::Owner:ClientWidth / cx
+      iy     := cy * nRatio
+
+      nHeight := ::Owner:ClientHeight
+      nWidth  := ::Owner:ClientWidth
+
+      IF iy < nHeight
+         nHeight := iy
+       ELSE
+         nRatio := nHeight / cy
+         nWidth := cx * nRatio
       ENDIF
-      ::hDIB := FreeImageStringToDib( cData )
-      IF ::Owner:BkBrush != NIL
-         DeleteObject( ::Owner:BkBrush )
-      ENDIF
-      ::lTransparentSet := .F.
+      cy := nHeight
+      cx := nWidth
+
+    ELSEIF ::Stretch
+      cy := ::Owner:ClientHeight
+      cx := ::Owner:ClientWidth
    ENDIF
+
+   tmp := FreeImageRescale( ::hDIB, cx, cy, FILTER_BICUBIC )
+   IF tmp != NIL
+      FreeImageUnload( ::hDIB )
+      ::hDIB := tmp
+   ENDIF
+RETURN Self
+
+//--------------------------------------------------------------------------------------------------------
+METHOD LoadFromString( cData ) CLASS FreeImageRenderer
+   ::xImageName := NIL
+
+   ::__cData := cData
+   IF ::Owner:BkBrush != NIL
+      DeleteObject( ::Owner:BkBrush )
+      ::Owner:BkBrush := NIL
+   ENDIF
+
+   ::lTransparentSet := .F.
+   IF ::hDIB != NIL
+      FreeImageUnload( ::hDIB )
+      ::hDIB := NIL
+   ENDIF
+
+   IF ! EMPTY( cData )
+      ::hDIB := FreeImageStringToDib( cData )
+   ENDIF
+
+   ::Owner:InvalidateRect()
    AEVAL( ::Children, {|o| o:Reload()} )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
-   LOCAL cx, cy, hDIBMemBitmap, display_dib, hDib, nRatio, iy, nHeight, nWidth
+   LOCAL cx, cy, hDIBMemBitmap, display_dib, hDib, nRatio, iy, nHeight, nWidth, hTmp
    LOCAL hMemBitmap1, hOldBitmap1, hMemDC1, x, y
    IF ::hDIB == NIL
       RETURN NIL
    ENDIF
+
    cx := FreeImageGetWidth( ::hDIB )
    cy := FreeImageGetHeight( ::hDIB )
 
@@ -317,7 +369,6 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
 
       IF FreeImageIsTransparent( ::hDIB ) .OR. FreeImageHasBackgroundColor( ::hDIB )
          IF .T. //! ::KeepAspectRatio .AND. ! ::Stretch
-
             hMemDC1     := CreateCompatibleDC( hMemDC )
             hMemBitmap1 := CreateCompatibleBitmap( hMemDC, cx, cy )
             hOldBitmap1 := SelectObject( hMemDC1, hMemBitmap1 )
@@ -327,18 +378,18 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
 
             IF hDIBMemBitmap != NIL
                IF FreeImageGetBPP( hDIBMemBitmap ) == 32
-                  hDib := FreeImageConvertTo24Bits( hDIBMemBitmap )
+                  hTmp := FreeImageConvertTo24Bits( hDIBMemBitmap )
                   FreeImageUnload( hDIBMemBitmap )
                 ELSE
-                  hDib := hDIBMemBitmap
+                  hTmp := hDIBMemBitmap
                ENDIF
 
-               IF ( display_dib := FreeImageComposite( ::hDIB, .F., , hDib ) ) != NIL
+               IF ( display_dib := FreeImageComposite( ::hDIB, .F., , hTmp ) ) != NIL
                   FreeImageUnload( ::hDIB )
                   ::hDIB := display_dib
                ENDIF
 
-               FreeImageUnload( hDib )
+               FreeImageUnload( hTmp )
 
             ENDIF
             SelectObject( hMemDC1, hOldBitmap1 )
@@ -365,12 +416,15 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
       RETURN 0
    ENDIF
 
+   IF ::KeepAspectRatio .OR. ::Stretch
+      hDib := FreeImageRescale( ::hDIB, cx, cy, FILTER_BICUBIC )
+   ENDIF
    IF ::xOpacity < 100
       hMemDC1     := CreateCompatibleDC( hMemDC )
       hMemBitmap1 := CreateCompatibleBitmap( hMemDC, cx, cy )
       hOldBitmap1 := SelectObject( hMemDC1, hMemBitmap1 )
 
-      FreeImageDraw( ::hDIB, hMemDC1, 0, 0, cx, cy )
+      FreeImageDraw( IIF( hDib != NIL, hDib, ::hDIB ), hMemDC1, 0, 0, cx, cy )
 
       _AlphaBlend( hMemDC, x, y, cx, cy, hMemDC1, 0, 0, cx, cy, ( 255 * ::xOpacity ) / 100 )
 
@@ -379,9 +433,11 @@ METHOD Draw( hMemDC, hBitmap ) CLASS FreeImageRenderer
       DeleteDC( hMemDC1 )
 
     ELSE //IF ! ::Transparent
-      FreeImageDraw( ::hDIB, hMemDC, x, y, cx, cy )
+      FreeImageDraw( IIF( hDib != NIL, hDib, ::hDIB ), hMemDC, x, y, cx, cy )
    ENDIF
-
+   IF hDib != NIL
+      FreeImageUnload( hDIB )
+   ENDIF
 RETURN NIL
 
 //--------------------------------------------------------------------------------------------------------
@@ -438,6 +494,7 @@ METHOD __SetImageName( cFile ) CLASS FreeImageRenderer
    ENDIF
    IF ::Owner:BkBrush != NIL
       DeleteObject( ::Owner:BkBrush )
+      ::Owner:BkBrush := NIL
    ENDIF
    ::lTransparentSet := .F.
    IF ::hDIB != NIL
@@ -602,8 +659,18 @@ HB_FUNC( FREEIMAGEDRAW )
 //--------------------------------------------------------------------------------------------------------
 HB_FUNC( FREEIMAGELOAD )
 {
-   FIBITMAP *dib;
-   dib = FreeImage_Load( (FREE_IMAGE_FORMAT) hb_parni(1), hb_parc(2), hb_parni(3) );
+   FIBITMAP *dib = FreeImage_Load( (FREE_IMAGE_FORMAT) hb_parni(1), hb_parc(2), hb_parni(3) );
+   if ( dib != NULL )
+   {
+      hb_retptr( dib );
+   }
+}
+
+
+//--------------------------------------------------------------------------------------------------------
+HB_FUNC( FREEIMAGERESCALE )
+{
+   FIBITMAP *dib = FreeImage_Rescale( (FIBITMAP *) hb_parptr(1), hb_parni(2), hb_parni(3), (FREE_IMAGE_FILTER) hb_parni(4) );
    if ( dib != NULL )
    {
       hb_retptr( dib );
@@ -619,13 +686,13 @@ HB_FUNC( FREEIMAGEUNLOAD )
 //--------------------------------------------------------------------------------------------------------
 HB_FUNC( FREEIMAGEGETWIDTH )
 {
-   hb_retnl( FreeImage_GetWidth( (FIBITMAP*) hb_parptr(1) ) );
+   hb_retni( FreeImage_GetWidth( (FIBITMAP*) hb_parptr(1) ) );
 }
 
 //--------------------------------------------------------------------------------------------------------
 HB_FUNC( FREEIMAGEGETHEIGHT )
 {
-   hb_retnl( FreeImage_GetHeight( (FIBITMAP*) hb_parptr(1) ) );
+   hb_retni( FreeImage_GetHeight( (FIBITMAP*) hb_parptr(1) ) );
 }
 
 //--------------------------------------------------------------------------------------------------------

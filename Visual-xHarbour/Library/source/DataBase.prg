@@ -286,7 +286,9 @@ METHOD Load( lAvoidNew ) CLASS DataTable
        xData := ::Connector:FieldGet( n )
        IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
           ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xData )
-          ::FieldCtrl[ ::Structure[n][1] ]:UpdateWindow()
+          IF ::FieldCtrl[ ::Structure[n][1] ]:IsWindowVisible()
+             ::FieldCtrl[ ::Structure[n][1] ]:UpdateWindow()
+          ENDIF
        ELSE
           ::__aData[n] := xData
        ENDIF
@@ -331,7 +333,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
-              lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
+             lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
                          ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
                          ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
                          ::__aTmpStruct[n][4] != ::Structure[n][4]
@@ -798,13 +800,10 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
          n := NIL
-         IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ::Owner:DesignMode
+         IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ! ::Owner:DesignMode
             //   6060  Advantage Database Server not started/loaded on specified server
             //   6420  Unable to "discover" the Advantage Database Server
-            IF MessageBox(0, "Error " + alltrim(str(oErr:SubCode)) + ": Advantage Server Not Found"+CHR(13)+;
-                             "Use local server instead?", "Open Error", MB_YESNO | MB_ICONQUESTION ) == IDYES
-               //AdsSetServerType(1)
-            ENDIF
+            MessageBox(0, "Error " + alltrim(str(oErr:SubCode)) + ": Advantage Server Not Found", "Open Error" )
          ENDIF
          IF oErr:GenCode == 18 .OR. oErr:GenCode == 17
 

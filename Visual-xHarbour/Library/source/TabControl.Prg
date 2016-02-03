@@ -1394,7 +1394,6 @@ METHOD Select() CLASS TabPage
    ::Parent:SetCurSel( ::__GetPosition() )
    ::__OnParentSize( ::ClientWidth, ::ClientHeight )
    ::Parent:Redraw()
-   //   ::Parent:Redraw()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

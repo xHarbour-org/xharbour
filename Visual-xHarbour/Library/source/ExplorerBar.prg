@@ -134,7 +134,7 @@ CLASS ExplorerBar INHERIT Control
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnPaint()
-   METHOD OnSize(n,l)      INLINE Super:OnSize(n,l), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), NIL
+   //METHOD OnSize(n,l)      INLINE Super:OnSize(n,l), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), NIL
    METHOD OnVertScroll()   INLINE ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), AEVAL( ::Children, {|o| o:Redraw() } ), NIL
    METHOD OnEraseBkGnd()   INLINE 1
    METHOD OnThemeChanged()
@@ -160,11 +160,13 @@ METHOD Init( oParent ) CLASS ExplorerBar
    ::Left          := 0
    ::Top           := 0
    ::Height        := 400
-   ::__lResizeable := {.F.,.F.,.F.,.T.,.F.,.F.,.F.,.T.}
+   ::__lResizeable := {.t.,.t.,.t.,.T.,.t.,.t.,.t.,.T.}
    IF ::DesignMode
       ::__IdeContextMenuItems := { { "&Add Expando", {|| ::__AddTaskPanel()} } }
    ENDIF
    ::ThemeName := "EXPLORERBAR"
+   ::xWidth   := ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:left + ::System:ExplorerBar:headernormal:rcTLPadding:right
+   ::MinWidth := ::xWidth
 RETURN Self
 
 METHOD __AddTaskPanel() CLASS ExplorerBar
@@ -175,8 +177,6 @@ RETURN( Self )
 
 METHOD Create() CLASS ExplorerBar
    ::OnThemeChanged( Self, .F. )
-   ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:left + ::System:ExplorerBar:headernormal:rcTLPadding:right
-   ::MinWidth := ::xWidth
    Super:Create()
    ::OpenThemeData()
 RETURN Self
@@ -316,6 +316,8 @@ RETURN Self
 METHOD Create() CLASS Expando
    LOCAL oHeader, oTask, n := 0
 
+   AADD( ::Parent:__aDock, Self )
+
    IF ::Special
       oHeader := ::System:ExplorerBar:headerspecial
       oTask   := ::System:ExplorerBar:taskspecial
@@ -411,11 +413,11 @@ METHOD OnSize( nwParam, nlParam ) CLASS Expando
 RETURN 0
 
 METHOD __OnParentSize( x ) CLASS Expando
-   ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth
+   ::xWidth := x - ( ::System:ExplorerBar:headernormal:rcTLPadding:left + ::System:ExplorerBar:headernormal:rcTLPadding:right ) //::System:ExplorerBar:headernormal:iHeaderBmpWidth
    IF ! ::DesignMode .AND. ::Parent:Height < ::Parent:OriginalRect[4] .AND. ( x - GetSystemMetrics( SM_CXVSCROLL ) ) < ::System:ExplorerBar:headernormal:iHeaderBmpWidth + ::System:ExplorerBar:headernormal:rcTLPadding:right + ::System:ExplorerBar:headernormal:rcTLPadding:left
-      ::xWidth := ::System:ExplorerBar:headernormal:iHeaderBmpWidth - GetSystemMetrics( SM_CXVSCROLL )
+      ::xWidth -= /*::System:ExplorerBar:headernormal:iHeaderBmpWidth -*/ GetSystemMetrics( SM_CXVSCROLL )
    ENDIF
-   ::MoveWindow( , ::OriginalRect[2] - ::Parent:VertScrollPos )
+   ::MoveWindow( , ::OriginalRect[2] - ::Parent:VertScrollPos, ::xWidth )
    ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
 RETURN 0
 
@@ -471,7 +473,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
 
    cx := ::Left + ::Width
    cy := ::Top + ::Height
-
+view cx
    x := ::Left
    y := ::Top
 
@@ -492,7 +494,7 @@ METHOD OnPaint( hDC, hMemDC ) CLASS Expando
 
    hFont := SelectObject( hMemDC, ::Font:Handle )
 
-   IF ::Application:IsThemedXP .AND. ::System:ExplorerBar:headernormal:hAlphaBmpListHeader != 0
+   IF .F. //::Application:IsThemedXP .AND. ::System:ExplorerBar:headernormal:hAlphaBmpListHeader != 0
       hPen   := CreatePen( PS_SOLID, 1, oHeader:crTLBorder )
       hBrush := CreateSolidBrush( oHeader:crTLbackground )
 

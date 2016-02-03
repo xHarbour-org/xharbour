@@ -29,7 +29,8 @@ CLASS Label INHERIT Control
    PROPERTY TextShadowColor ROOT "Colors" SET ::InvalidateRect()
    PROPERTY BlinkColor      ROOT "Colors" SET ::__SetBlinkColor(v)
    PROPERTY BorderColor     ROOT "Colors"                      DEFAULT __GetSystem():Color:Gray
-
+   PROPERTY Padding                       SET ::InvalidateRect() DEFAULT 0
+   PROPERTY WrapText        ROOT "Behavior" DEFAULT .F.
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
    DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
 
@@ -197,8 +198,10 @@ METHOD OnPaint() CLASS Label
 
    SetBkMode( hMemDC, TRANSPARENT )
    hFont  := SelectObject( hMemDC, ::Font:Handle )
-   nFlags := ::Alignment | DT_WORDBREAK
-
+   nFlags := ::Alignment
+   IF ::WrapText
+      nFlags := ::Alignment | DT_WORDBREAK
+   ENDIF
    IF ::NoPrefix
       nFlags := nFlags | DT_NOPREFIX
    ENDIF
@@ -206,13 +209,23 @@ METHOD OnPaint() CLASS Label
    cText := ::xText
    DEFAULT cText TO ""
 
+   IF ::Padding <> 0
+      //_GetTextExtentExPoint( hMemDC, Space(::Margin), ::Margin, @iLen )
+      //VIEW iLen
+      IF ::Alignment == DT_LEFT
+         cText := Space(::Padding)+cText
+      ELSEIF ::Alignment == DT_RIGHT
+         cText += Space(::Padding)
+      ENDIF
+   ENDIF
+
    IF ::VertCenter
       rc := (struct RECT)
-      rc:left   := 0
-      rc:top    := 0
+      rc:left   := aRect[1]
+      rc:top    := aRect[2]
       rc:right  := aRect[3]
       rc:bottom := aRect[4]
-      DrawText( hMemDC, cText, @rc, DT_CALCRECT|DT_CENTER|DT_WORDBREAK )
+      DrawText( hMemDC, cText, @rc, DT_CALCRECT|DT_CENTER|IIF( ::WrapText, DT_WORDBREAK, 0 ) )
       aRect[2]  := ( aRect[4]-rc:bottom ) / 2
       aRect[4]  := aRect[2] + rc:bottom
    ENDIF

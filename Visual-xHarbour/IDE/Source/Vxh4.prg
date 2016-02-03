@@ -488,9 +488,11 @@ METHOD DrawItem( tvcd ) CLASS ObjManager
              ENDIF
           ENDIF
 
-          oImageList := ::ActiveObject:ImageList
-          IF ::ActiveObject:Parent != NIL
-             DEFAULT oImageList TO ::ActiveObject:Parent:ImageList
+          IF __ObjHasMsg( ::ActiveObject, "ImageList" )
+             oImageList := ::ActiveObject:ImageList
+             IF ::ActiveObject:Parent != NIL
+                DEFAULT oImageList TO ::ActiveObject:Parent:ImageList
+             ENDIF
           ENDIF
 
           IF oItem:ColItems[n]:ColType == "IMAGEINDEX" .AND. oImageList != NIL .AND. ::ActiveObject:&cCap != NIL .AND. ::ActiveObject:&cCap > 0
@@ -911,7 +913,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       ::Application:Project:CurrentForm:UpdateSelection()
 
       TRY
-         IF cProp == "Name"
+         IF cProp == "Name" .AND. oActiveObject:ClsName == "VXH_FORM_IDE"
             ::RenameForm( cVal, xValue,, oActiveObject )
 
             FOR EACH Topic IN oActiveObject:Events

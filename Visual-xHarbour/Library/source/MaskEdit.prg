@@ -20,7 +20,7 @@
 
 CLASS MaskEdit INHERIT EditBox
    PROPERTY Picture      SET ::SetGetProp( "Picture", @v )
-   PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, ::oGet:VarGet(), ::xText );
+   PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, (::oget:assign(),::oGet:updatebuffer(),::oGet:VarGet()), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
    DATA ReadOnly         EXPORTED INIT .F.
@@ -390,6 +390,7 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
       nEnd   := HiWord( ::SendMessage( EM_GETSEL, 0, 0 ) ) + 1
       ::oGet:pos := nEnd
 
+
       DO CASE
          CASE ( nwParam == VK_BACK .AND. nlParam # 0 )
               IF nEnd > nStart
@@ -410,6 +411,11 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               //::Text := ::oGet:buffer
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
+
+              IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                 ::CallWindowProc()
+                 Eval( ::Form:bChanged, Self )
+              ENDIF
               RETURN 0
 
          CASE nwParam >= 32 .AND. nwParam < 256
@@ -475,6 +481,11 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               //::Text := ::oGet:buffer
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
+
+              IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                 ::CallWindowProc()
+                 Eval( ::Form:bChanged, Self )
+              ENDIF
               RETURN 0
 
       ENDCASE
