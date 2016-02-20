@@ -4303,6 +4303,31 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                 ELSE
                   xValue := &cValue
                ENDIF
+
+               // compatibility patch
+               IF Upper( cProperty ) == "BORDER" .AND. ValType( xValue ) == "L"
+                  IF xValue
+                     xValue := 0
+                  ELSE
+                     IF oObj:__xCtrlName == "Label"
+                        xValue := -1
+                     ELSE
+                        xValue := WS_BORDER
+                     ENDIF
+                  ENDIF
+               ENDIF
+               IF Upper( cProperty ) == "BORDER" .AND. ValType( xValue ) == "L"
+                  IF xValue
+                     xValue := 0
+                  ELSE
+                     IF oObj:__xCtrlName == "Label"
+                        xValue := -1
+                     ELSE
+                        xValue := WS_BORDER
+                     ENDIF
+                  ENDIF
+               ENDIF
+
                __objSendMsg( oObj, "_" + cProperty, xValue )
 
             ELSEIF cLine HAS "(?i)^::Create\(\)"
@@ -4484,6 +4509,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                    ELSE
                      oObj:__OleVars[cWithProperty][1] := xValue
                   ENDIF
+                  __objSendMsg( oObj, "_"+cWithProperty, xValue )
                 ELSE
                   __objSendMsg( oObj, "_" + cWithProperty, xValue )
                ENDIF
