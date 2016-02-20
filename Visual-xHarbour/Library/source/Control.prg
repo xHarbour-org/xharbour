@@ -64,6 +64,8 @@ CLASS Control INHERIT Window
    DATA __BackMargin      EXPORTED INIT 0
    DATA OnWMUnDock        EXPORTED
    DATA OnWMReDock        EXPORTED
+   DATA bSetValue         EXPORTED
+   DATA bGetValue         EXPORTED
 
    DATA SmallCaption      EXPORTED INIT .T.
    DATA bOnSetValue       EXPORTED
@@ -108,7 +110,9 @@ METHOD __SetBorder( nBorder ) CLASS Control
    IF VALTYPE( nBorder ) == "L" // backward compatibility
       nBorder := IIF( nBorder, WS_BORDER, 0 )
    ENDIF
-
+   IF VALTYPE( nBorder ) == "L"
+      nBorder := IIF( ! nBorder, 0, WS_BORDER )
+   ENDIF
    nStyle   := ::Style & NOT( WS_BORDER )
    nExStyle := ::ExStyle & NOT( WS_EX_STATICEDGE )
    nExStyle := nExStyle & NOT( WS_EX_CLIENTEDGE )
