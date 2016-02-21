@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-02-21 11:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * make_vc.bat
+    ! added visual studio 2014 support
+    
 2015-11-10 14:56 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/dllcall.c
     ! Accept pointer as 1st parameter in function DLLPREPARECALL
