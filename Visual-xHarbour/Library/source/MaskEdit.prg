@@ -20,7 +20,7 @@
 
 CLASS MaskEdit INHERIT EditBox
    PROPERTY Picture      SET ::SetGetProp( "Picture", @v )
-   PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, (::oget:assign(),::oGet:updatebuffer(),::oGet:VarGet()), ::xText );
+   PROPERTY Text         GET IIF( ::oGet != NIL .AND. ::oGet:VarGet() != NIL, (::oget:assign(),::oGet:VarGet()), ::xText );
                          SET IIF( ::oGet != NIL, ( ::oGet:VarPut(v), ::oGet:updatebuffer(), ::SetWindowText( ::oGet:Buffer ) ),  )
 
    DATA ReadOnly         EXPORTED INIT .F.
@@ -66,8 +66,6 @@ CLASS MaskEdit INHERIT EditBox
 
    METHOD __GoToNextControl()
    METHOD __Validate()
-   METHOD SetValue( xValue )           INLINE ::Text := xValue
-   METHOD GetValue()                   INLINE ::Text
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
