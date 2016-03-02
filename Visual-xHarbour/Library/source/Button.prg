@@ -36,6 +36,8 @@ CLASS Button INHERIT Control
 
    PROPERTY ImageAlign    ROOT "Appearance"                                      DEFAULT __GetSystem():TextAlignment:Center
    PROPERTY MenuArrow     ROOT "Appearance"                                      DEFAULT .F.
+
+   PROPERTY ImageList     ROOT "Appearance" GET __ChkComponent( Self, @::xImageList )
    PROPERTY ImageIndex    ROOT "Appearance" SET ::SetImageIndex(v)               DEFAULT  0
 
    PROPERTY ShortCutKey   ROOT "Behavior"
@@ -44,11 +46,11 @@ CLASS Button INHERIT Control
    PROPERTY Enabled       ROOT "Behavior"   SET ::SetStyle( WS_DISABLED, v )     DEFAULT .T.
    PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v )    DEFAULT .F. PROTECTED
    PROPERTY Split                           SET ::SetStyle( BS_SPLITBUTTON, v )  DEFAULT .F.
+   PROPERTY DrawFocus     ROOT "Appearance" DEFAULT .T.
 
    DATA ImgInst           EXPORTED
    DATA ImageIndent       EXPORTED INIT 3
    DATA DrawTheme         EXPORTED INIT .T.
-   DATA DrawFocus         EXPORTED INIT .T.
    DATA AllowUnDock       EXPORTED INIT FALSE
    DATA AllowClose        EXPORTED INIT FALSE
    ACCESS Checked INLINE ( ::GetState() == BST_CHECKED)
@@ -226,13 +228,15 @@ RETURN nWidth
 //-----------------------------------------------------------------------------------------------
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
-   LOCAL nLeft, nTop, aRect, nStyle, lDisabled, lSelected, lFocus, aTextRect, nTextFlags, nColor, n, lDefault
+   LOCAL nLeft, nTop, aRect, nStyle, lDisabled, lSelected, lFocus, aTextRect, nTextFlags, nColor, n, lDefault, oImageList
    (nwParam)
    (nlParam)
    IF !( ::__xCtrlName == "Button" )
       RETURN NIL
    ENDIF
-   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( ::Parent:ImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::DesignMode) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
+   oImageList := ::ImageList
+   DEFAULT oImageList TO ::Parent:ImageList
+   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::DesignMode) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
       nLeft := 6
 
@@ -246,29 +250,29 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       aTextRect  := aClone( aRect )
       nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
 
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      IF oImageList != NIL .AND. ::ImageIndex > 0
          DO CASE
             CASE ::ImageAlign == DT_LEFT
-                 nTop  := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 )
-                 aTextRect[1] := nLeft + ::Parent:ImageList:IconWidth + ::ImageIndent
+                 nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
+                 aTextRect[1] := nLeft + oImageList:IconWidth + ::ImageIndent
                  nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
 
             CASE ::ImageAlign == DT_RIGHT
-                 nLeft := ( aRect[3] - ::Parent:ImageList:IconWidth - ::ImageIndent )
-                 nTop  := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 )
+                 nLeft := ( aRect[3] - oImageList:IconWidth - ::ImageIndent )
+                 nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
                  aTextRect[3] := nLeft - ::ImageIndent
                  nTextFlags := DT_RIGHT  + DT_VCENTER + DT_SINGLELINE
 
             CASE ::ImageAlign == DT_CENTER
-                 nLeft := ( aRect[3] / 2 ) - ( ::Parent:ImageList:IconWidth / 2 )
+                 nLeft := ( aRect[3] / 2 ) - ( oImageList:IconWidth / 2 )
                  n := _GetTextExtentPoint32( dis:hDC, ::xText )[2]
-                 nTop  := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 ) - ( n / 2 )
+                 nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 ) - ( n / 2 )
 
-                 aTextRect[2] += ::Parent:ImageList:IconHeight
+                 aTextRect[2] += oImageList:IconHeight
                  nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
          ENDCASE
          IF EMPTY( ::xText )
-            nTop := ( aRect[4] / 2 ) - ( ::Parent:ImageList:IconHeight / 2 )
+            nTop := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
          ENDIF
       ENDIF
 
@@ -325,11 +329,11 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          nTop++
          OffSet( @aTextRect, 1, 1 )
       ENDIF
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      IF oImageList != NIL .AND. ::ImageIndex > 0
          IF lDisabled
-            ::Parent:ImageList:DrawDisabled( dis:hDC, ::ImageIndex, nLeft, nTop )
+            oImageList:DrawDisabled( dis:hDC, ::ImageIndex, nLeft, nTop )
           ELSE
-            ::Parent:ImageList:DrawImage( dis:hDC, ::ImageIndex, nLeft, nTop )
+            oImageList:DrawImage( dis:hDC, ::ImageIndex, nLeft, nTop )
          ENDIF
       ENDIF
       IF lFocus .AND. ::DrawFocus .AND. ! ::MenuArrow

@@ -191,6 +191,7 @@ CLASS Window INHERIT Object
    METHOD Disable()               INLINE ::Enabled := .F.
    METHOD Enable()                INLINE ::Enabled := .T.
    METHOD Close()
+   METHOD Hide()                  INLINE ShowWindow( ::hWnd, SW_HIDE )
 
    //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1846,7 +1847,7 @@ METHOD EndPaint() CLASS Window
 RETURN NIL
 
 METHOD OnNCDestroy() CLASS Window
-   LOCAL n, aComp
+   LOCAL n, aComp, aProperty, aProperties
    aComp := {}
 
    FOR n := 1 TO LEN( ::Components )
@@ -1928,6 +1929,15 @@ METHOD OnNCDestroy() CLASS Window
    ENDIF
 
    ::RemoveProperty()
+
+   IF ::DesignMode
+      aProperties := __clsGetPropertiesAndValues( Self )
+      FOR EACH aProperty IN aProperties
+          IF __objHasMsg( Self, "__a_"+aProperty[1] )
+             __objSendMsg( Self, "__a_"+aProperty[1] )[4] := NIL
+          ENDIF
+      NEXT
+   ENDIF
 
    IF ::Parent != NIL .AND. !(::Parent:__xCtrlName == "CoolBar")
       IF ( n := ASCAN( ::Parent:Children, {|o|o:hWnd == ::hWnd} ) ) > 0
@@ -4641,7 +4651,6 @@ METHOD __OnClose( nwParam, nlParam ) CLASS WinForm
       ENDCASE
       ::Animate( 1000, AW_HIDE | nAnimation )
    ENDIF
-   ::Application:DoEvents()
 RETURN nRet
 
 //-----------------------------------------------------------------------------------------------

@@ -2679,7 +2679,6 @@ METHOD SourceTabChanged( nCur, lTree, lMarkPrev ) CLASS Project
       DEFAULT lTree TO .T.
       ::Application:SourceEditor:aDocs[ nCur ]:Select( lMarkPrev )
       IF ::Application:SourceEditor:Source:TreeItem != NIL
-         //::Application:FileExplorer:lSkipSelect := ! lTree
          ::Application:SourceEditor:Source:TreeItem:Select()
       ENDIF
       ::Application:Project:EditReset()
@@ -3700,6 +3699,7 @@ METHOD NewSource() CLASS Project
    ::Application:SourceEditor:Enable()
 
    oEditor := Source( ::Application:SourceEditor )
+   oEditor:Modified := .T.
    oEditor:FileName := "Untitled Source"
 
    ::Application:FileExplorer:AddExtSource( oEditor )
@@ -3714,7 +3714,6 @@ METHOD NewSource() CLASS Project
    ::Modified := .T.
    OnShowEditors()
    oEditor:FirstOpen := .F.
-
 RETURN Self
 
 METHOD OpenSource( cSource ) CLASS Project

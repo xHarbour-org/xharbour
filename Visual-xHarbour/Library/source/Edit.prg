@@ -58,6 +58,7 @@ CLASS EditBox INHERIT Control
    PROPERTY Number            ROOT "Behavior"   SET ::SetStyle( ES_NUMBER, v )             DEFAULT .F.
    PROPERTY ContextMenu       ROOT "Behavior"   GET __ChkComponent( Self, @::xContextMenu ) SET ::__SetContextMenu(v)
    PROPERTY Alignment         ROOT "Behavior"   SET ::SetAlignment(v)                      DEFAULT 1
+   PROPERTY MaxChars          ROOT "Behavior"   SET ::SetLimitText(v)                      DEFAULT 0
 
    PROPERTY SelForeColor      ROOT "Colors"
    PROPERTY SelBackColor      ROOT "Colors"     SET ::__SetSelColor(v)
@@ -80,6 +81,7 @@ CLASS EditBox INHERIT Control
    DATA AllowClose                     EXPORTED INIT FALSE
    DATA Button                         EXPORTED INIT .F.
    DATA ButtonAction                   EXPORTED
+   DATA CalendarWindow                 EXPORTED
    DATA __SysBackColor                 EXPORTED INIT GetSysColor( COLOR_WINDOW )
    DATA __SysForeColor                 EXPORTED INIT GetSysColor( COLOR_WINDOWTEXT )
    DATA LastKey                        EXPORTED INIT 0
@@ -192,8 +194,6 @@ CLASS EditBox INHERIT Control
    METHOD OnMouseMove()
    METHOD __SetAutoScroll()
    METHOD __SetMenuArrow()
-   METHOD SetValue( cValue )           INLINE ::Text := AllTrim(cValue), IIF( ValType(::bOnSetValue)=="B", Eval( ::bOnSetValue, Self, cValue ),)
-   METHOD GetValue()                   INLINE AllTrim(::Text)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -278,6 +278,8 @@ METHOD Init( oParent ) CLASS EditBox
                                { "OnSetText"          , "", "" },;
                                { "OnUserMsg"          , "", "" } } } }
    ENDIF
+   ::bSetValue := {|cValue| ::Text := AllTrim(cValue), IIF( ValType(::bOnSetValue)=="B", Eval( ::bOnSetValue, Self, cValue ),) }
+   ::bGetValue := {|| AllTrim(::Text) }
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -318,6 +320,7 @@ METHOD Create() CLASS EditBox
    ENDIF
    ::__SetAutoScroll( ES_AUTOVSCROLL, ::xAutoVScroll )
    ::__SetAutoScroll( ES_AUTOHSCROLL, ::xAutoHScroll )
+   ::SetLimitText( ::MaxChars )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -397,11 +400,11 @@ METHOD __UpdateDataGrid() CLASS EditBox
    ::DataSource:GoTop()
    nRecs := 0
 
-   TRY
-      nOrder := ::DataSource:SetOrder( ::DataSearchField )
-      ::DataSource:Seek( ::Caption )
-   CATCH
-   END
+//   TRY
+//      nOrder := ::DataSource:SetOrder( ::DataSearchField )
+//   CATCH
+//   END
+   ::DataSource:Seek( ::Text )
    WHILE ( nRecs < ::DataSearchRecords .OR. ::DataSearchRecords == 0 ) .AND. !::DataSource:Eof()
       cData := ALLTRIM( ::DataSource:Fields:FieldGet( ::DataSearchField ) )
       IF UPPER( ALLTRIM( ::Caption ) ) IN UPPER( cData )
@@ -784,7 +787,7 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
          pt:x := ::Left
          pt:y := ::Top + ::Height
          ClientToScreen( ::Parent:hWnd, @pt )
-         WITH OBJECT ( FloatCalendar( ::Parent ) )
+         WITH OBJECT ( ::CalendarWindow := FloatCalendar( ::Parent ) )
             :Left   := pt:x
             :Top    := pt:y
             :Width  := 200
@@ -1090,7 +1093,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       pt:x := ::Left
       pt:y := ::Top + ::Height
       ClientToScreen( ::Parent:hWnd, @pt )
-      WITH OBJECT ( FloatCalendar( ::Parent ) )
+      WITH OBJECT ( ::CalendarWindow := FloatCalendar( ::Parent ) )
          :Left   := pt:x
          :Top    := pt:y
          :Width  := 200

@@ -36,7 +36,30 @@ CLASS AdsDataTable INHERIT DataTable
    METHOD Save()
    METHOD SetData()
    METHOD FieldPut()
+   METHOD NewInstance()
 ENDCLASS
+
+//-------------------------------------------------------------------------------------------------------
+METHOD NewInstance( lSetCurPos ) CLASS AdsDataTable
+   LOCAL oNewTable := AdsDataTable( ::Owner )
+   oNewTable:Area      := ::Area + 100
+   oNewTable:xAlias    := "New_"+xStr(::Area)
+   oNewTable:xFileName := ::FileName
+   oNewTable:Path      := ::Path
+   oNewTable:Driver    := ::Driver
+   oNewTable:Shared    := ::Shared
+
+   oNewTable:Open()
+
+   DEFAULT lSetCurPos TO .F.
+
+   IF ! oNewTable:IsOpen
+      oNewTable := NIL
+   ELSEIF lSetCurPos
+      oNewTable:OrdSetFocus( ::OrdSetFocus() )
+      oNewTable:Goto( ::Recno() )
+   ENDIF
+RETURN oNewTable
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS AdsDataTable
@@ -50,11 +73,13 @@ METHOD Save() CLASS AdsDataTable
    ENDIF
    FOR n := 1 TO LEN( ::Structure )
        IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
-          xValue := ::FieldCtrl[ ::Structure[n][1] ]:GetValue()
-          IF ::Structure[n][2] == "BINARY" .AND. File( xValue )
-             ::File2Blob( xValue, ::Structure[n][1] )
-          ELSE
-             (::Area)->( FieldPut( n, xValue ) )
+          IF ::FieldCtrl[ ::Structure[n][1] ]:bGetValue != NIL
+             xValue := Eval( ::FieldCtrl[ ::Structure[n][1] ]:bGetValue )
+             IF ::Structure[n][2] == "BINARY" .AND. File( xValue )
+                ::File2Blob( xValue, ::Structure[n][1] )
+             ELSE
+                (::Area)->( FieldPut( n, xValue ) )
+             ENDIF
           ENDIF
 
        ELSEIF ::__aData[n] != NIL
@@ -79,12 +104,12 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD FieldPut( nField, xVal ) CLASS AdsDataTable
-   IF ! Empty( ::__aData )
+   IF Len( ::__aData ) >= nField
       ::__aData[nField] := xVal
     ELSE
       IF ::Structure[nField][2] == "BINARY" .AND. ! Empty( xVal )
          ::File2Blob( xVal, ::Structure[nField][1] )
-       ELSE
+      ELSE
          ::Connector:FieldPut( nField, xVal )
       ENDIF
    ENDIF

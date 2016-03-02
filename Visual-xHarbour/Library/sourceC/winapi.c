@@ -10903,3 +10903,57 @@ HB_FUNC( DRAWMENUBAR )
 {
    hb_retl( DrawMenuBar( (HWND) hb_parnl(1) ) );
 }
+
+//------------------------------------------------------------------------------------------------
+HB_FUNC( GETCURSORINFO )
+{
+   PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
+   if( pStructure )
+   {
+      BOOL bResult;
+      CURSORINFO *pci = (CURSORINFO *) hb_xgrab( sizeof( CURSORINFO ) );
+
+      bResult = GetCursorInfo( pci );
+      if( bResult )
+      {
+         PHB_ITEM pByRef;
+
+         if( HB_IS_OBJECT( pStructure ) )
+         {
+            pByRef = NULL;
+         }
+         else
+         {
+            hb_vmPushSymbol( pHB_CSTRUCTURE->pSymbol );
+            hb_vmPushNil();
+            hb_itemPushStaticString( "CURSORINFO", 10 );
+            hb_vmDo(1);
+
+            pByRef = pStructure;
+            pStructure = hb_stackReturnItem();
+         }
+
+         hb_itemPutCRaw( pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 1, (char *) pci, sizeof( CURSORINFO ) );
+
+         hb_vmPushSymbol( pDEVALUE->pSymbol );
+         hb_vmPush( pStructure );
+         hb_vmSend(0);
+
+         if( pByRef )
+         {
+            hb_itemForwardValue( pByRef, pStructure );
+         }
+
+         hb_retl( TRUE );
+      }
+      else
+      {
+         hb_xfree( (void *) pci );
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 6001, NULL, "GETCURSORINFO", 4, hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
+   }
+}

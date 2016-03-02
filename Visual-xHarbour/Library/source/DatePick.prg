@@ -23,7 +23,10 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY Time              SET (::xTime := v, ::SetSystemTime()) DEFAULT TIME()
    PROPERTY UpDown            SET ::SetStyle( DTS_UPDOWN, v )       DEFAULT .F.
    PROPERTY Parse             SET ::SetStyle( DTS_APPCANPARSE, v )  DEFAULT .F.
+
    PROPERTY Format            SET ::SetFormat(v)                    DEFAULT __GetSystem():DateTimeFormat:Short
+   DATA EnumFormat            EXPORTED  INIT { { "Short","Long","Time","ShortCentury","Custom" }, {DTS_SHORTDATEFORMAT,DTS_LONGDATEFORMAT,DTS_TIMEFORMAT,DTS_SHORTDATECENTURYFORMAT,20} }
+
    PROPERTY CustomFormat      SET ::SetCustomFormat(v)
 
    PROPERTY ShowNone          SET ::SetStyle( DTS_SHOWNONE, v )     DEFAULT .F.
@@ -35,9 +38,6 @@ CLASS DateTimePicker INHERIT Control
    PROPERTY TitleBackColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLEBK, v )
    PROPERTY TitleForeColor    ROOT "Colors" SET ::SetCalendarColor( MCSC_TITLETEXT, v )
    PROPERTY TrailingTextColor ROOT "Colors" SET ::SetCalendarColor( MCSC_TRAILINGTEXT, v )
-
-   METHOD SetValue( dDate )   INLINE ::Date := dDate
-   METHOD GetValue()          INLINE ::Date
 
    DATA OnDTNCloseUp          EXPORTED
    DATA OnDTNDateTimeChange   EXPORTED
@@ -89,7 +89,7 @@ CLASS DateTimePicker INHERIT Control
    METHOD OnWMKeyDown         VIRTUAL
    METHOD OnKillFocus         VIRTUAL
    METHOD OnSetFocus          VIRTUAL
-
+   METHOD OnNCPaint()
    METHOD OnGetDlgCode( msg ) INLINE IIF( msg != NIL .AND. msg:message == WM_KEYDOWN .AND. msg:wParam == VK_ESCAPE, DLGC_WANTMESSAGE, NIL )
 
    METHOD OnKeyDown()
@@ -123,7 +123,8 @@ METHOD Init( oParent ) CLASS DateTimePicker
                                   { "OnKeyDown"         , "", "" },;
                                   { "OnSysKeyDown"      , "", "" } } } }
    ENDIF
-
+   ::bSetValue := {|dDate| ::Date := dDate }
+   ::bGetValue := {|| ::Date }
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -181,6 +182,8 @@ METHOD Create() CLASS DateTimePicker
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
+METHOD OnNCPaint() CLASS DateTimePicker
+RETURN 0
 
 METHOD GetSystemTime( nIndex ) CLASS DateTimePicker
    LOCAL st := (struct SYSTEMTIME)
@@ -305,12 +308,12 @@ METHOD OnParentNotify( nwParam, nlParam ) CLASS DateTimePicker
 
       CASE ::Parent:hdr:code == DTN_DATETIMECHANGE
            nmd := (struct NMDATETIMECHANGE*) nlParam
+           ::xDate := STOD( STRZERO(nmd:st:wYear,4) + STRZERO(nmd:st:wMonth,2) + STRZERO(nmd:st:wDay,2) )
+           ::xTime := STRZERO(nmd:st:wHour,2) +":"+ STRZERO(nmd:st:wMinute,2) +":"+ STRZERO(nmd:st:wSecond,2)
+
            nRet := ::OnDateTimeChange( nmd, nlParam )
            nRet := __Evaluate( ::OnDTNDateTimeChange, Self, nmd, nlParam, nRet )
            nRet := ExecuteEvent( "OnDateTimeChange", Self )
-
-           ::xDate := STOD( STRZERO(nmd:st:wYear,4) + STRZERO(nmd:st:wMonth,2) + STRZERO(nmd:st:wDay,2) )
-           ::xTime := STRZERO(nmd:st:wHour,2) +":"+ STRZERO(nmd:st:wMinute,2) +":"+ STRZERO(nmd:st:wSecond,2)
 
            IF ::AutoChange .AND. CHR(::__nLast) $ "0123456789"
               ::PostMessage( WM_KEYDOWN, VK_RIGHT, 0 )

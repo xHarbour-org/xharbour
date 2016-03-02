@@ -25,8 +25,6 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
    METHOD OnEraseBkGnd()
    METHOD Destroy()             INLINE ::Panel:Destroy()
    METHOD __CreateBkBrush()
-   METHOD SetValue( cValue )    INLINE ::LoadFromString( cValue )
-   METHOD GetValue()            INLINE ::__cData
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------
@@ -43,6 +41,8 @@ METHOD Init( oParent ) CLASS FreeImage
    IF ::Parent:DesignMode
       ::__ExplorerFilter := __GetSystem():FreeImageFormats
    ENDIF
+   ::bSetValue := {|cValue| ::LoadFromString( cValue ) }
+   ::bGetValue := {|| ::__cData }
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------

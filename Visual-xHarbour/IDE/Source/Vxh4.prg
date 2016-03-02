@@ -839,6 +839,7 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
              ELSE
                oObj:__OleVars[cProp][1] := xValue
             ENDIF
+            __objSendMsg( oObj, "_"+cProp, xValue )
          ENDIF
        ELSEIF ::Application:Project:CurrentForm != NIL
          IF LEN( ::Application:Project:CurrentForm:Selected ) > 1
@@ -1025,7 +1026,7 @@ RETURN Self
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
    LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly, aObjs
-   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps, cHelp
+   LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps, cHelp, e
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
@@ -1479,18 +1480,18 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        oItem:Expand()
    NEXT
 
-   TRY
-      IF ::ActiveObject:ClsName == "AtlAxWin"
-         oItem := TreeViewItem( Self )
-         oItem:Caption    := "COM Properties"
-         oItem:InsertAfter:= TVI_SORT
-         oItem:Create()
+   IF ::ActiveObject:ClsName == "AtlAxWin"
+      oItem := TreeViewItem( Self )
+      oItem:Caption    := "COM Properties"
+      oItem:InsertAfter:= TVI_SORT
+      oItem:Create()
 
-         FOR EACH cProp IN ::ActiveObject:__OleVars:Keys
+      FOR EACH cProp IN ::ActiveObject:__OleVars:Keys
+          TRY
              xValue    := ::ActiveObject:__OleVars[cProp][1]
              cType     := VALTYPE( xValue )
              lReadOnly := ::ActiveObject:__OleVars[cProp][3]
-             cHelp     := ::ActiveObject:__OleVars[ ::Application:Props[ "ObjPropsLabel5" ]:Text ][5]
+             cHelp     := ::ActiveObject:__OleVars[cProp][5]
 
              IF cType == "A"
                 cType := "ENUMERATION"
@@ -1509,15 +1510,16 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
              nColor   := NIL
              nDefault := NIL
 
-//             IF "Color" IN cProp
-//                VIEW oSub:ColItems[1]:Default
-//             ENDIF
-         NEXT
-         oItem:SortChildren( .T. )
-         oItem:Expand()
-      ENDIF
-    catch
-   END
+   //             IF "Color" IN cProp
+   //                VIEW oSub:ColItems[1]:Default
+   //             ENDIF
+          catch e
+             view e:description
+          END
+      NEXT
+      oItem:SortChildren( .T. )
+      oItem:Expand()
+   ENDIF
    oItem := ::SearchString( "Appearance" )
 
    IF oItem == NIL

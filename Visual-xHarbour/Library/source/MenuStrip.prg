@@ -31,6 +31,7 @@ GLOBAL EXTERNAL s_hKeyMenuHook
 
 CLASS MenuStrip INHERIT ToolStrip
    DATA __lIsMenu  EXPORTED  INIT .T.
+   DATA TextPadding EXPORTED INIT 14
 
    PROPERTY Height      SET ::__SetHeight(v)   DEFAULT 22 MIN 22
    PROPERTY ShowChevron SET ::__ShowChevron(v) DEFAULT .F. NOTPUBLIC

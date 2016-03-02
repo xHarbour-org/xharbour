@@ -135,7 +135,6 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    ASSIGN Text(c)              INLINE    ::xText := c
 
    DATA oServer PROTECTED
-
    //ACCESS hWnd INLINE IIF( __objHasMsg( ::TOleAuto, "HWND" ), ::TOleAuto:hWnd, ::hWnd )
 
    METHOD Init() CONSTRUCTOR
@@ -169,6 +168,9 @@ METHOD Init( oParent ) CLASS ActiveX
    ::Dock         := __WindowDock( Self )
    ::Anchor       := __AnchorSet( Self )
    ::EventHandler := {=>}
+   HSetCaseMatch( ::EventHandler, .F. )
+   ::IsContainer  := .T.
+
    ::Constants    := {=>}
    DEFAULT ::xWidth  TO 200
    DEFAULT ::xHeight TO 200
@@ -199,9 +201,9 @@ METHOD Create() CLASS ActiveX
    ENDIF
 
    ::TitleControl:Init( ::Parent, .F. )
-   ExecuteEvent( "OnInit", Self )
 
    IF ! ::DesignMode
+      ExecuteEvent( "OnInit", Self )
       DEFAULT ::ClsID TO ::ProgID
       DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .F. )
    ENDIF
@@ -230,7 +232,10 @@ METHOD Create() CLASS ActiveX
 
       IF ( oServer  := WrapTypeLib( ::oTypeLib, ::ProgID, "OleXWrapper", ::ClsID ) ) != NIL
          oServer:hObj := ::hObj
-         oServer:hWnd := ::hWnd
+         TRY
+            oServer:hWnd := ::hWnd
+         CATCH
+         END
          oServer:ConnectEvents( hEventHandler )
          ::oServer := oServer
       ENDIF
@@ -282,61 +287,64 @@ RETURN lRet
 
 METHOD __GetObjProp( oObj ) CLASS ActiveX
    LOCAL n, cArg, oProperty, xVal, cProp, o, xVal2, lReadOnly
-   LOCAL __OleVars := {=>}
-   WITH OBJECT oObj
-      FOR EACH oProperty IN :Properties
+   ::__OleVars := {=>}
+
+      FOR EACH oProperty IN oObj:Properties
           cProp := oProperty:Name
-          IF ! oProperty:VT IN { VT_VARIANT, VT_DISPATCH, VT_PTR, VT_USERDEFINED } .AND.;
-             ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
+
+          IF ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
              lReadOnly := .f.
+
              TRY
                 SWITCH oProperty:VT
                    CASE VT_VARIANT
-                      exit
+                        exit
                    CASE VT_DISPATCH
-                      exit
+                        exit
+                   CASE VT_USERDEFINED
                    CASE VT_VOID
-                        IF LEFT( oProperty:Arguments[1]:TypeDesc, 3 ) == "VT_"
-                           cArg := oProperty:Arguments[1]:TypeDesc
-                         ELSE
-                           cArg := SUBSTR( oProperty:Arguments[1]:TypeDesc, 13 )
+
+                        IF ! Empty( oProperty:Arguments )
+                           IF LEFT( oProperty:Arguments[1]:TypeDesc, 3 ) == "VT_"
+                              cArg := oProperty:Arguments[1]:TypeDesc
+                            ELSE
+                              cArg := SUBSTR( oProperty:Arguments[1]:TypeDesc, 13 )
+                           ENDIF
                         ENDIF
+
                         IF ( n := ASCAN( ::oTypeLib:Enumerations, {|o| o:Name == cArg } ) ) > 0
                            o := ::oTypeLib:Enumerations[n]
                            xVal  := o:Constants
                            xVal2 := ::AxGet( cProp ) //::&cProp
+
                          ELSE
-                           IF oProperty:Arguments[1]:TypeDesc != "VT_UNKNOWN" //.AND. oProperty:Arguments[1]:TypeDesc != "VT_I4" .AND. oProperty:Arguments[1]:TypeDesc != "VT_I2"
+
+                           IF Empty( oProperty:Arguments ) .OR. oProperty:Arguments[1]:TypeDesc != "VT_UNKNOWN" //.AND. oProperty:Arguments[1]:TypeDesc != "VT_I4" .AND. oProperty:Arguments[1]:TypeDesc != "VT_I2"
                               xVal  := ::AxGet( cProp ) //::&cProp
                            ENDIF
                         ENDIF
                         EXIT
 
-                   CASE VT_USERDEFINED
                    CASE VT_PTR
                         lReadOnly := oProperty:ReadOnly
                         EXIT
                 END
-                IF oProperty:VT != VT_VOID
+                IF ! oProperty:VT IN { VT_VOID, VT_PTR }
                    DEFAULT xVal TO ::AxGet( cProp )
                 ENDIF
              catch
                 xVal := NIL
                 lReadOnly := .T.
              END
-          if "Optional" IN cProp
-            VIEW xVal
-          ENDIF
-             IF ! lReadOnly .AND. xVal != NIL
-                __OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
+             IF .T. //! lReadOnly .AND. xVal != NIL
+                ::__OleVars[ cProp ] := { xVal, xVal, lReadOnly, xVal2, oProperty:HelpString }
              ENDIF
           ENDIF
 
       NEXT
-   END
-RETURN __OleVars
+RETURN NIL
 
 METHOD __GetEventList( lVars ) CLASS ActiveX
    LOCAL Event, Interface, cArg, Arg
@@ -344,12 +352,12 @@ METHOD __GetEventList( lVars ) CLASS ActiveX
 
       DEFAULT ::ClsID TO ::ProgID
       TRY
-         DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .T. )
+         DEFAULT ::oTypeLib TO LoadTypeLib( ::ClsID, .f. )
        CATCH
       END
       IF lVars
          TRY
-            ::__OleVars := ::__GetObjProp( ::oTypeLib:Objects[1]:Interfaces[1] )
+            ::__GetObjProp( ::oTypeLib:Objects[1]:Interfaces[1] )
           CATCH
          END
       ENDIF

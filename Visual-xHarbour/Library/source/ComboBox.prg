@@ -163,9 +163,6 @@ CLASS ComboBox FROM Control
    METHOD __ComboBoxEditProc()
    METHOD __ResetEdit()
    METHOD __SetSizePos()
-
-   METHOD SetValue( nValue )           INLINE ::SetCurSel( nValue )
-   METHOD GetValue()                   INLINE ::GetCurSel()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -182,6 +179,8 @@ METHOD Init( oParent ) CLASS ComboBox
       AADD( ::Events[3][2], { "OnCBNSelEndOk" , "", "" } )
       AADD( ::Events[3][2], { "OnSelChange" , "", "" } )
    ENDIF
+   ::bSetValue := {|nValue| ::SetCurSel( nValue )}
+   ::bGetValue := {||::GetCurSel()}
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------

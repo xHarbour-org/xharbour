@@ -81,6 +81,8 @@ METHOD Init( oParent ) CLASS MaskEdit
    ENDIF
    ::oGet := VXHGet()
    ::oGet:New( - 1, - 1, { | x | If( x == NIL, ::oGet:cargo, ::oGet:cargo := x ) } , '', ::Picture )
+   ::bSetValue := {|xValue| ::Text := xValue, IIF( ValType(::bOnSetValue)=="B", Eval( ::bOnSetValue, Self, xValue ),) }
+   ::bGetValue := {|| ::Text }
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -126,6 +128,7 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
          IF ::oGet:baddate()
             MessageBeep( MB_OK )
             ::oGet:buffer := dtoc(CTOD( "" ))
+            ::oget:baddate(.F.)
          ENDIF
          SetWindowText( ::hWnd, ::oGet:buffer )
          ::__Validate()
@@ -523,6 +526,7 @@ METHOD OnSetFocus() CLASS MaskEdit
    IF !( coldbuff == ::oGet:buffer )
       IF ::oGet:BadDate()
          ::Text := CTOD( "" )
+         ::oget:baddate(.F.)
       Else
          SetWindowText( ::hWnd, ::oGet:buffer )
          //::Text := ::oGet:buffer
@@ -549,16 +553,24 @@ METHOD OnKillFocus( nwParam, nlParam ) CLASS MaskEdit
          ::oget:VarPut( 0 )
       ENDIF
       IF ::oget:baddate()
+         ::oget:baddate(.F.)
          MessageBeep( MB_OK )
-         ::oget:buffer:=dtoc(ctod( "" ))
+         ::oGet:buffer := DTOC(CTOD( "" ))
+         ::oget:assign()
+         ::oget:updatebuffer()
       ENDIF
       SetWindowText( ::hWnd, ::oGet:buffer )
       ::InvalidateRect()
       ::SendMessage( WM_MOUSEMOVE, 1, 1 )
 
+      ::LastKey := 0
+
+      IF ::DropCalendar .AND. ::CalendarWindow != NIL .AND. ::CalendarWindow:IsWindow()
+         RETURN NIL
+      ENDIF
+
       ::__Validate()
 
-      ::LastKey := 0
       IF ! ::IsValid
          ::SetFocus()
          RETURN 0

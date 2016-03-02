@@ -70,6 +70,7 @@ CLASS DataTable INHERIT Component
    ASSIGN BindingSource(o) INLINE ::SqlConnector := o
 
    ASSIGN DataConnector(o) INLINE ::BindingSource := o
+   ACCESS IsNew            INLINE ::__lNew
 
    DATA Font               EXPORTED
    DATA ToolTip            EXPORTED
@@ -179,9 +180,10 @@ CLASS DataTable INHERIT Component
    METHOD OrdKeyCount()                       INLINE ::Connector:OrdKeyCount()
    METHOD Used()                              INLINE ::Connector:Used()
 
-   METHOD FieldPut( nField, xVal )            INLINE IIF( ! Empty(::__aData), ::__aData[nField] := xVal, ::Connector:FieldPut( nField, xVal ) )
+   METHOD FieldPut()
    METHOD FieldGet()
 
+   METHOD FieldPos( cField )                  INLINE ::Connector:FieldPos( cField )
    METHOD FieldType( nField )                 INLINE ::Connector:FieldType( nField )
 
    METHOD OrdKeyRelPos(n)                     INLINE ::Connector:OrdKeyRelPos( n )
@@ -214,8 +216,56 @@ CLASS DataTable INHERIT Component
    METHOD Save()
    METHOD Cancel() INLINE ::__lNew := .F., ::__aData := {}
    METHOD DestroyFields()
+   METHOD NewInstance()
+   METHOD SavePos()
+   METHOD RestPos()
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------------------
+METHOD Init( oOwner ) CLASS DataTable
+   DEFAULT ::__xCtrlName TO "DataTable"
+   DEFAULT ::ClsName     TO "DataTable"
+   ::ComponentType := "DataSource"
+   ::Super:Init( oOwner )
+   ::Connector := DataRdd( Self )
+   HSetCaseMatch( ::FieldCtrl, .F. )
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD SavePos() CLASS DataTable
+   LOCAL aSavedPos := Array(2)
+   aSavedPos[1] := ::OrdSetFocus()
+   aSavedPos[2] := ::Recno()
+RETURN aSavedPos
+
+//-------------------------------------------------------------------------------------------------------
+METHOD RestPos( aSavedPos ) CLASS DataTable
+   IF aSavedPos != NIL
+      ::OrdSetFocus( aSavedPos[1] )
+      ::Goto( aSavedPos[2] )
+   ENDIF
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD NewInstance( lSetCurPos ) CLASS DataTable
+   LOCAL oNewTable := DataTable( ::Owner )
+   oNewTable:Area      := ::Area + 100
+   oNewTable:xAlias    := "New_"+xStr(::Area)
+   oNewTable:xFileName := ::FileName
+   oNewTable:Path      := ::Path
+   oNewTable:Driver    := ::Driver
+   oNewTable:Shared    := ::Shared
+   oNewTable:Open()
+
+   DEFAULT lSetCurPos TO .F.
+
+   IF ! oNewTable:IsOpen
+      oNewTable := NIL
+   ELSEIF lSetCurPos
+      oNewTable:OrdSetFocus( ::OrdSetFocus() )
+      oNewTable:Goto( ::Recno() )
+   ENDIF
+RETURN oNewTable
 //-------------------------------------------------------------------------------------------------------
 METHOD Blank() CLASS DataTable
    LOCAL xValue, n
@@ -234,8 +284,14 @@ METHOD Blank() CLASS DataTable
           OTHERWISE
                xValue := ""
        ENDCASE
+
        IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
-          ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xValue )
+          IF ::FieldCtrl[ ::Structure[n][1] ]:bSetValue != NIL
+             Eval( ::FieldCtrl[ ::Structure[n][1] ]:bSetValue, xValue )
+             IF ::FieldCtrl[ ::Structure[n][1] ]:IsWindowVisible()
+                ::FieldCtrl[ ::Structure[n][1] ]:UpdateWindow()
+             ENDIF
+          ENDIF
        ELSE
           ::__aData[n] := xValue
        ENDIF
@@ -244,7 +300,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS DataTable
-   LOCAL n
+   LOCAL n, cField, oCtrl
    IF ::__lNew
       ::Append()
    ELSEIF ::Shared
@@ -253,10 +309,14 @@ METHOD Save() CLASS DataTable
       ENDDO
    ENDIF
    FOR n := 1 TO LEN( ::Structure )
-       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
-          (::Area)->( FieldPut( n, ::FieldCtrl[ ::Structure[n][1] ]:GetValue() ) )
+       cField := ::Structure[n][1]
+       IF HGetPos( ::FieldCtrl, cField ) > 0
+          oCtrl := ::FieldCtrl[ cField ]
+          IF oCtrl:bGetValue != NIL
+             ::Connector:FieldPut( n, Eval( oCtrl:bGetValue ) )
+          ENDIF
        ELSEIF ::__aData[n] != NIL
-          (::Area)->( FieldPut( n, ::__aData[n] ) )
+          ::Connector:FieldPut( n, ::__aData[n] )
        ENDIF
    NEXT
    IF ::__lNew .OR. ::Shared
@@ -267,42 +327,51 @@ METHOD Save() CLASS DataTable
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD FieldGet( nField ) CLASS DataTable
-   IF Empty(::__aData) .OR. ::__aData[nField] == NIL
-      RETURN ::Connector:FieldGet( nField )
+METHOD FieldPut( n, xVal ) CLASS DataTable
+   IF Len( ::__aData ) >= n
+      ::__aData[n] := xVal
+    ELSE
+      ::Connector:FieldPut( n, xVal )
    ENDIF
-RETURN ::__aData[nField]
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD FieldGet( n ) CLASS DataTable
+   LOCAL xVal
+   IF Len( ::__aData ) >= n .AND. ::__aData[n] != NIL
+      xVal := ::__aData[n]
+   ELSE
+      xVal := ::Connector:FieldGet( n )
+   ENDIF
+RETURN xVal
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Load( lAvoidNew ) CLASS DataTable
-   LOCAL n, xData
+   LOCAL n, cField, oCtrl, xData
    DEFAULT lAvoidNew TO .F.
    IF !lAvoidNew
       ::__lNew := .F.
    ENDIF
-
    ::__aData := Array( LEN( ::Structure ) )
+
    FOR n := 1 TO LEN( ::Structure )
-       xData := ::Connector:FieldGet( n )
-       IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
-          ::FieldCtrl[ ::Structure[n][1] ]:SetValue( xData )
-          IF ::FieldCtrl[ ::Structure[n][1] ]:IsWindowVisible()
-             ::FieldCtrl[ ::Structure[n][1] ]:UpdateWindow()
+       xData := ::FieldGet( n )
+
+       cField := ::Structure[n][1]
+       IF HGetPos( ::FieldCtrl, cField ) > 0
+          oCtrl := ::FieldCtrl[ cField ]
+          IF oCtrl:bSetValue != NIL
+
+             Eval( oCtrl:bSetValue, xData )
+
+             IF oCtrl:IsWindowVisible()
+                oCtrl:UpdateWindow()
+             ENDIF
           ENDIF
-       ELSE
+       ELSEIF Len( ::__aData ) >= n
           ::__aData[n] := xData
        ENDIF
    NEXT
-RETURN Self
-
-//-------------------------------------------------------------------------------------------------------
-METHOD Init( oOwner ) CLASS DataTable
-   DEFAULT ::__xCtrlName TO "DataTable"
-   DEFAULT ::ClsName     TO "DataTable"
-   ::ComponentType := "DataSource"
-   ::Super:Init( oOwner )
-   ::Connector := DataRdd( Self )
-   HSetCaseMatch( ::FieldCtrl, .F. )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -421,11 +490,31 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lAll ) CLASS DataTable
-   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0
+   LOCAL lShared
+   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. cKey != (::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )
+      lShared := ::Shared
+      IF lShared
+         ::Close()
+         ::Shared := .F.
+         ::Connector := DataRdd( Self )
+         ::Open()
+         IF ! ::IsOpen
+            ::Shared := .T.
+            ::Open()
+            RETURN .F.
+         ENDIF
+      ENDIF
       (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest ) )
       (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
+      IF lShared
+         ::Close()
+         ::Shared := .T.
+         ::Connector := DataRdd( Self )
+         ::Open()
+      ENDIF
+      RETURN (::Area)->( OrdNumber( cTag, cOrderBagName ) ) > 0 .AND. (::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ) == cKey
    ENDIF
-RETURN Self
+RETURN .F.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open() CLASS DataTable
@@ -437,10 +526,8 @@ METHOD CheckAlias() CLASS DataTable
    LOCAL n, aField
    LOCAL hClass, cField
 
-   IF ::xAlias == NIL
-      ::xAlias := ::Alias()
-      ::Area   := ::Select()
-   ENDIF
+   DEFAULT ::xAlias TO ::Alias()
+   DEFAULT ::Area   TO ::Select()
 
    IF ::xAlias != NIL
       IF Select( ::xAlias ) > 0 .AND. ::Structure == NIL
@@ -604,8 +691,10 @@ CLASS DataRdd
    METHOD Used()                              INLINE (::Owner:Area)->( Used() )
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE (::Owner:Area)->( OrdDescend( cnOrder, cFile, lDescend ) )
    METHOD SetRelation()
+   METHOD ClearRelations()                    INLINE (::Owner:Area)->( dbClearRel() )
    METHOD FieldPut( nField, xVal )            INLINE (::Owner:Area)->( FieldPut( nField, xVal ) )
    METHOD FieldGet( nField )                  INLINE (::Owner:Area)->( FieldGet( nField ) )
+   METHOD FieldPos( cField )                  INLINE (::Owner:Area)->( FieldPos( cField ) )
    METHOD FieldType( nField )                 INLINE (::Owner:Area)->( FieldType( nField ) )
    METHOD OrdBagExt()                         INLINE (::Owner:Area)->( OrdBagExt() )
    METHOD MemoExt()                           INLINE (::Owner:Area)->( RddInfo( RDDI_MEMOEXT ) )
@@ -664,7 +753,7 @@ METHOD SetRelation( oData, xKey, lAdditive ) CLASS DataRdd
    DEFAULT lAdditive TO FALSE
 
    IF !lAdditive
-      (::Owner:Area)->( dbClearRel() )
+      ::ClearRelations()
    ENDIF
 
    IF oData != NIL
@@ -783,6 +872,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             RETURN ::Owner
          ENDIF
          nMemSel++
+         ::Owner:Area := nMemSel
          Select( nMemSel )
 
          IF !FILE( cFile )
@@ -796,8 +886,11 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
          ENDIF
       ENDIF
 
+      IF ::Owner:Area != NIL
+         Select( ::Owner:Area )
+      ENDIF
       TRY
-         dbUseArea( ! ::Owner:__lMemory, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
+         dbUseArea( ::Owner:Area == NIL, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
        CATCH oErr
          n := NIL
          IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ! ::Owner:DesignMode

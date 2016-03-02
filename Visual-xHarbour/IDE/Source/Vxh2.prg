@@ -524,7 +524,11 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
    pt:x := x
    pt:y := y
    ClientToScreen( ::CtrlMask:hWnd, @pt )
-   oControl := ::GetChildFromPoint( pt )
+   TRY
+      oControl := ::GetChildFromPoint( pt )
+   CATCH
+      oControl := NIL
+   END
    DEFAULT oControl TO Self
 
    IF oControl:ClsName == "ToolBarWindow32"

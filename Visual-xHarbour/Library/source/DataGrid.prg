@@ -289,7 +289,6 @@ CLASS DataGrid INHERIT TitleControl
    MESSAGE OnTimer            METHOD __OnTimer()
 
    METHOD OnPaint()
-   METHOD OnNCPaint()
    METHOD OnHorzScroll()
    METHOD OnVertScroll()
 
@@ -1942,29 +1941,6 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
       ::__Edit(0, 0, 0, nKey, nwParam )
    ENDIF
    ::AutoUpdate := ::__nUpdtTimer
-RETURN NIL
-
-//----------------------------------------------------------------------------------
-METHOD OnNCPaint( nwParam, nlParam ) CLASS DataGrid
-   LOCAL hdc, hOldPen, nColor, hOldBrush
-   Super:OnNCPaint( nwParam, nlParam )
-   nColor := ::System:EditBoxBorderColor:Normal
-   IF ::HasFocus
-      nColor := ::System:EditBoxBorderColor:Focus
-    ELSEIF ::__lMouseHover
-      nColor := ::System:EditBoxBorderColor:Hover
-   ENDIF
-
-   IF nColor != NIL
-      hdc       := GetWindowDC( ::hWnd )
-      hOldPen   := SelectObject( hDC, CreatePen( PS_SOLID, 1, nColor ) )
-      hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
-      Rectangle( hDC, 0, 0, ::Width, ::Height )
-      SelectObject( hDC, hOldBrush )
-      DeleteObject( SelectObject( hDC, hOldPen ) )
-      ReleaseDC(::hWnd, hdc)
-      RETURN 0
-   ENDIF
 RETURN NIL
 
 //----------------------------------------------------------------------------------

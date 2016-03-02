@@ -31,8 +31,6 @@ CLASS ToolTip INHERIT Window
    PROPERTY Icon                                                                             DEFAULT 0
    PROPERTY CloseOnClick                                                                     DEFAULT .F.
 
-   DATA CropedText       PROTECTED
-
    DATA TabOrder         EXPORTED
    DATA Theming          EXPORTED  INIT .T.
    DATA ContextMenu      EXPORTED
@@ -61,7 +59,6 @@ CLASS ToolTip INHERIT Window
    ACCESS Transparent    INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
 
    ACCESS Child          INLINE ::Style & WS_CHILD != 0
-   ACCESS PopUp          INLINE ::Style & WS_POPUP != 0
    ACCESS ControlParent  INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
    ACCESS MdiContainer   INLINE ::xMdiContainer
    ACCESS TabStop        INLINE ::Style & WS_TABSTOP != 0
@@ -138,6 +135,7 @@ METHOD Create() CLASS ToolTip
       ::Tip:hwnd        := ::Parent:hWnd
       ::Tip:uId         := ::Parent:hWnd
       ::Tip:lpszText    := ::Text
+
       ::Tip:rect:left   := ::Left
       ::Tip:rect:top    := ::Top
       ::Tip:rect:right  := ::Width
@@ -170,80 +168,40 @@ RETURN Self
 METHOD Destroy() CLASS ToolTip
    SendMessage( ::hWnd, TTM_DELTOOL, 0, ::Tip )
    ::Tip := NIL
-RETURN( Self )
+RETURN Super:Destroy()
 
 METHOD GetMargin() CLASS ToolTip
-
    LOCAL rc := (struct RECT)
-
    SendMessage( ::hWnd, TTM_GETMARGIN, 0, rc )
-
    rc:Scatter()
-
 RETURN rc
 
 //------------------------------------------------------------------------------------------------
 
 METHOD SetNewRect( aRect ) CLASS ToolTip
-
-   ::Tip:uFlags      := ::TTStyle
    ::Tip:rect:left   := aRect[1]
    ::Tip:rect:top    := aRect[2]
    ::Tip:rect:right  := aRect[3]
    ::Tip:rect:bottom := aRect[4]
-
    SendMessage( ::hWnd, TTM_NEWTOOLRECT, 0, ::Tip )
-
 RETURN( Self )
 
 METHOD TrackActivate( lSet ) CLASS ToolTip
    local ti := (struct TOOLINFO)
    DEFAULT lSet TO .T.
    ti:cbSize      := ti:sizeof()
+   ti:uFlags      := ::TTStyle
    ti:hwnd        := ::Parent:hWnd
    ti:uId         := ::Parent:hWnd
    SendMessage( ::hWnd, TTM_TRACKACTIVATE, lSet, Ti )
 RETURN Self
 
 METHOD SetText(c) CLASS ToolTip
-   LOCAL x, n, cColor, ti := (struct TOOLINFO)
-   //IF c != NIL
-   //   IF AT( "<\b>", c ) == 0 .AND. AT( "<\i>", c ) == 0 .AND. AT( "<\c\", c ) == 0
-   //      ::__lOnPaint := .F.
-   //    ELSE
-   //      ::__lOnPaint := .T.
-   //   ENDIF
-   //ENDIF
    ::xText := c
-   IF ::hWnd != NIL
-      ti:cbSize      := ti:sizeof()
-      ti:hwnd        := ::Parent:hWnd
-      ti:uId         := ::Parent:hWnd
-
-      IF ::xText != NIL
-         ti:lpszText    := STRTRAN( ::xText, "<\b>", "  " )
-         ti:lpszText    := STRTRAN( ti:lpszText, "<b\>", "  " )
-         ti:lpszText    := STRTRAN( ti:lpszText, "<i\>", "  " )
-         ti:lpszText    := STRTRAN( ti:lpszText, "<\i>", "  " )
-
-         WHILE ( n := AT( "<\c\", ti:lpszText ) ) > 0
-            cColor := ""
-            FOR x := n TO LEN( ti:lpszText )
-                cColor += SUBSTR( ti:lpszText, x, 1 )
-                IF SUBSTR( ti:lpszText, x, 1 ) == ">"
-                   EXIT
-                ENDIF
-            NEXT
-            ti:lpszText := STRTRAN( ti:lpszText, cColor )
-         ENDDO
-       ELSE
-         ti:lpszText    := ::xText
-      ENDIF
-      SendMessage( ::hWnd, TTM_UPDATETIPTEXT , 0, ti )
+   IF IsWindow( ::hWnd )
+      ::tip:lpszText := ::xText
+      SendMessage( ::hWnd, TTM_UPDATETIPTEXT , 0, ::tip )
    ENDIF
-
-   ::CropedText := ti:lpszText
-
 RETURN Self
 
 METHOD OnLButtonDown( n, x, y ) CLASS ToolTip

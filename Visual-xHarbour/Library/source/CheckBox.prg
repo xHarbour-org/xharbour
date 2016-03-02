@@ -86,9 +86,6 @@ CLASS CheckBox INHERIT Control
    METHOD __SetSize()
    //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD ResetFrame() INLINE    ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
-
-   METHOD SetValue( lChecked )         INLINE ::State := IIF( lChecked, BST_CHECKED, BST_UNCHECKED )
-   METHOD GetValue()                   INLINE ::Checked()
    METHOD OnParentCommand()
 ENDCLASS
 
@@ -102,6 +99,8 @@ METHOD Init( oParent ) CLASS CheckBox
    IF ::DesignMode
       ::__PropFilter := { "ALLOWMAXIMIZE" }
    ENDIF
+   ::bSetValue := {|lChecked| ::State := IIF( lChecked, BST_CHECKED, BST_UNCHECKED )}
+   ::bGetValue := {||::Checked()}
 RETURN Self
 
 METHOD __SetSize( lAuto ) CLASS CheckBox

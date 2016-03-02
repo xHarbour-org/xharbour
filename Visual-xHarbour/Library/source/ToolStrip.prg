@@ -314,6 +314,7 @@ CLASS ToolStrip INHERIT Control
    PROPERTY ShowChevron  SET ::__ShowChevron(v)  DEFAULT .T.
    PROPERTY ShowGrip     SET ::__ShowGrip(@v)     DEFAULT .T.
    PROPERTY ImagePadding DEFAULT 4
+   PROPERTY TextPadding  DEFAULT 4
    PROPERTY Cursor       SET ::__SetWindowCursor(v) DEFAULT IDC_ARROW NOTPUBLIC
    PROPERTY Row          SET ( ::__SetRow(v), IIF( ::Parent != NIL .AND. ::Parent:ClsName == "ToolStripContainer",;
                                (::Parent:__RefreshPosNo(), ::Parent:__RefreshLayout(), ::MoveWindow()),) ) DEFAULT 1
@@ -1362,7 +1363,7 @@ RETURN NIL
 
 CLASS ToolStripItem INHERIT Control
    PROPERTY BeginGroup  SET ::__SetBeginGroup(v) DEFAULT .F.
-   PROPERTY ImageAlign  SET ::__SetImageAlign(v) DEFAULT __GetSystem():TextAlignment:Left
+   PROPERTY ImageAlign  SET ::__SetImageAlign(v) DEFAULT DT_LEFT
    PROPERTY Role        DEFAULT 1
    PROPERTY ShortCutKey
 
@@ -1531,6 +1532,15 @@ METHOD OnParentCommand( nId, nCode, nlParam ) CLASS ToolStripItem
    IF ::Id == nId
       IF ::Role == 2
          ::Checked := ! ::Checked
+      ELSEIF ::Role == 3
+         ::Checked := .T.
+         i := Max( 1, ASCAN( ::Parent:Children, {|o| o:Role == 3 } ) )
+         FOR n := i TO LEN( ::Parent:Children )
+             IF ::Parent:Children[n]:Role <> 3
+                EXIT
+             ENDIF
+             ::Parent:Children[n]:Checked := .F.
+         NEXT
       ENDIF
       IF VALTYPE( ::Action ) == "B"
          nRet := EVAL( ::Action, Self )
@@ -1648,7 +1658,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnLButtonUp() CLASS ToolStripItem
-   LOCAL pt
+   LOCAL pt, i, n
    ::ReleaseCapture()
    s_lExecuting := .T.
 
@@ -1666,6 +1676,32 @@ METHOD OnLButtonUp() CLASS ToolStripItem
       IF ::__lSelected
          IF ::Role == 2
             ::Checked := !::Checked
+
+         ELSEIF ::Role == 3
+            IF ::Checked
+               s_lExecuting := .F.
+               RETURN NIL
+            ENDIF
+            ::Checked := .T.
+            i := ASCAN( ::Parent:Children, {|o| o:hWnd == ::hWnd } )
+            FOR n := i-1 TO 1 STEP -1
+                IF ::Parent:Children[n]:Role <> 3
+                   EXIT
+                ENDIF
+                ::Parent:Children[n]:Checked := .F.
+                ::Parent:Children[n]:Redraw()
+                IF ::Parent:Children[n]:BeginGroup
+                   EXIT
+                ENDIF
+            NEXT
+            FOR n := i+1 TO LEN( ::Parent:Children )
+                IF ::Parent:Children[n]:Role <> 3 .OR. ::Parent:Children[n]:BeginGroup
+                   EXIT
+                ENDIF
+                ::Parent:Children[n]:Checked := .F.
+                ::Parent:Children[n]:Redraw()
+            NEXT
+
          ENDIF
 
          IF VALTYPE( ::Action ) == "B"
@@ -1689,12 +1725,13 @@ CLASS ToolStripButton INHERIT ToolStripItem
    PROPERTY ImageIndex                                           SET ::__SetImageIndex(v) DEFAULT  0
    PROPERTY DropDown                                             SET ::__SetDropDown(v)   DEFAULT  1
    PROPERTY Checked                                                                       DEFAULT .F.
-
+   PROPERTY ImageVertCenter                                                               DEFAULT .T.
    DATA EnumDropDown    EXPORTED  INIT { { "None", "Partial", "Full" }, {1,2,3} }
 
    DATA __pObjPtr       PROTECTED
    DATA __hMenu         PROTECTED
    DATA __nDropDown     PROTECTED INIT 0
+   DATA __nTextWidth    PROTECTED INIT 0
    DATA __hMenu         EXPORTED
 
    METHOD Init() CONSTRUCTOR
@@ -1718,6 +1755,7 @@ CLASS ToolStripButton INHERIT ToolStripItem
    METHOD __GetObjById()
    METHOD OnDestroy() INLINE Super:OnDestroy(), DestroyMenu( ::__hMenu ), NIL
    METHOD __Enable()
+   METHOD __SetItemSize()
 ENDCLASS
 
 METHOD __Enable( lEnable ) CLASS ToolStripButton
@@ -1738,41 +1776,56 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS ToolStripButton
-   LOCAL /*lpMenuInfo,*/ nAdd, aSize, n
-   nAdd := 12
-   IF !::Parent:__lIsMenu
-      nAdd := ::Parent:ImagePadding * 2
-   ENDIF
-   IF LEFT( ::xCaption, 2 ) == '{|' .AND. ! ::DesignMode
-      ::xText := EVAL( &(::xText) )
+   LOCAL n
 
+   IF LEFT( ::xText, 2 ) == '{|' .AND. ! ::DesignMode
+      ::xText := EVAL( &(::xText) )
       IF ( n := AT( "&", ::xText ) ) > 0
          ::Parent:Form:AddAccelerator( FVIRTKEY | FCONTROL, ASC( Upper(::xText[n+1]) ), ::Id )
-         //::Form:RegisterHotKey( ::Id, MOD_ALT, ASC( Upper(::xText[n+1]) ) )
        ELSE
          ::ShortCutKey:SetAccel()
       ENDIF
    ENDIF
-   aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
-   ::xWidth := aSize[1]+nAdd
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-      IF ::ImageAlign != DT_CENTER
-         ::xWidth += ::Parent:ImageList:IconWidth + 1
-       ELSE
-         ::xWidth := MAX( ::Parent:ImageList:IconWidth + nAdd, ::xWidth )
-      ENDIF
-   ENDIF
-   IF ::DropDown > 1
-      ::xWidth += 11
-   ENDIF
+
+   ::__SetItemSize()
+
    Super:Create()
    ::__hMenu := CreatePopupMenu()
-   //lpMenuInfo := (struct MENUINFO)
-   //lpMenuInfo:cbSize := lpMenuInfo:SizeOf()
-   //lpMenuInfo:fMask  := MIM_STYLE
-   //lpMenuInfo:dwStyle:= MNS_NOTIFYBYPOS
-   //SetMenuInfo( ::__hMenu, lpMenuInfo )
+RETURN Self
 
+//--------------------------------------------------------------------------------------------------------------------------------
+METHOD __SetItemSize() CLASS ToolStripButton
+   LOCAL aSize, cText, hDC, nWidth, cLine, aLines, hFont
+
+   nWidth := 0
+   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      nWidth := ::Parent:ImageList:IconWidth + ( ::Parent:ImagePadding * 2 )
+   ENDIF
+
+   IF ! Empty( ::xText )
+      hDC := GetDC( ::Parent:hWnd )
+      hFont := SelectObject( hDC, ::Font:Handle )
+
+      cText  := STRTRAN( ::Text, "&",,, 1 )
+      ::__nTextWidth := 0
+      aLines := hb_aTokens( cText, CRLF )
+
+      FOR EACH cLine IN aLines
+          aSize := _GetTextExtentPoint32( hDC, cLine )
+          ::__nTextWidth := Max( aSize[1], ::__nTextWidth )
+      NEXT
+
+      ::__nTextWidth += ( ::Parent:TextPadding * IIF( ::ImageAlign == DT_CENTER, 2, 1 ) )
+
+      IF ::ImageAlign == DT_CENTER
+         nWidth := Max( nWidth, ::__nTextWidth )
+      ELSE
+         nWidth += ::__nTextWidth
+      ENDIF
+      SelectObject( hDC, hFont )
+      ReleaseDC( ::Parent:hWnd, hDC )
+   ENDIF
+   ::xWidth := nWidth + IIF( ::DropDown > 1, 11, 0 )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -1889,28 +1942,30 @@ METHOD OnPaint() CLASS ToolStripButton
    aTextRect  := { 0, 0, ::Width-::__nDropDown, ::Height }
    nTextFlags := DT_CENTER | DT_VCENTER | DT_SINGLELINE
    x          := 0
-   nTop       := 5
-   nLeft      := 3
+
+   nTop       := 0
+   nLeft      := 0
 
    IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       DO CASE
-         CASE ::ImageAlign == DT_LEFT .AND. !EMPTY( ::Caption )
-              nTop  := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
-              aTextRect[1] := nLeft + ::Parent:ImageList:IconWidth + 3
+         CASE ::ImageAlign == DT_LEFT
+              nLeft := ::Parent:ImagePadding
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
+              aTextRect[1] := nLeft + ::Parent:ImageList:IconWidth + ::Parent:TextPadding
               nTextFlags := DT_LEFT | DT_VCENTER | DT_SINGLELINE
 
          CASE ::ImageAlign == DT_RIGHT
-              nLeft := ( ::Width - ::Parent:ImageList:IconWidth ) - 3 - ::__nDropDown
-              nTop  := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
-              aTextRect[3] := nLeft - 3
+              nLeft := ::Width - ::Parent:ImageList:IconWidth - ::Parent:ImagePadding - ::__nDropDown
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
+              aTextRect[1] := nLeft - ::Parent:TextPadding - ::__nTextWidth
               nTextFlags := DT_RIGHT | DT_VCENTER | DT_SINGLELINE
 
-         CASE ::ImageAlign == DT_CENTER .OR. EMPTY( ::Caption )
-              nLeft := ( ( ::Width+::__nDropDown - ::Parent:ImageList:IconWidth ) / 2 ) - ::__nDropDown
-              n := _GetTextExtentPoint32( hMemDC, ::Caption )[2]
-              nTop  := ( ::Height - ::Parent:ImageList:IconHeight - n ) / 2
-              aTextRect[2] += ::Parent:ImageList:IconHeight
-              nTextFlags := DT_CENTER | DT_VCENTER | DT_SINGLELINE
+         CASE ::ImageAlign == DT_CENTER
+              nLeft := ( ( ::Width + ::__nDropDown - ::Parent:ImageList:IconWidth ) / 2 ) - ::__nDropDown
+              n := _GetTextExtentPoint32( hMemDC, ::Caption )[2] * Len( hb_aTokens( ::Caption, CRLF ) )
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight - n ) / 2, ::Parent:ImagePadding )
+              aTextRect[2] := nTop + ::Parent:ImageList:IconHeight + ::Parent:TextPadding
+              nTextFlags := DT_CENTER | DT_VCENTER //| DT_SINGLELINE
 
       ENDCASE
       IF EMPTY( ::Caption )
@@ -1961,22 +2016,9 @@ RETURN 0
 
 //-------------------------------------------------------------------------------------------------------
 METHOD __SetImageIndex() CLASS ToolStripButton
-   LOCAL aSize, nLeft, nAdd
+   LOCAL nLeft
    IF ::hWnd != NIL
-      aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( ::Caption, "&" ) )
-      nAdd := 12
-      IF !::Parent:__lIsMenu
-         nAdd := ::Parent:ImagePadding * 2
-      ENDIF
-
-      ::xWidth := aSize[1]+nAdd
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-         IF ::ImageAlign != DT_CENTER
-            ::xWidth += ::Parent:ImageList:IconWidth + 1
-          ELSE
-            ::xWidth := MAX( ::Parent:ImageList:IconWidth + nAdd, ::xWidth )
-         ENDIF
-      ENDIF
+      ::__SetItemSize()
       ::MoveWindow()
 
       nLeft := IIF( ::Parent:ShowGrip, ::Parent:__GripperPos + 4, 1 )
@@ -1988,36 +2030,14 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD SetWindowText( cText ) CLASS ToolStripButton
-   LOCAL aSize, nAdd, nDiff, n, nPos
    IF VALTYPE( cText ) == "C"
-      ::xCaption := cText
+      ::xText := cText
    ENDIF
    IF ::hWnd != NIL .AND. !::__IsInstance
       IF VALTYPE( cText ) == "C"
          SetWindowText( ::hWnd, cText )
       ENDIF
-      aSize := ::Drawing:GetTextExtentPoint32( STRTRAN( cText, "&" ) )
-      nAdd := 12
-      IF !::Parent:__lIsMenu
-         nAdd := ::Parent:ImagePadding * 2
-      ENDIF
-      nDiff := (aSize[1]+nAdd) - ::Width
-
-      ::Width := aSize[1]+nAdd
-
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-         IF ::ImageAlign != DT_CENTER
-            ::Width += ::Parent:ImageList:IconWidth + 1
-          ELSE
-            ::Width := MAX( ::Parent:ImageList:IconWidth + nAdd, ::xWidth )
-         ENDIF
-      ENDIF
-      nPos := ASCAN( ::Parent:Children, Self,,, .T. )
-      FOR n := nPos + 1 TO LEN( ::Parent:Children )
-          ::Parent:Children[n]:Left += nDiff
-      NEXT
-
-      ::Parent:__UpdateWidth()
+      ::__SetImageIndex()
    ENDIF
 RETURN Self
 
@@ -2819,7 +2839,6 @@ CLASS MenuStripItem INHERIT ToolStripButton
    METHOD Destroy()
    METHOD OnDestroy()
 ENDCLASS
-
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS MenuStripItem

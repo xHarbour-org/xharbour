@@ -34,6 +34,9 @@ CLASS Label INHERIT Control
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
    DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
 
+   DATA TabStop          EXPORTED INIT .F.
+   DATA xTabStop         EXPORTED INIT .F.
+
    // Backward compatibility
    ACCESS CenterText    INLINE ::Alignment == DT_CENTER
    ASSIGN CenterText(l) INLINE ::Alignment := IIF( l, DT_CENTER, DT_LEFT )

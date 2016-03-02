@@ -86,6 +86,8 @@ CLASS TabControl INHERIT Control
 
    DATA EnumTabPosition  EXPORTED INIT { { "Left", "Top", "Right", "Bottom" }, {1,2,3,4} }
 
+   ACCESS CurPage        INLINE ::Children[ ::CurSel ]
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD InsertTab()
@@ -569,7 +571,11 @@ METHOD OnPaint() CLASS TabControl
 
              IF ::ShowTabs
                 IF ! ::ColorInactiveHeader
-                   DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                   IF nState == TIS_HOT .AND. oPage:__TabBrush != NIL
+                      _FillRect( hMemDC, aItem, oPage:__TabBrush )
+                   ELSE
+                      DrawThemeBackground( ::System:hTabTheme, hMemDC, TABP_TABITEM, nState, aItem )
+                   ENDIF
                 ELSEIF nState == TIS_HOT
                    _FillRect( hMemDC, aItem, hHotBrush )
                 ENDIF
@@ -775,6 +781,11 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
                  EVAL( ::OnSelChanged, Self, nOldSel, nSel )
               ENDIF
               ExecuteEvent( "OnTabChanged", Self )
+
+              IF ::__xCtrlName == "TabStrip"
+                 ::Redraw()
+                 ::UpdateWindow()
+              ENDIF
               RETURN 0
            ENDIF
    ENDCASE

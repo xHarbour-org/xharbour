@@ -4,6 +4,8 @@
 
 GLOBAL EXTERNAL s_CurrentObject
 
+static s_nSecs
+
 #include "vxh.ch"
 #include "cstruct.ch"
 #include "colors.ch"
@@ -208,7 +210,7 @@ METHOD Init( oParent ) CLASS SourceEditor
 
    ::CaretLineVisible  := ::Application:IniFile:ReadInteger( "Settings", "CaretLineVisible", 1 )
    ::AutoIndent        := ::Application:IniFile:ReadInteger( "Settings", "AutoIndent", 1 )
-   ::TrimEOLSpaces     := 0 //::Application:IniFile:ReadInteger( "Settings", "TrimEOLSpaces", 0 )
+   ::TrimEOLSpaces     := ::Application:IniFile:ReadInteger( "Settings", "TrimEOLSpaces", 0 )
 
 
    //IF ( n := ::Application:Props:FontList:FindString(, ::FontFaceName ) ) > 0
@@ -472,6 +474,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
    LOCAL nNext, nLast, lMarkPrev
+
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
@@ -485,22 +488,25 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
       ENDIF
 
     ELSEIF nKey == VK_TAB
-      IF IsKeyDown( VK_SHIFT ) .AND. ! IsKeyDown( VK_CONTROL )
-         nNext := ASCAN( ::aDocs, {|o|o:pSource==::pPrevSel} )
-
-       ELSEIF IsKeyDown( VK_CONTROL )
-         nLast := ASCAN( ::aDocs, {|o|o:pSource==::Source:pSource} )
-         nNext := nLast + IIF( IsKeyDown( VK_SHIFT ), -1, 1 )
-         IF nNext > LEN( ::aDocs )
-            nNext := 1
-          ELSEIF nNext <= 0
-            nNext := LEN( ::aDocs )
+      IF IsKeyDown( VK_CONTROL )
+         nNext := 0
+         IF ( Seconds() - s_nSecs ) > 1.5
+            nNext := ASCAN( ::aDocs, {|o|o:pSource==::pPrevSel} )
          ENDIF
-         lMarkPrev := .F.
 
-      ENDIF
-      IF nNext != NIL
+         IF nNext == 0
+            nLast := ASCAN( ::aDocs, {|o|o:pSource==::Source:pSource} )
+            nNext := nLast + IIF( IsKeyDown( VK_SHIFT ), -1, 1 )
+            IF nNext > LEN( ::aDocs )
+               nNext := 1
+             ELSEIF nNext <= 0
+               nNext := LEN( ::aDocs )
+            ENDIF
+            lMarkPrev := .F.
+         ENDIF
          ::Application:Project:SourceTabChanged( nNext, .F., lMarkPrev )
+         s_nSecs := Seconds()
+
       ENDIF
    ENDIF
 RETURN NIL
@@ -1003,6 +1009,7 @@ CLASS Source INHERIT ProjectFile
 
    METHOD SetSavePoint()                      INLINE ::SendEditor( SCI_SETSAVEPOINT, 0, 0 )
    METHOD GetTextLen()                        INLINE ::SendEditor( SCI_GETTEXTLENGTH, 0, 0 )
+   METHOD SetUndoCollection(n)                INLINE ::SendEditor( SCI_SETUNDOCOLLECTION, n, 0 )
    METHOD BeginUndoAction()                   INLINE ::SendEditor( SCI_BEGINUNDOACTION, 0, 0 )
    METHOD EndUndoAction()                     INLINE ::SendEditor( SCI_ENDUNDOACTION, 0, 0 )
 
@@ -1051,7 +1058,9 @@ ENDCLASS
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Select( lMarkPrev ) CLASS Source
    DEFAULT lMarkPrev TO .T.
-   IF lMarkPrev
+
+   IF lMarkPrev .AND. ::Owner:Source:pSource != ::pSource
+      s_nSecs := Seconds()
       ::Owner:pPrevSel := ::Owner:Source:pSource
    ENDIF
    ::__lSelected := .T.
@@ -1224,7 +1233,14 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer, nLines
+   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer, lEof, cLine
+
+   LOCAL nLineLen     := 1000
+   LOCAL lWrap        := .T.
+   LOCAL nEndOfLine   := 0
+   LOCAL nStartOffset := 1
+   LOCAL nEndOffSet   := 0
+   LOCAL lFound       := .F.
 
    IF cFile != NIL
       ::File := cFile
@@ -1233,6 +1249,7 @@ METHOD Save( cFile ) CLASS Source
    IF EMPTY( ::File )
       oFile := CFile( "" )
       oFile:Flags := OFN_EXPLORER | OFN_OVERWRITEPROMPT
+      oFile:DefaultExtention := ".prg"
       oFile:AddFilter( "Source Files (*.prg, *.c)", "*.prg;*.c" )
       oFile:Path := ::Application:Project:Properties:Path + "\" + ::Application:Project:Properties:Source
       oFile:SaveDialog()
@@ -1242,6 +1259,7 @@ METHOD Save( cFile ) CLASS Source
    ENDIF
 
    IF ! EMPTY( ::File )
+      ::ChkDoc()
       IF FILE( ::File ) .AND. ( ! __ObjHasMsg( ::Application, "EditorProps" ) .OR. ::Application:EditorProps:SaveBAK == 1 )
          cBak := ::File
          IF ( n := RAT( ".", cBak ) ) > 0
@@ -1257,32 +1275,46 @@ METHOD Save( cFile ) CLASS Source
       IF ( hFile := fCreate( ::File ) ) <> -1
          ::SetSavePoint()
 
+         cText := ::GetText()
+
          IF ::Owner:TrimEOLSpaces == 1
             nCol     := ::GetCurColumn()
             nLine    := ::GetCurLine()
 
             nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
-            nLines   := SCI_SEND( SCI_GETLINECOUNT, 0, 0 )
-
-            //WHILE At( " " + CRLF, cText ) > 0
-            //   cText := StrTran( cText, " " + CRLF, CRLF )
-            //ENDDO
 
             cBuffer := ""
-            FOR n := 1 TO nLines
-                cBuffer += RTrim( ::GetLine( n-1 ), .T. ) + IIF( n < nLines, CRLF, "" )
-            NEXT
+            DO WHILE .T.
+               HB_ReadLine( cText       , ;
+                            NIL         , ;
+                            nLineLen    , ;
+                            NIL         , ;
+                            lWrap       , ;
+                            nStartOffset, ;
+                            @lFound     , ;
+                            @lEof       , ;
+                            @nEndOffset , ;
+                            @nEndOfLine   )
+
+               IF lEof
+                  EXIT
+               ENDIF
+               cLine := SubStr( cText, nStartOffset, nEndOffset-nStartOffset+1 )
+               cBuffer += RTrim( cLine, .T. ) + CRLF
+               nStartOffSet := nEndOfLine
+            ENDDO
+
             cText := cBuffer
 
+            ::SetUndoCollection(0)
             ::SetText( cText )
+            ::SetUndoCollection(1)
+
             //::GotoLine( nLine )
 
             nPos := SCI_SEND( SCI_FINDCOLUMN, nLine, nCol )
             SCI_SEND( SCI_GOTOPOS, nPos, 0 )
-
             SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
-          ELSE
-            cText := ::GetText()
          ENDIF
 
          fWrite( hFile, cText, Len(cText) )
