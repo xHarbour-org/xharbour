@@ -241,6 +241,7 @@ METHOD Listen( lFlag ) CLASS XHDebuggerGUI
   ::Super:Listen( lFlag )
 
   ::btnBreak:Enabled := lFlag
+
    AEval( { ::btnGo, ::btnStop, ::btnInto, ::btnOver, ::btnOut, ::btnCursor }, ;
            {|o| o:Enabled := !lFlag } )
 

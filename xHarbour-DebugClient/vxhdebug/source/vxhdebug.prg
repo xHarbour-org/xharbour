@@ -90,7 +90,7 @@ ENDCLASS
 
 METHOD New() CLASS XHDebugger
   InetInit()
-  ::oTimer := XHDebugTimer():new( ::oConsole, {|| ::ProcessOutput() } )
+  ::oTimer := XHDebugTimer():new( ::oConsole, {|o| ::ProcessOutput(o) } )
 RETURN Self
 
 
@@ -187,10 +187,10 @@ METHOD Listen( lFlag ) CLASS XHDebugger
 RETURN Self
 
 
-METHOD ProcessOutput() CLASS XHDebugger
+METHOD ProcessOutput(o) CLASS XHDebugger
    LOCAL cString := "", s, n, socket := ::socket
    LOCAL cMessage
-
+o:Stop()
    IF socket != NIL .AND. InetErrorCode( socket ) == 0
       s := Space( 32 )
       DO WHILE InetErrorCode( socket ) == 0 .AND. InetDataReady( socket, 100 ) > 0
@@ -225,6 +225,7 @@ METHOD ProcessOutput() CLASS XHDebugger
    ELSE
       ::ConnectionError()
    ENDIF
+   o:Start()
 RETURN Self
 
 
@@ -391,7 +392,7 @@ METHOD ReadSets() CLASS XHDebugger
             { _SET_HARDCOMMIT, "HardCommit", aSets[ _SET_HARDCOMMIT ] }, ;
             { _SET_FORCEOPT, "ForceOpt", aSets[ _SET_FORCEOPT ] }, ;
             { _SET_EOL, "EOL", aSets[ _SET_EOL ] } }
-            
+
             // Phil: aSets returns an array of 111 elements (up to _SET_TRIMFILENAME) and these values
             // are beyond 200. Augusto
             //{ _SET_BACKGROUNDTASKS, "BackgroundTasks", aSets[ _SET_BACKGROUNDTASKS ] }, ;

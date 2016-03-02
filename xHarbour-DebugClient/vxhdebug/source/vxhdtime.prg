@@ -16,12 +16,12 @@ ENDCLASS
 METHOD New( oWindow, bCallback ) CLASS XHDebugTimer
   ::bCallback := bCallback
   ::oWindow := oWindow
-  ::hProc := WinCallBackPointer( HB_ObjMsgPtr( Self, "OnTimeOut" ), Self ) 
+  ::hProc := WinCallBackPointer( HB_ObjMsgPtr( Self, "OnTimeOut" ), Self )
 RETURN Self
 
 
 METHOD OnTimeOut() CLASS XHDebugTimer
-  Eval( ::bCallback )
+  Eval( ::bCallback, Self )
 RETURN Self
 
 
