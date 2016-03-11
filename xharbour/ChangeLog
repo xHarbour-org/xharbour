@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-03-10 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/txml.c
+    ! fixed write cdata inside an tag
+    
 2016-02-21 11:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * make_vc.bat
     ! added visual studio 2014 support

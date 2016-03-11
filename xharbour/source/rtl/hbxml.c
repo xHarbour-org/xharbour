@@ -1795,10 +1795,28 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT * out, PHB_ITEM pNode, int style
          break;
 
       case MXML_TYPE_CDATA:
+//          mxml_output_string_len( out, "<![CDATA[ ", 9 );
+//          hb_objSendMsg( pNode, "CDATA", 0 );
+//          mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
+//          mxml_output_string_len( out, " ]]>", 4 );
+      /* write tag name for  <![CDATA[..]]> section */
+         mxml_output_char( out, '<' );
+         hb_objSendMsg( pNode, "CNAME", 0 );
+         mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
+         mxml_output_char( out, '>' );
+
+         /* write CDATA section without spaces
+            mxml_output_string_len( out, "<![CDATA[ ", 9 ); */
          mxml_output_string_len( out, "<![CDATA[ ", 9 );
          hb_objSendMsg( pNode, "CDATA", 0 );
          mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
-         mxml_output_string_len( out, " ]]>", 4 );
+         /*mxml_output_string_len( out, " ]]>", 4 ); */
+         mxml_output_string_len( out, "]]>", 3 );
+
+         mxml_output_string_len( out, "</", 2 );
+         hb_objSendMsg( pNode, "CNAME", 0 );
+         mxml_output_string_len( out, hb_parc( -1 ), hb_parclen( -1 ) );
+         mxml_output_char( out, '>' );
          if( bnewline )
          {
             mxml_output_string( out, hb_conNewLine() );
