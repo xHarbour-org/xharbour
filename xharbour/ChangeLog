@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-03-12 12:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/txml.c
+    ! missed from previus commit
+
 2016-03-10 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/txml.c
     ! fixed write cdata inside an tag
