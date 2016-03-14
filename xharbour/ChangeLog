@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-03-13 21:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rdd/hsx/hsx.c
+    ! some fixes to make mingw 5.3.0 happy
+  * include/hbdefs.h
+    ! added HB_FUNC_TRANSLATE macro borrow from harbour
+    
 2016-03-12 12:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/txml.c
     ! missed from previus commit

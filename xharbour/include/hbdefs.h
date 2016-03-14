@@ -1697,7 +1697,7 @@ typedef HARBOUR ( * PHB_FUNC )( void );
 #define HB_FUNC_INITLINES( )                              static HARBOUR hb_INITLINES( void )
 #define HB_FUNC_INITGLOBALS( )                            static HARBOUR hb_INITGLOBALS( void )
 #define HB_FUNC_REGISTERGLOBAL( )                         static HARBOUR hb_REGISTERGLOBALS( void )
-
+#define HB_FUNC_TRANSLATE( w, o )  HB_FUNC_EXTERN( o ); HB_FUNC( w ) { HB_FUNC_EXEC( o ); }
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
 typedef SHORT HB_SYMBOLSCOPE;   /* stores symbol's scope */
 
