@@ -103,14 +103,21 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
          SetWindowText( ::hWnd, cText )
       ENDIF
       IF ::AutoSize
-         ::__lResizeable   := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
-         aSize := ::Drawing:GetTextExtentPoint32( ::Text )
-         ::xWidth := aSize[1]+4
+         ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
+
+         aSize := ::Drawing:GetTextExtentPoint32( cText )
+
+         ::xWidth  := aSize[1]+4
          ::xHeight := aSize[2]+2
+
          IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
             ::xWidth += ::Parent:ImageList:IconWidth + 1
          ENDIF
+
          ::MoveWindow()
+         ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
+         ::UpdateWindow()
+
        ELSE
          ::__lResizeable   := {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}
       ENDIF

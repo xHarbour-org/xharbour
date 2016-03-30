@@ -112,7 +112,7 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD BookmarkDelAll()                INLINE SCI_SEND( SCI_MARKERDELETEALL, MARKER_MASK, 0 )
 
    METHOD ToggleBookmark()
-   METHOD BookmarkNext()                  INLINE SCI_SEND( SCI_MARKERNEXT, ::Source:GetCurLine()+1, 1<<MARKER_MASK )
+   METHOD BookmarkNext()
    METHOD BookmarkPrev()                  INLINE SCI_SEND( SCI_MARKERPREVIOUS, ::Source:GetCurLine()-1, 1<<MARKER_MASK )
 
    METHOD GetTabWidth()                   INLINE SCI_SEND( SCI_GETTABWIDTH, 0, 0 )
@@ -144,6 +144,19 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD SetColors()
    METHOD Clean()
 ENDCLASS
+
+METHOD BookmarkNext() CLASS SourceEditor
+   LOCAL nPos, nLine := ::Source:GetCurLine()
+   WHILE .T.
+      nPos := SCI_SEND( SCI_MARKERNEXT, nLine+1, 1<<MARKER_MASK )
+
+      IF ::Application:EditorProps:WrapSearch == 1 .AND. nPos == -1 .AND. nLine > 0
+         nLine := 0
+         LOOP
+      ENDIF
+      EXIT
+   ENDDO
+RETURN nPos
 
 METHOD Clean() CLASS SourceEditor
    SCI_SEND( SCI_SETTEXT, 0, "" )
@@ -1071,7 +1084,7 @@ METHOD Select( lMarkPrev ) CLASS Source
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
-METHOD GetBookmarks() CLASS Source
+METHOD GetBookmarks( aBookmarks ) CLASS Source
    LOCAL n, nLines, nVisLine, nPos, cMarks := "", nLine, pSource := ::Owner:GetCurDoc()
 
    IF ! ( pSource == ::pSource )
@@ -1086,6 +1099,9 @@ METHOD GetBookmarks() CLASS Source
        IF ( nLine := SCI_SEND( SCI_MARKERNEXT, n-1, 1<<MARKER_MASK ) ) >= 0
           cMarks += IIF( ! EMPTY(cMarks),"|","") + xStr(nLine)
           n := nLine+1
+          IF aBookmarks != NIL
+             AADD( aBookmarks, nLine )
+          ENDIF
           LOOP
         ELSE
           EXIT
@@ -1233,7 +1249,7 @@ RETURN cText
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD Save( cFile ) CLASS Source
-   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer, lEof, cLine
+   LOCAL hFile, cText, n, cBak, oFile, nPos, nVisLine, nLine, nCol, cBuffer, lEof, cLine, nCurLine, aBookmarks
 
    LOCAL nLineLen     := 1000
    LOCAL lWrap        := .T.
@@ -1283,8 +1299,14 @@ METHOD Save( cFile ) CLASS Source
 
             nVisLine := SCI_SEND( SCI_GETFIRSTVISIBLELINE, 0, 0 )
 
-            cBuffer := ""
+            cBuffer  := ""
+            nCurLine := 1
+            aBookmarks := {}
             DO WHILE .T.
+               IF SCI_SEND( SCI_MARKERGET, nCurLine, MARKER_MASK ) == 1
+                  AADD( aBookmarks, nCurLine )
+               ENDIF
+
                HB_ReadLine( cText       , ;
                             NIL         , ;
                             nLineLen    , ;
@@ -1302,12 +1324,17 @@ METHOD Save( cFile ) CLASS Source
                cLine := SubStr( cText, nStartOffset, nEndOffset-nStartOffset+1 )
                cBuffer += RTrim( cLine, .T. ) + CRLF
                nStartOffSet := nEndOfLine
+               nCurLine ++
             ENDDO
 
             cText := cBuffer
 
             ::SetUndoCollection(0)
             ::SetText( cText )
+            IF ! Empty( aBookmarks )
+               AEVAL( aBookmarks, {|nLine| SCI_SEND( SCI_MARKERADD, nLine, MARKER_MASK )} )
+            ENDIF
+
             ::SetUndoCollection(1)
 
             //::GotoLine( nLine )

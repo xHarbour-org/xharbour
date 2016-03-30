@@ -389,7 +389,7 @@ RETURN( if(nLen == CB_ERR, nil, left(cBuf, nLen) ) )
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnParentCommand( nId, nCode ) CLASS ComboBox
-   LOCAL nRet := NIL
+   LOCAL bChanged, nRet := NIL
    (nId)
    DO CASE
       CASE nCode == CBN_SELENDOK
@@ -397,8 +397,15 @@ METHOD OnParentCommand( nId, nCode ) CLASS ComboBox
            nRet := __Evaluate( ::Action, Self,,,,)
            nRet := ExecuteEvent( "OnCBNSelEndOk", Self )
            nRet := 0
-           IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-              Eval( ::Form:bChanged, Self )
+           IF ::Parent != NIL
+              IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                 bChanged := ::Parent:bChanged
+              ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                 bChanged := ::Form:bChanged
+              ENDIF
+              IF bChanged != NIL
+                 Eval( bChanged, Self )
+              ENDIF
            ENDIF
 
       CASE nCode == CBN_SELENDCANCEL

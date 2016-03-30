@@ -1480,7 +1480,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
        oItem:Expand()
    NEXT
 
-   IF ::ActiveObject:ClsName == "AtlAxWin"
+   IF ::ActiveObject:ClsName == "AtlAxWin" .AND. ::ActiveObject:__OleVars != NIL
       oItem := TreeViewItem( Self )
       oItem:Caption    := "COM Properties"
       oItem:InsertAfter:= TVI_SORT

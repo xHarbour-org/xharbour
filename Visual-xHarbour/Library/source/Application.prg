@@ -325,7 +325,7 @@ CLASS Application
    DATA MainForm                       EXPORTED
    DATA bUserError                     EXPORTED
    DATA DesignMode                     EXPORTED  INIT .F.
-
+   DATA bError                         EXPORTED
    DATA Params                         EXPORTED
    DATA IdeActive                      EXPORTED  INIT .F.
    DATA Running                        EXPORTED
@@ -562,7 +562,6 @@ METHOD Exit() CLASS Application
    ::MainForm := NIL
    ::System:CurrentScheme:Unload()
    ::ColorTable:Unload()
-   QUIT
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------
@@ -876,7 +875,11 @@ RETURN
    DEFAULT lSilent TO .F.
    #endif
 
+   IF Application != NIL .AND. Application:bError != NIL
+      EVAL( Application:bError, e )
+   ENDIF
    nWinError := GetLastError()
+
 
    // By default, division by zero results in zero
    IF e:genCode == EG_ZERODIV

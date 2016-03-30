@@ -126,8 +126,14 @@ METHOD Create() CLASS CheckBox
 RETURN Self
 
 METHOD OnParentCommand() CLASS CheckBox
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      Eval( ::Form:bChanged, Self )
+   LOCAL bChanged
+   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+      bChanged := ::Parent:bChanged
+   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      bChanged := ::Form:bChanged
+   ENDIF
+   IF bChanged != NIL
+      Eval( bChanged, Self )
    ENDIF
 RETURN NIL
 

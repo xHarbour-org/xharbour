@@ -22,6 +22,8 @@
 #define EF_CANSUBSTITUTE                2
 #define EF_CANDEFAULT                   4
 
+#define COMPILE(c) &("{||" + c + "}")
+
 REQUEST HB_MEMIO
 
 static nMemSel := 100
@@ -116,6 +118,7 @@ CLASS DataTable INHERIT Component
    DATA __aData            EXPORTED INIT {}
 
    DATA __hClass           PROTECTED
+   DATA __aSavedPos        PROTECTED
 
    METHOD Init() CONSTRUCTOR
 
@@ -157,6 +160,7 @@ CLASS DataTable INHERIT Component
    METHOD OrdSetFocus( cOrder )               INLINE IIF( cOrder != NIL, ::IndexOrder := ::IndexOrd(),), ::Connector:OrdSetFocus( cOrder )
    METHOD SetIndex( cIndex )                  INLINE ::IndexOrder := ::IndexOrd(), ::Connector:SetIndex( cIndex )
    METHOD SetRelation( oData,xKey,lAdditive ) INLINE ::Connector:SetRelation( oData, xKey, lAdditive )
+   METHOD ClearRelations()                    INLINE ::Connector:ClearRelations(), Self
    METHOD SetOrder( nOrder )                  INLINE ::Connector:SetOrder( nOrder )
    METHOD Select( cAlias )                    INLINE ::Connector:Select( cAlias )
    METHOD SelectArea()                        INLINE ::Connector:SelectArea()
@@ -176,7 +180,8 @@ CLASS DataTable INHERIT Component
    METHOD OrdKey(n)                           INLINE ::Connector:OrdKey(n)
    METHOD Struct()                            INLINE ::Connector:Struct()
    METHOD OrdKeyGoTo( nPos )                  INLINE ::Connector:OrdKeyGoTo( nPos )
-   METHOD SetFilter( b, c )                   INLINE ::Connector:SetFilter( b, c )
+   METHOD SetFilter( c )                      INLINE ::Connector:SetFilter( c )
+   METHOD GetFilter()                         INLINE ::Connector:GetFilter()
    METHOD OrdKeyCount()                       INLINE ::Connector:OrdKeyCount()
    METHOD Used()                              INLINE ::Connector:Used()
 
@@ -233,16 +238,18 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SavePos() CLASS DataTable
-   LOCAL aSavedPos := Array(2)
-   aSavedPos[1] := ::OrdSetFocus()
-   aSavedPos[2] := ::Recno()
-RETURN aSavedPos
+   ::__aSavedPos := Array(2)
+   ::__aSavedPos[1] := ::OrdSetFocus()
+   ::__aSavedPos[2] := ::Recno()
+RETURN ::__aSavedPos
 
 //-------------------------------------------------------------------------------------------------------
 METHOD RestPos( aSavedPos ) CLASS DataTable
+   DEFAULT aSavedPos TO ::__aSavedPos
    IF aSavedPos != NIL
       ::OrdSetFocus( aSavedPos[1] )
       ::Goto( aSavedPos[2] )
+      ::__aSavedPos := NIL
    ENDIF
 RETURN NIL
 
@@ -281,6 +288,10 @@ METHOD Blank() CLASS DataTable
                xValue := .F.
           CASE ::Structure[n][2] == "D"
                xValue := CTOD("")
+          CASE ::Structure[n][2] == "M"
+               xValue := ""
+          CASE ::Structure[n][2] == "TIMESTAMP"
+               xValue := StoT( "" )
           OTHERWISE
                xValue := ""
        ENDCASE
@@ -340,6 +351,27 @@ METHOD FieldGet( n ) CLASS DataTable
    LOCAL xVal
    IF Len( ::__aData ) >= n .AND. ::__aData[n] != NIL
       xVal := ::__aData[n]
+
+   ELSEIF ::IsNew
+
+      DO CASE
+         CASE ::Structure[n][2] == "C"
+              xVal := SPACE( ::Structure[n][3] )
+         CASE ::Structure[n][2] == "N"
+              xVal := 0
+         CASE ::Structure[n][2] == "L"
+              xVal := .F.
+         CASE ::Structure[n][2] == "D"
+              xVal := CTOD("")
+         CASE ::Structure[n][2] == "M"
+              xVal := ""
+         CASE ::Structure[n][2] == "TIMESTAMP"
+              xVal := StoT( "" )
+
+         OTHERWISE
+              xVal := ""
+      ENDCASE
+
    ELSE
       xVal := ::Connector:FieldGet( n )
    ENDIF
@@ -686,7 +718,10 @@ CLASS DataRdd
    METHOD OrdKey(n)                           INLINE (::Owner:Area)->( OrdKey(n) )
    METHOD Struct()                            INLINE (::Owner:Area)->( dbStruct() )
    METHOD OrdKeyGoTo( nPos )                  INLINE (::Owner:Area)->( OrdKeyGoTo( nPos ) )
-   METHOD SetFilter( b, c )                   INLINE (::Owner:Area)->( dbSetFilter( b, c ) )
+   METHOD SetFilter( c )                      INLINE IIF( c != NIL, (::Owner:Area)->( dbSetFilter( COMPILE( c ), c ) ), (::Owner:Area)->( dbClearFilter() ) )
+
+
+   METHOD GetFilter()                         INLINE (::Owner:Area)->( dbFilter() )
    METHOD OrdKeyCount()                       INLINE (::Owner:Area)->( OrdKeyCount() )
    METHOD Used()                              INLINE (::Owner:Area)->( Used() )
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE (::Owner:Area)->( OrdDescend( cnOrder, cFile, lDescend ) )
@@ -1010,7 +1045,7 @@ CLASS SocketRdd
    METHOD OrdKey(n)                           INLINE ::Request( "OrdKey", {n} )
    METHOD Struct()                            INLINE ::Request( "dbStruct" )
    METHOD OrdKeyGoTo( nPos )                  INLINE ::Request( "OrdKeyGoTo", {nPos} )
-   METHOD SetFilter( b, c )                   INLINE ::Request( "dbSetFilter", {b, c} )
+   METHOD SetFilter( c )                      INLINE ::Request( "dbSetFilter", {c} )
    METHOD OrdKeyCount()                       INLINE ::Request( "OrdKeyCount" )
    METHOD Used()                              INLINE ::Request( "Used" )
    METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Request( "OrdDescend", {cnOrder, cFile, lDescend} )

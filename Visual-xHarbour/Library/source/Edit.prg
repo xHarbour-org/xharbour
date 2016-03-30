@@ -1077,7 +1077,7 @@ RETURN IIF( nRet == NIL, 0, nRet )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS EditBox
-   LOCAL h, lShift
+   LOCAL h, lShift, bChanged
 #ifdef VXH_PROFESSIONAL
    LOCAL pt
 #endif
@@ -1125,8 +1125,13 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
          CASE VK_DELETE
             ::CallWindowProc()
             ::__UpdateDataGrid()
-            IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-               Eval( ::Form:bChanged, Self )
+            IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+               bChanged := ::Parent:bChanged
+            ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+               bChanged := ::Form:bChanged
+            ENDIF
+            IF bChanged != NIL
+               Eval( bChanged, Self )
             ENDIF
             RETURN 0
 
@@ -1141,10 +1146,18 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
             RETURN 0
       END
 
-   ELSEIF nKey IN { VK_DELETE } .AND. ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      ::CallWindowProc()
-      Eval( ::Form:bChanged, Self )
-      RETURN 0
+   ELSEIF nKey IN { VK_DELETE }
+      IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+         bChanged := ::Parent:bChanged
+      ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+         bChanged := ::Form:bChanged
+      ENDIF
+      IF bChanged != NIL
+         ::CallWindowProc()
+         Eval( bChanged, Self )
+         RETURN 0
+      ENDIF
+
 
    ENDIF
 
@@ -1152,13 +1165,20 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnChar( nKey ) CLASS EditBox
-   LOCAL lProc := .F., aKeys := {VK_BACK}
+   LOCAL lProc := .F., aKeys := {VK_BACK}, bChanged
    IF ::DataSource != NIL .AND. ( ( nKey >= 32 .AND. nKey <= 168 ) .OR. ( nKey >= 224 .AND. nKey <= 253 ) .OR. ( nKey IN aKeys ) )
       ::CallWindowProc()
       ::__UpdateDataGrid()
       lProc := .T.
    ENDIF
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+
+   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+      bChanged := ::Parent:bChanged
+   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      bChanged := ::Form:bChanged
+   ENDIF
+
+   IF bChanged != NIL
       IF IsKeyDown( VK_CONTROL ) .OR. IsKeyDown( VK_MENU )
          RETURN NIL
       ENDIF
@@ -1166,33 +1186,51 @@ METHOD OnChar( nKey ) CLASS EditBox
          ::CallWindowProc()
          lProc := .T.
       ENDIF
-      Eval( ::Form:bChanged, Self )
+      Eval( bChanged, Self )
    ENDIF
 RETURN IIF( lProc, 0, NIL )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUndo() CLASS EditBox
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+   LOCAL bChanged
+   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+      bChanged := ::Parent:bChanged
+   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      bChanged := ::Form:bChanged
+   ENDIF
+   IF bChanged != NIL
       ::CallWindowProc()
-      Eval( ::Form:bChanged, Self )
+      Eval( bChanged, Self )
       RETURN 0
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaste() CLASS EditBox
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+   LOCAL bChanged
+   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+      bChanged := ::Parent:bChanged
+   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      bChanged := ::Form:bChanged
+   ENDIF
+   IF bChanged != NIL
       ::CallWindowProc()
-      Eval( ::Form:bChanged, Self )
+      Eval( bChanged, Self )
       RETURN 0
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnCut() CLASS EditBox
-   IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+   LOCAL bChanged
+   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+      bChanged := ::Parent:bChanged
+   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+      bChanged := ::Form:bChanged
+   ENDIF
+   IF bChanged != NIL
       ::CallWindowProc()
-      Eval( ::Form:bChanged, Self )
+      Eval( bChanged, Self )
       RETURN 0
    ENDIF
 RETURN NIL
@@ -1261,10 +1299,18 @@ METHOD Create() CLASS FloatCalendar
 RETURN Self
 
 METHOD FloatOnSelect() CLASS FloatCalendar
+   LOCAL bChanged
    ::Cargo:Text := IIF( ValType( ::Cargo:Text ) == "D", ::Calendar:Date, DTOC( ::Calendar:Date ) )
-   IF ::Cargo:Form != NIL .AND. ::Cargo:Form:HasMessage( "bChanged" ) .AND. ::Cargo:Form:bChanged != NIL
-      Eval( ::Cargo:Form:bChanged, Self )
+
+   IF ::Cargo:Parent:HasMessage( "bChanged" ) .AND. ::Cargo:Parent:bChanged != NIL
+      bChanged := ::Cargo:Parent:bChanged
+   ELSEIF ::Cargo:Form != NIL .AND. ::Cargo:Form:HasMessage( "bChanged" ) .AND. ::Cargo:Form:bChanged != NIL
+      bChanged := ::Cargo:Form:bChanged
    ENDIF
+   IF bChanged != NIL
+      Eval( bChanged, Self )
+   ENDIF
+
    ::Close()
    ::Cargo:SetFocus()
 RETURN Self

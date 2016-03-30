@@ -167,8 +167,6 @@ CLASS DataGrid INHERIT TitleControl
    DATA __SysHighlightTextColor EXPORTED
 
    DATA __HScrollUnits          PROTECTED INIT 15
-   DATA __HorzScroll            PROTECTED INIT FALSE
-   DATA __VertScroll            PROTECTED INIT FALSE
    DATA __lCreated              PROTECTED INIT .F.
    DATA __bGoTop                PROTECTED INIT {||.F.}
    DATA __bGoBottom             PROTECTED INIT {||.F.}
@@ -2321,11 +2319,12 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
                  IF ::__SelBorderPen != NIL
                     hPen := SelectObject( hMemDC, ::__SelBorderPen )
                     hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
-                    Rectangle( hMemDC, aText[1], nTop, nRight-1, nBottom )
+
+                    Rectangle( hMemDC, aText[1], nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1) )
                     SelectObject( hMemDC, hBrush )
                     SelectObject( hMemDC, hPen )
                   ELSE
-                    _DrawFocusRect( hMemDC, {aText[1], nTop, nRight-1, nBottom} )
+                    _DrawFocusRect( hMemDC, {aText[1], nTop, nRight-IIF( ( lSelected .AND. ::FullRowSelect .AND. i<nColEnd ) .OR. !::xShowGrid, 0, 1 ), nBottom+IIF(::xShowGrid,0,1)} )
                  ENDIF
               ENDIF
 
@@ -2783,10 +2782,10 @@ METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
    DEFAULT lRedraw TO TRUE
    DEFAULT lForce  TO FALSE
 
-   IF ::DataSource != NIL .AND. ::DataSource:IsOpen .AND. ( ::__VertScroll .OR. ::AutoVertScroll .OR. lForce )
+   IF ::DataSource != NIL .AND. ::DataSource:IsOpen .AND. ( ::AutoVertScroll .OR. lForce )
 
+      nPage := Int(  ::__DataHeight/::ItemHeight )
       IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
-         nPage := Int(  ::__DataHeight/::ItemHeight )
          nMax  := ::GetRecordCount() //::DataSource:OrdKeyCount()
          nPos  := IIF( nMax < nPage, 0, ::__VertScrolled )
          IF nMax <= nPage .AND. ::AutoVertScroll
@@ -2796,6 +2795,9 @@ METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
          nMax  := 100
          nPos  := ::DataSource:OrdKeyRelPos()*100
          nFlags := SIF_POS | SIF_RANGE
+         IF ::GetRecordCount() <= nPage
+            nMax := 0
+         ENDIF
       ENDIF
       ::__nVPage := nPage
       ::__nVMax  := nMax
@@ -2815,7 +2817,7 @@ METHOD __UpdateHScrollBar( lRedraw ) CLASS DataGrid
    LOCAL nMin := 0, nPage := 0, nMax  := 0, nPos  := 0
    DEFAULT lRedraw TO TRUE
 
-   IF (::__HorzScroll .OR. ::AutoHorzScroll) .AND. IsWindow( ::hWnd )
+   IF ::AutoHorzScroll .AND. IsWindow( ::hWnd )
       nMax   := ::__DataWidth
       nPage  := ::ClientWidth + 1
       nPos   := -::__HorzScrolled

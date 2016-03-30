@@ -1204,6 +1204,36 @@ HB_FUNC ( DRAWGRID )
    }
 }
 
+HB_FUNC ( DRAWGRIDOLD )
+{
+   HDC hDC          = (HDC) hb_parnl(1);
+   HDC hMemDC       = CreateCompatibleDC( hDC );
+   HBITMAP hBitmap  = (HBITMAP) hb_parnl(2);
+   int xGrid        = hb_parni(3);
+   int yGrid        = hb_parni(4);
+   int nWidth       = hb_parni(5);
+   int nHeight      = hb_parni(6);
+   int j;
+   DWORD dwraster     = hb_parnl(7);
+   HBITMAP hOldBmp;
+
+   hOldBmp = (HBITMAP) SelectObject( hMemDC, hBitmap );
+
+   j=0;
+   while (j < nHeight)
+   {
+      int i=0;
+      while (i < nWidth)
+      {
+         BitBlt( hDC, i, j, xGrid, yGrid, hMemDC, 0, 0, dwraster );
+         i += xGrid;
+      }
+      j += yGrid;
+   }
+   SelectObject( hMemDC, hOldBmp );
+   DeleteDC( hMemDC );
+}
+
 
 HB_FUNC ( GETXPARAM )
 {
@@ -5571,3 +5601,156 @@ HB_FUNC ( VXH_SETMENUBACKCOLOR )
    mi.hbrBack  = (HBRUSH) hb_parnl(2);
    hb_retl( SetMenuInfo( (HMENU) hb_parnl(1), &mi ) );
 }
+
+HB_FUNC( GETOLECOLOR )
+{
+   OLE_COLOR* oColor = (OLE_COLOR*) hb_parnl(1);
+   hb_retnl( (long) oColor );
+}
+
+/*
+#include <shobjidl.h>
+
+HB_FUNC( CREATEHPREVIEW ) //preview
+{
+
+#ifndef _WIN64
+  #define RET hb_retnl( (long) pPreview );
+#else
+  #define RET hb_retnll( (long long) pPreview );
+#endif
+ LPWSTR cFileName = UTF8toUTF16( hb_parc( 1 ) );
+  LPCWSTR cExtension = wcsrchr(cFileName,L'.');
+
+ CLSID cls;
+   wchar_t clsStr[250];
+   wchar_t cKey[250];
+   LONG nLen=250;
+   IPreviewHandler* pPreview=0;
+   HRESULT hr;
+
+   if(cExtension == 0 ) {
+      pPreview = 0;
+      RET
+      return;
+   }
+   wcscpy_s(cKey,250, cExtension);
+   wcscat_s(cKey,250, L"\\ShellEx\\{8895b1c6-b41f-4c1c-a562-0d564250836f}");
+   if( ERROR_SUCCESS != RegQueryValueW(HKEY_CLASSES_ROOT, cKey, clsStr, &nLen) )
+   {
+      RegQueryValueW(HKEY_CLASSES_ROOT, cExtension, cKey, &nLen);
+      wcscat_s(cKey,250, L"\\ShellEx\\{8895b1c6-b41f-4c1c-a562-0d564250836f}");
+      // MessageBoxW(0,cKey,cExtension,MB_OK);
+      if( ERROR_SUCCESS != RegQueryValueW(HKEY_CLASSES_ROOT, cKey, clsStr, &nLen) )
+      {
+       pPreview = 0;
+       RET
+       return;
+      }
+    }
+
+    CLSIDFromString( clsStr,&cls);
+
+   if( S_OK == CoCreateInstance(cls, NULL, CLSCTX_INPROC_SERVER |CLSCTX_LOCAL_SERVER, __uuidof(IPreviewHandler),(LPVOID*)&pPreview) )
+   {
+      RET
+      return;
+   }
+
+   MessageBoxW(0,cKey,cExtension,MB_OK);
+   pPreview = 0;
+   RET
+return;
+}
+
+
+HB_FUNC( ADDPREVIEWH ) // hWnd, {nTop, nLeft, nBottom, nRight}, cFileName, pPreview
+{
+#ifndef _WIN64
+   HWND hWnd = ( HWND ) hb_parnl( 1 );
+    IPreviewHandler* pPreview = ( IPreviewHandler* ) hb_parnl( 4 );
+#else
+   HWND hWnd = ( HWND ) hb_parnll( 1 );
+   IPreviewHandler* pPreview = ( IPreviewHandler* ) hb_parnll( 4 );
+#endif
+
+   RECT rectPreview;
+
+   LPWSTR cFileName = UTF8toUTF16( hb_parc( 3 ) );
+   LPCWSTR cExtension = wcsrchr(cFileName,L'.');
+
+   IInitializeWithFile* pFile;
+   IInitializeWithStream* pIStream;
+
+   if(pPreview==0)
+   {
+      MessageBoxW(0,L"no pPreview",cExtension,MB_OK);
+      RET
+      return;
+   }
+
+   pPreview->QueryInterface(__uuidof( IInitializeWithFile ), (LPVOID*)&pFile );
+   pPreview->QueryInterface(__uuidof( IInitializeWithStream ), (LPVOID*)&pIStream );
+
+   if(pFile==0 && pIStream==0)
+   {
+      MessageBoxW(0,L"no pfile no pStream",cExtension,MB_OK);
+      pPreview->Unload();
+      pPreview = 0;
+      RET
+      return;
+   }
+   if(pFile!=0)
+   {
+      pFile->Initialize( cFileName, STGM_READ);
+   } else
+   { //pIStream!=0
+      HANDLE hFile = CreateFileW(cFileName,FILE_READ_DATA,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL );
+     if( INVALID_HANDLE_VALUE != hFile )
+     {
+         DWORD dwSize = GetFileSize( hFile, NULL );
+         HGLOBAL hGlobal= GlobalAlloc(GPTR, dwSize );
+         BYTE * pByte = (BYTE *)GlobalLock(hGlobal);
+
+         if( pByte )
+         {
+            LPSTREAM pStream;
+            ReadFile(hFile,pByte,dwSize,&dwSize,NULL);
+            GlobalUnlock(hGlobal);
+
+             CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
+             pIStream->Initialize( pStream, STGM_READ);
+         }
+
+         CloseHandle( hFile );
+     }
+   }
+   hb_xfree( cFileName );
+
+   rectPreview.top    = hb_parvni(2,1);
+   rectPreview.left   = hb_parvni(2,2);
+   rectPreview.bottom = hb_parvni(2,3);
+   rectPreview.right  = hb_parvni(2,4);
+
+   pPreview->SetWindow( hWnd, &rectPreview );
+   pPreview->DoPreview();
+
+ //  pPreview->Unload();
+   delete pIStream ;
+
+}
+
+HB_FUNC( UNLOADHPREVIEW ) //preview
+{
+#ifndef _WIN64
+   IPreviewHandler* pPreview = ( IPreviewHandler* ) hb_parnl( 1 );
+  #else
+   IPreviewHandler* pPreview = ( IPreviewHandler* ) hb_parnll( 1 );
+  #endif
+   pPreview->Unload();
+
+ }
+
+*/
+
+

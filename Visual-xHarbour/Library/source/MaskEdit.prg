@@ -377,7 +377,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
-   LOCAL nStart, nEnd, i
+   LOCAL nStart, nEnd, i, bChanged
 
    IF nwParam==27 .OR. ::Validating
       RETURN 0
@@ -413,9 +413,14 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
 
-              IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+              IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                 bChanged := ::Parent:bChanged
+              ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                 bChanged := ::Form:bChanged
+              ENDIF
+              IF bChanged != NIL
                  ::CallWindowProc()
-                 Eval( ::Form:bChanged, Self )
+                 Eval( bChanged, Self )
               ENDIF
               RETURN 0
 
@@ -483,9 +488,14 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
 
-              IF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+              IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                 bChanged := ::Parent:bChanged
+              ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                 bChanged := ::Form:bChanged
+              ENDIF
+              IF bChanged != NIL
                  ::CallWindowProc()
-                 Eval( ::Form:bChanged, Self )
+                 Eval( bChanged, Self )
               ENDIF
               RETURN 0
 

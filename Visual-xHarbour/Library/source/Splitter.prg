@@ -189,7 +189,14 @@ METHOD SplitOn( x, y, lDirect )
       GetCursorPos( @pt )
       ScreenToClient( ::Parent:hWnd, @pt )
 
-      IF ::Position IN {1,3}
+      IF ::Position == 1
+         IF ::MaxPos > 0
+            pt:x := Min( pt:x, ::Parent:ClientWidth - ::MaxPos )
+         ENDIF
+         IF ::MinPos > 0
+            pt:x := Max( pt:x, ::Parent:ClientWidth - ::MinPos )
+         ENDIF
+      ELSEIF ::Position == 3
          IF ::MaxPos > 0
             pt:x := Min( pt:x, ::MaxPos )
          ENDIF
@@ -302,11 +309,20 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS Splitter
       ENDIF
       SWITCH nPos
          CASE 1
-              IF ::MaxPos > 0
-                 pt:x := Min( pt:x, ::MaxPos )
-              ENDIF
-              IF ::MinPos > 0
-                 pt:x := Max( pt:x, ::MinPos )
+              IF ::Position == 1
+                 IF ::MaxPos > 0
+                    pt:x := Min( pt:x, ::Parent:ClientWidth - ::MaxPos )
+                 ENDIF
+                 IF ::MinPos > 0
+                    pt:x := Max( pt:x, ::Parent:ClientWidth - ::MinPos )
+                 ENDIF
+              ELSE
+                 IF ::MaxPos > 0
+                    pt:x := Min( pt:x, ::MaxPos )
+                 ENDIF
+                 IF ::MinPos > 0
+                    pt:x := Max( pt:x, ::MinPos )
+                 ENDIF
               ENDIF
               ::InvRect[1] := MAX( MIN( pt:x, ::Parent:ClientWidth - ::xWidth ), 0 )
               ::InvRect[2] := pt2:y

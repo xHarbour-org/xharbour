@@ -1849,7 +1849,6 @@ RETURN NIL
 METHOD OnNCDestroy() CLASS Window
    LOCAL n, aComp, aProperty, aProperties
    aComp := {}
-
    FOR n := 1 TO LEN( ::Components )
        IF ::Components[n]:Exists
           AADD( aComp, ::Components[n] )
@@ -2004,9 +2003,6 @@ METHOD OnNCDestroy() CLASS Window
 
    ::__UnSubClass()
 
-   IF ::Application:MainForm:hWnd <> ::hWnd
-      ::Application:MainForm:PostMessage( WM_VXH_DESTRUCTOBJECT )
-   ENDIF
    ObjFromHandle( ::hWnd, .T. )
 
    ::MDIClient := NIL
@@ -2866,9 +2862,6 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                        CASE nMsg == WM_VXH_SHOWMODE
                             ::ShowMode := ::__GetShowMode()
 
-                       CASE nMsg == WM_VXH_DESTRUCTOBJECT
-                            hb_gcAll( .t. )
-
                        OTHERWISE
                             ODEFAULT nRet TO ::OnSystemMessage( nMsg, nwParam, nlParam)
                     ENDCASE
@@ -3218,7 +3211,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       IF VALTYPE( oLeft ) == "C"
          IF oLeft == ::Parent:Name
             oLeft := ::Parent
-          ELSE
+          ELSEIF HGetPos( ::Form:__hObjects, oLeft ) > 0
             oLeft := ::Form:__hObjects[ oLeft ]
          ENDIF
       ENDIF
@@ -3230,7 +3223,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       IF VALTYPE( oTop ) == "C"
          IF oTop == ::Parent:Name
             oTop := ::Parent
-          ELSE
+          ELSEIF HGetPos( ::Form:__hObjects, oTop ) > 0
             oTop := ::Form:__hObjects[ oTop ]
          ENDIF
       ENDIF
@@ -3242,7 +3235,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       IF VALTYPE( oRight ) == "C"
          IF oRight == ::Parent:Name
             oRight := ::Parent
-          ELSE
+          ELSEIF HGetPos( ::Form:__hObjects, oRight ) > 0
             oRight := ::Form:__hObjects[ oRight ]
          ENDIF
       ENDIF
@@ -3254,7 +3247,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       IF VALTYPE( oBottom ) == "C"
          IF oBottom == ::Parent:Name
             oBottom := ::Parent
-          ELSE
+          ELSEIF HGetPos( ::Form:__hObjects, oBottom ) > 0
             oBottom := ::Form:__hObjects[ oBottom ]
          ENDIF
       ENDIF
@@ -3321,7 +3314,20 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
             ENDIF
          ENDDO
       ENDIF
-
+/*
+      IF oLeft != NIL .AND. oLeft:hWnd != ::Parent:hWnd .AND. oLeft:Dock:IsDocked()
+         oLeft:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight )
+      ENDIF
+      IF oTop != NIL .AND. oTop:hWnd != ::Parent:hWnd .AND. oTop:Dock:IsDocked()
+         oTop:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight )
+      ENDIF
+      IF oRight != NIL .AND. oRight:hWnd != ::Parent:hWnd .AND. oRight:Dock:IsDocked()
+         oRight:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight )
+      ENDIF
+      IF oBottom != NIL .AND. oBottom:hWnd != ::Parent:hWnd .AND. oBottom:Dock:IsDocked()
+         oBottom:__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight )
+      ENDIF
+*/
       IF ! ::__Splitting
          // Get Standard positions
          ::xLeft := IIF( ::Anchor:Left .AND. ::Parent:__aCltRect != NIL .AND. x != NIL, x - (::Parent:__aCltRect[3] - ::xLeft), ::xLeft )
@@ -3798,6 +3804,7 @@ CLASS __WindowDock
    METHOD Update()
    METHOD SetMargins()
    METHOD Destroy()
+   METHOD IsDocked() INLINE ::Left != NIL .OR. ::Top != NIL .OR. ::Right != NIL .OR. ::Bottom != NIL
 ENDCLASS
 
 METHOD Init( oOwner ) CLASS __WindowDock
@@ -4689,6 +4696,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnNCDestroy() CLASS WinForm
    ::Super:OnNCDestroy()
+   hb_gcAll( .t. )
    IF ::xAnimation != NIL .AND. ::xAnimation:Owner != NIL
       ::xAnimation:Owner := NIL
    ENDIF
@@ -4840,9 +4848,10 @@ METHOD RestoreLayout( cIniFile, cSection, lAllowOut, lAllowMinimized ) CLASS Win
       endif
       ::xLeft   := aPos[1]
       ::xTop    := aPos[2]
-      ::xWidth  := aPos[3]
-      ::xHeight := aPos[4]
-
+      IF ::Resizable
+         ::xWidth  := aPos[3]
+         ::xHeight := aPos[4]
+      ENDIF
       IF ::xWidth <= 0 .OR. ::xHeight <= 0
          ::ShowMode := 3
          RETURN Self

@@ -33,6 +33,7 @@ CLASS AdsDataTable INHERIT DataTable
 
    METHOD BlobGet( nFieldNo, nStart, nCount ) INLINE (::Area)->( dbFieldInfo( DBS_BLOB_GET, nFieldNo, { nStart, nCount } ) )
    METHOD MemoExt()                           INLINE ".adm"
+   METHOD Append()                            INLINE (::Area)->( dbAppend(), AdsNull2Blank() )
    METHOD Save()
    METHOD SetData()
    METHOD FieldPut()
@@ -112,6 +113,20 @@ METHOD FieldPut( nField, xVal ) CLASS AdsDataTable
       ELSE
          ::Connector:FieldPut( nField, xVal )
       ENDIF
+   ENDIF
+RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+FUNCTION AdsNull2Blank( lAnyRDD )
+   Local xData, nI, nFCount
+   DEFAULT lAnyRDD TO .f.
+   IF lAnyRDD .or. RddName() == "ADSADT"
+      nFCount := FCount()
+      FOR nI := 1 To nFCount
+         IF Empty( xData := FieldGet( nI ) ) .and. ! ValType( xData ) == "M"   // Memo, Binary, Image, etc... don't have to worry about NULLs
+            FieldPut( nI, xData )
+         ENDIF
+      NEXT
    ENDIF
 RETURN NIL
 
