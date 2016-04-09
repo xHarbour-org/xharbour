@@ -4256,6 +4256,7 @@ METHOD Create() CLASS GridColumn
    ::Parent:Update()
    WITH OBJECT ::Parent
       IF ! :DesignMode .AND. :AnchorColumn == LEN( :Children )
+         :GetClientRect()
          :Children[ :AnchorColumn ]:xWidth := ( :ClientWidth - :__DataWidth ) + :Children[ :AnchorColumn ]:xWidth
          :__GetDataWidth()
          :__DisplayData()
