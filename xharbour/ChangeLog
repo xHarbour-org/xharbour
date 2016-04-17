@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-04-17 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * winmake/makefile.gc
+    ! when compiling to 64bits add -DWIN32 to compile properly pdflite
+  * include/thread.h
+    ! added S_RDDMTX enum  
+  * make_gc64.bat  
+    ! minor update
+    ! to compile properly with mingw on an dos shell do
+    set CC_DIR=directory where mingw64 is instaled so in my machine is ( i use one from https://sourceforge.net/projects/mingw-w64/ )
+    SET CC_DIR=C:/mingw530-64
+    make_Gc64 
+    
 2016-03-13 21:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rdd/hsx/hsx.c
     ! some fixes to make mingw 5.3.0 happy

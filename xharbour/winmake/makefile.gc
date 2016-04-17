@@ -29,7 +29,7 @@ NOCYGWIN  =-mno-cygwin
 endif
 
 ifeq ($(HB_ARCH),64)
-C64FLAGS  =-DHB_OS_WIN_64 -DNODLL 
+C64FLAGS  =-DHB_OS_WIN_64 -DNODLL  -DWIN32
 HB64FLAGS =-dNODLL
 else
 HB_TARGET =-mtune=pentium -march=i686 
@@ -59,7 +59,7 @@ HB_OPTIMFLAGS     +=-l
 endif
 
 OPTFLAGS    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN) -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
-HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(XWT_DIR)/include" -i"$(CGI_DIR)/include"
+HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(XWT_DIR)/include" -i"$(CGI_DIR)\include" 
 CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)/include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(SIXAPI_DIR)/include"
@@ -300,7 +300,7 @@ ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
 
 RC_CMD          =$(RC) --input=$^ --output=$@
-LIB_CMD         =$(DEL) $@ && AR cru $@ $^
+LIB_CMD         =$(DEL) $@ && AR cru $@ $^ && ranlib $@
 LIB_CMD_1       =$(LIB_CMD)
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
