@@ -124,8 +124,8 @@ endif
 ifeq ($(__BLD__),CORE_BLD)
 #*******************************************************************************
 
-HBDOC_EXE_OBJS+=\
-	$(HBDOC_PDF_OBJS)
+#HBDOC_EXE_OBJS+=\
+#	$(HBDOC_PDF_OBJS)
 
 ifeq ($(HB_GTALLEG),1)
 HB_GT_LIBS+=\

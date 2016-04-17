@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2016-04-17 19:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * winmake/makefile.gc
+    ! disable hbdoc build
+    
 2016-04-17 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * winmake/makefile.gc
     ! when compiling to 64bits add -DWIN32 to compile properly pdflite
