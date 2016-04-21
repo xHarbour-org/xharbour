@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2016-04-20 14:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * make_gc.bat
+    ! minor fix
+  
 2016-04-17 19:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * winmake/makefile.gc
     ! disable hbdoc build

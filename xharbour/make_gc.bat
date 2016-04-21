@@ -12,7 +12,7 @@ rem
 rem ============================================================================
 
 rem uncomment HB_ARCH to compile under Win64
-REM SET HB_ARCH=64
+rem SET HB_ARCH=64
 REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
@@ -28,7 +28,7 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
-IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGW
+IF "%CC_DIR%"=="" SET CC_DIR=C:/mingw530-32
 IF "%SUB_DIR%"=="" SET SUB_DIR=gc
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 IF "%BISON_DIR%"=="" SET BISON_DIR=C:/MSYS/1.0/bin
@@ -37,7 +37,7 @@ SET _PATH=%PATH%
 SET PATH=%CC_DIR%\bin;%BISON_DIR%;%PATH%
 
 rem Added for MinGW 4.70 -mno-cygwin is no longer valid
-rem SET NO_CYGWIN=1
+SET NO_CYGWIN=1
 
 rem ============================================================================
 rem The followings should never change
