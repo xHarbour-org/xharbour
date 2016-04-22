@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-04-22 23:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/ftpcln.prg
+    ! fixed calculation of length of file in method Retr(), it now uses SIZE command
+    ! replaced F_SIZE with 7 in method fileSize()
+
 2016-04-20 14:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * make_gc.bat
     ! minor fix

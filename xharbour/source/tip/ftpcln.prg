@@ -618,10 +618,18 @@ METHOD Retr( cFile ) CLASS TIPClientFTP
       ENDIF
    ENDIF
 
+   ::InetSendAll( ::SocketCon, "SIZE " + cFile + ::cCRLF )
+
+   IF !::GetReply()
+       RETURN .F.
+   ENDIF
+
+   ::nLength = Val( SubStr( ::cReply, 4 ) )
+
    ::InetSendAll( ::SocketCon, "RETR " + cFile + ::cCRLF )
 
    IF ::TransferStart()
-      ::ScanLength()
+//      ::ScanLength()
       RETURN .T.
    ENDIF
 
@@ -809,7 +817,7 @@ METHOD fileSize( cFileSpec ) CLASS TIPClientFTP
    LOCAL aFiles := ::listFiles( cFileSpec ), nSize := 0, n
 
    FOR n := 1 TO Len( aFiles )
-      nSize += Val( aFiles[n][F_SIZE] ) // Should [7] not be [F_SIZE] ?
+      nSize += Val( aFiles[n][7] ) // Should [7] not be [F_SIZE] ?
    NEXT
 
    RETURN nSize
