@@ -817,7 +817,7 @@ METHOD fileSize( cFileSpec ) CLASS TIPClientFTP
    LOCAL aFiles := ::listFiles( cFileSpec ), nSize := 0, n
 
    FOR n := 1 TO Len( aFiles )
-      nSize += Val( aFiles[n][7] ) // Should [7] not be [F_SIZE] ?
+      nSize += aFiles[n][F_SIZE]
    NEXT
 
    RETURN nSize

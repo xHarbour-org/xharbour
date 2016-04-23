@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-04-24 00:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/ftpcln.prg
+    ! restored F_SIZE and removed Val() in method fileSize()
+
 2016-04-22 23:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/ftpcln.prg
     ! fixed calculation of length of file in method Retr(), it now uses SIZE command
