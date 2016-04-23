@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-04-23 20:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/vm/arrayshb.c
+    ! minor adjust on previus commit
+
 2016-04-23 19:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * xharbour.spec
     ! minor adjust

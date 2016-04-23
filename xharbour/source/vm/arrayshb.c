@@ -996,11 +996,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                   break;
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asInteger.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRUINT ) ( pBaseVar->pItems + ulIndex )->item.asInteger.value;
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asLong.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRUINT ) ( pBaseVar->pItems + ulIndex )->item.asLong.value;
                   break;
 
                default:
@@ -1076,11 +1076,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1098,11 +1098,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:

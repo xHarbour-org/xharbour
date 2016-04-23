@@ -614,7 +614,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/%{name}
 %{_libdir}/%{name}/libxharbour*.so*
 %{!?hb_ldconf:%{_libdir}/libxharbour*.so*}
-%attr(644,root,root) %{?hb_ldconf:%{hb_ldconf}/%{name}.conf}
+
 
 %files pp
 %defattr(-,root,root,755)
@@ -693,11 +693,6 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Jul 20 2001 Dave Pearson <davep@davep.org>
 - Added the setting of $HB_GT_LIB to the environment (ncurses is used).
 - Added support for installing hbmake.
-
-* Mon Jun 28 2001 Dave Pearson <davep@davep.org>
-- Changed the gharbour script so that it only invokes the C compiler if a C
-  file was output. This stops any error messages when someone is using the
-  -g option to output other target types.
 
 * Mon Mar 19 2001 Dave Pearson <davep@davep.org>
 - Reinstated hbrun in the files section.
