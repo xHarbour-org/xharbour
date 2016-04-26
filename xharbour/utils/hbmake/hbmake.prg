@@ -1649,7 +1649,11 @@ FUNCTION CreateScript( cFile, lCreateAndCompile )
    LOCAL cDefaultLibs     := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib common.lib gtwin.lib codepage.lib ct.lib tip.lib pcrepos.lib hsx.lib hbsix.lib zlib.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lpcrepos -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage  -lm "
    LOCAL cDefGccLibsUnix  := "-lvm -lcodepage -ltef -lrtl  -lrdd  -lrtl  -lvm  -lmacro  -lpp  -llang  -lcommon  -lnulsys  -lbmdbfcdx  -ldbfntx  -ldbfcdx  -ldbffpt  -lhbsix  -lhsx  -lusrrdd -lpcrepos  -lgtsln -lslang -lm -lrt "
+   #ifdef __ARCH64BIT__
+   LOCAL cDefGccLibsw     := "-lvm64 -lrtl64 -lpcrepos64 -lgtwin64 -llang64 -lrdd64 -lrtl64 -lvm64 -lmacro64 -lpp64 -ldbfntx64 -ldbfcdx64 -ldbffpt64 -lhsx64 -lhbsix64 -lcommon64 -lcodepage64 -lm"
+   #else
    LOCAL cDefGccLibsw     := "-lvm -lrtl -lpcrepos -lgtwin -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
+   #endif
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lpcrepos -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lpcrepos -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage "
    LOCAL cDefaultLibsMt    := "lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib common.lib gtwin.lib codepage.lib ctmt.lib tipmt.lib pcrepos.lib hsxmt.lib hbsixmt.lib zlib.lib"
@@ -3068,7 +3072,7 @@ Endif // Create and compile
             cDefGccLibsMtw :=strtran( cDefGccLibsMtw,"-lgtwin" ,"-lgtgui")
             FWrite( nSFhandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + "-lhwgui -lprocmisc -lhwg_qhtm " +  IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF)
          else
-            FWrite( nSFhandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
+            FWrite( nSFhandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -mconsole  -Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
          endif
       ELSE
          FWrite( nSFhandle, "LIBFILES = " + IIF( ! s_lMt, cDefGccLibs, cDefGccLibs ) + CRLF )
@@ -3136,7 +3140,7 @@ Endif // Create and compile
 
    ELSEIF s_lGcc
 
-      FWrite( nSFhandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )+ " "  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
+      FWrite( nSFhandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )+ " "  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour -I/usr/local/include/xharbour ", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + " " + CRLF )
       #ifdef __ARCH64BIT__
       FWrite( nSFhandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" ) +  IIF( "Unix" in cOs , " -L/usr/lib64/xharbour ", "" ) + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
       #else
@@ -5061,7 +5065,7 @@ FUNCTION BuildGccCfgFile()
       endif
 
       FWrite( nCfg, "CC=gcc" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + s_cHarbourDir + "/include $(C_USR)  -L" + s_cHarbourDir + "/lib" )  + if(s_lmingw ," -mno-cygwin ","" )+ CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + s_cHarbourDir + "/include $(C_USR)  -L" + s_cHarbourDir + "/lib" )  + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
