@@ -32,9 +32,7 @@
 #define TS_TRUE   2
 #define TS_DRAW   3
 
-#define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
-#define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 
@@ -108,6 +106,9 @@ CLASS WindowEdit INHERIT WinForm
    METHOD SetFormIcon( cIcon )   INLINE ::Super:SetFormIcon( cIcon ), ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW + RDW_NOCHILDREN + RDW_NOERASE )
    METHOD OnNCDestroy()
    //METHOD OnNCCalcSize()
+   METHOD MoveControls()
+   METHOD DeleteControls()
+   //METHOD AddControl()
 ENDCLASS
 
 /*
@@ -413,7 +414,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
       CASE nKey == VK_DELETE
            lCheck := .F.
            IF LEN( ::Selected ) > 0
-              ::Application:Project:DelControl( ::Selected )
+              ::DeleteControls()
            ENDIF
            RETURN 0
 
@@ -884,11 +885,111 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
 RETURN aPoints
 
 //----------------------------------------------------------------------------
+METHOD MoveControls( n, oParent ) CLASS WindowEdit
+   LOCAL o
+   IF n == 1
+      IF oParent != NIL .AND. !(oParent==::Selected[1][1]:Parent)
+         ::UpdateSelection()
+         o := ::Selected[1][1]:Parent
+         ::Selected[1][1]:SetParent( oParent )
+         oParent := o
+      ENDIF
+
+      FOR n := 1 TO LEN( ::Selected )
+          MoveWindow( ::Selected[n][1]:hWnd, ::Selected[n][1]:Left, ::Selected[n][1]:Top, ::Selected[n][1]:Width, ::Selected[n][1]:Height )
+      NEXT
+   ENDIF
+
+   ::UpdateSelection()
+
+   ::Application:ObjectManager:CheckValue( "Left",   "Position", ::Selected[1][1]:Left )
+   ::Application:ObjectManager:CheckValue( "Top",    "Position", ::Selected[1][1]:Top  )
+   ::Application:ObjectManager:CheckValue( "Width",  "Size",     ::Selected[1][1]:Width )
+   ::Application:ObjectManager:CheckValue( "Height", "Size",     ::Selected[1][1]:Height )
+RETURN Self
+
+//----------------------------------------------------------------------------
+//METHOD AddControl( oParent, cName, nLeft, nTop, aProps, nwParam ) CLASS WindowEdit
+//RETURN Self
+
+//----------------------------------------------------------------------------
+METHOD DeleteControls( aDel ) CLASS WindowEdit
+   LOCAL n, oCtrl, x
+   DEFAULT aDel TO ::Selected
+
+   IF aDel[1][1]:__CustomOwner
+      ::Application:MainForm:MessageBox( "Cannot delete internal components of a Custom Control. Only individual objects can be deleted", "Custom Control", MB_ICONSTOP )
+      RETURN NIL
+   ENDIF
+
+   FOR n := 1 TO Len( aDel )
+       IF aDel[n][1]:Parent != NIL
+          FOR EACH oCtrl IN aDel[n][1]:Parent:Children
+              TRY
+                 IF oCtrl:Dock:Left == aDel[n][1]
+                    oCtrl:Dock:Left := NIL
+                 ENDIF
+               CATCH
+              END
+              TRY
+                 IF oCtrl:Dock:Top == aDel[n][1]
+                    oCtrl:Dock:Top := NIL
+                 ENDIF
+               CATCH
+              END
+              TRY
+                 IF oCtrl:Dock:Right == aDel[n][1]
+                    oCtrl:Dock:Right := NIL
+                 ENDIF
+               CATCH
+              END
+              TRY
+                 IF oCtrl:Dock:Bottom == aDel[n][1]
+                    oCtrl:Dock:Bottom := NIL
+                 ENDIF
+               CATCH
+              END
+          NEXT
+       ENDIF
+
+       TRY
+          IF aDel[n][1]:Owner:ClsName == "CoolBarBand"
+             aDel[n][1]:Owner:BandChild := NIL
+          ENDIF
+        catch
+       END
+
+       IF aDel[n][1]:__xCtrlName == "CustomControl"
+          IF ( x := ASCAN( ::CustomControls, aDel[n][1]:Reference,,, .T. ) ) > 0
+             ADEL( ::CustomControls, x, .T. )
+          ENDIF
+       ENDIF
+       IF aDel[n][1]:TreeItem != NIL
+          aDel[n][1]:TreeItem:Delete()
+          aDel[n][1]:TreeItem := NIL
+       ENDIF
+       aDel[n][1]:Destroy()
+       TRY
+          aDel[n][1]:Owner := NIL
+        catch
+       END
+
+       //IF aAction[12] != NIL
+       //   aAction[12]:Delete()
+       //ENDIF
+
+   NEXT
+
+   ::Application:Props[ "ComboSelect" ]:Reset()
+   ::Application:Project:Modified := .T.
+RETURN Self
+
+//----------------------------------------------------------------------------
 
 METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
    LOCAL aControl, aPt := { x, y }, aPoint, n, aRect, aPoints, oControl, aSelRect
    LOCAL nLeft, nTop, nRight, nBottom, nWidth, nHeight, nPlus, cClass, lLeft, lTop, lWidth, lHeight
-   LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aControls, aSnap, nSnap, hDef, nFor, aSelected
+   LOCAL aSel, pt, pt2, oParent, nCursor, nTab, z, aSnap, nSnap, hDef, nFor, aSelected
    ( nwParam )
    pt := (struct POINT)
    pt:x := x
@@ -1032,25 +1133,11 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
       ENDIF
 
       IF ( !lLeft .OR. !lTop .OR. !lWidth .OR. !lHeight ) .AND. ::__SelMoved
-         aRect := {}
-         aControls := {}
-         FOR n := 1 TO LEN( ::Selected )
-             nLeft   := ::Selected[n][1]:Left
-             nTop    := ::Selected[n][1]:Top
-             nWidth  := ::Selected[n][1]:Width
-             nHeight := ::Selected[n][1]:Height
-             AADD( aRect, { nLeft, nTop, nWidth, nHeight } )
-             AADD( aControls, ::Selected[n][1] )
-         NEXT
          ::Application:Project:Modified := .T.
          ::__lModified := .T.
 
-         ::Application:Project:SetAction( { { DG_MOVESELECTION,;
-                                            aControls,;
-                                            aRect,;
-                                            ::__PrevSelRect,;
-                                            0,;
-                                            ::OldParent } }, ::Application:Project:aUndo )
+         ::MoveControls( 0, ::OldParent )
+
       ENDIF
       ::__SelMoved := .F.
 

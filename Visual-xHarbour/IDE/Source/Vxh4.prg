@@ -16,7 +16,6 @@ static __aProps := {=>}
 
 #define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
-#define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 
@@ -732,7 +731,8 @@ METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
     CATCH
       xVal := xValue
    END
-   ::Application:Project:SetAction( { { DG_PROPERTYCHANGED, ::ActiveObject, xValue, cCaption, oItem, xVal, cProp } }, ::Application:Project:aUndo )
+   //::Application:Project:SetAction( { { DG_PROPERTYCHANGED, ::ActiveObject, xValue, cCaption, oItem, xVal, cProp } }, ::Application:Project:aUndo )
+   ::SetObjectValue( ::ActiveObject, xValue, cCaption, oItem, xVal, cProp )
 RETURN Self
 
 METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
@@ -937,11 +937,12 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
             view oError:ProcName, oError:ProcLine, oError:Description, oError:Operation
          ENDIF
       END
-    ELSEIF cProp == "Name"
+   ELSEIF cProp == "Name"
       ::RenameForm( "__"+cVal, "__"+xValue, .T., oActiveObject )
+   ELSE
+      __ObjSendMsg( oObj, "_"+cProp, xValue )
    ENDIF
    s_bSetting := .F.
-
 RETURN .T.
 
 FUNCTION IsValidIdentifier( sID, oObject )
@@ -1025,7 +1026,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS ObjManager
-   LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly, aObjs
+   LOCAL cProp, aProp, xValue, n, oItem, nColor, aCol, oSub, lReadOnly, aObjs, oSelf := Self
    LOCAL aProperties, aProperty, aSubProp, cType, Child, xProp, nDefault, aObj, aProps, cHelp, e
 
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
@@ -1220,12 +1221,11 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
           aCol[1]:Value    := ::ActiveObject:Enum&cProp[1]
           aCol[1]:ColType  := "ENUM"
           aCol[1]:SetValue := ASCAN( ::ActiveObject:Enum&cProp[2], ::ActiveObject:&cProp,,, .T. )
-          aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
-                                                 oPar := o:Parent,;
-                                                 o:Destroy(),;
-                                                 c := o:Cargo[1],;
-                                                 o:Cargo[2]:ColItems[1]:SetValue := n+1,;
-                                                 oPar:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
+          aCol[1]:Action   := {|o, n, c| n := o:GetCurSel()-1,;
+                                              c := o:Cargo[1],;
+                                              o:Destroy(),;
+                                              o:Cargo[2]:ColItems[1]:SetValue := n+1,;
+                                              oSelf:SetValue( ::ActiveObject:Enum&c[2][n+1] ) }
           xValue := NIL
         ELSE
           DO CASE
@@ -1544,7 +1544,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 RETURN NIL
 
 METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
-   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub, aProp, nDefault
+   LOCAL aSub, cProp2, xValue2, cType, nColor, aCol, aSubProp, Child, oSub, aProp, nDefault, oSelf := Self
    IF VALTYPE( xValue ) == "O"
       aSub := __ClsGetPropertiesAndValues( xValue )
       FOR EACH aSubProp IN aSub
@@ -1575,12 +1575,11 @@ METHOD CheckObjProp( xValue, oItem, cProp, aSubExpand ) CLASS ObjManager
              aCol[1]:Value    := xValue:Enum&cProp2[1]
              aCol[1]:ColType  := "ENUM"
              aCol[1]:SetValue := ASCAN( xValue:Enum&cProp2[2], xValue:&cProp2,,, .T. )
-             aCol[1]:Action   := {|o, n, oPar, c| n := o:GetCurSel()-1,;
-                                                    oPar := ObjFromHandle(o:Parent:hWnd),;
-                                                    c := o:Cargo[1],;
-                                                    o:Cargo[2]:ColItems[1]:SetValue := n+1,;
-                                                    o:Destroy(),;
-                                                    oPar:SetValue( xValue:Enum&c[2][n+1] ) }
+             aCol[1]:Action   := {|o, n, c| n := o:GetCurSel()-1,;
+                                                 c := o:Cargo[1],;
+                                                 o:Cargo[2]:ColItems[1]:SetValue := n+1,;
+                                                 o:Destroy(),;
+                                                 oSelf:SetValue( xValue:Enum&c[2][n+1] ) }
              xValue2 := NIL
 
            ELSEIF cProp == "Dock"
@@ -1757,11 +1756,10 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
 
                        :OnWMKeyDown := {|o,n| CheckShortCutKeyDown(o,n,::ActiveObject:ShortcutKey)}
                        :OnWMChar    := {|| 0}
-                       :OnWMKillFocus := {|o,cText,oPar| cText := IIF( o:Cargo == NIL, 0, o:Cargo ),;
-                                                         oPar  := o:Parent,;
-                                                         IIF( ::__xCtrlName == "ObjManager", oPar:SetValue( cText ), ),;
-                                                         o:Application:AccelEnabled := .T.,;
-                                                         o:Destroy(), 0 }
+                       :OnWMKillFocus := {|o,cText| cText := IIF( o:Cargo == NIL, 0, o:Cargo ),;
+                                                    IIF( ::__xCtrlName == "ObjManager", oSelf:SetValue( cText ), ),;
+                                                    o:Application:AccelEnabled := .T.,;
+                                                    o:Destroy(), 0 }
 
                        :Create()
                        :SetFocus()
@@ -1780,12 +1778,11 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Create()
 
                        :OnDTNDateTimeChange := {|o, d| d := o:Date,;
-                                                     o:Parent:SetValue( d, o ) }
+                                                       oSelf:SetValue( d, o ) }
 
-                       :Action := {|o, d, oPar| d := o:Date,;
-                                                     oPar := o:Parent,;
-                                                     o:Parent:SetValue( d, o ),;
-                                                     o:Destroy() }
+                       :Action := {|o, d| d := o:Date,;
+                                          oSelf:SetValue( d, o ),;
+                                          o:Destroy() }
                        :Date := ::GetEditBuffer( oItem, nCol )
                        :SetFocus()
                        :PostMessage( WM_LBUTTONDOWN, 1, MAKELPARAM( :Width - 10, :Height / 2 ) )
@@ -1806,7 +1803,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Action := {|o, c, oPar| c := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( c ) }
+                       :Action := {|o, c| c := o:GetSelString(), o:Destroy(), oSelf:SetValue( c ) }
                        :Create()
 
                        FOR n := 1 TO LEN( ::ActiveObject:MaskTypes )
@@ -1834,9 +1831,10 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Border := 0
                        :Cargo  := oItem:Owner:Caption
                        :Owner  := ::ActiveObject
+
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Action := {|o, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetValue( cSel ) }
+                       :Action := {|o, cSel| cSel := o:GetSelString(), o:Destroy(), oSelf:SetValue( cSel ) }
                        :Create()
 
                        cFont := :Cargo
@@ -1861,8 +1859,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-
-                       :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue(n) }
+                       :Action        := {|o, n| n := o:GetCurSel()-1, o:Destroy(), oSelf:SetValue(n) }
                        :Create()
 
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value )
@@ -1904,61 +1901,51 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        ENDIF
                        :Action := oItem:ColItems[nCol-1]:Action
                        IF cType == "OLEVERB"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:OleVerb, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:OleVerb, n+1 )  ) }
 
                         ELSEIF cType == "SYSFOLDERS"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:Folders, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:Folders, n+1 )  ) }
 
                         ELSEIF cType == "ADSDATADRIVERS"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:AdsDataDrivers, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:AdsDataDrivers, n+1 )  ) }
 
                         ELSEIF cType == "DATADRIVERS"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:DataDrivers, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:DataDrivers, n+1 )  ) }
 
                         ELSEIF cType == "LVGALIGNMENT"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:ListViewGroupAlign, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:ListViewGroupAlign, n+1 )  ) }
                         ELSEIF cType == "DTSFORMATS"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:DateTimeFormat, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:DateTimeFormat, n+1 )  ) }
                         ELSEIF cType == "TEXTALIGNMENT"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:TextAlignment, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:TextAlignment, n+1 )  ) }
                         ELSEIF cType == "CBDROPDOWN"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:DropDownStyle, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:DropDownStyle, n+1 )  ) }
                         ELSEIF cType == "ANIMATIONSTYLE"
-                          :Action := {|o, n, oPar| n    := o:GetCurSel()-1,;
-                                                   oPar := o:Parent,;
+                          :Action := {|o, n| n    := o:GetCurSel()-1,;
                                                    o:Destroy(),;
-                                                   oPar:SetValue( HGetValueAt( ::System:WindowAnimation, n+1 )  ) }
+                                                   oSelf:SetValue( HGetValueAt( ::System:WindowAnimation, n+1 )  ) }
                         ELSEIF cType == "SERVICES"
-                          :Action := {|o, oPar, cSel| cSel := o:GetSelString(),;
-                                                      oPar := o:Parent,;
-                                                      o:Destroy(),;
-                                                      oPar:SetValue( cSel ) }
+                          :Action := {|o, cSel| cSel := o:GetSelString(),;
+                                                        o:Destroy(),;
+                                                        oSelf:SetValue( cSel ) }
                         ELSE
-                          :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
+                          :Action := {|o, n| n := o:GetCurSel()-1, o:Destroy(), oSelf:SetValue( n + IIF( cType == "PAGE_POSITIONS" .OR. cType == "STATES" .OR. cType == "IMAGEINDEX", 0, 1 ) ) }
                        ENDIF
                        :Create()
 
@@ -2030,7 +2017,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Height := 200
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                       :Action := {|o, n, oPar| n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1 ) }
+                       :Action := {|o, n| n := o:GetCurSel()-1, o:Destroy(), oSelf:SetValue( n + 1 ) }
                        :Create()
                        :AddItem( "" )
                        FOR n := 1 TO LEN( oItem:ColItems[nCol-1]:Value[2] )
@@ -2061,7 +2048,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
 
                        :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                        :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ), NIL }
-                       :Action := {|o, n, oPar, c| c := o:GetSelString(), n := o:GetCurSel()-1, oPar := o:Parent, o:Destroy(), oPar:SetValue( n + 1, c ) }
+                       :Action := {|o, n, c| c := o:GetSelString(), n := o:GetCurSel()-1, o:Destroy(), oSelf:SetValue( n + 1, c ) }
                        :Create()
 
                        :AddItem( "" )
@@ -2107,9 +2094,8 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                                                        ::Application:Project:Modified := .T.}
                           ENDIF
                         ELSE
-                          :Action := {|o,oParent| oParent := o:Parent,;
-                                          StructEditor( o:Parent:ActiveObject ),;
-                                          oParent:ResetProperties(,,.T.),;
+                          :Action := {|o| StructEditor( oSelf:ActiveObject ),;
+                                          oSelf:ResetProperties(,,.T.),;
                                           o:Destroy(),;
                                           ::Application:Project:Modified := .T.}
                        ENDIF
@@ -2223,10 +2209,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :Cargo   := :Caption
 
                        IF !( oItem:Caption == "IncludePath"  .OR. oItem:Caption == "SourcePath" )
-                          :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
-                                                            oPar  := o:Parent,;
-                                                            IIF( ::__xCtrlName == "ObjManager", oPar:SetValue( cText ), ),;
-                                                            o:Destroy(), 0 }
+                          :OnWMKillFocus := {|o,cText| cText := o:Caption,;
+                                                       IIF( ::__xCtrlName == "ObjManager", oSelf:SetValue( cText ), ),;
+                                                       o:Destroy(), 0 }
                        ENDIF
                        :OnWMKeyDown   := {|o,n| CheckKeyDown(o,n)}
 
@@ -2251,10 +2236,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                        :AutoHScroll := .T.
                        :Border      := 0
                        :Cargo       := :Caption
-                       :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
-                                                                        oPar  := o:Parent,;
-                                                                        IIF( ::__xCtrlName == "ObjManager", oPar:SetValue( VAL( cText ) ), ),;
-                                                                        o:Destroy(), 0 }
+                       :OnWMKillFocus := {|o,cText| cText := o:Caption,;
+                                                    IIF( ::__xCtrlName == "ObjManager", oSelf:SetValue( VAL( cText ) ), ),;
+                                                    o:Destroy(), 0 }
 
                        :OnWMKeyDown  := {|o,n| CheckChar( o, n, oItem )}
                        :OnWMChar     := {|o,n| CheckChar( o, n, oItem )}

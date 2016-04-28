@@ -391,6 +391,8 @@ CLASS Window INHERIT Object
 
    METHOD Create()
 
+   METHOD UpdateScrollArea()
+
    METHOD __Register()
    METHOD __ControlProc()
    METHOD __CreateMDI()
@@ -459,7 +461,7 @@ CLASS Window INHERIT Object
    METHOD GetStyle(n)             INLINE IIF( ::IsWindow(), ( ::GetWindowLong( GWL_STYLE ) & n ) == n, ::Style & n == n )
    METHOD SetExStyle()
 
-   METHOD SetRedraw(lRed)         INLINE SendMessage( ::hWnd, WM_SETREDRAW,IIF(lRed,1,0),0)
+   METHOD SetRedraw(lRed)         INLINE SendMessage( ::hWnd, WM_SETREDRAW, lRed )
    METHOD IsWindowEnabled()       INLINE IsWindowEnabled( ::hWnd )
    METHOD SetBackColor()
    METHOD SetForeColor()
@@ -1991,10 +1993,12 @@ METHOD OnNCDestroy() CLASS Window
 
    IF ::BkBrush != NIL
       DeleteObject( ::BkBrush )
+      ::BkBrush := NIL
    ENDIF
 
    IF ::SelBkBrush != NIL
       DeleteObject( ::SelBkBrush )
+      ::SelBkBrush := NIL
    ENDIF
 
    IF ::DesignMode
@@ -3255,7 +3259,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          oBottom := EVAL( oBottom, Self )
       ENDIF
 
-      IF oLeft != NIL .AND. oLeft:AutoDock .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. oLeft:Style & WS_VISIBLE == 0 )
+      IF ISOBJECT( oLeft ) .AND. oLeft:AutoDock .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. oLeft:Style & WS_VISIBLE == 0 )
          WHILE oLeft != NIL .AND. oLeft:Parent != NIL .AND. oLeft != NIL .AND. oLeft:hWnd != ::Parent:hWnd .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. !oLeft:IsWindow() .OR. oLeft:Style & WS_VISIBLE == 0 ) //.AND. oLeft:IsWindow()
             IF oLeft:Dock != NIL
                oLeft := oLeft:Dock:Left
@@ -3270,7 +3274,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDDO
       ENDIF
 
-      IF oTop != NIL  .AND. oTop:AutoDock .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. oTop:Style & WS_VISIBLE == 0 )
+      IF ISOBJECT( oTop ) .AND. oTop:AutoDock .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. oTop:Style & WS_VISIBLE == 0 )
          WHILE oTop != NIL .AND. oTop:Parent != NIL .AND. oTop != NIL .AND. oTop:hWnd != ::Parent:hWnd .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. !oTop:IsWindow() .OR. oTop:Style & WS_VISIBLE == 0 ) //.AND. oTop:IsWindow()
             IF oTop:Dock != NIL
                oTop := oTop:Dock:Top
@@ -3285,7 +3289,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDDO
       ENDIF
 
-      IF oRight != NIL .AND. oRight:AutoDock .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. oRight:Style & WS_VISIBLE == 0 )
+      IF ISOBJECT( oRight ) .AND. oRight:AutoDock .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. oRight:Style & WS_VISIBLE == 0 )
          WHILE oRight != NIL .AND. oRight:Parent != NIL .AND. oRight != NIL .AND. oRight:hWnd != ::Parent:hWnd .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. !oRight:IsWindow() .OR. oRight:Style & WS_VISIBLE == 0 )//.AND. oRight:IsWindow()
             IF oRight:Dock != NIL
                oRight := oRight:Dock:Right
@@ -3300,7 +3304,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDDO
       ENDIF
 
-      IF oBottom != NIL .AND. oBottom:AutoDock .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. oBottom:Style & WS_VISIBLE == 0 )
+      IF ISOBJECT( oBottom ) .AND. oBottom:AutoDock .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. oBottom:Style & WS_VISIBLE == 0 )
          WHILE oBottom != NIL .AND. oBottom:Parent != NIL .AND. oBottom != NIL .AND. oBottom:hWnd != ::Parent:hWnd .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. !oBottom:IsWindow() .OR. oBottom:Style & WS_VISIBLE == 0 ) //.AND. oBottom:IsWindow()
             IF oBottom:Dock != NIL
                oBottom := oBottom:Dock:Bottom
@@ -3346,7 +3350,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       ENDIF
 
       // override Left
-      IF oLeft != NIL
+      IF ISOBJECT( oLeft )
          IF oLeft:hWnd == ::Parent:hWnd
             ::xLeft := ::Dock:LeftMargin
           ELSEIF oLeft:IsChild
@@ -3362,7 +3366,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
       ENDIF
 
       // override top
-      IF oTop != NIL
+      IF ISOBJECT( oTop )
          IF oTop:hWnd == ::Parent:hWnd
             ::xTop  := ::Dock:TopMargin
           ELSEIF oTop:IsChild
@@ -3380,7 +3384,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDIF
       ENDIF
 
-      IF oRight != NIL
+      IF ISOBJECT( oRight )
          // Right Docking
          IF oLeft == NIL .AND. !::__Splitting // move to the right
             IF oRight:hWnd == ::Parent:hWnd
@@ -3411,7 +3415,7 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ::xWidth  := Int( ( ::Parent:ClientWidth  ) * ::Dock:__nWidthPerc )
       ENDIF
 
-      IF oBottom != NIL
+      IF ISOBJECT( oBottom )
          // Bottom Docking
          IF oTop == NIL
             IF oBottom:hWnd == ::Parent:hWnd
@@ -3545,7 +3549,7 @@ RETURN Self
 METHOD MessageWait( cText, cTitle, lProgress, cCancel, lMarquee ) CLASS Window
    LOCAL oWnd
    DEFAULT lProgress TO .F.
-   oWnd := MessageWait( cText, cTitle, lProgress, cCancel, lMarquee )
+   oWnd := MessageWait( cText, cTitle, lProgress, cCancel, lMarquee, ::hWnd )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------
@@ -3615,9 +3619,46 @@ METHOD OnVScroll( nSBCode, nPos ) CLASS Window
 
 RETURN 0
 
+//----------------------------------------------------------------------------------------------------
+METHOD UpdateScrollArea( nWidth, nHeight ) CLASS Window
+   LOCAL x, y, oSelf := IIF( ::__oDlg != NIL, ::__oDlg, Self )
+   IF oSelf:HorzScroll
+      WITH OBJECT oSelf
+         IF nWidth != NIL
+            x := nWidth
+         ENDIF
+         x := 0
+         y := 0
+         AEVAL( ::Children, {|o| IIF( GetParent(o:hWnd)==oSelf:hWnd, ( x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) ),) } )
+         :OriginalRect[3] := x
+         :HorzScrollPos := 0
+      END
+   ENDIF
+   IF oSelf:VertScroll
+      WITH OBJECT oSelf
+         IF nHeight != NIL
+            y := nHeight
+         ENDIF
+         IF y == NIL
+            y := 0
+            AEVAL( ::Children, {|o| IIF( GetParent(o:hWnd)==oSelf:hWnd, y := Max(y,o:Top+o:Height),) } )
+         ENDIF
+         :OriginalRect[4] := y
+         :VertScrollPos := 0
+      END
+   ENDIF
+   IF oSelf:VertScroll
+      oSelf:__SetScrollBars()
+   ENDIF
+   IF oSelf:HorzScroll
+      oSelf:__SetScrollBars()
+   ENDIF
+   IF ::__oDlg != NIL
+      ::__oDlg:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+   ENDIF
+RETURN NIL
 
 //----------------------------------------------------------------------------------------------------
-
 METHOD OnHScroll( nSBCode, nPos ) CLASS Window
 
    LOCAL nDelta
@@ -4456,6 +4497,7 @@ CLASS WinForm INHERIT Window
    METHOD __CreateProperty()
    METHOD RegisterDocking()                 INLINE NIL
    METHOD Hide()
+   METHOD SetForeground()                   INLINE SetForegroundWindow( ::hWnd )
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -5366,11 +5408,13 @@ FUNCTION GetDesktopRect()
 RETURN aDesktopRect
 
 FUNCTION __ChkComponent( oObj, cComp, lClear )
-   LOCAL oForm
+   LOCAL oForm, n
    DEFAULT lClear TO .T.
    IF VALTYPE( cComp ) == "C"
       oForm := oObj:Form
+
       IF oForm:__hObjects != NIL
+
          IF HGetPos( oForm:__hObjects, cComp ) > 0
             IF oForm:__hObjects[ cComp ] != NIL
                cComp := oForm:__hObjects[ cComp ]
@@ -5387,12 +5431,36 @@ FUNCTION __ChkComponent( oObj, cComp, lClear )
                ENDIF
             ENDIF
          ENDIF
+
+      ENDIF
+
+      IF VALTYPE( cComp ) == "C"
+         IF ( n := Ascan( oForm:Components, {|o| o:Name != NIL .AND. lower(o:Name) == lower(cComp) } ) ) > 0
+            cComp := oForm:Components[n]
+         ENDIF
+      ENDIF
+      IF VALTYPE( cComp ) == "C"
+         IF ( n := Ascan( oObj:Parent:Children, {|o| o:Name != NIL .AND. lower(o:Name) == lower(cComp) } ) ) > 0
+            cComp := oObj:Parent:Children[n]
+         ENDIF
       ENDIF
    ENDIF
    IF lClear .AND. VALTYPE( cComp ) != "O" .AND. ! oObj:DesignMode
       cComp := NIL
    ENDIF
 RETURN cComp
+
+FUNCTION TraceDbg( ... )
+   LOCAL cStr, nLevel := SET( _SET_TRACESTACK ), xParam
+   IF nLevel > 0
+      cStr := '[ '  + ProcName( 1 ) + ' ] (' + Str( Procline(1), 5 ) + ')'
+      hb_outDebug( cStr )
+   ENDIF
+   FOR EACH xParam IN HB_aParams()
+      cStr :=  '>>>' + CStr( xParam ) + '<<<'
+      hb_outDebug( cStr )
+   NEXT
+RETURN .T.
 
 FUNCTION KeyCountRaw( xOrder, cBag )
 RETURN dbOrderInfo( DBOI_KEYCOUNTRAW, cBag, xOrder )

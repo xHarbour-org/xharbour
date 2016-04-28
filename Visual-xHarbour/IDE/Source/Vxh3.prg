@@ -25,7 +25,6 @@
 
 #define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
-#define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 
@@ -431,7 +430,14 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
 
                 AADD( aActions, { DG_ADDCONTROL, n, nLeft, nTop, .F., ::CurForm:CtrlParent, aCtrl[1],, aCtrl[4], aCtrl[5], {}, } )
             NEXT
-            ::Application:Project:SetAction( aActions, ::Application:Project:aUndo )
+
+            ::Application:Project:SetAction( aActions )
+
+            AEVAL( aActions, {|aCtrl| aCtrl[6] := NIL } )
+            aActions := NIL
+
+            hb_gcAll()
+
             ::Application:Project:PasteOn := .F.
             // ---------------------------------------------------------------------------------------------
 
@@ -454,6 +460,8 @@ METHOD OnLButtonUp( n, x, y ) CLASS ControlMask
          y := aPt[2]
 
          ::Application:Project:SetAction( { { DG_ADDCONTROL, n, x, y, .T., ::CurForm:CtrlParent, ::Application:CurCursor,,,1, {}, } }, ::Application:Project:aUndo )
+         //::CurForm:AddControl( ::CurForm:CtrlParent, ::Application:CurCursor, x, y, , n )
+
          ::CurForm:CtrlParent := NIL
       ENDIF
     ELSE

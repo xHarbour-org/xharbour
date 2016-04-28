@@ -34,6 +34,20 @@ static s_cVersion, s_cCopyright
 #define MXML_STYLE_THREESPACES   4
 
 
+#define EMULATION_IE_07             0x1B58
+#define EMULATION_IE_08_STD         0x22B8
+#define EMULATION_IE_08             0x1F40
+
+#define EMULATION_IE_09_STD         0x270F
+#define EMULATION_IE_09             0x2328
+
+#define EMULATION_IE_10_STD         0x2711
+#define EMULATION_IE_10             0x02710
+
+#define EMULATION_IE_11_EDG         0x2AF9
+#define EMULATION_IE_11             0x2AF8
+
+
 #define XFM_EOL Chr(13) + Chr(10)
 #define HKEY_LOCAL_MACHINE      0x80000002
 #define HKEY_CURRENT_USER       0x80000001
@@ -48,9 +62,7 @@ static s_cVersion, s_cCopyright
 #define MCS_DRAGGING 12
 
 #define DG_ADDCONTROL      1
-#define DG_DELCONTROL      2
 #define DG_PROPERTYCHANGED 3
-#define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 #define DG_ALIGNSELECTION  7
@@ -87,7 +99,7 @@ INIT PROCEDURE __VXH_Start
                aRect := NIL
             ENDIF
          ENDIF
-         Splash( GetModuleHandle( "vxh.exe" ), "SPLASH", "BMP",,  )
+         Splash( GetModuleHandle( "vxh.exe" ), "SPLASH", "BMP",,, RGB( 255,255,255 ), RGB( 80,80,80 )  )
       ENDIF
       oReg:Close()
    ENDIF
@@ -388,13 +400,12 @@ METHOD OnNavigateError( Sender /*, pDisp, URL, Frame, StatusCode, Cancel*/ ) CLA
                     '</html>' + CRLF
    Sender:Navigate( "About:blank" )
    Sender:Document:Write( cBuffer )
-   view "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 RETURN NIL
 
-METHOD OnDocumentComplete( Sender ) CLASS IDE_MainForm
+METHOD OnDocumentComplete( /*Sender*/ ) CLASS IDE_MainForm
 //   Sender:Document:Body:scroll := "no"
 //   Sender:Document:Body:Style:Overflow := "hidden"
-   Sender:Navigate("javascript:window.scroll(0,13);")
+//   Sender:Navigate("javascript:window.scroll(0,13);")
 RETURN NIL
 
 
@@ -2257,7 +2268,7 @@ METHOD Init( oParent ) CLASS StartTabPage
       :Dock:Bottom     := Self
       :Dock:Right      := Self
       :Url             := __NEWS_URL__
-      :BrowserEmulation:= 0x2AF8
+      :BrowserEmulation:= EMULATION_IE_10
 
       :EventHandler[ "NavigateError" ] := "OnNavigateError"
       :EventHandler[ "DocumentComplete" ] := "OnDocumentComplete"
@@ -2511,7 +2522,7 @@ METHOD AddControl( cCtrl, oParent ) CLASS Project
 RETURN oCtrl
 
 METHOD DelControl( oCtrl ) CLASS Project
-   LOCAL aAction, x, aDel, nLen, oSelect, nLeft, nTop
+   LOCAL aDel, oSelect
    IF VALTYPE( oCtrl ) == "A"
       aDel := oCtrl
     ELSE
@@ -2534,18 +2545,8 @@ METHOD DelControl( oCtrl ) CLASS Project
    ::Modified := .T.
    ::CurrentForm:__lModified := .T.
 
-   aAction := {}
-   nLen := LEN( aDel )
+   ::CurrentForm:DeleteControls( aDel )
 
-   FOR x := 1 TO LEN( aDel )
-       nLeft := nTop := NIL
-       IF __objHasMsg( aDel[x][1], "Left" )
-          nLeft   := aDel[x][1]:Left
-          nTop    := aDel[x][1]:Top
-       ENDIF
-       AADD( aAction, { DG_DELCONTROL, NIL, nLeft, nTop, .F., IIF( aDel[x][1]:__xCtrlName == "Splitter" .OR. __clsParent( aDel[x][1]:ClassH, "COMPONENT" ), aDel[x][1]:Owner, aDel[x][1]:Parent), aDel[x][1]:__xCtrlName, aDel[x][1], , nLen,, } )
-   NEXT
-   ::SetAction( aAction, ::aUndo )
    ::CurrentForm:SelectControl( oSelect )
 RETURN .T.
 
@@ -2690,264 +2691,114 @@ RETURN Self
 
 METHOD AlignRights() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Left := oCtrl:Left + ( oCtrl:Width - ::CurrentForm:Selected[n][1]:Width )
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD AlignLefts() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Left := oCtrl:Left
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD AlignMiddles() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Top := oCtrl:Top + ( ( oCtrl:Height - ::CurrentForm:Selected[n][1]:Height ) / 2 )
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD AlignCenters() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Left := oCtrl:Left + ( ( oCtrl:Width - ::CurrentForm:Selected[n][1]:Width ) / 2 )
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD AlignTops() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Top := oCtrl:Top
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD AlignBottom() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Top := oCtrl:Top + ( oCtrl:Height - ::CurrentForm:Selected[n][1]:Height )
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD SameWidth() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Width := oCtrl:Width
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD SameHeight() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Height := oCtrl:Height
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD SameSize() CLASS Project
    LOCAL n, oCtrl := ::CurrentForm:Selected[1][1]
-   LOCAL aRect := {}, aControls := {}
-
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 2 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Width  := oCtrl:Width
        ::CurrentForm:Selected[n][1]:Height := oCtrl:Height
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD CenterHorizontally() CLASS Project
-   LOCAL x, n, aRect, nDiff, aCurRect := {}, aControls := {}
-   aRect := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
-   x := aRect[1]
+   LOCAL x, n, aRect, nDiff
+
+   aRect    := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
+   x        := aRect[1]
    aRect[1] := ( ::CurrentForm:Selected[1][1]:Parent:ClientWidth / 2 ) - ( ( aRect[3]-aRect[1] ) / 2 )
    nDiff := Int( aRect[1]-x )
 
-   ::CurrentForm:__PrevSelRect := {}
-
    FOR n := 1 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
-       ::CurrentForm:Selected[n][1]:Left += nDiff
+       ::CurrentForm:Selected[n][1]:Top += nDiff
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 METHOD CenterVertically() CLASS Project
-   LOCAL x, n, aRect, nDiff, aCurRect := {}, aControls := {}, nTop
+   LOCAL n, x, aRect, nDiff
 
-   aRect := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
-   x := aRect[2]
-   nTop := aRect[4]-aRect[2]
+   aRect    := ::CurrentForm:GetSelRect(.T.,.F.,.F.)
+   x        := aRect[2]
    aRect[2] := ( ::CurrentForm:Selected[1][1]:Parent:ClientHeight / 2 ) - ( ( aRect[4]-aRect[2] ) / 2 )
-   nDiff := Int( aRect[2]-x )
-
-   ::CurrentForm:__PrevSelRect := {}
+   nDiff    := Int( aRect[2]-x )
 
    FOR n := 1 TO LEN( ::CurrentForm:Selected )
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( ::CurrentForm:__PrevSelRect, { :Left, :Top, :Width, :Height } )
-       END
        ::CurrentForm:Selected[n][1]:Top += nDiff
        ::CurrentForm:Selected[n][1]:MoveWindow()
-       WITH OBJECT ::CurrentForm:Selected[n][1]
-          AADD( aRect, { :Left, :Top, :Width, :Height } )
-       END
-       AADD( aControls, ::CurrentForm:Selected[n][1] )
    NEXT
-   ::CurrentForm:UpdateSelection()
-   AADD( ::aUndo, { DG_MOVESELECTION, aControls, ::CurrentForm:__PrevSelRect, aRect, 1, } )
-   ::Application:Props[ "EditUndoItem" ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem" ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+   ::CurrentForm:MoveControls( 1 )
 RETURN Self
 
 
@@ -3064,28 +2915,6 @@ METHOD ParseRC( cLine, aUnits ) CLASS Project
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
-
-METHOD EditCopy() CLASS Project
-   LOCAL aSelection, oCtrl, aCtrlProps
-   IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
-      SendMessage( GetFocus(), WM_COPY, 0, 0 )
-      RETURN NIL
-   ENDIF
-   IF ::Application:DesignPage:IsWindowVisible()
-      ::CopyBuffer := {}
-      FOR EACH aSelection IN ::CurrentForm:Selected
-          IF aSelection[1]:__lAllowCopy
-             oCtrl      := aSelection[1]
-             aCtrlProps := GetCtrlProps( oCtrl, { "LEFT", "TOP", "NAME", "ANCHOR", "DOCK" } )
-             AADD( ::CopyBuffer, { oCtrl:__xCtrlName, oCtrl:Left, oCtrl:Top, aCtrlProps, LEN( ::CurrentForm:Selected ), 0 } )
-          ENDIF
-      NEXT
-      ::EditReset(1)
-    ELSEIF ::Application:SourceEditor:IsWindowVisible()
-      ::Application:SourceEditor:Source:Copy()
-   ENDIF
-RETURN 0
-
 STATIC FUNCTION GetCtrlProps( oCtrl, aExclude )
    LOCAL aProps, aProperties, cProp, xValue1, xValue2, aProperty, aSub
 
@@ -3143,6 +2972,30 @@ FUNCTION SetCtrlProps( oObj, aProperties )
    ENDIF
 RETURN NIL
 
+METHOD EditCopy() CLASS Project
+   LOCAL aSelection, oCtrl, aCtrlProps
+
+   IF UPPER( GetClassName( GetFocus() ) ) == "EDIT"
+      SendMessage( GetFocus(), WM_COPY, 0, 0 )
+      RETURN NIL
+   ENDIF
+
+   IF ::Application:MainTab:CurSel == 3
+      ::Application:SourceEditor:Source:Copy()
+
+   ELSEIF ::Application:MainTab:CurSel == 4
+      ::CopyBuffer := {}
+      FOR EACH aSelection IN ::CurrentForm:Selected
+          IF aSelection[1]:__lAllowCopy
+             oCtrl      := aSelection[1]
+             aCtrlProps := GetCtrlProps( oCtrl, { "LEFT", "TOP", "NAME", "ANCHOR", "DOCK" } )
+             AADD( ::CopyBuffer, { oCtrl:__xCtrlName, oCtrl:Left, oCtrl:Top, aCtrlProps, LEN( ::CurrentForm:Selected ), 0 } )
+          ENDIF
+      NEXT
+      ::EditReset(1)
+   ENDIF
+RETURN 0
+
 METHOD EditCut() CLASS Project
    LOCAL aSelection, oCtrl, aCtrlProps
 
@@ -3150,32 +3003,30 @@ METHOD EditCut() CLASS Project
       SendMessage( GetFocus(), WM_CUT, 0, 0 )
       RETURN 0
    ENDIF
-   IF ::Application:DesignPage:IsWindowVisible()
-      ::CopyBuffer := {}
-      FOR EACH aSelection IN ::CurrentForm:Selected
-          IF aSelection[1]:__lAllowCopy
 
-             oCtrl       := aSelection[1]
-             aCtrlProps := GetCtrlProps( oCtrl )
-
-             AADD( ::CopyBuffer, { oCtrl:__xCtrlName, oCtrl:Left, oCtrl:Top, aCtrlProps, LEN( ::CurrentForm:Selected ), 1 } )
-             ::SetAction( { { DG_DELCONTROL, NIL, aSelection[1]:Left,;
-                                                  aSelection[1]:Top,;
-                                                  ::CurrentForm,;
-                                                  aSelection[1]:Parent,;
-                                                  aSelection[1]:__xCtrlName,;
-                                                  aSelection[1],,;
-                                                  ::CopyBuffer[-1][5],,, } }, ::aUndo )
-          ENDIF
-      NEXT
-
-      ::EditReset(1)
-    ELSEIF ::Application:SourceEditor:IsWindowVisible()
+   IF ::Application:MainTab:CurSel == 3
       ::Application:SourceEditor:Source:Cut()
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
       ::SetEditMenuItems()
+
+   ELSEIF ::Application:MainTab:CurSel == 4
+      ::CopyBuffer := {}
+      FOR EACH aSelection IN ::CurrentForm:Selected
+          IF aSelection[1]:__lAllowCopy
+             oCtrl      := aSelection[1]
+             aCtrlProps := GetCtrlProps( oCtrl, { "LEFT", "TOP", "NAME", "ANCHOR", "DOCK" } )
+             AADD( ::CopyBuffer, { oCtrl:__xCtrlName, oCtrl:Left, oCtrl:Top, aCtrlProps, LEN( ::CurrentForm:Selected ), 0 } )
+          ENDIF
+      NEXT
+
+      ::Modified := .T.
+      ::CurrentForm:__lModified := .T.
+      ::CurrentForm:DeleteControls()
+      ::CurrentForm:SelectControl( ::CurrentForm )
+
+      ::EditReset(1)
    ENDIF
 RETURN 0
 
@@ -3184,20 +3035,22 @@ METHOD EditPaste() CLASS Project
       SendMessage( GetFocus(), WM_PASTE, 0, 0 )
       RETURN 0
    ENDIF
-   IF ::Application:DesignPage:IsWindowVisible()
-      IF !EMPTY( ::CopyBuffer )
-         IF !::PasteOn
-            ::PasteOn := .T.
-            ::CurrentForm:CtrlMask:SetMouseShape( MCS_PASTE )
-         ENDIF
-      ENDIF
-      ::EditReset(1)
-    ELSEIF ::Application:SourceEditor:IsWindowVisible()
+
+   IF ::Application:MainTab:CurSel == 3
       ::Application:SourceEditor:Source:Paste()
       ::Application:SourceEditor:Source:Modified := .T.
 
       ::Modified := .T.
       ::SetEditMenuItems()
+
+   ELSEIF ::Application:MainTab:CurSel == 4
+      IF ::Application:DesignPage:IsWindowVisible()
+         IF !EMPTY( ::CopyBuffer ) .AND. !::PasteOn
+            ::PasteOn := .T.
+            ::CurrentForm:CtrlMask:SetMouseShape( MCS_PASTE )
+         ENDIF
+         ::EditReset(1)
+      ENDIF
    ENDIF
 RETURN 0
 
@@ -3223,10 +3076,7 @@ METHOD Undo() CLASS Project
       SendMessage( GetFocus(), WM_UNDO, 0, 0 )
       RETURN 0
    ENDIF
-
-   IF ::Application:DesignPage:IsWindowVisible()
-      ::SetAction( ::aUndo, ::aRedo )
-    ELSEIF ::Application:SourceEditor:IsWindowVisible()
+   IF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:Source:Undo()
    ENDIF
 RETURN NIL
@@ -3236,9 +3086,7 @@ METHOD ReDo() CLASS Project
       SendMessage( GetFocus(), WM_UNDO, 0, 0 )
       RETURN 0
    ENDIF
-   IF ::Application:DesignPage:IsWindowVisible()
-      ::SetAction( ::aRedo, ::aUnDo )
-    ELSEIF ::Application:SourceEditor:IsWindowVisible()
+   IF ::Application:SourceEditor:IsWindowVisible()
       ::Application:SourceEditor:Source:Redo()
    ENDIF
 RETURN NIL
@@ -3796,13 +3644,6 @@ METHOD Open( cProject ) CLASS Project
       ::Application:ResultPanel:Visible := ::Application:Props[ "ViewResultPanelItem" ]:Checked := .F.
    ENDIF
 
-   IF ! ::Application:ToolBox:Visible
-      ::Application:ToolBox:Visible := .T.
-      ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
-      ::Application:Props[ "StartTabPage" ]:DockControls()
-      ::Application:DoEvents()
-   ENDIF
-
    DEFAULT cProject TO ""
    oProject := CFile( cProject )
 
@@ -3880,6 +3721,7 @@ METHOD Open( cProject ) CLASS Project
    oWait:Position := 20
 
    ::OpenDesigner()
+
    ::Application:FileExplorer:InitProject()
 
    ::Application:ToolBox:Enabled := .T.
@@ -3971,13 +3813,26 @@ METHOD Open( cProject ) CLASS Project
       RETURN ::Close(.F.)
    ENDIF
 
+   IF LEN( ::Forms ) > 0
+      ::CurrentForm := ::Forms[1]
+      IF ::CurrentForm != NIL
+         ::Application:DesignPage:Select()
+      ENDIF
+   ENDIF
+
+   IF ! ::Application:ToolBox:Visible
+      ::Application:ToolBox:Visible := .T.
+      ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
+      ::Application:Props[ "StartTabPage" ]:DockControls()
+      ::Application:DoEvents()
+   ENDIF
+
    // Initialize everything !!!!!
    IF LEN( ::Forms ) > 0
       ::CurrentForm := ::Forms[1]
 
       ::SelectBuffer(.F.)
       IF ::CurrentForm != NIL
-         ::Application:DesignPage:Select()
 
          oWait:Position := 90
 
@@ -6119,215 +5974,57 @@ METHOD GenerateForm( oWnd, cPrefix, cClsName, nID, aChildEvents, nInsMetPos, lCu
 RETURN cText
 
 //-------------------------------------------------------------------------------------------------------
-METHOD SetAction( aActions, aReverse ) CLASS Project
-   LOCAL x, n, o, nPos, aChildren, aAction, oCtrl, aCtrlProps, nWidth, nHeight
+METHOD SetAction( aActions ) CLASS Project
+   LOCAL x, o, nPos, aAction, oCtrl, nWidth, nHeight
 
-   aAction := ACLONE( aActions[ -1 ] )
    ::Modified := .T.
    IF ::CurrentForm != NIL
       ::CurrentForm:__lModified := .T.
    ENDIF
 
-   IF EMPTY( aAction )
-      RETURN Self
-   ENDIF
-   SWITCH aAction[1]
+   FOR EACH aAction IN aActions
+       SWITCH aAction[1]
 
-      CASE DG_ADDCONTROL
-           FOR n := 1 TO aAction[10]
-               nWidth  := NIL
-               nHeight := NIL
+         CASE DG_ADDCONTROL
+              nWidth  := NIL
+              nHeight := NIL
 
-               IF aAction[9] != NIL
-                  IF ( nPos := ASCAN( aAction[9], {|a|a[1]=="WIDTH"} ) ) > 0
-                     nWidth := aAction[9][nPos][2]
-                  ENDIF
-                  IF ( nPos := ASCAN( aAction[9], {|a|a[1]=="HEIGHT"} ) ) > 0
-                     nHeight := aAction[9][nPos][2]
-                  ENDIF
-               ENDIF
-
-               IF VALTYPE( aAction[7] ) == "C" .AND. aAction[7] == "Splitter" .AND. !EMPTY( aAction[9] )
-                  x := ASCAN( aAction[9], {|a| a[1] == "POSITION"} )
-                  ::Application:DesignPage:CtrlMask:nSplitterPos := aAction[9][x][2]
-               ENDIF
-
-               o := ::Application:ToolBox:SetControl( aAction[7], aAction[2], aAction[3], aAction[4], aAction[6], nWidth, nHeight, aAction[5], @aAction[12], aAction[9], @oCtrl )
-
-               IF o != NIL
-                  ReCreateChildren( o, aAction[11] )
-
-                  IF o:__xCtrlName == "DataGrid"
-                     o:Create()
-                  ENDIF
-
-                  AADD( aReverse, { DG_DELCONTROL, aAction[2], aAction[3], aAction[4], aAction[5], aAction[6], aAction[7], o, , aAction[10], aAction[11], aAction[12]  } )
-               ENDIF
-
-               ADEL( aActions, LEN( aActions ), .T. )
-               aAction := aActions[ -1 ]
-               IF EMPTY( aAction ) .OR. aAction[1] != DG_ADDCONTROL
-                  EXIT
-               ENDIF
-           NEXT
-           ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-           ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
-
-           ::Application:Props[ "ComboSelect" ]:Reset(oCtrl)
-           RETURN Self
-
-      CASE DG_DELCONTROL
-           IF aAction[8]:__CustomOwner
-              ::Application:MainForm:MessageBox( "Cannot delete internal components of a Custom Control. Only individual objects can be deleted", "Custom Control", MB_ICONSTOP )
-              RETURN NIL
-           ENDIF
-           o := aAction[8]:Form
-           FOR n := 1 TO aAction[10]
-               IF aAction[8]:Parent != NIL
-                  FOR EACH oCtrl IN aAction[8]:Parent:Children
-                      TRY
-                         IF oCtrl:Dock:Left == aAction[8]
-                            oCtrl:Dock:Left := NIL
-                         ENDIF
-                       CATCH
-                      END
-                      TRY
-                         IF oCtrl:Dock:Top == aAction[8]
-                            oCtrl:Dock:Top := NIL
-                         ENDIF
-                       CATCH
-                      END
-                      TRY
-                         IF oCtrl:Dock:Right == aAction[8]
-                            oCtrl:Dock:Right := NIL
-                         ENDIF
-                       CATCH
-                      END
-                      TRY
-                         IF oCtrl:Dock:Bottom == aAction[8]
-                            oCtrl:Dock:Bottom := NIL
-                         ENDIF
-                       CATCH
-                      END
-                  NEXT
-               ENDIF
-               oCtrl      := aAction[8]
-               aCtrlProps := GetCtrlProps( oCtrl )
-               aChildren  := CollectChildren( aAction[8] )
-
-               IF VALTYPE( aAction[7] ) == "C" .AND. UPPER( aAction[7] ) == "FORM"
-                  IF ( x := ASCAN( ::Application:Project:Forms, {|o| o:hWnd == aAction[8]:hWnd } ) ) > 0
-                     ::Application:Project:Forms[x]:Editor:Close()
-                     //::Application:Project:Forms[x]:XFMEditor:Close()
-
-                     ADEL( ::Application:Project:Forms, x, .T. )
-                     IF x > LEN( ::Application:Project:Forms )
-                        x--
-                     ENDIF
-                     IF LEN( ::Application:Project:Forms ) >= x
-                        ::Application:Project:SelectWindow( ::Application:Project:Forms[x],, .T. )
-                     ENDIF
-                  ENDIF
-
-               ENDIF
-               TRY
-                  IF aAction[8]:Owner:ClsName == "CoolBarBand"
-                     aAction[8]:Owner:BandChild := NIL
-                  ENDIF
-                catch
-               END
-
-               IF aAction[8]:__xCtrlName == "CustomControl"
-                  IF ( x := ASCAN( ::CustomControls, aAction[8]:Reference,,, .T. ) ) > 0
-                     ADEL( ::CustomControls, x, .T. )
-                  ENDIF
-               ENDIF
-               IF aAction[8]:TreeItem != NIL
-                  aAction[8]:TreeItem:Delete()
-                  aAction[8]:TreeItem := NIL
-               ENDIF
-               aAction[8]:Destroy()
-               TRY
-                  aAction[8]:Owner := NIL
-                catch
-               END
-
-               IF aAction[12] != NIL
-                  aAction[12]:Delete()
-               ENDIF
-
-               AADD( aReverse, { DG_ADDCONTROL, aAction[2], aAction[3], aAction[4], aAction[5], aAction[6], aAction[7],, aCtrlProps, aAction[10], aChildren, } )
-
-
-               ADEL( aActions, LEN( aActions ), .T. )
-               aAction := aActions[ -1 ]
-               IF EMPTY( aAction ) .OR. aAction[1] != DG_DELCONTROL
-                  EXIT
-               ENDIF
-           NEXT
-           ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-           ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
-
-           IF !(o == ::CurrentForm)
-              TRY
-                 o:CtrlMask:Points := NIL
-                 o:CtrlMask:InvalidateRect()
-                 o:CtrlMask:UpdateWindow()
-               CATCH
-                 o := ::CurrentForm
-              END
-           ENDIF
-           ::Application:Props[ "ComboSelect" ]:Reset()
-           ::Application:Project:Modified := .T.
-           hb_gcAll(.t.)
-           RETURN Self
-
-      CASE DG_MOVESELECTION
-           TRY
-              IF aAction[5] == 1
-                 IF aAction[6] != NIL .AND. !(aAction[6]==aAction[2][1]:Parent)
-                    ::CurrentForm:UpdateSelection()
-                    o := aAction[2][1]:Parent
-                    aAction[2][1]:SetParent( aAction[6] )
-                    aAction[6] := o
+              IF aAction[9] != NIL
+                 IF ( nPos := ASCAN( aAction[9], {|a|a[1]=="WIDTH"} ) ) > 0
+                    nWidth := aAction[9][nPos][2]
                  ENDIF
-
-                 FOR n := 1 TO LEN( aAction[2] )
-                     MoveWindow( aAction[2][n]:hWnd, aAction[3][n][1], aAction[3][n][2], aAction[3][n][3], aAction[3][n][4] )
-                 NEXT
+                 IF ( nPos := ASCAN( aAction[9], {|a|a[1]=="HEIGHT"} ) ) > 0
+                    nHeight := aAction[9][nPos][2]
+                 ENDIF
               ENDIF
-              AADD( aReverse, { DG_MOVESELECTION, aAction[2], aAction[4], aAction[3], 1, aAction[6], aAction[2][1]:Parent } )
-           CATCH
-           END
 
-           ADEL( aActions, LEN( aActions ), .T. )
+              IF VALTYPE( aAction[7] ) == "C" .AND. aAction[7] == "Splitter" .AND. !EMPTY( aAction[9] )
+                 x := ASCAN( aAction[9], {|a| a[1] == "POSITION"} )
+                 ::Application:DesignPage:CtrlMask:nSplitterPos := aAction[9][x][2]
+              ENDIF
+              o := ::Application:ToolBox:SetControl( aAction[7], aAction[2], aAction[3], aAction[4], aAction[6], nWidth, nHeight, aAction[5], @aAction[12], aAction[9], @oCtrl )
 
-           ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-           ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+              IF o != NIL
+                 ReCreateChildren( o, aAction[11] )
 
-           ::CurrentForm:UpdateSelection()
+                 IF o:__xCtrlName == "DataGrid"
+                    o:Create()
+                 ENDIF
+              ENDIF
 
-           ::Application:ObjectManager:CheckValue( "Left",   "Position", ::CurrentForm:Selected[1][1]:Left )
-           ::Application:ObjectManager:CheckValue( "Top",    "Position", ::CurrentForm:Selected[1][1]:Top  )
-           ::Application:ObjectManager:CheckValue( "Width",  "Size",     ::CurrentForm:Selected[1][1]:Width )
-           ::Application:ObjectManager:CheckValue( "Height", "Size",     ::CurrentForm:Selected[1][1]:Height )
-           RETURN Self
+              ::Application:Props[ "ComboSelect" ]:Reset(oCtrl)
+              EXIT
 
-      CASE DG_PROPERTYCHANGED
-           ::Application:ObjectManager:SetObjectValue( aAction[2], aAction[3], aAction[4], aAction[5], aAction[6], aAction[7] )
-           ::Application:ObjectManager:InvalidateRect(,.F.)
-           AADD( aReverse, { DG_PROPERTYCHANGED, aAction[2], aAction[6], aAction[4], aAction[5], aAction[3], aAction[7] } )
-           //hb_gcall()
-           EXIT
+         CASE DG_PROPERTYCHANGED
+              ::Application:ObjectManager:SetObjectValue( aAction[2], aAction[3], aAction[4], aAction[5], aAction[6], aAction[7] )
+              ::Application:ObjectManager:InvalidateRect(,.F.)
+              EXIT
 
-      CASE DG_FONTCHANGED
-           ::Application:ObjectManager:SetActiveObjectFont( aAction[2], aAction[3], aAction[4], aAction[5] )
-           AADD( aReverse, { DG_FONTCHANGED, aAction[2], aAction[4], aAction[3], aAction[5] } )
-           EXIT
-   END
-   ADEL( aActions, LEN( aActions ), .T. )
-   ::Application:Props[ "EditUndoItem"  ]:Enabled := ::Application:Props[ "EditUndoBttn" ]:Enabled := LEN( ::aUndo ) > 0
-   ::Application:Props[ "EditRedoItem"  ]:Enabled := ::Application:Props[ "EditRedoBttn" ]:Enabled := LEN( ::aRedo ) > 0
+         CASE DG_FONTCHANGED
+              ::Application:ObjectManager:SetActiveObjectFont( aAction[2], aAction[3], aAction[4], aAction[5] )
+              EXIT
+      END
+   NEXT
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

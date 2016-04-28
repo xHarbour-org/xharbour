@@ -209,9 +209,9 @@ CLASS DataTable INHERIT Component
    METHOD __SetAlias()
    METHOD SetFileName()
    METHOD CreateOrder()
-   ACCESS IsOpen INLINE ::Structure != NIL //Select( ::Area ) > 0
+   ACCESS IsOpen                              INLINE ::Structure != NIL //Select( ::Area ) > 0
    METHOD FromAlias()
-   METHOD Insert() INLINE ::Append()
+   METHOD Insert()                            INLINE ::Append()
    METHOD __SetMemoType( nMemo )              INLINE ::RddInfo( RDDI_MEMOTYPE, nMemo )
 
    METHOD CreateTable()
@@ -255,9 +255,15 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewInstance( lSetCurPos ) CLASS DataTable
-   LOCAL oNewTable := DataTable( ::Owner )
-   oNewTable:Area      := ::Area + 100
-   oNewTable:xAlias    := "New_"+xStr(::Area)
+   LOCAL n, oNewTable := DataTable( ::Owner )
+
+   n := 1
+   WHILE Select( ::Alias+xStr(n) ) > 0
+      n++
+   ENDDO
+
+   oNewTable:Area      := NIL
+   oNewTable:xAlias    := ::Alias+xStr(n)
    oNewTable:xFileName := ::FileName
    oNewTable:Path      := ::Path
    oNewTable:Driver    := ::Driver
@@ -550,6 +556,7 @@ RETURN .F.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open() CLASS DataTable
+   DEFAULT ::Connector TO DataRdd( Self )
    ::Create(.T.)
 RETURN ::lCreated
 
@@ -846,26 +853,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
                RETURN ::Owner
             ENDIF
           ELSE
-            IF ::Owner:DesignMode
-               cFile := ::Owner:Application:Project:AppObject:SetDefault
-               IF EMPTY( cFile )
-                  lDef := .F.
-                  cFile := NIL
-               ENDIF
-               DEFAULT cFile TO ::Owner:Application:Project:Properties:Path + "\" + ::Owner:Application:Project:Properties:Binary
-               cFile += ( "\" + ::Owner:FileName )
-
-               IF !FILE( cFile ) .AND. !lDef
-                  RETURN ::Owner
-               ENDIF
-             ELSE
-               cFile := ::Owner:Application:SetDefault
-               IF EMPTY( cFile )
-                  cFile := NIL
-               ENDIF
-               DEFAULT cFile TO ::Owner:Application:Path
-               cFile += ( "\" + ::Owner:FileName )
-            ENDIF
+            cFile := ::Owner:Path + IIF( ! Empty(::Owner:Path), "\", "" ) + ::Owner:FileName
          ENDIF
       ENDIF
       IF HGetPos( ::Owner:EventHandler, "OnCreate" ) != 0
@@ -877,27 +865,30 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       nAlias := 1
       cAlias := ::Owner:xAlias
-      IF EMPTY( cAlias )
+      IF EMPTY( cAlias ) .AND. ! Empty( cFile )
          cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
          cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
       ENDIF
-      IF cAlias[1] == "&"
-         cAlias := SUBSTR( cAlias, 2 )
-         IF ::Owner:DesignMode
-            TRY
+
+      IF ! EMPTY( cAlias )
+         IF cAlias[1] == "&"
+            cAlias := SUBSTR( cAlias, 2 )
+            IF ::Owner:DesignMode
+               TRY
+                  cAlias := &cAlias
+               CATCH
+               END
+             ELSE
                cAlias := &cAlias
-            CATCH
-            END
-          ELSE
-            cAlias := &cAlias
-         ENDIF
-         ::Owner:xAlias := cAlias
-       ELSE
-         IF Select( cAlias ) > 0
-            WHILE Select( cAlias + XSTR( nAlias ) ) > 0
-               nAlias ++
-            ENDDO
-            ::Owner:xAlias := cAlias + XSTR( nAlias )
+            ENDIF
+            ::Owner:xAlias := cAlias
+          ELSEIF .F.
+            IF Select( cAlias ) > 0
+               WHILE Select( cAlias + XSTR( nAlias ) ) > 0
+                  nAlias ++
+               ENDDO
+               ::Owner:xAlias := cAlias + XSTR( nAlias )
+            ENDIF
          ENDIF
       ENDIF
 
@@ -924,35 +915,8 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       IF ::Owner:Area != NIL
          Select( ::Owner:Area )
       ENDIF
-      TRY
-         dbUseArea( ::Owner:Area == NIL, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
-       CATCH oErr
-         n := NIL
-         IF oErr:GenCode == 21 .AND. oErr:SubCode IN { 6060, 6420 } .AND. ! ::Owner:DesignMode
-            //   6060  Advantage Database Server not started/loaded on specified server
-            //   6420  Unable to "discover" the Advantage Database Server
-            MessageBox(0, "Error " + alltrim(str(oErr:SubCode)) + ": Advantage Server Not Found", "Open Error" )
-         ENDIF
-         IF oErr:GenCode == 18 .OR. oErr:GenCode == 17
 
-            cAlias := ::Owner:xAlias
-            IF EMPTY( cAlias )
-               cAlias := SUBSTR( cFile, RAT("\",cFile)+1 )
-               cAlias := SUBSTR( cAlias, 1, RAT(".",cAlias)-1 )
-            ENDIF
-            nAlias := 1
-            WHILE Select( cAlias + XSTR( nAlias ) ) > 0
-               nAlias ++
-            ENDDO
-            ::Owner:xAlias := cAlias + XSTR( nAlias )
-
-         ENDIF
-         TRY
-            dbUseArea( .T., ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
-         CATCH
-            RETURN .F.
-         END
-      END
+      dbUseArea( ::Owner:Area == NIL, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )
 
       IF ! ::Owner:__lMemory .AND. NETERR()
          ::Owner:Error := oErr

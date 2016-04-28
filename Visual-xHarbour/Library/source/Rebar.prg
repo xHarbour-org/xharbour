@@ -510,15 +510,16 @@ METHOD SetChild( oChild, lInit ) CLASS CoolBarBand
 
    IF oChild != NIL
       oChild := __ChkComponent( Self, oChild )
-
-      IF !lInit .AND. oChild:Owner != NIL
-         oOwner := oChild:Owner
-         oOwner:BandChild := NIL
-         oOwner:Owner := NIL
+      IF ISOBJECT( oChild )
+         IF !lInit .AND. oChild:Owner != NIL
+            oOwner := oChild:Owner
+            oOwner:BandChild := NIL
+            oOwner:Owner := NIL
+         ENDIF
+         oChild:Owner := Self
       ENDIF
-      oChild:Owner := Self
    ENDIF
-   IF ::lCreated
+   IF ::lCreated .AND. ValType( oChild ) != "C"
       ::oStruct:fMask      := RBBIM_CHILD
       ::oStruct:hwndChild  := IIF( Valtype( oChild )=="N" .OR. oChild == NIL, oChild, oChild:hWnd )
       SendMessage( ::Parent:hWnd, RB_SETBANDINFO, ::Index, ::oStruct )

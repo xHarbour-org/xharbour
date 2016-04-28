@@ -15,6 +15,7 @@
 #include "vxh.ch"
 
 //------------------------------------------------------------------------------------------------
+static s_oSelf
 
 CLASS Drawing
    DATA Owner       EXPORTED
@@ -34,7 +35,6 @@ CLASS Drawing
    METHOD FillRect()
    METHOD Rectangle()
    METHOD EnumFonts()
-   METHOD EnumProc()
    METHOD BeginPaint()
    METHOD GetDC()                                        INLINE ::xhDC := GetDC( ::Owner:hWnd ), Self
    METHOD ReleaseDC()                                    INLINE ReleaseDC( ::Owner:hWnd, ::xhDC ),  ::xhDC := NIL, Self
@@ -60,6 +60,7 @@ CLASS Drawing
 
    METHOD DrawThemeBackground( hTheme, nPartId, nStateId, aRect, aClipRect ) INLINE DrawThemeBackground( hTheme, ::hDC, nPartId, nStateId, aRect, aClipRect )
    METHOD Draw3DRect( rcItem, oTopLeftColor, oBottomRightColor )             INLINE __Draw3DRect( ::hDC, rcItem, oTopLeftColor, oBottomRightColor )
+   METHOD CleanEnumFont() INLINE ::__aFonts := NIL
 ENDCLASS
 
 //------------------------------------------------------------------------------------------------
@@ -188,16 +189,17 @@ RETURN Self
 
 
 METHOD EnumFonts( cFaceName ) CLASS Drawing
+   s_oSelf := Self
    ::__aFonts := {}
-   EnumFonts( ::hDC, cFaceName, WinCallBackPointer( HB_ObjMsgPtr( Self, "EnumProc" ), Self ), NIL )
+   _EnumFonts( ::hDC, cFaceName, "VXHENUMFONTS" )
 RETURN ::__aFonts
 
-METHOD EnumProc( plf, ptm ) CLASS Drawing
+FUNCTION VXHENUMFONTS( plf, ptm )
    LOCAL lf, tm
    lf := (struct LOGFONT*) plf
    tm := (struct TEXTMETRIC*) ptm
    IF lf:lfFaceName[1] != "@"
-      AADD( ::__aFonts, { lf, tm } )
+      AADD( s_oSelf:__aFonts, { lf, tm } )
    ENDIF
 RETURN 1
 

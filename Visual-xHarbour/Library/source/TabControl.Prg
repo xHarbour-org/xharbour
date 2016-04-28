@@ -867,8 +867,8 @@ CLASS TabPage INHERIT Dialog
    PROPERTY ImageIndex     SET ::__SetImageIndex(v)     DEFAULT 0
    PROPERTY Position       SET ::__SetPosition(v)
    PROPERTY Visible        SET ::__SetVisible(v)        DEFAULT .T.
-   PROPERTY VertScrollSize SET ::__SetVertScrollSize(v) DEFAULT 0
-   PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
+   DATA VertScrollSize //SET ::__SetVertScrollSize(v) DEFAULT 0
+   DATA HorzScrollSize //SET ::__SetHorzScrollSize(v) DEFAULT 0
    PROPERTY Text           SET ::__SetCaption(v)
    PROPERTY Theming        ROOT "Appearance" SET ::EnableThemeDialogTexture( IIF( v, ETDT_ENABLETAB, ETDT_DISABLE ) ) DEFAULT IsThemeActive()
 
@@ -1096,7 +1096,7 @@ METHOD Create() CLASS TabPage
    ::Super:Create()
    tci:lParam := ::hWnd
    ::EnableThemeDialogTexture( IIF( ::Parent:Theming, ETDT_ENABLETAB, ETDT_DISABLE ) )
-
+/*
    IF ::VertScrollSize > 0
       ::OriginalRect[4] := ::VertScrollSize
     ELSE
@@ -1113,7 +1113,7 @@ METHOD Create() CLASS TabPage
          __SetInitialValues( Self, "HorzScrollSize", ::ClientWidth )
       ENDIF
    ENDIF
-
+*/
    IF SendMessage( ::Parent:hWnd, TCM_INSERTITEM, SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT ), tci ) > -1
 
       ::xPosition := SendMessage( ::Parent:hWnd, TCM_GETITEMCOUNT )

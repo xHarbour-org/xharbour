@@ -31,6 +31,7 @@ CLASS Label INHERIT Control
    PROPERTY BorderColor     ROOT "Colors"                      DEFAULT __GetSystem():Color:Gray
    PROPERTY Padding                       SET ::InvalidateRect() DEFAULT 0
    PROPERTY WrapText        ROOT "Behavior" DEFAULT .F.
+
    DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
    DATA EnumBorder       EXPORTED INIT { { "None", "Flat", "Sunken", "Risen" }, { 0, -1, BDR_SUNKENINNER, BDR_RAISEDINNER } }
 
@@ -65,6 +66,8 @@ CLASS Label INHERIT Control
    METHOD SetForeColor()
    METHOD Redraw( aRect )      INLINE ::RedrawWindow( aRect, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ),::UpdateWindow()
    METHOD __SetBorder()        INLINE ::Refresh()
+   METHOD __Enable( lEnable )  INLINE ::xEnabled := lEnable, EnableWindow( ::hWnd, lEnable ), ::InvalidateRect(), ::UpdateWindow(), lEnable
+
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
@@ -183,7 +186,7 @@ METHOD OnPaint() CLASS Label
    DEFAULT ::__CurColor TO ::ForeColor
 
    DEFAULT hBkGnd TO GetSysColorBrush( COLOR_BTNFACE )
-   _FillRect( hMemDC, aRect, hBkGnd )
+   _FillRect( hMemDC, aRect, IIF( ::Enabled, hBkGnd, GetSysColorBrush( COLOR_BTNFACE ) ) )
 
    // compatibility
    IF VALTYPE( ::xBorder ) == "L"
@@ -192,7 +195,7 @@ METHOD OnPaint() CLASS Label
 
    IF ::xBorder <> 0
       IF ::xBorder == -1
-         hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, ::BorderColor ) )
+         hOldPen := SelectObject( hMemDC, CreatePen( PS_SOLID, 0, IIF( ::Enabled, ::BorderColor, ::System:Colors:GrayText ) ) )
          hBrush  := SelectObject( hMemDC, GetStockObject( NULL_BRUSH ) )
          Rectangle( hMemDC, aRect[1], aRect[2], aRect[3], aRect[4] )
          SelectObject( hMemDC, hBrush )
@@ -238,7 +241,7 @@ METHOD OnPaint() CLASS Label
       aRect[4]  := aRect[2] + rc:bottom
    ENDIF
 
-   IF ::xTextShadowColor != NIL
+   IF ::xTextShadowColor != NIL .AND. ::Enabled
       aRect[1] += 1
       aRect[2] += 1
       aRect[3] += 1
@@ -250,7 +253,7 @@ METHOD OnPaint() CLASS Label
       aRect[3] -= 1
       aRect[4] -= 1
    ENDIF
-   SetTextColor( hMemDC, ::__CurColor )
+   SetTextColor( hMemDC, IIF( ::Enabled, ::__CurColor, ::System:Colors:GrayText ) )
    _DrawText( hMemDC, cText, aRect, nFlags )
    SelectObject( hMemDC, hFont )
 

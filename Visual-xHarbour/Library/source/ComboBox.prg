@@ -952,6 +952,7 @@ CLASS FontComboBox INHERIT ComboBox
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnParentDrawItem()
+   METHOD OnDestroy() INLINE Super:OnDestroy(), ::Owner := NIL, ::Fonts := NIL, hb_gcAll(), NIL
 ENDCLASS
 
 METHOD Init( oParent ) CLASS FontComboBox
@@ -964,6 +965,7 @@ METHOD Create() CLASS FontComboBox
    LOCAL n, cFont := ::Cargo
    ::Super:Create()
    ::Fonts := ::Form:Drawing:EnumFonts()
+   ::Form:Drawing:CleanEnumFont()
    ASORT( ::Fonts,,, {|a,b| a[1]:lfFaceName:AsString() <  b[1]:lfFaceName:AsString() } )
 
    FOR n := 1 TO LEN( ::Fonts )

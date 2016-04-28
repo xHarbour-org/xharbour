@@ -193,7 +193,7 @@ METHOD Create() CLASS ToolBox
    AADD( ::aButtons[4][2], { "FtpClient", lPro } )
    AADD( ::aButtons[4][2], { "ServiceController", lPro } )
    AADD( ::aButtons[4][2], { "WinSock", lPro } )
-   AADD( ::aButtons[4][2], { "eMail", lPro } )
+   AADD( ::aButtons[4][2], { "SMTPCDO", lPro } )
 
    //Data
    //AADD( ::aButtons[5][2], { "BindingSource", .T. } )
@@ -614,7 +614,7 @@ METHOD SetControl( cName, nwParam, x, y, oParent, nWidth, nHeight, lSelect, oCmp
       EXTERN WebBrowser
       //EXTERN WebControl
       EXTERN FreeImage
-      EXTERN eMail
+      EXTERN SMTPCDO
    #endif
 
    EXTERN PageScroller

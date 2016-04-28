@@ -56,7 +56,7 @@ CLASS Splitter INHERIT Control
       DATA Theming        INIT .T.
       DATA HorzScroll     INIT .F.
       DATA VertScroll     INIT .F.
-      DATA BackColor
+      DATA BorderColor    INIT 0
       DATA ForeColor
       DATA Noresize
       DATA NoParentAlign
@@ -85,7 +85,7 @@ CLASS Splitter INHERIT Control
    METHOD GetSizes()
    METHOD SetSizes()
    METHOD OnLButtonDown()
-   METHOD OnEraseBkGnd()  INLINE 1
+   METHOD OnEraseBkGnd( hDC )  INLINE IIF( ::BackColor != NIL, Super:OnEraseBkGnd( hDC ), 1 )
    METHOD __GetOwner()
 ENDCLASS
 

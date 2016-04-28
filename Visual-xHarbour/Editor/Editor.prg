@@ -529,13 +529,13 @@ METHOD OnKeyUp() CLASS SourceEditor
    LOCAL lSel
 
    IF ::Source != NIL
-      lSel := ::Source:GetSelLen() > 0
+      IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0
+         lSel := ::Source:GetSelLen() > 0
 
-      IF lSel != ::Application:Props:EditCopyItem:Enabled
+         IF lSel != ::Application:Props[ "EditCopyItem" ]:Enabled
 
-         ::Application:Project:EditReset()
+            ::Application:Project:EditReset()
 
-         IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0 .AND. ::Application:Props[ "EditCopyItem" ]:Enabled
             ::Application:Props:EditCopyItem:Enabled := lSel
             ::Application:Props:EditCopyBttn:Enabled := lSel
             ::Application:Props:EditCutItem:Enabled  := lSel
@@ -608,7 +608,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
                     ::AutoIndentText()
                  ENDIF
 
-               ELSEIF scn:ch == 58
+              ELSEIF scn:ch == 58
                  nPosEnd   := ::Source:GetCurrentPos()-1
                  nPosStart := ::Source:PositionFromLine( ::Source:LineFromPosition( nPosEnd ) )
                  cObj := ""
@@ -1329,19 +1329,19 @@ METHOD Save( cFile ) CLASS Source
 
             cText := cBuffer
 
-            ::SetUndoCollection(0)
             ::SetText( cText )
             IF ! Empty( aBookmarks )
                AEVAL( aBookmarks, {|nLine| SCI_SEND( SCI_MARKERADD, nLine, MARKER_MASK )} )
             ENDIF
-
-            ::SetUndoCollection(1)
 
             //::GotoLine( nLine )
 
             nPos := SCI_SEND( SCI_FINDCOLUMN, nLine, nCol )
             SCI_SEND( SCI_GOTOPOS, nPos, 0 )
             SCI_SEND( SCI_SETFIRSTVISIBLELINE, nVisLine, 0 )
+
+            ::EmptyUndoBuffer()
+
          ENDIF
 
          fWrite( hFile, cText, Len(cText) )

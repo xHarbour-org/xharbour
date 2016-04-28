@@ -99,8 +99,9 @@ extern char * hb_oleWideToAnsi( LPWSTR wString );
 HB_EXTERN_END
 
 static IDispatch *pDispPtr;
-
 static HMODULE hLib = NULL;
+static PHB_DYNS pDynSym;
+static PHB_DYNS pFontDynSym;
 
 typedef BOOL (WINAPI *ATLAXWININIT)(void);
 typedef BOOL (WINAPI *ATLAXWINTERM)(void);
@@ -139,11 +140,12 @@ BOOL WINAPI GetNamedPipeServerProcessId( HANDLE Pipe, PULONG ServerProcessId )
    return FALSE;
 }
 
+
 HB_FUNC( BITMAPTOREGION )
 {
    HBITMAP hBmp = (HBITMAP) hb_parnl(1);
    COLORREF cTransparentColor = ISNIL(2) ? 0 : (COLORREF) hb_parnl(2);
-   COLORREF cTolerance = ISNIL(3) ? 0x101010 : (COLORREF) hb_parnl(3);
+   COLORREF cTolerance = ISNIL(3) ? (COLORREF) hb_parnl(2) : (COLORREF) hb_parnl(3);
    HRGN hRgn = NULL;
    INT y;
    INT x;
@@ -162,15 +164,15 @@ HB_FUNC( BITMAPTOREGION )
          HBITMAP holdBmp;
          HBITMAP hbm32;
          VOID * pbits32;
-         BITMAPINFOHEADER RGB32BITSBITMAPINFO;
+         BITMAPINFOHEADER bmi;
 
          BYTE lr = GetBValue(cTransparentColor);
          BYTE lg = GetGValue(cTransparentColor);
          BYTE lb = GetRValue(cTransparentColor);
 
-         BYTE hr = min(0xff, lr + GetRValue(cTolerance));
-         BYTE hg = min(0xff, lg + GetGValue(cTolerance));
-         BYTE hb = min(0xff, lb + GetBValue(cTolerance));
+         BYTE hr = GetRValue(cTolerance);
+         BYTE hg = GetGValue(cTolerance);
+         BYTE hb = GetBValue(cTolerance);
 
          BYTE *p32;
          // Get bitmap size
@@ -178,18 +180,18 @@ HB_FUNC( BITMAPTOREGION )
          GetObject(hBmp, sizeof(bm), &bm);
 
          // Create a 32 bits depth bitmap and select it into the memory DC
-         RGB32BITSBITMAPINFO.biSize          = sizeof(BITMAPINFOHEADER);  // biSize
-         RGB32BITSBITMAPINFO.biWidth         = bm.bmWidth;             // biWidth;
-         RGB32BITSBITMAPINFO.biHeight        = bm.bmHeight;            // biHeight;
-         RGB32BITSBITMAPINFO.biPlanes        = 1;                   // biPlanes;
-         RGB32BITSBITMAPINFO.biBitCount      = 32;                     // biBitCount
-         RGB32BITSBITMAPINFO.biCompression   = BI_RGB;                 // biCompression;
-         RGB32BITSBITMAPINFO.biSizeImage     = 0;                   // biSizeImage;
-         RGB32BITSBITMAPINFO.biXPelsPerMeter = 0;                   // biXPelsPerMeter;
-         RGB32BITSBITMAPINFO.biYPelsPerMeter = 0;                   // biYPelsPerMeter;
-         RGB32BITSBITMAPINFO.biClrUsed       = 0;                   // biClrUsed;
-         RGB32BITSBITMAPINFO.biClrImportant  = 0;                   // biClrImportant;
-         hbm32 = CreateDIBSection(hMemDC, (BITMAPINFO *)&RGB32BITSBITMAPINFO, DIB_RGB_COLORS, &pbits32, NULL, 0);
+         bmi.biSize          = sizeof(BITMAPINFOHEADER);
+         bmi.biWidth         = bm.bmWidth;
+         bmi.biHeight        = bm.bmHeight;
+         bmi.biPlanes        = 1;
+         bmi.biBitCount      = 32;
+         bmi.biCompression   = BI_RGB;
+         bmi.biSizeImage     = 0;
+         bmi.biXPelsPerMeter = 0;
+         bmi.biYPelsPerMeter = 0;
+         bmi.biClrUsed       = 0;
+         bmi.biClrImportant  = 0;
+         hbm32 = CreateDIBSection(hMemDC, (BITMAPINFO *)&bmi, DIB_RGB_COLORS, &pbits32, NULL, 0);
          if (hbm32)
          {
             holdBmp = (HBITMAP)SelectObject(hMemDC, hbm32);
@@ -225,16 +227,17 @@ HB_FUNC( BITMAPTOREGION )
                      // Search for a continuous range of "non transparent pixels"
                      int x0 = x;
                      LONG *p = (LONG *)p32 + x;
+
                      while (x < bm.bmWidth)
                      {
                         BYTE b = GetRValue(*p);
-                        if (b >= lr && b <= hr)
+                        if (b >= hr && b <= lr)
                         {
                            b = GetGValue(*p);
-                           if (b >= lg && b <= hg)
+                           if (b >= hg && b <= lg)
                            {
                               b = GetBValue(*p);
-                              if (b >= lb && b <= hb)
+                              if (b >= hb && b <= lb)
                                  // This pixel is "transparent"
                                  break;
                            }
@@ -2813,8 +2816,6 @@ HPALETTE CreateDIBPalette (LPBITMAPINFO lpbmi, LPINT lpiNumColors)
 }
 
 
-static PHB_DYNS pDynSym;
-
 void __stdcall _InternetStatusCallback( HINTERNET hInternet, DWORD dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
 {
    if( pDynSym )
@@ -2879,20 +2880,20 @@ HB_FUNC( _BMPREPLACECOLOR )
          if (DirectDC)
          {
             BITMAP bm;
-            BITMAPINFO RGB32BitsBITMAPINFO;
+            BITMAPINFO bmi;
             HBITMAP DirectBitmap;
             UINT *ptPixels;
 
             GetObject(hBmp, sizeof(bm), &bm);
 
-            ZeroMemory(&RGB32BitsBITMAPINFO,sizeof(BITMAPINFO));
-            RGB32BitsBITMAPINFO.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-            RGB32BitsBITMAPINFO.bmiHeader.biWidth=bm.bmWidth;
-            RGB32BitsBITMAPINFO.bmiHeader.biHeight=bm.bmHeight;
-            RGB32BitsBITMAPINFO.bmiHeader.biPlanes=1;
-            RGB32BitsBITMAPINFO.bmiHeader.biBitCount=32;
+            ZeroMemory(&bmi,sizeof(BITMAPINFO));
+            bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+            bmi.bmiHeader.biWidth=bm.bmWidth;
+            bmi.bmiHeader.biHeight=bm.bmHeight;
+            bmi.bmiHeader.biPlanes=1;
+            bmi.bmiHeader.biBitCount=32;
 
-            DirectBitmap= CreateDIBSection(DirectDC, (BITMAPINFO *)&RGB32BitsBITMAPINFO, DIB_RGB_COLORS,(void **)&ptPixels, NULL, 0);
+            DirectBitmap= CreateDIBSection(DirectDC, (BITMAPINFO *)&bmi, DIB_RGB_COLORS,(void **)&ptPixels, NULL, 0);
 
             if (DirectBitmap)
             {
@@ -5753,4 +5754,28 @@ HB_FUNC( UNLOADHPREVIEW ) //preview
 
 */
 
+int CALLBACK EnumFontProc( const LOGFONT *lplf, const TEXTMETRIC *lptm, DWORD dwType, LPARAM lpData )
+{
+   int iResponse = 0;
+   if( pFontDynSym )
+   {
+      hb_vmPushSymbol( pFontDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmPushLong( (long) lplf );
+      hb_vmPushLong( (long) lptm );
+      hb_vmPushLong( (long) dwType );
+      hb_vmPushLong( (long) lpData );
+      hb_vmDo( 4 );
+      iResponse = hb_itemGetNI( hb_stackReturnItem() );
+   }
+   return iResponse;
+}
+
+
+//------------------------------------------------------------------------------------------------
+HB_FUNC( _ENUMFONTS )
+{
+   pFontDynSym = hb_dynsymFindName( hb_parc(3) );
+   hb_retni( EnumFonts( (HDC) hb_parnl(1), (LPCTSTR) hb_parc(2), (FONTENUMPROC) EnumFontProc, (LPARAM) hb_parnl(4) ) );
+}
 

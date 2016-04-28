@@ -12,11 +12,11 @@
 //------------------------------------------------------------------------------------------------------*
 
 static __pCallBackPtr
-static __pPicture
+static __pPicture, hRegion, nWidth, nHeight, hBkBrush
 //static __hText
 
 static aSize
-static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect
+static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect, s_hParent
 static s_lAutoClose
 
 #define SHOWDEBUG
@@ -28,8 +28,8 @@ static s_lAutoClose
 #define PBS_MARQUEE        0x08
 #define PBM_SETMARQUEE WM_USER + 10
 
-FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
-   LOCAL nTop, nWidth, nHeight, nStyle, dt, nLeft
+FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter, nBitmapMaskColor, nTolerance )
+   LOCAL nTop, nStyle, dt, nLeft
    nSecs := nTimeout
 
    DEFAULT hInst TO GetModuleHandle()
@@ -41,19 +41,29 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    dt := (struct _DIALOGTEMPLATE)
 
    __pCallBackPtr := WinCallBackPointer( @__SplashDlgProc() )
-   IF cType != NIL
-      IF cType == "BMP"
-         __pPicture := PictureLoadImageFromResource( hInst, UPPER( cImage ), 1 )
-       ELSE
-         __pPicture := PictureLoadFromResource( hInst, UPPER( cImage ), cType )
-      ENDIF
-    ELSE
-      __pPicture     := PictureLoadFromFile( cImage )
-   ENDIF
-   aSize   := PictureGetSize( __pPicture )
+
    nStyle  := WS_POPUP | DS_SYSMODAL | WS_VISIBLE
    nLeft   := 0
    nTop    := 0
+
+   IF nBitmapMaskColor != NIL
+      __pPicture := LoadBitmap( hInst, cImage )
+      hBkBrush   := CreatePatternBrush( __pPicture )
+      hRegion    := BitmapToRegion( __pPicture, nBitmapMaskColor, nTolerance )
+      aSize      := GetBmpSize( __pPicture )
+   ELSE
+      IF cType != NIL
+         IF cType == "BMP"
+            __pPicture := PictureLoadImageFromResource( hInst, UPPER( cImage ), 1 )
+          ELSE
+            __pPicture := PictureLoadFromResource( hInst, UPPER( cImage ), cType )
+         ENDIF
+       ELSE
+         __pPicture     := PictureLoadFromFile( cImage )
+      ENDIF
+      aSize   := PictureGetSize( __pPicture )
+   ENDIF
+
    nWidth  := Int( ( aSize[1] * 4 )/LOWORD(GetDialogBaseUnits()) )
    nHeight := Int( ( aSize[2] * 4 )/LOWORD(GetDialogBaseUnits()) )
 
@@ -63,13 +73,35 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter )
    dt:y               := nTop
    dt:cx              := nWidth
    dt:cy              := nHeight
+
    CreateDialogIndirect( hInst, dt, GetActiveWindow(), __pCallBackPtr )
 RETURN NIL
 
 FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
-   LOCAL nLeft, nTop, aRect, aPar
+   LOCAL nLeft, nTop, aRect, aPar, hDC, hMemDC, hMemBitmap, hOldBitmap
    SWITCH nMsg
       CASE WM_INITDIALOG
+           IF hRegion != NIL
+              SetWindowRgn( hWnd, hRegion, .T. )
+              InvalidateRgn( hWnd, hRegion, .T. )
+              SetWindowPos( hWnd,,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+              RedrawWindow( hWnd,,, RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+              InvalidateRgn( hWnd, hRegion, .T. )
+
+              hDC        := GetDC( hWnd )
+              hMemDC     := CreateCompatibleDC( nwParam )
+              hMemBitmap := CreateCompatibleBitmap( hDC, nWidth, nHeight )
+              hOldBitmap := SelectObject( hMemDC, hMemBitmap)
+
+              _FillRect( hMemDC, { 0, 0, nWidth, nHeight }, hBkBrush )
+
+              BitBlt( hDC, 0, 0, nWidth, nHeight, hMemDC, 0, 0, SRCCOPY )
+
+              SelectObject( hMemDC,  hOldBitmap )
+              DeleteObject( hMemBitmap )
+              ReleaseDC( hWnd, hMemDC )
+           ENDIF
+
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
            aPar  := _GetWindowRect( GetDeskTopWindow() )
            aRect := _GetWindowRect( hWnd )
@@ -102,11 +134,18 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
            EXIT
 
       CASE WM_ERASEBKGND
-           PicturePaint( __pPicture, nwParam, 0, 0, aSize[1], aSize[2], .F., .T. )
+           IF hRegion == NIL
+              PicturePaint( __pPicture, nwParam, 0, 0, aSize[1], aSize[2], .F., .T. )
+           ELSE
+              _FillRect( nwParam, { 0, 0, aSize[1], aSize[2] }, hBkBrush )
+           ENDIF
            RETURN 1
 
       CASE WM_NCDESTROY
            __GetApplication():MainForm:PostMessage( WM_VXH_FREECALLBACK, __pCallBackPtr )
+           IF hRegion != NIL
+              DeleteObject( __pPicture )
+           ENDIF
            //VXH_FreeCallBackPointer( __pCallBackPtr )
 
    END
@@ -145,10 +184,10 @@ CLASS MessageWait
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee ) CLASS MessageWait
+METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee, hParent ) CLASS MessageWait
    DEFAULT lMarquee TO .F.
    s_lAutoClose := .F.
-   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
+   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -213,13 +252,14 @@ METHOD SetPosition() CLASS MessageWait
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
+FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
    LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd, hFont
 
    DEFAULT cText  TO ""
    DEFAULT lProgress TO .F.
    DEFAULT lMarquee TO .F.
 
+   s_hParent := hParent
    s_hFont   := __GetMessageFont()
 
    hDC       := GetDC(0)
@@ -256,37 +296,37 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee )
 
    hWnd := CreateDialogIndirect( GetModuleHandle(), dt, GetActiveWindow(), __pCallBackPtr )
    SetWindowText( hWnd, cTitle )
-   ShowWindow( hWnd, SW_SHOW )
+   ShowWindow( hWnd, SW_SHOWNOACTIVATE )
    UpdateWindow( hWnd )
 RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
    LOCAL aClient, nLeft, nTop, aRect, aPar, hDC, aSize, hBtn, hFont, rc := (struct RECT)
-   LOCAL nBorder, aCenter, hOldFont, cPaint, nStyle
+   LOCAL nBorder, hOldFont, cPaint, nStyle
 
    SWITCH nMsg
       CASE WM_INITDIALOG
            SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
-           aPar    := _GetWindowRect( GetDeskTopWindow() )
+
+           IF s_hParent == NIL
+              aPar := _GetWindowRect( GetDeskTopWindow() )
+           ELSE
+              aPar := _GetWindowRect( s_hParent )
+           ENDIF
            aRect   := _GetWindowRect( hWnd )
            aClient := _GetClientRect( hWnd )
+
            nBorder := aRect[4]-aRect[2]-aClient[4]
+
+           nLeft := ( ( aPar[1] + aPar[3] ) / 2 ) - ( aClient[3] / 2 )
+           nTop  := ( ( aPar[2] + aPar[4] ) / 2 ) - ( aClient[4] / 2 )
 
            hDC   := GetDC( hWnd )
            hFont := SelectObject( hDC, s_hFont )
            DrawText( hDC, s_cText, @rc, DT_CALCRECT )
 
            aRect[4] := aRect[2] + rc:bottom + nBorder + 20
-
-           aCenter := aPar
-           DEFAULT aCenter[1] TO 0
-           DEFAULT aCenter[2] TO 0
-           DEFAULT aCenter[3] TO aPar[3]
-           DEFAULT aCenter[4] TO aPar[4]
-
-           nLeft := aCenter[1] + ( ( aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
-           nTop  := aCenter[2] + ( ( aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
            MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], ( aRect[4]-aRect[2] ) + IIF( s_cCancel != NIL .OR. s_lProgress, 25, 0 ) )
 
@@ -299,13 +339,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
            aRect[2] := (aRect[4]-rc:bottom)/2
 
            s_aRect := aClone( aRect )
-/*
-           __hText := CreateWindowEx( 0, "static", s_cText,;
-                              WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_CENTER,;
-                              aRect[1], aRect[2], aRect[3], aRect[4],;
-                              hWnd, 4002, GetModuleHandle(), NIL )
-           SendMessage( __hText, WM_SETFONT, s_hFont )
-*/
+
            aRect[4] := rc:bottom
 
            aSize := {0,0}

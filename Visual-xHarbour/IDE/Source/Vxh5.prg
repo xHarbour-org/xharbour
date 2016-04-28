@@ -16,7 +16,6 @@
 
 #define DG_ADDCONTROL      1
 #define DG_PROPERTYCHANGED 3
-#define DG_MOVESELECTION   4
 #define DG_FONTCHANGED     5
 #define DG_DELCOMPONENT    6
 

@@ -12,7 +12,7 @@
 
 #ifdef VXH_PROFESSIONAL
 
-CLASS FreeImage INHERIT Panel, FreeImageRenderer
+CLASS FreeImage INHERIT TitleControl, FreeImageRenderer
    PROPERTY Transparent SET ::Update()                 DEFAULT .F.
    PROPERTY Alignment   SET ::Update()                 DEFAULT 1
 
@@ -20,10 +20,12 @@ CLASS FreeImage INHERIT Panel, FreeImageRenderer
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnDestroy()           INLINE ::Panel:OnDestroy(), ::FreeImageRenderer:Destroy(), NIL
+   METHOD OnDestroy()           INLINE ::TitleControl:OnDestroy(), IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ),), ::hDIB := NIL, NIL
+
+   METHOD OnLButtonUp()         INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
    METHOD OnGetDlgCode()        INLINE DLGC_WANTMESSAGE
    METHOD OnEraseBkGnd()
-   METHOD Destroy()             INLINE ::Panel:Destroy()
+   METHOD Destroy()             INLINE ::TitleControl:Destroy()
    METHOD __CreateBkBrush()
 ENDCLASS
 
@@ -31,32 +33,33 @@ ENDCLASS
 METHOD Init( oParent ) CLASS FreeImage
    LOCAL cSupp := ""
    ::__xCtrlName  := "FreeImage"
+   ::ClsName      := "PanelBox"
+   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::ExStyle      := WS_EX_CONTROLPARENT
+
    ::FreeImageRenderer:Init( Self )
-   ::Panel:Init( oParent )
+   ::TitleControl:Init( oParent )
    ::Width         := 100
    ::Height        := 100
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
    ::IsContainer   := .T.
-   ::ControlParent := .T.
+   ::__IsStandard  := .F.
    IF ::Parent:DesignMode
       ::__ExplorerFilter := __GetSystem():FreeImageFormats
    ENDIF
-   ::bSetValue := {|cValue| ::LoadFromString( cValue ) }
+   ::bSetValue := {|cValue| IIF( ValType(::bOnSetValue)=="B", Eval( ::bOnSetValue, Self, cValue ), ::LoadFromString( cValue ) ) }
    ::bGetValue := {|| ::__cData }
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS FreeImage
    ::FreeImageRenderer:Create()
-   ::Panel:Create()
+   ::TitleControl:Create()
    ::__SetImageName( ::xImageName )
-   ::Panel:TitleHeight := ::TitleHeight
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD __CreateBkBrush( hDC ) CLASS FreeImage
    LOCAL hMemBitmap, hOldBitmap, hMemDC, hBrush, nLeftBorder, nBorder, lDC := hDC != NIL
-
    IF ! lDC
       hDC := GetDC( ::hWnd )
    ENDIF
@@ -153,14 +156,14 @@ CLASS FreeImageRenderer
    ACCESS DesignMode    INLINE IIF( ::Owner != NIL, ::Owner:DesignMode, .F. )
 
    METHOD Init()   CONSTRUCTOR
-   METHOD Kill()   INLINE FreeImageUnload( ::hDIB ), ::hDIB := NIL
+   METHOD Kill()   INLINE IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ),), ::hDIB := NIL
    METHOD Update()
    METHOD __SetImageName()
    METHOD Create()
    METHOD Draw()
    METHOD LoadResource()
    METHOD LoadFromString()
-   METHOD Destroy()            INLINE ::Owner := NIL, IIF( ::hDIB != NIL, FreeImageUnload( ::hDIB ), ), NIL
+   METHOD Destroy()            INLINE ::Kill(), ::Owner := NIL,NIL
    METHOD SetMargins()
 
    METHOD Reload()             INLINE ::LoadFromString( ::__cData ), ::InvalidateRect()
@@ -473,7 +476,8 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
       ENDIF
 
    ENDIF
-
+   ::Owner:InvalidateRect()
+   AEVAL( ::Owner:Children, {|o| o:Reload()} )
 RETURN lOK
 
 //--------------------------------------------------------------------------------------------------------

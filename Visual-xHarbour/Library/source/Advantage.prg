@@ -30,6 +30,10 @@ CLASS AdsDataTable INHERIT DataTable
    METHOD Blob2File( cFile, cField )          INLINE (::Area)->( AdsBlob2File( cFile, cField ) )
    METHOD AdsSetServerType(n)                 INLINE AdsSetServerType(n)
    METHOD BlobImport( nFieldPos, cFile )      INLINE (::Area)->( BlobImport( nFieldPos, cFile ) )
+   METHOD EnableEncryption( cKey )            INLINE (::Area)->( AdsEnableEncryption( cKey ) )
+   METHOD EncryptTable()                      INLINE (::Area)->( AdsEncryptTable() )
+   METHOD DecryptTable()                      INLINE (::Area)->( AdsDecryptTable() )
+   METHOD IsTableEncrypted()                  INLINE (::Area)->( AdsIsTableEncrypted() )
 
    METHOD BlobGet( nFieldNo, nStart, nCount ) INLINE (::Area)->( dbFieldInfo( DBS_BLOB_GET, nFieldNo, { nStart, nCount } ) )
    METHOD MemoExt()                           INLINE ".adm"
@@ -42,9 +46,14 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewInstance( lSetCurPos ) CLASS AdsDataTable
-   LOCAL oNewTable := AdsDataTable( ::Owner )
-   oNewTable:Area      := ::Area + 100
-   oNewTable:xAlias    := "New_"+xStr(::Area)
+   LOCAL n, oNewTable := AdsDataTable( ::Owner )
+
+   n := 1
+   WHILE Select( ::Alias+xStr(n) ) > 0
+      n++
+   ENDDO
+   oNewTable:Area      := NIL
+   oNewTable:xAlias    := ::Alias+xStr(n)
    oNewTable:xFileName := ::FileName
    oNewTable:Path      := ::Path
    oNewTable:Driver    := ::Driver

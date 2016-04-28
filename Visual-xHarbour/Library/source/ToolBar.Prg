@@ -265,9 +265,26 @@ METHOD __ChkImageList(n,oImg) CLASS ToolBar
          oImg := ::Form:__hObjects[ oImg ]
        ELSE
          IF ::DesignMode
-            oImg := ::Application:Project:Forms[1]:__hObjects[ oImg ]
+            IF ( n := Ascan( ::Form:Components, {|o| o:Name != NIL .AND. lower(o:Name) == lower(oImg) } ) ) > 0
+               oImg := ::Form:Components[n]
+            ELSE
+               TRY
+                  oImg := ::Application:Project:Forms[1]:__hObjects[ oImg ]
+               CATCH
+               END
+            ENDIF
           ELSE
             oImg := ::Application:MainForm:__hObjects[ oImg ]
+         ENDIF
+      ENDIF
+      IF VALTYPE( oImg ) == "C"
+         IF ( n := Ascan( ::Form:Components, {|o| o:Name != NIL .AND. lower(o:Name) == lower(oImg) } ) ) > 0
+            oImg := ::Form:Components[n]
+         ENDIF
+      ENDIF
+      IF VALTYPE( oImg ) == "C"
+         IF ( n := Ascan( ::Parent:Children, {|o| o:Name != NIL .AND. lower(o:Name) == lower(oImg) } ) ) > 0
+            oImg := ::Parent:Children[n]
          ENDIF
       ENDIF
    ENDIF

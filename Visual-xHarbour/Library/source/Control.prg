@@ -343,7 +343,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnSize( nwParam, nlParam ) CLASS Control
-   LOCAL x, y, oParent
+   LOCAL x, y
    IF ::Super:OnSize( nwParam, nlParam ) == NIL
       x := LOWORD( nlParam )
       y := HIWORD( nlParam )
@@ -366,37 +366,6 @@ METHOD OnSize( nwParam, nlParam ) CLASS Control
    ENDIF
    x := NIL
    y := NIL
-
-   oParent := IIF( ::Parent:__oDlg != NIL, ::Parent:__oDlg, ::Parent )
-
-   IF oParent:HorzScroll
-      WITH OBJECT oParent
-         x := :ClientWidth
-         y := :ClientHeight
-         AEVAL( ::Parent:Children, {|o| IIF( GetParent(o:hWnd)==oParent:hWnd, ( x := Max(x,o:Left+o:Width), y := Max(y,o:Top+o:Height) ),) } )
-         :OriginalRect[3] := x
-         :HorzScrollPos := 0
-      END
-   ENDIF
-   IF oParent:VertScroll
-      WITH OBJECT oParent
-         IF y == NIL
-            y := :ClientHeight
-            AEVAL( ::Parent:Children, {|o| IIF( GetParent(o:hWnd)==oParent:hWnd, y := Max(y,o:Top+o:Height),) } )
-         ENDIF
-         :OriginalRect[4] := y
-         :VertScrollPos := 0
-      END
-   ENDIF
-   IF oParent:VertScroll
-      oParent:__SetScrollBars()
-   ENDIF
-   IF oParent:HorzScroll
-      oParent:__SetScrollBars()
-   ENDIF
-   IF ::Parent:__oDlg != NIL
-      ::Parent:__oDlg:RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
-   ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------

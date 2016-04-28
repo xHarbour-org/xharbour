@@ -16,23 +16,28 @@
 #include "vxh.ch"
 #include "fileio.ch"
 
-CLASS eMail INHERIT Component
+#define cdoSendUsingPort 2
+#define cdoBasic         1
+#define cdoNTLM          2
+
+CLASS SMTPCDO INHERIT Component
    PROPERTY To                DEFAULT ""
    PROPERTY From              DEFAULT ""
    PROPERTY CC                DEFAULT ""
    PROPERTY BCC               DEFAULT ""
    PROPERTY ReplyTo           DEFAULT ""
-   PROPERTY SendUsing         DEFAULT 2
+   PROPERTY SendUsing         DEFAULT cdoSendUsingPort
    PROPERTY SMTPServer        DEFAULT ""
-   PROPERTY MimeFormatted     DEFAULT .T.
+   PROPERTY MimeFormatted     DEFAULT .F.
    PROPERTY SMTPServerPort    DEFAULT 0
-   PROPERTY SMTPAuthenticate  DEFAULT .T.
+   PROPERTY SMTPTimeout       DEFAULT 60
+   PROPERTY SMTPAuthenticate  DEFAULT cdoBasic
    PROPERTY SMTPUseSSL        DEFAULT .F.
-   
+
    PROPERTY SendUserName      DEFAULT ""
    PROPERTY SendPassword      DEFAULT ""
    PROPERTY Attachments
-    
+
    DATA Subject           EXPORTED  INIT ""
    DATA HTMLBody          EXPORTED  INIT ""
    DATA TextBody          EXPORTED  INIT ""
@@ -42,30 +47,15 @@ CLASS eMail INHERIT Component
    METHOD Send()
 ENDCLASS
 
-METHOD Init( oOwner ) CLASS eMail
-   ::__xCtrlName   := "eMail"
-   ::ClsName       := "eMail"
-   ::ComponentType := "eMail"
+METHOD Init( oOwner ) CLASS SMTPCDO
+   ::__xCtrlName   := "SMTPCDO"
+   ::ClsName       := "SMTPCDO"
+   ::ComponentType := "SMTPCDO"
    ::Super:Init( oOwner )
 RETURN Self
 
-METHOD Send() CLASS eMail
-/*
-   HB_SendMail( ::SMTPServer,;
-                ::SMTPServerPort,;
-                ::From,;
-                hb_aTokens( ::To, ";" ),;
-                hb_aTokens( ::CC, ";" ),;
-                hb_aTokens( ::BCC, ";" ),;
-                ::TextBody,;
-                ::Subject,;
-                hb_aTokens( ::Attachments, ";" ),;
-                ::SendUserName,;
-                ::SendPassword,;
-                "", , , , .T., .T., , ::ReplyTo, ::SMTPUseSSL, ,  )
-
-*/
-   LOCAL oMsg, e, oConf, oFlds, cSchema, aFiles, cFile, lReturn := .T.
+METHOD Send( cCal ) CLASS SMTPCDO
+   LOCAL oStm, oMsg, oBody, cSchema, aFiles, cFile, lReturn := .T.
    LOCAL hEventHandler := {=>}
    TRY
       oMsg := GetActiveObject( "CDO.Message" )
@@ -73,46 +63,39 @@ METHOD Send() CLASS eMail
       TRY
          oMsg := CreateObject( "CDO.Message" )
       CATCH
-         ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Message)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
          RETURN .F.
       END
    END
-   TRY
-      oConf := GetActiveObject( "CDO.Configuration" )
-    CATCH
-      TRY
-         oConf := CreateObject("CDO.Configuration")
-       CATCH
-         ::Application:MainForm:MessageBox( "Cannot initialize mail interface (Configuration)", "Visual xHarbour", MB_OK | MB_ICONEXCLAMATION )
-         RETURN .F.
-      END
-   END
-   oFlds := oConf:Fields
 
    cSchema := "http://schemas.microsoft.com/cdo/configuration/"
 
-   oFlds:Item( cSchema + "sendusing" ):Value        := ::SendUsing
-   oFlds:Item( cSchema + "smtpserver" ):Value       := ::SMTPServer
-   oFlds:Item( cSchema + "smtpserverport" ):Value   := ::SMTPServerPort
-   oFlds:Item( cSchema + "smtpauthenticate" ):Value := IIF( ::SMTPAuthenticate, 1, 0 )
-   oFlds:Item( cSchema + "sendusername" ):Value     := ::SendUserName
-   oFlds:Item( cSchema + "sendpassword" ):Value     := ::SendPassword
-   oFlds:Item( cSchema + "smtpusessl" ):Value       := ::SMTPUseSSL
+   oMsg:Configuration:Fields:Item( cSchema + "sendusing" ):Value             := ::SendUsing
+   oMsg:Configuration:Fields:Item( cSchema + "smtpserver" ):Value            := ::SMTPServer
+   oMsg:Configuration:Fields:Item( cSchema + "smtpserverport" ):Value        := ::SMTPServerPort
+   oMsg:Configuration:Fields:Item( cSchema + "smtpusessl" ):Value            := IIF( ::SMTPUseSSL, 1, 0 )
+   oMsg:Configuration:Fields:Item( cSchema + "smtpconnectiontimeout" ):Value := ::SMTPTimeout
 
-   oFlds:Update()
+   oMsg:Configuration:Fields:Item( cSchema + "smtpauthenticate" ):Value      := ::SMTPAuthenticate
+   oMsg:Configuration:Fields:Item( cSchema + "sendusername" ):Value          := ::SendUserName
+   oMsg:Configuration:Fields:Item( cSchema + "sendpassword" ):Value          := ::SendPassword
+
+   oMsg:Configuration:Fields:Update()
+
+   IF cCal != NIL
+      oBody := oMsg:BodyPart:AddBodyPart(-1)
+      oBody:ContentClass := "urn:content-classes:calendarmessage"
+      oBody:Fields:Item( "urn:schemas:mailheader:content-type"):Value := 'text/calendar;method=REQUEST;name=\"meeting.ics\"'
+      oBody:Fields:Item( "urn:schemas:mailheader:content-transfer-encoding"):Value := "8bit"
+      oBody:Fields:Update()
+
+      oStm := oBody:GetDecodedContentStream()
+      oStm:WriteText( cCal, 1 )
+      oStm:Flush()
+      oStm:Close()
+      oMsg:BodyPart:Fields:Update()
+   ENDIF
 
    WITH OBJECT oMsg
-      :Configuration := oConf
-
-      :To            := ::To
-      :From          := ::From
-      :Subject       := ::Subject
-      :HTMLBody      := ::HTMLBody
-      :TextBody      := ::TextBody
-      :CC            := ::CC
-      :BCC           := ::BCC
-      :ReplyTo       := ::ReplyTo
-      :MimeFormatted := ::MimeFormatted
 
       IF ! EMPTY( ::Attachments )
          IF VALTYPE( ::Attachments ) == "C"
@@ -129,12 +112,26 @@ METHOD Send() CLASS eMail
              ENDIF
          NEXT
       ENDIF
+
+      :To            := ::To
+      :From          := ::From
+      :Subject       := ::Subject
+
+      IF cCal == NIL
+         :HTMLBody      := ::HTMLBody
+         :TextBody      := ::TextBody
+         :CC            := ::CC
+         :BCC           := ::BCC
+         :ReplyTo       := ::ReplyTo
+         :MimeFormatted := ::MimeFormatted
+      ENDIF
       TRY
          :Send()
-      CATCH e
+      CATCH
          lReturn := .F.
       END
    END
+   oMsg := NIL
 RETURN lReturn
 
 //------------------------------------------------------------------------------------------------
@@ -205,7 +202,7 @@ METHOD Send() CLASS MSendMail
    IF VALTYPE( ::Attachments ) == "C"
       ::Attachments := {::Attachments}
    ENDIF
-   
+
    aAttach := {}
    FOR n := 1 TO LEN( ::Attachments )
        pFile := (struct MapiFileDesc)
@@ -217,7 +214,7 @@ METHOD Send() CLASS MSendMail
        pFile:lpFileType        := NIL
        AADD( aAttach, pFile )
    NEXT
-   
+
    DEFAULT ::Subject     TO ""
    DEFAULT ::MessageBody TO ""
 
@@ -322,3 +319,4 @@ RETURN MAPISendMail( 0, 0, pMsg, ::__Flags, 0, IIF( LEN( aAttach ) > 1, aAttach,
 0x800CCE05  The requested body part was not found in this message.
 0x800CCE1D  The content encoding type is invalid.
 */
+
