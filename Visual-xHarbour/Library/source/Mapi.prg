@@ -118,13 +118,13 @@ METHOD Send( cCal ) CLASS SMTPCDO
       :Subject       := ::Subject
 
       IF cCal == NIL
-         :HTMLBody      := ::HTMLBody
-         :TextBody      := ::TextBody
          :CC            := ::CC
          :BCC           := ::BCC
          :ReplyTo       := ::ReplyTo
          :MimeFormatted := ::MimeFormatted
       ENDIF
+      :HTMLBody      := ::HTMLBody
+      :TextBody      := ::TextBody
       TRY
          :Send()
       CATCH
@@ -135,7 +135,13 @@ METHOD Send( cCal ) CLASS SMTPCDO
 RETURN lReturn
 
 //------------------------------------------------------------------------------------------------
+// Backwards compatibility
+//------------------------------------------------------------------------------------------------
 
+CLASS eMail INHERIT SMTPCDO
+ENDCLASS
+
+//------------------------------------------------------------------------------------------------
 #define MAPI_ORIG  0
 #define MAPI_TO    1
 #define MAPI_CC    2
