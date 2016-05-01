@@ -15,8 +15,6 @@
    #define VXH_PROFESSIONAL
 #endif
 
-#ifdef VXH_PROFESSIONAL
-
 #include "vxh.ch"
 #include "ole.ch"
 #include "debug.ch"
@@ -109,7 +107,6 @@ METHOD WebNavigate( Url ) CLASS WebBrowser
    ENDIF
 RETURN Self
 
-#endif
 
 
 /*

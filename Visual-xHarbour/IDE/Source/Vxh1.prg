@@ -6729,40 +6729,6 @@ METHOD LinkLabel1_OnClick() CLASS AboutVXH
 RETURN Self
 
 
-#ifndef VXH_PROFESSIONAL
-
-   CLASS WebBrowser INHERIT ActiveX
-      DATA ProgID        EXPORTED
-      DATA ClsID         EXPORTED
-
-      PROPERTY Url SET ::WebNavigate(v) PROTECTED
-
-      METHOD Init() CONSTRUCTOR
-      METHOD Create()
-      METHOD WebNavigate()
-      METHOD OnGetDlgCode() INLINE DLGC_WANTALLKEYS
-   ENDCLASS
-
-   METHOD Init( oParent ) CLASS WebBrowser
-      DEFAULT ::__xCtrlName TO "WebBrowser"
-      Super:Init( oParent )
-      ::ProgID  := "Shell.Explorer.2"
-   RETURN Self
-
-   METHOD Create() CLASS WebBrowser
-      Super:Create()
-      IF !EMPTY( ::Url )
-         ::WebNavigate( ::Url )
-      ENDIF
-   RETURN Self
-
-   METHOD WebNavigate( Url ) CLASS WebBrowser
-      IF ! ::DesignMode .AND. ::hObj != NIL
-         ::Navigate( Url )
-      ENDIF
-   RETURN Self
-#endif
-
 FUNCTION GetLogErrors( sText )
    LOCAL nID := 0, aaErrors := {}, sLine, aMatch, sFile
    LOCAL s_TraceLog := HB_RegExComp( "Type: . >>>(.*)(<<<)?" )
