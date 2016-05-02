@@ -383,10 +383,10 @@ HB_CALL_ON_STARTUP_END( _winapi_init_ )
        iFirst = 1;
 
        #ifdef VXH
-        MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of Visual xHarbour. \n \n Copyright (c) 2003-2010 xHarbour.com Inc. \n http://www.xHarbour.com"
+        MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of Visual xHarbour. \n \n Copyright (c) 2003-2016 xHarbour.com Inc. \n http://www.xHarbour.com"
                                      , (LPCSTR) "Visual xHarbour Demo", MB_OK | MB_ICONINFORMATION );
        #else
-        MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2003-2010 xHarbour.com Inc. \n http://www.xHarbour.com"
+        MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2003-2016 xHarbour.com Inc. \n http://www.xHarbour.com"
                                      , (LPCSTR) "xHarbour Builder Demo", MB_OK | MB_ICONINFORMATION );
        #endif
     }
@@ -1306,10 +1306,10 @@ HB_FUNC( POSTQUITMESSAGE )
    #ifdef WINAPI_DEMO
 
      #ifdef VXH
-      MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of Visual xHarbour. \n \n Copyright (c) 2003-2010 xHarbour.com Inc. \n http://www.xHarbour.com"
+      MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of Visual xHarbour. \n \n Copyright (c) 2003-2016 xHarbour.com Inc. \n http://www.xHarbour.com"
                                    , (LPCSTR) "Visual xHarbour Demo", MB_OK | MB_ICONINFORMATION );
      #else
-      MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2003-2010 xHarbour.com Inc. \n http://www.xHarbour.com"
+      MessageBox( GetActiveWindow(), (LPCSTR) "This application was build with the demo version of xHarbour Builder. \n \n Copyright (c) 2003-2016 xHarbour.com Inc. \n http://www.xHarbour.com"
                                    , (LPCSTR) "xHarbour Builder Demo", MB_OK | MB_ICONINFORMATION );
      #endif
 
