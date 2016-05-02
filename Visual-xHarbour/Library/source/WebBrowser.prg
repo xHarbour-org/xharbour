@@ -11,10 +11,6 @@
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
 
-#ifdef VXH_ENTERPRISE
-   #define VXH_PROFESSIONAL
-#endif
-
 #include "vxh.ch"
 #include "ole.ch"
 #include "debug.ch"
