@@ -453,6 +453,9 @@ RETURN hBkGnd
 METHOD OnNCPaint() CLASS Control
    LOCAL hOldBrush, hPen, hDC
    ::CallWindowProc()
+   IF VALTYPE( ::Border ) == "L"
+      ::Border := IIF( ::Border, WS_BORDER, 0 )
+   ENDIF
    IF ::BorderColor <> 0 .AND. ::Border <> 0
       hDC       := GetWindowDC( ::hWnd )
       hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )

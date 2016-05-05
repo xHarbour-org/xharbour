@@ -208,11 +208,11 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
    IF oObj:ClsName == "AtlAxWin" .AND. oObj:xName != NIL .AND. ! ( oObj:xName == cName ) .AND. procname(4) == "USERCONTROL:INIT"
       cName := oObj:xName
    ENDIF
-   IF ! ( oObj == Self ) .AND. ! ::DesignMode
+   IF ! ( oObj == Self )
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
-      ::__hObjects[ cName ] := oObj
+      ::__hObjects[ cName ] := IIF( ! ::DesignMode, oObj, NIL )
    ENDIF
    oObj:xName := cName
 RETURN Self

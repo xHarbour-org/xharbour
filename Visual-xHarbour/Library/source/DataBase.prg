@@ -156,7 +156,7 @@ CLASS DataTable INHERIT Component
                                                                                       ::Fields := NIL,;
                                                                       IIF( VALTYPE( lNotify ) == "L" .AND. lNotify, __Evaluate( ::bOnFileClosed, Self ), ),;
                                                                       ExecuteEvent( "OnClose", Self )
-   METHOD Append()                            INLINE ::Connector:Append()
+   METHOD Append()                            INLINE ::Cancel(), ::Connector:Append()
    METHOD OrdSetFocus( cOrder )               INLINE IIF( cOrder != NIL, ::IndexOrder := ::IndexOrd(),), ::Connector:OrdSetFocus( cOrder )
    METHOD SetIndex( cIndex )                  INLINE ::IndexOrder := ::IndexOrd(), ::Connector:SetIndex( cIndex )
    METHOD SetRelation( oData,xKey,lAdditive ) INLINE ::Connector:SetRelation( oData, xKey, lAdditive )
@@ -332,7 +332,7 @@ METHOD Save() CLASS DataTable
           IF oCtrl:bGetValue != NIL
              ::Connector:FieldPut( n, Eval( oCtrl:bGetValue ) )
           ENDIF
-       ELSEIF ::__aData[n] != NIL
+       ELSEIF LEN( ::__aData ) >= n .AND. ::__aData[n] != NIL
           ::Connector:FieldPut( n, ::__aData[n] )
        ENDIF
    NEXT
@@ -882,7 +882,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
                cAlias := &cAlias
             ENDIF
             ::Owner:xAlias := cAlias
-          ELSEIF .F.
+          ELSEIF ::Owner:__lMemory
             IF Select( cAlias ) > 0
                WHILE Select( cAlias + XSTR( nAlias ) ) > 0
                   nAlias ++

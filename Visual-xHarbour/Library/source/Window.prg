@@ -5444,6 +5444,12 @@ FUNCTION __ChkComponent( oObj, cComp, lClear )
             cComp := oObj:Parent:Children[n]
          ENDIF
       ENDIF
+      IF VALTYPE( cComp ) == "C"
+         IF ( n := Ascan( oObj:Parent:Components, {|o| o:Name != NIL .AND. lower(o:Name) == lower(cComp) } ) ) > 0
+            cComp := oObj:Parent:Children[n]
+         ENDIF
+      ENDIF
+
    ENDIF
    IF lClear .AND. VALTYPE( cComp ) != "O" .AND. ! oObj:DesignMode
       cComp := NIL
