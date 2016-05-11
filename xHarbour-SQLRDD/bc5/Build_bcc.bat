@@ -1,6 +1,6 @@
-SET PATH=%PATH%;C:\BCC58\Bin
+SET PATH=%PATH%;C:\Borland\BCC55\Bin
 SET XHB_BCC=C:\xHarbour
-SET BCCDIR=C:\BCC58
+SET BCCDIR=C:\Borland\BCC55
 
 RD \xbp\bc5\sql.lib /S /Q 
 
