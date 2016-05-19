@@ -809,33 +809,6 @@ HB_FUNC( _CHOOSEFONT )
 }
 
 //----------------------------------------------------------------------------
-HB_FUNC( _CHOOSECOLOR )
-{
-   CHOOSECOLOR cc ;
-   COLORREF crCustClr[16] ;
-   int i ;
-   BOOL bRet ;
-
-   for( i = 0 ; i <16 ; i++ )
-     crCustClr[i] = (ISARRAY(3) ? hb_parnl(3,i+1) : RGB(0,0,0)) ;// GetSysColor(COLOR_BTNFACE)) ;
-
-   cc.lStructSize    = sizeof( CHOOSECOLOR ) ;
-   cc.hwndOwner      = ISNIL(1) ? GetActiveWindow():(HWND) hb_parnl(1) ;
-   cc.rgbResult      = ISNIL(2) ? (COLORREF) 0 : (COLORREF) hb_parnl(2) ;
-   cc.lpCustColors   = crCustClr ;
-   cc.Flags          = (WORD) (ISNIL(4) ? CC_ANYCOLOR | CC_FULLOPEN | CC_RGBINIT : hb_parnl(4) ) ;
-   bRet = (BOOL) ChooseColor( &cc );
-   if ( bRet )
-   {
-      hb_stornl( (LONG) cc.rgbResult, 2 );
-      if ( ISARRAY(3) && hb_parinfa(3,0) >= 16 )
-         for( i = 0 ; i <16 ; i++ )
-             hb_stornl( (LONG) cc.lpCustColors[i], 3, i+1 );
-   }
-   hb_retl( bRet );
-}
-
-//----------------------------------------------------------------------------
 HB_FUNC( _GETWINDOWTEXT )
 {
    int   iLen  = GetWindowTextLength( (HWND) hb_parnl(1) );

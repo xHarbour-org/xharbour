@@ -51,14 +51,15 @@ CLASS WinSock INHERIT Component
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD SockControlProc()
-   METHOD Destroy()    INLINE ::Disconnect(), ::Super:Destroy(), IIF( ::pCallBack != NIL, VXH_FreeCallBackPointer( ::pCallBack ), ), NIL
+   METHOD Destroy()          INLINE ::Disconnect(), ::Super:Destroy(), IIF( ::pCallBack != NIL, VXH_FreeCallBackPointer( ::pCallBack ), ), NIL
 
    METHOD Connect()
    METHOD Send()
-   METHOD Close()      INLINE ::Disconnect( .T. )
+   METHOD Close()            INLINE ::Disconnect( .T. )
    METHOD Listen()
    METHOD Disconnect()
-   METHOD SetTimeOut(n) INLINE InetSetTimeout( ::Handle, n )
+   METHOD SetTimeOut(n)      INLINE InetSetTimeout( ::Handle, n )
+   METHOD Receive( cBuffer ) INLINE InetRecv( ::Handle, @cBuffer )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -131,21 +132,11 @@ METHOD Disconnect( lAll ) CLASS WinSock
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Send( cData, aFields ) CLASS WinSock
-   LOCAL nSent, oDataSource, n, cField, hSocket
+METHOD Send( cData ) CLASS WinSock
+   LOCAL nSent, hSocket
    IF ::Protocol == ::System:SockProtocol:TCP
-      IF VALTYPE( cData ) == "O"
-         oDataSource := cData
-         cData := ""
-         FOR n := 1 TO LEN( oDataSource:Structure )
-             cField := oDataSource:Structure[n][1]
-             IF EMPTY( aFields ) .OR. cField $ aFields
-                cData += "<"+lower(cField)+">" + ALLTRIM( oDataSource:Fields:&cField ) + "</"+lower(cField)+">"
-             ENDIF
-         NEXT
-      ENDIF
       IF ( hSocket := IIF( ::RemoteHandle != NIL, ::RemoteHandle, ::Handle ) ) != NIL
-         nSent := InetSend( hSocket, cData + InetCRLF() )
+         nSent := InetSend( hSocket, cData, Len( cData ) )
       ENDIF
    ENDIF
 RETURN nSent

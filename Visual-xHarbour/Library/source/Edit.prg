@@ -713,7 +713,7 @@ METHOD OnNCPaint() CLASS EditBox
             IF oImageList != NIL
                nTop  := ( ::Height - oImageList:IconHeight ) / 2
             ENDIF
-            _FillRect( hDC, aRect, hBrush )
+            _FillRect( hDC, aRect, IIF( ! ::Enabled, ::Parent:BkBrush, hBrush ) )
             IF oImageList != NIL
                oImageList:DrawImage( hDC, ::ImageIndex, ::__aImagePos[1], nTop )
             ENDIF
@@ -1310,6 +1310,8 @@ METHOD FloatOnSelect() CLASS FloatCalendar
    IF bChanged != NIL
       Eval( bChanged, Self )
    ENDIF
+
+   ExecuteEvent( "Valid", ::Cargo )
 
    ::Close()
    ::Cargo:SetFocus()

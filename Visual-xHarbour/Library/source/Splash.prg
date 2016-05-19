@@ -298,6 +298,9 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
    SetWindowText( hWnd, cTitle )
    ShowWindow( hWnd, SW_SHOWNOACTIVATE )
    UpdateWindow( hWnd )
+   IF hParent != NIL
+      SetForegroundWindow( hParent )
+   ENDIF
 RETURN hWnd
 
 //-------------------------------------------------------------------------------------------------------------------------------------

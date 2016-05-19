@@ -146,9 +146,9 @@ CLASS DataTable INHERIT Component
    METHOD Deleted()                           INLINE ::Connector:Deleted()
    METHOD RecCount()                          INLINE ::Connector:RecCount()
    METHOD RecNo()                             INLINE ::Connector:RecNo()
-   METHOD GoTop()                             INLINE ::Connector:GoTop()
-   METHOD GoTo( nRec )                        INLINE ::Connector:GoTo( nRec )
-   METHOD GoBottom()                          INLINE ::Connector:GoBottom()
+   METHOD GoTop()                             INLINE ::Cancel(), ::Connector:GoTop()
+   METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
+   METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()
    METHOD Skip( n )                           INLINE ::Connector:Skip( n )
    METHOD Close(lNotify)                      INLINE ::Connector:Close(), ::DestroyFields(),;
                                                                                       ::Connector := NIL,;
@@ -215,6 +215,7 @@ CLASS DataTable INHERIT Component
    METHOD __SetMemoType( nMemo )              INLINE ::RddInfo( RDDI_MEMOTYPE, nMemo )
 
    METHOD CreateTable()
+   METHOD EnableFieldCtrl()
 
    METHOD Blank()
    METHOD Load()
@@ -235,6 +236,17 @@ METHOD Init( oOwner ) CLASS DataTable
    ::Connector := DataRdd( Self )
    HSetCaseMatch( ::FieldCtrl, .F. )
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD EnableFieldCtrl( lEnable ) CLASS DataTable
+   LOCAL n, cField
+   FOR n := 1 TO LEN( ::Structure )
+       cField := ::Structure[n][1]
+       IF HGetPos( ::FieldCtrl, cField ) > 0
+          ::FieldCtrl[ cField ]:Enabled := lEnable
+       ENDIF
+   NEXT
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SavePos() CLASS DataTable
@@ -319,7 +331,7 @@ RETURN Self
 METHOD Save() CLASS DataTable
    LOCAL n, cField, oCtrl
    IF ::__lNew
-      ::Append()
+      (::Area)->( dbAppend() )
    ELSEIF ::Shared
       WHILE ! ::RecLock()
          sleep(1000)
@@ -338,6 +350,7 @@ METHOD Save() CLASS DataTable
    NEXT
    IF ::__lNew .OR. ::Shared
       ::Unlock()
+      ::Commit()
    ENDIF
    ::__lNew := .F.
    ::__aData := {}
@@ -527,7 +540,7 @@ METHOD DestroyFields() CLASS DataTable
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lAll ) CLASS DataTable
+METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lDescend, lAll ) CLASS DataTable
    LOCAL lShared
    IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. cKey != (::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )
       lShared := ::Shared
@@ -542,7 +555,8 @@ METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery
             RETURN .F.
          ENDIF
       ENDIF
-      (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest ) )
+
+      (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lDescend ) )
       (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
       IF lShared
          ::Close()
@@ -705,7 +719,9 @@ CLASS DataRdd
    METHOD Skip( n )                           INLINE (::Owner:Area)->( dbSkip( n ) )
    METHOD Close()                             INLINE (::Owner:Area)->( dbCloseArea() )
    METHOD Append()                            INLINE (::Owner:Area)->( dbAppend() )
-   METHOD OrdSetFocus( cOrder )               INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
+   METHOD OrdSetFocus( cOrder           )     INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
+   //, if( lDescend != NIL, dbOrderInfo( DBOI_ISDESC, , cOrder, lDescend ), ) )
+
    METHOD SetIndex( cIndex )                  INLINE (::Owner:Area)->( dbSetIndex( cIndex ) )
    METHOD SetOrder( nOrder )                  INLINE (::Owner:Area)->( dbSetOrder( nOrder ) )
    METHOD Select( cAlias )                    INLINE IIF( ! EMPTY(cAlias), Select(cAlias), dbSelectArea( ::Owner:Area ) )

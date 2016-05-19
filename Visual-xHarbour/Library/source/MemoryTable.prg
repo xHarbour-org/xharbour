@@ -51,7 +51,7 @@ CLASS MemoryTable INHERIT Component
    METHOD Bof()              INLINE ::lBof
    METHOD RecCount()         INLINE LEN( ::Table )
    METHOD RecNo()            INLINE MIN( ::Record, LEN( ::Table ) )
-   
+
    METHOD OrdKeyRelPos()     INLINE ( ::Record / LEN( ::Table ) )
    METHOD ordKey()           INLINE ""
    METHOD GoTop()
@@ -59,7 +59,7 @@ CLASS MemoryTable INHERIT Component
    METHOD GoBottom()
    METHOD Skip()
    METHOD Delete()
-   
+
    METHOD Close()            INLINE ::Table := NIL
    METHOD Append()
    METHOD Insert()           INLINE ::Append( .T. )
@@ -164,7 +164,7 @@ METHOD Create() CLASS MemoryTable
          NEXT
 
          ::Fields := __clsInst( hClass ):Init( Self )
-         
+
          ::lCreated := .T.
          //IF VALTYPE( ::Owner ) == "O" .AND. __ObjHasMsg( ::Owner, "__DataSourceNotify" )
          //   ::Owner:__DataSourceNotify()
@@ -336,7 +336,7 @@ FUNCTION Browse( nTop, nLeft, nBottom, nRight, aData, aHeaders, cCaption, bActio
            :Table := aData
          #else
             FOR EACH Row IN aData
-               :Append()
+               (:Area)->( dbAppend() )
 
                IF ValType( Row ) == 'A'
                   aEval( Row, {|xField, nField| :Fields:FieldPut( nField, xField ) } )
@@ -358,7 +358,7 @@ FUNCTION Browse( nTop, nLeft, nBottom, nRight, aData, aHeaders, cCaption, bActio
 
    oForm:Create()
    oDataSource:GoTop()
-   
+
    WITH OBJECT ( oGrid := DATAGRID( oForm ) )
       :Left                 := 2
       :Width                := 607
@@ -394,18 +394,18 @@ RETURN .T.
 FUNCTION BrowseArray( aArray, aStructure, oForm )
    LOCAL oGrid, aRect, n, i, aTable, hWin := GetDeskTopWindow()
    aRect := _GetWindowRect( hWin )
-   
+
    IF Empty(oForm)
       // Create Form on the fly here
       oForm := WinForm( NIL )
       oForm:Create()
-   ENDIF   
-   
+   ENDIF
+
    WITH OBJECT oGrid := DataGrid( oForm )
-   
+
       IF aStructure == NIL
          aStructure := {}
-         IF VALTYPE( aArray[1] ) == "A" 
+         IF VALTYPE( aArray[1] ) == "A"
             FOR n := 1 TO LEN( aArray[1] )
                 AADD( aStructure, {"COLUMN"+XSTR(n), VALTYPE( aArray[1][n] ), LEN(XSTR(aArray[1][n])), 0 } )
             NEXT
@@ -414,7 +414,7 @@ FUNCTION BrowseArray( aArray, aStructure, oForm )
                     aStructure[i][3] := MAX( aStructure[i][3], LEN(XSTR(aArray[n][i])) )
                 NEXT
             NEXT
-          ELSE                
+          ELSE
             AADD( aStructure, {"COLUMN"+XSTR(n), VALTYPE( aArray[1] ), LEN(XSTR(aArray[1])), 0 } )
             aTable := {}
             FOR n := 1 TO LEN( aArray )
@@ -424,9 +424,9 @@ FUNCTION BrowseArray( aArray, aStructure, oForm )
             aArray := aTable
          ENDIF
          :ShowHeaders := .F.
-         
+
       ENDIF
-      
+
       :DataSource := MemoryTable( oForm )
       :DataSource:Structure := ACLONE( aStructure )
       :DataSource:Table     := ACLONE( aArray )
@@ -445,7 +445,7 @@ FUNCTION BrowseArray( aArray, aStructure, oForm )
       NEXT
       oForm:Width  := MAX( MIN( oForm:xWidth, aRect[3] ), 200 )
       oForm:Height := MAX( MIN( (:RowCount * :ItemHeight) + GetSystemMetrics( SM_CYCAPTION ) + (GetSystemMetrics( SM_CYBORDER )*2) + 10, aRect[4] ), 150 )
-      
+
       oForm:CenterWindow()
       oForm:Show()
    END
@@ -467,9 +467,9 @@ CLASS MemoryDataTable INHERIT DataTable
 
    DATA ReadOnly           EXPORTED INIT .F.
    DATA AutoOpen           EXPORTED INIT .T.
-   DATA SqlConnector       EXPORTED 
+   DATA SqlConnector       EXPORTED
    DATA Path               EXPORTED INIT ""
-   DATA CodePage           EXPORTED 
+   DATA CodePage           EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD Destroy()      INLINE  ::Close(), DBDrop("mem:"+::name), Super:Destroy()
 ENDCLASS

@@ -768,8 +768,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+C"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "C" )
-            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditCopy(), ) }
-            :Enabled          := .F.
+            :Action           := {|| ::Application:Project:EditCopy() }
             :Create()
          END
 
@@ -779,8 +778,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+X"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "X" )
-            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditCut(), ) }
-            :Enabled          := .F.
+            :Action           := {|| ::Application:Project:EditCut() }
             :Create()
          END
 
@@ -790,8 +788,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+V"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "V" )
-            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:EditPaste(), ) }
-            :Enabled          := .F.
+            :Action           := {|| ::Application:Project:EditPaste() }
             :Create()
          END
 
@@ -801,8 +798,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+Z"
             :ShortCutKey:Alt  := .T.
             :ShortCutKey:Key  := VK_BACK
-            :Enabled          := .F.
-            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:Undo(), ) }
+            :Action           := {|| ::Application:Project:Undo() }
             :Create()
          END
 
@@ -812,8 +808,7 @@ METHOD Init() CLASS IDE_MainForm
             :ShortCutText     := "Ctrl+Y"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "Y" )
-            :Enabled          := .F.
-            :Action           := {|o| IIF( o:Enabled .OR. UPPER( GetClassName( GetFocus() ) ) == "EDIT", ::Application:Project:Redo(), ) }
+            :Action           := {|| ::Application:Project:Redo() }
             :Create()
          END
 
@@ -1291,7 +1286,6 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Copy
          :ToolTip:Text := "Copy"
          :Action       := {|| ::Application:Project:EditCopy() }
-         :Enabled      := .F.
          :Create()
       END
 
@@ -1299,7 +1293,6 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Cut
          :ToolTip:Text := "Cut"
          :Action       := {||::Application:Project:EditCut() }
-         :Enabled      := .F.
          :Create()
       END
 
@@ -1307,7 +1300,6 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Paste
          :ToolTip:Text := "Paste"
          :Action       := {|| ::Application:Project:EditPaste() }
-         :Enabled      := .F.
          :Create()
       END
 
@@ -1315,7 +1307,6 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Delete
          :ToolTip:Text := "Delete"
          :Action       := {|| ::Application:Project:EditDelete() }
-         :Enabled      := .F.
          :Create()
       END
 
@@ -1324,7 +1315,6 @@ METHOD Init() CLASS IDE_MainForm
          :ToolTip:Text := "Undo"
          :BeginGroup   := .T.
          :Action       := {|| ::Application:Project:UnDo() }
-         :Enabled      := .F.
          :Create()
       END
 
@@ -1332,7 +1322,6 @@ METHOD Init() CLASS IDE_MainForm
          :ImageIndex   := ::System:StdIcons:Redo
          :ToolTip:Text := "Redo"
          :Action       := {|| ::Application:Project:ReDo() }
-         :Enabled      := .F.
          :Create()
       END
    END
@@ -1663,6 +1652,7 @@ METHOD Init() CLASS IDE_MainForm
       :Dock:Bottom  := ::Application:StatusBar
       :Dock:Right   := :Parent
       :Dock:Margin  := 3
+      :Visible      := .F.
       :Create()
 
       WITH OBJECT ::Application:Props[ "ComboSelect" ] := FormComboBox( :this )
@@ -2563,16 +2553,8 @@ METHOD EditReset(n) CLASS Project
          lSelected := .F.
       ENDIF
     ELSE
-      lCopied   := IsClipboardFormatAvailable( CF_TEXT )
       lSelected := ::Application:SourceEditor:Source != NIL .AND. ::Application:SourceEditor:Source:GetSelLen() > 0
    ENDIF
-   ::Application:Props[ "EditPasteItem" ]:Enabled := lCopied
-   ::Application:Props[ "EditPasteBttn" ]:Enabled := lCopied
-   ::Application:Props[ "EditCopyItem"  ]:Enabled := lSelected
-   ::Application:Props[ "EditCopyBttn"  ]:Enabled := lSelected
-   ::Application:Props[ "EditCutItem"   ]:Enabled := lSelected
-   ::Application:Props[ "EditCutBttn"   ]:Enabled := lSelected
-   ::Application:Props[ "EditDelBttn"   ]:Enabled := lSelected .OR. ( n == 1 .AND. ::CurrentForm != NIL )
 
    lEnabled := n == 1 .AND. ::CurrentForm != NIL .AND. LEN( ::CurrentForm:Selected ) > 1
 
@@ -2606,6 +2588,10 @@ METHOD NewProject() CLASS Project
       ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
       ::Application:Props[ "StartTabPage" ]:DockControls()
       ::Application:DoEvents()
+   ENDIF
+
+   IF ! ::Application:Props[ "ObjectManagerPanel" ]:Visible .AND. ::Application:Props[ "ViewObjectManagerItem" ]:Checked
+      ::Application:Props[ "ObjectManagerPanel" ]:Visible := .T.
    ENDIF
 
    ::AppObject := Application():Init( .T. )
@@ -2815,10 +2801,10 @@ METHOD TabOrder( oBtn ) CLASS Project
    ::__oTabStop := NIL
 
    IF oBtn:Checked
-      ::aRealSelection := ACLONE( ::CurrentForm:Selected )
+      ::aRealSelection := ::CurrentForm:Selected
     ELSE
       ::CurrentForm:Refresh()
-      ::CurrentForm:Selected := ACLONE( ::aRealSelection )
+      ::CurrentForm:Selected := ::aRealSelection
       ::aRealSelection := NIL
       ::CurrentForm:__lModified := .T.
    ENDIF
@@ -3825,6 +3811,9 @@ METHOD Open( cProject ) CLASS Project
       ::Application:Props[ "ViewToolBoxItem" ]:Checked := .T.
       ::Application:Props[ "StartTabPage" ]:DockControls()
       ::Application:DoEvents()
+   ENDIF
+   IF ! ::Application:Props[ "ObjectManagerPanel" ]:Visible .AND. ::Application:Props[ "ViewObjectManagerItem" ]:Checked
+      ::Application:Props[ "ObjectManagerPanel" ]:Visible := .T.
    ENDIF
 
    // Initialize everything !!!!!

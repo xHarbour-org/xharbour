@@ -148,7 +148,7 @@ METHOD RenameComponents( oForm, cName, cOldName )
       ENDIF
       FOR EACH cCtrl IN oForm:__hObjects:Keys
           oObj := oForm:__hObjects[ cCtrl ]
-          IF __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "C" .AND. oObj:&cType == cOldName
+          IF oObj != NIL .AND. __ObjHasMsg( oObj, cType ) .AND. VALTYPE( oObj:&cType ) == "C" .AND. oObj:&cType == cOldName
              __objSendMsg( oObj, "_" + cType, cName )
           ENDIF
       NEXT

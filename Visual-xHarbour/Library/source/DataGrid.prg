@@ -2090,7 +2090,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
 
               lHighLight := ::ShowSelection .AND. ( lFocus .OR. (::MultipleSelection .AND. lSelected .AND. LEN( ::aSelected ) > 0 ) ) .AND. lData .AND. lSelected .AND. ( ( ( ! ::FullRowSelect .AND. ::ColPos == i ) .OR. (::MultipleSelection .AND. lSelected .AND. LEN( ::aSelected ) > 0 ) ) .OR. ::FullRowSelect )
 
-              lShadow    := ! ::FullRowSelect .AND. lData .AND. ::ShowSelection .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos <> i .OR. ! lFocus ) )
+              lShadow    := ::Enabled .AND. ! ::FullRowSelect .AND. lData .AND. ::ShowSelection .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos <> i .OR. ! lFocus ) )
 
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )
@@ -3002,13 +3002,16 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD __FillCol( nCol ) CLASS DataGrid
-   LOCAL nRow, nRec := ::DataSource:Recno()
-   ::Children[ nCol ]:__lHidden := .F.
-   FOR nRow := 1 TO LEN( ::__DisplayArray )
-       ::__GoToRec( ::__DisplayArray[nRow][2] )
-       ::__FillRow( nRow, nCol )
-   NEXT
-   ::__GoToRec( nRec )
+   LOCAL nRow, nRec
+   IF ::DataSource != NIL
+      nRec := ::DataSource:Recno()
+      ::Children[ nCol ]:__lHidden := .F.
+      FOR nRow := 1 TO LEN( ::__DisplayArray )
+          ::__GoToRec( ::__DisplayArray[nRow][2] )
+          ::__FillRow( nRow, nCol )
+      NEXT
+      ::__GoToRec( nRec )
+   ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
@@ -4256,10 +4259,7 @@ METHOD Create() CLASS GridColumn
    ::Parent:Update()
    WITH OBJECT ::Parent
       IF ! :DesignMode .AND. :AnchorColumn == LEN( :Children )
-
-         :GetClientRect()
-
-         :Children[ :AnchorColumn ]:xWidth := ( :ClientWidth - :__DataWidth ) + :Children[ :AnchorColumn ]:xWidth
+         :Children[ :AnchorColumn ]:xWidth := ( :Width - :__DataWidth ) + :Children[ :AnchorColumn ]:xWidth
          :__GetDataWidth()
          :__DisplayData()
       ENDIF

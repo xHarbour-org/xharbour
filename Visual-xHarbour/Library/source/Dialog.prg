@@ -122,7 +122,7 @@ METHOD PostInitDialog() CLASS Dialog
    IF ::BackgroundImage != NIL
       ::BackgroundImage:Create()
    ENDIF
-
+/*
    IF !::__lShown
       ::__lShown := .T.
       ::__FixDocking()
@@ -133,6 +133,7 @@ METHOD PostInitDialog() CLASS Dialog
          RETURN ::Animate( 1000, ::AnimationStyle )
       ENDIF
    ENDIF
+*/
    ::Show( ::ShowMode )
 RETURN nRet
 
@@ -210,7 +211,7 @@ METHOD PreInitDialog() CLASS Dialog
       ENDDO
    ENDIF
    IF !EMPTY( ::xText )
-      SetWindowText( ::hWnd, ::xText )
+      ::SetWindowText( ::xText )
    ENDIF
    IF ::lEmpty //.AND. ::Modal
       ::SetDialogRect()

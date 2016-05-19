@@ -37,11 +37,12 @@ CLASS AdsDataTable INHERIT DataTable
 
    METHOD BlobGet( nFieldNo, nStart, nCount ) INLINE (::Area)->( dbFieldInfo( DBS_BLOB_GET, nFieldNo, { nStart, nCount } ) )
    METHOD MemoExt()                           INLINE ".adm"
-   METHOD Append()                            INLINE (::Area)->( dbAppend(), AdsNull2Blank() )
+   METHOD Append()                            INLINE ::Cancel(), (::Area)->( dbAppend(), AdsNull2Blank() )
    METHOD Save()
    METHOD SetData()
    METHOD FieldPut()
    METHOD NewInstance()
+   METHOD SetIndexDirection( lInv )           INLINE AdsSetIndexDirection( lInv )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -75,7 +76,7 @@ RETURN oNewTable
 METHOD Save() CLASS AdsDataTable
    LOCAL n, xValue
    IF ::__lNew
-      ::Append()
+      (::Area)->( dbAppend(), AdsNull2Blank() )
    ELSEIF ::Shared
       WHILE ! ::RecLock()
          sleep(1000)
@@ -92,12 +93,15 @@ METHOD Save() CLASS AdsDataTable
              ENDIF
           ENDIF
 
-       ELSEIF ::__aData[n] != NIL
-          ::SetData(n)
+       ELSE
+          IF LEN( ::__aData ) >= n .AND. ::__aData[n] != NIL
+             ::SetData(n)
+          ENDIF
        ENDIF
    NEXT
    IF ::__lNew .OR. ::Shared
       ::Unlock()
+      ::Commit()
    ENDIF
    ::__lNew := .F.
    ::__aData := {}

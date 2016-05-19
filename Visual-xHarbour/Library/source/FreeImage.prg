@@ -27,6 +27,7 @@ CLASS FreeImage INHERIT TitleControl, FreeImageRenderer
    METHOD OnEraseBkGnd()
    METHOD Destroy()             INLINE ::TitleControl:Destroy()
    METHOD __CreateBkBrush()
+   METHOD Save(cFile)           INLINE MemoWrit( cFile, ::__cData )
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------

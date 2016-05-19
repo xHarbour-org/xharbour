@@ -772,6 +772,10 @@ METHOD SetObjectValue( oActiveObject, xValue, cCaption, oItem ) CLASS ObjManager
       xValue := ALLTRIM( xValue )
    ENDIF
 
+   ::Application:Project:Modified := .T.
+   IF ::Application:Project:CurrentForm != NIL
+      ::Application:Project:CurrentForm:__lModified := .T.
+   ENDIF
    IF cProp2 != NIL .AND. cProp2 == "MDIClient" .AND. cProp IN {"AlignLeft","AlignTop","AlignRight","AlignBottom"}
       __objSendMsg( oActiveObject:MDIClient, "_"+cProp, xValue )
       IF xValue != NIL
@@ -2676,8 +2680,6 @@ METHOD SetValue( xValue ) CLASS EventManager
 
               IF Empty( xValue )
                  ::ActiveObject:Events[n][2][i][2] := ""
-                 ::Application:Project:Modified := .T.
-                 ::Application:Project:CurrentForm:__lModified := .T.
                ELSE
                  IF Empty( ::ActiveObject:Events[n][2][i][2] )
                     ::ActiveObject:Events[n][2][i][2] := xValue
@@ -2724,7 +2726,6 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
 
          nPos := :GetTextLen()-2
          :AppendText( "RETURN Self" + CRLF )
-         ::Application:Project:CurrentForm:__lModified := .T.
 
       ENDIF
       :GotoPosition( nPos )
@@ -2738,6 +2739,8 @@ METHOD GenerateEvent( cEvent, cFuncName, Event ) CLASS EventManager
    InvalidateRect( ::Application:SourceEditor:hWnd,, .F. )
 
    ::Application:ToolBox:Enabled := .F.
+   ::Application:Project:Modified := .T.
+   ::Application:Project:CurrentForm:__lModified := .T.
 RETURN Self
 
 //------------------------------------------------------------------------------------------
@@ -2755,6 +2758,7 @@ METHOD RenameEvent( cEvent, cFuncName, cNewFuncName, lSwitch ) CLASS EventManage
          nPos := :Editor:FindInPos( "METHOD "+cFuncName, 1 )
          IF nPos >= 0
             IF :Editor:ReplaceAll( cFuncName, cNewFuncName, SCFIND_WHOLEWORD ) > 0
+               ::Application:Project:Modified := .T.
                :__lModified := .T.
                IF lSwitch
                   ::Application:EditorPage:Select()
@@ -2814,6 +2818,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ENDIF
 
    IF EMPTY( aSel ) .OR. EMPTY( aSel[1] ) .OR. aSel[1][1] == NIL
+      aSel := NIL
       ::ResetContent()
       RETURN NIL
    ENDIF
@@ -2842,6 +2847,7 @@ METHOD ResetEvents( aSel ) CLASS EventManager
    ::lPaint := .T.
    ::SetRedraw( .T. )
    ::Application:Yield()
+   aSel := NIL
    //hb_gcall(.T.)
 RETURN Self
 

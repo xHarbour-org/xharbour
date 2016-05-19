@@ -135,7 +135,6 @@ CLASS SourceEditor INHERIT TitleControl
    METHOD FindNext()
    METHOD EnsureRangeVisible()
    METHOD OnLButtonUp()
-   METHOD OnKeyUp()
    METHOD OnKeyDown()
    METHOD InitLexer()
    METHOD AutoIndentText()
@@ -429,11 +428,16 @@ RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------
 METHOD InvertCase() CLASS SourceEditor
-   LOCAL cSel, cInv, cChar, nStartPos, nEndPos
+   LOCAL cSel, cInv, cChar, nStartPos, nEndPos, cBuffer
    IF ::Source:GetSelLen() > 0
+
       nStartPos := ::Source:GetSelectionStart()
       nEndPos   := ::Source:GetSelectionEnd()
-      cSel := ::Source:GetSelText()
+      cSel      := ::Source:GetSelText()
+      cBuffer   := SPACE( SCI_SEND( SCI_GETSELTEXT, 0, 0 ) )
+      SCI_SEND( SCI_GETSELTEXT, 0, cBuffer )
+      cBuffer := Left(cBuffer,LEN(cBuffer)-1)
+
       cInv := ""
       FOR EACH cChar IN cSel
           cInv += IIF( IsLower(cChar), UPPER(cChar), lower(cChar) )
@@ -488,6 +492,7 @@ RETURN NIL
 METHOD OnKeyDown( nKey ) CLASS SourceEditor
    LOCAL nNext, nLast, lMarkPrev
 
+   DEFAULT s_nSecs TO 0
    IF nKey == VK_F3
       IF ::Source:GetSelLen() > 0
          ::cFindWhat := ::Source:GetSelText()
@@ -500,49 +505,26 @@ METHOD OnKeyDown( nKey ) CLASS SourceEditor
          ::Application:Project:Find()
       ENDIF
 
-    ELSEIF nKey == VK_TAB
-      IF IsKeyDown( VK_CONTROL )
-         nNext := 0
-         IF ( Seconds() - s_nSecs ) > 1.5
-            nNext := ASCAN( ::aDocs, {|o|o:pSource==::pPrevSel} )
-         ENDIF
+    ELSEIF nKey == VK_TAB .AND. IsKeyDown( VK_CONTROL )
 
-         IF nNext == 0
-            nLast := ASCAN( ::aDocs, {|o|o:pSource==::Source:pSource} )
-            nNext := nLast + IIF( IsKeyDown( VK_SHIFT ), -1, 1 )
-            IF nNext > LEN( ::aDocs )
-               nNext := 1
-             ELSEIF nNext <= 0
-               nNext := LEN( ::aDocs )
-            ENDIF
-            lMarkPrev := .F.
-         ENDIF
-         ::Application:Project:SourceTabChanged( nNext, .F., lMarkPrev )
-         s_nSecs := Seconds()
-
+      nNext := 0
+      IF ( Seconds() - s_nSecs ) > 1.5
+         nNext := ASCAN( ::aDocs, {|o|o:pSource==::pPrevSel} )
       ENDIF
-   ENDIF
-RETURN NIL
 
-//------------------------------------------------------------------------------------------------------------------------------------
-METHOD OnKeyUp() CLASS SourceEditor
-   LOCAL lSel
-
-   IF ::Source != NIL
-      IF __ObjHasMsg( ::Application, "Props" ) .AND. HGetPos( ::Application:Props, "EditCopyItem" ) != 0
-         lSel := ::Source:GetSelLen() > 0
-
-         IF lSel != ::Application:Props[ "EditCopyItem" ]:Enabled
-
-            ::Application:Project:EditReset()
-
-            ::Application:Props:EditCopyItem:Enabled := lSel
-            ::Application:Props:EditCopyBttn:Enabled := lSel
-            ::Application:Props:EditCutItem:Enabled  := lSel
-            ::Application:Props:EditCutBttn:Enabled  := lSel
-            ::Application:Props:EditDelBttn:Enabled  := lSel
+      IF nNext == 0
+         nLast := ASCAN( ::aDocs, {|o|o:pSource==::Source:pSource} )
+         nNext := nLast + IIF( IsKeyDown( VK_SHIFT ), -1, 1 )
+         IF nNext > LEN( ::aDocs )
+            nNext := 1
+          ELSEIF nNext <= 0
+            nNext := LEN( ::aDocs )
          ENDIF
+         lMarkPrev := .F.
       ENDIF
+      ::Application:Project:SourceTabChanged( nNext, .F., lMarkPrev )
+      s_nSecs := Seconds()
+
    ENDIF
 RETURN NIL
 
