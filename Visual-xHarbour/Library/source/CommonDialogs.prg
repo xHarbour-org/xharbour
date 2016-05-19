@@ -65,11 +65,11 @@ RETURN Self
 
 METHOD Show() CLASS ColorDialog
    LOCAL lRet
-   lRet := _ChooseColor( ::Owner:hWnd, @::Color, ::Application:CustomColors, ::Style, "VXHCOLORDIALOGPROC" )
+   lRet := _ChooseColor( ::Owner:hWnd, @::Color, ::Application:CustomColors, ::Style )//, "VXHCOLORDIALOGPROC" )
 RETURN lRet
 
-FUNCTION VXHCOLORDIALOGPROC( hWnd, nMsg, nwParam, nlParam )
-RETURN 1
+//FUNCTION VXHCOLORDIALOGPROC( hWnd, nMsg, nwParam, nlParam )
+//RETURN 1
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
