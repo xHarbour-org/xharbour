@@ -1,6 +1,0 @@
-*.log
-*.ppo
-._firebird.c
-._oci8dp.h
-._sqlconnection.prg
-._*
