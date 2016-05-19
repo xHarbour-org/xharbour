@@ -859,7 +859,7 @@ METHOD __Register( cClass ) CLASS Window
 
       wcex:hbrBackground  := ::ClassBrush
       wcex:lpszClassName  := ::ClsName
-      wcex:hCursor        := IIF( ::__hCursor != NIL, ::__hCursor, LoadCursor(, IDC_ARROW ) )
+      wcex:hCursor        := LoadCursor(, IDC_ARROW )
       wcex:cbWndExtra     := 16
 
       IF ::ClsName == "MDIChild"
@@ -1083,7 +1083,7 @@ METHOD Create( oParent ) CLASS Window
 
    __SetWindowObjPtr( Self )
 
-   IF ::xCursor != IDC_ARROW
+   IF ::xCursor != NIL .AND. ::xCursor != IDC_ARROW
       ::__SetWindowCursor( ::xCursor )
    ENDIF
 
@@ -1278,12 +1278,8 @@ METHOD SetBackColor( nColor, lRepaint ) CLASS Window
    IF nColor != NIL
       ::BkBrush := CreateSolidBrush( nColor )
    ENDIF
-   IF ::IsWindowVisible()
-      IF lRepaint
-         ::Redraw()
-       ELSE
-         ::InValidateRect()
-      ENDIF
+   IF lRepaint .AND. ::IsWindowVisible()
+      ::InValidateRect()
    ENDIF
 RETURN SELF
 
@@ -1291,15 +1287,11 @@ METHOD SetForeColor( nColor, lRepaint ) CLASS Window
    DEFAULT lRepaint TO .T.
    ::xForeColor := nColor
    IF lRepaint .AND. ::IsWindowVisible()
-      ::Redraw()//::Refresh()
-   ENDIF
-   IF ::IsWindowVisible()
       ::InValidateRect()
    ENDIF
 RETURN SELF
 
 //-----------------------------------------------------------------------------------------------
-
 METHOD IsCovered( nTopClip) CLASS Window
    LOCAL lRet := FALSE
    LOCAL aClip, nRet
@@ -2045,6 +2037,11 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkgnd( hDC ) CLASS Window
    LOCAL nRet
+
+   IF ::BkBrush == NIL .AND. ::ClsName == "Dialog" .AND. ::Modal .AND. ::xBackColor != NIL .AND. ::xBackColor <> ::__SysBackColor
+      ::BkBrush := CreateSolidBrush( ::xBackColor )
+   ENDIF
+
    IF ::BkBrush != NIL
       ::GetClientRect()
       _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
@@ -2205,7 +2202,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               mmi  := (struct MINMAXINFO *) nlParam
               nRet := ExecuteEvent( "OnGetMinMaxInfo", Self )
 
-              IF nRet == NIL
+              IF nRet == NIL .AND. ! ::DesignMode
                  IF ::MinWidth > 0
                     mmi:ptMinTrackSize:x := ::MinWidth
                     nRet := 0

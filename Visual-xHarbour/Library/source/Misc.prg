@@ -19,6 +19,10 @@
 #define REG_DWORD                   4
 #define KEY_WOW64_64KEY 0x0100
 
+#define KEY_READ        25 // ((STANDARD_RIGHTS_READ +  KEY_QUERY_VALUE + KEY_ENUMERATE_SUB_KEYS +  KEY_NOTIFY) & (~SYNCHRONIZE))
+#define KEY_WRITE        6 // ((STANDARD_RIGHTS_WRITE +  KEY_SET_VALUE +  KEY_CREATE_SUB_KEY) & (~SYNCHRONIZE))
+#define KEY_EXECUTE     25 // ((KEY_READ) & (~SYNCHRONIZE))
+
 CLASS Registry
    DATA nKey, cKey EXPORTED
    DATA Value      EXPORTED
@@ -74,7 +78,7 @@ METHOD GetKeys( lDel ) CLASS Registry
 RETURN aRet
 
 //-----------------------------------------------------------------------------------------------------------------------------
-METHOD Open( nKey, cKey ) CLASS Registry
+METHOD Open( nKey, cKey, nAccess ) CLASS Registry
    LOCAL lRet, hKey
    IF VALTYPE( nKey ) == "C"
       cKey := nKey
@@ -85,9 +89,10 @@ METHOD Open( nKey, cKey ) CLASS Registry
       ::nKey := nKey
       ::cKey := cKey
    ENDIF
-   lRet := RegOpenKeyEx( nKey, cKey, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, @hKey ) == 0
+   DEFAULT nAccess TO KEY_ALL_ACCESS
+   lRet := RegOpenKeyEx( nKey, cKey, 0, nAccess | KEY_WOW64_64KEY, @hKey ) == 0
    IF lRet
-      RegDisableReflectionKey( hKey ) 
+      RegDisableReflectionKey( hKey )
       AADD( ::aKeys, hKey )
    ENDIF
 RETURN lRet

@@ -354,6 +354,10 @@ METHOD OnPaint() CLASS WindowEdit
    hBitmap    := CreateCompatibleBitmap( hDC, ::ClientWidth, ::ClientHeight )
    hOldBitmap := SelectObject( hMemDC, hBitmap )
 
+   IF ::BkBrush == NIL .AND. ::Modal .AND. ::xBackColor != NIL .AND. ::xBackColor <> ::__SysBackColor
+      ::BkBrush := CreateSolidBrush( ::xBackColor )
+   ENDIF
+
    _FillRect( hMemDC, { 0,0,::ClientWidth, ::ClientHeight }, IIF( ::bkBrush != NIL, ::bkBrush, GetSysColorBrush( COLOR_BTNFACE ) ) )
 
    IF ::Application:ShowGrid == 1
@@ -775,7 +779,7 @@ METHOD ControlSelect( x, y ) CLASS WindowEdit
     ELSEIF LEN( ::Selected ) >= ::CtrlHover
       // a point is clicked, i have to select the control and release the rest
       n := LEN( ::Selected )
-      ::Selected := { ACLONE( ::Selected[ ::CtrlHover ] ) }
+      ::Selected := { ::Selected[ ::CtrlHover ] }
 
       IF n > 1
          ::CtrlOldPt := NIL
@@ -1296,8 +1300,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
     ELSEIF ::MouseDown
 
       IF LEN( ::Selected ) > 0
-
-         aSelected := ACLONE( ::Selected )
+         aSelected := ::Selected
          IF aSelected[1][1]:__CustomOwner
             aSelected := { { aSelected[1][1]:GetCCTL() } }
          ENDIF

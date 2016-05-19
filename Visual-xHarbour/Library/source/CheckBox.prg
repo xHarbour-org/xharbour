@@ -58,6 +58,8 @@ CLASS CheckBox INHERIT Control
    PROPERTY RightAlign  ROOT "Appearance"                             DEFAULT .F.
    PROPERTY BoxSize     ROOT "Appearance"                             DEFAULT 15
 
+   PROPERTY Checked     GET ::IsChecked() SET ::SetState(v)           DEFAULT .F.
+
    DATA ImageIndex
    DATA DefaultButton  EXPORTED INIT .F.
 
@@ -78,10 +80,10 @@ CLASS CheckBox INHERIT Control
    METHOD SetState()
    METHOD OnEraseBkGnd()  INLINE 1
    METHOD GetState()      INLINE ::SendMessage( BM_GETSTATE, 0, 0 )
-   METHOD Checked()       INLINE ( ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
    METHOD Check()         INLINE ::State := BST_CHECKED
    METHOD UnCheck()       INLINE ::State := BST_UNCHECKED
    METHOD Indeterminate() INLINE ::State := BST_INDETERMINATE
+   METHOD IsChecked()     INLINE ( ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_CHECKED ) != 0
 
    METHOD __SetSize()
    //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
@@ -340,6 +342,9 @@ METHOD OnCtlColorStatic( nwParam ) CLASS CheckBox
 RETURN hBkGnd
 
 METHOD SetState( nState ) CLASS CheckBox
+   IF VALTYPE( nState ) == "L"
+      nState := IIF( nState, BST_CHECKED, BST_UNCHECKED )
+   ENDIF
    IF ::IsWindow()
       ::SendMessage( BM_SETCHECK, nState, 0 )
    ENDIF

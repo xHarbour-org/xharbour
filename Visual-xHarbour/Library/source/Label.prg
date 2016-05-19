@@ -57,7 +57,7 @@ CLASS Label INHERIT Control
    METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
-   METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), ::InvalidateRect(), ::UpdateWindow()
+   METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), IIF( ::IsWindowVisible(), ( ::InvalidateRect(), ::UpdateWindow() ), )
    //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
    METHOD __SetBlinkColor()
    METHOD OnSize(w,l)          INLINE Super:OnSize( w, l ), ::Redraw(), NIL

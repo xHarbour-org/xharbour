@@ -56,7 +56,7 @@ CLASS ColorDialog INHERIT CommonDialogs
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ColorDialog
-   ::Style := CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN
+   ::Style := CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN //| CC_ENABLEHOOK
    ::__xCtrlName := "ColorDialog"
    ::ClsName     := "ColorDialog"
    ::ComponentType := "CommonDialog"
@@ -65,8 +65,11 @@ RETURN Self
 
 METHOD Show() CLASS ColorDialog
    LOCAL lRet
-   lRet := _ChooseColor( ::Owner:hWnd, @::Color, ::Application:CustomColors, ::Style )
+   lRet := _ChooseColor( ::Owner:hWnd, @::Color, ::Application:CustomColors, ::Style, "VXHCOLORDIALOGPROC" )
 RETURN lRet
+
+FUNCTION VXHCOLORDIALOGPROC( hWnd, nMsg, nwParam, nlParam )
+RETURN 1
 
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
@@ -555,6 +558,8 @@ RETURN .F.
 #define TDF_NO_DEFAULT_RADIO_BUTTON         0x4000
 #define TDF_CAN_BE_MINIMIZED                0x8000
 
+#define TDF_SIZE_TO_CONTENT                 0x1000000
+
 #define TDCBF_OK_BUTTON                     0x0001
 #define TDCBF_YES_BUTTON                    0x0002
 #define TDCBF_NO_BUTTON                     0x0004
@@ -564,13 +569,14 @@ RETURN .F.
 
 
 CLASS TaskDialog INHERIT CommonDialogs
-   DATA __Flags         PROTECTED INIT 0
+   DATA __Flags         PROTECTED INIT TDF_SIZE_TO_CONTENT
    DATA __ComBttns      PROTECTED INIT 0
 
    DATA ButtonPressed           EXPORTED
    DATA RadioButton             EXPORTED
    DATA VerificationFlagChecked EXPORTED
 
+   PROPERTY Width                                                                           DEFAULT 0
    PROPERTY Buttons                                                                         DEFAULT ""
    PROPERTY MainInstruction                                                                 DEFAULT ""
    PROPERTY Content                                                                         DEFAULT ""
@@ -630,11 +636,12 @@ METHOD Show() CLASS TaskDialog
                                ::__ComBttns,;
                                ::WindowTitle,;
                                ::Footer,;
+                               ::Width,;
                                @nButton, @nRadio, @lChecked )
    ::ButtonPressed := nButton
    ::RadioButton   := nRadio
    ::VerificationFlagChecked := lChecked
-RETURN nButton != IDCANCEL
+RETURN nButton
 
 METHOD __SetFlags( nFlags, lAdd ) CLASS TaskDialog
    DEFAULT lAdd TO .T.

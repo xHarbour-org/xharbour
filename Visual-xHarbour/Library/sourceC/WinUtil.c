@@ -102,6 +102,8 @@ static IDispatch *pDispPtr;
 static HMODULE hLib = NULL;
 static PHB_DYNS pDynSym;
 static PHB_DYNS pFontDynSym;
+static PHB_DYNS pColorDynSym;
+
 
 typedef BOOL (WINAPI *ATLAXWININIT)(void);
 typedef BOOL (WINAPI *ATLAXWINTERM)(void);
@@ -1914,35 +1916,14 @@ HB_FUNC( __AXTRANSLATE )
 }
 
 */
+BOOL AxTranslateMessageEx( MSG *pMsg );
 
-HB_FUNC( __AXTRANSLATEFROMHWND )
+
+HB_FUNC( __AXTRANSLATEMESSAGEEX )
 {
    BOOL bRet = FALSE;
-   IUnknown *pUnk = NULL;
-
-   if( hLib != NULL )
-   {
-      ATLAXGETCONTROL pAtlAxGetControl = (ATLAXGETCONTROL) GetProcAddress( hLib, "AtlAxGetControl" );
-
-      if (pAtlAxGetControl)
-      {
-         pAtlAxGetControl( (HWND) hb_parnl(1), &pUnk );
-
-         if( pUnk )
-         {
-            IOleInPlaceActiveObject *pIOIPAO = NULL;
-            MSG *pMsg = (MSG*) hb_param( 2, HB_IT_STRING )->item.asString.value;
-
-            if (SUCCEEDED( pUnk->lpVtbl->QueryInterface( pUnk, &IID_IOleInPlaceActiveObject, (void**) &pIOIPAO ) ) );
-            {
-               HRESULT hr = pIOIPAO->lpVtbl->TranslateAccelerator( pIOIPAO, pMsg );
-               pIOIPAO->lpVtbl->Release(pIOIPAO);
-               bRet = ( S_OK == hr );
-            }
-         }
-      }
-   }
-
+   MSG *msg = (MSG*) hb_param( 1, HB_IT_STRING )->item.asString.value;
+   bRet = AxTranslateMessageEx( msg );
    hb_retl( bRet );
 }
 
@@ -4962,25 +4943,16 @@ HB_FUNC( TASKBARPROGRESSSTATE )
 //#define WM_FORWARDMSG 0x037F
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
-BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
+BOOL AxTranslateMessageEx( MSG *pMsg )
 {
    BOOL bRet = FALSE;
-   if( pMsg->message == WM_KEYDOWN )
+   if( (pMsg->message >= WM_KEYFIRST) && (pMsg->message <= WM_KEYLAST) )
    {
-      if( pMsg->wParam == VK_RETURN || ( ( pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE ) && ( strcmp( cClass, TEXT("Internet Explorer_Server") ) == 0 || strcmp( cClass, TEXT("Shell DocObject View") ) == 0 ) ) )
+      if( pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK )
       {
          LPUNKNOWN pUnk;
          HWND hParent;
          HWND hWnd = pMsg->hwnd;
-
-         if( strcmp( cClass, TEXT("Shell DocObject View") ) == 0 )
-         {
-            hWnd = FindWindowEx( hWnd, 0, NULL, NULL );
-            if( ! hWnd )
-            {
-               hWnd = pMsg->hwnd;
-            }
-         }
 
          while( ! ( pUnk = (LPUNKNOWN) GetWindowLong( hWnd, GWL_USERDATA ) ) )
          {
@@ -4991,7 +4963,6 @@ BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
             }
             hWnd = hParent;
          }
-//         bRet = SendMessage(hWnd, WM_FORWARDMSG, 0, (LPARAM) pMsg );
 
          if( pUnk )
          {
@@ -5003,6 +4974,14 @@ BOOL AxTranslateMessageEx( MSG *pMsg, char *cClass )
                DispatchMessage( pMsg );
                bRet = TRUE;
             }
+         }
+      }
+      else
+      {
+         LPUNKNOWN pUnk = (LPUNKNOWN) GetWindowLong( pMsg->hwnd, GWL_USERDATA );
+         if( pUnk )
+         {
+            AxTranslateMessage( pUnk, pMsg );
          }
       }
    }
@@ -5064,33 +5043,22 @@ HB_FUNC( __VXHYIELD )
 HB_FUNC( VXH_MAINLOOP )
 {
    MSG msg;
-   BOOL bRet;
-   //HWND hMain = (HWND) hb_parnl(1);
    HWND hMDI  = (HWND) hb_parnl(2);
    PHB_ITEM aAccel = (PHB_ITEM) hb_param( 3, HB_IT_ARRAY );
    BOOL bAccEnabled = (BOOL) hb_parl(4);
 
-   while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0)
+   while( GetMessage( &msg, NULL, 0, 0 ) )
    {
-      if (bRet != -1)
+      if( ! AxTranslateMessageEx( &msg ) )
       {
-         TCHAR cClass[ MAX_PATH ];
-         GetClassName( msg.hwnd, cClass, MAX_PATH ) ;
-
-         if( ! AxTranslateMessageEx( &msg, cClass ) )
+         if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
          {
-            if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
+            if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
             {
-               if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
+               if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
                {
-                  if( !( strcmp( cClass, TEXT("AfxFrameOrView42s") ) == 0) )
-                  {
-                     if( ! IsDialogMessage( GetActiveWindow(), &msg ) )
-                     {
-                        TranslateMessage( &msg );
-                        DispatchMessage( &msg );
-                     }
-                  }
+                  TranslateMessage( &msg );
+                  DispatchMessage( &msg );
                }
             }
          }
@@ -5779,3 +5747,50 @@ HB_FUNC( _ENUMFONTS )
    hb_retni( EnumFonts( (HDC) hb_parnl(1), (LPCTSTR) hb_parc(2), (FONTENUMPROC) EnumFontProc, (LPARAM) hb_parnl(4) ) );
 }
 
+int CALLBACK ChooseColorProc( HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam )
+{
+   int iResponse = 0;
+   if( pColorDynSym )
+   {
+      hb_vmPushSymbol( pColorDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmPushLong( (long) hdlg );
+      hb_vmPushLong( (long) uiMsg );
+      hb_vmPushLong( (long) wParam );
+      hb_vmPushLong( (long) lParam );
+      hb_vmDo( 4 );
+      iResponse = hb_itemGetNI( hb_stackReturnItem() );
+   }
+   return iResponse;
+}
+
+//----------------------------------------------------------------------------
+HB_FUNC( _CHOOSECOLOR )
+{
+   CHOOSECOLOR cc ;
+   COLORREF crCustClr[16] ;
+   int i ;
+   BOOL bRet ;
+
+   //pColorDynSym = hb_dynsymFindName( hb_parc(5) );
+
+   for( i = 0 ; i <16 ; i++ )
+     crCustClr[i] = (ISARRAY(3) ? hb_parnl(3,i+1) : RGB(0,0,0)) ;// GetSysColor(COLOR_BTNFACE)) ;
+
+   cc.lStructSize    = sizeof( CHOOSECOLOR ) ;
+   cc.hwndOwner      = ISNIL(1) ? GetActiveWindow():(HWND) hb_parnl(1) ;
+   cc.rgbResult      = ISNIL(2) ? (COLORREF) 0 : (COLORREF) hb_parnl(2) ;
+   cc.lpCustColors   = crCustClr ;
+   cc.Flags          = (WORD) (ISNIL(4) ? CC_ANYCOLOR | CC_FULLOPEN | CC_RGBINIT : hb_parnl(4) ) ;
+//   cc.lpfnHook       = (LPCCHOOKPROC) ChooseColorProc;
+
+   bRet = (BOOL) ChooseColor( &cc );
+   if ( bRet )
+   {
+      hb_stornl( (LONG) cc.rgbResult, 2 );
+      if ( ISARRAY(3) && hb_parinfa(3,0) >= 16 )
+         for( i = 0 ; i <16 ; i++ )
+             hb_stornl( (LONG) cc.lpCustColors[i], 3, i+1 );
+   }
+   hb_retl( bRet );
+}
