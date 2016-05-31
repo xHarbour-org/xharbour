@@ -66,6 +66,8 @@ CLASS TreeViewItem INHERIT Object
    METHOD SetImageIndex()
    METHOD SetOwner()
    METHOD SetPosition()
+   METHOD GetChecked()          INLINE TVItemGetCheck( ::Parent:hWnd, ::hItem )
+   METHOD SetChecked(lChecked)  INLINE TVItemSetCheck( ::Parent:hWnd, ::hItem, lChecked )
 ENDCLASS
 
 //----------------------------------------------------------------------------//

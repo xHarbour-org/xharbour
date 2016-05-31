@@ -16,6 +16,7 @@
 #include "colors.ch"
 
 #include "ord.ch"
+#include "ads.ch"
 
 #define EF_NONE                         0
 #define EF_CANRETRY                     1
@@ -27,6 +28,8 @@
 REQUEST HB_MEMIO
 
 static nMemSel := 100
+static hFTConnection, hADDConnection
+
 //-------------------------------------------------------------------------------------------------------
 
 CLASS DataTable INHERIT Component
@@ -74,6 +77,7 @@ CLASS DataTable INHERIT Component
    ASSIGN DataConnector(o) INLINE ::BindingSource := o
    ACCESS IsNew            INLINE ::__lNew
 
+   DATA Connection         EXPORTED
    DATA Font               EXPORTED
    DATA ToolTip            EXPORTED
    DATA Id                 EXPORTED
@@ -126,6 +130,7 @@ CLASS DataTable INHERIT Component
    METHOD CreateFields()
    METHOD Create()
    METHOD MemoExt()                           INLINE ::Connector:MemoExt()
+   METHOD TableExt()                          INLINE ::Connector:TableExt()
    METHOD Gather()                            INLINE ::Connector:Gather()
    METHOD Scatter( aData )                    INLINE ::Connector:Scatter( aData )
    METHOD SetScope( xScope )                  INLINE ::Connector:SetScope( xScope )
@@ -228,12 +233,13 @@ CLASS DataTable INHERIT Component
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Init( oOwner ) CLASS DataTable
+METHOD Init( oOwner, hConnection ) CLASS DataTable
    DEFAULT ::__xCtrlName TO "DataTable"
    DEFAULT ::ClsName     TO "DataTable"
    ::ComponentType := "DataSource"
+   ::Connection    := hConnection
    ::Super:Init( oOwner )
-   ::Connector := DataRdd( Self )
+   ::Connector  := DataRdd( Self )
    HSetCaseMatch( ::FieldCtrl, .F. )
 RETURN Self
 
@@ -267,13 +273,11 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewInstance( lSetCurPos ) CLASS DataTable
-   LOCAL n, oNewTable := DataTable( ::Owner )
-
+   LOCAL n, oNewTable := DataTable( ::Owner, ::Connection )
    n := 1
    WHILE Select( ::Alias+xStr(n) ) > 0
       n++
    ENDDO
-
    oNewTable:Area      := NIL
    oNewTable:xAlias    := ::Alias+xStr(n)
    oNewTable:xFileName := ::FileName
@@ -441,19 +445,37 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
-   LOCAL lChanged, n, cFileName, cPath, cMemo
+   LOCAL lChanged, n, cFileName, cPath, cMemo, cData, cTable, aIndex
    IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:__hObjects[ ::Socket ]
       IF ! ::DesignMode
          ::Connector := SocketRdd( Self )
       ENDIF
    ENDIF
+   IF ::Connection != NIL
+      cFileName := ::FileName
+      n := RAT( "\", cFileName )
+      cPath  := SUBSTR( cFileName, 1, n-1 )
+
+      cTable := SubStr( cFileName, n+1 )
+      n := RAT( ".", cTable )
+      cTable  := Left( cTable, n-1 )
+
+      aIndex := AdsDDFindObject( ADS_DD_INDEX_FILE_OBJECT, cTable, ::Connection )
+
+      // Disaster recovery: Index file deleted
+      IF ! Empty(aIndex) .AND. ! File( cPath + "\" + aIndex[1] )
+         AdsDDRemoveIndexFile( cTable, aIndex[1], 0, ::Connection )
+      ENDIF
+
+      AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
+   ENDIF
    ::Connector:Create( lIgnoreAO )
    IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
-             lChanged := ::__aTmpStruct[n][1] != ::Structure[n][1] .OR.;
+             lChanged := Upper(::__aTmpStruct[n][1]) != Upper(::Structure[n][1]) .OR.;
                          ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
                          ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
                          ::__aTmpStruct[n][4] != ::Structure[n][4]
@@ -463,45 +485,93 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
          NEXT
       ENDIF
       IF lChanged
-         cFileName  := ::FileName
-         n := RAT( "\", cFileName )
-         cPath     := SUBSTR( cFileName, 1, n-1 )
+         cFileName := ::FileName
+         n         := RAT( "\", cFileName )
+         cData     := SUBSTR( cFileName, 1, n-1 )
+         cPath     := GetTempPath()
+
+         IF ::Connection != NIL
+            IF hFTConnection == NIL
+               IF ! AdsConnect60( SUBSTR( cFileName, 1, n-1 ), , , , , @hFTConnection )
+                  RETURN NIL
+               ENDIF
+            ELSE
+               AdsConnection( hFTConnection )
+            ENDIF
+         ENDIF
+
          cFileName := SUBSTR( cFileName, n+1 )
 
-         dbCreate( cPath + "\__" + cFileName, ::__aTmpStruct, ::Driver )
+         dbCreate( cPath + "__" + cFileName, ::__aTmpStruct, ::Driver, , , , , 0 )
 
-         IF FILE( cPath + "\__" + cFileName )
-            ::Close()
+         IF FILE( cPath + "__" + cFileName )
+            dbCloseArea( ::Area )
 
-            dbUseArea( ! ::__lMemory, ::Driver, cPath + "\__" + cFileName, "modstru", .F., .F. )
-            cMemo := ::MemoExt()
+            IF ::Connection != NIL
+               AdsDDRemoveTable( cFileName, 0, ::Connection )
+            ENDIF
+
+            dbUseArea( ! ::__lMemory, ::Driver, cPath + "__" + cFileName, "modstru", .F., .F.,, 0 )
 
             SELECT "modstru"
-            APPEND FROM (cPath + "\" + cFileName) VIA (::Driver)
-
+            APPEND FROM (::FileName) VIA (::Driver)
             modstru->( dbCloseArea() )
-            FERASE( cPath + "\" + cFileName )
-            FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
+
+            FERASE( ::FileName )
+
+            FRENAME( cPath + "__" + cFileName, ::FileName )
 
             n := RAT( ".", cFileName )
-            cFileName := Left( cFileName, n-1 ) + cMemo
-            FRENAME( cPath + "\__" + cFileName, cPath + "\" + cFileName )
+            cMemo := Left( cFileName, n-1 ) + ::MemoExt()
 
-            ::Connector := DataRdd( Self )
-            ::Connector:Create( lIgnoreAO )
+            FERASE( cData + "\" + cMemo )
+            FRENAME( cPath + "__" + cMemo, cData + "\" + cMemo )
+
+            IF ::Connection != NIL
+               AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
+               cFileName := SUBSTR( ::FileName, Rat( "\", ::FileName )+1 )
+            ELSE
+               cFileName := ::FileName
+            ENDIF
+
          ENDIF
+
+         IF ::Connection != NIL
+            AdsConnection( ::Connection )
+         ENDIF
+         dbSelectArea( ::Area )
+         dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
+
       ENDIF
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateTable( aStruc, cFile ) CLASS DataTable
+   LOCAL n, aTables, cTableName
    DEFAULT cFile  TO ::FileName
    DEFAULT aStruc TO ::Structure
    IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
-      ::Connector:CreateTable( cFile, aStruc, ::Driver )
+      IF ! ::Connector:CreateTable( cFile, aStruc, ::Driver )
+         IF ::Connection != NIL
+            n       := RAT( "\", cFile )
+            cTableName := SUBSTR( cFile, n+1 )
+            n       := RAT( ".", cTableName )
+            cTableName := SUBSTR( cTableName, 1, n-1 )
+            aTables := AdsDDFindObject( ADS_DD_TABLE_OBJECT, , ::Connection )
 
-    ELSEIF File( cFile ) .AND. ! Empty( aStruc )
+            IF ASCAN( aTables, {|cTable| Upper(cTable)==Upper(cTableName)} ) > 0
+               // Disaster recovery: Table file deleted
+               IF ! AdsDDRemoveTable( cTableName, 0, ::Connection )
+                  view AdsGetLastError()
+               ELSE
+                  ::Connector:CreateTable( cFile, aStruc, ::Driver )
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+
+   ELSEIF File( cFile ) .AND. ! Empty( aStruc )
       ::__aTmpStruct := aClone( aStruc )
 
    ENDIF
@@ -541,32 +611,52 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lDescend, lAll ) CLASS DataTable
-   LOCAL lShared
-   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. cKey != (::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )
-      lShared := ::Shared
-      IF lShared
-         ::Close()
-         ::Shared := .F.
-         ::Connector := DataRdd( Self )
-         ::Open()
-         IF ! ::IsOpen
-            ::Shared := .T.
-            ::Open()
-            RETURN .F.
+   LOCAL n, cFileName, cPath
+
+   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. ! Upper(cKey) == Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ))
+      cFileName := ::FileName
+      n         := RAT( "\", cFileName )
+      cPath     := Left( cFileName, n-1 )
+      cFileName := SubStr( cFileName, n+1 )
+
+      dbCloseArea( ::Area )
+
+      IF ::Connection != NIL
+         IF ! AdsDDRemoveTable( cFileName, 0, ::Connection )
+            view AdsGetLastError()
+         ENDIF
+
+         IF hFTConnection == NIL
+            IF ! AdsConnect60( cPath, , , , , @hFTConnection )
+               view AdsGetLastError()
+               RETURN NIL
+            ENDIF
+         ELSE
+            AdsConnection( hFTConnection )
          ENDIF
       ENDIF
 
+      dbSelectArea( ::Area )
+      dbUseArea( .F., ::Driver, cPath + "\" + cFileName, ::Alias, .F., ::ReadOnly, ::CodePage )
+
       (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lDescend ) )
       (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
-      IF lShared
-         ::Close()
-         ::Shared := .T.
-         ::Connector := DataRdd( Self )
-         ::Open()
+
+      dbCloseArea( ::Area )
+
+      IF ::Connection != NIL
+         AdsDDAddTable( , cPath + "\" + cFileName, ::TableType, ::Connection )
+         AdsConnection( ::Connection )
+      ELSE
+         cFileName := cPath + "\" + cFileName
       ENDIF
-      RETURN (::Area)->( OrdNumber( cTag, cOrderBagName ) ) > 0 .AND. (::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ) == cKey
+
+      dbSelectArea( ::Area )
+      dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
+
+      RETURN (::Area)->( OrdNumber( cTag, cOrderBagName ) ) > 0 .AND. Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )) == Upper(cKey)
    ENDIF
-RETURN .F.
+RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open() CLASS DataTable
@@ -741,7 +831,7 @@ CLASS DataRdd
    METHOD OrdKey(n)                           INLINE (::Owner:Area)->( OrdKey(n) )
    METHOD Struct()                            INLINE (::Owner:Area)->( dbStruct() )
    METHOD OrdKeyGoTo( nPos )                  INLINE (::Owner:Area)->( OrdKeyGoTo( nPos ) )
-   METHOD SetFilter( c )                      INLINE IIF( c != NIL, (::Owner:Area)->( dbSetFilter( COMPILE( c ), c ) ), (::Owner:Area)->( dbClearFilter() ) )
+   METHOD SetFilter()
 
 
    METHOD GetFilter()                         INLINE (::Owner:Area)->( dbFilter() )
@@ -755,6 +845,7 @@ CLASS DataRdd
    METHOD FieldPos( cField )                  INLINE (::Owner:Area)->( FieldPos( cField ) )
    METHOD FieldType( nField )                 INLINE (::Owner:Area)->( FieldType( nField ) )
    METHOD OrdBagExt()                         INLINE (::Owner:Area)->( OrdBagExt() )
+   METHOD TableExt()                          INLINE (::Owner:Area)->( RddInfo( RDDI_TABLEEXT ) )
    METHOD MemoExt()                           INLINE (::Owner:Area)->( RddInfo( RDDI_MEMOEXT ) )
 
    METHOD CreateTable( cFile, aStru, cDriver) INLINE dbCreate( cFile, aStru, cDriver )
@@ -771,6 +862,17 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner ) CLASS DataRdd
    ::Owner := oOwner
+RETURN Self
+
+METHOD SetFilter( cFilter ) CLASS DataRdd
+   IF cFilter != NIL
+      IF ValType( cFilter ) == "C"
+         cFilter := COMPILE( cFilter )
+      ENDIF
+      (::Owner:Area)->( dbSetFilter( , cFilter ) )
+   ELSE
+      (::Owner:Area)->( dbClearFilter() )
+   ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -921,7 +1023,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             TRY
                dbCreate( cFile, ::Owner:Structure, ::Owner:Driver )
                dbCloseArea( nMemSel )
-               Select( nMemSel )
+               dbSelectArea( nMemSel )
             CATCH
                RETURN ::Owner
             END
@@ -930,6 +1032,24 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
 
       IF ::Owner:Area != NIL
          Select( ::Owner:Area )
+      ENDIF
+
+      IF ::Owner:Connection != NIL .AND. ( n := RAT( "\", cFile ) ) > 0
+         cFile := SUBSTR( cFile, n+1 )
+      ENDIF
+
+      IF ::Owner:xAlias == NIL
+         ::Owner:xAlias := cFile
+         IF ( n := RAT( "\", ::Owner:xAlias ) ) > 0
+            ::Owner:xAlias := SUBSTR( ::Owner:xAlias, n+1 )
+         ENDIF
+         IF ( n := RAT( ".", ::Owner:xAlias ) ) > 0
+            ::Owner:xAlias := SUBSTR( ::Owner:xAlias, 1, n-1 )
+         ENDIF
+         ::Owner:xAlias := Upper( ::Owner:xAlias )
+         IF Len( ::Owner:xAlias ) > 10
+            ::Owner:xAlias := Left( ::Owner:xAlias, 10 )
+         ENDIF
       ENDIF
 
       dbUseArea( ::Owner:Area == NIL, ::Owner:Driver, cFile, ::Owner:Alias, ::Owner:Shared, ::Owner:ReadOnly, ::Owner:CodePage, IIF( ::Owner:SqlConnector != NIL, ::Owner:SqlConnector:ConnectionID, ) )

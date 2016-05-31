@@ -33,6 +33,9 @@ CLASS Control INHERIT Window
    PROPERTY AllowMaximize  ROOT "Behavior"   DEFAULT .F.
    PROPERTY BorderColor    ROOT "Colors" DEFAULT 0
    PROPERTY Border         ROOT "Appearance" SET ::__SetBorder(v)      DEFAULT 0
+
+   PROPERTY When           ROOT "Behavior"
+
    DATA EnumBorder       EXPORTED INIT { { "None", "Single", "Sunken", "Fixed3D" }, { 0, WS_BORDER, WS_EX_STATICEDGE, WS_EX_CLIENTEDGE } }
 
 
@@ -157,7 +160,7 @@ RETURN Self
 //---------------------------------------------------------------------------------------------------
 
 METHOD Create( hParent ) CLASS Control
-   LOCAL pt, rc
+   LOCAL pt, rc, bEnabled, cWhen
 
    ::__SetBorder( ::xBorder )
 
@@ -188,6 +191,12 @@ METHOD Create( hParent ) CLASS Control
       ENDIF
    ENDIF
    ::Super:Create( hParent )
+
+   IF ! Empty(::When) .AND. ! ::DesignMode
+      cWhen    := ::When
+      bEnabled := &("{|Self|" + cWhen + "}")
+      EnableWindow( ::hWnd, Eval( bEnabled, Self ) )
+   ENDIF
 
    IF ::__OnInitCanceled
       RETURN NIL

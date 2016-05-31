@@ -1491,6 +1491,9 @@ CLASS ToolButton INHERIT Object
    ACCESS Caption     INLINE ::Text
    ASSIGN Caption(c)  INLINE ::Text := c
 
+   ACCESS Checked     INLINE ::Parent:IsButtonChecked( ::ID )
+   ASSIGN Checked(l)  INLINE ::Check(l)
+
    DATA hMenu                 EXPORTED
 
    DATA __lResizeable          EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}

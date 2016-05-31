@@ -34,6 +34,9 @@
 
 CLASS Button INHERIT Control
 
+   PROPERTY Alignment                       SET ::Redraw(v)      DEFAULT DT_CENTER
+   DATA EnumAlignment    EXPORTED INIT { { "Left", "Center", "Right" }, { DT_LEFT, DT_CENTER, DT_RIGHT } }
+
    PROPERTY ImageAlign    ROOT "Appearance"                                      DEFAULT __GetSystem():TextAlignment:Center
    PROPERTY MenuArrow     ROOT "Appearance"                                      DEFAULT .F.
 
@@ -248,20 +251,20 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       lDefault  := dis:itemState & ODS_DEFAULT  != 0
 
       aTextRect  := aClone( aRect )
-      nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
+      nTextFlags := ::Alignment | DT_VCENTER | DT_SINGLELINE
 
       IF oImageList != NIL .AND. ::ImageIndex > 0
          DO CASE
             CASE ::ImageAlign == DT_LEFT
                  nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
                  aTextRect[1] := nLeft + oImageList:IconWidth + ::ImageIndent
-                 nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
+                 //nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
 
             CASE ::ImageAlign == DT_RIGHT
                  nLeft := ( aRect[3] - oImageList:IconWidth - ::ImageIndent )
                  nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
                  aTextRect[3] := nLeft - ::ImageIndent
-                 nTextFlags := DT_RIGHT  + DT_VCENTER + DT_SINGLELINE
+                 //nTextFlags := DT_RIGHT  + DT_VCENTER + DT_SINGLELINE
 
             CASE ::ImageAlign == DT_CENTER
                  nLeft := ( aRect[3] / 2 ) - ( oImageList:IconWidth / 2 )
@@ -269,7 +272,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
                  nTop  := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 ) - ( n / 2 )
 
                  aTextRect[2] += oImageList:IconHeight
-                 nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
+                 //nTextFlags := DT_CENTER + DT_VCENTER + DT_SINGLELINE
          ENDCASE
          IF EMPTY( ::xText )
             nTop := ( aRect[4] / 2 ) - ( oImageList:IconHeight / 2 )
@@ -358,13 +361,13 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       IF ::MenuArrow .AND. ::ContextMenu != NIL
          ::DrawArrow( dis:hDC, {aTextRect[3]-22,aTextRect[2],aTextRect[3],aTextRect[4]} )
          aTextRect[1] := 6
-         nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
+         //nTextFlags := DT_LEFT + DT_VCENTER + DT_SINGLELINE
       ENDIF
       IF ! EMPTY( ::xText )
          IF ::xMultiLine
             _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
             aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
-            nTextFlags := DT_CENTER | DT_VCENTER
+            nTextFlags := ::Alignment | DT_VCENTER
          ENDIF
          _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
       ENDIF

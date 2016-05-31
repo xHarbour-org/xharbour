@@ -638,6 +638,18 @@ HB_FUNC( TVDELETEITEM )
    TreeView_DeleteItem( (HWND) hb_parnl(1), (HTREEITEM) hb_parnl(2) );
 }
 
+HB_FUNC( TVITEMSETCHECK )
+{
+   TreeView_SetCheckState( (HWND) hb_parnl(1), (HTREEITEM) hb_parnl(2), hb_parl(3) );
+}
+
+HB_FUNC( TVITEMGETCHECK )
+{
+   hb_retl( TreeView_GetCheckState( (HWND) hb_parnl(1), (HTREEITEM) hb_parnl(2) ) );
+}
+
+
+
 #include <sddl.h>
 
 typedef BOOL (WINAPI *xpCSSD2SD)( LPCSTR, DWORD, PSECURITY_DESCRIPTOR *, PULONG );

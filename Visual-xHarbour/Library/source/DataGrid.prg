@@ -1980,7 +1980,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
    IF ::RowPos < 1
       ::RowPos := 1
    ENDIF
-   IF !EMPTY( ::__DisplayArray ) .AND. ::DataSource != NIL
+   IF !EMPTY( ::__DisplayArray ) .AND. ::DataSource != NIL .AND. ::DataSource:IsOpen
       nRecno   := ::DataSource:Recno()
     ELSE
       nRecno := 0
@@ -2090,7 +2090,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
 
               lHighLight := ::ShowSelection .AND. ( lFocus .OR. (::MultipleSelection .AND. lSelected .AND. LEN( ::aSelected ) > 0 ) ) .AND. lData .AND. lSelected .AND. ( ( ( ! ::FullRowSelect .AND. ::ColPos == i ) .OR. (::MultipleSelection .AND. lSelected .AND. LEN( ::aSelected ) > 0 ) ) .OR. ::FullRowSelect )
 
-              lShadow    := ::Enabled .AND. ! ::FullRowSelect .AND. lData .AND. ::ShowSelection .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos <> i .OR. ! lFocus ) )
+              lShadow    := ::Enabled .AND. /*! ::FullRowSelect .AND.*/ lData .AND. ::ShowSelection .AND. ::ShadowRow .AND. ( nRec == nRecno .AND. ( ::ColPos <> i .OR. ! lFocus ) )
 
               cData  := IIF( lData, ::__DisplayArray[nPos][1][i][ 1], " " )
               nInd   := IIF( lData, ::__DisplayArray[nPos][1][i][ 2], 0 )

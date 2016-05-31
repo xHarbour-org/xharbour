@@ -12,6 +12,10 @@
 //------------------------------------------------------------------------------------------------------*
 #include "debug.ch"
 #include "vxh.ch"
+#define TVS_EX_DOUBLEBUFFER 0x0004
+#define TVM_SETEXTENDEDSTYLE (TV_FIRST + 44)
+
+#define UM_CHECKSTATECHANGE (WM_USER + 123)
 
 #xcommand ODEFAULT <v> TO <x> [, <vN> TO <xN>]         ;
        => IF <v> == nil .OR. VALTYPE( <v> ) == "O"; <v> := <x> ; END            ;
@@ -35,7 +39,6 @@ CLASS TreeView FROM TitleControl
    PROPERTY BackColor       ROOT "Colors" SET ( _SendMessage( ::hWnd, TVM_SETBKCOLOR, 0, v ), IIF( ::IsWindowVisible(), ::InvalidateRect(),) ) DEFAULT GetSysColor( COLOR_WINDOW )
    PROPERTY ImageList       GET __ChkComponent( Self, @::xImageList );
                             SET (::xImageList := __ChkComponent( Self, v ), ::SetImageList(::xImageList))
-
 
    DATA Items            EXPORTED INIT {}
    DATA Header
@@ -99,7 +102,7 @@ CLASS TreeView FROM TitleControl
 
    METHOD __SetScrollBars() INLINE NIL
    METHOD GetExpandedCount()
-
+   METHOD OnUserMsg()
    METHOD OnMouseMove()
    METHOD OnLButtonUp()
 
@@ -159,6 +162,7 @@ METHOD Init( oParent ) CLASS TreeView
                             { "OnSysKeyUp"       , "", "" } } },;
           {"Notifications", {;
                             { "Click"            , "", "" },;
+                            { "ItemCheck"        , "", "" },;
                             { "RightClick"       , "", "" },;
                             { "CustomDraw"       , "", "" },;
                             { "AfterExpand"      , "", "" },;
@@ -192,6 +196,9 @@ METHOD Create() CLASS TreeView
    IF ::xBackColor != NIL
       ::SetBackColor( ::xBackColor )
    ENDIF
+
+   //::SendMessage( TVM_SETEXTENDEDSTYLE, TVS_EX_DOUBLEBUFFER | TVS_CHECKBOXES, TVS_EX_DOUBLEBUFFER | TVS_CHECKBOXES )
+
 RETURN Self
 
 //----------------------------------------------------------------------------//
@@ -316,9 +323,18 @@ METHOD SetImageList( oList ) CLASS TreeView
 RETURN Self
 
 //----------------------------------------------------------------------------//
+METHOD OnUserMsg( hWnd, nMsg, nwParam, nlParam ) CLASS TreeView
+   (hWnd,nwParam)
+   IF nMsg == UM_CHECKSTATECHANGE
+      ExecuteEvent( "ItemCheck", Self, FindTreeItem( ::Items, nlParam ) )
+      RETURN 0
+   ENDIF
+RETURN Self
+
+//----------------------------------------------------------------------------//
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
-   LOCAL tvht, rc
-   LOCAL tvkd, nState, lRet, hItem
+   LOCAL tvht, rc //, tvdi
+   LOCAL tvkd, nState, lRet, nPos, hItem//, nChecked
    DEFAULT hdr TO ::Parent:hdr
 
    IF ::__lResetting
@@ -328,7 +344,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
            ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
-           lRet := ExecuteEvent( "CustomDraw", Self )
+           lRet := ExecuteEvent( "CustomDraw", Self, nlParam )
 
       CASE hdr:code == NM_RCLICK
            ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
@@ -338,26 +354,38 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
       CASE hdr:code == NM_CLICK
            ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
            tvht := (struct TVHITTESTINFO)
-           tvht:flags := TVHT_ONITEM | TVHT_ONITEMICON
-           GetCursorPos( @tvht:pt )
-           ScreenToClient( ::hWnd, @tvht:pt )
+           nPos := GetMessagePos()
 
-           ::ClickedItem := NIL
-           hItem := SendMessage( ::hWnd, TVM_HITTEST, 0, tvht )
-           IF hItem != 0
-              rc := ::GetItemRect( hItem, .T. )
-              IF ::ImageList != NIL .AND. ::ImageList:Handle != NIL
-                 rc:Left -= ::ImageList:IconWidth
+           tvht:pt:x := GET_X_LPARAM( nPos )
+           tvht:pt:y := GET_Y_LPARAM( nPos )
+
+           MapWindowPoints( HWND_DESKTOP, ::hWnd, @tvht:pt, 1 )
+
+           SendMessage( ::hWnd, TVM_HITTEST, 0, @tvht )
+           IF tvht:flags & TVHT_ONITEMSTATEICON == TVHT_ONITEMSTATEICON
+              PostMessage( ::hWnd, UM_CHECKSTATECHANGE, 0, tvht:hItem )
+           ELSE
+              tvht:flags := TVHT_ONITEM | TVHT_ONITEMICON
+              GetCursorPos( @tvht:pt )
+              ScreenToClient( ::hWnd, @tvht:pt )
+
+              ::ClickedItem := NIL
+              hItem := SendMessage( ::hWnd, TVM_HITTEST, 0, tvht )
+              IF hItem != 0
+                 rc := ::GetItemRect( hItem, .T. )
+                 IF ::ImageList != NIL .AND. ::ImageList:Handle != NIL
+                    rc:Left -= ::ImageList:IconWidth
+                 ENDIF
+                 IF !PtInRect( rc, tvht:pt )
+                    hItem := 0
+                 ENDIF
               ENDIF
-              IF !PtInRect( rc, tvht:pt )
-                 hItem := 0
+              IF hItem != NIL
+                 ::ClickedItem := FindTreeItem( ::Items, hItem )
               ENDIF
+              ::OnClick()
+              lRet := ExecuteEvent( "Click", Self )
            ENDIF
-           IF hItem != NIL
-              ::ClickedItem := FindTreeItem( ::Items, hItem )
-           ENDIF
-           ::OnClick()
-           lRet := ExecuteEvent( "Click", Self )
 
       CASE hdr:code == TVN_BEGINDRAG
            IF ::DragItems

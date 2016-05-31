@@ -4492,7 +4492,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm, oItem, oFrm, oXML, oEvents
+   LOCAL n, cWindow := "", oFile, oForm, oItem, oFrm, oXML, oEvents, oEditor
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
 
@@ -4552,6 +4552,9 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    ENDIF
 
    aEditors := ::Application:SourceEditor:aDocs
+
+   oEditor := ::Application:SourceEditor:Source
+   oEditor:SavePos()
 
    cSourcePath := cPath + "\" + ::Properties:Source
 
@@ -4906,6 +4909,8 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
 
    ::Application:Cursor := NIL
    WinSetCursor( ::System:Cursor:Arrow )
+
+   oEditor:Select()
 
    ::Modified := .F.
 RETURN Self

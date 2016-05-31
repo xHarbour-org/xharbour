@@ -2832,28 +2832,28 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
                            EXIT
                         ENDIF
                     NEXT
-                  ELSEIF LOWORD( nlParam ) == WM_LBUTTONDOWN
+                 ELSEIF LOWORD( nlParam ) == WM_LBUTTONDOWN
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"
                            nRet := ExecuteEvent( "OnLButtonDown", oObj )
                            EXIT
                         ENDIF
                     NEXT
-                  ELSEIF LOWORD( nlParam ) == WM_LBUTTONUP
+                 ELSEIF LOWORD( nlParam ) == WM_LBUTTONUP
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"
                            nRet := ExecuteEvent( "OnLButtonUp", oObj )
                            EXIT
                         ENDIF
                     NEXT
-                  ELSEIF LOWORD( nlParam ) == WM_RBUTTONUP
+                 ELSEIF LOWORD( nlParam ) == WM_RBUTTONUP
                     FOR EACH oObj IN ::Components
                         IF oObj:__xCtrlName == "NotifyIcon"
                            nRet := ExecuteEvent( "OnRButtonUp", oObj )
                            EXIT
                         ENDIF
                     NEXT
-                  ELSE
+                 ELSE
                     nRet := ExecuteEvent( "OnUserMsg", Self )
                     ODEFAULT nRet TO  ::OnUserMsg( hWnd, nMsg, nwParam, nlParam)
                  ENDIF

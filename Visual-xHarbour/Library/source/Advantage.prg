@@ -17,9 +17,17 @@
 #include "ord.ch"
 #include "debug.ch"
 
+
+#define ADS_NTX                           1
+#define ADS_CDX                           2
+#define ADS_ADT                           3
+#define ADS_VFP                           4
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsDataTable INHERIT DataTable
+
+   PROPERTY TableType    ROOT "General" DEFAULT ADS_ADT
+   DATA EnumTableType    EXPORTED INIT { { "NTX", "CDX", "ADT", "VFP" }, { ADS_NTX, ADS_CDX, ADS_ADT, ADS_VFP } }
 
    DATA xDriver          PROTECTED INIT "ADSCDX"
    DATA __ExplorerFilter EXPORTED  INIT { { "DataTable / Advantage (*.dbf,*.adt)", "*.dbf;*.adt" } }
@@ -47,7 +55,7 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewInstance( lSetCurPos ) CLASS AdsDataTable
-   LOCAL n, oNewTable := AdsDataTable( ::Owner )
+   LOCAL n, oNewTable := AdsDataTable( ::Owner, ::Connection )
 
    n := 1
    WHILE Select( ::Alias+xStr(n) ) > 0
@@ -169,6 +177,130 @@ METHOD Create() CLASS AdsServer
 RETURN Self
 
 #pragma BEGINDUMP
+   #include <windows.h>
+   #include "hbapi.h"
+   #include "hbvm.h"
+   #include "hbstack.h"
+   #include "hbapiitm.h"
+   #include "tchar.h"
+
+   //-----------------------------------------------------------------------------
+   HB_FUNC( ADSDDDELETEINDEX )
+   {
+   #if ADS_LIB_VERSION >= 600
+      hb_retl( AdsDDDeleteIndex( HB_ADS_PARCONNECTION( 3 ) /* hConnect */,
+                               ( UNSIGNED8 * ) hb_parcx( 1 ) /* pTableName */,
+                               ( UNSIGNED8 * ) hb_parcx( 2 ) /* pIndexName */ ) == AE_SUCCESS );
+   #else
+      hb_retl( HB_FALSE );
+   #endif
+   }
+
+   HB_FUNC( ADSDDREMOVEINDEXFILE )
+   {
+   #if ADS_LIB_VERSION >= 600
+      hb_retl( AdsDDRemoveIndexFile( HB_ADS_PARCONNECTION( 4 ) /* hConnect */,
+                                     ( UNSIGNED8 * ) hb_parcx( 1 ) /* pTableName */,
+                                     ( UNSIGNED8 * ) hb_parcx( 2 ) /* pIndexName */,
+                                     ( UNSIGNED16 ) ( HB_ISNUM( 3 ) ? hb_parni( 3 ) : hb_parldef( 3, 0 ) ) /* usDeleteFiles */ ) == AE_SUCCESS );
+   #else
+      hb_retl( HB_FALSE );
+   #endif
+   }
+
+   HB_FUNC( ADSDDFINDOBJECT )
+   {
+   #if ADS_LIB_VERSION >= 600
+      UNSIGNED32 ulRetVal;
+      UNSIGNED16 ulObjectType = ( UNSIGNED16 ) hb_parni( 1 );
+      UNSIGNED8  ucParentName = ( UNSIGNED8 ) hb_parcx( 2 );
+      UNSIGNED8  ucObjectName[ ADS_MAX_OBJECT_NAME ];
+      UNSIGNED16 usObjectNameLen = sizeof( ucObjectName );
+   #if ADS_LIB_VERSION >= 900
+      ADSHANDLE  sHandle = 0;
+   #else
+      SIGNED32   sHandle = 0;
+   #endif
+      PHB_ITEM   pitmDir;
+      ADSHANDLE  hConnect = HB_ADS_PARCONNECTION( 3 );
+
+      pitmDir = hb_itemArrayNew( 0 );
+
+      ulRetVal = AdsDDFindFirstObject( hConnect,
+                                       ulObjectType,
+                                       ( HB_ISCHAR( 2 ) ? ( UNSIGNED8 * ) hb_parc( 2 ): NULL ),
+                                       ( UNSIGNED8 * ) ucObjectName,
+                                       &usObjectNameLen,
+                                       &sHandle );
+
+      if( ulRetVal == AE_SUCCESS )
+      {
+         while( ulRetVal == AE_SUCCESS )
+         {
+            PHB_ITEM pitmFileName = hb_itemPutCL( NULL, ( char * ) ucObjectName, usObjectNameLen - 1 );
+            hb_arrayAddForward( pitmDir, pitmFileName );
+
+            usObjectNameLen = sizeof( ucObjectName );
+
+            ulRetVal = AdsDDFindNextObject( hConnect,
+                                            sHandle,
+                                            ucObjectName,
+                                            &usObjectNameLen );
+         }
+
+         AdsDDFindClose( hConnect, sHandle );
+      }
+
+      hb_itemReturnRelease( pitmDir );
+   #else
+      hb_reta( 0 );
+   #endif
+   }
+
+   //AdsDDGetIndexProperty
+   HB_FUNC( ADSDDGETINDEXPROPERTY )
+   {
+   #if ADS_LIB_VERSION >= 600
+      UNSIGNED8  pTableName = ( UNSIGNED8 )  hb_parcx( 1 );
+      UNSIGNED8  pIndexName = ( UNSIGNED8 )  hb_parcx( 2 );
+      UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 3 );
+
+      ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
+
+      char sBuffer[ ADS_MAX_PARAMDEF_LEN ];
+      UNSIGNED16 ulLength = sizeof( sBuffer );
+
+      if( AdsDDGetIndexProperty( hConnect, pTableName, pIndexName, ulProperty, &sBuffer, &ulLength ) != AE_SUCCESS )
+      {
+         sBuffer[ 0 ] = '\0';
+         ulLength = 0;
+      }
+      hb_retclen( sBuffer, ulLength );
+   #endif
+   }
+
+   HB_FUNC( ADSDDGETINDEXFILEPROPERTY )
+   {
+   #if ADS_LIB_VERSION >= 600
+      UNSIGNED8  pTableName = ( UNSIGNED8 )  hb_parcx( 1 );
+      UNSIGNED8  pIndexName = ( UNSIGNED8 )  hb_parcx( 2 );
+      UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 3 );
+
+      ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
+      char sBuffer[ 260 ];
+      UNSIGNED16 ulLength;
+
+      if( AdsDDGetIndexFileProperty( hConnect, pTableName, pIndexName, ulProperty, &sBuffer, &ulLength ) != AE_SUCCESS )
+      {
+         sBuffer[ 0 ] = '\0';
+         ulLength = 0;
+      }
+      hb_retclen( sBuffer, ulLength );
+   #endif
+   }
+
    #pragma comment( lib, "ads.lib" )
    #pragma comment( lib, "ace32.lib" )
 #pragma ENDDUMP
