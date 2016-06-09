@@ -12,14 +12,13 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
    cTmp:=MemoRead("\xHarbour.com\Visual-xHarbour\IDE\Source\VXH1.PRG")
    nTmp1:=At("#define VXH_Version",cTmp)
    nTmp2:=At("#define VXH_BuildVersion",cTmp)
-   cRevision:="Build "+CMonth(Date())+"-"+NtoC(Day(Date()))+"-"+NtoC(Year(Date()))+" v"+SubStr(cTmp,nTmp1+26,3)+"."+SubStr(cTmp,nTmp2+26,3)
-   ? ">"+cRevision+"<"
+   cRevision:="2016-Build"+SubStr(cTmp,nTmp2+26,3)
 
    DO CASE
       CASE IsDirectory("C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\")
                   cAI:="C:\Program Files (x86)\Caphyon\Advanced Installer 10.6\bin\x86\"
       OTHER
-          ?     "Geen Advanced installer gevonden"
+          ?      "Geen Advanced installer gevonden"
           Alert("Geen Advanced installer gevonden")
           RETURN
    ENDCASE
@@ -69,7 +68,10 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
             ' -name "Visual xHarbour"'+;
             ' -desc "Visual xHarbour"'+;
             ' -target "APPDIR\Visual xHarbour.url"'+;
-			   ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
+
+
+
+   ' -icon C:\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\url.ico'+;
             ' -dir SHORTCUTDIR\"xHarbour On The Web"'+;
             CRLF+CRLF
 
@@ -92,9 +94,7 @@ FUNCTION Build_xHB_VXH_Setup(cEdition, cOFw)
 
    cPackageFolder:='C:\xHB-SetupFiles\vxh\windows\'+cRevision+'\'
    cProductName  :='Visual xHarbour '+cEdition_Full
-   cPackageName  :=cProductName+'-'+cRevision+'.exe'
-
-// cBuild+='RD C:\xHB-SetupFiles\vxh /Q /S'+CRLF
+   cPackageName  :='Visual-xHarbour-'+cEdition_Full+'-'+cRevision+'.exe'
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetPackageName "'+cPackageFolder+cPackageName+'"'+CRLF
    cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty ProductName="'+cProductName+'"'+CRLF

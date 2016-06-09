@@ -31,9 +31,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Include\w32
 
-    SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT
-    ROBOCOPY "\xHarbour.com\Visual-xHarbour\library\include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
+    ROBOCOPY "\xHarbour.com\Visual-xHarbour\library\include" "%RC_To%" *.* /NS /NC /NP /S
 
 
 
@@ -63,6 +61,23 @@ REM ===============================================
     ROBOCOPY "\xHarbour.com\Samples\Visual-xHarbour" "%RC_To%\Visual-xHarbour" *.* /NS /NC /NP /XF Changelog /S /XD %RC_Exclude_Folder% /XA:H
 
 
+
+REM ===============================================
+REM              /Common/dll
+REM ===============================================
+
+    SET RC_To=%XHBTO%\Dll
+
+    SET RC_Include=vxh*.dll FreeImage.dll
+    ROBOCOPY "\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
+
+    SET RC_Include=fbclient.dll libmysql.dll
+    ROBOCOPY "\xHB\Dll\SQLRDD" "%RC_To%" %RC_Include% /NS /NC /NP
+    
+    SET RC_Include=ace32.dll
+    ROBOCOPY "\xHB\Dll\ADS" "%RC_To%" %RC_Include% /NS /NC /NP
+
+    
 
 REM ==============================================================================================
 REM ==============================================================================================
@@ -145,16 +160,6 @@ REM ===============================================
 
 
 
-REM ===============================================
-REM              /Professional/dll
-REM ===============================================
-
-    SET RC_To=%XHBTO%\Dll
-
-    SET RC_Include=*.dll
-    ROBOCOPY "\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
-
-
 IF "%1" == "Professional" GOTO :EOF
 
 
@@ -184,17 +189,7 @@ REM ===============================================
 
     SET RC_Include=vxh*.lib WinApi.lib
     ROBOCOPY "\xHB\Lib" "%RC_To%" %RC_Include% /NS /NC /NP
-
-
-REM ===============================================
-REM              /Enterprise/dll
-REM ===============================================
-
-    SET RC_To=%XHBTO%\Dll
-
-    SET RC_Include=vxh*.dll
-    ROBOCOPY "\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
-
+    
 
 REM ==============================================================================================
 REM ==============================================================================================
