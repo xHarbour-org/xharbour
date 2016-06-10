@@ -443,8 +443,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
               tvkd := (struct NMTVKEYDOWN*) nlParam
               ::TVNKeyDown( tvkd:wVKey, ::SelectedItem )
               ::wParam := tvkd:wVKey
+
+              IF tvkd:wVKey == VK_SPACE .AND. ::CheckBoxes
+                 PostMessage( ::hWnd, UM_CHECKSTATECHANGE, 0, ::SelectedItem:hItem )
+              ELSE
+                 lRet := ExecuteEvent( "KeyDown", Self )
+              ENDIF
            ENDIF
-           lRet := ExecuteEvent( "KeyDown", Self )
 
       CASE hdr:code == TVN_SELCHANGED
            IF ( ::SelectedItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) ) ) != NIL

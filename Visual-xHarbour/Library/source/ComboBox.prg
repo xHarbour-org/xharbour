@@ -1158,28 +1158,30 @@ METHOD SelectControl( oControl ) CLASS FormComboBox
 RETURN Self
 
 METHOD Reset( oControl ) CLASS FormComboBox
-   LOCAL cCtrl, oForm, cText
+   LOCAL oForm, aObj, oCtrl
    ::SetRedraw(.F.)
    ::ResetContent()
    IF ::Application:Project:Properties != NIL
-      IF ! Empty( ::Application:Project:Forms )
-         ::AddItem( "Application" + CHR(9) + "Visual xHarbour" )
-         AADD( ::aItems, ::Application:Project:AppObject )
-      ENDIF
-      ::AddItem( ::Application:Project:Properties:Name + CHR(9) + "Project" )
-      AADD( ::aItems, ::Application:Project:Properties )
-
       IF ( oForm := ::Application:Project:CurrentForm ) != NIL
-         ::AddItem( oForm:Name + CHR(9) + IIF( !oForm:lCustom, "Forms", "Custom Controls" ) )
-         AADD( ::aItems, ::Application:Project:CurrentForm )
+         aObj := {::Application:Project:CurrentForm}
 
-         IF oForm:__hObjects != NIL
-            FOR EACH cCtrl IN oForm:__hObjects:Keys
-                cText := oForm:__hObjects[ cCtrl ]:ClassName
-                ::AddItem( cCtrl + CHR(9) + Upper( cText[1] ) + SubStr( Lower( cText ), 2 ) )
-                AADD( ::aItems, oForm:__hObjects[ cCtrl ] )
-            NEXT
+         GetObjChildren( @aObj, oForm )
+
+         ASORT( aObj,,, {|a,b| Upper(a:Name) < Upper(b:Name) } )
+
+         FOR EACH oCtrl IN aObj
+             ::AddItem( oCtrl:Name + CHR(9) + oCtrl:__xCtrlName )
+             AADD( ::aItems, oCtrl )
+         NEXT
+
+         aObj := NIL
+      ELSE
+         IF ! Empty( ::Application:Project:Forms )
+            ::AddItem( "Application" + CHR(9) + "Visual xHarbour" )
+            AADD( ::aItems, ::Application:Project:AppObject )
          ENDIF
+         ::AddItem( ::Application:Project:Properties:Name + CHR(9) + "Project" )
+         AADD( ::aItems, ::Application:Project:Properties )
       ENDIF
       IF oControl != NIL
          ::Application:Yield()
@@ -1191,6 +1193,18 @@ METHOD Reset( oControl ) CLASS FormComboBox
    ::SetRedraw(.T.)
 RETURN Self
 
+FUNCTION GetObjChildren( aObj, oObj )
+   LOCAL oCtrl
+   IF oObj != NIL
+      FOR EACH oCtrl IN oObj:Components
+          AADD( aObj, oCtrl )
+      NEXT
+      FOR EACH oCtrl IN oObj:Children
+          AADD( aObj, oCtrl )
+          GetObjChildren( @aObj, oCtrl )
+      NEXT
+   ENDIF
+RETURN NIL
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FormComboBox
    LOCAL n, lSelected, nLen, itemTxt, cText, aSize, hDC, hOld

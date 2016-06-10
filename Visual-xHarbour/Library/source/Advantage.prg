@@ -67,6 +67,7 @@ METHOD NewInstance( lSetCurPos ) CLASS AdsDataTable
    oNewTable:Path      := ::Path
    oNewTable:Driver    := ::Driver
    oNewTable:Shared    := ::Shared
+   oNewTable:bSave     := ::bSave
 
    oNewTable:Open()
 
@@ -83,6 +84,11 @@ RETURN oNewTable
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS AdsDataTable
    LOCAL n, xValue
+   IF ::bSave != NIL .AND. ! Eval( ::bSave, Self )
+      ::__lNew := .F.
+      ::__aData := {}
+      RETURN Self
+   ENDIF
    IF ::__lNew
       (::Area)->( dbAppend(), AdsNull2Blank() )
    ELSEIF ::Shared

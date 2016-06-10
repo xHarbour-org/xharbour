@@ -212,7 +212,7 @@ METHOD __SetAsProperty( cName, oObj ) CLASS Object
       IF !EMPTY( oObj:xName ) .AND. ( n := hGetPos( ::__hObjects, oObj:xName ) ) > 0
          HDelAt( ::__hObjects, n )
       ENDIF
-      ::__hObjects[ cName ] := IIF( ! ::DesignMode, oObj, NIL )
+      ::__hObjects[ cName ] := IIF( ! ::DesignMode, oObj, oObj:hWnd )
    ENDIF
    oObj:xName := cName
 RETURN Self

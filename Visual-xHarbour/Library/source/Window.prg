@@ -1202,6 +1202,7 @@ RETURN Self
 METHOD RegisterDocking() CLASS Window
    IF ::Dock != NIL
       IF ::Parent != NIL
+         DEFAULT ::Parent:__aDock TO {}
          IF ( ::Dock:Left != NIL .OR. ::Dock:Top != NIL .OR. ::Dock:Right != NIL .OR. ::Dock:Bottom != NIL .OR. ::ClsName == "ToolStripContainer" ) .AND. ASCAN( ::Parent:__aDock, {|o| o:hWnd == ::hWnd} ) == 0
             AADD( ::Parent:__aDock, Self )
          ENDIF

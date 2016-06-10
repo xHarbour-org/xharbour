@@ -106,7 +106,7 @@ CLASS DataTable INHERIT Component
                                                       { "OnDisconnect" , "", "" } } } }
    DATA bOnFileNameChanged EXPORTED
    DATA bOnFileClosed      EXPORTED
-
+   DATA bSave              EXPORTED
    DATA Area               EXPORTED
    DATA __ExplorerFilter   EXPORTED  INIT { { "DataTable *.dbf", "*.dbf" } }
    DATA aScatter           EXPORTED
@@ -284,6 +284,7 @@ METHOD NewInstance( lSetCurPos ) CLASS DataTable
    oNewTable:Path      := ::Path
    oNewTable:Driver    := ::Driver
    oNewTable:Shared    := ::Shared
+   oNewTable:bSave     := ::bSave
    oNewTable:Open()
 
    DEFAULT lSetCurPos TO .F.
@@ -334,6 +335,11 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS DataTable
    LOCAL n, cField, oCtrl
+   IF ::bSave != NIL .AND. ! Eval( ::bSave, Self )
+      ::__lNew := .F.
+      ::__aData := {}
+      RETURN Self
+   ENDIF
    IF ::__lNew
       (::Area)->( dbAppend() )
    ELSEIF ::Shared
@@ -869,7 +875,7 @@ METHOD SetFilter( cFilter ) CLASS DataRdd
       IF ValType( cFilter ) == "C"
          cFilter := COMPILE( cFilter )
       ENDIF
-      (::Owner:Area)->( dbSetFilter( , cFilter ) )
+      (::Owner:Area)->( dbSetFilter( cFilter ) )
    ELSE
       (::Owner:Area)->( dbClearFilter() )
    ENDIF

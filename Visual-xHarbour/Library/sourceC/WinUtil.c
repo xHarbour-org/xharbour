@@ -4960,7 +4960,7 @@ BOOL AxTranslateMessageEx( MSG *pMsg )
    BOOL bRet = FALSE;
    if( (pMsg->message >= WM_KEYFIRST) && (pMsg->message <= WM_KEYLAST) )
    {
-      if( pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK )
+      if( pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB )
       {
          LPUNKNOWN pUnk;
          HWND hParent;

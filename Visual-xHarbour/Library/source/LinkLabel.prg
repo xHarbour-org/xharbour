@@ -118,6 +118,7 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
          ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
          ::UpdateWindow()
 
+         ::Parent:DockControls()
        ELSE
          ::__lResizeable   := {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}
       ENDIF

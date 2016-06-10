@@ -92,17 +92,18 @@ METHOD OnParentNotify() CLASS ErrorListView
 
    IF ::Parent:hdr:code == NM_DBLCLK
       aSel := ::GetSelection()
-
-      FOR EACH oEditor IN ::Application:SourceEditor:aDocs
-         IF Upper( oEditor:File ) == Upper( aSel[1] )
-            ::Application:EditorPage:Select()
-            oEditor:Select()
-            oEditor:TreeItem:Select()
-            oEditor:GoToLine( Val(aSel[2])-1 )
-            ::Application:SourceEditor:SetFocus()
-            EXIT
-         ENDIF
-      NEXT
+      IF aSel != NIL
+         FOR EACH oEditor IN ::Application:SourceEditor:aDocs
+            IF Upper( oEditor:File ) == Upper( aSel[1] )
+               ::Application:EditorPage:Select()
+               oEditor:Select()
+               oEditor:TreeItem:Select()
+               oEditor:GoToLine( Val(aSel[2])-1 )
+               ::Application:SourceEditor:SetFocus()
+               EXIT
+            ENDIF
+         NEXT
+      ENDIF
    ENDIF
 RETURN 0
 

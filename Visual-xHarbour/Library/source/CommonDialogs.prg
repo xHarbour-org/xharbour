@@ -238,12 +238,16 @@ CLASS SaveFileDialog INHERIT CommonDialogs
    PROPERTY InitialDirectory
    PROPERTY Title
    PROPERTY ShowPlacesBar                                                     DEFAULT .T.
+   PROPERTY OverwritePrompt  SET ::SetStyle( OFN_OVERWRITEPROMPT, v )         DEFAULT .T.
    PROPERTY CheckPathExists  SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T.
    PROPERTY CheckFileExists  SET ::SetStyle( OFN_FILEMUSTEXIST, v )           DEFAULT .F.
-   PROPERTY CreatePrompt     SET ::SetStyle( OFN_CREATEPROMPT, v )            DEFAULT .T.
+   PROPERTY CreatePrompt     SET ::SetStyle( OFN_CREATEPROMPT, v )            DEFAULT .F.
    PROPERTY DeferenceLinks   SET ::__SetInvStyle( OFN_NODEREFERENCELINKS, v ) DEFAULT .T.
    PROPERTY RestoreDirectory SET ::SetStyle( OFN_NOCHANGEDIR, v )             DEFAULT .F.
    PROPERTY ShowHelp         SET ::SetStyle( OFN_SHOWHELP, v )                DEFAULT .F.
+   PROPERTY PathMustExist    SET ::SetStyle( OFN_PATHMUSTEXIST, v )           DEFAULT .T.
+   PROPERTY HideReadOnly     SET ::SetStyle( OFN_HIDEREADONLY, v )            DEFAULT .T.
+
 
    DATA __PrevName    PROTECTED
    DATA __PrevFilter  PROTECTED
@@ -255,7 +259,7 @@ CLASS SaveFileDialog INHERIT CommonDialogs
 ENDCLASS
 
 METHOD Init( oParent ) CLASS SaveFileDialog
-   ::Style := OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS | OFN_CREATEPROMPT
+   ::Style := OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT
    ::__xCtrlName := "SaveFileDialog"
    ::ClsName     := "SaveFileDialog"
    ::ComponentType := "CommonDialog"
