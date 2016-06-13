@@ -996,11 +996,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                   break;
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRUINT ) ( pBaseVar->pItems + ulIndex )->item.asInteger.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asInteger.value;
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRUINT ) ( pBaseVar->pItems + ulIndex )->item.asLong.value;
+                  *( ( char ** ) ( Buffer + uiOffset ) ) = ( char * ) ( HB_PTRDIFF ) ( pBaseVar->pItems + ulIndex )->item.asLong.value;
                   break;
 
                default:
@@ -1022,11 +1022,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( BYTE ** ) ( Buffer + uiOffset ) ) = ( BYTE * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1076,11 +1076,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( short ** ) ( Buffer + uiOffset ) ) = ( short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1098,11 +1098,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( unsigned short ** ) ( Buffer + uiOffset ) ) = ( unsigned short * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1153,11 +1153,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( int ** ) ( Buffer + uiOffset ) ) = ( int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1175,11 +1175,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( unsigned int ** ) ( Buffer + uiOffset ) ) = ( unsigned int * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1229,11 +1229,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( long ** ) ( Buffer + uiOffset ) ) = ( long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1251,11 +1251,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( unsigned long ** ) ( Buffer + uiOffset ) ) = ( unsigned long * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1280,11 +1280,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( float ** ) ( Buffer + uiOffset ) ) = ( float * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                /* Is this correct??? IMHO It's a bug */
@@ -1314,11 +1314,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( double ** ) ( Buffer + uiOffset ) ) = ( double * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                /* Is this correct??? IMHO It's a bug */
@@ -1341,11 +1341,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
 #if UINT_MAX == ULONG_MAX
                case HB_IT_INTEGER:
-                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asInteger.value );
                   break;
 #endif
                case HB_IT_LONG:
-                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRUINT ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
+                  *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) ( ( pBaseVar->pItems + ulIndex )->item.asLong.value );
                   break;
 
                default:
@@ -1362,17 +1362,17 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                if( HB_IS_LONG( pStructure ) )
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
-                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRUINT ) pStructure->item.asLong.value;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) pStructure->item.asLong.value;
                   else
-                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRUINT ) pStructure->item.asLong.value, uiMemberSize );
+                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRDIFF ) pStructure->item.asLong.value, uiMemberSize );
                }
 #if UINT_MAX == ULONG_MAX
                else if( HB_IS_INTEGER( pStructure ) )
                {
                   if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
-                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRUINT ) pStructure->item.asInteger.value;
+                     *( ( void ** ) ( Buffer + uiOffset ) ) = ( void * ) ( HB_PTRDIFF ) pStructure->item.asInteger.value;
                   else
-                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRUINT ) pStructure->item.asInteger.value, uiMemberSize );
+                     HB_MEMCPY( ( void * ) ( Buffer + uiOffset ), ( void * ) ( HB_PTRDIFF ) pStructure->item.asInteger.value, uiMemberSize );
                }
 #endif
                else if( HB_IS_NIL( pStructure ) )
@@ -1517,29 +1517,27 @@ PHB_ITEM StructureToArray( BYTE * Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, un
 
          default:
          {
-	        if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
-            {
+            HB_ITEM_NEW( ID );
+
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+
+            if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
                uiMemberSize = sizeof( void * );
-            } 	         
             else if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE )
             {
-               
-               PHB_ITEM ID        = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );  
                PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
-               
-               hb_itemRelease( ID );
 
                if( HB_IS_OBJECT( pStructure ) )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
-                  uiMemberSize =  ( HB_UINT ) hb_parns( -1 );
+                  uiMemberSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
                   hb_itemRelease( pStructure );
                }
                else
                {
                   hb_itemRelease( pStructure );
                   hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 1, hb_paramError( 1 ) );
-                  return pRet;
+                  return pRet;;
                }
             }
             else
@@ -1671,13 +1669,13 @@ PHB_ITEM StructureToArray( BYTE * Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, un
 
          default:
          {
-            PHB_ITEM ID    = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            HB_ITEM_NEW( ID );
             PHB_ITEM       pStructure;
             unsigned int   uiNestedSize /*, uiNestedAlign */;
-            
+
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+
             pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );
-            
-            hb_itemRelease( ID );
 
             if( ! HB_IS_OBJECT( pStructure ) )
             {
@@ -1691,7 +1689,7 @@ PHB_ITEM StructureToArray( BYTE * Buffer, HB_SIZE ulBufferLen, PHB_ITEM aDef, un
              */
 
             hb_objSendMsg( pStructure, "SizeOf", 0 );
-            uiNestedSize = ( HB_UINT ) hb_parns( -1 );
+            uiNestedSize = ( unsigned int ) hb_itemGetNL( &HB_VM_STACK.Return );
 
             /* TraceLog( NULL, "* NestedSize: %i Offset: %i\n", uiNestedSize, uiOffset );
              */

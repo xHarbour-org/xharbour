@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2016-16-13 20:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/vm/arrayshb.c
+    ! revert back to previus version
+
+2016-04-25 22:14 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! utils/hbmake/hbmake.prg
+   ! utils/hbmake/hbmlang.c
+     ! minor updated for mingw64 bits
+   ! winmake/makefile.gc
+     minor fix
+   
+
 2016-04-23 20:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/vm/arrayshb.c
     ! minor adjust on previus commit
