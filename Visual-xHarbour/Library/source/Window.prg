@@ -187,6 +187,8 @@ CLASS Window INHERIT Object
    METHOD Animate()
    METHOD MessageBox( cText, cCaption, nFlags ) INLINE MessageBox( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags )
 
+//   METHOD MessageBox( cText, cCaption, nFlags, cIcon, nHelpID ) INLINE MessageBoxIndirect( ::hWnd, IIF( cText == NIL, "", XSTR( cText )), IIF( cCaption == NIL, "", XSTR( cCaption ) ), nFlags, cIcon, nHelpID )
+
    METHOD Destroy()
    METHOD Disable()               INLINE ::Enabled := .F.
    METHOD Enable()                INLINE ::Enabled := .T.

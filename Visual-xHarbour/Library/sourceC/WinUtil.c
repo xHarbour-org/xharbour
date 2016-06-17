@@ -27,6 +27,7 @@
 #include <windows.h>
 #include <process.h>
 #include <objbase.h>
+#include <winnt.h>
 
 #include <wbemidl.h>
 #include <commdlg.h>
@@ -35,6 +36,7 @@
 #include <tchar.h>
 #include <comcat.h>
 #include <wininet.h>
+#include <winsock.h>
 
 #include <stdio.h>
 #include <olectl.h>
@@ -4990,10 +4992,13 @@ BOOL AxTranslateMessageEx( MSG *pMsg )
       }
       else
       {
-         LPUNKNOWN pUnk = (LPUNKNOWN) GetWindowLong( pMsg->hwnd, GWL_USERDATA );
-         if( pUnk )
+         if( pMsg->message == WM_KEYUP )
          {
-            AxTranslateMessage( pUnk, pMsg );
+            LPUNKNOWN pUnk = (LPUNKNOWN) GetWindowLong( pMsg->hwnd, GWL_USERDATA );
+            if( pUnk )
+            {
+               AxTranslateMessage( pUnk, pMsg );
+            }
          }
       }
    }
@@ -5805,4 +5810,61 @@ HB_FUNC( _CHOOSECOLOR )
              hb_stornl( (LONG) cc.lpCustColors[i], 3, i+1 );
    }
    hb_retl( bRet );
+}
+
+HB_FUNC( VXH_WSASTARTUP )
+{
+   WSADATA wsa;
+   hb_retni( WSAStartup( 0x101, &wsa ) );
+}
+
+HB_FUNC( VXH_WSACLEANUP )
+{
+   hb_retni( WSACleanup() );
+}
+
+HB_FUNC( VXH_GETHOSTNAME )
+{
+   BYTE Name[ 255 ];
+   gethostname( ( char * ) Name, 255 );
+   hb_retc( ( char * ) Name );
+}
+
+HB_FUNC( VXH_GETHOSTBYNAME )
+{
+   struct hostent * pHost;
+   BYTE addr[20];
+
+   strcpy( (char *) addr, "0.0.0.0" );
+
+   if( pHost = gethostbyname( hb_parc(1) ) )
+   {
+       wsprintf( (char *) addr, "%i.%i.%i.%i",
+                 (BYTE) pHost->h_addr[0], (BYTE) pHost->h_addr[1],
+                 (BYTE) pHost->h_addr[2], (BYTE) pHost->h_addr[3] );
+   }
+
+   hb_retc( (char *) addr );
+}
+
+HB_FUNC( MESSAGEBOXINDIRECT )
+{
+   MSGBOXPARAMS pMsgBox;
+   DWORD dwStyle = (DWORD) hb_parni(4);
+   if( ! ISNIL(5) )
+   {
+      dwStyle |= MB_USERICON;
+   }
+   pMsgBox.cbSize          = sizeof(pMsgBox);
+   pMsgBox.hwndOwner       = (HWND) hb_parnl(1);
+   pMsgBox.hInstance       = GetModuleHandle( NULL );
+   pMsgBox.lpszText        = hb_parc(2);
+   pMsgBox.lpszCaption     = hb_parc(3);
+   pMsgBox.dwStyle         = dwStyle;
+   pMsgBox.lpszIcon        = ISNIL(5)?NULL:MAKEINTRESOURCE(hb_parni(5));
+   pMsgBox.dwContextHelpId = hb_parni(6);
+   pMsgBox.lpfnMsgBoxCallback = NULL;
+   pMsgBox.dwLanguageId    = LANG_SYSTEM_DEFAULT;
+
+   hb_retni( MessageBoxIndirect( &pMsgBox ) );
 }

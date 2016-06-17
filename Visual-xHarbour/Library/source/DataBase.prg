@@ -16,7 +16,6 @@
 #include "colors.ch"
 
 #include "ord.ch"
-#include "ads.ch"
 
 #define EF_NONE                         0
 #define EF_CANRETRY                     1
@@ -458,24 +457,6 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
          ::Connector := SocketRdd( Self )
       ENDIF
    ENDIF
-   IF ::Connection != NIL
-      cFileName := ::FileName
-      n := RAT( "\", cFileName )
-      cPath  := SUBSTR( cFileName, 1, n-1 )
-
-      cTable := SubStr( cFileName, n+1 )
-      n := RAT( ".", cTable )
-      cTable  := Left( cTable, n-1 )
-
-      aIndex := AdsDDFindObject( ADS_DD_INDEX_FILE_OBJECT, cTable, ::Connection )
-
-      // Disaster recovery: Index file deleted
-      IF ! Empty(aIndex) .AND. ! File( cPath + "\" + aIndex[1] )
-         AdsDDRemoveIndexFile( cTable, aIndex[1], 0, ::Connection )
-      ENDIF
-
-      AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
-   ENDIF
    ::Connector:Create( lIgnoreAO )
    IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
@@ -496,26 +477,12 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
          cData     := SUBSTR( cFileName, 1, n-1 )
          cPath     := GetTempPath()
 
-         IF ::Connection != NIL
-            IF hFTConnection == NIL
-               IF ! AdsConnect60( SUBSTR( cFileName, 1, n-1 ), , , , , @hFTConnection )
-                  RETURN NIL
-               ENDIF
-            ELSE
-               AdsConnection( hFTConnection )
-            ENDIF
-         ENDIF
-
          cFileName := SUBSTR( cFileName, n+1 )
 
          dbCreate( cPath + "__" + cFileName, ::__aTmpStruct, ::Driver, , , , , 0 )
 
          IF FILE( cPath + "__" + cFileName )
             dbCloseArea( ::Area )
-
-            IF ::Connection != NIL
-               AdsDDRemoveTable( cFileName, 0, ::Connection )
-            ENDIF
 
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "__" + cFileName, "modstru", .F., .F.,, 0 )
 
@@ -533,18 +500,9 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             FERASE( cData + "\" + cMemo )
             FRENAME( cPath + "__" + cMemo, cData + "\" + cMemo )
 
-            IF ::Connection != NIL
-               AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
-               cFileName := SUBSTR( ::FileName, Rat( "\", ::FileName )+1 )
-            ELSE
-               cFileName := ::FileName
-            ENDIF
-
+            cFileName := ::FileName
          ENDIF
 
-         IF ::Connection != NIL
-            AdsConnection( ::Connection )
-         ENDIF
          dbSelectArea( ::Area )
          dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
 
@@ -558,24 +516,7 @@ METHOD CreateTable( aStruc, cFile ) CLASS DataTable
    DEFAULT cFile  TO ::FileName
    DEFAULT aStruc TO ::Structure
    IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
-      IF ! ::Connector:CreateTable( cFile, aStruc, ::Driver )
-         IF ::Connection != NIL
-            n       := RAT( "\", cFile )
-            cTableName := SUBSTR( cFile, n+1 )
-            n       := RAT( ".", cTableName )
-            cTableName := SUBSTR( cTableName, 1, n-1 )
-            aTables := AdsDDFindObject( ADS_DD_TABLE_OBJECT, , ::Connection )
-
-            IF ASCAN( aTables, {|cTable| Upper(cTable)==Upper(cTableName)} ) > 0
-               // Disaster recovery: Table file deleted
-               IF ! AdsDDRemoveTable( cTableName, 0, ::Connection )
-                  view AdsGetLastError()
-               ELSE
-                  ::Connector:CreateTable( cFile, aStruc, ::Driver )
-               ENDIF
-            ENDIF
-         ENDIF
-      ENDIF
+      ::Connector:CreateTable( cFile, aStruc, ::Driver )
 
    ELSEIF File( cFile ) .AND. ! Empty( aStruc )
       ::__aTmpStruct := aClone( aStruc )
@@ -627,21 +568,6 @@ METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery
 
       dbCloseArea( ::Area )
 
-      IF ::Connection != NIL
-         IF ! AdsDDRemoveTable( cFileName, 0, ::Connection )
-            view AdsGetLastError()
-         ENDIF
-
-         IF hFTConnection == NIL
-            IF ! AdsConnect60( cPath, , , , , @hFTConnection )
-               view AdsGetLastError()
-               RETURN NIL
-            ENDIF
-         ELSE
-            AdsConnection( hFTConnection )
-         ENDIF
-      ENDIF
-
       dbSelectArea( ::Area )
       dbUseArea( .F., ::Driver, cPath + "\" + cFileName, ::Alias, .F., ::ReadOnly, ::CodePage )
 
@@ -649,13 +575,6 @@ METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery
       (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
 
       dbCloseArea( ::Area )
-
-      IF ::Connection != NIL
-         AdsDDAddTable( , cPath + "\" + cFileName, ::TableType, ::Connection )
-         AdsConnection( ::Connection )
-      ELSE
-         cFileName := cPath + "\" + cFileName
-      ENDIF
 
       dbSelectArea( ::Area )
       dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )

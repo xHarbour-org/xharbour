@@ -1170,8 +1170,11 @@ METHOD Reset( oControl ) CLASS FormComboBox
          ASORT( aObj,,, {|a,b| Upper(a:Name) < Upper(b:Name) } )
 
          FOR EACH oCtrl IN aObj
-             ::AddItem( oCtrl:Name + CHR(9) + oCtrl:__xCtrlName )
-             AADD( ::aItems, oCtrl )
+             TRY
+                ::AddItem( oCtrl:Name + CHR(9) + oCtrl:__xCtrlName )
+                AADD( ::aItems, oCtrl )
+             CATCH
+             END
          NEXT
 
          aObj := NIL

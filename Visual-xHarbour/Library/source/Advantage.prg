@@ -16,6 +16,7 @@
 #include "vxh.ch"
 #include "ord.ch"
 #include "debug.ch"
+#include "ads.ch"
 
 
 #define ADS_NTX                           1
@@ -47,6 +48,9 @@ CLASS AdsDataTable INHERIT DataTable
    METHOD MemoExt()                           INLINE ".adm"
    METHOD Append()                            INLINE ::Cancel(), (::Area)->( dbAppend(), AdsNull2Blank() )
    METHOD Save()
+   METHOD Create()
+   METHOD CreateOrder()
+   METHOD CreateTable()
    METHOD SetData()
    METHOD FieldPut()
    METHOD NewInstance()
@@ -80,6 +84,140 @@ METHOD NewInstance( lSetCurPos ) CLASS AdsDataTable
       oNewTable:Goto( ::Recno() )
    ENDIF
 RETURN oNewTable
+
+//-------------------------------------------------------------------------------------------------------
+METHOD CreateTable( aStruc, cFile ) CLASS AdsDataTable
+   LOCAL n, aTables, cTableName
+   DEFAULT cFile  TO ::FileName
+   DEFAULT aStruc TO ::Structure
+   IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
+      IF ! ::Connector:CreateTable( cFile, aStruc, ::Driver )
+         IF ::Connection != NIL
+            n       := RAT( "\", cFile )
+            cTableName := SUBSTR( cFile, n+1 )
+            n       := RAT( ".", cTableName )
+            cTableName := SUBSTR( cTableName, 1, n-1 )
+            aTables := AdsDDFindObject( ADS_DD_TABLE_OBJECT, , ::Connection )
+
+            IF ASCAN( aTables, {|cTable| Upper(cTable)==Upper(cTableName)} ) > 0
+               // Disaster recovery: Table file deleted
+               IF ! AdsDDRemoveTable( cTableName, 0, ::Connection )
+                  view AdsGetLastError()
+               ELSE
+                  ::Connector:CreateTable( cFile, aStruc, ::Driver )
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+
+   ELSEIF File( cFile ) .AND. ! Empty( aStruc )
+      ::__aTmpStruct := aClone( aStruc )
+
+   ENDIF
+RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Create( lIgnoreAO ) CLASS AdsDataTable
+   LOCAL lChanged, n, cFileName, cPath, cMemo, cData, cTable, aIndex
+   IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
+      ::Socket := ::Form:__hObjects[ ::Socket ]
+      IF ! ::DesignMode
+         ::Connector := SocketRdd( Self )
+      ENDIF
+   ENDIF
+   IF ::Connection != NIL
+      cFileName := ::FileName
+      n := RAT( "\", cFileName )
+      cPath  := SUBSTR( cFileName, 1, n-1 )
+
+      cTable := SubStr( cFileName, n+1 )
+      n := RAT( ".", cTable )
+      cTable  := Left( cTable, n-1 )
+
+      aIndex := AdsDDFindObject( ADS_DD_INDEX_FILE_OBJECT, cTable, ::Connection )
+
+      // Disaster recovery: Index file deleted
+      IF ! Empty(aIndex) .AND. ! File( cPath + "\" + aIndex[1] )
+         AdsDDRemoveIndexFile( cTable, aIndex[1], 0, ::Connection )
+      ENDIF
+
+      AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
+   ENDIF
+   ::Connector:Create( lIgnoreAO )
+   IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
+      lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
+      IF ! lChanged
+         FOR n := 1 TO LEN( ::__aTmpStruct )
+             lChanged := Upper(::__aTmpStruct[n][1]) != Upper(::Structure[n][1]) .OR.;
+                         ::__aTmpStruct[n][2] != ::Structure[n][2] .OR.;
+                         ::__aTmpStruct[n][3] != ::Structure[n][3] .OR.;
+                         ::__aTmpStruct[n][4] != ::Structure[n][4]
+             IF lChanged
+                EXIT
+             ENDIF
+         NEXT
+      ENDIF
+      IF lChanged
+         cFileName := ::FileName
+         n         := RAT( "\", cFileName )
+         cData     := SUBSTR( cFileName, 1, n-1 )
+         cPath     := GetTempPath()
+
+         IF ::Connection != NIL
+            IF hFTConnection == NIL
+               IF ! AdsConnect60( SUBSTR( cFileName, 1, n-1 ), , , , , @hFTConnection )
+                  RETURN NIL
+               ENDIF
+            ELSE
+               AdsConnection( hFTConnection )
+            ENDIF
+         ENDIF
+
+         cFileName := SUBSTR( cFileName, n+1 )
+
+         dbCreate( cPath + "__" + cFileName, ::__aTmpStruct, ::Driver, , , , , 0 )
+
+         IF FILE( cPath + "__" + cFileName )
+            dbCloseArea( ::Area )
+
+            IF ::Connection != NIL
+               AdsDDRemoveTable( cFileName, 0, ::Connection )
+            ENDIF
+
+            dbUseArea( ! ::__lMemory, ::Driver, cPath + "__" + cFileName, "modstru", .F., .F.,, 0 )
+
+            SELECT "modstru"
+            APPEND FROM (::FileName) VIA (::Driver)
+            modstru->( dbCloseArea() )
+
+            FERASE( ::FileName )
+
+            FRENAME( cPath + "__" + cFileName, ::FileName )
+
+            n := RAT( ".", cFileName )
+            cMemo := Left( cFileName, n-1 ) + ::MemoExt()
+
+            FERASE( cData + "\" + cMemo )
+            FRENAME( cPath + "__" + cMemo, cData + "\" + cMemo )
+
+            IF ::Connection != NIL
+               AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
+               cFileName := SUBSTR( ::FileName, Rat( "\", ::FileName )+1 )
+            ELSE
+               cFileName := ::FileName
+            ENDIF
+
+         ENDIF
+
+         IF ::Connection != NIL
+            AdsConnection( ::Connection )
+         ENDIF
+         dbSelectArea( ::Area )
+         dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
+
+      ENDIF
+   ENDIF
+RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save() CLASS AdsDataTable
@@ -156,6 +294,55 @@ FUNCTION AdsNull2Blank( lAnyRDD )
       NEXT
    ENDIF
 RETURN NIL
+
+//-------------------------------------------------------------------------------------------------------
+METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lDescend, lAll ) CLASS AdsDataTable
+   LOCAL n, cFileName, cPath
+
+   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. ! Upper(cKey) == Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ))
+      cFileName := ::FileName
+      n         := RAT( "\", cFileName )
+      cPath     := Left( cFileName, n-1 )
+      cFileName := SubStr( cFileName, n+1 )
+
+      dbCloseArea( ::Area )
+
+      IF ::Connection != NIL
+         IF ! AdsDDRemoveTable( cFileName, 0, ::Connection )
+            view AdsGetLastError()
+         ENDIF
+
+         IF hFTConnection == NIL
+            IF ! AdsConnect60( cPath, , , , , @hFTConnection )
+               view AdsGetLastError()
+               RETURN NIL
+            ENDIF
+         ELSE
+            AdsConnection( hFTConnection )
+         ENDIF
+      ENDIF
+
+      dbSelectArea( ::Area )
+      dbUseArea( .F., ::Driver, cPath + "\" + cFileName, ::Alias, .F., ::ReadOnly, ::CodePage )
+
+      (::Area)->( OrdCondSet( cFor, bFor, lAll, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lDescend ) )
+      (::Area)->( OrdCreate( cOrderBagName, cTag, cKey,, lUnique ) )
+
+      dbCloseArea( ::Area )
+
+      IF ::Connection != NIL
+         AdsDDAddTable( , cPath + "\" + cFileName, ::TableType, ::Connection )
+         AdsConnection( ::Connection )
+      ELSE
+         cFileName := cPath + "\" + cFileName
+      ENDIF
+
+      dbSelectArea( ::Area )
+      dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
+
+      RETURN (::Area)->( OrdNumber( cTag, cOrderBagName ) ) > 0 .AND. Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )) == Upper(cKey)
+   ENDIF
+RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
