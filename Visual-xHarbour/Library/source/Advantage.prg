@@ -18,11 +18,8 @@
 #include "debug.ch"
 #include "ads.ch"
 
+static hFTConnection
 
-#define ADS_NTX                           1
-#define ADS_CDX                           2
-#define ADS_ADT                           3
-#define ADS_VFP                           4
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsDataTable INHERIT DataTable

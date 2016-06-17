@@ -27,7 +27,6 @@
 REQUEST HB_MEMIO
 
 static nMemSel := 100
-static hFTConnection, hADDConnection
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -450,7 +449,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Create( lIgnoreAO ) CLASS DataTable
-   LOCAL lChanged, n, cFileName, cPath, cMemo, cData, cTable, aIndex
+   LOCAL lChanged, n, cFileName, cPath, cMemo, cData
    IF ValType( ::Socket ) == "C" .AND. Ascan( ::Form:__hObjects:Keys, {|c| Upper(c) == Upper(::Socket) } ) > 0
       ::Socket := ::Form:__hObjects[ ::Socket ]
       IF ! ::DesignMode
@@ -512,7 +511,6 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD CreateTable( aStruc, cFile ) CLASS DataTable
-   LOCAL n, aTables, cTableName
    DEFAULT cFile  TO ::FileName
    DEFAULT aStruc TO ::Structure
    IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
