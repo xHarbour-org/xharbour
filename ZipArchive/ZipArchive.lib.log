@@ -1,0 +1,188 @@
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipArchive.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipArchive.cpp"<<<
+
+ZipArchive.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipAutoBuffer.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipAutoBuffer.cpp"<<<
+
+ZipAutoBuffer.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipCentralDir.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipCentralDir.cpp"<<<
+
+ZipCentralDir.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipCompatibility.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipCompatibility.cpp"<<<
+
+ZipCompatibility.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipException.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipException.cpp"<<<
+
+ZipException.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipFile.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipFile.cpp"<<<
+
+ZipFile.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+ZipFile.cpp(46) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+ZipFile.cpp(49) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+ZipFile.cpp(51) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipFileHeader.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipFileHeader.cpp"<<<
+
+ZipFileHeader.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipMemFile.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipMemFile.cpp"<<<
+
+ZipMemFile.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipPathComponent.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipPathComponent.cpp"<<<
+
+ZipPathComponent.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipPlatform.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipPlatform.cpp"<<<
+
+ZipPlatform.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+ZipPlatform.cpp(320) : warning C4996: 'chsize': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _chsize. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(325) : see declaration of 'chsize'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipPlatformComm.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipPlatformComm.cpp"<<<
+
+ZipPlatformComm.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipStorage.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipStorage.cpp"<<<
+
+ZipStorage.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+c:\temp3\zipa\ziparchive\ZipFile.h(84) : warning C4996: 'close': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _close. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(326) : see declaration of 'close'
+c:\temp3\zipa\ziparchive\ZipFile.h(94) : warning C4996: 'write': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _write. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(342) : see declaration of 'write'
+c:\temp3\zipa\ziparchive\ZipFile.h(100) : warning C4996: 'tell': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _tell. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(340) : see declaration of 'tell'
+c:\temp3\zipa\ziparchive\ZipFile.h(112) : warning C4996: 'read': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _read. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(337) : see declaration of 'read'
+c:\temp3\zipa\ziparchive\ZipFile.h(120) : warning C4996: 'lseek': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _lseek. See online help for details.
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\io.h(334) : see declaration of 'lseek'
+
+Type: C >>>cl.exe -Fo"\xbp\vc8\ZipArchive.lib\ZipString.obj" -W3 -EHa -O1 -FD -c  -Zi -DNDEBUG -D_MBCS -DWIN32 -D_WINDOWS -DZLIB_DLL -DZIP_ARCHIVE_STL_PROJ -DPKZIP_BUG_WORKAROUND -D_CRT_SECURE_NO_WARNINGS  -I"\xhb\include" -I"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include" -I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\include" -nologo "ZipString.cpp"<<<
+
+ZipString.cpp
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\sal_supp.h(57) : warning C4005: '__useHeader' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2886) : see previous definition of '__useHeader'
+c:\program files (x86)\microsoft sdks\windows\v7.1a\include\specstrings_supp.h(77) : warning C4005: '__on_failure' : macro redefinition
+        C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\sal.h(2896) : see previous definition of '__on_failure'
+
+Type: C >>>lib.exe  -out:"ZipArchive.lib"  "\xbp\vc8\ZipArchive.lib\ZipArchive.obj"  "\xbp\vc8\ZipArchive.lib\ZipAutoBuffer.obj"  "\xbp\vc8\ZipArchive.lib\ZipCentralDir.obj"  "\xbp\vc8\ZipArchive.lib\ZipCompatibility.obj"  "\xbp\vc8\ZipArchive.lib\ZipException.obj"  "\xbp\vc8\ZipArchive.lib\ZipFile.obj"  "\xbp\vc8\ZipArchive.lib\ZipFileHeader.obj"  "\xbp\vc8\ZipArchive.lib\ZipMemFile.obj"  "\xbp\vc8\ZipArchive.lib\ZipPathComponent.obj"  "\xbp\vc8\ZipArchive.lib\ZipPlatform.obj"  "\xbp\vc8\ZipArchive.lib\ZipPlatformComm.obj"  "\xbp\vc8\ZipArchive.lib\ZipStorage.obj"  "\xbp\vc8\ZipArchive.lib\ZipString.obj" <<<
+
+Microsoft (R) Library Manager Version 12.00.31101.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+

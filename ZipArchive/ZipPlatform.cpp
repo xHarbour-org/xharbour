@@ -163,10 +163,14 @@ bool ZipPlatform::GetFileModTime(LPCTSTR lpFileName, time_t & ttime)
 
 bool ZipPlatform::SetFileModTime(LPCTSTR lpFileName, time_t ttime)
 {
-	struct _utimbuf ub;
+#if defined _MSC_VER && !defined __BORLANDC__	
+	struct utimbuf ub;
+#else
+   struct _utimbuf ub;
+#endif	
 	ub.actime = time(NULL);
 	ub.modtime = ttime == -1 ? time(NULL) : ttime; // if wrong file time, set it to the current
-	return _tutime(lpFileName, &ub) == 0;
+	return utime(lpFileName, &ub) == 0;
 }
 
 
