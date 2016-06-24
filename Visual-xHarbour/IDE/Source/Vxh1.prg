@@ -651,6 +651,7 @@ METHOD Init() CLASS IDE_MainForm
    END
 
    ::Application:Props[ "MainToolBar" ] := ToolStripContainer( Self ):Create()
+   ::Application:Props[ "MainToolBar" ]:BackColor := ::BackColor
 
    //--------------------------------------
    WITH OBJECT ::Application:Props[ "MainMenu" ] := MenuStrip( ::Application:Props[ "MainToolBar" ] )
@@ -1229,8 +1230,9 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:StandardBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
-      :Caption   := "Standard"
-      :Row       := 2
+      :Caption     := "Standard"
+      :Row         := 2
+      :Transparent := .T.
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
       :ImageList:MaskColor := C_LIGHTCYAN
@@ -1276,8 +1278,9 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:EditBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
-      :Caption := "Edit"
-      :Row     := 2
+      :Caption     := "Edit"
+      :Row         := 2
+      :Transparent := .T.
       :Create()
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
@@ -1329,8 +1332,9 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:BuildBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
-      :Row     := 2
-      :Caption := "Build"
+      :Transparent := .T.
+      :Row         := 2
+      :Caption     := "Build"
       :ImageList := ImageList( :this, 16, 16 ):Create()
       :ImageList:AddImage( IDB_STD_SMALL_COLOR )
       :ImageList:MaskColor := C_LIGHTCYAN
@@ -1383,6 +1387,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:ToolBoxBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
+      :Transparent := .T.
       :Row       := 3
       :Caption   := ""
       :ImageList := ImageList( :this, 16, 16 ):Create()
@@ -1410,6 +1415,7 @@ METHOD Init() CLASS IDE_MainForm
    WITH OBJECT ::Application:AlignBar := ToolStrip( ::Application:Props[ "MainToolBar" ] )
       :Showgrip    := .F.
       :ShowChevron := .F.
+      :Transparent := .T.
       :Row       := 3
       :Caption   := "Alignment"
       :ImageList := ImageList( :this, 16, 16 ):Create()

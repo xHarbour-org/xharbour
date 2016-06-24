@@ -49,7 +49,6 @@ CLASS ToolStripContainer INHERIT Control
    DATA XPTheming        EXPORTED INIT .T.
    DATA AllowMaximize    EXPORTED INIT .F.
    DATA ContextMenu      EXPORTED
-   DATA BackColor        EXPORTED
    DATA ForeColor        EXPORTED
    DATA TabOrder         EXPORTED
    DATA ClipChildren     EXPORTED INIT .T.
@@ -200,7 +199,11 @@ METHOD OnPaint() CLASS ToolStripContainer
    hMemBitmap := CreateCompatibleBitmap( hDC, ::Width, ::Height )
    hOldBitmap := SelectObject( hMemDC, hMemBitmap)
 
-   __GradientFill( hMemDC, ::__aVertex, 2, ::__aMesh, 1, 0 )
+   IF ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor
+      _FillRect( hMemDC, {0,0,::xWidth,::xHeight}, ::BkBrush )
+   ELSE
+      __GradientFill( hMemDC, ::__aVertex, 2, ::__aMesh, 1, 0 )
+   ENDIF
 
    BitBlt( hDC, 0, 0, ::Width, ::Height, hMemDC, 0, 0, SRCCOPY )
 
@@ -336,7 +339,6 @@ CLASS ToolStrip INHERIT Control
    DATA AllowMaximize  EXPORTED INIT .F.
    DATA ContextMenu    EXPORTED
    DATA BackColor      EXPORTED
-   DATA ForeColor      EXPORTED
    DATA TabOrder       EXPORTED
    DATA ClipChildren   EXPORTED INIT .T.
    DATA ClipSiblings   EXPORTED INIT .T.
@@ -1869,7 +1871,7 @@ RETURN Self
 METHOD OnPaint() CLASS ToolStripButton
    LOCAL hOldBrush, hOldPen, aRect := Array(4)
    LOCAL x, n, nDots := ( ::Height - 6 ) / 4
-   LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled, hDC, hMemDC
+   LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled, hDC, hMemDC, nColor
    static lPaint := .F.
 
    lEnabled := ::Enabled .AND. ::Parent:Enabled
@@ -1984,11 +1986,16 @@ METHOD OnPaint() CLASS ToolStripButton
       ENDIF
    ENDIF
 
+   IF ! ::__lSelected .AND. ! ::Checked .AND. ::Parent:ForeColor != NIL .AND. ::Parent:ForeColor <> ::Parent:__SysForeColor
+      nColor := SetTextColor( hMemDC, ::Parent:ForeColor )
+   ENDIF
    IF !lEnabled
-      SetTextColor( hMemDC, GetSysColor( COLOR_GRAYTEXT ) )
+      nColor := SetTextColor( hMemDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
 
    _DrawText( hMemDC, ::Caption, /*{x,0,::ClientWidth,::ClientHeight}*/ aTextRect, nTextFlags /*DT_SINGLELINE | DT_CENTER | DT_VCENTER*/ )
+
+   SetTextColor( hMemDC, nColor )
 
    IF ::DropDown > 1
       MoveTo( hMemDC, ::Width - 9, ( ::Height / 2 ) - 1 )

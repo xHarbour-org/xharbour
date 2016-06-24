@@ -1541,7 +1541,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
 
    IF ::ActiveObject:TreeItem != NIL
       ::ActiveObject:TreeItem:Select()
-      ::ActiveObject:TreeItem:Expand()
+//      ::ActiveObject:TreeItem:Expand()
    ENDIF
 
    //hb_gcall(.T.)

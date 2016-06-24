@@ -144,12 +144,11 @@ BOOL WINAPI GetNamedPipeServerProcessId( HANDLE Pipe, PULONG ServerProcessId )
    return FALSE;
 }
 
-
 HB_FUNC( BITMAPTOREGION )
 {
    HBITMAP hBmp = (HBITMAP) hb_parnl(1);
-   COLORREF cTransparentColor = ISNIL(2) ? 0 : (COLORREF) hb_parnl(2);
-   COLORREF cTolerance = ISNIL(3) ? (COLORREF) hb_parnl(2) : (COLORREF) hb_parnl(3);
+   COLORREF cTransparentColor = (COLORREF) hb_parnl(2);
+   COLORREF cTolerance = (COLORREF) hb_parnl(3);
    HRGN hRgn = NULL;
    INT y;
    INT x;
@@ -170,17 +169,27 @@ HB_FUNC( BITMAPTOREGION )
          VOID * pbits32;
          BITMAPINFOHEADER bmi;
 
-         BYTE lr = GetBValue(cTransparentColor);
-         BYTE lg = GetGValue(cTransparentColor);
-         BYTE lb = GetRValue(cTransparentColor);
-
-         BYTE hr = GetRValue(cTolerance);
-         BYTE hg = GetGValue(cTolerance);
-         BYTE hb = GetBValue(cTolerance);
-
          BYTE *p32;
-         // Get bitmap size
          BITMAP bm;
+
+         BYTE lr, hr;
+         BYTE lg, hg;
+         BYTE lb, hb;
+
+         if( cTransparentColor )
+         {
+            lr = GetBValue(cTransparentColor);
+            lg = GetGValue(cTransparentColor);
+            lb = GetRValue(cTransparentColor);
+         }
+
+         if( cTolerance )
+         {
+            hr = GetRValue(cTolerance);
+            hg = GetGValue(cTolerance);
+            hb = GetBValue(cTolerance);
+         }
+
          GetObject(hBmp, sizeof(bm), &bm);
 
          // Create a 32 bits depth bitmap and select it into the memory DC
@@ -230,27 +239,31 @@ HB_FUNC( BITMAPTOREGION )
                   for ( x = 0; x < bm.bmWidth; x++) {
                      // Search for a continuous range of "non transparent pixels"
                      int x0 = x;
-                     LONG *p = (LONG *)p32 + x;
-
-                     while (x < bm.bmWidth)
+                     if( cTransparentColor )
                      {
-                        BYTE b = GetRValue(*p);
-                        if (b >= hr && b <= lr)
-                        {
-                           b = GetGValue(*p);
-                           if (b >= hg && b <= lg)
-                           {
-                              b = GetBValue(*p);
-                              if (b >= hb && b <= lb)
-                                 // This pixel is "transparent"
-                                 break;
-                           }
-                        }
-                        p++;
-                        x++;
-                     }
+                        LONG *p = (LONG *)p32 + x;
 
-                     if (x > x0)
+                        while (x < bm.bmWidth)
+                        {
+                           BYTE b = GetRValue(*p);
+                           if (b == lr)
+                           {
+                              b = GetGValue(*p);
+                              if (b == lg)
+                              {
+                                 b = GetBValue(*p);
+                                 if (b == lb)
+                                 {
+                                    // This pixel is "transparent"
+                                    break;
+                                 }
+                              }
+                           }
+                           p++;
+                           x++;
+                        }
+                     }
+                     if( (x > x0) || ( ! cTransparentColor ) )
                      {
                         // Add the pixels (x0, y) to (x, y+1) as a new rectangle in the region
                         if (pData->rdh.nCount >= maxRects)
@@ -271,22 +284,6 @@ HB_FUNC( BITMAPTOREGION )
                         if (y+1 > pData->rdh.rcBound.bottom)
                            pData->rdh.rcBound.bottom = y+1;
                         pData->rdh.nCount++;
-
-                        // On Windows98, ExtCreateRegion() may fail if the number of rectangles is too
-                        // large (ie: > 4000). Therefore, we have to create the region by multiple steps.
-                        if (pData->rdh.nCount == 2000)
-                        {
-                           HRGN h = ExtCreateRegion(NULL, sizeof(RGNDATAHEADER) + (sizeof(RECT) * maxRects), pData);
-                           if (hRgn)
-                           {
-                              CombineRgn(hRgn, hRgn, h, RGN_OR);
-                              DeleteObject(h);
-                           }
-                           else
-                              hRgn = h;
-                           pData->rdh.nCount = 0;
-                           SetRect(&pData->rdh.rcBound, MAXLONG, MAXLONG, 0, 0);
-                        }
                      }
                   }
 
