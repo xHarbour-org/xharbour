@@ -26,57 +26,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 490
    ::Height               := 281
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -84,16 +84,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 220
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -104,8 +104,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 12
       :Width                := 454
       :Height               := 77
-      :Caption              := "Captions at design time"
-      :ForeColor            := 0
+      :Text                 := "Captions at design time"
       :Create()
       WITH OBJECT ( LABEL( :this ) )
          :Name                 := "LabelOne"
@@ -113,7 +112,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Top                  := 24
          :Width                := 426
          :Height               := 29
-         :Caption              := "Most objects in VxH have a 'Caption' property. This property can be set at design time using the Object Manager."
+         :Text                 := "Most objects in VxH have a 'Caption' property. This property can be set at design time using the Object Manager."
          :Create()
       END //LABEL
 
@@ -125,8 +124,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 108
       :Width                := 454
       :Height               := 75
-      :Caption              := "Captions at run time"
-      :ForeColor            := 0
+      :Text                 := "Captions at run time"
       :Create()
       WITH OBJECT ( BUTTON( :this ) )
          :Name                 := "ButtonChange"
@@ -134,7 +132,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Top                  := 24
          :Width                := 80
          :Height               := 30
-         :Caption              := "Click Me!"
+         :Text                 := "Click Me!"
          :EventHandler[ "OnClick" ] := "ButtonChange_OnClick"
          :Create()
       END //BUTTON
@@ -145,7 +143,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Top                  := 30
          :Width                := 188
          :Height               := 16
-         :Caption              := "Click the button to change its caption."
+         :Text                 := "Click the button to change its caption."
          :Create()
       END //LABEL
 
