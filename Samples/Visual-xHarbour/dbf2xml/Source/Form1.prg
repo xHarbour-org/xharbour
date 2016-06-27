@@ -204,14 +204,25 @@ METHOD OpenTable() CLASS Form1
       hb_SetCodePage( "ITWIN" )
    endif
 
-   with object ::MyTable
-      :FileName := ::cFileIn
-      try
-         :Open()
+   IF Empty(::MyTable:FileName)
+      with object ::MyTable
+         :FileName := ::cFileIn
+         try
+            :Open()
+         catch
+            lOk:=.f.
+         end
+      end
+   ELSE
+     try
+         ::MyTable:Open()
       catch
          lOk:=.f.
+         ::MessageBox( "Input file open error", "dbf2xml", MB_ICONHAND )
       end
-   end
+      RETURN lOk
+   ENDIF
+   
    if !lOk
       ::MessageBox( "Input file open error", "dbf2xml", MB_ICONHAND )
       return .f.
