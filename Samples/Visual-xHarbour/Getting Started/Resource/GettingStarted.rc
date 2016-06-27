@@ -1,4 +1,4 @@
-IDOK MANIFEST "GettingStarted.XML"
+1 24 "GettingStarted.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
