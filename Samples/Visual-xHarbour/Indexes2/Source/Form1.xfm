@@ -18,9 +18,10 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    REQUEST DBFCDX, DBFFPT
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "DataTable1"
-      :Alias                := "PEOPLE"
-      :FileName             := "people.dbf"
+      :Path                 := "W:\VXHSamples\Indexes2\Bin"
+      :MemoType             := 3
       :Driver               := "DBFCDX"
+      :FileName             := "people.dbf"
       :Create()
    END //DataTable1
 
@@ -30,7 +31,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    ::Top                  := 10
    ::Width                := 300
    ::Height               := 300
-   ::Caption              := "Form1"
+   ::Text                 := "Form1"
 
    ::Create()
 
@@ -43,18 +44,19 @@ METHOD Init( oParent, aParameters ) CLASS Form1
 
       :Left                 := 1
       :Top                  := 0
-      :Caption              := "ToolStrip1"
+      :Text                 := "ToolStrip1"
+      :ShowGrip             := .F.
       :Create()
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "ToolStripButton1"
-         :Caption              := "File"
+         :Text                 := "File"
          :EventHandler[ "OnClick" ] := "ToolStripButton1_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
 
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "ToolStripButton2"
-         :Caption              := "Maintenance"
+         :Text                 := "Maintenance"
          :EventHandler[ "OnClick" ] := "ToolStripButton2_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
