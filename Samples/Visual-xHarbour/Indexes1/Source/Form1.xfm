@@ -24,7 +24,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "MyTable"
       :CodePage             := ""
-      :Path                 := "W:\VXHSamples\Indexes1\Data"
+      :Path                 := "W:\VXHSamples\Indexes1\Bin"
       :Driver               := "RMDBFCDX"
       :FileName             := "people.dbf"
       :Create()
