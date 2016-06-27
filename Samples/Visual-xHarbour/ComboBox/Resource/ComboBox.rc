@@ -1,4 +1,4 @@
-IDOK MANIFEST "ComboBox.XML"
+1 24 "ComboBox.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
