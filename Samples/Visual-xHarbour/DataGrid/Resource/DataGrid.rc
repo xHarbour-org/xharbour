@@ -1,4 +1,4 @@
-IDOK MANIFEST "DataGrid.XML"
+1 24 "DataGrid.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
