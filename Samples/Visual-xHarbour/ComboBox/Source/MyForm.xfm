@@ -27,57 +27,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 592
    ::Height               := 468
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -85,16 +85,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 407
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -109,7 +109,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 12
       :Width                := 117
       :Height               := 16
-      :Caption              := "Question 1 (History)"
+      :Text                 := "Question 1 (History)"
       :Create()
    END //LABEL
 
@@ -119,7 +119,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 30
       :Width                := 510
       :Height               := 16
-      :Caption              := "What was the name of the Pope who was head of the Catholic Church from 1939 to 1958?"
+      :Text                 := "What was the name of the Pope who was head of the Catholic Church from 1939 to 1958?"
       :Create()
    END //LABEL
 
@@ -129,7 +129,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 52
       :Width                := 159
       :Height               := 100
-      :ClientEdge           := .T.
+      :Border               := 512
       :ItemHeight           := 13
       :Create()
    END //COMBOBOX
@@ -144,7 +144,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 90
       :Width                := 141
       :Height               := 16
-      :Caption              := "Question 2 (Geography)"
+      :Text                 := "Question 2 (Geography)"
       :Create()
    END //LABEL
 
@@ -154,7 +154,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 108
       :Width                := 237
       :Height               := 16
-      :Caption              := "Which city has the largest population?"
+      :Text                 := "Which city has the largest population?"
       :Create()
    END //LABEL
 
@@ -164,7 +164,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 130
       :Width                := 159
       :Height               := 100
-      :ClientEdge           := .T.
+      :Border               := 512
       :ItemHeight           := 13
       :Create()
    END //COMBOBOX
@@ -179,7 +179,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 168
       :Width                := 116
       :Height               := 16
-      :Caption              := "Question 3 (Sience)"
+      :Text                 := "Question 3 (Sience)"
       :Create()
    END //LABEL
 
@@ -189,7 +189,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 186
       :Width                := 215
       :Height               := 16
-      :Caption              := "How many moons does Jupiter have?"
+      :Text                 := "How many moons does Jupiter have?"
       :Create()
    END //LABEL
 
@@ -199,7 +199,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 208
       :Width                := 159
       :Height               := 100
-      :ClientEdge           := .T.
+      :Border               := 512
       :ItemHeight           := 13
       :Create()
    END //COMBOBOX
@@ -214,7 +214,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 246
       :Width                := 120
       :Height               := 16
-      :Caption              := "Question 4 (People)"
+      :Text                 := "Question 4 (People)"
       :Create()
    END //LABEL
 
@@ -224,7 +224,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 264
       :Width                := 389
       :Height               := 16
-      :Caption              := "In which year did James Doohan (actor who played Scotty in Star Trek) die?"
+      :Text                 := "In which year did James Doohan (actor who played Scotty in Star Trek) die?"
       :Create()
    END //LABEL
 
@@ -234,7 +234,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 286
       :Width                := 159
       :Height               := 100
-      :ClientEdge           := .T.
+      :Border               := 512
       :ItemHeight           := 13
       :Create()
    END //COMBOBOX
@@ -249,7 +249,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 324
       :Width                := 119
       :Height               := 16
-      :Caption              := "Question 5 (Games)"
+      :Text                 := "Question 5 (Games)"
       :Create()
    END //LABEL
 
@@ -259,7 +259,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 342
       :Width                := 197
       :Height               := 16
-      :Caption              := "Which is the highest poker hand?"
+      :Text                 := "Which is the highest poker hand?"
       :Create()
    END //LABEL
 
@@ -269,7 +269,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 364
       :Width                := 159
       :Height               := 100
-      :ClientEdge           := .T.
+      :Border               := 512
       :ItemHeight           := 13
       :Create()
    END //COMBOBOX
@@ -277,16 +277,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonExit"
       WITH OBJECT :Dock
-         :Right                := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 12
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "12,12,12,12"
       END
 
       :Left                 := 484
       :Top                  := 390
       :Width                := 80
       :Height               := 30
-      :Caption              := "Exit"
+      :Text                 := "Exit"
       :EventHandler[ "OnClick" ] := "ButtonExit_OnClick"
       :Create()
    END //BUTTON
@@ -294,77 +294,77 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonCheck"
       WITH OBJECT :Dock
-         :Right                := ::ButtonExit
-         :Bottom               := :Owner:Parent
-         :Margin               := 12
+         :Right                := "ButtonExit"
+         :Bottom               := "MyForm"
+         :Margins              := "12,12,12,12"
       END
 
       :Left                 := 356
       :Top                  := 390
       :Width                := 116
       :Height               := 30
-      :Caption              := "Check my answers!"
+      :Text                 := "Check my answers!"
       :EventHandler[ "OnClick" ] := "ButtonCheck_OnClick"
       :Create()
    END //BUTTON
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelAnswer1"
+      :ForeColor            := 32768
       :Left                 := 180
       :Top                  := 54
       :Width                := 394
       :Height               := 16
       :Visible              := .F.
-      :Caption              := "Pius XII"
-      :ForeColor            := 32768
+      :Text                 := "Pius XII"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelAnswer2"
+      :ForeColor            := 32768
       :Left                 := 180
       :Top                  := 132
       :Width                := 396
       :Height               := 16
       :Visible              := .F.
-      :Caption              := "Shangai, China"
-      :ForeColor            := 32768
+      :Text                 := "Shangai, China"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelAnswer3"
+      :ForeColor            := 32768
       :Left                 := 180
       :Top                  := 210
       :Width                := 392
       :Height               := 16
       :Visible              := .F.
-      :Caption              := "Sixty-three"
-      :ForeColor            := 32768
+      :Text                 := "Sixty-three"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelAnswer4"
+      :ForeColor            := 32768
       :Left                 := 180
       :Top                  := 288
       :Width                := 395
       :Height               := 16
       :Visible              := .F.
-      :Caption              := "2005"
-      :ForeColor            := 32768
+      :Text                 := "2005"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelAnswer5"
+      :ForeColor            := 32768
       :Left                 := 180
       :Top                  := 366
       :Width                := 393
       :Height               := 16
       :Visible              := .F.
-      :Caption              := "Royal Flush"
-      :ForeColor            := 32768
+      :Text                 := "Royal Flush"
       :Create()
    END //LABEL
 
