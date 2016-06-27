@@ -125,7 +125,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
 
          :Height               := 160
          :Caption              := "Database"
-         :ImageList            := ::Application:MainForm:ImageList1
+         :ImageList            := "ImageList1"
          :Paneheight           := 160
          :Create()
          WITH OBJECT ( LINKLABEL( :this ) )
