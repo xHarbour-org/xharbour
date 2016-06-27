@@ -20,12 +20,13 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    ::EventHandler[ "UserMethod1" ] := "HelperMethod"
 
    // Populate Components
-   REQUEST DBFCDX, DBFFPT
+   REQUEST RMDBFCDX
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "MyTable"
-      :Alias                := "PEOPLE"
+      :CodePage             := ""
+      :Path                 := "W:\VXHSamples\Indexes1\Data"
+      :Driver               := "RMDBFCDX"
       :FileName             := "people.dbf"
-      :Driver               := "DBFCDX"
       :Create()
    END //MyTable
 
@@ -35,7 +36,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    ::Top                  := 4
    ::Width                := 411
    ::Height               := 300
-   ::Caption              := "People.dbf"
+   ::Text                 := "People.dbf"
 
    ::Create()
 
@@ -43,54 +44,60 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( DATAGRID( Self ) )
       :Name                 := "MyGrid"
       WITH OBJECT :Font
-         :Pointsize            := 11
+         :PointSize            := 11
       END
 
       :Left                 := 17
       :Top                  := 13
       :Width                := 243
       :Height               := 240
-      :BackColor            := 16777215
-      :SmallCaption         := .T.
-      :GridColor            := 12632260
       :HighlightColor       := 7381139
       :HighlightTextColor   := 16777215
       :ExtVertScrollBar     := .T.
-      :DataSource           := ::MyTable
+      :DataSource           := "MyTable"
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn1"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
-         :Caption              := "Id"
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Data                 := "hb_QSelf():DataSource:Fields:ID"
+         WITH OBJECT :Font
+            :PointSize            := 11
+         END
+
          :Width                := 51
-         :ImageIndex           := 0
+         :Text                 := "Id"
          :EventHandler[ "OnHeaderClick" ] := "GridColumn1_OnHeaderClick"
          :Create()
       END //GRIDCOLUMN
 
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn2"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
-         :Caption              := "Name"
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Data                 := "hb_QSelf():DataSource:Fields:NAME"
+         WITH OBJECT :Font
+            :PointSize            := 11
+         END
+
          :Width                := 83
-         :ImageIndex           := 0
+         :Text                 := "Name"
          :EventHandler[ "OnHeaderClick" ] := "GridColumn2_OnHeaderClick"
          :Create()
       END //GRIDCOLUMN
 
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn3"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Picture              := "9999999.999"
-         :Caption              := "Payment"
          :Data                 := "hb_QSelf():DataSource:Fields:PAYMENT"
+         WITH OBJECT :Font
+            :PointSize            := 11
+         END
+
          :Alignment            := 2
          :Width                := 88
-         :ImageIndex           := 0
+         :Text                 := "Payment"
          :Create()
       END //GRIDCOLUMN
 
@@ -103,19 +110,19 @@ METHOD Init( oParent, aParameters ) CLASS Form1
       :Top                  := 223
       :Width                := 98
       :Height               := 30
-      :Caption              := "Physical Order"
+      :Text                 := "Physical Order"
       :EventHandler[ "OnClick" ] := "ButtonNoOrd_OnClick"
       :Create()
    END //BUTTON
 
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "GroupBox1"
+      :ForeColor            := 677017
       :Left                 := 283
       :Top                  := 28
       :Width                := 98
       :Height               := 138
-      :Caption              := "Active Index"
-      :ForeColor            := 677017
+      :Text                 := "Active Index"
       :Create()
       WITH OBJECT ( LABEL( :this ) )
          :Name                 := "Label1"
@@ -123,7 +130,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
          :Top                  := 26
          :Width                := 72
          :Height               := 16
-         :Caption              := "Tag Number:"
+         :Text                 := "Tag Number:"
          :Create()
       END //LABEL
 
@@ -131,14 +138,14 @@ METHOD Init( oParent, aParameters ) CLASS Form1
          :Name                 := "LabelNr"
          WITH OBJECT :Font
             :Bold                 := .T.
-            :Pointsize            := 10
+            :PointSize            := 10
          END
 
          :Left                 := 15
          :Top                  := 53
          :Width                := 80
          :Height               := 16
-         :Caption              := "Label2"
+         :Text                 := "Label2"
          :Create()
       END //LABEL
 
@@ -148,7 +155,7 @@ METHOD Init( oParent, aParameters ) CLASS Form1
          :Top                  := 79
          :Width                := 66
          :Height               := 16
-         :Caption              := "Tag Name:"
+         :Text                 := "Tag Name:"
          :Create()
       END //LABEL
 
@@ -156,14 +163,14 @@ METHOD Init( oParent, aParameters ) CLASS Form1
          :Name                 := "LabelName"
          WITH OBJECT :Font
             :Bold                 := .T.
-            :Pointsize            := 10
+            :PointSize            := 10
          END
 
          :Left                 := 15
          :Top                  := 105
          :Width                := 80
          :Height               := 16
-         :Caption              := "Label3"
+         :Text                 := "Label3"
          :Create()
       END //LABEL
 
