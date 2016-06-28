@@ -4,6 +4,28 @@
 
 //----------------------------------------------------------------------------------------------------//
 METHOD Form1_OnLoad( Sender ) CLASS Form1
+   LOCAL cPath
+   
+   IF File(CurDirx()+"\Ord.dbf")
+      cPath:=CurDirx()
+   ELSEIF File(CurDirx()+"\Bin\Ord.dbf")
+      cPath:=CurDirx()+"\Bin"
+   ELSE
+      MsgAlert("Can't find file : Ord.dbf")
+      ::Close()
+      RETURN Self
+   ENDIF
+   
+   WITH OBJECT ::DataTable1
+      :FileName:=cPath+"\Ord.dbf"
+      :Open()
+   END
+   
+   WITH OBJECT ::DataTable2
+      :FileName:=cPath+"\Orddet.dbf"
+      :Open()
+   END
+
    ::DataTable1:GoTop()
    ::DataGrid1:Update()
    ::DataTable2:OrdSetFocus( "K_ID" )
