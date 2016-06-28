@@ -1,4 +1,4 @@
-IDOK MANIFEST "TreeView_Sample.XML"
+1 24 "TreeView_Sample.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
