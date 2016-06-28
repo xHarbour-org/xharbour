@@ -31,45 +31,45 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
@@ -83,13 +83,13 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 327
    ::Height               := 178
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -97,16 +97,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 117
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -114,45 +114,45 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelSlot1"
       WITH OBJECT :Font
-         :Pointsize            := 20
+         :PointSize            := 20
       END
 
       :Left                 := 18
       :Top                  := 12
       :Width                := 26
       :Height               := 34
-      :Caption              := "0"
-      :Centertext           := .T.
+      :Text                 := "0"
+      :Alignment            := 1
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelSlot2"
       WITH OBJECT :Font
-         :Pointsize            := 20
+         :PointSize            := 20
       END
 
       :Left                 := 78
       :Top                  := 12
       :Width                := 26
       :Height               := 34
-      :Caption              := "0"
-      :Centertext           := .T.
+      :Text                 := "0"
+      :Alignment            := 1
       :Create()
    END //LABEL
 
    WITH OBJECT ( LABEL( Self ) )
       :Name                 := "LabelSlot3"
       WITH OBJECT :Font
-         :Pointsize            := 20
+         :PointSize            := 20
       END
 
       :Left                 := 138
       :Top                  := 12
       :Width                := 26
       :Height               := 34
-      :Caption              := "0"
-      :Centertext           := .T.
+      :Text                 := "0"
+      :Alignment            := 1
       :Create()
    END //LABEL
 
@@ -166,7 +166,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 18
       :Width                := 95
       :Height               := 30
-      :Caption              := "Spin!"
+      :Text                 := "Spin!"
       :EventHandler[ "OnClick" ] := "ButtonSpin_OnClick"
       :Create()
    END //BUTTON
@@ -181,7 +181,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 60
       :Width                := 95
       :Height               := 30
-      :Caption              := "I Feel Lucky"
+      :Text                 := "I Feel Lucky"
       :EventHandler[ "OnClick" ] := "ButtonLucky_OnClick"
       :Create()
    END //BUTTON
@@ -189,14 +189,14 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonSlot1"
       WITH OBJECT :Font
-         :Pointsize            := 14
+         :PointSize            := 14
       END
 
       :Left                 := 12
       :Top                  := 60
       :Width                := 34
       :Height               := 30
-      :Caption              := "!"
+      :Text                 := "!"
       :EventHandler[ "OnClick" ] := "ButtonSlot1_OnClick"
       :Create()
    END //BUTTON
@@ -204,14 +204,14 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonSlot2"
       WITH OBJECT :Font
-         :Pointsize            := 14
+         :PointSize            := 14
       END
 
       :Left                 := 72
       :Top                  := 60
       :Width                := 34
       :Height               := 30
-      :Caption              := "!"
+      :Text                 := "!"
       :EventHandler[ "OnClick" ] := "ButtonSlot2_OnClick"
       :Create()
    END //BUTTON
@@ -219,14 +219,14 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonSlot3"
       WITH OBJECT :Font
-         :Pointsize            := 14
+         :PointSize            := 14
       END
 
       :Left                 := 132
       :Top                  := 60
       :Width                := 34
       :Height               := 30
-      :Caption              := "!"
+      :Text                 := "!"
       :EventHandler[ "OnClick" ] := "ButtonSlot3_OnClick"
       :Create()
    END //BUTTON

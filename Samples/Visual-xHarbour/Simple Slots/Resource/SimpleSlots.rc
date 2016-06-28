@@ -1,4 +1,4 @@
-IDOK MANIFEST "SimpleSlots.XML"
+1 24 "SimpleSlots.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
