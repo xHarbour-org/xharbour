@@ -1,4 +1,4 @@
-IDOK MANIFEST "PopUp.XML"
+1 24 "PopUp.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
