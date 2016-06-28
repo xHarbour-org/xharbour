@@ -1,4 +1,4 @@
-IDOK MANIFEST "PowerShellBoard.XML"
+1 24 "PowerShellBoard.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
