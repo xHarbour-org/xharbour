@@ -27,57 +27,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 537
    ::Height               := 293
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -85,8 +85,8 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
          :Margins              := "8,8,8,8"
       END
 
@@ -94,7 +94,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 232
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -109,31 +109,29 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 18
       :Width                := 80
       :Height               := 16
-      :Caption              := "1. Year:"
+      :Text                 := "1. Year:"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LISTBOX( Self ) )
       :Name                 := "BoxYear"
       :VertScroll           := .T.
+      :BackColor            := 16777215
       :Left                 := 12
       :Top                  := 36
       :Width                := 151
       :Height               := 81
-      :BackColor            := 16777215
-      :SmallCaption         := .T.
       :Create()
    END //LISTBOX
 
    WITH OBJECT ( LISTBOX( Self ) )
       :Name                 := "BoxMonth"
       :VertScroll           := .T.
+      :BackColor            := 16777215
       :Left                 := 186
       :Top                  := 36
       :Width                := 151
       :Height               := 81
-      :BackColor            := 16777215
-      :SmallCaption         := .T.
       :Create()
    END //LISTBOX
 
@@ -147,7 +145,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 18
       :Width                := 80
       :Height               := 16
-      :Caption              := "2. Month:"
+      :Text                 := "2. Month:"
       :Create()
    END //LABEL
 
@@ -161,19 +159,18 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 18
       :Width                := 80
       :Height               := 16
-      :Caption              := "3. Day:"
+      :Text                 := "3. Day:"
       :Create()
    END //LABEL
 
    WITH OBJECT ( LISTBOX( Self ) )
       :Name                 := "BoxDay"
       :VertScroll           := .T.
+      :BackColor            := 16777215
       :Left                 := 360
       :Top                  := 36
       :Width                := 151
       :Height               := 81
-      :BackColor            := 16777215
-      :SmallCaption         := .T.
       :Create()
    END //LISTBOX
 
@@ -187,7 +184,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 144
       :Width                := 103
       :Height               := 16
-      :Caption              := "4. Display options:"
+      :Text                 := "4. Display options:"
       :Create()
    END //LABEL
 
@@ -198,8 +195,8 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       END
 
       WITH OBJECT :Dock
-         :Right                := :Owner:Parent
-         :Bottom               := :Owner:Parent
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
          :Margins              := "12,12,12,12"
       END
 
@@ -207,7 +204,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 215
       :Width                := 80
       :Height               := 30
-      :Caption              := "Display"
+      :Text                 := "Display"
       :EventHandler[ "OnClick" ] := "ButtonDisplay_OnClick"
       :Create()
    END //BUTTON
@@ -219,8 +216,8 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       END
 
       WITH OBJECT :Dock
-         :Right                := ::ButtonDisplay
-         :Bottom               := :Owner:Parent
+         :Right                := "ButtonDisplay"
+         :Bottom               := "MyForm"
          :Margins              := "12,12,12,12"
       END
 
@@ -228,7 +225,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 215
       :Width                := 80
       :Height               := 30
-      :Caption              := "Reset"
+      :Text                 := "Reset"
       :EventHandler[ "OnClick" ] := "ButtonReset_OnClick"
       :Create()
    END //BUTTON
@@ -239,7 +236,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 164
       :Width                := 142
       :Height               := 15
-      :Caption              := "Display short notation"
+      :Text                 := "Display short notation"
       :InitialState         := 1
       :Create()
    END //RADIOBUTTON
@@ -250,7 +247,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 184
       :Width                := 139
       :Height               := 15
-      :Caption              := "Display long notation"
+      :Text                 := "Display long notation"
       :Create()
    END //RADIOBUTTON
 
