@@ -1,4 +1,4 @@
-IDOK MANIFEST "TinyBrowser.XML"
+1 24 "TinyBrowser.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
