@@ -1,4 +1,4 @@
-IDOK MANIFEST "Registry.XML"
+1 24 "Registry.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO

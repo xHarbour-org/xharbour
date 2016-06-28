@@ -25,57 +25,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 436
    ::Height               := 212
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -83,16 +83,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 151
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -107,7 +107,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 12
       :Width                := 128
       :Height               := 16
-      :Caption              := "Your xHarbour Edition:"
+      :Text                 := "Your xHarbour Edition:"
       :Create()
    END //LABEL
 
@@ -130,7 +130,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Top                  := 66
       :Width                := 161
       :Height               := 16
-      :Caption              := "xHarbour installation path:"
+      :Text                 := "xHarbour installation path:"
       :Create()
    END //LABEL
 

@@ -44,6 +44,6 @@ METHOD MyForm_OnLoad( Sender ) CLASS MyForm
 
    ::Caption := "xHarbour.com Training Center | " + AppCaption
 
-   ::LabelVersionValue:Caption := GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "Edition") + " Edition, build " + GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "xHB Build")
-   ::LabelPathValue:Caption := GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "RootDir")   
+   ::LabelVersionValue:Caption := XToC( GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "Edition") ) + " Edition, build " + XToC( GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "xHB Build") )
+   ::LabelPathValue:Caption := XToC( GetRegistry(0, "SOFTWARE\xHarbour.com\xHarbour Builder\", "RootDir") )
 RETURN Self
