@@ -1,4 +1,4 @@
-IDOK MANIFEST "mssql_blob.XML"
+1 24 "mssql_blob.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
