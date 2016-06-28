@@ -1,4 +1,4 @@
-IDOK MANIFEST "TypingTest.XML"
+1 24 "TypingTest.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO

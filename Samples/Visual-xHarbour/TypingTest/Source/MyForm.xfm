@@ -27,45 +27,45 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
@@ -79,13 +79,13 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 10
    ::Top                  := 10
    ::Width                := 674
    ::Height               := 403
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -93,38 +93,38 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 342
-      :Width                := 206
-      :Height               := 15
-      :Caption              := "http://www.xharbour.com/trainingcenter/"
+      :Width                := 227
+      :Height               := 17
+      :Text                 := "http://www.xharbour.com/trainingcenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
 
-   WITH OBJECT ( EDIT( Self ) )
+   WITH OBJECT ( EDITBOX( Self ) )
       :Name                 := "BoxTextToType"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 10
+         :Left                 := "MyForm"
+         :Top                  := "MyForm"
+         :Right                := "MyForm"
+         :Margins              := "10,10,10,10"
       END
 
       :Left                 := 10
       :Top                  := 10
       :Width                := 638
       :Height               := 126
-      :Caption              := "The xHarbour programming language is a superset of the well known xBase language, often referred to as Clipper. Though xHarbour is 100% backward compatible with the Clipper Language, xHarbour Builder adds many modern features and tools found in most modern compilers. Such features include Visual xHarbour, SQLRDD, xBuild Project Wizard, ActiveX, and many more."
+      :Text                 := "The xHarbour programming language is a superset of the well known xBase language, often referred to as Clipper. Though xHarbour is 100% backward compatible with the Clipper Language, xHarbour Builder adds many modern features and tools found in most modern compilers. Such features include Visual xHarbour, SQLRDD, xBuild Project Wizard, ActiveX, and many more."
       :MultiLine            := .T.
       :WantReturn           := .T.
       :Create()
-   END //EDIT
+   END //EDITBOX
 
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "ButtonStart"
@@ -133,29 +133,29 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       END
 
       WITH OBJECT :Dock
-         :Right                := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 10
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "10,10,10,10"
       END
 
       :Left                 := 568
       :Top                  := 327
       :Width                := 80
       :Height               := 30
-      :Caption              := "Start"
+      :Text                 := "Start"
       :EventHandler[ "OnClick" ] := "ButtonStart_OnClick"
       :Create()
    END //BUTTON
 
-   WITH OBJECT ( EDIT( Self ) )
+   WITH OBJECT ( EDITBOX( Self ) )
       :Name                 := "BoxTextTyped"
       :VertScroll           := .T.
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := ::BoxTextToType
-         :Right                := :Owner:Parent
-         :Bottom               := ::ButtonStart
-         :Margin               := 10
+         :Left                 := "MyForm"
+         :Top                  := "BoxTextToType"
+         :Right                := "MyForm"
+         :Bottom               := "ButtonStart"
+         :Margins              := "10,10,10,10"
       END
 
       :Left                 := 10
@@ -165,16 +165,15 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :MultiLine            := .T.
       :WantReturn           := .T.
       :Create()
-   END //EDIT
+   END //EDITBOX
 
    WITH OBJECT ( PROGRESSBAR( Self ) )
-      :Theming              := .F.
       :Name                 := "MyProgressBar"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := ::BoxTextTyped
-         :Right                := ::ButtonStart
-         :Margin               := 10
+         :Left                 := "MyForm"
+         :Top                  := "BoxTextTyped"
+         :Right                := "ButtonStart"
+         :Margins              := "10,10,10,10"
       END
 
       :Left                 := 10
@@ -182,6 +181,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Width                := 548
       :Height               := 10
       :Visible              := .F.
+      :Theming              := .F.
       :Smooth               := .T.
       :Create()
    END //PROGRESSBAR
