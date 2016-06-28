@@ -19,7 +19,6 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "DataTable1"
       :Alias                := "one"
-      :FileName             := "people.dbf"
       :Driver               := "DBFCDX"
       :Create()
    END //DataTable1
@@ -28,7 +27,6 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "DataTable2"
       :Alias                := "two"
-      :FileName             := "peopleex.DBF"
       :Driver               := "DBFCDX"
       :Create()
    END //DataTable2
