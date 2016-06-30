@@ -1,4 +1,4 @@
-IDOK MANIFEST "MDIEnvironment.XML"
+1 24 "MDIEnvironment.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
