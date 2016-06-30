@@ -37,8 +37,8 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    ::Top                  := 10
    ::Width                := 700
    ::Height               := 500
+   ::Text                 := "Application Form"
    ::Center               := .T.
-   ::Caption              := "Application Form"
 
    ::Create()
 
@@ -46,80 +46,79 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( COOLMENU( Self ) )
       :Name                 := "CoolMenu1"
       :Left                 := 12
-      :Top                  := 0
       :Width                := 676
       :Height               := 30
       :List                 := .T.
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :HideClippedButtons   := .T.
       :Create()
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "ModalForms"
-         :Caption              := "Modal Forms"
+         :Text                 := "Modal Forms"
          :Position             := 0
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "CreateModal"
-            :Caption              := "Create Modal Form"
+            :Text                 := "Create Modal Form"
             :EventHandler[ "OnClick" ] := "CreateModal_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "ModelessForms"
-         :Caption              := "Modeless Forms"
+         :Text                 := "Modeless Forms"
          :Position             := 1
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "CreateModeless"
-            :Caption              := "Create Modeless Form"
+            :Text                 := "Create Modeless Form"
             :EventHandler[ "OnClick" ] := "CreateModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "ShowModeless"
-            :Caption              := "Show Form"
+            :Text                 := "Show Form"
             :EventHandler[ "OnClick" ] := "ShowModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "HideModeless"
-            :Caption              := "Hide Form"
+            :Text                 := "Hide Form"
             :EventHandler[ "OnClick" ] := "HideModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "CountModeless"
-            :Caption              := "Update counter"
+            :Text                 := "Update counter"
             :EventHandler[ "OnClick" ] := "CountModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "MinimizeModeless"
-            :Caption              := "Minimize"
+            :Text                 := "Minimize"
             :EventHandler[ "OnClick" ] := "MinimizeModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "RestoreModeless"
-            :Caption              := "Restore"
+            :Text                 := "Restore"
             :EventHandler[ "OnClick" ] := "RestoreModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "CloseModeless"
-            :Caption              := "Close Form"
+            :Text                 := "Close Form"
             :EventHandler[ "OnClick" ] := "CloseModeless_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
@@ -128,23 +127,20 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( COOLBAR( Self ) )
       :Name                 := "CoolBar1"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 0
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Right                := "Form1"
+         :Margins              := "0,0,0,0"
       END
 
-      :Left                 := 0
-      :Top                  := 0
       :Width                := 684
       :Height               := 30
-      :Border               := .T.
+      :Border               := 8388608
       :Create()
       WITH OBJECT ( COOLBARBAND( :this ) )
-         :Name                 := "Band1"
          :MinWidth             := 60
          :MinHeight            := 30
-         :BandChild            := ::CoolMenu1
+         :BandChild            := "CoolMenu1"
          :Break                := .T.
          :Create()
       END //COOLBARBAND
@@ -154,22 +150,18 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    WITH OBJECT ( STATUSBAR( Self ) )
       :Name                 := "StatusApp"
       WITH OBJECT :Font
-         :Pointsize            := 14
+         :PointSize            := 14
       END
 
       :Height               := 23
       :Create()
       WITH OBJECT ( STATUSBARPANEL( :this ) )
-         :Name                 := "StatusBarPanel1"
          :Width                := 100
-         :ImageIndex           := -1
          :Create()
       END //STATUSBARPANEL
 
       WITH OBJECT ( STATUSBARPANEL( :this ) )
-         :Name                 := "StatusBarPanel2"
          :Width                := 100
-         :ImageIndex           := -1
          :Create()
       END //STATUSBARPANEL
 
