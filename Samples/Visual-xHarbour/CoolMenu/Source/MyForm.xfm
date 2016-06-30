@@ -33,57 +33,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 12
    ::Top                  := 12
    ::Width                := 591
    ::Height               := 367
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -91,16 +91,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( LINKLABEL( Self ) )
       :Name                 := "LinkWebsite"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 8
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
       END
 
       :Left                 := 8
       :Top                  := 306
       :Width                := 234
       :Height               := 17
-      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :Text                 := "http://www.xHarbour.com/TrainingCenter/"
       :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
       :Create()
    END //LINKLABEL
@@ -108,96 +108,95 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( COOLMENU( Self ) )
       :Name                 := "MyCoolMenu"
       :Left                 := 12
-      :Top                  := 0
       :Width                := 567
       :Height               := 20
       :List                 := .T.
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :HideClippedButtons   := .T.
       :Create()
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "MenuFile"
-         :Caption              := "File"
+         :Text                 := "File"
          :Position             := 0
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "FileOpen"
-            :Caption              := "Open"
+            :Text                 := "Open"
             :EventHandler[ "OnClick" ] := "FileOpen_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "FileClose"
-            :Caption              := "Close"
+            :Text                 := "Close"
             :EventHandler[ "OnClick" ] := "FileClose_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "FileLine"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "FileExit"
-            :Caption              := "Exit"
+            :Text                 := "Exit"
             :EventHandler[ "OnClick" ] := "FileExit_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "MenuSettings"
-         :Caption              := "Settings"
+         :Text                 := "Settings"
          :Position             := 1
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsOne"
-            :Caption              := "Disable File Menu"
+            :Text                 := "Disable File Menu"
             :EventHandler[ "OnClick" ] := "SettingsOne_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsLine1"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsDummy1"
-            :Caption              := "Dummy Setting 1"
             :RadioCheck           := .T.
+            :Text                 := "Dummy Setting 1"
             :EventHandler[ "OnClick" ] := "SettingsDummy1_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsDummy2"
-            :Caption              := "Dummy Setting 2"
             :RadioCheck           := .T.
+            :Text                 := "Dummy Setting 2"
             :EventHandler[ "OnClick" ] := "SettingsDummy2_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsDummy3"
-            :Caption              := "Dummy Setting 3"
             :RadioCheck           := .T.
+            :Text                 := "Dummy Setting 3"
             :EventHandler[ "OnClick" ] := "SettingsDummy3_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "SettingsDummy4"
-            :Caption              := "Dummy Setting 4"
             :RadioCheck           := .T.
+            :Text                 := "Dummy Setting 4"
             :EventHandler[ "OnClick" ] := "SettingsDummy4_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
@@ -206,23 +205,20 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( COOLBAR( Self ) )
       :Name                 := "MyCoolBar"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 0
+         :Left                 := "MyForm"
+         :Top                  := "MyForm"
+         :Right                := "MyForm"
+         :Margins              := "0,0,0,0"
       END
 
-      :Left                 := 0
-      :Top                  := 0
       :Width                := 575
       :Height               := 21
-      :Border               := .T.
+      :Border               := 8388608
       :Create()
       WITH OBJECT ( COOLBARBAND( :this ) )
-         :Name                 := "Band1"
          :MinWidth             := 60
          :MinHeight            := 21
-         :BandChild            := ::MyCoolMenu
+         :BandChild            := "MyCoolMenu"
          :Break                := .T.
          :Create()
       END //COOLBARBAND

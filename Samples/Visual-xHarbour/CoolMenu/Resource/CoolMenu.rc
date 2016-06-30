@@ -1,4 +1,4 @@
-IDOK MANIFEST "CoolMenu.XML"
+1 24 "CoolMenu.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
