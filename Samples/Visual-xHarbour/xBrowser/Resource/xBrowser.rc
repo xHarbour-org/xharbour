@@ -1,4 +1,4 @@
-IDOK MANIFEST "xBrowser.XML"
+1 24 "xBrowser.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO

@@ -38,57 +38,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( ContextMenu( Self ) )
       :Name                 := "QuickMenu"
       :Create()
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line1"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_MainSite"
-         :Caption              := "Visit xHarbour.com"
+         :Text                 := "Visit xHarbour.com"
          :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_ShopSite"
-         :Caption              := "Order onliine"
+         :Text                 := "Order onliine"
          :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Line2"
-         :Caption              := "-"
+         :Text                 := "-"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
-      WITH OBJECT ( CMENUITEM( :this ) )
+      WITH OBJECT ( MENUITEM( :this ) )
          :Name                 := "QMenu_Exit"
-         :Caption              := "Exit"
+         :Text                 := "Exit"
          :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
          :Create()
-      END //CMENUITEM
+      END //MENUITEM
 
    END //QuickMenu
 
    // Properties declaration
    ::Name                 := "MyForm"
-   ::ContextMenu          := ::Application:MainForm:QuickMenu
+   ::ContextMenu          := "QuickMenu"
    ::Left                 := 10
    ::Top                  := 10
    ::Width                := 720
    ::Height               := 520
+   ::Text                 := "xHarbour.com Training Center |"
    ::Center               := .T.
-   ::Caption              := "xHarbour.com Training Center |"
 
    ::Create()
 
@@ -96,58 +96,57 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( COOLMENU( Self ) )
       :Name                 := "MyCoolMenu"
       :Left                 := 11
-      :Top                  := 0
       :Width                := 793
       :Height               := 21
       :List                 := .T.
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :HideClippedButtons   := .T.
       :Create()
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "Main_File"
-         :Caption              := "File"
+         :Text                 := "File"
          :Position             := 0
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Exit"
-            :Caption              := "Exit"
+            :Text                 := "Exit"
             :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "Main_Navigate"
-         :Caption              := "Navigate"
+         :Text                 := "Navigate"
          :Position             := 1
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Navigate_Back"
-            :Caption              := "Back"
+            :Text                 := "Back"
             :EventHandler[ "OnClick" ] := "Navigate_Back_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Navigate_Forward"
-            :Caption              := "Forward"
+            :Text                 := "Forward"
             :EventHandler[ "OnClick" ] := "Navigate_Forward_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Navigate_Line"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Navigate_Home"
-            :Caption              := "Home"
+            :Text                 := "Home"
             :EventHandler[ "OnClick" ] := "Navigate_Home_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
@@ -156,23 +155,20 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( COOLBAR( Self ) )
       :Name                 := "MyCoolBar"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 0
+         :Left                 := "MyForm"
+         :Top                  := "MyForm"
+         :Right                := "MyForm"
+         :Margins              := "0,0,0,0"
       END
 
-      :Left                 := 0
-      :Top                  := 0
       :Width                := 704
       :Height               := 21
-      :Border               := .T.
+      :Border               := 8388608
       :Create()
       WITH OBJECT ( COOLBARBAND( :this ) )
-         :Name                 := "Band1"
          :MinWidth             := 60
          :MinHeight            := 21
-         :BandChild            := ::MyCoolMenu
+         :BandChild            := "MyCoolMenu"
          :Break                := .T.
          :Create()
       END //COOLBARBAND
@@ -182,22 +178,22 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( TOOLBAR( Self ) )
       :Name                 := "MyToolBar"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := ::MyCoolBar
-         :Right                := :Owner:Parent
+         :Left                 := "MyForm"
+         :Top                  := "MyCoolBar"
+         :Right                := "MyForm"
       END
 
       :Left                 := 1
       :Top                  := 22
       :Width                := 702
       :Height               := 37
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :Create()
       WITH OBJECT ( TOOLBUTTON( :this ) )
          :Name                 := "Main_Back"
          :AutoSize             := .F.
          :Width                := 54
-         :Caption              := "Back"
+         :Text                 := "Back"
          :Position             := 0
          :EventHandler[ "OnClick" ] := "Main_Back_OnClick"
          :Create()
@@ -207,7 +203,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Name                 := "Main_Forward"
          :AutoSize             := .F.
          :Width                := 54
-         :Caption              := "Forward"
+         :Text                 := "Forward"
          :Position             := 1
          :EventHandler[ "OnClick" ] := "Main_Forward_OnClick"
          :Create()
@@ -217,7 +213,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Name                 := "Main_Home"
          :AutoSize             := .F.
          :Width                := 54
-         :Caption              := "Home"
+         :Text                 := "Home"
          :Position             := 2
          :EventHandler[ "OnClick" ] := "Main_Home_OnClick"
          :Create()
@@ -226,7 +222,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       WITH OBJECT ( TOOLBUTTON( :this ) )
          :Name                 := "Main_Line"
          :Width                := 7
-         :Caption              := ""
+         :Text                 := ""
          :Separator            := .T.
          :Position             := 3
          :Create()
@@ -234,8 +230,8 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
 
       WITH OBJECT ( TOOLBUTTON( :this ) )
          :Name                 := "Main_xHarbour"
-         :Width                := 112
-         :Caption              := "xHarbour.com Online"
+         :Width                := 125
+         :Text                 := "xHarbour.com Online"
          :Position             := 4
          :EventHandler[ "OnClick" ] := "Main_xHarbour_OnClick"
          :Create()
@@ -250,16 +246,16 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       END
 
       WITH OBJECT :Dock
-         :Right                := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 6
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "6,6,6,6"
       END
 
       :Left                 := 653
       :Top                  := 456
       :Width                := 45
       :Height               := 22
-      :Caption              := "Go"
+      :Text                 := "Go"
       :EventHandler[ "OnClick" ] := "Button_Go_OnClick"
       :Create()
    END //BUTTON
@@ -267,11 +263,11 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( WEBBROWSER( Self ) )
       :Name                 := "MyWebBrowser"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := ::MyToolBar
-         :Right                := :Owner:Parent
-         :Bottom               := ::Button_Go
-         :Margin               := 6
+         :Left                 := "MyForm"
+         :Top                  := "MyToolBar"
+         :Right                := "MyForm"
+         :Bottom               := "Button_Go"
+         :Margins              := "6,6,6,6"
       END
 
       :Left                 := 6
@@ -290,9 +286,9 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
    WITH OBJECT ( PROGRESSBAR( Self ) )
       :Name                 := "MyProgressBar"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 6
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "6,6,6,6"
       END
 
       :Left                 := 6
@@ -304,24 +300,24 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       :Create()
    END //PROGRESSBAR
 
-   WITH OBJECT ( EDIT( Self ) )
+   WITH OBJECT ( EDITBOX( Self ) )
       :Name                 := "Edit_Address"
       WITH OBJECT :Dock
-         :Left                 := ::MyProgressBar
-         :Right                := :Owner:Parent
-         :Bottom               := :Owner:Parent
-         :Margin               := 6
+         :Left                 := "MyProgressBar"
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "6,6,6,6"
       END
 
       :Left                 := 165
       :Top                  := 456
       :Width                := 533
       :Height               := 22
-      :Caption              := "http://www.xHarbour.com"
+      :Text                 := "http://www.xHarbour.com"
       :EventHandler[ "OnKeyUp" ] := "Edit_Address_OnKeyUp"
       :EventHandler[ "OnLButtonUp" ] := "Edit_Address_OnLButtonUp"
       :Create()
-   END //EDIT
+   END //EDITBOX
 
    ::Show()
 
