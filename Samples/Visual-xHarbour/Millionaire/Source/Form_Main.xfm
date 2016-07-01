@@ -33,10 +33,10 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
    ::Top                  := 11
    ::Width                := 632
    ::Height               := 495
-   ::Center               := .T.
-   ::Caption              := "Millionaire"
+   ::Text                 := "Millionaire"
    ::SysMenu              := .F.
    ::DlgModalFrame        := .T.
+   ::Center               := .T.
 
    ::Create()
 
@@ -47,15 +47,14 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
          :Bold                 := .T.
       END
 
+      :ForeColor            := 10061943
       :Left                 := 42
       :Top                  := 378
       :Width                := 223
       :Height               := 16
       :Cursor               := 32649
-      :Caption              := "Answer 1"
-      :ForeColor            := 10061943
-      :TabStop              := .F.
-      :Centertext           := .T.
+      :Text                 := "Answer 1"
+      :Alignment            := 1
       :EventHandler[ "OnClick" ] := "lbl_answer_1_OnClick"
       :Create()
    END //LABEL
@@ -63,73 +62,72 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
    WITH OBJECT ( COOLMENU( Self ) )
       :Name                 := "Menu_Main"
       :Left                 := 12
-      :Top                  := 0
       :Width                := 608
       :Height               := 20
       :List                 := .T.
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :HorzPadding          := 7
       :VertPadding          := 6
       :HideClippedButtons   := .T.
       :Create()
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "Main_Game"
-         :Caption              := "Game"
+         :Text                 := "Game"
          :Position             := 0
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Game_NewGame"
-            :Caption              := "Start new game"
+            :Text                 := "Start new game"
             :EventHandler[ "OnClick" ] := "Game_NewGame_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Game_Bar_1"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Main_Exit"
-            :Caption              := "Exit"
+            :Text                 := "Exit"
             :EventHandler[ "OnClick" ] := "Main_Exit_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "Main_Info"
-         :Caption              := "Info"
+         :Text                 := "Info"
          :Position             := 1
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Info_About"
-            :Caption              := "About"
+            :Text                 := "About"
             :EventHandler[ "OnClick" ] := "Info_About_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Info_HowTo"
-            :Caption              := "How to play Millionaire"
+            :Text                 := "How to play Millionaire"
             :EventHandler[ "OnClick" ] := "Info_HowTo_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Info_Bar_1"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "Info_VisitOnline"
-            :Caption              := "Visit xHarbour.com online"
+            :Text                 := "Visit xHarbour.com online"
             :EventHandler[ "OnClick" ] := "Info_VisitOnline_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
@@ -141,15 +139,14 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
          :Bold                 := .T.
       END
 
+      :ForeColor            := 10061943
       :Left                 := 42
       :Top                  := 412
       :Width                := 223
       :Height               := 16
       :Cursor               := 32649
-      :Caption              := "Answer 3"
-      :ForeColor            := 10061943
-      :TabStop              := .F.
-      :Centertext           := .T.
+      :Text                 := "Answer 3"
+      :Alignment            := 1
       :EventHandler[ "OnClick" ] := "lbl_answer_3_OnClick"
       :Create()
    END //LABEL
@@ -160,15 +157,14 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
          :Bold                 := .T.
       END
 
+      :ForeColor            := 10061943
       :Left                 := 354
       :Top                  := 378
       :Width                := 223
       :Height               := 16
       :Cursor               := 32649
-      :Caption              := "Answer 2"
-      :ForeColor            := 10061943
-      :TabStop              := .F.
-      :Centertext           := .T.
+      :Text                 := "Answer 2"
+      :Alignment            := 1
       :EventHandler[ "OnClick" ] := "lbl_answer_2_OnClick"
       :Create()
    END //LABEL
@@ -179,15 +175,14 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
          :Bold                 := .T.
       END
 
+      :ForeColor            := 10061943
       :Left                 := 354
       :Top                  := 412
       :Width                := 223
       :Height               := 16
       :Cursor               := 32649
-      :Caption              := "Answer 4"
-      :ForeColor            := 10061943
-      :TabStop              := .F.
-      :Centertext           := .T.
+      :Text                 := "Answer 4"
+      :Alignment            := 1
       :EventHandler[ "OnClick" ] := "lbl_answer_4_OnClick"
       :Create()
    END //LABEL
@@ -199,21 +194,19 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
          :Bold                 := .T.
       END
 
+      :BackColor            := 0
+      :ForeColor            := 16777215
       :Left                 := 48
       :Top                  := 331
       :Width                := 532
       :Height               := 31
-      :Caption              := "Question?"
-      :BackColor            := 0
-      :ForeColor            := 16777215
-      :TabStop              := .F.
-      :Centertext           := .T.
+      :Text                 := "Question?"
+      :Alignment            := 1
       :Create()
    END //LABEL
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       :Name                 := "pic_answers"
-      :Left                 := 0
       :Top                  := 369
       :Width                := 625
       :Height               := 67
@@ -223,7 +216,6 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       :Name                 := "pic_question"
-      :Left                 := 0
       :Top                  := 321
       :Width                := 625
       :Height               := 44
@@ -233,11 +225,11 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       :Name                 := "pic_help_1"
+      :BackColor            := 8355711
       :Left                 := 426
       :Top                  := 30
       :Width                := 43
       :Height               := 27
-      :BackColor            := 8355711
       :TabStop              := .F.
       :EventHandler[ "OnLButtonUp" ] := "pic_help_1_OnLButtonUp"
       :Create()
@@ -245,11 +237,11 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       :Name                 := "pic_help_2"
+      :BackColor            := 8355711
       :Left                 := 498
       :Top                  := 30
       :Width                := 43
       :Height               := 27
-      :BackColor            := 8355711
       :TabStop              := .F.
       :EventHandler[ "OnLButtonUp" ] := "pic_help_2_OnLButtonUp"
       :Create()
@@ -257,11 +249,11 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
 
    WITH OBJECT ( PICTUREBOX( Self ) )
       :Name                 := "pic_help_3"
+      :BackColor            := 8355711
       :Left                 := 570
       :Top                  := 30
       :Width                := 43
       :Height               := 27
-      :BackColor            := 8355711
       :TabStop              := .F.
       :EventHandler[ "OnLButtonUp" ] := "pic_help_3_OnLButtonUp"
       :Create()
@@ -270,23 +262,21 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
    WITH OBJECT ( COOLBAR( Self ) )
       :Name                 := "CoolBar1"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 0
+         :Left                 := "Form_Main"
+         :Top                  := "Form_Main"
+         :Right                := "Form_Main"
+         :Margins              := "0,0,0,0"
       END
 
-      :Left                 := 0
-      :Top                  := 0
       :Width                := 616
       :Height               := 21
       :TabStop              := .F.
+      :Border               := 8388608
       :Create()
       WITH OBJECT ( COOLBARBAND( :this ) )
-         :Name                 := "Band1"
          :MinWidth             := 60
          :MinHeight            := 21
-         :BandChild            := ::Menu_Main
+         :BandChild            := "Menu_Main"
          :Break                := .T.
          :Create()
       END //COOLBARBAND
@@ -300,21 +290,18 @@ METHOD Init( oParent, aParameters ) CLASS Form_Main
       WITH OBJECT ( STATUSBARPANEL( :this ) )
          :Name                 := "pan_question"
          :Width                := 97
-         :ImageIndex           := -1
          :Create()
       END //STATUSBARPANEL
 
       WITH OBJECT ( STATUSBARPANEL( :this ) )
          :Name                 := "pan_score"
          :Width                := 160
-         :ImageIndex           := -1
          :Create()
       END //STATUSBARPANEL
 
       WITH OBJECT ( STATUSBARPANEL( :this ) )
          :Name                 := "pan_bet"
          :Width                := 160
-         :ImageIndex           := -1
          :Create()
       END //STATUSBARPANEL
 

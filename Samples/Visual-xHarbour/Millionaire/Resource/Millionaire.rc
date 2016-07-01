@@ -1,4 +1,4 @@
-IDOK MANIFEST "Millionaire.XML"
+1 24 "Millionaire.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
