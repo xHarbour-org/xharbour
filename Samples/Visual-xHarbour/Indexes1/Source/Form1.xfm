@@ -20,13 +20,11 @@ METHOD Init( oParent, aParameters ) CLASS Form1
    ::EventHandler[ "UserMethod1" ] := "HelperMethod"
 
    // Populate Components
-   REQUEST RMDBFCDX
+   REQUEST DBFCDX, DBFFPT
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "MyTable"
-      :CodePage             := ""
-      :Path                 := "W:\VXHSamples\Indexes1\Bin"
-      :Driver               := "RMDBFCDX"
-      :FileName             := "people.dbf"
+      :MemoType             := 3
+      :Driver               := "DBFCDX"
       :Create()
    END //MyTable
 

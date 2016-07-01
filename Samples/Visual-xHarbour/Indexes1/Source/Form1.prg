@@ -9,6 +9,7 @@ METHOD GridColumn1_OnHeaderClick( Sender ) CLASS Form1
    ::MyGrid:Update()
    ::HelperMethod()  // demo only
 RETURN Self
+
 //----------------------------------------------------------------------------------------------------//
 METHOD GridColumn2_OnHeaderClick( Sender ) CLASS Form1
 // when the user clicks the NAME column header   
@@ -17,8 +18,20 @@ METHOD GridColumn2_OnHeaderClick( Sender ) CLASS Form1
    ::MyGrid:Update()
    ::HelperMethod()   // demo only
 RETURN Self
+
 //----------------------------------------------------------------------------------------------------//
 METHOD Form1_OnLoad( Sender ) CLASS Form1
+
+   LOCAL cPath
+   
+   cPath := Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+         
+   WITH OBJECT ::MyTable
+      :Filename := cPath+"\People.dbf"
+      :Open()
+   END
+
+
 // Just to demonstrate how to open an index file...
 // In case of using more not structural index files,
 // there will be a SetIndex(...) method calls for each of them
@@ -35,6 +48,7 @@ METHOD Form1_OnLoad( Sender ) CLASS Form1
 // are automatically updated, no need of special care
    ::HelperMethod()  // demo only
 RETURN Self
+
 //----------------------------------------------------------------------------------------------------//
 METHOD ButtonNoOrd_OnClick( Sender ) CLASS Form1
 // ::MyTable:SetOrder( N ) sets the N'th opened index tag,
@@ -43,6 +57,7 @@ METHOD ButtonNoOrd_OnClick( Sender ) CLASS Form1
    ::MyGrid:Update()
    ::HelperMethod()    // demo only
 RETURN Self
+
 //----------------------------------------------------------------------------------------------------//
 METHOD HelperMethod() CLASS Form1   
    local nActive:=::MyTable:IndexOrd() // opened index tag number
