@@ -9,17 +9,9 @@ METHOD Form1_OnLoad( Sender ) CLASS Form1
 // where Key might be a string containing the key expression, or a codeblock
 
    LOCAL cPath
-
-   IF File(CurDirx()+"\People.dbf")
-      cPath:=CurDirx()
-   ELSEIF File(CurDirx()+"\Bin\People.dbf")
-      cPath:=CurDirx()+"\Bin"
-   ELSE
-      MsgAlert("Can't find file : People.dbf")
-      ::Close()
-      RETURN Self
-   ENDIF
-      
+   
+   cPath := Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+         
    WITH OBJECT ::DataTable1
       :Filename := cPath+"\People.dbf"
       :Open()
