@@ -1,4 +1,4 @@
-IDOK MANIFEST "MyOffice.XML"
+1 24 "MyOffice.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO

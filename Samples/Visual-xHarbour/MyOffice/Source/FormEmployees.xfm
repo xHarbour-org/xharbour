@@ -19,10 +19,12 @@ METHOD Init( oParent, aParameters ) CLASS FormEmployees
    ::EventHandler[ "OnLoad" ] := "FormEmployees_OnLoad"
 
    // Populate Components
+   REQUEST DBFCDX, DBFFPT
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "DataTable1"
       :Alias                := "emp"
-      :FileName             := "employees.DBF"
+      :MemoType             := 3
+      :Driver               := "DBFCDX"
       :Create()
    END //DataTable1
 
@@ -33,8 +35,8 @@ METHOD Init( oParent, aParameters ) CLASS FormEmployees
    ::Top                  := 10
    ::Width                := 475
    ::Height               := 300
+   ::Text                 := "Employees"
    ::Center               := .T.
-   ::Caption              := "Employees"
 
    ::Create()
 
@@ -51,45 +53,39 @@ METHOD OnInitDialog() CLASS FormEmployees
       :Top                  := 12
       :Width                := 309
       :Height               := 240
-      :BackColor            := 16777215
-      :SmallCaption         := .T.
-      :GridColor            := 12632260
       :HighlightColor       := 16750899
       :HighlightTextColor   := 16777215
       :ExtVertScrollBar     := .T.
-      :DataSource           := ::DataTable1
+      :DataSource           := "DataTable1"
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn1"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
-         :Caption              := "Name"
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Data                 := "hb_QSelf():DataSource:Fields:NAME"
          :Width                := 140
-         :ImageIndex           := 0
+         :Text                 := "Name"
          :Create()
       END //GRIDCOLUMN
 
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn2"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
-         :Caption              := "Birthday"
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Data                 := "hb_QSelf():DataSource:Fields:BIRTHDAY"
          :Alignment            := 3
          :Width                := 70
-         :ImageIndex           := 0
+         :Text                 := "Birthday"
          :Create()
       END //GRIDCOLUMN
 
       WITH OBJECT ( GRIDCOLUMN( :this ) )
          :Name                 := "GridColumn3"
-         :Allowsize            := .T.
-         :Allowdrag            := .T.
-         :Caption              := "Salary"
+         :AllowSize            := .T.
+         :AllowDrag            := .T.
          :Data                 := "hb_QSelf():DataSource:Fields:SALARY"
          :Alignment            := 2
          :Width                := 70
-         :ImageIndex           := 0
+         :Text                 := "Salary"
          :Create()
       END //GRIDCOLUMN
 
@@ -102,7 +98,7 @@ METHOD OnInitDialog() CLASS FormEmployees
       :Top                  := 33
       :Width                := 80
       :Height               := 30
-      :Caption              := "Append"
+      :Text                 := "Append"
       :EventHandler[ "OnClick" ] := "ButtonAppend_OnClick"
       :Create()
    END //BUTTON
@@ -113,7 +109,7 @@ METHOD OnInitDialog() CLASS FormEmployees
       :Top                  := 83
       :Width                := 80
       :Height               := 30
-      :Caption              := "Update"
+      :Text                 := "Update"
       :EventHandler[ "OnClick" ] := "ButtonUpdate_OnClick"
       :Create()
    END //BUTTON
@@ -124,7 +120,7 @@ METHOD OnInitDialog() CLASS FormEmployees
       :Top                  := 130
       :Width                := 80
       :Height               := 30
-      :Caption              := "Delete"
+      :Text                 := "Delete"
       :EventHandler[ "OnClick" ] := "ButtonDelete_OnClick"
       :Create()
    END //BUTTON

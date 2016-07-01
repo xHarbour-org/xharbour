@@ -10,6 +10,16 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------//
 METHOD FormProjects_OnLoad( Sender ) CLASS FormProjects
    local i, nModels:=len( hModel )
+   LOCAL cPath
+   
+   cPath := Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+         
+   WITH OBJECT ::DataTable1
+      :Filename := cPath+"\projects.dbf"
+      :Open()
+   END
+
+   
    if nModels < 1
       ::MessageBox( "No models available", "", MB_ICONEXCLAMATION )
       ::Close()

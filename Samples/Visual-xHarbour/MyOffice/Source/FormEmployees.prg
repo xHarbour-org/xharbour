@@ -28,5 +28,14 @@ METHOD ButtonDelete_OnClick( Sender ) CLASS FormEmployees
 RETURN Self
 //----------------------------------------------------------------------------------------------------//
 METHOD FormEmployees_OnLoad( Sender ) CLASS FormEmployees
+   LOCAL cPath
+   
+   cPath := Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+         
+   WITH OBJECT ::DataTable1
+      :Filename := cPath+"\employees.dbf"
+      :Open()
+   END
+   
    ::Application:MainForm:oEmployees:=Sender   
 RETURN Self
