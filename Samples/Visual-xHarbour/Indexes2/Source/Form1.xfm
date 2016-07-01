@@ -5,6 +5,7 @@ CLASS Form1 INHERIT WinForm
    METHOD Init() CONSTRUCTOR
 
    // Event declaration
+   METHOD Form1_OnLoad()
    METHOD ToolStripButton1_OnClick()
    METHOD ToolStripButton2_OnClick()
 
@@ -13,15 +14,14 @@ ENDCLASS
 METHOD Init( oParent, aParameters ) CLASS Form1
    ::Super:Init( oParent, aParameters )
 
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
 
    // Populate Components
    REQUEST DBFCDX, DBFFPT
    WITH OBJECT ( DataTable( Self ) )
       :Name                 := "DataTable1"
-      :Path                 := "W:\VXHSamples\Indexes2\Bin"
       :MemoType             := 3
       :Driver               := "DBFCDX"
-      :FileName             := "people.dbf"
       :Create()
    END //DataTable1
 

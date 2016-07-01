@@ -31,3 +31,17 @@ METHOD ToolStripButton2_OnClick( Sender ) CLASS Form1
    ::Enable()
    ::MessageBox( "End of maintenance", "" )
 RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
+METHOD Form1_OnLoad( Sender ) CLASS Form1
+
+   LOCAL cPath
+   
+   cPath := Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+         
+   WITH OBJECT ::DataTable1
+      :Filename := cPath+"\People.dbf"
+      :Open()
+   END
+   
+RETURN Self
