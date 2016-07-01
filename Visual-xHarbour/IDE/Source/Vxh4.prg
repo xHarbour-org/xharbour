@@ -665,6 +665,7 @@ RETURN Self
 METHOD SetValue( xValue, cCaption, oItem ) CLASS ObjManager
    LOCAL oObj, cProp, cProp2, xVal
 
+   hb_gcAll()
    DEFAULT oItem TO FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
    IF oItem == NIL
       RETURN Self
@@ -1372,7 +1373,7 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS O
                   NEXT
 
                   IF xValue != NIL
-                     aCol[1]:Value[1] := xValue:Name
+                     aCol[1]:Value[1] := IIF( VALTYPE( xValue ) == "C", xValue, xValue:Name )
                   ENDIF
 
                   aCol[1]:ColType  := "BANDCHILD"

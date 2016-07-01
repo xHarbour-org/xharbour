@@ -2014,7 +2014,7 @@ METHOD OnNCDestroy() CLASS Window
    ::ScrollInfo        := NIL
    ::hdr               := NIL
    ::WindowPos         := NIL
-
+   //::Cargo             := NIL
    ::Msg               := NIL
    ::wParam            := NIL
    ::lParam            := NIL
@@ -3259,64 +3259,66 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          oBottom := EVAL( oBottom, Self )
       ENDIF
 
-      IF ISOBJECT( oLeft ) .AND. oLeft:AutoDock .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. oLeft:Style & WS_VISIBLE == 0 )
-         WHILE oLeft != NIL .AND. oLeft:Parent != NIL .AND. oLeft != NIL .AND. oLeft:hWnd != ::Parent:hWnd .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. !oLeft:IsWindow() .OR. oLeft:Style & WS_VISIBLE == 0 ) //.AND. oLeft:IsWindow()
-            IF oLeft:Dock != NIL
-               oLeft := oLeft:Dock:Left
-               IF VALTYPE( oLeft ) == "C"
-                  IF oLeft == ::Parent:Name
-                     oLeft := ::Parent
-                   ELSE
-                     oLeft := ::Form:__hObjects[ oLeft ]
+      IF ! ::DesignMode
+         IF ISOBJECT( oLeft ) .AND. oLeft:AutoDock .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. oLeft:Style & WS_VISIBLE == 0 )
+            WHILE oLeft != NIL .AND. oLeft:Parent != NIL .AND. oLeft != NIL .AND. oLeft:hWnd != ::Parent:hWnd .AND. ( oLeft:Hidden .OR. !oLeft:__Docked .OR. !oLeft:IsWindow() .OR. oLeft:Style & WS_VISIBLE == 0 ) //.AND. oLeft:IsWindow()
+               IF oLeft:Dock != NIL
+                  oLeft := oLeft:Dock:Left
+                  IF VALTYPE( oLeft ) == "C"
+                     IF oLeft == ::Parent:Name
+                        oLeft := ::Parent
+                      ELSE
+                        oLeft := ::Form:__hObjects[ oLeft ]
+                     ENDIF
                   ENDIF
                ENDIF
-            ENDIF
-         ENDDO
-      ENDIF
+            ENDDO
+         ENDIF
 
-      IF ISOBJECT( oTop ) .AND. oTop:AutoDock .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. oTop:Style & WS_VISIBLE == 0 )
-         WHILE oTop != NIL .AND. oTop:Parent != NIL .AND. oTop != NIL .AND. oTop:hWnd != ::Parent:hWnd .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. !oTop:IsWindow() .OR. oTop:Style & WS_VISIBLE == 0 ) //.AND. oTop:IsWindow()
-            IF oTop:Dock != NIL
-               oTop := oTop:Dock:Top
-               IF VALTYPE( oTop ) == "C"
-                  IF oTop == ::Parent:Name
-                     oTop := ::Parent
-                   ELSE
-                     oTop := ::Form:__hObjects[ oTop ]
+         IF ISOBJECT( oTop ) .AND. oTop:AutoDock .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. oTop:Style & WS_VISIBLE == 0 )
+            WHILE oTop != NIL .AND. oTop:Parent != NIL .AND. oTop != NIL .AND. oTop:hWnd != ::Parent:hWnd .AND. ( oTop:Hidden .OR. !oTop:__Docked .OR. !oTop:IsWindow() .OR. oTop:Style & WS_VISIBLE == 0 ) //.AND. oTop:IsWindow()
+               IF oTop:Dock != NIL
+                  oTop := oTop:Dock:Top
+                  IF VALTYPE( oTop ) == "C"
+                     IF oTop == ::Parent:Name
+                        oTop := ::Parent
+                      ELSE
+                        oTop := ::Form:__hObjects[ oTop ]
+                     ENDIF
                   ENDIF
                ENDIF
-            ENDIF
-         ENDDO
-      ENDIF
+            ENDDO
+         ENDIF
 
-      IF ISOBJECT( oRight ) .AND. oRight:AutoDock .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. oRight:Style & WS_VISIBLE == 0 )
-         WHILE oRight != NIL .AND. oRight:Parent != NIL .AND. oRight != NIL .AND. oRight:hWnd != ::Parent:hWnd .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. !oRight:IsWindow() .OR. oRight:Style & WS_VISIBLE == 0 )//.AND. oRight:IsWindow()
-            IF oRight:Dock != NIL
-               oRight := oRight:Dock:Right
-               IF VALTYPE( oRight ) == "C"
-                  IF oRight == ::Parent:Name
-                     oRight := ::Parent
-                   ELSE
-                     oRight := ::Form:__hObjects[ oRight ]
+         IF ISOBJECT( oRight ) .AND. oRight:AutoDock .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. oRight:Style & WS_VISIBLE == 0 )
+            WHILE oRight != NIL .AND. oRight:Parent != NIL .AND. oRight != NIL .AND. oRight:hWnd != ::Parent:hWnd .AND. ( oRight:Hidden .OR. !oRight:__Docked .OR. !oRight:IsWindow() .OR. oRight:Style & WS_VISIBLE == 0 )//.AND. oRight:IsWindow()
+               IF oRight:Dock != NIL
+                  oRight := oRight:Dock:Right
+                  IF VALTYPE( oRight ) == "C"
+                     IF oRight == ::Parent:Name
+                        oRight := ::Parent
+                      ELSE
+                        oRight := ::Form:__hObjects[ oRight ]
+                     ENDIF
                   ENDIF
                ENDIF
-            ENDIF
-         ENDDO
-      ENDIF
+            ENDDO
+         ENDIF
 
-      IF ISOBJECT( oBottom ) .AND. oBottom:AutoDock .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. oBottom:Style & WS_VISIBLE == 0 )
-         WHILE oBottom != NIL .AND. oBottom:Parent != NIL .AND. oBottom != NIL .AND. oBottom:hWnd != ::Parent:hWnd .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. !oBottom:IsWindow() .OR. oBottom:Style & WS_VISIBLE == 0 ) //.AND. oBottom:IsWindow()
-            IF oBottom:Dock != NIL
-               oBottom := oBottom:Dock:Bottom
-               IF VALTYPE( oBottom ) == "C"
-                  IF oBottom == ::Parent:Name
-                     oBottom := ::Parent
-                   ELSE
-                     oBottom := ::Form:__hObjects[ oBottom ]
+         IF ISOBJECT( oBottom ) .AND. oBottom:AutoDock .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. oBottom:Style & WS_VISIBLE == 0 )
+            WHILE oBottom != NIL .AND. oBottom:Parent != NIL .AND. oBottom != NIL .AND. oBottom:hWnd != ::Parent:hWnd .AND. ( oBottom:Hidden .OR. !oBottom:__Docked .OR. !oBottom:IsWindow() .OR. oBottom:Style & WS_VISIBLE == 0 ) //.AND. oBottom:IsWindow()
+               IF oBottom:Dock != NIL
+                  oBottom := oBottom:Dock:Bottom
+                  IF VALTYPE( oBottom ) == "C"
+                     IF oBottom == ::Parent:Name
+                        oBottom := ::Parent
+                      ELSE
+                        oBottom := ::Form:__hObjects[ oBottom ]
+                     ENDIF
                   ENDIF
                ENDIF
-            ENDIF
-         ENDDO
+            ENDDO
+         ENDIF
       ENDIF
 /*
       IF oLeft != NIL .AND. oLeft:hWnd != ::Parent:hWnd .AND. oLeft:Dock:IsDocked()

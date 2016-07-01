@@ -129,32 +129,33 @@ RETURN WritePrivateProfileString(NIL,NIL,NIL,::Name)
 
 //--------------------------------------------------------------------------------------------------
 METHOD Write( cSection, acEntry, xValue ) CLASS IniFile
-   LOCAL cSave := "", c
+   LOCAL lRet := .F., cSave := "", c
    IF VALTYPE( acEntry ) != "A"
       IF Empty( ::Name )
-         RETURN WriteProfileString( cSection, acEntry, XSTR( xValue ) )
+         lRet := WriteProfileString( cSection, acEntry, XSTR( xValue ) )
+      ELSEIF ! WritePrivateProfileString( cSection, acEntry, XSTR( xValue ), ::Name )
+         ::aIni := HB_ReadIni( ::Name, .T., "=" )
+         IF ::aIni != NIL
+            ::aIni[cSection][ acEntry ] := XSTR( xValue )
+            lRet := HB_WriteIni( ::Name, ::aIni )
+         ENDIF
       ENDIF
-      IF WritePrivateProfileString( cSection, acEntry, XSTR( xValue ), ::Name )
-         RETURN .T.
-       ELSE
-         DEFAULT ::aIni TO HB_ReadIni( ::Name, .T., "=" )
-         ::aIni[cSection][ acEntry ] := XSTR( xValue )
-         HB_WriteIni( ::Name, ::aIni )
-      ENDIF
-    ELSE
+   ELSE
       FOR EACH c IN acEntry
          cSave += c + CHR(0)
       NEXT
       cSave += CHR(0)
       IF Empty( ::Name )
-         WriteProfileSection( cSection, NIL )
-         WriteProfileSection( cSection, cSave )
-       ELSE
-         WritePrivateProfileSection( cSection, NIL, ::Name )
-         WritePrivateProfileSection( cSection, cSave, ::Name )
+         IF ( lRet := WriteProfileSection( cSection, NIL ) )
+            lRet := WriteProfileSection( cSection, cSave )
+         ENDIF
+      ELSE
+         IF ( lRet := WritePrivateProfileSection( cSection, NIL, ::Name ) )
+            lRet := WritePrivateProfileSection( cSection, cSave, ::Name )
+         ENDIF
       ENDIF
    ENDIF
-RETURN .T.
+RETURN lRet
 
 
 //--------------------------------------------------------------------------------------------------

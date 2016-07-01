@@ -18,7 +18,7 @@
 #include "debug.ch"
 #include "ads.ch"
 
-static hFTConnection
+static hFTConnection, s_aTables
 
 //-------------------------------------------------------------------------------------------------------
 
