@@ -9,7 +9,11 @@
 */
 
 
-2016-16-13 20:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+2016-07-03 16:00   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * contrib/gtwvw/gtwvw.c
+   ! removed asm functions and changed hb_gt_wvw_Tone to call hb_gt_w32_tone 
+  
+2016-06-13 20:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/vm/arrayshb.c
     ! revert back to previus version
 
