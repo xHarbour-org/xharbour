@@ -24,14 +24,12 @@ METHOD Init( oParent, aParameters ) CLASS MDIForm
    // Populate Components
    WITH OBJECT ( OpenFileDialog( Self ) )
       :Name                 := "MyOpen"
-      :FileName             := ""
       :MultiSelect          := .F.
       :Create()
    END //MyOpen
 
    WITH OBJECT ( SaveFileDialog( Self ) )
       :Name                 := "MySave"
-      :FileName             := ""
       :Create()
    END //MySave
 
@@ -45,9 +43,9 @@ METHOD Init( oParent, aParameters ) CLASS MDIForm
    ::Top                  := 12
    ::Width                := 812
    ::Height               := 547
+   ::Text                 := "xPad"
+   ::MdiContainer         := .T.
    ::Center               := .T.
-   ::Caption              := "xPad"
-   ::MDIContainer         := .T.
 
    ::Create()
 
@@ -55,93 +53,92 @@ METHOD Init( oParent, aParameters ) CLASS MDIForm
    WITH OBJECT ( COOLMENU( Self ) )
       :Name                 := "MainBar"
       :Left                 := 12
-      :Top                  := 0
       :Width                := 865
       :Height               := 20
       :List                 := .T.
-      :Tooltips             := .T.
+      :ToolTips             := .T.
       :HorzPadding          := 7
       :VertPadding          := 6
       :HideClippedButtons   := .T.
       :Create()
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "MainBar_File"
-         :Caption              := "File"
+         :Text                 := "File"
          :Position             := 0
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_New"
-            :Caption              := "New"
+            :Text                 := "New"
             :EventHandler[ "OnClick" ] := "File_New_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Open"
-            :Caption              := "Open"
+            :Text                 := "Open"
             :EventHandler[ "OnClick" ] := "File_Open_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Line1"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Close"
-            :Caption              := "Close"
+            :Text                 := "Close"
             :EventHandler[ "OnClick" ] := "File_Close_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_CloseAll"
-            :Caption              := "Close All"
+            :Text                 := "Close All"
             :EventHandler[ "OnClick" ] := "File_CloseAll_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Line2"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "File_Exit"
-            :Caption              := "Exit"
+            :Text                 := "Exit"
             :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
       WITH OBJECT ( COOLMENUITEM( :this ) )
          :Name                 := "MainBar_About"
-         :Caption              := "About"
+         :Text                 := "About"
          :Position             := 1
          :Create()
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "About_Info"
-            :Caption              := "Info"
+            :Text                 := "Info"
             :EventHandler[ "OnClick" ] := "About_Info_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "About_Line1"
-            :Caption              := "-"
+            :Text                 := "-"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
-         WITH OBJECT ( CMENUITEM( :this ) )
+         WITH OBJECT ( MENUITEM( :this ) )
             :Name                 := "About_VisitOnline"
-            :Caption              := "Visit xHarbour.com"
+            :Text                 := "Visit xHarbour.com"
             :EventHandler[ "OnClick" ] := "About_VisitOnline_OnClick"
             :Create()
-         END //CMENUITEM
+         END //MENUITEM
 
       END //COOLMENUITEM
 
@@ -150,23 +147,21 @@ METHOD Init( oParent, aParameters ) CLASS MDIForm
    WITH OBJECT ( COOLBAR( Self ) )
       :Name                 := "CoolBar1"
       WITH OBJECT :Dock
-         :Left                 := :Owner:Parent
-         :Top                  := :Owner:Parent
-         :Right                := :Owner:Parent
-         :Margin               := 0
+         :Left                 := "MDIForm"
+         :Top                  := "MDIForm"
+         :Right                := "MDIForm"
+         :Margins              := "0,0,0,0"
       END
 
-      :Left                 := 0
-      :Top                  := 0
       :Width                := 804
       :Height               := 21
       :TabStop              := .F.
+      :Border               := 8388608
       :Create()
       WITH OBJECT ( COOLBARBAND( :this ) )
-         :Name                 := "Band1"
          :MinWidth             := 60
          :MinHeight            := 21
-         :BandChild            := ::MainBar
+         :BandChild            := "MainBar"
          :Break                := .T.
          :Create()
       END //COOLBARBAND
