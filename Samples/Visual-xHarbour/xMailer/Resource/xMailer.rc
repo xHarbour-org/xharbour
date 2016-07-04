@@ -1,4 +1,4 @@
-IDOK MANIFEST "xMailer.XML"
+1 24 "xMailer.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO

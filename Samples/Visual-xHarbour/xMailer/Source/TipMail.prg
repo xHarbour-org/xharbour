@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: TipMail.prg,v 1.1 2008/09/15 23:02:02 Ella Stern Exp $
  */
 
 /*
