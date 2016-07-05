@@ -1,0 +1,52 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 300
+   ::Text                 := "Form1"
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 177
+      :Top                  := 184
+      :Width                := 80
+      :Height               := 25
+      :Text                 := "Test"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( FREEIMAGE( Self ) )
+      :Name                 := "FreeImage1"
+      :Left                 := 38
+      :Top                  := 107
+      :Width                := 100
+      :Height               := 100
+      :Text                 := "FreeImage1"
+      :Create()
+   END //FREEIMAGE
+
+   ::Show()
+
+RETURN Self
