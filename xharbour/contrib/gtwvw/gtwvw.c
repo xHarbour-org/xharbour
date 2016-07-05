@@ -1422,6 +1422,7 @@ static int hb_gt_wvw_ReadKey( PHB_GT pGT, int eventmask )
 /*                                                                   */
 static void hb_gt_wvw_Tone( PHB_GT pGT, double dFrequency, double dDuration )
 {
+  HB_SYMBOL_UNUSED( pGT );
   hb_gt_w32_tone( dFrequency, dDuration );
 }
 

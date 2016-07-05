@@ -9,21 +9,24 @@
 */
 
 
+2016-07-05 10:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/gtwvw/gtwvw.c
+    ! pacify warning
+
 2016-07-03 16:00   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/gtwvw/gtwvw.c
-   ! removed asm functions and changed hb_gt_wvw_Tone to call hb_gt_w32_tone 
+    ! removed asm functions and changed hb_gt_wvw_Tone to call hb_gt_w32_tone 
   
 2016-06-13 20:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/vm/arrayshb.c
     ! revert back to previus version
 
 2016-04-25 22:14 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
-   ! utils/hbmake/hbmake.prg
-   ! utils/hbmake/hbmlang.c
-     ! minor updated for mingw64 bits
-   ! winmake/makefile.gc
-     minor fix
-   
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/hbmlang.c
+    ! minor updated for mingw64 bits
+  * winmake/makefile.gc
+    ! minor fix
 
 2016-04-23 20:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/vm/arrayshb.c
@@ -36,7 +39,6 @@
     ! LONG->HB_LONG and some adjust to make mingw happy
   * source/vm/arrayshb.c
     ! HB_PTRDIFF ->  HB_PTRUINT to make mingw happy
-    
 
 2016-04-24 00:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/tip/ftpcln.prg
