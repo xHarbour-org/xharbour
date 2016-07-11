@@ -62,7 +62,12 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    ENDIF
 
 
-   ::nCopies:=1
+   i:=AScan(aPrnSetup,{|x| x[1]=="COPY"})
+   IF i>0
+      ::nCopies:=aPrnSetup[i][2]
+   ELSE
+      ::nCopies:=1
+   ENDIF
 
    i:=AScan(aPrnSetup,{|x| x[1]=="LANDSCAPE"})
    IF i>0

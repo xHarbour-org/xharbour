@@ -1187,6 +1187,8 @@ METHOD Preview(oParentForm) CLASS WinPrint
    (cAlias2)->(DbAppend());    (cAlias2)->PRNPROP:="EMFNAMES" ; (cAlias2)->PRNVAL:=aEmfName
 
    (cAlias2)->(DbAppend());    (cAlias2)->PRNPROP:="GREYSCALE" ; (cAlias2)->PRNVAL:=::lGreyScale
+   
+   (cAlias2)->(DbAppend());    (cAlias2)->PRNPROP:="COPY" ; (cAlias2)->PRNVAL:=::nCopies
 
    (cAlias2)->(DbCloseArea())
 
@@ -1197,9 +1199,6 @@ METHOD Preview(oParentForm) CLASS WinPrint
 
    PrintPreview_Form1(oParentForm,{cFile2})
    
-// I didn't delete following comment as refrence if we need it in future.
-//   ShellExecute(0,"OPEN",GetExePath()+"\PrintPreview.exe",'"'+::cFile+'" "'+cFile2+'"',"",1)
-
 RETURN Self
 
 

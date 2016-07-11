@@ -6,13 +6,25 @@
 //----------------------------------------------------------------------------------------------------//
 
 METHOD Button1_OnClick( Sender ) CLASS Form1
+   WinPrintOutput(Self, .T.)
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------
+METHOD Button2_OnClick( Sender ) CLASS Form1
+   WinPrintOutput(Self, .F.)   
+RETURN Self
+
+
+FUNCTION WinPrintOutput(Self, lPreview)
 
    LOCAL oPrn,nLineWidth,cText,cPath
+
+   DEFAULT lPreview TO .T.
    
-   oPrn:=WinPrint():New(.T.,.F.)  // Preview 
+   oPrn:=WinPrint():New(lPreview,.F.)  
 
    IF oPrn=NIL
-      RETURN Self
+      RETURN NIL
    ENDIF
    
    WITH OBJECT oPrn
@@ -34,7 +46,7 @@ METHOD Button1_OnClick( Sender ) CLASS Form1
    oPrn:lDuplex:=.F.
 
    IF !oPrn:Create()
-      RETURN Self
+      RETURN NIL
    ENDIF
 
    nLineWidth:=oPrn:nPageWidth-oPrn:nLeftMargin-oPrn:nRightMargin
@@ -62,8 +74,12 @@ METHOD Button1_OnClick( Sender ) CLASS Form1
    oPrn:Say(oPrn:nLeftMargin,20,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
    //oPrn:PageBreak()
 
-   oPrn:Preview(Self)
+   IF lPreview
+      oPrn:Preview(Self)
+   ENDIF
    
    oPrn:Close()
    
-RETURN Self
+RETURN NIL
+   
+   
