@@ -172,7 +172,7 @@ RETURN {}
 METHOD IsValidStopLine( cFile, nLine ) CLASS XHDebugger
   IF ::socket != NIL
      ::Do( ".valid " + cFile + ":" + LTrim( Str( nLine ) ) )
-     RETURN Left( ::RecvUntil( ">" ), 3 ) == ".F."
+     RETURN Left( ::RecvUntil( ">" ), 3 ) == ".T."
   ENDIF
 RETURN .F.
 

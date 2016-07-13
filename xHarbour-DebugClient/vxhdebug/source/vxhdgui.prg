@@ -33,7 +33,7 @@ CLASS XHDebuggerGUI FROM XHDebugger
   //METHOD ProcessFnKey( nKey, nParam )
   METHOD DebugHookKeys( nCode, wParam, lParam )
   METHOD RunToCursor()
-  METHOD Start() INLINE IIf( ::lStopped .AND. ::oApp:ClassName == "DEBUGGER", ::oApp:Start(), ::Super:Start() )
+  METHOD Start() INLINE IIf( ::lStopped .AND. ::oApp:ClassName == "DEBUGGER", ::oApp:Start(), ::Super:Start() ),::oApp:DebuggerPanel:Show()
   METHOD Stop()
   METHOD Sync()
   METHOD ToggleBreak()
@@ -311,7 +311,6 @@ METHOD DebugHookKeys( nCode, nwParam, nlParam ) CLASS XHDebuggerGUI
   lShift := GetKeyState( VK_SHIFT ) & 0x8000 != 0
 
   //TraceLog( lAlt, lCtrl, lShift, nwParam, nlParam )
-
   SWITCH nwParam
     CASE VK_F5
        IF lShift

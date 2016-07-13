@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-07-13 13:52 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+    ! fixed  IsValidStopLine method and Start method
+
 2012-08-14 13:35 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   * vxhdebug\vc8\xDebugW.exe.xbp
   * vxhdebug\vc8\xDebugW.exe\xDebugW.exe.xbp
@@ -320,7 +325,7 @@
     + Added UnhookWindowsHookEx to METHOD Stop when Application:IdeActive is TRUE
       Stopping HOOKS is MANDATORY, I really didn't follow stand alone version but I couldn't find
       the call to UnhookWindowsHookEx() ANYWHERE
-      
+
 2005-08-17 07:36 UTC-0800 Augusto Infante <august@xHarbour.com>
   * xHarbour-DebugClient\vxhdebug\source\vxhdmon.prg
     !Fixed Controls creation to send only Parent as a constructor parameter
