@@ -41,7 +41,7 @@ ENDCLASS
 
 
 METHOD New() CLASS XHDebuggerGUI
-  //LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
+//  LOCAL lSysColor := ::oApp:DebuggerPanel:BackColor == __GetSystem():CurrentScheme:ToolStripPanelGradientEnd
   ::oEditor := ::oApp:SourceEditor:oEditor
 
   WITH OBJECT ::oToolBar := ToolStrip( ::oApp:DebuggerPanel )
@@ -312,6 +312,9 @@ METHOD DebugHookKeys( nCode, nwParam, nlParam ) CLASS XHDebuggerGUI
 
   //TraceLog( lAlt, lCtrl, lShift, nwParam, nlParam )
   SWITCH nwParam
+    CASE VK_RETURN
+         ::oConsole:DoIt()
+       RETURN 1
     CASE VK_F5
        IF lShift
           ::Stop()
