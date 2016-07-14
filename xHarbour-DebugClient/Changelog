@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-07-14 10:39 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdapp.prg
+  + vxhdebug/resource/Search.ico
+  + vxhdebug/resource/Goto.ico
+    add search and go to line
+
 2016-07-13 16:50 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
   * vxhdebug/source/vxhdgui.prg
     ! fixed  DebugHookKeys method execute console

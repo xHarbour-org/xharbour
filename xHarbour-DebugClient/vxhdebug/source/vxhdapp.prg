@@ -149,11 +149,11 @@ METHOD Open( cArgs, aSources ) CLASS Debugger
                           cArgs + " //debug" + If( !Empty( ::cPort ), " //debugport:" + ::cPort, "" ), ;
                           , SW_SHOW )
 
-            ::oDebugger:Start( , If( !Empty( ::cPort ), Val( ::cPort ), ) )
+            ::oDebugger:Start( , Iif( !Empty( ::cPort ), Val( ::cPort ), ) )
          ENDIF
       ENDIF
     ELSE
-      ::oDebugger:Start( ::cHost, If( !Empty( ::cPort ), Val( ::cPort ), ) )
+      ::oDebugger:Start( ::cHost, Iif( !Empty( ::cPort ), Val( ::cPort ), ) )
    ENDIF
 
 RETURN Self
@@ -245,6 +245,8 @@ METHOD Init() CLASS MainWindow
          :ImageList:AddIcon( "ICO_OPEN" )
          :ImageList:AddIcon( "ICO_CLOSE" )
          :ImageList:AddIcon( "ICO_SAVE" )
+         :ImageList:AddIcon( "ICO_SEARC" )
+         :ImageList:AddIcon( "ICO_GOTO" )
          :Create()
 
          WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
@@ -276,21 +278,22 @@ METHOD Init() CLASS MainWindow
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "S" )
             :Create()
-            ::Application:Project:ResetQuickOpen()
          END
 
          WITH OBJECT ::Application:Props[ "FindBttn" ] := ToolStripButton( :this )
-            :ImageIndex       := 0
-            :Text             := ""
+            :ImageIndex       := 4
+            :Text             := "Search"
+            :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Find() }
-            :Enabled          := .F.
+//            :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "F" )
             :Create()
          END
          WITH OBJECT ::Application:Props[ "ReplBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 0
-            :Text             := ""
+            :Text             := "Replace"
+            :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Replace() }
             :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
@@ -298,9 +301,10 @@ METHOD Init() CLASS MainWindow
             :Create()
          END
          WITH OBJECT ::Application:Props[ "SearchGoto" ] := ToolStripButton( :this )
-            :ImageIndex       := 0
-            :Text             := ""
-            :Enabled          := .F.
+            :ImageIndex       := 5
+            :Text             := "Go to"
+            :ImageAlign       := DT_CENTER
+//            :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC("G")
             :Action           := {|| ::Application:SourceEditor:GotoDialog() }
@@ -365,7 +369,6 @@ METHOD SetFile( oObj ) CLASS FileExplorer
    oObj:TreeItem := ::AddItem( oObj:FileName, 1 )
    oObj:TreeItem:Cargo := oObj
 RETURN Self
-
 
 CLASS Project
    ACCESS Application    INLINE __GetApplication()
