@@ -252,6 +252,7 @@ METHOD Init() CLASS MainWindow
          WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 1
             :Text             := "Open"
+            :ToolTip:Text     := "Open Application"
             :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Open() }
             :DropDown         := 2
@@ -262,10 +263,11 @@ METHOD Init() CLASS MainWindow
          END
 
          WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
-            :ImageIndex := 2
-            :ImageAlign := DT_CENTER
-            :Text       := "Close"
-            :Action     := {||::Application:Project:Close() }
+            :ImageIndex   := 2
+            :ImageAlign   := DT_CENTER
+            :Text         := "Close"
+            :ToolTip:Text := "Close Application"
+            :Action       := {||::Application:Project:Close() }
             :Create()
          END
 
@@ -283,6 +285,7 @@ METHOD Init() CLASS MainWindow
          WITH OBJECT ::Application:Props[ "FindBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 4
             :Text             := "Search"
+            :ToolTip:Text     := "Search in Source"
             :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Find() }
 //            :Enabled          := .F.
@@ -292,8 +295,8 @@ METHOD Init() CLASS MainWindow
          END
          WITH OBJECT ::Application:Props[ "ReplBttn" ] := ToolStripButton( :this )
             :ImageIndex       := 0
-            :Text             := "Replace"
-            :ImageAlign       := DT_CENTER
+            :Text             := ""
+//            :ImageAlign       := DT_CENTER
             :Action           := {||::Application:Project:Replace() }
             :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
@@ -303,11 +306,23 @@ METHOD Init() CLASS MainWindow
          WITH OBJECT ::Application:Props[ "SearchGoto" ] := ToolStripButton( :this )
             :ImageIndex       := 5
             :Text             := "Go to"
+            :ToolTip:Text     := "Junp to Line"
             :ImageAlign       := DT_CENTER
 //            :Enabled          := .F.
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC("G")
             :Action           := {|| ::Application:SourceEditor:GotoDialog() }
+            :Create()
+         END
+         WITH OBJECT ::Application:Props[ "SourceBttn" ] := ToolStripButton( :this )
+            :ImageIndex       := 1
+            :Text             := "Source"
+            :ToolTip:Text     := "Open Source File"
+            :ImageAlign       := DT_CENTER
+            :Action           := {||::Application:Project:OpenSource() }
+            :DropDown         := 2
+            :ShortCutKey:Ctrl := .T.
+            :ShortCutKey:Key  := ASC( "S" )
             :Create()
          END
       END
@@ -725,6 +740,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
       cPath := oFile:Path
       cName := oFile:Name
+      AADD( ::Application:aPath,cPath )
    ENDIF
 
    cPath += '\'
@@ -734,7 +750,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
    IF ( n := ASCAN( ::Application:SourceEditor:aDocs, {|o| o:cPath == cPath .AND. o:cFile == cName } ) ) > 0
       // File is open, just re-show
 
-      ::Application:SourceTabs:SetCurSel( n )
+//      ::Application:SourceTabs:SetCurSel( n )
       ::SourceTabChanged( n )
 
       IF !::Application:SourceEditor:IsWindowVisible()
@@ -863,6 +879,7 @@ METHOD ResetQuickOpen( cFile ) CLASS Project
 
    ::Application:IniFile:Write( "Recent", aEntries )
    ::Application:GenerateMembers := lMems
+
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------

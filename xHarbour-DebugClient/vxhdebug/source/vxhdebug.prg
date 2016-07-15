@@ -12,6 +12,7 @@
 #define EOL Chr( 10 )
 
 CLASS XHDebugger
+   ACCESS Application    INLINE __GetApplication()
   DATA socket
 
   /* UI elements */

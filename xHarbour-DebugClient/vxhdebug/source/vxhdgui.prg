@@ -400,6 +400,7 @@ RETURN Self
 METHOD Sync() CLASS XHDebuggerGUI
   LOCAL n, cPath, nDocs//, cSource
   LOCAL cFile := "", lAutoFind:=.F.
+  LOCAL oItem
 
   ::oMonitor:lDirty := .T.
   ::oCallStack:lDirty := .T.
@@ -410,7 +411,7 @@ METHOD Sync() CLASS XHDebuggerGUI
   IF ::oApp:ClassName == "DEBUGGER"
     cFile := ::cModule
     IF ::aSources == NIL
-      ::aSources := ASort( ::GetSourceFiles() )
+      ::aSources := ASort( ::GetSourceFiles() ,2,, {|x,y| upper(x) < upper(y) } )
 //       WITH OBJECT ::oApp:MainWindow:oButtonOpenSrc
 //         :Menu:Destroy()
 //         :Menu := MenuPopup( :Parent )
@@ -418,6 +419,21 @@ METHOD Sync() CLASS XHDebuggerGUI
 //           :AddMenuItem( cSource ):Action := {|o| ::oApp:Project:OpenSource( o:Caption, .T. ) }
 //         NEXT
 //       END
+
+      WITH OBJECT ::Application:Props[ "SourceBttn" ]   // Source Button
+         FOR n := 1 TO LEN( ::aSources )
+             IF ! EMPTY( ::aSources[n] )
+                IF :Children == NIL .OR. LEN( :Children ) < n
+                   oItem := MenuStripItem( :this )
+                   oItem:Create()
+                 ELSE
+                   oItem := :Children[n]
+                ENDIF
+                oItem:Text   := ::aSources[n]
+                oItem:Action := {|o| ::Application:Project:OpenSource( o:Text, .T. ) }
+             ENDIF
+         NEXT
+      END
     ENDIF
   ELSE
     IF ::oApp:Project:Properties == NIL

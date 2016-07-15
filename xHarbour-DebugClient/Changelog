@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-07-15 08:38 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdapp.prg
+  * vxhdebug/source/vxhdebug.prg
+  * vxhdebug/source/vxhdgui.prg
+    add Open Source File add ToolTips in Buttons
+
 2016-07-14 10:39 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
   * vxhdebug/source/vxhdapp.prg
   + vxhdebug/resource/Search.ico
