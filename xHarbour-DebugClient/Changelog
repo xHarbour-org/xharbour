@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-07-18 06:47 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdapp.prg
+    SourceTabChanged method SourceEditor:Text not updated
+
 2016-07-15 08:38 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
   * vxhdebug/source/vxhdapp.prg
   * vxhdebug/source/vxhdebug.prg

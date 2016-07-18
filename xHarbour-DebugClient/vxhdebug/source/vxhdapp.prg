@@ -227,6 +227,10 @@ METHOD Init() CLASS MainWindow
          :Width      := 140
          :Create()
       END
+      WITH OBJECT StatusBarPanel( :this )
+         :Width      := 140
+         :Create()
+      END
    END
 
    //Alert( "0" )
@@ -533,8 +537,11 @@ RETURN NIL
 
 METHOD SourceTabChanged( nCur ) CLASS Project
    ::Application:SourceEditor:aDocs[ nCur ]:Select()
-   ::Application:SourceEditor:Text := ::Application:SourceEditor:aDocs[ nCur ]:File
    ::Application:SourceEditor:aDocs[ nCur ]:TreeItem:Select()
+   WITH OBJECT ::Application:MainForm
+      :StatusBarPanel5:Caption := ::Application:SourceEditor:Text
+      :StatusBarPanel5:Width   := :Drawing:GetTextExtentPoint32( :StatusBarPanel5:Caption )[1] + 10
+   END
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -740,7 +747,7 @@ METHOD OpenSource( cSource, lNoDialog ) CLASS Project
 
       cPath := oFile:Path
       cName := oFile:Name
-      AADD( ::Application:aPath,cPath )
+//      AADD( ::Application:aPath,cPath )
    ENDIF
 
    cPath += '\'
