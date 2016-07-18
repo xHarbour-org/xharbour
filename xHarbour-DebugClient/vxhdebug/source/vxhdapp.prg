@@ -537,6 +537,7 @@ RETURN NIL
 
 METHOD SourceTabChanged( nCur ) CLASS Project
    ::Application:SourceEditor:aDocs[ nCur ]:Select()
+   ::Application:SourceEditor:Text := ::Application:SourceEditor:aDocs[ nCur ]:File // not updated, why???
    ::Application:SourceEditor:aDocs[ nCur ]:TreeItem:Select()
    WITH OBJECT ::Application:MainForm
       :StatusBarPanel5:Caption := ::Application:SourceEditor:Text
