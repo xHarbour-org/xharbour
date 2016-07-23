@@ -40,20 +40,20 @@ ENDCLASS
 METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPointSize, nDefault ) CLASS AlertDialog
    LOCAL n, aMsg, hFont, hOldFont, i
    LOCAL hDC, nWidth, nMsgHeight, aSize, oParent
-   
+
    nButWidth := 0
-   
+
    DEFAULT lVert    TO .F.
    DEFAULT nDefault TO 1
    DEFAULT lModal   TO .T.
-   
+
    ::_Vert      := lVert
    ::_Back      := nBackColor
    ::_Fore      := nForeColor
    ::_PointSize := nPointSize
    ::_Face      := cFace
    ::_Default   := nDefault
-   
+
    IF VALTYPE( cMsg ) != "C"
       IF VALTYPE( cMsg)=="A"
          cMsg:=__a2str(cMsg,";")
@@ -72,7 +72,7 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
 
    aSize    := _GetTextExtentPoint32( hDC, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" )
    nWidth   := 0
-   
+
    aMsg := __str2a( cMsg, CHR(13) )
 
    AEVAL( aMsg, {|x| nWidth := Max( nWidth, _GetTextExtentPoint32( hDC, AllTrim(x) )[1] ) } )
@@ -93,25 +93,25 @@ METHOD Init( cMsg, aChoices, lModal, nBackColor, nForeColor, lVert, cFace, nPoin
    ENDIF
 
    //hWnd := GetFocus()
-   
+
    IF lModal
       ::ExStyle := WS_EX_TOOLWINDOW
       oParent := ObjFromHandle( GetActiveWindow() )
     ELSE
-      ::ExStyle := WS_EX_TOOLWINDOW | WS_EX_TOPMOST
-      oParent := NIL 
+      ::ExStyle := ( WS_EX_TOOLWINDOW | WS_EX_TOPMOST )
+      oParent := NIL
    ENDIF
 
    Super:Init( oParent )
    ::Modal    := lModal
-   ::Style    := DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION
+   ::Style    := ( DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION )
    ::Message  := cMsg
    ::MsgHeight:= nMsgHeight
    ::aChoices := aChoices
    ::Width    := nWidth + 40
    ::Height   := nMsgHeight + 61 + IIF( !lVert, 0, 24 * (Len( aChoices )-1) )
-   ::Create() 
- 
+   ::Create()
+
    //SetFocus( hWnd )
 RETURN Self
 
@@ -121,7 +121,7 @@ METHOD OnInitDialog() CLASS AlertDialog
    o := Label( Self )
    o:Font:Bold  := .T.
    o:Alignment  := DT_CENTER
-   o:Border     := BDR_SUNKENINNER   
+   o:Border     := BDR_SUNKENINNER
    o:VertCenter := .T.
 
    IF ::_Back != NIL
@@ -158,7 +158,7 @@ METHOD OnInitDialog() CLASS AlertDialog
    nLeft  := 1
    nTop   := ::MsgHeight + 8 //::ClientHeight - 24
    nWidth := IIF( ::_Vert, ::ClientWidth-2, ::ClientWidth / LEN( ::aChoices ) )
-   
+
    n := LEN( ::aChoices )
    For i = 1 To n
        o := Button( Self )

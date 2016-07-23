@@ -50,9 +50,9 @@ CLASS Button INHERIT Control
    PROPERTY MultiLine     ROOT "Behavior"   SET ::SetStyle( BS_MULTILINE, v )    DEFAULT .F. PROTECTED
    PROPERTY Split                           SET ::SetStyle( BS_SPLITBUTTON, v )  DEFAULT .F.
    PROPERTY DrawFocus     ROOT "Appearance" DEFAULT .T.
+   PROPERTY ImageIndent   DEFAULT 3
 
    DATA ImgInst           EXPORTED
-   DATA ImageIndent       EXPORTED INIT 3
    DATA DrawTheme         EXPORTED INIT .T.
    DATA AllowUnDock       EXPORTED INIT FALSE
    DATA AllowClose        EXPORTED INIT FALSE
@@ -76,7 +76,7 @@ CLASS Button INHERIT Control
    METHOD Click()             INLINE SetActiveWindow( ::Parent:hWnd ), ::SendMessage( BM_CLICK, 0, 0 )
    METHOD Push()              INLINE ::SendMessage( BM_SETSTATE, .T., 0 )
    METHOD Release()           INLINE ::SendMessage( BM_SETSTATE, .F., 0 )
-   METHOD IsPushed()          INLINE ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_PUSHED != 0
+   METHOD IsPushed()          INLINE ( ::SendMessage( BM_GETSTATE, 0, 0 ) & BST_PUSHED ) != 0
    METHOD OnCtlColorBtn()
    METHOD OnCtlColorStatic()
    METHOD SetState()
@@ -95,7 +95,7 @@ METHOD Init( oParent ) CLASS Button
    DEFAULT ::__xCtrlName TO "Button"
    ::ImgInst   := ::Instance
    ::ClsName   := "Button"
-   DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::Style TO ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
    ::Super:Init( oParent )
    ::Width     := 80
    ::Height    := 25
@@ -177,19 +177,19 @@ METHOD GetState() CLASS Button
       nState := ::SendMessage( BM_GETSTATE, 0, 0 )
 
       DO CASE
-         CASE nState & BST_CHECKED == BST_CHECKED
+         CASE ( nState & BST_CHECKED ) == BST_CHECKED
               nState := BST_CHECKED
 
-         CASE nState & BST_INDETERMINATE == BST_INDETERMINATE
+         CASE ( nState & BST_INDETERMINATE ) == BST_INDETERMINATE
               nState := BST_INDETERMINATE
 
-         CASE nState & BST_UNCHECKED == BST_UNCHECKED
+         CASE ( nState & BST_UNCHECKED ) == BST_UNCHECKED
               nState := BST_UNCHECKED
 
-         CASE nState & BST_FOCUS == BST_FOCUS
+         CASE ( nState & BST_FOCUS ) == BST_FOCUS
               nState := BST_FOCUS
 
-         CASE nState & BST_PUSHED == BST_PUSHED
+         CASE ( nState & BST_PUSHED ) == BST_PUSHED
               nState := BST_PUSHED
       ENDCASE
    ENDIF
@@ -216,7 +216,7 @@ METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nStatus ) CLASS Button
    LOCAL nFlags := DFCS_BUTTONPUSH
 
    IF nStatus != NIL
-      nFlags := nFlags | nStatus
+      nFlags := ( nFlags | nStatus )
    ENDIF
    DO CASE
       CASE nAlign == DT_LEFT
@@ -239,19 +239,19 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
    ENDIF
    oImageList := ::ImageList
    DEFAULT oImageList TO ::Parent:ImageList
-   IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::DesignMode) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
+   IF ( dis:CtlType & ODT_BUTTON ) != 0 .AND. ( ( ::MenuArrow .AND. ::ContextMenu != NIL ) .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 ) .OR. ( ::ForeColor != NIL .AND. ( ::ForeColor != ::__SysForeColor .OR. ::DesignMode) ) .OR. ( ::BackColor != NIL .AND. ::BackColor != ::__SysBackColor )  .OR. ::Parent:__xCtrlName == "GroupBox" .OR. ::__ForceSysColor )
       nTop  := 5
       nLeft := 6
 
       aRect := { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }
 
-      lDisabled := dis:itemState & ODS_DISABLED != 0
-      lSelected := dis:itemState & ODS_SELECTED != 0
-      lFocus    := dis:itemState & ODS_FOCUS    != 0
-      lDefault  := dis:itemState & ODS_DEFAULT  != 0
+      lDisabled := ( dis:itemState & ODS_DISABLED ) != 0
+      lSelected := ( dis:itemState & ODS_SELECTED ) != 0
+      lFocus    := ( dis:itemState & ODS_FOCUS    ) != 0
+      lDefault  := ( dis:itemState & ODS_DEFAULT  ) != 0
 
       aTextRect  := aClone( aRect )
-      nTextFlags := ::Alignment | DT_VCENTER | DT_SINGLELINE
+      nTextFlags := ( ::Alignment | DT_VCENTER | DT_SINGLELINE )
 
       IF oImageList != NIL .AND. ::ImageIndex > 0
          DO CASE
@@ -286,7 +286,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
             nStyle := PBS_DISABLED
           ELSEIF lSelected
             nStyle := PBS_PRESSED
-          ELSEIF dis:itemState & ODS_HOTLIGHT != 0 .OR. ( ::__lMouseHover .AND. !lSelected )
+          ELSEIF ( dis:itemState & ODS_HOTLIGHT ) != 0 .OR. ( ::__lMouseHover .AND. !lSelected )
             nStyle := PBS_HOT
           ELSEIF lDefault
             nStyle := PBS_DEFAULTED
@@ -297,7 +297,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
          IF ::BkBrush != NIL
             _FillRect( dis:hDC, aRect, ::BkBrush )
          ENDIF
-       ELSE
+      ELSE
 
          IF lFocus .AND. lSelected
             SelectObject( dis:hDC, GetSysColorBrush( COLOR_BTNSHADOW ) )
@@ -366,8 +366,12 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS Button
       IF ! EMPTY( ::xText )
          IF ::xMultiLine
             _DrawText( dis:hDC, ::xText, @aRect, DT_CALCRECT )
-            aTextRect  := {0,(::xHeight-aRect[4])/2,::xWidth,::xHeight}
-            nTextFlags := ::Alignment | DT_VCENTER
+            aTextRect  := {aTextRect[1],(::xHeight-aRect[4])/2,::xWidth,::xHeight}
+            IF lSelected .AND. lFocus
+               aTextRect[1]++
+               aTextRect[2]++
+            ENDIF
+            nTextFlags := ( ::Alignment | DT_VCENTER )
          ENDIF
          _DrawText( dis:hDC, ::xText, aTextRect, nTextFlags )
       ENDIF
@@ -457,7 +461,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS CommandLink
    ::__xCtrlName := "CommandLink"
    ::ClsName   := "Button"
-   DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_COMMANDLINK
+   DEFAULT ::Style TO ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_COMMANDLINK )
    ::Super:Init( oParent )
    ::Width     := 180
    ::Height    := 45

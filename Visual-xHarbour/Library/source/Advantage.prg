@@ -23,6 +23,7 @@ static hFTConnection, s_aTables
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsDataTable INHERIT DataTable
+   CLASSDATA bLockMessage
 
    PROPERTY TableType    ROOT "General" DEFAULT ADS_ADT
    DATA EnumTableType    EXPORTED INIT { { "NTX", "CDX", "ADT", "VFP" }, { ADS_NTX, ADS_CDX, ADS_ADT, ADS_VFP } }
@@ -45,6 +46,9 @@ CLASS AdsDataTable INHERIT DataTable
    METHOD MemoExt()                           INLINE ".adm"
    METHOD Append()                            INLINE ::Cancel(), (::Area)->( dbAppend(), AdsNull2Blank() )
    METHOD Save()
+   METHOD RecLock()
+   METHOD UnLock()                            INLINE (::Area)->( dbRUnlock() )
+   METHOD GetLockOwner()
    METHOD Create()
    METHOD CreateOrder()
    METHOD CreateTable()
@@ -227,9 +231,9 @@ METHOD Save() CLASS AdsDataTable
    IF ::__lNew
       (::Area)->( dbAppend(), AdsNull2Blank() )
    ELSEIF ::Shared
-      WHILE ! ::RecLock()
-         sleep(1000)
-      ENDDO
+      IF ! ::RecLock()
+         RETURN Self
+      ENDIF
    ENDIF
    FOR n := 1 TO LEN( ::Structure )
        IF HGetPos( ::FieldCtrl, ::Structure[n][1] ) > 0
@@ -260,20 +264,22 @@ RETURN Self
 METHOD SetData(n) CLASS AdsDataTable
    IF ::Structure[n][2] == "BINARY" .AND. ! Empty( ::__aData[n] )
       ::File2Blob( ::__aData[n], ::Structure[n][1] )
-    ELSE
+    ELSEIF ::Structure[n][2] != "A"
       (::Alias)->( FieldPut( n, ::__aData[n] ) )
    ENDIF
 RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD FieldPut( nField, xVal ) CLASS AdsDataTable
-   IF Len( ::__aData ) >= nField
-      ::__aData[nField] := xVal
-    ELSE
-      IF ::Structure[nField][2] == "BINARY" .AND. ! Empty( xVal )
-         ::File2Blob( xVal, ::Structure[nField][1] )
-      ELSE
-         ::Connector:FieldPut( nField, xVal )
+   IF ::Structure[nField][2] != "A"
+      IF Len( ::__aData ) >= nField
+         ::__aData[nField] := xVal
+       ELSE
+         IF ::Structure[nField][2] == "BINARY" .AND. ! Empty( xVal )
+            ::File2Blob( xVal, ::Structure[nField][1] )
+         ELSE
+            ::Connector:FieldPut( nField, xVal )
+         ENDIF
       ENDIF
    ENDIF
 RETURN NIL
@@ -340,6 +346,54 @@ METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery
       RETURN (::Area)->( OrdNumber( cTag, cOrderBagName ) ) > 0 .AND. Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) )) == Upper(cKey)
    ENDIF
 RETURN .T.
+
+METHOD RecLock( nSecs ) CLASS AdsDataTable
+   LOCAL lForever, aInfo
+   DEFAULT nSecs TO 5
+
+   IF (::Area)->( dbrlock() )
+      RETURN(.T.)
+   ENDIF
+
+   lForever := (nSecs == 0)
+
+   IF ::bLockMessage != NIL
+      Eval( ::bLockMessage, (::Area)->(Alias()) )
+   ENDIF
+   DO WHILE (lForever .OR. nSecs > 0)
+      IF (::Area)->( dbrlock() )
+         IF ::bLockMessage != NIL
+            Eval( ::bLockMessage )
+         ENDIF
+         RETURN(.T.)
+      ELSE
+         sleep(500)
+         nSecs := nSecs - 0.5
+      ENDIF
+   ENDDO
+
+   aInfo := ::GetLockOwner( (::Area)->( Recno() ) )
+   IF ISARRAY( aInfo ) .AND. ! empty( aInfo[1] )
+      IF ::bLockMessage != NIL
+         Eval( ::bLockMessage, (::Area)->(Alias()), aInfo[1] )
+      ENDIF
+   ENDIF
+   IF ::bLockMessage != NIL
+      Eval( ::bLockMessage )
+   ENDIF
+RETURN .F.
+
+METHOD GetLockOwner( nRec ) CLASS AdsDataTable
+   local aInfo, cTableName := (::Area)->(dbInfo(DBI_FULLPATH))
+   IF AdsMgConnect( cTableName ) != 0
+      RETURN NIL
+   ENDIF
+   aInfo := (::Area)->(AdsMgGetLockOwner( cTableName, nRec ))
+   AdsMgDisConnect( cTableName )
+   IF empty(aInfo)
+      RETURN NIL
+   ENDIF
+RETURN aInfo
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------

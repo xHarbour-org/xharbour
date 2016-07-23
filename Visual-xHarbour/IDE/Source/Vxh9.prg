@@ -472,7 +472,7 @@ METHOD GetImage( oObj, lChange ) CLASS ObjectTreeView
          ADEL( ::aImages, ::aImages[n][2]-1 )
          RETURN -1
 
-       ELSEIF lChange .AND. oObj:HasMessage( "ImageIndex" ) .AND. oObj:ImageIndex > 0
+       ELSEIF lChange .AND. oObj:HasMessage( "ImageIndex" ) .AND. oObj:ImageIndex > 0 .AND. oObj:Parent:ImageList != NIL
          ::oList:AddIcon( oObj:Parent:ImageList:GetImage( oObj:ImageIndex ) )
          ::aImages[n][2] := ::oList:Count
          n := ::oList:Count

@@ -324,8 +324,9 @@ METHOD SelectControl( oControl, lTree ) CLASS WindowEdit
       ::InvalidateRect()
       ::MouseDown := .F.
 
-      ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
-
+      IF ::Parent != NIL
+         ::CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      ENDIF
       ::Application:ObjectManager:ResetProperties( ::Selected )
       ::Application:EventManager:ResetEvents( ::Selected )
       IF ! lTree
@@ -427,7 +428,7 @@ METHOD MaskKeyDown( o, nKey ) CLASS WindowEdit
 
            IF !EMPTY( ::Selected ) .AND. ::Selected[1][1]:__xCtrlName == "CoolMenuItem"
               ::Selected[1][1]:Parent:OpenPopup( ::Selected[1][1]:Parent:hWnd )
-             ELSE
+           ELSE
               FOR EACH aControl IN ::Selected
                   IF aControl[1]:__lMoveable
                      aControl[1]:Top += n
@@ -868,7 +869,7 @@ METHOD GetPoints( oControl, lPure, lMask, lConvert ) CLASS WindowEdit
       ClientToScreen( oControl:Parent:hWnd, @Pt )
       IF !lMask
          ScreenToClient( ::hWnd, @Pt )
-       ELSEIF ::CtrlMask != NIL
+       ELSEIF ::Parent != NIL .AND. ::CtrlMask != NIL
          ScreenToClient( ::CtrlMask:hWnd, @Pt )
       ENDIF
    ENDIF
@@ -981,11 +982,15 @@ METHOD DeleteControls( aDel ) CLASS WindowEdit
        //IF aAction[12] != NIL
        //   aAction[12]:Delete()
        //ENDIF
-
+       aDel[n][1] := NIL
    NEXT
 
    ::Application:Props[ "ComboSelect" ]:Reset()
    ::Application:Project:Modified := .T.
+
+   ::Selected := {}
+   aDel := NIL
+   hb_gcAll(.t.)
 RETURN Self
 
 //----------------------------------------------------------------------------
@@ -1001,7 +1006,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
 
    pt2 := (struct POINT)
 
-   IF LEN( ::Selected ) > 0 .AND. ::Selected[1][1]:__xCtrlName == "Application"
+   IF ::Parent == NIL .OR. ( LEN( ::Selected ) > 0 .AND. ::Selected[1][1]:__xCtrlName == "Application" )
       RETURN NIL
    ENDIF
 

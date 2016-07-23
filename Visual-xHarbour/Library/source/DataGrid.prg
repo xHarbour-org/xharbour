@@ -160,6 +160,7 @@ CLASS DataGrid INHERIT TitleControl
    ACCESS HitTop                INLINE ::DataSource == NIL .OR. ::DataSource:Bof()
    ACCESS HitBottom             INLINE ::DataSource == NIL .OR. ::DataSource:eof()
 
+   ACCESS DataHeight            INLINE ::__DataHeight
    DATA __HoverBackColor        PROTECTED
 
    DATA __SysGridColor          EXPORTED  INIT RGB(196,192,192)
@@ -850,7 +851,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
    ENDIF
    ::__DisplayArray := {}
 
-   IF oSource != NIL
+   IF VALTYPE(oSource) == "O"
       ::__SetBlocks()
       oSource:bOnFileNameChanged := {|o| Self:__ResetDataSource( o ) }
       oSource:bOnFileClosed := {|| Self:__SetDataSource( NIL ) }
@@ -1623,6 +1624,7 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
    ENDIF
    ::OnClick( ::ColPos, ::RowPos )
    IF nRow != ::RowPos
+      ::__DisplayData( ::RowPos, , ::RowPos,  )
       IF ::bRowChanged != NIL
          EVAL( ::bRowChanged, Self )
       ENDIF

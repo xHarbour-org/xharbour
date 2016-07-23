@@ -104,7 +104,6 @@ METHOD WebNavigate( Url ) CLASS WebBrowser
 RETURN Self
 
 
-
 /*
 32 bit:
 

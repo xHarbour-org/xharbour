@@ -1941,8 +1941,10 @@ METHOD OnPaint() CLASS ToolStripButton
    IF ::Font != NIL .AND. ::Font:Handle != NIL
       hPrevFont := SelectObject( hMemDC, ::Font:Handle )
    ENDIF
-   aTextRect  := { 0, 0, ::Width-::__nDropDown, ::Height }
-   nTextFlags := DT_CENTER | DT_VCENTER | DT_SINGLELINE
+   aTextRect    := { 0, 0, ::Width-::__nDropDown, ::Height }
+   aTextRect[2] := ( ::Height - ( _GetTextExtentPoint32( hMemDC, ::xText )[2]*Len(hb_aTokens( ::xText, CRLF )) ) ) / 2
+
+   nTextFlags := DT_CENTER | DT_VCENTER //| DT_SINGLELINE
    x          := 0
 
    nTop       := 0
@@ -1954,13 +1956,13 @@ METHOD OnPaint() CLASS ToolStripButton
               nLeft := ::Parent:ImagePadding
               nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
               aTextRect[1] := nLeft + ::Parent:ImageList:IconWidth + ::Parent:TextPadding
-              nTextFlags := DT_LEFT | DT_VCENTER | DT_SINGLELINE
+              nTextFlags := DT_LEFT | DT_VCENTER //| DT_SINGLELINE
 
          CASE ::ImageAlign == DT_RIGHT
               nLeft := ::Width - ::Parent:ImageList:IconWidth - ::Parent:ImagePadding - ::__nDropDown
               nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
               aTextRect[1] := nLeft - ::Parent:TextPadding - ::__nTextWidth
-              nTextFlags := DT_RIGHT | DT_VCENTER | DT_SINGLELINE
+              nTextFlags := DT_RIGHT | DT_VCENTER //| DT_SINGLELINE
 
          CASE ::ImageAlign == DT_CENTER
               nLeft := ( ( ::Width + ::__nDropDown - ::Parent:ImageList:IconWidth ) / 2 ) - ::__nDropDown
@@ -1993,7 +1995,7 @@ METHOD OnPaint() CLASS ToolStripButton
       nColor := SetTextColor( hMemDC, GetSysColor( COLOR_GRAYTEXT ) )
    ENDIF
 
-   _DrawText( hMemDC, ::Caption, /*{x,0,::ClientWidth,::ClientHeight}*/ aTextRect, nTextFlags /*DT_SINGLELINE | DT_CENTER | DT_VCENTER*/ )
+   _DrawText( hMemDC, ::Text, /*{x,0,::ClientWidth,::ClientHeight}*/ aTextRect, nTextFlags /*DT_SINGLELINE | DT_CENTER | DT_VCENTER*/ )
 
    SetTextColor( hMemDC, nColor )
 

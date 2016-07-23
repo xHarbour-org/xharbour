@@ -5,6 +5,7 @@
 //#ifndef NONAMELESSUNION
    //#define NONAMELESSUNION
 //#endif
+
 #define _WIN32_DCOM
 
 #define SEE_MASK_NOASYNC           0x00000100
@@ -106,6 +107,7 @@ static PHB_DYNS pDynSym;
 static PHB_DYNS pFontDynSym;
 static PHB_DYNS pColorDynSym;
 
+static HHOOK s_hMsgHook = NULL;
 
 typedef BOOL (WINAPI *ATLAXWININIT)(void);
 typedef BOOL (WINAPI *ATLAXWINTERM)(void);
@@ -1875,6 +1877,61 @@ HB_FUNC( __AXTRANSLATEMESSAGE )
    hb_retl( AxTranslateMessage( (IUnknown*) hb_parnl(1), (MSG*) hb_param( 2, HB_IT_STRING )->item.asString.value ) );
 }
 
+static LRESULT CALLBACK MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam )
+{
+   PMSG msg;
+
+   if( nCode < 0 )
+   {
+      return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
+   }
+
+   msg = (PMSG) lParam;
+
+   HWND hWnd = msg->hwnd;
+   UINT nMsg = 0;
+
+   if( ( msg->message == WM_KEYDOWN || msg->message == WM_KEYUP ) && ( msg->wParam == VK_BACK || msg->wParam == VK_LEFT || msg->wParam == VK_RIGHT || msg->wParam == VK_UP || msg->wParam == VK_DOWN ) )
+   {
+      nMsg = WM_KEYUP;
+   }
+   if( nMsg == 0 || msg->message == nMsg )
+   {
+      IUnknown *pUnk;
+      while( IsWindow( hWnd ) )
+      {
+         if( pUnk = AxGetUnknown( hWnd ) )
+         {
+            if( AxTranslateMessage( pUnk, msg ) )
+            {
+               return 0;
+            }
+            else
+            {
+               if( msg->message == 1169 )
+               {
+                  SetFocus( msg->hwnd );
+                  return 0;
+               }
+            }
+         }
+         hWnd = GetParent( hWnd );
+      }
+   }
+   return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
+}
+
+HB_FUNC( __MSGHOOKFUNC )
+{
+   s_hMsgHook = SetWindowsHookEx( WH_MSGFILTER, (HOOKPROC) MsgFilterFunc, NULL, GetCurrentThreadId() );
+}
+
+HB_FUNC( __MSGUNHOOKFUNC )
+{
+   UnhookWindowsHookEx( s_hMsgHook );
+   s_hMsgHook = NULL;
+}
+
 /*
 BOOL PreTranslateAccelerator(MSG* pMsg)
 {
@@ -1932,10 +1989,8 @@ BOOL AxTranslateMessageEx( MSG *pMsg );
 
 HB_FUNC( __AXTRANSLATEMESSAGEEX )
 {
-   BOOL bRet = FALSE;
    MSG *msg = (MSG*) hb_param( 1, HB_IT_STRING )->item.asString.value;
-   bRet = AxTranslateMessageEx( msg );
-   hb_retl( bRet );
+   hb_retl( AxTranslateMessageEx( msg ) );
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -4978,13 +5033,6 @@ BOOL AxTranslateMessageEx( MSG *pMsg )
          if( pUnk )
          {
             bRet = AxTranslateMessage( pUnk, pMsg );
-            if( ! bRet )
-            {
-               TranslateMessage( pMsg );
-               pMsg->message = WM_NULL;
-               DispatchMessage( pMsg );
-               bRet = TRUE;
-            }
          }
       }
       else
@@ -5063,8 +5111,8 @@ HB_FUNC( VXH_MAINLOOP )
 
    while( GetMessage( &msg, NULL, 0, 0 ) )
    {
-      if( ! AxTranslateMessageEx( &msg ) )
-      {
+      //if( ! AxTranslateMessageEx( &msg ) )
+      //{
          if( ! TranslateVXHAccel( aAccel, msg, bAccEnabled ) )
          {
             if( (hMDI == 0) || (! TranslateMDISysAccel( hMDI, &msg )) )
@@ -5076,7 +5124,7 @@ HB_FUNC( VXH_MAINLOOP )
                }
             }
          }
-      }
+      //}
    }
 }
 
@@ -5865,3 +5913,39 @@ HB_FUNC( MESSAGEBOXINDIRECT )
 
    hb_retni( MessageBoxIndirect( &pMsgBox ) );
 }
+
+HB_FUNC( GETSPECIALFOLDER )
+{
+   LPITEMIDLIST pidlBrowse;
+   char *lpBuffer = (char*) hb_xgrab( MAX_PATH + 1 );
+   SHGetSpecialFolderLocation( GetActiveWindow(), ISNIL(1) ? CSIDL_DRIVES : hb_parni(1), &pidlBrowse);
+   SHGetPathFromIDList( pidlBrowse, lpBuffer );
+   hb_retc( lpBuffer );
+   hb_xfree( lpBuffer);
+}
+
+HB_FUNC( LISTVIEWSETBKIMAGE )
+{
+   HWND hWnd   = ( HWND ) hb_parnl( 1 );
+
+   LVBKIMAGE lvbki;
+   memset( ( char * ) &lvbki, 0, sizeof( lvbki ) );
+
+   if( HB_ISCHAR(2) )
+   {
+      lvbki.ulFlags     = LVBKIF_SOURCE_URL; //|LVBKIF_FLAG_ALPHABLEND | LVBKIF_TYPE_WATERMARK | LVBKIF_FLAG_ALPHABLEND;
+      lvbki.pszImage    = (LPTSTR) hb_parc(2);
+   }
+   else
+   {
+      lvbki.ulFlags     = LVBKIF_SOURCE_HBITMAP ; //| LVBKIF_TYPE_WATERMARK; // | LVBKIF_FLAG_ALPHABLEND;
+      lvbki.hbm         = (HBITMAP) hb_parnl(2);
+   }
+
+   lvbki.xOffsetPercent = HB_ISNUM(3) ? hb_parni(3) : 0;
+   lvbki.yOffsetPercent = HB_ISNUM(4) ? hb_parni(4) : 0;
+
+   CoInitialize(NULL);
+   hb_retl( ListView_SetBkImage( hWnd, &lvbki ) );
+}
+

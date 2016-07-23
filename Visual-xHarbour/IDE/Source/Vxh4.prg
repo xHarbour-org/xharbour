@@ -1703,18 +1703,21 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
       ENDIF
 
     ELSEIF nMsg == WM_USER + 4767
-      IF ( oItem := ::GetSelected() ) != NIL .AND. ::ActiveObject:HasMessage( "Dock" ) .AND. ::ActiveObject:Dock != NIL
+      IF ( oItem := ::GetSelected() ) != NIL .AND. ::ActiveObject:HasMessage( "Dock" ) .AND. ::ActiveObject:Dock != NIL .AND. oItem:ColItems != NIL
          oItem:ColItems[1]:Value := ::ActiveObject:Dock:Margins
          ::InvalidateRect(,.F.)
       ENDIF
 
     ELSEIF nMsg == WM_USER + 4766
       IF ( oItem := ::GetSelected() ) != NIL
-         IF ::ActiveObject:HasMessage( "BackgroundImage" ) .AND. VALTYPE( ::ActiveObject:BackgroundImage ) == "O"
-            oItem:ColItems[1]:Value := ::ActiveObject:BackgroundImage:Margins
-          ELSE
-            oItem:ColItems[1]:Value := ::ActiveObject:Margins
-         ENDIF
+         TRY
+            IF ::ActiveObject:HasMessage( "BackgroundImage" ) .AND. VALTYPE( ::ActiveObject:BackgroundImage ) == "O"
+               oItem:ColItems[1]:Value := ::ActiveObject:BackgroundImage:Margins
+             ELSE
+               oItem:ColItems[1]:Value := ::ActiveObject:Margins
+            ENDIF
+         CATCH
+         END
          ::InvalidateRect(,.F.)
       ENDIF
 
@@ -2198,6 +2201,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS ObjManager
                              :ButtonAction := {|o| BrowseForFile( o, Self, IIF( oItem:Owner:Caption == "Font", ::ActiveObject:Font, ::ActiveObject ), oItem:Caption == "Icon" ) }
                           ENDIF
                         ELSEIF ::ActiveObject:ClassName == "WINDOWEDIT" .AND. oItem:Caption == "ImageName"
+                          :Button := .T.
+                          :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject:BackgroundImage, .F. ) }
+                        ELSEIF oItem:Caption == "ImageName"
                           :Button := .T.
                           :ButtonAction := {|o| BrowseForFile( o, Self, ::ActiveObject:BackgroundImage, .F. ) }
                         ELSEIF cType == "C"

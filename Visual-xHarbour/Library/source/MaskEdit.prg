@@ -413,14 +413,16 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
 
-              IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-                 bChanged := ::Parent:bChanged
-              ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-                 bChanged := ::Form:bChanged
-              ENDIF
-              IF bChanged != NIL
-                 ::CallWindowProc()
-                 Eval( bChanged, Self )
+              IF ! ::ReadOnly
+                 IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                    bChanged := ::Parent:bChanged
+                 ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                    bChanged := ::Form:bChanged
+                 ENDIF
+                 IF bChanged != NIL
+                    ::CallWindowProc()
+                    Eval( bChanged, Self )
+                 ENDIF
               ENDIF
               RETURN 0
 
@@ -488,14 +490,16 @@ METHOD OnChar( nwParam, nlParam ) CLASS MaskEdit
               ::SendMessage( EM_SETSEL, ( ::oGet:pos - 1 ) , ( ::oGet:pos - 1 ) )
               ::ScrollCaret()
 
-              IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-                 bChanged := ::Parent:bChanged
-              ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-                 bChanged := ::Form:bChanged
-              ENDIF
-              IF bChanged != NIL
-                 ::CallWindowProc()
-                 Eval( bChanged, Self )
+              IF ! ::ReadOnly
+                 IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                    bChanged := ::Parent:bChanged
+                 ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                    bChanged := ::Form:bChanged
+                 ENDIF
+                 IF bChanged != NIL
+                    ::CallWindowProc()
+                    Eval( bChanged, Self )
+                 ENDIF
               ENDIF
               RETURN 0
 

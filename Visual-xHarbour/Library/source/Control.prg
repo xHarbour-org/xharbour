@@ -269,6 +269,7 @@ METHOD Hide() CLASS Control
    ENDIF
    IF ::hWnd != NIL
       ShowWindow( ::hWnd, SW_HIDE )
+      ::UpdateWindow()
    ENDIF
    IF ::LeftSplitter != NIL
       ::LeftSplitter:Hide()
@@ -301,6 +302,7 @@ METHOD Show( nShow ) CLASS Control
 
    IF ::hWnd != NIL
       ShowWindow( ::hWnd, IIF( ! ::DesignMode, nShow, SW_SHOW ) )
+      ::UpdateWindow()
    ENDIF
    IF ::LeftSplitter != NIL
       ::LeftSplitter:Show()
@@ -612,6 +614,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
    ENDIF
    IF ::__nCaptionHeight > 0
       hdc := GetWindowDC( ::hWnd )
+
       IF ::ExStyle & WS_EX_CLIENTEDGE == WS_EX_CLIENTEDGE
          n += 2
       ENDIF
@@ -620,12 +623,22 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ENDIF
       ::__aCaptionRect := { n, n, ::xWidth - n, ::__nCaptionHeight + n + IIF( ::Style & WS_BORDER == WS_BORDER, 1, 0 ) }
 
-      hOldPen   := SelectObject( hDC, ::ColorScheme:Pen:TitleBackColorActive )
-      hOldBrush := SelectObject( hDC, IIF( ! ::__lActive, ::ColorScheme:Brush:TitleBackColorInactive, ::ColorScheme:Brush:TitleBackColorActive ) )
+      IF ::BorderColor != NIL .AND. ::BorderColor <> 0
+         hOldBrush := CreateSolidBrush( ::BorderColor )
+         _FillRect( hDC, ::__aCaptionRect, hOldBrush )
+      ELSE
+         hOldPen   := SelectObject( hDC, ::ColorScheme:Pen:TitleBackColorActive )
+         hOldBrush := SelectObject( hDC, IIF( ! ::__lActive, ::ColorScheme:Brush:TitleBackColorInactive, ::ColorScheme:Brush:TitleBackColorActive ) )
+         Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
+      ENDIF
 
-      Rectangle( hDC, ::__aCaptionRect[1], ::__aCaptionRect[2], ::__aCaptionRect[3], ::__aCaptionRect[4] )
-      SelectObject( hDC, hOldBrush )
-      SelectObject( hDC, hOldPen )
+      IF ::BorderColor != NIL .AND. ::BorderColor <> 0
+         DeleteObject( hOldBrush )
+      ELSE
+         SelectObject( hDC, hOldBrush )
+         SelectObject( hDC, hOldPen )
+      ENDIF
+
 
       SetTextColor( hDC, IIF( ! ::__lActive, ::System:Color:White, ::System:Color:Black ) )
 

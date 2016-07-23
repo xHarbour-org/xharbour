@@ -1125,13 +1125,15 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
          CASE VK_DELETE
             ::CallWindowProc()
             ::__UpdateDataGrid()
-            IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-               bChanged := ::Parent:bChanged
-            ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-               bChanged := ::Form:bChanged
-            ENDIF
-            IF bChanged != NIL
-               Eval( bChanged, Self )
+            IF ! ::ReadOnly
+               IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+                  bChanged := ::Parent:bChanged
+               ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+                  bChanged := ::Form:bChanged
+               ENDIF
+               IF bChanged != NIL
+                  Eval( bChanged, Self )
+               ENDIF
             ENDIF
             RETURN 0
 
@@ -1146,7 +1148,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
             RETURN 0
       END
 
-   ELSEIF nKey IN { VK_DELETE }
+   ELSEIF nKey IN { VK_DELETE } .AND. ! ::ReadOnly
       IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
          bChanged := ::Parent:bChanged
       ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
@@ -1172,66 +1174,74 @@ METHOD OnChar( nKey ) CLASS EditBox
       lProc := .T.
    ENDIF
 
-   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-      bChanged := ::Parent:bChanged
-   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      bChanged := ::Form:bChanged
-   ENDIF
+   IF ! ::ReadOnly
+      IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+         bChanged := ::Parent:bChanged
+      ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+         bChanged := ::Form:bChanged
+      ENDIF
 
-   IF bChanged != NIL
-      IF IsKeyDown( VK_CONTROL ) .OR. IsKeyDown( VK_MENU )
-         RETURN NIL
+      IF bChanged != NIL
+         IF IsKeyDown( VK_CONTROL ) .OR. IsKeyDown( VK_MENU )
+            RETURN NIL
+         ENDIF
+         IF ! lProc
+            ::CallWindowProc()
+            lProc := .T.
+         ENDIF
+         Eval( bChanged, Self )
       ENDIF
-      IF ! lProc
-         ::CallWindowProc()
-         lProc := .T.
-      ENDIF
-      Eval( bChanged, Self )
    ENDIF
 RETURN IIF( lProc, 0, NIL )
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnUndo() CLASS EditBox
    LOCAL bChanged
-   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-      bChanged := ::Parent:bChanged
-   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      bChanged := ::Form:bChanged
-   ENDIF
-   IF bChanged != NIL
-      ::CallWindowProc()
-      Eval( bChanged, Self )
-      RETURN 0
+   IF ! ::ReadOnly
+      IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+         bChanged := ::Parent:bChanged
+      ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+         bChanged := ::Form:bChanged
+      ENDIF
+      IF bChanged != NIL
+         ::CallWindowProc()
+         Eval( bChanged, Self )
+         RETURN 0
+      ENDIF
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnPaste() CLASS EditBox
    LOCAL bChanged
-   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-      bChanged := ::Parent:bChanged
-   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      bChanged := ::Form:bChanged
-   ENDIF
-   IF bChanged != NIL
-      ::CallWindowProc()
-      Eval( bChanged, Self )
-      RETURN 0
+   IF ! ::ReadOnly
+      IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+         bChanged := ::Parent:bChanged
+      ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+         bChanged := ::Form:bChanged
+      ENDIF
+      IF bChanged != NIL
+         ::CallWindowProc()
+         Eval( bChanged, Self )
+         RETURN 0
+      ENDIF
    ENDIF
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnCut() CLASS EditBox
    LOCAL bChanged
-   IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
-      bChanged := ::Parent:bChanged
-   ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
-      bChanged := ::Form:bChanged
-   ENDIF
-   IF bChanged != NIL
-      ::CallWindowProc()
-      Eval( bChanged, Self )
-      RETURN 0
+   IF ! ::ReadOnly
+      IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
+         bChanged := ::Parent:bChanged
+      ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL
+         bChanged := ::Form:bChanged
+      ENDIF
+      IF bChanged != NIL
+         ::CallWindowProc()
+         Eval( bChanged, Self )
+         RETURN 0
+      ENDIF
    ENDIF
 RETURN NIL
 

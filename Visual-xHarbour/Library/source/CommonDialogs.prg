@@ -218,6 +218,10 @@ METHOD Show() CLASS OpenFileDialog
          ::FileName := hb_aTokens( ofn:lpstrFile, CHR(0) )
          ADEL( ::FileName, LEN(::FileName), .T. )
          ADEL( ::FileName, LEN(::FileName), .T. )
+         IF LEN( ::FileName ) == 1
+            AADD( ::FileName, SubStr( ::FileName[1], RAT( "\", ::FileName[1] ) + 1 ) )
+            ::FileName[1] := SubStr( ::FileName[1], 1, RAT( "\", ::FileName[1] ) - 1 )
+         ENDIF
        ELSE
          ::FileName := Left( ofn:lpstrFile, At( Chr(0), ofn:lpstrFile ) - 1 )
       ENDIF

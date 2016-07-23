@@ -165,61 +165,61 @@
 
   //====== WM_NOTIFY codes (NMHDR.code values) ==================================
 
-  #define NM_FIRST                (0U-  0U)       // generic to all controls
-  #define NM_LAST                 (0U- 99U)
+  #define NM_FIRST                (0-  0)       // generic to all controls
+  #define NM_LAST                 (0- 99)
 
-  #define LVN_FIRST               (0U-100U)       // listview
-  #define LVN_LAST                (0U-199U)
+  #define LVN_FIRST               (0-100)       // listview
+  #define LVN_LAST                (0-199)
 
-  // Property sheet reserved      (0U-200U) -  (0U-299U) - see prsht.h
+  // Property sheet reserved      (0-200) -  (0U-299U) - see prsht.h
 
-  #define HDN_FIRST               (0U-300U)       // header
-  #define HDN_LAST                (0U-399U)
+  #define HDN_FIRST               (0-300)       // header
+  #define HDN_LAST                (0-399)
 
-  #define TVN_FIRST               (0U-400U)       // treeview
-  #define TVN_LAST                (0U-499U)
+  #define TVN_FIRST               (0-400)       // treeview
+  #define TVN_LAST                (0-499)
 
-  #define TTN_FIRST               (0U-520U)       // tooltips
-  #define TTN_LAST                (0U-549U)
+  #define TTN_FIRST               (0-520)       // tooltips
+  #define TTN_LAST                (0-549)
 
-  #define TCN_FIRST               (0U-550U)       // tab control
-  #define TCN_LAST                (0U-580U)
+  #define TCN_FIRST               (0-550)       // tab control
+  #define TCN_LAST                (0-580)
 
-  // Shell reserved               (0U-580U) -  (0U-589U)
+  // Shell reserved               (0-580) -  (0U-589U)
 
-  #define CDN_FIRST               (0U-601U)       // common dialog (new)
-  #define CDN_LAST                (0U-699U)
+  #define CDN_FIRST               (0-601)       // common dialog (new)
+  #define CDN_LAST                (0-699)
 
-  #define TBN_FIRST               (0U-700U)       // toolbar
-  #define TBN_LAST                (0U-720U)
+  #define TBN_FIRST               (0-700)       // toolbar
+  #define TBN_LAST                (0-720)
 
-  #define UDN_FIRST               (0U-721)        // updown
-  #define UDN_LAST                (0U-740)
-  #define MCN_FIRST               (0U-750U)       // monthcal
-  #define MCN_LAST                (0U-759U)
+  #define UDN_FIRST               (0-721        // updown
+  #define UDN_LAST                (0-740
+  #define MCN_FIRST               (0-750)       // monthcal
+  #define MCN_LAST                (0-759)
 
-  #define DTN_FIRST               (0U-760U)       // datetimepick
-  #define DTN_LAST                (0U-799U)
+  #define DTN_FIRST               (0-760)       // datetimepick
+  #define DTN_LAST                (0-799)
 
-  #define CBEN_FIRST              (0U-800U)       // combo box ex
-  #define CBEN_LAST               (0U-830U)
+  #define CBEN_FIRST              (0-800)       // combo box ex
+  #define CBEN_LAST               (0-830)
 
-  #define RBN_FIRST               (0U-831U)       // rebar
-  #define RBN_LAST                (0U-859U)
+  #define RBN_FIRST               (0-831)       // rebar
+  #define RBN_LAST                (0-859)
 
-  #define IPN_FIRST               (0U-860U)       // internet address
-  #define IPN_LAST                (0U-879U)       // internet address
+  #define IPN_FIRST               (0-860)       // internet address
+  #define IPN_LAST                (0-879)       // internet address
 
-  #define SBN_FIRST               (0U-880U)       // status bar
-  #define SBN_LAST                (0U-899U)
+  #define SBN_FIRST               (0-880)       // status bar
+  #define SBN_LAST                (0-899)
 
-  #define PGN_FIRST               (0U-900U)       // Pager Control
-  #define PGN_LAST                (0U-950U)
+  #define PGN_FIRST               (0-900)       // Pager Control
+  #define PGN_LAST                (0-950)
 
 
   #ifndef WMN_FIRST
-    #define WMN_FIRST               (0U-1000U)
-    #define WMN_LAST                (0U-1200U)
+    #define WMN_FIRST               (0-1000)
+    #define WMN_LAST                (0-1200)
   #endif
 
   #define MSGF_COMMCTRL_BEGINDRAG      16896

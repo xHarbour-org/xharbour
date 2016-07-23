@@ -29,11 +29,10 @@ CLASS Panel FROM TitleControl
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnLButtonUp() INLINE IIF( HGetPos( ::EventHandler, "OnClick" ) != 0, ::Form:&( ::EventHandler[ "OnClick" ] )( Self ), )
-
    METHOD OnEraseBkGnd()
    METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
    METHOD __CreateBkBrush()
+   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------

@@ -153,7 +153,7 @@ CLASS DataTable INHERIT Component
    METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
    METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()
    METHOD Skip( n )                           INLINE ::Connector:Skip( n )
-   METHOD Close(lNotify)                      INLINE ::Connector:Close(), ::DestroyFields(),;
+   METHOD Close(lNotify)                      INLINE IIF( ::Connector != NIL, ::Connector:Close(),), ::DestroyFields(),;
                                                                                       ::Connector := NIL,;
                                                                                       ::Structure := NIL,;
                                                                                       ::Fields := NIL,;
@@ -254,9 +254,11 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SavePos() CLASS DataTable
-   ::__aSavedPos := Array(2)
+   ::__aSavedPos := Array(4)
    ::__aSavedPos[1] := ::OrdSetFocus()
    ::__aSavedPos[2] := ::Recno()
+   ::__aSavedPos[3] := (::Area)->( OrdScope( TOPSCOPE ) )
+   ::__aSavedPos[4] := (::Area)->( OrdScope( BOTTOMSCOPE ) )
 RETURN ::__aSavedPos
 
 //-------------------------------------------------------------------------------------------------------
@@ -264,6 +266,8 @@ METHOD RestPos( aSavedPos ) CLASS DataTable
    DEFAULT aSavedPos TO ::__aSavedPos
    IF aSavedPos != NIL
       ::OrdSetFocus( aSavedPos[1] )
+      (::Area)->( OrdScope( TOPSCOPE, ::__aSavedPos[3] ) )
+      (::Area)->( OrdScope( BOTTOMSCOPE, ::__aSavedPos[4] ) )
       ::Goto( aSavedPos[2] )
       ::__aSavedPos := NIL
    ENDIF
@@ -341,7 +345,7 @@ METHOD Save() CLASS DataTable
    IF ::__lNew
       (::Area)->( dbAppend() )
    ELSEIF ::Shared
-      WHILE ! ::RecLock()
+      WHILE ! (::Area)->( RLock() )
          sleep(1000)
       ENDDO
    ENDIF

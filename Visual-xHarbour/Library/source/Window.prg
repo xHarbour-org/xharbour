@@ -18,6 +18,9 @@
 #include "uxTheme.ch"
 #include "dbinfo.ch"
 
+#define HH_HELP_CONTEXT         15
+#define SC_HELP        61824
+
 #define ETDT_DISABLE        0x00000001
 #define ETDT_ENABLE         0x00000002
 #define ETDT_USETABTEXTURE  0x00000004
@@ -180,7 +183,7 @@ CLASS Window INHERIT Object
    PROPERTY Text                          SET ::SetWindowText(v)                   DEFAULT ""
    PROPERTY Font
    PROPERTY ToolTip
-
+   PROPERTY HelpID        ROOT "Help" DEFAULT 0
    PROPERTY AllowDrop                                                              DEFAULT .F. HELP "Enables accepting dropped files from the file system"
 
    METHOD MessageWait()
@@ -266,7 +269,6 @@ CLASS Window INHERIT Object
 
    DATA Active                 EXPORTED  INIT .F.
    DATA DeferRedraw            EXPORTED  INIT .T.
-   DATA HelpId                 EXPORTED
    DATA IsContainer            EXPORTED  INIT .T.
    DATA TabValidate            EXPORTED  INIT .T.
 
@@ -1211,14 +1213,6 @@ METHOD RegisterDocking() CLASS Window
       ENDIF
    ENDIF
 RETURN Self
-
-FUNCTION __MainCallBack( hWnd, nMsg, nwParam, nlParam )
-   LOCAL oWnd
-   oWnd := ObjFromHandle( hWnd )
-   IF oWnd != NIL
-      RETURN oWnd:__ControlProc( hWnd, nMsg, nwParam, nlParam )
-   ENDIF
-RETURN DefWindowProc( hWnd, nMsg, nwParam, nlParam )
 
 //-------------------------------------------------------------------------------------------------
 METHOD __SubClass() CLASS Window
@@ -2191,6 +2185,10 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
          CASE WM_HELP
               nRet := ExecuteEvent( "OnHelp", Self )
+              IF nRet == NIL .AND. ::HelpID > 0 .AND. File( ::Application:Path + "\" + ::Application:Name + ".chm" )
+                 HTMLHelp( 0, ::Application:Path + "\" + ::Application:Name + ".chm", HH_HELP_CONTEXT, ::HelpID )
+                 RETURN .T.
+              ENDIF
               EXIT
 
          CASE WM_HOTKEY
@@ -2406,28 +2404,35 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_SYSCOMMAND
-              IF ::ClsName != "DataGrid"
-                 FOR EACH oChild IN ::Children
-
-                     nRet := ExecuteEvent( "OnParentSysCommand", oChild )
-                     TRY
-                        ODEFAULT nRet TO oChild:OnParentSysCommand( nwParam, nlParam )
-                      catch
-                     END
-                     IF nRet != NIL
-                        RETURN nRet
-                     ENDIF
-                 NEXT
-              ENDIF
-              nRet := ExecuteEvent( "OnSysCommand", Self )
-              ODEFAULT nRet TO ::OnSysCommand( nwParam, nlParam )
-              ODEFAULT nRet TO __Evaluate( ::OnWMSysCommand,  Self, nwParam, nlParam, nRet )
-
-              IF nwParam != SC_CLOSE
-                 IF nwParam == SC_MINIMIZE
-                    ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
+              IF nwParam == SC_HELP
+                 IF ::HelpID > 0 .AND. File( ::Application:Path + "\" + ::Application:Name + ".chm" )
+                    HTMLHelp( 0, ::Application:Path + "\" + ::Application:Name + ".chm", HH_HELP_CONTEXT, ::HelpID )
+                    RETURN .F.
                  ENDIF
-                 ::PostMessage( WM_VXH_SHOWMODE )
+              ELSE
+                 IF ::ClsName != "DataGrid"
+                    FOR EACH oChild IN ::Children
+
+                        nRet := ExecuteEvent( "OnParentSysCommand", oChild )
+                        TRY
+                           ODEFAULT nRet TO oChild:OnParentSysCommand( nwParam, nlParam )
+                         catch
+                        END
+                        IF nRet != NIL
+                           RETURN nRet
+                        ENDIF
+                    NEXT
+                 ENDIF
+                 nRet := ExecuteEvent( "OnSysCommand", Self )
+                 ODEFAULT nRet TO ::OnSysCommand( nwParam, nlParam )
+                 ODEFAULT nRet TO __Evaluate( ::OnWMSysCommand,  Self, nwParam, nlParam, nRet )
+
+                 IF nwParam != SC_CLOSE
+                    IF nwParam == SC_MINIMIZE
+                       ::__aMinRect := {::xLeft,::xTop,::xWidth,::xHeight}
+                    ENDIF
+                    ::PostMessage( WM_VXH_SHOWMODE )
+                 ENDIF
               ENDIF
               EXIT
 
@@ -4420,6 +4425,8 @@ CLASS WinForm INHERIT Window
    PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F.
    PROPERTY Center               SET ::CenterWindow(v)                     DEFAULT .F.
    PROPERTY VertScrollTopMargin  DEFAULT 0
+
+   PROPERTY HelpBox              ROOT "Help" SET ::SetExStyle( WS_EX_CONTEXTHELP, v )       DEFAULT .F.
 
    //compatibility ONLY, forms do not set "Border" property
    ACCESS TopMost              INLINE ::AlwaysOnTop

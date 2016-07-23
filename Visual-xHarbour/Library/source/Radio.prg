@@ -67,7 +67,6 @@ CLASS RadioButton INHERIT Control
    METHOD SetState(nState)     INLINE ::SendMessage( BM_SETCHECK, nState, 0 )
    METHOD __SetInitialState()
    METHOD OnCtlColorStatic()
-   //METHOD __SetTransp(lSet)    INLINE IIF( lSet, ::Parent:__RegisterTransparentControl( Self ), ::Parent:__UnregisterTransparentControl( Self ) )
 ENDCLASS
 
 METHOD Init( oParent ) CLASS RadioButton

@@ -3,6 +3,12 @@
 #include "commctrl.ch"
 #include "wingdi.ch"
 
+#ifndef __XHARBOUR__
+  #define PUBLISHED PERSISTENT
+  #define XHB_BITOP
+  #include "hbcompat.ch"
+#endif
+
 #define ALIGN_DEFAULT   0
 #define ALIGN_LEFT      1
 #define ALIGN_CENTER    2

@@ -166,7 +166,7 @@ CLASS FreeImageRenderer
    METHOD LoadFromString()
    METHOD Destroy()            INLINE ::Kill(), ::Owner := NIL,NIL
    METHOD SetMargins()
-
+   METHOD ValidImage()         INLINE ::hDIB != NIL
    METHOD Reload()             INLINE ::LoadFromString( ::__cData ), ::InvalidateRect()
    METHOD Rescale()
 ENDCLASS

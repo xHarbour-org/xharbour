@@ -5811,14 +5811,16 @@ METHOD GenerateForm( oWnd, cPrefix, cClsName, nID, aChildEvents, nInsMetPos, lCu
    cText += "METHOD Init( oParent, aParameters ) CLASS "+cPrefix+STRTRAN( oWnd:Name, " ", "_" ) + CRLF
    cText += "   ::Super:Init( oParent, aParameters )" + CRLF + CRLF
 
-   FOR EACH Topic IN oWnd:Events
-       FOR EACH Event IN Topic[2]
-           IF ! EMPTY( Event[2] )
-               cText += SPACE( 3 ) + "::EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
-           ENDIF
-       NEXT
-   NEXT
-
+   TRY
+      FOR EACH Topic IN oWnd:Events
+          FOR EACH Event IN Topic[2]
+              IF ! EMPTY( Event[2] )
+                  cText += SPACE( 3 ) + "::EventHandler[ " + ValToPrgExp( Event[1] )+ " ] := " + ValToPrgExp( Event[2] ) + CRLF
+              ENDIF
+          NEXT
+      NEXT
+   CATCH
+   END
    cText += CRLF
    cText += "   // Populate Components" + CRLF
 

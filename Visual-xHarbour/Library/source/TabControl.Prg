@@ -782,6 +782,8 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
               ENDIF
               ExecuteEvent( "OnTabChanged", Self )
 
+              ExecuteEvent( "OnSelected", oCurPage )
+
               IF ::__xCtrlName == "TabStrip"
                  ::Redraw()
                  ::UpdateWindow()
@@ -979,6 +981,7 @@ METHOD Init( oParent, acResource ) CLASS TabPage
       ::Events := ;
              { ;
                {"Command",     {;
+                               { "OnSelected"         , "", "" },;
                                { "OnParentCommand"    , "", "" },;
                                { "OnSysCommand"       , "", "" },;
                                { "OnToolTipNotify"    , "", "" } } },;
@@ -1027,6 +1030,8 @@ METHOD Init( oParent, acResource ) CLASS TabPage
                                { "OnVertScroll"       , "", "" } } },;
                {"Timer",       {;
                                { "OnTimer"            , "", "" } } },;
+               {"User",        {;
+                               { "OnUserMsg"          , "", "" } } },;
                {"Window",      {;
                                { "OnActivate"         , "", "" },;
                                { "OnCreate"           , "", "" },;
@@ -1405,6 +1410,7 @@ METHOD Select() CLASS TabPage
    ::Parent:SetCurSel( ::__GetPosition() )
    ::__OnParentSize( ::ClientWidth, ::ClientHeight )
    ::Parent:Redraw()
+   ExecuteEvent( "OnSelected", Self )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -1444,10 +1450,9 @@ METHOD __Show() CLASS TabPage
           ENDIF
        ENDIF
    NEXT
-
    ::Application:DoEvents()
 
-   oCur:Select()
+   //oCur:Select()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

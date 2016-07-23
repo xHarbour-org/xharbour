@@ -47,6 +47,7 @@ static nButWidth
 #include "vxh.ch"
 //#include "Structures.ch"
 //#define CR CHR(13)
+
 #define SM_CXSHADOW 4
 #ifndef SPI_GETDROPSHADOW
    #define SPI_GETDROPSHADOW   0x1024
@@ -66,8 +67,8 @@ static nButWidth
 #define EXCEPTION_CONTINUE_SEARCH  0
 #define EXCEPTION_CONTINUE_EXECUTION  (-1)
 
-#define STANDARD_RIGHTS_REQUIRED  0x000F0000L
-#define SYNCHRONIZE               0x00100000L
+#define STANDARD_RIGHTS_REQUIRED  0x000F0000
+#define SYNCHRONIZE               0x00100000
 #define MUTANT_QUERY_STATE        0x0001
 
 #define MUTANT_ALL_ACCESS  (STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE|MUTANT_QUERY_STATE)
@@ -100,7 +101,7 @@ INIT PROCEDURE __GPFCatch
 RETURN
 
 FUNCTION GPFCatch( oExceptionInfo )
-   LOCAL err := errorNew()
+   LOCAL nCode, err := errorNew()
    LOCAL __cGpfError := ""
    TRY
       __cGpfError := " " + Substr( GetModuleFileName(Application:DllInstance), Rat( "\", GetModuleFileName(Application:DllInstance) ) + 1 )
@@ -109,107 +110,86 @@ FUNCTION GPFCatch( oExceptionInfo )
    END
    __cGpfError += " has encountered a technical problem, and needs to close." + CRLF + CRLF
 
-   SWITCH oExceptionInfo:ExceptionRecord:ExceptionCode
-      CASE EXCEPTION_ACCESS_VIOLATION
+   nCode := oExceptionInfo:ExceptionRecord:ExceptionCode
+   DO CASE
+      CASE nCode == EXCEPTION_ACCESS_VIOLATION
          __cGpfError += " The thread tried to read from or write to a virtual address for which it does not have the appropriate" + CRLF +;
                         " access."
-         EXIT
 
-      CASE EXCEPTION_ARRAY_BOUNDS_EXCEEDED
+      CASE nCode == EXCEPTION_ARRAY_BOUNDS_EXCEEDED
          __cGpfError += " The thread tried to access an array element that is out of bounds and the underlying hardware supports" + CRLF +;
                         " bounds checking."
-         EXIT
 
-      CASE EXCEPTION_BREAKPOINT
+      CASE nCode == EXCEPTION_BREAKPOINT
          __cGpfError += " A breakpoint was encountered."
-         EXIT
 
-      CASE EXCEPTION_DATATYPE_MISALIGNMENT
+      CASE nCode == EXCEPTION_DATATYPE_MISALIGNMENT
          __cGpfError += " The thread tried to read or write data that is misaligned on hardware that does not provide alignment." + CRLF + ;
                         " For example, 16-bit values must be aligned on 2-byte boundaries; 32-bit values on 4-byte boundaries," + CRLF +;
                         " and so on."
-         EXIT
 
-      CASE EXCEPTION_FLT_DENORMAL_OPERAND
+      CASE nCode == EXCEPTION_FLT_DENORMAL_OPERAND
          __cGpfError += " One of the operands in a floating-point operation is denormal." + CRLF + ;
                         " A denormal value is one that is too small to represent as a standard floating-point value."
-         EXIT
 
-      CASE EXCEPTION_FLT_DIVIDE_BY_ZERO
+      CASE nCode == EXCEPTION_FLT_DIVIDE_BY_ZERO
          __cGpfError += " The thread tried to divide a floating-point value by a floating-point divisor of zero."
-         EXIT
 
-      CASE EXCEPTION_FLT_INEXACT_RESULT
+      CASE nCode == EXCEPTION_FLT_INEXACT_RESULT
          __cGpfError += " The result of a floating-point operation cannot be represented exactly as a decimal fraction."
-         EXIT
 
-      CASE EXCEPTION_FLT_INVALID_OPERATION
+      CASE nCode == EXCEPTION_FLT_INVALID_OPERATION
          __cGpfError += " This exception represents any floating-point exception not included in this list."
-         EXIT
 
-      CASE EXCEPTION_FLT_OVERFLOW
+      CASE nCode == EXCEPTION_FLT_OVERFLOW
          __cGpfError += " The exponent of a floating-point operation is greater than the magnitude allowed by the corresponding" + CRLF +;
                         " type."
-         EXIT
 
-      CASE EXCEPTION_FLT_STACK_CHECK
+      CASE nCode == EXCEPTION_FLT_STACK_CHECK
          __cGpfError += " The stack overflowed or underflowed as the result of a floating-point operation."
-         EXIT
 
-      CASE EXCEPTION_FLT_UNDERFLOW
+      CASE nCode == EXCEPTION_FLT_UNDERFLOW
          __cGpfError += " The exponent of a floating-point operation is less than the magnitude allowed by the corresponding type."
-         EXIT
 
-      CASE EXCEPTION_ILLEGAL_INSTRUCTION
+      CASE nCode == EXCEPTION_ILLEGAL_INSTRUCTION
          __cGpfError += " The thread tried to execute an invalid instruction."
-         EXIT
 
-      CASE EXCEPTION_IN_PAGE_ERROR
+      CASE nCode == EXCEPTION_IN_PAGE_ERROR
          __cGpfError += " The thread tried to access a page that was not present, and the system was unable to load the page." + CRLF + ;
                         " For example, this exception might occur if a network connection is lost while running a program over" + CRLF +;
                         " the network."
-         EXIT
 
-      CASE EXCEPTION_INT_DIVIDE_BY_ZERO
+      CASE nCode == EXCEPTION_INT_DIVIDE_BY_ZERO
          __cGpfError += " The thread tried to divide an integer value by an integer divisor of zero."
-         EXIT
 
-      CASE EXCEPTION_INT_OVERFLOW
+      CASE nCode == EXCEPTION_INT_OVERFLOW
          __cGpfError += " The result of an integer operation caused a carry out of the most significant bit of the result."
-         EXIT
 
-      CASE EXCEPTION_INVALID_DISPOSITION
+      CASE nCode == EXCEPTION_INVALID_DISPOSITION
          __cGpfError += " An exception handler returned an invalid disposition to the exception dispatcher." + CRLF + ;
                         " Programmers using a high-level language such as C should never encounter this exception."
-         EXIT
 
-      CASE EXCEPTION_NONCONTINUABLE_EXCEPTION
+      CASE nCode == EXCEPTION_NONCONTINUABLE_EXCEPTION
          __cGpfError += " The thread tried to continue execution after a noncontinuable exception occurred."
-         EXIT
 
-      CASE EXCEPTION_PRIV_INSTRUCTION
+      CASE nCode == EXCEPTION_PRIV_INSTRUCTION
          __cGpfError += " The thread tried to execute an instruction whose operation is not allowed in the current machine mode."
-         EXIT
 
-      CASE EXCEPTION_SINGLE_STEP
+      CASE nCode == EXCEPTION_SINGLE_STEP
          __cGpfError += " A trace trap or other single-instruction mechanism signaled that one instruction has been executed"
-         EXIT
 
-      CASE EXCEPTION_STACK_OVERFLOW
+      CASE nCode == EXCEPTION_STACK_OVERFLOW
          __cGpfError += " The thread used up its stack"
-         EXIT
 
-      CASE EXCEPTION_GUARD_PAGE
+      CASE nCode == EXCEPTION_GUARD_PAGE
          __cGpfError += " Guard page"
-         EXIT
 
-      CASE EXCEPTION_INVALID_HANDLE
+      CASE nCode == EXCEPTION_INVALID_HANDLE
          __cGpfError += " Invalid handle"
-         EXIT
 
-      DEFAULT
+      OTHERWISE
          __cGpfError += " Unknown exception error " + XSTR( oExceptionInfo:ExceptionRecord:ExceptionCode )
-   END
+   ENDCASE
 
    err:cargo       := __cGpfError
    err:description := "GENERAL PROTECTION FAULT"
@@ -525,7 +505,7 @@ METHOD SaveResource( ncRes, cFileName ) CLASS Application
    ENDIF
 
    IF ::Resources[n][2] == "BMP"
-      hBmp := LoadImage( ::Instance, ::Resources[n][1], IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE )
+      hBmp := LoadImage( ::Instance, ::Resources[n][1], IMAGE_BITMAP, 0, 0, ( LR_DEFAULTCOLOR | LR_DEFAULTSIZE ) )
       CreateBMPFile( hBmp, cFileName )
       lRet := FILE( cFileName )
     ELSE
@@ -781,7 +761,7 @@ METHOD Init( cMsg, cCaption, aChoices, nIcon, nDefault ) CLASS __AlertDlg
    hWnd    := GetFocus()
 
    Super:Init( Application:MainForm )
-   ::Style    := DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION
+   ::Style    := ( DS_MODALFRAME | WS_VISIBLE | WS_POPUP | DS_SETFONT | WS_CAPTION )
    ::ExStyle  := IIF( cCaption == NIL, WS_EX_TOOLWINDOW, 0 )
    ::Caption  := cCaption
    ::Message  := cMsg
@@ -800,7 +780,7 @@ METHOD OnInitDialog() CLASS __AlertDlg
    n := 15
    IF ::_Icon != NIL
       o := Label( Self )
-      o:Style   := SS_ICON | WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+      o:Style   := ( SS_ICON | WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
       o:Left    := 15
       o:Top     := 15
       o:Width   := 40
@@ -811,7 +791,7 @@ METHOD OnInitDialog() CLASS __AlertDlg
    ENDIF
 
    o := Label( Self )
-   o:Style   := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   o:Style   := ( WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
    o:Caption := ::Message
    o:Left    := n
    o:Top     := 15
@@ -1310,7 +1290,7 @@ FUNCTION ErrDialog( e, aChoices, aStack, cProcStack )
    ENDIF
    __cGpfError := e:cargo
 
-   dt:style           := WS_POPUP | DS_SETFONT | WS_CAPTION | DS_SYSMODAL
+   dt:style           := ( WS_POPUP | DS_SETFONT | WS_CAPTION | DS_SYSMODAL )
    dt:dwExtendedStyle := 0
    dt:x               := 0
    dt:y               := 0
@@ -1343,7 +1323,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
 
    SWITCH nMsg
       CASE WM_INITDIALOG
-           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
+           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, ( SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE ) )
 
            cText := Substr( GetModuleFileName(Application:DllInstance), Rat( "\", GetModuleFileName(Application:DllInstance) ) + 1 )
            cText := Left( cText, Rat("." ,cText )-1 )
@@ -1354,11 +1334,11 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            GetClientRect( hWnd, @rc )
 
            IF __cGpfError != NIL
-              hGpf := CreateWindowEx( WS_EX_TRANSPARENT, "static", __cGpfError, WS_CHILD | WS_VISIBLE | SS_SUNKEN, 5, 5, rc:right - 10, __nGpfHeight - 2, hWnd, 10, Application:Instance )
+              hGpf := CreateWindowEx( WS_EX_TRANSPARENT, "static", __cGpfError, ( WS_CHILD | WS_VISIBLE | SS_SUNKEN ), 5, 5, rc:right - 10, __nGpfHeight - 2, hWnd, 10, Application:Instance )
               SendMessage( hGpf, WM_SETFONT, __hErrorFontBold, MAKELPARAM( 1, 0 ) )
            ENDIF
 
-           hCtrl := CreateWindowEx( WS_EX_TRANSPARENT, "static", "", WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_SIMPLE | SS_SUNKEN, 5, 5+__nGpfHeight, rc:right - 10, rc:bottom - 55 - __nGpfHeight, hWnd, 101, Application:Instance )
+           hCtrl := CreateWindowEx( WS_EX_TRANSPARENT, "static", "", ( WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_SIMPLE | SS_SUNKEN ), 5, 5+__nGpfHeight, rc:right - 10, rc:bottom - 55 - __nGpfHeight, hWnd, 101, Application:Instance )
            SendMessage( hCtrl, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
 
            cCaption := "Arguments"      + CRLF +;
@@ -1373,7 +1353,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
                        "Current Alias"  + CRLF +;
                        "DOS Error"      + CRLF +;
                        "Windows Error"
-           hCtrl := CreateWindowEx( 0, "static", cCaption, WS_CHILD | WS_VISIBLE | SS_NOTIFY, 10, 8+__nGpfHeight, 100, rc:bottom - 60, hWnd, 102, Application:Instance )
+           hCtrl := CreateWindowEx( 0, "static", cCaption, ( WS_CHILD | WS_VISIBLE | SS_NOTIFY ), 10, 8+__nGpfHeight, 100, rc:bottom - 60, hWnd, 102, Application:Instance )
            SendMessage( hCtrl, WM_SETFONT, __hErrorFontBold, MAKELPARAM( 1, 0 ) )
 
 
@@ -1407,7 +1387,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
            nTop := 8+__nGpfHeight
            nWidth := rc:right - 112
            FOR n := 1 TO LEN( aLabels )
-               hCtrl := CreateWindowEx( 0, "static", aCaptions[n], WS_CHILD | WS_VISIBLE | SS_NOTIFY, 112, nTop, nWidth, 13, hWnd, 102+n, Application:Instance )
+               hCtrl := CreateWindowEx( 0, "static", aCaptions[n], ( WS_CHILD | WS_VISIBLE | SS_NOTIFY ), 112, nTop, nWidth, 13, hWnd, 102+n, Application:Instance )
                SendMessage( hCtrl, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
                nTop += 13
            NEXT
@@ -1417,18 +1397,18 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
 
            n := 1
            FOR EACH cOpt IN __aErrorOptions
-               hCtrl := CreateWindowEx( 0, "button", cOpt, WS_CHILD | WS_VISIBLE | WS_TABSTOP, nLeft, rc:bottom - 45, nWidth - 4, 25, hWnd, n, Application:Instance )
+               hCtrl := CreateWindowEx( 0, "button", cOpt, ( WS_CHILD | WS_VISIBLE | WS_TABSTOP ), nLeft, rc:bottom - 45, nWidth - 4, 25, hWnd, n, Application:Instance )
                SendMessage( hCtrl, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
                nLeft += nWidth
                n ++
            NEXT
 
-           hStk := CreateWindowEx( 0, "button", "Stack >>", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW, 2, rc:bottom - 17,  rc:right - 4, 15, hWnd, 201, Application:Instance )
+           hStk := CreateWindowEx( 0, "button", "Stack >>", ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW ), 2, rc:bottom - 17,  rc:right - 4, 15, hWnd, 201, Application:Instance )
            SendMessage( hStk, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
            SetWindowTheme( hStk, NIL, NIL )
 
            nTop := rc:bottom - 17
-           hLst := CreateWindowEx( WS_EX_CLIENTEDGE, "listbox", "", WS_CHILD | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL, 5, nTop, rc:right - 10, 200, hWnd, 202, Application:Instance )
+           hLst := CreateWindowEx( WS_EX_CLIENTEDGE, "listbox", "", ( WS_CHILD | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL ), 5, nTop, rc:right - 10, 200, hWnd, 202, Application:Instance )
            SendMessage( hLst, WM_SETFONT, __hErrorFont, MAKELPARAM( 1, 0 ) )
 
            FOR EACH cText IN __aErrorStack
@@ -1497,7 +1477,7 @@ FUNCTION __ErrorDlgProc( hWnd, nMsg, nwParam, nlParam )
 
            IF dis:hwndItem == hStk
               GetDlgItemText( hWnd, 201, @cText )
-              lSelected := dis:itemState & ODS_SELECTED != 0
+              lSelected := ( dis:itemState & ODS_SELECTED ) != 0
               aRect     := { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }
 
               _FillRect( dis:hDC, aRect, GetSysColorBrush( COLOR_BTNFACE ) )

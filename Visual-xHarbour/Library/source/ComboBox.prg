@@ -1202,10 +1202,13 @@ FUNCTION GetObjChildren( aObj, oObj )
       FOR EACH oCtrl IN oObj:Components
           AADD( aObj, oCtrl )
       NEXT
-      FOR EACH oCtrl IN oObj:Children
-          AADD( aObj, oCtrl )
-          GetObjChildren( @aObj, oCtrl )
-      NEXT
+      TRY
+         FOR EACH oCtrl IN oObj:Children
+             AADD( aObj, oCtrl )
+             GetObjChildren( @aObj, oCtrl )
+         NEXT
+      CATCH
+      END
    ENDIF
 RETURN NIL
 

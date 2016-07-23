@@ -54,7 +54,10 @@ EXIT PROCEDURE __SystemCleanup
    IF oSystem:hTabTheme != NIL
       CloseThemeData( oSystem:hTabTheme )
    ENDIF
-   oSystem:ImageList[ "StdSmall" ]:Destroy()
+   TRY
+      oSystem:ImageList[ "StdSmall" ]:Destroy()
+   CATCH
+   END
    DeleteObject( oSystem:hFont )
    #ifdef VXH_PROFESSIONAL
       FreeExplorerBarInfo()

@@ -1,3 +1,5 @@
+//static s_hMsgHook
+
 #include "vxh.ch"
 #include "ole.ch"
 #include "debug.ch"
@@ -98,7 +100,6 @@ RETURN
 #define HKEY_LOCAL_MACHINE          0x80000002
 #define KEY_ALL_ACCESS              (0xF003F)
 
-
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,14 +153,15 @@ CLASS ActiveX INHERIT ToleAuto, TitleControl
    METHOD __GetObjProp()
 
    METHOD OnDestroy()
-   METHOD OnGetDlgCode() INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
+   METHOD OnGetDlgCode() INLINE ( DLGC_WANTMESSAGE | DLGC_WANTALLKEYS )
+   //METHOD OnDestroy()    INLINE UnhookWindowsHookEx( s_hMsgHook ), s_hMsgHook := NIL, NIL
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ActiveX
    ::Parent       := oParent
    ::ClsName      := "AtlAxWin"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
 
    IF ::Parent != NIL .AND. ::Parent:DesignMode
       __SetInitialValues( Self )
@@ -255,10 +257,14 @@ METHOD Create() CLASS ActiveX
    IF !::Visible .AND. ! ::DesignMode
       ::Hide()
    ENDIF
+   __MSGHOOKFUNC()
+   //DEFAULT s_hMsgHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__MsgHook() ), NIL, GetCurrentThreadId() )
 RETURN Self
 
 METHOD OnDestroy() CLASS ActiveX
    SetWindowLong( ::hWnd, GWL_USERDATA, 0 )
+
+   __MSGUNHOOKFUNC()
 
    IF ::oServer != NIL
       ::oServer:DisconnectEvents()
@@ -292,7 +298,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
       FOR EACH oProperty IN oObj:Properties
           cProp := oProperty:Name
 
-          IF ! cProp IN { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
+          IF ! cProp $ { "Picture", "XMLData", "HTMLData" } .AND. !__objHasMsg( ::TitleControl, UPPER( cProp ) )
              xVal  := NIL
              xVal2 := NIL
              lReadOnly := .f.
@@ -331,7 +337,7 @@ METHOD __GetObjProp( oObj ) CLASS ActiveX
                         lReadOnly := oProperty:ReadOnly
                         EXIT
                 END
-                IF ! oProperty:VT IN { VT_VOID, VT_PTR }
+                IF ! oProperty:VT $ { VT_VOID, VT_PTR }
                    DEFAULT xVal TO ::AxGet( cProp )
                 ENDIF
              catch
@@ -415,9 +421,9 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ActiveX
       lAdd := !lAdd
    ENDIF
    IF lAdd
-      ::Style := ::Style | nStyle
+      ::Style := ( ::Style | nStyle )
     ELSE
-      ::Style := ::Style & NOT( nStyle )
+      ::Style := ( ::Style & NOT( nStyle ) )
    ENDIF
    IF ::IsWindow()
       SWITCH nStyle
@@ -653,4 +659,31 @@ FUNCTION AtlForwardMessage ( _
    END IF
 
 END FUNCTION
+*/
+
+/*
+FUNCTION __MsgHook( nCode, nwParam, nlParam )
+   LOCAL hWnd, msg, nMsg, pUnk
+   IF nCode >= 0
+      msg  := (struct MSG*) nlParam
+      hWnd := msg:hwnd
+
+      IF ( msg:message == WM_KEYDOWN .OR. msg:message == WM_KEYUP ) .AND. ( msg:wParam IN { VK_BACK, VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN } )
+         nMsg := WM_KEYUP
+      ENDIF
+      IF nMsg == NIL .OR. msg:message == nMsg
+         WHILE IsWindow( hWnd )
+            IF ( pUnk := __AxGetUnknown( hWnd ) ) > 0
+               IF __AxTranslateMessage( pUnk, msg:Value )
+                  RETURN 0
+               ELSEIF msg:message == 1169
+                  SetFocus( msg:hwnd )
+                  RETURN 0
+               ENDIF
+            ENDIF
+            hWnd := GetParent( hWnd )
+         ENDDO
+      ENDIF
+   ENDIF
+RETURN CallNextHookEx( s_hMsgHook, nCode, nwParam, nlParam)
 */

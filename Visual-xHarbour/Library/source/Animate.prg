@@ -78,7 +78,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS Animation
    DEFAULT ::__xCtrlName TO "Animation"
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := ( WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
    ::ClsName   := ANIMATE_CLASS
    ::Super:Init( oParent )
    ::Width     := 40
@@ -128,7 +128,7 @@ RETURN Self
 
 METHOD Create() CLASS Animation
    IF ::DesignMode
-      ::Style := ::Style & NOT( ACS_AUTOPLAY )
+      ::Style := ( ::Style & NOT( ACS_AUTOPLAY ) )
    ENDIF
    ::Super:Create()
    IF ::ImageName != NIL .OR. ::SystemAnimation >= 0
