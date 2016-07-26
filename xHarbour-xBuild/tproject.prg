@@ -16,6 +16,11 @@ STATIC s_hEnvVars := { => }
 STATIC s_sProgramsFolder
 STATIC s_sWinSDKFolder
 
+STATIC s_sUniversalCRT_IncludePath     //$(UniversalCRT_IncludePath)
+STATIC s_sUniversalCRT_LibraryPath_x86 //$(UniversalCRT_LibraryPath_x86)
+
+// TODO: $(UniversalCRT_LibraryPath_x64)
+
 STATIC s_sxCCFolder  := ""
 STATIC s_sBCCFolder  := ""
 STATIC s_sVCFolder   := ""
@@ -536,6 +541,10 @@ METHOD C_Command() CLASS TMakeObject
       ELSE
          cCommand += '-I"' + s_sWinSDKFolder + '\include" '
       ENDIF
+      IF ! Empty( s_sUniversalCRT_IncludePath )
+         cCommand += '-I"' + s_sUniversalCRT_IncludePath + '" '
+      ENDIF
+      
       cCommand += "-nologo "
    ELSE
 //      cCommand += '-I"' + ::Project:C_RootX + 'include" '
@@ -1659,6 +1668,7 @@ CLASS TMakeProject FROM TMakeObject
                                                         ::Link_Executable + " " + ::EXE_Command(), ;
                                                         ::Project:cFile + ".log", ;
                                                         "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TEMP=" + GetEnv( "TEMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
@@ -1666,6 +1676,7 @@ CLASS TMakeProject FROM TMakeObject
                                                         ::Lib_Executable + " " + ::LIB_Command(), ;
                                                         ::Project:cFile + ".log", ;
                                                         "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TEMP=" + GetEnv( "TEMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
@@ -1673,6 +1684,7 @@ CLASS TMakeProject FROM TMakeObject
                                                         ::Lib_Executable + " " + ::IMPLIB_Command(), ;
                                                         ::Project:cFile + ".log", ;
                                                         "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TEMP=" + GetEnv( "TEMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
@@ -1680,6 +1692,7 @@ CLASS TMakeProject FROM TMakeObject
                                                         ::Link_Executable + " " + ::DLL_Command(), ;
                                                         ::Project:cFile + ".log", ;
                                                         "TMP=" + GetEnv( "TMP" ) + Chr(0) + ;
+                                                        "TEMP=" + GetEnv( "TEMP" ) + Chr(0) + ;
                                                         "PATH=" + ::Project:C_RootX + "..\Common7\Ide" + Chr(0) + ;
                                                         "SystemRoot=" + GetEnv( "SystemRoot" ) + Chr(0) ) } PROTECTED
 
@@ -3512,6 +3525,10 @@ METHOD EXE_Command CLASS TMakeProject
             cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKFolder + '\lib" '
          ENDIF
 
+         IF ! Empty( s_sUniversalCRT_LibraryPath_x86 )
+            cCommand += ::Link_LibFolderFlag + '"' + s_sUniversalCRT_LibraryPath_x86 + '" '
+         ENDIF
+         
          IF ::lMT
             ::C_Libs := StrTran( ::C_Libs, "libc.lib", "libcmt.lib" )
          ENDIF
@@ -3653,6 +3670,10 @@ METHOD DLL_Command CLASS TMakeProject
             cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKFolder + '\lib" '
          ENDIF
 
+         IF ! Empty( s_sUniversalCRT_LibraryPath_x86 )
+            cCommand += ::Link_LibFolderFlag + '"' + s_sUniversalCRT_LibraryPath_x86 + '" '
+         ENDIF
+         
          IF ::lMT
             ::C_Libs := StrTran( ::C_Libs, "libc.lib", "libcmt.lib" )
          ENDIF
@@ -4683,13 +4704,22 @@ FUNCTION RelativeToAbsolutePath( cPath, cRoot )
 RETURN cFolder
 
 INIT PROCEDURE InitTProject
+   
+   LOCAL sUniversalCRTSdkDir, sUCRTVersion
+   
    HSetCaseMatch( s_hEnvVars, .F. )
 
    #ifdef __PLATFORM__Windows
-      s_sProgramsFolder := GetEnv( "ProgramFiles" )
-
+      s_sProgramsFolder := GetEnv( "ProgramFiles(x86)" )
+      IF Empty( s_sProgramsFolder ) .OR. ( ! IsDirectory( s_sProgramsFolder ) )
+         s_sProgramsFolder := GetEnv( "ProgramFiles" )
+      ENDIF
+      
       IF Empty( s_sProgramsFolder ) .OR. ( ! IsDirectory( s_sProgramsFolder ) )
          DO CASE
+            CASE IsDirectory( "C:\Program Files (x86)" )
+               s_sProgramsFolder := "C:\Program Files (x86)"
+
             CASE IsDirectory( "C:\Program Files" )
                s_sProgramsFolder := "C:\Program Files"
 
@@ -4703,6 +4733,15 @@ INIT PROCEDURE InitTProject
 
       IF ! Empty( s_sProgramsFolder )
          DO CASE
+            CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A\Include\windows.h" )
+               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A"
+
+            CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A\Include\windows.h" )
+               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A"
+
+            CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1\Include\windows.h" )
+               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1"
+
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A\Include\windows.h" )
                s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A"
 
@@ -4732,56 +4771,84 @@ INIT PROCEDURE InitTProject
          ENDCASE
       ENDIF
 
-         IF File( "\xhb\bin\xcc.exe" )
-            s_sxCCFolder := DiskName() + DRIVE_SEPARATOR + "\xhb"
-         ELSEIF File( "c:\xhb\bin\xcc.exe" )
-            s_sxCCFolder := "c:\xhb"
-         ENDIF
+      IF File( "\xhb\bin\xcc.exe" )
+         s_sxCCFolder := DiskName() + DRIVE_SEPARATOR + "\xhb"
+      ELSEIF File( "c:\xhb\bin\xcc.exe" )
+         s_sxCCFolder := "c:\xhb"
+      ENDIF
 
-         IF File( s_sProgramsFolder + "\Borland\BDS\4.0\bin\bcc32.exe" )
-            s_sBCCFolder := s_sProgramsFolder + "\Borland\BDS\4.0\"
-         ELSEIF File( "\bcc55\bin\bcc32.exe" )
-            s_sBCCFolder := DiskName() + DRIVE_SEPARATOR + "\bcc55"
-         ELSEIF File( "c:\bcc55\bin\bcc32.exe" )
-            s_sBCCFolder := "c:\bcc55"
-         ELSEIF File( "\borland\bcc55\bin\bcc32.exe" )
-            s_sBCCFolder := DiskName() + DRIVE_SEPARATOR + "\borland\bcc55"
-         ELSEIF File( "c:\borland\bcc55\bin\bcc32.exe" )
-            s_sBCCFolder := "c:\borland\bcc55"
-         ENDIF
+      IF File( s_sProgramsFolder + "\Borland\BDS\4.0\bin\bcc32.exe" )
+         s_sBCCFolder := s_sProgramsFolder + "\Borland\BDS\4.0\"
+      ELSEIF File( "\bcc55\bin\bcc32.exe" )
+         s_sBCCFolder := DiskName() + DRIVE_SEPARATOR + "\bcc55"
+      ELSEIF File( "c:\bcc55\bin\bcc32.exe" )
+         s_sBCCFolder := "c:\bcc55"
+      ELSEIF File( "\borland\bcc55\bin\bcc32.exe" )
+         s_sBCCFolder := DiskName() + DRIVE_SEPARATOR + "\borland\bcc55"
+      ELSEIF File( "c:\borland\bcc55\bin\bcc32.exe" )
+         s_sBCCFolder := "c:\borland\bcc55"
+      ENDIF
 
-         IF File( s_sProgramsFolder + "\Microsoft Visual Studio 12.0\VC\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 12.0\VC"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 11.0\VC\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 11.0\VC"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 10.0\VC\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 10.0\VC"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 9.0\VC\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 9.0\VC"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 8\VC\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 8\VC"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio .NET 2003\VC7\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio .NET 2003\VC7"
-         ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio\VC98\bin\cl.exe" )
-            s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio\VC98"
-         ENDIF
+/*TODO:
+//vs71comntools
+//vs80comntools
+//vs100comntools
+//vs120comntools
+//vs140comntools
+*/
 
-         IF File( s_sProgramsFolder + "\PellesC\bin\pocc.exe" )
-            s_sPOCCFolder := s_sProgramsFolder + "\PellesC"
-         ELSEIF File( "\PellesC\bin\pocc.exe" )
-            s_sPOCCFolder := DiskName() + DRIVE_SEPARATOR + "\PellesC"
+      sUniversalCRTSdkDir := GetEnv( "UniversalCRTSdkDir" )
+      
+      IF IsDirectory( sUniversalCRTSdkDir )
+         sUCRTVersion := GetEnv( "UCRTVersion" )
+         IF IsDirectory(  sUniversalCRTSdkDir + "include\" + sUCRTVersion + "\ucrt" )
+            s_sUniversalCRT_IncludePath := sUniversalCRTSdkDir + "include\" + sUCRTVersion + "\ucrt"
          ENDIF
-
-         IF File( "\lcc\bin\cl.exe" )
-            s_sLCCFolder := DiskName() + DRIVE_SEPARATOR + "\lcc"
-         ELSEIF File( "c:\lcc\bin\cl.exe" )
-            s_sLCCFolder := "c:\lcc"
+         IF IsDirectory( sUniversalCRTSdkDir + "lib\" + sUCRTVersion + "\ucrt\x86" )
+            s_sUniversalCRT_LibraryPath_x86 := sUniversalCRTSdkDir + "lib\" + sUCRTVersion + "\ucrt\x86"
          ENDIF
+      ENDIF
+      
+	  //TraceLog(sUniversalCRTSdkDir, sUCRTVersion, s_sUniversalCRT_LibraryPath_x86)
+	  
+      IF File( s_sProgramsFolder + "\Microsoft Visual Studio 15.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 15.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 14.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 14.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 13.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 13.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 12.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 12.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 11.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 11.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 10.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 10.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 9.0\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 9.0\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 8\VC\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 8\VC"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio .NET 2003\VC7\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio .NET 2003\VC7"
+      ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio\VC98\bin\cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio\VC98"
+      ENDIF
 
-         IF File( "\djgpp\bin\gcc.exe" )
-            s_sGCCFolder := DiskName() + DRIVE_SEPARATOR + "\djgpp\bin"
-         ELSEIF File( "c:\djgpp\bin\gcc.exe" )
-            s_sGCCFolder := "c:\djgpp\bin"
+      IF File( s_sProgramsFolder + "\PellesC\bin\pocc.exe" )
+         s_sPOCCFolder := s_sProgramsFolder + "\PellesC"
+      ELSEIF File( "\PellesC\bin\pocc.exe" )
+         s_sPOCCFolder := DiskName() + DRIVE_SEPARATOR + "\PellesC"
+      ENDIF
+
+      IF File( "\lcc\bin\cl.exe" )
+         s_sLCCFolder := DiskName() + DRIVE_SEPARATOR + "\lcc"
+      ELSEIF File( "c:\lcc\bin\cl.exe" )
+         s_sLCCFolder := "c:\lcc"
+      ENDIF
+
+      IF File( "\djgpp\bin\gcc.exe" )
+         s_sGCCFolder := DiskName() + DRIVE_SEPARATOR + "\djgpp\bin"
+      ELSEIF File( "c:\djgpp\bin\gcc.exe" )
+         s_sGCCFolder := "c:\djgpp\bin"
          ENDIF
 
    #endif
