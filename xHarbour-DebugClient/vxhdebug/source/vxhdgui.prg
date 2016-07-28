@@ -314,6 +314,9 @@ METHOD DebugHookKeys( nCode, nwParam, nlParam ) CLASS XHDebuggerGUI
   SWITCH nwParam
     CASE VK_RETURN
          ::oConsole:DoIt()
+         IF ::oWatch:Enabled
+            eval( ::oWatch:oWatch:Action )
+         ENDIF
        RETURN 1
     CASE VK_F5
        IF lShift

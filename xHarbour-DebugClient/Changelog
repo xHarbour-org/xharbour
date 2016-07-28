@@ -8,6 +8,11 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-07-28 16:05 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdgui.prg
+  * vxhdebug/source/vxhdwatch.prg
+  Enable "Add watchpoint" with ENTER
+
 2016-07-18 06:47 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
   * vxhdebug/source/vxhdapp.prg
     SourceTabChanged method SourceEditor:Text not updated

@@ -44,7 +44,7 @@ METHOD Create() CLASS XHDebugWatch
    ::Super:Create()
 
    WITH OBJECT ::oTrace := Button( Self )
-      :Caption        := "Add tracepoint"
+      :Caption        := " Add tracepoint"
       :Action         := {|| ::oDebugger:AddPoint( .T., ::oEdit:Caption ), ::oEdit:Caption := "" }
       :Dock:Top       := :Parent
       :Dock:TopMargin := 4
@@ -55,7 +55,7 @@ METHOD Create() CLASS XHDebugWatch
    END
 
    WITH OBJECT ::oWatch := Button( Self )
-      :Caption        := "Add watchpoint"
+      :Caption        := " Add watchpoint"
       :Action         := {|| ::oDebugger:AddPoint( .F., ::oEdit:Caption ), ::oEdit:Caption := "" }
       :Dock:Top       := :Parent
       :Dock:TopMargin := 4
