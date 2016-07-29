@@ -257,7 +257,9 @@ METHOD Create() CLASS ActiveX
    IF !::Visible .AND. ! ::DesignMode
       ::Hide()
    ENDIF
-   __MSGHOOKFUNC()
+   IF ! ::DesignMode
+      __MSGHOOKFUNC( ::hWnd )
+   ENDIF
    //DEFAULT s_hMsgHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__MsgHook() ), NIL, GetCurrentThreadId() )
 RETURN Self
 

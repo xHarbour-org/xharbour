@@ -1,7 +1,7 @@
 #include "winver.h"
 1 VERSIONINFO
-FILEVERSION       5,3,0,0
-PRODUCTVERSION    5,0,0,0
+FILEVERSION       20,16,3,75
+PRODUCTVERSION    20,16,3,75
 FILEFLAGS         0
 FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
 FILEOS            VOS__WINDOWS32
@@ -14,12 +14,12 @@ FILESUBTYPE       0
       {
          VALUE "CompanyName",      "xHarbour.com, Inc"
          VALUE "FileDescription",  "Visual xHarbour"
-         VALUE "FileVersion",      "5.3"
+         VALUE "FileVersion",      "20.16"
          VALUE "InternalName",     "vxh"
-         VALUE "LegalCopyright",   "2013 xHarbour.com, Inc"
+         VALUE "LegalCopyright",   "2016 xHarbour.com, Inc"
          VALUE "OriginalFilename", "vxh.exe"
          VALUE "ProductName",      "Visual xHarbour"
-         VALUE "ProductVersion",   "5.0"
+         VALUE "ProductVersion",   "20.16.3.75"
       }
    }
    BLOCK "VarFileInfo"

@@ -370,7 +370,7 @@ CLASS ToolStrip INHERIT Control
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
-   METHOD OnEraseBkGnd() INLINE 1
+   METHOD OnEraseBkGnd()      INLINE ::__CreateBkBrush(), 1
    METHOD OnPaint()
    METHOD OnThemeChanged()    INLINE ::__SetVertex(),;
                                      ::SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ),;

@@ -55,7 +55,9 @@ static s_cVersion, s_cCopyright
 #define KEY_ALL_ACCESS              (0xF003F)
 
 #define VXH_Version      "2016"
-#define VXH_BuildVersion "374"
+#define VXH_BuildVersion "375"
+
+#define VXH_SysVersion   "20.16.3.75"
 
 #define MCS_ARROW    10
 #define MCS_PASTE    11
@@ -216,6 +218,8 @@ RETURN Self
 METHOD Init( ... ) CLASS IDE
    LOCAL aEntries, n, cFile
    PUBLIC aChangedProps
+
+   ::Version := VXH_SysVersion
 
    IF ::System:OS:Version >= 6.2
       ::System:CurrentScheme:Load( "FlatGray" )
@@ -5926,7 +5930,7 @@ METHOD GenerateForm( oWnd, cPrefix, cClsName, nID, aChildEvents, nInsMetPos, lCu
       cPrefix := LEFT( cPrefix, n-1 )
    ENDIF
 
-   IF !oWnd:Modal
+   IF !oWnd:Modal .AND. ValType( oWnd:Children ) == "A"
       nPos := 1
       FOR EACH oChild IN oWnd:Children
           IF oChild:ClsName == "CMenuItem"

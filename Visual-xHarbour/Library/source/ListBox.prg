@@ -123,6 +123,7 @@ CLASS ListBox FROM TitleControl
    METHOD OnCtlColorListBox()
    METHOD SetIntegralHeight( n, lSet ) INLINE ::SetStyle( n, !lSet )
    METHOD OnMouseMove()
+   METHOD OnEraseBkGnd()
    METHOD __SetItemToolTips()
    METHOD __TipCallBack()
    METHOD __ListBoxMouseMove()
@@ -156,6 +157,12 @@ METHOD Create() CLASS ListBox
       ::__SetItemToolTips( .T. )
    ENDIF
 RETURN Self
+
+METHOD OnEraseBkGnd() CLASS ListBox
+   IF ::Transparent
+      RETURN 1
+   ENDIF
+RETURN NIL
 
 
 METHOD GetText( nItem ) CLASS ListBox
@@ -483,7 +490,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ListBox
       ::__ListboxMouseMove( nwParam, {x,y} )
    ENDIF
 RETURN NIL
-
+/*
 //----------------------------------------------------------------------------------------------------------------
 METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
    LOCAL hBkGnd := ::BkBrush
@@ -500,3 +507,32 @@ METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
       ENDIF
    ENDIF
 RETURN NIL
+*/
+//---------------------------------------------------------------------------------------------------
+METHOD OnCtlColorListBox( nwParam ) CLASS ListBox
+   LOCAL hBrush, nFore, nBack, nBorder, nLeftBorder
+
+   nFore := ::ForeColor
+   nBack := ::BackColor
+
+   IF nFore != NIL
+      SetTextColor( nwParam, nFore )
+   ENDIF
+   IF nBack != NIL
+      SetBkColor( nwParam, nBack )
+   ENDIF
+
+   hBrush := ::BkBrush
+
+   IF ::Transparent
+      hBrush := ::Parent:BkBrush
+      SelectObject( nwParam, hBrush )
+      SetBkMode( nwParam, TRANSPARENT )
+      nBorder    := (::Height - ( ::ClientHeight + IIF( ! Empty(::Text), ::TitleHeight, 0 ) ) ) / 2
+      nLeftBorder:= (::Width-::ClientWidth)/2
+      SetBrushOrgEx( nwParam, ::Parent:ClientWidth-::Left-nLeftBorder, ::Parent:ClientHeight-::Top-IIF( ! Empty(::Text), ::TitleHeight, 0 )-nBorder )
+   ENDIF
+
+   DEFAULT hBrush TO GetSysColorBrush( COLOR_WINDOW )
+RETURN hBrush
+

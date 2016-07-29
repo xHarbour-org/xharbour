@@ -412,7 +412,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnKeyDown( nKey ) CLASS ObjectTreeView
-   IF nKey == VK_DELETE
+   IF nKey == VK_DELETE .AND. ::SelectedItem != NIL
       ::Application:Project:DelControl( ::SelectedItem:Cargo )
    ENDIF
 RETURN Self

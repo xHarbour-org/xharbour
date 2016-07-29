@@ -657,12 +657,15 @@ METHOD SetFileName( cFileName ) CLASS DataTable
    ENDIF
    ::xFileName := cFileName
 
-   IF ::lCreated
-      ::Create()
-      IF ::bOnFileNameChanged != NIL
-         EVAL( ::bOnFileNameChanged, Self )
+   TRY // the object might be destroyed so we cannot TEST if Self != NIL the only way is to trap the error
+      IF ::lCreated
+         ::Create()
+         IF ::bOnFileNameChanged != NIL
+            EVAL( ::bOnFileNameChanged, Self )
+         ENDIF
       ENDIF
-   ENDIF
+   CATCH
+   END
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

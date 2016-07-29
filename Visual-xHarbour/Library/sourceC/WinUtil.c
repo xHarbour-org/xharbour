@@ -1923,7 +1923,8 @@ static LRESULT CALLBACK MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam )
 
 HB_FUNC( __MSGHOOKFUNC )
 {
-   s_hMsgHook = SetWindowsHookEx( WH_MSGFILTER, (HOOKPROC) MsgFilterFunc, NULL, GetCurrentThreadId() );
+   if( s_hMsgHook == NULL )
+      s_hMsgHook = SetWindowsHookEx( WH_MSGFILTER, (HOOKPROC) MsgFilterFunc, NULL, GetCurrentThreadId() );
 }
 
 HB_FUNC( __MSGUNHOOKFUNC )
