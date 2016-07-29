@@ -24,7 +24,7 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 STARTIN =
-TARGETFOLDER = Z:\Dropbox\Programming\wf-PRG\Build\xHB\Lib
+TARGETFOLDER =C:\Users\xHarbour\Google Drive\xHB-SetupFiles\WinFakt
 
 [..\..\source\*.prg]
 MYC_FLAGS =

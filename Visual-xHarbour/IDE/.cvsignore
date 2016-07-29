@@ -1,8 +1,0 @@
-obj
-*.log
-.DS_Store
-._vxh.exe.xbp
-._*
-.#*
-vxh.ini
-xbuild.windows.ini
