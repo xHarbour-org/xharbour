@@ -10,5 +10,5 @@
     SET INCLUDE=
     SET LIB=
 
-    \xHB\Bin\xBuild.exe sql.lib.xbp      -NoXbp %1
+    \xHB\Bin\xBuild.exe sqlbcc58.lib.xbp      -NoXbp %1
 rem    \xHB\Bin\xBuild.exe sqlmt.lib.xbp    -NoXbp %1

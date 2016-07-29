@@ -1,9 +1,9 @@
 CINI = xbuild.bc5.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\source;\xbp\bc5\sql.lib;\xHb\Include;\borland\bcc58\include
+INCLUDEFOLDERS = ..\source;\xbp\bc5\sql.lib;\xHb\Include;\borland\bcc55\include
 LAUTORUN = 
-LDEBUG = .F.
+LDEBUG = .T.
 LGUI = .F.
 LIBFOLDERS = 
 LMT = .F.
@@ -23,6 +23,6 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = \xHB\Lib\Bcc
+TARGETFOLDER = \xhb\lib\bcc
 
 #include "..\sql.files.inc"

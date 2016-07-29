@@ -1,0 +1,312 @@
+
+Type: C >>>C:\GnuWin32\bin\bison.exe -o"\xbp\bc55\sql.lib\sqly.c" -v -d "..\source\sql.y"<<<
+
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqly.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqly.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqly.c:
+Warning W8004 \\xbp\\bc55\\sql.lib\\sqly.c 1303: 'yymsg' is assigned a value that is never used in function yydestruct
+Warning W8008 \\xbp\\bc55\\sql.lib\\sqly.c 1510: Condition is always false in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1511: Unreachable code in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1575: Unreachable code in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1586: Unreachable code in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1597: Unreachable code in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1608: Unreachable code in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 1621: Unreachable code in function sql_yyparse
+Warning W8008 \\xbp\\bc55\\sql.lib\\sqly.c 3063: Condition is always false in function sql_yyparse
+Warning W8066 \\xbp\\bc55\\sql.lib\\sqly.c 3064: Unreachable code in function sql_yyparse
+Warning W8004 \\xbp\\bc55\\sql.lib\\sqly.c 2992: 'sql_yynerrs' is assigned a value that is never used in function sql_yyparse
+Warning W8004 \\xbp\\bc55\\sql.lib\\sqly.c 1444: 'yyptr' is assigned a value that is never used in function sql_yyparse
+Warning W8004 \\xbp\\bc55\\sql.lib\\sqly.c 1360: 'yytoken' is assigned a value that is never used in function sql_yyparse
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlodbc.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlodbc.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlodbc.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlodbc.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlodbc.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlconnection.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlconnection.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlconnection.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlconnection.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlconnection.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlrdd0.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlrdd0.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlrdd0.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlrdd0.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlrdd0.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlrdd2.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlrdd2.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlrdd2.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlrdd2.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlrdd2.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\utils.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\utils.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\utils.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\utils.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\utils.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlgen1.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlgen1.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlgen1.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlgen1.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlgen1.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\utilslang.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\utilslang.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\utilslang.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\utilslang.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\utilslang.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlmy.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlmy.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlmy.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlmy.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlmy.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlpgs.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlpgs.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlpgs.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlpgs.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlpgs.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlfirebird.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlfirebird.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlfirebird.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlfirebird.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlfirebird.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqloracle.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqloracle.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqloracle.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqloracle.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqloracle.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprtransl.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprtransl.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprtransl.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprtransl.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprtransl.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprparser.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprparser.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprparser.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprparser.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprparser.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprsimpl.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprsimpl.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprsimpl.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprsimpl.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprsimpl.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprobjs.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprobjs.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprobjs.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprobjs.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprobjs.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprrelation.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprrelation.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprrelation.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprrelation.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprrelation.c:
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\exprudf.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\exprudf.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\exprudf.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\exprudf.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\exprudf.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlact.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DHB_API_MACROS  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlact.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlact.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\firebird.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\firebird.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\firebird.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqllex.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqllex.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqllex.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\mysql.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\mysql.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\mysql.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\pgs.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\pgs.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\pgs.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlsrodbc.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlsrodbc.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlsrodbc.c:
+Warning W8004 ..\source\sqlsrodbc.c 1282: 'res' is assigned a value that is never used in function odbcGetData
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlrdd1.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlrdd1.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlrdd1.c:
+Warning W8004 ..\source\sqlrdd1.c 1256: 'pField' is assigned a value that is never used in function sqlGetValue
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlora.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlora.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlora.c:
+Warning W8004 ..\source\sqlora.c 2581: 'c' is assigned a value that is never used in function _save_oci_status
+Warning W8060 ..\source\sqlora.c 4761: Possibly incorrect assignment in function sqlo_init
+Warning W8004 ..\source\sqlora.c 4676: 'status' is assigned a value that is never used in function sqlo_init
+Warning W8004 ..\source\sqlora.c 4908: 'status' is assigned a value that is never used in function sqlo_exists
+Warning W8004 ..\source\sqlora.c 5262: 'ret' is assigned a value that is never used in function sqlo_open
+Warning W8060 ..\source\sqlora.c 5934: Possibly incorrect assignment in function sqlo_split_cstring
+Warning W8060 ..\source\sqlora.c 5960: Possibly incorrect assignment in function sqlo_server_attach
+Warning W8060 ..\source\sqlora.c 6449: Possibly incorrect assignment in function sqlo_finish
+Warning W8066 ..\source\sqlora.c 7391: Unreachable code in function sqlo_get_oci_handle
+Warning W8066 ..\source\sqlora.c 8047: Unreachable code in function sqlo_lob_read_stream
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlorax.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlorax.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlorax.c:
+Warning W8004 ..\source\sqlorax.c 1239: 'sth' is assigned a value that is never used in function HB_FUN_ORACLE_PROCCURSOR
+Warning W8004 ..\source\sqlorax.c 1333: 'ret' is assigned a value that is never used in function HB_FUN_ORACLEEXECDIRCURSOR
+Warning W8004 ..\source\sqlorax.c 1376: 'sth' is assigned a value that is never used in function HB_FUN_ORACLE_BINDCURSOR
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlnames.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlnames.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlnames.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlnames.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlnames.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlex1.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlex1.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlex1.c:
+Warning W8068 ..\source\sqlex1.c 455: Constant out of range in comparison in function getMissingColumn
+Warning W8004 ..\source\sqlex1.c 470: 'lType' is assigned a value that is never used in function getMissingColumn
+Warning W8012 ..\source\sqlex1.c 2867: Comparing signed and unsigned values in function sqlExSeek
+Warning W8057 ..\source\sqlex1.c 4770: Parameter 'str' is never used in function SqlExLog
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlex2.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlex2.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlex2.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlex3.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlex3.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlex3.c:
+Warning W8004 ..\source\sqlex3.c 703: 'SeekBind' is assigned a value that is never used in function BindSeekStmt
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqlmaria.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqlmaria.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlmaria.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqlmaria.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqlmaria.c:
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqlora2.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "..\source\sqlora2.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+..\source\sqlora2.c:
+Warning W8004 ..\source\sqlora2.c 589: 'lStmt' is assigned a value that is never used in function HB_FUN_ORACLEINBINDPARAM2
+Warning W8004 ..\source\sqlora2.c 693: 'ret' is assigned a value that is never used in function HB_FUN_ORACLEPREPARE2
+
+Type: C >>>harbour.exe -o"\xbp\bc55\sql.lib\sqloracle2.c" -m -n -pO\xbp\bc55\sql.lib\ -q -gc0 -w -es2 -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include"  -I"C:\xHarbour\include" "..\source\sqloracle2.prg"<<<
+
+xHarbour Compiler build 1.2.1 (SimpLex) (Rev. 6406)
+Copyright 1999-2009, http://www.xharbour.org http://www.harbour-project.org/
+
+Type: C >>>bcc32.exe -o"\xbp\bc55\sql.lib\sqloracle2.obj" -c -d -5 -6 -a8 -D__WIN32__ -DWIN32 -DPROTOTYPES  -DSQLRDD_TOPCONN -D_INTPTR_T_DEFINED  -I"C:\xHarbour.com\xHarbour-SQLRDD\source" -I"\xbp\bc55\sql.lib" -I"\xHb\Include" -I"C:\xHarbour\include" "\xbp\bc55\sql.lib\sqloracle2.c"<<<
+
+Borland C++ 5.82 for Win32 Copyright (c) 1993, 2005 Borland
+\xbp\bc55\sql.lib\sqloracle2.c:
+
+Type: C >>>tlib.exe   "\xHB\Lib\Bcc\sqlbcc55.lib" +"\xbp\bc55\sql.lib\sqly.obj" +"\xbp\bc55\sql.lib\sqlodbc.obj" +"\xbp\bc55\sql.lib\sqlconnection.obj" +"\xbp\bc55\sql.lib\sqlrdd0.obj" +"\xbp\bc55\sql.lib\sqlrdd2.obj" +"\xbp\bc55\sql.lib\utils.obj" +"\xbp\bc55\sql.lib\sqlgen1.obj" +"\xbp\bc55\sql.lib\utilslang.obj" +"\xbp\bc55\sql.lib\sqlmy.obj" +"\xbp\bc55\sql.lib\sqlpgs.obj" +"\xbp\bc55\sql.lib\sqlfirebird.obj" +"\xbp\bc55\sql.lib\sqloracle.obj" +"\xbp\bc55\sql.lib\exprtransl.obj" +"\xbp\bc55\sql.lib\exprparser.obj" +"\xbp\bc55\sql.lib\exprsimpl.obj" +"\xbp\bc55\sql.lib\exprobjs.obj" +"\xbp\bc55\sql.lib\exprrelation.obj" +"\xbp\bc55\sql.lib\exprudf.obj" +"\xbp\bc55\sql.lib\sqlact.obj" +"\xbp\bc55\sql.lib\firebird.obj" +"\xbp\bc55\sql.lib\sqllex.obj" +"\xbp\bc55\sql.lib\mysql.obj" +"\xbp\bc55\sql.lib\pgs.obj" +"\xbp\bc55\sql.lib\sqlsrodbc.obj" +"\xbp\bc55\sql.lib\sqlrdd1.obj" +"\xbp\bc55\sql.lib\sqlora.obj" +"\xbp\bc55\sql.lib\sqlorax.obj" +"\xbp\bc55\sql.lib\sqlnames.obj" +"\xbp\bc55\sql.lib\sqlex1.obj" +"\xbp\bc55\sql.lib\sqlex2.obj" +"\xbp\bc55\sql.lib\sqlex3.obj" +"\xbp\bc55\sql.lib\sqlmaria.obj" +"\xbp\bc55\sql.lib\sqlora2.obj" +"\xbp\bc55\sql.lib\sqloracle2.obj" <<<
+
+TLIB 4.5 Copyright (c) 1987, 1998 Borland International
