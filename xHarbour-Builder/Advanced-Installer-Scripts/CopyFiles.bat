@@ -1,7 +1,7 @@
 DEL C:\xHB-SetupFiles\xHB.back*.aip /Q
 
 REM SET XHBTO=C:\xHB-SetupFiles\xHB-%1
-    SET XHBTO=C:\xHB-SetupFiles\xHB-Files
+    SET XHBTO=D:\xHB-Files
 
     C:
     RD "%XHBTO%" /S /Q
