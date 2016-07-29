@@ -1,4 +1,4 @@
-SET PATH=%PATH%;C:\Borland\BCC55\Bin
+SET PATH=%PATH%;C:\Borland\BCC58\Bin
 SET XHB_BCC=C:\xHarbour
 SET BCCDIR=C:\Borland\BCC58
 
