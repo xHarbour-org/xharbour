@@ -1,7 +1,7 @@
 CINI = xbuild.bc5.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\source;\xbp\bc5\sql.lib;\xHb\Include;\borland\bcc55\include
+INCLUDEFOLDERS = ..\source;\xbp\bc5\sql.lib;\xHb\Include;\borland\bcc55\include;\xHb\Include;\borland\bcc58\include
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .F.
