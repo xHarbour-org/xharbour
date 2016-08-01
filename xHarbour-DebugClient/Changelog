@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-08-01 14:40 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
+  * vxhdebug/source/vxhdgui.prg
+  correct a conflict between "Add watchpoint" and the console
+
 2016-07-28 16:05 UTC-0300 Mario Simoes Filho <msimoes/at/gmail.com>
   * vxhdebug/source/vxhdgui.prg
   * vxhdebug/source/vxhdwatch.prg
