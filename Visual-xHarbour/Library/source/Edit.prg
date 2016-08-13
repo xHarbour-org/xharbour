@@ -479,7 +479,7 @@ METHOD OnGetDlgCode() CLASS EditBox
          RETURN 0
       ENDIF
    ENDIF
-RETURN NIL
+RETURN IIF( ::Multiline .AND. ::wParam == VK_ESCAPE, 0, NIL )
 
 //-----------------------------------------------------------------------------------------------
 METHOD __SetLayout() CLASS EditBox

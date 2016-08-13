@@ -5895,24 +5895,45 @@ HB_FUNC( VXH_GETHOSTBYNAME )
 
 HB_FUNC( MESSAGEBOXINDIRECT )
 {
-   MSGBOXPARAMS pMsgBox;
+   MSGBOXPARAMSW pMsgBox;
    DWORD dwStyle = (DWORD) hb_parni(4);
+   LPCWSTR wString = NULL;
+   LPCWSTR wText = hb_oleAnsiToWide( hb_parc(2) );
+   LPCWSTR wCaption = hb_oleAnsiToWide( hb_parc(3) );
+
    if( ! ISNIL(5) )
    {
       dwStyle |= MB_USERICON;
+
+      if( ISCHAR(5) )
+      {
+         wString = hb_oleAnsiToWide( hb_parc(5) );
+         pMsgBox.lpszIcon  = (LPCWSTR) wString;
+      }
+      else
+      {
+         pMsgBox.lpszIcon  = MAKEINTRESOURCEW( hb_parni(5) );
+      }
    }
+
    pMsgBox.cbSize          = sizeof(pMsgBox);
    pMsgBox.hwndOwner       = (HWND) hb_parnl(1);
    pMsgBox.hInstance       = GetModuleHandle( NULL );
-   pMsgBox.lpszText        = hb_parc(2);
-   pMsgBox.lpszCaption     = hb_parc(3);
+   pMsgBox.lpszText        = wText;
+   pMsgBox.lpszCaption     = wCaption;
    pMsgBox.dwStyle         = dwStyle;
-   pMsgBox.lpszIcon        = ISNIL(5)?NULL:MAKEINTRESOURCE(hb_parni(5));
    pMsgBox.dwContextHelpId = hb_parni(6);
    pMsgBox.lpfnMsgBoxCallback = NULL;
    pMsgBox.dwLanguageId    = LANG_SYSTEM_DEFAULT;
 
-   hb_retni( MessageBoxIndirect( &pMsgBox ) );
+   hb_retni( MessageBoxIndirectW( &pMsgBox ) );
+
+   if( wString != NULL )
+   {
+      hb_xfree( (void *) wString );
+   }
+   hb_xfree( (void *) wText );
+   hb_xfree( (void *) wCaption );
 }
 
 HB_FUNC( GETSPECIALFOLDER )

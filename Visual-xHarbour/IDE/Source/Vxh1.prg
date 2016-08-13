@@ -4502,7 +4502,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
-   LOCAL n, cWindow := "", oFile, oForm, oItem, oFrm, oXML, oEvents, oEditor
+   LOCAL n, cWindow := "", oFile, oForm, oItem, oFrm, oXML, oEvents, oEditor, aResInc, nRes
    LOCAL lNew := .F., aImage, aEditors, aChildEvents, nInsMetPos, cChildEvents, cEvent, cText, cPath, cBuffer, cResPath, nSecs
    LOCAL aDir, x, xVersion, cType, cRc, cPrj, hFile, cLine, xPath, xName, lPro, i, cName, cResImg, cFile, cSourcePath, cPrevRes
 
@@ -4831,30 +4831,38 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    #endif
 
    IF ! EMPTY( ::AppObject:Icon )
+       //cBuffer += "#define _APPICON 0"+CRLF
        cBuffer += "_0APPICON ICON "+ValToPrgExp( STRTRAN( ::AppObject:Icon, "\", "\\" )) + CRLF
    ENDIF
 
-   FOR EACH aImage IN ::aImages
-       cType := aImage[3]
+   nRes := 10000
 
-       IF VALTYPE( aImage[3] ) == "C"
-          IF aImage[3] == "CUR"
-             cType := "CURSOR"
-           ELSEIF aImage[3] == "ICO"
-             cType := "ICON"
-           ELSEIF aImage[3] == "BMP"
-             cType := "BITMAP"
+   aResInc := {}
+   FOR EACH aImage IN ::aImages
+       IF ASCAN( aResInc, {|a| Upper(a[1])==Upper(aImage[2]) .AND. Upper(a[2])==Upper(aImage[1]) } ) == 0
+          cType := aImage[3]
+
+          IF VALTYPE( aImage[3] ) == "C"
+             IF aImage[3] == "CUR"
+                cType := "CURSOR"
+              ELSEIF aImage[3] == "ICO"
+                cType := "ICON"
+              ELSEIF aImage[3] == "BMP"
+                cType := "BITMAP"
+             ENDIF
+           ELSEIF VALTYPE( aImage[3] ) != "C"
+             IF aImage[3] == IMAGE_CURSOR
+                cType := "CURSOR"
+              ELSEIF aImage[3] == IMAGE_ICON
+                cType := "ICON"
+              ELSE
+                cType := "BITMAP"
+             ENDIF
           ENDIF
-        ELSEIF VALTYPE( aImage[3] ) != "C"
-          IF aImage[3] == IMAGE_CURSOR
-             cType := "CURSOR"
-           ELSEIF aImage[3] == IMAGE_ICON
-             cType := "ICON"
-           ELSE
-             cType := "BITMAP"
-          ENDIF
+          //cBuffer += "#define "+aImage[2]+" "+xStr(nRes++)+CRLF
+          cBuffer += aImage[2]+" "+ cType +" "+ValToPrgExp( STRTRAN( aImage[1], "\", "\\" )) + CRLF
+          AADD( aResInc, { aImage[2], aImage[1] } )
        ENDIF
-       cBuffer += aImage[2]+" "+ cType +" "+ValToPrgExp( STRTRAN( aImage[1], "\", "\\" )) + CRLF
    NEXT
 
    FOR EACH cPrj IN ::Properties:ExtImages
@@ -4878,23 +4886,29 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
    NEXT
 
    FOR EACH cFile IN ::Properties:Resources
-       IF FILE( cFile )
-          n := RAT( "\", cFile )
-          cResImg := SUBSTR( cFile, n + 1 )
-          cResImg := STRTRAN( cResImg, " " )
-          cResImg := "_"+UPPER(STRTRAN( cResImg, "." ))
+       n := RAT( "\", cFile )
+       cResImg := SUBSTR( cFile, n + 1 )
+       cResImg := STRTRAN( cResImg, " " )
+       cResImg := "_"+UPPER(STRTRAN( cResImg, "." ))
+
+       IF FILE( cFile ) .AND. ASCAN( aResInc, {|a| Upper(a[1])==Upper(cResImg) .AND. Upper(a[2])==Upper(cFile)} ) == 0
 
           cType := UPPER( SUBSTR( cFile, RAT( ".", cFile )+1 ) )
           IF cType == "CUR"
              cType := "CURSOR"
+
+
            ELSEIF cType == "ICO"
-             cBuffer += cResImg+" "+ cType +" "+ValToPrgExp( STRTRAN( cFile, "\", "\\" )) + CRLF
+             //cBuffer += cResImg+" "+ cType +" "+ValToPrgExp( STRTRAN( cFile, "\", "\\" )) + CRLF
              cType := "ICON"
+
            ELSEIF cType == "BMP"
              cType := "BITMAP"
           ENDIF
 
+          //cBuffer += "#define "+cResImg+" "+xStr(nRes++)+CRLF
           cBuffer += cResImg+" "+ cType +" "+ValToPrgExp( STRTRAN( cFile, "\", "\\" )) + CRLF
+          AADD( aResInc, { cResImg, cFile } )
        ENDIF
    NEXT
 

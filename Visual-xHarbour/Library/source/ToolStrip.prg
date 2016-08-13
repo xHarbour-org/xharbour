@@ -343,7 +343,7 @@ CLASS ToolStrip INHERIT Control
    DATA ClipChildren   EXPORTED INIT .T.
    DATA ClipSiblings   EXPORTED INIT .T.
    DATA TabStop        EXPORTED INIT .F.
-   DATA Visible        EXPORTED INIT .T.
+//   DATA Visible        EXPORTED INIT .T.
 
    DATA __lIsMenu      EXPORTED INIT .F.
    DATA __nLeft        EXPORTED
@@ -1434,6 +1434,7 @@ CLASS ToolStripItem INHERIT Control
    METHOD Cancel()
    //METHOD GetControlName()
    METHOD Destroy()
+   METHOD SetTabOrder()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -1492,6 +1493,15 @@ METHOD Create() CLASS ToolStripItem
    ENDIF
 
 RETURN Self
+
+METHOD SetTabOrder( nTabOrder ) CLASS ToolStripItem
+   LOCAL nLeft
+   Super:SetTabOrder( nTabOrder )
+   nLeft := IIF( ::Parent:ShowGrip, ::Parent:__GripperPos + 4, 1 )
+   AEVAL( ::Parent:Children, {|o| o:xLeft := nLeft + o:__nSeparator, o:MoveWindow(), nLeft := o:Left + o:Width } )
+   ::Parent:__UpdateWidth()
+RETURN Self
+
 
 METHOD Destroy() CLASS ToolStripItem
    LOCAL nWidth, n, nPos := ASCAN( ::Parent:Children, Self,,, .T. )

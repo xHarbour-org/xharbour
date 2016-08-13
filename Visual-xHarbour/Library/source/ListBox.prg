@@ -123,7 +123,7 @@ CLASS ListBox FROM TitleControl
    METHOD OnCtlColorListBox()
    METHOD SetIntegralHeight( n, lSet ) INLINE ::SetStyle( n, !lSet )
    METHOD OnMouseMove()
-   METHOD OnEraseBkGnd()
+   //METHOD OnEraseBkGnd()
    METHOD __SetItemToolTips()
    METHOD __TipCallBack()
    METHOD __ListBoxMouseMove()
@@ -158,11 +158,11 @@ METHOD Create() CLASS ListBox
    ENDIF
 RETURN Self
 
-METHOD OnEraseBkGnd() CLASS ListBox
-   IF ::Transparent
-      RETURN 1
-   ENDIF
-RETURN NIL
+//METHOD OnEraseBkGnd() CLASS ListBox
+//   IF ::Transparent
+//      RETURN 1
+//   ENDIF
+//RETURN NIL
 
 
 METHOD GetText( nItem ) CLASS ListBox
