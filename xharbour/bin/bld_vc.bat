@@ -19,6 +19,9 @@ SET _INCLUDE=%INCLUDE%
 SET _LIB=%LIB%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
@@ -28,6 +31,18 @@ SET _LIB=%LIB%
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
+
+:SET_VC2015X86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\vc
+   GOTO SET_PATH
+
+:SET_VC2015
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 14.0\vc
+   GOTO SET_PATH
+
+:SET_VC2013X86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc
+   GOTO SET_PATH
 
 :SET_VC2013
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc

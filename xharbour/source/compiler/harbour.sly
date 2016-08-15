@@ -2161,14 +2161,15 @@ CodeBlock  : '{' CBMARKER
                      $$ = $<asExpr>3;
                   }
 
-                  hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
-
-                  hb_xfree( (void *) pDelete );
-
                   if( hb_comp_BlocksList == NULL )
                   {
                      hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
                   }
+				  else
+				  {
+                     hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
+                     hb_xfree( (void *) pDelete );
+				  }
                }
            ;
 

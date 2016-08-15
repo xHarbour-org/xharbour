@@ -9,6 +9,18 @@
 */
 
 
+2016-08-15 17:04 UTC-0400 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * bin/bld.bat
+     + Added test for error level after prg compilation
+   * bin/bld_vc.bat
+     + Added support for VS 2013 and 2015
+   * make_vc.bat
+     * More complete VS 2015 support and minor revision
+
+   * source/compiler/harbour.sly
+   * source/compiler/harbouryy.c
+     ! Fixed GPF trap (hb_comp_BlocksList NULL after syntax error)
+
 2016-07-05 10:02 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/gtwvw/gtwvw.c
     ! pacify warning

@@ -8876,14 +8876,15 @@ yyreduce:
                      (yyval.asExpr) = (yyvsp[-4].asExpr);
                   }
 
-                  hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
-
-                  hb_xfree( (void *) pDelete );
-
-                  if( hb_comp_BlocksList == NULL )
-                  {
-                     hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-                  }
+				  if (hb_comp_BlocksList == NULL)
+				  {
+					  hb_comp_SLX_LastBlock(TRUE); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+				  }
+				  else
+				  {
+					  hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
+					  hb_xfree((void *)pDelete);
+				  }
                }
 
     break;

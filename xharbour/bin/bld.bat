@@ -118,10 +118,13 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    echo Compiling...
    echo %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF ERRORLEVEL 1 GOTO END
    IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF ERRORLEVEL 1 GOTO END
    IF NOT '%2'=='' SET HB_2nd_prg=%2.c
    IF '%2'=='' SET HB_2nd_prg=
    IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF ERRORLEVEL 1 GOTO END
    IF NOT '%3'=='' SET HB_3rd_prg=%3.c
    IF '%3'=='' SET HB_3rd_prg=
 
