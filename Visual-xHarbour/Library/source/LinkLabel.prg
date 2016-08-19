@@ -98,10 +98,8 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
    IF VALTYPE( cText ) == "C"
       ::xText := cText
    ENDIF
-   IF ::hWnd != NIL .AND. !::__IsInstance
-      IF VALTYPE( cText ) == "C"
-         SetWindowText( ::hWnd, cText )
-      ENDIF
+   IF ::hWnd != NIL
+      SetWindowText( ::hWnd, cText )
       IF ::AutoSize
          ::__lResizeable := {.F.,.F.,.F.,.F.,.F.,.F.,.F.,.F.}
 
@@ -115,10 +113,12 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
          ENDIF
 
          ::MoveWindow()
-         ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
+         IF ! ::Parent:ClsName IN {"StatusBarPanel"}
+            ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
+            ::Parent:DockControls()
+         ENDIF
          ::UpdateWindow()
 
-         ::Parent:DockControls()
        ELSE
          ::__lResizeable   := {.T.,.T.,.T.,.T.,.T.,.T.,.T.,.T.}
       ENDIF
@@ -130,7 +130,7 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    LOCAL nColor, hBrush := ::BkBrush
    LOCAL rc := (struct RECT)
 
-   IF hBrush == NIL
+   IF hBrush == NIL .AND. ! ::Parent:ClsName IN {"StatusBarPanel"}
       hBrush := ::Parent:BkBrush
       IF hBrush != NIL
          SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
@@ -140,8 +140,7 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    _FillRect( hDC, {0,0,::Width,::Height}, hBrush )
 
    GetClientRect( ::hWnd, @rc )
-
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+   IF ! ::Parent:ClsName IN {"StatusBarPanel"} .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       IF ::__lFocused
          ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, ILD_TRANSPARENT | ILD_FOCUS, ::BackColor )
        ELSE
@@ -228,7 +227,7 @@ METHOD SetImageIndex() CLASS LinkLabel
       aSize := ::Drawing:GetTextExtentPoint32( ::Text )
       ::xWidth := aSize[1]+4
       ::xHeight := aSize[2]+2
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      IF ! ::Parent:ClsName IN {"StatusBarPanel"} .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
          ::xWidth += ::Parent:ImageList:IconWidth + 1
          ::xHeight := MAX( ::xHeight, ::Parent:ImageList:IconHeight )
       ENDIF

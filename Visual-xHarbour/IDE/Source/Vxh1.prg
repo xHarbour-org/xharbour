@@ -54,11 +54,6 @@ static s_cVersion, s_cCopyright
 
 #define KEY_ALL_ACCESS              (0xF003F)
 
-#define VXH_Version      "2016"
-#define VXH_BuildVersion "375"
-
-#define VXH_SysVersion   "20.16.3.75"
-
 #define MCS_ARROW    10
 #define MCS_PASTE    11
 #define MCS_DRAGGING 12
@@ -218,8 +213,6 @@ RETURN Self
 METHOD Init( ... ) CLASS IDE
    LOCAL aEntries, n, cFile
    PUBLIC aChangedProps
-
-   ::Version := VXH_SysVersion
 
    IF ::System:OS:Version >= 6.2
       ::System:CurrentScheme:Load( "FlatGray" )
@@ -551,9 +544,9 @@ METHOD Init() CLASS IDE_MainForm
    ENDIF
 
    #ifdef VXH_DEMO
-    ::Caption := "Visual xHarbour Demo " + VXH_Version
+      ::Caption := "Visual xHarbour Demo " + ::Application:VXHVersion
    #else
-    ::Caption := "Visual xHarbour " + VXH_Version
+      ::Caption := "Visual xHarbour " + ::Application:VXHVersion
    #endif
 
    ::Application:ColorTable:TitleBackColorActive   := TITLE_COLOR //RGB( 255, 230, 151 )
@@ -3141,9 +3134,9 @@ METHOD SetCaption( lMod ) CLASS Project
 
    IF ::Properties == NIL
       #ifdef VXH_DEMO
-       cCaption := "Visual xHarbour Demo " + VXH_Version
+       cCaption := "Visual xHarbour Demo " + ::Application:VXHVersion
       #else
-       cCaption := "Visual xHarbour " + VXH_Version
+       cCaption := "Visual xHarbour " + ::Application:VXHVersion
       #endif
      ELSE
       #ifdef VXH_DEMO
@@ -3393,9 +3386,9 @@ METHOD Close( lCloseErrors, lClosing ) CLASS Project
    ::Application:CloseMenu:Disable()
 
    #ifdef VXH_DEMO
-    ::Application:MainForm:Caption := "Visual xHarbour Demo " + VXH_Version
+    ::Application:MainForm:Caption := "Visual xHarbour Demo " + ::Application:VXHVersion
    #else
-    ::Application:MainForm:Caption := "Visual xHarbour " + VXH_Version
+    ::Application:MainForm:Caption := "Visual xHarbour " + ::Application:VXHVersion
    #endif
 
    ::Application:SourceEditor:Enabled := .F.
@@ -6652,7 +6645,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Top            := 0
          :Width          := 300
          :Height         := 62
-         :Caption        := VXH_Version
+         :Caption        := ::Application:VXHVersion
          :Transparent    := .T.
          :Font:FaceName  := "Times New Roman"
          :Font:Bold      := .F.
@@ -6692,7 +6685,7 @@ METHOD OnInitDialog() CLASS AboutVXH
          :Top            := 4
          :Width          := 300
          :Height         := 15
-         :Text           := "Visual xHarbour " + s_cVersion + " " + VXH_Version + " Build " + VXH_BuildVersion
+         :Text           := "Visual xHarbour " + s_cVersion + " " + ::Application:VXHVersion + " Build " + ::Application:VXHBuildVersion
          :Dock:Right     := :Parent
          :Dock:RightMargin := 10
          :Font:Bold      := .T.

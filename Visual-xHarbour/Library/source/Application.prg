@@ -74,6 +74,8 @@ static nButWidth
 #define MUTANT_ALL_ACCESS  (STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE|MUTANT_QUERY_STATE)
 #define MUTEX_ALL_ACCESS MUTANT_ALL_ACCESS
 
+#define VXH_Version      "2016"
+#define VXH_BuildVersion "375"
 
 INIT PROCEDURE __SetAutoClassInit
    OleInitialize()
@@ -204,6 +206,10 @@ RETURN EXCEPTION_EXECUTE_HANDLER
 CLASS Application
    PROPERTY MaskEditKillFocusValid ROOT "Behavior" DEFAULT .T.
    PROPERTY ColorScheme  SET ::__SetColorScheme(v) DEFAULT 1
+
+   DATA VXHVersion       EXPORTED INIT VXH_Version
+   DATA VXHBuildVersion  EXPORTED INIT VXH_BuildVersion
+
    DATA EnumColorScheme  EXPORTED INIT { { "System Default", "FlatGray", "Classic", "NormalColor", "HomeStead", "Metallic", "MediaCenter", "Aero" }, {1,2,3,4,5,6,7,8} }
 
    PROPERTY Icon                   ROOT "Appearance" DEFAULT ""
@@ -1009,6 +1015,7 @@ STATIC FUNCTION LogError( e, cProcStack )
    cErr += ( CRLF + "--------------------------------------------------------------------" )
    cErr += ( CRLF + "OS             " + GetOSDisplayString() )
    cErr += ( CRLF + "Date/Time      " + dtoc( date() ) + " - " + time() )
+   cErr += ( CRLF + "VXH Version    " + Application:VXHVersion + " Build " + Application:VXHBuildVersion )
    cErr += ( CRLF + "--------------------------------------------------------------------" )
    cErr += ( CRLF )
    IF e:cargo != NIL

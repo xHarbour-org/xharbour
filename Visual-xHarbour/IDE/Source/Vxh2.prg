@@ -1006,7 +1006,7 @@ METHOD CheckMouse( x, y, lRealUp, nwParam ) CLASS WindowEdit
 
    pt2 := (struct POINT)
 
-   IF ::Parent == NIL .OR. ( LEN( ::Selected ) > 0 .AND. ::Selected[1][1]:__xCtrlName == "Application" )
+   IF ::Parent == NIL .OR. ( LEN( ::Selected ) > 0 .AND. ( ::Selected[1][1]:__xCtrlName == "Application" .OR. ::Selected[1][1]:Parent:__xCtrlName == "StatusBarPanel" ) )
       RETURN NIL
    ENDIF
 

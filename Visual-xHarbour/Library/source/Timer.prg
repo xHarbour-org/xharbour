@@ -20,7 +20,10 @@ CLASS Timer INHERIT Component
    PROPERTY Delay   SET ::SetDelay(v) DEFAULT 1000
    PROPERTY AutoRun                   DEFAULT .T.
 
-   DATA lRunning      EXPORTED INIT .F.
+   DATA bWhen         EXPORTED INIT {||.T.}
+   DATA bTrace        EXPORTED
+
+   DATA Running       EXPORTED INIT .F.
    DATA Id            EXPORTED
    DATA ClsName       EXPORTED  INIT "Timer"
    DATA Events        EXPORTED  INIT {  {"General", { { "OnTimeOut"       , "", "" } } } }
@@ -30,8 +33,8 @@ CLASS Timer INHERIT Component
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD SetDelay()
-   METHOD Start()     INLINE ::lRunning := .T., ::Owner:SetTimer( ::Id, ::Delay, ::hProc )
-   METHOD Stop()      INLINE ::lRunning := .F., IIF( ::Owner != NIL, ::Owner:KillTimer( ::Id ),)
+   METHOD Start()
+   METHOD Stop()
    METHOD TimeProc()
    METHOD OnTimeOut() VIRTUAL
    METHOD Destroy()   INLINE ::Stop(), ::Super:Destroy()
@@ -49,9 +52,34 @@ METHOD Create() CLASS Timer
    ::lCreated := .T.
 RETURN Self
 
+METHOD Start() CLASS Timer
+   IF ! ::Running .AND. Eval( ::bWhen )
+      IF ::Owner != NIL
+         ::Running := .T.
+         ::Owner:SetTimer( ::Id, ::Delay, ::hProc )
+         IF ::bTrace != NIL
+            Eval( ::bTrace, ::Running )
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN Self
+
+METHOD Stop() CLASS Timer
+   IF ::Running .AND. Eval( ::bWhen )
+      ::Running := .F.
+      IF ::Owner != NIL
+         ::Owner:KillTimer( ::Id )
+         IF ::bTrace != NIL
+            Eval( ::bTrace, ::Running )
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN Self
+
+
 METHOD SetDelay(n) CLASS Timer
    ::xDelay := n
-   IF ::lRunning
+   IF ::Running
       ::Stop()
       ::Start()
    ENDIF

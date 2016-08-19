@@ -120,7 +120,9 @@ CLASS DataTable INHERIT Component
    DATA __aData            EXPORTED INIT {}
 
    DATA __hClass           PROTECTED
-   DATA __aSavedPos        PROTECTED
+   DATA __aSavedPos        PROTECTED INIT {}
+
+   DATA CurTopScope, CurBottomScope     EXPORTED
 
    METHOD Init() CONSTRUCTOR
 
@@ -131,10 +133,10 @@ CLASS DataTable INHERIT Component
    METHOD TableExt()                          INLINE ::Connector:TableExt()
    METHOD Gather()                            INLINE ::Connector:Gather()
    METHOD Scatter( aData )                    INLINE ::Connector:Scatter( aData )
-   METHOD SetScope( xScope )                  INLINE ::Connector:SetScope( xScope )
-   METHOD SetTopScope( xScope )               INLINE ::Connector:SetTopScope( xScope )
-   METHOD SetBottomScope( xScope )            INLINE ::Connector:SetBottomScope( xScope )
-   METHOD KillScope()                         INLINE ::Connector:KillScope()
+   METHOD SetScope( xScope )                  INLINE ::CurTopScope := ::CurBottomScope := xScope, ::Connector:SetScope( xScope )
+   METHOD SetTopScope( xScope )               INLINE ::CurTopScope := xScope, ::Connector:SetTopScope( xScope )
+   METHOD SetBottomScope( xScope )            INLINE ::CurBottomScope := xScope, ::Connector:SetBottomScope( xScope )
+   METHOD KillScope()                         INLINE ::CurTopScope := ::CurBottomScope := NIL, ::Connector:KillScope()
    METHOD Reindex()                           INLINE ::Connector:Reindex()
    METHOD Commit()                            INLINE ::Connector:Commit()
    METHOD RecLock()                           INLINE ::Connector:RecLock()
@@ -254,24 +256,25 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD SavePos() CLASS DataTable
-   ::__aSavedPos := Array(4)
-   ::__aSavedPos[1] := ::OrdSetFocus()
-   ::__aSavedPos[2] := ::Recno()
-   ::__aSavedPos[3] := (::Area)->( OrdScope( TOPSCOPE ) )
-   ::__aSavedPos[4] := (::Area)->( OrdScope( BOTTOMSCOPE ) )
-RETURN ::__aSavedPos
+   AADD( ::__aSavedPos, { ::OrdSetFocus(),;
+                          ::Recno(),;
+                          (::Area)->( OrdScope( TOPSCOPE ) ),;
+                          (::Area)->( OrdScope( BOTTOMSCOPE ) ),;
+                          (::Area)->( dbFilter() ) } )
+RETURN LEN( ::__aSavedPos )
 
 //-------------------------------------------------------------------------------------------------------
-METHOD RestPos( aSavedPos ) CLASS DataTable
-   DEFAULT aSavedPos TO ::__aSavedPos
-   IF aSavedPos != NIL
-      ::OrdSetFocus( aSavedPos[1] )
-      (::Area)->( OrdScope( TOPSCOPE, ::__aSavedPos[3] ) )
-      (::Area)->( OrdScope( BOTTOMSCOPE, ::__aSavedPos[4] ) )
-      ::Goto( aSavedPos[2] )
-      ::__aSavedPos := NIL
+METHOD RestPos() CLASS DataTable
+   LOCAL n := LEN( ::__aSavedPos )
+   IF n > 0
+      ::OrdSetFocus( ::__aSavedPos[n][1] )
+      (::Area)->( OrdScope( TOPSCOPE, ::__aSavedPos[n][3] ) )
+      (::Area)->( OrdScope( BOTTOMSCOPE, ::__aSavedPos[n][4] ) )
+      (::Area)->( dbSetFilter( ::__aSavedPos[n][5] ) )
+      ::Goto( ::__aSavedPos[n][2] )
+      ADEL( ::__aSavedPos, n, .T. )
    ENDIF
-RETURN NIL
+RETURN LEN( ::__aSavedPos )
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewInstance( lSetCurPos ) CLASS DataTable
@@ -874,7 +877,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
    IF ( ::Owner:AutoOpen .OR. lIgnoreAO ) .AND. ( ( !::Owner:IsOpen .AND. !EMPTY( ::Owner:FileName ) ) .OR. ::Owner:__lMemory )
       ExecuteEvent( "OnInit", ::Owner )
 
-      IF !::Owner:__lMemory
+      IF !::Owner:__lMemory .AND. ::Owner:Connection == NIL
          IF ::Owner:Driver IN { "SQLRDD", "SQLEX" }
             IF ::Owner:DesignMode
                RETURN ::Owner
@@ -903,6 +906,8 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
           ELSE
             cFile := ::Owner:Path + IIF( ! Empty(::Owner:Path), "\", "" ) + ::Owner:FileName
          ENDIF
+      ELSEIF ::Owner:Connection != NIL
+         cFile := ::Owner:FileName
       ENDIF
       IF HGetPos( ::Owner:EventHandler, "OnCreate" ) != 0
          cEvent := ::Owner:EventHandler[ "OnCreate" ]

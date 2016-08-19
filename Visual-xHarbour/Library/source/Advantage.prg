@@ -93,7 +93,7 @@ METHOD CreateTable( aStruc, cFile ) CLASS AdsDataTable
    DEFAULT aStruc TO ::Structure
    IF ! Empty( cFile ) .AND. ! File( cFile ) .AND. ! Empty( aStruc )
       IF ! ::Connector:CreateTable( cFile, aStruc, ::Driver )
-         IF ::Connection != NIL
+         IF Left( ::FileName, 2 ) .AND. ::Connection != NIL
             n       := RAT( "\", cFile )
             cTableName := SUBSTR( cFile, n+1 )
             n       := RAT( ".", cTableName )
@@ -126,7 +126,8 @@ METHOD Create( lIgnoreAO ) CLASS AdsDataTable
          ::Connector := SocketRdd( Self )
       ENDIF
    ENDIF
-   IF ::Connection != NIL
+
+   IF ::Connection != NIL .AND. Left( ::FileName, 2 ) != "\\"
       cFileName := ::FileName
       n := RAT( "\", cFileName )
       cPath  := SUBSTR( cFileName, 1, n-1 )
@@ -145,7 +146,7 @@ METHOD Create( lIgnoreAO ) CLASS AdsDataTable
       AdsDDAddTable( , ::FileName, ::TableType, ::Connection )
    ENDIF
    ::Connector:Create( lIgnoreAO )
-   IF ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
+   IF Left( ::FileName, 2 ) != "\\" .AND. ! Empty( ::__aTmpStruct ) .AND. ! Empty ( ::Structure )
       lChanged := LEN(::__aTmpStruct) <> LEN(::Structure)
       IF ! lChanged
          FOR n := 1 TO LEN( ::__aTmpStruct )
@@ -302,7 +303,7 @@ RETURN NIL
 METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery, nRecNo, nNext, nRecord, lRest, lUnique, lDescend, lAll ) CLASS AdsDataTable
    LOCAL n, cFileName, cPath
 
-   IF (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. ! Upper(cKey) == Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ))
+   IF Left( ::FileName, 2 ) != "\\" .AND. (::Area)->( OrdNumber( cTag, cOrderBagName ) ) == 0 .OR. ! Upper(cKey) == Upper((::Area)->( IndexKey( OrdNumber( cTag, cOrderBagName ) ) ))
       cFileName := ::FileName
       n         := RAT( "\", cFileName )
       cPath     := Left( cFileName, n-1 )
@@ -400,10 +401,17 @@ RETURN aInfo
 //-------------------------------------------------------------------------------------------------------
 
 CLASS AdsServer INHERIT Component
-   PROPERTY Type ROOT "Behavior"  SET AdsSetServerType( v ) DEFAULT 1
-   DATA EnumType   EXPORTED  INIT { { "Local", "Remote", "Either" }, {1,2,3} }
+   DATA hConnection
+
+   PROPERTY Type ROOT "Behavior"  SET AdsSetServerType( v ) DEFAULT ADS_LOCAL_SERVER
+   DATA EnumType EXPORTED  INIT { { "Local", "Remote", "Internet" }, {ADS_LOCAL_SERVER,ADS_REMOTE_SERVER,ADS_AIS_SERVER} }
+
+   PROPERTY FileType ROOT "Behavior"  SET AdsSetFileType( v ) DEFAULT ADS_ADT
+   DATA EnumFileType EXPORTED  INIT { { "NTX", "CDX", "ADT", "VFP" }, {ADS_NTX,ADS_CDX,ADS_ADT,ADS_VFP} }
+
    METHOD Init() CONSTRUCTOR
    METHOD Create()
+   METHOD Disconnect( lAll ) INLINE AdsDisconnect( if( ValType(lAll)=="L" .AND. lAll, 0, ::hConnection ) )
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
@@ -417,6 +425,7 @@ RETURN Self
 METHOD Create() CLASS AdsServer
    IF ! ::Owner:DesignMode
       AdsSetServerType( ::Type )
+      AdsSetFileType( ::FileType )
    ENDIF
 RETURN Self
 

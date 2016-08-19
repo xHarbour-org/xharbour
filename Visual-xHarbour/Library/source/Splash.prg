@@ -73,9 +73,7 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter, nBitmapMaskColor, nTol
    dt:y               := nTop
    dt:cx              := nWidth
    dt:cy              := nHeight
-
-   CreateDialogIndirect( hInst, dt, GetActiveWindow(), __pCallBackPtr )
-RETURN NIL
+RETURN CreateDialogIndirect( hInst, dt, GetActiveWindow(), __pCallBackPtr )
 
 FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
    LOCAL nLeft, nTop, aRect, aPar, hDC, hMemDC, hMemBitmap, hOldBitmap
