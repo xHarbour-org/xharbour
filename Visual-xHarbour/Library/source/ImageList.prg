@@ -93,7 +93,7 @@ RETURN SELF
 //----------------------------------------------------------------------------------------------------
 
 METHOD Create() CLASS ImageList
-   LOCAL oComp, aImage, cEvent, nStyle := ::Palette | ILC_MASK
+   LOCAL oComp, aImage, cEvent, nStyle := (::Palette | ILC_MASK)
 
    IF VALTYPE( ::Form ) == "O"
       FOR EACH oComp IN ::Form:Components
@@ -264,9 +264,9 @@ METHOD DrawDisabled( hDC, nIndex, x, y, hBrush ) CLASS ImageList
    LOCAL nStyle := DST_ICON, hIcon := ImageListGetIcon( ::Handle, nIndex-1, ILD_NORMAL )
    IF hBrush == NIL
       hBrush := 0
-      nStyle := nStyle | DSS_DISABLED
+      nStyle := (nStyle | DSS_DISABLED)
     ELSE
-      nStyle := nStyle | DSS_MONO
+      nStyle := (nStyle | DSS_MONO)
    ENDIF
    DrawState( hDC, hBrush, hIcon, 0, x, y, 0, 0, nStyle )
    DestroyIcon( hIcon )
@@ -285,7 +285,7 @@ METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled, nFlags, nRop ) CL
    DEFAULT nFlags TO ILD_TRANSPARENT
 
    IF lDisabled
-      nFlags := nFlags | ILS_SHADOW
+      nFlags := (nFlags | ILS_SHADOW)
    ENDIF
 
    ildp:cbSize  := ildp:sizeof()
@@ -331,7 +331,7 @@ ENDCLASS
 METHOD Init( oParent, oImageList ) CLASS __ImageListComboBox
    ::ImageList := oImageList
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 RETURN Self
 
 METHOD Create() CLASS __ImageListComboBox
@@ -348,9 +348,9 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS __ImageListComboBox
    LOCAL n, y, lSelected, nLen, itemTxt, aSize
    ( nwParam, nlParam )
    IF dis:hwndItem == ::hWnd
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
 
-      IF dis:itemAction & ODA_DRAWENTIRE == ODA_DRAWENTIRE .OR. dis:itemAction & ODA_SELECT == ODA_SELECT
+      IF (dis:itemAction & ODA_DRAWENTIRE) == ODA_DRAWENTIRE .OR. (dis:itemAction & ODA_SELECT) == ODA_SELECT
          SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -365,7 +365,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS __ImageListComboBox
 
          IF n > 0
             ExtTextOut( dis:hDC, ::ImageList:IconWidth+20, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
-            IF dis:itemState & ODS_COMBOBOXEDIT == 0
+            IF (dis:itemState & ODS_COMBOBOXEDIT) == 0
                DrawIconEx( dis:hDC, 3, dis:rcItem:Top, ::ImageList:GetImage(n), ::ImageList:IconWidth, ::ImageList:IconHeight, 0, NIL,  DI_NORMAL )
             ENDIF
           ELSE

@@ -111,8 +111,8 @@ RETURN Self
 METHOD Create() CLASS FolderTree
    Super:Create()
    ::__SetExpTheme()
-   RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+   RedrawWindow( ::hWnd, , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
+   ::SetWindowPos(,0,0,0,0, (SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER) )
 
    FolderTreeInit( ::hWnd, ::SysFolder, IIF( EMPTY( ::Folder ), NIL, ::Folder ) )
 RETURN Self
@@ -183,7 +183,7 @@ CLASS FolderList INHERIT ListView
    METHOD Populate()
    METHOD __SetFolder()
    METHOD OnUserMsg()
-   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
+   METHOD OnGetDlgCode()     INLINE (DLGC_WANTMESSAGE | DLGC_WANTALLKEYS)
    METHOD PopulateByID()
    METHOD PopulateFromTree()
 ENDCLASS
@@ -198,10 +198,10 @@ METHOD Init( oParent ) CLASS FolderList
 RETURN Self
 
 METHOD Create() CLASS FolderList
-   ::Style := ::Style | LVS_SHAREIMAGELISTS
+   ::Style := (::Style | LVS_SHAREIMAGELISTS)
    Super:Create()
-   RedrawWindow( ::hWnd, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
-   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
+   RedrawWindow( ::hWnd, , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
+   ::SetWindowPos(,0,0,0,0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
    ::__aColumns := {}
    ListViewBrowseInit( ::hWnd, ::SysFolder, IIF( EMPTY( ::Folder ), NIL, ::Folder ), ::ShowFolders )
    IF !EMPTY( ::Folder )

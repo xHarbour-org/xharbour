@@ -205,7 +205,7 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
    IF ::Owner != NIL .AND. ::Owner:HasMessage( "ForeColor" )
       cf:rgbColors := ::Owner:ForeColor
    ENDIF
-   cf:Flags := IIF( nStyle != NIL, nStyle, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS )
+   cf:Flags := IIF( nStyle != NIL, nStyle, (CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_EFFECTS) )
 
    IF ChooseFont( @cf )
       IF cf:lpLogFont:lfItalic <> 0
@@ -304,7 +304,7 @@ METHOD SetPointSize( n ) CLASS Font
    ::xPointSize := n
 
    IF ::DesignMode .AND. ::Owner != NIL  .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
-      ::Owner:SetWindowPos(, 0,0,0,0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+      ::Owner:SetWindowPos(, 0,0,0,0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
    ENDIF
 RETURN Self
 

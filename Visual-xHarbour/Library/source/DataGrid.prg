@@ -323,7 +323,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD ToggleSelection()
 
    METHOD ResetSearch()    INLINE ::KillTimer( 10 ), ::__cSearch := ""
-   METHOD ResetFrame()     INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD ResetFrame()     INLINE ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER))
 ENDCLASS
 
 METHOD Init( oParent ) CLASS DataGrid
@@ -331,7 +331,7 @@ METHOD Init( oParent ) CLASS DataGrid
    ::ClsName                 := "DataGrid"
    ::__SysBackColor          := GetSysColor( COLOR_WINDOW )
    ::BackColor               := GetSysColor( COLOR_WINDOW )
-   ::Style                   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style                   := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Border                  := WS_BORDER
    ::Super:Init( oParent )
    ::Width                   := 340
@@ -423,11 +423,11 @@ METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHea
       rc:top    := aText[2]
       rc:right  := aText[3]
       rc:bottom := aText[4]
-      DrawText( hDC, aData[1], @rc, IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_CALCRECT|DT_WORDBREAK )
+      DrawText( hDC, aData[1], @rc, ( IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_CALCRECT|DT_WORDBREAK ) )
       aText[2]  := ( aText[4]-rc:bottom ) / 2
       aText[4]  := aText[2] + rc:bottom
 
-      _DrawText( hDC, aData[1], aText, IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_WORDBREAK )
+      _DrawText( hDC, aData[1], aText, ( IIF( nAlign == ALIGN_CENTER, DT_CENTER,0) | DT_WORDBREAK ) )
     ELSE
       FOR z := 1 TO LEN( aData )
           aAlign := _GetTextExtentExPoint( hDC, ALLTRIM(aData[z]), aText[3]-aText[1]-nWimg, @iLen )
@@ -490,7 +490,7 @@ RETURN ::__DataWidth
 METHOD __GetPosition() CLASS DataGrid
    LOCAL nRec, lDeleted, nKeyNo, nDel := 0, nPos := 0
    IF ::DataSource != NIL
-      IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+      IF ::DataSource:ClsName == "MemoryTable" .OR. ( ::DataSource:Driver IN { "SQLRDD", "SQLEX" } ) .OR. ::ExtVertScrollBar
          nRec   := ::DataSource:Recno()
          nKeyNo := ::DataSource:OrdKeyNo()
          nPos   := nKeyNo
@@ -591,7 +591,7 @@ METHOD CreateDragImage(y) CLASS DataGrid
    LOCAL hImageList, hMemBitmap, nTop
    nTop       := ::__GetHeaderHeight() + ( ::ItemHeight*(::RowPos-1) )
    hMemBitmap := GetScreenBitmap( { 0, nTop, ::ClientWidth, nTop + ::ItemHeight }, ::hWnd )
-   hImageList := ImageListCreate( ::ClientWidth, ::ItemHeight, ILC_COLORDDB | ILC_MASK, 1, 0 )
+   hImageList := ImageListCreate( ::ClientWidth, ::ItemHeight, (ILC_COLORDDB | ILC_MASK), 1, 0 )
    ImageListAdd( hImageList, hMemBitmap )
    DeleteObject( hMemBitmap )
    ::__nDragTop := y-nTop
@@ -838,7 +838,7 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
 
    oSource := __ChkComponent( Self, oSource )
 
-   IF ( hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST ) ) > 0
+   IF ( hWnd := GetWindow( ::hWnd, (GW_CHILD | GW_HWNDFIRST) ) ) > 0
       DestroyWindow( hWnd )
    ENDIF
 
@@ -1249,7 +1249,7 @@ METHOD OnChar( nKey ) CLASS DataGrid
          RETURN 0
       ENDIF
    ENDIF
-   IF nKey IN {13,9} .AND. ::__CurControl == NIL .AND. ::Action != NIL
+   IF (nKey IN {13,9}) .AND. ::__CurControl == NIL .AND. ::Action != NIL
       __Evaluate( ::Action, Self )
    ENDIF
 RETURN NIL
@@ -1310,21 +1310,21 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
       aMove := ARRAY( LEN( ::DataSource:Structure ) )
       nRec  := ::DataSource:Recno()
 
-      aEval( aDrag, {|,n| aDrag[n] := ::DataSource:FieldGet(n) } )
+      aEval( aDrag, {|a,n| (a), aDrag[n] := ::DataSource:FieldGet(n) } )
 
       IF ::DataSource:FileLock()
          IF nPos > ::RowPos // Drag down
 
             FOR i := ::RowPos+1 TO nPos
                 ::DataSource:Skip()
-                aEval( aMove, {|,n| aMove[n] := ::DataSource:FieldGet(n) } )
+                aEval( aMove, {|a,n| (a), aMove[n] := ::DataSource:FieldGet(n) } )
                 AADD( aData, ACLONE( aMove ) )
             NEXT
             AADD( aData, ACLONE( aDrag ) )
             ::DataSource:Goto( nRec )
 
             FOR i := 1 TO LEN( aData )
-                aEval( aData[i], {|,n| ::DataSource:FieldPut(n, aData[i][n] ) } )
+                aEval( aData[i], {|a,n| (a), ::DataSource:FieldPut(n, aData[i][n] ) } )
                 ::DataSource:Skip()
             NEXT
             ::DataSource:Skip(-1)
@@ -1333,14 +1333,14 @@ METHOD OnLButtonUp( nwParam, xPos, yPos ) CLASS DataGrid
 
             FOR i := ::RowPos-1 TO nPos STEP -1
                 ::DataSource:Skip(-1)
-                aEval( aMove, {|,n| aMove[n] := ::DataSource:FieldGet(n) } )
+                aEval( aMove, {|a,n| (a), aMove[n] := ::DataSource:FieldGet(n) } )
                 AADD( aData, ACLONE( aMove ) )
             NEXT
             AADD( aData, ACLONE( aDrag ) )
             ::DataSource:Goto( nRec )
 
             FOR i := 1 TO LEN( aData )
-                aEval( aData[i], {|,n| ::DataSource:FieldPut(n, aData[i][n] ) } )
+                aEval( aData[i], {|a,n| (a), ::DataSource:FieldPut(n, aData[i][n] ) } )
                 ::DataSource:Skip(-1)
             NEXT
             IF nPos > 1
@@ -1898,7 +1898,7 @@ METHOD OnKeyDown( nwParam, nlParam ) CLASS DataGrid
            ENDIF
 
       OTHERWISE
-           IF ! nwParam IN { VK_RETURN, VK_DELETE, VK_TAB, VK_SHIFT } .AND. ! Empty( ::CurTag )
+           IF ! ( nwParam IN { VK_RETURN, VK_DELETE, VK_TAB, VK_SHIFT } ) .AND. ! Empty( ::CurTag )
               IF EMPTY( ::__cSearch )
                  // Start auto clearing timer
                  ::SetTimer( 10, 2000 )
@@ -2246,7 +2246,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
               ENDIF
 
               IF nRep > 1
-                 _ExtTextOut( hMemDC, aText[1], y, ETO_CLIPPED | ETO_OPAQUE, {aText[1],aText[2],nRight,aText[4]}, "")
+                 _ExtTextOut( hMemDC, aText[1], y, ( ETO_CLIPPED | ETO_OPAQUE ), {aText[1],aText[2],nRight,aText[4]}, "")
 
                ELSE
 
@@ -2368,7 +2368,7 @@ METHOD __DisplayData( nRow, nCol, nRowEnd, nColEnd, hMemDC, lHover, lPressed, lH
       SetBkColor( hMemDC, nBackGrid )
       SetTextColor( hMemDC, nForeGrid )
 
-      _ExtTextOut( hMemDC, x, y, ETO_CLIPPED | ETO_OPAQUE, { x, y, ::ClientWidth, ::ClientHeight }," ")
+      _ExtTextOut( hMemDC, x, y, (ETO_CLIPPED | ETO_OPAQUE), { x, y, ::ClientWidth, ::ClientHeight }," ")
    ENDIF
 
    SelectObject( hMemDC, hOldFont )
@@ -2430,14 +2430,14 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, nAlign, zL
               ENDIF
 
          CASE xVal == BST_INDETERMINATE
-              nStatus := DFCS_BUTTON3STATE | DFCS_CHECKED
+              nStatus := (DFCS_BUTTON3STATE | DFCS_CHECKED)
               IF lXP
                  nStatus := IIF( ::__lHot, CBS_MIXEDHOT, CBS_MIXEDNORMAL )
               ENDIF
 
       ENDCASE
 
-      nFlags := nFlags | nStatus
+      nFlags := (nFlags | nStatus)
 
       IF lXP
          aClip  := { aRect[1], aRect[2], aRect[3], aRect[4] }
@@ -2469,7 +2469,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, nAlign, zL
        ELSE
          nStatus := DFCS_BUTTONPUSH
          IF ::__lMouseDown  .AND. i == ::ColPos
-            nStatus := nStatus | DFCS_PUSHED
+            nStatus := (nStatus | DFCS_PUSHED)
          ENDIF
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, nStatus )
       ENDIF
@@ -2479,7 +2479,7 @@ METHOD __DrawRepresentation( hDC, nRep, aRect, cText, nBkCol, nTxCol, nAlign, zL
       IF ! EMPTY( ::Children[i]:ButtonText )
          cText := ::Children[i]:ButtonText
       ENDIF
-      _DrawText( hDC, cText, aRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
+      _DrawText( hDC, cText, aRect, (DT_CENTER | DT_VCENTER | DT_SINGLELINE) )
 
    ENDIF
 
@@ -2787,7 +2787,7 @@ METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
    IF ::DataSource != NIL .AND. ::DataSource:IsOpen .AND. ( ::AutoVertScroll .OR. lForce )
 
       nPage := Int(  ::__DataHeight/::ItemHeight )
-      IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+      IF ::DataSource:ClsName == "MemoryTable" .OR. ( ::DataSource:Driver IN { "SQLRDD", "SQLEX" } ) .OR. ::ExtVertScrollBar
          nMax  := ::GetRecordCount() //::DataSource:OrdKeyCount()
          nPos  := IIF( nMax < nPage, 0, ::__VertScrolled )
          IF nMax <= nPage .AND. ::AutoVertScroll
@@ -2796,7 +2796,7 @@ METHOD __UpdateVScrollBar( lRedraw, lForce ) CLASS DataGrid
        ELSE
          nMax  := 100
          nPos  := ::DataSource:OrdKeyRelPos()*100
-         nFlags := SIF_POS | SIF_RANGE
+         nFlags := (SIF_POS | SIF_RANGE)
          IF ::GetRecordCount() <= nPage
             nMax := 0
          ENDIF
@@ -2956,27 +2956,27 @@ METHOD OnVertScroll( nCode, nPos ) CLASS DataGrid
 
    DO CASE
       CASE nCode == SB_LINEUP
-           IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+           IF ::DataSource:ClsName == "MemoryTable" .OR. (::DataSource:Driver IN { "SQLRDD", "SQLEX" }) .OR. ::ExtVertScrollBar
               ::__ScrollDown()
             ELSE
               ::OnKeyDown( VK_UP )
            ENDIF
       CASE nCode == SB_LINEDOWN
-           IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+           IF ::DataSource:ClsName == "MemoryTable" .OR. (::DataSource:Driver IN { "SQLRDD", "SQLEX" }) .OR. ::ExtVertScrollBar
               ::__ScrollUp()
             ELSE
               ::OnKeyDown( VK_DOWN )
            ENDIF
 
       CASE nCode == SB_PAGEDOWN
-           IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+           IF ::DataSource:ClsName == "MemoryTable" .OR. (::DataSource:Driver IN { "SQLRDD", "SQLEX" }) .OR. ::ExtVertScrollBar
               ::__ScrollUp( ::__VertScrolled + ::RowCountUsable )
             ELSE
               ::OnKeyDown( VK_NEXT )
            ENDIF
 
       CASE nCode == SB_PAGEUP
-           IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+           IF ::DataSource:ClsName == "MemoryTable" .OR. (::DataSource:Driver IN { "SQLRDD", "SQLEX" }) .OR. ::ExtVertScrollBar
               ::__ScrollDown( ::__VertScrolled - ::RowCountUsable )
             ELSE
               ::OnKeyDown( VK_PRIOR )
@@ -2990,7 +2990,7 @@ METHOD OnVertScroll( nCode, nPos ) CLASS DataGrid
            ENDIF
 
       CASE nCode == SB_THUMBTRACK
-           IF ::DataSource:ClsName == "MemoryTable" .OR. ::DataSource:Driver IN { "SQLRDD", "SQLEX" } .OR. ::ExtVertScrollBar
+           IF ::DataSource:ClsName == "MemoryTable" .OR. (::DataSource:Driver IN { "SQLRDD", "SQLEX" }) .OR. ::ExtVertScrollBar
               IF nPos > ::__VertScrolled
                  ::__ScrollUp( nPos )
                ELSEIF nPos < ::__VertScrolled
@@ -3769,7 +3769,7 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
           ENDCASE
 
           IF lEdit
-             oCol:ControlAccessKey := GRID_CHAR | GRID_LCLICK
+             oCol:ControlAccessKey := (GRID_CHAR | GRID_LCLICK)
              oCol:OnSave := {|xData| ::DataSource:Fields:Put( xData, ::System:TypeCast( Alltrim(aField[1], aField[2] ) ) ) }
           ENDIF
       NEXT
@@ -3793,10 +3793,10 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
             nCol := ::ColPos
          ENDIF
       ENDIF
-      IF ::Children[nCol]:Representation == 3 .AND. nMessage == GRID_LCLICK .OR. nwParam IN {VK_SPACE,VK_RETURN}
+      IF ::Children[nCol]:Representation == 3 .AND. nMessage == GRID_LCLICK .OR. (nwParam IN {VK_SPACE,VK_RETURN})
          xValue := ::__DisplayArray[ ::RowPos ][ 1 ][ nCol ][ 1 ]
          IF VALTYPE( xValue ) == "L"
-            IF nwParam IN {VK_SPACE,VK_RETURN} .AND. n == 0
+            IF (nwParam IN {VK_SPACE,VK_RETURN}) .AND. n == 0
                RETURN Self
             ENDIF
             IF HGetPos( ::Children[nCol]:EventHandler, "OnSave" ) > 0
@@ -3808,12 +3808,12 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
          ENDIF
       ENDIF
       IF ::FullRowSelect
-         nCol := ASCAN( ::Children, {|o|o:Control != NIL .AND. o:ControlAccessKey & nMessage != 0 } )
+         nCol := ASCAN( ::Children, {|o|o:Control != NIL .AND. ( o:ControlAccessKey & nMessage ) != 0 } )
          IF nCol == 0
             nCol := ::ColPos
          ENDIF
       ENDIF
-      IF ::Children[nCol]:Control != NIL .AND. ::Children[nCol]:ControlAccessKey & nMessage != 0
+      IF ::Children[nCol]:Control != NIL .AND. (::Children[nCol]:ControlAccessKey & nMessage) != 0
          ::__CurControl := EVAL( ::Children[nCol]:Control, Self, ::DataSource:Recno() )
          aRect := ::GetItemRect()
          IF aRect == NIL
@@ -3822,7 +3822,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
       ENDIF
 
       IF ::__CurControl == NIL
-         IF nwParam == VK_RETURN .AND. ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+         IF nwParam == VK_RETURN .AND. ( n := HSCAN( ::Form:__hObjects, {|a,o| (a), o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
             ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
             RETURN NIL
          ENDIF
@@ -3888,7 +3888,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
                                            IF n == 27
                                               ::__ResetControl()
                                               RETURN 0
-                                            ELSEIF n IN {13,9}
+                                            ELSEIF (n IN {13,9})
                                               IF ! ::__ControlSaveData(o,n)
                                                  RETURN 0
                                               ENDIF
@@ -3905,7 +3905,7 @@ METHOD __Edit( n, xPos, yPos, nMessage, nwParam ) CLASS DataGrid
             ::__CurControl:PostMessage( EM_SETSEL, 0, -1 )
          ENDIF
 
-         IF n == 1 .AND. nwParam != NIL .AND. ! nwParam IN {13,9}
+         IF n == 1 .AND. nwParam != NIL .AND. ! (nwParam IN {13,9})
             ::__CurControl:PostMessage( WM_CHAR, nwParam, 0 )
          ENDIF
 
@@ -4253,7 +4253,7 @@ METHOD Create() CLASS GridColumn
    TRY
       IF ::AutoEdit
          ::Control := {|o| IIF( ValType(::CellData) $ "MC", EditBox(o), MaskEdit(o) ) }
-         ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
+         ::ControlAccessKey := (GRID_CHAR | GRID_LCLICK)
       ENDIF
    CATCH
    END
@@ -4293,7 +4293,7 @@ METHOD CreateDragImage( nLeft ) CLASS GridColumn
 
    hMemBitmap := GetScreenBitmap( {nLeft,0,nLeft+nWidth, ::Parent:ClientHeight}, ::Parent:hWnd )
 
-   hImageList := ImageListCreate( nWidth, ::Parent:ClientHeight, ILC_COLORDDB | ILC_MASK, 1, 0 )
+   hImageList := ImageListCreate( nWidth, ::Parent:ClientHeight, (ILC_COLORDDB | ILC_MASK), 1, 0 )
    ImageListAdd( hImageList, hMemBitmap )
 
    DeleteObject( hMemBitmap )
@@ -4574,7 +4574,7 @@ METHOD __SetAutoEdit( lEdit ) CLASS GridColumn
    IF lEdit != ::AutoEdit
       IF lEdit
          ::Control := {|o| IIF( ValType(::CellData) $ "MC", EditBox(o), MaskEdit(o) ) }
-         ::ControlAccessKey := GRID_CHAR | GRID_LCLICK
+         ::ControlAccessKey := (GRID_CHAR | GRID_LCLICK)
        ELSE
          ::Control := NIL
          ::ControlAccessKey := NIL

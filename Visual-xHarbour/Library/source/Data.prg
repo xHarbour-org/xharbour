@@ -5,7 +5,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "colors.ch"
-#include "sqlrdd.ch"
+//#include "sqlrdd.ch"
 
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -74,4 +74,4 @@ METHOD GetColumn( xIndex ) CLASS DataColumn
    IF ValType( xIndex ) == 'C'
       xIndex := aScan( ::Parent:pvtColumns, {|_1| Upper( xIndex ) == _1:Name } )
    ENDIF
-RETURN ::Parent:pvtColumns[ xIndex ] 
+RETURN ::Parent:pvtColumns[ xIndex ]

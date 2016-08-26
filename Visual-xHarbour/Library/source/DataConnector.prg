@@ -5,7 +5,7 @@
 #include "debug.ch"
 #include "vxh.ch"
 #include "colors.ch"
-#include "sqlrdd.ch"
+//#include "sqlrdd.ch"
 
 //-------------------------------------------------------------------------------------------------------
 CLASS SqlConnector INHERIT Component

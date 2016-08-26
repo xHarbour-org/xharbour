@@ -171,7 +171,7 @@ METHOD Init( oParent ) CLASS ComboBox
    DEFAULT ::__xCtrlName TO "ComboBox"
    ::ClsName    := "ComboBox"
    ::ThemeName  := "combobox"
-   ::Style      := WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL  | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style      := ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL  | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
    ::Super:Init( oParent )
    ::Width      := 100
    ::Height     := 100
@@ -200,15 +200,15 @@ RETURN cText
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD SetDropDownStyle( nDrop ) CLASS ComboBox
-   ::Style := ::Style & NOT( CBS_DROPDOWNLIST )
-   ::Style := ::Style & NOT( CBS_DROPDOWN )
-   ::Style := ::Style & NOT( CBS_SIMPLE )
-   ::Style := ::Style | nDrop
+   ::Style := ( ::Style & NOT( CBS_DROPDOWNLIST ) )
+   ::Style := ( ::Style & NOT( CBS_DROPDOWN ) )
+   ::Style := ( ::Style & NOT( CBS_SIMPLE ) )
+   ::Style := ( ::Style | nDrop )
    IF ::IsWindow()
       ::SetWindowLong( GWL_STYLE, ::Style )
       IF ::DesignMode
-         ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+         ::SetWindowPos(, 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
+         ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
       ENDIF
    ENDIF
 RETURN Self
@@ -267,7 +267,7 @@ METHOD __SetItemToolTips( lTips ) CLASS ComboBox
          ENDIF
          wcex := (struct WNDCLASSEX)
          wcex:cbSize         := wcex:SizeOf()
-         wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
+         wcex:style          := (CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW)
          wcex:hInstance      := ::AppInstance
          wcex:hbrBackground  := COLOR_BTNFACE+1
          wcex:lpszClassName  := "CBTT"
@@ -365,7 +365,7 @@ METHOD DrawFrame( hDC, aRect, nAlign, nWidth, nStatus ) CLASS ComboBox
       IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
          nStatus := CBXS_NORMAL
       ENDIF
-      nFlags := nFlags | nStatus
+      nFlags := (nFlags | nStatus)
    ENDIF
    aRect[1] := aRect[3] - GetSystemMetrics( SM_CXVSCROLL )
    IF ::OsVer:dwMajorVersion > 4 .AND. ::Application:ThemeActive
@@ -441,7 +441,7 @@ METHOD __ListCallBack( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
            ENDIF
 
            IF ! ::__isEnter
-              ::__TrackMouseEvent( hWnd, TME_HOVER|TME_LEAVE )
+              ::__TrackMouseEvent( hWnd, (TME_HOVER|TME_LEAVE) )
            ENDIF
            EXIT
 
@@ -513,7 +513,7 @@ METHOD __HandleOnPaint( hWnd ) CLASS ComboBox
    SetBkMode( hDC, TRANSPARENT )
    hOldFont := SelectObject( hDC, ::Font:Handle )
 
-   _DrawText( hDC, cText, aRect, DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+   _DrawText( hDC, cText, aRect, (DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX) )
 
    SelectObject( hDC, hOldFont )
    _EndPaint( hWnd, cPaint)
@@ -555,7 +555,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    rcDraw:right  := rcBounds:right
    rcDraw:bottom := rcBounds:bottom
 
-   DrawText( hDC, cBuf, @rcDraw, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+   DrawText( hDC, cBuf, @rcDraw, (DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX) )
 
    SelectObject( hDC, hOldFont )
    ReleaseDC( ::__tipWnd, hDC )
@@ -587,7 +587,7 @@ METHOD __ListboxMouseMove( hList, nwParam, aPt ) CLASS ComboBox
    //   SetCapture( hList )
    //ENDIF
 
-   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left+4, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
+   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left+4, rcDraw:Bottom-rcDraw:top, (SWP_NOACTIVATE | SWP_SHOWWINDOW) )
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
@@ -610,7 +610,7 @@ METHOD Init( oParent ) CLASS DriveCombobox
    LOCAL cDrives, n, cType, shfi
    ::__xCtrlName := "DriveComboBox"
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    IF !::Application:IsThemedXP
       ::Border := 0
    ENDIF
@@ -622,7 +622,7 @@ METHOD Init( oParent ) CLASS DriveCombobox
    STRTRAN( cDrives, CHR(0) )
    FOR n := 1 TO LEN( ALLTRIM(cDrives ))-1
 //       cBuffer := shfi:Value()
-       SHGetFileInfo( SUBSTR( cDrives, n, 3 ),, @shfi, SHGFI_ICON | SHGFI_SMALLICON | SHGFI_DISPLAYNAME)
+       SHGetFileInfo( SUBSTR( cDrives, n, 3 ),, @shfi, (SHGFI_ICON | SHGFI_SMALLICON | SHGFI_DISPLAYNAME) )
 //       shfi:Buffer( cBuffer )
        cType := shfi:szDisplayName:AsString()//:Value()
        AADD( ::Drives, { SUBSTR( cDrives, n, 2 ), cType, shfi:hIcon } )
@@ -648,10 +648,10 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS DriveCombobox
    LOCAL n, x, lSelected, aClip, nLen, itemTxt, cText, aRect, nField, y
    ( nwParam, nlParam )
    IF dis != NIL .AND. dis:hwndItem == ::hWnd
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
       aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
                      dis:rcItem:Right, dis:rcItem:Bottom  }
-      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0
          SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -668,7 +668,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS DriveCombobox
          FOR n := 3 to nLen + 1
              IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
                 x := aRect[1] + 2
-                _DrawText( dis:hDC, cText, {x, aRect[2], aRect[3], aRect[4] }, DT_VCENTER | DT_SINGLELINE )
+                _DrawText( dis:hDC, cText, {x, aRect[2], aRect[3], aRect[4] }, (DT_VCENTER | DT_SINGLELINE) )
                 cText := ""
                 aRect[1] += 4
                 nField ++
@@ -686,7 +686,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS DriveCombobox
          ENDIF
 
       ENDIF
-      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      IF (dis:itemState & ODS_FOCUS) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
          aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
                     dis:rcItem:Right, dis:rcItem:Bottom  }
          _DrawfocusRect( dis:hDC, aclip )
@@ -718,7 +718,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS ColorPicker
    ::__xCtrlName := "ColorPicker"
    ::Super:Init( oParent )
-   ::Style := WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := (WS_CHILD | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 RETURN Self
 
 METHOD SelectColor( nColor ) CLASS ColorPicker
@@ -768,7 +768,7 @@ METHOD OnParentCommand( nId, nCode ) CLASS ColorPicker
 
               CASE cSel == "Custom..."
                    nColor := ::ColorSelected //::Colors[ ::GetCurSel()+1 ][1]
-                   IF _ChooseColor( ::Parent:hWnd, @nColor, ::Application:CustomColors, CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN )
+                   IF _ChooseColor( ::Parent:hWnd, @nColor, ::Application:CustomColors, (CC_ANYCOLOR | CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN ) )
                       TRY
                         ::Colors[ ::GetCurSel() ][1] := nColor
                       CATCH
@@ -805,11 +805,11 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColorPicker
    LOCAL n, lSelected, aClip, nLen, itemTxt, hBrush, hOld, z
    (nwParam, nlParam)
    IF dis != NIL .AND. dis:hwndItem == ::hWnd
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
       aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
                      dis:rcItem:Right, dis:rcItem:Bottom  }
 
-      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
          SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -819,7 +819,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColorPicker
          itemTxt := left( itemTxt, nLen )
 
          z := 0
-         IF dis:itemState & ODS_COMBOBOXEDIT != 0
+         IF (dis:itemState & ODS_COMBOBOXEDIT) != 0
             z := 2
          ENDIF
          //_ExtTextOut( dis:hDC, IIF( itemTxt != "None", 28, 3 ), dis:rcItem:Top-z, ETO_OPAQUE + ETO_CLIPPED, { dis:rcItem:Left, dis:rcItem:Top, dis:rcItem:Right, dis:rcItem:Bottom }, itemTxt )
@@ -830,7 +830,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColorPicker
           ELSE
             dis:rcItem:Left += 3
          ENDIF
-         DrawText( dis:hDC, itemTxt, dis:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+         DrawText( dis:hDC, itemTxt, dis:rcItem, (DT_LEFT | DT_VCENTER | DT_SINGLELINE ) )
          IF itemTxt != "None"
             dis:rcItem:Left -= 28
           ELSE
@@ -841,7 +841,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ColorPicker
 
          IF n > 0
             z := 2
-            IF dis:itemState & ODS_COMBOBOXEDIT != 0
+            IF (dis:itemState & ODS_COMBOBOXEDIT) != 0
                z := 0
             ENDIF
             IF itemTxt != "None"
@@ -880,7 +880,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS CursorComboBox
    ::__xCtrlName := "CursorComboBox"
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
 RETURN Self
 
 METHOD Create() CLASS CursorComboBox
@@ -905,10 +905,10 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CursorComboBox
    LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize
    (nwParam, nlParam)
    IF dis:hwndItem == ::hWnd
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
       aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
                      dis:rcItem:Right, dis:rcItem:Bottom  }
-      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0
          SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -923,7 +923,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CursorComboBox
 
          IF n > 0
             ExtTextOut( dis:hDC, ::Cursors[n][3]+10, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
-            IF dis:itemState & ODS_COMBOBOXEDIT == 0 .AND. ::Cursors[n][2] != NIL
+            IF (dis:itemState & ODS_COMBOBOXEDIT) == 0 .AND. ::Cursors[n][2] != NIL
                DrawIcon( dis:hDC, 3, dis:rcItem:Top, ::Cursors[n][2] )
             ENDIF
           ELSE
@@ -931,7 +931,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CursorComboBox
          ENDIF
 
       ENDIF
-      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      IF (dis:itemState & ODS_FOCUS) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
          aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
                     dis:rcItem:Right, dis:rcItem:Bottom  }
          _DrawfocusRect( dis:hDC, aclip )
@@ -958,7 +958,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS FontComboBox
    ::__xCtrlName := "FontComboBox"
    ::Super:Init( oParent )
-   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 RETURN Self
 
 METHOD Create() CLASS FontComboBox
@@ -988,10 +988,10 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FontComboBox
    LOCAL n, y, lSelected, aClip, nLen, itemTxt, aSize, hFont, hOld
    (nwParam, nlParam)
    IF dis:hwndItem == ::hWnd
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
       aClip     := { dis:rcItem:Left+20,  dis:rcItem:Top, ;
                      dis:rcItem:Right, dis:rcItem:Bottom  }
-      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0
          SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -1009,14 +1009,14 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FontComboBox
             hOld  := SelectObject( dis:hDC, hFont )
 
             FillRect( dis:hDC, dis:rcItem, GetSysColorBrush( IIF( lselected, COLOR_HIGHLIGHT, COLOR_WINDOW )) )
-            DrawText( dis:hDC, itemTxt, dis:rcItem, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+            DrawText( dis:hDC, itemTxt, dis:rcItem, (DT_LEFT | DT_VCENTER | DT_SINGLELINE) )
 
             //ExtTextOut( dis:hDC, 10, y, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
             SelectObject( dis:hDC, hOld )
             DeleteObject( hFont )
          ENDIF
       ENDIF
-      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      IF (dis:itemState & ODS_FOCUS) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
          aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
                     dis:rcItem:Right, dis:rcItem:Bottom  }
          _DrawfocusRect( dis:hDC, aclip )
@@ -1048,7 +1048,7 @@ METHOD Init( oParent ) CLASS ComboBoxEx
    ::Super:Init( oParent )
    ::__xCtrlName := "ComboBoxEx"
    ::ClsName     := WC_COMBOBOXEX
-   ::Style       := WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style       := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ExStyle     := 0
 RETURN Self
 
@@ -1069,7 +1069,7 @@ RETURN Self
 METHOD AddItem( cText, nImage ) CLASS ComboBoxEx
    LOCAL cbei := (struct COMBOBOXEXITEM)
    DEFAULT nImage TO ::GetCount()+1
-   cbei:mask           := CBEIF_TEXT | CBEIF_INDENT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE
+   cbei:mask           := (CBEIF_TEXT | CBEIF_INDENT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE)
    cbei:iItem          := -1
    cbei:pszText        := cText
    cbei:cchTextMax     := LEN( cbei:pszText )+1
@@ -1137,7 +1137,7 @@ METHOD Init( oParent ) CLASS FormComboBox
 RETURN Self
 
 METHOD Create() CLASS FormComboBox
-   ::Style  := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style  := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::hFont1 := __GetMessageFont( 700 )
    ::hFont2 := __GetMessageFont( 400 )
    Super:Create()
@@ -1217,9 +1217,9 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FormComboBox
    (nwParam, nlParam)
    IF dis != NIL .AND. dis:hwndItem == ::hWnd
       hDC := dis:hDC
-      lSelected := dis:itemState & ODS_SELECTED != 0
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
 
-      IF dis:itemAction & ODA_DRAWENTIRE != 0 .OR. dis:itemAction & ODA_SELECT != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0
          SetTextColor( hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
          SetBkColor( hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
 
@@ -1242,7 +1242,7 @@ METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS FormComboBox
          _ExtTextOut( hDC, aSize[1]+15, dis:rcItem:Top, ETO_CLIPPED, dis:rcItem:Array, cText )
          SelectObject( hOld )
       ENDIF
-      IF dis:itemState & ODS_FOCUS != 0 .OR. dis:itemAction & ODA_FOCUS != 0
+      IF (dis:itemState & ODS_FOCUS) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
          _DrawfocusRect( hDC, dis:rcItem:Array )
       ENDIF
    ENDIF

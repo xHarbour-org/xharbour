@@ -174,7 +174,7 @@ METHOD PreInitDialog() CLASS Dialog
 
    IF ::Template != NIL
 
-      hWnd := GetWindow( ::hWnd, GW_CHILD | GW_HWNDFIRST )
+      hWnd := GetWindow( ::hWnd, (GW_CHILD | GW_HWNDFIRST ))
       WHILE hWnd != 0
 
          cClass := GetClassName( hWnd )
@@ -187,11 +187,11 @@ METHOD PreInitDialog() CLASS Dialog
                oCtrl := Label( Self )
              ELSEIF cClass == "SysListView32"
                oCtrl := ListView( Self )
-             ELSEIF cClass == "Button" .AND. nStyle & BS_GROUPBOX == BS_GROUPBOX
+             ELSEIF cClass == "Button" .AND. ( nStyle & BS_GROUPBOX ) == BS_GROUPBOX
                oCtrl := GroupBox( Self )
-             ELSEIF cClass == "Button" .AND. ( nStyle & BS_RADIOBUTTON == BS_RADIOBUTTON .OR. nStyle & BS_AUTORADIOBUTTON == BS_AUTORADIOBUTTON )
+             ELSEIF cClass == "Button" .AND. ( ( nStyle & BS_RADIOBUTTON) == BS_RADIOBUTTON .OR. (nStyle & BS_AUTORADIOBUTTON) == BS_AUTORADIOBUTTON )
                oCtrl := RadioButton( Self )
-             ELSEIF cClass == "Button" .AND. ( nStyle & BS_CHECKBOX == BS_CHECKBOX .OR. nStyle & BS_AUTOCHECKBOX == BS_AUTOCHECKBOX )
+             ELSEIF cClass == "Button" .AND. ( (nStyle & BS_CHECKBOX) == BS_CHECKBOX .OR. (nStyle & BS_AUTOCHECKBOX) == BS_AUTOCHECKBOX )
                oCtrl := CheckBox( Self )
              ELSE
                oCtrl := &cClass( Self )
@@ -220,7 +220,7 @@ METHOD PreInitDialog() CLASS Dialog
       IF ::VertScrollTopMargin > 0
          ::__oDlg := Dialog( Self )
          WITH OBJECT ::__oDlg
-            :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+            :Style       := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
             :ExStyle     := WS_EX_CONTROLPARENT
 
             :Top         := ::VertScrollTopMargin
@@ -317,7 +317,7 @@ RETURN Self
 
 FUNCTION __GetTemplate( oDlg )
    LOCAL dt := (struct DLGTEMPLATEX)
-   dt:style := oDlg:Style | WS_CLIPCHILDREN
+   dt:style := (oDlg:Style | WS_CLIPCHILDREN)
    dt:dwExtendedStyle := oDlg:ExStyle
    dt:x  := MulDiv( oDlg:Left,   4, LOWORD( GetDialogBaseUnits() ) )  //Int( ( oDlg:Left * 4 )  /LOWORD(GetDialogBaseUnits()) )
    dt:y  := MulDiv( oDlg:Top,    8, HIWORD( GetDialogBaseUnits() ) )  //Int( ( oDlg:Top * 4 )   /LOWORD(GetDialogBaseUnits()) )

@@ -68,7 +68,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS GroupBox
    ::__xCtrlName := "GroupBox"
    ::ClsName   := "GroupBox"
-   DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::Style TO (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Super:Init( oParent )
    ::Width         := 150
    ::Height        := 100
@@ -159,7 +159,7 @@ METHOD OnPaint() CLASS GroupBox
       aRect[1] := 10
 
       SetBkMode( hMemDC, TRANSPARENT )
-      _DrawText( hMemDC, ::Text, aRect, DT_LEFT | DT_SINGLELINE )
+      _DrawText( hMemDC, ::Text, aRect, (DT_LEFT | DT_SINGLELINE) )
    ENDIF
 
    SelectObject( hMemDC, hFont )

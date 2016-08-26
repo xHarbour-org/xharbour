@@ -462,7 +462,7 @@ METHOD LoadResource( cResource, cType ) CLASS FreeImageRenderer
     ELSE
 
       IF cType == "BMP"
-         hBmp := LoadImage( hInst, cResource, IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_CREATEDIBSECTION )
+         hBmp := LoadImage( hInst, cResource, IMAGE_BITMAP, 0, 0, (LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_CREATEDIBSECTION) )
        ELSE
          hBmp := LoadImage( hInst, cResource, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE )
       ENDIF

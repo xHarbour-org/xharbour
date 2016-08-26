@@ -51,7 +51,7 @@ METHOD Init( oParent ) CLASS Image
    DEFAULT ::__xCtrlName TO "Image"
    ::ClsName  := "static"
    ::Super:Init( oParent )
-   ::Style := WS_CHILD | WS_VISIBLE | SS_NOTIFY | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := (WS_CHILD | WS_VISIBLE | SS_NOTIFY | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------

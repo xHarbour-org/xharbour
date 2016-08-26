@@ -156,7 +156,7 @@ CLASS EditBox INHERIT Control
    METHOD SetWordBreakProc(nProc)      INLINE ::SendMessage( EM_SETWORDBREAKPROC, 0, nProc )
    METHOD Undo()                       INLINE ::SendMessage( EM_UNDO, 0, 0 )
    METHOD OnEraseBkGnd()
-   METHOD SetParent( oParent )         INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD SetParent( oParent )         INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
    METHOD SetRect(aRect, lRelative)
    METHOD SetRectNP(aRect, lRelative)
    METHOD SetTabStops( nTabs, aTabs )
@@ -202,7 +202,7 @@ METHOD Init( oParent ) CLASS EditBox
    ::ClsName   := "Edit"
    ::ThemeName := "EDIT"
 
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
+   ::Style        := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS) //| IIF( ! ::Application:IsThemedXP, WS_BORDER, 0 )
    ::Border       := WS_EX_CLIENTEDGE
 
    ::Super:Init( oParent )
@@ -289,7 +289,7 @@ METHOD __SetMenuArrow() CLASS EditBox
    ENDIF
    IF ::IsWindow()
       //::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
    ENDIF
 RETURN Self
 
@@ -304,7 +304,7 @@ METHOD Create() CLASS EditBox
       oImageList := ::ImageList
       DEFAULT oImageList TO ::Parent:ImageList
       IF ::Button .OR. /*::DropCalendar .OR.*/ ::MenuArrow .OR. ( oImageList != NIL .AND. ::ImageIndex > 0 )
-         ::SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+         ::SetWindowPos(, 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
       ENDIF
    ENDIF
    IF ! ::DesignMode
@@ -407,7 +407,7 @@ METHOD __UpdateDataGrid() CLASS EditBox
    ::DataSource:Seek( ::Text )
    WHILE ( nRecs < ::DataSearchRecords .OR. ::DataSearchRecords == 0 ) .AND. !::DataSource:Eof()
       cData := ALLTRIM( ::DataSource:Fields:FieldGet( ::DataSearchField ) )
-      IF UPPER( ALLTRIM( ::Caption ) ) IN UPPER( cData )
+      IF ( UPPER( ALLTRIM( ::Caption ) ) IN UPPER( cData ) )
          AADD( ::__oDataGrid:DataSource:Table, { cData } )
       ENDIF
       nRecs ++
@@ -431,7 +431,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnKillFocus() CLASS EditBox
    ::InvalidateRect(,.F.)
-   IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN}
+   IF ::__oDataGrid != NIL .AND. ::__oDataGrid:Height > 0 .AND. ! ( ::LastKey IN {VK_UP,VK_DOWN,VK_ESCAPE,VK_RETURN} )
       ::__ChkGridKeys( NIL, VK_RETURN, .F. )
    ENDIF
 RETURN NIL
@@ -469,7 +469,7 @@ RETURN NIL
 METHOD OnGetDlgCode() CLASS EditBox
    LOCAL n, nRet
    IF ::wParam == VK_RETURN .AND. ::Parent:ClsName != "DataGrid"
-      IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+      IF ( n := HSCAN( ::Form:__hObjects, {|a,o| (a), o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
          nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
          RETURN NIL
       ENDIF
@@ -658,7 +658,7 @@ METHOD OnNCPaint() CLASS EditBox
 
    IF ::Button .OR. ( ::xLayout > 1 .AND. ( ::__aArrowPos[2] > 0 .OR. ::__aImagePos[2] > 0 ) )
       nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
-      IF nStyle & WS_EX_CLIENTEDGE == 0
+      IF (nStyle & WS_EX_CLIENTEDGE) == 0
          n := 0
       ENDIF
 
@@ -666,7 +666,7 @@ METHOD OnNCPaint() CLASS EditBox
 
          aRect := {::Width-16-n, n, ::Width-n, ::Height-n}
          hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
+         hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE) )
 
          _DrawFrameControl( hDC, aRect, DFC_BUTTON, DFCS_BUTTONPUSH )
          SetBkMode( hDC, TRANSPARENT )
@@ -686,7 +686,7 @@ METHOD OnNCPaint() CLASS EditBox
 
             aRect := { ::__aArrowPos[1], 1, ::__aArrowPos[1] + ::__aArrowPos[2], ::Height-1 }
             hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
-            hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
+            hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE) )
 
             _FillRect( hDC, aRect, hBrush )
 
@@ -705,7 +705,7 @@ METHOD OnNCPaint() CLASS EditBox
          IF ::__aImagePos[2] > 0
             aRect := { ::__aImagePos[1], 1, ::__aImagePos[1] + ::__aImagePos[2], ::Height-1 }
             hRegion := CreateRectRgn( aRect[1], aRect[2], aRect[3], aRect[4] )
-            hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
+            hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE) )
 
             oImageList := ::ImageList
             DEFAULT oImageList TO ::Parent:ImageList
@@ -765,16 +765,16 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
       IF ::Button
          ::__ButtonPushed := .T.
          nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
-         IF nStyle & WS_EX_CLIENTEDGE == 0
+         IF (nStyle & WS_EX_CLIENTEDGE) == 0
             n := 0
          ENDIF
 
          hRegion := CreateRectRgn( ::Width-16-n, n, ::Width-n, ::Height-n )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
+         hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE) )
 
-         _DrawFrameControl( hDC, {::Width-16-n, n, ::Width-n, ::Height-n}, DFC_BUTTON, DFCS_BUTTONPUSH | DFCS_PUSHED )
+         _DrawFrameControl( hDC, {::Width-16-n, n, ::Width-n, ::Height-n}, DFC_BUTTON, (DFCS_BUTTONPUSH | DFCS_PUSHED) )
          SetBkMode( hDC, TRANSPARENT )
-         _DrawText( hDC, "...", {::Width-16-n, n, ::Width-n, ::Height-n}, DT_CENTER | DT_SINGLELINE | DT_VCENTER )
+         _DrawText( hDC, "...", {::Width-16-n, n, ::Width-n, ::Height-n}, (DT_CENTER | DT_SINGLELINE | DT_VCENTER) )
 
          ReleaseDC(::hWnd, hdc)
          DeleteObject( hRegion )
@@ -832,7 +832,7 @@ METHOD OnNCLButtonDown( nwParam, nlParam ) CLASS EditBox
                pt:y := ::top
 
                IF ::xLayout < 4
-                  nAlign := TPM_RIGHTALIGN | TPM_TOPALIGN
+                  nAlign := (TPM_RIGHTALIGN | TPM_TOPALIGN)
                   pt:x := ::left + ::Width
                ENDIF
 
@@ -860,16 +860,16 @@ METHOD OnNCLButtonUp( nwParam, nlParam ) CLASS EditBox
       IF ::__ButtonPushed .AND. _PtInRect( {::ClientWidth, 0, ::ClientWidth+16, ::ClientHeight}, aPt )
          ::__ButtonPushed := .F.
          nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
-         IF nStyle & WS_EX_CLIENTEDGE == 0
+         IF (nStyle & WS_EX_CLIENTEDGE) == 0
             n := 0
          ENDIF
 
          hRegion := CreateRectRgn( ::Width-16-n, n, ::Width-n, ::Height-n )
-         hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE )
+         hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_VALIDATE) )
 
          _DrawFrameControl( hDC, {::Width-16-n, n, ::Width-n, ::Height-n}, DFC_BUTTON, DFCS_BUTTONPUSH )
          SetBkMode( hDC, TRANSPARENT )
-         _DrawText( hDC, "...", {::Width-16-n, n, ::Width-n, ::Height-n}, DT_CENTER | DT_SINGLELINE | DT_VCENTER )
+         _DrawText( hDC, "...", {::Width-16-n, n, ::Width-n, ::Height-n}, (DT_CENTER | DT_SINGLELINE | DT_VCENTER) )
 
          ReleaseDC(::hWnd, hdc)
          DeleteObject( hRegion )
@@ -1109,7 +1109,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
       ::InvalidateRect(, .F.)
    ENDIF
 
-   IF ::Style & ES_MULTILINE == ES_MULTILINE .AND. nKey == VK_TAB
+   IF ( ::Style & ES_MULTILINE ) == ES_MULTILINE .AND. nKey == VK_TAB
       lShift := CheckBit( GetKeyState( VK_SHIFT ) , 32768 )
       IF ( h := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, lShift ) ) # 0
          IF ::Form:Modal
@@ -1148,7 +1148,7 @@ METHOD OnKeyDown( nKey ) CLASS EditBox
             RETURN 0
       END
 
-   ELSEIF nKey IN { VK_DELETE } .AND. ! ::ReadOnly
+   ELSEIF ( nKey IN { VK_DELETE } ) .AND. ! ::ReadOnly
       IF ::Parent:HasMessage( "bChanged" ) .AND. ::Parent:bChanged != NIL
          bChanged := ::Parent:bChanged
       ELSEIF ::Form != NIL .AND. ::Form:HasMessage( "bChanged" ) .AND. ::Form:bChanged != NIL

@@ -878,7 +878,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       ExecuteEvent( "OnInit", ::Owner )
 
       IF !::Owner:__lMemory .AND. ::Owner:Connection == NIL
-         IF ::Owner:Driver IN { "SQLRDD", "SQLEX" }
+         IF (::Owner:Driver IN { "SQLRDD", "SQLEX" })
             IF ::Owner:DesignMode
                RETURN ::Owner
             ENDIF
@@ -887,7 +887,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             cFile := ALLTRIM( ::Owner:Path ) + "\" + ::Owner:FileName
             IF !FILE( cFile )
                IF ! ::Owner:DesignMode
-                  Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", EF_CANRETRY | EF_CANDEFAULT ) )
+                  Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", (EF_CANRETRY | EF_CANDEFAULT) ) )
                 ELSE
                   ::Owner:Application:MainForm:MessageBox( "The specified file could not be found", ::Owner:FileName, "Error" )
                ENDIF
@@ -897,7 +897,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
             cFile := ALLTRIM( ::Owner:FileName )
             IF !FILE( cFile )
                IF ! ::Owner:DesignMode
-                  Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", EF_CANRETRY | EF_CANDEFAULT ) )
+                  Throw( ErrorNew( "DataTable", 21, 1010, ::Owner:FileName, "The specified file could not be found", (EF_CANRETRY | EF_CANDEFAULT) ) )
                 ELSE
                   ::Owner:Application:MainForm:MessageBox( "The specified file could not be found", ::Owner:FileName, "Error" )
                ENDIF
@@ -1004,7 +1004,7 @@ METHOD Create( lIgnoreAO ) CLASS DataRdd
       ::Owner:Area := Select()
       ::Owner:Structure := (::Owner:Area)->( dbStruct() )
 
-      AEVAL( ::Owner:Structure, {|,n| ASIZE( ::Owner:Structure[n], 4 )} )
+      AEVAL( ::Owner:Structure, {|a,n| (a), ASIZE( ::Owner:Structure[n], 4 )} )
 
       ::Owner:CreateFields()
 
@@ -1022,13 +1022,13 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 METHOD Scatter() CLASS DataRdd
    ::Owner:aScatter := ARRAY( LEN( ::Owner:Structure ) )
-   aEval( ::Owner:aScatter, {|,n| ::Owner:aScatter[n] := (::Owner:Area)->( FieldGet(n) ) } )
+   aEval( ::Owner:aScatter, {|a,n| (a), ::Owner:aScatter[n] := (::Owner:Area)->( FieldGet(n) ) } )
    ::Owner:Load( .T. )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Gather() CLASS DataRdd
-   aEval( ::Owner:aScatter, {|,n| (::Owner:Area)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
+   aEval( ::Owner:aScatter, {|a,n| (a), (::Owner:Area)->( FieldPut(n, ::Owner:aScatter[n] ) ) } )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------

@@ -97,7 +97,7 @@ METHOD Init( oParent, cName ) CLASS HeaderStrip
    ::__lMoveable := .T.
    ::Height := 17
    ::Width  := 0
-   ::Style  := WS_CHILD | WS_VISIBLE | HDS_BUTTONS | HDS_DRAGDROP | HDS_FULLDRAG | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style  := (WS_CHILD | WS_VISIBLE | HDS_BUTTONS | HDS_DRAGDROP | HDS_FULLDRAG | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -220,12 +220,12 @@ METHOD SetArrow( nColumn, nImage ) CLASS HeaderStrip
    IF ::Application:OsVersion:dwMajorVersion > 4
       // use built in sort arrows
       hdi:mask  := HDI_FORMAT
-      hdi:fmt   := HDF_STRING | IIF( nImage == 0, HDF_SORTDOWN, HDF_SORTUP ) | nAlignment
+      hdi:fmt   := (HDF_STRING | IIF( nImage == 0, HDF_SORTDOWN, HDF_SORTUP ) | nAlignment )
 
     ELSE
       // put our arrow icon next to the text
-      hdi:mask   := HDI_FORMAT | HDI_IMAGE
-      hdi:fmt    := HDF_STRING | HDF_IMAGE | HDF_BITMAP_ON_RIGHT
+      hdi:mask   := (HDI_FORMAT | HDI_IMAGE)
+      hdi:fmt    := (HDF_STRING | HDF_IMAGE | HDF_BITMAP_ON_RIGHT)
       hdi:iImage := nImage
    ENDIF
    ::SendMessage( HDM_SETITEM, nColumn, hdi )
@@ -235,7 +235,7 @@ METHOD SetArrow( nColumn, nImage ) CLASS HeaderStrip
           IF nColumn != ii
              hdi2 := (struct HDITEM)
              hdi2:mask  := HDI_FORMAT
-             hdi2:fmt   := HDF_STRING | ::Children[ii+1]:Alignment-1
+             hdi2:fmt   := ( HDF_STRING | ::Children[ii+1]:Alignment-1 )
              ::SendMessage( HDM_SETITEM, ii, hdi2 )
           ENDIF
       NEXT
@@ -261,7 +261,7 @@ METHOD DrawFrame( hDC, aRect, nStatus, lDraw ) CLASS HeaderStrip
          CloseThemeData( hTheme )
        ELSE
          IF nStatus != NIL
-            nFlags := nFlags | nStatus
+            nFlags := ( nFlags | nStatus )
          ENDIF
          DrawFrameControl( hDC, aRect, DFC_BUTTON, nFlags )
       ENDIF
@@ -374,20 +374,20 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD Create() CLASS HeaderItem
    LOCAL hi := (struct HDITEM)
-   hi:mask  := HDI_WIDTH | HDI_FORMAT | HDI_ORDER
+   hi:mask  := (HDI_WIDTH | HDI_FORMAT | HDI_ORDER)
    hi:fmt   := 0
 
    IF !EMPTY( ::Caption )
-      hi:mask      := hi:mask | HDI_TEXT
-      hi:fmt       := hi:fmt | HDF_STRING | ::Alignment-1
+      hi:mask      := (hi:mask | HDI_TEXT)
+      hi:fmt       := (hi:fmt | HDF_STRING | ::Alignment-1)
       hi:pszText   := ::Caption
       hi:cchTextMax:= LEN( ::Caption ) + 1
    ENDIF
 
    DEFAULT ::xImageIndex TO 0
    IF ::Parent:ImageList != NIL .AND. ::xImageIndex > 0
-      hi:mask   := hi:mask | HDI_IMAGE
-      hi:fmt    := hi:fmt | HDF_IMAGE
+      hi:mask   := (hi:mask | HDI_IMAGE)
+      hi:fmt    := (hi:fmt | HDF_IMAGE)
       hi:iImage := ::ImageIndex-1
    ENDIF
 
@@ -413,8 +413,8 @@ METHOD SetCaption() CLASS HeaderItem
    LOCAL hi
    IF LEN( ::Parent:Children ) >= ::Position + 1
       hi := (struct HDITEM)
-      hi:mask       := HDI_FORMAT | HDI_TEXT
-      hi:fmt        := HDF_STRING | ::Alignment-1
+      hi:mask       := (HDI_FORMAT | HDI_TEXT)
+      hi:fmt        := (HDF_STRING | ::Alignment-1)
       hi:pszText    := ::Caption
       hi:cchTextMax := LEN( ::Caption ) + 1
       ::Parent:SendMessage( HDM_SETITEM, ::Position, hi )
@@ -426,13 +426,13 @@ METHOD SetImageIndex() CLASS HeaderItem
    LOCAL hi
    IF LEN( ::Parent:Children ) >= ::Position + 1
       hi := (struct HDITEM)
-      hi:mask       := HDI_FORMAT | HDI_TEXT
-      hi:fmt        := HDF_STRING | ::Alignment-1
+      hi:mask       := (HDI_FORMAT | HDI_TEXT)
+      hi:fmt        := (HDF_STRING | ::Alignment-1)
       hi:pszText    := ::Caption
       hi:cchTextMax := LEN( ::Caption ) + 1
       IF ::xImageIndex > 0 .AND. ::Parent:ImageList != NIL
-         hi:mask   := hi:mask | HDI_IMAGE
-         hi:fmt    := hi:fmt | HDF_IMAGE
+         hi:mask   := (hi:mask | HDI_IMAGE)
+         hi:fmt    := (hi:fmt | HDF_IMAGE)
          hi:iImage := IIF( ::Parent:ImageList != NIL, ::xImageIndex-1, -2 )
       ENDIF
       ::Parent:SendMessage( HDM_SETITEM, ::Position, hi )
@@ -469,15 +469,15 @@ METHOD SetAlignment() CLASS HeaderItem
    LOCAL hi
    IF LEN( ::Parent:Children ) >= ::Position + 1
       hi := (struct HDITEM)
-      hi:mask       := HDI_FORMAT | HDI_TEXT
-      hi:fmt        := HDF_STRING | ::Alignment-1
+      hi:mask       := (HDI_FORMAT | HDI_TEXT)
+      hi:fmt        := (HDF_STRING | ::Alignment-1)
       hi:pszText    := ::Caption
       hi:cchTextMax := LEN( ::Caption ) + 1
 
       DEFAULT ::xImageIndex TO 0
       IF ::Parent:ImageList != NIL .AND. ::xImageIndex > 0
-         hi:mask   := hi:mask | HDI_IMAGE
-         hi:fmt    := hi:fmt | HDF_IMAGE
+         hi:mask   := (hi:mask | HDI_IMAGE)
+         hi:fmt    := (hi:fmt | HDF_IMAGE)
          hi:iImage := ::xImageIndex-1
       ENDIF
 

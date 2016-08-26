@@ -106,7 +106,7 @@ METHOD Init( oParent ) CLASS DateTimePicker
    ::ThemeName  := "combobox"
    ::ClsName    := DATETIMEPICK_CLASS
    ::Super:Init( oParent )
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::MinRange  := SysTime()
    ::MaxRange  := SysTime()
 
@@ -272,9 +272,9 @@ METHOD SetFormat( nFormat ) CLASS DateTimePicker
          ::SendMessage( DTM_SETFORMAT, 0, NIL )
       ENDIF
       FOR EACH xValue IN ::System:DateTimeFormat:Values
-          ::Style := ::Style & NOT( xValue )
+          ::Style := (::Style & NOT( xValue ))
       NEXT
-      ::Style := ::Style | nFormat
+      ::Style := (::Style | nFormat)
 
       IF ::IsWindow()
          ::SetWindowLong( GWL_STYLE, ::Style )

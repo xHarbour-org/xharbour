@@ -29,7 +29,7 @@ CLASS CustomControl INHERIT Control
    PROPERTY ImageList GET __ChkComponent( Self, @::xImageList )
    PROPERTY Reference
 
-   DATA __ChgRef  PRIVATE
+   DATA __ChgRef  PROTECTED
 
    METHOD Init()    CONSTRUCTOR
    METHOD Create()
@@ -42,8 +42,8 @@ METHOD Init( oParent, cReference ) CLASS CustomControl
    ::ClsName := "CCTL"
    ::Super:Init( oParent )
    ::__IsStandard := .F.
-   ::Style   := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
-   ::ExStyle := WS_EX_NOACTIVATE | WS_EX_CONTROLPARENT
+   ::Style   := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
+   ::ExStyle := (WS_EX_NOACTIVATE | WS_EX_CONTROLPARENT)
    ::Width   := 200
    ::Height  := 200
    ::__ChgRef := cReference
