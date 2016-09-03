@@ -131,7 +131,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS ListView
    DEFAULT ::__xCtrlName TO "ListView"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName      := "SysListView32"
    ::Super:Init( oParent )
    ::Width        := 245
@@ -216,9 +216,9 @@ RETURN Self
 METHOD SetCurSel( n ) CLASS ListView
    LOCAL lvi     := (struct LVITEM)
    lvi:mask      := 0x000F
-   lvi:stateMask := LVIS_SELECTED | LVIS_FOCUSED
+   lvi:stateMask := (LVIS_SELECTED | LVIS_FOCUSED)
    lvi:iItem     := n-1
-   lvi:state     := LVIS_SELECTED | LVIS_FOCUSED
+   lvi:state     := (LVIS_SELECTED | LVIS_FOCUSED)
 RETURN ::SendMessage( LVM_SETITEMSTATE, n-1, lvi )
 
 //-------------------------------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ METHOD SetDataSource( oSource ) CLASS ListView
           ::AddColumn( __Proper( aField[1] ), MAX( aField[3], LEN(aField[1])+2 )*7, nAlign )
       NEXT
       ListViewDeleteAllItems( ::hWnd )
-      ListViewSetItemCount( ::hWnd, oSource:RecCount(), LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL)
+      ListViewSetItemCount( ::hWnd, oSource:RecCount(), (LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL))
    ENDIF
 RETURN Self
 
@@ -277,7 +277,7 @@ METHOD __SetViewStyle( n ) CLASS ListView
 
       lvti := (struct LVTILEVIEWINFO)
       lvti:cbSize  := lvti:SizeOf()
-      lvti:dwMask  := LVTVIM_TILESIZE | LVTVIM_COLUMNS
+      lvti:dwMask  := (LVTVIM_TILESIZE | LVTVIM_COLUMNS)
       lvti:dwFlags := LVTVIF_AUTOSIZE
       lvti:cLines  := 1
       SendMessage( ::hWnd, LVM_SETTILEVIEWINFO, 0, lvti )
@@ -303,9 +303,9 @@ METHOD SetLVExStyle( nStyle, lAdd ) CLASS ListView
       ::LvExStyle := ::SendMessage( LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0 )
    ENDIF
    IF lAdd
-      ::LvExStyle := ::LvExStyle | nStyle
+      ::LvExStyle := (::LvExStyle | nStyle)
     ELSE
-      ::LvExStyle := ::LvExStyle & NOT( nStyle )
+      ::LvExStyle := (::LvExStyle & NOT( nStyle ))
    ENDIF
    IF ::IsWindow()
       ::SendMessage( LVM_SETEXTENDEDLISTVIEWSTYLE, 0, ::LvExStyle )
@@ -314,7 +314,7 @@ RETURN Self
 
 METHOD FindItem( cItem ) CLASS ListView
    LOCAL lvfi       := (struct LVFINDINFO)
-   lvfi:flags       := LVFI_PARTIAL | LVFI_STRING
+   lvfi:flags       := (LVFI_PARTIAL | LVFI_STRING)
    lvfi:lParam      := NIL
    lvfi:psz         := cItem
    lvfi:vkDirection := VK_DOWN
@@ -425,13 +425,13 @@ METHOD InsertItem( cText, nImage, nRow, nGroup, lParam ) CLASS ListView
 
    DEFAULT nImage TO 0
    DEFAULT nRow   TO ::SendMessage( LVM_GETITEMCOUNT, 0, 0 ) + 1
-   lvi:mask       := LVIF_TEXT | LVIF_IMAGE
+   lvi:mask       := (LVIF_TEXT | LVIF_IMAGE)
    IF nGroup != NIL
-      lvi:mask := lvi:mask | LVIF_GROUPID
+      lvi:mask := (lvi:mask | LVIF_GROUPID)
       lvi:iGroupId   := nGroup
    ENDIF
    IF lParam != NIL
-      lvi:mask := lvi:mask | LVIF_PARAM
+      lvi:mask := (lvi:mask | LVIF_PARAM)
       lvi:lParam := lParam
    ENDIF
    lvi:iItem      := nRow
@@ -443,7 +443,7 @@ RETURN SendMessage( ::hWnd, LVM_INSERTITEM, 0, lvi ) + 1
 
 METHOD InsertItems() CLASS ListView
    ListViewDeleteAllItems(::hWnd)
-   ListViewSetItemCount(::hWnd, LEN( ::Items ), LVSICF_NOINVALIDATEALL+LVSICF_NOSCROLL)
+   ListViewSetItemCount(::hWnd, LEN( ::Items ), (LVSICF_NOINVALIDATEALL|LVSICF_NOSCROLL) )
 return(self)
 
 METHOD GetSelection() CLASS ListView
@@ -528,7 +528,7 @@ RETURN Self
 METHOD Create() CLASS ListViewColumn
    LOCAL lvc := (struct LV_COLUMN)
 
-   lvc:mask       := LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM
+   lvc:mask       := (LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM)
    lvc:iOrder     := 0
    lvc:iSubItem   := LEN( ::Parent:Columns )
    lvc:cchTextMax := 0
@@ -582,7 +582,7 @@ METHOD Create() CLASS ListViewGroup
    ::Parent:SendMessage( LVM_ENABLEGROUPVIEW, 1, 0 )
 
    plvg:cbSize    := plvg:sizeof()
-   plvg:mask      := LVGF_HEADER | LVGF_GROUPID | LVGF_ALIGN
+   plvg:mask      := (LVGF_HEADER | LVGF_GROUPID | LVGF_ALIGN)
    plvg:pszHeader := ANSITOWIDE( ::Text )
    plvg:cchHeader := LEN( ::Text )
    plvg:uAlign    := ::Alignment

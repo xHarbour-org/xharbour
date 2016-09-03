@@ -52,7 +52,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS Link
    ::__xCtrlName := "SysLink"
    ::ClsName     := "SysLink"
-   ::Style       := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style       := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Width       := 80
    ::Height      := 16
    ::xText    := E"Sample link to web <A HREF=\"http://www.microsoft.com\">Microsoft</A>, and to <A HREF=\"http://www.xharbour.com\">xHarbour</A>"

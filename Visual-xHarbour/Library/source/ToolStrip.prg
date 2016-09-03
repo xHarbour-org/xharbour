@@ -11,12 +11,21 @@
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
 
+#ifdef __XHARBOUR__
 GLOBAL s_lExecuting := .F.
 GLOBAL s_CurrFocus
 GLOBAL s_CurrentObject
 GLOBAL s_lKey := .F.
 GLOBAL s_lOpenMenu := .T.
 GLOBAL s_hKeyMenuHook
+#else
+public s_lExecuting := .F.
+public s_CurrFocus
+public s_CurrentObject
+public s_lKey := .F.
+public s_lOpenMenu := .T.
+public s_hKeyMenuHook
+#endif
 
 #include "debug.ch"
 #include "vxh.ch"

@@ -90,7 +90,7 @@ METHOD Open( nKey, cKey, nAccess ) CLASS Registry
       ::cKey := cKey
    ENDIF
    DEFAULT nAccess TO KEY_ALL_ACCESS
-   lRet := RegOpenKeyEx( nKey, cKey, 0, nAccess | KEY_WOW64_64KEY, @hKey ) == 0
+   lRet := RegOpenKeyEx( nKey, cKey, 0, (nAccess | KEY_WOW64_64KEY), @hKey ) == 0
    IF lRet
       RegDisableReflectionKey( hKey )
       AADD( ::aKeys, hKey )
@@ -110,7 +110,7 @@ METHOD Create( ncKey, cKey ) CLASS Registry
       ::nKey := ncKey
       ::cKey := cKey
    ENDIF
-   lRet := RegCreateKeyEx( ncKey, cKey, KEY_ALL_ACCESS | KEY_WOW64_64KEY, @hKey  ) == 0
+   lRet := RegCreateKeyEx( ncKey, cKey, (KEY_ALL_ACCESS | KEY_WOW64_64KEY), @hKey  ) == 0
    IF lRet
       RegDisableReflectionKey( hKey )
       AADD( ::aKeys, hKey )

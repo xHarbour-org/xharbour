@@ -54,7 +54,7 @@ CLASS LinkLabel INHERIT Control
    METHOD OnKillFocus()        INLINE ::__lFocused  := .F., ::InvalidateRect(), NIL
    METHOD OnEraseBkGnd( hDC )  INLINE ::PaintLabel( hDC ), 1
    METHOD OnPaint()
-   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
    METHOD SetImageIndex()
    METHOD PaintLabel()
 ENDCLASS
@@ -63,7 +63,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS LinkLabel
    ::__xCtrlName := "LinkLabel"
-   ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName := "button"
    ::xCursor := IDC_HAND
    ::Super:Init( oParent )
@@ -113,7 +113,7 @@ METHOD SetWindowText( cText ) CLASS LinkLabel
          ENDIF
 
          ::MoveWindow()
-         IF ! ::Parent:ClsName IN {"StatusBarPanel"}
+         IF ! (::Parent:ClsName IN {"StatusBarPanel"})
             ::__OnParentSize( ::Parent:ClientWidth, ::Parent:ClientHeight, NIL, .T. )
             ::Parent:DockControls()
          ENDIF
@@ -130,7 +130,7 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    LOCAL nColor, hBrush := ::BkBrush
    LOCAL rc := (struct RECT)
 
-   IF hBrush == NIL .AND. ! ::Parent:ClsName IN {"StatusBarPanel"}
+   IF hBrush == NIL .AND. ! (::Parent:ClsName IN {"StatusBarPanel"})
       hBrush := ::Parent:BkBrush
       IF hBrush != NIL
          SetBrushOrgEx( hDC, ::Parent:ClientWidth-::Left, ::Parent:ClientHeight-::Top )
@@ -140,9 +140,9 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    _FillRect( hDC, {0,0,::Width,::Height}, hBrush )
 
    GetClientRect( ::hWnd, @rc )
-   IF ! ::Parent:ClsName IN {"StatusBarPanel"} .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+   IF ! (::Parent:ClsName IN {"StatusBarPanel"}) .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
       IF ::__lFocused
-         ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, ILD_TRANSPARENT | ILD_FOCUS, ::BackColor )
+         ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, (ILD_TRANSPARENT | ILD_FOCUS), ::BackColor )
        ELSE
          ::Parent:ImageList:DrawImage( hDC, ::ImageIndex, 0, 0, ILD_TRANSPARENT )
       ENDIF
@@ -155,14 +155,14 @@ METHOD PaintLabel( hDC ) CLASS LinkLabel
    nColor := IIF( !::xLinkVisited, ::xLinkColor, ::xVisitedColor )
    nColor := IIF( ::__lSelected, ::ActiveLinkColor, nColor )
 
-   IF ( ! ::IsWindowEnabled() .OR. ! ::Parent:IsWindowEnabled() ) .AND. ! ::Parent:ClsName IN {"StatusBarPanel"}
+   IF ( ! ::IsWindowEnabled() .OR. ! ::Parent:IsWindowEnabled() ) .AND. ! (::Parent:ClsName IN {"StatusBarPanel"})
       nColor := ::System:Colors:GrayText
    ENDIF
 
    SetTextColor( hDC, nColor )
    rc:Left+=2
 
-   DrawText( hDC, ::Text, rc, (::Alignment-1)|DT_WORDBREAK )
+   DrawText( hDC, ::Text, rc, ((::Alignment-1)|DT_WORDBREAK) )
    IF ::__lFocused .AND. ::FocusRect
       rc:Left-=2
       DrawFocusRect( hDC, rc)
@@ -227,7 +227,7 @@ METHOD SetImageIndex() CLASS LinkLabel
       aSize := ::Drawing:GetTextExtentPoint32( ::Text )
       ::xWidth := aSize[1]+4
       ::xHeight := aSize[2]+2
-      IF ! ::Parent:ClsName IN {"StatusBarPanel"} .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+      IF ! (::Parent:ClsName IN {"StatusBarPanel"}) .AND. ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
          ::xWidth += ::Parent:ImageList:IconWidth + 1
          ::xHeight := MAX( ::xHeight, ::Parent:ImageList:IconHeight )
       ENDIF

@@ -68,7 +68,7 @@ METHOD Init( oParent ) CLASS ProgressBar
    DEFAULT ::__xCtrlName TO "ProgressBar"
    ::ClsName   := PROGRESS_CLASS
    ::ThemeName := "progress"
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Super:Init( oParent )
    ::Width     := 150
    ::Height    := 20

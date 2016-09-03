@@ -71,7 +71,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS RadioButton
    DEFAULT ::__xCtrlName TO "RadioButton"
-   DEFAULT ::Style TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::Style TO (WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName   := "Button"
    ::Super:Init( oParent )
    ::Width     := 100
@@ -86,7 +86,7 @@ METHOD __SetInitialState( nState ) CLASS RadioButton
    IF ::IsWindow()
       ::SendMessage( BM_SETCHECK, nState, 0 )
    ENDIF
-   lChecked  := nState & BST_CHECKED == BST_CHECKED
+   lChecked  := (nState & BST_CHECKED) == BST_CHECKED
    ::xInitialState := IIF( lChecked, BST_CHECKED, BST_UNCHECKED )
 RETURN Self
 
@@ -111,12 +111,12 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
 
                    nState := ::SendMessage( BM_GETSTATE, 0, 0 )
 
-                   lDisabled := cd:uItemState & CDIS_DISABLED != 0
-                   lSelected := cd:uItemState & CDIS_SELECTED != 0
-                   lFocus    := cd:uItemState & CDIS_FOCUS    != 0
-                   lHot      := cd:uItemState & CDIS_HOT      != 0
-                   lChecked  := nState & BST_CHECKED == BST_CHECKED
-                   lPressed  := nState & BST_PUSHED  == BST_PUSHED
+                   lDisabled := (cd:uItemState & CDIS_DISABLED) != 0
+                   lSelected := (cd:uItemState & CDIS_SELECTED) != 0
+                   lFocus    := (cd:uItemState & CDIS_FOCUS)    != 0
+                   lHot      := (cd:uItemState & CDIS_HOT)      != 0
+                   lChecked  := (nState & BST_CHECKED) == BST_CHECKED
+                   lPressed  := (nState & BST_PUSHED)  == BST_PUSHED
 
                    hBkGnd := ::BkBrush
                    IF hBkGnd == NIL
@@ -152,13 +152,13 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
                     ELSE
                       nState := DFCS_BUTTONRADIO
                       IF lPressed
-                         nState := nState | DFCS_PUSHED
+                         nState := (nState | DFCS_PUSHED)
                       ENDIF
                       IF lHot
-                         nState := nState | DFCS_HOT
+                         nState := (nState | DFCS_HOT)
                       ENDIF
                       IF lDisabled
-                         nState := nState | DFCS_INACTIVE
+                         nState := (nState | DFCS_INACTIVE)
                       ENDIF
                       _DrawFrameControl( aRect, DFC_BUTTON, nState )
                    ENDIF
@@ -172,7 +172,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS RadioButton
 
                    cd:rc:left += 17
                    SetBkMode( cd:hdc, TRANSPARENT )
-                   DrawText( cd:hDC, ::Caption, cd:rc, DT_LEFT | DT_VCENTER | DT_SINGLELINE )
+                   DrawText( cd:hDC, ::Caption, cd:rc, (DT_LEFT | DT_VCENTER | DT_SINGLELINE) )
 
                    IF nColor != NIL
                       SetTextColor( cd:hDC, nColor )

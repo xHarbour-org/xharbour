@@ -5971,3 +5971,49 @@ HB_FUNC( LISTVIEWSETBKIMAGE )
    hb_retl( ListView_SetBkImage( hWnd, &lvbki ) );
 }
 
+
+BOOL GetAppVersion( char *LibName, WORD *MajorVersion, WORD *MinorVersion, WORD *BuildNumber, WORD *RevisionNumber )
+{
+   DWORD dwHandle, dwLen;
+   UINT BufLen;
+   LPTSTR lpData;
+   VS_FIXEDFILEINFO *pFileInfo;
+   dwLen = GetFileVersionInfoSize( LibName, &dwHandle );
+   if (!dwLen)
+      return FALSE;
+
+   lpData = (LPTSTR) malloc (dwLen);
+   if (!lpData)
+      return FALSE;
+
+   if( !GetFileVersionInfo( LibName, dwHandle, dwLen, lpData ) )
+   {
+      free (lpData);
+      return FALSE;
+   }
+   if( VerQueryValue( lpData, "\\", (LPVOID *) &pFileInfo, (PUINT)&BufLen ) )
+   {
+      *MajorVersion = HIWORD(pFileInfo->dwFileVersionMS);
+      *MinorVersion = LOWORD(pFileInfo->dwFileVersionMS);
+      *BuildNumber = HIWORD(pFileInfo->dwFileVersionLS);
+      *RevisionNumber = LOWORD(pFileInfo->dwFileVersionLS);
+      free (lpData);
+      return TRUE;
+   }
+   free (lpData);
+   return FALSE;
+}
+
+HB_FUNC( GETFILEVERSION )
+{
+   WORD MajorVersion;
+   WORD MinorVersion;
+   WORD BuildNumber;
+   WORD RevisionNumber;
+   if( GetAppVersion( (char*) hb_parc(1), &MajorVersion, &MinorVersion, &BuildNumber, &RevisionNumber ) )
+   {
+      char cVer[80];
+      wsprintf( cVer, "%d.%d.%d.%d", MajorVersion, MinorVersion, BuildNumber, RevisionNumber );
+      hb_retc( cVer );
+   }
+}

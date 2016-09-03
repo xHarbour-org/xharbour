@@ -71,7 +71,7 @@ METHOD Init( oOwner ) CLASS NotifyIcon
    ::ClsName       := "NotifyIcon"
    ::ComponentType := "NotifyIcon"
    ::Super:Init( oOwner )
-   ::Flags         := NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_INFO
+   ::Flags         := (NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_INFO)
    DEFAULT nMess TO 1
    ::Message       := WM_USER + nMess
    ::hWnd          := ::Owner:hWnd
@@ -142,7 +142,7 @@ METHOD __SetText( cText ) CLASS NotifyIcon
       tray:cbSize := NOTIFYICONDATA_V2_SIZE
       tray:hWnd   := ::Owner:hWnd
       tray:uID    := ::Id
-      tray:uFlags := NIF_TIP | NIF_INFO
+      tray:uFlags := (NIF_TIP | NIF_INFO)
       tray:szTip:Buffer( cText )
       Shell_NotifyIcon( NIM_MODIFY, tray )
    ENDIF

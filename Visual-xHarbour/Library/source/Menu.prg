@@ -414,7 +414,7 @@ METHOD Show( x, y, nAlign ) CLASS ContextMenu
    LOCAL nRes := 0
    DEFAULT x TO ::Left
    DEFAULT y TO ::Top
-   DEFAULT nAlign TO TPM_LEFTALIGN | TPM_TOPALIGN
+   DEFAULT nAlign TO (TPM_LEFTALIGN | TPM_TOPALIGN)
    TrackPopupMenu( ::hMenu, nAlign, x, y, 0, ::Parent:hWnd )
    ::Application:DoEvents()
 RETURN nRes

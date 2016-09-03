@@ -102,7 +102,7 @@ METHOD Create() CLASS MaskEdit
 
    Super:Create()
 
-   ::NoEdit := ::GetWindowLong( GWL_STYLE ) & ES_READONLY != 0
+   ::NoEdit := (::GetWindowLong( GWL_STYLE ) & ES_READONLY) != 0
 
    ::SendMessage( EM_LIMITTEXT, MAX( LEN( TRANSFORM( ::Text, ::oGet:Picture ) ), LEN( ::oGet:buffer ) ) , 0 )
 
@@ -117,12 +117,12 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnGetDlgCode( msg ) CLASS MaskEdit
    LOCAL n, nRet
-   IF ::InDataGrid .AND. msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. msg:wParam IN {VK_RETURN,VK_TAB,VK_ESCAPE}
+   IF ::InDataGrid .AND. msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN .AND. (msg:wParam IN {VK_RETURN,VK_TAB,VK_ESCAPE})
       RETURN ::Super:OnGetDlgCode( msg )
    ENDIF
    IF msg != NIL .AND. msg:hwnd == ::hWnd .AND. msg:message == WM_KEYDOWN
       ::LastKey := msg:wParam
-      IF msg:wParam IN {VK_RETURN,VK_UP,VK_DOWN}
+      IF (msg:wParam IN {VK_RETURN,VK_UP,VK_DOWN})
          ::oGet:assign()
          ::oGet:updatebuffer()
          IF ::oGet:baddate()
@@ -134,7 +134,7 @@ METHOD OnGetDlgCode( msg ) CLASS MaskEdit
          ::__Validate()
          // default button
          IF msg:wParam == VK_RETURN .AND. ::IsValid
-            IF ( n := HSCAN( ::Form:__hObjects, {|,o| o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
+            IF ( n := HSCAN( ::Form:__hObjects, {|a,o| (a), o:__xCtrlName == "Button" .AND. o:IsWindowVisible() .AND. o:DefaultButton } ) ) > 0
                nRet := ExecuteEvent( "OnClick", HGetValueAt( ::Form:__hObjects, n ) )
                RETURN NIL
             ENDIF
@@ -366,7 +366,7 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD __GoToNextControl( nKey ) CLASS MaskEdit
    LOCAL hNext
-   IF nKey IN { VK_UP, VK_DOWN, VK_RETURN }
+   IF (nKey IN { VK_UP, VK_DOWN, VK_RETURN })
       IF ::Form:Modal
          PostMessage( ::Form:hWnd, WM_NEXTDLGCTL, IIF( nKey == VK_UP, 1, 0 ), 0 )
        ELSEIF ( hNext := GetNextDlgTabItem( ::Form:hWnd, ::hWnd, nKey == VK_UP ) ) > 0
@@ -512,7 +512,7 @@ RETURN NIL
 METHOD OnSetFocus() CLASS MaskEdit
    LOCAL lShift, h, nStart, nEnd, coldbuff
 
-   ::NoEdit := ::GetWindowLong( GWL_STYLE ) & ES_READONLY != 0
+   ::NoEdit := (::GetWindowLong( GWL_STYLE ) & ES_READONLY) != 0
 
    IF HGetPos( ::EventHandler, "When" ) != 0 .AND. !::NoEdit
       ::NoEdit := !ExecuteEvent( "When", Self )

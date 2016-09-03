@@ -9336,6 +9336,12 @@ HB_FUNC ( INTERNETSETSTATUSCALLBACK )
    hb_retnl( (long) InternetSetStatusCallback( (HINTERNET) hb_parnl(1), (INTERNET_STATUS_CALLBACK) InternetStatusCallback ) );
 }
 
+HB_FUNC( INTERNETSETTIMEOUT )
+{
+   DWORD timeout = (DWORD) hb_parnl(3);
+   hb_retl( InternetSetOption( (HINTERNET) hb_parnl(1), (DWORD) hb_parnl(2), &timeout, sizeof(DWORD) ) );
+}
+
 //-------------------------------------------------------------------------------------------------
 HB_FUNC( GETPERFORMANCEINFO )
 {

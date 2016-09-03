@@ -54,7 +54,7 @@ CLASS Label INHERIT Control
 
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
-   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+   METHOD SetParent( oParent ) INLINE ::Super:SetParent( oParent ), ::RedrawWindow( , , ( RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW ) )
    METHOD OnEraseBkGnd()       INLINE 1
    METHOD OnPaint()
    METHOD SetWindowText(cText) INLINE Super:SetWindowText(cText), IIF( ::IsWindowVisible(), ( ::InvalidateRect(), ::UpdateWindow() ), )
@@ -64,7 +64,7 @@ CLASS Label INHERIT Control
    METHOD OnLButtonUp()
    METHOD OnTimer()
    METHOD SetForeColor()
-   METHOD Redraw( aRect )      INLINE ::RedrawWindow( aRect, , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ),::UpdateWindow()
+   METHOD Redraw( aRect )      INLINE ::RedrawWindow( aRect, , ( RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ) ),::UpdateWindow()
    METHOD __SetBorder()        INLINE ::Refresh()
    METHOD __Enable( lEnable )  INLINE ::xEnabled := lEnable, EnableWindow( ::hWnd, lEnable ), ::InvalidateRect(), ::UpdateWindow(), lEnable
 
@@ -74,7 +74,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS Label
    DEFAULT ::__xCtrlName TO "Label"
-   ::Style        := WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := (WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName      := "Label"
    ::Super:Init( oParent )
    ::__IsStandard := .F.
@@ -138,7 +138,7 @@ METHOD __SetBlinkColor() CLASS Label
        ELSE
          ::KillTimer( 512 )
          ::__CurColor := ::ForeColor
-         ::RedrawWindow( , , RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE )
+         ::RedrawWindow( , , (RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE) )
       ENDIF
    ENDIF
 RETURN Self
@@ -153,7 +153,7 @@ METHOD OnTimer( nID ) CLASS Label
       ELSE
          ::__CurColor := ::ForeColor
       ENDIF
-      ::RedrawWindow( , , RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE )
+      ::RedrawWindow( , , (RDW_INTERNALPAINT | RDW_UPDATENOW | RDW_INVALIDATE) )
       ::SetTimer( 512, 500 )
    ENDIF
 RETURN 0
@@ -211,10 +211,10 @@ METHOD OnPaint() CLASS Label
    hFont  := SelectObject( hMemDC, ::Font:Handle )
    nFlags := ::Alignment
    IF ::WrapText
-      nFlags := ::Alignment | DT_WORDBREAK
+      nFlags := (::Alignment | DT_WORDBREAK)
    ENDIF
    IF ::NoPrefix
-      nFlags := nFlags | DT_NOPREFIX
+      nFlags := (nFlags | DT_NOPREFIX)
    ENDIF
 
    cText := ::xText
@@ -236,7 +236,7 @@ METHOD OnPaint() CLASS Label
       rc:top    := aRect[2]
       rc:right  := aRect[3]
       rc:bottom := aRect[4]
-      DrawText( hMemDC, cText, @rc, DT_CALCRECT|DT_CENTER|IIF( ::WrapText, DT_WORDBREAK, 0 ) )
+      DrawText( hMemDC, cText, @rc, (DT_CALCRECT|DT_CENTER|IIF( ::WrapText, DT_WORDBREAK, 0 )) )
       aRect[2]  := ( aRect[4]-rc:bottom ) / 2
       aRect[4]  := aRect[2] + rc:bottom
    ENDIF
@@ -317,7 +317,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS Line
    DEFAULT ::__xCtrlName TO "Line"
    ::ClsName       := "VxhLine"
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style         := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::__lResizeable := {.F.,.T.,.F.,.F.,.F.,.T.,.F.,.F.}
    ::Super:Init( oParent )
    ::__IsStandard  := .F.

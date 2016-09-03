@@ -106,7 +106,7 @@ METHOD OpenDialog( oParent ) CLASS CFile
    ::ofn:Flags           := ::Flags
 
    IF ::AllowMultiSelect
-      ::ofn:Flags := ::ofn:Flags | OFN_ALLOWMULTISELECT
+      ::ofn:Flags := (::ofn:Flags | OFN_ALLOWMULTISELECT)
    ENDIF
 
    FOR n := 1 TO LEN( ::Filter )
@@ -154,7 +154,7 @@ RETURN Self
 
 METHOD Close() CLASS CFile
    IF ::Modified
-      IF MessageBox( 0, ::Name+" has been modified, Do you want to save the changes ?", "File Save", MB_ICONQUESTION | MB_YESNO ) == IDYES
+      IF MessageBox( 0, ::Name+" has been modified, Do you want to save the changes ?", "File Save", (MB_ICONQUESTION | MB_YESNO) ) == IDYES
          ::Save()
       ENDIF
    ENDIF
@@ -163,7 +163,7 @@ RETURN Self
 METHOD Save( cPath ) CLASS CFile
    LOCAL hFile
    DEFAULT cPath TO ::Path
-   
+
    IF ( hFile := fCreate( cPath + IIF( !Empty( cPath ), "\", "" ) + ::Name ) ) <> -1
       fWrite( hFile, ::FileBuffer, Len( ::FileBuffer ) )
       fClose( hFile )

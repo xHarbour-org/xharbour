@@ -69,7 +69,7 @@ METHOD Init( oParent ) CLASS CoolBar
    InitCommonControlsEx(ICC_COOL_CLASSES)
    ::ClsName           := REBARCLASSNAME
    DEFAULT ::__xCtrlName TO "CoolBar"
-   ::Style             := WS_CHILD | WS_VISIBLE | WS_BORDER | RBS_BANDBORDERS | RBS_VARHEIGHT | CCS_NODIVIDER | CCS_NOPARENTALIGN | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style             := (WS_CHILD | WS_VISIBLE | WS_BORDER | RBS_BANDBORDERS | RBS_VARHEIGHT | CCS_NODIVIDER | CCS_NOPARENTALIGN | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Super:Init( oParent )
    ::Caption           := ""
    ::Width             := oParent:ClientWidth
@@ -187,7 +187,7 @@ METHOD __SetTheming( lSet ) CLASS CoolBar
           Band:BandChild:Theming := lSet
        ENDIF
    NEXT
-   ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER))
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
@@ -401,10 +401,10 @@ ENDCLASS
 METHOD SetStyle( nStyle, Value ) CLASS CoolBarBand
    DEFAULT Value TO .T.
    IF Value
-      ::oStruct:fStyle := ::oStruct:fStyle | nStyle
+      ::oStruct:fStyle := (::oStruct:fStyle | nStyle)
    ELSE
-      ::oStruct:fStyle := ::oStruct:fStyle & NOT( nStyle )
-      ::oStruct:fStyle := ::oStruct:fStyle | nStyle
+      ::oStruct:fStyle := (::oStruct:fStyle & NOT( nStyle ) )
+      ::oStruct:fStyle := (::oStruct:fStyle | nStyle)
    ENDIF
    ::oStruct:fMask := RBBIM_STYLE
    IF ::lCreated
@@ -421,8 +421,8 @@ METHOD Init( oParent ) CLASS CoolBarBand
    ::oStruct:cbSize     := ::oStruct:sizeof()
    ::oStruct:hwndChild  := 0
    ::oStruct:wID        := LEN( ::Parent:Bands )
-   ::oStruct:fMask      := RBBIM_STYLE | RBBIM_ID
-   ::oStruct:fStyle     := RBBS_NOVERT | RBBS_GRIPPERALWAYS
+   ::oStruct:fMask      := (RBBIM_STYLE | RBBIM_ID)
+   ::oStruct:fStyle     := (RBBS_NOVERT | RBBS_GRIPPERALWAYS)
    ::oStruct:wID        := LEN( oParent:Bands )
 
    ::ClsName            := "CoolBarBand"
@@ -461,7 +461,7 @@ RETURN SELF
 
 METHOD ReflectColor()
    IF ::oStruct:hbmBack == NIL
-      ::oStruct:fMask      := ::oStruct:fMask | RBBIM_COLORS
+      ::oStruct:fMask      := (::oStruct:fMask | RBBIM_COLORS)
       ::oStruct:clrBack    := IIF( ::BackColor != NIL, ::BackColor, ::Parent:BackColor )
       SendMessage( ::Parent:hWnd, RB_SETBANDINFO, ::Index, ::oStruct )
    ENDIF
@@ -489,10 +489,10 @@ RETURN SELF
 METHOD SetGrippers( Value ) CLASS CoolBarBand
 
    IF Value
-      ::oStruct:fStyle := ::oStruct:fStyle | RBBS_GRIPPERALWAYS
+      ::oStruct:fStyle := (::oStruct:fStyle | RBBS_GRIPPERALWAYS)
    ELSE
-      ::oStruct:fStyle := ::oStruct:fStyle & NOT( RBBS_GRIPPERALWAYS )
-      ::oStruct:fStyle := ::oStruct:fStyle | RBBS_NOGRIPPER
+      ::oStruct:fStyle := (::oStruct:fStyle & NOT( RBBS_GRIPPERALWAYS ))
+      ::oStruct:fStyle := (::oStruct:fStyle | RBBS_NOGRIPPER)
    ENDIF
 
    ::oStruct:fMask := RBBIM_STYLE
@@ -623,11 +623,11 @@ METHOD SetChevron( lSet ) CLASS CoolBarBand
    IF lSet
       ::oStruct:fMask := RBBIM_IDEALSIZE + RBBIM_STYLE
       IF ::BandChild != NIL .AND. ::BandChild:ClsName == "ToolBarWindow32"
-         ::oStruct:fStyle  := ::oStruct:fStyle | RBBS_USECHEVRON
+         ::oStruct:fStyle  := (::oStruct:fStyle | RBBS_USECHEVRON)
          ::oStruct:cxIdeal := ::BandChild:GetButtonsWidth()
       ENDIF
     ELSE
-      ::oStruct:fStyle  := ::oStruct:fStyle & NOT( RBBS_USECHEVRON )
+      ::oStruct:fStyle  := (::oStruct:fStyle & NOT( RBBS_USECHEVRON ))
       ::oStruct:cxIdeal := 0
    ENDIF
    IF ::lCreated
@@ -662,7 +662,7 @@ RETURN rc:Array
 METHOD GetBandInfo() CLASS CoolBarBand
    LOCAL rbb := (struct REBARBANDINFO)
    rbb:cbSize     := rbb:sizeof()
-   rbb:fMask      := RBBIM_STYLE | RBBIM_ID | RBBIM_STYLE | RBBIM_CHILD | RBBIM_SIZE | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE | RBBIM_IMAGE | RBBIM_LPARAM | RBBIM_HEADERSIZE
+   rbb:fMask      := (RBBIM_STYLE | RBBIM_ID | RBBIM_STYLE | RBBIM_CHILD | RBBIM_SIZE | RBBIM_CHILDSIZE | RBBIM_IDEALSIZE | RBBIM_IMAGE | RBBIM_LPARAM | RBBIM_HEADERSIZE)
    SendMessage( ::Parent:hWnd, RB_GETBANDINFO, ::Index, @rbb )
 RETURN rbb
 
@@ -717,7 +717,7 @@ METHOD OnChevronPushed( chev ) CLASS CoolBarBand
              ClientToScreen( oBtn:Parent:hWnd, @pt )
 
              IF oBtn:id <= IDM_MDI_ICON  .AND. pt:x + 2 >= ::BandChild:Chevron:Left .AND. oBtn:Visible
-                IF oBtn:Style & BTNS_SEP == 0
+                IF (oBtn:Style & BTNS_SEP) == 0
                    DEFAULT oBtn:Text TO ""
 
                    oItem := MenuItem( ::BandChild:Chevron )
@@ -957,7 +957,7 @@ METHOD Create() CLASS Bitmap
    LOCAL aSize, cName := ::Name
 
    IF ::Path != NIL
-      ::nLoad := ::nLoad | LR_LOADFROMFILE
+      ::nLoad := (::nLoad | LR_LOADFROMFILE)
       cName   := ::Path+"\"+::Name
    ENDIF
    ::Handle := LoadImage( ::Instance, cName, IMAGE_BITMAP,,, ::nLoad )

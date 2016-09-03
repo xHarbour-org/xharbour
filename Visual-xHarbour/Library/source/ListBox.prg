@@ -130,12 +130,12 @@ CLASS ListBox FROM TitleControl
    METHOD __HandleOnPaint()
    METHOD __HandleOnTimer()
    METHOD __TrackMouseEvent()
-   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER))
 ENDCLASS
 
 METHOD Init( oParent ) CLASS ListBox
    ::ClsName      := "ListBox"
-   DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::Style   TO (WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    DEFAULT ::__xCtrlName TO "ListBox"
    ::Border       := WS_EX_CLIENTEDGE
    ::Super:Init( oParent )
@@ -184,7 +184,7 @@ METHOD __SetItemToolTips( lTips ) CLASS ListBox
       IF IsWindow( ::hWnd )
          wcex := (struct WNDCLASSEX)
          wcex:cbSize         := wcex:SizeOf()
-         wcex:style          := CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW
+         wcex:style          := (CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS | CS_DROPSHADOW)
          wcex:hInstance      := ::AppInstance
          wcex:hbrBackground  := COLOR_BTNFACE+1
          wcex:lpszClassName  := "CBTT"
@@ -288,7 +288,7 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
    rcDraw:right  := rcBounds:right
    rcDraw:bottom := rcBounds:bottom
 
-   DrawText( hDC, cBuf, @rcDraw, DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+   DrawText( hDC, cBuf, @rcDraw, (DT_CALCRECT|DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX) )
 
    SelectObject( hDC, hOldFont )
    ReleaseDC( ::__tipWnd, hDC )
@@ -316,7 +316,7 @@ METHOD __ListboxMouseMove( nwParam, aPt ) CLASS ListBox
 
    ShowWindow( ::__tipWnd, SW_HIDE )
 
-   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left+4, rcDraw:Bottom-rcDraw:top, SWP_NOACTIVATE | SWP_SHOWWINDOW )
+   SetWindowPos( ::__tipWnd, HWND_TOPMOST, rcDraw:left+1, rcDraw:top, rcDraw:Right-rcDraw:left+4, rcDraw:Bottom-rcDraw:top, (SWP_NOACTIVATE | SWP_SHOWWINDOW) )
    SetTimer( ::__tipWnd, 1, 9000, NIL )
 RETURN NIL
 
@@ -337,7 +337,7 @@ METHOD __HandleOnPaint( hWnd ) CLASS ListBox
    SetBkMode( hDC, TRANSPARENT )
    hOldFont := SelectObject( hDC, ::Font:Handle )
 
-   _DrawText( hDC, cText, aRect, DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+   _DrawText( hDC, cText, aRect, (DT_SINGLELINE|DT_CENTER|DT_VCENTER|DT_NOPREFIX) )
 
    SelectObject( hDC, hOldFont )
    _EndPaint( hWnd, cPaint)

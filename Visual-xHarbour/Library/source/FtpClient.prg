@@ -9,6 +9,7 @@
 #include "wininet.ch"
 
 #define INTERNET_INVALID_STATUS_CALLBACK -1
+#define FILE_ATTRIBUTE_NORMAL 0x00000080
 
 static __oFtp
 static aEvents
@@ -23,6 +24,7 @@ CLASS FtpClient INHERIT Component
    PROPERTY Port         DEFAULT INTERNET_DEFAULT_FTP_PORT
    PROPERTY Passive      DEFAULT .F.
    PROPERTY TransferType DEFAULT FTP_TRANSFER_TYPE_BINARY
+   PROPERTY Timeout      DEFAULT 3
 
    DATA EnumTransferType EXPORTED INIT { { "ASCII", "Binary" }, { FTP_TRANSFER_TYPE_ASCII, FTP_TRANSFER_TYPE_BINARY } }
    DATA EnumOperation    EXPORTED INIT { { "Synchronous", "Asynchronous" }, { 0, INTERNET_FLAG_ASYNC } }
@@ -39,8 +41,8 @@ CLASS FtpClient INHERIT Component
    METHOD DisConnect()
    METHOD GetDirectory()
    METHOD GetCurrentDirectory()
-   METHOD PutFile( cLocalFile, cRemoteFile )    INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile, ::TransferType, 1 )
-   METHOD GetFile( cRemoteFile, cLocalFile )    INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile, ::TransferType, 1 )
+   METHOD PutFile( cLocalFile, cRemoteFile, nAttrib ) INLINE FtpPutFile( ::hFtp, cLocalFile, cRemoteFile, ::TransferType, IIF( nAttrib == NIL, FILE_ATTRIBUTE_NORMAL, nAttrib ) )
+   METHOD GetFile( cRemoteFile, cLocalFile, nAttrib ) INLINE FtpGetFile( ::hFtp, cRemoteFile, cLocalFile, ::TransferType, IIF( nAttrib == NIL, FILE_ATTRIBUTE_NORMAL, nAttrib ) )
    METHOD DeleteFile( cRemoteFile )             INLINE FtpDeleteFile( ::hFtp, cRemoteFile )
    METHOD RenameFile( cExistingFile, cNewFile ) INLINE FtpRenameFile( ::hFtp, cExistingFile, cNewFile )
    METHOD CreateDirectory( cDirectory )         INLINE FtpCreateDirectory( ::hFtp, cDirectory )
@@ -110,9 +112,18 @@ METHOD Connect() CLASS FtpClient
    IF ::hHandle == 0
       ::Create()
    ENDIF
-   IF ::hHandle <> 0 .AND. ( ::hFtp := InternetConnect( ::hHandle, ::Server, IIF( ::Port == 0, INTERNET_DEFAULT_FTP_PORT, ::Port ), ::UserName, ::Password, ::Service, IIF( ::Passive, INTERNET_FLAG_PASSIVE, ), 1  ) ) <> NIL
-      InternetSetStatusCallback( ::hFtp, ( @FtpStatusCallback() ) )
-      RETURN .T.
+   IF ::hHandle != NIL .AND. ::hHandle <> 0
+      // Forces the OS to timeout if routers are delaying the denial.
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_CONNECT_TIMEOUT, ::Timeout * 1000 )
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_RECEIVE_TIMEOUT, ::Timeout * 1000 )
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_SEND_TIMEOUT, ::Timeout * 1000 )
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_DATA_RECEIVE_TIMEOUT, ::Timeout * 1000 )
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_DATA_SEND_TIMEOUT, ::Timeout * 1000 )
+      InternetSetTimeout( ::hHandle, INTERNET_OPTION_DISCONNECTED_TIMEOUT, ::Timeout * 1000 )
+      IF ( ::hFtp := InternetConnect( ::hHandle, ::Server, IIF( ::Port == 0, INTERNET_DEFAULT_FTP_PORT, ::Port ), ::UserName, ::Password, ::Service, IIF( ::Passive, INTERNET_FLAG_PASSIVE, ), 1  ) ) <> NIL
+         InternetSetStatusCallback( ::hFtp, ( @FtpStatusCallback() ) )
+         RETURN .T.
+      ENDIF
    ENDIF
 RETURN .F.
 

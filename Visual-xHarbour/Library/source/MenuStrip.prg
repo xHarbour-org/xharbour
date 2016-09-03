@@ -11,12 +11,21 @@
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
 
+#ifdef __XHARBOUR__
 GLOBAL EXTERNAL s_lExecuting
 GLOBAL EXTERNAL s_CurrFocus
 GLOBAL EXTERNAL s_CurrentObject
 GLOBAL EXTERNAL s_lKey
 GLOBAL EXTERNAL s_lOpenMenu
 GLOBAL EXTERNAL s_hKeyMenuHook
+#else
+memvar s_lExecuting
+memvar s_CurrFocus
+memvar s_CurrentObject
+memvar s_lKey
+memvar s_lOpenMenu
+memvar s_hKeyMenuHook
+#endif
 
 #include "debug.ch"
 #include "vxh.ch"
@@ -42,7 +51,7 @@ CLASS MenuStrip INHERIT ToolStrip
    METHOD OnSize()
    //METHOD OnMove()
    METHOD __OnParentSize()
-   METHOD __SetHeight( x )    INLINE ::__SetSizePos( 4, x ), IIF( ::hWnd != NIL, (::Parent:__RefreshLayout( .T. ), /*AEVAL( ::Children, {|o| o:Height := o:Parent:Height - 1, o:MoveWindow() } )*/ ),)
+   METHOD __SetHeight( x )    INLINE ::__SetSizePos( 4, x ), IIF( ::hWnd != NIL, (::Parent:__RefreshLayout( .T. ), NIL), NIL)
    METHOD __UpdateWidth()
    METHOD OnSysKeyDown()
    METHOD OnParentSysCommand()
@@ -52,7 +61,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS MenuStrip
    ::__xCtrlName   := "MenuStrip"
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style         := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName       := "MenuStrip"
    ::Super:Init( oParent )
    IF ::DesignMode
@@ -73,7 +82,7 @@ METHOD OnParentSysKeyDown( nwParam ) CLASS MenuStrip
          IF !EMPTY( oItem:Children ) .AND. ( oItem:DropDown > 1 .OR. oItem:Parent:__lIsMenu )
             IF s_CurrFocus != NIL
                s_CurrFocus:__lSelected := .F.
-               s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+               s_CurrFocus:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                s_CurrFocus := NIL
             ENDIF
             oItem:PostMessage( WM_USER + 1028 )
@@ -114,7 +123,7 @@ METHOD OnSysKeyDown( nwParam ) CLASS MenuStrip
    // close the menu on ALT KEY y it is selected
    IF nwParam == VK_MENU .AND. s_CurrentObject != NIL
       s_CurrentObject:__lSelected := .F.
-      s_CurrentObject:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      s_CurrentObject:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
       s_CurrFocus := NIL
       s_CurrentObject := NIL
       UnhookWindowsHookEx( s_hKeyMenuHook )
@@ -151,9 +160,9 @@ RETURN NIL
 METHOD OnSize( nwParam, nlParam ) CLASS MenuStrip
    Super:OnSize( nwParam, nlParam )
    ::__PrevSize := LOWORD(nlParam)
-   ::Parent:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::Parent:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    IF ::Row > 0 //.AND. ::__PrevRow == 0
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN) )
       //AEVAL( ::Children, {|o| o:SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ) } )
    ENDIF
 RETURN NIL
@@ -165,7 +174,7 @@ METHOD __OnParentSize( x, y, hDef ) CLASS MenuStrip
    IF ::IsWindowVisible() .AND. ::Parent:ClientWidth > 0
       ::Width := ::Parent:ClientWidth - IIF( ::xShowGrip, (::__GripperPos + 1), 0 )
       IF ::Row > 0 .AND. ::__PrevRow == 0
-         ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+         ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
       ENDIF
       IF LEN( ::Children ) > 0
          aLines := {}

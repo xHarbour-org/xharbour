@@ -52,8 +52,8 @@ METHOD Init( oParent, aParams, cProjectName ) CLASS MDIChildWindow
    ::Modal       := .F.
    ::ClsName     := "MDIChild"
    ::Super:Init( oParent:MDIClient, aParams, cProjectName )
-   ::ClassStyle  := CS_VREDRAW | CS_HREDRAW
-   ::Style       := WS_CHILD | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_THICKFRAME
+   ::ClassStyle  := (CS_VREDRAW | CS_HREDRAW)
+   ::Style       := (WS_CHILD | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_THICKFRAME)
    ::IsContainer := .F.
 RETURN Self
 
@@ -64,7 +64,7 @@ METHOD Create() CLASS MDIChildWindow
 
    ::ControlParent := .T.
 
-   ::ExStyle := ::ExStyle | WS_EX_MDICHILD
+   ::ExStyle := (::ExStyle | WS_EX_MDICHILD)
    ::Super:Create()
 
    AADD( ::Parent:Children, Self )
@@ -116,9 +116,9 @@ METHOD Show( nShow ) CLASS MDIChildWindow
       CASE nShow == SW_SHOWMAXIMIZED
            SendMessage( ::Parent:hWnd, WM_MDIMAXIMIZE, ::hWnd )
       OTHERWISE
-           ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+           ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
    ENDCASE
-   ::Style := ::Style | WS_VISIBLE
+   ::Style := (::Style | WS_VISIBLE)
 RETURN Self
 
 METHOD OnNCDestroy() CLASS MDIChildWindow

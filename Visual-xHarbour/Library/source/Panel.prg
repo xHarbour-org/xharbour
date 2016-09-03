@@ -30,16 +30,16 @@ CLASS Panel FROM TitleControl
    METHOD Init() CONSTRUCTOR
    METHOD Create()
    METHOD OnEraseBkGnd()
-   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER))
    METHOD __CreateBkBrush()
-   METHOD OnGetDlgCode()     INLINE DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
+   METHOD OnGetDlgCode()     INLINE (DLGC_WANTMESSAGE | DLGC_WANTALLKEYS)
 ENDCLASS
 
 //-----------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS Panel
    DEFAULT ::__xCtrlName TO "Panel"
    ::ClsName      := "PanelBox"
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ExStyle      := WS_EX_CONTROLPARENT
    ::Super:Init( oParent )
    ::xWidth       := 80

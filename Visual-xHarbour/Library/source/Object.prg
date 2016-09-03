@@ -276,7 +276,7 @@ METHOD SetTabOrder( nTabOrder ) CLASS Object
          NEXT
       ENDIF
       IF ::hWnd != NIL
-         SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE )
+         SetWindowPos( ::hWnd, hAfter, 0, 0, 0, 0, (SWP_NOSIZE | SWP_NOMOVE) )
       ENDIF
    ENDIF
 RETURN Self

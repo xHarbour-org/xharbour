@@ -800,9 +800,10 @@ RETURN Self
 METHOD SetFilter( cFilter ) CLASS DataRdd
    IF cFilter != NIL
       IF ValType( cFilter ) == "C"
-         cFilter := COMPILE( cFilter )
+         (::Owner:Area)->( dbSetFilter( &("{||" + cFilter + "}"), cFilter ) )
+      ELSE
+         (::Owner:Area)->( dbSetFilter( cFilter ) )
       ENDIF
-      (::Owner:Area)->( dbSetFilter( cFilter ) )
    ELSE
       (::Owner:Area)->( dbClearFilter() )
    ENDIF

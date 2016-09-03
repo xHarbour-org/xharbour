@@ -59,8 +59,8 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Unload() CLASS ProfessionalColorTable
    IF ::Pen != NIL
-      HEVAL( ::Pen,   {|,hPen| DeleteObject( hPen ) } )
-      HEVAL( ::Brush, {|,hBrush| DeleteObject( hBrush ) } )
+      HEVAL( ::Pen,   {|a,hPen| (a), DeleteObject( hPen ) } )
+      HEVAL( ::Brush, {|a,hBrush| (a), DeleteObject( hBrush ) } )
    ENDIF
    ::Pen   := NIL
    ::Brush := NIL

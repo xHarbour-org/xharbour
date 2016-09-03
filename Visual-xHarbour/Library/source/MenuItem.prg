@@ -165,18 +165,18 @@ METHOD Create( lAdd ) CLASS MenuItem
    ::__mii := (struct MENUITEMINFO )
    ::__mii:cbSize  := ::__mii:SizeOf()
    ::__mii:wID     := ::Id
-   ::__mii:fMask   := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
+   ::__mii:fMask   := (MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE)
    ::__mii:fType   := MFT_STRING
-   ::__mii:fState  := IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
+   ::__mii:fState  := (IIF( ::xEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED ))
 
    IF ::RadioCheck
-      ::__mii:fType := ::__mii:fType | MFT_RADIOCHECK
+      ::__mii:fType := (::__mii:fType | MFT_RADIOCHECK)
    ENDIF
    IF ::RightJustified
-      ::__mii:fType := ::__mii:fType | MFT_RIGHTJUSTIFY
+      ::__mii:fType := (::__mii:fType | MFT_RIGHTJUSTIFY)
    ENDIF
    IF ::Separator .OR. ::Text == "-"
-      ::__mii:fMask   := MIIM_ID | MIIM_STATE | MIIM_TYPE
+      ::__mii:fMask   := (MIIM_ID | MIIM_STATE | MIIM_TYPE)
       ::__mii:fType   := MFT_SEPARATOR
     ELSE
       IF ::DesignMode
@@ -192,7 +192,7 @@ METHOD Create( lAdd ) CLASS MenuItem
    ::hMenu := CreateMenu()
 
    IF ::Alignment <> 0
-      ::__mii:fType := ::__mii:fType | ::Alignment
+      ::__mii:fType := (::__mii:fType | ::Alignment)
    ENDIF
 
    IF ::Visible
@@ -245,7 +245,7 @@ METHOD __SetVisible( lVisible ) CLASS MenuItem
          ENDIF
 
          IF LEN( ::Children ) > 0
-            mii:fMask    := mii:fMask | MIIM_SUBMENU
+            mii:fMask    := (mii:fMask | MIIM_SUBMENU)
             mii:hSubMenu := ::hMenu
          ENDIF
 
@@ -263,10 +263,10 @@ METHOD __SetChecked( lCheck ) CLASS MenuItem
    IF ::__pObjPtr != NIL .AND. lCheck != ::xChecked
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
-      mii:fMask    := MIIM_STATE | MIIM_BITMAP
+      mii:fMask    := (MIIM_STATE | MIIM_BITMAP)
       mii:hbmpItem := IIF( lCheck, NIL, ::__hBitmap )
       mii:fState   := IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED )
-      mii:fState   := IIF( ::Enabled, MFS_ENABLED, MFS_DISABLED ) | IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED )
+      mii:fState   := (IIF( ::Enabled, MFS_ENABLED, MFS_DISABLED ) | IIF( lCheck, MFS_CHECKED, MFS_UNCHECKED ))
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL
@@ -276,9 +276,9 @@ METHOD __SetEnabled( lEnabled ) CLASS MenuItem
    IF ::__pObjPtr != NIL .AND. lEnabled != ::xEnabled
       mii := (struct MENUITEMINFO)
       mii:cbSize   := mii:SizeOf()
-      mii:fMask    := MIIM_STATE | MIIM_BITMAP
+      mii:fMask    := (MIIM_STATE | MIIM_BITMAP)
       mii:hbmpItem := IIF( ::xChecked, NIL, ::__hBitmap )
-      mii:fState   := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED )
+      mii:fState   := (IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( ::xChecked, MFS_CHECKED, MFS_UNCHECKED ) )
       SetMenuItemInfo( ::Parent:hMenu, ::Id, .F., mii )
    ENDIF
 RETURN NIL

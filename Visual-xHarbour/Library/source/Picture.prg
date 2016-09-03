@@ -79,7 +79,7 @@ METHOD Init( oParent ) CLASS PictureBox
    ::Super:Init( oParent )
    ::Width        := 100
    ::Height       := 100
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    //::__IsStandard   := .F.
    ::IsContainer   := .T.
    ::ControlParent := .T.

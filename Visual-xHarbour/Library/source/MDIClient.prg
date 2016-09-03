@@ -39,7 +39,7 @@ CLASS MDIClient INHERIT Window
 
    DATA FirstChild         EXPORTED
    DATA Parent             EXPORTED
-   DATA Style              EXPORTED INIT WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DATA Style              EXPORTED INIT (WS_CHILD | WS_HSCROLL | WS_VSCROLL | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    DATA ExStyle            EXPORTED INIT 0
    DATA ClsName            EXPORTED
    DATA Name               EXPORTED
@@ -70,19 +70,19 @@ CLASS MDIClient INHERIT Window
    DATA BottomMargin       EXPORTED INIT 0
 
    DATA Font               EXPORTED
-   ACCESS MDIChild         INLINE ::ExStyle & WS_EX_MDICHILD != 0
-   ACCESS ControlParent    INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
-   ACCESS Transparent      INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
-   ACCESS Visible          INLINE IIF( ::IsWindow(), ::IsWindowVisible(), ::Style & WS_VISIBLE != 0 )
-   ACCESS ClipChildren     INLINE ::Style & WS_CLIPCHILDREN != 0
-   ACCESS ClipSiblings     INLINE ::Style & WS_CLIPSIBLINGS != 0
+   ACCESS MDIChild         INLINE (::ExStyle & WS_EX_MDICHILD) != 0
+   ACCESS ControlParent    INLINE (::ExStyle & WS_EX_CONTROLPARENT) != 0
+   ACCESS Transparent      INLINE (::ExStyle & WS_EX_TRANSPARENT) != 0
+   ACCESS Visible          INLINE IIF( ::IsWindow(), ::IsWindowVisible(), (::Style & WS_VISIBLE) != 0 )
+   ACCESS ClipChildren     INLINE (::Style & WS_CLIPCHILDREN) != 0
+   ACCESS ClipSiblings     INLINE (::Style & WS_CLIPSIBLINGS) != 0
 
-   ACCESS PopUp          INLINE ::Style & WS_POPUP != 0
-   ACCESS ThickFrame     INLINE ::Style & WS_THICKFRAME != 0
-   ACCESS MaximizeBox    INLINE ::Style & WS_MAXIMIZEBOX != 0
-   ACCESS MinimizeBox    INLINE ::Style & WS_MINIMIZEBOX != 0
-   ACCESS CaptionBar     INLINE ::Style & WS_CAPTION != 0
-   ACCESS SysMenu        INLINE ::Style & WS_SYSMENU != 0
+   ACCESS PopUp          INLINE (::Style & WS_POPUP) != 0
+   ACCESS ThickFrame     INLINE (::Style & WS_THICKFRAME) != 0
+   ACCESS MaximizeBox    INLINE (::Style & WS_MAXIMIZEBOX) != 0
+   ACCESS MinimizeBox    INLINE (::Style & WS_MINIMIZEBOX) != 0
+   ACCESS CaptionBar     INLINE (::Style & WS_CAPTION) != 0
+   ACCESS SysMenu        INLINE (::Style & WS_SYSMENU) != 0
 
    METHOD Init() CONSTRUCTOR
    METHOD Create()
@@ -144,15 +144,15 @@ METHOD __SetBorder( nBorder ) CLASS MDIClient
       nBorder := IIF( nBorder, WS_BORDER, 0 )
    ENDIF
 
-   nStyle   := ::Style & NOT( WS_BORDER )
-   nExStyle := ::ExStyle & NOT( WS_EX_STATICEDGE )
-   nExStyle := nExStyle & NOT( WS_EX_CLIENTEDGE )
+   nStyle   := (::Style & NOT( WS_BORDER ))
+   nExStyle := (::ExStyle & NOT( WS_EX_STATICEDGE ))
+   nExStyle := (nExStyle & NOT( WS_EX_CLIENTEDGE ))
 
    IF nBorder <> 0
       IF nBorder == WS_BORDER
-         nStyle := nStyle | WS_BORDER
+         nStyle := (nStyle | WS_BORDER)
       ELSE
-         nExStyle := nExStyle | nBorder
+         nExStyle := (nExStyle | nBorder)
       ENDIF
    ENDIF
    ::Style := nStyle
@@ -190,9 +190,9 @@ METHOD SetExStyle(nStyle,lAdd) CLASS MDIClient
          ::ExStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
       ENDIF
       IF lAdd
-         ::ExStyle := ::ExStyle | nStyle
+         ::ExStyle := (::ExStyle | nStyle)
        ELSE
-         ::ExStyle := ::ExStyle & NOT( nStyle )
+         ::ExStyle := (::ExStyle & NOT( nStyle ))
       ENDIF
       IF IsWindow( ::hWnd )
          SetWindowLong( ::hWnd, GWL_EXSTYLE, ::ExStyle )
@@ -207,7 +207,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
 
    SWITCH nMsg
       CASE WM_MDICHILDSIZED
-           lShow := ::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE != 0
+           lShow := (::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE) != 0
            ::Parent:Children[nwParam]:UpdateMenu( lShow )
            RETURN 1
 
@@ -221,7 +221,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS MDIClient
            IF ::Parent:BackgroundImage != NIL .AND. !EMPTY( ::Parent:BackgroundImage:ImageName )
               ::CallWindowProc()
               ::InvalidateRect()
-              ::RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+              ::RedrawWindow( , , (RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN) )
            ENDIF
    END
 RETURN CallWindowProc( ::__nProc, hWnd, nMsg, nwParam, nlParam )
