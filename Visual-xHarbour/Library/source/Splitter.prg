@@ -95,7 +95,7 @@ METHOD Init( oParent ) CLASS Splitter
    ::Super:Init( oParent )
    ::ClassBrush   := GetStockObject( NULL_BRUSH )
    ::Weight       := 3
-   ::Style        := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style        := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ExStyle      := WS_EX_TRANSPARENT
    ::__IsStandard := .F.
    ::Events       := {  {"General", { { "OnPosChanged", "", "" } } } }
@@ -110,7 +110,7 @@ METHOD Create() CLASS Splitter
    LOCAL n
    DEFAULT ::Position TO 10 - ::Owner:Dock:Type
 
-   ::Style    := WS_CHILD | WS_VISIBLE
+   ::Style    := (WS_CHILD | WS_VISIBLE)
    ::ExStyle  := WS_EX_TRANSPARENT
 
    ::ClsName  := "Splitter"+ALLTRIM( STR( ::Position ) )
@@ -139,11 +139,11 @@ METHOD Create() CLASS Splitter
    END
    ::GetSizes()
 
-   ::Style    := WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style    := (WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
 
    TRY
       IF ::Owner:Visible
-         ::Style := ::Style | WS_VISIBLE
+         ::Style := (::Style | WS_VISIBLE)
       ENDIF
     CATCH
       OutputDebugString( ::Owner:ClassName )
@@ -162,7 +162,7 @@ METHOD __OnParentSize() CLASS Splitter
    LOCAL aRect
    IF !::lSizing
       ::GetSizes()
-      SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, ::xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
+      SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, ::xHeight, (SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE) )
       aRect := { ::xLeft, ::xTop, ::xLeft+::xWidth, ::xTop+::xHeight }
    ENDIF
 RETURN NIL
@@ -172,7 +172,7 @@ RETURN NIL
 METHOD OnParentMove() CLASS Splitter
    IF !::lSizing .AND. ::Owner != NIL .AND. ::Owner:IsWindow()
       ::GetSizes()
-      SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, ::xHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE )
+      SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, ::xHeight, (SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_DEFERERASE) )
    ENDIF
 RETURN NIL
 

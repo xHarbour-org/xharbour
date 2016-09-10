@@ -167,7 +167,7 @@ METHOD GetPathFromFolder( nId, lCreate ) CLASS System
    LOCAL cPath := ""
    DEFAULT lCreate TO .F.
    If lCreate
-      nId := nId | CSIDL_FLAG_CREATE
+      nId := (nId | CSIDL_FLAG_CREATE)
    Endif
    SHGetFolderPath( 0, nId, 0, SHGFP_TYPE_CURRENT, @cPath )
 RETURN cPath
@@ -293,10 +293,10 @@ METHOD Init() CLASS System
    ::WindowAnimation[ "None"               ] := 0
    ::WindowAnimation[ "Blend"              ] := AW_BLEND
    ::WindowAnimation[ "Center"             ] := AW_CENTER
-   ::WindowAnimation[ "SlideHorzPositive"  ] := AW_SLIDE | AW_HOR_POSITIVE
-   ::WindowAnimation[ "SlideHorzNegative"  ] := AW_SLIDE | AW_HOR_NEGATIVE
-   ::WindowAnimation[ "SlideVertPositive"  ] := AW_SLIDE | AW_VER_POSITIVE
-   ::WindowAnimation[ "SlideVertNegative"  ] := AW_SLIDE | AW_VER_NEGATIVE
+   ::WindowAnimation[ "SlideHorzPositive"  ] := (AW_SLIDE | AW_HOR_POSITIVE)
+   ::WindowAnimation[ "SlideHorzNegative"  ] := (AW_SLIDE | AW_HOR_NEGATIVE)
+   ::WindowAnimation[ "SlideVertPositive"  ] := (AW_SLIDE | AW_VER_POSITIVE)
+   ::WindowAnimation[ "SlideVertNegative"  ] := (AW_SLIDE | AW_VER_NEGATIVE)
 
    ::KeyboardList := {=>}
    HSetCaseMatch( ::KeyboardList, .F. )

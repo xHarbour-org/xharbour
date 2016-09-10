@@ -42,7 +42,7 @@ FUNCTION Splash( hInst, cImage, cType, nTimeout, aCenter, nBitmapMaskColor, nTol
 
    __pCallBackPtr := WinCallBackPointer( @__SplashDlgProc() )
 
-   nStyle  := WS_POPUP | DS_SYSMODAL | WS_VISIBLE
+   nStyle  := (WS_POPUP | DS_SYSMODAL | WS_VISIBLE)
    nLeft   := 0
    nTop    := 0
 
@@ -100,7 +100,7 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
               ReleaseDC( hWnd, hMemDC )
            ENDIF
 
-           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
+           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, (SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE) )
            aPar  := _GetWindowRect( GetDeskTopWindow() )
            aRect := _GetWindowRect( hWnd )
 
@@ -221,13 +221,13 @@ METHOD __SetMarquee( lSet ) CLASS MessageWait
    IF s_lMarquee != lSet
       nStyle := GetWindowLong( s_hProgress, GWL_STYLE )
       IF lSet
-         nStyle := nStyle | PBS_MARQUEE
+         nStyle := (nStyle | PBS_MARQUEE)
        ELSE
-         nStyle := nStyle & NOT( PBS_MARQUEE )
+         nStyle := (nStyle & NOT( PBS_MARQUEE ))
       ENDIF
       SetWindowLong( s_hProgress, GWL_STYLE, nStyle )
-      SetWindowPos( s_hProgress, ,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
-      RedrawWindow( s_hProgress, , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      SetWindowPos( s_hProgress, ,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
+      RedrawWindow( s_hProgress, , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW ))
       SendMessage( s_hProgress, PBM_SETMARQUEE, lSet, 30 )
       s_lMarquee := lSet
    ENDIF
@@ -237,7 +237,7 @@ RETURN Self
 METHOD SetText( cText ) CLASS MessageWait
    s_cText := cText
    //SetWindowText( __hText, cText )
-   RedrawWindow( ::hWnd, , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   RedrawWindow( ::hWnd, , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    __GetApplication():DoEvents()
 RETURN Self
 
@@ -272,10 +272,10 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
    s_lMarquee  := lMarquee
    s_cText     := cText
 
-   nStyle := WS_POPUP | WS_DLGFRAME | WS_CLIPCHILDREN
+   nStyle := (WS_POPUP | WS_DLGFRAME | WS_CLIPCHILDREN)
 
    IF cTitle != NIL
-      nStyle := nStyle | WS_CAPTION | WS_THICKFRAME
+      nStyle := (nStyle | WS_CAPTION | WS_THICKFRAME)
    ENDIF
 
    HB_CStructureCSyntax("_DIALOGTEMPLATE",{"-4","style -4","dwExtendedStyle -2","cdit","2","x","2","y","2","cx","2","cy -2","menu -2","windowclass -2","title",},,,4 )
@@ -286,7 +286,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
    __pCallBackPtr := WinCallBackPointer( @__MsgWaitDlgProc() )
 
    dt:style           := nStyle
-   dt:dwExtendedStyle := WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
+   dt:dwExtendedStyle := (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)
    dt:x               := 0
    dt:y               := 0
    dt:cx              := Int( ( nWidth  * 4 )/LOWORD(GetDialogBaseUnits()) )
@@ -308,7 +308,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
    SWITCH nMsg
       CASE WM_INITDIALOG
-           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE )
+           SetWindowPos( hWnd, HWND_TOPMOST, 0, 0, 0, 0, (SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE) )
 
            IF s_hParent == NIL
               aPar := _GetWindowRect( GetDeskTopWindow() )
@@ -355,15 +355,15 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               IF s_lProgress
                  nLeft := ( aRect[3] - aSize[1] ) - 4
               ENDIF
-              hBtn  := CreateWindowEx( 0, "Button", s_cCancel, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,;
+              hBtn  := CreateWindowEx( 0, "Button", s_cCancel, (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS),;
                                        nLeft, aRect[4]-26, aSize[1], 22, hWnd, 4000, GetModuleHandle(), NIL )
               SendMessage( hBtn, WM_SETFONT, s_hFont )
            ENDIF
            IF s_lProgress
               aRect := _GetClientRect( hWnd )
-              nStyle := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+              nStyle := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
               IF s_lMarquee
-                 nStyle := nStyle | PBS_MARQUEE
+                 nStyle := (nStyle | PBS_MARQUEE)
               ENDIF
               s_hProgress := CreateWindowEx( 0, PROGRESS_CLASS, , nStyle, 6, aRect[4]-23, aRect[3]-aSize[1]-14, 16, hWnd, 4001, GetModuleHandle(), NIL )
               IF s_lMarquee
@@ -382,7 +382,7 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
 
            hOldFont := SelectObject( hDC, s_hFont )
 
-           _DrawText( hDC, s_cText, s_aRect, DT_CENTER|DT_VCENTER|DT_NOPREFIX )
+           _DrawText( hDC, s_cText, s_aRect, (DT_CENTER|DT_VCENTER|DT_NOPREFIX) )
 
            SelectObject( hDC, hOldFont )
            _EndPaint( hWnd, cPaint)

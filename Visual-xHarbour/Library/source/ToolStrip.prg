@@ -10,22 +10,10 @@
 //  This source file is an intellectual property of xHarbour.com Inc.                                   *
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
-
-#ifdef __XHARBOUR__
-GLOBAL s_lExecuting := .F.
-GLOBAL s_CurrFocus
-GLOBAL s_CurrentObject
-GLOBAL s_lKey := .F.
-GLOBAL s_lOpenMenu := .T.
-GLOBAL s_hKeyMenuHook
-#else
-public s_lExecuting := .F.
-public s_CurrFocus
-public s_CurrentObject
-public s_lKey := .F.
-public s_lOpenMenu := .T.
-public s_hKeyMenuHook
-#endif
+static s_nx, s_ncx, s_nmw, s_Shadow := .F., s_aPixels, s_aRect, s_mousex := 0, s_mousey := 0
+static s_oCurrMenuItem, s_PrevFocus
+static s_hMenuDialogHook
+static s_MenuhWnd
 
 #include "debug.ch"
 #include "vxh.ch"
@@ -34,10 +22,6 @@ public s_hKeyMenuHook
 
 #define FROMARGB(r,g,b,a)  ((((b)<<16)|(((g)<<16)|(((r)<<16)|(((a)<<16)))
 
-static s_nx, s_ncx, s_nmw, s_Shadow := .F., s_aPixels, s_aRect, s_mousex := 0, s_mousey := 0
-static s_oCurrMenuItem, s_PrevFocus
-static s_hMenuDialogHook
-static s_MenuhWnd
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -503,13 +487,13 @@ RETURN nRet
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnDestroy() CLASS ToolStrip
-   IF s_CurrentObject != NIL
-      __ReleaseMenu( s_CurrentObject, s_CurrentObject:__hMenu )
-      s_CurrentObject := NIL
+   IF ::System:__ToolStripFlags[ "s_CurrentObject" ] != NIL
+      __ReleaseMenu( ::System:__ToolStripFlags[ "s_CurrentObject" ], ::System:__ToolStripFlags[ "s_CurrentObject" ]:__hMenu )
+      ::System:__ToolStripFlags[ "s_CurrentObject" ] := NIL
    ENDIF
-   IF s_hKeyMenuHook != NIL
-      UnhookWindowsHookEx( s_hKeyMenuHook )
-      s_hKeyMenuHook := NIL
+   IF ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] != NIL
+      UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
+      ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] := NIL
    ENDIF
    IF s_hMenuDialogHook != NIL
       UnhookWindowsHookEx( s_hMenuDialogHook )
@@ -1526,20 +1510,20 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------------------------------------
 
 METHOD Cancel() CLASS ToolStripItem
-   IF s_lExecuting
-      SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
+   IF ::System:__ToolStripFlags[ "s_lExecuting" ]
+      SendMessage( ::System:__ToolStripFlags[ "s_CurrentObject" ]:Form:hWnd, WM_CANCELMODE, 0, 0 )
    ENDIF
-   IF s_CurrFocus != NIL
-      s_CurrFocus:__lSelected := .F.
-      s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-      s_CurrFocus := NIL
+   IF ::System:__ToolStripFlags[ "s_CurrFocus" ] != NIL
+      ::System:__ToolStripFlags[ "s_CurrFocus" ]:__lSelected := .F.
+      ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
    ENDIF
-   UnhookWindowsHookEx( s_hKeyMenuHook )
-   s_CurrentObject := NIL
-   s_hKeyMenuHook := NIL
-   s_lExecuting := .F.
-   s_lKey       := .F.
-   s_lOpenMenu  := .T.
+   UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
+   ::System:__ToolStripFlags[ "s_CurrentObject" ] := NIL
+   ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] := NIL
+   ::System:__ToolStripFlags[ "s_lExecuting" ] := .F.
+   ::System:__ToolStripFlags[ "s_lKey" ]       := .F.
+   ::System:__ToolStripFlags[ "s_lOpenMenu" ]  := .T.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -1628,18 +1612,18 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
-   IF !s_lKey
+   IF !::System:__ToolStripFlags[ "s_lKey" ]
       ::__lPushed   := ::__lSelected .AND. nwParam == MK_LBUTTON .AND. !::Parent:__lIsMenu .AND. ::DropDown == 1
       ::__lSelected := .T.
-      IF s_CurrFocus != NIL
-         s_CurrFocus:__lSelected := .F.
-         s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-         s_CurrFocus := NIL
+      IF ::System:__ToolStripFlags[ "s_CurrFocus" ] != NIL
+         ::System:__ToolStripFlags[ "s_CurrFocus" ]:__lSelected := .F.
+         ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+         ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
       ENDIF
 
-      IF s_hKeyMenuHook != NIL
-         UnhookWindowsHookEx( s_hKeyMenuHook )
-         s_hKeyMenuHook := NIL
+      IF ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] != NIL
+         UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
+         ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] := NIL
       ENDIF
 
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -1663,7 +1647,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 METHOD OnMouseLeave() CLASS ToolStripItem
    ::Super:OnMouseLeave()
-   IF !s_lKey .AND. ( !s_lExecuting .OR. ( !::Parent:__lIsMenu .OR. EMPTY( ::Children ) ) ) .AND. s_hMenuDialogHook == NIL
+   IF !::System:__ToolStripFlags[ "s_lKey" ] .AND. ( !::System:__ToolStripFlags[ "s_lExecuting" ] .OR. ( !::Parent:__lIsMenu .OR. EMPTY( ::Children ) ) ) .AND. s_hMenuDialogHook == NIL
       ::__lSelected := ::__lPushed
       ::__lPushed   := .F.
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -1681,7 +1665,7 @@ RETURN NIL
 METHOD OnLButtonUp() CLASS ToolStripItem
    LOCAL pt, i, n
    ::ReleaseCapture()
-   s_lExecuting := .T.
+   ::System:__ToolStripFlags[ "s_lExecuting" ] := .T.
 
    IF ::__lPushed .AND. ::DropDown < 3 .AND. ( !::Parent:__lIsMenu  .OR. EMPTY( ::Children ) )
 
@@ -1700,7 +1684,7 @@ METHOD OnLButtonUp() CLASS ToolStripItem
 
          ELSEIF ::Role == 3
             IF ::Checked
-               s_lExecuting := .F.
+               ::System:__ToolStripFlags[ "s_lExecuting" ] := .F.
                RETURN NIL
             ENDIF
             ::Checked := .T.
@@ -1734,7 +1718,7 @@ METHOD OnLButtonUp() CLASS ToolStripItem
 
    ENDIF
    ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-   s_lExecuting := .F.
+   ::System:__ToolStripFlags[ "s_lExecuting" ] := .F.
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -2145,12 +2129,12 @@ FUNCTION ___OpenMenu( Self )
    s_PrevFocus := NIL
 
    lChildren := !EMPTY( ::Children )
-   s_lOpenMenu := .T.
+   ::System:__ToolStripFlags[ "s_lOpenMenu" ] := .T.
    IF !lChildren .OR. ::Children[1]:__pObjPtr != NIL
       IF lChildren .AND. ::Children[1]:__pObjPtr != NIL
          ::__lSelected  := .T.
          ::__lPushed    := .F.
-         s_lExecuting   := .F.
+         ::System:__ToolStripFlags[ "s_lExecuting" ]   := .F.
          ::ReleaseCapture()
       ENDIF
       ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
@@ -2163,7 +2147,7 @@ FUNCTION ___OpenMenu( Self )
    ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
 
    ::SetCapture()
-   s_lExecuting := .T.
+   ::System:__ToolStripFlags[ "s_lExecuting" ] := .T.
 
    __SetSubMenu( Self, ::__hMenu )
 
@@ -2182,11 +2166,11 @@ FUNCTION ___OpenMenu( Self )
    ENDIF
 
    //----------------------------------------------------------------------------------------------------------------------------------
-   s_CurrFocus     := NIL
-   s_CurrentObject := Self
+   ::System:__ToolStripFlags[ "s_CurrFocus" ]     := NIL
+   ::System:__ToolStripFlags[ "s_CurrentObject" ] := Self
 
    s_hMenuDialogHook := SetWindowsHookEx( WH_CALLWNDPROC, ( @__MenuDialogHook() ), NIL, GetCurrentThreadId() )
-   DEFAULT s_hKeyMenuHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
+   DEFAULT ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
    TrackPopupMenu( ::__hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, aPt[1], aPt[2], 0, ::Form:hWnd )
    s_nmw := 0
@@ -2198,14 +2182,14 @@ FUNCTION ___OpenMenu( Self )
    UnhookWindowsHookEx( s_hMenuDialogHook )
    s_hMenuDialogHook := NIL
 
-   IF s_CurrFocus == NIL .AND. s_hKeyMenuHook != NIL
-      UnhookWindowsHookEx( s_hKeyMenuHook )
-      s_hKeyMenuHook    := NIL
+   IF ::System:__ToolStripFlags[ "s_CurrFocus" ] == NIL .AND. ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] != NIL
+      UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
+      ::System:__ToolStripFlags[ "s_hKeyMenuHook" ]    := NIL
    ENDIF
    s_oCurrMenuItem := NIL
    //----------------------------------------------------------------------------------------------------------------------------------
 
-   s_lExecuting   := .F.
+   ::System:__ToolStripFlags[ "s_lExecuting" ]   := .F.
    ::__lPushed    := .F.
    ::__lSelected  := .F.
 
@@ -2232,7 +2216,7 @@ METHOD OnUserMsg() CLASS ToolStripButton
       CASE ::Msg == WM_USER + 1029
            ::__lSelected := .T.
            ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-           s_PrevFocus := s_CurrFocus
+           s_PrevFocus := ::System:__ToolStripFlags[ "s_CurrFocus" ]
    ENDCASE
 RETURN NIL
 
@@ -2286,7 +2270,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 STATIC FUNCTION __MenuDialogProc( hWnd, nMsg, nwParam, nlParam )
-   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, o := s_CurrentObject
+   LOCAL aPt, aRect, hdc, pProc, hOldBrush, hOldPen, n, o := __GetSystem():__ToolStripFlags[ "s_CurrentObject" ]
 
    pProc := GetProp( hWnd, "PROP_WND_PROC" )
 
@@ -2399,7 +2383,7 @@ RETURN NIL
 //-------------------------------------------------------------------------------------------------------
 FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
    LOCAL pt, hWnd, oObj, n, ms_hwnd, ms_message, ms_wParam, ms_lParam, mii_dwItemData
-   LOCAL aParams, oMenu, nItem, hMenu, oItem, i, nCurr
+   LOCAL aParams, oMenu, nItem, hMenu, oItem, i, nCurr, oSysFlags := __GetSystem():__ToolStripFlags
 
    aParams    := __GetMSG( nlParam )
    ms_hwnd    := aParams[1]
@@ -2419,7 +2403,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            EXIT
 
       CASE WM_MOUSEMOVE
-           IF s_CurrFocus == NIL .OR. s_PrevFocus != NIL
+           IF oSysFlags[ "s_CurrFocus" ] == NIL .OR. s_PrevFocus != NIL
               pt := _GetCursorPos()
 
               IF s_mousex != pt[1] .OR. s_mousey != pt[2]
@@ -2427,8 +2411,8 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                  s_mousey := pt[2]
 
                  hWnd := _WindowFromPoint( pt )
-                 IF hWnd != 0 .AND. s_CurrentObject:Parent != NIL
-                    IF !( hWnd == s_CurrentObject:hWnd ) .AND. GetParent( hWnd ) == s_CurrentObject:Parent:hWnd
+                 IF hWnd != 0 .AND. oSysFlags[ "s_CurrentObject" ]:Parent != NIL
+                    IF !( hWnd == oSysFlags[ "s_CurrentObject" ]:hWnd ) .AND. GetParent( hWnd ) == oSysFlags[ "s_CurrentObject" ]:Parent:hWnd
                        oObj := ObjFromHandle( hWnd )
 
                        IF VALTYPE( oObj ) == "O" .AND. oObj:Parent:HasMessage("__lIsMenu")
@@ -2438,7 +2422,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                              s_PrevFocus := NIL
                           ENDIF
                           SendMessage( ms_hWnd, WM_CANCELMODE, 0, 0 )
-                          s_lKey := .F.
+                          oSysFlags[ "s_lKey" ] := .F.
                           IF !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
                              oObj:PostMessage( WM_USER + 1028 )
                           ENDIF
@@ -2456,21 +2440,21 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            pt := (struct POINT)
            GetCursorPos( @pt )
            hWnd := WindowFromPoint( pt )
-           IF GetClassName( hWnd ) != "#32768" .AND. hWnd != s_CurrentObject:hWnd
-              IF s_lExecuting
-                 SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
+           IF GetClassName( hWnd ) != "#32768" .AND. hWnd != oSysFlags[ "s_CurrentObject" ]:hWnd
+              IF oSysFlags[ "s_lExecuting" ]
+                 SendMessage( oSysFlags[ "s_CurrentObject" ]:Form:hWnd, WM_CANCELMODE, 0, 0 )
               ENDIF
-              IF s_CurrFocus != NIL
-                 s_CurrFocus:__lSelected := .F.
-                 s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                 s_CurrFocus := NIL
+              IF oSysFlags[ "s_CurrFocus" ] != NIL
+                 oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
+                 oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                 oSysFlags[ "s_CurrFocus" ] := NIL
               ENDIF
-              UnhookWindowsHookEx( s_hKeyMenuHook )
-              s_CurrentObject := NIL
-              s_hKeyMenuHook := NIL
-              s_lExecuting := .F.
-              s_lKey       := .F.
-              s_lOpenMenu  := .T.
+              UnhookWindowsHookEx( oSysFlags[ "s_hKeyMenuHook" ] )
+              oSysFlags[ "s_CurrentObject" ] := NIL
+              oSysFlags[ "s_hKeyMenuHook" ] := NIL
+              oSysFlags[ "s_lExecuting" ] := .F.
+              oSysFlags[ "s_lKey" ]       := .F.
+              oSysFlags[ "s_lOpenMenu" ]  := .T.
               RETURN 0
            ENDIF
            EXIT
@@ -2480,20 +2464,20 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
 
       CASE WM_SYSKEYDOWN
            IF ms_wParam == VK_MENU
-              SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
-              s_CurrentObject:__lSelected := .F.
-              s_CurrentObject:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-              IF s_CurrFocus == NIL
-                 s_CurrentObject := NIL
+              SendMessage( oSysFlags[ "s_CurrentObject" ]:Form:hWnd, WM_CANCELMODE, 0, 0 )
+              oSysFlags[ "s_CurrentObject" ]:__lSelected := .F.
+              oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+              IF oSysFlags[ "s_CurrFocus" ] == NIL
+                 oSysFlags[ "s_CurrentObject" ] := NIL
               ENDIF
-              s_CurrFocus := NIL
-              UnhookWindowsHookEx( s_hKeyMenuHook )
+              oSysFlags[ "s_CurrFocus" ] := NIL
+              UnhookWindowsHookEx( oSysFlags[ "s_hKeyMenuHook" ] )
 
-              s_hKeyMenuHook := NIL
+              oSysFlags[ "s_hKeyMenuHook" ] := NIL
 
-              s_lExecuting := .F.
-              s_lKey       := .F.
-              s_lOpenMenu  := .T.
+              oSysFlags[ "s_lExecuting" ] := .F.
+              oSysFlags[ "s_lKey" ]       := .F.
+              oSysFlags[ "s_lOpenMenu" ]  := .T.
               RETURN 0
            ENDIF
            EXIT
@@ -2502,7 +2486,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            RETURN DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
 
       CASE WM_CHAR
-           oMenu := s_CurrentObject:Parent
+           oMenu := oSysFlags[ "s_CurrentObject" ]:Parent
            IF s_oCurrMenuItem != NIL
               oMenu := s_oCurrMenuItem:Parent
            ENDIF
@@ -2519,7 +2503,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               IF nCurr != NIL .AND. ( nItem := __GetHotItem( oMenu, nCurr, ms_wParam ) ) > 0
                  oItem := oMenu:Children[ nItem ]
 
-                 IF s_lOpenMenu
+                 IF oSysFlags[ "s_lOpenMenu" ]
 
                     IF nItem < nCurr
                        FOR i := 1 TO ( nCurr-nItem )
@@ -2556,10 +2540,10 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                     IF oItem:Enabled
 
                        IF !EMPTY( oItem:Children ) .AND. ( oItem:DropDown > 1 .OR. oItem:Parent:__lIsMenu )
-                          IF s_CurrentObject != NIL
-                             s_CurrentObject:__lSelected := .F.
-                             s_CurrentObject:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                             s_CurrentObject := NIL
+                          IF oSysFlags[ "s_CurrentObject" ] != NIL
+                             oSysFlags[ "s_CurrentObject" ]:__lSelected := .F.
+                             oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                             oSysFlags[ "s_CurrentObject" ] := NIL
                           ENDIF
                           oItem:PostMessage( WM_USER + 1028 )
                        ENDIF
@@ -2579,105 +2563,105 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            SWITCH ms_wParam
 
               CASE VK_LEFT
-                   oObj := s_CurrFocus
-                   DEFAULT oObj TO s_CurrentObject
+                   oObj := oSysFlags[ "s_CurrFocus" ]
+                   DEFAULT oObj TO oSysFlags[ "s_CurrentObject" ]
                    IF LEN( oObj:Parent:Children ) > 1 .AND. ( s_oCurrMenuItem == NIL .OR. s_oCurrMenuItem:Parent == oObj )
                       IF ( n := ASCAN( oObj:Parent:Children, {|o| o == oObj } ) - 1 ) <= 0
                          n := LEN( oObj:Parent:Children )
                       ENDIF
-                      IF s_CurrFocus != NIL
-                         s_CurrFocus:__lSelected := .F.
-                         s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                         s_CurrFocus := NIL
+                      IF oSysFlags[ "s_CurrFocus" ] != NIL
+                         oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ] := NIL
                        ELSE
                          SendMessage( oObj:Form:hWnd, WM_CANCELMODE, 0, 0 )
                       ENDIF
-                      s_lKey := .T.
-                      IF s_lOpenMenu .AND. !EMPTY( oObj:Parent:Children[n]:Children ) .AND. ( oObj:Parent:Children[n]:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
-                         s_lExecuting := .T.
-                         s_CurrFocus  := NIL
+                      oSysFlags[ "s_lKey" ] := .T.
+                      IF oSysFlags[ "s_lOpenMenu" ] .AND. !EMPTY( oObj:Parent:Children[n]:Children ) .AND. ( oObj:Parent:Children[n]:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
+                         oSysFlags[ "s_lExecuting" ] := .T.
+                         oSysFlags[ "s_CurrFocus" ]  := NIL
                          oObj:Parent:Children[n]:PostMessage( WM_USER + 1028 )
                        ELSE
-                         s_lExecuting := .F.
-                         s_CurrFocus  := oObj:Parent:Children[n]
+                         oSysFlags[ "s_lExecuting" ] := .F.
+                         oSysFlags[ "s_CurrFocus" ]  := oObj:Parent:Children[n]
                          oObj:Parent:Children[n]:PostMessage( WM_USER + 1029 )
-                         s_CurrentObject := oObj:Parent:Children[n]
+                         oSysFlags[ "s_CurrentObject" ] := oObj:Parent:Children[n]
                       ENDIF
                    ENDIF
                    RETURN 0
 
               CASE VK_RIGHT
-                   oObj := s_CurrFocus
-                   DEFAULT oObj TO s_CurrentObject
+                   oObj := oSysFlags[ "s_CurrFocus" ]
+                   DEFAULT oObj TO oSysFlags[ "s_CurrentObject" ]
                    IF LEN( oObj:Parent:Children ) > 1 .AND. ( s_oCurrMenuItem == NIL .OR. LEN( s_oCurrMenuItem:Children ) == 0 )
                       IF ( n := ASCAN( oObj:Parent:Children, {|o| o == oObj } ) + 1 ) > LEN( oObj:Parent:Children )
                          n := 1
                       ENDIF
-                      IF s_CurrFocus != NIL
-                         s_CurrFocus:__lSelected := .F.
-                         s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                         s_CurrFocus := NIL
+                      IF oSysFlags[ "s_CurrFocus" ] != NIL
+                         oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ] := NIL
                        ELSE
                          SendMessage( oObj:Form:hWnd, WM_CANCELMODE, 0, 0 )
                       ENDIF
-                      s_lKey := .T.
+                      oSysFlags[ "s_lKey" ] := .T.
 
-                      IF s_lOpenMenu .AND. !EMPTY( oObj:Parent:Children[n]:Children ) .AND. ( oObj:Parent:Children[n]:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
-                         s_lExecuting := .T.
-                         s_CurrFocus  := NIL
+                      IF oSysFlags[ "s_lOpenMenu" ] .AND. !EMPTY( oObj:Parent:Children[n]:Children ) .AND. ( oObj:Parent:Children[n]:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
+                         oSysFlags[ "s_lExecuting" ] := .T.
+                         oSysFlags[ "s_CurrFocus" ]  := NIL
                          oObj:Parent:Children[n]:PostMessage( WM_USER + 1028 )
                        ELSE
-                         s_lExecuting := .F.
-                         s_CurrFocus  := oObj:Parent:Children[n]
+                         oSysFlags[ "s_lExecuting" ] := .F.
+                         oSysFlags[ "s_CurrFocus" ]  := oObj:Parent:Children[n]
                          oObj:Parent:Children[n]:PostMessage( WM_USER + 1029 )
-                         s_CurrentObject := oObj:Parent:Children[n]
+                         oSysFlags[ "s_CurrentObject" ] := oObj:Parent:Children[n]
                       ENDIF
                    ENDIF
                    RETURN 0
 
               CASE VK_DOWN
-                   oObj := s_CurrFocus
-                   DEFAULT oObj TO s_CurrentObject
+                   oObj := oSysFlags[ "s_CurrFocus" ]
+                   DEFAULT oObj TO oSysFlags[ "s_CurrentObject" ]
 
-                   IF !s_lOpenMenu .AND. !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
-                      s_lKey := .T.
+                   IF !oSysFlags[ "s_lOpenMenu" ] .AND. !EMPTY( oObj:Children ) .AND. ( oObj:DropDown > 1 .OR. oObj:Parent:__lIsMenu )
+                      oSysFlags[ "s_lKey" ] := .T.
 
-                      s_lExecuting := .T.
+                      oSysFlags[ "s_lExecuting" ] := .T.
                       oObj:PostMessage( WM_USER + 1028 )
 
-                      IF s_CurrFocus != NIL
-                         s_CurrFocus:__lSelected := .F.
-                         s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                         s_CurrFocus := NIL
+                      IF oSysFlags[ "s_CurrFocus" ] != NIL
+                         oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ] := NIL
                       ENDIF
                       RETURN 1
                    ENDIF
                    EXIT
 
               CASE VK_ESCAPE
-                   s_lExecuting := .F.
-                   s_lKey       := .F.
-                   s_lOpenMenu  := .T.
+                   oSysFlags[ "s_lExecuting" ] := .F.
+                   oSysFlags[ "s_lKey" ]       := .F.
+                   oSysFlags[ "s_lOpenMenu" ]  := .T.
 
-                   IF s_CurrFocus != NIL
-                      s_CurrFocus:__lSelected := .F.
-                      s_CurrFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
-                      s_CurrFocus := NIL
-                      s_CurrentObject := NIL
-                      UnhookWindowsHookEx( s_hKeyMenuHook )
-                      s_hKeyMenuHook := NIL
+                   IF oSysFlags[ "s_CurrFocus" ] != NIL
+                      oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
+                      oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                      oSysFlags[ "s_CurrFocus" ] := NIL
+                      oSysFlags[ "s_CurrentObject" ] := NIL
+                      UnhookWindowsHookEx( oSysFlags[ "s_hKeyMenuHook" ] )
+                      oSysFlags[ "s_hKeyMenuHook" ] := NIL
 
-                      s_lExecuting := .F.
-                      s_lKey       := .F.
-                      s_lOpenMenu  := .T.
+                      oSysFlags[ "s_lExecuting" ] := .F.
+                      oSysFlags[ "s_lKey" ]       := .F.
+                      oSysFlags[ "s_lOpenMenu" ]  := .T.
 
-                    ELSEIF s_CurrentObject:ClsName != "ContextStrip"
-                      SendMessage( s_CurrentObject:Form:hWnd, WM_CANCELMODE, 0, 0 )
-                      s_CurrFocus  := s_CurrentObject
-                      s_lOpenMenu  := .F.
-                      s_CurrentObject:PostMessage( WM_USER + 1029 )
+                    ELSEIF oSysFlags[ "s_CurrentObject" ]:ClsName != "ContextStrip"
+                      SendMessage( oSysFlags[ "s_CurrentObject" ]:Form:hWnd, WM_CANCELMODE, 0, 0 )
+                      oSysFlags[ "s_CurrFocus" ]  := oSysFlags[ "s_CurrentObject" ]
+                      oSysFlags[ "s_lOpenMenu" ]  := .F.
+                      oSysFlags[ "s_CurrentObject" ]:PostMessage( WM_USER + 1029 )
                       s_oCurrMenuItem := NIL
-                      s_lKey := .T.
+                      oSysFlags[ "s_lKey" ] := .T.
                    ENDIF
                    RETURN 0
 
@@ -2685,7 +2669,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            EXIT
    END
 
-RETURN CallNextHookEx( s_hKeyMenuHook, nCode, nwParam, nlParam)
+RETURN CallNextHookEx( oSysFlags[ "s_hKeyMenuHook" ], nCode, nwParam, nlParam)
 
 
 FUNCTION __GetHotItem( oMenu, nCurr, nKey )
@@ -2738,7 +2722,7 @@ FUNCTION __MenuDialogHook( nCode, nwParam, nlParam )
            EXIT
 
       CASE WM_INITMENUPOPUP
-           IF s_lKey
+           IF __GetSystem():__ToolStripFlags[ "s_lKey" ]
               IF s_oCurrMenuItem == NIL
                  PostMessage( cwp_hWnd, WM_KEYDOWN, VK_DOWN, 0)
                  //HiLiteMenuItem( cwp_hWnd, ::__hMenu, 0, MF_BYPOSITION | MF_HILITE )
@@ -3255,11 +3239,11 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    __SetSubMenu( Self, ::__hMenu )
 
-   s_CurrFocus     := NIL
-   s_CurrentObject := Self
+   ::System:__ToolStripFlags[ "s_CurrFocus" ]     := NIL
+   ::System:__ToolStripFlags[ "s_CurrentObject" ] := Self
 
    s_hMenuDialogHook := SetWindowsHookEx( WH_CALLWNDPROC, ( @__MenuDialogHook() ), NIL, GetCurrentThreadId() )
-   DEFAULT s_hKeyMenuHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
+   DEFAULT ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
    TrackPopupMenu( ::__hMenu, nStyle, X, Y, 0, ::Form:hWnd )
    s_nmw := 0
@@ -3267,9 +3251,9 @@ METHOD Show( x, y ) CLASS ContextStrip
    UnhookWindowsHookEx( s_hMenuDialogHook )
    s_hMenuDialogHook := NIL
 
-   IF s_CurrFocus == NIL .AND. s_hKeyMenuHook != NIL
-      UnhookWindowsHookEx( s_hKeyMenuHook )
-      s_hKeyMenuHook    := NIL
+   IF ::System:__ToolStripFlags[ "s_CurrFocus" ] == NIL .AND. ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] != NIL
+      UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
+      ::System:__ToolStripFlags[ "s_hKeyMenuHook" ]    := NIL
    ENDIF
 
 RETURN nRes

@@ -154,7 +154,7 @@ CLASS ToolBar INHERIT Control
    DATA __hTheme         PROTECTED
 
    METHOD SetBanner()
-   METHOD IsButtonChecked( nId ) INLINE ::GetButtonInfo( nId ):fsState & TBSTATE_CHECKED != 0
+   METHOD IsButtonChecked( nId ) INLINE (::GetButtonInfo( nId ):fsState & TBSTATE_CHECKED) != 0
    METHOD AddBitmap()
    METHOD Init( oParent )        CONSTRUCTOR
    METHOD Create()
@@ -179,7 +179,7 @@ CLASS ToolBar INHERIT Control
                                                     ::SendMessage( TB_CHECKBUTTON, nBtn, If( lFlag, 1, 0 ) )
 
    METHOD IsButtonClicked(nBtn)              INLINE IF( ::SendMessage( TB_ISBUTTONCHECKED, nBtn, 0) == 0, .F., .T. )
-   METHOD SetListStyle()                     INLINE ::Style := ::Style | TBSTYLE_LIST
+   METHOD SetListStyle()                     INLINE ::Style := (::Style | TBSTYLE_LIST)
    METHOD Disable()                          INLINE ::DisableAll()
    METHOD Enable()                           INLINE ::EnableAll()
 
@@ -225,7 +225,7 @@ METHOD Init( oParent ) CLASS ToolBar
    ::ClsName  := "ToolBarWindow32"
    DEFAULT ::__xCtrlName TO "ToolBar"
    ::Super:Init( oParent )
-   ::Style           :=  WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | CCS_NORESIZE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style           :=  (WS_CHILD | WS_VISIBLE | CCS_NODIVIDER | CCS_NORESIZE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ThemeName       := "toolbar"
    ::__hTheme        := OpenThemeData(,"MENU")
    ::ToolTips        := .T.
@@ -344,13 +344,13 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ToolBar
    LOCAL cStyle := ""
    DEFAULT lAdd TO .T.
    IF lAdd
-      ::Style := ::Style | nStyle
+      ::Style := (::Style | nStyle)
     ELSE
-      ::Style := ::Style & NOT( nStyle )
+      ::Style := (::Style & NOT( nStyle ))
    ENDIF
    IF IsWindow( ::hWnd )
       ::SendMessage( TB_SETSTYLE, 0, ::Style )
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
+      ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
       ::InvalidateRect()
    ENDIF
 RETURN self
@@ -365,9 +365,9 @@ RETURN Self
 METHOD SetExtStyle( nStyle, lSet ) CLASS ToolBar
    DEFAULT lSet TO .T.
    IF lSet
-      ::ExtStyle := ::ExtStyle | nStyle
+      ::ExtStyle := (::ExtStyle | nStyle)
     ELSE
-      ::ExtStyle := ::ExtStyle & NOT( nStyle )
+      ::ExtStyle := (::ExtStyle & NOT( nStyle ))
    ENDIF
    IF ::hWnd != NIL
       ::SendMessage( TB_SETEXTENDEDSTYLE, 0, ::ExtStyle )
@@ -446,7 +446,7 @@ METHOD OnMeasureItem( nwParam, nlParam, mis ) CLASS ToolBar
       ENDIF
 
       FOR EACH oButton IN ::aItems
-         IF oButton:Style & BTNS_SEP == 0 .AND. oButton:Menu != NIL
+         IF (oButton:Style & BTNS_SEP) == 0 .AND. oButton:Menu != NIL
             IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==mis:itemID } ) ) > 0
                RETURN oButton:Menu:aItems[n]:MeasureItem( mis, nlParam )
             ENDIF
@@ -479,7 +479,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
       ENDIF
 
       FOR EACH oButton IN ::aItems
-         IF oButton:Style & BTNS_SEP == 0 .AND. oButton:Menu != NIL
+         IF (oButton:Style & BTNS_SEP) == 0 .AND. oButton:Menu != NIL
             IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==dis:itemID } ) ) > 0
                oButton:Menu:aItems[n]:DrawItem( dis, .F., ::__hTheme )
                RETURN 1
@@ -532,8 +532,8 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
          rc:bottom := MAX( rc:bottom, 2+yIcon+1 )
          rc:bottom := MAX( rc:bottom, GetSystemMetrics( SM_CYMENU ) )
 
-         lDisabled  := dis:itemState & ODS_DISABLED != 0
-         lSelected  := dis:itemState & ODS_SELECTED != 0
+         lDisabled  := (dis:itemState & ODS_DISABLED) != 0
+         lSelected  := (dis:itemState & ODS_SELECTED) != 0
 
          IF lSelected .AND. !lDisabled
             // for chevron bar use only
@@ -545,7 +545,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
             n := 0
 
             DO CASE
-               CASE oItem:Style & BTNS_WHOLEDROPDOWN != 0
+               CASE (oItem:Style & BTNS_WHOLEDROPDOWN) != 0
                     Chk:left   := rc:right-GetSystemMetrics( SM_CXMENUCHECK )
                     Chk:top    := rc:top
                     Chk:right  := rc:right
@@ -557,7 +557,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
                        lWhole := .T.
                     ENDIF
 
-               CASE oItem:Style & BTNS_DROPDOWN != 0
+               CASE (oItem:Style & BTNS_DROPDOWN) != 0
                     n := rc:right
                     rc:right -= GetSystemMetrics( SM_CXMENUCHECK )
                     IF dis:itemAction==ODA_DRAWENTIRE
@@ -636,7 +636,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
                FillRect( hDC, Rect, oMenu:ImageBkColor )
             ENDIF
 
-            IF oItem:Style != NIL .AND. ( oItem:Style & BTNS_DROPDOWN != 0 .OR. oItem:Style & BTNS_WHOLEDROPDOWN != 0 )
+            IF oItem:Style != NIL .AND. ( (oItem:Style & BTNS_DROPDOWN) != 0 .OR. (oItem:Style & BTNS_WHOLEDROPDOWN) != 0 )
 
                Rect := (struct RECT)
                Rect:left   := rc:right - ( ( GetSystemMetrics( SM_CXMENUCHECK ) )+xIcon )
@@ -649,7 +649,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
          nTop := rc:top + ( ( (rc:bottom-rc:top) - yIcon) / 2 )
          SetBkMode( hDC, 1 )
 
-         IF oMenu:ImageList != NIL .AND. oItem:ImageIndex != NIL .AND. oItem:ImageIndex > 0 .AND. dis:itemState & ODS_CHECKED == 0
+         IF oMenu:ImageList != NIL .AND. oItem:ImageIndex != NIL .AND. oItem:ImageIndex > 0 .AND. (dis:itemState & ODS_CHECKED) == 0
             IF lDisabled
                oMenu:ImageList:DrawDisabled( hDC, oItem:ImageIndex, rc:left+2, nTop )
             ELSE
@@ -669,12 +669,12 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS ToolBar
          ENDIF
 
          //----------------------------------------------------------------------------------------------
-         IF dis:itemAction==ODA_DRAWENTIRE .AND. ( lCheck.OR.lWhole ) .AND. ( oItem:Style & BTNS_DROPDOWN != 0 .OR. oItem:Style & BTNS_WHOLEDROPDOWN != 0 )
+         IF dis:itemAction==ODA_DRAWENTIRE .AND. ( lCheck.OR.lWhole ) .AND. ( (oItem:Style & BTNS_DROPDOWN) != 0 .OR. (oItem:Style & BTNS_WHOLEDROPDOWN) != 0 )
             IF ( nPos := ASCAN( ::aItems, {|o|o:Id==dis:itemID} ) ) > 0
                pt:x := dis:rcItem:Left
                pt:y := dis:rcItem:Bottom
                ClientToScreen( WindowFromDC( hDC ), @pt )
-               ::CreateDropDown( nPos, pt:x, pt:y, TPM_LEFTALIGN | TPM_TOPALIGN, ::hWnd )
+               ::CreateDropDown( nPos, pt:x, pt:y, (TPM_LEFTALIGN | TPM_TOPALIGN), ::hWnd )
                SendMessage( ::hWnd, WM_CANCELMODE, 0, 0 )
             ENDIF
          ENDIF
@@ -1082,20 +1082,20 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
                             rc:bottom := tbcd:nmcd:rc:bottom
                             IF !::Application:IsThemedXP .OR. !::Theming
                                FillRect( tbcd:nmcd:hdc, rc, GetSysColorBrush( COLOR_BTNFACE ) )
-                               IF tbcd:nmcd:uItemState & CDIS_DISABLED == 0
-                                  DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + IIF( tbcd:nmcd:uItemState & CDIS_SELECTED != 0, DFCS_PUSHED, 0 ) )
+                               IF (tbcd:nmcd:uItemState & CDIS_DISABLED) == 0
+                                  DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + IIF( (tbcd:nmcd:uItemState & CDIS_SELECTED) != 0, DFCS_PUSHED, 0 ) )
                                 ELSE
                                   DrawFrameControl( tbcd:nmcd:hdc, tbcd:nmcd:rc, DFC_CAPTION, nState + DFCS_INACTIVE )
                                ENDIF
                              ELSE
                                nState := IIF( ::Parent:Active, MDIBS_NORMAL, MDIBS_DISABLED )
-                               IF tbcd:nmcd:uItemState & CDIS_SELECTED != 0
+                               IF (tbcd:nmcd:uItemState & CDIS_SELECTED) != 0
                                   nState := MDIBS_PUSHED
                                ENDIF
-                               IF tbcd:nmcd:uItemState & CDIS_DISABLED != 0
+                               IF (tbcd:nmcd:uItemState & CDIS_DISABLED) != 0
                                   nState := MDIBS_DISABLED
                                ENDIF
-                               IF tbcd:nmcd:uItemState & CDIS_HOT != 0
+                               IF (tbcd:nmcd:uItemState & CDIS_HOT) != 0
                                   nState := MDIBS_HOT
                                ENDIF
 
@@ -1126,7 +1126,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 */
                                SetBkMode( tbcd:nmcd:hdc, TRANSPARENT )
                                SelectObject( tbcd:nmcd:hdc, ::GetFont() )
-                               DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE )
+                               DrawText( tbcd:nmcd:hdc, ::aItems[nHot]:Caption, tbcd:nmcd:rc, (DT_CENTER | DT_VCENTER | DT_SINGLELINE) )
                                nRet := CDRF_SKIPDEFAULT
                             ENDIF
                          ENDIF
@@ -1234,7 +1234,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBar
 
            IF ::__MenuBar .AND. ::nPressed < 0
 
-              IF Nmtb:dwFlags & HICF_ACCELERATOR != 0
+              IF (Nmtb:dwFlags & HICF_ACCELERATOR) != 0
                  SendMessage( ::hWnd, TB_SETHOTITEM, -1, 0 )
                  ::nPressed := Nmtb:idNew
                  ::lKeyboard := .T.
@@ -1268,7 +1268,7 @@ METHOD UpdateMenu( lShow ) CLASS ToolBar
    oMdi := ::Form:MDIClient:GetActive()
    IF oMdi != NIL
       nStyle := oMdi:GetWindowLong( GWL_STYLE )
-      IF nStyle & WS_MAXIMIZE == WS_MAXIMIZE
+      IF (nStyle & WS_MAXIMIZE) == WS_MAXIMIZE
          lShow := .T.
       ENDIF
    ENDIF
@@ -1580,17 +1580,17 @@ METHOD Create( nPos ) CLASS ToolButton
       ::Style += TBSTYLE_CHECKGROUP
    ENDIF
 
-   IF ::AutoSize .AND. ::Style != BTNS_SEP .AND. ::Style & TBSTYLE_AUTOSIZE == 0
+   IF ::AutoSize .AND. ::Style != BTNS_SEP .AND. (::Style & TBSTYLE_AUTOSIZE) == 0
       ::Style += TBSTYLE_AUTOSIZE
    ENDIF
-   IF ::ShowText .AND. ::Style & BTNS_SHOWTEXT == 0
+   IF ::ShowText .AND. (::Style & BTNS_SHOWTEXT) == 0
       ::Style += BTNS_SHOWTEXT
    ENDIF
 
    IF ::Parent:Parent:ClsName == "OptionBar"
       ::AutoSize   := .F.
       ::Width      := NIL
-      ::State      := TBSTATE_ENABLED | TBSTATE_WRAP
+      ::State      := (TBSTATE_ENABLED | TBSTATE_WRAP)
       ::Parent:Parent:__oPage:RecalSize()
       ::Parent:PostMessage( TB_SETBUTTONWIDTH, 0, MAKELONG( ::Parent:Parent:ClientWidth, ::Parent:Parent:ClientWidth ) )
    ENDIF
@@ -1613,13 +1613,13 @@ METHOD Create( nPos ) CLASS ToolButton
    ::oBtnInfo:idCommand := ::Id
 
    IF ::xCaption != NIL
-      ::oBtnInfo:dwMask := ::oBtnInfo:dwMask | TBIF_TEXT | TBIF_IMAGE
+      ::oBtnInfo:dwMask := (::oBtnInfo:dwMask | TBIF_TEXT | TBIF_IMAGE)
       ::oBtnInfo:pszText:= ::xCaption
       ::oBtnInfo:iImage := IIF( (::Separator .OR. ::ImageIndex <= 0) .AND. !::IsMenuItem, -2, ::ImageIndex-1 )
    ENDIF
 
    IF ::Width != NIL .AND. !::AutoSize
-      ::oBtnInfo:dwMask := ::oBtnInfo:dwMask | TBIF_SIZE
+      ::oBtnInfo:dwMask := (::oBtnInfo:dwMask | TBIF_SIZE)
       ::oBtnInfo:cx     := ::Width
    ENDIF
 
@@ -1705,7 +1705,7 @@ METHOD ShowMenu( x, y ) CLASS ToolButton
    LOCAL nRes := 0
    DEFAULT x TO ::Left
    DEFAULT y TO ::Top
-   TrackPopupMenu( ::hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, x, y, 0, ::Parent:hWnd )
+   TrackPopupMenu( ::hMenu, (TPM_LEFTALIGN | TPM_TOPALIGN), x, y, 0, ::Parent:hWnd )
 RETURN nRes
 
 //-------------------------------------------------------------------------------------------------------
@@ -1935,7 +1935,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ToolButton
    DEFAULT lAdd TO .T.
 
    IF lAdd
-      ::Style := ::Style | nStyle
+      ::Style := (::Style | nStyle)
       IF nStyle == BTNS_SEP
          ::Caption := ""
          IF ::lCreated .AND. !::DesignMode
@@ -1946,7 +1946,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ToolButton
          ENDIF
       ENDIF
     ELSE
-      ::Style := ::Style & NOT( nStyle )
+      ::Style := (::Style & NOT( nStyle ))
    ENDIF
 
    IF ::lCreated
@@ -1955,7 +1955,7 @@ METHOD SetStyle( nStyle, lAdd ) CLASS ToolButton
       tbbi:dwMask  := TBIF_STYLE
 
       IF ::Separator
-         ::Style := ::Style | TBSTYLE_AUTOSIZE
+         ::Style := (::Style | TBSTYLE_AUTOSIZE)
          ::xAutoSize  := .T.
       ENDIF
       tbbi:fsStyle := ::Style
@@ -2050,7 +2050,7 @@ FUNCTION __SysVxhMenuHook( nCode, nwParam, nlParam )
 
       CASE ms:message == WM_MOUSEMOVE
            IF oBar:Chevron == NIL
-              IF (! oBar:DesignMode ) .OR. ms:wParam & MK_LBUTTON == MK_LBUTTON
+              IF (! oBar:DesignMode ) .OR. (ms:wParam & MK_LBUTTON) == MK_LBUTTON
                  oBar:lKeyboard := .F.
                  pt:x := LoWord(ms:lparam)
                  pt:y := HiWord(ms:lparam)

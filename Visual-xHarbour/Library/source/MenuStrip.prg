@@ -11,22 +11,6 @@
 //  You may NOT forward or share this file under any conditions!                                        *
 //------------------------------------------------------------------------------------------------------*
 
-#ifdef __XHARBOUR__
-GLOBAL EXTERNAL s_lExecuting
-GLOBAL EXTERNAL s_CurrFocus
-GLOBAL EXTERNAL s_CurrentObject
-GLOBAL EXTERNAL s_lKey
-GLOBAL EXTERNAL s_lOpenMenu
-GLOBAL EXTERNAL s_hKeyMenuHook
-#else
-memvar s_lExecuting
-memvar s_CurrFocus
-memvar s_CurrentObject
-memvar s_lKey
-memvar s_lOpenMenu
-memvar s_hKeyMenuHook
-#endif
-
 #include "debug.ch"
 #include "vxh.ch"
 
@@ -80,10 +64,10 @@ METHOD OnParentSysKeyDown( nwParam ) CLASS MenuStrip
          oItem := ::Children[ nItem ]
 
          IF !EMPTY( oItem:Children ) .AND. ( oItem:DropDown > 1 .OR. oItem:Parent:__lIsMenu )
-            IF s_CurrFocus != NIL
-               s_CurrFocus:__lSelected := .F.
-               s_CurrFocus:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
-               s_CurrFocus := NIL
+            IF ::System:__ToolStripFlags[ "s_CurrFocus" ] != NIL
+               ::System:__ToolStripFlags[ "s_CurrFocus" ]:__lSelected := .F.
+               ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
+               ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
             ENDIF
             oItem:PostMessage( WM_USER + 1028 )
             RETURN 0
@@ -95,20 +79,20 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentSysCommand( nwParam ) CLASS MenuStrip
 
-   IF nwParam == SC_KEYMENU .AND. !CheckBit( GetKeyState( VK_SPACE ) , 32768 ) .AND. !s_lKey
-      IF s_CurrentObject != NIL
-         s_CurrentObject := NIL
+   IF nwParam == SC_KEYMENU .AND. !CheckBit( GetKeyState( VK_SPACE ) , 32768 ) .AND. !::System:__ToolStripFlags[ "s_lKey" ]
+      IF ::System:__ToolStripFlags[ "s_CurrentObject" ] != NIL
+         ::System:__ToolStripFlags[ "s_CurrentObject" ] := NIL
          RETURN 0
       ENDIF
       ::Form:SendMessage( WM_CANCELMODE, 0, 0 )
 
-      s_lKey := .T.
+      ::System:__ToolStripFlags[ "s_lKey" ] := .T.
 
-      s_CurrentObject := ::Children[1]
-      DEFAULT s_hKeyMenuHook TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
+      ::System:__ToolStripFlags[ "s_CurrentObject" ] := ::Children[1]
+      DEFAULT ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
-      s_CurrFocus  := ::Children[1]
-      s_lOpenMenu  := .F.
+      ::System:__ToolStripFlags[ "s_CurrFocus" ]  := ::Children[1]
+      ::System:__ToolStripFlags[ "s_lOpenMenu" ]  := .F.
       ::Children[1]:PostMessage( WM_USER + 1029 )
 
       RETURN 0
@@ -121,18 +105,18 @@ METHOD OnSysKeyDown( nwParam ) CLASS MenuStrip
    LOCAL n
 
    // close the menu on ALT KEY y it is selected
-   IF nwParam == VK_MENU .AND. s_CurrentObject != NIL
-      s_CurrentObject:__lSelected := .F.
-      s_CurrentObject:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
-      s_CurrFocus := NIL
-      s_CurrentObject := NIL
-      UnhookWindowsHookEx( s_hKeyMenuHook )
+   IF nwParam == VK_MENU .AND. ::System:__ToolStripFlags[ "s_CurrentObject" ] != NIL
+      ::System:__ToolStripFlags[ "s_CurrentObject" ]:__lSelected := .F.
+      ::System:__ToolStripFlags[ "s_CurrentObject" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
+      ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
+      ::System:__ToolStripFlags[ "s_CurrentObject" ] := NIL
+      UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
 
-      s_hKeyMenuHook := NIL
+      ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] := NIL
 
-      s_lExecuting := .F.
-      s_lKey       := .F.
-      s_lOpenMenu  := .T.
+      ::System:__ToolStripFlags[ "s_lExecuting" ] := .F.
+      ::System:__ToolStripFlags[ "s_lKey" ]       := .F.
+      ::System:__ToolStripFlags[ "s_lOpenMenu" ]  := .T.
       RETURN 1
 
     ELSEIF nwParam != VK_MENU
@@ -141,7 +125,7 @@ METHOD OnSysKeyDown( nwParam ) CLASS MenuStrip
          IF AT( "&"+UPPER( CHR( nwParam ) ), UPPER( ::Children[n]:Caption ) ) > 0
 
             SendMessage( ::Form:hWnd, WM_CANCELMODE, 0, 0 )
-            s_lKey := .F.
+            ::System:__ToolStripFlags[ "s_lKey" ] := .F.
             ::Children[n]:PostMessage( WM_USER + 1028 )
             RETURN 0
          ENDIF

@@ -2,8 +2,6 @@
  * $Id: Editor.prg,v 1.28 2015/05/12 08:35:49 Augusto Infante Exp $
  */
 
-GLOBAL EXTERNAL s_CurrentObject
-
 static s_nSecs
 
 #include "vxh.ch"
@@ -580,7 +578,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS SourceEditor
               ENDIF
 
          CASE hdr:code == SCN_CHARADDED
-              IF s_CurrentObject != NIL
+              IF ::System:__ToolStripFlags[ "s_CurrentObject" ] != NIL
                  ::Application:Props:MainMenu:OnSysKeyDown( VK_MENU )
               ENDIF
 

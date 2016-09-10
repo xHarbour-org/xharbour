@@ -67,7 +67,7 @@ METHOD Init( oParent ) CLASS StatusBar
    ::ThemeName := "Status"
    ::xHeight    := 30
    DEFAULT ::__xCtrlName TO "StatusBar"
-   ::Style     := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style     := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    //::IsContainer   := .T.
    ::Super:Init( oParent )
    IF ::DesignMode
@@ -134,7 +134,7 @@ METHOD __OnParentSize() CLASS StatusBar
    ::Left   := 0
    ::Top    := ::Parent:ClientHeight-::Height
    ::Width  := ::Parent:ClientWidth
-   ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_DEFERERASE)
+   ::SetWindowPos( , ::Left, ::Top, ::Width, ::Height, (SWP_NOACTIVATE|SWP_NOOWNERZORDER|SWP_NOZORDER|SWP_DEFERERASE))
    ::SetPanels( ::Parent:ClientWidth )
 RETURN( NIL )
 

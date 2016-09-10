@@ -388,6 +388,7 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init( lIde, __hDllInstance ) CLASS Application
    LOCAL cName, hPrevInstance
+
    DEFAULT lIde TO .F.
    IF !lIde
       Application := Self
