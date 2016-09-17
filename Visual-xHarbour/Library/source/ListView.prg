@@ -635,7 +635,6 @@ RETURN {0,0,0,0}
 #include "hbstack.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
-#include "classes.h"
 
 HB_FUNC ( LISTVIEWNOTIFY )
 {

@@ -261,7 +261,7 @@ CLASS Window INHERIT Object
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
    DATA ExStyle                EXPORTED  INIT 0
-   DATA ClassStyle             EXPORTED  INIT CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS
+   DATA ClassStyle             EXPORTED  INIT (CS_OWNDC | CS_DBLCLKS | CS_SAVEBITS)
 
    DATA TopMargin              EXPORTED  INIT 0
    DATA RightMargin            EXPORTED  INIT 0
@@ -339,9 +339,9 @@ CLASS Window INHERIT Object
 
    ACCESS Handle               INLINE ::hWnd
    ACCESS HasFocus             INLINE GetFocus() == ::hWnd
-   ACCESS IsChild              INLINE ::Style & WS_CHILD != 0
+   ACCESS IsChild              INLINE (::Style & WS_CHILD) != 0
 
-   ACCESS Child                INLINE ::Style & WS_CHILD != 0
+   ACCESS Child                INLINE (::Style & WS_CHILD) != 0
    ASSIGN Child(l)             INLINE ::SetStyle( WS_CHILD, l )
 
    DATA xMDIChild              EXPORTED INIT .F.
@@ -463,7 +463,7 @@ CLASS Window INHERIT Object
    METHOD GetIcon( nIcon )        INLINE ::SendMessage( WM_GETICON, nIcon, 0 )
    METHOD SetIcon( nIcon, hIcon ) INLINE ::SendMessage( WM_SETICON, nIcon, hIcon )
    METHOD SetStyle()
-   METHOD GetStyle(n)             INLINE IIF( ::IsWindow(), ( ::GetWindowLong( GWL_STYLE ) & n ) == n, ::Style & n == n )
+   METHOD GetStyle(n)             INLINE IIF( ::IsWindow(), ( ::GetWindowLong( GWL_STYLE ) & n ) == n, (::Style & n) == n )
    METHOD SetExStyle()
 
    METHOD SetRedraw(lRed)         INLINE SendMessage( ::hWnd, WM_SETREDRAW, lRed )
@@ -679,7 +679,7 @@ METHOD Init( oParent, lInitValues ) CLASS Window
    ::__lInitialized := .T.
 
    DEFAULT ::ThemeName    TO "window"
-   DEFAULT ::Style        TO WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   DEFAULT ::Style        TO (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    DEFAULT ::xLeft        TO 0
    DEFAULT ::xTop         TO 0
    DEFAULT ::xWidth       TO CW_USEDEFAULT
@@ -713,7 +713,7 @@ METHOD Init( oParent, lInitValues ) CLASS Window
    ENDIF
    DEFAULT ::EventHandler TO Hash()
 
-   IF oParent != NIL .AND. oParent:DesignMode .OR. ::ClsName IN { "VXH_FORM_IDE", "CCTL" }
+   IF oParent != NIL .AND. oParent:DesignMode .OR. (::ClsName IN { "VXH_FORM_IDE", "CCTL" })
       DEFAULT ::Events TO aEvents()
       aSort( ::Events,,,{|x, y| x[1] < y[1]})
       FOR EACH Topic IN ::Events
@@ -749,7 +749,7 @@ METHOD SaveValues() CLASS Window
    FOR n := 1 TO LEN( ::Children )
        xValue := NIL
        DO CASE
-          CASE ::Children[n]:__xCtrlName IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" }
+          CASE (::Children[n]:__xCtrlName IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" })
                xValue := ::Children[n]:Text
 
           CASE ::Children[n]:__xCtrlName == "ComboBox"
@@ -772,10 +772,10 @@ METHOD RestoreValues( aValues ) CLASS Window
        oCtrl := ::GetControl( aValues[n][1] )
        IF oCtrl != NIL
           DO CASE
-             CASE aValues[n][3] IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" }
+             CASE (aValues[n][3] IN { "EditBox", "MaskEdit", "CheckBox", "RadioButton" })
                   oCtrl:Text := aValues[n][2]
 
-             CASE aValues[n][3] IN { "ComboBox", "ListBox" }
+             CASE (aValues[n][3] IN { "ComboBox", "ListBox" })
                   oCtrl:SetCurSel( oCtrl:FindStringExact( -1, aValues[n][2] ) )
           ENDCASE
        ENDIF
@@ -1016,7 +1016,7 @@ METHOD Create( oParent ) CLASS Window
    ::xHeight := IFNIL( ::xHeight, CW_USEDEFAULT, ::xheight)
 
    IF ::DesignMode
-      ::Style := ::Style | WS_VISIBLE
+      ::Style := (::Style | WS_VISIBLE)
    ENDIF
 
    IF ! ::DesignMode .AND. !EMPTY( ::BitmapMask )
@@ -1030,7 +1030,7 @@ METHOD Create( oParent ) CLASS Window
          ::__hBmpRgn := LoadImage( ::Instance, cBmpMask, IMAGE_BITMAP, 0, 0, LR_VGACOLOR )
        ELSE
          IF RIGHT( UPPER( ::BitmapMask ), 4 ) == ".BMP"
-            ::__hBmpRgn := LoadImage( ::Instance, ::BitmapMask, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_VGACOLOR )
+            ::__hBmpRgn := LoadImage( ::Instance, ::BitmapMask, IMAGE_BITMAP, 0, 0, (LR_LOADFROMFILE | LR_VGACOLOR) )
          ELSE
             ::__hBmpRgn := LoadBitmap( ::Instance, ::BitmapMask )
          ENDIF
@@ -1076,7 +1076,7 @@ METHOD Create( oParent ) CLASS Window
       //ENDIF
       ::hWnd := CreateWindowEx( ::ExStyle, ::ClsName, ::Caption, ::Style, nLeft, nTop, ::Width, ::Height, hParent, ::Id, ::AppInstance, ::__ClientStruct )
     ELSE
-      ::hWnd := capCreateCaptureWindow( "CaptureWindow", WS_CHILD | WS_VISIBLE, ::Left, ::Top, ::Width, ::Height, hParent, 0 )
+      ::hWnd := capCreateCaptureWindow( "CaptureWindow", (WS_CHILD | WS_VISIBLE), ::Left, ::Top, ::Width, ::Height, hParent, 0 )
    ENDIF
    IF ::hWnd == 0
       nError := GetLastError()
@@ -1332,15 +1332,15 @@ METHOD SetExStyle(nStyle,lAdd) CLASS Window
       ::ExStyle := ::GetWindowLong( GWL_EXSTYLE )
    ENDIF
    IF lAdd
-      ::ExStyle := ::ExStyle | nStyle
+      ::ExStyle := (::ExStyle | nStyle)
     ELSE
-      ::ExStyle := ::ExStyle & NOT( nStyle )
+      ::ExStyle := (::ExStyle & NOT( nStyle ))
    ENDIF
    IF ::hWnd != NIL .AND. ::IsWindow()
       ::SetWindowLong( GWL_EXSTYLE, ::ExStyle )
       IF ::IsWindowVisible()
-         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-         ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+         ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
+         ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
       ENDIF
    ENDIF
 RETURN Self
@@ -1377,9 +1377,9 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
       lAdd := !lAdd
    ENDIF
    IF lAdd
-      ::Style := ::Style | nStyle
+      ::Style := (::Style | nStyle)
     ELSE
-      ::Style := ::Style & NOT( nStyle )
+      ::Style := (::Style & NOT( nStyle ))
    ENDIF
    IF ::IsWindow()
       SWITCH nStyle
@@ -1400,8 +1400,8 @@ METHOD SetStyle( nStyle, lAdd ) CLASS Window
       END
       ::SetWindowLong( GWL_STYLE, ::Style )
       IF ::IsWindowVisible()
-         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER)
-         ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+         ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
+         ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
       ENDIF
    ENDIF
 RETURN self
@@ -1653,7 +1653,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
    LOCAL nCode, nId, nRet, oCtrl, lHandled, oForm, oChild, oItem
    nCode := HIWORD( nwParam )
    nId   := LOWORD( nwParam )
-   IF nCode IN {0,1} .AND. nlParam == 0
+   IF (nCode IN {0,1}) .AND. nlParam == 0
       oItem := __ObjFromID( nID, ::hWnd )
       IF oItem != NIL
 
@@ -1677,7 +1677,7 @@ METHOD OnCommand( nwParam, nlParam ) CLASS Window
       ENDIF
    ENDIF
 
-   IF ::Style & WS_CHILD == 0
+   IF (::Style & WS_CHILD) == 0
       IF nwParam == IDCANCEL
 
          nRet := ExecuteEvent( "OnCancel", Self )
@@ -2618,15 +2618,12 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               ENDIF
               EXIT
 
-         CASE WM_SYSDEADCHAR
-              EXIT
-
          CASE WM_SYSKEYDOWN
               nRet := ExecuteEvent( "OnSysKeyDown", Self )
               ODEFAULT nRet TO ::OnSysKeyDown( nwParam, nlParam )
               IF nRet == NIL .AND. ::Form != NIL
                  FOR EACH oChild IN ::Form:Children
-                     IF oChild:__xCtrlName IN {"CoolMenu","MenuStrip","ToolStripContainer"}
+                     IF (oChild:__xCtrlName IN {"CoolMenu","MenuStrip","ToolStripContainer"})
                         nRet := oChild:OnSysKeyDown( nwParam, nlParam )
                         IF nRet != NIL
                            RETURN nRet
@@ -2823,7 +2820,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
               EXIT
 
          CASE WM_MDICHILDSIZED
-              lShow := ::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE != 0
+              lShow := (::GetWindowLong( GWL_STYLE ) & WS_MAXIMIZE) != 0
               ::Parent:Children[nwParam]:UpdateMenu( lShow )
               RETURN 1
 
@@ -2926,7 +2923,7 @@ METHOD OnMeasureItem( nwParam, nlParam, mis ) CLASS Window
 
    IF mis:CtlType == ODT_MENU .AND. oMenu != NIL
       FOR EACH oButton IN oMenu:aItems
-         IF oButton:MenuItemInfo:fType & BTNS_SEP == 0 .AND. oButton:Menu != NIL
+         IF (oButton:MenuItemInfo:fType & BTNS_SEP) == 0 .AND. oButton:Menu != NIL
             IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==mis:itemID } ) ) > 0
                RETURN oButton:Menu:aItems[n]:MeasureItem( mis, nlParam )
             ENDIF
@@ -2988,7 +2985,7 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS Window
          dis:itemState -= 256
       ENDIF
       FOR EACH oButton IN oMenu:aItems
-         IF oButton:MenuItemInfo:fType & BTNS_SEP == 0 .AND. oButton:Menu != NIL
+         IF (oButton:MenuItemInfo:fType & BTNS_SEP) == 0 .AND. oButton:Menu != NIL
             IF ( n := ASCAN( oButton:Menu:aItems, {|o|o:Id==dis:itemID } ) ) > 0
                oButton:Menu:aItems[n]:DrawItem( dis, .F. )
                RETURN 1
@@ -3499,13 +3496,13 @@ METHOD __OnParentSize( x, y, hDef, lMoveNow, lNoMove, nParX, nParY ) CLASS Windo
          ENDIF
 
          IF lMoveNow .OR. !::DeferRedraw .OR. hDef == NIL
-            n := SWP_NOOWNERZORDER | SWP_NOZORDER
+            n := (SWP_NOOWNERZORDER | SWP_NOZORDER)
             IF ::DeferRedraw
-               n := n | SWP_NOACTIVATE | SWP_DEFERERASE
+               n := (n | SWP_NOACTIVATE | SWP_DEFERERASE)
             ENDIF
             SetWindowPos( ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, n )
           ELSE
-            DeferWindowPos( hDef, ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER ) //| IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
+            DeferWindowPos( hDef, ::hWnd, , ::xLeft, ::xTop, ::xWidth, nHeight, (SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) ) //| IIF( ::Application:OsVersion:dwMajorVersion < 5, SWP_DEFERERASE, 0 ) )
          ENDIF
          //::UpdateWindow()
       ENDIF
@@ -3523,7 +3520,7 @@ METHOD TrackMouseEvent( nFlags, nHoverTimeOut ) CLASS Window
    tme:dwFlags     := nFlags
    tme:hwndTrack   := ::hWnd
    tme:dwHoverTime := NIL
-   IF nFlags & TME_HOVER == TME_HOVER
+   IF (nFlags & TME_HOVER) == TME_HOVER
       DEFAULT nHoverTimeOut TO HOVER_DEFAULT
       tme:dwHoverTime := nHoverTimeOut
    ENDIF
@@ -3764,25 +3761,25 @@ RETURN wndpl:showCmd
 METHOD __SetFrameStyle(n) CLASS Window
    SWITCH n
       CASE 1
-         ::Style := ::Style & NOT( WS_POPUP )
-         ::Style := ::Style & NOT( WS_CHILD )
-         ::Style := ::Style | WS_OVERLAPPED
+         ::Style := (::Style & NOT( WS_POPUP ))
+         ::Style := (::Style & NOT( WS_CHILD ))
+         ::Style := (::Style | WS_OVERLAPPED)
          EXIT
       CASE 2
-         ::Style := ::Style & NOT( WS_OVERLAPPED )
-         ::Style := ::Style & NOT( WS_CHILD )
-         ::Style := ::Style | WS_POPUP
+         ::Style := (::Style & NOT( WS_OVERLAPPED ))
+         ::Style := (::Style & NOT( WS_CHILD ))
+         ::Style := (::Style | WS_POPUP)
          EXIT
       CASE 3
-         ::Style := ::Style & NOT( WS_OVERLAPPED )
-         ::Style := ::Style & NOT( WS_POPUP )
-         ::Style := ::Style | WS_CHILD
+         ::Style := (::Style & NOT( WS_OVERLAPPED ))
+         ::Style := (::Style & NOT( WS_POPUP ))
+         ::Style := (::Style | WS_CHILD)
          EXIT
    END
    IF ::hWnd != NIL .AND. ! ::DesignMode
       SetWindowLong( ::hWnd, GWL_STYLE, ::Style )
-      SetWindowPos( ::hWnd,, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
-      ::RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW )
+      SetWindowPos( ::hWnd,, 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
+      ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW) )
    ENDIF
 RETURN Self
 
@@ -4338,7 +4335,7 @@ FUNCTION isChildOfActiveWindow(hWnd)
    DO WHILE lRet
       hParent := GetParent( hWnd )
       IF hNowActive != hParent
-         IF GetWindowLong( hParent, GWL_STYLE ) & WS_CHILD != 0
+         IF (GetWindowLong( hParent, GWL_STYLE ) & WS_CHILD) != 0
             hWnd:=hParent
           ELSE
             lRet:=.F.
@@ -4421,7 +4418,7 @@ CLASS WinForm INHERIT Window
    PROPERTY ImageList            GET __ChkComponent( Self, @::xImageList )     SET ::SetImageList(v)
    PROPERTY ActiveMenuBar        GET __ChkComponent( Self, @::xActiveMenuBar ) SET ::__SetActiveMenuBar(v)
 
-   PROPERTY MDIChild             GET IIF( ::ClsName == "MDIChild", ::ExStyle & WS_EX_MDICHILD != 0, ::xMDIChild );
+   PROPERTY MDIChild             GET IIF( ::ClsName == "MDIChild", (::ExStyle & WS_EX_MDICHILD) != 0, ::xMDIChild );
                                  SET ( IIF( ::DesignMode .AND. v .AND. ::Modal, ::Modal := .F., ), ::xMDIChild := v, IIF( ::ClsName == "MDIChild", ::SetExStyle( WS_EX_MDICHILD, v ), )) DEFAULT .F.
    PROPERTY MdiContainer         SET (::xMdiContainer := v, ::IsContainer := .F., ::__CreateMDI(v)) DEFAULT .F.
    PROPERTY Center               SET ::CenterWindow(v)                     DEFAULT .F.
@@ -4501,7 +4498,7 @@ CLASS WinForm INHERIT Window
    METHOD __OnClose()
    METHOD OnSysCommand()
    METHOD SetInstance()
-   METHOD Redraw( aRect )                   INLINE ::RedrawWindow( , aRect, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN ),::UpdateWindow()
+   METHOD Redraw( aRect )                   INLINE ::RedrawWindow( , aRect, (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN) ),::UpdateWindow()
    METHOD RegisterHotKey( nId, nMod, nKey ) INLINE IIF( RegisterHotKey( ::hWnd, nId, nMod, nKey ), AADD( ::__aHotKey, { nId, nMod, nKey } ),)
    METHOD InvalidateRect(a,l)               INLINE Super:InvalidateRect(a,l), IIF( ::xMDIContainer .AND. ::MDIClient != NIL, ::MDIClient:InvalidateRect(), )
    METHOD __CreateProperty()
@@ -4548,7 +4545,7 @@ METHOD Init( oParent, aParameters, cProjectName ) CLASS WinForm
       ::Application:__SetAsProperty( ::__xCtrlName + ALLTRIM( STR( n ) ), Self )
    ENDIF
 
-   IF ! Upper(::ClsName) IN {"MDICHILD","MDICLIENT"}
+   IF ! (Upper(::ClsName) IN {"MDICHILD","MDICLIENT"})
       ::MDIClient := MDIClient( Self )
    ENDIF
    ::__lCopyCut := .T.
@@ -4641,7 +4638,7 @@ METHOD Create( hoParent ) CLASS WinForm
       IF ::VertScrollTopMargin > 0
          ::__oDlg := Dialog( Self )
          WITH OBJECT ::__oDlg
-            :Style       := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+            :Style       := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
             :ExStyle     := WS_EX_CONTROLPARENT
 
             :Top         := ::VertScrollTopMargin
@@ -4678,11 +4675,11 @@ METHOD Hide() CLASS WinForm
             CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
                  nAnimation := ::System:WindowAnimation:SlideVertPositive
          ENDCASE
-         RETURN ::Animate( 1000, AW_HIDE | nAnimation )
+         RETURN ::Animate( 1000, (AW_HIDE | nAnimation) )
       ENDIF
       ShowWindow( ::hWnd, SW_HIDE )
    ENDIF
-   ::Style := ::Style & NOT( WS_VISIBLE )
+   ::Style := (::Style & NOT( WS_VISIBLE ))
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -4708,7 +4705,7 @@ METHOD __OnClose( nwParam, nlParam ) CLASS WinForm
          CASE nAnimation == ::System:WindowAnimation:SlideVertNegative
               nAnimation := ::System:WindowAnimation:SlideVertPositive
       ENDCASE
-      ::Animate( 1000, AW_HIDE | nAnimation )
+      ::Animate( 1000, (AW_HIDE | nAnimation) )
    ENDIF
 RETURN nRet
 
@@ -4806,7 +4803,7 @@ RETURN Self
 //-----------------------------------------------------------------------------------------------
 METHOD OnSysCommand( nwParam ) CLASS WinForm
    LOCAL oChild, hDef
-   IF nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2} .AND. ! EMPTY( ::__aDock )
+   IF (nwParam IN {SC_MAXIMIZE,SC_MAXIMIZE2,SC_RESTORE,SC_RESTORE2}) .AND. ! EMPTY( ::__aDock )
       ::CallWindowProc()
       hDef := BeginDeferWindowPos( LEN( ::__aDock ) )
       FOR EACH oChild IN ::__aDock
@@ -5030,7 +5027,7 @@ METHOD Show( nShow ) CLASS WinForm
          ENDIF
       ENDIF
    ENDIF
-   ::Style := ::Style | WS_VISIBLE
+   ::Style := (::Style | WS_VISIBLE)
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -5161,7 +5158,7 @@ METHOD __SetBitmapMaskColor( nColor ) CLASS WinForm
       ::Application:Yield()
 
       IF RIGHT( UPPER( cBmp ), 4 ) == ".BMP"
-         hBitmap := LoadImage( ::Instance, cBmp, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_VGACOLOR )
+         hBitmap := LoadImage( ::Instance, cBmp, IMAGE_BITMAP, 0, 0, (LR_LOADFROMFILE | LR_VGACOLOR) )
        ELSE
          hBitmap := LoadBitmap( ::Instance, cBmp )
       ENDIF
@@ -5174,8 +5171,8 @@ METHOD __SetBitmapMaskColor( nColor ) CLASS WinForm
       DeleteObject( hBitmap )
       InvalidateRgn( ::hWnd, ::__hRegion, .T. )
 
-      ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-      ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+      ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
+      ::RedrawWindow( , , ( RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW ) )
       InvalidateRgn( ::hWnd, ::__hRegion, .T. )
    ENDIF
 RETURN Self
@@ -5207,7 +5204,7 @@ METHOD __SetBitmapMask( cBmp ) CLASS WinForm
          ::Application:Yield()
 
          IF RIGHT( UPPER( cBmp ), 4 ) == ".BMP"
-            hBitmap := LoadImage( ::Instance, cBmp, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_VGACOLOR )
+            hBitmap := LoadImage( ::Instance, cBmp, IMAGE_BITMAP, 0, 0, (LR_LOADFROMFILE | LR_VGACOLOR ))
           ELSE
             hBitmap := LoadBitmap( ::Instance, cBmp )
          ENDIF
@@ -5223,8 +5220,8 @@ METHOD __SetBitmapMask( cBmp ) CLASS WinForm
          DeleteObject( hBitmap )
          InvalidateRgn( ::hWnd, ::__hRegion, .T. )
 
-         ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED+SWP_NOMOVE+SWP_NOSIZE+SWP_NOZORDER)
-         ::RedrawWindow( , , RDW_FRAME + RDW_INVALIDATE + RDW_UPDATENOW )
+         ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED|SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER))
+         ::RedrawWindow( , , (RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW ))
          InvalidateRgn( ::hWnd, ::__hRegion, .T. )
 
       ENDIF
@@ -5239,9 +5236,9 @@ METHOD SetOpacity( n ) CLASS WinForm
    IF ::hWnd != NIL
       nStyle := GetWindowLong( ::hWnd, GWL_EXSTYLE )
       IF n < 100
-         nStyle := nStyle | WS_EX_LAYERED
+         nStyle := (nStyle | WS_EX_LAYERED)
        ELSE
-         nStyle := nStyle & NOT( WS_EX_LAYERED )
+         nStyle := (nStyle & NOT( WS_EX_LAYERED ))
       ENDIF
       SetWindowLong( ::hWnd, GWL_EXSTYLE, nStyle )
       SetLayeredWindowAttributes( ::hWnd, NIL, ( 255 * n ) / 100, LWA_ALPHA )
@@ -5262,7 +5259,7 @@ FUNCTION __BrowseChildren( oObj )
           IF oChild:ClsName != "DataGrid"
              TRY
                 oChild:ImageIndex := oChild:ImageIndex
-                oChild:SetWindowPos(, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER )
+                oChild:SetWindowPos(, 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) )
               catch
              END
              __BrowseChildren( oChild )

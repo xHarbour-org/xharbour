@@ -58,7 +58,7 @@ CLASS ToolStripContainer INHERIT Control
    METHOD Create()
    METHOD OnEraseBkGnd()      INLINE 1
    METHOD OnPaint()
-   METHOD OnThemeChanged()    INLINE ::__SetVertex(), ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ), AEVAL( ::Children, {|o| o:InvalidateRect() } ), NIL
+   METHOD OnThemeChanged()    INLINE ::__SetVertex(), ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) ), AEVAL( ::Children, {|o| o:InvalidateRect() } ), NIL
    METHOD OnSize()
    METHOD OnParentSysCommand()
    METHOD OnSysKeyDown()
@@ -73,7 +73,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ToolStripContainer
    ::__xCtrlName   := "ToolStripContainer"
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style         := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ClsName       := "ToolStripContainer"
    ::Super:Init( oParent )
    ::ExStyle       := WS_EX_NOACTIVATE
@@ -105,7 +105,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS ToolStripContainer
    Super:OnSize( nwParam, nlParam )
    ::__SetVertex()
 //   ::InvalidateRect(, .F. )
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    AEVAL( ::Children, {|o| o:InvalidateRect(, .F. ) } )
 RETURN NIL
 
@@ -366,8 +366,8 @@ CLASS ToolStrip INHERIT Control
    METHOD OnEraseBkGnd()      INLINE ::__CreateBkBrush(), 1
    METHOD OnPaint()
    METHOD OnThemeChanged()    INLINE ::__SetVertex(),;
-                                     ::SetWindowPos( , 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER ),;
-                                     ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT ),;
+                                     ::SetWindowPos( , 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER) ),;
+                                     ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) ),;
                                      AEVAL( ::Children, {|o| o:InvalidateRect() } ), NIL
    METHOD OnParentSysKeyDown() VIRTUAL
    METHOD OnParentCommand()
@@ -413,7 +413,7 @@ METHOD Init( oParent ) CLASS ToolStrip
    DEFAULT ::__xCtrlName TO "ToolStrip"
    DEFAULT ::ClsName     TO "ToolStrip"
 
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style         := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Super:Init( oParent )
    ::ExStyle       := WS_EX_NOACTIVATE
    ::IsContainer   := .T.
@@ -760,7 +760,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStrip
                ENDIF
                ::MoveWindow()
                //::InvalidateRect()
-               ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+               ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
             ENDIF
 
             DEFAULT ::__PrevPos TO { x, y }
@@ -1135,7 +1135,7 @@ METHOD OnSize( nwParam, nlParam ) CLASS ToolStrip
    ::__CreateBkBrush()
    ::__PrevSize := LOWORD(nlParam)
    IF ::Row > 0 .AND. ::__PrevRow == 0
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN) )
    ENDIF
 RETURN NIL
 
@@ -1169,7 +1169,7 @@ METHOD __SetFloat( lFloat ) CLASS ToolStrip
       ::SendMessage( WM_LBUTTONUP, 0, MAKELPARAM( pt:x, pt:y ) )
 
       ::SetWindowLong( GWL_EXSTYLE, WS_EX_NOACTIVATE )
-      ::SetWindowLong( GWL_STYLE, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
+      ::SetWindowLong( GWL_STYLE, (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS) )
 
       SetParent( ::hWnd, ::Parent:hWnd )
 
@@ -1217,8 +1217,8 @@ METHOD __SetFloat( lFloat ) CLASS ToolStrip
 
       SetParent( ::hWnd, NIL )
       ::SetWindowLong( GWL_EXSTYLE, WS_EX_TOOLWINDOW )
-      ::SetWindowLong( GWL_STYLE, WS_POPUP | WS_VISIBLE )
-      ::SetWindowPos( HWND_TOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE )
+      ::SetWindowLong( GWL_STYLE, (WS_POPUP | WS_VISIBLE) )
+      ::SetWindowPos( HWND_TOPMOST, 0, 0, 0, 0, (SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE) )
 
       ::PostMessage( WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM( ::xLeft, ::xTop ) )
 
@@ -1237,7 +1237,7 @@ METHOD OnNCPaint() CLASS ToolStrip
       hPen    := CreatePen( PS_SOLID, 1, GetSysColor( COLOR_BTNFACE ) )
 
       hRegion := CreateRectRgn( 0, 0, ::Width, ::Height )
-      hdc := GetDCEx( ::hWnd, hRegion, DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_CLIPCHILDREN | DCX_VALIDATE )
+      hdc := GetDCEx( ::hWnd, hRegion, (DCX_WINDOW | DCX_PARENTCLIP | DCX_CLIPSIBLINGS | DCX_CLIPCHILDREN | DCX_VALIDATE) )
 
       hOldPen   := SelectObject( hDC, ::ColorScheme:Pen:MenuBorder )
       hOldBrush := SelectObject( hDC, GetStockObject( NULL_BRUSH ) )
@@ -1261,7 +1261,7 @@ METHOD OnNCPaint() CLASS ToolStrip
 
       aAlign := _GetTextExtentPoint32( hDC, ::Caption )
       y := ( 21 / 2 ) - ( aAlign[2] / 2 )
-      _ExtTextOut( hDC, 5, y, ETO_CLIPPED | ETO_OPAQUE, { 3, 3, ::Width - 3, 20 }, ::Caption )
+      _ExtTextOut( hDC, 5, y, (ETO_CLIPPED | ETO_OPAQUE), { 3, 3, ::Width - 3, 20 }, ::Caption )
 
       nBackColor := SetBkColor( hDC, nBackColor )
       nForeColor := SetTextColor( hDC, nForeColor )
@@ -1432,7 +1432,7 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Init( oParent ) CLASS ToolStripItem
-   ::Style         := WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style         := (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::ExStyle       := WS_EX_NOACTIVATE
    ::__aVertex     := { {=>}, {=>} }
    ::__aMesh       := { {=>} }
@@ -1515,7 +1515,7 @@ METHOD Cancel() CLASS ToolStripItem
    ENDIF
    IF ::System:__ToolStripFlags[ "s_CurrFocus" ] != NIL
       ::System:__ToolStripFlags[ "s_CurrFocus" ]:__lSelected := .F.
-      ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
       ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
    ENDIF
    UnhookWindowsHookEx( ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] )
@@ -1569,7 +1569,7 @@ RETURN nRet
 
 //-------------------------------------------------------------------------------------------------------
 METHOD __SetImageAlign() CLASS ToolStripItem
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
@@ -1617,7 +1617,7 @@ METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
       ::__lSelected := .T.
       IF ::System:__ToolStripFlags[ "s_CurrFocus" ] != NIL
          ::System:__ToolStripFlags[ "s_CurrFocus" ]:__lSelected := .F.
-         ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+         ::System:__ToolStripFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
          ::System:__ToolStripFlags[ "s_CurrFocus" ] := NIL
       ENDIF
 
@@ -1626,7 +1626,7 @@ METHOD OnMouseHover( nwParam ) CLASS ToolStripItem
          ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] := NIL
       ENDIF
 
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ENDIF
 RETURN Self
 
@@ -1640,7 +1640,7 @@ METHOD OnMouseMove( nwParam, nlParam ) CLASS ToolStripItem
 
    IF nwParam == MK_LBUTTON
       ::__lSelected := _PtInRect( { 0, 0, ::Width, ::Height }, { x, y } )
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ENDIF
 RETURN NIL
 
@@ -1650,14 +1650,14 @@ METHOD OnMouseLeave() CLASS ToolStripItem
    IF !::System:__ToolStripFlags[ "s_lKey" ] .AND. ( !::System:__ToolStripFlags[ "s_lExecuting" ] .OR. ( !::Parent:__lIsMenu .OR. EMPTY( ::Children ) ) ) .AND. s_hMenuDialogHook == NIL
       ::__lSelected := ::__lPushed
       ::__lPushed   := .F.
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown() CLASS ToolStripItem
    ::__lPushed := .T.
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ::SetCapture()
 RETURN NIL
 
@@ -1717,7 +1717,7 @@ METHOD OnLButtonUp() CLASS ToolStripItem
       ENDIF
 
    ENDIF
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ::System:__ToolStripFlags[ "s_lExecuting" ] := .F.
 RETURN Self
 
@@ -1786,7 +1786,7 @@ METHOD Create() CLASS ToolStripButton
    IF LEFT( ::xText, 2 ) == '{|' .AND. ! ::DesignMode
       ::xText := EVAL( &(::xText) )
       IF ( n := AT( "&", ::xText ) ) > 0
-         ::Parent:Form:AddAccelerator( FVIRTKEY | FCONTROL, ASC( Upper(::xText[n+1]) ), ::Id )
+         ::Parent:Form:AddAccelerator( (FVIRTKEY | FCONTROL), ASC( Upper(::xText[n+1]) ), ::Id )
        ELSE
          ::ShortCutKey:SetAccel()
       ENDIF
@@ -1800,11 +1800,13 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD __SetItemSize() CLASS ToolStripButton
-   LOCAL aSize, cText, hDC, nWidth, cLine, aLines, hFont
+   LOCAL aSize, cText, hDC, nWidth, cLine, aLines, hFont, oImageList := ::ImageList
+
+   DEFAULT oImageList TO ::Parent:ImageList
 
    nWidth := 0
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-      nWidth := ::Parent:ImageList:IconWidth + ( ::Parent:ImagePadding * 2 )
+   IF oImageList != NIL .AND. ::ImageIndex > 0
+      nWidth := oImageList:IconWidth + ( ::Parent:ImagePadding * 2 )
    ENDIF
 
    IF ! Empty( ::xText )
@@ -1872,10 +1874,13 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS ToolStripButton
-   LOCAL hOldBrush, hOldPen, aRect := Array(4)
+   LOCAL hOldBrush, hOldPen, aRect := Array(4), oImageList
    LOCAL x, n, nDots := ( ::Height - 6 ) / 4
    LOCAL hMemBitmap, hOldBitmap, hPrevFont, nLeft, nTop, nTextFlags, aTextRect, hBorderPen, lEnabled, hDC, hMemDC, nColor
    static lPaint := .F.
+
+   oImageList := ::ImageList
+   DEFAULT oImageList TO ::Parent:ImageList
 
    lEnabled := ::Enabled .AND. ::Parent:Enabled
 
@@ -1947,47 +1952,47 @@ METHOD OnPaint() CLASS ToolStripButton
    aTextRect    := { 0, 0, ::Width-::__nDropDown, ::Height }
    aTextRect[2] := ( ::Height - ( _GetTextExtentPoint32( hMemDC, ::xText )[2]*Len(hb_aTokens( ::xText, CRLF )) ) ) / 2
 
-   nTextFlags := DT_CENTER | DT_VCENTER //| DT_SINGLELINE
+   nTextFlags := (DT_CENTER | DT_VCENTER) //| DT_SINGLELINE
    x          := 0
 
    nTop       := 0
    nLeft      := 0
 
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+   IF oImageList != NIL .AND. ::ImageIndex > 0
       DO CASE
          CASE ::ImageAlign == DT_LEFT
               nLeft := ::Parent:ImagePadding
-              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
-              aTextRect[1] := nLeft + ::Parent:ImageList:IconWidth + ::Parent:TextPadding
-              nTextFlags := DT_LEFT | DT_VCENTER //| DT_SINGLELINE
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - oImageList:IconHeight ) / 2, ::Parent:ImagePadding )
+              aTextRect[1] := nLeft + oImageList:IconWidth + ::Parent:TextPadding
+              nTextFlags := (DT_LEFT | DT_VCENTER) //| DT_SINGLELINE
 
          CASE ::ImageAlign == DT_RIGHT
-              nLeft := ::Width - ::Parent:ImageList:IconWidth - ::Parent:ImagePadding - ::__nDropDown
-              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight ) / 2, ::Parent:ImagePadding )
+              nLeft := ::Width - oImageList:IconWidth - ::Parent:ImagePadding - ::__nDropDown
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - oImageList:IconHeight ) / 2, ::Parent:ImagePadding )
               aTextRect[1] := nLeft - ::Parent:TextPadding - ::__nTextWidth
-              nTextFlags := DT_RIGHT | DT_VCENTER //| DT_SINGLELINE
+              nTextFlags := (DT_RIGHT | DT_VCENTER) //| DT_SINGLELINE
 
          CASE ::ImageAlign == DT_CENTER
-              nLeft := ( ( ::Width + ::__nDropDown - ::Parent:ImageList:IconWidth ) / 2 ) - ::__nDropDown
+              nLeft := ( ( ::Width + ::__nDropDown - oImageList:IconWidth ) / 2 ) - ::__nDropDown
               n := _GetTextExtentPoint32( hMemDC, ::Caption )[2] * Len( hb_aTokens( ::Caption, CRLF ) )
-              nTop  := IIF( ::ImageVertCenter, ( ::Height - ::Parent:ImageList:IconHeight - n ) / 2, ::Parent:ImagePadding )
-              aTextRect[2] := nTop + ::Parent:ImageList:IconHeight + ::Parent:TextPadding
-              nTextFlags := DT_CENTER | DT_VCENTER //| DT_SINGLELINE
+              nTop  := IIF( ::ImageVertCenter, ( ::Height - oImageList:IconHeight - n ) / 2, ::Parent:ImagePadding )
+              aTextRect[2] := nTop + oImageList:IconHeight + ::Parent:TextPadding
+              nTextFlags := (DT_CENTER | DT_VCENTER) //| DT_SINGLELINE
 
       ENDCASE
       IF EMPTY( ::Caption )
-         nTop := ( ::Height - ::Parent:ImageList:IconHeight ) / 2
+         nTop := ( ::Height - oImageList:IconHeight ) / 2
       ENDIF
 
 
-      //y := ( ( ::Height - ::Top ) - ::Parent:ImageList:IconHeight ) / 2
-      //::Parent:ImageList:DrawImage( hMemDC, ::ImageIndex, 3, y, ILD_TRANSPARENT )
-      //x := ::Parent:ImageList:IconWidth + 3
+      //y := ( ( ::Height - ::Top ) - oImageList:IconHeight ) / 2
+      //oImageList:DrawImage( hMemDC, ::ImageIndex, 3, y, ILD_TRANSPARENT )
+      //x := oImageList:IconWidth + 3
 
       IF !lEnabled
-         ::Parent:ImageList:DrawDisabled( hMemDC, ::ImageIndex, Int( nLeft ), Int( nTop ) )
+         oImageList:DrawDisabled( hMemDC, ::ImageIndex, Int( nLeft ), Int( nTop ) )
        ELSE
-         ::Parent:ImageList:DrawImage( hMemDC, ::ImageIndex, Int( nLeft ), Int( nTop ) )
+         oImageList:DrawImage( hMemDC, ::ImageIndex, Int( nLeft ), Int( nTop ) )
       ENDIF
    ENDIF
 
@@ -2101,14 +2106,14 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
        ENDIF
 
        mii := {=>}
-       mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE
+       mii:fMask         := (MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE)
        mii:hSubMenu      := oItem:__hMenu
        IF LEN( oItem:Children ) > 0
-          mii:fMask      := mii:fMask | MIIM_SUBMENU
+          mii:fMask      := (mii:fMask | MIIM_SUBMENU)
        ENDIF
        mii:wID           := oItem:Id
        mii:fType         := MFT_OWNERDRAW
-       mii:fState        := IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED )
+       mii:fState        := (IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED ))
        mii:hbmpChecked   := 0
        mii:hbmpUnchecked := 0
        mii:dwTypeData    := oItem:Caption
@@ -2137,14 +2142,14 @@ FUNCTION ___OpenMenu( Self )
          ::System:__ToolStripFlags[ "s_lExecuting" ]   := .F.
          ::ReleaseCapture()
       ENDIF
-      ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+      ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
       RETURN Super:OnLButtonDown()
    ENDIF
 
    ::__lPushed   := .T.
    ::__lSelected := .T.
    s_hMenuDialogHook := 0
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
 
    ::SetCapture()
    ::System:__ToolStripFlags[ "s_lExecuting" ] := .T.
@@ -2172,7 +2177,7 @@ FUNCTION ___OpenMenu( Self )
    s_hMenuDialogHook := SetWindowsHookEx( WH_CALLWNDPROC, ( @__MenuDialogHook() ), NIL, GetCurrentThreadId() )
    DEFAULT ::System:__ToolStripFlags[ "s_hKeyMenuHook" ] TO SetWindowsHookEx( WH_MSGFILTER, ( @__KeyMenuHook() ), NIL, GetCurrentThreadId() )
 
-   TrackPopupMenu( ::__hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, aPt[1], aPt[2], 0, ::Form:hWnd )
+   TrackPopupMenu( ::__hMenu, (TPM_LEFTALIGN | TPM_TOPALIGN), aPt[1], aPt[2], 0, ::Form:hWnd )
    s_nmw := 0
 
    IF ::ColorScheme:MenuItemShadow
@@ -2196,7 +2201,7 @@ FUNCTION ___OpenMenu( Self )
    s_aPixels := NIL
    s_aRect   := NIL
 
-   ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+   ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
    ::PostMessage( WM_USER + 1027, 0, 0 )
 RETURN Self
 
@@ -2215,7 +2220,7 @@ METHOD OnUserMsg() CLASS ToolStripButton
 
       CASE ::Msg == WM_USER + 1029
            ::__lSelected := .T.
-           ::RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+           ::RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
            s_PrevFocus := ::System:__ToolStripFlags[ "s_CurrFocus" ]
    ENDCASE
 RETURN NIL
@@ -2418,7 +2423,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                        IF VALTYPE( oObj ) == "O" .AND. oObj:Parent:HasMessage("__lIsMenu")
                           IF s_PrevFocus != NIL
                              s_PrevFocus:__lSelected := .F.
-                             s_PrevFocus:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                             s_PrevFocus:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                              s_PrevFocus := NIL
                           ENDIF
                           SendMessage( ms_hWnd, WM_CANCELMODE, 0, 0 )
@@ -2446,7 +2451,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
               ENDIF
               IF oSysFlags[ "s_CurrFocus" ] != NIL
                  oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
-                 oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                 oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                  oSysFlags[ "s_CurrFocus" ] := NIL
               ENDIF
               UnhookWindowsHookEx( oSysFlags[ "s_hKeyMenuHook" ] )
@@ -2466,7 +2471,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            IF ms_wParam == VK_MENU
               SendMessage( oSysFlags[ "s_CurrentObject" ]:Form:hWnd, WM_CANCELMODE, 0, 0 )
               oSysFlags[ "s_CurrentObject" ]:__lSelected := .F.
-              oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+              oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
               IF oSysFlags[ "s_CurrFocus" ] == NIL
                  oSysFlags[ "s_CurrentObject" ] := NIL
               ENDIF
@@ -2483,7 +2488,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
            EXIT
 
       CASE WM_GETDLGCODE
-           RETURN DLGC_WANTMESSAGE | DLGC_WANTALLKEYS
+           RETURN (DLGC_WANTMESSAGE | DLGC_WANTALLKEYS)
 
       CASE WM_CHAR
            oMenu := oSysFlags[ "s_CurrentObject" ]:Parent
@@ -2542,7 +2547,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                        IF !EMPTY( oItem:Children ) .AND. ( oItem:DropDown > 1 .OR. oItem:Parent:__lIsMenu )
                           IF oSysFlags[ "s_CurrentObject" ] != NIL
                              oSysFlags[ "s_CurrentObject" ]:__lSelected := .F.
-                             oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                             oSysFlags[ "s_CurrentObject" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                              oSysFlags[ "s_CurrentObject" ] := NIL
                           ENDIF
                           oItem:PostMessage( WM_USER + 1028 )
@@ -2571,7 +2576,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       ENDIF
                       IF oSysFlags[ "s_CurrFocus" ] != NIL
                          oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
-                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                          oSysFlags[ "s_CurrFocus" ] := NIL
                        ELSE
                          SendMessage( oObj:Form:hWnd, WM_CANCELMODE, 0, 0 )
@@ -2599,7 +2604,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
                       ENDIF
                       IF oSysFlags[ "s_CurrFocus" ] != NIL
                          oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
-                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                          oSysFlags[ "s_CurrFocus" ] := NIL
                        ELSE
                          SendMessage( oObj:Form:hWnd, WM_CANCELMODE, 0, 0 )
@@ -2631,7 +2636,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
 
                       IF oSysFlags[ "s_CurrFocus" ] != NIL
                          oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
-                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                         oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                          oSysFlags[ "s_CurrFocus" ] := NIL
                       ENDIF
                       RETURN 1
@@ -2645,7 +2650,7 @@ FUNCTION __KeyMenuHook( nCode, nwParam, nlParam )
 
                    IF oSysFlags[ "s_CurrFocus" ] != NIL
                       oSysFlags[ "s_CurrFocus" ]:__lSelected := .F.
-                      oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT )
+                      oSysFlags[ "s_CurrFocus" ]:RedrawWindow( , , (RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT) )
                       oSysFlags[ "s_CurrFocus" ] := NIL
                       oSysFlags[ "s_CurrentObject" ] := NIL
                       UnhookWindowsHookEx( oSysFlags[ "s_hKeyMenuHook" ] )
@@ -2862,7 +2867,7 @@ RETURN Self
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS MenuStripItem
-   IF ::Parent:ClsName != ::ClsName .AND. ! ::Parent:ClsName IN { "ToolStripButton", "ContextStrip" }
+   IF ::Parent:ClsName != ::ClsName .AND. ! (::Parent:ClsName IN { "ToolStripButton", "ContextStrip" })
       Super:Create()
     ELSE
       IF LEFT( ::xCaption, 2 ) == '{|' .AND. ! ::DesignMode
@@ -2905,20 +2910,22 @@ RETURN SELF
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    LOCAL lDisabled, lSelected, lChecked, hSepDark, n, cText := ::Caption
-   LOCAL xIcon := 0, yIcon := 0, hOldPen, hOldBrush, hFont
+   LOCAL xIcon := 0, yIcon := 0, hOldPen, hOldBrush, hFont, oImageList := ::ImageList
    (nwParam)
    (nlParam)
    yIcon := 22
 
-   IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-      xIcon := ::Parent:ImageList:IconWidth
-      yIcon := ::Parent:ImageList:IconHeight
+   DEFAULT oImageList TO ::Parent:ImageList
+
+   IF oImageList != NIL .AND. ::ImageIndex > 0
+      xIcon := oImageList:IconWidth
+      yIcon := oImageList:IconHeight
    ENDIF
    xIcon := 24
 
-   lDisabled  := dis:itemState & ODS_GRAYED != 0
-   lSelected  := dis:itemState & ODS_SELECTED != 0
-   lChecked   := dis:itemState & ODS_CHECKED != 0
+   lDisabled  := (dis:itemState & ODS_GRAYED) != 0
+   lSelected  := (dis:itemState & ODS_SELECTED) != 0
+   lChecked   := (dis:itemState & ODS_CHECKED) != 0
 
    xIcon += 8 //MAX( xIcon, GetSystemMetrics( SM_CXMENUCHECK )+2 ) + 6
 
@@ -2962,12 +2969,12 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
           LineTo( dis:hDC, 15, dis:rcItem:Top +  7 + n )
       NEXT
 
-    ELSEIF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
+    ELSEIF oImageList != NIL .AND. ::ImageIndex > 0
       IF lDisabled
          SelectObject( dis:hDC, GetSysColorBrush( COLOR_GRAYTEXT ) )
-         ::Parent:ImageList:DrawDisabled( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
+         oImageList:DrawDisabled( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
        ELSE
-         ::Parent:ImageList:DrawImage( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
+         oImageList:DrawImage( dis:hDC, ::ImageIndex, 5, dis:rcItem:top + 3, ILD_TRANSPARENT )
       ENDIF
    ENDIF
 
@@ -2982,11 +2989,11 @@ METHOD OnDrawItem( nwParam, nlParam, dis ) CLASS MenuStripItem
    IF ::Font != NIL .AND. ::Font:Handle != NIL
       hFont := SelectObject( dis:hDC, ::Font:handle )
    ENDIF
-   _DrawText( dis:hDC, cText, dis:rcItem:Array, DT_SINGLELINE | DT_VCENTER )
+   _DrawText( dis:hDC, cText, dis:rcItem:Array, (DT_SINGLELINE | DT_VCENTER) )
 
    IF !EMPTY( ::ShortCutText )
       dis:rcItem:right -= 20
-      _DrawText( dis:hDC, ::ShortCutText, dis:rcItem:Array, DT_SINGLELINE | DT_VCENTER | DT_RIGHT )
+      _DrawText( dis:hDC, ::ShortCutText, dis:rcItem:Array, (DT_SINGLELINE | DT_VCENTER | DT_RIGHT) )
    ENDIF
    IF hFont != NIL
       SelectObject( dis:hDC, hFont )
@@ -2995,12 +3002,13 @@ RETURN 0
 
 //--------------------------------------------------------------------------------------------------------------------------------
 METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
-   LOCAL hOld, aRect, hDC, aExt, n, nWidth, nShort
+   LOCAL hOld, aRect, hDC, aExt, n, nWidth, nShort, oImageList := ::ImageList
    LOCAL xIcon := 0
    LOCAL yIcon := 0
    (nwParam)
    (nlParam)
    IF mi:CtlType == ODT_MENU
+      DEFAULT oImageList TO ::Parent:ImageList
 
       hDC   := GetDC( NIL )
       aRect := {0,0,0,0}
@@ -3028,9 +3036,9 @@ METHOD OnMeasureItem( nwParam, nlParam, mi ) CLASS MenuStripItem
 
       ReleaseDC( NIL, hDC )
 
-      IF ::Parent:ImageList != NIL .AND. ::ImageIndex > 0
-         xIcon := ::Parent:ImageList:IconWidth
-         yIcon := ::Parent:ImageList:IconHeight
+      IF oImageList != NIL .AND. ::ImageIndex > 0
+         xIcon := oImageList:IconWidth
+         yIcon := oImageList:IconHeight
       ENDIF
 
       xIcon := 24
@@ -3097,13 +3105,13 @@ METHOD SetAccel() CLASS __MenuStripItemShortCut
    IF ! ::DesignMode .AND. ::xKey <> 0
       nAccel := FVIRTKEY
       IF ::xCtrl
-         nAccel := nAccel | FCONTROL
+         nAccel := (nAccel | FCONTROL)
       ENDIF
       IF ::xShift
-         nAccel := nAccel | FSHIFT
+         nAccel := (nAccel | FSHIFT)
       ENDIF
       IF ::xAlt
-         nAccel := nAccel | FALT
+         nAccel := (nAccel | FALT)
       ENDIF
       ::Parent:Form:AddAccelerator( nAccel, ::Key, ::Parent:Id )
    ENDIF
@@ -3229,12 +3237,12 @@ METHOD Show( x, y ) CLASS ContextStrip
 
    __ReleaseMenu( Self, ::__hMenu )
 
-   nStyle := TPM_LEFTALIGN | TPM_TOPALIGN
+   nStyle := (TPM_LEFTALIGN | TPM_TOPALIGN)
    IF ::DesignMode
       GetWindowRect( ::Application:DesignPage:hWnd, @rc )
       x := ( rc:left + rc:right ) / 2
       y := ( rc:top + rc:bottom ) / 2
-      nStyle := TPM_CENTERALIGN | TPM_LEFTBUTTON
+      nStyle := (TPM_CENTERALIGN | TPM_LEFTBUTTON)
    ENDIF
 
    __SetSubMenu( Self, ::__hMenu )
@@ -3269,7 +3277,7 @@ FUNCTION __AddNewMenuItem( Self, oParent )
    oItem:__hMenu := CreateMenu()
 
    mii := {=>}
-   mii:fMask         := MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE | MIIM_SUBMENU
+   mii:fMask         := (MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE | MIIM_SUBMENU)
    mii:hSubMenu      := oItem:__hMenu
    mii:wID           := oItem:Id
    mii:fType         := MFT_OWNERDRAW

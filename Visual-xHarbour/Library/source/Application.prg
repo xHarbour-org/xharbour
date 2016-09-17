@@ -1581,17 +1581,6 @@ RETURN NIL
    ENDCLASS
 #endif
 
-//----------------------------------------------------------------------------//
-#pragma BEGINDUMP
-HB_FUNC( FORCEGPF )
-{
-   char gpf[1];
-
-   strcpy( gpf, "Intentionally attempting to force a gpf" );
-}
-#pragma ENDDUMP
-//----------------------------------------------------------------------------//
-
 #ifdef d_WinFakt
  FUNCTION wf_ErrorDialog(oErr,lSilent,lQuit,cDir)
    (lQuit)

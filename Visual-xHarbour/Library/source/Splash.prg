@@ -113,7 +113,7 @@ FUNCTION __SplashDlgProc( hWnd, nMsg, nwParam )
            nLeft := __aCenter[1] + ( ( __aCenter[3] ) / 2 ) - ( (aRect[3]-aRect[1]) / 2 )
            nTop  := __aCenter[2] + ( ( __aCenter[4] ) / 2 ) - ( (aRect[4]-aRect[2]) / 2 )
 
-           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1], aRect[4]-aRect[2] )
+           MoveWindow( hWnd, nLeft, nTop, aRect[3]-aRect[1]+1, aRect[4]-aRect[2]+1 )
            IF nSecs == NIL
               SetTimer( hWnd, 2, 100 )
             ELSE

@@ -530,6 +530,9 @@ CLASS TitleControl INHERIT Control
    PROPERTY AllowClose                     DEFAULT FALSE
    PROPERTY MenuArrow                      DEFAULT .F.
 
+   PROPERTY TextColor   ROOT "Colors"  GET IIF( ::xTextColor == NIL, ::__SysTextColor, ::xTextColor ) SET ::InValidateRect()
+
+   DATA __SysTextColor       EXPORTED  INIT GetSysColor( COLOR_WINDOW )
    DATA __lActive            EXPORTED  INIT .F.
    DATA OnWMClose            EXPORTED
 
@@ -640,7 +643,7 @@ METHOD OnNCPaint( nwParam, nlParam ) CLASS TitleControl
       ENDIF
 
 
-      SetTextColor( hDC, IIF( ! ::__lActive, ::System:Color:White, ::System:Color:Black ) )
+      SetTextColor( hDC, ::TextColor )
 
       hOldFont := SelectObject( hDC, ::System:hFont )
       SetBkMode( hDC, TRANSPARENT )

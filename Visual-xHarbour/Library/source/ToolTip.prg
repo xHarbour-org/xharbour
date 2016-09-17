@@ -55,28 +55,28 @@ CLASS ToolTip INHERIT Window
    ACCESS Center         INLINE ::CenterTip
    ASSIGN Center(l)      INLINE ::CenterTip := l
 
-   ACCESS Visible        INLINE ::Style & WS_VISIBLE != 0
-   ACCESS Transparent    INLINE ::ExStyle & WS_EX_TRANSPARENT != 0
+   ACCESS Visible        INLINE (::Style & WS_VISIBLE) != 0
+   ACCESS Transparent    INLINE (::ExStyle & WS_EX_TRANSPARENT) != 0
 
-   ACCESS Child          INLINE ::Style & WS_CHILD != 0
-   ACCESS ControlParent  INLINE ::ExStyle & WS_EX_CONTROLPARENT != 0
+   ACCESS Child          INLINE (::Style & WS_CHILD) != 0
+   ACCESS ControlParent  INLINE (::ExStyle & WS_EX_CONTROLPARENT) != 0
    ACCESS MdiContainer   INLINE ::xMdiContainer
-   ACCESS TabStop        INLINE ::Style & WS_TABSTOP != 0
-   ACCESS TopMost        INLINE ::ExStyle & WS_EX_TOPMOST != 0
+   ACCESS TabStop        INLINE (::Style & WS_TABSTOP) != 0
+   ACCESS TopMost        INLINE (::ExStyle & WS_EX_TOPMOST) != 0
    //------------------------------------------
 
    DATA MDIClient         PROTECTED
    DATA __SysBackColor    EXPORTED INIT GetSysColor( COLOR_INFOBK )
    DATA __SysForeColor    EXPORTED INIT GetSysColor( COLOR_INFOTEXT )
 
-   ACCESS ClipChildren    INLINE ::Style & WS_CLIPCHILDREN != 0
+   ACCESS ClipChildren    INLINE (::Style & WS_CLIPCHILDREN) != 0
    ASSIGN ClipChildren(l) INLINE ::SetStyle( WS_CLIPCHILDREN, l )
 
-   ACCESS ClipSiblings    INLINE ::Style & WS_CLIPSIBLINGS != 0
+   ACCESS ClipSiblings    INLINE (::Style & WS_CLIPSIBLINGS) != 0
    ASSIGN ClipSiblings(l) INLINE ::SetStyle( WS_CLIPSIBLINGS, l )
 
    DATA Tip               EXPORTED AS OBJECT
-   DATA TTStyle           EXPORTED INIT TTF_SUBCLASS | TTF_IDISHWND | TTF_ABSOLUTE
+   DATA TTStyle           EXPORTED INIT (TTF_SUBCLASS | TTF_IDISHWND | TTF_ABSOLUTE)
    DATA xMdiContainer     EXPORTED INIT .F.
 
    ACCESS MdiContainer    INLINE    ::xMdiContainer
@@ -115,7 +115,7 @@ METHOD Init( oParent ) CLASS ToolTip
    ::__xCtrlName    := "ToolTip"
    ::ClsName      := TOOLTIPS_CLASS
    ::Super:Init( oParent )
-   ::Style        := WS_POPUP | WS_BORDER | TTS_NOPREFIX | TTS_ALWAYSTIP
+   ::Style        := (WS_POPUP | WS_BORDER | TTS_NOPREFIX | TTS_ALWAYSTIP)
    ::ExStyle      := WS_EX_TOPMOST
    ::Left         := CW_USEDEFAULT
    ::Top          := CW_USEDEFAULT
@@ -155,9 +155,9 @@ RETURN( Self )
 
 METHOD SetTTStyle( nStyle, lSet ) CLASS ToolTip
    IF lSet
-      ::TTStyle := ::TTStyle | nStyle
+      ::TTStyle := (::TTStyle | nStyle)
     ELSE
-      ::TTStyle := ::TTStyle & NOT( nStyle )
+      ::TTStyle := (::TTStyle & NOT( nStyle ))
    ENDIF
    IF ::hWnd != NIL
       ::Tip:uFlags := ::TTStyle
@@ -206,7 +206,7 @@ RETURN Self
 
 METHOD OnLButtonDown( n, x, y ) CLASS ToolTip
    LOCAL pt
-   IF ::Tip:uflags & TTF_TRACK == TTF_TRACK .AND. ::CloseOnClick
+   IF (::Tip:uflags & TTF_TRACK) == TTF_TRACK .AND. ::CloseOnClick
       ::TrackActivate( .F. )
       ::PopUp()
 

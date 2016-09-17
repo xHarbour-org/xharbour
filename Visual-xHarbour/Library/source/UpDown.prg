@@ -24,10 +24,10 @@ CLASS UpDown INHERIT Control
    PROPERTY DisplayThousands DEFAULT .F.
    PROPERTY ArrowKeys        DEFAULT .T.
    PROPERTY Alignment        DEFAULT UDS_ALIGNRIGHT
-   
+
    DATA EnumAlignment        EXPORTED INIT {{ "Left", "Right" }, {UDS_ALIGNLEFT, UDS_ALIGNRIGHT} }
    DATA __lResizeable        EXPORTED INIT {.F.,.F.,.F.,.F.,.F.,.T.,.F.,.F.}
-   
+
    METHOD Init()  CONSTRUCTOR
    METHOD Create()
    METHOD __SetBuddy()
@@ -36,7 +36,7 @@ ENDCLASS
 
 METHOD Init( oParent ) CLASS UpDown
    ::ClsName := "msctls_updown32"
-   DEFAULT ::Style   TO WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | UDS_ALIGNRIGHT | UDS_SETBUDDYINT
+   DEFAULT ::Style   TO (WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | UDS_ALIGNRIGHT | UDS_SETBUDDYINT)
    DEFAULT ::__xCtrlName TO "UpDown"
    ::Super:Init( oParent )
    ::Width        := 80

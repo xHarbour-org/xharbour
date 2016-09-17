@@ -753,12 +753,6 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
               ::CurSel := nSel
 
               oCurPage := ::GetItemObject()
-              aRect := ::GetItemRect( nSel )
-              aRect[1] -= 2
-              aRect[2] -= 2
-              aRect[3] += 2
-              aRect[4] += 2
-              ::Redraw( aRect )
 
               IF oCurPage != NIL
                  oCurPage:__OnParentSize( ::ClientWidth, ::ClientHeight )
@@ -779,6 +773,20 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
 
                  ENDIF
               ENDIF
+              aRect := ::GetItemRect( nSel )
+              aRect[1] -= 2
+              aRect[2] -= 2
+              aRect[3] += 2
+              aRect[4] += 2
+
+              IF oCurPage != NIL .AND. oCurPage:TopMargin > 0
+                 aRect[1] := 0
+                 aRect[3] := ::ClientWidth
+                 aRect[4] += oCurPage:TopMargin
+              ENDIF
+
+              ::Redraw( aRect )
+
               oSelPage := ::GetItemObject( nOldSel )
               IF oSelPage != NIL
                  IF oSelPage:LastFocus != NIL
@@ -942,7 +950,7 @@ CLASS TabPage INHERIT Dialog
    METHOD OnGetDlgCode()   INLINE DLGC_WANTMESSAGE
    METHOD Destroy()        INLINE ::Delete()
    METHOD HideTab()        INLINE ShowWindow( ::hWnd, SW_HIDE ), ::UpdateWindow()//Super:Hide()
-   METHOD ShowTab()        INLINE IIF( ::TopMargin > 0, ::Parent:Redraw(),), ShowWindow( ::hWnd, SW_SHOW ), ::UpdateWindow()//Super:Show()
+   METHOD ShowTab()        INLINE ShowWindow( ::hWnd, SW_SHOW ), ::UpdateWindow()//Super:Show()
    METHOD OnHotKey()       INLINE ::Select(), NIL
    METHOD OnCtlColorDlg()
    METHOD Delete()

@@ -107,7 +107,7 @@ CLASS TreeView FROM TitleControl
    METHOD OnLButtonUp()
 
    METHOD MoveItem()
-   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER)
+   METHOD ResetFrame() INLINE ::SetWindowPos(,0,0,0,0,(SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER))
    METHOD __Enable( lEnable ) INLINE EnableWindow( ::hWnd, lEnable )
 ENDCLASS
 
@@ -116,7 +116,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS TreeView
    ::ClsName := "SysTreeView32"
    ::Level   := -1
-   ::Style   := WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
+   ::Style   := (WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | WS_CLIPCHILDREN | WS_CLIPSIBLINGS)
    ::Border  := WS_EX_CLIENTEDGE
    DEFAULT ::__xCtrlName TO "TreeView"
 
@@ -184,7 +184,7 @@ RETURN Self
 
 METHOD Create() CLASS TreeView
    IF ! ::DragItems
-      ::Style := ::Style | TVS_DISABLEDRAGDROP
+      ::Style := (::Style | TVS_DISABLEDRAGDROP)
    ENDIF
    ::Super:Create()
    IF ::xImageList != NIL
@@ -362,10 +362,10 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
            MapWindowPoints( HWND_DESKTOP, ::hWnd, @tvht:pt, 1 )
 
            SendMessage( ::hWnd, TVM_HITTEST, 0, @tvht )
-           IF tvht:flags & TVHT_ONITEMSTATEICON == TVHT_ONITEMSTATEICON
+           IF (tvht:flags & TVHT_ONITEMSTATEICON) == TVHT_ONITEMSTATEICON
               PostMessage( ::hWnd, UM_CHECKSTATECHANGE, 0, tvht:hItem )
            ELSE
-              tvht:flags := TVHT_ONITEM | TVHT_ONITEMICON
+              tvht:flags := (TVHT_ONITEM | TVHT_ONITEMICON)
               GetCursorPos( @tvht:pt )
               ScreenToClient( ::hWnd, @tvht:pt )
 
@@ -427,7 +427,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
               nState := ::SelectedItem:GetItemState( TVIF_STATE )
            ENDIF
            IF nState != NIL
-              lRet := ExecuteEvent( IIF( nState & TVIS_EXPANDED == TVIS_EXPANDED, "AfterExpand", "AfterCollapse" ), Self )
+              lRet := ExecuteEvent( IIF( (nState & TVIS_EXPANDED) == TVIS_EXPANDED, "AfterExpand", "AfterCollapse" ), Self )
            ENDIF
 
       CASE hdr:code == TVN_ITEMEXPANDING
@@ -435,7 +435,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TreeView
               nState := ::SelectedItem:GetItemState( TVIF_STATE )
            ENDIF
            IF nState != NIL
-              lRet := ExecuteEvent( IIF( nState & TVIS_EXPANDED == TVIS_EXPANDED, "BeforeCollapse", "BeforeExpand" ), Self )
+              lRet := ExecuteEvent( IIF( (nState & TVIS_EXPANDED) == TVIS_EXPANDED, "BeforeCollapse", "BeforeExpand" ), Self )
            ENDIF
 
       CASE hdr:code == TVN_KEYDOWN
