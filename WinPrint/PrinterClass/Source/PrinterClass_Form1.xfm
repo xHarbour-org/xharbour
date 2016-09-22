@@ -1,0 +1,54 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS PrinterClass_Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Button1_OnClick()
+   METHOD Button2_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS PrinterClass_Form1
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "PrinterClass_Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 300
+   ::Text                 := "WinPrint test"
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 95
+      :Top                  := 184
+      :Width                := 162
+      :Height               := 25
+      :Text                 := "Print preview test"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button2"
+      :Left                 := 95
+      :Top                  := 222
+      :Width                := 162
+      :Height               := 25
+      :Text                 := "Print test"
+      :EventHandler[ "OnClick" ] := "Button2_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self
