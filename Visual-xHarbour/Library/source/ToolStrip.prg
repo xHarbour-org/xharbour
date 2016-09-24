@@ -1488,9 +1488,12 @@ METHOD Create() CLASS ToolStripItem
 RETURN Self
 
 METHOD SetTabOrder( nTabOrder ) CLASS ToolStripItem
-   LOCAL nLeft
+   LOCAL nLeft := 0
    Super:SetTabOrder( nTabOrder )
-   nLeft := IIF( ::Parent:ShowGrip, ::Parent:__GripperPos + 4, 1 )
+   TRY
+      nLeft := IIF( ::Parent:ShowGrip, ::Parent:__GripperPos + 4, 1 )
+   CATCH
+   END
    AEVAL( ::Parent:Children, {|o| o:xLeft := nLeft + o:__nSeparator, o:MoveWindow(), nLeft := o:Left + o:Width } )
    ::Parent:__UpdateWidth()
 RETURN Self
@@ -2094,33 +2097,34 @@ STATIC FUNCTION __SetSubMenu( Self, hMenu )
 */
           EXIT
        ENDIF
+       IF oItem:Visible
+          IF LEN( oItem:Children ) > 0
+             oItem:__hMenu := CreateMenu()
+          ENDIF
 
-       IF LEN( oItem:Children ) > 0
-          oItem:__hMenu := CreateMenu()
+          IF ValType( oItem:Enabled ) == "B"
+             lEnabled := Eval( oItem:Enabled )
+           ELSE
+             lEnabled := oItem:Enabled
+          ENDIF
+
+          mii := {=>}
+          mii:fMask         := (MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE)
+          mii:hSubMenu      := oItem:__hMenu
+          IF LEN( oItem:Children ) > 0
+             mii:fMask      := (mii:fMask | MIIM_SUBMENU)
+          ENDIF
+          mii:wID           := oItem:Id
+          mii:fType         := MFT_OWNERDRAW
+          mii:fState        := (IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED ))
+          mii:hbmpChecked   := 0
+          mii:hbmpUnchecked := 0
+          mii:dwTypeData    := oItem:Caption
+          mii:hBmpItem      := NIL
+          mii:dwItemData    := oItem:__pObjPtr := __ObjPtr( oItem )
+
+          __InsertMenuStripItem( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
        ENDIF
-
-       IF ValType( oItem:Enabled ) == "B"
-          lEnabled := Eval( oItem:Enabled )
-        ELSE
-          lEnabled := oItem:Enabled
-       ENDIF
-
-       mii := {=>}
-       mii:fMask         := (MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE)
-       mii:hSubMenu      := oItem:__hMenu
-       IF LEN( oItem:Children ) > 0
-          mii:fMask      := (mii:fMask | MIIM_SUBMENU)
-       ENDIF
-       mii:wID           := oItem:Id
-       mii:fType         := MFT_OWNERDRAW
-       mii:fState        := (IIF( lEnabled, MFS_ENABLED, MFS_DISABLED ) | IIF( oItem:Checked, MFS_CHECKED, MFS_UNCHECKED ))
-       mii:hbmpChecked   := 0
-       mii:hbmpUnchecked := 0
-       mii:dwTypeData    := oItem:Caption
-       mii:hBmpItem      := NIL
-       mii:dwItemData    := oItem:__pObjPtr := __ObjPtr( oItem )
-
-       __InsertMenuStripItem( hMenu, -1, .T., mii:fMask, mii:hSubMenu, mii:wID, mii:dwTypeData, mii:dwItemData, mii:fState )
    NEXT
 RETURN Self
 

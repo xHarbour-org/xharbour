@@ -206,7 +206,7 @@ CLASS DataTable INHERIT Component
    METHOD RddInfo( nType, nSetting )          INLINE ::Connector:RddInfo( nType, nSetting )
    METHOD DbInfo( nType, nSetting )           INLINE ::Connector:DbInfo( nType, nSetting )
 
-   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Connector:OrdDescend( cnOrder, cFile, lDescend )
+   METHOD OrdDescend( cOrder, lDescend )      INLINE ::Connector:OrdDescend( cOrder, lDescend )
 
    METHOD CheckAlias()
 
@@ -742,8 +742,9 @@ CLASS DataRdd
    METHOD Skip( n )                           INLINE (::Owner:Area)->( dbSkip( n ) )
    METHOD Close()                             INLINE (::Owner:Area)->( dbCloseArea() )
    METHOD Append()                            INLINE (::Owner:Area)->( dbAppend() )
-   METHOD OrdSetFocus( cOrder           )     INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
-   //, if( lDescend != NIL, dbOrderInfo( DBOI_ISDESC, , cOrder, lDescend ), ) )
+   METHOD OrdSetFocus( cOrder )               INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
+
+   METHOD OrdDescend( cOrder, lDescend )      INLINE (::Owner:Area)->( dbOrderInfo( DBOI_ISDESC, , cOrder, lDescend ) )
 
    METHOD SetIndex( cIndex )                  INLINE (::Owner:Area)->( dbSetIndex( cIndex ) )
    METHOD SetOrder( nOrder )                  INLINE (::Owner:Area)->( dbSetOrder( nOrder ) )
@@ -770,7 +771,7 @@ CLASS DataRdd
    METHOD GetFilter()                         INLINE (::Owner:Area)->( dbFilter() )
    METHOD OrdKeyCount()                       INLINE (::Owner:Area)->( OrdKeyCount() )
    METHOD Used()                              INLINE (::Owner:Area)->( Used() )
-   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE (::Owner:Area)->( OrdDescend( cnOrder, cFile, lDescend ) )
+//   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE (::Owner:Area)->( OrdDescend( cnOrder, cFile, lDescend ) )
    METHOD SetRelation()
    METHOD ClearRelations()                    INLINE (::Owner:Area)->( dbClearRel() )
    METHOD FieldPut( nField, xVal )            INLINE (::Owner:Area)->( FieldPut( nField, xVal ) )
@@ -1084,7 +1085,7 @@ CLASS SocketRdd
    METHOD SetFilter( c )                      INLINE ::Request( "dbSetFilter", {c} )
    METHOD OrdKeyCount()                       INLINE ::Request( "OrdKeyCount" )
    METHOD Used()                              INLINE ::Request( "Used" )
-   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Request( "OrdDescend", {cnOrder, cFile, lDescend} )
+//   METHOD OrdDescend(cnOrder,cFile,lDescend ) INLINE ::Request( "OrdDescend", {cnOrder, cFile, lDescend} )
    METHOD SetTopScope( xScope )               INLINE ::Request( "OrdScope", {TOPSCOPE, xScope} )
    METHOD SetBottomScope( xScope )            INLINE ::Request( "OrdScope", {BOTTOMSCOPE, xScope} )
    METHOD SetScope( xScope )                  INLINE ::Request( "OrdScope", {TOPSCOPE, xScope} ),;

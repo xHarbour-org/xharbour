@@ -72,6 +72,7 @@ static s_cVersion, s_cCopyright
 #define TITLE_COLOR RGB(0,122,204)
 
 #define __GENVERSIONINFO__
+
 INIT PROCEDURE __VXH_Start
    LOCAL cRunning, cIni, aRect, oReg
 
@@ -5974,10 +5975,13 @@ METHOD GenerateForm( oWnd, cPrefix, cClsName, nID, aChildEvents, nInsMetPos, lCu
 
       cText += "   // Populate Children" + CRLF
       nPos := 1
-      FOR EACH oChild IN oWnd:Children
-          cText += ::GenerateChild( oChild, 3, @aChildEvents, "Self", oForm /*oCtrls*/ )
-          nPos++
-      NEXT
+      TRY
+         FOR EACH oChild IN oWnd:Children
+             cText += ::GenerateChild( oChild, 3, @aChildEvents, "Self", oForm /*oCtrls*/ )
+             nPos++
+         NEXT
+      CATCH
+      END
       cText += "RETURN Self" + CRLF + CRLF
    ENDIF
 
