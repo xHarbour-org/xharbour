@@ -744,7 +744,7 @@ CLASS DataRdd
    METHOD Append()                            INLINE (::Owner:Area)->( dbAppend() )
    METHOD OrdSetFocus( cOrder )               INLINE (::Owner:Area)->( OrdSetFocus( cOrder ) )
 
-   METHOD OrdDescend( cOrder, lDescend )      INLINE (::Owner:Area)->( dbOrderInfo( DBOI_ISDESC, , cOrder, lDescend ) )
+   METHOD OrdDescend( cOrder, lDescend )      INLINE (::Owner:Area)->( OrdDescend( cOrder, , lDescend ) )
 
    METHOD SetIndex( cIndex )                  INLINE (::Owner:Area)->( dbSetIndex( cIndex ) )
    METHOD SetOrder( nOrder )                  INLINE (::Owner:Area)->( dbSetOrder( nOrder ) )

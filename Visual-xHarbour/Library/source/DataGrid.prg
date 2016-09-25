@@ -200,6 +200,7 @@ CLASS DataGrid INHERIT TitleControl
    DATA __prevDrag              PROTECTED INIT 0
    DATA __prevHotRow            PROTECTED INIT 0
    DATA __prevHotCol            PROTECTED INIT 0
+   DATA __prevCol               PROTECTED INIT 1
    DATA __lHot                  PROTECTED INIT .F.
    DATA __nVPage                PROTECTED
    DATA __nVMax                 PROTECTED
@@ -756,7 +757,7 @@ METHOD OnMouseMove( wParam, lParam, lSuper ) CLASS DataGrid
             NEXT
          ENDIF
 
-         IF nDrag > 0 .AND. ::__DragColumn != nDrag .AND. nDrag != ::__prevDrag
+         IF nDrag > 0 .AND. ::__DragColumn != nDrag .AND. nDrag <> ::__prevDrag
             ImageListDragShowNolock( .F. )
             IF ::__DragColumn > 0
                ::Children[ ::__DragColumn ]:DrawHeader()
@@ -1433,7 +1434,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL nCol, nRow, n, lRes
+   LOCAL nCol, nRow, n, lRes, lDescending, cTag
    LOCAL nClickRow, lUpdt := .F.
    LOCAL nClickCol, pt //, lShift, lCtrl, i
    LOCAL lLineChange:=.F.
@@ -1486,13 +1487,25 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                ENDIF
                ::__lSizeMouseDown := .T.
              ELSEIF nClickCol <= LEN( ::Children )
+               cTag := ::Children[ nClickCol ]:Tag
+               IF ! Empty( cTag )
+                  lDescending := ::DataSource:OrdDescend( cTag )
 
-               IF ! Empty( ::Children[ nClickCol ]:Tag )
-                  ::DataSource:OrdSetFocus( ::Children[ nClickCol ]:Tag )
+                  IF ::__prevCol <> nClickCol .OR. Empty( ::CurTag )
+                     ::DataSource:OrdSetFocus( cTag )
+                  ELSE
+                     lDescending := ! lDescending
+                     ::DataSource:OrdDescend( cTag, lDescending )
+                  ENDIF
+
+                  ::CurTag    := cTag
+                  ::Children[ nClickCol ]:__SetSortArrow( IIF( lDescending, 1, 2 ) )
                   ::Children[ nClickCol ]:DrawHeader( ,,,, .T. )
-                  ::CurTag := ::Children[ nClickCol ]:Tag
+
                   ::Update()
                ENDIF
+
+               ::__prevCol := nClickCol
 
                IF !::Children[ nClickCol ]:AllowDrag
                   RETURN NIL
@@ -1502,7 +1515,6 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
 
                ::__SelLeft := xPos - ::__SelWidth
 
-               ::__prevDrag := nClickCol
 
                IF ::Children[ ::__SelCol ]:HeaderMenu == NIL
                   ::__DragColumn := nClickCol
@@ -4000,7 +4012,6 @@ CLASS GridColumn INHERIT Object
    PROPERTY ForeColor         ROOT "Colors" SET ::SetColor(2,v)
    PROPERTY ImageIndex        SET ::SetImageIndex(v)
    PROPERTY Text              SET ::SetText(v)
-   PROPERTY SortArrow         SET ::__SetSortArrow(v)      DEFAULT 0
    PROPERTY HeaderImageIndex  SET ::Refresh(v)             DEFAULT 0
    PROPERTY Representation    SET ::SetRepresentation(v)   DEFAULT 1
    PROPERTY AutoEdit          SET ::__SetAutoEdit(v)       DEFAULT .F.
@@ -4109,14 +4120,16 @@ CLASS GridColumn INHERIT Object
    DATA EventHandler                 EXPORTED
    DATA MDIContainer                 EXPORTED  INIT .F.
 
-   DATA Theming                      EXPORTED INIT .F.
+   DATA Theming                      EXPORTED  INIT .F.
    DATA __nLeft                      EXPORTED  INIT 0
+   DATA __nSortArrow                 EXPORTED  INIT 0
 
    DATA __HeaderLeft                 PROTECTED INIT 0
    DATA __HeaderRight                PROTECTED INIT 0
    DATA __HeaderX                    PROTECTED INIT 0
    DATA __aVertex                    PROTECTED
    DATA __aMesh                      PROTECTED
+
 
    METHOD Init() CONSTRUCTOR
    METHOD SetColor()
@@ -4304,10 +4317,10 @@ METHOD __SetSortArrow(n) CLASS GridColumn
    LOCAL i
    IF ::Parent:IsWindow()
       FOR i := 1 TO LEN( ::Parent:Children )
-          ::Parent:Children[i]:xSortArrow :=0
+          ::Parent:Children[i]:__nSortArrow := 0
           ::Parent:Children[i]:DrawHeader()
       NEXT
-      ::xSortArrow := n
+      ::__nSortArrow := n
       ::DrawHeader()
    ENDIF
 RETURN NIL
@@ -4347,7 +4360,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
 
    aRect := {nLeft, 0, nRight+1, ::Parent:__GetHeaderHeight()}
 
-   IF ::SortArrow > 0
+   IF ::__nSortArrow > 0
       nx := 18
    ENDIF
 
@@ -4484,11 +4497,11 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
    SelectObject( hDC, hOldFont )
    SelectObject( hDC, hOldPen )
 
-   IF ::SortArrow > 0 .AND. aRect[3]-15-nWImg > nLeft .AND. aRect[3]-15-nWImg > x + aAlign[1]
+   IF ::__nSortArrow > 0 .AND. aRect[3]-15-nWImg > nLeft .AND. aRect[3]-15-nWImg > x + aAlign[1]
       IF ::Parent:SchemeHeader
          hOldPen    := SelectObject( hDC, GetStockObject( BLACK_PEN ) )
          FOR n := 1 TO nH
-             x := IIF( ::SortArrow == 1,n,nH-n+1)
+             x := IIF( ::__nSortArrow == 1,n,nH-n+1)
              y := (aRect[4]-nH)/2
 
              MoveTo( hDC, aRect[3] - nWImg - (15-x), y+n-1 )
@@ -4503,7 +4516,7 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
          z := 1
          FOR i := 1 TO 2
              FOR n := 1 TO nH
-                 x := IIF( ::SortArrow == 1,n,nH-n+1)
+                 x := IIF( ::__nSortArrow == 1,n,nH-n+1)
                  y := (aRect[4]-nH)/2
 
                  MoveTo( hDC, aRect[3] - nWImg - (15-x), y+n+z )
