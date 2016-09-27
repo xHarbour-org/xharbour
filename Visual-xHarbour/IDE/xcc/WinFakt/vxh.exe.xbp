@@ -24,7 +24,7 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = C:\Users\xHarbour\Google Drive\xHB\Bin\WinFakt 
+TARGETFOLDER = D:\wf-VXH
 
 [..\..\source\vxh1.prg]
 MYC_FLAGS =
@@ -40,7 +40,7 @@ MYPRG_FLAGS =
 MYDEFINES =
 MYRC_FLAGS =
 
-[C:\Users\xHarbour\Google Drive\xHB\Lib\WinFakt\vxh.lib]
+[D:\wf-VXH\vxh.lib]
 
 [..\..\..\Editor\xcc\Editor.lib.xbp]
 

@@ -24,7 +24,7 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 STARTIN =
-TARGETFOLDER = C:\Users\xHarbour\Google Drive\xHB\Lib\WinFakt
+TARGETFOLDER = D:\wf-VXH
 
 [..\..\source\*.prg]
 MYC_FLAGS =
