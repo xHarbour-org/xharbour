@@ -15,7 +15,7 @@ MAPFILE =
 MYC_FLAGS =
 MYDEFINES = VXH ;VXH_ADS; VXH_ENTERPRISE; d_WinFakt
 MYLINK_FLAGS =
-MYPRG_FLAGS = -es2 -gc0 -n1 -q -w2 -P
+MYPRG_FLAGS = -es2 -gc0 -n1 -p -q -w2
 MYRC_FLAGS =
 MYSLY_FLAGS =
 OUTPUTFOLDER = C:\xbp\wf\VXH.LIB
@@ -24,7 +24,7 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 STARTIN =
-TARGETFOLDER = C:\Users\xHarbour\Google Drive\xHB\Lib\WinFakt
+TARGETFOLDER = C:\WinFakt.GIT\Build\xHB\Lib
 
 [..\..\source\*.prg]
 MYC_FLAGS =
