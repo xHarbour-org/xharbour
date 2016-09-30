@@ -562,8 +562,8 @@ METHOD Init() CLASS IDE_MainForm
 
    ::Left    := ::Application:IniFile:ReadNumber( "Position", "Left", 0 )+rc:Left
    ::Top     := ::Application:IniFile:ReadNumber( "Position", "Top", 0 )
-   ::Width   := ::Application:IniFile:ReadNumber( "Position", "Width", 800 )
-   ::Height  := ::Application:IniFile:ReadNumber( "Position", "Height", 600 )
+   ::Width   := ::Application:IniFile:ReadNumber( "Position", "Width", 1024 )
+   ::Height  := ::Application:IniFile:ReadNumber( "Position", "Height", 768 )
    ::Icon    := {, "AMAIN" }
 
    WITH OBJECT ::ToolTip
@@ -2075,7 +2075,7 @@ METHOD Init() CLASS IDE_MainForm
 
    END
 
-   ::ShowMode:= ::Application:IniFile:ReadNumber( "Position", "Show", SW_SHOWMAXIMIZED )
+   ::ShowMode:= ::Application:IniFile:ReadNumber( "Position", "Show", SW_SHOW )
    ::Application:Project:ResetQuickOpen()
    ::Show()
 

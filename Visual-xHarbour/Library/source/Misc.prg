@@ -116,3 +116,19 @@ METHOD Create( ncKey, cKey ) CLASS Registry
       AADD( ::aKeys, hKey )
    ENDIF
 RETURN lRet
+
+
+FUNCTION __Proper(cStr)
+   local n,ch,nLen
+   local c:=""
+   local l:=.T.
+   //cStr:=strtran(lower(alltrim(cStr)),"_"," ")
+   cStr:=lower(alltrim(cStr))
+   nlen:=len(cStr)
+   FOR n:=1 TO nLen
+      ch:=substr(cStr,n,1)
+      c+=if(l,upper(ch),ch)
+      l:=(ch==" ".or.ch=="_")
+   NEXT
+RETURN(c)
+

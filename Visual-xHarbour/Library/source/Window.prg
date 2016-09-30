@@ -4254,20 +4254,6 @@ FUNCTION __asString( x )
    END CASE
 RETURN x
 
-FUNCTION __Proper(cStr)
-   local n,ch,nLen
-   local c:=""
-   local l:=.T.
-   //cStr:=strtran(lower(alltrim(cStr)),"_"," ")
-   cStr:=lower(alltrim(cStr))
-   nlen:=len(cStr)
-   FOR n:=1 TO nLen
-      ch:=substr(cStr,n,1)
-      c+=if(l,upper(ch),ch)
-      l:=(ch==" ".or.ch=="_")
-   NEXT
-RETURN(c)
-
 FUNCTION __DrawSpecialChar( hDC, aRect, nSign, lBold, nPoint )
    //  48 Min
    //  49 Max

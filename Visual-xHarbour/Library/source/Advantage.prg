@@ -312,13 +312,14 @@ METHOD CreateOrder( cOrderBagName, cTag, cKey, cFor, bFor, bWhile, bEval, nEvery
       dbCloseArea( ::Area )
 
       IF ::Connection != NIL
-         IF ! AdsDDRemoveTable( cFileName, 0, ::Connection )
+         IF ! AdsDDRemoveTable( Left(cFileName,len(cFileName)-4), 0, ::Connection )
             view AdsGetLastError()
+            RETURN NIL
          ENDIF
+         AdsDDRemoveIndexFile( Left(cFileName,len(cFileName)-4), cFileName, 0, ::Connection )
 
          IF hFTConnection == NIL
             IF ! AdsConnect60( cPath, , , , , @hFTConnection )
-               view AdsGetLastError()
                RETURN NIL
             ENDIF
          ELSE

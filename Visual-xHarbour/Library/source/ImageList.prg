@@ -299,8 +299,7 @@ METHOD DrawIndirect( hDC, nIndex, x, y, xBmp, yBmp, lDisabled, nFlags, nRop ) CL
    ildp:yBitmap := yBmp
    ildp:dwRop   := nRop
 
-   ImageListDrawIndirect( ildp )
-RETURN SELF
+RETURN ImageListDrawIndirect( ildp )
 
 //----------------------------------------------------------------------------------------------------
 

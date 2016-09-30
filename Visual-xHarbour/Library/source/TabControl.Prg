@@ -710,7 +710,7 @@ RETURN 0
 
 //-----------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
-   LOCAL nSel, lAllow, nOldSel, oCurPage, oSelPage, aRect
+   LOCAL nSel, lAllow, nOldSel, oCurPage, oSelPage, aRect, h
    (nwParam, nlParam)
    DO CASE
       CASE hdr:code == NM_CLICK
@@ -762,13 +762,17 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
                  ENDIF
                  IF GetFocus() != ::hWnd
 
-                    IF oCurPage:LastFocus != NIL
+                    IF oCurPage:LastFocus != NIL .AND. oCurPage:LastFocus:Parent:hWnd == oCurPage:hWnd
                        oCurPage:LastFocus:SetFocus(.T.)
                        IF oCurPage:LastFocus:ClsName == "DataGrid"
                           oCurPage:LastFocus:InvalidateRect(, .F.)
                        ENDIF
-                     ELSEIF !EMPTY( oCurPage:Children )
-                       oCurPage:Children[1]:SetFocus( .T. )
+                    ELSEIF ! Empty( oCurPage:Children )
+                       IF ( h := GetNextDlgTabItem( oCurPage:hWnd ) ) <> 0
+                          SetFocus(h)
+                       ELSE
+                          oCurPage:Children[1]:SetFocus( .T. )
+                       ENDIF
                     ENDIF
 
                  ENDIF

@@ -1565,13 +1565,13 @@ FUNCTION __DrawDnArrow( hDC, aRect, lUp )
    SelectObject(hDC,GetStockObject(BLACK_PEN))
    hOld:=SelectObject(hDC,GetStockObject(BLACK_BRUSH))
    nM:=((nRight+nLeft)/2)
-   nL:=(nM-2)
-   nR:=(nM+2)
+   nL:=(nM-1)
+   nR:=(nM+1)
    nT:=nTop+((nBottom-nTop)/2)
    IF lUp
       _Polygon(hDC,{ {nL-2,nT+2},{nR+2,nT+2},{nM,nT-2} })
     ELSE
-      _Polygon(hDC,{ {nL-2,nT-2},{nR+2,nT-2},{nM,nT+2} })
+      _Polygon(hDC,{ {nL-2,nT-2},{nR+2,nT-2},{nM,nT+1} })
    ENDIF
    SelectObject(hDC,hOld)
 RETURN NIL

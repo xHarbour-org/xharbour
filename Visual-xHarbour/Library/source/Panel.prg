@@ -23,6 +23,8 @@ CLASS Panel FROM TitleControl
    PROPERTY HorzScrollSize SET ::__SetHorzScrollSize(v) DEFAULT 0
    PROPERTY ImageList      GET __ChkComponent( Self, @::xImageList )
 
+   ACCESS bChanged INLINE ::Parent:bChanged
+
    DATA oLastFocus EXPORTED
 
    DATA ImageIndex PROTECTED
