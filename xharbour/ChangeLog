@@ -9,6 +9,10 @@
 */
 
 
+2016-08-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * contrib/rdd_ads/ads1.c
+     ! sinc DBOI_ISDESC correction with harbour
+     
 2016-08-15 17:04 UTC-0400 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * bin/bld.bat
      + Added test for error level after prg compilation
