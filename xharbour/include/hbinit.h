@@ -61,36 +61,16 @@
 
 HB_EXTERN_BEGIN
 
-extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 
-#if defined( __EXPORT__ ) && defined( __cplusplus ) && defined( _MSC_VER ) && ( _MSC_VER < 1400 )
-   #if !defined( HB_STATIC_STARTUP )
-      #define HB_STATIC_STARTUP
-   #endif
-#endif
+extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, ULONG ulID, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 
-#if defined( _MSC_VER ) && \
-    !defined( __LCC__ ) && !defined( __POCC__ ) && !defined( __XCC__ ) && \
-    !defined(HARBOUR_STRICT_ANSI_C) && !defined(HB_STATIC_STARTUP) && \
-    !defined( HB_PRAGMA_STARTUP ) && !defined( HB_MSC_STARTUP )
+#define HB_INIT_SYMBOLS_END( func ) HB_INIT_SYMBOLS_EX_END( func, __FILE__, 0L, HB_PCODE_VER )
 
-   /* In order to maintain compatibility with other products, MSVC should
-      always use this startup.  If you know that you can use HB_STATIC_STARTUP
-      below, then all you need to do is define HB_STATIC_STARTUP to the
-      compiler.
-
-      Sat 07 Maj 2005 02:46:38 CEST
-      This is only necessary when you want to create binary libs using
-      MSC in C++ mode (-TP switch) and later this binaries will be linked
-      by standard C linker with [x]Harbour programs. I strongly suggest
-      to for 3-rd party developers to use MSC in standard C mode to create
-      libraries which can be used with standard C compilers. This will
-      eliminate the problem and we will be able to set C++ initialization
-      as default for MSC in C++ mode. Druzus.
-   */
-
-   #define HB_MSC_STARTUP
-
+/* By default in all C++ builds use static vars initialization as startup code */
+#if defined( __cplusplus ) && !defined( HB_STATIC_STARTUP ) && \
+    !defined( HB_PRAGMA_STARTUP ) && !defined( HB_GNUC_STARTUP ) && \
+    !defined( HB_INITSEG_STARTUP ) && !defined( HB_DATASEG_STARTUP )
+   #define HB_STATIC_STARTUP
 #endif
 
 
@@ -104,27 +84,27 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) \
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
       }; \
       static PHB_SYMB symbols; \
       void func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
          pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      func( void ) \
+      void func( void ) \
       {
 
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
-#elif defined( __GNUC__ )
+#elif defined( HB_STATIC_STARTUP )
 
-   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_MSC_STARTUP )
+   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_DATASEG_STARTUP )
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
@@ -133,101 +113,9 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) \
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
       }; \
-      static PHB_SYMB symbols; \
-      static void __attribute__ ((constructor)) func( void ) \
-      { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
-         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
-         symbols = pModuleSymbols->pSymbolTable; \
-         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
-      }
-
-   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static void __attribute__ ((constructor)) func( void ) \
-      {
-
-   #define HB_CALL_ON_STARTUP_END( func ) \
-      }
-
-#elif defined( HB_MSC_STARTUP )
-
-   #if defined( HB_PRAGMA_STARTUP )
-      #error Wrong macros set for startup code - clean your make/env settings.
-   #endif
-
-   #define HB_DATASEG_STARTUP
-
-   typedef int (* HB_$INITSYM)( void );
-
-   #if _MSC_VER >= 1010
-      #define HB_STARTUP_SEGMENT ".CRT$XIY"
-   #else
-      #define HB_STARTUP_SEGMENT "XIY"
-   #endif
-
-   #define HB_INIT_SYMBOLS_BEGIN( func ) \
-      static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn; \
-      static HB_SYMB symbols_table[] = {
-
-   #define HB_INIT_SYMBOLS_END( func ) \
-      }; \
-      static PHB_SYMB symbols; \
-      static int func( void ) \
-      { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
-         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
-         symbols = pModuleSymbols->pSymbolTable; \
-         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
-         return 0; \
-      }
-
-   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static int func( void ) \
-      {
-
-   #define HB_CALL_ON_STARTUP_END( func ) \
-         return 0; \
-      }
-
-   #define HB_DATASEG_FUNC( func )     HB_DATASEG_FUNC_( func )
-   #define HB_DATASEG_FUNC_( func ) \
-      static HB_$INITSYM _s_init_func_##func = func;
-
-   /*  After each '_END' symbol, additional 'hooks' are required See the C
-       output of a generated prg for example
-   */
-
-#elif defined( HB_STATIC_STARTUP ) || defined( __cplusplus )
-
-   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_MSC_STARTUP )
-      #error Wrong macros set for startup code - clean your make/env settings.
-   #endif
-
-   #define HB_INIT_SYMBOLS_BEGIN( func ) \
-      static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn; \
-      static HB_SYMB symbols_table[] = {
-
-   /* this allows any macros to be preprocessed first
-      so that token pasting is handled correctly */
-   #define HB_INIT_SYMBOLS_END( func ) \
-          _HB_INIT_SYMBOLS_END( func )
-
-   #define _HB_INIT_SYMBOLS_END( func ) \
-      }; \
-      static PHB_SYMB symbols; \
-      static int func( void ) \
-      { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
-         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
-         symbols = pModuleSymbols->pSymbolTable; \
-         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
-         return 0; \
-      } \
-      static int DUMMY_RegisterSymbols_##func = func();
+      static PHB_SYMB symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) \
@@ -241,14 +129,81 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
    #define _HB_CALL_ON_STARTUP_END( func ) \
          return 0; \
       } \
-      static int DUMMY_CallOnStart_##func = func();
+      static int static_int_##func = func();
 
-#elif defined( HB_PRAGMA_STARTUP ) || \
-      defined( __BORLANDC__ ) || defined( __LCC__ ) || defined( __POCC__ ) || defined( __XCC__ )
+#elif defined( HB_INITSEG_STARTUP )
 
-   #if defined( HB_MSC_STARTUP )
+   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_DATASEG_STARTUP )
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn; \
+      static HB_SYMB symbols_table[] = {
+
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
+      }; \
+      static PHB_SYMB symbols; \
+      HB_CALL_ON_STARTUP_BEGIN( func ) \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+      HB_CALL_ON_STARTUP_END( func )
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      HB_EXTERN_BEGIN \
+      static void func( void ) \
+      {
+
+   #define HB_CALL_ON_STARTUP_END( func ) \
+      } \
+      HB_INIT_FUNCTION_REF( func ) \
+      HB_EXTERN_END \
+      asm ( ".section .init\n\tcall " HB_MACRO2STRING( func ) "\n\t.section .text\n\t" );
+
+
+   #define HB_INIT_FUNCTION_REF( func )    \
+      extern void * func##_ref_( void ); \
+      void * func##_ref_( void ) \
+      { \
+         return ( void * ) func; \
+      }
+
+#elif defined( HB_GNUC_STARTUP ) || \
+      defined( __GNUC__ ) || defined( __SUNPRO_C ) || defined( __SUNPRO_CC )
+
+   #if defined( HB_PRAGMA_STARTUP ) || defined( HB_DATASEG_STARTUP )
+      #error Wrong macros set for startup code - clean your make/env settings.
+   #endif
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn; \
+      static HB_SYMB symbols_table[] = {
+
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
+      }; \
+      static PHB_SYMB symbols; \
+      static void __attribute__ ((constructor)) func( void ) \
+      { \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static void __attribute__ ((constructor)) func( void ) \
+      {
+
+   #define HB_CALL_ON_STARTUP_END( func ) \
+      }
+
+#elif defined( HB_PRAGMA_STARTUP ) || \
+      defined( __BORLANDC__ ) || defined( __LCC__ ) || \
+      defined( __POCC__ ) || defined( __XCC__ )
 
    #if !defined( HB_PRAGMA_STARTUP )
       #define HB_PRAGMA_STARTUP
@@ -259,12 +214,12 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) \
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
       }; \
       static PHB_SYMB symbols; \
       static void func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
          pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
@@ -277,6 +232,51 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
+#elif defined( _MSC_VER )
+
+   #define HB_DATASEG_STARTUP
+
+   #if _MSC_VER >= 1010
+      #define HB_STARTUP_SEGMENT    ".CRT$XIY"
+   #else
+      #define HB_STARTUP_SEGMENT    "XIY"
+   #endif
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn; \
+      static HB_SYMB symbols_table[] = {
+
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
+      }; \
+      static PHB_SYMB symbols; \
+      static int func( void ) \
+      { \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+         return 0; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static int func( void ) \
+      {
+
+   #define HB_CALL_ON_STARTUP_END( func ) \
+         return 0; \
+      }
+
+   typedef int (* HB_$INITSYM)( void );
+
+   #define HB_DATASEG_FUNC( func )     HB_DATASEG_FUNC_( func )
+   #define HB_DATASEG_FUNC_( func ) \
+      static HB_$INITSYM _s_init_func_##func = func;
+
+   /*  After each '*_END' symbol, additional 'hooks' are required
+    *  See the C output of a generated prg for example
+    */
+
 #elif defined( __WATCOMC__ )
 
    #if defined( HB_PRAGMA_STARTUP )
@@ -288,12 +288,12 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) \
+   #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
       }; \
       static PHB_SYMB symbols; \
       static void func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
          pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \

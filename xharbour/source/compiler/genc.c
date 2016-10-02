@@ -42,7 +42,7 @@ extern void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 extern void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
 
 static void hb_compGenCInLine( FILE * );
-static void hb_writeEndInit( FILE * yyc, const char * szModuleName );
+static void hb_writeEndInit( FILE * yyc, const char * szModuleName, const char * szSourceFile );
 static void hb_compGenCAddProtos( FILE * yyc );
 
 // AJ: 2004-02-05
@@ -56,6 +56,7 @@ static void hb_compWriteGlobalFunc( FILE * yyc, short * iLocalGlobals, short * i
 static void hb_compWriteDeclareGlobal( FILE * yyc, short iLocalGlobals );
 static BOOL hb_compWriteExternEntries( FILE * yyc, BOOL bSymFIRST, BOOL, BOOL, const char * szModuleName );
 static void hb_compWritePragma( FILE * yyc, const char * szPrefix, const char * szModuleName );
+extern void hb_gencc_string_put( FILE * yyc, BYTE * pText, HB_SIZE usLen );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
 {
@@ -1118,7 +1119,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       /*
          End of initializaton codes
        */
-      hb_writeEndInit( yyc, szModuleName );
+      hb_writeEndInit( yyc, szModuleName,hb_comp_PrgFileName );
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __begin__ ){}\n\n" );
@@ -1265,7 +1266,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          hb_compGenCAddProtos( yyc );
 
          if( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE, szModuleName ) )
-            hb_writeEndInit( yyc, szModuleName );
+            hb_writeEndInit( yyc, szModuleName,hb_comp_PrgFileName  );
       }
 
       if( bInline )
@@ -1515,8 +1516,9 @@ static void hb_compGenCAddProtos( FILE * yyc )
    }
 }
 
-static void hb_writeEndInit( FILE * yyc, const char * szModuleName )
+static void hb_writeEndInit( FILE * yyc, const char * szModuleName, const char * szSourceFile )
 {
+/*	
    fprintf( yyc,
 #ifdef BROKEN_MODULE_SPACE_LOGIC
             ",\n"
@@ -1526,6 +1528,21 @@ static void hb_writeEndInit( FILE * yyc, const char * szModuleName )
             "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n",
             hb_comp_szPrefix, szModuleName );
    hb_compWritePragma( yyc, hb_comp_szPrefix, szModuleName );
+*/
+   fprintf( yyc, "\nHB_INIT_SYMBOLS_EX_END( hb_vm_SymbolInit_%s%s, ",
+                 hb_comp_szPrefix, szModuleName );
+   //hb_gencc_string_put( yyc, ( BYTE * ) szSourceFile, strlen( szSourceFile ) );
+   fprintf( yyc, "__PRG_SOURCE__, 0x%lx, 0x%04x )\n\n", 0L, HB_PCODE_VER );
+
+   fprintf( yyc, "#if defined( HB_PRAGMA_STARTUP )\n"
+                 "   #pragma startup hb_vm_SymbolInit_%s%s\n"
+                 "#elif defined( HB_DATASEG_STARTUP )\n"
+                 "   #define HB_DATASEG_BODY    HB_DATASEG_FUNC( hb_vm_SymbolInit_%s%s )\n"
+                 "   #include \"hbiniseg.h\"\n"
+                 "#endif\n\n",
+                 hb_comp_szPrefix, szModuleName,
+                 hb_comp_szPrefix, szModuleName );
+   
 }
 
 /*

@@ -136,7 +136,7 @@ void hb_stackInit( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_stackInit()" ) );
 
-   hb_vmProcessSymbols( &s_initSymbol, 1, __FILE__, ( int ) HB_PCODE_VER, NULL );
+   hb_vmProcessSymbols( &s_initSymbol, 1, "estack.c", 0, ( int ) HB_PCODE_VER, NULL );
 
 #ifndef HB_THREAD_SUPPORT
    hb_stack_init( &hb_stackST );

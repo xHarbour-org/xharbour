@@ -8,10 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-10-02 15:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * include/hbapi.h
+      * Added new functions borrow from harbour
+   * include/hbinit.h
+     * updated to allow new gcc to compile borrow ideia from harbour 
+   * include/hbvm.h
+     ! Added ULONG ulId to the follow functions : hb_vmProcessSymbols, hb_vmProcessSysDllSymbols, hb_vmProcessPrgDllSymbols,hb_vmProcessExeUsesDllSymbols
+   * include/hbvmpub.h      
+     ! added ULONG    ulID; to SYMBOLS structure borrow from harbour
+     ! Added ULONG ulId to the follow function : hb_vmRegisterSymbols
+   * source/common/hbstr.c
+     ! Added new functions HB_NTOC borrow from harbour    
+   * source/compiler/genc.c   
+     ! changed to generate the new HB_INIT_SYMBOLS_EX_END
+   * source/rtl/hbntos.c
+     ! added new function 
+   * source/vm/hvm.c     
+     ! updated the follow functions to use the new parameter ULONG ulId: hb_vmProcessSymbols, hb_vmProcessSysDllSymbols, 
+       hb_vmProcessPrgDllSymbols,hb_vmProcessExeUsesDllSymbols and hb_vmRegisterSymbols
+   * source/vm/estack.c 
+   * source/vm/initsymb.c
+   * source/vm/maindlle.c
+   * source/vm/maindllh.c
+   * source/vm/maindllp.c
+   * source/vm/runner.c
+   * source/vm/usedll.c
+     ! updated to reflect the change on   hb_vmProcessSymbols
 
-2016-08-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+
+2016-09-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    * contrib/rdd_ads/ads1.c
      ! sinc DBOI_ISDESC correction with harbour
+   * contrib/rdd_ads/rddads.h
+     ! minor updates
      
 2016-08-15 17:04 UTC-0400 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * bin/bld.bat

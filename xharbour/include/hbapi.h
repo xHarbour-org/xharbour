@@ -725,12 +725,15 @@ extern HB_EXPORT char *    hb_strncpy( char * pDest, const char * pSource, HB_SI
 extern HB_EXPORT char *    hb_strncat( char * pDest, const char * pSource, HB_SIZE ulLen ); /* copy at most ulLen-strlen(pDest) bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
 extern HB_EXPORT char *    hb_strncpyTrim( char * pDest, const char * pSource, HB_SIZE ulLen );
 extern HB_EXPORT char *    hb_strncpyUpper( char * pDest, const char * pSource, HB_SIZE ulLen ); /* copy an existing string buffer to another buffer, as upper case */
+extern HB_EXPORT char *    hb_strncpyLower( char * pDest, const char * pSource, HB_SIZE nLen ); /* copy an existing string buffer to another buffer, as lower case */
 extern HB_EXPORT char *    hb_strncpyUpperTrim( char * pDest, const char * pSource, HB_SIZE ulLen );
 extern HB_EXPORT double    hb_strVal( const char * szText, HB_SIZE ulLen ); /* return the numeric value of a character string representation of a number */
+extern HB_EXPORT HB_MAXINT hb_strValInt( const char * szText, int * iOverflow );
 extern HB_EXPORT const char *    hb_strLTrim( const char * szText, HB_SIZE * ulLen ); /* return a pointer to the first non-white space character */
 extern HB_EXPORT HB_SIZE   hb_strRTrimLen( const char * szText, HB_SIZE ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 extern HB_EXPORT char *    hb_strRemEscSeq( char * szText, HB_SIZE * ulLen ); /* remove C ESC sequences and converts them to Clipper chars */
-
+extern HB_EXPORT char *    hb_numToStr( char * szBuf, HB_SIZE nSize, HB_MAXINT nNumber );
+extern HB_EXPORT char *    hb_dblToStr( char * szBuf, HB_SIZE nSize, double dNumber, int iMaxDec );
 extern HB_EXPORT double    hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 extern HB_EXPORT double    hb_numInt( double dNum ); /* take the integer part of the number */
 extern HB_EXPORT double    hb_numDecConv( double dNum, int iDec );

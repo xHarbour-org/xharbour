@@ -9709,19 +9709,20 @@ BOOL hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols,
    return FALSE;
 }
 
-static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, const char * szModuleName )
+static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, const char * szModuleName, ULONG ulID )
 {
    PSYMBOLS       pLastSymbols = s_pSymbols;
    PHB_SYMB       pModuleSymbols;
    register UINT  ui;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_vmFindFreeModule(%p,%hu,%s)", pSymbols, uiSymbols, szModuleName ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmFindFreeModule(%p,%hu,%s,%lu)", pSymbols, uiSymbols, szModuleName, ulID ) );
 
    if( s_ulFreeSymbols )
    {
       while( pLastSymbols )
       {
          if( ! pLastSymbols->fActive &&
+             pLastSymbols->ulID == ulID &&
              pLastSymbols->uiModuleSymbols == uiSymbols &&
              pLastSymbols->szModuleName != NULL &&
              strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
@@ -9910,7 +9911,7 @@ void hb_vmExitSymbolGroup( void * hDynLib )
    }
 }
 
-PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM * pGlobals )
+PSYMBOLS    hb_vmRegisterSymbols( PHB_SYMB pSymbolTable   , UINT uiSymbols, const char * szModuleName, ULONG ulID, BOOL fDynLib, BOOL fClone, PHB_ITEM * pGlobals )
 {
    PSYMBOLS       pNewSymbols = NULL;
    PHB_SYMB       pSymbol;
@@ -9932,7 +9933,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
 #endif
 
    if( s_ulFreeSymbols )
-      pNewSymbols = hb_vmFindFreeModule( pSymbolTable, uiSymbols, szModuleName );
+      pNewSymbols = hb_vmFindFreeModule( pSymbolTable, uiSymbols, szModuleName, ulID );
 
    if( pNewSymbols )
    {
@@ -9960,6 +9961,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
       pNewSymbols->pSymbolTable     = pSymbolTable;
       pNewSymbols->uiModuleSymbols  = uiSymbols;
       pNewSymbols->szModuleName     = hb_strdup( szModuleName );
+      pNewSymbols->ulID = ulID;
       pNewSymbols->fAllocated       = fClone;
       pNewSymbols->fActive          = TRUE;
       pNewSymbols->fInitStatics     = FALSE;
@@ -10385,9 +10387,10 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, const char
 }
 
 #if ! defined( HB_NO_DUPLICATE_HVMPROCESSSYMBOL )
-PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulID, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSymbols(%p, %dl )", pSymbols ) );
+   //HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSymbols(%p, %dl )", pSymbols ) );
+     HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p,%hu,%s,%lu,%hu)", pSymbols, uiModuleSymbols, szModule, ulID, iPCodeVer));
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
@@ -10414,14 +10417,15 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const c
    }
 #endif
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_bDynamicSymbols, s_fCloneSym, pGlobals );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, ulID, s_bDynamicSymbols, s_fCloneSym, pGlobals );
 }
 #endif
 
 /* HVM & RTL in harbour.dll */
-PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulID, int iPCodeVer, PHB_ITEM * pGlobals )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessSysDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSysDllSymbols(%p,%hu,%s,%lu,%hu)", pSymbols, uiModuleSymbols, szModule, ulID, iPCodeVer));   
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
@@ -10448,7 +10452,7 @@ PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
    }
 #endif
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, pGlobals );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,  ulID, TRUE, s_fCloneSym, pGlobals );
 }
 
 /*
@@ -10458,12 +10462,13 @@ PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
    will be used to process the prg dll's symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
  */
-PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulID, int iPCodeVer, PHB_ITEM * pGlobals )
 {
    PSYMBOLS pNewSymbols;
    PHB_SYMB pSymStart = s_pSymStart;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+  
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSysDllSymbols(%p,%hu,%s,%lu,%hu)", pSymbols, uiModuleSymbols, szModule, ulID, iPCodeVer));      
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
@@ -10491,7 +10496,7 @@ PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
 #endif
 
    /* s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality. */
-   pNewSymbols = hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
+   pNewSymbols = hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,  ulID, FALSE, s_bDynamicSymbols, pGlobals );
    /* Incase any of the prg dll's sources was *not* compiled with -n0! */
    s_pSymStart = pSymStart;
 
@@ -10505,9 +10510,10 @@ PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, c
    will be used to process the client exe symbols, instead of the vmProcessSymbols() from
    maindllh.c which is a wrapper of vmProcessSysDllSymbols() and is included in harbour.dll
  */
-PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals )
+PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulID, int iPCodeVer, PHB_ITEM * pGlobals )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols ) );
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p,%hu,%s,%lu,%hu)", pSymbols, uiModuleSymbols, szModule, ulID, iPCodeVer));         
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
@@ -10535,7 +10541,7 @@ PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 #endif
 
    /* s_bDynamicSymbols used instead of TRUE, because we still want to support that functionality. */
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, FALSE, s_bDynamicSymbols, pGlobals );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, ulID, FALSE, s_bDynamicSymbols, pGlobals );
 }
 
 PSYMBOLS * hb_vmSymbols( void )

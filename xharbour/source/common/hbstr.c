@@ -859,6 +859,177 @@ HB_LONG hb_strValInt( const char * szText, int * iOverflow )
    return lVal;
 }
 
+char * hb_numToStr( char * szBuf, HB_SIZE nSize, HB_MAXINT lNumber )
+{
+   int iPos = ( int ) nSize;
+   BOOL fNeg = FALSE;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_numToStr(%p, %" HB_PFS "u, %" PFHL "i)", szBuf, nSize, lNumber ) );
+
+   szBuf[ --iPos ] = '\0';
+   if( lNumber < 0 )
+   {
+      fNeg = TRUE;
+      lNumber = -lNumber;
+   }
+
+   while( --iPos >= 0 )
+   {
+      szBuf[ iPos ] = '0' + ( char ) ( lNumber % 10 );
+      lNumber /= 10;
+      if( lNumber == 0 )
+         break;
+   }
+   if( fNeg && --iPos >= 0 )
+      szBuf[ iPos ] = '-';
+
+   if( iPos > 0 )
+      memset( szBuf, ' ', iPos );
+   else if( iPos < 0 )
+   {
+      memset( szBuf, '*', nSize - 1 );
+      iPos = 0;
+   }
+
+   return &szBuf[ iPos ];
+}
+
+/* if you want to be sure that size of buffer is enough to hold each
+   double number with '\0' terminating character then it should have
+   at least HB_MAX_DOUBLE_LENGTH bytes. If buffer is not large enough
+   then NULL is returned */
+char * hb_dblToStr( char * szBuf, HB_SIZE nSize, double dNumber, int iMaxDec )
+{
+   double dInt, dFract, dDig, doBase = 10.0;
+   int iLen, iPos, iPrec;
+   char * szResult;
+   BOOL fFirst;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dblToStr(%p, %" HB_PFS "u, %f, %d)", szBuf, nSize, dNumber, iMaxDec ) );
+
+   iLen = ( int ) ( nSize - 1 );
+   if( iLen <= 0 )
+      return NULL;
+#ifdef HB_NUM_PRECISION
+   iPrec = HB_NUM_PRECISION;
+#else
+   iPrec = 16;
+#endif
+   szResult = szBuf;
+   if( dNumber < 0 )
+   {
+      dFract = modf( -dNumber, &dInt );
+      if( --iLen == 0 )
+      {
+         if( dInt < 1 && dFract < 0.5 )
+         {
+            szBuf[ 0 ] = '0';
+            szBuf[ 1 ] = '\0';
+            return szBuf;
+         }
+         return NULL;
+      }
+      *szBuf++ = '-';
+   }
+   else
+      dFract = modf( dNumber, &dInt );
+
+   iPos = iLen;
+   do
+   {
+      if( iPos == 0 )
+         return NULL;
+      dDig = modf( dInt / doBase + 0.01, &dInt ) * doBase;
+      szBuf[ --iPos ] = '0' + ( char ) ( dDig + 0.01 );
+   }
+   while( dInt >= 1 );
+   if( iPos > 0 )
+      memmove( szBuf, szBuf + iPos, HB_MIN( iLen - iPos, iPrec + 1 ) );
+   iPos = iLen - iPos;
+
+   fFirst = iPos > 1 || szBuf[ 0 ] != '0';
+   if( fFirst )
+   {
+      if( iPos >= iPrec )
+      {
+         fFirst = iPos == iPrec ? dFract >= 0.5 : szBuf[ iPrec ] >= '5';
+         if( iPrec < iPos )
+            memset( szBuf + iPrec , '0', iPos - iPrec );
+         if( fFirst )
+         {
+            for( ;; )
+            {
+               if( --iPrec < 0 )
+               {
+                  if( iPos == iLen )
+                     return NULL;
+                  memmove( szBuf + 1, szBuf, iPos );
+                  *szBuf = '1';
+                  ++iPos;
+                  break;
+               }
+               if( szBuf[ iPrec ] != '9' )
+               {
+                  ++szBuf[ iPrec ];
+                  break;
+               }
+               szBuf[ iPrec ] = '0';
+            }
+         }
+         iPrec = 0;
+      }
+      else
+         iPrec -= iPos;
+   }
+
+   if( iPrec > 0 && iLen - iPos > 1 && iMaxDec != 0 && dFract > 0 )
+   {
+      int iDec = iPos;
+
+      szBuf[ iPos ] = '.';
+      while( ++iPos < iLen && iPrec > 0 && iMaxDec-- != 0 )
+      {
+         dFract = modf( dFract * doBase, &dDig );
+         szBuf[ iPos ] = '0' + ( char ) ( dDig + 0.01 );
+         if( szBuf[ iPos ] != '0' )
+            fFirst = TRUE;
+         if( fFirst )
+            --iPrec;
+      }
+      if( dFract > ( iPrec > 0 ? 0.5 - hb_numPow10( -iPrec ) : 0.2 ) )
+      {
+         iPrec = iPos;
+         for( ;; )
+         {
+            if( --iPrec < 0 )
+            {
+               memmove( szBuf + 1, szBuf, iPos );
+               *szBuf = '1';
+               if( iPos < iLen )
+                  ++iPos;
+               ++iDec;
+               break;
+            }
+            if( iPrec == iDec )
+               --iPrec;
+            if( szBuf[ iPrec ] != '9' )
+            {
+               ++szBuf[ iPrec ];
+               break;
+            }
+            szBuf[ iPrec ] = '0';
+         }
+      }
+      while( iPos > iDec && szBuf[ iPos - 1 ] == '0' )
+         --iPos;
+      if( szBuf[ iPos - 1 ] == '.' )
+         --iPos;
+   }
+
+   szBuf[ iPos ] = '\0';
+   return iPos == 1 && *szResult == '-' && *szBuf == '0' ? szBuf : szResult;
+}
+
 /*
  * This function copies szText to destination buffer.
  * NOTE: Unlike the documentation for strncpy, this routine will always append
@@ -874,9 +1045,6 @@ char * hb_strncpy( char * pDest, const char * pSource, HB_SIZE ulLen )
 
    while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
       ulLen--;
-
-   while( ulLen-- )
-      *pDest++ = '\0';
 
    return pBuf;
 }
@@ -903,12 +1071,29 @@ char * hb_strncat( char * pDest, const char * pSource, HB_SIZE ulLen )
    while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
       ulLen--;
 
-/* if someone will need this then please uncomment the cleaning the rest of
-   buffer. */
-/*
-   while(ulLen--)
-   *pDest++ = '\0';
+   return pBuf;
+}
+/* This function copies and converts szText to lower case.
  */
+/*
+ * NOTE: Unlike the documentation for strncpy, this routine will always append
+ *       a null
+ * pt
+ */
+char * hb_strncpyLower( char * pDest, const char * pSource, HB_SIZE ulLen )
+{
+   char * pBuf = pDest;
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_strncpyLower(%p, %.*s, %" HB_PFS "u)", pDest, ( int ) ulLen, pSource, ulLen ) );
+
+   pDest[ ulLen ] = '\0';
+
+   while( ulLen && ( *pDest++ = ( char ) HB_TOLOWER( ( UCHAR ) *pSource ) ) != '\0' )
+   {
+      ulLen--;
+      pSource++;
+   }
+
    return pBuf;
 }
 
@@ -927,16 +1112,11 @@ char * hb_strncpyUpper( char * pDest, const char * pSource, HB_SIZE ulLen )
 
    pDest[ ulLen ] = '\0';
 
-   /* some compilers implement HB_TOUPPER as a macro, and this has side effects! */
-   /* *pDest++ = HB_TOUPPER( *pSource++ ); */
    while( ulLen && ( *pDest++ = ( char ) HB_TOUPPER( ( UCHAR ) *pSource ) ) != '\0' )
    {
       ulLen--;
       pSource++;
    }
-
-   while( ulLen-- )
-      *pDest++ = '\0';
 
    return pBuf;
 }
@@ -962,10 +1142,6 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
    while( ulSLen && pSource[ ulSLen - 1 ] == ' ' )
       ulSLen--;
 
-   pDest[ ulLen ] = '\0';
-
-   /* some compilers impliment HB_TOUPPER as a macro, and this has side effects! */
-   /* *pDest++ = HB_TOUPPER( *pSource++ ); */
    while( ulLen && ulSLen &&
           ( *pDest++ = ( char ) HB_TOUPPER( ( UCHAR ) *pSource ) ) != '\0' )
    {
@@ -974,8 +1150,7 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
       pSource++;
    }
 
-   while( ulLen-- )
-      *pDest++ = '\0';
+   *pDest = '\0';
 
    return pBuf;
 }
@@ -999,18 +1174,13 @@ char * hb_strncpyTrim( char * pDest, const char * pSource, HB_SIZE ulLen )
    while( ulSLen && pSource[ ulSLen - 1 ] == ' ' )
       ulSLen--;
 
-   pDest[ ulLen ] = '\0';
-
-   /* some compilers impliment HB_TOUPPER as a macro, and this has side effects! */
-   /* *pDest++ = HB_TOUPPER( *pSource++ ); */
    while( ulLen && ulSLen && ( *pDest++ = *pSource++ ) != '\0' )
    {
       ulSLen--;
       ulLen--;
    }
 
-   while( ulLen-- )
-      *pDest++ = '\0';
+   *pDest = '\0';
 
    return pBuf;
 }
@@ -1052,6 +1222,15 @@ char * hb_strRemEscSeq( char * str, HB_SIZE * pLen )
                   break;
                case 'b':
                   ch = '\b';
+                  break;
+               case 'f':
+                  ch = '\f';
+                  break;
+               case 'v':
+                  ch = '\v';
+                  break;
+               case 'a':
+                  ch = '\a';
                   break;
                case '0':
                case '1':
