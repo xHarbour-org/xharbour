@@ -42,7 +42,7 @@ extern void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 extern void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
 
 static void hb_compGenCInLine( FILE * );
-static void hb_writeEndInit( FILE * yyc, const char * szModuleName, const char * szSourceFile );
+static void hb_writeEndInit( FILE * yyc, const char * szModuleName );
 static void hb_compGenCAddProtos( FILE * yyc );
 
 // AJ: 2004-02-05
@@ -1119,7 +1119,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
       /*
          End of initializaton codes
        */
-      hb_writeEndInit( yyc, szModuleName,hb_comp_PrgFileName );
+      hb_writeEndInit( yyc, szModuleName);
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __begin__ ){}\n\n" );
@@ -1266,7 +1266,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          hb_compGenCAddProtos( yyc );
 
          if( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE, szModuleName ) )
-            hb_writeEndInit( yyc, szModuleName,hb_comp_PrgFileName  );
+            hb_writeEndInit( yyc, szModuleName );
       }
 
       if( bInline )
@@ -1516,7 +1516,7 @@ static void hb_compGenCAddProtos( FILE * yyc )
    }
 }
 
-static void hb_writeEndInit( FILE * yyc, const char * szModuleName, const char * szSourceFile )
+static void hb_writeEndInit( FILE * yyc, const char * szModuleName )
 {
 /*	
    fprintf( yyc,

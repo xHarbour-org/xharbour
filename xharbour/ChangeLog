@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-10-03 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * include/hbinit.h
+      * minor adjust to previus commit
+   * source/compiler/genc.c   
+      * minor adjust to previus commit
+      
 2016-10-02 15:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    * include/hbapi.h
       * Added new functions borrow from harbour

@@ -108,14 +108,28 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       #error Wrong macros set for startup code - clean your make/env settings.
    #endif
 
-   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+ #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
       static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
+   /* this allows any macros to be preprocessed first
+      so that token pasting is handled correctly */
    #define HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
+           _HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode )
+
+   #define _HB_INIT_SYMBOLS_EX_END( func, module, id, vpcode ) \
       }; \
-      static PHB_SYMB symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
+      static PHB_SYMB symbols; \
+      static int func( void ) \
+      { \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), (module), (id), (vpcode), HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+         return 0; \
+      } \
+      static int DUMMY_RegisterSymbols_##func = func();
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) \
@@ -129,7 +143,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
    #define _HB_CALL_ON_STARTUP_END( func ) \
          return 0; \
       } \
-      static int static_int_##func = func();
+      static int DUMMY_CallOnStart_##func = func();
 
 #elif defined( HB_INITSEG_STARTUP )
 
