@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-10-04 15:05 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/compiler/hbusage.c
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbrun/hbrun.prg
+  * utils/hbtest/hbtest.prg
+  * winmake/compile.mak
+    ! bump copyright year to 2016
+
 2016-10-03 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    * include/hbinit.h
       * minor adjust to previus commit
