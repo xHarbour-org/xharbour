@@ -25,7 +25,7 @@ PrinterDialog_Form.xfm=
 [Sources]
 Source\cWin32Prn.prg=
 [Binaries]
-C:\xHB\Lib\FreeImage.lib
-C:\xHB\Lib\FreeImage-xHB.lib
+\xHB\Lib\FreeImage.lib
+\xHB\Lib\FreeImage-xHB.lib
 [ExtImages]
 [Resources]
