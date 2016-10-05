@@ -1,0 +1,127 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS PrintPreview_Form2 INHERIT Dialog
+   // Components declaration
+   // User variables definitions
+   VAR lReturn
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD PrintPreview_Form2_OnLoad()
+   METHOD Button1_OnClick()
+   METHOD edtPageNo_OnVertScroll()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "PrintPreview_Form2_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "PrintPreview_Form2"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 368
+   ::Height               := 224
+   ::Text                 := "Goto page"
+   ::AlwaysOnTop          := .T.
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+   ::Icon                 := { "W:\wf-PRG\Level2\VXH\Common Resources\wfH_16x16.ico","_WFH_16X16ICO" }
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS PrintPreview_Form2
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "PictureBox1"
+      WITH OBJECT :Dock
+         :Left                 := "PrintPreview_Form2"
+         :Right                := "PrintPreview_Form2"
+         :Bottom               := "PrintPreview_Form2"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Top                  := 135
+      :Width                := 352
+      :Height               := 50
+      :ImageName            := { "W:\wf-PRG\Level2\VXH\Common Resources\Ribbon.jpg","_RIBBONJPG" }
+      :Stretch              := .T.
+      :Create()
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "Button1"
+         WITH OBJECT :Dock
+            :Top                  := "PictureBox1"
+            :Right                := "PictureBox1"
+            :Margins              := "0,12,12,0"
+         END
+
+         :Left                 := 260
+         :Top                  := 12
+         :Width                := 80
+         :Height               := 25
+         :Text                 := "Ok"
+         :EventHandler[ "OnClick" ] := "Button1_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PICTUREBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      WITH OBJECT :Dock
+         :Left                 := "PrintPreview_Form2"
+         :Top                  := "PrintPreview_Form2"
+         :Right                := "PrintPreview_Form2"
+         :Bottom               := "PrintPreview_Form2"
+         :Margins              := "20,20,20,70"
+      END
+
+      :Left                 := 20
+      :Top                  := 20
+      :Width                := 312
+      :Height               := 95
+      :Text                 := "Goto page"
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 21
+         :Top                  := 42
+         :Width                := 100
+         :Height               := 16
+         :Text                 := "Page no :"
+         :Alignment            := 2
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( MASKEDIT( :this ) )
+         :Name                 := "edtPageNo"
+         :VertScroll           := .T.
+         :Left                 := 126
+         :Top                  := 39
+         :Width                := 103
+         :Height               := 24
+         :Text                 := (0)
+         :Alignment            := 3
+         :FullSelectOnClick    := .T.
+         :AutoHScroll          := .T.
+         :WantReturn           := .T.
+         :Picture              := "99999"
+         :EventHandler[ "OnVertScroll" ] := "edtPageNo_OnVertScroll"
+         :Create()
+      END //MASKEDIT
+
+   END //GROUPBOX
+
+RETURN Self
+
