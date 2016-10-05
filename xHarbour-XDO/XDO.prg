@@ -230,18 +230,16 @@ RETURN oXDO
 
 STATIC FUNCTION EarlyFieldBlock( nField )
 
-Local bBlock
-bBlock := <| Self, xVal|
-Local xReturn
-
-if PCount() == 2
-   xReturn := ( Self:nArea )->( FieldPut( nField, xVal ) )
-else 
-   xReturn := ( Self:nArea )->( FieldGet( nField ) )
-endif   
-RETURN xReturn
->
-
+	LOCAL bBlock
+	
+	bBlock := <| Self, xVal|
+					Local xReturn
+					IF PCount() == 2
+						xReturn := ( Self:nArea )->( FieldPut( nField, xVal ) )
+					ELSE 
+						xReturn := ( Self:nArea )->( FieldGet( nField ) )
+					ENDIF   
+					RETURN xReturn
+				>
+				
 RETURN  bBlock
-//RETURN {|Self, xVal| IIF( PCount() == 2, ( Self:nArea )->( FieldPut( nField, xVal ) ), ( Self:nArea )->( FieldGet( nField ) ) ) }
-//RETURN {|Self, xVal| IIF( PCount() == 2, FieldPut( nField, xVal ), FieldGet( nField ) ) }
