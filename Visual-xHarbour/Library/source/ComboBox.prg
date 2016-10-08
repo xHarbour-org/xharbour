@@ -163,6 +163,7 @@ CLASS ComboBox FROM Control
    METHOD __ComboBoxEditProc()
    METHOD __ResetEdit()
    METHOD __SetSizePos()
+   METHOD OnParentDrawItem()
 ENDCLASS
 
 //--------------------------------------------------------------------------------------------------------------
@@ -171,7 +172,7 @@ METHOD Init( oParent ) CLASS ComboBox
    DEFAULT ::__xCtrlName TO "ComboBox"
    ::ClsName    := "ComboBox"
    ::ThemeName  := "combobox"
-   ::Style      := ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL  | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
+   ::Style      := ( WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_HASSTRINGS | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL  | WS_CLIPCHILDREN | WS_CLIPSIBLINGS )
    ::Super:Init( oParent )
    ::Width      := 100
    ::Height     := 100
@@ -253,6 +254,32 @@ METHOD __ComboBoxEditProc( hWnd, nMsg, nwParam, nlParam ) CLASS ComboBox
          ENDIF
    ENDCASE
 RETURN CallWindowProc( ::__nProcEdit, hWnd, nMsg, nwParam, nlParam )
+
+METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ComboBox
+   LOCAL lSelected, nLen, itemTxt
+   ( nwParam, nlParam )
+   IF dis != NIL .AND. dis:hwndItem == ::hWnd
+      lSelected := (dis:itemState & ODS_SELECTED) != 0
+      IF (dis:itemAction & ODA_DRAWENTIRE) != 0 .OR. (dis:itemAction & ODA_SELECT) != 0
+         SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
+         SetBkColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
+
+         nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
+
+         itemTxt := Space( nLen + 1 )
+         SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
+
+         itemTxt := Left( itemTxt, nLen )
+
+         //DrawText( dis:hDC, itemTxt, dis:rcItem, (DT_VCENTER | DT_SINGLELINE) )
+
+         ExtTextOut( dis:hDC, 5, dis:rcItem:Top, ETO_OPAQUE + ETO_CLIPPED, dis:rcItem, itemTxt )
+      ENDIF
+      IF (dis:itemState & ODS_FOCUS) != 0 .OR. (dis:itemAction & ODA_FOCUS) != 0
+         DrawfocusRect( dis:hDC, dis:rcItem )
+      ENDIF
+   ENDIF
+RETURN Self
 
 //----------------------------------------------------------------------------------------------------------------
 METHOD __SetItemToolTips( lTips ) CLASS ComboBox

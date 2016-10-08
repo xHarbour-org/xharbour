@@ -89,6 +89,10 @@
 #define TMT_BORDERCOLORHINT         3822
 #define TMT_ACCENTCOLORHINT         3823
 
+#ifndef SPI_GETDROPSHADOW
+   #define SPI_GETDROPSHADOW   0x1024
+#endif
+
 #xtranslate CEIL( <x> ) => ( if( <x> - Int( <x> ) > 0 , Int( <x> )+1, Int( <x> ) ) )
 
 CLASS DataGrid INHERIT TitleControl
@@ -157,6 +161,7 @@ CLASS DataGrid INHERIT TitleControl
    ASSIGN AutoUpdate(n)         INLINE ::__nUpdtTimer := n, IIF( n>0, ::SetTimer( 15, n*1000 ), ::KillTimer(15) )
    ACCESS Record                INLINE ::__GetPosition()
    ACCESS IsDelIndexOn          INLINE !EMPTY( ::DataSource ) .AND. ( "DELETED()" IN UPPER( ::DataSource:OrdKey() ) )
+   ACCESS HoverHeader           INLINE ::__SelCol
 
    ACCESS HitTop                INLINE ::DataSource == NIL .OR. ::DataSource:Bof()
    ACCESS HitBottom             INLINE ::DataSource == NIL .OR. ::DataSource:eof()
@@ -310,11 +315,7 @@ CLASS DataGrid INHERIT TitleControl
    METHOD OnItemChanged()
    METHOD OnEraseBkGnd( hDC ) INLINE IIF( LEN( ::Children ) > 0, 1, Super:OnEraseBkGnd( hDC ) )
    METHOD OnHeaderClick()
-   METHOD OnMouseLeave()   INLINE ::Super:OnMouseLeave(),;
-                                  IIF( ::__nHotHeader != NIL, ::Children[ ::__nHotHeader ]:DrawHeader(),),;
-                                  ::__nHotHeader := NIL,;
-                                  IIF( ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0, (::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] ),::__aLastHover[1] := 0 ), )
-
+   METHOD OnMouseLeave()
    METHOD __DrawRepresentation()
    METHOD OnMouseMove()
    METHOD GetPosition()
@@ -415,6 +416,19 @@ METHOD OnGetDlgCode( msg ) CLASS DataGrid
       ENDIF
    ENDIF
 RETURN DLGC_WANTMESSAGE
+
+METHOD OnMouseLeave() CLASS DataGrid
+   ::Super:OnMouseLeave()
+
+   IF ::__nHotHeader != NIL .AND. ! ::__lMouseDown
+      ::Children[ ::__nHotHeader ]:DrawHeader()
+      ::__nHotHeader := NIL
+   ENDIF
+   IF ::__HoverBackColor != NIL .AND. ::__aLastHover[1] > 0
+      ::__DisplayData( ::__aLastHover[1], , ::__aLastHover[1] )
+      ::__aLastHover[1] := 0
+   ENDIF
+RETURN NIL
 
 METHOD __DrawMultiText( hDC, aText, aData, nRight, zLeft, nWImg, nAlign, y, lHeader, nImgAlign, lSelected ) CLASS DataGrid
    LOCAL z, rc, nDif, aAlign, iLen, x, cx, pt := (struct POINT)
@@ -870,6 +884,8 @@ METHOD __SetDataSource( oSource ) CLASS DataGrid
    IF oSource == NIL
       ::__DataWidth := 0
       ::__UpdateHScrollBar( .T., .T. )
+      ::__UpdateVScrollBar( .T., .T. )
+      ::__DisplayData()
    ENDIF
 RETURN Self
 
@@ -1425,7 +1441,7 @@ RETURN Self
 
 //----------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
-   LOCAL nCol, nRow, n, lRes, lDescending, cTag, rc
+   LOCAL nCol, nRow, n, lRes, lDescending, cTag, rc, nShadow
    LOCAL nClickRow, lUpdt := .F.
    LOCAL nClickCol, pt //, lShift, lCtrl, i
    LOCAL lLineChange:=.F.
@@ -1496,8 +1512,12 @@ METHOD OnLButtonDown( nwParam, xPos, yPos ) CLASS DataGrid
                      pt:x := ::Children[::__SelCol]:aSelRect[3]
                      pt:y := ::HeaderHeight
                      ClientToScreen( ::hWnd, @pt )
-                     ::Children[ ::__SelCol ]:DrawHeader()
-                     ::Children[ ::__SelCol ]:HeaderMenu:Show( pt:x, pt:y, (TPM_RIGHTALIGN | TPM_TOPALIGN) )
+
+                     SystemParametersInfo( SPI_GETDROPSHADOW, 0, @nShadow, 0)
+                     ::__lMouseDown := .T.
+                     ::Children[ ::__SelCol ]:DrawHeader(,,,,.T.,.T.)
+                     ::Children[ ::__SelCol ]:HeaderMenu:Show( pt:x+if( nShadow==1, 5, 0 ), pt:y, (TPM_RIGHTALIGN | TPM_TOPALIGN) )
+                     ::__lMouseDown := .F.
                      RETURN NIL
                   ENDIF
                ENDIF
@@ -3755,8 +3775,14 @@ RETURN Self
 
 //----------------------------------------------------------------------------------
 
-METHOD AutoAddColumns( lEdit ) CLASS DataGrid
+METHOD AutoAddColumns( lEdit, aExclude ) CLASS DataGrid
    LOCAL aField, n, oCol, lCol := .F.
+
+   IF VALTYPE( lEdit ) == "A"
+      aExclude := lEdit
+      lEdit := .F.
+   ENDIF
+
    DEFAULT lEdit TO .F.
 
    IF VALTYPE( ::DataSource )=="O" .AND. ::DataSource:IsOpen
@@ -3765,42 +3791,44 @@ METHOD AutoAddColumns( lEdit ) CLASS DataGrid
       FOR n := 1 TO LEN( ::DataSource:Structure )
           aField := ::DataSource:Structure[n]
 
-          oCol := GridColumn( Self )
-          oCol:xText     := __Proper( aField[1] )
+          IF Empty( aExclude ) .OR. ASCAN( aExclude, {|c| Upper(c)==Upper(aField[1])} ) == 0
+             oCol := GridColumn( Self )
+             oCol:xText     := __Proper( aField[1] )
 
-          oCol:FieldPos  := n
+             oCol:FieldPos  := n
 
-          //oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
+             //oCol:Data      := "hb_QSelf():DataSource:Fields:" + aField[1]
 
-          oCol:AllowSize := .T.
-          oCol:AllowDrag := .T.
-          oCol:Create()
-          oCol:Width     := MAX( aField[3], LEN(oCol:xText)+2 )*7
+             oCol:AllowSize := .T.
+             oCol:AllowDrag := .T.
+             oCol:Create()
+             oCol:Width     := MAX( aField[3], LEN(oCol:xText)+2 )*7
 
-          DO CASE
-             CASE aField[2]=="C"
-                  IF lEdit
-                     oCol:Picture := "@k"
-                     oCol:Control := {|o|MaskEdit( o )  }
-                  ENDIF
-             CASE aField[2]=="D"
-                  IF lEdit
-                     oCol:Control := {|o|MaskEdit( o )  }
-                  ENDIF
-                  oCol:Alignment := ALIGN_CENTER
-             CASE aField[2]=="L"
-                  oCol:Width := MAX( 6, LEN(oCol:xText)+2 )*7
-                  oCol:Alignment := ALIGN_CENTER
-             CASE aField[2]=="N"
-                  IF lEdit
-                     oCol:Control := {|o|MaskEdit( o )  }
-                  ENDIF
-                  oCol:Alignment := ALIGN_RIGHT
-          ENDCASE
+             DO CASE
+                CASE aField[2]=="C"
+                     IF lEdit
+                        oCol:Picture := "@k"
+                        oCol:Control := {|o|MaskEdit( o )  }
+                     ENDIF
+                CASE aField[2]=="D"
+                     IF lEdit
+                        oCol:Control := {|o|MaskEdit( o )  }
+                     ENDIF
+                     oCol:Alignment := ALIGN_CENTER
+                CASE aField[2]=="L"
+                     oCol:Width := MAX( 6, LEN(oCol:xText)+2 )*7
+                     oCol:Alignment := ALIGN_CENTER
+                CASE aField[2]=="N"
+                     IF lEdit
+                        oCol:Control := {|o|MaskEdit( o )  }
+                     ENDIF
+                     oCol:Alignment := ALIGN_RIGHT
+             ENDCASE
 
-          IF lEdit
-             oCol:ControlAccessKey := (GRID_CHAR | GRID_LCLICK)
-             oCol:OnSave := {|xData| ::DataSource:Fields:Put( xData, ::System:TypeCast( Alltrim(aField[1], aField[2] ) ) ) }
+             IF lEdit
+                oCol:ControlAccessKey := (GRID_CHAR | GRID_LCLICK)
+                oCol:OnSave := {|xData| ::DataSource:Fields:Put( xData, ::System:TypeCast( Alltrim(aField[1], aField[2] ) ) ) }
+             ENDIF
           ENDIF
       NEXT
       IF ::__lCreated
@@ -4485,12 +4513,8 @@ METHOD DrawHeader( hDC, nLeft, nRight, x, lPressed, lHot, zLeft, nImgAlign, xRig
          hOldPen := NIL
       ENDIF
    ENDIF
-   IF nMenuWidth > 0
+   IF nMenuWidth > 0 .AND. ( lHot .OR. lPressed )
       Rectangle( hMemDC, nRight-nMenuWidth, aRect[2]-1, aRect[3], aRect[4] )
-
-      //nTop  := Int( ( aRect[4] - ::System:ImageList:StdSmall:IconHeight ) / 2 )
-      //::System:ImageList:StdSmall:DrawIndirect( hMemDC, 11, nRight-18, nTop )
-
       __DrawDnArrow( hMemDC, {nRight-nMenuWidth, aRect[2], aRect[3], aRect[4]}, .F. )
    ENDIF
 

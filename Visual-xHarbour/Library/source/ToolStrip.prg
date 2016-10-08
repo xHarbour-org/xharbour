@@ -3235,13 +3235,13 @@ METHOD __AddToolStripItem( cType ) CLASS ContextStrip
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
-METHOD Show( x, y ) CLASS ContextStrip
-   LOCAL nStyle, nRes := 0, rc, pt := (struct POINT)
+METHOD Show( x, y, nStyle ) CLASS ContextStrip
+   LOCAL nRes := 0, rc, pt := (struct POINT)
    LOCAL lpMenuInfo := (struct MENUINFO)
 
    __ReleaseMenu( Self, ::__hMenu )
 
-   nStyle := (TPM_LEFTALIGN | TPM_TOPALIGN)
+   DEFAULT nStyle TO (TPM_LEFTALIGN | TPM_TOPALIGN)
    IF ::DesignMode
       GetWindowRect( ::Application:DesignPage:hWnd, @rc )
       x := ( rc:left + rc:right ) / 2

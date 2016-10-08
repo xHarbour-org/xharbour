@@ -186,8 +186,8 @@ METHOD Create( hParent ) CLASS Control
       IF PtInRect( rc, pt )
          hParent := ::Parent:__oDlg:hWnd
          ::xTop  -= ::Parent:VertScrollTopMargin
-         ::Parent:__oDlg:OriginalRect[4] := Max( ::Top + ::Height, ::Parent:__oDlg:OriginalRect[4] )
-         ::Parent:__oDlg:OriginalRect[3] := Max( ::Left + ::Width, ::Parent:__oDlg:OriginalRect[3] )
+         ::Parent:__oDlg:OriginalRect[4] := Max( ::xTop + ::xHeight + ( (GetSystemMetrics( SM_CYFRAME )*2) + GetSystemMetrics( SM_CYSMCAPTION ) ), ::Parent:__oDlg:OriginalRect[4] )
+         ::Parent:__oDlg:OriginalRect[3] := Max( ::xLeft + ::xWidth + ( GetSystemMetrics( SM_CXFRAME )*2), ::Parent:__oDlg:OriginalRect[3] )
       ENDIF
    ENDIF
    ::Super:Create( hParent )

@@ -21,6 +21,8 @@
 //--------------------------------------------------------------------------------------------------------
 
 CLASS Font
+   CLASSDATA ncm              EXPORTED
+
    DATA EnumQuality EXPORTED INIT { { "Default", "Draft", "Proof", "Non Antialiased", "Antialiased" },;
                                     { DEFAULT_QUALITY, DRAFT_QUALITY, PROOF_QUALITY, NONANTIALIASED_QUALITY, ANTIALIASED_QUALITY, CLEARTYPE_QUALITY } }
 
@@ -53,8 +55,6 @@ CLASS Font
    DATA ClipPrecision    EXPORTED
    DATA PitchAndFamily   EXPORTED
    DATA Shared           EXPORTED INIT .F.
-   DATA ncm              EXPORTED
-   DATA lCreateHandle    EXPORTED INIT .T.
    DATA __IsInstance     EXPORTED INIT .F.
    DATA __ExplorerFilter EXPORTED INIT {;
                                        { "Font Files", "*.ttf;*.fnt;*.fon;*.ttc;*.fot;*.otf" },;
@@ -85,72 +85,78 @@ ENDCLASS
 //--------------------------------------------------------------------------------------------------------
 METHOD Init( oOwner ) CLASS Font
    ::Owner := oOwner
+   IF ::ncm == NIL
+      ::ncm := (struct NONCLIENTMETRICS)
+      ::ncm:cbSize := ::ncm:Sizeof()
+      SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ::ncm:Sizeof(), @::ncm, 0 )
+      ::ncm:lfMessageFont:lfHeight := -12
+   ENDIF
+   ::xFaceName      := ::ncm:lfMessageFont:lfFaceName:AsString()
+   ::xHeight        := ::ncm:lfMessageFont:lfHeight
+
+   ::xWidth         := ::ncm:lfMessageFont:lfWidth
+   ::xEscapement    := ::ncm:lfMessageFont:lfEscapement
+   ::xOrientation   := ::ncm:lfMessageFont:lfOrientation
+   ::xCharSet       := ::ncm:lfMessageFont:lfCharSet
+
+   ::xWeight        := ::ncm:lfMessageFont:lfWeight
+   ::xnItalic       := ::ncm:lfMessageFont:lfItalic
+   ::xnUnderline    := ::ncm:lfMessageFont:lfUnderline
+   ::xnStrikeOut    := ::ncm:lfMessageFont:lfStrikeOut
+
+   ::OutPrecision   := OUT_DEFAULT_PRECIS
+   ::ClipPrecision  := CLIP_DEFAULT_PRECIS
+   ::Quality        := DEFAULT_QUALITY
+   ::PitchAndFamily := ( DEFAULT_PITCH | FF_DONTCARE )
+
+   ::GetPointSize()
+
+   __SetInitialValues( Self )
 RETURN Self
 
 //--------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS Font
-   LOCAL cFont
-
-   ::ncm := (struct NONCLIENTMETRICS)
-   ::ncm:cbSize := ::ncm:Sizeof()
-
-   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ::ncm:Sizeof(), @::ncm, 0 )
+   LOCAL cFont, lf := (struct LOGFONT)
 
    IF ::FaceName != NIL
-      ::ncm:lfMessageFont:lfFaceName:Buffer( ::FaceName )
+      lf:lfFaceName:Buffer( ::FaceName )
+   ELSE
+      lf:lfFaceName := ::ncm:lfMessageFont:lfFaceName
    ENDIF
 
-   cFont := ::ncm:lfMessageFont:lfFaceName:AsString()
-
+   cFont := lf:lfFaceName:AsString()
    IF ::Escapement != 0 .AND. cFont == "MS Sans Serif"
-      ::ncm:lfMessageFont:lfFaceName:Buffer( "Tahoma" )
+      lf:lfFaceName:Buffer( "Tahoma" )
       cFont := "Tahoma"
    ENDIF
 
    IF ::Owner != NIL
       IF ::nUnderline == NIL .AND. ::Owner:__xCtrlName == "LinkLabel"
-         ::ncm:lfMessageFont:lfUnderline := 1
+         lf:lfUnderline := 1
          ::nUnderline := 1
       ENDIF
    ENDIF
 
-   ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height        )
-   ::ncm:lfMessageFont:lfWidth          := IFNIL( ::Width         , ::ncm:lfMessageFont:lfWidth         , ::Width          )
-   ::ncm:lfMessageFont:lfEscapement     := IFNIL( ::Escapement    , ::ncm:lfMessageFont:lfEscapement    , ::Escapement     )
-   ::ncm:lfMessageFont:lfOrientation    := IFNIL( ::Orientation   , ::ncm:lfMessageFont:lfOrientation   , ::Orientation    )
-   ::ncm:lfMessageFont:lfWeight         := IFNIL( ::Weight        , ::ncm:lfMessageFont:lfWeight        , ::Weight         )
-   ::ncm:lfMessageFont:lfItalic         := IFNIL( ::nItalic       , ::ncm:lfMessageFont:lfItalic        , ::nItalic        )
-   ::ncm:lfMessageFont:lfUnderline      := IFNIL( ::nUnderline    , ::ncm:lfMessageFont:lfUnderline     , ::nUnderline     )
-   ::ncm:lfMessageFont:lfStrikeOut      := IFNIL( ::nStrikeOut    , ::ncm:lfMessageFont:lfStrikeOut     , ::nStrikeOut     )
-   ::ncm:lfMessageFont:lfCharSet        := IFNIL( ::CharSet       , ::ncm:lfMessageFont:lfCharSet       , ::CharSet        )
+   lf:lfHeight         := ::Height
+   lf:lfWidth          := ::Width
+   lf:lfEscapement     := ::Escapement
+   lf:lfOrientation    := ::Orientation
+   lf:lfWeight         := ::Weight
+   lf:lfItalic         := ::nItalic
+   lf:lfUnderline      := ::nUnderline
+   lf:lfStrikeOut      := ::nStrikeOut
+   lf:lfCharSet        := ::CharSet
 
-   ::ncm:lfMessageFont:lfOutPrecision   := IFNIL( ::OutPrecision  , OUT_DEFAULT_PRECIS                  , ::OutPrecision   )
-   ::ncm:lfMessageFont:lfClipPrecision  := IFNIL( ::ClipPrecision , CLIP_DEFAULT_PRECIS                 , ::ClipPrecision  )
-   ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
-   ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
+   lf:lfOutPrecision   := ::OutPrecision
+   lf:lfClipPrecision  := ::ClipPrecision
+   lf:lfQuality        := ::Quality
+   lf:lfPitchAndFamily := ::PitchAndFamily
 
-   ::xFaceName     := cFont
+   ::Handle := CreateFontIndirect( lf )
 
-   ::xHeight       := ::ncm:lfMessageFont:lfHeight
-   ::xWidth        := ::ncm:lfMessageFont:lfWidth
-   ::xEscapement   := ::ncm:lfMessageFont:lfEscapement
-   ::xOrientation  := ::ncm:lfMessageFont:lfOrientation
-   ::xCharSet      := ::ncm:lfMessageFont:lfCharSet
-
-   ::xWeight       := ::ncm:lfMessageFont:lfWeight
-   ::xnItalic      := ::ncm:lfMessageFont:lfItalic
-   ::xnUnderline   := ::ncm:lfMessageFont:lfUnderline
-   ::xnStrikeOut   := ::ncm:lfMessageFont:lfStrikeOut
-
-   ::GetPointSize()
-
-   ::Delete()
-   IF ::lCreateHandle
-      ::Handle := CreateFontIndirect( ::ncm:lfMessageFont )
+   IF ::Owner != NIL
+      ::Set()
    ENDIF
-
-   __SetInitialValues( Self )
-
 RETURN Self
 
 METHOD Delete() CLASS Font
@@ -171,7 +177,7 @@ METHOD Set( oOwner ) CLASS Font
    IF oOwner:ClsName != "FontDialog"
       IF oOwner:HasMessage( "SendMessage" )
          oOwner:SendMessage( WM_SETFONT, ::Handle, MAKELPARAM( 1, 0 ) )
-       ELSEIF oOwner:HasMessage( "InvalidateRect" )
+      ELSEIF oOwner:HasMessage( "InvalidateRect" )
          oOwner:InvalidateRect()
       ENDIF
       ::GetPointSize()
@@ -185,23 +191,23 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
    cf:lStructSize := cf:sizeof()
    cf:hwndOwner   := IIF( oOwner != NIL, IIF( VALTYPE(oOwner)=="O", oOwner:hWnd, oOwner ), GetActiveWindow() )
 
-   ::ncm:lfMessageFont:lfFaceName:Buffer( ::FaceName )
-   ::ncm:lfMessageFont:lfHeight         := IFNIL( ::Height        , ::ncm:lfMessageFont:lfHeight        , -::Height         )
-   ::ncm:lfMessageFont:lfWidth          := IFNIL( ::Width         , ::ncm:lfMessageFont:lfWidth         , ::Width          )
-   ::ncm:lfMessageFont:lfEscapement     := IFNIL( ::Escapement    , ::ncm:lfMessageFont:lfEscapement    , ::Escapement     )
-   ::ncm:lfMessageFont:lfOrientation    := IFNIL( ::Orientation   , ::ncm:lfMessageFont:lfOrientation   , ::Orientation    )
-   ::ncm:lfMessageFont:lfCharSet        := IFNIL( ::CharSet       , ::ncm:lfMessageFont:lfCharSet       , ::CharSet        )
+   cf:lpLogFont:lfFaceName:Buffer( ::FaceName )
+   cf:lpLogFont:lfHeight         := -::Height
+   cf:lpLogFont:lfWidth          := ::Width
+   cf:lpLogFont:lfEscapement     := ::Escapement
+   cf:lpLogFont:lfOrientation    := ::Orientation
+   cf:lpLogFont:lfCharSet        := ::CharSet
 
-   ::ncm:lfMessageFont:lfWeight         := IFNIL( ::Weight        , ::ncm:lfMessageFont:lfWeight        , ::Weight         )
-   ::ncm:lfMessageFont:lfItalic         := IFNIL( ::nItalic        , ::ncm:lfMessageFont:lfItalic        , ::nItalic         )
-   ::ncm:lfMessageFont:lfUnderline      := IFNIL( ::nUnderline     , ::ncm:lfMessageFont:lfUnderline     , ::nUnderline      )
-   ::ncm:lfMessageFont:lfStrikeOut      := IFNIL( ::nStrikeOut     , ::ncm:lfMessageFont:lfStrikeOut     , ::nStrikeOut      )
+   cf:lpLogFont:lfWeight         := ::Weight
+   cf:lpLogFont:lfItalic         := ::nItalic
+   cf:lpLogFont:lfUnderline      := ::nUnderlin
+   cf:lpLogFont:lfStrikeOut      := ::nStrikeOu
 
-   ::ncm:lfMessageFont:lfOutPrecision   := IFNIL( ::OutPrecision  , OUT_DEFAULT_PRECIS                  , ::OutPrecision   )
-   ::ncm:lfMessageFont:lfClipPrecision  := IFNIL( ::ClipPrecision , CLIP_DEFAULT_PRECIS                 , ::ClipPrecision  )
-   ::ncm:lfMessageFont:lfQuality        := IFNIL( ::Quality       , DEFAULT_QUALITY                     , ::Quality        )
-   ::ncm:lfMessageFont:lfPitchAndFamily := IFNIL( ::PitchAndFamily, DEFAULT_PITCH + FF_DONTCARE         , ::PitchAndFamily )
-   cf:lpLogFont   := ::ncm:lfMessageFont
+   cf:lpLogFont:lfOutPrecision   := ::OutPrecision
+   cf:lpLogFont:lfClipPrecision  := ::ClipPrecision
+   cf:lpLogFont:lfQuality        := ::Quality
+   cf:lpLogFont:lfPitchAndFamily := ::PitchAndFamily
+
    IF ::Owner != NIL .AND. ::Owner:HasMessage( "ForeColor" )
       cf:rgbColors := ::Owner:ForeColor
    ENDIF
@@ -234,20 +240,6 @@ METHOD Choose( oOwner, lSet, nStyle ) CLASS Font
          ::Quality        := cf:lpLogFont:lfQuality
          ::PitchAndFamily := cf:lpLogFont:lfPitchAndFamily
 
-         ::ncm:lfMessageFont:lfFaceName:Buffer( ::FaceName )
-         ::ncm:lfMessageFont:lfHeight         := ::Height
-         ::ncm:lfMessageFont:lfWidth          := ::Width
-         ::ncm:lfMessageFont:lfEscapement     := ::Escapement
-         ::ncm:lfMessageFont:lfOrientation    := ::Orientation
-         ::ncm:lfMessageFont:lfWeight         := ::Weight
-         ::ncm:lfMessageFont:lfItalic         := ::nItalic
-         ::ncm:lfMessageFont:lfUnderline      := ::nUnderline
-         ::ncm:lfMessageFont:lfStrikeOut      := ::nStrikeOut
-         ::ncm:lfMessageFont:lfCharSet        := ::CharSet
-         ::ncm:lfMessageFont:lfOutPrecision   := ::OutPrecision
-         ::ncm:lfMessageFont:lfClipPrecision  := ::ClipPrecision
-         ::ncm:lfMessageFont:lfQuality        := ::Quality
-         ::ncm:lfMessageFont:lfPitchAndFamily := ::PitchAndFamily
          ::GetPointSize()
       ENDIF
     ELSE
@@ -259,28 +251,26 @@ RETURN cf
 
 METHOD Modify() CLASS Font
    LOCAL lf
-   IF !EMPTY( ::FaceName ) .AND. !::__IsInstance
-      lf := (struct LOGFONT)
-      lf:lfFaceName:Buffer( ::xFaceName )
-      lf:lfHeight         := ::xHeight
-      lf:lfWidth          := ::xWidth
-      lf:lfEscapement     := ::xEscapement
-      lf:lfOrientation    := ::xOrientation
-      lf:lfWeight         := ::xWeight
-      lf:lfItalic         := ::xnItalic
-      lf:lfUnderline      := ::xnUnderline
-      lf:lfStrikeOut      := ::xnStrikeOut
-      lf:lfCharSet        := ::xCharSet
-      lf:lfOutPrecision   := ::OutPrecision
-      lf:lfClipPrecision  := ::ClipPrecision
-      lf:lfQuality        := ::Quality
-      lf:lfPitchAndFamily := ::PitchAndFamily
-
+   IF ::Owner == NIL .OR. ( __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd ) )
       IF ::Delete()
-         IF ::lCreateHandle
-            ::Handle := CreateFontIndirect( lf )
-         ENDIF
-         IF ::Owner != NIL .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
+         lf := (struct LOGFONT)
+         lf:lfFaceName:Buffer( ::xFaceName )
+         lf:lfHeight         := ::xHeight
+         lf:lfWidth          := ::xWidth
+         lf:lfEscapement     := ::xEscapement
+         lf:lfOrientation    := ::xOrientation
+         lf:lfWeight         := ::xWeight
+         lf:lfItalic         := ::xnItalic
+         lf:lfUnderline      := ::xnUnderline
+         lf:lfStrikeOut      := ::xnStrikeOut
+         lf:lfCharSet        := ::xCharSet
+         lf:lfOutPrecision   := ::OutPrecision
+         lf:lfClipPrecision  := ::ClipPrecision
+         lf:lfQuality        := ::Quality
+         lf:lfPitchAndFamily := ::PitchAndFamily
+
+         ::Handle := CreateFontIndirect( lf )
+         IF ::Owner != NIL
             ::Set( ::Owner )
          ENDIF
       ENDIF
@@ -298,9 +288,9 @@ RETURN 1
 //-----------------------------------------------------------------------------
 
 METHOD SetPointSize( n ) CLASS Font
-   LOCAL hDC := CreateCompatibleDC() //GetDC(0)
+   LOCAL hDC := GetDC(0)
    ::Height := -MulDiv( n, GetDeviceCaps( hDC, LOGPIXELSY ), 72 )
-   DeleteDC( hDC )
+   ReleaseDC( 0, hDC )
    ::xPointSize := n
 
    IF ::DesignMode .AND. ::Owner != NIL  .AND. __objHasMsg( ::Owner, "hWnd" ) .AND. IsWindow( ::Owner:hWnd )
@@ -311,11 +301,11 @@ RETURN Self
 
 METHOD GetPointSize() CLASS Font
    LOCAL tm, n, hDC
-   hDC := CreateCompatibleDC()
+   hDC := GetDC(0)
    GetTextMetrics( hDC, @tm )
    IF tm != NIL
       ::xPointSize := MulDiv( ABS( ::Height ) - tm:tmInternalLeading, 72, GetDeviceCaps( hDC, LOGPIXELSY ) ) + 2
    ENDIF
-   DeleteDC( hDC )
+   ReleaseDC( 0, hDC )
 RETURN n
 

@@ -132,3 +132,16 @@ FUNCTION __Proper(cStr)
    NEXT
 RETURN(c)
 
+
+FUNCTION GetDesktopRect()     // Gets full rectangle INCLUDING SECONDARY MONITOR. See also GETDESKTOPWA() in winapiX.c which ONLY gets the WorkArea
+   local aDesktopRect := array(4), hWnd
+   TRY
+      aDesktopRect[1] := GetSystemMetrics(SM_YVIRTUALSCREEN)            // top
+      aDesktopRect[2] := GetSystemMetrics(SM_XVIRTUALSCREEN)
+      aDesktopRect[3] := aDesktopRect[1] + GetSystemMetrics(SM_CYVIRTUALSCREEN) //bottom
+      aDesktopRect[4] := aDesktopRect[2] + GetSystemMetrics(SM_CXVIRTUALSCREEN) // right
+   CATCH
+      hWnd := GetDeskTopWindow()
+      aDesktopRect := _GetWindowRect( hWnd )
+   END
+RETURN aDesktopRect

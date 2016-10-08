@@ -257,6 +257,7 @@ CLASS Window INHERIT Object
    DATA MaxHeight              EXPORTED  INIT 0
 
    DATA SetChildren            EXPORTED  INIT .T.
+   DATA LastEvent              EXPORTED
 
    DATA ClassBrush             EXPORTED  INIT COLOR_BTNFACE+1
    DATA Style                  EXPORTED
@@ -648,6 +649,8 @@ CLASS Window INHERIT Object
    METHOD BeginPaint()
    METHOD EndPaint()
    METHOD GetControl()
+   METHOD IsChildOf()
+
    METHOD OnNCDestroy()
    METHOD OnEraseBkGnd()
    METHOD __CreateBkBrush() VIRTUAL
@@ -694,7 +697,6 @@ METHOD Init( oParent, lInitValues ) CLASS Window
    ENDIF
 
    ::Font := Font( Self )
-   ::Font:Create()
 
    IF ! ( ::ClsName == TOOLTIPS_CLASS )
       ::ToolTip := ToolTip( Self )
@@ -793,6 +795,21 @@ METHOD SaveLayout( cIniFile, cSection ) CLASS Window
    DEFAULT cSection TO "Forms"
    oIni:WriteString( cSection, ::Application:Name + "_" + ::Name, xSTR( ::Left ) + ", " + xSTR( ::Top ) + ", " + xSTR( ::Width ) + ", " + xSTR( ::Height ) )
 RETURN Self
+
+//-----------------------------------------------------------------------------------------------
+METHOD IsChildOf( hWnd ) CLASS Window
+   LOCAL oParent := ::Parent
+
+   WHILE oParent != NIL
+      IF oParent:hWnd == hWnd
+         RETURN .T.
+      ENDIF
+      IF oParent:Parent == NIL
+         EXIT
+      ENDIF
+      oParent := oParent:Parent
+   ENDDO
+RETURN .F.
 
 //-----------------------------------------------------------------------------------------------
 METHOD SetWindowText( cText ) CLASS Window
@@ -973,9 +990,6 @@ METHOD Create( oParent ) CLASS Window
    ::Super:Create()
 
    IF ::__OnInitCanceled
-      IF VALTYPE( ::Font ) == "O" .AND. ! ::Font:Shared
-         ::Font:Destroy()
-      ENDIF
       RETURN NIL
    ENDIF
 
@@ -1118,7 +1132,7 @@ METHOD Create( oParent ) CLASS Window
    ::__ClientRect := { ::Left, ::Top, ::Width, ::Height }
    ::OriginalRect := { ::Left, ::Top, ::ClientWidth, ::ClientHeight }
 
-   ::Font:Set( Self )
+   ::Font:Create()
 
    IF ::Parent != NIL .AND. ::ClsName != TOOLTIPS_CLASS .AND. ::__xCtrlName != "CtrlMask" .AND. ::ClsName != "MDIClient"
       IF ::SetChildren .AND. ( !(::Parent:ClsName == WC_TABCONTROL) .OR. ::__xCtrlName == "TabPage" .OR. ::DesignMode )
@@ -2072,6 +2086,7 @@ METHOD __ControlProc( hWnd, nMsg, nwParam, nlParam ) CLASS Window
 
    IF ( nMess := aScan( aMessages, {|a| a[1] == nMsg} ) ) > 0
       nRet := NIL
+      ::LastEvent := aMessages[nMess][2]
       IF nMsg == WM_INITDIALOG
          ::hWnd := hWnd
          ::PreInitDialog()
@@ -3551,10 +3566,10 @@ METHOD MoveWindow( x, y, w, h, lRep ) CLASS Window
 RETURN Self
 //---------------------------------------------------------------------------------------------
 
-METHOD MessageWait( cText, cTitle, lProgress, cCancel, lMarquee ) CLASS Window
+METHOD MessageWait( cText, cTitle, lProgress, cCancel, lMarquee, nMaxRange ) CLASS Window
    LOCAL oWnd
    DEFAULT lProgress TO .F.
-   oWnd := MessageWait( cText, cTitle, lProgress, cCancel, lMarquee, ::hWnd )
+   oWnd := MessageWait( cText, cTitle, lProgress, cCancel, lMarquee, ::hWnd, nMaxRange )
 RETURN oWnd
 
 //----------------------------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ static __pPicture, hRegion, nWidth, nHeight, hBkBrush
 //static __hText
 
 static aSize
-static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect, s_hParent
+static nSecs, __aCenter, s_lProgress, s_lMarquee, s_cCancel, s_hFont, s_cText, s_hProgress, s_aRect, s_hParent, s_nMaxRange
 static s_lAutoClose
 
 #define SHOWDEBUG
@@ -164,7 +164,7 @@ CLASS MessageWait
    ASSIGN Text(cText)   INLINE ::SetText( cText ), UpdateWindow( ::hWnd )
 
    ACCESS Position      INLINE ::xPosition
-   ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition()
+   ASSIGN Position( n ) INLINE ::xPosition := n, ::SetPosition(n)
 
    ACCESS AutoClose     INLINE s_lAutoClose
    ASSIGN AutoClose(l)  INLINE s_lAutoClose := l
@@ -182,10 +182,10 @@ CLASS MessageWait
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee, hParent ) CLASS MessageWait
+METHOD Init( cText, cTitle, lProgress, cCancel, lMarquee, hParent, nMaxRange ) CLASS MessageWait
    DEFAULT lMarquee TO .F.
    s_lAutoClose := .F.
-   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
+   ::hWnd := __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent, nMaxRange )
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -242,15 +242,15 @@ METHOD SetText( cText ) CLASS MessageWait
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-METHOD SetPosition() CLASS MessageWait
+METHOD SetPosition(n) CLASS MessageWait
    IF ! s_lMarquee
-      SendMessage( s_hProgress, PBM_SETPOS, ::xPosition, 0 )
+      SendMessage( s_hProgress, PBM_SETPOS, n, 0 )
       __GetApplication():DoEvents()
    ENDIF
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------------------------------------------
-FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
+FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent, nMaxRange )
    LOCAL nWidth, nHeight, nStyle, dt, hDC, hWnd, hFont
 
    DEFAULT cText  TO ""
@@ -271,6 +271,7 @@ FUNCTION __MsgWait( cText, cTitle, lProgress, cCancel, lMarquee, hParent )
    s_lProgress := lProgress
    s_lMarquee  := lMarquee
    s_cText     := cText
+   s_nMaxRange := nMaxRange
 
    nStyle := (WS_POPUP | WS_DLGFRAME | WS_CLIPCHILDREN)
 
@@ -369,6 +370,10 @@ FUNCTION __MsgWaitDlgProc( hWnd, nMsg, nwParam )
               IF s_lMarquee
                  SendMessage( s_hProgress, PBM_SETMARQUEE, .T., 30 )
               ENDIF
+              IF s_nMaxRange != NIL
+                 SendMessage( s_hProgress, PBM_SETRANGE, 0, MAKELONG( 0, s_nMaxRange ) )
+              ENDIF
+
            ENDIF
            SelectObject( hDC, hFont )
            ReleaseDC( hWnd, hDC )

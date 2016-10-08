@@ -285,7 +285,7 @@ METHOD Create() CLASS TabControl
       ::Style := (::Style & NOT( TCS_OWNERDRAWFIXED ))
    ENDIF
    IF ::VertFont == NIL
-      ::VertFont := Font()
+      ::VertFont := Font( NIL )
       ::VertFont:Escapement := 900
       ::VertFont:Create()
    ENDIF
@@ -305,17 +305,17 @@ METHOD Create() CLASS TabControl
 
    IF ::BoldSelection
       IF ::FocusFont == NIL
-         ::FocusFont := Font()
+         ::FocusFont := Font( NIL )
          ::FocusFont:Bold := .T.
          ::FocusFont:Create()
-         ::VertFocusFont := Font()
+         ::VertFocusFont := Font( NIL )
          ::VertFocusFont:Bold := .T.
          ::VertFocusFont:Escapement := 900
          ::VertFocusFont:Create()
       ENDIF
    ENDIF
 
-   ::BoldFont := Font()
+   ::BoldFont := Font( NIL )
    ::BoldFont:Bold := .T.
    ::BoldFont:Create()
 
@@ -761,8 +761,7 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS TabControl
                     Eval( oCurPage:Action, oCurPage )
                  ENDIF
                  IF GetFocus() != ::hWnd
-
-                    IF oCurPage:LastFocus != NIL .AND. oCurPage:LastFocus:Parent:hWnd == oCurPage:hWnd
+                    IF oCurPage:LastFocus != NIL .AND. oCurPage:LastFocus:IsChildOf( oCurPage:hWnd )
                        oCurPage:LastFocus:SetFocus(.T.)
                        IF oCurPage:LastFocus:ClsName == "DataGrid"
                           oCurPage:LastFocus:InvalidateRect(, .F.)

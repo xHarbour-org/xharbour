@@ -112,6 +112,6 @@ RETURN NIL
 //-----------------------------------------------------------------------------------------------
 METHOD OnEraseBkGnd( hDC ) CLASS Panel
    ::__CreateBkBrush( hDC )
-   _FillRect( hDC, { 0, 0, ::ClientWidth, ::ClientHeight }, ::BkBrush )
+   _FillRect( hDC, { 0, 0, ::Width, ::Height }, ::BkBrush )
 RETURN 1
 

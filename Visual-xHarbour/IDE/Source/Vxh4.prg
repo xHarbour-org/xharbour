@@ -128,7 +128,7 @@ METHOD Create() CLASS ObjManager
    ::ExStyle := 0
    ::Super:Create()
    ::SetScrollTime(0)
-   ::LevelFont := Font()
+   ::LevelFont := Font( NIL )
    ::LevelFont:Weight     := 700
    ::LevelFont:Create()
    ::SetIndent( 15 )
@@ -2940,7 +2940,7 @@ ENDCLASS
 METHOD Init( oParent ) CLASS ObjCombo
    ::Super:Init( oParent )
    ::Style := WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_HASSTRINGS | CBS_OWNERDRAWFIXED | CBS_DROPDOWNLIST
-   ::ColFont := Font()
+   ::ColFont := Font( NIL )
 RETURN Self
 
 METHOD Create() CLASS ObjCombo

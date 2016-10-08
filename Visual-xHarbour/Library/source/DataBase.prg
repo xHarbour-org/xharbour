@@ -155,12 +155,7 @@ CLASS DataTable INHERIT Component
    METHOD GoTo( nRec )                        INLINE ::Cancel(), ::Connector:GoTo( nRec )
    METHOD GoBottom()                          INLINE ::Cancel(), ::Connector:GoBottom()
    METHOD Skip( n )                           INLINE ::Connector:Skip( n )
-   METHOD Close(lNotify)                      INLINE IIF( ::Connector != NIL, ::Connector:Close(),), ::DestroyFields(),;
-                                                                                      ::Connector := NIL,;
-                                                                                      ::Structure := NIL,;
-                                                                                      ::Fields := NIL,;
-                                                                      IIF( VALTYPE( lNotify ) == "L" .AND. lNotify, __Evaluate( ::bOnFileClosed, Self ), ),;
-                                                                      ExecuteEvent( "OnClose", Self )
+   METHOD Close()
    METHOD Append()                            INLINE ::Cancel(), ::Connector:Append()
    METHOD OrdSetFocus( cOrder )               INLINE IIF( cOrder != NIL, ::IndexOrder := ::IndexOrd(),), ::Connector:OrdSetFocus( cOrder )
    METHOD SetIndex( cIndex )                  INLINE ::IndexOrder := ::IndexOrd(), ::Connector:SetIndex( cIndex )
@@ -242,6 +237,25 @@ METHOD Init( oOwner, hConnection ) CLASS DataTable
    ::Connector  := DataRdd( Self )
    HSetCaseMatch( ::FieldCtrl, .F. )
 RETURN Self
+
+//-------------------------------------------------------------------------------------------------------
+METHOD Close( lNotify ) CLASS DataTable
+   IF ::Connector != NIL
+      ::Connector:Close()
+   ENDIF
+   ::DestroyFields()
+   IF ::FieldCtrl != NIL
+      HEVAL( ::FieldCtrl, {|cField| ::FieldCtrl[ cField ] := NIL } )
+      ::FieldCtrl := {=>}
+   ENDIF
+   ::Connector := NIL
+   ::Structure := NIL
+   ::Fields    := NIL
+   IF VALTYPE( lNotify ) == "L" .AND. lNotify
+      __Evaluate( ::bOnFileClosed, Self )
+      ExecuteEvent( "OnClose", Self )
+   ENDIF
+RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD EnableFieldCtrl( lEnable ) CLASS DataTable
@@ -489,6 +503,7 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
 
          IF FILE( cPath + "__" + cFileName )
             dbCloseArea( ::Area )
+            ::DestroyFields()
 
             dbUseArea( ! ::__lMemory, ::Driver, cPath + "__" + cFileName, "modstru", .F., .F.,, 0 )
 
@@ -507,10 +522,13 @@ METHOD Create( lIgnoreAO ) CLASS DataTable
             FRENAME( cPath + "__" + cMemo, cData + "\" + cMemo )
 
             cFileName := ::FileName
+
+            dbSelectArea( ::Area )
+            dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
+            ::Structure := (::Area)->( dbStruct() )
+            ::CreateFields()
          ENDIF
 
-         dbSelectArea( ::Area )
-         dbUseArea( .F., ::Driver, cFileName, ::Alias, ::Shared, ::ReadOnly, ::CodePage )
 
       ENDIF
    ENDIF

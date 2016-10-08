@@ -108,7 +108,7 @@ METHOD Create() CLASS ToolBox
    ::Super:Create()
    //FlatSB_EnableScrollBar( ::hWnd, SB_BOTH, ESB_ENABLE_BOTH )
    ::SetScrollTime(0)
-   ::LevelFont := Font()
+   ::LevelFont := Font( NIL )
    ::LevelFont:Weight     := 700
    ::LevelFont:Create()
    ::hPen := CreatePen( PS_SOLID, 0, GetSysColor( COLOR_BTNFACE ) )

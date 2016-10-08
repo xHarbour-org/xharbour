@@ -278,6 +278,9 @@ static BOOL (WINAPI *pGetScrollBarInfo)(HWND,LONG,PSCROLLBARINFO)               
 static HWND (WINAPI *pRealChildWindowFromPoint)(HWND,POINT)                                                    = NULL;
 static VOID (WINAPI *pSwitchToThisWindow)(HWND,BOOL)                                                           = NULL;
 static BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND,COLORREF,BYTE,DWORD)                                    = NULL;
+static BOOL (WINAPI *pSetProcessDPIAware)(VOID)                                                                = NULL;
+static BOOL (WINAPI *pSystemParametersInfoForDpi)(UINT,UINT,PVOID,UINT,UINT)                                   = NULL;
+
 static BOOL (WINAPI *psndPlaySound)(LPCSTR,UINT)                                                               = NULL;
 
 static ULONG (WINAPI *pSHChangeNotifyRegister)(HWND,int,LONG,UINT,int,SHChangeNotifyEntry*)                    = NULL;
@@ -543,6 +546,8 @@ HB_FUNC_INIT( _INITSYMBOLS_ )
       pRealChildWindowFromPoint   = (HWND (WINAPI *)(HWND,POINT))                GetProcAddress( hUser32, "RealChildWindowFromPoint" );
       pSwitchToThisWindow         = (VOID (WINAPI *)(HWND,BOOL))                 GetProcAddress( hUser32, "SwitchToThisWindow" );
       pSetLayeredWindowAttributes = (BOOL (WINAPI *)(HWND,COLORREF,BYTE,DWORD))  GetProcAddress( hUser32, "SetLayeredWindowAttributes");
+      pSetProcessDPIAware         = (BOOL (WINAPI *)(VOID))                      GetProcAddress( hUser32, "SetProcessDPIAware");
+      pSystemParametersInfoForDpi = (BOOL (WINAPI *)(UINT,UINT,PVOID,UINT,UINT)) GetProcAddress( hUser32, "SystemParametersInfoForDpi");
    }
 
    if( hShell32 )
@@ -3875,6 +3880,48 @@ HB_FUNC( GETPROFILEINT )
 }
 
 //-------------------------------------------------------------------------------------------------
+
+HB_FUNC( SYSTEMPARAMETERSINFOFORDPI )
+{
+   BOOL bRet;
+   int iLen = hb_parni(2);
+   PHB_ITEM pParam = hb_param( 3, HB_IT_BYREF );
+
+   if( pSystemParametersInfoForDpi )
+   {
+      if( pParam && HB_IS_OBJECT( pParam ) )
+      {
+         //void *pBuffer;
+
+         hb_vmPushSymbol( pVALUE->pSymbol );
+         hb_vmPush( pParam );
+         hb_vmSend(0);
+
+         //pBuffer = (void *) ( pParam->item.asArray.value->pItems + pParam->item.asArray.value->ulLen - 1 )->item.asString.value;
+         bRet = pSystemParametersInfoForDpi( (UINT) hb_parnl(1), iLen, (void *) hb_parc(-1), (UINT) hb_parnl(4), (UINT) hb_parni(5) );
+
+         if( bRet )
+         {
+            hb_vmPushSymbol( pDEVALUE->pSymbol );
+            hb_vmPush( pParam );
+            hb_vmSend(0);
+         }
+      }
+      else if( ISBYREF(3) )
+      {
+         long nVal;
+
+         bRet = pSystemParametersInfoForDpi( (UINT) hb_parni(1), (UINT) hb_parni(2), &nVal, (UINT) hb_parni(4), (UINT) hb_parni(5) );
+         hb_stornl( nVal, 3 );
+      }
+      else
+      {
+         bRet = pSystemParametersInfoForDpi( (UINT) hb_parni(1), (UINT) hb_parni(2), (PVOID) hb_parnl(3), (UINT) hb_parni(4), (UINT) hb_parni(5) );
+      }
+   }
+   hb_retl( bRet );
+}
+
 HB_FUNC( SYSTEMPARAMETERSINFO )
 {
    BOOL bRet;
@@ -10962,5 +11009,14 @@ HB_FUNC( GETCURSORINFO )
    else
    {
       hb_errRT_BASE( EG_ARG, 6001, NULL, "GETCURSORINFO", 4, hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
+   }
+}
+
+//------------------------------------------------------------------------------------------------
+HB_FUNC( SETPROCESSDPIAWARE )
+{
+   if( pSetProcessDPIAware )
+   {
+      hb_retl( pSetProcessDPIAware() );
    }
 }

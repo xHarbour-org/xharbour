@@ -387,7 +387,7 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init( lIde, __hDllInstance ) CLASS Application
-   LOCAL cName, hPrevInstance
+   LOCAL cName, hPrevInstance, cVersion, oOS
 
    DEFAULT lIde TO .F.
    IF !lIde
@@ -430,11 +430,36 @@ METHOD Init( lIde, __hDllInstance ) CLASS Application
 
       ::IniFile          := IniFile( ::Path + "\" + ::Name + ".ini" )
       ::Msg              := (struct MSG)
-      ::OsVersion        := (struct OSVERSIONINFOEX)
-
-      GetVersionEx( @::OsVersion )
 
    ENDIF
+
+   ::OsVersion        := (struct OSVERSIONINFOEX)
+   GetVersionEx( @::OsVersion )
+
+   ::System:OS := {=>}
+   HSetCaseMatch( ::System:OS, .F. )
+   ::System:OS:Version      := VAL( xStr(::OsVersion:dwMajorVersion)+"."+xStr(::OsVersion:dwMinorVersion) )
+   ::System:OS:BuildNumber  := ::OsVersion:dwBuildNumber
+   ::System:OS:Bitness      := IIF( IsWow64(), "x64", "x86" )
+   ::System:OS:ServicePack  := ::OsVersion:szCSDVersion:AsString()
+
+   IF ::System:OS:Version >= 6.2
+      ::System:CurrentScheme := FlatGrayColorTable()
+    ELSE
+      ::System:CurrentScheme := ProfessionalColorTable()
+   ENDIF
+   ::System:CurrentScheme:Load()
+(oOS,cVersion)
+/*
+   oOS := WinOS()
+   cVersion := StrTran( oOS:Version, "."+oOS:BuildNumber )
+
+   IF VAL( cVersion ) >= 6.2
+      ::System:CurrentScheme := FlatGrayColorTable()
+      ::System:CurrentScheme:Load()
+      ::System:OS:Version := VAL( cVersion )
+   ENDIF
+*/
    ::Instance := GetModuleHandle( ::FileName )
 RETURN Self
 

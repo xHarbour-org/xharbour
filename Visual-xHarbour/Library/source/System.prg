@@ -207,7 +207,8 @@ RETURN ::xLocalTime
 //-----------------------------------------------------------------------------------------------------------------------------
 METHOD Init() CLASS System
    LOCAL cRdd, aList, hSmall, hLarge, cBuffer := ""
-   LOCAL n, aCursors, osvi, cSupp := ""
+   LOCAL n, aCursors, cSupp := ""
+
    ::FreeImageFormats := {;
                    { "Windows or OS/2 Bitmap (*.bmp)",                   "*.bmp;" },;
                    { "Dr. Halo (*.cut)",                                 "*.cut;" },;
@@ -245,25 +246,6 @@ METHOD Init() CLASS System
 
    AEVAL( ::FreeImageFormats, {|a| cSupp += a[2]} )
    AINS( ::FreeImageFormats, 1, { "All Supported Graphics", cSupp }, .T. )
-
-   osvi := (struct OSVERSIONINFOEX)
-   GetVersionEx( @osvi )
-
-   ::OsVersion := osvi
-
-   ::OS := {=>}
-   HSetCaseMatch( ::OS, .F. )
-   ::OS:Version      := VAL( xStr(osvi:dwMajorVersion)+"."+xStr(osvi:dwMinorVersion) )
-   ::OS:BuildNumber  := osvi:dwBuildNumber
-   ::OS:Bitness      := IIF( IsWow64(), "x64", "x86" )
-   ::OS:ServicePack  := osvi:szCSDVersion:AsString()
-
-   IF ::OS:Version >= 6.2
-      ::CurrentScheme := FlatGrayColorTable()
-    ELSE
-      ::CurrentScheme := ProfessionalColorTable()
-   ENDIF
-   ::CurrentScheme:Load()
 
    ::Border := {=>}
    HSetCaseMatch( ::Border, .F. )
@@ -981,43 +963,40 @@ RETURN aProcessList
 
 
 FUNCTION __GetMessageFont( nWeight )
-   LOCAL ncm := (struct NONCLIENTMETRICS)
-   ncm:cbSize := ncm:Sizeof()
-
-   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:Sizeof(), @ncm, 0 )
-
+   LOCAL oFont := Font( NIL )
    IF nWeight != NIL
-      ncm:lfMessageFont:lfWeight := nWeight
+      oFont:Weight := nWeight
    ENDIF
+   oFont:Create()
+RETURN oFont:Handle
 
-RETURN CreateFontIndirect( ncm:lfMessageFont )
-/*
 FUNCTION WinOS()
-Set dtmConvertedDate = CreateObject("WbemScripting.SWbemDateTime")
-strComputer = "."
-Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
-Set oss = objWMIService.ExecQuery ("Select * from Win32_OperatingSystem")
+   LOCAL oLocator := CreateObject("wbemScripting.SwbemLocator")
+   LOCAL oService := oLocator:ConnectServer( , "root\CIMV2" )
 
-For Each os in oss
-    Wscript.Echo "Boot Device: " & os.BootDevice
-    Wscript.Echo "Build Number: " & os.BuildNumber
-    Wscript.Echo "Build Type: " & os.BuildType
-    Wscript.Echo "Caption: " & os.Caption
-    Wscript.Echo "Code Set: " & os.CodeSet
-    Wscript.Echo "Country Code: " & os.CountryCode
-    Wscript.Echo "Debug: " & os.Debug
-    Wscript.Echo "Encryption Level: " & os.EncryptionLevel
-    dtmConvertedDate.Value = os.InstallDate
-    dtmInstallDate = dtmConvertedDate.GetVarDate
-    Wscript.Echo "Install Date: " & dtmInstallDate
-    Wscript.Echo "Licensed Users: " & os.NumberOfLicensedUsers
-    Wscript.Echo "Organization: " & os.Organization
-    Wscript.Echo "OS Language: " & os.OSLanguage
-    Wscript.Echo "OS Product Suite: " & os.OSProductSuite
-    Wscript.Echo "OS Type: " & os.OSType
-    Wscript.Echo "Primary: " & os.Primary
-    Wscript.Echo "Registered User: " & os.RegisteredUser
-    Wscript.Echo "Serial Number: " & os.SerialNumber
-    Wscript.Echo "Version: " & os.Version
-Next
-*/
+   LOCAL os, aOS := oService:ExecQuery( "Select * from Win32_OperatingSystem" )
+
+   LOCAL hOS := {=>}
+   HSetCaseMatch( hOS, .F. )
+   FOR EACH os IN aOS
+       hOS[ "BootDevice" ]      := os:BootDevice
+       hOS[ "BuildNumber" ]     := os:BuildNumber
+       hOS[ "BuildType" ]       := os:BuildType
+       hOS[ "Caption" ]         := os:Caption
+       hOS[ "CodeSet" ]         := os:CodeSet
+       hOS[ "CountryCode" ]     := os:CountryCode
+       hOS[ "Debug" ]           := os:Debug
+       hOS[ "EncryptionLevel" ] := os:EncryptionLevel
+       hOS[ "InstallDate" ]     := os:InstallDate
+       hOS[ "LicensedUsers" ]   := os:NumberOfLicensedUsers
+       hOS[ "Organization" ]    := os:Organization
+       hOS[ "OSLanguage" ]      := os:OSLanguage
+       hOS[ "OSProductSuite" ]  := os:OSProductSuite
+       hOS[ "OSType" ]          := os:OSType
+       hOS[ "Primary" ]         := os:Primary
+       hOS[ "RegisteredUser" ]  := os:RegisteredUser
+       hOS[ "SerialNumber" ]    := os:SerialNumber
+       hOS[ "Version" ]         := os:Version
+   NEXT
+RETURN hOS
+

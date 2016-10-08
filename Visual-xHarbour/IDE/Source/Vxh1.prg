@@ -215,10 +215,6 @@ METHOD Init( ... ) CLASS IDE
    LOCAL aEntries, n, cFile
    PUBLIC aChangedProps
 
-   IF ::System:OS:Version >= 6.2
-      ::System:CurrentScheme:Load( "FlatGray" )
-   ENDIF
-
    m->aChangedProps := {}
 
    HSetCaseMatch( ::Props, .F. )
@@ -3197,18 +3193,17 @@ METHOD SelectWindow( oWin, hTree, lFromTab ) CLASS Project
    ENDIF
 
    ::CurrentForm := oWin
-
    ::CurrentForm:Show()
-   ::CurrentForm:Validaterect()
-   ::CurrentForm:UpdateWindow()
-//   ::CurrentForm:Redraw()
+   ::CurrentForm:Parent:UpdateScroll()
+   ::SelectBuffer()
    ::Application:DoEvents()
 
-   ::CurrentForm:Parent:UpdateScroll()
-
+/*
+   ::CurrentForm:Validaterect()
+   ::CurrentForm:UpdateWindow()
    ::CurrentForm:CtrlMask:RedrawWindow( , , RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
-
    ::Application:MainForm:PostMessage( WM_USER + 3001, hTree )
+*/
 
 RETURN 0
 
@@ -3919,9 +3914,10 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
-   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens, cBkMk
+   LOCAL cObjectName, cXfm, cLine, nLine, aChildren, hFile, cClassName, aTokens, cBkMk, oWait, nControls
    LOCAL cSourcePath := ::Properties:Path + "\" + ::Properties:Source
    cXfm := cSourcePath +"\" + cFile
+
    DEFAULT lLoadProps TO .T.
 
    hFile := FOpen( cXfm, FO_READ )
@@ -3946,6 +3942,7 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
 
    IF oForm == NIL
       oForm := ::AddWindow( .F., cObjectName + ".prg", cClassName == "CUSTOMCONTROL" )
+
       cBkMk := GetPrivateProfileString( "Files", cFile, "", ::Properties:Path + "\" + ::Properties:Name + ".vxh")
 
       cSourcePath := ::Properties:Path + "\" + ::Properties:Source
@@ -3957,14 +3954,19 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
    oForm:__lLoading := .T.
 
    IF lLoadProps
+      nControls := len( hb_aTokens( MemoRead(cXfm), " :Create()" ) )
+
+      oWait := ::Application:MainForm:MessageWait( "Loading form " + oForm:Name,, .T.,,, nControls )
+      oWait:SetPosition( 1 )
+
       ::CurrentForm := oForm
       nLine := 1
       DEFAULT aErrors  TO {}
       DEFAULT aEditors TO {}
       WHILE HB_FReadLine( hFile, @cLine, XFM_EOL ) == 0
-         ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors )
+         ::ParseXFM( oForm, cLine, hFile, @aChildren, cFile, @nLine, @aErrors, @aEditors,,, oWait )
          nLine++
-      END
+      ENDDO
       aChildren := NIL
     ELSEIF aErrors != NIL
       oForm:Name := cObjectName
@@ -3978,10 +3980,13 @@ METHOD LoadForm( cFile, aErrors, aEditors, lLoadProps, oForm ) CLASS Project
       ::Application:FileExplorer:AddSource( oForm:Editor )
    ENDIF
    oForm:__lLoading := .F.
+   IF oWait != NIL
+      oWait:close()
+   ENDIF
 RETURN .T.
 
 //-------------------------------------------------------------------------------------------------------
-METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, lCustomOwner ) CLASS Project
+METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors, oCC, lCustomOwner, oWait ) CLASS Project
    LOCAL oErr, nRead, nPos, n, cParent, lFound, hPtr
    LOCAL aTokens, nTokens, nToken, Topic, Event
    LOCAL cClassName, cObjectName, oParent, cEvent, cHandler, cProperty, cValue, xValue
@@ -4036,6 +4041,7 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
 
          WHILE ( nRead := HB_FReadLine( hFile, @cLine, XFM_EOL ) ) == 0
             nLine++
+
             cLine := AllTrim( cLine )
 
             IF UPPER( LEFT( ALLTRIM( cLine ), 4 ) ) == "VAR "
@@ -4182,6 +4188,14 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
                // Create Container / Form
                IF oCC == NIL
                   oObj:Create()
+                  //IF oWait != NIL
+                  //   oWait:Text := "Loading " + oObj:__xCtrlName + ": " + oObj:Name
+                  //ENDIF
+                  //TRY
+                  //   ShowWindow( oObj:hWnd, SW_SHOW )
+                  //   ::Application:DoEvents()
+                  //CATCH
+                  //END
                ENDIF
             ELSEIF cLine HAS "(?i)^WITH OBJECT +::"
                // Generate object type PROPERTY for CLASS
@@ -4371,6 +4385,17 @@ METHOD ParseXFM( oForm, cLine, hFile, aChildren, cFile, nLine, aErrors, aEditors
             ELSEIF UPPER( cLine ) HAS "(?i)^:CREATE\(\)"
                // Create Object
                oObj:Create()
+               IF oWait != NIL
+                  oWait:Position ++
+               ENDIF
+               //IF oWait != NIL
+               //   oWait:Text := "Loading " + oObj:__xCtrlName + ": " + oObj:Name
+               //ENDIF
+               //TRY
+               //   ShowWindow( oObj:hWnd, SW_SHOW )
+               //   ::Application:DoEvents()
+               //CATCH
+               //END
 
             ELSEIF cLine HAS "(?i)^WITH OBJECT +:"
                // Generate object type PROPERTY for Control
@@ -4735,7 +4760,7 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
       oFile:Path := cPath + "\" + ::Properties:Resource
       oFile:FileBuffer := ;
          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'                       + CRLF +;
-         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">'     + CRLF +;
+         '<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">'     + CRLF +;
          '   <assemblyIdentity'                                                          + CRLF +;
          '      version="1.0.0.0"'                                                       + CRLF +;
          '      processorArchitecture="*"'                                             + CRLF +;
@@ -4761,7 +4786,12 @@ METHOD Save( lProj, lForce, cPrevPath ) CLASS Project
          '            <ms_asmv2:requestedExecutionLevel level="asInvoker" uiAccess="false"/>' + CRLF +;
          '         </ms_asmv2:requestedPrivileges>'                                      + CRLF +;
          '      </ms_asmv2:security>'                                                    + CRLF +;
-         '   </ms_asmv2:trustInfo>'                                                      + CRLF
+         '   </ms_asmv2:trustInfo>'                                                      + CRLF +;
+         '   <asmv3:application>'                                                        + CRLF +;
+         '     <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">'+ CRLF+;
+         '       <ms_windowsSettings:dpiAware xmlns:ms_windowsSettings="http://schemas.microsoft.com/SMI/2005/WindowsSettings">false</ms_windowsSettings:dpiAware>'+ CRLF+;
+         '     </asmv3:windowsSettings>'                                                 + CRLF +;
+         '   </asmv3:application>'                                                       + CRLF
    IF ::Properties:Compatibility
       oFile:FileBuffer += ;
          '   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">'         + CRLF +;
