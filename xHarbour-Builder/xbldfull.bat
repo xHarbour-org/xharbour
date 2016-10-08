@@ -143,7 +143,7 @@ REM --> Copy files
     XCOPY \xHarbour\contrib\gd\include                  \xHb\include /d /y /i
 
     XCOPY \xHarbour.com\xHarbour-Builder\include        \xHb\include /d /y /i
-    XCOPY \xHarbour.com\xHarbour-AxtiveX\ole.ch         \xHb\include\w32 /d /y
+    XCOPY \xHarbour.com\xHarbour-ActiveX\ole.ch         \xHb\include\w32 /d /y
     XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHb\include\w32 /d /y /i
     XCOPY \xHarbour.com\IEGui\iegui.ch                  \xHb\include /d /y
     XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i

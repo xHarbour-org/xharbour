@@ -759,5 +759,5 @@
 [\xbp\xcc\dbf.lib\rddordu.obj]
 [\xbp\xcc\dbf.lib\dbjoinx.obj]
 
-[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.prg]
-[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.c]
+#[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.prg]
+#[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.c]

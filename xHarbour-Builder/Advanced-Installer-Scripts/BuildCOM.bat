@@ -1,24 +1,24 @@
     SET VXH_Edition=VXH_ENTERPRISE
 
-    SET ROBOCOPY_FROM=W:\xHarbour.com
+    SET ROBOCOPY_FROM=C:\xHarbour.com
     SET ROBOCOPY_XF=*.exe *.obj *.bak *.log *.pdb *.idb *.map *.exp *.ilk
-    SET ROBOCOPY_XD=CVS CVSROOT Obj Free xHarbour-Documentation xHarbour-VRW xHarbour-XBScript Samples UpdateServer X xHarbour.com*
+    SET ROBOCOPY_XD=GIT CVS CVSROOT Obj Free xHarbour-Documentation xHarbour-VRW xHarbour-XBScript Samples UpdateServer X xHarbour.com*
     SET ROBOCOPY_INCL=*.*
     ROBOCOPY "%ROBOCOPY_FROM%" C:\xHarbour.com *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
   
-    SET ROBOCOPY_FROM=W:\xHb
+    SET ROBOCOPY_FROM=C:\xHb
     SET ROBOCOPY_XF=*.obj *.bak *.log *.pdb *.idb *.map *.exp *.ilk *.ppo Unwise.exe vxh-patrick*.*
     SET ROBOCOPY_XD=CVS CVSROOT Doc Samples BC5 VC8 Personal Professional Demo DLL
     SET ROBOCOPY_INCL=*.*
     ROBOCOPY "%ROBOCOPY_FROM%" C:\xHb %ROBOCOPY_INCL% /XO /NS /NC /NP /S /E /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
 
-    ROBOCOPY W:\OpenSSL C:\OpenSSL %ROBOCOPY_INCL% /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF%
+    ROBOCOPY C:\OpenSSL C:\OpenSSL %ROBOCOPY_INCL% /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF%
 
     SET ROBOCOPY_XD=Help
     SET ROBOCOPY_XF=uninst.exe
-    ROBOCOPY "W:\Program Files\PellesC" "C:\Program Files\PellesC" *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
+    ROBOCOPY "C:\Program Files\PellesC" "C:\Program Files\PellesC" *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
 
-    ROBOCOPY "W:\Program Files\Advantage 9.10\acesdk" "C:\Program Files\Advantage 9.10\acesdk" *.* /XO /NS /NC /NP /S /E /PURGE /XF
+    ROBOCOPY "C:\Program Files\Advantage 11.10\acesdk" "C:\Program Files\Advantage 11.10\acesdk" *.* /XO /NS /NC /NP /S /E /PURGE /XF
 
     C:
     
@@ -69,7 +69,7 @@ REM ========================
     ATTRIB +r \xHarbour.com\Visual-xHarbour\Library\xcc\xbuild.windows.ini
     ATTRIB +r \xHarbour.com\Visual-xHarbour\xEdit\xcc\xbuild.windows.ini
     ATTRIB +r \xHarbour.com\xHarbour-ApolloRDD\xcc\xbuild.windows.ini
-    ATTRIB +r \xHarbour.com\xHarbour-AxtiveX\xcc\xbuild.windows.ini
+    ATTRIB +r \xHarbour.com\xHarbour-ActiveX\xcc\xbuild.windows.ini
     ATTRIB +r \xHarbour.com\xHarbour-Builder\xcc\xbuild.windows.ini
     ATTRIB +r \xHarbour.com\xHarbour-ct3comm\xcc\xbuild.windows.ini
     ATTRIB +r \xHarbour.com\xHarbour-DebugClient\vxhdebug\xcc\xbuild.windows.ini
@@ -89,4 +89,4 @@ REM ========================
 
     SET ROBOCOPY_XF=*.obj *.bak *.log *.pdb *.idb *.map *.exp *.ilk          
     SET ROBOCOPY_XD=CVS CVSROOT Doc Samples
-    ROBOCOPY C:\xHB W:\xHB *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
+    ROBOCOPY C:\xHB C:\xHB *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%

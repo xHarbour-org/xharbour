@@ -176,7 +176,7 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
 
    //----------------------------------------------------------------------------------------------------//
 
-   cPackageFolder:='C:\Users\xHarbour\Google Drive\xHB-SetupFiles\xHB\xHB Windows Installers\'+cRevision+"\"
+   cPackageFolder:='C:\odrive\Gdrive (xHarbour Builder)\xHB-SetupFiles\xHB\xHB Win-Installers\xHB-'+cRevision+'\'
    cProductName  :='xHarbour Builder '+cEdition_Full
    cPackageName  :=cProductName+'-'+cRevision+'.exe'
 
@@ -196,6 +196,8 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
    cBuild+='RD D:\Setups /Q /S'+CRLF
    cBuild+='DEL '+cAIP+' /Q'+CRLF
    cBuild+='ATTRIB +H D:\xHB-Files'+CRLF
+	
+//	cBuild+='COPY D:\'+cPackageName+' 
 
 // cBuild+='pause'+CRLF+CRLF
 

@@ -236,12 +236,10 @@ REM --> BGD.lib
         IF "%XBUILD_VC8%"=="YES" XCOPY BGD.lib \xhb\lib\vc8 /d /y
         IF "%XBUILD_BC5%"=="YES" XCOPY BGD.lib \xhb\lib\bc5 /d /y
 
-
 REM --> ADS.lib
         IF "%_BUILD_ADS%"=="NO" GOTO No_ADS
         CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
         \xhb\bin\XBUILD.EXE ads.lib.xbp  %_XB_Debug% %1
-REM     \xhb\bin\XBUILD.EXE ads7.lib.xbp %_XB_Debug% %1
 
         IF "%XBUILD_XCC%"=="YES" XCOPY \xhb\dll\ADS\ACE32.dll \xhb\bin /d /y
         IF "%XBUILD_XCC%"=="YES" \xhb\bin\XLIB \xhb\bin\ace32.dll /out:\xhb\lib\ACE32.lib
@@ -257,18 +255,15 @@ REM --> xbScript.lib
         CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
         \xhb\bin\XBUILD.EXE XBScript.lib.xbp %_XB_Debug% %1
 
-
 REM --> TProject.lib
         IF "%_BUILD_TPROJECT.LIB%"=="NO" GOTO No_TProjectLIB
            CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%"
            \xhb\bin\XBUILD.EXE TProject.lib.xbp %_XB_Debug% %1
         :No_TProjectLIB
 
-
-REM --> AxtiveX.lib
-        CD "\xHarbour.com\xHarbour-AxtiveX\%_XB_Compiler%"
+REM --> ActiveX.lib
+         CD "\xHarbour.com\xHarbour-ActiveX\%_XB_Compiler%"
         \xhb\bin\XBUILD.EXE ActiveX.lib.xbp %_XB_Debug% %1
-
 
 REM --> xEdit*.LIB
         IF "%_BUILD_XEDIT.LIB%"=="NO" GOTO No_xEditLIB
@@ -279,13 +274,11 @@ REM        \xhb\bin\XBUILD.EXE xEdit.lib.xbp        %_XB_Debug% %1
            \xhb\bin\XBUILD.EXE xEditVXH.lib.xbp     %_XB_Debug% %1
         :No_xEditLIB
 
-
 REM --> WinCore.lib
         IF "%_XB_Compiler%"=="bc5" GOTO No_WinCore.LIB
            CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
            \xhb\bin\XBUILD.EXE WinCore.lib.xbp %_XB_Debug% %1
         :No_WinCore.LIB
-
 
 REM --> WinApi.LIB
         IF "%_BUILD_WINAPI.LIB%"=="NO" GOTO No_WinApi.LIB

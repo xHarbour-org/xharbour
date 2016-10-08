@@ -62,7 +62,7 @@ REM ===============================================
     IF "%1" == "BCC-DEMO" SET RC_To=C:\xHB-SetupFiles\xHB-Files\Lib\Bcc
 
     IF "%1" == "XHB-DEMO" SET RC_Include=SQL.lib
-    IF "%1" == "BCC-DEMO" SET RC_Include=SQLBCC55.lib SQLBCC58.lib SQLBCC65.lib
+    IF "%1" == "BCC-DEMO" SET RC_Include=SQL.lib
 
     IF "%1" == "XHB-DEMO" ROBOCOPY "\xHB\Lib\Demo"     "%RC_To%" %RC_Include% /NS /NC /NP
     IF "%1" == "BCC-DEMO" ROBOCOPY "\xHB\Lib\Demo\Bcc" "%RC_To%" %RC_Include% /NS /NC /NP
@@ -82,7 +82,7 @@ REM ===============================================
 
 
    ROBOCOPY "\xHB\Lib"     "C:\xHB-SetupFiles\xHB-Files\Lib" SQL.lib SQLMT.lib /NS /NC /NP
-   ROBOCOPY "\xHB\Lib\Bcc" "C:\xHB-SetupFiles\xHB-Files\Lib\Bcc" SQLBCC55.lib SQLBCC58.lib SQLBCC65.lib /NS /NC /NP
+   ROBOCOPY "\xHB\Lib\Bcc" "C:\xHB-SetupFiles\xHB-Files\Lib\Bcc" SQL.lib /NS /NC /NP
 
 
 REM ==============================================================================================
