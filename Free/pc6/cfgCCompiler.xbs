@@ -1,0 +1,53 @@
+#define CRLF Chr(13)+Chr(10)
+
+PROCEDURE Main()
+
+   LOCAL cFolder:="",cAppDir:="",cIni:=""
+  
+   IF Len(HB_aParams())=0
+      Alert('Use cfgCCompiler.xbs "<PellesC_Folder>\pocc.exe" <xHarbour Folder>')
+      RETURN
+   ENDIF
+   
+   cFolder:=HB_aParams()[1]
+   cFolder:=Left(cFolder,Len(cFolder)-13)
+   IF !File(cFolder+"\bin\pocc.exe")
+      Alert("Can not find "+cFolder+"\bin\pocc.exe")
+      RETURN
+   ENDIF
+   
+   cAppDir:=HB_aParams()[2]
+   
+   cIni+="[xHB]"+CRLF
+   cIni+="Root      = "+cAppDir+CRLF
+   cIni+="LibFolder = "+cAppDir+"lib\"+CRLF
+   cIni+="Flags     = -m -n -p -q -gc0"+CRLF
+   cIni+="Exe       = harbour.exe"+CRLF
+   cIni+=""+CRLF
+   cIni+="[POCC]"+CRLF
+   cIni+="Root          = "+cFolder+"\"+CRLF
+   cIni+="Compile Flags = -Ze -Ot"+CRLF
+   cIni+="Link Flags    = -MAP -FORCE:MULTIPLE"+CRLF
+   
+   MemoWrit(cAppDir+"Bin\xbuild.windows.ini",cIni,.F.)
+   
+RETURN
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION HB_aParams()
+
+   LOCAL aArg:={},Arg
+
+   FOR EACH Arg IN WScript:Arguments
+      Aadd(aArg,Arg)
+   NEXT
+
+RETURN aArg
+
+
+//----------------------------------------------------------------------------------------------------//
+
+
