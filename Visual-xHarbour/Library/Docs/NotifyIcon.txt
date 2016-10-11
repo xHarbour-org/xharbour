@@ -1,0 +1,16 @@
+Properties
+   BalloonTipText  
+   Text          
+   BalloonTipIcon 
+   Visible        
+   Icon           
+   Text          
+   ContextMenu    
+   Balloon_Icons   
+   ID              
+   Flags          
+   Message         
+   Parent          
+   Events                
+                            
+

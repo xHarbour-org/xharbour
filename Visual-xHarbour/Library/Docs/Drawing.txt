@@ -1,0 +1,46 @@
+Properties
+   Parent  
+
+
+Methods
+   Destroy()
+   RefreshDC()
+   GetTextExtentPoint32()
+   GetTextExtentExPoint()
+   DrawFrameControl()
+   FillRect()
+   Rectangle()
+   EnumFonts()
+   EnumProc()
+   BeginPaint()
+   GetDC()                                       
+   ReleaseDC()                                  
+   EndPaint()                
+   SelectObject( hObj )                
+   SetPixel( x, y, nColor )          
+   GetPixel( x, y )               
+   SetBkColor( nColor )                
+   SetTextColor( nColor )             
+   SetTextAlign( nAlign )                       
+   ExtTextOut( x, y, nFlags, aRect, cText, aDx )
+   PolyLine( aReg )                         
+   DrawFocusRect( aRect )                  
+   GetClipBox()
+   GetDeviceCaps( nFlags )                
+   SetBkMode( nMode )                  
+   DrawText( cText, aRect, nFlags )
+   GetTextMetrics()
+   DrawEdge( aRect, nFlags, nState ) 
+   DrawThemeParentBackground( aRect )
+   DrawIcon( nLeft, nTop, hIcon ) 
+   DrawSpecialChar( aRect, nSign, lBold, nPoint )
+   DrawThemeBackground( hTheme, nPartId, nStateId, aRect, aClipRect )
+   Draw3DRect( rcItem, oTopLeftColor, oBottomRightColor )
+
+
+
+
+
+
+   
+

@@ -1,0 +1,20 @@
+Properties
+   ShowDialog
+   LogonUI
+   NewSession 
+   Subject 
+   MessageBody 
+   SenderName 
+   SenderAddress
+   RecipientName    
+   RecipientAddress 
+   Attachments      
+   
+                            
+
+Methods
+   SetFlags()
+   Send()
+
+   
+

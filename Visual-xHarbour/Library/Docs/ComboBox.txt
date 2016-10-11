@@ -1,0 +1,57 @@
+Properties
+   CurSel
+   HorzScroll        
+   Border            
+   SelectionHeight   
+   OwnerDrawFixed    
+   OwnerDrawVariable 
+   AutoEditHorzScroll
+   Sort              
+   DropDownStyle     
+   UpperCase         
+   LowerCase         
+   HasStrings        
+   DisableNoScroll   
+   NoIntegralHeight  
+   OemConvert        
+   ItemHeight        
+   VertScroll        
+   ClientEdge        
+   FitToolBar        
+   
+Methods   
+   GetString()
+   AddString()
+   AddItem( cText )              
+   InsertString(nLine,cText )    
+   DeleteString(nLine)           
+   SetCurSel(nLine)              
+   FindString(nStart,cStr)       
+   FindStringExact()
+   GetCount()                    
+   GetCurSel()                   
+   Dir(nAttr, cFileSpec)         
+   GetDroppedWidth()             
+   ResetContent()                
+   GetEditSel(nLine)             
+   GetLBText( nLine, cBuffer )   
+   GetLBTextLen( nLine )         
+   SelectString( nLine, cText )  
+   GetTopIndex( nLine )          
+   GetHorizontalExtent()         
+   SetHorizontalExtent(nWidth)   
+   SetTopIndex( nLine )          
+   GetItemData( nLine )          
+   SetItemData( nLine, cData )   
+   GetTopIndex()                 
+   GetItemHeight( nLine )        
+   SetLocale( nID )              
+   GetLocale()                   
+   GetDroppedState()             
+   ShowDropDown(l)               
+   SetExtendedUi(l)              
+   HideDropDown()                
+   GetInfo()
+   GetSelString()
+   SetItemHeight()
+

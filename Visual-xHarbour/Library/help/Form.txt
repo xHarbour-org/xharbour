@@ -1,0 +1,208 @@
+Properties
+
+GenerateMember     Logical    Indicates if a member variable will be generated for this form
+ContextMenu        Object     The shortcut menu to display when the user right-clicks the control
+Left               Numeric    The left position in pixels
+Top                Numeric    The Top position in pixels
+Width              Numeric    The control's width in pixels
+Height             Numeric    The control's height in pixels
+Cursor             Numeric    Cursor handle loaded with LoadCursor or from System:Cursor. ie ::Cursor := System:Cursor:Working
+Theming            Logical    Indicates if a control will draw using themes
+NoActivate         Logical    A top-level window created with this style does not become the foreground window when the user clicks it. The system does not bring this window to the foreground when the user minimizes or closes the foreground window. 
+StaticEdge         Logical    Creates a window with a three-dimensional border style intended to be used for items that do not accept user input.
+ClientEdge         Logical    Specifies that a window has a border with a sunken edge.
+ControlParent      Logical    The window itself contains child windows that should take part in dialog box navigation. If this style is specified, the dialog manager recurses into children of this window when performing navigation operations such as handling the TAB key, an arrow key, or a keyboard mnemonic.
+Visible            Logical    Indicates if the control will show.
+Enabled            Logocal    Indicates if a control will enable its contents.
+Border             Logical    Creates a window that has a border.
+Center             Logical    Specifies if the window will center within its parent.
+ClipChildren       Logical    Clips child windows relative to each other; that is, when a particular child window receives a paint message.
+ClipSiblings       Logical    Clips all other overlapped child windows out of the region of the child window to be updated.
+AcceptFiles        Logical    Specifies that a window created with this style accepts drag-and-drop files. 
+AnimationStyle     Numeric    Specifies the annimation used to show/hide the window. ie ::System:WindowAnimation:SlideHorzPositive.
+Modal              Logical    Specifies if the form will display as a modal dialog box.
+UserVariables      Character  When set in design mode it publishes DATA variables for the Form class.
+ShowMode           Numeric    Specifies how the window will show "Normal", "Minimized" or "Maximized".
+AutoClose          Logical    In modal mode, it specifies if the form will close by hitting the escape key.
+VertScroll         Logical    Indicates if the form will show the vertical scroll bar.
+HorzScroll         Logical    Indicates if the form will show the horizontal scroll bar.
+MDIClient          Numeric    If MDIContainer is true, it contains the object of the MDI client window.
+MinWidth           Numeric    Minimum width the form can size to.
+MinHeight          Numeric    Minimum height the form can size to.
+MaxWidth           Numeric    Maximum width the form can size to.
+MaxHeight          Numeric    Maximum height the form can size to.
+ShowInTaskBar      Logical    Specifies if the form should show its button in the Windows' task bar.
+ToolWindow         Logical    Creates a tool window; that is, a window intended to be used as a floating toolbar. A tool window does not appear in the taskbar or in the dialog that appears when the user presses ALT+TAB. If a tool window has a system menu, its icon is not displayed on the title bar.
+TopMost            Logical    Specifies that a window created with this style should be placed above all non-topmost windows and should stay above them, even when the window is deactivated.
+ThickFrame         Logical    Creates a window that has a sizing border.       
+MaximizeBox        Logical    Creates a window that has a Maximize button.
+MinimizeBox        Logical    Creates a window that has a Minimize button.
+CaptionBar         Logical    Creates a window that has a title bar (includes the Border style).
+SysMenu            Logical    Creates a window that has a Close (X) button in the non-client area.
+FrameStyle         Numeric    Creates a "PopUp" or "Overlapped" form
+MDIContainer       Numeric    Creates a MDI framed app.
+DlgModalFrame      Logical    Creates a window that has a double border; the window can, optionally, be created with a title bar by specifying CaptionBar = true.
+Icon               Character  Associates a new large and small icon with a form. The system displays the large icon in the ALT+TAB dialog box, and the small icon in the window caption. 
+Opacity            Numeric    Sets the percentage of opacity for the form. The range goes from 0 to 100%
+ImageList          Object     Associates an ImageList component to the form
+BitmapMask         Character  Sets the Bitmap that will be used to create the form's shape and background
+BitmapMaskColor    Character  Sets the color that will become hollow in the BitmapMask
+MDIChild           Object     Holds the object created by a MDIContainer form.
+BackgroundImage    Object     Sets a background image.
+
+-------------------------------------------------------------------------------------------------------------------------------
+Methods
+
+EnableThemeDialogTexture      Enables or disables the visual style of a dialog window's background.
+                              Parameters
+                                       nFlags 
+                                                ETDT_DISABLE                  Disables background texturing.
+                                                ETDT_ENABLE                   Enables dialog window background texturing. The texturing is defined by a visual style.
+                                                ETDT_USETABTEXTURE            Uses the Tab control texture for the background texture of a dialog window.
+                                                ETDT_USEAEROWIZARDTABTEXTURE  Uses the Aero wizard texture for the background texture of a dialog window.
+                                                ETDT_ENABLETAB                Enables dialog window background texturing. The texture is the Tab control texture defined by the visual style. This flag is equivalent to (ETDT_ENABLE | ETDT_USETABTEXTURE).
+                                                ETDT_ENABLEAEROWIZARDTAB      ETDT_ENABLE | ETDT_USEAEROWIZARDTABTEXTURE.
+                                                ETDT_VALIDBITS                ETDT_DISABLE | ETDT_ENABLE | ETDT_USETABTEXTURE | ETDT_USEAEROWIZARDTABTEXTURE.
+
+Animate                       Produces special effects when showing or hiding windows. There are four types of animation: roll, slide, collapse or expand, and alpha-blended fade.
+                              Parameters
+                                       nSpeed   Specifies how long it takes to play the animation, in milliseconds. Typically, an animation takes 200 milliseconds to play. 
+                                       nFlags   Specifies the type of animation.
+                                                AW_SLIDE Uses slide animation. By default, roll animation is used. This flag is ignored when used with AW_CENTER. 
+                                                AW_ACTIVATE       Activates the window. Do not use this value with AW_HIDE. 
+                                                AW_BLEND          Uses a fade effect. This flag can be used only if hwnd is a top-level window. 
+                                                AW_HIDE           Hides the window. By default, the window is shown. 
+                                                AW_CENTER         Makes the window appear to collapse inward if AW_HIDE is used or expand outward if the AW_HIDE is not used. The various direction flags have no effect. 
+                                                AW_HOR_POSITIVE   Animates the window from left to right. This flag can be used with roll or slide animation. It is ignored when used with AW_CENTER or AW_BLEND.
+                                                AW_HOR_NEGATIVE   Animates the window from right to left. This flag can be used with roll or slide animation. It is ignored when used with AW_CENTER or AW_BLEND.
+                                                AW_VER_POSITIVE   Animates the window from top to bottom. This flag can be used with roll or slide animation. It is ignored when used with AW_CENTER or AW_BLEND. 
+                                                AW_VER_NEGATIVE   Animates the window from bottom to top. This flag can be used with roll or slide animation. It is ignored when used with AW_CENTER or AW_BLEND. 
+
+   
+Destroy                       Destroys the window
+                              Parameters
+                                       NONE
+Disable                       Disables the window
+                              Parameters
+                                       NONE
+Enable                        Enables the window
+                              Parameters
+                                       NONE
+Close                         Closes the form triggering the OnClose() event
+                              Parameters
+                                       NONE
+Hide                          Hides the window
+                              Parameters
+                                       NONE
+Show                          Shows the window
+                              Parameters
+                                       NONE
+MessageWait                   Displays a message a "Please wait" centered on the form. The size of this depends on the text.
+                              Parameters
+                                       cText    Text to be displayed in the message.
+                                       nTimeOut Timeout to close. If this parameter is NIL the user is responsible for destroying the message. ie. oMsg:Destroy()
+                                       nColor   Background color.
+ 
+MessageBox                    Displays a MessageBox centered on the screen
+                              Parameters
+                                       cText    Text to be displayed in the message.
+                                       cCaption Window title.
+                                       nFlags   See. MSDN MessageBox.i.e MB_ICONEXCLAMATION | MB_YESNOCANCEL
+
+IsCovered                     Indicates if the form is partially or totally covered by another window.
+                              Parameters
+                                       NONE
+LockWindowUpdate              Disables drawing in the window. Only one window can be locked at a time.
+                              Parameters
+                                       NONE
+UnlockWindowUpdate            Enables drawing in the window. Only one window can be locked at a time.
+                              Parameters
+                                       NONE
+
+HideCaret                     Removes the caret from the screen. Hiding a caret does not destroy its current shape or invalidate the insertion point.
+                              Parameters
+                                       NONE
+ShowCaret                     Makes the caret visible on the screen at the caret's current position. When the caret becomes visible, it begins flashing automatically. 
+                              Parameters
+                                       NONE
+DestroyCaret                  Destroys the caret's current shape, frees the caret from the window, and removes the caret from the screen. 
+                              Parameters
+                                       NONE
+
+CreateCaret                   Creates a new shape for the system caret and assigns ownership of the caret to the specified window. The caret shape can be a line, a block, or a bitmap. 
+                              Parameters
+                                       hBmp     Handle to the bitmap that defines the caret shape. If this parameter is NULL, the caret is solid. If this parameter is (HBITMAP) 1, the caret is gray. If this parameter is a bitmap handle, the caret is the specified bitmap. The bitmap handle must have been created by the CreateBitmap, CreateDIBitmap, or LoadBitmap function. 
+                                       nWidth   Specifies the width of the caret in logical units. If this parameter is zero, the width is set to the system-defined window border width. If hBitmap is a bitmap handle, CreateCaret ignores this parameter.
+                                       nHeight  Specifies the height, in logical units, of the caret. If this parameter is zero, the height is set to the system-defined window border height. If hBitmap is a bitmap handle, CreateCaret ignores this parameter.
+
+SetCapture                    Captures mouse input either when the mouse is over the capturing window, or when the mouse button was pressed while the mouse was over the capturing window and the button is still down. Only one window at a time can capture the mouse.
+
+   METHOD GetCapture()          INLINE GetCapture() == ::hWnd
+   METHOD ReleaseCapture()      INLINE ReleaseCapture()
+   METHOD OpenClipboard()       INLINE OpenClipboard( ::hWnd )
+   METHOD IsWindow()            INLINE IsWindow( ::hWnd )
+   METHOD IsWindowVisible()     INLINE IsWindowVisible( ::hWnd )
+   METHOD SetFocus()            INLINE SetFocus( ::hWnd),self
+   METHOD GetWindowRect()
+   METHOD SetParent()
+   METHOD ScrollWindow( x, y, rRect, rClip ) INLINE _ScrollWindow( ::hWnd, x, y, rRect, rClip )
+   METHOD SetActiveWindow()     INLINE SetActiveWindow( ::hWnd )
+   METHOD GetClientRect()
+   METHOD SetWindowText(cText)  INLINE ::xCaption := cText, IIF( ::hWnd != NIL, SetWindowText( ::hWnd, cText ),)
+   METHOD BringWindowToTop()    INLINE BringWindowToTop( ::hWnd )
+   METHOD ScreenToClient( pt )  INLINE ScreenToClient( ::hWnd, @pt )
+   METHOD ClientToScreen( pt )  INLINE ClientToScreen( ::hWnd, @pt )
+   METHOD SetWindowPos( hAfter, x, y, w, h , n)             INLINE SetWindowPos( ::hWnd, hAfter, x, y, w, h , n )
+   METHOD DeferWindowPos( hDef, hAfter, x, y, w, h , n)     INLINE DeferWindowPos( hDef, ::hWnd, hAfter, x, y, w, h , n )
+   METHOD SendMessage( nMsg, nwParam, nlParam )             INLINE SendMessage( ::hWnd, nMsg, nwParam, nlParam )
+   METHOD SendDlgItemMessage( nId, nMsg, nwParam, nlParam ) INLINE SendDlgItemMessage( ::hWnd, nId, nMsg, nwParam, nlParam )
+   METHOD PostMessage( nMsg, nwParam, nlParam )             INLINE _PostMessage( ::hWnd, nMsg, nwParam, nlParam )
+   METHOD GetWindowLong(n)      INLINE GetWindowLong( ::hWnd, n )
+   METHOD SetWindowLong(n,nSt)  INLINE SetWindowLong( ::hWnd, n, nSt )
+   METHOD RedrawWindow( rc, hRgn, nFlags ) INLINE _RedrawWindow( ::hWnd, rc, hRgn, nFlags )
+   METHOD TrackMouseEvent()
+   METHOD DefWindowProc( nMsg, nwParam, nlParam ) INLINE DefWindowProc( ::hWnd, nMsg, nwParam, nlParam )
+   METHOD GetWindowTextLength() INLINE GetWindowTextLength( ::hWnd )
+   METHOD GetWindowPlacement()
+   METHOD GetWindowInfo()
+   METHOD GetIcon( nIcon )        INLINE ::SendMessage( WM_GETICON, nIcon, 0 )
+   METHOD SetIcon( nIcon, hIcon ) INLINE ::SendMessage( WM_SETICON, nIcon, hIcon )
+   METHOD SetStyle()
+   METHOD GetStyle(n)             INLINE IIF( ::IsWindow(), ( ::GetWindowLong( GWL_STYLE ) & n ) == n, ::Style & n == n )
+   METHOD SetExStyle()
+
+   METHOD SetRedraw(lRed)       INLINE ::SendMessage( WM_SETREDRAW,IIF(lRed,1,0),0)
+   METHOD IsWindowEnabled()     INLINE IsWindowEnabled( ::hWnd )
+   METHOD SetBackColor()
+   METHOD SetForeColor()
+   METHOD ValidateRect( rc ) INLINE _ValidateRect( ::hWnd, rc )
+   METHOD InvalidateRect( rc, lErase )      INLINE IIF( ::hWnd != NIL, _InvalidateRect( ::hWnd, rc, lErase ),)
+   METHOD MapWindowPoints( hWndDest, pt, nPoint ) INLINE MapWindowPoints( ::hWnd, hWndDest, @pt, nPoint )
+   METHOD MoveWindow()
+
+   METHOD GetRectangle()             INLINE { ::Left, ::Top, ::Left + ::Width, ::Top + ::Height }
+   METHOD GetRect()
+
+   METHOD CallWindowProc() INLINE CallWindowProc( ::__nProc, ::hWnd, ::Msg, ::wParam, ::lParam )
+   METHOD UpdateWindow()        INLINE UpdateWindow( ::hWnd ), Self
+
+   METHOD Refresh()
+   METHOD ReCreate()
+   METHOD GetHeight()           INLINE ::xHeight
+   METHOD IsChildren()
+   METHOD DockIt()
+   METHOD SetTabOrder()
+
+   //METHOD DefControlProc()
+
+   METHOD DockToParent()         INLINE ::Dock:Left   := ::Parent,;
+                                        ::Dock:Top    := ::Parent,;
+                                        ::Dock:Right  := ::Parent,;
+                                        ::Dock:Bottom := ::Parent,;
+                                        ::DockIt()
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+Events
+
+   

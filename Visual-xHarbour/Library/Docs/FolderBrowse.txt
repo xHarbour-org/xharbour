@@ -1,0 +1,29 @@
+Properties
+   RootFolder
+   InitialPath
+   AllowShellMenu
+   SysFolder
+   Folder
+   AllowNavigation 
+   ShowFolders     
+   AllowShellMenu  
+   SelFile         
+   SelFolder       
+
+
+Methods
+   Update()
+   GetPath()
+   GetSysFolder()
+   Populate()
+   OpenSelFile(cFile)
+   OpenSelFolder()
+   Open()
+   GoUp()         
+
+
+
+
+
+   
+

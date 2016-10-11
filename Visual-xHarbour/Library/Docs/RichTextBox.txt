@@ -1,0 +1,19 @@
+Properties
+   
+
+
+Methods
+   FindText()
+   GetTextLength()
+   SetSelectionColor()
+   EditStreamCallback()
+
+
+
+
+
+    
+
+
+   
+   

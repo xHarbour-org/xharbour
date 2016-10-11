@@ -1,0 +1,26 @@
+Properties
+   ImageList
+   BackColor 
+   Caption
+   Width   
+   Left 
+   Top 
+   Border  
+   TabStop  
+   Enabled                             
+           
+
+
+Methods
+   SetPanels()
+   GetPanelRect()
+   SetImageIndex()
+
+
+
+
+    
+
+
+   
+   

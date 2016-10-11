@@ -1,0 +1,15 @@
+Properties
+   PagerSize  
+   ButtonCheckColor
+   ButtonCheckSolid(l)
+   CheckGroup(l)
+   ImageList(o)
+   HotImageList(o)
+   List
+
+Methods
+   IsButtonChecked( nId )
+   CheckButton( nId, lCheck )
+   Undock()
+   GetChildFromPoint()
+

@@ -1,0 +1,68 @@
+Properties
+   Items
+   Header
+   Columns          
+   Level           
+   SelectedItem    
+   PreviousItem   
+   DragImage        
+   ClickedItem       
+   HasLines        
+   HasButtons      
+   LinesAtRoot     
+   ShowSelAlways   
+   CheckBoxes      
+   FullRowSelect   
+   NoHScroll       
+   NoToolTips      
+   SingleExpand    
+   TrackSelect     
+   DisableDragDrop 
+   StaticEdge      
+   Border          
+   BackColor         
+   ImageList  
+
+Methods
+   AddItem()
+   GetSelected()
+   GetItem()
+   ExpandAll()
+   GetSelText()                
+   SetBkColor( nColor )        
+   SetTextColor( nColor )     
+   SelectItem( hItem, nFlag ) 
+   SetScrollTime(n)            
+   EnsureVisible( hItem )      
+   Toggle( hItem )             
+   Expand( hItem )             
+   EditLabel( hItem )          
+   SetIndent( n )             
+   GetCount()                  
+   GetVisibleCount()           
+   GetRoot()                   
+   GetFirstVisibleItem()       
+   GetLastVisibleItem()        
+   GetNextVisibleItem( hItem ) 
+   GetNextItem( hItem )        
+   GetChild( hItem )           
+   SetItemHeight( nHeight )    
+   GetItemHeight()             
+   CreateDragImage( hItem )    
+   GetItemState()
+   SetImageList()
+   ResetContent()
+   GetItemRect()
+   HitTest()
+   OnRightClick()         
+   SearchString()
+   GetExpandedCount()
+
+      
+Events
+   OnSelDelete      
+   OnBeginLabelEdit 
+   OnBeginDrag      
+   OnBeginRDrag     
+   OnLabelEdit      
+   OnEndLabelEdit   

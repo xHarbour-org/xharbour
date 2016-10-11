@@ -1,0 +1,22 @@
+Properties
+   BackColor 
+   ForeColor 
+   Editor         
+   HotImageList    
+   ImageList
+          
+ 
+Methods
+   GetItem()
+   GetItemCount()    
+   DeleteMenuItem()
+   CheckMenuItem()
+   EnableMenuItem()
+
+
+
+
+
+
+   
+

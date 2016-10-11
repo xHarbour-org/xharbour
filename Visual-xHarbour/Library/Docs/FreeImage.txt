@@ -1,0 +1,12 @@
+Properties
+   Transparent
+   Alignment
+
+
+Methods
+   SetBackColor(n)
+
+
+
+   
+

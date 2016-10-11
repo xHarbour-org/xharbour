@@ -1,0 +1,55 @@
+Properties
+   Parent
+   Icon             
+   CloseOnClick     
+   CropedText       
+   TabOrder         
+   Theming          
+   ContextMenu      
+   Cursor           
+   Top              
+   Dock            
+   Left             
+   Width            
+   Height  
+   ClsName
+   Caption 
+   Name
+   AutoClose       
+   ShowMode 
+   DisableParent
+   ToolTip  
+   MDIClient
+   BackColor
+   ForeColor 
+   Tip     
+   Track
+   Transparent
+   CenterTip 
+   Absolute  
+   MdiContainer           
+   
+
+Methods
+   TrackActivate()
+   Pop()         
+   PopUp()                
+   Activate(lAct)
+   SetTitle(nIcon,cTitle)
+   SetTTStyle()
+   GetMargin()
+   SetDelayTime(nmSec)   
+   SetAutoPop(nmSec)     
+   SetReShow(nmSec)     
+   SetAutomatic(nmSec)    
+   TrackPosition(x,y)     
+   Update()               
+   SetNewRect()
+   SetText()
+   OnLButtonDown()
+   AlignToParent()       
+   ShowAt( x, y ) 
+   Show()                 
+   OnParentNotify()
+   OnTimer()
+   

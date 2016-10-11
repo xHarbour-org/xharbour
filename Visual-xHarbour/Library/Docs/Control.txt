@@ -1,0 +1,44 @@
+Properties
+   AllowUnDock
+   Dock  
+   Anchor 
+   AllowClose        
+   HighlightCaption
+   Flat            
+   Transparent 
+   ContextMenu 
+   TabStop 
+   SmallCaption  
+   Enabled         
+   AllowMaximize    
+   IsContainer        
+   Action            
+   CaptionHeight     
+   CaptionWidth      
+   KeepActiveCaption  
+   DisableParent
+   Center         
+   Child        
+   ControlParent 
+   MdiContainer   
+   IsDocked  
+          
+ 
+Methods
+   Disable()
+   Enable() 
+   Undock()
+   Redock()
+   Redraw() 
+   Hide() 
+   Show()
+ 
+
+Events
+   OnWMUnDock        
+   OnWMReDock        
+
+
+
+   
+

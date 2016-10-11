@@ -1,0 +1,51 @@
+Properties
+   ItemHeight         
+   FullRowSelect      
+   ShadowRow          
+   GridColor          
+   AutoHorzScroll     
+   AutoVertScroll     
+   FreezeColumn       
+   ShowHeaders        
+   HeaderHeight       
+   ShowSelection      
+   ShowSelectionBorder
+   ImageList
+   DataSource 
+   ShowGrid
+   Striping
+   ConvertOem
+   HighlightColor          
+   HighlightTextColor      
+   ExtVertScrollBar
+   ColPos                  
+   RowPos                  
+   HitTop                  
+   HitBottom               
+   bRowChanged             
+
+Methods   
+   Update()
+   AutoAddColumns()
+   ArrowRight()
+   ArrowLeft()
+   PageDown()
+   PageUp()
+   Home()
+   End()
+   Up()
+   Down()
+   UpdateRow()
+   DeleteColumn()
+   GoBottom()     
+   GoTop()        
+   Edit()         
+   Skip( n )
+   Refresh()
+   ColFromPos()
+   OnPaint()
+   OnHorzScroll()
+   OnVertScroll()
+   SaveLayout()
+   RestoreLayout()
+

@@ -1,0 +1,90 @@
+PROCEDURE RCColorizerInit()
+
+   PUBLIC RCReserved := HB_RegExComp( "(?i)(language|discardable|font|dialogex|dialog|style|exstyle|control|avi|bitmap|checkbox|combobox|cursor|groupbox|icon|radiobox|menuitem|menu|begin|end|popup) *" )
+   PUBLIC RCLiteral  := HB_RegExComp( '".*" *' )
+   PUBLIC RCOperator := HB_RegExComp( "\+\+|--|\*\*|:=|<>|>=|<=|==|!=|\+=|-=|\*=|/=|&&|[!@#$^&*(){}[\]|/,><-=]|\+ *" )
+
+RETURN
+
+PROCEDURE RCColorizer( hDC, nX, nY, sLine, nCharWidth, nOffset, CustomColors )
+
+   LOCAL cToken, nIndex := 1, nLen, nLens := 0
+   LOCAL oError
+
+   //TraceLog( HB_aParams() )
+   //TraceLog( sLine, nOffset, Len( sLine ) )
+
+   IF Empty( sLine ) .OR. nOffset >= Len( sLine )
+      RETURN
+   ENDIF
+
+   TRY
+      WHILE sLine[nIndex] == ' '
+         nIndex++
+      END
+      nIndex--
+
+      IF nIndex > nOffset
+         nIndex -= nOffset
+         nOffset := 0
+         TextOut( hDC, nX, nY, Space( nIndex ), nIndex )
+         nX += ( nIndex * nCharWidth )
+         nLens += nIndex
+      ELSE
+         nOffset -= nIndex
+      ENDIF
+
+      sLine := LTrim( sLine )
+
+      IF sLine[1] == '#'
+         SetTextColor( hDC, CustomColors[ "Directives" ] )
+         nLen := Len( sLine ) - nOffset
+         TextOut( hDC, nX, nY, SubStr( sLine, nOffset + 1 ), nLen )
+         BREAK
+      ELSEIF sLine[1] == '/'
+         SetTextColor( hDC, CustomColors[ "Comments" ] )
+         nLen := Len( sLine ) - nOffset
+         TextOut( hDC, nX, nY, SubStr( sLine, nOffset + 1 ), nLen )
+         BREAK
+      ENDIF
+
+      WHILE ! Empty( cToken := NextToken( @sLine ) )
+         nLen := Len( cToken )
+
+         IF HB_RegExMatch( M->RCReserved, cToken, .T. )
+            SetTextColor( hDC, CustomColors[ "Reserved" ] )
+         ELSEIF HB_RegExMatch( M->RCLiteral, cToken, .T. )
+            SetTextColor( hDC, CustomColors[ "Literals" ] )
+         ELSEIF HB_RegExMatch( M->RCOperator, cToken, .T. )
+            SetTextColor( hDC, CustomColors[ "Operators" ] )
+         ELSEIF cToken = "/*" .OR. cToken = "//"
+            SetTextColor( hDC, CustomColors[ "Comments" ] )
+         ELSE
+            SetTextColor( hDC, CustomColors[ "Text" ] )
+         ENDIF
+
+         IF nLens >= nOffset
+            TextOut( hDC, nX, nY, cToken, nLen )
+            nX += ( nLen * nCharWidth )
+            //nLens += nLen // No longer needed here
+         ELSEIF nLens + nLen > nOffset
+            nLen := nLens + nLen - nOffset
+            cToken := Right( cToken, nLen )
+            TextOut( hDC, nX, nY, cToken, nLen )
+            nX += ( nLen * nCharWidth )
+            nLens := nOffset //+ nLen No longer needed
+         ELSE
+            nLens += nLen
+         ENDIF
+      END
+      
+   CATCH oError
+      IF oError == NIL
+         nX += ( nLen * nCharWidth )
+      ELSE   
+         TraceLog( oError:ProcName, oError:ProcLine, + oError:Operation, oError:Description )
+      ENDIF
+
+   END
+
+RETURN

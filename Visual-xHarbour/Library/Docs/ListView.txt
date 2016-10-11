@@ -1,0 +1,48 @@
+Properties
+   LvExStyle           
+   Items
+   CurPos  
+   Columns
+   Groups
+   ImageList      
+   ImageListSmall
+   Source 
+   FlatScrollBar
+   GridLines 
+   FullRowSelect 
+   AlignLeft
+   AlignMask
+   AlignTop
+   NoColumnHeader
+   NoLabelWrap
+   NoScroll   
+   NoSortHeader   
+   OwnerDrawFixed 
+   EditLabels     
+   AutoArrange    
+   BackColor  
+   ForeColor    
+   ViewStyle   
+   nCurRec
+ 
+Methods
+   InsertItem()
+   InsertItems()
+   SetLVExStyle()
+   AddColumn()
+   DeleteColumn(nCol)
+   GetCurPos()
+   SetItemText()
+   SetImageList()
+   SetImageListSmall()
+   SetCurSel()
+   ResetContent()    
+   GetHotItem() 
+   EnsureVisible( nItem, lPart )
+   SetDataSource()
+   GetVirtualValue()
+   SortItems()
+   SetBackColor()
+   SetForeColor()
+   FindItem()
+   GetSearchString()
