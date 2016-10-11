@@ -96,10 +96,10 @@ extern HB_EXPORT void     hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
 extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
-extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, ULONG ulID, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-extern HB_EXPORT PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, ULONG ulID, int iPCodeVer, PHB_ITEM *pGlobals );
-extern HB_EXPORT PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, ULONG ulID, int iPCodeVer, PHB_ITEM *pGlobals );
-extern HB_EXPORT PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule, ULONG ulID, int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule,  int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
+extern HB_EXPORT PSYMBOLS hb_vmProcessSysDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule,  int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_EXPORT PSYMBOLS hb_vmProcessPrgDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule,  int iPCodeVer, PHB_ITEM *pGlobals );
+extern HB_EXPORT PSYMBOLS hb_vmProcessExeUsesDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char *szModule,  int iPCodeVer, PHB_ITEM *pGlobals );
 
 #ifdef _HB_API_INTERNAL_
    extern BOOL        hb_vmFindModuleSymbols( PHB_SYMB pSym, PHB_SYMB * pSymbols, USHORT * puiSymbols );

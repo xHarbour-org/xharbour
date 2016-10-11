@@ -192,5 +192,5 @@ void hb_vmSymbolInit_RT( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmSymbolInit_RT()" ) );
 
-   hb_vmProcessSymbols( symbols, ( USHORT ) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), "initsymb.c", 0, ( int ) HB_PCODE_VER, NULL );
+   hb_vmProcessSymbols( symbols, ( USHORT ) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), "initsymb.c",  ( int ) HB_PCODE_VER, NULL );
 }

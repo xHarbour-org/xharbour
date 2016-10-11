@@ -562,17 +562,17 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          {
             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
-               char *      szFileName  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
+               char *      szFileNames  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
                FILE *      yyc;
                PNAMESPACE  pMember;
                int         iLevel      = 1;
 
-               yyc = hb_fopen( szFileName, "wb" );
+               yyc = hb_fopen( szFileNames, "wb" );
 
                if( ! yyc )
                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
 
-               hb_xfree( szFileName );
+               hb_xfree( szFileNames );
 
                fprintf( yyc, "#if defined( NAMESPACE_DECFUNCS ) && ! defined( __PRG__ ) \n" );
 
@@ -1532,7 +1532,7 @@ static void hb_writeEndInit( FILE * yyc, const char * szModuleName )
    fprintf( yyc, "\nHB_INIT_SYMBOLS_EX_END( hb_vm_SymbolInit_%s%s, ",
                  hb_comp_szPrefix, szModuleName );
    //hb_gencc_string_put( yyc, ( BYTE * ) szSourceFile, strlen( szSourceFile ) );
-   fprintf( yyc, "__PRG_SOURCE__, 0x%lx, 0x%04x )\n\n", 0L, HB_PCODE_VER );
+   fprintf( yyc, "__PRG_SOURCE__,  0x%04x )\n\n",  HB_PCODE_VER );
 
    fprintf( yyc, "#if defined( HB_PRAGMA_STARTUP )\n"
                  "   #pragma startup hb_vm_SymbolInit_%s%s\n"

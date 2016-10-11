@@ -101,9 +101,9 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserve
    return TRUE;
 }
 
-HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulId, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
-   return hb_vmProcessPrgDllSymbols( pSymbols, uiModuleSymbols, szModule, ulId, iPCodeVer, pGlobals );
+   return hb_vmProcessPrgDllSymbols( pSymbols, uiModuleSymbols, szModule,  iPCodeVer, pGlobals );
 }
 HB_EXTERN_END
 #endif

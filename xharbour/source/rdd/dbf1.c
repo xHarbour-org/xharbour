@@ -551,7 +551,7 @@ static BOOL hb_dbfWriteRecord( DBFAREAP pArea )
  */
 static void hb_dbfTableTransaction( DBFAREAP pArea, BOOL fTransaction )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_dbfTableTransaction(%p,%d)", pArea, pPasswd, fTransaction ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_dbfTableTransaction(%p,%d)", pArea, fTransaction ) );
 
    if( ! pArea->fReadonly )
    {

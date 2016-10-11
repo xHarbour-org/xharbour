@@ -138,7 +138,7 @@ static FARPROC hb_GetProcAddress( char * szFuncName )
 }
 
 /* module symbols initialization */
-PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule, ULONG ulId, int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
+PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const char * szModule,  int iPCodeVer, PHB_ITEM * pGlobals ) /* module symbols initialization */
 {
    /* notice hb_vmProcessSysDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
@@ -153,7 +153,7 @@ PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, const c
    pProcessSymbols = ( VM_PROCESS_DLL_SYMBOLS ) hb_GetProcAddress( "_hb_vmProcessSysDllSymbols" );
 
    HB_SYMBOL_UNUSED( pGlobals );
-   return pProcessSymbols( pSymbols, uiModuleSymbols, szModule,ulId, iPCodeVer, pGlobals );
+   return pProcessSymbols( pSymbols, uiModuleSymbols, szModule, iPCodeVer, pGlobals );
 }
 
 void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )

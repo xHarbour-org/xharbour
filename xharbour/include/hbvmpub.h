@@ -158,7 +158,7 @@
    extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
    extern PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
    extern void     hb_vmFreeSymbols( PSYMBOLS pSymbols );
-   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, UINT uiSymbols, const char * szModuleName, ULONG ulID, BOOL fDynLib, BOOL fClone, struct _HB_ITEM **pGlobals );
+   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, UINT uiSymbols, const char * szModuleName,  BOOL fDynLib, BOOL fClone, struct _HB_ITEM **pGlobals );
    extern void     hb_vmBeginSymbolGroup( void * hDynLib, BOOL fClone );
    extern void     hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] );
    extern void     hb_vmExitSymbolGroup( void * hDynLib );

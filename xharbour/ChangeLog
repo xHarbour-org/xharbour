@@ -8,6 +8,56 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-10-10 22:05 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * contrib/gtwvw/gtwvw.c
+       ! fixed call to HB_TRACE() macro in hb_gt_FuncInit  function. was passing an diferent name of parameter found when compiling with -DHB_TR_LEVEL=HB_TR_DEBUG
+   * source/rdd/dbf1.c
+   * source/rdd/dbf1net.c
+     ! fixed call to HB_TRACE() macro in hb_dbfTableTransaction  function. was passing an non declared password found when compiling with -DHB_TR_LEVEL=HB_TR_DEBUG
+   * gtcgi/gtcgi.c
+     ! in hb_gt_cgi_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT )
+     ! using hb_xgrabz insted of hb_xgrab/memset calls
+   * gtcrs/gtcrs.c   
+     ! hb_gt_crs_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT )   
+   * gtpca/gtpca.c
+      ! hb_gt_pca_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )
+   * gtsln/gtsln.c
+      ! hb_gt_sln_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )  
+   * gtstd/gtstd.c
+      ! hb_gt_std_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )    
+      ! using hb_xgrabz insted of hb_xgrab/memset calls
+   * gttrm/gttrm.c
+      ! hb_gt_trm_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )  
+      ! using hb_xgrabz insted of hb_xgrab/memset calls
+   * gtwin/gtwin.c
+      ! hb_gt_win_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT )
+   * gtwvt/gtwvt.c
+      ! in hb_gt_wvt_New using hb_xgrabz insted of hb_xgrab/memset calls
+      ! hb_gt_wvt_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )  
+      ! in hb_gt_wvt_Info using cast to ( HB_PTRUINT ) insted of (HB_PTRDIFF) when  calling GetStdHandle
+   * gtxwc/gtxwc.c
+      ! hb_gt_xwc_Init changed HB_TRACE to cast hFilenoStdin, hFilenoStdout, hFilenoStderr as ( void * ) ( HB_PTRUINT ) insted of ( void * ) ( HB_PTRDIFF )  
+   * include/hbinit.h
+     * updated to allow new gcc to compile borrow ideia from harbour 
+   * include/hbvm.h
+     ! removed ULONG ulId to the follow functions : hb_vmProcessSymbols, hb_vmProcessSysDllSymbols, hb_vmProcessPrgDllSymbols,hb_vmProcessExeUsesDllSymbols
+   * include/hbvmpub.h      
+     ! removed ULONG ulId to the follow function : hb_vmRegisterSymbols
+   * source/compiler/genc.c   
+     ! changed to generate the new HB_INIT_SYMBOLS_EX_END
+
+   * source/vm/hvm.c     
+     ! updated the follow functions to use the removed the parameter ULONG ulId: hb_vmProcessSymbols, hb_vmProcessSysDllSymbols, 
+       hb_vmProcessPrgDllSymbols,hb_vmProcessExeUsesDllSymbols and hb_vmRegisterSymbols
+   * source/vm/estack.c 
+   * source/vm/initsymb.c
+   * source/vm/maindlle.c
+   * source/vm/maindllh.c
+   * source/vm/maindllp.c
+   * source/vm/runner.c
+   * source/vm/usedll.c
+     ! updated to reflect the change on   hb_vmProcessSymbols
+         
 2016-10-08 19:05 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include/hbcompat.ch
     + added translation rules for hb_SToD() and SToD()

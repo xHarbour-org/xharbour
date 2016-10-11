@@ -112,10 +112,10 @@ static void hb_gt_cgi_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
 {
    PHB_GTCGI pGTCGI;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Init(%p,%p,%p,%p)", pGT, hFilenoStdin, hFilenoStdout, hFilenoStderr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_cgi_Init(%p,%p,%p,%p)", pGT, ( void * ) ( HB_PTRUINT )hFilenoStdin, ( void * ) ( HB_PTRUINT ) hFilenoStdout, ( void * ) ( HB_PTRUINT ) hFilenoStderr ) );
 
-   pGTCGI            = ( PHB_GTCGI ) hb_xgrab( sizeof( HB_GTCGI ) );
-   memset( pGTCGI, 0, sizeof( HB_GTCGI ) );
+   pGTCGI            = ( PHB_GTCGI ) hb_xgrabz( sizeof( HB_GTCGI ) );
+   //memset( pGTCGI, 0, sizeof( HB_GTCGI ) );
    HB_GTLOCAL( pGT ) = pGTCGI;
 
    pGTCGI->hStdout   = hFilenoStdout;

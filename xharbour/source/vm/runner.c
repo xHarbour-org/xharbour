@@ -524,7 +524,7 @@ PHRB_BODY hb_hrbLoad( const char * szHrbBody, ULONG ulBodySize, char * szHrb )
       }
 
       pHrbBody->pModuleSymbols               = hb_vmRegisterSymbols( pHrbBody->pSymRead,
-                                                                     ( USHORT ) pHrbBody->ulSymbols, szHrb ? szHrb : ( char * ) "PCODE_HRB.hrb", 0, TRUE, FALSE, NULL );
+                                                                     ( USHORT ) pHrbBody->ulSymbols, szHrb ? szHrb : ( char * ) "PCODE_HRB.hrb",  TRUE, FALSE, NULL );
       pHrbBody->pModuleSymbols->pNamespaces  = pHrbBody->pNamespaces;
       pHrbBody->ModuleFakeDyn.pModuleSymbols = pHrbBody->pModuleSymbols;
 
