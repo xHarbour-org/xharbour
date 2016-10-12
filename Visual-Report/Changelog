@@ -1,0 +1,180 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2010-08-09
+   + Added formulas the usage is easy just drop the Formula component and set its value to whatever formula
+     you want. Values can include other Formulas as well TEST->SALARY*@Formula2. Remember to use the @ symbol
+     in front of the Formula component to point at it. DO NOT set @ as the formula name the system does it
+     automatically.
+
+2010-08-08
+   * Changed RelationExp to Relation which will contain a COMMA separated string for each relation 
+     which is a PIPE separated string which are 2 elements FIELD and ALIAS i.e.
+     Relation = First|ALIAS, Date|ALIAS2, CustID|CUSTOMERS
+     this will translate into something like this: 
+     SET RELATION TO First INTO ALIAS, Date INTO ALIAS2, CusID INTO CUSTOMERS
+
+2010-07-18
+   + Finished DataTable Filter UI
+
+2011-07-18
+   + Added WinFakt related function to be able to open index file.
+
+2010-07-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Filter dialog to setup filtering conditions via UI
+
+2010-07-12 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added functionality to read a connection string from an INI file
+   - Removed obsolete connection creation in VrDataTable since it only needs to be done
+     when running the report
+   ! Fixed bug editing string based properties not creatring the expanded box button
+   ! Fixed default edit button action to create the expanded box
+   * Changed ORDER property to be a STRING instead of a combobox when driver is SQLRDD
+     because VR designer doesn't create a connection when editing the report.
+   
+2010-07-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added properties RelationTable and RelationExp
+     To set a relationship between 2 tables make sure the target database has
+     driver and index order selected.
+     The expression in a normal clipper expression which can be as simple as
+     the field name
+   
+2010-06-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Changed DataTable property name bFilter to Filter because users don't know
+     what a codeblock is
+   + Added new Filter UI to generate the filter that will be converted into a codeblock
+
+2010-06-29 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Moved Report Header AFTER the page header and Report Footer right
+     after all data has printed
+
+2010-06-28 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed page break
+   ! Fixed Report Footer
+   + Added Picture property to Labels
+
+2010-06-24 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Report Header to saving and printing routines
+   ! Fixed Report Header and Footer printing out of context
+
+2010-06-23 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Fixed RTE clicking the [...] extended text editor
+   ! Fixed modified flag not being changed when chaning a property
+   ! Fixed GroupBy list of fields after assigning a DataSource to the Report
+   ! Fixed Deleting components
+   ! Fixed component name not being reused after deletion
+
+2010-06-22 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   * Rewritten SQL support for DataTable
+   + Added SQL support executing the report
+   + Added security when SQL server is not Online
+   ! Fixed DataTable to fill up the ORDER list of indexes upon setting the DRIVER
+     Remember it cannot know what the indexes are if the index is not assigned
+     to do that FIRST assign the file then the driver followed by the ORDER
+
+2010-06-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   - Removed property FIELD from labels
+   + Added support for formulas inside the TEXT property
+   - Removed VALUE from Totals. Now ROW totaling can be done with a Label
+   * Changed report engine to collect TOTAL information based on the result of 
+     the macro execution of labels
+   + Added support for SQL Server and ConnectionString
+
+2010-06-20 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Added more room to all list properties (comboboxes)
+   + Added support for xbase code inside the Text property
+
+2010-12-14 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Component holder to allow selecting non UI components
+   + Added DataTable component to ToolBox
+
+2010-12-04 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Started to work on Print Preview via PDF field generation
+   + Started to work on database component
+
+2010-12-02 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added new VrReport class to hold the PDF activex that will preview/print the report
+     and will also hold properties like PaperSize, Landscape, etc...
+   + Added Label:Draw() that will create the corresponding control on the PDF
+   + Added Image:Draw() to ADD the image filename to the PDF
+
+   
+2010-12-01 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Started to generate the report
+      #include 'vxh.ch'
+      FUNCTION test( lDesign )
+         LOCAL oCtrl
+         DEFAULT lDesign TO .F.
+         // Generate Header area
+         IF !lDesign
+            vrlabel():Draw( hDC,146,35,150,150, "Tahoma" )
+          ELSE
+            oCtrl := vrlabel( oApp:Props:Header )
+            oCtrl:Font:FaceName := "Tahoma"
+            oCtrl:Left   := 146
+            oCtrl:Top    := 35
+            oCtrl:Width  := 150
+            oCtrl:Height := 150
+            oCtrl:Create()
+         ENDIF
+      RETURN NIL
+
+2010-11-30 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Toolbar Close Button
+   + Added Save and SaveAs methods and corresponding logic to show
+     SaveFile dialog, main window caption with current report name stripping out 
+     the path.
+   ! Fixed Method Close() to clear up design area and disable toolbars
+   ! Fixed Main window's OnClose event to detect Report:Modified and prompt
+     for saving.
+     
+2010-11-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Image component
+   ! Fixed changing size to refresh selection rectangle
+
+2010-11-16 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Color selection
+   * Changed Label to automatically adjust width and height based on font 
+     size and Text length
+   ! Finished character edition
+
+2010-11-15 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Font:FaceName combobox
+   ! Fixed setting up values from Property Editor
+
+2010-11-13 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Font object to VR_Label
+   ! Finished property value display in Property Editor
+   + Added logical values combobox.
+
+2010-10-21 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Finished Editor Grid
+   + Added selection masked rectangle
+   + Finished control selection
+   + Adding selection sizer and Font/Color properties
+
+2010-10-19 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Save/Restore position and size for MainForm, ToolBox and PropEditor
+   ! Fixed current cursor after dropping an object on the paper
+
+2010-10-18 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added Object generation
+   + Added Object Link to ToolBox
+   + Added Property Manager object
+
+2010-10-17 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   + Added first Icon
+   ! Fixed StatusBar text
+   + Added ImageList to main toolbar
+   + Started RepEdit.prg which will host report pages
+   
+2010-10-08 00:00 UTC-0300 Augusto Infante <augusto.infante@xHarbour.com>
+   ! Replaced ExplorerBar with a real ToolBox VXH style.
+   + Added paste and drag cursors
