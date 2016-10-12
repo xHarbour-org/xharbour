@@ -1,0 +1,532 @@
+#ifndef _SHELLAPI_H
+#define _SHELLAPI_H
+
+/* Windows Shell API definitions */
+
+#define WINSHELLAPI  DECLSPEC_IMPORT
+#define SHSTDAPI  EXTERN_C DECLSPEC_IMPORT HRESULT STDAPICALLTYPE
+#define SHSTDAPI_(type)  EXTERN_C DECLSPEC_IMPORT type STDAPICALLTYPE
+#define SHDOCAPI  EXTERN_C DECLSPEC_IMPORT HRESULT STDAPICALLTYPE
+#define SHDOCAPI_(type)  EXTERN_C DECLSPEC_IMPORT type STDAPICALLTYPE
+
+#include <pshpack1.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if __POCC__ >= 290
+#pragma warn(push)
+#pragma warn(disable:2198)  /* Nameless field is not standard */
+#endif
+
+#define EIRESID(x)  ((-1)*(int)(x))
+
+#define ABM_NEW  0x00000000
+#define ABM_REMOVE  0x00000001
+#define ABM_QUERYPOS  0x00000002
+#define ABM_SETPOS  0x00000003
+#define ABM_GETSTATE  0x00000004
+#define ABM_GETTASKBARPOS  0x00000005
+#define ABM_ACTIVATE  0x00000006
+#define ABM_GETAUTOHIDEBAR  0x00000007
+#define ABM_SETAUTOHIDEBAR  0x00000008
+#define ABM_WINDOWPOSCHANGED  0x00000009
+
+#define ABN_STATECHANGE  0x00000000
+#define ABN_POSCHANGED  0x00000001
+#define ABN_FULLSCREENAPP  0x00000002
+#define ABN_WINDOWARRANGE  0x00000003
+
+#define ABS_AUTOHIDE  0x00000001
+#define ABS_ALWAYSONTOP  0x00000002
+
+#define ABE_LEFT  0
+#define ABE_TOP  1
+#define ABE_RIGHT  2
+#define ABE_BOTTOM  3
+
+#define SE_ERR_FNF  2
+#define SE_ERR_PNF  3
+#define SE_ERR_ACCESSDENIED  5
+#define SE_ERR_OOM  8
+#define SE_ERR_SHARE  26
+#define SE_ERR_ASSOCINCOMPLETE  27
+#define SE_ERR_DDETIMEOUT  28
+#define SE_ERR_DDEFAIL  29
+#define SE_ERR_DDEBUSY  30
+#define SE_ERR_NOASSOC  31
+#define SE_ERR_DLLNOTFOUND  32
+
+#define SEE_MASK_CLASSNAME  0x00000001
+#define SEE_MASK_CLASSKEY  0x00000003
+#define SEE_MASK_IDLIST  0x00000004
+#define SEE_MASK_INVOKEIDLIST  0x0000000c
+#define SEE_MASK_ICON  0x00000010
+#define SEE_MASK_HOTKEY  0x00000020
+#define SEE_MASK_NOCLOSEPROCESS  0x00000040
+#define SEE_MASK_CONNECTNETDRV  0x00000080
+#define SEE_MASK_FLAG_DDEWAIT  0x00000100
+#define SEE_MASK_DOENVSUBST  0x00000200
+#define SEE_MASK_FLAG_NO_UI  0x00000400
+#define SEE_MASK_UNICODE  0x00004000
+#define SEE_MASK_NO_CONSOLE  0x00008000
+#define SEE_MASK_ASYNCOK  0x00100000
+#define SEE_MASK_HMONITOR  0x00200000
+#if (_WIN32_IE >= 0x0500)
+#define SEE_MASK_NOQUERYCLASSSTORE  0x01000000
+#define SEE_MASK_WAITFORINPUTIDLE  0x02000000
+#endif /* (_WIN32_IE >= 0x500) */
+
+#define SHERB_NOCONFIRMATION  0x00000001
+#define SHERB_NOPROGRESSUI  0x00000002
+#define SHERB_NOSOUND  0x00000004
+
+#define NIM_ADD  0x00000000
+#define NIM_MODIFY  0x00000001
+#define NIM_DELETE  0x00000002
+
+#define NIF_MESSAGE  0x00000001
+#define NIF_ICON  0x00000002
+#define NIF_TIP  0x00000004
+
+#if (_WIN32_IE >= 0x0500)
+#define NIN_SELECT  (WM_USER+0)
+#define NIN_KEYSELECT  (NIN_SELECT|NINF_KEY)
+#define NINF_KEY  0x1
+
+#if (_WIN32_IE >= 0x0501)
+#define NIN_BALLOONSHOW  (WM_USER+2)
+#define NIN_BALLOONHIDE  (WM_USER+3)
+#define NIN_BALLOONTIMEOUT  (WM_USER+4)
+#define NIN_BALLOONUSERCLICK  (WM_USER+5)
+#endif /* _WIN32_IE >= 0x0501 */
+
+#define NIM_SETFOCUS  0x00000003
+#define NIM_SETVERSION  0x00000004
+
+#define NOTIFYICON_VERSION  3
+
+#define NIF_STATE  0x00000008
+#define NIF_INFO  0x00000010
+
+#define NIS_HIDDEN  0x00000001
+#define NIS_SHAREDICON  0x00000002
+
+#define NIIF_NONE  0x00000000
+#define NIIF_INFO  0x00000001
+#define NIIF_WARNING  0x00000002
+#define NIIF_ERROR  0x00000003
+#if (_WIN32_IE >= 0x0501)
+#define NIIF_NOSOUND  0x00000010
+#endif /* _WIN32_IE >= 0x0501 */
+#endif /* _WIN32_IE >= 0x0500 */
+
+#define SHGFI_ICON  0x000000100
+#define SHGFI_DISPLAYNAME  0x000000200
+#define SHGFI_TYPENAME  0x000000400
+#define SHGFI_ATTRIBUTES  0x000000800
+#define SHGFI_ICONLOCATION  0x000001000
+#define SHGFI_EXETYPE  0x000002000
+#define SHGFI_SYSICONINDEX  0x000004000
+#define SHGFI_LINKOVERLAY  0x000008000
+#define SHGFI_SELECTED  0x000010000
+#define SHGFI_ATTR_SPECIFIED  0x000020000
+#define SHGFI_LARGEICON  0x000000000
+#define SHGFI_SMALLICON  0x000000001
+#define SHGFI_OPENICON  0x000000002
+#define SHGFI_SHELLICONSIZE  0x000000004
+#define SHGFI_PIDL  0x000000008
+#define SHGFI_USEFILEATTRIBUTES  0x000000010
+#if (_WIN32_IE >= 0x0500)
+#define SHGFI_ADDOVERLAYS  0x000000020
+#define SHGFI_OVERLAYINDEX  0x000000040
+#endif
+
+#define SHGNLI_PIDL  0x000000001
+#define SHGNLI_PREFIXNAME  0x000000002
+#define SHGNLI_NOUNIQUE  0x000000004
+#if (_WIN32_IE >= 0x0501)
+#define SHGNLI_NOLNK  0x000000008
+#endif /* _WIN2_IE >= 0x0501 */
+
+#define PRINTACTION_OPEN  0
+#define PRINTACTION_PROPERTIES  1
+#define PRINTACTION_NETINSTALL  2
+#define PRINTACTION_NETINSTALLLINK  3
+#define PRINTACTION_TESTPAGE  4
+#define PRINTACTION_OPENNETPRN  5
+#ifdef WINNT
+#define PRINTACTION_DOCUMENTDEFAULTS  6
+#define PRINTACTION_SERVERPROPERTIES  7
+#endif
+
+#ifndef FO_MOVE
+#define FO_MOVE  0x0001
+#define FO_COPY  0x0002
+#define FO_DELETE  0x0003
+#define FO_RENAME  0x0004
+
+#define PO_DELETE  0x0013
+#define PO_RENAME  0x0014
+#define PO_PORTCHANGE  0x0020
+#define PO_REN_PORT  0x0034
+
+#define FOF_MULTIDESTFILES  0x0001
+#define FOF_CONFIRMMOUSE  0x0002
+#define FOF_SILENT  0x0004
+#define FOF_RENAMEONCOLLISION  0x0008
+#define FOF_NOCONFIRMATION  0x0010
+#define FOF_WANTMAPPINGHANDLE  0x0020
+#define FOF_ALLOWUNDO  0x0040
+#define FOF_FILESONLY  0x0080
+#define FOF_SIMPLEPROGRESS  0x0100
+#define FOF_NOCONFIRMMKDIR  0x0200
+#define FOF_NOERRORUI  0x0400
+#define FOF_NOCOPYSECURITYATTRIBS  0x0800
+#define FOF_NORECURSION  0x1000
+#if (_WIN32_IE >= 0x0500)
+#define FOF_NO_CONNECTED_ELEMENTS  0x2000
+#define FOF_WANTNUKEWARNING  0x4000
+#endif /* _WIN32_IE >= 0x500 */
+#if (_WIN32_WINNT >= 0x0501)
+#define FOF_NORECURSEREPARSE  0x8000
+#endif /* _WIN32_WINNT >= 0x501 */
+
+typedef WORD FILEOP_FLAGS;
+typedef WORD PRINTEROP_FLAGS;
+#endif /* FO_MOVE */
+
+#if (_WIN32_WINNT >= 0x0500) || (_WIN32_WINDOWS >= 0x0500)
+#define OFFLINE_STATUS_LOCAL  0x0001
+#define OFFLINE_STATUS_REMOTE  0x0002
+#define OFFLINE_STATUS_INCOMPLETE  0x0004
+#endif
+
+DECLARE_HANDLE(HDROP);
+
+typedef struct _DRAGINFOA {
+    UINT uSize;
+    POINT pt;
+    BOOL fNC;
+    LPSTR lpFileList;
+    DWORD grfKeyState;
+} DRAGINFOA, *LPDRAGINFOA;
+
+typedef struct _DRAGINFOW {
+    UINT uSize;
+    POINT pt;
+    BOOL fNC;
+    LPWSTR lpFileList;
+    DWORD grfKeyState;
+} DRAGINFOW, *LPDRAGINFOW;
+
+typedef struct _AppBarData {
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uCallbackMessage;
+    UINT uEdge;
+    RECT rc;
+    LPARAM lParam;
+} APPBARDATA, *PAPPBARDATA;
+
+typedef struct _SHFILEOPSTRUCTA {
+    HWND hwnd;
+    UINT wFunc;
+    LPCSTR pFrom;
+    LPCSTR pTo;
+    FILEOP_FLAGS fFlags;
+    BOOL fAnyOperationsAborted;
+    LPVOID hNameMappings;
+    LPCSTR lpszProgressTitle;
+} SHFILEOPSTRUCTA, *LPSHFILEOPSTRUCTA;
+
+typedef struct _SHFILEOPSTRUCTW {
+    HWND hwnd;
+    UINT wFunc;
+    LPCWSTR pFrom;
+    LPCWSTR pTo;
+    FILEOP_FLAGS fFlags;
+    BOOL fAnyOperationsAborted;
+    LPVOID hNameMappings;
+    LPCWSTR lpszProgressTitle;
+} SHFILEOPSTRUCTW, *LPSHFILEOPSTRUCTW;
+
+typedef struct _SHNAMEMAPPINGA {
+    LPSTR pszOldPath;
+    LPSTR pszNewPath;
+    int cchOldPath;
+    int cchNewPath;
+} SHNAMEMAPPINGA, *LPSHNAMEMAPPINGA;
+
+typedef struct _SHNAMEMAPPINGW {
+    LPWSTR pszOldPath;
+    LPWSTR pszNewPath;
+    int cchOldPath;
+    int cchNewPath;
+} SHNAMEMAPPINGW, *LPSHNAMEMAPPINGW;
+
+typedef struct _SHELLEXECUTEINFOA {
+    DWORD cbSize;
+    ULONG fMask;
+    HWND hwnd;
+    LPCSTR lpVerb;
+    LPCSTR lpFile;
+    LPCSTR lpParameters;
+    LPCSTR lpDirectory;
+    int nShow;
+    HINSTANCE hInstApp;
+    LPVOID lpIDList;
+    LPCSTR lpClass;
+    HKEY hkeyClass;
+    DWORD dwHotKey;
+    union {
+        HANDLE hIcon;
+        HANDLE hMonitor;
+    } DUMMYUNIONNAME;
+    HANDLE hProcess;
+} SHELLEXECUTEINFOA, *LPSHELLEXECUTEINFOA;
+
+typedef struct _SHELLEXECUTEINFOW {
+    DWORD cbSize;
+    ULONG fMask;
+    HWND hwnd;
+    LPCWSTR lpVerb;
+    LPCWSTR lpFile;
+    LPCWSTR lpParameters;
+    LPCWSTR lpDirectory;
+    int nShow;
+    HINSTANCE hInstApp;
+    LPVOID lpIDList;
+    LPCWSTR lpClass;
+    HKEY hkeyClass;
+    DWORD dwHotKey;
+    union {
+        HANDLE hIcon;
+        HANDLE hMonitor;
+    } DUMMYUNIONNAME;
+    HANDLE hProcess;
+} SHELLEXECUTEINFOW, *LPSHELLEXECUTEINFOW;
+
+typedef struct _SHCREATEPROCESSINFOW {
+    DWORD cbSize;
+    ULONG fMask;
+    HWND hwnd;
+    LPCWSTR pszFile;
+    LPCWSTR pszParameters;
+    LPCWSTR pszCurrentDirectory;
+    HANDLE hUserToken;
+    LPSECURITY_ATTRIBUTES lpProcessAttributes;
+    LPSECURITY_ATTRIBUTES lpThreadAttributes;
+    BOOL bInheritHandles;
+    DWORD dwCreationFlags;
+    LPSTARTUPINFOW lpStartupInfo;
+    LPPROCESS_INFORMATION lpProcessInformation;
+} SHCREATEPROCESSINFOW, *PSHCREATEPROCESSINFOW;
+
+typedef struct _SHQUERYRBINFO {
+    DWORD cbSize;
+    __int64 i64Size;
+    __int64 i64NumItems;
+} SHQUERYRBINFO, *LPSHQUERYRBINFO;
+
+typedef struct _NOTIFYICONDATAA {
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uID;
+    UINT uFlags;
+    UINT uCallbackMessage;
+    HICON hIcon;
+#if (_WIN32_IE < 0x0500)
+    CHAR szTip[64];
+#else
+    CHAR szTip[128];
+    DWORD dwState;
+    DWORD dwStateMask;
+    CHAR szInfo[256];
+    union {
+        UINT uTimeout;
+        UINT uVersion;
+    } DUMMYUNIONNAME;
+    CHAR szInfoTitle[64];
+    DWORD dwInfoFlags;
+#endif
+} NOTIFYICONDATAA, *PNOTIFYICONDATAA;
+
+typedef struct _NOTIFYICONDATAW {
+    DWORD cbSize;
+    HWND hWnd;
+    UINT uID;
+    UINT uFlags;
+    UINT uCallbackMessage;
+    HICON hIcon;
+#if (_WIN32_IE < 0x0500)
+    WCHAR szTip[64];
+#else
+    WCHAR szTip[128];
+    DWORD dwState;
+    DWORD dwStateMask;
+    WCHAR szInfo[256];
+    union {
+        UINT uTimeout;
+        UINT uVersion;
+    } DUMMYUNIONNAME;
+    WCHAR szInfoTitle[64];
+    DWORD dwInfoFlags;
+#endif
+} NOTIFYICONDATAW, *PNOTIFYICONDATAW;
+
+#define NOTIFYICONDATAA_V1_SIZE  FIELD_OFFSET(NOTIFYICONDATAA,szTip[64])
+#define NOTIFYICONDATAW_V1_SIZE  FIELD_OFFSET(NOTIFYICONDATAW,szTip[64])
+
+#ifndef SHFILEINFO_DEFINED
+#define SHFILEINFO_DEFINED
+
+typedef struct _SHFILEINFOA {
+    HICON hIcon;
+    int iIcon;
+    DWORD dwAttributes;
+    CHAR szDisplayName[MAX_PATH];
+    CHAR szTypeName[80];
+} SHFILEINFOA;
+
+typedef struct _SHFILEINFOW {
+    HICON hIcon;
+    int iIcon;
+    DWORD dwAttributes;
+    WCHAR szDisplayName[MAX_PATH];
+    WCHAR szTypeName[80];
+} SHFILEINFOW;
+
+#ifdef UNICODE
+typedef SHFILEINFOW SHFILEINFO;
+#else
+typedef SHFILEINFOA SHFILEINFO;
+#endif
+
+#endif /* SHFILEINFO_DEFINED */
+
+SHSTDAPI_(UINT) DragQueryFileA(HDROP,UINT,LPSTR,UINT);
+SHSTDAPI_(UINT) DragQueryFileW(HDROP,UINT,LPWSTR,UINT);
+SHSTDAPI_(BOOL) DragQueryPoint(HDROP,LPPOINT);
+SHSTDAPI_(void) DragFinish(HDROP);
+SHSTDAPI_(void) DragAcceptFiles(HWND,BOOL);
+SHSTDAPI_(HINSTANCE) ShellExecuteA(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,INT);
+SHSTDAPI_(HINSTANCE) ShellExecuteW(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,INT);
+SHSTDAPI_(HINSTANCE) FindExecutableA(LPCSTR,LPCSTR,LPSTR);
+SHSTDAPI_(HINSTANCE) FindExecutableW(LPCWSTR,LPCWSTR,LPWSTR);
+SHSTDAPI_(LPWSTR *) CommandLineToArgvW(LPCWSTR,int*);
+SHSTDAPI_(INT) ShellAboutA(HWND,LPCSTR,LPCSTR,HICON);
+SHSTDAPI_(INT) ShellAboutW(HWND,LPCWSTR,LPCWSTR,HICON);
+SHSTDAPI_(HICON) DuplicateIcon(HINSTANCE,HICON);
+SHSTDAPI_(HICON) ExtractAssociatedIconA(HINSTANCE,LPSTR,LPWORD);
+SHSTDAPI_(HICON) ExtractAssociatedIconW(HINSTANCE,LPWSTR,LPWORD);
+SHSTDAPI_(HICON) ExtractIconA(HINSTANCE,LPCSTR,UINT);
+SHSTDAPI_(HICON) ExtractIconW(HINSTANCE,LPCWSTR,UINT);
+SHSTDAPI_(UINT) SHAppBarMessage(DWORD,PAPPBARDATA);
+SHSTDAPI_(DWORD) DoEnvironmentSubstA(LPSTR,UINT);
+SHSTDAPI_(DWORD) DoEnvironmentSubstW(LPWSTR,UINT);
+SHSTDAPI_(UINT) ExtractIconExA(LPCSTR,int,HICON*,HICON*,UINT);
+SHSTDAPI_(UINT) ExtractIconExW(LPCWSTR,int,HICON*,HICON*,UINT);
+SHSTDAPI_(int) SHFileOperationA(LPSHFILEOPSTRUCTA);
+SHSTDAPI_(int) SHFileOperationW(LPSHFILEOPSTRUCTW);
+SHSTDAPI_(void) SHFreeNameMappings(HANDLE);
+SHSTDAPI_(BOOL) ShellExecuteExA(LPSHELLEXECUTEINFOA);
+SHSTDAPI_(BOOL) ShellExecuteExW(LPSHELLEXECUTEINFOW);
+SHSTDAPI_(void) WinExecErrorA(HWND,int,LPCSTR,LPCSTR);
+SHSTDAPI_(void) WinExecErrorW(HWND,int,LPCWSTR,LPCWSTR);
+SHSTDAPI_(BOOL) SHCreateProcessAsUserW(PSHCREATEPROCESSINFOW);
+SHSTDAPI SHQueryRecycleBinA(LPCSTR,LPSHQUERYRBINFO);
+SHSTDAPI SHQueryRecycleBinW(LPCWSTR,LPSHQUERYRBINFO);
+SHSTDAPI SHEmptyRecycleBinA(HWND,LPCSTR,DWORD);
+SHSTDAPI SHEmptyRecycleBinW(HWND,LPCWSTR,DWORD);
+SHSTDAPI_(BOOL) Shell_NotifyIconA(DWORD,PNOTIFYICONDATAA);
+SHSTDAPI_(BOOL) Shell_NotifyIconW(DWORD,PNOTIFYICONDATAW);
+SHSTDAPI_(DWORD_PTR) SHGetFileInfoA(LPCSTR,DWORD,SHFILEINFOA*,UINT,UINT);
+SHSTDAPI_(DWORD_PTR) SHGetFileInfoW(LPCWSTR,DWORD,SHFILEINFOW*,UINT,UINT);
+SHSTDAPI_(BOOL) SHGetDiskFreeSpaceExA(LPCSTR,ULARGE_INTEGER*,ULARGE_INTEGER*,ULARGE_INTEGER*);
+SHSTDAPI_(BOOL) SHGetDiskFreeSpaceExW(LPCWSTR,ULARGE_INTEGER*,ULARGE_INTEGER*,ULARGE_INTEGER*);
+SHSTDAPI_(BOOL) SHGetNewLinkInfoA(LPCSTR,LPCSTR,LPSTR,BOOL*,UINT);
+SHSTDAPI_(BOOL) SHGetNewLinkInfoW(LPCWSTR,LPCWSTR,LPWSTR,BOOL*,UINT);
+SHSTDAPI_(BOOL) SHInvokePrinterCommandA(HWND,UINT,LPCSTR,LPCSTR,BOOL);
+SHSTDAPI_(BOOL) SHInvokePrinterCommandW(HWND,UINT,LPCWSTR,LPCWSTR,BOOL);
+#if (_WIN32_WINNT >= 0x0500) || (_WIN32_WINDOWS >= 0x0500)
+SHSTDAPI SHLoadNonloadedIconOverlayIdentifiers(void);
+SHSTDAPI SHIsFileAvailableOffline(LPCWSTR,PDWORD);
+#endif
+
+#ifdef UNICODE
+typedef DRAGINFOW DRAGINFO;
+typedef LPDRAGINFOW LPDRAGINFO;
+typedef SHFILEOPSTRUCTW SHFILEOPSTRUCT;
+typedef LPSHFILEOPSTRUCTW LPSHFILEOPSTRUCT;
+typedef SHNAMEMAPPINGW SHNAMEMAPPING;
+typedef LPSHNAMEMAPPINGW LPSHNAMEMAPPING;
+typedef SHELLEXECUTEINFOW SHELLEXECUTEINFO;
+typedef LPSHELLEXECUTEINFOW LPSHELLEXECUTEINFO;
+typedef NOTIFYICONDATAW NOTIFYICONDATA;
+typedef PNOTIFYICONDATAW PNOTIFYICONDATA;
+#define NOTIFYICONDATA_V1_SIZE NOTIFYICONDATAW_V1_SIZE
+#define DragQueryFile DragQueryFileW
+#define ShellExecute ShellExecuteW
+#define FindExecutable FindExecutableW
+#define ShellAbout ShellAboutW
+#define ExtractAssociatedIcon ExtractAssociatedIconW
+#define ExtractIcon ExtractIconW
+#define DoEnvironmentSubst DoEnvironmentSubstW
+#define ExtractIconEx ExtractIconExW
+#define SHFileOperation SHFileOperationW
+#define ShellExecuteEx ShellExecuteExW
+#define WinExecError WinExecErrorW
+#define SHQueryRecycleBin SHQueryRecycleBinW
+#define SHEmptyRecycleBin SHEmptyRecycleBinW
+#define Shell_NotifyIcon Shell_NotifyIconW
+#define SHGetFileInfo SHGetFileInfoW
+#define SHGetDiskFreeSpaceEx SHGetDiskFreeSpaceExW
+#define SHGetNewLinkInfo SHGetNewLinkInfoW
+#define SHInvokePrinterCommand SHInvokePrinterCommandW
+#else
+typedef DRAGINFOA DRAGINFO;
+typedef LPDRAGINFOA LPDRAGINFO;
+typedef SHFILEOPSTRUCTA SHFILEOPSTRUCT;
+typedef LPSHFILEOPSTRUCTA LPSHFILEOPSTRUCT;
+typedef SHNAMEMAPPINGA SHNAMEMAPPING;
+typedef LPSHNAMEMAPPINGA LPSHNAMEMAPPING;
+typedef SHELLEXECUTEINFOA SHELLEXECUTEINFO;
+typedef LPSHELLEXECUTEINFOA LPSHELLEXECUTEINFO;
+typedef NOTIFYICONDATAA NOTIFYICONDATA;
+typedef PNOTIFYICONDATAA PNOTIFYICONDATA;
+#define NOTIFYICONDATA_V1_SIZE NOTIFYICONDATAA_V1_SIZE
+#define DragQueryFile DragQueryFileA
+#define ShellExecute ShellExecuteA
+#define FindExecutable FindExecutableA
+#define ShellAbout ShellAboutA
+#define ExtractAssociatedIcon ExtractAssociatedIconA
+#define ExtractIcon ExtractIconA
+#define DoEnvironmentSubst DoEnvironmentSubstA
+#define ExtractIconEx ExtractIconExA
+#define SHFileOperation SHFileOperationA
+#define ShellExecuteEx ShellExecuteExA
+#define WinExecError WinExecErrorA
+#define SHQueryRecycleBin SHQueryRecycleBinA
+#define SHEmptyRecycleBin SHEmptyRecycleBinA
+#define Shell_NotifyIcon Shell_NotifyIconA
+#define SHGetFileInfo SHGetFileInfoA
+#define SHGetDiskFreeSpaceEx SHGetDiskFreeSpaceExA
+#define SHGetNewLinkInfo SHGetNewLinkInfoA
+#define SHInvokePrinterCommand SHInvokePrinterCommandA
+#endif /* UNICODE */
+
+#define SHGetDiskFreeSpace  SHGetDiskFreeSpaceEx
+
+#if __POCC__ >= 290
+#pragma warn(pop)
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#include <poppack.h>
+
+#endif /* _SHELLAPI_H */

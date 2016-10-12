@@ -1,0 +1,95 @@
+/*
+ * $Id:
+ */
+
+2014-10-06 23:56 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * crt\src\g.bat
+  * xcc\g.bat
+  * xlib\g.bat
+  * xlink\g.bat
+  * xrc\g.bat
+    * Minor synch and refinment in the MSVC FIND block
+    * Avoid redundant calls to vcvarsall.bat
+
+2013-06-03 22:51 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   % xcc\cc\init.c
+     % Optimized find_elem() by creating optimized add_elem_find_elem() and get_elem_find_elem()
+
+2013-06-02 20:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xcc\lburg\x86.md
+     ! Fixed typo which caused exported symbols in Dlls to "lose" the underscore prefix
+
+2013-06-01 00:55 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * crt\include\math.h
+     ! Fixed typo missing #endif
+     ! Reverted to not guard_exception constants with #ifdef _MSC_EXTENSIONS
+
+   * crt\src\g.bat
+     ! Use xcc to compile the CRT instead of Pelles C
+     ! Fix output to the Log file
+   * crt\src\makefile
+     ! Use xcc include files instead of Pelles C
+
+   * xlink\export.c
+     ! Reverted to original version
+
+   * xrc\g.bat
+     * Minor cleanup
+     ! Fixed output to the Log file
+
+2012-09-17 19:00 UTC-0800 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xcc\cc\cpp.h
+    * Increased INPUT BUFFER SIZE to 65536
+
+  * xlink\export.c
+    * Temporarily disabled generation of IMPORT LIB
+
+2012-08-14 12:49 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * crt\include\assert.h
+  * crt\include\complex.h
+  * crt\include\conio.h
+  * crt\include\ctype.h
+  * crt\include\direct.h
+  * crt\include\errno.h
+  * crt\include\excpt.h
+  * crt\include\fcntl.h
+  * crt\include\fenv.h
+  * crt\include\inttypes.h
+  * crt\include\io.h
+  * crt\include\limits.h
+  * crt\include\locale.h
+  * crt\include\math.h
+  * crt\include\process.h
+  * crt\include\setjmp.h
+  * crt\include\signal.h
+  * crt\include\stdio.h
+    * Tried to merge WINCE support from xcc\crt\include to \crt\include
+
+2012-08-14 12:43 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xcc\crt\include\conio.h
+  * xcc\crt\include\ctype.h
+  * xcc\crt\include\direct.h
+  * xcc\crt\include\errno.h
+  * xcc\crt\include\fcntl.h
+  * xcc\crt\include\io.h
+  * xcc\crt\include\math.h
+  * xcc\crt\include\process.h
+  * xcc\crt\include\stdio.h
+  * xcc\crt\include\stdlib.h
+  * xcc\crt\include\string.h
+  * xcc\crt\include\wchar.h
+  * xcc\crt\include\wctype.h
+    * Tried to merge most features between crt\include and xcc\crt\include
+    * Tried to standardized use of #ifndef _NO_OLDNAMES instead of #ifdef __POCC__OLDNAMES
+
+2012-08-14 12:37 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xlink\export.c
+    ! Fixed .dll generation of .exp and .lib with regard to underscore decoration (COFF_I_NAME_NOPREF)
+
+2012-08-14 12:23 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * xcc\cc\init.c
+    + Added support for imported function pointers as static initializers
+
+  * xcc\cc\utils.c
+    Fixed support for relative paths in my_fullpath()
+
