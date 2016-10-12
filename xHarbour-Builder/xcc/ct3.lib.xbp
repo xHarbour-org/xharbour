@@ -1,0 +1,122 @@
+CINI = 
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = include
+LAUTORUN =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\ct3.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+[source\ct\addascii.c]
+[source\ct\asciisum.c]
+[source\ct\ascpos.c]
+[source\ct\atadjust.c]
+[source\ct\atnum.c]
+[source\ct\atrepl.c]
+[source\ct\bit1.c]
+[source\ct\bit2.c]
+[source\ct\bit3.c]
+[source\ct\charevod.c]
+[source\ct\charlist.c]
+[source\ct\charmirr.c]
+[source\ct\charmix.c]
+[source\ct\charone.c]
+[source\ct\charonly.c]
+[source\ct\charop.c]
+[source\ct\charrepl.c]
+[source\ct\charsort.c]
+[source\ct\charswap.c]
+[source\ct\count.c]
+[source\ct\ctc.c]
+[source\ct\ctchksum.c]
+[source\ct\ctcrypt.c]
+[source\ct\ctmath.c]
+[source\ct\ctmath2.c]
+[source\ct\ctnet.c]
+[source\ct\ctset.c]
+[source\ct\ctstr.c]
+[source\ct\ctwfunc.c]
+[source\ct\cursor.c]
+[source\ct\datetime.c]
+[source\ct\dattime2.c]
+[source\ct\dattime3.c]
+[source\ct\dbftools.c]
+[source\ct\disk.c]
+[source\ct\exponent.c]
+[source\ct\files.c]
+[source\ct\finan.c]
+[source\ct\ftoc.c]
+[source\ct\justify.c]
+[source\ct\keyset.c]
+[source\ct\lton.c]
+[source\ct\maxline.c]
+[source\ct\misc1.c]
+[source\ct\misc2.c]
+[source\ct\misc3.c]
+[source\ct\num1.c]
+[source\ct\numat.c]
+[source\ct\numcount.c]
+[source\ct\numline.c]
+[source\ct\numlohi.c]
+[source\ct\ctpad.c]
+[source\ct\ctwin.c]
+[source\ct\misc3.c]
+[source\ct\pack.c]
+[source\ct\pos1.c]
+[source\ct\pos2.c]
+[source\ct\posdiff.c]
+[source\ct\print.c]
+[source\ct\range.c]
+[source\ct\relation.c]
+[source\ct\remove.c]
+[source\ct\replace.c]
+[source\ct\screen1.c]
+[source\ct\screen2.c]
+[source\ct\setlast.c]
+[source\ct\settime.c]
+[source\ct\strdiff.c]
+[source\ct\strfile.c]
+[source\ct\strswap.c]
+[source\ct\tab.c]
+[source\ct\token1.c]
+[source\ct\token2.c]
+[source\ct\trig.c]
+[source\ct\video.c]
+[source\ct\wordrepl.c]
+[source\ct\wordtoch.c]
+
+[source\ct\blank.prg]
+[source\ct\color.prg]
+[source\ct\ct.prg]
+[source\ct\ctmisc.prg]
+[source\ct\cttime.prg]
+[source\ct\diskutil.prg]
+[source\ct\fcopy.prg]
+[source\ct\getinfo.prg]
+[source\ct\getsecrt.prg]
+[source\ct\keysec.prg]
+[source\ct\keytime.prg]
+[source\ct\like.prg]
+[source\ct\numconv.prg]
+[source\ct\screen3.prg]
+[source\ct\scrmark.prg]
+[source\ct\setkeys.prg]
+[source\ct\spread.prg]
+[source\ct\util.prg]
+[source\ct\showtime.prg]
+

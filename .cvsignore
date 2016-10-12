@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -21,3 +22,6 @@ xbp
 *.log
 *.ppo
 >>>>>>> xHarbour-ActiveX/master
+=======
+xbldfull.log
+>>>>>>> xHarbour-Builder/master

@@ -1,0 +1,21 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .T.
+LIBFOLDERS =
+LMT = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN32;__WIN32__;__EXPORT__;DllEntryPoint=DllMain
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\xhbdll.dll
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\bin\vc8
+
+#include "\xHarbour.com\xHarbour-Builder\vc8\stddll.files.inc"
