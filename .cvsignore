@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -31,3 +32,8 @@ xbldfull.log
 ._*
 *.txt alias
 >>>>>>> xHarbour-Documentation/master
+=======
+xbp
+*.log
+*.ppo
+>>>>>>> xHarbour-HBZlib/master
