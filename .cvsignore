@@ -11,6 +11,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -96,3 +97,15 @@ xbp
 =======
 .DS_Store
 >>>>>>> xHarbour.com-Inhouse-Projects/master
+=======
+xbp
+*.log
+*.ppo
+.DS_Store
+._xdo.dll.xbp
+*.prg.bak
+._Changelog
+._XDO.prg
+*.txt
+*.zip
+>>>>>>> xHarbour-XDO/master
