@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -15,3 +16,8 @@ xbuild.windows.ini
 *.log
 *.prg.bak
 >>>>>>> IEGui/master
+=======
+xbp
+*.log
+*.ppo
+>>>>>>> xHarbour-ActiveX/master
