@@ -1,0 +1,50 @@
+CINI = xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LAUTORUN = .T.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\vc8; $(XHB_VC8)\Lib
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = GUI
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\xBuildW.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+STARTIN =
+TARGETFOLDER = \xhb\bin\vc8
+
+[\xHarbour.com\xHarbour-xBuild\xbuild.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[\xHarbour.com\xHarbour-xBuild\gui.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[\xHarbour.com\xHarbour-xBuild\xbuild.rc]
+MYDEFINES = 
+MYRC_FLAGS = 
+
+[tproject.lib]
+
+[xeditw.lib]
+
+[winapi.lib]
+
+[ActiveX.lib]
+
+[Ole.Lib]

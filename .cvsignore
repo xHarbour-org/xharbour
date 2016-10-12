@@ -8,6 +8,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -67,3 +68,21 @@ xbp
 *.log
 *.ppo
 >>>>>>> xHarbour-ct3comm/master
+=======
+xbp
+*.log
+*.ppo
+tproject.c
+xBuild.c
+.DS_Store
+tproject.obj
+*.prg.bak
+._Changelog
+._gui.c
+._tproject.prg
+._xbuild.exe.xbp
+._xbuild.prg
+._xbuild.rc
+._xbuild.xml
+tproject-c.c
+>>>>>>> xHarbour-xBuild/master
