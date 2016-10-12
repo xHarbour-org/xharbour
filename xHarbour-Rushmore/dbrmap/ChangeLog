@@ -1,0 +1,481 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2011-05-15 14:23 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+    * adopted to compile with xHarbour
+
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmcdx1.c
+    * minor cleanup
+
+2011-05-13 00:23 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+    * adopted to compile with xHarbour
+
+2010-11-28 20:33 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/cmcompat.prg
+    * minor formatting
+
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmcdx1.c
+    * use new harbour function hb_rddIsDerivedFrom() to check
+      if RDD is one of RMDBF* RDDs or inherited from them.
+
+2010-11-26 08:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * simplified RDD registration code
+
+2010-11-17 21:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    * renamed variable to avoid potential name conflict
+
+2010-09-29 00:59 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * updated to use hb_rddInheritEx()
+
+2010-06-17 21:33 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    * updated to not use ISBLOCK() macro
+
+2010-02-09 12:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmcdx1.c
+  * dbrmap/m6funcs.c
+    * updated to use new Harbour types
+
+2009-12-09 11:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * updated for new startup code
+
+2009-11-17 03:14 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * modified HB_ERRCODE variable names
+
+2009-10-20 12:03 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    * casting to pacify MSVC warnings
+
+2009-10-01 13:22 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    % call SUPER_CLEARFILTER() before releasing bitmap filter,
+      SUPER_CLEARFILTER() may cause data base scan, i.e. to resolve
+      pending relations so we can optimize it also.
+
+2009-09-30 23:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * removed some old xHarbour macros
+
+2009-09-15 16:52 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * updated for modified method table in core code
+
+2009-06-30 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * updated to compile with modified Harbour RDD API
+
+2009-06-26 03:23 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    * updated to compile with new Harbour API
+    ! fixed memory leak in DTOS() optimization
+    ! fixed typo in space stripping in STOD() optimization
+
+2009-03-21 16:07 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    * small update to accept also TIMESTAMP values in DTOS() optimization
+
+2009-03-07 01:28 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    * updated to compile with xHarbour
+
+2009-03-06 10:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+    * cleanup SELF_RMDETACH(), SELF_RMRELEASE(), SELF_RMSET() macros
+
+2009-02-08 02:04 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    * replaced toupper() with HB_TOUPPER() macro
+
+2009-02-03 20:23 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/m6funcs.c
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmcdx1.c
+    * updated for new types with HB_ prefix
+    * pacified MSVC warnings
+
+2009-01-28 19:52 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    + optimize filters with date literal values using indexes on
+      STOD(...) + <exp>
+
+2009-01-16 01:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    ! fixed RMDBFNSX support
+
+  * dbrmap/rmap1.c
+  * dbrmap/m6funcs.c
+    * added MT support. Now rlOpeLevel() and m6_error() are thread
+      local values. The RM bad access is protected by mutex.
+      RM filters can be shared between threads but in such case user
+      should protect simultaneous access to the same RM filter himself
+      using mutex or other serialization mechanism.
+  * dbrmap/rmap2.c
+    ! fixed bad typo which caused GPF if expression has more then
+      16 logical subexpressions
+
+2008-07-03 20:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    + added optimizations for logical experssions like:
+         [!] <exp> < = | == | != > < .t. | .f. >
+      when <exp> is FOR conditions in one of active indexes
+      and cannot be located in KEY expressions
+
+2008-06-26 19:21 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    % recognize '#' operator as != and/or <>
+    % added expressions reduction:
+         <exp> = .T. => <exp>
+         <exp> == .T. => <exp>
+         <exp> != .F. => <exp>
+  * dbrmap/m6funcs.c
+    * use hb_araySet*(...) instead of
+      hb_itemPut*( hb_arrayGetItemPtr(...), ...)
+
+2008-06-11 03:57 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/README.TXT
+  * dbrmap/rmap2.c
+    + added optimization for filter expressions starting with
+      DTOS(<exp>) if date index on <exp> exists
+
+2008-02-16 18:23 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+  + dbrmap/rmnsx1.c
+    + added RMDBFNSX RDD it inherits from DBFNSX adding bitmap filter
+      support
+
+2007-01-13 22:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+  * dbrmap/rmcdx1.c
+    + added automatic WA filter resizing
+
+2006-12-11 15:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/m6funcs.c
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+    * cleaned BCC warnings
+
+2006-11-10 02:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    ! added missing line with:
+        pRM->iOptLvl = iOptLvl;
+
+2006-09-29 12:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmcdx1.c
+    % retrive information directly from bitmap filter when ordKeyPos() or
+      ordKeyNo() are executed and current index is set to 0 to not enable
+      slow emulation of filters respecting in pure DBFCDX.
+    % optimized SKIP() when bitmap filter is set and current index is 0
+    + added rlPosRecNo( <rl>, <nRecNo> ) -> <nLogicalPos>
+
+2006-07-11 21:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    ! fixed GPF reported by Ron
+
+  * dbrmap/rmcdx1.c
+    * updated to recent core code modifications
+
+2005-11-25 12:43 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    * code cleaned
+
+  * dbrmap/rmcdx1.c
+    * update work area bitmap filter when record is changed and written
+      to disk - COMIX compatibility
+
+2005-11-16 14:26 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmcdx1.c
+    * synced with recent core changes
+
+2005-11-13 12:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    - removed hb_itemClone()
+
+2005-11-07 03:47 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap2.c
+    - removed hb_itemClone()
+
+2005-10-24 18:28 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/README.TXT
+  * dbrmap/rmtst.prg
+  * dbrmap/Makefile
+  * dbrmap/hbrddrm.h
+  * dbrmap/m6funcs.c
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+    * updated for recent CVS modifications and some minor cleanups
+
+2005-10-04 12:52 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/Makefile
+  * dbrmap/rmcdx1.c
+  - dbrmap/rmcdx0.prg
+  - dbrmap/rmntx0.prg
+    * updated to recent core RDD code in xHarbour CVS
+
+2005-09-20 21:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/Makefile
+    * minor cleanup
+
+  * dbrmap/rmap1.c
+    * RLOPTLEVEL() can receive now as parameter also RL filter handle
+      and returns optimization level reach for this filter
+
+  * dbrmap/rmcdx1.c
+    * updated for core RDD modifications
+
+  * dbrmap/rmntx0.prg
+    * by default use DBT memo in RMDBFNTX
+
+2005-09-11 22:06 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmcdx1.c
+   * updated for recent RDD modification in xHarbour core code
+   * minor modification in returned nonopt expression
+
+2005-09-05 16:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmcdx1.c
+    * changed extracting of nonoptimized part of expression - now it's
+      absolutely not SIX3 compatible but return more accurate data
+    * added new function RLNONOP( <cExp> ) -> <cNonOptExp> to return
+      nonoptimized part of expression
+    ! fixed area filter detaching i broke in previous commit
+
+2005-08-23 18:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/m6compat.prg
+  * dbrmap/m6funcs.c
+  * dbrmap/rmap1.c
+  * dbrmap/rmcdx1.c
+    * updated for recen RDD modifications
+    * M6_FILTERJOIN() should not destroy the second filter if it's
+      own by system
+    + RL_RESIZE( <rl>, <newSize> ) -> <rl> function added
+
+2005-08-06 21:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+    + macros to set/get/remove RM filters in WA
+
+  * dbrmap/m6compat.prg
+    ! restore previous filter if any in m6_dbEval()
+
+  * dbrmap/rmap1.c
+    * use DBI_* interface instead of direct AREAP access
+
+  * dbrmap/m6funcs.c
+  * dbrmap/rmap2.c
+    * formatting
+
+  * dbrmap/Makefile
+  - dbrmap/rmap0.prg
+  - dbrmap/rmap3.c
+  + dbrmap/rmcdx0.prg
+  + dbrmap/rmcdx1.c
+    * file names changed
+
+  * dbrmap/Makefile
+  + dbrmap/rmntx0.prg
+  + dbrmap/rmntx1.c
+    + added RMDBFNTX
+
+2005-08-05 10:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap0.prg
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  * dbrmap/rmap3.c
+    * updated for recent base RDD modifications
+
+2005-04-21 19:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    + copy in rlDupNew() the filter expressions (MachSIX extension)
+      (I didn't change it in previous commit)
+
+2005-04-21 18:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+   * dbrmap/Makefile
+   + dbrmap/machsix.ch
+   - dbrmap/rmerror.ch
+     * renamed the include file
+
+   * dbrmap/cmcompat.prg
+   * dbrmap/hbrddrm.h
+   * dbrmap/rmap1.c
+   * dbrmap/rmap2.c
+   * dbrmap/rmap3.c
+     * updated for recent modifications in xHarbour CVS
+     + updated for HSX support
+     + extended for MachSIX support - all low level functions
+       implemented
+     ! fixed bug in rlDupNew() which caused GPF.
+     + copy in rlDupNew() the filter expressions (MachSIX extension)
+
+   + dbrmap/m6compat.prg
+   + dbrmap/m6funcs.c
+     + all MachSIX functions implemented. m6_FiltSave()/m6_filtRestore()
+       use different binary format then SIX3 and cannot be shared. I made
+       it intentionally - SIX dumps memory structures as is and it does
+       not support some extensions like "maybe" records which DBRMAP does.
+
+2005-04-09 19:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+    * updated for recent changes in CVS
+      I will have to think about sth what will allow automatic
+      synchronization in pending RDDs when DBFAREA structure
+      is modified
+  + dbrmap/rmerror.ch
+    + initial support for MachSIX like error codes - not ready yet
+
+2005-02-09 04:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/cmcompat.prg
+    * TAB replaced by spaces
+
+  * dbrmap/rmap1.c
+    + debug function rlDo( <rl>, <n> )
+
+2005-02-06 23:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+    * casting for C++ compilation
+
+2005-02-05 02:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap1.c
+    * clear the unused bits in negated filter.
+
+  * dbrmap/cmcompat.prg
+    ! cmFiltCount() should return rlCount() for current RM filter.
+      deleted records for fully optimized expressions and never
+      check scopes.
+    * modified cm(x)Key*() functions to use DBOI_KEYGOTO[RAW] and
+      DBOI_KEYNO[RAW] and DBOI_KEYCOUNT[RAW] to avoid confusion
+      what they exactly do ;-)
+
+  * dbrmap/rmap2.c
+    * disabled DELETED() and logical position optimization in
+      ordKey{Count,Goto,Pos}() functions.
+
+  * dbrmap/rmap3.c
+    ! fixed typo in FOR condition
+
+2005-31-01 02:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/cmcompat.prg
+    + added missing cmxKeyCount()
+
+  * dbrmap/rmap0.prg
+    + added REQUEST DBFCDX
+
+  * dbrmap/rmap1.c
+    * changed hb_rmCountRecords(), hb_rmNextRecord(), hb_rmPrevRecord()
+      to respect "maybe" records - I hope it's ClipMore compatible.
+
+  * dbrmap/rmap3.c
+    + added logic to detect abberivated function names
+
+2004-09-22 00:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/cmcompat.prg
+  * dbrmap/hbrddrm.h
+    * updated to the last changes in xHarbour SF CVS.
+      RMDBFCDX has to be rebuild!!! with last CVS.
+
+2004-09-15 01:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+    + add new function hb_rmMakeMB() (for future use)
+    * small modification for future dynamic inheritance in our RDD model
+
+2004-09-13 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/README.TXT
+  * dbrmap/rmtst.prg
+  * dbrmap/Makefile
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap3.c
+    % detect ranges in AND operation - it will speedup some operation
+    % some other improvements
+    ! some fixes
+    IMHO now it's ready for tests
+
+2004-09-06 16:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+   ! added missing braces.
+
+2004-08-29 20:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+   * Detect non full L-value in character expressions, f.e.
+     set filter to a='x' when we have index on a+b
+
+2004-08-28 14:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+   * casting for C++ compilers
+
+2004-08-28 14:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+   ! oops2, I had to be really tired yesterday - in simple fix
+     four typos and bad memory deallocation in one case :-( Fixed.
+
+2004-08-28 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/rmap3.c
+   * oops, missing stack initialization added
+
+2004-08-28 00:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/README.TXT
+  * dbrmap/Makefile
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+  + dbrmap/rmap3.c
+   + query analizer implemented
+     the DBSETFILTER() autooptimization is already done.
+     It's not yet as functional as I want but I'll try implement
+     the missing functionality ASAP - see README.TXT
+     The QUERY analyzer is a little bit differ then in SIX and COMIX.
+     It can and try to use also conditional indexes when the FOR
+     expression is part of filter query - such optimization when
+     available is even more efficient then checking for KEY expression
+     because in record scanning process we do not have to check for the
+     ranges.
+     Now it's time for first tests - I'm waiting for bug reports
+
+2004-08-20 01:12 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * dbrmap/cmcompat.prg
+  * dbrmap/hbrddrm.h
+  * dbrmap/rmap0.prg
+  * dbrmap/rmap1.c
+  * dbrmap/rmap2.c
+    * set xHarbour.com license
+
+2004-08-18 00:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + dbrmap/Makefile
+  + dbrmap/cmcompat.prg
+  + dbrmap/hbrddrm.h
+  + dbrmap/rmap0.prg
+  + dbrmap/rmap1.c
+  + dbrmap/rmap2.c
+  + dbrmap/README.TXT
+  + dbrmap/rmtst.prg
+    + initial version uploaded
