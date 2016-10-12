@@ -1,0 +1,80 @@
+	body
+	{	background-color:#ffffff;
+
+		margin:0px;
+		padding:0px;
+
+		font-family:tahoma;
+		font-size:11px;
+	}
+
+	.corner_main_01	{background-image:url('Images/table_corner_main.jpg');background-repeat:no-repeat;background-position:top left;height:14px;}
+	.corner_main_11	{background-image:url('Images/table_corner_main.jpg');background-repeat:no-repeat;background-position:top right;height:14px;}
+	.corner_main_10	{background-image:url('Images/table_corner_main.jpg');background-repeat:no-repeat;background-position:bottom right;height:14px;}
+	.corner_main_00 {background-image:url('Images/table_corner_main.jpg');background-repeat:no-repeat;background-position:bottom left;height:14px;}
+
+	.border_main_top {background-image:url('Images/table_border_top_main.jpg');background-repeat:repeat-x;background-position:top;height:14px;}
+	.border_main_bottom {background-image:url('Images/table_border_top_main.jpg');background-repeat:repeat-x;background-position:bottom;height:14px;}
+	.border_main_left {background-image:url('Images/table_border_left_main.jpg');background-repeat:repeat-y;background-position:left;}
+	.border_main_right {background-image:url('Images/table_border_left_main.jpg');background-repeat:repeat-y;background-position:right;}
+
+	.corner_sub_01 {background-image:url('Images/table_corner_sub.jpg');background-repeat:no-repeat;background-position:top left;height:14px;}
+	.corner_sub_11 {background-image:url('Images/table_corner_sub.jpg');background-repeat:no-repeat;background-position:top right;height:14px;}
+	.corner_sub_10 {background-image:url('Images/table_corner_sub.jpg');background-repeat:no-repeat;background-position:bottom right;height:14px;}
+	.corner_sub_00 {background-image:url('Images/table_corner_sub.jpg');background-repeat:no-repeat;background-position:bottom left;height:14px;}
+
+	.corner_sub_2_01 {background-image:url('Images/table_corner_sub_2.jpg');background-repeat:no-repeat;background-position:top left;height:6px;}
+	.corner_sub_2_11 {background-image:url('Images/table_corner_sub_2.jpg');background-repeat:no-repeat;background-position:top right;height:6px;}
+	.corner_sub_2_10 {background-image:url('Images/table_corner_sub_2.jpg');background-repeat:no-repeat;background-position:bottom right;height:6px;}
+	.corner_sub_2_00 {background-image:url('Images/table_corner_sub_2.jpg');background-repeat:no-repeat;background-position:bottom left;height:6px;}
+
+	.border_sub_top {background-image:url('Images/table_border_top_sub.jpg');background-repeat:repeat-x;background-position:top;height:14px;}
+	.border_sub_bottom {background-image:url('Images/table_border_top_sub.jpg');background-repeat:repeat-x;background-position:bottom;height:14px;}
+	.border_sub_left {background-image:url('Images/table_border_left_sub.jpg');background-repeat:repeat-y;background-position:left;}
+	.border_sub_right {background-image:url('Images/table_border_left_sub.jpg');background-repeat:repeat-y;background-position:right;}
+
+	.border_sub_top_2 {background-image:url('Images/table_border_top_sub_2.jpg');background-repeat:repeat-x;background-position:top;height:6px;}
+	.border_sub_bottom_2 {background-image:url('Images/table_border_top_sub_2.jpg');background-repeat:repeat-x;background-position:bottom;height:6px;}
+	.border_sub_left_2 {background-image:url('Images/table_border_left_sub_2.jpg');background-repeat:repeat-y;background-position:left;}
+	.border_sub_right_2 {background-image:url('Images/table_border_left_sub_2.jpg');background-repeat:repeat-y;background-position:right;}
+
+	a.link_blue:link
+	{	color:#336699;text-decoration:none;font-family:tahoma;font-size:11px;
+	}
+	a.link_blue:visited
+	{	color:#336699;text-decoration:none;font-family:tahoma;font-size:11px;
+	}
+	a.link_blue:hover
+	{	color:#336699;text-decoration:none;font-family:tahoma;font-size:11px;
+	}
+	a.link_blue:active
+	{	color:#336699;text-decoration:none;font-family:tahoma;font-size:11px;
+	}
+
+	.xhdn_text
+	{	font-family:tahoma;
+		font-size:11px;
+	}
+	
+	.cust_text_1 {
+		border-width:0px;
+		border-bottom:1px solid #999999;
+		
+		background-color:#fafafa;
+		vertical-align:middle;
+		font-size:11px;
+		font-family:verdana;
+	}
+	.cust_text_2 {
+		border:1px solid #e0e0e0;
+		border-bottom:1px solid #999999;
+		
+		background-color:#fafafa;
+		vertical-align:middle;
+		font-size:11px;
+		font-family:verdana;
+	}
+	.cust_button_1 {
+		font-size:11px;
+		font-weight:bold;
+	}

@@ -1,0 +1,8 @@
+*.MAP
+*.exe
+*.log
+*.old
+long_qry.dbf
+long_qry.dbt
+xHDNCachedFile.htm
+xHDNAdministrator.ini
