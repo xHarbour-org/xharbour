@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -86,3 +87,8 @@ tproject.obj
 ._xbuild.xml
 tproject-c.c
 >>>>>>> xHarbour-xBuild/master
+=======
+xbp
+*.log
+*.ppo
+>>>>>>> xHarbour-xHBcomm/master
