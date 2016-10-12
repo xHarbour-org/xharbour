@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 *.DS_Store
+=======
+freeimage-xhb.lib
+*.log
+._*
+>>>>>>> FreeImage/master
