@@ -1,0 +1,27 @@
+#ifndef NAMESPACE_SQLRDD
+#define NAMESPACE_SQLRDD
+#if defined( __PRG__ )
+DEFINE NAMESPACE SQLRDD
+#else
+typedef struct
+{
+#endif
+   #if defined( __PRG__ )
+   DEFINE NAMESPACE MEMBER FILE
+   #else
+   PHB_FUNC FILE;
+
+   #endif
+   #if defined( __PRG__ )
+   DEFINE NAMESPACE MEMBER DBSTRUCT
+   #else
+   PHB_FUNC DBSTRUCT;
+
+   #endif
+#if defined( __PRG__ )
+END
+#else
+} HB_NS_SQLRDD;
+
+#endif
+#endif

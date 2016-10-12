@@ -1,0 +1,12 @@
+/*
+ *   $Id$
+ */
+
+URGENT:
+
+* update DOCs (Firebird, Multilang, SetJoin() and all recent changes)
+
+SQLRDD to do list:
+
+* SUpport to "index on descend(col) + col2"
+

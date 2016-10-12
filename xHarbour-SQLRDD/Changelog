@@ -1,0 +1,1106 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2015-09-18 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlora.c
+     ! Added missing cast
+     
+2015-07-25 19:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlora2.c
+   ! source/sqlsrodbc.c
+     ! minor fix when retriving numeric data to correct set the number size  
+     
+2015-07-24 17:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlodbc.prg 	
+     ! minor fix to detect DATE Field when SqlServer is 2008 or newer and SR_GETSQL2008NEWTYPES() return .t.
+   ! source/sqlprototypes.h
+     ! added declaration to sr_fShortasNum 
+   ! source/sqlconnection.prg 
+     ! adjusted sqltype method to return T for firebird also on datetime fields
+   ! source/sqlsrodbc.c
+     ! using hb_itemPutTDT insted of hb_itemPutCLPtr of empty string when returning empty date under DB2
+   ! source/sqlrdd0.prg
+     ! added s_fShortasNum static variable
+     ! added sr_fShortasNum and  SETFIREBIRDUSESHORTASNUM function
+   ! source/firebird.c
+     ! added support to use smallint as pure number  insted of converting to boolean field when SETFIREBIRDUSESHORTASNUM is used with .t. parameter
+     ! adjust the return from datetime fields to return correctly
+     
+2015-06-21 19:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlrdd2.prg
+     ! updated writebuffer method to add E when creating the string to send to database server when building the indkey_xxx string
+     
+2015-05-10 12:25 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlrdd2.prg
+     ! adjust to create time field under mysql
+   ! source/mysql.c
+     ! Moved MYSQL_TIMESTAMP_TYPE From "C" to create "T" field type  
+     ! removed unnecessary casts to ULONG
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'
+   ! source/pgs.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'
+   ! source/firebird.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'     
+   ! source/sqlmaria.prg
+     ! clear unused variables
+   ! source/sqloracle.prg  
+     ! clear unused variables
+   ! source/sqlora.c
+     ! added define HAVE_OCILOBWRITEAPPEND
+     ! ULONG -> HB_SIZE where aplicable
+     ! on HB_TRACE changed direct %lu with %" HB_PFS "u to make some c compiler happy
+     ! fixed some compilation warnings
+   ! source/sqlorax.c
+     ! before calling hb_itemPutCLPtr( pItem, szResult, lLen ); set szResult[lLen] to '\0'     
+     
+2015-03-15 17:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! vc12/mysql.lib.xbp
+   ! vc12/mysqlmt.lib.xbp
+   ! vc12/sql.lib.xbp
+   ! vc12/sqlmt.lib.xbp
+     vc8 -> vc12
+   ! sql.files
+     ! added source\sqloracle2.prg and source\sqlora2.c  as dependencie
+   + dll/ociliba.dll
+     ! dll for ocilib version 4 used for sqlrdd oracle mode 2 connection
+   ! lib/ociliba.lib
+   ! lib/bc5/ociliba.lib
+     ! updated ocilib to version 4
+   ! source/ocilib.h      
+     ! updated to version 4
+   ! source/sqlora2.c
+     ! Changed all function names to have an 2 so SQLO_XXX is for version 2 SQLO2_xxx as also for oracle_xxx is now oracle_xxx2  
+   ! source/sqloracle2.prg
+     ! renamed class name to SR_ORACLE2 
+   ! source/sqlorastru.h
+     ! small updated
+   ! include/sqlrdd.ch
+   ! source/sqlrdd.ch    
+     ! added constant for CONNECT_ORACLE2 as 8, this indicate to use oracle conenction type 2 ( ocilib )
+   ! source/sqlrdd0.prg
+     ! in function SR_AddConnection added support for oracle connection type 2
+     ! in function SR_DetectDBFromDSN() added check for OCI2 to support oracle connection type 2
+   ! source/sqlex1ora.c    
+   ! source/sqlex2ora.c    
+   ! source/sqlex3ora.c    
+     ! some minor updated to avoid function colission between sqlex and sqlexora rdd
+          
+2015-03-14 16:40  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/mysql.c
+     ! in function MYSAFFECTEDROWS change hb_retni to hb_retnll since variable type is ulongulong
+     ! added some cast to make msvc 12 happy
+   ! source/sqlsrodbc.c
+     ! added some missing type cast to make msvc 12 happy
+   ! source/sqlrdd1.c
+     ! in function hb_sqlrddRddInit changed USHORT usResult to int usResult
+     ! HB_ULONG to ULONG where necessary
+   + vc12/SQLRDD.xns
+   + vc12/mysql.lib.xbp
+   + vc12/mysqlmt.lib.xbp
+   + vc12/sql.lib.xbp
+   + vc12/sqlmt.lib.xbp
+   + vc12/xbuild.vc8.ini
+     ! makefiles for msvc 2012
+                 
+2015-03-01 16:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/mysql.c
+     ! moved case MYSQL_TIME_TYPE: to be alone to define time type as SQL_TIME
+     ! updated MSQLFieldGet to correct return time values under SQL_TIME  
+   ! source/pgs.c  
+     ! moved case TIMEOID: to be alone to define time type as SQL_TIME
+     ! updated PGSFieldGet to correct return time values under SQL_TIME  
+   ! source/sqlact.c
+     ! fixed minor typo on escape_pgs  
+   ! source/sqlconnection.prg
+     ! added lOracle12 data to class
+     ! on method SQLType return "T" when nType == SQL_TIME when nSystemID is SYSTEMID_MYSQL or SYSTEMID_MARIADB or SYSTEMID_POSTGR
+   ! source/sqlrdd2.prg
+     ! updated method Quoted to return Time Part when field type is T and len is 4  
+     ! updated method QuotedNull to return Time Part when field type is T and len is 4  
+     ! using HB_TSTOSTR to format datetime to send to database insted of transform(ttos()) 
+     ! updated sqlcreate method to send 'time without time zone ' when field type is T and len is 4 under postgresql/mariadb/mysql
+   ! source/sqlex1ora.c
+   ! source/sqlex2ora.c
+   ! source/sqlex3ora.c
+   ! source/sqlexora.h
+   ! source/sqlorastru.h  
+   ! source/sqloracle2.prg
+   ! source/sqlora2.c
+     ! some updated for SQLEXORA RDD   
+   ! source/sqlex1.c
+     ! using hb_xgrabz insted hb_xgrab where aplicable
+   ! source/sqlrdd1.c
+     ! added HB_IS_TIMEFLAG and HB_IS_DATATIME To allow save time values 
+   
+   
+2015-02-17 22:40 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/sqlex1ora.c
+
+2015-02-17 22:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source\sqlsrodbc.c 
+     ! fixed minor typo     
+     
+2015-02-17 20:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   + source/sqlex1ora.c
+   + source/sqlex2ora.c
+   + source/sqlex3ora.c
+   + source/sqlexora.h
+   + source/sqlorastru.h  
+     ! sources for sqlexOra version for native sqlex for oracle. work in progress   
+   ! source\compat.h
+     ! typedef to HB_LONG and HB_ULONG protected by #ifdef SQLRDD_COMPAT_PRE_1_1
+   ! source\sqlora2.c
+     ! updated to some function for better integration with sqlexora
+   ! source\sqlsrodbc.c 
+     ! fixed minor typo
+
+2015-01-13 09:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! minor fix to previus commit 
+    
+2015-01-12 19:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! if using ODBCVER >= 0x0300 calling SQLAllocHandle insted of deprecated SQLAllocStmt
+  * source/sql.y
+    ! %pure_parser ->  %pure-parser
+    ! %name-prefix="sql_yy" ->  %name-prefix "sql_yy"
+  * source/utils.prg
+    ! Cleaned unused variables
+  * source/sqlrdd2.prg
+    ! Cleaned unused variables
+  * source/sqloracle.prg  
+    ! Cleaned unused variables
+  * source/sqlgen1.prg    
+    ! Cleaned unused variables  
+  * source/compat.h
+    ! protected typedef of HB_SIZE With SQLRDD_COMPAT_PRE_1_1 define
+  * source/Makefile
+    ! update to include all dependencies
+  * source/sqlex1.c 
+    ! ULONG -> HB_SIZE where aplicable     
+    ! Cleaned unused variables  
+  * source/sqlex2.c      
+    ! ULONG -> HB_SIZE where aplicable
+        
+2015-01-06 09:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! minor fix to odbcFieldGet function declaration
+  * source/sqlex.h
+    ! change to reflect the function signature changed on sqlsrodbc.c
+      
+2015-01-04 18:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  + source/sqlmaria.prg
+    ! class for mariadb
+  * sql.files
+    ! added srmaria.prg to list of dependencies
+  * Include/sqlextern.ch
+    ! added SR_MARIADB to list of requests
+  * Include/sqlrdd.ch  
+    + added define for CONNECT_MARIA_XXXX starting at 7
+    + added define for SYSTEMID_MARIADB as 19
+  * source/sqlrdd.ch  
+  * source/hbsql.ch  
+  * source/sqlrddsetup.ch    
+    + added define for SYSTEMID_MARIADB as 19  
+  * source/pgs.c
+  * source/mysql.c
+  * source\sqlora.c
+  * source\sqlora2.c
+  * source\sqlorax.c
+  * source\sqlsrodbc.c  
+  * changed all TraceLog( "oci.log"),TraceLog( "pgs.log"),TraceLog( "fb.log"),TraceLog( "mysql.log") to TraceLog( LOGFILE )  
+  * source\firebird.c
+    ! minor fix on compile
+  * source\sqllex.c
+     int sql_yyerror(const char* msg) -> int sql_yyerror(void * stmt,const char* msg) to make newer bison version happy
+  * source\sql.y
+    ! changed to make bison 2.5 or newer happy
+  * source/sqlmy.prg  
+    ! changed MINIMAL_MYSQL_SUPPORTED define from character to numeric
+    ! test for minimum version is againt the numeric version
+  * source/utils.prg
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlrdd0.prg
+    source/sqlrdd2.prg    
+    source/sqlgen1.prg  
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlact.c
+    ! added test to SYSTEMID_MARIADB 
+  * source/sqlconnection.prg
+    ! added test to SYSTEMID_MARIADB 
+    ! in method Connect, added test For "MARIA" on connect string to connect to mariadb
+              
+2014-12-15 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/pgs.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+    ! some log renamed from oci.log to pgs.log
+  * source/firebird.c
+    ! when ISC_INT64_FORMAT macro is not defined, set to PFLL
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! unused variables commented
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+    ! added the variables
+    ! LONG lType,lLen, lDec; to FBLINEPROCESSED function
+    % using hb_snprintf insted of sprintf
+  * source/utils.prg
+    % ! use HB_IS*() instead of valtype() where aplicable
+  * source/mysql.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+  * source/sqlrdd1.c
+    ! changed SELF_XXXXX( (AREAP) yyyyy)  with SELF_XXXX( &yyyyy->area )
+    ! changed SUPER_XXXXX( (AREAP) yyyyy) with SUPER_XXXX( &yyyyy->area )
+    ! changed some ULONG with HB_ULONG where aplicable
+  * source/sqlrdd1.h    
+    ! changed ULONG ulhRecno to HB_ULONG ulhRecno
+    ! changed ULONG ulhDeleted to HB_ULONG ulhDeleted
+  * source/sqlorax.c
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null
+  * source/sqlprototype.h
+    ! changed signature  from PHB_ITEM sr_escapeNumber( char *FromBuffer, ULONG len, ULONG dec, PHB_ITEM pRet ); to PHB_ITEM sr_escapeNumber( char *FromBuffer, HB_SIZE len, HB_SIZE dec, PHB_ITEM pRet );  
+  * source/sqlsrodbc.c
+    ! ULONG -> HB_SIZE
+    ! when retriving datetime using hb_itemPutTDT also for xharbour when datetime is null
+    ! when retriving datetime using hb_dateTimeStampStrGet/hb_itemPutTDT also for xharbour when datetime is not null      
+  * source/sqlact.c
+    ! ULONG -> HB_SIZE
+    ! using hb_xgrabz insted of hb_xgrab follow by memset
+  * source/sqlrdd2.prg
+    ! cleaned unused variables
+        
+      
+2014-10-07 00:29 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/sqlact.c
+  * source/sqllex.c
+    + Added #define WIN32_LEAN_AND_MEAN to protect against inlusion of winsock2.h
+      due to #define conflict of GROUP with sqly.h
+
+2014-07-07 11:06 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlex1.c
+    ! added cast to line 2205
+    ! fixed parameter passing on line  462
+    
+2014-07-07 11:06   UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlsrodbc.c
+    ! minor optimize to return SQL_NUMERIC correctly in odbcGetData
+
+2014-05-20 00:05  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+  * source/sqlrdd2.prg
+    ! changed sqlCreate to allow binary field in mssql as type "V"
+    ! changed altercolumn to allow new field type as for creating tables
+  * source/sqlconnection.prg
+    ! added decode to type V in binaries field
+  * source/sqlsrodbc.c
+    ! added test for SQL_VARBINARY  
+  * source/sqlex2.c  
+    ! minor fix for feedrecord to respect data from correct work area
+
+2014-04-14 23:00  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlconnection.prg
+    source/sqlpgs.prg
+    source/sqlmy.prg
+    source/sqloracle.prg
+    ! Added GetAffectedRows() method to return the number of rows affected by commands
+  * source/pgs.c
+    ! added PGSAFFECTEDROWS function 
+  * source/mysql.c
+    ! added MYSAFFECTEDROWS function
+  
+
+2014-04-06 10:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/mysql.c
+    ! added 8th parameter to MYSCONNECT to inform to use compression or not in mysql connection togheter with client_multi_result flags for stored procedure execution
+  * source/sqlconnection.prg
+    ! added lcompress member to class
+    ! on connect method, check for "COMPRESS" keyword to enable compression under mysql    
+  * source/sqlex.h
+    ! added prototype for  odbcGetData function
+  * source/sqlmy.prg
+    ! Changed ConnectRaw to pass lcompress parameter to MYSCONNECT function
+  * source/sqlrdd2.prg
+    ! minor change to detect timestamp field under sqlserver
+  * source/sqlsrodbc.c
+    ! added odbcGetData function
+    ! Added some casts
+    ! add data retrive changed to new function odbcGetData, so we can reduce memory consume since if not allocated an char buffer to retrive data
+  * source/sqlex1.c
+    ! add data retrive changed to new function odbcGetData, so we can reduce memory consume since if not allocated an char buffer to retrive data
+    
+2014-03-17 09:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlex.h
+    * COLUMN_BLOCK_SIZE decrease  32k to 64 bytes
+    * INITIAL_MEMO_ALLOC decrease from 1K to  256 bytes.
+  * source/sqlex1.c  
+    some fixes for memo detecting, release of cursors and data retriving from rdbms to use less memory
+  * source/sqlex2.c  
+    some fixes for memo detecting and release cursors
+  * source/sqlex3.c  
+    ! fixed getSeekWhereExpression becouse sometimes was passing wrong value to bwhere even is thisWa->sWhere is filler
+  * source/sqlsrodbc.c
+    ! some casts  and data retriving from rdbms to use less memory
+    
+  
+
+2014-01-02 20:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>   
+  *  source/sqlorax.c
+    ! added functions GETORAHANDLE and SETORAHANDLE
+  *  source/sqlora2.c
+    ! Removed unneaded tracelogs
+    ! some fixes on ORACLEINBINDPARAM()
+    ! added functions SQLO_ORACLESETLOBPREFETCH , SQLO_SETSTATEMENTCACHESIZE, SQLO_GETSTATEMENTCACHESIZE,GETORAHANDLE,SETORAHANDLE
+  * source/sqlex.h
+    * COLUMN_BLOCK_SIZE increase size from 8k to 32k
+  * source/sqlrdd2.prg
+    ! fix when softseeking complete date index
+  * source/sqlex1.c     
+  * source/sqlex2.c
+  * source/sqlex3.c
+    ! fixed close cursors
+    ! fixed bind problems for datetime fields when using sqlserver native cliemt 10.x
+  * source/oraedit.prg
+    source/oraclip.prg
+    ! some fixes
+      
+
+2013-09-27 20:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/oraedit.prg
+  * source/oraclip.prg 
+    ! somefixes
+  * source/sqlora.h
+  * source/sqlora.c
+  * source/sqlorax.c
+    ! Added GETAFFECTROWS() function and change sqlo_exec to return the value of number of rows affected by the querie
+  + source/sqlora2.c  
+    ! new code to access oracle that use ocilib
+  + source/sqloracle2.prg
+    ! updated version of sr_oracle class to take advantage of new C bindinds
+  + source/ocilib.h
+    ! Header file for ocilib
+  + dll/ociliba.dll
+    ! dll for ocilib      
+
+2013-07-28 10:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlodbc.prg 
+  * source/sqlsrodbc.c  
+    ! fix to return date type and correct date values on old sqlserverversion ( sqlserver 2005 and older)
+
+2013-07-21 09:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/oraedit.prg
+    source/oraclip.prg
+    ! some fixes to oraclip functions
+  * source/sqlsrodbc.c  
+    ! fix to odbcFieldGet () to return date when sr_lsql2008newTypes() for older version of sqlserver ( sqlserver 2005 and older, sqlserver 2008 and newer use the sr_lsql2008newTypes )
+
+2013-04-07 18:35 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/mysql.c
+    ! fix to mysql_library_end() only when connection counter come to 0, otherwise in multiple connections, close one, close all other
+    
+2013-02-21 05:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg
+    ! minor fix in SolveRestrictors() method related to deleted status ( users that dont use sr_deleted field is not affected)
+    
+    
+2013-02-02 19:45 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/utils.prg
+    ! change in SR_ChangeStruct for better check for postgresql with version 8.4 or newer
+  * source/firebird.c
+    ! minor change to FBEXECUTE to declare ISC_STATUS r; only when used
+  * source/pgs.c 
+    ! changed PGSQUERYATTR() 
+    ! changed PGSTABLEATTR() to declare the typmod,nullable,type variable on the for loop where their are used
+  * source/sqlconnection.prg
+    ! added lPostgresql83 data variable ( used to determine postgresql newer then 8.4
+    ! added SR_SetTraceLog() to set the path and filename used for SR_LogFile() function    
+  * source/sqlpgs.prg
+    ! Added test for postgresql 8.3 version
+  * source/oraclip.prg
+    ! some fixes
+  * source/sqlrdd2.prg
+    ! added nMininumVarchar2Size  data , this determine  whe minimum size for varchar2,default still to create varchar2 only fields with size >30
+    ! added lOracleSyntheticVirtual data, determine if will be create function based index or indkey based indexes, for oracle version 10 or newer 
+    + added FUNCTION SR_SetMininumVarchar2Size( n )  set the minimum size to create varchar
+    + added FUNCTION SR_SetOracleSyntheticVirtual( l ) set .f. to disable create of function based index on oracle 10 or newer
+    + added FUNCTION SR_GetOracleSyntheticVirtual( l )
+    
+  
+      
+2012-12-17 05:54 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlact.c
+    ! fixed and small bug on SQLpCodeGenIntItem2 that was making sqlparser return error
+  * source/oraclip.prg
+    ! added new functions
+        
+
+2012-11-01 20:12 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg
+    * fixes for seek last and ordscope
+  * source/sqlora.c
+    ! enable ocismttfetch2
+  
+2012-10-02 21:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd0.prg
+    ! fixed sr_renametable under postgresql
+  * source/utils.prg  
+    ! minor fix
+
+2012-09-18 19:16 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd0.prg
+    ! fixed sr_renametable under postgresql
+  * source/sqlrdd2.prg
+    ! minor fix to method QuotedNull() when database is postgresql and old behavior is set
+  
+2012-09-17 19:16 UTC-0800 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/firebird.c
+    * Define _INTPTR_T_DEFINED for xCC and Borland
+
+  * xcc\sql.lib.xbp
+  * xcc\sqlmt.lib.xbp  
+    + Added WIN32 to MYDEFINES
+
+2012-08-21 00:12 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/oratypes.h
+    ! fixes for define of _int64 for new xcc
+    
+2012-08-16 22:42 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/compat.h
+    ! removed duplicates defines due recent xharbour core header changes
+    
+2012-08-12 18:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlex1.c
+    ! minor fix for sqlex for datetime fields under oracle, since date fields need to be binded as timestamp ( oracle odbc driver requiment)
+  * source/sqlex2.c
+  * source/sqlex3.c
+    ! minor fix for sqlex for datetime fields under oracle, since date fields need to be binded as timestamp ( oracle odbc driver requiment)
+  + source/sqlrdddemo.hbp
+    + makefile for sqlrdd demo for harbour  
+  * source/pgs.c
+    - removed function SETPGSOLDBEHAVIOR and variable iOldBehavior
+  * source/sqlrdd0.prg
+    + added SETPGSOLDBEHAVIOR() function and added iOldBehavior Variable named as s_iOldPgsBehavior
+    + added sr_iOldPgsBehavior() function 
+  * source/sqlprototypes.h
+    + added declaration for sr_iOldPgsBehavior()  function
+
+2012-08-11 03:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlorax.c
+    ! some changes to make harbour happy
+    
+2012-08-06 05:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlorax.c
+    ! some changes to make harbour happy
+    
+2012-07-30 00:01 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * source/sqlrdd2.prg 
+    ! updated SolveRestrictors() method to check for SET_DELETED flag when using deleted record,so it can respect the seek/skip on deleted records
+    ! changed QuotedNull() method for then checking for postgresql() use the oldbehavior when set
+    ! when createing tables , and target is oracle and using deleted record, now deleted record is created nullable, since newer oracle version trying to store '' , oracle chenge to null    
+  + source/oraclip.prg
+  + source/oraedit.prg
+    ! added oraclip compatible bindings    
+  * source/pgs.c
+    ! changed SETPGSOLDBEHAVIOR() to return the old status
+  * source/sqlorax.c
+    ! changed SQLO_DESCRIBECOL() to return the correct size when returning rowid type 
+    ! fixed ORACLEINBINDPARAM() to correct find date values
+      
+2012-07-01 10:37 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * source/sqlconnection.prg
+    SR_AdjustNum made NON static as it is also used in other PRG's
+
+2012-06-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlrdd2.prg
+    ! fixed an typo on source
+  * source/sqlorax.c
+    ! fixed an typo on source  
+  + bc5/sqlbcc58.lib.xbp  
+    bc5/sqlbcc55.lib.xbp  
+    ! added xbuild project files for borland 5.82 and 5.5
+     
+2012-06-01 08:35 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlorax.c
+    ! some enhacements to bind function by create tipe 1 in ORACLEINBINDPARAM to bind CHAR type bind variables ( varchar2 is -1 type )
+  * source/sqlconnection.prg
+   ! moved method ExecSPRC and ExecSP to sqloracle
+  * source/sqloracle.prg   
+   ! added  method ExecSPRC and ExecSP moved from sqlconnection.prg
+  * source/sqlrdd2.prg 
+    ! changed sqlOrderCreate method to add nulls first in database is postgresql 8 or newer to indkey_xxx coluns
+      
+2012-05-27 12:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlrdd2.prg
+    * aaded support to create index for datetime fields
+    * added support to seek datetime fields( total or partial)
+    
+  * source/sqlpgs.prg
+    * change ConnectRaw method to better detection for postgresql version
+  * source/pgs.c
+    ! fixed return of datetime fields  
+  * source/sqlora.h
+    ! Added prototype for int sqlo_executeselect __P((sqlo_stmt_handle_t sth, unsigned int iterations));
+  * source/sqlora.c
+    ! added function int sqlo_executeselect __P((sqlo_stmt_handle_t sth, unsigned int iterations))
+  * source/sqlconnection.prg
+    ! added lPostgresql8 member to class to use for an better detection of postgresql versions
+    ! added lBind  to inform if we are in bind mode ( oracle only work in progress)
+    ! added cSqlPrepare to hold the prepared sql( oracle only work in progress)
+    ! added aBindParameters to hold the variables to be binded ( oracle only work in progress)
+    ! added new parameter to IniFields to inform that we are with an ref cursor
+    ! added METHOD ExecSPRC(  cComm, lMsg, lFetch, aArray, cFile, cAlias, cVar, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode  )
+    ! added    METHOD ExecSP( cComm, aReturn, nParam )                                                                                                   
+  * source/utils.prg
+    ! updated SR_SubQuoted function to return correct value for datetime fields
+  * source/sqlorax.c
+    ! added iValue and sDate[7] members to ORA_BIND_COLS structure
+    ! added stmtParamRes to OCI_SESSION structure
+    ! changed SQLO_CONNECT function to initialize    stmtParamRes on OCI_SESSION structure
+    ! updated ORACLEINBINDPARAM and ORACLEGETBINDDATA to properly set and get date,datetime and bool variable
+    ! added ORACLE_PROCCURSOR function
+    ! added ORACLE_BINDCURSOR function
+    ! added ORACLE_EXECCURSOR function
+    ! added CLOSECURSOR function
+    ! fixed return of datetime fields  
+     
+2012-03-28  06:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source\sqlgen1.prg
+  * source\sqlrdd2.prg   
+    ! updated SR_SQLQuotedString and and methods Quoted and QuotedNull to escape character as per postgresql docs ( Added E on from os string)
+  * source\sqlodbc.prg
+    ! redirect (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) to SQL_DATE under oracle when nlen == 19
+  * source\sqlora.c
+    ! strdup    -> hb_strdup
+    
+2012-01-29 17:12 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/compat.h
+    * do not redefine TRUE and FALSE macros if they already exists
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlex3.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * pacified warnings with uninitialized variables
+
+  * xHarbour-SQLRDD/source/sqlact.c
+    ! fixed potential GPF traps and memory corruption due to
+      uninitialized variables
+
+  * xHarbour-SQLRDD/source/sqlex1.c
+    * pacified warnings with uninitialized variables
+    * removed redundant bPrepare parameter of getWhereExpression()
+      function and modified the code to always initialize index
+      when it's necessary for given action.
+
+  * xHarbour-SQLRDD/source/sqlrdd.hbx
+    * updated automatically
+
+2012-01-26 11:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/mysql.c
+    ! added workaround for problems with xHarbour core header files which
+      define _WINSOCKAPI_ what effectively breaks compilation of code using
+      sockets. It means that it's necessary to include windows.h before
+      xHarbour header files.
+
+2012-01-19 02:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/compat.h
+    * added hbset.h and eliminated hbvmint.h from Harbour builds
+    + added few new macros to hide differences in CDP API.
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/mysql.c
+  * xHarbour-SQLRDD/source/pgs.c
+  * xHarbour-SQLRDD/source/sqlex1.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlorax.c
+  * xHarbour-SQLRDD/source/sqlrdd1.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+  * xHarbour-SQLRDD/source/sqlact.c
+    * replaced hb_vmPushSymbol() with hb_vmPushDynSym()
+    * replaced code directly accessed HB_ITEM internals with
+      macros and functions from official [x]Harbour API
+    % eliminated some unused C stack HB_ITEM variables.
+    ! eliminated rest of C stack HB_ITEM variables. Some of them
+      were used for complex items like array with inter memory
+      allocation calls what should cause GPF when GC is
+      automatically activated by MM.
+    % eliminated unnecessary __HARBOUR__/__XHARBOUR__ branches
+      which can be covered by macros defined in compat.h
+    * pacified few warnings
+    ; added TOFIX note before code calling HB_JSONDECODE().
+      Without any doubts this code does not work correctly.
+      It has to be fixed by implementing proper passing
+      by reference in C code or by small PRG function used
+      as wrapper, i.e.:
+         func SR_FROMJSON( cText )
+            local xResult
+            HB_JSONDECODE( cText, @xResult )
+         return xResult
+
+  * xHarbour-SQLRDD/source/sqlrdd.hbx
+    * regenerated automatically with new PRG functions added
+      after my last commit
+
+2012-01-15 20:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+  * source/sqlrdd1.c
+    source /sqlex1.c
+     ! hb_cdpnTranslate and hb_cdpTranslate  changes to hb_cdpndup2 and hb_cdpnDup
+     
+2012-01-12 14:52 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xHarbour-SQLRDD/source/sqlrdd0.prg
+    * replaced #include "xhb.ch" with REQUEST XHB_LIB
+
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * casting to pacify warning
+
+2012-01-12 10:53 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xHarbour-SQLRDD/source/compat.h
+    + added header file which includes commonly used Harbour and xHarbour
+      core header files and defines some macros to hide diferences between
+      both compilers.
+
+  + xHarbour-SQLRDD/source/compat.c
+    + added file with some missing functions necessary for compatibility
+      (Now only TraceLog() for Harbour was added).
+
+  * xHarbour-SQLRDD/source/compat.ch
+    + added #include "hbcompat.ch"
+
+  * xHarbour-SQLRDD/source/exprobjs.prg
+  * xHarbour-SQLRDD/source/exprparser.prg
+  * xHarbour-SQLRDD/source/exprsimpl.prg
+  * xHarbour-SQLRDD/source/exprtransl.prg
+  * xHarbour-SQLRDD/source/exprudf.prg
+  * xHarbour-SQLRDD/source/sqlgen1.prg
+  * xHarbour-SQLRDD/source/sqlrdd2.prg
+  * xHarbour-SQLRDD/source/utils.prg
+    + added #include "compat.ch"
+    * enclose in parentheses expressions with LIKE operator for
+      compatibility with hbcompat.ch PP rules.
+    * replaced IN operator with $
+
+  * xHarbour-SQLRDD/source/sqlgen1.prg
+    * replaced GLOBALs bTableInfo and bIndexInfo with STATICs
+      They were used only locally - have you documented these vars
+      as public API
+
+  * xHarbour-SQLRDD/source/sqlprototypes.h
+  * xHarbour-SQLRDD/source/sqlrdd0.prg
+  * xHarbour-SQLRDD/source/utilslang.prg
+    * eliminated GLOBAL variables
+    * changed sr_get*()/sr_set*() PRG and C functions to work without
+      global items
+    ; this modification fixed potential RTE or even GPF when wrong
+      parameters are passed to SR_SET*() functions
+
+  * xHarbour-SQLRDD/source/sqlconnection.prg
+    * renamed PUBLIC: => EXPORTED:
+
+  * xHarbour-SQLRDD/source/exprrelation.prg
+    + added #include "compat.ch"
+    + added #include "xhbcls.ch" in Harbour builds
+
+  * xHarbour-SQLRDD/source/sqlnames.prg
+    * disabled in Harbour builds
+
+  * xHarbour-SQLRDD/source/hbsql.h
+    % added missing 'const' to some char* declarations
+      It fixes warnings in code using them and allows to eliminate
+      unnecessary castings.
+
+  * xHarbour-SQLRDD/source/firebird.c
+  * xHarbour-SQLRDD/source/mysql.c
+  * xHarbour-SQLRDD/source/pgs.c
+  * xHarbour-SQLRDD/source/sqlact.c
+  * xHarbour-SQLRDD/source/sqlex.h
+  * xHarbour-SQLRDD/source/sqlex1.c
+  * xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbour-SQLRDD/source/sqlex3.c
+  * xHarbour-SQLRDD/source/sqllex.c
+  * xHarbour-SQLRDD/source/sqlora.h
+  * xHarbour-SQLRDD/source/sqlora.c
+  * xHarbour-SQLRDD/source/sqlorax.c
+  * xHarbour-SQLRDD/source/sqlrdd1.c
+  * xHarbour-SQLRDD/source/sqlsrodbc.c
+    * use compat.h instead of hb*.h files
+      (BTW some of the should not be included explicitly)
+    - removed some old compatibility macros which are not longer
+      necessary (they are covered by macros in compat.h)
+    ! replaced NULL(s) wrongly used instead of 0
+    ! fixed and synced with format strings parameters passed to sprintf()
+      functions
+    ! fixed buffer overflow in datetime buffer
+      I do not know what is the format of datetime strings returned by FB
+      but for me the conversion code is wrong - I do not believe that there
+      is no delimiter between day and hour numbers
+    + added support for datetime/timstamp conversions in Harbour builds
+    % added missing 'const' to some char* declarations
+    * updated to work with modified sr_get*Lang() C functions
+    * updated to compile with Harbour and xHarbour
+    * removed some unnecessary castings - redundant casting does not help
+      but can hide serious problems or even create some new ones
+    * use API functions to eliminate direct access to HVM internals like
+      HB_ITEM structures - still it's a work in progress
+    % eliminated some unnecessary item allocations
+    * use hb_objSendMessage() instead of hb_objSendSymbol()
+    * added support for CP translations in Harbour builds
+      Warning: some of xHarbour only code has to be fixed because
+               it may corrupt internal HVM strings changing directly
+               HB_ITEM string buffers.
+    ! do not redefine __STDC__ in GCC builds - IMHO it's fatal idea in
+      any builds because it may strongly interact with system header files
+
+  * xHarbour-SQLRDD/source/sqlrdd.h
+    ! removed unnecessary static function declarations from commonly used
+      header file
+
+   ; all these modifications allow to compile SQLRDD using xHarbour and
+     Harbour compilers. I made only compile time tests so now please try
+     to make runtime tests with real RDBMS using Harbour and xHarbour
+     (to test potential regression problems).
+     Harbour applications have to be linked yet with XHB and HBCT
+     libraries and it should be eliminated from the final product.
+   ; TODO:
+      - update code to work without hbvmint.h Harbour header files.
+        This header allows to access HVM internals and should not be
+        used by RDD libraries. Using HVM internals directly causes
+        that library has to be recompiled after each modification
+        touching HVM structures.
+      - eliminate HBCT dependencies: ATREPL(), CHARLIST()
+      - move support for HBXML from sqlrdd2.prg to separate file and
+        make it fully optional so it can be replaced by other low level
+        XML engine, i.e. Harbour supports EXPAT and MINIXML which seems
+        to be better alternatives then TXML class which in Harbour is
+        part of XHB library.
+      - update PRG code so it can work without xHarbour extenssions which
+        are not covered by hbcompat.ch. Mostly [] used to access string
+        items. This will allow to eliminate XHB library from Harbour
+        builds.
+
+  + xHarbour-SQLRDD/source/sqlrdd.hbp
+    + added HBMK2 build/make file
+  + xHarbour-SQLRDD/source/hbmk2_bison.hbs
+    + added HBMK2 plugin for bison files - thanks to Viktor.
+
+  + xHarbour-SQLRDD/source/sqlrdd.hbx
+    + added automatically generated by HBMK2 list of PRG level functions
+      which allows to create dynamic libraries which automatically
+      register all PRG level functions in HVM. This file can be used also
+      to force linking all SQLRDD functions with final executbale and
+      crate HRB or dynamic libraries (.DLL/.so/...) which uses dynamic
+      bindings to SQLRDD functions.
+
+2012-01-03 19:10  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! dll\libeay32.dll
+   ! dll\libiconv-2.dll
+   ! dll\libpq.dll
+   ! dll\ssleay32.dll
+     ! updated postgresql client dll to version 9.0.4
+   ! lib\BC5\libpq.lib
+     ! updated import library to reflect dll change
+   ! source\pgs.c
+   ! source\sqlorax.c     
+     ! fixes to timestamp support
+   ! source\firebird.c
+   ! source\mysql.c
+   ! source\sqlex1.c
+   ! source\sqlex2.c
+   ! source\sqlex3.c
+   ! source\sqlsrodbc.c
+     ! added support to timestamp fields for firebird, mysql and sqlserver 2008 or newer 
+   
+   ! source\sqlact.c
+     ! added support to timestamp fields to SR_itemEmpty function
+   ! source\sqlconnection.prg
+     ! fixes SQLType function to correct return the field type for date and datetime fields
+   ! source\sqlfirebird.prg
+   ! source\sqlodbc.prg      
+   ! source\sqlrdd0.prg
+   ! source\sqlrdd2.prg
+   
+   ! source\sqlprototypes.h
+     ! added new prototypes 
+
+
+2011-09-30 15:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! dll\fbclient.dll
+     ! updated to firebird 2.1 dll
+   ! lib\fbclient_ms.lib
+     ! updated to firebird 2.1 
+   ! lib\fbclient_bc.lib
+     ! updated to firebird 2.1   
+   ! source\firebird.c
+     ! updated to use firebird 2.x fb_interpret insted on unsafe isc_interprete as per firebird 2.x docs
+   ! source\ibase.h
+   ! source\iberror.h
+     ! updated to firebird 2.1 header files
+   ! source\sqlfirebird.prg
+     ! fixes commit method that sometime was not commiting properly
+   ! source\sqlrdd0.prg
+     ! added an missed commit in SR_ExistTable() function
+
+
+2011-08-26 23:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlex.h
+     ! added bIsSelect member to SQLEXAREA structure
+   ! source/sqlex1.c
+     ! fixed createRecodListQuery function to proper generate query when using query in dbusearea function
+     ! fixed getMissingColumn function to proper generate query when using query in dbusearea function
+     ! fixed updateRecordBuffer function to proper generate query when using query in dbusearea function as also to recreate the thiswa->hStmtBuffer member if is null
+     ! updated _hb_sqlEx_rdd_init_ to use same way to register normal rdds with xharbour
+   ! source/sqlorax.c
+     ! added an missing return on ORACLEPREPARE function
+   ! source/sqlrdd0.prg
+     source;sqlodbc.prg
+     ! added test for azure database
+   ! source/sqlconnection.prg
+     ! added lclustered member to class and test for azure database
+   ! source/sqlrdd.ch
+     ! added define for azure database
+   ! source/sqlrdd1.c
+     ! updated _hb_sqlrdd_rdd_init_to use same way to register normal rdds with xharbour
+   ! source/sqlrdd2.prg
+     ! added define for azure database
+     ! fixed reset sequence for postgresql
+   ! source/utils.prg
+     ! added define for azure database
+   ! source/sqlpgs.prg
+     ! added support for postgresql 9.1
+
+
+2011-06-05 18:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlprototypes.h
+     ! added missing prototype for sr_lSerializeArrayAsJson()
+     
+2011-05-25 07:02 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlex2.c
+     ! fixed generation of sr_recno in multiple connection under sqlserver
+   ! source/sqlrdd2.prg
+     ! updated sqlzap method to reset sequence number under postgresql
+       
+2011-05-15 10:50 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd2.prg
+     ! fixed generation of sr_recno in multiple connection  under sqlserver
+     
+2011-05-01 15:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd1.c
+     ! Fixed some memory leaks that can cause apps slow and huge memory consume
+   ! source/mysql.c  
+     ! correct to call mysql_library_load and mysql_library_free
+     
+2011-03-30 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/sqlrdd2.prg
+     ! added support for datetime field for postgresql and oracle, type for this field is T
+     ! move function responsable from converting arrays into xml and vice versa from sqlpgs.prg 
+   ! source/sqlpgs.prg  
+     - functions for converting arrays into xml and vice versa from sqlpgs.prg 
+   ! source/pgs.c
+     ! added support for datetime fields
+   ! source/sqlorax.c
+     ! added support for datetime fields
+   ! source/sqlrdd1.c
+     source/utils.prg
+     source/sqlodbc.ch
+     source/sqlconnection.prg
+     ! added code to support datetime field under postgresql and oracle
+               
+2011-03-30 22:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>   
+   ! source/firebird.c
+   ! source/mysql.c   
+   ! source/sqlsrodbc.c
+   ! source/sqlorax.c
+     ! added support to decode json arrays
+   ! source/pgs.c     
+      ! added support to decode json arrays
+      ! added support to decode xml data as array   
+   ! source/sqlpgs.prg
+     ! added code to suport xml field types
+   ! source/sqlrdd0.prg
+     ! added need code to suport xml field types and settings
+   ! source/sqlrdd1.c
+   ! source/sqlrdd2.prg
+     ! added support to xml fields in postgresql, and encoding arrays in json format is SR_SetSerializeArrayAsJson() is set to true ( default is false )
+   
+2011-03-22 21:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     ! fixed minor memory leak when monting filters
+     ! added detection for sqlserver >=8.x
+   ! source/sqlconnection.prg
+     ! added new members to class to allow postgresql use ssl connection
+   ! source/sqlpgs.prg
+     ! added code to allow ssl connection
+   ! source/sqlrdd2.prg
+     ! when creating the index for sr_recno key under sqlserver, is the server support clustered index, this index will be clustered
+
+2011-03-22 17:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   ! source\sqlex1.c
+   ! source\sqlrdd1.c
+     ! Fixed MSVC missing external loadTagDefault()
+
+2011-03-03 21:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/utils.prg
+     ! added SR_SetFieldDefault() to set field default under postgresql ( work in progress for other databases)
+
+2011-03-03 20:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fix on AlterColumns when converting numeric field to char under postgresql
+   ! source/sqlrdd0.prg
+     ! change SR_RenameTable() to rename sequence to new table name under postgresql and oracle
+     !TEMP_DROP_COL -> TEMPDROPCO   to respect alias name to 10 chars
+
+2011-01-27 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! in createtable method added logic to detect mysql 5.5 since it use engine=innodb insted of type=innodb
+     ! added logic in AlterColumnsDirect method to allow convertion from char to numeric field
+   ! source/firebird.c
+     ! changed FBCREATEDB to dont lock database upon created is success fully created . Sugested by marson de paula
+   ! source/utils.prg
+     ! added logic in sr_changestruct method to allow convertion from char to numeric field
+
+2010-10-11 14:25  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/pgs.c
+     ! added  SETPGSOLDBEHAVIOR() to set postgresql behavior ( default .f. which means use null fields when applied)
+
+2010-09-26 13:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fixed seek when key is val(field)
+   ! source/pgs.c
+     ! minor clean up
+   ! source/utils.prg
+     ! fixed undeclared variable
+
+2010-08-25 20:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/pgs.c
+     ! fix to nullable  detection ( was inverted )
+
+2010-08-04 19:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd0.prg
+     ! fixed drop of indkex_xxx in SR_DropIndex()
+
+2010-08-04 19:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd1.c
+     + Sr_SetFound() function
+   ! source/sqlrdd2.prg
+     ! fixed seek last
+     ! fixed orddestroy support
+   ! source/sqlrdd0.prg
+     ! minor fix to sr_dropindex
+
+2010-07-25 14:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/pgs.c
+     ! minor fix to nullable field detection
+
+2010-07-13 23:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+   ! source/sqlex2.c
+   ! source/sqlex3.c
+       ! some fixes on seeks and order setting
+       ! implemented sr_setfilter
+       changes for use the new INDEXBINDP * IndexBindings
+   ! source/sqlex.h
+     !changed  INDEXBINDP IndexBindings[MAX_INDEXES] to  INDEXBINDP * IndexBindings for better memory usage
+   ! source/sqlsrodbc.c
+     ! changed all fix arrays initialization to {0}
+   ! source/sqlrdd1.c
+     ! change all HB_ITEM xxx to PHB_ITM xxx and commented out usage os  xxx.type = HB_IT_NIL;
+   ! source/sqlrdd2.prg]
+     ! under sqlex, we need to get the indkey_xxx field
+
+2010-07-12 19:13 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/utils.prg
+     + functions sr_AddToFilter()  to add an recno to existing filter  and sr_clearFilter() to clear this recno filter
+   ! source/sqlrdd2.prg
+     ! Added support for recno filters
+     ! fixed QuotedNull() method to return null values where need under postgresql
+   ! source/pgs.c
+     ! fixed PGSTABLEATTR() to correct check if field is nullable
+
+2010-06-21 23:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     ! fixed orddescend support
+
+2010-06-19 10:45 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlpgs.prg
+     ! added support for postgresql 9.0
+
+2010-06-18 16:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     ! fixed some memory init buffer initialize to 0 ( memset( buffer,0,buffersize)
+     ! HB_ITEM xxx -> PHB_ITEM ccc
+   ! source/sqlsrodbc.c
+     ! buffer initialize to 0 ( memset( buffer,0,buffersize)
+
+
+2010-06-17 21:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     ! fixed buffer problem on getColumnList()
+   ! source/sqlsrodbc.c
+     ! fixed problem when  data is an real large string on odbcFieldGet()
+
+2010-06-15 15:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex2.c
+     ! fixed ResolveSpecialCols() function that on some cases was not updating indkey_xxx coluns
+
+2010-06-15 18:34 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex2.c
+     ! fixed ResolveSpecialCols() function that on some cases was not updating indkey_xxx coluns
+   ! source/sqlrdd2.prg
+     ! updated oracle hits to use First_rows_xxxxx when oracle version is >=9
+
+2010-06-11 10:40 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fixed oracle otimizer hint ( was " /* + FIRST_ROWS(1) */ "  , correct according to oracle docs (" /*+ FIRST_ROWS(1) */ "
+
+2010-06-06 23:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlex1.c
+     + getMessagePtr() function due change of odbc to use pointer type
+   ! source/sqlex2.c
+     ! fixed problem on ResolveSpecialCols() function that was incorrectly getting the arrays values
+   ! source/sqlconnection.prg
+     ! some change on handles init to nil insted of 0 ( due change for pointer values on odbc)
+   ! source/sqlsrodbc.c
+   ! source/sqlodbc.prg
+     ! change odbc code to use pointers( hb_retptr (void*) data) insted of long values ( hb_retnl((LONG) Data) ), for better 64 bits support
+
+2010-06-06 13:31 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+   ! IsSQLWorkarea(), added "SQLEX" to the search string.
+
+2010-04-12 22:14 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fix DropColRules() method to remove firebird desceding index
+
+2010-03-02 19:24 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/firebird.c
+     ! fixed return values for double/float values
+
+2010-02-18 16:24 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! changed @@indentify with IDENT_CURRENT which is the recomended way to get the result of identify field
+     ! fixed to altertabledirect under postgres
+
+2010-02-09 23:10 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! source/sqlrdd2.prg
+     ! fix when column type of the index if logical
+   ! source/utils.prg
+     ! minor change to SR_SubQuoted to change same values as method ::quoted() under logical fields
+
+2010-01-21 08:30 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   ! Changelog
+   * ! renamed to Changelog.001 and started an new one
+   * source/sqlrdd2.prg
+     source/utils.prg
+      ! updated sr_changestruct() to do direct alter column, if changing column is same type and field len is granter then original size
