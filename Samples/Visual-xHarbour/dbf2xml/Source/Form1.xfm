@@ -1,0 +1,270 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR Stru, Pos, cFileIn, cFileOut, hOut, oTest, oProggy, lTerminate, lCanceled
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnSysCommand()
+   METHOD Form1_OnLoad()
+   METHOD MyConvert()
+   METHOD Cycle()
+   METHOD OpenTable()
+   METHOD TestUI()
+   METHOD OutOpen()
+   METHOD OutWrite()
+   METHOD OutClose()
+   METHOD MyRoot()
+   METHOD ButtonBrow_OnClick()
+   METHOD ButtonDoc_OnClick()
+   METHOD ButtonTest_OnClick()
+   METHOD ButtonStart_OnClick()
+   METHOD ButtonTerminate_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnSysCommand" ] := "Form1_OnSysCommand"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyConvert"
+   ::EventHandler[ "UserMethod10" ] := "Cycle"
+   ::EventHandler[ "UserMethod11" ] := "OpenTable"
+   ::EventHandler[ "UserMethod12" ] := "TestUI"
+   ::EventHandler[ "UserMethod13" ] := "OutOpen"
+   ::EventHandler[ "UserMethod14" ] := "OutWrite"
+   ::EventHandler[ "UserMethod15" ] := "OutClose"
+   ::EventHandler[ "UserMethod16" ] := "MyRoot"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "MyTable"
+      :AutoOpen             := .F.
+      :Codepage             := ""
+      :Create()
+   END //MyTable
+
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "MyOpenFile"
+      :FileName             := ""
+      :Title                := ""
+      :MultiSelect          := .F.
+      :Create()
+   END //MyOpenFile
+
+   WITH OBJECT ( SaveFileDialog( Self ) )
+      :Name                 := "MySaveFile"
+      :FileName             := ""
+      :Create()
+   END //MySaveFile
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 11
+   ::Width                := 540
+   ::Height               := 340
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "dbf2xml"
+   ::ThickFrame           := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "MyPanel"
+      :Left                 := 5
+      :Top                  := 8
+      :Width                := 520
+      :Height               := 295
+      :VertScrollSize       := 80
+      :HorzScrollSize       := 80
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 18
+         :Top                  := 10
+         :Width                := 155
+         :Height               := 16
+         :VertScrollSize       := 16
+         :HorzScrollSize       := 80
+         :Caption              := "Input file name ( .dbf ):"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditIn"
+         WITH OBJECT :Font
+            :Pointsize            := 10
+         END
+
+         :VertScroll           := .T.
+         :Left                 := 14
+         :Top                  := 33
+         :Width                := 454
+         :Height               := 44
+         :Enabled              := .F.
+         :VertScrollSize       := 18
+         :HorzScrollSize       := 76
+         :BackColor            := 16711422
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonBrow"
+         :Left                 := 488
+         :Top                  := 40
+         :Width                := 20
+         :Height               := 20
+         :VertScrollSize       := 25
+         :HorzScrollSize       := 80
+         :Caption              := "..."
+         :EventHandler[ "OnClick" ] := "ButtonBrow_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 18
+         :Top                  := 88
+         :Width                := 110
+         :Height               := 16
+         :VertScrollSize       := 16
+         :HorzScrollSize       := 80
+         :Caption              := "Input file encoding:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "ComboLang"
+         :VertScroll           := .T.
+         :Left                 := 145
+         :Top                  := 88
+         :Width                := 117
+         :Height               := 100
+         :VertScrollSize       := 24
+         :HorzScrollSize       := 100
+         :ItemHeight           := 15
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 14
+         :Top                  := 120
+         :Width                := 163
+         :Height               := 16
+         :VertScrollSize       := 16
+         :HorzScrollSize       := 80
+         :Caption              := "Output file name ( .xml ):"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "EditOut"
+         WITH OBJECT :Font
+            :Pointsize            := 10
+         END
+
+         :VertScroll           := .T.
+         :Left                 := 14
+         :Top                  := 150
+         :Width                := 454
+         :Height               := 44
+         :Enabled              := .F.
+         :VertScrollSize       := 18
+         :HorzScrollSize       := 76
+         :BackColor            := 16711422
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonDoc"
+         :Left                 := 488
+         :Top                  := 158
+         :Width                := 20
+         :Height               := 20
+         :VertScrollSize       := 25
+         :HorzScrollSize       := 80
+         :Caption              := "..."
+         :EventHandler[ "OnClick" ] := "ButtonDoc_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         :Left                 := 14
+         :Top                  := 220
+         :Width                := 118
+         :Height               := 16
+         :VertScrollSize       := 16
+         :HorzScrollSize       := 80
+         :Caption              := "Row number in Test:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "ComboPos"
+         :Left                 := 145
+         :Top                  := 216
+         :Width                := 67
+         :Height               := 100
+         :VertScrollSize       := 24
+         :HorzScrollSize       := 100
+         :ItemHeight           := 15
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonTest"
+         :Left                 := 230
+         :Top                  := 215
+         :Width                := 64
+         :Height               := 25
+         :VertScrollSize       := 25
+         :HorzScrollSize       := 80
+         :Caption              := "Test"
+         :EventHandler[ "OnClick" ] := "ButtonTest_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonStart"
+         :Left                 := 318
+         :Top                  := 215
+         :Width                := 64
+         :Height               := 25
+         :VertScrollSize       := 25
+         :HorzScrollSize       := 80
+         :Caption              := "Convert"
+         :EventHandler[ "OnClick" ] := "ButtonStart_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonTerminate"
+         :Left                 := 404
+         :Top                  := 259
+         :Width                := 64
+         :Height               := 25
+         :VertScrollSize       := 25
+         :HorzScrollSize       := 80
+         :Caption              := "Close"
+         :EventHandler[ "OnClick" ] := "ButtonTerminate_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PANEL
+
+   ::Show()
+
+RETURN Self

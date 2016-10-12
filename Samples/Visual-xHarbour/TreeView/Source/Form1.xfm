@@ -1,0 +1,107 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD TreeView1_AfterSelect()
+   METHOD Button1_OnClick()
+   METHOD Button2_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 446
+   ::Height               := 366
+   ::Center               := .T.
+   ::Text                 := "Form1"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TREEVIEW( Self ) )
+      :Name                 := "TreeView1"
+      :Left                 := 9
+      :Top                  := 10
+      :Width                := 203
+      :Height               := 273
+      :Text                 := "TreeView1"
+      :EventHandler[ "AfterSelect" ] := "TreeView1_AfterSelect"
+      :Create()
+   END //TREEVIEW
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 9
+      :Top                  := 297
+      :Width                := 80
+      :Height               := 25
+      :Text                 := "Add item"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button2"
+      :Left                 := 100
+      :Top                  := 297
+      :Width                := 80
+      :Height               := 25
+      :Text                 := "Delete item"
+      :EventHandler[ "OnClick" ] := "Button2_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 220
+      :Top                  := 10
+      :Width                := 193
+      :Height               := 274
+      :Text                 := "Selected"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         WITH OBJECT :Font
+            :Pointsize            := 10
+         END
+
+         :Left                 := 6
+         :Top                  := 60
+         :Width                := 185
+         :Height               := 24
+         :Text                 := "Label1"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         WITH OBJECT :Font
+            :Pointsize            := 10
+         END
+
+         :Left                 := 6
+         :Top                  := 119
+         :Width                := 185
+         :Height               := 26
+         :Text                 := "Label2"
+         :Create()
+      END //LABEL
+
+   END //GROUPBOX
+
+   ::Show()
+
+RETURN Self

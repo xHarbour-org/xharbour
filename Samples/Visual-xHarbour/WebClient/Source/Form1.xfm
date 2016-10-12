@@ -1,0 +1,207 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR NavError, WebPage
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnCreate()
+   METHOD Form1_OnLoad()
+   METHOD MyGet_OnClick()
+   METHOD MyPost_OnClick()
+   METHOD MyUpload_OnClick()
+   METHOD WebBrowser1_DocumentComplete()
+   METHOD WebBrowser1_DownloadBegin()
+   METHOD WebBrowser1_DownloadComplete()
+   METHOD WebBrowser1_NavigateError()
+   METHOD WebBrowser1_ProgressChange()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 467
+   ::Height               := 411
+   ::Caption              := "Sample Web Client"
+   ::ThickFrame           := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "BigPanel"
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 453
+      :Height               := 288
+      :Create()
+      WITH OBJECT ( PROGRESSBAR( :this ) )
+         :Name                 := "ProgressBar1"
+         :Left                 := 40
+         :Top                  := 257
+         :Width                := 150
+         :Height               := 20
+         :Create()
+      END //PROGRESSBAR
+
+      WITH OBJECT ( GROUPBOX( :this ) )
+         :Name                 := "GroupBox1"
+         :Left                 := 13
+         :Top                  := 45
+         :Width                := 204
+         :Height               := 200
+         :Caption              := "Input data"
+         :ForeColor            := 0
+         :Create()
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit1"
+            :Left                 := 17
+            :Top                  := 30
+            :Width                := 80
+            :Height               := 22
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit2"
+            :Left                 := 17
+            :Top                  := 70
+            :Width                := 170
+            :Height               := 100
+            :MultiLine            := .T.
+            :WantReturn           := .T.
+            :Create()
+         END //EDIT
+
+      END //GROUPBOX
+
+      WITH OBJECT ( GROUPBOX( :this ) )
+         :Name                 := "GroupBox2"
+         :Left                 := 233
+         :Top                  := 45
+         :Width                := 204
+         :Height               := 200
+         :Enabled              := .F.
+         :Caption              := "Output data"
+         :ForeColor            := 0
+         :Create()
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit3"
+            :Left                 := 17
+            :Top                  := 30
+            :Width                := 80
+            :Height               := 22
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Edit4"
+            :Left                 := 17
+            :Top                  := 70
+            :Width                := 170
+            :Height               := 100
+            :MultiLine            := .T.
+            :WantReturn           := .T.
+            :Create()
+         END //EDIT
+
+      END //GROUPBOX
+
+      WITH OBJECT ( TOOLSTRIP( :this ) )
+         :Name                 := "ToolStrip1"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 8
+         :Top                  := 8
+         :Caption              := "ToolStrip1"
+         :Showgrip             := .F.
+         :Create()
+         WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+            :Name                 := "MyGet"
+            :Caption              := "Http GET"
+            :EventHandler[ "OnClick" ] := "MyGet_OnClick"
+            :Create()
+         END //TOOLSTRIPBUTTON
+
+         WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+            :Name                 := "MyPost"
+            :Caption              := "Http POST"
+            :EventHandler[ "OnClick" ] := "MyPost_OnClick"
+            :Create()
+         END //TOOLSTRIPBUTTON
+
+         WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+            :Name                 := "MyUpload"
+            :Caption              := "Http Upload"
+            :EventHandler[ "OnClick" ] := "MyUpload_OnClick"
+            :Create()
+         END //TOOLSTRIPBUTTON
+
+      END //TOOLSTRIP
+
+   END //PANEL
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "UploadPanel"
+      :Left                 := 0
+      :Top                  := 291
+      :Width                := 453
+      :Height               := 86
+      :Create()
+      WITH OBJECT ( WEBBROWSER( :this ) )
+         :Name                 := "WebBrowser1"
+         :Left                 := 15
+         :Top                  := 30
+         :Width                := 358
+         :Height               := 43
+         :Border               := .T.
+         :Url                  := "about:blank"
+         :EventHandler[ "DocumentComplete" ] := "WebBrowser1_DocumentComplete"
+         :EventHandler[ "DownloadBegin" ] := "WebBrowser1_DownloadBegin"
+         :EventHandler[ "DownloadComplete" ] := "WebBrowser1_DownloadComplete"
+         :EventHandler[ "NavigateError" ] := "WebBrowser1_NavigateError"
+         :EventHandler[ "ProgressChange" ] := "WebBrowser1_ProgressChange"
+         :Create()
+         :Configure()
+      END //WEBBROWSER
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "UploadLabel"
+         :Left                 := 18
+         :Top                  := 6
+         :Width                := 172
+         :Height               := 16
+         :Caption              := "Http upload via HTML form:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonCancel"
+         :Left                 := 382
+         :Top                  := 36
+         :Width                := 62
+         :Height               := 30
+         :Caption              := "Cancel"
+         :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PANEL
+
+   ::Show()
+
+RETURN Self

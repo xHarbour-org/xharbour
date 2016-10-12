@@ -1,0 +1,55 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR oSplash, nTimer
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnCreate()
+   METHOD Timer1_OnTimeOut()
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 500
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 12
+   ::Top                  := 11
+   ::Width                := 600
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Form1"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 459
+      :Top                  := 399
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

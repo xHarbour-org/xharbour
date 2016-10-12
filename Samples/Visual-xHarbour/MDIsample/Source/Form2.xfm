@@ -1,0 +1,74 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form2 INHERIT MDIChildWindow
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form2_OnLoad()
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form2_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form2"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 366
+   ::Height               := 387
+   ::Caption              := "Form2"
+   ::MDIChild             := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 37
+      :Top                  := 48
+      :Width                := 145
+      :Height               := 30
+      :Caption              := "Label1"
+      :ForeColor            := 255
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 37
+      :Top                  := 303
+      :Width                := 80
+      :Height               := 25
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 37
+      :Top                  := 131
+      :Width                := 145
+      :Height               := 30
+      :Caption              := "Label2"
+      :ForeColor            := 128
+      :Create()
+   END //LABEL
+
+   ::Show()
+
+RETURN Self

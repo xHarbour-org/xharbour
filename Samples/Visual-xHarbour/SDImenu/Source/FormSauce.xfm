@@ -1,0 +1,122 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormSauce INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormSauce_OnDestroy()
+   METHOD FormSauce_OnLoad()
+   METHOD ButtonDel_OnClick()
+   METHOD ButtonAdd_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormSauce
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormSauce_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormSauce_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormSauce"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 481
+   ::Height               := 306
+   ::Center               := .T.
+   ::Caption              := "Update Sauces"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "gsauce"
+      :Left                 := 20
+      :Top                  := 20
+      :Width                := 221
+      :Height               := 187
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel1"
+      :Left                 := 253
+      :Top                  := 66
+      :Width                := 210
+      :Height               := 125
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 9
+         :Top                  := 18
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Name:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditName"
+         :Left                 := 9
+         :Top                  := 39
+         :Width                := 193
+         :Height               := 22
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 9
+         :Top                  := 68
+         :Width                := 46
+         :Height               := 16
+         :Caption              := "Price:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditPrice"
+         :Left                 := 9
+         :Top                  := 89
+         :Width                := 80
+         :Height               := 22
+         :Create()
+      END //EDIT
+
+   END //PANEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonDel"
+      :Left                 := 374
+      :Top                  := 225
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Delete"
+      :EventHandler[ "OnClick" ] := "ButtonDel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonAdd"
+      :Left                 := 278
+      :Top                  := 225
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Add"
+      :EventHandler[ "OnClick" ] := "ButtonAdd_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

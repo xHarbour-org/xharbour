@@ -1,0 +1,68 @@
+IDOK MANIFEST "xDB.XML"
+#include "Winver.h"
+
+1 VERSIONINFO
+FILEVERSION       1,0,0,0
+PRODUCTVERSION    1,0,0,0
+FILEFLAGS         0
+FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
+FILEOS            VOS__WINDOWS32
+FILETYPE          VFT_APP
+FILESUBTYPE       0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName",      ""
+         VALUE "FileDescription",  ""
+         VALUE "FileVersion",      "1.0.0.0\0"
+         VALUE "InternalName",     "xDB"
+         VALUE "LegalCopyright",   ""
+         VALUE "OriginalFilename", "xDB.exe"
+         VALUE "ProductName",      ""
+         VALUE "ProductVersion",   "1.0.0.0\0"
+      }
+   }
+   BLOCK "VarFileInfo"
+   {
+      // English language and the Windows ANSI codepage
+      VALUE "Translation", 0x409, 1252
+   }
+}
+_SETTINGSICO ICON "settings.ico"
+_NEWICO ICON "new.ico"
+_OPENICO ICON "open.ico"
+_OPENIICO ICON "openi.ico"
+_CLOSEICO ICON "close.ico"
+_PROPERTYICO ICON "property.ico"
+_VIEWICO ICON "view.ico"
+_MARKERICO ICON "marker.ico"
+_SHOWDICO ICON "showd.ico"
+_HIDEDICO ICON "hided.ico"
+_RDDICO ICON "rdd.ico"
+_EXCHANGEICO ICON "exchange.ico"
+_QUESTION_AND_ANSWERICO ICON "question_and_answer.ico"
+_QUERY_DBFICO ICON "query_dbf.ico"
+_IMPORT1ICO ICON "import1.ico"
+_STEPICO ICON "step.ico"
+_FINDICO ICON "find.ico"
+_PLUGICO ICON "plug.ico"
+_UNPLUGICO ICON "unplug.ico"
+_GEARS_VIEWICO ICON "gears_view.ico"
+_CHECK1ICO ICON "check1.ico"
+_DELETE2ICO ICON "delete2.ico"
+_DELETE1ICO ICON "delete1.ico"
+_UPICO ICON "up.ico"
+_DOWNICO ICON "down.ico"
+_DOCUMENTICO ICON "document.ico"
+_1APPICO ICON ".\\resource\\app.ico"
+_TABLESICO ICON ".\\Resource\\tables.ico"
+_APPICO ICON ".\\Resource\\app.ico"
+_COLUMNICO ICON "column.ico"
+_SORT_AZ_ASCENDINGICO ICON "sort_az_ascending.ico"
+_DESKTOPICO ICON "desktop.ico"
+_REPLACEICO ICON "replace.ico"
+_DISK_YELLOWICO ICON "disk_yellow.ico"
+_RUNICO ICON "run.ico"
+_EXPORT1ICO ICON "export1.ico"

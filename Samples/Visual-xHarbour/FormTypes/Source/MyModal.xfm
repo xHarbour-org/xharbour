@@ -1,0 +1,77 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyModal INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD MyModal_OnCancel()
+   METHOD MyModal_OnClose()
+   METHOD MyModal_OnSysCommand()
+   METHOD MyModal_OnDestroy()
+   METHOD MyModal_OnInitDialog()
+   METHOD MyModal_OnLoad()
+   METHOD MyModal_OnShowWindow()
+   METHOD ButtonApply_OnClick()
+   METHOD ButtonUpdateApp_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyModal
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCancel" ] := "MyModal_OnCancel"
+   ::EventHandler[ "OnClose" ] := "MyModal_OnClose"
+   ::EventHandler[ "OnSysCommand" ] := "MyModal_OnSysCommand"
+   ::EventHandler[ "OnDestroy" ] := "MyModal_OnDestroy"
+   ::EventHandler[ "OnInitDialog" ] := "MyModal_OnInitDialog"
+   ::EventHandler[ "OnLoad" ] := "MyModal_OnLoad"
+   ::EventHandler[ "OnShowWindow" ] := "MyModal_OnShowWindow"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MyModal"
+   ::Modal                := .T.
+   ::Left                 := 12
+   ::Top                  := 8
+   ::Width                := 400
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Modal Form"
+   ::FrameStyle           := 2
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS MyModal
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonApply"
+      :Left                 := 156
+      :Top                  := 213
+      :Width                := 100
+      :Height               := 30
+      :Caption              := "Apply"
+      :Group                := .T.
+      :EventHandler[ "OnClick" ] := "ButtonApply_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonUpdateApp"
+      :Left                 := 270
+      :Top                  := 213
+      :Width                := 100
+      :Height               := 30
+      :Caption              := "Update App"
+      :EventHandler[ "OnClick" ] := "ButtonUpdateApp_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

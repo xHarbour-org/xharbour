@@ -1,0 +1,383 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MySettings INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD MySettings_OnLoad()
+   METHOD Button_Cancel_OnClick()
+   METHOD Button_OK_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MySettings
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "MySettings_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MySettings"
+   ::Modal                := .T.
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 488
+   ::Height               := 341
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS MySettings
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_Cancel"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 390
+      :Top                  := 270
+      :Width                := 80
+      :Height               := 27
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Button_Cancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( TABCONTROL( Self ) )
+      :Name                 := "MyTabs"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := ::Button_Cancel
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 10
+      :Width                := 460
+      :Height               := 250
+      :Caption              := "TabControl1"
+      :Create()
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabSettings"
+         :Caption              := "&Settings"
+         :ImageIndex           := -1
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_SMTP"
+            :Left                 := 13
+            :Top                  := 16
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "SMTP Server:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_SMTP"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_SMTP
+               :Right                := :Owner:Parent
+               :Margin               := 4
+            END
+
+            :Left                 := 97
+            :Top                  := 12
+            :Width                := 355
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "LabelSMTPPort"
+            :Left                 := 13
+            :Top                  := 43
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Port:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_SMTPPort"
+            WITH OBJECT :Dock
+               :Left                 := ::LabelSMTPPort
+               :Margin               := 4
+            END
+
+            :Left                 := 97
+            :Top                  := 39
+            :Width                := 43
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_POP"
+            :Left                 := 13
+            :Top                  := 118
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "POP3 Server:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_POP"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_POP
+               :Right                := :Owner:Parent
+               :Margin               := 4
+            END
+
+            :Left                 := 97
+            :Top                  := 113
+            :Width                := 355
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_User"
+            :Left                 := 13
+            :Top                  := 143
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "User:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_User"
+            :Left                 := 97
+            :Top                  := 140
+            :Width                := 192
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_Password"
+            :Left                 := 13
+            :Top                  := 170
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Password:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_Password"
+            :Left                 := 97
+            :Top                  := 167
+            :Width                := 192
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Password             := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "Check_SMTPAuthentication"
+            :Left                 := 97
+            :Top                  := 71
+            :Width                := 225
+            :Height               := 15
+            :Caption              := "SMTP server requires authentication"
+            :Create()
+         END //CHECKBOX
+
+      END //TABPAGE
+
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabPreferences"
+         :Caption              := "&Preferences"
+         :ImageIndex           := -1
+         :Create()
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_Name"
+            :Left                 := 13
+            :Top                  := 15
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Name:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_Name"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_Name
+            END
+
+            :Left                 := 94
+            :Top                  := 11
+            :Width                := 234
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_Reply"
+            :Left                 := 13
+            :Top                  := 41
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Reply-to:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_Reply"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_Reply
+            END
+
+            :Left                 := 94
+            :Top                  := 38
+            :Width                := 234
+            :Height               := 22
+            :AutoHScroll          := .T.
+            :Create()
+         END //EDIT
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_Receipt"
+            :Left                 := 13
+            :Top                  := 80
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Receipt:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :Name                 := "Combo_Receipt"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_Receipt
+            END
+
+            :Left                 := 94
+            :Top                  := 77
+            :Width                := 156
+            :Height               := 100
+            :ClientEdge           := .T.
+            :ItemHeight           := 13
+            :Create()
+         END //COMBOBOX
+
+         WITH OBJECT ( LABEL( :this ) )
+            :Name                 := "Label_Priority"
+            :Left                 := 13
+            :Top                  := 106
+            :Width                := 80
+            :Height               := 16
+            :Caption              := "Priority:"
+            :Create()
+         END //LABEL
+
+         WITH OBJECT ( COMBOBOX( :this ) )
+            :Name                 := "Combo_Priority"
+            WITH OBJECT :Dock
+               :Left                 := ::Label_Priority
+            END
+
+            :Left                 := 94
+            :Top                  := 105
+            :Width                := 77
+            :Height               := 100
+            :ClientEdge           := .T.
+            :ItemHeight           := 13
+            :Create()
+         END //COMBOBOX
+
+         WITH OBJECT ( CHECKBOX( :this ) )
+            :Name                 := "Check_Signature"
+            :Left                 := 13
+            :Top                  := 145
+            :Width                := 100
+            :Height               := 15
+            :Caption              := "Add signature:"
+            :Create()
+         END //CHECKBOX
+
+         WITH OBJECT ( EDIT( :this ) )
+            :Name                 := "Box_Signature"
+            :VertScroll           := .T.
+            :Left                 := 13
+            :Top                  := 167
+            :Width                := 433
+            :Height               := 52
+            :MultiLine            := .T.
+            :WantReturn           := .T.
+            :Create()
+         END //EDIT
+
+      END //TABPAGE
+
+   END //TABCONTROL
+
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 284
+      :Width                := 227
+      :Height               := 17
+      :Caption              := "http://www.xharbour.com/trainingcenter/"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_OK"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := ::Button_Cancel
+         :Bottom               := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 300
+      :Top                  := 270
+      :Width                := 80
+      :Height               := 27
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "Button_OK_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

@@ -1,0 +1,322 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form_Main INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form_OnShowWindow()
+   METHOD lbl_answer_1_OnClick()
+   METHOD Game_NewGame_OnClick()
+   METHOD Main_Exit_OnClick()
+   METHOD Info_About_OnClick()
+   METHOD Info_HowTo_OnClick()
+   METHOD Info_VisitOnline_OnClick()
+   METHOD lbl_answer_3_OnClick()
+   METHOD lbl_answer_2_OnClick()
+   METHOD lbl_answer_4_OnClick()
+   METHOD pic_help_1_OnLButtonUp()
+   METHOD pic_help_2_OnLButtonUp()
+   METHOD pic_help_3_OnLButtonUp()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form_Main
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnShowWindow" ] := "Form_OnShowWindow"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form_Main"
+   ::Left                 := 13
+   ::Top                  := 11
+   ::Width                := 632
+   ::Height               := 495
+   ::Text                 := "Millionaire"
+   ::SysMenu              := .F.
+   ::DlgModalFrame        := .T.
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "lbl_answer_1"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :ForeColor            := 10061943
+      :Left                 := 42
+      :Top                  := 378
+      :Width                := 223
+      :Height               := 16
+      :Cursor               := 32649
+      :Text                 := "Answer 1"
+      :Alignment            := 1
+      :EventHandler[ "OnClick" ] := "lbl_answer_1_OnClick"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "Menu_Main"
+      :Left                 := 12
+      :Width                := 608
+      :Height               := 20
+      :List                 := .T.
+      :ToolTips             := .T.
+      :HorzPadding          := 7
+      :VertPadding          := 6
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Main_Game"
+         :Text                 := "Game"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Game_NewGame"
+            :Text                 := "Start new game"
+            :EventHandler[ "OnClick" ] := "Game_NewGame_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Game_Bar_1"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Main_Exit"
+            :Text                 := "Exit"
+            :EventHandler[ "OnClick" ] := "Main_Exit_OnClick"
+            :Create()
+         END //MENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "Main_Info"
+         :Text                 := "Info"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Info_About"
+            :Text                 := "About"
+            :EventHandler[ "OnClick" ] := "Info_About_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Info_HowTo"
+            :Text                 := "How to play Millionaire"
+            :EventHandler[ "OnClick" ] := "Info_HowTo_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Info_Bar_1"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Info_VisitOnline"
+            :Text                 := "Visit xHarbour.com online"
+            :EventHandler[ "OnClick" ] := "Info_VisitOnline_OnClick"
+            :Create()
+         END //MENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "lbl_answer_3"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :ForeColor            := 10061943
+      :Left                 := 42
+      :Top                  := 412
+      :Width                := 223
+      :Height               := 16
+      :Cursor               := 32649
+      :Text                 := "Answer 3"
+      :Alignment            := 1
+      :EventHandler[ "OnClick" ] := "lbl_answer_3_OnClick"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "lbl_answer_2"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :ForeColor            := 10061943
+      :Left                 := 354
+      :Top                  := 378
+      :Width                := 223
+      :Height               := 16
+      :Cursor               := 32649
+      :Text                 := "Answer 2"
+      :Alignment            := 1
+      :EventHandler[ "OnClick" ] := "lbl_answer_2_OnClick"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "lbl_answer_4"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :ForeColor            := 10061943
+      :Left                 := 354
+      :Top                  := 412
+      :Width                := 223
+      :Height               := 16
+      :Cursor               := 32649
+      :Text                 := "Answer 4"
+      :Alignment            := 1
+      :EventHandler[ "OnClick" ] := "lbl_answer_4_OnClick"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "lbl_question"
+      WITH OBJECT :Font
+         :FaceName             := "Verdana"
+         :Bold                 := .T.
+      END
+
+      :BackColor            := 0
+      :ForeColor            := 16777215
+      :Left                 := 48
+      :Top                  := 331
+      :Width                := 532
+      :Height               := 31
+      :Text                 := "Question?"
+      :Alignment            := 1
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_answers"
+      :Top                  := 369
+      :Width                := 625
+      :Height               := 67
+      :TabStop              := .F.
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_question"
+      :Top                  := 321
+      :Width                := 625
+      :Height               := 44
+      :TabStop              := .F.
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_help_1"
+      :BackColor            := 8355711
+      :Left                 := 426
+      :Top                  := 30
+      :Width                := 43
+      :Height               := 27
+      :TabStop              := .F.
+      :EventHandler[ "OnLButtonUp" ] := "pic_help_1_OnLButtonUp"
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_help_2"
+      :BackColor            := 8355711
+      :Left                 := 498
+      :Top                  := 30
+      :Width                := 43
+      :Height               := 27
+      :TabStop              := .F.
+      :EventHandler[ "OnLButtonUp" ] := "pic_help_2_OnLButtonUp"
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_help_3"
+      :BackColor            := 8355711
+      :Left                 := 570
+      :Top                  := 30
+      :Width                := 43
+      :Height               := 27
+      :TabStop              := .F.
+      :EventHandler[ "OnLButtonUp" ] := "pic_help_3_OnLButtonUp"
+      :Create()
+   END //PICTUREBOX
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := "Form_Main"
+         :Top                  := "Form_Main"
+         :Right                := "Form_Main"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Width                := 616
+      :Height               := 21
+      :TabStop              := .F.
+      :Border               := 8388608
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :MinWidth             := 60
+         :MinHeight            := 21
+         :BandChild            := "Menu_Main"
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   WITH OBJECT ( STATUSBAR( Self ) )
+      :Name                 := "GameBar"
+      :Height               := 23
+      :Create()
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "pan_question"
+         :Width                := 97
+         :Create()
+      END //STATUSBARPANEL
+
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "pan_score"
+         :Width                := 160
+         :Create()
+      END //STATUSBARPANEL
+
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "pan_bet"
+         :Width                := 160
+         :Create()
+      END //STATUSBARPANEL
+
+   END //STATUSBAR
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "pic_background"
+      :Left                 := 6
+      :Top                  := 69
+      :Width                := 451
+      :Height               := 241
+      :TabStop              := .F.
+      :Create()
+   END //PICTUREBOX
+
+   ::Show()
+
+RETURN Self

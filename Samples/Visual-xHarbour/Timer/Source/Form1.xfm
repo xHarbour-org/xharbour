@@ -1,0 +1,76 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR oProgress
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnLoad()
+   METHOD Timer1_OnTimeOut()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "Form1_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :AddImage( "_CALENDARICO", NIL, 4194304, NIL,1, "calendar.ico" )
+      :AddImage( "_CLOCKICO", NIL, 4194304, NIL,1, "clock.ico" )
+      :Create()
+   END //ImageList1
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 500
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 476
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Sample Timer"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( STATUSBAR( Self ) )
+      :Name                 := "StatusBar1"
+      WITH OBJECT :Font
+         :Pointsize            := 12
+      END
+
+      :Height               := 23
+      :Caption              := "StatusBar1"
+      :ImageList            := ::ImageList1
+      :Create()
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel1"
+         :Width                := 97
+         :ImageIndex           := 1
+         :Create()
+      END //STATUSBARPANEL
+
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel2"
+         :Width                := 120
+         :ImageIndex           := 2
+         :Create()
+      END //STATUSBARPANEL
+
+   END //STATUSBAR
+
+   ::Show()
+
+RETURN Self

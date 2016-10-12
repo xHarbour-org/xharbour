@@ -1,0 +1,90 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormCurrentView INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormCurrentView_OnClose()
+   METHOD FormCurrentView_OnDestroy()
+   METHOD FormCurrentView_OnLoad()
+   METHOD myImgIndex()
+   METHOD myMarkBack()
+   METHOD myMarkFore()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormCurrentView
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "FormCurrentView_OnClose"
+   ::EventHandler[ "OnDestroy" ] := "FormCurrentView_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormCurrentView_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myImgIndex"
+   ::EventHandler[ "UserMethod3" ] := "myMarkBack"
+   ::EventHandler[ "UserMethod4" ] := "myMarkFore"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "VTable"
+      :AutoOpen             := .F.
+      :Create()
+   END //VTable
+
+   REQUEST ADS
+   WITH OBJECT ( AdsDataTable( Self ) )
+      :Name                 := "VAdsFree"
+      :AutoOpen             := .F.
+      :Driver               := "ADT"
+      :Create()
+   END //VAdsFree
+
+   // Properties declaration
+   ::Name                 := "FormCurrentView"
+   ::MinWidth             := 580
+   ::MinHeight            := 465
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 8
+   ::Width                := 580
+   ::Height               := 465
+   ::Center               := .T.
+   ::Caption              := "Current View"
+   ::Icon                 := { ".\Resource\view.ico","_VIEWICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormCurrentView
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "VGrid"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 559
+      :Height               := 424
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :ImageList            := ::Application:MainForm:ImageList2
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

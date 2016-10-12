@@ -1,0 +1,272 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormImportInEngine INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormImportInEngine_OnDestroy()
+   METHOD FormImportInEngine_OnLoad()
+   METHOD Timer1_OnTimeOut()
+   METHOD ToolFree_OnClick()
+   METHOD ToolSchema_OnClick()
+   METHOD ToolIndex_OnClick()
+   METHOD ButtonSelect_OnClick()
+   METHOD RadioCreate_OnClick()
+   METHOD RadioAppend_OnClick()
+   METHOD ButtonOK_OnClick()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormImportInEngine
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormImportInEngine_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormImportInEngine_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 32
+      :Iconheight           := 32
+      :AddImage( "_PROPERTYICO", NIL, 4194304, NIL,1, "property.ico" )
+      :AddImage( "_GEARS_VIEWICO", NIL, 4194304, NIL,1, "gears_view.ico" )
+      :AddImage( "_QUERY_DBFICO", NIL, 4194304, NIL,1, "query_dbf.ico" )
+      :Create()
+   END //ImageList1
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "FormImportInEngine"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 600
+   ::Height               := 499
+   ::Center               := .T.
+   ::Caption              := "Import"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\import1.ico","_IMPORT1ICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormImportInEngine
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "ToolBara"
+      :Left                 := 25
+      :Top                  := 16
+      :Width                := 315
+      :Height               := 64
+      :Tooltips             := .T.
+      :ImageList            := ::ImageList1
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolFree"
+         :ToolTip              := "Currently opened free table's properties"
+         :Width                := 86
+         :Caption              := "Free table info"
+         :ImageIndex           := 1
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "ToolFree_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolSchema"
+         :ToolTip              := "SQL schema (metadata) information"
+         :Width                := 77
+         :Caption              := "Schema info"
+         :ImageIndex           := 2
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "ToolSchema_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolIndex"
+         :ToolTip              := "Column statistics for index candidates"
+         :Width                := 81
+         :Caption              := "Column stats"
+         :ImageIndex           := 3
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "ToolIndex_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 27
+      :Top                  := 91
+      :Width                := 537
+      :Height               := 146
+      :Caption              := "Source"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditFree"
+         :VertScroll           := .T.
+         :Left                 := 26
+         :Top                  := 30
+         :Width                := 450
+         :Height               := 60
+         :BackColor            := 16711422
+         :AutoVScroll          := .T.
+         :MultiLine            := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonSelect"
+         WITH OBJECT :Font
+            :Pointsize            := 10
+         END
+
+         :Left                 := 493
+         :Top                  := 44
+         :Width                := 24
+         :Height               := 24
+         :Caption              := "..."
+         :EventHandler[ "OnClick" ] := "ButtonSelect_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckIndex"
+         :Left                 := 26
+         :Top                  := 111
+         :Width                := 538
+         :Height               := 15
+         :Caption              := "Reproduce index tags from the currently opened index files - when creating a new table"
+         :Create()
+      END //CHECKBOX
+
+   END //GROUPBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox2"
+      :Left                 := 27
+      :Top                  := 252
+      :Width                := 537
+      :Height               := 137
+      :Caption              := "Destination"
+      :ForeColor            := 0
+      :Create()
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioCreate"
+         :Left                 := 29
+         :Top                  := 27
+         :Width                := 188
+         :Height               := 15
+         :Caption              := "Create new table in schema"
+         :Group                := .T.
+         :InitialState         := 1
+         :EventHandler[ "OnClick" ] := "RadioCreate_OnClick"
+         :Create()
+      END //RADIOBUTTON
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioAppend"
+         :Left                 := 262
+         :Top                  := 26
+         :Width                := 238
+         :Height               := 15
+         :Caption              := "Use an existent table in schema"
+         :EventHandler[ "OnClick" ] := "RadioAppend_OnClick"
+         :Create()
+      END //RADIOBUTTON
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditTable"
+         :Left                 := 26
+         :Top                  := 87
+         :Width                := 160
+         :Height               := 22
+         :AutoHScroll          := .T.
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 26
+         :Top                  := 63
+         :Width                := 137
+         :Height               := 16
+         :Caption              := "Table name in schema:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 262
+         :Top                  := 63
+         :Width                := 157
+         :Height               := 16
+         :Caption              := "Choose from list:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxTable"
+         :VertScroll           := .T.
+         :Left                 := 262
+         :Top                  := 87
+         :Width                := 200
+         :Height               := 120
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+   END //GROUPBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonOK"
+      :Left                 := 389
+      :Top                  := 412
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 484
+      :Top                  := 412
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 56
+      :Top                  := 419
+      :Width                := 150
+      :Height               := 18
+      :Create()
+   END //PROGRESSBAR
+
+RETURN Self
+

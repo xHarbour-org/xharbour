@@ -1,0 +1,176 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyAttachments INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD MyAttachments_OnLoad()
+   METHOD Button_Cancel_OnClick()
+   METHOD Button_Add_OnClick()
+   METHOD Button_Delete_OnClick()
+   METHOD Button_OK_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyAttachments
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "MyAttachments_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MyAttachments"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 456
+   ::Height               := 318
+   ::Center               := .T.
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS MyAttachments
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelAttachments"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 12
+      :Top                  := 12
+      :Width                := 127
+      :Height               := 16
+      :Caption              := "Current Attachments:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_Cancel"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 358
+      :Top                  := 247
+      :Width                := 80
+      :Height               := 27
+      :Caption              := "Cancel"
+      :EventHandler[ "OnClick" ] := "Button_Cancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_Add"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Bottom               := ::Button_Cancel
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 215
+      :Width                := 66
+      :Height               := 22
+      :Caption              := "Add"
+      :EventHandler[ "OnClick" ] := "Button_Add_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "ListAttachments"
+      :VertScroll           := .T.
+      :HorzScroll           := .T.
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := ::LabelAttachments
+         :Right                := :Owner:Parent
+         :Bottom               := ::Button_Add
+         :Margin               := 10
+      END
+
+      :Left                 := 10
+      :Top                  := 38
+      :Width                := 428
+      :Height               := 167
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :Create()
+   END //LISTBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_Delete"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Bottom               := ::Button_Cancel
+         :Margin               := 10
+      END
+
+      :Left                 := 86
+      :Top                  := 215
+      :Width                := 66
+      :Height               := 22
+      :Caption              := "Delete"
+      :EventHandler[ "OnClick" ] := "Button_Delete_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button_OK"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Right                := ::Button_Cancel
+         :Bottom               := :Owner:Parent
+         :Margin               := 10
+      END
+
+      :Left                 := 268
+      :Top                  := 247
+      :Width                := 80
+      :Height               := 27
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "Button_OK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 261
+      :Width                := 227
+      :Height               := 17
+      :Caption              := "http://www.xharbour.com/trainingcenter/"
+      :Create()
+   END //LINKLABEL
+
+RETURN Self
+

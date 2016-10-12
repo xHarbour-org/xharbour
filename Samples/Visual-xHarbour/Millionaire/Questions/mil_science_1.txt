@@ -1,0 +1,70 @@
+Q Approximately, how much Air is there in Oxygen?
+L 9
+R 20%
+F 78%
+F 52%
+F 63%
+---
+Q Approximately, how high is the Troposphere on the North Pole?
+L 11
+R Between 0 and 10 km
+F Between 8 and 50 km
+F Between 50 and 85 km
+F There is no Troposphere
+---
+Q On the scale devised by Francis Beaufort, Strong Breeze is defined as ...
+L 12
+F 4 - 7 mph
+F 13 - 18 mph
+R 25 - 31 mph
+F 39 - 46 mph
+---
+Q On the periodic table, what is the correct Symbol for Helium?
+L 12
+F Hm
+F Hl
+F Hi
+R He
+---
+Q On the periodic table, what is the correct Symbol for Neon?
+L 12
+R Ne
+F Nn
+F N
+F En
+---
+Q On the periodic table, what is the correct Symbol for Fluorine?
+L 15
+R F
+F Fl
+F Fr
+F Fn
+---
+Q Which academic study is defined by Acarology?
+L 11
+F Spiders and their kind
+F Biological cells
+R Ticks and mites
+F Old age
+---
+Q Which academic study is defined by Herpetology
+L 5
+F Fish
+R Reptiles and amphibians
+F The Sun
+F Clouds
+---
+Q What is the name of the academic study of ants?
+L 7
+F Vexillology
+F Pedology
+R Myrmecology
+F Selenology
+---
+Q What is the order of magnitude of yotta-?
+L 3
+F 10 ^ -6
+F 10 ^ -12
+F 10 ^ 12
+R 10 ^ 24
+---

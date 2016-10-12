@@ -1,0 +1,191 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormView INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormView_OnLoad()
+   METHOD CheckColumn_OnClick()
+   METHOD ButtonApply_OnClick()
+   METHOD ButtonClose_OnClick()
+   METHOD CheckTop_OnClick()
+   METHOD CheckBottom_OnClick()
+   METHOD ButtonView_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormView
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormView_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormView"
+   ::Modal                := .T.
+   ::Left                 := 11
+   ::Top                  := 6
+   ::Width                := 580
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Set Up View"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\view.ico","_VIEWICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormView
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelColumn"
+      :Left                 := 31
+      :Top                  := 31
+      :Width                := 154
+      :Height               := 16
+      :Caption              := "Select columns to display:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "Listme"
+      WITH OBJECT :ToolTip
+         :Text                 := "By default all columns"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 31
+      :Top                  := 54
+      :Width                := 145
+      :Height               := 302
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :ExtendedSel          := .T.
+      :Create()
+   END //LISTBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckColumn"
+      :Left                 := 31
+      :Top                  := 372
+      :Width                := 175
+      :Height               := 15
+      :Caption              := "Activate column selection"
+      :EventHandler[ "OnClick" ] := "CheckColumn_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonApply"
+      :Left                 := 354
+      :Top                  := 423
+      :Width                := 90
+      :Height               := 30
+      :Caption              := "Apply"
+      :EventHandler[ "OnClick" ] := "ButtonApply_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonClose"
+      :Left                 := 464
+      :Top                  := 423
+      :Width                := 90
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditTop"
+      :VertScroll           := .T.
+      :Left                 := 219
+      :Top                  := 54
+      :Width                := 335
+      :Height               := 80
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditBottom"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 219
+      :Top                  := 276
+      :Width                := 335
+      :Height               := 80
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelTop"
+      :Left                 := 219
+      :Top                  := 31
+      :Width                := 148
+      :Height               := 16
+      :Caption              := "ORDER - key expression:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelBottom"
+      :Left                 := 219
+      :Top                  := 252
+      :Width                := 131
+      :Height               := 16
+      :Caption              := "FOR - filter expression:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckTop"
+      :Left                 := 219
+      :Top                  := 149
+      :Width                := 166
+      :Height               := 15
+      :Caption              := "Activate ordering option"
+      :EventHandler[ "OnClick" ] := "CheckTop_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckBottom"
+      :Left                 := 219
+      :Top                  := 372
+      :Width                := 158
+      :Height               := 15
+      :Caption              := "Activate filtering option"
+      :EventHandler[ "OnClick" ] := "CheckBottom_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonView"
+      :Left                 := 244
+      :Top                  := 423
+      :Width                := 90
+      :Height               := 30
+      :Caption              := "Open View"
+      :EventHandler[ "OnClick" ] := "ButtonView_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

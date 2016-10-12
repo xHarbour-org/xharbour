@@ -1,0 +1,118 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormPerson INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormPerson_OnLoad()
+   METHOD ButtonSave_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormPerson
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormPerson_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormPerson"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 300
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Update Employee"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormPerson
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 39
+      :Top                  := 49
+      :Width                := 80
+      :Height               := 16
+      :Caption              := "Name"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 39
+      :Top                  := 107
+      :Width                := 80
+      :Height               := 16
+      :Caption              := "Birthday"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 39
+      :Top                  := 165
+      :Width                := 80
+      :Height               := 16
+      :Caption              := "Salary"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( MASKEDIT( Self ) )
+      :Name                 := "MaskEdit1"
+      :Left                 := 132
+      :Top                  := 49
+      :Width                := 126
+      :Height               := 22
+      :Caption              := "MaskEdit1"
+      :WantReturn           := .T.
+      :Picture              := "xxxxxxxxxxxxxxxxxxxx"
+      :Create()
+   END //MASKEDIT
+
+   WITH OBJECT ( MASKEDIT( Self ) )
+      :Name                 := "MaskEdit2"
+      :Left                 := 132
+      :Top                  := 107
+      :Width                := 80
+      :Height               := 22
+      :Caption              := "MaskEdit2"
+      :WantReturn           := .T.
+      :Picture              := "@D"
+      :Create()
+   END //MASKEDIT
+
+   WITH OBJECT ( MASKEDIT( Self ) )
+      :Name                 := "MaskEdit3"
+      :Left                 := 132
+      :Top                  := 165
+      :Width                := 80
+      :Height               := 22
+      :Caption              := "MaskEdit3"
+      :WantReturn           := .T.
+      :Number               := .T.
+      :Picture              := "9999999.99"
+      :Create()
+   END //MASKEDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonSave"
+      :Left                 := 178
+      :Top                  := 221
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Save"
+      :EventHandler[ "OnClick" ] := "ButtonSave_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+
