@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = ..\..\Library\Include;..\..\..\xharbour-axtivex;\xHarbour\include\w32
+INCLUDEFOLDERS = ..\..\Library\Include;..\..\..\xharbour-ActiveX;\xHarbour\include\w32
 LAUTORUN =
 LDEBUG = .T.
 LGUI = .T.

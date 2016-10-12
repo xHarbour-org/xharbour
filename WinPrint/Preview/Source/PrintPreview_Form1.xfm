@@ -1,0 +1,185 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS PrintPreview_Form1 INHERIT Dialog
+   // Components declaration
+   // User variables definitions
+   VAR oPrinter,nCopies,lGreyScale,lAskPrinter,aEmfName,prnDC,nPage,nZoom,NeedsRedraw,nHeight,nWidth,cPrinter,lLandScape,nFormType,nPaperWidth,nPaperLength,lMaxMinRestore,aPrnPage
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD PrintPreview_Form1_OnClose()
+   METHOD PrintPreview_Form1_OnSysCommand()
+   METHOD PrintPreview_Form1_OnLoad()
+   METHOD PrintPreview_Form1_OnExitSizeMove()
+   METHOD PrintPreview_Form1_OnSize()
+   METHOD ZoomInToolStripButton_OnClick()
+   METHOD ZoomOutToolStripButton_OnClick()
+   METHOD PrintToolStripButton_OnClick()
+   METHOD MenuPrinterSetting_OnClick()
+   METHOD GotoPageToolStripButton_OnClick()
+   METHOD FirstPageToolStripButton_OnClick()
+   METHOD PrevPageToolStripButton_OnClick()
+   METHOD NextPageToolStripButton_OnClick()
+   METHOD LastPageToolStripButton_OnClick()
+   METHOD Panel1_OnPaint()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "PrintPreview_Form1_OnClose"
+   ::EventHandler[ "OnSysCommand" ] := "PrintPreview_Form1_OnSysCommand"
+   ::EventHandler[ "OnLoad" ] := "PrintPreview_Form1_OnLoad"
+   ::EventHandler[ "OnExitSizeMove" ] := "PrintPreview_Form1_OnExitSizeMove"
+   ::EventHandler[ "OnSize" ] := "PrintPreview_Form1_OnSize"
+
+   // Populate Components
+   WITH OBJECT ( SaveFileDialog( Self ) )
+      :Name                 := "SaveFileDialog1"
+      :FileName             := "SaveFileDialog1"
+      :Create()
+   END //SaveFileDialog1
+
+   // Properties declaration
+   ::Name                 := "PrintPreview_Form1"
+   ::VertScroll           := .T.
+   ::HorzScroll           := .T.
+   ::Modal                := .T.
+   ::BackColor            := 11119017
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 710
+   ::Height               := 432
+   ::Text                 := "Print preview"
+   ::VertScrollTopMargin  := 58
+   ::AlwaysOnTop          := .T.
+   ::DlgModalFrame        := .T.
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS PrintPreview_Form1
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( TOOLSTRIP( Self ) )
+      :Name                 := "ToolStrip1"
+      WITH OBJECT :Dock
+         :Left                 := "PrintPreview_Form1"
+         :Top                  := "PrintPreview_Form1"
+         :Right                := "PrintPreview_Form1"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Height               := 56
+      :ImagePadding         := 7
+      :ShowChevron          := .F.
+      :ShowGrip             := .F.
+      :Row                  := 2
+      :Create()
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ZoomInToolStripButton"
+         :Text                 := "Zoom-In"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "ZoomInToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ZoomOutToolStripButton"
+         :Text                 := "Zoom-Out"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "ZoomOutToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "PrintToolStripButton"
+         :Text                 := "Print"
+         :BeginGroup           := .T.
+         :ImageAlign           := 1
+         :DropDown             := 2
+         :EventHandler[ "OnClick" ] := "PrintToolStripButton_OnClick"
+         :Create()
+         WITH OBJECT ( MENUSTRIPITEM( :this ) )
+            :Name                 := "MenuPrinterSetting"
+            :Text                 := "Printer opties"
+            :EventHandler[ "OnClick" ] := "MenuPrinterSetting_OnClick"
+            :Create()
+         END //MENUSTRIPITEM
+
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "GotoPageToolStripButton"
+         :Text                 := "Goto page"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "GotoPageToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "FirstPageToolStripButton"
+         :Text                 := "First"
+         :BeginGroup           := .T.
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "FirstPageToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "PrevPageToolStripButton"
+         :Text                 := "Prev"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "PrevPageToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "NextPageToolStripButton"
+         :Text                 := "Next"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "NextPageToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "LastPageToolStripButton"
+         :Text                 := "Last"
+         :ImageAlign           := 1
+         :EventHandler[ "OnClick" ] := "LastPageToolStripButton_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+   END //TOOLSTRIP
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel1"
+      :BackColor            := 13882323
+      :Left                 := 20
+      :Top                  := 77
+      :Width                := 647
+      :Height               := 296
+      :EventHandler[ "OnPaint" ] := "Panel1_OnPaint"
+      :Create()
+   END //PANEL
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel2"
+      :BackColor            := 7697781
+      :Left                 := 23
+      :Top                  := 80
+      :Width                := 647
+      :Height               := 296
+      :Create()
+   END //PANEL
+
+RETURN Self
+

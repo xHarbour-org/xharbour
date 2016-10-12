@@ -41,4 +41,4 @@ MYRC_FLAGS =
 [..\..\..\xharbour-builder\xcc\xbScript.lib.xbp]
 
 [..\..\..\xharbour-oleserver\xcc\ole.lib.xbp]
-[..\..\..\xharbour-axtivex\xcc\activex.lib.xbp]
+[..\..\..\xharbour-ActiveX\xcc\activex.lib.xbp]
