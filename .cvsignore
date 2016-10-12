@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -25,3 +26,8 @@ xbp
 =======
 xbldfull.log
 >>>>>>> xHarbour-Builder/master
+=======
+.DS_Store
+._*
+*.txt alias
+>>>>>>> xHarbour-Documentation/master
