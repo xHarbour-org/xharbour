@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -37,3 +38,9 @@ xbp
 *.log
 *.ppo
 >>>>>>> xHarbour-HBZlib/master
+=======
+xbp
+*.log
+*.ppo
+*.DS_Store
+>>>>>>> xHarbour-OLEServer/master
