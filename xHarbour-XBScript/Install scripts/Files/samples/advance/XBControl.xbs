@@ -1,0 +1,15 @@
+Procedure Main()
+  
+   LOCAL oControl
+
+   TRY
+      oControl := CreateObject( "XBControl.wsc" )
+
+      Alert( oControl:sampleProperty )      
+
+      Alert( oControl:SampleMethod( 7 ) )
+   CATCH oErr
+      Alert( "Error: " + oErr:Operation + " -> " + oErr:Description )
+   END
+
+Return

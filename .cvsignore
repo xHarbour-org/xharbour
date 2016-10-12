@@ -6,6 +6,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
@@ -50,3 +51,13 @@ xbp
 *.log
 *.ppo
 >>>>>>> xHarbour-Rushmore/master
+=======
+XBScript
+XBScriptEnt
+XBScriptPro
+*.ncb
+*.suo
+XBScript*.vcproj.*.user
+.DS_Store
+._*
+>>>>>>> xHarbour-XBScript/master

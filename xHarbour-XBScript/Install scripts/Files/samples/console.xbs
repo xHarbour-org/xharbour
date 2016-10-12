@@ -1,0 +1,14 @@
+#include "wsh.ch"
+
+? "Welcome to XbScript"
+
+oArgs := WScript:Arguments
+nArgs := oArgs:Length - 1
+
+IF nArgs < 0
+   ? "Please run me using like this: CScript [Arg1] [ArgN]"
+ELSE
+   FOR Counter := 0 TO nArgs
+      ? "Argument:", Counter, "=>", oArgs:Item( Counter )
+   NEXT
+ENDIF

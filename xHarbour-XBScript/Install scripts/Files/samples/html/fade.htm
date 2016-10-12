@@ -1,0 +1,62 @@
+<HTML>
+   <HEAD>
+      <OBJECT ID="XBScript" WIDTH=0 HEIGHT=0
+         CLASSID="CLSID:ADB21CAC-9B03-4D64-9097-83B05741FDAF"
+         CODEBASE="http://www.xharbour.com/ondemand/xbscript.cab#Version=2,0,3,0">
+      </OBJECT>
+
+      <SCRIPT LANGUAGE="XBScript">
+
+PROCEDURE Main()
+
+   Alert( "Page will fade out when you leave here." )
+
+RETURN
+
+FUNCTION Hex( n )
+
+  IF n >= 255
+     RETURN "FF"
+  ELSEIF n <= 0
+     RETURN "00"
+  ENDIF  
+
+  cHex := "0123456789ABCDEF"
+
+RETURN cHex[ Int( n / 16 ) ] + cHex[ n % 16 ]
+
+PROCEDURE SetBGColor( r, g, b )
+   
+   hr = Hex( r )
+   hg = Hex( g )
+   hb = Hex( b )
+
+   Document:bgColor := "#" + hr + hg + hb
+
+RETURN
+
+PROCEDURE Fade( r1, g1, b1, r2, g2, b2, nSpeed )
+ 
+   FOR i := 1 TO nSpeed
+      SetBGColor( ;
+                  Int( r1 * ( ( nSpeed - i ) / nSpeed ) + r2 * ( i / nSpeed ) ),;
+             Int( g1 * ( ( nSpeed - i ) / nSpeed ) + g2 * ( i / nSpeed ) ),;
+                  Int( b1 * ( ( nSpeed - i ) / nSpeed ) + b2 * ( i / nSpeed ) ) ;
+                )
+   NEXT
+
+RETURN
+
+PROCEDURE Fadeout()
+
+   Fade( 255, 255, 255, 0, 0, 0, 64 )
+
+RETURN
+
+   </SCRIPT>
+</head>
+
+<BODY bgcolor="ffffff" onUnLoad="FadeOut()">
+<center><h3>...</h3></center>
+</body>
+</html>

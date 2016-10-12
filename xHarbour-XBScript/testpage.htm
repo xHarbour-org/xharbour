@@ -1,0 +1,125 @@
+<HTML>
+<BODY>
+
+<Script language=XBScriptAX>
+
+PROCEDURE Main
+  //Alert( "Main of Script" )
+RETURN
+
+PROCEDURE FibHelper()
+  text2:value := Fib( Val( text1:value ) )
+RETURN
+
+FUNCTION Fib( n )
+  IF n <= 1
+     RETURN 1
+  ENDIF
+
+RETURN Fib( n - 1 ) + Fib( n - 2 )
+
+
+PROCEDURE FactorialHelper()
+  text4:value := Factorial( Val( text3:value ) )
+RETURN
+
+FUNCTION Factorial( n )
+   nResult := 0
+
+   FOR i := 0 TO n
+      nResult += i
+   NEXT
+
+RETURN nResult
+
+
+PROCEDURE PowerOf2Helper()
+   text6:value := PowerOf2( Val( text5:value ) )
+RETURN
+
+FUNCTION PowerOf2( power )
+
+  IF power <= 0
+    nResult = 1
+  ELSE
+     nResult := 2
+     i = 1  
+     WHILE i < power		
+	nResult *= 2
+        i++
+     END
+  ENDIF
+
+return nResult
+
+
+/******************************************************************************
+*	XBScriptAXEntry -- This method is called by VBScript to demonstrate cross-
+*	engine calls.
+*	Parameters:	none
+*	Returns:	none
+******************************************************************************/
+PROCEDURE XBScriptAXEntry()
+   Alert( "Hello from XBScript!" )
+RETURN
+
+/******************************************************************************
+*	XBScriptAXCallout -- This method calls a method implemented in VBScript to
+*	demonstrate cross-engine calls.
+*	Parameters:	none
+*	Returns:	none
+******************************************************************************/
+PROCEDURE XBScriptAXCallout()
+   VBScriptEntry()
+RETURN
+
+</Script>
+
+<Script language=VBScript>
+
+Sub VBScriptEntry()
+   MsgBox "Hello from VBScript!"
+End Sub
+
+</Script>
+
+<CENTER>
+<h1>
+XBScript<br></h1>
+<h3>
+Demonstration and Test Page</h3>
+<P align=left><STRONG>Fibonacci:</STRONG> This method calculates the Fibonacci sum of a given
+number.&nbsp; It is implemented recursively so it tests function declarations,
+parameter passing, conditional evaluation, and recursion.</P>
+<P align=left><INPUT id=button1 name=button1 type=button value="Push to Test" language=XBScriptAX OnClick="FibHelper()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The Fibonacci sum of&nbsp;
+
+<INPUT id=text1 name=text1 style="HEIGHT: 22px; WIDTH: 37px" value=1>&nbsp; is&nbsp;
+<INPUT id=text2 name=text2 style="HEIGHT: 22px; WIDTH: 39px" disabled>.</P>
+<P align=left><STRONG>Factorial:</STRONG> This method caculates the factorial of a given
+number.&nbsp; It tests For-loops and the auto-increment operator.</P>
+<P align=left><INPUT id=button2 name=button2 type=button value="Push to Test" language=XBScriptAX OnClick="FactorialHelper()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The Factorial of&nbsp;
+
+<INPUT id=text3 name=text3 style="HEIGHT: 22px; WIDTH: 37px" value=1>&nbsp; is&nbsp;
+<INPUT id=text4 name=text4 style="HEIGHT: 22px; WIDTH: 42px" disabled>.</P>
+<P align=left><STRONG>Power of Two:
+ </STRONG>This method raises two to the a given power.&nbsp; It tests
+While-loops.</P>
+<P align=left><INPUT id=button3 name=button3 type=button value="Push to Test" language=XBScriptAX OnClick="PowerOf2Helper()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Two, raised to the&nbsp;
+<INPUT id=text5 name=text5 style="HEIGHT: 22px; WIDTH: 40px" value=1>&nbsp; power is&nbsp;
+<INPUT id=text6 name=text6 style="HEIGHT: 22px; WIDTH: 42px" disabled>.</P>
+<P align=left><STRONG>Cross Engine Calls
+(Outgoing):</STRONG> This button demonstrates calls from XBScript to other
+script engines by calling a method implemented in VBScript which puts up a
+message box.</P>
+<P align=left><INPUT id=button4 name=button4 type=button value="Push to Test" language=XBScriptAX OnClick="XBScriptAXCallout()"></P>
+<P align=left><STRONG>Cross Engine Calls
+(Incoming):</STRONG> This button demonstrates calls from other script engines
+into XBScript by calling a method implemented in XBScript which puts up
+a message box.&nbsp; This call is made from VBScript.</P>
+<P align=left><INPUT id=button5 name=button5 type=button value="Push to Test" language=VBScript OnClick="XBScriptAXEntry"></P>
+</CENTER>
+</BODY>
+</HTML>

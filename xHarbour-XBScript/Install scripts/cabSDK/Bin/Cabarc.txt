@@ -1,0 +1,33 @@
+
+Microsoft (R) Cabinet Tool - Version 1.00.0601 (03/18/97)
+Copyright (c) Microsoft Corp 1996-1997. All rights reserved.
+
+Usage: CABARC [options] command cabfile [@list] [files] [dest_dir]
+
+Commands:
+   L   List contents of cabinet (e.g. cabarc l test.cab)
+   N   Create new cabinet (e.g. cabarc n test.cab *.c app.mak *.h)
+   X   Extract file(s) from cabinet (e.g. cabarc x test.cab foo*.c)
+
+Options:
+  -c   Confirm files to be operated on
+  -o   When extracting, overwrite without asking for confirmation
+  -m   Set compression type [LZX:<15..21>|MSZIP|NONE], (default is MSZIP)
+  -p   Preserve path names (absolute paths not allowed)
+  -P   Strip specified prefix from files when added
+  -r   Recurse into subdirectories when adding files (see -p also)
+  -s   Reserve space in cabinet for signing (e.g. -s 6144 reserves 6K bytes)
+  -i   Set cabinet set ID when creating cabinets (default is 0)
+
+Notes
+-----
+When creating a cabinet, the plus sign (+) may be used as a filename
+to force a folder boundary; e.g. cabarc n test.cab *.c test.h + *.bmp
+
+When extracting files to disk, the <dest_dir>, if provided, must end in
+a backslash; e.g. cabarc x test.cab bar*.cpp *.h d:\test\
+
+The -P (strip prefix) option can be used to strip out path information
+e.g. cabarc -r -p -P myproj\ a test.cab myproj\balloon\*.*
+The -P option can be used multiple times to strip out multiple paths
+
