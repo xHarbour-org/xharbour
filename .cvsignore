@@ -1,7 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.DS_Store
 =======
 freeimage-xhb.lib
 *.log
 ._*
 >>>>>>> FreeImage/master
+=======
+xbp
+iegui.lib.log
+iegui.ppo
+trace.log
+xbuild.windows.ini
+*.log
+*.prg.bak
+>>>>>>> IEGui/master
