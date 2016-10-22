@@ -1425,3 +1425,38 @@ void hb_strtohex( const char * pSource, HB_SIZE size, char * pDest )
       *pDest++ = ( char ) ( b + ( b > 9 ? 'a' - 10 : '0' ) );
    }
 }
+
+
+// Case insensitive hb_strAt() function
+HB_SIZE hb_strAtI( const char * szSub, HB_SIZE ulSubLen, const char * szText, HB_SIZE ulLen )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_strAt(%s, %" HB_PFS "u, %s, %" HB_PFS "u)", szSub, ulSubLen, szText, ulLen));
+
+   if( ulSubLen > 0 && ulLen >= ulSubLen )
+   {
+      HB_SIZE ulPos = 0;
+      HB_SIZE ulSubPos = 0;
+
+      while( ulPos < ulLen && ulSubPos < ulSubLen )
+      {
+         if( tolower( (BYTE) szText[ ulPos ] ) == tolower( (BYTE) szSub[ ulSubPos ] ) )
+         {
+            ulSubPos++;
+            ulPos++;
+         }
+         else if( ulSubPos )
+         {
+            /* Go back to the first character after the first match,
+               or else tests like "22345" $ "012223456789" will fail. */
+            ulPos -= ( ulSubPos - 1 );
+            ulSubPos = 0;
+         }
+         else
+            ulPos++;
+      }
+
+      return ( ulSubPos < ulSubLen ) ? 0 : ( ulPos - ulSubLen + 1 );
+   }
+   else
+      return 0;
+}

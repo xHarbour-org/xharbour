@@ -229,8 +229,8 @@ static void XMLCALL hb_expat_StartElementHandler( void * userdata, const XML_Cha
          if( atts )
          {
             PHB_ITEM pTempItem = hb_itemNew( NULL );
-            LONG nPos;
-            LONG nLen = 0;
+            HB_ISIZ nPos;
+            HB_ISIZ nLen = 0;
 
             for( nPos = 0; atts[ nPos ]; nPos += 2 )
                ++nLen;

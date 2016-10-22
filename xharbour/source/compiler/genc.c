@@ -562,17 +562,17 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          {
             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
-               char *      szFileNames  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
+               char *      szFileName  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
                FILE *      yyc;
                PNAMESPACE  pMember;
                int         iLevel      = 1;
 
-               yyc = hb_fopen( szFileNames, "wb" );
+               yyc = hb_fopen( szFileName, "wb" );
 
                if( ! yyc )
                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
 
-               hb_xfree( szFileNames );
+               hb_xfree( szFileName );
 
                fprintf( yyc, "#if defined( NAMESPACE_DECFUNCS ) && ! defined( __PRG__ ) \n" );
 

@@ -67,7 +67,7 @@ HB_FUNC( AT )
 
    if( pText && pSub )
    {
-      hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
+      hb_retnl( hb_strAt( hb_itemGetCPtr(pSub), hb_itemGetCLen( pSub ), hb_itemGetCPtr(pText), hb_itemGetCLen( pText ) ) );
    }
    else
    {
@@ -86,13 +86,13 @@ HB_FUNC( AT )
 
    if( pText && pSub )
    {
-      LONG     lStart   = pStart ? hb_itemGetNL( pStart ) : 1;
-      LONG     lEnd     = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
+      HB_SIZE     lStart   = pStart ? hb_itemGetNS( pStart ) : 1;
+      HB_SIZE     lEnd     = pEnd ? hb_itemGetNS( pEnd ) : hb_itemGetCLen( pText);
       HB_SIZE  ulPos;
 
       if( lStart < 0 )
       {
-         lStart += ( LONG ) pText->item.asString.length;
+         lStart += hb_itemGetCLen( pText );
 
          if( lStart < 0 )
          {
@@ -106,12 +106,12 @@ HB_FUNC( AT )
 
       if( lEnd < 0 )
       {
-         lEnd += ( LONG ) pText->item.asString.length + 1;
+         lEnd += hb_itemGetCLen( pText ) + 1;
       }
 
-      if( lEnd > ( LONG ) pText->item.asString.length )
+      if( lEnd > hb_itemGetCLen( pText ) )
       {
-         lEnd = ( LONG ) pText->item.asString.length;
+         lEnd = hb_itemGetCLen( pText );
       }
 
       // Stop searching if starting past beyond end.
@@ -124,7 +124,7 @@ HB_FUNC( AT )
 
       //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
 
-      ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
+      ulPos = hb_strAt( hb_itemGetCPtr( pSub ), hb_itemGetCLen( pSub), hb_itemGetCPtr( pText ) + lStart, lEnd - lStart );
 
       hb_retnl( ( LONG ) ( ulPos ? ulPos + lStart : 0 ) );
    }
@@ -235,27 +235,86 @@ HB_FUNC( ATSKIPSTRINGS ) // cFind, cWhere, nStart
 
    if( pFind && pWhere )
    {
-      unsigned long ulStart = ( unsigned long ) hb_parnl( 3 );
+      HB_SIZE ulStart =  hb_parns( 3 );
 
       if( ulStart > 0 )
       {
          ulStart--;
       }
 
-      if( ulStart < pWhere->item.asString.length )
+      if( ulStart < hb_itemGetCLen( pWhere ) )
       {
          HB_SIZE ulRet;
 
-         ulRet = hb_AtSkipStrings( pFind->item.asString.value, pFind->item.asString.length,
-                                   pWhere->item.asString.value + ulStart, pWhere->item.asString.length - ulStart );
+         ulRet = hb_AtSkipStrings( hb_itemGetCPtr( pFind ), hb_itemGetCLen( pFind ),
+                                   hb_itemGetCPtr( pWhere ) + ulStart, hb_itemGetCLen( pWhere)  - ulStart );
 
          if( ulRet )
          {
-            hb_retnl( ( LONG ) ( ulRet + ulStart ) );
+            hb_retns(  ( ulRet + ulStart ) );
             return;
          }
       }
    }
 
-   hb_retnl( 0 );
+   hb_retns( 0 );
+}
+
+
+// Case insensitive At() function
+HB_FUNC( ATI )
+{
+   PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
+   PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
+
+   if( pText && pSub )
+   {
+      HB_SIZE lStart = pStart ? hb_itemGetNS( pStart ) : 1;
+      HB_SIZE lEnd = pEnd ? hb_itemGetNS( pEnd ) :  hb_itemGetCLen( pText );
+      HB_SIZE ulPos;
+
+      if( lStart < 0 )
+      {
+         lStart += hb_itemGetCLen( pText );
+
+         if( lStart < 0 )
+         {
+            lStart = 0;
+         }
+      }
+      else if( lStart )
+      {
+         lStart--;
+      }
+
+      if( lEnd < 0 )
+      {
+         lEnd +=  hb_itemGetCLen( pText ) + 1;
+      }
+
+      if( lEnd >  hb_itemGetCLen( pText ) )
+      {
+         lEnd =  hb_itemGetCLen( pText );
+      }
+
+      // Stop searching if starting past beyond end.
+      if( lStart >= lEnd )
+      {
+         //TraceLog( NULL, "Start: %i End: %i\n", lStart, lEnd );
+         hb_retns( 0 );
+         return;
+      }
+
+      //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", hb_itemGetCPtr( pText ), hb_itemGetCPtr( pSub ), lStart, lEnd );
+
+      ulPos = hb_strAtI( hb_itemGetCPtr( pSub ),  hb_itemGetCLen( pSub ), hb_itemGetCPtr( pText ) + lStart, lEnd - lStart );
+
+      hb_retns( ulPos ? ulPos + lStart : 0 );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }

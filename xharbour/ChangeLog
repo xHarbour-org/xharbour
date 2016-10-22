@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-10-22 21:20 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+   * source/compiler/genc.c
+     ! reverted last change
+   * source/rtl/at.c
+     + Added function ATI moved from tip/thtml.prg
+     + changed to use itemapi insted of direct structure manipulation
+     ! Cast to ( LONG ) removed  now using HB_SIZE for parameter type insted of LONG
+   * source/common/hbstr.c
+     ! added hb_strAtI function moved from tip/thtml.prg
+   * include/hbapi.h
+     ! added prototype for hb_strAtI function 
+   * source/tip/thtml.prg
+     ! removed ATI and hb_strAtI
+     % optimized PSTRCOMPI function.
+   * contrib/hbexpat/core.c
+     ! Changed LONG -> HB_ISIZ
+   * contrib/misc/stringsx.c
+     ! changed HB_SIZE -> HB_ISIZ 
+   * contrib/rdd_ads/ads1.c   
+     ! changed in adsSkip       LONG -> HB_LONG
+     ! change in adsSkipFilter  LONG -> HB_LONG
+     ! changed in adsCreateFields to allow size 8 on field type I and ADS_LIB_VERSION > = 700
+     ! changed in adsGetValue   to get longlong value when  field type I and ADS_LIB_VERSION > = 700
+     ! changed test #ifdef ADS_MONEY with #ifdef ADS_LIB_VERSION >= 700
+     ! changed  in adsGetKeyItem  LONG lDate, lTime to long lDate, lTime
+     ! changed cast to LONG with long
+   
+
 2016-10-10 22:05 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
    * contrib/gtwvw/gtwvw.c
        ! fixed call to HB_TRACE() macro in hb_gt_FuncInit  function. was passing an diferent name of parameter found when compiling with -DHB_TR_LEVEL=HB_TR_DEBUG

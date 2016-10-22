@@ -7,16 +7,16 @@
 /* TODO: search this file for TODO and find 'em! */
 
 static char *hb_strtoken( char *szText,
-                  HB_SIZE lText,
-                  HB_SIZE lIndex,
+                  HB_ISIZ lText,
+                  HB_ISIZ lIndex,
                   char cDelimiter,
-                  HB_SIZE *lLen)
+                  HB_ISIZ *lLen)
 {
-   HB_SIZE wStart;
-   HB_SIZE wEnd = 0;
-   HB_SIZE wCounter = 0;
+   HB_ISIZ wStart;
+   HB_ISIZ wEnd = 0;
+   HB_ISIZ wCounter = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strtoken(%s, %ld, %ld, %d, %p)", szText, lText, lIndex, (int) cDelimiter, lLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_strtoken(%s, %" HB_PFS "d, %" HB_PFS "d, %d, %p)", szText, lText, lIndex, (int) cDelimiter, lLen));
 
    do
      {
@@ -61,16 +61,16 @@ static char *hb_strtoken( char *szText,
 HB_FUNC( STRTOKEN )
 {
    char *szText;
-   HB_SIZE lIndex = hb_parnl(2);
+   HB_ISIZ lIndex = hb_parns(2);
    char cDelimiter = *hb_parcx(3);
-   HB_SIZE lLen;
+   HB_ISIZ lLen;
 
    if( !cDelimiter )
       cDelimiter = ' ';
 
    szText = hb_strtoken( (char*) hb_parcx(1), hb_parclen(1), lIndex, cDelimiter, &lLen );
 
-   hb_stornl( ( LONG ) lLen, 4 );
+   hb_storns(  lLen, 4 );
    hb_retclen( szText, lLen );
 }
 

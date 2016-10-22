@@ -715,6 +715,7 @@ extern HB_EXPORT BOOL      hb_strMatchCaseWildExact( const char *szString, const
 extern HB_EXPORT BOOL      hb_strEmpty( const char * szText, HB_SIZE ulLen ); /* returns whether a string contains only white space */
 extern HB_EXPORT void      hb_strDescend( char * szStringTo, const char * szStringFrom, HB_SIZE ulLen ); /* copy a string to a buffer, inverting each character */
 extern HB_EXPORT HB_SIZE   hb_strAt( const char * szSub, HB_SIZE ulSubLen, const char * szText, HB_SIZE ulLen ); /* returns an index to a sub-string within another string */
+extern HB_EXPORT HB_SIZE  hb_strAtI( const char * szSub, HB_SIZE ulSubLen, const char * szText, HB_SIZE ulLen ); /* returns an index to a sub-string within another string (case insensitive)*/
 extern HB_EXPORT char *    hb_stripOutComments( char* buffer, BOOL bStripChars ); /* extract uncommented part of read buffer */
 extern HB_EXPORT char *    hb_strUpper( char * szText, HB_SIZE ulLen ); /* convert an existing string buffer to upper case */
 extern HB_EXPORT char *    hb_strUpperCopy( char * szText, HB_SIZE ulLen );

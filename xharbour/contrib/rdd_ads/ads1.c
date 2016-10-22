@@ -419,7 +419,7 @@ static void adsGetKeyItem( ADSAREAP pArea, PHB_ITEM pItem, int iKeyType,
          /* hack for timestamp values, we need sth better yo detect timestamp indexes */
          if( pArea->iFileType == ADS_ADT && pKeyBuf[ 0 ] == 0 && ( iKeyLen == 8 || iKeyLen == 4 ) )
          {
-            LONG lDate, lTime;
+            long lDate, lTime;
             lDate = HB_GET_BE_UINT32( pKeyBuf );
             if( iKeyLen == 8 )
             {
@@ -484,7 +484,7 @@ static void adsGetKeyItem( ADSAREAP pArea, PHB_ITEM pItem, int iKeyType,
          else /* ADS_CDX, ADS_ADT, ADS_VFP */
          {
             HB_ORD2DBL( pKeyBuf, &dValue );
-            hb_itemPutDL( pItem, ( LONG ) dValue );
+            hb_itemPutDL( pItem, ( long ) dValue );
          }
          break;
 
@@ -1171,7 +1171,7 @@ static HB_ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL b
    return HB_SUCCESS;
 }
 
-static HB_ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
+static HB_ERRCODE adsSkip( ADSAREAP pArea, HB_LONG lToSkip )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSkip(%p, %ld)", pArea, lToSkip));
 
@@ -1227,7 +1227,7 @@ static HB_ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
    else
    {
       HB_ERRCODE errCode = HB_SUCCESS;
-      LONG lSkipper;
+      HB_LONG lSkipper;
 
       if( !pArea->fPositioned && lToSkip < 0 )
       {
@@ -1291,7 +1291,7 @@ static HB_ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
    }
 }
 
-static HB_ERRCODE adsSkipFilter( ADSAREAP pArea, LONG lUpDown )
+static HB_ERRCODE adsSkipFilter( ADSAREAP pArea, HB_LONG lUpDown )
 {
    BOOL fBottom;
    HB_ERRCODE uiError;
@@ -1680,12 +1680,25 @@ static HB_ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             break;
 
          case 'I':
+#if ADS_LIB_VERSION >= 700
+            if( iNameLen == 1 && ( uiLen == 2 || uiLen == 4 || uiLen == 8 ) )
+            {
+	           dbFieldInfo.uiType = HB_FT_INTEGER;
+               dbFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT && uiLen == 2 ) ?
+                                2 : ( uiLen == 8 ? 8 : 4 );
+               dbFieldInfo.uiTypeExtended = dbFieldInfo.uiLen == 2 ? ADS_SHORTINT :
+                                         ( dbFieldInfo.uiLen == 8 ? ADS_LONGLONG :
+                                           ADS_INTEGER );
+	      
+   	        }
+#else         
             if( iNameLen == 1 && ( uiLen == 2 || uiLen == 4 ) )
             {
                dbFieldInfo.uiType = HB_FT_INTEGER;
                dbFieldInfo.uiTypeExtended = uiLen == 2 ? ADS_SHORTINT : ADS_INTEGER;
                dbFieldInfo.uiLen = uiLen;
             }
+#endif            
             else if( !hb_stricmp( szFieldType, "integer" ) )
             {
                dbFieldInfo.uiType = HB_FT_INTEGER;
@@ -2061,6 +2074,31 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
       }
       case HB_FT_INTEGER:
+#if ADS_LIB_VERSION >= 700
+         if( pField->uiTypeExtended == ADS_LONGLONG )
+         {
+#ifndef HB_LONG_LONG_OFF
+            SIGNED64 qVal = 0;
+            u32RetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
+            if( u32RetVal != AE_SUCCESS )
+            {
+               qVal = 0;
+               pArea->area.fEof = HB_TRUE;
+            }
+            hb_itemPutNIntLen( pItem, ( HB_MAXINT ) qVal, 20 );
+#else
+            DOUBLE   dVal = 0;
+            u32RetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
+            if( u32RetVal != AE_SUCCESS )
+            {
+               dVal = 0.0;
+               pArea->area.fEof = HB_TRUE;
+            }
+            hb_itemPutNLen( pItem, dVal, 20, 0 );
+#endif
+         }
+         else
+#endif      
       {
          SIGNED32 lVal = 0;
          ulRetVal = AdsGetLong( pArea->hTable, ADSFIELD( uiIndex ), &lVal );
@@ -2072,7 +2110,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( pField->uiTypeExtended == ADS_SHORTINT )
             hb_itemPutNILen( pItem, ( int ) lVal, 6 );
          else
-            hb_itemPutNLLen( pItem, ( LONG ) lVal, 11 );
+            hb_itemPutNLLen( pItem, ( long ) lVal, 11 );
          break;
       }
 #if ADS_LIB_VERSION >= 700 && !defined(HB_LONG_LONG_OFF)
@@ -2086,7 +2124,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             qVal = 0;
             pArea->area.fEof = TRUE;
          }
-         hb_itemPutNIntLen( pItem, ( HB_LONG ) qVal, 10 );
+         hb_itemPutNIntLen( pItem, ( HB_MAXINT ) qVal, 10 );
          break;
       }
       case HB_FT_ROWVER:
@@ -2098,7 +2136,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             qVal = 0;
             pArea->area.fEof = TRUE;
          }
-         hb_itemPutNIntLen( pItem, ( HB_LONG ) qVal, 20 );
+         hb_itemPutNIntLen( pItem, ( HB_MAXINT ) qVal, 20 );
          break;
       }
 #else
@@ -2130,7 +2168,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             dVal = 0.0;
             pArea->area.fEof = TRUE;
          }
-#ifdef ADS_MONEY /* Not defined below 7.00 */
+#ifdef ADS_LIB_VERSION >= 700
          if( pField->uiTypeExtended == ADS_CURDOUBLE ||
              pField->uiTypeExtended == ADS_DOUBLE ||
              pField->uiTypeExtended == ADS_MONEY )
@@ -2979,7 +3017,7 @@ static HB_ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          if( uRetVal != AE_SUCCESS )
             return HB_FAILURE;
 
-         hb_itemPutNL( pItem, ( LONG ) u16Count );
+         hb_itemPutNL( pItem, ( long ) u16Count );
          break;
       }
 

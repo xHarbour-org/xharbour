@@ -4749,32 +4749,19 @@ STATIC PROCEDURE _Init_Html_AnsiCharacterEntities
 #include "hbapierr.h"
 #include "hbfast.h"
 
-HB_EXTERN_BEGIN
-extern ULONG  hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string (case insensitive)*/
-HB_EXTERN_END
-// extern int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
-
-// Case insensitive string comparison to optimize this expression:
-// IF Lower( <cSubStr> ) == Lower( SubStr( <cString>, <nStart>, Len(<cSubStr>) ) )
-//  <cString> must be provided as a pointer to the character string containing a substring
-//  <nStart> is the numeric position to start comparison in <cString>
-//  <cSubStr> is the character string to compare with characters in <cString>, beginning at <nStart>
 
 HB_FUNC( PSTRCOMPI )
 {
-   PHB_ITEM pPointer = hb_param( 1, HB_IT_POINTER );
+   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pStart   = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pSubstr  = hb_param( 3, HB_IT_STRING  );
 
-   if( (pPointer && pStart && pSubstr) )
+   if( (pString && pStart && pSubstr) )
    {
-      char * pcBase = (char*) hb_itemGetPtr( pPointer ) ;
-      char * pcSub  = pSubstr->item.asString.value ;
-      HB_SIZE uSublen = pSubstr->item.asString.length ;
-      ULONG uStart  = hb_itemGetNL( pStart ) ;
-      int iCompare  = hb_strnicmp( pcBase+uStart-1 , pcSub, uSublen ) ;
-
-      hb_retl( (LONG) iCompare==0 ) ;
+            
+      hb_retl(  hb_strnicmp( hb_itemGetCPtr( pString ) + hb_itemGetNS( pStart ) - 1,
+                            hb_itemGetCPtr( pSubstr ),
+                            hb_itemGetCLen( pSubstr ) ) == 0 ) ;
    }
    else
    {
@@ -4782,95 +4769,5 @@ HB_FUNC( PSTRCOMPI )
    }
 }
 
-// Case insensitive At() function
-    HB_FUNC( ATI )
-    {
-       PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
-       PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
-       PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
-       PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
 
-       if( pText && pSub )
-       {
-          LONG lStart = pStart ? hb_itemGetNL( pStart ) : 1;
-          LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
-          ULONG ulPos;
-
-          if( lStart < 0 )
-          {
-             lStart += ( LONG ) pText->item.asString.length;
-
-             if( lStart < 0 )
-             {
-                lStart = 0;
-             }
-          }
-          else if( lStart )
-          {
-             lStart--;
-          }
-
-          if( lEnd < 0 )
-          {
-             lEnd += ( LONG ) pText->item.asString.length + 1;
-          }
-
-          if( lEnd > ( LONG ) pText->item.asString.length )
-          {
-             lEnd = ( LONG ) pText->item.asString.length;
-          }
-
-          // Stop searching if starting past beyond end.
-          if( lStart >= lEnd )
-          {
-             //TraceLog( NULL, "Start: %i End: %i\n", lStart, lEnd );
-             hb_retnl( 0 );
-             return;
-          }
-
-          //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
-
-          ulPos = hb_strAtI( pSub->item.asString.value, ( ULONG ) pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
-
-          hb_retnl( ulPos ? ulPos + lStart : 0 );
-       }
-       else
-       {
-          hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-       }
-    }
-
-// Case insensitive hb_strAt() function
-ULONG hb_strAtI( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_strAt(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
-
-   if( ulSubLen > 0 && ulLen >= ulSubLen )
-   {
-      ULONG ulPos = 0;
-      ULONG ulSubPos = 0;
-
-      while( ulPos < ulLen && ulSubPos < ulSubLen )
-      {
-         if( tolower( (BYTE) szText[ ulPos ] ) == tolower( (BYTE) szSub[ ulSubPos ] ) )
-         {
-            ulSubPos++;
-            ulPos++;
-         }
-         else if( ulSubPos )
-         {
-            /* Go back to the first character after the first match,
-               or else tests like "22345" $ "012223456789" will fail. */
-            ulPos -= ( ulSubPos - 1 );
-            ulSubPos = 0;
-         }
-         else
-            ulPos++;
-      }
-
-      return ( ulSubPos < ulSubLen ) ? 0 : ( ulPos - ulSubLen + 1 );
-   }
-   else
-      return 0;
-}
 #pragma ENDDUMP
