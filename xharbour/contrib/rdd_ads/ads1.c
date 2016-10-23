@@ -2079,8 +2079,8 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
 #ifndef HB_LONG_LONG_OFF
             SIGNED64 qVal = 0;
-            u32RetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
-            if( u32RetVal != AE_SUCCESS )
+            ulRetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
+            if( ulRetVal != AE_SUCCESS )
             {
                qVal = 0;
                pArea->area.fEof = HB_TRUE;
@@ -2088,8 +2088,8 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             hb_itemPutNIntLen( pItem, ( HB_MAXINT ) qVal, 20 );
 #else
             DOUBLE   dVal = 0;
-            u32RetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
-            if( u32RetVal != AE_SUCCESS )
+            ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
+            if( ulRetVal != AE_SUCCESS )
             {
                dVal = 0.0;
                pArea->area.fEof = HB_TRUE;
