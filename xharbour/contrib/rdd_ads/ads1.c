@@ -2168,7 +2168,7 @@ static HB_ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             dVal = 0.0;
             pArea->area.fEof = TRUE;
          }
-#ifdef ADS_LIB_VERSION >= 700
+#if ADS_LIB_VERSION >= 700
          if( pField->uiTypeExtended == ADS_CURDOUBLE ||
              pField->uiTypeExtended == ADS_DOUBLE ||
              pField->uiTypeExtended == ADS_MONEY )
