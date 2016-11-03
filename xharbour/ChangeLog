@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-11-02 19:50 UTC-0500 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * source/compiler/harbour.sly
+   * source/compiler/harbouryy.c
+     ! Fixed bug I committed Aug-15-2016 when fixing GPF, failed to reset codeblock flags.
+ 
 2016-10-24  06:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
    * contrib/rdd_ads/ads1.c   
    ! minor fix on last commit

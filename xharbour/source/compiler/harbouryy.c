@@ -8876,11 +8876,12 @@ yyreduce:
                      (yyval.asExpr) = (yyvsp[-4].asExpr);
                   }
 
-				  if (hb_comp_BlocksList == NULL)
+				  if (hb_comp_BlocksList == NULL || hb_comp_BlocksList->pOuter == NULL)
 				  {
 					  hb_comp_SLX_LastBlock(TRUE); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
 				  }
-				  else
+
+				  if (hb_comp_BlocksList)
 				  {
 					  hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
 					  hb_xfree((void *)pDelete);
