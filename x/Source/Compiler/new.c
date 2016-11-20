@@ -368,6 +368,16 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
          pValue->Type = pValue->Value.pObjectProperty->Type;
          break;
       
+       case VALUE_KIND_FIELD :
+           pValue->Value.pVariable = (DECLARED *) x;
+           pValue->Type = pValue->Value.pVariable->Type;
+           break;
+           
+       case VALUE_KIND_MEMVAR :
+           pValue->Value.pVariable = (DECLARED *) x;
+           pValue->Type = pValue->Value.pVariable->Type;
+           break;
+           
        default:
            PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, ", internal error - unexpected case in: " __SOURCE__, Parser_pContext );
    }
@@ -462,11 +472,11 @@ VALUE * New_UnaryValue( VALUE * pLValue, UNARY_KIND Kind, UNARY_WHEN When, PARSE
    return New_Value( (void *) pUnary, ValueKind , Parser_pContext );
 }
 
-VALUE * New_IDValue( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
+VALUE * New_IDValue( char *sName, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
-   DECLARED *pDeclared = New_DeclaredID( sName, Kind, Parser_pContext );
+   DECLARED *pDeclared = New_DeclaredID( sName, DECLARED_KIND_NONE, Parser_pContext );
    
-   return New_Value( (void *) pDeclared, VALUE_KIND_VARIABLE, Parser_pContext );
+   return New_Value( (void *) pDeclared, Kind, Parser_pContext );
 }
 
 VALUE * New_BinaryValue( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_CONTEXT *Parser_pContext )

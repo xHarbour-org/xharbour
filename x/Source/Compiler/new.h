@@ -30,7 +30,7 @@
    VALUE *             New_ConstantValue( CONSTANT *pConstant, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_NILValue( PARSER_CONTEXT *Parser_pContext );
 
-   VALUE *             New_IDValue( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext );
+   VALUE *             New_IDValue( char *sName, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    VALUE *             New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT *Parser_pContext );
 

@@ -45,17 +45,23 @@ int IterateMacro( MACRO * pMacro, PARSER_CONTEXT *Parser_pContext, int iNestingL
    return iResult;
 }
 
-int IterateVariable( DECLARED *pVariable, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, BOOL bAssign )
+int IterateVariable( DECLARED *pVariable, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, VALUE_KIND Kind )
 {
    int iResult = 0;
    
-   if( bAssign )
+   if( Kind & VALUE_KIND_MEMVAR )
    {
-      printf( "*** ASSIGN ***\n" );
+       printf( "%s %i [%s] Variable: %s\n", sPad, iNestingLevel, "MEMVAR", pVariable->pID->Name );
    }
-   
-   printf( "%s %i [%s] Variable: %s\n", sPad, iNestingLevel, ClipNet_DeclaredKind( pVariable ), pVariable->pID->Name );
-   
+   else if( Kind & VALUE_KIND_FIELD )
+   {
+       printf( "%s %i [%s] Variable: %s\n", sPad, iNestingLevel, "FIELD", pVariable->pID->Name );
+   }
+   else
+   {
+      printf( "%s %i [%s] Variable: %s\n", sPad, iNestingLevel, ClipNet_DeclaredKind( pVariable ), pVariable->pID->Name );
+   }
+    
    return iResult;
 }
 
@@ -194,6 +200,14 @@ int IterateValue( VALUE *pValue, PARSER_CONTEXT *Parser_pContext, int iNestingLe
          iResult = IterateVariable( pValue->Value.pVariable, Parser_pContext ,iNestingLevel, ( pValue->Kind & VALUE_KIND_ASSIGNED_MASK ) == VALUE_KIND_ASSIGNED_MASK );
          break;
 
+       case VALUE_KIND_MEMVAR:
+           iResult = IterateVariable( pValue->Value.pVariable, Parser_pContext ,iNestingLevel, ( pValue->Kind & VALUE_KIND_ASSIGNED_MASK ) == VALUE_KIND_ASSIGNED_MASK );
+           break;
+           
+       case VALUE_KIND_FIELD:
+           iResult = IterateVariable( pValue->Value.pVariable, Parser_pContext ,iNestingLevel, ( pValue->Kind & VALUE_KIND_ASSIGNED_MASK ) == VALUE_KIND_ASSIGNED_MASK );
+           break;
+           
       case VALUE_KIND_MACRO:
          iResult = IterateMacro( pValue->Value.pMacro, Parser_pContext, iNestingLevel, ( pValue->Kind & VALUE_KIND_ASSIGNED_MASK ) == VALUE_KIND_ASSIGNED_MASK );
          break;

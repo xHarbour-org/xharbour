@@ -707,7 +707,7 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
       case TOKEN_IDENTIFIER:
          DROP_AHEAD_TOKEN();
          
-         pValue = New_IDValue( yylval.sText, DECLARED_KIND_NONE, Parser_pContext );
+         pValue = New_IDValue( yylval.sText, VALUE_KIND_VARIABLE, Parser_pContext );
          
          break;
 
@@ -942,15 +942,15 @@ VALUE * ParseValue( PARSER_CONTEXT *Parser_pContext )
              )
            )
          {
-            DECLARED_KIND Kind;
+            VALUE_KIND Kind;
             
             if( pValue->Value.pVariable->pID->Name[0] == 'M' )
             {
-               Kind = DECLARED_KIND_MEMVAR;
+               Kind = VALUE_KIND_MEMVAR;
             }
             else
             {
-               Kind = DECLARED_KIND_FIELD;
+               Kind = VALUE_KIND_FIELD;
             }
             
             switch (LOOK_AHEAD_TOKEN() )

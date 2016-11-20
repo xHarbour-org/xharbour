@@ -11,7 +11,7 @@
    #define ITERATOR_DEFINED
 
    extern int IterateMacro( MACRO * pMacro, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, BOOL bAssign );
-   extern int IterateVariable( DECLARED *pVariable, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, BOOL bAssign );
+   extern int IterateVariable( DECLARED *pVariable, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, VALUE_KIND Kind );
    extern int IterateAliasedField( ALIASED_FIELD *pAliasedField, PARSER_CONTEXT *Parser_pContext, int iNestingLevel, BOOL bAssign );
    extern int IterateAST( PARSER_CONTEXT *Parset_pContext );
    extern int IterateBody( BODY *pBody, PARSER_CONTEXT *Parser_pContext, int iNestedLevel );

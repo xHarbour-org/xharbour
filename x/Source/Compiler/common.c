@@ -145,6 +145,12 @@ const char * ClipNet_ValueKind( const VALUE *pValue )
       CASE_STRING(VALUE_KIND_OBJECT_PROPERTY )
          break;
          
+      CASE_STRING(VALUE_KIND_FIELD )
+         break;
+           
+      CASE_STRING(VALUE_KIND_MEMVAR )
+         break;
+           
       default:
          printf( "internal error - unexpected case in: " __SOURCE__ "\n" );
    }
