@@ -61,6 +61,7 @@
 		694E769917796C0B00417D9C /* test.prg */ = {isa = PBXFileReference; lastKnownFileType = text; name = test.prg; path = Tests/test.prg; sourceTree = "<group>"; };
 		694E769A177BCB8B00417D9C /* Iterator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Iterator.c; path = Source/Compiler/Iterator.c; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		694E769C177BCBF800417D9C /* Iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Iterator.h; path = Source/Compiler/Iterator.h; sourceTree = SOURCE_ROOT; };
+		699021161DE26DAA0049711A /* X.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = X.xcworkspace; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +78,7 @@
 		694E763E177956EB00417D9C = {
 			isa = PBXGroup;
 			children = (
+				699021161DE26DAA0049711A /* X.xcworkspace */,
 				694E769717796BD300417D9C /* Tests */,
 				694E7649177956EB00417D9C /* Compiler */,
 				694E7648177956EB00417D9C /* Products */,
