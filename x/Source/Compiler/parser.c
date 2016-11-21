@@ -356,7 +356,7 @@ DECLARED * ParseDeclarationLine( PARSER_CONTEXT *Parser_pContext )
    {
       ppDeclared = &( ( *ppDeclared )->pNext );
    }
-   
+
    *ppDeclared = ParseDeclaredList( (DECLARED_KIND) LAST_TOKEN(), piDeclared, Parser_pContext );
    
    ACCEPT_EOL()
@@ -380,7 +380,7 @@ void ParseDeclarations( PARSER_CONTEXT *Parser_pContext )
          break;
       }
    }
-   while( LOOK_AHEAD_TOKEN() == '\n' );
+   while( LAST_TOKEN() == '\n' );
 }
 
 LINE * ParseExecutableLine( PARSER_CONTEXT *Parser_pContext )

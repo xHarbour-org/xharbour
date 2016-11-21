@@ -37,18 +37,6 @@ ID * New_ID( const char *sName, PARSER_CONTEXT *Parser_pContext )
    return pID; 
 }
 
-DECLARED * New_Declared( PARSER_CONTEXT *Parser_pContext )
-{
-   DECLARED *pDeclared = NEW( DECLARED );
-   
-   pDeclared->Kind  = DECLARED_KIND_NONE;
-   pDeclared->Type  = PRG_TYPE_UNDEF;
-   pDeclared->pID   = NULL;
-   pDeclared->Attribute.pInit = NULL;
-   
-   return pDeclared;
-}
-
 DECLARED * New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    DECLARED *pDeclared = NULL;
@@ -85,6 +73,7 @@ DECLARED * New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Pars
    }
 
    pDeclared = NEW( DECLARED );
+   ZERO( pDeclared );
    
    pDeclared->Kind  = Kind;
    pDeclared->Type  = PRG_TYPE_UNDEF;
@@ -387,18 +376,22 @@ VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 
 VALUE * New_NILValue( PARSER_CONTEXT *Parser_pContext )
 {
-   CONSTANT *pNil = NEW( CONSTANT );
-   
-   pNil->Kind = CONSTANT_KIND_NIL;
-   pNil->Type = PRG_TYPE_NIL;
+   // Intentionally not allocated pointer, becaue New_ConstantValue() creates COPY!
+   CONSTANT Nil;
 
-   return New_ConstantValue( pNil, Parser_pContext );
+   ZERO( &Nil );
+
+   Nil.Kind = CONSTANT_KIND_NIL;
+   Nil.Type = PRG_TYPE_NIL;
+
+   return New_ConstantValue( &Nil, Parser_pContext );
 }
 
 VALUE * New_ConstantValue( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext )
 {
    CONSTANT *pCopy = NEW( CONSTANT);
 
+   // Because we may use yylval.Constant
    memcpy( (void *) pCopy, (void *) pConstant, sizeof( CONSTANT ) );
 
    switch( pCopy->Kind )

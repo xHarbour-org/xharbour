@@ -9,7 +9,6 @@
 
    ID *                New_ID( const char *sName, PARSER_CONTEXT *Parser_pContext );
 
-   DECLARED *          New_Declared( PARSER_CONTEXT *Parser_pContext );
    DECLARED *          New_DeclaredID( char *sName, DECLARED_KIND Kind, PARSER_CONTEXT *Parser_pContext );
 
 

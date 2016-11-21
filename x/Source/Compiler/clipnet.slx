@@ -65,7 +65,6 @@ static long SLX_Hex2L( char* sHex, DEF_CARGO );
 static int  SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO );
 static int  SLX_InterceptAction( int iRet, DEF_CARGO );
 static int  SLX_CustomAction( int x, DEF_CARGO );
-static void SLX_CheckIllegalChar( char * szName, DEF_CARGO );
 
 char *SLX_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
                              "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
@@ -1539,19 +1538,4 @@ char * SLX_LastBlock( BOOL bReset )
    }
 
    return s_sLastBlock;
-}
-
-static void SLX_CheckIllegalChar( char *szName, DEF_CARGO )
-{
-   char *pTmp = szName;
-
-   while( *pTmp )
-   {
-      if( ! isalnum( (BYTE) *pTmp ) && *pTmp != '_' )
-      {
-         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_ILLEGAL_CHARACTER, SLX_acAscii[ (int)(unsigned char) *pTmp ], NULL, CARGO );
-      }
-
-      pTmp++;
-   }
 }

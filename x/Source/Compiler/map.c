@@ -67,7 +67,6 @@ MAP * NewMap( unsigned int uiBuckets )
       pMap->uiHighestBucketCollisions = 0;
    #endif
    
-   
 	memset( pMap->pBuckets, 0, uiBuckets * sizeof( BUCKET ) );
    
 	return pMap;
