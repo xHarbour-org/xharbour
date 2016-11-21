@@ -28,8 +28,9 @@ ID * New_ID( const char *sName, PARSER_CONTEXT *Parser_pContext )
       return pID;
    }
    
-   pID = NEW( ID ); 
-   pID->pNext = NULL;
+   pID = NEW( ID );
+   ZERO( pID );
+
    strcpy( pID->Name, sName );
 
    AddMapValue( Parser_pContext->pIDs, sName, pID );
@@ -116,7 +117,9 @@ FUNCTION * New_Function( char *sFunc, FUNC_KIND Kind, PARSER_CONTEXT *Parser_pCo
 BODY * New_Body( PARSER_CONTEXT *Parser_pContext )
 {
    BODY *pBody = NEW( BODY );
- 
+
+   ZERO( pBody );
+
    pBody->pLines = NULL;
  
    return pBody;
@@ -126,10 +129,10 @@ LINE * New_Line( void *x, LINE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    LINE *pLine = NEW( LINE ); 
 
+   ZERO( pLine );
+
    pLine->Kind = Kind;
    pLine->iNo  = Parser_pContext->iLine;
-   
-   pLine->pNext = NULL;
 
    switch( Kind ) 
    {
@@ -254,10 +257,9 @@ INLINE * New_Inline( char *sName, PARSER_CONTEXT *Parser_pContext )
 {
    INLINE *pInline = NEW( INLINE );
 
+   ZERO( pInline );
+
    pInline->sName      = sName;
-   pInline->pCode      = NULL;
-   pInline->lPCodeSize = 0;
-   pInline->pNext      = NULL;
    pInline->sFileName  = ClipNet_strdup( Parser_pContext->Files.pLast->sName );
    pInline->iLine      = Parser_pContext->iLine - 1;
 
@@ -267,6 +269,8 @@ INLINE * New_Inline( char *sName, PARSER_CONTEXT *Parser_pContext )
 VALUE * New_Value( void *x, VALUE_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    VALUE *pValue = NEW( VALUE );
+
+   ZERO( pValue );
 
    pValue->Kind = Kind;
 
@@ -429,10 +433,8 @@ VALUE * New_ConstantValue( CONSTANT * pConstant, PARSER_CONTEXT *Parser_pContext
 VALUE * New_BlockValue( PARSER_CONTEXT *Parser_pContext )
 { 
    BLOCK *pBlock = NEW( BLOCK );
-    
-   pBlock->pBlockLocals = NULL;
-   pBlock->iBlockLocals = 0;
-   pBlock->pList        = NULL;
+
+   ZERO( pBlock );
 
    return New_Value( (void *) pBlock, VALUE_KIND_BLOCK, Parser_pContext );
 } 
@@ -456,7 +458,8 @@ VALUE * New_UnaryValue( VALUE * pLValue, UNARY_KIND Kind, UNARY_WHEN When, PARSE
    pLValue->Kind |= VALUE_KIND_ASSIGNED_MASK;
    
    pUnary = NEW( UNARY );
-   
+   ZERO( pUnary );
+
    pUnary->Kind = Kind;
    pUnary->When = When;
    pUnary->pLValue = pLValue;
@@ -476,6 +479,8 @@ VALUE * New_BinaryValue( VALUE *pLeft, VALUE *pRight, BINARY_KIND Kind, PARSER_C
 {
    BINARY *pBinary = NEW( BINARY );
    VALUE  *pValue;
+
+   ZERO( pBinary );
 
    //printf( "Binary: %i, Left: %i Right: %i\n", Kind, pLeft->Kind, pRight->Kind );
 
@@ -514,6 +519,8 @@ VALUE * New_MacroValue( void *x, MACRO_KIND Kind, PARSER_CONTEXT *Parser_pContex
 {
    MACRO *pMacro = NEW( MACRO );
 
+   ZERO( pMacro );
+
    pMacro->Kind = Kind;
    pMacro->Type = PRG_TYPE_UNDEF;
    
@@ -538,6 +545,8 @@ VALUE * New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_
 {
    ALIASED *pAliased = NEW( ALIASED );
 
+   ZERO( pAliased );
+
    pAliased->pArea  = pArea;
    pAliased->pValue = pValue;
    pAliased->Type   = PRG_TYPE_UNDEF;
@@ -548,6 +557,8 @@ VALUE * New_AliasedValue( VALUE * pArea, VALUE * pValue, PARSER_CONTEXT *Parser_
 VALUE * New_IIFValue( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTEXT *Parser_pContext )
 {
    IIF *pIIF = NEW( IIF );
+
+   ZERO( pIIF );
 
    pIIF->Type =  pTrue->Type | pFalse->Type;
    pIIF->pCond = pCond;
@@ -560,7 +571,9 @@ VALUE * New_IIFValue( VALUE * pCond, VALUE * pTrue, VALUE * pFalse, PARSER_CONTE
 ASSIGNMENT * New_Assignment(  VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Kind, PARSER_CONTEXT *Parser_pContext )
 {
    ASSIGNMENT *pAssignment = NEW( ASSIGNMENT );
-   
+
+   ZERO( pAssignment );
+
    assert( pLValue );
    assert( pValue );
    
@@ -593,6 +606,8 @@ VALUE * New_AssignmentValue( VALUE * pLValue, VALUE * pValue, ASSIGNMENT_KIND Ki
 VALUE * New_FunctionCallValue( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT *Parser_pContext )
 {
    FUNCTION_CALL *pFunctionCall = NEW( FUNCTION_CALL );
+
+   ZERO( pFunctionCall );
    
    pFunctionCall->pSymbol = pSymVal ;
    pFunctionCall->pArguments = pArgList;
@@ -604,7 +619,9 @@ VALUE * New_FunctionCallValue( VALUE * pSymVal, VALUE * pArgList, PARSER_CONTEXT
 VALUE * New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT *Parser_pContext )
 {
    ARRAY_ELEMENT *pArrayElement = NEW( ARRAY_ELEMENT );
-   
+
+   ZERO( pArrayElement );
+
    if( pIndexList == NULL )
    {
       PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "invalid array index.", Parser_pContext );
@@ -622,11 +639,11 @@ VALUE * New_ArrayElementValue( VALUE * pArray, LIST * pIndexList, PARSER_CONTEXT
 LINE * New_If( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContext )
 {
    IF *pIf = NEW( IF );
-   
+
+   ZERO( pIf );
+
    pIf->pCondExp = pCondExp;
    pIf->pBody    = pBody;
-   pIf->pElseIf  = NULL;
-   pIf->pElse    = NULL;
 
    return New_Line( (void *) pIf, LINE_KIND_IF, Parser_pContext );
 }
@@ -635,9 +652,10 @@ LINE * New_ElseIf( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContex
 {
    ELSEIF *pElseIf = NEW( ELSEIF );
 
+   ZERO( pElseIf );
+
    pElseIf->pCondExp = pCondExp;
    pElseIf->pBody    = pBody;
-   pElseIf->pNext    = NULL;
 
    return New_Line( (void *) pElseIf, LINE_KIND_ELSEIF, Parser_pContext );
 }
@@ -645,6 +663,8 @@ LINE * New_ElseIf( VALUE * pCondExp, BODY *pBody, PARSER_CONTEXT *Parser_pContex
 LINE * New_Else( BODY *pBody, PARSER_CONTEXT *Parser_pContext )
 {
    ELSE *pElse = NEW( ELSE );
+
+   ZERO( pElse );
 
    pElse->pBody = pBody;
 
@@ -655,13 +675,14 @@ LIST * New_ListNode( LIST * pList, VALUE * pValue, PARSER_CONTEXT *Parser_pConte
 {
    LIST_NODE *pListNode = NEW( LIST_NODE );
 
+   ZERO( pListNode );
+
    if( pValue == NULL )
    {
       PARSE_ERROR( PARSER_ERR_SYNTAX, yytext, "NULL Node in:" __SOURCE__, Parser_pContext );
    }
 
    pListNode->pValue = pValue;
-   pListNode->pNext = NULL;
 
    if( pList->iNodes )
    {
@@ -683,9 +704,7 @@ LIST * New_List( VALUE * pValue, PARSER_CONTEXT *Parser_pContext )
 {
    LIST *pList = NEW( LIST );
 
-   pList->iNodes = 0;
-   pList->pFirst = NULL;
-   pList->pLast  = NULL;
+   ZERO( pList );
 
    if( pValue )
    {

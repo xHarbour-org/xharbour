@@ -2,6 +2,7 @@
 
    #define RELEASE_DEFINED
 
+   void Release_ListNode( LIST_NODE *pListNode );
    void Release_List( LIST *pList );
    void Release_Block( BLOCK *pBlock );
    void Release_Unary( UNARY *pUnary );

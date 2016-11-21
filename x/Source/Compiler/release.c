@@ -38,9 +38,23 @@ void Release_Macro( MACRO *pMacro )
    }
 }
 
+void Release_ListNode( LIST_NODE *pListNode )
+{
+   Release_Value( pListNode->pValue );
+   ClipNet_free( (void *) pListNode );
+}
+
 void Release_List( LIST *pList )
 {
-   // TODO!!!
+   LIST_NODE *pFree, *pListNode = pList->pFirst;
+
+   while( pListNode )
+   {
+      pFree = pListNode;
+      pListNode = pListNode->pNext;
+      Release_ListNode( pFree );
+   }
+
    ClipNet_free( (void *) pList );
 }
 
