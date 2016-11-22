@@ -8,6 +8,7 @@ SET _PRESET_LFLAGS=%LFLAGS%
 
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\VC"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
@@ -24,6 +25,12 @@ SET _PRESET_LFLAGS=%LFLAGS%
 :SET_VC2015X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Vc
    SET PSDKDIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A
+   CALL "%MSVCDIR%\vcvarsall.bat"
+   GOTO READY
+
+:SET_VC2015
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio 14.0\vc
+   SET PSDKDIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 

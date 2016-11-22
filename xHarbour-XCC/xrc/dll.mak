@@ -31,9 +31,9 @@ all: msrc.dll xrc.dll
 ##############################################################
 
 !IFDEF POWERDEBUG
-mslibs = kernel32.lib user32.lib libcdmt.lib
+mslibs = kernel32.lib user32.lib libcdmt.lib libvcruntimed.lib libucrtd.lib
 !ELSE
-mslibs = kernel32.lib user32.lib libcmt.lib
+mslibs = kernel32.lib user32.lib libcmt.lib libvcruntime.lib libucrt.lib
 !ENDIF
 
 mscflags = -Gs -Gz -c -W4 -nologo -Gy -J $(CFLAGS)

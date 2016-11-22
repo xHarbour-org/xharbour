@@ -1,4 +1,4 @@
-Procedure Main
+Procedure Main()
 
    LOCAL Var := 1;Var++
 
