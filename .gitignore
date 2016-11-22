@@ -113,3 +113,17 @@ xHarbour-XCC/xrc/xrc.exe
 *.EXP
 
 xHarbour-XCC/xrc/xrc.LIB
+
+xHarbour-xBuild/vc8/xbuild.xml
+
+xHarbour-XCC/xcc/cc/x86.c
+
+xHarbour-XCC/xcc/ccl/msg.h
+
+xHarbour-XCC/xcc/ccl/msg.rc
+
+xHarbour-XCC/xlib/msg.h
+
+xHarbour-XCC/xlink/msg.h
+
+xHarbour-XCC/xrc/msg.h
