@@ -460,8 +460,8 @@ HB_FUNC( ADSDDREVOKEPERMISSION )
 HB_FUNC( ADSDDGETINDEXFILEPROPERTY )
 {
 #if ADS_LIB_VERSION >= 600
-   UNSIGNED8  pTableName = ( UNSIGNED8 )  hb_parcx( 1 );
-   UNSIGNED8  pIndexName = ( UNSIGNED8 )  hb_parcx( 2 );
+   UNSIGNED8  *pTableName = ( UNSIGNED8 * )  hb_parcx( 1 );
+   UNSIGNED8  *pIndexName = ( UNSIGNED8 * )  hb_parcx( 2 );
    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 3 );
 
    ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );

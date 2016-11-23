@@ -5597,7 +5597,7 @@ HB_FUNC( CREATEIMAGELISTBITMAP )
    // Select bitmap into target DC and draw from image list to it
    if(hBitmap != NULL)
    {
-      HBITMAP hOldBmp = SelectObject((HDC) hb_parnl(4), hBitmap);
+      HBITMAP hOldBmp = (HBITMAP) SelectObject((HDC) hb_parnl(4), hBitmap);
 
       IMAGELISTDRAWPARAMS ildp = { 0 };
       ildp.cbSize = sizeof(IMAGELISTDRAWPARAMS);

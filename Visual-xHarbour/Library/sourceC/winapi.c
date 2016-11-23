@@ -236,15 +236,9 @@ typedef struct _PERFORMANCE_INFORMATION {
 
    #if defined(HB_PRAGMA_STARTUP)
       #pragma startup winapi__InitSymbols
-   #elif defined(_MSC_VER)
-      #if _MSC_VER >= 1010
-         #pragma data_seg( ".CRT$XIY" )
-         #pragma comment( linker, "/Merge:.CRT=.data" )
-      #else
-         #pragma data_seg( "XIY" )
-      #endif
-      static HB_$INITSYM hb_vm_auto_winapi__InitSymbols = winapi__InitSymbols;
-      #pragma data_seg()
+   #elif defined( HB_DATASEG_STARTUP )
+      #define HB_DATASEG_BODY    HB_DATASEG_FUNC( startup winapi__InitSymbols )
+      #include "hbiniseg.h"
    #endif
 #endif
 
