@@ -197,3 +197,9 @@ xHarbour-xBuild/vc8/xBuildWizard.bmp
 xHarbour-xBuild/vc8/xEdit.ico
 
 xHarbour-xBuild/vc8/xharbour320.avi
+
+*.idb
+
+ZipArchive/ZipArchive.lib
+
+ZipArchive/zlib/ZLib.lib
