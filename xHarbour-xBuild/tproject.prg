@@ -1835,6 +1835,7 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::Console_Flag := "-SUBSYSTEM:CONSOLE ", ;
                                                          ::GUI_Flag := "-SUBSYSTEM:WINDOWS ", ;
                                                          ::hC_EnvVars[ "PATH" ] := ::C_RootX + "..\Common7\Ide", ;
+                                                         ::hC_EnvVars[ "TMP" ] := GetEnv( "TMP" ), ;
                                                          ::hC_EnvVars[ "SystemRoot" ] := GetEnv( "SystemRoot" )
 
    METHOD Set_POCC( cRoot, C_Flags, LINK_Flags )  INLINE ::C_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
