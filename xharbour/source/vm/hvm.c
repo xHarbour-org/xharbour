@@ -1105,8 +1105,11 @@ int hb_vmQuit( void )
    TraceLog( NULL, "After Return\n" );
 #endif
 
-   /* Beyond this point all STATICs will be empty, Destructors will have access to the NIL values, we avoid GPF by not releasing the array yet. */
-   hb_arrayFill( &s_aStatics, ( *HB_VM_STACK.pPos ), 1, s_aStatics.item.asArray.value->ulLen );
+   if (s_aStatics.type == HB_IT_ARRAY)
+   {
+	   /* Beyond this point all STATICs will be empty, Destructors will have access to the NIL values, we avoid GPF by not releasing the array yet. */
+	   hb_arrayFill(&s_aStatics, (*HB_VM_STACK.pPos), 1, s_aStatics.item.asArray.value->ulLen);
+   }
 #ifdef TRACE_QUIT
    TraceLog( NULL, "After reset Statics\n" );
 #endif
