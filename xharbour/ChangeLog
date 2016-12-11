@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2016-12-10  11:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+   * contrib/hbssl/bio.c
+   * contrib/hbssl/err.c
+   * contrib/hbssl/evpciph.c
+   * contrib/hbssl/evpmd.c
+   * contrib/hbssl/ssl.c
+   * contrib/hbssl/x509.c
+   * some fix to compile under new openssl version borrow from harbour
+
 
 2016-12-10  23:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
    * contrib/hbssl/bio.c
