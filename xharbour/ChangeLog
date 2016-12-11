@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-12-10  23:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+   * contrib/hbssl/bio.c
+     ! fixed compilation under new version of openssl
+
 2016-11-23 11:24 UTC-0600 Ron Pinkas <ron.pinkas/at/xharbour.com>
    * source/vm/hvm.c
      ! Fixed gpf trap in hb_vmQuit() - afill of s_aStatics did not verify type array.
