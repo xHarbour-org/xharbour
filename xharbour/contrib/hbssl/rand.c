@@ -54,6 +54,9 @@
 #include "hbapierr.h"
 
 #include "hbssl.h"
+#ifdef HB_OS_WIN
+#include "windows.h"
+#endif
 
 #include <openssl/rand.h>
 

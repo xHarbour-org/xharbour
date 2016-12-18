@@ -71,7 +71,11 @@ static HB_GARBAGE_FUNC( EVP_CIPHER_CTX_release )
    if( ph && *ph )
    {
       /* Cleanup the object */
-      EVP_CIPHER_CTX_cleanup( ( EVP_CIPHER_CTX * ) *ph );
+      #if OPENSSL_VERSION_NUMBER >= 0x10002000L
+         EVP_CIPHER_CTX_free( (EVP_CIPHER_CTX * ) *ph);
+      #else
+         EVP_CIPHER_CTX_cleanup( ( EVP_CIPHER_CTX * ) *ph );
+      #endif
       /* Destroy the object */
       hb_xfree( *ph );
 
@@ -478,9 +482,13 @@ HB_FUNC( HB_EVP_CIPHER_CTX_CREATE )
 {
    void ** ph = ( void ** ) hb_gcAlloc( sizeof( EVP_CIPHER_CTX * ), EVP_CIPHER_CTX_release );
 
+   #if OPENSSL_VERSION_NUMBER >= 0x10002000L
+      EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+   #else
    EVP_CIPHER_CTX * ctx = ( EVP_CIPHER_CTX * ) hb_xgrab( sizeof( EVP_CIPHER_CTX ) );
 
    EVP_CIPHER_CTX_init( ctx );
+   #endif
 
    *ph = ctx;
 

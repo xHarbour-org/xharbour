@@ -1533,7 +1533,7 @@ HB_FUNC( SSL_SET_MSG_CALLBACK )
 
       if( ssl )
       {
-#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+#if OPENSSL_VERSION_NUMBER >= 0x00907000L &&  OPENSSL_VERSION_NUMBER < 0x10002000L
          PHB_ITEM pCallback = hb_param( 2, HB_IT_BLOCK | HB_IT_SYMBOL );
 
          if( pCallback )
