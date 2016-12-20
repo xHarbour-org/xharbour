@@ -156,6 +156,11 @@
       #endif
    #endif
 #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10002000L
+#define OPENSSL_NO_SHA
+#endif
+
+
 #if OPENSSL_VERSION_NUMBER < 0x00906030L
    #define SSL_get_rfd  SSL_get_fd
    #define SSL_get_wfd  SSL_get_fd

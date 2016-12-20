@@ -166,7 +166,7 @@ static int hb_EVP_MD_ptr_to_id( const EVP_MD * p )
    else if( p == EVP_sha1()      ) n = HB_EVP_MD_SHA1;
    else if( p == EVP_dss()       ) n = HB_EVP_MD_DSS;
    else if( p == EVP_dss1()      ) n = HB_EVP_MD_DSS1;
-#if OPENSSL_VERSION_NUMBER >= 0x00908000L && ! defined( HB_OPENSSL_OLD_OSX_ )
+#if (OPENSSL_VERSION_NUMBER >= 0x00908000L && OPENSSL_VERSION_NUMBER < 0x10002000L )&& ! defined( HB_OPENSSL_OLD_OSX_ )
    else if( p == EVP_ecdsa()     ) n = HB_EVP_MD_ECDSA;
 #endif
 #endif
@@ -282,8 +282,11 @@ HB_FUNC( EVP_MD_CTX_CLEANUP )
 
       if( ctx )
       {
-#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+#if OPENSSL_VERSION_NUMBER >= 0x00907000L &&  OPENSSL_VERSION_NUMBER < 0x10002000L
          hb_retni( EVP_MD_CTX_cleanup( ctx ) );
+#elif OPENSSL_VERSION_NUMBER >= 0x10002000L         
+    EVP_MD_CTX_destroy( ctx ) ;
+    hb_retni( 1 );
 #else
          hb_retni( 0 );
 #endif
