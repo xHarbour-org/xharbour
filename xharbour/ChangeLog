@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-12-24 19:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+   * contrib/hbssl/rand.c
+   * contrib/hbssl/ssl.c
+   * contrib/hbssl/sslctx.c
+   * contrib/hbssl/bio.c
+     ! minor fix to compile under pelles c with openssl >= 1.1.0
+
 2016-12-20 21:10  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
    * contrib/hbssl/evpmd.c
    * contrib/hbssl/hbssl.h

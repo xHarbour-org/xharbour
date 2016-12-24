@@ -77,7 +77,7 @@ HB_FUNC( RAND_STATUS )
 
 HB_FUNC( RAND_EVENT )
 {
-#if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ ) && OPENSSL_VERSION_NUMBER < 0x10100000L
    hb_retni( RAND_event( hb_parni( 1 ), ( WPARAM ) hb_parnint( 2 ), ( LPARAM ) hb_parnint( 3 ) ) );
 #else
    hb_retni( 0 );
@@ -86,7 +86,7 @@ HB_FUNC( RAND_EVENT )
 
 HB_FUNC( RAND_SCREEN )
 {
-#if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
+#if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ ) && OPENSSL_VERSION_NUMBER < 0x10100000L
    RAND_screen();
 #endif
 }

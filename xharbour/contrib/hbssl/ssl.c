@@ -74,7 +74,7 @@
 /* NOTE: See: http://www.openssl.org/support/faq.html#PROG2
          Application must call SSL_INIT(), so that this module gets linked.
          [vszakats] */
-#if defined( HB_OS_WIN ) && ! defined( HB_OPENSSL_STATIC ) && OPENSSL_VERSION_NUMBER >= 0x00908000L
+#if defined( HB_OS_WIN ) && ! defined( HB_OPENSSL_STATIC ) && OPENSSL_VERSION_NUMBER >= 0x00908000L && OPENSSL_VERSION_NUMBER < 0x10100000L
    /* NOTE: It doesn't build in bcc55:
             Warning W8065 openssl/applink.c 40: Call to function '_setmode' with no prototype in function app_fsetmod
             Error E2451 openssl/applink.c 82: Undefined symbol '_lseek' in function OPENSSL_Applink
@@ -210,7 +210,7 @@ HB_FUNC( SSL_CLEAR )
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
-
+#if  OPENSSL_VERSION_NUMBER < 0x10100000L
 HB_FUNC( SSL_STATE )
 {
    if( hb_SSL_is( 1 ) )
@@ -236,7 +236,7 @@ HB_FUNC( SSL_PENDING )
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
-
+#endif
 HB_FUNC( SSL_SET_BIO )
 {
    BIO * rbio = ( BIO * ) hb_parptr( 2 );
@@ -617,7 +617,7 @@ HB_FUNC( SSL_GET_SSL_METHOD )
          const SSL_METHOD * p = SSL_get_ssl_method( ssl );
 #endif
          int n;
-
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
          if(      p == SSLv3_method()         ) n = HB_SSL_CTX_NEW_METHOD_SSLV3;
          else if( p == SSLv3_server_method()  ) n = HB_SSL_CTX_NEW_METHOD_SSLV3_SERVER;
          else if( p == SSLv3_client_method()  ) n = HB_SSL_CTX_NEW_METHOD_SSLV3_CLIENT;
@@ -626,9 +626,13 @@ HB_FUNC( SSL_GET_SSL_METHOD )
          else if( p == SSLv2_server_method()  ) n = HB_SSL_CTX_NEW_METHOD_SSLV2_SERVER;
          else if( p == SSLv2_client_method()  ) n = HB_SSL_CTX_NEW_METHOD_SSLV2_CLIENT;
 #endif
+
          else if( p == TLSv1_method()         ) n = HB_SSL_CTX_NEW_METHOD_TLSV1;
          else if( p == TLSv1_server_method()  ) n = HB_SSL_CTX_NEW_METHOD_TLSV1_SERVER;
          else if( p == TLSv1_client_method()  ) n = HB_SSL_CTX_NEW_METHOD_TLSV1_CLIENT;
+#else
+     if( p == SSLv23_method()        ) n = HB_SSL_CTX_NEW_METHOD_SSLV23;         
+#endif         
          else if( p == SSLv23_method()        ) n = HB_SSL_CTX_NEW_METHOD_SSLV23;
          else if( p == SSLv23_server_method() ) n = HB_SSL_CTX_NEW_METHOD_SSLV23_SERVER;
          else if( p == SSLv23_client_method() ) n = HB_SSL_CTX_NEW_METHOD_SSLV23_CLIENT;
@@ -1379,7 +1383,7 @@ HB_FUNC( SSL_GET_CIPHERS )
             int      tmp;
 
             for( tmp = 0; tmp < len; tmp++ )
-               hb_arraySetPtr( pArray, tmp + 1, sk_SSL_CIPHER_value( stack, tmp ) );
+               hb_arraySetPtr( pArray, tmp + 1, (void*)sk_SSL_CIPHER_value( stack, tmp ) );
 
             hb_itemReturnRelease( pArray );
          }

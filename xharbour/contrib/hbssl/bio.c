@@ -475,7 +475,7 @@ HB_FUNC( BIO_NEW_MEM_BUF )
       ! defined( LIBRESSL_VERSION_NUMBER )
       hb_BIO_ret( BIO_new_mem_buf( hb_itemGetCPtr( pBuffer ), ( int ) hb_itemGetCLen( pBuffer ) ) );
 #else
-      hb_BIO_ret( BIO_new_mem_buf( HB_UNCONST( hb_itemGetCPtr( pBuffer ) ), ( int ) hb_itemGetCLen( pBuffer ) ) );
+      hb_BIO_ret( BIO_new_mem_buf( (void*)HB_UNCONST( hb_itemGetCPtr( pBuffer ) ), ( int ) hb_itemGetCLen( pBuffer ) ) );
 #endif
    }
    else
