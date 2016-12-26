@@ -61,7 +61,7 @@
    #endif
 #endif
 
-#if __BORLANDC__ <= 1361 
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ < 0x582 )
 #define _MSC_VER 1000
 #endif
 
