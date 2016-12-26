@@ -94,22 +94,18 @@ const SSL_METHOD * hb_ssl_method_id_to_ptr( int n )
 
    switch( n )
    {
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
-      case HB_SSL_CTX_NEW_METHOD_SSLV2:         p = SSLv2_method();         break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV2_SERVER:  p = SSLv2_server_method();  break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV2_CLIENT:  p = SSLv2_client_method();  break;
-#endif
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-      case HB_SSL_CTX_NEW_METHOD_SSLV3:         p = SSLv3_method();         break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV3_SERVER:  p = SSLv3_server_method();  break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV3_CLIENT:  p = SSLv3_client_method();  break;
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+      case HB_SSL_CTX_NEW_METHOD_TLS:           p = TLS_method();           break;
+      case HB_SSL_CTX_NEW_METHOD_TLS_SERVER:    p = TLS_server_method();    break;
+      case HB_SSL_CTX_NEW_METHOD_TLS_CLIENT:    p = TLS_client_method();    break;
+#else
       case HB_SSL_CTX_NEW_METHOD_TLSV1:         p = TLSv1_method();         break;
       case HB_SSL_CTX_NEW_METHOD_TLSV1_SERVER:  p = TLSv1_server_method();  break;
       case HB_SSL_CTX_NEW_METHOD_TLSV1_CLIENT:  p = TLSv1_client_method();  break;
+      case HB_SSL_CTX_NEW_METHOD_TLS:           p = SSLv23_method();        break;
+      case HB_SSL_CTX_NEW_METHOD_TLS_SERVER:    p = SSLv23_server_method(); break;
+      case HB_SSL_CTX_NEW_METHOD_TLS_CLIENT:    p = SSLv23_client_method(); break;
 #endif      
-      case HB_SSL_CTX_NEW_METHOD_SSLV23:        p = SSLv23_method();        break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV23_SERVER: p = SSLv23_server_method(); break;
-      case HB_SSL_CTX_NEW_METHOD_SSLV23_CLIENT: p = SSLv23_client_method(); break;
       default: p = SSLv23_method();
    }
 
@@ -780,7 +776,7 @@ HB_FUNC( SSL_CTX_SET_DEFAULT_VERIFY_PATHS )
 #endif
 }
 
-/*
+#if 0
 
    #define sk_X509_NAME_new_null() SKM_sk_new_null(X509_NAME)
    #define sk_X509_NAME_push(st, val) SKM_sk_push(X509_NAME, (st), (val))
@@ -818,13 +814,13 @@ HB_FUNC( SSL_CTX_SET_DEFAULT_VERIFY_PATHS )
    long SSL_CTX_set_tmp_dh(SSL_CTX* ctx, DH *dh);
    long SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*cb)(void));
    long SSL_CTX_set_tmp_rsa(SSL_CTX *ctx, RSA *rsa);
-   SSL_CTX_set_tmp_rsa_callback
+/* SSL_CTX_set_tmp_rsa_callback */
    long SSL_CTX_set_tmp_rsa_callback(SSL_CTX *ctx, RSA *(*cb)(SSL *ssl, int export, int keylength));
-   Sets the callback which will be called when a temporary private key is required. The export flag will be set if the reason for needing a temp key is that an export ciphersuite is in use, in which case, keylength will contain the required keylength in bits. Generate a key of appropriate size (using ???) and return it.
-   SSL_set_tmp_rsa_callback
+/* Sets the callback which will be called when a temporary private key is required.The export flag will be set if the reason for needing a temp key is that an export ciphersuite is in use, in which case, keylength will contain the required keylength in bits.Generate a key of appropriate size( using ? ? ? ) and return it. */
    long SSL_set_tmp_rsa_callback(SSL *ssl, RSA *(*cb)(SSL *ssl, int export, int keylength));
    The same as SSL_CTX_set_tmp_rsa_callback, except it operates on an SSL session instead of a context.
    void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*cb);(void))
    void SSL_CTX_set_psk_client_callback(SSL_CTX *ctx, unsigned int (*callback)(SSL *ssl, const char *hint, char *identity, unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len));
    void SSL_CTX_set_psk_server_callback(SSL_CTX *ctx, unsigned int (*callback)(SSL *ssl, const char *identity, unsigned char *psk, int max_psk_len));
- */
+
+#endif

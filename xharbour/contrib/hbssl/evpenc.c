@@ -65,12 +65,13 @@ static HB_GARBAGE_FUNC( EVP_ENCODE_CTX_release )
    /* Check if pointer is not NULL to avoid multiple freeing */
    if( ph && *ph )
    {
-      /* Destroy the object */
-      #if OPENSSL_VERSION_NUMBER >= 0x10002000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && \
+    ! defined( LIBRESSL_VERSION_NUMBER )
          EVP_ENCODE_CTX_free( (EVP_ENCODE_CTX*) *ph);
-      #endif
-      
+#else
+      /* Destroy the object */
       hb_xfree( *ph );
+#endif
 
       /* set pointer to NULL just in case */
       *ph = NULL;
@@ -92,16 +93,23 @@ static EVP_ENCODE_CTX * hb_EVP_ENCODE_CTX_par( int iParam )
 HB_FUNC( HB_EVP_ENCODE_CTX_CREATE )
 {
    void ** ph = ( void ** ) hb_gcAlloc( sizeof( EVP_ENCODE_CTX * ), EVP_ENCODE_CTX_release );
-#if OPENSSL_VERSION_NUMBER >= 0x10002000L
-EVP_ENCODE_CTX * ctx = ( EVP_ENCODE_CTX * ) EVP_ENCODE_CTX_new();
+   EVP_ENCODE_CTX * ctx;
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && \
+    ! defined( LIBRESSL_VERSION_NUMBER )
+   ctx = EVP_ENCODE_CTX_new();
 #else
-   EVP_ENCODE_CTX * ctx = ( EVP_ENCODE_CTX * ) hb_xgrab( sizeof( EVP_ENCODE_CTX ) );
+   ctx = ( EVP_ENCODE_CTX * ) hb_xgrabz( sizeof( EVP_ENCODE_CTX ) );
 #endif   
 
    *ph = ctx;
 
    hb_retptrGC( ph );
 }
+
+#if defined( HB_LEGACY_LEVEL5 )
+HB_FUNC_TRANSLATE( HB_EVP_ENCODE_CTX_CREATE, EVP_ENCODE_CTX_NEW )
+#endif
 
 HB_FUNC( EVP_ENCODEINIT )
 {
@@ -126,12 +134,24 @@ HB_FUNC( EVP_ENCODEUPDATE )
       {
          int size = 512;
          unsigned char * buffer = ( unsigned char * ) hb_xgrab( size + 1 );
+         int result;
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && \
+    ! defined( LIBRESSL_VERSION_NUMBER )
+         result = EVP_EncodeUpdate( ctx,
+                           buffer,
+                           &size,
+                           ( HB_SSL_CONST unsigned char * ) hb_parcx( 3 ),
+                           ( int ) hb_parclen( 3 ) );
+#else
          EVP_EncodeUpdate( ctx,
                            buffer,
                            &size,
-                           ( const unsigned char * ) hb_parcx( 3 ),
+                           ( HB_SSL_CONST unsigned char * ) hb_parcx( 3 ),
                            ( int ) hb_parclen( 3 ) );
+         result = 1;  /* Success */
+#endif
+         hb_retni( result );
 
          if( size > 0 )
          {
@@ -205,7 +225,7 @@ HB_FUNC( EVP_DECODEUPDATE )
          EVP_DecodeUpdate( ctx,
                            buffer,
                            &size,
-                           ( const unsigned char * ) hb_parcx( 3 ),
+                           ( HB_SSL_CONST unsigned char * ) hb_parcx( 3 ),
                            ( int ) hb_parclen( 3 ) );
 
          if( size > 0 )

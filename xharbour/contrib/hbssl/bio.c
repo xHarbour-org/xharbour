@@ -51,28 +51,56 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 
 #include "hbssl.h"
 
-void * hb_BIO_is( int iParam )
+/* BIO GC handler */
+
+/* BIO destructor, it's executed automatically */
+static HB_GARBAGE_FUNC( HB_BIO_Destructor )
 {
-   return hb_parptr( iParam );
+   void ** ph = ( void ** ) Cargo;
+
+   /* Check if pointer is not NULL to avoid multiple freeing */
+   if( ph && *ph )
+   {
+      /* Destroy the object */
+      BIO_free( ( BIO * ) *ph );
+
+      /* set pointer to NULL just in case */
+      *ph = NULL;
+   }
 }
+
 
 BIO * hb_BIO_par( int iParam )
 {
-   return ( BIO * ) hb_parptr( iParam );
+   void ** ph = ( void ** ) hb_parptrGC( HB_BIO_Destructor, iParam );
+
+   return ph ? ( BIO * ) *ph : NULL;
 }
    
+HB_BOOL hb_BIO_is( int iParam )
+{
+   void ** ph = ( void ** ) hb_parptrGC( HB_BIO_Destructor, iParam );
+
+   return ph && *ph;
+}
+
 static void hb_BIO_ret( BIO * bio )
 {
-   
-   hb_retptr( bio );
+void ** ph = ( void ** ) hb_gcAlloc( sizeof( BIO * ), HB_BIO_Destructor );
+
+   *ph = ( void * ) bio;
+
+   hb_retptrGC( ph );
 }
 
+/* */
 
-static int hb_BIO_METHOD_is( int iParam )
+static HB_BOOL hb_BIO_METHOD_is( int iParam )
 {
    return HB_ISCHAR( iParam );
 }
@@ -475,7 +503,7 @@ HB_FUNC( BIO_NEW_MEM_BUF )
       ! defined( LIBRESSL_VERSION_NUMBER )
       hb_BIO_ret( BIO_new_mem_buf( hb_itemGetCPtr( pBuffer ), ( int ) hb_itemGetCLen( pBuffer ) ) );
 #else
-      hb_BIO_ret( BIO_new_mem_buf( (void*)HB_UNCONST( hb_itemGetCPtr( pBuffer ) ), ( int ) hb_itemGetCLen( pBuffer ) ) );
+      hb_BIO_ret( BIO_new_mem_buf( HB_UNCONST( hb_itemGetCPtr( pBuffer ) ), ( int ) hb_itemGetCLen( pBuffer ) ) );
 #endif
    }
    else
@@ -493,8 +521,8 @@ HB_FUNC( BIO_READ )
       if( size > 0 )
       {
          char * buffer = ( char * ) hb_xgrab( size + 1 );
-         size = BIO_read( bio, buffer, size ) ;
-         hb_retni( size );
+
+         hb_retni( size = BIO_read( bio, buffer, size ) );
 
          if( ! hb_storclenAdopt( buffer, size, 2 ) )
             hb_xfree( buffer );
@@ -520,8 +548,8 @@ HB_FUNC( BIO_GETS )
       if( size > 0 )
       {
          char * buffer = ( char * ) hb_xgrab( size + 1 );
-         size = BIO_gets( bio, buffer, size ) ;
-         hb_retni( size );
+
+         hb_retni( size = BIO_gets( bio, buffer, size ) );
 
          if( ! hb_storclenAdopt( buffer, size, 2 ) )
             hb_xfree( buffer );
@@ -568,38 +596,27 @@ HB_FUNC( BIO_PUTS )
 }
 
 #if defined( HB_LEGACY_LEVEL5 )
-HB_FUNC( BIO_VFREE )
-{
-   BIO * bio = hb_BIO_par( 1 );
-
-   if( bio )
-      BIO_vfree( bio );
-   else
-      hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
-}
-
 HB_FUNC( BIO_FREE )
 {
-   BIO * bio = hb_BIO_par( 1 );
+   void ** ph = ( void ** ) hb_parptrGC( &s_gcBIOFuncs, 1 );
 
-   if( bio )
-      hb_retni( BIO_free( bio ) );
-   else
-      hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
-}
-
-HB_FUNC( BIO_FREE_ALL )
+   if( ph )
 {
-   BIO * bio = hb_BIO_par( 1 );
+      if( *ph )
+         hb_retni( BIO_free( ( BIO * ) *ph ) );
+      else
+         hb_retni( 0 );
 
-   if( bio )
-      BIO_free_all( bio );
+      *ph = NULL;
+   }
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
+HB_FUNC_TRANSLATE( BIO_VFREE, BIO_FREE )
+HB_FUNC_TRANSLATE( BIO_FREE_ALL, BIO_FREE )  /* These wrappers don't allow to create chained BIOs, so this is valid. */
 #endif
-/* ------------ connect ------------ */
+/* --- connect --- */
 
 HB_FUNC( BIO_NEW_CONNECT )
 {

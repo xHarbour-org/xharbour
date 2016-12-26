@@ -61,6 +61,10 @@
    #endif
 #endif
 
+#if __BORLANDC__ <= 1361 
+#define _MSC_VER 1000
+#endif
+
 #include <openssl/ssl.h>
 
 #include "hbssl.ch"
@@ -69,11 +73,6 @@
    /* #error "unsupported OpenSSL version, required 0.9.6 or higher" */
 #endif
 
-#if OPENSSL_VERSION_NUMBER < 0x00908060L
-   #ifndef OPENSSL_NO_SEED
-      #define OPENSSL_NO_SEED
-   #endif
-#endif
 #if OPENSSL_VERSION_NUMBER < 0x00908030L
    #ifndef OPENSSL_NO_CAMELLIA
       #define OPENSSL_NO_CAMELLIA
@@ -99,23 +98,11 @@
    #if defined( NO_BF ) && ! defined( OPENSSL_NO_BF )
       #define OPENSSL_NO_BF
    #endif
-   #if defined( NO_CAST ) && ! defined( OPENSSL_NO_CAST )
-      #define OPENSSL_NO_CAST
-   #endif
    #if defined( NO_DES ) && ! defined( OPENSSL_NO_DES )
       #define OPENSSL_NO_DES
    #endif
    #if defined( NO_DSA ) && ! defined( OPENSSL_NO_DSA )
       #define OPENSSL_NO_DSA
-   #endif
-   #if defined( NO_IDEA ) && ! defined( OPENSSL_NO_IDEA )
-      #define OPENSSL_NO_IDEA
-   #endif
-   #if defined( NO_MDC2 ) && ! defined( OPENSSL_NO_MDC2 )
-      #define OPENSSL_NO_MDC2
-   #endif
-   #if defined( NO_MD2 ) && ! defined( OPENSSL_NO_MD2 )
-      #define OPENSSL_NO_MD2
    #endif
    #if defined( NO_MD4 ) && ! defined( OPENSSL_NO_MD4 )
       #define OPENSSL_NO_MD4
@@ -128,9 +115,6 @@
    #endif
    #if defined( NO_RC4 ) && ! defined( OPENSSL_NO_RC4 )
       #define OPENSSL_NO_RC4
-   #endif
-   #if defined( NO_RC5 ) && ! defined( OPENSSL_NO_RC5 )
-      #define OPENSSL_NO_RC5
    #endif
    #if defined( NO_RIPEMD ) && ! defined( OPENSSL_NO_RIPEMD )
       #define OPENSSL_NO_RIPEMD
@@ -156,11 +140,6 @@
       #endif
    #endif
 #endif
-#if OPENSSL_VERSION_NUMBER >= 0x10002000L
-#define OPENSSL_NO_SHA
-#endif
-
-
 #if OPENSSL_VERSION_NUMBER < 0x00906030L
    #define SSL_get_rfd  SSL_get_fd
    #define SSL_get_wfd  SSL_get_fd
@@ -168,6 +147,14 @@
 
 #define hb_storclen_buffer hb_storclenAdopt
 #define hb_arraySetCLPtr   hb_arraySetCPtr
+
+#if ! defined( OPENSSL_VERSION )
+   #define OPENSSL_VERSION   SSLEAY_VERSION
+   #define OPENSSL_CFLAGS    SSLEAY_CFLAGS
+   #define OPENSSL_BUILT_ON  SSLEAY_BUILT_ON
+   #define OPENSSL_PLATFORM  SSLEAY_PLATFORM
+   #define OPENSSL_DIR       SSLEAY_DIR
+#endif
    
 #if OPENSSL_VERSION_NUMBER < 0x0090800fL
    #define HB_SSL_CONST
@@ -179,7 +166,7 @@ HB_EXTERN_BEGIN
 
 extern const SSL_METHOD * hb_ssl_method_id_to_ptr( int n );
 
-extern void *             hb_BIO_is( int iParam );
+extern HB_BOOL            hb_BIO_is( int iParam );
 extern BIO *              hb_BIO_par( int iParam );
 
 extern void *             hb_SSL_CTX_is( int iParam );

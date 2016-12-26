@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-12-25 23:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
+   * contrib/hbssl/bio.c
+   * contrib/hbssl/err.c
+   * contrib/hbssl/evp.c
+   * contrib/hbssl/evpciph.c
+   * contrib/hbssl/evpenc.c
+   * contrib/hbssl/evpmd.c
+   * contrib/hbssl/hbssl.ch
+   * contrib/hbssl/hbssl.h
+   * contrib/hbssl/rand.c
+   * contrib/hbssl/ssl.c
+   * contrib/hbssl/sslctx.c
+     * Adjust to compile under openssl >= 1.1.x some fixes borrow from Victor harbour branch
+   
 2016-12-24 19:30  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
    * contrib/hbssl/rand.c
    * contrib/hbssl/ssl.c
