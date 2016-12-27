@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2016-12-27 21:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+   * include/hbdefs.h
+     ! added missing hb_unconst macro
+     
 2016-12-26 22:00  UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
    * contrib/hbssl/hbssl.h
      ! minor fix to previus commit.
