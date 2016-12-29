@@ -67,6 +67,9 @@
          #include <winsock2.h>
          #include "cinterface.h"
          #include <windows.h>
+         #if defined(__BORLANDC__)
+         #define _MSC_VER 1500
+         #endif
 
          #define HB_INET_CLOSE( x )    closesocket( x )
 
@@ -94,7 +97,10 @@
          #endif
          #include <errno.h>
       #endif
-      
+      #if ( defined( __BORLANDC__ ) && __BORLANDC__ < 0x582 )
+          #define _MSC_VER 1000
+      #endif
+     
       #include <openssl/ssl.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
       #include <openssl/err.h> //If you get a compilation error about this missing header file, then you need to download OpenSSL from http://www.openssl.org and build a Win32 version and incorporate it into your project
       #include <openssl/rand.h>
