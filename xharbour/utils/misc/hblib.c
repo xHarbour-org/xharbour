@@ -269,7 +269,7 @@ int main( int argc, char * argv[] )
 
       if( strcmp( argv[ 1 ], "__BORLANDC__" ) == 0 )
       {
-         szLibs   = "cw32mt.lib import32.lib ws2_32.lib";
+         szLibs   = "cw32mt.lib import32.lib ws2_32.lib Iphlpapi.lib";
          iComp    = BORLANDC;
       }
       else if( strcmp( argv[ 1 ], "__DMC__" ) == 0 )

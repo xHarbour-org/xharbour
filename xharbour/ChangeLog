@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-01-01 15:30   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+   * utils/misc/hblib.c
+     ! added Iphlpapi.lib to borland c libs
+  * source/compiler/hbusage.c
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbrun/hbrun.prg
+  * utils/hbtest/hbtest.prg
+  * winmake/compile.mak
+    ! bump copyright year to 2017
+     
+     
 2016-12-29 19:30   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
    * contrib/tipssl/inetssl.h
      ! fix to compile with borland c++ 5.5
