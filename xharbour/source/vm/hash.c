@@ -2670,7 +2670,7 @@ HB_FUNC( HSETPARTITION )
    }
    else
    {
-      pHash->item.asHash.value->uiLevel      = ( USHORT ) uiLevel;
+      pHash->item.asHash.value->uiLevel      = ( USHORT ) uiLevel - 1;
       pHash->item.asHash.value->ulPageSize   = ulSize;
    }
 }

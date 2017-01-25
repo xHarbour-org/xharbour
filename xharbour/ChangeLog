@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-01-24 21:00 UTC-0600 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * source/vm/hash.c
+    ! Fixed a -1 bug for 3rd argument (nLevel) in HB_FUNC( HSetPartition )
+
 2017-01-01 15:30   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
    * utils/misc/hblib.c
      ! added Iphlpapi.lib to borland c libs
