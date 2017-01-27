@@ -1878,7 +1878,8 @@ COMPILER_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)harbour_reserved$(OBJEXT)\
 	\
 	$(OBJ_DIR)$(DIR_SEP)harbour_pptable$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)harbour_ppcore$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)harbour_ppcore$(OBJEXT)\
+      $(OBJ_DIR)$(DIR_SEP)hbarch$(OBJEXT)
 
 #===============================================================================
 # HBRUN.EXE rules

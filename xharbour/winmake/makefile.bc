@@ -14,9 +14,9 @@ RC        =BRC32
 
 !if ("$(HB_ARCH)"=="64")
 ACE_LIB   =$(ACE64_LIB)
-CC        =BCC64
-LINKEXE   =ILINK64
-LIBEXE    =TLIB64
+CC        =bcc64
+LINKEXE   =ilink64
+LIBEXE    =tlib64
 IMPLIBEXE =MKEXP
 !else
 ACE_LIB   =$(ACE32_LIB)
