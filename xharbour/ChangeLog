@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-01-27 23:12 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * utils/misc/hblib.c
+    ! fixed to compile under BCC 64-bit
+
 2017-01-27 11:30 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake/makefile.bc
   * winmake/common.mak
