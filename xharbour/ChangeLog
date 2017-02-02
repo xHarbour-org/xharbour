@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-02-02 19:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/filenet.c
+    ! fixed endless loop in function hb_fileNetFindOffset (many thanks to Rajesh!)
+
 2017-01-27 23:12 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * utils/misc/hblib.c
     ! fixed to compile under BCC 64-bit

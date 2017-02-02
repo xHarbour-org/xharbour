@@ -223,6 +223,12 @@ static UINT hb_fileNetFindOffset( PHB_FILE pFile, HB_FOFFSET ulOffset )
                          pFile->pLocks[ uiMiddle ].len;
 
       uiFirst  = ( ulEnd <= ulOffset ) ? uiMiddle + 1 : uiMiddle;
+
+      if ( ulEnd <= ulOffset )
+         uiFirst = uiMiddle + 1;
+      else
+         uiLast = uiMiddle;
+
       uiMiddle = ( uiFirst + uiLast ) >> 1;
    }
 
