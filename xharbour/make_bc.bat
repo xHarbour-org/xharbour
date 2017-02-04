@@ -88,7 +88,8 @@ SET OBJEXT=.obj
 SET DIR_SEP=\
 IF "%HB_DEBUG%"=="d" SET LIBEXT=%HB_DEBUG%.lib
 IF "%HB_DEBUG%"=="d" SET OBJEXT=%HB_DEBUG%.obj
-IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
+REM IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
+IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_DEBUG%.a
 IF "%HB_ARCH%"=="64" SET OBJEXT=%HB_DEBUG%.o
 REM SET LIBPREFIX=
 rem ============================================================================
