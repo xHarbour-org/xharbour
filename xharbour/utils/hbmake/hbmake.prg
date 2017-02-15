@@ -2398,7 +2398,7 @@ Endif // Create and compile
       AAdd( s_aCommands, { ".c.obj:", "$(CC_DIR)\bin\cl -I$(HB_DIR)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS)  -go" + if(s_lGenCsource,"3","") + IIF( lMediator," -I$(MEDIATOR)\include ","")+ " -o$* $**" } )
+         AAdd( s_aCommands, { ".prg.obj:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n -I$(HB_DIR)\include $(HARBOURFLAGS)  -go" + if(s_lGenCsource,"3","")+ IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+ + IIF( lMediator," -I$(MEDIATOR)\include ","")+ " -o$* $**" } )
       ELSE
          AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)\include $(HARBOURFLAGS) -o$* $**" } )
       ENDIF
@@ -3044,7 +3044,7 @@ Endif // Create and compile
       ELSEIF lWhat32
          FWrite( nSFhandle, "LIBFILES = what32.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lHwGui
-         FWrite( nSFhandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+         FWrite( nSFhandle, "LIBFILES = hwgui.lib procmisc.lib  " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSE
          if lGtwvt
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib gtwvg.lib")
@@ -3115,7 +3115,7 @@ Endif // Create and compile
       FWrite( nSFhandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL)  $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( nSFhandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( nSFhandle, "RFLAGS = " + CRLF )
-      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib "  +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + CRLF )
+      FWrite( nSFhandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH:$(HB_DIR)\lib "  + if(lHwGui,"/LIBPATH:$(HWGUI)\LIB ","" ) +IIF(s_lMt, " /Nodefaultlib:LIBCMT "," /Nodefaultlib:LIBC " ) + iif( s_lGui," /SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE" ) + CRLF )
       FWrite( nSFhandle, "IFLAGS = " + CRLF )
       FWrite( nSFhandle, "LINKER = link" + CRLF )
       FWrite( nSFhandle, " " + CRLF )

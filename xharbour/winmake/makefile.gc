@@ -99,8 +99,8 @@ endif
 
 ifneq ($(HB_NO_VM_ALL),1)
 VM_LIB_OBJS=\
-	$(VM_ALL_OBJS)\
-	$(VM_MAIN_OBJS)
+	$(VM_ALL_OBJS)
+#	$(VM_MAIN_OBJS)
 endif
 
 VM_LIB_OBJS+=\
@@ -304,7 +304,11 @@ endif
 RC_CMD          =$(RC) --input=$^ --output=$@
 LIB_CMD         =$(DEL) $@ && AR cru $@ $^ && ranlib $@
 LIB_CMD_1       =$(LIB_CMD)
+ifneq ($(HB_ARCH),64)
+DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ @winmake/mingw.rsp $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
+else
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
+endif
 DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
 HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(NOCYGWIN) $(HRB_LIBS) $(HARBOUR_EXE_RES)

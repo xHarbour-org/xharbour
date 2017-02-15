@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2017-02-15 21:10   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  + winmake/mingw.rsp
+  + winmake/mingw64.rsp
+    ! response linker file for mingw and mingw64
+  * winmake/makefile.gc
+    ! changes to use the response file when build the dll
+       
 2017-02-14 23:40   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
   * winmmake/compile.mak
     ! fix minor rule
