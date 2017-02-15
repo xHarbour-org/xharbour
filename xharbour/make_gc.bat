@@ -118,6 +118,7 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=%DIR_SEP%dll
+   SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
    mingw32-make.exe -f winmake\makefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR

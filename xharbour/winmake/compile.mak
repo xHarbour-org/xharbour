@@ -97,7 +97,7 @@ $(OBJ_DIR)$(DIR_SEP)hbver.c : include$(DIR_SEP)hbver.h
 	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbver.cxx $(OBJ_DIR)$(DIR_SEP)hbver.c
 
 $(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cmdarg.c
-	$(CC_CMD)
+	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)cmdarg.c : ChangeLog
 	$(TYPE) $(VM_DIR)$(DIR_SEP)cmdarg.c > $(OBJ_DIR)$(DIR_SEP)cmdarg.cxx
