@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2017-02-14 23:40   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>  
+  * make_gc.bat
+    ! Add missing set HB_ARCHITECTURE=w32
 
 2017-02-04 19:41 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_bc.bat
