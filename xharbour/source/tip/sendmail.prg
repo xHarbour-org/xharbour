@@ -124,7 +124,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    IF HB_ISARRAY( aTo )
       IF Len( aTo ) > 1
          FOR EACH cTo IN aTo
-            IF HB_EnumIndex() != 1
+            IF HB_EnumIndex() != 1 .AND. !Empty( cTo )
                cTmp += cTo + ","
             ENDIF
          NEXT
@@ -143,7 +143,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    IF HB_ISARRAY( aCC )
       IF Len( aCC ) > 0
          FOR EACH cTmp IN aCC
-            cCC += cTmp + ","
+            IF !Empty( cTmp )
+               cCC += cTmp + ","
+            ENDIF
          NEXT
          cCC := SubStr( cCC, 1, Len( cCC ) - 1 )
       ENDIF
@@ -156,7 +158,9 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    IF HB_ISARRAY( aBCC )
       IF Len( aBCC ) > 0
          FOR EACH cTmp IN aBCC
-            cBCC += cTmp + ","
+            IF !Empty( cTmp )
+               cBCC += cTmp + ","
+            ENDIF
          NEXT
          cBCC := SubStr( cBCC, 1, Len( cBCC ) - 1 )
       ENDIF
