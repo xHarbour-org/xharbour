@@ -4752,7 +4752,7 @@ STATIC PROCEDURE _Init_Html_AnsiCharacterEntities
 
 HB_FUNC( PSTRCOMPI )
 {
-   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString = ISPOINTER(1) ? hb_param( 1, HB_IT_POINTER ) : hb_param( 1, HB_IT_STRING );
    PHB_ITEM pStart   = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pSubstr  = hb_param( 3, HB_IT_STRING  );
 

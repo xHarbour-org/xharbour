@@ -1,9 +1,9 @@
-// Sends a query to Google and displays the Links from the response HTML page
+ 	// Sends a query to Google and displays the Links from the response HTML page
 
 PROCEDURE Main
-   LOCAL oHttp, cHtml, hQuery, aLink, oNode, oDoc
-
-   oHttp:= TIpClientHttp():new( "http://www.google.de/search" )
+   LOCAL oHttp, cHtml, hQuery, aLink, oNode, oDoc,ohttp1
+Local cRef
+   oHttp1:= TIpClientHttp():new( "http://www.google.com/",.t. )
    
    // build the Google query
    hQUery := Hash()
@@ -14,16 +14,29 @@ PROCEDURE Main
    hQuery["btnG"] := "Google+Search"
 
    // add query data to the TUrl object
-   oHttp:oUrl:addGetForm( hQuery )
+   oHttp1:oUrl:addGetForm( hQuery )
 
    // Connect to the HTTP server
-   IF .NOT. oHttp:open()
-      ? "Connection error:", oHttp:lastErrorMessage()
+   IF .NOT. oHttp1:open()
+      ? "Connection error:", oHttp1:lastErrorMessage()
       QUIT
    ENDIF
-
+altd()
    // download the Google response
-   cHtml   := oHttp:readAll()
+   cHtml   := oHttp1:readAll()
+   if "302 Moved" in cHtml
+   oDoc := THtmlDocument():new( cHtml )
+   oNode := oDoc:body:a
+   cRef := strtran(onode:Attr["HREF"],"&amp;","&")+"&btnG=Google+Search"
+   tracelog(valtoprg(ohttp1))
+   oHttp1:close()
+   cRef := strtran(cRef,"/www.google.com.br/","/www.google.com.br/search")
+   oHttp:= TIpClientHttp():new( cref,.t. )
+   oHttp:cConnetion:='keep-alive'
+   oHttp:open()
+   cHtml:=ohttp:readall()
+   endif
+   tracelog(valtoprg(ohttp))
    oHttp:close()
    ? Len(cHtml), "bytes received "
 
@@ -36,7 +49,7 @@ PROCEDURE Main
    ? oNode:getText(""), oNode:href
 
    // ":divs(5)" returns the 5th <div> tag
-   oNode := oDoc:body:divs(5)
+   oNode := oDoc:body
 
    // "aS" is the plural of "a" and returns all <a href="url"> tags
    aLink := oNode:aS
