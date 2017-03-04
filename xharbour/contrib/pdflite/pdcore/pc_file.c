@@ -104,7 +104,7 @@ pdc__fseek(FILE *fp, pdc_off_t offset, int whence)
 {
 #if defined(_LARGEFILE_SOURCE)
     #if defined(WIN32)
-        #if defined(__POCC__)
+        #if defined(__POCC__) && (__POCC__ <=600 )
            #define _telli64  _tell
            #define _lseeki64 _lseek
         #endif
