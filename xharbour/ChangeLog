@@ -9,6 +9,11 @@
 */
 
 
+2017-03-12 17:00   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/win_misc.c
+    ! optimized  ANSITOWIDE to not use wcslen to make pelles C happy fix borrow from harbour
+
+
 2017-03-04 21:00    UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/pdflite/pdcore/pc_file.c
     ! minor fix to compile under pelles C 8

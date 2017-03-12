@@ -66,29 +66,14 @@
 //---------------------------------------------------------------------------//
 HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
 {
-   const char * szString = hb_parc( 1 );
+    HB_SIZE nLen = hb_parclen( 1 );
+   LPCSTR lpSrcMB = hb_parcx( 1 );
+   DWORD dwLength = MultiByteToWideChar( CP_ACP, 0, lpSrcMB, ( int ) nLen, NULL, 0 );
+   LPWSTR lpDstWide = ( LPWSTR ) hb_xgrab( ( dwLength + 1 ) * sizeof( wchar_t ) );
 
-   if( szString )
-   {
-      int iLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, szString, -1, NULL, 0 );
+   MultiByteToWideChar( CP_ACP, 0, lpSrcMB, ( int ) nLen, lpDstWide, dwLength + 1 );
 
-      if( iLen )
-      {
-         LPWSTR szWide = ( LPWSTR ) hb_xgrab( iLen * sizeof( wchar_t ) );
-
-         if( MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, szString, -1, szWide, iLen ) )
-         {
-            hb_retclenAdoptRaw( ( char * ) szWide, ( wcslen( szWide ) + 1 ) * sizeof( wchar_t ) );
-            return;
-         }
-         else
-         {
-            hb_xfree( szWide );
-         }
-      }
-   }
-
-   hb_ret();
+   hb_retclen_buffer( ( char * ) lpDstWide, ( HB_SIZE ) ( dwLength * sizeof( wchar_t ) ) );
 }
 
 //---------------------------------------------------------------------------//
