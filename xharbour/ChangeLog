@@ -9,6 +9,10 @@
 */
 
 
+2017-05-13 19:00   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/hbxml.c 
+    ! fix to allow dot in xml tag name. fix provided by Grzegorz Wojnarowski
+
 2017-03-12 17:00   UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/win_misc.c
     ! optimized  ANSITOWIDE to not use wcslen to make pelles C happy fix borrow from harbour
