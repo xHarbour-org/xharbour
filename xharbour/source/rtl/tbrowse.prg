@@ -3262,9 +3262,6 @@ METHOD SetRowPos( nRow ) CLASS TBrowse
       if ::lStable
          if nRow = 1
             ::Gotop()
-         else
-            ::nRowPos := nRow
-            ::oCache:CurRow := nRow
          endif
       else
          if nRow > ::nRowPos
@@ -3277,6 +3274,8 @@ METHOD SetRowPos( nRow ) CLASS TBrowse
 
       ::Moved()
 
+      ::nRowPos := nRow
+      ::oCache:CurRow := nRow
    endif
 
 Return ::nRowPos
