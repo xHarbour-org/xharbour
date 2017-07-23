@@ -1,5 +1,7 @@
 Procedure Main()
 
+// Comment added to test GIT functionality in Xcode
+
    LOCAL Var := 1;Var++
 
    Var;
