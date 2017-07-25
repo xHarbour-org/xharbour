@@ -1,12 +1,22 @@
-ECHO ON
+@ECHO OFF
 
-SET _PRESET_PATH=%PATH%
-SET _PRESET_INCLUDE=%INCLUDE%
-SET _PRESET_LIB=%LIB%
-SET _PRESET_CFLAGS=%CFLAGS%
-SET _PRESET_LFLAGS=%LFLAGS%
+:SAVE
+   SET _PRESET_PATH=%PATH%
+   SET _PRESET_INCLUDE=%INCLUDE%
+   SET _PRESET_LIB=%LIB%
+   SET _PRESET_CFLAGS=%CFLAGS%
+   SET _PRESET_LFLAGS=%LFLAGS%
+   SET _PRESET_MSVCDIR=%MSVCDIR%
+   SET _PRESET_PSDKDIR=%PSDKDIR%
+   SET _PRESET_PELLESCDIR=%PELLESCDIR%
  
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"   GOTO SET_VC2017EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"        GOTO SET_VC2017E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools" GOTO SET_VC2017PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\VC"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
@@ -15,18 +25,59 @@ SET _PRESET_LFLAGS=%LFLAGS%
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
-
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
    GOTO NONE
-   
+
+:SET_VC2017EX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017E
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017PX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017P
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017CX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017C
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
 :SET_VC2015X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Vc
-   SET PSDKDIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A
-   SET PELLESCDIR=%ProgramW6432%\PellesC
+   SET PELLESCDIR=%ProgramFiles(x86)%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
    GOTO READY
 
 :SET_VC2015
@@ -93,63 +144,84 @@ SET _PRESET_LFLAGS=%LFLAGS%
    GOTO READY
 
 :SET_VC2003
-   SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
-   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
 :SET_VC6
-   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
-   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
+
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\VC98
+
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+
    SET PELLESCDIR=%ProgramFiles%\PellesC
+
    CALL "%MSVCDIR%\vcvarsall.bat"
+
    GOTO READY
 
-:NONE   
-   ECHO MSVC not found!!!
+
+
+:NONE
+   ECHO Could not locate any MSVC installation!
    GOTO RESTORE
-   
+
 :READY
+   SET XCCDIR=\xhb\bin
+   SET PATH=%PATH%;"%XCCDIR%"
 
-ECHO ON
+   REM SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
+   REM SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 
-SET XCCDIR=\xhb\bin
-SET PATH=%PATH%;"%XCCDIR%"
+   IF NOT EXIST Objs MD Objs
+   IF NOT EXIST mtObjs MD mtObjs
 
-REM SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
-REM SET LFLAGS=-DEBUG -DEBUGTYPE:CV
+   ECHO single-thread > log
+   nmake >> log
+   IF ERRORLEVEL 0 GOTO CONTINUE
+   GOTO FAILURE
 
-IF NOT EXIST Objs MD Objs
-IF NOT EXIST mtObjs MD mtObjs
+:CONTINUE
+   ECHO multi-thread >>log
+   nmake __MT__=1 >> log
+   IF ERRORLEVEL 0 GOTO CONTINUE2
+   GOTO FAILURE
 
-echo single-thread > log
-nmake >> log
-if errorlevel 1 goto q
+:CONTINUE2
+   REM echo wince
+   REM ..\utils\narmw -o wince\xdiv.obj -f win32 wince\xdiv.asm
+   REM IF ERRORLEVEL 0 xlib.exe -out:crtce.lib wince\xdiv.obj
+   REM IF ERRORLEVEL 0 goto SUCCESS
+   IF ERRORLEVEL 0 GOTO SUCCESS
 
-echo multi-thread >>log
-nmake __MT__=1 >> log
-if errorlevel 1 goto q
+:FAILURE
+   TYPE Log.
+   PAUSE
+   GOTO RESTORE
 
-REM echo wince
-REM ..\utils\narmw -o wince\xdiv.obj -f win32 wince\xdiv.asm
-REM @if errorlevel 1 goto Q
-REM xlib.exe -out:crtce.lib wince\xdiv.obj
-
-:q
-IF ERRORLEVEL 0 xcopy crt.lib \xhb\c_lib /d /r /y
-IF ERRORLEVEL 0 xcopy crtmt.lib \xhb\c_lib /d /r /y
-xcopy "%PELLESCDIR%\lib\win" \xhb\c_lib\win /d /y 
+:SUCCESS
+   xcopy crt.lib \xhb\c_lib /d /r /y
+   xcopy crtmt.lib \xhb\c_lib /d /r /y
+   xcopy "%PELLESCDIR%\lib\win" \xhb\c_lib\win /d /y 
 
 :RESTORE
-SET PATH=%_PRESET_PATH%
-SET INCLUDE=%_PRESET_INCLUDE% 
-SET LIB=%_PRESET_LIB% 
-SET CFLAGS=%_PRESET_CFLAGS% 
-SET LFLAGS=%_PRESET_LFLAGS% 
+   SET PATH=%_PRESET_PATH%
+   SET INCLUDE=%_PRESET_INCLUDE%
+   SET LIB=%_PRESET_LIB%
+   SET CFLAGS=%_PRESET_CFLAGS%
+   SET LFLAGS=%_PRESET_LFLAGS%
+   SET MSVCDIR=%_PRESET_MSVCDIR%
+   SET PSDKDIR=%_PRESET_PSDKDIR%
+   SET PELLESCDIR=%_PRESET_PELLESCDIR%
 
-SET _PRESET_PATH=
-SET _PRESET_INCLUDE=
-SET _PRESET_LIB=
-SET _PRESET_CFLAGS=
-SET _PRESET_LFLAGS=
+:CLEANUP
+   SET _PRESET_PATH=
+   SET _PRESET_INCLUDE=
+   SET _PRESET_LIB=
+   SET _PRESET_CFLAGS=
+   SET _PRESET_LFLAGS=
+   SET _PRESET_MSVCDIR=
+   SET _PRESET_PSDKDIR=
+   SET _PRESET_PELLESCDIR=

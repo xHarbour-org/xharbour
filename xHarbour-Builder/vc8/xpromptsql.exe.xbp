@@ -5,7 +5,7 @@ INCLUDEFOLDERS = \xhb\include
 LAUTORUN =
 LDEBUG = .F.
 LGUI = .F.
-LIBFOLDERS = \xhb\lib\vc8; \xhb\lib
+LIBFOLDERS =
 LMT = .F.
 LUSEDLL = .T.
 MAPFILE =
@@ -24,14 +24,15 @@ TARGETFOLDER = \xhb\bin\vc8
 
 [\xharbour\utils\xbscript\xbscript.prg]
 
-[fix.odbccp32.lib.sdk710.c]
+#[fix.odbccp32.lib.sdk710.c]
+[legacy_stdio_definitions.lib]
 
-[sql.lib]
+[\xhb\lib\vc8\sql.lib]
 
-[libmysql.lib]
+[\xhb\lib\libmysql.lib]
 
-[libpq.lib]
+[\xhb\lib\libpq.lib]
 
-[oci.lib]
+[\xhb\lib\oci.lib]
 
-[fbclient_ms.lib]
+[\xhb\lib\fbclient_ms.lib]

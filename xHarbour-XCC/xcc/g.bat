@@ -1,4 +1,4 @@
-ECHO ON
+@ECHO OFF
 
 :SAVE
    SET _PRESET_PATH=%PATH%
@@ -11,6 +11,12 @@ ECHO ON
    SET _PRESET_PELLESCDIR=%PELLESCDIR%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"   GOTO SET_VC2017EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"        GOTO SET_VC2017E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools" GOTO SET_VC2017PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\VC"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
@@ -19,18 +25,59 @@ ECHO ON
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
-
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"  GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"    GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc" GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"     GOTO SET_VC6
    GOTO NONE
-   
+
+:SET_VC2017EX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017E
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017PX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017P
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017CX86
+   SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2017C
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
 :SET_VC2015X86
    SET MSVCDIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Vc
-   SET PSDKDIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v10.0A
-   SET PELLESCDIR=%ProgramW6432%\PellesC
+   SET PELLESCDIR=%ProgramFiles(x86)%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
    GOTO READY
 
 :SET_VC2015
@@ -97,22 +144,29 @@ ECHO ON
    GOTO READY
 
 :SET_VC2003
-   SET MSVCDIR=%ProgramFiles%\Microsoft Visual .NET 2003\vc
-   SET PSDKDIR="*** PLEASE SET PSDKDIR ***""
-   SET PELLESCDIR=%ProgramFiles%\PellesC
-   CALL "%MSVCDIR%\vcvarsall.bat"
-   GOTO READY
-
-:SET_VC6
-   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\vc98
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
    SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
    SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\vcvarsall.bat"
    GOTO READY
 
+:SET_VC6
+
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\VC98
+
+   SET PSDKDIR="*** PLEASE SET PSDKDIR ***"
+
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+
+   CALL "%MSVCDIR%\vcvarsall.bat"
+
+   GOTO READY
+
+
+
 :NONE
    ECHO Could not locate any MSVC installation!
-   RESTORE
+   GOTO RESTORE
 
 :READY
    SET PATH=%PATH%;"%PELLESCDIR%\bin"
@@ -129,12 +183,13 @@ ECHO ON
    IF NOT EXIST bprint\obj MD bprint\obj
    IF NOT EXIST ccl\obj MD ccl\obj
 
-   "%MSVCDIR%\bin\NMAKE.exe" > Log
+   NMAKE.exe -S > Log
 
    IF ERRORLEVEL 0 GOTO SUCCESS
 
 :FAILURE
    TYPE Log.
+   PAUSE
    GOTO RESTORE
 
 :SUCCESS

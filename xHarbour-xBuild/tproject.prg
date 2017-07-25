@@ -14,19 +14,26 @@
 STATIC s_hEnvVars := { => }
 
 STATIC s_sProgramsFolder
-STATIC s_sWinSDKFolder
+
+STATIC s_sWinSDKBinFolder
+STATIC s_sWinSDKIncludeFolders
+STATIC s_sWinSDKLibFolder
+
+STATIC s_sHostArch := ""
 
 STATIC s_sUniversalCRT_IncludePath     //$(UniversalCRT_IncludePath)
 STATIC s_sUniversalCRT_LibraryPath_x86 //$(UniversalCRT_LibraryPath_x86)
 
 // TODO: $(UniversalCRT_LibraryPath_x64)
 
-STATIC s_sxCCFolder  := ""
-STATIC s_sBCCFolder  := ""
-STATIC s_sVCFolder   := ""
-STATIC s_sPOCCFolder := ""
-STATIC s_sLCCFolder  := ""
-STATIC s_sGCCFolder  := ""
+STATIC s_sxCCFolder   := ""
+STATIC s_sBCCFolder   := ""
+STATIC s_sVCFolder    := ""
+STATIC s_sVCBinFolder := "bin"
+STATIC s_sVCLibFolder := "lib"
+STATIC s_sPOCCFolder  := ""
+STATIC s_sLCCFolder   := ""
+STATIC s_sGCCFolder   := ""
 
 /*
 #xcommand       VIEW  <x> [ <y> ]  =>     sLogDebug( IF(Empty(ProcName( 1 ) ),"",Trim( ProcName( 1 ) ) + "(" + LTrim(Str( ProcLine( 1 ) ) ) + ")->" ) + IF(Empty(ProcName( 0 ) ),"",Trim( ProcName( 0 ) ) + "(" + LTrim(Str( ProcLine( 0 ) ) ) + ")" ) + " : " + <x>   + " -> [" + ValType(<y>) + "] " + ValToPrg(<y>),.T. )
@@ -454,13 +461,14 @@ CLASS TMakeObject FROM TDependant
    #endif
 
 
-   METHOD C_Compiler   INLINE ::Project:C_RootX + "bin" + DIR_SEPARATOR + ::Project:C_Executable
+   METHOD C_Compiler   INLINE ::Project:C_RootX + ::Project:C_BinFolder + DIR_SEPARATOR + ::Project:C_Executable
+      
    METHOD xHB_Compiler INLINE ::Project:xHB_RootX + "bin" + DIR_SEPARATOR + ::Project:xHB_Executable
 
    #ifdef DEFERRED_RC
-      METHOD RC_Binder    INLINE ::Project:RC_RootX + "bin" + DIR_SEPARATOR + ::Project:RC_Executable
+      METHOD RC_Binder    INLINE IIF( ::Project:RC_Root == s_sWinSDKBinFolder, s_sWinSDKBinFolder, ::Project:RC_RootX + "bin" ) + DIR_SEPARATOR + ::Project:RC_Executable
    #else
-      METHOD RC_Compiler  INLINE ::Project:RC_RootX + "bin" + DIR_SEPARATOR + ::Project:RC_Executable
+      METHOD RC_Compiler  INLINE IIF( ::Project:RC_Root == s_sWinSDKBinFolder, s_sWinSDKBinFolder, ::Project:RC_RootX + "bin" ) + DIR_SEPARATOR + ::Project:RC_Executable
    #endif
 
    METHOD SLY_Compiler INLINE ::Project:SLY_Root + "bin" + DIR_SEPARATOR + ::Project:SLY_Executable
@@ -536,10 +544,10 @@ METHOD C_Command() CLASS TMakeObject
       ENDIF
    ELSEIF ::Project:C_Executable == "cl.exe"
       cCommand += '-I"' + ::Project:C_RootX + 'include" '
-      IF Empty( s_sWinSDKFolder )
+      IF Empty( s_sWinSDKIncludeFolders )
          cCommand += '-I"' + ::Project:C_RootX + 'PlatformSdk\Include" '
       ELSE
-         cCommand += '-I"' + s_sWinSDKFolder + '\include" '
+         cCommand += SplitFoldersWithFlag( s_sWinSDKIncludeFolders, "-I" )
       ENDIF
       IF ! Empty( s_sUniversalCRT_IncludePath )
          cCommand += '-I"' + s_sUniversalCRT_IncludePath + '" '
@@ -674,10 +682,10 @@ METHOD RC_Command CLASS TMakeObject
      ELSE
         cCommand += ::Project:RC_IncludeFlag + '"' + ::Project:C_RootX + 'include" '
 
-        IF Empty( s_sWinSDKFolder )
+        IF Empty( s_sWinSDKIncludeFolders )
            cCommand += ::Project:RC_IncludeFlag + '"' + ::Project:C_RootX + 'PlatformSDK\Include" '
         ELSE
-           cCommand += ::Project:RC_IncludeFlag + '"' + s_sWinSDKFolder + '\include" '
+           cCommand += SplitFoldersWithFlag( s_sWinSDKIncludeFolders, ::Project:RC_IncludeFlag )
         ENDIF
      ENDIF
 
@@ -1480,6 +1488,9 @@ CLASS TMakeProject FROM TMakeObject
    VAR C_Executable    READONLY
    VAR xHB_Executable  READONLY
    VAR RC_Executable   READONLY
+   
+   VAR C_BinFolder     INIT "bin" READONLY
+   VAR C_LibFolder     INIT "lib" READONLY   
 
    #ifdef __PLATFORM__Windows
       VAR SLY_Executable  INIT "bison.exe" READONLY
@@ -1727,8 +1738,8 @@ CLASS TMakeProject FROM TMakeObject
 
    METHOD SetIncludeFolders( cIncludeFolders )
    #ifdef __PLATFORM__Windows
-   METHOD Librarian     INLINE ::C_RootX + "bin" + DIR_SEPARATOR + ::Lib_Executable +" "
-   METHOD Linker        INLINE ::C_RootX + "bin" + DIR_SEPARATOR + ::Link_Executable +" "
+   METHOD Librarian     INLINE ::C_RootX + ::C_BinFolder + DIR_SEPARATOR + ::Lib_Executable + " "
+   METHOD Linker        INLINE ::C_RootX + ::C_BinFolder + DIR_SEPARATOR + ::Link_Executable + " "
    #else
    METHOD Librarian     INLINE ::C_RootX + "bin" + DIR_SEPARATOR + ::Lib_Executable
    METHOD Linker        INLINE ::C_RootX + "bin" + DIR_SEPARATOR + ::Link_Executable
@@ -1803,13 +1814,15 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::hPRG_EnvVars[ "PATH" ] := ::C_RootX + "bin" // NOT a typo!
 
    METHOD Set_VC( cRoot, C_Flags, LINK_Flags )    INLINE ::C_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                         ::C_BinFolder := s_sVCBinFolder, ;
+                                                         ::C_LibFolder := s_sVCLibFolder, ;
                                                          ::xHB_Executable := "harbour.exe", ;
                                                          ::C_Executable := "cl.exe", ;
                                                          ::Lib_Executable := "lib.exe", ;
                                                          ::Link_Executable := "link.exe", ;
                                                          /*::RC_Root := Left( cRoot, RAt( '\', cRoot ) ) + "Common\MSDev98\", */;
-                                                         ::RC_Root := IIF( File( s_sWinSDKFolder + "\bin\rc.exe" ), ;
-                                                                             s_sWinSDKFolder + "\", ;
+                                                         ::RC_Root := IIF( File( s_sWinSDKBinFolder + "\rc.exe" ), ;
+                                                                             s_sWinSDKBinFolder /* Do NOT add BACKSLASH! - See :RC_Binfer() / :RC_Compiler() */, ;
                                                                              ::C_Root ), ;
                                                          ::RC_Executable := "rc.exe", ;
                                                          ::RC_Flags := "-x ", ;
@@ -3519,11 +3532,12 @@ METHOD EXE_Command CLASS TMakeProject
             ::C_Libs := StrTran( ::C_Libs, "crt.lib", "crtmt.lib" )
          ENDIF
       ELSEIF ::Link_Executable == "link.exe"
-         cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + 'lib" '
-         IF Empty( s_sWinSDKFolder )
+         cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + ::C_LibFolder + '" '
+         
+         IF Empty( s_sWinSDKLibFolder )
             cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + 'PlatformSdk\lib" '
          ELSE
-            cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKFolder + '\lib" '
+            cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKLibFolder + '" '
          ENDIF
 
          IF ! Empty( s_sUniversalCRT_LibraryPath_x86 )
@@ -3664,11 +3678,11 @@ METHOD DLL_Command CLASS TMakeProject
             ::C_Libs := StrTran( ::C_Libs, "crt.lib", "crtmt.lib" )
          ENDIF
       ELSEIF ::Link_Executable == "link.exe"
-         cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + 'lib" '
-         IF Empty( s_sWinSDKFolder )
+         cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + ::C_LibFolder + '" '
+         IF Empty( s_sWinSDKLibFolder )
             cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + 'PlatformSdk\lib" '
          ELSE
-            cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKFolder + '\lib" '
+            cCommand += ::Link_LibFolderFlag + '"' + s_sWinSDKLibFolder + '" '
          ENDIF
 
          IF ! Empty( s_sUniversalCRT_LibraryPath_x86 )
@@ -4707,10 +4721,13 @@ RETURN cFolder
 INIT PROCEDURE InitTProject
    
    LOCAL sUniversalCRTSdkDir, sUCRTVersion
+   LOCAL cVSPAth, cVCVer
    
    HSetCaseMatch( s_hEnvVars, .F. )
 
    #ifdef __PLATFORM__Windows
+      s_sHostArch = GetEnv( "PROCESSOR_ARCHITECTURE" )
+   
       s_sProgramsFolder := GetEnv( "ProgramFiles(x86)" )
       IF Empty( s_sProgramsFolder ) .OR. ( ! IsDirectory( s_sProgramsFolder ) )
          s_sProgramsFolder := GetEnv( "ProgramFiles" )
@@ -4734,41 +4751,82 @@ INIT PROCEDURE InitTProject
 
       IF ! Empty( s_sProgramsFolder )
          DO CASE
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.15063.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.15063.0\" + s_sHostArch 
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.15063.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.15063.0\um\" + s_sHostArch 
+               ENDIF
+               
+            CASE File( s_sProgramsFolder + "\Windows Kits\8.1\Include\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\8.1\Include\um" + ";" + ;
+                                          s_sProgramsFolder + "\Windows Kits\8.1\Include\shared"
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\8.1\bin\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\8.1\bin\" + s_sHostArch
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\8.1\Lib\winv6.3\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\8.1\Lib\winv6.3\um\" + s_sHostArch
+               ENDIF
+               
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A"
-
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A\include"       
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v10.0A\bin"
+               
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1A\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v8.1\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1A\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.1\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0A"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0A\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0A\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v7.0\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1A"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1A\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1A\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.1\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0A\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0A"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0A\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0A\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0A\bin"
 
             CASE File( s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0\Include\windows.h" )
-               s_sWinSDKFolder := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0"
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0\include"
+               s_sWinSDKLibFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0\lib"
+               s_sWinSDKBinFolder      := s_sProgramsFolder + "\Microsoft SDKs\Windows\v6.0\bin"
 
-            OTHERWISE
-               s_sWinSDKFolder := ""
          ENDCASE
       ENDIF
 
@@ -4799,8 +4857,12 @@ INIT PROCEDURE InitTProject
 */
 
       sUniversalCRTSdkDir := GetEnv( "UniversalCRTSdkDir" )
-      
-      IF IsDirectory( sUniversalCRTSdkDir )
+      IF Empty( sUniversalCRTSdkDir )
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.15063.0\ucrt\x86"
+         ENDIF         
+      ELSEIF IsDirectory( sUniversalCRTSdkDir )
          sUCRTVersion := GetEnv( "UCRTVersion" )
          IF IsDirectory(  sUniversalCRTSdkDir + "include\" + sUCRTVersion + "\ucrt" )
             s_sUniversalCRT_IncludePath := sUniversalCRTSdkDir + "include\" + sUCRTVersion + "\ucrt"
@@ -4809,11 +4871,25 @@ INIT PROCEDURE InitTProject
             s_sUniversalCRT_LibraryPath_x86 := sUniversalCRTSdkDir + "lib\" + sUCRTVersion + "\ucrt\x86"
          ENDIF
       ENDIF
+           
+      //TraceLog(sUniversalCRTSdkDir, sUCRTVersion, s_sUniversalCRT_LibraryPath_x86)
+  
+      IF File( s_sProgramsFolder + "\Microsoft Visual Studio\Installer\vswhere.exe" )   
+         __Run( '"\Program Files\Microsoft Visual Studio\Installer\vswhere.exe" -latest -legacy -property InstallationPath > $VS-latest-path_.txt' )
       
-	  //TraceLog(sUniversalCRTSdkDir, sUCRTVersion, s_sUniversalCRT_LibraryPath_x86)
-	  
-      IF File( s_sProgramsFolder + "\Microsoft Visual Studio 15.0\VC\bin\cl.exe" )
-         s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 15.0\VC"
+         cVSPath := MemoRead( "$VS-latest-path_.txt" )
+         cVSPath := Left( cVSPath, Len(cVSPath ) - 2 )
+         
+         IF File( cVSPath + "\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt" )  
+            cVCVer := MemoRead(  cVSPath + "\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt" )         
+            cVCVer := Trim( Left( cVCVer, Len( cVCVer ) - 2 ) )
+         ENDIF
+      ENDIF
+
+      IF File( cVSPath +"\VC\Tools\MSVC\" + cVCVer + "\bin\Host" + s_sHostArch + "\" + s_sHostArch + "\cl.exe" )
+         s_sVCFolder := cVSPath +"\VC\Tools\MSVC\" + cVCVer 
+         s_sVCBinFolder := "bin\Host" + s_sHostArch + "\" + s_sHostArch
+         s_sVCLibFolder := "lib\" + s_sHostArch         
       ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 14.0\VC\bin\cl.exe" )
          s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio 14.0\VC"
       ELSEIF File( s_sProgramsFolder + "\Microsoft Visual Studio 13.0\VC\bin\cl.exe" )

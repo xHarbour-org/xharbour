@@ -1,11 +1,10 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XBScriptEnt", "XBScriptEnt.vcproj", "{C107DC60-129B-4F90-B085-CF04789F3E72}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F4ECD0EC-8AA5-43F5-9033-63E65774274C} = {F4ECD0EC-8AA5-43F5-9033-63E65774274C}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XBScriptEnt", "XBScriptEnt.vcxproj", "{C107DC60-129B-4F90-B085-CF04789F3E72}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZipArchive", "..\ZipArchive\ZipArchive_STL.vcproj", "{F4ECD0EC-8AA5-43F5-9033-63E65774274C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZipArchive", "..\ZipArchive\ZipArchive_STL.vcxproj", "{F4ECD0EC-8AA5-43F5-9033-63E65774274C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

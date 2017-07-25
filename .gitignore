@@ -5,6 +5,20 @@
 
 *.map
 
+*.bak
+
+*.sbr
+*.tlog
+*.suo
+*.db
+*.pch
+*.bsc
+*.filters
+*.db-shm
+*.db-wal
+
+$vs-latest-path_.txt
+
 xHarbour-XCC/xcc/bprint.exe
 
 xHarbour-XCC/xcc/cc.exe
@@ -203,3 +217,11 @@ xHarbour-xBuild/vc8/xharbour320.avi
 ZipArchive/ZipArchive.lib
 
 ZipArchive/zlib/ZLib.lib
+
+xHarbour-XBScript/XBScriptEnt/xbScriptAX.c
+
+xHarbour-XBScript/UpgradeLog.htm
+
+xHarbour-XBScript/Backup/XBScriptEnt.sln
+
+ZipArchive/Debug/ZipArchive_STL.lib

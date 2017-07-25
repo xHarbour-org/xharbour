@@ -82,10 +82,10 @@ mslflags = /incremental:no /pdb:none /debug /nologo /stack:0x1000000 "/libpath:$
 mslflags = /incremental:no /pdb:none /release /nologo /profile /stack:0x1000000 "/libpath:$(MSVCDIR)\LIB" $(LFLAGS)
 !ENDIF
 
-mscc = "$(MSVCDIR)\BIN\cl" $(mscflags) $(mscvars) $(mscdebug) "-I$(MSVCDIR)\include" "-I$(INCLUDEDIR)"
-msrc = "$(PSDKDIR)\BIN\rc"
-msmc = "$(PSDKDIR)\BIN\mc"
-msld = "$(MSVCDIR)\BIN\link"
+mscc = cl $(mscflags) $(mscvars) $(mscdebug) "-I$(MSVCDIR)\include" "-I$(INCLUDEDIR)"
+msrc = rc
+msmc = mc
+msld = link
 
 {cc}.c{$(MSOBJ)}.obj:
 !IFDEF MSDEBUG
