@@ -2774,7 +2774,7 @@ static PHB_ITEM hb_pureparam( int iParam, LONG iMask )
 
 HB_FUNC( SCI_SEND )
 {
-   BOOL bByRef;
+   BOOL bByRef = FALSE;
    LPARAM lParam;
    WPARAM wParam;
 
@@ -2806,10 +2806,6 @@ HB_FUNC( SCI_SEND )
             {
                bByRef = TRUE;
                pLPARAM = hb_itemUnRef( pLPARAM );
-            }
-            else
-            {
-               bByRef = FALSE;
             }
 
             if( HB_IS_STRING( pLPARAM ) )
