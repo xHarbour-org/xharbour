@@ -29,6 +29,13 @@ REM SET HB_DIR_ADS=
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\VC"   GOTO SET_VC2017EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\VC"        GOTO SET_VC2017E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\VC" GOTO SET_VC2017PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\VC"      GOTO SET_VC2017P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC"    GOTO SET_VC2017CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC"         GOTO SET_VC2017C
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
@@ -43,10 +50,58 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
    GOTO FIND_BISON
 
+:SET_VC2017EX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
+:SET_VC2017E
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
+:SET_VC2017PX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
+:SET_VC2017P
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
+:SET_VC2017CX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
+:SET_VC2017C
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
+   GOTO FIND_BISON
+
 :SET_VC2015X86
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
    IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
    GOTO FIND_BISON
 

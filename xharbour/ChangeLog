@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-07-25 02:40 UTC-0600 Ron Pinkas <ron.pinkas/at/xharbour.com>
+  * make_vc.bat
+    + Added auto detect/setup for MS VS 2017 (more generic approach using vswhere.exe was avoided because it would require wider scope changes than I was ready to perform.
+    * Fixed minor typo
 
 2017-06-28 23:22 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/tbrowse.prg
