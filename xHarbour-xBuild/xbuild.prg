@@ -109,7 +109,7 @@ FUNCTION Main( ... )
       CLS
       ? "Switches: -All (Force clean build.)"
       ? "          -B (compile with prg debug information.)"
-      ? "          -C<Bcc|Gcc|Mingw|POCC|Vc|xCC>=<RootFolder>[,C_Flags]"
+      ? "          -C<Bcc|Gcc|Mingw|POCC|Vc|xCC>[=<RootFolder>][,C_Flags]"
       ? "          -CLASSIC (link classic prg debugger)"
       ? "          -CON (direct error log to console instead of NotePad.)"
       ? "          -D<Define>[=<Value>][;<MoreDefines>]"
@@ -176,15 +176,15 @@ FUNCTION Main( ... )
                ENDIF
 
                aTokens := HB_aTokens( cArgument, '=' )
-               IF Len( aTokens ) != 2
-                  Throw( ErrorNew( "xBuild", 0, 1001, "Command Processor", "invalid number of arguments: " + cArgument, aParams ) )
+               IF Len( aTokens ) == 2
+                  C_Compiler := aTokens[1]
+                  aTokens := HB_aTokens( aTokens[2], ',' )
+                  C_Folder := aTokens[1]
+               ELSE
+                  aTokens := HB_aTokens( cArgument, ',' )
+                  C_Compiler := aTokens[1]
+                  c_Folder := "?" 
                ENDIF
-
-               C_Compiler := aTokens[1]
-
-               aTokens := HB_aTokens( aTokens[2], ',' )
-
-               C_Folder := aTokens[1]
 
                IF Len( aTokens ) >= 2
                   C_Flags := aTokens[2]
@@ -235,20 +235,20 @@ FUNCTION Main( ... )
             CASE 'g'
             CASE 'G'
                IF Lower( cArgument ) == "ui"
-									lGUI := .T.
-							 ELSE
-               		aTokens := HB_aTokens( cArgument, ',' )
-               		IF Len( aTokens ) >= 2
-               		   GUI_Root := aTokens[1]
-               		   GUI_Flags := aTokens[2]
+                           lGUI := .T.
+                      ELSE
+                     aTokens := HB_aTokens( cArgument, ',' )
+                     IF Len( aTokens ) >= 2
+                        GUI_Root := aTokens[1]
+                        GUI_Flags := aTokens[2]
 
-               		   IF Len( aTokens ) >= 3
+                        IF Len( aTokens ) >= 3
                         GUI_LibFolder := aTokens[3]
-               		   ENDIF
-               		ELSE
-               		   GUI_Root := cArgument
-               		ENDIF
-							 ENDIF
+                        ENDIF
+                     ELSE
+                        GUI_Root := cArgument
+                     ENDIF
+                      ENDIF
                EXIT
 
             CASE 'i'
@@ -633,27 +633,27 @@ FUNCTION Main( ... )
    ENDIF
 
    IF BCC != NIL
-      oProject:Set_BCC( BCC, C_Flags )
+      oProject:Set_BCC( IIF( BCC == "?", NIL, BCC ), C_Flags )
    ENDIF
 
    IF GCC != NIL
-      oProject:Set_GCC( GCC, C_Flags )
+      oProject:Set_GCC( IIF( GCC == "?", NIL, GCC ), C_Flags )
    ENDIF
 
    IF MINGW != NIL
-      oProject:Set_MINGW( MINGW, C_Flags )
+      oProject:Set_MINGW( IIF( MINGW == "?", NIL, MINGW ), C_Flags )
    ENDIF
 
    IF POCC != NIL
-      oProject:Set_POCC( POCC, C_Flags )
+      oProject:Set_POCC( IIF( POCC == "?", NIL, POCC ), C_Flags )
    ENDIF
 
    IF VC != NIL
-      oProject:Set_VC( VC, C_Flags )
+      oProject:Set_VC( IIF( VC == "?", NIL, VC ), C_Flags )
    ENDIF
 
    IF XCC != NIL
-      oProject:Set_XCC( XCC, C_Flags )
+      oProject:Set_XCC( IIF( XCC == "?", NIL, XCC ), C_Flags )
    ENDIF
 
    IF ! Empty( cIni )
@@ -682,9 +682,9 @@ FUNCTION Main( ... )
       oProject:lDebug := .T.
    ENDIF
 
-	 IF lGUI
+    IF lGUI
       oProject:lGUI := .T.
-	 ENDIF
+    ENDIF
 
    IF lMT
       oProject:lMT := .T.

@@ -28,9 +28,14 @@ STATIC s_sUniversalCRT_LibraryPath_x86 //$(UniversalCRT_LibraryPath_x86)
 
 STATIC s_sxCCFolder   := ""
 STATIC s_sBCCFolder   := ""
+
 STATIC s_sVCFolder    := ""
 STATIC s_sVCBinFolder := "bin"
 STATIC s_sVCLibFolder := "lib"
+STATIC s_sVC_CL       := "cl.exe"
+STATIC s_sVC_LIB      := "lib.exe"
+STATIC s_sVC_LINK     := "link.exe"
+
 STATIC s_sPOCCFolder  := ""
 STATIC s_sLCCFolder   := ""
 STATIC s_sGCCFolder   := ""
@@ -542,7 +547,7 @@ METHOD C_Command() CLASS TMakeObject
       IF ::Project:lMT
          cCommand += '-tWM '
       ENDIF
-   ELSEIF ::Project:C_Executable == "cl.exe"
+   ELSEIF ::Project:C_Executable == s_sVC_CL//"cl.exe"
       cCommand += '-I"' + ::Project:C_RootX + 'include" '
       IF Empty( s_sWinSDKIncludeFolders )
          cCommand += '-I"' + ::Project:C_RootX + 'PlatformSdk\Include" '
@@ -980,7 +985,7 @@ METHOD Reset() CLASS TMakeObject
                       IF Lower( ::Project:LibList ) HAS "fivehcm{0,1}.lib"
                          // Explictly specified by user.
                       ELSE
-                         IF ::Project:C_Executable == "cl.exe" .OR. ::Project:C_Executable == "xcc.exe"
+                         IF ::Project:C_Executable == s_sVC_CL/*"cl.exe"*/ .OR. ::Project:C_Executable == "xcc.exe"
                             ::Project:GUI_Libs += "FiveHCM.lib FiveHMX.lib "
                          ELSEIF ::Project:lX
                             ::Project:GUI_Libs += "FiveHC.lib FiveHX.lib "
@@ -1813,13 +1818,13 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::GUI_Flag := "-aa ", ;
                                                          ::hPRG_EnvVars[ "PATH" ] := ::C_RootX + "bin" // NOT a typo!
 
-   METHOD Set_VC( cRoot, C_Flags, LINK_Flags )    INLINE ::C_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+   METHOD Set_VC( cRoot, C_Flags, LINK_Flags, cCL, cLIB, cLINK )    INLINE ::C_Root := IIF( cRoot == NIL, s_sVCFolder, cRoot ) + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
                                                          ::C_BinFolder := s_sVCBinFolder, ;
                                                          ::C_LibFolder := s_sVCLibFolder, ;
                                                          ::xHB_Executable := "harbour.exe", ;
-                                                         ::C_Executable := "cl.exe", ;
-                                                         ::Lib_Executable := "lib.exe", ;
-                                                         ::Link_Executable := "link.exe", ;
+                                                         ::C_Executable := IIF( cCL == NIL, s_sVC_CL, cCL ), ;
+                                                         ::Lib_Executable := IIF( cLIB == NIL, s_sVC_LIB, cLib ), ;
+                                                         ::Link_Executable := IIF( cLINK == NIL, s_sVC_LINK, cLink ), ;
                                                          /*::RC_Root := Left( cRoot, RAt( '\', cRoot ) ) + "Common\MSDev98\", */;
                                                          ::RC_Root := IIF( File( s_sWinSDKBinFolder + "\rc.exe" ), ;
                                                                              s_sWinSDKBinFolder /* Do NOT add BACKSLASH! - See :RC_Binfer() / :RC_Compiler() */, ;
@@ -2700,7 +2705,7 @@ FUNCTION LoadIni( oProject )
          EXIT
 
       CASE 4
-         oProject:Set_VC( IIF( Empty( C_Root ), s_sVCFolder, C_Root ) )
+         oProject:Set_VC( IIF( Empty( C_Root ), s_sVCFolder, C_Root ), , , s_sVC_CL, s_sVC_LIB, s_sVC_LINK )
          EXIT
 
       CASE 5
@@ -3531,7 +3536,7 @@ METHOD EXE_Command CLASS TMakeProject
          IF ::lMT
             ::C_Libs := StrTran( ::C_Libs, "crt.lib", "crtmt.lib" )
          ENDIF
-      ELSEIF ::Link_Executable == "link.exe"
+      ELSEIF ::Link_Executable == s_sVC_LINK//"link.exe"
          cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + ::C_LibFolder + '" '
          
          IF Empty( s_sWinSDKLibFolder )
@@ -3577,7 +3582,7 @@ METHOD EXE_Command CLASS TMakeProject
 
       cCommand += ::C_Libs
 
-      IF ::lGUI .AND. ( ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == "link.exe" )
+      IF ::lGUI .AND. ( ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == s_sVC_LINK/*"link.exe"*/ )
          cCommand += "comctl32.lib comdlg32.lib gdi32.lib shell32.lib winmm.lib lz32.lib Netapi32.lib "
       ENDIF
 
@@ -3596,7 +3601,7 @@ METHOD DLL_Command CLASS TMakeProject
       cCommand := ::DLL_Flags
    ENDIF
 
-   IF ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == "link.exe"
+   IF ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == s_sVC_LINK//"link.exe"
       cCommand := StrTran( cCommand, "-NOEXPOBJ", "" )
 
       IF ! "-DLL" IN cCommand
@@ -3677,7 +3682,7 @@ METHOD DLL_Command CLASS TMakeProject
          IF ::lMT
             ::C_Libs := StrTran( ::C_Libs, "crt.lib", "crtmt.lib" )
          ENDIF
-      ELSEIF ::Link_Executable == "link.exe"
+      ELSEIF ::Link_Executable == s_sVC_LINK//"link.exe"
          cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + ::C_LibFolder + '" '
          IF Empty( s_sWinSDKLibFolder )
             cCommand += ::Link_LibFolderFlag + '"' + ::C_RootX + 'PlatformSdk\lib" '
@@ -3711,7 +3716,7 @@ METHOD DLL_Command CLASS TMakeProject
 
       cCommand += StrTran( Self:LibList(), ",", " " )
 
-      IF ::lGUI .AND. ( ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == "link.exe" )
+      IF ::lGUI .AND. ( ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == s_sVC_LINK/*"link.exe"*/ )
          cCommand += "comctl32.lib comdlg32.lib gdi32.lib shell32.lib winmm.lib lz32.lib "
       ENDIF
 
@@ -3829,6 +3834,23 @@ METHOD ValidateSettings() CLASS TMakeProject
          ELSEIF File( "c:\xharbour\bin\harbour.exe" )
             ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "c:\xharbour", , , "harbour.exe" )
          ENDIF
+      ELSEIF Empty( ::xHB_Root )
+         sExeFolder := GetModuleFileName()
+         nAt := RAt( '\', sExeFolder )
+         sExeFolder := Left( sExeFolder, nAt )
+
+         IF File( sExeFolder + ::xHB_Executable )
+            ::Set_xHB( Left( sExeFolder, Len( sExeFolder ) - 4 ), , , ::xHB_Executable )
+         ELSEIF ::xHB_Executable == "xhb.exe" .AND. File( "\xhb\bin\xhb.exe" )
+            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xhb", , , "xhb.exe" )
+         ELSEIF ::xHB_Executable == "xhb.exe" .AND. File( "c:\xhb\bin\xhb.exe" )
+            ::Set_xHB( "c:\xhb", , , "xhb.exe" )
+         ELSEIF ::xHB_Executable == "harbour.exe" .AND. File( "\xharbour\bin\harbour.exe" )
+            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xharbour", , , "harbour.exe" )
+         ELSEIF File( "c:\xharbour\bin\harbour.exe" )
+            ::Set_xHB( "c:\xharbour", , , "harbour.exe" )
+         ENDIF
+         
       ENDIF
 
       IF Empty( ::C_Executable )
@@ -3839,10 +3861,10 @@ METHOD ValidateSettings() CLASS TMakeProject
          ELSEIF File( s_sBCCFolder + "\bin\bcc32.exe" )
             ::Set_BCC( s_sBCCFolder )
          ELSEIF File( s_sVCFolder + "\bin\cl.exe" )
-            ::Set_VC( s_sVCFolder )
+            ::Set_VC( s_sVCFolder, , , s_sVC_CL, s_sVC_LIB, s_sVC_LINK )
          ELSEIF File( s_sPOCCFolder + "\bin\pocc.exe" )
             ::Set_POCC( s_sPOCCFolder )
-         ELSEIF File( s_sLCCFolder + "\bin\cl.exe" )
+         ELSEIF File( s_sLCCFolder + "\bin\lcc.exe" )
             ::Set_LCC( s_sLCCFolder )
          ELSEIF File( s_sGCCFolder + "\bin\gcc.exe" )
             ::Set_GCC( s_sGCCFolder )
@@ -4439,7 +4461,6 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
                IF File( c + ":\lcc\bin\lcc.exe" )
                   s_sLCCFolder := c + ":\lcc"
                   C_Root := Pad( s_sLCCFolder, Len( C_Root ) )
-
                   EXIT
                ENDIF
             ENDIF
@@ -4466,8 +4487,7 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
       CASE C_Compiler == "MSVC"
          IF File( s_sVCFolder + "\bin\cl.exe" )
             C_Root := Pad( s_sVCFolder, Len( C_Root ) )
-
-            RETURN .T.
+           RETURN .T.
          ENDIF
 
    ENDCASE
@@ -4885,7 +4905,7 @@ INIT PROCEDURE InitTProject
             cVCVer := Trim( Left( cVCVer, Len( cVCVer ) - 2 ) )
          ENDIF
       ENDIF
-
+      
       IF File( cVSPath +"\VC\Tools\MSVC\" + cVCVer + "\bin\Host" + s_sHostArch + "\" + s_sHostArch + "\cl.exe" )
          s_sVCFolder := cVSPath +"\VC\Tools\MSVC\" + cVCVer 
          s_sVCBinFolder := "bin\Host" + s_sHostArch + "\" + s_sHostArch
@@ -4910,15 +4930,24 @@ INIT PROCEDURE InitTProject
          s_sVCFolder := s_sProgramsFolder + "\Microsoft Visual Studio\VC98"
       ENDIF
 
+#if 0
+      IF ( ! Empty( GetEnv( "CLANG-CL" ) ) .AND. File( s_sProgramsFolder + "\llvm\bin\clang-cl.exe" )
+         s_sVCFolder := s_sProgramsFolder + "\llvm"
+         s_sVC_CL   := "clang-cl.exe"
+         s_sVC_LIB  := "llvm-lib.exe"
+         s_sVC_LINK := "lld-link.exe"
+      ENDIF
+#endif
+
       IF File( s_sProgramsFolder + "\PellesC\bin\pocc.exe" )
          s_sPOCCFolder := s_sProgramsFolder + "\PellesC"
       ELSEIF File( "\PellesC\bin\pocc.exe" )
          s_sPOCCFolder := DiskName() + DRIVE_SEPARATOR + "\PellesC"
       ENDIF
 
-      IF File( "\lcc\bin\cl.exe" )
+      IF File( "\lcc\bin\lcc.exe" )
          s_sLCCFolder := DiskName() + DRIVE_SEPARATOR + "\lcc"
-      ELSEIF File( "c:\lcc\bin\cl.exe" )
+      ELSEIF File( "c:\lcc\bin\lcc.exe" )
          s_sLCCFolder := "c:\lcc"
       ENDIF
 
@@ -4926,7 +4955,7 @@ INIT PROCEDURE InitTProject
          s_sGCCFolder := DiskName() + DRIVE_SEPARATOR + "\djgpp\bin"
       ELSEIF File( "c:\djgpp\bin\gcc.exe" )
          s_sGCCFolder := "c:\djgpp\bin"
-         ENDIF
+      ENDIF
 
    #endif
 
