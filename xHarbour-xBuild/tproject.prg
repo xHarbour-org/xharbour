@@ -4741,7 +4741,7 @@ RETURN cFolder
 INIT PROCEDURE InitTProject
    
    LOCAL sUniversalCRTSdkDir, sUCRTVersion
-   LOCAL cVSPAth, cVCVer
+   LOCAL cVSPAth:="", cVCVer:=""
    
    HSetCaseMatch( s_hEnvVars, .F. )
 
