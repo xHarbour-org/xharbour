@@ -1087,7 +1087,7 @@ HB_ERRCODE hb_memvarGet( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
 
    OutputDebugValues( "MEMVAR GET: %s %p\n", pMemvarSymb->szName, pMemvarSymb->pDynSym );
 
-   HB_VALUE_PTR s_globalTable = *hb_memvarValueBaseAddress();
+   PHB_VALUE s_globalTable = *hb_memvarValueBaseAddress();
 
    pDyn = pMemvarSymb->pDynSym;
 
@@ -1099,7 +1099,7 @@ HB_ERRCODE hb_memvarGet( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
       {
          /* value is already created
           */
-         HB_ITEM_PTR pGetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
+         PHB_ITEM pGetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
          if( HB_IS_BYREF( pGetItem ) )
          {
@@ -1165,7 +1165,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, PHB_ITEM pItem )
 
    OutputDebugValues( "hb_memvarSetValue(%s)\n", pMemvarSymb->szName );
 
-   HB_VALUE_PTR s_globalTable = *hb_memvarValueBaseAddress();
+   PHB_VALUE s_globalTable = *hb_memvarValueBaseAddress();
 
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
 
@@ -1176,7 +1176,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, PHB_ITEM pItem )
       if( pDyn->hMemvar )
       {
          /* value is already created */
-         HB_ITEM_PTR pSetItem;
+         PHB_ITEM pSetItem;
 
          pSetItem = s_globalTable[ pDyn->hMemvar ].pVarItem;
 
@@ -1243,13 +1243,13 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, PHB_ITEM pItem )
    }
 }
 
-void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
+void hb_memvarGetValue( PHB_ITEM pItem, PHB_SYMB pMemvarSymb )
 {
    OutputDebugValues( "hb_memvarGetValue(%s)\n", pMemvarSymb->szName );
 
    if( hb_memvarGet( pItem, pMemvarSymb ) == FAILURE )
    {
-	  HB_ERROR_INFO_PTR pHandler = hb_errorHandler( NULL );
+	  PHB_ERROR_INFO pHandler = hb_errorHandler( NULL );
 
       if( pHandler )
 	  {
@@ -1262,7 +1262,7 @@ void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
        * (user created error handler can create this variable)
        */
       USHORT uiAction = E_RETRY;
-      HB_ITEM_PTR pError;
+      PHB_ITEM pError;
 
       OutputDebugValues( "*** RAISING Error for (%s)\n", pMemvarSymb->szName );
 

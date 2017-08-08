@@ -16,7 +16,9 @@
 #define CASERRORHANDLER
 #include "activeDepends.h"
 
+#ifndef SCRIPT_E_REPORTED
 #define SCRIPT_E_REPORTED 0x80020101
+#endif
 
 extern CASInterpreter *g_ActiveInterpreter;
 
