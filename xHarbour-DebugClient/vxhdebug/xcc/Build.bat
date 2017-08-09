@@ -1,0 +1,1 @@
+C:\xhb\bin\XBUILD.EXE xDebugW.exe.xbp
