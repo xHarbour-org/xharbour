@@ -88,7 +88,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>VM.LIB;RTL.LIB;COMMON.LIB;MACRO.LIB;PP.LIB;LANG.LIB;RDD.LIB;DBFNTX.LIB;DBFCDX.LIB;DBFFPT.LIB;ZLIB.LIB;pcrepos.lib;hbSix.lib;CT.lib;mpr.lib;rddads.lib;ace32.lib;\xhb\lib\vc8\rmdbfcdx.lib;\xharbour.com\ZipArchive\Release\ZipArchive_STL.lib;\xbp\vc8\xhbZipDll.dll\Zip_C.obj;\xhb\lib\vc8\xHBZip.lib;\xhb\lib\vc8\sql.lib;\xhb\lib\oci.lib;\xhb\lib\libmysql.lib;\xhb\lib\libpq.lib;\xhb\lib\fbclient_ms.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VM.LIB;RTL.LIB;COMMON.LIB;MACRO.LIB;PP.LIB;LANG.LIB;RDD.LIB;DBFNTX.LIB;DBFCDX.LIB;DBFFPT.LIB;ZLIB.LIB;pcrepos.lib;hbSix.lib;CT.lib;mpr.lib;rddads.lib;ace32.lib;\xhb\lib\vc8\rmdbfcdx.lib;\xharbour.com\ZipArchive\Release\ZipArchive_STL.lib;\xhb\lib\vc8\xHBZip.lib;\xhb\lib\vc8\sql.lib;\xhb\lib\oci.lib;\xhb\lib\libmysql.lib;\xhb\lib\libpq.lib;\xhb\lib\fbclient_ms.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <Version />
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -241,7 +241,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="c:\xharbour.com\xHarbour-HBZlib\xhbzipdll\zip_c.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\xHarbour.com\ZipArchive;Active Script Engine;\xharbour\include;\xhb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">c:\xHarbour.com\ZipArchive;Active Script Engine;\xharbour\include;\xhb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
