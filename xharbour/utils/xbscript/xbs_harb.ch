@@ -544,6 +544,8 @@
   #ifdef WIN
     FUNCTION Alert( cMsg, aOptions )
 
+	(aOptions)
+
     RETURN MessageBox( 0, CStr( cMsg ), "XBScript", 0 )
   #endif
 
