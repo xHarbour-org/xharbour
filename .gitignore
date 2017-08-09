@@ -238,12 +238,11 @@ xHarbour-XBScript/UpgradeLog3.htm
 
 xHarbour-XBScript/Backup2/XBScriptPro.sln
 
-xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.dll
-
-xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.lib
+xHarbour-XBScript/XBScriptPro/xbScriptAX.c
 
 xHarbour-XBScript/XBScriptPro/xbscript.c
 
-xHarbour-XBScript/XBScript/xbscript.c
 
-xHarbour-XBScript/XBScriptPro/xbScriptAX.c
+xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.lib
+
+xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.dll

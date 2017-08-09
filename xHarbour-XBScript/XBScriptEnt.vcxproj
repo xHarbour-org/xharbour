@@ -140,10 +140,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>VM.LIB;RTL.LIB;COMMON.LIB;MACRO.LIB;PP.LIB;LANG.LIB;RDD.LIB;DBFNTX.LIB;DBFCDX.LIB;DBFFPT.LIB;ZLIB.LIB;pcrepos.lib;hbSix.lib;CT.lib;mpr.lib;rddads.lib;ace32.lib;\xhb\lib\vc8\rmdbfcdx.lib;\xbp\vc8\xhbZipDll.dll\Zip_C.obj;\xhb\lib\vc8\xHBZip.lib;\xharbour.com\ZipArchive\Debug\ZipArchive_STL.lib;\xHB\lib\vc8\sql.lib;\xhb\lib\oci.lib;\xhb\lib\libmysql.lib;\xhb\lib\libpq.lib;\xhb\lib\fbclient_ms.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VM.LIB;RTL.LIB;COMMON.LIB;MACRO.LIB;PP.LIB;LANG.LIB;RDD.LIB;DBFNTX.LIB;DBFCDX.LIB;DBFFPT.LIB;ZLIB.LIB;pcrepos.lib;hbSix.lib;CT.lib;mpr.lib;rddads.lib;ace32.lib;\xhb\lib\vc8\rmdbfcdx.lib;\xhb\lib\vc8\xHBZip.lib;\xharbour.com\ZipArchive\Debug\ZipArchive_STL.lib;\xHB\lib\vc8\sql.lib;\xhb\lib\oci.lib;\xhb\lib\libmysql.lib;\xhb\lib\libpq.lib;\xhb\lib\fbclient_ms.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>\XHARBOUR\LIB\VC;C:\Program Files\Advantage 9.10\acesdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\XHARBOUR\LIB\VC;C:\Program Files\Advantage 11.10\acesdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <ModuleDefinitionFile>.\XBScript.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -170,8 +170,6 @@
     <ClInclude Include="Active Script Engine\NamedItem.h" />
     <ClInclude Include="Active Script Engine\TList.h" />
     <ClInclude Include="DLLFunctions.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resourceEnt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\xHarbour-OLEServer\source\oleserver.c">
@@ -242,9 +240,9 @@
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)</ProgramDataBaseFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Readme.txt" />
+    <ClCompile Include="\\vboxsvr\Documents\xHarbourBuilder\xHarbour-HBZlib\xhbzipdll\zip_c.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\xHarbour.com\ZipArchive;Active Script Engine;\xharbour\include;\xhb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\xharbour\utils\xbscript\xbscript.prg">
@@ -298,9 +296,6 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\$(ProjectName)\%(Filename).c;%(Outputs)</Outputs>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="XBScriptEnt.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZipArchive\ZipArchive_STL.vcxproj">
