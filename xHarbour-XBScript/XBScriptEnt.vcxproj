@@ -240,7 +240,7 @@
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)</ProgramDataBaseFileName>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="\\vboxsvr\Documents\xHarbourBuilder\xHarbour-HBZlib\xhbzipdll\zip_c.cpp">
+    <ClCompile Include="c:\xharbour.com\xHarbour-HBZlib\xhbzipdll\zip_c.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\xHarbour.com\ZipArchive;Active Script Engine;\xharbour\include;\xhb\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
