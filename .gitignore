@@ -218,31 +218,21 @@ ZipArchive/ZipArchive.lib
 
 ZipArchive/zlib/ZLib.lib
 
-xHarbour-XBScript/XBScriptEnt/xbScriptAX.c
-
 xHarbour-XBScript/UpgradeLog.htm
 
 xHarbour-XBScript/Backup/XBScriptEnt.sln
 
 ZipArchive/Debug/ZipArchive_STL.lib
 
-xHarbour-XBScript/XBScript/Debug/Obj/RCa03296
-
-xHarbour-XBScript/XBScript/Debug/Obj/RCa07556
+xHarbour-XBScript/XBScript/Debug/Obj/
 
 xHarbour-XBScript/UpgradeLog2.htm
-
-xHarbour-XBScript/XBScript/Debug/Obj/RCa05644
 
 xHarbour-XBScript/UpgradeLog3.htm
 
 xHarbour-XBScript/Backup2/XBScriptPro.sln
 
-xHarbour-XBScript/XBScriptPro/xbScriptAX.c
-
-xHarbour-XBScript/XBScriptPro/xbscript.c
-
-
-xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.lib
-
-xHarbour-XBScript/XBScriptPro/Debug/XBScriptPro.dll
+xbScript.c
+xbScriptAX.c
+xbScript*.dll
+xbScript*.lib
