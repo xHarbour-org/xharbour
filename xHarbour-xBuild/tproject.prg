@@ -4895,7 +4895,7 @@ INIT PROCEDURE InitTProject
       //TraceLog(sUniversalCRTSdkDir, sUCRTVersion, s_sUniversalCRT_LibraryPath_x86)
   
       IF File( s_sProgramsFolder + "\Microsoft Visual Studio\Installer\vswhere.exe" )   
-         __Run( '"\Program Files\Microsoft Visual Studio\Installer\vswhere.exe" -latest -legacy -property InstallationPath > $VS-latest-path_.txt' )
+         __Run( '"' + s_sProgramsFolder + '\Microsoft Visual Studio\Installer\vswhere.exe" -latest -legacy -property InstallationPath > $VS-latest-path_.txt' )
       
          cVSPath := MemoRead( "$VS-latest-path_.txt" ) ; FErase( "$VS-latest-path_.txt" )
          cVSPath := Left( cVSPath, Len(cVSPath ) - 2 )
