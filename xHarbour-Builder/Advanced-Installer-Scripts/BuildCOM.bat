@@ -16,9 +16,9 @@
 
     SET ROBOCOPY_XD=Help
     SET ROBOCOPY_XF=uninst.exe
-    ROBOCOPY "C:\Program Files\PellesC" "C:\Program Files\PellesC" *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
+    ROBOCOPY "%ProgramFiles%\PellesC" "%ProgramFiles%\PellesC" *.* /XO /NS /NC /NP /S /E /PURGE /XF %ROBOCOPY_XF% /XD %ROBOCOPY_XD%
 
-    ROBOCOPY "C:\Program Files\Advantage 11.10\acesdk" "C:\Program Files\Advantage 11.10\acesdk" *.* /XO /NS /NC /NP /S /E /PURGE /XF
+    ROBOCOPY "%ProgramFiles%\Advantage 11.10\acesdk" "%ProgramFiles%\Advantage 11.10\acesdk" *.* /XO /NS /NC /NP /S /E /PURGE /XF
 
     C:
     

@@ -1,5 +1,5 @@
 @ECHO OFF
-SET HB_DIR_ADS=C:\Program Files\Advantage 9.10\acesdk
+SET HB_DIR_ADS=%ProgramFiles%\Advantage 11.10\acesdk
 
 SET HB_DIR_OPENSSL=C:\OPENSSL
 SET TIPSSL=1

@@ -4,8 +4,7 @@ SET CFLAGS=/Od /EHsc /RTC1 /MTd /Gs /GS /Gy /GR /Zi /DHB_FM_STATISTICS /D_CRT_SE
 SET LFLAGS=-DEBUG -DEBUGTYPE:CV
 SET __MSC__=14
 
-IF EXIST "\Program Files\Advantage 11.10\acesdk" SET HB_DIR_ADS=\Program Files\Advantage 11.10\acesdk
-IF EXIST "\Program Files (x86)\Advantage 11.10\acesdk" SET HB_DIR_ADS=\Program Files (x86)\Advantage 11.10\acesdk
+IF EXIST "%ProgramFiles%\Advantage 11.10\acesdk" SET HB_DIR_ADS=%ProgramFiles%\Advantage 11.10\acesdk
 
 SET HB_DIR_OPENSSL=\OpenSSL-Win32
 
