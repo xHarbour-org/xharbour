@@ -13,6 +13,7 @@ CD \xHarbour
     IF NOT EXIST "%_XHARBOUR_XBP%\lib\vc8" MD "%_XHARBOUR_XBP%\lib\vc8"
     IF NOT EXIST "%_XHARBOUR_XBP_DEMO%"    MD "%_XHARBOUR_XBP_DEMO%"
     IF NOT EXIST "%_XHARBOUR_XBP_PERS%"    MD "%_XHARBOUR_XBP_PERS%"
+    IF NOT EXIST \xHB\c_lib\Win            MD \xHB\c_lib\Win
 
 IF "%_XB_Compiler%"=="vc8" XCOPY \xHarbour\bin\vc\harbour.dll  \xHb\bin\vc8 /d /y /i
 IF "%_XB_Compiler%"=="bc5" XCOPY \xHarbour\bin\b32\harbour.dll \xHb\bin\bc5 /d /y /i
