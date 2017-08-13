@@ -262,6 +262,7 @@ METHOD ListCatTables( cOwner )   CLASS SR_CONNECTION
       aRet := ::DriverCatTables()
       exit
    Case SYSTEMID_FIREBR
+   Case SYSTEMID_FIREBR3   
       If empty( cOwner )
          ::exec( "select RDB$RELATION_NAME from RDB$RELATIONS where RDB$FLAGS = 1 order by RDB$RELATION_NAME", .T., .T., @aRet )
       Else
@@ -732,7 +733,11 @@ METHOD DetectTargetDb() CLASS SR_CONNECTION
    Case "MARIADB" $ cTargetDB
       ::nSystemID := SYSTEMID_MARIADB
    Case "FIREBIRD" $ cTargetDb .or. "INTERBASE" $ cTargetdb
-      ::nSystemID := SYSTEMID_FIREBR
+      ::nSystemID := SYSTEMID_FIREBR 
+      aVers := hb_atokens( ::cSystemVers , '.' ) 
+      IF val(aVers[1]) >= 3
+         ::nSystemID := SYSTEMID_FIREBR3
+      Endif
    Case "INTERSYSTEMS CACHE" $ cTargetDb
       ::nSystemID := SYSTEMID_CACHE
       ::lComments := .F.
@@ -1026,7 +1031,7 @@ METHOD Connect( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrace,;
             ::cCharSet := aToken[2]
          Case cBuff == "AUTOCOMMIT"
             ::nAutoCommit := Val( aToken[2] )
-         Case cBuff == "DTB".or. cBuff == "FB" .or. cBuff == "FIREBIRD" .or. cBuff == "IB" .or. cBuff == "TNS" .or. cBuff == "DATABASE"
+         Case cBuff == "DTB" .or. cBuff == "FB" .or. cBuff == "FIREBIRD" .or. cBuff == "FB3" .or. cBuff == "FIREBIRD3" .or. cBuff == "IB" .or. cBuff == "TNS" .or. cBuff == "DATABASE"
             ::cDTB   += aToken[2]
          Case cBuff == "TABLESPACE_DATA"
             ::cDsnTblData := aToken[2]
@@ -1105,7 +1110,7 @@ METHOD SQLType( nType, cName, nLen ) CLASS SR_CONNECTION
    case nType == SQL_DATE .or. nType == SQL_TYPE_DATE
       cType = "D"
    case nType == SQL_TIME
-      if (::nSystemID == SYSTEMID_POSTGR .or. ::nSystemID == SYSTEMID_MYSQL  .or. ::nSystemID == SYSTEMID_MARIADB .or. ::nSystemID == SYSTEMID_FIREBR )
+      if (::nSystemID == SYSTEMID_POSTGR .or. ::nSystemID == SYSTEMID_MYSQL  .or. ::nSystemID == SYSTEMID_MARIADB .or. ::nSystemID == SYSTEMID_FIREBR .or. ::nSystemID == SYSTEMID_FIREBR3  )
          cType := "T"
       else
          cType := "C"

@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-04-04 14:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
+   ! source/utils.prg
+     ! adjust SR_SubQuoted to add E to string under postgresql
+   ! source/sqlrdd2.prg
+     ! adjust WriteBuffer to add E to string under postgresql when creating string ( E is escape on postgresql )
+
 2015-09-18 22:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/sqlora.c
      ! Added missing cast

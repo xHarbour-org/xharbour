@@ -326,6 +326,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
                Exit
             CASE SYSTEMID_IBMDB2
             CASE SYSTEMID_FIREBR
+            CASE SYSTEMID_FIREBR3
             CASE SYSTEMID_POSTGR
                cSql += "CURRENT_DATE "
                Exit
@@ -453,6 +454,7 @@ Static Function SR_SQLCodeGen2( apCode, aParam, nSystemId, lIdent, nIP, nContext
                cSql += "TOP " + ltrim(str(uData)) + " "
                Exit
             Case SYSTEMID_FIREBR
+            Case SYSTEMID_FIREBR3
             Case SYSTEMID_INFORM
                cSql += "FIRST " + ltrim(str(uData)) + " "
                Exit
@@ -1188,7 +1190,7 @@ Function SR_SQLQuotedString( uData, nSystemID, lNotNull )
       return (['] + SR_dtoUS(uData) + ['])
    Case cType == "D" .and. nSystemID == SYSTEMID_INGRES
       return (['] + SR_dtoDot(uData) + ['])
-   Case cType == "D" .and. nSystemID == SYSTEMID_FIREBR
+   Case cType == "D" .and. (nSystemID == SYSTEMID_FIREBR .or. nSystemID == SYSTEMID_FIREBR3)
       return [']+transform(DtoS(uData) ,'@R 9999/99/99')+[']
    Case cType == "D" .and. nSystemID == SYSTEMID_CACHE
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]

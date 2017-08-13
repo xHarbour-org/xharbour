@@ -257,6 +257,7 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
       Next
       IF Len( aDirect ) > 0 .and.;
        ( oWA:oSql:nSystemID == SYSTEMID_FIREBR .or. ;
+         oWA:oSql:nSystemID == SYSTEMID_FIREBR3 .or. ;
          oWA:oSql:nSystemID == SYSTEMID_MYSQL  .or. ;
          oWA:oSql:nSystemID == SYSTEMID_MARIADB  .or. ;
          oWA:oSql:nSystemID == SYSTEMID_ORACLE .or. ;
@@ -466,7 +467,7 @@ Static Function SR_SubQuoted( cType, uData, nSystemID )
    Case cType $ "CM" .and. nSystemID == SYSTEMID_MSSQL7
       return ['] + rtrim(strtran(uData,"'",[']+['])) + [']
    Case cType $ "CM" .and. nSystemID == SYSTEMID_POSTGR
-      return ['] + strtran(rtrim(strtran(uData,"'",[']+['])), "\","\\") + [']
+      return [E'] + strtran(rtrim(strtran(uData,"'",[']+['])), "\","\\") + [']
    Case cType $ "CM"
       return ['] + rtrim(strtran(uData,"'","")) + [']
    Case cType == "D" .and. nSystemID == SYSTEMID_ORACLE
@@ -479,15 +480,16 @@ Static Function SR_SubQuoted( cType, uData, nSystemID )
       return ['] + SR_dtoUS(uData) + [']
    Case cType == "D" .and. nSystemID == SYSTEMID_INGRES
       return ['] + SR_dtoDot(uData) + [']
-   Case cType == "D" .and. nSystemID == SYSTEMID_FIREBR
+   Case cType == "D" .and. (nSystemID == SYSTEMID_FIREBR .or. nSystemID == SYSTEMID_FIREBR3)
       return [']+transform(DtoS(uData) ,'@R 9999/99/99')+[']
+
    Case cType == "D" .and. nSystemID == SYSTEMID_CACHE
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
    Case cType == "D"
       return ['] + dtos(uData) + [']
    Case cType == "N"   
       return ltrim(str(uData))
-   Case cType == "L" .and. nSystemID == SYSTEMID_POSTGR
+   Case cType == "L" .and. (nSystemID == SYSTEMID_POSTGR .or. nSystemID == SYSTEMID_FIREBR3 ) 
       return if(uData,"true","false")
    Case cType == "L" .and. nSystemID == SYSTEMID_INFORM
       return if(uData,"'t'","'f'")      

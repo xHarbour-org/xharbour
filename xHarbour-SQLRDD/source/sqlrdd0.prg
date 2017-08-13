@@ -394,6 +394,14 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect2 := &( "SR_FIREBIRD()" )
 #endif
       Exit
+   Case CONNECT_FIREBIRD3
+   Case CONNECT_FIREBIRD3_NOEXLOCK
+#ifndef MYSQLRDD
+      oConnect  := &( "SR_FIREBIRD3()" )
+      oConnect2 := &( "SR_FIREBIRD3()" )
+#endif
+      Exit
+
    Case CONNECT_MARIA
    Case CONNECT_MARIA_NOEXLOCK
 #ifndef MYSQLRDD
@@ -668,6 +676,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
          Exit
 
       Case SYSTEMID_FIREBR
+      Case SYSTEMID_FIREBR3
 //         oCnn:exec( "SET TERM !@¨§;", .f. )
          oCnn:Commit()
          Exit
@@ -822,6 +831,7 @@ Static Function SR_SetEnvSQLRDD( oConnect )
       Case SYSTEMID_INGRES
       Case SYSTEMID_INFORM
       Case SYSTEMID_FIREBR
+      Case SYSTEMID_FIREBR3
          oConnect:exec( "CREATE TABLE " + SR_GetToolsOwner() + "SR_MGMNTLOCKS (LOCK_ CHAR(250) NOT NULL UNIQUE, WSID_ CHAR(250) NOT NULL, SPID_ DECIMAL(8), LOGIN_TIME_ TIMESTAMP )",.F. )
          Exit
       DEFAULT
@@ -2052,6 +2062,8 @@ Function SR_DetectDBFromDSN( cConnect )
          Return CONNECT_MARIA
       Case cBuff == "FB" .or. cBuff == "FIREBIRD" .or. cBuff == "IB"
          Return CONNECT_FIREBIRD
+      Case cBuff == "FB3" .or. cBuff == "FIREBIRD3"
+         Return CONNECT_FIREBIRD3         
       Case cBuff == "DSN" .or. cBuff == "DRIVER"
          Return CONNECT_ODBC
       EndCase

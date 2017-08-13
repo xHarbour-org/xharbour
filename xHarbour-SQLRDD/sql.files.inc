@@ -19,6 +19,7 @@
 [source\sqlpgs.prg]
 
 [source\sqlfirebird.prg]
+[source\sqlfirebird3.prg]
 
 [source\sqloracle.prg]
 
@@ -38,6 +39,7 @@
 MYDEFINES = HB_API_MACROS
 
 [source\firebird.c]
+[source\firebird3.c]
 
 [source\sqllex.c]
 
