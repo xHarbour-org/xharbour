@@ -8,6 +8,8 @@ SET VC8_DEBUG=YES
 SET VC8_DEMO=NO
 SET VC8_PERSONAL=NO
 
+ATTRIB +R \xHarbour.com\xbuild*.ini /S
+
 CALL \xharbour.com\xharbour-builder\xbldfull.bat %1
 
 CD \xharbour
