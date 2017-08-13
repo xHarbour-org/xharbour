@@ -16,7 +16,6 @@ METHOD Init( oParent, aParameters ) CLASS __DataGrid
 
    // Populate Components
    // Properties declaration
-   ::Version              := "2.1.0.0"
    ::Resources            := {  }
 
    ::Create()

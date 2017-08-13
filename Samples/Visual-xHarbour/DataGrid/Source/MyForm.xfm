@@ -95,7 +95,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
       END
 
       :Left                 := 8
-      :Top                  := 302
+      :Top                  := 304
       :Width                := 234
       :Height               := 17
       :Text                 := "http://www.xHarbour.com/TrainingCenter/"
@@ -112,9 +112,7 @@ METHOD Init( oParent, aParameters ) CLASS MyForm
          :Bottom               := "LinkWebsite"
       END
 
-      :Left                 := 1
-      :Top                  := 1
-      :Width                := 569
+      :Width                := 575
       :Height               := 300
       :HighlightColor       := 13407857
       :HighlightTextColor   := 16777215
