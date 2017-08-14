@@ -71,7 +71,7 @@ REM --> Cleanup for -ALL
     REM We will use only \xharbour\lib\vc or bc5 so make sure that's the case
     REM when done using make_vc all or make_b32 all will quickly copy them back!
     DEL \xharbour\lib\*.lib
-REM COPY \xharbour\lib\vc\*.lib \xharbour\lib\*.lib
+    COPY \xharbour\lib\vc\*.lib \xharbour\lib\*.lib
 
     REM Clean up XBP
     RD \xbp /S /Q
