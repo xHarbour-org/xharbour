@@ -1,7 +1,7 @@
 DEL C:\xHB-SetupFiles\xHB.back*.aip /Q
 
 REM SET XHBTO=C:\xHB-SetupFiles\xHB-%1
-    SET XHBTO=D:\xHB-Files
+    SET XHBTO=C:\Temp\xHB-Files
 
     C:
     RD "%XHBTO%" /S /Q
@@ -91,8 +91,10 @@ REM ===============================================
     SET RC_Exclude_Folder=CVS CVSROOT .SVN
     ROBOCOPY "\xHarbour\contrib\gd\doc" "%RC_To%\GD" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
-    COPY "%XHB-DOC%\Getting-Started.pdf" "%RC_To%\Getting Started with xHarbour Builder.pdf"
+    COPY "%XHB-DOC%\Getting-Started.pdf"                             "%RC_To%\Getting Started with xHarbour Builder.pdf"
     COPY "%XHB-DOC%\VXH Getting Started 1.0\VXH-Getting-Started.pdf" "%RC_To%\Getting Started with Visual xHarbour.pdf"
+    COPY "%XHB-DOC%\Visual-xHarbour.chm"                             "%RC_To%\Visual-xHarbour.chm"
+
     COPY "\xHarbour.com\xHarbour-Builder\Wise Install Scripts (xHBDocs)\Files\xHarbour Language Reference Guide.chm" "%RC_To%"
 
     COPY "\xHarbour\xDiff.txt"         "%RC_To%"

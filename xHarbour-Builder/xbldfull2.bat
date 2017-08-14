@@ -16,7 +16,6 @@ CD \xHarbour
     IF NOT EXIST \xHB\c_lib\Win            MD \xHB\c_lib\Win
 
 IF "%_XB_Compiler%"=="vc8" XCOPY \xHarbour\bin\vc\harbour.dll  \xHb\bin\vc8 /d /y /i
-IF "%_XB_Compiler%"=="bc5" XCOPY \xHarbour\bin\b32\harbour.dll \xHb\bin\bc5 /d /y /i
 
 IF "%_XB_Compiler%"=="xcc" GOTO No_MakeFolders
    IF NOT EXIST \xhb\bin\%_XB_Compiler% MD \xhb\bin\%_XB_Compiler%
@@ -44,7 +43,7 @@ REM  ===============================================
      IF EXIST \xhb\bin\xbuild.exe GOTO No_xBuild    
         CD \xHarbour.com\xHarbour-xBuild\ 
         CALL \xharbour\bin\bld_vc xbuild tproject tproject-c
-        XCOPY xbuild.exe \xhb\bin
+        COPY xbuild.exe \xhb\bin /y
      :No_xBuild
 
 REM  ===============================================
@@ -235,7 +234,6 @@ REM --> BGD.lib
         CD "\xHarbour.com\xHarbour-Builder"
         IF "%XBUILD_XCC%"=="YES" \xhb\bin\XLIB \xhb\dll\BGD.dll /out:\xhb\lib\BGD.lib
         IF "%XBUILD_VC8%"=="YES" XCOPY BGD.lib \xhb\lib\vc8 /d /y
-        IF "%XBUILD_BC5%"=="YES" XCOPY BGD.lib \xhb\lib\bc5 /d /y
 
 REM --> ADS.lib
         IF "%_BUILD_ADS%"=="NO" GOTO No_ADS
@@ -248,8 +246,6 @@ REM --> ADS.lib
         IF "%XBUILD_VC8%"=="YES" XCOPY \xhb\dll\ADS\ace32.dll \xhb\bin\vc8 /d /y
         IF "%XBUILD_VC8%"=="YES" XCOPY "%HB_DIR_ADS%\ace32.lib" \xhb\lib\vc8 /d /y
 
-        IF "%XBUILD_BC5%"=="YES" XCOPY \xhb\dll\ADS\ace32.dll \xhb\bin\bc5 /d /y
-        IF "%XBUILD_BC5%"=="YES" XCOPY \xharbour\lib\bc5\ace32.lib \xhb\lib\bc5
         :No_ADS
 
 REM --> xbScript.lib
@@ -276,10 +272,8 @@ REM        \xhb\bin\XBUILD.EXE xEdit.lib.xbp        %_XB_Debug% %1
         :No_xEditLIB
 
 REM --> WinCore.lib
-        IF "%_XB_Compiler%"=="bc5" GOTO No_WinCore.LIB
            CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
            \xhb\bin\XBUILD.EXE WinCore.lib.xbp %_XB_Debug% %1
-        :No_WinCore.LIB
 
 REM --> WinApi.LIB
         IF "%_BUILD_WINAPI.LIB%"=="NO" GOTO No_WinApi.LIB
@@ -646,7 +640,6 @@ REM --> xEditW
 
 IF "%XBUILD_XCC%"=="YES" GOTO CleanXCC
 IF "%XBUILD_VC8%"=="YES" GOTO CleanVC8
-IF "%XBUILD_BC5%"=="YES" GOTO CleanBC5
 
 :CleanXCC
  DEL \xHB\Bin\*.MAP /Q
@@ -674,16 +667,5 @@ GOTO Done
  DEL \xHB\Dll\vc8\*.EXP /Q
 GOTO Done
 
-:CleanBC5
- DEL \xHB\Bin\*.MAP /Q
- DEL \xHB\Bin\*.EXP /Q
- DEL \xHB\Bin\Demo\*.MAP /Q
- DEL \xHB\Bin\Demo\*.EXP /Q
- DEL \xHB\Bin\Personal\*.MAP /Q
- DEL \xHB\Bin\Personal\*.EXP /Q
- DEL \xHB\Bin\Professional\*.MAP /Q
- DEL \xHB\Bin\Professional\*.EXP /Q
- DEL \xHB\Dll\*.MAP /Q
- DEL \xHB\Dll\*.EXP /Q
 
 :Done

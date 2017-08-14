@@ -1,26 +1,19 @@
-ECHO OFF
-
-REM --> Lets time this build
-    TIME /T > xbldfull.log
-
+@ECHO OFF
 
 REM --> Save Environment
     SET _PATH=%PATH%
-REM SET _DJGPP=%DJGPP%
     SET _INCLUDE=%INCLUDE%
     SET _LIB=%LIB%
 
-
 REM --> Set Environment
-    IF "%PROG_PATH%"==""         SET PROG_PATH=%ProgramFiles%
-    IF "%BCCDIR%" == ""          SET BCCDIR=\BCC55
+    IF "%PROG_PATH%"=="" SET PROG_PATH=%ProgramFiles%
 
     SET INCLUDE=
     SET LIB=
 
     IF EXIST xbuild.ini         DEL xBuild.ini > NUL:
     IF EXIST xbuild.windows.ini DEL xBuild.Windows.ini > NUL:
-
+	 
 
 REM --> Cleanup for -ALL
     IF "%1"=="-all" GOTO CLEAN_ALL
@@ -34,9 +27,9 @@ REM --> Cleanup for -ALL
     ATTRIB +r \xhb\bin\xcc.*
     ATTRIB +r \xhb\bin\xrc.*
     ATTRIB +r \xhb\bin\xlib.exe
-    ATTRIB +r \xhb\c_lib\*.lib /s
+    ATTRIB +r \xhb\c_lib\*.lib /S
     ATTRIB +r \xhb\bin\xbuild.exe
-
+    
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\bin\*.exe /s
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\bin\*.map /s
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\bin\*.exp /s
@@ -47,7 +40,6 @@ REM --> Cleanup for -ALL
     IF "%XBUILD_VC8%"=="YES" MD \xhb\bin\vc8
     IF "%XBUILD_BC5%"=="YES" RD \xhb\bin\bc5 /s /q
     IF "%XBUILD_BC5%"=="YES" MD \xhb\bin\bc5
-
     ATTRIB -r \xhb\bin\xbuild.exe
 
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\dll\*.dll /s
@@ -60,9 +52,6 @@ REM --> Cleanup for -ALL
     IF "%XBUILD_VC8%"=="YES" RD \xhb\dll\vc8 /s /q
     IF "%XBUILD_VC8%"=="YES" RD \xhb\lib\vc8 /s /q
     IF "%XBUILD_VC8%"=="YES" MD \xhb\lib\vc8
-    IF "%XBUILD_BC5%"=="YES" RD \xhb\dll\bc5 /s /q
-    IF "%XBUILD_BC5%"=="YES" RD \xhb\lib\bc5 /s /q
-    IF "%XBUILD_BC5%"=="YES" MD \xhb\lib\bc5
 
     DEL \xharbour\bin\xcc.*
     DEL \xharbour\bin\xrc.*
@@ -70,16 +59,17 @@ REM --> Cleanup for -ALL
     DEL \xharbour\bin\xlink.exe
     DEL \xharbour\bin\xhb.exe
 
-    IF EXIST \xhb\include             RD \xhb\include /s /q
-    IF EXIST \xharbour\c_include      RD \xharbour\c_include /s /q
-    IF EXIST \xharbour\c_lib          RD \xharbour\c_lib /s /q
+    IF EXIST \xhb\include        RD \xhb\include /s /q
+    IF EXIST \xharbour\c_include RD \xharbour\c_include /s /q
+    IF EXIST \xharbour\c_lib     RD \xharbour\c_lib /s /q
 
     REM We will use only \xharbour\lib\vc or bc5 so make sure that's the case
     REM when done using make_vc all or make_b32 all will quickly copy them back!
     DEL \xharbour\lib\*.lib
+REM COPY \xharbour\lib\vc\*.lib \xharbour\lib\*.lib
 
     REM Clean up XBP
-    RD \xbp
+    RD \xbp /S /Q
 
     :AFTER_CLEAN_ALL
 
@@ -112,6 +102,7 @@ REM --> Copy files
     XCOPY "%HB_DIR_ADS%\AdsLocal.cfg"    \xhb\dll\ADS /d /y
     XCOPY \xHarbour\contrib\rdd_ads\*.ch \xHb\include /d /y /i
 
+	 
     REM ** FreeImage **
     IF NOT EXIST \xhb\lib\vc8 MD \xhb\lib\vc8
     XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xhb\lib\     /d /y /i
@@ -139,7 +130,7 @@ REM --> Copy files
 
     XCOPY \xHarbour\source\rtl\pcre\*.h                 \xHb\include /d /y /i
     XCOPY \xHarbour\source\rtl\pcre\*.generic           \xHb\include /d /y /i
-    XCOPY \xHarbour\obj\vc\hbverbld.h                   \xHb\include /d /y /i
+    XCOPY \xHarbour\include\hbverbld.h                  \xHb\include /d /y /i
     XCOPY \xHarbour\contrib\gd\include                  \xHb\include /d /y /i
 
     XCOPY \xHarbour.com\xHarbour-Builder\include        \xHb\include /d /y /i
@@ -199,28 +190,20 @@ IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
 IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-VC8.bat %1
 IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
 
-IF "%XBUILD_BC5%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-BC5.bat %1
-IF "%XBUILD_BC5%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
-
-
 REM  ===============================================
 REM  ===============================================
 REM  ===============================================
 REM  ===============================================
-
-
 
 
 REM  ===============================================
 ECHO Restore Environment
 REM  ===============================================
     SET PATH=%_PATH%
-REM SET DJGPP=%_DJGPP%
     SET INCLUDE=%_INCLUDE%
     SET LIB=%_LIB%
 
     SET _PATH=
-REM SET _DJGPP=
     SET _INCLUDE=
     SET _LIB=
 
@@ -314,20 +297,7 @@ REM SET _DJGPP=
     SET _XB_Echo=
     SET _XB_Exe=
 
-REM XCOPY \xHb\bin\xbuild.exe \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xhb.exe    \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xcc.exe    \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xcc.dll    \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xrc.exe    \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xrc.dll    \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xlib.exe   \xHarbour\bin       /d /y
-REM XCOPY \xHb\bin\xlink.exe  \xHarbour\bin       /d /y
-REM XCOPY \xHb\lib\*.lib      \xHarbour\lib       /d /y /s
-REM XCOPY \xhb\dll\*.dll      %windir%\system32   /d /y /u
-
     CD \xHarbour.com\xHarbour-Builder
-
-    TIME /T >> xbldfull.log
 
 :Done1
 
