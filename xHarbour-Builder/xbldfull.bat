@@ -35,11 +35,15 @@ REM --> Cleanup for -ALL
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\bin\*.exp /s
     IF "%XBUILD_XCC%"=="YES" RD  \xhb\bin\Demo  /s /q
     IF "%XBUILD_XCC%"=="YES" RD  \xhb\bin\Personal /s /q
+    IF "%XBUILD_XCC%"=="YES" RD  \xhb\bin\Professional /s /q
 
     IF "%XBUILD_VC8%"=="YES" RD \xhb\bin\vc8 /s /q
     IF "%XBUILD_VC8%"=="YES" MD \xhb\bin\vc8
-    IF "%XBUILD_BC5%"=="YES" RD \xhb\bin\bc5 /s /q
-    IF "%XBUILD_BC5%"=="YES" MD \xhb\bin\bc5
+
+    ATTRIB -r \xhb\bin\xcc.*
+    ATTRIB -r \xhb\bin\xrc.*
+    ATTRIB -r \xhb\bin\xlib.exe
+    ATTRIB -r \xhb\c_lib\*.lib /S
     ATTRIB -r \xhb\bin\xbuild.exe
 
     IF "%XBUILD_XCC%"=="YES" DEL \xhb\dll\*.dll /s
@@ -51,6 +55,7 @@ REM --> Cleanup for -ALL
 
     IF "%XBUILD_VC8%"=="YES" RD \xhb\dll\vc8 /s /q
     IF "%XBUILD_VC8%"=="YES" RD \xhb\lib\vc8 /s /q
+    IF "%XBUILD_VC8%"=="YES" MD \xhb\dll\vc8
     IF "%XBUILD_VC8%"=="YES" MD \xhb\lib\vc8
 
     DEL \xharbour\bin\xcc.*
@@ -294,7 +299,6 @@ REM  ===============================================
     SET _BUILD_XEDIT.LIB=
     SET _BUILD_XHBCOMM=
 
-    SET _XB_Echo=
     SET _XB_Exe=
 
     CD \xHarbour.com\xHarbour-Builder
