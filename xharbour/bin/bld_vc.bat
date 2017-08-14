@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 rem
 rem $Id$
 rem
@@ -19,6 +19,12 @@ SET _INCLUDE=%INCLUDE%
 SET _LIB=%LIB%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"   GOTO SET_VC2017EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"        GOTO SET_VC2017E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools" GOTO SET_VC2017PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc" GOTO SET_VC2013X86
@@ -31,6 +37,32 @@ SET _LIB=%LIB%
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
+
+:SET_VC2017EX86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
+   GOTO SET_PATH
+
+:SET_VC2017E
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
+   GOTO SET_PATH
+
+:SET_VC2017PX86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
+   GOTO SET_PATH
+
+:SET_VC2017P
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
+   GOTO SET_PATH
+
+:SET_VC2017CX86
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\
+   SET _ARCH=x64
+   GOTO SET_PATH
+
+:SET_VC2017C
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\
+   SET _ARCH=x86
+   GOTO SET_PATH
 
 :SET_VC2015X86
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\vc
@@ -81,7 +113,7 @@ SET _LIB=%LIB%
    GOTO SET_PATH
 
 :SET_PATH
-IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat
+IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat %_ARCH%
 
 SET PATH="%CC_DIR%\bin";%~dp0;%PATH%
 
