@@ -42,6 +42,7 @@ REM ===============================================
     COPY "\xHB\Dll\FreeImage.dll"       "%RC_To%"
     COPY "\xHB\Bin\SciLexer.dll"        "%RC_To%"
     COPY "\xHB\Bin\vxh.syn"             "%RC_To%"
+    COPY "\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\VXH.ini" "%RC_To%"
 
 REM ===============================================
 REM                /Common/c_include
@@ -200,7 +201,7 @@ REM ===============================================
 
 REM TipSSL:
     COPY \OpenSSL\Libeay32.dll "%RC_To%"
-	COPY \OpenSSL\SSLeay32.dll "%RC_To%"
+    COPY \OpenSSL\SSLeay32.dll "%RC_To%"
 	
 
 REM ===============================================
@@ -239,20 +240,20 @@ REM ===============================================
     ROBOCOPY "\xHarbour\Source\tip\encoding" "%RC_To%\Tip\Encoding" *.c /NS /NC /NP /XD %RC_Exclude_Folder%
     ROBOCOPY "\xHarbour\tests\tiptest" "%RC_To%\Tip\Tests" *.* /NS /NC /NP /XD %RC_Exclude_Folder%
 
-	COPY "\xHarbour\Source\rdd\dbf0.prg"           "%RC_To%"
-	COPY "\xHarbour\Source\rdd\dbfcdx\dbfcdx0.prg" "%RC_To%"
-	COPY "\xHarbour\Source\rdd\dbfdbt\dbfdbt0.prg" "%RC_To%"
-	COPY "\xHarbour\Source\rdd\dbffpt\dbffpt0.prg" "%RC_To%"
-	COPY "\xHarbour\Source\rdd\dbfntx\dbfntx0.prg" "%RC_To%"
-	COPY "\xHarbour\Source\rdd\nulsys\nulsys.prg"  "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbf0.prg"           "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbfcdx\dbfcdx0.prg" "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbfdbt\dbfdbt0.prg" "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbffpt\dbffpt0.prg" "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbfntx\dbfntx0.prg" "%RC_To%"
+    COPY "\xHarbour\Source\rdd\nulsys\nulsys.prg"  "%RC_To%"
 
-	COPY "\xHarbour\Source\rdd\dbf0.prg"           "%RC_To%"
-	COPY "\xHarbour\Source\rdd\rddsys.prg"         "%RC_To%"
-	COPY "\xHarbour\Source\rdd\sdf0.prg"           "%RC_To%"
-	COPY "\xHarbour\Source\rdd\delim0.prg"         "%RC_To%"
+    COPY "\xHarbour\Source\rdd\dbf0.prg"           "%RC_To%"
+    COPY "\xHarbour\Source\rdd\rddsys.prg"         "%RC_To%"
+    COPY "\xHarbour\Source\rdd\sdf0.prg"           "%RC_To%"
+    COPY "\xHarbour\Source\rdd\delim0.prg"         "%RC_To%"
 
-	COPY "\xHarbour\Source\rtl\errorsys.prg"       "%RC_To%"
-	COPY "\xHarbour\Source\rtl\getsys.prg"         "%RC_To%"
+    COPY "\xHarbour\Source\rtl\errorsys.prg"       "%RC_To%"
+    COPY "\xHarbour\Source\rtl\getsys.prg"         "%RC_To%"
     COPY "\xHarbour\Source\vm\harbinit.prg"        "%RC_To%"
 
 
