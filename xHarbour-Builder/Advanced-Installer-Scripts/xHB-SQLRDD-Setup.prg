@@ -27,7 +27,7 @@ FUNCTION Build_xHB_Setup(cOFw,cVersion)
    ENDCASE
 
 
-   cAIP:="C:\xHB-SetupFiles\xHB.aip"
+   cAIP:="C:\Temp\xHB.aip"
 
    IF "DEMO"$cVersion
       cOriginalAIP:= "\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-SQLRDD-Demo.aip"
@@ -76,6 +76,8 @@ FUNCTION Build_xHB_Setup(cOFw,cVersion)
 
    //----------------------------------------------------------------------------------------------------//
 
+	cPackageFolder:="Z:\Dropbox (WinFakt)\xHarbour Builder Releases\xHB\SQLRDD\xHB Windows Installers\"+cRevision
+	
    DO CASE
       CASE cVersion=="XHB-RELEASE"
            cProductName  :='xHarbour Builder SQLRDD'

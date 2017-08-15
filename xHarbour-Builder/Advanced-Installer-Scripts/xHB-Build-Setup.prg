@@ -3,7 +3,7 @@
 FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
 
    LOCAL cBuild:="",cAIP,cAI,lDemo:=.F.
-   LOCAL cPackageName,cPackageFolder,cProductName
+   LOCAL cPackageName,cPackageFolder,cProductName,cFinalFolder
 
    IF Empty(cOFw)
       cOFw:="C"
@@ -23,7 +23,6 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
           RETURN
    ENDCASE
 
-
    IF Empty(cEdition)
       cEdition:="ENT"
    ELSE
@@ -38,18 +37,18 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
       OTHER                 ; Alert("Unknown edition") ; Alert(cEdition)
    ENDCASE
 
-   cAIP:="D:\xHB.aip"
+   cAIP:="C:\Temp\xHB.aip"
 
    IF cEdition="DEMO"
       cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB-Demo.aip '+cAIP+' /Y'+CRLF
    ELSE
       cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\xHB.aip '+cAIP+' /Y'+CRLF
    ENDIF
-   cBuild+='MD D:\Resources'+CRLF
-   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg D:\Resources\*.jpg /Y'+CRLF
-   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf D:\Resources\*.rtf /Y'+CRLF
-   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini D:\xHB-Files\Bin\*.ini /Y'+CRLF
-   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs D:\xHB-Files\*.vbs /Y'+CRLF
+   cBuild+='MD C:\Temp\Resources'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.jpg C:\Temp\Resources\*.jpg /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.rtf C:\Temp\Resources\*.rtf /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.ini C:\Temp\xHB-Files\Bin\*.ini /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Resources\*.vbs C:\Temp\xHB-Files\*.vbs /Y'+CRLF
 
    //----------------------------------------------------------------------------------------------------//
 
@@ -171,16 +170,16 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
 
    //----------------------------------------------------------------------------------------------------//
 
-   cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+;
-            ' /SetProperty wf_Edition="'+cEdition_Full+'"'+CRLF
+   cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty wf_Edition="'+cEdition_Full+'"'+CRLF
 
    //----------------------------------------------------------------------------------------------------//
 
-   cPackageFolder:='C:\odrive\Gdrive (xHarbour Builder)\xHB-SetupFiles\xHB\xHB Win-Installers\xHB-'+cRevision+'\'
+   cPackageFolder:='C:\Temp\xHB-'+cRevision+'\'
    cProductName  :='xHarbour Builder '+cEdition_Full
    cPackageName  :=cProductName+'-'+cRevision+'.exe'
 
-// cBuild+='RD D:\xHB /Q /S'+CRLF
+   cFinalFolder:="Z:\Dropbox (WinFakt)\xHarbour Builder Releases\xHB\xHB Win-Installers\"
+   cFinalFolder  :=cFinalFolder+'xHB-'+cRevision+'\'
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetPackageName "'+cPackageFolder+cPackageName+'"'+CRLF
    cBuild+='"'+cAI+'AdvancedInstaller.com" /edit '+cAIP+' /SetProperty ProductName="'+cProductName+'"'+CRLF
@@ -189,21 +188,21 @@ FUNCTION Build_xHB_Setup(cEdition, cOFw, cRevision)
 
    cBuild+='"'+cAI+'AdvancedInstaller.com" /build '+cAIP+CRLF+CRLF
 
-   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cPackageFolder+'\serial.txt" /Y'+CRLF
-
-   cBuild+='RD D:\xHB-cache /Q /S'+CRLF
-   cBuild+='RD D:\Resources /Q /S'+CRLF
-   cBuild+='RD D:\Setups /Q /S'+CRLF
+   cBuild+='RD C:\Temp\xHB-cache /Q /S'+CRLF
+   cBuild+='RD C:\Temp\Resources /Q /S'+CRLF
+   cBuild+='RD C:\Temp\Setups /Q /S'+CRLF
    cBuild+='DEL '+cAIP+' /Q'+CRLF
-   cBuild+='ATTRIB +H D:\xHB-Files'+CRLF
-	
-//	cBuild+='COPY D:\'+cPackageName+' 
+   cBuild+='ATTRIB +H C:\Temp\xHB-Files'+CRLF
+   cBuild+='MD "'+cPackageFolder+cPackageName+'" "'+cFinalFolder+'"'+CRLF
+   cBuild+='COPY "'+cPackageFolder+cPackageName+'" "'+cFinalFolder+'" /Y'+CRLF
+   cBuild+='COPY \xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Serial.txt "'+cFinalFolder+'\serial.txt" /Y'+CRLF
+// cBuild+='RD "'+cPackageFolder+'" /Q /S'+CRLF
 
 // cBuild+='pause'+CRLF+CRLF
 
-   MemoWrit("D:\Build.bat",cBuild,.F.)
-   __Run("D:\Build.bat")
-   DELETE FILE ("D:\Build.bat")
+   MemoWrit("C:\Temp\Build.bat",cBuild,.F.)
+   __Run("C:\Temp\Build.bat")
+// DELETE FILE ("C:\Temp\Build.bat")
 
 RETURN NIL
 
