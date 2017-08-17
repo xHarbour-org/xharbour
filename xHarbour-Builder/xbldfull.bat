@@ -14,6 +14,8 @@ REM --> Set Environment
     IF EXIST xbuild.ini         DEL xBuild.ini > NUL:
     IF EXIST xbuild.windows.ini DEL xBuild.Windows.ini > NUL:
     
+    IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-XCC.bat
+    IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-VC8.bat
 
 REM --> Cleanup for -ALL
     IF "%1"=="-all" GOTO CLEAN_ALL
@@ -25,31 +27,32 @@ REM --> Cleanup for -ALL
     :CLEAN_ALL
 
     
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\bin\*.exe /s
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\bin\*.map /s
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\bin\*.exp /s
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\bin\*.dll /s
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\bin\Demo /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\bin\Personal /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\bin\Professional /s /q
+    IF "%XBUILD_XCC%"=="YES" (
+       DEL \xHB\bin\*.exe /s
+       DEL \xHB\bin\*.map /s
+       DEL \xHB\bin\*.exp /s
+       DEL \xHB\bin\*.dll /s
+       RD  \xHB\bin\Demo /s /q
+       RD  \xHB\bin\Personal /s /q
+       RD  \xHB\bin\Professional /s /q
+       DEL \xHB\dll\*.dll /s
+       RD  \xHB\dll\Ads /s /q
+       RD  \xHB\dll\ApolloRDD /s /q
+       RD  \xHB\dll\SQLRDD /s /q
+       DEL \xHB\lib\*.lib /s
+       RD  \xHB\lib\Demo /s /q
+       RD  \xHB\lib\Personal /s /q
+       RD  \xHB\lib\Professional /s /q
+       )
     
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\dll\*.dll /s
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\dll\Ads /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\dll\ApolloRDD /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\dll\SQLRDD /s /q
-    
-    IF "%XBUILD_XCC%"=="YES" DEL \xHB\lib\*.lib /s
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\lib\Demo /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\lib\Personal /s /q
-    IF "%XBUILD_XCC%"=="YES" RD  \xHB\lib\Professional /s /q
-
-    
-    IF "%XBUILD_VC8%"=="YES" RD \xHB\bin\vc8 /s /q
-    IF "%XBUILD_VC8%"=="YES" MD \xHB\bin\vc8
-    IF "%XBUILD_VC8%"=="YES" RD \xHB\dll\vc8 /s /q
-    IF "%XBUILD_VC8%"=="YES" RD \xHB\lib\vc8 /s /q
-    IF "%XBUILD_VC8%"=="YES" MD \xHB\dll\vc8
-    IF "%XBUILD_VC8%"=="YES" MD \xHB\lib\vc8
+    IF "%XBUILD_VC8%"=="YES" (
+       RD \xHB\bin\vc8 /s /q
+       MD \xHB\bin\vc8
+       RD \xHB\dll\vc8 /s /q
+       RD \xHB\lib\vc8 /s /q
+       MD \xHB\dll\vc8
+       MD \xHB\lib\vc8
+      )
 
     DEL \xharbour\bin\xCC.*
     DEL \xharbour\bin\xRC.*
@@ -75,11 +78,11 @@ REM --> Cleanup for -ALL
 
 REM --> Copy files
 
-   IF "%XBUILD_VC8%"=="NO" GOTO N84
+   IF "%XBUILD_VC8%"=="YES" (
       MD \xHB\bin\vc8
       MD \xHB\dll\vc8
       MD \xHB\lib\vc8
-   :N84
+      )
 
    IF NOT EXIST "\xHB\bin"         MD "\xHB\bin"
    IF NOT EXIST "\xHB\lib"         MD "\xHB\lib"
@@ -109,10 +112,11 @@ REM --> Copy files
 
     
     REM ** FreeImage **
-    IF "%XBUILD_VC8%"=="NO" GOTO N114
+    
+    IF "%XBUILD_VC8%"=="YES" (
        IF NOT EXIST \xHB\lib\vc8 MD \xHB\lib\vc8
-       XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xHB\lib\vc8  /d /y /i
-    :N114
+       XCOPY \xHarbour.com\FreeImage\FreeImage.lib \xHB\lib\vc8  /d /y /i
+       )
     XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xHB\lib\     /d /y /i
     XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\dll\     /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.ch \xHB\include\ /d /y /i
@@ -120,15 +124,17 @@ REM --> Copy files
 
 
     REM ** ApolloRDD **
-    IF NOT EXIST \xHB\dll\ApolloRDD MD \xHB\dll\ApolloRDD
-    XCOPY \xHarbour.com\xHarbour-ApolloRDD\dll\*.dll \xHB\dll\ApolloRDD /d /y /i
-    XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.h  \xHB\include /d /y /i
-    XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.ch \xHB\include /d /y /i
-
+    IF "%_BUILD_APOLLORDD%"=="YES" (
+       IF NOT EXIST \xHB\dll\ApolloRDD MD \xHB\dll\ApolloRDD
+       XCOPY \xHarbour.com\xHarbour-ApolloRDD\dll\*.dll \xHB\dll\ApolloRDD /d /y /i
+       XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.h  \xHB\include /d /y /i
+       XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.ch \xHB\include /d /y /i
+       )
 
     REM ** BGD.DLL **
-    XCOPY \xHarbour.com\xHarbour-Builder\BGD.DLL \xHB\dll  /d /y /i
-
+    IF "%_BUILD_BGD%"=="YES" (
+       XCOPY \xHarbour.com\xHarbour-Builder\BGD.DLL \xHB\dll  /d /y /i
+       )
 
     XCOPY \xHarbour\include\*.api                       \xHB\include /d /y /i
     XCOPY \xHarbour\include\*.ch                        \xHB\include /d /y /i
@@ -143,9 +149,9 @@ REM --> Copy files
     XCOPY \xHarbour.com\xHarbour-Builder\include        \xHB\include /d /y /i
     XCOPY \xHarbour.com\xHarbour-ActiveX\ole.ch         \xHB\include\w32 /d /y
     XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /d /y /i
-    XCOPY \xHarbour.com\IEGui\iegui.ch                  \xHB\include /d /y
     XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i
 
+    IF "%_BUILD_IEGUI_LIB%"=="YES" XCOPY \xHarbour.com\IEGui\iegui.ch \xHB\include /d /y
 
     IF EXIST \xHarbour\include\Ado.ch      DEL \xHarbour\include\Ado.ch
     IF EXIST \xHarbour\include\Colors.ch   DEL \xHarbour\include\Colors.ch
@@ -191,10 +197,7 @@ REM  ===============================================
 REM  ===============================================
 
 
-IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-XCC.bat %1
 IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
-
-IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-VC8.bat %1
 IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
 
 REM  ===============================================

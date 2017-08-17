@@ -235,11 +235,11 @@ REM  ===============================================
 
 
 REM --> BGD.lib
-        IF "%_BUILD_BGD%"=="NO" GOTO No_BGD
+        IF "%_BUILD_BGD%"=="YES" (
            CD "\xHarbour.com\xHarbour-Builder"
            IF "%XBUILD_XCC%"=="YES" \xHB\bin\XLIB \xHB\dll\BGD.dll /out:\xHB\lib\BGD.lib
            IF "%XBUILD_VC8%"=="YES" XCOPY BGD.lib \xHB\lib\vc8 /d /y
-        :No_BGD
+           )
 
 REM --> ADS.lib
         IF "%_BUILD_ADS%"=="NO" GOTO No_ADS
