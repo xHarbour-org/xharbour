@@ -112,7 +112,6 @@ REM --> Copy files
 
     
     REM ** FreeImage **
-    
     IF "%XBUILD_VC8%"=="YES" (
        IF NOT EXIST \xHB\lib\vc8 MD \xHB\lib\vc8
        XCOPY \xHarbour.com\FreeImage\FreeImage.lib \xHB\lib\vc8  /d /y /i
@@ -148,8 +147,11 @@ REM --> Copy files
 
     XCOPY \xHarbour.com\xHarbour-Builder\include        \xHB\include /d /y /i
     XCOPY \xHarbour.com\xHarbour-ActiveX\ole.ch         \xHB\include\w32 /d /y
-    XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /d /y /i
     XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i
+    XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /d /y /i
+    DEL \xHB\Include\w32\Oleserver.h
+    DEL \xHB\Include\w32\Structures_HB.ch
+    DEL \xHB\Include\w32\Globals.ch
 
     IF "%_BUILD_IEGUI_LIB%"=="YES" XCOPY \xHarbour.com\IEGui\iegui.ch \xHB\include /d /y
 
