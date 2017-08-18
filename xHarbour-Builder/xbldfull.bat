@@ -92,17 +92,19 @@ REM --> Copy files
     REM ** SQLRDD **
     IF NOT EXIST \xHB\dll\SQLRDD MD \xHB\dll\SQLRDD
     XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xHB\dll\SQLRDD /d /y
+    XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xHB\bin /d /y
     XCOPY \xharbour.com\xHarbour-SQLRDD\lib\*.lib      \xHB\lib /d /y
     XCOPY \xHarbour.com\xHarbour-SQLRDD\include        \xHB\include /d /y /i
-    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y /i
+    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y
     XCOPY \xHarbour.com\xHarbour-SQLRDD\source\mysql.h \xHB\include /d /y
-    IF EXIST \xHB\include\sqlrdd.xns DEL \xHB\include\sqlrdd.xns /Q
+    IF EXIST \xHB\include\sqlrdd.xns DEL \xHB\include\sqlrdd.xns
 
 
     REM ** ADS **
     REM HB_DIR_ADS is the ONE place ace32.dll SHOULD be in.
     IF NOT EXIST \xHB\dll\ADS MD \xHB\dll\ADS
     XCOPY "%HB_DIR_ADS%\Ace32.dll"       \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\Ace32.dll"       \xHB\Bin\    /d /y
     XCOPY "%HB_DIR_ADS%\AdsLoc32.dll"    \xHB\dll\ADS /d /y
     XCOPY "%HB_DIR_ADS%\AXCws32.dll"     \xHB\dll\ADS /d /y
     XCOPY "%HB_DIR_ADS%\Ansi.chr"        \xHB\dll\ADS /d /y
@@ -115,9 +117,10 @@ REM --> Copy files
     IF "%XBUILD_VC8%"=="YES" (
        IF NOT EXIST \xHB\lib\vc8 MD \xHB\lib\vc8
        XCOPY \xHarbour.com\FreeImage\FreeImage.lib \xHB\lib\vc8  /d /y /i
-       )
+		 )
     XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xHB\lib\     /d /y /i
     XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\dll\     /d /y /i
+	 XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\bin\     /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.ch \xHB\include\ /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.h  \xHB\include\ /d /y /i
 
@@ -148,10 +151,13 @@ REM --> Copy files
     XCOPY \xHarbour.com\xHarbour-Builder\include        \xHB\include /d /y /i
     XCOPY \xHarbour.com\xHarbour-ActiveX\ole.ch         \xHB\include\w32 /d /y
     XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i
+ 
+    REM ** VXH **
     XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /d /y /i
-    DEL \xHB\Include\w32\Oleserver.h
-    DEL \xHB\Include\w32\Structures_HB.ch
-    DEL \xHB\Include\w32\Globals.ch
+    IF EXIST \xHB\Include\w32\Oleserver.h      DEL \xHB\Include\w32\Oleserver.h
+    IF EXIST \xHB\Include\w32\Structures_HB.ch DEL \xHB\Include\w32\Structures_HB.ch
+    IF EXIST \xHB\Include\w32\Globals.ch       DEL \xHB\Include\w32\Globals.ch
+    XCOPY \xHarbour.com\Visual-xHarbour\Extras \xHB\Bin /d /y /i
 
     IF "%_BUILD_IEGUI_LIB%"=="YES" XCOPY \xHarbour.com\IEGui\iegui.ch \xHB\include /d /y
 
