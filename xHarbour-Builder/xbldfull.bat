@@ -92,12 +92,13 @@ REM --> Copy files
     REM ** SQLRDD **
     IF NOT EXIST \xHB\dll\SQLRDD MD \xHB\dll\SQLRDD
     XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xHB\dll\SQLRDD /d /y
-    XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xHB\bin /d /y
     XCOPY \xharbour.com\xHarbour-SQLRDD\lib\*.lib      \xHB\lib /d /y
     XCOPY \xHarbour.com\xHarbour-SQLRDD\include        \xHB\include /d /y /i
     XCOPY \xHarbour.com\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y
     XCOPY \xHarbour.com\xHarbour-SQLRDD\source\mysql.h \xHB\include /d /y
     IF EXIST \xHB\include\sqlrdd.xns DEL \xHB\include\sqlrdd.xns
+    COPY \xharbour.com\xHarbour-SQLRDD\dll\fbclient.dll \xHB\bin /Y
+    COPY \xharbour.com\xHarbour-SQLRDD\dll\libmysql.dll \xHB\bin /Y
 
 
     REM ** ADS **
@@ -110,7 +111,9 @@ REM --> Copy files
     XCOPY "%HB_DIR_ADS%\Ansi.chr"        \xHB\dll\ADS /d /y
     XCOPY "%HB_DIR_ADS%\Extend.chr"      \xHB\dll\ADS /d /y
     XCOPY "%HB_DIR_ADS%\AdsLocal.cfg"    \xHB\dll\ADS /d /y
-    XCOPY \xHarbour\contrib\rdd_ads\*.ch \xHB\include /d /y /i
+    XCOPY "%HB_DIR_ADS%\*.h"             \xHB\include /d /y
+    XCOPY \xHarbour\contrib\rdd_ads\*.ch \xHB\include /d /y
+    XCOPY \xHarbour\contrib\rdd_ads\*.h  \xHB\include /d /y
 
     
     REM ** FreeImage **
@@ -120,7 +123,7 @@ REM --> Copy files
 		 )
     XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xHB\lib\     /d /y /i
     XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\dll\     /d /y /i
-	 XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\bin\     /d /y /i
+    XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\bin\     /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.ch \xHB\include\ /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.h  \xHB\include\ /d /y /i
 

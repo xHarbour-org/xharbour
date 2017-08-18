@@ -276,7 +276,7 @@ REM --> xEdit*.LIB
 REM        \xHB\bin\XBUILD.EXE xEdit.lib.xbp        %_XB_Debug% %1
            \xHB\bin\XBUILD.EXE xEditW.lib.xbp       %_XB_Debug% %1
            \xHB\bin\XBUILD.EXE xEditWScript.lib.xbp %_XB_Debug% %1
-           \xHB\bin\XBUILD.EXE xEditVXH.lib.xbp     %_XB_Debug% %1
+REM        \xHB\bin\XBUILD.EXE xEditVXH.lib.xbp     %_XB_Debug% %1
         :No_xEditLIB
 
 REM --> WinCore.lib
