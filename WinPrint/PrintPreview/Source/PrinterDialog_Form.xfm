@@ -1,0 +1,270 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS PrinterDialog_Form INHERIT Dialog
+   // Components declaration
+   // User variables definitions
+   VAR lReturn,wfVar
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD PrinterDialog_Form_OnLoad()
+   METHOD Button1_OnClick()
+   METHOD PrnPrefButton_OnClick()
+   METHOD CheckBox1_OnClick()
+   METHOD CheckBox2_OnClick()
+   METHOD CopyEditBox_OnEn_Change()
+   METHOD CopyEditBox_OnVertScroll()
+   METHOD AllPageCheckBox_OnClick()
+   METHOD CurPageCheckBox_OnClick()
+   METHOD PageEditBox_OnChar()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS PrinterDialog_Form
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "PrinterDialog_Form_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "PrinterDialog_Form"
+   ::Modal                := .T.
+   ::BackColor            := 16119285
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 491
+   ::Height               := 365
+   ::Text                 := "Printer options"
+   ::Resizable            := .F.
+   ::MaximizeBox          := .F.
+   ::MinimizeBox          := .F.
+   ::DlgModalFrame        := .T.
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS PrinterDialog_Form
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      WITH OBJECT :Dock
+         :Right                := "PrintDialogForm"
+         :Bottom               := "PrintDialogForm"
+         :Margins              := "12,12,12,12"
+      END
+
+      :Left                 := 373
+      :Top                  := 296
+      :Width                := 80
+      :Height               := 26
+      :Text                 := "OK"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckBox4"
+      WITH OBJECT :Dock
+         :Left                 := "PrintDialogForm"
+         :Bottom               := "PrintDialogForm"
+         :Margins              := "12,12,12,12"
+      END
+
+      :Left                 := 21
+      :Top                  := 304
+      :Width                := 341
+      :Height               := 16
+      :Text                 := "Print document after clicking 'OK'"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( TABCONTROL( Self ) )
+      :Name                 := "TabControl1"
+      WITH OBJECT :Dock
+         :Left                 := "PrinterDialog_Form"
+         :Top                  := "PrinterDialog_Form"
+         :Right                := "PrinterDialog_Form"
+         :Bottom               := "PrinterDialog_Form"
+         :Margins              := "20,0,20,70"
+      END
+
+      :Left                 := 20
+      :Width                := 442
+      :Height               := 271
+      :Text                 := "TabControl1"
+      :ShowTabs             := .F.
+      :Create()
+      WITH OBJECT ( TABPAGE( :this ) )
+         :Name                 := "TabPage1"
+         :Text                 := "Page &1"
+         :Create()
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox1"
+            :Left                 := 20
+            :Top                  := 20
+            :Width                := 397
+            :Height               := 65
+            :Text                 := "Printer :"
+            :Create()
+            WITH OBJECT ( COMBOBOX( :this ) )
+               :Name                 := "PrinterComboBox"
+               :Left                 := 12
+               :Top                  := 27
+               :Width                := 335
+               :Height               := 237
+               :ItemHeight           := 15
+               :Create()
+            END //COMBOBOX
+
+            WITH OBJECT ( BUTTON( :this ) )
+               :Name                 := "PrnPrefButton"
+               WITH OBJECT :ToolTip
+                  :Text                 := "Options for this printer"
+               END
+
+               :Left                 := 355
+               :Top                  := 26
+               :Width                := 22
+               :Height               := 23
+               :Text                 := "..."
+               :TabStop              := .F.
+               :EventHandler[ "OnClick" ] := "PrnPrefButton_OnClick"
+               :Create()
+            END //BUTTON
+
+         END //GROUPBOX
+
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox2"
+            :Left                 := 23
+            :Top                  := 125
+            :Width                := 176
+            :Height               := 100
+            :Text                 := "Copies"
+            :Create()
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox1"
+               :Left                 := 16
+               :Top                  := 24
+               :Width                := 100
+               :Height               := 16
+               :Text                 := "1 copy"
+               :State                := 1
+               :Checked              := .T.
+               :EventHandler[ "OnClick" ] := "CheckBox1_OnClick"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CheckBox2"
+               :Left                 := 16
+               :Top                  := 44
+               :Width                := 100
+               :Height               := 16
+               :Text                 := "2 copies"
+               :EventHandler[ "OnClick" ] := "CheckBox2_OnClick"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "CopyEditBox"
+               :VertScroll           := .T.
+               :Left                 := 108
+               :Top                  := 66
+               :Width                := 55
+               :Height               := 24
+               :Text                 := "1"
+               :Alignment            := 3
+               :Number               := .T.
+               :EventHandler[ "OnEn_Change" ] := "CopyEditBox_OnEn_Change"
+               :EventHandler[ "OnVertScroll" ] := "CopyEditBox_OnVertScroll"
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label1"
+               :Left                 := 9
+               :Top                  := 71
+               :Width                := 92
+               :Height               := 16
+               :Text                 := "More copies :"
+               :Alignment            := 2
+               :Create()
+            END //LABEL
+
+         END //GROUPBOX
+
+         WITH OBJECT ( GROUPBOX( :this ) )
+            :Name                 := "GroupBox3"
+            :Left                 := 228
+            :Top                  := 98
+            :Width                := 190
+            :Height               := 126
+            :Text                 := "Pages"
+            :Create()
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "AllPageCheckBox"
+               :Left                 := 14
+               :Top                  := 25
+               :Width                := 100
+               :Height               := 16
+               :Text                 := "All pages"
+               :EventHandler[ "OnClick" ] := "AllPageCheckBox_OnClick"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( CHECKBOX( :this ) )
+               :Name                 := "CurPageCheckBox"
+               :Left                 := 14
+               :Top                  := 50
+               :Width                := 100
+               :Height               := 16
+               :Text                 := "Current page"
+               :EventHandler[ "OnClick" ] := "CurPageCheckBox_OnClick"
+               :Create()
+            END //CHECKBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label2"
+               :Left                 := 12
+               :Top                  := 76
+               :Width                := 38
+               :Height               := 16
+               :Text                 := "Pages :"
+               :Create()
+            END //LABEL
+
+            WITH OBJECT ( EDITBOX( :this ) )
+               :Name                 := "PageEditBox"
+               :Left                 := 55
+               :Top                  := 72
+               :Width                := 120
+               :Height               := 22
+               :EventHandler[ "OnChar" ] := "PageEditBox_OnChar"
+               :Create()
+            END //EDITBOX
+
+            WITH OBJECT ( LABEL( :this ) )
+               :Name                 := "Label3"
+               :Left                 := 55
+               :Top                  := 99
+               :Width                := 80
+               :Height               := 16
+               :Text                 := "Eg, 1-3,5 ..."
+               :Create()
+            END //LABEL
+
+         END //GROUPBOX
+
+      END //TABPAGE
+
+   END //TABCONTROL
+
+RETURN Self
+

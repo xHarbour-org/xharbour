@@ -1,9 +1,11 @@
 #include "vxh.ch"
-#include "WinPrintTest_Form1.xfm"
+#include "BillPrint_Form1.xfm"
+
+#define BOTTOM_POS   50
 //---------------------------------------- End of system code ----------------------------------------//
 
 //----------------------------------------------------------------------------------------------------
-METHOD WinPrintTest_Form1_OnLoad( Sender ) CLASS WinPrintTest_Form1
+METHOD BillPrint_Form1_OnLoad( Sender ) CLASS BillPrint_Form1
    LOCAL i, aPrn
    
    aPrn:=GetPrinters()
@@ -17,125 +19,41 @@ RETURN Self
 
 //----------------------------------------------------------------------------------------------------//
 
-METHOD Button1_OnClick( Sender ) CLASS WinPrintTest_Form1
-   DO CASE
-      CASE ::RadioButton1:Checked()
-         BasicReport(Self, .T.)
-      CASE ::RadioButton2:Checked()
-         SaleReport(Self, .T.)
-   ENDCASE
+METHOD Button1_OnClick( Sender ) CLASS BillPrint_Form1
+   Bill(Self, .T.)
 RETURN Self
 
 //----------------------------------------------------------------------------------------------------
-METHOD Button2_OnClick( Sender ) CLASS WinPrintTest_Form1
-   DO CASE
-      CASE ::RadioButton1:Checked()
-         BasicReport(Self, .F.)
-      CASE ::RadioButton2:Checked()
-         SaleReport(Self, .F.)
-   ENDCASE
+METHOD Button2_OnClick( Sender ) CLASS BillPrint_Form1
+   Bill(Self, .F.)
 RETURN Self
 
 
 //----------------------------------------------------------------------------------------------------
 
-FUNCTION BasicReport(Self, lPreview)
-
-   LOCAL oPrn,nLineWidth,cText,cPath
-
-   DEFAULT lPreview TO .T.
-   
-   oPrn:=WinPrint():New(lPreview,.F.)  
-
-   IF oPrn=NIL
-      RETURN NIL
-   ENDIF
-   
-   WITH OBJECT oPrn
-      :nTopMargin:=10
-      :nLeftMargin:=10
-      :nRightMargin:=10
-      :nBottomMargin:=10
-   END   
-
-   oPrn:cPrinter:=::ComboBox1:GetString()
- 
-   IF ::CheckBox1:Checked()
-      oPrn:cFormType:="0"
-      oPrn:nPageWidth:=Val(::EditBox3:Text)
-      oPrn:nPageHeight:=Val(::EditBox2:Text)
-   ELSE
-      oPrn:cFormType:="9" //A4
-   ENDIF
-     
-   oPrn:nCopies:=If(Val(::EditBox1:Text)<1,1,Val(::EditBox1:Text))
-
-   oPrn:lGreyScale:=.F.
-
-   oPrn:lBestQuality:=.T.
-   oPrn:lDuplex:=.F.
-   
-   oPrn:lLandscape:=::chkLandscape:Checked()
-
-   IF !oPrn:Create()
-      RETURN NIL
-   ENDIF
-
-   nLineWidth:=oPrn:nPageWidth-oPrn:nLeftMargin-oPrn:nRightMargin
-   
-   oPrn:SetPenWidth(0.1)
-   
-   oPrn:SetFont("Times New Roman",10,.F.,.F.,.F.,.F.,0)
-   
-   cText:="Hello world with WinPrn class for VXH!"   
-   oPrn:Say(oPrn:nLeftMargin,20,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
-   cText:="This is page 1 test."   
-   oPrn:Say(oPrn:nLeftMargin,120,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
-   
-   cPath:=Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
-      
-   oPrn:Image(cPath+"\Pic1.jpg", 150, 100, 25, 50 )
-   oPrn:PageBreak()
-
-   cText:="Page 2"   
-   oPrn:Say(oPrn:nLeftMargin,20,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
-   oPrn:Image(cPath+"\Pic2.jpg", 200, 75, 25, 50 )
-   oPrn:PageBreak()
-
-   cText:="Page 3"   
-   oPrn:Say(oPrn:nLeftMargin,20,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
-   //oPrn:PageBreak()
-
-   IF lPreview
-      oPrn:Preview(Self)
-   ENDIF
-   
-   oPrn:Close()
-   
-RETURN NIL
-   
-   
-
-//----------------------------------------------------------------------------------------------------
-
-FUNCTION SaleReport(Self, lPreview)
+FUNCTION Bill(Self, lPreview)
 
    LOCAL oPrn,nLineWidth,cText,nRow,nCol,nPctr
-   LOCAL nRowCtr,nColCtr,aCol:={{"Date",20,1,"DToC(FIELD->BILLDT)"}, {"Number",20,1,"FIELD->BILLNO"}, {"Customer",80,1,"FIELD->CUSTNM"}, {"Amount",25,3,"TRANSFORM(FIELD->AMT,'999,999,999.99')"}},nGap
-   LOCAL cDbf:=Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() ) )+"sale.dbf",cAlias:="A1",nTotAmt
+   LOCAL nRowCtr,nColCtr
+   LOCAL aCol:={{"Item",40,1,"FIELD->ITEMDESC"},;
+              {"Rate",20,3,"TRANSFORM(FIELD->RATE,'99,999.99')"}, ;
+              {"Qty",20,3,"TRANSFORM(FIELD->QTY,'99,999')"}, ;
+              {"VAT %",20,3,"TRANSFORM(FIELD->VAT,'999.99 %')"}, ;              
+              {"Amount",25,3,"TRANSFORM(FIELD->RATE*FIELD->QTY*(1+FIELD->VAT/100),'999,999,999.99')"}}
+   LOCAL cDbf:=Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() ) )+"SALEDTL.dbf",cAlias:="A1",nTotAmt,nGap
 
    DEFAULT lPreview TO .T.
    
-   DbCreate(cDbf,{{"billno","C",10,0},{"billdt","D",8,0},{"custnm","C",50,0},{"amt","N",10,2}})
+   DbCreate(cDbf,{{"ITEMDESC","C",40,0},{"RATE","N",9,2},{"VAT","N",6,2},{"QTY","N",6,0}})
    
    USE (cDbf) ALIAS (cAlias)
    
-   FOR nRowCtr=1 TO 100
+   FOR nRowCtr=1 TO 10
       (cAlias)->(DbAppend())
-      (cAlias)->BILLNO:=Str(nRowCtr,10,0)
-      (cAlias)->BILLDT:=Date()
-      (cAlias)->CUSTNM:="Customer "+NToC(nRowCtr)
-      (cAlias)->AMT:=HB_RandomInt(10,10000)
+      (cAlias)->ITEMDESC:="Item "+NToC(nRowCtr)
+      (cAlias)->RATE:=HB_RandomInt(100,1000)      
+      (cAlias)->QTY:=HB_RandomInt(1,100)
+      (cAlias)->VAT:=HB_RandomInt(0,25)
       (cAlias)->(DbUnlock())
    NEXT
    
@@ -155,13 +73,7 @@ FUNCTION SaleReport(Self, lPreview)
 
    oPrn:cPrinter:=::ComboBox1:GetString()
 
-   IF ::CheckBox1:Checked()
-      oPrn:cFormType:="0"
-      oPrn:nPageWidth:=Val(::EditBox3:Text)
-      oPrn:nPageHeight:=Val(::EditBox2:Text)
-   ELSE
-      oPrn:cFormType:="9" //A4
-   ENDIF
+   oPrn:cFormType:="9" //A4
    
    oPrn:nCopies:=If(Val(::EditBox1:Text)<1,1,Val(::EditBox1:Text))
 
@@ -170,7 +82,7 @@ FUNCTION SaleReport(Self, lPreview)
    oPrn:lBestQuality:=.T.
    oPrn:lDuplex:=.F.
    
-   oPrn:lLandscape:=::chkLandscape:Checked()
+   oPrn:lLandscape:=.F.
    
    IF !oPrn:Create()
       (cAlias)->(DbCloseArea())
@@ -187,7 +99,9 @@ FUNCTION SaleReport(Self, lPreview)
          nGap+=aCol[nColCtr][2]
       NEXT
       
+      
       nGap:=(nLineWidth-nGap)/(Len(aCol)-1)
+      
    ENDIF
    
    oPrn:SetFont("Arial",12,.F.,.F.,.F.,.F.,0)   
@@ -197,14 +111,14 @@ FUNCTION SaleReport(Self, lPreview)
    (cAlias)->(DbGoTop())
    nPctr:=0
    WHILE !(cAlias)->(Eof())
-      IF nRow=0 .OR. nRow>=oPrn:nPageHeight-oPrn:nTopMargin-oPrn:nBottomMargin-oPrn:nCharHeight*2
+      IF nRow=0 .OR. nRow>=oPrn:nPageHeight-oPrn:nTopMargin-oPrn:nBottomMargin-BOTTOM_POS-oPrn:nCharHeight
 
          IF nRow>=oPrn:nPageHeight-oPrn:nTopMargin-oPrn:nBottomMargin-oPrn:nCharHeight*2
             oPrn:PageBreak()
          ENDIF
 
          oPrn:SetFont("Arial",16,.T.,.T.,.T.,.F.,0)   
-         cText:="Sales Report" 
+         cText:="Sales Bill" 
          nRow:=20
          oPrn:Say(oPrn:nLeftMargin+nLineWidth/2,nRow,cText,2,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
 
@@ -212,6 +126,54 @@ FUNCTION SaleReport(Self, lPreview)
          oPrn:SetFont("Arial",14,.T.,.F.,.F.,.F.,0)   
          cText:="ABC Company Ltd." 
          oPrn:Say(oPrn:nLeftMargin+nLineWidth/2,nRow,cText,2,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="Address line 1" 
+         oPrn:Say(oPrn:nLeftMargin+nLineWidth/2,nRow,cText,2,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="Address line 2" 
+         oPrn:Say(oPrn:nLeftMargin+nLineWidth/2,nRow,cText,2,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="Address line 3" 
+         oPrn:Say(oPrn:nLeftMargin+nLineWidth/2,nRow,cText,2,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+
+         nRow+=oPrn:nCharHeight*2
+         oPrn:SetFont("Arial",12,.T.,.F.,.F.,.F.,0)   
+         cText:="XYZ Company Ltd" 
+         oPrn:Say(oPrn:nLeftMargin,nRow,cText,1,,oPrn:GetTextHeightMM(cText,nLineWidth))
+         
+
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="First line of address" 
+         oPrn:Say(oPrn:nLeftMargin,nRow,cText,1,,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+         
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="Second line of address" 
+         oPrn:Say(oPrn:nLeftMargin,nRow,cText,1,,oPrn:GetTextHeightMM(cText,nLineWidth))
+         
+         nRow+=oPrn:nCharHeight
+         oPrn:SetFont("Arial",10,.F.,.F.,.F.,.F.,0)   
+         cText:="Third line of address" 
+         oPrn:Say(oPrn:nLeftMargin,nRow,cText,1,nLineWidth,oPrn:GetTextHeightMM(cText,nLineWidth))
+         
+
+         nRow+=oPrn:nCharHeight*2
+         oPrn:SetFont("Arial",12,.T.,.F.,.F.,.F.,0)   
+         cText:="Bill no.: 00000001" 
+         oPrn:Say(oPrn:nLeftMargin,nRow,cText,1,,oPrn:GetTextHeightMM(cText,nLineWidth))
+
+         cText:="Date: "+DToC(Date()) 
+         oPrn:Say(oPrn:nLeftMargin+nLineWidth,nRow,cText,3,,oPrn:GetTextHeightMM(cText,nLineWidth))
+
 
          nRow+=oPrn:nCharHeight
          PrintLine(oPrn,nRow,nLineWidth)
@@ -256,12 +218,14 @@ FUNCTION SaleReport(Self, lPreview)
          nCol+=nGap+IF(aCol[nColCtr][3]=1,aCol[nColCtr][2],If(aCol[nColCtr][3]=2,aCol[nColCtr][2]/2,0))
       NEXT
 
-      nTotAmt+=(cAlias)->AMT
+      nTotAmt+=(cAlias)->RATE*(cAlias)->QTY*(1+(cAlias)->VAT/100)
       nRow+=oPrn:nCharHeight 
       
       (cAlias)->(DbSkip())
    ENDDO
 
+   nRow:=oPrn:nPageHeight-oPrn:nTopMargin-oPrn:nBottomMargin-BOTTOM_POS
+   
    oPrn:SetFont("Arial",12,.T.,.F.,.F.,.F.,0)   
    PrintLine(oPrn,nRow,nLineWidth)
    nRow+=oPrn:nCharHeight/2+1
@@ -275,6 +239,12 @@ FUNCTION SaleReport(Self, lPreview)
    nRow+=oPrn:nCharHeight
    PrintLine(oPrn,nRow,nLineWidth)
    nRow+=oPrn:nCharHeight/2
+   
+   nRow+=oPrn:nCharHeight*2
+   cText:="Authorised signatory"
+   oPrn:SetFont("Arial",12,.T.,.T.,.F.,.F.,0)   
+   oPrn:Say(oPrn:nLeftMargin+nLineWidth,nRow,cText,3,50,oPrn:GetTextHeightMM(cText,50))
+   
 
 
    IF lPreview
@@ -300,10 +270,3 @@ FUNCTION PrintLine(oPrn,t,w)
 
 RETURN Nil
 
-
-//----------------------------------------------------------------------------------------------------
-
-METHOD CheckBox1_OnClick( Sender ) CLASS WinPrintTest_Form1
-   ::EditBox2:Enabled:=Sender:Checked()
-   ::EditBox3:Enabled:=Sender:Checked()   
-RETURN Self

@@ -23,7 +23,7 @@ METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
    ::Left                 := 10
    ::Top                  := 10
    ::Width                := 321
-   ::Height               := 343
+   ::Height               := 379
    ::Text                 := "WinPrintTest_Form1"
    ::Center               := .T.
 
@@ -33,7 +33,7 @@ METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Button1"
       :Left                 := 58
-      :Top                  := 264
+      :Top                  := 306
       :Width                := 107
       :Height               := 25
       :Text                 := "Print preview test"
@@ -44,7 +44,7 @@ METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
    WITH OBJECT ( BUTTON( Self ) )
       :Name                 := "Button2"
       :Left                 := 180
-      :Top                  := 264
+      :Top                  := 306
       :Width                := 107
       :Height               := 25
       :Text                 := "Print test"
@@ -99,9 +99,9 @@ METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
 
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "GroupBox1"
-      :Left                 := 13
-      :Top                  := 157
-      :Width                := 272
+      :Left                 := 21
+      :Top                  := 199
+      :Width                := 264
       :Height               := 99
       :Text                 := "Report type"
       :Create()
@@ -186,6 +186,16 @@ METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
       :Number               := .T.
       :Create()
    END //EDITBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "chkLandscape"
+      :Left                 := 68
+      :Top                  := 159
+      :Width                := 100
+      :Height               := 16
+      :Text                 := "Landscape"
+      :Create()
+   END //CHECKBOX
 
    ::Show()
 

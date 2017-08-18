@@ -19,10 +19,16 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    LOCAL aPrnSetup,i,cAlias,nOldPDFRightMargin,lDefaultSize
 
    REQUEST DBFCDX, DBFFPT
-	
+   
+   ::Params:={}
+   
+   FOR i=1 TO HB_ArgC()
+      AAdd(::Params,HB_ArgV(i))
+   NEXT
+
    IF Empty(::Params)
 
-      MsgAlert("Please use as WinPrnPreview.exe <cDBF>")
+      MsgAlert("Please use as PrintPreview.exe <PreviewDataFile>")
       ::Application:Quit()
       RETURN Self
 
@@ -48,8 +54,6 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
       RETURN Self
 
    ENDIF
-
-   ::Text:=""
    
    ::aPrnPage:={}
 
@@ -179,7 +183,7 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    ENDIF
    
    IF lDefaultSize
-      ::Height:=800
+      ::Height:=600
       ::Width:=450
       ::CenterWindow(.T.)
    ENDIF
@@ -224,7 +228,7 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    ResizePreviewDlg(Self)
    
    ::Panel1:SetFocus()
-
+   
 RETURN Self
 
 
@@ -465,7 +469,7 @@ METHOD GotoPageToolStripButton_OnClick() CLASS PrintPreview_Form1
    LOCAL nPageNo, lOk
 
    nPageNo := ::nPage
-   lOk := PrintPreview_GetPageNo(Self, @nPageNo)
+   lOk := PrintPreview_GetPageNo(Self, @nPageNo, Len(::aEmfName))
 
    IF !lOk
       RETURN NIL
@@ -693,6 +697,7 @@ FUNCTION ResizePreviewDlg( Self, nZoom)
    LOCAL nWidth, nHeight, x, y 
 
    x := ::Width-40
+   
    IF ::VertScrollTopMargin=0 
       y := ::Height-::ToolStrip1:Height-40
    ELSE
@@ -714,7 +719,6 @@ FUNCTION ResizePreviewDlg( Self, nZoom)
       nWidth:=x-40
       nHeight:=Round(nWidth * ::nHeight / ::nWidth, 0)
    ENDIF
-
 
    nWidth:=Round(nWidth*(1+::nZoom*20/100),0)
    nHeight:=Round(nWidth*::nHeight/::nWidth,0)
@@ -760,7 +764,7 @@ RETURN Self
 METHOD Panel1_OnPaint( Sender ) CLASS PrintPreview_Form1
 
    LOCAL aRect,hDC,hMemDC,hMemBitmap,hOldBitmap
-
+   
    aRect:={0,0,Sender:xWidth,Sender:xHeight}
    hDC        := Sender:BeginPaint()
    
@@ -778,10 +782,13 @@ METHOD Panel1_OnPaint( Sender ) CLASS PrintPreview_Form1
    SetBkMode(hMemDC,TRANSPARENT)
    // Draw the actual printer data
 
-   VXH_PlayEnhMetaFile(::aEmfName[::nPage],hMemDC,0,0,Sender:Width,Sender:Height)
+   IF !(::aEmfName=NIL .OR. Len(::aEmfName)=0)
+      VXH_PlayEnhMetaFile(::aEmfName[::nPage],hMemDC,0,0,Sender:Width,Sender:Height)
+   ENDIF
 
    ::NeedsRedraw:=.F.  
-   
+
+
    BitBlt( hDC, 0, 0, Sender:Width, Sender:Height, hMemDC, 0, 0, SRCCOPY )
 
    SelectObject( hMemDC,  hOldBitmap )

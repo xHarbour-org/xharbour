@@ -9,8 +9,8 @@ CLASS PrintPreview_Form2 INHERIT Dialog
 
    // Event declaration
    METHOD PrintPreview_Form2_OnLoad()
-   METHOD Button1_OnClick()
    METHOD edtPageNo_OnVertScroll()
+   METHOD Button1_OnClick()
 
 ENDCLASS
 
@@ -26,12 +26,12 @@ METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form2
    ::Left                 := 10
    ::Top                  := 10
    ::Width                := 368
-   ::Height               := 224
+   ::Height               := 202
    ::Text                 := "Goto page"
    ::AlwaysOnTop          := .T.
    ::MaximizeBox          := .F.
    ::MinimizeBox          := .F.
-   ::Icon                 := { "W:\wf-PRG\Level2\VXH\Common Resources\wfH_16x16.ico","_WFH_16X16ICO" }
+   ::DlgModalFrame        := .T.
    ::Center               := .T.
 
    ::Create()
@@ -43,40 +43,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form2
    // Properties declaration
 
    // Populate Children
-   WITH OBJECT ( PICTUREBOX( Self ) )
-      :Name                 := "PictureBox1"
-      WITH OBJECT :Dock
-         :Left                 := "PrintPreview_Form2"
-         :Right                := "PrintPreview_Form2"
-         :Bottom               := "PrintPreview_Form2"
-         :Margins              := "0,0,0,0"
-      END
-
-      :Top                  := 135
-      :Width                := 352
-      :Height               := 50
-      :ImageName            := { "W:\wf-PRG\Level2\VXH\Common Resources\Ribbon.jpg","_RIBBONJPG" }
-      :Stretch              := .T.
-      :Create()
-      WITH OBJECT ( BUTTON( :this ) )
-         :Name                 := "Button1"
-         WITH OBJECT :Dock
-            :Top                  := "PictureBox1"
-            :Right                := "PictureBox1"
-            :Margins              := "0,12,12,0"
-         END
-
-         :Left                 := 260
-         :Top                  := 12
-         :Width                := 80
-         :Height               := 25
-         :Text                 := "Ok"
-         :EventHandler[ "OnClick" ] := "Button1_OnClick"
-         :Create()
-      END //BUTTON
-
-   END //PICTUREBOX
-
    WITH OBJECT ( GROUPBOX( Self ) )
       :Name                 := "GroupBox1"
       WITH OBJECT :Dock
@@ -122,6 +88,21 @@ METHOD OnInitDialog() CLASS PrintPreview_Form2
       END //MASKEDIT
 
    END //GROUPBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      WITH OBJECT :Dock
+         :Margins              := "0,12,12,0"
+      END
+
+      :Left                 := 252
+      :Top                  := 125
+      :Width                := 80
+      :Height               := 25
+      :Text                 := "Ok"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
 
 RETURN Self
 

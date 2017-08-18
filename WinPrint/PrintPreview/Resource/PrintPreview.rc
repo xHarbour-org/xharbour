@@ -1,4 +1,4 @@
-1 24 "WinPrint.exe.manifest"
+1 24 "PrintPreview.exe.manifest"
 #include "Winver.h"
 
 1 VERSIONINFO
@@ -17,9 +17,9 @@ FILESUBTYPE       0
          VALUE "CompanyName",      ""
          VALUE "FileDescription",  ""
          VALUE "FileVersion",      "1.0.0.0\0"
-         VALUE "InternalName",     "WinPrint"
+         VALUE "InternalName",     "PrintPreview"
          VALUE "LegalCopyright",   ""
-         VALUE "OriginalFilename", "WinPrint.exe"
+         VALUE "OriginalFilename", "PrintPreview.exe"
          VALUE "ProductName",      ""
          VALUE "ProductVersion",   "1.0.0.0\0"
       }
@@ -30,5 +30,3 @@ FILESUBTYPE       0
       VALUE "Translation", 0x409, 1252
    }
 }
-_WFH_16X16ICO ICON "W:\\wf-PRG\\Level2\\VXH\\Common Resources\\wfH_16x16.ico"
-_RIBBONJPG JPG "W:\\wf-PRG\\Level2\\VXH\\Common Resources\\Ribbon.jpg"

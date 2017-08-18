@@ -169,7 +169,6 @@ METHOD Create() CLASS WinPrint
       ::oPrinter:PaperLength:=2970
       ::lPaperLength:=.F.
    ELSEIF Val(::cFormType)=DMPAPER_CUSTOM
-   Alert(str(::nPageHeight)+","+str(::nPageWidth))
       ::oPrinter:FormType:=0
       ::oPrinter:PaperWidth:=::nPageWidth*10
       IF ::nPageHeight=0
@@ -1042,6 +1041,7 @@ RETURN Ceiling(n/::oPrinter:PixelsPerInchY*25.4)
 METHOD Preview(oParentForm) CLASS WinPrint
 
    LOCAL cAlias2,cFile2,lUse:=.T.,hDCBak,cEmfName,aEmfName,cEmfPrefix,hDC,j,nMaxY,nPrevColor,aPrevFont
+   LOCAL cPath
 
    IF ::lPreload
       RETURN Self
@@ -1198,8 +1198,19 @@ METHOD Preview(oParentForm) CLASS WinPrint
    CATCH
    END
 
-   PrintPreview_Form1(oParentForm,{cFile2})
-   
+//   PrintPreview_Form1(oParentForm,{cFile2})
+
+   cPath:=Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
+
+   IF File(cPath+"\PrintPreview.exe")
+      TRY
+         ShellExecute(0,"OPEN",cPath+"\PrintPreview.exe",cFile2,"",1)
+      CATCH
+         MsgAlert("Print preview data file corrupted")
+      END
+   ELSE
+      MsgAlert("Cannot find "+cPath+"\PRINTPREVIEW.EXE")
+   ENDIF
 RETURN Self
 
 
@@ -1594,100 +1605,194 @@ HB_FUNC( ENDPAGE_PREVIEW )
 
 
 
+// Adopted from codes by Dr. Claudio Soto (June 2014)
 
-
-HB_FUNC( EMF_DRAWIMAGE_LOWLEVEL )
+HB_FUNC ( EMF_DRAWIMAGE_LOWLEVEL )
 {
-   // 1: hDC
-   // 2: Image File
-   // 3: Row
-   // 4: Col
-   // 5: Height
-   // 6: Width
-   // 7: Stretch
-   // 8: Transparent
 
-   HDC     hdcPrint  = ( HDC ) hb_parnl( 1 );
+// 1: hDC
+// 2: Image File
+// 3: Row
+// 4: Col
+// 5: Height
+// 6: Width
+// 7: Stretch
+// 8: lTransparent
+// 9: aTransparentColor
+
+   HDC   hdcPrint  = (HDC)     hb_parnl (1);
    char *  FileName  = ( char * ) hb_parc( 2 );
-   BOOL    bBmpImage = TRUE;
    HBITMAP hBitmap;
-   HRGN    hRgn;
-   HDC     memDC;
-   INT     nWidth, nHeight;
-   POINT   Point;
-   BITMAP  Bmp;
-   int     r   = hb_parni( 3 ); // Row
-   int     c   = hb_parni( 4 ); // Col
-   int     odr = hb_parni( 5 ); // Height
-   int     odc = hb_parni( 6 ); // Width
-   int     dr;
-   int     dc;
+   HRGN hRgn;
+   INT nWidth, nHeight;
+   POINT Point;
+   BITMAP Bmp;
+   int r   = hb_parni (3);   // Row
+   int c   = hb_parni (4);   // Col
+   int odr = hb_parni (5);   // Height
+   int odc = hb_parni (6);   // Width
+   int dr ;
+   int dc ;
 
-   if( hdcPrint != NULL )
+   if ( hdcPrint != NULL )
    {
-      c  = ( c * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 ) - GetDeviceCaps( hdcPrint, PHYSICALOFFSETX );
-      r  = ( r * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 ) - GetDeviceCaps( hdcPrint, PHYSICALOFFSETY );
-      dc = ( odc * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 );
-      dr = ( odr * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 );
+      c  = ( c   * GetDeviceCaps ( hdcPrint, LOGPIXELSX ) / 1000 ) - GetDeviceCaps ( hdcPrint, PHYSICALOFFSETX );
+      r  = ( r   * GetDeviceCaps ( hdcPrint, LOGPIXELSY ) / 1000 ) - GetDeviceCaps ( hdcPrint, PHYSICALOFFSETY );
+      dc = ( odc * GetDeviceCaps ( hdcPrint, LOGPIXELSX ) / 1000 ); 
+      dr = ( odr * GetDeviceCaps ( hdcPrint, LOGPIXELSY ) / 1000 ); 
 
       hBitmap = ( HBITMAP ) LoadImage( GetModuleHandle( NULL ), FileName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION );
       if( hBitmap == NULL )
          hBitmap = ( HBITMAP ) LoadImage( NULL, FileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION );
       if( hBitmap == NULL )
-         bBmpImage = FALSE;
-      /* Not needed here
-      hBitmap = LoadImage( FileName );
-      */
-      if( hBitmap == NULL )
          return;
-
-      GetObject( hBitmap, sizeof( BITMAP ), &Bmp );
+      
+      GetObject (hBitmap, sizeof(BITMAP), &Bmp);
       nWidth  = Bmp.bmWidth;
       nHeight = Bmp.bmHeight;
 
-      if( ! hb_parl( 7 ) ) // Scale
+      if ( ! hb_parl (7) ) // Scale
       {
-         if( odr * nHeight / nWidth <= odr )
-            dr = odc * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 * nHeight / nWidth;
+         if ( odr * nHeight / nWidth <= odr )
+            dr = odc * GetDeviceCaps ( hdcPrint, LOGPIXELSY ) / 1000 * nHeight / nWidth;
          else
-            dc = odr * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 * nWidth / nHeight;
+            dc = odr * GetDeviceCaps ( hdcPrint, LOGPIXELSX ) / 1000 * nWidth / nHeight;
       }
 
-      GetViewportOrgEx( hdcPrint, &Point );
+      GetViewportOrgEx (hdcPrint, &Point);
 
-      hRgn = CreateRectRgn( c + Point.x,
-                            r + Point.y,
-                            c + dc + Point.x - 1,
-                            r + dr + Point.y - 1 );
+      hRgn = CreateRectRgn ( c + Point.x,
+                             r + Point.y,
+                             c + dc + Point.x - 1,
+                             r + dr + Point.y - 1);
 
-      SelectClipRgn( hdcPrint, hRgn );
+      SelectClipRgn (hdcPrint, hRgn);
 
-      if( ! bBmpImage )
-      {
-         if( hb_parl( 7 ) )             // Stretch
-            SetStretchBltMode( hdcPrint, COLORONCOLOR );
+      GetBrushOrgEx (hdcPrint, &Point);
+      SetStretchBltMode (hdcPrint, HALFTONE); 
+      SetBrushOrgEx (hdcPrint, Point.x, Point.y, NULL);
+
+      HDC memDC = CreateCompatibleDC (hdcPrint);
+      SelectObject (memDC, hBitmap);
+
+      BOOL Transparent      = (BOOL) hb_parl (8);
+      int  TransparentColor = HB_ISARRAY (9) ? (int) RGB (hb_parnl(9,1), hb_parnl(9,2), hb_parnl(9,3)) : -1;
+      COLORREF color_transp;
+
+      if (( Transparent == TRUE ) || ( TransparentColor != -1 ))
+      {  if (TransparentColor == -1)
+            color_transp = GetPixel (memDC, 0, 0);
          else
-         {
-            GetBrushOrgEx( hdcPrint, &Point );
-            SetStretchBltMode( hdcPrint, HALFTONE );
-            SetBrushOrgEx( hdcPrint, Point.x, Point.y, NULL );
-         }
+            color_transp = (COLORREF) TransparentColor;
+         TransparentBlt (hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, color_transp);
       }
-
-      memDC = CreateCompatibleDC( hdcPrint );
-      SelectObject( memDC, hBitmap );
-
-      if( hb_parl( 8 ) && ! bBmpImage ) // Transparent
-         TransparentBlt( hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, GetPixel( memDC, 0, 0 ) );
       else
-         StretchBlt( hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, SRCCOPY );
+         StretchBlt (hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, SRCCOPY);
 
-      SelectClipRgn( hdcPrint, NULL );
+      SelectClipRgn (hdcPrint, NULL);
 
-      DeleteObject( hBitmap );
-      DeleteDC( memDC );
+      DeleteObject (hBitmap);
+      DeleteDC (memDC);
    }
 }
+
+
+
+
+
+//HB_FUNC( EMF_DRAWIMAGE_LOWLEVEL )
+//{
+//   // 1: hDC
+//   // 2: Image File
+//   // 3: Row
+//   // 4: Col
+//   // 5: Height
+//   // 6: Width
+//   // 7: Stretch
+//   // 8: Transparent
+//
+//   HDC     hdcPrint  = ( HDC ) hb_parnl( 1 );
+//   char *  FileName  = ( char * ) hb_parc( 2 );
+//   BOOL    bBmpImage = TRUE;
+//   HBITMAP hBitmap;
+//   HRGN    hRgn;
+//   HDC     memDC;
+//   INT     nWidth, nHeight;
+//   POINT   Point;
+//   BITMAP  Bmp;
+//   int     r   = hb_parni( 3 ); // Row
+//   int     c   = hb_parni( 4 ); // Col
+//   int     odr = hb_parni( 5 ); // Height
+//   int     odc = hb_parni( 6 ); // Width
+//   int     dr;
+//   int     dc;
+//
+//   if( hdcPrint != NULL )
+//   {
+//      c  = ( c * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 ) - GetDeviceCaps( hdcPrint, PHYSICALOFFSETX );
+//      r  = ( r * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 ) - GetDeviceCaps( hdcPrint, PHYSICALOFFSETY );
+//      dc = ( odc * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 );
+//      dr = ( odr * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 );
+//
+//      hBitmap = ( HBITMAP ) LoadImage( GetModuleHandle( NULL ), FileName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION );
+//      if( hBitmap == NULL )
+//         hBitmap = ( HBITMAP ) LoadImage( NULL, FileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION );
+//      if( hBitmap == NULL )
+//         bBmpImage = FALSE;
+////       Not needed here
+////      hBitmap = LoadImage( FileName );
+////      
+//      if( hBitmap == NULL )
+//         return;
+//
+//      GetObject( hBitmap, sizeof( BITMAP ), &Bmp );
+//      nWidth  = Bmp.bmWidth;
+//      nHeight = Bmp.bmHeight;
+//
+//      if( ! hb_parl( 7 ) ) // Scale
+//      {
+//         if( odr * nHeight / nWidth <= odr )
+//            dr = odc * GetDeviceCaps( hdcPrint, LOGPIXELSY ) / 1000 * nHeight / nWidth;
+//         else
+//            dc = odr * GetDeviceCaps( hdcPrint, LOGPIXELSX ) / 1000 * nWidth / nHeight;
+//      }
+//
+//      GetViewportOrgEx( hdcPrint, &Point );
+//
+//      hRgn = CreateRectRgn( c + Point.x,
+//                            r + Point.y,
+//                            c + dc + Point.x - 1,
+//                            r + dr + Point.y - 1 );
+//
+//      SelectClipRgn( hdcPrint, hRgn );
+//
+//      if( ! bBmpImage )
+//      {
+//         if( hb_parl( 7 ) )             // Stretch
+//            SetStretchBltMode( hdcPrint, COLORONCOLOR );
+//         else
+//         {
+//            GetBrushOrgEx( hdcPrint, &Point );
+//            SetStretchBltMode( hdcPrint, HALFTONE );
+//            SetBrushOrgEx( hdcPrint, Point.x, Point.y, NULL );
+//         }
+//      }
+//
+//      memDC = CreateCompatibleDC( hdcPrint );
+//      SelectObject( memDC, hBitmap );
+//
+//      if( hb_parl( 8 ) && ! bBmpImage ) // Transparent
+//         TransparentBlt( hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, GetPixel( memDC, 0, 0 ) );
+//      else
+//         StretchBlt( hdcPrint, c, r, dc, dr, memDC, 0, 0, nWidth, nHeight, SRCCOPY );
+//
+//      SelectClipRgn( hdcPrint, NULL );
+//
+//      DeleteObject( hBitmap );
+//      DeleteDC( memDC );
+//   }
+//}
+
 
 
 HB_FUNC_STATIC( CREATEFONT )
