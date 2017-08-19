@@ -32,6 +32,8 @@ TARGETFOLDER = \xhb\bin\Personal
 [\xHarbour.com\xHarbour-xBuild\xbuild.ico]
 [\xHarbour.com\xHarbour-xBuild\xharbour320.avi]
 
+[wincore.lib]
+
 [tproject.lib]
 
 [xeditw.lib]
