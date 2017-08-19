@@ -34,7 +34,7 @@ METHOD Init( oParent ) CLASS VrFormula
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrFormula
-   LOCAL oXmlValue, oXmlFont
+   LOCAL oXmlValue
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Value", NIL, ::Value )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self

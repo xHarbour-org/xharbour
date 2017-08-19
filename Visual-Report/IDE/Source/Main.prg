@@ -144,12 +144,12 @@ CLASS RepApp INHERIT Application
    METHOD Init() CONSTRUCTOR
 ENDCLASS
 
-METHOD Init( cFile ) CLASS RepApp
+METHOD Init() CLASS RepApp
    oApp := Self
    oApp:Report := Report()
    HSetCaseMatch( ::Props, .F. )
    ::Super:Init( NIL )
-   MainForm( NIL )
+   VRMainForm( NIL )
    ::Run()
 RETURN Self
 
@@ -158,13 +158,13 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
-CLASS MainForm FROM WinForm
+CLASS VRMainForm FROM WinForm
    METHOD Init() CONSTRUCTOR
    METHOD OnClose()
 ENDCLASS
 
-METHOD Init() CLASS MainForm
-   LOCAL aSize, aEntries, cReport, oItem, aComp, n, i
+METHOD Init() CLASS VRMainForm
+   LOCAL aEntries, cReport, oItem
    ::Super:Init()
 
    ::Caption := "Visual Report"
@@ -209,7 +209,7 @@ METHOD Init() CLASS MainForm
             :ShortCutText      := "Ctrl+N"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "N" )
-            :Action            := {|o| ::Application:Report:NewReport() }
+            :Action            := {|| ::Application:Report:NewReport() }
             :Create()
          END
 
@@ -219,7 +219,7 @@ METHOD Init() CLASS MainForm
             :ShortCutText      := "Ctrl+O"
             :ShortCutKey:Ctrl  := .T.
             :ShortCutKey:Key   := ASC( "O" )
-            :Action            := {|o| ::Application:Report:Open() }
+            :Action            := {|| ::Application:Report:Open() }
             :Create()
          END
 
@@ -230,7 +230,7 @@ METHOD Init() CLASS MainForm
             :ShortCutText     := "Ctrl+S"
             :ShortCutKey:Ctrl := .T.
             :ShortCutKey:Key  := ASC( "S" )
-            :Action     := {|o|::Application:Report:Save() }
+            :Action     := {||::Application:Report:Save() }
             :Create()
          END
 
@@ -238,7 +238,7 @@ METHOD Init() CLASS MainForm
             :Caption    := "Save &As ... "
             :ImageIndex := 0
             :Enabled    := .F.
-            :Action     := {|o|::Application:Report:Save(.T.) }
+            :Action     := {||::Application:Report:Save(.T.) }
             :Create()
          END
 
@@ -250,7 +250,7 @@ METHOD Init() CLASS MainForm
             :ShortCutKey:Key  := ASC( "P" )
             :ImageIndex := 0
             :Enabled    := .F.
-            :Action     := {|o|::Application:Report:PageSetup() }
+            :Action     := {||::Application:Report:PageSetup() }
             :Create()
          END
 
@@ -258,7 +258,7 @@ METHOD Init() CLASS MainForm
             :Begingroup := .T.
             :Caption    := "&Exit"
             :ImageIndex := 0
-            :Action     := {|o|::Application:MainForm:Close() }
+            :Action     := {||::Application:MainForm:Close() }
             :Create()
          END
 
@@ -390,14 +390,14 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ToolStripButton( :this )
          :Caption           := "New"
          :ImageIndex        := ::System:StdIcons:FileNew
-         :Action            := {|o| ::Application:Report:NewReport() }
+         :Action            := {|| ::Application:Report:NewReport() }
          :Create()
       END
 
       WITH OBJECT ::Application:Props[ "OpenBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileOpen
          :ToolTip:Text := "Open"
-         :Action       := {|o| ::Application:Report:Open() }
+         :Action       := {|| ::Application:Report:Open() }
          :DropDown     := 2
          :Create()
          aEntries := ::Application:IniFile:GetEntries( "Recent" )
@@ -416,7 +416,7 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ::Application:Props[ "CloseBttn" ] := ToolStripButton( :this )
          :ImageIndex   := 16
          :ToolTip:Text := "Close"
-         :Action       := {|o|::Application:Report:Close() }
+         :Action       := {||::Application:Report:Close() }
          :Enabled      := .F.
          :Create()
       END
@@ -424,7 +424,7 @@ METHOD Init() CLASS MainForm
       WITH OBJECT ::Application:Props[ "SaveBttn" ] := ToolStripButton( :this )
          :ImageIndex   := ::System:StdIcons:FileSave
          :ToolTip:Text := "Save"
-         :Action       := {|o|::Application:Report:Save() }
+         :Action       := {||::Application:Report:Save() }
          :Enabled      := .F.
          :Create()
       END
@@ -503,7 +503,7 @@ METHOD Init() CLASS MainForm
          :ImageIndex      := 18
          :ToolTip:Text    := "Run report (F5)"
          :ShortCutKey:Key := VK_F5
-         :Action          := {|o|::Application:Report:Run() }
+         :Action          := {||::Application:Report:Run() }
          :Enabled         := .F.
          :Create()
       END
@@ -720,7 +720,7 @@ METHOD Init() CLASS MainForm
 
 RETURN Self
 
-METHOD OnClose() CLASS MainForm
+METHOD OnClose() CLASS VRMainForm
    LOCAL nClose
    IF ::Application:Report != NIL
       IF ( nClose := ::Application:Report:Close() ) != NIL
@@ -828,7 +828,7 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD EditRedo() CLASS Report
-   LOCAL n, oObj, xVal, cProp, cProp2
+   LOCAL xVal, cProp, cProp2
    IF VALTYPE( ::aRedo[1][1] ) == "A" .AND. ::aRedo[1][2] == "__MOVESIZE"
       WITH OBJECT ::aRedo[1][3]
          AINS( ::aUndo, 1, { { :Left, :Top, :Width, :Height }, "__MOVESIZE", ::aRedo[1][3] }, .T. )
@@ -861,8 +861,6 @@ RETURN NIL
 
 //-------------------------------------------------------------------------------------------------------
 METHOD NewReport() CLASS Report
-   LOCAL oPs
-
    IF ::VrReport != NIL .AND. ::Close() != NIL
       RETURN NIL
    ENDIF
@@ -1080,7 +1078,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Open( cReport ) CLASS Report
-   LOCAL oFile, pHrb, nX
+   LOCAL oFile
 
    IF ::VrReport != NIL .AND. ::Close() != NIL
       RETURN NIL
@@ -1129,7 +1127,7 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Generate( oCtrl, oXmlNode ) CLASS Report
-   LOCAL aProps, oXmlValue, oXmlControl, oSub
+   LOCAL oXmlValue, oXmlControl, oSub
 
    oXmlControl := TXmlNode():new( , "Control" )
       oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "ClsName", NIL, oCtrl:ClassName )
@@ -1153,9 +1151,9 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------------
 METHOD Save( lSaveAs, cTemp ) CLASS Report
-   LOCAL cHrb, cName, n, nHeight, cBuffer, aCtrls, i, pHrb, xhbPath, aCtrl
-   LOCAL oFile, cFile
-   LOCAL oXmlReport, oXmlProp, hAttr, oXmlSource, oXmlData, oXmlValue, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oRep, oXmlComp
+   LOCAL cName, n, aCtrl
+   LOCAL cFile
+   LOCAL oXmlReport, oXmlProp, oXmlSource, oXmlHeader, oXmlBody, oXmlExtra, oXmlFooter, oXmlComp
 
    cFile := cTemp
    DEFAULT cFile TO ::FileName
@@ -1331,7 +1329,7 @@ RETURN oFile:FileName
 //-------------------------------------------------------------------------------------------------------
 
 METHOD ResetQuickOpen( cFile ) CLASS Report
-   LOCAL lMembers, aEntries, n, cProject, oItem, nId, nBkHeight, oLink, x, oMenu
+   LOCAL aEntries, n, oItem
 
    // IniFile Recently open projects
    aEntries := oApp:IniFile:ReadArray( "Recent" )
@@ -1368,3 +1366,5 @@ METHOD ResetQuickOpen( cFile ) CLASS Report
 RETURN Self
 
 #endif
+
+FUNCTION _(c);RETURN c

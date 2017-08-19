@@ -37,7 +37,7 @@ CLASS PropEditor INHERIT TreeView
    METHOD ResetProperties()
    METHOD OnUserMsg()
    METHOD Create()
-   METHOD OnHScroll( n, nPos ) INLINE ::nScroll := n
+   METHOD OnHScroll( n )       INLINE ::nScroll := n
    METHOD OnDestroy()          INLINE ::LevelFont:Delete(), NIL
 
    METHOD OnEraseBkGnd()
@@ -61,7 +61,7 @@ ENDCLASS
 //---------------------------------------------------------------------------------------------------
 
 METHOD CheckValue( cProp, cRoot, xValue ) CLASS PropEditor
-   LOCAL xVal, lDiff, oItem := ::SearchString( cProp, cRoot )
+   LOCAL xVal, oItem := ::SearchString( cProp, cRoot )
    IF oItem != NIL
       xVal := oItem:ColItems[1]:Value
       IF !( VALTYPE( xVal ) == VALTYPE( xValue ) )
@@ -98,7 +98,6 @@ METHOD OnGetDlgCode() CLASS PropEditor
 RETURN DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
 
 METHOD Init( oParent ) CLASS PropEditor
-   LOCAL cColor
    ::ReleaseEditSelection := .F.
    DEFAULT ::__xCtrlName  TO "PropEditor"
    ::Super:Init( oParent )
@@ -118,7 +117,7 @@ METHOD Create() CLASS PropEditor
    ::LevelFont:Weight     := 700
    ::LevelFont:Create()
    ::SetIndent( 15 )
-   ::SetItemHeight( ABS( ::Font:Height ) + 6 )
+   //::SetItemHeight( ABS( ::Font:Height ) + 6 )
 RETURN Self
 
 //---------------------------------------------------------------------------------------------------
@@ -148,7 +147,8 @@ RETURN 1
 
 //---------------------------------------------------------------------------------------------------
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS PropEditor
-   LOCAL oItem, tvcd, tvkd
+   LOCAL tvcd
+   (nwParam)
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
            tvcd := (struct NMTVCUSTOMDRAW)
@@ -286,11 +286,11 @@ METHOD SetPropValue( xValue, cCaption, oObject, cProp, cProp2 ) CLASS PropEditor
 RETURN Self
 
 METHOD DrawItem( tvcd ) CLASS PropEditor
-   LOCAL hItem, n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
+   LOCAL n, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
    LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, nfHeight := ABS( ::Font:Height )+3
-   LOCAL nPos, cCap, xValue, cProp, nLevel, hDC, oItem
-   LOCAL hOldFont, hIcon, lDisabled := .F.
-   LOCAL hMemBitmap, hOldBitmap, lEnabled, hBoldFont
+   LOCAL nPos, cCap, nLevel, hDC, oItem
+   LOCAL hIcon, lDisabled := .F.
+   LOCAL lEnabled
 
    rc       := tvcd:nmcd:rc
    oItem    := FindTreeItem( ::Items, tvcd:nmcd:dwItemSpec )
@@ -500,6 +500,9 @@ METHOD DrawItem( tvcd ) CLASS PropEditor
              nFore := GetSysColor( COLOR_BTNSHADOW )
              SetTextColor( hDC, nFore )
           ENDIF
+          IF VALTYPE(cText) != "C"
+             cText := ""
+          endif
 
           _ExtTextOut( hDC, x, y, ETO_CLIPPED+ETO_OPAQUE, { nLeft, rc:top, nRight, rc:bottom }, cText  )
 
@@ -548,7 +551,7 @@ RETURN 0
 //---------------------------------------------------------------------------------------------------
 
 METHOD GetValue( cProp, cRoot ) CLASS PropEditor
-   LOCAL lDiff, oItem := ::SearchString( cProp, cRoot )
+   LOCAL oItem := ::SearchString( cProp, cRoot )
    IF oItem != NIL
       RETURN oItem:ColItems[1]:Value
    ENDIF
@@ -557,9 +560,8 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------------
 
 METHOD OnLButtonDown(n,x,y) CLASS PropEditor
-   LOCAL oItem, rc, pt, aSize, cText
-   LOCAL nCol:=0, z, nLeft
-
+   LOCAL oItem, nCol:=0, z, nLeft
+   (n)
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
       ::ActiveControl := NIL
@@ -592,7 +594,8 @@ METHOD OnLButtonDown(n,x,y) CLASS PropEditor
 RETURN NIL
 
 METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
-   LOCAL oItem, rc, cType, n, cProp, cFont, cText
+   LOCAL oItem, rc, cType, n, cProp, cFont
+   (hWnd)
    DO CASE
       CASE nMsg == WM_USER + 4768
            ::ActiveItem := FindTreeItem( ::Items, TVGetSelected( ::hWnd ) )
@@ -648,7 +651,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Owner  := ::ActiveObject
                             :OnWMKillFocus := {|o|o:HideDropDown(),o:Destroy() }
                             :OnWMKeyDown   := {|o,n| IIF( n == 27, o:Destroy(),NIL ) }
-                            :Action := {|o, n, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetPropValue( cSel ) }
+                            :Action := {|o, oPar, cSel| cSel := o:GetSelString(), oPar := o:Parent, o:Destroy(), oPar:SetPropValue( cSel ) }
                             :Create()
 
                             cFont := :Cargo
@@ -703,7 +706,7 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :OnWMLButtonUp := {|o,x,y|CheckBtnClickPos(o,x,y) }
                             :OnWMKillFocus := {|o|o:Destroy() }
 
-                            :Action := <|o,oUI|
+                            :Action := <|oUI|
                                          oUI := FilterUI( ::ActiveObject )
                                          IF oUI != NIL .AND. oUI:Result==IDOK
                                             ::ActiveObject:Filter := oUI:BuildFilter
@@ -726,8 +729,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             :Top    := rc:top+1
                             :Width  := ::Columns[ nCol ][ 1 ]+2 - IIF( cType == "ICONS", 20, 0 )
                             :Height := rc:bottom-rc:top-1
-                            :SetExStyle( WS_EX_CLIENTEDGE, .F. )
+                            :Border := 0
                             :Style  := :Style | ES_AUTOHSCROLL | ES_MULTILINE & NOT( WS_BORDER )
+                            :SetExStyle( WS_EX_CLIENTEDGE, .F. )
                             :Button := .T.
                             :ButtonAction := {|o| ::EditText( o ) }
 
@@ -738,7 +742,9 @@ METHOD OnUserMsg( hWnd, nMsg, nCol, nLeft ) CLASS PropEditor
                             ENDIF
 
                             :Create()
+                            :lDesignMode  := .T.
                             :Text := ::GetEditBuffer( ::ActiveItem, nCol )
+                            :lDesignMode  := .F.
                             :Cargo := :Text
 
                             :OnWMKillFocus := {|o,cText,oPar| cText := o:Caption,;
@@ -892,7 +898,7 @@ FUNCTION InitEditText( oForm, oMan )
       :Height      := 25
       :Dock:Right  := oForm
       :Dock:Bottom := oForm
-      :Action      := {|o| oForm:Close()}
+      :Action      := {|| oForm:Close()}
       :Create()
    END
    WITH OBJECT oOK := Button( oForm )
@@ -900,12 +906,11 @@ FUNCTION InitEditText( oForm, oMan )
       :Height      := 25
       :Dock:Right  := oCancel
       :Dock:Bottom := oForm
-      :Action      := {|o| oMan:SetPropValue( oEdit:Caption ),;
-                           oForm:Close()}
+      :Action      := {|| oMan:SetPropValue( oEdit:Caption ),;
+                          oForm:Close()}
       :Create()
    END
    WITH OBJECT oEdit := EditBox( oForm )
-      :Caption     := oForm:Cargo:Caption
       :Dock:Left   := oForm
       :Dock:Top    := oForm
       :Dock:Right  := oForm
@@ -916,15 +921,16 @@ FUNCTION InitEditText( oForm, oMan )
       :WantReturn   := .T.
       :Multiline   := .T.
       :Create()
+      :Caption     := oForm:Cargo:Caption
    END
 RETURN NIL
 
 
 METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS PropEditor
-   LOCAL cProp, cProp2, aProp, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2
-   LOCAL aObj, aProperties, cProperty, aProperty, aSubProp, cType, Child, xProp
+   LOCAL cProp, cProp2, xValue, n, oItem, nColor, aSub, aCol, oSub, oObj, xValue2
+   LOCAL aProperties, aProperty, aSubProp, cType, Child
    LOCAL aField
-
+   (aSubExpand)
    IF ::ActiveControl != NIL .AND. ::ActiveControl:IsWindow()
       ::ActiveControl:Destroy()
       ::ActiveControl := NIL
@@ -1093,10 +1099,10 @@ METHOD ResetProperties( aSel, lPaint, lForce, aSubExpand, lRefreshComp ) CLASS P
           aCol[1]:Value    := ::ActiveObject:GetValue( cProp )
           //aCol[1]:ColType  := ::ActiveObject:ClsName
           //aCol[1]:SetValue := ::ActiveObject:Value
-          aCol[1]:Action   := {|o, n, oPar, c| oPar := o:Parent,;
-                                               o:Destroy(),;
-                                               c := o:Cargo[1],;
-                                               oPar:SetPropValue( c ) }
+          aCol[1]:Action   := {|o, oPar, c| oPar := o:Parent,;
+                                            o:Destroy(),;
+                                            c := o:Cargo[1],;
+                                            oPar:SetPropValue( c ) }
        ENDIF
 
        oSub := oItem:AddItem( cProp, 0, aCol )
@@ -1213,8 +1219,8 @@ RETURN Self
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS ObjCombo
 
-   LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, hBrush, hOld, z, aAlign, y
-
+   LOCAL n, x, lSelected, aRect, aClip, nLen, itemTxt, cText, nField, z, aAlign, y
+   (nwParam, nlParam)
    IF dis:hwndItem == ::hWnd
       DEFAULT ::ColWidth TO ::ClientWidth
 
@@ -1332,7 +1338,7 @@ HB_FUNC( DRAWMINUSPLUS )
 #pragma ENDDUMP
 
 STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
-   LOCAL cName, oFile := CFile( oEdit:Caption )
+   LOCAL oFile := CFile( oEdit:Caption )
    oEdit:OnWMKillFocus := NIL
 
    DEFAULT lIcon TO .F.
@@ -1376,7 +1382,7 @@ STATIC FUNCTION BrowseForFile( oEdit, oMan, oObj, lIcon, aFilter )
       oEdit:SetFocus()
    ENDIF
 RETURN NIL
-
+/*
 STATIC FUNCTION BrowseForFolder( oEdit, oMan, oItem )
    LOCAL cDir
    static pCallBack
@@ -1411,7 +1417,7 @@ STATIC FUNCTION BrowseForFolderCallBack( hWnd, nMsg, lp, pData )
          SendMessage( hWnd, BFFM_SETSTATUSTEXT, 0, cBuffer )
    END
 RETURN 0
-
+*/
 STATIC FUNCTION CheckKeyDown( o, n )
    LOCAL oPar, cText
    SWITCH n
@@ -1477,7 +1483,7 @@ STATIC FUNCTION CheckChar( o, n, oItem )
    END
 RETURN NIL
 
-STATIC FUNCTION CheckCharPaste( o, n, oItem )
+STATIC FUNCTION CheckCharPaste()
 RETURN 0
 
 STATIC FUNCTION CompileValue( cVal )

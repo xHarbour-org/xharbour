@@ -43,7 +43,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD AddButton( oComponent ) CLASS ComponentPanel
-   LOCAL n, x, lExit, nBtn, aButtons, hIcon, oItem, aSize, oBtn := CompButton( Self )
+   LOCAL n, x, lExit, nBtn, aButtons, aSize, oBtn := CompButton( Self )
    oComponent:Button := oBtn
    WITH OBJECT oBtn
       :Component   := oComponent
@@ -52,12 +52,12 @@ METHOD AddButton( oComponent ) CLASS ComponentPanel
       :Caption     := oComponent:Name
       :ImageList   := ::Application:MainForm:ToolBox1:ImageList
       :Action      := {|o| o:SelectComponent()}
-      
+
       aButtons := ::Application:MainForm:ToolBox1:aButtons
       nBtn  := 1
       lExit := .F.
-      
-     
+
+
       FOR n := 1 TO LEN( aButtons )
           FOR x := 1 TO LEN( aButtons[n][2] )
               nBtn ++
@@ -94,8 +94,8 @@ RETURN oBtn
 //------------------------------------------------------------------------------------------
 
 METHOD Reset() CLASS ComponentPanel
-   LOCAL n, Component, Btn, aChildren, lUpdate := .T.
-   
+   LOCAL n, aChildren, lUpdate := .T.
+
    aChildren := {}
    FOR n := 1 TO LEN( ::Children )
        IF ::Children[n]:ClsName == "Button"
@@ -122,7 +122,7 @@ RETURN NIL
 //------------------------------------------------------------------------------------------
 
 METHOD Close() CLASS ComponentPanel
-   LOCAL n, Component, Btn, aChildren, lUpdate := .T.
+   LOCAL n, aChildren, lUpdate := .T.
    aChildren := {}
    FOR n := 1 TO LEN( ::Children )
        IF ::Children[n]:ClsName == "Button"
@@ -181,7 +181,7 @@ RETURN 0
 
 //------------------------------------------------------------------------------------------
 METHOD Delete() CLASS CompButton
-   LOCAL oBtn, Control
+   LOCAL oBtn
    ::Destroy()
    ::Parent:LeftMargin := 10
    FOR EACH oBtn IN ::Parent:Children
@@ -196,8 +196,7 @@ METHOD Delete() CLASS CompButton
    ::Parent:__SetScrollBars()
 RETURN NIL
 
-METHOD OnKeyDown( nwParam, nlParam ) CLASS CompButton
-   LOCAL oBtn, Control
+METHOD OnKeyDown( nwParam ) CLASS CompButton
    IF nwParam == VK_DELETE
    ENDIF
 RETURN 0
@@ -205,9 +204,8 @@ RETURN 0
 //------------------------------------------------------------------------------------------
 
 METHOD OnParentDrawItem( nwParam, nlParam, dis ) CLASS CompButton
-
-   LOCAL nLeft, nTop, hDC, cPaint, aRect, nStyle, lDisabled, lSelected, lFocus, hTheme, aTextRect, nTextFlags
-
+   LOCAL nLeft, nTop, aRect, lDisabled, lSelected, lFocus, aTextRect, nTextFlags
+   (nwParam, nlParam)
    IF dis:CtlType & ODT_BUTTON != 0 .AND. ( ( ::ImageList != NIL .AND. ::ImageIndex != NIL ) .OR. ::bkBrush != NIL .OR. ::ForeColor != NIL )
       nTop := 5
       nLeft:= 3

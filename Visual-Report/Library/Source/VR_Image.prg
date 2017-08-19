@@ -64,7 +64,7 @@ METHOD Create() CLASS VrImage
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrImage
-   LOCAL oXmlValue, oXmlFont
+   LOCAL oXmlValue
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
@@ -78,9 +78,21 @@ METHOD WriteProps( oXmlControl ) CLASS VrImage
 RETURN Self
 
 METHOD Draw( hDC ) CLASS VrImage
-   local nX, nY, x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
+   local hImage, cFilename, nX, nY, x, y, cx, cy, cName := "Image" + AllTrim( Str( ::Parent:nImage++ ) )
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
    nY := GetDeviceCaps( hDC, LOGPIXELSY )
+
+   TRY
+      cFilename := &(::FileName)
+      cFilename := Eval( cFilename )
+   CATCH
+      cFilename := ::FileName
+   END
+
+   hImage   := FreeImageLoad( FreeImageGetFileType( cFilename ), cFilename, 0 )
+   ::Width  := FreeImageGetWidth( hImage )
+   ::Height := FreeImageGetHeight( hImage )
+   FreeImageUnload( hImage )
 
    x  := ( ::nPixPerInch / nX ) * ::Left
    y  := ::Parent:nRow + ( ( ::nPixPerInch / nY ) * ::Top )
@@ -90,7 +102,12 @@ METHOD Draw( hDC ) CLASS VrImage
       :CreateObject( acObjectTypePicture,  cName )
       ::PDFCtrl := :GetObjectByName( cName )
       WITH OBJECT ::PDFCtrl
-         :Attribute( "FileName", ::FileName )
+         IF ! Empty( cFilename )
+            TRY
+               :Attribute( "FileName", cFileName )
+            catch
+            end
+         ENDIF
          :Attribute( "Left",     x )
          :Attribute( "Top",      y )
          :Attribute( "Right",    x + cx )
@@ -116,6 +133,7 @@ ENDCLASS
 
 METHOD OnLButtonDown(n,x,y) CLASS __VrImage
    LOCAL aRect, oCtrl
+   (n)
    ::Parent:SetCapture()
    IF ::Application:Props:PropEditor:ActiveObject != NIL
       oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl

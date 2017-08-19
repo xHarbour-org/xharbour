@@ -57,7 +57,7 @@ METHOD Create() CLASS VrLine
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrLine
-   LOCAL oXmlValue, oXmlFont
+   LOCAL oXmlValue
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Left", NIL, XSTR( ::Left ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
@@ -67,7 +67,7 @@ METHOD WriteProps( oXmlControl ) CLASS VrLine
 RETURN Self
 
 METHOD Draw( hDC ) CLASS VrLine
-   LOCAL nX, nY, x, y, cx, cy, cUnderline, cText, cItalic, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
+   LOCAL nX, nY, x, y, cx, cName := "Line" + AllTrim( Str( ::Parent:nLine++ ) )
 
    nX := GetDeviceCaps( hDC, LOGPIXELSX )
    nY := GetDeviceCaps( hDC, LOGPIXELSY )

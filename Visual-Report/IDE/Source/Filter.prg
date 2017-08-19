@@ -55,7 +55,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oDataTable ) CLASS FilterUI
-   LOCAL lProp
    IF EMPTY( oDataTable:Alias )
       ::Application:MainForm:MessageBox( "The Alias property cannot be empty", "DataTable" )
       RETURN NIL
@@ -72,7 +71,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS FilterUI
-   LOCAL hFilter, aExps, n, i, aExp, hExp
+   LOCAL hFilter, aExps, i
 
    ::Left    := 190
    ::Top     := 20
@@ -177,7 +176,7 @@ METHOD OnInitDialog() CLASS FilterUI
    END
    ::AddConditionButton_OnClick()
    ::CenterWindow()
-   
+
    hFilter := ::oDataTable:Filter
 
    IF VALTYPE( hFilter ) == "H"
@@ -207,8 +206,8 @@ METHOD OnInitDialog() CLASS FilterUI
 RETURN NIL
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
-   LOCAL cName, n, oLastPanel
+METHOD AddConditionButton_OnClick() CLASS FilterUI
+   LOCAL oLastPanel
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
       IF LEN( oLastPanel:Children ) == 4
@@ -300,7 +299,7 @@ METHOD AddConditionButton_OnClick( Sender ) CLASS FilterUI
          END
 
          ::AddButtons( :this, .F. )
-         
+
          :SetRedraw( .T. )
          :RedrawWindow( , , RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_INTERNALPAINT | RDW_ALLCHILDREN )
          :UpdateWindow()
@@ -531,9 +530,9 @@ METHOD RemoveConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
-   LOCAL cName, n, oLastPanel
-   
+METHOD MoreConditionButton_OnClick() CLASS FilterUI
+   LOCAL oLastPanel
+
    IF LEN( ::ConditionPanel:Children ) > 0
       oLastPanel := ATAIL( ::ConditionPanel:Children )
       oLastPanel:Children[-3]:Enabled := .F.
@@ -581,7 +580,7 @@ METHOD MoreConditionButton_OnClick( Sender ) CLASS FilterUI
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD FilterBrowse_OnClick( Sender ) CLASS FilterUI
+METHOD FilterBrowse_OnClick() CLASS FilterUI
    LOCAL oDlg
    ::GetFilterExp()
 
@@ -611,7 +610,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 METHOD GetFilterExp() CLASS FilterUI
-   LOCAL cAndOr, nNum, cExpSel, cField, cExp1, cExp2, nSel1, nSel2, oPanel, n, cType, aExp, hExp
+   LOCAL cField, oPanel, n, hExp
 
    ::BuildFilter := {=>}
    HSetCaseMatch( ::BuildFilter, .F. )
@@ -625,7 +624,7 @@ METHOD GetFilterExp() CLASS FilterUI
        IF !EMPTY( cField )
           hExp := {=>}
           HSetCaseMatch( hExp, .F. )
-          
+
           hExp:AndOr  := NIL
           IF LEN( oPanel:Children ) == 4
              hExp:AndOr  := oPanel:Children[1]:GetCurSel()
@@ -657,7 +656,7 @@ RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 METHOD LoadFieldList( oComboBox ) CLASS FilterUI
-   LOCAL n, i, aFields
+   LOCAL n, aFields
    oComboBox:ResetContent()
    aFields := ::oDataTable:EditCtrl:Struct()
    FOR n := 1 TO LEN( aFields )
@@ -689,12 +688,12 @@ ENDCLASS
 
 METHOD OnInitDialog() CLASS TestFilter
    LOCAL cFilter, oGrid, oEdit, oData, oTable := ::Parent:oDataTable
-   
+
    WITH OBJECT oData := &(SubStr(oTable:ClsName,3))( Self )
-   
+
       :xFileName := oTable:FileName
       :Driver   := oTable:Driver
-      
+
       IF oTable:Driver != "SQLRDD"
          :Alias := oTable:Alias
          :Create()

@@ -24,7 +24,7 @@ CLASS ToolBox INHERIT TreeView
    DATA LevelFont    PROTECTED
    DATA hPen         PROTECTED
    DATA nImage       PROTECTED
-   
+
    DATA ActiveItem   EXPORTED
    DATA HoverItem    EXPORTED
    DATA aButtons     EXPORTED
@@ -35,7 +35,7 @@ CLASS ToolBox INHERIT TreeView
    METHOD Init() CONSTRUCTOR
    METHOD Create()
 
-   METHOD OnHScroll( n, nPos ) INLINE ::nScroll := n
+   METHOD OnHScroll( n ) INLINE ::nScroll := n
    METHOD OnNCDestroy()        INLINE ::LevelFont:Delete(), DeleteObject( ::hPen ), DeleteObject( ::hPenShadow )
    METHOD OnEraseBkGnd()
    METHOD OnParentNotify()
@@ -55,7 +55,6 @@ ENDCLASS
 //------------------------------------------------------------------------------------------
 
 METHOD Init( oParent ) CLASS ToolBox
-   LOCAL n, cName, cType, xData, cValue, lPro
    DEFAULT ::__xCtrlName  TO "ToolBox"
    ::Super:Init( oParent )
    ::ShowSelAlways := .T.
@@ -79,7 +78,6 @@ RETURN Self
 
 METHOD Create() CLASS ToolBox
    LOCAL nIndex, nIcon, o, oPtr, oItem, n, x
-   LOCAL hKey, cName, cType, xData, hSub, cValue, oTypeLib, cId, cProgID, cClsID, lPro
 
    ::VertScroll := .F.
    ::Super:Create()
@@ -108,12 +106,12 @@ METHOD Create() CLASS ToolBox
 
    FOR n := 2 TO LEN( ::aButtons )
        aSort(::aButtons[n][2],,,{|x, y| x[1] < y[1]})
-       
+
        // Add to "All"
        AEVAL( ::aButtons[n][2], {|a| AADD( ::aButtons[1][2], { a[1], a[2] } ) } )
    NEXT
    aSort(::aButtons[1][2],,,{|x, y| x[1] < y[1]})
-   
+
    ::ImageList := ImageList( Self, 16, 16 ):Create()
    ::ImageList:AddIcon( "ICO_Pointer" )
 
@@ -122,18 +120,18 @@ METHOD Create() CLASS ToolBox
 
        oItem := ::AddItem( ::aButtons[n][1] )
        oItem:Cargo := .T.
-       
+
        oPtr := oItem:AddItem( "Pointer", 1 )
        oPtr:Action := {|o|IIF( o:Parent:Enabled, ::SetControlCursor(o),) }
        oPtr:Cargo := .T.
 
        FOR x := 1 TO LEN( ::aButtons[n][2] )
-           
+
            nIcon := ::ImageList:AddImage( "ICO_" + UPPER( ::aButtons[n][2][x][1] ) )
-           
+
            o := oItem:AddItem( ::aButtons[n][2][x][1], IIF( nIcon != NIL, nIndex, -1 ) )
            o:Cargo := ::aButtons[n][2][x][2]
-           
+
            o:PointerItem := oPtr
            IF nIcon != NIL
               nIndex ++
@@ -152,7 +150,7 @@ METHOD Create() CLASS ToolBox
 RETURN Self
 
 METHOD FindItem( cText ) CLASS ToolBox
-   LOCAL oItem, n, i
+   LOCAL n, i
    FOR n := 2 TO LEN( ::Items )
        FOR i := 1 TO LEN( ::Items[n]:Items )
            IF ::Items[n]:Items[i]:Caption == cText
@@ -193,7 +191,7 @@ METHOD OnEraseBkGnd( hDC ) CLASS ToolBox
 RETURN 1
 
 METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
-   LOCAL oItem, tvcd, tvkd
+   LOCAL tvcd
    Super:OnParentNotify( nwParam, nlParam, hdr )
    DO CASE
       CASE hdr:code == NM_CUSTOMDRAW
@@ -207,14 +205,14 @@ METHOD OnParentNotify( nwParam, nlParam, hdr ) CLASS ToolBox
               CASE tvcd:nmcd:dwDrawStage == CDDS_ITEMPREPAINT
                    ::DrawItem( tvcd )
                    SetWindowLong( ::Parent:hWnd, DWL_MSGRESULT, CDRF_SKIPDEFAULT  )
-                   RETURN CDRF_SKIPDEFAULT 
+                   RETURN CDRF_SKIPDEFAULT
            ENDCASE
    ENDCASE
 RETURN NIL
 
 METHOD DrawItem( tvcd ) CLASS ToolBox
-   LOCAL hItem, n, oItem, nState, nBack, nFore, lExpanded, rc, nWidth, nLeft, nRight, nBottom, aAlign, x, y, lHasChildren
-   LOCAL aRow, aCol, hOldPen, nAlign, cType, nColor, hOld, hBrush, aRest, cText, hPen, cPaint, nFlags, hBackBrush, nBackColor, hItemBrush
+   LOCAL oItem, nState, nBack, nFore, lExpanded, rc, nLeft, nRight, nBottom, aAlign, x, y
+   LOCAL hBrush, aRest, cText, hPen, nFlags, hBackBrush, nBackColor, hItemBrush
    LOCAL hBorderPen, hSelBrush, hDC
 
    hDC        := tvcd:nmcd:hdc
@@ -258,9 +256,9 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
    IF oItem:Level > 0
       x += 5
    ENDIF
-   
+
    _FillRect( hDC, { rc:left, rc:top, rc:right, rc:bottom }, hBackBrush )
-   
+
    IF oItem:Level == 0
       rc:top ++
       FillGradient( hDC, rc, ::ColorScheme:ToolStripGradientEnd, ::ColorScheme:ToolStripGradientBegin )
@@ -287,7 +285,7 @@ METHOD DrawItem( tvcd ) CLASS ToolBox
          SetBkColor( hDC, ::ColorScheme:MenuItemSelected )
       ENDIF
    ENDIF
-   
+
    nFlags := ETO_CLIPPED | ETO_OPAQUE
    IF oItem:Level == 0
       SetBkMode( hDC, TRANSPARENT )
@@ -330,7 +328,7 @@ METHOD OnSelChanged( oItem ) CLASS ToolBox
 RETURN 0
 
 METHOD SetControlCursor( oItem ) CLASS ToolBox
-   LOCAL cClass, n, hClass
+   LOCAL cClass
    LOCAL oApp := __GetApplication()
    ::ActiveItem := oItem
    cClass := oItem:Caption

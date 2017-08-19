@@ -33,6 +33,18 @@ static nPageNumber
 #define FC_TRUE       "True"
 #define FC_FALSE      "False"
 
+#define SIGNATURE_DISPLAY_SIGNER      1
+#define SIGNATURE_DISPLAY_REASON      2
+#define SIGNATURE_DISPLAY_LOCATION    4
+#define SIGNATURE_DISPLAY_IMAGE       8
+#define SIGNATURE_DISPLAY_CERTIFICATE 16
+#define SIGNATURE_DISPLAY_DATE        32
+#define SIGNATURE_DISPLAY_TYPE        64
+
+#define SIGNATURE_DISPLAY_ALL SIGNATURE_DISPLAY_SIGNER|SIGNATURE_DISPLAY_REASON|SIGNATURE_DISPLAY_LOCATION|SIGNATURE_DISPLAY_IMAGE|SIGNATURE_DISPLAY_CERTIFICATE|SIGNATURE_DISPLAY_DATE|SIGNATURE_DISPLAY_TYPE
+
+
+
 #define PIX_PER_INCH   1440
 
 #define  acFileSaveDefault     -1
@@ -44,6 +56,19 @@ static nPageNumber
 #define  acCommandToolZoomIn           53541
 #define  acCommandToolZoomOut          53542
 #define  acCommandToolPageHome         53773
+
+#define  acObjectTypeSignature     39
+#define  acObjectTypeText           5
+
+#pragma TEXTHIDDEN(1)
+
+#define AMY_PROGID            "PDFCreactiveX.PDFCreactiveX"
+
+#define AMY_LICENSETO         "WinFakt"
+#define AMY_ACTIVATIONCODE    "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F"
+
+
+#pragma TEXTHIDDEN(0)
 
 CLASS VrReport INHERIT VrObject
    DATA oForm           EXPORTED
@@ -99,7 +124,7 @@ CLASS VrReport INHERIT VrObject
 
    DATA hProps          EXPORTED
    DATA hExtra          EXPORTED
-
+   DATA Signature       EXPORTED
    DATA nVirTop         EXPORTED  INIT 0
 
    ACCESS Application   INLINE __GetApplication()
@@ -123,7 +148,7 @@ CLASS VrReport INHERIT VrObject
    METHOD PrepareArrays()
    METHOD Load()
    METHOD InitPDF()
-   METHOD Save() INLINE ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
+   METHOD Save()
    METHOD __SetDataSource()
    METHOD ChangePage()
    METHOD Print()
@@ -142,10 +167,18 @@ METHOD OnError( ... ) CLASS VrReport
 RETURN hRet
 
 //-----------------------------------------------------------------------------------------------
-METHOD Init() CLASS VrReport
+METHOD Init( oForm ) CLASS VrReport
    EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrAdsDataTable, VrTotal, VrGroupHeader, VrGroupFooter, VrTotal, VrFormula
    ::aProperties := {}
    ::Orientation := __GetSystem():PageSetup:Portrait
+   ::Signature := {=>}
+   HSetCaseMatch( ::Signature, .F. )
+
+   ::Signature[ "SignedBy" ]   := ""
+   ::Signature[ "ImageFile" ]  := ""
+   ::Signature[ "Location" ]   := ""
+   ::Signature[ "PageNumber" ] := -1
+
    AADD( ::aProperties, { "Name",           "Object"  } )
    AADD( ::aProperties, { "DataSource",     "Data"    } )
    AADD( ::aProperties, { "PrintHeader",    "Print"   } )
@@ -155,20 +188,22 @@ METHOD Init() CLASS VrReport
    AADD( ::aProperties, { "GroupBy1",       "General" } )
    AADD( ::aProperties, { "GroupBy2",       "General" } )
    AADD( ::aProperties, { "GroupBy3",       "General" } )
-   ::InitPDF()
+   ::InitPDF( oForm )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
-METHOD InitPDF() CLASS VrReport
-   LOCAL oForm
+METHOD InitPDF( oForm ) CLASS VrReport
    IF ::oPDF == NIL
+      IF oForm == NIL
       #ifdef VRDLL
          ::oForm := WinForm():SetInstance( "VReport" ):Init( GetActiveWindow(), {} )
          ::oForm:Create()
       #else
          ::oForm := ::Application:MainForm
       #endif
-
+      ELSE
+         ::oForm := oForm
+      ENDIF
       ::oPDF := ActiveX( ::oForm )
       ::oPDF:SetChildren := .F.
 
@@ -182,7 +217,7 @@ METHOD InitPDF() CLASS VrReport
          RETURN NIL
       ENDIF
 
-      ::oPDF:SetLicenseKey( "WinFakt", "07EFCDAB010001008C5BD0102426F725C273B3A7C1B30B61521A8890359D83AE6FD68732DDAE4AC7E85003CDB8ED4F70678BF1EDF05F" )
+      ::oPDF:SetLicenseKey( AMY_LICENSETO, AMY_ACTIVATIONCODE )
       ::oPDF:ObjectAttributeSTR( "Document", "UseSystemFonts", "1" )
       ::oPDF:ObjectAttributeSTR( "Document", "UnicodeFonts"  , "0" )
    ENDIF
@@ -194,6 +229,11 @@ METHOD Create() CLASS VrReport
    ::nPage := 0
    FERASE( GetTempPath() + "\vr.tmp" )
    ::oPDF:StartSave( GetTempPath() + "\vr.tmp", acFileSaveView )
+RETURN Self
+
+METHOD Save() CLASS VrReport
+
+   ::oPDF:Save( ::FileName + ".pdf", acFileSaveView )
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -228,15 +268,15 @@ METHOD EndPage() CLASS VrReport
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------
-METHOD Preview( aIcons ) CLASS VrReport
-   LOCAL oPv := VrPreview( Self, aIcons )
+METHOD Preview( aIcons, bEmail ) CLASS VrReport
+   LOCAL oPv := VrPreview( Self, aIcons, bEmail )
    oPv:Create()
    ::oPDF:Destroy()
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateControl( hCtrl, nHeight, oPanel, hDC, nVal, nVirTop, nTop, hTotal ) CLASS VrReport
-   LOCAL aCtrl, oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
+   LOCAL oControl, x := 0, y := 0, n, cProp, xValue, xVar, oParent
 
    DEFAULT nVirTop TO 0
    DEFAULT nTop    TO 0
@@ -340,6 +380,7 @@ RETURN Self
 METHOD CreateGroupHeaders( hDC ) CLASS VrReport
    LOCAL nTop, n, hCtrl, nHeight := 0
    ::nVirTop := 0
+
    FOR EACH hCtrl IN ::aBody
        IF hCtrl:ClsName == "VRGROUPHEADER"
           ::nVirTop += VAL( hCtrl:Height )
@@ -357,7 +398,7 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateGroupFooters( hDC ) CLASS VrReport
-   LOCAL nTop, n, hCtrl, hTotal, nHeight := 0
+   LOCAL n, hCtrl, hTotal, nHeight := 0
    ::nVirTop := 0
    FOR EACH hCtrl IN ::aBody
        IF HGetPos( hCtrl, "ParCls" ) > 0 .AND. hCtrl:ParCls == "VRGROUPFOOTER"
@@ -385,7 +426,7 @@ RETURN nHeight
 
 //-----------------------------------------------------------------------------------------------
 METHOD CreateRecord( hDC ) CLASS VrReport
-   LOCAL hCtrl, nTop, nHeight := 0, oCtrl, n, hTotal
+   LOCAL hCtrl, nHeight := 0, oCtrl, n, hTotal
    FOR EACH hCtrl IN ::aBody
        IF ( HGetPos( hCtrl, "ParCls" ) == 0 .OR. ! (hCtrl:ParCls IN {"VRGROUPHEADER","VRGROUPFOOTER"}) ) .AND. ! (hCtrl:ClsName IN {"VRGROUPHEADER","VRGROUPFOOTER"})
           hTotal := NIL
@@ -462,6 +503,33 @@ METHOD CreateFooter( hDC ) CLASS VrReport
           ::CreateControl( hCtrl, @nHeight,, hDC )
       NEXT
    ENDIF
+
+   IF ! Empty( ::Signature[ "SignedBy" ] )
+      ::oPDF:CreateObject( acObjectTypeText, "SigLabel" )
+      WITH OBJECT ::oPDF:GetObjectByName( "SigLabel" )
+         :Attribute( "Left",     100 )
+         :Attribute( "Top",      ::oPDF:PageLength - 400 )
+         :Attribute( "Right",    ::oPDF:PageWidth )
+         :Attribute( "Bottom",   ::oPDF:PageLength )
+         :Attribute( "Single Line", 1 )
+         :Attribute( "Text", "Digitally signed by: " + ::Signature[ "SignedBy" ] )
+      END
+
+      ::oPDF:CreateObject( acObjectTypeSignature, "Signature" )
+      WITH OBJECT ::oPDF:GetObjectByName( "Signature" )
+         :Attribute( "Left",     0 )
+         :Attribute( "Top",      ::oPDF:PageLength - 500 )
+         :Attribute( "Right",    ::oPDF:PageWidth )
+         :Attribute( "Bottom",   ::oPDF:PageLength )
+         :Attribute( "SignerName", ::Signature[ "SignedBy" ] )
+         :Attribute( "Location", ::Signature[ "Location" ] )
+         IF ! Empty( ::Signature[ "ImageFile" ] )
+            :Attribute( "FileName", ::Signature[ "ImageFile" ] )
+         ENDIF
+         :Attribute( "Flags", SIGNATURE_DISPLAY_ALL )
+      END
+   ENDIF
+
 RETURN Self
 
 //-----------------------------------------------------------------------------------------------
@@ -475,7 +543,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD PrepareArrays( oDoc ) CLASS VrReport
-   LOCAL oNode, cData, n, cParent, hDC, hControl, cParName, cParCls
+   LOCAL oNode, n, cParent, hDC, hControl, cParName, cParCls
 
    ::hProps := {=>}
    ::hExtra := {=>}
@@ -612,7 +680,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------
 METHOD Load( cReport ) CLASS VrReport
-   LOCAL n, hCtrl, oCtrl, oDoc := TXmlDocument():New( cReport )
+   LOCAL hCtrl, oCtrl, oDoc := TXmlDocument():New( cReport )
 
    ::PrepareArrays( oDoc )
 
@@ -678,7 +746,7 @@ RETURN oDoc
 
 //-----------------------------------------------------------------------------------------------
 METHOD Run( oDoc, oWait ) CLASS VrReport
-   LOCAL nHeight, hDC, nSubHeight, nTotHeight, nCount, nPer, nPos, nRow, oData, hCtrl, hData := {=>}
+   LOCAL nHeight, hDC, nCount, nPos, oData, hCtrl, hData := {=>}
    LOCAL xValue1, xValue2, xValue3, cFilter, cData, oIni, cEntry, aRelation, aRelations, cRelation, e
 
    ::Create()
@@ -724,7 +792,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                    ENDIF
                    MessageBox( GetActiveWindow(), "Report generation cancelled", "Ask me later" )
                    hb_gcall(.t.)
-                   HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+                   HEVAL( hData, {|o| IIF( o:IsOpen, o:Close(),)} )
                    ::End()
                    return .f.
                 ENDIF
@@ -755,7 +823,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
                 ENDIF
                 MessageBox( GetActiveWindow(), "Error connecting to SQL server", "VR" )
                 hb_gcall(.t.)
-                HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+                HEVAL( hData, {|o| IIF( o:IsOpen, o:Close(),)} )
                 ::End()
                 return .f.
              END
@@ -793,7 +861,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
          MessageBox(0, "Database error" )
          ::End()
          hb_gcall(.t.)
-         HEVAL( hData, {|cKey,o| IIF( o:EditCtrl:IsOpen, o:EditCtrl:Close(),)} )
+         HEVAL( hData, {|o| IIF( o:EditCtrl:IsOpen, o:EditCtrl:Close(),)} )
          RETURN .F.
       END
    ENDIF
@@ -838,6 +906,7 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
       IF !EMPTY(::GroupBy3)
          xValue3 := ::DataSource:Fields:&(::GroupBy3)
       ENDIF
+
       WHILE ! ::DataSource:Eof()
          nHeight := ::CreateRecord( hDC )
          ::DataSource:Skip()
@@ -870,17 +939,19 @@ METHOD Run( oDoc, oWait ) CLASS VrReport
             oWait:Position := Int( (nPos/nCount)*100 )
          ENDIF
       ENDDO
+      ::nRow += 100
+      nHeight := ::CreateGroupFooters( hDC )
+
    ENDIF
 
    ::CreateRepFooter( hDC )
    ::CreateFooter( hDC )
 
    ReleaseDC(0, hDC)
-
    ::EndPage()
    ::End()
    hb_gcall(.t.)
-   HEVAL( hData, {|cKey,o| IIF( o:IsOpen, o:Close(),)} )
+   HEVAL( hData, {|o| IIF( o:IsOpen, o:Close(),)} )
 
 RETURN .T.
 
@@ -910,19 +981,21 @@ CLASS VrPreview INHERIT Dialog
    DATA Report EXPORTED
    DATA oPDF   EXPORTED
    DATA aIcons EXPORTED INIT {"ICO_ZOOMIN","ICO_ZOOMOUT","ICO_PRINT"}
+   DATA bEmail EXPORTED
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 ENDCLASS
 
 //------------------------------------------------------------------------------------------
 
-METHOD Init( oReport, aIcons ) CLASS VrPreview
+METHOD Init( oReport, aIcons, bEmail ) CLASS VrPreview
    ::Report := oReport
    ::Super:Init( oReport:oForm )
    ::Modal      := .T.
    ::Top        := 300
    ::Width      := 800
    ::Height     := 900
+   ::bEmail     := bEmail
    IF ! Empty( aIcons )
       ::aIcons := ACLONE(aIcons)
    ENDIF
@@ -933,7 +1006,7 @@ RETURN Self
 //------------------------------------------------------------------------------------------
 
 METHOD OnInitDialog() CLASS VrPreview
-   LOCAL oItem, oSub, nZoom
+   LOCAL nZoom, n
    ::Caption := ::Report:PreviewCaption
 
    WITH OBJECT ToolStripContainer( Self )
@@ -944,27 +1017,27 @@ METHOD OnInitDialog() CLASS VrPreview
          //:ShowGrip    := .F.
          :ImageList   := ImageList( :this, 32, 32 ):Create()
          :Height      := 38
-         :ImageList:AddImage( ::aIcons[1] )
-         :ImageList:AddImage( ::aIcons[2] )
-         :ImageList:AddImage( ::aIcons[3] )
+         FOR n := 1 TO LEN( ::aIcons )
+            :ImageList:AddImage( ::aIcons[n] )
+         NEXT
          :Create()
          WITH OBJECT ToolStripButton( :this )
             :Caption           := "Zoom-In"
             :ImageIndex        := 1
-            :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomIn )}
+            :Action            := {|| ::Report:oPDF:DoCommandTool( acCommandToolZoomIn )}
             :Create()
          END
          WITH OBJECT ToolStripButton( :this )
             :Caption           := "Zoom-Out"
             :ImageIndex        := 2
-            :Action            := {|o| ::Report:oPDF:DoCommandTool( acCommandToolZoomOut )}
+            :Action            := {|| ::Report:oPDF:DoCommandTool( acCommandToolZoomOut )}
             :Create()
          END
          WITH OBJECT ToolStripButton( :this )
             :Caption           := "Print"
             :Begingroup        := .T.
             :ImageIndex        := 3
-            :Action            := <|o|
+            :Action            := <||
                                    TRY
                                      ::Report:oPDF:Print( "", .T. )
                                    CATCH
@@ -972,6 +1045,34 @@ METHOD OnInitDialog() CLASS VrPreview
                                    >
             :Create()
          END
+         WITH OBJECT ToolStripButton( :this )
+            :Caption           := "Save"
+            :ImageIndex        := 4
+            :Action            := <||
+                                     WITH OBJECT ( SaveFileDialog( __GetApplication():MainForm ) )
+                                        :FileExtension   := "prg"
+                                        :CheckPathExists := .T.
+                                        :Filter          := "Portable Document Format (*.pdf)|*.pdf"
+                                        IF :Show()
+                                           ::Report:oPDF:Save( :FileName + ".pdf", acFileSaveAll )
+                                        ENDIF
+                                     END
+                                   >
+            :Create()
+         END
+         IF ::bEmail != NIL
+            WITH OBJECT ToolStripButton( :this )
+               :Caption           := "Email"
+               :ImageIndex        := 5
+               :Action            := <||
+                                      TRY
+                                        Eval( ::bEmail, ::Report:oPDF )
+                                      CATCH
+                                      END
+                                      >
+               :Create()
+            END
+         ENDIF
       END
 
       WITH OBJECT StatusBar( Self )
@@ -1212,7 +1313,7 @@ METHOD BrowseF3_OnClick() CLASS VrAskLater
 RETURN Self
 
 METHOD OK_OnClick() CLASS VrAskLater
-   LOCAL cExp1, cExp2, bExp, cType, nSel, oGet1, oGet2, aExp, nNum, cExpSel, cField
+   LOCAL cExp1, cExp2, bExp, cType, nSel, aExp, nNum, cExpSel, cField
    IF ::cField != NIL
       cExp1   := ::oGet1:Caption
       cExp2   := ::oGet2:Caption
@@ -1339,34 +1440,34 @@ CLASS Conditions
 ENDCLASS
 
 
-METHOD Init( oDataTable ) CLASS Conditions
-   ::aCond_N := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| "!(" + cField + "==" + cExp + ")" } },;
-                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+METHOD Init() CLASS Conditions
+   ::aCond_N := {  { FC_EQUALTO,          {|cField,cExp| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp| "!(" + cField + "==" + cExp + ")" } },;
+                   { FC_GREATEREQU,       {|cField,cExp| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp| cField + "<=" + cExp} },;
                    { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp } } }
+                   { FC_INTHERANGE,       {|cField,cExp| cField + "="  + cExp } } }
 
-   ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp,cExp2| cExp + " $ " + cField} },;
-                   { FC_NOTCONTAIN,       {|cField,cExp,cExp2| "!(" + cExp + " $ " + cField + ")"} },;
-                   { FC_BEGWITH,          {|cField,cExp,cExp2| cField + "=" + cExp} },;
-                   { FC_NOTBEGWITH,       {|cField,cExp,cExp2| cField + "!=" + cExp} },;
-                   { FC_ISEMPTY,          {|cField,cExp,cExp2| "EMPTY(" + cField + ")"} },;
-                   { FC_NOTEMPTY,         {|cField,cExp,cExp2| "! EMPTY(" + cField + ")"} },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp} } }
+   ::aCond_C := {  { FC_CONTAINS,         {|cField,cExp| cExp + " $ " + cField} },;
+                   { FC_NOTCONTAIN,       {|cField,cExp| "!(" + cExp + " $ " + cField + ")"} },;
+                   { FC_BEGWITH,          {|cField,cExp| cField + "=" + cExp} },;
+                   { FC_NOTBEGWITH,       {|cField,cExp| cField + "!=" + cExp} },;
+                   { FC_ISEMPTY,          {|cField| "EMPTY(" + cField + ")"} },;
+                   { FC_NOTEMPTY,         {|cField| "! EMPTY(" + cField + ")"} },;
+                   { FC_INTHERANGE,       {|cField,cExp| cField + "="  + cExp} } }
 
-   ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp,cExp2| cField + "==" + cExp} },;
-                   { FC_NOTEQUALTO,       {|cField,cExp,cExp2| cField + "<>" + cExp} },;
-                   { FC_GREATEREQU,       {|cField,cExp,cExp2| cField + ">=" + cExp} },;
-                   { FC_LESSEQUAL,        {|cField,cExp,cExp2| cField + "<=" + cExp} },;
+   ::aCond_D := {  { FC_EQUALTO,          {|cField,cExp| cField + "==" + cExp} },;
+                   { FC_NOTEQUALTO,       {|cField,cExp| cField + "<>" + cExp} },;
+                   { FC_GREATEREQU,       {|cField,cExp| cField + ">=" + cExp} },;
+                   { FC_LESSEQUAL,        {|cField,cExp| cField + "<=" + cExp} },;
                    { FC_BETWEEN,          {|cField,cExp,cExp2| "(" + cField + ">= " + cExp + ".AND." + cField +"<=" + cExp2 + ")"} },;
-                   { FC_PERQUARTER,       {|cField,cExp,cExp2| cExp } },;
-                   { FC_INLAST,           {|cField,cExp,cExp2| cField + ">=" + cExp } },;
-                   { FC_NOTINLAST,        {|cField,cExp,cExp2| cField + "<"  + cExp } },;
-                   { FC_INTHERANGE,       {|cField,cExp,cExp2| cField + "="  + cExp } } }
+                   { FC_PERQUARTER,       {|cField,cExp| (cField), cExp } },;
+                   { FC_INLAST,           {|cField,cExp| cField + ">=" + cExp } },;
+                   { FC_NOTINLAST,        {|cField,cExp| cField + "<"  + cExp } },;
+                   { FC_INTHERANGE,       {|cField,cExp| cField + "="  + cExp } } }
 
-   ::aCond_L := {  { FC_TRUE,  {|cField,cExp,cExp2| cField} },;
-                   { FC_FALSE, {|cField,cExp,cExp2| "!"+cField} } }
+   ::aCond_L := {  { FC_TRUE,  {|cField| cField} },;
+                   { FC_FALSE, {|cField| "!"+cField} } }
 
    ::aCond_M := ACLONE( ::aCond_C )
 RETURN Self
@@ -1675,7 +1776,7 @@ METHOD OnInitDialog() CLASS FilterPerQuarter
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD EditBox1_OnChar( Sender ) CLASS FilterPerQuarter
+METHOD EditBox1_OnChar() CLASS FilterPerQuarter
 RETURN 0
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -1689,43 +1790,43 @@ METHOD EditBox1_OnVertScroll( Sender ) CLASS FilterPerQuarter
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD FilterPerQuarter_OnLoad( Sender ) CLASS FilterPerQuarter
+METHOD FilterPerQuarter_OnLoad() CLASS FilterPerQuarter
 
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD RadioButton1_OnClick( Sender ) CLASS FilterPerQuarter
+METHOD RadioButton1_OnClick() CLASS FilterPerQuarter
    ::EditBox1:Caption := "1"
    ::EditBox2:Caption := "3"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD RadioButton2_OnClick( Sender ) CLASS FilterPerQuarter
+METHOD RadioButton2_OnClick() CLASS FilterPerQuarter
    ::EditBox1:Caption := "4"
    ::EditBox2:Caption := "6"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD RadioButton3_OnClick( Sender ) CLASS FilterPerQuarter
+METHOD RadioButton3_OnClick() CLASS FilterPerQuarter
    ::EditBox1:Caption := "7"
    ::EditBox2:Caption := "9"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD RadioButton4_OnClick( Sender ) CLASS FilterPerQuarter
+METHOD RadioButton4_OnClick() CLASS FilterPerQuarter
    ::EditBox1:Caption := "10"
    ::EditBox2:Caption := "12"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD RadioButton5_OnClick( Sender ) CLASS FilterPerQuarter
+METHOD RadioButton5_OnClick() CLASS FilterPerQuarter
    ::EditBox1:Caption := "1"
    ::EditBox2:Caption := "12"
 RETURN Self
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-METHOD Button1_OnClick( Sender ) CLASS FilterPerQuarter
-   LOCAL nMonFrom, nMonTo, mFromDt, mToDt, nYear, i, cTemp
+METHOD Button1_OnClick() CLASS FilterPerQuarter
+   LOCAL nMonFrom, nMonTo
    nMonFrom := VAL(::EditBox1:Caption)
    nMonTo   := VAL(::EditBox2:Caption)
    IF nMonFrom < 1 .OR. nMonFrom > 12 .OR. nMonTo > 12
@@ -1847,4 +1948,3 @@ RETURN NIL
 
 METHOD Help_OnClick() CLASS IsInTheLast
 RETURN NIL
-

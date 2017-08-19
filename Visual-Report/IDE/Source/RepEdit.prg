@@ -40,7 +40,7 @@ ENDCLASS
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD Create() CLASS RepEdit
-   LOCAL cBits, xSize, ySize, aSize, hDC, n
+   LOCAL cBits, xSize, ySize, n
    ::oPs := PageSetup( ::Application:MainForm )
    ::oPs:ReturnDefault := .T.
    ::oPs:Show()
@@ -68,7 +68,7 @@ RETURN Self
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnMouseMove( nwParam, nlParam ) CLASS RepEdit
-   LOCAL aPoint, aPoints, oCtrl, n, hDC, aPt, aRect[4], nx, ny, x, y
+   LOCAL oCtrl, hDC, aRect[4], nx, ny, x, y
    Super:OnMouseMove( nwParam, nlParam )
 
    x := LOWORD( nlParam )
@@ -160,7 +160,7 @@ RETURN 0
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
    EXTERN VrLabel, VrLine, VrImage, VrDataTable, VrAdsDataTable, VrTotal, VrGroupHeader, VrGroupFooter, VrTotal, VrFormula
-   LOCAL xValue, xVar, hWnd, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
+   LOCAL xValue, xVar, n, oControl, hPointer := HB_FuncPtr( IIF( VALTYPE( hControl ) == "C", hControl, hControl:ClsName ) )
 
    IF hPointer != NIL
       DEFAULT oParent TO Self
@@ -170,7 +170,7 @@ METHOD CreateControl( hControl, x, y, oParent ) CLASS RepEdit
       oControl:__ClassInst := __ClsInst( oControl:ClassH )
       oControl:Left := x
       oControl:Top  := y
-      IF oControl:ClsName == "GroupHeader"
+      IF oControl:ClsName IN { "GroupHeader", "GroupFooter" }
          oControl:bCreate := <|Self|
                         WITH OBJECT ::EditCtrl := __VrGroup( ::Parent )
                            :BackColor := ::BackColor
@@ -229,6 +229,7 @@ RETURN oControl
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
    LOCAL pt
+   (nwParam)
    ::SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
       IF UPPER( ::Application:Props:ToolBox:ActiveItem:Caption ) == "GROUP" .AND. ::Type != "Body"
@@ -248,7 +249,7 @@ METHOD OnLButtonDown( nwParam, x, y ) CLASS RepEdit
 RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
-METHOD OnLButtonUp( nwParam, x, y ) CLASS RepEdit
+METHOD OnLButtonUp() CLASS RepEdit
    ::aSelect  := NIL
    ::aPrevSel := NIL
    ::nDownPos := NIL
@@ -271,7 +272,7 @@ RETURN NIL
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnPaint() CLASS RepEdit
-   LOCAL hOldBrush, hOldPen, aRect, oCtrl, cx, cy, nX, nY, hDC
+   LOCAL aRect, oCtrl, cx, cy, hDC
    LOCAL hMemDC, hMemBitmap, hOldBitmap, nBColor, nFColor, lMarkers := .F.
    LOCAL xSize, ySize, cBits
 
@@ -292,7 +293,7 @@ METHOD OnPaint() CLASS RepEdit
          ::xBmpSize := xSize
          ::yBmpSize := ySize
       ENDIF
-      DrawGrid( hMemDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
+      DrawGridOld( hMemDC, ::hBmpGrid, ::xBmpSize, ::yBmpSize, ::Width, ::Height, SRCCOPY )
     ELSE
       _Fillrect( hMemDC, {0,0,::Width,::Height}, ::BkBrush )
    ENDIF
@@ -375,7 +376,6 @@ FUNCTION MakeGridTile( nxGrid, nyGrid, Width, Height)
    LOCAL cDotted
    LOCAL cEmpty
    LOCAL nBits
-   LOCAL nPos
    LOCAL i
 
    Width   := nWidth
@@ -427,6 +427,7 @@ ENDCLASS
 //-----------------------------------------------------------------------------------------------------------------------------------
 METHOD OnLButtonDown(n,x,y) CLASS __VrGroup
    LOCAL aRect, oCtrl
+   (n)
    ::Parent:SetCapture()
    IF ::Application:Props:ToolBox:ActiveItem != NIL
       ::Parent:CreateControl( "Vr"+::Application:Props:ToolBox:ActiveItem:Caption, x, y, ::Cargo )

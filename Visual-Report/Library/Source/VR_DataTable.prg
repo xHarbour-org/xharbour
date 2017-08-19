@@ -88,7 +88,7 @@ METHOD Create( lSuper ) CLASS VrDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrDataTable
-   LOCAL cAlias, nCnn, oIni, cEntry, e
+   LOCAL cAlias, e
 
    WITH OBJECT ::EditCtrl
       :FileName := ::FileName
@@ -128,7 +128,7 @@ METHOD Configure() CLASS VrDataTable
 RETURN Self
 
 METHOD WriteProps( oControl ) CLASS VrDataTable
-   LOCAL oValue, oFilter, hExp, oExp, n, oAsk
+   LOCAL oValue, oFilter, oExp, n, oAsk
    oValue := TXmlNode():new( HBXML_TYPE_TAG, "FileName", NIL, ::FileName )
    oControl:addBelow( oValue )
    oValue := TXmlNode():new( HBXML_TYPE_TAG, "Alias", NIL, ::Alias )
@@ -204,7 +204,7 @@ METHOD Create( lSuper ) CLASS VrAdsDataTable
 RETURN Self
 
 METHOD Configure() CLASS VrAdsDataTable
-   LOCAL cAlias, nCnn, oIni, cEntry, e
+   LOCAL cAlias, e
 
    WITH OBJECT ::EditCtrl
       :FileName := ::FileName

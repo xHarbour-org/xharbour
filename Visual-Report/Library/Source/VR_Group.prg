@@ -63,14 +63,14 @@ METHOD Configure() CLASS VrGroupHeader
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrGroupHeader
-   LOCAL oXmlValue, oXmlFont
+   LOCAL oXmlValue
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Top", NIL, XSTR( ::Top ) )
    oXmlControl:addBelow( oXmlValue )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Height", NIL, XSTR( ::Height ) )
    oXmlControl:addBelow( oXmlValue )
 RETURN Self
 
-METHOD Draw( hDC ) CLASS VrGroupHeader
+METHOD Draw() CLASS VrGroupHeader
    LOCAL oLabel
    FOR EACH oLabel IN ::Objects
    NEXT

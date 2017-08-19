@@ -59,7 +59,7 @@ METHOD Init( oParent ) CLASS VrLabel
       AADD( ::aProperties, { "Name",       "Object"  } )
    ENDIF
    DEFAULT ::Font TO Font( Self )
-   ::Font:lCreateHandle := oParent != NIL
+   //::Font:lCreateHandle := oParent != NIL
 RETURN Self
 
 METHOD Create() CLASS VrLabel
@@ -215,8 +215,8 @@ METHOD GetFormulas( cText ) CLASS VrLabel
 RETURN cText
 
 METHOD Draw( hDC, hTotal, hCtrl ) CLASS VrLabel
-   LOCAL nX, nY, hFont, hPrevFont, nWidth, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
-   LOCAL xText, lAuto, lf := (struct LOGFONT), aTxSize, n
+   LOCAL nX, nY, hFont, hPrevFont, x, y, cUnderline, cText, cItalic, cName := "Text" + AllTrim( Str( ::Parent:nText++ ) )
+   LOCAL xText, lAuto, lf := (struct LOGFONT), aTxSize
 
    lAuto := ::AutoResize
 
@@ -353,6 +353,7 @@ RETURN Self
    //-----------------------------------------------------------------------------------------------------------------------------------
    METHOD OnLButtonDown(n,x,y) CLASS __VrLabel
       LOCAL aRect, oCtrl
+      (n)
       ::Parent:SetCapture()
       IF ::Application:Props:PropEditor:ActiveObject != NIL
          oCtrl := ::Application:Props:PropEditor:ActiveObject:EditCtrl
@@ -392,7 +393,7 @@ FUNCTION GetPoints( oCtrl )
 RETURN aPoints
 
 FUNCTION MouseMove( oCtrl, n, x, y )
-   LOCAL i, aPoint, aPoints, nCursor := 0
+   LOCAL i, aPoints, nCursor := 0
    IF n != MK_LBUTTON
       oCtrl:Parent:nMove := 0
       aPoints := GetPoints( oCtrl )
@@ -408,7 +409,7 @@ FUNCTION MouseMove( oCtrl, n, x, y )
 RETURN NIL
 
 FUNCTION PaintMarkers( hDC, oCtrl )
-   LOCAL nColor, i, aPt, hBrush, aPts := GetPoints( oCtrl )
+   LOCAL i, aPt, hBrush, aPts := GetPoints( oCtrl )
    local r,g,b, hOld, lDC := hDC != NIL
 
    IF !lDC
@@ -471,7 +472,7 @@ METHOD Init( oParent ) CLASS VrTotal
 RETURN Self
 
 METHOD WriteProps( oXmlControl ) CLASS VrTotal
-   LOCAL oXmlValue, oXmlFont
+   LOCAL oXmlValue
    Super:WriteProps( oXmlControl )
    oXmlValue := TXmlNode():new( HBXML_TYPE_TAG, "Column", NIL, ::Column )
    oXmlControl:addBelow( oXmlValue )

@@ -1,13 +1,10 @@
-/*
- * $Id$
- */
-
 //-----------------------------------------------------------------------------------------------
 // Copyright   WinFakt! / SOCS BVBA  http://www.WinFakt.com
 //
 // This source file is an intellectual property of SOCS bvba.
 // You may NOT forward or share this file under any conditions!
 //-----------------------------------------------------------------------------------------------
+static aSel
 
 #include "debug.ch"
 #include "vxh.ch"
@@ -62,7 +59,7 @@ CLASS VrObject
    METHOD SetSize()
    METHOD Draw()           VIRTUAL
    METHOD FillRect()
-   METHOD MoveWindow()     INLINE ::EditCtrl:MoveWindow( ::Left, ::Top )
+   METHOD MoveWindow()     INLINE IIF( ::EditCtrl != NIL .AND. ::Left != NIL .AND. ::Top != NIL, ::EditCtrl:MoveWindow( ::Left, ::Top ), NIL )
    METHOD WriteProps()     VIRTUAL
    METHOD Configure()      VIRTUAL
    METHOD Delete()
@@ -79,17 +76,20 @@ METHOD Init( oParent ) CLASS VrObject
 RETURN Self
 
 METHOD __GetDataSource( cDataSource ) CLASS VrObject
-   LOCAL n, oSource
-   IF ( n := ASCAN( ::Objects, {|o| o:Name == cDataSource} ) ) > 0
+   LOCAL n, oSource, bBlock := {|o| o:Name == cDataSource}
+   IF ( n := ASCAN( ::Objects, bBlock ) ) > 0
       oSource := ::Objects[n]
    ENDIF
 RETURN oSource
 
 METHOD Create() CLASS VrObject
+   LOCAL oApp, aSel
    IF ::Parent != NIL
       AADD( IIF( ::lUI, ::Parent:Objects, ::Application:Props:CompObjects ), Self )
       IF ::lUI
-         ::EditCtrl:OnWMLButtonDown := {|| ::Application:Props:PropEditor:ResetProperties( {{ Self }} ) }
+         oApp := ::Application:Props:PropEditor
+         aSel := {{ hb_qSelf() }}
+         ::EditCtrl:OnWMLButtonDown := {||oApp:ResetProperties( aSel )}
       ENDIF
    ENDIF
 RETURN Self
@@ -256,12 +256,14 @@ FUNCTION KeyDown( oCtrl, nKey )
          IF !oCtrl:Application:Report:Modified
             oCtrl:Application:Report:Modified := .T.
          ENDIF
-         IF oCtrl:Cargo:lUI
-            oCtrl:Parent:InvalidateRect( aRect, .T.)
-          ELSEIF oCtrl:Cargo:Button != NIL
-            oCtrl:Cargo:Button:Delete()
-         ENDIF
+         TRY
+            IF oCtrl:Cargo:lUI .AND. oCtrl:Parent != NIL
+               oCtrl:Parent:InvalidateRect( aRect, .T.)
+             ELSEIF oCtrl:Cargo:Button != NIL
+               oCtrl:Cargo:Button:Delete()
+            ENDIF
+         CATCH
+         END
       ENDIF
    ENDIF
 RETURN NIL
-
