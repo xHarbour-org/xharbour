@@ -39,6 +39,8 @@ MYDEFINES =
 MYDEFINES = 
 MYRC_FLAGS = 
 
+[wincore.lib]
+
 [tproject.lib]
 
 [xeditw.lib]
