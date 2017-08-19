@@ -104,18 +104,18 @@ REM --> Copy files
     REM ** ADS **
     REM HB_DIR_ADS is the ONE place ace32.dll SHOULD be in.
     IF NOT EXIST \xHB\dll\ADS MD \xHB\dll\ADS
-    XCOPY "%HB_DIR_ADS%\Ace32.dll"       \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\Ace32.dll"       \xHB\Bin\    /d /y
-    XCOPY "%HB_DIR_ADS%\AdsLoc32.dll"    \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\AXCws32.dll"     \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\Ansi.chr"        \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\Extend.chr"      \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\AdsLocal.cfg"    \xHB\dll\ADS /d /y
-    XCOPY "%HB_DIR_ADS%\*.h"             \xHB\include /d /y
-    XCOPY \xHarbour\contrib\rdd_ads\*.ch \xHB\include /d /y
-    XCOPY \xHarbour\contrib\rdd_ads\*.h  \xHB\include /d /y
+    XCOPY "%HB_DIR_ADS%\Ace32.dll"           \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\Ace32.dll"           \xHB\Bin\    /d /y
+    XCOPY "%HB_DIR_ADS%\AdsLoc32.dll"        \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\AXCws32.dll"         \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\Ansi.chr"            \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\Extend.chr"          \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\AdsLocal.cfg"        \xHB\dll\ADS /d /y
+    XCOPY "%HB_DIR_ADS%\ACE.h"               \xHB\include\w32 /d /y
+    XCOPY \xHarbour\contrib\rdd_ads\rddads.h \xHB\include\w32 /d /y
+    XCOPY \xHarbour\contrib\rdd_ads\ads*.ch  \xHB\include /d /y
 
-    
+
     REM ** FreeImage **
     IF "%XBUILD_VC8%"=="YES" (
        IF NOT EXIST \xHB\lib\vc8 MD \xHB\lib\vc8
