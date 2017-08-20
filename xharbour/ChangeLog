@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-08-20 14:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/tip/httpcln.prg
+  * contrib/tipssl/httpcln.prg
+    ! fixed method ReadHeaders() increasing buffer to 10000 (many thanks to ostap.romanenko@gmail.com)
+
 2017-08-14 17:04 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
 * bin/bld_vc.bat
   + Added support for Visual Studio 2017 Community edition

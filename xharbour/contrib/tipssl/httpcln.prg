@@ -278,7 +278,7 @@ METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
    LOCAL aHead
 
    // Now reads the fields and set the content lenght
-   cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
+   cLine := ::InetRecvLine( ::SocketCon, @nPos, 10000 )
    IF Empty( cLine )
       // In case of timeout or error on receiving
       RETURN .F.
@@ -302,14 +302,14 @@ METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
 
    ::nLength := -1
    ::bChunked := .F.
-   cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
+   cLine := ::InetRecvLine( ::SocketCon, @nPos, 10000 )
    IF !lClear=.f. .AND. !empty(::hHeaders)
       ::hHeaders:={=>}
    ENDIF
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
       aHead := HB_RegexSplit( ":", cLine,,, 1 )
       IF aHead == NIL .or. Len( aHead ) != 2
-         cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
+         cLine := ::InetRecvLine( ::SocketCon, @nPos, 10000 )
          LOOP
       ENDIF
 
@@ -331,7 +331,7 @@ METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
             ::setCookie(aHead[2])
 
       ENDCASE
-      cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
+      cLine := ::InetRecvLine( ::SocketCon, @nPos, 10000 )
    ENDDO
    IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
