@@ -1151,16 +1151,13 @@ static void s_inetRecvInternal(char *szFuncName, int iMode)
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
 
-      if (hb_inetSSLRead(Socket, Buffer + iReceived, iBufferLen,
-          &Socket->errorCode) > 0)
+      iLen = hb_inetSSLRead(Socket, Buffer + iReceived, iBufferLen, &Socket->errorCode);
+      if (iLen > 0)
       {
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
 
-         if (iLen > 0)
-         {
-            iReceived += iLen;
-         }
+         iReceived += iLen;
 
          /* Called from InetRecv()? */
          if (iMode == 0)

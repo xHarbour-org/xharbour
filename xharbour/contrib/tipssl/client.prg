@@ -324,11 +324,11 @@ METHOD Read( nLen ) CLASS tIPClient
       // read till end of stream
       cStr1 := Space( RCV_BUF_SIZE )
       cStr0 := ""
-      ::nLastRead := ::InetRecv( if(!::lSSL,::SocketCon,::SocketSSLCon), @cStr1, RCV_BUF_SIZE )
+      ::nLastRead := ::InetRecvAll( if(!::lSSL,::SocketCon,::SocketSSLCon), @cStr1, RCV_BUF_SIZE )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
          cStr0 += Substr( cStr1, 1, ::nLastRead )
-         ::nLastRead := ::InetRecv( if(!::lSSL,::SocketCon,::SocketSSLCon), @cStr1, RCV_BUF_SIZE )
+         ::nLastRead := ::InetRecvAll( if(!::lSSL,::SocketCon,::SocketSSLCon), @cStr1, RCV_BUF_SIZE )
       ENDDO
       ::bEof := .T.
    ELSE
