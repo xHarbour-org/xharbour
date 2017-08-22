@@ -402,14 +402,18 @@ REM ===============================================
     SET RC_Include=*.dll
     ROBOCOPY "\xHB\Bin\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
-REM    SET CopyTo=%XHBTO%\Dll
-REM    SET EmptyDLL=\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\empty.dll
 
-REM    COPY "%EmptyDLL%" "%CopyTo%\xHBmtDLL.dll" /b
-REM    COPY "%EmptyDLL%" "%CopyTo%\xHBDmtDLL.dll" /b
-REM    COPY "%EmptyDLL%" "%CopyTo%\xHBCommDll.dll" /b
-REM    COPY "%EmptyDLL%" "%CopyTo%\xHBZipDll.dll" /b
+REM ===============================================
+REM              /Professional/dll/XBScript
+REM ===============================================
 
+    SET RC_To=%XHBTO%\Dll\XBScript
+	 
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScript.bat "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScript.bat "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\XBScriptPro\Debug\XBScriptPro.dll "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt "%RC_TO%"
 
 REM ===============================================
 REM              /Professional/Samples
@@ -463,7 +467,20 @@ REM ===============================================
 
     SET RC_Include=vxh*.dll
     ROBOCOPY "\xHB\Dll" "%RC_To%" %RC_Include% /NS /NC /NP
+	 
+	 
+REM ===============================================
+REM              /Enterprise/dll/XBScript
+REM ===============================================
 
+    SET RC_To=%XHBTO%\Dll\XBScript
+	 
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScriptEnt.bat "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScriptEnt.bat "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\XBScriptEnt\Debug\XBScriptEnt.dll "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt "%RC_TO%"
+    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt "%RC_TO%"
+    XCOPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\samples\ "%RC_TO%"\Samples
 
 REM ==============================================================================================
 REM ==============================================================================================
