@@ -73,6 +73,7 @@ CLASS TIPClientFTP FROM TIPClient
    DATA SocketPortServer              //
    DATA cLogFile                      // Holds the filename of the current logfile
    DATA lInUser                       // To verify if we finish user command
+   DATA bChunked INIT .F.
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open( cUrl )

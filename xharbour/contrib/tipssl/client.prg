@@ -320,7 +320,7 @@ METHOD Read( nLen ) CLASS tIPClient
       nLen := ::nLength - ::nRead
    ENDIF
 
-   IF ::nLength > RCV_BUF_SIZE //.AND. !::bChunked //Empty( nLen ) .or. nLen < 0
+   IF ::nLength > RCV_BUF_SIZE .AND. !::bChunked //Empty( nLen ) .or. nLen < 0
       // read till end of stream
       cStr1 := Space( RCV_BUF_SIZE )
       cStr0 := ""
