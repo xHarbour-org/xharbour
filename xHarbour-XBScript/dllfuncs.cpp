@@ -43,6 +43,7 @@ char const * const g_RegTable [][3] =
    {"XBScript\\OLEScript", 0, NULL},
 
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}", 0, "XB Script Language"},
+   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories", 0, NULL },
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A1-9847-11CF-8F20-00805F2CD064}", 0, NULL},
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A2-9847-11CF-8F20-00805F2CD064}", 0, NULL},
 
@@ -62,9 +63,11 @@ char const * const g_RegTable [][3] =
    {"XBSFile", 0, "XBScript Script File"},
    {"XBSFile\\DefaultIcon", 0, "WScript.exe,3" },
    {"XBSFile\\ScriptEngine", 0, "XBScript" },
+   {"XBSFile\\Shell", 0, NULL },
    {"XBSFile\\Shell\\Open", 0, "&Open" },
    {"XBSFile\\Shell\\Open\\Command", 0, "WScript.exe \"%1\" %*" },
-   {"XBSFile\\Shell\\Open2\\Command", 0, "CScript.exe \"%1\" %*" },                        
+   {"XBSFile\\Shell\\Open2", 0, "&Open &with command prompt" },
+   {"XBSFile\\Shell\\Open2\\Command", 0, "CScript.exe \"%1\" %*" },
    //Ron end.
 
 #if 0
@@ -135,6 +138,8 @@ STDAPI DllRegisterServer(void)
 		//Set the value
 		if (err == ERROR_SUCCESS)
 		{
+			OutputDebugValues("Created Key %s!!!\n", pszName);
+
 			if (pszValue == NULL)
 			{
 				OutputDebugValues("Skipping SetValue: %s\n", pszName);
@@ -146,7 +151,7 @@ STDAPI DllRegisterServer(void)
 				if (err != ERROR_SUCCESS)
 				{
 					OutputDebugValues("FAILED to Set Property %s in Key: %s\n", pszValueName, pszName);
-					break;
+					hr = SELFREG_E_CLASS;
 				}
 			}
 
@@ -155,15 +160,14 @@ STDAPI DllRegisterServer(void)
 		else
 		{
 			OutputDebugValues("FAILED to Create Key %s!!!\n", pszName );
-			break;
+			hr = SELFREG_E_CLASS;
 		}
 	}
 
 	//if cannot add key or value, back out and fail
-	if (err != ERROR_SUCCESS)
+	if (hr != S_OK)
 	{
 		DllUnregisterServer();
-		hr = SELFREG_E_CLASS;
 	}
 
     return hr;
@@ -190,6 +194,10 @@ STDAPI DllUnregisterServer(void)
 	  if (err == ERROR_SUCCESS)
 	  {
 		  OutputDebugValues("Deleted Key: %s\n", pszKeyName);
+	  }
+	  else if (err == 2)
+	  {
+		  OutputDebugValues("Missing Key: %s\n", pszKeyName);
 	  }
 	  else
 	  {
