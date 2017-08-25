@@ -65,17 +65,17 @@ STDMETHODIMP CEventHandler::QueryInterface(REFIID riid, void ** ppvObj)
    //tracing purposes only
    EVENTTRACE("CEventHandler::QueryInterface->");
    
-   if (riid == IID_IUnknown)
+   if (IsEqualGUID(riid, IID_IUnknown))
    {
       EVENTTRACE("IUnknown\n");
       *ppvObj = static_cast<IDispatch*>(this);
    }   
-   else if (riid == IID_IDispatch)
+   else if (IsEqualGUID(riid, IID_IDispatch))
    {
       EVENTTRACE("IDispatch\n");
       *ppvObj = static_cast<IDispatch*>(this);
    }
-   else if (riid == m_ConnectedInterface)
+   else if (IsEqualGUID(riid, m_ConnectedInterface))
    {
       EVENTTRACE("Event Interface\n");
       *ppvObj = this;
@@ -83,6 +83,7 @@ STDMETHODIMP CEventHandler::QueryInterface(REFIID riid, void ** ppvObj)
    else
    {
       EVENTTRACE("Unsupported Interface\n");
+	  _ASSERT(0);
       *ppvObj = NULL;
       return E_NOINTERFACE;
    }
@@ -193,7 +194,7 @@ STDMETHODIMP CEventHandler::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid,
    EVENTTRACE("CEventHandler::Invoke\n");
    
    //Validate arguments
-   if ((riid != IID_NULL))
+   if (!IsEqualGUID(riid, IID_NULL))
       return E_INVALIDARG;
    
    HRESULT hr = S_OK;

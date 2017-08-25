@@ -17,6 +17,10 @@
 #define DLLFUNCTIONS
 #include "activeDepends.h"
 
+//{ADB21CAC-9B03-4D64-9097-83B05741FDAF}
+//GUID for this script engine  {ADB21CAC-  9B03-  4D64-   90   97-  83   B0   57   41   FD   AF}
+const IID & CLSID_XBScript = { 0xADB21CAC,0x9B03,0x4D64,{ 0x90,0x97,0x83,0xB0,0x57,0x41,0xFD,0xAF } };
+
 #ifndef VM_RESET
    static BOOL s_bInit = TRUE;
 #endif
@@ -31,23 +35,23 @@ extern void xbScript_atexit( void );
 *  g_RegTable -- This N*3 array contains the keys, value names, and values that
 *  are associated with this dll in the registry.
 ******************************************************************************/
-const char *g_RegTable[][3] = 
+char const * const g_RegTable [][3] = 
 {
    //format is {key, value name, value }
    {"XBScript", 0, "XB Script Language"},
    {"XBScript\\CLSID", 0, "{ADB21CAC-9B03-4D64-9097-83B05741FDAF}"},
-   {"XBScript\\OLEScript", 0, ""},
+   {"XBScript\\OLEScript", 0, NULL},
 
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}", 0, "XB Script Language"},
-   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A1-9847-11CF-8F20-00805F2CD064}", 0, ""},
-   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A2-9847-11CF-8F20-00805F2CD064}", 0, ""},
+   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A1-9847-11CF-8F20-00805F2CD064}", 0, NULL},
+   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\Implemented Categories\\{F0B7A1A2-9847-11CF-8F20-00805F2CD064}", 0, NULL},
 
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\InprocServer32", 0, (const char*)-1},
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\InprocServer32", "ThreadingModel", "Apartment" },
 
-   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\OLEScript", 0, "" },
+   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\OLEScript", 0, NULL },
    {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\ProgId", 0, "XBScript"},
-   {"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\VersionIndependentProgId", 0, "XBScript"},
+   //{"CLSID\\{ADB21CAC-9B03-4D64-9097-83B05741FDAF}\\VersionIndependentProgId", 0, "XBScript"},
 
       //Ron begin
    {".XBS", 0, "XBSFile" }, 
@@ -113,34 +117,23 @@ STDAPI DllRegisterServer(void)
    //register entries from the table
    int nEntries = sizeof(g_RegTable)/sizeof(*g_RegTable);
 
-   for (int i = 0; SUCCEEDED(hr) && i < nEntries; i++)
    {
       const char *pszName = g_RegTable[i][0];
       const char *pszValueName = g_RegTable[i][1];
       const char *pszValue = g_RegTable[i][2];
-
       //Map rogue values to module file name
       if (pszValue == (const char*) -1 )
-	   {
          pszValue = szFileName;
-	   }
 
       //Create the key
       HKEY hkey;
       long err = RegCreateKeyA( HKEY_CLASSES_ROOT, pszName, &hkey);
 
       //Set the value
-      if (err == ERROR_SUCCESS)
-	   {
-         err = RegSetValueExA( hkey, pszValueName, 0, REG_SZ, (const BYTE*)pszValue, (strlen(pszValue) + 1));
-         RegCloseKey(hkey);
       }
 
       //if cannot add key or value, back out and fail
       if (err != ERROR_SUCCESS)
-	   {
-         DllUnregisterServer();
-         hr = SELFREG_E_CLASS;
       }
    }
 
@@ -165,9 +158,7 @@ STDAPI DllUnregisterServer(void)
 
       long err = RegDeleteKeyA(HKEY_CLASSES_ROOT, pszKeyName);
 
-      if (err != ERROR_SUCCESS)
 	  {
-         hr = S_FALSE;
 	  }
    }
 
@@ -238,13 +229,9 @@ STDAPI DllCanUnloadNow()
 		#ifndef VM_RESET
 		   OutputDebugValues( "(%i) DllCanUnloadNow() -> Quiting VM...\n", g_cLock );
 
-         #if 0 // WHY?
 		      hb_vmPushSymbol( hb_dynsymGet( "__MVCLEAR" )->pSymbol );
-            hb_vmPushNil();
 		      hb_vmDo(0);
-         #endif
 
-         hb_gcSetCollecting( FALSE );
 
 		   hb_vmQuit();
 
@@ -263,7 +250,6 @@ STDAPI DllCanUnloadNow()
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved )
 {
    OutputDebugString( "DllMain\n" );
-
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
@@ -286,4 +272,3 @@ BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved )
 
    return TRUE;
 }
-#endif

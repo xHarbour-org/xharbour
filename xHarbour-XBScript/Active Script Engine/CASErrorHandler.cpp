@@ -262,12 +262,12 @@ STDMETHODIMP CASErrorHandler::QueryInterface(REFIID riid, void ** ppvObj)
    //tracing purposes only
    CASERRORHANDLERTRACE("CASErrorHandler::QueryInterface->");
 
-   if (riid == IID_IUnknown)
+   if (IsEqualGUID(riid, IID_IUnknown))
    {
       CASERRORHANDLERTRACE("IUnknown\n");
       *ppvObj = static_cast<IActiveScriptError*>(this);
    }
-   else if( riid == IID_IActiveScriptError )
+   else if(IsEqualGUID(riid, IID_IActiveScriptError))
    {
       CASERRORHANDLERTRACE("IActiveScriptError\n");
       *ppvObj = static_cast<IActiveScriptError*>(this);
@@ -275,6 +275,7 @@ STDMETHODIMP CASErrorHandler::QueryInterface(REFIID riid, void ** ppvObj)
    else
    {
       CASERRORHANDLERTRACE("Unsupported Interface\n");
+	  _ASSERT(0);
       *ppvObj = NULL;
       return E_NOINTERFACE;
    }

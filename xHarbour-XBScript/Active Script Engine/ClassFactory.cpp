@@ -45,12 +45,12 @@ STDMETHODIMP XBScriptFactory::QueryInterface(REFIID riid, void ** ppvObj)
    //tracing purposes only
    SAMPLESCRIPTFACTORYTRACE("XBScriptFactory::QueryInterface->");
 
-   if (riid == IID_IUnknown)
+   if (IsEqualGUID(riid, IID_IUnknown))
    {
       SAMPLESCRIPTFACTORYTRACE("IUnknown\n");
       *ppvObj = static_cast<IClassFactory*>(this);
    }
-   else if (riid == IID_IClassFactory)
+   else if (IsEqualGUID(riid, IID_IClassFactory))
    {
       SAMPLESCRIPTFACTORYTRACE("IDispatch\n");
       *ppvObj = static_cast<IClassFactory*>(this);
@@ -58,6 +58,7 @@ STDMETHODIMP XBScriptFactory::QueryInterface(REFIID riid, void ** ppvObj)
    else
    {
       SAMPLESCRIPTFACTORYTRACE("XBScriptFactory::Unsupported Interface\n");
+	  _ASSERT(0);
       *ppvObj = NULL;
       return E_NOINTERFACE;
    }

@@ -10,7 +10,14 @@
 #pragma comment( lib, "oleAut32.lib" )
 #pragma comment( lib, "AdvApi32.lib" )
 
-#ifndef AX
+#ifdef AX
+   #ifdef __cplusplus
+      #error __cplusplus
+   #endif	
+   #ifdef CINTERFACE_H_
+      #error CINTERFACE_H_
+   #endif
+#else
   #if defined( _MSC_VER )
      #ifndef NODLLMAIN
         #pragma comment( linker, "-export:DllRegisterServer=_DllRegisterServer@0,@1" )

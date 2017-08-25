@@ -89,32 +89,32 @@ STDMETHODIMP XBScript::QueryInterface(REFIID riid, void ** ppvObj)
    //tracing purposes only
    SAMPLESCRIPTTRACE("XBScript::QueryInterface->");
 
-   if (riid == IID_IUnknown)
+   if (IsEqualGUID(riid, IID_IUnknown))
    {
       SAMPLESCRIPTTRACE("IUnknown\n");
       *ppvObj = static_cast<IActiveScript*>(this);
    }
-   else if (riid == IID_IActiveScript)
+   else if (IsEqualGUID(riid, IID_IActiveScript))
    {
       SAMPLESCRIPTTRACE("IActiveScript\n");
       *ppvObj = static_cast<IActiveScript*>(this);
    }
-   else if (riid == IID_IActiveScriptParse)
+   else if (IsEqualGUID(riid, IID_IActiveScriptParse))
    {
       SAMPLESCRIPTTRACE("IActiveScriptParse\n");
       *ppvObj = static_cast<IActiveScriptParse*>(this);
    }
-   else if (riid == IID_IActiveScriptParseProcedure)
+   else if (IsEqualGUID(riid, IID_IActiveScriptParseProcedure))
    {
       SAMPLESCRIPTTRACE("IActiveScriptParseProcedure\n");
       *ppvObj = static_cast<IActiveScriptParseProcedure*>(this);
    }
-   else if (riid == IID_IHostInfoUpdate)
+   else if (IsEqualGUID(riid, IID_IHostInfoUpdate))
    {
       SAMPLESCRIPTTRACE("IHostInfoUpdate\n");
       *ppvObj = static_cast<IHostInfoUpdate*>(this);
    }
-   else if (riid == IID_IObjectSafety)
+   else if (IsEqualGUID(riid, IID_IObjectSafety))
    {
       SAMPLESCRIPTTRACE("IObjectSafety\n");
       *ppvObj = static_cast<IObjectSafety*>(this);
@@ -122,6 +122,7 @@ STDMETHODIMP XBScript::QueryInterface(REFIID riid, void ** ppvObj)
    else
    {
       SAMPLESCRIPTTRACE("Unsupported Interface\n");
+	  _ASSERT(0);
       *ppvObj = NULL;
       return E_NOINTERFACE;
    }

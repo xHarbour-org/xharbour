@@ -28,6 +28,9 @@
 // To avoid hack forcing C mode in cinterface.h
 #define CINTERFACE_H_
 
+// RP 2017/08/24
+#define _NO_SYS_GUID_OPERATOR_EQ_
+
 #ifdef CLASSFACTORY
 #define XBSCRIPT
 #endif
@@ -101,14 +104,15 @@
 #endif
 
 #ifdef XBSCRIPT
-#include "Hostinfo.h"
-#include "Objsafe.h"
-#include "ASXBScript.h"
+   #include "Hostinfo.h"
+   #include "Objsafe.h"
+   #include "ASXBScript.h"
 
-#ifdef DLLFUNCTIONS
-#include "DLLFunctions.h"
-#include "comdef.h"
-#include "initguid.h"
-#endif
+   #ifdef DLLFUNCTIONS
+      #include "DLLFunctions.h"
+      #include "comdef.h"
+      #include "initguid.h"
+   #endif
 
+   extern const IID & CLSID_XBScript;
 #endif

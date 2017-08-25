@@ -60,37 +60,37 @@ static PHB_DYNS s_pSym_Operation      = NULL;
 
 CASInterpreter::CASInterpreter( LPCOLESTR name, XBScript *pEngine )
 {
-   CASINTERPRETERTRACE( "!!!CASInterpreter::CASInterpreter\n" );
+    CASINTERPRETERTRACE( "!!!CASInterpreter::CASInterpreter\n" );
 
-   unsigned int uLen = wcslen( name ) + 1;
+    unsigned int uLen = wcslen( name ) + 1;
 
-   wcscpy( m_Name, name );
+    wcscpy( m_Name, name );
 
-   WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, name, uLen, (char *) m_sName, uLen, NULL, NULL );
+    WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, name, uLen, (char *) m_sName, uLen, NULL, NULL );
 
 	m_refCount = 1;
 
 	m_pNamedItems = NULL;
 
 	m_pInterpreter = NULL;
-   m_pOleWrapDispatch = OleWrap( NULL );
-   m_pEngine = pEngine;
+    m_pOleWrapDispatch = OleWrap( NULL );
+    m_pEngine = pEngine;
 
-   m_sCode = (char *) malloc( MAX_SCRIPT_SIZE );
+    m_sCode = (char *) malloc( MAX_SCRIPT_SIZE );
 	m_sCode[0] = 0;
 
 	m_bExecuted     = FALSE;
-   m_bAppendText   = FALSE;
+    m_bAppendText   = FALSE;
 	m_bAddedGlobals = FALSE;
 
 	if( s_bInit )
 	{
-      s_bInit = FALSE;
+       s_bInit = FALSE;
 	   InitSymbols();
 	}
 
-   GetPRGInterpreter();
-   _ASSERT( m_pInterpreter );
+    GetPRGInterpreter();
+    _ASSERT( m_pInterpreter );
 
 	CASINTERPRETERTRACE("Created Interpreter\n");
 }
@@ -179,12 +179,12 @@ STDMETHODIMP CASInterpreter::QueryInterface(REFIID riid, void ** ppvObj)
    //tracing purposes only
    CASINTERPRETERTRACE("CASInterpreter::QueryInterface->");
 
-   if (riid == IID_IUnknown)
+   if (IsEqualGUID(riid, IID_IUnknown))
    {
       CASINTERPRETERTRACE("IUnknown\n");
       *ppvObj = static_cast<IDispatch*>(this);
    }
-   else if (riid == IID_IDispatch)
+   else if (IsEqualGUID(riid, IID_IDispatch))
    {
       CASINTERPRETERTRACE("IDispatch\n");
       *ppvObj = static_cast<IDispatch*>(this);
@@ -192,6 +192,7 @@ STDMETHODIMP CASInterpreter::QueryInterface(REFIID riid, void ** ppvObj)
    else
    {
       CASINTERPRETERTRACE("Unsupported Interface\n");
+	  _ASSERT(0);
       *ppvObj = NULL;
       return E_NOINTERFACE;
    }
