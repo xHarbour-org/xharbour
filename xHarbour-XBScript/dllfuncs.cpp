@@ -102,42 +102,71 @@ char const * const g_RegTable [][3] =
 ******************************************************************************/
 STDAPI DllRegisterServer(void)
 {
-   HRESULT hr = S_OK;
+	HRESULT hr = S_OK;
 
-   //look up server's file name
-   char szFileName[256];
-   //HMODULE dllModule = GetModuleHandle( "XBScript.dll" );
+	//look up server's file name
+	char szFileName[256];
+	//HMODULE dllModule = GetModuleHandle( "XBScript.dll" );
 
-   GetModuleFileName( g_hInstance, szFileName, 255 );
+	GetModuleFileName(g_hInstance, szFileName, 255);
 
-   OutputDebugString( "Registring: " );
-   OutputDebugString( szFileName );
-   OutputDebugString( "\n" );
+	OutputDebugValues("Registring: %s\n", szFileName);
 
-   //register entries from the table
-   int nEntries = sizeof(g_RegTable)/sizeof(*g_RegTable);
+	//register entries from the table
+	int nEntries = sizeof(g_RegTable) / sizeof(*g_RegTable);
+	long err;
 
-   {
-      const char *pszName = g_RegTable[i][0];
-      const char *pszValueName = g_RegTable[i][1];
-      const char *pszValue = g_RegTable[i][2];
-      //Map rogue values to module file name
-      if (pszValue == (const char*) -1 )
-         pszValue = szFileName;
+	for (int i = 0; i < nEntries; i++)
+	{
+		const char *pszName = g_RegTable[i][0];
+		const char *pszValueName = g_RegTable[i][1];
+		const char *pszValue = g_RegTable[i][2];
 
-      //Create the key
-      HKEY hkey;
-      long err = RegCreateKeyA( HKEY_CLASSES_ROOT, pszName, &hkey);
+		//Map rogue values to module file name
+		if (pszValue == (const char*)-1)
+		{
+			pszValue = szFileName;
+		}
 
-      //Set the value
-      }
+		//Create the key
+		HKEY hkey;
+		err = RegCreateKeyA(HKEY_CLASSES_ROOT, pszName, &hkey);
 
-      //if cannot add key or value, back out and fail
-      if (err != ERROR_SUCCESS)
-      }
-   }
+		//Set the value
+		if (err == ERROR_SUCCESS)
+		{
+			if (pszValue == NULL)
+			{
+				OutputDebugValues("Skipping SetValue: %s\n", pszName);
+			}
+			else
+			{
+				err = RegSetValueExA(hkey, pszValueName, 0, REG_SZ, (const BYTE*)pszValue, (pszValue == NULL ? 0 : (strlen(pszValue) + 1)));
+				
+				if (err != ERROR_SUCCESS)
+				{
+					OutputDebugValues("FAILED to Set Property %s in Key: %s\n", pszValueName, pszName);
+					break;
+				}
+			}
 
-   return hr;
+			RegCloseKey(hkey);
+		}
+		else
+		{
+			OutputDebugValues("FAILED to Create Key %s!!!\n", pszName );
+			break;
+		}
+	}
+
+	//if cannot add key or value, back out and fail
+	if (err != ERROR_SUCCESS)
+	{
+		DllUnregisterServer();
+		hr = SELFREG_E_CLASS;
+	}
+
+    return hr;
 }
 
 /******************************************************************************
@@ -158,7 +187,14 @@ STDAPI DllUnregisterServer(void)
 
       long err = RegDeleteKeyA(HKEY_CLASSES_ROOT, pszKeyName);
 
+	  if (err == ERROR_SUCCESS)
 	  {
+		  OutputDebugValues("Deleted Key: %s\n", pszKeyName);
+	  }
+	  else
+	  {
+		  OutputDebugValues("FAILED!!! DeleteKey: %s\n", pszKeyName);
+          hr = SELFREG_E_CLASS;
 	  }
    }
 
@@ -173,10 +209,10 @@ STDAPI DllUnregisterServer(void)
 ******************************************************************************/
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID FAR * ppvObj)
 {
-   OutputDebugValues( "DllGetClassObject(%p)\n", rclsid );
+	OutputDebugValues("DllGetClassObject(%p)\n", rclsid);
 
-   //Make sure the requested class is supported by this server
-   if( IsEqualCLSID(rclsid, CLSID_XBScript ) )
+    //Make sure the requested class is supported by this server
+   if( IsEqualCLSID( rclsid, CLSID_XBScript )  )
    {
       //Make sure the requested interface is supported
       if(( !IsEqualCLSID(riid, IID_IUnknown ) ) && ( !IsEqualCLSID(riid, IID_IClassFactory ) ) )
@@ -229,9 +265,13 @@ STDAPI DllCanUnloadNow()
 		#ifndef VM_RESET
 		   OutputDebugValues( "(%i) DllCanUnloadNow() -> Quiting VM...\n", g_cLock );
 
+           #if 0 // WHY?
 		      hb_vmPushSymbol( hb_dynsymGet( "__MVCLEAR" )->pSymbol );
+              hb_vmPushNil();
 		      hb_vmDo(0);
+           #endif
 
+           hb_gcSetCollecting( FALSE );
 
 		   hb_vmQuit();
 
@@ -250,6 +290,7 @@ STDAPI DllCanUnloadNow()
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved )
 {
    OutputDebugString( "DllMain\n" );
+    
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
@@ -272,3 +313,4 @@ BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved )
 
    return TRUE;
 }
+#endif
