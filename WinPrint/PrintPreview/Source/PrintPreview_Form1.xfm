@@ -3,7 +3,7 @@
 CLASS PrintPreview_Form1 INHERIT Dialog
    // Components declaration
    // User variables definitions
-   VAR oPrinter,nCopies,lGreyScale,lAskPrinter,aEmfName,prnDC,nPage,nZoom,NeedsRedraw,nHeight,nWidth,cPrinter,lLandScape,nFormType,nPaperWidth,nPaperLength,lMaxMinRestore,aPrnPage
+   VAR oPrinter,nCopies,lGreyScale,lAskPrinter,aEmfName,prnDC,nPage,nZoom,NeedsRedraw,nHeight,nWidth,cPrinter,lLandScape,nFormType,nPaperWidth,nPaperLength,lMaxMinRestore,aPrnPage,oNavForm,nPrevTop,nPrevLeft,nPrevWidth,nPrevHeight
    METHOD Init() CONSTRUCTOR
    METHOD OnInitDialog()
 
@@ -12,12 +12,13 @@ CLASS PrintPreview_Form1 INHERIT Dialog
    METHOD PrintPreview_Form1_OnSysCommand()
    METHOD PrintPreview_Form1_OnLoad()
    METHOD PrintPreview_Form1_OnExitSizeMove()
+   METHOD PrintPreview_Form1_OnMove()
    METHOD PrintPreview_Form1_OnSize()
+   METHOD Timer1_OnTimeOut()
    METHOD ZoomInToolStripButton_OnClick()
    METHOD ZoomOutToolStripButton_OnClick()
    METHOD PrintToolStripButton_OnClick()
    METHOD MenuPrinterSetting_OnClick()
-   METHOD GotoPageToolStripButton_OnClick()
    METHOD FirstPageToolStripButton_OnClick()
    METHOD PrevPageToolStripButton_OnClick()
    METHOD NextPageToolStripButton_OnClick()
@@ -33,6 +34,7 @@ METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form1
    ::EventHandler[ "OnSysCommand" ] := "PrintPreview_Form1_OnSysCommand"
    ::EventHandler[ "OnLoad" ] := "PrintPreview_Form1_OnLoad"
    ::EventHandler[ "OnExitSizeMove" ] := "PrintPreview_Form1_OnExitSizeMove"
+   ::EventHandler[ "OnMove" ] := "PrintPreview_Form1_OnMove"
    ::EventHandler[ "OnSize" ] := "PrintPreview_Form1_OnSize"
 
    // Populate Components
@@ -41,6 +43,14 @@ METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form1
       :FileName             := "SaveFileDialog1"
       :Create()
    END //SaveFileDialog1
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 100
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
 
    // Properties declaration
    ::Name                 := "PrintPreview_Form1"
@@ -53,9 +63,9 @@ METHOD Init( oParent, aParameters ) CLASS PrintPreview_Form1
    ::Width                := 710
    ::Height               := 432
    ::Text                 := "Print preview"
-   ::VertScrollTopMargin  := 58
    ::AlwaysOnTop          := .T.
    ::DlgModalFrame        := .T.
+   ::Icon                 := { "Resource\preview.ico","_1PREVIEWICO" }
    ::Center               := .T.
 
    ::Create()
@@ -78,6 +88,7 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
 
       :Left                 := 0
       :Top                  := 0
+      :Width                := 694
       :Height               := 56
       :ImagePadding         := 7
       :ShowChevron          := .F.
@@ -87,7 +98,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "ZoomInToolStripButton"
          :Text                 := "Zoom-In"
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "ZoomInToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
@@ -95,7 +105,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "ZoomOutToolStripButton"
          :Text                 := "Zoom-Out"
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "ZoomOutToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
@@ -104,7 +113,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
          :Name                 := "PrintToolStripButton"
          :Text                 := "Print"
          :BeginGroup           := .T.
-         :ImageAlign           := 1
          :DropDown             := 2
          :EventHandler[ "OnClick" ] := "PrintToolStripButton_OnClick"
          :Create()
@@ -118,18 +126,9 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       END //TOOLSTRIPBUTTON
 
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
-         :Name                 := "GotoPageToolStripButton"
-         :Text                 := "Goto page"
-         :ImageAlign           := 1
-         :EventHandler[ "OnClick" ] := "GotoPageToolStripButton_OnClick"
-         :Create()
-      END //TOOLSTRIPBUTTON
-
-      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "FirstPageToolStripButton"
          :Text                 := "First"
          :BeginGroup           := .T.
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "FirstPageToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
@@ -137,7 +136,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "PrevPageToolStripButton"
          :Text                 := "Prev"
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "PrevPageToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
@@ -145,7 +143,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "NextPageToolStripButton"
          :Text                 := "Next"
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "NextPageToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON
@@ -153,7 +150,6 @@ METHOD OnInitDialog() CLASS PrintPreview_Form1
       WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
          :Name                 := "LastPageToolStripButton"
          :Text                 := "Last"
-         :ImageAlign           := 1
          :EventHandler[ "OnClick" ] := "LastPageToolStripButton_OnClick"
          :Create()
       END //TOOLSTRIPBUTTON

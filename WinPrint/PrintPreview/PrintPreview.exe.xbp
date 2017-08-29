@@ -46,6 +46,11 @@ MYC_FLAGS =
 MYDEFINES = 
 MYPRG_FLAGS = 
 
+[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_NavForm.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
 [C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrinterDialog_Form.prg]
 MYC_FLAGS = 
 MYDEFINES = 

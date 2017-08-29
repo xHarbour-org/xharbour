@@ -160,23 +160,23 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    IF File(GetExePath()+"\vxh_Preview.INI")
       TRY
        ::RestoreLayout( GetExePath()+"\vxh_Preview.INI", "Form" )
-       IF ::Height < 600
-          ::Top-=600-::Height
-          IF ::Top<50
-             ::Top:=50
-          ENDIF
-          ::Height := 600
-       ENDIF
-       IF ::Width < 450
-          ::Left-=450-::Width
-          IF ::Left<50
-             ::Left:=50
-          ENDIF
-          ::Width := 450
-       ENDIF
-       IF ::ShowMode = 2
-          ::ShowMode := 1
-       ENDIF
+       // IF ::Height < 600
+       //    ::Top-=600-::Height
+       //    IF ::Top<50
+       //       ::Top:=50
+       //    ENDIF
+       //    ::Height := 600
+       // ENDIF
+       // IF ::Width < 450
+       //    ::Left-=450-::Width
+       //    IF ::Left<50
+       //       ::Left:=50
+       //    ENDIF
+       //    ::Width := 450
+       // ENDIF
+       // IF ::ShowMode = 2
+       //    ::ShowMode := 1
+       // ENDIF
        lDefaultSize:=.F.
       CATCH
       END
@@ -189,16 +189,15 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
    ENDIF
 
    IF Len(::aEmfName)<=1
-   
-      ::GotoPageToolStripButton:Destroy()
       ::FirstPageToolStripButton:Destroy()
       ::PrevPageToolStripButton:Destroy()
       ::NextPageToolStripButton:Destroy()
       ::LastPageToolStripButton:Destroy()
-
    ENDIF
+   
+   ::ToolStrip1:Visible:=.F.
 
-   ::Panel1:Top:=::ToolStrip1:Height+20
+   ::Panel1:Top:=If(::ToolStrip1:Visible,If(::ToolStrip1:Visible,::ToolStrip1:Height,0),0)+20
    ::Panel1:Left:=20
 
    ::nWidth :=GetDeviceCaps(::prnDC,HORZRES)
@@ -225,11 +224,42 @@ METHOD PrintPreview_Form1_OnLoad() CLASS PrintPreview_Form1
       ::lMaxMinRestore:=.T.
    ENDIF
 
-   ResizePreviewDlg(Self)
+   // ResizePreviewDlg(Self)   
+   // ::Panel1:SetFocus()
    
-   ::Panel1:SetFocus()
+   ::Timer1_OnTimeOut()
    
 RETURN Self
+
+
+//----------------------------------------------------------------------------------------------------//
+
+METHOD Timer1_OnTimeOut() CLASS PrintPreview_Form1
+
+   ::Timer1:Stop()
+
+   ResizePreviewDlg(Self)
+
+
+   PrintPreview_ShowPageNumber(Self)
+
+   ::Panel2:Visible:=.T.
+   ::Panel1:Visible:=.T.
+
+   ::oNavForm:=PrintPreview_NavForm(Self,{})
+
+   ::Panel1:SetFocus()
+
+   ::oNavForm:Top:=::Top+::Height-::oNavForm:Height-20
+   ::oNavForm:Left:=::Left+(::Width-::oNavForm:Width)/2
+
+   ::nPrevTop:=::Top
+   ::nPrevLeft:=::Left
+   ::nPrevWidth:=::Width
+   ::nPrevHeight:=::Height
+
+RETURN Self
+
 
 
 //----------------------------------------------------------------------------------------------------//
@@ -239,6 +269,19 @@ METHOD PrintPreview_Form1_OnSysCommand() CLASS PrintPreview_Form1
 
    ::lMaxMinRestore:=.T.
    
+RETURN Self
+
+//----------------------------------------------------------------------------------------------------//
+
+METHOD PrintPreview_Form1_OnMove() CLASS PrintPreview_Form1
+
+   IF !(::oNavForm=NIL)
+      ::oNavForm:Top+=::Top-::nPrevTop
+      ::oNavForm:Left+=::Left-::nPrevLeft
+      ::nPrevTop:=::Top
+      ::nPrevLeft:=::Left
+   ENDIF
+
 RETURN Self
 
 
@@ -256,6 +299,19 @@ METHOD PrintPreview_Form1_OnExitSizeMove() CLASS PrintPreview_Form1
    ::Panel1:Refresh()
    ::Refresh()
 
+   IF !(::oNavForm=NIL)
+
+      ::oNavForm:Top=::Top+Round((::oNavForm:Top-::nPrevTop)*::Height/::nPrevHeight,0);
+                     -(::oNavForm:Height-::oNavForm:Height*::Height/::nPrevHeight)/2
+      ::oNavForm:Left=::Left+Round((::oNavForm:Left-::nPrevLeft)*::Width/::nPrevWidth,0);
+                      -(::oNavForm:Width-::oNavForm:Width*::Width/::nPrevWidth)/2
+
+      ::nPrevTop:=::Top
+      ::nPrevLeft:=::Left
+      ::nPrevHeight:=::Height
+      ::nPrevWidth:=::Width
+   ENDIF
+   
 RETURN Self
 
 
@@ -287,6 +343,20 @@ RETURN Self
 
 METHOD PrintPreview_Form1_OnClose() CLASS PrintPreview_Form1
 
+   LOCAL i
+
+   TRY
+    ::oNavForm:Close()
+   CATCH
+   END
+
+   TRY
+    FOR i=1 TO Len(::aEmfName)
+       DeleteFile(::aEmfName)
+    NEXT
+   CATCH
+   END   
+   
    TRY
     IF ::ShowMode != 2
        ::SaveLayout( GetExePath()+"\vxh_Preview.INI", "Form" )
@@ -464,35 +534,13 @@ RETURN Self
 //----------------------------------------------------------------------------------------------------//
 
 
-METHOD GotoPageToolStripButton_OnClick() CLASS PrintPreview_Form1
-
-   LOCAL nPageNo, lOk
-
-   nPageNo := ::nPage
-   lOk := PrintPreview_GetPageNo(Self, @nPageNo, Len(::aEmfName))
-
-   IF !lOk
-      RETURN NIL
-   ENDIF
-   
-   IF nPageNo > 0 .AND. nPageNo!=::nPage  .AND. nPageNo <= Len(::aEmfName)
-      ::nPage:=nPageNo
-      ::NeedsRedraw := .T.
-      ::Panel1:Refresh()
-   ENDIF
-
-RETURN Self
-
-
-//----------------------------------------------------------------------------------------------------//
-
-
 METHOD FirstPageToolStripButton_OnClick() CLASS PrintPreview_Form1
 
    IF ::nPage>1
       ::nPage:=1
       ::NeedsRedraw := .T.
       ::Panel1:Refresh()
+      PrintPreview_ShowPageNumber(Self)
    ENDIF
 
 RETURN Self
@@ -507,6 +555,7 @@ METHOD PrevPageToolStripButton_OnClick() CLASS PrintPreview_Form1
       ::nPage--
       ::NeedsRedraw := .T.
       ::Panel1:Refresh()
+      PrintPreview_ShowPageNumber(Self)
    ENDIF
 
 RETURN Self                  
@@ -521,6 +570,7 @@ METHOD NextPageToolStripButton_OnClick() CLASS PrintPreview_Form1
       ::nPage++
       ::NeedsRedraw := .T.
       ::Panel1:Refresh()
+      PrintPreview_ShowPageNumber(Self)
    ENDIF
    
 RETURN Self
@@ -535,6 +585,7 @@ METHOD LastPageToolStripButton_OnClick() CLASS PrintPreview_Form1
       ::nPage:=Len(::aEmfName)
       ::NeedsRedraw := .T.
       ::Panel1:Refresh()
+      PrintPreview_ShowPageNumber(Self)
    ENDIF
 
 RETURN Self
@@ -696,13 +747,8 @@ FUNCTION ResizePreviewDlg( Self, nZoom)
 
    LOCAL nWidth, nHeight, x, y 
 
-   x := ::Width-40
-   
-   IF ::VertScrollTopMargin=0 
-      y := ::Height-::ToolStrip1:Height-40
-   ELSE
-      y := ::Height-::VertScrollTopMargin-40
-   ENDIF
+   x := ::Width-60 //40
+   y := ::Height-If(::ToolStrip1:Visible,::ToolStrip1:Height,0)-60 //40
 
    IF nZoom != NIL
       ::nZoom += nZoom
@@ -715,33 +761,30 @@ FUNCTION ResizePreviewDlg( Self, nZoom)
    IF ::nHeight>::nWidth
       nHeight:=y-40
       nWidth:=Round(nHeight * ::nWidth / ::nHeight, 0)
+      IF nWidth>x-40
+         nWidth:=x-40
+         nHeight:=Round(nWidth * ::nHeight / ::nWidth, 0)
+      ENDIF
    ELSE
       nWidth:=x-40
       nHeight:=Round(nWidth * ::nHeight / ::nWidth, 0)
+      IF nHeight>y-40
+         nHeight:=y-40
+         nWidth:=Round(nHeight * ::nWidth / ::nHeight, 0)
+      ENDIF         
    ENDIF
+
 
    nWidth:=Round(nWidth*(1+::nZoom*20/100),0)
    nHeight:=Round(nWidth*::nHeight/::nWidth,0)
    
-//   ::Panel1:Width:=nWidth
-//   ::Panel1:Height:=nHeight
+   ::Panel1:Left:=Max(Round((::Width-nWidth)/2,0)-10,20)
 
-   IF nWidth+40<::Width
-      ::Panel1:Left:=Round((::Width-nWidth)/2,0)
+   IF ::ToolStrip1:Visible
+      ::Panel1:Top:=Max(Round((::Height-::ToolStrip1:Height-nHeight)/2,0)-20, 20)
    ELSE
-      ::Panel1:Left:=20
+      ::Panel1:Top:=Max(Round((::Height-nHeight)/2,0)-20, 20)
    ENDIF
-
-   IF nHeight+40<y
-      ::Panel1:Top:=Round((y-nHeight)/2,0)+IF(::VertScrollTopMargin=0,::ToolStrip1:Height,0)-20
-   ELSE
-      ::Panel1:Top:=IF(::VertScrollTopMargin=0,::ToolStrip1:Height,0)+20
-   ENDIF
-
-   IF ::VertScrollTopMargin>0
-      ::Panel1:Left:=Max(::Panel1:Left,20)
-      ::Panel1:Top:=Max(::Panel1:Top,20)
-   ENDIF 
 
    ::Panel2:Left:=::Panel1:Left+3
    ::Panel2:Top:=::Panel1:Top+3
@@ -752,8 +795,7 @@ FUNCTION ResizePreviewDlg( Self, nZoom)
    ::Panel2:Width:=nWidth
    ::Panel2:Height:=nHeight
 
-   ::Panel2:Refresh()      
-   ::Panel1:Refresh()
+   ::ResetScrollBars()
 
 RETURN Self
 
@@ -833,5 +875,13 @@ STATIC FUNCTION GetExePath()
    
 RETURN cPathMask
 
+//----------------------------------------------------------------------------------------------------//
+
+
+FUNCTION PrintPreview_ShowPageNumber(Self)
+
+   ::Text:="Print preview ("+NToC(::nPage)+"/"+NToC(Len(::aEmfName))+")"
+
+RETURN NIL
 
 //----------------------------------------------------------------------------------------------------//

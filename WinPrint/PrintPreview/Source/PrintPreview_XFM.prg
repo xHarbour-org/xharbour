@@ -16,6 +16,7 @@ METHOD Init( oParent, aParameters ) CLASS __PrintPreview
 
    // Populate Components
    // Properties declaration
+   ::Icon                 := "Resource\preview.ico"
    ::Resources            := {  }
 
    ::Create()

@@ -45,7 +45,7 @@ FUNCTION BasicReport(Self, lPreview)
 
    DEFAULT lPreview TO .T.
    
-   oPrn:=WinPrint():New(lPreview,.F.)  
+   oPrn:=WinPrint():New(lPreview)  
 
    IF oPrn=NIL
       RETURN NIL
@@ -70,7 +70,7 @@ FUNCTION BasicReport(Self, lPreview)
      
    oPrn:nCopies:=If(Val(::EditBox1:Text)<1,1,Val(::EditBox1:Text))
 
-   oPrn:lGreyScale:=.F.
+   oPrn:lGrayScale:=.F.
 
    oPrn:lBestQuality:=.T.
    oPrn:lDuplex:=.F.
@@ -139,7 +139,7 @@ FUNCTION SaleReport(Self, lPreview)
       (cAlias)->(DbUnlock())
    NEXT
    
-   oPrn:=WinPrint():New(lPreview,.F.)  
+   oPrn:=WinPrint():New(lPreview)  
 
    IF oPrn=NIL
       (cAlias)->(DbCloseArea())
@@ -165,7 +165,7 @@ FUNCTION SaleReport(Self, lPreview)
    
    oPrn:nCopies:=If(Val(::EditBox1:Text)<1,1,Val(::EditBox1:Text))
 
-   oPrn:lGreyScale:=.F.
+   oPrn:lGrayScale:=.F.
 
    oPrn:lBestQuality:=.T.
    oPrn:lDuplex:=.F.

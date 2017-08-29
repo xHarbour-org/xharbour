@@ -20,6 +20,7 @@ ClassID=
 [Files]
 PrintPreview_Form1.xfm=
 PrintPreview_Form2.xfm=
+PrintPreview_NavForm.xfm=
 PrinterDialog_Form.xfm=
 [Sources]
 [Binaries]

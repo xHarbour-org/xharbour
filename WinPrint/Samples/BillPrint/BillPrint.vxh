@@ -21,8 +21,8 @@ ClassID=
 BillPrint_Form1.xfm=
 [Sources]
 [Binaries]
-C:\xHB\Lib\WinPrint.lib
-C:\xHB\Lib\FreeImage.lib
 C:\xHB\Lib\FreeImage-xHB.lib
+C:\xHB\Lib\FreeImage.lib
+C:\xHB\Lib\WinPrint.lib
 [ExtImages]
 [Resources]
