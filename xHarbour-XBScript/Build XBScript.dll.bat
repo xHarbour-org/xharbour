@@ -66,7 +66,7 @@ IF EXIST \xHarbour.com\xHarbour-XBScript\XBScriptEnt RD \xHarbour.com\xHarbour-X
    GOTO SUCCESS
 
 :FAILURE
-   PAUSE
+   PAUSE "Error building!"
    GOTO RESTORE
 
 :SUCCESS

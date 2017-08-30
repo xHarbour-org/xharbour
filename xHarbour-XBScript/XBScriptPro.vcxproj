@@ -172,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\xHarbour-OLEServer\source\oleserver.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="Active Script Engine\ASXBScript.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
