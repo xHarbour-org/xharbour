@@ -539,6 +539,7 @@ HB_FUNC( HPDF_SETINFODATEATTR )
    date.hour    = hb_parni( 3,4 );
    date.minutes = hb_parni( 3,5 );
    date.seconds = hb_parni( 3,6 );
+   date.ind     = ' ';
 
    hb_retnl( ( long ) HPDF_SetInfoDateAttr( HPDF_Doc_par( 1 ), (HPDF_InfoType) hb_parni( 2 ), date ) );
 }

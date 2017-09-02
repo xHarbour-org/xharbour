@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-09-02 23:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/hbhpdf/harupdf.c
+    ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Simões Filho)
+
 2017-08-27 00:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/tipssl/client.prg
     ! reverted change on method Read(), replaced back InetRecvAll() with InetRecv() (many thanks to ostap.romanenko@gmail.com)
