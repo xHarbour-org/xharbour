@@ -1,4 +1,14 @@
-#include "vxh.ch"
+#ifdef d_WinFakt
+ #ifdef d_VXH
+  #ifdef __XHARBOUR__
+   #include "vxh.ch"
+  #else
+   #include "vh.ch"
+  #endif
+ #endif
+#else
+ #include "vxh.ch"
+#endif
 
 #ifndef CRLF
  #define CRLF CHR(13) + CHR(10)
@@ -11,7 +21,7 @@
                   If( <uVar1> == nil, <uVar1> := <uVal1>, ) ;;
                 [ If( <uVarN> == nil, <uVarN> := <uValN>, ); ]
 
-STATIC aPaper:={ {"9","A4 210 x 297 mm"},;
+STATIC lDebug:=.F., aPaper:={ {"9","A4 210 x 297 mm"},;
                  {"8","A3 297 x 420 mm"},;
                  {"1","Letter 8 1/2 x 11 in"},;
                  {"5","Legal 8 1/2 x 14 in"},;
@@ -103,9 +113,9 @@ STATIC aPaper:={ {"9","A4 210 x 297 mm"},;
 
 CLASS WinPrint
 
-   DATA oPrinter,nPage,lPaperLength,lPreview,lBestQuality,lLatePrn,cAlias,cFile
+   DATA oPrinter,nPage,lPaperLength,lPreload,lPDF,lPreview,lBestQuality,lLatePrn,cAlias,cFile
    DATA cPrinter,nCharHeight,nCopies,cFormType,lAskProperties
-   DATA nPageWidth,nPageHeight,lLandScape
+   DATA nPageWidth,nPageHeight,lLandScape,cEmailID,cEmailBodyText,cEmailSubText,cEmailPdf,cEmailSignatory
    DATA nTopMargin,nLeftMargin,nRightMargin,nBottomMargin,nLineHeight,nFontSizeDiff,nDtlLineRowGap
    DATA cHexShadowColor,nMaxY,aPrn,nPenWidth,lError,lDuplex,nPrnPosX,nPrnPosY,lDtlLine,lNextToHeader,lNextPageSameNum
    DATA cPrevFontName,nPrevFontSize,lPrevBold,lPrevItalic,lPrevUnderLine,lPrevStrikeOut,nForeColor,lGrayScale
@@ -170,9 +180,10 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------------//
 
 
-METHOD New(lPreview) CLASS WinPrint
+METHOD New(lPreview,lPload) CLASS WinPrint
 
    DEFAULT lPreview := .F.
+   DEFAULT lPload   := .F.
 
    REQUEST DBFCDX, DBFFPT
 
@@ -187,11 +198,13 @@ METHOD New(lPreview) CLASS WinPrint
    ::cHexShadowColor:="DCDCDC"
    ::nMaxY:=0
    ::nPenWidth:=0.10
+   ::lPreload:=lPload
    ::lPreview:=lPreview
    ::nRightMargin:=10
    ::lGrayScale:=.F.
    ::lBestQuality:=.F.
    ::lDuplex:=.F.
+   ::lPdf:=.F.
    ::nPrnPosX:=0
    ::nPrnPosY:=0
    ::nLineHeight:=0
@@ -204,6 +217,11 @@ METHOD New(lPreview) CLASS WinPrint
    ::nRightMargin:=10
    ::nBottomMargin:=10
    ::nLeftMargin:=10
+   ::cEmailID:=""
+   ::cEmailBodyText := ""
+   ::cEmailSubText := ""
+   ::cEmailPdf:=""
+   ::cEmailSignatory := ""
    ::cEmfName:=""
    ::aEmfName:={}
    ::lLatePrn:=.F.
@@ -217,6 +235,14 @@ RETURN Self
 
 
 METHOD Create() CLASS WinPrint
+
+   IF ::lPreload
+      ::nPageWidth:=200
+      ::nPageHeight:=300
+      ::nCharHeight:=5
+      ::nPage:=1
+      RETURN .T.
+   ENDIF
 
    IF AScan(GetPrinters(),{|x| Upper(x)==Upper(::cPrinter)})==0
       ::cPrinter:=GetDefaultPrinter()
@@ -262,7 +288,7 @@ METHOD Create() CLASS WinPrint
       ::oPrinter:setPrintQuality(-4) // Highest printer quality
    ENDIF
 
-   IF ::lPaperLength .AND. ::nCopies=1 .AND. !::lPreview .AND. ::lDuplex
+   IF ::lPaperLength .AND. ::nCopies=1 .AND. !(::lPreview .OR. ::lPdf) .AND. ::lDuplex
       IF ::oPrinter:setDuplexType()=1
          ::oPrinter:setDuplexType(3) // Made it horizontally
       ENDIF
@@ -304,7 +330,7 @@ METHOD Create() CLASS WinPrint
 
    ::nPage:=1
 
-   IF !::lPaperLength .OR. ::lLatePrn .OR. ::nCopies>1 .OR. ::lPreview
+   IF !::lPaperLength .OR. ::lLatePrn .OR. ::nCopies>1 .OR. (::lPreview .OR. ::lPdf)
       ::aPrn:={}
 
       IF !::lPaperLength .OR. ::lLatePrn
@@ -336,10 +362,14 @@ RETURN .T.
 
 METHOD SetPenWidth(n) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    IF ::lPaperLength .AND. !::lLatePrn
       ::oPrinter:SetPen(::oPrinter:PenStyle,Int(n*::oPrinter:PixelsPerInchY/MM_TO_INCH),::oPrinter:PenColor)
    ELSE
-      IF ::lPreview
+      IF (::lPreview .OR. ::lPdf)
          AAdd(::aPrn,{"SETPEN",::oPrinter:PenStyle,n,::oPrinter:PenColor})
          AAdd(::aPrn,{"SETLINEWIDTH",n})
       ELSE
@@ -357,6 +387,10 @@ RETURN Self
 
 METHOD SetFontArray(aFont) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    ::SetFont(aFont[1],aFont[2],aFont[3],aFont[4],aFont[5],aFont[6],aFont[7])
 
 RETURN Self
@@ -371,6 +405,10 @@ METHOD SetFont(cFontName,nFontSize,lBold,lItalic,lUnderLine,lStrikeOut,nForeColo
    (lStrikeOut)
 
    DEFAULT lForce:=.F.
+
+   IF ::lPreload
+      RETURN Self
+   ENDIF
 
    IF ValType(nForeColor)="C"
       nForeColor:=Val(nForeColor)
@@ -565,7 +603,11 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
 
    DEFAULT lWrap := .T.
 
-   cString:=StrTran(AllTrim(cString),"~",CRLF)
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
+   cString:=wf_Swap(AllTrim(cString),"~",CRLF)
 
    lJustified:=(nAlign==4)
 
@@ -588,7 +630,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
       IF ::lPaperLength .AND. !::lLatePrn
          ::oPrinter:TextOutAt(::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign)
       ELSE
-         IF ::lPreview
+         IF (::lPreview .OR. ::lPdf)
             AAdd(::aPrn, {"TEXTOUTAT",nLeft,nTop,cString,.F.,.F.,nAlign})
          ELSE
             AAdd(::aPrn, {"TEXTOUTAT",::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign})
@@ -597,7 +639,9 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
       ENDIF
       ::nLineHeight:=Max(::nLineHeight,::nCharHeight)
    ELSE
+      // Changed by SB on 06/03/2017
       nWidth:=::Mm2ActX(nWidth)
+      // nWidth:=::Mm2X(nWidth)
 
       lFnt:=(nAlign= 0 .AND. ;
             ("<b>" $ Lower(cString) .OR. "</b>" $ Lower(cString) .OR. ;
@@ -605,10 +649,10 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
             "<u>" $ Lower(cString) .OR. "</u>" $ Lower(cString) .OR. "<n>" $ Lower(cString)))
 
       IF lFnt
-         cTmp:=StrTran(StrTran(StrTran(cString,"<b>",""),"<i>",""),"<u>","")
-         cTmp:=StrTran(StrTran(StrTran(cTmp,"</b>",""),"</i>",""),"</u>","")
-         cTmp:=StrTran(cTmp,CRLF," ")
-         nTmp:=::oPrinter:GetTextWidth(StrTran(cTmp,"<n>",""))
+         cTmp:=wf_Swap(wf_Swap(wf_Swap(cString,"<b>",""),"<i>",""),"<u>","")
+         cTmp:=wf_Swap(wf_Swap(wf_Swap(cTmp,"</b>",""),"</i>",""),"</u>","")
+         cTmp:=wf_Swap(cTmp,CRLF," ")
+         nTmp:=::oPrinter:GetTextWidth(wf_Swap(cTmp,"<n>",""))
       ELSE
          nTmp:=::oPrinter:GetTextWidth(cString)
       ENDIF
@@ -619,7 +663,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
             nLeft:=::mm2x(nLeft)
             cTmp:=""
 
-            cString:=StrTran(cString,CRLF," ")
+            cString:=wf_Swap(cString,CRLF," ")
 
             i=1
             WHILE i<=Len(cString)
@@ -733,7 +777,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
                   IF ::lPaperLength .AND. !::lLatePrn
                      ::oPrinter:TextOutAt(nLeft,::mm2y(nTop),SubStr(cString,i,nNext),.F.,.F.,nAlign)
                   ELSE
-                     IF ::lPreview
+                     IF (::lPreview .OR. ::lPdf)
                         AAdd(::aPrn, {"TEXTOUTAT",::X2Mm(nLeft+::oPrinter:LeftMargin),nTop,SubStr(cString,i,nNext),.F.,.F.,nAlign})
                      ELSE
                         AAdd(::aPrn, {"TEXTOUTAT",nLeft,::mm2y(nTop),SubStr(cString,i,nNext),.F.,.F.,nAlign})
@@ -749,7 +793,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
             IF ::lPaperLength .AND. !::lLatePrn
                ::oPrinter:TextOutAt(::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign)
             ELSE
-               IF ::lPreview
+               IF (::lPreview .OR. ::lPdf)
                   AAdd(::aPrn, {"TEXTOUTAT",nLeft,nTop,cString,.F.,.F.,nAlign})
                ELSE
                   AAdd(::aPrn, {"TEXTOUTAT",::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign})
@@ -766,7 +810,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
          IF ::lPaperLength .AND. !::lLatePrn
             ::oPrinter:TextOutAt(::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign)
          ELSE
-            IF ::lPreview
+            IF (::lPreview .OR. ::lPdf)
                AAdd(::aPrn, {"TEXTOUTAT",nLeft,nTop,cString,.F.,.F.,nAlign})
             ELSE
                AAdd(::aPrn, {"TEXTOUTAT",::mm2x(nLeft),::mm2y(nTop),cString,.F.,.F.,nAlign})
@@ -863,7 +907,7 @@ METHOD Say(nLeft,nTop,cString,nAlign,nWidth,nHeight,lWrap) CLASS WinPrint
                IF ::lPaperLength .AND. !::lLatePrn
                   ::oPrinter:TextOutAt(::mm2x(nLeft),nTop+n,aString[i],.F.,.F.,nAlign)
                ELSE
-                  IF ::lPreview
+                  IF (::lPreview .OR. ::lPdf)
                      AAdd(::aPrn, {"TEXTOUTAT",nLeft,::y2mm(nTop+n+::oPrinter:TopMargin),aString[i],.F.,.F.,nAlign})
                   ELSE
                      AAdd(::aPrn, {"TEXTOUTAT",::mm2x(nLeft),nTop+n,aString[i],.F.,.F.,nAlign})
@@ -925,11 +969,15 @@ RETURN cString
 
 METHOD PageBreak() CLASS WinPrint
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    ::nPrnPosX:=0
    ::nPrnPosY:=0
 
    IF ::lPaperLength .AND. !::lLatePrn
-      IF ::lPreview .OR. ::nCopies>1
+      IF ::lPreview .OR. ::lPdf() .OR. ::nCopies>1
          ::EmfPrnPageEnd()
          ::EmfPrnPageStart()
       ELSE
@@ -959,11 +1007,15 @@ METHOD Line(t,l,b,r,w,c) CLASS WinPrint
 
    LOCAL nPrevColor
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    IF w=NIL .AND. c=NIL
       IF ::lPaperLength .AND. !::lLatePrn
          ::oPrinter:Line(::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b))
       ELSE
-         IF ::lPreview
+         IF (::lPreview .OR. ::lPdf)
             AAdd(::aPrn, {"LINE", l, t, r, b})
          ELSE
             AAdd(::aPrn, {"LINE", ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b)})
@@ -982,7 +1034,7 @@ METHOD Line(t,l,b,r,w,c) CLASS WinPrint
          ::oPrinter:Line(::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b))
          ::oPrinter:SetPen(::oPrinter:PenStyle,Int(::nPenWidth*::oPrinter:PixelsPerInchY/MM_TO_INCH),nPrevColor)
       ELSE
-         IF ::lPreview
+         IF (::lPreview .OR. ::lPdf)
             AAdd(::aPrn,{"SETPEN",::oPrinter:PenStyle,w,IF(::lGrayScale,0,HexToNum(c))})
             AAdd(::aPrn,{"LINE", l, t, r, b})
             AAdd(::aPrn,{"SETPEN",::oPrinter:PenStyle,::nPenWidth,IF(::lGrayScale,0,nPrevColor)})
@@ -1006,7 +1058,7 @@ METHOD Image(cImage,t,l,b,r) CLASS WinPrint
    LOCAL oBmp
 
    cImage:=If(Upper(Right(cImage,3))=="BMP" .AND. !::lGrayScale,cImage,WinPrint_ToBmp(cImage,::lGrayScale))
-   IF ::lPaperLength .AND. ::nCopies=1 .AND. !::lPreview .AND. !::lLatePrn
+   IF ::lPaperLength .AND. ::nCopies=1 .AND. !(::lPreview .OR. ::lPdf) .AND. !::lLatePrn
       oBMP:= Win32BMP():new()
       l:=::mm2x(l)
       t:=::mm2y(t)
@@ -1038,16 +1090,20 @@ RETURN Self
 
 METHOD Box(t,l,b,r) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    IF ::lPaperLength .AND. !::lLatePrn
       ::oPrinter:Box( ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b) )
    ELSE
-      IF ::lPreview
+      IF (::lPreview .OR. ::lPdf)
          AAdd(::aPrn, {"BOX", l, t, r, b})
       ELSE
          AAdd(::aPrn, {"BOX",::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b)})
       ENDIF
       ::nMaxY:=Max(::nMaxY, Max(::mm2y(t),::mm2y(b))+::nCharHeight)
-      //IF ::lPreview
+      //IF (::lPreview .OR. ::lPdf)
       //   AAdd(::aPrn, {"BOXPDF", ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b)})
       //ENDIF
    ENDIF
@@ -1061,6 +1117,10 @@ RETURN Self
 
 METHOD Shadow(t,l,b,r,cHexShadowColor,nBoxType) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
    IF cHexShadowColor=NIL
       cHexShadowColor:=::cHexShadowColor
    ENDIF
@@ -1070,7 +1130,7 @@ METHOD Shadow(t,l,b,r,cHexShadowColor,nBoxType) CLASS WinPrint
    ENDIF
 
    IF ::lGrayScale
-      cHexShadowColor:="DCDCDC"
+      cHexShadowColor:=::cHexShadowColor //"DCDCDC"
    ENDIF
 
    DEFAULT nBoxType := 1
@@ -1082,18 +1142,18 @@ METHOD Shadow(t,l,b,r,cHexShadowColor,nBoxType) CLASS WinPrint
       ::oPrinter:FillRect( ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b) , HexToNum(cHexShadowColor) )
    ELSE
       IF nBoxType!=1
-         IF ::lPreview
+         IF (::lPreview .OR. ::lPdf)
             AAdd(::aPrn, {"BOX", l-0.25, t-0.25, r+0.25, b+0.25} )
          ELSE
             AAdd(::aPrn, {"BOX", ::mm2x(l-0.25), ::mm2y(t-0.25), ::mm2x(r+0.25), ::mm2y(b+0.25)} )
          ENDIF
       ENDIF
-      IF ::lPreview
+      IF (::lPreview .OR. ::lPdf)
          AAdd(::aPrn, {"FILLRECT", l, t, r, b, HexToNum(cHexShadowColor)})
       ELSE
          AAdd(::aPrn, {"FILLRECT", ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b) , HexToNum(cHexShadowColor)})
       ENDIF
-      //IF ::lPreview
+      //IF (::lPreview .OR. ::lPdf)
       //   AAdd(::aPrn, {"FILLRECTPDF", ::mm2x(l), ::mm2y(t), ::mm2x(r), ::mm2y(b) , cHexShadowColor, nBoxType})
       //ENDIF
       ::nMaxY:=Max(::nMaxY, Max(::mm2y(t),::mm2y(b))+::nCharHeight)
@@ -1117,7 +1177,13 @@ METHOD GetTextArray(cString,nWidth) CLASS WinPrint
 
    LOCAL i,j,aString,n,cTmp,lFirst
 
+   IF ::lPreload
+      RETURN {}
+   ENDIF
+
+   // Changed by SB on 07/03/2017
    nWidth:=::mm2ActX(nWidth)
+  //  nWidth:=::mm2x(nWidth)
 
    aString:=hb_ATokens(cString,CRLF)
 
@@ -1185,6 +1251,10 @@ RETURN aString
 METHOD GetTextHeightMM(cString,nWidth) CLASS WinPrint
 
    LOCAL i,aString,n
+
+   IF ::lPreload
+      RETURN 1
+   ENDIF
    
    IF nWidth=NIL
       RETURN Ceiling(::oPrinter:GetTextHeight(cString)/::oPrinter:PixelsPerInchY*MM_TO_INCH)
@@ -1208,6 +1278,10 @@ RETURN Ceiling(n/::oPrinter:PixelsPerInchY*MM_TO_INCH)
 METHOD EmfPrnStart() CLASS WinPrint
 
    LOCAL nMaxY
+
+   IF ::lPreload
+      RETURN NIL
+   ENDIF
 
    ::nPrevColor:=-1
    ::aPrevFont:={}
@@ -1261,7 +1335,16 @@ RETURN NIL
 
 METHOD EmfPrnPageStart() CLASS WinPrint
 
-   ::cEmfName:=TempFileName(,,"EMF")
+   IF ::lPreload
+      RETURN NIL
+   ENDIF
+   
+   #ifdef d_WinFakt
+    ::cEmfName:=TempFileName(oApp:Path:Temp,::cEmfPrefix,"EMF")
+   #else
+    ::cEmfName:=TempFileName(,,"EMF")
+   #endif
+   
    ::hDC := StartPage_Preview(::hDCBak,::cEmfName)
    ::oPrinter:hPrinterDC:=::hDC
    AAdd(::aEmfName,::cEmfName)
@@ -1274,6 +1357,10 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------//
 
 METHOD EmfPrnPageEnd() CLASS WinPrint
+
+   IF ::lPreload
+      RETURN NIL
+   ENDIF
 
    EndPage_Preview(::hDC)
 
@@ -1309,6 +1396,34 @@ METHOD EmfPrnEnd() CLASS WinPrint
    AAdd(::aPrnData, {"RIGHTMARGIN", ::nRightMargin})
    AAdd(::aPrnData, {"EMFNAMES", ::aEmfName})
    AAdd(::aPrnData, {"GREYSCALE", ::lGrayScale})
+
+   IF Upper(::cEmailId)==Upper("<Email>")
+      ::cEmailid := ""
+   ENDIF
+
+
+   AAdd(::aPrnData, {"EMAILID", ::cEmailID})
+   AAdd(::aPrnData, {"EMAILBODYTEXT", ::cEmailBodyText})
+   AAdd(::aPrnData, {"EMAILSUBTEXT", ::cEmailSubText})
+
+
+   IF Upper(wf_FileNoExt(::cEmailPdf))==Upper(::cEmailPdf)
+      #ifdef d_WinFakt
+       ::cEmailPdf:=oApp:Path:Temp+"\"+::cEmailPdf+".PDF"
+      #else
+       ::cEmailPdf:=GetEnv("Temp")+"\"+::cEmailPdf+".PDF"
+      #endif
+   ELSEIF Upper(wf_FileNoPath(::cEmailPdf))==Upper(::cEmailPdf)
+      #ifdef d_WinFakt
+       ::cEmailPdf:=oApp:Path:Temp+"\"+::cEmailPdf
+      #else 
+       ::cEmailPdf:=GetEnv("Temp")+"\"+::cEmailPdf
+      #endif
+   ENDIF
+
+   AAdd(::aPrnData, {"EMAILPDF", ::cEmailPdf})
+   AAdd(::aPrnData, {"EMAILSIGNATORY", ::cEmailSignatory})
+
 
    TRY
     ::oPrinter:Destroy()
@@ -1391,10 +1506,22 @@ RETURN NIL
 //----------------------------------------------------------------------------------------------------//
 
 
-METHOD Preview() CLASS WinPrint
+METHOD Preview(aVDocPDFParam) CLASS WinPrint
 
    LOCAL j,cPath,cAlias2,cFile2,lUse
-   
+
+   #ifdef d_WinFakt   
+    #ifdef d_VXH
+     LOCAL oMsg
+    #endif
+   #endif
+
+   DEFAULT aVDocPDFParam := {}
+
+   IF ::lPreload
+      RETURN {}
+   ENDIF
+
    IF !::lPaperLength .OR. ::lLatePrn
 
       IF Len(::aPrn)>0
@@ -1413,11 +1540,28 @@ METHOD Preview() CLASS WinPrint
       IF Len(::aPrevFont)!=0
          ::wfSetFont(::aPrevfont[1],::aPrevFont[2],::aPrevFont[3],::aPrevFont[4],::aPrevFont[5],::aPrevFont[6],::aPrevFont[7],::aPrevFont[8])
       ENDIF
+
+      #ifdef d_WinFakt
+       #ifdef d_VXH
+        wfMSG NEW oMsg;
+           TEXT1 "EMF voorbereiden" BOLD;
+           TEXT2 "";
+           TEXT3 "";
+           METERTOTAL (::cAlias)->(RecCount())
+           oMsg:GoTop()
+       #endif
+      #endif
             
       (::cAlias)->(DbGoTop())
 
       WHILE !(::cAlias)->(Eof())
 
+         #ifdef d_WinFakt
+          #ifdef d_VXH
+           wfMSG SET METER IN oMsg TO (::cAlias)->(RecNo())
+          #endif
+         #endif
+      
          ::aPrn:=(::cAlias)->PAGEDATA
          ::oPrinter:SetBkMode(1)
          ::oPrinter:SetPrc(0,0)
@@ -1440,8 +1584,8 @@ METHOD Preview() CLASS WinPrint
                ::aPrevFont:={::aPrn[j][2],::aPrn[j][3],::aPrn[j][4],::aPrn[j][5],::aPrn[j][6],::aPrn[j][7],::aPrn[j][8],::aPrn[j][9]}
 
             ELSEIF ::aPrn[j][1]=="TEXTOUTAT"
-               ::aPrn[j][4]:=StrTran(::aPrn[j][4],"@Pages",LTrim(Str( Ceiling((::cAlias)->(RecCount()) * IF(::lDuplex .AND. ::lNextPageSameNum, 1/2, 1)) )))
-               ::aPrn[j][4]:=StrTran(::aPrn[j][4],"@Page",LTrim( Str( Ceiling((::cAlias)->(RecNo()) * IF(::lDuplex .AND. ::lNextPageSameNum, 1/2, 1)) )))
+               ::aPrn[j][4]:=wf_Swap(::aPrn[j][4],"@Pages",LTrim(Str( Ceiling((::cAlias)->(RecCount()) * IF(::lDuplex .AND. ::lNextPageSameNum, 1/2, 1)) )))
+               ::aPrn[j][4]:=wf_Swap(::aPrn[j][4],"@Page",LTrim( Str( Ceiling((::cAlias)->(RecNo()) * IF(::lDuplex .AND. ::lNextPageSameNum, 1/2, 1)) )))
                ::oPrinter:TextOutAt(::mm2x(::aPrn[j][2]),::mm2Y(::aPrn[j][3]),::aPrn[j][4],::aPrn[j][5],::aPrn[j][6],::aPrn[j][7])
             ELSEIF ::aPrn[j][1]=="LINE"
                ::oPrinter:Line(::mm2x(::aPrn[j][2]),::mm2y(::aPrn[j][3]),::mm2x(::aPrn[j][4]),::mm2y(::aPrn[j][5]))
@@ -1477,6 +1621,12 @@ METHOD Preview() CLASS WinPrint
       CATCH
       END
 
+      #ifdef d_WinFakt
+       #ifdef d_VXH
+        wfMSG CLOSE oMsg
+       #endif
+      #endif
+      
    ENDIF
    
    ::EmfPrnEnd()  // For both ::lPaperLength .T./.F.
@@ -1509,6 +1659,20 @@ METHOD Preview() CLASS WinPrint
 
    cPath:=Left( GetModuleFileName(), Rat("\" ,GetModuleFileName() )-1 )
    
+#ifdef d_WinFakt   
+
+   IF ::lPdf .AND. Empty(aVDocPDFParam)
+      RETURN ::aPrnData
+   ELSEIF ::lPdf
+      RETURN {::aPrnData,aVDocPDFParam}
+   ELSEIF !::lPdf
+      wfRUN "wf_PrintPreview.HELPER" WITH ::aPrnData, aVDocPDFParam SENDSETTINGS MODAL
+   ENDIF
+
+ RETURN {::aPrnData,aVDocPDFParam}
+
+#else
+ 
    IF File(cPath+"\PrintPreview.exe")
       TRY
          ShellExecute(0,"OPEN",cPath+"\PrintPreview.exe",cFile2,"",1)
@@ -1518,9 +1682,10 @@ METHOD Preview() CLASS WinPrint
    ELSE
       MsgAlert("Cannot find "+cPath+"\PRINTPREVIEW.EXE")
    ENDIF
+      
+ RETURN ::aPrnData
 
-
-RETURN ::aPrnData
+#endif
 
 
 //----------------------------------------------------------------------------------------------------//
@@ -1545,9 +1710,17 @@ METHOD Close(lAbort) CLASS WinPrint
 
    LOCAL j,oBmp,nMaxY,nCopyCtr
 
+   #ifdef d_VXH
+      LOCAL oMsg
+   #endif
+
    DEFAULT lAbort := .F.
 
-   IF ::lError .OR. lAbort .OR. ::lPreview
+   IF ::lPreload
+      RETURN Self
+   ENDIF
+
+   IF ::lError .OR. lAbort .OR. (::lPreview .OR. ::lPdf)
       TRY
          IF ::lPaperLength
             ::oPrinter:SetDuplexType(1)
@@ -1620,6 +1793,15 @@ METHOD Close(lAbort) CLASS WinPrint
 
       ::oPrinter:SetBkMode(1)
       ::oPrinter:SetPrc(0,0)
+
+      #ifdef d_VXH
+         wfMSG NEW oMsg;
+            TEXT1 "Afdrukken voorbereiden" BOLD;
+            TEXT2 "";
+            TEXT3 "";
+            METERTOTAL (::cAlias)->(RecCount())*::nCopies
+         oMsg:GoTop()
+      #endif
       
       FOR nCopyCtr=1 TO ::nCopies
 
@@ -1627,6 +1809,10 @@ METHOD Close(lAbort) CLASS WinPrint
 
          WHILE !(::cAlias)->(Eof())
 
+            #ifdef d_VXH
+               wfMSG SET METER IN oMsg TO (::cAlias)->(RecNo())*nCopyCtr
+            #endif
+         
             ::aPrn:=(::cAlias)->PAGEDATA
 
             FOR j=1 TO Len(::aPrn)
@@ -1635,8 +1821,8 @@ METHOD Close(lAbort) CLASS WinPrint
                ELSEIF ::aPrn[j][1]=="SETFONT"
                   ::wfSetFont(::aPrn[j][2],::aPrn[j][3],::aPrn[j][4],::aPrn[j][5],::aPrn[j][6],::aPrn[j][7],::aPrn[j][8],::aPrn[j][9])
                ELSEIF ::aPrn[j][1]=="TEXTOUTAT"
-                  ::aPrn[j][4]:=StrTran(::aPrn[j][4],"@Pages",LTrim(Str( Ceiling((::cAlias)->(RecCount()) * IF(::lDuplex .AND. ::lNextPageSameNum,1/2,1)) )))
-                  ::aPrn[j][4]:=StrTran(::aPrn[j][4],"@Page",LTrim(Str( Ceiling((::cAlias)->(RecNo()) * IF(::lDuplex .AND. ::lNextPageSameNum,1/2,1)) )))
+                  ::aPrn[j][4]:=wf_Swap(::aPrn[j][4],"@Pages",LTrim(Str( Ceiling((::cAlias)->(RecCount()) * IF(::lDuplex .AND. ::lNextPageSameNum,1/2,1)) )))
+                  ::aPrn[j][4]:=wf_Swap(::aPrn[j][4],"@Page",LTrim(Str( Ceiling((::cAlias)->(RecNo()) * IF(::lDuplex .AND. ::lNextPageSameNum,1/2,1)) )))
                   ::oPrinter:TextOutAt(::aPrn[j][2],::aPrn[j][3],::aPrn[j][4],::aPrn[j][5],::aPrn[j][6],::aPrn[j][7])
                ELSEIF ::aPrn[j][1]=="LINE"
                   ::oPrinter:Line(::aPrn[j][2],::aPrn[j][3],::aPrn[j][4],::aPrn[j][5])
@@ -1686,6 +1872,10 @@ METHOD Close(lAbort) CLASS WinPrint
       CATCH
       END
 
+      #ifdef d_VXH
+         wfMSG CLOSE oMsg
+      #endif
+      
    ELSE
       ::oPrinter:EndDoc()
    ENDIF
@@ -1700,6 +1890,10 @@ RETURN Self
 
 METHOD mm2actx(nMm) CLASS WinPrint        // mm to actual X axis
 
+   IF ::lPreload
+      RETURN 1
+   ENDIF
+
 RETURN Int((nMM*::oPrinter:PixelsPerInchX)/MM_TO_INCH)
 
 
@@ -1707,6 +1901,10 @@ RETURN Int((nMM*::oPrinter:PixelsPerInchX)/MM_TO_INCH)
 
 
 METHOD mm2acty(nMm)  CLASS WinPrint       // mm to actual Y axis
+
+   IF ::lPreload
+      RETURN 1
+   ENDIF
 
 RETURN Int((nMM*::oPrinter:PixelsPerInchY)/MM_TO_INCH)
 
@@ -1717,6 +1915,10 @@ RETURN Int((nMM*::oPrinter:PixelsPerInchY)/MM_TO_INCH)
 
 METHOD mm2x(nMm) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN 1
+   ENDIF
+
 RETURN ::oPrinter:MM_TO_POSX(nMM)
 // RETURN ::oPrinter:MM_TO_POSX(nMM)+::oPrinter:LeftMargin
 
@@ -1726,15 +1928,21 @@ RETURN ::oPrinter:MM_TO_POSX(nMM)
 
 METHOD mm2y(nMm)  CLASS WinPrint
 
+   IF ::lPreload
+      RETURN 1
+   ENDIF
 RETURN ::oPrinter:MM_TO_POSY(nMM)
 // RETURN ::oPrinter:MM_TO_POSY(nMM)+::oPrinter:TopMargin
-
 
 
 //----------------------------------------------------------------------------------------------------//
 
 
 METHOD SetPosX(x) CLASS WinPrint
+
+   IF ::lPreload
+      RETURN 1
+   ENDIF
 
    ::nPrnPosX:=x
 
@@ -1746,6 +1954,10 @@ RETURN NIL
 
 METHOD SetPosY(y) CLASS WinPrint
 
+   IF ::lPreload
+      RETURN 1
+   ENDIF
+
    ::nPrnPosY:=y
 
 RETURN NIL
@@ -1755,6 +1967,10 @@ RETURN NIL
 
 
 METHOD SetPos(x,y) CLASS WinPrint
+
+   IF ::lPreload
+      RETURN 1
+   ENDIF
 
    ::nPrnPosX:=x
    ::nPrnPosY:=y
@@ -1802,7 +2018,7 @@ RETURN ::nCharHeight// +IF(::lDtlLine,::nDtlLineRowGap,1)
 
 
 METHOD X2mm(n) CLASS WinPrint
-RETURN n*25.4/::oPrinter:PixelsPerInchX
+RETURN n*MM_TO_INCH/::oPrinter:PixelsPerInchX
 //RETURN (n+::oPrinter:LeftMargin)*25.4/::oPrinter:PixelsPerInchX
 
 
@@ -1810,7 +2026,7 @@ RETURN n*25.4/::oPrinter:PixelsPerInchX
 
 
 METHOD Y2mm(n) CLASS WinPrint
-RETURN n*25.4/::oPrinter:PixelsPerInchY
+RETURN n*MM_TO_INCH/::oPrinter:PixelsPerInchY
 //RETURN (n+::oPrinter:TopMargin)*25.4/::oPrinter:PixelsPerInchY
 
 
@@ -1867,7 +2083,11 @@ FUNCTION WinPrint_ToBmp(cFile,lGrayScale)
      im := fi_ConvertToGreyScale( im2 )
      FreeImageUnload( im2 )
      IF nFif==FIF_BMP
-        cTemp := TempFileName(,,"BMP")
+        #ifdef d_WinFakt
+         cTemp := TempFileName(oApp:Path:Temp,,"BMP")
+        #else
+         cTemp := TempFileName(,,"BMP")
+        #endif
         fi_Save( FIF_BMP, im, cTemp, BMP_DEFAULT )
         FreeImageUnload(im)
         RETURN cTemp
@@ -1875,7 +2095,11 @@ FUNCTION WinPrint_ToBmp(cFile,lGrayScale)
   ENDIF
   im2 := fi_Clone( im )
   FreeImageUnload( im )
-  cTemp := TempFileName(,,"BMP")
+  #ifdef d_WinFakt
+   cTemp := TempFileName(oApp:Path:Temp,,"BMP")
+  #else
+   cTemp := TempFileName(,,"BMP")
+  #endif
   fi_Save( FIF_BMP, im2, cTemp, BMP_DEFAULT )
 
   FreeImageUnload( im2 )
@@ -1905,7 +2129,11 @@ FUNCTION WinPrint_ToJpg(cFile,lGrayScale)
      im := fi_ConvertToGreyScale( im2 )
      FreeImageUnload( im2 )
      IF nFif==FIF_JPEG
-        cTemp := TempFileName(,,"JPG")
+        #ifdef d_WinFakt
+         cTemp := TempFileName(oApp:Path:Temp,,"JPG")
+        #else
+         cTemp := TempFileName(,,"JPG")
+        #endif
         fi_Save( FIF_JPEG, im, cTemp, JPEG_DEFAULT )
         FreeImageUnload(im)
         RETURN cTemp
@@ -1913,7 +2141,11 @@ FUNCTION WinPrint_ToJpg(cFile,lGrayScale)
   ENDIF
   im2 := fi_Clone( im )
   FreeImageUnload( im )
-  cTemp := TempFileName(,,"JPG")
+  #ifdef d_WinFakt
+   cTemp := TempFileName(oApp:Path:Temp,,"JPG")
+  #else
+   cTemp := TempFileName(,,"JPG")
+  #endif
   fi_Save( FIF_JPEG, im2, cTemp, JPEG_DEFAULT )
 
   FreeImageUnload( im2 )
@@ -1972,7 +2204,11 @@ FUNCTION WinPrint_ImageRescale(cFile,nWidth,nHeight)
 
    im := FreeImageLoad(nFif, cFile, 0)
    im2 := fi_Rescale( im, nWidth,nHeight, FILTER_BICUBIC )
-   cTemp := TempFileName(,,cExt)
+   #ifdef d_WinFakt
+    cTemp := TempFileName(oApp:Path:Temp,,cExt)
+   #else
+    cTemp := TempFileName(,,cExt)
+   #endif
    fi_Save( nFif, im2, cTemp, 0 )
    FreeImageUnload(im2)
    FreeImageUnload(im)
@@ -2001,6 +2237,7 @@ STATIC FUNCTION TempFileName(cFolder,cPrefix,cExt)
 
    LOCAL cFile,n:=1
 
+   //DEFAULT cFolder:=oApp:Path:Temp //GetEnv("Temp")
    DEFAULT cFolder:=GetEnv("Temp")
    DEFAULT cPrefix:="Temp"
    DEFAULT cExt:="tmp"
@@ -2047,14 +2284,77 @@ RETURN "A"+LTrim(Str(n,4,0))
 
 
 //----------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------------------//
+
+#ifndef d_WinFakt
+
+STATIC FUNCTION wf_FileNoPath(cFullName)
+  LOCAL cName,cExt
+  
+  hb_FNameSplit(cFullName,,@cName,@cExt)
+  
+RETURN cName+"."+cExt
+
+//----------------------------------------------------------------------------------------------------//
+
+STATIC FUNCTION wf_FileNoExt(cFullName)
+  LOCAL cName
+  
+  hb_FNameSplit(cFullName,,@cName,)
+  
+RETURN cName
+
+//----------------------------------------------------------------------------------------------------//
+
+FUNCTION wf_Swap(cChar,c1,c2,lCase)
+
+   LOCAL nWaar1, cResul
+
+   DEFAULT lCase:=.F.
+
+   cResul:=""
+
+   WHILE .T.
+
+      IF lCase
+         nWaar1:=At(c1,cChar)
+      ELSE
+         nWaar1:=At(Upper(c1),Upper(cChar))
+      ENDIF
+
+      IF nWaar1=0
+         IF !Empty(cChar)
+            cResul+=cChar
+         ENDIF
+
+         EXIT
+      ENDIF
+
+      cResul+=SubStr(cChar,1,nWaar1-1)+c2
+      cChar:=SubStr(cChar,nWaar1+Len(c1),Len(cChar)-Len(c1))
+
+   ENDDO
+
+RETURN cResul
+  
+#endif
+//----------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------------------//
 
 
 //----------------------------------------------------------------------------------------------------//
 
 
 #pragma BEGINDUMP
-#include "cinterface.h"
-#include <windows.h>
+#ifdef __XHARBOUR__
+   #include "cinterface.h"
+   #include <windows.h>
+   #include <winsock2.h>
+#else
+   #include <winsock2.h>
+   #include <windows.h>
+#endif
+
 #include <unknwn.h>
 #include <commdlg.h>
 #include <shellapi.h>
@@ -2062,8 +2362,19 @@ RETURN "A"+LTrim(Str(n,4,0))
 #include <Rpc.h>
 #include <ole2.h>
 #include <wincrypt.h>
-#include <winsock2.h>
 #include <winspool.h>
+
+//#include "cinterface.h"
+//#include <windows.h>
+//#include <unknwn.h>
+// #include <commdlg.h>
+// #include <shellapi.h>
+// #include <winreg.h>
+// #include <Rpc.h>
+// #include <ole2.h>
+// #include <wincrypt.h>
+// #include <winsock2.h>
+// #include <winspool.h>
 
 #include "hbapiitm.h"
 
@@ -2072,9 +2383,12 @@ RETURN "A"+LTrim(Str(n,4,0))
 #endif
 
 #include "hbapi.h"
-#include "FreeImage.h"
-//#include <FreeImage\FreeImage.h>
-
+#ifdef d_WinFakt
+ #include "vh.h"
+ #include <FreeImage\FreeImage.h>
+#else
+ #include "FreeImage.h"
+#endif
 
 static DWORD charset = DEFAULT_CHARSET;
 
