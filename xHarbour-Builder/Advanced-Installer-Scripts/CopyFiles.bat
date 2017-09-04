@@ -19,8 +19,7 @@ REM ===============================================
 
     SET RC_From=\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\Common.Files
     SET RC_To=%XHBTO%
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
-    SET RC_Exclude_File=.cvsignore
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /XF %RC_Exclude_File% /S /XD %RC_Exclude_Folder%
 
 
@@ -49,8 +48,7 @@ REM                /Common/c_include
 REM ===============================================
 
     SET RC_To=%XHBTO%\c_include
-    SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
 
     SET RC_From=\xHB\c_include
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
@@ -67,8 +65,7 @@ REM ===============================================
     SET RC_To=%XHBTO%\c_lib
 
     SET RC_From=\xHB\c_lib
-    SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "%RC_From%" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
 
@@ -88,8 +85,7 @@ REM ===============================================
 
     SET XHB-DOC=\xHarbour.com\xHarbour-Documentation
 
-    SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "\xHarbour\contrib\gd\doc" "%RC_To%\GD" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
     COPY "%XHB-DOC%\Getting-Started.pdf"                             "%RC_To%\Getting Started with xHarbour Builder.pdf"
@@ -126,8 +122,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Include
 
-    SET RC_Exclude_File=.cvsignore
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "\xHB\Include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
     ROBOCOPY "\xHarbour.com\xHarbour-SQLRDD\include" "%RC_To%" *.* /NS /NC /NP /S /XF %RC_Exclude_File% /XD %RC_Exclude_Folder%
 
@@ -189,7 +184,7 @@ REM                  /Common/Dll
 REM ===============================================
 
     SET RC_To=%XHBTO%\Dll
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
 
     ROBOCOPY "\xHB\Dll" "%RC_To%" bgd.dll XDO.dll FreeImage.dll /NS /NC /NP
     ROBOCOPY "\xHB\Bin" "%RC_To%" xHBdll.dll xHBddll.dll /NS /NC /NP
@@ -210,7 +205,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Samples
 
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "\xHarbour.com\Samples"         "%RC_To%"         *.* /NS /NC /NP    /XD %RC_Exclude_Folder% /XA:H
     ROBOCOPY "\xHarbour.com\Samples\FiveWin" "%RC_To%\FiveWin" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
     ROBOCOPY "\xHarbour.com\Samples\GD"      "%RC_To%\GD"      *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
@@ -224,6 +219,8 @@ REM ===============================================
     SET RC_Exclude_File=Makefile *.bat *.mak
     ROBOCOPY "\xHarbour\Tests" "%RC_To%\xHarbour" *.* /NS /NC /NP /XF %RC_Exclude_File% /S /XD %RC_Exclude_Folder% /XA:H
 
+    ROBOCOPY "\xHarbour.com\WinPrint\Samples" "%RC_To%\WinPrint" *.* /NS /NC /NP /XF %RC_Exclude_File% /S /XD %RC_Exclude_Folder% /XA:H
+
     COPY "\xHarbour.com\xHarbour-xHBComm\querycls.prg" "%RC_To%\xHBComm\"
 
 
@@ -234,7 +231,7 @@ REM ===============================================
 
     SET RC_To=%XHBTO%\Source
 
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "\xHarbour\Source" "%RC_To%" *.c* *.prg *.s* *.y *.h *.x* *.gen* *.def *.gcc /NS /NC /NP /S /XD %RC_Exclude_Folder%
 
     ROBOCOPY "\xHarbour\Source\tip\encoding" "%RC_To%\Tip\Encoding" *.c /NS /NC /NP /XD %RC_Exclude_Folder%
@@ -407,14 +404,16 @@ REM ===============================================
 REM              /Professional/dll/XBScript
 REM ===============================================
 
-    SET RC_To=%XHBTO%\Dll\XBScript
+    SET RC_To=%XHBTO%\Dll\XBScript\
 	 
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScript.bat "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScript.bat "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\XBScriptPro\Debug\XBScriptPro.dll "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt "%RC_TO%"
-
+    MD %RC_TO%\Samples
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScriptPro.bat" "%RC_TO%Register XBScript.bat"
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScriptPro.bat" "%RC_TO%Un-Register XBScript.bat"
+    COPY "\xHarbour.com\xHarbour-XBScript\XBScriptPro\Debug\XBScriptPro.dll" "%RC_TO%XBScript.dll"
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt" "%RC_TO%"
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt" "%RC_TO%"
+    ROBOCOPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\samples" "%RC_TO%Samples" /NS /NC /NP
+	 
 REM ===============================================
 REM              /Professional/Samples
 REM ===============================================
@@ -424,7 +423,7 @@ REM ===============================================
     SET RC_Include=xhbdmtdll.dll xhbmtdll.dll xhbcommdll.dll xHBZipDll.dll
     ROBOCOPY "\xHB\Dll\Professional" "%RC_To%" %RC_Include% /NS /NC /NP
 
-    SET RC_Exclude_Folder=CVS CVSROOT .SVN
+    SET RC_Exclude_Folder=.GIT
     ROBOCOPY "\xHarbour.com\Samples\Samples for PROF and ENT versions" "%RC_To%" *.* /NS /NC /NP /S /XD %RC_Exclude_Folder% /XA:H
 
 
@@ -473,15 +472,18 @@ REM ===============================================
 REM              /Enterprise/dll/XBScript
 REM ===============================================
 
-    SET RC_To=%XHBTO%\Dll\XBScript
+    SET RC_To=%XHBTO%\Dll\XBScript\
 	 
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScriptEnt.bat "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScriptEnt.bat "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\XBScriptEnt\Debug\XBScriptEnt.dll "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt "%RC_TO%"
-    COPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt "%RC_TO%"
-    XCOPY \xHarbour.com\xHarbour-XBScript\Install scripts\Files\samples\ "%RC_TO%"\Samples
+    MD %RC_TO%\Samples
 
+    DEL "%RC_TO%\Register XBScript.bat" /Q
+    DEL "%RC_TO%\Un-Register XBScript.bat" /Q
+    DEL "%RC_TO%\XBScript.dll" /Q
+
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScriptEnt.bat" "%RC_TO%Register XBScript.bat"
+    COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScriptEnt.bat" "%RC_TO%Un-Register XBScript.bat"
+    COPY "\xHarbour.com\xHarbour-XBScript\XBScriptEnt\Debug\XBScriptEnt.dll" "%RC_TO%XBScript.dll"
+	 
 REM ==============================================================================================
 REM ==============================================================================================
 REM ==============================================================================================

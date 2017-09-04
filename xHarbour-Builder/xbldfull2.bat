@@ -43,10 +43,10 @@ ECHO xBuild
 REM  ===============================================
 REM  ===============================================
 
-     IF EXIST \xHB\bin\xbuild.exe GOTO No_xBuild    
+     IF EXIST \xHB\bin\xBuild.exe GOTO No_xBuild    
         CD \xHarbour.com\xHarbour-xBuild\ 
         CALL \xharbour\bin\bld_vc xbuild tproject tproject-c
-        COPY xbuild.exe \xHB\bin /y
+        COPY xBuild.exe \xHB\bin /y
      :No_xBuild
 
 REM  ===============================================
@@ -61,11 +61,11 @@ REM  ===============================================
         COPY "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\xHB.exe.xbp" "\xHarbour\xHB.exe.xbp" /y
         COPY "\xHarbour.com\xHarbour-Builder\stxHB.files.inc"            "\xHarbour\stxHB.files.inc" /y
 
-        \xHB\bin\XBUILD.EXE xHB.exe.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe xHB.exe.xbp %_XB_Debug% %1
 
         IF "%_BUILD_DEMO%"=="NO" GOTO No_xhbexe_Demo
            COPY "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\Demo\xHB.exe.xbp" "\xHarbour\xHB-Demo.exe.xbp" /y
-           \xHB\bin\XBUILD.EXE xHB-Demo.exe.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe xHB-Demo.exe.xbp %_XB_Debug% %1
            IF EXIST "%_XHB_BIN%\Demo\xHB.exe"  DEL "%_XHB_BIN%\Demo\xHB.exe"  /Q
            RENAME "%_XHB_BIN%\Demo\xHB-Demo.exe" "xHB.exe"
         :No_xhbexe_Demo
@@ -99,38 +99,38 @@ REM  ===============================================
 
         CD "\xHarbour"
         IF "%_BUILD_XHB_EXE%"=="NO" GOTO No_XHBLIB
-        \xHB\bin\XBUILD.EXE xHB.lib.xbp           %_XB_Debug% %1
+        \xHB\bin\xBuild.exe xHB.lib.xbp           %_XB_Debug% %1
         :No_XHBLIB
-        \xHB\bin\XBUILD.EXE DBF.lib.xbp           %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE NTX.lib.xbp           %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE CDX.lib.xbp           %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE NSX.lib.xbp           %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE SixCDX.lib.xbp        %_XB_Debug% %1
+        \xHB\bin\xBuild.exe DBF.lib.xbp           %_XB_Debug% %1
+        \xHB\bin\xBuild.exe NTX.lib.xbp           %_XB_Debug% %1
+        \xHB\bin\xBuild.exe CDX.lib.xbp           %_XB_Debug% %1
+        \xHB\bin\xBuild.exe NSX.lib.xbp           %_XB_Debug% %1
+        \xHB\bin\xBuild.exe SixCDX.lib.xbp        %_XB_Debug% %1
 
         IF "%_BUILD_DEMO%"=="NO" GOTO No_xhblib_Demo
            COPY "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\Demo\xHB.lib.xbp" "\xHarbour\xHB-Demo.lib.xbp" /y
-           \xHB\bin\XBUILD.EXE xHB-demo.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe xHB-demo.lib.xbp %_XB_Debug% %1
            IF EXIST "%_XHB_LIB%\Demo\xHB.lib" DEL "%_XHB_LIB%\Demo\xHB.lib" /Q
            RENAME "%_XHB_LIB%\Demo\xHB-Demo.lib" "xHB.lib"
         :No_xhblib_Demo
 
         CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE noRDD.lib.xbp %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE OptG.lib.xbp  %_XB_Debug% %1
+        \xHB\bin\xBuild.exe noRDD.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe OptG.lib.xbp  %_XB_Debug% %1
 
         IF "%_BUILD_XHB_DLL%"=="NO" GOTO No_XHBDLL
-           \xHB\bin\XBUILD.EXE DMAIN.LIB.xbp  %_XB_Debug% %1
-           \xHB\bin\XBUILD.EXE UseDll.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe DMAIN.LIB.xbp  %_XB_Debug% %1
+           \xHB\bin\xBuild.exe UseDll.lib.xbp %_XB_Debug% %1
 
            IF     EXIST "%_XHB_BIN%\xHBdll.lib" DEL "%_XHB_BIN%\xHBdll.lib" /Q
-           IF     EXIST "%_XHB_LIB%\xHBdll.lib" \xHB\bin\XBUILD.EXE xHBDll.dll.xbp %_XB_NonDebug% %1
-           IF NOT EXIST "%_XHB_LIB%\xHBdll.lib" \xHB\bin\XBUILD.EXE xHBDll.dll.xbp %_XB_NonDebug% %1 -link
+           IF     EXIST "%_XHB_LIB%\xHBdll.lib" \xHB\bin\xBuild.exe xHBDll.dll.xbp %_XB_NonDebug% %1
+           IF NOT EXIST "%_XHB_LIB%\xHBdll.lib" \xHB\bin\xBuild.exe xHBDll.dll.xbp %_XB_NonDebug% %1 -link
            IF     EXIST "%_XHB_BIN%\xHBdll.lib" MOVE /Y "%_XHB_BIN%\xHBdll.lib" "%_XHB_LIB%"
 
            IF "%_BUILD_DEBUG%"=="NO" GOTO N137
               IF     EXIST "%_XHB_BIN%\xHBddll.lib" DEL "%_XHB_BIN%\xHBddll.lib" /Q
-              IF     EXIST "%_XHB_LIB%\xHBddll.lib" \xHB\bin\XBUILD.EXE xHBdDll.dll.xbp %_XB_Debug% %1
-              IF NOT EXIST "%_XHB_LIB%\xHBddll.lib" \xHB\bin\XBUILD.EXE xHBdDll.dll.xbp %_XB_Debug% %1 -link
+              IF     EXIST "%_XHB_LIB%\xHBddll.lib" \xHB\bin\xBuild.exe xHBdDll.dll.xbp %_XB_Debug% %1
+              IF NOT EXIST "%_XHB_LIB%\xHBddll.lib" \xHB\bin\xBuild.exe xHBdDll.dll.xbp %_XB_Debug% %1 -link
               IF     EXIST "%_XHB_BIN%\xHBddll.lib" MOVE /Y "%_XHB_BIN%\xHBddll.lib" "%_XHB_LIB%"
            :N137
            
@@ -152,27 +152,27 @@ REM  ===============================================
 
             CD \xHarbour
             IF "%_BUILD_XHB_EXE%"=="NO" GOTO No_XHBLIBmt
-               \xHB\bin\XBUILD.EXE xHBmt.lib.xbp        %_XB_Debug% %1
+               \xHB\bin\xBuild.exe xHBmt.lib.xbp        %_XB_Debug% %1
             :No_XHBLIBmt
-            \xHB\bin\XBUILD.EXE DBFmt.lib.xbp           %_XB_Debug% %1
-            \xHB\bin\XBUILD.EXE NTXmt.lib.xbp           %_XB_Debug% %1
-            \xHB\bin\XBUILD.EXE CDXmt.lib.xbp           %_XB_Debug% %1
-            \xHB\bin\XBUILD.EXE NSXmt.lib.xbp           %_XB_Debug% %1
-            \xHB\bin\XBUILD.EXE SixCDXmt.lib.xbp        %_XB_Debug% %1
+            \xHB\bin\xBuild.exe DBFmt.lib.xbp           %_XB_Debug% %1
+            \xHB\bin\xBuild.exe NTXmt.lib.xbp           %_XB_Debug% %1
+            \xHB\bin\xBuild.exe CDXmt.lib.xbp           %_XB_Debug% %1
+            \xHB\bin\xBuild.exe NSXmt.lib.xbp           %_XB_Debug% %1
+            \xHB\bin\xBuild.exe SixCDXmt.lib.xbp        %_XB_Debug% %1
 
             CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE OptGmt.lib.xbp          %_XB_Debug% %1
+            \xHB\bin\xBuild.exe OptGmt.lib.xbp          %_XB_Debug% %1
 
            IF "%_BUILD_XHB_DLL%"=="NO" GOTO No_XHBDLLmt
 
                IF     EXIST "%_XHB_BIN%\xHBmtdll.lib"      DEL "%_XHB_BIN%\xHBmtdll.lib" /Q
-               IF     EXIST "%_XHB_LIB%\xHBmtdll.lib"           \xHB\bin\XBUILD.EXE xHBmtDll.dll.xbp %_XB_NonDebug% %1
-               IF NOT EXIST "%_XHB_LIB%\xHBmtdll.lib"           \xHB\bin\XBUILD.EXE xHBmtDll.dll.xbp %_XB_NonDebug% %1 -link
+               IF     EXIST "%_XHB_LIB%\xHBmtdll.lib"           \xHB\bin\xBuild.exe xHBmtDll.dll.xbp %_XB_NonDebug% %1
+               IF NOT EXIST "%_XHB_LIB%\xHBmtdll.lib"           \xHB\bin\xBuild.exe xHBmtDll.dll.xbp %_XB_NonDebug% %1 -link
                IF     EXIST "%_XHB_BIN%\xHBmtdll.lib"  MOVE /Y "%_XHB_BIN%\xHBmtdll.lib" "%_XHB_LIB%"
 
                IF     EXIST "%_XHB_BIN%\xHBdmtdll.lib"      DEL "%_XHB_BIN%\xHBdmtdll.lib" /Q
-               IF     EXIST "%_XHB_LIB%\xHBdmtdll.lib"           \xHB\bin\XBUILD.EXE xHBdmtDll.dll.xbp %_XB_NonDebug% %1
-               IF NOT EXIST "%_XHB_LIB%\xHBdmtdll.lib"           \xHB\bin\XBUILD.EXE xHBdmtDll.dll.xbp %_XB_NonDebug% %1 -link
+               IF     EXIST "%_XHB_LIB%\xHBdmtdll.lib"           \xHB\bin\xBuild.exe xHBdmtDll.dll.xbp %_XB_NonDebug% %1
+               IF NOT EXIST "%_XHB_LIB%\xHBdmtdll.lib"           \xHB\bin\xBuild.exe xHBdmtDll.dll.xbp %_XB_NonDebug% %1 -link
                IF     EXIST "%_XHB_BIN%\xHBdmtdll.lib"  MOVE /Y "%_XHB_BIN%\xHBdmtdll.lib" "%_XHB_LIB%"
 
             :No_XHBDLLmt
@@ -193,13 +193,13 @@ REM  ===============================================
      IF "%_BUILD_XBUILD%"=="NO" GOTO No_xBuild
 
         REM - Can not build inplace because file is in-use!
-        \xHB\bin\xbuild.exe \xharbour\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xHB -NoXbp -o\xbp\%_XB_Compiler%\xBuild-1.exe
-        \xharbour\bin\xbuild.exe \xHB\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xHB -NoXbp -o\xbp\%_XB_Compiler%\xBuild-2.exe
+        \xHB\bin\xBuild.exe \xharbour\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xHB -NoXbp -o\xbp\%_XB_Compiler%\xBuild-1.exe
+        \xharbour\bin\xBuild.exe \xHB\bin\xBuild.exe \xharbour.com\xharbour-xbuild\xBuild.prg \xharbour.com\xharbour-xbuild\tproject.prg \xharbour.com\xharbour-xbuild\tproject-c.prg -New -x\xHB -NoXbp -o\xbp\%_XB_Compiler%\xBuild-2.exe
         IF EXIST \xharbour\bin\xBuild.exe DEL \xharbour\bin\xBuild.exe
 
         IF "%_BUILD_DEMO%"=="NO" GOTO No_xBuild_Demo
            CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%\Demo"
-           \xHB\bin\XBUILD.EXE xBuild.exe.xbp %_XB_NonDebug% %1
+           \xHB\bin\xBuild.exe xBuild.exe.xbp %_XB_NonDebug% %1
         :No_xBuild_Demo
 
      :No_xBuild
@@ -214,14 +214,14 @@ REM  ===============================================
      IF "%_BUILD_CONTRIB%"=="NO" GOTO No_Contrib
 
         CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE WVT.lib.xbp     %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE WVG.lib.xbp     %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE ODBC.lib.xbp    %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE LibMisc.lib.xbp %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE Nanfor.lib.xbp  %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE GD.lib.xbp      %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE TipSSL.lib.xbp  %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE WVW.lib.xbp     %_XB_Debug% %1
+        \xHB\bin\xBuild.exe WVT.lib.xbp     %_XB_Debug% %1
+        \xHB\bin\xBuild.exe WVG.lib.xbp     %_XB_Debug% %1
+        \xHB\bin\xBuild.exe ODBC.lib.xbp    %_XB_Debug% %1
+        \xHB\bin\xBuild.exe LibMisc.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe Nanfor.lib.xbp  %_XB_Debug% %1
+        \xHB\bin\xBuild.exe GD.lib.xbp      %_XB_Debug% %1
+        \xHB\bin\xBuild.exe TipSSL.lib.xbp  %_XB_Debug% %1
+        \xHB\bin\xBuild.exe WVW.lib.xbp     %_XB_Debug% %1
 
      :No_Contrib
 
@@ -234,6 +234,12 @@ REM  ===============================================
 REM  ===============================================
 
 
+REM --> WinPrint.lib
+        IF "%_BUILD_WINPRINT%"=="YES" (
+           CD "\xHarbour.com\WinPrint\Build LIB\"
+           \xHB\Bin\xBuild.exe WinPrint.lib.xbp %_XB_Debug% %1
+           )
+
 REM --> BGD.lib
         IF "%_BUILD_BGD%"=="YES" (
            CD "\xHarbour.com\xHarbour-Builder"
@@ -244,7 +250,7 @@ REM --> BGD.lib
 REM --> ADS.lib
         IF "%_BUILD_ADS%"=="NO" GOTO No_ADS
            CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE ads.lib.xbp  %_XB_Debug% %1
+           \xHB\bin\xBuild.exe ads.lib.xbp %_XB_Debug% %1
            
            IF "%XBUILD_XCC%"=="YES" XCOPY "%HB_DIR_ADS%\ACE32.dll" \xHB\bin /d /y
            IF "%XBUILD_XCC%"=="YES" \xHB\bin\XLIB \xHB\bin\ace32.dll /out:\xHB\lib\ACE32.lib
@@ -257,60 +263,60 @@ REM --> ADS.lib
 REM --> xbScript.lib
         IF "%_BUILD_XBSCRIPT_LIB%"=="NO" GOTO No_XBSCRIPT_LIB
            CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE XBScript.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe XBScript.lib.xbp %_XB_Debug% %1
         :No_XBSCRIPT_LIB
 
 REM --> TProject.lib
         IF "%_BUILD_TPROJECT_LIB%"=="NO" GOTO No_TProjectLIB
            CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE TProject.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe TProject.lib.xbp %_XB_Debug% %1
         :No_TProjectLIB
 
 REM --> ActiveX.lib
          CD "\xHarbour.com\xHarbour-ActiveX\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE ActiveX.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe ActiveX.lib.xbp %_XB_Debug% %1
 
 REM --> xEdit*.LIB
         IF "%_BUILD_XEDIT_LIB%"=="NO" GOTO No_xEditLIB
            CD "\xHarbour.com\Visual-xHarbour\xEdit\%_XB_Compiler%"
-REM        \xHB\bin\XBUILD.EXE xEdit.lib.xbp        %_XB_Debug% %1
-           \xHB\bin\XBUILD.EXE xEditW.lib.xbp       %_XB_Debug% %1
-           \xHB\bin\XBUILD.EXE xEditWScript.lib.xbp %_XB_Debug% %1
-REM        \xHB\bin\XBUILD.EXE xEditVXH.lib.xbp     %_XB_Debug% %1
+REM        \xHB\bin\xBuild.exe xEdit.lib.xbp        %_XB_Debug% %1
+           \xHB\bin\xBuild.exe xEditW.lib.xbp       %_XB_Debug% %1
+           \xHB\bin\xBuild.exe xEditWScript.lib.xbp %_XB_Debug% %1
+REM        \xHB\bin\xBuild.exe xEditVXH.lib.xbp     %_XB_Debug% %1
         :No_xEditLIB
 
 REM --> WinCore.lib
         IF "%_BUILD_WINCORE%"=="NO" GOTO No_WinCore
            CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE WinCore.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe WinCore.lib.xbp %_XB_Debug% %1
         :No_WinCore
 
 REM --> WINAPI.LIB
         IF "%_BUILD_WINAPI_LIB%"=="NO" GOTO No_WINAPI_LIB
             CD "\xHarbour.com\Visual-xHarbour\Library\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE WINAPI.LIB.xbp %_XB_Debug% %1
+            \xHB\bin\xBuild.exe WINAPI.LIB.xbp %_XB_Debug% %1
 
             IF "%_BUILD_PROF%"=="NO" GOTO No_WinApi_Prof
                CD "\xHarbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Professional"
-               IF EXIST WINAPI.LIB.xbp \xHB\bin\XBUILD.EXE WINAPI.LIB.xbp %_XB_Debug% %1
+               IF EXIST WINAPI.LIB.xbp \xHB\bin\xBuild.exe WINAPI.LIB.xbp %_XB_Debug% %1
             :No_WinApi_Prof
 
             IF "%_BUILD_DEMO%"=="NO" GOTO No_WinApi_Demo
                CD "\xHarbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Demo"
-               \xHB\bin\XBUILD.EXE WINAPI.LIB.xbp %_XB_Debug% %1
+               \xHB\bin\xBuild.exe WINAPI.LIB.xbp %_XB_Debug% %1
             :No_WinApi_Demo
             
         :No_WINAPI_LIB
 
 REM --> Ole
         CD "\xHarbour.com\xHarbour-OleServer\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE Ole.lib.xbp          %_XB_Debug% %1
-        \xHB\bin\XBUILD.EXE OleServer.lib.xbp    %_XB_Debug% %1
+        \xHB\bin\xBuild.exe Ole.lib.xbp          %_XB_Debug% %1
+        \xHB\bin\xBuild.exe OleServer.lib.xbp    %_XB_Debug% %1
 
         IF "%_BUILD_DEMO%"=="NO" GOTO No_Ole_Demo
            CD "\xHarbour.com\xHarbour-OleServer\%_XB_Compiler%\Demo"
-           \xHB\bin\XBUILD.EXE Ole.lib.xbp       %_XB_Debug% %1
-           \xHB\bin\XBUILD.EXE OleServer.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe Ole.lib.xbp       %_XB_Debug% %1
+           \xHB\bin\xBuild.exe OleServer.lib.xbp %_XB_Debug% %1
         :No_Ole_Demo
 
 
@@ -318,18 +324,18 @@ REM --> ZipArchive & ZLib & HBZlib
         IF "%_BUILD_HBZLIB%"=="NO" GOTO No_HBZlib
 
            CD "\xharbour.com\ZipArchive"
-           \xHB\bin\XBUILD.EXE ZipArchive.lib.xbp -NoXbp -Debug %1
+           \xHB\bin\xBuild.exe ZipArchive.lib.xbp -NoXbp -Debug %1
 
            CD "\xharbour.com\ZipArchive\ZLib"
-           \xHB\bin\XBUILD.EXE ZLib.lib.xbp -NoXbp -Debug %1
+           \xHB\bin\xBuild.exe ZLib.lib.xbp -NoXbp -Debug %1
 
            CD "\xHarbour.com\xHarbour-HBZLib\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE xHBzip.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe xHBzip.lib.xbp %_XB_Debug% %1
 
            CD "\xHarbour.com\xHarbour-HBZLib\xHbZipDll"
            IF     EXIST "%_XHB_DLL%\xHBZipDll.lib"     DEL "%_XHB_DLL%\xHBZipDll.lib" /Q
-           IF     EXIST "%_XHB_LIB%\xHBZipDll.lib"          \xHB\bin\XBUILD.EXE xHBZipDll.dll.xbp -NoXbp %1
-           IF NOT EXIST "%_XHB_LIB%\xHBZipDll.lib"          \xHB\bin\XBUILD.EXE xHBZipDll.dll.xbp -NoXbp %1 -link
+           IF     EXIST "%_XHB_LIB%\xHBZipDll.lib"          \xHB\bin\xBuild.exe xHBZipDll.dll.xbp -NoXbp %1
+           IF NOT EXIST "%_XHB_LIB%\xHBZipDll.lib"          \xHB\bin\xBuild.exe xHBZipDll.dll.xbp -NoXbp %1 -link
            IF     EXIST "%_XHB_DLL%\xHBZipDll.lib" MOVE /Y "%_XHB_DLL%\xHBZipDll.lib" "%_XHB_LIB%"
 
        :No_HBZlib
@@ -339,13 +345,13 @@ REM --> SQLRDD
         IF "%_BUILD_SQLRDD%"=="NO" GOTO No_SQLRDD
         
             CD "\xHarbour.com\xHarbour-SQLRDD\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE SQL.lib.xbp                             %_XB_Debug% %1
-            IF "%_BUILD_MT%"=="YES" \xHB\bin\XBUILD.EXE SQLmt.lib.xbp   %_XB_Debug% %1
+            \xHB\bin\xBuild.exe SQL.lib.xbp                             %_XB_Debug% %1
+            IF "%_BUILD_MT%"=="YES" \xHB\bin\xBuild.exe SQLmt.lib.xbp   %_XB_Debug% %1
 
             IF "%_BUILD_DEMO%"=="NO" GOTO No_SQL_Demo
                CD "\xHarbour.com\xHarbour-SQLRDD\%_XB_Compiler%\Demo"
-               \xHB\bin\XBUILD.EXE SQL.lib.xbp                             %_XB_Debug% %1
-               IF "%_BUILD_MT%"=="YES" \xHB\bin\XBUILD.EXE SQLmt.lib.xbp   %_XB_Debug% %1
+               \xHB\bin\xBuild.exe SQL.lib.xbp                             %_XB_Debug% %1
+               IF "%_BUILD_MT%"=="YES" \xHB\bin\xBuild.exe SQLmt.lib.xbp   %_XB_Debug% %1
                
             :NO_SQL_Demo
             
@@ -356,7 +362,7 @@ REM --> REDBFCDX
         IF "%_BUILD_REDBFCDX%"=="NO" GOTO No_REDBFCDX
            CD "\xHarbour"
            COPY "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\redbfcdx.lib.xbp" "\xHarbour\redbfcdx.lib.xbp"    /y
-           \xHB\bin\XBUILD.EXE REDBFCDX.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe REDBFCDX.lib.xbp %_XB_Debug% %1
         :No_REDBFCDX
 
 
@@ -364,18 +370,18 @@ REM --> BMDBFCDX
         IF "%_BUILD_BMDBFCDX%"=="NO" GOTO No_BMDBFCDX
            CD "\xHarbour"
            COPY "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\bmdbfcdx.lib.xbp" "\xHarbour\bmdbfcdx.lib.xbp"    /y
-           \xHB\bin\XBUILD.EXE BMDBFCDX.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe BMDBFCDX.lib.xbp %_XB_Debug% %1
         :No_BMDBFCDX
 
 
 REM --> ApolloRDD
         IF "%_BUILD_APOLLORDD%"=="NO" GOTO No_ApolloRDD
             CD "\xHarbour.com\xHarbour-ApolloRDD\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE Six.lib.xbp %_XB_Debug% %1
+            \xHB\bin\xBuild.exe Six.lib.xbp %_XB_Debug% %1
 
             IF "%_BUILD_DEMO%"=="NO" GOTO No_Apollo_Demo
                CD "\xHarbour.com\xHarbour-ApolloRDD\%_XB_Compiler%\Demo"
-               \xHB\bin\XBUILD.EXE Six.lib.xbp %_XB_Debug% %1
+               \xHB\bin\xBuild.exe Six.lib.xbp %_XB_Debug% %1
             :No_Apollo_Demo
 
             IF NOT EXIST "%_XHB_LIB%\fts32.lib" \xHB\bin\XLIB "%_XHB_DLL%\ApolloRDD\fts32.dll" /out:"%_XHB_LIB%\FTS32.lib"
@@ -387,16 +393,16 @@ REM --> ApolloRDD
 REM --> xHBComm
         IF "%_BUILD_XHBCOMM%"=="NO" GOTO No_xHBComm
             CD "\xHarbour.com\xHarbour-xHBComm\Comm"
-            \xHB\bin\XBUILD.EXE Comm.lib.xbp -NoXbp -Debug %1
+            \xHB\bin\xBuild.exe Comm.lib.xbp -NoXbp -Debug %1
 
             CD "\xHarbour.com\xHarbour-xHBComm\xHBCommDll"
             IF     EXIST "%_XHB_DLL%\xHBCommDll.lib"     DEL "%_XHB_DLL%\xHBCommDll.lib" /Q
-            IF     EXIST "%_XHB_LIB%\xHBCommDll.lib"          \xHB\bin\XBUILD.EXE xHBCommDll.dll.xbp -NoXbp %1
-            IF NOT EXIST "%_XHB_LIB%\xHBCommDll.lib"          \xHB\bin\XBUILD.EXE xHBCommDll.dll.xbp -NoXbp -link
+            IF     EXIST "%_XHB_LIB%\xHBCommDll.lib"          \xHB\bin\xBuild.exe xHBCommDll.dll.xbp -NoXbp %1
+            IF NOT EXIST "%_XHB_LIB%\xHBCommDll.lib"          \xHB\bin\xBuild.exe xHBCommDll.dll.xbp -NoXbp -link
             IF     EXIST "%_XHB_DLL%\xHBCommDll.lib" MOVE /Y "%_XHB_DLL%\xHBCommDll.lib" "%_XHB_LIB%"
 
             CD "\xHarbour.com\xHarbour-xHBComm\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE xHBComm.lib.xbp %_XB_Debug% %1
+            \xHB\bin\xBuild.exe xHBComm.lib.xbp %_XB_Debug% %1
             
         :No_xHBComm
 
@@ -404,20 +410,20 @@ REM --> xHBComm
 REM --> CT3-Comm
         IF "%_BUILD_CT3COMM%"=="NO" GOTO No_CT3Comm
            CD "\xHarbour.com\xHarbour-CT3Comm\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE CT3Comm.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe CT3Comm.lib.xbp %_XB_Debug% %1
         :No_CT3Comm
 
 
 REM --> RMDBFCDX.lib
         CD "\xHarbour.com\xHarbour-Rushmore\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE RMDBFCDX.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe RMDBFCDX.lib.xbp %_XB_Debug% %1
 
 
 REM --> XDO
         IF "%_BUILD_XDO_DLL%"=="NO" GOTO No_XDO_DLL
             CD "\xHarbour.com\xHarbour-XDO\%_XB_Compiler%"
             IF EXIST "%_XHB_DLL%\XDO.lib" DEL "%_XHB_DLL%\XDO.lib" /Q
-            \xHB\bin\XBUILD.EXE XDO.dll.xbp %_XB_NonDebug% %1
+            \xHB\bin\xBuild.exe XDO.dll.xbp %_XB_NonDebug% %1
             IF EXIST "%_XHB_DLL%\XDO.lib" MOVE /Y "%_XHB_DLL%\XDO.lib" "%_XHB_LIB%"
         :No_XDO_DLL
 
@@ -425,13 +431,13 @@ REM --> XDO
 REM --> IEGui
         IF "%_BUILD_IEGUI_LIB%"=="NO" GOTO No_IEGUI_LIB
            CD "\xHarbour.com\IEGui\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE IEGui.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe IEGui.lib.xbp %_XB_Debug% %1
         :No_IEGUI_LIB
 
 
 REM --> FreeImage
         CD "\xHarbour.com\FreeImage\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE FreeImage-xHB.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe FreeImage-xHB.lib.xbp %_XB_Debug% %1
          XCOPY FreeImage.lib "%_XHB_LIB%" /d /y
          XCOPY FreeImage.dll "%_XHB_DLL%" /d /y
 
@@ -441,21 +447,21 @@ REM --> VXH.lib
         IF "%_BUILD_VXH_AS%"=="NO"   GOTO No_VXHLib
         
              CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%"
-            \xHB\bin\XBUILD.EXE VXH.lib.xbp %_XB_Debug% %1
+            \xHB\bin\xBuild.exe VXH.lib.xbp %_XB_Debug% %1
 
             IF "%_BUILD_DEMO%"=="NO" GOTO N433
             CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Personal"
-               IF EXIST VXH.lib.xbp \xHB\bin\XBUILD.EXE VXH.lib.xbp %_XB_Debug% %1
+               IF EXIST VXH.lib.xbp \xHB\bin\xBuild.exe VXH.lib.xbp %_XB_Debug% %1
             :N433
 
             IF "%_BUILD_PERSONAL%"=="NO" GOTO N438
             CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Professional"
-               IF EXIST VXH.lib.xbp \xHB\bin\XBUILD.EXE VXH.lib.xbp %_XB_Debug% %1
+               IF EXIST VXH.lib.xbp \xHB\bin\xBuild.exe VXH.lib.xbp %_XB_Debug% %1
             :N438
 
             IF "%_BUILD_PROF%"=="NO" GOTO N443
                CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Demo"
-               IF EXIST VXH.lib.xbp \xHB\bin\XBUILD.EXE VXH.lib.xbp %_XB_Debug% %1
+               IF EXIST VXH.lib.xbp \xHB\bin\xBuild.exe VXH.lib.xbp %_XB_Debug% %1
             :N443
 
             
@@ -467,14 +473,14 @@ REM --> VXH.DLL
            CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%"
 
             IF     EXIST "%_XHB_BIN%\vxhdll.lib"       DEL "%_XHB_BIN%\vxhdll.lib" /Q
-            IF     EXIST "%_XHB_LIB%\vxhdll.lib"            \xHB\bin\XBUILD.EXE VXHDll.dll.xbp %_XB_NonDebug% %1
-            IF NOT EXIST "%_XHB_LIB%\vxhdll.lib"            \xHB\bin\XBUILD.EXE VXHDll.dll.xbp %_XB_NonDebug% %1 -link
+            IF     EXIST "%_XHB_LIB%\vxhdll.lib"            \xHB\bin\xBuild.exe VXHDll.dll.xbp %_XB_NonDebug% %1
+            IF NOT EXIST "%_XHB_LIB%\vxhdll.lib"            \xHB\bin\xBuild.exe VXHDll.dll.xbp %_XB_NonDebug% %1 -link
             IF     EXIST "%_XHB_BIN%\vxhdll.lib"   MOVE /Y "%_XHB_BIN%\vxhdll.lib" "%_XHB_LIB%"
 
             IF "%_BUILD_DEBUG%"=="NO" GOTO N472
                IF     EXIST "%_XHB_BIN%\vxhddll.lib"      DEL "%_XHB_BIN%\vxhddll.lib" /Q
-               IF     EXIST "%_XHB_LIB%\vxhddll.lib"           \xHB\bin\XBUILD.EXE VXHdDll.dll.xbp %_XB_NonDebug% %1
-               IF NOT EXIST "%_XHB_LIB%\vxhddll.lib"           \xHB\bin\XBUILD.EXE VXHdDll.dll.xbp %_XB_NonDebug% %1 -link
+               IF     EXIST "%_XHB_LIB%\vxhddll.lib"           \xHB\bin\xBuild.exe VXHdDll.dll.xbp %_XB_NonDebug% %1
+               IF NOT EXIST "%_XHB_LIB%\vxhddll.lib"           \xHB\bin\xBuild.exe VXHdDll.dll.xbp %_XB_NonDebug% %1 -link
                IF     EXIST "%_XHB_BIN%\vxhddll.lib"  MOVE /Y "%_XHB_BIN%\vxhddll.lib" "%_XHB_LIB%"
             :N472
 
@@ -482,14 +488,14 @@ REM --> VXH.DLL
                CD "\xharbour.com\Visual-xHarbour\Library\%_XB_Compiler%\Professional"
 
                IF     EXIST "%_XHB_BIN%\Professional\vxhdll.lib"       DEL "%_XHB_BIN%\Professional\vxhdll.lib" /Q
-               IF     EXIST "%_XHB_LIB%\Professional\vxhdll.lib"            \xHB\bin\XBUILD.EXE VXHDll.dll.xbp %_XB_NonDebug% %1
-               IF NOT EXIST "%_XHB_LIB%\Professional\vxhdll.lib"            \xHB\bin\XBUILD.EXE VXHDll.dll.xbp %_XB_NonDebug% %1 -link
+               IF     EXIST "%_XHB_LIB%\Professional\vxhdll.lib"            \xHB\bin\xBuild.exe VXHDll.dll.xbp %_XB_NonDebug% %1
+               IF NOT EXIST "%_XHB_LIB%\Professional\vxhdll.lib"            \xHB\bin\xBuild.exe VXHDll.dll.xbp %_XB_NonDebug% %1 -link
                IF     EXIST "%_XHB_BIN%\Professional\vxhdll.lib"   MOVE /Y "%_XHB_BIN%\Professional\vxhdll.lib" "%_XHB_LIB%\Professional"
                
                IF "%_BUILD_DEBUG%"=="NO" GOTO N487
                   IF     EXIST "%_XHB_BIN%\Professional\vxhddll.lib"      DEL "%_XHB_BIN%\Professional\vxhddll.lib" /Q
-                  IF     EXIST "%_XHB_LIB%\Professional\vxhddll.lib"           \xHB\bin\XBUILD.EXE VXHdDll.dll.xbp %_XB_NonDebug% %1
-                  IF NOT EXIST "%_XHB_LIB%\Professional\vxhddll.lib"           \xHB\bin\XBUILD.EXE VXHdDll.dll.xbp %_XB_NonDebug% %1 -link
+                  IF     EXIST "%_XHB_LIB%\Professional\vxhddll.lib"           \xHB\bin\xBuild.exe VXHdDll.dll.xbp %_XB_NonDebug% %1
+                  IF NOT EXIST "%_XHB_LIB%\Professional\vxhddll.lib"           \xHB\bin\xBuild.exe VXHdDll.dll.xbp %_XB_NonDebug% %1 -link
                   IF     EXIST "%_XHB_BIN%\Professional\vxhddll.lib"  MOVE /Y "%_XHB_BIN%\Professional\vxhddll.lib" "%_XHB_LIB%\Professional%"
                :N487
                
@@ -500,13 +506,13 @@ REM --> VXH.DLL
 
 REM --> DebugServer
         CD "\xHarbour.com\xHarbour-DebugServer\server\%_XB_Compiler%"
-        \xHB\bin\XBUILD.EXE DbgServe.lib.xbp %_XB_Debug% %1
+        \xHB\bin\xBuild.exe DbgServe.lib.xbp %_XB_Debug% %1
 
 
 REM --> VXHDebugger
         IF "%_BUILD_DBG_CLIENT%"=="NO" GOTO No_DebugClient
            CD "\xHarbour.com\xHarbour-DebugClient\vxhdebug\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE VXHD.lib.xbp %_XB_Debug% %1
+           \xHB\bin\xBuild.exe VXHD.lib.xbp %_XB_Debug% %1
         :No_DebugClient
 
 
@@ -528,7 +534,7 @@ REM --> xBuildW.exe
                 IF NOT EXIST \xHarbour.com\xHarbour-xBuild\vc8\xbuild.xml      COPY \xHarbour.com\xHarbour-xBuild\*.xml       \xHarbour.com\xHarbour-xBuild\vc8\*.xml /Y
             :No_VC8_1
            CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%"
-           \xHB\bin\XBUILD.EXE xBuildW.exe.xbp %_XB_Exe% %1
+           \xHB\bin\xBuild.exe xBuildW.exe.xbp %_XB_Exe% %1
            IF EXIST "%_XHB_BIN%\xBuildW.lib" DEL "%_XHB_BIN%\xBuildW.lib" /Q
 
 
@@ -541,7 +547,7 @@ REM --> xBuildW.exe
                    IF NOT EXIST \xHarbour.com\xHarbour-xBuild\vc8\Personal\xbuild.xml      COPY \xHarbour.com\xHarbour-xBuild\*.xml       \xHarbour.com\xHarbour-xBuild\vc8\Personal\*.xml /Y
                 :No_VC8_2
               CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%\Personal"
-              \xHB\bin\XBUILD.EXE xBuildW.exe.xbp %_XB_Exe% %1
+              \xHB\bin\xBuild.exe xBuildW.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\Personal\xBuildW.lib" DEL "%_XHB_BIN%\Personal\xBuildW.lib" /Q
            :No_xBuildW_Personal
            
@@ -555,7 +561,7 @@ REM --> xBuildW.exe
                    IF NOT EXIST \xHarbour.com\xHarbour-xBuild\vc8\Demo\xbuild.xml      COPY \xHarbour.com\xHarbour-xBuild\*.xml       \xHarbour.com\xHarbour-xBuild\vc8\Demo\*.xml /Y
                 :No_VC8_3
               CD "\xHarbour.com\xHarbour-xBuild\%_XB_Compiler%\Demo"
-              \xHB\bin\XBUILD.EXE xBuildW.exe.xbp %_XB_Exe% %1
+              \xHB\bin\xBuild.exe xBuildW.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\Demo\xBuildW.lib" DEL "%_XHB_BIN%\Demo\xBuildW.lib" /Q
            :No_xBuildW_Demo
         :No_xBuildW
@@ -567,17 +573,17 @@ REM --> xPrompt
         
             IF "%_BUILD_XPROMPT_AS%"=="EXE" GOTO No_XPROMPTDLL
                CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%"
-               \xHB\bin\XBUILD.EXE xPrompt.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xPrompt.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xPrompt.lib" DEL "%_XHB_BIN%\xPrompt.lib" /Q
-               \xHB\bin\XBUILD.EXE xPromptSQL.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xPromptSQL.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xPromptSQL.lib" DEL "%_XHB_BIN%\xPromptSQL.lib" /Q
             :No_XPROMPTDLL
 
             IF "%_BUILD_XPROMPT_AS%"=="DLL" GOTO No_XPROMPTEXE
                CD "\xHarbour.com\xHarbour-Builder\%_XB_Compiler%\XPROMPT.exe"
-               \xHB\bin\XBUILD.EXE xPrompt.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xPrompt.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xPrompt.lib" DEL "%_XHB_BIN%\xPrompt.lib" /Q
-               \xHB\bin\XBUILD.EXE xPromptSQL.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xPromptSQL.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xPromptSQL.lib" DEL "%_XHB_BIN%\xPromptSQL.lib" /Q
             :No_XPROMPTEXE
             
@@ -591,18 +597,18 @@ REM --> VXH.EXE
             IF "%_BUILD_VXH_AS%"=="EXE"    GOTO No_VXHDLL
 
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%"
-               \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\vxh.lib" DEL "%_XHB_BIN%\vxh.lib" /Q
                
                IF "%_BUILD_PERSONAL%"=="NO" GOTO N568
                   CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Personal"
-                  IF EXIST VXH.exe.xbp \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                   IF EXIST "%_XHB_BIN%\Personal\vxh.lib" DEL "%_XHB_BIN%\Personal\vxh.lib" /Q
                :N568
 
                IF "%_BUILD_PROF%"=="NO" GOTO N574
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Professional"
-                  IF EXIST VXH.exe.xbp \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                   IF EXIST "%_XHB_BIN%\Professional\vxh.lib" DEL "%_XHB_BIN%\Professional\vxh.lib" /Q
                :N574
                
@@ -611,18 +617,18 @@ REM --> VXH.EXE
             IF "%_BUILD_VXH_AS%"=="DLL" GOTO No_VXHEXE
 
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\vxh.exe"
-               \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\vxh.lib" DEL "%_XHB_BIN%\vxh.lib" /Q
 
                IF "%_BUILD_PERSONAL%"=="NO" GOTO N588
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Personal\vxh.exe"
-                  IF EXIST VXH.exe.xbp \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                   IF EXIST "%_XHB_BIN%\Personal\vxh.lib" DEL "%_XHB_BIN%\Personal\vxh.lib" /Q
                :N588
 
                IF "%_BUILD_PROF%"=="NO" GOTO N594
                   CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Professional\vxh.exe"
-                  IF EXIST VXH.exe.xbp \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                   IF EXIST "%_XHB_BIN%\Professional\vxh.lib" DEL "%_XHB_BIN%\Professional\vxh.lib" /Q
                :N594
                
@@ -630,7 +636,7 @@ REM --> VXH.EXE
 
             IF "%_BUILD_DEMO%"=="NO" GOTO N602
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Demo"
-               \xHB\bin\XBUILD.EXE VXH.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\Demo\vxh.lib" DEL "%_XHB_BIN%\Demo\vxh.lib" /Q
             :N602
             
@@ -643,19 +649,19 @@ REM --> xDebugW
          
             IF "%_BUILD_xDebugW_AS%"=="EXE"    GOTO No_xDebugWDLL
                CD "\xHarbour.com\xHarbour-DebugClient\vxhdebug\%_XB_Compiler%"
-               \xHB\bin\XBUILD.EXE xDebugW.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xDebugW.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xDebugW.lib" DEL "%_XHB_BIN%\xDebugW.lib" /Q
             :No_xDebugWDLL
 
             IF "%_BUILD_xDebugW_AS%"=="DLL" GOTO No_xDebugWEXE
                CD "\xHarbour.com\xHarbour-DebugClient\vxhdebug\%_XB_Compiler%\xDebugW.exe"
-               \xHB\bin\XBUILD.EXE xDebugW.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xDebugW.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\xDebugW.lib" DEL "%_XHB_BIN%\xDebugW.lib" /Q
             :No_xDebugWEXE
 
             IF "%_BUILD_DEMO%"=="NO" GOTO No_xDebugWExe_Demo
                CD "\xHarbour.com\xHarbour-DebugClient\vxhdebug\%_XB_Compiler%\Demo"
-               \xHB\bin\XBUILD.EXE xDebugW.exe.xbp %_XB_Exe% %1
+               \xHB\bin\xBuild.exe xDebugW.exe.xbp %_XB_Exe% %1
                IF EXIST "%_XHB_BIN%\Demo\xDebugW.lib" DEL "%_XHB_BIN%\Demo\xDebugW.lib" /Q
             :No_xDebugWExe_Demo
             
@@ -668,13 +674,13 @@ REM --> xEditW
           
               IF "%_BUILD_xEditW_AS%"=="EXE" GOTO No_xEditWDLL
                  CD "\xHarbour.com\Visual-xHarbour\xEdit\%_XB_Compiler%"
-                 \xHB\bin\XBUILD.EXE xEditW.exe.xbp %_XB_Exe% %1
+                 \xHB\bin\xBuild.exe xEditW.exe.xbp %_XB_Exe% %1
                  IF EXIST "%_XHB_BIN%\xEditW.lib" DEL "%_XHB_BIN%\xEditW.lib" /Q
               :No_xEditWDLL
 
               IF "%_BUILD_xEditW_AS%"=="DLL" GOTO No_xEditWEXE
                  CD "\xHarbour.com\Visual-xHarbour\xEdit\%_XB_Compiler%\xEditW.exe"
-                 \xHB\bin\XBUILD.EXE xEditW.exe.xbp %_XB_Exe% %1
+                 \xHB\bin\xBuild.exe xEditW.exe.xbp %_XB_Exe% %1
                  IF EXIST "%_XHB_BIN%\xEditW.lib" DEL "%_XHB_BIN%\xEditW.lib" /Q
                  IF EXIST "%_XHB_BIN%\xEditW.lib" DEL "%_XHB_BIN%\xEditW.lib" /Q
               :No_xEditWEXE
