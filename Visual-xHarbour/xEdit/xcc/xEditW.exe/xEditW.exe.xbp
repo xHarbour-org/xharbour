@@ -14,7 +14,7 @@ MAPFILE =
 MYC_FLAGS =  
 MYDEFINES = WIN; XEDIT_APPLICATION
 MYLINK_FLAGS = 
-MYPRG_FLAGS = -es2 -gc0 -m -n -p -q -w2
+MYPRG_FLAGS = -es2 -gc0 -m -n -q -w2
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
 OUTPUTFOLDER = \xbp\xcc\xEditW-exe.exe
@@ -34,6 +34,7 @@ MYDEFINES =
 MYRC_FLAGS = 
 
 [WinAPI.lib]
+[WinCore.lib]
 
 [xEditWScript.lib]
 [xbScript.lib]

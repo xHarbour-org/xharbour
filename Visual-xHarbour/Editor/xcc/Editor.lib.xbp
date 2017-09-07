@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = \xhb\include\w32
+INCLUDEFOLDERS = ..\..\Library\Include
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .T.
@@ -15,7 +15,7 @@ MAPFILE =
 MYC_FLAGS = 
 MYDEFINES = WIN ;VXH
 MYLINK_FLAGS = 
-MYPRG_FLAGS = -n1 -p -w2 -es2
+MYPRG_FLAGS = -n1 -w2 -es2
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
 OUTPUTFOLDER = \xbp\xcc\Editor.lib

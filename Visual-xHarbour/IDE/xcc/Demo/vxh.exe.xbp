@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\..\include;\xHb\include\w32
+INCLUDEFOLDERS = ..\..\..\Library\Include
 LAUTORUN = .F.
 LDEBUG = .F.
 LGUI = .T.
@@ -15,10 +15,10 @@ MAPFILE =
 MYC_FLAGS = 
 MYDEFINES = WIN ;WIN32 ;VXH ;VXH_ADS ;VXH_DEMO ;WINAPI_DEMO 
 MYLINK_FLAGS = 
-MYPRG_FLAGS = -es2 -gc0 -n -p -q -w2
+MYPRG_FLAGS = -es2 -gc0 -n -q -w2
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
-OUTPUTFOLDER = \xbp\xcc\demo\vxh-exe.exe
+OUTPUTFOLDER = \xbp\xcc\demo\vxh.exe
 PRG_OUTPUTFOLDER = 
 RC_OUTPUTFOLDER = 
 RUNARGUMENTS = 
@@ -44,7 +44,9 @@ MYRC_FLAGS =
 
 [..\..\..\Editor\xcc\Editor.lib.xbp]
 
-[vxhd.lib]
+#[vxh.lib]
+
+[wincore.lib]
 
 [tproject.lib]
 

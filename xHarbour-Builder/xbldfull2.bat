@@ -438,8 +438,9 @@ REM --> IEGui
 REM --> FreeImage
         CD "\xHarbour.com\FreeImage\%_XB_Compiler%"
         \xHB\bin\xBuild.exe FreeImage-xHB.lib.xbp %_XB_Debug% %1
-         XCOPY FreeImage.lib "%_XHB_LIB%" /d /y
-         XCOPY FreeImage.dll "%_XHB_DLL%" /d /y
+        CD "\xHarbour.com\FreeImage"
+        XCOPY FreeImage.lib "%_XHB_LIB%" /d /y
+        XCOPY FreeImage.dll "%_XHB_DLL%" /d /y
 
 
 REM --> VXH.lib
@@ -594,45 +595,21 @@ REM --> VXH.EXE
          IF "%_BUILD_VXH_AS%"=="NONE"   GOTO No_VXH
          IF "%_BUILD_VXH_AS%"=="NO"     GOTO No_VXH
          
-            IF "%_BUILD_VXH_AS%"=="EXE"    GOTO No_VXHDLL
-
-               CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%"
-               \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-               IF EXIST "%_XHB_BIN%\vxh.lib" DEL "%_XHB_BIN%\vxh.lib" /Q
+            CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%"
+            \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
+            IF EXIST "%_XHB_BIN%\vxh.lib" DEL "%_XHB_BIN%\vxh.lib" /Q
                
-               IF "%_BUILD_PERSONAL%"=="NO" GOTO N568
-                  CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Personal"
-                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-                  IF EXIST "%_XHB_BIN%\Personal\vxh.lib" DEL "%_XHB_BIN%\Personal\vxh.lib" /Q
-               :N568
+            IF "%_BUILD_PERSONAL%"=="NO" GOTO N568
+               CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Personal"
+               IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
+               IF EXIST "%_XHB_BIN%\Personal\vxh.lib" DEL "%_XHB_BIN%\Personal\vxh.lib" /Q
+            :N568
 
-               IF "%_BUILD_PROF%"=="NO" GOTO N574
+            IF "%_BUILD_PROF%"=="NO" GOTO N574
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Professional"
-                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-                  IF EXIST "%_XHB_BIN%\Professional\vxh.lib" DEL "%_XHB_BIN%\Professional\vxh.lib" /Q
-               :N574
-               
-            :No_VXHDLL
-
-            IF "%_BUILD_VXH_AS%"=="DLL" GOTO No_VXHEXE
-
-               CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\vxh.exe"
-               \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-               IF EXIST "%_XHB_BIN%\vxh.lib" DEL "%_XHB_BIN%\vxh.lib" /Q
-
-               IF "%_BUILD_PERSONAL%"=="NO" GOTO N588
-               CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Personal\vxh.exe"
-                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-                  IF EXIST "%_XHB_BIN%\Personal\vxh.lib" DEL "%_XHB_BIN%\Personal\vxh.lib" /Q
-               :N588
-
-               IF "%_BUILD_PROF%"=="NO" GOTO N594
-                  CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Professional\vxh.exe"
-                  IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
-                  IF EXIST "%_XHB_BIN%\Professional\vxh.lib" DEL "%_XHB_BIN%\Professional\vxh.lib" /Q
-               :N594
-               
-            :No_VXHEXE
+               IF EXIST VXH.exe.xbp \xHB\bin\xBuild.exe VXH.exe.xbp %_XB_Exe% %1
+               IF EXIST "%_XHB_BIN%\Professional\vxh.lib" DEL "%_XHB_BIN%\Professional\vxh.lib" /Q
+            :N574
 
             IF "%_BUILD_DEMO%"=="NO" GOTO N602
                CD "\xHarbour.com\Visual-xHarbour\IDE\%_XB_Compiler%\Demo"

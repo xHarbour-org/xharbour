@@ -1,7 +1,7 @@
 CINI =
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = ..\..\include;\xhb\include\w32
+INCLUDEFOLDERS = ..\..\include;\xhb\include\w32;\Harbour\contrib\xhb\
 LAUTORUN = .F.
 LDEBUG = .T.
 LGUI = .F.
@@ -15,7 +15,7 @@ MAPFILE =
 MYC_FLAGS =
 MYDEFINES = VXH ;VXH_ADS; VXH_ENTERPRISE; d_WinFakt
 MYLINK_FLAGS =
-MYPRG_FLAGS = -es2 -gc0 -n1 -p -q -w2
+MYPRG_FLAGS = -es2 -gc0 -n1 -q -w2
 MYRC_FLAGS =
 MYSLY_FLAGS =
 OUTPUTFOLDER = C:\xbp\wf\VXH.LIB
@@ -24,7 +24,7 @@ RC_OUTPUTFOLDER =
 RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 STARTIN =
-TARGETFOLDER = C:\WinFakt.GIT\Build\xHB\Lib
+TARGETFOLDER = C:\wf-PRG\Build\xHB\Lib
 
 [..\..\source\*.prg]
 MYC_FLAGS =
@@ -34,3 +34,4 @@ MYPRG_FLAGS =
 [..\..\sourceC\*.c]
 MYC_FLAGS =
 MYDEFINES =
+

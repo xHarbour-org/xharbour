@@ -156,7 +156,7 @@ REM --> Copy files
     XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i
  
     REM ** VXH **
-    XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /d /y /i
+    XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /y /i
     IF EXIST \xHB\Include\w32\Oleserver.h      DEL \xHB\Include\w32\Oleserver.h
     IF EXIST \xHB\Include\w32\Structures_HB.ch DEL \xHB\Include\w32\Structures_HB.ch
     IF EXIST \xHB\Include\w32\Globals.ch       DEL \xHB\Include\w32\Globals.ch
