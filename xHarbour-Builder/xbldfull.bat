@@ -26,6 +26,18 @@ REM --> Cleanup for -ALL
 
     :CLEAN_ALL
 
+	 IF "%XCC_XCC%"=="NO" (
+	    ATTRIB +R \xHB\Bin\xCC.exe
+            ATTRIB +R \xHB\Bin\xCC.dll
+	    ATTRIB +R \xHB\Bin\xLib.exe
+	    ATTRIB +R \xHB\Bin\xLink.exe
+	    ATTRIB +R \xHB\Bin\xRC.exe
+            ATTRIB +R \xHB\Bin\xRC.dll
+	 )
+	 
+	 IF "%XCC_XBUILD%"=="NO" (
+	    ATTRIB +R \xHB\Bin\xBuild.exe
+	    )
     
     IF "%XBUILD_XCC%"=="YES" (
        DEL \xHB\bin\*.exe /s
@@ -53,11 +65,25 @@ REM --> Cleanup for -ALL
        MD \xHB\dll\vc8
        MD \xHB\lib\vc8
       )
+		
+	IF "%XCC_XBUILD%"=="NO" (
+	    ATTRIB -R \xHB\Bin\xBuild.exe
+	    )
+		
+	 IF "%XCC_XCC%"=="NO" (
+	   ATTRIB -R \xHB\Bin\xCC.exe
+           ATTRIB -R \xHB\Bin\xCC.dll
+	   ATTRIB -R \xHB\Bin\xLib.exe
+	   ATTRIB -R \xHB\Bin\xLink.exe
+	   ATTRIB -R \xHB\Bin\xRC.exe
+           ATTRIB -R \xHB\Bin\xRC.dll
+         ) ELSE ( 
+      DEL \xharbour\bin\xCC.*
+      DEL \xharbour\bin\xRC.*
+      DEL \xharbour\bin\xLib.exe
+      DEL \xharbour\bin\xLink.exe
+	 )
 
-    DEL \xharbour\bin\xCC.*
-    DEL \xharbour\bin\xRC.*
-    DEL \xharbour\bin\xLib.exe
-    DEL \xharbour\bin\xLink.exe
     DEL \xharbour\bin\xHB.exe
 
     IF EXIST \xHB\include        RD \xHB\include /s /q

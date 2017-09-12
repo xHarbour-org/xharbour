@@ -221,6 +221,8 @@ REM ===============================================
 
     ROBOCOPY "\xHarbour.com\WinPrint\Samples" "%RC_To%\WinPrint" *.* /NS /NC /NP /XF %RC_Exclude_File% /S /XD %RC_Exclude_Folder% /XA:H
 
+    XCOPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\Samples\*.*" "%RC_To%\XBScript" /d /y /s /i
+
     COPY "\xHarbour.com\xHarbour-xHBComm\querycls.prg" "%RC_To%\xHBComm\"
 
 
@@ -300,8 +302,8 @@ REM ===============================================
     SET CopyTo=%XHBTO%\Dll
     SET EmptyDLL=\xHarbour.com\xHarbour-Builder\Advanced-Installer-Scripts\empty.dll
 
-    COPY "%EmptyDLL%" "%CopyTo%\xHBmtDLL.dll" /b
-    COPY "%EmptyDLL%" "%CopyTo%\xHBDmtDLL.dll" /b
+REM COPY "%EmptyDLL%" "%CopyTo%\xHBmtDLL.dll" /b
+REM COPY "%EmptyDLL%" "%CopyTo%\xHBDmtDLL.dll" /b
     COPY "%EmptyDLL%" "%CopyTo%\xHBCommDll.dll" /b
     COPY "%EmptyDLL%" "%CopyTo%\xHBZipDll.dll" /b
 
@@ -405,14 +407,12 @@ REM              /Professional/dll/XBScript
 REM ===============================================
 
     SET RC_To=%XHBTO%\Dll\XBScript\
-	 
-    MD %RC_TO%\Samples
+
     COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Register XBScriptPro.bat" "%RC_TO%Register XBScript.bat"
     COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Un-Register XBScriptPro.bat" "%RC_TO%Un-Register XBScript.bat"
     COPY "\xHarbour.com\xHarbour-XBScript\XBScriptPro\Debug\XBScriptPro.dll" "%RC_TO%XBScript.dll"
     COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\license.txt" "%RC_TO%"
     COPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\docs\readme.txt" "%RC_TO%"
-    ROBOCOPY "\xHarbour.com\xHarbour-XBScript\Install scripts\Files\samples" "%RC_TO%Samples" /NS /NC /NP
 	 
 REM ===============================================
 REM              /Professional/Samples
