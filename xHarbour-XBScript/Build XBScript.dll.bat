@@ -1,14 +1,16 @@
 @ECHO OFF
 
-IF "%1"=="-ALL" GOTO CLEAN
-IF "%1"=="-All" GOTO CLEAN
-IF "%1"=="-all" GOTO CLEAN
+IF "%1"=="-ALL"  GOTO CLEAN
+IF "%1"=="-All"  GOTO CLEAN
+IF "%1"=="-all"  GOTO CLEAN
+IF "%1"=="CLEAN" GOTO CLEAN
 GOTO SAVE
 
 :CLEAN
 IF EXIST \xHarbour.com\xHarbour-XBScript\XBScript    RD \xHarbour.com\xHarbour-XBScript\XBScript    /S/Q
 IF EXIST \xHarbour.com\xHarbour-XBScript\XBScriptPro RD \xHarbour.com\xHarbour-XBScript\XBScriptPro /S/Q
 IF EXIST \xHarbour.com\xHarbour-XBScript\XBScriptEnt RD \xHarbour.com\xHarbour-XBScript\XBScriptEnt /S/Q
+IF "%1"=="CLEAN" GOTO CLEANUP
 
 :SAVE
    SET _PRESET_PATH=%PATH%
