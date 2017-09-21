@@ -241,3 +241,4 @@ xbScript*.dll
 xbScript*.lib
 
 
+.DS_Store
