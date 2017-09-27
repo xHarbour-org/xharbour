@@ -5,7 +5,7 @@
    #define NEW( TYPE ) (TYPE *) ClipNet_alloc( sizeof( TYPE ) )
    #define ZERO( p )   memset( p, 0, sizeof( *p ) )
 
-   PARSER_CONTEXT *    New_Context();
+   PARSER_CONTEXT *    New_Context(void);
 
    ID *                New_ID( const char *sName, PARSER_CONTEXT *Parser_pContext );
 

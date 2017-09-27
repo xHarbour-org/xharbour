@@ -47,7 +47,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "268"
             endingLineNumber = "268"
-            landmarkName = "IterateValue()"
+            landmarkName = "IterateValue"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -58,12 +58,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384762.880783"
+            timestampString = "528152795.081263"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "65"
             endingLineNumber = "65"
-            landmarkName = "ClipNet_DeclaredKind()"
+            landmarkName = "ClipNet_DeclaredKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -74,12 +74,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384769.833889"
+            timestampString = "528152795.081788"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "33"
             endingLineNumber = "33"
-            landmarkName = "ClipNet_MacroKind()"
+            landmarkName = "ClipNet_MacroKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -90,12 +90,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384778.163289"
+            timestampString = "528152795.082052"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "87"
             endingLineNumber = "87"
-            landmarkName = "ClipNet_LValueKind()"
+            landmarkName = "ClipNet_LValueKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -106,12 +106,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384789.083131"
+            timestampString = "528152795.082304"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "155"
             endingLineNumber = "155"
-            landmarkName = "ClipNet_ValueKind()"
+            landmarkName = "ClipNet_ValueKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -122,12 +122,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384824.978071"
+            timestampString = "528152795.082553"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "254"
             endingLineNumber = "254"
-            landmarkName = "ClipNet_LineKind()"
+            landmarkName = "ClipNet_LineKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -138,12 +138,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384832.492395"
+            timestampString = "528152795.082801"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "334"
             endingLineNumber = "334"
-            landmarkName = "ClipNet_BinaryKind()"
+            landmarkName = "ClipNet_BinaryKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -154,12 +154,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Compiler/common.c"
-            timestampString = "501384839.659952"
+            timestampString = "528152795.083046"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "351"
             endingLineNumber = "351"
-            landmarkName = "ClipNet_UnaryKind()"
+            landmarkName = "ClipNet_UnaryKind"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
