@@ -8,6 +8,59 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-12-17 16:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/png/png.c
+  * contrib/png/pngerror.c
+  * contrib/png/pngget.c
+  * contrib/png/pngmem.c
+  * contrib/png/pngpread.c
+  * contrib/png/pngread.c
+  * contrib/png/pngrio.c
+  * contrib/png/pngrtran.c
+  * contrib/png/pngrutil.c
+  * contrib/png/pngset.c
+  * contrib/png/pngtrans.c
+  * contrib/png/pngwio.c
+  * contrib/png/pngwrite.c
+  * contrib/png/pngwtran.c
+  * contrib/png/pngwutil.c
+  * contrib/png/png.h
+  * contrib/png/pngconf.h
+  * contrib/png/pngdebug.h
+  * contrib/png/pnginfo.h
+  * contrib/png/pnglibconf.h
+  * contrib/png/pngpriv.h
+  * contrib/png/pngstruct.h
+    * update to version 1.6.34
+
+  * source/rtl/zlib/adler32.c
+  * source/rtl/zlib/compress.c
+  * source/rtl/zlib/crc32.c
+  * source/rtl/zlib/deflate.c
+  * source/rtl/zlib/gzclose.c
+  * source/rtl/zlib/gzlib.c
+  * source/rtl/zlib/gzread.c
+  * source/rtl/zlib/gzwrite.c
+  * source/rtl/zlib/infback.c
+  * source/rtl/zlib/inffast.c
+  * source/rtl/zlib/inflate.c
+  * source/rtl/zlib/inftrees.c
+  * source/rtl/zlib/trees.c
+  * source/rtl/zlib/uncompr.c
+  * source/rtl/zlib/zutil.c
+  * source/rtl/zlib/crc32.h
+  * source/rtl/zlib/deflate.h
+  * source/rtl/zlib/gzguts.h
+  * source/rtl/zlib/inffast.h
+  * source/rtl/zlib/inffixed.h
+  * source/rtl/zlib/inflate.h
+  * source/rtl/zlib/inftrees.h
+  * source/rtl/zlib/trees.h
+  * source/rtl/zlib/zconf.h
+  * source/rtl/zlib/zlib.h
+  * source/rtl/zlib/zutil.h
+    * update to version 1.2.11
+
 2017-09-02 23:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbhpdf/harupdf.c
     ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Simões Filho)
