@@ -377,10 +377,10 @@ void makefixed()
    output will fall in the output data, making match copies simpler and faster.
    The advantage may be dependent on the size of the processor's data caches.
  */
-local int updatewindow(strm, end, copy)
+local int updatewindow(
 z_streamp strm;
 const Bytef *end;
-unsigned copy;
+unsigned copy)
 {
     struct inflate_state FAR *state;
     unsigned dist;
