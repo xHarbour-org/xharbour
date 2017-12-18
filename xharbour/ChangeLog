@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2017-12-18 19:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/zlib/gzlib.c
+    ! pacify warnings
+
 2017-12-17 16:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/png/png.c
   * contrib/png/pngerror.c
