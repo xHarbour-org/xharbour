@@ -378,8 +378,8 @@ void makefixed()
    The advantage may be dependent on the size of the processor's data caches.
  */
 local int updatewindow(
-z_streamp strm;
-const Bytef *end;
+z_streamp strm,
+const Bytef *end,
 unsigned copy)
 {
     struct inflate_state FAR *state;
