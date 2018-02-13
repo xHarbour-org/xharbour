@@ -126,6 +126,9 @@ HB_FUNC( RAT )
         if( ISNUM( 3 ) )
            lPos = hb_parnl( 3 ) - 1;
 
+        if ( lPos > ( LONG ) strlen( pszText ) )
+           lPos = strlen( pszText );
+
         while( lPos >= lEnd && ! bFound )
         {
            if( *( pszText + lPos ) == *pszSub )
