@@ -51,7 +51,7 @@
  */
 
 #include "hbapi.h"
-
+/*
 HB_FUNC( RAT )
 {
    PHB_ITEM pszSub = hb_param( 1, HB_IT_STRING );
@@ -106,39 +106,38 @@ HB_FUNC( RAT )
 
    hb_retni( 0 );
 }
-
-/*
-* HB_FUNC( RAT )
-* {
-*   HB_SIZE ulSubLen = hb_parclen( 1 );
-*
-*   if( ulSubLen )
-*   {
-*      LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
-*
-*      if( lPos >= 0 )
-*      {
-*         const char *   pszSub   = hb_parcx( 1 );
-*         const char *   pszText  = hb_parcx( 2 );
-*         LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
-*         BOOL           bFound   = FALSE;
-*
-*         if( ISNUM( 3 ) )
-*            lPos = hb_parnl( 3 ) - 1;
-*
-*         while( lPos >= lEnd && ! bFound )
-*         {
-*            if( *( pszText + lPos ) == *pszSub )
-*               bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
-*            lPos--;
-*         }
-*         hb_retnl( bFound ? lPos + 2 : 0 );
-*      }
-*      else
-*         hb_retni( 0 );
-*   }
-*   else
-*      // This function never seems to raise an error
-*      hb_retni( 0 );
-* }
 */
+
+HB_FUNC( RAT )
+{
+  HB_SIZE ulSubLen = hb_parclen( 1 );
+
+  if( ulSubLen )
+  {
+     LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
+
+     if( lPos >= 0 )
+     {
+        const char *   pszSub   = hb_parcx( 1 );
+        const char *   pszText  = hb_parcx( 2 );
+        LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
+        BOOL           bFound   = FALSE;
+
+        if( ISNUM( 3 ) )
+           lPos = hb_parnl( 3 ) - 1;
+
+        while( lPos >= lEnd && ! bFound )
+        {
+           if( *( pszText + lPos ) == *pszSub )
+              bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
+           lPos--;
+        }
+        hb_retnl( bFound ? lPos + 2 : 0 );
+     }
+     else
+        hb_retni( 0 );
+  }
+  else
+     // This function never seems to raise an error
+     hb_retni( 0 );
+}

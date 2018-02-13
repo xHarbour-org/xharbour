@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-02-13 22:15 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/rat.c
+    ! reverted changes of 2012-12-06 by Andi
+
 2017-12-19 10:33 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/zlib/inflate.c
     ! minor fix
