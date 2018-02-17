@@ -426,10 +426,10 @@ HB_FATTR hb_fsAttrToRaw( HB_FATTR ulAttr )
       raw_attr |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
    if( ulAttr & HB_FA_VOLCOMP )
       raw_attr |= 0x00008000;
-   if( raw_attr &  HB_FA_PINNED  )
-      ulAttr |= FILE_ATTRIBUTE_PINNED;
-   if( raw_attr & HB_FA_UNPINNED )
-      ulAttr |=  FILE_ATTRIBUTE_UNPINNED ;
+   if( ulAttr &  HB_FA_PINNED  )
+      raw_attr |= FILE_ATTRIBUTE_PINNED;
+   if( ulAttr & HB_FA_UNPINNED )
+      raw_attr |=  FILE_ATTRIBUTE_UNPINNED ;
   
   
 
