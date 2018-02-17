@@ -1452,7 +1452,7 @@ PHB_NETFFIND hb_FileNetFindFirst( const char * pszFileName, HB_SIZE ulAttr )
       if( pffind->pNetffind )
       {
          ptr                        = hb_strToken( ptrBuf, ulLen, 2, &ulSize );
-         sscanf( ptr, "%lu", &pffind->attr );
+         sscanf( ptr, "%u", &pffind->attr );
          ptr                        = hb_strToken( ptrBuf, ulLen, 3, &ulSize );
          sscanf( ptr, "%" PFHL "i", &pffind->size );
          ptr                        = hb_strToken( ptrBuf, ulLen, 4, &ulSize );
@@ -1499,7 +1499,7 @@ BOOL hb_FileNetFindNext( PHB_NETFFIND pffind )
 
       ptrBuf                     = hb_NetFirstChar();
       ptr                        = hb_strToken( ptrBuf, ulLen, 1, &ulSize );
-      sscanf( ptr, "%lu", &pffind->attr );
+      sscanf( ptr, "%u", &pffind->attr );
       ptr                        = hb_strToken( ptrBuf, ulLen, 2, &ulSize );
       sscanf( ptr, "%" PFHL "i", &pffind->size );
       ptr                        = hb_strToken( ptrBuf, ulLen, 3, &ulSize );

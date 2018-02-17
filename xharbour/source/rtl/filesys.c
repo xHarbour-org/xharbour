@@ -2383,12 +2383,12 @@ BOOL hb_fsSetFileTime( const char * pszFileName, long lJulian, long lMillisec )
    return fResult;
 }
 
-BOOL hb_fsSetAttr( const char * pszFileName, ULONG ulAttr )
+BOOL hb_fsSetAttr( const char * pszFileName, HB_FATTR ulAttr )
 {
    BOOL     fResult;
    char *   pszFree;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsSetAttr(%s, %lu)", pszFileName, ulAttr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsSetAttr(%s, %u)", pszFileName, ulAttr ) );
 
    pszFileName = hb_fsNameConv( pszFileName, &pszFree );
 

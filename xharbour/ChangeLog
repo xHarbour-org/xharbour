@@ -9,6 +9,12 @@
 */
 
 
+2018-02-17 15:00 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\rtl\filenet.c
+    ! fix to hb_fsSetAttr typo on previus commit
+  * source\rtl\filenet.c
+    !fix to format
+	
 2018-02-17 14:15 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/ct/files.c
     ! added defined for FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED if not exist on windows.h
