@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2018-02-17 14:15 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/ct/files.c
+    ! added defined for FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED if not exist on windows.h
+
 2018-02-17 13:25 Luiz Rafael Culik <luiz@xharbour.com.br>
   * source\rtl\filenet.c
     ! missed from previus commit

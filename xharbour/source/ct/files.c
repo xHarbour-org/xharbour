@@ -137,6 +137,13 @@ static LPTSTR GetTime( FILETIME * rTime );
    #include <dir.h>
 #endif
 
+ #if ! defined( FILE_ATTRIBUTE_PINNED )
+      #define FILE_ATTRIBUTE_PINNED               0x00080000  
+   #endif
+   #if !defined( FILE_ATTRIBUTE_UNPINNED ) 
+      #define FILE_ATTRIBUTE_UNPINNED             0x00100000  
+   #endif
+
 #endif
 
 #if ! defined( FA_ARCH )
