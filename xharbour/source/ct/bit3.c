@@ -70,11 +70,8 @@ static void sizeofbits( HB_USHORT * pusBytes, HB_LONG * plPattern, HB_LONG * plT
 
 HB_FUNC( NUMANDX )
 {
-   int   iPCount;
    HB_LONG  lNumOp;
    BOOL  bOk;
-
-   iPCount  = hb_pcount();
 
    lNumOp = __numfun( hb_pcount(), __numand, &bOk );
    if( bOk )
