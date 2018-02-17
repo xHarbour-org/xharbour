@@ -1293,7 +1293,7 @@ USHORT hb_fileNetRemote( PHB_FILE pFile )
    return ( USHORT ) ( ( pFile && pFile->hSocket ) ? 2 : 1 );
 }
 
-PHB_FILE hb_fileNetCreateTemp( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszName )
+PHB_FILE hb_fileNetCreateTemp( const char * pszDir, const char * pszPrefix, HB_FATTR ulAttr, char * pszName )
 {
    PHB_FILE    pFile = NULL;
    HB_FHANDLE  hFile;

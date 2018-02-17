@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2018-02-17 13:25 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\rtl\filenet.c
+    ! missed from previus commit
+
 2018-02-17 12:15 Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbapiitm.h
     ! removed const from hb_itemPutNL function declaration
