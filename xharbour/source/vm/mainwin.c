@@ -56,7 +56,7 @@
 #include "hbvm.h"
 
 #if defined( HB_OS_WIN )
-
+#include "windows.h"
 #define HB_GT_NAME   GUI
 #include "hbgtcore.h"
 

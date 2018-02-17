@@ -7,7 +7,74 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2018-02-17 12:15 Luiz Rafael Culik <luiz@xharbour.com.br>
+  * include/hbapiitm.h
+    ! removed const from hb_itemPutNL function declaration
+  * !include/hbapi.h
+    ! added HB_ITEM_PUT_LONGRAW macro, borrow from harbour
+  * include/hbapifs.h	
+    ! added HB_FA_PINNED and HB_FA_UNPINNED defined for directory output W and U
+	! changed ULONG ulAttr to HB_FATTR ulAttr in hb_fsCreate, hb_fsCreateEx, hb_fsCreateTemp, hb_fsCreateTempEx, hb_spCreate, hb_spCreateEx, hb_fsFindFirst, 
+     	hb_fsAttrFromRaw, hb_fsAttrToRaw, hb_fsAttrEncode, hb_fsAttrDecode, hb_fsGetFileAttributes, hb_fileCreateTemp, hb_fileCreateTempEx
+        hb_fileNetCreateTemp, hb_fileNetCreateTempEx		functions
+	! changed ULONG ulAttr to HB_FATTR ulAttr and LONG to long in hb_fsGetFileTime, hb_fsSetFileTime, hb_fsGetAttr, hb_fsSetAttr functions
+	! added long lTime member to structure  HB_FFIND and change attrmask type from ULONG to HB_FATTR
+	! added long lTime member to structure  HB_NETFFIND and change attr type from ULONG to HB_FATTR
+  * ! include/hbrdddel.h 
+    ! added new members to DELIMAREA structure borrow from harbour 
+  * ! include/hbrddsdf.h	
+    ! added new members to SDFAREA structure  borrow from harbour
+  * source\common\hbfsapi.c	
+    ! changed HB_WIN32_IO to HB_OS_WIN 
+  * c:\xharbour\source\common\hbwince.c
+    ! added #include "windows.h" when HB_OS_WIN is defined
+  * source\ct\bit3.c
+    ! small optimizations to functions  
+  * source\ct\files.c 
+    ! added defined for FA_PINNED and FA_UNPINNED
+	! change signature of function hb_fsGetFileAttributes from ULONG  to HB_FATTR
+    ! in function SETFATTR added support for FA_PINNED and FA_UNPINNED attributes
+    ! removed (LONG) cast when calling hb_retd
+    ! in function SETFDATI change LONG to long
+  * source/rdd/delim1.c
+    ! updated delim RDD to allow timestamp borrow from harbour  
+  * source/rdd/sdf1.c	
+    ! updated SFD RDD to allow timestamp borrow from harbour	
+  * source\rtl\gtpca\gtpca.c 
+    ! changed HB_WIN32_IO to HB_OS_WIN 
+  * source\rtl\gtpca\gtstd.c 
+    ! changed HB_WIN32_IO to HB_OS_WIN 
+  * source\rtl\console.c 
+    ! changed HB_WIN32_IO to HB_OS_WIN 
+  *  source\rtl\direct.c 
+    ! added support for  FA_PINNED and FA_UNPINNED attributes
+  * source\rtl\file.c 
+	! changed HB_WIN32_IO to HB_OS_WIN 
+  * source\rtl\filebuf.c
+    ! change ULONG ulAttr to HB_FATTR ulAttr  
+  * source\rtl\filenet.c 
+    ! change ULONG ulAttr to HB_FATTR ulAttr  
+  * source\rtl\filestat.c   	
+    ! change LONG  to long ulAttr  
+  * source\rtl\filesys.c 
+	! change ULONG ulAttr to HB_FATTR ulAttr
+  * source\rtl\fserror.c 
+    ! added #include "windows.h" when HB_OS_WIN is defined	
+  * source\rtl\fstemp.c 
+    ! change ULONG ulAttr to HB_FATTR ulAttr   and  HB_WIN32_IO to HB_OS_WIN 
+  * source\rtl\hbffind.c 
+    ! Changes to support  FA_PINNED and FA_UNPINNED attributes, ULONG ulAttr to HB_FATTR ulAttr
+  * source\rtl\spfiles.c 
+    ! change ULONG ulAttr to HB_FATTR ulAttr
+  * source\vm\itemapi.c
+	! removed unnecessary const in hb_itemPutNL function and using the new HB_ITEM_PUT_LONGRAW macro11
+  * source\vm\maindll.c 
+    source\vm\maindlle.c 
+	source\vm\maindllh.c 
+	source\vm\maindllp.c 
+	source\vm\mainwin.c	
+	! when HB_OS_WIN is defined added #include "windows.h"
+	
 2018-02-13 22:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/rat.c
     ! One more fix regarding the 3rd parameter

@@ -56,6 +56,7 @@
 #  define _LARGEFILE64_SOURCE  1
 #endif
 
+#define _HB_FFIND_INTERNAL_
 #define INCL_DOSFILEMGR
 #define INCL_DOSERRORS
 
@@ -64,7 +65,7 @@
 #include "hbapifs.h"
 #include "hbdate.h"
 #include "hb_io.h"
-
+#include "hbtrace.h"
 
 /* ------------------------------------------------------------- */
 
@@ -200,6 +201,14 @@ typedef void HB_FFIND_INFO, * PHB_FFIND_INFO;
    #if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
       #define FILE_ATTRIBUTE_ENCRYPTED             0x00004000
    #endif
+   
+   #if ! defined( FILE_ATTRIBUTE_PINNED )
+      #define FILE_ATTRIBUTE_PINNED               0x00080000  
+   #endif
+   #if !defined( FILE_ATTRIBUTE_UNPINNED ) 
+      #define FILE_ATTRIBUTE_UNPINNED             0x00100000  
+   #endif
+   
 #endif
 
 /* Internal funtion, Convert Windows Error Values to Dos Error Values */
@@ -238,11 +247,11 @@ FILETIME GetOldesFile( const char * szPath )
 
 /* ------------------------------------------------------------- */
 
-ULONG hb_fsAttrFromRaw( ULONG raw_attr )
+HB_FATTR hb_fsAttrFromRaw( HB_FATTR raw_attr )
 {
-   ULONG ulAttr = 0;
+   HB_FATTR ulAttr = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsAttrFromRaw(%lu)", raw_attr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsAttrFromRaw(%u)", raw_attr ) );
 
 #if defined( HB_OS_DOS )
 
@@ -289,6 +298,9 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
    if( raw_attr & 0x00000008 )
       ulAttr |= HB_FA_LABEL;
 
+  
+  
+
 #ifdef HB_EXTENSION
    /* Note that FILE_ATTRIBUTE_NORMAL is not needed
       HB_FA_DEVICE not supported
@@ -311,6 +323,10 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
       ulAttr |= HB_FA_NOTINDEXED;
    if( raw_attr & 0x00008000 )
       ulAttr |= HB_FA_VOLCOMP;
+   if( raw_attr & FILE_ATTRIBUTE_PINNED )
+      ulAttr |= HB_FA_PINNED;
+   if( raw_attr & FILE_ATTRIBUTE_UNPINNED )
+      ulAttr |= HB_FA_UNPINNED;
 #endif
 
 #elif defined( HB_OS_UNIX )
@@ -339,11 +355,11 @@ ULONG hb_fsAttrFromRaw( ULONG raw_attr )
    return ulAttr;
 }
 
-ULONG hb_fsAttrToRaw( ULONG ulAttr )
+HB_FATTR hb_fsAttrToRaw( HB_FATTR ulAttr )
 {
-   ULONG raw_attr = 0;
+   HB_FATTR raw_attr = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsAttrToRaw(%lu)", ulAttr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsAttrToRaw(%u)", ulAttr ) );
 
 #if defined( HB_OS_DOS )
 
@@ -410,6 +426,12 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
       raw_attr |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
    if( ulAttr & HB_FA_VOLCOMP )
       raw_attr |= 0x00008000;
+   if( raw_attr &  HB_FA_PINNED  )
+      ulAttr |= FILE_ATTRIBUTE_PINNED;
+   if( raw_attr & HB_FA_UNPINNED )
+      ulAttr |=  FILE_ATTRIBUTE_UNPINNED ;
+  
+  
 
 #endif
 
@@ -442,11 +464,11 @@ ULONG hb_fsAttrToRaw( ULONG ulAttr )
 /* Converts a CA-Cl*pper compatible file attribute string
    to the internal reprensentation. */
 
-ULONG hb_fsAttrEncode( const char * szAttr )
+HB_FATTR hb_fsAttrEncode( const char * szAttr )
 {
    const char *   pos      = szAttr;
    char           ch;
-   ULONG          ulAttr   = 0;
+   HB_FATTR          ulAttr   = 0;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsAttrEncode(%p)", szAttr ) );
 
@@ -470,6 +492,8 @@ ULONG hb_fsAttrEncode( const char * szAttr )
          case 'X': ulAttr  |= HB_FA_NOTINDEXED; break;
          case 'I': ulAttr  |= HB_FA_DEVICE;     break;
          case 'M': ulAttr  |= HB_FA_VOLCOMP;    break;
+		 case 'W': ulAttr  |= HB_FA_PINNED;     break;
+		 case 'U': ulAttr  |= HB_FA_UNPINNED;   break;
 #endif
       }
 
@@ -484,7 +508,7 @@ ULONG hb_fsAttrEncode( const char * szAttr )
 
 /* NOTE: szAttr buffer must be at least 16 chars long */
 
-char * hb_fsAttrDecode( ULONG ulAttr, char * szAttr )
+char * hb_fsAttrDecode( HB_FATTR ulAttr, char * szAttr )
 {
    char * ptr = szAttr;
 
@@ -524,6 +548,12 @@ char * hb_fsAttrDecode( ULONG ulAttr, char * szAttr )
       *ptr++ = 'I';
    if( ulAttr & HB_FA_VOLCOMP )
       *ptr++ = 'M';
+   if( ulAttr & HB_FA_PINNED )
+      *ptr++ = 'W';
+   if( ulAttr & HB_FA_UNPINNED )
+      *ptr++ = 'U';
+
+  
 #endif
 
    *ptr = '\0';
@@ -543,7 +573,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    USHORT         lMin;
    USHORT         lSec;
 
-   ULONG          raw_attr;
+   HB_FATTR          raw_attr;
    BOOL           bIsLink = FALSE;
 
    /* Set the default values in case some platforms don't
@@ -638,7 +668,8 @@ static void hb_fsFindFill( PHB_FFIND ffind )
             ffind->size = ( HB_FOFFSET ) info->pFindFileData.nFileSizeLow +
                           ( ( HB_FOFFSET ) info->pFindFileData.nFileSizeHigh << 32 );
          }
-         raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;
+         raw_attr =  info->pFindFileData.dwFileAttributes;
+		 
       }
 
 
@@ -746,13 +777,14 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    }
 
    ffind->lDate         = hb_dateEncode( lYear, lMonth, lDay );
+   ffind->lTime         = hb_timeEncode( lHour, lMin, (double)lSec );
    hb_dateStrPut( ffind->szDate, lYear, lMonth, lDay );
    ffind->szDate[ 8 ]   = '\0';
 
    hb_snprintf( ffind->szTime, sizeof( ffind->szTime ), "%02d:%02d:%02d", lHour, lMin, lSec );
 }
 
-PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
+PHB_FFIND hb_fsFindFirst( const char * pszFileName, HB_FATTR ulAttr )
 {
    PHB_FFIND   ffind = ( PHB_FFIND ) hb_xgrab( sizeof( HB_FFIND ) );
    BOOL        bFound;
@@ -869,6 +901,7 @@ PHB_FFIND hb_fsFindFirst( const char * pszFileName, ULONG ulAttr )
                          ( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) ||
                          ( info->dwAttr & info->pFindFileData.dwFileAttributes ) )
                      {
+						 						 
                         bFound = TRUE;
                         break;
                      }

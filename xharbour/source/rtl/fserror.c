@@ -55,17 +55,15 @@
 #include "hbapifs.h"
 #include "hbstack.h"
 #include "hb_io.h"
-#if defined(HB_OS_WIN)
-#include "windows.h"
-#endif
-
-#if ! ( defined( HB_WIN32_IO ) || defined( HB_OS_WIN ) )
+#if defined( HB_OS_WIN )
+#  include <windows.h>
+#else
 #  include <errno.h>
 #endif
 
 
 /* Try to translate C errno into DOS error code */
-#if ! defined( HB_WIN32_IO )
+#if ! defined( HB_OS_WIN )
 static int hb_errnoToDosError( int ErrCode )
 {
    int iResult;
@@ -147,7 +145,7 @@ static int hb_errnoToDosError( int ErrCode )
 }
 #endif
 
-#if defined( HB_WIN32_IO ) || defined( HB_OS_WIN )
+#if  defined( HB_OS_WIN )
 static int hb_WinToDosError( ULONG ulError )
 {
    int iResult;
@@ -242,7 +240,7 @@ void  hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
    }
    else
    {
-#if defined( HB_WIN32_IO ) || defined( HB_OS_WIN )
+#if  defined( HB_OS_WIN )
       uiOsErrorLast  = ( USHORT ) GetLastError();
       uiErrorLast    = ( USHORT ) hb_WinToDosError( uiOsErrorLast );
 #elif defined( _MSC_VER ) || defined( __DMC__ )

@@ -61,7 +61,7 @@
 #include "hbapiitm.h"
 #include "hbset.h"
 
-#if defined( HB_WIN32_IO )
+#if defined( HB_OS_WIN )
    #include <windows.h>
 #endif
 

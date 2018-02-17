@@ -1413,7 +1413,7 @@ PHB_FILE hb_fileNetCreateTempEx( char * pszName,
                                  const char * pszDir,
                                  const char * pszPrefix,
                                  const char * pszExt,
-                                 ULONG ulAttr )
+                                 HB_FATTR ulAttr )
 {
    PHB_FILE    pFile = NULL;
    HB_FHANDLE  hFile;

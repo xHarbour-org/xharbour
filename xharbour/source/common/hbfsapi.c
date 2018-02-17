@@ -81,7 +81,7 @@
    #include <sys/types.h>
    #include <sys/stat.h>
 #endif
-#if ! defined( HB_WIN32_IO )
+#if ! defined( HB_OS_WIN )
    #include <errno.h>
 #endif
 
@@ -493,7 +493,7 @@ BOOL hb_fsMaxFilesError( void )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsMaxFilesError()" ) );
 
-#if defined( HB_WIN32_IO )
+#if defined( HB_OS_WIN )
    return GetLastError() == ERROR_TOO_MANY_OPEN_FILES;
 #else
    return errno == EMFILE;

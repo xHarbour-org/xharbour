@@ -64,7 +64,7 @@
 #include "hbdate.h"
 
 #if defined( HB_OS_WIN )
-
+#include "windows.h"
 void hb_mbtowccpy( wchar_t * dstW, const char * srcA, ULONG ulLen )
 {
    MultiByteToWideChar( CP_ACP, 0, srcA, -1, dstW, ulLen / sizeof( wchar_t ) );

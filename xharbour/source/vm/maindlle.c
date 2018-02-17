@@ -73,6 +73,7 @@
 
 
 #if defined( HB_OS_WIN )
+#include "windows.h"
 HB_EXTERN_BEGIN
 #if defined( HB_DLL_REQUIRED_DLLMAIN )
 BOOL WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )

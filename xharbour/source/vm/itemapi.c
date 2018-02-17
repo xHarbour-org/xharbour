@@ -830,12 +830,13 @@ PHB_ITEM hb_itemPutNI( PHB_ITEM pItem, int iNumber )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutNL( PHB_ITEM pItem, const LONG lNumber )
+PHB_ITEM hb_itemPutNL( PHB_ITEM pItem, LONG lNumber )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemPutNL(%p, %ld)", pItem, lNumber ) );
 
    pItem = hb_itemapiCheck( pItem );
 
+   /*
 #if HB_INT_MAX >= LONG_MAX
    pItem->type                   = HB_IT_INTEGER;
    pItem->item.asInteger.value   = ( int ) lNumber;
@@ -845,6 +846,8 @@ PHB_ITEM hb_itemPutNL( PHB_ITEM pItem, const LONG lNumber )
    pItem->item.asLong.value      = ( HB_LONG ) lNumber;
    pItem->item.asLong.length     = ( UINT ) HB_LONG_LENGTH( lNumber );
 #endif
+*/
+HB_ITEM_PUT_LONGRAW( pItem, lNumber );
 
    return pItem;
 }

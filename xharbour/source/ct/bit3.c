@@ -76,8 +76,7 @@ HB_FUNC( NUMANDX )
 
    iPCount  = hb_pcount();
 
-   lNumOp   = __numfun( iPCount, ( HB_LONG ( * )( HB_LONG wNum1, HB_LONG wNum2 ) )( __numand ), &bOk );
-
+   lNumOp = __numfun( hb_pcount(), __numand, &bOk );
    if( bOk )
       hb_retnl( lNumOp );
    else
@@ -92,7 +91,7 @@ HB_FUNC( NUMORX )
 
    iPCount  = hb_pcount();
 
-   lNumOp   = __numfun( iPCount, ( HB_LONG ( * )( HB_LONG wNum1, HB_LONG wNum2 ) )( __numor ), &bOk );
+   lNumOp   = __numfun( iPCount,  __numor , &bOk );
 
    if( bOk )
       hb_retnl( lNumOp );
@@ -110,7 +109,7 @@ HB_FUNC( NUMXORX )
 
    iPCount  = 3;
 
-   lNumOp   = __numfun( iPCount, ( HB_LONG ( * )( HB_LONG wNum1, HB_LONG wNum2 ) )( __numxor ), &bOk );
+   lNumOp   = __numfun( iPCount,  __numxor , &bOk );
 
    if( bOk )
       hb_retnl( lNumOp );
@@ -128,7 +127,7 @@ HB_FUNC( NUMNOTX )
 
    iPCount  = 2;
 
-   lNumOp   = __numfun( iPCount, ( HB_LONG ( * )( HB_LONG wNum1, HB_LONG wNum2 ) )( __numnot ), &bOk );
+   lNumOp   = __numfun( iPCount,  __numnot , &bOk );
 
    if( bOk )
       hb_retnl( lNumOp );

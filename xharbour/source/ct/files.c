@@ -147,6 +147,7 @@ static LPTSTR GetTime( FILETIME * rTime );
    #define FA_DIREC        16       /* D */
    #define FA_ARCH         32       /* A */
    #define FA_NORMAL       0
+   
 #endif
 
 #if ! defined( FA_DEVICE )
@@ -160,6 +161,8 @@ static LPTSTR GetTime( FILETIME * rTime );
    #define FA_NOTINDEXED   8192     /* X */
    #define FA_ENCRYPTED    16384    /* E */
    #define FA_VOLCOMP      32768    /* M */
+   #define FA_PINNED       524288
+   #define FA_UNPINNED     1048576
 #endif
 
 #if defined( HB_OS_UNIX ) || defined( HB_OS_OS2 )
@@ -220,7 +223,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    #endif
 #endif
 
-ULONG hb_fsGetFileAttributes( const char * szFile )
+HB_FATTR hb_fsGetFileAttributes( const char * szFile )
 {
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
@@ -239,17 +242,17 @@ ULONG hb_fsGetFileAttributes( const char * szFile )
       iAttri = _chmod(  szFile, 0  );
       #endif
 
-      return ( ULONG ) iAttri;
+      return ( HB_FATTR ) iAttri;
    }
    else
    {
-      return ( ULONG ) fsOldFiles.ff_attrib;
+      return ( HB_FATTR ) fsOldFiles.ff_attrib;
    }
       #endif
 
    #elif defined( HB_OS_WIN )
    {
-      ULONG dAttr;
+      HB_FATTR dAttr;
 
       if( szFile )
       {
@@ -260,11 +263,11 @@ ULONG hb_fsGetFileAttributes( const char * szFile )
       {
          dAttr = Lastff32.dwFileAttributes;
       }
-      return ( ULONG ) dAttr;
+      return ( HB_FATTR ) dAttr;
 
    }
    #else
-   return ( ULONG ) FA_ARCH;
+   return ( HB_FATTR ) FA_ARCH;
    #endif
 }
 
@@ -324,6 +327,14 @@ HB_FUNC( SETFATTR )
       if( iAttr & FILE_ATTRIBUTE_ARCHIVE )
          dwFlags |= FILE_ATTRIBUTE_ARCHIVE;
 
+	  if( iAttr & FA_PINNED )
+         dwFlags |= FILE_ATTRIBUTE_PINNED;
+
+	  if( iAttr & FA_UNPINNED )
+         dwFlags |= FILE_ATTRIBUTE_UNPINNED;
+
+	 
+	 
       lSuccess = SetFileAttributes( cFile, dwFlags );
 
       if( lSuccess )
@@ -535,15 +546,15 @@ HB_FUNC( FILESIZE )
       }
       else
       {
-         if( Lastff32.nFileSizeHigh > 0 )
-         {
+         //if( Lastff32.nFileSizeHigh > 0 )
+        // {
             
             dwFileSize = ( HB_FOFFSET ) Lastff32.nFileSizeLow + ( ( HB_FOFFSET ) Lastff32.nFileSizeHigh << 32 ); 
-         }
-         else
-         {
-            dwFileSize = Lastff32.nFileSizeLow;
-         }
+        // }
+        // else
+         //{
+         //   dwFileSize = Lastff32.nFileSizeLow;
+        // }
          hb_retnint( dwFileSize );
       }
    }
@@ -720,16 +731,16 @@ HB_FUNC( FILEDATE )
          if( ! iFind )
          {
             if( ( iAttr > 0 ) & ( iAttr & fsFiles.ff_attrib ) )
-               hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) + 1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG ) fsFiles.ff_fdate & ~0xFFE0 );
+               hb_retd(  ( fsFiles.ff_fdate >> 9 ) + 1980,  ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ),  fsFiles.ff_fdate & ~0xFFE0 );
             else
-               hb_retd( ( LONG ) ( fsFiles.ff_fdate >> 9 ) + 1980, ( LONG ) ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG ) fsFiles.ff_fdate & ~0xFFE0 );
+               hb_retd(  ( fsFiles.ff_fdate >> 9 ) + 1980, ( ( fsFiles.ff_fdate & ~0xFE00 ) >> 5 ),  fsFiles.ff_fdate & ~0xFFE0 );
             hb_fsFindClose( iFind );
          }
          else
             hb_retds( "        " );
       }
       else
-         hb_retd( ( LONG ) ( fsOldFiles.ff_fdate >> 9 ) + 1980, ( LONG ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG ) fsOldFiles.ff_fdate & ~0xFFE0 );
+         hb_retd(  ( fsOldFiles.ff_fdate >> 9 ) + 1980,  ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ),  fsOldFiles.ff_fdate & ~0xFFE0 );
    }
 
 #elif defined( HB_OS_UNIX ) || defined( HB_OS_OS2 )
@@ -1015,7 +1026,7 @@ HB_FUNC( SETFDATI )
 #if defined( HB_OS_WIN ) && ! defined( __CYGWIN__ )
       #if 1
       {
-         LONG lJulian, lMillisec;
+         long lJulian, lMillisec;
 
          lJulian     = pDate ? hb_dateEncode( year, month, day ) : -1;
          lMillisec   = pTime ? hb_timeStampEncode( hour, minute, second, 0 ) : -1;
@@ -1149,7 +1160,7 @@ HB_FUNC( SETFDATI )
       }
 #else
       {
-         LONG lJulian, lMillisec;
+         long lJulian, lMillisec;
 
          lJulian     = pDate ? hb_dateEncode( year, month, day ) : -1;
          lMillisec   = pTime ? hb_timeStampEncode( hour, minute, second, 0 ) : -1;

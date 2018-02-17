@@ -66,7 +66,7 @@
 HB_EXTERN_BEGIN
 
 #if defined( HB_OS_WIN )
-
+#include "windows.h"
 static HMODULE hModule = NULL;
 static FARPROC pExtIsArray = NULL;
 static FARPROC hb_GetProcAddress( char * szFuncName );

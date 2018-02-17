@@ -97,7 +97,7 @@
       #define HB_USE_LARGEFILE64
    #endif
 #endif
-#if ! defined( HB_WIN32_IO )
+#if ! defined( HB_OS_WIN )
 static BOOL fsGetTempDirByCase( char * pszName, const char * pszTempDir, HB_BOOL fTrans )
 {
    BOOL fOK = FALSE;
@@ -140,7 +140,7 @@ static BOOL fsGetTempDirByCase( char * pszName, const char * pszTempDir, HB_BOOL
 }
 #endif
 
-static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszName, const char * pszExt )
+static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefix, HB_FATTR ulAttr, char * pszName, const char * pszExt )
 {
    /* less attemps */
    int         iAttemptLeft = 99, iLen;
@@ -156,7 +156,7 @@ static HB_FHANDLE hb_fsCreateTempLow( const char * pszDir, const char * pszPrefi
       }
       else
       {
-#if defined( HB_WIN32_IO )
+#if defined( HB_OS_WIN )
          if( ! GetTempPathA( ( DWORD ) ( HB_PATH_MAX - 1 ), ( LPSTR ) pszName ) )
          {
             pszName[ 0 ]   = '.';
@@ -264,7 +264,7 @@ static BOOL hb_fsTempName( char * pszBuffer, const char * pszDir, const char * p
 {
    BOOL fResult;
 
-#if defined( HB_WIN32_IO )
+#if defined( HB_OS_WIN )
    {
       char cTempDir[ HB_PATH_MAX ];
 
@@ -303,7 +303,7 @@ static BOOL hb_fsTempName( char * pszBuffer, const char * pszDir, const char * p
 
 /* NOTE: The pszName buffer must be at least HB_PATH_MAX chars long */
 
-HB_FHANDLE hb_fsCreateTemp( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszName )
+HB_FHANDLE hb_fsCreateTemp( const char * pszDir, const char * pszPrefix, HB_FATTR ulAttr, char * pszName )
 {
    USHORT nAttemptLeft = 999;
 
@@ -331,7 +331,7 @@ HB_FHANDLE hb_fsCreateTemp( const char * pszDir, const char * pszPrefix, ULONG u
 }
 #else
 
-HB_FHANDLE hb_fsCreateTemp( const char * pszDir, const char * pszPrefix, ULONG ulAttr, char * pszName )
+HB_FHANDLE hb_fsCreateTemp( const char * pszDir, const char * pszPrefix, HB_FATTR ulAttr, char * pszName )
 {
    return hb_fsCreateTempLow( pszDir, pszPrefix, ulAttr, pszName, NULL );
 }
@@ -344,13 +344,13 @@ HB_FUNC( HB_FTEMPCREATE )
 
    hb_retnint( ( HB_NHANDLE ) hb_fsCreateTemp( hb_parc( 1 ),
                                                hb_parc( 2 ),
-                                               ( ULONG ) ( ISNUM( 3 ) ? ( ULONG ) hb_parnl( 3 ) : FC_NORMAL ),
+                                               ( HB_FATTR ) hb_parnldef( 3, FC_NORMAL ),
                                                szName ) );
 
    hb_storc( szName, 4 );
 }
 
-HB_FHANDLE hb_fsCreateTempEx( char * pszName, const char * pszDir, const char * pszPrefix, const char * pszExt, ULONG ulAttr )
+HB_FHANDLE hb_fsCreateTempEx( char * pszName, const char * pszDir, const char * pszPrefix, const char * pszExt, HB_FATTR ulAttr )
 {
    return hb_fsCreateTempLow( pszDir, pszPrefix, ulAttr, pszName, pszExt );
 }
@@ -363,7 +363,7 @@ HB_FUNC( HB_FTEMPCREATEEX )
                                                  hb_parc( 2 ),
                                                  hb_parc( 3 ),
                                                  hb_parc( 4 ),
-                                                 ( ULONG ) ( ISNUM( 5 ) ? ( ULONG ) hb_parnl( 5 ) : FC_NORMAL ) ) );
+                                                 ( HB_FATTR ) hb_parnldef( 5, FC_NORMAL ) ) );
 
    hb_storc( szName, 1 );
 }

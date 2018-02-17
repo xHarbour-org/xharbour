@@ -355,7 +355,7 @@ static HANDLE DosToWinHandle( HB_FHANDLE fHandle )
       return ( HANDLE ) fHandle;
 }
 
-static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
+static void convert_open_flags( BOOL fCreate, HB_FATTR ulAttr, USHORT uiFlags,
                                 DWORD * dwMode, DWORD * dwShare,
                                 DWORD * dwCreat, DWORD * dwAttr )
 {
@@ -451,7 +451,7 @@ static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
 
 #elif defined( HB_OS2_IO )
 
-static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
+static void convert_open_flags( BOOL fCreate, HB_FATTR ulAttr, USHORT uiFlags,
                                 ULONG * ulAttribute,
                                 ULONG * fsOpenFlags,
                                 ULONG * fsOpenMode )
@@ -537,11 +537,11 @@ static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
 
 #else
 
-static void convert_open_flags( BOOL fCreate, ULONG ulAttr, USHORT uiFlags,
+static void convert_open_flags( BOOL fCreate, HB_FATTR ulAttr, USHORT uiFlags,
                                 int * flags, unsigned * mode,
                                 int * share, int * attr )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "convert_open_flags(%d, %lu, %hu, %p, %p, %p, %p)", fCreate, ulAttr, uiFlags, flags, mode, share, attr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "convert_open_flags(%d, %u, %hu, %p, %p, %p, %p)", fCreate, ulAttr, uiFlags, ( void * ) flags, ( void * ) mode, ( void * ) share, ( void * ) attr ) );
 
    /* file access mode */
 #if defined( HB_OS_UNIX )
@@ -1741,13 +1741,13 @@ HB_FHANDLE hb_fsOpen( const char * pFilename, USHORT uiFlags )
    return hFileHandle;
 }
 
-HB_FHANDLE hb_fsCreate( const char * pFilename, ULONG ulAttr )
+HB_FHANDLE hb_fsCreate( const char * pFilename, HB_FATTR ulAttr )
 {
    HB_THREAD_STUB
    HB_FHANDLE  hFileHandle;
    char *      pszFree;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCreate(%p, %lu)", pFilename, ulAttr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCreate(%p, %u)", pFilename, ulAttr ) );
 
    pFilename = hb_fsNameConv( pFilename, &pszFree );
 
@@ -1838,13 +1838,13 @@ HB_FHANDLE hb_fsCreate( const char * pFilename, ULONG ulAttr )
          [vszakats]
  */
 
-HB_FHANDLE hb_fsCreateEx( const char * pFilename, ULONG ulAttr, USHORT uiFlags )
+HB_FHANDLE hb_fsCreateEx( const char * pFilename, HB_FATTR ulAttr, USHORT uiFlags )
 {
    HB_THREAD_STUB
    HB_FHANDLE  hFileHandle;
    char *      pszFree;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCreateEx(%p, %lu, %hu)", pFilename, ulAttr, uiFlags ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCreateEx(%p, %u, %hu)", pFilename, ulAttr, uiFlags ) );
 
    pFilename = hb_fsNameConv( pFilename, &pszFree );
 
@@ -2032,12 +2032,12 @@ BOOL hb_fsSetDevMode( HB_FHANDLE hFileHandle, USHORT uiDevMode )
 #endif
 }
 
-BOOL hb_fsGetFileTime( const char * pszFileName, LONG * plJulian, LONG * plMillisec )
+BOOL hb_fsGetFileTime( const char * pszFileName, long * plJulian, long * plMillisec )
 {
    HB_THREAD_STUB
    BOOL fResult;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsGetFileTime(%s, %p, %p)", pszFileName, plJulian, plMillisec ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsGetFileTime(%s, %p, %p)", pszFileName, ( void * ) plJulian, ( void * ) plMillisec ) );
 
    fResult = FALSE;
 
@@ -2117,12 +2117,12 @@ BOOL hb_fsGetFileTime( const char * pszFileName, LONG * plJulian, LONG * plMilli
    return fResult;
 }
 
-BOOL hb_fsGetAttr( const char * pszFileName, ULONG * pulAttr )
+BOOL hb_fsGetAttr( const char * pszFileName, HB_FATTR * pulAttr )
 {
    BOOL     fResult;
    char *   pszFree;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsGetAttr(%s, %p)", pszFileName, pulAttr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsGetAttr(%s, %p)", pszFileName, (void *) pulAttr ) );
 
    fResult     = FALSE;
    pszFileName = hb_fsNameConv( pszFileName, &pszFree );
@@ -2213,7 +2213,7 @@ BOOL hb_fsGetAttr( const char * pszFileName, ULONG * pulAttr )
    return fResult;
 }
 
-BOOL hb_fsSetFileTime( const char * pszFileName, LONG lJulian, LONG lMillisec )
+BOOL hb_fsSetFileTime( const char * pszFileName, long lJulian, long lMillisec )
 {
    BOOL  fResult;
    int   iYear, iMonth, iDay;
@@ -2601,7 +2601,7 @@ USHORT hb_fsWrite( HB_FHANDLE hFileHandle, const void * pBuff, USHORT uiCount )
 HB_SIZE hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount )
 {
    HB_THREAD_STUB
-   ULONG ulRead;
+   HB_SIZE ulRead;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsReadLarge(%p, %p, %" HB_PFS "u)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount ) );
 
@@ -2783,9 +2783,9 @@ HB_SIZE hb_fsWriteLarge( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE ulC
 HB_SIZE hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount, HB_FOFFSET llOffset )
 {
    HB_THREAD_STUB
-   ULONG ulRead;
+   HB_SIZE ulRead;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_fsReadAt(%p, %p, %lu, %" PFHL "i)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount, llOffset ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsReadAt(%p, %p, %" HB_PFS "u, %" PFHL "i)", ( void * ) ( HB_PTRDIFF ) hFileHandle, pBuff, ulCount, llOffset ) );
 
 #if defined( HB_FS_FILE_IO )
 

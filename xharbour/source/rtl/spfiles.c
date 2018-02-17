@@ -193,12 +193,12 @@ HB_FHANDLE hb_spOpen( const char * pFilename, USHORT uiFlags )
       return hb_fsOpen( pFilename, uiFlags );
 }
 
-HB_FHANDLE hb_spCreate( const char * pFilename, ULONG ulAttr )
+HB_FHANDLE hb_spCreate( const char * pFilename, HB_FATTR ulAttr )
 {
    char        path[ HB_PATH_MAX ];
    PHB_FNAME   pFilepath;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreate(%p, %lu)", pFilename, ulAttr ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreate(%p, %u)", ( const void * ) pFilename, ulAttr ) );
 
    pFilepath = hb_fsFNameSplit( pFilename );
    if( ! pFilepath->szPath )
@@ -210,12 +210,12 @@ HB_FHANDLE hb_spCreate( const char * pFilename, ULONG ulAttr )
    return hb_fsCreate( path, ulAttr );
 }
 
-HB_FHANDLE hb_spCreateEx( const char * pFilename, ULONG ulAttr, USHORT uiFlags )
+HB_FHANDLE hb_spCreateEx( const char * pFilename, HB_FATTR ulAttr, USHORT uiFlags )
 {
    char        path[ HB_PATH_MAX ];
    PHB_FNAME   pFilepath;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreateEx(%p, %lu, %hu)", pFilename, ulAttr, uiFlags ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_spCreateEx(%p, %u, %hu)", ( const void * ) pFilename, ulAttr, uiFlags ) );
 
    pFilepath = hb_fsFNameSplit( pFilename );
    if( ! pFilepath->szPath )

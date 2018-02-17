@@ -250,6 +250,21 @@ HB_EXTERN_BEGIN
                   } \
                } \
                while( 0 )
+#  if HB_INT_MAX >= LONG_MAX
+#     define HB_ITEM_PUT_LONGRAW( p, v )  \
+               do { \
+                  (p)->type = HB_IT_INTEGER; \
+                  (p)->item.asInteger.value = ( int ) (v); \
+                  (p)->item.asInteger.length = HB_INT_LENGTH( v ); \
+               } while( 0 )
+#  else
+#     define HB_ITEM_PUT_LONGRAW( p, v )  \
+               do { \
+                  (p)->type = HB_IT_LONG; \
+                  (p)->item.asLong.value = (v); \
+                  (p)->item.asLong.length = HB_LONG_LENGTH( v ); \
+               } while( 0 )
+#  endif
 
 // Should NEVER be called directly - always use HB_STRING_ALLOC()
 #define __HB_STRING_REALLOC( p, len ) \
