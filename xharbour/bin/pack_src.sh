@@ -527,6 +527,22 @@ $hb_collect contrib/png/*.[ch]
 $hb_collect contrib/png/*.c
 $hb_collect contrib/png/*.h
 $hb_collect contrib/png/Makefile
+#rddsql
+$hb_collect contrib/rddsql/hbrddsql.ch
+$hb_collect contrib/rddsql/*.c
+$hb_collect contrib/rddsql/hbrddsql.h
+$hb_collect contrib/rddsql/Makefile
+#hbhpdf
+$hb_collect contrib/hbhpdf/*.[ch]
+$hb_collect contrib/hbhpdf/*.c
+$hb_collect contrib/hbhpdf/*.h
+$hb_collect contrib/hbhpdf/Makefile
+#sddodbc
+$hb_collect contrib/sddodbc/*.[ch]
+$hb_collect contrib/sddodbc/*.c
+$hb_collect contrib/sddodbc/*.h
+$hb_collect contrib/sddodbc/Makefile
+
 }
 
 hb_flst=`cd "$hb_rootdir";hb_collect_all|grep -v "[*?[]"`

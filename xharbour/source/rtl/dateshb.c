@@ -250,6 +250,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
             case 's':
                if( s_pos == 0 )
                   s_pos = digit++;
+            /* fallthrough */			  
             case 'C':
             case 'c':
                if( c_pos == 0 )
@@ -257,6 +258,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
                   if( s_pos != 0 )
                      c_pos = s_pos;
                }
+			 /* fallthrough */   
             case 'P':
             case 'p':
                if( p_pos == 0 )
@@ -268,6 +270,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
                      count++;
                   }
                }
+			   
          }
       }
 

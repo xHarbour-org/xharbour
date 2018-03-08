@@ -406,7 +406,7 @@ HB_FUNC( HB_COMPRESS )
       cDest    = ( char * ) hb_xgrab( ulDstlen + 1 );
    }
 
-   cerr = compress( ( Bytef * ) cDest, ( uLongf * ) &ulDstlen, ( const Bytef * ) cSource,  ulSrclen,
+   cerr = compress2( ( Bytef * ) cDest, ( uLongf * ) &ulDstlen, ( const Bytef * ) cSource,  ulSrclen,
                     nCompFactor );
 
    if( cerr != Z_OK )

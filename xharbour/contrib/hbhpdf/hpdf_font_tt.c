@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_font_tt.c
  *
  * URL: http://libharu.org
@@ -183,6 +180,7 @@ CreateDescriptor  (HPDF_Font  font)
         ret += HPDF_Dict_AddName (descriptor, "Type", "FontDescriptor");
         ret += HPDF_Dict_AddNumber (descriptor, "Ascent", def->ascent);
         ret += HPDF_Dict_AddNumber (descriptor, "Descent", def->descent);
+        ret += HPDF_Dict_AddNumber (descriptor, "CapHeight", def->cap_height);
         ret += HPDF_Dict_AddNumber (descriptor, "Flags", def->flags);
 
         array = HPDF_Box_Array_New (font->mmgr, def->font_bbox);
@@ -310,14 +308,14 @@ MeasureText (HPDF_Font          font,
             tmp_len = i + 1;
 
             if (real_width)
-                *real_width = (HPDF_REAL) w;
+                *real_width = (HPDF_REAL)w;
 
             w += word_space;
         } else if (!wordwrap) {
             tmp_len = i;
 
             if (real_width)
-                *real_width = (HPDF_REAL) w;
+                *real_width = (HPDF_REAL)w;
         }
 
         w += (HPDF_DOUBLE)CharWidth (font, b) * font_size / 1000;
@@ -332,7 +330,7 @@ MeasureText (HPDF_Font          font,
 
     /* all of text can be put in the specified width */
     if (real_width)
-        *real_width = (HPDF_REAL) w;
+        *real_width = (HPDF_REAL)w;
     return len;
 }
 

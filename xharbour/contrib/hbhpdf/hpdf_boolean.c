@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_boolean.c
  *
  * URL: http://libharu.org

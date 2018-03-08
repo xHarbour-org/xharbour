@@ -1823,15 +1823,15 @@ HB_FUNC( ADSGETNUMACTIVELINKS )         /* Only valid for a DataDict */
 HB_FUNC( ADSDDCREATEREFINTEGRITY)
 {
 #if ADS_LIB_VERSION >= 600
-	hb_retl( AdsDDCreateRefIntegrity( HB_ADS_PARCONNECTION( 4 ) /*hConnect*/,
-							( UNSIGNED8 * ) hb_parcx( 1 ) /* pRIName */,
-							( UNSIGNED8 * ) hb_parcx( 2 ) /* pFailTable */,
-							( UNSIGNED8 * ) hb_parcx( 3 ) /* pParentTable */,
-							( UNSIGNED8 * ) hb_parcx( 4 ) /* pPaerntTagName */,
-							( UNSIGNED8 * ) hb_parcx( 5 ) /* pChildTable */,
-							( UNSIGNED8 * ) hb_parcx( 6 ) /* pChildTagName */,
-							( UNSIGNED16 ) hb_parcx( 7 ) /* pUpdateRule */,
-							( UNSIGNED16 ) hb_parcx( 8 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
+	hb_retl( AdsDDCreateRefIntegrity( HB_ADS_PARCONNECTION( 1 ) /*hConnect*/,
+							( UNSIGNED8 * ) hb_parcx( 2 ) /* pRIName */,
+							( UNSIGNED8 * ) hb_parcx( 3 ) /* pFailTable */,
+							( UNSIGNED8 * ) hb_parcx( 4 ) /* pParentTable */,
+							( UNSIGNED8 * ) hb_parcx( 5 ) /* pPaerntTagName */,
+							( UNSIGNED8 * ) hb_parcx( 6 ) /* pChildTable */,
+							( UNSIGNED8 * ) hb_parcx( 7 ) /* pChildTagName */,
+							( UNSIGNED16 ) hb_parcx( 8 ) /* pUpdateRule */,
+							( UNSIGNED16 ) hb_parcx( 9 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
 #else
    hb_retl( FALSE );
 #endif
@@ -2190,7 +2190,7 @@ HB_FUNC( ADSDDSETTABLEPROPERTY )       /* cTableName, nProperty, xNewValue, [nCo
       {
          ulBuffer = (UNSIGNED16) hb_itemGetL( pPropValue );
          ulRetVal = AdsDDSetTableProperty( hConnect, pTableName,
-                           ulPropertyID, &ulBuffer, 2, NULL, NULL );
+                           ulPropertyID, &ulBuffer, 2, ADS_NO_VALIDATE, NULL );
          break;
       }
 // for other types:

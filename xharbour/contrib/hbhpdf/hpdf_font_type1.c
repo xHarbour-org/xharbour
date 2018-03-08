@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_font_type1.c
  *
  * URL: http://libharu.org

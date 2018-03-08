@@ -62,14 +62,14 @@ HB_FUNC( HB_POINTER2STRING )
 
    if( HB_IS_POINTER( pPointer ) && pLen )
    {
-      hb_retclenStatic( ( char * ) hb_itemGetPtr( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) hb_itemGetPtr( pPointer ), hb_itemGetNS( pLen ) );
    }
    else if( HB_IS_INTEGER( pPointer ) && pLen )
    {
 #if defined ( HB_OS_WIN_64 )
-      hb_retclenStatic( ( char * ) ( HB_LONG ) hb_itemGetNI( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) ( HB_LONG ) hb_itemGetNI( pPointer ),  hb_itemGetNS( pLen ) );
 #else
-      hb_retclenStatic( ( char * ) hb_itemGetNI( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) ( HB_PTRUINT ) hb_itemGetNI( pPointer ),  hb_itemGetNS( pLen ) );
 #endif
    }
    else if( HB_IS_LONG( pPointer ) && pLen )
@@ -77,7 +77,7 @@ HB_FUNC( HB_POINTER2STRING )
 #if defined ( HB_OS_WIN_64 )
       hb_retclenStatic( ( char * ) ( HB_LONG ) hb_itemGetNL( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
 #else
-      hb_retclenStatic( ( char * ) hb_itemGetNL( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( ( char * ) ( HB_PTRUINT ) hb_itemGetNL( pPointer ), ( ULONG ) hb_itemGetNL( pLen ) );
 #endif
    }
    else

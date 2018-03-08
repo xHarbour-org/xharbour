@@ -83,6 +83,9 @@
 #define O_HB_ITEMPUTSTR( itm, str )             hb_itemPutC( itm, str )
 #define O_HB_ITEMPUTSTRLEN( itm, str, len )     hb_itemPutCL( itm, str, len )
 #define O_HB_CHAR    char
+#define O_HB_CHARDUP( str )                     hb_strdup( str )
+#define O_HB_STRLEN( str )                      strlen( str )
+#define O_HB_OSSTRDUP( str )                    hb_strdup( str )
 
 /*
 ====================================================================
@@ -111,7 +114,7 @@ typedef struct _SQLBASEAREA
 
    ULONG                   ulConnection;
    struct _SQLDDCONNECTION *  pConnection;
-   struct _SDDNODE *       pSDD;
+   const struct _SDDNODE * pSDD;
 
    char *                  szQuery;       /* SQL query */
 
@@ -273,6 +276,7 @@ typedef struct _SDDNODE
 #define ESQLDD_NULLSDD             1911
 #define ESQLDD_CONNALLOC           1912
 #define ESQLDD_ENVALLOC            1913
+#define ESQLDD_EXECUTE       1914
 
 HB_EXTERN_BEGIN
 

@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_info.c
  *
  * URL: http://libharu.org
@@ -22,7 +19,7 @@
 #include "hpdf_utils.h"
 #include "hpdf_info.h"
 
-static const char  *HPDF_INFO_ATTR_NAMES[] = {
+static const char * const HPDF_INFO_ATTR_NAMES[] = {
     "CreationDate",
     "ModDate",
     "Author",

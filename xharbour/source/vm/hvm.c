@@ -2343,7 +2343,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                }
             }
          /* Intentionally FALL through. */
-
+         /* fallthrough */
          case HB_P_SEQBEGIN:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_SEQBEGIN" ) );
             {
@@ -2444,7 +2444,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 #endif /* DEBUG_FINALLY */
 
          /* Intentionally FALL through. */
-
+         /* fallthrough */
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ( "HB_P_SEQEND" ) );
 
@@ -2500,7 +2500,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 
             w += 3;
          /* Intentionally FALL through. */
-
+         /* fallthrough */
          case HB_P_SEQRECOVER:
          {
             PHB_SEQUENCE pFree = HB_VM_STACK.pSequence;
@@ -3452,6 +3452,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                   case HB_P_PUSHSYMNEAR:
                      pSymTemp = pSymbols + ( USHORT ) ( pCode[ w + 1 ] );
                      uiJump   = 2;
+					 /* fallthrough */
                   case HB_P_MPUSHSYM:
                   {
                      PHB_DYNS pDynSym = ( PHB_DYNS ) HB_GET_PTR( pCode + w + 1 );
@@ -3459,6 +3460,7 @@ void hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
                      pSymTemp = pDynSym->pSymbol;
                      uiJump   = sizeof( PHB_DYNS ) + 1;
                   }
+				  /* fallthrough */
                   default:
                      pSymTemp = pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                      uiJump   = 3;

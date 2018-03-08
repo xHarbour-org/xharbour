@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_outline.c
  *
  * URL: http://libharu.org
@@ -70,7 +67,7 @@ HPDF_OutlineRoot_New  (HPDF_MMgr   mmgr,
     open_flg->header.obj_id |= HPDF_OTYPE_HIDDEN;
 
     ret += HPDF_Dict_Add (outline, "_OPENED", open_flg);
-    ret += HPDF_Dict_AddName (outline, "Type", "Outline");
+    ret += HPDF_Dict_AddName (outline, "Type", "Outlines");
 
     if (ret != HPDF_OK)
         return NULL;
@@ -120,7 +117,7 @@ HPDF_Outline_New  (HPDF_MMgr          mmgr,
     open_flg->header.obj_id |= HPDF_OTYPE_HIDDEN;
     ret += HPDF_Dict_Add (outline, "_OPENED", open_flg);
 
-    ret += HPDF_Dict_AddName (outline, "Type", "Outline");
+    ret += HPDF_Dict_AddName (outline, "Type", "Outlines");
     ret += AddChild (parent, outline);
 
     if (ret != HPDF_OK)
@@ -238,7 +235,7 @@ BeforeWrite  (HPDF_Dict obj)
         return HPDF_Dict_RemoveElement (obj, "Count");
 
     if (!HPDF_Outline_GetOpened ((HPDF_Outline)obj))
-        count *= (HPDF_UINT) -1;
+        count = count * -1;
 
     if (n)
         n->value = count;

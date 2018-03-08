@@ -60,9 +60,9 @@ int ZEXPORT compress2 ( Bytef *dest, uLongf *destLen, const Bytef *source, uLong
 
 /* ===========================================================================
  */
-int ZEXPORT compress ( Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen, int iLevel )
+int ZEXPORT compress ( Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen )
 {
-    return compress2(dest, destLen, source, sourceLen, iLevel);
+    return compress2(dest, destLen, source, sourceLen, Z_DEFAULT_COMPRESSION);
 }
 
 /* ===========================================================================

@@ -1225,7 +1225,7 @@ ZEXTERN uLong ZEXPORT zlibCompileFlags OF((void));
 */
 
 ZEXTERN int ZEXPORT compress OF((Bytef *dest,   uLongf *destLen,
-                                 const Bytef *source, uLong sourceLen, int iLevel));
+                                 const Bytef *source, uLong sourceLen));
 /*
      Compresses the source buffer into the destination buffer.  sourceLen is
    the byte length of the source buffer.  Upon entry, destLen is the total size

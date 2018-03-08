@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_image.c
  *
  * URL: http://libharu.org
@@ -17,11 +14,10 @@
  * It is provided "as is" without express or implied warranty.
  *
  */
-#include "hbdefs.h"
+
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf_image.h"
-#include "string.h"
 
 #ifndef LIBHPDF_HAVE_NOPNGLIB
 #if !defined(HB_OS_WIN)
@@ -29,6 +25,7 @@
 #else
 #include <pngpriv.h>
 #endif
+#include <string.h>
 
 static void
 PngErrorFunc  (png_structp       png_ptr,
@@ -204,7 +201,7 @@ ReadTransparentPaletteData  (HPDF_Dict    image,
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
-				for (; i != 0; i--) {
+				for (; i > 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
 				}
 				HPDF_FreeMem (image->mmgr, row_ptr);
@@ -248,7 +245,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 	HPDF_STATUS ret = HPDF_OK;
 	HPDF_INT row_len;
 	HPDF_UINT i, j;
-	png_bytep *row_ptr, row = 0;
+	png_bytep *row_ptr, row;
 	png_byte color_type;
 	png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
 	png_uint_32 width = png_get_image_width(png_ptr, info_ptr);
@@ -268,7 +265,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 		for (i = 0; i < (HPDF_UINT)height; i++) {
 			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
-				for (; i != 0; i--) {
+				for (; i > 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
 				}
 				HPDF_FreeMem (image->mmgr, row_ptr);
@@ -454,8 +451,7 @@ LoadPngData  (HPDF_Dict     image,
 	}
 
 	png_set_sig_bytes (png_ptr, HPDF_PNG_BYTES_TO_CHECK);
-	png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)PngReadFunc);
-	// png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
+	png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
 
 	/* reading info structure. */
 	png_read_info(png_ptr, info_ptr);
@@ -482,7 +478,7 @@ LoadPngData  (HPDF_Dict     image,
 		HPDF_Dict smask;
 		png_bytep smask_data;
 
-		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ||
+		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) || 
 			!png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, NULL)) {
 			goto no_transparent_color_in_palette;
 		}

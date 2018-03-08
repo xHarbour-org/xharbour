@@ -3753,6 +3753,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                dbFieldInfo.uiFlags  |= HB_FF_BINARY;
                break;
             }
+         /* fallthrough */
          case 'O': /* dBase IV double */
          case '8':
             dbFieldInfo.uiType   = HB_FT_DOUBLE;
@@ -3862,6 +3863,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pArea->area.uNullFlagField = uiCount;
                break;
             }
+			/* fallthrough */
 #else
             if( pArea->bTableType == DB_DBF_VFP && pField->bFieldFlags & 0x01 )
             {
@@ -3872,6 +3874,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pArea->uiRecordLen += dbFieldInfo.uiLen;
                continue;
             }
+			/* fallthrough */
 #endif
             else if( memcmp( dbFieldInfo.atomName, "_DBASELOCK", 10 ) == 0 )
             {
@@ -3880,7 +3883,7 @@ static HB_ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pArea->uidbaselock   = uiCount;
                break;
             }
-
+         /* fallthrough */
          default:
             errCode = HB_FAILURE;
             break;
@@ -4878,6 +4881,7 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
             case 0x31:  /* Visual FoxPro w. AutoIncrement field */
             case 0x32:  /* Visual FoxPro, autoincrement enabled */
                pArea->fAutoInc   = TRUE;
+			 /* fallthrough */   
             case 0x30:  /* Visual FoxPro w. DBC or Visual FoxPro */
                pArea->bTableType = DB_DBF_VFP;
                if( pArea->dbfHeader.bHasTags & 0x02 )
@@ -4936,6 +4940,7 @@ static HB_ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
             case 0x7B:  /* dBASE IV with memo */
             case 0x8B:  /* dBASE IV w. memo */
                pArea->bTableType = DB_DBF_IV;
+			/* fallthrough */
             case 0x83:  /* dBASE III+ with memo file DBT*/
                pArea->fHasMemo   = TRUE;
                pArea->bMemoType  = DB_MEMO_DBT;

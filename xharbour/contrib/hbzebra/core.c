@@ -51,12 +51,10 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 #include "hbstack.h"
 
 
-/* ================ Bit buffer ================ */
+/* --- Bit buffer --- */
 
 PHB_BITBUFFER hb_bitbuffer_create( void )
 {
@@ -74,7 +72,7 @@ void hb_bitbuffer_destroy( PHB_BITBUFFER pBitBuffer )
 }
 
 
-ULONG hb_bitbuffer_len( PHB_BITBUFFER pBitBuffer )
+HB_SIZE hb_bitbuffer_len( PHB_BITBUFFER pBitBuffer )
 {
    return pBitBuffer->nLen;
 }
@@ -86,18 +84,18 @@ unsigned char * hb_bitbuffer_buffer( PHB_BITBUFFER pBitBuffer )
 }
 
 
-BOOL hb_bitbuffer_get( PHB_BITBUFFER pBitBuffer, ULONG nPos )
+HB_BOOL hb_bitbuffer_get( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos )
 {
-   return nPos > pBitBuffer->nLen ? FALSE :
+   return nPos > pBitBuffer->nLen ? HB_FALSE :
           ( ( pBitBuffer->pBuffer[ nPos >> 3 ] >> ( nPos & 7 ) ) & 1 );
 }
 
 
-void hb_bitbuffer_set( PHB_BITBUFFER pBitBuffer, ULONG nPos, BOOL fValue )
+void hb_bitbuffer_set( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos, HB_BOOL fValue )
 {
    if( pBitBuffer->nAlloc * 8 <= nPos )
    {
-      ULONG  nNewAlloc = ( ( pBitBuffer->nAlloc >> 1 ) + nPos + 8 ) / 8;
+      HB_SIZE nNewAlloc = ( ( pBitBuffer->nAlloc >> 1 ) + nPos + 8 ) / 8;
       pBitBuffer->pBuffer = ( unsigned char * ) hb_xrealloc( pBitBuffer->pBuffer, nNewAlloc );
       hb_xmemset( pBitBuffer->pBuffer + pBitBuffer->nAlloc, 0, nNewAlloc - pBitBuffer->nAlloc );
       pBitBuffer->nAlloc = nNewAlloc;
@@ -113,11 +111,11 @@ void hb_bitbuffer_set( PHB_BITBUFFER pBitBuffer, ULONG nPos, BOOL fValue )
 }
 
 
-void hb_bitbuffer_not( PHB_BITBUFFER pBitBuffer, ULONG nPos )
+void hb_bitbuffer_not( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos )
 {
    if( pBitBuffer->nAlloc * 8 <= nPos )
    {
-      ULONG  nNewAlloc = ( ( pBitBuffer->nAlloc >> 1 ) + nPos + 8 ) / 8;
+      HB_SIZE nNewAlloc = ( ( pBitBuffer->nAlloc >> 1 ) + nPos + 8 ) / 8;
       pBitBuffer->pBuffer = ( unsigned char * ) hb_xrealloc( pBitBuffer->pBuffer, nNewAlloc );
       hb_xmemset( pBitBuffer->pBuffer + pBitBuffer->nAlloc, 0, nNewAlloc - pBitBuffer->nAlloc );
       pBitBuffer->nAlloc = nNewAlloc;
@@ -133,7 +131,7 @@ void hb_bitbuffer_cat_int( PHB_BITBUFFER pBitBuffer, int iValue, int iLen )
 
    if( ( pBitBuffer->nLen + iLen ) >= pBitBuffer->nAlloc * 8 )
    {
-      int  nNewAlloc = pBitBuffer->nAlloc + ( ( pBitBuffer->nAlloc >> 1 ) + iLen + 7 ) / 8;
+      HB_SIZE nNewAlloc = pBitBuffer->nAlloc + ( ( pBitBuffer->nAlloc >> 1 ) + iLen + 7 ) / 8;
       pBitBuffer->pBuffer = ( unsigned char * ) hb_xrealloc( pBitBuffer->pBuffer, nNewAlloc );
       hb_xmemset( pBitBuffer->pBuffer + pBitBuffer->nAlloc, 0, nNewAlloc - pBitBuffer->nAlloc );
       pBitBuffer->nAlloc = nNewAlloc;
@@ -154,7 +152,7 @@ void hb_bitbuffer_cat_int_rev( PHB_BITBUFFER pBitBuffer, int iValue, int iLen )
 
    if( ( pBitBuffer->nLen + iLen ) >= pBitBuffer->nAlloc * 8 )
    {
-      int  nNewAlloc = pBitBuffer->nAlloc + ( ( pBitBuffer->nAlloc >> 1 ) + iLen + 7 ) / 8;
+      HB_SIZE nNewAlloc = pBitBuffer->nAlloc + ( ( pBitBuffer->nAlloc >> 1 ) + iLen + 7 ) / 8;
       pBitBuffer->pBuffer = ( unsigned char * ) hb_xrealloc( pBitBuffer->pBuffer, nNewAlloc );
       hb_xmemset( pBitBuffer->pBuffer + pBitBuffer->nAlloc, 0, nNewAlloc - pBitBuffer->nAlloc );
       pBitBuffer->nAlloc = nNewAlloc;
@@ -169,7 +167,7 @@ void hb_bitbuffer_cat_int_rev( PHB_BITBUFFER pBitBuffer, int iValue, int iLen )
 }
 
 
-/* ================ GC pointer ================ */
+/* --- GC pointer --- */
 
 static HB_GARBAGE_FUNC( hb_zebra_destructor )
 {
@@ -226,7 +224,7 @@ void hb_zebra_ret( PHB_ZEBRA pZebra )
 }
 
 
-/* ================ Zebra ================ */
+/* --- Zebra --- */
 
 PHB_ZEBRA hb_zebra_create( void )
 {
@@ -261,17 +259,13 @@ HB_FUNC( HB_ZEBRA_GETERROR )
 {
    PHB_ZEBRA pZebra = hb_zebra_param( 1 );
    if( pZebra )
-   {
       hb_retni( pZebra->iError );
    }
-}
 
 
 HB_FUNC( HB_ZEBRA_GETCODE )
 {
    PHB_ZEBRA pZebra = hb_zebra_param( 1 );
    if( pZebra )
-   {
       hb_retc( pZebra->szCode );
    }
-}

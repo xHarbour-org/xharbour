@@ -377,6 +377,7 @@ static HB_ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiLen  = 10;
                break;
             }
+         /* fallthrough */
          /* else as HB_FT_DOUBLE */
          case '8':
             pFieldInfo.uiType = HB_FT_DOUBLE;
@@ -1898,6 +1899,7 @@ static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnecti
          }
          /* no break - return HB_FAILURE */
       }
+	  /* fallthrough */
       case RDDI_TABLEEXT:
       case RDDI_ORDBAGEXT:
       case RDDI_ORDEREXT:
@@ -1907,7 +1909,7 @@ static HB_ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnecti
       case RDDI_TRIGGER:
       case RDDI_PENDINGTRIGGER:
          hb_itemPutC( pItem, NULL );
-      /* no break - return HB_FAILURE */
+      /* fallthrough */ /* no break - return HB_FAILURE */
 
       default:
          return HB_FAILURE;

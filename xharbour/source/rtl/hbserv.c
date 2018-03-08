@@ -980,7 +980,7 @@ HB_FUNC( HB_SIGNALDESC )
 
       case SIGABRT:
          hb_retc( "Abort" );
-
+         return;
       case SIGUSR1:
          hb_retc( "User defined" );
          return;

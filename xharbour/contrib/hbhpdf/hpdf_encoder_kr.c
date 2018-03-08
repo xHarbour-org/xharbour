@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_encoder_kr.c
  *
  * URL: http://libharu.org
@@ -27645,7 +27642,7 @@ static HPDF_BOOL
 KSCms_UHC_IsLeadByte  (HPDF_Encoder    encoder,
                   HPDF_BYTE       b)
 {
-    ( void ) encoder;	
+    HPDF_UNUSED (encoder);
     return (b >= 0x81 && b <= 0xFE);
 }
 
@@ -27654,7 +27651,7 @@ static HPDF_BOOL
 KSCms_UHC_IsTrialByte  (HPDF_Encoder    encoder,
                    HPDF_BYTE       b)
 {
-    ( void ) encoder;	
+    HPDF_UNUSED (encoder);
     return (b >= 0x41 && b <= 0xfe);
 }
 
@@ -27812,7 +27809,7 @@ static HPDF_BOOL
 KSC_EUC_IsLeadByte  (HPDF_Encoder    encoder,
                    HPDF_BYTE       b)
 {
-    ( void ) encoder;
+    HPDF_UNUSED (encoder);
     return (b >= 0xa1 && b <= 0xfe);
 }
 
@@ -27821,7 +27818,7 @@ static HPDF_BOOL
 KSC_EUC_IsTrialByte  (HPDF_Encoder    encoder,
                     HPDF_BYTE       b)
 {
-    ( void ) encoder;	
+    HPDF_UNUSED (encoder);
     return (b >= 0xa0 && b <= 0xfe);
 }
 

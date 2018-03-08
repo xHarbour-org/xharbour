@@ -68,30 +68,34 @@ void bz_internal_error( int errcode )
 static void * hb_bz2Alloc( void * cargo, int nmemb, int size )
 {
    HB_SYMBOL_UNUSED( cargo );
-   return hb_xalloc( ( ULONG ) nmemb * size );
+
+   return ( nmemb > 0 && size > 0 ) ? hb_xalloc( ( HB_SIZE ) nmemb * size ) : NULL;
 }
 
 static void hb_bz2Free( void * cargo, void * ptr )
 {
    HB_SYMBOL_UNUSED( cargo );
+
+   if( ptr )
    hb_xfree( ptr );
 }
 
-static ULONG hb_bz2CompressBound( ULONG nLen )
+static HB_SIZE hb_bz2CompressBound( HB_SIZE nLen )
 {
-   ULONG nSize = nLen + nLen / 100 + 600;
-   return nSize < nLen ? LONG_MAX - 1 : nSize;
+   HB_SIZE nSize = nLen + nLen / 100 + 600;
+
+   return nSize < nLen ? HB_SIZE_MAX - 1 : nSize;
 }
 
-static int hb_bz2Compress( const char * szSrc, ULONG nSrc,
-                           char * szDst, ULONG * pnDst, int iBlockSize )
+static int hb_bz2Compress( const char * szSrc, HB_SIZE nSrc,
+                           char * szDst, HB_SIZE * pnDst, int iBlockSize )
 {
    bz_stream stream;
    int iResult;
 
    memset( &stream, 0, sizeof( stream ) );
 
-   stream.next_in   = ( char * ) szSrc;
+   stream.next_in  = ( char * ) HB_UNCONST( szSrc );
    stream.avail_in  = ( unsigned int ) nSrc;
 
    stream.next_out  = szDst;
@@ -99,21 +103,25 @@ static int hb_bz2Compress( const char * szSrc, ULONG nSrc,
 
    stream.bzalloc   = hb_bz2Alloc;
    stream.bzfree    = hb_bz2Free;
-/* stream.opaque    = NULL; */
+#if 0
+   stream.opaque  = NULL;
+#endif
 
    iResult = BZ2_bzCompressInit( &stream, iBlockSize, 0, 0 );
    if( iResult == BZ_OK )
    {
       do
+      {
          iResult = BZ2_bzCompress( &stream, BZ_FINISH );
+      }
       while( iResult == BZ_FINISH_OK );
 
       if( iResult == BZ_STREAM_END )
       {
-#if LONG_MAX <= UINT_MAX
-         *pnDst = ( ULONG ) stream.total_out_lo32;
+#if HB_SIZE_MAX <= UINT_MAX
+         *pnDst = ( HB_SIZE ) stream.total_out_lo32;
 #else
-         *pnDst = ( ( ULONG ) stream.total_out_hi32 << 32 ) |
+         *pnDst = ( ( HB_SIZE ) stream.total_out_hi32 << 32 ) |
                                 stream.total_out_lo32;
 #endif
          iResult = BZ_OK;
@@ -125,21 +133,23 @@ static int hb_bz2Compress( const char * szSrc, ULONG nSrc,
    return iResult;
 }
 
-static ULONG hb_bz2UncompressedSize( const char * szSrc, ULONG nLen,
+static HB_SIZE hb_bz2UncompressedSize( const char * szSrc, HB_SIZE nLen,
                                        int * piResult )
 {
    char buffer[ 1024 ];
    bz_stream stream;
-   ULONG nDest = 0;
+   HB_SIZE   nDest = 0;
 
    memset( &stream, 0, sizeof( stream ) );
 
-   stream.next_in   = ( char * ) szSrc;
+   stream.next_in  = ( char * ) HB_UNCONST( szSrc );
    stream.avail_in  = ( unsigned int ) nLen;
 
    stream.bzalloc   = hb_bz2Alloc;
    stream.bzfree    = hb_bz2Free;
-/* stream.opaque    = NULL; */
+#if 0
+   stream.opaque  = NULL;
+#endif
 
    *piResult = BZ2_bzDecompressInit( &stream, 0, 0 );
    if( *piResult == BZ_OK )
@@ -155,13 +165,13 @@ static ULONG hb_bz2UncompressedSize( const char * szSrc, ULONG nLen,
       if( *piResult == BZ_STREAM_END )
       {
          *piResult = BZ_OK;
-#if LONG_MAX <= UINT_MAX
+#if HB_SIZE_MAX <= UINT_MAX
          if( stream.total_out_hi32 != 0 )
             *piResult = BZ_MEM_ERROR;
          else
-            nDest = ( ULONG ) stream.total_out_lo32;
+            nDest = ( HB_SIZE ) stream.total_out_lo32;
 #else
-         nDest = ( ( ULONG ) stream.total_out_hi32 << 32 ) |
+         nDest = ( ( HB_SIZE ) stream.total_out_hi32 << 32 ) |
                                stream.total_out_lo32;
 #endif
       }
@@ -171,15 +181,15 @@ static ULONG hb_bz2UncompressedSize( const char * szSrc, ULONG nLen,
    return nDest;
 }
 
-static int hb_bz2Uncompress( const char * szSrc, ULONG nSrc,
-                             char * szDst, ULONG * pnDst )
+static int hb_bz2Uncompress( const char * szSrc, HB_SIZE nSrc,
+                             char * szDst, HB_SIZE * pnDst )
 {
    bz_stream stream;
    int iResult;
 
    memset( &stream, 0, sizeof( stream ) );
 
-   stream.next_in   = ( char * ) szSrc;
+   stream.next_in  = ( char * ) HB_UNCONST( szSrc );
    stream.avail_in  = ( unsigned int ) nSrc;
 
    stream.next_out  = szDst;
@@ -187,21 +197,25 @@ static int hb_bz2Uncompress( const char * szSrc, ULONG nSrc,
 
    stream.bzalloc   = hb_bz2Alloc;
    stream.bzfree    = hb_bz2Free;
-/* stream.opaque    = NULL; */
+#if 0
+   stream.opaque  = NULL;
+#endif
 
    iResult = BZ2_bzDecompressInit( &stream, 0, 0 );
    if( iResult == BZ_OK )
    {
       do
+      {
          iResult = BZ2_bzDecompress( &stream );
+      }
       while( iResult == BZ_OK );
 
       if( iResult == BZ_STREAM_END )
       {
-#if LONG_MAX <= UINT_MAX
-         *pnDst = ( ULONG ) stream.total_out_lo32;
+#if HB_SIZE_MAX <= UINT_MAX
+         *pnDst = ( HB_SIZE ) stream.total_out_lo32;
 #else
-         *pnDst = ( ( ULONG ) stream.total_out_hi32 << 32 ) |
+         *pnDst = ( ( HB_SIZE ) stream.total_out_hi32 << 32 ) |
                                 stream.total_out_lo32;
 #endif
          iResult = BZ_OK;
@@ -212,38 +226,32 @@ static int hb_bz2Uncompress( const char * szSrc, ULONG nSrc,
    return iResult;
 }
 
-/*
- * HB_BZ2_VERSION() -> <cBZlibVersion>
- */
+/* hb_bz2_Version() --> <cBZlibVersion> */
 HB_FUNC( HB_BZ2_VERSION )
 {
    hb_retc( BZ2_bzlibVersion() );
 }
 
-/*
- * HB_BZ2_COMPRESSBOUND( <cData> | <nDataLen> ) -> <nMaxCompressLen>
- */
+/* hb_bz2_CompressBound( <cData> | <nDataLen> ) --> <nMaxCompressLen> */
 HB_FUNC( HB_BZ2_COMPRESSBOUND )
 {
-   if( ISCHAR( 1 ) )
-      hb_retnint( hb_bz2CompressBound( ( ULONG ) hb_parclen( 1 ) ) );
-   else if( ISNUM( 1 ) )
-      hb_retnint( hb_bz2CompressBound( ( ULONG ) hb_parnint( 1 ) ) );
+   if( HB_ISCHAR( 1 ) )
+      hb_retnint( hb_bz2CompressBound( hb_parclen( 1 ) ) );
+   else if( HB_ISNUM( 1 ) )
+      hb_retnint( hb_bz2CompressBound( ( HB_SIZE ) hb_parnint( 1 ) ) );
    else
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-/*
- * HB_BZ2_UNCOMPRESSLEN( <cCompressedData>, [<@nResult>] )
- *          -> <nUnCompressedDataLen> or -1 on error
- */
+/* hb_bz2_UncompressLen( <cCompressedData>, [<@nResult>] )
+      --> <nUnCompressedDataLen> or -1 on error */
 HB_FUNC( HB_BZ2_UNCOMPRESSLEN )
 {
    const char * szData = hb_parc( 1 );
 
    if( szData )
    {
-      ULONG nLen = ( ULONG ) hb_parclen( 1 );
+      HB_SIZE nLen    = hb_parclen( 1 );
       int iResult = BZ_OK;
 
       if( nLen )
@@ -260,20 +268,18 @@ HB_FUNC( HB_BZ2_UNCOMPRESSLEN )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-/*
- * HB_BZ2_COMPRESS( <cData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>], [<nLevel>] )
- *    => <cCompressedData> or NIL on Error
- */
+/* hb_bz2_Compress( <cData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>], [<nLevel>] )
+      --> <cCompressedData> or NIL on Error */
 HB_FUNC( HB_BZ2_COMPRESS )
 {
    const char * szData = hb_parc( 1 );
    if( szData )
    {
-      ULONG nLen = ( ULONG ) hb_parclen( 1 );
+      HB_SIZE nLen = hb_parclen( 1 );
 
       if( nLen )
       {
-         PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
+         PHB_ITEM pBuffer = HB_ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
          HB_SIZE nDstLen;
          char * pDest;
          int iResult;
@@ -285,14 +291,14 @@ HB_FUNC( HB_BZ2_COMPRESS )
          }
          else
          {
-            nDstLen = ISNUM( 2 ) ? ( ULONG ) hb_parnint( 2 ) :
-                                      ( ULONG ) hb_bz2CompressBound( nLen );
+            nDstLen = HB_ISNUM( 2 ) ? ( HB_SIZE ) hb_parnint( 2 ) :
+                      ( HB_SIZE ) hb_bz2CompressBound( nLen );
             pDest = ( char * ) hb_xalloc( nDstLen + 1 );
          }
 
          if( pDest )
          {
-            iResult = hb_bz2Compress( szData, nLen, pDest, (ULONG*) &nDstLen,
+            iResult = hb_bz2Compress( szData, nLen, pDest, &nDstLen,
                                       hb_parnidef( 4, HB_BZ_COMPRESSION_DEFAULT ) );
             if( !pBuffer )
             {
@@ -319,18 +325,16 @@ HB_FUNC( HB_BZ2_COMPRESS )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-/*
- * HB_BZ2_UNCOMPRESS( <cCompressedData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>] )
- *    => <cUnCompressedData> or NIL on Error
- */
+/* hb_bz2_Uncompress( <cCompressedData>, [<nDstBufLen>|<@cBuffer>], [<@nResult>] )
+      --> <cUnCompressedData> or NIL on Error */
 HB_FUNC( HB_BZ2_UNCOMPRESS )
 {
-   PHB_ITEM pBuffer = ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
+   PHB_ITEM     pBuffer = HB_ISBYREF( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL;
    const char * szData = hb_parc( 1 );
 
    if( szData )
    {
-      ULONG nLen = ( ULONG ) hb_parclen( 1 );
+      HB_SIZE nLen = hb_parclen( 1 );
 
       if( nLen )
       {
@@ -345,7 +349,7 @@ HB_FUNC( HB_BZ2_UNCOMPRESS )
          }
          else
          {
-            nDstLen = ISNUM( 2 ) ? ( ULONG ) hb_parnint( 2 ) :
+            nDstLen = HB_ISNUM( 2 ) ? ( HB_SIZE ) hb_parnint( 2 ) :
                            hb_bz2UncompressedSize( szData, nLen, &iResult );
             if( iResult == BZ_OK )
             {
@@ -357,7 +361,7 @@ HB_FUNC( HB_BZ2_UNCOMPRESS )
 
          if( iResult == BZ_OK )
          {
-            iResult = hb_bz2Uncompress( szData, nLen, pDest, (ULONG*) &nDstLen );
+            iResult = hb_bz2Uncompress( szData, nLen, pDest, &nDstLen );
 
             if( !pBuffer )
             {

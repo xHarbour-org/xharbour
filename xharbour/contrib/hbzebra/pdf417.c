@@ -54,25 +54,23 @@
    PDF417 is ISO/IEC 15438:2006
 
    Good short PDF417 description:
-     http://grandzebu.net/index.php?page=/informatique/codbar-en/pdf417.htm
+     https://grandzebu.net/informatique/codbar-en/pdf417.htm
 
    Free PDF417 specification (in Russian):
-     http://protect.gost.ru/v.aspx?control=8&baseC=-1&page=0&month=-1&year=-1&search=&RegNum=1&DocOnPageCount=15&id=122345&pageK=D11DCCF9-B540-4CB2-A514-C3547043FC68
+     [LOST LINK] protect.gost.ru/v.aspx?control=8&baseC=-1&page=0&month=-1&year=-1&search=&RegNum=1&DocOnPageCount=15&id=122345&pageK=D11DCCF9-B540-4CB2-A514-C3547043FC68
 
    Online generator:
-     http://www.bcmaker.com/demos/pdf417.php
-     http://www.terryburton.co.uk/barcodewriter/generator/
+     https://www.barcodetools.com/generator/index.html
+     https://www.terryburton.co.uk/barcodewriter/generator/
 
    Online decoder:
-     http://www.datasymbol.com/barcode-recognition-sdk/barcode-reader/online-barcode-decoder.html
+     https://www.datasymbol.com/barcode-recognition-sdk/barcode-reader/online-barcode-decoder.html
 */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
-#define CODE_START       0x2AFF   /* 17 bit width */
-#define CODE_STOP       0x2517F   /* 18 bit width */
+#define CODE_START          0x2AFF  /* 17-bit width */
+#define CODE_STOP           0x2517F /* 18-bit width */
 
 #define LATCH_TEXT          900
 #define LATCH_BYTE          901
@@ -209,7 +207,8 @@ static const short s_code[ 3 ][ 929 ] = {
    0x4630, 0x27BC, 0x4738, 0x6C20, 0x6E30, 0x6F38, 0x6FBC, 0x2BEF,
    0x4BEF, 0x29E7, 0x2DF7, 0x49E7, 0x4DF7, 0x28E3, 0x2CF3, 0x48E3,
    0x2EFB, 0x4CF3, 0x4EFB, 0x2861, 0x2C71, 0x4861, 0x2E79, 0x4C71,
-   0x2F7D },
+      0x2F7D
+   },
  {
    0x06AF, 0x1D5F, 0x0257, 0x0CAF, 0x395F, 0x0457, 0x18AF, 0x715F,
    0x0857, 0x30AF, 0x1057, 0x60AF, 0x2057, 0x06D7, 0x1DAF, 0x7B5F,
@@ -327,7 +326,8 @@ static const short s_code[ 3 ][ 929 ] = {
    0x317E, 0x617E, 0x3A7C, 0x3B7E, 0x727C, 0x737E, 0x1A7E, 0x74FD,
    0x327E, 0x627E, 0x747C, 0x767E, 0x347E, 0x647E, 0x7AF0, 0x3AF8,
    0x72F8, 0x1AFC, 0x75F9, 0x32FC, 0x62FC, 0x74F8, 0x76FC, 0x34FC,
-   0x64FC },
+      0x64FC
+   },
  {
    0x07D5, 0x1FAB, 0x03CA, 0x0F95, 0x3F2B, 0x078A, 0x1F15, 0x7E2B,
    0x0F0A, 0x3E15, 0x1E0A, 0x0B5F, 0x07DA, 0x1FB5, 0x135F, 0x0F9A,
@@ -445,7 +445,9 @@ static const short s_code[ 3 ][ 929 ] = {
    0x48F0, 0x2EFC, 0x4CF8, 0x4EFC, 0x53F3, 0x51F1, 0x59F9, 0x50F0,
    0x58F8, 0x5CFC, 0x35C0, 0x65C0, 0x15E0, 0x6BC1, 0x25E0, 0x45E0,
    0x69C0, 0x6DE0, 0x2BE1, 0x4BE1, 0x29E0, 0x2DF0, 0x49E0, 0x4DF0,
-   0x57E3 }};
+      0x57E3
+   }
+};
 
 static const unsigned short s_rs0[] = {
    27, 917 };
@@ -539,7 +541,7 @@ static int _pdf417_ec_size( int iLevel )
 
 static int _pdf417_default_ec_level( int iDataSize )
 {
-   /* http://www.idautomation.com/pdf417faq.html */
+   /* https://www.idautomation.com/barcode-faq/2d/pdf417/ */
    if( iDataSize <= 40 )
       return 2;
    if( iDataSize <= 160 )
@@ -551,7 +553,7 @@ static int _pdf417_default_ec_level( int iDataSize )
 
 static int _pdf417_width( int iColCount, int iFlags )
 {
-   return 17 + ( iColCount + 2 ) * 17 + 18 - ( iFlags & HB_ZEBRA_FLAG_PDF417_TRUNCATED ? 34 : 0 );
+   return 17 + ( iColCount + 2 ) * 17 + 18 - ( ( iFlags & HB_ZEBRA_FLAG_PDF417_TRUNCATED ) ? 34 : 0 );
 }
 
 static int _pdf417_left_codeword( int iRow, int iRowCount, int iColCount, int iLevel )
@@ -748,13 +750,13 @@ static int _pdf417_encode_byte( const char * szCode, int iLen, int * pCW, int iP
          if( iPos + 5 > MAX_CODEWORD_COUNT )
             return -1;
 
-         pCW[ iPos + 4 ] = ( int ) ( ill % 900 );
+         pCW[ iPos + 4 ] = ill % 900;
          ill /= 900;
-         pCW[ iPos + 3 ] = ( int ) ( ill % 900 );
+         pCW[ iPos + 3 ] = ill % 900;
          ill /= 900;
-         pCW[ iPos + 2 ] = ( int ) ( ill % 900 );
+         pCW[ iPos + 2 ] = ill % 900;
          ill /= 900;
-         pCW[ iPos + 1 ] = ( int ) ( ill % 900 );
+         pCW[ iPos + 1 ] = ill % 900;
          pCW[ iPos     ] = ( int ) ( ill / 900 );
          iPos += 5;
       }
@@ -822,7 +824,9 @@ static int _pdf417_encode_text( const char * szCode, int iLen, int * pCW, int iP
             no = _pdf417_punctno( szCode[ i ] );
             for( j = i + 1; j < iLen &&
                             _pdf417_punctno( szCode[ j ] ) != -1 &&
-                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ );
+                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ )
+               ;
+
             if( j - i >= 5 )
             {
                iPos = _pdf417_encode_text_add( pCW, iPos, &i1, &i2, 28 /* UPPER->MIXED */ );
@@ -852,7 +856,9 @@ static int _pdf417_encode_text( const char * szCode, int iLen, int * pCW, int iP
          {
             for( j = i + 1; j < iLen &&
                             _pdf417_upperno( szCode[ j ] ) != -1 &&
-                            szCode[ j ] != ' '; j++ );
+                            szCode[ j ] != ' '; j++ )
+               ;
+
             if( j - i >= 4 )
             {
                iPos = _pdf417_encode_text_add( pCW, iPos, &i1, &i2, 28 /* LOWER->MIXED */ );
@@ -885,7 +891,9 @@ static int _pdf417_encode_text( const char * szCode, int iLen, int * pCW, int iP
             no = _pdf417_punctno( szCode[ i ] );
             for( j = i + 1; j < iLen &&
                             _pdf417_punctno( szCode[ j ] ) != -1 &&
-                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ );
+                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ )
+               ;
+
             if( j - i >= 5 )
             {
                iPos = _pdf417_encode_text_add( pCW, iPos, &i1, &i2, 28 /* LOWER->MIXED */ );
@@ -932,7 +940,9 @@ static int _pdf417_encode_text( const char * szCode, int iLen, int * pCW, int iP
             no = _pdf417_punctno( szCode[ i ] );
             for( j = i + 1; j < iLen &&
                             _pdf417_punctno( szCode[ j ] ) != -1 &&
-                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ );
+                            _pdf417_mixedno( szCode[ j ] ) == -1; j++ )
+               ;
+
             if( j - i >= 4 )
             {
                iPos = _pdf417_encode_text_add( pCW, iPos, &i1, &i2, 25 /* MIXED->PUNCT */ );
@@ -1006,12 +1016,11 @@ static int _pdf417_encode_text( const char * szCode, int iLen, int * pCW, int iP
 
 static int _pdf417_encode_numeric( const char * szCode, int iLen, int * pCW, int iPos )
 {
-   /* Some very long integer (147bit) arithmetics shoud be implemented to encode
+   /* Some very long integer (147-bit) arithmetics should be implemented to encode
       digits in an effective way. I use more simple way and encode digits in groups
-      not longer that 18 digits. 64bit integer arithmetics do this job */
+      not longer that 18 digits. 64-bit integer arithmetics do this job */
 
-   LONGLONG  ill;
-   int  i, j, k;
+   int i, j;
 
    HB_TRACE( HB_TR_DEBUG, ("encode numeric len=%d", iLen));
    if( iLen == 0 )
@@ -1020,7 +1029,8 @@ static int _pdf417_encode_numeric( const char * szCode, int iLen, int * pCW, int
    i = 0;
    while( i < iLen )
    {
-      k = iLen - i;
+      LONGLONG ill;
+      int k = iLen - i;
       if( k > 18 )
          k = 18;
 
@@ -1037,7 +1047,7 @@ static int _pdf417_encode_numeric( const char * szCode, int iLen, int * pCW, int
       k = k / 3 + 1;
       for( j = k - 1; j >= 0; j-- )
       {
-         pCW[ iPos + j ] = ( int ) ( ill % 900 );
+         pCW[ iPos + j ] = ill % 900;
          ill /= 900;
       }
       iPos += k;
@@ -1065,10 +1075,11 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
          {
             /*
                Digit in textmode uses 0.5 CW, in numeric mode 0.3409 CW.
-               To save 2 CW + average remainig space in text mode we must
+               To save 2 CW + average remaining space in text mode we must
                have 2.5 / (0.5-0.3409) = 15.71 digits
             */
-            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ j ] ); j++ );
+            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ j ] ); j++ )
+               ;
             if( j - i >= 16 )
             {
                iPos = _pdf417_encode_text( szCode + iStart, i - iStart, pCW, iPos );
@@ -1086,7 +1097,8 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
                return -1;
 
             /* Switch if we have 3 or more non-alphanumeric values */
-            for( j = i + 1; j < iLen && ! _pdf417_isalpha( szCode[ j ] ); j++ );
+            for( j = i + 1; j < iLen && ! _pdf417_isalpha( szCode[ j ] ); j++ )
+               ;
             if( j - i >= 3 )
             {
                iMode = LATCH_BYTE;
@@ -1103,7 +1115,8 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
       {
          if( _pdf417_isdigit( szCode[ i ] ) )
          {
-            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ i ] ); j++ );
+            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ i ] ); j++ )
+               ;
             if( j - i >= 4 )
             {
                iPos = _pdf417_encode_byte( szCode + iStart, i - iStart, pCW, iPos );
@@ -1115,7 +1128,8 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
          }
          if( iMode == LATCH_BYTE && _pdf417_isalpha( szCode[ i ] ) )
          {
-            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ i ] ); j++ );
+            for( j = i + 1; j < iLen && _pdf417_isdigit( szCode[ i ] ); j++ )
+               ;
             if( j - i >= 4 )
             {
                iPos = _pdf417_encode_byte( szCode + iStart, i - iStart, pCW, iPos );
@@ -1137,7 +1151,8 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
             if( iPos == -1 || iPos >= MAX_CODEWORD_COUNT - 2 )
                return -1;
 
-            for( j = i + 1; j < iLen && ! _pdf417_isalpha( szCode[ j ] ); j++ );
+            for( j = i + 1; j < iLen && ! _pdf417_isalpha( szCode[ j ] ); j++ )
+               ;
             if( j - i >= 2 )
             {
                iMode = LATCH_BYTE;
@@ -1145,7 +1160,8 @@ static int _pdf417_encode( const char * szCode, int iLen, int * pCW )
             }
             else
             {
-               for( j = i + 2; j < iLen && _pdf417_isdigit( szCode[ j ] ); j++ );
+               for( j = i + 2; j < iLen && _pdf417_isdigit( szCode[ j ] ); j++ )
+                  ;
                if( j - i >= 16 )
                {
                   pCW[ iPos++ ] = SHIFT_BYTE;
@@ -1181,7 +1197,7 @@ static void _pdf417_reed_solomon( int * pCW, int iLen, int iLevel )
 {
    int * pEC;
    const unsigned short * coef;
-   int i, j, iM, iECLen;
+   int i, j, iECLen;
 
    iECLen = _pdf417_ec_size( iLevel );
 
@@ -1223,7 +1239,7 @@ static void _pdf417_reed_solomon( int * pCW, int iLen, int iLevel )
 
    for( i = 0; i < iLen; i++ )
    {
-      iM = ( pCW[ i ] + pEC[ iECLen - 1 ] ) % 929;
+      int iM = ( pCW[ i ] + pEC[ iECLen - 1 ] ) % 929;
       for( j = iECLen - 1; j >= 0; j-- )
       {
          if( j )
@@ -1245,7 +1261,7 @@ static void _pdf417_reed_solomon( int * pCW, int iLen, int iLevel )
    }
 }
 
-PHB_ZEBRA hb_zebra_create_pdf417( const char * szCode, ULONG nLen, int iFlags, int iColCount )
+PHB_ZEBRA hb_zebra_create_pdf417( const char * szCode, HB_SIZE nLen, int iFlags, int iColCount )
 {
    PHB_ZEBRA  pZebra;
    int *      pCW;
@@ -1294,7 +1310,7 @@ PHB_ZEBRA hb_zebra_create_pdf417( const char * szCode, ULONG nLen, int iFlags, i
       for( ;; )
       {
          iColCount = ( iDataCount + _pdf417_ec_size( iLevel ) + iRowCount - 1 ) / iRowCount;
-         /* w:h aspect ration is less than 2:1 for defaul 3x module height */
+         /* w:h aspect ration is less than 2:1 for default 3x module height */
          HB_TRACE( HB_TR_DEBUG, ("iDataCount=%d iRowCount=%d iColCount=%d", iDataCount, iRowCount, iColCount));
          if( ( _pdf417_width( iColCount, iFlags ) < iRowCount * 3 * 2 || iColCount == 1 ) &&
              iColCount <= MAX_COL_COUNT &&
@@ -1382,9 +1398,7 @@ HB_FUNC( HB_ZEBRA_CREATE_PDF417 )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_pdf417( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ), hb_parni( 3 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_pdf417( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ), hb_parni( 3 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

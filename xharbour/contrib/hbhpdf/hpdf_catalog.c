@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_catalog.c
  *
  * URL: http://libharu.org
@@ -23,16 +20,18 @@
 #include "hpdf_catalog.h"
 #include "hpdf_pages.h"
 
-static const char *HPDF_PAGE_LAYOUT_NAMES[] = {
+static const char * const HPDF_PAGE_LAYOUT_NAMES[] = {
                         "SinglePage",
                         "OneColumn",
                         "TwoColumnLeft",
                         "TwoColumnRight",
+                        "TwoPageLeft",
+                        "TwoPageRight",
                         NULL
 };
 
 
-static const char *HPDF_PAGE_MODE_NAMES[] = {
+static const char * const HPDF_PAGE_MODE_NAMES[] = {
                         "UseNone",
                         "UseOutlines",
                         "UseThumbs",

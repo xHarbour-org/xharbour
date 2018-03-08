@@ -51,8 +51,6 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 static const char s_code[] = {
@@ -103,7 +101,8 @@ static const char s_code[] = {
    0x5B,  /* (%) 44 */
    0x6B,  /* (/) 45 */
    0x4C,  /* (+) 46 */
-   0x7A};  /* Start/Stop 47 */
+   0x7A   /* Start/Stop 47 */
+};
 
 static int _code93_charno( char ch )
 {
@@ -122,10 +121,11 @@ static int _code93_charno( char ch )
    return -1;
 }
 
-PHB_ZEBRA hb_zebra_create_code93( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_code93( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
-   int        csum, ksum, k, i, j, iLen = ( int ) nLen;
+   int        k, i, j, iLen = ( int ) nLen;
+   int        csum, ksum;
 
    HB_SYMBOL_UNUSED( iFlags );
 
@@ -174,8 +174,8 @@ PHB_ZEBRA hb_zebra_create_code93( const char * szCode, ULONG nLen, int iFlags )
          hb_bitbuffer_cat_int( pZebra->pBits, 1, 1 );
          hb_bitbuffer_cat_int( pZebra->pBits, s_code[ no ], 7 );
          hb_bitbuffer_cat_int( pZebra->pBits, 0, 1 );
-         ksum += ( k % 15 ? k % 15 : 15 ) * no;  k--;
-         csum += ( k % 20 ? k % 20 : 20 ) * no;
+         ksum += ( ( k % 15 ) ? k % 15 : 15 ) * no; k--;
+         csum += ( ( k % 20 ) ? k % 20 : 20 ) * no;
       }
       else
       {
@@ -231,10 +231,10 @@ PHB_ZEBRA hb_zebra_create_code93( const char * szCode, ULONG nLen, int iFlags )
          hb_bitbuffer_cat_int( pZebra->pBits, 1, 1 );
          hb_bitbuffer_cat_int( pZebra->pBits, s_code[ no2 ], 7 );
          hb_bitbuffer_cat_int( pZebra->pBits, 0, 1 );
-         ksum += ( k % 15 ? k % 15 : 15 ) * no1;  k--;
-         csum += ( k % 20 ? k % 20 : 20 ) * no1;
-         ksum += ( k % 15 ? k % 15 : 15 ) * no2;  k--;
-         csum += ( k % 20 ? k % 20 : 20 ) * no2;
+         ksum += ( ( k % 15 ) ? k % 15 : 15 ) * no1; k--;
+         csum += ( ( k % 20 ) ? k % 20 : 20 ) * no1;
+         ksum += ( ( k % 15 ) ? k % 15 : 15 ) * no2; k--;
+         csum += ( ( k % 20 ) ? k % 20 : 20 ) * no2;
       }
    }
 
@@ -261,9 +261,7 @@ HB_FUNC( HB_ZEBRA_CREATE_CODE93 )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_code93( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_code93( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

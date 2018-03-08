@@ -208,14 +208,15 @@ typedef UInt32 UIntN;
       START_VAL( src8 );                            \
                                                     \
       switch( count ) {                             \
-         case 7: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 6: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 5: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 4: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 3: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 2: INC_VAL( dst8 ) = INC_VAL( src8 ); \
-         case 1: INC_VAL( dst8 ) = INC_VAL( src8 ); \
+         case 7: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 6: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 5: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 4: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 3: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 2: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
+         case 1: INC_VAL( dst8 ) = INC_VAL( src8 ); /* fallthrough */\
          case 0:                                    \
+		 /* fallthrough */                          \
          default: break;                            \
       }                                             \
 }
@@ -332,16 +333,17 @@ HB_EXPORT void * dv_memcpy( void * dest, const void * src, size_t count )
 
    switch( ( ( ( UIntN ) src8 )PRE_SWITCH_ADJUST ) & ( TYPE_WIDTH - 1 ) )
    {
-      case 0: COPY_NO_SHIFT();
-      case 1: COPY_SHIFT( 1 );
-      case 2: COPY_SHIFT( 2 );
-      case 3: COPY_SHIFT( 3 );
+      case 0: COPY_NO_SHIFT() /* fallthrough */;
+      case 1: COPY_SHIFT( 1 ) /* fallthrough */;
+      case 2: COPY_SHIFT( 2 ) /* fallthrough */;
+      case 3: COPY_SHIFT( 3 ) /* fallthrough */;
 #if TYPE_WIDTH > 4
-      case 4: COPY_SHIFT( 4 );
-      case 5: COPY_SHIFT( 5 );
-      case 6: COPY_SHIFT( 6 );
-      case 7: COPY_SHIFT( 7 );
+      case 4: COPY_SHIFT( 4 ) /* fallthrough */;
+      case 5: COPY_SHIFT( 5 ) /* fallthrough */;
+      case 6: COPY_SHIFT( 6 ) /* fallthrough */;
+      case 7: COPY_SHIFT( 7 ) /* fallthrough */;
 #endif
+  
    }
 
    return NULL;  /* pseudo return to avoid no-return-value warning */

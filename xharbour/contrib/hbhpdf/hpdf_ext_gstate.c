@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_ext_gstate.c
  *
  * URL: http://libharu.org
@@ -23,7 +20,7 @@
 #include "hpdf_ext_gstate.h"
 #include "hpdf.h"
 
-static const char  *HPDF_BM_NAMES[] = {
+static const char * const HPDF_BM_NAMES[] = {
                                       "Normal",
                                       "Multiply",
                                       "Screen",

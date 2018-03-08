@@ -1,8 +1,5 @@
 /*
- * $Id$
- */
-/*
- * << Haru Free PDF Library >> -- hpdf_pdfa.h
+ * << Haru Free PDF Library >> -- hpdf_annotation.h
  *
  * URL: http://libharu.org
  *
@@ -18,29 +15,27 @@
  *
  */
 
-#ifndef _HPDF_PDFA_H
-#define _HPDF_PDFA_H
+#ifndef _HPDF_EXDATA_H
+#define _HPDF_EXDATA_H
 
-#include "hpdf_doc.h"
 #include "hpdf_objects.h"
-
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-HPDF_STATUS
-HPDF_PDFA_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdict);
+/*----------------------------------------------------------------------------*/
+/*------ HPDF_ExData -----------------------------------------------------*/
 
-HPDF_STATUS
-HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,
-			      HPDF_PDFAType pdfatype);
-			      
-HPDF_STATUS
-HPDF_PDFA_GenerateID(HPDF_Doc);
+HPDF_ExData
+HPDF_3DAnnotExData_New(HPDF_MMgr mmgr,
+					   HPDF_Xref xref );
+
+         
+
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-#endif
+#endif /* _HPDF_EXDATA_H */
+

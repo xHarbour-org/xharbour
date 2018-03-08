@@ -51,8 +51,6 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 static const char s_code[] = { 0x0C, 0x11, 0x12, 0x03, 0x14, 0x05, 0x06, 0x18, 0x09, 0x0A };
@@ -62,11 +60,11 @@ static char _itf_checksum( const char * szCode )
    int   i, sum = 0;
 
    for ( i = 0; szCode[ i ]; i++ )
-      sum += ( szCode[ i ] - '0' ) * ( i & 1 ? 1 : 3 );
+      sum += ( szCode[ i ] - '0' ) * ( ( i & 1 ) ? 1 : 3 );
    return '0' + ( 100000 - sum ) % 10;
 }
 
-PHB_ZEBRA hb_zebra_create_itf( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_itf( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
    int        i, iN, iW, iLen = ( int ) nLen;
@@ -83,7 +81,7 @@ PHB_ZEBRA hb_zebra_create_itf( const char * szCode, ULONG nLen, int iFlags )
          return pZebra;
       }
    }
-   if( ( iLen + (iFlags & HB_ZEBRA_FLAG_CHECKSUM ? 1 : 0 ) ) & 1 )
+   if( ( iLen + ( ( iFlags & HB_ZEBRA_FLAG_CHECKSUM ) ? 1 : 0 ) ) & 1 )
    {
      pZebra->szCode = ( char * ) hb_xgrab( iLen + 2 );
      pZebra->szCode[ 0 ] = '0';
@@ -130,11 +128,11 @@ PHB_ZEBRA hb_zebra_create_itf( const char * szCode, ULONG nLen, int iFlags )
    for( i = 0; szCode[ i ]; i += 2 )
    {
       char c1 = s_code[ szCode[ i ] - '0' ], c2 = szCode[ i + 1 ] ? s_code[ szCode[ i + 1 ] - '0' ] : csum;
-      hb_bitbuffer_cat_int( pZebra->pBits, 31, c1 & 1 ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, c2 & 1 ? iW : iN );  c1 >>= 1;  c2 >>= 1;
-      hb_bitbuffer_cat_int( pZebra->pBits, 31, c1 & 1 ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, c2 & 1 ? iW : iN );  c1 >>= 1;  c2 >>= 1;
-      hb_bitbuffer_cat_int( pZebra->pBits, 31, c1 & 1 ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, c2 & 1 ? iW : iN );  c1 >>= 1;  c2 >>= 1;
-      hb_bitbuffer_cat_int( pZebra->pBits, 31, c1 & 1 ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, c2 & 1 ? iW : iN );  c1 >>= 1;  c2 >>= 1;
-      hb_bitbuffer_cat_int( pZebra->pBits, 31, c1 & 1 ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, c2 & 1 ? iW : iN );
+      hb_bitbuffer_cat_int( pZebra->pBits, 31, ( c1 & 1 ) ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, ( c2 & 1 ) ? iW : iN );  c1 >>= 1;  c2 >>= 1;
+      hb_bitbuffer_cat_int( pZebra->pBits, 31, ( c1 & 1 ) ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, ( c2 & 1 ) ? iW : iN );  c1 >>= 1;  c2 >>= 1;
+      hb_bitbuffer_cat_int( pZebra->pBits, 31, ( c1 & 1 ) ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, ( c2 & 1 ) ? iW : iN );  c1 >>= 1;  c2 >>= 1;
+      hb_bitbuffer_cat_int( pZebra->pBits, 31, ( c1 & 1 ) ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, ( c2 & 1 ) ? iW : iN );  c1 >>= 1;  c2 >>= 1;
+      hb_bitbuffer_cat_int( pZebra->pBits, 31, ( c1 & 1 ) ? iW : iN );  hb_bitbuffer_cat_int( pZebra->pBits, 0, ( c2 & 1 ) ? iW : iN );
       if( ! szCode[ i + 1 ] )
          break;
    }
@@ -151,9 +149,7 @@ HB_FUNC( HB_ZEBRA_CREATE_ITF )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_itf( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_itf( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

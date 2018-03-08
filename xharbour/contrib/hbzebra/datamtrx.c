@@ -54,29 +54,29 @@
    DataMatrix is ISO/IEC 16022:2006
 
    Some info links:
-     http://www.gs1.org/docs/barcodes/GS1_DataMatrix_Introduction_and_technical_overview.pdf
-     http://www.aipsys.com/dmintro.htm
+     https://web.archive.org/web/20150208040021/www.gs1.org/docs/barcodes/GS1_DataMatrix_Introduction_and_technical_overview.pdf
+     https://web.archive.org/web/20161114095405/www.aipsys.com/dmintro.htm
 
-   Open source projects, that implements DataMatrix:
-     http://www.datenfreihafen.org/projects/iec16022.html
-     http://www.libdmtx.org/
-     http://www.codeproject.com/Articles/66495/DataMatrixNet-ported-to-Compact-Framework.aspx
+   Open source projects, that implement DataMatrix:
+     https://www.datenfreihafen.org/projects/iec16022.html
+     https://web.archive.org/web/20130325083148/www.libdmtx.org/
+     https://www.codeproject.com/Articles/66495/DataMatrixNet-ported-to-Compact-Framework.aspx
 
    Online encoder:
-     http://www.bcgen.com/datamatrix-barcode-creator.html
-     http://www.bcmaker.com/demos/datamatrix.php
+     https://www.barcodetools.com/generator/index.html
 
    Online decoder:
-     http://www.datasymbol.com/barcode-recognition-sdk/barcode-reader/online-barcode-decoder.html
+     https://www.datasymbol.com/barcode-reader-sdk/barcode-reader-sdk-for-windows/online-barcode-decoder.html
 
 */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
+/* Special CodeWords */
 #define PADDING    129
+#define PAIR_OF_DIGITS        130  /* 00..99 encoded as 130..229 */
+#define SHIFT_EXTENDED_ASCII  235  /* Shift to extended ASCII for 1 character */
 
 #define SIZE_COUNT  30
 
@@ -137,17 +137,17 @@ static int _datamatrix_encode( const char * szCode, int iLen, unsigned char * pC
    {
       if( _datamatrix_isdigit( szCode[ i ] ) && i < iLen - 1 && _datamatrix_isdigit( szCode[ i + 1 ] ) )
       {
-         pCW[ iPos++ ] = ( szCode[ i ] - '0' ) * 10 + szCode[ i + 1 ] - '0' + 130;
+         pCW[ iPos++ ] = ( unsigned char ) ( ( szCode[ i ] - '0' ) * 10 + szCode[ i + 1 ] - '0' + PAIR_OF_DIGITS );
          i++;
       }
       else if( ( unsigned char ) szCode[ i ] <= 127 )
       {
-         pCW[ iPos++ ] = szCode[ i ] + 1;
+         pCW[ iPos++ ] = ( unsigned char ) szCode[ i ] + 1;
       }
       else
       {
-         pCW[ iPos++ ] = 235; /* Shift to extended ASCII for 1 character */
-         pCW[ iPos++ ] = szCode[ i ] - 127;
+         pCW[ iPos++ ] = SHIFT_EXTENDED_ASCII;
+         pCW[ iPos++ ] = ( unsigned char ) szCode[ i ] - 127;
       }
    }
    return iPos;
@@ -156,14 +156,14 @@ static int _datamatrix_encode( const char * szCode, int iLen, unsigned char * pC
 static void _reed_solomon_encode( unsigned char * pData, int iDataLen, unsigned char * pEC, int iECLen, int * pPoly, int * pExp, int * pLog, int iMod )
 {
    int   i, j;
-   unsigned char iM;
 
    for( i = 0; i < iECLen; i++ )
       pEC[ i ] = 0;
 
    for( i = 0; i < iDataLen; i++ )
    {
-      iM = pData[ i ] ^ pEC[ iECLen - 1 ];
+      unsigned char iM = pData[ i ] ^ pEC[ iECLen - 1 ];
+
       for( j = iECLen - 1; j > 0; j-- )
       {
          if( iM && pPoly[ j ] )
@@ -233,7 +233,7 @@ static void _datamatrix_reed_solomon( unsigned char * pData, const DATAMATRIX_SI
 
       /* Copy to temporary buffer */
       for( j = i; j < pSize->iDataSize; j += iBlocks )
-         data[ k++ ] = ( unsigned char ) pData[ j ];
+         data[ k++ ] = pData[ j ];
 
       /* Calculate Reed-Solomon ECC for one block */
       _reed_solomon_encode( data, k, ecc, pSize->iBlockErrorSize, pPoly, pExp, pLog, iMod );
@@ -241,7 +241,7 @@ static void _datamatrix_reed_solomon( unsigned char * pData, const DATAMATRIX_SI
       /* Copy ECC to codeword array */
       k = pSize->iBlockErrorSize;
       for( j = i; j < pSize->iBlockErrorSize * iBlocks; j += iBlocks )
-         pData[ pSize->iDataSize + j ] = ( char ) ecc[ --k ];
+         pData[ pSize->iDataSize + j ] = ecc[ --k ];
    }
 
    hb_xfree( pExp );
@@ -360,7 +360,8 @@ static void _datamatrix_do_placement( PHB_BITBUFFER pBits, unsigned char * pCW, 
             _datamatrix_place( pArr, iPRow, iPCol, iR, iC, i++ );
          iR -= 2;
          iC += 2;
-      } while( iR >= 0 && iC < iPCol );
+      }
+      while( iR >= 0 && iC < iPCol );
 
       iR++;
       iC += 3;
@@ -371,11 +372,13 @@ static void _datamatrix_do_placement( PHB_BITBUFFER pBits, unsigned char * pCW, 
             _datamatrix_place( pArr, iPRow, iPCol, iR, iC, i++ );
          iR += 2;
          iC -= 2;
-      } while( iR < iPRow && iC >= 0 );
+      }
+      while( iR < iPRow && iC >= 0 );
 
       iR += 3;
       iC++;
-   } while( iR < iPRow || iC < iPCol );
+   }
+   while( iR < iPRow || iC < iPCol );
 
    if( pArr[ iPRow * iPCol - 1 ] == 0 )
       pArr[ iPRow * iPCol - 1 ] = pArr[ iPRow * iPCol - iPCol - 2 ] = 1;
@@ -400,7 +403,7 @@ static void _datamatrix_do_placement( PHB_BITBUFFER pBits, unsigned char * pCW, 
    hb_xfree( pArr );
 }
 
-PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
    const DATAMATRIX_SIZE * pSize;
@@ -450,18 +453,14 @@ PHB_ZEBRA hb_zebra_create_datamatrix( const char * szCode, ULONG nLen, int iFlag
 
    pCW = ( unsigned char * ) hb_xrealloc( pCW, pSize->iDataSize + iErrorSize );
    for( i = iDataCount; i < pSize->iDataSize; i++ )
-   {
-      pCW[ i ] = ( unsigned char ) PADDING;
-   }
+      pCW[ i ] = PADDING;
 
    /* Reed-Solomon error correction */
    _datamatrix_reed_solomon( pCW, pSize );
 
 #if 0
    for( i = 0; i < pSize->iDataSize + iErrorSize; i++ )
-   {
-      HB_TRACE( HB_TR_ALWAYS, ("cw=%d", ( unsigned char ) pCW[ i ] ));
-   }
+      HB_TRACE( HB_TR_ALWAYS, ( "cw=%d", pCW[ i ] ) );
 #endif
 
    pZebra->iCol = pSize->iCol;
@@ -499,9 +498,7 @@ HB_FUNC( HB_ZEBRA_CREATE_DATAMATRIX )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_datamatrix( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_datamatrix( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

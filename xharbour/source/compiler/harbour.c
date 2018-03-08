@@ -4059,6 +4059,7 @@ static void hb_compPCodeEnumScanLocals( PFUNCTION pFunc, PHB_OPT_LOCAL pLocals )
             case HB_P_PUSHLOCALNEARINC:
             case HB_P_PUSHLOCALNEARDEC:
                pLocals[ isVar - 1 ].bFlags |= OPT_LOCAL_FLAG_CHANGE;
+			   /* fallthrough */
                /*break;*/
 
             case HB_P_PUSHLOCALNEAR:

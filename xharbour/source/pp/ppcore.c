@@ -5999,11 +5999,13 @@ void hb_pp_setStream( PHB_PP_STATE pState, int iMode )
 
       case HB_PP_STREAM_INLINE_C:
          pState->iDumpLine = pState->pFile ? pState->pFile->iCurrentLine : 0;
+		 /* fallthrough */
       case HB_PP_STREAM_CLIPPER:
       case HB_PP_STREAM_PRG:
       case HB_PP_STREAM_C:
          if( ! pState->pStreamBuffer )
             pState->pStreamBuffer = hb_membufNew();
+		/* fallthrough */
       case HB_PP_STREAM_OFF:
       case HB_PP_STREAM_COMMENT:
          pState->iStreamDump = iMode;

@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_fontdef_kr.c
  *
  * URL: http://libharu.org
@@ -22,9 +19,6 @@
 #include "hpdf_utils.h"
 #include "hpdf.h"
 
-#if defined(__BORLANDC__)
-   #pragma warn -use
-#endif
 /*----------------------------------------------------------------------------*/
 
 static const HPDF_CID_Width DotumChe_W_ARRAY[] = {

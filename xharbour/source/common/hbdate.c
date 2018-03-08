@@ -326,6 +326,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 6 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 3:
                      if( ! used_d && format_count < size )
                      {
@@ -333,12 +334,14 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 6 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 2:
                      if( ! used_d && format_count < size )
                      {
                         szFormattedDate[ format_count++ ] = szDate[ 6 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   default:
                      if( ! used_d && format_count < size )
                      {
@@ -361,6 +364,7 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 4 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 3:
                      if( ! used_m && format_count < size )
                      {
@@ -368,12 +372,14 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 4 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 2:
                      if( ! used_m && format_count < size )
                      {
                         szFormattedDate[ format_count++ ] = szDate[ 4 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   default:
                      if( ! used_m && format_count < size )
                      {
@@ -395,21 +401,21 @@ char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * 
                         szFormattedDate[ format_count++ ] = szDate[ 0 ];
                         digit_count--;
                      }
-
+                     /* fallthrough */
                   case 3:
                      if( ! used_y && format_count < size )
                      {
                         szFormattedDate[ format_count++ ] = szDate[ 1 ];
                         digit_count--;
                      }
-
+                     /* fallthrough */
                   case 2:
                      if( ! used_y && format_count < size )
                      {
                         szFormattedDate[ format_count++ ] = szDate[ 2 ];
                         digit_count--;
                      }
-
+                     /* fallthrough */
                   default:
                      if( ! used_y && format_count < size )
                      {
@@ -519,6 +525,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 0 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   default:
                      if( ! used_h && format_count < size )
                      {
@@ -548,6 +555,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 2 ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   default:
                      if( ! used_m && format_count < size )
                      {
@@ -569,7 +577,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ 4 ];
                         digit_count--;
                      }
-
+/* fallthrough */
                   default:
                      if( ! used_s && format_count < size )
                      {
@@ -595,6 +603,7 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ digit_c++ ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 3:
                      if( ! used_c && format_count < size && digit_c - 9 < HB_DATETIMEDECIMALS )
                      {
@@ -602,12 +611,14 @@ char * hb_timeFormat( const char * szTime, char * szFormattedTime, const char * 
                         szFormattedTime[ format_count++ ] = szTime[ digit_c++ ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   case 2:
                      if( ! used_c && format_count < size && digit_c - 9 < HB_DATETIMEDECIMALS )
                      {
                         szFormattedTime[ format_count++ ] = szTime[ digit_c++ ];
                         digit_count--;
                      }
+					 /* fallthrough */
                   default:
                      if( ! used_c && format_count < size && digit_c - 9 < HB_DATETIMEDECIMALS )
                      {
@@ -1115,7 +1126,7 @@ void hb_datetimeEncode( long * plDate, long * plTime, int iYear, int iMonth, int
    BOOL  iOk;
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p)", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk ) );
-   //printf( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p) Que pasa???\n", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, iOk);
+   /*printf( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p) Que pasa???\n", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, iOk);*/
 
    lDate = ( long ) hb_dateEncode( iYear, iMonth, iDay );
    iOk   = FALSE;

@@ -29,5 +29,9 @@ PRG_HEADERS=\
 
 LIBNAME=hbzebra
 
-include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/header.cf
+INSTALL_RULE_HEADERS := $(INSTALL_RULE)
+include $(TOP)$(ROOT)config/lib.cf
+
+install::
+	$(INSTALL_RULE_HEADERS)

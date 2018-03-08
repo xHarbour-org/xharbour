@@ -9,6 +9,89 @@
 */
 
 
+2018-03-07 21:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * bin/pack_src.sh
+    ! added new sources to compress
+  * contrib/hbbz2/bzlib_pr.h
+    contrib/hbbz2/core.c
+    ! sync with harbour  
+  * contrib/hbbz2/Makefile
+    ! updated
+  * contrib/hbhpdf/*.c
+    ! updated to version 2.3  
+  * contrib/hbhpdf/*.h
+    ! updated to version 2.3
+  * contrib/hbzebra/*.c
+    ! sync with harbour  
+  * contrib/rddsql/hbrddsql.h
+    contrib/rddsql/sqlmix.c
+    contrib/rddsql/sqlbase.c	
+	! sync with harbour  
+  * contrib/rddsql/Makefile 
+    ! added missing makefile  
+  * contrib/rdd_ads/adsfunc.c
+    ! minor fix on ADSDDSETTABLEPROPERTY and ADSDDCREATEREFINTEGRITY  
+  * contrib/sddoci/sddoci.c
+   ! sync with harbour  
+  * contrib/sddoci/Makefile 
+    ! added missing makefile     
+  * contrib/sddodbc/sddodbc.c
+   ! sync with harbour  
+  * contrib/sddodbc/Makefile 
+    ! added missing makefile     
+  * xharbour.spec  
+    ! minor updates  
+  * include/hbexprb.c	
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy	
+  ! source\common\hbdate.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source\common\hbmem.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source\common\hbprintf.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source\compiler\cmdcheck.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source\compiler\comptool.c   
+    ! added missing else braces on hb_compOutStd and hb_compOutErr functions
+  ! source\compiler\harbour.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy  
+  ! source\pp\ppcore.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy  
+  ! source\rtl\gtcrs\gtcrs.c 
+    ! Change  WINDOW * stdscr -> WINDOW * hb_stdscr to make gtcrs compile under newer versions;
+  ! source\rtl\zlib\compress.c 
+    ! update to version 1.2.11
+  ! source\rtl\zlib\zlib.h 
+    ! update to version 1.2.11
+  ! source\rtl\dateshb.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy    
+  ! source\rtl\hbcomprs.c 
+    ! fix typo compress -> compress2 
+  ! source\rtl\hbgtcore.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy      
+  ! source\rtl\hbserv.c 
+    ! added missing return
+  ! source\rtl\philes.c 	
+    ! minor fix on casts
+  ! source\rtl\str2ptr.c 
+    ! fixed some cast (ULONG) hb_itemGetNL -> hb_itemGetNS
+  ! source\rtl\valtostr.c	
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy        
+  ! source\rtl\zlib\infback.c 
+  ! source\rtl\zlib\inflate.c	
+	! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy        
+  ! source\rdd\dbf1.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy      
+  ! source\rdd\dbf1net.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy      
+  ! source\rdd\workarea.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source/rdd/bmdbfcdx/bmdbfcdx1.c
+  ! source/rdd/bmdbfcdx/redbfcdx1.c
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+  ! source/vm/hvm.c 
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy
+      
 2018-02-17 19:32 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\ct\bit3.c
     ! removed unused variable iPCount in function NUMANDX()

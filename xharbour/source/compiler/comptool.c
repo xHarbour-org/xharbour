@@ -794,17 +794,19 @@ void hb_compOutStd( char * szMessage )
    {
       if( hb_outStdFunc )
          hb_outStdFunc( hb_compHandle, szMessage );
-      else
+      else {		  
          fprintf( stdout, "%s", szMessage ); fflush( stdout );
    }
+}
 }
 
 void hb_compOutErr( char * szMessage )
 {
    if( hb_outErrFunc )
       hb_outErrFunc( hb_compHandle, szMessage );
-   else
+   else {
       fprintf( stderr, "%s", szMessage ); fflush( stderr );
+}
 }
 
 

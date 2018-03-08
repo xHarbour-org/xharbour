@@ -255,7 +255,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                            Switch[ 2 ] = '\0';
                            cmdcheckerror( ( const char* ) Switch );
                         }
-
+                        /* fallthrough */
                      case 'd':
                      case 'D':
                         Args[ i ] += ( j - 1 );

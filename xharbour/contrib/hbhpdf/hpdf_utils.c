@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_utils.c
  *
  * URL: http://libharu.org
@@ -18,9 +15,6 @@
  *
  */
 
-#if defined( __WATCOMC__ )
-   #pragma disable_message ( 124 )
-#endif
 #include <stdlib.h>
 #include "hpdf_utils.h"
 #include "hpdf_consts.h"
@@ -142,7 +136,7 @@ HPDF_IToA  (char        *s,
     *t-- = 0;
 
     while (val > 0) {
-        *t = (char)(val % 10) + '0';
+        *t = (char)((char)(val % 10) + '0');
         val /= 10;
         t--;
     }
@@ -171,7 +165,7 @@ HPDF_IToA2  (char         *s,
     *u = 0;
     t = u - 1;
     while (val > 0 && t >= s) {
-        *t = (char)(val % 10) + '0';
+        *t = (char)((char)(val % 10) + '0');
         val /= 10;
         t--;
     }
@@ -215,7 +209,7 @@ HPDF_FToA  (char       *s,
 
     /* process decimal part */
     for (i = 0; i < 5; i++) {
-        *t = (char)(fpart_val % 10) + '0';
+        *t = (char)((char)(fpart_val % 10) + '0');
         fpart_val /= 10;
         t--;
     }
@@ -227,7 +221,7 @@ HPDF_FToA  (char       *s,
         t--;
 
     while (int_val > 0) {
-        *t = (char)(int_val % 10) + '0';
+        *t = (char)((char)(int_val % 10) + '0');
         int_val /= 10;
         t--;
     }
@@ -446,6 +440,6 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value)
     HPDF_BYTE u[2];
 
     HPDF_MemCpy (u, (HPDF_BYTE*)value, 2);
-    *value = ((HPDF_UINT16)((HPDF_UINT16)u[0] << 8 ) | (HPDF_UINT16)u[1]);
+    *value = (HPDF_UINT16)((HPDF_UINT16)u[0] << 8 | (HPDF_UINT16)u[1]);
 }
 

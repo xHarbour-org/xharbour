@@ -51,8 +51,6 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 /* Usually one character bitmap does not fit into 1 byte, but if we use enough
@@ -101,7 +99,8 @@ static const UCHAR s_code[] =
    0x2A,   /* $ */
    0x8A,   /* / */
    0xA2,   /* + */
-   0xA8 }; /* % */
+   0xA8    /* % */
+};
 
 static int _code39_charno( char ch )
 {
@@ -120,7 +119,7 @@ static int _code39_charno( char ch )
    return -1;
 }
 
-static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, BOOL fLast )
+static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, HB_BOOL fLast )
 {
    int i, cnt = 0;
 
@@ -128,7 +127,7 @@ static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, BOOL fLast 
    {
       for( i = 0; i < 8; i++ )
       {
-         hb_bitbuffer_cat_int( pBits, i & 1 ? 0 : 31, code & 1 ? 5 : 2 );
+         hb_bitbuffer_cat_int( pBits, ( i & 1 ) ? 0 : 31, ( code & 1 ) ? 5 : 2 );
          cnt += ( code & 1 );
          code >>= 1;
       }
@@ -140,7 +139,7 @@ static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, BOOL fLast 
    {
       for( i = 0; i < 8; i++ )
       {
-         hb_bitbuffer_cat_int( pBits, i & 1 ? 0 : 31, code & 1 ? 3 : 1 );
+         hb_bitbuffer_cat_int( pBits, ( i & 1 ) ? 0 : 31, ( code & 1 ) ? 3 : 1 );
          cnt += ( code & 1 );
          code >>= 1;
       }
@@ -152,7 +151,7 @@ static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, BOOL fLast 
    {
       for( i = 0; i < 8; i++ )
       {
-         hb_bitbuffer_cat_int( pBits, i & 1 ? 0 : 31, code & 1 ? 2 : 1 );
+         hb_bitbuffer_cat_int( pBits, ( i & 1 ) ? 0 : 31, ( code & 1 ) ? 2 : 1 );
          cnt += ( code & 1 );
          code >>= 1;
       }
@@ -162,10 +161,11 @@ static void _code39_add( PHB_BITBUFFER pBits, char code, int iFlags, BOOL fLast 
    }
 }
 
-PHB_ZEBRA hb_zebra_create_code39( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_code39( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
-   int        i, csum, iLen = ( int ) nLen;
+   int        i, iLen = ( int ) nLen;
+   int        csum;
 
    pZebra = hb_zebra_create();
    pZebra->iType = HB_ZEBRA_TYPE_CODE39;
@@ -186,20 +186,20 @@ PHB_ZEBRA hb_zebra_create_code39( const char * szCode, ULONG nLen, int iFlags )
 
    pZebra->pBits = hb_bitbuffer_create();
 
-   _code39_add( pZebra->pBits, 0x52, iFlags, FALSE );    /* start */
+   _code39_add( pZebra->pBits, 0x52, iFlags, HB_FALSE );    /* start */
 
    csum = 0;
    for( i = 0; i < iLen; i++ )
    {
       int no = _code39_charno( szCode[ i ] );
-      _code39_add( pZebra->pBits, ( char ) s_code[ no ], iFlags, FALSE );
+      _code39_add( pZebra->pBits, ( char ) s_code[ no ], iFlags, HB_FALSE );
       csum += no;
    }
 
    if( iFlags & HB_ZEBRA_FLAG_CHECKSUM )
-      _code39_add( pZebra->pBits, ( char ) s_code[ csum % 43 ], iFlags, FALSE );
+      _code39_add( pZebra->pBits, ( char ) s_code[ csum % 43 ], iFlags, HB_FALSE );
 
-   _code39_add( pZebra->pBits, 0x52, iFlags, TRUE );    /* stop */
+   _code39_add( pZebra->pBits, 0x52, iFlags, HB_TRUE );    /* stop */
    return pZebra;
 }
 
@@ -208,9 +208,7 @@ HB_FUNC( HB_ZEBRA_CREATE_CODE39 )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_code39( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_code39( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

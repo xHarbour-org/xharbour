@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_doc.c
  *
  * URL: http://libharu.org
@@ -29,7 +26,7 @@
 #include "hpdf.h"
 
 
-static const char *HPDF_VERSION_STR[6] = {
+static const char * const HPDF_VERSION_STR[6] = {
                 "%PDF-1.2\012%\267\276\255\252\012",
                 "%PDF-1.3\012%\267\276\255\252\012",
                 "%PDF-1.4\012%\267\276\255\252\012",
@@ -661,7 +658,7 @@ HPDF_GetContents   (HPDF_Doc   pdf,
                  HPDF_UINT32  *size)
 {
     HPDF_Stream stream;
-    HPDF_UINT isize;
+    HPDF_UINT isize = *size;
     HPDF_STATUS ret;
 
     HPDF_PTRACE ((" HPDF_GetContents\n"));
@@ -1231,7 +1228,7 @@ HPDF_SetCurrentEncoder  (HPDF_Doc    pdf,
     if (!encoder)
         return HPDF_GetError (pdf);
 
-	pdf->cur_encoder = encoder;
+    pdf->cur_encoder = encoder;
 
     return HPDF_OK;
 }
@@ -1524,15 +1521,14 @@ LoadTTFontFromStream (HPDF_Doc         pdf,
     HPDF_FontDef def;
 
     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream\n"));
-    
-    ( void ) file_name; 
+    HPDF_UNUSED (file_name);
+
     def = HPDF_TTFontDef_Load (pdf->mmgr, font_data, embedding);
     if (def) {
         HPDF_FontDef  tmpdef = HPDF_Doc_FindFontDef (pdf, def->base_font);
         if (tmpdef) {
             HPDF_FontDef_Free (def);
-            HPDF_SetError (&pdf->error, HPDF_FONT_EXISTS, 0);
-            return NULL;
+            return tmpdef->base_font;
         }
 
         if (HPDF_List_Add (pdf->fontdef_list, def) != HPDF_OK) {
@@ -1603,16 +1599,14 @@ LoadTTFontFromStream2 (HPDF_Doc         pdf,
     HPDF_FontDef def;
 
     HPDF_PTRACE ((" HPDF_LoadTTFontFromStream2\n"));
-    
-    ( void ) file_name; 
-    
+    HPDF_UNUSED (file_name);
+
     def = HPDF_TTFontDef_Load2 (pdf->mmgr, font_data, index, embedding);
     if (def) {
         HPDF_FontDef  tmpdef = HPDF_Doc_FindFontDef (pdf, def->base_font);
         if (tmpdef) {
             HPDF_FontDef_Free (def);
-            HPDF_SetError (&pdf->error, HPDF_FONT_EXISTS, 0);
-            return NULL;
+            return tmpdef->base_font;
         }
 
         if (HPDF_List_Add (pdf->fontdef_list, def) != HPDF_OK) {
@@ -1696,14 +1690,19 @@ HPDF_LoadRawImageFromMem  (HPDF_Doc           pdf,
     if (!HPDF_HasDoc (pdf))
         return NULL;
 
-    image = HPDF_Image_LoadRawImageFromMem (pdf->mmgr, buf, pdf->xref, width,
-                height, color_space, bits_per_component);
+    /* Use directly HPDF_Image_LoadRaw1BitImageFromMem to save B/W images */
+    if(color_space == HPDF_CS_DEVICE_GRAY && bits_per_component == 1) {
+        return HPDF_Image_LoadRaw1BitImageFromMem (pdf, buf, width, height, (width+7)/8, HPDF_TRUE, HPDF_TRUE);
+    }
+
+    image = HPDF_Image_LoadRawImageFromMem (pdf->mmgr, buf, pdf->xref, width, height, color_space, bits_per_component);
 
     if (!image)
         HPDF_CheckError (&pdf->error);
 
-    if (image && pdf->compression_mode & HPDF_COMP_IMAGE)
+    if (image && pdf->compression_mode & HPDF_COMP_IMAGE) {
         image->filter = HPDF_STREAM_FILTER_FLATE_DECODE;
+    }
 
     return image;
 }
@@ -1788,6 +1787,9 @@ HPDF_SetPageLayout  (HPDF_Doc          pdf,
     if (layout < 0 || layout >= HPDF_PAGE_LAYOUT_EOF)
         return HPDF_RaiseError (&pdf->error, HPDF_PAGE_LAYOUT_OUT_OF_RANGE,
                 (HPDF_STATUS)layout);
+
+    if ((layout == HPDF_PAGE_LAYOUT_TWO_PAGE_LEFT || layout == HPDF_PAGE_LAYOUT_TWO_PAGE_RIGHT) && pdf->pdf_version < HPDF_VER_15)
+        pdf->pdf_version = HPDF_VER_15 ;
 
     ret = HPDF_Catalog_SetPageLayout (pdf->catalog, layout);
     if (ret != HPDF_OK)

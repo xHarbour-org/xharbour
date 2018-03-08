@@ -51,8 +51,6 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 static const unsigned short s_code[] = {
@@ -161,7 +159,8 @@ static const unsigned short s_code[] = {
    01657,   /*  FNC1 FNC1 FNC1 102 */
    00413,   /*  Start Code A   103 */
    00113,   /*  Start Code B   104 */
-   00713};  /*  Start Code C   105 */
+   00713    /* Start Code C   105 */
+};
 
 #define CODESET_A       0
 #define CODESET_B       1
@@ -198,10 +197,10 @@ static int _code128_charno( char ch, int iCodeSet )
    return -1;
 }
 
-PHB_ZEBRA hb_zebra_create_code128( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_code128( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
-   int        i, j, k, csum, iCode, iCodeSet, iCodeLen, iLen = ( int ) nLen;
+   int        i, j, k, csum, iCodeSet, iCodeLen, iLen = ( int ) nLen;
    int *      pCode;
 
    HB_SYMBOL_UNUSED( iFlags );
@@ -259,10 +258,11 @@ PHB_ZEBRA hb_zebra_create_code128( const char * szCode, ULONG nLen, int iFlags )
 
    /* encode source data */
    /* Warning: digit optimizer works in optimal way with this encoder code. Be careful
-      if you'll change encoder code, digit optimizer canm require adjustment also [Mindaugas] */
+      if you'll change encoder code, digit optimizer can require adjustment also [Mindaugas] */
    for( i = 0; i < iLen; i++ )
    {
-      iCode = _code128_charno( szCode[ i ], iCodeSet );
+      int iCode = _code128_charno( szCode[ i ], iCodeSet );
+
       if( iCode != -1 )
          pCode[ iCodeLen++ ] = iCode;
       else
@@ -303,7 +303,9 @@ PHB_ZEBRA hb_zebra_create_code128( const char * szCode, ULONG nLen, int iFlags )
 
       if( 16 <= pCode[ i ] && pCode[ i ] <= 25 )
       {
-         for( j = i + 1; j < iCodeLen && 16 <= pCode[ j ] && pCode[ j ] <= 25; j++ );
+         for( j = i + 1; j < iCodeLen && 16 <= pCode[ j ] && pCode[ j ] <= 25; j++ )
+            ;
+
          if( j - i == 2 && i == 1 && j == iCodeLen )
          {
             /* [StartB] 1 2  -->  [StartC] [12] */
@@ -391,9 +393,7 @@ HB_FUNC( HB_ZEBRA_CREATE_CODE128 )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_code128( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_code128( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

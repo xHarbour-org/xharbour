@@ -51,18 +51,16 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 static char _msi_checksum( const char * szCode )
 {
-   int   i, j = 1, k, sum = 0;
+   int i, j = 1, sum = 0;
 
    /* Luhn algorithm */
    for ( i = ( int ) strlen( szCode ) - 1; i >= 0; i-- )
    {
-      k = ( szCode[ i ] - '0' ) * ( j ? 2 : 1 );
+      int k = ( szCode[ i ] - '0' ) * ( j ? 2 : 1 );
       if( k > 9 )
          k -= 9;
       sum += k;
@@ -72,7 +70,7 @@ static char _msi_checksum( const char * szCode )
    return ( char ) ( '0' + ( sum ? 10 - sum : 0 ) );
 }
 
-PHB_ZEBRA hb_zebra_create_msi( const char * szCode, ULONG nLen, int iFlags )
+PHB_ZEBRA hb_zebra_create_msi( const char * szCode, HB_SIZE nLen, int iFlags )
 {
    PHB_ZEBRA  pZebra;
    int        i, j, iN, iW, iLen = ( int ) nLen;
@@ -164,9 +162,7 @@ HB_FUNC( HB_ZEBRA_CREATE_MSI )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
    if( pItem )
-   {
-      hb_zebra_ret( hb_zebra_create_msi( hb_itemGetCPtr( pItem ), (ULONG) hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
-   }
+      hb_zebra_ret( hb_zebra_create_msi( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ), hb_parni( 2 ) ) );
    else
       hb_errRT_BASE( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }

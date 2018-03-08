@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_destination.c
  *
  * URL: http://libharu.org
@@ -17,12 +14,12 @@
  * It is provided "as is" without express or implied warranty.
  *
  */
-#include "hpdf_destination.h"
+
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf.h"
 
-const char *HPDF_DESTINATION_TYPE_NAMES[] = {
+const char * const HPDF_DESTINATION_TYPE_NAMES[] = {
         "XYZ",
         "Fit",
         "FitH",

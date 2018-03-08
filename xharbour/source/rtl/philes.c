@@ -535,17 +535,17 @@ HB_FUNC( HB_OPENPROCESS )
 
       if( pfhIn )
       {
-         hb_stornint(  ( HB_NHANDLE )pfhIn ,2 );
+         hb_stornint(  ( HB_NHANDLE ) *pfhIn ,2 );
       }
 
       if( pfhOut )
       {
-         hb_stornint( ( HB_NHANDLE )pfhOut ,3 );
+         hb_stornint( ( HB_NHANDLE ) *pfhOut ,3 );
       }
 
       if( pfhErr  && pfhErr != pfhOut )
       {
-         hb_stornint( ( HB_NHANDLE ) pfhErr ,4);
+         hb_stornint( ( HB_NHANDLE ) *pfhErr ,4);
       }
 
          hb_stornint( pid ,6 );

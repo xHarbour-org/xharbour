@@ -54,13 +54,15 @@
 #define HB_ZEBRA_H_
 
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
 #include "hbzebra.ch"
 
 typedef struct
 {
    unsigned char * pBuffer;
-   ULONG         nLen;
-   ULONG         nAlloc;
+   HB_SIZE         nLen;
+   HB_SIZE         nAlloc;
    void *          pCargo;
 } HB_BITBUFFER, * PHB_BITBUFFER;
 
@@ -77,11 +79,11 @@ HB_EXTERN_BEGIN
 
 extern HB_EXPORT PHB_BITBUFFER    hb_bitbuffer_create( void );
 extern HB_EXPORT void             hb_bitbuffer_destroy( PHB_BITBUFFER pBitBuffer );
-extern HB_EXPORT ULONG            hb_bitbuffer_len( PHB_BITBUFFER pBitBuffer );
+extern HB_EXPORT HB_SIZE          hb_bitbuffer_len( PHB_BITBUFFER pBitBuffer );
 extern HB_EXPORT unsigned char *  hb_bitbuffer_buffer( PHB_BITBUFFER pBitBuffer );
-extern HB_EXPORT BOOL             hb_bitbuffer_get( PHB_BITBUFFER pBitBuffer, ULONG nPos );
-extern HB_EXPORT void             hb_bitbuffer_set( PHB_BITBUFFER pBitBuffer, ULONG nPos, BOOL fValue );
-extern HB_EXPORT void             hb_bitbuffer_not( PHB_BITBUFFER pBitBuffer, ULONG nPos );
+extern HB_EXPORT HB_BOOL          hb_bitbuffer_get( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos );
+extern HB_EXPORT void             hb_bitbuffer_set( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos, HB_BOOL fValue );
+extern HB_EXPORT void             hb_bitbuffer_not( PHB_BITBUFFER pBitBuffer, HB_SIZE nPos );
 extern HB_EXPORT void             hb_bitbuffer_cat_int( PHB_BITBUFFER pBitBuffer, int iValue, int iLen );
 extern HB_EXPORT void             hb_bitbuffer_cat_int_rev( PHB_BITBUFFER pBitBuffer, int iValue, int iLen );
 
