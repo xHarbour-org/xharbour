@@ -6266,7 +6266,17 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_ext_g
 $(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_u3d.c
 	$(CC_CMD)
 
+$(OBJ_DIR)$(DIR_SEP)hpdf_3dmeasure$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_3dmeasure.c
+	$(CC_CMD)	
 
+$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_utf$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_utf.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_exdata$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_exdata.c
+	$(CC_CMD)
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_image_ccitt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image_ccitt.c
+	$(CC_CMD)	
 #===============================================================================
 # TIPSSL.LIB rules
 #===============================================================================

@@ -2461,6 +2461,10 @@ LIBHARU_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_namedict$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_pdfa$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_3dmeasure$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_utf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_exdata$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)hpdf_image_ccitt$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT)
 
 #===============================================================================

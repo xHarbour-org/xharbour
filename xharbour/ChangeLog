@@ -9,6 +9,11 @@
 */
 
 
+2018-03-08 21:37 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * winmake/common.mak
+  * winmake/compile.mak
+    ! update dependencies missed from previus commit
+
 2018-03-07 21:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * bin/pack_src.sh
     ! added new sources to compress
