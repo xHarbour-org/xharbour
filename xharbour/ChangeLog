@@ -9,6 +9,10 @@
 */
 
 
+2018-03-10 11:05 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbhpdf\hpdf_encoder_utf.c
+    ! added a cast in function UTF8_Encoder_EncodeText_Func()
+
 2018-03-08 21:37 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * winmake/common.mak
   * winmake/compile.mak
