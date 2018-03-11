@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-03-11 21:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include/hbfloat.h
+    ! fixed a wrong comparison in #define HB_NUMTYPE()
+
 2018-03-11 20:29 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_gc.bat
     ! SET HB_ARCHITECTURE=w32 remmed out, it prevented MinGW build

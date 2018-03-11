@@ -136,7 +136,7 @@
 #  define HB_NUMTYPE( v, d )  do { \
                                  v = ( isfinite( d ) ? 0 : \
                                        ( isnan( d ) ? _HB_NUM_NAN : \
-                                         ( isinf( d ) < 0 ? _HB_NUM_NINF : \
+                                         ( isinf( d ) ? _HB_NUM_NINF : \
                                            _HB_NUM_PINF ) ) ); \
                               } while( 0 )
 
