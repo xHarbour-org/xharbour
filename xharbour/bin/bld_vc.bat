@@ -113,7 +113,7 @@ SET _LIB=%LIB%
    GOTO SET_PATH
 
 :SET_PATH
-IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat %_ARCH%
+IF EXIST "%CC_DIR%"\vcvars32.bat CALL "%CC_DIR%"\vcvars32.bat
 
 SET PATH="%CC_DIR%\bin";%~dp0;%PATH%
 
