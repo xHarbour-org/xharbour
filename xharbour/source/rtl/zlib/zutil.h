@@ -178,10 +178,19 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #  endif
 #endif
 
-#if defined(__BORLANDC__) && !defined(MSDOS)
+#if defined( __POCC__ )
+   #pragma warn(push)
+   #pragma warn(disable:2154)
+#elif defined(_MSC_VER)
+   #pragma warning(disable:4244)
+   /* C4244: conversion from 'int' to 'Bytef', possible loss of data -> safe */
+#elif defined(__WATCOMC__) && !defined(MSDOS)
+   #pragma disable_message ( 201 )
+#elif defined(__BORLANDC__) && !defined(MSDOS)
   #pragma warn -8004
   #pragma warn -8008
   #pragma warn -8066
+   #pragma warn -8012
 #endif
 
 /* provide prototypes for these when building zlib without LFS */

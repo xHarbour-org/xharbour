@@ -1171,7 +1171,7 @@ static HB_ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL b
    return HB_SUCCESS;
 }
 
-static HB_ERRCODE adsSkip( ADSAREAP pArea, HB_LONG lToSkip )
+static HB_ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSkip(%p, %ld)", pArea, lToSkip));
 
@@ -1203,8 +1203,8 @@ static HB_ERRCODE adsSkip( ADSAREAP pArea, HB_LONG lToSkip )
       /* Clipper does not update record at EOF position in SKIP(0) */
       if( pArea->fPositioned )
       {
-         BOOL fBof, fEof;
-
+         BOOL fBof;
+         BOOL fEof;
          /* Save flags */
          fBof = pArea->area.fBof;
          fEof = pArea->area.fEof;
@@ -1227,7 +1227,7 @@ static HB_ERRCODE adsSkip( ADSAREAP pArea, HB_LONG lToSkip )
    else
    {
       HB_ERRCODE errCode = HB_SUCCESS;
-      HB_LONG lSkipper;
+      LONG lSkipper;
 
       if( !pArea->fPositioned && lToSkip < 0 )
       {
@@ -1291,7 +1291,7 @@ static HB_ERRCODE adsSkip( ADSAREAP pArea, HB_LONG lToSkip )
    }
 }
 
-static HB_ERRCODE adsSkipFilter( ADSAREAP pArea, HB_LONG lUpDown )
+static HB_ERRCODE adsSkipFilter( ADSAREAP pArea, LONG lUpDown )
 {
    BOOL fBottom;
    HB_ERRCODE uiError;
