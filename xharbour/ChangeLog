@@ -8,6 +8,79 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-04-11 14:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * include/hbapifs.h
+    ! adjust in function that use USHORT uiFlags to use HB_FATTR uiFlags
+  * include/hbcompat.h
+    ! added defined #define hb_arraySetCLPtr          hb_arraySetCPtr  and #define HB_MAXUINT                HB_ULONG
+  * include/hbdate.h
+    ! added hb_timerGet(),hb_timerInit() and hb_timerTest() borrow from harbour
+  * include/hbexprb.c
+    ! fixed warning by using duplicate variable by renaming the second variable to szName2
+  * include/hbsocket.ch
+    ! Sync with harbour
+  * include/hbsocket.h
+    ! Sync with harbour
+  * source/common/hbdate.c
+    ! added hb_timerGet(),hb_timerInit() and hb_timerTest() borrow from harbour  	
+  * source/common/hbgete.c
+    ! cast strlen( szValue ) to DWORD on call to RegSetValueEx to make msvc win64 build happy
+  * source/compiler/comptool.c 
+    ! in structure HB_MEMINFO ULONG ulSize  => HB_SIZE ulSize
+    ! static LONG s_ulMemoryBlocks       => static HB_SIZE s_ulMemoryBlocks       
+    ! static LONG s_ulMemoryMaxBlocks    => static HB_SIZE s_ulMemoryMaxBlocks    
+    ! static LONG s_ulMemoryMaxConsumed  => static HB_SIZE s_ulMemoryMaxConsumed  
+    ! static LONG s_ulMemoryConsumed     => static HB_SIZE s_ulMemoryConsumed   
+    ! in hb_xquery() function change ULONG => HB_SIZE
+    ! in hb_memToStr function change ULONG => HB_SIZE
+	! changed %lu to %" HB_PFS "u where applicable	
+  * source/ct/bit3.c
+    ! Change HB_LONG to long
+  * source/pp/ppgen.c 
+    ! in function hb_pp_writeToken and hb_pp_parseChangelog cast strlen to int 
+  * source/rdd/dbfntx/dbfntx1.c
+	! optimized to use  hb_itemGetDTS( pItem, szBuffer );	 insted of char szBuffer[ 17 ];
+      hb_datetimeDecStr( szBuffer, hb_itemGetDL( pItem ), hb_itemGetT( pItem ) );
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbffpt/redbffpt1.c
+  * source/rdd/dbfmdx/dbfmdx1.c
+  * source/rdd/hsx/hsx.c
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy		  
+  * source/rtl/copyfile.c
+	! changed blockeval function to use HB_SIZE insted of ULONG			  	 
+  * source/rtl/filebuf.c
+    ! changed USHORT uiExFlags to HB_FATTR uiExFlags in s_fileExtOpen and hb_fileExtOpen functions
+  * source/rtl/filenet.c	
+    ! changed USHORT uiExFlags to HB_FATTR uiExFlags in hb_NetExtName and hb_fileNetExtOpen functions
+  * source/rtl/filesys.c
+    ! in hb_fsReadAt and hb_fsReadLarge some changed on call to ReadFile Api to make win64 build happy
+	! changed USHORT uiExFlags to HB_FATTR uiExFlags in hb_fsExtName and hb_fsExtOpen functions
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy		  	
+  ! source\rtl\hbcomprs.c	
+    ! some casts to make win64 build happy  ( HB_SIZE ) to ( uLong)  in HB_UNCOMPRESS and HB_COMPRESS functions
+  ! source\rtl\hbsrlraw.c
+    ! fixed cast on  HB_DESERIALIZEARRAY	 LONG -> HB_SIZE
+  ! source\rtl\readline.c 
+    ! hb_fsSeek -> hb_fsSeekLarge
+	! hb_xfree( Term ); - >hb_xfree( ( void * ) Term );
+  ! source\tip\base64.c
+    ! change int to HB_FHANDLE   
+  * source/vm/dbgentry.c
+    ! changed HB_COUNTER  nProcLevel to  int nProcLevel in hb_dbgEvalResolve and hb_dbgEntry functions	
+  ! source\rdd\hsx\hsx.c
+    ! in function HS_FILTER change ULONG ulLen -> HB_SIZE        ulLen and ULONG ull,ul to HB_SIZE ull,ul
+  ! winmake/common.mak  
+    ! removed maindll from VM_MAIN_OBJS
+  * winmake/makefile.gc 
+   ! added iphlpapi to compiler libs 
+  ! winmake/msvcerr.vc
+    + added defined to msvc 2015 and msvc 2017
+  * make_vc64.bat 
+    ! bat to build xharbour using msvc 64bits
+	
 2018-03-25 21:37 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * contrib/rdd_ads/ads1.c
     ! minor fix on adsSkip and adsSkipFilter ( HB_LONG -> LONG)

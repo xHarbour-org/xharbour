@@ -168,7 +168,7 @@ typedef struct _HB_MEMINFO
 {
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
-   ULONG                ulSize;
+   HB_SIZE              ulSize;
    const char *         szSourceFile;
    const char *         szFuncName;
    int                  iSourceLine;
@@ -183,17 +183,17 @@ typedef struct _HB_MEMINFO
 #endif
 
 static PHB_MEMINFO   s_pMemBlocks            = NULL;
-static LONG          s_ulMemoryBlocks        = 0;  /* memory blocks used */
-static LONG          s_ulMemoryMaxBlocks     = 0;  /* maximum number of used memory blocks */
-static LONG          s_ulMemoryMaxConsumed   = 0;  /* memory size consumed */
-static LONG          s_ulMemoryConsumed      = 0;  /* memory max size consumed */
+static HB_SIZE          s_ulMemoryBlocks        = 0;  /* memory blocks used */
+static HB_SIZE          s_ulMemoryMaxBlocks     = 0;  /* maximum number of used memory blocks */
+static HB_SIZE          s_ulMemoryMaxConsumed   = 0;  /* memory size consumed */
+static HB_SIZE          s_ulMemoryConsumed      = 0;  /* memory max size consumed */
 
 #endif /* __HB_COMP_TRACE__ */
 
 
 HB_SIZE hb_xquery( USHORT uiMode )
 {
-   ULONG ulResult = 0;
+   HB_SIZE ulResult = 0;
 
 #if defined( __HB_COMP_TRACE__ )
    switch( uiMode )
@@ -213,43 +213,42 @@ HB_SIZE hb_xquery( USHORT uiMode )
 }
 
 #if defined( __HB_COMP_TRACE__ )
-static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
+static char * hb_memToStr( char * szBuffer, void * pMem, HB_SIZE ulSize )
 {
-   unsigned char *   byMem = ( BYTE * ) pMem;
-   char *            pDest = szBuffer;
-   int               iSize, i, iPrintable;
+   BYTE *   byMem = ( BYTE * ) pMem;
+   HB_SIZE  i, iPrintable;
 
-   if( ulSize > HB_MEMSTR_BLOCK_MAX )
-      iSize = HB_MEMSTR_BLOCK_MAX;
-   else
-      iSize = ( int ) ulSize;
-
+  
    iPrintable = 0;
-   for( i = 0; i < iSize; ++i )
-      if( ( byMem[ i ] & 0x7f ) >= 0x20 )
+   for( i = 0; i < ulSize; ++i )
+      if( ( byMem[ i ] & 0x60 ) != 0 )
          iPrintable++;
 
-   if( ( iPrintable * 100 ) / iSize > 70 ) /* more then 70% printable chars */
+   if( ( iPrintable * 100 ) / ulSize > 70 ) /* more then 70% printable chars */
    {
       /* format as string of original chars */
-      for( i = 0; i < iSize; ++i )
-         if( ( byMem[ i ] & 0x7f ) >= 0x20 )
-            *pDest++ = byMem[ i ];
+      for( i = 0; i < ulSize; ++i ) 
+	  {
+         if(  byMem[ i ] >= ' ' )
+            szBuffer[ i ] = byMem[ i ];
          else
-            *pDest++ = '.';
+            szBuffer[ i ] = '.';
+      }
+	  szBuffer[ i ] = '\0';	
    }
    else
    {
       /* format as hex */
-      for( i = 0; i < iSize; ++i )
+      for( i = 0; i < ulSize; ++i )
       {
-         int iLo = byMem[ i ] & 0x0f, iHi = byMem[ i ] >> 4;
-         *pDest++ = '\\';
-         *pDest++ = iHi <= 9 ? '0' + iHi : 'A' - 10 + iHi;
-         *pDest++ = iLo <= 9 ? '0' + iLo : 'A' - 10 + iLo;
+		 HB_BYTE hinibble = byMem[ i ] >> 4;
+         HB_BYTE lownibble = byMem[ i ] & 0x0F;         
+         szBuffer[ i * 2 ] = hinibble <= 9 ? ('0' + hinibble) : ('A' - 10 + hinibble);
+         szBuffer[ i * 2 + 1 ]= lownibble <= 9 ? ('0' + lownibble) : ('A' - 10 + lownibble);
       }
+	   szBuffer[ i * 2 ] = '\0';
    }
-   *pDest = '\0';
+   
 
    return szBuffer;
 }
@@ -351,7 +350,7 @@ void * hb_xreallocEx( void * pMem, HB_SIZE ulSize, const char* szSourceFile, int
 {
 #if defined( __HB_COMP_TRACE__ )
    PHB_MEMINFO pMemBlock;
-   ULONG       ulMemSize;
+   HB_SIZE       ulMemSize;
    void *      pResult;
 
    if( ulSize == 0 )
@@ -453,13 +452,13 @@ void hb_xexitEx( void )
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %" HB_PFS "u bytes (%" HB_PFS "u blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       fprintf( hLog, "%s\n", szBuffer );
 
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %" HB_PFS "u bytes (%" HB_PFS "u blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       fprintf( hLog, "--------------------------------------------------------------------------------\n" );
@@ -470,13 +469,13 @@ void hb_xexitEx( void )
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
       {
          char _Error[ 256 ];
-         hb_snprintf ( _Error, sizeof(_Error), "%s(%i) %s() Block %i %p (size %lu) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
+         hb_snprintf ( _Error, sizeof(_Error), "%s(%i) %s() Block %i %p (size %" HB_PFS "u) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ) ) ;
 
          hb_conOutErr( _Error, 0 );
-         fprintf( hLog,"%s(%i) %s() Block %i %p (size %lu) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
+         fprintf( hLog,"%s(%i) %s() Block %i %p (size %" HB_PFS "u) \"%s\"\n", pMemBlock->szSourceFile, pMemBlock->iSourceLine, pMemBlock->szFuncName, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ));
@@ -992,13 +991,13 @@ void hb_xexit( void )
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %" HB_PFS "u bytes (%" HB_PFS "u blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       fprintf( hLog, "%s\n", szBuffer );
 
       hb_conOutErr( hb_conNewLine(), 0 );
-      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+      hb_snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %" HB_PFS "u bytes (%" HB_PFS "u blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       fprintf( hLog, "--------------------------------------------------------------------------------\n" );
@@ -1008,11 +1007,11 @@ void hb_xexit( void )
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
       {
-         HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
+         HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %" HB_PFS "u) \"%s\"", pMemBlock->iSourceLine - 1, i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ) ) );
-         fprintf( hLog,"Block %i %p (size %lu) \"%s\"\n", i,
+         fprintf( hLog,"Block %i %p (size %" HB_PFS "u) \"%s\"\n", i,
                                   ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                                   hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                                                pMemBlock->ulSize ));

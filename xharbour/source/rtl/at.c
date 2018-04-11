@@ -87,12 +87,13 @@ HB_FUNC( AT )
    if( pText && pSub )
    {
       HB_SIZE     lStart   = pStart ? hb_itemGetNS( pStart ) : 1;
-      HB_SIZE     lEnd     = pEnd ? hb_itemGetNS( pEnd ) : hb_itemGetCLen( pText);
-      HB_SIZE  ulPos;
+	  HB_SIZE     nLen     =  hb_itemGetCLen( pText);
+      HB_SIZE     lEnd     = pEnd ? hb_itemGetNS( pEnd ) :nLen ;
+      HB_SIZE     ulPos;
 
       if( lStart < 0 )
       {
-         lStart += hb_itemGetCLen( pText );
+         lStart += nLen;
 
          if( lStart < 0 )
          {
@@ -106,12 +107,12 @@ HB_FUNC( AT )
 
       if( lEnd < 0 )
       {
-         lEnd += hb_itemGetCLen( pText ) + 1;
+         lEnd += nLen + 1;
       }
 
-      if( lEnd > hb_itemGetCLen( pText ) )
+      if( lEnd > nLen )
       {
-         lEnd = hb_itemGetCLen( pText );
+         lEnd = nLen;
       }
 
       // Stop searching if starting past beyond end.
@@ -126,7 +127,7 @@ HB_FUNC( AT )
 
       ulPos = hb_strAt( hb_itemGetCPtr( pSub ), hb_itemGetCLen( pSub), hb_itemGetCPtr( pText ) + lStart, lEnd - lStart );
 
-      hb_retnl( ( LONG ) ( ulPos ? ulPos + lStart : 0 ) );
+      hb_retns(  ( ulPos ? ulPos + lStart : 0 ) );
    }
    else
    {

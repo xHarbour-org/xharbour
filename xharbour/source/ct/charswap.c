@@ -130,7 +130,7 @@ static void do_charswap( int iSwitch )
                *( pcRet + sRetIndex )  = *( pcSub + 2 );
                sRetIndex++;
             }; /* no 'break' here !! */
-
+            /* fallthrough */
             case DO_CHARSWAP_CHARSWAP:
             {
                *( pcRet + sRetIndex )  = *( pcSub + 1 );

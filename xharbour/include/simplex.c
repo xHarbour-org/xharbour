@@ -322,7 +322,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
          { \
             register unsigned int i = aPairNodes[chrRead].iMin, iMax = aPairNodes[chrRead].iMax + 1, iStartLen = 0; \
             register unsigned char chrStart = 0; \
-            unsigned int iLastPair = 0, iLastLen = 0; \
+            unsigned int iLastPair = 0, iLastLen2 = 0; \
             \
             DEBUG_INFO( printf( "Checking %i Streams for %c At: >%s<\n", iPairs, chrRead, szBuffer - 1 ) ); \
             \
@@ -347,10 +347,10 @@ static int rulecmp( const void * pLeft, const void * pRight );
                /* Match */ \
                if( aPairs[i].sStart[iStartLen] == '\0' ) \
                { \
-                  if( iStartLen > iLastLen ) \
+                  if( iStartLen > iLastLen2 ) \
                   { \
                      iLastPair = i + 1; \
-                     iLastLen  = iStartLen; \
+                     iLastLen2  = iStartLen; \
                   } \
                } \
                i++; \
@@ -369,7 +369,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
                   if( iStartLen > 1 ) chrRead = chrStart; \
                   \
                   /* Moving to next postion after the Stream Start position. */ \
-                  szBuffer += ( iLastLen - 1 ); \
+                  szBuffer += ( iLastLen2 - 1 ); \
                   \
                   sStart     = (char *) aPairs[iLastPair].sStart; \
                   sTerm      = (char *) aPairs[iLastPair].sTerm; \
@@ -697,7 +697,7 @@ int SimpLex_GetNextToken( void )
 
                      if( iSize <= 0 )
                      {
-                        int iRet = iPairToken;
+                        int iRet2 = iPairToken;
 
                         sPair[ iPairLen ] = '\0';
 
@@ -707,7 +707,7 @@ int SimpLex_GetNextToken( void )
                         iPairToken = 0;
                         s_szBuffer = szBuffer;
 
-                        return iRet;
+                        return iRet2;
                      }
 
                      /* Next Character. */
@@ -767,7 +767,7 @@ int SimpLex_GetNextToken( void )
                      /* Check if exception. */
                      IF_ABORT_PAIR( chrPair )
                      {
-                        int iRet = iPairToken;
+                        int iRet2 = iPairToken;
 
                         sPair[ iPairLen ] = '\0';
 
@@ -780,7 +780,7 @@ int SimpLex_GetNextToken( void )
                         iPairToken = 0;
                         s_szBuffer = szBuffer;
 
-                        return iRet;
+                        return iRet2;
                      }
                      else
                      {
@@ -796,13 +796,13 @@ int SimpLex_GetNextToken( void )
                }
 
                {
-                  int iRet = iPairToken;
+                  int iRet2 = iPairToken;
 
                   /* Resetting. */
                   iPairToken = 0;
                   s_szBuffer = szBuffer;
 
-                  return iRet;
+                  return iRet2;
                }
             }
             /* End Pairs. */

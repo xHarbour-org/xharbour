@@ -144,7 +144,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, HB_SIZE * plBuffLen,const char ** Ter
             pBuff[ *plBuffLen ]  = '\0';
 
             /* Set handle pointer in the end of the line */
-            hb_fsSeek( hFileHandle,  ( ( ( lRead - iPos ) * -1 ) + 1 ), FS_RELATIVE );
+            hb_fsSeekLarge( hFileHandle,  ( ( ( lRead - iPos ) * -1 ) + 1 ), FS_RELATIVE );
 
             return pBuff;
          }
@@ -251,6 +251,6 @@ HB_FUNC( HB_FREADLINE )
 
    hb_storclenAdopt( ( char * ) pBuffer, lSize, 2 );
    hb_retnl( bEOF ? -1 : 0 );
-   hb_xfree( Term );
+   hb_xfree( ( void * ) Term );
    hb_xfree( iTermSizes );
 }

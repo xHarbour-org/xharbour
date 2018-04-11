@@ -985,10 +985,12 @@ static int hb_hsxLock( int iHandle, int iAction, ULONG ulRecord )
             iRetVal = hb_hsxFlush( iHandle );
             if( iAction == HSX_APPENDLOCK )
                pHSX->fWrLocked = FALSE;
+		  /* fallthrough */  
          case HSX_HDRWRITEUNLOCK:
             iRet = hb_hsxHdrFlush( iHandle );
             if( iRetVal == HSX_SUCCESS )
                iRetVal = iRet;
+		  /* fallthrough */  
          case HSX_HDRREADUNLOCK:
             if( ! hb_fileLock( pHSX->pFile, HSX_HDRLOCKPOS, HSX_HDRLOCKSIZE,
                                FL_UNLOCK ) )
@@ -1577,7 +1579,7 @@ static int hb_hsxIndex( const char * szFile, PHB_ITEM pExpr, int iKeySize,
                         int iMode, int iBufSize, BOOL fIgnoreCase, int iFilter )
 {
    int         iRetVal  = HSX_SUCCESS, iHandle;
-   ULONG       ulRecNo , ulRecCount , ulNewRec, ulRec;
+   ULONG       ulRecNo=0 , ulRecCount =0, ulNewRec =0, ulRec;
    HB_ERRCODE  errCode;
    AREAP       pArea    = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -1863,7 +1865,8 @@ HB_FUNC( HS_FILTER )
 {
    const char *   szText   = hb_parc( 2 );
    char *         pBuff    = NULL;
-   ULONG          ulLen    = ( ULONG ) hb_parclen( 2 ), ulRecords = 0, ull, ul;
+   HB_SIZE        ulLen    =  hb_parclen( 2 );
+   ULONG          ulRecords = 0; //, ull, ul;
    int            iHandle  = -1, iResult = HSX_BADPARMS;
    BOOL           fNew     = FALSE, fToken = TRUE;
 
@@ -1920,6 +1923,8 @@ HB_FUNC( HS_FILTER )
          /* to be SIX compatible divide given text on space delimited tokens */
          if( fToken )
          {
+			HB_SIZE ull, ul;
+			 
             iResult = HSX_SUCCESS;
             for( ul = 0; ul < ulLen && iResult == HSX_SUCCESS; ul++ )
             {

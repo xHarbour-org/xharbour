@@ -1467,7 +1467,7 @@ VM_COMMON_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)bkgtsks$(HB_MT)$(OBJEXT)
 
 VM_MAIN_OBJS=\
-	$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT)\
+#	$(OBJ_DIR)$(DIR_SEP)maindll$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mainstd$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)mainwin$(OBJEXT)
 

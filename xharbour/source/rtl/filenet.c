@@ -390,19 +390,19 @@ static char * hb_strToken( char * szText, HB_SIZE ulText, HB_SIZE ulIndex, HB_SI
    }
 }
 
-static long int hb_Net_Recv( HB_SOCKET_T hSocket )
+static long int hb_Net_Recv( HB_SOCKET_T hSockets )
 {
    ULONG ulDataLen;
    ULONG ulRead = 0;
    int   iRet;
 
-   while( hb_ipDataReady( hSocket, 2 ) == 0 )
+   while( hb_ipDataReady( hSockets, 2 ) == 0 )
    {
    }
 
    while( ulRead < HB_LENGTH_ACK )
    {
-      iRet = hb_ipRecv( hSocket, szBuffer + ulRead, lBufferLen - ulRead );
+      iRet = hb_ipRecv( hSockets, szBuffer + ulRead, lBufferLen - ulRead );
       if( iRet > 0 )
          ulRead += ( ULONG ) iRet;
    }
@@ -418,7 +418,7 @@ static long int hb_Net_Recv( HB_SOCKET_T hSocket )
       }
       while( ulRead < ( ulDataLen + HB_LENGTH_ACK ) )
       {
-         iRet = hb_ipRecv( hSocket, szBuffer + ulRead, lBufferLen - ulRead );
+         iRet = hb_ipRecv( hSockets, szBuffer + ulRead, lBufferLen - ulRead );
          if( iRet > 0 )
             ulRead += ( ULONG ) iRet;
       }
@@ -479,13 +479,13 @@ static int hb_NetSingleSendRecv( HB_SOCKET_T hCurSocket, char * sData, HB_SIZE u
    return lRet;
 }
 
-static long int hb_Net_SingleRecv( HB_SOCKET_T hSocket )
+static long int hb_Net_SingleRecv( HB_SOCKET_T hSockets )
 {
-   while( hb_ipDataReady( hSocket, 2 ) == 0 )
+   while( hb_ipDataReady( hSockets, 2 ) == 0 )
    {
    }
 
-   hb_ipRecv( hSocket, szBuffer, lBufferLen );
+   hb_ipRecv( hSockets, szBuffer, lBufferLen );
 
    *( szBuffer + 2 ) = '\0';
 
@@ -623,7 +623,7 @@ USHORT hb_fileNetCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
       return hb_fsCurDirBuffEx( uiDrive, pbyBuffer, ulLen );
 }
 
-static char * hb_NetExtName( const char * pFilename, const char * pDefExt, USHORT uiExFlags, const char * pPaths )
+static char * hb_NetExtName( const char * pFilename, const char * pDefExt, HB_FATTR uiExFlags, const char * pPaths )
 {
    HB_PATHNAMES * pNextPath;
    PHB_FNAME      pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
@@ -697,7 +697,7 @@ static char * hb_NetExtName( const char * pFilename, const char * pDefExt, USHOR
 }
 
 PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
-                            USHORT uiExFlags, const char * pPaths,
+                            HB_FATTR uiExFlags, const char * pPaths,
                             PHB_ITEM pError, BOOL fBufferLock )
 {
    PHB_FILE    pFile;
@@ -783,7 +783,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
 void hb_fileNetClose( PHB_FILE pFile )
 {
    HB_FHANDLE  hFile       = FS_ERROR;
-   HB_SOCKET_T hCurSocket  ;
+   HB_SOCKET_T hCurSocket = 0 ;
 
    hb_threadLock( S_FILENETMTX );
 
@@ -1065,13 +1065,13 @@ HB_SIZE hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, HB_SIZE ulSi
       HB_PUT_BE_UINT32( szData, ulSize + ulLen + 2 );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, ulLen + ulSize + 2 + HB_LENGTH_ACK, 1009 ) )
       {
-         char *   ptr;
+         char *   ptrs;
          USHORT   uiError;
 
          ptr = hb_NetFirstChar();
-         hb_NetGetCmdItem( &ptr, szData ); ptr++;
+         hb_NetGetCmdItem( &ptrs, szData ); ptrs++;
          sscanf( szData, "%lu", (unsigned long int *) &ulWrite );
-         hb_NetGetCmdItem( &ptr, szData );
+         hb_NetGetCmdItem( &ptrs, szData );
          sscanf( szData, "%hu", &uiError );
          hb_fsSetError( uiError );
       }
@@ -1112,13 +1112,13 @@ USHORT hb_fileNetWrite( PHB_FILE pFile, const char * pBuffer, USHORT uiCount )
       HB_PUT_BE_UINT32( szData, uiCount + ulLen + 2 );
       if( hb_NetSingleSendRecv( pFile->hSocket, szData, ulLen + uiCount + 2 + HB_LENGTH_ACK, 1012 ) )
       {
-         char *   ptr;
+         char *   ptrs;
          USHORT   uiError;
 
-         ptr = hb_NetFirstChar();
-         hb_NetGetCmdItem( &ptr, szData ); ptr++;
+         ptrs = hb_NetFirstChar();
+         hb_NetGetCmdItem( &ptrs, szData ); ptrs++;
          sscanf( szData, "%hu", &uiWrite );
-         hb_NetGetCmdItem( &ptr, szData );
+         hb_NetGetCmdItem( &ptrs, szData );
          sscanf( szData, "%hu", &uiError );
          hb_fsSetError( uiError );
       }

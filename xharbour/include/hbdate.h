@@ -109,6 +109,11 @@ extern HB_EXPORT double   hb_datetimePackInSec( long lJulian, long lTime );
 extern HB_EXPORT void     hb_timeStampUnpackDT( double dTimeStamp, long * plJulian, long * plMilliSec );
 extern HB_EXPORT void     hb_timeStampGetLocal( int * piYear, int * piMonth, int * piDay,int * piHour, int * piMinutes,int * piSeconds, int * piMSec );
 extern HB_EXPORT void     hb_timeStampGet( long * plJulian, long * plMilliSec );
+
+extern HB_EXPORT HB_MAXUINT hb_timerGet( void );
+extern HB_EXPORT HB_MAXUINT hb_timerInit( HB_MAXINT nTimeOut );
+extern HB_EXPORT HB_MAXINT  hb_timerTest( HB_MAXINT nTimeOut, HB_MAXUINT * pnTimer );
+
 HB_EXTERN_END
 
 #define HB_MINUTES_PER_DAY    ( 24 * 60 )

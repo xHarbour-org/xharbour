@@ -25,7 +25,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * aHB_LONG with this software; see the file COPYING.  If not, write to
+ * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
@@ -60,17 +60,17 @@
 #include "ct.h"
 
 
-static HB_LONG __getparam( int iParam );
-static HB_LONG __numand( HB_LONG wNum1, HB_LONG wNum2 );
-static HB_LONG __numor( HB_LONG wNum1, HB_LONG wNum2 );
-static HB_LONG __numxor( HB_LONG wNum1, HB_LONG wNum2 );
-static HB_LONG __numnot( HB_LONG wNum1, HB_LONG wNum2 );
-static HB_LONG __numfun( int iPCount, HB_LONG ( * operation )( HB_LONG wNum1, HB_LONG wNum2 ), BOOL * pbOk );
-static void sizeofbits( HB_USHORT * pusBytes, HB_LONG * plPattern, HB_LONG * plTestMSB );
+static long __getparam( int iParam );
+static long __numand( long wNum1, long wNum2 );
+static long __numor( long wNum1, long wNum2 );
+static long __numxor( long wNum1, long wNum2 );
+static long __numnot( long wNum1, long wNum2 );
+static long __numfun( int iPCount, long ( * operation )( long wNum1, long wNum2 ), BOOL * pbOk );
+static void sizeofbits( HB_USHORT * pusBytes, long * plPattern, long * plTestMSB );
 
 HB_FUNC( NUMANDX )
 {
-   HB_LONG  lNumOp;
+   long  lNumOp;
    BOOL  bOk;
 
    lNumOp = __numfun( hb_pcount(), __numand, &bOk );
@@ -83,7 +83,7 @@ HB_FUNC( NUMANDX )
 HB_FUNC( NUMORX )
 {
    int   iPCount;
-   HB_LONG  lNumOp;
+   long  lNumOp;
    BOOL  bOk;
 
    iPCount  = hb_pcount();
@@ -99,7 +99,7 @@ HB_FUNC( NUMORX )
 HB_FUNC( NUMXORX )
 {
    int   iPCount;
-   HB_LONG  lNumOp;
+   long  lNumOp;
    BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
@@ -117,7 +117,7 @@ HB_FUNC( NUMXORX )
 HB_FUNC( NUMNOTX )
 {
    int   iPCount;
-   HB_LONG  lNumOp;
+   long  lNumOp;
    BOOL  bOk;
 
 /*  iPCount = hb_pcount(); */
@@ -134,7 +134,7 @@ HB_FUNC( NUMNOTX )
 
 HB_FUNC( NUMROLX )
 {
-   HB_LONG   lNum1, lNumBak, lPattern, lTestRol;
+   long   lNum1, lNumBak, lPattern, lTestRol;
    USHORT usBytes, usFor, usNum2;
 
    if( ISNUM( 2 ) || ISCHAR( 2 ) )
@@ -169,7 +169,7 @@ HB_FUNC( NUMROLX )
 
 HB_FUNC( NUMMIRRX )
 {
-   HB_LONG   lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
+   long   lNum1, lPattern, lTestMSB, lNumBak, lMirror = 0;
    USHORT usBytes, usFor;
 
    if( ISNUM( 2 ) || ISCHAR( 2 ) )
@@ -201,41 +201,41 @@ HB_FUNC( NUMMIRRX )
 
 }
 
-static HB_LONG __getparam( int iParam )
+static long __getparam( int iParam )
 {
    if( ISCHAR( iParam ) )
-      return ( HB_LONG ) hb_hextonum( hb_parcx( iParam ) );
+      return ( long ) hb_hextonum( hb_parcx( iParam ) );
    else
       return hb_parnl( iParam );
 }
 
-static HB_LONG __numand( HB_LONG lNum1, HB_LONG lNum2 )
+static long __numand( long lNum1, long lNum2 )
 {
    return lNum1 & lNum2;
 }
 
-static HB_LONG __numor( HB_LONG lNum1, HB_LONG lNum2 )
+static long __numor( long lNum1, long lNum2 )
 {
    return lNum1 | lNum2;
 }
 
 
-static HB_LONG __numxor( HB_LONG lNum1, HB_LONG lNum2 )
+static long __numxor( long lNum1, long lNum2 )
 {
    return lNum1 ^ lNum2;
 }
 
-static HB_LONG __numnot( HB_LONG lNum1, HB_LONG lNum2 )
+static long __numnot( long lNum1, long lNum2 )
 {
    HB_SYMBOL_UNUSED( lNum2 );
    return ~lNum1;
 }
 
-static HB_LONG __numfun( int iPCount, HB_LONG ( * operation )( HB_LONG wNum1, HB_LONG wNum2 ), BOOL * pbOk )
+static long __numfun( int iPCount, long ( * operation )( long wNum1, long wNum2 ), BOOL * pbOk )
 {
-   HB_LONG     lNumOp = 0;
-   HB_LONG     lNum1, lNum2;
-   HB_LONG     lPattern, lTestMSB;
+   long     lNumOp = 0;
+   long     lNum1, lNum2;
+   long     lPattern, lTestMSB;
    USHORT   usBytes;
    int      iFor;
 
@@ -293,13 +293,13 @@ static HB_LONG __numfun( int iPCount, HB_LONG ( * operation )( HB_LONG wNum1, HB
    }
 }
 
-static void sizeofbits( HB_USHORT * pusBytes, HB_LONG * plPattern, HB_LONG * plTestMSB )
+static void sizeofbits( HB_USHORT * pusBytes, long * plPattern, long * plTestMSB )
 {
    *pusBytes =  ( ( ISNIL( 1 ) || hb_parni( 1 ) == 0 ) ? sizeof( int ) * 8 :  (HB_USHORT) hb_parni( 1 ) );
 
-   if( *pusBytes > sizeof( HB_LONG ) * 8 )
-      *pusBytes = *pusBytes % ( sizeof( HB_LONG ) * 8 );
+   if( *pusBytes > sizeof( long ) * 8 )
+      *pusBytes = *pusBytes % ( sizeof( long ) * 8 );
 
-   *plPattern = *pusBytes == ( sizeof( HB_LONG ) * 8 ) ? 0 : ( -1 ) << *pusBytes;
+   *plPattern = *pusBytes == ( sizeof( long ) * 8 ) ? 0 : ( -1 ) << *pusBytes;
    *plTestMSB = *pusBytes == 0 ? 0 : 1 << ( *pusBytes - 1 );
 }

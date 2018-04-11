@@ -58,7 +58,9 @@ else
 HB_OPTIMFLAGS     +=-l
 endif
 
-OPTFLAGS    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN) -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
+
+OPTFLAGS    =-W -Wall -O3 -c  $(HB_TARGET) -O3 -c  $(NOCYGWIN) 
+#OPTFLAGS1    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN) -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
 HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(XWT_DIR)/include" -i"$(CGI_DIR)\include" 
 CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)/include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
@@ -167,7 +169,7 @@ HARBOUR_LIBS=\
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32
+	-lole32 -luuid -loleaut32 -liphlpapi -lws2_32
 
 EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
 HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
@@ -191,12 +193,12 @@ HARBOUR_DLL_OBJS+=\
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32 -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
+	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
 
 COMPILERLIBS1=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool\
-	-loleaut32 -luuid -lmpr
+	-loleaut32 -luuid -lmpr -liphlpapi
 
 ifneq ($(HB_DIR_ADS),)
 ifeq ($(HB_DLL_HAVE_ADS),1)

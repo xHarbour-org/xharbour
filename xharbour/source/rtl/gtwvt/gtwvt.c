@@ -1917,7 +1917,7 @@ static LRESULT CALLBACK hb_gt_wvt_WndProc( HWND hWnd, UINT message, WPARAM wPara
          }
          else
             hb_gt_wvt_AddCharToInputQueue( pWVT, HB_K_CLOSE );
-
+      return 0;
       case WM_QUIT:
       case WM_DESTROY:
          return 0;

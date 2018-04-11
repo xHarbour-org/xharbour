@@ -13,8 +13,8 @@
 extern "C"{
 #endif
 
-char *Base64Encode(const unsigned char *pcCode, unsigned int uCodeLen);
-unsigned char *Base64Decode(const char *pcszInput, unsigned int *puOutLen);
+char *Base64Encode(const unsigned char *pcCode, HB_SIZE uCodeLen);
+unsigned char *Base64Decode(const char *pcszInput, HB_SIZE *puOutLen);
 
 #ifdef __cplusplus
 }

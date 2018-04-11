@@ -336,7 +336,7 @@ static BOOL s_fileAccept( const char * pFilename )
 }
 
 static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
-                               USHORT uiExFlags, const char * pPaths,
+                               HB_FATTR uiExFlags, const char * pPaths,
                                PHB_ITEM pError, BOOL fBufferLock )
 {
 #if defined( HB_OS_UNIX )
@@ -707,7 +707,7 @@ BOOL hb_fileRename( const char * pFilename, const char * pszNewName )
 }
 
 PHB_FILE hb_fileExtOpen( const char * pFilename, const char * pDefExt,
-                         USHORT uiExFlags, const char * pPaths,
+                         HB_FATTR uiExFlags, const char * pPaths,
                          PHB_ITEM pError, BOOL fBufferLock )
 {
    int i = s_iFileTypes;

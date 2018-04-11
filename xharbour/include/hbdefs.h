@@ -317,7 +317,7 @@
 
 #ifndef HB_LONG_LONG_OFF
 
-   #if ! defined( HB_DONT_DEFINE_BASIC_TYPES ) && ! defined( _WINNT_H )
+ /*  #if ! defined( HB_DONT_DEFINE_BASIC_TYPES ) && ! defined( _WINNT_H )
       #if !defined( LONGLONG )
          #if defined( __GNUC__ ) || defined( __XCC__ )
             typedef signed long long LONGLONG;
@@ -332,6 +332,14 @@
             typedef unsigned __int64 ULONGLONG;
          #endif
       #endif
+   #endif
+*/
+   #if defined( HB_OS_WIN ) && ! defined( __GNUC__ )
+      typedef __int64            LONGLONG;
+      typedef unsigned __int64   ULONGLONG;
+   #else
+      typedef signed long long   LONGLONG;
+      typedef unsigned long long ULONGLONG;
    #endif
 
    #if !defined( ULONGLONG_MAX )
@@ -451,10 +459,10 @@
 
 #if defined( HB_ARCH_64BIT ) && !defined( HB_OS_WIN_64 )
 #  if !defined( UINT64 )
-     typedef ULONG         UINT64;
+     typedef unsigned long          UINT64;
 #  endif
 #  if !defined( INT64 )
-     typedef LONG          INT64;
+     typedef signed long          INT64;
 #  endif
 #  if !defined( UINT64_MAX )
 #     define UINT64_MAX    ULONG_MAX
@@ -496,8 +504,8 @@
 #  define HB_LONG_MAX            LONG_MAX
 #  define HB_LONG_MIN            LONG_MIN
 #  define HB_ULONG_MAX           ULONG_MAX
-   typedef LONG                  HB_LONG;
-   typedef ULONG                 HB_ULONG;
+   typedef long                          HB_LONG;
+   typedef unsigned long                 HB_ULONG;
 #  define PFHL                   "l"
 #elif !defined( HB_LONG_LONG_OFF ) && ULONG_MAX == UINT_MAX
 #  define HB_INT_MAX             INT_MAX
@@ -515,8 +523,8 @@
 #  define HB_LONG_MAX            LONG_MAX
 #  define HB_LONG_MIN            LONG_MIN
 #  define HB_ULONG_MAX           ULONG_MAX
-   typedef LONG                  HB_LONG;
-   typedef ULONG                 HB_ULONG;
+   typedef long                          HB_LONG;
+   typedef unsigned long                 HB_ULONG;
 #  define PFHL                   "l"
 #endif
 

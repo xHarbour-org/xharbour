@@ -5464,8 +5464,9 @@ static HB_ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
 
                case HB_IT_TIMEFLAG:
                {
-                  char szBuffer[ 17 ];
-                  hb_datetimeDecStr( szBuffer, hb_itemGetDL( pItem ), hb_itemGetT( pItem ) );
+                  //char szBuffer[ 17 ];
+                  //hb_datetimeDecStr( szBuffer, hb_itemGetDL( pItem ), hb_itemGetT( pItem ) );
+				  hb_itemGetDTS( pItem, szBuffer );
                   hb_ntxSortKeyAdd( pSort, pArea->dbfarea.ulRecNo, szBuffer, 17 );
                   break;
                }

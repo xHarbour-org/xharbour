@@ -75,7 +75,7 @@ HB_FUNC( HB_CHECKSUM )
 
    if( ISNUM( 2 ) )
    {
-      ulSum =  hb_parns( 2 );
+      ulSum =  hb_parnl( 2 );
    }
 
    hb_retnint( ( HB_U32 )

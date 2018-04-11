@@ -328,7 +328,7 @@ static PHB_ITEM hb_dbgActivateVarArray( int nVars, HB_VARINFO * aVars )
 void hb_dbgEntry( int nMode, int nLine, char * szName, int nIndex, int nFrame )
 {
    int               i;
-   HB_COUNTER        nProcLevel;
+   int               nProcLevel;
    char              szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    HB_DEBUGINFO_ *   info = s_pInfo;
 
@@ -1135,7 +1135,7 @@ static PHB_ITEM hb_dbgEvalResolve( HB_DEBUGINFO_ * info, HB_WATCHPOINT * watch )
    PHB_ITEM             aVars    = hb_itemArrayNew( watch->nVars );
    HB_VARINFO *         scopes;
    HB_MODULEINFO *      module   = NULL;
-   HB_COUNTER           nProcLevel;
+   int           nProcLevel;
 
    if( ! watch->nVars )
       return aVars;

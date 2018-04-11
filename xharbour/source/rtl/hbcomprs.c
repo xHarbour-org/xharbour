@@ -86,8 +86,8 @@ static int hb_gz_compress( char ** pDstPtr, HB_SIZE * pnDst,
       if( *pDstPtr == NULL )
       {
          if( *pnDst == 0 )
-            *pnDst = deflateBound( &stream, ( HB_SIZE ) nSrc );
-         *pDstPtr = ( char * ) hb_xalloc( ( HB_SIZE ) *pnDst + 1 );
+            *pnDst = deflateBound( &stream, ( uLong ) nSrc );
+         *pDstPtr = ( char * ) hb_xalloc(  *pnDst + 1 );
          if( *pDstPtr == NULL )
             iResult = Z_MEM_ERROR;
       }
@@ -406,7 +406,7 @@ HB_FUNC( HB_COMPRESS )
       cDest    = ( char * ) hb_xgrab( ulDstlen + 1 );
    }
 
-   cerr = compress2( ( Bytef * ) cDest, ( uLongf * ) &ulDstlen, ( const Bytef * ) cSource,  ulSrclen,
+   cerr = compress2( ( Bytef * ) cDest, ( uLongf * ) &ulDstlen, ( const Bytef * ) cSource,  (uLong)ulSrclen,
                     nCompFactor );
 
    if( cerr != Z_OK )
@@ -491,7 +491,7 @@ HB_FUNC( HB_UNCOMPRESS )
       cDest = ( char * ) hb_xgrab( ulDstlen + 1 );
    }
 
-   cerr = uncompress( ( Bytef * ) cDest, &ulDstlen, ( const Bytef * ) cSource, ulSrclen );
+   cerr = uncompress( ( Bytef * ) cDest, &ulDstlen, ( const Bytef * ) cSource, (uLong) ulSrclen );
 
    if( cerr != Z_OK )
    {

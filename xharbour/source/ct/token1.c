@@ -120,7 +120,7 @@ static void do_token1( int iSwitch )
       {
          siPreSeparator = siPostSeparator = -1;
       }; /* no "break" here !! */
-
+      /* fallthrough */
       case DO_TOKEN1_ATTOKEN:
       case DO_TOKEN1_NUMTOKEN:
       case DO_TOKEN1_TOKENLOWER:

@@ -996,16 +996,16 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
        */
       switch( wKey )
       {
-         case 0x38:
-         case 0x47:
-         case 0x48:
-         case 0x49:
-         case 0x4b:
-         case 0x4c:
-         case 0x4d:
-         case 0x4f:
-         case 0x50:
-         case 0x51:
+         case 0x38:	/* fallthrough */
+         case 0x47: /* fallthrough */ 
+         case 0x48: /* fallthrough */ 
+         case 0x49: /* fallthrough */ 
+         case 0x4b: /* fallthrough */ 
+         case 0x4c: /* fallthrough */ 
+         case 0x4d: /* fallthrough */ 
+         case 0x4f: /* fallthrough */ 
+         case 0x50: /* fallthrough */ 
+         case 0x51: /* fallthrough */ 
          case 0x52:
             break;
 
@@ -1043,15 +1043,15 @@ static int Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey,
             *paltisdown = *paltnum = 0;
             break;
 
-         case 0x52: --nm;
-         case 0x4f: --nm;
-         case 0x50: --nm;
-         case 0x51: --nm;
-         case 0x4b: --nm;
-         case 0x4c: --nm;
-         case 0x4d: --nm;
-         case 0x47: --nm;
-         case 0x48: --nm;
+         case 0x52: --nm; /* fallthrough */ 
+         case 0x4f: --nm; /* fallthrough */ 
+         case 0x50: --nm; /* fallthrough */ 
+         case 0x51: --nm; /* fallthrough */ 
+         case 0x4b: --nm; /* fallthrough */ 
+         case 0x4c: --nm; /* fallthrough */ 
+         case 0x4d: --nm; /* fallthrough */ 
+         case 0x47: --nm; /* fallthrough */ 
+         case 0x48: --nm; /* fallthrough */ 
          case 0x49: --nm;
             *paltnum = ( ( *paltnum * 10 ) & 0xff ) + nm;
             break;
@@ -1070,14 +1070,14 @@ static int SpecialHandling( WORD * wChar, unsigned short wKey, int ch, BOOL lRev
    {
       switch( wKey )
       {
-         case 2:           /* 1 to 9 */
-         case 3:
-         case 4:
-         case 5:
-         case 6:
-         case 7:
-         case 8:
-         case 9:
+         case 2: /* fallthrough */            /* 1 to 9 */
+         case 3: /* fallthrough */ 
+         case 4: /* fallthrough */ 
+         case 5: /* fallthrough */ 
+         case 6: /* fallthrough */ 
+         case 7: /* fallthrough */ 
+         case 8: /* fallthrough */ 
+         case 9: /* fallthrough */ 
          case 10:
             ch = wKey + 31;
             break;
@@ -1138,14 +1138,14 @@ static int SpecialHandling( WORD * wChar, unsigned short wKey, int ch, BOOL lRev
    {
       switch( wKey )
       {
-         case 2:           /* 1 to 9 */
-         case 3:
-         case 4:
-         case 5:
-         case 6:
-         case 7:
-         case 8:
-         case 9:
+         case 2: /* fallthrough */            /* 1 to 9 */
+         case 3: /* fallthrough */ 
+         case 4: /* fallthrough */ 
+         case 5: /* fallthrough */ 
+         case 6: /* fallthrough */ 
+         case 7: /* fallthrough */ 
+         case 8: /* fallthrough */ 
+         case 9: /* fallthrough */ 
          case 10:
             ch = *wChar = wKey + 47;
             break;

@@ -87,7 +87,7 @@
 #endif
 
 
-static void blockeval( EVALINFO, PHB_ITEM, ULONG );
+static void blockeval( EVALINFO, PHB_ITEM, HB_SIZE );
 
 static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM block )
 {
@@ -199,13 +199,13 @@ static BOOL hb_fsCopy( const char * szSource, const char * szDest, PHB_ITEM bloc
    return bRetVal;
 }
 
-static void blockeval( EVALINFO info, PHB_ITEM block, ULONG count )
+static void blockeval( EVALINFO info, PHB_ITEM block, HB_SIZE count )
 {
    if( hb_itemType( block ) == HB_IT_BLOCK )
    {
       HB_ITEM_NEW( Count );
 
-      hb_evalPutParam( &info, hb_itemPutNL( &Count, count ) );
+      hb_evalPutParam( &info, hb_itemPutNS( &Count, count ) );
 
       hb_itemRelease( hb_evalLaunch( &info ) );
    }

@@ -14,6 +14,9 @@
 !message __MSC__=9  -> MSVC 9  Visual Studio 2008 (_MSC_VER=1500)
 !message __MSC__=10 -> MSVC 10 Visual Studio 2010 (_MSC_VER=1600)
 !message __MSC__=11 -> MSVC 11 Visual Studio 2012 (_MSC_VER=1700)
+!message __MSC__=12 -> MSVC 12 Visual Studio 2013 (_MSC_VER=1800)               
+!message __MSC__=14 -> MSVC 14 Visual Studio 2015 Update 3 (_MSC_VER=1900)       
+!message __MSC__=15 -> MSVC 15 Visual Studio 2017 Update 5 (_MSC_VER=1914)             
 !error
 !endif
 !endif

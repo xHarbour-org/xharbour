@@ -71,10 +71,10 @@ HB_FUNC( HB_ANSITOOEM )
    if( pString )
 #if defined( HB_OS_WIN )
    {
-      HB_SIZE  ulLen    = hb_itemGetCLen( pString );
+      ULONG  ulLen    = ( ULONG )hb_itemGetCLen( pString );
       char *   pszDst   = ( char * ) hb_xgrab( ulLen + 1 );
 
-      CharToOemBuff( hb_itemGetCPtr( pString ), ( LPSTR ) pszDst,  ulLen );
+      CharToOemBuff( hb_itemGetCPtr( pString ), ( LPSTR ) pszDst,   ulLen );
 
       hb_retclenAdopt( pszDst, ulLen );
    }
@@ -94,7 +94,7 @@ HB_FUNC( HB_OEMTOANSI )
    if( pString )
 #if defined( HB_OS_WIN )
    {
-      HB_SIZE  ulLen    = hb_itemGetCLen( pString );
+      ULONG  ulLen    = ( ULONG )hb_itemGetCLen( pString );
       char *   pszDst   = ( char * ) hb_xgrab( ulLen + 1 );
 
       OemToCharBuff( hb_itemGetCPtr( pString ), ( LPSTR ) pszDst,  ulLen );

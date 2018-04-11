@@ -2064,20 +2064,20 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         {
                            if( pString->ExprType == HB_ET_VARIABLE )
                            {
-                              char *szName = pString->value.asSymbol.szName;
+                              char *szName2 = pString->value.asSymbol.szName;
 
 #if defined( HB_MACRO_SUPPORT )
-                              if( hb_compLocalVarGetPos( szName, HB_MACRO_PARAM ) == 0 )
+                              if( hb_compLocalVarGetPos( szName2, HB_MACRO_PARAM ) == 0 )
                               {
                                  /* do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
                                   */
                                  goto PostOptimization;
                               }
 #else
-                              if( hb_compLocalGetPos( szName ) == 0 &&
-                                  hb_compStaticGetPos( szName, hb_comp_functions.pLast ) == 0 &&
-                                  hb_compVariableGetPos( hb_comp_pGlobals, szName ) == 0 &&
-                                  ( hb_comp_bStartProc || hb_compStaticGetPos( szName, hb_comp_functions.pFirst ) == 0 ) )
+                              if( hb_compLocalGetPos( szName2 ) == 0 &&
+                                  hb_compStaticGetPos( szName2, hb_comp_functions.pLast ) == 0 &&
+                                  hb_compVariableGetPos( hb_comp_pGlobals, szName2 ) == 0 &&
+                                  ( hb_comp_bStartProc || hb_compStaticGetPos( szName2, hb_comp_functions.pFirst ) == 0 ) )
                               {
                                  /* do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
                                   */

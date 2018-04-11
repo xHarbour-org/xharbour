@@ -1158,6 +1158,7 @@ static ULONG hb_fptCountSMTItemLength( FPTAREAP pArea, PHB_ITEM pItem,
             break;
          }
       }
+	  /* fallthrough */
       case HB_IT_DOUBLE:
          ulSize = 11;
          break;
@@ -1281,6 +1282,7 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
             *bBufPtr          += 4;
             break;
          }
+	  /* fallthrough */
       case HB_IT_DOUBLE:
          dVal = hb_itemGetND( pItem );
          hb_itemGetNLen( pItem, &iWidth, &iDec );
@@ -2646,6 +2648,7 @@ static HB_ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
                   pBuffer           = NULL;
                   break;
                }
+			   /* fallthrough */
             case FPTIT_SIX_DNUM:
             case FPTIT_SIX_LDATE:
             case FPTIT_SIX_LOG:

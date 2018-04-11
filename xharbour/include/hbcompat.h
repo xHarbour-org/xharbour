@@ -54,6 +54,7 @@
 #define HB_COMPAT_H_
 
 #define HB_MAXINT                 HB_LONG
+#define HB_MAXUINT                HB_ULONG
 #define HB_BOOL                   BOOL
 #define HB_TRUE                   TRUE
 #define HB_FALSE                  FALSE
@@ -88,6 +89,7 @@
 #define HB_FSNAMECONV             hb_fsNameConv
 #define hb_cdpFindExt             hb_cdpFind
 #define hb_itemPutTS              hb_itemPutDTS
+#define hb_arraySetCLPtr          hb_arraySetCPtr 
 #define HB_IS_TIMESTAMP           HB_IS_TIMEFLAG
 #define HB_CDP_ISBINSORT(cdp)     0
 #define hb_itemGetTDT             hb_itemGetDTL

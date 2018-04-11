@@ -2611,8 +2611,12 @@ HB_SIZE hb_fsReadLarge( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount )
 
    #if defined( HB_WIN32_IO )
    {
-      hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
-                                 pBuff, ( DWORD ) ulCount, &ulRead, NULL ), 0 );
+	  BOOL bResult;
+	  DWORD dwRead;
+      bResult = ReadFile( DosToWinHandle( hFileHandle ),
+                                 pBuff, ( DWORD ) ulCount, &dwRead, NULL );
+      ulRead  = bResult ? ( HB_SIZE ) dwRead : 0;								 
+	  hb_fsSetIOError( bResult, 0 );
    }
    #elif defined( HB_FS_LARGE_OPTIMIZED )
    {
@@ -2807,12 +2811,16 @@ HB_SIZE hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE ulCount, HB_F
    if( hb_iswinnt() )
    {
       OVERLAPPED Overlapped;
+	  BOOL bResult;
+	  DWORD dwRead;
       hb_vmUnlock();
       memset( &Overlapped, 0, sizeof( Overlapped ) );
       Overlapped.Offset       = ( DWORD ) ( llOffset & 0xFFFFFFFF ),
       Overlapped.OffsetHigh   = ( DWORD ) ( llOffset >> 32 ),
-      hb_fsSetIOError( ReadFile( DosToWinHandle( hFileHandle ),
-                                 pBuff, ( DWORD ) ulCount, &ulRead, &Overlapped ), 0 );
+      bResult = ReadFile( DosToWinHandle( hFileHandle ),
+                                 pBuff, ( DWORD ) ulCount, &dwRead, &Overlapped );
+      ulRead  = bResult ? ( HB_SIZE ) dwRead : 0;								 
+	  hb_fsSetIOError( bResult, 0 );								 
       hb_vmLock();
    }
    else
@@ -4034,7 +4042,7 @@ BOOL hb_fsIsDevice( HB_FHANDLE hFileHandle )
 /* convert file name for hb_fsExtOpen
  * caller must free the returned buffer
  */
-char * hb_fsExtName( const char * pFilename, const char * pDefExt, USHORT uiExFlags, const char * pPaths )
+char * hb_fsExtName( const char * pFilename, const char * pDefExt, HB_FATTR uiExFlags, const char * pPaths )
 {
    HB_PATHNAMES * pNextPath;
    PHB_FNAME      pFilepath;
@@ -4109,7 +4117,7 @@ char * hb_fsExtName( const char * pFilename, const char * pDefExt, USHORT uiExFl
 }
 
 HB_FHANDLE hb_fsExtOpen( const char * pFilename, const char * pDefExt,
-                         USHORT uiExFlags, const char * pPaths,
+                         HB_FATTR uiExFlags, const char * pPaths,
                          PHB_ITEM pError )
 {
    HB_FHANDLE  hFile;
