@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-04-12 10:16 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\filenet.c
+    ! fixed a mistype: ptr => ptrs in hb_fileNetWriteLarge()
+  * contrib\filemem\filemem.c
+    ! changed USHORT uiExFlags to HB_FATTR uiExFlags in s_fileOpen()
+
 2018-04-11 14:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbapifs.h
     ! adjust in function that use USHORT uiFlags to use HB_FATTR uiFlags

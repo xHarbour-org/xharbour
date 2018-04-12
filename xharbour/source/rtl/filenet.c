@@ -1068,7 +1068,7 @@ HB_SIZE hb_fileNetWriteLarge( PHB_FILE pFile, const void * pBuffer, HB_SIZE ulSi
          char *   ptrs;
          USHORT   uiError;
 
-         ptr = hb_NetFirstChar();
+         ptrs = hb_NetFirstChar();
          hb_NetGetCmdItem( &ptrs, szData ); ptrs++;
          sscanf( szData, "%lu", (unsigned long int *) &ulWrite );
          hb_NetGetCmdItem( &ptrs, szData );

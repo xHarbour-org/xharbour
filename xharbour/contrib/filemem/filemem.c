@@ -703,7 +703,7 @@ static BOOL s_fileRename( const char * szName, const char * szNewName )
 }
 
 
-static PHB_FILE s_fileOpen( const char * szName, const char * szDefExt, USHORT uiExFlags, const char * pPaths, PHB_ITEM pError, BOOL fBufferLock )
+static PHB_FILE s_fileOpen( const char * szName, const char * szDefExt, HB_FATTR uiExFlags, const char * pPaths, PHB_ITEM pError, BOOL fBufferLock )
 {
    HB_FHANDLE hFile;
    char       szNameNew[ HB_PATH_MAX + 1 ];
