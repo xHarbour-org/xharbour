@@ -114,19 +114,19 @@ HB_FUNC( RAT )
 
   if( ulSubLen )
   {
-     HB_SIZE lPos =  ( hb_parclen( 2 ) - ulSubLen );
+     LONG lPos = ( LONG ) ( hb_parclen( 2 ) - ulSubLen );
 
      if( lPos >= 0 )
      {
         const char *   pszSub   = hb_parcx( 1 );
         const char *   pszText  = hb_parcx( 2 );
-        HB_SIZE           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
+        LONG           lEnd     = ISNUM( 4 ) ? hb_parnl( 4 ) - 1 : 0;
         BOOL           bFound   = FALSE;
 
         if( ISNUM( 3 ) )
            lPos = hb_parnl( 3 ) - 1;
 
-        if ( lPos > ( HB_SIZE ) strlen( pszText ) )
+        if ( lPos > ( LONG ) strlen( pszText ) )
            lPos = strlen( pszText );
 
         while( lPos >= lEnd && ! bFound )
@@ -135,12 +135,12 @@ HB_FUNC( RAT )
               bFound = ( memcmp( pszSub, pszText + lPos, ( size_t ) ulSubLen ) == 0 );
            lPos--;
         }
-        hb_retns( bFound ? lPos + 2 : 0 );
+        hb_retnl( bFound ? lPos + 2 : 0 );
      }
      else
-        hb_retns( 0 );
+        hb_retni( 0 );
   }
   else
      // This function never seems to raise an error
-     hb_retns( 0 );
+     hb_retni( 0 );
 }

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-04-19 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source/rtl/rat.c
+    ! revert to previus version
+	
 2018-04-12 10:16 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\filenet.c
     ! fixed a mistype: ptr => ptrs in hb_fileNetWriteLarge()
