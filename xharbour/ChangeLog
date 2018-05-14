@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-05-14 8:12 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
+  * source/rtl/zlib/gzguts.h
+    ! Fix to make XCC happy
+
 2018-04-19 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/rat.c
     ! revert to previus version
