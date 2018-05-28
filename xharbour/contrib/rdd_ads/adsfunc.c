@@ -2818,7 +2818,12 @@ HB_FUNC( ADSSETTIMESTAMP )
 {
    UNSIGNED32 ulRetVal;
    ADSAREAP pArea = hb_adsGetWorkAreaPointer();
-   ulRetVal = AdsSetTimeStamp( pArea->hStatement,(char*) hb_parc(1), hb_parl(2));
+
+   ulRetVal = AdsSetTimeStamp( pArea->hStatement,
+	   (char*) hb_parc(1),
+	   (char*) hb_parc(2), 
+	   hb_parclen(2) );
+
    hb_retl( ulRetVal == AE_SUCCESS );
 }
 
@@ -2832,11 +2837,7 @@ HB_FUNC( ADSSETNULL )
    UNSIGNED32 ulRetVal;
    ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 
-   //RCB 3rd parameter as statement handle to allow more than one 
-   //prepared sql to be active at the same time.
-   ADSHANDLE hStatement = ISNUM( 2 ) ? hb_parni( 2 ) : pArea->hStatement ;
-   
-   ulRetVal = AdsSetNull( hStatement, 
+   ulRetVal = AdsSetNull( pArea->hStatement, 
                   ( UNSIGNED8 * ) hb_parcx( 1 ) ) ;//  pucFldName ,
 
    hb_retl( ulRetVal == AE_SUCCESS );
