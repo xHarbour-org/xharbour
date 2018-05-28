@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-05-28 11:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\rddads\adsfunc.c
+    ! added functions ADSDDSETFIELDPROPERTY(), ADSSETTIMESTAMP() and ADSSETNULL(). Thanks to Reinaldo!
+
 2018-05-14 8:12 UTC+0100 Patrick Mast <patrick.mast@xharbour.com>
   * source/rtl/zlib/gzguts.h
     ! Fix to make XCC happy

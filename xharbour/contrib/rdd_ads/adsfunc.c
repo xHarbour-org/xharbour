@@ -2776,3 +2776,68 @@ HB_FUNC( ADSSETINDEXDIRECTION )
 #endif
    hb_retnl( nRet );
 }
+
+
+//RCB 
+//Reinaldo Crespo-Bazan  
+//reinaldo.crespo@gmail.com
+
+HB_FUNC( ADSDDSETFIELDPROPERTY )
+{
+   UNSIGNED16 ulBuffer;
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pTableName   = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED8 *pFieldName   = (UNSIGNED8 *) hb_parcx( 2 );
+   UNSIGNED16 ulPropertyID = (UNSIGNED16 ) hb_parni( 3 );
+   PHB_ITEM pPropValue     = hb_param( 4, HB_IT_ANY ) ;
+   UNSIGNED16 usPropertyLen= hb_parclen( pPropValue ) ;
+   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
+   //The property passed in PvProperty is expected to be a NULL 
+   //terminated expression that evaluates to the proper data type.
+   //usPropertyLen is the length of the expression including the NULL 
+   //terminator.  To remove a previous setting of this property, use 
+   //NULL as the pPropValue.
+
+   if( HB_IS_NIL( pPropValue ) ) pPropValue = NULL ;
+
+   ulBuffer = (UNSIGNED16) hb_itemGetL( pPropValue );
+   ulRetVal = AdsDDSetFieldProperty( hConnect, pTableName, pFieldName, 
+                           ulPropertyID, &ulBuffer, usPropertyLen, NULL, NULL );
+
+   hb_retl( ulRetVal == AE_SUCCESS);
+
+}
+
+
+//RCB 
+//Reinaldo Crespo-Bazan  
+//reinaldo.crespo@gmail.com
+
+HB_FUNC( ADSSETTIMESTAMP )
+{
+   UNSIGNED32 ulRetVal;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+   ulRetVal = AdsSetTimeStamp( pArea->hStatement,(char*) hb_parc(1), hb_parl(2));
+   hb_retl( ulRetVal == AE_SUCCESS );
+}
+
+
+//RCB 
+//Reinaldo Crespo-Bazan  
+//reinaldo.crespo@gmail.com
+
+HB_FUNC( ADSSETNULL )
+{
+   UNSIGNED32 ulRetVal;
+   ADSAREAP pArea = hb_adsGetWorkAreaPointer();
+
+   //RCB 3rd parameter as statement handle to allow more than one 
+   //prepared sql to be active at the same time.
+   ADSHANDLE hStatement = ISNUM( 2 ) ? hb_parni( 2 ) : pArea->hStatement ;
+   
+   ulRetVal = AdsSetNull( hStatement, 
+                  ( UNSIGNED8 * ) hb_parcx( 1 ) ) ;//  pucFldName ,
+
+   hb_retl( ulRetVal == AE_SUCCESS );
+}
