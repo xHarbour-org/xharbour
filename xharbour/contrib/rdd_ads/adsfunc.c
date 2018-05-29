@@ -2790,23 +2790,23 @@ HB_FUNC( ADSDDSETFIELDPROPERTY )
    UNSIGNED8 *pFieldName   = (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED16 ulPropertyID = (UNSIGNED16 ) hb_parni( 3 );
    PHB_ITEM pPropValue     = hb_param( 4, HB_IT_ANY ) ;
-   UNSIGNED16 usPropertyLen= hb_parclen( pPropValue ) ;
    ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
 
    //The property passed in PvProperty is expected to be a NULL 
    //terminated expression that evaluates to the proper data type.
    //usPropertyLen is the length of the expression including the NULL 
    //terminator.  To remove a previous setting of this property, use 
    //NULL as the pPropValue.
-
    if( HB_IS_NIL( pPropValue ) ) pPropValue = NULL ;
 
    ulBuffer = (UNSIGNED16) hb_itemGetL( pPropValue );
    ulRetVal = AdsDDSetFieldProperty( hConnect, pTableName, pFieldName, 
-                           ulPropertyID, &ulBuffer, usPropertyLen, NULL, NULL );
+                           ulPropertyID, &ulBuffer, 
+                           ( UNSIGNED16 ) hb_itemGetCLen( pPropValue ) + 1,
+                           NULL, NULL );
 
    hb_retl( ulRetVal == AE_SUCCESS);
-
 }
 
 
@@ -2820,8 +2820,8 @@ HB_FUNC( ADSSETTIMESTAMP )
    ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 
    ulRetVal = AdsSetTimeStamp( pArea->hStatement,
-	   (char*) hb_parc(1),
-	   (char*) hb_parc(2), 
+	   ( UNSIGNED8 *) hb_parc(1),
+	   ( UNSIGNED8 *) hb_parc(2), 
 	   hb_parclen(2) );
 
    hb_retl( ulRetVal == AE_SUCCESS );

@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-05-29 10:13 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\rddads\adsfunc.c
+    ! minor fixes to ADSDDSETFIELDPROPERTY() and ADSSETTIMESTAMP(). Thanks to Reinaldo!
+
 2018-05-28 19:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\rddads\adsfunc.c
     ! better implementation of functions ADSSETTIMESTAMP() and ADSSETNULL(). Thanks to Reinaldo!
