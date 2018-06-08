@@ -65,7 +65,7 @@ SetMenuInfo(
 void xwt_win_free_wnd( void *wnd )
 {
    PXWT_WIN_DATA self = (PXWT_WIN_DATA) wnd;
-#ifndef __GNUC__
+#if !defined( __GNUC__ ) && !defined( __clang__ )
    CloseHandle( self->hMain );
 #else
    CloseHandle( self->pBase.hMain );
@@ -182,7 +182,7 @@ void xwt_win_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    frame = (PXWT_WIN_DATA) xwtData->widget_data;
 
    hMenu = xwt_win_createMenuFromArray( pMenuArray );
-#ifndef __GNUC__
+#if !defined( __GNUC__ ) && !defined( __clang__ )
    hOldMenu = GetMenu( frame->hMain );
    SetMenu( frame->hMain, hMenu );
 #else
@@ -194,7 +194,7 @@ void xwt_win_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
       DestroyMenu( hOldMenu );
    }
    frame->pMenu = pMenuArray->item.asArray.value;
-#ifndef __GNUC__
+#if !defined( __GNUC__ ) && !defined( __clang__ )
    DrawMenuBar( wnd->hMain );
 #else
    DrawMenuBar( wnd->pBase.hMain );
@@ -324,7 +324,7 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
       return FALSE;
 
    data = (PXWT_WIN_DATA) hb_xgrab( sizeof( XWT_WIN_DATA ) );
-#ifndef __GNUC__
+#if !defined( __GNUC__ ) && !defined( __clang__ )
    data->xwt_widget = xwtData;
    data->hMain = hWnd;
 #else

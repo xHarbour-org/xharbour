@@ -828,7 +828,7 @@ RESULT DynaCall( int Flags, LPVOID lpFunction, int nArgs,
    #endif
 
    // Reserve 256 bytes of stack space for our arguments
-   #if defined( __MINGW32__ )
+   #if defined( __MINGW32__ ) || defined( __clang__ )
    asm volatile ( "\tmovl %%esp, %0\n"
                   "\tsubl $0x100, %%esp\n"
                   : "=r" ( pStack ) );
@@ -884,7 +884,7 @@ RESULT DynaCall( int Flags, LPVOID lpFunction, int nArgs,
       pStack--;                  // ESP = ESP - 4
       *pStack  = ( DWORD ) pRet; // SS:[ESP] = pMem
    }
-   #if defined( __MINGW32__ )
+   #if defined( __MINGW32__ ) || defined( __clang__ )
    asm volatile ( "\taddl $0x100, %%esp\n"         /* Restore to original position */
                   "\tsubl %2, %%esp\n"             /* Adjust for our new parameters */
 

@@ -84,7 +84,7 @@ static int hb_Inp9x( USHORT usPort )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x(%hu)", usPort ) );
 
-   #if defined( __BORLANDC__ ) || defined( __DMC__ )
+   #if (defined( __BORLANDC__ ) || defined( __DMC__ )) && !defined( __clang__ )
 
    _DX   = usPort;
    __emit__( 0xEC );          /* ASM  IN AL, DX */
@@ -101,7 +101,7 @@ static int hb_Inp9x( USHORT usPort )
       mov usVal, ax
    }
 
-   #elif defined( __MINGW32__ )
+   #elif defined( __MINGW32__ ) || defined( __clang__ )
    __asm__ __volatile__ ( "inb %w1,%b0" : "=a" ( usVal ) : "Nd" ( usPort ) );
 
    #elif defined( __WATCOMC__ )
@@ -123,7 +123,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x(%hu, %hu)", usPort, usVal ) );
 
-   #if defined( __BORLANDC__ ) || defined( __DMC__ )
+   #if (defined( __BORLANDC__ ) || defined( __DMC__ )) && !defined( __clang__ )
 
    _DX   = usPort;
    _AL   = ( BYTE ) usVal;
@@ -138,7 +138,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
       out dx, al
    }
 
-   #elif defined( __MINGW32__ )
+   #elif defined( __MINGW32__ ) || defined( __clang__ )
 
    __asm__ __volatile__ ( "outb %b0,%w1" : : "a" ( usVal ), "Nd" ( usPort ) );
 

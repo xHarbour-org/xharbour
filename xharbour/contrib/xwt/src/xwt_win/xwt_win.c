@@ -311,7 +311,7 @@ BOOL xwt_drv_quit( void )
 void *xwt_win_get_topwidget_neuter( void *data )
 {
    PXWT_WIN_DATA win = (PXWT_WIN_DATA) data;
-#ifdef __GNUC__
+#if defined( __GNUC__ ) || defined( __clang__ )
    return win->pBase.hMain;
 #else
    return win->hMain;

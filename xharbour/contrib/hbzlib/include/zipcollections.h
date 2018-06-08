@@ -69,7 +69,7 @@ int GetUpperBound() const
 }
 int Add( const TYPE&x )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->push_back( x );
    #else
       push_back( x );
@@ -82,7 +82,7 @@ void RemoveAll()
 }
 void RemoveAt( int uIndex )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->erase( GetIterFromIndex( uIndex ) );
    #else
       erase( GetIterFromIndex( uIndex ) );
@@ -90,7 +90,7 @@ void RemoveAt( int uIndex )
 }
 void InsertAt( int uIndex, const TYPE&x )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->insert( GetIterFromIndex( uIndex ), x );
    #else
       insert( GetIterFromIndex( uIndex ), x );
@@ -128,7 +128,7 @@ int GetCount() const
 }
 void AddTail( const TYPE&x )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->push_back( x );
    #else	
       push_back( x );
@@ -136,7 +136,7 @@ void AddTail( const TYPE&x )
 }
 void AddHead( const TYPE&x )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->push_front( x );
    #else
       push_front( x );
@@ -204,7 +204,7 @@ iterator Find( TYPE&x )
 }
 void RemoveAt( iterator&pos )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
       this->erase( pos );
    #else
       erase( pos );
@@ -258,7 +258,7 @@ typedef typename std::map<KEY, VALUE>::const_iterator const_iterator;
 typedef typename  std::map<KEY, VALUE, std::less<KEY>, std::allocator<std::pair<const KEY, VALUE> > >::value_type v_type;
 void SetAt( KEY key, VALUE newValue )
 {
-    #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+    #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
        this->insert( v_type( key, newValue ) );
     #else
        insert( v_type( key, newValue ) );
@@ -266,7 +266,7 @@ void SetAt( KEY key, VALUE newValue )
 }
 BOOL RemoveKey( KEY key )
 {
-   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )
+   #if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
    return this->erase( key ) != 0;
    #else	
    return erase( key ) != 0;
@@ -274,13 +274,13 @@ BOOL RemoveKey( KEY key )
 }
 BOOL Lookup( KEY key, VALUE&rValue ) const
 {
-#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 )	
+#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7 ) || defined( __clang__ )
    const_iterator iter = this->find( key );
 #else
    const_iterator iter = find( key );
 #endif   
 
-#if ( __GNUC__ >= 3 ) // I'm not sure which version precisely should be put here
+#if ( __GNUC__ >= 3 ) || defined( __clang__ ) // I'm not sure which version precisely should be put here
    if( iter == std::map<KEY, VALUE>::end() )
 #else
    if( iter == end() )

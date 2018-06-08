@@ -72,7 +72,7 @@ typedef struct tag_xwt_win_base_data
 
 typedef struct tag_xwt_win_data
 {
-#ifndef __GNUC__
+#if !defined( __GNUC__ ) && !defined( __clang__ )
    XWT_WIN_BASE_DATA;
 #else
    XWT_WIN_BASE_DATA pBase;
