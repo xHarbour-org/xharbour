@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-06-09 22:32 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.bc
+    ! minor fixes to compile hbzip library under BCC 64-bit.
+
 2018-06-08 18:31 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\dllcall.c
   * source\rtl\gttone.c
