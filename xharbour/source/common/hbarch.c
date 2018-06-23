@@ -227,7 +227,7 @@ double hb_get_ord_ieee754( BYTE * ptr )
  * some compilers does not like constraction used by in HB_GET_LE_DOUBLE
  * macro => d = { ... }
  */
-double hb_get_rev_double( BYTE * ptr )
+double hb_get_rev_double( const BYTE * ptr )
 {
    union
    {
@@ -249,7 +249,7 @@ double hb_get_rev_double( BYTE * ptr )
    return u.dbl;
 }
 
-double hb_get_std_double( BYTE * ptr )
+double hb_get_std_double( const BYTE * ptr )
 {
    union
    {

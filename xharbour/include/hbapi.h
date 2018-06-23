@@ -760,8 +760,8 @@ extern HB_EXPORT void      hb_put_ieee754( BYTE * ptr, double d );
 extern HB_EXPORT double    hb_get_ieee754( BYTE * ptr );
 extern HB_EXPORT void      hb_put_ord_ieee754( BYTE * ptr, double d );
 extern HB_EXPORT double    hb_get_ord_ieee754( BYTE * ptr );
-extern HB_EXPORT double    hb_get_rev_double( BYTE * ptr );
-extern HB_EXPORT double    hb_get_std_double( BYTE * ptr );
+extern HB_EXPORT double    hb_get_rev_double( const BYTE * ptr );
+extern HB_EXPORT double    hb_get_std_double( const BYTE * ptr );
 
 #if defined( HB_LONG_LONG_OFF )
 extern HB_EXPORT double    hb_get_le_int64( BYTE * ptr );

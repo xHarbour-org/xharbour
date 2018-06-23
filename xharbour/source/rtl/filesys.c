@@ -3965,7 +3965,7 @@ USHORT hb_fsIsDrv( BYTE nDrive )
       hb_vmUnlock();
       type        = GetDriveTypeA( buffer );
       hb_vmLock();
-      uiResult    = ( type == DRIVE_UNKNOWN || type == DRIVE_NO_ROOT_DIR ) ? F_ERROR : 0;
+      uiResult    = ( type == DRIVE_UNKNOWN || type == DRIVE_NO_ROOT_DIR ) ? ( USHORT )F_ERROR : ( USHORT )0;
       hb_fsSetError( 0 );
    }
 #elif defined( HB_OS_HAS_DRIVE_LETTER )
