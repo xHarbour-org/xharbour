@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-06-23 17:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * make_pc.bat
+  * winmake\makefile.pc    
+    ! some fix to build dll and contribs
+	! for proper build set __make__=nmake ( using msvc nmake to build full pelles c 64 bits binaries )
+	
 2018-06-23 12:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include\hbapi.h
   * source\common\hbarch.c 

@@ -38,7 +38,7 @@ ACE_LIB   =$(ACE32_LIB)
 
 !if ("$(HB_ARCH)"=="64")
 HB_TARGET   =-Tamd64-coff
-HB_MACHINE  =AMD64
+HB_MACHINE  =X64
 WS32DEF     =winmake\ws2_32pc.def
 !else
 HB_TARGET   =-Tx86-coff
@@ -47,7 +47,7 @@ HB_MACHINE  =X86
 !endif
 !endif
 
-CC_DEFINES  =-DNEED_DUMMY_RETURN -DNULL=0 -DMINILZO_HAVE_CONFIG_H
+CC_DEFINES  =-DNEED_DUMMY_RETURN -DNULL=0 -DMINILZO_HAVE_CONFIG_H -W2
 
 !if ("$(HB_MT)"=="mt") || ("$(HB_THREAD_SUPPORT)"=="1")
 CC_DEFINES  =$(CC_DEFINES) -MT
@@ -83,13 +83,13 @@ HBDOC_EXE_OBJS=\
 !endif
 
 # Hack for 64-bit compilation -> unresolved: __WSAFDIsSet
-!if ("$(HB_ARCH)"=="64")
-WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
-!endif
+#!if ("$(HB_ARCH)"=="64")
+#WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
+#!endif
 
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
+#VM_LIB_OBJS=\
+#	$(VM_LIB_OBJS)\
+#	$(VM_MAIN_OBJS)
 
 LINKERFLAGS  =-LIBPATH:$(LIB_DIR) -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)" -MACHINE:$(HB_MACHINE) -SUBSYSTEM:CONSOLE
 
@@ -99,11 +99,14 @@ PROJECT=$(ST_PROJECT)
 PROJECT=$(MT_PROJECT)
 !endif
 
-!if ("$(HB_ARCH)"=="64")
-PROJECT=$(PROJECT) $(WS2_32PC_LIB)
-!endif
-
 ALL: $(PROJECT)
+#!if ("$(HB_ARCH)"=="64")
+#PROJECT=$(PROJECT) $(WS2_32PC_LIB)
+#!endif
+
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_MAIN_OBJS)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")
@@ -114,9 +117,9 @@ HARBOUR_DLL_OBJS=\
 	$(TIFF_LIB_OBJS)
 
 # Hack for 64-bit compilation -> unresolved: __WSAFDIsSet
-!if ("$(HB_ARCH)"=="64")
-WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
-!endif
+#!if ("$(HB_ARCH)"=="64")
+#WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
+#!endif
 
 !if ("$(HB_DLL_ISMT)"=="1")
 CLIBFLAGS   =-MT $(CLIBFLAGS)
@@ -135,7 +138,7 @@ DLLFLAGS=\
 	-MACHINE:$(HB_MACHINE)\
 	-LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:$(LIB_DIR) -LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)"\
 	-SUBSYSTEM:WINDOWS\
-	$(HARBOUR_DLL_OBJS) $(HARBOUR_DLL_RES) $(WS2_32PC_LIB)
+	$(HARBOUR_DLL_OBJS) $(HARBOUR_DLL_RES)
 
 EXEFLAGS=\
 	-LIBPATH:"$(CC_DIR)\LIB"\
@@ -152,20 +155,20 @@ ALL: $(DLL_PROJECT)
 !include winmake\common1.mak
 
 CONTRIB_PROJECT=\
-        $(CONTRIB_PROJECT)\
+	$(CONTRIB_PROJECT)\
 	$(HBSQLIT3_LIB)
 
 !if !("$(HB_ARCH)"=="64")
 CONTRIB_PROJECT=\
-        $(CONTRIB_PROJECT)\
+	$(CONTRIB_PROJECT)\
 	$(GTWVW_LIB)\
 	$(XWT_LIB)\
 	$(GTWVG_LIB)
 !endif
 
 CONTRIB_PROJECT=\
-        $(CONTRIB_PROJECT)\
-        $(OPTIONAL_PRJ)
+	$(CONTRIB_PROJECT)\
+	$(OPTIONAL_PRJ)
 
 ALL: $(CONTRIB_PROJECT)
 
@@ -174,24 +177,24 @@ ALL: $(CONTRIB_PROJECT)
 RC_CMD         =$(RC) -r -i"$(CC_DIR)\include" -fo $@ $**
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
-CC_CMD         =$(CC) $(CLIBFLAGS) -Fo$@ $**
-CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) -Fo$@ $**
+CC_CMD         =$(CC) $(CLIBFLAGS) -W2 -Fo$@ $**
+CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -W2 -D__HB_COMPILER__ $(CC_COMP_DEFINES) -Fo$@ $**
 CCC_CMD        =$(CC_CMD)
-LIB_CMD        =$(LIBEXE) -OUT:$@ $**
+LIB_CMD        =$(LIBEXE) -MACHINE:$(HB_MACHINE) -OUT:$@ $**
 LIB_CMD_1      =$(LIB_CMD)
-LINK_CMD       =$(LINKEXE) $(LNK_DEBUGFLAGS) -OUT:$@ $** $(LINKERFLAGS)
-HRB_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) -OUT:$(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(HRB_LIBS) $(HARBOUR_EXE_RES) $(LINKERFLAGS)
-DLL_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
-DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) -OUT:$@ $** $(HARBOUR_DLL_LIB) $(ZLIB_LIB) $(PNG_LIB) $(PDFLIB)
+LINK_CMD       =$(LINKEXE) $(LNK_DEBUGFLAGS) -MACHINE:$(HB_MACHINE) -OUT:$@ $** $(LINKERFLAGS)
+HRB_LINK_CMD   =$(LINKEXE) $(LNK_DEBUGFLAGS) -MACHINE:$(HB_MACHINE) -OUT:$(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(HRB_LIBS) $(HARBOUR_EXE_RES) $(LINKERFLAGS)
+DLL_LINK_CMD  =$(LINKEXE) $(LNK_DEBUGFLAGS) $(DLLFLAGS)
+DLLEXE_LINK_CMD=$(LINKEXE) $(LNK_DEBUGFLAGS) $(EXEFLAGS) -OUT:$@ $** $(HARBOUR_DLL_LIB) 
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
 
-!if ("$(HB_ARCH)"=="64")
-$(WS2_32PC_LIB) : $(WS32DEF)
-	$(LIBEXE) -DEF:$(WS32DEF) -OUT:$(WS2_32PC_LIB) -MACHINE:AMD64
-!endif
+#!if ("$(HB_ARCH)"=="64")
+#$(WS2_32PC_LIB) : $(WS32DEF)
+#	$(LIBEXE) -DEF:$(WS32DEF) -OUT:$(WS2_32PC_LIB) -MACHINE:AMD64
+#!endif
 
 !include winmake\common2.mak
 !include winmake\compile.mak

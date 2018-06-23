@@ -31,8 +31,7 @@ REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
 IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
-IF "%SUB_DIR%"=="" SET SUB_DIR=pc
-IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
+
 
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
@@ -64,15 +63,21 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    GOTO READY
 
 :READY
+
+SET SUB_DIR=pc
+SET HB_GT_LIB=$(GTWIN_LIB)
+
+echo "%CC_DIR%"
+echo "%RC_DIR%"
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
-
+echo %path%
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
 SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
+SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================
@@ -142,7 +147,6 @@ rem=============================================================================
    rem
    SET __BLD__=DLL_BLD
    SET HB_MT=
-   SET HB_MT_FLAGS=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
    %__MAKE__% /F winmake\makefile.pc >dll_%SUB_DIR%.log
@@ -172,12 +176,11 @@ rem=============================================================================
 rem=============================================================================
    SET __BLD__=CONTRIB_BLD
    SET HB_MT=
-   SET HB_MT_FLAGS=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >cont_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.pc   >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
-   goto CONTRIBS_OK
+
 
 rem=============================================================================
 :CONTRIBS_OK
@@ -220,5 +223,4 @@ rem=============================================================================
 rem=============================================================================
 :EXIT
 rem=============================================================================
-   SET HB_MT=
    @CALL winmake\mdir.bat resetenvar
