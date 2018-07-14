@@ -110,6 +110,8 @@
 #define RDDI_LOCKRETRY           43   /* Get/Set record and file lock timeout value */
 #define RDDI_DIRTYREAD           44   /* Get/Set index dirty read flag */
 
+#define RDDI_SETHEADER           47   /* DBF header updating modes */
+
 /*
    Constants for SELF_ORDINFO ()
 */

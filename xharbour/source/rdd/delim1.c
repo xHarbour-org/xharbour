@@ -71,7 +71,7 @@ static void hb_delimInitArea( DELIMAREAP pArea, char * szFileName )
 {
    const char * szEol;
 
-   /* Allocate only after succesfully open file */
+   /* Allocate only after successfully open file */
    pArea->szFileName    = hb_strdup( szFileName );
 
    /* set line separator: EOL */
@@ -90,7 +90,7 @@ static void hb_delimInitArea( DELIMAREAP pArea, char * szFileName )
    /* pseudo deleted flag */
    *pArea->pRecord++    = ' ';
 
-   /* Allocate IO buffer */
+   /* allocate IO buffer */
    pArea->nBufferSize += pArea->fAnyEol ? 2 : pArea->uiEolLen;
    if( pArea->fReadonly && pArea->nBufferSize < 8192 )
       pArea->nBufferSize = 8192;
@@ -176,7 +176,7 @@ static HB_SIZE hb_delimEncodeBuffer( DELIMAREAP pArea )
    LPFIELD  pField;
    HB_BYTE * pBuffer;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_delimEncodeBuffer(%p)", pArea ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_delimEncodeBuffer(%p)", ( void * ) pArea ) );
 
    /* mark the read buffer as empty */
    pArea->nBufferRead = pArea->nBufferIndex = 0;
@@ -337,7 +337,7 @@ static HB_ERRCODE hb_delimReadRecord( DELIMAREAP pArea )
    HB_USHORT uiField;
    int      ch = 0;
 
-   HB_TRACE( HB_TR_DEBUG, ( "hb_delimReadRecord(%p)", pArea ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_delimReadRecord(%p)", ( void * ) pArea ) );
 
    pArea->area.fEof = HB_TRUE;
 
@@ -422,7 +422,7 @@ static HB_ERRCODE hb_delimReadRecord( DELIMAREAP pArea )
                double   dVal;
                HB_BOOL fDbl;
 
-               fDbl = hb_strnToNum( ( const char * ) buffer, uiSize, &lVal, &dVal );
+               fDbl = hb_strnToNum( (const char *) buffer, uiSize, &lVal, &dVal );
                if( fDbl )
                   pArea->area.valResult = hb_itemPutNDLen( pArea->area.valResult, dVal,
                                                            uiLen - pField->uiDec - 1, pField->uiDec );
@@ -1468,7 +1468,9 @@ static HB_ERRCODE hb_delimCreate( DELIMAREAP pArea, LPDBOPENINFO pCreateInfo )
       pArea->fPositioned = HB_FALSE;
       hb_delimClearRecordBuffer( pArea );
 
-  //
+      if( SELF_RDDINFO( SELF_RDDNODE( &pArea->area ), RDDI_SETHEADER,
+                        pCreateInfo->ulConnection, pItem ) == HB_SUCCESS &&
+          hb_itemGetNI( pItem ) > 0 )
       errCode = hb_delimWriteHeader( pArea );
 
       hb_itemRelease( pItem );
@@ -1584,7 +1586,30 @@ static HB_ERRCODE hb_delimOpen( DELIMAREAP pArea, LPDBOPENINFO pOpenInfo )
    return SELF_GOTOP( &pArea->area );
 }
 
+/*
+ * RDD init
+ */
+static HB_ERRCODE hb_delimInit( LPRDDNODE pRDD )
+{
+   DELIMNODE_DATARAW( pRDD )             = ( LPDELIMDATA ) hb_xgrabz( sizeof( DELIMDATA ) );
+   
 
+}
+
+/*
+ * RDD exit
+ */
+static HB_ERRCODE hb_delimExit( LPRDDNODE pRDD )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_delimExit(%p)", ( void * ) pRDD ) );
+
+   if( pRDD->lpvCargo )
+   {
+      hb_xfree( pRDD->lpvCargo );
+      pRDD->lpvCargo = NULL;
+   }	   
+   return HB_SUCCESS;
+}
 /*
  * Retrieve information about the current driver.
  */
@@ -1600,8 +1625,33 @@ static HB_ERRCODE hb_delimRddInfo( LPRDDNODE pRDD, HB_USHORT uiIndex, ULONG ulCo
          break;
 
       case RDDI_TABLEEXT:
-         hb_itemPutC( pItem, DELIM_TABLEEXT );
+      {
+         LPDELIMDATA pData = DELIMNODE_DATA( pRDD );
+         const char * szNew = hb_itemGetCPtr( pItem );
+         char * szNewVal;
+
+         szNewVal = szNew[ 0 ] == '.' && szNew[ 1 ] ? hb_strdup( szNew ) : NULL;
+         hb_itemPutC( pItem, pData->szTableExt[ 0 ] ? pData->szTableExt : DELIM_TABLEEXT );
+         if( szNewVal )
+         {
+            hb_strncpy( pData->szTableExt, szNewVal, sizeof( pData->szTableExt ) - 1 );
+            hb_xfree( szNewVal );
+         }
          break;
+      }
+      case RDDI_SETHEADER:
+      {
+         LPDELIMDATA pData = DELIMNODE_DATA( pRDD );
+         HB_USHORT uiSetHeader = pData->uiSetHeader;
+         if( HB_IS_NUMERIC( pItem ) )
+         {
+            int iMode = hb_itemGetNI( pItem );
+            if( iMode == 0 || iMode == 1 )
+               pData->uiSetHeader = ( HB_USHORT ) iMode;
+         }
+         hb_itemPutNI( pItem, uiSetHeader );
+         break;
+      }
       default:
          return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );
 
@@ -1706,8 +1756,8 @@ static const RDDFUNCS delimTable =
                                      NULL /* hb_delimPutValueFile */,
                                      NULL /* hb_delimReadDBHeader */,
                                      NULL /* hb_delimWriteDBHeader */,
-                                     NULL /* hb_delimInit */,
-                                     NULL /* hb_delimExit */,
+   ( DBENTRYP_R ) hb_delimInit,
+   ( DBENTRYP_R ) hb_delimExit,
                                      NULL /* hb_delimDrop */,
                                      NULL /* hb_delimExists */,
                                      NULL /* hb_delimRename */,

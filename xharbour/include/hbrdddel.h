@@ -59,7 +59,14 @@ HB_EXTERN_BEGIN
 
 /* DELIMITED default file extensions */
 #define DELIM_TABLEEXT                    ".txt"
+typedef struct _DELIMDATA
+{
+   char      szTableExt[ HB_MAX_FILE_EXT + 1 ];
+   HB_USHORT uiSetHeader;      /* RDDI_SETHEADER */
+} DELIMDATA, * LPDELIMDATA;
 
+#define DELIMNODE_DATARAW( r )  ( ( r )->lpvCargo )
+#define DELIMNODE_DATA( r )     ( (LPDELIMDATA) DELIMNODE_DATARAW( r )  )
 
 /*
  *  DELIM WORKAREA
