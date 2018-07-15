@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2018-07-14 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\rdd\delim1.c
+    ! minor fix
+	
 2018-07-14 15:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include\dbinfo.ch
   * include\hbrdddel.h

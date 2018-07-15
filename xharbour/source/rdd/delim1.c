@@ -1593,7 +1593,7 @@ static HB_ERRCODE hb_delimInit( LPRDDNODE pRDD )
 {
    DELIMNODE_DATARAW( pRDD )             = ( LPDELIMDATA ) hb_xgrabz( sizeof( DELIMDATA ) );
    
-
+  return HB_SUCCESS;
 }
 
 /*
