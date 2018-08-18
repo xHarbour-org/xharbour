@@ -30,7 +30,7 @@
    #pragma warn(disable:2117)
    #pragma warn(disable:2073)
    #pragma warn(disable:2115)
-#elif defined(_MSC_VER) && (_MSC_VER>=1400)
+#elif defined(_MSC_VER) && (_MSC_VER>=1400) &&(!defined(_CRT_SECURE_NO_WARNINGS))
    #define _CRT_SECURE_NO_WARNINGS
    #define _CRT_SECURE_NO_DEPRECATE
 #endif

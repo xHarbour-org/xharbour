@@ -602,7 +602,7 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT * pVariant, PHB_ITEM pItem )
          }
          else
          {
-            unsigned long i;
+            unsigned long i2;
             SAFEARRAY     * parray;
 
             vt = VT_VARIANT;
@@ -632,10 +632,10 @@ HB_EXPORT void hb_oleItemToVariant( VARIANT * pVariant, PHB_ITEM pItem )
                PHB_V_UNION( pVariant, parray ) = parray;
             }
 
-            for( i = 0; i < rgsabound.cElements; i++ )
+            for( i2 = 0; i2 < rgsabound.cElements; i2++ )
             {
-               hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, i + 1 ) );
-               SafeArrayPutElement( parray, ( LONG * ) &i, pSource );
+               hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, i2 + 1 ) );
+               SafeArrayPutElement( parray, ( LONG * ) &i2, pSource );
                VariantClear( &mVariant );
             }
          }

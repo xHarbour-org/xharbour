@@ -77,7 +77,7 @@ HB_HASH_FUNC( hb_comp_IdentKey )    /* ULONG func (void *Value, void *Cargo) */
 /* deletes an identifier */
 HB_HASH_FUNC( hb_comp_IdentDel )
 {
-   hb_xfree( Value );
+   hb_xfree( HB_UNCONST( Value ) );
    HB_SYMBOL_UNUSED( Cargo );
 
    return 1;

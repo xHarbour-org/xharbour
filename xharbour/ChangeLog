@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-08-18 16:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * include/hbhash.h
+    ! added const to hb_hashTableFind to make msvc happy  
+  * source/common/hbhash.c
+    ! change ULONG => HB_SIZE
+	! xgrab/memset  => xgrabz
+	! added const to hb_hashTableFind/hb_hashTableAdd to make msvc happy  	  
+  * source/tip/ftpcln.prg 
+    ! updated method RETR to dont call SIZE operation
+  * source/rtl/rat.c
+    ! added missing cast to strlen
+  * source\rtl\hbsrlraw.c	
+    ! in HB_DESERIALIZEARRAY LONG -> HB_SIZE
+  * source\rtl\hbwinole.c
+    ! fixed double variable declaration
+  * source\compiler\hbident.c
+    !added HB_UNCONST  to hb_comp_IdentDel Value variable
+  * source\rtl\pcre\config.h
+    contrib\jpeg\jconfig.h 
+	contrib\pdflite\include\pc_util.h
+	contrib\pdflite\include\p_intern.h
+	utils\hbpp\hbpp.c
+	utils\hbpp\hbppcalc.c
+	utils\hbpp\hbppcomp.c
+    ! define _CRT_SECURE_NO_WARNINGS only if not defined  
+  * winmake/makefile.vc
+    ! added some defines to shout off some warnings
+	
 2018-07-14 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source\rdd\delim1.c
     ! minor fix

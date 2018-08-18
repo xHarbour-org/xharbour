@@ -127,7 +127,7 @@ HB_FUNC( RAT )
            lPos = hb_parnl( 3 ) - 1;
 
         if ( lPos > ( LONG ) strlen( pszText ) )
-           lPos = strlen( pszText );
+           lPos = (LONG)strlen( pszText );
 
         while( lPos >= lEnd && ! bFound )
         {

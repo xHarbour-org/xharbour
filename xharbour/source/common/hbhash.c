@@ -57,7 +57,7 @@
    #include "hbcomp.h"
 #endif
 
-static PHB_HASH_ITEM hb_hashItemNew( HB_SIZE ulKey, void * pValue )
+static PHB_HASH_ITEM hb_hashItemNew( HB_SIZE ulKey, const void * pValue )
 {
    PHB_HASH_ITEM pItem = ( PHB_HASH_ITEM ) hb_xgrab( sizeof( HB_HASH_ITEM ) );
 
@@ -96,8 +96,8 @@ PHB_HASH_TABLE hb_hashTableCreate( HB_SIZE       ulSize,
    pTable->pCompFunc       = pComp;
    pTable->ulCount         = pTable->ulUsed = 0;
 
-   pTable->pItems          = ( PHB_HASH_ITEM * ) hb_xgrab( sizeof( PHB_HASH_ITEM ) * ulSize );
-   memset( pTable->pItems, 0, ( size_t ) ( sizeof( PHB_HASH_ITEM ) * ulSize ) );
+   pTable->pItems          = ( PHB_HASH_ITEM * ) hb_xgrabz( sizeof( PHB_HASH_ITEM ) * ulSize );
+//   memset( pTable->pItems, 0, ( size_t ) ( sizeof( PHB_HASH_ITEM ) * ulSize ) );
 
    return pTable;
 }
@@ -106,7 +106,7 @@ PHB_HASH_TABLE hb_hashTableCreate( HB_SIZE       ulSize,
  */
 void hb_hashTableKill( PHB_HASH_TABLE pTable )
 {
-   ULONG ulSize = 0;
+   HB_SIZE ulSize = 0;
 
    while( ulSize < pTable->ulTableSize )
    {
@@ -126,15 +126,15 @@ void hb_hashTableKill( PHB_HASH_TABLE pTable )
       }
       ++ulSize;
    }
-   hb_xfree( ( void * ) pTable->pItems );
-   hb_xfree( ( void * ) pTable );
+   hb_xfree( pTable->pItems );
+   hb_xfree( pTable );
 }
 
 /* resize table */
 PHB_HASH_TABLE hb_hashTableResize( PHB_HASH_TABLE pTable, HB_SIZE ulNewSize )
 {
    PHB_HASH_TABLE pNew;
-   ULONG          ulSize = 0;
+   HB_SIZE          ulSize = 0;
 
    if( ulNewSize == 0 )
       ulNewSize = 2 * pTable->ulTableSize + 1;
@@ -178,14 +178,14 @@ PHB_HASH_TABLE hb_hashTableResize( PHB_HASH_TABLE pTable, HB_SIZE ulNewSize )
       }
       ++ulSize;
    }
-   hb_xfree( ( void * ) pTable->pItems );
-   hb_xfree( ( void * ) pTable );
+   hb_xfree( pTable->pItems );
+   hb_xfree( pTable );
 
    return pNew;
 }
 
 /* add a new value into th ehash table */
-BOOL hb_hashTableAdd( PHB_HASH_TABLE pTable, void * pValue )
+BOOL hb_hashTableAdd( PHB_HASH_TABLE pTable, const void * pValue )
 {
    HB_SIZE       ulKey;
    PHB_HASH_ITEM pItem;
@@ -210,11 +210,11 @@ BOOL hb_hashTableAdd( PHB_HASH_TABLE pTable, void * pValue )
 
 /* return the pointer to item's value or NULL if not found
  */
-void * hb_hashTableFind( PHB_HASH_TABLE pTable, void * pValue )
+const void * hb_hashTableFind( PHB_HASH_TABLE pTable, const void * pValue )
 {
    HB_SIZE       ulKey;
    PHB_HASH_ITEM pItem;
-   void *        pFound = NULL;
+   const void *        pFound = NULL;
 
    ulKey = ( pTable->pKeyFunc )( pValue, NULL );
    pItem = pTable->pItems[ ulKey ];

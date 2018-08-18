@@ -619,14 +619,6 @@ METHOD Retr( cFile ) CLASS TIPClientFTP
       ENDIF
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "SIZE " + cFile + ::cCRLF )
-
-   IF !::GetReply()
-       RETURN .F.
-   ENDIF
-
-   ::nLength = Val( SubStr( ::cReply, 4 ) )
-
    ::InetSendAll( ::SocketCon, "RETR " + cFile + ::cCRLF )
 
    IF ::TransferStart()
