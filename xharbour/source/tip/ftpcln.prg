@@ -220,7 +220,7 @@ METHOD GetReply() CLASS TIPClientFTP
    LOCAL nLen
    LOCAL cRep
 
-   ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+   ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 256 )
 
    cRep := ::cReply
 
@@ -230,7 +230,7 @@ METHOD GetReply() CLASS TIPClientFTP
 
    // now, if the reply has a '-' as fourth character, we need to proceed...
    WHILE ( ! Empty( cRep ) .AND. cRep[4] == '-' )
-      ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+      ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 256 )
       cRep := If( HB_ISSTRING( ::cReply ), ::cReply, "" )
    ENDDO
 

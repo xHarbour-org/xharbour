@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2018-10-18 23:00 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\tip\ftpcln.prg
+    ! increase InetRecvLine() buffer to 256 in method GetReply(). Thanks to Klas Engwall!
+
 2018-08-18 16:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbhash.h
     ! added const to hb_hashTableFind to make msvc happy  
