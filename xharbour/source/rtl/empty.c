@@ -79,7 +79,7 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_LONG:
-         hb_retl( hb_itemGetNL( pItem ) == 0l );
+         hb_retl( hb_itemGetNInt( pItem ) == 0 );
          break;
 
       case HB_IT_DOUBLE:
