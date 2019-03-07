@@ -9,6 +9,10 @@
 */
 
 
+2019-03-07 09:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\readline.c
+    ! Replaced HB_SIZE with HB_ISIZ. Thanks to Luiz!
+
 2018-12-12 21:46 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/empty.c
     ! fixed minor bug on empty
