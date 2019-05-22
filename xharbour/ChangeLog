@@ -8,10 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-05-23 00:16 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\errorapi.c
+    ! add HB_THREAD_STUB to hb_errInternal() to allow mt compilation
 
 2019-05-21 09:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
-    ! fixed wrong use of error.log name. Thanks to Claudio Voskian!
+    ! fixed wrong use of static error.log name in hb_errInternal(). Thanks to Claudio Voskian!
 
 2019-03-07 09:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\readline.c

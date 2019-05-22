@@ -103,7 +103,6 @@
    "Unrecoverable error 650: Processor stack fault" internal error, but
    better shows what is really the problem. [vszakats] */
 #define HB_ERROR_LAUNCH_MAX      hb_stackSetStruct()->HB_SET_ERRORLOOP
-#define HB_ERROR_LOG_NAME        hb_stackSetStruct()->HB_SET_ERRORLOG
 
 /* Error class instance variables offsets */
 #define HB_TERROR_CARGO          1
@@ -1879,6 +1878,8 @@ USHORT hb_errRT_TOOLS( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char 
 
 void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
 {
+   HB_THREAD_STUB
+
    char     title[ 64 ], buffer[ 1024 ];
    FILE *   fpError;
    BOOL     bLang;
@@ -1889,12 +1890,12 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
 
    if( szText )
    {
-      fpError = hb_fopen( HB_ERROR_LOG_NAME, "a" );
+      fpError = hb_fopen( hb_stackSetStruct()->HB_SET_ERRORLOG, "a" );
 
       if( fpError )
       {
          fclose( fpError );
-         TraceLog( HB_ERROR_LOG_NAME, szText, szPar1, szPar2 );
+         TraceLog( hb_stackSetStruct()->HB_SET_ERRORLOG, szText, szPar1, szPar2 );
       }
    }
 
