@@ -1010,8 +1010,11 @@ static HB_GENC_FUNC( hb_p_pushlonglong )
    }
    return 9 + iSkip;
 #else
+   LONGLONG llVal = HB_PCODE_MKLONGLONG( &pFunc->pCode[ lPCodePos + 1 ] );
+   char szBuf[ 24 ];	
    HB_GENC_LABEL();
-   fprintf( cargo->yyc, "\thb_xvmPushLongLong( HB_LL( %" PFLL "i ) );\n", HB_PCODE_MKLONGLONG( &pFunc->pCode[ lPCodePos + 1 ] ) );
+   //fprintf( cargo->yyc, "\thb_xvmPushLongLong( HB_LL( %" PFLL "i ) );\n", HB_PCODE_MKLONGLONG( &pFunc->pCode[ lPCodePos + 1 ] ) );
+   fprintf( cargo->yyc, "\thb_xvmPushLongLong( HB_LL( %s ) );\n", hb_numToStr( szBuf, sizeof( szBuf ), llVal ) );
    return 9;
 #endif
 }

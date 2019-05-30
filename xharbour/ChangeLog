@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-05-29 21:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\vm\errorapi.c
+    ! using hb_setGetErrorLog insted  of using stack
+  * source\compiler\gencc.c
+    ! fix to hb_p_pushlonglong to correct generate hb_xvmPushLongLong call
+  * contrib\tipssl\smtpcln.prg	
+    ! adjust to connect to office365 smtp
+	
 2019-05-23 00:16 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! add HB_THREAD_STUB to hb_errInternal() to allow mt compilation

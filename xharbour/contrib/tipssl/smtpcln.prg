@@ -68,6 +68,7 @@ CLASS tIPClientSMTP FROM tIPClient
   Data lAuthLogin INIT .F.
   Data lAuthPlain INIT .F.
   Data lTls       INIT .F.
+  Data cClientHost
 
    METHOD New( oUrl, lTrace, oCredentials,CAFile,CaPath )
    METHOD Open()
@@ -205,8 +206,8 @@ METHOD OpenSecure( cUrl,lSSL ) CLASS tIPClientSMTP
 
    cUser := ::oUrl:cuserid
 
-   IF .not. Empty ( ::oUrl:cuserid )
-      ::InetSENDall( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
+   IF .not. Empty ( ::cClientHost )
+      ::InetSENDall( ::SocketCon, "EHLO " +  ::cClientHost + ::cCRLF )
    ELSE
       ::InetSENDall( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
    ENDIF   
@@ -351,6 +352,8 @@ METHOD StartTLS()  CLASS TIpClientSmtp
    if ::GetOk()
      ::lSsl := .t.
      ::ActivateSSL(Self)
+	   ::InetSENDall( ::SocketCon, "EHLO " + iif( Empty( ::cClientHost ), "TIPClientSMTP", ::cClientHost ) + ::cCRLF  )
+       RETURN ::DetectSecurity()		   
    else
     RETURN .F.  
    endif 

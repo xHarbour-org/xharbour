@@ -1,4 +1,4 @@
-/*
+3/*
  * $Id$
  */
 
@@ -1890,12 +1890,12 @@ void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, 
 
    if( szText )
    {
-      fpError = hb_fopen( hb_stackSetStruct()->HB_SET_ERRORLOG, "a" );
+      fpError = hb_fopen( hb_setGetErrorLog(), "a" );
 
       if( fpError )
       {
          fclose( fpError );
-         TraceLog( hb_stackSetStruct()->HB_SET_ERRORLOG, szText, szPar1, szPar2 );
+         TraceLog( hb_setGetErrorLog(), szText, szPar1, szPar2 );
       }
    }
 
