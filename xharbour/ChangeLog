@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-05-30 12:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\errorapi.c
+    ! removed a spurious character at the beginning of file
+    ! removed no more needed HB_THREAD_STUB from hb_errInternal()
+
 2019-05-29 21:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source\vm\errorapi.c
     ! using hb_setGetErrorLog insted  of using stack

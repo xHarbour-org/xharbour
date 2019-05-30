@@ -1,4 +1,4 @@
-3/*
+/*
  * $Id$
  */
 
@@ -1878,8 +1878,6 @@ USHORT hb_errRT_TOOLS( HB_ERRCODE errGenCode, HB_ERRCODE errSubCode, const char 
 
 void hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
 {
-   HB_THREAD_STUB
-
    char     title[ 64 ], buffer[ 1024 ];
    FILE *   fpError;
    BOOL     bLang;
