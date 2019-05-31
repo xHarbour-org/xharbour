@@ -192,7 +192,7 @@ RETURN ::GetOk()
 
 METHOD OpenSecure( cUrl,lSSL ) CLASS tIPClientSMTP
 
-   Local cUser,lOk
+   Local lOk
    Default lSSL to .F.
 
    IF .not. ::super:Open( cUrl )
@@ -203,8 +203,6 @@ METHOD OpenSecure( cUrl,lSSL ) CLASS tIPClientSMTP
    ELSE
       InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ENDIF
-
-   cUser := ::oUrl:cuserid
 
    IF .not. Empty ( ::cClientHost )
       ::InetSENDall( ::SocketCon, "EHLO " +  ::cClientHost + ::cCRLF )

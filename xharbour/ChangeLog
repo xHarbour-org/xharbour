@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-05-31 21:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\tipssl\smtpcln.prg
+    ! removed unused variable cUser from OpenSecure() method
+
 2019-05-30 12:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! removed a spurious character at the beginning of file
