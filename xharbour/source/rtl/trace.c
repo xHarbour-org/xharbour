@@ -66,7 +66,7 @@ void hb_traceInit( void )
    FILE *   fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
-   if( s_bDoInit && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( "trace.log" ) )
+   if( s_bDoInit && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( hb_setGetTraceFile() ) )
    {
       s_bDoInit = FALSE;
 
@@ -74,7 +74,7 @@ void hb_traceInit( void )
       hb_threadLockInit( S_TRACEMTX );
 
       /* Empty the file if it exists. */
-      fpTrace = hb_fopen( "trace.log", "w" );
+      fpTrace = hb_fopen( hb_setGetTraceFile(), "w" );
 
       if( fpTrace )
          fclose( fpTrace );
@@ -108,9 +108,9 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
    {
       if( bEmpty )
          /* Empty the file if it exists. */
-         hFile = hb_fopen( "trace.log", "w" );
+         hFile = hb_fopen( hb_setGetTraceFile(), "w" );
       else
-         hFile = hb_fopen( "trace.log", "a" );
+         hFile = hb_fopen( hb_setGetTraceFile(), "a" );
    }
    else
       hFile = hb_fopen( sFile, "a" );

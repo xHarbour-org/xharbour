@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-06-03 11:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\trace.c
+    ! replace fixed name "trace.log" with hb_setGetTraceFile()
+
 2019-05-31 21:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\tipssl\smtpcln.prg
     ! removed unused variable cUser from OpenSecure() method
