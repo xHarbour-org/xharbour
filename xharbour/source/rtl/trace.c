@@ -55,6 +55,7 @@
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "thread.h"
+#include "hbset.h"
 
 #ifdef HB_EXTENSION
 
