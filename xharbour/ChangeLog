@@ -8,19 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2019-06-03 11:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-06-13 15:39 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\cdpapi.c
+    ! added function HB_UTF8ASC() borrow from harbour
+
+2019-06-03 11:40 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\trace.c
     ! added #include "hbset.h"
 
-2019-06-03 11:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-06-03 11:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\trace.c
     ! replace fixed name "trace.log" with hb_setGetTraceFile()
 
-2019-05-31 21:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-05-31 21:40 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\tipssl\smtpcln.prg
     ! removed unused variable cUser from OpenSecure() method
 
-2019-05-30 12:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-05-30 12:45 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! removed a spurious character at the beginning of file
     ! removed no more needed HB_THREAD_STUB from hb_errInternal()
@@ -33,11 +37,11 @@
   * contrib\tipssl\smtpcln.prg	
     ! adjust to connect to office365 smtp
 	
-2019-05-23 00:16 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-05-23 00:16 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! add HB_THREAD_STUB to hb_errInternal() to allow mt compilation
 
-2019-05-21 09:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2019-05-21 09:38 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! fixed wrong use of static error.log name in hb_errInternal(). Thanks to Claudio Voskian!
 
@@ -127,7 +131,6 @@
   * contrib\hbzlib\include\zipcollections.h
     ! minor fixes to compile under BCC102. Thanks to Mel!
 
->>>>>>> .r10236
 2018-05-29 10:13 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\rddads\adsfunc.c
     ! minor fixes to ADSDDSETFIELDPROPERTY() and ADSSETTIMESTAMP(). Thanks to Reinaldo!

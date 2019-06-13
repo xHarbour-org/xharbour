@@ -1581,6 +1581,36 @@ HB_FUNC( HB_UTF8CHR )
    }
 }
 
+HB_FUNC( HB_UTF8ASC )
+
+{
+   const char * pszString = hb_parc( 1 );
+
+   if( pszString )
+   {
+      HB_SIZE nLen = hb_parclen( 1 );
+      USHORT wc = 0;
+      int n = 0;
+
+      while( nLen )
+      {
+         if( ! utf8tou16nextchar( ( unsigned char ) *pszString, &n, &wc ) )
+            break;
+
+         if( n == 0 )
+            break;
+
+         pszString++;
+
+         nLen--;
+      }
+
+      hb_retnint( wc );
+   }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+}
+
 HB_FUNC( HB_UTF8TOSTR )
 {
    const char * szString = hb_parc( 1 );
