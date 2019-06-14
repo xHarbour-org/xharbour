@@ -2654,13 +2654,13 @@ ulRetVal = AdsSetLogical( pArea->hStatement,(UNSIGNED8*) hb_parc(1), (UNSIGNED16
 hb_retl( ulRetVal == AE_SUCCESS );
 }
 
-HB_FUNC( ADSSETNULL )
+/*HB_FUNC( ADSSETNULL )
 {
 UNSIGNED32 ulRetVal;
 ADSAREAP pArea = hb_adsGetWorkAreaPointer();
 ulRetVal = AdsSetNull( (hb_parnl(1)==0) ? pArea->hOrdCurrent : hb_parnl(1),(char*) hb_parc(2));
 hb_retl( ulRetVal == AE_SUCCESS );
-}
+}*/
 
 
 //RCB 12/4/2011 5:51:59 PM
