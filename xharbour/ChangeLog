@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2019-06-14 17:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\rdd_ads\adsfunc.c
+    ! uncomment function HB_FUNC( ADSSETNULL )
+
 2019-06-13 15:39 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\cdpapi.c
     ! added function HB_UTF8ASC() borrow from harbour
