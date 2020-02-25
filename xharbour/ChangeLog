@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2020-02-25 17:30 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * contrib\sddoci\sddoci.c
+    ! fixed compilation
+
+  * source\compiler\cmdcheck.c
+    ! fix memory leak on compiling
+
+  * include/hbver.ch
+    + added new define _HB_CURR_YEAR
+
+  * source/compiler/hbusage.c
+  * source/pp/ppgen.c
+  * utils/hbdoc/hbdoc.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbpp/hbpp.c
+  * utils/hbrun/hbrun.prg
+  * utils/hbtest/hbtest.prg
+  * winmake/compile.mak
+    ! bump copyright year to 2019
+
 2019-06-14 17:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\rdd_ads\adsfunc.c
     ! reverted my last wrong commit
@@ -42,9 +62,9 @@
     ! using hb_setGetErrorLog insted  of using stack
   * source\compiler\gencc.c
     ! fix to hb_p_pushlonglong to correct generate hb_xvmPushLongLong call
-  * contrib\tipssl\smtpcln.prg	
+  * contrib\tipssl\smtpcln.prg
     ! adjust to connect to office365 smtp
-	
+
 2019-05-23 00:16 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\errorapi.c
     ! add HB_THREAD_STUB to hb_errInternal() to allow mt compilation
@@ -60,43 +80,43 @@
 2018-12-12 21:46 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/empty.c
     ! fixed minor bug on empty
-	
+
 2018-10-11 23:00 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\tip\ftpcln.prg
     ! increase InetRecvLine() buffer to 256 in method GetReply(). Thanks to Klas Engwall!
 
 2018-08-18 16:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include/hbhash.h
-    ! added const to hb_hashTableFind to make msvc happy  
+    ! added const to hb_hashTableFind to make msvc happy
   * source/common/hbhash.c
     ! change ULONG => HB_SIZE
 	! xgrab/memset  => xgrabz
-	! added const to hb_hashTableFind/hb_hashTableAdd to make msvc happy  	  
-  * source/tip/ftpcln.prg 
+	! added const to hb_hashTableFind/hb_hashTableAdd to make msvc happy
+  * source/tip/ftpcln.prg
     ! updated method RETR to dont call SIZE operation
   * source/rtl/rat.c
     ! added missing cast to strlen
-  * source\rtl\hbsrlraw.c	
+  * source\rtl\hbsrlraw.c
     ! in HB_DESERIALIZEARRAY LONG -> HB_SIZE
   * source\rtl\hbwinole.c
     ! fixed double variable declaration
   * source\compiler\hbident.c
     !added HB_UNCONST  to hb_comp_IdentDel Value variable
   * source\rtl\pcre\config.h
-    contrib\jpeg\jconfig.h 
+    contrib\jpeg\jconfig.h
 	contrib\pdflite\include\pc_util.h
 	contrib\pdflite\include\p_intern.h
 	utils\hbpp\hbpp.c
 	utils\hbpp\hbppcalc.c
 	utils\hbpp\hbppcomp.c
-    ! define _CRT_SECURE_NO_WARNINGS only if not defined  
+    ! define _CRT_SECURE_NO_WARNINGS only if not defined
   * winmake/makefile.vc
     ! added some defines to shout off some warnings
-	
+
 2018-07-14 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source\rdd\delim1.c
     ! minor fix
-	
+
 2018-07-14 15:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include\dbinfo.ch
   * include\hbrdddel.h
@@ -105,26 +125,26 @@
 
 2018-06-23 17:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * make_pc.bat
-  * winmake\makefile.pc    
+  * winmake\makefile.pc
     ! some fix to build dll and contribs
 	! for proper build set __make__=nmake ( using msvc nmake to build full pelles c 64 bits binaries )
-	
+
 2018-06-23 12:50 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * include\hbapi.h
-  * source\common\hbarch.c 
+  * source\common\hbarch.c
     ! added missing cast to hb_get_rev_double and hb_get_std_double to make pellesc 64 bits compiler happy
   * source\common\hbstr.c
     source\rtl\at.c
 	source\rtl\dateshb.c
-    ! added new line to end of file  
+    ! added new line to end of file
   * source\rtl\filesys.c
     ! added an missing USHORT cast on hb_fsIsDrv function
   * source\rtl\hbxml.c
     ! fixed old style declaration to mxml_sgs_new()
-  * source\rtl\zlib\crc32.c	
+  * source\rtl\zlib\crc32.c
     ! fixed old style declaration to get_crc_table
   * source\rtl\zlib\zutil.c
-    ! fixed old style declaration to zlibVersion and zlibCompileFlags 
+    ! fixed old style declaration to zlibVersion and zlibCompileFlags
 
 2018-06-09 22:32 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
@@ -158,7 +178,7 @@
 2018-04-19 22:10 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source/rtl/rat.c
     ! revert to previus version
-	
+
 2018-04-12 10:16 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\filenet.c
     ! fixed a mistype: ptr => ptrs in hb_fileNetWriteLarge()
@@ -179,22 +199,22 @@
   * include/hbsocket.h
     ! Sync with harbour
   * source/common/hbdate.c
-    ! added hb_timerGet(),hb_timerInit() and hb_timerTest() borrow from harbour  	
+    ! added hb_timerGet(),hb_timerInit() and hb_timerTest() borrow from harbour
   * source/common/hbgete.c
     ! cast strlen( szValue ) to DWORD on call to RegSetValueEx to make msvc win64 build happy
-  * source/compiler/comptool.c 
+  * source/compiler/comptool.c
     ! in structure HB_MEMINFO ULONG ulSize  => HB_SIZE ulSize
-    ! static LONG s_ulMemoryBlocks       => static HB_SIZE s_ulMemoryBlocks       
-    ! static LONG s_ulMemoryMaxBlocks    => static HB_SIZE s_ulMemoryMaxBlocks    
-    ! static LONG s_ulMemoryMaxConsumed  => static HB_SIZE s_ulMemoryMaxConsumed  
-    ! static LONG s_ulMemoryConsumed     => static HB_SIZE s_ulMemoryConsumed   
+    ! static LONG s_ulMemoryBlocks       => static HB_SIZE s_ulMemoryBlocks
+    ! static LONG s_ulMemoryMaxBlocks    => static HB_SIZE s_ulMemoryMaxBlocks
+    ! static LONG s_ulMemoryMaxConsumed  => static HB_SIZE s_ulMemoryMaxConsumed
+    ! static LONG s_ulMemoryConsumed     => static HB_SIZE s_ulMemoryConsumed
     ! in hb_xquery() function change ULONG => HB_SIZE
     ! in hb_memToStr function change ULONG => HB_SIZE
-	! changed %lu to %" HB_PFS "u where applicable	
+	! changed %lu to %" HB_PFS "u where applicable
   * source/ct/bit3.c
     ! Change HB_LONG to long
-  * source/pp/ppgen.c 
-    ! in function hb_pp_writeToken and hb_pp_parseChangelog cast strlen to int 
+  * source/pp/ppgen.c
+    ! in function hb_pp_writeToken and hb_pp_parseChangelog cast strlen to int
   * source/rdd/dbfntx/dbfntx1.c
 	! optimized to use  hb_itemGetDTS( pItem, szBuffer );	 insted of char szBuffer[ 17 ];
       hb_datetimeDecStr( szBuffer, hb_itemGetDL( pItem ), hb_itemGetT( pItem ) );

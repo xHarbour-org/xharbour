@@ -116,6 +116,7 @@
 #include "fileio.ch"
 #include "inkey.ch"
 #include 'hbdocdef.ch'
+#include 'hbver.ch'
 //  output lines on the screen
 
 #define INFILELINE   10
@@ -273,7 +274,7 @@ FUNCTION _APPMAIN( cFlags, cLinkName, cAtFile )
 
    IF cLinkName = NIL
       outstd( "xHarbour Doc Extractor"+ hb_osnewline() )
-      outstd( "Copyright 1999-2018, http://www.xharbour.org"+ hb_osnewline() )
+      outstd( "Copyright 1999-" +_HB_CURR_YEAR +", http://www.xharbour.org"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )
       outstd( "Syntax:  hbdoc [options] <linkname> [<ifile>]"+ hb_osnewline() )
       outstd( ""+ hb_osnewline() )

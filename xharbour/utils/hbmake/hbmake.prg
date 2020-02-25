@@ -61,6 +61,7 @@
 #include "common.ch"
 #include "radios.ch"
 #include "inkey.ch"
+#include 'hbver.ch'
 
 
 #define EOL Hb_OsNewLine()
@@ -5936,7 +5937,7 @@ RETURN ( "HbMake v"+s_cHbMakeVersion+" - xHarbour Make Utility")
 *--------------------------
 FUNCTION HbMake_Copyright()
 *--------------------------
-RETURN ( "Copyright (C) 2000-2018 xHarbour project - http://www.xharbour.org")
+RETURN ( "Copyright (C) 2000-" +_HB_CURR_YEAR +" xHarbour project - http://www.xharbour.org")
 
 *---------------------
 FUNCTION ShowCredits()

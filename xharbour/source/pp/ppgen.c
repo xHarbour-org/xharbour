@@ -150,7 +150,7 @@ void * hb_xgrabEx( HB_SIZE ulSize, const char *szSource, int iLine, const char *
    HB_SYMBOL_UNUSED( szSource );
    HB_SYMBOL_UNUSED( iLine );
    HB_SYMBOL_UNUSED( szFunc );
-   
+
    return malloc( ( size_t ) ulSize );
 }
 #endif
@@ -279,8 +279,8 @@ static int hb_pp_writeTokenCount( PHB_PP_TOKEN pToken )
 
    while( pToken )
    {
-      iToken   += hb_pp_writeTokenCount( pToken->pMTokens ) + 1;
-      pToken   = pToken->pNext;
+      iToken += hb_pp_writeTokenCount( pToken->pMTokens ) + 1;
+      pToken  = pToken->pNext;
    }
    return iToken;
 }
@@ -317,8 +317,8 @@ static void hb_pp_writeToken( FILE * fout, PHB_PP_TOKEN pToken,
          hb_pp_writeToken( fout, pToken->pMTokens, szName, iToken + 1,
                            pToken->pNext == NULL && fLast );
 
-      iToken   += iOptional + 1;
-      pToken   = pToken->pNext;
+      iToken += iOptional + 1;
+      pToken  = pToken->pNext;
    }
 }
 
@@ -540,8 +540,8 @@ static void hb_pp_undefCompilerRules( PHB_PP_STATE pState )
 
 static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile, char* szWordFile )
 {
-   int   iResult = 0;
-   ULONG ulLen;
+   int    iResult = 0;
+   ULONG  ulLen;
    FILE * fWord = NULL;
 
    while( hb_pp_nextLine( pState, &ulLen ) != NULL && ulLen )
@@ -582,9 +582,9 @@ static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile, char* sz
 
 static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCVSDateID, char * szChangeLogID, char * szLastEntry )
 {
-   int      iResult = 0;
-   char *   pszEnv;
-   FILE *   fout;
+   int     iResult = 0;
+   char *  pszEnv;
+   FILE *  fout;
 
    fout = hb_fopen( szVerFile, "w" );
    if( ! fout )
@@ -673,9 +673,9 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
                                  BOOL fQuiet, char * piSVNID, char * piSVNDateID,
                                  char ** pszChangeLogID, char ** pszLastEntry )
 {
-   int            iResult = 0;
-   const char *   pszFile;
-   FILE *         file_in;
+   int           iResult = 0;
+   const char *  pszFile;
+   FILE *        file_in;
 
    pszFile = pszFileName ? pszFileName : "../../../../ChangeLog";
 
@@ -702,12 +702,12 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
    }
    else
    {
-      char     szLine[ 256 ];
-      char     szLine1[ 256 ];
-      char     szId[ 128 ];
-      char     szLog[ 128 ];
-      char *   szFrom, * szTo;
-      int      iLen;
+      char    szLine[ 256 ];
+      char    szLine1[ 256 ];
+      char    szId[ 128 ];
+      char    szLog[ 128 ];
+      char *  szFrom, * szTo;
+      int     iLen;
 
       *szId = *szLog = *szLine1 = '\0';
 
@@ -878,12 +878,12 @@ static void hb_pp_usage( char * szName )
 
 int main( int argc, char * argv[] )
 {
-   char *         szFile         = NULL, * szRuleFile = NULL, * szWordFile = NULL, * szVerFile = NULL;
-   char *         szLogFile      = NULL;
-   BOOL           fQuiet         = FALSE, fWrite = FALSE, fChgLog = FALSE;
-   char *         szChangeLogID  = NULL, * szLastEntry = NULL;
-   int            iResult        = 0, i;
-   PHB_PP_STATE   pState;
+   char *        szFile        = NULL, * szRuleFile = NULL, * szWordFile = NULL, * szVerFile = NULL;
+   char *        szLogFile     = NULL;
+   BOOL          fQuiet        = FALSE, fWrite = FALSE, fChgLog = FALSE;
+   char *        szChangeLogID = NULL, * szLastEntry = NULL;
+   int           iResult       = 0, i;
+   PHB_PP_STATE  pState;
 
    pState = hb_pp_new();
 

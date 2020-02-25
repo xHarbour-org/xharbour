@@ -51,6 +51,7 @@
  */
 
 #include "hbextern.ch"
+#include "hbver.ch"
 
 /* NOTE: Undocumented CA-Clipper _APPMAIN is used instead of Main to avoid
          collision with user function in HRB file with that name. [ckedem]
@@ -60,7 +61,7 @@ FUNCTION _APPMAIN( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cP
 
    IF Empty( cHRBFile )
       OutStd( "xHarbour Runner" + HB_OSNewLine() +;
-              "Copyright 1999-2018, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              "Copyright 1999-" +_HB_CURR_YEAR +", http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
               "Syntax:  hbrun <hrbfile[.hrb]> [parameters]" + HB_OSNewLine() + ;
               HB_OSNewLine() +;

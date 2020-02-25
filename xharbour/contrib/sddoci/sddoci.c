@@ -606,7 +606,7 @@ static HB_ERRCODE ocilibGoTo( SQLBASEAREAP pArea, ULONG ulRecNo )
                if( ts && OCI_TimestampGetDateTime( ts, &iYear, &iMonth, &iDay, &iHour, &iMin, &iSec, &iFSec ) )
                   pItem = hb_itemPutTDT( pItem, hb_dateEncode( iYear, iMonth, iDay ),
                                          hb_timeEncode( iHour, iMin, iSec ) );
-               break
+               break;
             }
          }
 

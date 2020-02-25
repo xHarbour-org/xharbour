@@ -909,6 +909,9 @@ void hb_compChkEnvironVar( char * szSwitch )
             {
                char * szPath = hb_strdup( s + 1 );
 
+               if( hb_comp_pOutPath )
+                  hb_xfree( hb_comp_pOutPath );
+
                hb_comp_pOutPath = hb_fsFNameSplit( szPath );
                hb_xfree( szPath );
             }
@@ -941,6 +944,9 @@ void hb_compChkEnvironVar( char * szSwitch )
                         {
                            char * szPath = hb_strdup( s + 3 );
 
+                           if( hb_comp_ppo_pOutPath )
+                              hb_xfree( hb_comp_ppo_pOutPath );
+
                            hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
                            hb_xfree( szPath );
                         }
@@ -952,6 +958,9 @@ void hb_compChkEnvironVar( char * szSwitch )
                   char * szPath = hb_strdup( s + 2 );
 
                   hb_comp_bTracePP     = 0;
+
+                  if( hb_comp_ppo_pOutPath )
+                     hb_xfree( hb_comp_ppo_pOutPath );
 
                   hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
                   hb_xfree( szPath );

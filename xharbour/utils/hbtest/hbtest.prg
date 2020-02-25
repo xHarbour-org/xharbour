@@ -76,6 +76,7 @@
 
 #include "error.ch"
 #include "fileio.ch"
+#include "hbver.ch"
 
 /* Don't change the position of this #include. */
 #include "rt_vars.ch"
@@ -102,7 +103,7 @@ STATIC s_nEndTime
 PROCEDURE _AppMain( cPar1, cPar2 )
 
    OutStd( "xHarbour Regression Test Suite" + HB_OSNewLine() +;
-           "Copyright 1999-2018, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
+           "Copyright 1999-" +_HB_CURR_YEAR +", http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() )
 
    IF cPar1 == NIL
       cPar1 := ""

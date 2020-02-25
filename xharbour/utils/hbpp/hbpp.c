@@ -123,7 +123,7 @@ int main( int argc, char * argv[] )
 
   printf( "xHarbour Preprocessor %d.%d.%d\n",
      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION );
-  printf( "Copyright 1999-2018, http://www.xharbour.org\n" );
+  printf( "Copyright 1999-" _HB_CURR_YEAR ", http://www.xharbour.org\n" );
 
   hb_pp_Table();
   stdef = hb_pp_topDefine;
@@ -157,7 +157,7 @@ int main( int argc, char * argv[] )
                     else
                     {
                        UINT uiLen;
-                       
+
                        szDefText[ pAssign - szDefText ] = '\0';
 
                        //hb_pp_AddDefine( szDefText,  pAssign + 1, FALSE );
