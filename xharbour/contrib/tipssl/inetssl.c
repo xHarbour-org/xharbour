@@ -2598,9 +2598,9 @@ HB_FUNC( INETSSLCONNECTFROMFD )
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET(3);
    PHB_ITEM             pSocket = NULL;
 //   struct hostent       *Host;
-   int                  iPort;
+//   int                  iPort;
 //   int                  iRetries = 0;
-   int                  iRet;
+//   int                  iRet;
    int                  iRet2;
 
    if (Socket != NULL)
@@ -2630,7 +2630,7 @@ HB_FUNC( INETSSLCONNECTFROMFD )
       }
       else
       {
-         iPort = htons((u_short) hb_parni(2));
+//         iPort = htons((u_short) hb_parni(2));
 
          HB_STACK_UNLOCK;
          HB_TEST_CANCEL_ENABLE_ASYN;
@@ -2642,7 +2642,7 @@ HB_FUNC( INETSSLCONNECTFROMFD )
 
          iRet2 = SSL_connect(Socket->pSSL);
          
-         iRet = SSL_get_error(Socket->pSSL, iRet2);
+//         iRet = SSL_get_error(Socket->pSSL, iRet2);
 
          if (iRet2 < 1) HB_SOCKET_SET_ERROR2(Socket, -1, "Timeout");
 
