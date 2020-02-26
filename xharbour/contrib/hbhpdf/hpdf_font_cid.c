@@ -409,7 +409,7 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
                     max = cid;
             }
 	    } else {
-		HPDF_UNICODE unicode = (i << 8) | j;
+		HPDF_UNICODE unicode = (HPDF_UNICODE)((i << 8) | j);
 		HPDF_UINT16 gid = HPDF_TTFontDef_GetGlyphid (fontdef,
 							     unicode);
 		tmp_map[unicode] = gid;
@@ -796,7 +796,7 @@ UINT16ToHex  (char     *s,
 
     /* align byte-order */
     HPDF_MemCpy (b, (HPDF_BYTE *)&val, 2);
-    val2 = (HPDF_UINT16)((HPDF_UINT16)b[0] << 8 | (HPDF_UINT16)b[1]);
+    val2 = (HPDF_UINT16)(((HPDF_UINT16)b[0] << 8) | (HPDF_UINT16)b[1]);
 
     HPDF_MemCpy (b, (HPDF_BYTE *)&val2, 2);
 
@@ -1083,4 +1083,3 @@ CreateCMap  (HPDF_Encoder   encoder,
 
     return cmap;
 }
-

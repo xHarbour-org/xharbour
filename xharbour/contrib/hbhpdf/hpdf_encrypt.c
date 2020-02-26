@@ -181,7 +181,7 @@ HPDF_MD5Final  (HPDF_BYTE              digest[16],
 
 /* This is the central step in the HPDF_MD5 algorithm. */
 #define HPDF_MD5STEP(f, w, x, y, z, data, s) \
- ( w += f(x, y, z) + data,  w = w<<s | w>>(32-s),  w += x )
+ ( w += f(x, y, z) + data,  w = (w<<s) | (w>>(32-s)),  w += x )
 
 
 /*
@@ -282,8 +282,8 @@ MD5ByteReverse  (HPDF_BYTE    *buf,
     HPDF_UINT32 t;
     do
     {
-        t = (HPDF_UINT32) ((HPDF_UINT32) buf[3] << 8 | buf[2]) << 16 |
-        ((HPDF_UINT32) buf[1] << 8 | buf[0]);
+        t = (HPDF_UINT32) ((((HPDF_UINT32) buf[3] << 8) | buf[2]) << 16) |
+        (((HPDF_UINT32) buf[1] << 8) | buf[0]);
         *(HPDF_UINT32 *) buf = t;
         buf += 4;
     }

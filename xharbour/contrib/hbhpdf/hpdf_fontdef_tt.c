@@ -2250,10 +2250,10 @@ UINT32Swap (HPDF_UINT32  *value)
     HPDF_BYTE b[4];
 
     HPDF_MemCpy (b, (HPDF_BYTE *)value, 4);
-    *value = (HPDF_UINT32)((HPDF_UINT32)b[0] << 24 |
-             (HPDF_UINT32)b[1] << 16 |
-             (HPDF_UINT32)b[2] << 8 |
-             (HPDF_UINT32)b[3]);
+    *value = (HPDF_UINT32)(((HPDF_UINT32)b[0] << 24) |
+                           ((HPDF_UINT32)b[1] << 16) |
+                           ((HPDF_UINT32)b[2] <<  8) |
+                           (HPDF_UINT32)b[3]);
 }
 
 static void
@@ -2262,7 +2262,7 @@ UINT16Swap (HPDF_UINT16  *value)
     HPDF_BYTE b[2];
 
     HPDF_MemCpy (b, (HPDF_BYTE *)value, 2);
-    *value = (HPDF_UINT16)((HPDF_UINT16)b[0] << 8 | (HPDF_UINT16)b[1]);
+    *value = (HPDF_UINT16)(((HPDF_UINT16)b[0] << 8) | (HPDF_UINT16)b[1]);
 }
 
 static void
@@ -2271,6 +2271,5 @@ INT16Swap (HPDF_INT16  *value)
     HPDF_BYTE b[2];
 
     HPDF_MemCpy (b, (HPDF_BYTE *)value, 2);
-    *value = (HPDF_INT16)((HPDF_INT16)b[0] << 8 | (HPDF_INT16)b[1]);
+    *value = (HPDF_INT16)(((HPDF_INT16)b[0] << 8) | (HPDF_INT16)b[1]);
 }
-

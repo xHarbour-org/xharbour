@@ -779,7 +779,7 @@ static const HPDF_CID_Width MS_PGothic_W_ARRAY[] = {
     {0xFFFF, 0}
 };
 
-
+/*
 static const HPDF_CID_Width MS_Mincho_W_ARRAY[] = {
     {1, 500},
     {2, 500},
@@ -1036,9 +1036,9 @@ static const HPDF_CID_Width MS_Mincho_W_ARRAY[] = {
     {631, 500},
     {0xFFFF, 0}
 };
+*/
 
-
-
+/*
 static const HPDF_CID_Width MS_PMincho_W_ARRAY[] = {
     {1, 304},
     {2, 304},
@@ -1542,7 +1542,7 @@ static const HPDF_CID_Width MS_PMincho_W_ARRAY[] = {
     {1010, 765},
     {0xFFFF, 0}
 };
-
+*/
 
 /*---------------------------------------------------------------------------*/
 /*----- Mincho Font ---------------------------------------------------------*/
