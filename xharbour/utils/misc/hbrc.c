@@ -311,6 +311,35 @@ static char * _hb_verCompiler( void )
    return pszCompiler;
 }
 
+static char * cParExp( char * szParam, char * szStr )
+{
+   char szTemp[ 265 ];
+   char * pAction;
+   int  iPos = 0;
+
+   strncpy( szParam, szStr, 264 );
+
+   while( ( pAction = strchr( szParam + iPos, '$' ) ) != NULL && *( pAction + 1 ) )
+   {
+      switch( *( pAction + 1 ) )
+      {
+         case 'y':
+         case 'Y':              /* put _HB_CURR_YEAR value */
+            strncpy( szTemp, pAction + 2, 264 );
+            *pAction = '\0';
+            strcat( szParam, _HB_CURR_YEAR );
+            strcat( szParam, szTemp );
+            break;
+
+         default:
+            iPos = pAction - szParam + 1;
+            break;
+      }
+   }
+
+   return szParam;
+}
+
 int main( int argc, char * argv[] )
 {
    if( argc >= 7 )
@@ -320,8 +349,9 @@ int main( int argc, char * argv[] )
       if( h )
       {
          SYSTEMTIME  t;
-         char *      cCompiler     = _hb_verCompiler();
-         char *      aMo[]         = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+         char *      cCompiler = _hb_verCompiler();
+         char *      aMo[]     = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+         char        szParam[ 265 ];
 
          GetLocalTime( &t );
 
@@ -345,17 +375,17 @@ int main( int argc, char * argv[] )
 #else
          fprintf( h, "  {\n" );
 #endif
-         fprintf( h, "   VALUE \"CompanyName\", \"%s\\000\"\n", argv[6] );
-         fprintf( h, "   VALUE \"FileDescription\", \"%s\\000\"\n", argv[2] );
+         fprintf( h, "   VALUE \"CompanyName\", \"%s\\000\"\n", cParExp( szParam, argv[6] ) );
+         fprintf( h, "   VALUE \"FileDescription\", \"%s\\000\"\n", cParExp( szParam, argv[2] ) );
          fprintf( h, "   VALUE \"FileVersion\", \"%d.%d.%d.%d\\000\"\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
-         fprintf( h, "   VALUE \"InternalName\", \"%s\\000\"\n", argv[3] );
-         fprintf( h, "   VALUE \"LegalCopyright\", \"\\251 %s\\000\"\n", argv[4] );
-         fprintf( h, "   VALUE \"ProductName\", \"%s\\000\"\n", argv[2] );
+         fprintf( h, "   VALUE \"InternalName\", \"%s\\000\"\n", cParExp( szParam, argv[3] ) );
+         fprintf( h, "   VALUE \"LegalCopyright\", \"\\251 %s\\000\"\n", cParExp( szParam, argv[4] ) );
+         fprintf( h, "   VALUE \"ProductName\", \"%s\\000\"\n", cParExp( szParam, argv[2] ) );
          fprintf( h, "   VALUE \"ProductVersion\", \"%d.%d.%d.%d\\000\"\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
-         fprintf( h, "   VALUE \"Programmer\", \"%s\\000\"\n", argv[5] );
+         fprintf( h, "   VALUE \"Programmer\", \"%s\\000\"\n", cParExp( szParam, argv[5] ) );
          fprintf( h, "   VALUE \"CompileDate\", \"%02d%s%s%s%04d\\000\"\n", t.wDay, " ", aMo[ t.wMonth - 1 ], " ", t.wYear );
          fprintf( h, "   VALUE \"CompileTime\", \"%02d:%02d:%02d\\000\"\n", t.wHour, t.wMinute, t.wSecond );
-         fprintf( h, "   VALUE \"OriginalFileName\", \"%s\\000\"\n", argv[3] );
+         fprintf( h, "   VALUE \"OriginalFileName\", \"%s\\000\"\n", cParExp( szParam, argv[3] ) );
          fprintf( h, "   VALUE \"Compiler\", \"%s\\000\"\n", cCompiler );
          fprintf( h, "   VALUE \"PrivateBuild\", \"\\000\"\n" );
          fprintf( h, "   VALUE \"SpecialBuild\", \"\\000\"\n" );

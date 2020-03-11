@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2020-03-11 19:50 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
+  * contrib/hbhpdf/hpdf_fontdef_tt.c
+  * contrib/hbhpdf/hpdf_image_png.c
+  * contrib/hbhpdf/hpdf_pages.c
+    ! initialize & define statics as required
+
+  * utils/misc/hbrc.c
+  * winmake/compile.mak
+    + introduce environment-variable strings and
+      replaces them with their defined values
+
 2020-02-26 15:45 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbhpdf/hpdf_encrypt.c
   * contrib/hbhpdf/hpdf_font_cid.c
