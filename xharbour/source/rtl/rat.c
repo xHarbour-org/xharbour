@@ -107,7 +107,7 @@ HB_FUNC( RAT )
    hb_retni( 0 );
 }
 */
-
+/*
 HB_FUNC( RAT )
 {
   HB_SIZE ulSubLen = hb_parclen( 1 );
@@ -143,4 +143,37 @@ HB_FUNC( RAT )
   else
      // This function never seems to raise an error
      hb_retni( 0 );
+}
+*/
+
+HB_FUNC( RAT )
+{
+    PHB_ITEM pszSub = hb_param( 1, HB_IT_STRING );
+
+    if ( pszSub && pszSub->item.asString.length )
+    {
+        PHB_ITEM pszText = hb_param( 2, HB_IT_STRING );
+
+        if( pszText && pszText->item.asString.length )
+        {
+            HB_ISIZ nStart = hb_parns( 3 );
+            HB_ISIZ nEnd = hb_parns( 4 );
+
+            HB_ISIZ nLen = pszSub->item.asString.length;
+
+            HB_ISIZ i;
+
+            if ( nStart <= 0 ) nStart = pszText->item.asString.length;
+            if ( nEnd<= 0 ) nEnd = 1;
+
+            for ( i = nStart - nLen + 1; i >= nEnd; i-- )
+                if ( memcmp( pszText->item.asString.value + i - 1, pszSub->item.asString.value, nLen ) == 0 )
+                {
+                    hb_retni( i );
+                    return;
+                }
+        }
+    }
+
+    hb_retni( 0 );
 }
