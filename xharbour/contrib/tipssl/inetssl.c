@@ -2171,6 +2171,10 @@ HB_FUNC( INETSSLCONNECT )
 
          hb_socketConnect(Socket);
          hb_socketSetNonBlocking(Socket);
+
+         // added to fix handshake faillure TLSv3
+         SSL_set_tlsext_host_name(Socket->pSSL, Host->h_name);
+
          SSL_set_bio(Socket->pSSL, Socket->pBio, Socket->pBio);
          SSL_set_fd(Socket->pSSL, (int)Socket->com);
          SSL_set_connect_state(Socket->pSSL);

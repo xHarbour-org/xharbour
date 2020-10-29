@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2020-10-29 16:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\tipssl\inetssl.c
+    ! added call to SSL_set_tlsext_host_name() to fix handshake faillure TLSv3. Thanks to Richard Visscher!
+
 2020-10-15 12:26 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\rat.c
     ! completely rewritten (commented out old version)
