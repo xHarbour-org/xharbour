@@ -50,9 +50,14 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+/* stime() exists only in SVr4, SVID, X/OPEN and Linux */
 #ifndef _SVID_SOURCE
-#   define _SVID_SOURCE
+#define _SVID_SOURCE
 #endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+
 
 #include "hbapi.h"
 #include "hbdate.h"
@@ -138,7 +143,7 @@ HB_FUNC( SETTIME )
       st.wSecond        = ( WORD ) iTime[ 2 ];
       st.wMilliseconds  = ( WORD ) iTime[ 3 ] * 10;
       fResult           = SetLocalTime( &st );
-#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_LINUX ) && ! defined( HB_OS_ANDROID ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
       ULONG    lNewTime;
       time_t   tm;
@@ -173,7 +178,7 @@ HB_FUNC( SETDATE )
          st.wDay        = ( WORD ) iDay;
          st.wDayOfWeek  = ( WORD ) hb_dateJulianDOW( lDate );
          fResult        = SetLocalTime( &st );
-#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_LINUX ) && ! defined( HB_OS_ANDROID ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
          long     lNewDate;
          time_t   tm;

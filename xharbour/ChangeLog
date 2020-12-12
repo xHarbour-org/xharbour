@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2020-12-12  14:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\ct\dattime3.c
+  * source\ct\settime.c
+     * added #define _DEFAULT_SOURCE necessay in new Linux distors
+	   Borrow from harbour 
+  * source\rtl\arc4.c
+    * updated to the current state of glibc, versions >= 2.30 have
+      no sysctl(). Should fix build issues on current Linux distros
+      like Fedora 33, etc.	 Borrow from harbour 
+
 2020-10-29 16:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\tipssl\inetssl.c
     ! added call to SSL_set_tlsext_host_name() to fix handshake faillure TLSv3. Thanks to Richard Visscher!

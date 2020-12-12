@@ -53,8 +53,12 @@
  * See doc/license.txt for licensing terms.
  *
  */
+/* stime() exists only in SVr4, SVID, X/OPEN and Linux */
 #ifndef _SVID_SOURCE
-   #define _SVID_SOURCE
+#define _SVID_SOURCE
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
 #endif
 
 #include "hbapi.h"
@@ -90,7 +94,7 @@ HB_FUNC( SETNEWDATE )
 
       hb_retl( SetLocalTime( &st ) );
    }
-#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_LINUX ) && ! defined( HB_OS_ANDROID ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
    {
       /* LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek; */
@@ -136,7 +140,7 @@ HB_FUNC( SETNEWTIME )
 
       hb_retl( SetLocalTime( &st ) );
    }
-#elif defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ )
+#elif defined( HB_OS_LINUX ) && ! defined( HB_OS_ANDROID ) && ! defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
    {
       ULONG    lNewTime;
