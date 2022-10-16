@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2022-10-17  14:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
+  * source\ct\dattime3.c
+  * source\ct\settime.c
+  * source\rtl\arc4.c
+    * updated to the current state of glibc, versions >= 2.30 have
+      no sysctl(). Should fix build issues on current Linux distros
+      like Fedora 33, etc.	 Borrow from harbour 
+
 
 2020-12-12  14:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
   * source\ct\dattime3.c

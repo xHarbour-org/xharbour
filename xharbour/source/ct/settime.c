@@ -111,8 +111,13 @@ HB_FUNC( SETNEWDATE )
 
       tm       = time( NULL );
       tm       = lNewDate * 86400 + ( tm % 86400 );
-
+#  if ( defined( __GLIBC__ ) && ( ( __GLIBC__ > 2 ) || ( ( __GLIBC__ == 2 ) && ( __GLIBC_MINOR__ >= 31 ) ) ) )
+      /* stime() is deprecated in glibc 2.31+ */
+      struct timespec ts = { tm, 0 };
+      hb_retl( clock_settime( CLOCK_REALTIME, &ts ) == 0);
+#  else	  
       hb_retl( stime( &tm ) == 0 );
+#endif
    }
 #else
    hb_retl( FALSE );
@@ -121,6 +126,7 @@ HB_FUNC( SETNEWDATE )
 
 HB_FUNC( SETNEWTIME )
 {
+	 BOOL  fResult = FALSE;
 #if defined( HB_OS_WIN )
    {
       WORD        wNewHour, wNewMin, wNewSec;
@@ -144,6 +150,7 @@ HB_FUNC( SETNEWTIME )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
    {
       ULONG    lNewTime;
+	  
       int      iH, iM, iS;
       time_t   tm;
 
@@ -151,11 +158,18 @@ HB_FUNC( SETNEWTIME )
       iM       = hb_parni( 2 );
       iS       = hb_parni( 3 );
       lNewTime = iH * 3600 + iM * 60 + iS;
-
+#  if ( defined( __GLIBC__ ) && ( ( __GLIBC__ > 2 ) || ( ( __GLIBC__ == 2 ) && ( __GLIBC_MINOR__ >= 31 ) ) ) )
+         /* stime() is deprecated in glibc 2.31+ */
+         struct timespec ts = { 0 };
+         clock_gettime(CLOCK_REALTIME, &ts);  /* keep tv_nsec */
+         ts.tv_sec = lNewTime * 86400 + ( ts.tv_sec % 86400 );
+         hb_retl( clock_settime( CLOCK_REALTIME, &ts ) == 0);	
+#  else	
       tm       = time( NULL );
       tm       += lNewTime - ( tm % 86400 );
 
       hb_retl( stime( &tm ) == 0 );
+#endif
    }
 #else
    hb_retl( FALSE );
