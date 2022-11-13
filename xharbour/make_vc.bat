@@ -197,12 +197,12 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 SET SUB_DIR=vc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
-echo "%CC_DIR%"
-echo "%RC_DIR%"
+REM echo "%CC_DIR%"
+REM echo "%RC_DIR%"
 SET _PATH=%PATH%
 IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
-set PATH "%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
-echo %path%
+set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
+REM echo %path%
 
 rem ============================================================================
 rem The followings should never change
