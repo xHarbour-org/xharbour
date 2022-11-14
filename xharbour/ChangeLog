@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2022-11-14 10:47 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\dllcall.c
+    ! always define LoadLibrary(), FreeLibrary() and GetLastError() functions for Win builds
+
 2022-11-13 16:08 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_vc.bat
     ! fixed a syntax error on PATH assignment and commented out three unuseful ECHO commands

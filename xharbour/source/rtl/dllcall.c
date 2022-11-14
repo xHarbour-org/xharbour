@@ -1034,4 +1034,28 @@ HB_FUNC( CALLDLL )
 
 #endif   /* HB_OS_WIN32 */
 
+#else
+
+#if defined( HB_OS_WIN_64 )
+
+#include <windows.h>
+#include "hbapi.h"
+
+HB_FUNC( LOADLIBRARY )
+{
+   hb_retptr( ( void* ) LoadLibraryA( ( LPCSTR ) hb_parcx( 1 ) ) );
+}
+
+HB_FUNC( FREELIBRARY )
+{
+   hb_retl( FreeLibrary( ( HMODULE ) hb_parptr( 1 ) ) );
+}
+
+HB_FUNC( GETLASTERROR )
+{
+   hb_retnl( GetLastError() );
+}
+
+#endif   /* HB_OS_WIN64 */
+
 #endif   /* NODLL */
