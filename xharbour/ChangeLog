@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2022-11-14 12:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.vc
+    ! fix to build hbzip library in 64 bit mode
+
 2022-11-14 10:47 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\dllcall.c
     ! always define LoadLibrary(), FreeLibrary() and GetLastError() functions for Win builds
