@@ -233,7 +233,7 @@ void hb_fsDirectory( PHB_ITEM pDir, const char * szSkleton, const char * szAttri
       {
          if( fDirSpec->szDrive )
          {
-            hb_fsChDrv( ( BYTE ) ( fDirSpec->szDrive[ 0 ] - 'A' ) );
+            hb_fsChDrv( ( BYTE ) ( HB_TOUPPER( fDirSpec->szDrive[ 0 ] ) - 'A' ) );
          }
 
          if( fDirSpec->szPath )

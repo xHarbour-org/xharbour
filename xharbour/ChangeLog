@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2022-11-18 23:30 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\direct.c
+    ! fixed hb_fsDirectory() to work fine with lower drive name
+
 2022-11-14 12:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
-    ! fix to build hbzip library in 64 bit mode
+    ! fixed to build hbzip library in 64 bit mode
 
 2022-11-14 10:47 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\dllcall.c
