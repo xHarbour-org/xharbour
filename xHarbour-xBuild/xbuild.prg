@@ -6,6 +6,11 @@
   You may NOT forward or share this file under any conditions!
 */
 
+#ifndef __XHARBOUR__
+   #include "xhb.ch"
+   request XHB_ERRORNEW
+#endif   
+
 #ifdef __PLATFORM__Windows
   #define DRIVE_SEPARATOR ':'
   #define DIR_SEPARATOR '\'
@@ -19,10 +24,10 @@
 #define _BUILD_ "4.7"
 //#define d_Debug
 
-FUNCTION Main( ... )
+FUNCTION xBuildMain( ... )
 
    LOCAL aParams := HB_aParams(), oProject, cTarget, nAt, cParam, cArgument, aTokens
-   LOCAL BCC, GCC, MINGW, POCC, VC, XCC, xHB_Root, xHB_LibFolder, XHB_Exe, cLibFolders, cIncludeFolders
+   LOCAL BCC, CLANG, GCC, MINGW, POCC, TCC, VC, XCC, xHB_Root, xHB_LibFolder, XHB_Exe, xHB_IncFolder, cLibFolders, cIncludeFolders
    LOCAL cDefines, lClean := .F., lLink := .F., C_Compiler, C_Folder, C_Flags, PRG_Flags
    LOCAL GUI_Root, GUI_Flags, GUI_LibFolder
    LOCAL cDefaultFolder, cPRG_OutputFolder, cC_OutputFolder, cRC_OutputFolder
@@ -33,7 +38,7 @@ FUNCTION Main( ... )
    LOCAL lPRG_Debug := .F., lPRG_ClassicDebug := .F.
    LOCAL cIni
 
-   ErrorBlock( {|oErr| TraceLog( ValToPrg( oErr ) ), ;
+   ErrorBlock( {|oErr| TraceLog( ValToPrg( { oErr:Description, oErr:Operation, oErr:ModuleName(), oErr:ProcName, oErr:ProcLine } ) ), ;
                         Alert( IIF( oProject == NIL, "Error!", "Sorry, could not build (1):" + oProject:cFile ) + ";;Operation: " + oErr:Operation + ";Description: " + oErr:Description ), ;
                         __Quit() } )
 
@@ -43,7 +48,7 @@ FUNCTION Main( ... )
          bDefaultHandler := NIL
 
          /*
-         ErrorBlock( {|oErr| TraceLog( ValToPrg( oErr ) ), ;
+         ErrorBlock( {|oErr| TraceLog( ValToPrg( { oErr:Description, oErr:Operation, oErr:ModuleName(), oErr:ProcName, oErr:ProcLine } ) ), ;
                              Alert( "Sorry, could not build (2):;" + oProject:cFile + ";;Operation: " + oErr:Operation + ";Description: " + oErr:Description ), ;
                              GUI_OnError(oErr) } )
          */
@@ -99,7 +104,7 @@ FUNCTION Main( ... )
       #endif
 
       RETURN 0
-   ELSEIF PCount() == 1 .AND. aParams[1] LIKE "[/\-]\?" .OR. Lower( aParams[1] ) LIKE "-{1,2}help"
+   ELSEIF PCount() == 1 .AND. ( ( aParams[1] LIKE "[/\-]\?" ) .OR. ( Lower( aParams[1] ) LIKE "-{1,2}help" ) )
       ?
       ? "xBuild [<target.exe|lib|a|dll>]|[<MainSource>] [<MoreSourceMask>] [switches]"
       ? "or"
@@ -109,7 +114,7 @@ FUNCTION Main( ... )
       CLS
       ? "Switches: -All (Force clean build.)"
       ? "          -B (compile with prg debug information.)"
-      ? "          -C<Bcc|Gcc|Mingw|POCC|Vc|xCC>[=<RootFolder>][,C_Flags]"
+      ? "          -C<Bcc|Clang|Gcc|Mingw|POCC|Tcc|Vc|xCC>[=<RootFolder>][,C_Flags]"
       ? "          -CLASSIC (link classic prg debugger)"
       ? "          -CON (direct error log to console instead of NotePad.)"
       ? "          -D<Define>[=<Value>][;<MoreDefines>]"
@@ -183,7 +188,7 @@ FUNCTION Main( ... )
                ELSE
                   aTokens := HB_aTokens( cArgument, ',' )
                   C_Compiler := aTokens[1]
-                  c_Folder := "?" 
+                  C_Folder := "?" 
                ENDIF
 
                IF Len( aTokens ) >= 2
@@ -191,17 +196,21 @@ FUNCTION Main( ... )
                ENDIF
 
                IF Lower( C_Compiler ) == "bcc"
-                  BCC := C_Folder
+                  BCC := IIF( C_Folder == "?", FoundCompiler( C_Compiler ) , C_Folder )
+               ELSEIF Lower( C_Compiler ) == "clang"
+                  CLANG := IIF( C_Folder == "?", FoundCompiler( C_Compiler ), C_Folder )
                ELSEIF Lower( C_Compiler ) == "gcc"
-                  GCC := C_Folder
+                  GCC := IIF( C_Folder == "?", FoundCompiler( C_Compiler ), C_Folder )
                ELSEIF Lower( C_Compiler ) == "mingw"
-                  MINGW := C_Folder
+                  MINGW := C_Folder /* REVIEW */ 
                ELSEIF Lower( C_Compiler ) == "pocc"
-                  POCC := C_Folder
+                  POCC := IIF( C_Folder == "?", FoundCompiler( C_Compiler ), C_Folder )
+               ELSEIF Lower( C_Compiler ) == "tcc"
+                  TCC := IIF( C_Folder == "?", FoundCompiler( C_Compiler ), C_Folder )
                ELSEIF Lower( C_Compiler ) == "vc"
-                  VC := C_Folder
+                  VC := C_Folder /* REVIEW */
                ELSEIF Lower( C_Compiler ) == "xcc"
-                  XCC := C_Folder
+                  XCC := C_Folder /* REVIEW */
                ELSE
                   Throw( ErrorNew( "xBuild", 0, 1001, "Command Processor", "unsupported compiler: " + C_Compiler, aParams ) )
                ENDIF
@@ -370,6 +379,9 @@ FUNCTION Main( ... )
 
                   IF Len( aTokens ) >= 3
                      xHB_LibFolder := aTokens[3]
+                     IF Len( aTokens ) >= 4
+                        xHB_IncFolder := aTokens[4]
+                     ENDIF
                   ENDIF
                ELSE
                   xHB_Root := cArgument
@@ -563,7 +575,7 @@ FUNCTION Main( ... )
       ENDIF
    ENDIF
 
-   IF ".a" IN cTarget
+   IF ( ".a" IN cTarget )
       cTarget := cTargetFolder + "lib" + cTarget
    ELSE
       cTarget := cTargetFolder + cTarget
@@ -609,7 +621,7 @@ FUNCTION Main( ... )
    ENDIF
 
    IF ! Empty( xHB_Root )
-      oProject:Set_xHB( xHB_Root, PRG_Flags, xHB_LibFolder, xHB_Exe )
+      oProject:Set_xHB( xHB_Root, PRG_Flags, xHB_LibFolder, xHB_Exe, xHB_IncFolder )
    ENDIF
 
    // Note From Luiz By default Linux only install the shared library version(.so)
@@ -636,6 +648,10 @@ FUNCTION Main( ... )
       oProject:Set_BCC( IIF( BCC == "?", NIL, BCC ), C_Flags )
    ENDIF
 
+   IF CLANG != NIL
+      oProject:Set_CLang( IIF( CLANG == "?", NIL, CLANG ), C_Flags )
+   ENDIF
+
    IF GCC != NIL
       oProject:Set_GCC( IIF( GCC == "?", NIL, GCC ), C_Flags )
    ENDIF
@@ -646,6 +662,10 @@ FUNCTION Main( ... )
 
    IF POCC != NIL
       oProject:Set_POCC( IIF( POCC == "?", NIL, POCC ), C_Flags )
+   ENDIF
+
+   IF TCC != NIL
+      oProject:Set_TCC( IIF( TCC == "?", NIL, TCC ), C_Flags )
    ENDIF
 
    IF VC != NIL
@@ -666,7 +686,7 @@ FUNCTION Main( ... )
    ENDIF
 
    FOR EACH cArgument in aParams
-      IF ! '.' IN cArgument
+      IF ! ( '.' IN cArgument )
          cArgument += ".prg"
       ENDIF
 
@@ -728,20 +748,19 @@ FUNCTION Main( ... )
 
       CATCH oErr
          IF lShowErrors
-            Alert( "Sorry, could not build (6):;" + oProject:cFile + ";;Operation: " + oErr:Operation + ";Description: " + oErr:Description )
+            Alert( "Sorry, could not build (6):;" + oProject:cFile + ";;Operation: " + oErr:Operation + ";Description: " + oErr:Description + "';;At: '" + oErr:ModuleName + "/" + oErr:Procname + "(" + LTrim(Str(oErr:ProcLine)) + ")"  )
          ELSE
-            TraceLog( "Sorry, could not build your project (6).;;Operation: " + oErr:Operation + ";Description: " + oErr:Description )
+            TraceLog( "Sorry, could not build your project (6)", oErr:Description, oErr:Operation, oErr:ModuleName, oErr:ProcName, oErr:ProcLine )
          ENDIF
-
-         SET TRACE ON
-         SET( _SET_TRACEFILE, "error.log" )
-         SET( _SET_TRACESTACK, 2 )
 
          IF cCurrentFolder != NIL
             DirChange( cCurrentFolder )
          ENDIF
 
-         TraceLog( ValToPrg( oErr ) )
+         SET TRACE ON
+         SET( _SET_TRACEFILE, "error.log" )
+         SET( _SET_TRACESTACK, 2 )
+         TraceLog( oErr:Description, oErr:Operation, oErr:ModuleName, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:aaStack ) )
 
          ErrorLevel( 1 )
          RETURN 1
@@ -758,17 +777,21 @@ RETURN 0
 
    PROCEDURE xBuildWizard( oProject )
 
-      LOCAL cTarget, cMain, cTargetType, xHB_Root, xHB_LibFolder, XHB_Exe, cLibFolders, cIncludeFolders, cDefines
+      LOCAL cTarget, cMain, cTargetType, xHB_Root, xHB_LibFolder, XHB_Exe, xHB_IncFolder, cLibFolders, cIncludeFolders, cDefines
       LOCAL C_Compiler, C_Root, C_Flags, PRG_Flags
       LOCAL GUI_Root, GUI_Flags, GUI_LibFolder
       LOCAL cDefaultFolder, cPRG_OutputFolder, cC_OutputFolder, cRC_OutputFolder
 
-      LOCAL lClean := .F., lDebug := .F., bErrorHandler, bProgress := {|Module| SetPos( 21, 13 ), QQOut( Module:cFile ) }
+      LOCAL lClean := .F., lDebug := .F., bErrorHandler := {|e| Break(e) }, bProgress := {|Module| SetPos( 21, 13 ), QQOut( Module:cFile ) }
       LOCAL lXbp := .T., lGUI := .F., lMT := .F.
 
-      LOCAL lShowErrors := .T., oErr, bDefaultHandler := {|e| Break(e) }, lExpand := .F.
+      //LOCAL lShowErrors := .T.
+      
+      LOCAL oErr 
+      //LOCAL bDefaultHandler := {|e| Break(e) }
+      LOCAL lExpand := .F.
       LOCAL acMasks[7], cMask
-      LOCAL GetList := {}, cScreen, lCancel, lPrevious, lNext, lFinish, nWizard := 0, nDirection := 1
+      LOCAL GetList := {}, cScreen, lCancel, lPrevious, lNext, lFinish, nWizard := 1
 
       LOCAL nPresetRow := Row(), nPresetCol := Col()
       LOCAL nMasks
@@ -783,10 +806,11 @@ RETURN 0
          cMain             := Space(128)
          xHB_Root          := Space(128)
          xHB_LibFolder     := Space(128)
+         xHB_IncFolder     := Space(128)
          cLibFolders       := Space(128)
          cIncludeFolders   := Space(128)
          cDefines          := Space(128)
-         //C_Compiler        := Space(128)
+       //C_Compiler        := Space(128) // ListBox
          C_Root            := Space(128)
          C_Flags           := Space(128)
          PRG_Flags         := Space(128)
@@ -805,6 +829,7 @@ RETURN 0
             cMain             := Pad( :aLiteralDependancies[1], 128 )
             xHB_Root          := Pad( :xHB_Root, 128 )
             xHB_LibFolder     := Pad( SubStr( :xHB_LibFolder, Len( RTrim( :xHB_Root ) ) + 1 ), 128 )
+            xHB_IncFolder     := Pad( SubStr( :xHB_IncFolder, Len( RTrim( :xHB_Root ) ) + 1 ), 128 )
             cLibFolders       := Pad( :LibFolders, 128 )
             cIncludeFolders   := Pad( :IncludeFolders, 128 )
             cDefines          := Pad( SubStr( StrTran( :Defines, "-D", ";" ), 2 ), 128 )
@@ -877,7 +902,6 @@ RETURN 0
       BEGIN SEQUENCE
 
          DO WHILE LastKey() != 27
-            nWizard += nDirection
 
             DO CASE
                CASE nWizard == 1
@@ -886,7 +910,7 @@ RETURN 0
                   @ 22, 12 SAY '['
                   @ 22, 67 SAY ']'
 
-                  @  9, 11 CLEAR TO 21,68
+                  @  9, 11 CLEAR TO 21,79
 
                   @  9, 32 SAY "xBuild Wizard"
 
@@ -910,7 +934,6 @@ RETURN 0
                   @ 18, 12 GET lDebug CHECKBOX       CAPTION "Include Debug information." ;
 
                   @ 20, 12 GET lCancel PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
                                CAPTION "&Cancel"  ;
                                STATE { || BREAK( .T. ) } ;
                                COLOR "B/W, W+/B, R/W, R/W"
@@ -918,12 +941,12 @@ RETURN 0
                   @ 20, 42 GET lPrevious PUSHBUTTON ;
                                WHEN .F. ;
                                CAPTION "&Previous"  ;
-                               STATE { || ReadKill( .T. ), nDirection := -1 } ;
+                               STATE { || ReadKill( .T. ) } ;
                                COLOR "N+/W, W+/B, R/W, R/W"
 
                   @ 20, 53 GET lNext PUSHBUTTON ;
                                CAPTION "&Next"  ;
-                               STATE { || ReadKill( .T. ), nDirection := 1 } ;
+                               STATE { || ReadKill( .T. ), nWizard++ } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 60 GET lFinish PUSHBUTTON ;
@@ -931,7 +954,7 @@ RETURN 0
                                STATE { || Break() } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
-                  READ MSG AT 22, 13, 66
+                  READ MSG AT 21, 13, 66
 
                   LOOP
 
@@ -943,7 +966,7 @@ RETURN 0
                      ENDIF
                   ENDIF
 
-                  @ 10, 12 CLEAR TO 19, 66
+                  @ 10, 12 CLEAR TO 21, 79
 
                   @ 11, 12 SAY "Main Source:" GET cMain     PICTURE "@S30" ;
                                                             WHEN cTargetType == "Exe" ;
@@ -967,20 +990,18 @@ RETURN 0
 
 
                   @ 20, 12 GET lCancel PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
                                CAPTION "&Cancel"  ;
                                STATE { || BREAK( .T. ) } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 42 GET lPrevious PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
                                CAPTION "&Previous"  ;
-                               STATE { || ReadKill( .T. ), nDirection := -1 } ;
+                               STATE { || ReadKill( .T. ), nWizard--, Alert("Prev") } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 53 GET lNext PUSHBUTTON ;
                                CAPTION "&Next"  ;
-                               STATE { || ReadKill( .T. ), nDirection := 1 } ;
+                               STATE { || ReadKill( .T. ), nWizard++ } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 60 GET lFinish PUSHBUTTON ;
@@ -994,7 +1015,7 @@ RETURN 0
 
                CASE nWizard == 3
                   // Sources
-                  @ 10, 12 CLEAR TO 19, 66
+                  @ 10, 12 CLEAR TO 21, 66
 
                   @ 11, 12 SAY "Modules:" GET acMasks[1] PICTURE "@S30" ;
                                                          VALID ValidateModules( acMasks, 1 ) ;
@@ -1031,19 +1052,18 @@ RETURN 0
                                                          MESSAGE "May be '.prg', '.c', '.rc', '.obj', '.res' '.lib','.a', or '.xbp'."
 
                   @ 20, 12 GET lCancel PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
                                CAPTION "&Cancel"  ;
                                STATE { || BREAK( .T. ) } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 42 GET lPrevious PUSHBUTTON WHEN LastKey() == 5 .OR. LastKey() == 271;
                                CAPTION "&Previous"  ;
-                               STATE { || ReadKill( .T. ), nDirection := -1 } ;
+                               STATE { || ReadKill( .T. ), nWizard-- } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 53 GET lNext PUSHBUTTON ;
                                CAPTION "&Next"  ;
-                               STATE { || ReadKill( .T. ), nDirection := 1 } ;
+                               STATE { || ReadKill( .T. ), nWizard++ } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
                   @ 20, 60 GET lFinish PUSHBUTTON ;
@@ -1057,26 +1077,21 @@ RETURN 0
 
                CASE nWizard == 4
                   // Settings
-                  #ifndef __PLATFORM__Windows
-                     IF cTargetType == 'a'
-                        xHB_Root:= Pad( "/usr/", 128 )
-                        Find_xHarbour( @xHB_Root, @XHB_Exe )
-                        Validate_xHB( xHB_Root, xHB_LibFolder )
-                     ENDIF
-                  #endif
-                  @ 10, 12 CLEAR TO 19, 66
+                  @ 10, 12 CLEAR TO 22, 66
 
-                  @ 11, 12 SAY "xHarbour Root:" GET xHB_Root         PICTURE "@S29" ;
-                                                                     WHEN Find_xHarbour( @xHB_Root, @XHB_Exe ) ;
-                                                                     VALID Validate_xHB( xHB_Root, xHB_LibFolder ) ;
+                  @ 11, 12 SAY " xHarbour Root:" GET xHB_Root        PICTURE "@S29" ;
+                                                                     WHEN Find_xHarbour( @xHB_Root, @xHB_Exe, @xHB_LibFolder, @xHB_IncFolder ) ;
+                                                                     VALID Validate_xHB( xHB_Root, xHB_LibFolder, xHB_IncFolder ) ;
                                                                      MESSAGE "Location of xHarbour on your system."
-
-
-                  @ 12, 12 SAY "   Lib Folder:" GET xHB_LibFolder    PICTURE "@S29" ;
+                  @ 12, 12 SAY "    Lib Folder:" GET xHB_LibFolder   PICTURE "@S29" ;
                                                                      VALID Validate_xHB( xHB_Root, xHB_LibFolder ) ;
                                                                      MESSAGE "Optional location of xHarbour libraries on your system."
+                  @ 14, 12 SAY "Include Folder:" GET xHB_IncFolder   PICTURE "@S29" ;
+                                                                     VALID Validate_xHB( xHB_Root, xHB_LibFolder, xHB_IncFolder ) ;
+                                                                     MESSAGE "Optional location of xHarbour #includes on your system."
+
 #ifdef __PLATFORM__Windows
-                  @ 14, 27, 22, 40 GET C_Compiler LISTBOX { "BCC", "MingW", "MSVC", "PellesC", "xCC" };
+                  @ 15, 27, 22, 40 GET C_Compiler LISTBOX { "BCC", "MingW", "MSVC", "PellesC", "xCC" };
                                    WHEN IIF( XHB_Exe == "xhb.exe", ( GetActive():VarPut( "xCC" ), C_Root := xHB_Root, GetActive():Display(), .F. ), .T. )  ;
                                    VALID Find_CCompiler( C_Compiler, @C_Root ) ;
                                    CAPTION "&C Compiler:" ;
@@ -1084,12 +1099,12 @@ RETURN 0
                                    DROPDOWN ;
                                    COLOR "B/W, B/W, N/W, W+/B, N/W, N/W, R/W, R/W"
 
-                  @ 15, 12 SAY "       C Root:" GET C_Root           PICTURE "@S29" ;
+                  @ 16, 12 SAY "       C Root:" GET C_Root           PICTURE "@S29" ;
                                                                      WHEN XHB_Exe != "xhb.exe" ;
                                                                      VALID Validate_CCompiler( C_Compiler, C_Root ) ;
                                                                      MESSAGE "Location of C Compiler on your system."
 #else
-                  @ 14, 27, 22, 40 GET C_Compiler LISTBOX { "GCC" };
+                  @ 15, 27, 22, 40 GET C_Compiler LISTBOX { "GCC", "CLANG", "TCC" };
                                    WHEN IIF( XHB_Exe == "xhb" , ( GetActive():VarPut( "GCC" ), C_Root := xHB_Root, GetActive():Display(), .F. ), .T. )  ;
                                    VALID Find_CCompiler( C_Compiler, @C_Root ) ;
                                    CAPTION "&C Compiler:" ;
@@ -1097,40 +1112,38 @@ RETURN 0
                                    DROPDOWN ;
                                    COLOR "B/W, B/W, N/W, W+/B, N/W, N/W, R/W, R/W"
 
-                  @ 15, 12 SAY "       C Root:" GET C_Root           PICTURE "@S29" ;
+                  @ 16, 12 SAY "       C Root:" GET C_Root           PICTURE "@S29" ;
                                                                      WHEN XHB_Exe != "xhb";
                                                                      VALID Validate_CCompiler( C_Compiler, C_Root ) ;
                                                                      MESSAGE "Location of C Compiler on your system."
 
 #endif
 
-                  @ 16, 12 SAY "    C Flags:" GET C_Flags   PICTURE "@S30" ;
+                  @ 17, 12 SAY "    C Flags:" GET C_Flags   PICTURE "@S30" ;
                                                             MESSAGE "Normally you don't need to specify any."
 
-                  @ 20, 12 GET lCancel PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
+                  @ 21, 12 GET lCancel PUSHBUTTON ;
                                CAPTION "&Cancel"  ;
                                STATE { || BREAK( .T. ) } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
-                  @ 20, 42 GET lPrevious PUSHBUTTON ;
-                               WHEN LastKey() == 5 .OR. LastKey() == 271;
+                  @ 21, 42 GET lPrevious PUSHBUTTON ;
                                CAPTION "&Previous"  ;
-                               STATE { || ReadKill( .T. ), nDirection := -1 } ;
+                               STATE { || ReadKill( .T. ), nWizard-- } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
-                  @ 20, 53 GET lNext PUSHBUTTON ;
+                  @ 21, 53 GET lNext PUSHBUTTON ;
                                WHEN .F. ;
                                CAPTION "&Next"  ;
-                               STATE { || ReadKill( .T. ), nDirection := 1 } ;
+                               STATE { || ReadKill( .T. ) } ;
                                COLOR "N+/W, W+/B, R/W, R/W"
 
-                  @ 20, 60 GET lFinish PUSHBUTTON ;
+                  @ 21, 60 GET lFinish PUSHBUTTON ;
                                CAPTION "&Finish"  ;
-                               STATE { || ReadKill( .T. ), nDirection := 1 } ;
+                               STATE { || Break() } ;
                                COLOR "B/W, W+/B, R/W, R/W"
 
-                  READ MSG AT 21, 13, 66
+                  READ MSG AT 22, 13, 66
 
                   LOOP
 
@@ -1140,13 +1153,13 @@ RETURN 0
          ENDDO
       RECOVER
 
-          IF cTargetType == "" .AND. ! '.' IN cTarget
+          IF cTargetType == "" .AND. ( ! ( '.' IN cTarget ) )
              cTargetType := "exe"
           ENDIF
 
           Find_xHarbour( @xHB_Root )
           Find_CCompiler( @C_Compiler, @C_Root )
-
+          
       END SEQUENCE
 
       IF LastKey() == 27
@@ -1159,6 +1172,7 @@ RETURN 0
          BREAK
       ENDIF
 
+TRY
       cTarget := RTrim( cTarget )
 
       #ifdef __PLATFORM__Windows
@@ -1167,7 +1181,9 @@ RETURN 0
          ENDIF
       #else
          IF ! ( Right( cTarget, 3 ) == cTargetType .OR. Right( cTarget, 1 ) == cTargetType )
-            cTarget += "." + cTargetType
+            IF ! ( cTargetType == "exe" )
+               cTarget += "." + cTargetType
+            ENDIF    
          ENDIF
       #endif
 
@@ -1175,12 +1191,11 @@ RETURN 0
          IF cTargetType == 'a'
              oProject := TMakeProject():New( "lib" + cTarget )
          ELSE
-             #ifdef __PLATFORM__Windows
-                TraceLog( cTarget )
+             //#ifdef __PLATFORM__Windows
                 oProject := TMakeProject():New( cTarget )
-             #else
-                oProject := TMakeProject():New( Left( cTarget, At( ".", cTarget ) - 1 )
-             #endif
+             //#else
+                //oProject := TMakeProject():New( Left( cTarget, At( ".", cTarget ) - 1 ) )
+             //#endif
          ENDIF
       ENDIF
 
@@ -1207,7 +1222,7 @@ RETURN 0
          oProject:LibFolders := RTrim( cLibFolders ) // standard compiler libs are auto managed.
       ENDIF
 
-      oProject:Set_xHB( RTrim( xHB_Root ), RTrim( PRG_Flags ), RTrim( xHB_LibFolder ), XHB_Exe )
+      oProject:Set_xHB( RTrim( xHB_Root ), RTrim( PRG_Flags ), RTrim( xHB_LibFolder ), RTrim( xHB_Exe ), RTrim( xHB_IncFolder ) )
 
       C_Compiler := RTrim( C_Compiler )
 
@@ -1235,6 +1250,14 @@ RETURN 0
          oProject:Set_XCC( RTrim( xHB_Root ), RTrim( C_Flags ) )
       ENDIF
 
+      IF C_Compiler == "CLANG"
+         oProject:Set_CLang( RTrim( C_Root ), RTrim( C_Flags ) )
+      ENDIF
+
+      IF C_Compiler == "TCC"
+         oProject:Set_TCC( RTrim( C_Root ), RTrim( C_Flags ) )
+      ENDIF
+
       IF ! Empty( cMain )
          oProject:AddFiles( RTrim( cMain ) )
       ENDIF
@@ -1244,7 +1267,7 @@ RETURN 0
          IF ! Empty( cMask )
             cMask := AllTrim( cMask )
 
-            IF ".a" IN cMask
+            IF ( ".a" IN cMask )
                oProject:AddFiles( "lib" + cMask )
             ELSE
                oProject:AddFiles( cMask )
@@ -1270,6 +1293,11 @@ RETURN 0
       ENDIF
 
       oProject:OnFWH := {|| SetFWH() }
+
+CATCH oErr
+   Alert( "xBuild Error: '" + oErr:Description + "' Op: '" + oErr:Operation + "' At: " + oErr:Procname + "(" + LTrim(Str(oErr:ProcLine)) + ")" )
+   Break( oErr )
+END
 
       TRY
          oProject:Make( bErrorHandler, bProgress )
@@ -1324,7 +1352,7 @@ RETURN 0
 
       LOCAL cTestTarget, hFile, nAt, cExt
 
-      IF '.' IN cTarget
+      IF ( '.' IN cTarget )
          cTestTarget := RTrim( cTarget )
          nAt := RAt( '.', cTestTarget )
          cExt := Lower( SubStr( cTestTarget, nAt ) )
@@ -1338,10 +1366,14 @@ RETURN 0
             cTestTarget := Pad( RTrim( cTarget ) + ".exe", 128 )
          ENDIF
       ELSE
-         cTestTarget := RTrim( cTarget ) + IF("LINUX" IN Upper( Os() ) ,"" ,".exe" )
+#ifdef __PLATFORM__Windows
+         cTestTarget := RTrim( cTarget ) + ".exe"
+#else
+         cTestTarget := RTrim( cTarget )
+#endif      
       ENDIF
 
-      IF cTestTarget[1] == '.'
+      IF ( cTestTarget[1] == '.' )
          Alert( "Invalid Target format." )
          RETURN .F.
       ELSEIF File( cTestTarget )
@@ -1366,10 +1398,10 @@ RETURN 0
 
    FUNCTION ValidateMain( cMain )
 
-      IF ! '.' IN cMain
+      IF ! ( '.' IN cMain )
          cMain := Pad( RTrim( cMain ) + ".prg", 128 )
       ELSE
-         IF ! cMain LIKE "[_\a-zA-Z][^.]*\.(c|prg) *"
+         IF ! ( cMain LIKE "[_\a-zA-Z][^.]*\.(c|prg) *" )
             Alert( "Main source extension must be '.prg' or '.c'." )
             RETURN .F.
          ENDIF
@@ -1395,12 +1427,11 @@ RETURN 0
          RETURN .T.
       ENDIF
 
-
       #ifndef __PLATFORM__Windows
          lLinuxLib := (".so" in cMask) .OR. (".a" in cMask)
       #endif
 
-      IF ! '.' IN cMask
+      IF ! ( '.' IN cMask )
          cMask := Pad( RTrim( cMask ) + ".prg", 128 )
          acMasks[ nIndex ] := cMask
       ELSE
@@ -1408,7 +1439,7 @@ RETURN 0
              cMask := Alltrim( cMask )
          #ENDIF
 
-         IF ! cMask LIKE "[_\a-zA-Z][^.]*\.(prg|c|rc|y|sly|obj|res|lib|a|xbp) *"
+         IF ! ( cMask LIKE "[_\a-zA-Z][^.]*\.(prg|c|rc|y|sly|obj|res|lib|a|xbp) *" )
             Alert( "Module extension must be one of these supported extensions:;; '.prg', '.c', '.rc', '.y', '.sly', '.obj', '.res', '.lib', '.a', '.xbp'." )
             RETURN .F.
          ENDIF
@@ -1419,7 +1450,7 @@ RETURN 0
      #else
       IF Len( Directory( IIF( lLinuxLib, "/usr/lib/xbuilder/lib" + cMask , cMask) ) ) == 0
      #endif
-         IF '?' IN cMask .OR. '*' IN cMask
+         IF ( '?' IN cMask ) .OR. ( '*' IN cMask )
             Alert( "Couldn't match any module with: '" + cMask + "'" )
          ELSE
             Alert( "Couldn't locate specified Module: '" + cMask + "'" )
@@ -1464,7 +1495,7 @@ RETURN 0
        FOR EACH cDefine IN aDefines
           cDefine := LTrim( RTrim( cDefine ) )
 
-          IF ! cDefine LIKE "[_a-zA-Z][_a-zA-Z0-9]* *(=.*)*"
+          IF ! ( cDefine LIKE "[_a-zA-Z][_a-zA-Z0-9]* *(=.*)*" )
              Alert( "Invalid #define format: '" + cDefine + "'" )
              RETURN .F.
           ENDIF
@@ -1474,7 +1505,7 @@ RETURN 0
 
    FUNCTION PRG_Flags_Needed( cMain )
 
-   RETURN cMain LIKE "[_a-zA-Z][^.]*\.prg *"
+   RETURN ( cMain LIKE "[_a-zA-Z][^.]*\.prg *" )
 
 #endif
 

@@ -6,6 +6,10 @@
   You may NOT forward or share this file under any conditions!
 */
 
+#ifndef __XHARBOUR__
+   #include "xhb.ch"
+#endif
+
 #include "hbclass.ch"
 
 //#define d_Debug
@@ -39,6 +43,23 @@ STATIC s_sVC_LINK     := "link.exe"
 STATIC s_sPOCCFolder  := ""
 STATIC s_sLCCFolder   := ""
 STATIC s_sGCCFolder   := ""
+STATIC s_sCLangFolder := ""
+STATIC s_sTCCFolder   := ""
+
+STATIC s_lX            := .F.
+STATIC s_sHB_Exe       := ""
+STATIC s_sHB_Folder    := ""
+STATIC s_sHB_LibFolder := ""
+STATIC s_sHB_IncFolder := ""
+
+#ifdef __PLATFORM__Windows
+#else
+   STATIC s_sLocalFolder       := ""
+#endif
+
+STATIC s_sCoreLibs    :=  ""
+STATIC s_sCoreMinLibs :=  ""
+STATIC s_sCoreDynLibs :=  ""
 
 /*
 #xcommand       VIEW  <x> [ <y> ]  =>     sLogDebug( IF(Empty(ProcName( 1 ) ),"",Trim( ProcName( 1 ) ) + "(" + LTrim(Str( ProcLine( 1 ) ) ) + ")->" ) + IF(Empty(ProcName( 0 ) ),"",Trim( ProcName( 0 ) ) + "(" + LTrim(Str( ProcLine( 0 ) ) ) + ")" ) + " : " + <x>   + " -> [" + ValType(<y>) + "] " + ValToPrg(<y>),.T. )
@@ -153,11 +174,13 @@ STATIC s_sGCCFolder   := ""
 #endif
 
 
-CLASS TDependant //FROM HBPersistent
+CLASS TDependant MODULE FRIENDLY //FROM HBPersistent
 
-   VAR lCurrent      INIT .F. PROTECTED
-   VAR dDate                  PROTECTED
-   VAR cTime                  PROTECTED
+   //FRIEND FUNCTION xBuildMain
+
+   VAR lCurrent      INIT .F. READONLY
+   VAR dDate                  READONLY
+   VAR cTime                  READONLY
    VAR aDependancies INIT {}  PROTECTED
    VAR bAction                PROTECTED
 
@@ -274,7 +297,7 @@ METHOD CatchUp() CLASS TDependant
    IF ( ::nType == TYPE_EXE .OR. ::nType == TYPE_DLL ) .AND. ::lPRG
 
       #ifdef __PLATFORM__Windows
-         IF ::lGUI .AND. ( ! ::lUseDll ) .AND. ( ! ::lDebug ) .AND. ::nType != TYPE_DLL
+         IF ::lGUI .AND. ( ! ::lUseDll ) .AND. ( ! ::lDebug ) .AND. ::nType != TYPE_DLL .AND. ::lX
             IF ::lMT
                IF ::C_Executable == "xcc.exe"
                   ::GUI_Libs += "OptGMT.lib "
@@ -298,6 +321,14 @@ METHOD CatchUp() CLASS TDependant
       #endif
 
       FOR EACH cLib IN HB_aTokens( AllTrim( ::GUI_Libs ), ' ', .T. )
+         IF Empty( cLib )
+            IF Empty( AllTrim( ::GUI_Libs ) )
+               EXIT
+            ELSE    
+               Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "corrupt GUI_Libs: " + ::GUI_Libs ) )
+            ENDIF   
+         ENDIF
+
          //VIEW cLib
          LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
          LIB:Project := Self
@@ -308,6 +339,14 @@ METHOD CatchUp() CLASS TDependant
 
       FOR EACH cLib IN HB_aTokens( AllTrim( ::Auto_Libs ), ' ', .T. )
          //VIEW cLib
+         IF Empty( cLib )
+            IF Empty( AllTrim( ::Auto_Libs ) )
+               EXIT
+            ELSE    
+               Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "corrupt Auto_Libs: " + ::Auto_Libs ) )
+            ENDIF   
+         ENDIF
+
          LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
          LIB:Project := Self
          LIB:Reset()
@@ -319,6 +358,14 @@ METHOD CatchUp() CLASS TDependant
 
       FOR EACH cLib IN HB_aTokens( AllTrim( ::PRG_Libs ), ' ', .T. )
          //VIEW cLib
+         IF Empty( cLib )
+            IF Empty( AllTrim( ::PRG_Libs ) )
+               EXIT
+            ELSE    
+               Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "corrupt PRG_Libs: " + ::PRG_Libs ) )
+            ENDIF   
+         ENDIF
+
          LIB = TMakeObject():New( cLib, TYPE_SOURCE_LIB )
          LIB:Project := Self
          LIB:Reset()
@@ -329,7 +376,7 @@ METHOD CatchUp() CLASS TDependant
    ENDIF
 
    lCurrent := ::lCurrent
-   IF ! ::lCurrent
+   IF ! lCurrent
       ::Refresh()
    ENDIF
 
@@ -364,11 +411,13 @@ METHOD CatchUp() CLASS TDependant
 
 RETURN ::lCurrent
 
-CLASS TMakeObject FROM TDependant
+CLASS TMakeObject FROM TDependant MODULE FRIENDLY
+
+   //FRIEND FUNCTION xBuildMain
 
    VAR cFile                     READONLY
-   VAR nType INIT TYPE_NO_ACTION PROTECTED
-   VAR Project                   PROTECTED
+   VAR nType INIT TYPE_NO_ACTION READONLY
+   VAR Project                   READONLY
 
    VAR MyC_Flags       INIT ""             PERSISTENT
    VAR MyPRG_Flags     INIT ""             PERSISTENT
@@ -376,8 +425,8 @@ CLASS TMakeObject FROM TDependant
    VAR MySLY_Flags     INIT ""             PERSISTENT
    VAR MyDefines       INIT ""             PERSISTENT
 
-   VAR C_DebugFlags    INIT ""             PROTECTED
-   VAR Link_DebugFlags INIT ""             PROTECTED
+   VAR C_DebugFlags    INIT ""             READONLY
+   VAR Link_DebugFlags INIT ""             READONLY
 
    #ifdef __PLATFORM__Windows
 
@@ -444,25 +493,25 @@ CLASS TMakeObject FROM TDependant
 
      VAR bC_Compile   INIT {|Self| __RUN( ::C_Compiler + " " + ;
                                           ::C_Command() + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
      VAR bPRG_Compile INIT {|Self| __RUN( ::XHB_Compiler + " " + ;
                                           ::xHB_Command() + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
    #ifdef DEFERRED_RC
      VAR bRC_Bind     INIT {|Self| __RUN( ::RC_Binder + " " + ;
                                           Eval( ::RC_Command, Self ) + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
    #else
      VAR bRC_Compile  INIT {|Self| __RUN( ::RC_Compiler + " " + ;
                                           ::RC_Command() + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
    #endif
 
      VAR bSLY_Compile INIT {|Self| __RUN( ::SLY_Compiler + " " + ;
                                           ::SLY_Command() + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
    #endif
 
 
@@ -533,7 +582,14 @@ METHOD C_Command() CLASS TMakeObject
 
    cCommand += ::Defines()
    cCommand += ::Project:Includes( "-I" )
-   cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
+
+   // Linux only? Assumed same on Windows
+   IF ::Project:lX // ( ::Project:C_Executable IN "gcc;clang;tcc" ) .AND. ::Project:xHB_RootX == "/opt/harbour/"
+      cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
+      cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
+   ELSE
+      cCommand += '-I"' + ::Project:xHB_RootX + 'include/harbour" '
+   ENDIF
 
    IF ::Project:C_Executable == "xcc.exe"
       cCommand += '-I"' + ::Project:C_RootX + 'c_include" '
@@ -559,13 +615,12 @@ METHOD C_Command() CLASS TMakeObject
       ENDIF
       
       cCommand += "-nologo "
-   ELSE
-//      cCommand += '-I"' + ::Project:C_RootX + 'include" '
+   ELSE      
       #IFDEF __PLATFORM__Windows
          cCommand += '-I"' + ::Project:C_RootX + 'include" '
       #ELSE
-         cCommand += '-I"' + ::Project:C_RootX + 'include/xbuilder" '
-      #ENDIF
+         //cCommand += '-I"' + ::Project:C_RootX + 'include" '
+      #ENDIF      
    ENDIF
 
    cCommand += ::SourceFile
@@ -654,7 +709,12 @@ METHOD xHB_Command() CLASS TMakeObject
          cCommand += '-I"' + ::Project:xHB_RootX + 'include\w32" '
       ENDIF
    #else
-     cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
+     IF ::Project:lX
+        cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
+     ELSE
+        cCommand += '-I"' + ::Project:xHB_RootX + 'include/harbour" '
+        cCommand += '-I"' + ::Project:xHB_RootX + 'contrib/xhb" '
+     ENDIF
    #endif
 
    IF ::Project:lUseDLL .AND. Self == ::Project:aDependancies[1]
@@ -665,7 +725,7 @@ METHOD xHB_Command() CLASS TMakeObject
 
 RETURN cCommand
 
-METHOD RC_Command CLASS TMakeObject
+METHOD RC_Command() CLASS TMakeObject
 
    LOCAL cCommand
 
@@ -812,17 +872,20 @@ METHOD Reset() CLASS TMakeObject
       ENDIF
    ENDIF
 
-   IF ::nType == TYPE_FROM_C
-      IF "gcc" IN ::Project:C_Executable
-         ::cFile := StrTran( ::cFile, ".obj", ".o" )
+   #ifdef __PLATFORM__Windows
+   #else
+      IF ::nType == TYPE_FROM_C
+         //IF ( ::Project:C_Executable IN "gcc;clang;tcc")
+            ::cFile := StrTran( ::cFile, ".obj", ".o" )
+         //ENDIF
       ENDIF
-   ENDIF
+   #endif   
 
    //VIEW2 "Searching: '" + ::OutputFile( .T., .F. ) + "'"
    aFileInfo := Directory( ::OutputFile( .T., .F. ) )
    //VIEW aFileInfo
 
-   IF ::nType == TYPE_INCLUDE .AND. Len( aFileInfo ) == 0 .AND. ! DIR_SEPARATOR IN ::cFile
+   IF ::nType == TYPE_INCLUDE .AND. Len( aFileInfo ) == 0 .AND. ! ( DIR_SEPARATOR IN ::cFile )
       nAt := Len( ::Project:aIncludeFolders )
 
       aAdd( ::Project:aIncludeFolders, ::Project:xHB_RootX + "include" + DIR_SEPARATOR )
@@ -874,7 +937,7 @@ METHOD Reset() CLASS TMakeObject
 
    BEGIN SEQUENCE
 
-      IF ::nType == TYPE_SOURCE_LIB .AND. Len( aFileInfo ) == 0 .AND. ! DIR_SEPARATOR IN ::cFile
+      IF ::nType == TYPE_SOURCE_LIB .AND. Len( aFileInfo ) == 0 .AND. ! ( DIR_SEPARATOR IN ::cFile )
          FOR EACH cLibFolder IN HB_aTokens( ::Project:LibFoldersX, ';', .T. )
             cLibFolder := AllTrim( cLibFolder )
 
@@ -982,7 +1045,7 @@ METHOD Reset() CLASS TMakeObject
                       ::Project:lFWH := .T.
                       ::Project:lGUI := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "fivehcm{0,1}.lib"
+                      IF ( Lower( ::Project:LibList ) HAS "fivehcm{0,1}.lib" )
                          // Explictly specified by user.
                       ELSE
                          IF ::Project:C_Executable == s_sVC_CL/*"cl.exe"*/ .OR. ::Project:C_Executable == "xcc.exe"
@@ -1036,7 +1099,7 @@ METHOD Reset() CLASS TMakeObject
                       ::Project:lW32 := .T.
                       ::Project:lGUI := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "(w32)|(what32).lib"
+                      IF ( Lower( ::Project:LibList ) HAS "(w32)|(what32).lib" )
                          // Explictly specified by user.
                       ELSE
                          IF ::Project:C_Executable == "xcc.exe"
@@ -1058,7 +1121,7 @@ METHOD Reset() CLASS TMakeObject
                       ::Project:lWinAPI := .T.
                       ::Project:lGUI := .T.
 
-                      IF ( Lower( ::Project:LibList ) HAS "(winapi.lib)|(vxh.lib)" ) .OR. Lower( ::Project:ObjList ) HAS "(winapi.obj)"
+                      IF ( Lower( ::Project:LibList ) HAS "(winapi.lib)|(vxh.lib)" ) .OR. ( Lower( ::Project:ObjList ) HAS "(winapi.obj)" )
                          // Explictly specified by user.
                       ELSE
                          ::Project:GUI_Libs += "WinAPI.lib "
@@ -1074,7 +1137,7 @@ METHOD Reset() CLASS TMakeObject
 
                    ::Project:lGUI := .T.
 
-                   IF Lower( ::Project:LibList ) HAS "(wvg)|(gtwvg).lib"
+                   IF ( Lower( ::Project:LibList ) HAS "(wvg)|(gtwvg).lib" )
                       // Explictly specified by user.
                    ELSE
                       IF ::Project:C_Executable == "xcc.exe"
@@ -1093,7 +1156,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lSIX == .F.
                       ::Project:lSIX := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "six.lib"
+                      IF ( Lower( ::Project:LibList ) HAS "six.lib" )
                          // Explictly specified by user.
                       ELSE
                          ::Project:Auto_Libs += "six.lib sde61.lib "
@@ -1105,7 +1168,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lADS == .F.
                       ::Project:lADS := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "ace32.lib" .OR. Lower(::Project:LibList ) HAS "adsloc.so"
+                      IF ( Lower( ::Project:LibList ) HAS "ace32.lib" ) .OR. ( Lower(::Project:LibList ) HAS "adsloc.so" )
                          // Explictly specified by user.
                       ELSE
                          IF ::Project:C_Executable == "xcc.exe"
@@ -1125,7 +1188,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lSQL == .F.
                       ::Project:lSQL := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "sql.lib" .OR. Lower( ::Project:LibList ) HAS "sqlrdd.a"
+                      IF ( Lower( ::Project:LibList ) HAS "sql.lib" ) .OR. ( Lower( ::Project:LibList ) HAS "sqlrdd.a" )
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
@@ -1146,7 +1209,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lPgs == .F.
                       ::Project:lPgs := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "libpq.lib" .OR. Lower( ::Project:LibList ) HAS "pq.so"
+                      IF ( Lower( ::Project:LibList ) HAS "libpq.lib" ) .OR. ( Lower( ::Project:LibList ) HAS "pq.so" )
                          // Explictly specified by user.
                       ELSE
                       #ifdef __PLATFORM__Windows
@@ -1167,7 +1230,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lMySql == .F.
                       ::Project:lMySql := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "libmysql.lib" .OR. Lower( ::Project:LibList ) HAS "mysqlclient.so"
+                      IF ( Lower( ::Project:LibList ) HAS "libmysql.lib" ) .OR. ( Lower( ::Project:LibList ) HAS "mysqlclient.so" )
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
@@ -1187,7 +1250,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lOracle == .F.
                       ::Project:lOracle := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "oci.lib" .OR. Lower( ::Project:LibList ) HAS "oci.so"
+                      IF ( Lower( ::Project:LibList ) HAS "oci.lib" ) .OR. ( Lower( ::Project:LibList ) HAS "oci.so" )
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
@@ -1207,7 +1270,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lFirebird == .F.
                       ::Project:lFirebird := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "fbclient"
+                      IF ( Lower( ::Project:LibList ) HAS "fbclient" )
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
@@ -1231,7 +1294,7 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lOle == .F.
                       ::Project:lOle := .T.
 
-                      IF "oleserver.lib" IN Lower( ::Project:LibList )
+                      IF ( "oleserver.lib" IN Lower( ::Project:LibList ) )
                          // Explictly specified by user.
                       ELSE
                          ::Project:Auto_Libs += "oleserver.lib "
@@ -1243,14 +1306,14 @@ METHOD Reset() CLASS TMakeObject
                    IF ::Project:lHtml == .F.
                       ::Project:lHtml := .T.
 
-                      IF Lower( ::Project:LibList ) HAS "html.lib" .OR. Lower( ::Project:LibList ) HAS "html.a"
+                      IF ( Lower( ::Project:LibList ) HAS "html.lib" ) .OR. ( Lower( ::Project:LibList ) HAS "html.a" )
                          // Explictly specified by user.
                       ELSE
                          #ifdef __PLATFORM__Windows
                             ::Project:Auto_Libs += "html.lib "
                          #else
                             ::Project:Auto_Libs += "libhtml.a "
-                            ::Project:MyLink_Flags := StrTran( ::Project:MyLink_Flags, "-gtcrs", "-gtcgi" )
+                            ::Project:MyLink_Flags := StrTran( ::Project:MyLink_Flags, "-lgtcrs", "-lgtcgi" )
                          #endif
 
                       ENDIF
@@ -1418,6 +1481,8 @@ METHOD Refresh() CLASS TMakeObject
 
    IF ValType( ::bAction ) == 'B'
       Eval( ::bAction, Self )
+   ELSE
+      TraceLog( ::bAction )   
    ENDIF
 
    ::lCurrent := .T.
@@ -1478,7 +1543,9 @@ METHOD SourceFile() CLASS TMakeObject
 
 RETURN '"' + ::aDependancies[1]:cFile + '"'
 
-CLASS TMakeProject FROM TMakeObject
+CLASS TMakeProject FROM TMakeObject MODULE FRIENDLY
+   
+   //FRIEND FUNCTION xBuildMain
 
    CLASS VAR C_Libs
 
@@ -1488,6 +1555,7 @@ CLASS TMakeProject FROM TMakeObject
    VAR RC_Root         INIT "" READONLY
    VAR xHB_Root        INIT "" READONLY
    VAR xHB_LibFolder   INIT "" READONLY
+   VAR xHB_IncFolder   INIT "" READONLY
    VAR SLY_Root        INIT "" READONLY
 
    VAR C_Executable    READONLY
@@ -1529,15 +1597,13 @@ CLASS TMakeProject FROM TMakeObject
    VAR StartIn               INIT ""             PERSISTENT
    VAR lAutoRun                                  PERSISTENT
 
-   VAR bProgress                       PROTECTED
+   VAR bProgress                       READONLY
    //VAR bOnErr                          PROTECTED
 
-   VAR aDeferred             INIT {}   PROTECTED
-   VAR aIncludes             INIT {}   PROTECTED
-   VAR aSources              INIT {}   PROTECTED
+   VAR aDeferred             INIT {}   READONLY
+   VAR aIncludes             INIT {}   READONLY
+   VAR aSources              INIT {}   READONLY
    VAR aLiteralDependancies  INIT {}   READONLY
-
-   //VAR aObjects            INIT {}   PROTECTED
 
    VAR OutputFolder          INIT ""             PERSISTENT
    VAR C_OutputFolder                            PERSISTENT
@@ -1553,9 +1619,9 @@ CLASS TMakeProject FROM TMakeObject
    VAR GUI_LibFolder         INIT ""   READONLY
    VAR GUI_PRGFlags          INIT ""   READONLY
 
-   VAR C_OutputFlag          INIT "-o" PROTECTED
-   VAR PRG_OutputFlag        INIT "-o" PROTECTED
-   VAR SLY_OutputFlag        INIT "-o" PROTECTED
+   VAR C_OutputFlag          INIT "-o" READONLY
+   VAR PRG_OutputFlag        INIT "-o" READONLY
+   VAR SLY_OutputFlag        INIT "-o" READONLY
 
    VAR IncludeFolders        INIT ""   READONLY PERSISTENT
    VAR aIncludeFolders       INIT {}   PROTECTED
@@ -1569,19 +1635,19 @@ CLASS TMakeProject FROM TMakeObject
    VAR PRG_Flags             INIT "-m -n -p -q -gc0"   READONLY
    VAR RC_Flags              INIT ""   READONLY
 
-   VAR RC_OutputFlag         INIT ""   PROTECTED
-   VAR RC_IncludeFlag        INIT ""   PROTECTED
-   VAR SLY_Flags        INIT "-v -d"   PROTECTED
+   VAR RC_OutputFlag         INIT ""   READONLY
+   VAR RC_IncludeFlag        INIT ""   READONLY
+   VAR SLY_Flags        INIT "-v -d"   READONLY
 
-   VAR Lib_Flags                       PROTECTED
-   VAR Lib_OutputFlag                  PROTECTED
-   VAR Lib_AddFlag                     PROTECTED
-   VAR Link_LibFolderFlag              PROTECTED
-   VAR Link_OutputFlag                 PROTECTED
-   VAR DLL_Flags                       PROTECTED
-   VAR DLL_Startup                     PROTECTED
-   VAR Console_Flag                    PROTECTED
-   VAR GUI_Flag                        PROTECTED
+   VAR Lib_Flags                       READONLY
+   VAR Lib_OutputFlag                  READONLY
+   VAR Lib_AddFlag                     READONLY
+   VAR Link_LibFolderFlag              READONLY
+   VAR Link_OutputFlag                 READONLY
+   VAR DLL_Flags                       READONLY
+   VAR DLL_Startup                     READONLY
+   VAR Console_Flag                    READONLY
+   VAR GUI_Flag                        READONLY
 
    VAR lClean        INIT .F.
 
@@ -1623,26 +1689,26 @@ CLASS TMakeProject FROM TMakeObject
    VAR OnWhoo
    VAR OnWhat32
 
-   VAR MIN_Libs      INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib nulsys.lib debug.lib pcrepos.lib zlib.lib "                                                                          PROTECTED
-   VAR ST_Libs       INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib rdd.lib dbfntx.lib dbfnsx.lib dbfcdx.lib dbffpt.lib debug.lib pcrepos.lib hsx.lib hbsix.lib ct.lib zlib.lib codepage.lib "                   PROTECTED
-   VAR MT_Libs       INIT "vmmt.lib rtlmt.lib macro.lib ppmt.lib common.lib lang.lib gtwin.lib rddmt.lib dbfnsxmt.lib dbfntxmt.lib dbfcdxmt.lib dbffptmt.lib debug.lib pcrepos.lib hsxmt.lib hbsixmt.lib ct.lib zlib.lib codepage.lib " PROTECTED
+   VAR MIN_Libs      INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib nulsys.lib debug.lib pcrepos.lib zlib.lib "                                                                                                    READONLY
+   VAR ST_Libs       INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib rdd.lib dbfntx.lib dbfnsx.lib dbfcdx.lib dbffpt.lib debug.lib pcrepos.lib hsx.lib hbsix.lib ct.lib zlib.lib codepage.lib "                     READONLY
+   VAR MT_Libs       INIT "vmmt.lib rtlmt.lib macro.lib ppmt.lib common.lib lang.lib gtwin.lib rddmt.lib dbfnsxmt.lib dbfntxmt.lib dbfcdxmt.lib dbffptmt.lib debug.lib pcrepos.lib hsxmt.lib hbsixmt.lib ct.lib zlib.lib codepage.lib " READONLY
 
 #ifdef __PLATFORM__Windows
-   VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lrtl -lvm -lmacro -lpp -lcommon -lcodepage -lgtwin -lnulsys -ldebug"                            PROTECTED
-   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lrtl -lvm -lmacro -lpp -lcommon -lcodepage -lgtwin -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug"             PROTECTED
-   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtwin -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" PROTECTED
+   VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtwin -lnulsys -ldebug"                                       READONLY
+   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtwin -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug"               READONLY
+   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtwin -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" READONLY
 #else
-   VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lrtl -lvm -lmacro -lpp -lcommon -lcodepage -lgtcrs -lnulsys -ldebug"                            PROTECTED
-   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lrtl -lvm -lmacro -lpp -lcommon -lcodepage -lgtcrs -lrdd - ldbfnsx -ldbfntx -ldbfcdx -ldebug"             PROTECTED
-   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtcrs -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" PROTECTED
+   VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtcrs -lnulsys -ldebug"                                       READONLY
+   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtcrs -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug"              READONLY
+   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtcrs -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" READONLY
 #endif
 
-   VAR GUI_Libs      INIT ""           PROTECTED
+   VAR GUI_Libs      INIT ""           READONLY
 
-   VAR Auto_Libs     INIT ""           PROTECTED
+   VAR Auto_Libs     INIT ""           READONLY
 
-   VAR MyLink_Flags      INIT ""       PERSISTENT
-   VAR DefaultLink_Flags INIT ""       PROTECTED
+   VAR MyLink_Flags      INIT ""       READONLY
+   VAR DefaultLink_Flags INIT ""       READONLY
 
    VAR cINI                            PERSISTENT
 
@@ -1650,6 +1716,7 @@ CLASS TMakeProject FROM TMakeObject
    METHOD RC_RootX       INLINE ExpandEnvVars( ::RC_Root       )
    METHOD xHB_RootX      INLINE ExpandEnvVars( ::xHB_Root      )
    METHOD xHB_LibFolderX INLINE ExpandEnvVars( ::xHB_LibFolder )
+   METHOD xHB_IncFolderX INLINE ExpandEnvVars( ::xHB_IncFolder )
    METHOD FWH_RootX      INLINE ExpandEnvVars( ::FWH_Root      )
    METHOD FWH_LibFolderX INLINE ExpandEnvVars( ::FWH_LibFolder )
    METHOD GUI_RootX      INLINE ExpandEnvVars( ::GUI_Root      )
@@ -1723,22 +1790,22 @@ CLASS TMakeProject FROM TMakeObject
 
       VAR bExe_Build INIT {|Self| __RUN( ::Linker + " " + ;
                                          ::EXE_Command() + ;
-                                         " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                         " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
       VAR bLIB_Build INIT {|Self| __RUN( ::Librarian + " " + ;
                                          ::LIB_Command() + ;
-                                         " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                         " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
       VAR bDLL_Build INIT {|Self| __RUN( ::Linker + " " + ;
                                          ::DLL_Command() + ;
-                                         " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                         " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
       VAR bHRB_Build INIT {|Self| __RUN( ::XHB_Compiler + " " + ;
                                           ::xHB_Command() + " -Gh" + ;
-                                          " >> " + ::Project:cFile + ".log" ) } PROTECTED
+                                          " >> " + ::Project:cFile + ".log 2>&1" ) } PROTECTED
 
       // When sucessfully build a lib on linux, install to xbuilder lib folder
-      VAR bLib_Install INIT {|Self| __RUN("install -m644 " + ::OutputFile( .F. )+ " /usr/lib/xbuilder" + " >> " + ::Project:cFile + ".log" ) }
+      VAR bLib_Install INIT {|Self| IIF( ::Project:lX, __RUN( "install -m644 " + ::OutputFile( .F. ) + " /usr/local/lib/xbuilder" + " >> " + ::Project:cFile + ".log 2>&1" ), NIL ) }
    #endif
 
    METHOD SetIncludeFolders( cIncludeFolders )
@@ -1750,7 +1817,7 @@ CLASS TMakeProject FROM TMakeObject
    METHOD Linker        INLINE ::C_RootX + "bin" + DIR_SEPARATOR + ::Link_Executable
    #endif
 
-   METHOD Includes()
+   METHOD Includes( cFlag )
 
    METHOD PRG_Libs()
 
@@ -1758,35 +1825,29 @@ CLASS TMakeProject FROM TMakeObject
                                                       ::GUI_Root := cRoot, ;
                                                       ::GUI_PRGFlags := IIF( Empty( cFlags ), "-n -m ", cFlags + " " ), ;
                                                       ::GUI_LibFolder := IIF( Empty( cLibFolder ), ::GUI_Root + "lib", ;
-                                                                              IIF( DIR_SEPARATOR IN cLibFolder, cLibFolder, ::GUI_Root + cLibFolder ) )
+                                                                              IIF( ( DIR_SEPARATOR IN cLibFolder ), cLibFolder, ::GUI_Root + cLibFolder ) )
 
    METHOD Set_FWH( cRoot, cLibFolder ) INLINE cRoot += IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
                                                       ::FWH_Root := cRoot, ;
                                                       ::FWH_LibFolder := IIF( Empty( cLibFolder ), ::FWH_Root + "lib", ;
-                                                                              IIF( DIR_SEPARATOR IN cLibFolder, cLibFolder, ::FWH_Root + cLibFolder ) )
+                                                                              IIF( ( DIR_SEPARATOR IN cLibFolder ), cLibFolder, ::FWH_Root + cLibFolder ) )
 
-#IFDEF __PLATFORM__Windows
-   METHOD Set_xHB( cRoot, cFlags, cLibFolder, Exe ) INLINE ::xHB_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
-                                                           IIF( File( ::xHB_Root + "include" + DIR_SEPARATOR + "thread.h" ), , ::lX := .F. ), ;
-                                                           ::xHB_Executable := IIF( Empty( Exe ), IIF( ::lX .AND. File( ::xHB_Root + "bin\xhb.exe" ), "xhb.exe", "harbour.exe" ), Exe ), ;
-                                                           ::PRG_Flags := IIF( Empty( cFlags ), ::PRG_Flags, cFlags + " " ), ;
-                                                           ::xHB_LibFolder := IIF( Empty( cLibFolder ), ;
-                                                                                   ::xHB_Root + "lib\", ;
-                                                                                   IIF( DIR_SEPARATOR IN cLibFolder, ;
-                                                                                        cLibFolder + IIF( cLibFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
-                                                                                        ::xHB_Root + cLibFolder + DIR_SEPARATOR ) )
-#else
-   METHOD Set_xHB( cRoot, cFlags, cLibFolder, Exe ) INLINE ::xHB_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
-                                                           IIF( File( ::xHB_Root + "include" + DIR_SEPARATOR + "thread.h" ), , ::lX := .F. ), ;
-                                                           ::xHB_Executable := IIF( Empty( Exe ),IIF( File( ::xHB_Root + "bin/xhb" ), "xhb", "harbour" ), Exe),;
-                                                           ::PRG_Flags := IIF( Empty( cFlags ), " ", cFlags + " " ), ;
-                                                           ::xHB_LibFolder := IIF( Empty( cLibFolder ), ;
-                                                                                   "/usr/lib/xbuilder/" , ;
-                                                                                   IIF( DIR_SEPARATOR IN cLibFolder, ;
-                                                                                        cLibFolder + IIF( cLibFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
-                                                                                        ::xHB_Root + cLibFolder + DIR_SEPARATOR ) )
+   METHOD Set_xHB( cRoot, cFlags, cLibFolder, Exe, cIncFolder ) INLINE  ::xHB_Root       := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                                        ::xHB_Executable := IIF( Empty( Exe ), s_sHB_Exe, Exe ),;
+                                                                        ::PRG_Flags      := IIF( Empty( cFlags ), ::PRG_Flags, cFlags ), ;
+                                                                        ::xHB_LibFolder  := IIF( Empty( cLibFolder ), ;
+                                                                                                 s_sHB_LibFolder, ;
+                                                                                                 IIF( ( DIR_SEPARATOR IN cLibFolder ), ;
+                                                                                                      cLibFolder + IIF( cLibFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                                                                      ::xHB_Root + cLibFolder + DIR_SEPARATOR ) ), ;
+                                                                        ::xHB_IncFolder := IIF( Empty( cIncFolder ), ;
+                                                                                                s_sHB_IncFolder, ;
+                                                                                                IIF( ( DIR_SEPARATOR IN cIncFolder ), ;
+                                                                                                     cIncFolder + IIF( cIncFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                                                                     ::xHB_Root + cIncFolder + DIR_SEPARATOR ) ), ;
+                                                                        ::lX            := File( ::xHB_IncFolder + "hbfast.h" )
 
-#endif
+
    METHOD Set_BCC( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot + IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
                                                          ::xHB_Executable := "harbour.exe", ;
                                                          ::C_Executable := "bcc32.exe", ;
@@ -1979,9 +2040,10 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::GUI_Flag := " "
 #else
    METHOD Set_GCC( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot +  IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                         ::xHB_Executable := "harbour", ;
                                                          ::C_Executable := "gcc", ;
                                                          ::Lib_Executable := "ar", ;
-                                                         ::Link_Executable := "xblnk", ;
+                                                         ::Link_Executable := "gcc", ;
                                                          ::RC_Root := ::C_Root, ;
                                                          ::RC_Executable := "???", ;
                                                          ::RC_Flags := " ", ;
@@ -1999,7 +2061,7 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::Lib_Flags := "cru ", ;
                                                          ::Lib_OutputFlag := " ", ;
                                                          ::Lib_AddFlag := " ", ;
-                                                         ::DefaultLINK_Flags := "-L/usr/lib/xbuilder" + IIF(::Project:lUseDLL == .F., " -fullstatic -gtcrs", "" ), ;
+                                                         ::DefaultLINK_Flags := IIF(::Project:lUseDLL == .F., " --static -lgtcrs", "" ), ;
                                                          ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
                                                          ::LINK_DebugFlags := " ", ;
                                                          ::DLL_Flags := " ", ;
@@ -2038,13 +2100,139 @@ CLASS TMakeProject FROM TMakeObject
                                                          ::Console_Flag := " ", ;
                                                          ::GUI_Flag := " "
 
-   METHOD EXE_Command
+#ifdef __PLATFORM__Windows
+   METHOD Set_Clang( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot + DIR_SEPARATOR, ;
+                                                         ::xHB_Executable := "harbour.exe", ;
+                                                         ::C_Executable := "clang.exe", ;
+                                                         ::Lib_Executable := "ar.exe", ;
+                                                         ::Link_Executable := "clang.exe", ;
+                                                         ::RC_Root := ::C_Root, ;
+                                                         ::RC_Executable := "???", ;
+                                                         ::RC_Flags := " ", ;
+                                                         ::RC_OutputFlag := "", ;
+                                                         ::RC_IncludeFlag := "", ;
+                                                         ::Console_Startup := " ", ;
+                                                         ::GUI_Startup := " ", ;
+                                                         ::C_Flags :=  "-c ", ;
+                                                         ::C_DebugFlags := "??? ", ;
+                                                         ::MyC_Flags := IIF( Empty( C_Flags ), ::MyC_Flags, C_Flags + " " ), ;
+                                                         ::C_OutputFlag := "-o ", ;
+                                                         ::Link_LibFolderFlag := "-L ", ;
+                                                         ::Link_OutputFlag := "-o ", ;
+                                                         ::C_Libs := " ", ;
+                                                         ::Lib_Flags := "a ", ;
+                                                         ::Lib_OutputFlag := " ", ;
+                                                         ::Lib_AddFlag := " ", ;
+                                                         ::DefaultLINK_Flags := " ", ;
+                                                         ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
+                                                         ::LINK_DebugFlags := " ", ;
+                                                         ::DLL_Flags := " ", ;
+                                                         ::DLL_Startup := " ", ;
+                                                         ::Console_Flag := " ", ;
+                                                         ::GUI_Flag := " "
+#else
+   METHOD Set_Clang( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot +  IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                         ::xHB_Executable := "harbour", ;
+                                                         ::C_Executable := "clang", ;
+                                                         ::Lib_Executable := "ar", ;
+                                                         ::Link_Executable := "clang", ;
+                                                         ::RC_Root := ::C_Root, ;
+                                                         ::RC_Executable := "???", ;
+                                                         ::RC_Flags := " ", ;
+                                                         ::RC_OutputFlag := "", ;
+                                                         ::RC_IncludeFlag := "", ;
+                                                         ::Console_Startup := " ", ;
+                                                         ::GUI_Startup := " ", ;
+                                                         ::C_Flags :=  "-c ", ;
+                                                         ::C_DebugFlags := "-g ", ;
+                                                         ::MyC_Flags := IIF( Empty( C_Flags ), ::MyC_Flags, C_Flags + " " ), ;
+                                                         ::C_OutputFlag := "-o ", ;
+                                                         ::Link_LibFolderFlag := "-L ", ;
+                                                         ::Link_OutputFlag := "-o", ;
+                                                         ::C_Libs := " -lpthread -lgpm -lncurses -lm -lslang ", ;
+                                                         ::Lib_Flags := "cru ", ;
+                                                         ::Lib_OutputFlag := " ", ;
+                                                         ::Lib_AddFlag := " ", ;
+                                                         ::DefaultLINK_Flags := IIF(::Project:lUseDLL == .F., " -fullstatic -lgtcrs", "" ), ;
+                                                         ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
+                                                         ::LINK_DebugFlags := " ", ;
+                                                         ::DLL_Flags := " ", ;
+                                                         ::DLL_Startup := " ", ;
+                                                         ::Console_Flag := " ", ;
+                                                         ::GUI_Flag := " "
+#endif
 
-   METHOD DLL_Command
+// Never tested!!!
+#ifdef __PLATFORM__Windows
+   METHOD Set_TCC( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot + DIR_SEPARATOR, ;
+                                                         ::xHB_Executable := "harbour.exe", ;
+                                                         ::C_Executable := "gcc.exe", ;
+                                                         ::Lib_Executable := "ar.exe", ;
+                                                         ::Link_Executable := "ld.exe", ;
+                                                         ::RC_Root := ::C_Root, ;
+                                                         ::RC_Executable := "???", ;
+                                                         ::RC_Flags := " ", ;
+                                                         ::RC_OutputFlag := "", ;
+                                                         ::RC_IncludeFlag := "", ;
+                                                         ::Console_Startup := " ", ;
+                                                         ::GUI_Startup := " ", ;
+                                                         ::C_Flags :=  "-c ", ;
+                                                         ::C_DebugFlags := "??? ", ;
+                                                         ::MyC_Flags := IIF( Empty( C_Flags ), ::MyC_Flags, C_Flags + " " ), ;
+                                                         ::C_OutputFlag := "-o ", ;
+                                                         ::Link_LibFolderFlag := "-L ", ;
+                                                         ::Link_OutputFlag := "-o ", ;
+                                                         ::C_Libs := " ", ;
+                                                         ::Lib_Flags := "a ", ;
+                                                         ::Lib_OutputFlag := " ", ;
+                                                         ::Lib_AddFlag := " ", ;
+                                                         ::DefaultLINK_Flags := " ", ;
+                                                         ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
+                                                         ::LINK_DebugFlags := " ", ;
+                                                         ::DLL_Flags := " ", ;
+                                                         ::DLL_Startup := " ", ;
+                                                         ::Console_Flag := " ", ;
+                                                         ::GUI_Flag := " "
+#else
+   METHOD Set_TCC( cRoot, C_Flags, LINK_Flags )   INLINE ::C_Root := cRoot +  IIF( cRoot[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ), ;
+                                                         ::xHB_Executable := "harbour", ;
+                                                         ::C_Executable := "tcc", ;
+                                                         ::Lib_Executable := "ar", ;
+                                                         ::Link_Executable := "tcc", ;
+                                                         ::RC_Root := ::C_Root, ;
+                                                         ::RC_Executable := "???", ;
+                                                         ::RC_Flags := " ", ;
+                                                         ::RC_OutputFlag := "", ;
+                                                         ::RC_IncludeFlag := "", ;
+                                                         ::Console_Startup := " ", ;
+                                                         ::GUI_Startup := " ", ;
+                                                         ::C_Flags :=  "-c ", ;
+                                                         ::C_DebugFlags := "-g ", ;
+                                                         ::MyC_Flags := IIF( Empty( C_Flags ), ::MyC_Flags, C_Flags + " " ), ;
+                                                         ::C_OutputFlag := "-o ", ;
+                                                         ::Link_LibFolderFlag := "-L ", ;
+                                                         ::Link_OutputFlag := "-o", ;
+                                                         ::C_Libs := " -lpthread -lgpm -lncurses -lm -lslang ", ;
+                                                         ::Lib_Flags := "cru ", ;
+                                                         ::Lib_OutputFlag := " ", ;
+                                                         ::Lib_AddFlag := " ", ;
+                                                         ::DefaultLINK_Flags := IIF(::Project:lUseDLL == .F., " -fullstatic -lgtcrs", "" ), ;
+                                                         ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
+                                                         ::LINK_DebugFlags := " ", ;
+                                                         ::DLL_Flags := " ", ;
+                                                         ::DLL_Startup := " ", ;
+                                                         ::Console_Flag := " ", ;
+                                                         ::GUI_Flag := " "
+#endif
 
-   METHOD New( cFile, cWorkFolder ) CONSTRUCTOR
-   METHOD AddFiles() // ...
-   METHOD AddObjects() // ...
+
+   METHOD EXE_Command()
+
+   METHOD DLL_Command()
+
+   METHOD New( cFile ) CONSTRUCTOR
+   METHOD AddFiles(...) // ...
+   METHOD AddObjects(...) // ...
    METHOD AddProject( cFile )
    METHOD Make( bOnErr, bProgress )
 
@@ -2121,7 +2309,7 @@ METHOD New( cFile ) CLASS TMakeProject
 
 RETURN Self
 
-METHOD PRG_Libs CLASS TMakeProject
+METHOD PRG_Libs() CLASS TMakeProject
 
    IF ::lPRG
       IF ::Project:xHB_Executable == "xhb.exe" .OR. ::Project:xHB_Executable == "xhb"
@@ -2129,40 +2317,40 @@ METHOD PRG_Libs CLASS TMakeProject
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
                   IF ::Project:lDebug
-                     RETURN IIF( "gcc" IN ::C_Executable, "", "xhbdmtdll.lib rmdbfcdx.lib ct3comm.lib " )
+                     RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbdmtdll.lib rmdbfcdx.lib ct3comm.lib " )
                   ELSE
-                     RETURN IIF( "gcc" IN ::C_Executable, "", "xhbmtdll.lib rmdbfcdx.lib ct3comm.lib " )
+                     RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbmtdll.lib rmdbfcdx.lib ct3comm.lib " )
                   ENDIF
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable , "libxhbmt.a libdbfmt.a libnsxmt.a libntxmt.a libcdxmt.a ", "xhbmt.lib dbfmt.lib nsxmt.lib ntxmt.lib cdxmt.lib rmdbfcdx.lib ct3comm.lib ")
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "libxhbmt.a libdbfmt.a libnsxmt.a libntxmt.a libcdxmt.a ", "xhbmt.lib dbfmt.lib nsxmt.lib ntxmt.lib cdxmt.lib rmdbfcdx.lib ct3comm.lib ")
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
                IF ::Project:lDebug
-                  RETURN IIF( "gcc" IN ::C_Executable, "", "xhbdmtdll.lib rmdbfcdx.lib ct3comm.lib " )
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbdmtdll.lib rmdbfcdx.lib ct3comm.lib " )
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable, "", "xhbmtdll.lib rmdbfcdx.lib ct3comm.lib " )
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbmtdll.lib rmdbfcdx.lib ct3comm.lib " )
                ENDIF
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
             ENDIF
          ELSEIF ::lMinimal
-            RETURN IIF( "gcc" IN ::C_Executable, "libxh.a libnordd.a", "xhb.lib nordd.lib ")
+            RETURN IIF( ( "gcc" IN ::C_Executable ), "libxh.a libnordd.a", "xhb.lib nordd.lib ")
          ELSE
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
                   IF ::Project:lDebug
-                     RETURN IIF( "gcc" IN ::C_Executable, "", "xhbddll.lib rmdbfcdx.lib ct3comm.lib " )
+                     RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbddll.lib rmdbfcdx.lib ct3comm.lib " )
                   ELSE
-                     RETURN IIF( "gcc" IN ::C_Executable, "", "xhbdll.lib rmdbfcdx.lib ct3comm.lib " )
+                     RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbdll.lib rmdbfcdx.lib ct3comm.lib " )
                   ENDIF
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable , "libxhb.a libdbf.a libntx.a libnsx.a libcdx.a ", "xhb.lib dbf.lib nsx.lib ntx.lib cdx.lib rmdbfcdx.lib ct3comm.lib ")
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "libxhb.a libdbf.a libntx.a libnsx.a libcdx.a ", "xhb.lib dbf.lib nsx.lib ntx.lib cdx.lib rmdbfcdx.lib ct3comm.lib ")
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
                IF ::Project:lDebug
-                  RETURN IIF( "gcc" IN ::C_Executable, "", "xhbddll.lib rmdbfcdx.lib ct3comm.lib " )
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbddll.lib rmdbfcdx.lib ct3comm.lib " )
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable, "", "xhbdll.lib rmdbfcdx.lib ct3comm.lib " )
+                  RETURN IIF( ( "gcc" IN ::C_Executable ), "", "xhbdll.lib rmdbfcdx.lib ct3comm.lib " )
                ENDIF
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
@@ -2172,26 +2360,49 @@ METHOD PRG_Libs CLASS TMakeProject
          IF ::lMT
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
-                  RETURN /* use_dll.lib see EXE_Command */ "xharbour.lib "
+                  #ifdef __PLATFORM__Windows                  
+                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "xharbour.lib ", "harbour.lib " )
+                  #else                  
+                     // REVIEW! xharbour.so ?
+                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "libxharbour.a ", "libharbour.dylib " )
+                  #endif   
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable, ::MTG_Libs, ::MT_Libs )
+                  // "gcc;clang" implied!
+                  RETURN IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ), ::MTG_Libs, ::MT_Libs )
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
-               RETURN "xharbour.lib "
+               #ifdef __PLATFORM__Windows                  
+                  RETURN IIF( ::lX, "xharbour.lib ", "harbour.lib " )
+               #else                  
+                  // REVIEW! xharbour.so ?
+                  RETURN IIF( ::lX, "libxharbour.a ", "libharbour.dylib " )
+               #endif   
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
             ENDIF
          ELSEIF ::lMinimal
-            RETURN IIF( "gcc" IN ::C_Executable, ::MING_Libs, ::MIN_Libs )
+            // "gcc;clang" implied!                    
+            RETURN IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ), ::MING_Libs, ::MIN_Libs )
          ELSE
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
-                  RETURN /* use_dll.lib see EXE_Command */"xharbour.lib "
+                  #ifdef __PLATFORM__Windows                  
+                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "xharbour.lib ", "harbour.lib " )
+                  #else                  
+                     // REVIEW! xharbour.so ?
+                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "libxharbour.a ", "libharbour.dylib " )
+                  #endif   
                ELSE
-                  RETURN IIF( "gcc" IN ::C_Executable,::STG_Libs,::ST_Libs )
+                  // "gcc;clang" implied!
+                  RETURN IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ),::STG_Libs,::ST_Libs )
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
-               RETURN "xharbour.lib "
+               #ifdef __PLATFORM__Windows                  
+                  RETURN IIF( ::lX, "xharbour.lib ", "harbour.lib " )
+               #else                  
+                  // REVIEW! xharbour.so ?
+                  RETURN IIF( ::lX, "libxharbour.a ", "libharbour.dylib " )
+               #endif   
             ELSE
                Alert( "Un-Expected case, ", ProcName() )
             ENDIF
@@ -2205,9 +2416,10 @@ METHOD Lib_Command() CLASS TMakeProject
 
    LOCAL cCommand
 
-   IF "gcc" IN ::C_Executable
+   // "gcc;clang" implied!
+   IF ( ::C_Executable IN "gcc.exe;clang.exe" )
       cCommand := ::LIB_Flags
-      cCommand += ::Lib_OutputFlag +::OutputFile( .F. ) + " "
+      cCommand += ::Lib_OutputFlag + ::OutputFile( .F. ) + " "
       cCommand +=  StrTran( Self:ObjList(), ",", " "  )
    ELSE
       cCommand := ::LIB_Flags
@@ -2481,7 +2693,7 @@ RETURN oProject
 FUNCTION LoadIni( oProject )
 
    LOCAL cIni, cLine, cGroup, nGroup, aLine
-   LOCAL xHB_Root, xHB_Flags, xHB_LibFolder, xHB_Executable
+   LOCAL xHB_Root, xHB_Flags, xHB_LibFolder, xHB_Executable, xHB_IncFolder
    LOCAL C_Root, C_Flags, Link_Flags, C_Compiler := 0
    LOCAL FWH_Root, FWH_LibFolder
    LOCAL GUI_Root, GUI_LibFolder
@@ -2571,6 +2783,14 @@ FUNCTION LoadIni( oProject )
                nGroup := 2
                C_Compiler := 5
 
+            CASE cGroup == "clang"
+               nGroup := 2
+               C_Compiler := 6
+
+            CASE cGroup == "tcc"
+               nGroup := 2
+               C_Compiler := 7
+
             CASE cGroup == "fwh"
                nGroup := 3
 
@@ -2616,6 +2836,9 @@ FUNCTION LoadIni( oProject )
 
                   CASE aLine[1] == "exe"
                      xHB_Executable := aLine[2]
+
+                  CASE aLine[1] == "incfolder"
+                     xHB_IncFolder := aLine[2]
 
                   OTHERWISE
                      Throw( ErrorNew( "xBuild", 0, 1001, ProcName(), "Invalid xHB setting: " + aLine[1], HB_aParams() ) )
@@ -2675,7 +2898,7 @@ FUNCTION LoadIni( oProject )
          xHB_Root += DIR_SEPARATOR
       ENDIF
 
-      oProject:Set_xHB( ExpandEnvVars( xHB_Root ), NIL, xHB_LibFolder, xHB_Executable )
+      oProject:Set_xHB( ExpandEnvVars( xHB_Root ), NIL, xHB_LibFolder, xHB_Executable, xHB_IncFolder )
 
       IF ! Empty( xHB_Flags )
          oProject:PRG_Flags := xHB_Flags
@@ -2711,6 +2934,14 @@ FUNCTION LoadIni( oProject )
       CASE 5
          oProject:Set_POCC( IIF( Empty( C_Root ), s_sPOCCFolder, C_Root ) )
          EXIT
+
+      CASE 6
+         oProject:Set_CLang( IIF( Empty( C_Root ), s_sCLangFolder, C_Root ) )
+         EXIT
+
+      CASE 7
+         oProject:Set_TCC( IIF( Empty( C_Root ), s_sTCCFolder, C_Root ) )
+         EXIT
    END
 
    IF ! Empty( C_Flags )
@@ -2745,7 +2976,7 @@ FUNCTION FileWithPath( cFile )
 
    IF cFile[1] == '.'
       RETURN RelativeToAbsolutePath( cFile, DiskName() + DRIVE_SEPARATOR + DIR_SEPARATOR + CurDir() )
-   ELSEIF DIR_SEPARATOR IN cFile
+   ELSEIF ( DIR_SEPARATOR IN cFile )
       RETURN cFile
    ENDIF
 
@@ -2837,6 +3068,7 @@ FUNCTION LoadProject( cFile, Parent, cIniFile )
          :RC_Root            := Parent:RC_Root
          :xHB_Root           := Parent:xHB_Root
          :xHB_LibFolder      := Parent:xHB_LibFolder
+         :xHB_IncFolder      := Parent:xHB_IncFolder
          :SLY_Root           := Parent:SLY_Root
 
          :C_Executable       := Parent:C_Executable
@@ -3036,7 +3268,7 @@ FUNCTION LoadProject( cFile, Parent, cIniFile )
                #ifdef d_Debug_Loadproject
                 TraceLog( oObject, cProperty, cValue )
                #endif
-               IF "DEFINES" IN cProperty
+               IF ( "DEFINES" IN cProperty )
                   oObject:SetDefines( cValue )
                ELSEIF cProperty == "INCLUDEFOLDERS"
                   oObject:SetIncludeFolders( cValue )
@@ -3083,7 +3315,7 @@ FUNCTION LoadProject( cFile, Parent, cIniFile )
       Throw( ErrorNew( "xBuild", 0, 1001, ProcName(), "Could not load one or more files:;;" + cMissingFiles ) )
    ENDIF
 
-   oProject:aLoadedProperties := __ClsGetPropertiesAndValues( oProject )
+   oProject:aLoadedProperties := __objGetIVars( oProject, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( oProject )
 
    oProject:lAddedDependencies := .F.
 
@@ -3136,16 +3368,17 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
          #endif
 
       #else
-         bOnErr := { |oErr| TraceLog( oErr:Description ), __Run( "mcedit " + cLogFile ) }
+         bOnErr := { |oErr| TraceLog( oErr:Description, oErr:Operation, oErr:ModuleName, oErr:ProcName, oErr:ProcLine ), __Run( "nano " + FileWithPath( cLogFile ) ) }
       #endif
    ENDIF
 
    TRY
       cTraceFile  := SET( _SET_TRACEFILE, ::cFile + ".log" )
+      
       #ifdef d_Debug
-       nTraceLevel:= SET( _SET_TRACESTACK, 2 )
+         nTraceLevel:= SET( _SET_TRACESTACK, 2 )
       #else
-       nTraceLevel:= SET( _SET_TRACESTACK, 0 )
+         nTraceLevel:= SET( _SET_TRACESTACK, 0 )
       #endif
 
       #ifdef AUTO_CLEAN
@@ -3169,7 +3402,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
          IF Empty( ::aLoadedProperties ) .OR. ::lAddedDependencies .OR. ::lExpand
             GenerateProjectFile( Self )
          ELSE
-            FOR EACH aProperty IN __ClsGetPropertiesAndValues( Self )
+            FOR EACH aProperty IN __objGetIVars( Self, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( Self )
                /*
                IF aProperty[1] == "LAUTORUN" .OR. aProperty[1] == "RUNARGUMENTS"
                   // Ignore.
@@ -3177,7 +3410,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
                ENDIF
                */
 
-               IF ValType( aProperty[2] ) != ValType( ::aLoadedProperties[ HB_EnumIndex() ][2] ) .OR. ! aProperty[2] == ::aLoadedProperties[ HB_EnumIndex() ][2]
+               IF ( ValType( aProperty[2] ) != ValType( ::aLoadedProperties[ HB_EnumIndex() ][2] ) ) .OR. ! ( aProperty[2] == ::aLoadedProperties[ HB_EnumIndex() ][2] )
                   GenerateProjectFile( Self )
                   EXIT
                ENDIF
@@ -3297,7 +3530,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
          ENDIF
       ENDIF
 
-      IF Lower( ::cFile ) HAS "xbuild.*\.exe"
+      IF ( Lower( ::cFile ) HAS "xbuild.*\.exe" )
          ::lMinimal := .T.
       ENDIF
 
@@ -3309,6 +3542,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
       SET( _SET_TRACESTACK, nTraceLevel )
    CATCH oError
       //TraceLog( ValToPrg( oError ) )
+      //TraceLog( ValToPrg( Self ) )
       Eval( bOnErr, oError )
 
       IF bThrow
@@ -3322,7 +3556,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
 
 RETURN ::lCurrent
 
-METHOD PrgSources CLASS TMakeProject
+METHOD PrgSources() CLASS TMakeProject
 
    LOCAL cList := "", Dependancy
 
@@ -3392,14 +3626,14 @@ METHOD SetIncludeFolders( cIncludeFolders ) CLASS TMakeProject
 
 RETURN Self
 
-METHOD EXE_Command CLASS TMakeProject
+METHOD EXE_Command() CLASS TMakeProject
 
    LOCAL cCommand
 
    cCommand := ::Link_Flags()
 
    IF ::Link_Executable == "ilink32.exe"
-      IF "-v" IN cCommand .OR. "/v" IN cCommand
+      IF ( "-v" IN cCommand ) .OR. ( "/v" IN cCommand )
          ::C_Libs := "cg32.lib " + ::C_Libs
 
          IF ::Project:lSQL
@@ -3461,7 +3695,7 @@ METHOD EXE_Command CLASS TMakeProject
 
       cCommand += ", "
       cCommand += StrTran( Self:ResList(), ",", " " )
-  ELSEIF ::Link_Executable == "ld.exe" .or. ::Link_Executable == "ld" .or. ::Link_Executable == "gcc"  .or. ::Link_Executable == "gcc.exe"
+  ELSEIF ( ::Link_Executable IN "ld.exe;lld.exe;gcc.exe;clang.exe" ) /* "ld;lld;gcc;clang" are implied */
       IF ::Project:lDebug
          cCommand += ::Project:Link_DebugFlags
       ENDIF
@@ -3487,7 +3721,13 @@ METHOD EXE_Command CLASS TMakeProject
 
       cCommand += ::Console_Startup
       cCommand += StrTran( Self:ResList(), ",", " " )
-      cCommand += "-Wl, --start-group " + IIF( ::lUseDll, "use_dll.lib ", "" ) + StrTran( Self:LibList(), ",", " " ) + "-Wl, --end-group"
+
+      IF ::Project:lX
+         cCommand += "-Wl, --start-group " + IIF( ::lUseDll, "use_dll.lib ", "" ) + StrTran( Self:LibList(), ",", " " ) + "-Wl, --end-group"
+      ELSE
+         cCommand += + StrTran( Self:LibList(), ",", " " )
+      ENDIF
+
       cCommand += ::C_Libs
    ELSE
       IF ::Project:lDebug
@@ -3591,7 +3831,7 @@ METHOD EXE_Command CLASS TMakeProject
 
 RETURN cCommand
 
-METHOD DLL_Command CLASS TMakeProject
+METHOD DLL_Command() CLASS TMakeProject
 
    LOCAL cCommand
 
@@ -3604,7 +3844,7 @@ METHOD DLL_Command CLASS TMakeProject
    IF ::Link_Executable == "xlink.exe" .OR. ::Link_Executable == s_sVC_LINK//"link.exe"
       cCommand := StrTran( cCommand, "-NOEXPOBJ", "" )
 
-      IF ! "-DLL" IN cCommand
+      IF ! ( "-DLL" IN cCommand )
          cCommand += "-DLL "
       ENDIF
 
@@ -3757,20 +3997,30 @@ METHOD LibList() CLASS TMakeProject
    LOCAL cList := "", Dependancy, nAt, cWorkFolder, cFile
 
    FOR EACH Dependancy IN ::aDependancies
+      //TraceLog( Dependancy:nType, Dependancy:cFile )
 
       IF Dependancy:nType == TYPE_SOURCE_LIB
-//       cList += Dependancy:OutputFile( .F. ) + ','
-         cList += '"' + IIF( "gcc" IN ::C_Executable, "-l", "" ) + IIF( "gcc" in ::C_Executable, StrTran(Strtran( StrTran(Dependancy:OutputFile( .T. ), "lib" , "") , ".a", "" ) ,".so","" ), Dependancy:OutputFile( .T. ) ) + '",'
-
+// cList += Dependancy:OutputFile( .F. ) + ','
+         // "gcc;clang" implied
+         IF Right( Dependancy:cFile, 6 ) == ".dylib"
+            cList += '"' + Dependancy:Project:xHB_LibFolder + Dependancy:cFile + '",'
+         ELSEIF Left( Dependancy:cFile, 2 ) == "-l"   
+            cList += '"' + Dependancy:cFile + '",'
+         ELSE
+            cList += '"' + IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ), "-l", "" ) + ;
+                           IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ), StrTran( StrTran( StrTran( Dependancy:OutputFile( .T. ), "lib" , "" ), ".a", "" ), ".so", "" ), Dependancy:OutputFile( .T. ) ) + '",'
+         ENDIF 
+         //TraceLog( IIF( Dependancy:cFile == "", ValToPrg( Dependancy ), "Ok" ), cList, Dependancy:cFile, Dependancy:OutputFile(.F.) )
       ELSEIF Dependancy:nType == TYPE_LIB
          nAt := RAt( DIR_SEPARATOR, Dependancy:cFile )
 
          IF nAt > 0
             cWorkFolder := Left( Dependancy:cFile, nAt )
             cFile := SubStr( Dependancy:cFile, nAt + 1 )
-//          cFile := cWorkFolder + Dependancy:TargetFolder + DIR_SEPARATOR + cFile
-            cFile := IIF( "gcc" IN ::C_Executable, '-l"', '"' ) + cWorkFolder + Dependancy:TargetFolder + ;
-                     IIF( Dependancy:TargetFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ) + cFile + '"'
+// cFile := cWorkFolder + Dependancy:TargetFolder + DIR_SEPARATOR + cFile
+            // "gcc;clang" implied!
+            cFile := IIF( ( ::C_Executable IN "gcc.exe;clang.exe" ), '-l"', '"' ) + cWorkFolder + Dependancy:TargetFolder + ;
+                          IIF( Dependancy:TargetFolder[-1] == DIR_SEPARATOR, "", DIR_SEPARATOR ) + cFile + '"'
          ELSE
             cFile := Dependancy:OutputFile( .F. )
          ENDIF
@@ -3784,6 +4034,7 @@ METHOD LibList() CLASS TMakeProject
          ENDIF
 
          cList += cFile + ','
+         //TraceLog( IIF( Dependancy:cFile == "", ValToPrg( Dependancy ), "Ok" ), cList, Dependancy:cFile, Dependancy:OutputFile(.F.) )
       ENDIF
    NEXT
 
@@ -3817,46 +4068,17 @@ RETURN cList
 
 METHOD ValidateSettings() CLASS TMakeProject
 
-   LOCAL sExeFolder, nAt
+   IF Empty( ::xHB_Executable ) .OR. Empty(::xHB_Root )
+      ::Set_xHB( s_sHB_Folder, , s_sHB_LibFolder, s_sHB_Exe, s_sHB_IncFolder )
+   ENDIF
 
    #ifdef __PLATFORM__Windows
-      IF Empty( ::xHB_Executable )
-         sExeFolder := GetModuleFileName()
-         nAt := RAt( '\', sExeFolder )
-         sExeFolder := Left( sExeFolder, nAt )
-
-         IF File( sExeFolder + "xhb.exe" )
-            ::Set_xHB( Left( sExeFolder, Len( sExeFolder ) - 4 ), , , "xhb.exe" )
-         ELSEIF File( "\xhb\bin\xhb.exe" )
-            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xhb", , , "xhb.exe" )
-         ELSEIF File( "\xharbour\bin\harbour.exe" )
-            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xharbour", , , "harbour.exe" )
-         ELSEIF File( "c:\xharbour\bin\harbour.exe" )
-            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "c:\xharbour", , , "harbour.exe" )
-         ENDIF
-      ELSEIF Empty( ::xHB_Root )
-         sExeFolder := GetModuleFileName()
-         nAt := RAt( '\', sExeFolder )
-         sExeFolder := Left( sExeFolder, nAt )
-
-         IF File( sExeFolder + ::xHB_Executable )
-            ::Set_xHB( Left( sExeFolder, Len( sExeFolder ) - 4 ), , , ::xHB_Executable )
-         ELSEIF ::xHB_Executable == "xhb.exe" .AND. File( "\xhb\bin\xhb.exe" )
-            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xhb", , , "xhb.exe" )
-         ELSEIF ::xHB_Executable == "xhb.exe" .AND. File( "c:\xhb\bin\xhb.exe" )
-            ::Set_xHB( "c:\xhb", , , "xhb.exe" )
-         ELSEIF ::xHB_Executable == "harbour.exe" .AND. File( "\xharbour\bin\harbour.exe" )
-            ::Set_xHB( DiskName() + DRIVE_SEPARATOR + "\xharbour", , , "harbour.exe" )
-         ELSEIF File( "c:\xharbour\bin\harbour.exe" )
-            ::Set_xHB( "c:\xharbour", , , "harbour.exe" )
-         ENDIF
-         
-      ENDIF
+      LOCAL nAt
 
       IF Empty( ::C_Executable )
          IF ( ! Empty( ::xHB_Root ) ) .AND. File( ::xHB_RootX + "bin\xcc.exe" )
             ::Set_XCC( ::xHB_RootX )
-         ELSEIF File( s_sxCCFolder + "\bin\xcc.exe" )
+         ELSEIF File( s_sXCCFolder + "\bin\xcc.exe" )
             ::Set_XCC( s_sxCCFolder )
          ELSEIF File( s_sBCCFolder + "\bin\bcc32.exe" )
             ::Set_BCC( s_sBCCFolder )
@@ -3868,127 +4090,104 @@ METHOD ValidateSettings() CLASS TMakeProject
             ::Set_LCC( s_sLCCFolder )
          ELSEIF File( s_sGCCFolder + "\bin\gcc.exe" )
             ::Set_GCC( s_sGCCFolder )
+         ELSEIF File( s_sClangFolder + "\bin\clang.exe" )
+            ::Set_CLang( s_sCLangFolder )
          ENDIF
       ENDIF
 
-      IF ::lPRG .AND. ! File( ::xHB_Compiler )
-         Throw( ErrorNew( "xBuild", 0, 1002, Self:ClassName, "Could not locate xHarbour at: " + ::xHB_Compiler, HB_aParams() ) )
+      IF ::lSLY
+         IF File( ::xHB_RootX + "bin" + DIR_SEPARATOR + ::SLY_Executable )
+            ::SLY_Root := ::xHB_RootX
+         ELSEIF File( s_sProgramsFolder + "\GnuWin32\bin\" + ::SLY_Executable )
+            ::SLY_Root := s_sProgramsFolder + "\GnuWin32\"
+         ELSEIF File( "\GnuWin32\bin\" + ::SLY_Executable )
+            ::SLY_Root := DiskName() + ":\GnuWin32\"
+         ELSEIF File( "\djgpp\bin\" + ::SLY_Executable )
+            ::SLY_Root := DiskName() + ":\djgpp\"
+         ELSEIF File( "c:\djgpp\bin\" + ::SLY_Executable )
+            ::SLY_Root := "c:\djgpp\"
+         ELSE
+            Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Bison: " + ::SLY_Executable, HB_aParams() ) )
+         ENDIF
+
+         IF Empty( GetEnv( "BISON_SIMPLE" ) )
+            IF Empty( GetEnv( "DJGPP" ) )
+               IF File( ::SLY_Root + "share\bison\bison.simple" )
+                  ::hSLY_EnvVars[ "BISON_SIMPLE" ] := ::SLY_Root + "share\bison\bison.simple"
+               ENDIF
+            ELSE
+               ::hSLY_EnvVars[ "DJGPP" ] := GetEnv( "DJGPP" )
+            ENDIF
+         ELSE
+            ::hSLY_EnvVars[ "BISON_SIMPLE" ] := GetEnv( "BISON_SIMPLE" )
+         ENDIF
+
+         ::hSLY_EnvVars[ "PATH" ] := ::SLY_Root + "bin"
+
+         // TODO - Very ODD we MUST run Bison once by itself or subsequent real command will fail.
+         CreateProcessWait( ::SLY_Compiler, ::SLY_Executable + " --version", "NUL", HashToEnvVars( ::hSLY_EnvVars ) )
+         //__Run( ::SLY_Compiler + " --version > NUL:" )
       ENDIF
 
-      IF ! File( ::C_Compiler )
-         Throw( ErrorNew( "xBuild", 0, 1002, Self:ClassName, "Could not locate C Compiler at: " + ::C_Compiler, HB_aParams() ) )
+      IF ::nType == TYPE_LIB .AND. ! File( ::Librarian )
+         Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Librarian at: " + ::Librarian, HB_aParams() ) )
       ENDIF
 
-      IF ( ::nType == TYPE_EXE .OR. ::nType == TYPE_DLL ) .AND. ! File( ::Linker )
-         Throw( ErrorNew( "xBuild", 0, 1002, Self:ClassName, "Could not locate Linker at: " + ::Linker, HB_aParams() ) )
-      ENDIF
-
-    #ifdef DEFERRED_RC
-       IF ::lRC .AND. ! File( ::RC_Binder )
-          Throw( ErrorNew( "xBuild", 0, 1002, Self:ClassName, "Could not locate Resource Binder at: " + ::RC_Binder, HB_aParams() ) )
-    #else
-       IF ::lRC .AND. ! File( ::RC_Compiler )
-    #endif
-          Throw( ErrorNew( "xBuild", 0, 1002, Self:ClassName, "Could not locate Resource Compiler at: " + ::RC_Compiler, HB_aParams() ) )
-       ENDIF
-
-       IF ::lSLY
-          #ifdef __PLATFORM__Windows
-             IF File( ::xHB_RootX + "bin" + DIR_SEPARATOR + ::SLY_Executable )
-                ::SLY_Root := ::xHB_RootX
-             ELSEIF File( s_sProgramsFolder + "\GnuWin32\bin\" + ::SLY_Executable )
-                ::SLY_Root := s_sProgramsFolder + "\GnuWin32\"
-             ELSEIF File( "\GnuWin32\bin\" + ::SLY_Executable )
-                ::SLY_Root := DiskName() + ":\GnuWin32\"
-             ELSEIF File( "\djgpp\bin\" + ::SLY_Executable )
-                ::SLY_Root := DiskName() + ":\djgpp\"
-             ELSEIF File( "c:\djgpp\bin\" + ::SLY_Executable )
-                ::SLY_Root := "c:\djgpp\"
-             ELSE
-                Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Bison: " + ::SLY_Executable, HB_aParams() ) )
-             ENDIF
-
-             IF Empty( GetEnv( "BISON_SIMPLE" ) )
-                IF Empty( GetEnv( "DJGPP" ) )
-                   IF File( ::SLY_Root + "share\bison\bison.simple" )
-                      ::hSLY_EnvVars[ "BISON_SIMPLE" ] := ::SLY_Root + "share\bison\bison.simple"
-                   ENDIF
-                ELSE
-                   ::hSLY_EnvVars[ "DJGPP" ] := GetEnv( "DJGPP" )
-                ENDIF
-             ELSE
-                ::hSLY_EnvVars[ "BISON_SIMPLE" ] := GetEnv( "BISON_SIMPLE" )
-             ENDIF
-
-             ::hSLY_EnvVars[ "PATH" ] := ::SLY_Root + "bin"
-
-             // TODO - Very ODD we MUST run Bison once by itself or subsequent real command will fail.
-             CreateProcessWait( ::SLY_Compiler, ::SLY_Executable + " --version", "NUL", HashToEnvVars( ::hSLY_EnvVars ) )
-             //__Run( ::SLY_Compiler + " --version > NUL:" )
-          #else
-             IF File( "/usr/bin/" + ::SLY_Executable )
-                ::SLY_Root := "/usr/bin"
-             ELSE
-                Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Bison at: " + ::SLY_Executable, HB_aParams() ) )
-             ENDIF
-          #endif
-       ENDIF
-
-       IF ::nType == TYPE_LIB .AND. ! File( ::Librarian )
-          Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Librarian at: " + ::Librarian, HB_aParams() ) )
-       ENDIF
    #else
-       // Todo auto setup under Linux.
-       IF Empty( ::xHB_Executable )
-          sExeFolder := GetModuleFileName()
-          nAt := RAt( "/", sExeFolder )
-          IF File( sExeFolder + "xhb" )
-             ::Set_xHB( Left( sExeFolder, Len( sExeFolder ) - 4 ), , , "xhb" )
-          ELSEIF File("/usr/bin/xhb")
-             ::Set_xHB( "/usr", , ,"xhb" )
-          ELSEIF File( "/usr/bin/harbour" )
-             ::Set_xHB( "/usr", , ,"harbour" )
-          ENDIF
-       ENDIF
 
-       IF Empty( ::C_Executable )
-          IF File( "/usr/bin/gcc" )
-             ::Set_GCC( "/usr" )
-          ENDIF
-       ENDIF
+      IF Empty( ::C_Executable )
+         IF File( s_sGCCFolder + "/bin/gcc" )
+            ::Set_GCC( s_sGCCFolder )
+         ELSEIF File( s_sCLangFolder + "/bin/clang" )
+            ::Set_CLang( s_sCLangFolder )
+         ELSEIF File( s_sTCCFolder + "/bin/tcc" )
+            ::Set_TCC( s_sTCCFolder )
+         ENDIF
+      ENDIF
 
-       IF ::lPRG .AND. ! File( ::xHB_Compiler )
-          Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate xHarbour at: " + ::xHB_Compiler, HB_aParams() ) )
-       ENDIF
+      IF ::lSLY
+         IF File( "/usr/bin/" + ::SLY_Executable )
+            ::SLY_Root := "/usr/bin"
+         ELSE
+            Throw( ErrorNew( "xBuild", 0, 1001, Self:ClassName, "Could not locate Bison at: " + ::SLY_Executable, HB_aParams() ) )
+         ENDIF
 
-       IF ! File( ::C_Compiler )
-          Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate C Compiler at: " + ::C_Compiler, HB_aParams() ) )
-       ENDIF
+         IF Empty( GetEnv( "BISON_SIMPLE" ) )
+            ::hSLY_EnvVars[ "BISON_SIMPLE" ] := GetEnv( "BISON_SIMPLE" )
+         ENDIF
 
-       IF ( ::nType == TYPE_EXE .OR. ::nType == TYPE_DLL ) .AND. ! File( ::Linker )
-          Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Linker at: " + ::Linker, HB_aParams() ) )
-       ENDIF
+         ::hSLY_EnvVars[ "PATH" ] := ::SLY_Root + "bin"
 
-       #ifdef DEFERRED_RC
-          IF ::lRC .AND. ! File( ::RC_Binder )
-             Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Resource Binder at: " + ::RC_Binder, HB_aParams() ) )
-       #else
-          IF ::lRC .AND. ! File( ::RC_Compiler )
-       #endif
-          Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Resource Compiler at: " + ::RC_Compiler, HB_aParams() ) )
-       ENDIF
-       IF ::lSLY
-          IF File( ::xHB_RootX + "bin" + DIR_SEPARATOR + ::SLY_Executable )
-             ::SLY_Root := ::xHB_Root
-          ELSE
-             Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Bison at: " + ::SLY_Executable, HB_aParams() ) )
-          ENDIF
-       ENDIF
+         // TODO - Very ODD we MUST run Bison once by itself or subsequent real command will fail.
+         __Run( ::SLY_Compiler + " --version > NUL:" )
+      ENDIF
 
-       IF ::nType == TYPE_LIB .AND. ! File( ::Librarian )
-          Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Librarian at: " + ::Librarian, HB_aParams() ) )
-       ENDIF
    #endif
+
+   IF ::lPRG .AND. ! File( ::xHB_Compiler )
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate xHarbour at: " + ::xHB_Compiler, HB_aParams() ) )
+   ENDIF
+
+   IF ! File( ::C_Compiler )
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate C Compiler at: " + ::C_Compiler, HB_aParams() ) )
+   ENDIF
+
+   IF ( ::nType == TYPE_EXE .OR. ::nType == TYPE_DLL ) .AND. ! File( ::Linker )
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Linker at: " + ::Linker, HB_aParams() ) )
+   ENDIF
+
+#ifdef DEFERRED_RC
+   IF ::lRC .AND. ! File( ::RC_Binder )
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Resource Binder at: " + ::RC_Binder, HB_aParams() ) )
+#else
+   IF ::lRC .AND. ! File( ::RC_Compiler )
+#endif
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Resource Compiler at: " + ::RC_Compiler, HB_aParams() ) )
+   ENDIF
+
+   IF ::nType == TYPE_LIB .AND. ! File( ::Librarian )
+      Throw( ErrorNew( "xBuild", 0, 1003, Self:ClassName, "Could not locate Librarian at: " + ::Librarian, HB_aParams() ) )
+   ENDIF
 
 RETURN Self
 
@@ -4037,6 +4236,7 @@ FUNCTION GenerateIni( oProject )
    cIni += "LibFolder = " + oProject:xHB_LibFolder + EOL
    cIni += "Flags     = " + oProject:PRG_Flags + EOL
    cIni += "Exe       = " + oProject:xHB_Executable + EOL
+   cIni += "IncFolder = " + oProject:xHB_IncFolder + EOL
    cIni += EOL
 
    SWITCH oProject:C_Executable[1]
@@ -4106,10 +4306,13 @@ FUNCTION GenerateProjectFile( oProject )
 
    IF oProject:ClassName == "TMAKEPROJECT"
 
-      aPropertyAndValues := __ClsGetPropertiesAndValues( oProject )
+      aPropertyAndValues := __objGetIVars( oProject, HB_OO_CLSTP_PERSIST, .F. )//__ClsGetPropertiesAndValues( oProject )
       aSort( aPropertyAndValues, , , {|a1, a2| a1[1] < a2[1] } )
 
       FOR EACH aPropertyAndValue IN aPropertyAndValues
+
+         //Alert( aPropertyAndValue[1] )
+         //TraceLog( aPropertyAndValue[1] )
 
          IF aPropertyAndValue[1] == "MYDEFINES"
             aPropertyAndValue[2] := StrTran( SubStr( aPropertyAndValue[2], 3 ), "-D", ";" )
@@ -4134,7 +4337,11 @@ FUNCTION GenerateProjectFile( oProject )
                cIni += aPropertyAndValue[1] + " = "
 
                FOR EACH cStr IN aPropertyAndValue[2]
-                  cIni += cStr + ","
+                  IF ValType( cStr ) != 'C'
+                     cIni += "*UNDEFINED*,"
+                  ELSE  
+                     cIni += cStr + ","
+                  ENDIF   
                NEXT
 
                cIni[-1] := ' '
@@ -4149,7 +4356,7 @@ FUNCTION GenerateProjectFile( oProject )
       IF ! oProject:lExpand
          oProject:lExpand := .T.
          FOR EACH LiteralDependancy IN oProject:aLiteralDependancies
-            IF LiteralDependancy HAS "(\?|\*)"
+            IF ( LiteralDependancy HAS "(\?|\*)" )
                oProject:lExpand := .F.
                EXIT
             ENDIF
@@ -4192,7 +4399,7 @@ FUNCTION GenerateProjectFile( oProject )
                LOOP
             ENDIF
 
-            aPropertyAndValues := __ClsGetPropertiesAndValues( Dependancy )
+            aPropertyAndValues := __objGetIVars( Dependancy, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( Dependancy )
             aSort( aPropertyAndValues, , , {|a1, a2| a1[1] < a2[1] } )
 
             FOR EACH aPropertyAndValue IN aPropertyAndValues
@@ -4243,7 +4450,11 @@ FUNCTION GenerateProjectFile( oProject )
                      cIni += aPropertyAndValue[1] + " = "
 
                      FOR EACH cStr IN aPropertyAndValue[2]
-                        cIni += cStr + ","
+                        IF ValType( cStr ) != 'C'
+                           cIni += "*UNDEFINED*,"
+                        ELSE  
+                           cIni += cStr + ","
+                        ENDIF   
                      NEXT
 
                      cIni[-1] := ' '
@@ -4299,30 +4510,31 @@ FUNCTION GenerateProjectFile( oProject )
 
 RETURN .T.
 
-FUNCTION Find_xHarbour( xHB_Root, cExe )
-
-   LOCAL cCurrent := DiskName(), cDrives := "", c
-   LOCAL sExeFolder, nAt
-
+FUNCTION Find_xHarbour( xHB_Root, cExe, cLibFolder )
+   
   #ifdef __PLATFORM__Windows
+   LOCAL cCurrent := DiskName() 
+   //LOCAL cDrives := ""
+   LOCAL c, sExeFolder, nAt
+
    sExeFolder := GetModuleFileName()
-   nAt := RAt( '\', sExeFolder )
+   nAt        := RAt( '\', sExeFolder )
 
    IF File( sExeFolder + "xhb.exe" )
-      xHB_Root := Pad( Left( sExeFolder, Len( sExeFolder ) - 4 ), Len( xHB_Root ) )
-      cExe := "xhb.exe"
+      xHB_Root := Pad( Left( sExeFolder, Len( sExeFolder ) - 4 ), 128 )
+      cExe     := "xhb.exe"
       RETURN .T.
    ELSEIF File( "\xhb\bin\xhb.exe" )
-      xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xhb\", Len( xHB_Root ) )
-      cExe := "xhb.exe"
+      xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xhb\", 128 ) )
+      cExe     := "xhb.exe"
       RETURN .T.
    ENDIF
 
    FOR c := 'C' TO 'Z'
       IF DiskChange( c )
          IF File( c + ":\xhb\bin\xhb.exe" )
-            xHB_Root := Pad( c + ":\xhb\", Len( xHB_Root ) )
-            cExe := "xhb.exe"
+            xHB_Root := Pad( c + ":\xhb\", 128 )
+            cExe     := "xhb.exe"
 
             EXIT
          ENDIF
@@ -4331,8 +4543,8 @@ FUNCTION Find_xHarbour( xHB_Root, cExe )
 
    IF Empty( xHB_Root )
       IF File( "\xharbour\bin\harbour.exe" )
-         xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xharbour\", Len( xHB_Root ) )
-         cExe := "harbour.exe"
+         xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xharbour\", 128 ) )
+         cExe     := "harbour.exe"
 
          RETURN .T.
       ENDIF
@@ -4340,8 +4552,8 @@ FUNCTION Find_xHarbour( xHB_Root, cExe )
       FOR c := 'C' TO 'Z'
          IF DiskChange( c )
             IF File( c + ":\xharbour\bin\harbour.exe" )
-               xHB_Root := Pad( c + ":\xharbour\", Len( xHB_Root ) )
-               cExe := "harbour.exe"
+               xHB_Root := Pad( c + ":\xharbour\", 128 )
+               cExe     := "harbour.exe"
 
                EXIT
             ENDIF
@@ -4352,53 +4564,63 @@ FUNCTION Find_xHarbour( xHB_Root, cExe )
    DiskChange( cCurrent )
   #else
    IF File( "/usr/bin/xhb" )
-      xHB_Root := "/usr/"
-      cExe := "xhb"
+      xHB_Root   := Pad( "/usr/" , 128 )
+      cExe       := "xhb"
       RETURN .T.
    ELSEIF File( "/usr/bin/harbour" )
-      xHB_Root := "/usr/"
-      cExe := "harbour"
+      xHB_Root   := Pad( "/usr/", 128 )
+      cExe       := "harbour"
+      RETURN .T.
+   ELSEIF File( "/opt/harbour/bin/harbour" )
+      xHB_Root   := Pad( "/opt/harbour/", 128 )
+      cExe       := "harbour"
+      cLibFolder := Pad( "lib/harbour/", 128 )
       RETURN .T.
    ENDIF
   #endif
 
 RETURN .F.
 
-FUNCTION Validate_xHB( xHB_Root, XHB_LibFolder )
+FUNCTION Validate_xHB( xHB_Root, xHB_LibFolder, xHB_IncFolder )
 
-   xHB_Root := ExpandEnvVars( AllTrim( xHB_Root ) )
+   xHB_Root      := ExpandEnvVars( AllTrim( xHB_Root ) )
    xHB_LibFolder := ExpandEnvVars( AllTrim( xHB_LibFolder ) )
-
-   IF Empty( xHB_LibFolder )
-      #ifdef __PLATFORM__Windows
-         xHB_LibFolder := "lib\"
-      #else
-         xHB_LibFolder := "lib/xbuilder/"
-      #endif
-   ELSE
-      IF xHB_LibFolder[-1] != DIR_SEPARATOR
-         xHB_LibFolder += DIR_SEPARATOR
-      ENDIF
-   ENDIF
+   xHB_LibFolder := ExpandEnvVars( AllTrim( xHB_IncFolder ) )
 
 #ifdef __PLATFORM__Windows
    IF ( ! File( xHB_Root + "bin\xhb.exe" ) ) .AND. ( ! File( xHB_Root + "bin\harbour.exe" ) )
       Alert( "Couldn't find PRG Compiler at: '" + xHB_Root + "bin'" )
+      
+      xHB_Root      := Pad( xHB_Root, 128 )
+      xHB_LibFolder := Pad( xHB_LibFolder, 128 )
+      xHB_IncFolder := Pad( xHB_IncFolder, 128 )
       RETURN .F.
    ENDIF
 
    IF ( ! File( xHB_Root + xHB_LibFolder + "xhb.lib" ) ) .AND. ( ! File( xHB_Root + xHB_LibFolder + "rtl.lib" ) )
       Alert( "Couldn't find R/T support' at: '" +  xHB_Root + xHB_LibFolder + "'" )
+      
+      xHB_Root      := Pad( xHB_Root, 128 )
+      xHB_LibFolder := Pad( xHB_LibFolder, 128 )
+      xHB_IncFolder := Pad( xHB_IncFolder, 128 )
       RETURN .F.
    ENDIF
 #else
    IF ( ! File( xHB_Root + "bin/xhb" ) ) .AND. ( ! File( xHB_Root + "bin/harbour" ) )
       Alert( "Couldn't find PRG Compiler at: '" + xHB_Root + "bin'" )
+
+      xHB_Root      := Pad( xHB_Root, 128 )
+      xHB_LibFolder := Pad( xHB_LibFolder, 128 )
+      xHB_IncFolder := Pad( xHB_IncFolder, 128 )
       RETURN .F.
    ENDIF
 
    IF ( ! File( xHB_Root + xHB_LibFolder + "libxhb.a" ) ) .AND. ( ! File( xHB_Root + xHB_LibFolder + "librtl.a" ) )
       Alert( "Couldn't find R/T support' at: '" +  xHB_Root + xHB_LibFolder + "'" )
+
+      xHB_Root      := Pad( xHB_Root, 128 )
+      xHB_LibFolder := Pad( xHB_LibFolder, 128 )
+      xHB_IncFolder := Pad( xHB_IncFolder, 128 )
       RETURN .F.
    ENDIF
 #endif
@@ -4407,16 +4629,20 @@ RETURN .T.
 
 FUNCTION Find_CCompiler( C_Compiler, C_Root )
 
-   LOCAL cCurrent := DiskName(), cDrives := "", c
-
-   // TODO Linux !!!
+   LOCAL lFound := .F.
+#ifdef __PLATFORM__Windows
+   LOCAL cCurrent := DiskName(), c, lFound := .F.
+   //LOCAL cDrives := ""
+#endif   
 
    C_Compiler := Upper( AllTrim( C_Compiler ) )
+   C_Root     := ExpandEnvVars( AllTrim( C_Root ) )
 
    DO CASE
+#ifdef __PLATFORM__Windows
       CASE C_Compiler == "BCC"
          IF File( s_sBCCFolder + "\bin\bcc32.exe" )
-            C_Root := Pad( s_sBCCFolder, Len( C_Root ) )
+            C_Root := Pad( s_sBCCFolder, 128 )
 
             RETURN .T.
          ENDIF
@@ -4425,33 +4651,54 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
             IF DiskChange( c )
                IF File( c + ":\bcc55\bin\bcc32.exe" )
                   s_sBCCFolder := c + ":\bcc55"
-                  C_Root := Pad( s_sBCCFolder, Len( C_Root ) )
+                  C_Root := Pad( s_sBCCFolder, 128 )
 
+                  lFound := .T.
                   EXIT
                ELSEIF File( c + ":\borland\bcc55\bin\bcc32.exe" )
                   s_sBCCFolder := c + ":\borland\bcc55"
-                  C_Root := Pad( s_sBCCFolder, Len( C_Root ) )
+                  C_Root := Pad( s_sBCCFolder, 128 ) )
 
+                  lFound := .T.
                   EXIT
                ENDIF
             ENDIF
          NEXT
+#endif
+
+      CASE C_Compiler == "CLANG"
+
+         #ifdef __PLATFORM__Windows
+            IF File( s_sCLangFolder + "\bin\clang.exe" )
+               C_Root := Pad( s_sCLangFolder, 128 )
+               RETURN .T.
+            ENDIF
+         #else
+            IF File( s_sCLangFolder + "/bin/clang" )
+               C_Root := Pad( s_sCLangFolder, 128 )
+               RETURN .T.
+            ENDIF
+         #endif
 
       CASE C_Compiler == "GCC"
 
-         // TODO!!!
          #ifdef __PLATFORM__Windows
             IF File( s_sGCCFolder + "\bin\gcc.exe" )
-               C_Root := Pad( s_sGCCFolder, Len( C_Root ) )
+               C_Root := Pad( s_sGCCFolder, 128 )
+               RETURN .T.
             ENDIF
          #else
-            s_sGCCFolder := "/usr/"
-            C_Root := Pad( s_sGCCFolder, Len( C_Root ) )
+            IF File( s_sGCCFolder + "/bin/gcc" )
+               C_Root := Pad( s_sGCCFolder, 128 )
+               RETURN .T.
+            ENDIF
          #endif
 
+
+#ifdef __PLATFORM__Windows
       CASE C_Compiler == "LCC"
          IF File( s_sLCCFolder + "\bin\lcc.exe" )
-            C_Root := Pad( s_sLCCFolder, Len( C_Root ) )
+            C_Root := Pad( s_sLCCFolder, 128 )
 
             RETURN .T.
          ENDIF
@@ -4460,15 +4707,19 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
             IF DiskChange( c )
                IF File( c + ":\lcc\bin\lcc.exe" )
                   s_sLCCFolder := c + ":\lcc"
-                  C_Root := Pad( s_sLCCFolder, Len( C_Root ) )
+                  C_Root := Pad( s_sLCCFolder, 128 )
+
+                  lFound := .T.
                   EXIT
                ENDIF
             ENDIF
          NEXT
+#endif
 
+#ifdef __PLATFORM__Windows
       CASE C_Compiler == "MINGW"
          IF File( s_sGCCFolder + "\bin\gcc.exe" )
-            C_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\cygwin\", Len( C_Root ) )
+            C_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\cygwin\", 128 )
 
             RETURN .T.
          ENDIF
@@ -4477,24 +4728,50 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
             IF DiskChange( c )
                IF File( c + ":\cygwin\bin\gcc.exe" )
                   s_sGCCFolder := c + ":\cygwin"
-                  C_Root := Pad( s_sGCCFolder, Len( C_Root ) )
+                  C_Root := Pad( s_sGCCFolder, 128 )
 
+                  lFound := .T.
                   EXIT
                ENDIF
             ENDIF
          NEXT
+#endif
 
+#ifdef __PLATFORM__Windows
       CASE C_Compiler == "MSVC"
          IF File( s_sVCFolder + "\bin\cl.exe" )
-            C_Root := Pad( s_sVCFolder, Len( C_Root ) )
+            C_Root := Pad( s_sVCFolder, 128 )
            RETURN .T.
          ENDIF
+#endif
+
+      CASE C_Compiler == "TCC"
+
+         #ifdef __PLATFORM__Windows
+            IF File( s_sTCColder + "\bin\tcc.exe" )
+               C_Root := Pad( s_sTCCFolder, 128 )
+
+               RETURN .T.
+            ENDIF
+         #else
+            IF File( s_sTCCFolder + "/bin/tcc" )
+               C_Root := Pad( s_sTCCFolder, 128 )
+
+               RETURN .T.
+            ENDIF
+         #endif
 
    ENDCASE
 
+#ifdef __PLATFORM__Windows
    DiskChange( cCurrent )
+#endif
 
-RETURN .F.
+//Unused var
+( lFound )
+
+// Always return .T. so as to free the user to correct the C_Root!
+RETURN .T.
 
 FUNCTION Validate_CCompiler( C_Compiler, C_Root )
 
@@ -4526,34 +4803,34 @@ FUNCTION Validate_CCompiler( C_Compiler, C_Root )
 
       CASE C_Compiler == "MSVC"
          C_Exe := "cl.exe"
+
+      CASE C_Compiler == "CLANG"
+         #ifdef __PLATFORM__Windows
+            C_Exe := "clang.exe"
+         #else
+            C_Exe := "clang"
+         #endif
+
+      CASE C_Compiler == "TCC"
+         #ifdef __PLATFORM__Windows
+            C_Exe := "tcc.exe"
+         #else
+            C_Exe := "tcc"
+         #endif
+
    ENDCASE
 
    IF ! File( C_Root + "bin" + DIR_SEPARATOR + C_Exe )
-      Alert( "Couldn't find '" + C_Exe + "' at: '" + C_Root + "bin'" )
+      Alert( "Couldn't locate C Compiler '" + C_Exe + "' at: '" + C_Root + "bin'" )
       RETURN .F.
    ENDIF
 
 RETURN .T.
 
-FUNCTION Find_xCC( cRoot )
-  cRoot := ""
-RETURN .F.
-
-FUNCTION Find_BCC( cRoot )
-  cRoot := ""
-RETURN .F.
-
-FUNCTION Find_VC( cRoot )
-  cRoot := ""
-RETURN .F.
-
-FUNCTION Find_POCC( cRoot )
-  cRoot := ""
-RETURN .F.
-
 FUNCTION Find_FWH( FWH_Root )
 
-   LOCAL cCurrent := DiskName(), cDrives := "", c
+   LOCAL cCurrent := DiskName(), c
+   //cDrives := ""
 
    // TODO Linux!!!
 
@@ -4603,7 +4880,7 @@ RETURN .T.
 
 FUNCTION MakeNestedDir( cPath )
 
-   LOCAL nAt, nStart := 1, nResult, cCurrentFolder := DIR_SEPARATOR + CurDir(), cNewFolder
+   LOCAL nAt, nStart := 1, cCurrentFolder := DIR_SEPARATOR + CurDir(), cNewFolder
 
    IF cPath[1] = DIR_SEPARATOR
       IF DirChange( DIR_SEPARATOR ) != 0
@@ -4631,7 +4908,7 @@ FUNCTION MakeNestedDir( cPath )
          LOOP
       ENDIF
 
-      IF ( nResult := MakeDir( cNewFolder ) ) == 0
+      IF MakeDir( cNewFolder ) == 0
          IF DirChange( cNewFolder ) != 0
             IF DirChange( cCurrentFolder ) != 0
                TraceLog( "OOps!", cCurrentFolder, cNewFolder )
@@ -4653,7 +4930,7 @@ FUNCTION MakeNestedDir( cPath )
       cNewFolder := SubStr( cPath, nStart )
 
       IF Len( Directory( cNewFolder, 'D' ) ) != 1
-         IF ( nResult := MakeDir( cNewFolder ) ) != 0
+         IF  MakeDir( cNewFolder ) != 0
             IF DirChange( cCurrentFolder ) != 0
                TraceLog( "OOps!", cCurrentFolder, cNewFolder )
             ENDIF
@@ -4740,12 +5017,46 @@ RETURN cFolder
 
 INIT PROCEDURE InitTProject
    
-   LOCAL sUniversalCRTSdkDir, sUCRTVersion
-   LOCAL cVSPAth:="", cVCVer:=""
-   
+   LOCAL sExeFolder, nAt   
+
+   #ifdef __PLATFORM__Windows
+      LOCAL sUniversalCRTSdkDir, sUCRTVersion
+      LOCAL cVSPAth:="", cVCVer:=""
+   #endif
+
    HSetCaseMatch( s_hEnvVars, .F. )
 
    #ifdef __PLATFORM__Windows
+      sExeFolder := GetModuleFileName()
+          
+      nAt := RAt( "\", sExeFolder )
+      sExeFolder := Left( sExeFolder, nAt )
+
+      IF File( sExeFolder + "xhb.exe" ) .AND. Lower( Right( sExeFolder, 5 ) ) == "\bin\"
+         s_lX            := .T.
+         s_sHB_Exe       := "xhb.exe"
+         s_sHB_Folder    := Left( sExeFolder, Len( sExeFolder ) - 4 )
+         s_sHB_LibFolder := s_sHB_Folder + "lib\"
+         s_sHB_IncFolder := s_sHB_Folder + "include\"
+      ELSEIF File( "\xharbour\bin\xhb.exe" )
+         s_lX            := .T.
+         s_sHB_Exe       := "xhb.exe"
+         s_sHB_Folder    := "\xharbour\"   
+         s_sHB_LibFolder := s_sHB_Folder + "lib\"
+         s_sHB_IncFolder := s_sHB_Folder + "include\"
+      ELSEIF File( "\xharbour\bin\harbour.exe" )
+         s_lX            := .T.
+         s_sHB_Folder    := "\xharbour\"   
+         s_sHB_LibFolder := s_sHB_Folder + "lib\"
+         s_sHB_IncFolder := s_sHB_Folder + "include\"
+      ELSEIF File( "\harbour\bin\harbour.exe" )
+         s_lX            := .F.
+         s_sHB_Exe       := "harbour.exe"
+         s_sHB_Folder    := "\harbour\"   
+         s_sHB_LibFolder := s_sHB_Folder + "lib\harbour\lib\"
+         s_sHB_IncFolder := s_sHB_Folder + "include\harbour\include\"
+      ENDIF      
+
       s_sHostArch = GetEnv( "PROCESSOR_ARCHITECTURE" )
    
       s_sProgramsFolder := GetEnv( "ProgramFiles(x86)" )
@@ -4957,6 +5268,74 @@ INIT PROCEDURE InitTProject
          s_sGCCFolder := "c:\djgpp\bin"
       ENDIF
 
+   #else   
+
+      sExeFolder := GetModuleFileName()
+          
+      nAt := RAt( "/", sExeFolder )
+      sExeFolder := Left( sExeFolder, nAt )
+
+      IF File( sExeFolder + "xhb" ) .AND. Right( sExeFolder, 5 ) == "/bin/"
+         s_sHB_Exe       := "xhb"      
+         s_sHB_Folder    := Left( sExeFolder, Len( sExeFolder ) - 4 )
+         s_sHB_LibFolder := s_sHB_Folder + "lib/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/"
+         s_lX            := .T.
+      ELSEIF File("/usr/local/bin/xhb")
+         s_sHB_Exe       := "xhb"      
+         s_sHB_Folder    := "/usr/local/"
+         s_sHB_LibFolder := s_sHB_Folder + "lib/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/"
+         s_lX            := .T.
+      ELSEIF File("/usr/bin/xhb")
+         s_sHB_Exe       := "xhb"      
+         s_sHB_Folder    := "/usr/"
+         s_sHB_LibFolder := s_sHB_Folder + "lib/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/"
+         s_lX            := .T.
+      ELSEIF File( "/usr/local/bin/harbour" )
+         s_sHB_Exe       := "xhb"      
+         s_sHB_Folder    := "/usr/local/"
+         s_sHB_LibFolder := s_sHB_Folder + "lib/harbour/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/harbour/"
+      ELSEIF File( "/usr/bin/harbour" )
+         s_sHB_Exe       := "harbour"      
+         s_sHB_Folder    := "/usr/"
+         s_sHB_LibFolder := s_sHB_Folder + "lib/harbour/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/harbour/"
+         s_lX            := IIF( File( s_sHB_IncFolder + "hbvmpub.h" ), .F., .T. )
+      ELSEIF File( "/opt/harbour/bin/harbour" )
+         s_sHB_Exe       := "harbour"      
+         s_sHB_Folder    := "/opt/harbour/"
+         s_sHB_LibFolder := s_sHB_Folder + "lib/harbour/"
+         s_sHB_IncFolder := s_sHB_Folder + "include/harbour/"
+         s_lX            := IIF( File( s_sHB_IncFolder + "hbvmpub.h" ), .F., .T. )
+      ENDIF
+
+      IF File( "/usr/bin/clang" )
+         s_sClangFolder := "/usr/"
+      ELSEIF File( "/usr/local/bin/clang" )
+         s_sCLangFolder := "/usr/local/"
+      ELSEIF File( "/opt/gcc/bin/clang" )
+         s_sCLangFolder := "/opt/clang/"
+      ENDIF   
+
+      IF File( "/usr/bin/gcc" )
+         s_sGCCFolder := "/usr/"
+      ELSEIF File( "/usr/local/bin/gcc" )
+         s_sGCCFolder := "/usr/local/"
+      ELSEIF File( "/opt/gcc/bin/gcc" )
+         s_sGCCFolder := "/opt/gcc/"
+      ENDIF   
+
+      IF File( "/usr/bin/tcc" )
+         s_sTCCFolder := "/usr/"
+      ELSEIF File( "/usr/local/bin/tcc" )
+         s_sTCCFolder := "/usr/local/"
+      ELSEIF File( "/opt/gcc/bin/tcc" )
+         s_sTCCFolder := "/opt/tcc/"
+      ENDIF   
+
    #endif
 
 RETURN
@@ -4964,3 +5343,32 @@ RETURN
 FUNCTION AddEnvVar( cVar, cValue )
    s_hEnvVars[ cVar ] := cValue
 RETURN s_hEnvVars
+
+FUNCTION FoundCompiler( C_Compiler )
+   C_Compiler := Lower( C_Compiler )
+
+    DO CASE
+       CASE C_Compiler == "bcc"
+          RETURN s_sBCCFolder
+
+       CASE C_Compiler == "clang"
+          RETURN s_sClangFolder
+
+       CASE C_Compiler == "gcc"
+          RETURN s_sGCCFolder
+
+       CASE C_Compiler == "pocc"
+          RETURN s_sPOCCFolder
+
+       CASE C_Compiler == "tcc"
+          RETURN s_sTCCFolder
+
+       OTHERWISE
+          Throw( ErrorNew( "xBuild", 0, 1001, ProcName(), "unknown compiler: " + C_Compiler ) )         
+   ENDCASE
+
+RETURN NIL   
+
+
+ 
+   
