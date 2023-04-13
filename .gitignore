@@ -240,5 +240,8 @@ xbScript*.dll
 
 xbScript*.lib
 
-
 .DS_Store
+x/x.xcodeproj/*
+x/x.xcworkspace/*
+*.xcbkptlist
+*.plist
