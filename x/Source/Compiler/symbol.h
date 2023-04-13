@@ -40,7 +40,7 @@
    } SYMBOLTABLE;
         
    /* Initialize the hash table which makes up the symbol table. */   
-   SYMBOLTABLE * Symbol_InitTable();   
+   SYMBOLTABLE * Symbol_InitTable(void);   
       
    SYMBOL * Symbol_Put( SYMBOLTABLE *SymbolTable, char *Name, SYMBOL_KIND Kind, PARSER_CONTEXT *Parser_pContext );
    SYMBOL * Symbol_Get( SYMBOLTABLE *SymbolTable, char *Name, PARSER_CONTEXT *Parser_pContext );
