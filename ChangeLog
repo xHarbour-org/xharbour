@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-13 22:02 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+    * First ChangeLog entry after porting to GitHub and adding $Id tag. 
+  
 2022-11-18 23:30 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\direct.c
     ! fixed hb_fsDirectory() to work fine with lower drive name
