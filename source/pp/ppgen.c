@@ -670,8 +670,8 @@ static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCVS
 }
 
 static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
-                                 BOOL fQuiet, char * piSVNID, char * piSVNDateID,
-                                 char ** pszChangeLogID, char ** pszLastEntry )
+                                 BOOL fQuiet, char **pszGitFakeID, char **pszChgLogDateID,
+                                 char ** pszChangeLogGitHash, char **pszLastEntry )
 {
    int           iResult = 0;
    const char *  pszFile;
@@ -702,160 +702,78 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
    }
    else
    {
-      char    szLine[ 256 ];
-      char    szLine1[ 256 ];
-      char    szId[ 128 ];
-      char    szLog[ 128 ];
-      char *  szFrom, * szTo;
-      int     iLen;
-
-      *szId = *szLog = *szLine1 = '\0';
-
+      char szLine[ 256 ]             = { 0 };
+      char szChangeLogGitHash[ 256 ] = { 0 };
+      char szLastEntry[256]          = { 0 };
+      char szChgLogDateID[9]         = { 0 };
+      char szChgLogTimeID[5]         = { 0 };
+      char szGitFakeID[13]           = { 0 };
+      char *szFrom = NULL, *szTo = NULL, *szUTC = NULL;
+   
       do
       {
          if( ! fgets( szLine, sizeof( szLine ), file_in ) )
             break;
 
-         if( ! *szId )
+         if( szChangeLogGitHash[0] == 0 && ( szFrom = strstr( szLine, " $Id: " ) ) != NULL )
          {
-            szFrom = strstr( szLine, "$Id: " );
-            if( szFrom )
-            {
-               szFrom   += 5;
-               szTo     = strstr( szFrom, " $" );
+            szTo = strstr( szFrom + 1, " $" );
+            hb_strncpy( szChangeLogGitHash, szFrom + 6, szTo - szFrom - 6 );
 
-               if( szTo )
-               {
-                  *szTo = 0;
-               }
-
-               hb_strncpy( szId, szFrom, sizeof( szId ) - 1 );
-               hb_strncpy( szLine1, szLine + 1, sizeof( szLine1 ) - 1 );
-            }
+            //fprintf( stderr, "ChangeLog Git Hash: '%s'\n", szChangeLogGitHash );  
          }
-         else if( ! *szLog )
+         else if( szChgLogDateID[0] == 0 && ( szUTC = strstr( szLine, "UTC-" ) ) != NULL && szUTC - szLine >= 17 )
          {
-            if( szLine[ 4 ] == '-' && szLine[ 7 ] == '-' &&
-                szLine[ 10 ] == ' ' && szLine[ 13 ] == ':' )
-            {
-               //int iLen;
-               hb_strncpy( szLog, szLine, sizeof( szLog ) - 1 );
-               iLen = ( int ) strlen( szLog );
-               while( iLen-- && HB_ISSPACE( szLog[ iLen ] ) )
-                  szLog[ iLen ] = '\0';
-            }
+            hb_strncpy( szLastEntry, szLine, strlen(szLine) - 1 );
+
+            szChgLogDateID[0] = szLine[0];
+            szChgLogDateID[1] = szLine[1];
+            szChgLogDateID[2] = szLine[2];
+            szChgLogDateID[3] = szLine[3];
+            szChgLogDateID[4] = szLine[5];
+            szChgLogDateID[5] = szLine[6];
+            szChgLogDateID[6] = szLine[8];
+            szChgLogDateID[7] = szLine[9];
+            szChgLogDateID[8] = '\0';
+
+            //fprintf( stderr, "ChangeLog Date ID: '%s'\n", szChgLogDateID );
+
+            szChgLogTimeID[0] = szLine[11];
+            szChgLogTimeID[1] = szLine[12];
+            szChgLogTimeID[2] = szLine[14];
+            szChgLogTimeID[3] = szLine[15];
+            szChgLogTimeID[4] = '\0';
+
+            //fprintf( stderr, "ChangeLog Time ID: '%s'\n", szChgLogTimeID );
+
+            snprintf( szGitFakeID, sizeof( szGitFakeID ), "%s%s", szChgLogDateID, szChgLogTimeID );
+            //fprintf( stderr, "Git Fake ID: '%s'\n", szGitFakeID );
          }
       }
-      while( ! *szLog );
+      while( ! feof( file_in ) );
 
       fclose( file_in );
 
-      if( ! *szLog )
+      if( szChangeLogGitHash[0] == 0 && szChgLogDateID[0] == 0 && szChgLogTimeID[0] == 0 && szLastEntry[0] == 0 )
       {
          if( ! fQuiet )
-            fprintf( stderr, "Cannot find valid $Id end log entry in the %s file.\n", pszFile );
+            fprintf( stderr, "Invalid $Id or Change Log\'s format in file: '%s'.\n", pszFile );
+
          iResult = 1;
       }
       else
       {
-         char  _szId[ 6 ];
-         int   u = 0;
+         hb_pp_addDefine( pState, "HB_VER_LENTRY", szLastEntry );
+         *pszLastEntry = hb_strdup( szLastEntry );
 
-         hb_xmemset( _szId, 0, 6 );
-         *szLine           = '"';
-         hb_strncpy( szLine + 1, szLog, sizeof( szLine ) - 3 );
-         iLen              = ( int ) strlen( szLine );
-         szLine[ iLen ]    = '"';
-         szLine[ ++iLen ]  = '\0';
-         hb_pp_addDefine( pState, "HB_VER_LENTRY", szLine );
-         *pszLastEntry     = hb_strdup( szLog );
+         hb_pp_addDefine( pState, "HB_VER_CHLHASH", szChangeLogGitHash );
+         *pszChangeLogGitHash = hb_strdup( szChangeLogGitHash );
 
-         hb_strncpy( szLine + 1, szId, sizeof( szLine ) - 3 );
-         iLen              = ( int ) strlen( szLine );
-         szLine[ iLen ]    = '"';
-         szLine[ ++iLen ]  = '\0';
-         hb_pp_addDefine( pState, "HB_VER_CHLCVS", szLine );
-         *pszChangeLogID   = hb_strdup( szId );
+         hb_pp_addDefine( pState, "HB_VER_GITFAKEID", szGitFakeID );
+         *pszGitFakeID = hb_strdup( szGitFakeID );
 
-         szFrom            = strchr( szLine, ' ' );
-
-         if( szFrom )
-         {
-            while( *szFrom == ' ' )
-               ++szFrom;
-            iLen = 0;
-            while( ! HB_ISSPACE( szFrom[ iLen ] ) )
-            {
-               _szId[ u++ ] = szFrom[ iLen ];
-               ++iLen;
-            }
-            /*
-               Latest CVS version before migration to SVN:
-               ChangeLog,v 1.6768 2011/01/25 18:50:35 guerra000
-             */
-            if( iLen )
-            {
-#if 0
-               int iCurrentVersion = atoi( _szId ) + 6768;
-               sprintf( _szId, "%i", iCurrentVersion );
-               hb_strncpy( piSVNID, _szId, strlen( _szId ) );
-#else
-               hb_strncpy( piSVNID, _szId, u );
-#endif
-            }
-            else
-               _szId[ 0 ] = 0;
-         }
-
-         if( _szId[ 0 ] )
-         {
-            char szSVNDateID[ 10 ];
-            int  wLen = ( int ) strlen( szLine1 );
-            char *szDate = NULL;
-            iLen     = 0; u = 0;
-            *szSVNDateID ='\0';
-
-            do
-            {
-               if ( szLine1[ u ] == ' ' )
-                  iLen ++;
-
-               if ( iLen == 4 )
-               {
-                  iLen = u;
-                  szDate = szLine1 + iLen + 1;
-                  break;
-               }
-
-               ++u;
-            } while ( u < wLen );
-
-            iLen = 0;
-            u    = 0;
-
-            do
-            {
-               if (! ( szDate[ iLen ] == '-' ) )
-                  szSVNDateID[ u++ ] = szDate[ iLen ];
-
-               if ( szDate[ iLen ] == ' ' )
-                  break;
-
-               ++iLen;
-            } while( szDate [ iLen ] );
-
-            szSVNDateID[ u ] = 0;
-            hb_strncpy( piSVNDateID, szSVNDateID, u );
-
-            hb_pp_addDefine( pState, "HB_VER_BUILDDATE", szSVNDateID );
-            hb_pp_addDefine( pState, "HB_VER_CVSID", _szId );
-         }
-         else
-         {
-            if( ! fQuiet )
-               fprintf( stderr, "Unrecognized Id entry in the %s file.\n", pszFile );
-            iResult = 1;
-         }
+         hb_pp_addDefine( pState, "HB_VER_BUILDDATE", szChgLogDateID );
+         *pszChgLogDateID = hb_strdup( szChgLogDateID );
       }
    }
 
@@ -964,10 +882,12 @@ int main( int argc, char * argv[] )
    if( szFile )
    {
       hb_pp_init( pState, fQuiet, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
+      
       if( hb_pp_inFile( pState, szFile, TRUE, NULL, TRUE ) )
       {
-         char * szSVNID = ( char * ) hb_xgrab( 10 );
-         char * szSVNDateID = ( char * ) hb_xgrab( 10 );
+         char * szSVNID = NULL;
+         char * szSVNDateID = NULL;
+
          if( fWrite )
          {
             char        szFileName[ HB_PATH_MAX ];
@@ -983,7 +903,7 @@ int main( int argc, char * argv[] )
 
          if( fChgLog )
             iResult = hb_pp_parseChangelog( pState, szLogFile, fQuiet,
-                                            szSVNID, szSVNDateID, &szChangeLogID, &szLastEntry );
+                                            &szSVNID, &szSVNDateID, &szChangeLogID, &szLastEntry );
 
          if( iResult == 0 )
             iResult = hb_pp_preprocesfile( pState, szRuleFile, szWordFile );
@@ -992,8 +912,11 @@ int main( int argc, char * argv[] )
             iResult = hb_pp_generateVerInfo( szVerFile, szSVNID, szSVNDateID,
                                              szChangeLogID, szLastEntry );
 
-         hb_xfree( szSVNID );
-         hb_xfree( szSVNDateID );
+         if( szSVNID )
+            hb_xfree( szSVNID );
+
+         if( szSVNDateID )   
+            hb_xfree( szSVNDateID );
       }
       else
          iResult = 1;
