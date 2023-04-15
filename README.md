@@ -5,7 +5,7 @@ compatible with CA-Clipper 5.2e and 5.3c, and offers many modern language extens
 and extensive Run-time libraries.
 
                              Welcome to xHarbour
-                             ==================
+                             ===================
 
 xHarbour is a fork from the Harbour project <URL:http://harbour-project.org> -
 a free software compiler for the xBase superset language often
