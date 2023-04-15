@@ -3990,7 +3990,7 @@ PHB_ITEM hb_socketGetIFaces( int af, HB_BOOL fNoAliases )
                {
                   char * hwaddr = hb_getMAC( pifr->ifr_name );
                   if( hwaddr != NULL )
-                     hb_arraySetCPtr( pItem, HB_SOCKET_IFINFO_HWADDR, hwaddr );
+                     hb_arraySetCPtr( pItem, HB_SOCKET_IFINFO_HWADDR, hwaddr, strlen( hwaddr ) );
                }
 #  endif
             }

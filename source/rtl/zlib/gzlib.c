@@ -5,6 +5,13 @@
 
 #include "gzguts.h"
 
+#ifdef __APPLE__
+   #include <TargetConditionals.h>
+   #if TARGET_OS_MAC && !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
+      #include <unistd.h>
+   #endif
+#endif
+
 #if defined(__XCC__) || defined(__DMC__) || defined(__MINGW32CE__)
 #  define LSEEK lseek
 #elif defined(__POCC__)

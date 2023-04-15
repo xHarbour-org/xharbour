@@ -1,1 +1,39 @@
 .DS_Store
+
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+
+*.o
+*.a
+*.so
+*.obj
+*.lib
+*.exp
+*.dll
+*.exe
+*.pdb
+
+hbverbld.h
+ppword.c
+
+source/*/windows/*
+source/*/win/*
+source/*/darwin/*
+source/*/linux/*
+source/*/unix/*
+
+source/rdd/*/windows/*
+source/rdd/*/win/*
+source/rdd/*/darwin/*
+source/rdd/*/linux/*
+source/rdd/*/unix/*
+
+utils/*/windows/*
+utils/*/win/*
+utils/*/darwin/*
+utils/*/linux/*
+utils/*/unix/*

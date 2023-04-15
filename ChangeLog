@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-14 19:27 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * .gitignore
+     * Ignore build generated files.
+
+   * config/darwin/gcc.cf
+     - Removed -Wno-long-double from CFLAGS.
+     + Added -DHB_NO_DV_MEMCPY to CFLAGS.
+
+   * make_drw.sh
+      + Added Instructions as well as recommended EXPORTS for Darwin.
+
+   * source/rtl/hbsocket.c
+      ! Fixed compilation error on Darwin.
+
+   * source/rtl/zlib/gzlib.c
+   * source/rtl/zlib/gzread.c
+   * source/rtl/zlib/gzwrite.c
+     + Added missing include <unistd.h> for Darwin.
+
 2023-04-13 22:02 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
     * First ChangeLog entry after porting to GitHub and adding $Id tag. 
   

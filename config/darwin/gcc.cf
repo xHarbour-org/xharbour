@@ -30,7 +30,7 @@ CFLAGS = -fno-common -Wall -W
 
 # It's to avoid warning message generated when 'long double' is used
 # remove it if you have newer compiler version
-CFLAGS += -Wno-long-double
+CFLAGS += -DHB_NO_DV_MEMCPY
 
 ifeq ($(HB_LEX),SIMPLEX)
   CFLAGS += -DSIMPLEX
