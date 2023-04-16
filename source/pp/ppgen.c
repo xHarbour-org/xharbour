@@ -611,7 +611,10 @@ static int hb_pp_generateVerInfo( char * szVerFile, char * szCVSID, char * szCVS
       fprintf( fout, "\n#define __HBVERBLD_INCLUDED\n" );
 
       if( szCVSID )
-         fprintf( fout, "\n#define HB_VER_CVSID\t\t%s\n", szCVSID );
+      {
+         fprintf( fout, "\n#define HB_VER_GITFAKEID\t%s\n", szCVSID );
+         fprintf( fout, "#define HB_VER_CVSID\t\t%s\n", szCVSID );
+      }
 
       if( szCVSDateID )
       {
@@ -770,6 +773,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
          *pszChangeLogGitHash = hb_strdup( szChangeLogGitHash );
 
          hb_pp_addDefine( pState, "HB_VER_GITFAKEID", szGitFakeID );
+         hb_pp_addDefine( pState, "HB_VER_CVSID", szGitFakeID ); 
          *pszGitFakeID = hb_strdup( szGitFakeID );
 
          hb_pp_addDefine( pState, "HB_VER_BUILDDATE", szChgLogDateID );
@@ -882,7 +886,7 @@ int main( int argc, char * argv[] )
    if( szFile )
    {
       hb_pp_init( pState, fQuiet, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
-      
+
       if( hb_pp_inFile( pState, szFile, TRUE, NULL, TRUE ) )
       {
          char * szSVNID = NULL;

@@ -37,3 +37,5 @@ utils/*/win/*
 utils/*/darwin/*
 utils/*/linux/*
 utils/*/unix/*
+
+tests/*.c
