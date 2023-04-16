@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-16 14:10 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * .gitignore
+     + Added tests\*.c to ignore generated test files.
+   * source/pp/ppgen.c
+     + Added missing legacy #define HB_VER_CVSID 
+   * tests/Makefile
+     ! Fixed multiple errors in Makefile.
+   + tests/make_gnu.sh
+     + New script to build tests using GNU make.
+   * tests/test.prg
+     + Added sample use of HB_VER_CVSID and HB_VER_GITFAKEID
+
 2023-04-15 00:52 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * source/pp/ppgen.c
      * Modified to process new ChangeLog header after port to GIT from SVN
