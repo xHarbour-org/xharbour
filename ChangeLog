@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-20 12:38 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * source/rtl/traceprg.prg
+     * Added logic to retain original directory of tracefile.
+   * tests/make_gnu.sh
+     * Corrected missing name="xharbour"
+
 2023-04-16 14:10 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * .gitignore
      + Added tests\*.c to ignore generated test files.
