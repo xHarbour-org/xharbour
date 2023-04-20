@@ -1,5 +1,7 @@
 #!/bin/sh
 
+name="xharbour"
+
 if [ -z "$HB_ARCHITECTURE" ]; then
    if [ "$OSTYPE" = "msdosdjgpp" ]; then
       hb_arch="dos"
