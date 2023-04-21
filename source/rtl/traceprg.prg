@@ -58,20 +58,7 @@
 
 FUNCTION TraceLog( ... )
 
-#ifdef __PLATFORM__Windows
-   #define DRIVE_SEPARATOR ':'
-   #define DIR_SEPARATOR '\'
-#else
-   #define DRIVE_SEPARATOR ''
-   #define DIR_SEPARATOR '/'
-#endif
-   
-#ifdef __PLATFORM__Windows
-   STATIC s_Drive, s_Folder
-#else
-   STATIC s_Folder
-#endif
-
+   STATIC s_haFiles := Hash()
    LOCAL cFile, FileHandle, nLevel, ProcName, xParam
 
    IF ! Set( _SET_TRACE )
@@ -82,26 +69,18 @@ FUNCTION TraceLog( ... )
    nLevel := Set( _SET_TRACESTACK )
 
    // Make sure file will preserve original location if CurDir() is changed.
-   IF ! ( DIR_SEPARATOR $ cFile )
-#ifdef __PLATFORM__Windows
-      IF s_Drive == NIL
-         s_Drive  := DiskName()
-         s_Folder := IIF( Empty( CurDir() ), DIR_SEPARATOR, DIR_SEPARATOR + CurDir() + DIR_SEPARATOR )
-      ENDIF
-
-      cFile := s_Drive + DRIVE_SEPARATOR + s_Folder + cFile
-#else
-      IF s_Folder == NIL
-         s_Folder := IIF( Empty( CurDir() ), DIR_SEPARATOR, DIR_SEPARATOR + CurDir() + DIR_SEPARATOR )
-      ENDIF
-
-      cFile := s_Folder + cFile
+#ifdef __PLATFORM__Windows   
+   IF ! ( "\" $ cFile )
+#else   
+   IF ! ( "/" $ cFile )
 #endif   
+      IF hScan( s_haFiles, cFile ) == 0
+         cFile := cWithPath( cFile )
+         s_haFiles[ cFile ] := cFile
+      ELSE
+         cFile := s_haFiles[ cFile ]
+      ENDIF
    ENDIF
-
-   /* File() and FOpen()/FCreate() make different assumptions rgdg path,
-      so we have to make sure cFile contains path to avoid ambiguity */
-   cFile := cWithPath( cFile )
 
    IF File( cFile )
       FileHandle := FOpen( cFile, 1 )
