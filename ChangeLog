@@ -9,6 +9,10 @@
 */
 
 2023-04-20 11:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * source/pp/ppgen.c
+     * Fixed compiler warnings.
+     
+2023-04-20 11:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    + tests/tsttrace.prg
       + Added sample use of TraceLog().
 

@@ -711,16 +711,17 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
       char szChgLogDateID[9]         = { 0 };
       char szChgLogTimeID[5]         = { 0 };
       char szGitFakeID[13]           = { 0 };
-      char *szFrom = NULL, *szTo = NULL, *szUTC = NULL;
    
       do
       {
+         char *szFrom, *szUTC = NULL;
+
          if( ! fgets( szLine, sizeof( szLine ), file_in ) )
             break;
 
          if( szChangeLogGitHash[0] == 0 && ( szFrom = strstr( szLine, " $Id: " ) ) != NULL )
          {
-            szTo = strstr( szFrom + 1, " $" );
+            char *szTo = strstr( szFrom + 1, " $" );
             hb_strncpy( szChangeLogGitHash, szFrom + 6, szTo - szFrom - 6 );
 
             //fprintf( stderr, "ChangeLog Git Hash: '%s'\n", szChangeLogGitHash );  
