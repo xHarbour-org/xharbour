@@ -1,11 +1,11 @@
-.DS_Store
-
 # Ignore all
 *
 # Unignore all with extensions
 !*.*
 # Unignore all dirs
 !*/
+
+.DS_Store
 
 *.o
 *.a
@@ -39,3 +39,4 @@ utils/*/linux/*
 utils/*/unix/*
 
 tests/*.c
+tests/*.log

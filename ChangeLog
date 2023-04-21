@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-20 11:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   + tests/tsttrace.prg
+      + Added sample use of TraceLog().
+
 2023-04-20 19:30 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * source/rtl/traceprg.prg
      * Improved logic to retain original directory of tracefile.
