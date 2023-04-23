@@ -9,6 +9,90 @@
 */
 
 2023-04-20 11:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * .gitignore
+     + *.log|ppo|pp$ tests/*.c 
+     * make_drw.sh
+       * Added to C_USR "-Wno-invalid-source-encoding"
+   
+   * contrib/hbssl/err.c
+   * contrib/hbssl/ssl.c
+   * contrib/hbssl/sslciph.c
+   * contrib/rdd_ads/adsfunc.c
+   * source/common/hbwince.c
+   * source/odbc/odbc.c
+   * source/rtl/filesys.c
+   * source/rtl/fstemp.c
+     ! Fixed compiler warnings - Corrected char iniitialization from '\0' to 0
+
+   * include/hbapi.h
+   * source/compiler/comptool.c
+   * source/pp/ppgen.c
+     ! Fixed compiler warning - return value of hb_verCvsID() int to long long int
+
+   * include/set.ch
+     + Added missing constants: 
+         #define HB_SET_TRACESTACK_NONE    0
+         #define HB_SET_TRACESTACK_CURRENT 1
+         #define HB_SET_TRACESTACK_ALL     2
+   
+   * source/common/hbmem.c
+     * Protected with #ifndef HB_NO_DV_MEMCPY
+
+   * source/compiler/cmdcheck.c
+     * Fixed compiler warnings - apparent typo in bit masking: & ( 2 ^ 6 ) -> & ((1 << 6) - 1)
+
+   * source/compiler/harbour.sly
+     * Corrected deprecated %name-prefix "hb_comp_yy" to %define api.prefix {hb_comp_yy}
+
+   * source/ct/dattime2.c
+     ! Fixed compiler warning - Apparent typo, corrected: && to || 
+
+   * source/ct/disk.c
+      ! Fixed compiler warning - protected windows specific code with #ifdef HB_OS_WIN
+
+   * source/ct/files.c
+     ! Fixed compiler warning - added: HB_SYMBOL_UNUSED( szFile );
+
+   * source/ct/settime.c
+     ! Fixed compiler warning - commented unused variable: fResult
+
+   * source/macro/Makefile
+     - Removed -p hb_comp_yy from YACC_FLAGS
+   * source/macro/macro.slx
+     * Added #define YYSTYPE HB_MACRO_YYSTYPE
+   * source/macro/macro.y
+     * Fixed compiler warnings - Corrected deprecated %pure-parser to %define api.pure 
+       and %name-prefix "hb_macro_yy" to %define api.prefix {hb_macro_yy}
+   * source/macro/macroyy.c
+      * Fixed compiler warnings - corrected deprecated %name-prefix "hb_macro_yy" to %define api.prefix {hb_macro_yy}
+
+   * source/rdd/hbsix/sxtable.c
+     ! Fixed compiler warning - Apparent typo, corrected: || to &&
+
+   * source/rtl/filenet.c
+     ! Fixed compiler warning - %hu to %u and cast to void * by interim (intptr_t) cast
+
+   * source/rtl/gtcrs/gtcrs.c
+   * source/rtl/gttrm/gttrm.c
+     ! Fixed compiler warning - %hd to %d
+
+   * source/rtl/gtxwc/gtxwc.c
+     ! Fixed compiler warning - type cast to const char * and Commented un used variable: whiteColor
+   * source/rtl/pcre/pcre_study.c
+   * source/tip/cgi.prg
+   * source/vm/classes.c
+   * source/vm/cmdarg.c
+   * source/vm/hbservmt.c
+   * source/vm/itemapi.c
+   * tests/test.prg
+   * tests/tsttrace.prg
+   * tests/while.prg
+   * utils/hbfilere/hbfilere.c
+   * utils/misc/hbrc.c
+   * utils/xbscript/xbscript.prg
+   * winmake/makefile.gc
+   
+2023-04-20 11:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * source/pp/ppgen.c
      * Fixed compiler warnings.
      

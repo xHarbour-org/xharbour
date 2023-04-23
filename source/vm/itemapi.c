@@ -1429,6 +1429,8 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
 #  define HB_FINITE_DBL( d )  ( isfinite( d ) != 0 )
 #elif defined( __WATCOMC__ ) || defined( __BORLANDC__ ) || defined( _MSC_VER )
 #  define HB_FINITE_DBL( d )  ( _finite( d ) != 0 )
+#elif defined(__APPLE__)
+#  define HB_FINITE_DBL( d )  ( isfinite( d ) != 0 )
 #elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) || \
       defined( __LCC__ )
 #  define HB_FINITE_DBL( d )  ( finite( d ) != 0 )

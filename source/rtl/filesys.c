@@ -3766,7 +3766,7 @@ USHORT hb_fsCurDirBuff( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsCurDirBuff(%hu)", uiDrive ) );
 
-   pbyBuffer[ 0 ] = '\0';
+   pbyBuffer[ 0 ] = 0;
 
    /*
     * do not cover this code by HB_OS_HAS_DRIVE_LETTER macro
@@ -4294,7 +4294,7 @@ USHORT hb_fsCurDirBuffEx( USHORT uiDrive, char * pbyBuffer, HB_SIZE ulLen )
 
    HB_SYMBOL_UNUSED( uiDrive );
 
-   pbyBuffer[ 0 ] = '\0';
+   pbyBuffer[ 0 ] = 0;
 
 #if defined( HB_OS_WIN )
    {

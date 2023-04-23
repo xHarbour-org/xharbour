@@ -165,7 +165,7 @@ static int              ServiceStatus;
 #define SERVICE_RUNNING 3
 #endif
 
-void main( int argc, char * argv[] )
+int main( int argc, char * argv[] )
 {
 #if defined( HB_OS_WIN )
    char pModuleFile[501];
@@ -242,6 +242,8 @@ void main( int argc, char * argv[] )
    ServiceStatus = SERVICE_RUNNING;
    ServiceExecution();
 
+   HB_SYMBOL_UNUSED( argc );
+   HB_SYMBOL_UNUSED( argv );
    exit(0);
 
 #endif
@@ -788,7 +790,7 @@ static void filere_ExtOpen( PUSERSTRU pUStru, BYTE * szData )
       pUStru->ulBufAnswerLen = 35 + HB_LENGTH_ACK;
       pUStru->pBufAnswer = ( BYTE * ) fl_realloc( pUStru->pBufAnswer, pUStru->ulBufAnswerLen );
    }
-   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|\r\n", ( void * ) hFileHandle, hb_fsError() );
+   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|\r\n", ( void * )(intptr_t) hFileHandle, hb_fsError() );
    HB_PUT_BE_UINT32( pUStru->pBufAnswer, ulSize );
    filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulSize + HB_LENGTH_ACK );
 }
@@ -1114,7 +1116,7 @@ static void filere_SeekLarge( PUSERSTRU pUStru, BYTE* szData )
 
    ptr = hb_strToken( szData, ( ULONG ) strlen( ( char * ) szData ), 3, &ulSize );
    if( ulSize )
-      sscanf( ( char * ) ptr, "%lu", &uiFlags );
+      sscanf( ( char * ) ptr, "%hu", &uiFlags );
    else
       uiFlags = 0;
 
@@ -1276,7 +1278,7 @@ static void filere_GetFileAttributes( PUSERSTRU pUStru, BYTE* szData )
    }
    else
    {
-      ULONG ulLen = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%lu|\r\n", 0 );
+      ULONG ulLen = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%d|\r\n", 0 );
       HB_PUT_BE_UINT32( pUStru->pBufAnswer, ulLen );
       filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulLen + HB_LENGTH_ACK );
    }
@@ -1366,7 +1368,7 @@ static void filere_CreateTemp( PUSERSTRU pUStru, BYTE* szData  )
    }
 
    hFileHandle = hb_fsCreateTemp( pPaths, pDefExt, ulAttr, pFilename );
-   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|%s|\r\n", hFileHandle, hb_fsError(), pFilename );
+   ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|%s|\r\n", (void *)(intptr_t)hFileHandle, hb_fsError(), pFilename );
    HB_PUT_BE_UINT32( pUStru->pBufAnswer, ulSize );
    filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulSize + HB_LENGTH_ACK );
 }
@@ -1427,7 +1429,7 @@ static void filere_FindFirst( PUSERSTRU pUStru, BYTE* szData )
 
    pffind = hb_fsFindFirst( ( char * ) pFilename, ulAttr );
    if( pffind )
-      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%lu|%" PFHL "i|%lu|%8s|%hu|%s|\r\n", pffind, pffind->attr,
+      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%u|%" PFHL "i|%lu|%8s|%hu|%s|\r\n", pffind, pffind->attr,
                         pffind->size, pffind->lDate, pffind->szTime, hb_fsError(), pffind->szName );
    else
       ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%p|%hu|\r\n", pffind, hb_fsError() );
@@ -1457,10 +1459,10 @@ static void filere_FindNext( PUSERSTRU pUStru, BYTE* szData  )
    }
 
    if( hb_fsFindNext( pffind ) )
-      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%lu|%" PFHL "i|%lu|%8s|1|%hu|%s|\r\n", pffind->attr,
+      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%u|%" PFHL "i|%lu|%8s|1|%hu|%s|\r\n", pffind->attr,
                         pffind->size, pffind->lDate, pffind->szTime, hb_fsError(), pffind->szName );
    else
-      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%lu|%" PFHL "i|%lu|%8s|0|%hu|%s|\r\n", pffind->attr,
+      ulSize = sprintf( ( char * ) pUStru->pBufAnswer + HB_LENGTH_ACK, "+%u|%" PFHL "i|%lu|%8s|0|%hu|%s|\r\n", pffind->attr,
                         pffind->size, pffind->lDate, pffind->szTime, hb_fsError(), pffind->szName );
    HB_PUT_BE_UINT32( pUStru->pBufAnswer, ulSize );
    filere_SendSingleAnswer( pUStru, pUStru->pBufAnswer, ulSize + HB_LENGTH_ACK );
@@ -1491,7 +1493,7 @@ void filere_DelUser( PUSERSTRU pUStru )
 {
    filere_SendOkAnswer( pUStru );
 
-   printf( "LogOut user with IP %s at socket %p\r\n", pUStru->szAddr, pUStru->hSocket );
+   printf( "LogOut user with IP %s at socket %p\r\n", pUStru->szAddr, (void *)(intptr_t)(pUStru->hSocket) );
 
    hb_ip_rfd_clr( pUStru->hSocket );
    hb_ipclose( pUStru->hSocket );
@@ -1857,7 +1859,7 @@ void ServiceExecution( void )
                memcpy( pUStru->szAddr, szBuffer, lTemp );
                pUStru->szAddr[lTemp] = '\0';
                filere_SendAnswer( pUStru, ( BYTE * ) szBuffer, strlen( szBuffer ) );
-               printf( "LogIn user with IP %s at socket %p\r\n", pUStru->szAddr, incoming );
+               printf( "LogIn user with IP %s at socket %p\r\n", pUStru->szAddr, (void *)(intptr_t)incoming );
             }
          }
          filere_ScanUser();

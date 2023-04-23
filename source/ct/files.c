@@ -274,6 +274,7 @@ HB_FATTR hb_fsGetFileAttributes( const char * szFile )
 
    }
    #else
+   HB_SYMBOL_UNUSED( szFile );
    return ( HB_FATTR ) FA_ARCH;
    #endif
 }

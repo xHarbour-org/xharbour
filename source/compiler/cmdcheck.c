@@ -87,7 +87,7 @@ static ULONG PackDateTime( void )
    SYSTEMTIME  t;
    GetLocalTime( &t );
 
-   nValue         = ( BYTE ) ( ( t.wYear - 1980 ) & ( 2 ^ 6 ) );  /* 6 bits */
+   nValue         = ( BYTE ) ( ( t.wYear - 1980 ) & ((1 << 6) - 1) );  /* 6 bits */
    szString[ 0 ]  = nValue << 2;
    nValue         = ( BYTE ) ( t.wMonth );                        /* 4 bits */
    szString[ 0 ]  |= nValue >> 2;
@@ -111,7 +111,7 @@ static ULONG PackDateTime( void )
    time( &t );
    oTime          = localtime( &t );
 
-   nValue         = ( BYTE ) ( ( ( oTime->tm_year + 1900 ) - 1980 ) & ( 2 ^ 6 ) );  /* 6 bits */
+   nValue         = ( BYTE ) ( ( ( oTime->tm_year + 1900 ) - 1980 ) & ((1 << 6) - 1) );  /* 6 bits */
    szString[ 0 ]  = nValue << 2;
    nValue         = ( BYTE ) ( oTime->tm_mon + 1 );                                 /* 4 bits */
    szString[ 0 ]  |= nValue >> 2;

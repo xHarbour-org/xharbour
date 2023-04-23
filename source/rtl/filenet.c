@@ -729,7 +729,7 @@ PHB_FILE hb_fileNetExtOpen( const char * pFileName, const char * pDefExt,
       if( hSocket )
       {
          char  szData[ HB_PATH_MAX * 3 + 32 ];
-         int   nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%hu|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( char * ) "" ),
+         int   nSend = sprintf( szData + HB_LENGTH_ACK, "A|%s|%s|%u|%s|\r\n", pszFile, ( pDefExt ? pDefExt : ( char * ) "" ),
                                 uiExFlags, ( pPaths ? pPaths : ( char * ) "" ) );
          HB_PUT_BE_UINT32( szData, nSend );
 
@@ -2158,7 +2158,7 @@ HB_FUNC( NET_OPENCONNECTION )
 
 HB_FUNC( NET_CLOSECONNECTION )
 {
-   hb_NetCloseConnection( ( HB_SOCKET_T ) hb_parptr( 1 ) );
+   hb_NetCloseConnection( ( HB_SOCKET_T )(intptr_t) hb_parptr( 1 ) );
 }
 
 HB_FUNC( NET_SETBUFFERSIZE )

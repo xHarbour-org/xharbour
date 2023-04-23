@@ -143,7 +143,7 @@
   #include "thread.h"
 /* #endif */
 
-/* Compile using: bison -d -p hb_comp macro.y */
+/* Compile using: bison -d macro.y */
 
 /* to pacify some warnings in BCC */
 #if defined( __POCC__ )

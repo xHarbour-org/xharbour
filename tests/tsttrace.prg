@@ -1,7 +1,4 @@
 #include "set.ch"
-#define HB_SET_TRACESTACK_NONE    0
-#define HB_SET_TRACESTACK_CURRENT 1
-#define HB_SET_TRACESTACK_ALL     2
 
 PROCEDURE Main()
    
@@ -29,5 +26,7 @@ PROCEDURE Main()
    Set( _SET_TRACESTACK, nLevel )
 
    TraceLog( 3 )
+
+   Alert( "Done" )
 
 RETURN   

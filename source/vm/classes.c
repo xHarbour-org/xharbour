@@ -1255,7 +1255,7 @@ BOOL hb_clsHasMsg( USHORT uiClass, const char * szMsg )
 
             if( pMethod->uiScope & HB_OO_CLSTP_READONLY )
             {
-               if( pMethod->uiScope && HB_OO_CLSTP_PROTECTED )
+               if( pMethod->uiScope & HB_OO_CLSTP_PROTECTED )
                   return FALSE;
             }
          }

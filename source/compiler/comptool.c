@@ -626,7 +626,7 @@ int hb_setGetDirSeparator( void )
 }
 
 /* ChangeLog CVS revision number */
-int hb_verCvsID( void )
+long long int hb_verCvsID( void )
 {
    return HB_VER_CVSID;
 }

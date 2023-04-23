@@ -27,8 +27,11 @@ fi
 # brew install tcl-tk
 # brew install --cask xquartz
 
-export L_USR="-L/usr/local/opt/zlib/lib"
-export C_USR="-I/usr/local/opt/zlib/include"
+export C_USR="-Wno-invalid-source-encoding"
+export L_USR=""
+
+export C_USR="$C_USR -I/usr/local/opt/zlib/include"
+export L_USR="$L_USR -L/usr/local/opt/zlib/lib"
 
 export C_USR="$C_USR -I/usr/local/opt/openssl/include"
 export L_USR="$L_USR -L/usr/local/opt/openssl/lib"

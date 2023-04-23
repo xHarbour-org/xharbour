@@ -16,6 +16,9 @@
 *.dll
 *.exe
 *.pdb
+*.log
+*.ppo
+*.pp$
 
 hbverbld.h
 ppword.c
@@ -39,4 +42,3 @@ utils/*/linux/*
 utils/*/unix/*
 
 tests/*.c
-tests/*.log

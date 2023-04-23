@@ -83,7 +83,7 @@ void hb_service_ConsoleHandlerRoutineDestroyStack( PHB_STACK pStack )
 PHB_STACK hb_service_ConsoleHandlerRoutineInit( void )
 {
 #ifdef HB_THREAD_SUPPORT
-   PHB_STACK pStack = NULL;
+   //PHB_STACK pStack = NULL;
 
    /* we need a new stack: this is NOT an hb thread. */
 #ifdef HB_OS_WIN

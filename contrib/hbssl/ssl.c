@@ -853,7 +853,7 @@ HB_FUNC( SSL_GET_SHARED_CIPHERS )
       {
          char buffer[ 128 + 1 ]; /* See: CVE-2006-3738 */
 
-         buffer[ 0 ] = '\0';
+         buffer[ 0 ] = 0;
 
          hb_retc( SSL_get_shared_ciphers( ssl, buffer, sizeof( buffer ) - 1 ) );
       }

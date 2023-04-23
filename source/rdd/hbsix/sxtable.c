@@ -301,7 +301,7 @@ HB_FUNC( SX_SETPASS )
          }
       }
    }
-   else if( iPCount >= 2 || iPCount <= 4 )
+   else if( iPCount >= 2 && iPCount <= 4 )
    {
       if( ISCHAR( 1 ) && ISNUM( 2 ) && ( iPCount < 3 || ISCHAR( 3 ) ) &&
           ( iPCount < 4 || ISNUM( 4 ) ) )

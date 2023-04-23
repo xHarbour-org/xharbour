@@ -1557,7 +1557,7 @@ static void hb_gt_trm_LinuxSetCursorStyle( PHB_GTTRM pTerm, int iStyle )
       if( lcurs != -1 )
       {
          char escseq[ 64 ];
-         hb_snprintf( escseq, sizeof( escseq ), "\033[?25%c\033[?%hdc",
+         hb_snprintf( escseq, sizeof( escseq ), "\033[?25%c\033[?%dc",
                       iStyle == SC_NONE ? 'l' : 'h', lcurs );
          hb_gt_trm_termOut( pTerm,  escseq, strlen( escseq ) );
          pTerm->iCursorStyle = iStyle;

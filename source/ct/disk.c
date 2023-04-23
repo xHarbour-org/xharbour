@@ -232,12 +232,13 @@ HB_FUNC( VOLUME )
 {
    BOOL bReturn = FALSE;
 
+#if defined( HB_OS_WIN )
    if( ! ct_getsafety() )
    {
       PHB_FNAME    fname;
       const char * sDiskName;
-      char *       sRoot    = NULL;
-      char *       sVolName = NULL;
+      char *       sRoot;
+      char *       sVolName;
       char         sRootBuf[ 4 ], sVolNameBuf[ 12 ];
       char *       pszFree;
 
@@ -268,7 +269,6 @@ HB_FUNC( VOLUME )
          if( pszFree )
             hb_xfree( pszFree );
       }
-#if defined( HB_OS_WIN )
       {
          LPTSTR lpRoot, lpVolName;
          lpRoot      = sRoot ? HB_TCHAR_CONVTO( sRoot ) : NULL;
@@ -279,8 +279,8 @@ HB_FUNC( VOLUME )
          if( lpVolName )
             HB_TCHAR_FREE( lpVolName );
       }
-#endif
    }
+#endif
    hb_retl( bReturn );
 }
 

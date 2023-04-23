@@ -126,7 +126,7 @@ HB_FUNC( SETNEWDATE )
 
 HB_FUNC( SETNEWTIME )
 {
-	 BOOL  fResult = FALSE;
+	 //BOOL  fResult = FALSE;
 #if defined( HB_OS_WIN )
    {
       WORD        wNewHour, wNewMin, wNewSec;

@@ -1,3 +1,4 @@
+#ifndef HB_NO_DV_MEMCPY
 /*
  * $Id$
  */
@@ -532,3 +533,4 @@ HB_EXTERN_END    /* Added for xHarbour */
    The code is configured for an intel x86 target but it is easy to change
    configuration as desired.
  */
+#endif

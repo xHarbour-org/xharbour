@@ -2278,10 +2278,10 @@ static void hb_gt_xwc_WndProc( PXWND_DEF wnd, XEvent * evt )
 #ifndef HB_CDP_SUPPORT_OFF
          else if( req->target == s_atomUTF8String )
          {
-            HB_SIZE    ulLen    = hb_cdpStringInUTF8Length( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize );
+            HB_SIZE    ulLen    = hb_cdpStringInUTF8Length( wnd->hostCDP, FALSE, (const char *)(wnd->ClipboardData), wnd->ClipboardSize );
             BYTE *   pBuffer  = ( BYTE * ) hb_xgrab( ulLen + 1 );
 
-            hb_cdpStrnToUTF8( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );
+            hb_cdpStrnToUTF8( wnd->hostCDP, FALSE, (const char *)(wnd->ClipboardData), wnd->ClipboardSize, (char *) pBuffer );
 #ifdef XWC_DEBUG
             printf( "SelectionRequest: (%s)->(%s) [%s]\r\n", wnd->ClipboardData, pBuffer, wnd->hostCDP->id ); fflush( stdout );
 #endif
@@ -3205,7 +3205,7 @@ static void hb_gt_xwc_DestroyWndDef( PXWND_DEF wnd )
 
 static void hb_gt_xwc_CreateWindow( PXWND_DEF wnd )
 {
-   int         whiteColor, blackColor, i;
+   int         /*whiteColor,*/ blackColor, i;
    XSizeHints  xsize;
    XColor      color, dummy;
 
@@ -3247,7 +3247,7 @@ static void hb_gt_xwc_CreateWindow( PXWND_DEF wnd )
       }
    }
 
-   whiteColor  = WhitePixel( wnd->dpy, DefaultScreen( wnd->dpy ) );
+   //whiteColor  = WhitePixel( wnd->dpy, DefaultScreen( wnd->dpy ) );
    blackColor  = BlackPixel( wnd->dpy, DefaultScreen( wnd->dpy ) );
    wnd->window = XCreateSimpleWindow( wnd->dpy, DefaultRootWindow( wnd->dpy ),
                                       0, 0,

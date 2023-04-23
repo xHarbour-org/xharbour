@@ -2019,7 +2019,7 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
                                        &ulLength ) != AE_SUCCESS )
          {
             /* TODO: Better error handling. */
-            sBuffer[ 0 ] = '\0';
+            sBuffer[ 0 ] = 0;
             ulLength = 0;
          }
          hb_retclen( sBuffer, ulLength );

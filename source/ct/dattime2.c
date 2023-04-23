@@ -95,7 +95,7 @@ static int ct_daystomonth( int iMonth, BOOL bLeap )
    static const int iMonths[] =
    { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
-   return ( iMonth < 1 && iMonth > 12 ) ? 0 : iMonths[ iMonth - 1 ] +
+   return ( iMonth < 1 || iMonth > 12 ) ? 0 : iMonths[ iMonth - 1 ] +
           ( ( bLeap && iMonth > 2 ) ? 1 : 0 );
 }
 

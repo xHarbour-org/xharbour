@@ -1,4 +1,4 @@
-%name-prefix "hb_comp_yy"
+%define api.prefix {hb_comp_yy}
 
 %{
 /*

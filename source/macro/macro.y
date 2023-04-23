@@ -1,7 +1,7 @@
-%pure-parser
+%define api.pure
 %parse-param { PHB_MACRO pMacro }
 %lex-param   { PHB_MACRO pMacro }
-%name-prefix "hb_macro_yy"
+%define api.prefix {hb_macro_yy}
 
 %{
 /*
@@ -78,7 +78,7 @@
   #include "thread.h"
 /* #endif */
 
-/* Compile using: bison -d -p hb_comp macro.y */
+/* Compile using: bison -d macro.y */
 
 /* to pacify some warnings in BCC */
 #if defined( __POCC__ )

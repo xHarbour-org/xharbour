@@ -95,7 +95,7 @@ HB_FUNC( ERR_ERROR_STRING )
 {
    char buffer[ 120 + 1 ];
 
-   buffer[ 0 ] = '\0';
+   buffer[ 0 ] = 0;
 
    ERR_error_string_n( ( unsigned long ) hb_parnint( 1 ), buffer, sizeof( buffer ) );
 

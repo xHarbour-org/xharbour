@@ -145,6 +145,10 @@
 #define _SET_TRACESTACK       210 /* xHarbour extension */
 #define _SET_WORKAREAS_SHARED 211
 
+#define HB_SET_TRACESTACK_NONE    0
+#define HB_SET_TRACESTACK_CURRENT 1
+#define HB_SET_TRACESTACK_ALL     2
+
 #define HB_SET_XHB_BASE       200
 #define HB_SET_XHB_COUNT      12
 

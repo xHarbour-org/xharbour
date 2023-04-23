@@ -245,7 +245,7 @@ BOOL WINAPI GetProcessTimes( HANDLE hprocess,
 BOOL WINAPI GetUserNameA( LPSTR buffer, LPDWORD len )
 {
    if( len && buffer )
-      buffer[ 0 ] = '\0';
+      buffer[ 0 ] = 0;
 
    return FALSE;
 }
@@ -253,7 +253,7 @@ BOOL WINAPI GetUserNameA( LPSTR buffer, LPDWORD len )
 BOOL WINAPI GetComputerNameA( LPSTR buffer, LPDWORD len )
 {
    if( len && buffer )
-      buffer[ 0 ] = '\0';
+      buffer[ 0 ] = 0;
 
    return FALSE;
 }
@@ -261,7 +261,7 @@ BOOL WINAPI GetComputerNameA( LPSTR buffer, LPDWORD len )
 DWORD WINAPI GetCurrentDirectoryA( DWORD len, LPSTR buffer )
 {
    if( len && buffer )
-      buffer[ 0 ] = '\0';
+      buffer[ 0 ] = 0;
 
    return FALSE;
 }

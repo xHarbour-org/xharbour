@@ -292,7 +292,7 @@ static BOOL hb_fsTempName( char * pszBuffer, const char * pszDir, const char * p
              passed buffer. It will be needed to fix HB_PATH_MAX - 1 to be
              at least this large. */
 
-   pszBuffer[ 0 ] = '\0';
+   pszBuffer[ 0 ] = 0;
    fResult        = ( tmpnam( pszBuffer ) != NULL );
 
 #endif

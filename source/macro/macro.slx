@@ -238,6 +238,8 @@
                       x == NUM_DOUBLE     \
                     )
 
+#define YYSTYPE HB_MACRO_YYSTYPE
+
 static PHB_MACRO pMacro;
 static YYSTYPE *pYYLVAL;
 

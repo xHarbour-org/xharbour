@@ -225,7 +225,7 @@ int hb_setGetDirSeparator( void )
    return HB_OS_PATH_DELIM_CHR;
 }
 
-int hb_verCvsID( void )
+long long int hb_verCvsID( void )
 {
    return 0;
 }

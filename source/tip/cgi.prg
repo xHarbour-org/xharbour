@@ -435,6 +435,7 @@ STATIC FUNCTION HtmlTag( xVal, cKey )
 
    RETURN cVal
 
+#if 0
 STATIC FUNCTION HtmlAllTag( hTags, cSep )
 
    LOCAL cVal := ''
@@ -443,6 +444,7 @@ STATIC FUNCTION HtmlAllTag( hTags, cSep )
    hEval( hTags, { |k| cVal += HtmlTag( hTags, k ) + cSep } )
 
    RETURN cVal
+#endif
 
 STATIC FUNCTION HtmlOption( xVal, cKey, cPre, cPost, lScan )
 
@@ -493,6 +495,7 @@ STATIC FUNCTION HtmlValue( xVal, cKey, cDefault )
 
    RETURN cVal
 
+#if 0
 STATIC FUNCTION HtmlAllValue( hValues, cSep )
 
    LOCAL cVal := ''
@@ -503,6 +506,7 @@ STATIC FUNCTION HtmlAllValue( hValues, cSep )
    ENDIF
 
    RETURN cVal
+#endif
 
 STATIC FUNCTION HtmlScript( xVal, cKey )
 

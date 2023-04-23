@@ -6,7 +6,7 @@ HB_LEX := SIMPLEX
 
 ROOT = ../../
 
-YACC_FLAGS = -p hb_comp
+YACC_FLAGS = -d
 
 YACC_SOURCE=macro.y
 

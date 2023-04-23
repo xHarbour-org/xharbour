@@ -7874,6 +7874,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               #else
                  s_bArrayPrefix := .F.
               #endif
+
+              LOOP
            ENDIF
         ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%=\IN\=>\^^\>>\<<"
            sExp           += sNextToken
