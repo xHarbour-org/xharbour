@@ -356,8 +356,8 @@ int main( int argc, char * argv[] )
          GetLocalTime( &t );
 
          fprintf( h, "1 VERSIONINFO\n" );
-         fprintf( h, "FILEVERSION %d,%d,%d,%d\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
-         fprintf( h, "PRODUCTVERSION %d,%d,%d,%d\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
+         fprintf( h, "FILEVERSION %d,%d,%d,%lld\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
+         fprintf( h, "PRODUCTVERSION %d,%d,%d,%lld\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
 #if defined( __DMC__ )
          fprintf( h, "BEGIN\n" );
 #else

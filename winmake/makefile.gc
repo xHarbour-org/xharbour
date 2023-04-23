@@ -115,8 +115,8 @@ CLIBFLAGS     +=$(CC_DEFINES) $(INCLUDE_DIR) $(OPTFLAGS) $(C64FLAGS) $(CC_DEBUGF
 ifeq ($(HB_USE_BISON),1)
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbour.sly
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macro.y
-BISON_CMD1   =bison -v -p yy -d -o $@ $^
-BISON_CMD2   =bison -v -p hb_comp -d -o $@ $^
+BISON_CMD1   =bison -v -d -o $@ $^
+BISON_CMD2   =bison -v -d -o $@ $^
 else
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbouryy.c
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macroyy.c
