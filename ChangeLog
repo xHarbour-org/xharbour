@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-04-24 13:55 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * include/harboury.h
+   * include/macroy.h
+   * source/compiler/harbouryy.c
+   * source/macro/macroyy.c
+    * Refreshed with prebuilt using new versions of bison and flex.
+
+   * make_vc.bat
+     ! Fixed and added support for Visual Studio 2022
+
+   * source/vm/hbservmt.c
+     * Corrected last modification - moved pStack into #ifdef HB_OS_WIN
+
+   * winmake/mdir.bat
+     * Corrected restoration of %PATH%
+   
 2023-04-22 23:55 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * .gitignore
      + *.log|ppo|pp$ tests/*.c 

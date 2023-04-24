@@ -20,8 +20,11 @@
 *.ppo
 *.pp$
 
+pptable.c
 hbverbld.h
 ppword.c
+
+/obj/*
 
 source/*/windows/*
 source/*/win/*

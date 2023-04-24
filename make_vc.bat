@@ -11,7 +11,7 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-rem SET HB_ARCH=64
+REM SET HB_ARCH=64
 REM SET HB_WARNING_FLAGS=
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
@@ -26,9 +26,25 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
+SET _PATH=%PATH%
+
+IF "%HB_ARCH%"=="64" ( 
+   SET HB_VS_ARCH=x64
+) ELSE (
+
+   SET HB_VS_ARCH=x86
+)   
+
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC"   GOTO SET_VC2022EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC"        GOTO SET_VC2022E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\VC" GOTO SET_VC2022PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\VC"      GOTO SET_VC2022P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\VC"    GOTO SET_VC2022CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC"         GOTO SET_VC2022C
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\VC"   GOTO SET_VC2017EX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\VC"        GOTO SET_VC2017E
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\VC" GOTO SET_VC2017PX86
@@ -38,17 +54,67 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\Vc"      GOTO SET_VC2013
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"       GOTO SET_VC2008
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
+
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
    GOTO FIND_BISON
+
+:SET_VC2022EX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Vc
+   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
+   GOTO FIND_BISON
+
+:SET_VC2022E
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Vc
+   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
+   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
+   GOTO FIND_BISON
+
+:SET_VC2022PX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Vc
+   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Common7\Tools\
+   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
+   GOTO FIND_BISON
+
+:SET_VC2022P
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Vc
+   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Common7\Tools\
+   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
+   GOTO FIND_BISON
+
+:SET_VC2022CX86
+   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Vc
+   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Common7\Tools\
+   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
+   GOTO FIND_BISON
+
+:SET_VC2022C
+   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Vc
+   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\
+   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
+   GOTO FIND_BISON
+
 
 :SET_VC2017EX86
    CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
@@ -199,9 +265,14 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 
 REM echo "%CC_DIR%"
 REM echo "%RC_DIR%"
-SET _PATH=%PATH%
-IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
-set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
+
+if "%VSINSTALLDIR%"=="" (
+   IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
+   IF "%VCINSTALLDIR%"=="" (
+      set PATH="%CC_DIR%\bin;%VSCOMMONTOOLS%;%RC_DIR%;%BISON_DIR%;%~dp0bin;%PATH%"
+   )
+)
+
 REM echo %path%
 
 rem ============================================================================

@@ -642,8 +642,12 @@ SET HB_GT_LIB=
 SET LIBEXT=
 SET OBJEXT=
 SET DIR_SEP=
-SET PATH=%_PATH%
+
+setlocal enabledelayedexpansion
+set PATH=!_PATH:"=^"!
+endlocal
 SET _PATH=
+
 IF NOT "%LIBPREFIX%"=="" SET LIBPREFIX=
 IF NOT "%_PATH%"    =="" SET _PATH=
 IF NOT "%HB_MT%"    =="" SET HB_MT=
