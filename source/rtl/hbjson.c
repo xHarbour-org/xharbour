@@ -538,6 +538,8 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
          fNegExp = *szSource == '-';
          if( fNegExp )
             szSource++;
+         else if( *szSource == '+' )
+            szSource++;   
 
          while( *szSource >= '0' && *szSource <= '9' )
          {
@@ -552,6 +554,14 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
          if( fNegExp )
             iDec += iExp;
          dblValue = hb_numExpConv( dblValue, fNegExp ? iExp : -iExp );
+         
+         // If the exponent is positive and greater or equal to the number of digits after the decimal point, then the number is an integer.
+         if( ! fNegExp && iExp >= iDec )
+         {
+            nValue = ( HB_MAXINT ) dblValue;
+            fDbl = FALSE;
+            iDec = 0;
+         }
       }
 
       if( fDbl )

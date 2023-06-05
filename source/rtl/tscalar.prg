@@ -234,7 +234,7 @@ CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
    METHOD AsString()               INLINE ( Self ), ValToPrg( HB_QSelf() )
    METHOD Collect( bCollect )
    METHOD COPY()                   INLINE hCopy( Self, Hash() )
-   METHOD DeleteAt( nPos )         INLINE hDelat( Self, nPos )
+   METHOD DeleteAt( nPos )         INLINE hDelAt( Self, nPos )
    METHOD DO( bBlock )
    METHOD IndexOf( xValue )        INLINE hScan( Self, xValue )
    METHOD Init( nLen )             INLINE ::Size := iif( nLen == NIL, 0, nLen ), Self

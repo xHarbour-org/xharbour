@@ -1021,7 +1021,7 @@ RETURN
         aProcedure[2] += Chr( HB_P_ENDPROC )
      NEXT
 
-     IF hScan( s_hDynFuncLists, cID ) == 0
+     IF hGetPos( s_hDynFuncLists, cID ) == 0
         s_hDynFuncLists[ cID ] := pDynFunctions
      ENDIF
 
