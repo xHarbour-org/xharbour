@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-06-05 12:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   ! source/rtl/hbjson.c
+     ! Fixed to add optional support of '+' after the e/E in scientific notations.
+     * Improved to store a scientific notation which yields an integer as an xHarbour Integer instead of a Double.
+   * source/rtl/tscalar.prg
+     * Minor case correction hDelat() -> hDelAt()
+   ! utils/xbscript/xbscript.prg
+     Fixed typo hScan() -> hGetPos()
+   + tests/tstjson.prg  
+     + New sample of hb_jsonEncode() and hb_jsonDecode()
+
 2023-04-24 13:55 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * include/harboury.h
    * include/macroy.h
