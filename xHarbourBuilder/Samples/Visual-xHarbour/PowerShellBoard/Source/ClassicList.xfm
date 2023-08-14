@@ -1,0 +1,70 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS ClassicList INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD ClassicList_OnLoad()
+   METHOD FillData()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS ClassicList
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "ClassicList_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "FillData"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "ClassicList"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 700
+   ::Height               := 500
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "Classic Process List"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS ClassicList
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "MyListBox"
+      WITH OBJECT :Font
+         :FaceName             := "Courier New"
+         :Pointsize            := 12
+      END
+
+      :VertScroll           := .T.
+      :HorzScroll           := .T.
+      WITH OBJECT :Dock
+         :Left                 := "ClassicList"
+         :Top                  := "ClassicList"
+         :Right                := "ClassicList"
+         :Bottom               := "ClassicList"
+      END
+
+      :Left                 := 19
+      :Top                  := 15
+      :Width                := 600
+      :Height               := 393
+      :VertScrollSize       := 76
+      :HorzScrollSize       := 76
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :Create()
+   END //LISTBOX
+
+RETURN Self
+

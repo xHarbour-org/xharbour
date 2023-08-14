@@ -1,0 +1,58 @@
+#ifdef __PP__
+ #include "wsh.ch" 
+#endif
+
+#define cUserName   "Username-to-login-into-smtp-server"
+#define cPassword   "Password-to-login-into-smtp-server"
+#define cSMTPServer "SMTP-server-address-or-ip"
+
+#define cFrom       "me@me.com"
+#define cTo         "myfriend@friend.com"
+#define cSubject    "Modified XBS file"
+#define cBody       "Test Message"
+
+PROCEDURE Main
+
+LOCAL oMessage, oConf, oFields
+LOCAL cMS := "http://schemas.microsoft.com/cdo/configuration/"
+
+TRY
+
+  oMessage := CreateObject("CDO.Message")
+  oConf    := CreateObject("CDO.Configuration")
+  oFields  := oConf:Fields
+
+  With Object oFields
+   :Item(cMS + "smtpconnectiontimeout") := "20"
+   :Item(cMS + "smtpauthenticate")      := 1  // 1 = Plain Text authentication
+   :Item(cMS + "sendusername")          := cUserName
+   :Item(cMS + "smtpserverport")        := "25"
+   :Item(cMS + "sendpassword")          := cPassword
+   :Item(cMS + "sendusing")             := 2  // 2 = Remote Server
+   :Item(cMS + "smtpserver")            := cSMTPServer
+   :Item(cMS + "smtpusessl")            := "False"
+   :Update()
+  End
+
+  With Object oMessage
+   :Configuration := oConf
+   :To            := cTo
+   :From          := cFrom
+   :Subject       := cSubject
+   :TextBody      := cBody
+   :Send()
+  End
+
+  ? "Mail sent!"
+
+CATCH oErr
+
+  ? oErr:Description+'  '+oErr:Subsystem+'-'+AllTrim(Str(oErr:SubCode))+'  '+oErr:Operation
+
+END
+
+oMessage := NIL
+oConf    := NIL
+oFields  := NIL
+
+RETURN

@@ -1,0 +1,1541 @@
+/*
+ * ClipNet Project source code:
+ * Lexer definitions file.
+ *
+ * Copyright 2001 Ron Pinkas <ron@xharbour.com>
+ * www - http://www.RonPinkas.com
+ *
+ */
+
+//#define SHOW_LEX_TOKENS
+//#define DEBUG_LEX
+
+#include <ctype.h>
+
+#include "common.h"
+
+#define SLX_NUM_DOUBLE 0
+#define SLX_NUM_LONG   1
+
+#define SLX_INLINE_MAX 255
+
+#ifdef DEBUG_LEX
+   #undef DEBUG_INFO
+      #define DEBUG_INFO(x) x
+#endif
+
+#undef LEX_ABBREVIATE
+   #define LEX_ABBREVIATE 4
+
+#define IS_OP( x ) (                          \
+                      x == TOKEN_INASSIGN  || \
+                      x == TOKEN_EQ        || \
+                      x == TOKEN_BITSHIFTL || \
+                   /* x == TOKEN_LE        || */ \
+                      x == TOKEN_NE        || \
+                   /* x == TOKEN_GE        || */ \
+                      x == TOKEN_BITSHIFTR || \
+                   /* x == TOKEN_NE2       || */ \
+                      x == TOKEN_INC       || \
+                      x == TOKEN_PLUSEQ    || \
+                      x == TOKEN_DEC       || \
+                      x == TOKEN_MINUSEQ   || \
+                      x == TOKEN_ALIAS     || \
+                      x == TOKEN_HASH      || \
+                      x == TOKEN_MULTEQ    || \
+                   /* x == TOKEN_POWER     || */ \
+                      x == TOKEN_DIVEQ     || \
+                      x == TOKEN_EXPEQ     || \
+                      x == TOKEN_BITXOR    || \
+                      x == TOKEN_MODEQ     || \
+                      strchr( "+-*/^<>=#!\242\243~?", x ) || \
+                      x == /* TOKEN_LIKE || TOKEN_MATCH || */ TOKEN_STEP || x == TOKEN_TO || x == TOKEN_IN \
+                   )
+
+static int iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
+
+static unsigned char iIdentifier = 0;
+static char *sIdOnHold, *s_sLastBlock = NULL;
+
+static char *sTextFunction, *sTextReset;
+
+char * SLX_LastBlock( BOOL bReset );
+
+static long SLX_Hex2L( char* sHex, DEF_CARGO );
+static int  SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO );
+static int  SLX_InterceptAction( int iRet, DEF_CARGO );
+static int  SLX_CustomAction( int x, DEF_CARGO );
+
+char *SLX_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
+                             "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
+                             "\x20", "\x21", "\x22", "\x23", "\x24", "\x25", "\x26", "\x27", "\x28", "\x29", "\x2A", "\x2B", "\x2C", "\x2D", "\x2E", "\x2F",
+                             "\x30", "\x31", "\x32", "\x33", "\x34", "\x35", "\x36", "\x37", "\x38", "\x39", "\x3A", "\x3B", "\x3C", "\x3D", "\x3E", "\x3F",
+                             "\x40", "\x41", "\x42", "\x43", "\x44", "\x45", "\x46", "\x47", "\x48", "\x49", "\x4A", "\x4B", "\x4C", "\x4D", "\x4E", "\x4F",
+                             "\x50", "\x51", "\x52", "\x53", "\x54", "\x55", "\x56", "\x57", "\x58", "\x59", "\x5A", "\x5B", "\x5C", "\x5D", "\x5E", "\x5F",
+                             "\x60", "\x61", "\x62", "\x63", "\x64", "\x65", "\x66", "\x67", "\x68", "\x69", "\x6A", "\x6B", "\x6C", "\x6D", "\x6E", "\x6F",
+                             "\x70", "\x71", "\x72", "\x73", "\x74", "\x75", "\x76", "\x77", "\x78", "\x79", "\x7A", "\x7B", "\x7C", "\x7D", "\x7E", "\x7F",
+                             "\x80", "\x81", "\x82", "\x83", "\x84", "\x85", "\x86", "\x87", "\x88", "\x89", "\x8A", "\x8B", "\x8C", "\x8D", "\x8E", "\x8F",
+                             "\x90", "\x91", "\x92", "\x93", "\x94", "\x95", "\x96", "\x97", "\x98", "\x99", "\x9A", "\x9B", "\x9C", "\x9D", "\x9E", "\x9F",
+                             "\xA0", "\xA1", "\xA2", "\xA3", "\xA4", "\xA5", "\xA6", "\xA7", "\xA8", "\xA9", "\xAA", "\xAB", "\xAC", "\xAD", "\xAE", "\xAF",
+                             "\xB0", "\xB1", "\xB2", "\xB3", "\xB4", "\xB5", "\xB6", "\xB7", "\xB8", "\xB9", "\xBA", "\xBB", "\xBC", "\xBD", "\xBE", "\xBF",
+                             "\xC0", "\xC1", "\xC2", "\xC3", "\xC4", "\xC5", "\xC6", "\xC7", "\xC8", "\xC9", "\xCA", "\xCB", "\xCC", "\xCD", "\xCE", "\xCF",
+                             "\xD0", "\xD1", "\xD2", "\xD3", "\xD4", "\xD5", "\xD6", "\xD7", "\xD8", "\xD9", "\xDA", "\xDB", "\xDC", "\xDD", "\xDE", "\xDF",
+                             "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
+                             "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
+
+/* -----------------------------------------------------  Language Definitions. ---------------------------------------------------- */
+
+/* Delimiters. */
+ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
+
+// Last used values - here for file compare.
+#define SLX_TRUE    LEX_CUSTOM_ACTION - 33
+#define SLX_FALSE   LEX_CUSTOM_ACTION - 34
+
+#define SLX_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
+
+ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
+                                     LEX_DELIMITER( ','  ) AS_TOKEN( ',' ),
+                                     LEX_DELIMITER( '('  ) AS_TOKEN( '(' ),
+                                     LEX_DELIMITER( ')'  ) AS_TOKEN( ')' ),
+                                     LEX_DELIMITER( '['  ) AS_TOKEN( '[' ),
+                                     LEX_DELIMITER( ']'  ) AS_TOKEN( ']'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '}'  ) AS_TOKEN( '}'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( ':'  ) AS_TOKEN( ':' ),
+                                     LEX_DELIMITER( '='  ) AS_TOKEN( '=' ),
+                                     LEX_DELIMITER( '#'  ) AS_TOKEN( '#' ),
+                                     LEX_DELIMITER( '@'  ) AS_TOKEN( '@' ),
+                                     LEX_DELIMITER( '<'  ) AS_TOKEN( '<'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '>'  ) AS_TOKEN( '>'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '!'  ) AS_TOKEN( TOKEN_NOT      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '{'  ) AS_TOKEN( SLX_CHK_BLOCK        ),
+                                     LEX_DELIMITER( '\\' ) AS_TOKEN( TOKEN_CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
+                                     LEX_DELIMITER( '|'  ) AS_TOKEN( TOKEN_BITOR    + DONT_REDUCE ),
+                                     LEX_DELIMITER( '^'  ) AS_TOKEN( '^'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '%'  ) AS_TOKEN( '%'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '*'  ) AS_TOKEN( '*'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '/'  ) AS_TOKEN( '/'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '+'  ) AS_TOKEN( '+'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '-'  ) AS_TOKEN( '-'            + DONT_REDUCE ),
+                                     LEX_DELIMITER( '$'  ) AS_TOKEN( '$'            + DONT_REDUCE )
+                                   };
+
+/* Custom Intermediate Token needed to be expanded. */
+#define SLX_LIT_ACT      LEX_CUSTOM_ACTION - 2
+
+/* Stream Pairs. */
+DEFINE_STREAM_AS_ONE_OF_THESE {
+                                START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                                START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(SLX_LIT_ACT),
+                              };
+
+START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
+
+
+#define SLX_SELF    LEX_CUSTOM_ACTION - 4
+
+
+SELF_CONTAINED_WORDS_ARE {
+                           LEX_WORD( ".AND." ) AS_TOKEN( TOKEN_AND        + DONT_REDUCE ),
+                           LEX_WORD( ".F."   ) AS_TOKEN( SLX_FALSE        ),
+                           LEX_WORD( ".N."   ) AS_TOKEN( SLX_FALSE        ),
+                           LEX_WORD( ".NOT." ) AS_TOKEN( TOKEN_NOT        + DONT_REDUCE ),
+                           LEX_WORD( ".OR."  ) AS_TOKEN( TOKEN_OR         + DONT_REDUCE ),
+                           LEX_WORD( ".T."   ) AS_TOKEN( SLX_TRUE         ),
+                           LEX_WORD( ".Y."   ) AS_TOKEN( SLX_TRUE         ),
+                           LEX_WORD( ":="    ) AS_TOKEN( TOKEN_INASSIGN   ),
+                           LEX_WORD( "::"    ) AS_TOKEN( SLX_SELF          ),
+                           LEX_WORD( "=="    ) AS_TOKEN( TOKEN_EQ         + DONT_REDUCE ),
+                           LEX_WORD( "=>"    ) AS_TOKEN( TOKEN_HASH       + DONT_REDUCE ),
+                           LEX_WORD( "<<"    ) AS_TOKEN( TOKEN_BITSHIFTL  + DONT_REDUCE ),
+                           LEX_WORD( "<="    ) AS_TOKEN( '\243'              + DONT_REDUCE ),
+                           LEX_WORD( "<>"    ) AS_TOKEN( TOKEN_NE         + DONT_REDUCE ),
+                           LEX_WORD( ">="    ) AS_TOKEN( '\242'              + DONT_REDUCE ),
+                           LEX_WORD( ">>"    ) AS_TOKEN( TOKEN_BITSHIFTR  + DONT_REDUCE ),
+                           LEX_WORD( "!="    ) AS_TOKEN( TOKEN_NE         + DONT_REDUCE ),
+                           LEX_WORD( "++"    ) AS_TOKEN( TOKEN_INC        ),
+                           LEX_WORD( "+="    ) AS_TOKEN( TOKEN_PLUSEQ     ),
+                           LEX_WORD( "--"    ) AS_TOKEN( TOKEN_DEC        ),
+                           LEX_WORD( "-="    ) AS_TOKEN( TOKEN_MINUSEQ    ),
+                           LEX_WORD( "->"    ) AS_TOKEN( TOKEN_ALIAS    ),
+                           LEX_WORD( "*="    ) AS_TOKEN( TOKEN_MULTEQ     ),
+                           LEX_WORD( "**"    ) AS_TOKEN( '^'              + DONT_REDUCE ),
+                           LEX_WORD( "/="    ) AS_TOKEN( TOKEN_DIVEQ      ),
+                           LEX_WORD( "^="    ) AS_TOKEN( TOKEN_EXPEQ      ),
+                           LEX_WORD( "^^"    ) AS_TOKEN( TOKEN_BITXOR     + DONT_REDUCE ),
+                           LEX_WORD( "%="    ) AS_TOKEN( TOKEN_MODEQ      )
+                         };
+
+/* Intermediate KeyWords when ambigious. */
+#define DO_WHILE         701
+#define DO_WHILE_WITH    702
+
+/* KEYWORDS are grouped based on the next token they require. */
+#define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
+#define WANTS_ID         704 /* Wants TOKEN_IDENTIFIER: ANNOUNCE, CRITICAL_*, ENUM, EXIT_*, EXTERN, FIELD, INIT_*, FUNC, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
+#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
+#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
+#define REJECT_OP        707
+
+#define SLX_TEXT          708
+
+#define SLX_WANTS_VAR     LEX_CUSTOM_ACTION - 512
+#define SLX_WANTS_ID      LEX_CUSTOM_ACTION - 1024
+#define SLX_WANTS_EOL     LEX_CUSTOM_ACTION - 1536
+#define SLX_WANTS_EXP     LEX_CUSTOM_ACTION - 2048
+
+/* WORDS can NOT use SLX_WANTS_EXP, instead must use SLX_AFTER_EXP. */
+#define SLX_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* LIKE, MATCH, STEP, TO */
+
+/* When 2 TOKEN_IDENTIFIERs are correct syntax like in class declaration, we have to temporarily store the 2nd TOKEN_IDENTIFIER. */
+#define SLX_ID_ON_HOLD    LEX_CUSTOM_ACTION -  5
+
+#define SLX_MACRO_ERR     LEX_CUSTOM_ACTION -  6
+
+//#define SLX_CRITICAL_FUNC        LEX_CUSTOM_ACTION -  7
+//#define SLX_CRITICAL_PROC        LEX_CUSTOM_ACTION -  8
+//#define SLX_CRITICAL_STATIC_FUNC LEX_CUSTOM_ACTION -  9
+//#define SLX_CRITICAL_STATIC_PROC LEX_CUSTOM_ACTION - 10
+//#define SLX_EXIT_FUNC            LEX_CUSTOM_ACTION - 11
+//#define SLX_EXIT_PROC            LEX_CUSTOM_ACTION - 12
+//#define SLX_INIT_FUNC            LEX_CUSTOM_ACTION - 13
+//#define SLX_INIT_PROC            LEX_CUSTOM_ACTION - 14
+//#define SLX_STATIC_FUNC          LEX_CUSTOM_ACTION - 15
+//#define SLX_STATIC_PROC          LEX_CUSTOM_ACTION - 16
+
+#define SLX_DO_CASE_ID    LEX_CUSTOM_ACTION - 17
+
+#define SLX_DO_WHILE_ID   LEX_CUSTOM_ACTION - 18
+#define SLX_DO_WHILE_WITH LEX_CUSTOM_ACTION - 19
+
+#define _WITH_ID_CR       LEX_CUSTOM_ACTION - 20
+#define _WITH_ID_SEMI     LEX_CUSTOM_ACTION - 21
+
+#define SLX_IN            LEX_CUSTOM_ACTION - 22
+#define SLX_WITH          LEX_CUSTOM_ACTION - 23
+
+/* When reservered words are used as TOKEN_IDENTIFIER. */
+#define SLX_IDENTIFIER    LEX_CUSTOM_ACTION - 24
+
+#define SLX_INLINE        LEX_CUSTOM_ACTION - 25
+
+#define SLX_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
+#define SLX_TEXT_LINE     LEX_CUSTOM_ACTION - 27
+#define SLX_NEXT_LINE     LEX_CUSTOM_ACTION - 28
+
+#define SLX_TEXT_ID       LEX_CUSTOM_ACTION - 29
+
+#define SLX_QSELF         LEX_CUSTOM_ACTION - 30
+
+#define SLX_FIELD_ALIAS   LEX_CUSTOM_ACTION - 31
+
+#define SLX_IIF_OPEN      LEX_CUSTOM_ACTION - 32
+
+#define USE_KEYWORDS
+
+/* Key Words. */
+LANGUAGE_KEY_WORDS_ARE {
+                         LEX_WORD( "ANNOUNCE"                        ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_ANNOUNCE         ),
+                         LEX_WORD( "BEGIN{WS}SEQUENCE"               ) AS_TOKEN( TOKEN_BEGINSEQ         ),
+                         LEX_WORD( "BREAK"                           ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_BREAK            ),
+                         LEX_WORD( "CASE"                            ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_CASE             ),
+                         LEX_WORD( "CATCH"                           ) AS_TOKEN( TOKEN_CATCH            ),
+                         LEX_WORD( "CRITICAL{WS}FUNCTION"            ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_CRITICAL_FUNC    ),
+                         LEX_WORD( "CRITICAL{WS}PROC"                ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_CRITICAL_PROC    ),
+                         LEX_WORD( "CRITICAL{WS}STATIC{WS}FUNCTION"  ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_CRITICAL_STATIC_FUNC ),
+                         LEX_WORD( "CRITICAL{WS}STATIC{WS}PROCEDURE" ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_CRITICAL_STATIC_PROC ),
+                         LEX_WORD( "DECLARE"                         ) AS_TOKEN( TOKEN_DECLARE          ),
+                         LEX_WORD( "DEFAULT"                         ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_DEFAULT          ),
+                         LEX_WORD( "DO"                              ) AS_TOKEN( SLX_WANTS_VAR - TOKEN_DO               ),
+                         LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( TOKEN_DOCASE           ),
+                         LEX_WORD( "DO{WS}WHILE"                     ) AS_TOKEN( DO_WHILE         ),
+                         LEX_WORD( "DO{WS}WHILE{WS}WITH"             ) AS_TOKEN( DO_WHILE_WITH    ),
+                         LEX_WORD( "ELSE"                            ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_ELSE             ),
+                         LEX_WORD( "ELSEIF"                          ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_ELSEIF           ),
+                         LEX_WORD( "END"                             ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_END              ),
+                         LEX_WORD( "ENDCASE"                         ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_ENDCASE          ),
+                         LEX_WORD( "ENDDO"                           ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_ENDDO            ),
+                         LEX_WORD( "ENDIF"                           ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_ENDIF            ),
+                         LEX_WORD( "ENUMERATION"                     ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_ENUM             ),
+                         LEX_WORD( "EXIT"                            ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_EXIT             ),
+                         LEX_WORD( "EXIT{WS}FUNC"                    ) AS_TOKEN( TOKEN_EXIT_FUNC     ),
+                         LEX_WORD( "EXIT{WS}PROCEDURE"               ) AS_TOKEN( TOKEN_EXIT_PROC     ),
+                         LEX_WORD( "EXTERNAL"                        ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_EXTERN           ),
+                         LEX_WORD( "FIELD"                           ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_FIELD            ),
+                         LEX_WORD( "FINALLY"                         ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_FINALLY          ),
+                         LEX_WORD( "FOR"                             ) AS_TOKEN( SLX_WANTS_VAR - TOKEN_FOR              ),
+                         LEX_WORD( "FOR{WS}EACH"                     ) AS_TOKEN( TOKEN_FOREACH                          ),
+                         LEX_WORD( "FUNCTION"                        ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_FUNC             ),
+                         LEX_WORD( "GLOBAL"                          ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_GLOBAL           ),
+                         LEX_WORD( "GLOBAL{WS}EXTERNAL"              ) AS_TOKEN( TOKEN_EXTERNGLOBAL  ),
+                         LEX_WORD( "IF"                              ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_IF               ),
+                         LEX_WORD( "INIT{WS}FUNCTION"                ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_INIT_FUNC        ),
+                         LEX_WORD( "INIT{WS}PROCEDURE"               ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_INIT_PROC        ),
+                         LEX_WORD( "LOCAL"                           ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_LOCAL            ),
+                         LEX_WORD( "LOOP"                            ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_LOOP             ),
+                         LEX_WORD( "MEMVAR"                          ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_MEMVAR           ),
+                         LEX_WORD( "NEXT"                            ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_NEXT             ),
+                         LEX_WORD( "OTHERWISE"                       ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_OTHERWISE        ),
+                         LEX_WORD( "PARAMETERS"                      ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_PARAMETERS       ),
+                         LEX_WORD( "PRIVATE"                         ) AS_TOKEN( SLX_WANTS_VAR - TOKEN_PRIVATE          ),
+                         LEX_WORD( "PROCEDURE"                       ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_PROC             ),
+                         LEX_WORD( "PUBLIC"                          ) AS_TOKEN( SLX_WANTS_VAR - TOKEN_PUBLIC           ),
+                         LEX_WORD( "RECOVER"                         ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_RECOVER          ),
+                         LEX_WORD( "RECOVER{WS}USING"                ) AS_TOKEN( TOKEN_RECOVERUSING     ),
+                         LEX_WORD( "RETURN"                          ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_RETURN           ),
+                         LEX_WORD( "STATIC"                          ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_STATIC           ),
+                         LEX_WORD( "STATIC{WS}FUNCTION"              ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_STATIC_FUNC      ),
+                         LEX_WORD( "STATIC{WS}PROCEDURE"             ) AS_TOKEN( SLX_WANTS_ID  - TOKEN_STATIC_PROC      ),
+                         LEX_WORD( "SWITCH"                          ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_SWITCH           ),
+                         LEX_WORD( "TEXT"                            ) AS_TOKEN( SLX_TEXT          ),
+                         LEX_WORD( "TRY"                             ) AS_TOKEN( SLX_WANTS_EOL - TOKEN_TRY             ),
+                         LEX_WORD( "WHILE"                           ) AS_TOKEN( SLX_WANTS_EXP - TOKEN_WHILE            ),
+                         LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( TOKEN_WITHOBJ          ),
+                         LEX_WORD( "_CLASS"                          ) AS_TOKEN( TOKEN_DECLARE_CLASS    ),
+                         LEX_WORD( "_MEMBER"                         ) AS_TOKEN( TOKEN_DECLARE_MEMBER   ),
+                         LEX_WORD( "_PROCREQ_"                       ) AS_TOKEN( TOKEN_PROCREQ          )
+                       };
+
+/* Intermediate Words when ambigious. */
+#define QSELF     801
+#define _LINE_    802
+
+/* Words. */
+LANGUAGE_WORDS_ARE {
+                     LEX_WORD( "..."                              ) AS_TOKEN( TOKEN_EPSILON            + DONT_REDUCE ),
+
+                     LEX_WORD( "AS{WS}ANYTYPE"                    ) AS_TOKEN( TOKEN_AS_VARIANT         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY"                      ) AS_TOKEN( TOKEN_AS_ARRAY           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ANYTYPE"     ) AS_TOKEN( TOKEN_AS_ARRAY           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ARRAY"       ) AS_TOKEN( TOKEN_AS_ARRAY_ARRAY     + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CHARACTER"   ) AS_TOKEN( TOKEN_AS_CHARACTER_ARRAY + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CLASS"       ) AS_TOKEN( TOKEN_AS_CLASS_ARRAY     + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}CODEBLOCK"   ) AS_TOKEN( TOKEN_AS_BLOCK_ARRAY     + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}DATE"        ) AS_TOKEN( TOKEN_AS_DATE_ARRAY      + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ENUMERATION" ) AS_TOKEN( TOKEN_AS_ENUM_ARRAY      + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}LOGICAL"     ) AS_TOKEN( TOKEN_AS_LOGICAL_ARRAY   + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}NUMERIC"     ) AS_TOKEN( TOKEN_AS_NUMERIC_ARRAY   + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}OBJECT"      ) AS_TOKEN( TOKEN_AS_OBJECT_ARRAY    + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}STRING"      ) AS_TOKEN( TOKEN_AS_CHARACTER_ARRAY + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}USUAL"       ) AS_TOKEN( TOKEN_AS_CHARACTER_ARRAY + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CHARACTER"                  ) AS_TOKEN( TOKEN_AS_CHARACTER       + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CLASS"                      ) AS_TOKEN( TOKEN_AS_CLASS           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}CODEBLOCK"                  ) AS_TOKEN( TOKEN_AS_BLOCK           + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}DATE"                       ) AS_TOKEN( TOKEN_AS_DATE            + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ENUMERATION"                ) AS_TOKEN( TOKEN_AS_ENUM            + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}LOGICAL"                    ) AS_TOKEN( TOKEN_AS_LOGICAL         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}NUMERIC"                    ) AS_TOKEN( TOKEN_AS_NUMERIC         + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}OBJECT"                     ) AS_TOKEN( TOKEN_AS_OBJECT          + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}STRING"                     ) AS_TOKEN( TOKEN_AS_CHARACTER       + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}USUAL"                      ) AS_TOKEN( TOKEN_AS_CHARACTER       + DONT_REDUCE ),
+
+                  /* LEX_WORD( "FIELD"                            ) AS_TOKEN( TOKEN_FIELD          ), */
+
+                     LEX_WORD( "FIELD?WS?->"                      ) AS_TOKEN( SLX_FIELD_ALIAS      ),
+                     LEX_WORD( "HAS"                              ) AS_TOKEN( SLX_AFTER_EXP  - '?' ),
+                     LEX_WORD( "SLX_INLINE"                        ) AS_TOKEN( SLX_INLINE          ),
+
+                     LEX_WORD( "IF?WS?("                          ) AS_TOKEN( SLX_IIF_OPEN         ),
+                     LEX_WORD( "IIF?WS?("                         ) AS_TOKEN( SLX_IIF_OPEN         ),
+
+                     LEX_WORD( "IN"                               ) AS_TOKEN( SLX_IN               ),
+                     LEX_WORD( "LIKE"                             ) AS_TOKEN( SLX_AFTER_EXP - '~'  ),
+                     LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_               ),
+                     LEX_WORD( "NIL"                              ) AS_TOKEN( TOKEN_NIL                + DONT_REDUCE ),
+                     LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( TOKEN_OPTIONAL       ),
+
+                  /* LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF                ), */
+
+                     LEX_WORD( "QSELF?WS?(?WS?)"                  ) AS_TOKEN( SLX_QSELF            ),
+
+                  /* LEX_WORD( "SELF"                             ) AS_TOKEN( TOKEN_SELF           ), */
+
+                     LEX_WORD( "STEP"                             ) AS_TOKEN( SLX_AFTER_EXP - TOKEN_STEP              ),
+                     LEX_WORD( "TO"                               ) AS_TOKEN( SLX_AFTER_EXP - TOKEN_TO                ),
+                     LEX_WORD( "WITH"                             ) AS_TOKEN( SLX_WITH             ),
+
+                  /* LEX_WORD( "_FIELD"                           ) AS_TOKEN( TOKEN_FIELD          ), */
+
+                     LEX_WORD( "_FIELD?WS?->"                     ) AS_TOKEN( SLX_FIELD_ALIAS      ),
+                     LEX_WORD( "_GET_?WS?("                       ) AS_TOKEN( TOKEN_GET            )
+                   };
+
+/* Intermediate Reductions when still ambigious or need further reductions. */
+#define _ID_ARRAY         901
+#define _ID_COMMA         902
+#define _ID_CR            903
+#define _ID_SEMI          904
+#define _ID_ASSIGN        905
+#define _WHL_ID_CR        906
+#define _WHL_ID_SEMI      907
+
+/* When 2 TOKEN_IDENTIFIERs are correct syntax like in class declaration, we have to temporarily store the 2nd TOKEN_IDENTIFIER. */
+#define _ID_ON_HOLD       913
+
+LANGUAGE_RULES_ARE {
+                    /* Wants any Var. */
+                    IF_SEQUENCE_IS( WANTS_VAR      , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_VAR      , TOKEN_MACROVAR    , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_VAR      , TOKEN_MACROTEXT   , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_VAR      , '&'         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_VAR      , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( TOKEN_FOREACH  , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_FOREACH  , 0           , 0      , 0          ) REDUCE_TO( TOKEN_FOR, SLX_IDENTIFIER ),
+
+                    /* Wants TOKEN_IDENTIFIER. */
+                    IF_SEQUENCE_IS( WANTS_ID       , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_ID       , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( TOKEN_CATCH          , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_CATCH          , '\n'        , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_CATCH          , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    /* Wants EOL */
+                    IF_SEQUENCE_IS( WANTS_EOL      , '\n'        , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_EOL      , ';'         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( WANTS_EOL      , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    /* Wants Expression ( DOESN'T WANT OPERATORS ) - At BOL, if followed by operator (other than logicals .t., .f., !) than TOKEN_IDENTIFIER else COMMAND. */
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_INC         , '\n'   , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_INC         , ';'    , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_DEC         , '\n'   , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_DEC         , ';'    , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_INASSIGN    , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_ALIAS       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_PLUSEQ      , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_MINUSEQ     , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_MULTEQ      , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_DIVEQ       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_EXPEQ       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_MODEQ       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , ')'         , 0      , 0          ) PASS_THROUGH(),
+                 /* IF_SEQUENCE_IS( REJECT_OP      , '('         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , '['         , 0      , 0          ) PASS_THROUGH(), DONT uncomment!!!*/
+                    IF_SEQUENCE_IS( REJECT_OP      , '='         , 0      , 0          ) PASS_THROUGH(),
+                 /* IF_SEQUENCE_IS( REJECT_OP      , ':'         , 0      , 0          ) PASS_THROUGH(), */
+                    IF_SEQUENCE_IS( REJECT_OP      , 0           , 0      , 0          ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , 0             ),
+
+                    IF_SEQUENCE_IS( REJECT_OP      , TOKEN_OPTIONAL     , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , SLX_IDENTIFIER ),
+                    IF_SEQUENCE_IS( REJECT_OP      , WANTS_ID     , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , SLX_IDENTIFIER ),
+                    IF_SEQUENCE_IS( REJECT_OP      , WANTS_EXP    , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , SLX_IDENTIFIER ),
+                    IF_SEQUENCE_IS( REJECT_OP      , WANTS_VAR    , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , SLX_IDENTIFIER ),
+
+
+                    /* Complex */
+
+                    IF_SEQUENCE_IS( TOKEN_DOCASE       , '\n'       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_DOCASE       , ';'        , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_DOCASE       , 0          , 0      , 0          ) REDUCE_TO( SLX_DO_CASE_ID     , 0             ),
+
+                    IF_SEQUENCE_IS( DO_WHILE_WITH, '\n'       , 0      , 0          ) REDUCE_TO( TOKEN_WHILE + DONT_REDUCE, _WITH_ID_CR  ),
+                    IF_SEQUENCE_IS( DO_WHILE_WITH, ';'        , 0      , 0          ) REDUCE_TO( TOKEN_WHILE + DONT_REDUCE, _WITH_ID_SEMI),
+                    IF_SEQUENCE_IS( DO_WHILE_WITH, 0          , 0      , 0          ) REDUCE_TO( SLX_DO_WHILE_WITH  , 0             ),
+
+                    IF_SEQUENCE_IS( DO_WHILE     , '\n'       , 0      , 0          ) REDUCE_TO( SLX_DO_WHILE_ID    , '\n' + DONT_REDUCE        ),
+                    IF_SEQUENCE_IS( DO_WHILE     , ';'        , 0      , 0          ) REDUCE_TO( SLX_DO_WHILE_ID    , ';' + DONT_REDUCE         ),
+                    IF_SEQUENCE_IS( DO_WHILE     , 0          , 0      , 0          ) REDUCE_TO( TOKEN_WHILE + DONT_REDUCE, 0             ),
+
+
+                    /* DECLARE as PRIVATE. */
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  , '['          , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , _ID_ARRAY     ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  , ','          , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , _ID_COMMA     ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  , '\n'         , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , _ID_CR        ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  , ';'          , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , _ID_SEMI      ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  ,TOKEN_INASSIGN, 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , _ID_ASSIGN    ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_MACROVAR    , 0            , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , TOKEN_MACROVAR      ),
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_MACROTEXT   , 0            , 0          ) REDUCE_TO( TOKEN_PRIVATE    + DONT_REDUCE , TOKEN_MACROTEXT     ),
+
+                    /* Any other DECLARE TOKEN_IDENTIFIER, must be Strong Type DECLARE. */
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+
+                    IF_SEQUENCE_IS( _ID_ON_HOLD , 0           , 0      , 0          ) REDUCE_TO( SLX_ID_ON_HOLD      , 0                   ),
+
+                    /* Any other DECLARE must be TOKEN_IDENTIFIER. */
+                    IF_SEQUENCE_IS( TOKEN_DECLARE     , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER      , 0                   ),
+
+                    /* Expnasions from DECLARE ...*/
+                    IF_SEQUENCE_IS( _ID_ARRAY   , 0           , 0      , 0          ) REDUCE_TO( TOKEN_IDENTIFIER + DONT_REDUCE , '[' + DONT_REDUCE      ),
+                    IF_SEQUENCE_IS( _ID_COMMA   , 0           , 0      , 0          ) REDUCE_TO( TOKEN_IDENTIFIER + DONT_REDUCE , ',' + DONT_REDUCE      ),
+                    IF_SEQUENCE_IS( _ID_CR      , 0           , 0      , 0          ) REDUCE_TO( TOKEN_IDENTIFIER + DONT_REDUCE , '\n' + DONT_REDUCE     ),
+                    IF_SEQUENCE_IS( _ID_SEMI    , 0           , 0      , 0          ) REDUCE_TO( TOKEN_IDENTIFIER + DONT_REDUCE , ';' + DONT_REDUCE      ),
+                    IF_SEQUENCE_IS( _ID_ASSIGN  , 0           , 0      , 0          ) REDUCE_TO( TOKEN_IDENTIFIER + DONT_REDUCE , TOKEN_INASSIGN + DONT_REDUCE ),
+
+
+                    /* This FIELD is NOT at BOL wants only ->. */
+                 /* IF_SEQUENCE_IS( TOKEN_FIELD       , TOKEN_ALIAS     , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_FIELD       , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ), */
+
+
+                 /* IF_SEQUENCE_IS( TOKEN_SELF        , ':'         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_SELF        , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ), */
+
+                    IF_SEQUENCE_IS( QSELF       , '('         , ')'    , 0          ) REDUCE_TO( TOKEN_SELF + DONT_REDUCE, 0             ),
+                    IF_SEQUENCE_IS( QSELF       , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( TOKEN_OPTIONAL    , TOKEN_IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_OPTIONAL    , '@'         , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( TOKEN_OPTIONAL    , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( TOKEN_PROCREQ     , '('         , 0      , 0          ) REDUCE_TO( TOKEN_PROCREQ + DONT_REDUCE, 0          ),
+                    IF_SEQUENCE_IS( TOKEN_PROCREQ     , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                 /* IF_SEQUENCE_IS( TOKEN_GET         , '('         , 0      , 0          ) REDUCE_TO( TOKEN_GET + DONT_REDUCE , 0             ),
+                    IF_SEQUENCE_IS( TOKEN_GET         , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ), */
+
+                    IF_SEQUENCE_IS( '#'         , _LINE_      , 0      , 0          ) REDUCE_TO( TOKEN_LINE + DONT_REDUCE, 0             ),
+                    IF_SEQUENCE_IS( _LINE_      , 0           , 0      , 0          ) REDUCE_TO( SLX_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( '&'         , '\''        , 0      , 0          ) REDUCE_TO( SLX_MACRO_ERR      , 0             ),
+                    IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( SLX_MACRO_ERR      , 0             ),
+                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( SLX_MACRO_ERR      , 0             ),
+
+                    IF_SEQUENCE_IS( SLX_TEXT     , TOKEN_IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( SLX_TEXT_BLOCK     , 0             ),
+                    IF_SEQUENCE_IS( SLX_TEXT     , 0           , 0      , 0          ) REDUCE_TO( SLX_TEXT_ID        , 0             )
+                   };
+
+/* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
+
+/* SimpLex Macros. */
+
+#undef LEX_CASE
+   #define LEX_CASE(x) ( (  ( iRet = (x) ) > 96 && iRet < 123 ) ? iRet - 32 : iRet )
+
+#undef INTERCEPT_ACTION
+   #define INTERCEPT_ACTION(x) x = SLX_InterceptAction( x, CARGO )
+
+#undef ELEMENT_TOKEN
+  #define ELEMENT_TOKEN(x,y) SLX_ElementToken( x, y, CARGO )
+
+#undef YY_DECL
+#define YY_DECL int yylex( DEF_CARGO )
+
+#undef YY_INPUT      /* to implement our own YY_INPUT function to manage PRGs without \n at the end */
+   int yy_lex_input( char *, int, DEF_CARGO );
+   #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( buf, max_size, CARGO );
+
+#undef CUSTOM_ACTION
+   #define CUSTOM_ACTION(x) SLX_CustomAction( x, CARGO )
+
+#undef STREAM_EXCEPTION
+
+// Not needed at all - save space.
+#define STREAM_EXCEPTION( sPair, cChar )
+
+#undef STREAM_APPEND
+   #define STREAM_APPEND(x) \
+      \
+      if( sStart[0] == 'E' ) \
+      { \
+         if( x == '\\' ) \
+         { \
+            switch( *szBuffer ) \
+            { \
+               case '\\' : \
+               case '"'  : \
+               case '\'' : \
+                  sPair [ iPairLen++ ] = *szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'n' : \
+                  sPair [ iPairLen++ ] = '\n'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 't' : \
+                  sPair [ iPairLen++ ] = '\t'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'b' : \
+                  sPair [ iPairLen++ ] = '\b'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'r' : \
+                  sPair [ iPairLen++ ] = '\r'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               default :\
+                  sPair[ iPairLen++ ] = x; \
+            } \
+         } \
+         else \
+         { \
+            sPair[ iPairLen++ ] = x; \
+         } \
+      } \
+      else \
+      { \
+         char *sClose, cTermLen; \
+         \
+         if( sStart[1] == '\0' ) \
+         { \
+            sClose = strchr( szBuffer, sTerm[0] ); \
+            cTermLen = 1; \
+         } \
+         else \
+         { \
+            sClose = strstr( szBuffer, sTerm ); \
+            \
+            if( sClose == NULL ) \
+            { \
+               szBuffer--; iSize++; \
+               sClose = strchr( szBuffer, ']' ); \
+               cTermLen = 1; \
+            } \
+            else \
+            { \
+               cTermLen = 2; \
+            } \
+         } \
+         \
+         if( sClose ) \
+         { \
+            int iLen; \
+            \
+            szBuffer--; iSize++; \
+            \
+            iLen = (int) ( sClose - szBuffer ); \
+            \
+            if( iLen > iPairAllocated )\
+            { \
+               sPair = (char *) realloc( sPair, iLen + 1 ); \
+               iPairAllocated = iLen + 1; \
+            } \
+            \
+            strncpy( sPair, szBuffer, iLen ); \
+            sPair[ iLen ] = '\0'; \
+            s_szBuffer = sClose + cTermLen; \
+            iSize -= s_szBuffer - szBuffer; \
+            yylval.Constant.Kind = CONSTANT_KIND_STRING; \
+            yylval.Constant.Value.sString = ClipNet_IdentifierNew( (char *) sPair, TRUE ); \
+            \
+            /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
+            iPairToken = 0; \
+            return TOKEN_CONSTANT + DONT_REDUCE ; \
+         } \
+         else \
+         { \
+            szBuffer--; \
+            szBuffer[strlen(szBuffer)-1] = '\0'; \
+            Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_STRING_TERMINATOR, szBuffer, NULL, CARGO ); \
+            yylval.Constant.Kind = CONSTANT_KIND_STRING; \
+            yylval.Constant.Value.sString = ClipNet_IdentifierNew( (char *) sPair, TRUE ); \
+            iSize = 0; \
+            iPairToken = 0; \
+            return TOKEN_CONSTANT + DONT_REDUCE; \
+         } \
+      }
+
+#undef IF_BELONG_LEFT
+   #define IF_BELONG_LEFT(chr) if( iLastToken == TOKEN_IDENTIFIER || iLastToken == TOKEN_SELF || iLastToken == ']' || iLastToken == TOKEN_MACROVAR || iLastToken == TOKEN_MACROTEXT || \
+                                   iLastToken == ')' || iLastToken == '}' || iLastToken == TOKEN_CONSTANT || iLastToken == WANTS_EOL || iLastToken == WANTS_ID || \
+                                   iLastToken == WANTS_VAR || iLastToken == TOKEN_DECLARE || iLastToken == TOKEN_FIELD || /*iLastToken == TOKEN_SELF ||*/ iLastToken == QSELF || \
+                                   iLastToken == TOKEN_IIF || iLastToken == TOKEN_PROCREQ || iLastToken == TOKEN_OPTIONAL || iLastToken == SLX_TEXT )
+
+/* Support Functions. */
+static int SLX_InterceptAction( int iRet, DEF_CARGO )
+{
+   if( iRet < 256 )
+   {
+      yytext[0] = iRet;
+      yytext[1] = '\0';
+      yyleng = 1;
+   }
+   else if( iRet < 512 )
+   {
+      if( iRet == TOKEN_IDENTIFIER )
+      {
+         if( iIdentifier > 0 )
+         {
+            iIdentifier--;
+         }
+      }
+      else if( yylval.sText == NULL )
+      {
+         //yytext = sToken;
+         yyleng = (int) strlen( yytext );
+      }
+   }
+   else
+   {
+      //yytext = sToken;
+      yyleng = (int) strlen( yytext );
+
+      if( iRet == WANTS_EXP )
+         { iRet = iWantsEXP; }
+      else if( iRet == WANTS_EOL )
+         { iRet = iWantsEOL; }
+      else if( iRet == WANTS_ID )
+         { iRet = iWantsID; }
+      else if( iRet == WANTS_VAR )
+         { iRet = iWantsVAR; }
+      else if( iRet == REJECT_OP )
+         { yylval.sText = ClipNet_IdentifierNew( (char*) yytext, TRUE ); iRet = TOKEN_IDENTIFIER; }
+      else
+         { printf( "Error SLX0002 Missing handler for '%i' line: %i\n", iRet, Parser_pContext->iLine - 1 ); Parser_pContext->iErrors++; }
+   }
+
+   #ifdef SHOW_LEX_TOKENS
+      if( iRet == TOKEN_IDENTIFIER )
+         { printf( "   IDENTIFIER = \"%s\"\n", yylval.sText ); }
+      else if( iRet == TOKEN_MACROVAR )
+         { printf( "   MACROVAR = \"%s\"\n", yylval.sText ); }
+      else if( iRet == TOKEN_MACROTEXT )
+         { printf( "   MACROTEXT = \"%s\"\n", yylval.sText ); }
+      else if( iRet == TOKEN_CONSTANT )
+      {
+         switch( yylval.Constant.Kind )
+         {
+            case CONSTANT_KIND_STRING :
+               printf( "   LITERAL = \"%s\"\n", yylval.Constant.Value.sString );
+               break;
+
+            case CONSTANT_KIND_INTEGER :
+               printf( "   INTEGER = %i\n", yylval.Constant.Value.Integer.iInteger );
+               break;
+
+            case CONSTANT_KIND_LONG :
+               printf( "   LONG = %il\n", yylval.Constant.Value.Long.lLong  );
+               break;
+
+            case CONSTANT_KIND_DOUBLE :
+               printf( "   DOUBLE = %f\n", yylval.Constant.Value.Double.dDouble );
+               break;
+         }
+      }
+      else if( iRet < 256 )
+      {
+         if( iRet == '\n' || iRet == ';' )
+            { printf( "***NEW LINE %i\n", Parser_iLine - 1  ); }
+         else if( iRet == -1 )
+            { printf( "!!!<EOF>\n" ); }
+         else
+            { printf( "   DELIMITER = \"%c\"\n", iRet  ); }
+      }
+      else
+         { printf( "   TOKEN = %i\n", iRet  ); }
+   #endif
+
+   return iRet;
+}
+
+static int SLX_ElementToken( char* szToken, unsigned int iTokenLen, DEF_CARGO )
+{
+   extern char *yytext;
+   extern int yyleng;
+
+   char* tmpPtr;
+   int   iElement;
+
+   yytext = szToken;
+   yyleng = (int) iTokenLen;
+
+   if( ( *yytext >= 'A' && *yytext <= 'Z' ) || *yytext == '&' || *yytext == '_' )
+   {
+      /* Macro. */
+      if( ( tmpPtr = strrchr( yytext, '&' ) ) != NULL ) /* Right Search. */
+      {
+         /* Is '&' the first char? - Since its was right search that would be the only '&'. */
+         if( tmpPtr == yytext )
+         {
+            /* Maybe just the Macro Operator. */
+            if( yyleng == 1 )
+            {
+               if( iLastToken == TOKEN_CONSTANT ||
+                   iLastToken == TOKEN_IDENTIFIER ||  iLastToken == TOKEN_MACROVAR || iLastToken == TOKEN_MACROTEXT ||
+                   iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
+               {
+                  iElement = TOKEN_BITAND + DONT_REDUCE;
+               }
+               else
+               {
+                  iElement = '&';
+               }
+            }
+            /* No '.' so Simple Macro. */
+            else if( ( tmpPtr = strchr( yytext, '.' ) ) == NULL ) /* Left Search. */
+            {
+               /* Remove the '&'. */
+               yyleng--;
+
+               yylval.sText = ClipNet_IdentifierNew( yytext + 1, TRUE );
+               iElement = TOKEN_MACROVAR;
+            }
+            else if( tmpPtr == yytext + yyleng - 1 )
+            {
+               /* The only '.' is last char, so Simple Macro. */
+
+               /* Remove the '&' and the '.' */
+               yyleng -= 2;
+               yytext[yyleng + 1] = '\0';
+
+               yylval.sText = ClipNet_IdentifierNew( yytext + 1, TRUE );
+               iElement = TOKEN_MACROVAR;
+            }
+            else
+            {
+               /*
+               yytext = ClipNet_IdentifierNew( yytext, TRUE );
+               */
+               yylval.sText = ClipNet_strdup( yytext );
+               iElement = TOKEN_MACROTEXT;
+            }
+         }
+         else
+         {
+            /*
+            yytext = ClipNet_IdentifierNew( yytext, TRUE );
+            */
+            yylval.sText = ClipNet_strdup( yytext );
+            iElement = TOKEN_MACROTEXT;
+         }
+      }
+      else
+      {
+         DEBUG_INFO( printf(  "Element \"%s\" is IDENTIFIER\n", yytext ) );
+
+         //SLX_CheckIllegalChar( yytext );
+
+         if( yyleng > SYMBOL_NAME_LEN )
+         {
+            yytext[ SYMBOL_NAME_LEN ] = '\0';
+            yyleng = SYMBOL_NAME_LEN;
+         }
+
+         if( iIdentifier )
+         {
+            DEBUG_INFO( printf( "*** iDentifier = %i - Holding %s\n", iIdentifier, yytext ) );
+            sIdOnHold = ClipNet_IdentifierNew( yytext, TRUE );
+            iElement = _ID_ON_HOLD;
+         }
+         else
+         {
+            iIdentifier++;
+            DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
+            yylval.sText = ClipNet_IdentifierNew( yytext, TRUE );
+            iElement = TOKEN_IDENTIFIER;
+         }
+      }
+   }
+   else
+   {
+      /* ConverNumber */
+
+      /* Hex Number */
+      if( yytext[0] == '0' && yytext[1] == 'X' )
+      {
+         long lNumber = SLX_Hex2L( yytext + 2, CARGO );
+
+         if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
+         {
+            yylval.Constant.Kind = CONSTANT_KIND_LONG;
+            yylval.Constant.Value.lLong = lNumber;
+         }
+      }
+      else
+      {
+         tmpPtr = strchr( yytext, '.' );
+
+         if( tmpPtr )
+         {
+            yylval.Constant.Value.Double.dDouble = strtod( yytext, NULL );
+
+            yylval.Constant.Kind = CONSTANT_KIND_DOUBLE;
+            yylval.Constant.Value.Double.cDec = strlen( tmpPtr + 1 );
+            yylval.Constant.Value.Double.cWidth = yyleng - yylval.Constant.Value.Double.cDec;
+
+            if( yylval.Constant.Value.Double.cDec )
+            {
+               yylval.Constant.Value.Double.cWidth--;
+            }
+         }
+         else
+         {
+            long lNumber = strtol( yytext, NULL, 10 );
+
+            if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
+            {
+               yylval.Constant.Kind = CONSTANT_KIND_LONG;
+               yylval.Constant.Value.lLong = lNumber;
+            }
+         }
+      }
+
+      iElement = TOKEN_CONSTANT + DONT_REDUCE;
+   }
+
+   DEBUG_INFO( printf(  "Element \"%s\" is %i\n", szToken, iElement ) );
+
+   return iElement;
+}
+
+static long SLX_Hex2L( char* sHex, DEF_CARGO )
+{
+   int i = 0;
+   long lVal = 0;
+   char cChar;
+
+   while( ( cChar = sHex[i++] ) )
+   {
+      if( cChar >= '0' && cChar <= '0' )
+      {
+         cChar -= '0';
+      }
+      else if( cChar >= 'A' && cChar <= 'F' )
+      {
+         cChar -= ( 'A' - 10 );
+      }
+      else
+      {
+         break;
+      }
+
+      lVal = ( lVal << 4 ) + cChar;
+   }
+
+   return lVal;
+}
+
+static int SLX_CustomAction( int x, DEF_CARGO )
+{
+   extern BOOL PP_bInline;
+   char *pTmp;
+
+   DEBUG_INFO( printf( "Custom Action for %i after: %i\n", x, iLastToken ) );
+
+   if( x < SLX_AFTER_EXP )
+   {
+      bIgnoreWords = FALSE;
+
+      if( iLastToken == TOKEN_CONSTANT ||
+          iLastToken == TOKEN_IDENTIFIER ||  iLastToken == TOKEN_MACROVAR || iLastToken == TOKEN_MACROTEXT ||
+          iLastToken == ')' || iLastToken == ']' || iLastToken == '}' ||
+          iLastToken == TOKEN_FIELD || iLastToken == QSELF || iLastToken == TOKEN_IIF || iLastToken == TOKEN_GET )
+      {
+         return ( (-x) + (SLX_AFTER_EXP) ) + DONT_REDUCE;
+      }
+      else
+      {
+         yylval.sText = ClipNet_IdentifierNew( sToken, TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "SLX_AFTER_EXP, Primary Identifier %s Increased to: %i\n", sToken, iIdentifier ) );
+         return TOKEN_IDENTIFIER;
+      }
+   }
+   else if( x < SLX_WANTS_EXP )
+   {
+      bIgnoreWords = FALSE;
+      iWantsEXP = (-x) + (SLX_WANTS_EXP) ;
+      return REJECT_OP;
+   }
+   else if( x < SLX_WANTS_EOL )
+   {
+      iWantsEOL = (-x) + (SLX_WANTS_EOL) ;
+      return WANTS_EOL;
+   }
+   else if( x < SLX_WANTS_ID )
+   {
+      iWantsID = (-x) + (SLX_WANTS_ID) ;
+      return WANTS_ID;
+   }
+   else if( x < SLX_WANTS_VAR )
+   {
+      iWantsVAR = (-x) + (SLX_WANTS_VAR) ;
+      return WANTS_VAR;
+   }
+
+   switch ( x )
+   {
+      case SLX_FALSE :
+         yylval.Constant.Kind = CONSTANT_KIND_BOOL;
+         yylval.Constant.Value.bLogical = FALSE;
+         return TOKEN_CONSTANT + DONT_REDUCE ;
+
+      case SLX_TRUE :
+         yylval.Constant.Kind = CONSTANT_KIND_BOOL;
+         yylval.Constant.Value.bLogical = TRUE;
+         return TOKEN_CONSTANT + DONT_REDUCE ;
+
+      case SLX_IDENTIFIER :
+         bIgnoreWords = FALSE;
+         yylval.sText = ClipNet_IdentifierNew( yytext, TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
+         return TOKEN_IDENTIFIER + DONT_REDUCE;
+
+      case SLX_SELF :
+         aiHold[ iHold++ ] = ':' + DONT_REDUCE ;
+         yylval.sText = ClipNet_IdentifierNew( "SELF", TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "SLX_SELF, Primary Identifier %s Increased to: %i\n", "SELF", iIdentifier ) );
+         return TOKEN_IDENTIFIER;
+
+      case SLX_CHK_BLOCK :
+         pTmp = (char *) s_szBuffer;
+
+         /* Skip White Space. */
+         while( isspace( (BYTE) *pTmp ) )
+         {
+            pTmp++;
+         }
+
+         if( *pTmp == '|' )
+         {
+            unsigned int iBrackets = 1;
+            char cTmp;
+            BOOL bMacro = FALSE;
+
+            *pTmp = '\\';
+
+            pTmp++;
+
+            while( *pTmp  )
+            {
+               if( *pTmp == '|' )
+               {
+                  *pTmp = '\\';
+                  pTmp++;
+                  break;
+               }
+
+               pTmp++;
+            }
+
+            if( s_sLastBlock == NULL )
+            {
+               while( *pTmp )
+               {
+                  if( *pTmp == '}' )
+                  {
+                     iBrackets--;
+                     if( iBrackets == 0 )
+                     {
+                        break;
+                     }
+                  }
+                  else if( *pTmp == '{' )
+                  {
+                     iBrackets++;
+                  }
+                  else if( *pTmp == '&' )
+                  {
+                     bMacro = TRUE;
+                  }
+
+                  pTmp++;
+               }
+
+               if( bMacro )
+               {
+                  pTmp++;
+                  cTmp = *pTmp;
+                  *pTmp = '\0';
+
+                  s_sLastBlock = ClipNet_IdentifierNew( s_szBuffer - 1, TRUE );
+
+                  *pTmp = cTmp;
+               }
+            }
+         }
+
+         return '{' + DONT_REDUCE;
+
+      case SLX_LIT_ACT :
+         yylval.Constant.Kind = CONSTANT_KIND_STRING;
+         yylval.Constant.Value.sString = ClipNet_IdentifierNew( (char *) sPair, TRUE );
+         return TOKEN_CONSTANT + DONT_REDUCE ;
+
+/*    case SLX_INIT_PROC :
+         aiHold[ iHold++ ] = TOKEN_PROC + DONT_REDUCE;
+         return TOKEN_INIT_PROC + DONT_REDUCE;
+
+      case SLX_INIT_FUNC :
+         aiHold[ iHold++ ] = TOKEN_FUNC + DONT_REDUCE;
+         return TOKEN_INIT + DONT_REDUCE;
+
+      case SLX_EXIT_PROC :
+         aiHold[ iHold++ ] = TOKEN_PROC + DONT_REDUCE;
+         return TOKEN_EXIT + DONT_REDUCE;
+
+      case SLX_EXIT_FUNC :
+         aiHold[ iHold++ ] = TOKEN_FUNC + DONT_REDUCE;
+         return TOKEN_EXIT + DONT_REDUCE;
+
+      case SLX_STATIC_PROC :
+         aiHold[ iHold++ ] = TOKEN_PROC + DONT_REDUCE;
+         return TOKEN_STATIC + DONT_REDUCE;
+
+      case SLX_STATIC_FUNC :
+         aiHold[ iHold++ ] = TOKEN_FUNC + DONT_REDUCE;
+         return TOKEN_STATIC + DONT_REDUCE;
+
+      case SLX_CRITICAL_PROC :
+         aiHold[ iHold++ ] = TOKEN_PROC + DONT_REDUCE;
+         return TOKEN_CRITICAL + DONT_REDUCE;
+
+      case SLX_CRITICAL_FUNC :
+         aiHold[ iHold++ ] = TOKEN_FUNC + DONT_REDUCE;
+         return TOKEN_CRITICAL + DONT_REDUCE;
+
+      case SLX_CRITICAL_STATIC_PROC :
+         aiHold[ iHold++ ] = TOKEN_PROC + DONT_REDUCE;
+         return TOKEN_CRITICAL_STATIC + DONT_REDUCE;
+
+      case SLX_CRITICAL_STATIC_FUNC :
+         aiHold[ iHold++ ] = TOKEN_FUNC + DONT_REDUCE;
+         return TOKEN_CRITICAL_STATIC + DONT_REDUCE;   */
+
+      case SLX_IN :
+         bIgnoreWords = FALSE;
+
+         // pTmp is the Begining of Line - skip white space.
+         pTmp = (char *) szLexBuffer;
+         while( *pTmp == ' ' || *pTmp == '\t' )
+         {
+            pTmp++;
+         }
+
+         // FIEL[D] statmenet?
+         if( toupper( pTmp[0] ) == 'F' && toupper( pTmp[1] ) == 'I' && toupper( pTmp[2] ) == 'E' && toupper( pTmp[3] ) == 'L' )
+         {
+            if( toupper( pTmp[4] ) == 'D' || pTmp[4] == ' ' || pTmp[4] == '\t' )
+            {
+               if( iLastToken == TOKEN_IDENTIFIER )
+               {
+                  return TOKEN_IN + DONT_REDUCE;
+               }
+               else
+               {
+                  yylval.sText = ClipNet_IdentifierNew( "IN", TRUE );
+                  iIdentifier++;
+                  DEBUG_INFO( printf( "SLX_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
+                  return TOKEN_IDENTIFIER;
+               }
+            }
+         } // FOR statement?
+         else if( toupper( pTmp[0] ) == 'F' && toupper( pTmp[1] ) == 'O' && toupper( pTmp[2] ) == 'R' )
+         {
+            if( pTmp[3] != ' ' && pTmp[3] != '\t' )
+            {
+               goto NOT_FOREACH;
+            }
+
+            pTmp += 4;
+            while( *pTmp == ' ' || *pTmp == '\t' )
+            {
+               pTmp++;
+            }
+
+            // FOR EACH statemenr?
+            if( toupper( pTmp[0] ) == 'E' && toupper( pTmp[1] ) == 'A' && toupper( pTmp[2] ) == 'C' && toupper( pTmp[3] ) == 'H' )
+            {
+               if( pTmp[4] == ' ' || pTmp[4] == '\t' )
+               {
+                  return TOKEN_IN + DONT_REDUCE;
+               }
+            }
+         }
+
+         NOT_FOREACH :
+
+           if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
+               iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == TOKEN_CBMARKER || iLastToken == ',' ||
+               iLastToken == WANTS_ID ||
+               iLastToken == TOKEN_WITH ||
+               iLastToken == REJECT_OP ||
+               iLastToken == TOKEN_GET ||
+               IS_OP( iLastToken )
+             )
+           {
+              yylval.sText = ClipNet_IdentifierNew( "IN", TRUE );
+              iIdentifier++;
+              DEBUG_INFO( printf( "SLX_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
+              return TOKEN_IDENTIFIER;
+           }
+           else
+           {
+              iWantsEXP = '$';
+              return REJECT_OP;
+           }
+
+      case SLX_WITH :
+         bIgnoreWords = FALSE;
+
+         if( iLastToken == TOKEN_IDENTIFIER || iLastToken == TOKEN_MACROVAR || iLastToken == TOKEN_MACROTEXT || iLastToken == ')' )
+         {
+            return TOKEN_WITH + DONT_REDUCE;
+         }
+         else
+         {
+            yylval.sText = ClipNet_IdentifierNew( "WITH", TRUE );
+            iIdentifier++;
+            DEBUG_INFO( printf( "SLX_WITH, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
+            return TOKEN_IDENTIFIER;
+         }
+
+      case _WITH_ID_CR :
+         aiHold[ iHold++ ] = '\n' + DONT_REDUCE;
+         yylval.sText = ClipNet_IdentifierNew( "WITH", TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "_WITH_ID_CR, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
+         return TOKEN_IDENTIFIER + DONT_REDUCE;
+
+      case _WITH_ID_SEMI :
+         aiHold[ iHold++ ] = ';' + DONT_REDUCE;
+         yylval.sText = ClipNet_IdentifierNew( "WITH", TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "_WITH_ID_SEMI, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
+         return TOKEN_IDENTIFIER + DONT_REDUCE;
+
+      case SLX_DO_WHILE_ID :
+         iIdentifier++;
+         DEBUG_INFO( printf( "SLX_DO_WHILE_ID, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
+         yylval.sText = ClipNet_IdentifierNew( "WHILE", TRUE );
+         aiHold[ iHold++ ] = TOKEN_IDENTIFIER + DONT_REDUCE;
+         return TOKEN_DO + DONT_REDUCE;
+
+      case SLX_DO_WHILE_WITH :
+         aiHold[ iHold++ ] = TOKEN_WITH + DONT_REDUCE;
+         yylval.sText = ClipNet_IdentifierNew( "WHILE", TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "SLX_DO_WHILE_WITH, Primary Identifier %s Increased to: %i\n", "WHILE", iIdentifier ) );
+         aiHold[ iHold++ ] = TOKEN_IDENTIFIER + DONT_REDUCE;
+         return TOKEN_DO + DONT_REDUCE;
+
+      case SLX_DO_CASE_ID :
+         yylval.sText = ClipNet_IdentifierNew( "CASE", TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "SLX_DO_CASE_ID, Primary Identifier %s Increased to: %i\n", "CASE", iIdentifier ) );
+         aiHold[ iHold++ ] = TOKEN_IDENTIFIER + DONT_REDUCE;
+         return TOKEN_DO + DONT_REDUCE;
+
+      case SLX_MACRO_ERR :
+         Parser_GenError( Parser_asErrors, 'E', PARSER_ERR_SYNTAX, "&", NULL, CARGO );
+         return  0;
+
+      case SLX_ID_ON_HOLD :
+         yylval.sText = sIdOnHold;
+         iIdentifier++;
+         DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s - Increased to: %i\n", sIdOnHold, iIdentifier ) );
+         return TOKEN_IDENTIFIER;
+
+      case SLX_INLINE :
+
+         /* NOTE: ClipNet_iLineINLINE is being RESET in ppcomp.c - SLX_pp_Internal() */
+
+         if( Parser_pContext->iLineINLINE )
+         {
+            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, "on the same line", NULL, CARGO );
+            iIdentifier++;
+            return TOKEN_IDENTIFIER + DONT_REDUCE;
+         }
+         else
+         {
+            #define INLINE_NORMAL 0
+            #define INLINE_SINGLE_QUOT 1
+            #define INLINE_DOUBLE_QUOT 2
+            #define INLINE_COMMENT 3
+
+            char sBuffer[ YY_BUF_SIZE ], *pBuffer, cMode = INLINE_NORMAL;
+            char *sInlineSym = (char *) ClipNet_alloc(16);
+            int iSize, iBraces = 0;
+            char szID[6];
+            INLINE *pInline;
+
+            Parser_pContext->iLineINLINE = Parser_pContext->iLine;
+            PP_bInline = TRUE;
+
+            strncpy( sInlineSym, "SLX_INLINE_", 16 );
+
+            Parser_pContext->iInlineID++;
+            sprintf( szID, "%03d",  Parser_pContext->iInlineID );
+            strncpy( sInlineSym + 11, szID, 4 );
+
+            if( Parser_pContext->iInlineID > SLX_INLINE_MAX )
+            {
+               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_TOOMANY_INLINE, NULL, NULL, CARGO );
+               break;
+            }
+
+            pInline = Parser_InlineAdd( ClipNet_IdentifierNew( sInlineSym, TRUE ), CARGO );
+
+          DigestInline :
+
+            YY_INPUT( (char*) sBuffer, iSize, YY_BUF_SIZE );
+            if( iSize == 0 )
+            {
+               Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_INVALID_INLINE, Parser_pContext->Functions.pLast->pName->Name, NULL, CARGO );
+               PP_bInline = FALSE;
+               return '\n' + DONT_REDUCE;
+            }
+            pBuffer = (char*) sBuffer;
+
+            while( *pBuffer )
+            {
+               switch( cMode )
+               {
+                  case INLINE_NORMAL :
+                     if( *pBuffer == '{' )
+                     {
+                        iBraces++;
+                     }
+                     else if( *pBuffer == '}' && iBraces > 1 )
+                     {
+                        iBraces--;
+                     }
+                     else if( *pBuffer == '}' )
+                     {
+                        PP_bInline = FALSE;
+                        break;
+                     }
+                     else if( *pBuffer == '\'' )
+                     {
+                        cMode = INLINE_SINGLE_QUOT;
+                     }
+                     else if( *pBuffer == '"' )
+                     {
+                        cMode = INLINE_DOUBLE_QUOT;
+                     }
+                     else if( *pBuffer == '/' && *(pBuffer+1) == '/' )
+                     {
+                        goto SaveInline;
+                     }
+                     else if( *pBuffer == '/' && *(pBuffer+1) == '*' )
+                     {
+                        pBuffer++;
+                        cMode = INLINE_COMMENT;
+                     }
+                     break;
+
+                  case INLINE_SINGLE_QUOT :
+                     if( *pBuffer == '\\' )
+                     {
+                        pBuffer++;
+                     }
+                     else if( *pBuffer == '\'' )
+                     {
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
+
+                  case INLINE_DOUBLE_QUOT :
+                     if( *pBuffer == '\\' )
+                     {
+                        pBuffer++;
+                     }
+                     else if( *pBuffer == '"' )
+                     {
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
+
+                  case INLINE_COMMENT :
+                     if( *pBuffer == '*' && *(pBuffer+1) == '/' )
+                     {
+                        pBuffer++;
+                        cMode = INLINE_NORMAL;
+                     }
+                     break;
+               }
+
+               pBuffer++;
+            }
+
+          SaveInline :
+
+            if( pInline->pCode == NULL )
+            {
+               pInline->pCode = (unsigned char *) ClipNet_alloc( ( iSize = (int) strlen( (char*) sBuffer ) ) + 1 );
+               strncpy( (char *) pInline->pCode, (char*) sBuffer, iSize );
+            }
+            else
+            {
+               pInline->pCode = (unsigned char *) ClipNet_realloc( pInline->pCode, pInline->lPCodeSize + ( iSize = (int) strlen( (char*) sBuffer ) ) + 1 );
+               strncpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer, iSize );
+            }
+            pInline->lPCodeSize += iSize;
+
+            if( PP_bInline )
+            {
+               goto DigestInline;
+            }
+            else
+            {
+               if( Parser_pContext->iBackend != LANG_C && Parser_pContext->iBackend != LANG_OBJ_MODULE )
+               {
+                  Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_REQUIRES_C, NULL, NULL, CARGO );
+                  ClipNet_free( (void *) pInline->pCode );
+                  ClipNet_free( (void *) pInline->sFileName );
+                  ClipNet_free( (void *) pInline );  /* NOTE: szName will be released by ClipNet_SymbolKill() */
+               }
+
+               Parser_pContext->iLinePRG = Parser_pContext->iLine;
+               Parser_pContext->iLine = Parser_pContext->iLineINLINE;
+
+               yylval.sText = ClipNet_IdentifierNew( sInlineSym, TRUE );
+               ClipNet_free( sInlineSym ) ;
+               iIdentifier++;
+               DEBUG_INFO( printf( "INLINE, Primary Identifier %s Increased to: %i\n", "INLINE", iIdentifier ) );
+               return TOKEN_IDENTIFIER + DONT_REDUCE;
+            }
+         }
+
+      case SLX_TEXT_LINE :
+         aiHold[ 0 ] = SLX_NEXT_LINE;
+         aiHold[ 1 ] = '\n' + DONT_REDUCE;
+         aiHold[ 2 ] = ')' + DONT_REDUCE;
+         iHold = 3;
+
+         yylval.Constant.Kind = CONSTANT_KIND_STRING;
+         yylval.Constant.Value.sString = ClipNet_IdentifierNew( (char *) sPair, TRUE );
+         return TOKEN_CONSTANT + DONT_REDUCE;
+
+      case SLX_TEXT_BLOCK :
+         sTextFunction = ClipNet_IdentifierNew( yylval.sText, TRUE );
+         sTextReset    = ClipNet_IdentifierNew( sIdOnHold, TRUE );
+         iIdentifier   = 1;
+         printf( "TextFun: %s Reset %s\n", sTextFunction, sTextReset );
+
+         // Intentionaly fall through to SLX_NEXT_LINE below.
+
+      case SLX_NEXT_LINE :
+      {
+         int iSize;
+
+         PP_bInline = TRUE;
+
+         YY_INPUT( (char*) sPair, iSize, YY_BUF_SIZE );
+
+         PP_bInline = FALSE;
+
+         if( iSize == 0 )
+         {
+            Parser_GenError( Parser_asErrors, 'F', PARSER_ERR_MISSING_ENDTEXT, Parser_pContext->Functions.pLast->pName->Name, NULL, CARGO );
+            return '\n' + DONT_REDUCE;
+         }
+         else
+         {
+            char *pTmp = (char *) sPair;
+
+            while( *pTmp == ' ' || *pTmp == '\t' )
+            {
+               pTmp++;
+            }
+
+            if( toupper( pTmp[0] ) == 'E' &&
+                toupper( pTmp[1] ) == 'N' &&
+                toupper( pTmp[2] ) == 'D' &&
+                toupper( pTmp[3] ) == 'T' &&
+                toupper( pTmp[4] ) == 'E' &&
+                toupper( pTmp[5] ) == 'X' &&
+                toupper( pTmp[6] ) == 'T' )
+            {
+               pTmp += 7;
+
+               while( *pTmp == ' ' || *pTmp == '\t' )
+               {
+                  pTmp++;
+               }
+
+               if( *pTmp == '\n' || *pTmp == ';' )
+               {
+                  aiHold[ 0 ] = '\n';
+                  aiHold[ 1 ] = ')' + DONT_REDUCE;
+                  aiHold[ 2 ] = '(' + DONT_REDUCE;
+                  iHold = 3;
+
+                  yylval.sText = sTextReset;
+                  return TOKEN_IDENTIFIER + DONT_REDUCE;
+               }
+            }
+         }
+
+         // Remove the CR.
+         sPair[ iSize - 1 ] = '\0';
+
+         aiHold[ 0 ] = SLX_TEXT_LINE;
+         aiHold[ 1 ] = '(' + DONT_REDUCE;
+         iHold = 2;
+
+         yylval.sText = sTextFunction;
+         return TOKEN_IDENTIFIER + DONT_REDUCE;
+      }
+
+      case SLX_TEXT_ID :
+         yylval.sText = ClipNet_IdentifierNew( "TEXT", TRUE );
+         return TOKEN_IDENTIFIER + DONT_REDUCE;
+
+      case SLX_QSELF :
+         bIgnoreWords = FALSE;
+         return TOKEN_SELF;
+
+      case SLX_FIELD_ALIAS :
+         aiHold[ iHold++ ] = TOKEN_ALIAS;
+         return TOKEN_FIELD;
+
+      case SLX_IIF_OPEN :
+         aiHold[ iHold++ ] = '(';
+         return TOKEN_IIF;
+
+      default:
+         printf( "Error SLX0001 Missing custom handler for '%i' line: %i\n", x, Parser_pContext->iLine - 1 );
+         Parser_pContext->iErrors++;
+   }
+
+   return x;
+}
+
+int yy_lex_input( char *pBuffer, int iBufferSize, DEF_CARGO )
+{
+   SYMBOL_UNUSED( iBufferSize );
+
+   return PP_NextLine( Parser_pContext->pPPO, pBuffer, CARGO );
+}
+
+char * SLX_LastBlock( BOOL bReset )
+{
+   if( bReset )
+   {
+      s_sLastBlock = NULL;
+   }
+   else
+   {
+      char *pTmp = (char *) s_sLastBlock + 1;
+
+      /* Skip White Space. */
+      while( isspace( (BYTE) *pTmp ) )
+      {
+         pTmp++;
+      }
+
+      *pTmp = '|';
+
+      pTmp++;
+
+      while( *pTmp  )
+      {
+         if( *pTmp == '\\' )
+         {
+            *pTmp = '|';
+            break;
+         }
+
+         pTmp++;
+      }
+   }
+
+   return s_sLastBlock;
+}

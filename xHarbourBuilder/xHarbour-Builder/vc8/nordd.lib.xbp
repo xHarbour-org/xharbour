@@ -1,0 +1,21 @@
+CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+GUI_LIBFOLDERS =
+GUI_PRGFLAGS =
+GUI_ROOT =
+INCLUDEFOLDERS =
+LIBFOLDERS =
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\nordd.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\vc8
+
+[\xHarbour\source\rdd\nulsys\nulsys.c]

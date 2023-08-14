@@ -1,0 +1,814 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form_Main INHERIT WinForm
+   // Components declaration
+   DATA Actions_Approve EXPORTED
+   DATA Actions_Disapprove EXPORTED
+   DATA Actions_Seperator1 EXPORTED
+   DATA Actions_Seperator2 EXPORTED
+   DATA Actions_UpdateCVS EXPORTED
+   DATA Actions_Upload EXPORTED
+   DATA ApproveFile_Active EXPORTED
+   DATA ApproveFile_All EXPORTED
+   DATA Approve_Active EXPORTED
+   DATA Approve_All EXPORTED
+   DATA Bar_Main EXPORTED
+   DATA Button_Search EXPORTED
+   DATA Check_SearchInFiles EXPORTED
+   DATA Combo_Filter EXPORTED
+   DATA DisapproveFile_Active EXPORTED
+   DATA DisapproveFile_All EXPORTED
+   DATA Disapprove_Active EXPORTED
+   DATA Disapprove_All EXPORTED
+   DATA Edit_FileSource EXPORTED
+   DATA Edit_Search EXPORTED
+   DATA File_Exit EXPORTED
+   DATA File_OpenLocation EXPORTED
+   DATA File_SaveChanges EXPORTED
+   DATA File_Seperator1 EXPORTED
+   DATA File_Seperator2 EXPORTED
+   DATA Folder_Main EXPORTED
+   DATA Help_About EXPORTED
+   DATA Help_Topics EXPORTED
+   DATA Label_Filter EXPORTED
+   DATA Main_ApproveFile EXPORTED
+   DATA Main_DisapproveFile EXPORTED
+   DATA Main_OpenLocation EXPORTED
+   DATA Main_SaveChanges EXPORTED
+   DATA Main_Seperator1 EXPORTED
+   DATA Main_Seperator2 EXPORTED
+   DATA Main_UpdateCVS EXPORTED
+   DATA Main_UploadFile EXPORTED
+   DATA Menu_ApproveFile EXPORTED
+   DATA Menu_DisapproveFile EXPORTED
+   DATA Menu_Main EXPORTED
+   DATA Menu_UploadFile EXPORTED
+   DATA Options_ConfirmExit EXPORTED
+   DATA Options_ExpandTree EXPORTED
+   DATA Options_FilterFiles EXPORTED
+   DATA Options_OpenRecursive EXPORTED
+   DATA Options_SavePositions EXPORTED
+   DATA Options_Seperator1 EXPORTED
+   DATA Options_Seperator2 EXPORTED
+   DATA Options_Settings EXPORTED
+   DATA Panel_Files EXPORTED
+   DATA Panel_Main EXPORTED
+   DATA Panel_Progress EXPORTED
+   DATA Panel_Search EXPORTED
+   DATA Panel_Status EXPORTED
+   DATA Panel_Tree EXPORTED
+   DATA Progress_Main EXPORTED
+   DATA Splitter_Tree EXPORTED
+   DATA Status_Main EXPORTED
+   DATA Tab_Content EXPORTED
+   DATA Tab_Html EXPORTED
+   DATA Tab_Source EXPORTED
+   DATA Tool_Main EXPORTED
+   DATA Tree_Files EXPORTED
+   DATA UploadFile_Active EXPORTED
+   DATA UploadFile_All EXPORTED
+   DATA Upload_Active EXPORTED
+   DATA Upload_All EXPORTED
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form_Main_OnClose()
+   METHOD Form_Main_OnLoad()
+   METHOD ApproveFile_Active_OnClick()
+   METHOD ApproveFile_All_OnClick()
+   METHOD DisapproveFile_Active_OnClick()
+   METHOD DisapproveFile_All_OnClick()
+   METHOD UploadFile_Active_OnClick()
+   METHOD UploadFile_All_OnClick()
+   METHOD File_OpenLocation_OnClick()
+   METHOD File_SaveChanges_OnClick()
+   METHOD File_Exit_OnClick()
+   METHOD Approve_Active_OnClick()
+   METHOD Approve_All_OnClick()
+   METHOD Disapprove_Active_OnClick()
+   METHOD Disapprove_All_OnClick()
+   METHOD Upload_Active_OnClick()
+   METHOD Upload_All_OnClick()
+   METHOD Actions_UpdateCVS_OnClick()
+   METHOD Options_OpenRecursive_OnClick()
+   METHOD Options_FilterFiles_OnClick()
+   METHOD Options_ExpandTree_OnClick()
+   METHOD Options_ConfirmExit_OnClick()
+   METHOD Options_SavePositions_OnClick()
+   METHOD Options_Settings_OnClick()
+   METHOD Help_Topics_OnClick()
+   METHOD Help_About_OnClick()
+   METHOD Main_OpenLocation_OnClick()
+   METHOD Main_SaveChanges_OnClick()
+   METHOD Main_ApproveFile_OnClick()
+   METHOD Main_DisapproveFile_OnClick()
+   METHOD Main_UploadFile_OnClick()
+   METHOD Main_UpdateCVS_OnClick()
+   METHOD Button_Search_OnClick()
+   METHOD Combo_Filter_OnCBNSelEndOk()
+   METHOD Tree_Files_AfterSelect()
+
+ENDCLASS
+
+METHOD Init( oParent ) CLASS Form_Main
+   ::Super:Init( oParent )
+
+   ::EventHandler[ "OnClose" ] := "Form_Main_OnClose"
+   ::EventHandler[ "OnLoad" ] := "Form_Main_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ::Menu_ApproveFile := ContextMenu( Self ) )
+      :Name                 := "Menu_ApproveFile"
+      :Create()
+      WITH OBJECT ( :Form:ApproveFile_Active := CMENUITEM( :this ) )
+         :Caption              := "Active File"
+         :Name                 := "ApproveFile_Active"
+         :EventHandler[ "OnClick" ] := "ApproveFile_Active_OnClick"
+         :Create()
+      END //ApproveFile_Active
+
+      WITH OBJECT ( :Form:ApproveFile_All := CMENUITEM( :this ) )
+         :Caption              := "All Files"
+         :Name                 := "ApproveFile_All"
+         :EventHandler[ "OnClick" ] := "ApproveFile_All_OnClick"
+         :Create()
+      END //ApproveFile_All
+
+   END //Menu_ApproveFile
+
+   WITH OBJECT ( ::Menu_DisapproveFile := ContextMenu( Self ) )
+      :Name                 := "Menu_DisapproveFile"
+      :Create()
+      WITH OBJECT ( :Form:DisapproveFile_Active := CMENUITEM( :this ) )
+         :Caption              := "Active File"
+         :Name                 := "DisapproveFile_Active"
+         :EventHandler[ "OnClick" ] := "DisapproveFile_Active_OnClick"
+         :Create()
+      END //DisapproveFile_Active
+
+      WITH OBJECT ( :Form:DisapproveFile_All := CMENUITEM( :this ) )
+         :Caption              := "All Files"
+         :Name                 := "DisapproveFile_All"
+         :EventHandler[ "OnClick" ] := "DisapproveFile_All_OnClick"
+         :Create()
+      END //DisapproveFile_All
+
+   END //Menu_DisapproveFile
+
+   WITH OBJECT ( ::Menu_UploadFile := ContextMenu( Self ) )
+      :Name                 := "Menu_UploadFile"
+      :Create()
+      WITH OBJECT ( :Form:UploadFile_Active := CMENUITEM( :this ) )
+         :Caption              := "Active File"
+         :Name                 := "UploadFile_Active"
+         :EventHandler[ "OnClick" ] := "UploadFile_Active_OnClick"
+         :Create()
+      END //UploadFile_Active
+
+      WITH OBJECT ( :Form:UploadFile_All := CMENUITEM( :this ) )
+         :Caption              := "All Files"
+         :Name                 := "UploadFile_All"
+         :EventHandler[ "OnClick" ] := "UploadFile_All_OnClick"
+         :Create()
+      END //UploadFile_All
+
+   END //Menu_UploadFile
+
+   WITH OBJECT ( ::Folder_Main := FolderBrowserDialog( Self ) )
+      :Name                 := "Folder_Main"
+      :Create()
+   END //Folder_Main
+
+   // Properties declaration
+   ::Name                 := "Form_Main"
+   ::Left                 :=         10
+   ::Top                  :=          9
+   ::Width                :=       1183
+   ::Height               :=        706
+   ::Center               := .T.
+   ::ClipChildren         := .T.
+   ::ClipSiblings         := .T.
+   ::Caption              := "xHDN Manager"
+   ::BackColor            :=   16777215
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( ::Menu_Main := COOLMENU( Self ) )
+      :Name                 := "Menu_Main"
+      :Left                 :=         12
+      :Top                  :=          0
+      :Width                :=       1159
+      :Height               :=         20
+      :ForeColor            :=   12562599
+      :List                 := .T.
+      :Tooltips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( :Form:Main_File := COOLMENUITEM( :this ) )
+         :Caption              := "File"
+         :Position             :=          0
+         :Name                 := "Main_File"
+         :Create()
+         WITH OBJECT ( :Form:File_OpenLocation := CMENUITEM( :this ) )
+            :Caption              := "Open Location"
+            :Name                 := "File_OpenLocation"
+            :EventHandler[ "OnClick" ] := "File_OpenLocation_OnClick"
+            :Create()
+         END //File_OpenLocation
+
+         WITH OBJECT ( :Form:File_Seperator1 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "File_Seperator1"
+            :Create()
+         END //File_Seperator1
+
+         WITH OBJECT ( :Form:File_SaveChanges := CMENUITEM( :this ) )
+            :Caption              := "Save changes"
+            :Name                 := "File_SaveChanges"
+            :EventHandler[ "OnClick" ] := "File_SaveChanges_OnClick"
+            :Create()
+         END //File_SaveChanges
+
+         WITH OBJECT ( :Form:File_Seperator2 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "File_Seperator2"
+            :Create()
+         END //File_Seperator2
+
+         WITH OBJECT ( :Form:File_Exit := CMENUITEM( :this ) )
+            :Caption              := "Exit"
+            :Name                 := "File_Exit"
+            :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
+            :Create()
+         END //File_Exit
+
+      END //Main_File
+
+      WITH OBJECT ( :Form:Main_Actions := COOLMENUITEM( :this ) )
+         :Caption              := "Actions"
+         :Position             :=          1
+         :Name                 := "Main_Actions"
+         :Create()
+         WITH OBJECT ( :Form:Actions_Approve := CMENUITEM( :this ) )
+            :Caption              := "Approve File"
+            :Name                 := "Actions_Approve"
+            :Create()
+            WITH OBJECT ( :Form:Approve_Active := CMENUITEM( :this ) )
+               :Caption              := "Active File"
+               :Name                 := "Approve_Active"
+               :EventHandler[ "OnClick" ] := "Approve_Active_OnClick"
+               :Create()
+            END //Approve_Active
+
+            WITH OBJECT ( :Form:Approve_All := CMENUITEM( :this ) )
+               :Caption              := "All Files"
+               :Name                 := "Approve_All"
+               :EventHandler[ "OnClick" ] := "Approve_All_OnClick"
+               :Create()
+            END //Approve_All
+
+         END //Actions_Approve
+
+         WITH OBJECT ( :Form:Actions_Disapprove := CMENUITEM( :this ) )
+            :Caption              := "Disapprove File"
+            :Name                 := "Actions_Disapprove"
+            :Create()
+            WITH OBJECT ( :Form:Disapprove_Active := CMENUITEM( :this ) )
+               :Caption              := "Active File"
+               :Name                 := "Disapprove_Active"
+               :EventHandler[ "OnClick" ] := "Disapprove_Active_OnClick"
+               :Create()
+            END //Disapprove_Active
+
+            WITH OBJECT ( :Form:Disapprove_All := CMENUITEM( :this ) )
+               :Caption              := "All Files"
+               :Name                 := "Disapprove_All"
+               :EventHandler[ "OnClick" ] := "Disapprove_All_OnClick"
+               :Create()
+            END //Disapprove_All
+
+         END //Actions_Disapprove
+
+         WITH OBJECT ( :Form:Actions_Seperator1 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "Actions_Seperator1"
+            :Create()
+         END //Actions_Seperator1
+
+         WITH OBJECT ( :Form:Actions_Upload := CMENUITEM( :this ) )
+            :Caption              := "Upload File"
+            :Name                 := "Actions_Upload"
+            :Create()
+            WITH OBJECT ( :Form:Upload_Active := CMENUITEM( :this ) )
+               :Caption              := "Active File"
+               :Name                 := "Upload_Active"
+               :EventHandler[ "OnClick" ] := "Upload_Active_OnClick"
+               :Create()
+            END //Upload_Active
+
+            WITH OBJECT ( :Form:Upload_All := CMENUITEM( :this ) )
+               :Caption              := "All Files"
+               :Name                 := "Upload_All"
+               :EventHandler[ "OnClick" ] := "Upload_All_OnClick"
+               :Create()
+            END //Upload_All
+
+         END //Actions_Upload
+
+         WITH OBJECT ( :Form:Actions_Seperator2 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "Actions_Seperator2"
+            :Create()
+         END //Actions_Seperator2
+
+         WITH OBJECT ( :Form:Actions_UpdateCVS := CMENUITEM( :this ) )
+            :Caption              := "Update CVS"
+            :Name                 := "Actions_UpdateCVS"
+            :Enabled              := .F.
+            :EventHandler[ "OnClick" ] := "Actions_UpdateCVS_OnClick"
+            :Create()
+         END //Actions_UpdateCVS
+
+      END //Main_Actions
+
+      WITH OBJECT ( :Form:Main_Options := COOLMENUITEM( :this ) )
+         :Caption              := "Options"
+         :Position             :=          2
+         :Name                 := "Main_Options"
+         :Create()
+         WITH OBJECT ( :Form:Options_OpenRecursive := CMENUITEM( :this ) )
+            :Caption              := "Open location recursive"
+            :RadioCheck           := .T.
+            :Name                 := "Options_OpenRecursive"
+            :EventHandler[ "OnClick" ] := "Options_OpenRecursive_OnClick"
+            :Create()
+         END //Options_OpenRecursive
+
+         WITH OBJECT ( :Form:Options_FilterFiles := CMENUITEM( :this ) )
+            :Caption              := "Filter location on .txt files"
+            :RadioCheck           := .T.
+            :Name                 := "Options_FilterFiles"
+            :EventHandler[ "OnClick" ] := "Options_FilterFiles_OnClick"
+            :Create()
+         END //Options_FilterFiles
+
+         WITH OBJECT ( :Form:Options_Seperator1 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "Options_Seperator1"
+            :Create()
+         END //Options_Seperator1
+
+         WITH OBJECT ( :Form:Options_ExpandTree := CMENUITEM( :this ) )
+            :Caption              := "Expand tree by default"
+            :RadioCheck           := .T.
+            :Name                 := "Options_ExpandTree"
+            :EventHandler[ "OnClick" ] := "Options_ExpandTree_OnClick"
+            :Create()
+         END //Options_ExpandTree
+
+         WITH OBJECT ( :Form:Options_ConfirmExit := CMENUITEM( :this ) )
+            :Caption              := "Confirm exit"
+            :RadioCheck           := .T.
+            :Name                 := "Options_ConfirmExit"
+            :EventHandler[ "OnClick" ] := "Options_ConfirmExit_OnClick"
+            :Create()
+         END //Options_ConfirmExit
+
+         WITH OBJECT ( :Form:Options_SavePositions := CMENUITEM( :this ) )
+            :Caption              := "Save window position"
+            :RadioCheck           := .T.
+            :Name                 := "Options_SavePositions"
+            :EventHandler[ "OnClick" ] := "Options_SavePositions_OnClick"
+            :Create()
+         END //Options_SavePositions
+
+         WITH OBJECT ( :Form:Options_Seperator2 := CMENUITEM( :this ) )
+            :Caption              := "-"
+            :Name                 := "Options_Seperator2"
+            :Create()
+         END //Options_Seperator2
+
+         WITH OBJECT ( :Form:Options_Settings := CMENUITEM( :this ) )
+            :Caption              := "Settings && Preferences"
+            :Name                 := "Options_Settings"
+            :EventHandler[ "OnClick" ] := "Options_Settings_OnClick"
+            :Create()
+         END //Options_Settings
+
+      END //Main_Options
+
+      WITH OBJECT ( :Form:Main_Help := COOLMENUITEM( :this ) )
+         :Caption              := "Help"
+         :Position             :=          3
+         :Name                 := "Main_Help"
+         :Create()
+         WITH OBJECT ( :Form:Help_Topics := CMENUITEM( :this ) )
+            :Caption              := "Help Topics"
+            :Name                 := "Help_Topics"
+            :EventHandler[ "OnClick" ] := "Help_Topics_OnClick"
+            :Create()
+         END //Help_Topics
+
+         WITH OBJECT ( :Form:Help_About := CMENUITEM( :this ) )
+            :Caption              := "About"
+            :Name                 := "Help_About"
+            :EventHandler[ "OnClick" ] := "Help_About_OnClick"
+            :Create()
+         END //Help_About
+
+      END //Main_Help
+
+   END //Menu_Main
+
+   WITH OBJECT ( ::Bar_Main := COOLBAR( Self ) )
+      :Name                 := "Bar_Main"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Margin               :=          0
+      END
+
+      :Left                 :=          0
+      :Top                  :=          0
+      :Width                :=       1175
+      :Height               :=         20
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Create()
+      WITH OBJECT ( :Form:Band1 := COOLBARBAND( :this ) )
+         :MinWidth             :=         60
+         :MinHeight            :=         20
+         :BandChild            := :Form:Menu_Main
+         :Break                := .T.
+         :Create()
+      END //Band1
+
+   END //Bar_Main
+
+   WITH OBJECT ( ::Status_Main := STATUSBAR( Self ) )
+      :Name                 := "Status_Main"
+      :Height               :=         23
+      :Create()
+      WITH OBJECT ( :Form:Panel_Main := STATUSBARPANEL( :this ) )
+         :Name                 := "Panel_Main"
+         :Width                :=        543
+         :ImageIndex           :=         -1
+         :Create()
+      END //Panel_Main
+
+      WITH OBJECT ( :Form:Panel_Status := STATUSBARPANEL( :this ) )
+         :Name                 := "Panel_Status"
+         :Width                :=        172
+         :ImageIndex           :=         -1
+         :Create()
+      END //Panel_Status
+
+      WITH OBJECT ( :Form:Panel_Progress := STATUSBARPANEL( :this ) )
+         :Name                 := "Panel_Progress"
+         :Width                :=        148
+         :ImageIndex           :=         -1
+         :Create()
+         WITH OBJECT ( :Form:Progress_Main := PROGRESSBAR( :this ) )
+            :Name                 := "Progress_Main"
+            :Left                 :=        719
+            :Top                  :=          4
+            :Width                :=        144
+            :Height               :=         17
+            :Visible              := .F.
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "ProgressBar1"
+            :Step                 :=          1
+            :Create()
+         END //Progress_Main
+
+      END //Panel_Progress
+
+   END //Status_Main
+
+   WITH OBJECT ( ::Tool_Main := TOOLBAR( Self ) )
+      :Name                 := "Tool_Main"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent:Bar_Main
+         :Right                := :Owner:Parent
+         :Margin               :=          0
+      END
+
+      :Left                 :=          0
+      :Top                  :=         20
+      :Width                :=       1175
+      :Height               :=         46
+      :Tooltips             := .T.
+      :Create()
+      WITH OBJECT ( :Form:Main_OpenLocation := TOOLBUTTON( :this ) )
+         :Width                :=         80
+         :Caption              := "Open Location"
+         :Position             :=          0
+         :Name                 := "Main_OpenLocation"
+         :EventHandler[ "OnClick" ] := "Main_OpenLocation_OnClick"
+         :Create()
+      END //Main_OpenLocation
+
+      WITH OBJECT ( :Form:Main_SaveChanges := TOOLBUTTON( :this ) )
+         :Width                :=         80
+         :Caption              := "Save Changes"
+         :Position             :=          1
+         :Name                 := "Main_SaveChanges"
+         :EventHandler[ "OnClick" ] := "Main_SaveChanges_OnClick"
+         :Create()
+      END //Main_SaveChanges
+
+      WITH OBJECT ( :Form:Main_Seperator1 := TOOLBUTTON( :this ) )
+         :Width                :=          7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             :=          2
+         :Name                 := "Main_Seperator1"
+         :Create()
+      END //Main_Seperator1
+
+      WITH OBJECT ( :Form:Main_ApproveFile := TOOLBUTTON( :this ) )
+         :ContextMenu          := :Form:Menu_ApproveFile
+         :Dropdown             := .T.
+         :Width                :=         90
+         :Caption              := "Approve File"
+         :Position             :=          3
+         :Name                 := "Main_ApproveFile"
+         :EventHandler[ "OnClick" ] := "Main_ApproveFile_OnClick"
+         :Create()
+      END //Main_ApproveFile
+
+      WITH OBJECT ( :Form:Main_DisapproveFile := TOOLBUTTON( :this ) )
+         :ContextMenu          := :Form:Menu_DisapproveFile
+         :Dropdown             := .T.
+         :Width                :=        103
+         :Caption              := "Disapprove File"
+         :Position             :=          4
+         :Name                 := "Main_DisapproveFile"
+         :EventHandler[ "OnClick" ] := "Main_DisapproveFile_OnClick"
+         :Create()
+      END //Main_DisapproveFile
+
+      WITH OBJECT ( :Form:Main_UploadFile := TOOLBUTTON( :this ) )
+         :ContextMenu          := :Form:Menu_UploadFile
+         :Dropdown             := .T.
+         :Width                :=         82
+         :Caption              := "Upload File"
+         :Position             :=          5
+         :Name                 := "Main_UploadFile"
+         :EventHandler[ "OnClick" ] := "Main_UploadFile_OnClick"
+         :Create()
+      END //Main_UploadFile
+
+      WITH OBJECT ( :Form:Main_Seperator2 := TOOLBUTTON( :this ) )
+         :Width                :=          7
+         :Caption              := ""
+         :Separator            := .T.
+         :Position             :=          6
+         :Name                 := "Main_Seperator2"
+         :Create()
+      END //Main_Seperator2
+
+      WITH OBJECT ( :Form:Main_UpdateCVS := TOOLBUTTON( :this ) )
+         :Width                :=         68
+         :Caption              := "Update CVS"
+         :Enabled              := .F.
+         :Position             :=          7
+         :Name                 := "Main_UpdateCVS"
+         :EventHandler[ "OnClick" ] := "Main_UpdateCVS_OnClick"
+         :Create()
+      END //Main_UpdateCVS
+
+   END //Tool_Main
+
+   WITH OBJECT ( ::Panel_Tree := PANEL( Self ) )
+      :Name                 := "Panel_Tree"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent:Tool_Main
+         :Bottom               := :Owner:Parent:Status_Main
+         :Margin               :=          6
+      END
+
+      :Left                 :=          6
+      :Top                  :=         72
+      :Width                :=        294
+      :Height               :=        576
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Create()
+      WITH OBJECT ( :Form:Panel_Search := PANEL( :this ) )
+         :Name                 := "Panel_Search"
+         WITH OBJECT :Dock
+            :Left                 := :Owner:Parent
+            :Top                  := :Owner:Parent
+            :Right                := :Owner:Parent
+         END
+
+         :Left                 :=          2
+         :Top                  :=          2
+         :Width                :=        290
+         :Height               :=         79
+         :ClipChildren         := .T.
+         :ClipSiblings         := .T.
+         :Caption              := "Search"
+         :BackColor            :=   16777215
+         :Create()
+         WITH OBJECT ( :Form:Button_Search := BUTTON( :this ) )
+            :Name                 := "Button_Search"
+            WITH OBJECT :Dock
+               :Right                := :Owner:Parent
+               :Margin               :=          4
+            END
+
+            :Left                 :=        226
+            :Top                  :=          7
+            :Width                :=         60
+            :Height               :=         22
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Search"
+            WITH OBJECT :Font
+               :Bold                 := .T.
+            END
+
+            :EventHandler[ "OnClick" ] := "Button_Search_OnClick"
+            :Create()
+         END //Button_Search
+
+         WITH OBJECT ( :Form:Edit_Search := EDIT( :this ) )
+            :Name                 := "Edit_Search"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent
+               :Right                := :Owner:Parent:Button_Search
+               :Margin               :=          4
+            END
+
+            :Left                 :=          4
+            :Top                  :=          8
+            :Width                :=        218
+            :Height               :=         20
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Create()
+         END //Edit_Search
+
+         WITH OBJECT ( :Form:Check_SearchInFiles := CHECKBOX( :this ) )
+            :Name                 := "Check_SearchInFiles"
+            :Left                 :=          3
+            :Top                  :=         36
+            :Width                :=        140
+            :Height               :=         15
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Search inside source files"
+            :Create()
+         END //Check_SearchInFiles
+
+      END //Panel_Search
+
+      WITH OBJECT ( :Form:Panel_Files := PANEL( :this ) )
+         :Name                 := "Panel_Files"
+         WITH OBJECT :Dock
+            :Left                 := :Owner:Parent
+            :Top                  := :Owner:Parent:Panel_Search
+            :Right                := :Owner:Parent
+            :Bottom               := :Owner:Parent
+         END
+
+         :Left                 :=          2
+         :Top                  :=         83
+         :Width                :=        290
+         :Height               :=        491
+         :ClipChildren         := .T.
+         :ClipSiblings         := .T.
+         :Caption              := "Documentation Files"
+         :BackColor            :=   16777215
+         :Create()
+         WITH OBJECT ( :Form:Label_Filter := LABEL( :this ) )
+            :Name                 := "Label_Filter"
+            :Left                 :=          6
+            :Top                  :=          6
+            :Width                :=         38
+            :Height               :=         16
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :Caption              := "Filter:"
+            WITH OBJECT :Font
+               :Bold                 := .T.
+            END
+
+            :Create()
+         END //Label_Filter
+
+         WITH OBJECT ( :Form:Combo_Filter := COMBOBOX( :this ) )
+            :Name                 := "Combo_Filter"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent:Label_Filter
+               :Right                := :Owner:Parent
+            END
+
+            :Left                 :=         46
+            :Top                  :=          3
+            :Width                :=        242
+            :Height               :=        100
+            :ClientEdge           := .T.
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :ItemHeight           :=         13
+            :EventHandler[ "OnCBNSelEndOk" ] := "Combo_Filter_OnCBNSelEndOk"
+            :Create()
+         END //Combo_Filter
+
+         WITH OBJECT ( :Form:Tree_Files := TREEVIEW( :this ) )
+            :Name                 := "Tree_Files"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent
+               :Top                  := :Owner:Parent:Combo_Filter
+               :Right                := :Owner:Parent
+               :Bottom               := :Owner:Parent
+            END
+
+            :Left                 :=          2
+            :Top                  :=         26
+            :Width                :=        286
+            :Height               :=        444
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :EventHandler[ "AfterSelect" ] := "Tree_Files_AfterSelect"
+            :Create()
+         END //Tree_Files
+
+      END //Panel_Files
+
+   END //Panel_Tree
+
+   WITH OBJECT ( ::Tab_Content := TABCONTROL( Self ) )
+      :Name                 := "Tab_Content"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent:Panel_Tree
+         :Top                  := :Owner:Parent:Tool_Main
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent:Status_Main
+         :Margin               :=          6
+      END
+
+      :Left                 :=        309
+      :Top                  :=         72
+      :Width                :=        860
+      :Height               :=        576
+      :ClipChildren         := .T.
+      :ClipSiblings         := .T.
+      :Caption              := "TabControl2"
+      :Create()
+      WITH OBJECT ( :Form:Tab_Source := TABPAGE( :this ) )
+         :Name                 := "Tab_Source"
+         :Caption              := "Source View"
+         :ImageIndex           :=         -1
+         :Create()
+         WITH OBJECT ( :Form:Edit_FileSource := EDIT( :this ) )
+            :VertScroll           := .T.
+            :HorzScroll           := .T.
+            :Name                 := "Edit_FileSource"
+            WITH OBJECT :Dock
+               :Left                 := :Owner:Parent
+               :Top                  := :Owner:Parent
+               :Right                := :Owner:Parent
+               :Bottom               := :Owner:Parent
+               :Margin               :=          6
+            END
+
+            :Left                 :=          6
+            :Top                  :=          6
+            :Width                :=        844
+            :Height               :=        540
+            :ClipChildren         := .T.
+            :ClipSiblings         := .T.
+            :MultiLine            := .T.
+            :WantReturn           := .T.
+            :Create()
+         END //Edit_FileSource
+
+      END //Tab_Source
+
+      WITH OBJECT ( :Form:Tab_Html := TABPAGE( :this ) )
+         :Name                 := "Tab_Html"
+         :Caption              := "HTML View"
+         :ImageIndex           :=         -1
+         :Create()
+      END //Tab_Html
+
+   END //Tab_Content
+
+   WITH OBJECT ( ::Splitter_Tree := SPLITTER( Self ) )
+      :Owner                := :Parent:Panel_Tree
+      :Name                 := "Splitter_Tree"
+      :Position             :=          3
+      :Create()
+   END //Splitter_Tree
+
+   ::Show()
+
+RETURN Self

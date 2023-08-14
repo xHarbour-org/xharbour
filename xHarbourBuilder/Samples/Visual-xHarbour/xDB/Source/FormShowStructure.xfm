@@ -1,0 +1,151 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormShowStructure INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormShowStructure_OnLoad()
+   METHOD ButtonClose_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormShowStructure
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormShowStructure_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MTable"
+      :Structure            := { { "A", "C", 10, 0 }, { "B", "C", 1, 0 }, { "C", "N", 3, 0 }, { "D", "N", 3, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MTable
+
+   // Properties declaration
+   ::Name                 := "FormShowStructure"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 312
+   ::Height               := 357
+   ::Center               := .T.
+   ::Caption              := "Current Table Structure"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\app.ico","_APPICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormShowStructure
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 265
+      :Width                := 306
+      :Height               := 60
+      :Create()
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonClose"
+         :Left                 := 209
+         :Top                  := 15
+         :Width                := 80
+         :Height               := 30
+         :Caption              := "Close"
+         :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PANEL
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := ::Panel1
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 301
+      :Height               := 265
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := ::MTable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "!!!!!!!!!!"
+         :Caption              := "Field Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:A"
+         :Width                := 100
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "!"
+         :Caption              := "Type"
+         :Data                 := "hb_QSelf():DataSource:Fields:B"
+         :Alignment            := 3
+         :Width                := 50
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Length"
+         :Data                 := "hb_QSelf():DataSource:Fields:C"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Decimals"
+         :Data                 := "hb_QSelf():DataSource:Fields:D"
+         :Alignment            := 3
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

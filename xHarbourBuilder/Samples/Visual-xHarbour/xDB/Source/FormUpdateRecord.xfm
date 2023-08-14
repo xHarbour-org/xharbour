@@ -1,0 +1,180 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormUpdateRecord INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormUpdateRecord_OnClose()
+   METHOD FormUpdateRecord_OnLoad()
+   METHOD ButtonCancel_OnClick()
+   METHOD ButtonOK_OnClick()
+   METHOD GridColumn5_OnSave()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormUpdateRecord
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "FormUpdateRecord_OnClose"
+   ::EventHandler[ "OnLoad" ] := "FormUpdateRecord_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MTable"
+      :Structure            := { { "A", "C", 10, 0 }, { "B", "C", 1, 0 }, { "C", "N", 3, 0 }, { "D", "N", 3, 0 }, { "E", "C", 255, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MTable
+
+   // Properties declaration
+   ::Name                 := "FormUpdateRecord"
+   ::Modal                := .T.
+   ::Left                 := 12
+   ::Top                  := 8
+   ::Width                := 640
+   ::Height               := 480
+   ::Center               := .T.
+   ::Caption              := "Update Record"
+   ::Icon                 := { ".\Resource\app.ico","_APPICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormUpdateRecord
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 380
+      :Width                := 632
+      :Height               := 66
+      :Create()
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonCancel"
+         :Left                 := 524
+         :Top                  := 18
+         :Width                := 80
+         :Height               := 30
+         :Caption              := "Cancel"
+         :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+         :Create()
+      END //BUTTON
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonOK"
+         WITH OBJECT :Dock
+            :Right                := ::ButtonCancel
+            :Margin               := 20
+         END
+
+         :Left                 := 424
+         :Top                  := 18
+         :Width                := 80
+         :Height               := 30
+         :Caption              := "OK"
+         :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PANEL
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := ::Panel1
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 619
+      :Height               := 380
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :DataSource           := ::MTable
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Field Name"
+         :Data                 := "hb_QSelf():DataSource:Fields:A"
+         :Width                := 84
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Type"
+         :Data                 := "hb_QSelf():DataSource:Fields:B"
+         :Alignment            := 3
+         :Width                := 40
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Len"
+         :Data                 := "hb_QSelf():DataSource:Fields:C"
+         :Alignment            := 3
+         :Width                := 40
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Picture              := "999"
+         :Caption              := "Dec"
+         :Data                 := "hb_QSelf():DataSource:Fields:D"
+         :Alignment            := 3
+         :Width                := 40
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Content"
+         :Data                 := "hb_QSelf():DataSource:Fields:E"
+         :Autoedit             := .T.
+         :Width                := 420
+         :ImageIndex           := 0
+         :EventHandler[ "OnSave" ] := "GridColumn5_OnSave"
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

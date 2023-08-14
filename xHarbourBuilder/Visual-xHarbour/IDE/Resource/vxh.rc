@@ -1,0 +1,32 @@
+#include "winver.h"
+1 VERSIONINFO
+FILEVERSION       20,16,3,75
+PRODUCTVERSION    20,16,3,75
+FILEFLAGS         0
+FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
+FILEOS            VOS__WINDOWS32
+FILETYPE          VFT_APP
+FILESUBTYPE       0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName",      "xHarbour.com, Inc"
+         VALUE "FileDescription",  "Visual xHarbour"
+         VALUE "FileVersion",      "20.16"
+         VALUE "InternalName",     "vxh"
+         VALUE "LegalCopyright",   "2016 xHarbour.com, Inc"
+         VALUE "OriginalFilename", "vxh.exe"
+         VALUE "ProductName",      "Visual xHarbour"
+         VALUE "ProductVersion",   "20.16.3.75"
+      }
+   }
+   BLOCK "VarFileInfo"
+   {
+      VALUE "Translation", 0x409, 1252
+   }
+}
+
+#include "vxhres.rc"
+

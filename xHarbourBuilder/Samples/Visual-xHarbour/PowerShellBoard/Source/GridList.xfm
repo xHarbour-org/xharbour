@@ -1,0 +1,142 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS GridList INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD GridList_OnLoad()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS GridList
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "GridList_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "MemTab"
+      :Structure            := { { "A", "C", 64, 0 }, { "B", "C", 32, 0 }, { "C", "C", 16, 0 }, { "D", "C", 10, 0 }, { "E", "C", 10, 0 }, { "F", "C", 128, 0 } }
+      :Table                := {  }
+      :Create()
+   END //MemTab
+
+   // Properties declaration
+   ::Name                 := "GridList"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 800
+   ::Height               := 500
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "Selective Service list"
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS GridList
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "DataGrid1"
+      WITH OBJECT :Dock
+         :Left                 := "GridList"
+         :Top                  := "GridList"
+         :Right                := "GridList"
+         :Bottom               := "GridList"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Left                 := 11
+      :Top                  := 20
+      :Width                := 750
+      :Height               := 411
+      :VertScrollSize       := 238
+      :HorzScrollSize       := 338
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :Freezecolumn         := 1
+      :HighlightColor       := 16750899
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := "MemTab"
+      :Striping             := .T.
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "DisplayName"
+         :Data                 := "hb_QSelf():DataSource:Fields:A"
+         :Width                := 325
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "ServiceName"
+         :Data                 := "hb_QSelf():DataSource:Fields:B"
+         :Width                := 224
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Status"
+         :Data                 := "hb_QSelf():DataSource:Fields:C"
+         :Width                := 112
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn4"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "CanStop"
+         :Data                 := "hb_QSelf():DataSource:Fields:D"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn5"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "CanPause"
+         :Data                 := "hb_QSelf():DataSource:Fields:E"
+         :Width                := 70
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn6"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "DependentServices"
+         :Data                 := "hb_QSelf():DataSource:Fields:F"
+         :Width                := 896
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

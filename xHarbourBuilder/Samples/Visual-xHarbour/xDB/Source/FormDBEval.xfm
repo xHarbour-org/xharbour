@@ -1,0 +1,354 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormDBEval INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormDBEval_OnLoad()
+   METHOD Timer1_OnTimeOut()
+   METHOD ButtonCalc_OnClick()
+   METHOD ButtonClose_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormDBEval
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormDBEval_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "FormDBEval"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 570
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "DBEval"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\query_dbf.ico","_QUERY_DBFICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormDBEval
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditWhile"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 293
+      :Top                  := 221
+      :Width                := 250
+      :Height               := 60
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioAll"
+      :Left                 := 19
+      :Top                  := 310
+      :Width                := 42
+      :Height               := 15
+      :Caption              := "All"
+      :InitialState         := 1
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioRest"
+      :Left                 := 64
+      :Top                  := 310
+      :Width                := 52
+      :Height               := 15
+      :Caption              := "Rest"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( RADIOBUTTON( Self ) )
+      :Name                 := "RadioNext"
+      :Left                 := 128
+      :Top                  := 310
+      :Width                := 53
+      :Height               := 15
+      :Caption              := "Next"
+      :Create()
+   END //RADIOBUTTON
+
+   WITH OBJECT ( MASKEDIT( Self ) )
+      :Name                 := "MaskEditNext"
+      :Left                 := 189
+      :Top                  := 310
+      :Width                := 80
+      :Height               := 22
+      :Caption              := (1)
+      :Alignment            := 3
+      :WantReturn           := .T.
+      :Picture              := "99999999"
+      :Create()
+   END //MASKEDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCalc"
+      :Left                 := 362
+      :Top                  := 429
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Calculate"
+      :EventHandler[ "OnClick" ] := "ButtonCalc_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonClose"
+      :Left                 := 463
+      :Top                  := 429
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TInit1"
+      :Left                 := 24
+      :Top                  := 28
+      :Width                := 143
+      :Height               := 16
+      :Caption              := "Initial value of  _CALC1:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TInit2"
+      :Left                 := 215
+      :Top                  := 28
+      :Width                := 143
+      :Height               := 16
+      :Caption              := "Initial value of _CALC2:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditInit1"
+      :Left                 := 24
+      :Top                  := 54
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :AutoHScroll          := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditInit2"
+      :Left                 := 215
+      :Top                  := 54
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditInit3"
+      :Left                 := 413
+      :Top                  := 54
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditExpr"
+      :VertScroll           := .T.
+      :Left                 := 20
+      :Top                  := 115
+      :Width                := 524
+      :Height               := 60
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditFor"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 19
+      :Top                  := 221
+      :Width                := 250
+      :Height               := 60
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( MASKEDIT( Self ) )
+      :Name                 := "MaskEditNext"
+      :Left                 := 189
+      :Top                  := 310
+      :Width                := 80
+      :Height               := 22
+      :Caption              := (1)
+      :Alignment            := 3
+      :WantReturn           := .T.
+      :Picture              := "99999999"
+      :Create()
+   END //MASKEDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TResult1"
+      :Left                 := 23
+      :Top                  := 347
+      :Width                := 127
+      :Height               := 16
+      :Caption              := "Final value of _CALC1:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TResult2"
+      :Left                 := 215
+      :Top                  := 347
+      :Width                := 127
+      :Height               := 16
+      :Caption              := "Final value of _CALC2:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditResult1"
+      :Left                 := 23
+      :Top                  := 373
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :BackColor            := 16711422
+      :AutoHScroll          := .T.
+      :ReadOnly             := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditResult2"
+      :Left                 := 215
+      :Top                  := 373
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :BackColor            := 16711422
+      :ReadOnly             := .T.
+      :SelBackColor         := 16711422
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditResult3"
+      :Left                 := 413
+      :Top                  := 373
+      :Width                := 130
+      :Height               := 22
+      :Alignment            := 3
+      :BackColor            := 16711422
+      :ReadOnly             := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonClose"
+      :Left                 := 463
+      :Top                  := 429
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TInit3"
+      :Left                 := 413
+      :Top                  := 28
+      :Width                := 132
+      :Height               := 16
+      :Caption              := "Initial value of _CALC3:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Labelx"
+      :Left                 := 19
+      :Top                  := 92
+      :Width                := 162
+      :Height               := 16
+      :Caption              := "Expression to evaluate:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Labely"
+      :Left                 := 19
+      :Top                  := 196
+      :Width                := 115
+      :Height               := 16
+      :Caption              := "FOR confition:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Labelz"
+      :Left                 := 293
+      :Top                  := 196
+      :Width                := 111
+      :Height               := 16
+      :Caption              := "WHILE condition:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "TResult3"
+      :Left                 := 413
+      :Top                  := 347
+      :Width                := 130
+      :Height               := 16
+      :Caption              := "Final value of _CALC3"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 23
+      :Top                  := 434
+      :Width                := 150
+      :Height               := 20
+      :Create()
+   END //PROGRESSBAR
+
+RETURN Self
+

@@ -1,0 +1,153 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormEngineInfo INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormEngineInfo_OnLoad()
+   METHOD myInitGrid()
+   METHOD ToolButtonTables_OnClick()
+   METHOD ToolButtonColumns_OnClick()
+   METHOD ToolButtonIndexes_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormEngineInfo
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormEngineInfo_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myInitGrid"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mtmy"
+      :Structure            := { { "A1", "C", 32, 0 }, { "A2", "C", 32, 0 }, { "A3", "C", 32, 0 }, { "A4", "C", 32, 0 }, { "A5", "C", 32, 0 }, { "A6", "C", 32, 0 }, { "A7", "C", 32, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mtmy
+
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mtfb"
+      :Structure            := { { "A1", "C", 32, 0 }, { "A2", "C", 32, 0 }, { "A3", "C", 32, 0 }, { "A4", "C", 32, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mtfb
+
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 48
+      :Iconheight           := 48
+      :AddImage( "_TABLESICO", NIL, 4194304, NIL,1, "tables.ico" )
+      :AddImage( "_COLUMNICO", NIL, 4194304, NIL,1, "column.ico" )
+      :AddImage( "_SORT_AZ_ASCENDINGICO", NIL, 4194304, NIL,1, "sort_az_ascending.ico" )
+      :AddImage( "_QUESTION_AND_ANSWERICO", NIL, 4194304, NIL,1, "question_and_answer.ico" )
+      :Create()
+   END //ImageList1
+
+   // Properties declaration
+   ::Name                 := "FormEngineInfo"
+   ::MinWidth             := 500
+   ::MinHeight            := 400
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 800
+   ::Height               := 462
+   ::Center               := .T.
+   ::Caption              := "Schema Informations"
+   ::Icon                 := { ".\resource\gears_view.ico","_GEARS_VIEWICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormEngineInfo
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "ToolBara"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 6
+      :Top                  := 6
+      :Width                := 82
+      :Height               := 416
+      :Tooltips             := .T.
+      :ImageList            := ::ImageList1
+      :HorzPadding          := 30
+      :VertPadding          := 20
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButtonTables"
+         :Showtext             := .T.
+         :Width                := 78
+         :Caption              := "Tables"
+         :ImageIndex           := 1
+         :Checkgroup           := .T.
+         :Wrap                 := .T.
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "ToolButtonTables_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButtonColumns"
+         :Showtext             := .T.
+         :Width                := 82
+         :Caption              := "Columns"
+         :ImageIndex           := 2
+         :Checkgroup           := .T.
+         :Wrap                 := .T.
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "ToolButtonColumns_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButtonIndexes"
+         :Showtext             := .T.
+         :Width                := 78
+         :Caption              := "Indexes"
+         :ImageIndex           := 3
+         :Checkgroup           := .T.
+         :Wrap                 := .T.
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "ToolButtonIndexes_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Grid"
+      WITH OBJECT :Dock
+         :Left                 := ::ToolBara
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 6
+      END
+
+      :Left                 := 94
+      :Top                  := 6
+      :Width                := 685
+      :Height               := 415
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :Create()
+   END //DATAGRID
+
+RETURN Self
+

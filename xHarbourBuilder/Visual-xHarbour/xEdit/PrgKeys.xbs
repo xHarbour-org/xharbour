@@ -1,0 +1,103 @@
+#include "xEditConstants.ch"
+
+#define K_RETURN         13
+#define K_DEL             7
+#define K_BS              8
+
+PROCEDURE PRGAfterKey( oEditor, nKey, nCount )
+
+   //To disable Macros UNcomment next line.
+   //RETURN
+
+   nNewPad := 0
+   nPad    := 0
+   aActions := {}
+
+   WITH OBJECT oEditor
+      IF :nLine > 1
+         IF Len( :CurrentLine[ ED_PREVLINE ] ) > 3
+            // Collapsed mode.
+            RETURN
+         ENDIF
+
+         HB_AtX( "^ *", :CurrentLine[ ED_PREVLINE ][ ED_BUFFER ], , , @nNewPad )
+
+         IF ! Empty( HB_AtX( "(?i)^ *(INIT +(FUNCTION|PROCEDURE)|EXIT +(FUNCTION|PROCEDURE)|STATIC +(FUNCTION|PROCEDURE)|FUNCTION|PROCEDURE|CLASS|METHOD|IF|ELSEIF|ELSE|DO|WHILE|SWITCH|FOR|BEGIN|TRY|CATCH|WITH)", :CurrentLine[ ED_PREVLINE ][ ED_BUFFER ] ) )
+            nNewPad += 3
+         ENDIF
+      ENDIF
+
+      IF nKey == K_RETURN
+         IF :nLine > 1
+            HB_AtX( "^ *", :CurrentLine[ ED_BUFFER ], , , @nPad )
+
+            :LineHome()
+            //TraceLog( :CurrentLine[ ED_BUFFER ], nNewPad, nPad, :nLine, :nColumn )
+
+            IF nPad < nNewPad
+               :Action( { { ED_PASTE, :nLine, :nColumn, Space( nNewPad - nPad ) } }, :aUndo )
+            ELSEIF nPad > nNewPad
+               //TraceLog( :Column, nPad, nNewPad )
+               :OnKey( K_BS, nPad - nNewPad )
+            ENDIF
+         ENDIF
+      ELSEIF nKey == ' '
+         HB_AtX( "^ *", :CurrentLine[ ED_BUFFER ], , , @nPad )
+
+         IF :nColumn == nPad + 3
+            IF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'I'
+               aAdd( aActions, { ED_GOTO, :nLine, :nColumn + 1 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "ENDIF" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "F" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'F'
+               aAdd( aActions, { ED_GOTO, :nLine, :nColumn + 2 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "NEXT" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "OR" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'W'
+               aAdd( aActions, { ED_GOTO, :nLine, :nColumn + 4 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "ENDDO" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "HILE" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'S'
+               aAdd( aActions, { ED_GOTO, :nLine, :nColumn + 5 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad + 3 ) + "CASE " } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "END" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "WITCH" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'D'
+               aAdd( aActions, { ED_GOTO, :nLine + 1, nPad + 3 + 6 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad + 3 ) + "CASE " } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "ENDCASE" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "O CASE" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'B'
+               aAdd( aActions, { ED_GOTO, :nLine + 1, nPad + 3 + 15 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad + 3 ) + "RECOVER USING " } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "ENDSEQUENCE" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "EGIN SEQUENCE" } )
+            ELSEIF :CurrentLine[ ED_BUFFER][ :nColumn - 2 ] == 'T'
+               aAdd( aActions, { ED_GOTO, :nLine + 1, nPad + 3 + 7 } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad + 3 ) + "CATCH " } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, Space( nPad ) + "END" } )
+               aAdd( aActions, { ED_INSERTLINE, :nLine + 1, "" } )
+               aAdd( aActions, { ED_PASTE, :nLine, :nColumn - 1, "RY" } )
+            ENDIF
+         ENDIF
+
+         IF ! Empty( aActions )
+            aActions[-1][1] += 256 * Len( aActions )
+            :Action( aActions, :aUnDo )
+         ENDIF
+      /*
+      ELSEIF :nColumn == 2 .AND. Len( :CurrentLine[ ED_BUFFER ] ) == 1 .AND. ( ( nKey >= '0' .AND. nKey <= '9' ) .OR. ( nKey >= 'A' .OR. nKey <= 'Z' ) .OR. ( nKey >= 'a' .OR. nKey <= 'z' ) .OR. nKey == '_' )
+         :LineHome()
+         :Action( { { ED_PASTE, :nLine, :nColumn, Space( nNewPad ) } }, ::aUndo )
+         :LineEnd()
+      */
+      ENDIF
+   END
+
+RETURN

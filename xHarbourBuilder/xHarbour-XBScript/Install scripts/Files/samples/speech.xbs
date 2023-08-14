@@ -1,0 +1,9 @@
+Function Main()
+
+   Try
+     CreateObject( "SAPI.SpVoice" ):Speak( "Hello from X Harbour's XB Script.", 0 )
+   Catch
+     Alert( "It appears that speech isn't available on this machine" )
+   End
+   
+Return( NIL )

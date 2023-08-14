@@ -1,0 +1,21 @@
+Properties
+   Range       
+   MinRange 
+   MaxRange 
+   Position 
+   Smooth
+   ForeColor
+   BackColor
+   Step
+   Vertical
+   Border 
+
+
+Methods
+   DeltaPos( n )    
+   SetRange( a )    
+   SetPosition()
+   SetBarColor( n ) 
+   StepIt()         
+   SetBkColor( n )  
+   SetStep( n )

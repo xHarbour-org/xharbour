@@ -1,0 +1,26 @@
+[Project]
+Name=Timer
+Bin=Bin
+Obj=Obj
+Source=Source
+Resource=Resource
+Parameters=
+SourcePath=
+IncludePath=
+CompilerFlags=-es2 -gc0 -m -n -w -q
+Definitions=
+CleanBuild=0
+UseDLL=0
+ThemeActive=1
+TargetName=
+TargetType=1
+MultiThread=0
+GUI=1
+ClassID=
+[Files]
+Form1.xfm=
+Form2.xfm=
+[Sources]
+[Binaries]
+[ExtImages]
+[Resources]

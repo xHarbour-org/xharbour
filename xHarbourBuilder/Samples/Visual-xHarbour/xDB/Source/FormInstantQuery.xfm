@@ -1,0 +1,277 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormInstantQuery INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormInstantQuery_OnClose()
+   METHOD FormInstantQuery_OnDestroy()
+   METHOD FormInstantQuery_OnLoad()
+   METHOD myCloseTempFile()
+   METHOD myCursorExport()
+   METHOD Timer1_OnTimeOut()
+   METHOD ContextDB3_OnClick()
+   METHOD ContextDB4_OnClick()
+   METHOD ContextADT_OnClick()
+   METHOD ToolEdit_OnClick()
+   METHOD ToolLoad_OnClick()
+   METHOD ToolSave_OnClick()
+   METHOD ToolRun_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormInstantQuery
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "FormInstantQuery_OnClose"
+   ::EventHandler[ "OnDestroy" ] := "FormInstantQuery_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormInstantQuery_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "myCloseTempFile"
+   ::EventHandler[ "UserMethod2" ] := "myCursorExport"
+
+   // Populate Components
+   WITH OBJECT ( DataTable( Self ) )
+      :Name                 := "dt"
+      :AutoOpen             := .F.
+      :Create()
+   END //dt
+
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 32
+      :Iconheight           := 32
+      :AddImage( "_DESKTOPICO", NIL, 4194304, NIL,1, "desktop.ico" )
+      :AddImage( "_REPLACEICO", NIL, 4194304, NIL,1, "replace.ico" )
+      :AddImage( "_DISK_YELLOWICO", NIL, 4194304, NIL,1, "disk_yellow.ico" )
+      :AddImage( "_RUNICO", NIL, 4194304, NIL,1, "run.ico" )
+      :AddImage( "_EXPORT1ICO", NIL, 4194304, NIL,1, "export1.ico" )
+      :Create()
+   END //ImageList1
+
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mt"
+      :Structure            := { { "A1", "C", 32, 0 }, { "A2", "C", 32, 0 }, { "A3", "C", 32, 0 } }
+      :Table                := {  }
+      :Create()
+   END //mt
+
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextExport"
+      :Create()
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextDB3"
+         :Caption              := "Copy Cursor to DBase III file"
+         :EventHandler[ "OnClick" ] := "ContextDB3_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextDB4"
+         :Caption              := "Copy Cursor to Dbase IV file"
+         :EventHandler[ "OnClick" ] := "ContextDB4_OnClick"
+         :Create()
+      END //CMENUITEM
+
+      WITH OBJECT ( CMENUITEM( :this ) )
+         :Name                 := "ContextADT"
+         :Caption              := "Copy Cursor to .ADT file"
+         :EventHandler[ "OnClick" ] := "ContextADT_OnClick"
+         :Create()
+      END //CMENUITEM
+
+   END //ContextExport
+
+   // Properties declaration
+   ::Name                 := "FormInstantQuery"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 550
+   ::Height               := 600
+   ::Caption              := "SQL query"
+   ::ThickFrame           := .F.
+   ::Icon                 := { ".\resource\question_and_answer.ico","_QUESTION_AND_ANSWERICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormInstantQuery
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "ToolQuery"
+      :Left                 := 16
+      :Top                  := 6
+      :Width                := 282
+      :Height               := 67
+      :Tooltips             := .T.
+      :ImageList            := ::ImageList1
+      :HorzPadding          := 10
+      :VertPadding          := 10
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolEdit"
+         :ToolTip              := "Edit query source code"
+         :Width                := 42
+         :Caption              := "Edit"
+         :ImageIndex           := 1
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "ToolEdit_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolLoad"
+         :ToolTip              := "Load query source code from existing text file"
+         :Width                := 42
+         :Caption              := "Load"
+         :ImageIndex           := 2
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "ToolLoad_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolSave"
+         :ToolTip              := "Save query source code in text file"
+         :Width                := 42
+         :Caption              := "Save"
+         :ImageIndex           := 3
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "ToolSave_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolRun"
+         :ToolTip              := "Execute SQL query"
+         :Width                := 42
+         :Caption              := "Run"
+         :ImageIndex           := 4
+         :Position             := 3
+         :EventHandler[ "OnClick" ] := "ToolRun_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolFix"
+         :ToolTip              := "Save cursor data in free table"
+         :ContextMenu          := ::ContextExport
+         :DropDown             := .T.
+         :Width                := 68
+         :Caption              := "Export"
+         :ImageIndex           := 5
+         :Position             := 4
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 21
+      :Top                  := 90
+      :Width                := 204
+      :Height               := 16
+      :Caption              := "Essential Schema Informations:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "Helper"
+      :Left                 := 21
+      :Top                  := 114
+      :Width                := 500
+      :Height               := 160
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :DataSource           := ::mt
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn1"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Table"
+         :Data                 := "hb_QSelf():DataSource:Fields:A1"
+         :Width                := 160
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn2"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Column"
+         :Data                 := "hb_QSelf():DataSource:Fields:A2"
+         :Width                := 160
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      WITH OBJECT ( GRIDCOLUMN( :this ) )
+         :Name                 := "GridColumn3"
+         :Allowsize            := .T.
+         :Allowdrag            := .T.
+         :Caption              := "Datatype"
+         :Data                 := "hb_QSelf():DataSource:Fields:A3"
+         :Width                := 160
+         :ImageIndex           := 0
+         :Create()
+      END //GRIDCOLUMN
+
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 21
+      :Top                  := 281
+      :Width                := 133
+      :Height               := 16
+      :Caption              := "Query source code:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditQuery"
+      :VertScroll           := .T.
+      :HorzScroll           := .T.
+      :Left                 := 20
+      :Top                  := 305
+      :Width                := 500
+      :Height               := 220
+      :AutoVScroll          := .T.
+      :AutoHScroll          := .T.
+      :MultiLine            := .T.
+      :WantReturn           := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 160
+      :Top                  := 537
+      :Width                := 223
+      :Height               := 16
+      :Create()
+   END //PROGRESSBAR
+
+RETURN Self
+

@@ -1,0 +1,159 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormDish INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormDish_OnDestroy()
+   METHOD FormDish_OnLoad()
+   METHOD MyFillSauces()
+   METHOD ButtonUpdate_OnClick()
+   METHOD ButtonAdd_OnClick()
+   METHOD ButtonDel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormDish
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormDish_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormDish_OnLoad"
+   ::EventHandler[ "UserMethod1" ] := "MyFillSauces"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormDish"
+   ::Left                 := 9
+   ::Top                  := 11
+   ::Width                := 628
+   ::Height               := 295
+   ::Center               := .T.
+   ::Caption              := "Update Dishes"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( DATAGRID( Self ) )
+      :Name                 := "gdish"
+      :Left                 := 20
+      :Top                  := 20
+      :Width                := 347
+      :Height               := 186
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :GridColor            := 12632260
+      :HighlightColor       := 7381139
+      :HighlightTextColor   := 16777215
+      :ExtVertScrollBar     := .T.
+      :Create()
+   END //DATAGRID
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "Panel1"
+      :Left                 := 378
+      :Top                  := 21
+      :Width                := 236
+      :Height               := 165
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 13
+         :Top                  := 2
+         :Width                := 54
+         :Height               := 16
+         :Caption              := "Name:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditName"
+         :Left                 := 13
+         :Top                  := 24
+         :Width                := 208
+         :Height               := 22
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 13
+         :Top                  := 53
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Sauce:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxSauce"
+         :VertScroll           := .T.
+         :Left                 := 13
+         :Top                  := 76
+         :Width                := 169
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 13
+         :Top                  := 108
+         :Width                := 43
+         :Height               := 16
+         :Caption              := "Price:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditPrice"
+         :Left                 := 13
+         :Top                  := 130
+         :Width                := 80
+         :Height               := 22
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( BUTTON( :this ) )
+         :Name                 := "ButtonUpdate"
+         :Left                 := 197
+         :Top                  := 76
+         :Width                := 24
+         :Height               := 24
+         :Caption              := "..."
+         :TabStop              := .F.
+         :EventHandler[ "OnClick" ] := "ButtonUpdate_OnClick"
+         :Create()
+      END //BUTTON
+
+   END //PANEL
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonAdd"
+      :Left                 := 425
+      :Top                  := 214
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Add"
+      :EventHandler[ "OnClick" ] := "ButtonAdd_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonDel"
+      :Left                 := 520
+      :Top                  := 214
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Delete"
+      :EventHandler[ "OnClick" ] := "ButtonDel_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

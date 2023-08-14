@@ -1,0 +1,41 @@
+2012-08-14 13:08 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * bc5\xEditw.lib.xbp
+   * bc5\xEditwScript.lib.xbp
+   * bc5\xeditvxh.lib.xbp
+   * vc8\xEditw.lib.xbp
+   * vc8\xEditwScript.lib.xbp
+   * vc8\xeditvxh.lib.xbp
+   * vc9\xEditw.lib.xbp
+   * vc9\xEditwScript.lib.xbp
+   * vc9\xeditvxh.lib.xbp
+   * xcc\xEditVXH.lib.xbp
+   * xcc\xEditW.lib.xbp
+   * xcc\xEditWScript.lib.xbp
+     - Removed wrong definition of __IMPORT__;__EXPORT__ from MYDEFINES
+
+2011-03-22 17:33 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     + Added support for compiler line number output to Warning & Error RegEx
+
+2010-11-23 07:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     ! Fixed compilation error for unused cBuffer (when VXH not defined)
+
+2009-11-13 09:45 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     + Added logic to ProcessTextFile() to skip over \r at begin of line
+     + Added conversion of \r to "" of sText in :Load()
+     ! Fixed auto open of source in PopupEditor() of xBuild log file
+
+2009-08-24 20:31 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     ! Fixed compilation when VXH not defined (unused declared local)
+
+2009-07-23 00:30 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xedit.rc
+     * Fixed typo to allow compilation with Borland
+
+2009-06-02 14:04 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
+   * xeditlib.prg
+     * Added .T. and .F. to reserved words (for colorization).
+

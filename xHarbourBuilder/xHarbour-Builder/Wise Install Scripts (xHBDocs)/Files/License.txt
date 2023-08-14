@@ -1,0 +1,8 @@
+(C)2006 -2007 xHarbour.com Inc. All rights reserved.
+
+xHarbour Reference Guide version 1.1. If this guide is distributed with software that includes an end user agreement, this guide, as well as the software described in it, is furnished under license and may be used or copied only in accordance with the terms of such license. Except as permitted by any such license, no part of this guide may be reproduced, stored in a retrieval
+system, or transmitted, in any form or by any means, electronic,  techanical, recording, or otherwise, without the prior written permission of xHarbour.com Inc. Please note that the content in this guide is protected under copyright law even if it is not distributed with software that includes an end user license agreement.
+
+The content of this guide is furnished for informational use only, is subject to change without notice, and should not be construed as a commitment by xHarbour.com Inc. xHarbour.com Inc. assumes no responsibility or liability for any errors or inaccuracies that may appear in the informational content contained in this guide.
+
+xHarbour.com Inc. 10624 S. Eastern Avenue, Henderson, Nevada 89052, USA.

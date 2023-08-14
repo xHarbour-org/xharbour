@@ -1,0 +1,31 @@
+CINI = xbuild.bc5.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = ..\..\Library\Include;..\..\..\xharbour-ActiveX;\xHarbour\include\w32
+LAUTORUN = 
+LDEBUG = .T.
+LGUI = .T.
+LIBFOLDERS = 
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN
+MYLINK_FLAGS = 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\bc5\Editor.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = \xhb\lib\bc5
+
+[..\editor.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 

@@ -1,0 +1,35 @@
+Usage:  SignCode [options] [FileName]
+Options: 
+ -spc  <file>       Spc file containing software publishing certificates
+ -v    <pvkFile>    Pvk file name containing the private key
+ -k    <KeyName>    Key container name
+ -n    <name>       Text name representing content of the file to be signed
+ -i    <info>       Place to get more info on content (usually a URL)
+ -p    <provider>   Name of the cryptographic provider on the system
+ -y    <type>       Cryptographic provider type to use
+ -ky   <keytype>    Key type
+                      <signature|exchange|<integer>>
+ -$    <authority>  Signing authority of the certificate
+                      <individual|commercial>
+                      Default to using certificate's highest capability 
+ -a    <algorithm>  Hashing algorithm for signing
+                      <md5|sha1>. Default to md5
+ -t    <URL>        TimeStamp server's http address
+ -tr   <number>     The # of timestamp trial until succeeds. Default to 1
+ -tw   <number>     The # of seconds delay between each timestamp. Default to 0
+ -j    <dllName>    Name of the dll that provides attributes of the signature
+ -jp   <param>      Parameter to be passed to the dll
+ -c    <file>       file containing encoded software publishing certificate
+ -s    <store>      Cert store containing certs. Default to my store
+ -r    <location>   Location of the cert store in the registry
+                      <localMachine|currentUser>. Default to currentUser
+ -sp   <policy>     Add the certification path (chain) or add the certification
+                    path excluding the root certificate (spcstore).
+                      <chain|spcstore>. Default to spcstore
+ -cn   <name>       The common name of the certificate
+ -sha1 <thumbPrint> The sha1 hash of the certificate
+ -x                 Do not sign the file.  Only Timestamp the file
+
+Note:   To sign with a SPC file, the required options are -spc and -v if
+        your private key is in a PVK file. If your private key is in a 
+        registry key container, then -spc and -k are the required options.

@@ -1,0 +1,625 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormSettings INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormSettings_OnLoad()
+   METHOD BoxFontFace_OnCBNSelEndOk()
+   METHOD BoxBack_OnCBNSelEndOk()
+   METHOD BoxFore_OnCBNSelEndOk()
+   METHOD BoxHighlight_OnCBNSelEndOk()
+   METHOD BoxHighlightTextColor_OnCBNSelEndOk()
+   METHOD BoxMarkerSec_OnCBNSelEndOk()
+   METHOD GridColumnb_OnQueryBackColor()
+   METHOD GridColumnb_OnQueryForeColor()
+   METHOD GridColumnc_OnQueryBackColor()
+   METHOD GridColumnc_OnQueryForeColor()
+   METHOD BoxFontSize_OnCBNSelEndOk()
+   METHOD BoxMarker_OnCBNSelEndOk()
+   METHOD BoxMarkerTextColor_OnCBNSelEndOk()
+   METHOD BoxMarkerTextColorSec_OnCBNSelEndOk()
+   METHOD EditEpoch_OnKillFocus()
+   METHOD ButtonOK_OnClick()
+   METHOD ButtonCancel_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormSettings
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormSettings_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( MemoryTable( Self ) )
+      :Name                 := "mt"
+      :Structure            := { { "A", "C", 5, 0 }, { "B", "C", 5, 0 }, { "C", "C", 5, 0 } }
+      :Table                := { { "01234", "56789", "abcde" }, { "fghij", "klmno", "01234" }, { "56789", "ABCDE", "FGHIJ" }, { "pqrst", "01234", "KLMNO" }, { "PQRST", "56789", "uvwxy" }, { "01234", "UVWXY", "56789" }, { "abcde", "01234", "fghij" }, { "56789", "ABCDE", "FGHIJ" }, { "klmno", "KLMNO", "pqrst" }, { "01234", "PQRST", "56789" }, { "uvwxy", "01234", "56789" }, { "01234", "56789", "UVWXY" } }
+      :Create()
+   END //mt
+
+   // Properties declaration
+   ::Name                 := "FormSettings"
+   ::Modal                := .T.
+   ::Left                 := 11
+   ::Top                  := 7
+   ::Width                := 800
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Settings"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\settings.ico","_SETTINGSICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormSettings
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBoxb"
+      :Left                 := 20
+      :Top                  := 20
+      :Width                := 472
+      :Height               := 432
+      :Caption              := "Appearance"
+      :ForeColor            := 677017
+      :Create()
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxFontFace"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 25
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxFontFace_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxBack"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 175
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxBack_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxFore"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 205
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxFore_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxHighlight"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 235
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxHighlight_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxHighlightTextColor"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 265
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxHighlightTextColor_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela5"
+         :Left                 := 14
+         :Top                  := 25
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Fontface:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxMarkerSec"
+         :VertScroll           := .T.
+         :Left                 := 131
+         :Top                  := 355
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxMarkerSec_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela6"
+         :Left                 := 14
+         :Top                  := 55
+         :Width                := 80
+         :Height               := 16
+         :Caption              := "Fontsize:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela7"
+         :Left                 := 14
+         :Top                  := 175
+         :Width                := 110
+         :Height               := 16
+         :Caption              := "Cell backcolor:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela8"
+         :Left                 := 14
+         :Top                  := 205
+         :Width                := 110
+         :Height               := 16
+         :Caption              := "Cell forecolor:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela9"
+         :Left                 := 14
+         :Top                  := 235
+         :Width                := 102
+         :Height               := 16
+         :Caption              := "Highlight color:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckShadowRow"
+         :Left                 := 14
+         :Top                  := 85
+         :Width                := 100
+         :Height               := 15
+         :Caption              := "Shadow row"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckShowGrid"
+         :Left                 := 14
+         :Top                  := 115
+         :Width                := 100
+         :Height               := 15
+         :Caption              := "Show grid"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela12"
+         :Left                 := 14
+         :Top                  := 325
+         :Width                := 110
+         :Height               := 16
+         :Caption              := "Marker 1 forecolor:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( DATAGRID( :this ) )
+         :Name                 := "GridTest"
+         WITH OBJECT :Font
+            :Pointsize            := 12
+         END
+
+         :Left                 := 253
+         :Top                  := 55
+         :Width                := 197
+         :Height               := 262
+         :BackColor            := 16777215
+         :SmallCaption         := .T.
+         :GridColor            := 12632260
+         :HighlightColor       := 7381139
+         :HighlightTextColor   := 16777215
+         :DataSource           := ::mt
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumna"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Normal"
+            :Data                 := "hb_QSelf():DataSource:Fields:A"
+            :Width                := 56
+            :ImageIndex           := 0
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumnb"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Marker 1"
+            :Data                 := "hb_QSelf():DataSource:Fields:B"
+            :Width                := 63
+            :ImageIndex           := 0
+            :EventHandler[ "OnQueryBackColor" ] := "GridColumnb_OnQueryBackColor"
+            :EventHandler[ "OnQueryForeColor" ] := "GridColumnb_OnQueryForeColor"
+            :Create()
+         END //GRIDCOLUMN
+
+         WITH OBJECT ( GRIDCOLUMN( :this ) )
+            :Name                 := "GridColumnc"
+            :Allowsize            := .T.
+            :Allowdrag            := .T.
+            :Caption              := "Marker 2"
+            :Data                 := "hb_QSelf():DataSource:Fields:C"
+            :Width                := 64
+            :ImageIndex           := 0
+            :EventHandler[ "OnQueryBackColor" ] := "GridColumnc_OnQueryBackColor"
+            :EventHandler[ "OnQueryForeColor" ] := "GridColumnc_OnQueryForeColor"
+            :Create()
+         END //GRIDCOLUMN
+
+         :Create()
+      END //DATAGRID
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela13"
+         :Left                 := 14
+         :Top                  := 355
+         :Width                := 110
+         :Height               := 16
+         :Caption              := "Marker 2 backcolor:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckShowHeaders"
+         :Left                 := 14
+         :Top                  := 145
+         :Width                := 121
+         :Height               := 15
+         :Caption              := "Show Headers"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label1"
+         :Left                 := 14
+         :Top                  := 265
+         :Width                := 102
+         :Height               := 16
+         :Caption              := "Highlight text:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label2"
+         :Left                 := 14
+         :Top                  := 295
+         :Width                := 104
+         :Height               := 16
+         :Caption              := "Marker 1 backcolor:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label3"
+         :Left                 := 14
+         :Top                  := 385
+         :Width                := 107
+         :Height               := 16
+         :Caption              := "Marker 2 forecolor"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxFontSize"
+         :Left                 := 131
+         :Top                  := 55
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxFontSize_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxMarker"
+         :Left                 := 131
+         :Top                  := 295
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxMarker_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxMarkerTextColor"
+         :Left                 := 131
+         :Top                  := 325
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxMarkerTextColor_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxMarkerTextColorSec"
+         :Left                 := 131
+         :Top                  := 385
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :EventHandler[ "OnCBNSelEndOk" ] := "BoxMarkerTextColorSec_OnCBNSelEndOk"
+         :Create()
+      END //COMBOBOX
+
+   END //GROUPBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBoxa"
+      :Left                 := 520
+      :Top                  := 20
+      :Width                := 247
+      :Height               := 383
+      :Caption              := "Data"
+      :ForeColor            := 677017
+      :Create()
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxDriver"
+         :VertScroll           := .T.
+         :Left                 := 130
+         :Top                  := 25
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckShared"
+         :Left                 := 15
+         :Top                  := 55
+         :Width                := 129
+         :Height               := 15
+         :Caption              := "Shared access"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckReadOnly"
+         :Left                 := 15
+         :Top                  := 85
+         :Width                := 124
+         :Height               := 15
+         :Caption              := "ReadOnly access"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckSoftSeek"
+         :Left                 := 15
+         :Top                  := 115
+         :Width                := 100
+         :Height               := 15
+         :Caption              := "SoftSeek"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxDate"
+         :VertScroll           := .T.
+         :Left                 := 130
+         :Top                  := 143
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( EDIT( :this ) )
+         :Name                 := "EditEpoch"
+         :Left                 := 130
+         :Top                  := 174
+         :Width                := 38
+         :Height               := 24
+         :Border               := .T.
+         :Caption              := "1940"
+         :Alignment            := 2
+         :EventHandler[ "OnKillFocus" ] := "EditEpoch_OnKillFocus"
+         :Create()
+      END //EDIT
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckCentury"
+         :Left                 := 15
+         :Top                  := 205
+         :Width                := 120
+         :Height               := 15
+         :Caption              := "Century ON"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxCode"
+         :VertScroll           := .T.
+         :Left                 := 130
+         :Top                  := 234
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxMemo"
+         WITH OBJECT :ToolTip
+            :Text                 := "Max. number of rows in a MemoryTable"
+            :Balloon              := .T.
+         END
+
+         :VertScroll           := .T.
+         :Left                 := 130
+         :Top                  := 295
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( COMBOBOX( :this ) )
+         :Name                 := "BoxFile"
+         WITH OBJECT :ToolTip
+            :Text                 := "Max. number of rows in a temp. file"
+            :Balloon              := .T.
+         END
+
+         :VertScroll           := .T.
+         :Left                 := 130
+         :Top                  := 325
+         :Width                := 100
+         :Height               := 100
+         :SelectionHeight      := 18
+         :ItemHeight           := 18
+         :Create()
+      END //COMBOBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela1"
+         :Left                 := 15
+         :Top                  := 25
+         :Width                := 108
+         :Height               := 16
+         :Caption              := "Free table type:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela2"
+         :Left                 := 15
+         :Top                  := 145
+         :Width                := 108
+         :Height               := 16
+         :Caption              := "Date format:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela3"
+         :Left                 := 15
+         :Top                  := 175
+         :Width                := 108
+         :Height               := 16
+         :Caption              := "Epoch:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Labela15"
+         :Left                 := 15
+         :Top                  := 295
+         :Width                := 108
+         :Height               := 16
+         :Caption              := "Query RAM limit:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label4"
+         :Left                 := 15
+         :Top                  := 235
+         :Width                := 97
+         :Height               := 16
+         :Caption              := "Codepage:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label5"
+         :Left                 := 15
+         :Top                  := 325
+         :Width                := 105
+         :Height               := 16
+         :Caption              := "Query file limit:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckConvertOEM"
+         :Left                 := 15
+         :Top                  := 265
+         :Width                := 100
+         :Height               := 15
+         :Caption              := "Convert OEM"
+         :Create()
+      END //CHECKBOX
+
+      WITH OBJECT ( CHECKBOX( :this ) )
+         :Name                 := "CheckStatistics"
+         :Left                 := 15
+         :Top                  := 355
+         :Width                := 189
+         :Height               := 15
+         :Caption              := "Show 'Elapsed Time' messages"
+         :Create()
+      END //CHECKBOX
+
+   END //GROUPBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonOK"
+      :Left                 := 582
+      :Top                  := 422
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 687
+      :Top                  := 422
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+RETURN Self
+

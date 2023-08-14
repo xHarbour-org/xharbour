@@ -1,0 +1,46 @@
+<HTML>
+   <HEAD>
+      <OBJECT ID="XBScript" WIDTH=0 HEIGHT=0
+         CLASSID="CLSID:ADB21CAC-9B03-4D64-9097-83B05741FDAF"
+         CODEBASE="http://www.xharbour.com/ondemand/xbscript.cab#Version=2,0,3,0">
+      </OBJECT>
+
+<SCRIPT LANGUAGE="XBScript">
+
+PROCEDURE Main()
+
+   PUBLIC cMsg      := "This message will keep on looping for as long as you are willing to read it. "
+   PUBLIC nSpeed    := 200
+   PUBLIC nStartPos := 1
+
+   PUBLIC oControl
+
+RETURN
+
+PROCEDURE TextScroller()
+   
+   nRegion := oControl:Size
+   nLen := Len( cMsg )
+
+   oControl:Value := SubStr( cMSg + Left( cMsg, nStartPos ), nStartPos, nRegion )
+   nstartPos++
+
+   IF nStartPos > nLen
+      nStartPos := 1
+   ENDIF
+
+   Window:SetTimeout( "TextScroller()", nSpeed )
+
+RETURN
+
+</script>
+
+</head>
+
+<BODY onLoad="oControl := MainForm:TextScroller; TextScroller()">
+   <form name="MainForm">
+      <center><input type="text" Name="TextScroller" size="50"></center>
+   </form>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+CINI = ..\xbuild.vc8.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS = ..\..\source;\xbp\vc8\demo\sql.lib;\xHarbour.com\xHarbour-SQLRDD\vc8\Demo\
+LAUTORUN =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = SQLRDD_DEMO;SQLRDD_TOPCONN
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\vc8\demo\sql.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib\vc8\Demo
+
+#include "..\..\sql.files.inc"

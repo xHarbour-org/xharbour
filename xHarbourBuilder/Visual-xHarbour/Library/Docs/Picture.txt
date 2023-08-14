@@ -1,0 +1,27 @@
+Properties
+   TransparencyByPixel
+   pPicture        
+   ResourceName    
+   PictureWidth    
+   PictureHeight   
+   Type     
+   ImageIndex    
+   TransparentColor
+   ImageName        
+   Stretch          
+   KeepAspectRatio  
+   Transparent      
+   BlackAndWhite    
+   InvertedColors   
+   Opacity         
+   Alignment 
+
+
+Methods
+   Kill() 
+   SetImageName()
+   SetBitmap( hBmp ) 
+   Update()
+   Destroy()
+
+

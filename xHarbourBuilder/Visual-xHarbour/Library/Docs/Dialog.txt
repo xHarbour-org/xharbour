@@ -1,0 +1,17 @@
+Properties
+   Template
+   Result 
+   Modal
+   Form      
+
+
+Methods
+   Close()
+
+
+
+
+
+
+   
+

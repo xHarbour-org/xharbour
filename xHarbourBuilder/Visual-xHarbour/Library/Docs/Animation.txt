@@ -1,0 +1,100 @@
+Properties
+
+   ImageName   
+   Centered    
+   Transparent 
+   AutoPlay    
+   SystemAnimation
+   FromFrame 
+   ToFrame   
+   Repeat    
+
+Methods
+
+   Play()             
+   Stop()             
+   Seek( n )          
+   Close()            
+   Open()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

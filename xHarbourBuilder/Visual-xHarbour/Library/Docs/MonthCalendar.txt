@@ -1,0 +1,31 @@
+Properties
+	
+	DayState          
+	MultiSelect       
+	NoToday           
+	NoTodayCircle     
+	WeekNumbers 
+	Date   
+	Today    
+	BackColor
+	ForeColor  
+	TitleBackColor
+	TitleForeColor  
+	TrailingTextColor
+	Border  
+	Caption
+	NmDayState
+	NmSelChange 
+                            
+
+Methods
+
+	Create()
+	OnParentNotify()
+	SetCurSel()
+	SetRange()
+	SetToday()
+	SetCalendarColor( nPos, nColor )
+	GetCalendarColor( nPos )
+
+

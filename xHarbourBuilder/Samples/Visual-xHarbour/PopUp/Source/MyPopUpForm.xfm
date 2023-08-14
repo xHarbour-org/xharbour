@@ -1,0 +1,51 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyPopUpForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyPopUpForm_OnClose()
+   METHOD MyPopUpForm_OnLoad()
+   METHOD LinkWebsite_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyPopUpForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyPopUpForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyPopUpForm_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MyPopUpForm"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 367
+   ::Height               := 206
+   ::Caption              := "xHarbour.com Training Center |"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 8
+      END
+
+      :Left                 := 8
+      :Top                  := 145
+      :Width                := 234
+      :Height               := 17
+      :Caption              := "http://www.xHarbour.com/TrainingCenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   ::Show()
+
+RETURN Self

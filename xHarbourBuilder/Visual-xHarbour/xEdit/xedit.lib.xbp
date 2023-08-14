@@ -1,0 +1,47 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = HB_MULTI_GT
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\obj\xEdit.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+[xeditlib.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[confunctions.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[winfunctions.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[\xharbour\source\rtl\gtnul\gtnul.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xharbour\source\rtl\gtwin\gtwin.c]
+MYC_FLAGS =
+MYDEFINES =
+
+[\xharbour\source\rtl\gtwin\mousewin.c]
+MYC_FLAGS =
+MYDEFINES =

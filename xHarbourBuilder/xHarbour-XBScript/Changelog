@@ -1,0 +1,28 @@
+/*
+ * $Id:
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2005-10-07 08:31UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  * Install Scripts/SideImage.*
+    * Changed name to "xbScrit Dll" instead of "xbScript Engine"
+  * Install Scripts/*.wse
+    * Changed title of installer
+    + Added /Dll's/*.* to installer
+
+2005-10-07 08:31UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  + Install Scripts/DLL's
+    * Initial upload of MS* DLL's needed for xbScript.dll
+
+2005-10-04 11:22UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
+  + Install Scripts
+    * Initial upload of install scripts for XBScript
+
+2005-03-02 18:13 UTC-0800 Ron Pinkas <Ron@xHarbour.com>  
+  * CASInterpreter.cpp 
+    ! Fixed multiple GPF traps, my testes are no longer gpfing! :-)

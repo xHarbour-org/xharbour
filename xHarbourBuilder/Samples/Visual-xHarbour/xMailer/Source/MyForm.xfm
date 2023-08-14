@@ -1,0 +1,620 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyForm_OnClose()
+   METHOD MyForm_OnLoad()
+   METHOD QMenu_About_OnClick()
+   METHOD QMenu_MainSite_OnClick()
+   METHOD QMenu_ShopSite_OnClick()
+   METHOD QMenu_Exit_OnClick()
+   METHOD ContAtt_Open_OnClick()
+   METHOD ContAtt_Delete_OnClick()
+   METHOD ContAtt_Manage_OnClick()
+   METHOD LinkWebsite_OnClick()
+   METHOD File_New_OnClick()
+   METHOD File_Attachments_OnClick()
+   METHOD File_Send_OnClick()
+   METHOD File_Outlook_OnClick()
+   METHOD File_Exit_OnClick()
+   METHOD Options_Importance_OnClick()
+   METHOD Importance_High_OnClick()
+   METHOD Importance_Normal_OnClick()
+   METHOD Importance_Low_OnClick()
+   METHOD Options_Receipt_OnClick()
+   METHOD Options_Settings_OnClick()
+   METHOD View_Toolbar_OnClick()
+   METHOD View_Attachment_OnClick()
+   METHOD Tool_Send_OnClick()
+   METHOD Tool_New_OnClick()
+   METHOD Tool_Priority_High_OnClick()
+   METHOD Tool_Priority_Normal_OnClick()
+   METHOD Tool_Priority_Low_OnClick()
+   METHOD Tool_Receipt_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyForm_OnClose"
+   ::EventHandler[ "OnLoad" ] := "MyForm_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "QuickMenu"
+      :Create()
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_About"
+         :Text                 := "About"
+         :EventHandler[ "OnClick" ] := "QMenu_About_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_Line1"
+         :Text                 := "-"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_MainSite"
+         :Text                 := "Visit xHarbour.com"
+         :EventHandler[ "OnClick" ] := "QMenu_MainSite_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_ShopSite"
+         :Text                 := "Order onliine"
+         :EventHandler[ "OnClick" ] := "QMenu_ShopSite_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_Line2"
+         :Text                 := "-"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "QMenu_Exit"
+         :Text                 := "Exit"
+         :EventHandler[ "OnClick" ] := "QMenu_Exit_OnClick"
+         :Create()
+      END //MENUITEM
+
+   END //QuickMenu
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextAttachments"
+      :Create()
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "ContAtt_Open"
+         :Text                 := "Open"
+         :EventHandler[ "OnClick" ] := "ContAtt_Open_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "ContAtt_Delete"
+         :Text                 := "Delete"
+         :EventHandler[ "OnClick" ] := "ContAtt_Delete_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "ContAtt_Line1"
+         :Text                 := "-"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "ContAtt_Manage"
+         :Text                 := "Manage Attachments"
+         :EventHandler[ "OnClick" ] := "ContAtt_Manage_OnClick"
+         :Create()
+      END //MENUITEM
+
+   END //ContextAttachments
+
+   WITH OBJECT ( OpenFileDialog( Self ) )
+      :Name                 := "MyOpen"
+      :MultiSelect          := .F.
+      :DeferenceLinks       := .F.
+      :Create()
+   END //MyOpen
+
+   // Properties declaration
+   ::Name                 := "MyForm"
+   ::Left                 := 12
+   ::Top                  := 12
+   ::Width                := 812
+   ::Height               := 612
+   ::Text                 := "xHarbour.com Training Center |"
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( LINKLABEL( Self ) )
+      :Name                 := "LinkWebsite"
+      WITH OBJECT :Dock
+         :Left                 := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
+      END
+
+      :Left                 := 8
+      :Top                  := 555
+      :Width                := 227
+      :Height               := 17
+      :Text                 := "http://www.xharbour.com/trainingcenter/"
+      :EventHandler[ "OnClick" ] := "LinkWebsite_OnClick"
+      :Create()
+   END //LINKLABEL
+
+   WITH OBJECT ( COOLMENU( Self ) )
+      :Name                 := "MyCoolMenu"
+      :Left                 := 12
+      :Width                := 1040
+      :Height               := 20
+      :List                 := .T.
+      :ToolTips             := .T.
+      :HideClippedButtons   := .T.
+      :Create()
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuFile"
+         :Text                 := "File"
+         :Position             := 0
+         :Create()
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_New"
+            :Text                 := "New"
+            :EventHandler[ "OnClick" ] := "File_New_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Attachments"
+            :Text                 := "Manage Attachments"
+            :EventHandler[ "OnClick" ] := "File_Attachments_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Line1"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Send"
+            :Text                 := "Send Message"
+            :EventHandler[ "OnClick" ] := "File_Send_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Outlook"
+            :Text                 := "Open in Outlook"
+            :EventHandler[ "OnClick" ] := "File_Outlook_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Line2"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "File_Exit"
+            :Text                 := "Exit"
+            :EventHandler[ "OnClick" ] := "File_Exit_OnClick"
+            :Create()
+         END //MENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuOptions"
+         :Text                 := "Options"
+         :Position             := 1
+         :Create()
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Options_Importance"
+            :RadioCheck           := .T.
+            :Text                 := "Importance"
+            :EventHandler[ "OnClick" ] := "Options_Importance_OnClick"
+            :Create()
+            WITH OBJECT ( MENUITEM( :this ) )
+               :Name                 := "Importance_High"
+               :RadioCheck           := .T.
+               :Text                 := "High"
+               :EventHandler[ "OnClick" ] := "Importance_High_OnClick"
+               :Create()
+            END //MENUITEM
+
+            WITH OBJECT ( MENUITEM( :this ) )
+               :Name                 := "Importance_Normal"
+               :RadioCheck           := .T.
+               :Text                 := "Normal"
+               :EventHandler[ "OnClick" ] := "Importance_Normal_OnClick"
+               :Create()
+            END //MENUITEM
+
+            WITH OBJECT ( MENUITEM( :this ) )
+               :Name                 := "Importance_Low"
+               :RadioCheck           := .T.
+               :Text                 := "Low"
+               :EventHandler[ "OnClick" ] := "Importance_Low_OnClick"
+               :Create()
+            END //MENUITEM
+
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Options_Receipt"
+            :RadioCheck           := .T.
+            :Text                 := "Request Receipt"
+            :EventHandler[ "OnClick" ] := "Options_Receipt_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Options_Line1"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "Options_Settings"
+            :Text                 := "Settings"
+            :EventHandler[ "OnClick" ] := "Options_Settings_OnClick"
+            :Create()
+         END //MENUITEM
+
+      END //COOLMENUITEM
+
+      WITH OBJECT ( COOLMENUITEM( :this ) )
+         :Name                 := "MenuView"
+         :Text                 := "View"
+         :Position             := 2
+         :Create()
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "View_Toolbar"
+            :Text                 := "Show Toolbar"
+            :EventHandler[ "OnClick" ] := "View_Toolbar_OnClick"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "View_Line1"
+            :Text                 := "-"
+            :Create()
+         END //MENUITEM
+
+         WITH OBJECT ( MENUITEM( :this ) )
+            :Name                 := "View_Attachment"
+            :Text                 := "Show Attachment List"
+            :EventHandler[ "OnClick" ] := "View_Attachment_OnClick"
+            :Create()
+         END //MENUITEM
+
+      END //COOLMENUITEM
+
+   END //COOLMENU
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "MyCoolBar"
+      WITH OBJECT :Dock
+         :Left                 := "MyForm"
+         :Top                  := "MyForm"
+         :Right                := "MyForm"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Width                := 804
+      :Height               := 21
+      :Border               := 8388608
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :MinWidth             := 60
+         :MinHeight            := 21
+         :BandChild            := "MyCoolMenu"
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "MyToolBar"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      WITH OBJECT :Dock
+         :Left                 := "MyForm"
+         :Top                  := "MyCoolBar"
+         :Right                := "MyForm"
+      END
+
+      :ForeColor            := 12615680
+      :Left                 := 1
+      :Top                  := 22
+      :Width                := 802
+      :Height               := 60
+      :ToolTips             := .T.
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Send"
+         :ShowText             := .T.
+         :Width                := 39
+         :Text                 := "Send"
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "Tool_Send_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_New"
+         :Width                := 88
+         :Text                 := "New Message"
+         :Position             := 1
+         :EventHandler[ "OnClick" ] := "Tool_New_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Line1"
+         :Width                := 7
+         :Text                 := ""
+         :Separator            := .T.
+         :Position             := 2
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Priority_High"
+         :Width                := 81
+         :Text                 := "High Priority"
+         :Position             := 3
+         :EventHandler[ "OnClick" ] := "Tool_Priority_High_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Priority_Normal"
+         :Width                := 96
+         :Text                 := "Normal Priority"
+         :Position             := 4
+         :EventHandler[ "OnClick" ] := "Tool_Priority_Normal_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Priority_Low"
+         :Message              := ""
+         :Width                := 78
+         :Text                 := "Low Priority"
+         :Position             := 5
+         :EventHandler[ "OnClick" ] := "Tool_Priority_Low_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "Tool_Receipt"
+         :Width                := 103
+         :Text                 := "Request Receipt"
+         :Position             := 6
+         :EventHandler[ "OnClick" ] := "Tool_Receipt_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "PanelAttachments"
+      WITH OBJECT :Dock
+         :Top                  := "MyToolBar"
+         :Right                := "MyForm"
+      END
+
+      :Left                 := 541
+      :Top                  := 83
+      :Width                := 262
+      :Height               := 77
+      :Create()
+      WITH OBJECT ( LISTBOX( :this ) )
+         :Name                 := "List_Attachments"
+         WITH OBJECT :Dock
+            :Left                 := "PanelAttachments"
+            :Top                  := "PanelAttachments"
+            :Right                := "PanelAttachments"
+            :Bottom               := "PanelAttachments"
+            :Margins              := "3,3,3,3"
+         END
+
+         :BackColor            := 16777215
+         :ContextMenu          := "ContextAttachments"
+         :Left                 := 3
+         :Top                  := 3
+         :Width                := 256
+         :Height               := 71
+         :Create()
+      END //LISTBOX
+
+   END //PANEL
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "PanelHeader"
+      WITH OBJECT :Dock
+         :Left                 := "MyForm"
+         :Top                  := "MyToolBar"
+         :Right                := "PanelAttachments"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Top                  := 82
+      :Width                := 538
+      :Height               := 81
+      :Create()
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label_MailTo"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 10
+         :Top                  := 7
+         :Width                := 80
+         :Height               := 16
+         :Text                 := "To:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "MailTo"
+         WITH OBJECT :Dock
+            :Left                 := "Label_MailTo"
+            :Right                := "PanelHeader"
+            :Margins              := "6,6,6,6"
+         END
+
+         :Left                 := 96
+         :Top                  := 5
+         :Width                := 436
+         :Height               := 22
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label_MailFrom"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 10
+         :Top                  := 33
+         :Width                := 80
+         :Height               := 16
+         :Text                 := "From:"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "MailFrom"
+         WITH OBJECT :Dock
+            :Left                 := "Label_MailFrom"
+            :Right                := "PanelHeader"
+            :Margins              := "6,6,6,6"
+         END
+
+         :Left                 := 96
+         :Top                  := 30
+         :Width                := 436
+         :Height               := 22
+         :Create()
+      END //EDITBOX
+
+      WITH OBJECT ( LABEL( :this ) )
+         :Name                 := "Label_MailSubject"
+         WITH OBJECT :Font
+            :Bold                 := .T.
+         END
+
+         :Left                 := 10
+         :Top                  := 60
+         :Width                := 80
+         :Height               := 16
+         :Text                 := "Subject"
+         :Create()
+      END //LABEL
+
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "MailSubject"
+         WITH OBJECT :Dock
+            :Left                 := "Label_MailSubject"
+            :Right                := "PanelHeader"
+            :Margins              := "6,6,6,6"
+         END
+
+         :Left                 := 96
+         :Top                  := 55
+         :Width                := 436
+         :Height               := 22
+         :Create()
+      END //EDITBOX
+
+   END //PANEL
+
+   WITH OBJECT ( PANEL( Self ) )
+      :Name                 := "PanelBody"
+      WITH OBJECT :Dock
+         :Left                 := "MyForm"
+         :Top                  := "PanelHeader"
+         :Right                := "MyForm"
+         :Bottom               := "LinkWebsite"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Top                  := 163
+      :Width                := 804
+      :Height               := 392
+      :Create()
+      WITH OBJECT ( EDITBOX( :this ) )
+         :Name                 := "MailBody"
+         :VertScroll           := .T.
+         :HorzScroll           := .T.
+         WITH OBJECT :Dock
+            :Left                 := "PanelBody"
+            :Top                  := "PanelBody"
+            :Right                := "PanelBody"
+            :Bottom               := "PanelBody"
+            :Margins              := "6,6,6,6"
+         END
+
+         :Left                 := 6
+         :Top                  := 6
+         :Width                := 792
+         :Height               := 380
+         :MultiLine            := .T.
+         :WantReturn           := .T.
+         :Create()
+      END //EDITBOX
+
+   END //PANEL
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "MyProgress"
+      WITH OBJECT :Dock
+         :Right                := "MyForm"
+         :Bottom               := "MyForm"
+         :Margins              := "8,8,8,8"
+      END
+
+      :Left                 := 591
+      :Top                  := 559
+      :Width                := 205
+      :Height               := 11
+      :Visible              := .F.
+      :Position             := 10
+      :Smooth               := .T.
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( SPLITTER( Self ) )
+      :Owner                := "PanelAttachments"
+      :Name                 := "MySplitter"
+      :Position             := 1
+      :Create()
+   END //SPLITTER
+
+   ::Show()
+
+RETURN Self

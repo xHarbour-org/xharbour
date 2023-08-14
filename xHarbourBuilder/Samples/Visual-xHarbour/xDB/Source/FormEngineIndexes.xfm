@@ -1,0 +1,255 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormEngineIndexes INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormEngineIndexes_OnDestroy()
+   METHOD FormEngineIndexes_OnLoad()
+   METHOD Timer1_OnTimeOut()
+   METHOD BoxColumn_OnCBNSelEndOk()
+   METHOD ButtonClose_OnClick()
+   METHOD ButtonCalculate_OnClick()
+   METHOD ChartBox_OnPaint()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormEngineIndexes
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FormEngineIndexes_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "FormEngineIndexes_OnLoad"
+
+   // Populate Components
+   WITH OBJECT ( Timer( Self ) )
+      :Name                 := "Timer1"
+      :AutoRun              := .F.
+      :Delay                := 200
+      :EventHandler[ "OnTimeOut" ] := "Timer1_OnTimeOut"
+      :Create()
+   END //Timer1
+
+   // Properties declaration
+   ::Name                 := "FormEngineIndexes"
+   ::Modal                := .T.
+   ::Left                 := 6
+   ::Top                  := 4
+   ::Width                := 532
+   ::Height               := 500
+   ::Center               := .T.
+   ::Caption              := "Column Statistics - Index Candidates"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\query_dbf.ico","_QUERY_DBFICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormEngineIndexes
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 25
+      :Top                  := 65
+      :Width                := 158
+      :Height               := 16
+      :Caption              := "Choose column from list:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "BoxColumn"
+      :VertScroll           := .T.
+      :Left                 := 200
+      :Top                  := 62
+      :Width                := 181
+      :Height               := 149
+      :SelectionHeight      := 18
+      :ItemHeight           := 18
+      :EventHandler[ "OnCBNSelEndOk" ] := "BoxColumn_OnCBNSelEndOk"
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonClose"
+      :Left                 := 413
+      :Top                  := 421
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonClose_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCalculate"
+      :Left                 := 313
+      :Top                  := 421
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Calculate"
+      :EventHandler[ "OnClick" ] := "ButtonCalculate_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelChart"
+      :Left                 := 25
+      :Top                  := 217
+      :Width                := 468
+      :Height               := 16
+      :Caption              := "Cardinalities of duplicate key-groups in proportion to the total number of keys:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 25
+      :Top                  := 165
+      :Width                := 114
+      :Height               := 16
+      :Caption              := "Total distinct keys:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 25
+      :Top                  := 135
+      :Width                := 129
+      :Height               := 16
+      :Caption              := "Total completed keys:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelDistinct"
+      :Left                 := 163
+      :Top                  := 165
+      :Width                := 100
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelTotal"
+      :Left                 := 163
+      :Top                  := 135
+      :Width                := 100
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelTable"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Left                 := 27
+      :Top                  := 25
+      :Width                := 468
+      :Height               := 25
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label11"
+      :Left                 := 25
+      :Top                  := 105
+      :Width                := 69
+      :Height               := 16
+      :Caption              := "Total keys:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label12"
+      :Left                 := 281
+      :Top                  := 105
+      :Width                := 94
+      :Height               := 16
+      :Caption              := "Total null keys:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label13"
+      :Left                 := 281
+      :Top                  := 135
+      :Width                := 80
+      :Height               := 16
+      :Caption              := "Null keys %:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelGrand"
+      :Left                 := 163
+      :Top                  := 105
+      :Width                := 100
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelNull"
+      :Left                 := 379
+      :Top                  := 105
+      :Width                := 100
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "LabelNullPr"
+      :Left                 := 379
+      :Top                  := 135
+      :Width                := 100
+      :Height               := 20
+      :StaticEdge           := .T.
+      :BackColor            := 16777215
+      :Centertext           := .T.
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "PBar"
+      :Left                 := 93
+      :Top                  := 427
+      :Width                := 150
+      :Height               := 18
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( PICTUREBOX( Self ) )
+      :Name                 := "ChartBox"
+      :Left                 := 25
+      :Top                  := 250
+      :Width                := 468
+      :Height               := 141
+      :StaticEdge           := .T.
+      :EventHandler[ "OnPaint" ] := "ChartBox_OnPaint"
+      :Create()
+   END //PICTUREBOX
+
+RETURN Self
+

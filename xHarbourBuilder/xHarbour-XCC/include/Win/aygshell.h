@@ -1,0 +1,288 @@
+#ifndef _AYGSHELL_H
+#define _AYGSHELL_H
+
+/* Windows Shell definitions (Windows CE) */
+
+#ifdef _WINCE_SMARTPHONE
+#include <windows.h>
+#include <sipapi.h>
+#include <shlobj.h>
+#include <prsht.h>
+#include "vibrate.h"
+#else
+#include <sipapi.h>
+#endif /* _WINCE_SMARTPHONE */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef _WINCE_SMARTPHONE
+#define SHNN_FIRST  (0U-1000U)
+#define SHNN_LAST  (0U-1020U)
+#endif /* _WINCE_SMARTPHONE */
+
+#ifndef SHMENUBAR
+#define SHMENUBAR  RCDATA
+#endif
+
+#define SIPF_DISABLECOMPLETION  0x08
+
+#ifndef SPI_SETSIPINFO
+#define SPI_SETSIPINFO  224
+#endif
+#define SPI_GETSIPINFO  225
+#define SPI_SETCURRENTIM  226
+#define SPI_GETCURRENTIM  227
+#define SPI_SETCOMPLETIONINFO  223
+#define SPI_APPBUTTONCHANGE  228
+#ifdef _WINCE_SMARTPHONE
+#define SPI_RESERVED  229
+#define SPI_SYNCSETTINGSCHANGE  230
+#endif /* _WINCE_SMARTPHONE */
+
+#define WC_SIPPREF  L"SIPPREF"
+
+#define CEM_UPCASEALLWORDS  (WM_USER+1)
+#define CEM_ENABLEUPCASE  (WM_USER+2)
+
+#define SHIDIM_FLAGS  0x0001
+
+#define SHIDIF_DONEBUTTON  0x0001
+#define SHIDIF_SIZEDLG  0x0002
+#define SHIDIF_SIZEDLGFULLSCREEN  0x0004
+#define SHIDIF_SIPDOWN  0x0008
+#define SHIDIF_FULLSCREENNOMENUBAR  0x0010
+#ifdef _WINCE_SMARTPHONE
+#define SHIDIF_EMPTYMENU  0x0020
+#endif /* _WINCE_SMARTPHONE */
+
+#define NOMENU  0xFFFF
+#define IDC_COMMANDBANDS  100
+
+#define IDS_SHNEW  1
+#define IDS_SHEDIT  2
+#define IDS_SHTOOLS  3
+#define IDS_SHVIEW  4
+#define IDS_SHFILE  5
+#define IDS_SHGO  6
+#define IDS_SHFAVORITES  7
+
+#define IDM_SHAREDNEW  10
+#define IDM_SHAREDNEWDEFAULT  11
+
+#define SHCMBF_EMPTYBAR  0x0001
+#define SHCMBF_HIDDEN  0x0002
+#define SHCMBF_HIDESIPBUTTON  0x0004
+#ifdef _WINCE_SMARTPHONE
+#define SHCMBF_COLORBK  0x0008
+#define SHCMBF_HMENU  0x0010
+#endif /* _WINCE_SMARTPHONE */
+
+#define SHCMBM_SETSUBMENU  (WM_USER+400)
+#define SHCMBM_GETSUBMENU  (WM_USER+401)
+#define SHCMBM_GETMENU  (WM_USER+402)
+#define SHCMBM_OVERRIDEKEY  (WM_USER+403)
+#define SHCMBM_SETBKCOLOR  (WM_USER+406)
+
+#ifdef _WINCE_SMARTPHONE
+#define SHMBOF_NODEFAULT  0x00000001
+#define SHMBOF_NOTIFY  0x00000002
+#endif /* _WINCE_SMARTPHONE */
+
+#define SHA_INPUTDIALOG  0x00000001
+
+#ifndef _WINCE_SMARTPHONE
+#define NMN_GETAPPREGKEY  1101
+#define NMN_NEWMENUDESTROY  1102
+#define NMN_INVOKECOMMAND  1103
+#define NMN_NEWBUTTONUPDATED  1104
+#endif /* _WINCE_SMARTPHONE */
+
+#define IDM_NEWMENUMAX  3000
+
+#define GN_CONTEXTMENU  1000
+
+#define SHRG_RETURNCMD  0x00000001
+#define SHRG_NOTIFYPARENT  0x00000002
+#define SHRG_LONGDELAY  0x00000008
+#ifdef _WINCE_SMARTPHONE
+#define SHRG_NOANIMATION  0x00000010
+#endif /* _WINCE_SMARTPHONE */
+
+#define SHFS_SHOWTASKBAR  0x0001
+#define SHFS_HIDETASKBAR  0x0002
+#define SHFS_SHOWSIPBUTTON  0x0004
+#define SHFS_HIDESIPBUTTON  0x0008
+#define SHFS_SHOWSTARTICON  0x0010
+#define SHFS_HIDESTARTICON  0x0020
+
+#define SHDB_SHOW  0x0001
+#define SHDB_HIDE  0x0002
+
+#define WS_NONAVDONEBUTTON  WS_MINIMIZEBOX 
+
+#ifdef _WINCE_SMARTPHONE
+#define MAX_EXTENSION_PAGES  6
+#endif /* _WINCE_SMARTPHONE */
+
+#ifdef _WINCE_SMARTPHONE
+#define SHNUM_PRIORITY  0x0001
+#define SHNUM_DURATION  0x0002
+#define SHNUM_ICON  0x0004
+#define SHNUM_HTML  0x0008
+#define SHNUM_TITLE  0x0010
+
+#define SHNF_STRAIGHTTOTRAY  0x00000001
+#define SHNF_CRITICAL  0x00000002
+#define SHNF_FORCEMESSAGE  0x00000008
+
+#define SHNN_LINKSEL  (SHNN_FIRST-0)
+#define SHNN_DISMISS  (SHNN_FIRST-1)
+#define SHNN_SHOW  (SHNN_FIRST-2)
+#endif /* _WINCE_SMARTPHONE */
+
+typedef struct tagSHINITDLGINFO {
+    DWORD dwMask;
+    HWND  hDlg;
+    DWORD dwFlags;
+} SHINITDLGINFO, *PSHINITDLGINFO;
+
+typedef struct tagSHMENUBARINFO {
+    DWORD cbSize;
+    HWND hwndParent;
+    DWORD dwFlags;
+    UINT nToolBarId;
+    HINSTANCE hInstRes;
+    int nBmpId;
+    int cBmpImages;
+    HWND hwndMB;
+#ifdef _WINCE_SMARTPHONE
+    COLORREF clrBk;
+#endif /* _WINCE_SMARTPHONE */
+} SHMENUBARINFO, *PSHMENUBARINFO;
+
+typedef struct {
+    DWORD cbSize;
+    HWND hwndLastFocus;
+    UINT fSipUp:1;
+    UINT fSipOnDeactivation:1;
+    UINT fActive:1;
+    UINT fReserved:29;
+} SHACTIVATEINFO, *PSHACTIVATEINFO;
+
+typedef enum tagSIPSTATE {
+    SIP_UP = 0,
+    SIP_DOWN,
+    SIP_FORCEDOWN,
+    SIP_UNCHANGED,
+    SIP_INPUTDIALOG,
+} SIPSTATE;
+
+#ifndef _WINCE_SMARTPHONE
+typedef struct tagNMNEWMENU {
+    NMHDR hdr;
+    TCHAR szReg[80];
+    HMENU hMenu;
+    CLSID clsid;
+} NMNEWMENU, *PNMNEWMENU;
+#endif /* _WINCE_SMARTPHONE */
+
+typedef struct tagSHRGI {
+    DWORD cbSize;
+    HWND hwndClient;
+    POINT ptDown;
+    DWORD dwFlags;
+} SHRGINFO, *PSHRGINFO;
+
+typedef struct tagNMRGINFO {
+    NMHDR hdr;
+    POINT ptAction;
+    DWORD dwItemSpec;
+} NMRGINFO, *PNMRGINFO;
+
+#ifdef _WINCE_SMARTPHONE
+typedef enum _SHNP {
+    SHNP_INFORM = 0x1B1,
+    SHNP_ICONIC,
+} SHNP;
+
+typedef struct _SHNOTIFICATIONDATA {
+    DWORD cbStruct;
+    DWORD dwID;
+    SHNP npPriority;
+    DWORD csDuration;
+    HICON hicon;
+    DWORD grfFlags;
+    CLSID clsid;
+    HWND hwndSink;
+    LPCTSTR pszHTML;
+    LPCTSTR pszTitle;
+    LPARAM lParam;
+} SHNOTIFICATIONDATA;
+
+typedef struct _NMSHN {
+    NMHDR hdr;
+    LPARAM lParam;
+    DWORD dwReturn;
+    union {
+        LPCTSTR pszLink;
+        BOOL fTimeout;
+        POINT pt;
+    };
+} NMSHN;
+
+#undef  INTERFACE
+#define INTERFACE IShellNotificationCallback
+DECLARE_INTERFACE_(IShellNotificationCallback,IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,LPVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(OnShow)(THIS_ DWORD,POINT,LPARAM) PURE;
+    STDMETHOD(OnCommandSelected)(THIS_ DWORD, WORD) PURE;
+    STDMETHOD(OnLinkSelected)(THIS_ DWORD,LPCTSTR,LPARAM) PURE;
+    STDMETHOD(OnDismiss)(THIS_ DWORD,BOOL,LPARAM) PURE;
+};
+#endif /* _WINCE_SMARTPHONE */
+
+BYTE SHGetAppKeyAssoc(LPCTSTR);
+BOOL SHSetAppKeyWndAssoc(BYTE,HWND);
+BOOL SHInitExtraControls(void);
+BOOL SHCloseApps(DWORD);
+BOOL SHInitDialog(PSHINITDLGINFO);
+BOOL SHSipPreference(HWND,SIPSTATE);
+BOOL SHFullScreen(HWND,DWORD);
+BOOL SHDoneButton(HWND,DWORD);
+BOOL SHGetAutoRunPath(LPTSTR);
+BOOL SHSetNavBarText(HWND,LPCTSTR);
+void SHInputDialog(HWND,UINT,WPARAM);
+#ifdef _WINCE_SMARTPHONE
+HBITMAP SHLoadImageResource(HINSTANCE, UINT);
+HBITMAP SHLoadImageFile(LPCTSTR);
+HWND WINAPI SHFindMenuBar(HWND);
+void WINAPI SHNavigateBack(void);
+HRESULT SHOnPluginDataChange(const CLSID*);
+BOOL SHEnumPropSheetHandlers(HKEY,int*,HPROPSHEETPAGE*,IShellPropSheetExt**);
+BOOL SHLoadContextMenuExtensions(IUnknown*,LPCTSTR,LPCTSTR,HMENU,UINT,UINT,HANDLE*);
+BOOL SHInvokeContextMenuCommand(HWND,UINT,HANDLE);
+BOOL SHFreeContextMenuExtensions(HANDLE);
+HRESULT SHCreateNewItem(HWND,REFCLSID);
+HRESULT SHGetEmergencyCallList(TCHAR*,UINT);
+LRESULT SHNotificationAdd(SHNOTIFICATIONDATA*);
+LRESULT SHNotificationUpdate(DWORD,SHNOTIFICATIONDATA*);
+LRESULT SHNotificationRemove(const CLSID*,DWORD);
+LRESULT SHNotificationGetData(const CLSID*,DWORD,SHNOTIFICATIONDATA*);
+#endif /* _WINCE_SMARTPHONE */
+
+WINSHELLAPI BOOL SHSipInfo(UINT,UINT,PVOID,UINT);
+WINSHELLAPI BOOL SHCreateMenuBar(SHMENUBARINFO*);
+WINSHELLAPI BOOL SHHandleWMActivate(HWND,WPARAM,LPARAM,SHACTIVATEINFO*,DWORD);
+WINSHELLAPI BOOL SHHandleWMSettingChange(HWND,WPARAM,LPARAM,SHACTIVATEINFO*);
+WINSHELLAPI DWORD SHRecognizeGesture(SHRGINFO*);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _AYGSHELL_H */

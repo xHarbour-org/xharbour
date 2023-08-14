@@ -1,0 +1,33 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LAUTORUN =
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = HB_MULTI_GT;HB_EXT_INKEY
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\wvw.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+[\xHarbour\contrib\gtwvw\gtwvw.c]
+[\xHarbour\contrib\gtwvw\wvwcheck.c]
+[\xHarbour\contrib\gtwvw\wvwdraw.c]
+[\xHarbour\contrib\gtwvw\wvwedit.c]
+[\xHarbour\contrib\gtwvw\wvwfuncs.c]
+[\xHarbour\contrib\gtwvw\wvwmenu.c]
+[\xHarbour\contrib\gtwvw\wvwpush.c]
+[\xHarbour\contrib\gtwvw\wvwstbar.c]
+[\xHarbour\contrib\gtwvw\wvwtbar.c]
+

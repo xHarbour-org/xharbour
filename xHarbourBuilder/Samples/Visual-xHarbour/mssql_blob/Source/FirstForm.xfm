@@ -1,0 +1,67 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FirstForm INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FirstForm_OnDestroy()
+   METHOD ToolStripButton1_OnClick()
+   METHOD ToolStripButton2_OnClick()
+   METHOD ToolStripButton3_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FirstForm
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnDestroy" ] := "FirstForm_OnDestroy"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FirstForm"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 443
+   ::Height               := 251
+   ::Caption              := "MS SQL Blob Test"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TOOLSTRIP( Self ) )
+      :Name                 := "ToolStrip1"
+      WITH OBJECT :Font
+         :Bold                 := .T.
+      END
+
+      :Left                 := 9
+      :Top                  := 6
+      :Caption              := "ToolStrip1"
+      :Create()
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ToolStripButton1"
+         :Caption              := "Connect"
+         :EventHandler[ "OnClick" ] := "ToolStripButton1_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ToolStripButton2"
+         :Caption              := "Create"
+         :EventHandler[ "OnClick" ] := "ToolStripButton2_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+      WITH OBJECT ( TOOLSTRIPBUTTON( :this ) )
+         :Name                 := "ToolStripButton3"
+         :Caption              := "Query"
+         :EventHandler[ "OnClick" ] := "ToolStripButton3_OnClick"
+         :Create()
+      END //TOOLSTRIPBUTTON
+
+   END //TOOLSTRIP
+
+   ::Show()
+
+RETURN Self

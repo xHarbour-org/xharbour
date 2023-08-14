@@ -1,0 +1,13 @@
+Properties
+   ImageIndex
+   Transparent
+   ImageList   
+
+Methods
+   GetSysColor()
+   
+
+
+
+   
+

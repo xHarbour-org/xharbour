@@ -1,0 +1,193 @@
+CINI = 
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = ..\source;\xbp\xcc\sql.lib
+LAUTORUN = 
+LDEBUG = .T.
+LGUI = .F.
+LIBFOLDERS = 
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .T.
+LPRG_DEBUG = .T.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN32 ;SQLRDD_TOPCONN 
+MYLINK_FLAGS = -NOEXPOBJ -MAP -FORCE:MULTIPLE 
+MYPRG_FLAGS = 
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = \xbp\xcc\sql.lib
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = \xhb\lib
+
+[..\source\sql.y]
+MYC_FLAGS = 
+MYDEFINES = 
+MYSLY_FLAGS = 
+
+[..\source\sqlodbc.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlconnection.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlrdd0.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlrdd2.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\utils.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlgen1.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\utilslang.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlmy.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlpgs.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlfirebird.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlfirebird3.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqloracle.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprtransl.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprparser.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprsimpl.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprobjs.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprrelation.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\exprudf.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlact.c]
+MYC_FLAGS = 
+MYDEFINES = HB_API_MACROS 
+
+[..\source\firebird.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\firebird3.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqllex.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\mysql.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\pgs.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlsrodbc.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlrdd1.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlora.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlorax.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlnames.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlex1.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlex2.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlex3.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqlmaria.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\source\sqlora2.c]
+MYC_FLAGS = 
+MYDEFINES = 
+
+[..\source\sqloracle2.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 

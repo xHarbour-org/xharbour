@@ -1,0 +1,54 @@
+Properties
+   MinRange              
+   MaxRange              
+   MinDate               
+   MinTime               
+   MaxDate               
+   MaxTime               
+   SmallCaption 
+   Caption
+   Date 
+   Time
+   UpDown
+   Parse
+   Format
+   CustomFormat
+   Border   
+
+
+Methods
+   GetCalendarColor( nPos )     
+   GetCalendarFont()  
+   GetCalendarHandle() 
+   GetRange()           
+   SetRange()
+   GetSystemTime()
+   SetSystemTime()
+   SetFormat()
+   SetCustomFormat()
+   SetCalendarColor( nPos, nColor )
+   SetCalendarFont( nPos, hFont )
+   SetBkColor( nColor )  
+   SetTextColor( nColor )
+   SetTitleTextColor( nColor )
+   SetTitleBackColor( nColor )
+   SetMonthBackColor( nColor )
+   SetTrailingTextColor( nColor )
+
+
+Events
+   OnCloseUp          
+   OnDateTimeChange   
+   OnDropDown         
+   OnFormat           
+   OnFormatQuery      
+   OnUserString       
+   OnWMKeyDown        
+   OnKillFocus        
+   OnSetFocus         
+
+
+
+
+   
+

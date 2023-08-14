@@ -1,0 +1,93 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyModeless INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyModeless_OnClose()
+   METHOD MyModeless_OnSysCommand()
+   METHOD MyModeless_OnCreate()
+   METHOD MyModeless_OnDestroy()
+   METHOD MyModeless_OnHideWindow()
+   METHOD MyModeless_OnLoad()
+   METHOD MyModeless_OnShowWindow()
+   METHOD ButtonUpdate_OnClick()
+   METHOD ButtonApply_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyModeless
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyModeless_OnClose"
+   ::EventHandler[ "OnSysCommand" ] := "MyModeless_OnSysCommand"
+   ::EventHandler[ "OnCreate" ] := "MyModeless_OnCreate"
+   ::EventHandler[ "OnDestroy" ] := "MyModeless_OnDestroy"
+   ::EventHandler[ "OnHideWindow" ] := "MyModeless_OnHideWindow"
+   ::EventHandler[ "OnLoad" ] := "MyModeless_OnLoad"
+   ::EventHandler[ "OnShowWindow" ] := "MyModeless_OnShowWindow"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MyModeless"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 500
+   ::Height               := 300
+   ::Center               := .T.
+   ::Caption              := "Modeless Form"
+   ::FrameStyle           := 2
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonUpdate"
+      :Left                 := 390
+      :Top                  := 192
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Update App"
+      :EventHandler[ "OnClick" ] := "ButtonUpdate_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonApply"
+      :Left                 := 297
+      :Top                  := 192
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Apply"
+      :EventHandler[ "OnClick" ] := "ButtonApply_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( STATUSBAR( Self ) )
+      :Name                 := "StatusModeless"
+      WITH OBJECT :Font
+         :Pointsize            := 14
+      END
+
+      :Height               := 23
+      :Create()
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel1"
+         :Width                := 100
+         :ImageIndex           := -1
+         :Create()
+      END //STATUSBARPANEL
+
+      WITH OBJECT ( STATUSBARPANEL( :this ) )
+         :Name                 := "StatusBarPanel2"
+         :Width                := 100
+         :ImageIndex           := -1
+         :Create()
+      END //STATUSBARPANEL
+
+   END //STATUSBAR
+
+   ::Show()
+
+RETURN Self

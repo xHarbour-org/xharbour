@@ -1,0 +1,66 @@
+Properties
+   Caption                  
+   ImageIndex
+   RadioCheck
+   ShortCutText             
+   Font                     
+   HotImageList             
+   Message                  
+   ShortCutKey              
+   ImageList
+   Visible                 
+   Enabled 
+   Id                       
+   Cargo                    
+   Action       
+   Parent                   
+   Position  
+   Menu                     
+   hMenu                    
+   lInserted 
+   aItems                   
+   Style                    
+   MenuItemInfo             
+   MenuBreak                
+   Status                    
+   ShortCut                 
+   Default              
+   BkBrush        
+   Type                     
+   Bitmap                   
+   Children                 
+                            
+
+Methods
+    Enable()               
+    Disable()              
+    IsEnabled()            
+    GetItem( nId )         
+    UnCheck()              
+    IsChecked()            
+    SetDefaultItem()       
+    Select()               
+    Destroy()              
+    GetRectangle()         
+    GetClientRect()        
+    GetWindowRect()        
+    InvalidateRect()       
+    SetSubMenu()
+    SetText()
+    IsMenuItem()
+    GetMenuById()
+    GetMenuByKey()
+    GetMenuByHandle()
+    AddMenuItem()
+    GetSubMenu()
+    SetStatus()
+    Check()
+    Delete()
+    MeasureItem()
+    HiLite()
+    DrawItem()
+    DrawItemText()
+    CheckForDefaultItem()
+    Cancel()
+
+

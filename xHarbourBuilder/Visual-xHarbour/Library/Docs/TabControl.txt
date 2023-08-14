@@ -1,0 +1,69 @@
+Properties
+   MultiLine 
+   ImageList          
+   FocusNever 
+   FixedWidth  
+   ColorInactiveHeader
+   ImageList  
+   BoldSelection 
+   ShowTabs       
+   Flat           
+   CurSel     
+   Frame            
+   TabBrush         
+   CloseBtn         
+   PinBtn           
+   TabPosition  
+   EnumTabPosition  
+           
+
+
+Methods
+   InsertTab()
+   DeleteTab()
+   DeleteAllTabs()
+   AlignTop 
+   AlignBottom 
+   AlignLeft 
+   AlignRight
+   AdjustRect(lDisplay,aRect)
+   SetMinTabWidth( dx ) 
+   GetCurFocus()   
+   GetCurSel()
+   GetExtendedStyle()        
+   GetItem(nItem,ptrItem)   
+   GetItemText()
+   SetItemText()
+   GetItemCount()       
+   GetItemRect(nItem) 
+   GetRowCount()
+   GetToolTips()   
+   GetUnicodeFormat()
+   HighlightItem(n,nHigh) 
+   HitTest()
+   RemoveImage(nImageIndex)
+   SetCurFocus(nItem) 
+   SetCurSel(nItem)           
+   SetExtendedStyle(nExStyle) 
+   SetImageList( oImageList ) 
+   SetItem(nItem, cText)     
+   SetItemValues()
+   GetTabPosByName()
+   SetItemExtra(nBytes)    
+   SetItemSize(x,y)
+   SetPadding( cx, cy )
+   SetToolTips( hToolTips ) 
+   SetUnicodeFormat(lUnicode)
+   DeselectAll(lExcludeFocus)
+   GetObj()
+   SetPos(n,l)
+   Refresh()
+   RestoreTabPos()
+
+    
+Events
+   OnSelChanged     
+
+
+   
+   

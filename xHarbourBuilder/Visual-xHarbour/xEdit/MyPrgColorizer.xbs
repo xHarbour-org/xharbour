@@ -1,0 +1,159 @@
+PROCEDURE PrgColorizerInit() 
+
+   //Alert( "INIT" )
+
+   PUBLIC s_PRG_KeyWord  := PRG_KeyWord() 
+   PUBLIC s_PRG_Word     := PRG_Word()  
+   PUBLIC s_PRG_Literal  := PRG_Literal()  
+   PUBLIC s_PRG_Operator := PRG_Operator()  
+ 
+RETURN
+ 
+PROCEDURE PrgColorizer( hDC, nX, nY, sLine, nCharWidth, nOffset, CustomColors, oEditor )
+
+   LOCAL cToken, nIndex := 1, nLen, nLens := 0 
+   LOCAL nComment := 0
+   LOCAL oError
+
+   //TraceLog( sLine, nOffset )
+
+   IF Empty( sLine ) .OR. nOffset >= Len( sLine )
+      RETURN
+   ENDIF
+
+   WITH OBJECT oEditor
+      TRY
+         WHILE sLine[nIndex] == ' '
+            nIndex++
+         END
+         nIndex--
+
+         IF nIndex > nOffset
+            nIndex -= nOffset
+            nOffset := 0
+            TextOut( hDC, nX, nY, Space( nIndex ), nIndex )
+            nX += ( nIndex * nCharWidth )
+            nLens += nIndex
+         ELSE
+            nOffset -= nIndex
+         ENDIF
+
+         sLine := LTrim( sLine )
+
+         nLen := At( "*/", sLine )
+         IF nLen > 0 .AND. :nPhysicalLine - 1 == :nLastCloser
+            SetTextColor( hDC, CustomColors[ "Comments" ] )
+            cToken := Left( sLine, ++nLen )
+            sLine := SubStr( sLine, nLen + 1 )
+            //TraceLog( cToken, sLine )
+         ELSE
+            cToken := HB_AtX( s_PRG_KeyWord, sLine, , , @nLen )
+
+             IF nLen > 0
+                SetTextColor( hDC, CustomColors[ "Keywords" ] )
+                sLine := SubStr( sLine, nLen + 1 )
+             ELSE
+                cToken := NextToken( @sLine )
+                nLen := Len( cToken )
+
+                IF cToken[1] == '*'
+                   SetTextColor( hDC, CustomColors[ "Comments" ] )
+                   nLen := Len( cToken ) + Len( sLine ) - nOffset
+                   TextOut( hDC, nX, nY, SubStr( cToken + sLine, nOffset + 1 ), nLen )
+                   BREAK
+                ELSEIF cToken = "/*" .OR. cToken = '//' .OR. cToken = '&&'
+                   SetTextColor( hDC, CustomColors[ "Comments" ] )
+                   nLen := Len( cToken ) + Len( sLine ) - nOffset
+                   TextOut( hDC, nX, nY, SubStr( cToken + sLine, nOffset + 1 ), nLen )
+                   BREAK
+                /* Commented for Patrick. :-) 
+                ELSEIF cToken[1] == '#'
+                   SetTextColor( hDC, CustomColors[ "Directives" ] )
+                   nLen := Len( cToken ) + Len( sLine ) - nOffset
+                   TextOut( hDC, nX, nY, SubStr( cToken + sLine, nOffset + 1 ), nLen )
+                   BREAK
+                */                    
+                ENDIF
+
+                IF HB_RegExMatch( s_PRG_Operator, cToken, .T. )
+                   SetTextColor( hDC, CustomColors[ "Operators" ] )
+                ELSEIF HB_RegExMatch( s_PRG_Literal, cToken, .T. )
+                   SetTextColor( hDC, CustomColors[ "Literals" ] )
+                ELSEIF cToken[1] $ ["']
+                   cToken += sLine
+                   sLine := ""
+                   nLen := Len( cToken )
+                   SetTextColor( hDC, CustomColors[ "Open Literals" ] )
+                ELSEIF sLine[1] == '(' .AND. '|' + Lower( cToken ) + '|' IN s_SysFunc
+                   SetTextColor( hDC, CustomColors[ "API" ] )
+                ELSEIF cToken = "/*"
+                   SetTextColor( hDC, CustomColors[ "Comments" ] )
+                ELSE
+                   SetTextColor( hDC, CustomColors[ "Text" ] )
+                ENDIF
+             ENDIF
+         ENDIF
+
+         //TraceLog( nLen, nLens, nOffset, cToken )
+
+         IF nLens >= nOffset
+            TextOut( hDC, nX, nY, cToken, nLen )
+            nX += ( nLen * nCharWidth )
+         ELSEIF nLens + nLen > nOffset
+            nLen := nLens + nLen - nOffset
+            cToken := Right( cToken, nLen )
+            TextOut( hDC, nX, nY, cToken, nLen )
+            nX += ( nLen * nCharWidth )
+            nLens := nOffset + nLen
+         ELSE
+            nLens += nLen
+         ENDIF
+
+         WHILE ! Empty( cToken := NextToken( @sLine ) )
+            nLen := Len( cToken )
+
+            IF HB_RegExMatch( s_PRG_Word, cToken, .T. )
+               SetTextColor( hDC, CustomColors[ "Reserved" ] )
+            ELSEIF HB_RegExMatch( s_PRG_Literal, cToken, .T. )
+               SetTextColor( hDC, CustomColors[ "Literals" ] )
+            ELSEIF cToken[1] $ ["']
+               cToken += sLine
+               sLine := ""
+               nLen := Len( cToken )
+               SetTextColor( hDC, CustomColors[ "Open Literals" ] )
+            ELSEIF HB_RegExMatch( s_PRG_Operator, cToken, .T. )
+               SetTextColor( hDC, CustomColors[ "Operators" ] )
+            ELSEIF sLine[1] == '(' .AND. '|' + Lower( cToken ) + '|' IN s_SysFunc
+               SetTextColor( hDC, CustomColors[ "API" ] )
+            ELSEIF cToken = "/*" .OR. cToken = '//' .OR. cToken = '&&'
+               SetTextColor( hDC, CustomColors[ "Comments" ] )
+            ELSE
+               SetTextColor( hDC, CustomColors[ "Text" ] )
+            ENDIF
+
+            IF nLens >= nOffset
+               TextOut( hDC, nX, nY, cToken, nLen )
+               nX += ( nLen * nCharWidth )
+               //nLens += nLen // No longer needed here
+            ELSEIF nLens + nLen > nOffset
+               nLen := nLens + nLen - nOffset
+               cToken := Right( cToken, nLen )
+               TextOut( hDC, nX, nY, cToken, nLen )
+               nX += ( nLen * nCharWidth )
+               nLens := nOffset //+ nLen No longer needed
+            ELSE
+               nLens += nLen
+            ENDIF
+         END
+         
+      CATCH oError
+         IF oError == NIL
+            nX += ( nLen * nCharWidth )      
+         ELSE   
+            TraceLog( oError:ProcName, oError:ProcLine, oError:Operation, oError:Description )
+         ENDIF
+         
+      END SEQUENCE
+   END
+
+RETURN

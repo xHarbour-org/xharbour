@@ -1,0 +1,69 @@
+Properties
+   Alias   
+   FileName
+   BindingSource
+   Shared             
+   ReadOnly           
+   AutoOpen           
+   SqlConnector       
+   Path               
+   CodePage           
+   Socket             
+   Structure
+   Fields    
+   IndexOrder
+   bOnFileNameChanged
+   bOnFileClosed     
+   Area              
+   Connector         
+   Driver           
+   Exists           
+
+Methods
+   Open()
+   Gather()                            
+   Scatter( aData )                    
+   SetTopScope( xScope )               
+   SetBottomScope( xScope )            
+   KillScope()                         
+   Reindex()                           
+   Commit()                            
+   RecLock()                           
+   FileLock()                          
+   UnLock()                            
+   UnLockAll()                         
+   Bof()                               
+   Eof()                               
+   Deleted()                           
+   RecCount()                          
+   RecNo()                             
+   GoTop()                             
+   GoTo( nRec )                        
+   GoBottom()                          
+   Skip( n )                           
+   Close(lNotify)                      
+   Append()                            
+   OrdSetFocus( cOrder )               
+   SetIndex( cIndex )                  
+   SetRelation()                       
+   SetOrder( nOrder )                  
+   Select()                            
+   SelectArea()                        
+   Delete()                            
+   Recall()                            
+   Seek( xKey, lSoft )                 
+   Found()                             
+   SetDriver( cDriver )                
+   CreateIndex( cName, xKey, lUnique ) 
+   IndexOrd()                          
+   Zap()                               
+   OrdName(n)                          
+   OrdKey(n)                           
+   Struct()                            
+   OrdKeyGoTo( nPos )                  
+   SetFilter( b, c )                   
+   OrdKeyCount()                       
+   Used()                              
+   OrdKeyRelPos(n)                     
+   OrdKeyNo()                          
+   FromAlias()

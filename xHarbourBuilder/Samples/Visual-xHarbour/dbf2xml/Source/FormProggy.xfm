@@ -1,0 +1,65 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormProggy INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD FormProggy_OnCreate()
+   METHOD FormProggy_OnDestroy()
+   METHOD Button1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormProggy
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "FormProggy_OnCreate"
+   ::EventHandler[ "OnDestroy" ] := "FormProggy_OnDestroy"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormProggy"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 342
+   ::Height               := 166
+   ::Center               := .T.
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "dbf2xml"
+   ::ThickFrame           := .F.
+   ::SysMenu              := .F.
+   ::FrameStyle           := 2
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( PROGRESSBAR( Self ) )
+      :Name                 := "Proggy"
+      :Left                 := 22
+      :Top                  := 42
+      :Width                := 282
+      :Height               := 22
+      :VertScrollSize       := 20
+      :HorzScrollSize       := 150
+      :Create()
+   END //PROGRESSBAR
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 123
+      :Top                  := 89
+      :Width                := 80
+      :Height               := 25
+      :VertScrollSize       := 25
+      :HorzScrollSize       := 80
+      :Caption              := "Cancel"
+      :DefaultButton        := .T.
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   ::Show()
+
+RETURN Self

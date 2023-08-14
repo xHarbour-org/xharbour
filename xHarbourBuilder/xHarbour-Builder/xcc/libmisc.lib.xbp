@@ -1,0 +1,41 @@
+CINI = 
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .F.
+LIBFOLDERS =
+LMT = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES =
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\libmisc.lib
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\lib
+
+
+# *** samples.lib ***
+[\xHarbour\contrib\misc\date.c]
+#[\xHarbour\contrib\misc\dbf.c]
+[\xHarbour\contrib\misc\environ.c]
+[\xHarbour\contrib\misc\gauge.c]
+[\xHarbour\contrib\misc\hb_f.c]
+[\xHarbour\contrib\misc\mathx.c]
+[\xHarbour\contrib\misc\num.c]
+[\xHarbour\contrib\misc\stack.c]
+[\xHarbour\contrib\misc\status.c]
+[\xHarbour\contrib\misc\strfmt.c]
+[\xHarbour\contrib\misc\stringsx.c]
+[\xHarbour\contrib\misc\time.c]
+
+[\xHarbour\contrib\misc\fileread.prg]
+[\xHarbour\contrib\misc\nconvert.prg]
+[\xHarbour\contrib\misc\numtxten.prg]
+[\xHarbour\contrib\misc\numtxthu.prg]
+[\xHarbour\contrib\misc\stringp.prg]
+[\xHarbour\contrib\misc\twirler.prg]

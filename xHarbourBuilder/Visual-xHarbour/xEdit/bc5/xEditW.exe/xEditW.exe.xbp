@@ -1,0 +1,42 @@
+CINI = ..\xbuild.bc5.ini
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LAUTORUN =
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = \xhb\lib\bc5; $(XHB_BC5)\Lib
+LMT = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN; XEDIT_APPLICATION
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\bc5\xEditW-exe.exe
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+RUNARGUMENTS =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\bin\bc5
+
+[..\..\xedit.prg]
+MYC_FLAGS = 
+MYDEFINES = 
+MYPRG_FLAGS = 
+
+[..\..\xedit.rc]
+MYDEFINES = 
+MYRC_FLAGS = 
+
+[winapi.lib]
+
+[xEditWScript.lib]
+[xbScript.lib]
+
+[ole.lib]
+[activex.lib]

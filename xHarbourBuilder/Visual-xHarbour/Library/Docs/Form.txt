@@ -1,0 +1,56 @@
+Properties
+   Params          
+   Sizeable        
+   Modal           
+   UserVariables   
+   ShowMode        
+   AutoClose       
+   VertScroll      
+   HorzScroll      
+   MDIClient       
+   ShowInTaskBar   
+   ToolWindow    
+   TopMost       
+   ThickFrame    
+   Resizable     
+   MaximizeBox   
+   MinimizeBox   
+   CaptionBar    
+   SysMenu       
+   FrameStyle    
+   DlgModalFrame 
+   Icon          
+   Opacity       
+   BitmapMask    
+   BitmapMaskColor
+   MDIChild
+   MdiContainer
+   BackgroundImage
+   MaskBitmap
+   MinWidth        
+   MinHeight       
+   MaxWidth        
+   MaxHeight       
+   ImageList     
+   Visible
+   ActiveForm
+
+Methods
+   MdiTileHorizontal( lTileDisable )
+   MdiTileVertical( lTileDisable )  
+   MdiCascade( lTileDisable )       
+   MdiIconArrange()                 
+   MdiNext()                        
+   MdiActivate()
+   MdiDestroy()
+   MdiClose()
+   MdiGetActive()
+   MdiMaximize()
+   MdiRestore()
+   Maximize()
+   Minimize()
+   Restore() 
+   SetOpacity()
+   Show()
+   SaveLayout()
+   RestoreLayout()

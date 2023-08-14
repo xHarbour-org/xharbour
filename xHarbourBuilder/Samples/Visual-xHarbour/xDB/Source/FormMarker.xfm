@@ -1,0 +1,167 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS FormMarker INHERIT Dialog
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+   METHOD OnInitDialog()
+
+   // Event declaration
+   METHOD FormMarker_OnLoad()
+   METHOD CheckMarker_OnClick()
+   METHOD ButtonOK_OnClick()
+   METHOD ButtonCancel_OnClick()
+   METHOD CheckMarkerSec_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS FormMarker
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "FormMarker_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "FormMarker"
+   ::Modal                := .T.
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 520
+   ::Height               := 478
+   ::Center               := .T.
+   ::Caption              := "Set Up Markers"
+   ::ThickFrame           := .F.
+   ::MaximizeBox          := .F.
+   ::Icon                 := { ".\Resource\marker.ico","_MARKERICO" }
+
+   ::Create()
+
+   // Populate Children
+RETURN Self
+
+METHOD OnInitDialog() CLASS FormMarker
+   // Properties declaration
+
+   // Populate Children
+   WITH OBJECT ( LISTBOX( Self ) )
+      :Name                 := "Listme"
+      :VertScroll           := .T.
+      :Left                 := 18
+      :Top                  := 44
+      :Width                := 163
+      :Height               := 330
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :ExtendedSel          := .T.
+      :Create()
+   END //LISTBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 18
+      :Top                  := 22
+      :Width                := 171
+      :Height               := 16
+      :Caption              := "Select columns to colorize:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditPri"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 202
+      :Top                  := 44
+      :Width                := 291
+      :Height               := 102
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 202
+      :Top                  := 22
+      :Width                := 154
+      :Height               := 16
+      :Caption              := "Marker 1 - Condition:"
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckMarker"
+      :Left                 := 202
+      :Top                  := 153
+      :Width                := 126
+      :Height               := 15
+      :Caption              := "Activate Marker 1"
+      :EventHandler[ "OnClick" ] := "CheckMarker_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonOK"
+      :Left                 := 313
+      :Top                  := 403
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "OK"
+      :EventHandler[ "OnClick" ] := "ButtonOK_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "ButtonCancel"
+      :Left                 := 413
+      :Top                  := 403
+      :Width                := 80
+      :Height               := 30
+      :Caption              := "Close"
+      :EventHandler[ "OnClick" ] := "ButtonCancel_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( EDIT( Self ) )
+      :Name                 := "EditSec"
+      WITH OBJECT :ToolTip
+         :Text                 := "Please use single quotes as string delimiters"
+         :Balloon              := .T.
+      END
+
+      :VertScroll           := .T.
+      :Left                 := 202
+      :Top                  := 250
+      :Width                := 291
+      :Height               := 102
+      :AutoVScroll          := .T.
+      :MultiLine            := .T.
+      :Create()
+   END //EDIT
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckMarkerSec"
+      :Left                 := 202
+      :Top                  := 359
+      :Width                := 131
+      :Height               := 15
+      :Caption              := "Activate Marker 2"
+      :EventHandler[ "OnClick" ] := "CheckMarkerSec_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 202
+      :Top                  := 228
+      :Width                := 130
+      :Height               := 16
+      :Caption              := "Marker 2 - Condition:"
+      :Create()
+   END //LABEL
+
+RETURN Self
+

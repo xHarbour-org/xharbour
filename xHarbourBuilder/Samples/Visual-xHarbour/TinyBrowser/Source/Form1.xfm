@@ -1,0 +1,121 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD ToolButton1_OnClick()
+   METHOD ToolButton2_OnClick()
+   METHOD ToolButton3_OnClick()
+   METHOD WebBrowser1_BeforeNavigate2()
+   METHOD WebBrowser1_DocumentComplete()
+   METHOD WebBrowser1_NavigateError()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :Iconwidth            := 48
+      :Iconheight           := 48
+      :AddImage( "_BOOKSICO", NIL, 4194304, NIL,1, "books.ico" )
+      :AddImage( "_DOCPREFICO", NIL, 4194304, NIL,1, "docpref.ico" )
+      :AddImage( "_PRINTICO", NIL, 4194304, NIL,1, "print.ico" )
+      :Create()
+   END //ImageList1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 812
+   ::Height               := 600
+   ::Center               := .T.
+   ::Caption              := "TinyBrowser"
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( OPTIONBAR( Self ) )
+      :Name                 := "OptionBar1"
+      WITH OBJECT :Dock
+         :Left                 := :Owner:Parent
+         :Top                  := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 0
+      :Top                  := 0
+      :Width                := 150
+      :Height               := 566
+      :BackColor            := 16777215
+      :SmallCaption         := .T.
+      :ImageList            := ::ImageList1
+      :Create()
+      WITH OBJECT ( OPTIONBARBUTTON( :this ) )
+         :Name                 := "ToolButton1"
+         :Caption              := "Documentation"
+         :ImageIndex           := 1
+         :EventHandler[ "OnClick" ] := "ToolButton1_OnClick"
+         :Create()
+      END //OPTIONBARBUTTON
+
+      WITH OBJECT ( OPTIONBARBUTTON( :this ) )
+         :Name                 := "ToolButton2"
+         :Caption              := "Page Setup"
+         :ImageIndex           := 2
+         :EventHandler[ "OnClick" ] := "ToolButton2_OnClick"
+         :Create()
+      END //OPTIONBARBUTTON
+
+      WITH OBJECT ( OPTIONBARBUTTON( :this ) )
+         :Name                 := "ToolButton3"
+         :Caption              := "Print"
+         :ImageIndex           := 3
+         :EventHandler[ "OnClick" ] := "ToolButton3_OnClick"
+         :Create()
+      END //OPTIONBARBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ToolButton4"
+         :AutoSize             := .F.
+         :Width                := 0
+         :Caption              := ""
+         :Enabled              := .F.
+         :Position             := 3
+         :Create()
+      END //TOOLBUTTON
+
+   END //OPTIONBAR
+
+   WITH OBJECT ( WEBBROWSER( Self ) )
+      :Name                 := "WebBrowser1"
+      WITH OBJECT :Dock
+         :Left                 := ::OptionBar1
+         :Top                  := :Owner:Parent
+         :Right                := :Owner:Parent
+         :Bottom               := :Owner:Parent
+         :Margin               := 0
+      END
+
+      :Left                 := 150
+      :Top                  := 0
+      :Width                := 654
+      :Height               := 566
+      :Url                  := "http://www.sourceforge.net"
+      :EventHandler[ "BeforeNavigate2" ] := "WebBrowser1_BeforeNavigate2"
+      :EventHandler[ "DocumentComplete" ] := "WebBrowser1_DocumentComplete"
+      :EventHandler[ "NavigateError" ] := "WebBrowser1_NavigateError"
+      :Create()
+      :Configure()
+   END //WEBBROWSER
+
+   ::Show()
+
+RETURN Self

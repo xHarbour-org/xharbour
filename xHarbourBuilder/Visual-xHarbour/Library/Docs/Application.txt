@@ -1,0 +1,98 @@
+Properties
+
+   Version    
+   Company    
+   Copyright  
+   Description
+   Resources  
+   SetCentury         
+   SetDeleted         
+   SetDefault         
+   SetExact           
+   SetFixed           
+   SetDecimals        
+   SetDateFormat      
+   SetEpoch           
+   SetPath            
+   SetExclusive       
+   SetSoftseek        
+   SetUnique          
+   SetCancel          
+   SetDebug           
+   SetTypeahead       
+   SetAlternate       
+   SetAltfile         
+   SetDevice          
+   SetExtra           
+   SetExtrafile       
+   SetPrintfile       
+   SetMargin          
+   SetBell            
+   SetConfirm         
+   SetEscape          
+   SetInsert          
+   SetExit            
+   SetWrap            
+   SetMessage         
+   SetMcenter         
+   SetScrollbreak     
+   SetEventmask       
+   SetVideomode       
+   SetMblocksize      
+   SetMfileext        
+   SetStrictread      
+   SetOptimize        
+   SetAutopen         
+   SetAutorder        
+   SetAutoshare       
+   SetCount           
+   SetLanguage        
+   SetIdlerepeat      
+   SetTrace           
+   SetTracefile       
+   SetTracestack      
+   SetFilecase        
+   SetDircase         
+   SetDirseparator    
+   SetErrorloop       
+   SetOutputsafety    
+   SetDbflockscheme   
+   SetTrimfilename    
+   SetPrinterjob      
+   SetHardcommit      
+   SetForceopt        
+   SetEol             
+   SetErrorlog        
+
+   DllInstance 
+   Path        
+   Name        
+   FileName    
+   OsVersion   
+   Instance    
+   ThemeActive 
+   MDIClient   
+   IniFile     
+   MainForm    
+   bUserError  
+   TempDir   
+   AppIniFile
+   Params 
+   Running
+
+Methods
+   Run()
+   Close()                     
+   Exit()
+   Yield()
+   DoEvents()                  
+   LoadIcon( cIcon )           
+   RestorePrevInstance(nNotify)
+   IsThemeActive()             
+   MessageBox()
+   LoadResource( cName, cType )
+   SaveResource()
+
+Events
+   OnExit()
+

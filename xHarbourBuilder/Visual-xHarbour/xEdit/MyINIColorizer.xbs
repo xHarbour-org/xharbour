@@ -1,0 +1,50 @@
+PROCEDURE INIColorizer( hDC, nX, nY, sLine, nCharWidth, nOffset, CustomColors )
+
+   LOCAL cToken, nIndex := 1, nLen, nLens := 0
+   LOCAL oError
+   
+   IF Empty( sLine ) .OR. nOffset >= Len( sLine )
+      RETURN
+   ENDIF
+
+   TRY
+      WHILE sLine[nIndex] == ' '
+         nIndex++
+      END
+      nIndex--
+
+      IF nIndex > nOffset
+         nIndex -= nOffset
+         nOffset := 0
+         TextOut( hDC, nX, nY, Space( nIndex ), nIndex )
+         nX += ( nIndex * nCharWidth )
+         nLens += nIndex
+      ELSE
+         nOffset -= nIndex
+      ENDIF
+
+      sLine := LTrim( sLine )
+
+      IF sLine[1] == '#'
+         SetTextColor( hDC, CustomColors[ "Comments" ] )
+         nLen := Len( sLine ) - nOffset
+         TextOut( hDC, nX, nY, SubStr( sLine, nOffset + 1 ), nLen )
+      ELSEIF sLine[1] == '['
+         SetTextColor( hDC, CustomColors[ "Sections" ] )
+         nLen := Len( sLine ) - nOffset
+         TextOut( hDC, nX, nY, SubStr( sLine, nOffset + 1 ), nLen )
+      ELSE
+         SetTextColor( hDC, CustomColors[ "Text" ] )
+         nLen := Len( sLine ) - nOffset
+         TextOut( hDC, nX, nY, SubStr( sLine, nOffset + 1 ), nLen )
+      ENDIF
+
+      nX += ( nLen * nCharWidth )
+      
+   CATCH oError
+      IF oError != NIL
+         TraceLog( oError:ProcLine, oError:Operation, oError:Description )
+      ENDIF      
+   END
+
+RETURN

@@ -1,0 +1,1 @@
+#COMMAND ? [<x,...>] => WSH:Echo( <x> )

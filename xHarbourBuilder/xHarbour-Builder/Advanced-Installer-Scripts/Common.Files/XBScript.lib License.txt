@@ -1,0 +1,3 @@
+Please NOTE the following licence requirement, when you link xbScript into any of your applications: 
+
+You may link xbScript.lib into  any application as long as the application into which you integrate xbScript adds significant value over and above the scripting and interactive capabilities of xbScript.lib, and does not compete in any way with the xbScript family of products from xHarbour.com Inc., and/or the xPrompt product of xHarbour.com Inc.

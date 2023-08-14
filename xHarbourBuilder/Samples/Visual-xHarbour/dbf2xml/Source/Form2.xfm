@@ -1,0 +1,56 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form2 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form2_OnCreate()
+   METHOD Form2_OnDestroy()
+   METHOD Form2_OnLoad()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "Form2_OnCreate"
+   ::EventHandler[ "OnDestroy" ] := "Form2_OnDestroy"
+   ::EventHandler[ "OnLoad" ] := "Form2_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "Form2"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 800
+   ::Height               := 600
+   ::VertScrollSize       := 264
+   ::HorzScrollSize       := 284
+   ::Caption              := "Test..."
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( WEBBROWSER( Self ) )
+      :Name                 := "WebBrowser1"
+      WITH OBJECT :Dock
+         :Left                 := "Form2"
+         :Top                  := "Form2"
+         :Right                := "Form2"
+         :Bottom               := "Form2"
+      END
+
+      :Left                 := 42
+      :Top                  := 12
+      :Width                := 200
+      :Height               := 207
+      :VertScrollSize       := 32
+      :HorzScrollSize       := 32
+      :Create()
+      :Configure()
+   END //WEBBROWSER
+
+   ::Show()
+
+RETURN Self

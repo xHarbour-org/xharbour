@@ -1,0 +1,34 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS MyMDI2 INHERIT MDIChildWindow
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD MyMDI2_OnClose()
+   METHOD MyMDI2_OnShowWindow()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS MyMDI2
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnClose" ] := "MyMDI2_OnClose"
+   ::EventHandler[ "OnShowWindow" ] := "MyMDI2_OnShowWindow"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "MyMDI2"
+   ::Left                 := 31
+   ::Top                  := 36
+   ::Width                := 500
+   ::Height               := 300
+   ::Caption              := "xHarbour.com Training Center |"
+   ::MDIChild             := .T.
+
+   ::Create()
+
+   // Populate Children
+   ::Show()
+
+RETURN Self

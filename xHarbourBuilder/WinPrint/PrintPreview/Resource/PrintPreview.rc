@@ -1,0 +1,41 @@
+1 24 "PrintPreview.exe.manifest"
+#include "Winver.h"
+
+1 VERSIONINFO
+FILEVERSION       1,0,0,0
+PRODUCTVERSION    1,0,0,0
+FILEFLAGS         0
+FILEFLAGSMASK     VS_FFI_FILEFLAGSMASK
+FILEOS            VOS__WINDOWS32
+FILETYPE          VFT_APP
+FILESUBTYPE       0
+{
+   BLOCK "StringFileInfo"
+   {
+      BLOCK "040904E4"
+      {
+         VALUE "CompanyName",      ""
+         VALUE "FileDescription",  ""
+         VALUE "FileVersion",      "1.0.0.0\0"
+         VALUE "InternalName",     "PrintPreview"
+         VALUE "LegalCopyright",   ""
+         VALUE "OriginalFilename", "PrintPreview.exe"
+         VALUE "ProductName",      ""
+         VALUE "ProductVersion",   "1.0.0.0\0"
+      }
+   }
+   BLOCK "VarFileInfo"
+   {
+      // English language and the Windows ANSI codepage
+      VALUE "Translation", 0x409, 1252
+   }
+}
+_0APPICON ICON "Resource\\preview.ico"
+_1PREVIEWICO ICON "Resource\\preview.ico"
+_ZOOM-INICO ICON "Resource\\Zoom-In.ico"
+_ZOOM-OUTICO ICON "Resource\\Zoom-Out.ico"
+_PRINTICO ICON "Resource\\Print.ico"
+_FIRSTICO ICON "Resource\\First.ico"
+_PREVICO ICON "Resource\\Prev.ico"
+_NEXTPAGEICO ICON "Resource\\NextPage.ico"
+_LASTICO ICON "Resource\\Last.ico"

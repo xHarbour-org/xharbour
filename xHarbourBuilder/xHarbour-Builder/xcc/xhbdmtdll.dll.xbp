@@ -1,0 +1,20 @@
+C_OUTPUTFOLDER =
+DEFFILE =
+INCLUDEFOLDERS =
+LGUI = .T.
+LIBFOLDERS = \xHarbour\lib;\xHarbour\lib\Win
+LMT = .T.
+MAPFILE =
+MYC_FLAGS =
+MYDEFINES = WIN32;__EXPORT__
+MYLINK_FLAGS =
+MYPRG_FLAGS =
+MYRC_FLAGS =
+MYSLY_FLAGS =
+OUTPUTFOLDER = \xbp\xcc\xhbdmtdll.dll
+PRG_OUTPUTFOLDER =
+RC_OUTPUTFOLDER =
+SLY_OUTPUTFOLDER =
+TARGETFOLDER = \xhb\bin
+
+#include "\xHarbour.com\xHarbour-Builder\xcc\mtdll.files.inc"

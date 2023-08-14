@@ -1,0 +1,5 @@
+PROCEDURE Main()
+
+   Alert( "Hello" )
+
+RETURN

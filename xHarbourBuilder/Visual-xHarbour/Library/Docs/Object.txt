@@ -1,0 +1,29 @@
+Properties
+   Instance 
+   Theming 
+   hWnd                  
+   Error                  
+   GenerateMember         
+   Parent                 
+   ThemeName              
+   hTheme                 
+   Children               
+   Cargo                  
+   Owner                  
+   Property               
+   Name                 
+   Application          
+   System               
+   Form                 
+   This                
+                            
+
+Methods
+   HasMessage( cMsg )  
+   HasProperty( cName )
+   GetControlName()
+   SetWindowTheme( cSubAppName, cSubIdList ) 
+   RemoveWindowTheme()
+   RemoveProperty()
+
+

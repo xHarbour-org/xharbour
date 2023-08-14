@@ -1,0 +1,202 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS WinPrintTest_Form1 INHERIT WinForm
+   // Components declaration
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD WinPrintTest_Form1_OnLoad()
+   METHOD Button1_OnClick()
+   METHOD Button2_OnClick()
+   METHOD CheckBox1_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS WinPrintTest_Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnLoad" ] := "WinPrintTest_Form1_OnLoad"
+
+   // Populate Components
+   // Properties declaration
+   ::Name                 := "WinPrintTest_Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 321
+   ::Height               := 379
+   ::Text                 := "WinPrintTest_Form1"
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button1"
+      :Left                 := 58
+      :Top                  := 306
+      :Width                := 107
+      :Height               := 25
+      :Text                 := "Print preview test"
+      :EventHandler[ "OnClick" ] := "Button1_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( BUTTON( Self ) )
+      :Name                 := "Button2"
+      :Left                 := 180
+      :Top                  := 306
+      :Width                := 107
+      :Height               := 25
+      :Text                 := "Print test"
+      :EventHandler[ "OnClick" ] := "Button2_OnClick"
+      :Create()
+   END //BUTTON
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label1"
+      :Left                 := 5
+      :Top                  := 34
+      :Width                := 53
+      :Height               := 16
+      :Text                 := "Printer :"
+      :Alignment            := 2
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( COMBOBOX( Self ) )
+      :Name                 := "ComboBox1"
+      :VertScroll           := .T.
+      :Left                 := 67
+      :Top                  := 30
+      :Width                := 206
+      :Height               := 100
+      :ItemHeight           := 15
+      :Create()
+   END //COMBOBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label2"
+      :Left                 := 5
+      :Top                  := 63
+      :Width                := 53
+      :Height               := 16
+      :Text                 := "Copies :"
+      :Alignment            := 2
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "EditBox1"
+      :Left                 := 67
+      :Top                  := 61
+      :Width                := 40
+      :Height               := 22
+      :Text                 := "1"
+      :Alignment            := 3
+      :Number               := .T.
+      :Create()
+   END //EDITBOX
+
+   WITH OBJECT ( GROUPBOX( Self ) )
+      :Name                 := "GroupBox1"
+      :Left                 := 21
+      :Top                  := 199
+      :Width                := 264
+      :Height               := 99
+      :Text                 := "Report type"
+      :Create()
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioButton1"
+         :Left                 := 30
+         :Top                  := 31
+         :Width                := 100
+         :Height               := 15
+         :Text                 := "Basic sample"
+         :InitialState         := 1
+         :Create()
+      END //RADIOBUTTON
+
+      WITH OBJECT ( RADIOBUTTON( :this ) )
+         :Name                 := "RadioButton2"
+         :Left                 := 30
+         :Top                  := 59
+         :Width                := 100
+         :Height               := 15
+         :Text                 := "Sales report"
+         :Create()
+      END //RADIOBUTTON
+
+   END //GROUPBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "CheckBox1"
+      :Left                 := 67
+      :Top                  := 91
+      :Width                := 141
+      :Height               := 16
+      :Text                 := "Custom paper size"
+      :EventHandler[ "OnClick" ] := "CheckBox1_OnClick"
+      :Create()
+   END //CHECKBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label3"
+      :Left                 := 5
+      :Top                  := 123
+      :Width                := 53
+      :Height               := 16
+      :Text                 := "Ht (mm) :"
+      :Alignment            := 2
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "EditBox2"
+      :Left                 := 68
+      :Top                  := 122
+      :Width                := 40
+      :Height               := 22
+      :Enabled              := .F.
+      :Text                 := "279"
+      :Alignment            := 3
+      :Number               := .T.
+      :Create()
+   END //EDITBOX
+
+   WITH OBJECT ( LABEL( Self ) )
+      :Name                 := "Label4"
+      :Left                 := 115
+      :Top                  := 123
+      :Width                := 64
+      :Height               := 16
+      :Text                 := "Wd (mm) :"
+      :Alignment            := 2
+      :Create()
+   END //LABEL
+
+   WITH OBJECT ( EDITBOX( Self ) )
+      :Name                 := "EditBox3"
+      :Left                 := 189
+      :Top                  := 122
+      :Width                := 40
+      :Height               := 22
+      :Enabled              := .F.
+      :Text                 := "216"
+      :Alignment            := 3
+      :Number               := .T.
+      :Create()
+   END //EDITBOX
+
+   WITH OBJECT ( CHECKBOX( Self ) )
+      :Name                 := "chkLandscape"
+      :Left                 := 68
+      :Top                  := 159
+      :Width                := 100
+      :Height               := 16
+      :Text                 := "Landscape"
+      :Create()
+   END //CHECKBOX
+
+   ::Show()
+
+RETURN Self

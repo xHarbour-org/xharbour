@@ -1,0 +1,132 @@
+//------------------------------------------------------------------------------------------------------------------------------------
+
+CLASS Form1 INHERIT WinForm
+   // Components declaration
+   // User variables definitions
+   VAR oNotes, oEmployees
+   METHOD Init() CONSTRUCTOR
+
+   // Event declaration
+   METHOD Form1_OnCreate()
+   METHOD MenuEmployees_OnClick()
+   METHOD MenuScheduler_OnClick()
+   METHOD ButtonProjects_OnClick()
+   METHOD ButtonNotes_OnClick()
+
+ENDCLASS
+
+METHOD Init( oParent, aParameters ) CLASS Form1
+   ::Super:Init( oParent, aParameters )
+
+   ::EventHandler[ "OnCreate" ] := "Form1_OnCreate"
+
+   // Populate Components
+   WITH OBJECT ( ImageList( Self ) )
+      :Name                 := "ImageList1"
+      :IconWidth            := 32
+      :IconHeight           := 32
+      :AddImage( "_CUBESICO", NIL, 4194304, NIL,1, "cubes.ico" )
+      :AddImage( "_PARTICO", NIL, 4194304, NIL,1, "part.ico" )
+      :AddImage( "_DATE-TIMEICO", NIL, 4194304, NIL,1, "date-time.ico" )
+      :Create()
+   END //ImageList1
+
+   WITH OBJECT ( ContextMenu( Self ) )
+      :Name                 := "ContextMenu1"
+      :Create()
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "MenuEmployees"
+         :Text                 := "Employees"
+         :EventHandler[ "OnClick" ] := "MenuEmployees_OnClick"
+         :Create()
+      END //MENUITEM
+
+      WITH OBJECT ( MENUITEM( :this ) )
+         :Name                 := "MenuScheduler"
+         :Text                 := "Scheduler"
+         :EventHandler[ "OnClick" ] := "MenuScheduler_OnClick"
+         :Create()
+      END //MENUITEM
+
+   END //ContextMenu1
+
+   // Properties declaration
+   ::Name                 := "Form1"
+   ::Left                 := 10
+   ::Top                  := 10
+   ::Width                := 900
+   ::Height               := 600
+   ::Text                 := "MyOffice"
+   ::Center               := .T.
+
+   ::Create()
+
+   // Populate Children
+   WITH OBJECT ( TOOLBAR( Self ) )
+      :Name                 := "ToolBar1"
+      :Left                 := 5
+      :Top                  := 9
+      :Width                := 269
+      :Height               := 51
+      :ImageList            := "ImageList1"
+      :ToolTips             := .T.
+      :Create()
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ButtonProjects"
+         :ContextMenu          := "ContextMenu1"
+         :DropDown             := .T.
+         :Width                := 74
+         :Text                 := "Projects"
+         :ImageIndex           := 1
+         :Position             := 0
+         :EventHandler[ "OnClick" ] := "ButtonProjects_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ButtonPartners"
+         :Width                := 54
+         :Text                 := "Partners"
+         :ImageIndex           := 2
+         :Position             := 1
+         :Create()
+      END //TOOLBUTTON
+
+      WITH OBJECT ( TOOLBUTTON( :this ) )
+         :Name                 := "ButtonNotes"
+         :Width                := 42
+         :Text                 := "Notes"
+         :ImageIndex           := 3
+         :Position             := 2
+         :EventHandler[ "OnClick" ] := "ButtonNotes_OnClick"
+         :Create()
+      END //TOOLBUTTON
+
+   END //TOOLBAR
+
+   WITH OBJECT ( COOLBAR( Self ) )
+      :Name                 := "CoolBar1"
+      WITH OBJECT :Dock
+         :Left                 := "Form1"
+         :Top                  := "Form1"
+         :Right                := "Form1"
+         :Margins              := "0,0,0,0"
+      END
+
+      :Width                := 884
+      :Height               := 56
+      :Border               := 8388608
+      :Create()
+      WITH OBJECT ( COOLBARBAND( :this ) )
+         :MinWidth             := 60
+         :MinHeight            := 56
+         :BandChild            := "ToolBar1"
+         :Break                := .T.
+         :Create()
+      END //COOLBARBAND
+
+   END //COOLBAR
+
+   ::Show()
+
+RETURN Self
