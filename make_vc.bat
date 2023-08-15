@@ -266,12 +266,8 @@ SET HB_GT_LIB=$(GTWIN_LIB)
 REM echo "%CC_DIR%"
 REM echo "%RC_DIR%"
 
-if "%VSINSTALLDIR%"=="" (
-   IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
-   IF "%VCINSTALLDIR%"=="" (
-      set PATH="%CC_DIR%\bin;%VSCOMMONTOOLS%;%RC_DIR%;%BISON_DIR%;%~dp0bin;%PATH%"
-   )
-)
+IF "%VSINSTALLDIR%"=="" IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
+IF "%VSINSTALLDIR%"=="" IF "%VCINSTALLDIR%"=="" set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
 
 REM echo %path%
 

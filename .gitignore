@@ -19,6 +19,7 @@
 *.log
 *.ppo
 *.pp$
+*.map
 
 pptable.c
 hbverbld.h
