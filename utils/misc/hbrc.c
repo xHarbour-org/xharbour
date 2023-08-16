@@ -353,11 +353,20 @@ int main( int argc, char * argv[] )
          char *      aMo[]     = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
          char        szParam[ 265 ];
 
+         unsigned long long llvalue = HB_VER_CVSID; 
+         unsigned long dw1 = llvalue >> 32; // Get the first DWORD (the higher 32 bits) 
+         unsigned long dw2 = llvalue & 0xFFFFFFFF; // Get the second DWORD (the lower 32 bits) 
+
+         unsigned short hiword1 = dw1 >> 16; // Get the high word of dw1 
+         unsigned short loword1 = dw1 & 0xFFFF; // Get the low word of dw1 
+         unsigned short hiword2 = dw2 >> 16; // Get the high word of dw2 
+         unsigned short loword2 = dw2 & 0xFFFF; // Get the low word of dw2 
+
          GetLocalTime( &t );
 
          fprintf( h, "1 VERSIONINFO\n" );
-         fprintf( h, "FILEVERSION %d,%d,%d,%lld\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
-         fprintf( h, "PRODUCTVERSION %d,%d,%d,%lld\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
+         fprintf( h, "FILEVERSION %u,%u,%u,%u\n", hiword1, loword1, hiword2, loword2 ); 
+         fprintf( h, "PRODUCTVERSION %u,%u,%u,%u\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, 0 );
 #if defined( __DMC__ )
          fprintf( h, "BEGIN\n" );
 #else
@@ -377,11 +386,11 @@ int main( int argc, char * argv[] )
 #endif
          fprintf( h, "   VALUE \"CompanyName\", \"%s\\000\"\n", cParExp( szParam, argv[6] ) );
          fprintf( h, "   VALUE \"FileDescription\", \"%s\\000\"\n", cParExp( szParam, argv[2] ) );
-         fprintf( h, "   VALUE \"FileVersion\", \"%d.%d.%d.%d\\000\"\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
+         fprintf( h, "   VALUE \"FileVersion\", \"%u.%u.%u.%u\\000\"\n", hiword1, loword1, hiword2, loword2 );
          fprintf( h, "   VALUE \"InternalName\", \"%s\\000\"\n", cParExp( szParam, argv[3] ) );
          fprintf( h, "   VALUE \"LegalCopyright\", \"\\251 %s\\000\"\n", cParExp( szParam, argv[4] ) );
          fprintf( h, "   VALUE \"ProductName\", \"%s\\000\"\n", cParExp( szParam, argv[2] ) );
-         fprintf( h, "   VALUE \"ProductVersion\", \"%d.%d.%d.%d\\000\"\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,HB_VER_CVSID );
+         fprintf( h, "   VALUE \"ProductVersion\", \"%u.%u.%u.%u\\000\"\n", HB_VER_MAJOR,HB_VER_MINOR,HB_VER_REVISION,0 );
          fprintf( h, "   VALUE \"Programmer\", \"%s\\000\"\n", cParExp( szParam, argv[5] ) );
          fprintf( h, "   VALUE \"CompileDate\", \"%02d%s%s%s%04d\\000\"\n", t.wDay, " ", aMo[ t.wMonth - 1 ], " ", t.wYear );
          fprintf( h, "   VALUE \"CompileTime\", \"%02d:%02d:%02d\\000\"\n", t.wHour, t.wMinute, t.wSecond );
