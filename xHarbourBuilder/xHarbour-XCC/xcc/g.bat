@@ -1,5 +1,5 @@
 @ECHO OFF
-
+ 
 :SAVE
    SET _PRESET_PATH=%PATH%
    SET _PRESET_INCLUDE=%INCLUDE%
@@ -13,6 +13,8 @@
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"   GOTO SET_VC2017EX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"        GOTO SET_VC2017E
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools"         GOTO SET_VC2022E
+   IF EXIST "d:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools"       GOTO SET_VC2022EA         
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools" GOTO SET_VC2017PX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
@@ -54,6 +56,20 @@
 
 :SET_VC2017P
    SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2022E
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+:SET_VC2022EA
+   SET MSVCDIR=d:\Program Files\Microsoft Visual Studio\2022\Community\Vc
    SET PELLESCDIR=%ProgramFiles%\PellesC
    CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
    SET PSDKDIR=%WindowsSdkBinPath%..
