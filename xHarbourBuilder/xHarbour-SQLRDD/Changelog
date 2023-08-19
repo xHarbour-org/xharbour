@@ -8,6 +8,16 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2023-08-19 10:30  UTC-0300  Luiz Rafael Culik <culikr@gmail.com>     
+ + vc2022/mysql.lib.xbp
+ + vc2022/mysqlmt.lib.xbp
+ + vc2022/sql.lib.xbp
+ + vc2022/sqlmt.lib.xbp
+ + vc2022/sqlrdd.xns
+ + vc2022/xbuild.vc8.ini 
+   + Added project for msvc 2022
+   
 2017-04-04 14:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/utils.prg
      ! adjust SR_SubQuoted to add E to string under postgresql

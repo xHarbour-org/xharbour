@@ -174,7 +174,7 @@ STATIC s_sCoreDynLibs :=  ""
 #endif
 
 
-CLASS TDependant MODULE FRIENDLY //FROM HBPersistent
+CLASS TDependant //MODULE FRIENDLY //FROM HBPersistent
 
    //FRIEND FUNCTION xBuildMain
 
@@ -411,7 +411,7 @@ METHOD CatchUp() CLASS TDependant
 
 RETURN ::lCurrent
 
-CLASS TMakeObject FROM TDependant MODULE FRIENDLY
+CLASS TMakeObject FROM TDependant //MODULE FRIENDLY
 
    //FRIEND FUNCTION xBuildMain
 
@@ -588,7 +588,7 @@ METHOD C_Command() CLASS TMakeObject
       cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
       cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
    ELSE
-      cCommand += '-I"' + ::Project:xHB_RootX + 'include/harbour" '
+      cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
    ENDIF
 
    IF ::Project:C_Executable == "xcc.exe"
@@ -1543,7 +1543,7 @@ METHOD SourceFile() CLASS TMakeObject
 
 RETURN '"' + ::aDependancies[1]:cFile + '"'
 
-CLASS TMakeProject FROM TMakeObject MODULE FRIENDLY
+CLASS TMakeProject FROM TMakeObject //MODULE FRIENDLY
    
    //FRIEND FUNCTION xBuildMain
 
@@ -2231,8 +2231,8 @@ CLASS TMakeProject FROM TMakeObject MODULE FRIENDLY
    METHOD DLL_Command()
 
    METHOD New( cFile ) CONSTRUCTOR
-   METHOD AddFiles(...) // ...
-   METHOD AddObjects(...) // ...
+   METHOD AddFiles() 
+   METHOD AddObjects() 
    METHOD AddProject( cFile )
    METHOD Make( bOnErr, bProgress )
 
@@ -3315,7 +3315,7 @@ FUNCTION LoadProject( cFile, Parent, cIniFile )
       Throw( ErrorNew( "xBuild", 0, 1001, ProcName(), "Could not load one or more files:;;" + cMissingFiles ) )
    ENDIF
 
-   oProject:aLoadedProperties := __objGetIVars( oProject, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( oProject )
+   oProject:aLoadedProperties := __ClsGetPropertiesAndValues( oProject )
 
    oProject:lAddedDependencies := .F.
 
@@ -3402,7 +3402,7 @@ METHOD Make( bOnErr, bProgress ) CLASS TMakeProject
          IF Empty( ::aLoadedProperties ) .OR. ::lAddedDependencies .OR. ::lExpand
             GenerateProjectFile( Self )
          ELSE
-            FOR EACH aProperty IN __objGetIVars( Self, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( Self )
+            FOR EACH aProperty IN __ClsGetPropertiesAndValues( Self )
                /*
                IF aProperty[1] == "LAUTORUN" .OR. aProperty[1] == "RUNARGUMENTS"
                   // Ignore.
@@ -4067,13 +4067,14 @@ RETURN cList
 #endif
 
 METHOD ValidateSettings() CLASS TMakeProject
+      LOCAL nAt
 
    IF Empty( ::xHB_Executable ) .OR. Empty(::xHB_Root )
       ::Set_xHB( s_sHB_Folder, , s_sHB_LibFolder, s_sHB_Exe, s_sHB_IncFolder )
    ENDIF
 
    #ifdef __PLATFORM__Windows
-      LOCAL nAt
+
 
       IF Empty( ::C_Executable )
          IF ( ! Empty( ::xHB_Root ) ) .AND. File( ::xHB_RootX + "bin\xcc.exe" )
@@ -4306,7 +4307,7 @@ FUNCTION GenerateProjectFile( oProject )
 
    IF oProject:ClassName == "TMAKEPROJECT"
 
-      aPropertyAndValues := __objGetIVars( oProject, HB_OO_CLSTP_PERSIST, .F. )//__ClsGetPropertiesAndValues( oProject )
+      aPropertyAndValues := __ClsGetPropertiesAndValues( oProject )
       aSort( aPropertyAndValues, , , {|a1, a2| a1[1] < a2[1] } )
 
       FOR EACH aPropertyAndValue IN aPropertyAndValues
@@ -4399,7 +4400,7 @@ FUNCTION GenerateProjectFile( oProject )
                LOOP
             ENDIF
 
-            aPropertyAndValues := __objGetIVars( Dependancy, HB_OO_CLSTP_PERSIST, .T. )//__ClsGetPropertiesAndValues( Dependancy )
+            aPropertyAndValues := __ClsGetPropertiesAndValues( Dependancy )
             aSort( aPropertyAndValues, , , {|a1, a2| a1[1] < a2[1] } )
 
             FOR EACH aPropertyAndValue IN aPropertyAndValues
@@ -4525,7 +4526,7 @@ FUNCTION Find_xHarbour( xHB_Root, cExe, cLibFolder )
       cExe     := "xhb.exe"
       RETURN .T.
    ELSEIF File( "\xhb\bin\xhb.exe" )
-      xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xhb\", 128 ) )
+      xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xhb\", 128 ) 
       cExe     := "xhb.exe"
       RETURN .T.
    ENDIF
@@ -4543,7 +4544,7 @@ FUNCTION Find_xHarbour( xHB_Root, cExe, cLibFolder )
 
    IF Empty( xHB_Root )
       IF File( "\xharbour\bin\harbour.exe" )
-         xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xharbour\", 128 ) )
+         xHB_Root := Pad( DiskName() + DRIVE_SEPARATOR + "\xharbour\", 128 ) 
          cExe     := "harbour.exe"
 
          RETURN .T.
@@ -4631,7 +4632,7 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
 
    LOCAL lFound := .F.
 #ifdef __PLATFORM__Windows
-   LOCAL cCurrent := DiskName(), c, lFound := .F.
+   LOCAL cCurrent := DiskName(), c
    //LOCAL cDrives := ""
 #endif   
 
@@ -4657,7 +4658,7 @@ FUNCTION Find_CCompiler( C_Compiler, C_Root )
                   EXIT
                ELSEIF File( c + ":\borland\bcc55\bin\bcc32.exe" )
                   s_sBCCFolder := c + ":\borland\bcc55"
-                  C_Root := Pad( s_sBCCFolder, 128 ) )
+                  C_Root := Pad( s_sBCCFolder, 128 ) 
 
                   lFound := .T.
                   EXIT
@@ -5093,6 +5094,16 @@ INIT PROCEDURE InitTProject
                   s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.15063.0\um\" + s_sHostArch 
                ENDIF
                
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.22621.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.22621.0\" + s_sHostArch 
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22621.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22621.0\um\" + s_sHostArch 
+               ENDIF			
             CASE File( s_sProgramsFolder + "\Windows Kits\8.1\Include\um\windows.h" )
                s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\8.1\Include\um" + ";" + ;
                                           s_sProgramsFolder + "\Windows Kits\8.1\Include\shared"
@@ -5193,6 +5204,11 @@ INIT PROCEDURE InitTProject
             s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.15063.0\ucrt"
             s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.15063.0\ucrt\x86"
          ENDIF         
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.22621.0\ucrt\x86"
+         ENDIF     
+		 
       ELSEIF IsDirectory( sUniversalCRTSdkDir )
          sUCRTVersion := GetEnv( "UCRTVersion" )
          IF IsDirectory(  sUniversalCRTSdkDir + "include\" + sUCRTVersion + "\ucrt" )

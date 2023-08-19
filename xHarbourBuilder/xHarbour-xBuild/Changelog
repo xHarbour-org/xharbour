@@ -8,6 +8,10 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-19 10:30 UTC-0300 Luiz Rafael Culik <culikr@gmail.com>
+  ! tproject.prg
+    ! added support for msvc 2022    
+
 2015-03-14 16:40 UTC-0300 Luiz Rafael Culik <Luiz@xHarbour.com.br>
   ! tproject.prg
     ! removed ace32.lib from ::Project:Auto_Libs  when checking for sql.lib
