@@ -210,4 +210,4 @@ BEGIN
    END
 END
 
-#include "\xharbour.com\visual-xharbour\xedit\xedit.rc"
+#include "\xharbour\xHarbourBuilder\visual-xharbour\xedit\xedit.rc"
