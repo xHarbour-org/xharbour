@@ -13,9 +13,12 @@ REM --> Set Environment
 
     IF EXIST xbuild.ini         DEL xBuild.ini > NUL:
     IF EXIST xbuild.windows.ini DEL xBuild.Windows.ini > NUL:
-    
-    IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-XCC.bat
-    IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull-VC8.bat
+    SET OLD_PATH=%PATH%
+    IF "%XBUILD_XCC%"=="YES" CALL \xharbour\xHarbourBuilder\xHarbour-Builder\xbldfull-XCC.bat
+	SET PATH=%OLD_PATH%
+	SET OLD_PATH=%PATH%
+    IF "%XBUILD_VC8%"=="YES" CALL \xharbour\xHarbourBuilder\xHarbour-Builder\xbldfull-VC8.bat
+	SET PATH=%OLD_PATH%
 
 REM --> Cleanup for -ALL
     IF "%1"=="-all" GOTO CLEAN_ALL
@@ -117,14 +120,14 @@ REM --> Copy files
 
     REM ** SQLRDD **
     IF NOT EXIST \xHB\dll\SQLRDD MD \xHB\dll\SQLRDD
-    XCOPY \xharbour.com\xHarbour-SQLRDD\dll\*.dll      \xHB\dll\SQLRDD /d /y
-    XCOPY \xharbour.com\xHarbour-SQLRDD\lib\*.lib      \xHB\lib /d /y
-    XCOPY \xHarbour.com\xHarbour-SQLRDD\include        \xHB\include /d /y /i
-    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y
-    XCOPY \xHarbour.com\xHarbour-SQLRDD\source\mysql.h \xHB\include /d /y
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\dll\*.dll      \xHB\dll\SQLRDD /d /y
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\lib\*.lib      \xHB\lib /d /y
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\include        \xHB\include /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\source\mysql.h \xHB\include /d /y
     IF EXIST \xHB\include\sqlrdd.xns DEL \xHB\include\sqlrdd.xns
-    COPY \xharbour.com\xHarbour-SQLRDD\dll\fbclient.dll \xHB\bin /Y
-    COPY \xharbour.com\xHarbour-SQLRDD\dll\libmysql.dll \xHB\bin /Y
+    COPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\dll\fbclient.dll \xHB\bin /Y
+    COPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\dll\libmysql.dll \xHB\bin /Y
 
 
     REM ** ADS **
@@ -145,11 +148,11 @@ REM --> Copy files
     REM ** FreeImage **
     IF "%XBUILD_VC8%"=="YES" (
        IF NOT EXIST \xHB\lib\vc8 MD \xHB\lib\vc8
-       XCOPY \xHarbour.com\FreeImage\FreeImage.lib \xHB\lib\vc8  /d /y /i
+       XCOPY \xharbour\xHarbourBuilder\FreeImage\FreeImage.lib \xHB\lib\vc8  /d /y /i
 		 )
-    XCOPY \xHarbour.com\FreeImage\FreeImage.lib    \xHB\lib\     /d /y /i
-    XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\dll\     /d /y /i
-    XCOPY \xHarbour.com\FreeImage\FreeImage.dll    \xHB\bin\     /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\FreeImage\FreeImage.lib    \xHB\lib\     /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\FreeImage\FreeImage.dll    \xHB\dll\     /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\FreeImage\FreeImage.dll    \xHB\bin\     /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.ch \xHB\include\ /d /y /i
     XCOPY \xHarbour\contrib\FreeImage\include\*.h  \xHB\include\ /d /y /i
 
@@ -157,14 +160,14 @@ REM --> Copy files
     REM ** ApolloRDD **
     IF "%_BUILD_APOLLORDD%"=="YES" (
        IF NOT EXIST \xHB\dll\ApolloRDD MD \xHB\dll\ApolloRDD
-       XCOPY \xHarbour.com\xHarbour-ApolloRDD\dll\*.dll \xHB\dll\ApolloRDD /d /y /i
-       XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.h  \xHB\include /d /y /i
-       XCOPY \xHarbour.com\xHarbour-ApolloRDD\*.ch \xHB\include /d /y /i
+       XCOPY \xharbour\xHarbourBuilder\xHarbour-ApolloRDD\dll\*.dll \xHB\dll\ApolloRDD /d /y /i
+       XCOPY \xharbour\xHarbourBuilder\xHarbour-ApolloRDD\*.h  \xHB\include /d /y /i
+       XCOPY \xharbour\xHarbourBuilder\xHarbour-ApolloRDD\*.ch \xHB\include /d /y /i
        )
 
     REM ** BGD.DLL **
     IF "%_BUILD_BGD%"=="YES" (
-       XCOPY \xHarbour.com\xHarbour-Builder\BGD.DLL \xHB\dll  /d /y /i
+       XCOPY \xharbour\xHarbourBuilder\xHarbour-Builder\BGD.DLL \xHB\dll  /d /y /i
        )
 
     XCOPY \xHarbour\include\*.api                       \xHB\include /d /y /i
@@ -177,18 +180,18 @@ REM --> Copy files
     XCOPY \xHarbour\include\hbverbld.h                  \xHB\include /d /y /i
     XCOPY \xHarbour\contrib\gd\include                  \xHB\include /d /y /i
 
-    XCOPY \xHarbour.com\xHarbour-Builder\include        \xHB\include /d /y /i
-    XCOPY \xHarbour.com\xHarbour-ActiveX\ole.ch         \xHB\include\w32 /d /y
-    XCOPY \xHarbour.com\xHarbour-Builder\xcc*.lib       \xHarbour.com\xHarbour-XCC\xcc\xcc*.lib /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-Builder\include        \xHB\include /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-ActiveX\ole.ch         \xHB\include\w32 /d /y
+    XCOPY \xharbour\xHarbourBuilder\xHarbour-Builder\xcc*.lib       \xharbour\xHarbourBuilder\xHarbour-XCC\xcc\xcc*.lib /d /y /i
  
     REM ** VXH **
-    XCOPY \xHarbour.com\Visual-xHarbour\library\include \xHB\include\w32 /y /i
+    XCOPY \xharbour\xHarbourBuilder\Visual-xHarbour\library\include \xHB\include\w32 /y /i
     IF EXIST \xHB\Include\w32\Oleserver.h      DEL \xHB\Include\w32\Oleserver.h
     IF EXIST \xHB\Include\w32\Structures_HB.ch DEL \xHB\Include\w32\Structures_HB.ch
     IF EXIST \xHB\Include\w32\Globals.ch       DEL \xHB\Include\w32\Globals.ch
-    XCOPY \xHarbour.com\Visual-xHarbour\Extras \xHB\Bin /d /y /i
+    XCOPY \xharbour\xHarbourBuilder\Visual-xHarbour\Extras \xHB\Bin /d /y /i
 
-    IF "%_BUILD_IEGUI_LIB%"=="YES" XCOPY \xHarbour.com\IEGui\iegui.ch \xHB\include /d /y
+    IF "%_BUILD_IEGUI_LIB%"=="YES" XCOPY \xharbour\xHarbourBuilder\IEGui\iegui.ch \xHB\include /d /y
 
     IF EXIST \xHarbour\include\Ado.ch      DEL \xHarbour\include\Ado.ch
     IF EXIST \xHarbour\include\Colors.ch   DEL \xHarbour\include\Colors.ch
@@ -234,8 +237,8 @@ REM  ===============================================
 REM  ===============================================
 
 
-IF "%XBUILD_XCC%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
-IF "%XBUILD_VC8%"=="YES" CALL \xHarbour.com\xHarbour-Builder\xbldfull2.bat %1
+IF "%XBUILD_XCC%"=="YES" CALL \xharbour\xHarbourBuilder\xHarbour-Builder\xbldfull2.bat %1
+IF "%XBUILD_VC8%"=="YES" CALL \xharbour\xHarbourBuilder\xHarbour-Builder\xbldfull2.bat %1
 
 REM  ===============================================
 REM  ===============================================
@@ -338,7 +341,7 @@ REM  ===============================================
 
     SET _XB_Exe=
 
-    CD \xHarbour.com\xHarbour-Builder
+    CD \xharbour\xHarbourBuilder\xHarbour-Builder
 
 :Done1
 

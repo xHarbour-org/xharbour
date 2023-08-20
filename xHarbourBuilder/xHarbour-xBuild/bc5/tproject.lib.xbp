@@ -25,7 +25,7 @@ SLY_OUTPUTFOLDER =
 STARTIN =
 TARGETFOLDER = \xhb\lib\bc5
 
-[\xHarbour.com\xHarbour-xBuild\tproject.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\tproject.prg]
 MYC_FLAGS = 
 MYDEFINES =
 MYPRG_FLAGS = 

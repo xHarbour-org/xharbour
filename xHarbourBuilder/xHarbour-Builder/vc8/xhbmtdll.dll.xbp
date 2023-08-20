@@ -1,4 +1,4 @@
-CINI = \xHarbour.com\xHarbour-Builder\vc8\xbuild.vc8.ini
+CINI = \xharbour\xHarbourBuilder\xHarbour-Builder\vc8\xbuild.vc8.ini
 C_OUTPUTFOLDER =
 DEFFILE =
 INCLUDEFOLDERS =
@@ -18,4 +18,4 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\bin\vc8
 
-#include "\xHarbour.com\xHarbour-Builder\vc8\mtdll.files.inc"
+#include "\xharbour\xHarbourBuilder\xHarbour-Builder\vc8\mtdll.files.inc"

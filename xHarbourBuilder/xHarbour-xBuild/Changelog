@@ -7,8 +7,25 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
-2023-08-19 10:30 UTC-0300 Luiz Rafael Culik <culikr@gmail.com>
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! bc5\tproject.lib.xbp
+  ! bc5\xbuild.exe.xbp
+  ! bc5\xbuildw.exe.xbp
+  ! vc8\Demo\xbuild.exe.xbp
+  ! vc8\Demo\xbuildw.exe.xbp
+  ! vc8\Personal\xbuildw.exe.xbp
+  ! vc8\tproject.lib.xbp
+  ! vc8\xbuild.exe.xbp
+  ! vc8\xbuildw.exe.xbp
+  ! xcc\Demo\xbuild.exe.xbp
+  ! xcc\Demo\xbuildw.exe.xbp
+  ! xcc\Personal\xbuildw.exe.xbp
+  ! xcc\TProject.lib.xbp
+  ! xcc\xBuild.exe.xbp
+  ! xcc\xBuildW.exe.xbp
+    ! updated path to reflect new directories
+	
+2023-08-19 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
   ! tproject.prg
     ! added support for msvc 2022    
 

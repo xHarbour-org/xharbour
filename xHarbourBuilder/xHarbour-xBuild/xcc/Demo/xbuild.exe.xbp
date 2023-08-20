@@ -21,6 +21,6 @@ RUNARGUMENTS =
 SLY_OUTPUTFOLDER = 
 TARGETFOLDER = \xhb\bin\demo
 
-[\xHarbour.com\xHarbour-xBuild\xbuild.prg]
-[\xHarbour.com\xHarbour-xBuild\tproject.prg]
-[\xHarbour.com\xHarbour-xBuild\tproject-c.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\tproject.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\tproject-c.prg]

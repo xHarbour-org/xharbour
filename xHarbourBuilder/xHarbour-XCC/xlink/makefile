@@ -108,7 +108,7 @@ link.h:             msg.h defs.h
 
 polibs = kernel32.lib user32.lib crt.lib
 
-pocflags = -c -Ot -Ze -Gz -W1 -X -I"$(PELLESCDIR)\INCLUDE" -I"$(PELLESCDIR)\INCLUDE\WIN"
+pocflags = -c -Ot -Ze -Gz -W1 -Tx86-coff -X -I"$(PELLESCDIR)\INCLUDE" -I"$(PELLESCDIR)\INCLUDE\WIN"
 pocvars  = $(POWERDEBUG) $(PRERELEASE) -I..\include
 
 !IFDEF POWERDEBUG

@@ -25,12 +25,12 @@ SLY_OUTPUTFOLDER =
 STARTIN = 
 TARGETFOLDER = \xhb\bin\vc8\Personal
 
-[\xHarbour.com\xHarbour-xBuild\xbuild.prg]
-[\xHarbour.com\xHarbour-xBuild\gui.c]
-[\xHarbour.com\xHarbour-xBuild\xbuild.rc]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\gui.c]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.rc]
 
-[\xHarbour.com\xHarbour-xBuild\xbuild.ico]
-[\xHarbour.com\xHarbour-xBuild\xharbour320.avi]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.ico]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xharbour320.avi]
 
 [tproject.lib]
 

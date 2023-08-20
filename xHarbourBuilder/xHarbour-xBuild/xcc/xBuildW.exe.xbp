@@ -26,16 +26,16 @@ SLY_OUTPUTFOLDER =
 STARTIN = 
 TARGETFOLDER = \xhb\bin
 
-[\xHarbour.com\xHarbour-xBuild\xbuild.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[\xHarbour.com\xHarbour-xBuild\gui.c]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\gui.c]
 MYC_FLAGS = 
 MYDEFINES = 
 
-[\xHarbour.com\xHarbour-xBuild\xbuild.rc]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\xbuild.rc]
 MYDEFINES = 
 MYRC_FLAGS = 
 

@@ -25,12 +25,12 @@ SLY_OUTPUTFOLDER =
 STARTIN =
 TARGETFOLDER = \xhb\lib
 
-[\xHarbour.com\xHarbour-xBuild\tproject.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\tproject.prg]
 MYC_FLAGS = 
 MYDEFINES =
 MYPRG_FLAGS = 
 
-[\xHarbour.com\xHarbour-xBuild\tproject-c.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xBuild\tproject-c.prg]
 MYC_FLAGS = 
 MYDEFINES =
 MYPRG_FLAGS = 

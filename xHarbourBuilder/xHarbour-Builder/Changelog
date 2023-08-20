@@ -8,6 +8,54 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-20 10?00 UTC -0300 Luiz Culik <culikr/at/gmail.com>
+  ! xBldfull.bat 
+  ! xbldfull2.bat
+  ! vc8\ads.lib.xbp
+  ! vc8\cdx.lib.xbp
+  ! vc8\cdxmt.lib.xbp
+  ! vc8\ct3.lib.xbp
+  ! vc8\ct3comm.lib.xbp
+  ! vc8\dbf.lib.xbp
+  ! vc8\dbfmt.lib.xbp
+  ! vc8\Demo\xhb.exe.xbp
+  ! vc8\Demo\xhb.lib.xbp
+  ! vc8\dmain.lib.xbp
+  ! vc8\gd.lib.xbp
+  ! vc8\libc.lib.xbp
+  ! vc8\libct.lib.xbp
+  ! vc8\libmisc.lib.xbp
+  ! vc8\nordd.lib.xbp
+  ! vc8\nsx.lib.xbp
+  ! vc8\nsxmt.lib.xbp
+  ! vc8\ntx.lib.xbp
+  ! vc8\ntxmt.lib.xbp
+  ! vc8\odbc.lib.xbp
+  ! vc8\oldnames.lib.xbp
+  ! vc8\optg.lib.xbp
+  ! vc8\optgmt.lib.xbp
+  ! vc8\sixcdx.lib.xbp
+  ! vc8\sixcdxMT.lib.xbp
+  ! vc8\wincore.lib.xbp
+  ! vc8\wvg.lib.xbp
+  ! vc8\wvt.lib.xbp
+  ! vc8\xbscript.lib.xbp
+  ! vc8\xhb.exe.xbp
+  ! vc8\xhb.lib.xbp
+  ! vc8\xhbd.exe.xbp
+  ! vc8\xhbddll.dll.xbp
+  ! vc8\xhbdll.dll.xbp
+  ! vc8\xhbdmtdll.dll.xbp
+  ! vc8\xhbmt.lib.xbp
+  ! vc8\xhbmtdll.dll.xbp
+  ! vc8\xPrompt.exe\xPrompt.exe.xbp
+  ! vc8\xPrompt.exe\xPromptsql.exe.xbp
+  ! vc8\xprompt.exe.xbp
+  ! vc8\xpromptsql.exe.xbp	
+    ! updated path to reflect new directories
+
+
+
 2014-10-06 23:48 UTC-0430 Ron Pinkas <ron.pinkas/at/xharbour.com>
   + vc8\fix.odbccp32.lib.sdk710.c
     + New file to workaround versions 7,7.,8 and 8.1 of PSDK odbccp32.lib
