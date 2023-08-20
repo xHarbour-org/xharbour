@@ -1,7 +1,7 @@
 CINI = xbuild.vc8.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = ..\source;\xbp\vc8\sql.lib;\xHarbour.com\xHarbour-SQLRDD\vc8\
+INCLUDEFOLDERS = ..\source;\xbp\vc8\sql.lib;\xharbour\xHarbourBuilder\xHarbour-SQLRDD\vc8\
 LAUTORUN = 
 LDEBUG = .T.
 LGUI = .F.

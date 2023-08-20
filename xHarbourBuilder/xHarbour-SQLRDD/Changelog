@@ -8,6 +8,24 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! bc5\Demo\xBuild.bc5.ini
+  ! bc5\xBuild.bc5.ini
+  ! bc55\Demo\xBuild.bc5.ini
+  ! bc55\xBuild.bc5.ini
+  ! bc58\Demo\xBuild.bc5.ini
+  ! bc58\xBuild.bc5.ini
+  ! bc65\Demo\xBuild.bc5.ini
+  ! bc65\xBuild.bc65.ini
+  ! vc12\sqlmt.lib.xbp
+  ! vc2022\sqlmt.lib.xbp
+  ! vc8\Demo\sql.lib.xbp
+  ! vc8\Demo\sqlmt.lib.xbp
+  ! vc8\SQLRDD.xns
+  ! vc8\sql.lib.xbp
+  ! vc8\sqlmt.lib.xbp
+  ! vc8\xbuild.vc8.ini
+   ! updated path to reflect new directories
 
 2023-08-19 10:30  UTC-0300  Luiz Rafael Culik <culikr@gmail.com>     
  + vc2022/mysql.lib.xbp
