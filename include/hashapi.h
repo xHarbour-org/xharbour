@@ -77,15 +77,15 @@ HB_EXPORT void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
 HB_EXPORT  BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent );
 
 #ifdef HB_API_MACROS
-   #define hb_hashLen( pHash )                  ( pHash )->item.asHash.value->ulTotalLen
+//   #define hb_hashLen( pHash )                  ( pHash )->item.asHash.value->ulTotalLen
    #define hb_hashGetCompatibility( pHash )     (( pHash )->item.asHash.value->pAccessAA == NULL?FALSE:TRUE)
    #define hb_hashAAGetRealPos( pHash, ulPos )  ( ( ( ulPos ) > 0 && ( ulPos) <= hb_hashLen( ( pHash ) ) )? *(( pHash )->item.asHash.value->pAccessAA + ( ulPos ) - 1 ) : 0 )
 #else
-   extern HB_EXPORT HB_SIZE hb_hashLen( PHB_ITEM pHash );
-   extern HB_EXPORT  BOOL hb_hashGetCompatibility( PHB_ITEM pHash );
-   extern HB_EXPORT HB_SIZE hb_hashAAGetRealPos( PHB_ITEM pHash, HB_SIZE ulPos );
+   
+   HB_EXPORT  BOOL hb_hashGetCompatibility( PHB_ITEM pHash );
+   HB_EXPORT HB_SIZE hb_hashAAGetRealPos( PHB_ITEM pHash, HB_SIZE ulPos );
 #endif
-
+HB_EXPORT HB_SIZE hb_hashLen( PHB_ITEM pHash );
 HB_EXPORT PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash );
 HB_EXPORT PHB_ITEM hb_hashGetValues( PHB_ITEM pValues, PHB_ITEM pHash );
 HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, HB_SIZE ulPos );
