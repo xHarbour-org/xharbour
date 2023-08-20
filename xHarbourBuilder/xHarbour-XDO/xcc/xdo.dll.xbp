@@ -20,4 +20,4 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\dll
 
-[\xHarbour.com\xHarbour-XDO\XDO.prg]
+[\xharbour\xHarbourBuilder\xHarbour-XDO\XDO.prg]
