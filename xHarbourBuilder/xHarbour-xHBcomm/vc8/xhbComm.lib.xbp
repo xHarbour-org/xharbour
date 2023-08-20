@@ -1,7 +1,7 @@
 CINI = xbuild.vc8.ini
 C_OUTPUTFOLDER = 
 DEFFILE = 
-INCLUDEFOLDERS = \xHarbour.com\xHarbour-xHBComm\xhbcommdll;\xHarbour.com\xHarbour-xHBComm\comm
+INCLUDEFOLDERS = \xharbour\xHarbourBuilder\xHarbour-xHBComm\xhbcommdll;\xharbour\xHarbourBuilder\xHarbour-xHBComm\comm
 LDEBUG = .T.
 LGUI = .F.
 LIBFOLDERS = 
@@ -20,5 +20,5 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER = 
 TARGETFOLDER = \xhb\lib\vc8
 
-[\xHarbour.com\xHarbour-xHBComm\xhbcomm.c]
-[\xHarbour.com\xHarbour-xHBComm\tcomm.prg]
+[\xharbour\xHarbourBuilder\xHarbour-xHBComm\xhbcomm.c]
+[\xharbour\xHarbourBuilder\xHarbour-xHBComm\tcomm.prg]

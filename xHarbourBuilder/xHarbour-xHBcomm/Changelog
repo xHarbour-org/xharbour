@@ -7,6 +7,15 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! comm\xbuild.windows.ini
+  ! vc8\xbuild.vc8.ini
+  ! vc8\xhbComm.lib.xbp
+  ! xcc\xhbComm.lib.xbp
+  ! xhbcommdll\xbuild.windows.ini
+    ! updated path to reflect new directories  
+	
 2009-01-07 08:40  UTC-0300 Luiz Rafael Culik
   ! xhbcomm.c
    ! Minor fixes
