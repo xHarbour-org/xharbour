@@ -25,6 +25,7 @@ SET _LIB=%LIB%
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools"         GOTO SET_VC2022E   
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc" GOTO SET_VC2013X86
@@ -112,6 +113,10 @@ SET _LIB=%LIB%
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\VC98
    GOTO SET_PATH
 
+:SET_VC2022E
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\vc\Auxiliary\Build
+   GOTO SET_PATH
+
 :SET_PATH
 IF EXIST "%CC_DIR%"\vcvars32.bat CALL "%CC_DIR%"\vcvars32.bat
 
@@ -127,3 +132,5 @@ SET _PATH=
 SET _INCLUDE=
 SET _LIB=
 SET CC_DIR=
+
+
