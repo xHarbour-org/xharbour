@@ -22,11 +22,11 @@ RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\lib
 
-[\xHarbour.com\xHarbour-ActiveX\TActiveX.prg]
+[\xharbour\xHarbourBuilder\xHarbour-ActiveX\TActiveX.prg]
 MYC_FLAGS =
 MYDEFINES =
 MYPRG_FLAGS =
 
-[\xHarbour.com\xHarbour-ActiveX\ActiveX.c]
+[\xharbour\xHarbourBuilder\xHarbour-ActiveX\ActiveX.c]
 MYC_FLAGS =
 MYDEFINES =

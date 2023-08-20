@@ -24,7 +24,7 @@ RUNARGUMENTS =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\lib\bc5
 
-[\xHarbour.com\xHarbour-DebugServer\server\source\*.prg]
+[\xharbour\xHarbourBuilder\xHarbour-DebugServer\server\source\*.prg]
 MYC_FLAGS =
 MYDEFINES =
 MYPRG_FLAGS =

@@ -2361,7 +2361,7 @@ METHOD PRG_Libs() CLASS TMakeProject
             IF ::Project:nType == TYPE_EXE
                IF ::Project:lUseDLL
                   #ifdef __PLATFORM__Windows                  
-                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "xharbour.lib ", "harbour.lib " )
+                     RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "xharbour.lib ", "xharbour.lib " )
                   #else                  
                      // REVIEW! xharbour.so ?
                      RETURN IIF( ::lX, /* use_dll.lib see EXE_Command */ "libxharbour.a ", "libharbour.dylib " )
@@ -2372,7 +2372,7 @@ METHOD PRG_Libs() CLASS TMakeProject
                ENDIF
             ELSEIF ::Project:nType == TYPE_DLL
                #ifdef __PLATFORM__Windows                  
-                  RETURN IIF( ::lX, "xharbour.lib ", "harbour.lib " )
+                  RETURN IIF( ::lX, "xharbour.lib ", "xharbour.lib " )
                #else                  
                   // REVIEW! xharbour.so ?
                   RETURN IIF( ::lX, "libxharbour.a ", "libharbour.dylib " )

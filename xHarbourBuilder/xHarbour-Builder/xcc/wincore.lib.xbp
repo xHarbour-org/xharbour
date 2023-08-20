@@ -27,6 +27,6 @@ SLY_OUTPUTFOLDER =
 STARTIN = 
 TARGETFOLDER = \xhb\lib
 
-[\xHarbour.com\xHarbour-Builder\WinCallBack.c]
+[\xharbour\xHarbourBuilder\xHarbour-Builder\WinCallBack.c]
 MYC_FLAGS = 
 MYDEFINES = 

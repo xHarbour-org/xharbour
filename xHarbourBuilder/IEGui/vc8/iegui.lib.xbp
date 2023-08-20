@@ -24,7 +24,7 @@ RUNARGUMENTS =
 SLY_OUTPUTFOLDER = 
 TARGETFOLDER = \xhb\lib\vc8
 
-[\xHarbour.com\IEGui\iegui.prg]
+[\xharbour\xHarbourBuilder\IEGui\iegui.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 

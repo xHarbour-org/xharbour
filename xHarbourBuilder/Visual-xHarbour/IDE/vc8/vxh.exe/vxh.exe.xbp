@@ -42,7 +42,7 @@ MYRC_FLAGS =
 
 #VC specific - do NOT remove!
 [filemem.lib]
-#[\xharbour.com\xHarbour-Builder\vc8\fix.odbccp32.lib.sdk710.c]
+#[\xharbour\xHarbourBuilder\xHarbour-Builder\vc8\fix.odbccp32.lib.sdk710.c]
 [legacy_stdio_definitions.lib]
 
 [\xhb\lib\vc8\vxh.lib]

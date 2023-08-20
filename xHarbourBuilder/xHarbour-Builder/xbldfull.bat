@@ -96,7 +96,9 @@ REM --> Cleanup for -ALL
     REM We will use only \xharbour\lib\vc or bc5 so make sure that's the case
     REM when done using make_vc all or make_b32 all will quickly copy them back!
     DEL \xharbour\lib\*.lib
+	COPY \xharbour\lib\vc\xharbour.lib \xharbour\lib\vc\harbour.lib
     COPY \xharbour\lib\vc\*.lib \xharbour\lib\*.lib
+	
 
     REM Clean up XBP
     RD \xbp /S /Q
@@ -122,6 +124,9 @@ REM --> Copy files
     IF NOT EXIST \xHB\dll\SQLRDD MD \xHB\dll\SQLRDD
     XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\dll\*.dll      \xHB\dll\SQLRDD /d /y
     XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\lib\*.lib      \xHB\lib /d /y
+IF "%XBUILD_VC8%"=="YES" (	
+	XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\lib\*.lib      \xHB\lib\vc8 /d /y 
+	)
     XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\include        \xHB\include /d /y /i
     XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\source\*.ch    \xHB\include /d /y
     XCOPY \xharbour\xHarbourBuilder\xHarbour-SQLRDD\source\mysql.h \xHB\include /d /y

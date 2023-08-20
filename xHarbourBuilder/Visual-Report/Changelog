@@ -8,6 +8,23 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  + bc5/vr.dll.xbp
+  + bc5/vr.exe.xbp
+  + bc5/vr.lib.xbp
+  + bc5/xBuild.bc5.ini
+  + vc8/vr.dll.xbp
+  + vc8/vr.exe.xbp
+  + vc8/vr.lib.xbp
+  + vc8/xbuild.vc8.ini
+  + xcc/vr.dll.xbp
+  + xcc/vr.exe.xbp
+  + xcc/vr.lib.xbp
+  + xcc/xbuild.windows.ini
+    + Added build for compilers
+
+
 2010-08-09
    + Added formulas the usage is easy just drop the Formula component and set its value to whatever formula
      you want. Values can include other Formulas as well TEST->SALARY*@Formula2. Remember to use the @ symbol

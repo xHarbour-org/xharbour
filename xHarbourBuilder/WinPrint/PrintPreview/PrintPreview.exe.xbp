@@ -18,45 +18,45 @@ MYLINK_FLAGS = -NOEXPOBJ -MAP -FORCE:MULTIPLE
 MYPRG_FLAGS = -es2 -gc0 -m -n -w -q
 MYRC_FLAGS = 
 MYSLY_FLAGS = 
-OUTPUTFOLDER = C:\xHarbour.com\PrintPreview\PrintPreview Preview\Obj
+OUTPUTFOLDER = \xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Obj
 PRG_OUTPUTFOLDER = 
 RC_OUTPUTFOLDER = 
 RUNARGUMENTS = 
 SLY_OUTPUTFOLDER = 
 STARTIN = 
-TARGETFOLDER = C:\xHarbour.com\PrintPreview\PrintPreview Preview\Bin
+TARGETFOLDER = \xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Bin
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_Main.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrintPreview_Main.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_XFM.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrintPreview_XFM.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_Form1.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrintPreview_Form1.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_Form2.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrintPreview_Form2.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrintPreview_NavForm.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrintPreview_NavForm.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Source\PrinterDialog_Form.prg]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Source\PrinterDialog_Form.prg]
 MYC_FLAGS = 
 MYDEFINES = 
 MYPRG_FLAGS = 
 
-[C:\xHarbour.com\PrintPreview\PrintPreview Preview\Resource\PrintPreview.rc]
+[\xharbour\xHarbourBuilder\PrintPreview\PrintPreview Preview\Resource\PrintPreview.rc]
 MYDEFINES = 
 MYRC_FLAGS = 
 

@@ -2,13 +2,14 @@ ECHO -----------
 ECHO VC8 VERSION
 ECHO -----------
 
+set XHB_VC8=\xharbour
 SET _XB_Compiler=vc8
 SET _XB_NonDebug=-NoXbp
 SET _XB_Debug=-NoXbp -Debug
 SET _XB_Exe=%_XB_NonDebug%
 
 SET _BUILD_MT=YES
-SET _BUILD_DEBUG=YES
+SET _BUILD_DEBUG=NO
 
 SET _BUILD_DEMO=NO
 SET _BUILD_PERSONAL=NO

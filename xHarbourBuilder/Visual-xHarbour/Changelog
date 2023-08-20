@@ -8,6 +8,18 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  * IDE/vc8/vxh.exe/vxh.exe.xbp
+  * Library/VC8/xbuild.vc8.ini
+  * Library/bc5/xBuild.bc5.ini
+  * xEdit/bc5/xBuild.bc5.ini
+  * xEdit/vc14/xbuild.vc14.ini
+  * xEdit/vc8/xbuild.vc8.ini
+  * xEdit/vc9/xbuild.vc9.ini
+    ! updated path to reflect new directories
+
+
 2015-05-09 19:00 UTC-0300 Luiz Rafael Culik <luiz@xharbour.com.br> 
   * IDE/Source/Vxh1.prg
     ! On GenerateControl method, if Selected Database is POSTGRES, add the correct SR_XXXX REQUEST to generated code

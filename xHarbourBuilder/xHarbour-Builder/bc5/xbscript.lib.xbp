@@ -1,7 +1,7 @@
-CINI = \xHarbour.com\xHarbour-Builder\bc5\xbuild.bc5.ini
+CINI = \xharbour\xHarbourBuilder\xHarbour-Builder\bc5\xbuild.bc5.ini
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = \xharbour.com\xharbour-builder
+INCLUDEFOLDERS = \xharbour\xHarbourBuilder\xharbour-builder
 LDEBUG = .T.
 LGUI = .F.
 LIBFOLDERS =

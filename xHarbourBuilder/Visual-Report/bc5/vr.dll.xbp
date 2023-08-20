@@ -1,0 +1,63 @@
+CINI =  xbuild.bc5.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = ..\library\include;\xHb\include\w32;..\..\xharbour-sqlrdd\include
+LAUTORUN = 
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = 
+LMT = .F.
+LNOAUTOFWH = .T.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN ;WIN32 ;__EXPORT__ ;__VXH__ ;VRDLL 
+MYLINK_FLAGS = 
+MYPRG_FLAGS = -es2 -gc0 -m -n -w -q
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = ..\DLL\Obj
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = ..\DLL\bin
+
+[..\IDE\source\Main.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[Library\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =
+
+[..\IDE\resource\vr.rc]
+MYDEFINES =
+MYRC_FLAGS =
+
+[vxh.lib]
+
+[Activex.lib]
+
+[Ole.lib]
+
+[sql.lib]
+
+[rmdbfcdx.lib]
+
+[ads.lib]
+
+[ace32.lib]
+
+[libmysql.lib]
+
+[libpq.lib]
+
+[oci.lib]
+
+[fbclient_ms.lib]

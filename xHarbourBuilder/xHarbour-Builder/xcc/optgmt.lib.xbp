@@ -23,4 +23,4 @@ TARGETFOLDER = \xhb\lib
 
 [\xHarbour\source\vm\hvm.c]
 
-[\xHarbour.com\xHarbour-builder\gt_nul.prg]
+[\xharbour\xHarbourBuilder\xHarbour-builder\gt_nul.prg]

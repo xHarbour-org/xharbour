@@ -24,6 +24,7 @@ IF "%1"=="CLEAN" GOTO CLEANUP
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools"         GOTO SET_VC2022E   
    GOTO NONE
 
 :SET_VC2017EX86
@@ -40,6 +41,14 @@ IF "%1"=="CLEAN" GOTO CLEANUP
    SET PSDKDIR=%WindowsSdkBinPath%..
    GOTO READY
 
+:SET_VC2022E
+   SET MSVCDIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Vc
+   SET PELLESCDIR=%ProgramFiles%\PellesC
+   CALL "%MSVCDIR%\..\Common7\Tools\vsdevcmd.bat"
+   SET PSDKDIR=%WindowsSdkBinPath%..
+   GOTO READY
+
+
 :NONE
    ECHO Could not locate any MSVC installation!
    GOTO RESTORE
@@ -53,7 +62,7 @@ IF "%1"=="CLEAN" GOTO CLEANUP
    
    @ECHO ON
    
-   \xHB\Bin\xBuild.exe \xHarbour.com\xHarbour-HBZlib\vc8\xhbzip.lib.xbp %1 > xhbzip.log
+   \xHB\Bin\xBuild.exe \xharbour\xHarbourBuilder\xHarbour-HBZlib\vc8\xhbzip.lib.xbp %1 > xhbzip.log
    IF NOT ERRORLEVEL 0 GOTO FAILURE
 
    msbuild XBScript.sln > XBScript.log 2>CON

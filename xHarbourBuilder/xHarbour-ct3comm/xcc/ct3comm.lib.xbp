@@ -21,4 +21,4 @@ RUNARGUMENTS =
 SLY_OUTPUTFOLDER = 
 TARGETFOLDER = \xhb\lib 
 
-[\xHarbour.com\xHarbour-ct3comm\ct3comm.prg]
+[\xharbour\xHarbourBuilder\xHarbour-ct3comm\ct3comm.prg]

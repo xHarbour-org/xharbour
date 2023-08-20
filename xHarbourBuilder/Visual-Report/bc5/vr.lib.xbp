@@ -1,0 +1,32 @@
+CINI =  xbuild.bc5.ini
+C_OUTPUTFOLDER = 
+DEFFILE = 
+INCLUDEFOLDERS = ..\library\include;\xHb\include\w32;..\..\xharbour-sqlrdd\include
+LAUTORUN = .T.
+LDEBUG = .F.
+LGUI = .T.
+LIBFOLDERS = 
+LMT = .F.
+LNOAUTOFWH = .F.
+LPRG_CLASSICDEBUG = .F.
+LPRG_DEBUG = .F.
+LUSEDLL = .F.
+MAPFILE = 
+MYC_FLAGS = 
+MYDEFINES = WIN ;WIN32 ;ENABLECC 
+MYLINK_FLAGS = 
+MYPRG_FLAGS = -m -n -p -q -gc0
+MYRC_FLAGS = 
+MYSLY_FLAGS = 
+OUTPUTFOLDER = ..\Library\obj
+PRG_OUTPUTFOLDER = 
+RC_OUTPUTFOLDER = 
+RUNARGUMENTS = 
+SLY_OUTPUTFOLDER = 
+STARTIN = 
+TARGETFOLDER = ..\Library\bin
+
+[..\Library\source\*.prg]
+MYC_FLAGS =
+MYDEFINES =
+MYPRG_FLAGS =

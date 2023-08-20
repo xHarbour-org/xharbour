@@ -20,20 +20,20 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\lib\vc9
 
-[\xHarbour.com\xHarbour-OLEServer\source\oleserver.c]
+[\xharbour\xHarbourBuilder\xHarbour-OLEServer\source\oleserver.c]
 MYC_FLAGS =
 MYDEFINES =
 
-[\xHarbour.com\xHarbour-OLEServer\source\TypeLib.c]
+[\xharbour\xHarbourBuilder\xHarbour-OLEServer\source\TypeLib.c]
 MYC_FLAGS =
 MYDEFINES =
 
-[\xHarbour.com\xHarbour-OLEServer\source\OleWrap.prg]
+[\xharbour\xHarbourBuilder\xHarbour-OLEServer\source\OleWrap.prg]
 MYC_FLAGS =
 MYDEFINES =
 MYPRG_FLAGS =
 
-[\xHarbour.com\xHarbour-OLEServer\source\TypeInfo.prg]
+[\xharbour\xHarbourBuilder\xHarbour-OLEServer\source\TypeInfo.prg]
 MYC_FLAGS =
 MYDEFINES =
 MYPRG_FLAGS =

@@ -27,5 +27,5 @@ SLY_OUTPUTFOLDER =
 STARTIN = 
 TARGETFOLDER = \xhb\lib
 
-[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.c]
-[\xHarbour.com\xHarbour-Rushmore\dbrmap\*.prg]
+[\xharbour\xHarbourBuilder\xHarbour-Rushmore\dbrmap\*.c]
+[\xharbour\xHarbourBuilder\xHarbour-Rushmore\dbrmap\*.prg]

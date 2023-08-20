@@ -1,7 +1,7 @@
 CINI = 
 C_OUTPUTFOLDER =
 DEFFILE =
-INCLUDEFOLDERS = \xharbour.com\xharbour-builder
+INCLUDEFOLDERS = \xharbour\xHarbourBuilder\xharbour-builder
 LDEBUG = .T.
 LGUI = .F.
 LIBFOLDERS =

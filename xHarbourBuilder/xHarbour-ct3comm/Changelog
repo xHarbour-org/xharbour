@@ -8,6 +8,12 @@
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! bc5\xBuild.bc5.ini
+  ! vc8\xbuild.vc8.ini
+  ! xcc\ct3comm.lib.xbp
+    ! updated path to reflect new directories  
+
 2009-01-21 15:046 UTC+0100 Patrick Mast <patrick.mast@xHarbour.com>
 - xHarbour-ct3comm/ct3comm.lib.xbp
 + xHarbour-ct3comm/vc8/xbuild.vc8.ini

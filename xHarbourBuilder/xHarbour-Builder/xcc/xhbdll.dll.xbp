@@ -17,4 +17,4 @@ RC_OUTPUTFOLDER =
 SLY_OUTPUTFOLDER =
 TARGETFOLDER = \xhb\bin
 
-#include "\xHarbour.com\xHarbour-Builder\xcc\stddll.files.inc"
+#include "\xharbour\xHarbourBuilder\xHarbour-Builder\xcc\stddll.files.inc"

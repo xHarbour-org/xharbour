@@ -7,8 +7,12 @@
    For example:
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
- 
 
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! xbuild.windows.ini
+  ! zlib\xbuild.windows.ini
+    ! updated path to reflect new directories
+ 
 2009-01-21 16:05 UTC-0800 Patrick Mast <Patrick.Mast@xHarbour.com>
 * ZipArchive/ZipArchive.lib.xbp
 * ZipArchive/zlib/zlib.lib.xbp

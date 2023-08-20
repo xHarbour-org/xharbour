@@ -24,13 +24,16 @@ IF "%_XB_Compiler%"=="xcc" GOTO No_MakeFolders
    IF NOT EXIST \xHB\lib\%_XB_Compiler% MD \xHB\lib\%_XB_Compiler%
 :No_MakeFolders
 
-ATTRIB +R \xharbour\xHarbourBuilder\xbuild*.ini /S
+ATTRIB -R \xharbour\xHarbourBuilder\xbuild*.ini /S
 
 REM  ===============================================
 REM  ===============================================
 ECHO XCC
 REM  ===============================================
 REM  ===============================================
+
+copy \xharbour\xharbourbuilder\Visual-xHarbour\Library\include\winuser.ch \xharbour\include
+copy \xharbour\xharbourbuilder\Visual-xHarbour\Library\include\winapi.ch \xharbour\include
 
       IF NOT "%_XB_Compiler%"=="xcc" GOTO No_xCC
       IF "%XCC_XCC%"=="NO" GOTO No_xCC
@@ -406,7 +409,7 @@ REM --> xHBComm
 
 
 REM --> CT3-Comm
-        IF "%_BUILD_CT3COMM%"=="NO" GOTO No_CT3Comm
+        IF "%_BUILD_CT3COMM%"=="NO" GOTO No_CT3Comm		
            CD "\xharbour\xHarbourBuilder\xHarbour-CT3Comm\%_XB_Compiler%"
            \xHB\bin\xBuild.exe CT3Comm.lib.xbp %_XB_Debug% %1
         :No_CT3Comm
@@ -620,7 +623,7 @@ REM --> VXH.EXE
 
 REM --> VR.EXE
          IF "%_BUILD_VR%"=="NO" GOTO No_VR
-            CD "\xharbour\xHarbourBuilder\Visual-Report\"
+            CD "\xharbour\xHarbourBuilder\Visual-Report\%_XB_Compiler%""
             \xHB\bin\xBuild.exe VR.lib.xbp %_XB_Exe% %1
             \xHB\bin\xBuild.exe VR.exe.xbp %_XB_Exe% %1
          :No_VR

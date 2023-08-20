@@ -45,7 +45,7 @@ MYRC_FLAGS =
 
 [vxh.lib]
 
-[..\..\..\Editor\vc8\Editor.lib.xbp]
+[..\..\Editor\vc8\Editor.lib.xbp]
 
 [vxhd.lib]
 
@@ -71,3 +71,4 @@ MYRC_FLAGS =
 
 [oci.lib]
 
+[legacy_stdio_definitions.lib]

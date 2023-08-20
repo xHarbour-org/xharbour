@@ -8,6 +8,15 @@
    2009-01-01 00:00 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-20 10:30 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! bc5\iegui.lib.xbp
+  ! bc5\xbuild.bc5.ini
+  ! samples\ie_app.exe.xbp
+  ! samples\xbuild.windows.ini
+  ! vc8\iegui.lib.xbp
+  ! vc8\xbuild.vc8.ini
+  ! xcc\iegui.lib.xbp
+    ! updated path to reflect new directories  
 
 2009-01-21 13:33 UTC-0800 Patrick Mast <Patrick.Mast@xHarbour.com>
 + Changelog
