@@ -1256,7 +1256,7 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
    SQLLEN iLen;
    SQLLEN lLenOut;
    SQLRETURN res;   
-
+   
    cType  = ( char * ) hb_arrayGetCPtr(pField, FIELD_TYPE );
    lType = ( LONG ) hb_arrayGetNL( pField, FIELD_DOMAIN );
    lLen  = hb_arrayGetNL( pField, FIELD_LEN );
@@ -1268,7 +1268,6 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
              case SQL_VARCHAR:
              case SQL_NVARCHAR:
              case SQL_WCHAR:
-             case SQL_GUID:
              case SQL_LONGVARCHAR:
              case SQL_WLONGVARCHAR:
              case SQL_DB2_CLOB:
@@ -1283,7 +1282,9 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                res = SQLGetData( ( HSTMT ) hStmt, ui, SQL_CHAR  ,  buffer, 0, &lLenOut  );                              
                if( SQL_SUCCEEDED( res   ) )
                {               
-	
+	   		      if ( lLenOut == SQL_NO_TOTAL ) {
+			        lLenOut = lLen;
+			      }
                   if( (int)lLenOut == SQL_NULL_DATA  || lLenOut == 0)
 	              {
 
@@ -1305,7 +1306,43 @@ void odbcGetData( SQLHSTMT hStmt, PHB_ITEM pField,PHB_ITEM pItem,  BOOL bQueryOn
                }    
                break;
             }
-            
+			case SQL_GUID:
+  {
+
+	           SQLGUID buffer;
+               lLenOut        = 0;
+               res = 0;
+               res = SQLGetData( ( HSTMT ) hStmt, ui, SQL_GUID  ,  &buffer, sizeof(buffer), &lLenOut  );                              
+			   
+               if( SQL_SUCCEEDED( res   ) )
+               {               
+	   		      
+                  if( (int)lLenOut == SQL_NULL_DATA  || lLenOut == 0)
+	              {
+
+		             odbcFieldGet(pField, pItem, NULL, -1, bQueryOnly, ulSystemID, bTranslate );
+	              }
+                  else if( lLenOut > 0 )
+                  {
+	              
+	                 char * val = ( char * ) hb_xgrab( lLen +1  );
+					 
+                     sprintf(val,
+	                 "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+	                 buffer.Data1, buffer.Data2, buffer.Data3,
+	                 buffer.Data4[0], buffer.Data4[1], buffer.Data4[2], buffer.Data4[3],
+	                 buffer.Data4[4], buffer.Data4[5], buffer.Data4[6], buffer.Data4[7]);			
+                     
+                     odbcFieldGet( pField, pItem, (char * ) val, lLen, bQueryOnly, ulSystemID, bTranslate );
+//                         hb_arraySetForward( pRet, i, temp );                     
+        	         
+        	         if ( val )  
+    	                hb_xfree( val );                     
+                     }
+               }    
+               break;
+            }			
+						           
             case SQL_INTEGER:
             case SQL_BIGINT:
             case SQL_FAKE_NUM:

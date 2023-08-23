@@ -33,7 +33,7 @@
 #define LOGFILE               "fb.log"
 
 #define CHECK_ERROR(session)  (session->status[0] == 1 && session->status[1] > 0)
-#define ERRORLOGANDEXIT(session, from) { fb_log_status(session, from); hb_retnl(SQL_ERROR); return; }
+#define ERRORLOGANDEXIT(session, from) { fb_log_status3(session, from); hb_retnl(SQL_ERROR); return; }
 
 #ifndef ISC_INT64_FORMAT
 #define   ISC_INT64_FORMAT   PFLL
@@ -88,7 +88,7 @@ const double divider[19] = { 1, 1E1, 1E2, 1E3, 1E4,   1E5, 1E6, 1E7, 1E8, 1E9, 1
 }
 
 
-void fb_log_status( PFB_SESSION session, char * from )
+void fb_log_status3( PFB_SESSION session, char * from )
 {
    const ISC_STATUS * pVect = session->status;
    SCHAR s[1024] = {0};
@@ -184,7 +184,7 @@ HB_FUNC( FBCONNECT3 )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hE
    }
    if ( isc_attach_database( session->status, 0, db_connect, &(session->db), i, dpb ) )
    {
-      fb_log_status(session, "FBCONNECT");
+      fb_log_status3(session, "FBCONNECT");
       if ( session->msgerror )
          hb_xfree(session->msgerror);
 

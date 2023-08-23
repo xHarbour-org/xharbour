@@ -74,8 +74,8 @@ HB_FUNC_EXTERN( SR_INIT );
 HB_FUNC_EXTERN( __SR_STARTSQL );
 HB_FUNC_EXTERN( SQLRDD );
 
-static int pageReadSize   = PAGE_READ_SIZE;
-static int bufferPoolSize = BUFFER_POOL_SIZE;
+static HB_ISIZ pageReadSize   = PAGE_READ_SIZE;
+static HB_SIZE bufferPoolSize = BUFFER_POOL_SIZE;
 
 static BOOL CreateSkipStmt( SQLEXAREAP thiswa );
 static int bOldReverseIndex  = 0;
@@ -2035,7 +2035,7 @@ static HB_ERRCODE updateRecordBuffer( SQLEXAREAP thiswa, BOOL bUpdateDeleted )
 
    // Check for maximum buffer pool size
 
-   if( ((LONG) hb_hashLen(thiswa->hBufferPool)) > bufferPoolSize )
+   if( ( hb_hashLen(thiswa->hBufferPool)) > bufferPoolSize )
    {
       hb_hashNew( thiswa->hBufferPool );
       hb_hashPreallocate( thiswa->hBufferPool, ( ULONG ) ( bufferPoolSize * 1.2 ) );
