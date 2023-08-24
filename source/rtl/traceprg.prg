@@ -68,20 +68,6 @@ FUNCTION TraceLog( ... )
    cFile := Set( _SET_TRACEFILE ) 
    nLevel := Set( _SET_TRACESTACK )
 
-   // Make sure file will preserve original location if CurDir() is changed.
-#ifdef __PLATFORM__Windows   
-   IF ! ( "\" $ cFile )
-#else   
-   IF ! ( "/" $ cFile )
-#endif   
-      IF hScan( s_haFiles, cFile ) == 0
-         cFile := cWithPath( cFile )
-         s_haFiles[ cFile ] := cFile
-      ELSE
-         cFile := s_haFiles[ cFile ]
-      ENDIF
-   ENDIF
-
    IF File( cFile )
       FileHandle := FOpen( cFile, 1 )
    ELSE
@@ -112,13 +98,5 @@ FUNCTION TraceLog( ... )
 
    FClose( FileHandle )
 
-   RETURN .T.
-
-//--------------------------------------------------------------//
-
-STATIC FUNCTION cWithPath( cFilename )
-/* Ensure cFilename contains path. If it doesn't, add current directory to the front of it */
-   local cPath
-   hb_fnamesplit(cFilename, @cPath)
-return iif(empty(cPath), "." + hb_ospathseparator(), "") + cFilename
+RETURN .T.
 

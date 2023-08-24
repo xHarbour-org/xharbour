@@ -163,6 +163,7 @@ typedef struct
    UCHAR          hb_set_oscptransto[ 256 ];
    UCHAR          hb_set_oscptransfrom[ 256 ];
    void *         hb_set_listener;
+   PHB_ITEM       hb_set_phTracePathsHash;
 
    /* Upper case members are directly related to a SET */
    BOOL       HB_SET_ALTERNATE;

@@ -78,6 +78,7 @@
 #include "hbapirdd.h"
 #include "hbset.h"
 #include "hbstack.h"
+#include "hashapi.h"
 
 typedef struct HB_SET_LISTENER_
 {
@@ -1047,12 +1048,71 @@ HB_FUNC( SET )
       case HB_SET_TRACEFILE:
          hb_retc( ( char * ) ( pSet->HB_SET_TRACEFILE ) );
 
-         if( args > 1 && HB_IS_STRING( pArg2 ) )
+         // Only String of at least one character is allowed
+         if( args > 1 && HB_IS_STRING( pArg2 ) && pArg2->item.asString.value[0] != '\0' )
          {
             FILE *   fpTrace;
             BOOL     bAppend = FALSE;
 
-            hb_xstrcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value, 0 );
+            /* 
+                Check if the file name is a full path, or EXPLICTLY RELATIVE.
+                If not, then check if it was used before and if so use same path.
+                Otherwise, use the current directory and store it into a Hash 
+                with the key of the file.
+             */
+
+            // The ':' is for Windows drive letters. The [1] is not a GPF trap because of NULL terminator.  
+            if( pArg2->item.asString.value[0] == '.' || strpbrk( pArg2->item.asString.value, HB_OS_PATH_DELIM_CHR_LIST ) )
+            {
+               /*
+                  No need to use the Hash because the file name is a full path name or EXPILICTLY RELATIVE.
+                */
+               hb_xstrcpy( pSet->HB_SET_TRACEFILE, pArg2->item.asString.value, 0 );
+            }
+            else
+            {
+               HB_SIZE ulPos;
+               PHB_ITEM pPathAndName = hb_itemNew( NULL );
+
+               // Check if the file name was used before
+               if( hb_hashScan( pSet->hb_set_phTracePathsHash, pArg2, &ulPos ) )
+               {                  
+                  // Found! So get the full path and file name from the prior usage
+                  hb_hashGet( pSet->hb_set_phTracePathsHash, ulPos, pPathAndName );
+               }
+               else
+               {
+                  const char *szPath = hb_fsCurDrvDir();
+
+                  // Now create the full path and file name (avoid double path delimiter in case of root directory)
+                  if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
+                  {
+                     int iLen = strlen( szPath ) + strlen( pArg2->item.asString.value );
+
+                     // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
+                     hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
+
+                     hb_xstrcpy( pPathAndName->item.asString.value, szPath, pArg2->item.asString.value, NULL );
+                  }
+                  else
+                  {
+                     int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( pArg2->item.asString.value );
+
+                     // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
+                     hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
+
+                     hb_xstrcpy( pPathAndName->item.asString.value, szPath, HB_OS_PATH_DELIM_CHR_STRING, pArg2->item.asString.value, NULL );
+                  }
+
+                  // Store the full path and file name into the Hash
+                  hb_hashAdd( pSet->hb_set_phTracePathsHash, ULONG_MAX, pArg2, pPathAndName );
+
+                  hb_itemClear( pPathAndName );
+               }
+
+               // Copy the full path and file name to the SET entry.
+               hb_xstrcpy( pSet->HB_SET_TRACEFILE, pPathAndName->item.asString.value, 0 );
+            }
 
             /* Create trace.log for tracing. */
             if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
@@ -1449,7 +1509,38 @@ void hb_setInitialize( PHB_SET_STRUCT pSet )
 
    pSet->HB_SET_TRACE         = TRUE; /* Default Trace to ON */
 
-   hb_xstrcpy( ( char * ) ( pSet->HB_SET_TRACEFILE ), "trace.log", 0 );
+   pSet->hb_set_phTracePathsHash = hb_hashNew( NULL );
+   {
+      const char *szPath = hb_fsCurDrvDir();
+      PHB_ITEM pPathAndName = hb_itemNew( NULL );
+
+      // Avoid double path delimiter in case of root directory
+      if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
+      {
+         int iLen = strlen( szPath ) + strlen( "trace.log" );
+
+         // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
+         hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
+
+         hb_xstrcpy( pPathAndName->item.asString.value, szPath, "trace.log", NULL );
+      }
+      else
+      {
+         int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( "trace.log" );
+
+         // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
+         hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
+
+         hb_xstrcpy( pPathAndName->item.asString.value, szPath, HB_OS_PATH_DELIM_CHR_STRING, "trace.log", NULL );
+      }
+
+      // Store the full path and file name into the Hash
+      hb_hashAddChar( pSet->hb_set_phTracePathsHash, "trace.log", pPathAndName );
+      
+      hb_xstrcpy( ( char * ) ( pSet->HB_SET_TRACEFILE ), pPathAndName->item.asString.value , NULL );
+
+      hb_itemClear( pPathAndName );
+   }
 
    hb_xstrcpy( ( char * ) ( pSet->HB_SET_ERRORLOG ), "error.log", 0 );
    pSet->HB_SET_APPENDERROR      = FALSE;
@@ -1562,6 +1653,12 @@ void hb_setRelease( PHB_SET_STRUCT pSet )
    {
       hb_xfree( pSet->hb_set_printerjob );
       pSet->hb_set_printerjob = NULL;
+   }
+
+   if( pSet->hb_set_phTracePathsHash )
+   {
+      hb_itemClear( pSet->hb_set_phTracePathsHash );
+      pSet->hb_set_phTracePathsHash = NULL;
    }
 
    pSet->HB_SET_TYPEAHEAD = 0;

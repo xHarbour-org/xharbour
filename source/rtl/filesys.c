@@ -3741,6 +3741,30 @@ BOOL hb_fsRmDir( const char * pDirname )
    return bResult;
 }
 
+/*
+   TODO: Make this function thread safe.
+ */
+const char * hb_fsCurDrvDir( void )
+{
+   static char szPathWithDrive[ HB_PATH_MAX ];
+   const char *szPath = hb_fsCurDir( 0 );
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_fsCurDrvDir()" ) );
+
+#if defined( HB_OS_HAS_DRIVE_LETTER )
+   // Prefix the drive letter and ':' to the path
+   szPathWithDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
+   szPathWithDrive[ 1 ] = ':';
+
+   // Copy the path to the buffer after the drive letter and ':'                  
+   hb_xstrcpy( szPathWithDrive + 2, szPath[0] == HB_OS_PATH_DELIM_CHR ? "" : HB_OS_PATH_DELIM_CHR_STRING, szPath, NULL );
+#else
+   hb_xstrcpy( szPathWithDrive, szPath[0] == HB_OS_PATH_DELIM_CHR ? "" : HB_OS_PATH_DELIM_CHR_STRING, szPath, NULL );
+#endif
+
+   return szPathWithDrive;
+}
+
 /* NOTE: This is not thread safe function, it's there for compatibility. */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 

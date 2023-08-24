@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-23 22:16 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * doc/en/file.txt
+    * Type in function name 
+
+  * include/hbapifs.h
+  * source/rtl/filesys.c
+    + Added hb_fsCurDrvDir() to get current drive and directory.
+
+  * include/hbset.h
+    + Added member PHB_ITEM       hb_set_phTracePathsHash; 
+
+  * source/vm/hash.c
+    * Minor reduction of code duplication.
+
+  * source/vm/set.c
+    + Added logic to HB_SET_TRACEFILE to retain original directory of tracefile 
+      when specified file name is not a full path and not EXPLICITLY relative.
+
+  * source/rtl/traceprg.prg
+    * Removed temporary hack related to retaining the original directory of tracefile.
+
+  * tests/tsttrace.prg
+    * Enhanced sample use of TraceLog(). 
+
 2023-08-20  16:00 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>
    ! include/hashapi.h
      ! force export of hb_hashLen when creating dll   
@@ -835,7 +859,7 @@
 
 2017-09-02 23:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbhpdf/harupdf.c
-    ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Simões Filho)
+    ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Simï¿½es Filho)
 
 2017-08-27 00:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/tipssl/client.prg
@@ -1942,7 +1966,7 @@
 2015-01-29 08:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbsqlit3/xhbsqlite3.c
     + add function HB_FUNC( SQLITE3_LOAD_EXTENSION )
-      addendum by César Lozada
+      addendum by Cï¿½sar Lozada
 
 2015-01-14 14:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/pcre/config.generic.h
@@ -2794,7 +2818,7 @@
 
 2014-05-19 13:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/encoding/base64.c
-    ! fixed memory leak & bug reported by Mario Simões Filho
+    ! fixed memory leak & bug reported by Mario Simï¿½es Filho
 
 2014-05-10 13:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/win_misc.c
@@ -10236,7 +10260,7 @@
      ! Minox Fix im compilation under linux
 
 2011-12-15 10:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-   * source/típ/sendmail.prg
+   * source/tï¿½p/sendmail.prg
      ! fixed Disposition-Notification-To field
 
 2011-11-27 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>

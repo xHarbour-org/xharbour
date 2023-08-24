@@ -156,6 +156,7 @@ HB_EXTERN_BEGIN
                                 HB_FA_POSIX_USR(a) | \
                                 HB_FA_POSIX_SID(a) )
 
+extern HB_EXPORT const char * hb_fsCurDrvDir ( void ); /* retrieve a static pointer containing current drive and directory */
 extern HB_EXPORT BOOL       hb_fsChDir       ( const char * pszDirName ); /* change working directory */
 extern HB_EXPORT USHORT     hb_fsChDrv       ( BYTE nDrive ); /* change working drive */
 extern HB_EXPORT void hb_fsClose       ( HB_FHANDLE hFileHandle ); /* close a file */

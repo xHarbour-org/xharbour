@@ -1989,10 +1989,7 @@ HB_FUNC( HHASKEY )
       return;
    }
 
-   if( ! hb_hashScan( pHash, pKey, &ulPos ) )
-      hb_retl( FALSE );
-   else
-      hb_retl( TRUE );
+   hb_retl( hb_hashScan( pHash, pKey, &ulPos ) );
 }
 
 HB_FUNC( HGET )
