@@ -3765,6 +3765,31 @@ const char * hb_fsCurDrvDir( void )
    return szPathWithDrive;
 }
 
+/*
+   TODO: Make this function thread safe.
+ */
+void hb_fsFileToFileWithPath( char *szFile, PHB_ITEM pNameWithPath )
+{
+   const char *szPath = hb_fsCurDrvDir();
+
+   if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
+   {
+      int iLen = strlen( szPath ) + strlen( szFile );
+
+      hb_itemPutCPtr( pNameWithPath, (char *) hb_xgrab( iLen + 1 ), iLen );
+
+      hb_xstrcpy( pNameWithPath->item.asString.value, szPath, szFile, NULL );
+   }
+   else
+   {
+      int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( szFile );
+
+      hb_itemPutCPtr( pNameWithPath, (char *) hb_xgrab( iLen + 1 ), iLen );
+
+      hb_xstrcpy( pNameWithPath->item.asString.value, szPath, HB_OS_PATH_DELIM_CHR_STRING, szFile, NULL );
+   }
+}
+
 /* NOTE: This is not thread safe function, it's there for compatibility. */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 

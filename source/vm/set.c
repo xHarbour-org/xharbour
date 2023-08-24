@@ -1082,27 +1082,7 @@ HB_FUNC( SET )
                }
                else
                {
-                  const char *szPath = hb_fsCurDrvDir();
-
-                  // Now create the full path and file name (avoid double path delimiter in case of root directory)
-                  if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
-                  {
-                     int iLen = strlen( szPath ) + strlen( pArg2->item.asString.value );
-
-                     // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
-                     hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
-
-                     hb_xstrcpy( pPathAndName->item.asString.value, szPath, pArg2->item.asString.value, NULL );
-                  }
-                  else
-                  {
-                     int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( pArg2->item.asString.value );
-
-                     // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
-                     hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
-
-                     hb_xstrcpy( pPathAndName->item.asString.value, szPath, HB_OS_PATH_DELIM_CHR_STRING, pArg2->item.asString.value, NULL );
-                  }
+                  hb_fsFileToFileWithPath( pArg2->item.asString.value, pPathAndName );
 
                   // Store the full path and file name into the Hash
                   hb_hashAdd( pSet->hb_set_phTracePathsHash, ULONG_MAX, pArg2, pPathAndName );
@@ -1511,29 +1491,10 @@ void hb_setInitialize( PHB_SET_STRUCT pSet )
 
    pSet->hb_set_phTracePathsHash = hb_hashNew( NULL );
    {
-      const char *szPath = hb_fsCurDrvDir();
       PHB_ITEM pPathAndName = hb_itemNew( NULL );
 
-      // Avoid double path delimiter in case of root directory
-      if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
-      {
-         int iLen = strlen( szPath ) + strlen( "trace.log" );
-
-         // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
-         hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
-
-         hb_xstrcpy( pPathAndName->item.asString.value, szPath, "trace.log", NULL );
-      }
-      else
-      {
-         int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( "trace.log" );
-
-         // Set pPathAndName as a HB_IT_STRING and allocate memory for the full path and file name
-         hb_itemPutCPtr( pPathAndName, hb_xgrab( iLen + 1 ), iLen );
-
-         hb_xstrcpy( pPathAndName->item.asString.value, szPath, HB_OS_PATH_DELIM_CHR_STRING, "trace.log", NULL );
-      }
-
+      hb_fsFileToFileWithPath( "trace.log", pPathAndName );
+      
       // Store the full path and file name into the Hash
       hb_hashAddChar( pSet->hb_set_phTracePathsHash, "trace.log", pPathAndName );
       

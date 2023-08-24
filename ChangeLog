@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-24 13:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * include/hbapifs.h
+  * source/rtl/filesys.c
+    + Added: void hb_fsFileToFileWithPath( char *szFile, PHB_ITEM pNameWithPath ); 
+  * source/vm/set.c
+    * Refactored to use new hb_fsFileToFileWithPath() to remove code duplication    
+  * source/common/hbdate.c
+    ! Fix by Richard Visscher to hb_timeEncode() (Thanks to EMG)
+
 2023-08-23 22:16 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * doc/en/file.txt
     * Typo in function name 

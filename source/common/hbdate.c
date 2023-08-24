@@ -1016,7 +1016,7 @@ long hb_timeEncode( int iHour, int iMinute, double dSeconds )
 
    if( iHour >= 0 && iHour <= 23 && iMinute >= 0 && iMinute <= 59 && dSeconds >= 0 && dSeconds < 60 )
    {
-      return ( long ) ( iHour * 3600 * HB_DATETIMEINSEC ) + ( long ) ( iMinute * 60 * HB_DATETIMEINSEC ) + ( long ) ( dSeconds * HB_DATETIMEINSEC );
+      return ( long ) ( iHour * 3600 * HB_DATETIMEINSEC + iMinute * 60 * HB_DATETIMEINSEC + dSeconds * HB_DATETIMEINSEC );
    }
 
    return 0;
