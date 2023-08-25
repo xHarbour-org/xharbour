@@ -90,9 +90,9 @@ HB_FUNC( HB_CRC32 )
 #define		CRC_START_MODBUS	   0xFFFF
 #define		CRC_POLY_16	      	0xA001
 
-static bool crc_tab_init		= false;
-static bool crc_tabccitt_init = false;
-static bool crc_tab16_init    = false;
+static BOOL crc_tab_init		= FALSE;
+static BOOL crc_tabccitt_init = FALSE;
+static BOOL crc_tab16_init    = FALSE;
 
 static uint16_t crc_tab[256];
 static uint16_t crc_tabccitt[256];
@@ -122,7 +122,7 @@ static void init_crc_tab( void )
       crc_tab[i] = crc;
    }
 
-   crc_tab_init = true;
+   crc_tab_init = TRUE;
 
 }
 
@@ -149,7 +149,7 @@ static void init_crcccitt_tab( void )
 		crc_tabccitt[i] = crc;
 	}
 
-	crc_tabccitt_init = true;
+	crc_tabccitt_init = TRUE;
 
 }
 
@@ -175,7 +175,7 @@ static void init_crc16_tab( void )
 		}
 		crc_tab16[i] = crc;
 	}
-	crc_tab16_init = true;
+	crc_tab16_init = TRUE;
 }
 
 
@@ -205,13 +205,13 @@ static uint16_t crc_kermit( const unsigned char *input_str, size_t num_bytes )
 
 }
 
-static uint16_t crc_mcrf4xx(uint8_t *data, size_t len) 
+static uint16_t crc_mcrf4xx( const uint8_t *data, size_t len) 
 {
    uint16_t crc;
 
    crc = CRC_START_CCITT_FFFF;
 
-   if (!data || len < 0)
+   if (!data || len == 0)
         return crc;
 
     while (len--) 
@@ -291,7 +291,7 @@ HB_FUNC( HB_CRC_KERMIT )
       return;
    }
 
-   hb_retnl( crc_kermit( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+   hb_retnl( crc_kermit( ( const unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
 }
 
 HB_FUNC( HB_CRC_MCRF4XX )
@@ -304,7 +304,7 @@ HB_FUNC( HB_CRC_MCRF4XX )
       return;
    }
 
-   hb_retnl( crc_mcrf4xx( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+   hb_retnl( crc_mcrf4xx( ( const unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
 }
 
 HB_FUNC( HB_CCITT_FFFF )
@@ -317,7 +317,7 @@ HB_FUNC( HB_CCITT_FFFF )
       return;
    }
 
-   hb_retnl( crc_ccitt_ffff( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+   hb_retnl( crc_ccitt_ffff( ( const unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
 }
 
 HB_FUNC( HB_CRC_MODBUS )
@@ -330,6 +330,6 @@ HB_FUNC( HB_CRC_MODBUS )
       return;
    }
 
-   hb_retnl( crc_modbus( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+   hb_retnl( crc_modbus( ( const unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
 }
 

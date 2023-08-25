@@ -55,18 +55,18 @@
 
 #define HB_VER_LEX "SimpLex"
 #define HB_VER_MAJOR    1       /* Major version number */
-#define HB_VER_MINOR    2       /* Minor version number */
-#define HB_VER_REVISION 3       /* Revision number */
+#define HB_VER_MINOR    3       /* Minor version number */
+#define HB_VER_REVISION 0       /* Revision number */
 
 #if defined( __XHARBOUR__ )
    #undef __XHARBOUR__
 #endif
-#define __XHARBOUR__    0x0123
+#define __XHARBOUR__    0x0130
 
 #if defined( __HARBOUR__ )
    #undef __HARBOUR__
 #endif
-#define __HARBOUR__     0x0123
+#define __HARBOUR__     0x0130
 
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
