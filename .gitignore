@@ -46,3 +46,7 @@ utils/*/linux/*
 utils/*/unix/*
 
 tests/*.c
+
+bin/data/*
+
+xHarbourBuilder/Visual-Report/*/obj/*
