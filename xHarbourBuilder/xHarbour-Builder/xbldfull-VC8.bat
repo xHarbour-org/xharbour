@@ -132,6 +132,7 @@ IF "%VC8_DEBUG%"=="YES"        SET _XB_Exe=%_XB_Debug%
 IF "%VC8_DEBUG%"=="NO"         SET _XB_Exe=%_XB_NonDebug%
 IF "%VC8_DEBUG%"=="YES"        SET _BUILD_DEBUG=YES
 IF "%VC8_DEBUG%"=="NO"         SET _BUILD_DEBUG=NO
+IF "%VC8_DEBUG%"=="NO"         SET _XB_Debug=%_XB_NonDebug%
 
 IF "%VC8_XBUILDW_AS%"=="DLL"   SET _BUILD_XBUILDW_AS=DLL
 IF "%VC8_XBUILDW_AS%"=="EXE"   SET _BUILD_XBUILDW_AS=EXE

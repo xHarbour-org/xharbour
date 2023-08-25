@@ -83,3 +83,253 @@ HB_FUNC( HB_CRC32 )
                       ( uInt ) hb_itemGetCLen( pString ) ) );
 }
 
+#define		CRC_POLY_KERMIT		0x8408
+#define		CRC_START_KERMIT	   0x0000
+#define		CRC_START_CCITT_FFFF	0xFFFF
+#define		CRC_POLY_CCITT		   0x1021
+#define		CRC_START_MODBUS	   0xFFFF
+#define		CRC_POLY_16	      	0xA001
+
+static bool crc_tab_init		= false;
+static bool crc_tabccitt_init = false;
+static bool crc_tab16_init    = false;
+
+static uint16_t crc_tab[256];
+static uint16_t crc_tabccitt[256];
+static uint16_t crc_tab16[256];
+
+static void init_crc_tab( void ) 
+{
+
+   uint16_t i;
+   uint16_t j;
+   uint16_t crc;
+   uint16_t c;
+
+   for (i=0; i<256; i++) 
+   {
+      crc = 0;
+      c   = i;
+
+      for (j=0; j<8; j++) {
+
+         if ( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_KERMIT;
+         else                      crc =   crc >> 1;
+
+         c = c >> 1;
+      }
+
+      crc_tab[i] = crc;
+   }
+
+   crc_tab_init = true;
+
+}
+
+static void init_crcccitt_tab( void ) 
+{
+	uint16_t i;
+	uint16_t j;
+	uint16_t crc;
+	uint16_t c;
+
+	for (i=0; i<256; i++) {
+
+		crc = 0;
+		c   = i << 8;
+
+		for (j=0; j<8; j++) {
+
+			if ( (crc ^ c) & 0x8000 ) crc = ( crc << 1 ) ^ CRC_POLY_CCITT;
+			else                      crc =   crc << 1;
+
+			c = c << 1;
+		}
+
+		crc_tabccitt[i] = crc;
+	}
+
+	crc_tabccitt_init = true;
+
+}
+
+static void init_crc16_tab( void ) 
+{
+	uint16_t i;
+	uint16_t j;
+	uint16_t crc;
+	uint16_t c;
+
+	for (i=0; i<256; i++) 
+   {
+		crc = 0;
+		c   = i;
+
+		for (j=0; j<8; j++) 
+      {
+
+			if ( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_16;
+			else                      crc =   crc >> 1;
+
+			c = c >> 1;
+		}
+		crc_tab16[i] = crc;
+	}
+	crc_tab16_init = true;
+}
+
+
+static uint16_t crc_kermit( const unsigned char *input_str, size_t num_bytes ) 
+{
+   uint16_t crc;
+   uint16_t low_byte;
+   uint16_t high_byte;
+   const unsigned char *ptr;
+   size_t a;
+
+   if ( ! crc_tab_init ) init_crc_tab();
+
+   crc = CRC_START_KERMIT;
+   ptr = input_str;
+
+   if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+   {
+      crc = (crc >> 8) ^ crc_tab[ (crc ^ (uint16_t) *ptr++) & 0x00FF ];
+   }
+
+   low_byte  = (crc & 0xff00) >> 8;
+   high_byte = (crc & 0x00ff) << 8;
+   crc       = low_byte | high_byte;
+
+   return crc;
+
+}
+
+static uint16_t crc_mcrf4xx(uint8_t *data, size_t len) 
+{
+   uint16_t crc;
+
+   crc = CRC_START_CCITT_FFFF;
+
+   if (!data || len < 0)
+        return crc;
+
+    while (len--) 
+    {
+        crc ^= *data++;
+        for (int i=0; i<8; i++) {
+            if (crc & 1)  crc = (crc >> 1) ^ 0x8408;
+            else          crc = (crc >> 1);
+        }
+    }
+    return crc;   
+}
+
+static uint16_t crc_ccitt_generic( const unsigned char *input_str, size_t num_bytes, uint16_t start_value ) 
+{
+   uint16_t crc;
+   uint16_t tmp;
+   uint16_t short_c;
+   const unsigned char *ptr;
+   size_t a;
+
+   if ( ! crc_tabccitt_init ) init_crcccitt_tab();
+
+   crc = start_value;
+   ptr = input_str;
+
+   if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+   {
+      short_c = 0x00ff & (unsigned short) *ptr;
+      tmp     = (crc >> 8) ^ short_c;
+      crc     = (crc << 8) ^ crc_tabccitt[tmp];
+
+      ptr++;
+   }
+
+   return crc;
+}
+
+static uint16_t crc_modbus( const unsigned char *input_str, size_t num_bytes ) 
+{
+	uint16_t crc;
+	uint16_t tmp;
+	uint16_t short_c;
+	const unsigned char *ptr;
+	size_t a;
+
+	if ( ! crc_tab16_init ) init_crc16_tab();
+
+	crc = CRC_START_MODBUS;
+	ptr = input_str;
+
+	if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+   {
+
+		short_c = 0x00ff & (uint16_t) *ptr;
+		tmp     =  crc       ^ short_c;
+		crc     = (crc >> 8) ^ crc_tab16[ tmp & 0xff ];
+
+		ptr++;
+	}
+
+	return crc;
+}
+
+static uint16_t crc_ccitt_ffff( const unsigned char *input_str, size_t num_bytes ) 
+{
+   return crc_ccitt_generic( input_str, num_bytes, CRC_START_CCITT_FFFF );
+}
+
+HB_FUNC( HB_CRC_KERMIT )
+{
+   PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
+
+   if( pString == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param( 1, HB_IT_ANY ) );
+      return;
+   }
+
+   hb_retnl( crc_kermit( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+}
+
+HB_FUNC( HB_CRC_MCRF4XX )
+{
+   PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
+
+   if( pString == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param( 1, HB_IT_ANY ) );
+      return;
+   }
+
+   hb_retnl( crc_mcrf4xx( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+}
+
+HB_FUNC( HB_CCITT_FFFF )
+{
+   PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
+
+   if( pString == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param( 1, HB_IT_ANY ) );
+      return;
+   }
+
+   hb_retnl( crc_ccitt_ffff( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+}
+
+HB_FUNC( HB_CRC_MODBUS )
+{
+   PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
+
+   if( pString == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param( 1, HB_IT_ANY ) );
+      return;
+   }
+
+   hb_retnl( crc_modbus( ( unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
+}
+

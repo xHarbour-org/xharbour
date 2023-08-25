@@ -326,10 +326,10 @@ REM --> ZipArchive & ZLib & HBZlib
         IF "%_BUILD_HBZLIB%"=="NO" GOTO No_HBZlib
 
            CD "\xharbour\xHarbourBuilder\ZipArchive"
-           \xHB\bin\xBuild.exe ZipArchive.lib.xbp -NoXbp -Debug %1
+           \xHB\bin\xBuild.exe ZipArchive.lib.xbp %_XB_Debug% %1
 
            CD "\xharbour\xHarbourBuilder\ZipArchive\ZLib"
-           \xHB\bin\xBuild.exe ZLib.lib.xbp -NoXbp -Debug %1
+           \xHB\bin\xBuild.exe ZLib.lib.xbp %_XB_Debug% %1
 
            CD "\xharbour\xHarbourBuilder\xHarbour-HBZLib\%_XB_Compiler%"
            \xHB\bin\xBuild.exe xHBzip.lib.xbp %_XB_Debug% %1
@@ -394,7 +394,7 @@ REM --> ApolloRDD
 REM --> xHBComm
         IF "%_BUILD_XHBCOMM%"=="NO" GOTO No_xHBComm
             CD "\xharbour\xHarbourBuilder\xHarbour-xHBComm\Comm"
-            \xHB\bin\xBuild.exe Comm.lib.xbp -NoXbp -Debug %1
+            \xHB\bin\xBuild.exe Comm.lib.xbp %_XB_Debug% %1
 
             CD "\xharbour\xHarbourBuilder\xHarbour-xHBComm\xHBCommDll"
             IF     EXIST "%_XHB_DLL%\xHBCommDll.lib"     DEL "%_XHB_DLL%\xHBCommDll.lib" /Q
