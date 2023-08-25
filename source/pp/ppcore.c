@@ -1657,7 +1657,7 @@ static BOOL hb_pp_tokenValueCmp( PHB_PP_TOKEN pToken, char * szValue, USHORT mod
    if( pToken->len )
    {
       if( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_CASE )
-         return memcmp( szValue, pToken->value, pToken->len ) == 0;
+         return strlen(szValue) == pToken->len && memcmp( szValue, pToken->value, pToken->len ) == 0;
       if( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_DBASE && pToken->len >= 4 &&
           ( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD ||
             HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_STRING ||

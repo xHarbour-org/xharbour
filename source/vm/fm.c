@@ -1342,11 +1342,11 @@ HB_FUNC( MEMORY )
 #ifdef HB_FM_STATISTICS
 HB_FUNC( HB_FM_STAT )
 {
-};
+}
 #else
 HB_FUNC( HB_FM_NOSTAT )
 {
-};
+}
 #endif
 
 /* This pragma with maximum priority [64] under c function, all other xharbour startup has priority [100] */

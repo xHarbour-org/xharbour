@@ -1616,11 +1616,15 @@ void hb_setRelease( PHB_SET_STRUCT pSet )
       pSet->hb_set_printerjob = NULL;
    }
 
+   /*    
+    * DO NOT uncomment - hb_gcReleaseAll() is called before hb_setRelease()!!!
+    *
    if( pSet->hb_set_phTracePathsHash )
    {
       hb_itemClear( pSet->hb_set_phTracePathsHash );
       pSet->hb_set_phTracePathsHash = NULL;
    }
+   */
 
    pSet->HB_SET_TYPEAHEAD = 0;
    hb_inkeyReset(); /* reset keyboard buffer */
@@ -1699,6 +1703,13 @@ PHB_SET_STRUCT hb_setClone( PHB_SET_STRUCT pSrc )
 
    if( pSet->hb_set_printerjob )
       pSet->hb_set_printerjob = hb_strdup( pSet->hb_set_printerjob );
+
+   if( pSet->hb_set_phTracePathsHash )
+   {
+      pSet->hb_set_phTracePathsHash = hb_itemNew( NULL );
+      // Set this item to be a copy of the original
+      hb_itemCopy( pSet->hb_set_phTracePathsHash, pSrc->hb_set_phTracePathsHash );
+   }
 
    return pSet;
 }

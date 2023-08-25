@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-24 20:45 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * make_drw.sh
+    + Added warning and ASan support
+  * source/pp/ppcore.c
+    ! Fixed GPF trap
+  * source/vm/fm.c
+    - Removed 2 redundant ';'
+
+  * source/vm/set.c
+    + Added pSet->hb_set_phTracePathsHash support to hb_setClone()
+  * source/vm/hvm.c
+    + Added mark of HB_VM_STACK.set.hb_set_phTracePathsHash in hb_vmIsLocalRef()
+  * source/vm/thread.c
+    + Added mark of (&pStack->set)->hb_set_phTracePathsHash in hb_threadIsLocalRef()
+      /* This should fix gpf trap introduced by addition of hb_set_phTracePathsHash */
+
 2023-08-24 13:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * include/hbapifs.h
   * source/rtl/filesys.c

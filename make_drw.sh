@@ -27,7 +27,7 @@ fi
 # brew install tcl-tk
 # brew install --cask xquartz
 
-export C_USR="-Wno-invalid-source-encoding"
+export C_USR="-Weverything -Wno-empty-translation-unit -Wno-newline-eof -Wno-date-time -Wno-double-promotion -Wno-shorten-64-to-32 -Wno-shadow -Wno-implicit-int-conversion -Wno-sign-conversion -Wno-poison-system-directories -Wno-padded -Wno-deprecated-declarations -Wno-cast-align -Wno-undef -Wno-unused-macros -Wno-missing-prototypes -Wno-invalid-source-encoding"
 export L_USR=""
 
 export C_USR="$C_USR -I/usr/local/opt/zlib/include"
@@ -39,8 +39,8 @@ export L_USR="$L_USR -L/usr/local/opt/openssl/lib"
 export C_USR="$C_USR -I/opt/X11/include"
 export L_USR="$L_USR -L/opt/X11/lib"
 
-#if you want DEBUG build, uncomment the following line
-export C_USR="$C_USR -g -O0"
-export L_USR="$L_USR -g -O0"
+#if you do not want DEBUG build, comment the following line
+export C_USR="$C_USR -g -O0 -fsanitize=address"
+export L_USR="$L_USR -g -O0 -fsanitize=address"
 
 . `dirname $0`/make_gnu.sh $*

@@ -753,6 +753,11 @@ void hb_threadIsLocalRef( void )
        */
       hb_memvarsIsMemvarRef( pStack );
 
+      /* set TraceLog Paths HashTable
+       */
+      if( HB_IS_GCITEM( (&pStack->set)->hb_set_phTracePathsHash ) )
+         hb_gcItemRef( (&pStack->set)->hb_set_phTracePathsHash );
+
       pStack = pStack->next;
    }
 

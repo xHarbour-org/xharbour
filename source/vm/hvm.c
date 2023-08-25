@@ -10985,6 +10985,12 @@ void hb_vmIsLocalRef( void )
       if( HB_IS_GCITEM( &( HB_VM_STACK.aWithObject[ i ] ) ) )
          hb_gcItemRef( &( HB_VM_STACK.aWithObject[ i ] ) );
    }
+
+   /* SET's TraceLog Paths Hash */
+   if( HB_IS_GCITEM( HB_VM_STACK.set.hb_set_phTracePathsHash  ) )
+   {
+      hb_gcItemRef( HB_VM_STACK.set.hb_set_phTracePathsHash );
+   }
 }
 #endif /* HB_THREAD_SUPPORT */
 
