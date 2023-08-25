@@ -50,5 +50,3 @@ tests/*.c
 bin/data/*
 
 xHarbourBuilder/Visual-Report/*/obj/*
-include/winapi.ch
-include/winuser.ch
