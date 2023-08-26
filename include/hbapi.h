@@ -205,7 +205,11 @@ HB_EXTERN_BEGIN
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
 #define HB_IT_NUMERINT        HB_IT_NUMINT
 
-#define HB_ITEM_NIL        { HB_IT_NIL, {0} }
+#if defined(__BORLANDC__)
+   #define HB_ITEM_NIL     { 0 }
+#else
+   #define HB_ITEM_NIL     { HB_IT_NIL, {0} }
+#endif
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
 #define ISCHAR( n )        ( hb_param( n, HB_IT_STRING ) != NULL )
