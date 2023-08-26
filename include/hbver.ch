@@ -90,7 +90,7 @@
 #define _HB_VER_LAST                35  /* last  */
 
 
-#define _HB_CURR_YEAR           "2022"  /* current year */
+#define _HB_CURR_YEAR           "2023"  /* current year */
 
 /* #include "hb_ver.ch" */
 
