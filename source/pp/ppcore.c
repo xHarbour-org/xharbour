@@ -141,7 +141,7 @@ HB_EXTERN_END
 #endif
 
 /* warning messages */
-static const char * hb_pp_szWarnings[] =
+const char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s"                /* C1005 */
 #ifdef __XHARBOUR__
