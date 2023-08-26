@@ -63,6 +63,21 @@
 
 #include "hbzlib.h"
 
+#define		CRC_POLY_KERMIT		0x8408
+#define		CRC_START_KERMIT	   0x0000
+#define		CRC_START_CCITT_FFFF	0xFFFF
+#define		CRC_POLY_CCITT		   0x1021
+#define		CRC_START_MODBUS	   0xFFFF
+#define		CRC_POLY_16	      	0xA001
+
+static BOOL crc_tab_init		= FALSE;
+static BOOL crc_tabccitt_init = FALSE;
+static BOOL crc_tab16_init    = FALSE;
+
+static uint16_t crc_tab[256];
+static uint16_t crc_tabccitt[256];
+static uint16_t crc_tab16[256];
+
 HB_FUNC( HB_CRC32 )
 {
    PHB_ITEM pString  = hb_param( 1, HB_IT_STRING );
@@ -83,37 +98,21 @@ HB_FUNC( HB_CRC32 )
                       ( uInt ) hb_itemGetCLen( pString ) ) );
 }
 
-#define		CRC_POLY_KERMIT		0x8408
-#define		CRC_START_KERMIT	   0x0000
-#define		CRC_START_CCITT_FFFF	0xFFFF
-#define		CRC_POLY_CCITT		   0x1021
-#define		CRC_START_MODBUS	   0xFFFF
-#define		CRC_POLY_16	      	0xA001
-
-static BOOL crc_tab_init		= FALSE;
-static BOOL crc_tabccitt_init = FALSE;
-static BOOL crc_tab16_init    = FALSE;
-
-static uint16_t crc_tab[256];
-static uint16_t crc_tabccitt[256];
-static uint16_t crc_tab16[256];
-
 static void init_crc_tab( void ) 
 {
-
    uint16_t i;
    uint16_t j;
    uint16_t crc;
    uint16_t c;
 
-   for (i=0; i<256; i++) 
+   for( i=0; i<256; i++ ) 
    {
       crc = 0;
       c   = i;
 
-      for (j=0; j<8; j++) {
-
-         if ( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_KERMIT;
+      for( j=0; j<8; j++ )
+      {
+         if( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_KERMIT;
          else                      crc =   crc >> 1;
 
          c = c >> 1;
@@ -123,7 +122,6 @@ static void init_crc_tab( void )
    }
 
    crc_tab_init = TRUE;
-
 }
 
 static void init_crcccitt_tab( void ) 
@@ -133,14 +131,14 @@ static void init_crcccitt_tab( void )
 	uint16_t crc;
 	uint16_t c;
 
-	for (i=0; i<256; i++) {
-
+	for( i=0; i<256; i++ )
+   {
 		crc = 0;
 		c   = i << 8;
 
-		for (j=0; j<8; j++) {
-
-			if ( (crc ^ c) & 0x8000 ) crc = ( crc << 1 ) ^ CRC_POLY_CCITT;
+		for( j=0; j<8; j++ )
+      {
+			if( (crc ^ c) & 0x8000 ) crc = ( crc << 1 ) ^ CRC_POLY_CCITT;
 			else                      crc =   crc << 1;
 
 			c = c << 1;
@@ -150,7 +148,6 @@ static void init_crcccitt_tab( void )
 	}
 
 	crc_tabccitt_init = TRUE;
-
 }
 
 static void init_crc16_tab( void ) 
@@ -160,15 +157,14 @@ static void init_crc16_tab( void )
 	uint16_t crc;
 	uint16_t c;
 
-	for (i=0; i<256; i++) 
+	for( i=0; i<256; i++ ) 
    {
 		crc = 0;
 		c   = i;
 
-		for (j=0; j<8; j++) 
+		for( j=0; j<8; j++ ) 
       {
-
-			if ( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_16;
+			if( (crc ^ c) & 0x0001 ) crc = ( crc >> 1 ) ^ CRC_POLY_16;
 			else                      crc =   crc >> 1;
 
 			c = c >> 1;
@@ -187,14 +183,17 @@ static uint16_t crc_kermit( const unsigned char *input_str, size_t num_bytes )
    const unsigned char *ptr;
    size_t a;
 
-   if ( ! crc_tab_init ) init_crc_tab();
+   if( ! crc_tab_init ) init_crc_tab();
 
    crc = CRC_START_KERMIT;
    ptr = input_str;
 
-   if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+   if( ptr != NULL )
    {
-      crc = (crc >> 8) ^ crc_tab[ (crc ^ (uint16_t) *ptr++) & 0x00FF ];
+      for( a=0; a < num_bytes; a++ ) 
+      {
+         crc = (crc >> 8) ^ crc_tab[ (crc ^ (uint16_t) *ptr++) & 0x00FF ];
+      }
    }
 
    low_byte  = (crc & 0xff00) >> 8;
@@ -202,27 +201,30 @@ static uint16_t crc_kermit( const unsigned char *input_str, size_t num_bytes )
    crc       = low_byte | high_byte;
 
    return crc;
-
 }
 
-static uint16_t crc_mcrf4xx( const uint8_t *data, size_t len) 
+static uint16_t crc_mcrf4xx( const uint8_t *data, size_t len ) 
 {
    uint16_t crc;
 
    crc = CRC_START_CCITT_FFFF;
 
-   if (!data || len == 0)
+   if( !data || len == 0 )
         return crc;
 
-    while (len--) 
-    {
-        crc ^= *data++;
-        for (int i=0; i<8; i++) {
-            if (crc & 1)  crc = (crc >> 1) ^ 0x8408;
-            else          crc = (crc >> 1);
-        }
-    }
-    return crc;   
+   while( len-- ) 
+   {
+      int i=0
+      crc ^= *data++;
+      
+      for( int i=0; i<8; i++ ) 
+      {
+         if (crc & 1)  crc = (crc >> 1) ^ 0x8408;
+         else          crc = (crc >> 1);
+      }
+   }
+
+   return crc;   
 }
 
 static uint16_t crc_ccitt_generic( const unsigned char *input_str, size_t num_bytes, uint16_t start_value ) 
@@ -233,20 +235,22 @@ static uint16_t crc_ccitt_generic( const unsigned char *input_str, size_t num_by
    const unsigned char *ptr;
    size_t a;
 
-   if ( ! crc_tabccitt_init ) init_crcccitt_tab();
+   if( ! crc_tabccitt_init ) init_crcccitt_tab();
 
    crc = start_value;
    ptr = input_str;
 
-   if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+   if( ptr != NULL ) 
    {
-      short_c = 0x00ff & (unsigned short) *ptr;
-      tmp     = (crc >> 8) ^ short_c;
-      crc     = (crc << 8) ^ crc_tabccitt[tmp];
+      for( a=0; a<num_bytes; a++ ) 
+      {
+         short_c = 0x00ff & (unsigned short) *ptr;
+         tmp     = (crc >> 8) ^ short_c;
+         crc     = (crc << 8) ^ crc_tabccitt[tmp];
 
-      ptr++;
+         ptr++;
+      }
    }
-
    return crc;
 }
 
@@ -258,21 +262,23 @@ static uint16_t crc_modbus( const unsigned char *input_str, size_t num_bytes )
 	const unsigned char *ptr;
 	size_t a;
 
-	if ( ! crc_tab16_init ) init_crc16_tab();
+	if( ! crc_tab16_init ) init_crc16_tab();
 
 	crc = CRC_START_MODBUS;
 	ptr = input_str;
 
-	if ( ptr != NULL ) for (a=0; a<num_bytes; a++) 
+	if( ptr != NULL ) 
    {
+      for( a=0; a<num_bytes; a++ ) 
+      {
 
-		short_c = 0x00ff & (uint16_t) *ptr;
-		tmp     =  crc       ^ short_c;
-		crc     = (crc >> 8) ^ crc_tab16[ tmp & 0xff ];
+         short_c = 0x00ff & (uint16_t) *ptr;
+         tmp     =  crc       ^ short_c;
+         crc     = (crc >> 8) ^ crc_tab16[ tmp & 0xff ];
 
-		ptr++;
-	}
-
+         ptr++;
+      }
+   }
 	return crc;
 }
 
@@ -332,4 +338,3 @@ HB_FUNC( HB_CRC_MODBUS )
 
    hb_retnl( crc_modbus( ( const unsigned char *  ) hb_parc( 1 ), hb_parclen( 1 ) ) );
 }
-

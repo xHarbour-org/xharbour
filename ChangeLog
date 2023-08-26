@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-26 11:33 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source/rtl/hbcrc32.c
+    * Corrected inline declaraion to conform with C89/CP10029
+    * Many formatting and readability corrections to conform with xHarbour code style
+
 2023-08-25 22:49 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * make_drw.sh
     * Refining warnings
