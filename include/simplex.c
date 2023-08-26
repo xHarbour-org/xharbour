@@ -235,7 +235,7 @@ void SimpLex_CheckWords( void );
 
 /* Declarations. */
 
-FILE * yyin;      /* currently yacc parsed file */
+extern FILE * yyin;      /* currently yacc parsed file */
 
 extern void yyerror( char * ); /* parsing error management function */
 

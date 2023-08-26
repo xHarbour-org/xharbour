@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-25 22:49 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * make_drw.sh
+    * Refining warnings
+  * include/hbapi.h
+    * Minor reduction (fix compile warning)
+  * include/simplex.c
+    * Added missing extern to pacify warning
+
 2023-08-25 22:00 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * source/rtl/at.c
     ! Fixed wrong types in AT() and ATI() which broke support for negative arguments.

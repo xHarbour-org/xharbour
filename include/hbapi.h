@@ -205,13 +205,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
 #define HB_IT_NUMERINT        HB_IT_NUMINT
 
-#if defined(__GNUC__)
-#  define HB_ITEM_NIL      { HB_IT_NIL, {} }
-#elif defined(__BORLANDC__)
-#  define HB_ITEM_NIL      { 0 }
-#else
-#  define HB_ITEM_NIL      { HB_IT_NIL, NULL }
-#endif
+#define HB_ITEM_NIL        { HB_IT_NIL, {0} }
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
 #define ISCHAR( n )        ( hb_param( n, HB_IT_STRING ) != NULL )
@@ -481,7 +475,7 @@ extern HB_EXPORT void   hb_retd( int iYear, int iMonth, int iDay ); /* returns a
 extern HB_EXPORT void   hb_retdl( long lJulian );   /* returns a LONG value as a julian date */
 extern HB_EXPORT void   hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm ); /* returns a datetime */
 extern HB_EXPORT void   hb_retdtd( double dDateTime ); /* returns a datetime as double */
-extern HB_EXPORT void   hb_retdtl( long lDate, long lTime ); /* returns a datetime as JulianÝs date and seconds */
+extern HB_EXPORT void   hb_retdtl( long lDate, long lTime ); /* returns a datetime as Julianï¿½s date and seconds */
 extern HB_EXPORT void   hb_retl( int iTrueFalse );  /* returns a logical integer */
 extern HB_EXPORT void   hb_retnd( double dNumber ); /* returns a double */
 extern HB_EXPORT void   hb_retni( int iNumber );    /* returns a integer number */
