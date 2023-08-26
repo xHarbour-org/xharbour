@@ -310,10 +310,10 @@ static void hb_pp_operatorsFree( PHB_PP_OPERATOR pOperators, int iOperators )
    hb_xfree( pOperators );
 }
 
-static PHB_PP_OPERATOR hb_pp_operatorFind( PHB_PP_STATE pState,
+static const HB_PP_OPERATOR * hb_pp_operatorFind( PHB_PP_STATE pState,
                                            char * buffer, HB_SIZE ulLen )
 {
-   PHB_PP_OPERATOR   pOperator   = pState->pOperators;
+   const HB_PP_OPERATOR  *pOperator   = pState->pOperators;
    int               i           = pState->iOperators;
 
    while( --i >= 0 )
@@ -325,7 +325,7 @@ static PHB_PP_OPERATOR hb_pp_operatorFind( PHB_PP_STATE pState,
       ++pOperator;
    }
 
-   pOperator   = ( PHB_PP_OPERATOR ) s_operators;
+   pOperator   = ( const HB_PP_OPERATOR * ) s_operators;
    i           = sizeof( s_operators ) / sizeof( HB_PP_OPERATOR );
 
    do
@@ -1471,7 +1471,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
          }
          else
          {
-            PHB_PP_OPERATOR pOperator = hb_pp_operatorFind( pState, pBuffer, ulLen );
+            const HB_PP_OPERATOR * pOperator = hb_pp_operatorFind( pState, pBuffer, ulLen );
 
             if( pOperator )
             {
@@ -1657,7 +1657,7 @@ static BOOL hb_pp_tokenValueCmp( PHB_PP_TOKEN pToken, char * szValue, USHORT mod
    if( pToken->len )
    {
       if( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_CASE )
-         return strlen(szValue) == pToken->len && memcmp( szValue, pToken->value, pToken->len ) == 0;
+         return strlen(szValue) == (size_t) pToken->len && memcmp( szValue, pToken->value, pToken->len ) == 0;
       if( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_DBASE && pToken->len >= 4 &&
           ( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD ||
             HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_STRING ||
@@ -5430,7 +5430,7 @@ static void hb_pp_preprocessToken( PHB_PP_STATE pState )
 void hb_pp_initRules( PHB_PP_RULE * pRulesPtr, int * piRules,
                       const HB_PP_DEFRULE pDefRules[], int iDefRules )
 {
-   PHB_PP_DEFRULE pDefRule;
+   const HB_PP_DEFRULE *pDefRule;
    PHB_PP_MARKER  pMarkers;
    PHB_PP_RULE    pRule;
 
@@ -5439,7 +5439,7 @@ void hb_pp_initRules( PHB_PP_RULE * pRulesPtr, int * piRules,
 
    while( --iDefRules >= 0 )
    {
-      pDefRule = ( PHB_PP_DEFRULE ) pDefRules + iDefRules;
+      pDefRule = ( const HB_PP_DEFRULE * ) pDefRules + iDefRules;
       if( pDefRule->markers > 0 )
       {
          USHORT   marker;

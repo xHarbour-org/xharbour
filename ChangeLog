@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-25 21:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source/compiler/harbour.sly
+    * Added few static qualifiers to pacify pedantic Compiler's warnings
+  * source/pp/ppcore.c
+    * Added explicit type cast to pacify warning about signed/unsigned comparison
+    * Minor modifications to pacify const related warnings 
+
 2023-08-25 17:45 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * include/hbver.h
     * Bumped to 1.3.0

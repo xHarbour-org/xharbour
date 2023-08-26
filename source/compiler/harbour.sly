@@ -159,10 +159,10 @@ USHORT hb_comp_wIfCounter      = 0;
 USHORT hb_comp_wWhileCounter   = 0;
 USHORT hb_comp_wCaseCounter    = 0;
 USHORT hb_comp_wWithObjCounter = 0;
-USHORT hb_comp_wFinallyCounter = 0;
+static USHORT hb_comp_wFinallyCounter = 0;
 
-HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
-USHORT hb_comp_wSwitchCounter  = 0;
+static HB_SIZE hb_comp_alLastSwitchPos[ HB_MAX_SWITCHES ];
+static USHORT hb_comp_wSwitchCounter  = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
 
@@ -184,7 +184,7 @@ extern HB_COMP_IDS hb_compExpr_IDs;
 
 char * hb_comp_szAnnounce = NULL;    /* ANNOUNCEd procedure */
 
-BOOL   hb_comp_bVarParams = FALSE;
+static BOOL   hb_comp_bVarParams = FALSE;
 
 typedef struct _LOCALPARAM
 {
@@ -193,7 +193,7 @@ typedef struct _LOCALPARAM
   struct _LOCALPARAM * pNext;
 } LOCALPARAM, * PLOCALPARAM;
 
-PLOCALPARAM hb_comp_LocalParams = NULL;
+static PLOCALPARAM hb_comp_LocalParams = NULL;
 
 typedef struct _BLOCKSLIST
 {
@@ -201,11 +201,11 @@ typedef struct _BLOCKSLIST
   struct _BLOCKSLIST * pOuter;
 } BLOCKSLIST, * PBLOCKSLIST;
 
-PBLOCKSLIST hb_comp_BlocksList = NULL;
+static PBLOCKSLIST hb_comp_BlocksList = NULL;
 
 static void hb_compYYError( char cPrefix, int iError, const char * szError1, const char * szError2 );
 
-static void hb_compDebugStart( void ) {};
+static void hb_compDebugStart( void ) {}
 
 %}
 
