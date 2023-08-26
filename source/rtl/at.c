@@ -86,9 +86,9 @@ HB_FUNC( AT )
 
    if( pText && pSub )
    {
-      HB_SIZE     lStart   = pStart ? hb_itemGetNS( pStart ) : 1;
-	  HB_SIZE     nLen     =  hb_itemGetCLen( pText);
-      HB_SIZE     lEnd     = pEnd ? hb_itemGetNS( pEnd ) :nLen ;
+      HB_ISIZ    lStart    = pStart ? hb_itemGetNS( pStart ) : 1;
+	   HB_ISIZ     nLen     =  hb_itemGetCLen( pText);
+      HB_ISIZ     lEnd     = pEnd ? hb_itemGetNS( pEnd ) :nLen ;
       HB_SIZE     ulPos;
 
       if( lStart < 0 )
@@ -272,8 +272,8 @@ HB_FUNC( ATI )
 
    if( pText && pSub )
    {
-      HB_SIZE lStart = pStart ? hb_itemGetNS( pStart ) : 1;
-      HB_SIZE lEnd = pEnd ? hb_itemGetNS( pEnd ) :  hb_itemGetCLen( pText );
+      HB_ISIZ lStart = pStart ? hb_itemGetNS( pStart ) : 1;
+      HB_ISIZ lEnd = pEnd ? hb_itemGetNS( pEnd ) :  hb_itemGetCLen( pText );
       HB_SIZE ulPos;
 
       if( lStart < 0 )
@@ -295,7 +295,7 @@ HB_FUNC( ATI )
          lEnd +=  hb_itemGetCLen( pText ) + 1;
       }
 
-      if( lEnd >  hb_itemGetCLen( pText ) )
+      if( (HB_SIZE) lEnd >  hb_itemGetCLen( pText ) )
       {
          lEnd =  hb_itemGetCLen( pText );
       }

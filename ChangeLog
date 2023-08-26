@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-25 22:00 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source/rtl/at.c
+    ! Fixed wrong types in AT() and ATI() which broke support for negative arguments.
+
 2023-08-25 21:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * source/compiler/harbour.sly
     * Added few static qualifiers to pacify pedantic Compiler's warnings
