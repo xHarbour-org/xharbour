@@ -214,7 +214,7 @@ static uint16_t crc_mcrf4xx( const uint8_t *data, size_t len )
 
    while( len-- ) 
    {
-      int i=0;
+      int i;
       crc ^= *data++;
       
       for( i=0; i<8; i++ ) 
