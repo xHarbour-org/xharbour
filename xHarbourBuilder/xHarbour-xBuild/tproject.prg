@@ -5104,6 +5104,48 @@ INIT PROCEDURE InitTProject
                IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22621.0\um\" + s_sHostArch )
                   s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22621.0\um\" + s_sHostArch 
                ENDIF			
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22000.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22000.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22000.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.22000.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.22000.0\" + s_sHostArch 
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22000.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.22000.0\um\" + s_sHostArch 
+               ENDIF			
+
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.1904.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.1904.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.1904.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.1904.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.1904.0\" + s_sHostArch 
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.1904.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.1904.0\um\" + s_sHostArch 
+               ENDIF			
+
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.18362.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.18362.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.18362.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.18362.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.18362.0\" + s_sHostArch 
+               ENDIF
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.18362.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.18362.0\um\" + s_sHostArch 
+               ENDIF			
+            CASE File( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.17434.0\um\windows.h" )
+               s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.17434.0\um" + ";" +  ;
+                                          s_sProgramsFolder + "\Windows Kits\10\Include\10.0.17434.0\shared"
+                                          
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\bin\10.0.17434.0\" + s_sHostArch )
+                  s_sWinSDKBinFolder := s_sProgramsFolder + "\Windows Kits\10\bin\10.0.17434.0\" + s_sHostArch 
+               ENDIF	
+               IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.17434.0\um\" + s_sHostArch )
+                  s_sWinSDKLibFolder := s_sProgramsFolder + "\Windows Kits\10\Lib\10.0.17434.0\um\" + s_sHostArch 
+               ENDIF						   
             CASE File( s_sProgramsFolder + "\Windows Kits\8.1\Include\um\windows.h" )
                s_sWinSDKIncludeFolders := s_sProgramsFolder + "\Windows Kits\8.1\Include\um" + ";" + ;
                                           s_sProgramsFolder + "\Windows Kits\8.1\Include\shared"
@@ -5207,6 +5249,25 @@ INIT PROCEDURE InitTProject
          IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\ucrt" )
             s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22621.0\ucrt"
             s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.22621.0\ucrt\x86"
+         ENDIF     
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22000.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.22000.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.22000.0\ucrt\x86"
+         ENDIF     
+
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.1904.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.1904.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.1904.0\ucrt\x86"
+         ENDIF     
+
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.18362.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.18362.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.18362.0\ucrt\x86"
+         ENDIF     
+
+         IF IsDirectory( s_sProgramsFolder + "\Windows Kits\10\Include\10.0.17434.0\ucrt" )
+            s_sUniversalCRT_IncludePath := s_sProgramsFolder + "\Windows Kits\10\Include\10.0.17434.0\ucrt"
+            s_sUniversalCRT_LibraryPath_x86 := s_sProgramsFolder + "\Windows Kits\10\lib\10.0.17434.0\ucrt\x86"
          ENDIF     
 		 
       ELSEIF IsDirectory( sUniversalCRTSdkDir )
