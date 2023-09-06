@@ -185,7 +185,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    Local aRet := {}
    Local aVersion
    Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
-   Local cString
+   Local cString,s_reEnvVar1 := HB_RegexComp( "(\d+\.\d+)" )
    
    
    (cDSN)
@@ -224,14 +224,20 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       cTargetDB  = "PostgreSQL Native"
       ::exec( "select version()", .t., .t., @aRet )
       If len (aRet) > 0
+ 
          cSystemVers := aRet[1,1]
          cString := aRet[1,1]          
+         If "POSTGRESQL" in upper(aRet[1,1])
+         cMAtch := HB_AtX( s_reEnvVar1, cString, , @nStart, @nLen )         
+         Else
          cMatch := HB_AtX( s_reEnvVar, cString, , @nStart, @nLen )         
+         Endif
          if !empty(cMatch )
             aVersion      := hb_atokens( cMatch, "." )
          else
             aVersion      := hb_atokens( strtran(Upper(aRet[1,1]),"POSTGRESQL ",""), "." )
          endif
+
       Else
          cSystemVers= "??"
          aVersion      := {"6","0"}
