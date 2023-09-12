@@ -13,6 +13,7 @@
     ! Removed redundant initialization in hb_pp_parseChangelog() function
   * winmake\makefile.bc
     ! Removed unuseful compiler options: -6 -w-8027 -w-8071 -w-8121 -vi -H- -w-
+    ! Added -w- in CC_CMD_ZIP for 32 bit compilation
   * contrib\tiff\tif_aux.c
   * contrib\tiff\tif_color.c
   * contrib\tiff\tif_luv.c
