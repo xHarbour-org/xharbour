@@ -714,7 +714,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
    
       do
       {
-         char *szFrom, *szUTC = NULL;
+         char *szFrom, *szUTC;
 
          if( ! fgets( szLine, sizeof( szLine ), file_in ) )
             break;
