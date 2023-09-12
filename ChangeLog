@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-12 13:58 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/pp/ppgen.c
+    ! Removed redundant initialization in hb_pp_parseChangelog() function
+  * winmake\makefile.bc
+    ! Removed unuseful compiler options: -6 -w-8027 -w-8071 -w-8121 -vi -H- -w-
+  * contrib\tiff\tif_aux.c
+  * contrib\tiff\tif_color.c
+  * contrib\tiff\tif_luv.c
+    ! Removed #include <math.h>
+
 2023-09-11 13:05 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbzlib\zipplatform.cpp
     ! fixed SetFileModTime() to compile with BCC 7.60 32-bit
