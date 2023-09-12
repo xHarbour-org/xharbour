@@ -149,7 +149,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 /*
  * State block for each open TIFF
