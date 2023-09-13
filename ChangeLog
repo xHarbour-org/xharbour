@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-13 11:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.bc
+  * contrib\tiff\tif_aux.c
+  * contrib\tiff\tif_color.c
+  * contrib\tiff\tif_luv.c
+    ! Reverted the previous changes. Still searching for the proper fixes for BCC 7.60 64-bit...
+
 2023-09-12 13:58 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/pp/ppgen.c
     ! Removed redundant initialization in hb_pp_parseChangelog() function
