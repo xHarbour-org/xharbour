@@ -8,6 +8,47 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-13 12:35 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  + xHarbour-to-Harbour.txt
+    + New text file borrowed from: https://wiki.xailer.com/doku.php?id=en:migrar.de.xharbour.a.harbour
+      /* 
+        Thanks to Jose F. Gimenez
+       */
+
+  * xHarbourBuilder/xHarbour-SQLRDD/source/compat.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/compat.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprobjs.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprrelation.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprtransl.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/firebird.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/firebird3.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/oraclip.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/oraedit.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlact.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlconnection.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex1.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex1ora.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex2.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex2ora.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex3.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlex3ora.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlfirebird.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlfirebird3.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlgen1.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlmaria.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlodbc.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlpgs.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlrdd.hbx
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlrdd0.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlrdd1.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlrdd2.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlsrodbc.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/utils.prg
+    ! Fixes by Przemyslaw Czerpak to compile with Harbour
+      /* 
+        Thanks to Przemyslaw Czerpak
+       */
+  
 2023-09-13 11:03 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
   * contrib\tiff\tif_aux.c
