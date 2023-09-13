@@ -8,10 +8,54 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-13 13:07 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * xHarbourBuilder/xHarbour-SQLRDD/source/Makefile
+  * xHarbourBuilder/xHarbour-SQLRDD/source/compat.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/config-netware.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/config-os2.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/config-win.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/dbug.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/errmsg.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprparser.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprsimpl.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/exprudf.prg
+  * xHarbourBuilder/xHarbour-SQLRDD/source/firebird.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/firebird.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/firebird3.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/hbmk2_bison.hbs
+  * xHarbourBuilder/xHarbour-SQLRDD/source/hbsql.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/hbsql.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/ib_util.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/ibase.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/ibase3.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/iberror.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/iberror3.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/libpq-fe.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/linux.sh
+  * xHarbourBuilder/xHarbour-SQLRDD/source/linux64.sh
+  * xHarbourBuilder/xHarbour-SQLRDD/source/m_ctype.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/m_string.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/msg.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_alloc.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_dbug.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_getopt.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_global.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_list.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_pthread.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/my_sys.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql.c
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql.ch
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql_com.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql_embed.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql_time.h
+  * xHarbourBuilder/xHarbour-SQLRDD/source/mysql_version.h
+    * Changes in LF/CRLF from Przemek modifications
+  
 2023-09-13 12:58 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
- * xHarbourBuilder/xHarbour-SQLRDD/source/sqlmy.prg
-   * Missed from last commit
-   
+  * xHarbourBuilder/xHarbour-SQLRDD/source/sqlmy.prg
+    * Missed from last commit
+
 2023-09-13 12:35 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   + xHarbour-to-Harbour.txt
     + New text file borrowed from: https://wiki.xailer.com/doku.php?id=en:migrar.de.xharbour.a.harbour
