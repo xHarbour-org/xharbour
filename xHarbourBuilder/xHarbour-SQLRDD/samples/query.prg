@@ -20,6 +20,7 @@ FUNCTION MAIN(cRDD, cDsn)
    local nErr, nPos
    LOCAL vEmp := {}
    Local nCnn, s, i, oSql
+   default cRdd to "SQLRDD"
 
    Connect( cRDD, cDSN )    // see connect.prg
 

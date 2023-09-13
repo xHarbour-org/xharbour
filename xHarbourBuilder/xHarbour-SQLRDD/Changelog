@@ -46,6 +46,48 @@
  + vc2022/sqlrdd.xns
  + vc2022/xbuild.vc8.ini 
    + Added project for msvc 2022
+
+2018-11-16 23:20  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>    
+   ! source\sqlpgs.prg 
+     ! updated for better detect postgresql >=11
+	 
+2018-05-14 23:20  UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>    
+   ! source/firebird3.c 
+   ! source/oraclip.prg
+   ! source/sqlact.c
+   ! source/sqlrdd0.prg
+     ! include windows.h only when HB_OS_WIN is defined
+	 ! added /* fallthrough */ comments to case statement with out break to make gcc 7 happy		 
+   ! samples/query.prg
+     !added default to SQLRDD if crdd parameter is not passed
+
+2018-03-31 14:20 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>    
+   ! source/firebird3.c 
+     ! minor update to not conflict with firebird.c 
+   ! source/firebird.c
+     ! some cast to make msvc happy   
+   ! source/sqlfirebird.prg 
+   ! source/sqlfirebird3.prg 
+     ! updated to return is the field is part of primary key
+   ! source/sqlmaria.prg 
+      ! updated to return is the field is part of primary key
+   ! source/sqlmy.prg 
+      ! updated to return is the field is part of primary key
+   ! source/sqlpgs.prg 
+      ! updated to return is the field is part of primary key
+   ! source/sqlrdd1.c 
+   ! source/sqlrdd2.prg
+     source/sqlact.prg
+     ! updated to firebird 3 support 
+   ! source/sqlrdd1.c 
+   ! source/sqlora.c 
+   ! source/sqlex1.c 
+   ! source/sqlex2ora.c 
+   ! source/sqlex2.c 
+   ! source/sqlex3.c 
+   ! source/sqlex3ora.c 
+   ! source/sqlex1ora.c   
+     ! cast to make msvc happy
    
 2017-04-04 14:30 UTC-0300  Luiz Rafael Culik <luiz@xharbour.com.br>     
    ! source/utils.prg

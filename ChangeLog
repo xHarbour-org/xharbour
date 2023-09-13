@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-13 14:08 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * xHarbourBuilder/xHarbour-SQLRDD/Changelog
+  * xHarbourBuilder/xHarbour-SQLRDD/samples/query.prg
+    * Updated to include few missing changes found in zip which inluded Przemek changes
+  + xHarbourBuilder/xHarbour-SQLRDD/vc14/
+    + xHarbourBuilder/xHarbour-SQLRDD/vc14/mysql.lib.xbp
+    + xHarbourBuilder/xHarbour-SQLRDD/vc14/mysqlmt.lib.xbp
+    + xHarbourBuilder/xHarbour-SQLRDD/vc14/sql.lib.xbp
+    + xHarbourBuilder/xHarbour-SQLRDD/vc14/sqlmt.lib.xbp
+    + xHarbourBuilder/xHarbour-SQLRDD/vc14/xbuild.vc8.ini
+      + Added from new folder present in zip which inluded Przemek changes
+
 2023-09-13 13:46 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   + xHarbourBuilder/xHarbour-SQLRDD/H32.bat
   + xHarbourBuilder/xHarbour-SQLRDD/SQLRDD.lib.hbp
