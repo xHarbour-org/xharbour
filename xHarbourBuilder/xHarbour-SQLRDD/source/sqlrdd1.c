@@ -7,6 +7,10 @@
 #include "compat.h"
 #include "hbapilng.h"
 
+#ifndef __XHARBOUR__
+   #define HB_IS_TIMEFLAG HB_IS_TIMESTAMP
+#endif
+
 #include "sqlrdd.h"
 #include "msg.ch"
 #include "rddsys.ch"
@@ -567,7 +571,7 @@ int sqlKeyCompare( AREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    LONG lorder  = 0;
    PHB_ITEM pTag, pKeyVal, itemTemp;
    int iLimit, iResult = 0;
-   BYTE len1, len2;
+   HB_SIZE len1, len2;
    char * valbuf = NULL;
    const char * val1, * val2;
 
@@ -613,7 +617,7 @@ int sqlKeyCompare( AREAP thiswa, PHB_ITEM pKey, BOOL fExact )
    {
       PHB_ITEM pLen = hb_itemPutNL( NULL, (const LONG) len1 );
       val2 = valbuf = hb_itemStr( pKey, pLen, NULL );
-      len2 = strlen( val2 );
+      len2 = (HB_SIZE)strlen( val2 );
       hb_itemRelease( pLen );
    }
    else if( HB_IS_LOGICAL( pKey ) )
@@ -688,12 +692,14 @@ static HB_ERRCODE sqlSeek( SQLAREAP thiswa, BOOL bSoftSeek, PHB_ITEM pKey, BOOL 
          HB_SIZE nLen = hb_itemGetCLen( pKey );
          char * pszVal = hb_cdpnDup( hb_itemGetCPtr( pKey ), &nLen,
                                      cdpSrc, thiswa->area.cdPage );
-         pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
+         //pKey = pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
+         pNewKey = hb_itemPutCLPtr( NULL, pszVal, nLen );
       }
    }
 #endif
 
-   hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLSEEK, 3, pKey, pItem, pItem2 );
+   //hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLSEEK, 3, pKey, pItem, pItem2 );
+   hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLSEEK, 3, pNewKey ? pNewKey : pKey, pItem, pItem2 );
 
    thiswa->area.fFound = hb_arrayGetL( thiswa->aInfo, AINFO_FOUND );
    thiswa->area.fBof   = hb_arrayGetL( thiswa->aInfo, AINFO_BOF );
@@ -1034,7 +1040,7 @@ static HB_ERRCODE sqlSkipRaw( SQLAREAP thiswa, LONG lToSkip )
                setCurrentFromCache( thiswa, lFound );
                return ConcludeSkipraw( thiswa, lToSkip );
             }
-			lPreviousCacheStatus = lPosCache;
+         lPreviousCacheStatus = lPosCache;
             readCachePageBWD( thiswa );
             lFound = searchCacheBWD( thiswa, lPreviousCacheStatus );
             if( lFound )
@@ -3157,7 +3163,7 @@ static HB_ERRCODE sqlSetFilter( SQLAREAP thiswa, LPDBFILTERINFO pFilterInfo )
 
    hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLSETFILTER, 1, filtertext );
    hb_itemRelease( filtertext );
-   res = hb_itemGetNI( hb_stackReturnItem() );
+   res = (HB_ERRCODE)hb_itemGetNI( hb_stackReturnItem() );
 
    if( res == HB_SUCCESS )
    {
@@ -3270,17 +3276,17 @@ static HB_ERRCODE sqlLock( SQLAREAP thiswa, LPDBLOCKINFO pLockInfo )
          hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pRecord );
          hb_itemRelease( pRecord );
 
-         pLockInfo->fResult = hb_itemGetL( hb_stackReturnItem() );
+         pLockInfo->fResult = ( USHORT )hb_itemGetL( hb_stackReturnItem() );
          break;
 
       case DBLM_MULTIPLE:
          hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLLOCK, 2, pMethod, pLockInfo->itmRecID );
-         pLockInfo->fResult = hb_itemGetL( hb_stackReturnItem() );
+         pLockInfo->fResult = ( USHORT )hb_itemGetL( hb_stackReturnItem() );
          break;
 
       case DBLM_FILE:
          hb_objSendMessage( thiswa->oWorkArea, s_pSym_SQLLOCK, 1, pMethod );
-         pLockInfo->fResult = hb_itemGetL( hb_stackReturnItem() );
+         pLockInfo->fResult = ( USHORT )hb_itemGetL( hb_stackReturnItem() );
          break;
 
       default:
@@ -3520,7 +3526,7 @@ static BOOL ProcessFields( SQLAREAP thiswa )
       // new field type
       case 't':
       case 'T':
-     if( field.uiLen == 4 )            
+     if( field.uiLen == 4 )
      {
          field.uiType = HB_FT_TIME;
      }
@@ -3531,7 +3537,7 @@ static BOOL ProcessFields( SQLAREAP thiswa )
 #else
          field.uiType = HB_FT_TIMESTAMP;
 #endif
-	 }
+    }
 
          break;
       default:

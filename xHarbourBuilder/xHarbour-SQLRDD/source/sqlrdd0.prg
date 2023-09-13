@@ -386,7 +386,7 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect2 := &( "SR_ORACLE2()" )
 #endif
       Exit
-      
+
    Case CONNECT_FIREBIRD
    Case CONNECT_FIREBIRD_NOEXLOCK
 #ifndef MYSQLRDD
@@ -409,8 +409,8 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect2 := &( "SR_MARIA()" )
 #endif
       Exit
-      
-      
+
+
    Case CONNECT_ODBC_QUERY_ONLY
 #ifndef MYSQLRDD
       oConnect  := &( "SR_ODBC()" )
@@ -429,7 +429,7 @@ Function SR_AddConnection( nType, cDSN, cUser, cPassword, cOwner, lCounter, lAut
       oConnect:lQueryOnly := .T.
 #endif
       Exit
-      
+
    Case CONNECT_MYSQL_QUERY_ONLY
       oConnect  := &( "SR_MYSQL()" )
       oConnect:lQueryOnly := .T.
@@ -1101,14 +1101,14 @@ Function SR_ErrorOnGotoToInvalidRecord( l )
    EndIf
 Return lOld
 
-Function SR_UseNullsFirst( l ) 
+Function SR_UseNullsFirst( l )
    Local lOld  := lUseNullsFirst
    If l != NIL
       lUseNullsFirst := l
    EndIf
 Return lOld
-      
-   
+
+
 
 /*------------------------------------------------------------------------*/
 
@@ -1500,6 +1500,7 @@ Function SR_DropIndex( cIndexName, cOwner )
    Local oWA
    Local lTag := .F.,cIndex
    Local ctempIndex := ""
+   Local nSelect
 
    oCnn := SR_GetConnection()
 
@@ -1575,8 +1576,12 @@ Function SR_DropIndex( cIndexName, cOwner )
       DEFAULT
          oCnn:exec( "DROP INDEX " + cPhisicalName + if(oCnn:lComments," /* DROP Index */",""), .F. )
       End
+      
+      oCnn:Commit()  //prevent hanging on MsSQL
 
       If (!Empty( aIndex[4] )) .or. aIndex[5][1] == "#"
+         nSelect:=select()
+         
          USE (cFileName) NEW VIA "SQLRDD" ALIAS "TEMPDROPCO" exclusive
          oWA := TEMPDROPCO->( dbInfo( DBI_INTERNAL_OBJECT ) )
 
@@ -1588,10 +1593,12 @@ Function SR_DropIndex( cIndexName, cOwner )
          EndIf
 
          TEMPDROPCO->( dbCLoseArea() )
+         
+         select(nSelect)
       EndIf
    Next
 
-   oCnn:Commit()
+//   oCnn:Commit()                 //moved up to prevent hanging on MsSQL
    SR_CleanTabInfoCache()
 
 Return .T.
@@ -2063,7 +2070,7 @@ Function SR_DetectDBFromDSN( cConnect )
       Case cBuff == "FB" .or. cBuff == "FIREBIRD" .or. cBuff == "IB"
          Return CONNECT_FIREBIRD
       Case cBuff == "FB3" .or. cBuff == "FIREBIRD3"
-         Return CONNECT_FIREBIRD3         
+         Return CONNECT_FIREBIRD3
       Case cBuff == "DSN" .or. cBuff == "DRIVER"
          Return CONNECT_ODBC
       EndCase
@@ -2076,8 +2083,12 @@ Return SYSTEMID_UNKNOW
 
 #pragma BEGINDUMP
 
+#include "hbapi.h"
+#include "hbapiitm.h"
 #include "compat.h"
-
+#if defined(HB_OS_WIN)
+#include <windows.h>
+#endif
 static HB_BOOL s_fMultiLang               = HB_FALSE;
 static HB_BOOL s_fShutDown                = HB_FALSE;
 static HB_BOOL s_fGoTopOnScope            = HB_TRUE;
@@ -2091,7 +2102,7 @@ static HB_BOOL s_fSerializeArrayAsJson    = HB_FALSE;
 static HB_BOOL s_fSql2008newTypes         = HB_FALSE;
 
 static HB_BOOL s_iOldPgsBehavior          = HB_FALSE;
-static HB_BOOL s_fShortasNum              = HB_FALSE;  
+static HB_BOOL s_fShortasNum              = HB_FALSE;
 
 HB_BOOL HB_EXPORT sr_isMultilang( void )
 {
@@ -2213,8 +2224,8 @@ HB_FUNC( SR_SETSQL2008NEWTYPES )
 
 HB_FUNC(SETPGSOLDBEHAVIOR)
 {
-	int iOld = s_iOldPgsBehavior;
-	if (ISLOG( 1 ) )
+   int iOld = s_iOldPgsBehavior;
+   if (ISLOG( 1 ) )
        s_iOldPgsBehavior= hb_parl( 1 ) ;
     hb_retl( iOld ) ;
 }
@@ -2226,8 +2237,8 @@ return s_fShortasNum;
 }
 HB_FUNC(SETFIREBIRDUSESHORTASNUM)
 {
-	int iOld = s_fShortasNum;
-	if (ISLOG( 1 ) )
+   int iOld = s_fShortasNum;
+   if (ISLOG( 1 ) )
        s_fShortasNum= hb_parl( 1 ) ;
     hb_retl( iOld ) ;
 

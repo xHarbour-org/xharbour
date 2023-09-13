@@ -119,7 +119,8 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
    const char * passwd;
    const char * charset;
    char dpb[256];
-   int  i, len;
+   int   len;
+   short i;
 
 //    PFB_SESSION session = (PFB_SESSION) hb_xgrab( sizeof( FB_SESSION ) );
 // 
@@ -146,24 +147,24 @@ HB_FUNC( FBCONNECT )  // FBConnect( cDatabase, cUser, cPassword, [charset], @hEn
    i = 0;
    dpb[i++] = isc_dpb_version1;
    dpb[i++] = isc_dpb_user_name;
-   len = strlen(user);
+   len = ( int ) strlen(user);
    dpb[i++] = (char) len;
    strncpy(&(dpb[i]), user, len);
-   i += len;
+   i += ( short ) len;
 
    dpb[i++] = isc_dpb_password;
-   len = strlen(passwd);
-   dpb[i++] = len;
+   len = ( int ) strlen(passwd);
+   dpb[i++] = ( char ) len;
    strncpy(&(dpb[i]), passwd, len);
-   i += len;
+   i += ( short ) len;
 
    if ( charset != NULL )
    {
       dpb[i++] = isc_dpb_lc_ctype;
-      len = strlen(charset);
-      dpb[i++] = len;
+      len = ( int ) strlen(charset);
+      dpb[i++] = ( char ) len;
       strncpy(&(dpb[i]), charset, len);
-      i += len;
+      i += ( short ) len;
    }
    if ( isc_attach_database( session->status, 0, db_connect, &(session->db), i, dpb ) )
    {
@@ -380,7 +381,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    }
    //printf( "isc_dsql_prepare %p %p %p %s %p\n", session->status, session->transac, session->stmt, command, session->sqlda );
    //if (isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda ))
-   isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, hb_parni(3), session->sqlda );
+   isc_dsql_prepare( session->status, &(session->transac), &(session->stmt), 0, command, ( unsigned short )hb_parni(3), session->sqlda );
    if ( CHECK_ERROR(session) )
    {
       ERRORLOGANDEXIT( session, (char *) command );
@@ -447,7 +448,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    {
 // 	       ISC_STATUS r;
 //      if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL ) )
-      isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), NULL );
+      isc_dsql_execute( session->status, &(session->transac), &(session->stmt), (unsigned short) hb_parni(3), NULL );
       if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE4" );
@@ -458,7 +459,7 @@ HB_FUNC( FBEXECUTE ) // FBExecute( hEnv, cCmd, nDialect )
    {
       //if ( isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) )
 //          ISC_STATUS r;
-      isc_dsql_execute( session->status, &(session->transac), &(session->stmt), hb_parni(3), session->sqlda ) ;
+      isc_dsql_execute( session->status, &(session->transac), &(session->stmt), (unsigned short)hb_parni(3), session->sqlda ) ;
       if ( CHECK_ERROR(session) )
       {
          ERRORLOGANDEXIT( session, "FBEXECUTE5" );
@@ -495,7 +496,7 @@ HB_FUNC( FBEXECUTEIMMEDIATE ) // FBExecuteImmediate( hEnv, cCmd, nDialect )
 //    {
 //       ERRORLOGANDEXIT( session, (char *) command );
 //    }
-   isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, hb_parni(3), NULL );
+   isc_dsql_execute_immediate( session->status, &(session->db), &(session->transac), 0, command, ( unsigned short )hb_parni(3), NULL );
 
    if ( CHECK_ERROR(session) )
    {
@@ -795,9 +796,9 @@ HB_FUNC( FBGETDATA )    // FBGetData( hEnv, nField, @uData )
                if (dscale < 0)
                {
                   ISC_INT64 tens;
-                  short i;
+                  short i2;
                   tens = 1;
-                  for (i = 0; i > dscale; i--)
+                  for (i2 = 0; i2 > dscale; i2--)
                   {
                      tens *= 10;
                   }
@@ -944,14 +945,14 @@ HB_FUNC( FBCREATEDB )
    const char * passwd;
    const char * charset;
    int page;
-   int dialect;
+   unsigned short dialect;
 
    db_name = hb_parcx(1);
    username = hb_parcx(2);
    passwd = hb_parcx(3);
    page = hb_parni(4);
    charset = hb_parc(5);
-   dialect = hb_parni(6);
+   dialect = ( unsigned short )hb_parni(6);
 
    if (!dialect)
    {
@@ -1421,9 +1422,9 @@ HB_FUNC( FBLINEPROCESSED )
                      if (dscale < 0)
                      {
                         ISC_INT64 tens;
-                        short i;
+                        short i2;
                         tens = 1;
-                        for (i = 0; i > dscale; i--)
+                        for (i2 = 0; i2 > dscale; i2--)
                         {
                            tens *= 10;
                         }
@@ -1468,7 +1469,7 @@ HB_FUNC( FBLINEPROCESSED )
                            PHB_ITEM pField = hb_arrayGetItemPtr( pFields, icol );
                            LONG lType = ( LONG ) hb_arrayGetNL( pField, 6 );
                            if (lType == SQL_BIT || lType == SQL_SMALLINT) 
-                              hb_itemPutL(temp,value);
+                              hb_itemPutL(temp,(BOOL)value);
                            else   
                               hb_itemPutNInt( temp,( ISC_INT64 ) value);
                          

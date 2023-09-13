@@ -66,14 +66,14 @@ char * QualifyName2( char * szName, SQLEXORAAREAP thiswa )
       case SYSTEMID_FIREBR:
       case SYSTEMID_IBMDB2:
       case SYSTEMID_ADABAS:
-         szName[i] = (char)toupper( (int)szName[i] );
+         szName[i] = ( char ) HB_TOUPPER( ( unsigned char ) szName[i] );
          break;
       case SYSTEMID_INGRES:
       case SYSTEMID_POSTGR:
       case SYSTEMID_MYSQL:
       case SYSTEMID_OTERRO:
       case SYSTEMID_INFORM:
-         szName[i] = (char)tolower(  (int)szName[i] );
+         szName[i] = ( char ) HB_TOLOWER( ( unsigned char ) szName[i] );
          break;
       }
    }
@@ -606,7 +606,7 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
    {
    case SYSTEMID_ORACLE:
    {
-      int res;
+      int res2;
       char ident[200]={0};
       char tablename[100]={0};
 
@@ -637,10 +637,10 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
          }
 
          OCI_AllowRebinding(thiswa->hStmtNextval,1);
-         res = OCI_Prepare(  thiswa->hStmtNextval,  (ident));
-         if ( !res )
+         res2 = OCI_Prepare(  thiswa->hStmtNextval,  (ident));
+         if ( !res2 )
          {
-            OraErrorDiagRTE( thiswa->hStmtNextval, "SQLPrepare", ident, res, __LINE__, __FILE__ );
+            OraErrorDiagRTE( thiswa->hStmtNextval, "SQLPrepare", ident, res2, __LINE__, __FILE__ );
             return (HB_FAILURE);
          }
       }
@@ -650,10 +650,10 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
       }
 
 //       res = SQLExecute( thiswa->hStmtNextval );
-      res = OCI_Execute(thiswa->hStmtNextval );                                                         
-      if ( !res)
+      res2 = OCI_Execute(thiswa->hStmtNextval );                                                         
+      if ( !res2)
       {
-         OraErrorDiagRTE( thiswa->hStmtNextval, "SQLExecute", ident, res, __LINE__, __FILE__ );
+         OraErrorDiagRTE( thiswa->hStmtNextval, "SQLExecute", ident, res2, __LINE__, __FILE__ );
          return (HB_FAILURE);
       }
 //       res = SQLFetch( thiswa->hStmtNextval );
@@ -662,18 +662,18 @@ HB_ERRCODE ExecuteInsertStmtOra( SQLEXORAAREAP thiswa )
       rs = OCI_GetResultset( thiswa->hStmtNextval);
       if ( rs ==  NULL )
       {
-         OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res, __LINE__, __FILE__ );
+         OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/Fetch", ident, res2, __LINE__, __FILE__ );
 //          thiswa->hStmtNextval=NULL;
          return (HB_FAILURE);
       }
 
-      res = OCI_FetchNext(rs);
+      res2 = OCI_FetchNext(rs);
 
       thiswa->recordList[0]= OCI_GetUnsignedBigInt( rs,1 ) ;
 
       if (thiswa->recordList[0] == 0)
       {
-         OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res, __LINE__, __FILE__ );
+         OraErrorDiagRTE( thiswa->hStmtNextval, "ExecuteInsertStmtOra/GetData", ident, res2, __LINE__, __FILE__ );
 
          return (HB_FAILURE);
       }

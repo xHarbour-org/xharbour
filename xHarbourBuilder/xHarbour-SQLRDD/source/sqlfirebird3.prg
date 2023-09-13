@@ -34,7 +34,7 @@ CLASS SR_FIREBIRD3 FROM SR_CONNECTION
    METHOD FetchRaw( lTranslate, aFields )
    METHOD FieldGet( nField, aFields, lTranslate )
    METHOD Getline( aFields, lTranslate, aArray )
-   METHOD MoreResults( aArray, lTranslate )  
+   METHOD MoreResults( aArray, lTranslate )
 ENDCLASS
 
 /*------------------------------------------------------------------------*/
@@ -114,7 +114,7 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
    local _nLen, _nDec, nPos
    local cType, nLenField
    local aFields := {}
-   local nDec := 0, nRet, cVlr := "", aLocalPrecision := {}
+   local nDec := 0, nRet, cVlr := "", aLocalPrecision := {}, aPks := {}
 
    DEFAULT lReSelect    := .T.
    DEFAULT lLoadCache   := .F.
@@ -128,6 +128,7 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
       Else
          // DOON'T remove "+0"
          ::Exec( [select a.rdb$field_name, b.rdb$field_precision + 0 from rdb$relation_fields a, rdb$fields b where a.rdb$relation_name = '] + StrTran( cTable, ["], [] ) + [' and a.rdb$field_source = b.rdb$field_name] , .F., .T., @aLocalPrecision )
+		 ::Exec( [select sg.rdb$field_name as field_name, rc.rdb$relation_name as table_name , (sg.RDB$FIELD_POSITION + 1) AS field_position from rdb$indices ix left join rdb$index_segments sg on ix.rdb$index_name = sg.rdb$index_name left join rdb$relation_constraints rc on rc.rdb$index_name = ix.rdb$index_name where rc.rdb$constraint_type = 'PRIMARY KEY'		  and rc.rdb$relation_name = '] + StrTran( cTable, ["], [] ) + ['] , .F., .T., @aPks )		
          nRet := ::Execute( "SELECT A.* FROM " + cTable + " A " + if(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + if(::lComments," /* Open Workarea */",""), .F. )
       EndIf
       If nRet != SQL_SUCCESS .and. nRet != SQL_SUCCESS_WITH_INFO
@@ -153,6 +154,7 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
                           "Last command sent to database : " + ::cLastComm )
          return nil
       else
+	  
          _nLen := nLen
          _nDec := nDec
 
@@ -165,11 +167,15 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          ElseIf ( nType == SQL_DOUBLE .or. nType == SQL_FLOAT .or. nType == SQL_NUMERIC )
             nLenField := 19
          EndIf
-
+         nPos := aScan( aPks, { |x| rtrim(x[1]) == cName } )  
          If cType == "U"
             ::RuntimeErr( "", SR_Msg(21) + cName + " : " + str( nType ) )
          Else
-            aFields[n] := { cName, cType, nLenField, nDec, nNull >= 1 , nType,, n, _nDec,, }
+		    if nPos >0
+		       aFields[n] := { cName, cType, nLenField, nDec, nNull >= 1 , nType,, n, _nDec, aPks[nPos,3], }
+		    else
+               aFields[n] := { cName, cType, nLenField, nDec, nNull >= 1 , nType,, n, _nDec,0, }
+		    Endif	
          EndIf
 
       endif
@@ -198,7 +204,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
             cConnect, nPrefetch, cTargetDB, nSelMeth, nEmptyMode, nDateMode, lCounter, lAutoCommit ) CLASS SR_FIREBIRD3
 
    local nRet, hEnv, cSystemVers
-   
+
    (cDSN)
    (cUser)
    (cPassword)
@@ -249,27 +255,27 @@ METHOD End() CLASS SR_FIREBIRD3
    ::Commit()
    FBClose( ::hEnv )
 
-return Super:End()
+return ::Super:End()
 
 /*------------------------------------------------------------------------*/
 
 METHOD Commit() CLASS SR_FIREBIRD3
-   Super:Commit()
-   ::nRetCode := FBCOMMITTRANSACTION3(::hEnv )  
+   ::Super:Commit()
+   ::nRetCode := FBCOMMITTRANSACTION3(::hEnv )
 Return ( ::nRetCode := FBBeginTransaction3( ::hEnv ) )
 
 /*------------------------------------------------------------------------*/
 
 METHOD RollBack() CLASS SR_FIREBIRD3
-   Super:RollBack()
+   ::Super:RollBack()
 Return ( ::nRetCode := FBRollBackTransaction3( ::hEnv ) )
 
 /*------------------------------------------------------------------------*/
 
 METHOD ExecuteRaw( cCommand ) CLASS SR_FIREBIRD3
    local nRet
- 
-   If upper(left(ltrim(cCommand), 6)) == "SELECT" .or. "RETURNING" in upper(alltrim(cCommand))
+
+   If upper(left(ltrim(cCommand), 6)) == "SELECT" .or. ("RETURNING" in upper(alltrim(cCommand)))
       nRet := FBExecute3( ::hEnv, cCommand, IB_DIALECT_CURRENT )
       ::lResultSet := .T.
    Else
@@ -284,8 +290,7 @@ Return nRet
 
 METHOD MoreResults( aArray, lTranslate )  CLASS SR_FIREBIRD3
 
-   local nRet, i, n,nvalue := -1
-   Static aFieldsMore
+   local nRet, n,nvalue := -1
 
    DEFAULT lTranslate := .T.
 
@@ -295,12 +300,12 @@ METHOD MoreResults( aArray, lTranslate )  CLASS SR_FIREBIRD3
 
       DEFAULT aArray := {}
       n := 1
-   
+
      AADD( aArray, Array(1) )
-  
+
      aArray[n,1] := nvalue
-    
-  
+
+
    EndIf
 
 Return nRet

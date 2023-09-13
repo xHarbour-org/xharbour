@@ -5,14 +5,20 @@
 * All Rights Reserved
 */
 
-#define WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN
 
 #include "compat.h"
 #include "hbsql.h"
 
 #include <ctype.h>
+//#include <windows.h>
+#if defined(HB_OS_WIN)
+#include <windows.h>
+#endif
 
-#include "sqly.h"          /* Bison-generated include */
+#ifdef __XHARBOUR__
+   #include "sqly.h"          /* Bison-generated include */
+#endif
 #include "msg.ch"
 #include "sqlrdd.h"
 #include "sqlrddsetup.ch"
@@ -254,22 +260,22 @@ HB_FUNC( SR_STRTOHEX )
 
       if ( iCipher < 10 )
       {
-         c[1] = '0' + iCipher;
+         c[1] = '0' + ( char ) iCipher;
       }
       else
       {
-         c[1] = 'A' + (iCipher - 10 );
+         c[1] = 'A' + ( char ) (iCipher - 10 );
       }
       iNum >>=4;
 
       iCipher = iNum % 16;
       if ( iCipher < 10 )
       {
-         c[0] = '0' + iCipher;
+         c[0] = '0' + ( char ) iCipher;
       }
       else
       {
-         c[0] = 'A' + (iCipher - 10 );
+         c[0] = 'A' + ( char ) (iCipher - 10 );
       }
 
       c+=2;
@@ -336,7 +342,7 @@ char * sr_Hex2Str( const char * cStr, int len, int * lenOut )
 
       iNum += iCipher;
       cStr++;
-      outbuff[i] = iNum;
+      outbuff[i] = ( char ) iNum;
    }
 
    outbuff[nalloc] = '\0';
@@ -939,16 +945,16 @@ HB_FUNC( SR_DBQUALIFY )
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ )
          {
-            szOut[ i+1 ] = toupper( (BYTE) pszBuffer[ i ] );
+            szOut[ i+1 ] = ( char ) HB_TOUPPER( ( unsigned char ) pszBuffer[ i ] );
          }
          szOut[i+1] = '"';
          break;
       case SYSTEMID_INGRES:
-      case SYSTEMID_POSTGR:      
+      case SYSTEMID_POSTGR:
          szOut[0] = '"';
          for( i = 0; i < ulLen; i++ )
          {
-            szOut[ i+1 ] = tolower( (BYTE) pszBuffer[ i ] );
+            szOut[ i+1 ] = ( char ) HB_TOLOWER( ( unsigned char ) pszBuffer[ i ] );
          }
          szOut[i+1] = '"';
          break;
@@ -966,14 +972,14 @@ HB_FUNC( SR_DBQUALIFY )
          szOut[0] = '`';
          for( i = 0; i < ulLen; i++ )
          {
-            szOut[ i+1 ] = tolower( (BYTE) pszBuffer[ i ] );
+            szOut[ i+1 ] = ( char ) HB_TOLOWER( ( unsigned char ) pszBuffer[ i ] );
          }
          szOut[i+1] = '`';
          break;
       case SYSTEMID_INFORM:
          for( i = 0; i < ulLen; i++ )
          {
-            szOut[ i ] = tolower( (BYTE) pszBuffer[ i ] );
+            szOut[ i ] = ( char ) HB_TOLOWER( ( unsigned char ) pszBuffer[ i ] );
          }
          ulLen -=2;
          break;
@@ -1064,7 +1070,7 @@ BOOL SR_itemEmpty( PHB_ITEM pItem )
          hb_itemGetTDT( pItem, &lDate, &lTime );
          return lDate == 0 && lTime == 0;
       }
-#endif      
+#endif
       case HB_IT_LOGICAL:
          return ! hb_itemGetL( pItem );
 
@@ -1183,6 +1189,7 @@ char * quotedNull( PHB_ITEM pFieldData, PHB_ITEM pFieldLen, PHB_ITEM pFieldDec, 
                return (sValue);
             }
          }
+		 /* fallthrough */
          default:
          {
             if (!bMemo)

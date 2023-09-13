@@ -120,7 +120,7 @@ METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, c
    local nType := 0, nLen := 0, nNull := 0
    local aFields := {}
    local nDec := 0, nRet, cVlr := ""
-   local aFld
+   local aFld,aPks :={},nPos
 
    DEFAULT lReSelect    := .T.
    DEFAULT lLoadCache   := .F.
@@ -132,6 +132,7 @@ METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, c
       If !Empty( cCommand )
          nRet := ::Execute( cCommand + if(::lComments," /* Open Workarea with custom SQL command */",""), .F. )
       Else
+	     ::exec( [SELECT column_name, ordinal_position FROM   information_schema.key_column_usage WHERE  table_schema = schema() AND    constraint_name = 'PRIMARY' AND    table_name = ']+ StrTran( cTable, [`], [] ) + ['], .F., .T., @aPks )
          nRet := ::Execute( "SELECT A.* FROM " + cTable + " A " + if(lLoadCache, cWhere + " ORDER BY A." + cRecnoName, " WHERE 1 = 0") + if(::lComments," /* Open Workarea */",""), .F. )
       EndIf
       If nRet != SQL_SUCCESS .and. nRet != SQL_SUCCESS_WITH_INFO
@@ -158,6 +159,12 @@ METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, c
 
    For each aFld in ::aFields
       aFld[ FIELD_ENUM ] = hb_enumIndex()
+	  nPos := ascan( aPks, { |x| Alltrim( Upper( x[ 1 ] ) ) == Alltrim( Upper( aFld[ FIELD_NAME ] ) ) } )
+      aFld[ FIELD_PRIMARY_KEY ] := 0
+	  if nPos > 0
+	     aFld[ FIELD_PRIMARY_KEY ] := aPks[ nPos, 2 ]
+	  endif
+	  
    Next
 
    If lReSelect .and. !lLoadCache
@@ -183,10 +190,10 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
 
    local hEnv := 0, hDbc := 0
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
-   
+
    Local nVersionp
-   
-   
+
+
    (cDSN)
    (cUser)
    (cPassword)
@@ -208,7 +215,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       ::nRetCode = nRet
       ::nSystemID := 0
       SR_MsgLogFile( "Connection Error" )
-      nVersionp := 4      
+      nVersionp := 4
       Return Self
    else
       ::cConnect  = cConnect
@@ -216,8 +223,8 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       ::hDbc      = hDbc
       cTargetDB   = "MARIADB Native"
       cSystemVers = alltrim( str( MYSVERS( hDbc ) ) )
-      nVersionp  := MYSVERS( hDbc )     
-                              
+      nVersionp  := MYSVERS( hDbc )
+
    EndIf
 
    If (!::lQueryOnly) .and. nVersionp < MINIMAL_MYSQL_SUPPORTED
@@ -248,18 +255,18 @@ METHOD End() CLASS SR_MARIA
       MYSFinish( ::hDbc )
    EndIf
 
-return Super:End()
+return ::Super:End()
 
 /*------------------------------------------------------------------------*/
 
 METHOD Commit( lNoLog ) CLASS SR_MARIA
-   Super:Commit( lNoLog )
+   ::Super:Commit( lNoLog )
 Return ( ::nRetCode := MYSCommit( ::hDbc ) )
 
 /*------------------------------------------------------------------------*/
 
 METHOD RollBack() CLASS SR_MARIA
-   Super:RollBack()
+   ::Super:RollBack()
 Return ( ::nRetCode := MYSRollBack( ::hDbc ) )
 
 /*------------------------------------------------------------------------*/

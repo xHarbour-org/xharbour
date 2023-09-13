@@ -116,6 +116,7 @@ METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, c
    local nType := 0, nLen := 0, nNull := 0
    local aFields := {}
    local nDec := 0, nRet, cVlr := "", cTbl, cOwner := "public"
+   LOCAL nPos,aPks:={},aFld
 
    DEFAULT lReSelect    := .T.
    DEFAULT lLoadCache   := .F.
@@ -152,7 +153,17 @@ METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, c
       If left( cTbl, 1 ) == ["]     // "
          cTbl := SubStr( cTbl, 2, len(cTbl)-2 )
       EndIf
+      ::exec([SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type FROM   pg_index i JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ']+ cOwner+'.'+cTbl+['::regclass AND    i.indisprimary    ] , .F., .T., @aPks)
+    //::exec([SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type FROM   pg_index i JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ']+ cTbl+['::regclass AND    i.indisprimary	 ] , .F., .T., @aPks)
       aFields := PGSTableAttr( ::hDbc, cTbl, cOwner )
+	  For each aFld in aFields
+
+        aFld[ FIELD_PRIMARY_KEY ] := 0
+        nPos := ascan( aPks, { |x| Alltrim( Upper( x[ 1 ] ) ) == Alltrim( Upper( aFld[ FIELD_NAME ] ) ) } )
+	    if nPos>0
+		  aFld[ FIELD_PRIMARY_KEY ] := nPos
+	    endif
+      next
    Else
       aFields := PGSQueryAttr( ::hDbc )
    EndIf
@@ -184,10 +195,11 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    local nret, cVersion := "", cSystemVers := "", cBuff := ""
    Local aRet := {}
    Local aVersion
-   Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
-   Local cString,s_reEnvVar1 := HB_RegexComp( "(\d+\.\d+)" )
-   
-   
+   //Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+\.\d+)" )
+   Local cmatch,nstart,nlen,s_reEnvVar := HB_RegexComp( "(\d+\.\d+)" )
+   Local cString
+
+
    (cDSN)
    (cUser)
    (cPassword)
@@ -205,11 +217,11 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    DEFAULT ::cPort := 5432
 
    cConnect := "host=" + ::cHost + " user=" + ::cUser + " password=" + ::cPassword + " dbname=" + ::cDTB + " port=" + str(::cPort,6)
-   
+
    IF !Empty( ::sslcert )
       cConnect += " sslmode=prefer sslcert="+::sslcert +" sslkey="+::sslkey +" sslrootcert="+ ::sslrootcert +" sslcrl="+ ::sslcrl
-   ENDIF   
-   
+   ENDIF
+
    hDbc := PGSConnect( cConnect )
    nRet := PGSStatus( hDbc )
 
@@ -224,20 +236,16 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       cTargetDB  = "PostgreSQL Native"
       ::exec( "select version()", .t., .t., @aRet )
       If len (aRet) > 0
- 
          cSystemVers := aRet[1,1]
-         cString := aRet[1,1]          
-         If "POSTGRESQL" in upper(aRet[1,1])
-         cMAtch := HB_AtX( s_reEnvVar1, cString, , @nStart, @nLen )         
-         Else
-         cMatch := HB_AtX( s_reEnvVar, cString, , @nStart, @nLen )         
-         Endif
+         cString := aRet[1,1]
+         cMatch := HB_AtX( s_reEnvVar, cString, , @nStart, @nLen )
+		
          if !empty(cMatch )
             aVersion      := hb_atokens( cMatch, "." )
          else
             aVersion      := hb_atokens( strtran(Upper(aRet[1,1]),"POSTGRESQL ",""), "." )
          endif
-
+		
       Else
          cSystemVers= "??"
          aVersion      := {"6","0"}
@@ -248,7 +256,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
    ::cSystemVers := cSystemVers
    ::nSystemID   := SYSTEMID_POSTGR
    ::cTargetDB   := Upper( cTargetDB )
-   
+
 
 *    If ! ("7.3" $ cSystemVers .or. "7.4" $ cSystemVers .or. "8.0" $ cSystemVers .or. "8.1" $ cSystemVers .or. "8.2" $ cSystemVers .or. "8.3" $ cSystemVers .or. "8.4" $ cSystemVers .or. "9.0" $ cSystemVers or. "9.1" $ cSystemVers)
 
@@ -259,11 +267,11 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       SR_MsgLogFile( "Unsupported Postgres version: " + cSystemVers )
    else
       ::lPostgresql8 := (( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) >= 3) .or. ( Val( aversion[ 1 ] ) >= 9 ))
-      ::lPostgresql83 := ( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) == 3) 
+      ::lPostgresql83 := ( Val( aversion[ 1 ] ) == 8 .and. Val( aversion[ 2 ] ) == 3)
    EndIf
-   
-   
-   
+
+
+
    ::exec( "select pg_backend_pid()", .T., .T., @aRet )
 
    If len( aRet ) > 0
@@ -292,13 +300,13 @@ return nil
 /*------------------------------------------------------------------------*/
 
 METHOD Commit( lNoLog ) CLASS SR_PGS
-   Super:Commit( lNoLog )
+   ::Super:Commit( lNoLog )
 Return ( ::nRetCode := ::exec( "COMMIT;BEGIN",.f. ) )
 
 /*------------------------------------------------------------------------*/
 
 METHOD RollBack() CLASS SR_PGS
-   Super:RollBack()
+   ::Super:RollBack()
    ::nRetCode := PGSRollBack( ::hDbc )
    ::exec( "BEGIN",.f. )
 Return ::nRetCode

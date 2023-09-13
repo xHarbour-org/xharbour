@@ -1,0 +1,98 @@
+/*
+  This file is a copy of the text on:
+
+   https://wiki.xailer.com/doku.php?id=en:migrar.de.xharbour.a.harbour
+
+  Many thanks to Jose F. Gimenez, the author of this page.
+*/
+
+MIGRATION GUIDE TO HARBOUR
+
+As we know, Harbour and xHarbour have an origin and a common basis. In fact, xHarbour is a fork or derived from Harbour, and since that incident occurred the two have walked through different paths, but in parallel. During all this time there have been occasions when some parts of xHarbour were ported into Harbour to maintain compatibility, and the reverse has also happened.
+
+However, and although both are compatible compilers by 99%, there are some differences to be taken into account if we want that our programs written on Xailer for xHarbour will also function on Xailer for Harbour.
+
+This paper aims to show and how to overcome those differences. It is based on the experience of migration Xailer sources of xHarbour to Harbour, so it should cover almost all cases that can be given to any programmer.
+
+The list of differences is divided into three blocks, as affecting the PRG code, C code, or Xailer itself. Some of the differences are easily detected by the compiler, either PRG level or C-level, but others are not detected at compile time, making it more difficult to fix. This is indicated in each difference.  
+
+At the PRG level
+
+There are no global variables, so there are no GLOBAL nor GLOBAL EXTERNAL sentences. The closest thing to the global variables are the public variables, which are created with the sentence PUBLIC and are declared in the modules which use them with the sentence MEMVAR. It is detected by the compiler.
+The IN operator does not exist, use the operator $ instead, which is the Clipper standard. It is detected by the compiler.
+On SWITCH sentences, change DEFAULT with OTHERWISE. On xHarbour, DEFAULT indicates the part of code to execute when none of the previous CASE statements were true. In Harbour, this clause uses the command OTHERWISE, and with the same functionality. It is detected by the compiler.
+The sentences TRY / CATCH / ALWAYS / END: in Harbour has been emulated. You should not have any problem, but maybe you can get some minor behavior difference on extreme cases.
+You can not use any object member as indexes on loops FOR / NEXT. This means, that code like this:
+   FOR ::nCounter := 1 TO 100
+      ...
+should be modified by something like this:
+
+   FOR n := 1 TO 100
+      ::nCounter := n
+      ...
+Detected by the compiler.
+
+   UPDATE: This was fixed later in Harbour, and only applies to Xailer 2.7. Newer versions are free of this lack.
+   
+You cannot use array indexed on string types. You must use the Substr() function to extract individual characters. This extension was made on xHarbour long time ago, although it brought some problems (run-time errors difficult to detect), it had greatest advantages on some cases. However, this was never implemented in Harbour. For example:
+   nTotal := 0
+   FOR n := 1 TO Len( cString )
+      nTotal += Asc( cString[ n ] )
+   NEXT
+should be changed to:
+
+   nTotal := 0
+   FOR n := 1 TO Len( cString )
+      nTotal += Asc( Substr( cString, n, 1 ) )
+   NEXT
+Although this other construction is also possible:
+
+   nTotal := 0
+   FOR EACH cChar IN @cString
+      nTotal += Asc( cChar )
+      cChar := Upper( cChar ) 
+   NEXT
+Not detected at compile-time, but at run-time.
+
+Change At() with 3 parameters to hb_At(). In xHarbour, the At() function allows a third parameter which indicates the first position to start the search. In Harbour, the At() function remains exactly the same as in Clipper, with two parameters, and when you need the third parameter you must use the hb_At() function. Detected by the compiler.
+The Trim() function does not allow the third parameter to indicate extra characters to delete like TAB, CR and LF from the end of the string. We have added the XA_Trim() function to overcome this lack. Detected by the compiler.
+Change ADel() with 3 parameters for hb_ADel(). On xHarbour, the ADel() function allows a third parameter to reduce the array size. Harbour ignores this third parameter and you should change to hb_ADel() or resize the array manually with the ASize() function. Not detected at compile-time nor at run-time but may clearly break your code.
+Function ASizeAlloc() does not exist, there is nothing similar to this, you just need to eliminate it from your code. Detected at link time.
+Change hb_SetCodePage() to hb_CdpSelect(). Detected at linking time.
+Change Super: into ::Super:. In xHarbour and Xailer 2.7's Harbour release, Super: is used to access parent class members from a child class. Later, this reserved word was removed, and now it has to be used ::Super to access parent class members.
+Change HB_QWith() with :__WithObject(). In xHarbour the HB_QWith() function returns the active object used on a WITH OBJECT / END WITH statement. On Harbour there is no such function, but you may use the method __WithObject() from any object to get the same result. Detected at link time.
+Change HB_EnumIndex() with <obj>:__enumIndex(). In xHarbour the function HB_EnumIndex() returns the current active index on a FOR EACH / NEXT loop. In Harbour there is no such function. To retrieve the same index loop value you may call the method __enumIndex() over the variable that stores the current loop value. For example:
+   FOR EACH oControl IN ::aControls
+      LogDebug( oControl:__enumIndex() )
+   NEXT
+Detected at link time.
+
+Some date and time functions have the hb_ prefix in Harbour. This functions are: DateTime(), Hour(), Minute(), TToS(), SToT(), TToC() and CToT(). Detected at link time.
+You can not use negative indexes on arrays. You must use ATail( array ) or array[ Len( array ) ]. In xHarbour you could use negative index values in arrays, which lets the possibility to access the array elements from last to first. For example aData[ -1 ] returned the last element on the array. In Harbour there is not such functionality and you must use ATail() instead. Detected at run-time.
+You may search in your project for expressions that contain the minus sign (-) inside brackets with this regular expression: \[[^\]]*-[^\[]*\].
+With this, you will get all the possible conflicting cases. Surely some more cases will arrive that will not be incorrect, but it will help on doing the job.
+
+When creating objects with only its class function name, the parameters you may give will not be sent to its New() constructor method. In xHarbour, any parameter passed to the class function, was passed to its New() method. For example:
+   ::oBtn := TButton( Self )
+was equivalent to:
+
+   ::oBtn := TButton():New( Self )
+But not in Harbour. You must call the object method New(). In the case of Xailer objects, it's specially important because or first (and normally only) parameter of the New() constructor is oParent, that could become Nil causing important errors and in some cases difficult to find. Not detected at compile-time, nor at run-time.
+
+The scope validation of class members is more strict and correct than xHarbour. xHarbour took for good some scopes incorrectly, while Harbour does it well, and leads to surface errors that had not occurred. F.e. if you try to access from TForm to a PROTECTED control's property, xHarbour erroneously permitted it because TForm is also inherited from TControl. But really, that property belongs to another object, the control (although it's in the same hierarchy), and not to the form, and therefore should be a mistake. This is the biggest difference to fix. It is not detected at compile-time and although some run-time errors arise, not always it depends on the conditions. For example the same PROTECTED member of a class maybe accessed from a method of a child class but only if this member belongs to the same object that makes the call. In the practice, when working with PROTECTED methods, expression like ::Property or Self:Property are normally correct, but expressions like Object:Property are not.
+The PRIVATE scope works in a different manner in Harbour than xHarbour. On both cases, this scope means that the member can only be accessed from a method of its own class and not from outside of it or any child class. But in Harbour, if a PRIVATE method is overloaded, a new member is created with the same name, but in the rest, completely different from its parent class. This implies that when the parent class private member change its value, the child class member does not change, and the opposite. In all aspects the two members are completely different. This was not the behavior in xHarbour. A overloaded PRIVATE method there was only a member on the object with a unique value.
+The ErrorNew() function that creates an Error object in xHarbour supports many parameters to indicate the type of error: cSubsystem, nGenCode, cOperation, cDescription, aArgs, ModuleName, cProcName and nProcLine. However in Harbour as in CA-Clipper it does not receive such parameters. Therefore, in Harbour the Error object created by ErrorNew() will be created meaningless. The simplest way to fix this is to create a MyErrorNew() function to get the parameters used on xHarbour and that function will create the error object and set the value of its members. Not detected at compile-time nor at run-time but produces useless error objects.
+At the C level
+
+hb_par???() and hb_stor???() do not allow the extra parameter to be used for array handling. When used with arrays you must change them with the functions hb_parv???() and hb_storv???(). Detected at compile time.
+hb_parc() is of type const char *, instead of char *, so you need to make a cast to (LPSTR) or declare the variables as const char *. Detected at compile time.
+hb_arrayGetCPtr() is also of type const char * so you must do the same than hb_parc(). Detected at compile time.
+hb_parl() returns FALSE if the parameter is not of type logical (p.ej. numeric). In xHarbour returned TRUE if the parameter was numeric and different of 0. This can arise logical errors. Not detected at compile time, and since internally C treats the BOOL type as INT, neither generates run-time errors, therefore is really difficult to detect.
+You must change hb_itemPutCPtr() to hb_itemPutCLPtr(). Detected at compile time.
+hb_retcAdopt() does not exist, must be changed to hb_retc_buffer(). Detected at compile time.
+hb_retclenAdopt() and hb_retclenAdoptRaw() do not exist, and must be changed to hb_retclen_buffer(). But notice that hb_retclen_buffer() adds an extra chr(0) to the end of the buffer, so the buffer have to be one byte larger than what it's really needed. Detected at compile time.
+You can not directly use a HB_ITEM structure. You must always use its pointer of type PHB_ITEM and create the item using hb_itemNew( NULL ). Detected at compile time.
+PHB_ITEM is declared as void *, therefore you can not use directly any member of the HB_ITEM structure. Instead, you must use the Harbour API functions to do the job. For example, instead of pItem–>type, you should use hb_itemType( pItem ). Detected at compile time.
+Neither you can use any member from other Harbour VM structures, like HB_DYNS, HB_SYMBOL, etcetera. This implies that you can not make function calls like hb_vmPushSymbol( hb_dynsymFindName( “METHOD” )–>pSymbol ). Instead, you must use hb_vmPushDynSym( hb_dynsymFindName( “METHOD” ) ). So, in the practice, you must change calls to hb_vmPushSymbol() for hb_vmPushDynSym(). Detected at compile time.
+You can not use XA_ObjSend() to assign a NIL value to a property. Instead you must use the new function XA_ObjSendNil().
+The macros ISNIL(), ISNUM(), ISCHARACTER(), etcetera., have been renamed. Instead you must use the same names with the HB_ prefix. (For example HB_ISNIL(), HB_ISNUM(), etc.). Detected at compile time.

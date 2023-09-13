@@ -72,7 +72,7 @@ Return NIL
 
 Function SR_Val2Char(a,n1,n2)
    Do Case
-   Case HB_ISSTRING(a) 
+   Case HB_ISSTRING(a)
       Return a
    Case HB_ISNUMERIC(a) .and. n1 != NIL .and. n2 != NIL
       Return Str(a,n1,n2)
@@ -80,7 +80,7 @@ Function SR_Val2Char(a,n1,n2)
       Return Str(a)
    Case HB_ISDATE(a)
       Return dtoc(a)
-   Case HB_ISLOGICAL(a) 
+   Case HB_ISLOGICAL(a)
       Return if(a,".T.",".F.")
    EndCase
 Return ""
@@ -129,7 +129,7 @@ return nil
 Function SR_FilterStatus(lEnable)
 
    If IS_SQLRDD
-      If HB_ISLOGICAL( lEnable ) 
+      If HB_ISLOGICAL( lEnable )
          Return (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):lDisableFlts := !lEnable
       Else
          Return (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):lDisableFlts
@@ -201,7 +201,7 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
 
             If aNewStruct[i, 2] == oWA:aFields[n, 2] .and. aNewStruct[i, 3] == oWA:aFields[n, 3] .and. aNewStruct[i, 4] == oWA:aFields[n, 4]
                // Structure is identical. Only need to check for NOT NULL flag.
-               If aNewStruct[i, FIELD_NULLABLE] != NIL .and. aNewStruct[i, FIELD_NULLABLE] !=  oWA:aFields[n, FIELD_NULLABLE]
+               If aNewStruct[i, FIELD_NULLABLE] != NIL .and. valtype(aNewStruct[i, FIELD_NULLABLE]) == "L" .and. aNewStruct[i, FIELD_NULLABLE] !=  oWA:aFields[n, FIELD_NULLABLE]
                   If aNewStruct[i, FIELD_NULLABLE]
                      SR_LogFile( "changestruct.log", { oWA:cFileName, "Changing to nullable:", aNewStruct[i,1]} )
                      oWA:DropRuleNotNull( aNewStruct[i,1] )
@@ -219,7 +219,7 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
                aadd( aToFix, aClone( aNewStruct[i] ) )
                SR_LogFile( "changestruct.log", { oWA:cFileName, "Warning: Possible data loss changing data type:", aNewStruct[i,1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]} )
             ElseIf aNewStruct[i, 2] != oWA:aFields[n, 2]
-               IF aNewStruct[i, 2] $"CN" .and. oWA:aFields[n, 2] $"CN" .and. oWA:oSql:nSystemID == SYSTEMID_POSTGR               
+               IF aNewStruct[i, 2] $"CN" .and. oWA:aFields[n, 2] $"CN" .and. oWA:oSql:nSystemID == SYSTEMID_POSTGR
 
 *                   IF "8.4" $ oWA:oSql:cSystemVers .or. "9.0" $ oWA:oSql:cSystemVers
                   IF oWA:oSql:lPostgresql8 .and. !oWA:oSql:lPostgresql83
@@ -228,11 +228,11 @@ Function SR_ChangeStruct( cTableName, aNewStruct )
                      aadd( aToFix, aClone( aNewStruct[i] ) )
                   ENDIF
                   SR_LogFile( "changestruct.log", { oWA:cFileName, "Warning: Possible data loss changing field types:", aNewStruct[i,1], "from", oWA:aFields[n, 2], "to", aNewStruct[i, 2]} )
-               ELSE 
+               ELSE
                   SR_LogFile( "changestruct.log", { oWA:cFileName, "ERROR: Cannot convert data type of field:", aNewStruct[i,1], " from", oWA:aFields[n, 2], "to", aNewStruct[i, 2] } )
                ENDIF
-            ElseIf aNewStruct[i, 3] >= oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"              
-               
+            ElseIf aNewStruct[i, 3] >= oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"
+
                aadd( aDirect, aClone( aNewStruct[i] ) )
                SR_LogFile( "changestruct.log", { oWA:cFileName, "Will Change field size:", aNewStruct[i,1], "from", oWA:aFields[n, 3], "to", aNewStruct[i, 3] } )
             ElseIf aNewStruct[i, 3] < oWA:aFields[n, 3] .and. oWA:aFields[n, 2] $ "CN"
@@ -355,7 +355,7 @@ Function SR_SetReverseIndex( nIndex, lSet )
 
    If IS_SQLRDD .and. nIndex > 0 .and. nIndex <= len( (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex )
       lOldSet := (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex[ nIndex, DESCEND_INDEX_ORDER ]
-      If HB_ISLOGICAL( lSet ) 
+      If HB_ISLOGICAL( lSet )
          (Select())->(dbInfo( DBI_INTERNAL_OBJECT )):aIndex[ nIndex, DESCEND_INDEX_ORDER ] := lSet
       EndIf
    EndIf
@@ -434,7 +434,7 @@ Function SR_SetCreateAsHistoric( l )
 
    Local lOld := lCreateAsHistoric
 
-   If HB_ISLOGICAL( l ) 
+   If HB_ISLOGICAL( l )
       lCreateAsHistoric := l
    EndIf
 
@@ -459,7 +459,7 @@ return SR_SubQuoted( valtype( uData ), uData, nSystemID )
 Static Function SR_SubQuoted( cType, uData, nSystemID )
 
    local cRet
-   lOCAL cOldSet := SET(_SET_DATEFORMAT)   
+   lOCAL cOldSet := SET(_SET_DATEFORMAT)
 
    Do Case
    Case cType $ "CM" .and. nSystemID == SYSTEMID_ORACLE
@@ -487,34 +487,34 @@ Static Function SR_SubQuoted( cType, uData, nSystemID )
       return [{d ']+transform(DtoS(if(year(uData)<1850,stod("18500101"),uData)) ,'@R 9999-99-99')+['}]
    Case cType == "D"
       return ['] + dtos(uData) + [']
-   Case cType == "N"   
+   Case cType == "N"
       return ltrim(str(uData))
-   Case cType == "L" .and. (nSystemID == SYSTEMID_POSTGR .or. nSystemID == SYSTEMID_FIREBR3 ) 
+   Case cType == "L" .and. (nSystemID == SYSTEMID_POSTGR .or. nSystemID == SYSTEMID_FIREBR3 )
       return if(uData,"true","false")
    Case cType == "L" .and. nSystemID == SYSTEMID_INFORM
-      return if(uData,"'t'","'f'")      
-   Case cType == "L"   
+      return if(uData,"'t'","'f'")
+   Case cType == "L"
       return if(uData,"1","0")
-   case ctype == "T"  .and. nSystemID == SYSTEMID_POSTGR  
-      IF Empty( uData) 
+   case ctype == "T"  .and. nSystemID == SYSTEMID_POSTGR
+      IF Empty( uData)
          RETURN 'NULL'
-      ENDIF 
+      ENDIF
 
-      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']      
+      return ['] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
    case ctype == "T" .and. nSystemID == SYSTEMID_ORACLE
-      IF Empty( uData) 
+      IF Empty( uData)
          RETURN 'NULL'
-      ENDIF       
-      return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']        
+      ENDIF
+      return [ TIMESTAMP '] + transform(ttos(uData), '@R 9999-99-99 99:99:99') + [']
    Case cType == 'T'
-      IF Empty( uData) 
+      IF Empty( uData)
          RETURN 'NULL'
-      ENDIF 
-      Set( _SET_DATEFORMAT,  "yyyy-mm-dd") 
+      ENDIF
+      Set( _SET_DATEFORMAT,  "yyyy-mm-dd")
       cRet := ttoc( uData )
       Set( _SET_DATEFORMAT,cOldSet)
       RETURN [']+cRet+[']
-      
+
    OtherWise
       cRet := SR_STRTOHEX(HB_Serialize( uData ))
       return SR_SubQuoted( "C", SQL_SERIALIZED_SIGNATURE + str(len(cRet),10) + cRet, nSystemID )
@@ -645,13 +645,13 @@ Function SR_ShowVector( a )
 
    local cRet := "", i
 
-   If HB_ISARRAY(a) 
+   If HB_ISARRAY(a)
 
       cRet := "{"
 
       For i = 1 to len(a)
 
-         If HB_ISARRAY(a[i]) 
+         If HB_ISARRAY(a[i])
             cRet += SR_showvector(a[i]) + if( i == len(a), "", "," ) + CRLF
          Else
             cRet += SR_Val2CharQ(a[i]) + if( i == len(a), "", "," )
@@ -684,7 +684,7 @@ Function SR_Val2CharQ( uData )
    Case cType == "D"
       Return dtoc(uData)
    Case cType == "T"
-      Return ttoc(uData)      
+      Return ttoc(uData)
    Case cType == "L"
       Return if(uData,".T.",".F.")
    Case cType == "A"
@@ -743,7 +743,7 @@ Local nVal
       endif
       return 0
    Case cType == 'T'
-      return datetime(0,0,0,0,0,0,0)   
+      return datetime(0,0,0,0,0,0,0)
    EndCase
 
 Return ""
@@ -889,7 +889,7 @@ Function SR_Deserialize( uData )
 * Local ctemp,cdes,chex
 * cTemp := udata
 * altd()
-* cHex := SR_HEXTOSTR(SubStr( uData, 21, val( substr(uData,11,10) ) ) ) 
+* cHex := SR_HEXTOSTR(SubStr( uData, 21, val( substr(uData,11,10) ) ) )
 * cdes := sr_Deserialize1( cHex)
 * tracelog(udata,chex,cdes)
 * return cdes
@@ -931,7 +931,7 @@ Function SR_SetFilter( cFlt )
       If !Empty( cFlt )
          oWA:cFilter := cFlt
          oWA:Refresh()
-      ElseIf HB_ISSTRING( cFlt ) 
+      ElseIf HB_ISSTRING( cFlt )
          oWA:cFilter := ''
       EndIf
    EndIf
@@ -1319,14 +1319,14 @@ Return 0
 
 Function SR_GetStack()
 
-	Local i := 1, cErrorLog := ""
+   Local i := 1, cErrorLog := ""
 
-	while ( i < 70 )
-		 If ! Empty( ProcName( i ) )
+   while ( i < 70 )
+       If ! Empty( ProcName( i ) )
           cErrorLog += CRLF + Trim( ProcName( i ) ) + "     Linha : " + alltrim(str(ProcLine(i)))
-		 EndIf
-		 i++
-	end
+       EndIf
+       i++
+   end
 
 Return  cErrorLog
 
@@ -1440,7 +1440,7 @@ FUNCTION SQLBINDBYVAL( xMessage, aOptions, cColorNorm, nDelay )
          CASE "D"
             xMessage := DToC( xMessage )
             EXIT
-            
+
          CASE "T"
             xMessage := TToC( xMessage )
             EXIT
@@ -1955,9 +1955,9 @@ function sr_AddToFilter( nRecNo )
 
    If IS_SQLRDD
       oWA := (Select())->(dbInfo( DBI_INTERNAL_OBJECT ))
-      
+
       If !Empty( oWA:cFilter )
-         aadd( oWA:aRecnoFilter, nRecno ) 
+         aadd( oWA:aRecnoFilter, nRecno )
          oWA:Refresh()
       EndIf
    EndIf
@@ -1968,9 +1968,9 @@ FUNCTION sr_clearFilter()
    Local oWa
    If IS_SQLRDD
       oWA := (Select())->(dbInfo( DBI_INTERNAL_OBJECT ))
-      
+
       If !Empty( oWA:cFilter )
-         oWA:aRecnoFilter := {} 
+         oWA:aRecnoFilter := {}
          oWA:Refresh()
       EndIf
    EndIf
@@ -1982,10 +1982,10 @@ FUNCTION SR_SetFieldDefault( cTable, cField, cDefault )
    LOCAL oCnn
    LOCAL cSql := "ALTER TABLE "+ cTable + " ALTER COLUMN " +cField +" SET DEFAULT "
    oCnn := SR_GetConnection(  )
-   IF HB_ISNUMERIC( cDefault ) 
+   IF HB_ISNUMERIC( cDefault )
       cSql += Alltrim( str( cDefault ) )
    ELSEIF HB_ISSTRING( cDefault )
-      IF Empty( cDefault) 
+      IF Empty( cDefault)
          cSql += "''"
       ELSE
          cSql +="'"+cDefault+"'"
@@ -1995,9 +1995,9 @@ FUNCTION SR_SetFieldDefault( cTable, cField, cDefault )
       oCnn:exec( cSql,,.f.)
       oCnn:Commit()
    ENDIF
-RETURN NIL            
-            
-      
+RETURN NIL
+
+
 
 
 

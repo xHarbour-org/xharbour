@@ -134,7 +134,8 @@ CLASS SR_CONNECTION
    METHOD IniFields( lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cDeletedName, lRefCursor ) VIRTUAL
    METHOD ExecuteRaw() VIRTUAL
    METHOD Execute( cCommand, lErrMsg, nLogMode, cType )
-   METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType )
+   //METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType )
+   METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType , cCodePage )
    METHOD AllocStatement()
    METHOD SetStmtOptions( nType, uBuffer )
    METHOD RuntimeErr( cOperation, cErr )
@@ -328,7 +329,8 @@ Return NIL
 
 
 
-METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType ) CLASS SR_CONNECTION
+//METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType ) CLASS SR_CONNECTION
+METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecno, cRecnoName, cDeletedName, lTranslate, nLogMode, cType, cCodePage ) CLASS SR_CONNECTION
 
    local nRet := 0, i, j, n, cEste, cCampo, aDb, nFieldRec
    local aFields, nBlocks, nAllocated := 0, nLenMemo, nLinesMemo, aMemo
@@ -357,6 +359,7 @@ METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecn
    DEFAULT lNoRecno      := .F.
    DEFAULT cRecnoName    := SR_RecnoName()
    DEFAULT cDeletedName  := SR_DeletedName()
+   DEFAULT cCodePage  := HB_SetCodePage()
 
    If !Empty( cFile )
       HB_FNameSplit( cFile,, @cFileTemp )
@@ -410,23 +413,34 @@ METHOD Exec( cCommand, lMsg, lFetch, aArray, cFile, cAlias, nMaxRecords, lNoRecn
             If !Empty( cFile )
 
                aFields := ::IniFields(.F.,,,,,cRecnoName, cDeletedName)
+               aDb := {}
+               If lNoRecno
+                  For i = 1 to len( aFields )
+                     If aFields[i,1] != cRecnoName
+                        AADD( aDb, aFields[i] )
+                     Else
+                        nFieldRec := i
+                     EndIf
+                  Next
+               EndIf
 
                if Select( cAlias ) == 0
-                  aDb := {}
+//                  aDb := {}
                   If lNoRecno
-                     For i = 1 to len( aFields )
+/*                     For i = 1 to len( aFields )
                         If aFields[i,1] != cRecnoName
                            AADD( aDb, aFields[i] )
                         Else
                            nFieldRec := i
                         EndIf
-                     Next
+                     Next*/
                      dbCreate( cFile, SR_AdjustNum(aDb), SR_SetRDDTemp() )
                   Else
                      dbCreate( cFile, SR_AdjustNum(aFields), SR_SetRDDTemp() )
                   EndIf
 
-                  dbUseArea( .t., SR_SetRDDTemp(), cFile, cAlias, .F. )
+                  //dbUseArea( .t., SR_SetRDDTemp(), cFile, cAlias, .F. )
+                  dbUseArea( .t., SR_SetRDDTemp(), cFile, cAlias, .F.,, cCodePage )
                else
                   dbSelectArea( cAlias )
                EndIf
@@ -1240,4 +1254,3 @@ function SR_SetTraceLog(cLog)
    EndIf
 
 Return cOld
-

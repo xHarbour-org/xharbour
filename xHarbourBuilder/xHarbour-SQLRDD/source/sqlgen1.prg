@@ -1200,7 +1200,7 @@ Function SR_SQLQuotedString( uData, nSystemID, lNotNull )
       return (['] + dtos(uData) + ['])
    Case cType == "N"
       return ltrim(str(uData))
-   Case cType == "L" .and. nSystemID == SYSTEMID_POSTGR
+   Case cType == "L" .and. ( nSystemID == SYSTEMID_POSTGR .or. nSystemID == SYSTEMID_FIREBR3)
       return if(uData,"true","false")
    Case cType == "L" .and. nSystemID == SYSTEMID_INFORM
       return if(uData,"'t'","'f'")

@@ -290,18 +290,18 @@ METHOD IniFields(lReSelect, cTable, cCommand, lLoadCache, cWhere, cRecnoName, cD
          If (nLen == 2000 .or. nLen == 4000) .and. SR_SetNwgCompat()
             nType := SQL_FAKE_LOB
          EndIf
-         
+
          if  ::nSystemID == SYSTEMID_ORACLE  .and. nLen == 19 .and. (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME)
              nType := SQL_DATE
-         ENDIF    
+         ENDIF
          if ::nsystemId ==  SYSTEMID_MSSQL7
-            if ( ntype == SQL_TYPE_DATE ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
+            if ( ntype == SQL_TYPE_DATE ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008
                nType := SQL_DATE
-            elseif ( nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008 
-         
-            elseif  (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES() //.and.   !::lSqlServer2008 
+            elseif ( nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME ) .and.  SR_GETSQL2008NEWTYPES() .and.  ::lSqlServer2008
+
+            elseif  (nType == SQL_TIMESTAMP .or. nType == SQL_TYPE_TIMESTAMP  .or. nType == SQL_DATETIME) .and. !SR_GETSQL2008NEWTYPES() //.and.   !::lSqlServer2008
             nType := SQL_DATE
-         endif   
+         endif
          endif
 
          cName     := upper(alltrim( cName ))
@@ -411,7 +411,7 @@ METHOD ConnectRaw( cDSN, cUser, cPassword, nVersion, cOwner, nSizeMaxBuff, lTrac
       SR_SetConnectAttr( hDbc, SQL_ATTR_LONGDATA_COMPAT, SQL_LD_COMPAT_YES )
       Exit
    Case SYSTEMID_MSSQL7
-   Case SYSTEMID_AZURE	
+   Case SYSTEMID_AZURE
       ::exec( "select cast( @@spid as numeric )", .T., .T., @aRet )
       If len( aRet ) > 0
          ::uSid := val(str(aRet[1,1],8,0))
@@ -441,7 +441,7 @@ METHOD End() CLASS SR_ODBC
       EndIf
    EndIf
 
-return Super:End()
+return ::Super:End()
 
 /*------------------------------------------------------------------------*/
 
@@ -477,13 +477,13 @@ Return ( ::nRetCode := SR_SetStmtOption( ::hStmt, nType, uBuffer ) )
 /*------------------------------------------------------------------------*/
 
 METHOD Commit( lNoLog ) CLASS SR_ODBC
-   Super:Commit( lNoLog )
+   ::Super:Commit( lNoLog )
 Return ( ::nRetCode := SR_Commit( ::hEnv, ::hDbc ) )
 
 /*------------------------------------------------------------------------*/
 
 METHOD RollBack() CLASS SR_ODBC
-   Super:RollBack()
+   ::Super:RollBack()
 Return ( ::nRetCode := SR_RollBack( ::hEnv, ::hDbc ) )
 
 /*------------------------------------------------------------------------*/

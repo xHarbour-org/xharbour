@@ -78,10 +78,14 @@
 #else
 
    #include "hbapicls.h"
+   #define HB_DATETIMEINSEC    1000
+   #define HB_DATETIMEDECIMALS 3
 
    HB_EXTERN_BEGIN
 
    extern void TraceLog( const char * sFile, const char * sTraceMsg, ... );
+   extern HB_EXPORT long     hb_timeEncStr( const char * szTime );  /* Hecho */
+   extern HB_EXPORT char *   hb_timeDecStr( char * szTime, long lSeconds );  /* Hecho */
 
    HB_EXTERN_END
 
@@ -120,6 +124,8 @@
    #define hb_dynsymLock()
    #define hb_dynsymUnlock()
 
+   #define hb_stordtl hb_stortdt
+   #define hb_dateTimeStampStrGet hb_timeStampStrGetDT
 #endif
 
 #endif /* _SQL_RDD_COMPAT_H */
