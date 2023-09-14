@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-14 16:38 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * include/hbdefs.h
+    + Added comments questioning our implementation of HB_SIZE (and variants)
+    + Added typedefs for HB_OFFSET and HB_SIGNED_SIZE with comments explaining their purpose
+  * source/rtl/substr.c
+    * Replaces HB_ISIZ with HB_OFFSET and HB_SIGNED_SIZE to examplify the usage of these new types
+    * Added comments explaining each code block
+    + Added support for negative length to signify ENDPOS as number of characters from the end of the string    
+  * tests/Makefile
+    * Modified to have explicit rule for .c files and adding Echo to show each step1
+  + tests/make_drw.sh
+    + New wrapper for make_gnu.sh including usage of C_USR and L_USR
+  + tests/tstsubstr.prg
+    + New sample/test of SUBSTR() with few variations including the new support for negative length to signify
+      ENDPOS as number of characters from the end of the string
+
 2023-09-14 21:52 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbzlib\zipplatform.cpp
     ! fixed SetFileModTime() to work fine with BCC 7.60 32-bit and 64-bit
