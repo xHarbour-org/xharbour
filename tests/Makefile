@@ -124,10 +124,15 @@ info:
 	@echo "HB_MT=$(HB_MT)"
 	@echo "HB_BIN_INSTALL=$(HB_BIN_INSTALL)"
 
-%.o: %.prg
+%.c: %.prg
+	echo "Compiling prg $<"
 	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n -w2 -es2 $<
-	gcc $(C_USR) -I$(HB_INC_INSTALL) -c -o $@ $(<:.prg=.c)
+
+%.o: %.c
+	echo "Compiling c $<"
+	gcc $(C_USR) -I$(HB_INC_INSTALL) -c -o $@ $<
 
 %$(EXE_EXT): %.o
+	echo "Linking $@"
 	gcc -o $@ $< $(C_USR) -L$(HB_LIB_INSTALL) $(LD_LIBS)
 

@@ -1756,6 +1756,10 @@ typedef BYTE HB_ATTR;
 // UGLY hack
 #include "hbtrace.h"
 
+/*
+   QUESTION 1: Why not use compiler's 'size_t' type for HB_SIZE?
+   QUESTION 2: Why such short (and confusing) names for HB_SIZE variation types? 
+*/
 
 /* Harbour size type */
 #if defined( HB_OS_WIN_64 )
@@ -1779,6 +1783,29 @@ typedef BYTE HB_ATTR;
 // typedef HB_LONG            HB_ISIZ;        /* TODO: Change to HB_SIZE, after HB_SIZE has been converted to signed type. TEMPORARY type. */
 // typedef HB_ULONG           HB_USIZ;        /* TEMPORARY type. Do not use it. */
 #endif
+
+// We use ptrdiff_t for signed size_t - see below
+#ifndef ptrdiff_t
+   #include <stddef.h>
+#endif
+
+/*
+   HB_OFFSET type should be used when explicitly supporting a NEGATIVE offset
+   into the length (HB_SIZE) of entities like Strings and Arrays. Teoretically
+   we lose the upper half of the address space, but in practice it is not a
+   problem, because the maximum size of the String or Array should never
+   exceed half of the totall addressable memory space.
+*/   
+typedef ptrdiff_t             HB_OFFSET;
+
+/*
+   HB_SIGNED_SIZE type should be used when we need a SIGNED type of the length
+   of entities like Strings and Arrays. Teoretically we lose the upper half of
+   the address space, but in practice it is not a problem, because the maximum
+   size of the String or Array should never exceed half of the totall
+   addressable memory space.   
+*/
+typedef ptrdiff_t             HB_SIGNED_SIZE;
 
 #include "hbcompat.h"
 

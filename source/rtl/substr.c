@@ -63,18 +63,29 @@ HB_FUNC( SUBSTR )
 
    if( pText && pNum )
    {
-      HB_ISIZ lPos = hb_itemGetNS( pNum );
-      HB_ISIZ liLen = hb_itemGetCLen( pText );
+      HB_OFFSET      lPos  = hb_itemGetNS( pNum );
+      HB_SIGNED_SIZE liLen = hb_itemGetCLen( pText );
 
       if( lPos < 0 )
       {
          lPos += liLen;
 
-         if( lPos < 0 )
-            lPos = 0;
+         if( lPos < 1 )
+         {
+            lPos = 0; // compatibility with Clipper
+         }            
+      }
+      else if( lPos == 0 )
+      {
+         /*
+           Clipper treats any out of range position as the first character which is 0 in C
+           So, no need to self decrement lPos as it is already 0
+         */
       }
       else if( lPos )
+      {
          lPos--;
+      }
 
       if( lPos < liLen )
       {
@@ -86,28 +97,57 @@ HB_FUNC( SUBSTR )
 
             if( pNum1 )
             {
+               // The desired length or ENDPOS if negative.
                lLen = hb_itemGetNS( pNum1 );
 
+               // xHarbour Extension - support for negative length to signify ENDPOS as number of characters from the end of the string
+               if( lLen < 0 )
+               {  
+                  // Interpret the length as the END position (number of characters from the end of the string)
+                  long lEnd = liLen + lLen + 1; // Will include the end position character
+                  
+                  // Calculate the length from the start position to the end position
+                  lLen = lEnd - lPos;
+                  if( lLen == 0 )
+                  {
+                     lLen = 1; // Same position as the start position should return 1 character
+                  }
+                  else if ( lLen < 0 )
+                  {
+                     // Clipper treats any out of range length as 0 length!
+                     lLen = 0;
+                  }
+               }
+
                if( lLen > liLen - lPos )
+               {
                   lLen = liLen - lPos;
+               }
             }
             else
             {
                hb_errRT_BASE_SubstR( EG_ARG, 1110, NULL, "SUBSTR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
-               /* NOTE: Exit from inside [vszakats] */
                return;
             }
          }
          else
+         {
             lLen = liLen - lPos;
+         }
 
          if( lLen > 0 )
+         {
             hb_retclen( hb_itemGetCPtr( pText ) + lPos, lLen );
+         }
          else
+         {
             hb_retc( "" );
+         }
       }
       else
+      {
          hb_retc( "" );
+      }
 
       return;
    }
