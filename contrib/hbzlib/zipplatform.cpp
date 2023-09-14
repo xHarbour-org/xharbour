@@ -43,6 +43,9 @@ const TCHAR CZipPathComponent::m_cSeparator = _T( '\\' );
 #define _UTIMBUF_DEFINED
 #endif
 
+#if ( defined( __BORLANDC__ ) && __BORLANDC__ >= 1888 )
+#define _UTIMBUF_DEFINED
+#endif
 
 #ifndef _UTIMBUF_DEFINED
 #define _utimbuf utimbuf
