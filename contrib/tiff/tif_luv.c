@@ -24,6 +24,10 @@
  * OF THIS SOFTWARE.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
 #include "tiffiop.h"
 #ifdef LOGLUV_SUPPORT
 
@@ -146,10 +150,6 @@
  * SGILOGENCODE_RANDITHER for COMPRESSION_SGILOG24 to turn
  * quantization errors into noise.
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 
 /*
  * State block for each open TIFF
