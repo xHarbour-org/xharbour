@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-09-14 21:52 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbzlib\zipplatform.cpp
+    ! fixed SetFileModTime() to work fine with BCC 7.60 32-bit and 64-bit
+
 2023-09-14 11:53 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
     ! Fixed compilation with BCC 7.60 64-bit
