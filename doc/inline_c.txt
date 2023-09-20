@@ -97,7 +97,7 @@ Here is a summary of findings, limitations, and specifications with regard to in
  *      ...
  *      [#PRAGMA ENDDUMP]|EOF
  *      
- *      The transition from Harbour to C* occurs when encountering the FIRST NewLine token, at the end of the #pragme BEGINDUMP directive line. The transition from C* back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line containing a #pragma STOPDUMP directive, or at the EOF.
+ *      The transition from Harbour to C* occurs when encountering the FIRST NewLine token, at the end of the #pragme BEGINDUMP directive line. The transition from C* back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line containing a #pragma ENDDUMP directive, or at the EOF.
  *      
  *      There may be any number of lines in such C* block. Any legal C* syntax including #directives, and any number of nested balanced {} is allowed.
  *      

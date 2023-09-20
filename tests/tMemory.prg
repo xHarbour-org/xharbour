@@ -27,7 +27,7 @@ Function Memory( n )
    #ifdef __HARBOUR__
       #pragma BEGINDUMP
          #include "windows.h"
-      #pragma STOPDUMP
+      #pragma ENDDUMP
 
       nRetu := HB_INLINE( n )
       {
