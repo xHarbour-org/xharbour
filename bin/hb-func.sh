@@ -72,7 +72,7 @@ mk_hbgetlibs()
         then
             libs="$libs gtwin"
         fi
-        echo "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfnsx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler"
+        echo "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfnsx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gttrm zlib $libs gtwvt gtgui gtdos gtos2 tip ct cgi hbodbc debug profiler debug"
     else
         echo "$@"
     fi

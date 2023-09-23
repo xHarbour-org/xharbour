@@ -7,6 +7,11 @@
    For example:
    2004-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2023-09-14 10:50 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
+  ! source/sqlsrodbc.c
+    ! adjust to odbcGetData to properly return nvarchar and sql_guid field types 
+
+
 2023-09-06 11:45 UTC-0300 Luiz Rafael Culik <culikr/at/gmail.com>
   ! source/sqlpgs.prg
     | Small adjusts to detech new Postgresql Version 

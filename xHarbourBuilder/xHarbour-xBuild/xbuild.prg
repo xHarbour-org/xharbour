@@ -23,8 +23,12 @@
 
 #define _BUILD_ "4.7"
 //#define d_Debug
-
+#ifndef __PLATFORM__Windows
+FUNCTION Main( ... )
+#else
 FUNCTION xBuildMain( ... )
+#endif
+
 
    LOCAL aParams := HB_aParams(), oProject, cTarget, nAt, cParam, cArgument, aTokens
    LOCAL BCC, CLANG, GCC, MINGW, POCC, TCC, VC, XCC, xHB_Root, xHB_LibFolder, XHB_Exe, xHB_IncFolder, cLibFolders, cIncludeFolders
@@ -33,7 +37,7 @@ FUNCTION xBuildMain( ... )
    LOCAL cDefaultFolder, cPRG_OutputFolder, cC_OutputFolder, cRC_OutputFolder
    LOCAL bErrorHandler, bProgress := { |Module| OutStd( DiskName() + DRIVE_SEPARATOR + DIR_SEPARATOR + CurDir() + DIR_SEPARATOR + Module:Project:cFile + "->" + Module:cFile + EOL ) }
    LOCAL lShowErrors := .T., oErr, bDefaultHandler := { |e| Break(e) }, lExpand := .F., lXbp := .T., lNew := .F., lNoAutoFWH := .F.
-   LOCAL nIndex, lDebug := .F., cTargetFolder := "", lGUI := .F., lWizard := .F., lMT := .F., lUseDLL := .F.
+   LOCAL nIndex, lDebug := .F., cTargetFolder := "", lGUI := .F., lWizard := .F., lMT := .F., lUseDLL := .F.,lFullStatic:=.f.
    LOCAL cFile, cWorkFolder, cCurrentFolder
    LOCAL lPRG_Debug := .F., lPRG_ClassicDebug := .F.
    LOCAL cIni
@@ -236,6 +240,15 @@ FUNCTION xBuildMain( ... )
                   AddEnvVar( aTokens[1], aTokens[2] )
                ELSEIF Lower( cArgument ) == "xpand"
                   lExpand := .T.
+               ELSE
+                  Throw( ErrorNew( "xBuild", 0, 1001, "Command Processor", "Arguments() - unsupported switch: " + cParam, aParams ) )
+               ENDIF
+               EXIT
+
+            CASE 'f'
+            CASE 'F'
+               IF Lower( cArgument ) == "ullstatic"
+                  lFullStatic := .T.
                ELSE
                   Throw( ErrorNew( "xBuild", 0, 1001, "Command Processor", "Arguments() - unsupported switch: " + cParam, aParams ) )
                ENDIF
@@ -643,6 +656,10 @@ FUNCTION xBuildMain( ... )
    IF lUseDLL
       oProject:lUseDLL := .T.
    ENDIF
+   
+   if lFullStatic 
+      oProject:lFullStatic  := .t.
+   endif      
 
    IF BCC != NIL
       oProject:Set_BCC( IIF( BCC == "?", NIL, BCC ), C_Flags )

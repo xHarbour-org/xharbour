@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-08-20 17:30 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
+  + buildxbuilder.sh
+    ! shell script to build xharbour/contribs/xbuild and sqlrdd under linux
+  + xHarbourBuilder/Makefile
+  + xHarbourBuilder/xHarbour-SQLRDD/Makefile
+  + xHarbourBuilder/xHarbour-SQLRDD/Include/Makefile
+  + xHarbourBuilder/xHarbour-SQLRDD/source/Makefile
+  + xHarbourBuilder/xHarbour-xBuild/Makefile
+    + *unix makefile
+ ! xHarbourBuilder/xHarbour-xBuild/xbuild.prg 
+   ! added new option -fullstatic for *nix to force link os linux static libraries ( .a libraries) 
+ ! xHarbourBuilder/xHarbour-xBuild/tproject.prg 
+   ! added support for new -fullstatic under *nix  and adjust libraries names for linking under *nix
+
 2023-09-20 10:02 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * doc/inline_c.txt
   * tests/tMemory.prg

@@ -586,7 +586,11 @@ METHOD C_Command() CLASS TMakeObject
    // Linux only? Assumed same on Windows
    IF ::Project:lX // ( ::Project:C_Executable IN "gcc;clang;tcc" ) .AND. ::Project:xHB_RootX == "/opt/harbour/"
       cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
+      #ifdef __PLATFORM__Windows
       cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
+      #else
+      cCommand += '-I"' + s_sHB_IncFolder +'" '
+      #endif
    ELSE
       cCommand += '-I"' + ::Project:xHB_RootX + 'include" '
    ENDIF
@@ -710,7 +714,11 @@ METHOD xHB_Command() CLASS TMakeObject
       ENDIF
    #else
      IF ::Project:lX
+     #ifdef __PLATFORM__Windows
         cCommand += '-I"' + ::Project:xHB_RootX + 'include/xbuilder" '
+     #else
+     cCommand += '-I"' + s_sHB_IncFolder +'" '
+     #endif
      ELSE
         cCommand += '-I"' + ::Project:xHB_RootX + 'include/harbour" '
         cCommand += '-I"' + ::Project:xHB_RootX + 'contrib/xhb" '
@@ -1196,9 +1204,9 @@ METHOD Reset() CLASS TMakeObject
                          #else
                             ::Project:Auto_Libs += "libsqlrdd.a "
                             IF ::Project:lUseDll
-                               ::Project:Auto_Libs += "libodbc.so "
+                               ::Project:c_libs += " -lodbc "
                             ELSE
-                               ::Project:Auto_Libs += "libodbc.a "
+                               ::Project:c_Libs += " -lodbc "
                             ENDIF
                          #endif
                       ENDIF
@@ -1656,6 +1664,7 @@ CLASS TMakeProject FROM TMakeObject //MODULE FRIENDLY
    VAR lDebug            INIT .F.      PERSISTENT
    VAR lMT               INIT .F.      PERSISTENT
    VAR lUseDLL           INIT .F.      PERSISTENT
+   VAR lFullStatic       INIT .F.      PERSISTENT
    VAR lPRG_Debug        INIT .F.      PERSISTENT
    VAR lPRG_ClassicDebug INIT .F.      PERSISTENT
 
@@ -1691,16 +1700,16 @@ CLASS TMakeProject FROM TMakeObject //MODULE FRIENDLY
 
    VAR MIN_Libs      INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib nulsys.lib debug.lib pcrepos.lib zlib.lib "                                                                                                    READONLY
    VAR ST_Libs       INIT "vm.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib rdd.lib dbfntx.lib dbfnsx.lib dbfcdx.lib dbffpt.lib debug.lib pcrepos.lib hsx.lib hbsix.lib ct.lib zlib.lib codepage.lib "                     READONLY
-   VAR MT_Libs       INIT "vmmt.lib rtlmt.lib macro.lib ppmt.lib common.lib lang.lib gtwin.lib rddmt.lib dbfnsxmt.lib dbfntxmt.lib dbfcdxmt.lib dbffptmt.lib debug.lib pcrepos.lib hsxmt.lib hbsixmt.lib ct.lib zlib.lib codepage.lib " READONLY
+   VAR MT_Libs       INIT "vmmt.lib rtl.lib macro.lib pp.lib common.lib lang.lib gtwin.lib rdd.lib dbfnsx.lib dbfntx.lib dbfcdx.lib dbffpt.lib debug.lib pcrepos.lib hsx.lib hbsix.lib ct.lib zlib.lib codepage.lib " READONLY
 
 #ifdef __PLATFORM__Windows
    VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtwin -lnulsys -ldebug"                                       READONLY
    VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtwin -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug"               READONLY
-   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtwin -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" READONLY
+   VAR MTG_Libs       INIT "-lvmmt -lrtl -llang -lrtl -lvmmt -lmacro -lpp -lcommon -lcodepage -lgtwin -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug" READONLY
 #else
    VAR MING_Libs      INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtcrs -lnulsys -ldebug"                                       READONLY
-   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgtcrs -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug"              READONLY
-   VAR MTG_Libs       INIT "-lvmmt -lrtlmt -llang -lrtlmt -lvmmt -lmacromt -lppmt -lcommon -lcodepage -lgtcrs -lrddmt -ldbfnsxmt -ldbfntxmt -ldbfcdxmt -ldebug" READONLY
+   VAR STG_Libs       INIT "-lvm -lrtl -llang -lrdd -lmacro -lpp -lcommon -lcodepage -lgttrm -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldbffpt -lhbsix -lpcrepos -ldebug"              READONLY
+   VAR MTG_Libs       INIT "-lvmmt -lrtl -llang -lrtl -lvmmt -lmacro -lpp -lcommon -lcodepage -lgttrm -lrdd -ldbfnsx -ldbfntx -ldbfcdx -ldebug -ldbffpt -lhbsix -lpcrepos" READONLY
 #endif
 
    VAR GUI_Libs      INIT ""           READONLY
@@ -3723,7 +3732,11 @@ METHOD EXE_Command() CLASS TMakeProject
       cCommand += StrTran( Self:ResList(), ",", " " )
 
       IF ::Project:lX
+         #ifdef __PLATFORM__Windows
          cCommand += "-Wl, --start-group " + IIF( ::lUseDll, "use_dll.lib ", "" ) + StrTran( Self:LibList(), ",", " " ) + "-Wl, --end-group"
+         #else
+         cCommand += "-Wl,--start-group " +  StrTran( Self:LibList(), ",", " " ) + "-Wl,--end-group"
+         #endif 
       ELSE
          cCommand += + StrTran( Self:LibList(), ",", " " )
       ENDIF
@@ -4067,7 +4080,7 @@ RETURN cList
 #endif
 
 METHOD ValidateSettings() CLASS TMakeProject
-      LOCAL nAt
+      
 
    IF Empty( ::xHB_Executable ) .OR. Empty(::xHB_Root )
       ::Set_xHB( s_sHB_Folder, , s_sHB_LibFolder, s_sHB_Exe, s_sHB_IncFolder )
@@ -5367,8 +5380,14 @@ INIT PROCEDURE InitTProject
       ELSEIF File("/usr/bin/xhb")
          s_sHB_Exe       := "xhb"      
          s_sHB_Folder    := "/usr/"
-         s_sHB_LibFolder := s_sHB_Folder + "lib/"
-         s_sHB_IncFolder := s_sHB_Folder + "include/"
+		 IF File(s_sHB_Folder+"lib/xbuilder/librtl.a")
+            s_sHB_LibFolder := s_sHB_Folder + "lib/xbuilder/"
+            s_sHB_IncFolder := s_sHB_Folder + "include/xbuilder/"
+         ELSEIF File(s_sHB_Folder+"lib64/xbuilder/librtl.a")
+            s_sHB_LibFolder := s_sHB_Folder + "lib64/xbuilder/"
+            s_sHB_IncFolder := s_sHB_Folder + "include/xbuilder/"
+         ENDIF
+		 
          s_lX            := .T.
       ELSEIF File( "/usr/local/bin/harbour" )
          s_sHB_Exe       := "xhb"      
@@ -5378,8 +5397,16 @@ INIT PROCEDURE InitTProject
       ELSEIF File( "/usr/bin/harbour" )
          s_sHB_Exe       := "harbour"      
          s_sHB_Folder    := "/usr/"
+         IF File(s_sHB_Folder+"lib/xharbour/librtl.a")
+            s_sHB_LibFolder := s_sHB_Folder + "lib/xharbour/"
+            s_sHB_IncFolder := s_sHB_Folder + "include/xharbour/"
+         ELSEIF File(s_sHB_Folder+"lib64/xharbour/librtl.a")
+            s_sHB_LibFolder := s_sHB_Folder + "lib64/xharbour/"
+            s_sHB_IncFolder := s_sHB_Folder + "include/xharbour/"
+         ELSE 
          s_sHB_LibFolder := s_sHB_Folder + "lib/harbour/"
          s_sHB_IncFolder := s_sHB_Folder + "include/harbour/"
+         ENDIF
          s_lX            := IIF( File( s_sHB_IncFolder + "hbvmpub.h" ), .F., .T. )
       ELSEIF File( "/opt/harbour/bin/harbour" )
          s_sHB_Exe       := "harbour"      
