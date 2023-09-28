@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2023-08-20 17:30 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
+2023-09-20 17:30 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
   + buildxbuilder.sh
     ! shell script to build xharbour/contribs/xbuild and sqlrdd under linux
   + xHarbourBuilder/Makefile
