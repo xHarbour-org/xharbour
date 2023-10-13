@@ -2066,11 +2066,11 @@ CLASS TMakeProject FROM TMakeObject //MODULE FRIENDLY
                                                          ::C_OutputFlag := "-o ", ;
                                                          ::Link_LibFolderFlag := "-L ", ;
                                                          ::Link_OutputFlag := "-o", ;
-                                                         ::C_Libs := " -lpthread -lgpm -lncurses -lm -lslang ", ;
+                                                         ::C_Libs := " -lpthread -lm ", ;
                                                          ::Lib_Flags := "cru ", ;
                                                          ::Lib_OutputFlag := " ", ;
                                                          ::Lib_AddFlag := " ", ;
-                                                         ::DefaultLINK_Flags := IIF(::Project:lUseDLL == .F., " --static -lgtcrs", "" ), ;
+                                                         ::DefaultLINK_Flags := IIF( ::Project:lFullStatic == .T., " --static -lgtcrs -Wl,--noinhibit-exec", " -Wl,--noinhibit-exec" ), ;
                                                          ::MyLink_Flags := IIF( Empty( Link_Flags ), "", Link_Flags ), ;
                                                          ::LINK_DebugFlags := " ", ;
                                                          ::DLL_Flags := " ", ;

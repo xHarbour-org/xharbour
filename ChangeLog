@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-10-13 11:00 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
+  ! buildxbuilder.sh
+    !updated to not build gtcrs and gtsln
+  ! xHarbourBuilder/xHarbour-xBuild/tproject.prg 
+    ! updated to not link by default -lncurses -lslang and -lgpm under linux
+  ! contrib/hbzlib/Include/zipcollections.h
+    ! update to compile under gcc>= 4
+
 2023-09-20 17:30 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
   + buildxbuilder.sh
     ! shell script to build xharbour/contribs/xbuild and sqlrdd under linux

@@ -16,13 +16,18 @@ export HB_WITHOUT_X11=yes
 export HB_PREFIX_INSTALL=/usr
 export PREFIX=/usr 
 
+export HB_WITHOUT_GTCRS=yes
+
+export HB_COMMERCE=no
+export HB_WITHOUT_GTSLN=yes
+
 
 #packagesNeeded='curl jq'
 if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
 elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
 elif [ -x "$(command -v dnf)" ];     then sudo dnf install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v zypper)" ];  then sudo zypper install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
-elif [ -x "$(command -v yum)" ];  then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
+elif [ -x "$(command -v yum)" ];  then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel libnsl2-devel libnsl
 else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
 
 
