@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-10-23 22:34 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * make_drw.sh
+    * Improved to use dynamicly extract from brew the path for zlib and and openssl
+  * make_macosx.sh
+    * Modified to source ./make_drw.sh
+
 2023-10-13 11:00 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
   ! buildxbuilder.sh
     !updated to not build gtcrs and gtsln
