@@ -20,13 +20,13 @@
 # export HB_ARCHITECTURE="linux"
 # export HB_COMPILER="gcc"
 ifeq ("${HB_BIN_INSTALL}","")
-  export HB_BIN_INSTALL="/usr/bin"
+  export HB_BIN_INSTALL="/usr/local/bin"
 endif
 ifeq ("${HB_INC_INSTALL}","")
-  export HB_INC_INSTALL="/usr/include/xharbour"
+  export HB_INC_INSTALL="/usr/local/include/xharbour"
 endif
 ifeq ("${HB_LIB_INSTALL}","")
-  export HB_LIB_INSTALL="/usr/lib/xharbour"
+  export HB_LIB_INSTALL="/usr/local/lib/xharbour"
 endif  
 
 ifeq (${HB_COMPILER},gpp)
