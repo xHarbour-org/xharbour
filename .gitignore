@@ -45,6 +45,36 @@ utils/*/darwin/*
 utils/*/linux/*
 utils/*/unix/*
 
+contrib/*/windows/*
+contrib/*/win/*
+contrib/*/darwin/*
+contrib/*/linux/*
+contrib/*/unix/*
+
+contrib/xwt/src/windows/*
+contrib/xwt/src/win/*
+contrib/xwt/src/darwin/*
+contrib/xwt/src/linux/*
+contrib/xwt/src/unix/*
+
+contrib/xwt/test/windows/*
+contrib/xwt/test/win/*
+contrib/xwt/test/darwin/*
+contrib/xwt/test/linux/*
+contrib/xwt/test/unix/*
+
+xHarbourBuilder/*/windows/*
+xHarbourBuilder/*/win/*
+xHarbourBuilder/*/darwin/*
+xHarbourBuilder/*/linux/*
+xHarbourBuilder/*/unix/*
+
+xHarbourBuilder/*/source/windows/*
+xHarbourBuilder/*/source/win/*
+xHarbourBuilder/*/source/darwin/*
+xHarbourBuilder/*/source/linux/*
+xHarbourBuilder/*/source/unix/*
+
 tests/*.c
 
 bin/data/*

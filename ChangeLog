@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-10-26 22:00 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * .gitignore
+    + Added contrib generated files
+  * buildxbuilder.sh
+    Linux: /usr -> /usr/local  
+  * contrib/Makefile
+    + Added gd to DIRS
+
 2023-10-23 22:34 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * make_drw.sh
     * Improved to use dynamicly extract from brew the path for zlib and and openssl

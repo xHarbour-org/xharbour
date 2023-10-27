@@ -124,7 +124,7 @@ case "$HB_ARCHITECTURE" in
         ETC="/private/etc"
         ;;
     linux)
-        [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
+        [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && [ "${HB_ARCH64}" = yes ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
         ;;

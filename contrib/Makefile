@@ -31,6 +31,7 @@ DIRS=\
 else
 
 DIRS=\
+	gd \
 	hbzlib \
 	libnf \
 	xwt \
