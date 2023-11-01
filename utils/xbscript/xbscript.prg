@@ -210,6 +210,8 @@
          REQUEST ZipCreate
          REQUEST RMDBFCDX
       #endif
+   #else
+      #include "hbcompat.ch"
    #endif
 
    #ifndef NO_BOOST
