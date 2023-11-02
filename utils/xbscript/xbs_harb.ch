@@ -1481,8 +1481,10 @@
     #endif
 
     #idef __HARBOUR__
-      #pragma BEGINDUMP
-         #define HB_LEGACY_TYPES_ON
+      #ifndef __XHARBOUR__
+         #pragma BEGINDUMP
+            #define HB_LEGACY_TYPES_ON
+         #endif
       #pragma ENDDUMP
     #endif
 
