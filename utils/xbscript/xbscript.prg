@@ -29,7 +29,9 @@
  *
  */
 
-#pragma w2
+#ifdef __XHARBOUR__
+   #pragma w2
+#endif
 
 #include "error.ch"
 
