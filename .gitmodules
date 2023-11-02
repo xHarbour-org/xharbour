@@ -1,0 +1,3 @@
+[submodule "utils/xbscript"]
+	path = utils/xbscript
+	url = https://github.com/ronpinkas/xbScript.git
