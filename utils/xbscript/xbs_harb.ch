@@ -1480,6 +1480,12 @@
       #pragma ENDDUMP
     #endif
 
+    #idef __HARBOUR__
+      #pragma BEGINDUMP
+         #define HB_LEGACY_TYPES_ON
+      #pragma ENDDUMP
+    #endif
+
     #pragma BEGINDUMP
 
       #include <ctype.h>
