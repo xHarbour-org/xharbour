@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-02 13:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   - utils/xbscript
+     - Removed utils/xbscript directory and replaced it with a link
+       to a stand alone repository of xbScript as a submodule. 
+   
+   Instructions for Existing Clones:
+    1. Pull Latest Changes: First, git pull
+    2. Ensure the old utils/xbscript directory is completley removed since it likely had a sub folder for you platform
+    3. Now, you can initialize and fetch the content of the submodule:
+        git submodule update --init --recursive 
+        
+  Instructions for New Clones - ADD the git flag --recurse-submodules as follows:  
+    git clone --recurse-submodules https://github.com/xHarbour-org/xharbour.git
+
 2023-11-01 22:02 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * utils/xbscript/xbs_harb.ch
      * Corrected typo #idef -> #ifdef
