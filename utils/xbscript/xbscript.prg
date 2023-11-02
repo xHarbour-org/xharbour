@@ -3297,11 +3297,10 @@ RETURN
   PROCEDURE ParseLine( sLine, nLine, nProcID, aProcedures, aInitExit )
 
      LOCAL sSymbol
-     LOCAL nAt, nPos, cChr
+     LOCAL nAt
      LOCAL nJumps, nJump
      LOCAL sCounter, sStart, sEnd, sStep
      LOCAL sEnumerator, sEnumeration
-     LOCAL cPCode
 
      IF sLine = "PP_PROC"
 
