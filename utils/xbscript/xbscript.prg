@@ -2629,10 +2629,21 @@ RETURN
 
 #else
 
-   //--------------------------------------------------------------//
+  //--------------------------------------------------------------//
+  #ifdef __HARBOUR__
+     #ifndef __XHARBOUR__
+        #xuntranslate THROW( =>
+     #endif
+  #endif
 
-    FUNCTION Throw( xVal )
+  FUNCTION Throw( xVal )
 
+  #ifdef __HARBOUR__
+     #ifndef __XHARBOUR__
+        #xtranslate Throw( <oErr> ) => ( Eval( ErrorBlock(), <oErr> ), Break( <oErr> ) )
+     #endif
+  #endif
+  
        IF Empty( s_aProc )
           Eval( ErrorBlock(), xVal )
           // Safety

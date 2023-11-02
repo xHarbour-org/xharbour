@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-01 19:45 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * utils/xbscript/xbscript.prg
+     + Added: #xuntranslate THROW before FUNCTION Throw() and restore the #xtranslate after to fix Harbour compilation
+
 2023-11-01 15:24 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * utils/xbscript/xbscript.prg
      + Added: #include "hbcompat.ch" when compiled under Harbour
