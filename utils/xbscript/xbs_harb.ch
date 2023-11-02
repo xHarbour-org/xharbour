@@ -1484,8 +1484,8 @@
       #ifndef __XHARBOUR__
          #pragma BEGINDUMP
             #define HB_LEGACY_TYPES_ON
-         #endif
-      #pragma ENDDUMP
+         #pragma ENDDUMP
+      #endif
     #endif
 
     #pragma BEGINDUMP
