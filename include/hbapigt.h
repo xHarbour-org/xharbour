@@ -95,7 +95,7 @@ HB_EXTERN_BEGIN
 
 
 /* strings for borders (same as box.ch, but defined for use by C) */
-
+#if 0
 /* Note. This part will never be used, but is being kept in the source,
          so that if you use code page 437, you can see what the line
          draw characters are supposed to look like.
@@ -109,6 +109,8 @@ HB_EXTERN_BEGIN
 #define HB_B_DOUBLE_V          'º'
 #define HB_B_DOUBLE_H          'Í'
 */
+#endif
+
 #define _B_SINGLE              "\xDA\xC4\xBF\xB3\xD9\xC4\xC0\xB3"
 #define _B_DOUBLE              "\xC9\xCD\xBB\xBA\xBC\xCD\xC8\xBA"
 #define _B_SINGLE_DOUBLE       "\xD6\xC4\xB7\xBA\xBD\xC4\xD3\xBA"
