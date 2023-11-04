@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cd6cefde5bc43775cace456615c318fccd617e1d $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2023-11-04 11:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * make_gc.bat
+  * make_gc64.bat
+  * winmake\makefile.gc
+    ! fixed compilation with MinGW 32-bit and 64-bit
 
 2023-11-03 00:16 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
    * include/hbapigt.h
@@ -1177,7 +1183,7 @@
 
 2017-09-02 23:08 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbhpdf/harupdf.c
-    ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Sim�es Filho)
+    ! added setting date.ind to space in function HPDF_SETINFODATEATTR (many thanks to Mario Simï¿½es Filho)
 
 2017-08-27 00:33 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/tipssl/client.prg
@@ -2284,7 +2290,7 @@
 2015-01-29 08:25 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * contrib/hbsqlit3/xhbsqlite3.c
     + add function HB_FUNC( SQLITE3_LOAD_EXTENSION )
-      addendum by C�sar Lozada
+      addendum by Cï¿½sar Lozada
 
 2015-01-14 14:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/rtl/pcre/config.generic.h
@@ -3136,7 +3142,7 @@
 
 2014-05-19 13:55 UTC+0200 Saulius Zrelskis <labitas/AT/gmail/com>
   * source/tip/encoding/base64.c
-    ! fixed memory leak & bug reported by Mario Sim�es Filho
+    ! fixed memory leak & bug reported by Mario Simï¿½es Filho
 
 2014-05-10 13:50 UTC-300 Luiz Rafael Culik <luiz/AT/xharbour/com/br>
   * source/rtl/win_misc.c
@@ -10578,7 +10584,7 @@
      ! Minox Fix im compilation under linux
 
 2011-12-15 10:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
-   * source/t�p/sendmail.prg
+   * source/tï¿½p/sendmail.prg
      ! fixed Disposition-Notification-To field
 
 2011-11-27 22:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
@@ -17655,4 +17661,3 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
-   
