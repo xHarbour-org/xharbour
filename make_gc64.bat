@@ -1,7 +1,7 @@
 @echo off
 rem ============================================================================
 rem
-rem $Id: make_gc.bat 10057 2014-12-01 23:01:42Z lculik $
+rem $Id$
 rem
 rem FILE: make_gc.bat
 rem BATCH FILE FOR MINGW32
@@ -11,7 +11,6 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-rem uncomment HB_ARCH to compile under Win64
 SET HB_ARCH=64
 REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
@@ -27,7 +26,7 @@ REM SET HB_DIR_CURL=
 REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
-set HB_ARCHITECTURE=w32
+SET HB_ARCHITECTURE=w64
 IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGw64
 IF "%SUB_DIR%"=="" SET SUB_DIR=gc64
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
@@ -43,8 +42,7 @@ rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET DIR_SEP=/
-if %HB_ARCHITECTURE%.==w32. SET DIR_SEP=\
+SET DIR_SEP=\
 SET OBJEXT=%HB_ARCH%%HB_DEBUG%.o
 SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
 SET LIBPREFIX=lib
@@ -118,6 +116,7 @@ rem=============================================================================
    SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=%DIR_SEP%dll
+   SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
    mingw32-make.exe -f winmake\makefile.gc  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
