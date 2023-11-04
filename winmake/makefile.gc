@@ -14,15 +14,9 @@ RESEXT=.o
 RC    =windres
 CC    =GCC
 CCP   =G++
-ifeq ($(HB_ARCHITECTURE),w32)
 TYPE  =type
 DEL   =$(HBRM_EXE)
 COPY  =copy
-else
-TYPE  =cat
-DEL   =RM -f
-COPY  =cp
-endif
 
 ifneq ($(NO_CYGWIN),1)
 NOCYGWIN  =-mno-cygwin
