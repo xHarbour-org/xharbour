@@ -1,5 +1,5 @@
 /*
- * $Id: cd6cefde5bc43775cace456615c318fccd617e1d $
+ * $Id$
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-04 12:26 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+   * xbscript.prg
+   * xbs_harb.ch
+     ! Guard DESTRUCTOR Finalize with #ifndef __CONCILE_PCODE__ to avoid duplicate release!
+     ! Fixed PP_Cleanup() to release Dynamic Procedures in reverse order!
+     
 2023-11-04 11:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_gc.bat
   * make_gc64.bat
