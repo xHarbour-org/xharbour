@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-07 16:28 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.bc
+    ! fixed compilation warning flags of hbzip library with BCC64
+
 2023-11-07 11:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\common1.mak
     ! fixed compilation of curl contrib library
