@@ -18,15 +18,15 @@ CC        =bcc64
 LINKEXE   =ilink64
 LIBEXE    =tlib64
 IMPLIBEXE =MKEXP
+OPTFLAGS=-q -d -fpack-struct=8
 !else
 ACE_LIB   =$(ACE32_LIB)
 CC        =BCC32
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
 IMPLIBEXE =IMPLIB
-!endif
-
 OPTFLAGS=-q -d -a8
+!endif
 
 !if ( ( ("$(HB_CG32)"=="1") || ("$(HB_DEBUG)"=="d") ) && !defined( HB_OS_WIN_64 ) )
 COMPILERLIBS=\
@@ -226,7 +226,7 @@ CC_CMD_HARBOUR =$(CC) -c -tWM -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) 
 CCC_CMD        =$(CC_CMD)
 
 !if ("$(HB_ARCH)"=="64")
-CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -R- $(OPTFLAGS) -X- -o$@ $**
+CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" $(OPTFLAGS) -Wno-user-defined-literals -Wno-unused-value -Wno-tautological-compare -Wno-int-to-void-pointer-cast -o$@ $**
 !else
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi -R- -H- $(OPTFLAGS) -w- -X- -o$@ $**
 !endif
