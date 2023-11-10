@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-10 17:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * make_vc.bat
+    ! Change the name of the SUB_DIR: vc32 and vc64 instead of vc
+
 2023-11-08 19:22 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbssl\pem.c
     ! fixed compilation with BCC64
