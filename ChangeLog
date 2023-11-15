@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: 83963d0b24fc600fcfea2b8d8d2c22222d1996a1 $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2023-11-15 13:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * make_bc.bat
+    ! Change end of line character from LF to CRLF to fix the wrong execution of GOTO statements
 
 2023-11-10 17:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_vc.bat
