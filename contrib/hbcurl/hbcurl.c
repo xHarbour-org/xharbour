@@ -206,7 +206,7 @@ static void * hb_curl_xgrab( size_t size )
 
 static void hb_curl_xfree( void * p )
 {
-   hb_xfree( p );
+   if ( p ) hb_xfree( p );
 }
 
 static void * hb_curl_xrealloc( void * p, size_t size )
