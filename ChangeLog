@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-11-19 11:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbcurl\hbcurl.c
+    ! Fixed hb_curl_xfree() to avoid error with null pointer
+
 2023-11-15 13:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_bc.bat
     ! Change end of line character from LF to CRLF to fix the wrong execution of GOTO statements
