@@ -147,7 +147,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT% copy lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%tiff%LIBEXT%     copy lib\%SUB_DIR%\%LIBPREFIX%tiff%LIBEXT%     lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%   copy lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%   lib >NUL
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      copy lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%      lib >NUL
-
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%  copy lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%   lib >NUL
 ECHO Done ...
 ECHO.
 goto EXIT
@@ -348,6 +348,7 @@ if exist lib\%LIBPREFIX%xwt%LIBEXT%                  del lib\%LIBPREFIX%xwt%LIBE
 if exist lib\%LIBPREFIX%zlib%LIBEXT%                 del lib\%LIBPREFIX%zlib%LIBEXT%
 if exist lib\%LIBPREFIX%*.bak                        del lib\%LIBPREFIX%*.bak
 if exist lib\%LIBPREFIX%*%OBJEXT%                    del lib\%LIBPREFIX%*%OBJEXT%
+if exist lib\%LIBPREFIX%hbzebra%LIBEXT%               del lib\%LIBPREFIX%hbzebra%LIBEXT%
 
 if exist bin\*%HB_DEBUG%.tds                         del bin\*%HB_DEBUG%.tds
 if exist bin\*%HB_DEBUG%.map                         del bin\*%HB_DEBUG%.map
@@ -601,6 +602,7 @@ if exist lib\%SUB_DIR%\%LIBPREFIX%telepath%LIBEXT%  del lib\%SUB_DIR%\%LIBPREFIX
 if exist lib\%SUB_DIR%\%LIBPREFIX%tiff%LIBEXT%      del lib\%SUB_DIR%\%LIBPREFIX%tiff%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%tipssl%LIBEXT%
 if exist lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%       del lib\%SUB_DIR%\%LIBPREFIX%xwt%LIBEXT%
+if exist lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%    del lib\%SUB_DIR%\%LIBPREFIX%hbzebra%LIBEXT%
 
 IF EXIST make_%SUB_DIR%.log                         del make_%SUB_DIR%.log
 IF EXIST dll_%SUB_DIR%.log                          del dll_%SUB_DIR%.log

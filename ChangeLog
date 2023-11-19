@@ -1,5 +1,5 @@
 /*
- * $Id: 83963d0b24fc600fcfea2b8d8d2c22222d1996a1 $
+ * $Id$
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2023-11-19 17:25 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
+  ! winmake\common.mak
+  ! winmake\common1.mak
+  ! winmake\compile.mak
+  ! winmake\mdir.bat
+    + Support to build hbzebra
+	
 2023-11-19 11:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbcurl\hbcurl.c
     ! fixed hb_curl_xfree() to avoid error with null pointer

@@ -1468,7 +1468,7 @@ $(OBJ_DIR)$(DIR_SEP)code39$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code39.c
 $(OBJ_DIR)$(DIR_SEP)code93$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)code93.c
 	$(CC_CMD)
 
-$(OBJ_DIR)$(DIR_SEP)coreHBZEBRA$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)core.c
+$(OBJ_DIR)$(DIR_SEP)core$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)core.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)coredraw$(OBJEXT) : $(HBZEBRA_DIR)$(DIR_SEP)coredraw.c
@@ -6324,3 +6324,4 @@ $(OBJ_DIR)$(DIR_SEP)smtpcln1.c : $(TIPSSL_DIR)$(DIR_SEP)smtpcln.prg
 
 $(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)smtpcln1.c
 	$(CC_CMD)
+

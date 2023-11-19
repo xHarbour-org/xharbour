@@ -2480,6 +2480,25 @@ TIPSSL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT)
 
+
+#===============================================================================
+# HBZEBRA.LIB rules
+#===============================================================================
+HBZEBRA_LIB_OBJS=\
+	$(OBJ_DIR)$(DIR_SEP)codabar$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code11$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code128$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code39$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)code93$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)core$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)coredraw$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)datamtrx$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)eanupc$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)itf$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)msi$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)pdf417$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)qrcode$(OBJEXT)
+
 #===============================================================================
 # Build Target
 #===============================================================================
