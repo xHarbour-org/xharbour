@@ -73,7 +73,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~€
+      a~â‚¬
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,8 +84,8 @@
 
 static HB_CODEPAGE s_codepage = { "TRWIN",
     HB_CPID_1254,HB_UNITB_1254,NUMBER_OF_CHARACTERS,
-    "AÂBCÇDEÊFGÐHIÝÎJKLMNOÔÖPRSÞTUÛÜVYZ",
-    "aâbcçdeêfgðhýiîjklmnoôöprsþtuûüvyz",
+    "AÃ‚BCÃ‡DEÃŠFGGHIIÃŽJKLMNOÃ”Ã–PRSSTUÃ›ÃœVYZ",
+    "aÃ¢bcÃ§deÃªfgghiiÃ®jklmnoÃ´Ã¶prsstuÃ»Ã¼vyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 #define HB_CP_ID TRWIN
