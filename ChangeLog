@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-13 22:36 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source/pp/ppgen.c
+    ! Fixed hb_pp_parseChangelog() to support UTC+ as well as UTC- timezones
+    ! Fixed hb_pp_parseChangelog() to support /r/n as well as /n line endings
+    * Modified hb_pp_parseChangelog() to expect the UTC marker to be at position 17 instead of >= 17
+     
 2023-11-23 14:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\codepage\cptrwin.c
     ! fixed charset (borrowed from Harbour)

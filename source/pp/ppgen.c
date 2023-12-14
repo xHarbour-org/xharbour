@@ -726,9 +726,16 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
 
             //fprintf( stderr, "ChangeLog Git Hash: '%s'\n", szChangeLogGitHash );  
          }
-         else if( szChgLogDateID[0] == 0 && ( szUTC = strstr( szLine, "UTC-" ) ) != NULL && szUTC - szLine >= 17 )
+         else if( szChgLogDateID[0] == 0 && ( ( ( szUTC = strstr( szLine, "UTC-" ) ) != NULL ) || ( ( szUTC = strstr( szLine, "UTC+" ) ) != NULL ) ) && szUTC - szLine == 17 )
          {
-            hb_strncpy( szLastEntry, szLine, strlen(szLine) - 1 );
+            if( szLine[ strlen( szLine ) - 2 ] == '\r' )
+            {
+               hb_strncpy( szLastEntry, szLine, strlen( szLine ) - 2 );
+            }
+            else
+            {
+               hb_strncpy( szLastEntry, szLine, strlen( szLine ) - 1 );
+            }
 
             szChgLogDateID[0] = szLine[0];
             szChgLogDateID[1] = szLine[1];
