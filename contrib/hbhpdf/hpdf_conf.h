@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_conf.h
  *
  * URL: http://libharu.org
@@ -32,24 +29,6 @@
 #define __USE_XOPEN /* for M_PI */
 #endif /* __USE_XOPEN */
 #include <math.h>
-
-#if defined( __BORLANDC__ )
-   #pragma warn -aus
-   #pragma warn -ccc
-   #pragma warn -rch
-   #pragma warn -csu
-   #pragma warn -par
-#elif defined( __WATCOMC__ )
-   #pragma disable_message ( 136 )
-   #pragma disable_message ( 124 )
-   #pragma disable_message ( 202 )
-#elif defined( __POCC__ )
-   #pragma warn(push)
-   #pragma warn(disable:2130)
-   #pragma warn(disable:2154)
-   #pragma warn(disable:2135)
-   #pragma warn(disable:2231)   
-#endif
 
 /*----------------------------------------------------------------------------*/
 /*----- standard C library functions -----------------------------------------*/
@@ -99,8 +78,9 @@
 
 /* alignment size of memory-pool-object
  */
-#define HPDF_ALIGN_SIZ              sizeof int;
+#define HPDF_ALINMENT_SIZ              sizeof(int)
 
+#define G3CODES
 
 #endif /* _HPDF_CONF_H */
 

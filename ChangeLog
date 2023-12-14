@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-14 01:12 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * config/linux/gcc.cf
+    * Set USE_FPIC for aarch64
+     
+  * contrib/hbhpdf
+    * Updated to 2.4.4
+    * Makefile
+      + added missing source filesd and corrected sorting
+
 2023-12-13 22:36 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * source/pp/ppgen.c
     ! Fixed hb_pp_parseChangelog() to support UTC+ as well as UTC- timezones

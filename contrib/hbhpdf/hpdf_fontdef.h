@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_fontdef.h
  *
  * URL: http://libharu.org
@@ -111,7 +108,7 @@ typedef struct _HPDF_FontDef_Rec {
     HPDF_UINT16   cap_height;
 
     /*  the initial value of descriptor entry is NULL.
-     *  when first font-object besed on the fontdef object is created,
+     *  when first font-object based on the fontdef object is created,
      *  the font-descriptor object is created and descriptor entry is set.
      */
     HPDF_Dict                descriptor;
@@ -407,4 +404,3 @@ HPDF_CIDFontDef_ChangeStyle   (HPDF_FontDef    fontdef,
 #endif /* __cplusplus */
 
 #endif /* _HPDF_FONTDEF_H */
-

@@ -17,12 +17,14 @@
 
 
 #include "hpdf_conf.h"
+#include "hpdf_config.h"
 #include "hpdf_utils.h"
 #include "hpdf_encryptdict.h"
 #include "hpdf_namedict.h"
 #include "hpdf_destination.h"
 #include "hpdf_info.h"
 #include "hpdf_page_label.h"
+#include "hpdf_version.h"
 #include "hpdf.h"
 
 
@@ -121,6 +123,13 @@ HPDF_HasDoc  (HPDF_Doc  pdf)
         return HPDF_TRUE;
 }
 
+HPDF_EXPORT(HPDF_MMgr)
+HPDF_GetDocMMgr  (HPDF_Doc doc)
+{
+    HPDF_PTRACE ((" HPDF_GetDocMMgr\n"));
+
+    return doc->mmgr;
+}
 
 HPDF_EXPORT(HPDF_Doc)
 HPDF_New  (HPDF_Error_Handler    user_error_fn,
@@ -157,7 +166,7 @@ HPDF_NewEx  (HPDF_Error_Handler    user_error_fn,
     }
 
     /* now create pdf_doc object */
-    pdf = (HPDF_Doc)HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
+    pdf = HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
     if (!pdf) {
         HPDF_MMgr_Free (mmgr);
         HPDF_CheckError (&tmp_error);
@@ -497,6 +506,7 @@ HPDF_SetEncryptionMode  (HPDF_Doc           pdf,
             /* if encryption mode is specified revision-3, the version of
              * pdf file is set to 1.4
              */
+            if (pdf->pdf_version < HPDF_VER_14)
             pdf->pdf_version = HPDF_VER_14;
 
             if (key_len >= 5 && key_len <= 16)
@@ -577,7 +587,7 @@ HPDF_Doc_PrepareEncryption  (HPDF_Doc   pdf)
         return pdf->error.error_no;
 
     /* reset 'ID' to trailer-dictionary */
-    id = (HPDF_Array)HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
+    id = HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
     if (!id) {
         id = HPDF_Array_New (pdf->mmgr);
 
@@ -611,7 +621,7 @@ InternalSaveToStream  (HPDF_Doc      pdf,
     if ((ret = PrepareTrailer (pdf)) != HPDF_OK)
         return ret;
 
-    /* prepare encription */
+    /* prepare encryption */
     if (pdf->encrypt_on) {
         HPDF_Encrypt e= HPDF_EncryptDict_GetAttr (pdf->encrypt_dict);
 
@@ -788,7 +798,7 @@ HPDF_GetPageByIndex  (HPDF_Doc    pdf,
     if (!HPDF_HasDoc (pdf))
         return NULL;
 
-    ret = (HPDF_Page)HPDF_List_ItemAt (pdf->page_list, index);
+    ret = HPDF_List_ItemAt (pdf->page_list, index);
     if (!ret) {
         HPDF_RaiseError (&pdf->error, HPDF_INVALID_PAGE_INDEX, 0);
         return NULL;
@@ -2126,16 +2136,16 @@ HPDF_SetCompressionMode  (HPDF_Doc    pdf,
     if (mode != (mode & HPDF_COMP_MASK))
         return HPDF_RaiseError (&pdf->error, HPDF_INVALID_COMPRESSION_MODE, 0);
 
-#ifndef LIBHPDF_HAVE_NOZLIB
+#ifdef LIBHPDF_HAVE_ZLIB
     pdf->compression_mode = mode;
 
     return HPDF_OK;
 
-#else /* LIBHPDF_HAVE_NOZLIB */
+#else /* LIBHPDF_HAVE_ZLIB */
 
     return HPDF_INVALID_COMPRESSION_MODE;
 
-#endif /* LIBHPDF_HAVE_NOZLIB */
+#endif /* LIBHPDF_HAVE_ZLIB */
 }
 
 
@@ -2227,7 +2237,7 @@ HPDF_AddIntent(HPDF_Doc  pdf,
     if (!HPDF_HasDoc (pdf))
         return HPDF_INVALID_DOCUMENT;
 
-    intents = (HPDF_Array)HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
+    intents = HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
     if (intents == NULL) {
         intents = HPDF_Array_New (pdf->mmgr);
         if (intents) {

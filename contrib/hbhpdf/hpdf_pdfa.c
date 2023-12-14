@@ -15,7 +15,7 @@
  *
  */
 /* This is used to avoid warnings on 'ctime' when compiling in MSVC 9 */
-#if defined(_MSC_VER) && (_MSC_VER>=1400)
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
@@ -38,9 +38,9 @@
 #define XMP_CREATORTOOL_STARTTAG "<xmp:CreatorTool>"
 #define XMP_CREATORTOOL_ENDTAG   "</xmp:CreatorTool>"
 #define XMP_CREATE_DATE_STARTTAG "<xmp:CreateDate>"
-#define XMP_CREATE_DATE_ENDTAG "</xmp:CreateDate>"
-#define XMP_MOD_DATE_STARTTAG "<xmp:ModifyDate>"
-#define XMP_MOD_DATE_ENDTAG "</xmp:ModifyDate>"
+#define XMP_CREATE_DATE_ENDTAG   "</xmp:CreateDate>"
+#define XMP_MOD_DATE_STARTTAG    "<xmp:ModifyDate>"
+#define XMP_MOD_DATE_ENDTAG      "</xmp:ModifyDate>"
 #define XMP_FOOTER               "</rdf:Description>"
 #define PDF_HEADER               "<rdf:Description xmlns:pdf='http://ns.adobe.com/pdf/1.3/' rdf:about=''>"
 #define PDF_KEYWORDS_STARTTAG    "<pdf:Keywords>"
@@ -112,7 +112,7 @@ HPDF_STATUS ConvertDateToXMDate(HPDF_Stream stream, const char *pDate)
         return ret;
     pDate+=2;
     /* Write +... */
-    if(pDate[0]==0) {
+    if(pDate[0]==0 || pDate[0]=='Z') {
         ret = HPDF_Stream_Write(stream, (const HPDF_BYTE*)"Z", 1);
         return ret;
     }
@@ -127,7 +127,7 @@ HPDF_STATUS ConvertDateToXMDate(HPDF_Stream stream, const char *pDate)
         ret = HPDF_Stream_Write(stream, (const HPDF_BYTE*)pDate, 2);
         if (ret != HPDF_OK)
             return ret;
-        return ret;        
+        return ret;
     }
     return HPDF_SetError (stream->error, HPDF_INVALID_PARAMETER, 0);
 }
@@ -152,11 +152,11 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
     const char *pdf_Producer    = NULL;
 
     const char *info = NULL;
-    
+
     if (!HPDF_HasDoc(pdf)) {
       return HPDF_INVALID_DOCUMENT;
     }
-    
+
     dc_title       = (const char *)HPDF_GetInfoAttr(pdf, HPDF_INFO_TITLE);
     dc_creator     = (const char *)HPDF_GetInfoAttr(pdf, HPDF_INFO_AUTHOR);
     dc_description = (const char *)HPDF_GetInfoAttr(pdf, HPDF_INFO_SUBJECT);
@@ -172,24 +172,24 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
        || (xmp_CreateDate != NULL) || (xmp_ModifyDate != NULL) || (xmp_CreatorTool != NULL)
        || (pdf_Keywords != NULL)) {
 
-    xmp = HPDF_DictStream_New(pdf->mmgr,pdf->xref);
-    if (!xmp) {
-      return HPDF_INVALID_STREAM;
-    }
-    
+        xmp = HPDF_DictStream_New(pdf->mmgr,pdf->xref);
+        if (!xmp) {
+          return HPDF_INVALID_STREAM;
+        }
+
         /* Update the PDF number version */
         pdf->pdf_version = HPDF_VER_14;
 
-    HPDF_Dict_AddName(xmp,"Type","Metadata");
-    HPDF_Dict_AddName(xmp,"SubType","XML");
+        HPDF_Dict_AddName(xmp,"Type","Metadata");
+        HPDF_Dict_AddName(xmp,"Subtype","XML");
 
-    ret = HPDF_OK;
+        ret = HPDF_OK;
         ret += HPDF_Stream_WriteStr(xmp->stream, HEADER);
-    
+
         /* Add the dc block */
         if((dc_title != NULL) || (dc_creator != NULL) || (dc_description != NULL)) {
             ret += HPDF_Stream_WriteStr(xmp->stream, DC_HEADER);
-   
+
             if(dc_title != NULL) {
                 ret += HPDF_Stream_WriteStr(xmp->stream, DC_TITLE_STARTTAG);
                 ret += HPDF_Stream_WriteStr(xmp->stream, dc_title);
@@ -214,8 +214,8 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
         /* Add the xmp block */
         if((xmp_CreateDate != NULL) || (xmp_ModifyDate != NULL) || (xmp_CreatorTool != NULL)) {
             ret += HPDF_Stream_WriteStr(xmp->stream, XMP_HEADER);
-    
-    /* Add CreateDate, ModifyDate, and CreatorTool */
+
+            /* Add CreateDate, ModifyDate, and CreatorTool */
             if(xmp_CreatorTool != NULL) {
                 ret += HPDF_Stream_WriteStr(xmp->stream, XMP_CREATORTOOL_STARTTAG);
                 ret += HPDF_Stream_WriteStr(xmp->stream, xmp_CreatorTool);
@@ -223,16 +223,16 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
             }
 
             if(xmp_CreateDate != NULL) {
-    ret += HPDF_Stream_WriteStr(xmp->stream, XMP_CREATE_DATE_STARTTAG);    
-    /* Convert date to XMP compatible format */
+                ret += HPDF_Stream_WriteStr(xmp->stream, XMP_CREATE_DATE_STARTTAG);
+                /* Convert date to XMP compatible format */
                 ret += ConvertDateToXMDate(xmp->stream, xmp_CreateDate);
-    ret += HPDF_Stream_WriteStr(xmp->stream, XMP_CREATE_DATE_ENDTAG);
+                ret += HPDF_Stream_WriteStr(xmp->stream, XMP_CREATE_DATE_ENDTAG);
             }
-    
+
             if(xmp_ModifyDate != NULL) {
-    ret += HPDF_Stream_WriteStr(xmp->stream, XMP_MOD_DATE_STARTTAG);    
+                ret += HPDF_Stream_WriteStr(xmp->stream, XMP_MOD_DATE_STARTTAG);
                 ret += ConvertDateToXMDate(xmp->stream, xmp_ModifyDate);
-    ret += HPDF_Stream_WriteStr(xmp->stream, XMP_MOD_DATE_ENDTAG);
+                ret += HPDF_Stream_WriteStr(xmp->stream, XMP_MOD_DATE_ENDTAG);
             }
 
             ret += HPDF_Stream_WriteStr(xmp->stream, XMP_FOOTER);
@@ -247,43 +247,43 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
                 ret += HPDF_Stream_WriteStr(xmp->stream, pdf_Keywords);
                 ret += HPDF_Stream_WriteStr(xmp->stream, PDF_KEYWORDS_ENDTAG);
             }
-    
+
             if(pdf_Producer != NULL) {
                 ret += HPDF_Stream_WriteStr(xmp->stream, PDF_PRODUCER_STARTTAG);
                 ret += HPDF_Stream_WriteStr(xmp->stream, pdf_Producer);
                 ret += HPDF_Stream_WriteStr(xmp->stream, PDF_PRODUCER_ENDTAG);
             }
-    
+
             ret += HPDF_Stream_WriteStr(xmp->stream, PDF_FOOTER);
         }
-    
+
         /* Add the pdfaid block */
-    switch(pdfatype) {
-      case HPDF_PDFA_1A:
+        switch(pdfatype) {
+          case HPDF_PDFA_1A:
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA1A);
-        break;
-      case HPDF_PDFA_1B:
+            break;
+          case HPDF_PDFA_1B:
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA1B);
-        break;
-    }
+            break;
+        }
 
         ret += HPDF_Stream_WriteStr(xmp->stream, FOOTER);
 
-    if (ret != HPDF_OK) {
-      return HPDF_INVALID_STREAM;
-    }
-    
-    if ((ret = HPDF_Dict_Add(pdf->catalog, "Metadata", xmp)) != HPDF_OK) {
-      return ret;
-    }
-    
-    return HPDF_PDFA_GenerateID(pdf);
+        if (ret != HPDF_OK) {
+          return HPDF_INVALID_STREAM;
+        }
+
+        if ((ret = HPDF_Dict_Add(pdf->catalog, "Metadata", xmp)) != HPDF_OK) {
+          return ret;
+        }
+
+        return HPDF_PDFA_GenerateID(pdf);
     }
 
     return HPDF_OK;
 }
 
-/* Generate an ID for the trailer dict, PDF/A needs this. 
+/* Generate an ID for the trailer dict, PDF/A needs this.
    TODO: Better algorithm for generate unique ID.
 */
 HPDF_STATUS
@@ -293,33 +293,32 @@ HPDF_PDFA_GenerateID(HPDF_Doc pdf)
     HPDF_BYTE *currentTime;
     HPDF_BYTE idkey[HPDF_MD5_KEY_LEN];
     HPDF_MD5_CTX md5_ctx;
-    time_t ltime; 
+    time_t ltime;
 
-    ltime = time(NULL); 
+    ltime = time(NULL);
     currentTime = (HPDF_BYTE *)ctime(&ltime);
-        
-    /* HPDF_Array id; */
-    id = (HPDF_Array)HPDF_Dict_GetItem(pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
+
+    id = HPDF_Dict_GetItem(pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
     if (!id) {
        id = HPDF_Array_New(pdf->mmgr);
 
        if (!id || HPDF_Dict_Add(pdf->trailer, "ID", id) != HPDF_OK)
          return pdf->error.error_no;
-       
+
        HPDF_MD5Init(&md5_ctx);
        HPDF_MD5Update(&md5_ctx, (HPDF_BYTE *) "libHaru", sizeof("libHaru") - 1);
        HPDF_MD5Update(&md5_ctx, currentTime, HPDF_StrLen((const char *)currentTime, -1));
        HPDF_MD5Final(idkey, &md5_ctx);
-       
+
        if (HPDF_Array_Add (id, HPDF_Binary_New (pdf->mmgr, idkey, HPDF_MD5_KEY_LEN)) != HPDF_OK)
          return pdf->error.error_no;
 
        if (HPDF_Array_Add (id, HPDF_Binary_New (pdf->mmgr,idkey,HPDF_MD5_KEY_LEN)) != HPDF_OK)
          return pdf->error.error_no;
-    
+
        return HPDF_OK;
     }
-    
+
     return HPDF_OK;
 }
 
@@ -370,11 +369,11 @@ HPDF_PDFA_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdi
     }
 
     /* Copied from HPDF_AddIntent - not public function */
-    intents = (HPDF_Array)HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
+    intents = HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
     if (intents == NULL) {
         intents = HPDF_Array_New (pdf->mmgr);
         if (intents) {
-            HPDF_STATUS ret = HPDF_Dict_Add (pdf->catalog, "OutputIntents", intents);
+            ret = HPDF_Dict_Add (pdf->catalog, "OutputIntents", intents);
             if (ret != HPDF_OK) {
                 HPDF_CheckError (&pdf->error);
                 return HPDF_Error_GetDetailCode (&pdf->error);

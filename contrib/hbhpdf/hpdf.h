@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library 2.0.8 >> -- hpdf.h
  *
  * URL http://libharu.org/
@@ -57,6 +54,7 @@
 #include "hpdf_types.h"
 
 typedef void         *HPDF_HANDLE;
+typedef HPDF_HANDLE   HPDF_Boolean;
 typedef HPDF_HANDLE   HPDF_Doc;
 typedef HPDF_HANDLE   HPDF_Page;
 typedef HPDF_HANDLE   HPDF_Pages;
@@ -80,6 +78,7 @@ typedef HPDF_HANDLE   HPDF_Dict;
 typedef HPDF_HANDLE   HPDF_EmbeddedFile;
 typedef HPDF_HANDLE   HPDF_OutputIntent;
 typedef HPDF_HANDLE   HPDF_Xref;
+typedef HPDF_HANDLE   HPDF_Shading;
 
 #else
 
@@ -122,6 +121,8 @@ HPDF_SetErrorHandler  (HPDF_Doc            pdf,
 HPDF_EXPORT(void)
 HPDF_Free  (HPDF_Doc  pdf);
 
+HPDF_EXPORT(HPDF_MMgr)
+HPDF_GetDocMMgr  (HPDF_Doc doc);
 
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_NewDoc  (HPDF_Doc  pdf);
@@ -194,6 +195,9 @@ HPDF_GetPageByIndex  (HPDF_Doc    pdf,
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
+HPDF_EXPORT(HPDF_MMgr)
+HPDF_GetPageMMgr    (HPDF_Page  page);
+
 HPDF_EXPORT(HPDF_PageLayout)
 HPDF_GetPageLayout  (HPDF_Doc   pdf);
 
@@ -252,6 +256,13 @@ HPDF_EXPORT(HPDF_STATUS)
 HPDF_Page_SetHeight  (HPDF_Page   page,
                       HPDF_REAL   value);
 
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_Page_SetBoundary  (HPDF_Page           page,
+                        HPDF_PageBoundary   boundary,
+                        HPDF_REAL           left,
+                        HPDF_REAL           bottom,
+                        HPDF_REAL           right,
+                        HPDF_REAL           top);
 
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_Page_SetSize  (HPDF_Page            page,
@@ -454,12 +465,30 @@ HPDF_UseUTFEncodings   (HPDF_Doc   pdf);
 
 
 /*--------------------------------------------------------------------------*/
+/*----- XObject ------------------------------------------------------------*/
+
+HPDF_EXPORT(HPDF_XObject)
+HPDF_Page_CreateXObjectFromImage    (HPDF_Doc       pdf,
+                                     HPDF_Page      page,
+                                     HPDF_Rect      rect,
+                                     HPDF_Image     image,
+                                     HPDF_BOOL      zoom);
+
+HPDF_EXPORT(HPDF_XObject)
+HPDF_Page_CreateXObjectAsWhiteRect  (HPDF_Doc   pdf,
+                                     HPDF_Page  page,
+                                     HPDF_Rect  rect);
+
+/*--------------------------------------------------------------------------*/
 /*----- annotation ---------------------------------------------------------*/
 
 HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_Create3DAnnot    (HPDF_Page       page,
 							HPDF_Rect       rect,
-							HPDF_U3D        u3d);
+                            HPDF_BOOL       tb,
+                            HPDF_BOOL       np,
+                            HPDF_U3D        u3d,
+                            HPDF_Image      ap);
 
 HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_CreateTextAnnot  (HPDF_Page       page,
@@ -477,6 +506,15 @@ HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_CreateLineAnnot  (HPDF_Page       page,
 							const char     *text,
 							HPDF_Encoder    encoder);
+
+HPDF_EXPORT(HPDF_Annotation)
+HPDF_Page_CreateWidgetAnnot_WhiteOnlyWhilePrint (HPDF_Doc   pdf,
+                                                 HPDF_Page  page,
+                                                 HPDF_Rect  rect);
+
+HPDF_EXPORT(HPDF_Annotation)
+HPDF_Page_CreateWidgetAnnot (HPDF_Page  page,
+                             HPDF_Rect  rect);
 
 HPDF_EXPORT(HPDF_Annotation)
 HPDF_Page_CreateLinkAnnot  (HPDF_Page          page,
@@ -555,6 +593,9 @@ HPDF_EXPORT(HPDF_STATUS)
 HPDF_LinkAnnot_SetHighlightMode  (HPDF_Annotation           annot,
                                   HPDF_AnnotHighlightMode   mode);
 
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_LinkAnnot_SetJavaScript(HPDF_Annotation    annot,
+                             HPDF_JavaScript    javascript);
 
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_LinkAnnot_SetBorderStyle  (HPDF_Annotation  annot,
@@ -624,7 +665,7 @@ HPDF_EXPORT(HPDF_STATUS)
 HPDF_TextMarkupAnnot_SetQuadPoints ( HPDF_Annotation annot, HPDF_Point lb, HPDF_Point rb, HPDF_Point rt, HPDF_Point lt); /* l-left, r-right, b-bottom, t-top positions */
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_Annot_Set3DView  ( HPDF_MMgr mmgr, 
+HPDF_Annot_Set3DView  ( HPDF_MMgr mmgr,
 					 	HPDF_Annotation	annot,
 					 	HPDF_Annotation	annot3d,
 					 	HPDF_Dict			view);
@@ -646,8 +687,8 @@ HPDF_EXPORT(HPDF_STATUS)
 HPDF_FreeTextAnnot_SetDefaultStyle (HPDF_Annotation  annot, const char* style);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_LineAnnot_SetPosition (HPDF_Annotation annot, 
-							HPDF_Point startPoint, HPDF_LineAnnotEndingStyle startStyle, 
+HPDF_LineAnnot_SetPosition (HPDF_Annotation annot,
+							HPDF_Point startPoint, HPDF_LineAnnotEndingStyle startStyle,
 							HPDF_Point endPoint, HPDF_LineAnnotEndingStyle endStyle);
 
 HPDF_EXPORT(HPDF_STATUS)
@@ -689,29 +730,29 @@ HPDF_Page_CreatePD33DMeasure(HPDF_Page       page,
   					        );
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetName(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetName(HPDF_3DMeasure measure,
 					   const char* name);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetColor(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetColor(HPDF_3DMeasure measure,
 						   HPDF_RGBColor color);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DMeasure_SetTextSize(HPDF_3DMeasure measure, 
+HPDF_3DMeasure_SetTextSize(HPDF_3DMeasure measure,
 							  HPDF_REAL textsize);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetTextBoxSize(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetTextBoxSize(HPDF_3DMeasure measure,
 							 HPDF_INT32 x,
 							 HPDF_INT32 y);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetText(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetText(HPDF_3DMeasure measure,
 						  const char* text,
 						  HPDF_Encoder encoder);
 
 HPDF_EXPORT(HPDF_STATUS)
-HPDF_3DC3DMeasure_SetProjectionAnotation(HPDF_3DMeasure measure, 
+HPDF_3DC3DMeasure_SetProjectionAnotation(HPDF_3DMeasure measure,
 										 HPDF_Annotation projectionanotation);
 
 /*--------------------------------------------------------------------------*/
@@ -945,7 +986,7 @@ HPDF_Font_MeasureText (HPDF_Font          font,
 
 
 /*--------------------------------------------------------------------------*/
-/*----- attachements -------------------------------------------------------*/
+/*----- attachments -------------------------------------------------------*/
 
 HPDF_EXPORT(HPDF_EmbeddedFile)
 HPDF_AttachFile  (HPDF_Doc    pdf,
@@ -1155,9 +1196,9 @@ HPDF_Page_SetMiterLimit  (HPDF_Page  page,
 /* d */
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_Page_SetDash  (HPDF_Page           page,
-                    const HPDF_UINT16  *dash_ptn,
+                    const HPDF_REAL  *dash_ptn,
                     HPDF_UINT           num_param,
-                    HPDF_UINT           phase);
+                    HPDF_REAL           phase);
 
 
 
@@ -1173,6 +1214,11 @@ HPDF_Page_SetFlat  (HPDF_Page    page,
 HPDF_EXPORT(HPDF_STATUS)
 HPDF_Page_SetExtGState  (HPDF_Page        page,
                          HPDF_ExtGState   ext_gstate);
+
+/* sh */
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_Page_SetShading  (HPDF_Page    page,
+                       HPDF_Shading shading);
 
 
 /*--- Special graphic state operator --------------------------------------*/
@@ -1453,7 +1499,23 @@ HPDF_Page_SetCMYKStroke  (HPDF_Page  page,
 
 /*--- Shading patterns ---------------------------------------------------*/
 
-/* sh --not implemented yet */
+/* Notes for docs:
+ * - ShadingType must be HPDF_SHADING_FREE_FORM_TRIANGLE_MESH (the only
+ *   defined option...)
+ * - colorSpace must be HPDF_CS_DEVICE_RGB for now.
+ */
+HPDF_EXPORT(HPDF_Shading)
+HPDF_Shading_New  (HPDF_Doc         pdf,
+                   HPDF_ShadingType type,
+                   HPDF_ColorSpace  colorSpace,
+                   HPDF_REAL xMin, HPDF_REAL xMax,
+                   HPDF_REAL yMin, HPDF_REAL yMax);
+
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_Shading_AddVertexRGB(HPDF_Shading shading,
+                          HPDF_Shading_FreeFormTriangleMeshEdgeFlag edgeFlag,
+                          HPDF_REAL x, HPDF_REAL y,
+                          HPDF_UINT8 r, HPDF_UINT8 g, HPDF_UINT8 b);
 
 /*--- In-line images -----------------------------------------------------*/
 
@@ -1554,14 +1616,14 @@ HPDF_EXPORT(HPDF_OutputIntent)
 HPDF_ICC_LoadIccFromMem (HPDF_Doc   pdf,
                         HPDF_MMgr   mmgr,
                         HPDF_Stream iccdata,
-                        HPDF_Xref   xref, 
+                        HPDF_Xref   xref,
                         int         numcomponent);
 
 HPDF_EXPORT(HPDF_OutputIntent)
 HPDF_LoadIccProfileFromFile  (HPDF_Doc  pdf,
                             const char* icc_file_name,
                                    int  numcomponent);
-                                   
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

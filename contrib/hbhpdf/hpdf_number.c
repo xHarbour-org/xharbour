@@ -23,7 +23,7 @@ HPDF_Number
 HPDF_Number_New  (HPDF_MMgr   mmgr,
                   HPDF_INT32  value)
 {
-    HPDF_Number obj = (HPDF_Number)HPDF_GetMem (mmgr, sizeof(HPDF_Number_Rec));
+    HPDF_Number obj = HPDF_GetMem (mmgr, sizeof(HPDF_Number_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));

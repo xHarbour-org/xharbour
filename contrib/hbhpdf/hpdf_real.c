@@ -24,7 +24,7 @@ HPDF_Real
 HPDF_Real_New  (HPDF_MMgr  mmgr,
                 HPDF_REAL  value)
 {
-    HPDF_Real obj = (HPDF_Real)HPDF_GetMem (mmgr, sizeof(HPDF_Real_Rec));
+    HPDF_Real obj = HPDF_GetMem (mmgr, sizeof(HPDF_Real_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));

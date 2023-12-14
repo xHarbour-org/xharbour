@@ -779,7 +779,7 @@ static const HPDF_CID_Width MS_PGothic_W_ARRAY[] = {
     {0xFFFF, 0}
 };
 
-/*
+
 static const HPDF_CID_Width MS_Mincho_W_ARRAY[] = {
     {1, 500},
     {2, 500},
@@ -1036,9 +1036,9 @@ static const HPDF_CID_Width MS_Mincho_W_ARRAY[] = {
     {631, 500},
     {0xFFFF, 0}
 };
-*/
 
-/*
+
+
 static const HPDF_CID_Width MS_PMincho_W_ARRAY[] = {
     {1, 304},
     {2, 304},
@@ -1542,7 +1542,7 @@ static const HPDF_CID_Width MS_PMincho_W_ARRAY[] = {
     {1010, 765},
     {0xFFFF, 0}
 };
-*/
+
 
 /*---------------------------------------------------------------------------*/
 /*----- Mincho Font ---------------------------------------------------------*/
@@ -1685,7 +1685,7 @@ MS_Mincho_Init  (HPDF_FontDef   fontdef)
                 HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_Gothic_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_Mincho_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }
@@ -1746,7 +1746,7 @@ MS_PMincho_Init  (HPDF_FontDef   fontdef)
     fontdef->flags = HPDF_FONT_SYMBOLIC + HPDF_FONT_SERIF;
     fontdef->italic_angle = 0;
     fontdef->stemv = 78;
-    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_PGothic_W_ARRAY)) !=
+    if ((ret = HPDF_CIDFontDef_AddWidth (fontdef, MS_PMincho_W_ARRAY)) !=
                 HPDF_OK) {
         return ret;
     }

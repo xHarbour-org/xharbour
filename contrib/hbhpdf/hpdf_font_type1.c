@@ -84,7 +84,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
 
     font->header.obj_class |= HPDF_OSUBCLASS_FONT;
 
-    attr = (HPDF_FontAttr)HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -108,7 +108,7 @@ HPDF_Type1Font_New  (HPDF_MMgr        mmgr,
     /* singlebyte-font has a widths-array which is an array of 256 signed
      * short integer.
      */
-    attr->widths = (HPDF_INT16*)HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
+    attr->widths = HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
     if (!attr->widths) {
         HPDF_Dict_Free (font);
         return NULL;

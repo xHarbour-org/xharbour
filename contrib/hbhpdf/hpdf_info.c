@@ -82,7 +82,7 @@ HPDF_Info_GetInfoAttr (HPDF_Dict      info,
     if (!info)
         return NULL;
 
-    s = (HPDF_String)HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
+    s = HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
 
     if (!s)
         return NULL;

@@ -19,12 +19,8 @@
 #include "hpdf_utils.h"
 #include "hpdf_image.h"
 
-#ifndef LIBHPDF_HAVE_NOPNGLIB
-#if !defined(HB_OS_WIN)
+#ifdef LIBHPDF_HAVE_LIBPNG
 #include <png.h>
-#else
-#include <pngpriv.h>
-#endif
 #include <string.h>
 
 static void
@@ -113,9 +109,9 @@ ReadPngData_Interlaced  (HPDF_Dict    image,
                          png_structp  png_ptr,
                          png_infop    info_ptr)
 {
-    png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
+    png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
     png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
-    png_bytep* row_pointers = (png_bytep*) HPDF_GetMem (image->mmgr,
+    png_bytep* row_pointers = HPDF_GetMem (image->mmgr,
                 height * sizeof (png_bytep));
 
     if (row_pointers) {
@@ -123,7 +119,7 @@ ReadPngData_Interlaced  (HPDF_Dict    image,
 
         HPDF_MemSet (row_pointers, 0, height * sizeof (png_bytep));
         for (i = 0; i < (HPDF_UINT)height; i++) {
-            row_pointers[i] = (png_bytep) HPDF_GetMem (image->mmgr, len);
+            row_pointers[i] = HPDF_GetMem (image->mmgr, len);
 
             if (image->error->error_no != HPDF_OK)
                 break;
@@ -156,9 +152,9 @@ ReadPngData  (HPDF_Dict    image,
               png_structp  png_ptr,
               png_infop    info_ptr)
 {
-    png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
+    png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
     png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
-    png_bytep buf_ptr = (png_bytep) HPDF_GetMem (image->mmgr, len);
+    png_bytep buf_ptr = HPDF_GetMem (image->mmgr, len);
 
     if (buf_ptr) {
         HPDF_UINT i;
@@ -192,14 +188,14 @@ ReadTransparentPaletteData  (HPDF_Dict    image,
 	png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
 	png_uint_32 width = png_get_image_width(png_ptr, info_ptr);
 
-	row_ptr = (png_bytep *) HPDF_GetMem (image->mmgr, height * sizeof(png_bytep));
+	row_ptr = HPDF_GetMem (image->mmgr, height * sizeof(png_bytep));
 	if (!row_ptr) {
 		return HPDF_FAILD_TO_ALLOC_MEM;
 	} else {
-		png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
+		png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
 
 		for (i = 0; i < (HPDF_UINT)height; i++) {
-			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
+			row_ptr[i] = HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
 				for (; i > 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
@@ -245,7 +241,7 @@ ReadTransparentPngData  (HPDF_Dict    image,
 	HPDF_STATUS ret = HPDF_OK;
 	HPDF_INT row_len;
 	HPDF_UINT i, j;
-	png_bytep *row_ptr, row = NULL;
+	png_bytep *row_ptr, row;
 	png_byte color_type;
 	png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
 	png_uint_32 width = png_get_image_width(png_ptr, info_ptr);
@@ -256,14 +252,14 @@ ReadTransparentPngData  (HPDF_Dict    image,
 		return HPDF_INVALID_PNG_IMAGE;
 	}
 
-	row_ptr = (png_bytep*) HPDF_GetMem (image->mmgr, height * sizeof(png_bytep));
+	row_ptr = HPDF_GetMem (image->mmgr, height * sizeof(png_bytep));
 	if (!row_ptr) {
 		return HPDF_FAILD_TO_ALLOC_MEM;
 	} else {
-		png_uint_32 len = (png_uint_32) png_get_rowbytes(png_ptr, info_ptr);
+		png_uint_32 len = png_get_rowbytes(png_ptr, info_ptr);
 
 		for (i = 0; i < (HPDF_UINT)height; i++) {
-			row_ptr[i] = (png_bytep) HPDF_GetMem(image->mmgr, len);
+			row_ptr[i] = HPDF_GetMem(image->mmgr, len);
 			if (!row_ptr[i]) {
 				for (; i > 0; i--) {
 					HPDF_FreeMem (image->mmgr, row_ptr[i]);
@@ -284,8 +280,8 @@ ReadTransparentPngData  (HPDF_Dict    image,
 		case PNG_COLOR_TYPE_RGB_ALPHA:
 			row_len = 3 * width * sizeof(png_byte);
 			for (j = 0; j < height; j++) {
+				row = row_ptr[j];
 				for (i = 0; i < width; i++) {
-					row = row_ptr[j];
 					memmove(row + (3 * i), row + (4*i), 3);
 					smask_data[width * j + i] = row[4 * i + 3];
 				}
@@ -299,8 +295,8 @@ ReadTransparentPngData  (HPDF_Dict    image,
 		case PNG_COLOR_TYPE_GRAY_ALPHA:
 			row_len = width * sizeof(png_byte);
 			for (j = 0; j < height; j++) {
+				row = row_ptr[j];
 				for (i = 0; i < width; i++) {
-					row = row_ptr[j];
 					row[i] = row[2 * i];
 					smask_data[width * j + i] = row[2 * i + 1];
 				}
@@ -347,12 +343,12 @@ CreatePallet (HPDF_Dict    image,
 
 
     /* make a pallet array for indexed image. */
-    ppallet = (HPDF_BYTE *) HPDF_GetMem (image->mmgr, num_pl * 3);
+    ppallet = HPDF_GetMem (image->mmgr, num_pl * 3);
     if (!ppallet)
         return image->error->error_no;
 
     p = ppallet;
-    for (i = 0; i < (HPDF_UINT) num_pl; i++, src_pl++) {
+    for (i = 0; i < num_pl; i++, src_pl++) {
         *p++ = src_pl->red;
         *p++ = src_pl->green;
         *p++ = src_pl->blue;
@@ -464,6 +460,7 @@ LoadPngData  (HPDF_Dict     image,
 	/* 16bit images are not supported. */
 	if (bit_depth == 16) {
 		png_set_strip_16(png_ptr);
+		bit_depth = 8;
 	}
 
 	png_read_update_info(png_ptr, info_ptr);
@@ -478,7 +475,7 @@ LoadPngData  (HPDF_Dict     image,
 		HPDF_Dict smask;
 		png_bytep smask_data;
 
-		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) || 
+		if (!png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ||
 			!png_get_tRNS(png_ptr, info_ptr, &trans, &num_trans, NULL)) {
 			goto no_transparent_color_in_palette;
 		}
@@ -503,7 +500,7 @@ LoadPngData  (HPDF_Dict     image,
 			goto Exit;
 		}
 
-		smask_data = (png_bytep) HPDF_GetMem(image->mmgr, width * height);
+		smask_data = HPDF_GetMem(image->mmgr, width * height);
 		if (!smask_data) {
 			HPDF_Dict_Free(smask);
 			ret = HPDF_FAILD_TO_ALLOC_MEM;
@@ -538,7 +535,7 @@ LoadPngData  (HPDF_Dict     image,
 
 no_transparent_color_in_palette:
 
-	/* read images with alpha channel right away 
+	/* read images with alpha channel right away
 	   we have to do this because image transparent mask must be added to the Xref */
 	if (xref && PNG_COLOR_MASK_ALPHA & color_type) {
 		HPDF_Dict smask;
@@ -549,8 +546,10 @@ no_transparent_color_in_palette:
 			ret = HPDF_FAILD_TO_ALLOC_MEM;
 			goto Exit;
 		}
-
+		
+		smask->filter = image->filter;
 		smask->header.obj_class |= HPDF_OSUBCLASS_XOBJECT;
+		
 		ret = HPDF_Dict_AddName (smask, "Type", "XObject");
 		ret += HPDF_Dict_AddName (smask, "Subtype", "Image");
 		ret += HPDF_Dict_AddNumber (smask, "Width", (HPDF_UINT)width);
@@ -564,7 +563,7 @@ no_transparent_color_in_palette:
 			goto Exit;
 		}
 
-		smask_data = (png_bytep) HPDF_GetMem(image->mmgr, width * height);
+		smask_data = HPDF_GetMem(image->mmgr, width * height);
 		if (!smask_data) {
 			HPDF_Dict_Free(smask);
 			ret = HPDF_FAILD_TO_ALLOC_MEM;
@@ -671,7 +670,7 @@ PngBeforeWrite  (HPDF_Dict obj)
 
     HPDF_MemStream_FreeData(obj->stream);
 
-    s = (HPDF_String) HPDF_Dict_GetItem (obj, "_FILE_NAME", HPDF_OCLASS_STRING);
+    s = HPDF_Dict_GetItem (obj, "_FILE_NAME", HPDF_OCLASS_STRING);
     if (!s)
         return HPDF_SetError (obj->error, HPDF_MISSING_FILE_NAME_ENTRY, 0);
 
@@ -709,4 +708,4 @@ PngAfterWrite  (HPDF_Dict obj)
 }
 
 
-#endif /* LIBHPDF_HAVE_NOPNGLIB */
+#endif /* LIBHPDF_HAVE_PNGLIB */

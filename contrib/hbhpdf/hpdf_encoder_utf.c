@@ -70,8 +70,8 @@ UTF8_Encoder_ByteType_Func  (HPDF_Encoder        encoder,
     // When HPDF_BYTE_TYPE_SINGLE is returned, the current byte is the
     //   CODE argument in call ToUnicode_Func
     // When HPDF_BYTE_TYPE_LEAD is returned, the current byte (msb) and the
-    //   next byte (lsb) is the CODE arguement in call ToUnicodeFunc
-    // When HPDF_BYTE_TYPE_TRIAL is returned, the current byte is ignored
+    //   next byte (lsb) is the CODE argument in call ToUnicodeFunc
+    // When HPDF_BYTE_TYPE_TRAIL is returned, the current byte is ignored
 
     HPDF_CMapEncoderAttr  encoder_attr;
     HPDF_BYTE             byte;
@@ -119,9 +119,9 @@ UTF8_Encoder_ByteType_Func  (HPDF_Encoder        encoder,
 	}
 
 	utf8_attr->current_byte++;
-}
+    }
 
-    return HPDF_BYTE_TYPE_TRIAL;
+    return HPDF_BYTE_TYPE_TRAIL;
 }
 
 /*
@@ -133,7 +133,7 @@ UTF8_Encoder_ToUnicode_Func  (HPDF_Encoder   encoder,
                               HPDF_UINT16    code)
 {
     // Supposed to convert CODE to unicode.
-    // This function is allways called after ByteType_Func.
+    // This function is always called after ByteType_Func.
     // ByteType_Func recognizes the utf-8 bytes belonging to one character.
 
     HPDF_CMapEncoderAttr encoder_attr;
@@ -164,7 +164,7 @@ UTF8_Encoder_ToUnicode_Func  (HPDF_Encoder   encoder,
 	break;
     default:
 	val = 32; // Unknown character
-}
+    }
 
     if (val > 65535) //Convert everything outside UCS-2 to space
         val = 32;
@@ -178,7 +178,7 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
 			       HPDF_UINT           len,
 			       HPDF_UINT          *length)
 {
-    char *result = (char *) malloc(len * 2);
+    char *result = malloc(len * 2);
     char *c = result;
     HPDF_ParseText_Rec  parse_state;
     HPDF_UINT i;
@@ -190,13 +190,13 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
 	HPDF_UNICODE tmp_unicode;
 	HPDF_ByteType btype = HPDF_Encoder_ByteType (encoder, &parse_state);
 
-	if (btype != HPDF_BYTE_TYPE_TRIAL) {
+	if (btype != HPDF_BYTE_TYPE_TRAIL) {
 	    tmp_unicode = HPDF_Encoder_ToUnicode (encoder, 0);
 
 	    HPDF_UInt16Swap (&tmp_unicode);
 	    HPDF_MemCpy ((HPDF_BYTE *)c, (const HPDF_BYTE*)&tmp_unicode, 2);
 	    c += 2;
-}
+        }
     }
 
     *length = c - result;
@@ -219,6 +219,7 @@ UTF8_Init  (HPDF_Encoder  encoder)
     encoder->byte_type_fn = UTF8_Encoder_ByteType_Func;
     encoder->to_unicode_fn = UTF8_Encoder_ToUnicode_Func;
     encoder->encode_text_fn = UTF8_Encoder_EncodeText_Func;
+
     attr = (HPDF_CMapEncoderAttr)encoder->attr;
 
     if (HPDF_CMapEncoder_AddCMap (encoder, UTF8_CID_RANGE) != HPDF_OK)
@@ -233,7 +234,6 @@ UTF8_Init  (HPDF_Encoder  encoder)
         return encoder->error->error_no;
 
     attr->is_lead_byte_fn = NULL;
-
     attr->is_trial_byte_fn = NULL;
 
     HPDF_StrCpy (attr->registry, "Adobe", attr->registry +

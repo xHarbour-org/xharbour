@@ -328,5 +328,3 @@ HPDF_Outline_SetOpened  (HPDF_Outline  outline,
 
     return HPDF_OK;
 }
-
-

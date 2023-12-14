@@ -1,7 +1,4 @@
 /*
- * $Id$
- */
-/*
  * << Haru Free PDF Library >> -- hpdf_encoder.h
  *
  * URL: http://libharu.org
@@ -117,7 +114,7 @@ typedef void
 
 typedef struct  _HPDF_Encoder_Rec {
     HPDF_UINT32                     sig_bytes;
-    char                       name[HPDF_LIMIT_MAX_NAME_LEN + 1];
+    char                            name[HPDF_LIMIT_MAX_NAME_LEN + 1];
     HPDF_MMgr                       mmgr;
     HPDF_Error                      error;
     HPDF_EncoderType                type;
@@ -240,7 +237,7 @@ typedef struct  _HPDF_CMapEncoderAttr_Rec {
 
 HPDF_Encoder
 HPDF_CMapEncoder_New  (HPDF_MMgr                mmgr,
-                       char               *name,
+                       char                    *name,
                        HPDF_Encoder_Init_Func   init_fn);
 
 
