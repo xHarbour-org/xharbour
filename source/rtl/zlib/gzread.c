@@ -308,7 +308,7 @@ local z_size_t gz_read( gz_statep state, voidp buf, z_size_t len )
     got = 0;
     do {
         /* set n to the maximum amount of len that fits in an unsigned int */
-        n = -1;
+        n = ( unsigned int ) -1;
         if (n > len)
             n = len;
 
