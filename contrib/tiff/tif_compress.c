@@ -233,7 +233,7 @@ TIFFUnRegisterCODEC(TIFFCodec* c)
 	codec_t* cd;
 	codec_t** pcd;
 
-	for (pcd = &registeredCODECS; (cd = *pcd); pcd = &cd->next)
+	for (pcd = &registeredCODECS; (cd = *pcd) != 0; pcd = &cd->next)
 		if (cd->info == c) {
 			*pcd = cd->next;
 			_TIFFfree(cd);
