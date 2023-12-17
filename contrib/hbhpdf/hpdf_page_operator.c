@@ -21,7 +21,7 @@
 #include "hpdf.h"
 
 static const HPDF_Point INIT_POS = {0, 0};
-static const HPDF_DashMode INIT_MODE = {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, 0.0f, 0.0f};
+static const HPDF_DashMode INIT_MODE = {{0, 0, 0, 0, 0, 0, 0, 0}, 0, 0};
 
 
 static HPDF_STATUS
@@ -194,11 +194,11 @@ HPDF_Page_SetDash  (HPDF_Page        page,
         return ret;
 
     if (num_param == 0 && phase > 0)
-        return HPDF_RaiseError (page->error, HPDF_PAGE_OUT_OF_RANGE,
+        return ( HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_PAGE_OUT_OF_RANGE,
                 phase);
 
     if (!dash_ptn && num_param > 0)
-        return HPDF_RaiseError (page->error, HPDF_INVALID_PARAMETER,
+        return HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_INVALID_PARAMETER,
                 phase);
 
     HPDF_MemSet (buf, 0, HPDF_TMP_BUF_SIZ);
@@ -1186,7 +1186,7 @@ HPDF_Page_SetFontAndSize  (HPDF_Page  page,
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT, 0);
 
     if (size <= 0 || size > HPDF_MAX_FONTSIZE)
-        return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT_SIZE, size);
+        return HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT_SIZE, size);
 
     if (page->mmgr != font->mmgr)
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT, 0);
