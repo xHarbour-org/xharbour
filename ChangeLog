@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-17 23:09 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\pdflite\include\ft_font.h
+  * contrib\pdflite\pdflib\p_document.c
+  * contrib\pdflite\tiff\tif_unix.c
+  * utils\hbpp\hbppcore.c
+  * utils\hbpp\pragma.c
+    ! fixed compiler warnings
+
 2023-12-17 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbmxml\config.h
   * contrib\hbxdiff\core.c
