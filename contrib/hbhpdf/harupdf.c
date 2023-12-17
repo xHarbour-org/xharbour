@@ -769,14 +769,14 @@ HB_FUNC( HPDF_PAGE_GETDASH )
 
    dash = HPDF_Page_GetDash( (HPDF_Page) hb_parptr( 1 ) );
 
-   hb_arraySetNI( info, 1, dash.ptn[0] );
-   hb_arraySetNI( info, 2, dash.ptn[1] );
-   hb_arraySetNI( info, 3, dash.ptn[2] );
-   hb_arraySetNI( info, 4, dash.ptn[3] );
-   hb_arraySetNI( info, 5, dash.ptn[4] );
-   hb_arraySetNI( info, 6, dash.ptn[5] );
-   hb_arraySetNI( info, 7, dash.ptn[6] );
-   hb_arraySetNI( info, 8, dash.ptn[7] );
+   hb_arraySetNI( info, 1, ( int ) dash.ptn[0] );
+   hb_arraySetNI( info, 2, ( int ) dash.ptn[1] );
+   hb_arraySetNI( info, 3, ( int ) dash.ptn[2] );
+   hb_arraySetNI( info, 4, ( int ) dash.ptn[3] );
+   hb_arraySetNI( info, 5, ( int ) dash.ptn[4] );
+   hb_arraySetNI( info, 6, ( int ) dash.ptn[5] );
+   hb_arraySetNI( info, 7, ( int ) dash.ptn[6] );
+   hb_arraySetNI( info, 8, ( int ) dash.ptn[7] );
    hb_arraySetND( info, 9, dash.num_ptn );
    hb_arraySetND( info,10, dash.phase   );
 
@@ -996,7 +996,7 @@ HB_FUNC( HPDF_PAGE_SETDASH )
    for ( i = 0; i < nPtns; i++ )
       dash.ptn[ i ] = ( HPDF_UINT16 ) hb_parni( 2, i + 1 );
 
-   hb_retnl( ( long ) HPDF_Page_SetDash( (HPDF_Page) hb_parptr( 1 ), dash.ptn, nPtns, hb_parni( 4 ) ) );
+   hb_retnl( ( long ) HPDF_Page_SetDash( (HPDF_Page) hb_parptr( 1 ), dash.ptn, nPtns, ( HPDF_REAL ) hb_parni( 4 ) ) );
 }
 
 /* HPDF_Page_SetExtGState( hPage, hGState ) --> hStatus */
@@ -1467,7 +1467,7 @@ HB_FUNC( HPDF_ENCODER_GETWRITINGMODE )
 //     nHilightMode ==
 // HPDF_ANNOT_NO_HIGHTLIGHT       1     No highlighting.
 // HPDF_ANNOT_INVERT_BOX          2     Invert the contents of the area of annotation.
-// HPDF_ANNOT_INVERT_BORDER       3     Invert the annotation’s border.
+// HPDF_ANNOT_INVERT_BORDER       3     Invert the annotationâ€™s border.
 // HPDF_ANNOT_DOWN_APPEARANCE     4     Dent the annotation.
 //
 HB_FUNC( HPDF_LINKANNOT_SETHIGHLIGHTMODE )
