@@ -143,7 +143,7 @@ static void * hb_mmf_itemGet( PHB_ITEM pItem, int iType, HB_BOOL fError )
       return pStructHolder->hb_mmf;
 
    if( fError )
-      hb_errRT_BASE_SubstR( EG_ARG, iError, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
+      hb_errRT_BASE_SubstR( EG_ARG, ( HB_ERRCODE ) iError, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 
    return NULL;
 }
