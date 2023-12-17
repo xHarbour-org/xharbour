@@ -106,7 +106,7 @@ HPDF_Type0Font_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    attr = HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = ( HPDF_FontAttr ) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -408,7 +408,7 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
 			max = cid;
 		}
 	    } else {
-		HPDF_UNICODE unicode = (i << 8) | j;
+		HPDF_UNICODE unicode = ( HPDF_UNICODE ) ( (i << 8) | j );
 		HPDF_UINT16 gid = HPDF_TTFontDef_GetGlyphid (fontdef,
 							     unicode);
 		tmp_map[unicode] = gid;
@@ -987,7 +987,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->code_space_range->count; i++) {
-        HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->code_space_range,
+        HPDF_CidRange_Rec *range = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->code_space_range,
                         i);
 
         pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
@@ -1011,7 +1011,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->notdef_range->count; i++) {
-        HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->notdef_range, i);
+        HPDF_CidRange_Rec *range = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->notdef_range, i);
 
         pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
         *pbuf++ = ' ';
@@ -1040,7 +1040,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
     for (i = 0; i < attr->cmap_range->count; i++) {
-        HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->cmap_range, i);
+        HPDF_CidRange_Rec *range = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->cmap_range, i);
 
         pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
         *pbuf++ = ' ';
@@ -1084,4 +1084,3 @@ CreateCMap  (HPDF_Encoder   encoder,
 
     return cmap;
 }
-
