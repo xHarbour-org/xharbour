@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-17 19:29 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbhpdf\hpdf_fontdef_tt.c
+  * contrib\hbhpdf\hpdf_fontdef_type1.c
+  * contrib\hbhpdf\hpdf_fontdef_cid.c
+  * contrib\hbhpdf\hpdf_font_type1.c
+  * contrib\hbhpdf\hpdf_font_tt.c
+  * contrib\hbhpdf\hpdf_font_cid.c
+  * contrib\hbhpdf\hpdf_doc.c
+  * contrib\hbhpdf\hpdf_info
+  * contrib\hbhpdf\hpdf_catalog.c
+  * contrib\hbhpdf\hpdf_gstate.c
+  * contrib\hbhpdf\hpdf_pages.c
+  * contrib\hbhpdf\hpdf_page_operator.c
+  * contrib\hbhpdf\hpdf_annotation.c
+  * contrib\hbhpdf\hpdf_image.c
+  * contrib\hbhpdf\hpdf_image_png.c
+  * contrib\hbhpdf\hpdf_doc_png.c
+  * contrib\hbhpdf\hpdf_namedict.c
+  * contrib\hbhpdf\hpdf_pdfa.c
+  * contrib\hbhpdf\hpdf_encoder_utf.c
+  * contrib\hbhpdf\hpdf_image_ccitt.c
+    ! fixed compiler warnings
+
 2023-12-17 16:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbbz2\bzlib_pr.h
   * contrib\hbhpdf\hpdf_utils.c

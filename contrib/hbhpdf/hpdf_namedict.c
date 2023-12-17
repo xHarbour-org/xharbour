@@ -54,7 +54,7 @@ HPDF_NameDict_GetNameTree  (HPDF_NameDict     namedict,
 {
     if (!namedict)
         return NULL;
-    return HPDF_Dict_GetItem (namedict, HPDF_NAMEDICT_KEYS[key], HPDF_OCLASS_DICT);
+    return ( HPDF_NameTree ) HPDF_Dict_GetItem (namedict, HPDF_NAMEDICT_KEYS[key], HPDF_OCLASS_DICT);
 }
 
 HPDF_STATUS
@@ -124,7 +124,7 @@ HPDF_NameTree_Add  (HPDF_NameTree  tree,
     if (!tree || !name)
         return HPDF_INVALID_PARAMETER;
 
-    items = HPDF_Dict_GetItem (tree, "Names", HPDF_OCLASS_ARRAY);
+    items = ( HPDF_Array ) HPDF_Dict_GetItem (tree, "Names", HPDF_OCLASS_ARRAY);
     if (!items)
         return HPDF_INVALID_OBJECT;
 
@@ -136,7 +136,7 @@ HPDF_NameTree_Add  (HPDF_NameTree  tree,
     icount = HPDF_Array_Items(items);
 
     for( i = 0; i < icount; i += 2 ) {
-      HPDF_String elem = HPDF_Array_GetItem( items, i, HPDF_OCLASS_STRING );
+      HPDF_String elem = ( HPDF_String ) HPDF_Array_GetItem( items, i, HPDF_OCLASS_STRING );
       if( HPDF_String_Cmp( name, elem ) < 0 ) {
         HPDF_Array_Insert( items, elem, name );
         HPDF_Array_Insert( items, elem, obj );

@@ -82,7 +82,7 @@ HPDF_Info_GetInfoAttr (HPDF_Dict      info,
     if (!info)
         return NULL;
 
-    s = HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
+    s = ( HPDF_String ) HPDF_Dict_GetItem (info, name, HPDF_OCLASS_STRING);
 
     if (!s)
         return NULL;
@@ -168,5 +168,3 @@ HPDF_Info_SetInfoDateAttr (HPDF_Dict      info,
     return HPDF_Dict_Add (info, name, HPDF_String_New (info->mmgr, tmp,
                 NULL));
 }
-
-

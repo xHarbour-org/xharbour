@@ -140,6 +140,8 @@ UTF8_Encoder_ToUnicode_Func  (HPDF_Encoder   encoder,
     UTF8_EncoderAttr     utf8_attr;
     unsigned int         val;
 
+    ( void ) code;
+
     encoder_attr = (HPDF_CMapEncoderAttr) encoder->attr;
     utf8_attr = (UTF8_EncoderAttr) ((void *)encoder_attr->cid_map[0]);
 
@@ -169,7 +171,7 @@ UTF8_Encoder_ToUnicode_Func  (HPDF_Encoder   encoder,
     if (val > 65535) //Convert everything outside UCS-2 to space
         val = 32;
 
-    return val;
+    return ( HPDF_UNICODE ) val;
 }
 
 static char *
@@ -178,7 +180,7 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
 			       HPDF_UINT           len,
 			       HPDF_UINT          *length)
 {
-    char *result = malloc(len * 2);
+    char *result = ( char * ) malloc(len * 2);
     char *c = result;
     HPDF_ParseText_Rec  parse_state;
     HPDF_UINT i;

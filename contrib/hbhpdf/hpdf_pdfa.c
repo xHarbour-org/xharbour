@@ -151,8 +151,6 @@ HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf,HPDF_PDFAType pdfatype)
     const char *pdf_Keywords    = NULL;
     const char *pdf_Producer    = NULL;
 
-    const char *info = NULL;
-
     if (!HPDF_HasDoc(pdf)) {
       return HPDF_INVALID_DOCUMENT;
     }
@@ -298,7 +296,7 @@ HPDF_PDFA_GenerateID(HPDF_Doc pdf)
     ltime = time(NULL);
     currentTime = (HPDF_BYTE *)ctime(&ltime);
 
-    id = HPDF_Dict_GetItem(pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
+    id = ( HPDF_Array ) HPDF_Dict_GetItem(pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
     if (!id) {
        id = HPDF_Array_New(pdf->mmgr);
 
@@ -369,7 +367,7 @@ HPDF_PDFA_AppendOutputIntents(HPDF_Doc pdf, const char *iccname, HPDF_Dict iccdi
     }
 
     /* Copied from HPDF_AddIntent - not public function */
-    intents = HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
+    intents = ( HPDF_Array ) HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
     if (intents == NULL) {
         intents = HPDF_Array_New (pdf->mmgr);
         if (intents) {

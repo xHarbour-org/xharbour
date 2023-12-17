@@ -835,7 +835,7 @@ CheckSubType (HPDF_Annotation  annot,
     if (!HPDF_Annotation_Validate (annot))
         return HPDF_FALSE;
 
-    subtype = HPDF_Dict_GetItem (annot, "Subtype", HPDF_OCLASS_NAME);
+    subtype = ( HPDF_Name ) HPDF_Dict_GetItem (annot, "Subtype", HPDF_OCLASS_NAME);
 
     if (!subtype || HPDF_StrCmp (subtype->value,
                 HPDF_ANNOT_TYPE_NAMES[(HPDF_INT)type]) != 0) {
