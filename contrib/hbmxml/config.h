@@ -21,7 +21,6 @@
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_WARNINGS
 
 #include "hbdefs.h"
 #include "hb_io.h"
