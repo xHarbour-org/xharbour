@@ -2222,7 +2222,7 @@ HPDF_BasicEncoder_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    encoder = HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
+    encoder = ( HPDF_Encoder ) HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
     if (!encoder)
         return NULL;
 
@@ -2239,7 +2239,7 @@ HPDF_BasicEncoder_New  (HPDF_MMgr        mmgr,
     encoder->write_fn = HPDF_BasicEncoder_Write;
     encoder->free_fn = HPDF_BasicEncoder_Free;
 
-    encoder_attr = HPDF_GetMem(mmgr, sizeof(HPDF_BasicEncoderAttr_Rec));
+    encoder_attr = ( HPDF_BasicEncoderAttr ) HPDF_GetMem(mmgr, sizeof(HPDF_BasicEncoderAttr_Rec));
     if (!encoder_attr) {
         HPDF_FreeMem (encoder->mmgr, encoder);
         return NULL;
@@ -2531,7 +2531,7 @@ HPDF_CMapEncoder_New  (HPDF_MMgr                mmgr,
     if (mmgr == NULL)
         return NULL;
 
-    encoder = HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
+    encoder = ( HPDF_Encoder ) HPDF_GetMem (mmgr, sizeof(HPDF_Encoder_Rec));
     if (!encoder)
         return NULL;
 
@@ -2564,7 +2564,7 @@ HPDF_CMapEncoder_InitAttr  (HPDF_Encoder  encoder)
     if (encoder->attr)
         return HPDF_INVALID_ENCODER;
 
-    encoder_attr = HPDF_GetMem(encoder->mmgr,
+    encoder_attr = ( HPDF_CMapEncoderAttr ) HPDF_GetMem(encoder->mmgr,
             sizeof(HPDF_CMapEncoderAttr_Rec));
 
     if (!encoder_attr)
@@ -2639,7 +2639,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->cmap_range) {
         for (i = 0; i < attr->cmap_range->count; i++) {
-            data = HPDF_List_ItemAt (attr->cmap_range, i);
+            data = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->cmap_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2649,7 +2649,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->notdef_range) {
         for (i = 0; i < attr->notdef_range->count; i++) {
-            data = HPDF_List_ItemAt (attr->notdef_range, i);
+            data = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->notdef_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2659,7 +2659,7 @@ HPDF_CMapEncoder_Free  (HPDF_Encoder  encoder)
 
     if (attr && attr->code_space_range) {
         for (i = 0; i < attr->code_space_range->count; i++) {
-            data = HPDF_List_ItemAt (attr->code_space_range, i);
+            data = ( HPDF_CidRange_Rec * ) HPDF_List_ItemAt (attr->code_space_range, i);
 
             HPDF_FreeMem (encoder->mmgr, data);
         }
@@ -2763,7 +2763,7 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
 	    HPDF_UINT16 cid = range->cid;
 
 	    while (code <= range->to) {
-		HPDF_BYTE l = code;
+		HPDF_BYTE l = ( HPDF_BYTE ) code;
 		HPDF_BYTE h = code >> 8;
 
 		attr->cid_map[l][h] = cid;
@@ -2800,7 +2800,7 @@ AddCidRainge  (HPDF_MMgr            mmgr,
     HPDF_CidRange_Rec *prange;
     HPDF_STATUS ret;
 
-    prange = HPDF_GetMem (mmgr, sizeof(HPDF_CidRange_Rec));
+    prange = ( HPDF_CidRange_Rec * ) HPDF_GetMem (mmgr, sizeof(HPDF_CidRange_Rec));
     if (!prange)
         return mmgr->error->error_no;
 
