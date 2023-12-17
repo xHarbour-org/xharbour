@@ -31,7 +31,7 @@ HPDF_GState_New  (HPDF_MMgr    mmgr,
         return NULL;
     }
 
-    gstate = HPDF_GetMem (mmgr, sizeof(HPDF_GState_Rec));
+    gstate = ( HPDF_GState ) HPDF_GetMem (mmgr, sizeof(HPDF_GState_Rec));
     if (!gstate)
         return NULL;
 
@@ -70,7 +70,7 @@ HPDF_GState_New  (HPDF_MMgr    mmgr,
         HPDF_TransMatrix DEF_MATRIX = {1, 0, 0, 1, 0, 0};
         HPDF_RGBColor DEF_RGB_COLOR = {0, 0, 0};
         HPDF_CMYKColor DEF_CMYK_COLOR = {0, 0, 0, 0};
-        HPDF_DashMode DEF_DASH_MODE = {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, 0.0f, 0.0f};
+        HPDF_DashMode DEF_DASH_MODE = {{0, 0, 0, 0, 0, 0, 0, 0}, 0, 0};
 
         gstate->trans_matrix = DEF_MATRIX;
         gstate->line_width = HPDF_DEF_LINEWIDTH;
@@ -120,4 +120,3 @@ HPDF_GState_Free  (HPDF_MMgr    mmgr,
 
     return current;
 }
-
