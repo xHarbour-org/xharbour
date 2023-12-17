@@ -478,8 +478,8 @@ typedef
 
 #define SET_LL4(i,n)                                          \
    { if (((i) & 0x1) == 0)                                    \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0xf0) | (n); else    \
-        s->ll4[(i) >> 1] = (s->ll4[(i) >> 1] & 0x0f) | ((n) << 4);  \
+        s->ll4[(i) >> 1] = (UChar)((s->ll4[(i) >> 1] & 0xf0) | (n)); else    \
+        s->ll4[(i) >> 1] = (UChar)((s->ll4[(i) >> 1] & 0x0f) | ((n)) << 4);  \
    }
 
 #define GET_LL4(i)                             \
