@@ -26,7 +26,7 @@ HPDF_Array_New  (HPDF_MMgr  mmgr)
 
     HPDF_PTRACE((" HPDF_Array_New\n"));
 
-    obj = HPDF_GetMem (mmgr, sizeof(HPDF_Array_Rec));
+    obj = ( HPDF_Array ) HPDF_GetMem (mmgr, sizeof(HPDF_Array_Rec));
     if (obj) {
         HPDF_MemSet (obj, 0, sizeof(HPDF_Array_Rec));
         obj->header.obj_class = HPDF_OCLASS_ARRAY;
