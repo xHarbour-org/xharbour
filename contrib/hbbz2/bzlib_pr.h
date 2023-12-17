@@ -28,9 +28,6 @@
 #if defined(__POCC__)
    #pragma warn(push)
    #pragma warn(disable:2154)
-#elif defined(_MSC_VER) && (_MSC_VER>=1400)
-   #define _CRT_SECURE_NO_WARNINGS
-   #define _CRT_SECURE_NO_DEPRECATE
 #elif defined(__WATCOMC__)
    #pragma disable_message ( 201 )
 #elif defined(__BORLANDC__)
