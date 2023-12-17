@@ -166,7 +166,7 @@ LoadPngImageFromStream (HPDF_Doc      pdf,
         image->filter = HPDF_STREAM_FILTER_FLATE_DECODE;
 
 	// is there an alpha layer? then compress it also
-	smask = HPDF_Dict_GetItem(image, "SMask", HPDF_OCLASS_DICT);
+	smask = ( HPDF_Dict ) HPDF_Dict_GetItem(image, "SMask", HPDF_OCLASS_DICT);
 	if (smask) smask->filter = HPDF_STREAM_FILTER_FLATE_DECODE;
     }
 
