@@ -8,8 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2023-12-17 14:05 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2023-12-17 16:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbbz2\bzlib_pr.h
+  * contrib\hbhpdf\hpdf_utils.c
+  * contrib\hbhpdf\hpdf_objects.c
+  * contrib\hbhpdf\hpdf_null.c
+  * contrib\hbhpdf\hpdf_boolean.c
+  * contrib\hbhpdf\hpdf_number.c
+  * contrib\hbhpdf\hpdf_real.c
+  * contrib\hbhpdf\hpdf_name.c
+  * contrib\hbhpdf\hpdf_array.c
+  * contrib\hbhpdf\hpdf_dict.c
+  * contrib\hbhpdf\hpdf_encoder.c
+  * contrib\hbhpdf\hpdf_string.c
+  * contrib\hbhpdf\hpdf_binary.c
+  * contrib\hbhpdf\hpdf_encryptdict.c
     ! fixed compiler warnings
 
 2023-12-17 13:17 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
