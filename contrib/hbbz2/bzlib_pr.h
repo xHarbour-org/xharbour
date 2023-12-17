@@ -496,7 +496,7 @@ typedef
 #define BZ_GET_SMALL(cccc)                            \
     /* c_tPos is unsigned, hence test < 0 is pointless. */ \
     if (s->tPos >= (UInt32)100000 * (UInt32)s->blockSize100k) return True; \
-    cccc = BZ2_indexIntoF ( s->tPos, s->cftab );    \
+    cccc = (UChar) BZ2_indexIntoF ( s->tPos, s->cftab );    \
     s->tPos = GET_LL(s->tPos);
 
 
