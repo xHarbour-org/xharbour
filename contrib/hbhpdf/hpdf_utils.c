@@ -217,11 +217,11 @@ HPDF_FToA  (char       *s,
     }
 
     /* separate an integer part and a fractional part. */
-    fpart_val = modf(val, (double *)&int_val);
+    fpart_val = ( HPDF_REAL ) modf(val, (double *) &int_val);
 
     /* process integer part */
     do {
-        dig = modf(int_val/10.0, (double *)&int_val);
+        dig = ( HPDF_REAL ) modf(int_val/10.0, (double *) &int_val);
         *t++ = (char)(dig*10.0 + 0.5) + '0';
     } while (int_val > 0);
 
@@ -234,7 +234,7 @@ HPDF_FToA  (char       *s,
    *s++ = '.';
    if(fpart_val != 0.0) {
        for (i = 0; i < prec; i++) {
-          fpart_val = modf(fpart_val*10.0, (double *)&int_val);
+          fpart_val = ( HPDF_REAL ) modf(fpart_val*10.0, (double *) &int_val);
           *s++ = (char)(int_val + 0.5) + '0';
        }
    }
