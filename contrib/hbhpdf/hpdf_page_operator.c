@@ -194,12 +194,12 @@ HPDF_Page_SetDash  (HPDF_Page        page,
         return ret;
 
     if (num_param == 0 && phase > 0)
-        return ( HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_PAGE_OUT_OF_RANGE,
-                phase);
+        return HPDF_RaiseError (page->error, HPDF_PAGE_OUT_OF_RANGE,
+                ( HPDF_STATUS ) phase);
 
     if (!dash_ptn && num_param > 0)
-        return HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_INVALID_PARAMETER,
-                phase);
+        return HPDF_RaiseError (page->error, HPDF_INVALID_PARAMETER,
+                ( HPDF_STATUS ) phase);
 
     HPDF_MemSet (buf, 0, HPDF_TMP_BUF_SIZ);
     *pbuf++ = '[';
@@ -1186,7 +1186,7 @@ HPDF_Page_SetFontAndSize  (HPDF_Page  page,
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT, 0);
 
     if (size <= 0 || size > HPDF_MAX_FONTSIZE)
-        return HPDF_STATUS ) HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT_SIZE, size);
+        return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT_SIZE, ( HPDF_STATUS ) size);
 
     if (page->mmgr != font->mmgr)
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_FONT, 0);
