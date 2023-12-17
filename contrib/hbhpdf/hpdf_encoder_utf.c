@@ -180,7 +180,7 @@ UTF8_Encoder_EncodeText_Func  (HPDF_Encoder        encoder,
 			       HPDF_UINT           len,
 			       HPDF_UINT          *length)
 {
-    char *result = malloc(len * 2);
+    char *result = ( char * ) malloc(len * 2);
     char *c = result;
     HPDF_ParseText_Rec  parse_state;
     HPDF_UINT i;
