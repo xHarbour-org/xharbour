@@ -27,7 +27,7 @@ HPDF_Binary_New  (HPDF_MMgr  mmgr,
 {
     HPDF_Binary obj;
 
-    obj  = HPDF_GetMem (mmgr, sizeof(HPDF_Binary_Rec));
+    obj  = ( HPDF_Binary ) HPDF_GetMem (mmgr, sizeof(HPDF_Binary_Rec));
 
     if (obj) {
         HPDF_MemSet(&obj->header, 0, sizeof(HPDF_Obj_Header));
@@ -83,7 +83,7 @@ HPDF_Binary_SetValue  (HPDF_Binary  obj,
         obj->len = 0;
     }
 
-    obj->value = HPDF_GetMem (obj->mmgr, len);
+    obj->value = ( HPDF_BYTE * ) HPDF_GetMem (obj->mmgr, len);
     if (!obj->value)
         return HPDF_Error_GetCode (obj->error);
 
@@ -117,4 +117,3 @@ HPDF_Binary_GetValue  (HPDF_Binary  obj)
 {
     return obj->value;
 }
-

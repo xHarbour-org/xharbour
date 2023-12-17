@@ -57,19 +57,19 @@ HPDF_Obj_ForceFree  (HPDF_MMgr    mmgr,
 
     switch (header->obj_class & HPDF_OCLASS_ANY) {
         case HPDF_OCLASS_STRING:
-            HPDF_String_Free (obj);
+            HPDF_String_Free ((HPDF_String)obj);
             break;
         case HPDF_OCLASS_BINARY:
-            HPDF_Binary_Free (obj);
+            HPDF_Binary_Free ((HPDF_Binary)obj);
             break;
         case HPDF_OCLASS_ARRAY:
-            HPDF_Array_Free (obj);
+            HPDF_Array_Free ((HPDF_Array)obj);
             break;
         case HPDF_OCLASS_DICT:
-            HPDF_Dict_Free (obj);
+            HPDF_Dict_Free ((HPDF_Dict)obj);
             break;
         case HPDF_OCLASS_DIRECT:
-            HPDF_Direct_Free (obj);
+            HPDF_Direct_Free ((HPDF_Direct)obj);
             break;
         default:
             HPDF_FreeMem (mmgr, obj);
@@ -94,7 +94,7 @@ HPDF_Obj_Write  (void          *obj,
         char buf[HPDF_SHORT_BUF_SIZ];
         char *pbuf = buf;
         char *eptr = buf + HPDF_SHORT_BUF_SIZ - 1;
-        HPDF_Proxy p = obj;
+        HPDF_Proxy p = (HPDF_Proxy)obj;
 
         header = (HPDF_Obj_Header*)p->obj;
 
@@ -126,31 +126,31 @@ HPDF_Obj_WriteValue  (void          *obj,
 
     switch (header->obj_class & HPDF_OCLASS_ANY) {
         case HPDF_OCLASS_NAME:
-            ret = HPDF_Name_Write (obj, stream);
+            ret = HPDF_Name_Write ((HPDF_Name)obj, stream);
             break;
         case HPDF_OCLASS_NUMBER:
-            ret = HPDF_Number_Write (obj, stream);
+            ret = HPDF_Number_Write ((HPDF_Number)obj, stream);
             break;
         case HPDF_OCLASS_REAL:
-            ret = HPDF_Real_Write (obj, stream);
+            ret = HPDF_Real_Write ((HPDF_Real)obj, stream);
             break;
         case HPDF_OCLASS_STRING:
-            ret = HPDF_String_Write (obj, stream, e);
+            ret = HPDF_String_Write ((HPDF_String)obj, stream, e);
             break;
         case HPDF_OCLASS_BINARY:
-            ret = HPDF_Binary_Write (obj, stream, e);
+            ret = HPDF_Binary_Write ((HPDF_Binary)obj, stream, e);
             break;
         case HPDF_OCLASS_ARRAY:
-            ret = HPDF_Array_Write (obj, stream, e);
+            ret = HPDF_Array_Write ((HPDF_Array)obj, stream, e);
             break;
         case HPDF_OCLASS_DICT:
-            ret = HPDF_Dict_Write (obj, stream, e);
+            ret = HPDF_Dict_Write ((HPDF_Dict)obj, stream, e);
             break;
         case HPDF_OCLASS_BOOLEAN:
-            ret = HPDF_Boolean_Write (obj, stream);
+            ret = HPDF_Boolean_Write ((HPDF_Boolean)obj, stream);
             break;
         case HPDF_OCLASS_DIRECT:
-            ret = HPDF_Direct_Write (obj, stream);
+            ret = HPDF_Direct_Write ((HPDF_Direct)obj, stream);
             break;
         case HPDF_OCLASS_NULL:
             ret = HPDF_Stream_WriteStr (stream, "null");
@@ -166,7 +166,7 @@ HPDF_Proxy
 HPDF_Proxy_New  (HPDF_MMgr  mmgr,
                  void       *obj)
 {
-    HPDF_Proxy p = HPDF_GetMem (mmgr, sizeof(HPDF_Proxy_Rec));
+    HPDF_Proxy p = (HPDF_Proxy)HPDF_GetMem (mmgr, sizeof(HPDF_Proxy_Rec));
 
     HPDF_PTRACE((" HPDF_Proxy_New\n"));
 
@@ -178,4 +178,3 @@ HPDF_Proxy_New  (HPDF_MMgr  mmgr,
 
     return p;
 }
-
