@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-17 19:53 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbmxml\config.h
+  * contrib\hbxdiff\core.c
+  * contrib\hbsqlit3\sqlite3.c
+    ! fixed compiler warnings
+
 2023-12-17 19:29 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\hbhpdf\hpdf_fontdef_tt.c
   * contrib\hbhpdf\hpdf_fontdef_type1.c
