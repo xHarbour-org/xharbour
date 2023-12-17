@@ -2772,7 +2772,7 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
 	    }
 	}
 
-        prange = HPDF_GetMem (encoder->mmgr, sizeof(HPDF_CidRange_Rec));
+        prange = ( HPDF_CidRange_Rec * ) HPDF_GetMem (encoder->mmgr, sizeof(HPDF_CidRange_Rec));
         if (!prange)
             return encoder->error->error_no;
 
