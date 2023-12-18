@@ -552,7 +552,7 @@ static int xdl_reject_hunk(recfile_t *rf, patch_t *pch, int mode,
 			}
 		} else {
 			pre = *line == '+' ? "-": "+";
-			if (xdl_emit_diffrec(line + 1, size - 1, pre, strlen(pre),
+			if (xdl_emit_diffrec(line + 1, size - 1, pre, ( long ) strlen(pre),
 					     rjecb) < 0) {
 
 				return -1;
@@ -645,4 +645,3 @@ int xdl_patch(mmfile_t *mf, mmfile_t *mfp, int mode, xdemitcb_t *ecb,
 
 	return pch.fuzzies;
 }
-
