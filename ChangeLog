@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-18 14:57 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\sevenzip\sevenzip.c
+  * contrib\hbhpdf\hpdf_streams.c
+  * contrib\hbhpdf\hpdf_image_png.c
+  * contrib\sixapi\source\base.c
+  * contrib\sixapi\source\dbcopy.c
+  * contrib\sixapi\source\dbdelim.c
+  * contrib\sixapi\source\dbsort.c
+  * source\rtl\filesys.c
+  * source\rtl\zlib\gzread.c
+  * source\rtl\zlib\gzwrite.c
+  * utils\hbpp\hbpp.c
+  * utils\hbpp\hbppcomp.c
+  * utils\hbpp\hbppcore.c
+  * utils\hbpp\pragma.c
+  * contrib\hbmxml\mxml_fil.c
+  * contrib\hbxdiff\xemit.c
+  * contrib\hbxdiff\xpatchi.c
+  * contrib\hbxdiff\xutils.c
+    ! fixed compiler warnings
+
 2023-12-17 23:09 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\pdflite\include\ft_font.h
   * contrib\pdflite\pdflib\p_document.c
