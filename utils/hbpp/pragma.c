@@ -256,12 +256,12 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
          {
             if( pInline->pCode == NULL )
             {
-               pInline->pCode = (BYTE *) hb_xgrab( ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               pInline->pCode = (BYTE *) hb_xgrab( ( iSize = ( int ) strlen( (char*) sBuffer ) ) + 1 );
                strcpy( (char*) pInline->pCode, (char*) sBuffer );
             }
             else
             {
-               pInline->pCode = (BYTE *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = strlen( (char*) sBuffer ) ) + 1 );
+               pInline->pCode = (BYTE *) hb_xrealloc( pInline->pCode, pInline->lPCodeSize + ( iSize = ( int ) strlen( (char*) sBuffer ) ) + 1 );
                strcpy( (char *) (pInline->pCode + pInline->lPCodeSize), (char*) sBuffer );
             }
 
@@ -350,7 +350,7 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
 /* Checks for +/- within the string, sets bDefault if not found */
 static BOOL IsOnOffSwitch( char * pszStr, BOOL bValue )
 {
-   int iPos = strlen( pszStr ) - 1;
+   int iPos = ( int ) strlen( pszStr ) - 1;
 
    if( pszStr[ iPos ] == '+' )
    {
