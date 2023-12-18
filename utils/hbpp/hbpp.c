@@ -161,7 +161,7 @@ int main( int argc, char * argv[] )
                        szDefText[ pAssign - szDefText ] = '\0';
 
                        //hb_pp_AddDefine( szDefText,  pAssign + 1, FALSE );
-                       uiLen = strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1;
+                       uiLen = ( UINT ) ( strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1 );
                        sDefLine = (char*) hb_xgrab( uiLen );
                        hb_snprintf( sDefLine, uiLen, "%s %s", szDefText, pAssign + 1 );
                        hb_pp_ParseDefine( sDefLine );
