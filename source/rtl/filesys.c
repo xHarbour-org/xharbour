@@ -3774,7 +3774,7 @@ void hb_fsFileToFileWithPath( char *szFile, PHB_ITEM pNameWithPath )
 
    if( szPath[ strlen( szPath ) - 1 ] == HB_OS_PATH_DELIM_CHR )
    {
-      int iLen = strlen( szPath ) + strlen( szFile );
+      int iLen = ( int ) ( strlen( szPath ) + strlen( szFile ) );
 
       hb_itemPutCPtr( pNameWithPath, (char *) hb_xgrab( iLen + 1 ), iLen );
 
@@ -3782,7 +3782,7 @@ void hb_fsFileToFileWithPath( char *szFile, PHB_ITEM pNameWithPath )
    }
    else
    {
-      int iLen = strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( szFile );
+      int iLen = ( int ) ( strlen( szPath ) + strlen( HB_OS_PATH_DELIM_CHR_STRING ) + strlen( szFile ) );
 
       hb_itemPutCPtr( pNameWithPath, (char *) hb_xgrab( iLen + 1 ), iLen );
 

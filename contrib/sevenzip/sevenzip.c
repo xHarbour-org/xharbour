@@ -250,7 +250,7 @@ HB_FUNC( HB_SEVENZIPOPENARCHIVE )
 #if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
    hb_retnl( (long) ( HB_LONG ) pFunc( (HWND) hb_parns( 1 ), (LPCSTR) hb_parc( 2 ), ( const DWORD) hb_parns( 3 ) ) );
 #else
-   hb_retnl( (LONG) pFunc( (HWND) hb_parns( 1 ), (LPCSTR) hb_parc( 2 ), ( const DWORD) hb_parns( 3 ) ) );
+   hb_retnl( (LONG) (LONG_PTR) pFunc( (HWND) hb_parns( 1 ), (LPCSTR) hb_parc( 2 ), ( const DWORD) hb_parns( 3 ) ) );
 #endif
 }
 

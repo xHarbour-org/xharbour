@@ -35,7 +35,7 @@ static long xdl_get_rec(xdfile_t *xdf, long ri, char const **rec) {
 
 
 static int xdl_emit_record(xdfile_t *xdf, long ri, char const *pre, xdemitcb_t *ecb) {
-	long size, psize = strlen(pre);
+	long size, psize = ( long ) strlen(pre);
 	char const *rec;
 
 	size = xdl_get_rec(xdf, ri, &rec);
@@ -132,4 +132,3 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 
 	return 0;
 }
-

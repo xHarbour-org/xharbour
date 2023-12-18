@@ -296,7 +296,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      {
         if( pTmp > sOut )
         {
-           hb_pp_Stuff( sOut, s_szOutLine, pTmp - sOut, 0, strlen( s_szOutLine ) );
+           hb_pp_Stuff( sOut, s_szOutLine, pTmp - sOut, 0, ( int ) strlen( s_szOutLine ) );
         }
 
         hb_pp_WrStr( handl_o, s_szOutLine );
@@ -410,4 +410,3 @@ int hb_pp_ReadRules( void )
 
   return 0;
 }
-

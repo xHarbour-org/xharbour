@@ -858,11 +858,11 @@ int hb_pp_ParseDirective( char * sLine )
 
         if( DefSearch( sID, NULL, NULL ) )
         {
-           hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+           hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
         }
         else
         {
-           hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+           hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
         }
      }
 
@@ -928,11 +928,11 @@ int hb_pp_ParseDirective( char * sLine )
 
                if( DefSearch( sID, NULL, NULL ) )
                {
-                  hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+                  hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
                }
                else
                {
-                  hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+                  hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
                }
             }
 
@@ -1186,7 +1186,7 @@ int hb_pp_ParseDefine( char * sLine )
            if( ISID( *sLine ) && ( iParamLen = NextName( &sLine, (char *) sParam ) ) > 0 )
            {
               char *pTmp;
-              int iPos, iLen = strlen( sLine );
+              int iPos, iLen = ( int ) strlen( sLine );
 
               iParams++;
 
@@ -2493,7 +2493,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
            *( sLine + isdvig + ipos - 1 ) = ';';
         }
 
-        lens = strlen( ptri );
+        lens = ( int ) strlen( ptri );
 
         //printf( "Len: %i, Digesting: >%s<\n", lens, ptri );
 
@@ -2543,12 +2543,12 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
               if( ( i = WorkDefine( &ptri, ptro, stdef ) ) >= 0 )
               {
-                 lens = strlen( ptrb );
+                 lens = ( int ) strlen( ptrb );
 
                  if( ipos > 0 )
                  {
                     *( ptrb + lens ) = ';';
-                    lens += strlen( ptrb + lens + 1 );
+                    lens += ( int ) strlen( ptrb + lens + 1 );
                  }
 
                  if( hb_comp_PPTrace )
@@ -2641,7 +2641,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                     fprintf( hb_comp_PPTrace, "#[x]translated >%.*s<\n", i, ptro );
                  }
 
-                 hb_pp_Stuff( ptro, ptri, i, lens, strlen( ptri ) );
+                 hb_pp_Stuff( ptro, ptri, i, lens, ( int ) strlen( ptri ) );
 
                  #if 0
                  if( hb_comp_PPTrace )
@@ -2728,7 +2728,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
               if( isdvig + ipos > 0 )
               {
-                 lens = strlen( sLine + isdvig );
+                 lens = ( int ) strlen( sLine + isdvig );
 
                  if( hb_comp_PPTrace )
                  {
@@ -3398,7 +3398,7 @@ static int RemoveNotInstanciated( char * stroka )
   char *ptr = stroka;
   int State = STATE_INIT;
   BOOL bDirective = FALSE;
-  int lenres = strlen( stroka );
+  int lenres = ( int ) strlen( stroka );
   char cLastChar = '\0';
 
   HB_TRACE(HB_TR_DEBUG, ("RemoveNotInstanciated(%s)", stroka));
@@ -3881,7 +3881,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
       else
       {
-         lens = strlen( *ptri );
+         lens = ( int ) strlen( *ptri );
 
          if( expreal )
          {
@@ -4958,7 +4958,7 @@ static BOOL isExpres( char * stroka, char cMarkerType )
 
   //printf( "isExp: >%s<\n", stroka );
 
-  l1 = strlen( stroka );
+  l1 = ( int ) strlen( stroka );
   l2 = getExpReal( NULL, &stroka, cMarkerType, HB_PP_STR_SIZE, 1 );
 
   //printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
@@ -6052,7 +6052,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
     if( *iBuffer == *lenBuffer )
     {
-      if( (*lenBuffer = fread(sBuffer, 1, HB_PP_BUFF_SIZE, handl_i ) ) < 1 )
+      if( (*lenBuffer = ( int ) fread(sBuffer, 1, HB_PP_BUFF_SIZE, handl_i ) ) < 1 )
       {
         sBuffer[0] = '\n';
       }
@@ -6305,7 +6305,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
 int hb_pp_WrStr( FILE * handl_o, char * buffer )
 {
-  int lens = strlen(buffer);
+  int lens = ( int ) strlen(buffer);
 
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_pp_WrStr(%p, >%s<)", handl_o, buffer ));
 
@@ -7942,7 +7942,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
       printf( "Token: >%s< Line: >%s<\n", sToken, *pLine );
    #endif
 
-   return nLen + iPad;
+   return ( int ) ( nLen + iPad );
 }
 
 char *strpbrkSkipStrings( const char* string, const char *strCharSet )
