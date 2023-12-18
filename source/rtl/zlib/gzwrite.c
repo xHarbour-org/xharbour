@@ -208,7 +208,7 @@ local z_size_t gz_write( gz_statep state, voidpc buf, z_size_t len )
                               state->in);
             copy = state->size - have;
             if (copy > len)
-                copy = len;
+                copy = ( unsigned int ) len;
             memcpy(state->in + have, buf, copy);
             state->strm.avail_in += copy;
             state->x.pos += copy;
@@ -228,7 +228,7 @@ local z_size_t gz_write( gz_statep state, voidpc buf, z_size_t len )
         do {
             unsigned n = (unsigned)-1;
             if (n > len)
-                n = len;
+                n = ( unsigned int ) len;
             state->strm.avail_in = n;
             state->x.pos += n;
             if (gz_comp(state, Z_NO_FLUSH) == -1)
@@ -356,7 +356,7 @@ int ZEXPORT gzputs( gzFile file, const char *str )
 
     /* write string */
     len = strlen(str);
-    ret = gz_write(state, str, len);
+    ret = ( int ) gz_write(state, str, len);
     return ret == 0 && len != 0 ? -1 : ret;
 }
 
