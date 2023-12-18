@@ -807,7 +807,7 @@ HPDF_FileReader_ReadFunc  (HPDF_Stream  stream,
 
     HPDF_PTRACE((" HPDF_FileReader_ReadFunc\n"));
 
-    HPDF_MemSet(ptr, 0, *siz);
+    HPDF_MemSet(ptr, 0, ( HPDF_UINT ) *siz);
     rsiz = HPDF_FREAD(ptr, 1, *siz, fp);
 
     if (rsiz != *siz) {
@@ -975,7 +975,7 @@ HPDF_FileWriter_WriteFunc  (HPDF_Stream      stream,
     HPDF_PTRACE((" HPDF_FileWriter_WriteFunc\n"));
 
     fp = (HPDF_FILEP)stream->attr;
-    ret = HPDF_FWRITE (ptr, 1, siz, fp);
+    ret = HPDF_FWRITE (ptr, 1, ( HPDF_UINT ) siz, fp);
 
     if (ret != siz) {
         return HPDF_SetError (stream->error, HPDF_FILE_IO_ERROR, HPDF_FERROR(fp));
@@ -1467,4 +1467,3 @@ HPDF_Stream_Validate  (HPDF_Stream  stream)
     else
         return HPDF_TRUE;
 }
-
