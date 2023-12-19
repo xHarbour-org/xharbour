@@ -74,7 +74,7 @@ HPDF_String_SetValue  (HPDF_String      obj,
     if (len > HPDF_LIMIT_MAX_STRING_LEN)
         return HPDF_SetError (obj->error, HPDF_STRING_OUT_OF_RANGE, 0);
 
-    obj->value = ( HPDF_BYTE * ) HPDF_GetMem (obj->mmgr, len + 1);
+    obj->value = HPDF_GetMem (obj->mmgr, len + 1);
     if (!obj->value)
         return HPDF_Error_GetCode (obj->error);
 

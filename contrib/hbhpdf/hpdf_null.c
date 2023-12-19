@@ -22,7 +22,7 @@
 HPDF_Null
 HPDF_Null_New  (HPDF_MMgr  mmgr)
 {
-    HPDF_Null obj = ( HPDF_Null ) HPDF_GetMem (mmgr, sizeof(HPDF_Null_Rec));
+    HPDF_Null obj = HPDF_GetMem (mmgr, sizeof(HPDF_Null_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));

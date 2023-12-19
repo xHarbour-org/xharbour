@@ -88,7 +88,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
         return NULL;
     }
 
-    attr = ( HPDF_FontAttr ) HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
+    attr = HPDF_GetMem (mmgr, sizeof(HPDF_FontAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -117,7 +117,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
      * initialized at 0, and set when the corresponding character was used
      * for the first time.
      */
-    attr->widths = ( HPDF_INT16 * ) HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
+    attr->widths = HPDF_GetMem (mmgr, sizeof(HPDF_INT16) * 256);
     if (!attr->widths) {
         HPDF_Dict_Free (font);
         return NULL;
@@ -125,7 +125,7 @@ HPDF_TTFont_New  (HPDF_MMgr        mmgr,
 
     HPDF_MemSet (attr->widths, 0, sizeof(HPDF_INT16) * 256);
 
-    attr->used = ( HPDF_BYTE * ) HPDF_GetMem (mmgr, sizeof(HPDF_BYTE) * 256);
+    attr->used = HPDF_GetMem (mmgr, sizeof(HPDF_BYTE) * 256);
     if (!attr->used) {
         HPDF_Dict_Free (font);
         return NULL;

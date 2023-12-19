@@ -41,7 +41,7 @@ HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
     dict->header.obj_class |= HPDF_OSUBCLASS_ENCRYPT;
     dict->free_fn = HPDF_EncryptDict_OnFree;
 
-    attr = ( HPDF_Encrypt ) HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
+    attr = HPDF_GetMem (dict->mmgr, sizeof(HPDF_Encrypt_Rec));
     if (!attr) {
         HPDF_Dict_Free (dict);
         return NULL;

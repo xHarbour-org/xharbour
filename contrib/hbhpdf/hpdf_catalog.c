@@ -77,7 +77,7 @@ HPDF_Catalog_GetRoot  (HPDF_Catalog  catalog)
     if (!catalog)
         return NULL;
 
-    pages = ( HPDF_Dict ) HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
+    pages = HPDF_Dict_GetItem (catalog, "Pages", HPDF_OCLASS_DICT);
     if (!pages || pages->header.obj_class != (HPDF_OSUBCLASS_PAGES |
                 HPDF_OCLASS_DICT))
         HPDF_SetError (catalog->error, HPDF_PAGE_CANNOT_GET_ROOT_PAGES, 0);
@@ -91,7 +91,7 @@ HPDF_Catalog_GetNames  (HPDF_Catalog catalog)
 {
     if (!catalog)
         return NULL;
-    return ( HPDF_NameDict ) HPDF_Dict_GetItem (catalog, "Names", HPDF_OCLASS_DICT);
+    return HPDF_Dict_GetItem (catalog, "Names", HPDF_OCLASS_DICT);
 }
 
 
@@ -200,7 +200,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
 {
     HPDF_STATUS ret;
     HPDF_Array nums;
-    HPDF_Dict labels = ( HPDF_Dict ) HPDF_Dict_GetItem (catalog, "PageLabels",
+    HPDF_Dict labels = HPDF_Dict_GetItem (catalog, "PageLabels",
         HPDF_OCLASS_DICT);
 
     HPDF_PTRACE ((" HPDF_Catalog_AddPageLabel\n"));
@@ -215,7 +215,7 @@ HPDF_Catalog_AddPageLabel  (HPDF_Catalog   catalog,
             return ret;
     }
 
-    nums = ( HPDF_Array ) HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
+    nums = HPDF_Dict_GetItem (labels, "Nums", HPDF_OCLASS_ARRAY);
 
     if (!nums) {
         nums = HPDF_Array_New (catalog->mmgr);
@@ -382,3 +382,4 @@ HPDF_Catalog_GetViewerPreference  (HPDF_Catalog   catalog)
 
     return value;
 }
+

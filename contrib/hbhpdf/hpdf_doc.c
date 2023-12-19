@@ -166,7 +166,7 @@ HPDF_NewEx  (HPDF_Error_Handler    user_error_fn,
     }
 
     /* now create pdf_doc object */
-    pdf = ( HPDF_Doc ) HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
+    pdf = HPDF_GetMem (mmgr, sizeof (HPDF_Doc_Rec));
     if (!pdf) {
         HPDF_MMgr_Free (mmgr);
         HPDF_CheckError (&tmp_error);
@@ -587,7 +587,7 @@ HPDF_Doc_PrepareEncryption  (HPDF_Doc   pdf)
         return pdf->error.error_no;
 
     /* reset 'ID' to trailer-dictionary */
-    id = ( HPDF_Array ) HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
+    id = HPDF_Dict_GetItem (pdf->trailer, "ID", HPDF_OCLASS_ARRAY);
     if (!id) {
         id = HPDF_Array_New (pdf->mmgr);
 
@@ -798,7 +798,7 @@ HPDF_GetPageByIndex  (HPDF_Doc    pdf,
     if (!HPDF_HasDoc (pdf))
         return NULL;
 
-    ret = ( HPDF_Page ) HPDF_List_ItemAt (pdf->page_list, index);
+    ret = HPDF_List_ItemAt (pdf->page_list, index);
     if (!ret) {
         HPDF_RaiseError (&pdf->error, HPDF_INVALID_PAGE_INDEX, 0);
         return NULL;
@@ -2237,7 +2237,7 @@ HPDF_AddIntent(HPDF_Doc  pdf,
     if (!HPDF_HasDoc (pdf))
         return HPDF_INVALID_DOCUMENT;
 
-    intents = ( HPDF_Array ) HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
+    intents = HPDF_Dict_GetItem (pdf->catalog, "OutputIntents", HPDF_OCLASS_ARRAY);
     if (intents == NULL) {
         intents = HPDF_Array_New (pdf->mmgr);
         if (intents) {
@@ -2375,3 +2375,4 @@ HPDF_LoadIccProfileFromFile  (HPDF_Doc pdf,
 
     return iccentry;
 }
+

@@ -410,7 +410,7 @@ HPDF_Image_Validate (HPDF_Image  image)
         return HPDF_FALSE;
     }
 
-    subtype = ( HPDF_Name ) HPDF_Dict_GetItem (image, "Subtype", HPDF_OCLASS_NAME);
+    subtype = HPDF_Dict_GetItem (image, "Subtype", HPDF_OCLASS_NAME);
     if (!subtype || HPDF_StrCmp (subtype->value, "Image") != 0) {
         HPDF_RaiseError (image->error, HPDF_INVALID_IMAGE, 0);
         return HPDF_FALSE;
@@ -432,8 +432,8 @@ HPDF_Image_GetSize (HPDF_Image  image)
     if (!HPDF_Image_Validate (image))
         return ret;
 
-    width = ( HPDF_Number ) HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
-    height = ( HPDF_Number ) HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+    width = HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
+    height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
       ret.x = (HPDF_REAL)width->value;
@@ -456,8 +456,8 @@ HPDF_Image_GetSize2 (HPDF_Image  image, HPDF_Point *size)
     if (!HPDF_Image_Validate (image))
         return HPDF_INVALID_IMAGE;
 
-    width = ( HPDF_Number ) HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
-    height = ( HPDF_Number ) HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
+    width = HPDF_Dict_GetItem (image, "Width", HPDF_OCLASS_NUMBER);
+    height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
       size->x = (HPDF_REAL)width->value;
@@ -477,7 +477,7 @@ HPDF_Image_GetBitsPerComponent (HPDF_Image  image)
     if (!HPDF_Image_Validate (image))
         return 0;
 
-    n = ( HPDF_Number ) HPDF_Dict_GetItem (image, "BitsPerComponent", HPDF_OCLASS_NUMBER);
+    n = HPDF_Dict_GetItem (image, "BitsPerComponent", HPDF_OCLASS_NUMBER);
 
     if (!n)
         return 0;
@@ -492,17 +492,17 @@ HPDF_Image_GetColorSpace (HPDF_Image  image)
 
 	HPDF_PTRACE ((" HPDF_Image_GetColorSpace\n"));
 
-	n = ( HPDF_Name ) HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
+	n = HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
 
 	if (!n) {
 		HPDF_Array a;
 
 		HPDF_Error_Reset(image->error);
 
-		a = ( HPDF_Array ) HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_ARRAY);
+		a = HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_ARRAY);
 
 		if (a) {
-			n = ( HPDF_Name ) HPDF_Array_GetItem (a, 0, HPDF_OCLASS_NAME);
+			n = HPDF_Array_GetItem (a, 0, HPDF_OCLASS_NAME);
 		}
 	}
 
@@ -539,7 +539,7 @@ HPDF_Image_SetMask (HPDF_Image   image,
         return HPDF_SetError (image->error, HPDF_INVALID_BIT_PER_COMPONENT,
                 0);
 
-    image_mask = ( HPDF_Boolean ) HPDF_Dict_GetItem (image, "ImageMask", HPDF_OCLASS_BOOLEAN);
+    image_mask = HPDF_Dict_GetItem (image, "ImageMask", HPDF_OCLASS_BOOLEAN);
     if (!image_mask) {
         HPDF_STATUS ret;
         image_mask = HPDF_Boolean_New (image->mmgr, HPDF_FALSE);
@@ -661,3 +661,4 @@ HPDF_Image_SetRenderingIntent  (HPDF_Image   image,
 
     return HPDF_Dict_AddName (image, "Intent", intent);
 }
+
