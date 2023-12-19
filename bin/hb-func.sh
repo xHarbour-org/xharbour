@@ -37,7 +37,8 @@ get_hbplatform()
             *) ;;
         esac
     fi
-    echo -n "${id}"
+    #echo -n "${id}"
+    printf "%s" "${id}"
 }
 
 get_hbver()
@@ -49,7 +50,8 @@ get_hbver()
     MAJOR=`sed -e '/HB_VER_MAJOR/    !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
     MINOR=`sed -e '/HB_VER_MINOR/    !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
     REVIS=`sed -e '/HB_VER_REVISION/ !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
-    echo -n "${MAJOR}.${MINOR}.${REVIS}"
+    #echo -n "${MAJOR}.${MINOR}.${REVIS}"
+    printf "%s.%s.%s" "${MAJOR}" "${MINOR}" "${REVIS}"
 }
 
 get_solibname()

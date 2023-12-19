@@ -112,11 +112,9 @@ OBJLST=`find . -name \*.o`
 cd "${OTMPDIR}"
 if [ "${SLIB_EXT}" = ".dylib" ]; then
     FULLNAME="${BASE}.${VERSION}${SLIB_EXT}"
-    ld -r -o "${FULLNAME}.o" $OBJLST && \
-    ${CCPREFIX}gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
-        -compatibility_version ${MAJOR}.${MINOR} -current_version ${VERSION} \
-        -flat_namespace -undefined warning -multiply_defined suppress -single_module \
-        -o "${FULLNAME}" "${FULLNAME}.o" ${linker_options} && \
+    ${CCPREFIX}gcc -fsanitize=address -dynamiclib -o "${FULLNAME}" $OBJLST -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
+    -compatibility_version ${MAJOR}.${MINOR} -current_version ${VERSION} \
+    -flat_namespace ${linker_options} && \
     cd "${dir}" && \
     mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}" && \
     ln -sf "${FULLNAME}" "${DSTDIR}${BASE}.${MAJOR}${SLIB_EXT}" && \

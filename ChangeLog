@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-19 02:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * bin/hb-func.sh
+    * Replaced 'echo -n ...' with 'printf ...' to fix '-n' not supported by some shells
+  * bin/hb-mkslib.sh
+    ! Fixed (and simplified) .dylib creation
+
 2023-12-18 14:57 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\sevenzip\sevenzip.c
   * contrib\hbhpdf\hpdf_streams.c
