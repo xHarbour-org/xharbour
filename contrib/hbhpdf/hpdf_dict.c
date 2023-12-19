@@ -121,8 +121,8 @@ HPDF_Dict_Add_FilterParams(HPDF_Dict    dict, HPDF_Dict filterParam)
 {
     HPDF_Array paramArray;
     /* prepare params object */
-    paramArray = ( HPDF_Array ) HPDF_Dict_GetItem (dict, "DecodeParms",
-                                                   HPDF_OCLASS_ARRAY);
+    paramArray = HPDF_Dict_GetItem (dict, "DecodeParms",
+                                              HPDF_OCLASS_ARRAY);
     if(paramArray==NULL) {
         paramArray = HPDF_Array_New (dict->mmgr);
        if (!paramArray)
@@ -162,8 +162,8 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
         if (dict->filter == HPDF_STREAM_FILTER_NONE)
             HPDF_Dict_RemoveElement (dict, "Filter");
         else {
-            HPDF_Array array = ( HPDF_Array ) HPDF_Dict_GetItem (dict, "Filter",
-                                                                 HPDF_OCLASS_ARRAY);
+            HPDF_Array array = HPDF_Dict_GetItem (dict, "Filter",
+                        HPDF_OCLASS_ARRAY);
 
             if (!array) {
                 array = HPDF_Array_New (dict->mmgr);
@@ -430,7 +430,7 @@ HPDF_Dict_GetItem  (HPDF_Dict        dict,
         HPDF_Obj_Header *header = (HPDF_Obj_Header *)element->value;
 
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = ( HPDF_Proxy ) element->value;
+            HPDF_Proxy p = element->value;
             header = (HPDF_Obj_Header *)p->obj;
             obj = p->obj;
         } else
@@ -505,7 +505,7 @@ HPDF_Dict_GetKeyByObj (HPDF_Dict  dict,
 
         header = (HPDF_Obj_Header *)(element->value);
         if (header->obj_class == HPDF_OCLASS_PROXY) {
-            HPDF_Proxy p = ( HPDF_Proxy ) element->value;
+            HPDF_Proxy p = element->value;
 
             if (p->obj == obj)
                 return element->key;
@@ -517,3 +517,4 @@ HPDF_Dict_GetKeyByObj (HPDF_Dict  dict,
 
     return NULL;
 }
+

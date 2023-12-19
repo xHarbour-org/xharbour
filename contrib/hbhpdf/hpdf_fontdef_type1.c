@@ -68,7 +68,7 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     if (!mmgr)
         return NULL;
 
-    fontdef = ( HPDF_FontDef ) HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
+    fontdef = HPDF_GetMem (mmgr, sizeof(HPDF_FontDef_Rec));
     if (!fontdef)
         return NULL;
 
@@ -79,7 +79,7 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     fontdef->type = HPDF_FONTDEF_TYPE_TYPE1;
     fontdef->free_fn = FreeFunc;
 
-    fontdef_attr = ( HPDF_Type1FontDefAttr ) HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
+    fontdef_attr = HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
     if (!fontdef_attr) {
         HPDF_FreeMem (fontdef->mmgr, fontdef);
         return NULL;
@@ -184,7 +184,7 @@ LoadAfm (HPDF_FontDef  fontdef,
             HPDF_UINT len1 = HPDF_StrLen (s, HPDF_LIMIT_MAX_STRING_LEN);
 
             if (len1 > 0) {
-                attr->char_set = ( char * ) HPDF_GetMem (fontdef->mmgr, len1 + 1);
+                attr->char_set = HPDF_GetMem (fontdef->mmgr, len1 + 1);
                 if (!attr->char_set)
                     return HPDF_Error_GetCode (fontdef->error);
 
@@ -519,3 +519,4 @@ FreeFunc (HPDF_FontDef  fontdef)
     HPDF_FreeMem (fontdef->mmgr, attr->widths);
     HPDF_FreeMem (fontdef->mmgr, attr);
 }
+

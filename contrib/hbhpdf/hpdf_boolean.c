@@ -22,7 +22,7 @@ HPDF_Boolean
 HPDF_Boolean_New  (HPDF_MMgr  mmgr,
                    HPDF_BOOL  value)
 {
-    HPDF_Boolean obj = ( HPDF_Boolean ) HPDF_GetMem (mmgr, sizeof(HPDF_Boolean_Rec));
+    HPDF_Boolean obj = HPDF_GetMem (mmgr, sizeof(HPDF_Boolean_Rec));
 
     if (obj) {
         HPDF_MemSet(&obj->header, 0, sizeof(HPDF_Obj_Header));

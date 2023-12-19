@@ -318,7 +318,7 @@ HPDF_Page_New  (HPDF_MMgr   mmgr,
     page->free_fn = Page_OnFree;
     page->before_write_fn = Page_BeforeWrite;
 
-    attr = ( HPDF_PageAttr ) HPDF_GetMem (page->mmgr, sizeof(HPDF_PageAttr_Rec));
+    attr = HPDF_GetMem (page->mmgr, sizeof(HPDF_PageAttr_Rec));
     if (!attr) {
         HPDF_Dict_Free (page);
         return NULL;
@@ -431,14 +431,14 @@ HPDF_Page_GetInheritableItem  (HPDF_Page          page,
      * pages recursively
      */
     if (!obj) {
-        HPDF_Pages pages = ( HPDF_Pages ) HPDF_Dict_GetItem (page, "Parent", HPDF_OCLASS_DICT);
+        HPDF_Pages pages = HPDF_Dict_GetItem (page, "Parent", HPDF_OCLASS_DICT);
         while (pages) {
             obj = HPDF_Dict_GetItem (page, key, obj_class);
 
             if (obj)
                 break;
 
-            pages = ( HPDF_Pages ) HPDF_Dict_GetItem (pages, "Parent", HPDF_OCLASS_DICT);
+            pages = HPDF_Dict_GetItem (pages, "Parent", HPDF_OCLASS_DICT);
         }
     }
 
@@ -502,7 +502,7 @@ HPDF_Page_GetLocalFontName  (HPDF_Page  page,
         HPDF_Dict resources;
         HPDF_Dict fonts;
 
-        resources = ( HPDF_Dict ) HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -548,25 +548,25 @@ HPDF_Page_GetMediaBox  (HPDF_Page   page)
     HPDF_PTRACE((" HPDF_Page_GetMediaBox\n"));
 
     if (HPDF_Page_Validate (page)) {
-        HPDF_Array array = ( HPDF_Array ) HPDF_Page_GetInheritableItem (page, "MediaBox",
+        HPDF_Array array = HPDF_Page_GetInheritableItem (page, "MediaBox",
                         HPDF_OCLASS_ARRAY);
 
         if (array) {
             HPDF_Real r;
 
-            r = ( HPDF_Real ) HPDF_Array_GetItem (array, 0, HPDF_OCLASS_REAL);
+            r = HPDF_Array_GetItem (array, 0, HPDF_OCLASS_REAL);
             if (r)
                 media_box.left = r->value;
 
-            r = ( HPDF_Real ) HPDF_Array_GetItem (array, 1, HPDF_OCLASS_REAL);
+            r = HPDF_Array_GetItem (array, 1, HPDF_OCLASS_REAL);
             if (r)
                 media_box.bottom = r->value;
 
-            r = ( HPDF_Real ) HPDF_Array_GetItem (array, 2, HPDF_OCLASS_REAL);
+            r = HPDF_Array_GetItem (array, 2, HPDF_OCLASS_REAL);
             if (r)
                 media_box.right = r->value;
 
-            r = ( HPDF_Real ) HPDF_Array_GetItem (array, 3, HPDF_OCLASS_REAL);
+            r = HPDF_Array_GetItem (array, 3, HPDF_OCLASS_REAL);
             if (r)
                 media_box.top = r->value;
 
@@ -835,7 +835,7 @@ HPDF_Page_GetXObjectName  (HPDF_Page     page,
         HPDF_Dict resources;
         HPDF_Dict xobjects;
 
-        resources = ( HPDF_Dict ) HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -886,7 +886,7 @@ HPDF_Page_GetExtGStateName  (HPDF_Page       page,
         HPDF_Dict resources;
         HPDF_Dict ext_gstates;
 
-        resources = ( HPDF_Dict ) HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = HPDF_Page_GetInheritableItem (page, "Resources",
                         HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -936,7 +936,7 @@ HPDF_Page_GetShadingName  (HPDF_Page    page,
         HPDF_Dict resources;
         HPDF_Dict shadings;
 
-        resources = ( HPDF_Dict ) HPDF_Page_GetInheritableItem (page, "Resources",
+        resources = HPDF_Page_GetInheritableItem (page, "Resources",
                                                   HPDF_OCLASS_DICT);
         if (!resources)
             return NULL;
@@ -983,7 +983,7 @@ AddAnnotation  (HPDF_Page        page,
     HPDF_PTRACE((" HPDF_Pages\n"));
 
     /* find "Annots" entry */
-    array = ( HPDF_Array ) HPDF_Dict_GetItem (page, "Annots", HPDF_OCLASS_ARRAY);
+    array = HPDF_Dict_GetItem (page, "Annots", HPDF_OCLASS_ARRAY);
 
     if (!array) {
         array = HPDF_Array_New (page->mmgr);
@@ -1189,7 +1189,7 @@ HPDF_Page_GetMiterLimit  (HPDF_Page   page)
 HPDF_EXPORT(HPDF_DashMode)
 HPDF_Page_GetDash  (HPDF_Page   page)
 {
-    HPDF_DashMode mode = {{0, 0, 0, 0, 0, 0, 0, 0}, 0, 0};
+    HPDF_DashMode mode = {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, 0.0f, 0.0f};
 
     HPDF_PTRACE((" HPDF_Page_GetDash\n"));
 
@@ -1557,11 +1557,11 @@ HPDF_Page_SetBoxValue (HPDF_Page          page,
     if (!HPDF_Page_Validate (page))
         return HPDF_INVALID_PAGE;
 
-    array = ( HPDF_Array ) HPDF_Page_GetInheritableItem (page, name, HPDF_OCLASS_ARRAY);
+    array = HPDF_Page_GetInheritableItem (page, name, HPDF_OCLASS_ARRAY);
     if (!array)
         return HPDF_SetError (page->error, HPDF_PAGE_CANNOT_FIND_OBJECT, 0);
 
-    r = ( HPDF_Real ) HPDF_Array_GetItem (array, index, HPDF_OCLASS_REAL);
+    r = HPDF_Array_GetItem (array, index, HPDF_OCLASS_REAL);
     if (!r)
         return HPDF_SetError (page->error, HPDF_PAGE_INVALID_INDEX, 0);
 
@@ -1586,7 +1586,7 @@ HPDF_Page_SetRotate (HPDF_Page      page,
         return HPDF_RaiseError (page->error, HPDF_PAGE_INVALID_ROTATE_VALUE,
                 (HPDF_STATUS)angle);
 
-    n = ( HPDF_Number ) HPDF_Page_GetInheritableItem (page, "Rotate", HPDF_OCLASS_NUMBER);
+    n = HPDF_Page_GetInheritableItem (page, "Rotate", HPDF_OCLASS_NUMBER);
 
     if (!n)
         ret = HPDF_Dict_AddNumber (page, "Rotate", angle);

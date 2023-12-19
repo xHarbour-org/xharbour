@@ -191,7 +191,6 @@ HPDF_FToA  (char       *s,
     char* t;
     HPDF_INT32 logVal;
     HPDF_UINT32 prec;
-    HPDF_UINT32 i;
 
     if (val > HPDF_LIMIT_MAX_REAL)
         val = HPDF_LIMIT_MAX_REAL;
@@ -217,11 +216,11 @@ HPDF_FToA  (char       *s,
     }
 
     /* separate an integer part and a fractional part. */
-    fpart_val = ( HPDF_REAL ) modf(val, (double *) &int_val);
+    fpart_val = modff(val, &int_val);
 
     /* process integer part */
     do {
-        dig = ( HPDF_REAL ) modf(int_val/10.0, (double *) &int_val);
+        dig = modff(int_val/10.0, &int_val);
         *t++ = (char)(dig*10.0 + 0.5) + '0';
     } while (int_val > 0);
 
@@ -233,8 +232,8 @@ HPDF_FToA  (char       *s,
    /* process fractional part */
    *s++ = '.';
    if(fpart_val != 0.0) {
-       for (i = 0; i < prec; i++) {
-          fpart_val = ( HPDF_REAL ) modf(fpart_val*10.0, (double *) &int_val);
+       for (HPDF_UINT32 i = 0; i < prec; i++) {
+          fpart_val = modff(fpart_val*10.0, &int_val);
           *s++ = (char)(int_val + 0.5) + '0';
        }
    }
@@ -449,5 +448,6 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value)
     HPDF_BYTE u[2];
 
     HPDF_MemCpy (u, (HPDF_BYTE*)value, 2);
-    *value = (HPDF_UINT16)(((HPDF_UINT16)u[0] << 8) | (HPDF_UINT16)u[1]);
+    *value = (HPDF_UINT16)((HPDF_UINT16)u[0] << 8 | (HPDF_UINT16)u[1]);
 }
+

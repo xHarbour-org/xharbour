@@ -26,7 +26,7 @@ HPDF_Name_New  (HPDF_MMgr        mmgr,
 {
     HPDF_Name obj;
 
-    obj  = ( HPDF_Name ) HPDF_GetMem (mmgr, sizeof(HPDF_Name_Rec));
+    obj  = HPDF_GetMem (mmgr, sizeof(HPDF_Name_Rec));
 
     if (obj) {
         HPDF_MemSet (&obj->header, 0, sizeof(HPDF_Obj_Header));
