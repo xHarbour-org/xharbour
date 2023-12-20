@@ -24,11 +24,22 @@ rem if "%HB_ARCHITECTURE%" == "" set HB_ARCHITECTURE=dos
 rem if "%HB_COMPILER%" == "" set HB_COMPILER=djgpp
 rem if "%HB_GT_LIB%" == "" set HB_GT_LIB=
 
+if "%HB_BIN_INSTALL%" == "" if "%HB_INSTALL%" == "" (
+    set "HB_BIN_INSTALL=%~dp0"
+    set "HB_INSTALL=%~dp0.."
+    echo WARNING: HB_INSTALL is not set. Deducing from batch file location!
+)
+
 if "%HB_INSTALL%" == "" set HB_INSTALL=\xharbour
 
-if "%HB_BIN_INSTALL%" == "" set HB_BIN_INSTALL=%HB_INSTALL%\bin
-if "%HB_LIB_INSTALL%" == "" set HB_LIB_INSTALL=%HB_INSTALL%\lib
-if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
+if "%HB_BIN_INSTALL%" == "" set "HB_BIN_INSTALL=%HB_INSTALL%\bin"
+if "%HB_LIB_INSTALL%" == "" set "HB_LIB_INSTALL=%HB_INSTALL%\lib"
+if "%HB_INC_INSTALL%" == "" set "HB_INC_INSTALL=%HB_INSTALL%\include"
+
+echo HB_BIN_INSTALL=%HB_BIN_INSTALL%
+echo HB_LIB_INSTALL=%HB_LIB_INSTALL%
+echo HB_INC_INSTALL=%HB_INC_INSTALL%
+echo HB_LIBLIST=%HB_LIBLIST%
 
 :START
 
@@ -270,15 +281,19 @@ rem   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
    if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
-   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl.lib %HB_LIB_INSTALL%\zlib.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd.lib %HB_LIB_INSTALL%\macro.lib %HB_LIB_INSTALL%\pp.lib %HB_LIB_INSTALL%\dbffpt.lib %HB_LIB_INSTALL%\dbfntx.lib %HB_LIB_INSTALL%\dbfcdx.lib %HB_LIB_INSTALL%\bmdbfcdx.lib %HB_LIB_INSTALL%\redbfcdx.lib %HB_LIB_INSTALL%\hsx.lib %HB_LIB_INSTALL%\hbsix.lib %HB_LIB_INSTALL%\sixcdx.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct.lib %HB_LIB_INSTALL%\tip.lib %HB_LIB_INSTALL%\usrrdd.lib %HB_LIB_INSTALL%\rdds.lib %ADS_LIBS% %HB_USER_LIBS%
+   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% debug.lib vm%HB_MT%.lib rtl.lib zlib.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd.lib macro.lib pp.lib dbffpt.lib dbfntx.lib dbfcdx.lib bmdbfcdx.lib redbfcdx.lib hsx.lib hbsix.lib sixcdx.lib common.lib ct.lib tip.lib usrrdd.lib rdds.lib %ADS_LIBS% %HB_USER_LIBS%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
 
-   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% %HB_LIB_INSTALL%\hbzip.lib
+   if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% hbzip.lib
+   if exist %HB_LIB_INSTALL%\libharu.lib if exist %HB_LIB_INSTALL%\hbhpdf.lib set HB_LIBLIST=%HB_LIBLIST% libharu.lib hbhpdf.lib
+   if exist %HB_LIB_INSTALL%\png.lib set HB_LIBLIST=%HB_LIBLIST% png.lib
 
 rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if not "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP
 
    if not "%HB_DLL%" == "" if "%HB_MT%" == "" set LDFLAGS=%LDFLAGS% /NODEFAULTLIB:LIBC
+
+   set LDFLAGS=%LDFLAGS% /LIBPATH:"%HB_LIB_INSTALL%"
 
    set _cons=CONSOLE
    set _main=std
@@ -290,8 +305,8 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if "%HB_GT_LIB%"=="gtgui" set _main=win
    if "%HB_GT_LIB%"=="gtnul" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtnul" set _main=win
-   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
-        cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
+   echo cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
+        cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
    set _cons=
    set _main=
    @type msvc.log

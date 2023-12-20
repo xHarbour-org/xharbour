@@ -225,6 +225,7 @@ CC_CMD_ZIP     =$(CC)\
 	-D_WIN32 $(ZIP_DEBUGFLAGS) -D_MBCS -D"_LIB"\
 	-Fp"$(OBJ_DIR)\hbzip.pch" -Fd"$(OBJ_DIR)\\"\
 	-D_CRT_SECURE_NO_WARNINGS -Fo$@ $**
+CC_CMD_HARU    =$(CC) $(CLIBFLAGS) -Fo$@ $**
 
 #===============================================================================
 # Building rules of Object files

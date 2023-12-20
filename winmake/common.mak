@@ -2465,7 +2465,9 @@ LIBHARU_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_encoder_utf$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_exdata$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)hpdf_image_ccitt$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT) \
+	$(OBJ_DIR)$(DIR_SEP)hpdf_direct$(OBJEXT) \
+	$(OBJ_DIR)$(DIR_SEP)hpdf_shading$(OBJEXT)
 
 #===============================================================================
 # TIPSSL.LIB rules

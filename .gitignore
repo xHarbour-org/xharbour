@@ -20,6 +20,7 @@
 *.ppo
 *.pp$
 *.map
+*.json
 
 pptable.c
 hbverbld.h

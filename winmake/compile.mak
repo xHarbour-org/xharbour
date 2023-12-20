@@ -6105,178 +6105,185 @@ $(OBJ_DIR)$(DIR_SEP)pngwutil$(OBJEXT) : $(PNG_DIR)$(DIR_SEP)pngwutil.c
 # HBHPDF.LIB dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)harupdf$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)harupdf.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_utils$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_utils.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_error$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_error.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_mmgr$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_mmgr.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_list$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_list.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_streams$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_streams.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_objects$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_objects.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_null$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_null.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_boolean$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_boolean.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_number$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_number.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_namedict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_namedict.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_pdfa$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_pdfa.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_real$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_real.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_name$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_name.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_array$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_array.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_dict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_dict.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_xref$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_xref.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_string$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_string.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_binary$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_binary.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encrypt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encrypt.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encryptdict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encryptdict.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_tt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_tt.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_type1$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_type1.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_base14$(OBJEXT): $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_base14.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cid$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_cid.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_font$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_font_type1$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font_type1.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_font_tt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font_tt.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_font_cid$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font_cid.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_doc$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_info$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_info.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_catalog$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_catalog.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_page_label$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_page_label.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_gstate.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_pages$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_pages.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_page_operator$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_page_operator.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_destination$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_destination.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_annotation$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_annotation.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_outline$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_outline.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_jp$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_jp.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_kr$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_kr.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_cns$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_cns.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_cnt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_cnt.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_jp$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_jp.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_kr$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_kr.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cns$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_cns.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cnt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_cnt.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image_png.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc_png.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_ext_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_ext_gstate.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_u3d$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_u3d.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_3dmeasure$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_3dmeasure.c
-	$(CC_CMD)	
+	$(CC_CMD_HARU)	
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_utf$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_utf.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_exdata$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_exdata.c
-	$(CC_CMD)
+	$(CC_CMD_HARU)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image_ccitt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image_ccitt.c
-	$(CC_CMD)	
+	$(CC_CMD_HARU)	
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_direct$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_direct.c
+	$(CC_CMD_HARU)	
+
+$(OBJ_DIR)$(DIR_SEP)hpdf_shading$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_shading.c
+	$(CC_CMD_HARU)	
+
 #===============================================================================
 # TIPSSL.LIB rules
 #===============================================================================
