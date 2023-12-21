@@ -80,6 +80,10 @@
    #pragma warn(disable:2130)
 #endif
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #include "hbapi.h"
 #include "hbver.h"
 #include "hbcomp.h"
