@@ -1797,7 +1797,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   else if( HB_EXPR_ISBUILTIN_ID( szName, STOD ) && ( ! usCount || pParms->value.asList.pExprList->ExprType == HB_ET_STRING ) )
                   {
                      /* try to change it into a date */
-                     PHB_EXPR pArg;
+                     PHB_EXPR pArg = NULL;
                      int      iDate  = 0;
                      BOOL     bEmpty = TRUE;
 
