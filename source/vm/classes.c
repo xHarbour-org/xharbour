@@ -1575,15 +1575,15 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
          if( pNewMeth->pFunction == hb___msgSetData || pNewMeth->pFunction == hb___msgGetData )
          {
             UINT      uiLen  = pClass->uiDataInitiated + 1;
-            PCLSDINIT pInit  = pClass->pInitValues;
+            PCLSDINIT pInit2 = pClass->pInitValues;
             PHB_ITEM  pValue = pNewMeth->pInitValue;
 
-            for(; --uiLen; pInit++ )
+            for(; --uiLen; pInit2++ )
             {
-               if( pInit->pInitValue == pValue )
+               if( pInit2->pInitValue == pValue )
                {
                   if( uiLen > 1 )
-                     memmove( pInit, pInit + 1, ( uiLen - 1 ) * sizeof( CLSDINIT ) );
+                     memmove( pInit2, pInit2 + 1, ( uiLen - 1 ) * sizeof( CLSDINIT ) );
 
                   /* without realloc, only free if uiDataInitiated is 0 */
                   if( --pClass->uiDataInitiated == 0 )
@@ -1633,9 +1633,9 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
                   {
                      if( pInit->item.asArray.value->uiClass )
                      {
-                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
+                        PCLASS pClass2 = s_pClasses + pInit->item.asArray.value->uiClass - 1;
 
-                        if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        if( pClass2->pDestructor && pClass2->uiScope & HB_OO_CLS_DESTRUC_SYMB )
                         {
                            hb_errRT_BASE( EG_ARG, 3009, "Init value can not contain an object with a destructor", szMessage, 1, pInit );
                            return FALSE;
@@ -1691,9 +1691,9 @@ static BOOL hb_clsAddMsg( USHORT uiClass, const char * szMessage,
                   {
                      if( pInit->item.asArray.value->uiClass )
                      {
-                        PCLASS pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
+                        PCLASS pClass2 = s_pClasses + pInit->item.asArray.value->uiClass - 1;
 
-                        if( pClass->pDestructor && pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+                        if( pClass2->pDestructor && pClass2->uiScope & HB_OO_CLS_DESTRUC_SYMB )
                         {
                            hb_errRT_BASE( EG_ARG, 3009, "Class Var's init value can not contain an object with a destructor", szMessage, 1, pInit );
                            return FALSE;
@@ -2074,26 +2074,26 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
          uiSuperCls = ( USHORT ) hb_arrayGetNI( pSuperArray, i );
          if( uiSuperCls && uiSuperCls < s_uiClasses )
          {
-            PCLASS pSprCls;
+            PCLASS pSprCls2;
 
-            pSprCls = s_pClasses + uiSuperCls - 1;
+            pSprCls2 = s_pClasses + uiSuperCls - 1;
             if( i == 1 )
             {
-               if( pSprCls->pFunError )
+               if( pSprCls2->pFunError )
                {
-                  pNewCls->pFunError   = pSprCls->pFunError;
+                  pNewCls->pFunError   = pSprCls2->pFunError;
                   pNewCls->uiScope     |= HB_OO_CLS_ONERROR_SUPER;
                }
 
-               pNewCls->pDestructor    = pSprCls->pDestructor;
+               pNewCls->pDestructor    = pSprCls2->pDestructor;
 
                /* CLASS DATA Not Shared ( new array, new value ) */
-               pNewCls->pClassDatas    = hb_arrayClone( pSprCls->pClassDatas, NULL );
-               pNewCls->pInlines       = hb_arrayClone( pSprCls->pInlines, NULL );
-               pNewCls->uiDatasShared  = pSprCls->uiDatasShared;
-               HB_MEMCPY( pNewCls->pMethDyn, pSprCls->pMethDyn, pSprCls->uiMethods * sizeof( METHDYN ) );
+               pNewCls->pClassDatas    = hb_arrayClone( pSprCls2->pClassDatas, NULL );
+               pNewCls->pInlines       = hb_arrayClone( pSprCls2->pInlines, NULL );
+               pNewCls->uiDatasShared  = pSprCls2->uiDatasShared;
+               HB_MEMCPY( pNewCls->pMethDyn, pSprCls2->pMethDyn, pSprCls2->uiMethods * sizeof( METHDYN ) );
             }
-            else if( ! hb_clsHasParent( pNewCls, pSprCls->pClassSym ) )
+            else if( ! hb_clsHasParent( pNewCls, pSprCls2->pClassSym ) )
             {
                USHORT   uiNew, uiAdd = 0;
                USHORT   nLen, ui;
@@ -2104,7 +2104,7 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                nLenInlines    = ( USHORT ) hb_itemSize( pNewCls->pInlines );
 
                /* ClassDatas */
-               pClsAnyTmp     = hb_arrayClone( pSprCls->pClassDatas, NULL );
+               pClsAnyTmp     = hb_arrayClone( pSprCls2->pClassDatas, NULL );
 
                nLen           = ( USHORT ) hb_itemSize( pClsAnyTmp );
                ui             = ( USHORT ) hb_itemSize( pNewCls->pClassDatas );
@@ -2119,10 +2119,10 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                hb_itemRelease( pClsAnyTmp );
 
                /* SharedDatas */
-               pNewCls->uiDatasShared  += pSprCls->uiDatasShared;
+               pNewCls->uiDatasShared  += pSprCls2->uiDatasShared;
 
                /* Inlines */
-               pClsAnyTmp              = hb_arrayClone( pSprCls->pInlines, NULL );
+               pClsAnyTmp              = hb_arrayClone( pSprCls2->pInlines, NULL );
                ui                      = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
                nLen                    = ( USHORT ) ( pClsAnyTmp )->item.asArray.value->ulLen;
                nLen                    += ui;
@@ -2137,8 +2137,8 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                hb_itemRelease( pClsAnyTmp );
             }
 
-            pSprMethod  = pSprCls->pMethods;
-            j           = pSprCls->uiMethods + 1;
+            pSprMethod  = pSprCls2->pMethods;
+            j           = pSprCls2->uiMethods + 1;
 
             for(; --j; pMethod++, pSprMethod++ )
             {
@@ -2159,7 +2159,7 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                   hb_clsSaveMethod( pMethod->pMessage, iPos, pNewCls, ( USHORT ) ulSize );
                }
 
-               /* TraceLog( NULL, "NEW INHERITED Method: %s:%s from CLASS %s Module: %s Pos: %i %i\n", pNewCls->szName, pNewMethod->pMessage->pSymbol->szName, pSprCls->szName, pNewMethod->pModuleSymbols->szModuleName, iPos, ulSize );
+               /* TraceLog( NULL, "NEW INHERITED Method: %s:%s from CLASS %s Module: %s Pos: %i %i\n", pNewCls->szName, pNewMethod->pMessage->pSymbol->szName, pSprCls2->szName, pNewMethod->pModuleSymbols->szModuleName, iPos, ulSize );
                 */
 
                if( pMethod->pFunction == hb___msgSetClsData ||
@@ -2192,8 +2192,8 @@ static USHORT hb_clsNew( const char * szClassName, USHORT uiDatas,
                   }
                }
             }
-            pNewCls->fOpOver     |= pSprCls->fOpOver;
-            pNewCls->uiDataFirst += pSprCls->uiDatas;
+            pNewCls->fOpOver     |= pSprCls2->fOpOver;
+            pNewCls->uiDataFirst += pSprCls2->uiDatas;
          }
       }
       pNewCls->uiMethods         = ( USHORT ) ulSize;
@@ -2586,7 +2586,7 @@ void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
                      if( hb_arrayGetItemPtr( pClass->pClassDatas, pMeth->uiData )->type == HB_IT_NIL )
                      {
-                        /* TraceLog(NULL,"Inicializando la posiciÛn #%d del array de pClassDatas GetShrData() con un valor tipo: %x\n", pMeth->uiData,pMeth->pInitValue->type);
+                        /* TraceLog(NULL,"Inicializando la posici√≥n #%d del array de pClassDatas GetShrData() con un valor tipo: %x\n", pMeth->uiData,pMeth->pInitValue->type);
                          */
                         if( HB_IS_ARRAY( pMeth->pInitValue ) )
                            pInit = hb_arrayClone( pMeth->pInitValue, NULL );
@@ -3341,7 +3341,7 @@ HB_FUNC( __SENDER )
 }
 
 /*
- * Added by R‚C&JfL
+ * Added by R√¢C&JfL
  *
  * based on hb___msgClsH( void )
  */
