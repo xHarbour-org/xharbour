@@ -8,6 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-21 18:14 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * .gitignore
+    + Added *.tds, *.il?
+
+  * config/w32/bcc32.cf
+    * Default CC and LD to bcc32 only if NOT set already
+  
+  * make_bc.bat
+    + Added auto detection of C:\BCC102 Embarcadero Free BCC C++ 7.30 in CLANG mode (bcc32c.exe)
+
+  * tests/dll_b32.mak
+    * Default CC and LD to bcc32 only if NOT set already
+    + Add -L$(BCC_LIB)
+
+  * winmake/compile.mak
+    * Replace CC_CMD_HARU with existing CCC_CMD
+
+  * winmake/makefile.bc
+    * Default RC to rc.exe if CC is bcc32c
+    * Default CC only if not set already
+    - Remove '-d' from OPTFLAFGS (I suspect it was a typo)
+    + Added logic to set differentt flags for legacy bcc32 vs CLang based bcc32c
+    + Added -L$(BCC_LIB) to link commands. This allows build using auto detection 
+      User does not have to specify any setting to build with Free Embaracadero. 
+    * Alternate syntax when using brc32.exe vs. rc.exe
+
+  * winmake/makefile.vc
+    - Remove no longer needed CC_CMD_HARU
+  
 2023-12-20 14:22 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * .gitignore
     + *.json

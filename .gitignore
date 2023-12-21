@@ -21,6 +21,8 @@
 *.pp$
 *.map
 *.json
+*.tds
+*.il?
 
 pptable.c
 hbverbld.h
