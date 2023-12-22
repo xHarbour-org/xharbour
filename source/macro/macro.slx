@@ -467,7 +467,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    extern int yyleng;
 
    char *tmpPtr;
-   int iRet;
+   int iRet2;
 
    yytext = szToken;
    yyleng = iTokenLen;
@@ -487,11 +487,11 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                    iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
                    iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
                {
-                  iRet = BITAND + DONT_REDUCE;
+                  iRet2 = BITAND + DONT_REDUCE;
                }
                else
                {
-                  iRet = '&' + DONT_REDUCE;
+                  iRet2 = '&' + DONT_REDUCE;
                }
             }
             /* No '.' so Simple Macro. */
@@ -502,7 +502,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yyleng--;
 
                pYYLVAL->string = hb_strdup( yytext );
-               iRet = MACROVAR;
+               iRet2 = MACROVAR;
             }
             else if( tmpPtr == yytext + yyleng - 1 )
             {
@@ -514,20 +514,20 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yytext[yyleng] = '\0';
 
                pYYLVAL->string = hb_strdup( yytext );
-               iRet = MACROVAR;
+               iRet2 = MACROVAR;
             }
             else
             {
                yytext = hb_strdup( yytext );
                pYYLVAL->string = yytext;
-               iRet = MACROTEXT;
+               iRet2 = MACROTEXT;
             }
          }
          else
          {
             yytext = hb_strdup( yytext );
             pYYLVAL->string = yytext;
-            iRet = MACROTEXT;
+            iRet2 = MACROTEXT;
          }
       }
       else
@@ -539,7 +539,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
          }
 
          pYYLVAL->string = hb_strdup( yytext );
-         iRet = IDENTIFIER;
+         iRet2 = IDENTIFIER;
       }
    }
    else
@@ -551,14 +551,14 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       int iDec, iWidth;
       BOOL bError = FALSE;
 
-      iRet = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth, &bError );
+      iRet2 = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth, &bError );
 
       if( bError )
       {
          hb_macroError( EG_SYNTAX, YYLEX_PARAM );
-         iRet = -1;
+         iRet2 = -1;
       }
-      else if ( iRet == NUM_DOUBLE )
+      else if ( iRet2 == NUM_DOUBLE )
       {
          pYYLVAL->valDouble.dNumber = dNumber;
          pYYLVAL->valDouble.bDec = ( unsigned char ) iDec;
@@ -572,8 +572,8 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       }
    }
 
-   DEBUG_INFO( printf(  "Element \"%s\" is %i\n", sToken, iRet ) );
-   return iRet;
+   DEBUG_INFO( printf(  "Element \"%s\" is %i\n", sToken, iRet2 ) );
+   return iRet2;
 }
 
 static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth, BOOL* pbError )
@@ -584,11 +584,11 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
 
-static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )
+static int hb_macro_SLX_CustomAction( int x, int aiHold2[], int *ptr_iHold, char *sToken2 )
 {
    char *pTmp;
 
-   HB_SYMBOL_UNUSED( sToken );
+   HB_SYMBOL_UNUSED( sToken2 );
 
    if( x < HB_AFTER_EXP )
    {
@@ -603,8 +603,8 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
       }
       else
       {
-         pYYLVAL->string = hb_strdup( sToken );
-         DEBUG_INFO( printf( "HB_AFTER_EXP, Identifier %s\n", sToken ) );
+         pYYLVAL->string = hb_strdup( sToken2 );
+         DEBUG_INFO( printf( "HB_AFTER_EXP, Identifier %s\n", sToken2 ) );
          return IDENTIFIER;
       }
    }
@@ -646,11 +646,11 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return LITERAL + DONT_REDUCE;
 
       case HB_FIELD_ALIAS :
-         aiHold[ (*ptr_iHold)++ ] = ALIASOP;
+         aiHold2[ (*ptr_iHold)++ ] = ALIASOP;
          return FIELD;
 
       case HB_ID_QSELF :
-         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         if( *ptr_iHold && aiHold2[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
          {
             /*
                <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
@@ -662,7 +662,7 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_ID_IIF :
-         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         if( *ptr_iHold && aiHold2[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
          {
             /*
                <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
@@ -674,7 +674,7 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_ID_IF :
-         if( *ptr_iHold && aiHold[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
+         if( *ptr_iHold && aiHold2[ (*ptr_iHold) - 1 ] == IDENTIFIER && pYYLVAL->string )
          {
             /*
                <Id> <Id> is a syntax error so overriding pYYLVAL->string has no practical
@@ -686,7 +686,7 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_SELF :
-         aiHold[ (*ptr_iHold)++ ] = ':' + DONT_REDUCE ;
+         aiHold2[ (*ptr_iHold)++ ] = ':' + DONT_REDUCE ;
          pYYLVAL->string = hb_strdup( "SELF" );
          return IDENTIFIER + DONT_REDUCE ;
 
