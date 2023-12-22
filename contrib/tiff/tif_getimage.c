@@ -1633,7 +1633,7 @@ DECLARESepPutFunc(putRGBUAseparate16bittile)
 		uint8* m;
 		for (x = w; x-- > 0;) {
 			a2 = img->Bitdepth16To8[*wa++];
-			m = img->UaToAa+(a<<8);
+			m = img->UaToAa+(a2<<8);
 			r2 = m[img->Bitdepth16To8[*wr++]];
 			g2 = m[img->Bitdepth16To8[*wg++]];
 			b2 = m[img->Bitdepth16To8[*wb++]];
