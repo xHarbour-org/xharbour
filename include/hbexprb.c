@@ -1903,20 +1903,20 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                            /* The {|| &cMacro } block is now &( "{||" + cMacro + "}" ) due to early macro expansion in compiler. */
                            if( pElem->ExprType == HB_ET_MACRO )
                            {
-                              PHB_EXPR pMacro = pElem->value.asMacro.pExprList;
+                              PHB_EXPR pMacro2 = pElem->value.asMacro.pExprList;
 
-                              if( pMacro &&
-                                  pMacro->ExprType == HB_EO_PLUS &&
-                                  pMacro->value.asOperator.pLeft->ExprType == HB_EO_PLUS &&
-                                  pMacro->value.asOperator.pLeft->value.asOperator.pRight->ExprType == HB_ET_VARIABLE
+                              if( pMacro2 &&
+                                  pMacro2->ExprType == HB_EO_PLUS &&
+                                  pMacro2->value.asOperator.pLeft->ExprType == HB_EO_PLUS &&
+                                  pMacro2->value.asOperator.pLeft->value.asOperator.pRight->ExprType == HB_ET_VARIABLE
                                 )
                               {
-                                 PHB_EXPR pVar = pMacro->value.asOperator.pLeft->value.asOperator.pRight;
+                                 PHB_EXPR pVar = pMacro2->value.asOperator.pLeft->value.asOperator.pRight;
 
                                  /* Saving the next array element so the list can be relinked after we substitute the macro block. */
                                  pNext = pElem->pNext;
 
-                                 pMacro->value.asOperator.pLeft->value.asOperator.pRight = NULL;
+                                 pMacro2->value.asOperator.pLeft->value.asOperator.pRight = NULL;
 
                                  /* Instead we only want the macro variable, {|| &cMacro } -> &( "{||" + cMacro + "}" ) -> cMacro */
                                  HB_EXPR_PCODE1( hb_compExprDelete, pElem );
@@ -1946,15 +1946,15 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                               if( pBlock->ExprType == HB_ET_MACRO && ! pBlock->pNext &&
                                   pBlock->value.asMacro.SubType == HB_ET_MACRO_EXPR )
                               {
-                                 PHB_EXPR pMacro = pBlock->value.asMacro.pExprList;
+                                 PHB_EXPR pMacro2 = pBlock->value.asMacro.pExprList;
 
                                  /* Saving the next array element so the list can be relinked after we substitute the macro block. */
                                  pNext = pElem->pNext;
 
-                                 if( pMacro->ExprType == HB_ET_LIST && ! pMacro->pNext &&
+                                 if( pMacro2->ExprType == HB_ET_LIST && ! pMacro2->pNext &&
                                      ! pBlock->value.asMacro.cMacroOp && ! pBlock->value.asMacro.szMacro )
                                  {
-                                    PHB_EXPR pList = pMacro->value.asList.pExprList;
+                                    PHB_EXPR pList = pMacro2->value.asList.pExprList;
 
                                     if( ! pList->pNext && ( pList->ExprType == HB_ET_VARIABLE || pList->ExprType == HB_ET_VARREF ) )
                                     {
