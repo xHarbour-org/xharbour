@@ -562,19 +562,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
          {
             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
-               char *      szFileName  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
-               FILE *      yyc;
+               char *      szFileName2  = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
+               FILE *      yyc2;
                PNAMESPACE  pMember;
                int         iLevel      = 1;
 
-               yyc = hb_fopen( szFileName, "wb" );
+               yyc2 = hb_fopen( szFileName2, "wb" );
 
-               if( ! yyc )
-                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
+               if( ! yyc2 )
+                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName2, NULL );
 
-               hb_xfree( szFileName );
+               hb_xfree( szFileName2 );
 
-               fprintf( yyc, "#if defined( NAMESPACE_DECFUNCS ) && ! defined( __PRG__ ) \n" );
+               fprintf( yyc2, "#if defined( NAMESPACE_DECFUNCS ) && ! defined( __PRG__ ) \n" );
 
                pMember = pNamespace->pNext;
 
@@ -583,7 +583,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   if( pMember->type & NSTYPE_MEMBER )
                   {
                      if( ( pMember->pFunc->cScope & HB_FS_STATIC ) == 0 )
-                        fprintf( yyc, "   HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->iID, pMember->szName );
+                        fprintf( yyc2, "   HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->iID, pMember->szName );
                   }
 
                   if( pMember->type & NSTYPE_SPACE )
@@ -601,8 +601,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
                   pMember = pMember->pNext;
                }
 
-               fprintf( yyc, "\n#endif\n\n" );  /* Dont remove prefix \n! */
-               fclose( yyc );
+               fprintf( yyc2, "\n#endif\n\n" );  /* Dont remove prefix \n! */
+               fclose( yyc2 );
 
                if( pMember )
                   pNamespace = pMember;
@@ -686,50 +686,50 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
       while( pFunCall )
       {
-         PFUNCTION pFunc = NULL;
+         PFUNCTION pFunc2 = NULL;
 
          if( pFunCall->Namespace )
          {
             if( ( pFunCall->iFlags & NSF_RESOLVE ) == NSF_RESOLVE )
             {
-               pFunc = hb_compFunctionResolve( pFunCall->szName, ( PNAMESPACE ) pFunCall->Namespace, NULL );
+               pFunc2 = hb_compFunctionResolve( pFunCall->szName, ( PNAMESPACE ) pFunCall->Namespace, NULL );
 #if 0
-               fprintf( yyc, "/* %s from %s resolved to %s */\n", pFunCall->szName, ( (PNAMESPACE) pFunCall->Namespace )->szName , pFunc && pFunc->pNamespace ? pFunc->pNamespace->szFullPath  : "global" );
+               fprintf( yyc, "/* %s from %s resolved to %s */\n", pFunCall->szName, ( (PNAMESPACE) pFunCall->Namespace )->szName , pFunc2 && pFunc2->pNamespace ? pFunc2->pNamespace->szFullPath  : "global" );
 #endif
             }
          }
 #if defined( __XCC__ )
-         if( pFunc == ( PFUNCTION ) 1 )
+         if( pFunc2 == ( PFUNCTION ) 1 )
 #else
-         if( pFunc == ( PFUNCTION ) (HB_LONG) 1 )
+         if( pFunc2 == ( PFUNCTION ) (HB_LONG) 1 )
 #endif
             fprintf( yyc, "/* Skipped: call to '%s' resolved to external */\n", pFunCall->szName );
-         else if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc && pFunc->pNamespace ) ) )
+         else if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc2 && pFunc2->pNamespace ) ) )
          {
             /* No prototype for Namespace function calls! */
-            if( pFunc && pFunc->pNamespace )
-               fprintf( yyc, "/* Skipped: call to '%s' resolved to: '%s' */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
+            if( pFunc2 && pFunc2->pNamespace )
+               fprintf( yyc, "/* Skipped: call to '%s' resolved to: '%s' */\n", pFunCall->szName, pFunc2->pNamespace->szFullPath );
             else
                fprintf( yyc, "/* Skipped: call to: '%s' of: '%s' */\n", pFunCall->szName, ( char * ) pFunCall->Namespace );
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
          {
-            PCOMSYMBOL pSym = hb_compSymbolFind( pFunCall->szName, NULL, NULL, SYMF_FUNCALL );
+            PCOMSYMBOL pSym2 = hb_compSymbolFind( pFunCall->szName, NULL, NULL, SYMF_FUNCALL );
 
             /* Skip! */
-            if( pSym && ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
+            if( pSym2 && ( ( pSym2->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
             {
-               if( pSym->Namespace )
+               if( pSym2->Namespace )
                {
-                  if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
-                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, ( ( PNAMESPACE ) pSym->Namespace )->szFullPath );
-                  else if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
-                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, ( char * ) pSym->Namespace );
+                  if( ( pSym2->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
+                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym2->szName, ( ( PNAMESPACE ) pSym2->Namespace )->szFullPath );
+                  else if( ( pSym2->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
+                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym2->szName, ( char * ) pSym2->Namespace );
                   else
                      assert( 0 );
                }
                else
-                  fprintf( yyc, "/* Skipped DEFERRED call to: '%s' */\n", pSym->szName );
+                  fprintf( yyc, "/* Skipped DEFERRED call to: '%s' */\n", pSym2->szName );
             }
             else if( hb_compCStaticSymbolFound( pFunCall->szName, HB_PROTO_FUNC_PUBLIC ) )
             {
@@ -747,7 +747,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
             {
                if( hb_comp_autoDeferred )
                {
-                  pSym->cScope |= HB_FS_DEFERRED;
+                  pSym2->cScope |= HB_FS_DEFERRED;
 
                   if( fCodeExt )
                   {
@@ -811,11 +811,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, const char * szSourceExtension )     
 
       if( hb_comp_Namespaces.pFirst )
       {
-         void * pTemp = ( void * ) yyc;
+         void * pTemp2 = ( void * ) yyc;
 
-         hb_compNamespaceEnumSpaces( hb_comp_Namespaces.pFirst, hb_compGenerateXNS, &pTemp );
+         hb_compNamespaceEnumSpaces( hb_comp_Namespaces.pFirst, hb_compGenerateXNS, &pTemp2 );
 
-         yyc = ( FILE * ) pTemp;
+         yyc = ( FILE * ) pTemp2;
       }
 
       fprintf( yyc,

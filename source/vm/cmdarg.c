@@ -109,12 +109,12 @@ void * hb_winmainGetInstance( void )
 }
 #endif
 
-void hb_cmdargInit( int argc, char * argv[] )
+void hb_cmdargInit( int argc, char * argv2[] )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargInit(%d, %p)", argc, argv ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_cmdargInit(%d, %p)", argc, argv2 ) );
 
    s_argc   = argc;
-   s_argv   = argv;
+   s_argv   = argv2;
 }
 
 int hb_cmdargARGC( void )
@@ -468,4 +468,3 @@ HB_FUNC( HB_CMDARGARGV )
 {
    hb_retc( hb_cmdargARGV()[ 0 ] );
 }
-

@@ -1,4 +1,3 @@
-
 /* pngerror.c - stub functions for i/o and memory allocation
  *
  * Last changed in libpng 1.6.31 [July 27, 2017]
@@ -15,6 +14,10 @@
  * and use png_set_error_fn() to use those functions.  See the instructions
  * at each function.
  */
+
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4611 )
+#endif
 
 #include "pngpriv.h"
 

@@ -1,4 +1,3 @@
-
 /* png.c - location for general purpose libpng functions
  *
  * Last changed in libpng 1.6.33 [September 28, 2017]
@@ -10,6 +9,10 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
+
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4611 )
+#endif
 
 #include "pngpriv.h"
 

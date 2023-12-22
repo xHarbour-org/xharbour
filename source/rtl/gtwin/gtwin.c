@@ -72,6 +72,10 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #define HB_GT_NAME WIN
 
 /* TODO: include any standard headers here */

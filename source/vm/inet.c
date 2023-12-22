@@ -55,6 +55,10 @@
  *
  */
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #define _HB_API_INTERNAL_
 #include "inet.h"
 #include "hbapi.h"

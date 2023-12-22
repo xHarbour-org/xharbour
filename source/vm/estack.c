@@ -809,14 +809,14 @@ void hb_stackDispCall( void )
 
    do
    {
-      char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
+      char buffer2[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
-         hb_snprintf( buffer, sizeof( buffer ), HB_I_( "Called from %s:%s(%i)" ), hb_objGetClsName( *( pBase + 1 ) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer2, sizeof( buffer2 ), HB_I_( "Called from %s:%s(%i)" ), hb_objGetClsName( *( pBase + 1 ) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
       else
-         hb_snprintf( buffer, sizeof( buffer ), HB_I_( "Called from %s(%i)" ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
+         hb_snprintf( buffer2, sizeof( buffer2 ), HB_I_( "Called from %s(%i)" ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.pCargo->lineno );
 
-      hb_conOutErr( buffer, 0 );
+      hb_conOutErr( buffer2, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
 
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.pCargo->stackbase;

@@ -10204,13 +10204,13 @@ PSYMBOLS    hb_vmRegisterSymbols( PHB_SYMB pSymbolTable   , UINT uiSymbols, cons
                        if( ( pModuleSymbols->hScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
                        {
                           PHB_SYMB       pModuleSymbol;
-                          register UINT  ui;
+                          register UINT  ui2;
 #ifdef DEBUG_SYMBOLS
                           TraceLog( NULL, "Module: '%s' has Deferred Symbols, resolving: '%s' \n", pModuleSymbols->szModuleName, pSymbol->szName );
 #endif /* DEBUG_SYMBOLS */
-                          for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
+                          for( ui2 = 0; ui2 < pModuleSymbols->uiModuleSymbols; ui2++ )
                           {
-                             pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
+                             pModuleSymbol = pModuleSymbols->pSymbolTable + ui2;
 
                              if( pModuleSymbol->pDynSym == pDynSym && ( ( pModuleSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) /* && pModuleSymbol->value.pFunPtr == NULL */ )
                              {

@@ -59,6 +59,10 @@
  *
  */
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -616,7 +620,7 @@ HB_SOCKET_T hb_ipAccept( HB_SOCKET_T hSocket, int timeout, char * szAddr, long i
 #endif
    HB_SOCKET_T          incoming = 0;
    int                  iError   = EAGAIN;
-   struct sockaddr_in   si_remote;
+   struct sockaddr_in   si_remote = { 0 };
 
 #if defined( _XOPEN_SOURCE_EXTENDED )
    socklen_t            Len;
