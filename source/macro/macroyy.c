@@ -157,6 +157,7 @@
    #pragma warn(disable:2154)
 #elif defined( _MSC_VER )
    #pragma warning (disable:4065)
+   #pragma warning (disable:4702)
 #elif defined( __BORLANDC__ )
    #if !defined( __STDC__ )
      #define __STDC__
