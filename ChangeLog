@@ -8,6 +8,41 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-22 15:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\compiler\genc.c
+  * source\compiler\harbour.slx
+  * source\vm\classes.c
+  * source\vm\estack.c
+  * source\vm\hvm.c
+  * source\vm\cmdarg.c
+  * include\hbexprb.c
+  * include\simplex.c
+  * source\macro\macro.slx
+  * source\ct\disk.c
+  * contrib\tiff\tif_dir.c
+  * contrib\tiff\tif_dirread.c
+  * contrib\tiff\tif_getimage.c
+  * contrib\tiff\tif_print.c
+  * contrib\pdflite\pdflib\p_color.c
+  * contrib\png\png.c
+  * contrib\png\pngerror.c
+    ! fixed compiler warnings
+
+  * source\common\hbver.c
+  * source\vm\inet.c
+  * source\rtl\hbip.c
+  * source\rtl\hbsyslog.c
+  * source\rtl\tprinter.c
+  * source\rtl\hbping.c
+  * source\rtl\win32prn.prg
+  * source\rtl\winos.prg
+  * source\rtl\gtwin\gtwin.c
+  * source\rtl\gtwvt\gtwvt.c
+    ! suppress MSC 4996 compiler warning
+
+  * source\macro\macroyy.c
+    ! suppress MSC 4702 compiler warning
+
 2023-12-21 18:14 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * .gitignore
     + Added *.tds, *.il?
