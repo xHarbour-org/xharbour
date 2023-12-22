@@ -33,11 +33,27 @@ IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_BCC
+   IF EXIST C:\bcc102                        GOTO SET_BCC_C_102
    IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
    IF EXIST \Borland\bcc58                   GOTO SET_BORLAND_58
    IF EXIST \bcc58                           GOTO SET_BCC_58
    IF EXIST \Borland\bcc55                   GOTO SET_BORLAND_55
    IF EXIST \bcc55                           GOTO SET_BCC_55
+   GOTO FIND_BISON
+
+:SET_BCC_C_102
+   SET CC_DIR=C:\bcc102
+   make > NUL 2>&1 || set PATH=$(CC_DIR)\bin;%PATH%
+   
+   REM Not needed because bcc32c.exe uses bcc32c.cfg
+   REM set BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
+   
+   REM Needed because iLink32.exe does not have a config file!
+   
+   set BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
+   set CC=bcc32c
+   set LD=bcc32c
+
    GOTO FIND_BISON
 
 :SET_BDS_40
@@ -119,7 +135,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -s -l -fwinmake\makefile.bc >make_%SUB_DIR%.log
+   make -l -fwinmake\makefile.bc >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -129,7 +145,7 @@ rem=============================================================================
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>make_%SUB_DIR%.log
+   make -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -162,7 +178,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=\dll
    @CALL winmake\mdir.bat dllcreate
-   make -s -l -fwinmake\makefile.bc >dll_%SUB_DIR%.log
+   make -l -fwinmake\makefile.bc >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -191,7 +207,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -s -l -fwinmake\makefile.bc >cont_%SUB_DIR%.log
+   make -l -fwinmake\makefile.bc >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
    REM SET HB_MT=mt

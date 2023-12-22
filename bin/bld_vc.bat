@@ -19,97 +19,159 @@ SET _INCLUDE=%INCLUDE%
 SET _LIB=%LIB%
 
 :FIND_VC
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC"   GOTO SET_VC2022EX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC"        GOTO SET_VC2022E
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\VC" GOTO SET_VC2022PX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\VC"      GOTO SET_VC2022P
+   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\VC"    GOTO SET_VC2022CX86
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC"         GOTO SET_VC2022C
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"   GOTO SET_VC2017EX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools"        GOTO SET_VC2017E
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools" GOTO SET_VC2017PX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools"      GOTO SET_VC2017P
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools"    GOTO SET_VC2017CX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools"         GOTO SET_VC2017C
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools"         GOTO SET_VC2022E   
+   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools"         GOTO SET_VC2022E
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc" GOTO SET_VC2013X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\VC"      GOTO SET_VC2013
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
+
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
+   
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"       GOTO SET_VC2008
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
 
+:SET_VC2022EX86
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Vc
+   GOTO SET_PATH
+
+:SET_VC2022E
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Vc
+   GOTO SET_PATH
+
+:SET_VC2022PX86
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Vc
+   GOTO SET_PATH
+
+:SET_VC2022P
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Vc
+   GOTO SET_PATH
+
+:SET_VC2022CX86
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Vc
+   SET _ARCH=x64
+   GOTO SET_PATH
+
+:SET_VC2022C
+   SET __MSC__=17
+   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Vc
+   GOTO SET_PATH
+
+
 :SET_VC2017EX86
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
    GOTO SET_PATH
 
 :SET_VC2017E
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
    GOTO SET_PATH
 
 :SET_VC2017PX86
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
    GOTO SET_PATH
 
 :SET_VC2017P
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
    GOTO SET_PATH
 
 :SET_VC2017CX86
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\
    SET _ARCH=x64
    GOTO SET_PATH
 
 :SET_VC2017C
+   SET __MSC__=15
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\
    SET _ARCH=x86
    GOTO SET_PATH
 
 :SET_VC2015X86
+   SET __MSC__=14
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\vc
    GOTO SET_PATH
 
 :SET_VC2015
+   SET __MSC__=14
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 14.0\vc
    GOTO SET_PATH
 
 :SET_VC2013X86
+   SET __MSC__=12
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\vc
    GOTO SET_PATH
 
 :SET_VC2013
+   SET __MSC__=12
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
    GOTO SET_PATH
 
 :SET_VC2012X86
+   SET __MSC__=11
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
    GOTO SET_PATH
 
 :SET_VC2012
+   SET __MSC__=11
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
    GOTO SET_PATH
 
 :SET_VC2010X86
+   SET __MSC__=10
    SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
    GOTO SET_PATH
 
 :SET_VC2010
+   SET __MSC__=10
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
    GOTO SET_PATH
 
 :SET_VC2008
+   SET __MSC__=9
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
    GOTO SET_PATH
 
 :SET_VC2005
+   SET __MSC__=8
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
    GOTO SET_PATH
 
 :SET_VC2003
+   SET __MSC__=7
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
    GOTO SET_PATH
 
 :SET_VC6
+   SET __MSC__=6
    SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\VC98
    GOTO SET_PATH
 

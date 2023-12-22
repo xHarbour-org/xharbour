@@ -15,8 +15,10 @@
 !message __MSC__=10 -> MSVC 10 Visual Studio 2010 (_MSC_VER=1600)
 !message __MSC__=11 -> MSVC 11 Visual Studio 2012 (_MSC_VER=1700)
 !message __MSC__=12 -> MSVC 12 Visual Studio 2013 (_MSC_VER=1800)               
-!message __MSC__=14 -> MSVC 14 Visual Studio 2015 Update 3 (_MSC_VER=1900)       
-!message __MSC__=15 -> MSVC 15 Visual Studio 2017 Update 5 (_MSC_VER=1914)             
+!message __MSC__=14 -> MSVC 14 Visual Studio 2015 (_MSC_VER=1900)       
+!message __MSC__=15 -> MSVC 15 Visual Studio 2017 (_MSC_VER=1911-1920)           
+!message __MSC__=16 -> MSVC 16 Visual Studio 2019 (_MSC_VER=1921-1929)           
+!message __MSC__=17 -> MSVC 17 Visual Studio 2022 (_MSC_VER=1930-1935)           
 !error
 !endif
 !endif
