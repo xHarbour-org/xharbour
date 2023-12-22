@@ -845,7 +845,7 @@ pdf_setcolor_internal(PDF *p, int drawmode, int colortype,
     pdc_scalar c1, pdc_scalar c2, pdc_scalar c3, pdc_scalar c4,
     pdf_color *fcolor)
 {
-    pdf_color c, cstroke;
+    pdf_color c = { 0 }, cstroke;
     pdf_colorspace cs;
 
     if (PDF_GET_STATE(p) == pdf_state_pattern &&
