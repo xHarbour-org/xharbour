@@ -4582,10 +4582,10 @@ TIFFFetchDirectory(TIFF* tif, uint64 diroff, TIFFDirEntry** pdir,
 		}
 		else
 		{
-			tmsize_t m;
+			tmsize_t m2;
 			uint64 dircount64;
-			m=off+sizeof(uint64);
-			if ((m<off)||(m<(tmsize_t)sizeof(uint64))||(m>tif->tif_size)) {
+			m2=off+sizeof(uint64);
+			if ((m2<off)||(m2<(tmsize_t)sizeof(uint64))||(m2>tif->tif_size)) {
 				TIFFErrorExt(tif->tif_clientdata, module,
 					"Can not read TIFF directory count");
 				return 0;
