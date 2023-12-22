@@ -237,8 +237,8 @@ HB_FUNC( VOLUME )
    {
       PHB_FNAME    fname;
       const char * sDiskName;
-      char *       sRoot;
-      char *       sVolName;
+      char *       sRoot = NULL;
+      char *       sVolName = NULL;
       char         sRootBuf[ 4 ], sVolNameBuf[ 12 ];
       char *       pszFree;
 
