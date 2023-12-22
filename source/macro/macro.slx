@@ -193,24 +193,24 @@
          \
          if( sClose ) \
          { \
-            int iLen; \
+            int iLen2; \
             \
             szBuffer--; iSize++; \
             \
-            iLen = ( int ) ( sClose - szBuffer ); \
+            iLen2 = ( int ) ( sClose - szBuffer ); \
             \
-            if( iLen > iPairAllocated )\
+            if( iLen2 > iPairAllocated )\
             { \
-               sPair = (char *) realloc( sPair, iLen + 1 ); \
-               iPairAllocated = iLen + 1; \
+               sPair = (char *) realloc( sPair, iLen2 + 1 ); \
+               iPairAllocated = iLen2 + 1; \
             } \
             \
-            hb_strncpy( sPair, szBuffer, iLen ); \
-            sPair[ iLen ] = '\0'; \
+            hb_strncpy( sPair, szBuffer, iLen2 ); \
+            sPair[ iLen2 ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
             iSize -= ( int ) ( s_szBuffer - szBuffer ); \
             pYYLVAL->valChar.string = hb_strdup( sPair ); \
-            pYYLVAL->valChar.length = iLen; \
+            pYYLVAL->valChar.length = iLen2; \
             \
             /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
             iPairToken = 0; \
