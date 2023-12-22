@@ -814,6 +814,10 @@ ENDCLASS
 
 #pragma BEGINDUMP
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #include <windows.h>
 #include <winspool.h>
 
