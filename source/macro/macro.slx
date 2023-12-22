@@ -68,7 +68,7 @@
  * NOTE: yylval_ptr is passed automaticaly by bison if %pure_parser is used
 */
 #undef YY_DECL
-   #define YY_DECL int yylex( YYSTYPE *yylval_ptr, PHB_MACRO pMacro )
+   #define YY_DECL int yylex( YYSTYPE *yylval_ptr, PHB_MACRO pMacro2 )
 
 #define YYLEX_PARAM pMacro
 
@@ -459,7 +459,7 @@ LANGUAGE_RULES_ARE {
    #define CUSTOM_ACTION(x) hb_macro_SLX_CustomAction( x, aiHold, &iHold, (char*) sToken  )
 
 #undef LEX_USER_SETUP
-   #define LEX_USER_SETUP() if( pYYLVAL == NULL ){ pYYLVAL = yylval_ptr; } HB_SYMBOL_UNUSED( pMacro );
+   #define LEX_USER_SETUP() if( pYYLVAL == NULL ){ pYYLVAL = yylval_ptr; } HB_SYMBOL_UNUSED( pMacro2 );
 
 static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 {
