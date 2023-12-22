@@ -138,6 +138,10 @@ FUNCTION OS_NETVREDIROK( nResult )
 #pragma BEGINDUMP
 #if defined(HB_OS_WIN) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 #include <windows.h>
 #define HB_OS_WIN_USED
 #include "hbapiitm.h"
