@@ -232,7 +232,9 @@ HPDF_FToA  (char       *s,
    /* process fractional part */
    *s++ = '.';
    if(fpart_val != 0.0) {
-       for (HPDF_UINT32 i = 0; i < prec; i++) {
+       HPDF_UINT32 i;
+
+       for (i = 0; i < prec; i++) {
           fpart_val = modff(fpart_val*10.0, &int_val);
           *s++ = (char)(int_val + 0.5) + '0';
        }
@@ -450,4 +452,3 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value)
     HPDF_MemCpy (u, (HPDF_BYTE*)value, 2);
     *value = (HPDF_UINT16)((HPDF_UINT16)u[0] << 8 | (HPDF_UINT16)u[1]);
 }
-
