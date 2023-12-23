@@ -95,6 +95,7 @@ HPDF_Shading_New  (HPDF_Doc         pdf,
   HPDF_Shading shading;
   HPDF_Array decodeArray;
   HPDF_STATUS ret = HPDF_OK;
+  const char *colName = NULL;
   int i;
 
   HPDF_PTRACE((" HPDF_Shading_New\n"));
@@ -127,7 +128,6 @@ HPDF_Shading_New  (HPDF_Doc         pdf,
   ret += HPDF_Array_AddReal(decodeArray, yMin);
   ret += HPDF_Array_AddReal(decodeArray, yMax);
 
-  const char *colName = NULL;
   switch (colorSpace) {
     case HPDF_CS_DEVICE_RGB:
       colName = COL_RGB;
