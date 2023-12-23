@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-23 10:46 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\hbhpdf\hpdf_utils.c
+    ! removed inline declaration to allow compilation with BCC32 non-CLANG
+
 2023-12-22 15:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\compiler\genc.c
   * source\compiler\harbour.slx
