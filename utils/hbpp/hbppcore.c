@@ -68,6 +68,10 @@
 
 //#define DEBUG_MARKERS
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
+
 /* Pacify MSVS2005 and above */
 #if defined(_MSC_VER) && (_MSC_VER>=1400)
    #define _CRT_SECURE_NO_DEPRECATE
