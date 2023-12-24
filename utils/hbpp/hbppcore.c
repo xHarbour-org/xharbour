@@ -278,7 +278,7 @@ const char * hb_pp_szWarnings[] =
    "1Overloaded #define %s"
 };
 
-void hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet )
+void hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet2 )
 {
    static COMMANDS sC___IIF = { 0, "IF", "(\16\1A00\17,\16\1B00\17,\16\1C00\17 )", "IIF(\1A00,\1B00,\1C00 )", NULL };
 
@@ -341,7 +341,7 @@ void hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet )
 
                if( s_kolAddComs || s_kolAddTras || s_kolAddDefs > 3 )
                {
-                  if( ! hb_comp_bQuiet )
+                  if( ! hb_comp_bQuiet2 )
                      printf( "Loaded: %i Commands, %i Translates, %i Defines from: %s\n", s_kolAddComs, s_kolAddTras, s_kolAddDefs - 3, szFileName );
                }
                else
@@ -374,7 +374,7 @@ void hb_pp_SetRules( PHB_INCLUDE_FUNC hb_compInclude, BOOL hb_comp_bQuiet )
       }
       else
       {
-         if( ! hb_comp_bQuiet )
+         if( ! hb_comp_bQuiet2 )
             printf( "Standard command definitions excluded.\n" );
 
          hb_pp_Init();
