@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-24 19:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.bc
+  * winmake\makefile.dc
+  * winmake\makefile.gc
+  * winmake\makefile.pc
+  * winmake\makefile.vc
+  * winmake\makefile.wc
+  * winmake\compile.mak
+    ! added new macros CC_CMD_NOWARN and CCC_CMD_NOWARN to silence contrib warnings
+
+  * contrib\gtwvw\gtwvw.c
+  * contrib\gtwvg\gtwvg.c
+  * contrib\tipssl\inetssl.c
+  * contrib\hbssl\ssl.c
+  * contrib\hbssl\sslctx.c
+    ! fixed compiler warnings
+
+2023-12-24 19:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\unicode\hbencode.c
+    ! fixed compiler warnings
+
 2023-12-24 10:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * utils\hbpp\hbppcore.c
   * source\vm\hvm.c
