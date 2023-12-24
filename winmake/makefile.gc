@@ -311,8 +311,10 @@ HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARB
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d"_USE_APPMAIN_" -o$@ $^
 CC_CMD          =$(CC) $(CLIBFLAGS) -I"include"  -o $@ $^
+CC_CMD_NOWARN   =$(CC) $(CLIBFLAGS) -I"include"  -o $@ $^
 CC_CMD_HARBOUR  =$(CC) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o $@ $^
 CCC_CMD         =$(CC_CMD)
+CCC_CMD_NOWARN  =$(CC_CMD)
 CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)/include" -D_WIN32 $(ZIP_DEBUGFLAGS) -fpermissive -c -o $@ $^
 
 #===============================================================================

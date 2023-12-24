@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -91,6 +91,10 @@
 *          Refactoring for xHarbour 1.2.1
 *
 */
+
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
 
 #include "hbgtwvw.h"
 
@@ -507,13 +511,13 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    s_pWvwData->s_pWindows[0]->hCompDC = CreateCompatibleDC( s_pWvwData->s_pWindows[0]->hdc );
 
    /*
-      Ap¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
+      ApÂ¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
       o handle original da PEN e BRUSH do Device Context
    */
    s_pWvwData->s_sApp->OriginalPen   = (HPEN) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->penWhite );
    s_pWvwData->s_sApp->OriginalBrush = (HBRUSH) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->currentBrush );
    /*
-      E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
+      E, logo apÂ¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restauraâ€¡Ã†o
       quando for utilizar DeleteObject()
    */
    SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
@@ -580,9 +584,9 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
          DeleteObject( ( HFONT ) pWindowData->hFont );
 
          /*
-           Faz apenas para a janela 0 (a primeira) j  que existe, na cria‡Æo das mesmas, uma condi‡Æo para que
+           Faz apenas para a janela 0 (a primeira) jÂ  que existe, na criaâ€¡Ã†o das mesmas, uma condiâ€¡Ã†o para que
            apenas a primeira seja criada
-           Obs: A exclusÆo desses objetos precisa ocorrer antes da Release do Device Context
+           Obs: A exclusÃ†o desses objetos precisa ocorrer antes da Release do Device Context
          */
          if (j==0)
          {
@@ -593,7 +597,7 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
             SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
 
             /*
-             Com PENs e BRUSHes liberadas, efetua exclusÆo
+             Com PENs e BRUSHes liberadas, efetua exclusÃ†o
             */
             if (s_pWvwData->s_sApp->penWhite)
             {
@@ -5782,11 +5786,11 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
     s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->hIcon = NULL;
 
     /*
-       Ap¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
+       ApÂ¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
        o handle original da PEN e BRUSH do Device Context
     */
     /*
-       E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
+       E, logo apÂ¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restauraâ€¡Ã†o
        quando for utilizar DeleteObject()
     */
     SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );

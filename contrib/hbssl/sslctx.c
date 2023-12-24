@@ -504,7 +504,7 @@ HB_FUNC( SSL_CTX_GET_OPTIONS )
       SSL_CTX * ctx = hb_SSL_CTX_par( 1 );
 
       if( ctx )
-         hb_retnl( SSL_CTX_get_options( ctx ) );
+         hb_retnl( ( LONG ) SSL_CTX_get_options( ctx ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );

@@ -1265,7 +1265,7 @@ $(OBJ_DIR)$(DIR_SEP)coreHBEXPAT$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)core.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)xmlparse$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmlparse.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xmltok_n$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmltok_n.c
 	$(CC_CMD)
@@ -1502,7 +1502,7 @@ $(OBJ_DIR)$(DIR_SEP)hbcurl$(OBJEXT) : $(HBCURL_DIR)$(DIR_SEP)hbcurl.c
 # HBSQLIT3.LIB Dependencies
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)sqlite3.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)xhbsqlite3.c
 	$(CC_CMD)
@@ -5049,7 +5049,7 @@ $(OBJ_DIR)$(DIR_SEP)mzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)zip.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)unzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)unzip.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hbmzip$(OBJEXT) : $(HBMZIP_DIR)$(DIR_SEP)hbmzip.c
 	$(CC_CMD)
@@ -6108,7 +6108,7 @@ $(OBJ_DIR)$(DIR_SEP)harupdf$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)harupdf.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_utils$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_utils.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_error$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_error.c
 	$(CCC_CMD)
@@ -6138,7 +6138,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_namedict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_namedic
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_pdfa$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_pdfa.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_real$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_real.c
 	$(CCC_CMD)
@@ -6156,7 +6156,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_xref$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_xref.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_string$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_string.c
 	$(CCC_CMD)
@@ -6174,7 +6174,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef.
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_tt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_tt.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_type1$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_type1.c
 	$(CCC_CMD)
@@ -6195,7 +6195,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_font_tt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font_tt.
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_font_cid$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font_cid.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_doc$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc.c
 	$(CCC_CMD)
@@ -6210,13 +6210,13 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_page_label$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_page_
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_gstate$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_gstate.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_pages$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_pages.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_page_operator$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_page_operator.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_destination$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_destination.c
 	$(CCC_CMD)
@@ -6228,7 +6228,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_outline$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_outline.
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_jp$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_jp.c
 	$(CCC_CMD)
@@ -6255,7 +6255,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_cnt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_font
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image_png.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_doc_png$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_doc_png.c
 	$(CCC_CMD)
@@ -6270,13 +6270,13 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_3dmeasure$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_3dmeas
 	$(CCC_CMD)	
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encoder_utf$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encoder_utf.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_exdata$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_exdata.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_image_ccitt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_image_ccitt.c
-	$(CCC_CMD)	
+	$(CCC_CMD_NOWARN)	
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_direct$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_direct.c
 	$(CCC_CMD)	
@@ -6331,4 +6331,3 @@ $(OBJ_DIR)$(DIR_SEP)smtpcln1.c : $(TIPSSL_DIR)$(DIR_SEP)smtpcln.prg
 
 $(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)smtpcln1.c
 	$(CC_CMD)
-

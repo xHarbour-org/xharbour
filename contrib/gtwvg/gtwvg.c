@@ -13,7 +13,7 @@
  *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  *
  *
@@ -83,6 +83,10 @@
  */
 //----------------------------------------------------------------------//
 
+
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4996 )
+#endif
 
 #if !defined( HB_VM_ALL )
    #define _HB_API_INTERNAL_ /* for hb_stack_ready, should be eliminated later */

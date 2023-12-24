@@ -1276,7 +1276,7 @@ HB_FUNC( SSL_GET_OPTIONS )
       SSL * ssl = hb_SSL_par( 1 );
 
       if( ssl )
-         hb_retnl( SSL_get_options( ssl ) );
+         hb_retnl( ( LONG ) SSL_get_options( ssl ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );

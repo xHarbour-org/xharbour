@@ -2598,7 +2598,7 @@ HB_FUNC( INITSSLRANDFILE )
 
 HB_FUNC( INETSSLCONNECTFROMFD )
 {
-   int fd               = hb_parnint(1);
+   int fd               = ( int ) hb_parnint(1);
    HB_SSL_SOCKET_STRUCT *Socket = HB_SSLPARSOCKET(3);
    PHB_ITEM             pSocket = NULL;
 //   struct hostent       *Host;
