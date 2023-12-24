@@ -64,39 +64,62 @@ typedef HB_STRIP_FUNC_ * PHB_STRIP_FUNC;
 static HB_STRIP_FUNC( hb_p_line )
 {
    HB_SYMBOL_UNUSED( cargo );
+   HB_SIZE ulPos = lPCodePos;
 
-   if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_LINE ||
-       pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
+   ulPos += 3;
+
+   // Skip HB_P_NOOPs
+   while( pFunc->pCode[ ulPos ] == HB_P_NOOP )
+      ulPos++;
+
+   if( pFunc->pCode[ ulPos ] == HB_P_LINE ||
+       pFunc->pCode[ ulPos ] == HB_P_BASELINE || 
+       pFunc->pCode[ ulPos ] == HB_P_LINEOFFSET )
    {
       hb_compNOOPfill( pFunc, lPCodePos, 3, FALSE, FALSE );
    }
 
-   return 3;
+   return ulPos - lPCodePos;
 }
 
 static HB_STRIP_FUNC( hb_p_baseline )
 {
    HB_SYMBOL_UNUSED( cargo );
+   HB_SIZE ulPos = lPCodePos;
 
-   if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
+   ulPos += 3;
+
+   // Skip HB_P_NOOPs
+   while( pFunc->pCode[ ulPos ] == HB_P_NOOP )
+      ulPos++;
+
+   if( pFunc->pCode[ ulPos ] == HB_P_BASELINE ||
+       pFunc->pCode[ ulPos ] == HB_P_LINEOFFSET )
    {
       hb_compNOOPfill( pFunc, lPCodePos, 3, FALSE, FALSE );
    }
 
-   return 3;
+   return ulPos - lPCodePos;
 }
 
 static HB_STRIP_FUNC( hb_p_lineoffset )
 {
    HB_SYMBOL_UNUSED( cargo );
+   HB_SIZE ulPos = lPCodePos;
 
-   if( pFunc->pCode[ lPCodePos + 2 ] == HB_P_BASELINE ||
-       pFunc->pCode[ lPCodePos + 2 ] == HB_P_LINEOFFSET )
+   ulPos += 2;
+
+   // Skip HB_P_NOOPs
+   while( pFunc->pCode[ ulPos ] == HB_P_NOOP )
+      ulPos++;
+
+   if( pFunc->pCode[ ulPos ] == HB_P_BASELINE ||
+       pFunc->pCode[ ulPos ] == HB_P_LINEOFFSET )
    {
       hb_compNOOPfill( pFunc, lPCodePos, 2, FALSE, FALSE );
    }
 
-   return 2;
+   return ulPos - lPCodePos;
 }
 
 /* NOTE: The order of functions have to match the order of opcodes mnemonics

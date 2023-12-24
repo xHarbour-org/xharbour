@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-23 19:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source/compiler/harbour.c
+    * Modified call to hb_compStripFuncLines() to be called on 'iPass > 0' instead of 'iPass == 2'
+      to fix stripping of line numbers for empty lines
+  * source/compiler/hbfix.c
+    + Added logic to hb_p_pushlocal() to convert to HB_P_NOOP if followed by HB_P_POP 
+      This optimizes out liness like this:
+         ( SomeLocal ) 
+  * source/compiler/hbstripl.c
+     + Added logic to skip HB_P_NOOPs when checking for empty lines
+  * tests/test.prg
+    ! Fixed compilation of C'LL suffix in versions constants
+  
 2023-12-22 15:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\compiler\genc.c
   * source\compiler\harbour.slx

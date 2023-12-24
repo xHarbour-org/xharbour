@@ -137,6 +137,12 @@ static HB_FIX_FUNC( hb_p_poplocal )
 
 static HB_FIX_FUNC( hb_p_pushlocal )
 {
+   // If subsequent code is HB_P_POP we can mark the push and pop as NOOP
+   if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_POP )
+   { 
+      hb_compNOOPfill( pFunc, lPCodePos, 4, FALSE, FALSE );
+   }
+
    /* only local variables used outside of a codeblock need fixing
     */
    if( cargo->iNestedCodeblock == 0 )

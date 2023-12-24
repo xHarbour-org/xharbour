@@ -4,6 +4,8 @@
 
 //
 
+#xtranslate <x>LL => <x>
+
 PROCEDURE Main()
 
    ? "Hello World"
