@@ -27,7 +27,7 @@ fi
 # brew install tcl-tk
 # brew install --cask xquartz
 
-export C_USR="-Weverything -Wno-cast-qual -Wno-format-nonliteral -Wno-declaration-after-statement -Wno-empty-translation-unit -Wno-newline-eof -Wno-date-time -Wno-double-promotion -Wno-shorten-64-to-32 -Wno-shadow -Wno-implicit-int-conversion -Wno-sign-conversion -Wno-poison-system-directories -Wno-padded -Wno-deprecated-declarations -Wno-cast-align -Wno-undef -Wno-unused-macros -Wno-missing-prototypes -Wno-invalid-source-encoding"
+export C_USR="-Weverything -Wno-cast-qual -Wno-format-nonliteral -Wno-declaration-after-statement -Wno-empty-translation-unit -Wno-newline-eof -Wno-date-time -Wno-double-promotion -Wno-shorten-64-to-32 -Wno-shadow -Wno-implicit-int-conversion -Wno-sign-conversion -Wno-poison-system-directories -Wno-padded -Wno-deprecated-declarations -Wno-cast-align -Wno-undef -Wno-unused-macros -Wno-missing-prototypes -Wno-invalid-source-encoding -Wno-documentation-unknown-command -Wno-c11-extensions -Wno-c++11-extensions"
 export L_USR=""
 
 LIB_NAMES=("zlib" "openssl" "X11")
