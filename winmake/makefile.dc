@@ -118,6 +118,7 @@ DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:conso
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -o$@ $**
 CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CPPFLAGS) -o$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -o$@ $**
+CCC_CMD_NOWARN =$(CC) $(CLIBFLAGS) -o$@ $**
 CC_CMD_ZIP     =$(CC) -o+s -cpp -mn -I"include" -I"$(CC_DIR)\include\win32" -I"$(CC_DIR)\include" -I"$(HBZIP_DIR)\include" -c -6 -WD -D"__WIN32__" -D"_WIN32" -D"NULL=0" -D"STRICT" -D"snprintf=_snprintf" -o$@ $**
 LIB_CMD        =$(LIBEXE) $(ARFLAGS) $@ $**
 LIB_CMD_1      =$(HBLIB_EXE) __DMC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
