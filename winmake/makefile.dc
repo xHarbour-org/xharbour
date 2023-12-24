@@ -116,6 +116,7 @@ HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -exetype:nt -subsystem:console -noi $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB)
 CC_CMD         =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -o$@ $**
+CC_CMD_NOWARN  =$(CC) $(CLIBFLAGS) $(CPPFLAGS) -o$@ $**
 CC_CMD_HARBOUR =$(CC) $(CLIBFLAGS) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CPPFLAGS) -o$@ $**
 CCC_CMD        =$(CC) $(CLIBFLAGS) -o$@ $**
 CCC_CMD_NOWARN =$(CC) $(CLIBFLAGS) -o$@ $**
