@@ -4286,32 +4286,6 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          hb_compGenPCode1( HB_P_ENDPROC );
       }
 
-      if( pFunc->bFlags & FUN_USES_LOCAL_PARAMS )
-      {
-         USHORT PCount = pFunc->wParamCount;
-
-         /* do not adjust if local parameters are used -remove NOOPs only */
-         pFunc->wParamCount = 0;
-         /* There was a PARAMETERS statement used.
-          * NOTE: This fixes local variables references in a case when
-          * there is PARAMETERS statement after a LOCAL variable declarations.
-          * All local variables are numbered from 1 - which means use first
-          * item from the eval stack. However if PARAMETERS statement is used
-          * then there are additional items on the eval stack - the
-          * function arguments. Then first local variable is at the position
-          * (1 + <number of arguments>). We cannot fix this numbering
-          * because the PARAMETERS statement can be used even at the end
-          * of function body when all local variables are already created.
-          */
-
-         hb_compFixFuncPCode( pFunc );
-         pFunc->wParamCount = PCount;
-      }
-      else
-         hb_compFixFuncPCode( pFunc );
-
-      hb_compOptimizeJumps();
-
       if( hb_comp_iWarnings )
       {
          /*
@@ -4413,6 +4387,32 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          pFunc->iStackFunctions  = 0;
          pFunc->iStackClasses    = 0;
       }
+
+      if( pFunc->bFlags & FUN_USES_LOCAL_PARAMS )
+      {
+         USHORT PCount = pFunc->wParamCount;
+
+         /* do not adjust if local parameters are used -remove NOOPs only */
+         pFunc->wParamCount = 0;
+         /* There was a PARAMETERS statement used.
+          * NOTE: This fixes local variables references in a case when
+          * there is PARAMETERS statement after a LOCAL variable declarations.
+          * All local variables are numbered from 1 - which means use first
+          * item from the eval stack. However if PARAMETERS statement is used
+          * then there are additional items on the eval stack - the
+          * function arguments. Then first local variable is at the position
+          * (1 + <number of arguments>). We cannot fix this numbering
+          * because the PARAMETERS statement can be used even at the end
+          * of function body when all local variables are already created.
+          */
+
+         hb_compFixFuncPCode( pFunc );
+         pFunc->wParamCount = PCount;
+      }
+      else
+         hb_compFixFuncPCode( pFunc );
+
+      hb_compOptimizeJumps();
    }
 }
 
