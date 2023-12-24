@@ -7305,11 +7305,9 @@ void hb_vmSend( USHORT uiParams )
          if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
             HB_ITEM_NEW( RealSelf );
-            USHORT uiClass;
 
             /* printf( "\n VmSend Method: %s \n", pSym->szName ); */
-            uiClass                                   = pSelfBase->uiClass;
-            pItem->item.asSymbol.pCargo->uiSuperClass = uiClass;
+            pItem->item.asSymbol.pCargo->uiSuperClass = pSelfBase->uiClass;
 
             /* TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
              */
