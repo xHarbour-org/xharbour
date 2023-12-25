@@ -1265,7 +1265,7 @@ $(OBJ_DIR)$(DIR_SEP)coreHBEXPAT$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)core.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)xmlparse$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmlparse.c
-	$(CCC_CMD_NOWARN)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xmltok_n$(OBJEXT) : $(HBEXPAT_DIR)$(DIR_SEP)xmltok_n.c
 	$(CC_CMD)
@@ -1505,7 +1505,7 @@ $(OBJ_DIR)$(DIR_SEP)sqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)sqlite3.c
 	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xhbsqlite3$(OBJEXT) : $(HBSQLIT3_DIR)$(DIR_SEP)xhbsqlite3.c
-	$(CC_CMD)
+	$(CCC_CMD)
 
 #===============================================================================
 # SEVENZIP.LIB rules
