@@ -50,6 +50,10 @@
  *
  */
 
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4206 )
+#endif
+
 #include "hbsetup.ch"
 
 /* NOTE: Xbase++ has a standard function named dbSkipper(), it's not a
