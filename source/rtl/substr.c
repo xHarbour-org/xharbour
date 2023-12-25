@@ -104,7 +104,7 @@ HB_FUNC( SUBSTR )
                if( lLen < 0 )
                {  
                   // Interpret the length as the END position (number of characters from the end of the string)
-                  long lEnd = liLen + lLen + 1; // Will include the end position character
+                  long lEnd = ( long ) ( liLen + lLen + 1 ); // Will include the end position character
                   
                   // Calculate the length from the start position to the end position
                   lLen = lEnd - lPos;
