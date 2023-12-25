@@ -28,7 +28,7 @@ OPTFLAGS=-q -fpack-struct=8
 !else
 ACE_LIB   =$(ACE32_LIB)
 !if ("$(CC)"=="")
-CC        =BCC32
+CC        =bcc32
 !endif
 LINKEXE   =ILINK32
 LIBEXE    =TLIB
