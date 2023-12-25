@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-25 11:07 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.vc
+  * winmake\compile.mak
+    ! fixed some improper use of the new macros CC_CMD_NOWARN and CCC_CMD_NOWARN
+
 2023-12-25 04:21 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * utils/misc/hbrc.c
     unsigned long long -> ULONGLONG
