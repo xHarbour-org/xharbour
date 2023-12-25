@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-24 20:46 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * include/hbapi.h
+  * source/compiler/comptool.c
+  * source/vm/cmdarg.c
+  * source/pp/ppgen.c
+    * Corrected hb_verCvsID() to return ULONGLONG instead of long long int 
+  * source/pp/ppgen.c
+    Corrected sufix of 64bit version consttants from LL to UL 
+  
 2023-12-24 19:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
   * winmake\makefile.dc
