@@ -225,7 +225,7 @@ int hb_setGetDirSeparator( void )
    return HB_OS_PATH_DELIM_CHR;
 }
 
-long long int hb_verCvsID( void )
+ULONGLONG hb_verCvsID( void )
 {
    return 0;
 }
@@ -757,7 +757,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
 
             //fprintf( stderr, "ChangeLog Time ID: '%s'\n", szChgLogTimeID );
 
-            snprintf( szGitFakeID, sizeof( szGitFakeID ), "%s%sLL", szChgLogDateID, szChgLogTimeID );
+            snprintf( szGitFakeID, sizeof( szGitFakeID ), "%s%sUL", szChgLogDateID, szChgLogTimeID );
             //fprintf( stderr, "Git Fake ID: '%s'\n", szGitFakeID );
          }
       }
