@@ -381,7 +381,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
             }
             else if( pField->uiType == HB_FT_DOUBLE )
             {
-               HB_PUT_LE_DOUBLE( pPtr, nValue );
+               HB_PUT_LE_DOUBLE( pPtr, ( double ) nValue );
             }
             else
             {
