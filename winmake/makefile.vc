@@ -44,7 +44,7 @@ OPTFLAGS    =-Otyb1
 !if ("$(__MSC__)"=="8") || ("$(__MSC__)"=="9")
 WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4244
 !else
-WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4206
+WARNINGFLAGS=-W4 -wd4127 -wd4054 -wd4055 -wd4206 -wd4201
 !endif
 !endif
 
