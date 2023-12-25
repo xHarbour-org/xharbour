@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-24 20:53 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+* make_bc.bat
+    + Added auto detection with auto setup of C:\BCC55 as SET_BCC_C_55
+    + Completed auto setup to SET_BCC_55
+
 2023-12-24 20:46 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * include/hbapi.h
   * source/compiler/comptool.c
