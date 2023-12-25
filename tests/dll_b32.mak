@@ -7,8 +7,8 @@ ifeq ($(CC),)
 CC           = bcc32.exe
 endif
 ILINK_EXE    = ilink32.exe
-COMPILER     = ..\bin\b32\harbour.exe
-HARBOURLIB   = ..\lib\b32
+COMPILER     = ..\bin\%SUB_DIR%\harbour.exe
+HARBOURLIB   = ..\lib\%SUB_DIR%
 MAINWIN      = ..\SOURCE\VM\MAINWIN.C
 
 $(APPEXE) : $(OBJDIR)\$(PRGFILE).obj \

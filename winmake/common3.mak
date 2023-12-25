@@ -88,11 +88,15 @@ HARBOURFLAGS =-dHB_THREAD_SUPPORT $(HARBOURFLAGS)
 CC_DEFINES=-DHB_AVOID_RESERVED_WORDS $(CC_DEFINES)
 !endif
 
+!if ("$(BISON)"=="")	# if not defined
+BISON=bison
+!endif
+
 !if ("$(HB_USE_BISON)"=="1")
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbour.sly
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macro.y
-BISON_CMD1   =bison --no-line --verbose -d $** -o$@
-BISON_CMD2   =bison --no-line --verbose --name-prefix=hb_comp -d $** -o$@
+BISON_CMD1   =$(BISON) --no-line --verbose -d $** -o$@
+BISON_CMD2   =$(BISON) --no-line --verbose -d $** -o$@
 !else
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbouryy.c
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macroyy.c

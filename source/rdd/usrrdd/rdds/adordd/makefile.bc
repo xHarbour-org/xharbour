@@ -7,9 +7,9 @@
 
 INCLUDE_DIR = ..\..\include
 
-BIN_DIR = ..\..\bin\b32
-OBJ_DIR = ..\..\obj\b32
-LIB_DIR = ..\..\lib\b32
+BIN_DIR = ..\..\bin\%SUB_DIR%
+OBJ_DIR = ..\..\obj\%SUB_DIR%
+LIB_DIR = ..\..\lib\%SUB_DIR%
 
 $(LIB_DIR)\adordd.lib :   \
    $(OBJ_DIR)\adordd.obj   

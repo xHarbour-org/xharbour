@@ -33,6 +33,7 @@ IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :FIND_BCC
+   IF EXIST \bcc102                          GOTO SET_BC_102
    IF EXIST C:\bcc102                        GOTO SET_BCC_C_102
    IF EXIST \Borland\bcc58                   GOTO SET_BORLAND_58
    IF EXIST \bcc58                           GOTO SET_BCC_58
@@ -42,17 +43,29 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
    GOTO FIND_BISON
 
-:SET_BCC_C_102
-   SET CC_DIR=C:\bcc102
-   make > NUL 2>&1 || set PATH=$(CC_DIR)\bin;%PATH%
+:SET_BCC_102
+   SET CC_DIR=\bcc102
    
    REM Not needed because bcc32c.exe uses bcc32c.cfg
-   REM set BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
+   REM SET BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
    
    REM Needed because iLink32.exe does not have a config file!
-   set BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
-   set CC=bcc32c
-   set LD=bcc32c
+   SET BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
+   SET CC=bcc32c
+   SET LD=bcc32c
+
+   GOTO FIND_BISON
+
+:SET_BCC_C_102
+   SET CC_DIR=C:\bcc102
+   
+   REM Not needed because bcc32c.exe uses bcc32c.cfg
+   REM SET BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
+   
+   REM Needed because iLink32.exe does not have a config file!
+   SET BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
+   SET CC=bcc32c
+   SET LD=bcc32c
 
    GOTO FIND_BISON
 
@@ -74,30 +87,35 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 
 :SET_BCC_55
    SET CC_DIR=\bcc55
-   make > NUL 2>&1 || set PATH=$(CC_DIR)\bin;%PATH%
    
    REM Not needed because bcc32c.exe uses bcc32c.cfg
    REM set BCC_INC=$(CC_DIR)\include
    
    REM Needed because iLink32.exe does not have a config file!
-   set BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
+   SET BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
    GOTO FIND_BISON
 
 :SET_BCC_C_55
    SET CC_DIR=C:\bcc55
-   make > NUL 2>&1 || set PATH=$(CC_DIR)\bin;%PATH%
    
    REM Not needed because bcc32c.exe uses bcc32c.cfg
    REM set BCC_INC=$(CC_DIR)\include
    
    REM Needed because iLink32.exe does not have a config file!
-   set BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
+   SET BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
    GOTO FIND_BISON   
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
+   IF EXIST C:\win_flex_bison-2.5.5\win_bison.exe  GOTO SET_WIN_FLEX_BISON_C_2_5_5
    IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
    IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2
+   GOTO READY
+
+:SET_WIN_FLEX_BISON_C_2_5_5
+   SET BISON_DIR=C:\win_flex_bison-2.5.5
+   SET BISON=win_bison.exe
+   SET HB_USE_BISON=1
    GOTO READY
 
 :SET_BISON1
@@ -109,6 +127,8 @@ IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    GOTO READY
 
 :READY
+
+IF "%CC%"=="bcc32c" SET SUB_DIR=b32c
 
 SET _PATH=%PATH%
 SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%

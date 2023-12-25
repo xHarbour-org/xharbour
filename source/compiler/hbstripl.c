@@ -63,8 +63,8 @@ typedef HB_STRIP_FUNC_ * PHB_STRIP_FUNC;
 
 static HB_STRIP_FUNC( hb_p_line )
 {
-   HB_SYMBOL_UNUSED( cargo );
    HB_SIZE ulPos = lPCodePos;
+   HB_SYMBOL_UNUSED( cargo );
 
    ulPos += 3;
 
@@ -84,8 +84,8 @@ static HB_STRIP_FUNC( hb_p_line )
 
 static HB_STRIP_FUNC( hb_p_baseline )
 {
-   HB_SYMBOL_UNUSED( cargo );
    HB_SIZE ulPos = lPCodePos;
+   HB_SYMBOL_UNUSED( cargo );
 
    ulPos += 3;
 
@@ -104,8 +104,8 @@ static HB_STRIP_FUNC( hb_p_baseline )
 
 static HB_STRIP_FUNC( hb_p_lineoffset )
 {
-   HB_SYMBOL_UNUSED( cargo );
    HB_SIZE ulPos = lPCodePos;
+   HB_SYMBOL_UNUSED( cargo );
 
    ulPos += 2;
 

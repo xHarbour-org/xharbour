@@ -8,6 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-25 04:21 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * utils/misc/hbrc.c
+    unsigned long long -> ULONGLONG
+    
+  * source/compiler/hbstripl.c
+    * Move HB_SYMBOL_UNUSED() (executable context) below declaration
+
+  * make_bc.bat
+    + Added auto detection with auto setup of \BCC55 as SET_BCC_55
+    + Added auto detection with auto setup of C:\win_flex_bison-2.5.5 as 
+    + Added: IF "%CC%"=="bcc32c" SET SUB_DIR=b32c
+
+  * source/rdd/usrrdd/rdds/adordd/make_b32.bat
+  * source/rdd/usrrdd/rdds/adordd/makefile.bc
+  * tests/dll_b32.mak
+  * tests/dll_b32.bat
+    * modify hard coded b32 to %SUB_DIR% to differentiate between bcc32 (b32) and bcc32c (b32c)
+
+  * winmake/common3.mak
+    * Modified hard coded bison to $(BISON) to allow support for win_bison.exe
+  * winmake/makefile.bc
+    * Modified OPT_FLAGS of bcc32c to use same flags as bcc32
+  
 2023-12-24 20:53 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
 * make_bc.bat
     + Added auto detection with auto setup of C:\BCC55 as SET_BCC_C_55

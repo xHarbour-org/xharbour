@@ -8,23 +8,23 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
-   make -fmakefile.bc %1 %2 %3 > make_b32.log
+   make -fmakefile.bc %1 %2 %3 > make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
 
-   copy ..\..\lib\b32\adordd.lib ..\..\lib\*.* > nul
-   if exist ..\..\lib\b32\adordd.bak del ..\..\lib\b32\adordd.bak
+   copy ..\..\lib\%SUB_DIR%\adordd.lib ..\..\lib\*.* > nul
+   if exist ..\..\lib\%SUB_DIR%\adordd.bak del ..\..\lib\%SUB_DIR%\adordd.bak
    goto EXIT
 
 :BUILD_ERR
 
-   notepad make_b32.log
+   notepad make_%SUB_DIR%.log
    goto EXIT
 
 :CLEAN
-   if exist ..\..\lib\b32\adordd.lib   del ..\..\lib\b32\adordd.lib
-   if exist ..\..\lib\b32\adordd.bak  del ..\..\lib\b32\adordd.bak
+   if exist ..\..\lib\%SUB_DIR%\adordd.lib   del ..\..\lib\%SUB_DIR%\adordd.lib
+   if exist ..\..\lib\%SUB_DIR%\adordd.bak  del ..\..\lib\%SUB_DIR%\adordd.bak
 
    goto EXIT
 

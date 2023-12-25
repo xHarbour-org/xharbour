@@ -1,7 +1,7 @@
 @echo off
 if '%1' == '' goto error
 
-make -DPRGFILE=%1 -fdll_b32.mak /B %2 %3 > dll_b32.log
+make -DPRGFILE=%1 -fdll_b32.mak /B %2 %3 > dll_%SUB_DIR%.log
 
 if errorlevel 1 goto BUILD_ERR
 
@@ -25,6 +25,6 @@ Echo Syntax DLL [PROGRAM] // WITHOUT PRG EXTENSION
 goto end
 
 :BUILD_ERR
-   notepad dll_b32.log
+   notepad dll_%SUB_DIR%.log
 
 :end

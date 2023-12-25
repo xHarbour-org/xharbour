@@ -67,6 +67,8 @@
 #include <windows.h>
 #include <time.h>
 #include <stdio.h>
+
+#include "hbdefs.h"
 #include "hbver.h"
 #include "hbverbld.h"
 
@@ -353,7 +355,7 @@ int main( int argc, char * argv[] )
          char *      aMo[]     = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
          char        szParam[ 265 ];
 
-         unsigned long long llvalue = HB_VER_CVSID; 
+         ULONGLONG llvalue = HB_VER_CVSID; 
          unsigned long dw1 = llvalue >> 32; // Get the first DWORD (the higher 32 bits) 
          unsigned long dw2 = llvalue & 0xFFFFFFFF; // Get the second DWORD (the lower 32 bits) 
 
