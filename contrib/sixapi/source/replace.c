@@ -61,7 +61,7 @@ HB_FUNC( SX_REPLACE )  /* ( cpFieldName, xData, cArea ) */
          case HB_IT_STRING:
          {
             PVOID    pValue     = ( PVOID ) hb_parc( 2 );
-            char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
+            char *   cFieldType = ( char * ) ( LONG_PTR ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
 
             switch( *cFieldType )
             {
@@ -268,7 +268,7 @@ HB_FUNC( SX_REPLACEEX )      /* ( aReplace, cArea ) */
 #if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
                   char *   cFieldType = ( char * ) ( HB_LONG ) sx_FieldType( cFieldName );
 #else
-                  char *   cFieldType = ( char * ) sx_FieldType( cFieldName );
+                  char *   cFieldType = ( char * ) ( LONG_PTR ) sx_FieldType( cFieldName );
 #endif
                   switch( *cFieldType )
                   {
@@ -316,7 +316,7 @@ HB_FUNC( SX_BLOBTOFILE )
 #if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
       pFieldType = ( char * ) ( HB_LONG ) sx_FieldType( cpFieldName );
 #else
-      pFieldType = ( char * ) sx_FieldType( cpFieldName );
+      pFieldType = ( char * ) ( LONG_PTR ) sx_FieldType( cpFieldName );
 #endif
       switch( *pFieldType )
       {

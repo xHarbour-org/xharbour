@@ -70,7 +70,7 @@ HB_FUNC( SX_PUTVALUEEX )  // ( aValues, nArea )
       for( uiSize = 0; uiSize < uiLen; uiSize++ )
       {
          uVarType   = ( WORD ) hb_arrayGetType( pValue, uiSize + 1 );
-         cFieldName = ( PBYTE ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( uiSize + 1 ) ) );
+         cFieldName = ( PBYTE ) ( LONG_PTR ) SX_CONVFUNC( sx_FieldName( ( WORD ) ( uiSize + 1 ) ) );
 
          switch( uVarType )
          {
@@ -109,7 +109,7 @@ HB_FUNC( SX_PUTVALUEEX )  // ( aValues, nArea )
             case HB_IT_STRING:
             {
                PBYTE    cVar       = ( PBYTE ) hb_arrayGetC( pValue, uiSize + 1 );
-               char *   cFieldType = ( char * ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
+               char *   cFieldType = ( char * ) ( LONG_PTR ) SX_CONVFUNC( sx_FieldType( cFieldName ) );
 
                switch( *cFieldType )
                {

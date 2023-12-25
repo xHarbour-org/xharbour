@@ -317,7 +317,7 @@ $(OBJ_DIR)$(DIR_SEP)xmissing$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xmissing.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)xpatchi$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xpatchi.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xprepare$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xprepare.c
 	$(CC_CMD)
@@ -329,7 +329,7 @@ $(OBJ_DIR)$(DIR_SEP)xrabply$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xrabply.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)xutils$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xutils.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)xversion$(OBJEXT) : $(HBXDIFF_DIR)$(DIR_SEP)xversion.c
 	$(CC_CMD)
@@ -401,7 +401,7 @@ $(OBJ_DIR)$(DIR_SEP)mxml_ent$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_ent.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)mxml_fil$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_fil.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)mxml_get$(OBJEXT) : $(HBMXML_DIR)$(DIR_SEP)mxml_get.c
 	$(CC_CMD)
@@ -716,7 +716,7 @@ $(OBJ_DIR)$(DIR_SEP)tif_next$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_next.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)tif_ojpeg$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_ojpeg.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)tif_open$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_open.c
 	$(CCC_CMD)
@@ -1190,7 +1190,7 @@ $(OBJ_DIR)$(DIR_SEP)tif_next_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DI
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)tif_ojpeg_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_ojpeg.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)tif_open_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_open.c
 	$(CCC_CMD)
@@ -6120,7 +6120,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_list$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_list.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_streams$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_streams.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_objects$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_objects.c
 	$(CCC_CMD)
@@ -6177,7 +6177,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_tt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontd
 	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_type1$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_type1.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_fontdef_base14$(OBJEXT): $(HBHPDF_DIR)$(DIR_SEP)hpdf_fontdef_base14.c
 	$(CCC_CMD)

@@ -38,7 +38,7 @@ HB_FUNC( SX_SYSPROP )
 #else
       hb_retni( sx_SysProp(
                    ( WORD ) hb_parni( 1 ), /* One of the predefined constant values. */
-                   ( void * ) i ) );
+                   ( void * ) ( LONG_PTR ) i ) );
 #endif
 }
 
@@ -55,7 +55,7 @@ HB_FUNC( SX_RDDDRIVER )
 #if defined( __MINGW32__ ) && defined( HB_OS_WIN_64 )
       iDriverName = ( int ) sx_SysProp( SDE_SP_GETDRIVER, ( void * ) ( HB_LONG ) iWorkArea );
 #else
-      iDriverName = ( int ) sx_SysProp( SDE_SP_GETDRIVER, ( void * ) iWorkArea );
+      iDriverName = ( int ) sx_SysProp( SDE_SP_GETDRIVER, ( void * ) ( LONG_PTR ) iWorkArea );
 #endif
    }
 

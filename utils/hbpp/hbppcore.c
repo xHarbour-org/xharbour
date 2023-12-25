@@ -862,11 +862,11 @@ int hb_pp_ParseDirective( char * sLine )
 
         if( DefSearch( sID, NULL, NULL ) )
         {
-           hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
+           hb_pp_Stuff( "1", pDefined, 1, ( int ) ( pTemp - pDefined ), ( int ) strlen( pDefined ) );
         }
         else
         {
-           hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
+           hb_pp_Stuff( "0", pDefined, 1, ( int ) ( pTemp - pDefined ), ( int ) strlen( pDefined ) );
         }
      }
 
@@ -932,11 +932,11 @@ int hb_pp_ParseDirective( char * sLine )
 
                if( DefSearch( sID, NULL, NULL ) )
                {
-                  hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
+                  hb_pp_Stuff( "1", pDefined, 1, ( int ) ( pTemp - pDefined ), ( int ) strlen( pDefined ) );
                }
                else
                {
-                  hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, ( int ) strlen( pDefined ) );
+                  hb_pp_Stuff( "0", pDefined, 1, ( int ) ( pTemp - pDefined ), ( int ) strlen( pDefined ) );
                }
             }
 
@@ -1991,7 +1991,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            //printf( "Find Marker: %c Optional: %i >%.*s< In: Len: %i %.*s\n", lastchar, uiOpenBrackets, explen, exppatt, mlen - ( ptr - mpatt ), mlen - ( ptr - mpatt ), ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
-           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
+           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, ( ULONG ) ( mlen - ( ptr - mpatt ) ) ) ) > 0 )
            {
               char *pTmp = ptr + ifou - 2, *pStart;
 
@@ -2091,7 +2091,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
               // Use same marker ID in expreal[1]
               expreal[2] = exptype;
-              rmlen = ( ptr + ifou + explen ) - pStart;
+              rmlen = ( int ) ( ( ptr + ifou + explen ) - pStart );
 
               //printf( "Repeated: >%.*s<\n", rmlen, pStart );
               //printf( "maptt: >%s<\n", mpatt );
@@ -2106,7 +2106,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
            //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, rlen - ( ptr - rpatt ), rlen - ( ptr - rpatt ), ptr );
 
-           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
+           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, ( ULONG ) ( rlen - ( ptr - rpatt ) ) ) ) > 0 )
            {
               /* Convert result marker into inner format */
               ifou --;
@@ -2561,7 +2561,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                     fprintf( hb_comp_PPTrace, "#defined >%.*s<\n", i, ptro );
                  }
 
-                 hb_pp_Stuff( ptro, ptrb, i, ptri - ptrb, lens + 1 );
+                 hb_pp_Stuff( ptro, ptrb, i, ( int ) ( ptri - ptrb ), lens + 1 );
 
                  #if 0
                  if( hb_comp_PPTrace )
@@ -3393,7 +3393,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   }
   else
   {
-     return ptri - inputLine;
+     return ( int ) ( ptri - inputLine );
   }
 }
 
@@ -3457,8 +3457,8 @@ static int RemoveNotInstanciated( char * stroka )
 
              if( *ptr == '\16' && ( pClose = strchr( ptr, '\17' ) ) != NULL )
              {
-                hb_pp_Stuff( "", ptr, 0, pClose - ptr + 1, lenres - (ptr - stroka) );
-                lenres -= pClose - ptr + 1;
+                hb_pp_Stuff( "", ptr, 0, ( int ) ( pClose - ptr + 1 ), ( int ) ( lenres - ( ptr - stroka ) ) );
+                lenres -= ( int ) ( pClose - ptr + 1 );
              }
           }
           break;
@@ -3758,7 +3758,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
            ptrtemp = ptr;
            if( !strincmp( *ptri, &ptr, !com_or_xcom ) )
            {
-              lenreal = stroncpy( expreal, *ptri, ( ptr - ptrtemp ) );
+              lenreal = stroncpy( expreal, *ptri, ( int ) ( ptr - ptrtemp ) );
               *ptri += lenreal;
               SearnRep( exppatt, expreal, lenreal, ptro, lenres );
               rezrestr = 1;
@@ -3872,7 +3872,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
       if( pTmp )
       {
-         lens = pTmp - *ptri;
+         lens = ( int ) ( pTmp - *ptri );
 
          if( expreal )
          {
@@ -5334,9 +5334,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                }
                else
                {
-                  hb_pp_Stuff( "", ptr, 0, ptr2 - ptr + 1, *lenres - ( ptr - ptro ) );
-                  *lenres -= ptr2-ptr+1;
-                  isdvig = ptr - ptro;
+                  hb_pp_Stuff( "", ptr, 0, ( int ) ( ptr2 - ptr + 1 ), ( int ) ( *lenres - ( ptr - ptro ) ) );
+                  *lenres -= ( int ) ( ptr2-ptr+1 );
+                  isdvig = ( int ) ( ptr - ptro );
                   rezs = TRUE;
                }
             }
@@ -5346,7 +5346,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                {
                   BYTE cMarkerCount = '0', cGroupCount = '0';
 
-                  lennew = ptr2 - ptr - 1;
+                  lennew = ( int ) ( ptr2 - ptr - 1 );
 
                   // Flagging the instanciated Marker in Repeatable group as Instanciated.
                   for( i = 0; i < lennew; i++ )
@@ -5444,9 +5444,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      }
                   }
 
-                  hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
+                  hb_pp_Stuff( expnew, ptr, lennew, 0, ( int ) ( *lenres-(ptr-ptro)+1 ) );
                   *lenres += lennew;
-                  isdvig = ptr - ptro + ( ptr2 - ptr - 1 ) + lennew;
+                  isdvig = ( int ) ( ptr - ptro + ( ptr2 - ptr - 1 ) + lennew );
                   rezs = TRUE;
 
                   #ifdef DEBUG_MARKERS
@@ -5479,7 +5479,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   }
                   else
                   {
-                     lennew = ptr2 - ptr - 1;
+                     lennew = ( int ) ( ptr2 - ptr - 1 );
 
                      // Scanning all Markers in Repeatable group to check if Instanciated.
                      for( i = 0; i < lennew; i++ )
@@ -5492,7 +5492,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                                  printf( "   '%s' Already instanciated\n", ptr + i );
                               #endif
 
-                              isdvig = ptr2 - ptro;
+                              isdvig = ( int ) ( ptr2 - ptro );
                               rezs = TRUE;
                            }
                         }
@@ -5601,7 +5601,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         // Ron Pinkas revised July-17-2004 - iResidualOffset already added to lenres in loop above.
                         *lenres += lennew;// + iResidualOffset;
 
-                        isdvig = ptr - ptro + ( ptr2 - ptr - 1 ) + lennew + iResidualOffset;
+                        isdvig = ( int ) ( ptr - ptro + ( ptr2 - ptr - 1 ) + lennew + iResidualOffset );
 
                         #ifdef DEBUG_MARKERS
                            printf( "   Instanciated Repeatable Group: >%s< with Non Repeatable >%s<\n", expnew, expreal );

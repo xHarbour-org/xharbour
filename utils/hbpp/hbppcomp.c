@@ -275,7 +275,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      /* Ron Pinkas end 2000-06-14 */
   }
 
-  lens = hb_pp_strocpy( ptrOut, s_szLine ) + ( ptrOut - sOut );
+  lens = ( int ) ( hb_pp_strocpy( ptrOut, s_szLine ) + ( ptrOut - sOut ) );
 
   if( hb_comp_iLineINLINE && hb_pp_bInline == 0 )
   {
@@ -296,7 +296,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      {
         if( pTmp > sOut )
         {
-           hb_pp_Stuff( sOut, s_szOutLine, pTmp - sOut, 0, ( int ) strlen( s_szOutLine ) );
+           hb_pp_Stuff( sOut, s_szOutLine, ( int ) ( pTmp - sOut ), 0, ( int ) strlen( s_szOutLine ) );
         }
 
         hb_pp_WrStr( handl_o, s_szOutLine );

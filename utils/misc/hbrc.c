@@ -334,7 +334,7 @@ static char * cParExp( char * szParam, char * szStr )
             break;
 
          default:
-            iPos = pAction - szParam + 1;
+            iPos = ( int ) ( pAction - szParam + 1 );
             break;
       }
    }

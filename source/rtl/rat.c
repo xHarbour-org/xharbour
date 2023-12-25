@@ -169,7 +169,7 @@ HB_FUNC( RAT )
             for ( i = nStart - nLen + 1; i >= nEnd; i-- )
                 if ( memcmp( pszText->item.asString.value + i - 1, pszSub->item.asString.value, nLen ) == 0 )
                 {
-                    hb_retni( i );
+                    hb_retni( ( int ) i );
                     return;
                 }
         }

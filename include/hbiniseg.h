@@ -60,7 +60,9 @@
    #elif defined( __ICL )
       #pragma warning( disable: 177 ) /* disable unused variable warnings */
    #elif defined( _MSC_VER ) && defined( HB_OS_WIN_64 )
+      #pragma warning( disable: 4109 )
       #pragma section( HB_STARTUP_SEGMENT, long, read )
+      #pragma warning( default: 4109 )
    #endif
 
    #pragma data_seg( HB_STARTUP_SEGMENT )
