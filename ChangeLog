@@ -8,6 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-25 15:54 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\common\hbmem.c
+  * utils\misc\hbrc.c
+  * source\rtl\rat.c
+  * source\rtl\substr.c
+  * source\rtl\browdbx.prg
+  * source\rdd\dbf1.c
+  * source\rdd\dbf1net.c
+  * utils\hbpp\hbppcomp.c
+  * utils\hbpp\hbppcore.c
+  * contrib\sixapi\source\dbstru.c
+  * contrib\sixapi\source\decrypt.c
+  * contrib\sixapi\source\encrypt.c
+  * contrib\sixapi\source\eval.c
+  * contrib\sixapi\source\field.c
+  * contrib\sixapi\source\filter.c
+  * contrib\sixapi\source\get.c
+  * contrib\sixapi\source\index.c
+  * contrib\sixapi\source\put.c
+  * contrib\sixapi\source\rec.c
+  * contrib\sixapi\source\replace.c
+  * contrib\sixapi\source\sysprop.c
+  * contrib\sixapi\source\use.c
+  * contrib\sixapi\source\global.c
+  * include\hbiniseg.h
+  * winmake\makefile.vc
+  * winmake\compile.mak
+    ! fixed compiler warnings
+
 2023-12-25 11:07 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
   * winmake\compile.mak
