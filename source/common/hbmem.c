@@ -1,3 +1,7 @@
+#if defined( _MSC_VER )
+   #pragma warning( disable: 4206 )
+#endif
+
 #ifndef HB_NO_DV_MEMCPY
 /*
  * $Id$
