@@ -716,7 +716,7 @@ $(OBJ_DIR)$(DIR_SEP)tif_next$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_next.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)tif_ojpeg$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_ojpeg.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)tif_open$(OBJEXT) : $(TIFF_DIR)$(DIR_SEP)tif_open.c
 	$(CCC_CMD)
@@ -1190,7 +1190,7 @@ $(OBJ_DIR)$(DIR_SEP)tif_next_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DI
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)tif_ojpeg_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_ojpeg.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)tif_open_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_open.c
 	$(CCC_CMD)
