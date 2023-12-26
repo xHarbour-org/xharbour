@@ -292,10 +292,10 @@ static char * _hb_verCompiler( void )
 #     endif
 #   endif
 #else
-         sprintf( pszCompiler, "%s%s %hd.%hd.%hd", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
+         sprintf( pszCompiler, "%s%s %i.%i.%i", pszName, szSub, iVerMajor, iVerMinor, iVerPatch );
 #endif
       else if( iVerMajor != 0 || iVerMinor != 0 )
-         sprintf( pszCompiler, "%s%s %hd.%hd", pszName, szSub, iVerMajor, iVerMinor );
+         sprintf( pszCompiler, "%s%s %i.%i", pszName, szSub, iVerMajor, iVerMinor );
       else
          sprintf( pszCompiler, "%s%s", pszName, szSub );
 #endif

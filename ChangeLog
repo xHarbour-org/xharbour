@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-25 22:43 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * utils\misc\hbrc.c
+    ! Fixed compiler warnings
+
+  * tests/test.prg
+  * source/pp/ppgen.c
+    ! Fixed UL suffix in version constants to ULL
+
 2023-12-25 22:01 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   + bin/find_bc.bat
   + bin/find_bison.bat

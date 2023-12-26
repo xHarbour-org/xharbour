@@ -4,7 +4,7 @@
 
 //
 
-#xtranslate <x>UL => <x>
+#xtranslate <x>ULL => <x>
 
 PROCEDURE Main()
 
