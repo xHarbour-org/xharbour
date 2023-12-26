@@ -8,6 +8,44 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-25 22:01 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  + bin/find_bc.bat
+  + bin/find_bison.bat
+  + bin/find_vc.bat
+    + Added new shared scripts to simplify updates and avoid redundancy 
+      They find the respective tools and set the respective environment variables
+
+  * make_bc.bat
+  * make_vc.bat
+  * bin/bld.bat
+  + bin/bld_bc.bat
+  * bin/bld_vc.bat
+    * Rewrote to use the new shared scripts
+    % Optimized to avoid redundant settings
+    ! Fixed to avoid duplicate setting of PATH
+    ! Fixed to correctly support side by side installations of BCC and MSVC with 
+      ability to switch between them without having to restart the shell.
+
+      /* 
+        Please fix/add all other make_<compiler>.bat and bld_<compiler>.bat
+        to follow the same logic/structure as make_bc.bat and bld_bc.bat
+
+        With minor modification to support CONTRIB libs we can now remove all Contrib's
+        specific bld_<compiler>.bat in favor of a single bld_<compiler>.bat
+       */
+
+  * bin/bld_b32.bat
+    * Now alias to bld_bc.bat
+  + make_b32.bat
+    + New alias to make_bc.bat
+
+  * winmake/mdir.bat
+    * Do nott reset SUB_DIR
+    * Default LIBEXT to ".lib" if not set already set.
+
+  * tests/test.prg
+    * Corrected LL to UL in version constants
+ 
 2023-12-25 15:54 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\common\hbmem.c
   * utils\misc\hbrc.c

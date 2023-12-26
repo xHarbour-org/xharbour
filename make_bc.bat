@@ -27,121 +27,77 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
-IF "%SUB_DIR%"=="" SET SUB_DIR=b32
-IF "%HB_ARCH%"=="64" SET SUB_DIR=b64
-IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
-IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+REM Make that the current directory is the same as the batch file (root of xHarbour)
+CD %~dp0
 
-:FIND_BCC
-   IF EXIST \bcc102                          GOTO SET_BC_102
-   IF EXIST C:\bcc102                        GOTO SET_BCC_C_102
-   IF EXIST \Borland\bcc58                   GOTO SET_BORLAND_58
-   IF EXIST \bcc58                           GOTO SET_BCC_58
-   IF EXIST \Borland\bcc55                   GOTO SET_BORLAND_55
-   IF EXIST \bcc55                           GOTO SET_BCC_55
-   IF EXIST C:\bcc55                         GOTO SET_BCC_C_55
-   IF EXIST "%ProgramFiles%\Borland\BDS\4.0" GOTO SET_BDS_40
-   GOTO FIND_BISON
+IF NOT "%CC%"=="" (
+   IF NOT "%CC%"=="bcc32" IF NOT "%CC%"=="bcc32c" GOTO SWITCH_CC
+)
 
-:SET_BCC_102
-   SET CC_DIR=\bcc102
-   
-   REM Not needed because bcc32c.exe uses bcc32c.cfg
-   REM SET BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
-   
-   REM Needed because iLink32.exe does not have a config file!
-   SET BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
-   SET CC=bcc32c
-   SET LD=bcc32c
+GOTO SET_BCC
 
-   GOTO FIND_BISON
+:SWITCH_CC
+   ECHO Your Environment is set to use %CC% as the compiler.
+   ECHO This batch file is intended to be used with BCC only.
+   SET /P RESPONSE="Do you want to switch to BCC (Y/N)? "
+   IF /I "%RESPONSE%"=="Y" (
+      SET CC=
+      SET CC_DIR=
+      SET RC_DIR=
+      SET BCC_LIB=
+      SET LIBEXT=
+      GOTO SET_BCC
+   )
+   EXIT /B 1
 
-:SET_BCC_C_102
-   SET CC_DIR=C:\bcc102
-   
-   REM Not needed because bcc32c.exe uses bcc32c.cfg
-   REM SET BCC_INC=$(CC_DIR)\include\dinkumware64;$(CC_DIR)\include\windows\crtl;$(CC_DIR)\include\windows\sdk
-   
-   REM Needed because iLink32.exe does not have a config file!
-   SET BCC_LIB=$(CC_DIR)\lib\win32c\debug;$(CC_DIR)\lib\win32c\release;$(CC_DIR)\lib\win32c\release\psdk
-   SET CC=bcc32c
-   SET LD=bcc32c
-
-   GOTO FIND_BISON
-
-:SET_BDS_40
-   SET CC_DIR=%ProgramFiles%\Borland\BDS\4.0
-   GOTO FIND_BISON
-
-:SET_BORLAND_58
-   SET CC_DIR=\Borland\bcc58
-   GOTO FIND_BISON
-
-:SET_BCC_58
-   SET CC_DIR=\bcc58
-   GOTO FIND_BISON
-
-:SET_BORLAND_55
-   SET CC_DIR=\Borland\bcc55
-   GOTO FIND_BISON
-
-:SET_BCC_55
-   SET CC_DIR=\bcc55
-   
-   REM Not needed because bcc32c.exe uses bcc32c.cfg
-   REM set BCC_INC=$(CC_DIR)\include
-   
-   REM Needed because iLink32.exe does not have a config file!
-   SET BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
-   GOTO FIND_BISON
-
-:SET_BCC_C_55
-   SET CC_DIR=C:\bcc55
-   
-   REM Not needed because bcc32c.exe uses bcc32c.cfg
-   REM set BCC_INC=$(CC_DIR)\include
-   
-   REM Needed because iLink32.exe does not have a config file!
-   SET BCC_LIB=$(CC_DIR)\lib;$(CC_DIR)\lib\psdk
-   GOTO FIND_BISON   
+:SET_BCC
+   IF NOT "%CC%"=="" IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+   CALL bin\find_bc.bat
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   IF EXIST C:\win_flex_bison-2.5.5\win_bison.exe  GOTO SET_WIN_FLEX_BISON_C_2_5_5
-   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2
+   CALL bin\find_bison.bat
+   IF "%CC%"=="" GOTO NOT_READY
    GOTO READY
 
-:SET_WIN_FLEX_BISON_C_2_5_5
-   SET BISON_DIR=C:\win_flex_bison-2.5.5
-   SET BISON=win_bison.exe
-   SET HB_USE_BISON=1
-   GOTO READY
-
-:SET_BISON1
-   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
-   GOTO READY
-
-:SET_BISON2
-   SET BISON_DIR=\GnuWin32\Bin
-   GOTO READY
+:NOT_READY
+   ECHO.
+   ECHO. ------------------------------
+   ECHO. Make Utility for Borland C/C++
+   ECHO. ------------------------------
+   ECHO.
+   ECHO. Borland C/C++ not found.
+   ECHO. Please install Borland C/C++ and try again.
+   ECHO.
+   GOTO EXIT
 
 :READY
+   IF "%SUB_DIR%"=="" SET SUB_DIR=bc32
+   IF "%HB_ARCH%"=="64" SET SUB_DIR=bc64
 
-IF "%CC%"=="bcc32c" SET SUB_DIR=b32c
+   SET HB_GT_LIB=$(GTWIN_LIB)
 
-SET _PATH=%PATH%
-SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
+   REM echo "%CC_DIR%"
+   REM echo "%RC_DIR%"
+
+   REM Make sure that xHarbour's bin and BCC's bin are in the path even after we restore the original path! 
+   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0bin;%PATH%
+   make -h > nul 2>&1 || ECHO For your convenience BCC's bin directory was added to your PATH && SET PATH=%CC_DIR%\BIN;%PATH%
+
+:SAVE_PATH
+   REM Save the original path before further modifications   
+   SET _PATH=%PATH%
+
+IF "%HB_USE_BISON%"=="1" SET PATH=%BISON_DIR%;%PATH%
+REM echo %path%
 
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=.lib
-SET OBJEXT=.obj
+SET LIBEXT=%HB_DEBUG%.lib
+SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
-IF "%HB_DEBUG%"=="d" SET LIBEXT=%HB_DEBUG%.lib
-IF "%HB_DEBUG%"=="d" SET OBJEXT=%HB_DEBUG%.obj
 REM IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
 IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_DEBUG%.a
 IF "%HB_ARCH%"=="64" SET OBJEXT=%HB_DEBUG%.o
