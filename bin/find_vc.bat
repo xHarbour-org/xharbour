@@ -1,5 +1,8 @@
 SET CC_DIR=
 
+for /f "delims=" %%a in ('where cl.exe') do @set _MSVC_BIN=%%a
+IF NOT "%_MSVC_BIN%"=="" SET CC_DIR=%_MSVC_BIN:~0,-5% && SET CC=cl && set _MSVC_BIN= && GOTO FOUND
+
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC"   GOTO SET_VC2022EX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC"        GOTO SET_VC2022E

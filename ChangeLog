@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-26 11:41 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  + bin/find_bc.bat
+  + bin/find_vc.bat
+    + Added support for user defined PATH to BCC and MSVC
+  * winmake/makefile.bc
+
+    * Resttored Modified OPT_FLAGS of bcc32c (CLang does not support legacy optimization flags)
 2023-12-26 15:13 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\hbcrc32.c
   * contrib\hbssl\evpciph.c

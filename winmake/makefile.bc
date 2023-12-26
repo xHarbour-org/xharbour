@@ -59,8 +59,7 @@ OPTFLAGS              =-O2 $(OPTFLAGS)
 !if ("$(CC)"=="bcc32")
 OPTFLAGS              =-O2 -OS -Ov -Oi -Oc -Ve -b -k- $(OPTFLAGS)
 !else
-OPTFLAGS              =-O2 -OS -Ov -Oi -Oc -Ve -b -k- $(OPTFLAGS)
-#OPTFLAGS              =-O2 -b $(OPTFLAGS)
+OPTFLAGS              =-O2 -b $(OPTFLAGS)
 !endif
 !endif
 
