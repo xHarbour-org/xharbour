@@ -242,49 +242,49 @@ $(OBJ_DIR)$(DIR_SEP)CGILIB_thtm.c : $(CGI_DIR)$(DIR_SEP)thtm.prg
 # HBSSL.LIB
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)bio$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)bio.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)err$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)err.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)evp$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evp.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)evpciph$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpciph.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)evpenc$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpenc.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)evpmd$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evpmd.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)evppkey$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)evppkey.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)pem$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)pem.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)rand$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)rand.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)ssl$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)ssl.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)sslciph$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslciph.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)sslctx$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslctx.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)sslsess$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)sslsess.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)ssl_hb$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)ssl_hb.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)x509$(OBJEXT) : $(HBSSL_DIR)$(DIR_SEP)x509.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 #===============================================================================
 # HBXDIFF.LIB
@@ -1406,7 +1406,7 @@ $(OBJ_DIR)$(DIR_SEP)crctableHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)crctable.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)decompreHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)decompre.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)huffmanHBBZ2$(OBJEXT) : $(HBBZ2_DIR)$(DIR_SEP)huffman.c
 	$(CC_CMD)
@@ -6165,7 +6165,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_binary$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_binary.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encrypt$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encrypt.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_encryptdict$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_encryptdict.c
 	$(CCC_CMD)
@@ -6282,7 +6282,7 @@ $(OBJ_DIR)$(DIR_SEP)hpdf_direct$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_direct.c
 	$(CCC_CMD)	
 
 $(OBJ_DIR)$(DIR_SEP)hpdf_shading$(OBJEXT) : $(HBHPDF_DIR)$(DIR_SEP)hpdf_shading.c
-	$(CCC_CMD)	
+	$(CCC_CMD_NOWARN)	
 
 #===============================================================================
 # TIPSSL.LIB rules
