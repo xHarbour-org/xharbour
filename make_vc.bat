@@ -1,4 +1,4 @@
-	@echo off
+@echo off
 rem ============================================================================
 rem
 rem $Id$
@@ -26,8 +26,6 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
-SET _PATH=%PATH%
-
 IF "%HB_ARCH%"=="64" ( 
    SET HB_VS_ARCH=x64
 ) ELSE (
@@ -35,274 +33,65 @@ IF "%HB_ARCH%"=="64" (
    SET HB_VS_ARCH=x86
 )   
 
-IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+REM Make that the current directory is the same as the batch file (root of xHarbour)
+CD %~dp0
 
-:FIND_VC
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC"   GOTO SET_VC2022EX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC"        GOTO SET_VC2022E
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\VC" GOTO SET_VC2022PX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\VC"      GOTO SET_VC2022P
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\VC"    GOTO SET_VC2022CX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC"         GOTO SET_VC2022C
+IF NOT "%CC%"=="" (
+   IF NOT "%CC%"=="cl" GOTO SWITCH_CC
+)
 
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\VC"   GOTO SET_VC2017EX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\VC"        GOTO SET_VC2017E
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\VC" GOTO SET_VC2017PX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\VC"      GOTO SET_VC2017P
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC"    GOTO SET_VC2017CX86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2017\Community\VC"         GOTO SET_VC2017C
+GOTO SET_VC
 
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC" GOTO SET_VC2015X86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 14.0\Vc"      GOTO SET_VC2015
+:SWITCH_CC
+   ECHO Your Environment is set to use %CC% as the compiler.
+   ECHO This batch file is intended to be used with MSVC only.
+   SET /P RESPONSE="Do you want to switch to MSVC (Y/N)? "
+   IF /I "%RESPONSE%"=="Y" (
+      SET CC=
+      SET CC_DIR=
+      SET RC_DIR=
+      SET BCC_LIB=
+      SET LIBEXT=
+      GOTO SET_VC
+   )
+   EXIT /B 1
 
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC" GOTO SET_VC2013X86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 12.0\Vc"      GOTO SET_VC2013
-
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc" GOTO SET_VC2012X86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 11.0\vc"      GOTO SET_VC2012
-
-   IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc" GOTO SET_VC2010X86
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 10.0\vc"      GOTO SET_VC2010
-
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 9.0\vc"       GOTO SET_VC2008
-
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 8\vc"         GOTO SET_VC2005
-
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
-
-   IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
-   GOTO FIND_BISON
-
-:SET_VC2022EX86
-   SET __MSC__=17
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2022E
-   SET __MSC__=17
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Vc
-   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\
-   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2022PX86
-   SET __MSC__=17
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Vc
-   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional\Common7\Tools\
-   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2022P
-   SET __MSC__=17
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Vc
-   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Professional\Common7\Tools\
-   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2022CX86
-   SET __MSC__=17
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Vc
-   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\Common7\Tools\
-   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2022C
-   SET __MSC__=17
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Vc
-   IF "%VS170COMNTOOLS%"=="" SET VS170COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\
-   IF NOT "%VS170COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS170COMNTOOLS%
-   GOTO FIND_BISON
-
-
-:SET_VC2017EX86
-   SET __MSC__=15
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2017E
-   SET __MSC__=15
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2017PX86
-   SET __MSC__=15
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2017P
-   SET __MSC__=15
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Professional\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2017CX86
-   SET __MSC__=15
-   CALL "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2017C
-   SET __MSC__=15
-   CALL "%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio\2017\Community\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Windows Kits\8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles%\Windows Kits\8.1\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2015X86
-   SET __MSC__=14
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2015
-   SET __MSC__=14
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 14.0\vc
-   IF "%VS140COMNTOOLS%"=="" SET VS140COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 14.0\Common7\Tools\
-   IF NOT "%VS140COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS140COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2013X86
-   SET __MSC__=12
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Vc
-   IF "%VS120COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\Common7\Tools\
-   IF NOT "%VS120COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
-   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2013
-   SET __MSC__=12
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 12.0\vc
-   IF "%VS120COMNTOOLS%"=="" SET VS120COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 12.0\Common7\Tools\
-   IF NOT "%VS120COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS120COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2012X86
-   SET __MSC__=11
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\vc
-   IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\Common7\Tools\
-   IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
-   IF EXIST "%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Microsoft SDKs\Windows\v7.1A\Bin\
-   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\x86\
-   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.1\Bin\x86\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.1\Bin\x86\
-   GOTO FIND_BISON
-
-:SET_VC2012
-   SET __MSC__=11
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 11.0\vc
-   IF "%VS110COMNTOOLS%"=="" SET VS110COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 11.0\Common7\Tools\
-   IF NOT "%VS110COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS110COMNTOOLS%
-   IF EXIST "%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\RC.Exe" SET RC_DIR=%ProgramFiles%\Microsoft SDKs\Windows\v7.1A\Bin\
-   IF EXIST "%ProgramFiles(x86)%\Windows kits\v8.0\Bin\RC.Exe" SET RC_DIR=%ProgramFiles(x86)%\Windows kits\v8.0\Bin\
-   GOTO FIND_BISON
-
-:SET_VC2010X86
-   SET __MSC__=10
-   SET CC_DIR=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\vc
-   IF "%VS100COMNTOOLS%"=="" SET VS100COMNTOOLS=%ProgramFiles(x86)%\Microsoft Visual Studio 10.0\Common7\Tools\
-   IF NOT "%VS100COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS100COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2010
-   SET __MSC__=10
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 10.0\vc
-   IF "%VS100COMNTOOLS%"=="" SET VS100COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 10.0\Common7\Tools\
-   IF NOT "%VS100COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS100COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2008
-   SET __MSC__=9
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 9.0\vc
-   IF "%VS90COMNTOOLS%"=="" SET VS90COMNTOOLS=%ProgramFiles%\Microsoft Visual Studio 9.0\Common7\Tools\
-   IF NOT "%VS90COMNTOOLS%"=="" SET VSCOMMONTOOLS=%VS90COMNTOOLS%
-   GOTO FIND_BISON
-
-:SET_VC2005
-   SET __MSC__=8
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio 8\vc
-   GOTO FIND_BISON
-
-:SET_VC2003
-   SET __MSC__=7
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio .NET 2003\VC7
-   GOTO FIND_BISON
-
-:SET_VC6
-   SET __MSC__=6
-   SET CC_DIR=%ProgramFiles%\Microsoft Visual Studio\VC98
-   GOTO FIND_BISON
+:SET_VC
+   IF NOT "%CC%"=="" IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+   CALL bin\find_vc.bat
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   IF EXIST "%ProgramFiles(x86)%\GnuWin32\Bin" GOTO SET_BISONX86
-   IF EXIST "%ProgramFiles%\GnuWin32\Bin"      GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                      GOTO SET_BISON2
-   GOTO READY
-
-:SET_BISONX86
-   SET BISON_DIR=%ProgramFiles(x86)%\GnuWin32\Bin
-   GOTO READY
-
-:SET_BISON1
-   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
-   GOTO READY
-
-:SET_BISON2
-   SET BISON_DIR=\GnuWin32\Bin
-   GOTO READY 
+   CALL bin\find_bison.bat
 
 :READY
-IF "%SUB_DIR%"=="" SET SUB_DIR=vc32
-IF "%HB_ARCH%"=="64" SET SUB_DIR=vc64
+   IF "%SUB_DIR%"=="" SET SUB_DIR=vc32
+   IF "%HB_ARCH%"=="64" SET SUB_DIR=vc64
 
-SET HB_GT_LIB=$(GTWIN_LIB)
+   SET HB_GT_LIB=$(GTWIN_LIB)
 
-REM echo "%CC_DIR%"
-REM echo "%RC_DIR%"
+   REM echo "%CC_DIR%"
+   REM echo "%RC_DIR%"
 
-IF "%VSINSTALLDIR%"=="" IF EXIST "%CC_DIR%"\vcvarsall.bat CALL "%CC_DIR%"\vcvarsall.bat 
-IF "%VSINSTALLDIR%"=="" IF "%VCINSTALLDIR%"=="" set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%";"%BISON_DIR%";%~dp0bin;%PATH%
+   REM Make sure that xHarbour's bin and MSVC's bin are in the path even after we restore the original path! 
+   harbour -credit > nul 2>&1 || ECHO ***For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0bin;%PATH%
 
+   IF "%VSINSTALLDIR%"=="" IF EXIST "%CC_DIR%"\vcvarsall.bat cl 2>&1 || ECHO For your convenience vcvarsall.bat will be called to setup your MSVC... && CALL "%CC_DIR%"\vcvarsall.bat && GOTO SAVE_PATH
+   IF "%VSINSTALLDIR%"=="" IF "%VCINSTALLDIR%"=="" cl > nul 2>&1 || ECHO For your convenience MSVC's bin folders were added to PATH && set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%"
+
+:SAVE_PATH
+   REM Save the original path before further modifications   
+   SET _PATH=%PATH%
+
+IF "%HB_USE_BISON%"=="1" SET PATH=%BISON_DIR%;%PATH%
 REM echo %path%
 
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
-SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
+SET LIBEXT=%HB_DEBUG%.lib
+SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
 REM SET LIBPREFIX=
 rem ============================================================================

@@ -64,6 +64,7 @@ rem=============================================================================
 rem=============================================================================
 ECHO System Files Succesfully Built ...
 ECHO Copying System Files to BIN and LIB Folders ...
+if "%LIBEXT%"=="" set LIBEXT=".lib
 if exist bin\ppgen.exe           del   bin\ppgen.exe
 if exist bin\%SUB_DIR%\ppgen.exe del   bin\%SUB_DIR%\ppgen.exe
 if exist bin\%SUB_DIR%\*.exe     copy  bin\%SUB_DIR%\*.exe bin /D /Y > nul
@@ -639,7 +640,7 @@ rem=============================================================================
 rem=============================================================================
 rem SET CC_DIR=
 rem SET BISON_DIR=
-SET SUB_DIR=
+rem SET SUB_DIR=
 SET HB_GT_LIB=
 SET LIBEXT=
 SET OBJEXT=
