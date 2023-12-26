@@ -53,12 +53,8 @@ GOTO SET_BCC
 :SET_BCC
    IF NOT "%CC%"=="" IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    CALL bin\find_bc.bat
-
-:FIND_BISON
-   IF NOT "%BISON_DIR%"=="" GOTO READY
-   CALL bin\find_bison.bat
-   IF "%CC%"=="" GOTO NOT_READY
-   GOTO READY
+   IF ERRORLEVEL 1 GOTO NOT_READY
+   GOTO FIND_BISON
 
 :NOT_READY
    ECHO.
@@ -70,6 +66,12 @@ GOTO SET_BCC
    ECHO. Please install Borland C/C++ and try again.
    ECHO.
    GOTO EXIT
+
+:FIND_BISON
+   IF NOT "%BISON_DIR%"=="" GOTO READY
+   CALL bin\find_bison.bat
+   IF "%CC%"=="" GOTO NOT_READY
+   GOTO READY
 
 :READY
    IF "%SUB_DIR%"=="" SET SUB_DIR=bc32

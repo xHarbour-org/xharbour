@@ -59,6 +59,19 @@ GOTO SET_VC
 :SET_VC
    IF NOT "%CC%"=="" IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
    CALL bin\find_vc.bat
+   IF ERRORLEVEL 1 GOTO NOT_READY
+   GOTO FIND_BISON
+
+:NOT_READY
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Microsoft Visual C/C++ not found.
+   ECHO. Please install Microsoft Visual C/C++ and try again.
+   ECHO.
+   EXIT /B 1
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
@@ -74,7 +87,7 @@ GOTO SET_VC
    REM echo "%RC_DIR%"
 
    REM Make sure that xHarbour's bin and MSVC's bin are in the path even after we restore the original path! 
-   harbour -credit > nul 2>&1 || ECHO ***For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0bin;%PATH%
+   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0bin;%PATH%
 
    IF "%VSINSTALLDIR%"=="" IF EXIST "%CC_DIR%"\vcvarsall.bat cl 2>&1 || ECHO For your convenience vcvarsall.bat will be called to setup your MSVC... && CALL "%CC_DIR%"\vcvarsall.bat && GOTO SAVE_PATH
    IF "%VSINSTALLDIR%"=="" IF "%VCINSTALLDIR%"=="" cl > nul 2>&1 || ECHO For your convenience MSVC's bin folders were added to PATH && set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%"
