@@ -239,10 +239,10 @@ LINKERFLAGS    =$(LINKERFLAGS) $(LFLAGS)
 HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
-CC_CMD_NOWARN  =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
+CC_CMD_NOWARN  =$(CC) -c -tWM $(CLIBFLAGS) -w-8080 -w-8084 -o$@ $**
 CC_CMD_HARBOUR =$(CC) -c -tWM -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o$@ $**
 CCC_CMD        =$(CC_CMD)
-CCC_CMD_NOWARN =$(CC_CMD)
+CCC_CMD_NOWARN =$(CC) -c -tWM $(CLIBFLAGS) -w-8060 -w-8080 -w-8084 -o$@ $**
 
 !if ("$(HB_ARCH)"=="64")
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" $(OPTFLAGS) -Wno-user-defined-literals -Wno-unused-value -Wno-tautological-compare -Wno-int-to-void-pointer-cast -o$@ $**
