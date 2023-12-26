@@ -307,7 +307,7 @@ HB_FUNC( EVP_MD_CTX_MD )
       EVP_MD_CTX * ctx = hb_EVP_MD_CTX_par( 1 );
 
       if( ctx )
-         hb_retni( hb_EVP_MD_ptr_to_id( EVP_MD_CTX_md( ctx ) ) );
+         hb_retni( hb_EVP_MD_ptr_to_id( ( const EVP_MD * ) EVP_MD_CTX_md( ctx ) ) );
    }
    else
       hb_errRT_BASE( EG_ARG, 2010, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );

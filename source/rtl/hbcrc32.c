@@ -1,4 +1,3 @@
-
 /*
  * $Id$
  */
@@ -192,7 +191,7 @@ static uint16_t crc_kermit( const unsigned char *input_str, size_t num_bytes )
    {
       for( a=0; a < num_bytes; a++ ) 
       {
-         crc = (crc >> 8) ^ crc_tab[ (crc ^ (uint16_t) *ptr++) & 0x00FF ];
+         crc = ( uint16_t ) ( (crc >> 8) ^ crc_tab[ (crc ^ (uint16_t) *ptr++) & 0x00FF ] );
       }
    }
 
@@ -244,9 +243,9 @@ static uint16_t crc_ccitt_generic( const unsigned char *input_str, size_t num_by
    {
       for( a=0; a<num_bytes; a++ ) 
       {
-         short_c = 0x00ff & (unsigned short) *ptr;
-         tmp     = (crc >> 8) ^ short_c;
-         crc     = (crc << 8) ^ crc_tabccitt[tmp];
+         short_c = ( uint16_t ) ( 0x00ff & (unsigned short) *ptr );
+         tmp     = ( uint16_t ) ( (crc >> 8) ^ short_c );
+         crc     = ( uint16_t ) ( (crc << 8) ^ crc_tabccitt[tmp] );
 
          ptr++;
       }
@@ -272,9 +271,9 @@ static uint16_t crc_modbus( const unsigned char *input_str, size_t num_bytes )
       for( a=0; a<num_bytes; a++ ) 
       {
 
-         short_c = 0x00ff & (uint16_t) *ptr;
+         short_c = ( uint16_t ) ( 0x00ff & (uint16_t) *ptr );
          tmp     =  crc       ^ short_c;
-         crc     = (crc >> 8) ^ crc_tab16[ tmp & 0xff ];
+         crc     = ( uint16_t ) ( (crc >> 8) ^ crc_tab16[ tmp & 0xff ] );
 
          ptr++;
       }

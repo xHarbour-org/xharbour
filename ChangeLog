@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-26 15:13 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\hbcrc32.c
+  * contrib\hbssl\evpciph.c
+  * contrib\hbssl\evpmd.c
+  * winmake\makefile.bc
+  * winmake\compile.mak
+    ! fixed compiler warnings
+
 2023-12-25 22:43 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * utils\misc\hbrc.c
     ! Fixed compiler warnings
