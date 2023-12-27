@@ -38,10 +38,6 @@ GOTO SET_BCC
 
 IF "%CC%"=="" GOTO NOT_FOUND
 
-:FOUND
-   REM Make sure that xHarbour's bin and BCC's bin are in the path even after we restore the original path! 
-   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0;%PATH%
-
 :SAVE_PATH
    SET _PATH=%PATH%
 

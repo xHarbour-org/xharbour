@@ -182,5 +182,9 @@ SET LD=
    IF "%CC%"=="bcc32c" SET "SUB_DIR=b32c"
    IF "%CC%"=="bcc32"  SET "SUB_DIR=b32"
    IF "%HB_ARCH%"==""  SET "HB_ARCH=w32"
+   
+   REM Make sure that xHarbour's bin is in the path even after we restore the original path! 
+   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0;%PATH%
+
    exit /b 0
  

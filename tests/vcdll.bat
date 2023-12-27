@@ -25,7 +25,7 @@ cl -I..\include /Ox /G6 /MT /TP /W3 /c /GA ..\source\vm\mainstd.c
 
 echo %1.obj  > msvc.tmp
 echo mainstd.obj  >> msvc.tmp
-echo ..\lib\vc\harbour.lib >> msvc.tmp
+echo ..\lib\%SUB_DIR%\harbour.lib >> msvc.tmp
 echo winspool.lib >> msvc.tmp
 echo user32.lib >> msvc.tmp
 link @msvc.tmp /nodefaultlib:libc.lib /out:%1.exe /nologo /subsystem:console
@@ -43,6 +43,7 @@ GOTO EXIT
 ECHO
 
 :LINKERROR
+ECHO Link error!
 GOTO EXIT
 
 :SINTAX
@@ -50,6 +51,6 @@ ECHO Syntax: VCDLL [Program] -- Don't specify .PRG extension
 GOTO EXIT
 
 :NOEXIST
-ECHO The specified PRG %1 does not exist
+ECHO The specified PRG '%1' does not exist
 
 :EXIT

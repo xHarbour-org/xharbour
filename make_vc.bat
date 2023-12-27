@@ -85,12 +85,6 @@ GOTO SET_VC
    REM echo "%CC_DIR%"
    REM echo "%RC_DIR%"
 
-   REM Make sure that xHarbour's bin and MSVC's bin are in the path even after we restore the original path! 
-   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0bin;%PATH%
-
-   IF "%VSINSTALLDIR%"=="" IF EXIST "%CC_DIR%"\vcvarsall.bat cl 2>&1 || ECHO For your convenience vcvarsall.bat will be called to setup your MSVC... && CALL "%CC_DIR%"\vcvarsall.bat && GOTO SAVE_PATH
-   IF "%VSINSTALLDIR%"=="" IF "%VCINSTALLDIR%"=="" cl > nul 2>&1 || ECHO For your convenience MSVC's bin folders were added to PATH && set PATH="%CC_DIR%\bin";%VSCOMMONTOOLS%;"%RC_DIR%"
-
 :SAVE_PATH
    REM Save the original path before further modifications   
    SET _PATH=%PATH%

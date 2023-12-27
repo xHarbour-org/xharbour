@@ -285,14 +285,14 @@ ECHO Searching for Microsoft Visual C++...
    REM GOTO DIR_SET 
 
 :DIR_SET
-   cl > nul 2>&1 && GOTO SKIPPED_PATH
+   cl > nul 2>&1 && GOTO IS_64
 
    REM Support legacy manual installation
    %CC_DIR%\bin\cl > nul 2>&1 && ECHO For your convenience MSVC's bin directory was added to your PATH && SET PATH=%CC_DIR%\bin;%PATH%
+
+   cl > nul 2>&1 || GOTO NOT_FOUND
    
-   cl > nul 2>&1 && GOTO NOT_FOUND
-   
-   :SKIPPED_PATH
+   :IS_64
    IF "%is_x64_arch%"=="true" (
       SET "HB_VS_ARCH=x64"
       SET "HB_ARCH=w64"
@@ -312,4 +312,8 @@ ECHO Searching for Microsoft Visual C++...
 
    IF     "%HB_ARCH%"=="w32" SET "SUB_DIR=vc32"
    IF NOT "%HB_ARCH%"=="w32" SET "SUB_DIR=vc64"
+
+   REM Make sure that xHarbour's bin is in the path even after we restore the original path! 
+   harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0;%PATH%
+
    exit /b 0   

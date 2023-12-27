@@ -8,6 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-27 13:21 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * bin/find_bc.bat
+    ! Fixed silly typo '&&' instead of '||'
+  * bin/find_vc.bat
+    ! Fixed silly typo '&&' instead of '||'
+    * Added support for xHarbour's bin path.
+
+  * bin/bld_bc.bat
+  * bin/bld_vc.bat 
+  * make_bc.bat
+  * make_vc.bat
+    - Removed redundant support for xHarbour's bin
+    
 2023-12-27 12:20 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * bin/find_bc.bat
   * bin/find_vc.bat
