@@ -23,7 +23,7 @@
     * Modified HB_ARCH=64 to w64   
 
   /* 
-    With this changes opening a 'Developer Command Prompt for VS 2022'
+    With these changes opening a 'Developer Command Prompt for VS 2022'
     (which opens a 64bit settings), calling our make_vc will succesfully build
     a 64bit build.
   */
