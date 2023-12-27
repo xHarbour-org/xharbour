@@ -34,7 +34,6 @@ GOTO SET_BCC
    EXIT /B 1
 
 :SET_BCC
-   IF NOT "%CC%"=="" IF NOT "%CC_DIR%"=="" GOTO FOUND
    call %~dp0find_bc.bat
 
 IF "%CC%"=="" GOTO NOT_FOUND
@@ -42,7 +41,6 @@ IF "%CC%"=="" GOTO NOT_FOUND
 :FOUND
    REM Make sure that xHarbour's bin and BCC's bin are in the path even after we restore the original path! 
    harbour -credit > nul 2>&1 || ECHO For your convenience xHarbour's bin directory was added to your PATH && set PATH=%~dp0;%PATH%
-   make -h > nul 2>&1 || ECHO For your convenience BCC's bin directory was added to your PATH && SET PATH=%CC_DIR%\BIN;%PATH%
 
 :SAVE_PATH
    SET _PATH=%PATH%

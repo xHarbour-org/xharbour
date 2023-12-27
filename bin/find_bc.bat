@@ -7,7 +7,7 @@ IF NOT "%_BCC_BIN%"=="" SET "CC=bcc32c" && SET "CC_DIR=%_BCC_BIN:~0,-15%" && set
 @for /f "delims=" %%a in ('where bcc32.exe 2^>nul') do set "_BCC_BIN=%%a"
 IF NOT "%_BCC_BIN%"=="" SET "CC=bcc32" && SET "CC_DIR=%_BCC_BIN:~0,-14%" && set _BCC_BIN= && GOTO DIR_SET
 
-REM We have to find the compiler...
+ECHO Searching for Borland C++...
 
 REM SET BCC_LIB=
 SET CC=
@@ -147,6 +147,9 @@ SET LD=
    
    IF "%CC%"=="" IF EXIST "%CC_DIR%\bin\bcc32c.exe" SET "CC=bcc32c"
    IF "%CC%"=="" IF EXIST "%CC_DIR%\bin\bcc32.exe"  SET "CC=bcc32"
+
+   REM Let's make sure the PATH is set correctly
+   make -h > nul 2>&1 || ECHO For your convenience BCC's bin directory was added to your PATH && SET PATH=%CC_DIR%\bin;%PATH%
 
    IF NOT "%BCC_LIB%"=="" GOTO FOUND
 

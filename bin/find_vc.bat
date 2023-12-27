@@ -1,5 +1,3 @@
-IF "%CC%"=="cl" IF NOT "%CC_DIR%"=="" EXIT /B 0
-
 REM User specified compiler location
 
 IF NOT "%CC_DIR%"=="" ECHO Using CC_DIR: '%CC_DIR%' && GOTO DIR_SET
@@ -287,8 +285,14 @@ ECHO Searching for Microsoft Visual C++...
    REM GOTO DIR_SET 
 
 :DIR_SET
-   REM In MSVC case cl.exe may be in many sub sub directories - so don't check for it's existence instead make sure that cl.exe is in the path
-   cl > nul 2>&1 || GOTO NOT_FOUND
+   cl > nul 2>&1 && GOTO SKIPPED_PATH
+
+   REM Support legacy manual installation
+   %CC_DIR%\bin\cl > nul 2>&1 && ECHO For your convenience MSVC's bin directory was added to your PATH && SET PATH=%CC_DIR%\bin;%PATH%
+   
+   cl > nul 2>&1 && GOTO NOT_FOUND
+   
+   :SKIPPED_PATH
    IF "%is_x64_arch%"=="true" (
       SET "HB_VS_ARCH=x64"
       SET "HB_ARCH=w64"
