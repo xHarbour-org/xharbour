@@ -8,9 +8,29 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2023-12-26 22:32 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * source\rtl\dllcall.c
+    * Fixed wrong nested structure of #ifdefs
+    ! Fixed #ifdef HB_OS_WIN_32 to add '&& ! defined( HB_OS_WIN_64 )'
+  * winmake/makefile.bc
+    + Added NODLL_FLAG set to -DNODLL when HB_ARCH==w64
+  + bin/find_vc.bat
+    + Added auto detection of %is_x64_arch% to set HB_ARCH to w64
+  * make_bc.bat
+  * make_gc64.bat
+  * make_pc.bat
+  * make_vc.bat
+    * Modified HB_ARCH=64 to w64   
+
+  /* 
+    With this changes opening a 'Developer Command Prompt for VS 2022'
+    (which opens a 64bit settings), calling our make_vc will succesfully build
+    a 64bit build.
+  */
+
 2023-12-26 19:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   + bin/find_vc.bat
-    * Added some ECHO to show detection steps and correcccted LOCAL Labels to avoid duplicate labels
+    * Added some ECHO to show detection steps and corrected LOCAL Labels to avoid duplicate labels
     
 2023-12-26 19:57 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc

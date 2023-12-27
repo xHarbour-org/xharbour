@@ -69,11 +69,11 @@
 
 #include "hbapiitm.h"
 
-#if defined( HB_OS_WIN )
+#if defined( HB_OS_WIN_32 ) && ! defined( HB_OS_WIN_64 )
 
-   #if defined( __WATCOMC__ )
-      #pragma disable_message ( 200 )
-   #endif
+#if defined( __WATCOMC__ )
+   #pragma disable_message ( 200 )
+#endif
 
 #include <windows.h>
 
@@ -1031,12 +1031,7 @@ HB_FUNC( CALLDLL )
 
 }
 
-
-#endif   /* HB_OS_WIN32 */
-
-#else
-
-#if defined( HB_OS_WIN_64 )
+#elif defined( HB_OS_WIN_64 ) /* End of HB_OS_WIN32 */
 
 #include <windows.h>
 #include "hbapi.h"
@@ -1056,6 +1051,6 @@ HB_FUNC( GETLASTERROR )
    hb_retnl( GetLastError() );
 }
 
-#endif   /* HB_OS_WIN64 */
+#endif   /* HB_OS_WIN_64 */
 
 #endif   /* NODLL */

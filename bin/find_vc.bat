@@ -289,6 +289,12 @@ ECHO Searching for Microsoft Visual C++...
 :DIR_SET
    REM In MSVC case cl.exe may be in many sub sub directories - so don't check for it's existence instead make sure that cl.exe is in the path
    cl > nul 2>&1 || GOTO NOT_FOUND
+   IF "%is_x64_arch%"=="true" (
+      SET "HB_VS_ARCH=x64"
+      SET "HB_ARCH=w64"
+   ) ELSE (
+      SET "HB_VS_ARCH=x86"
+   )
    GOTO FOUND
 
 :NOT_FOUND

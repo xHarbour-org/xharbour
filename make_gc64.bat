@@ -11,7 +11,7 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET HB_ARCH=64
+SET HB_ARCH=w64
 REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
