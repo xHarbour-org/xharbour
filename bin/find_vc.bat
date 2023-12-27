@@ -1,11 +1,15 @@
-REM User specified compiler location
-IF NOT "%CC_DIR%"=="" GOTO DIR_SET
+IF "%CC%"=="cl" IF NOT "%CC_DIR%"=="" EXIT /B 0
 
-IF NOT "%VCINSTALLDIR%"=="" SET CC_DIR=%VCINSTALLDIR% && GOTO DIR_SET
+REM User specified compiler location
+
+IF NOT "%CC_DIR%"=="" ECHO Using CC_DIR: '%CC_DIR%' && GOTO DIR_SET
+
+IF NOT "%VCINSTALLDIR%"=="" SET "CC_DIR=%VCINSTALLDIR:~0,-1%" && ECHO Using VCINSTALLDIR: '%VCINSTALLDIR:~0,-1%' && GOTO DIR_SET
 
 @for /f "delims=" %%a in ('where cl.exe 2^>nul') do set "_MSVC_BIN=%%a"
-IF NOT "%_MSVC_BIN%"=="" GOTO FIND_ROOT
+IF NOT "%_MSVC_BIN%"=="" ECHO Using PATH: '%_MSVC_BIN%' && GOTO FIND_ROOT
 
+ECHO Searching for Microsoft Visual C++...
 :FIND_VC
    IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC"   GOTO SET_VC2022EX86
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC"        GOTO SET_VC2022E
@@ -40,7 +44,7 @@ IF NOT "%_MSVC_BIN%"=="" GOTO FIND_ROOT
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio 2003\vc"      GOTO SET_VC2003
 
    IF EXIST "%ProgramFiles%\Microsoft Visual Studio\vc8"          GOTO SET_VC6
-   GOTO FOUND
+   GOTO NOT_FOUND
 
 :SET_VC2022EX86
    SET "__MSC__=17"
@@ -234,6 +238,8 @@ IF NOT "%_MSVC_BIN%"=="" GOTO FIND_ROOT
    GOTO FOUND
 
 :FIND_ROOT
+   ECHO Searching for ROOT of: '%_MSVC_BIN%'
+
    SETLOCAL EnableDelayedExpansion
       SET "fullPath=%_MSVC_BIN%"
       SET "leftPortion="
@@ -246,7 +252,7 @@ IF NOT "%_MSVC_BIN%"=="" GOTO FIND_ROOT
 
          IF "!currentPart!"=="VC" (
             SET "leftPortion=!leftPortion!\!currentPart!"
-            GOTO Found
+            GOTO Local_Found
          )
          IF DEFINED rest (
             IF "!leftPortion!"=="" (
@@ -256,18 +262,18 @@ IF NOT "%_MSVC_BIN%"=="" GOTO FIND_ROOT
             )
             GOTO SplitPath
          ) ELSE (
-            GOTO NotFound
+            GOTO Local_NotFound
          )
       )
 
-      :Found
+      :Local_Found
       REM ECHO Found: '!leftPortion!'
       ECHO !leftPortion! > %TEMP%\leftPortion.txt
-      GOTO EndScript
+      GOTO Local_EndScript
 
-      :NotFound
+      :Local_NotFound
       REM ECHO Not found!
-      GOTO EndScript
+      GOTO Local_EndScript
 
       :EndScript
    ENDLOCAL
