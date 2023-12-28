@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -326,8 +326,8 @@ HB_FUNC( WVW_CXGETCHECK )
 
    if (pcd->hWndCtrl)
    {
-      ulCheck = SendMessage(pcd->hWndCtrl,
-                            BM_GETCHECK, (WPARAM) 0, (LPARAM) 0);
+      ulCheck = ( ULONG ) SendMessage(pcd->hWndCtrl,
+                                      BM_GETCHECK, (WPARAM) 0, (LPARAM) 0);
    }
 
    hb_retnl( ulCheck );
@@ -704,4 +704,3 @@ HB_FUNC( WVW_PGGETPOS )
 /*-------------------------------------------------------------------*/
 /* PROGRESSBAR ends                                                   */
 /*-------------------------------------------------------------------*/
-
