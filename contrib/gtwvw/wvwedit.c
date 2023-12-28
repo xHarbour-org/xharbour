@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -642,12 +642,12 @@ HB_FUNC( WVW_EBSETTEXT )
      lpszText = lpszTextANSI;
    }
 
-   bRetval = SendMessage(
-               (HWND) pcd->hWndCtrl,
-               WM_SETTEXT,
-               0,
-               (LPARAM) lpszText
-             );
+   bRetval = ( BOOL ) SendMessage(
+                       (HWND) pcd->hWndCtrl,
+                       WM_SETTEXT,
+                       0,
+                       (LPARAM) lpszText
+                     );
 
    if (bFromOEM)
    {
@@ -916,4 +916,3 @@ HB_FUNC( WVW_STSETFONT )
    hb_retl( retval );
 
 }
-
