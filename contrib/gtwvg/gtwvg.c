@@ -3279,7 +3279,7 @@ static void hb_wvt_gtCreateObjects( PHB_GTWVT pWVT )
    {
       pWVT->hDlgModal[ iIndex ]    = NULL;
       pWVT->pFuncModal[ iIndex ]   = NULL;
-      pWVT->iTypeModal[ iIndex ]   = 0
+      pWVT->iTypeModal[ iIndex ]   = 0;
    }
 
    pWVT->bGui                      = FALSE;
