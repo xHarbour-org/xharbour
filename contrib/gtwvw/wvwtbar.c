@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -168,13 +168,13 @@ HB_FUNC( WVW_TBCREATE)
       tbab.hInst = HINST_COMMCTRL;
 
       tbab.nID   = iSystemBitmap == 1 ? IDB_STD_SMALL_COLOR : IDB_STD_LARGE_COLOR;
-      pWindowData->iStartStdBitmap= SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
+      pWindowData->iStartStdBitmap= ( int ) SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
 
       tbab.nID   = iSystemBitmap == 1 ? IDB_VIEW_SMALL_COLOR : IDB_VIEW_LARGE_COLOR;
-      pWindowData->iStartViewBitmap = SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
+      pWindowData->iStartViewBitmap = ( int ) SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
 
       tbab.nID   = iSystemBitmap == 1 ? IDB_HIST_SMALL_COLOR : IDB_HIST_LARGE_COLOR;
-      pWindowData->iStartHistBitmap = SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
+      pWindowData->iStartHistBitmap = ( int ) SendMessage(hWndTB, TB_ADDBITMAP, (WPARAM) 0, (WPARAM) &tbab);
    }
    else
    {
@@ -313,7 +313,7 @@ HB_FUNC( WVW_TBBUTTONCOUNT )
      return;
    }
 
-   hb_retni ( SendMessage(hWndTB, TB_BUTTONCOUNT,(WPARAM) 0, (LPARAM) 0) );
+   hb_retni ( ( int ) SendMessage(hWndTB, TB_BUTTONCOUNT,(WPARAM) 0, (LPARAM) 0) );
 }
 
 /*WVW_TBDelButton([nWinNum], nButton)
