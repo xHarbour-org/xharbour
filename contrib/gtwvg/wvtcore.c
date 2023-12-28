@@ -17,7 +17,7 @@
  *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * See doc/license.txt for licensing terms.
  *
@@ -173,7 +173,7 @@ HB_EXPORT IPicture * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 
       CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
 
-      OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, &iPicture );
+      OleLoadPicture( iStream, ( LONG ) nFileSize, TRUE, &IID_IPicture, &iPicture );
 
       FreeResource( mem );
    }
@@ -362,7 +362,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
    long int lReturn = 0;
    PHB_ITEM pFunc = NULL;
 
-   iType = (int) NULL;
+   iType = 0;
 
    for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
    {
@@ -450,7 +450,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          }
          _s->hDlgModeless[ iIndex ] = NULL;
          _s->pFunc[ iIndex ] = NULL;
-         _s->iType[ iIndex ] = (int) NULL;
+         _s->iType[ iIndex ] = 0;
          lReturn = 0;
          break;
    }
@@ -476,7 +476,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
       return lReturn;
    }
 
-   iType = ( int ) NULL;
+   iType = 0;
 
    for ( iIndex = 0; iIndex < WVT_DLGMD_MAX; iIndex++ )
    {
@@ -564,7 +564,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
          }
          _s->hDlgModal[ iIndex ]  = NULL;
          _s->pFuncModal[ iIndex ] = NULL;
-         _s->iTypeModal[ iIndex ] = ( int ) NULL;
+         _s->iTypeModal[ iIndex ] = 0;
          lReturn = 0;
          break;
    }
@@ -2281,7 +2281,7 @@ HB_FUNC( WVT_DRAWLABELOBJ )
 
    SetTextColor( _s->hdc, fgClr );
    SetBkColor( _s->hdc, bgClr );
-   SelectObject( _s->hdc, ( HFONT ) hb_parnl( 10 ) );
+   SelectObject( _s->hdc, ( HFONT ) ( LONG_PTR ) hb_parnl( 10 ) );
 
    //GetTextExtentPoint32( _s->hdc, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), &sz );
    GetTextExtentPoint32( _s->hdc, text, lstrlen( text ), &sz );
@@ -2339,7 +2339,7 @@ HB_FUNC( WVT_DRAWLABELOBJ )
    {
       SetTextColor( _s->hGuiDC, fgClr );
       SetBkColor( _s->hGuiDC, bgClr );
-      SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 10 ) );
+      SelectObject( _s->hGuiDC, ( HFONT ) ( LONG_PTR ) hb_parnl( 10 ) );
       SetTextAlign( _s->hGuiDC, iAlignH | iAlignV );
 
       //ExtTextOut( _s->hGuiDC, x, y, uiOptions, &rect, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), NULL );
@@ -2706,7 +2706,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    SetTextColor( _s->hdc, fgClr );
    SetBkColor( _s->hdc, bgClr );
    SetBkMode( _s->hdc, ISNIL( 11 ) ? OPAQUE : hb_parni( 11 ) );
-   SelectObject( _s->hdc, ( HFONT ) hb_parnl( 12 ) );
+   SelectObject( _s->hdc, ( HFONT ) ( LONG_PTR ) hb_parnl( 12 ) );
 
    //DrawText( _s->hdc, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
    DrawText( _s->hdc, text, lstrlen( text ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
@@ -2716,7 +2716,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
       SetTextColor( _s->hGuiDC, fgClr );
       SetBkColor( _s->hGuiDC, bgClr );
       SetBkMode( _s->hGuiDC, ISNIL( 11 ) ? OPAQUE : hb_parni( 11 ) );
-      SelectObject( _s->hGuiDC, ( HFONT ) hb_parnl( 12 ) );
+      SelectObject( _s->hGuiDC, ( HFONT ) ( LONG_PTR ) hb_parnl( 12 ) );
 
       //DrawText( _s->hGuiDC, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
       DrawText( _s->hGuiDC, text, lstrlen( text ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
@@ -2850,7 +2850,7 @@ HB_FUNC( WVT_CREATEFONT )
    hFont = CreateFontIndirect( &logfont );
    if ( hFont )
    {
-      hb_retnl( ( ULONG ) hFont );
+      hb_retnl( ( ULONG ) ( LONG_PTR ) hFont );
    }
    else
    {
@@ -3014,7 +3014,7 @@ HB_FUNC( WVT_SAVESCREEN )
 
    hb_arraySet( info, 1, hb_itemPutNI( temp, iWidth ) );
    hb_arraySet( info, 2, hb_itemPutNI( temp, iHeight ) );
-   hb_arraySet( info, 3, hb_itemPutNL( temp, ( ULONG ) hBmp ) );
+   hb_arraySet( info, 3, hb_itemPutNL( temp, ( ULONG ) ( LONG_PTR ) hBmp ) );
    hb_itemRelease( temp );
 
    hb_itemReturnRelease( info );
@@ -3046,7 +3046,7 @@ HB_FUNC( WVT_RESTSCREEN )
    iWidth  = iRight - iLeft + 1 ;
    iHeight = iBottom - iTop + 1 ;
 
-   hBmp    = (HBITMAP) SelectObject( _s->hCompDC, ( HBITMAP ) hb_parnl( 5,3 ) );
+   hBmp    = (HBITMAP) SelectObject( _s->hCompDC, ( HBITMAP ) ( LONG_PTR ) hb_parnl( 5,3 ) );
    if ( hBmp )
    {
       if ( ( iWidth == hb_parni( 5,1 ) )  && ( iHeight == hb_parni( 5,2 ) ) )
@@ -3087,7 +3087,7 @@ HB_FUNC( WVT_RESTSCREEN )
 
    if ( ! bDoNotDestroyBMP )
    {
-      DeleteObject( ( HBITMAP ) hb_parnl( 5,3 ) );
+      DeleteObject( ( HBITMAP ) ( LONG_PTR ) hb_parnl( 5,3 ) );
    }
 
    hb_retl( bResult );
