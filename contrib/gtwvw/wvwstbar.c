@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -201,7 +201,7 @@ HB_FUNC (WVW_SBADDPART)
      HFONT hFont = (HFONT) SendMessage( hWndSB, WM_GETFONT, (WPARAM) 0, (LPARAM) 0);
      HFONT hOldFont  = ( HFONT ) SelectObject( hDCSB, hFont );
 
-     if (GetTextExtentPoint32(hDCSB, hb_parcx(2), hb_parclen(2)+1, &size))
+     if (GetTextExtentPoint32(hDCSB, hb_parcx(2), ( int ) hb_parclen(2)+1, &size))
      {
        usWidth = (USHORT) size.cx;
      }
@@ -214,7 +214,7 @@ HB_FUNC (WVW_SBADDPART)
    if ( !lResetParts )
    {
 
-    numOfParts = SendMessage(hWndSB,SB_GETPARTS, WVW_MAX_STATUS_PARTS , (LPARAM)(LPINT)ptArray);
+    numOfParts = ( int ) SendMessage(hWndSB,SB_GETPARTS, WVW_MAX_STATUS_PARTS , (LPARAM)(LPINT)ptArray);
    }
    else
    {
@@ -287,7 +287,7 @@ HB_FUNC (WVW_SBREFRESH)
      return;
    }
 
-   numOfParts = SendMessage(hWndSB,SB_GETPARTS, WVW_MAX_STATUS_PARTS , (LPARAM)(LPINT)ptArray);
+   numOfParts = ( int ) SendMessage(hWndSB,SB_GETPARTS, WVW_MAX_STATUS_PARTS , (LPARAM)(LPINT)ptArray);
    if (numOfParts==0)
    {
      hb_retnl( 0 );
