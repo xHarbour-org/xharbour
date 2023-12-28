@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -511,13 +511,13 @@ static void hb_gt_wvw_Init( PHB_GT pGT, FHANDLE hFilenoStdin, FHANDLE hFilenoStd
    s_pWvwData->s_pWindows[0]->hCompDC = CreateCompatibleDC( s_pWvwData->s_pWindows[0]->hdc );
 
    /*
-      Ap¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
+      ApÂ¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
       o handle original da PEN e BRUSH do Device Context
    */
    s_pWvwData->s_sApp->OriginalPen   = (HPEN) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->penWhite );
    s_pWvwData->s_sApp->OriginalBrush = (HBRUSH) SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->currentBrush );
    /*
-      E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
+      E, logo apÂ¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restauraâ€¡Ã†o
       quando for utilizar DeleteObject()
    */
    SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
@@ -584,9 +584,9 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
          DeleteObject( ( HFONT ) pWindowData->hFont );
 
          /*
-           Faz apenas para a janela 0 (a primeira) j  que existe, na cria‡Æo das mesmas, uma condi‡Æo para que
+           Faz apenas para a janela 0 (a primeira) jÂ  que existe, na criaâ€¡Ã†o das mesmas, uma condiâ€¡Ã†o para que
            apenas a primeira seja criada
-           Obs: A exclusÆo desses objetos precisa ocorrer antes da Release do Device Context
+           Obs: A exclusÃ†o desses objetos precisa ocorrer antes da Release do Device Context
          */
          if (j==0)
          {
@@ -597,7 +597,7 @@ static void hb_gt_wvw_Exit( PHB_GT pGT )
             SelectObject( s_pWvwData->s_pWindows[0]->hdc, (HBRUSH) s_pWvwData->s_sApp->OriginalBrush );
 
             /*
-             Com PENs e BRUSHes liberadas, efetua exclusÆo
+             Com PENs e BRUSHes liberadas, efetua exclusÃ†o
             */
             if (s_pWvwData->s_sApp->penWhite)
             {
@@ -947,7 +947,7 @@ static void hb_gt_wvw_Replicate( PHB_GT pGT, int iRow, int iCol, BYTE bColor, BY
     hb_gt_wvwFUNCPrologue(2, &iRow, &iCol, NULL, NULL);
   }
 
-  hb_gt_wvw_vReplicate( s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ], iRow, iCol, bColor, bAttr, usChar, ulLen );
+  hb_gt_wvw_vReplicate( s_pWvwData->s_pWindows[ s_pWvwData->s_usCurWindow ], iRow, iCol, bColor, bAttr, usChar, ( ULONG ) ulLen );
 
   if ( s_pWvwData->s_bMainCoordMode )
   {
@@ -3997,7 +3997,7 @@ hb_vmPushPointer( hWnd );
 
          stLen = pEnd-ptStr;
 
-         ExtTextOut(lpDIS->hDC, rectCorner.top, rectCorner.left+3, 0, &lpDIS->rcItem, ptStr, stLen, NULL);
+         ExtTextOut(lpDIS->hDC, rectCorner.top, rectCorner.left+3, 0, &lpDIS->rcItem, ptStr, ( UINT ) stLen, NULL);
 
          return(0);
       }
@@ -4224,7 +4224,7 @@ DWORD hb_gt_wvwProcessMessages( WIN_DATA * pWindowData )
     }
   }
 
-  return( msg.wParam );
+  return( ( DWORD ) msg.wParam );
 
 }
 
@@ -5786,11 +5786,11 @@ static UINT hb_gt_wvwOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, int 
     s_pWvwData->s_pWindows[ s_pWvwData->s_usNumWindows-1 ]->hIcon = NULL;
 
     /*
-       Ap¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
+       ApÂ¢s o Device Context e as PENs e BRUSHes criados, atribuo uma PEN e um BRUSH qualquer apenas para pegar
        o handle original da PEN e BRUSH do Device Context
     */
     /*
-       E, logo ap¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restaura‡Æo
+       E, logo apÂ¢s, restaura aos valores originais mantendo em s_pWvwData->s_sApp os valores salvos para restauraâ€¡Ã†o
        quando for utilizar DeleteObject()
     */
     SelectObject( s_pWvwData->s_pWindows[s_pWvwData->s_usNumWindows-1]->hdc, (HPEN) s_pWvwData->s_sApp->OriginalPen );
@@ -7066,7 +7066,7 @@ BOOL HB_EXPORT hb_gt_wvwSetFont( UINT usWinNum, const char *fontFace, int height
       pWindowData->fontWeight  = Bold;
       pWindowData->fontQuality = Quality;
 
-      size = strlen( fontFace );
+      size = ( int ) strlen( fontFace );
       if ( ( size > 0 ) && ( size < LF_FACESIZE-1 ) )
       {
         strcpy( pWindowData->fontFace, fontFace );
@@ -7924,7 +7924,7 @@ HB_FUNC( WVW_NOPENWINDOW )
 
   if ( ISCHAR(1) )
   {
-    iLen = hb_parclen(1);
+    iLen = ( int ) hb_parclen(1);
     if ( iLen > WVW_MAXWINNAMELENGTH-1)
     {
       MessageBox( NULL, TEXT( "Windows name too long" ),
@@ -8426,7 +8426,7 @@ HB_FUNC( WVW_SETWINSTYLE )
    {
       lpStyle = GetWindowLongPtr( s_pWvwData->s_pWindows[usWinNum]->hWnd, GWL_STYLE );
    }
-   hb_retnl( lpStyle );
+   hb_retnl( ( LONG ) lpStyle );
 }
 
 /*
@@ -8954,7 +8954,7 @@ HB_FUNC( WVW_SETCLIPBOARD )
    /* Get text from PRG
     */
    cText = hb_parcx( 1 );
-   nLen  = hb_parclen( 1 );
+   nLen  = ( int ) hb_parclen( 1 );
 
    /* Allocate a global memory object for the text.
     */
@@ -10074,7 +10074,7 @@ BOOL AddTBButton(HWND hWndToolbar, char * szBitmap, UINT uiBitmap, char * pszLab
 
       tbab.hInst = NULL;
       tbab.nID   = (UINT_PTR) hBitmap;
-      iNewBitmap = SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
+      iNewBitmap = ( int ) SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
 
    }
    else /* system bitmap */
@@ -10085,7 +10085,7 @@ BOOL AddTBButton(HWND hWndToolbar, char * szBitmap, UINT uiBitmap, char * pszLab
    szBuffer[0] = (char) 0;
    strcat(szBuffer, pszLabel);
    szBuffer[strlen(szBuffer)+1] = (char) 0;
-   iNewString = SendMessage(hWndToolbar, TB_ADDSTRING,(WPARAM) 0, (LPARAM) szBuffer);
+   iNewString = ( int ) SendMessage(hWndToolbar, TB_ADDSTRING,(WPARAM) 0, (LPARAM) szBuffer);
 
    tbb.iBitmap = iNewBitmap;
    tbb.idCommand = iCommand;
@@ -10098,7 +10098,7 @@ BOOL AddTBButton(HWND hWndToolbar, char * szBitmap, UINT uiBitmap, char * pszLab
    tbb.dwData = 0;
    tbb.iString = iNewString;
 
-   bSuccess = SendMessage(hWndToolbar, TB_ADDBUTTONS, (WPARAM) 1, (LPARAM) (LPTBBUTTON) &tbb);
+   bSuccess = ( BOOL ) SendMessage(hWndToolbar, TB_ADDBUTTONS, (WPARAM) 1, (LPARAM) (LPTBBUTTON) &tbb);
 
    return (bSuccess);
 }
@@ -10119,7 +10119,7 @@ int IndexToCommand(HWND hWndTB, int iIndex)
 
 int CommandToIndex(HWND hWndTB, int iCommand)
 {
-   return ( SendMessage(hWndTB, TB_COMMANDTOINDEX,(WPARAM) iCommand, (LPARAM) 0) );
+   return ( ( int ) SendMessage(hWndTB, TB_COMMANDTOINDEX,(WPARAM) iCommand, (LPARAM) 0) );
 }
 
 void hb_gt_wvwTBinitSize( WIN_DATA * pWindowData, HWND hWndTB )
@@ -10481,10 +10481,10 @@ static void RunControlBlock(UINT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT
            case CBN_SETFOCUS:
            case CBN_KILLFOCUS:
            {
-              iCurSel = SendMessage((HWND) pcd->hWndCtrl,
-                                    CB_GETCURSEL,
-                                    (WPARAM) 0,
-                                    (LPARAM) 0
+              iCurSel = ( int ) SendMessage((HWND) pcd->hWndCtrl,
+                                            CB_GETCURSEL,
+                                            (WPARAM) 0,
+                                            (LPARAM) 0
                                     );
               if (iCurSel == CB_ERR)
               {
@@ -11069,11 +11069,11 @@ LRESULT CALLBACK hb_gt_wvwCBProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM
         break;
       }
 
-      bDropped = SendMessage( (HWND) hWnd,
-                              CB_GETDROPPEDSTATE,
-                              (WPARAM) 0,
-                              (LPARAM) 0
-                             );
+      bDropped = ( BOOL ) SendMessage( (HWND) hWnd,
+                                       CB_GETDROPPEDSTATE,
+                                       (WPARAM) 0,
+                                       (LPARAM) 0
+                                     );
 
       if (bKbdType==WVW_CB_KBD_STANDARD)
       {
@@ -11834,7 +11834,7 @@ static BOOL hb_gt_wvw_KeyEvent( WIN_DATA * pWindowData, UINT message, WPARAM wPa
         {
           if ( s_pWvwData->s_sApp->AltF4Close && bAlt )
           {
-            return( DefWindowProc( hWnd, message, wParam, lParam ) );
+            return( ( BOOL ) DefWindowProc( hWnd, message, wParam, lParam ) );
           }
           else
           {
@@ -11932,7 +11932,7 @@ static BOOL hb_gt_wvw_KeyEvent( WIN_DATA * pWindowData, UINT message, WPARAM wPa
           }
           else if ( pWindowData->EnableShortCuts )
           {
-            return( DefWindowProc( hWnd, message, wParam, lParam ) );
+            return( ( BOOL ) DefWindowProc( hWnd, message, wParam, lParam ) );
           }
         }
       }
