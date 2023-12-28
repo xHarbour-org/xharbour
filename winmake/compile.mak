@@ -1166,7 +1166,7 @@ $(OBJ_DIR)$(DIR_SEP)tif_extension_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tif
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)tif_fax3_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)tif_fax3sm_PDFLITE$(OBJEXT) : $(PDFLITE_DIR)$(DIR_SEP)tiff$(DIR_SEP)tif_fax3sm.c
 	$(CCC_CMD)
@@ -1382,7 +1382,7 @@ $(OBJ_DIR)$(DIR_SEP)coreHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)core.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)lzf_cHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)lzf_c.c
-	$(CCC_CMD)
+	$(CCC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)lzf_dHBLZF$(OBJEXT) : $(HBLZF_DIR)$(DIR_SEP)lzf_d.c
 	$(CCC_CMD)
@@ -3663,7 +3663,7 @@ $(OBJ_DIR)$(DIR_SEP)wvtcore$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtcore.c
 	$(CCC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)wvtutils$(OBJEXT) : $(GTWVG_DIR)$(DIR_SEP)wvtutils.c
-	$(CC_CMD)
+	$(CC_CMD_NOWARN)
 
 $(OBJ_DIR)$(DIR_SEP)wvtclass$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)wvtclass.c
 	$(CC_CMD)

@@ -139,7 +139,7 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
       miInfo.fType = MFT_STRING;
 
       //gets the string;
-      miInfo.cch = strlen( menuData->szLabel );
+      miInfo.cch = ( UINT ) strlen( menuData->szLabel );
       miInfo.dwTypeData = menuData->szLabel;
 
       // set backreference to this menu item
@@ -346,4 +346,3 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
 
    return TRUE;
 }
-

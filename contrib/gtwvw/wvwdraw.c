@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -150,7 +150,7 @@ HB_FUNC( WVW_DRAWLABELOBJ )
    oldBkColor   = SetBkColor( pWindowData->hdc, ISNIL( 10 ) ? pWindowData->background : ( COLORREF ) hb_parnl( 10 ) );
    oldFont      = ( HFONT ) SelectObject( pWindowData->hdc, ( HFONT ) HB_PARHANDLE( 11 ) );
 
-   GetTextExtentPoint32( pWindowData->hdc, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &sz );
+   GetTextExtentPoint32( pWindowData->hdc, hb_parcx( 6 ), ( int ) strlen( hb_parcx( 6 ) ), &sz );
 
    x = iLeft;
    y = iTop;
@@ -201,7 +201,7 @@ HB_FUNC( WVW_DRAWLABELOBJ )
 
    uiOptions    = ETO_CLIPPED | ETO_OPAQUE ;
 
-   ExtTextOut( pWindowData->hdc, x, y, uiOptions, &rect, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), NULL );
+   ExtTextOut( pWindowData->hdc, x, y, uiOptions, &rect, hb_parcx( 6 ), ( UINT ) strlen( hb_parcx( 6 ) ), NULL );
 
    SelectObject( pWindowData->hdc, oldFont );
    SetTextAlign( pWindowData->hdc, oldTextAlign );
@@ -670,7 +670,7 @@ HB_FUNC( WVW_DRAWTEXTBOX )
    oldBkMode    = SetBkMode( pWindowData->hdc, ISNIL( 12 ) ? OPAQUE : hb_parni( 12 ) );
    oldFont      = ( HFONT ) SelectObject( pWindowData->hdc, ( HFONT ) HB_PARHANDLE( 13 ) );
 
-   DrawText( pWindowData->hdc, hb_parcx( 7 ), strlen( hb_parcx( 7 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
+   DrawText( pWindowData->hdc, hb_parcx( 7 ), ( int ) strlen( hb_parcx( 7 ) ), &rc, iAlignH | DT_WORDBREAK | DT_TOP );
 
    SetTextColor( pWindowData->hdc, oldTextColor );
    SetBkColor( pWindowData->hdc, oldBkColor );
@@ -1614,7 +1614,7 @@ HB_FUNC( WVW_DRAWLABEL )
       oldTextAlign = SetTextAlign( pWindowData->hdc, ( ISNIL( 5 ) ? TA_LEFT : hb_parni( 5 ) ) );
       oldFont      = (HFONT) SelectObject( pWindowData->hdc, hFont );
 
-      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 4 ), strlen( hb_parcx( 4 ) ), NULL );
+      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 4 ), ( UINT ) strlen( hb_parcx( 4 ) ), NULL );
 
       SelectObject( pWindowData->hdc, oldFont );
       DeleteObject( hFont );
@@ -1942,7 +1942,7 @@ HB_FUNC( WVW_DRAWRECTANGLE )
             usLeft   = ( USHORT )hb_parni( 3 ),
             usBottom = ( USHORT )hb_parni( 4 ),
             usRight  = ( USHORT )hb_parni( 5 );
-   // Ref.: 28454 - M rson de Paula - 11/27/2007
+   // Ref.: 28454 - MÂ rson de Paula - 11/27/2007
    BOOL     bUsaCurrentPen = ( ISNIL( 7 ) ? TRUE : hb_parl( 7 ) );
 
    iOffTop    = !ISNIL( 6 ) ? hb_parni( 6,1 ) : 0 ;
@@ -1967,7 +1967,7 @@ HB_FUNC( WVW_DRAWRECTANGLE )
    iRight  = xy.x-1 + iOffRight;
 
    SelectObject( pWindowData->hdc, s_sApp->currentBrush );
-   // Ref.: 28454 - M rson de Paula - 11/27/2007
+   // Ref.: 28454 - MÂ rson de Paula - 11/27/2007
    if ( bUsaCurrentPen )
    {
       SelectObject( pWindowData->hdc, s_sApp->currentPen );
@@ -2356,7 +2356,7 @@ HB_FUNC( WVW_DRAWBUTTON )
    {
       ( HFONT ) SelectObject( pWindowData->hdc, GetStockObject( DEFAULT_GUI_FONT ) );
 
-      GetTextExtentPoint32( pWindowData->hdc, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), &sz );
+      GetTextExtentPoint32( pWindowData->hdc, hb_parcx( 6 ), ( int ) strlen( hb_parcx( 6 ) ), &sz );
 
       iTextHeight  = sz.cy;
 
@@ -2384,7 +2384,7 @@ HB_FUNC( WVW_DRAWBUTTON )
       oldBkMode    = SetBkMode( pWindowData->hdc, TRANSPARENT );
       oldTextColor = SetTextColor( pWindowData->hdc, textColor );
 
-      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 6 ), strlen( hb_parcx( 6 ) ), NULL );
+      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 6 ), ( UINT ) strlen( hb_parcx( 6 ) ), NULL );
 
       SetTextColor( pWindowData->hdc, oldTextColor );
       SetBkMode( pWindowData->hdc, oldBkMode );
@@ -2622,7 +2622,7 @@ HB_FUNC( WVW_DRAWLABELEX )
       oldTextAlign = SetTextAlign( pWindowData->hdc, ( ISNIL( 5 ) ? TA_LEFT : hb_parni( 5 ) ) );
       oldFont      = ( HFONT ) SelectObject( pWindowData->hdc, s_sApp->hUserFonts[ iSlot ] );
 
-      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 4 ), strlen( hb_parcx( 4 ) ), NULL );
+      ExtTextOut( pWindowData->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 4 ), ( UINT ) strlen( hb_parcx( 4 ) ), NULL );
 
       SelectObject( pWindowData->hdc, oldFont );
       SetTextAlign( pWindowData->hdc, oldTextAlign );
@@ -2890,4 +2890,3 @@ HB_FUNC( WVW_SETGRIDPEN )
       hb_retl( FALSE );
    }
 }
-

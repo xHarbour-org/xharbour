@@ -13,7 +13,7 @@
  *     Copyright 2002 Przemyslaw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  *
  *
@@ -1111,7 +1111,7 @@ static BOOL hb_gt_wvt_KeyEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, LPA
                break;
             case VK_F4:
                if( pWVT->AltF4Close && bAlt )
-                  return DefWindowProc( pWVT->hWnd, message, wParam, lParam );
+                  return ( BOOL ) DefWindowProc( pWVT->hWnd, message, wParam, lParam );
                hb_gt_wvt_TranslateKey( pWVT, K_F4   , K_SH_F4, K_ALT_F4   , K_CTRL_F4    );
                break;
             case VK_F5:
@@ -1193,7 +1193,7 @@ static BOOL hb_gt_wvt_KeyEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, LPA
                }
                else if( pWVT->EnableShortCuts )
                {
-                  return DefWindowProc( pWVT->hWnd, message, wParam, lParam );
+                  return ( BOOL ) DefWindowProc( pWVT->hWnd, message, wParam, lParam );
                }
             }
          }
@@ -1777,7 +1777,7 @@ static DWORD hb_gt_wvt_ProcessMessages( PHB_GTWVT pWVT )
       }
    }
 
-   return msg.wParam;
+   return ( DWORD ) msg.wParam;
 }
 
 static BOOL hb_gt_wvt_ValidWindowSize( HWND hWnd, int rows, int cols, HFONT hFont, int iWidth )
@@ -2466,7 +2466,7 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          else
          {
             char * szClipboardData;
-            ULONG ulLen;
+            HB_SIZE ulLen;
             if( hb_gt_w32_getClipboard( pWVT->CodePage == OEM_CHARSET ?
                                         CF_OEMTEXT : CF_TEXT,
                                         &szClipboardData, &ulLen ) )
@@ -2631,7 +2631,7 @@ static BOOL hb_gt_wvt_Info( PHB_GT pGT, int iType, PHB_GT_INFO pInfo )
          switch( iMessage )
          {
             case HB_GTS_WINDOWHANDLE:
-               pInfo->pResult = hb_itemPutNL( pInfo->pResult, ( LONG ) pWVT->hWnd );
+               pInfo->pResult = hb_itemPutNL( pInfo->pResult, ( LONG ) ( LONG_PTR ) pWVT->hWnd );
                break;
 
             case HB_GTS_CENTERWINDOW:
@@ -3273,13 +3273,13 @@ static void hb_wvt_gtCreateObjects( PHB_GTWVT pWVT )
    {
       pWVT->hDlgModeless[ iIndex ] = NULL;
       pWVT->pFunc[ iIndex ]        = NULL;
-      pWVT->iType[ iIndex ]        = ( int ) NULL;
+      pWVT->iType[ iIndex ]        = 0;
    }
    for( iIndex = 0; iIndex < WVT_DLGMD_MAX; iIndex++ )
    {
       pWVT->hDlgModal[ iIndex ]    = NULL;
       pWVT->pFuncModal[ iIndex ]   = NULL;
-      pWVT->iTypeModal[ iIndex ]   = ( int ) NULL;
+      pWVT->iTypeModal[ iIndex ]   = 0;
    }
 
    pWVT->bGui                      = FALSE;

@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -450,7 +450,7 @@ HB_FUNC( WIN_DRAWTEXT )
    rc.right  = hb_parni( 3,3 );
    rc.bottom = hb_parni( 3,4 );
 
-   hb_retl( DrawText( ( HDC ) HB_PARHANDLE( 1 ), hb_parc( 2 ), strlen( hb_parc( 2 ) ), &rc, hb_parni( 4 ) ) );
+   hb_retl( DrawText( ( HDC ) HB_PARHANDLE( 1 ), hb_parc( 2 ), ( int ) strlen( hb_parc( 2 ) ), &rc, hb_parni( 4 ) ) );
 }
 
 
@@ -785,7 +785,7 @@ HB_FUNC( CREATEIMAGELIST )
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
    UINT flags = ( ISNIL(5) ) ? ILC_COLOR : hb_parni(5);
    HIMAGELIST himl;
-   ULONG ul, ulLen = hb_arrayLen( pArray );
+   ULONG ul, ulLen = ( ULONG ) hb_arrayLen( pArray );
    HBITMAP hbmp;
 
    himl = ImageList_Create( hb_parni(2), hb_parni(3), flags,
@@ -925,7 +925,7 @@ HB_FUNC( OPENIMAGE )
 
    if( lString )
    {
-      iFileSize = hb_parclen( 1 );
+      iFileSize = ( int ) hb_parclen( 1 );
       hG = GlobalAlloc( GPTR,iFileSize );
       if( !hG )
       {
@@ -1027,7 +1027,7 @@ HB_FUNC( OPENBITMAP )
    /* Allocate memory for the BITMAPINFO structure. */
 
    hmem1 = GlobalAlloc( GHND, sizeof(BITMAPINFOHEADER) +
-             ((1<<bmih.biBitCount) * sizeof(RGBQUAD)));
+             ((1ULL<<bmih.biBitCount) * sizeof(RGBQUAD)));
    lpbmi = (LPBITMAPINFO)GlobalLock( hmem1 );
 
    /*  Load BITMAPINFOHEADER into the BITMAPINFO  structure. */
@@ -1053,7 +1053,7 @@ HB_FUNC( OPENBITMAP )
       case 4  :
       case 8  :
          ReadFile(hfbm, lpbmi->bmiColors,
-           ((1<<bmih.biBitCount) * sizeof(RGBQUAD)),
+           ((1ULL<<bmih.biBitCount) * sizeof(RGBQUAD)),
            &dwRead, (LPOVERLAPPED) NULL);
            break;
 
@@ -1377,7 +1377,7 @@ HB_FUNC(SETBITMAPRESOURCEID)
 
       tbab.hInst = NULL;
       tbab.nID   = (UINT_PTR) hBitmap;
-      iNewBitmap = SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
+      iNewBitmap = ( int ) SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
 
    }
    else /* system bitmap */
@@ -2546,31 +2546,31 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    {
       case 0:
       {
-         iResult = DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
-                                                     hb_parc( 1 ),
-                                                     hParent,
-                                                     (DLGPROC) hb_gt_wvwDlgProcModal,
-                                ( LPARAM ) ( DWORD ) iIndex+1 );
+         iResult = ( int ) DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
+                                                             hb_parc( 1 ),
+                                                             hParent,
+                                                             (DLGPROC) hb_gt_wvwDlgProcModal,
+                                        ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
 
       case 1:
       {
-         iResult = DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
-                           MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
-                                                     hParent,
-                                                     (DLGPROC) hb_gt_wvwDlgProcModal,
-                                ( LPARAM ) ( DWORD ) iIndex+1 );
+         iResult = ( int ) DialogBoxParam( ( HINSTANCE     ) hb_winmainGetInstance(),
+                                   MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
+                                                             hParent,
+                                                             (DLGPROC) hb_gt_wvwDlgProcModal,
+                                        ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
 
       case 2:
       {
-         iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_winmainGetInstance(),
-                                           ( LPDLGTEMPLATE ) hb_parc( 1 ),
-                                                             hParent,
-                                                            (DLGPROC) hb_gt_wvwDlgProcModal,
-                                        ( LPARAM ) ( DWORD ) iIndex+1 );
+         iResult = ( int ) DialogBoxIndirectParam( ( HINSTANCE     ) hb_winmainGetInstance(),
+                                                   ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                                                     hParent,
+                                                                    (DLGPROC) hb_gt_wvwDlgProcModal,
+                                                ( LPARAM ) ( DWORD ) iIndex+1 );
       }
       break;
    }

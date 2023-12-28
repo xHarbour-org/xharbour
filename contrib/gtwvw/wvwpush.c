@@ -18,10 +18,10 @@
  * based on
  *   Bcc ConIO Video subsystem by
  *     Copyright 2002 Marek Paliwoda <paliwoda@inteia.pl>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
- *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
+ *     Copyright 2002 PrzemysÂ³aw Czerpak <druzus@polbox.com>
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -598,7 +598,7 @@ HB_FUNC( WVW_CBCREATE)
          }
          else
          {
-            numofchars =SendMessage((HWND) hWndCB,CB_GETLBTEXTLEN,i-1,0);
+            numofchars = ( LONG ) SendMessage((HWND) hWndCB,CB_GETLBTEXTLEN,i-1,0);
             if ( numofchars > LongComboWidth )
                 LongComboWidth=numofchars;
 
@@ -924,11 +924,11 @@ HB_FUNC( WVW_CBGETINDEX )
      return;
    }
 
-   retval = SendMessage((HWND) pcd->hWndCtrl,
-                        CB_GETCURSEL,
-                        (WPARAM) 0,
-                        (LPARAM) 0
-                        );
+   retval = ( int ) SendMessage((HWND) pcd->hWndCtrl,
+                                CB_GETCURSEL,
+                                (WPARAM) 0,
+                                (LPARAM) 0
+                                );
    hb_retni(retval);
 }
 
@@ -953,11 +953,11 @@ HB_FUNC( WVW_CBFINDSTRING )
      return;
    }
 
-   retval = SendMessage((HWND) pcd->hWndCtrl,
-                         CB_FINDSTRING,
-                         (WPARAM) -1,
-                         (LPARAM) (LPCSTR) hb_parcx(3)
-                         );
+   retval = ( int ) SendMessage((HWND) pcd->hWndCtrl,
+                                CB_FINDSTRING,
+                                (WPARAM) -1,
+                                (LPARAM) (LPCSTR) hb_parcx(3)
+                                );
    hb_retni(retval);
 }
 
@@ -981,16 +981,16 @@ HB_FUNC( WVW_CBGETCURTEXT )
      return;
    }
 
-   iCurSel = SendMessage((HWND) pcd->hWndCtrl,
-                        CB_GETCURSEL,
-                        (WPARAM) 0,
-                        (LPARAM) 0
-                        );
-   iTextLen = SendMessage((HWND) pcd->hWndCtrl,
-                          CB_GETLBTEXTLEN,
-                          (WPARAM) iCurSel,
-                          (LPARAM) 0
-                          );
+   iCurSel = ( int ) SendMessage((HWND) pcd->hWndCtrl,
+                                 CB_GETCURSEL,
+                                 (WPARAM) 0,
+                                 (LPARAM) 0
+                                 );
+   iTextLen = ( int ) SendMessage((HWND) pcd->hWndCtrl,
+                                  CB_GETLBTEXTLEN,
+                                  (WPARAM) iCurSel,
+                                  (LPARAM) 0
+                                  );
    if (iTextLen==CB_ERR)
    {
      hb_retclen(lptstr, 0);
@@ -1032,11 +1032,11 @@ HB_FUNC( WVW_CBISDROPPED )
       return;
    }
 
-   bDropped = SendMessage( (HWND) pcd->hWndCtrl,
-                           CB_GETDROPPEDSTATE,
-                           (WPARAM) 0,
-                           (LPARAM) 0
-                          );
+   bDropped = ( BOOL ) SendMessage( (HWND) pcd->hWndCtrl,
+                                    CB_GETDROPPEDSTATE,
+                                    (WPARAM) 0,
+                                    (LPARAM) 0
+                                   );
    hb_retl(bDropped);
 }
 
