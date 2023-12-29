@@ -10,7 +10,7 @@
 
 2023-12-29 18:58 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.gc
-    ! reactivate build of libgtwvg64.a and libhbzip64.a
+    ! reactivated build of libgtwvg64.a and libhbzip64.a
 
 2023-12-28 13:51 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\eval.c
