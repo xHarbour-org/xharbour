@@ -207,14 +207,6 @@ ALL: $(DLL_PROJECT)
 #*******************************************************************************
 !include winmake\common1.mak
 
-!if ("$(HB_ARCH)"=="64")
-CONTRIB_PROJECT=\
-	$(CONTRIB_PROJECT)\
-	$(HBSQLIT3_LIB)\
-	$(HBZIP_LIB)\
-	\
-	$(OPTIONAL_PRJ)
-!else
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GTWVW_LIB)\
@@ -224,7 +216,6 @@ CONTRIB_PROJECT=\
 	$(HBZIP_LIB)\
 	\
 	$(OPTIONAL_PRJ)
-!endif
 
 ALL: $(CONTRIB_PROJECT)
 
