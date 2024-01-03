@@ -65,6 +65,7 @@ echo HB_LIBLIST=%HB_LIBLIST%
    echo     HB_ARCH:
    echo       - dos   (HB_GT_LIB=gtdos by default)
    echo       - w32   (gtwin for console or gtgui for windows applications)
+   echo       - w64   (gtwin for console or gtgui for windows applications)
    echo       - linux (HB_GT_LIB=gtstd by default)
    echo       - os2   (HB_GT_LIB=gtos2 by default)
    echo.
@@ -142,7 +143,7 @@ echo HB_LIBLIST=%HB_LIBLIST%
 
    if not "%HB_GT_LIB%" == "" set _HB_GT_LIB=%HB_GT_LIB%
 
-   if not "%HB_ARCH%" == "dos" goto A_W32
+   if not "%HB_ARCH%" == "dos" goto A_W32_64
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtdos
 
@@ -242,9 +243,9 @@ echo HB_LIBLIST=%HB_LIBLIST%
       del build.tmp
       goto END
 
-:A_W32
+:A_W32_64
 
-   if not "%HB_ARCH%" == "w32" goto A_OS2
+   if not "%HB_ARCH%" == "w32" if not "%HB_ARCH%" == "w64" goto A_OS2
    if "%CC%" == "cl"      goto C_MSVC
    if "%CC%" == "watcom"  goto C_WATCOM
    if "%CC%" == "mingw32" goto C_MINGW32

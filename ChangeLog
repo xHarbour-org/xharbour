@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-03 17:15 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * bin/bld.bat
+    + Added support for VS 64bit build (w64)
+
 2024-01-03 16:45 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   - bin/find_bc.bat
   - bin/find_vc.bat
@@ -39,7 +43,7 @@
   /* 
     Make andd build batch files on Windows have been written from scratch to support
     simplified auto detection of compilers and their respective paths. The system
-    is also shared nott jusst between different compilers but also between make and build
+    is also shared not jusst between different compilers but also between make and build
     batch files. This allows us to avoid redundancy and simplify updates. New compilers
     can be added by simply adding a new known file and a new ssimple find script. Also
     new known locations can be added to existing known files to support new versions of
@@ -190,7 +194,7 @@
     + New alias to make_bc.bat
 
   * winmake/mdir.bat
-    * Do nott reset SUB_DIR
+    * Do not reset SUB_DIR
     * Default LIBEXT to ".lib" if not set already set.
 
   * tests/test.prg
@@ -265,7 +269,7 @@
   * source/pp/ppgen.c
     * Corrected hb_verCvsID() to return ULONGLONG instead of long long int 
   * source/pp/ppgen.c
-    Corrected sufix of 64bit version consttants from LL to UL 
+    Corrected sufix of 64bit version constants from LL to UL 
   
 2023-12-24 19:35 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
@@ -379,7 +383,7 @@
     * Default RC to rc.exe if CC is bcc32c
     * Default CC only if not set already
     - Remove '-d' from OPTFLAFGS (I suspect it was a typo)
-    + Added logic to set differentt flags for legacy bcc32 vs CLang based bcc32c
+    + Added logic to set different flags for legacy bcc32 vs CLang based bcc32c
     + Added -L$(BCC_LIB) to link commands. This allows build using auto detection 
       User does not have to specify any setting to build with Free Embaracadero. 
     * Alternate syntax when using brc32.exe vs. rc.exe
@@ -402,10 +406,10 @@
     + Added assignment of respective __MSC__ version
 
   * bin/bld.bat
-    + Added logic to default HB_INSTALL HB_BIN_INSTALL HB_LIB_INSTTALL and HB_INC_INSTALL 
+    + Added logic to default HB_INSTALL HB_BIN_INSTALL HB_LIB_INSTALL and HB_INC_INSTALL 
       based on the directory from which bld.bat was loaded.
     - Removed explicit HB_LIB_INSTALL for each library in MSVC section 
-    + Added /LIBPATH=%HB_LIB_INSTALL% to LDFLAGS in MSVC secttion
+    + Added /LIBPATH=%HB_LIB_INSTALL% to LDFLAGS in MSVC section
     + Added libharu.lib hbhpdf.lib and png.lib to default libraries (if exist) in MSVC section
     + Added enclosing "" around %HB_INC_INSTALL% in -I switch in MSVC section
 
@@ -416,7 +420,7 @@
   * winmake/compile.mak
     + Added hpdf_direct and hpdf_shading to HBHPDF.LIB dependencies
     * Changed HBHPDF.LIB dependencies to use CC_CMD_HARU instead of CC_CMD
-      to use C compilattion instead of C++
+      to use C compilation instead of C++
   * winmake/msvcerr.vc
     + Added messages for __MSC__ 16 and 17
   
