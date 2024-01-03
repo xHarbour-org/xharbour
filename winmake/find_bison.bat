@@ -1,4 +1,4 @@
-IF "%HB_USE_BISON%"=="0" GOTO END
+IF "%HB_USE_BISON%" == "" GOTO END
 
 :FIND_BISON
    IF EXIST C:\win_flex_bison-2.5.5\win_bison.exe  GOTO SET_WIN_FLEX_BISON_C_2_5_5
@@ -34,6 +34,7 @@ GOTO NOT_FOUND
 :FOUND
    REM echo %BISON_DIR%
    REM echo %BISON%
+   %BISON% --version > NUL 2>&1 || SET "PATH=%BISON_DIR%;%PATH%"
    GOTO END
 
 :NOT_FOUND

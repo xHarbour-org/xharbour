@@ -36,28 +36,11 @@ IF "%HB_ARCH%"=="64" (
 REM Make that the current directory is the same as the batch file (root of xHarbour)
 CD %~dp0
 
-IF NOT "%CC%"=="" (
-   IF NOT "%CC%"=="cl" GOTO SWITCH_CC
-)
-
-GOTO SET_VC
-
-:SWITCH_CC
-   ECHO Your Environment is set to use %CC% as the compiler.
-   ECHO This batch file is intended to be used with MSVC only.
-   SET /P RESPONSE="Do you want to switch to MSVC (Y/N)? "
-   IF /I "%RESPONSE%"=="Y" (
-      SET CC=
-      SET CC_DIR=
-      SET RC_DIR=
-      SET BCC_LIB=
-      SET LIBEXT=
-      GOTO SET_VC
-   )
-   EXIT /B 1
+SET "scriptName=%~n0"
+ECHO *** START [%~f0](%*) > winmake\functions.log
 
 :SET_VC
-   CALL bin\find_vc.bat
+   CALL winmake\find_vc.bat
    IF ERRORLEVEL 1 GOTO NOT_READY
    GOTO FIND_BISON
 
@@ -68,13 +51,13 @@ GOTO SET_VC
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Microsoft Visual C/C++ not found.
-   ECHO. Please install Microsoft Visual C/C++ and try again.
+   ECHO. Please install and try again.
    ECHO.
    EXIT /B 1
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   CALL bin\find_bison.bat
+   CALL winmake\find_bison.bat
 
 :READY
    IF "%SUB_DIR%"=="" SET SUB_DIR=vc32
@@ -89,7 +72,7 @@ GOTO SET_VC
    REM Save the original path before further modifications   
    SET _PATH=%PATH%
 
-IF "%HB_USE_BISON%"=="1" SET PATH=%BISON_DIR%;%PATH%
+IF "%HB_USE_BISON%"=="1" SET "PATH=%BISON_DIR%;%PATH%"
 REM echo %path%
 
 rem ============================================================================

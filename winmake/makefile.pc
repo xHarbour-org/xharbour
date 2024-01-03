@@ -70,6 +70,9 @@ OPTFLAGS   =-Ze -Zx $(HB_TARGET) $(OLDFLAG)
 #*******************************************************************************
 !if ("$(__BLD__)"=="CORE_BLD")
 #*******************************************************************************
+VM_LIB_OBJS=\
+	$(VM_LIB_OBJS)\
+	$(VM_MAIN_OBJS)
 
 # XCC cannot compiler PDFLITE, due internal compiler error
 !if ("$(__COMP__)"=="__XCC__")
@@ -82,16 +85,22 @@ HBDOC_EXE_OBJS=\
 	$(HBDOC_PDF_OBJS)
 !endif
 
+!if !("$(HB_GTALLEG)"=="")
+HB_GT_LIBS=\
+	$(HB_GT_LIBS)\
+	$(GTALLEG_LIB)
+!endif
+
 # Hack for 64-bit compilation -> unresolved: __WSAFDIsSet
-#!if ("$(HB_ARCH)"=="64")
+#!if ("$(HB_ARCH)"=="w64")
 #WS2_32PC_LIB=$(LIB_DIR)\ws2_32pc.lib
 #!endif
 
-#VM_LIB_OBJS=\
-#	$(VM_LIB_OBJS)\
-#	$(VM_MAIN_OBJS)
-
-LINKERFLAGS  =-LIBPATH:$(LIB_DIR) -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:"$(CC_DIR)\LIB\WIN$(HB_ARCH)" -MACHINE:$(HB_MACHINE) -SUBSYSTEM:CONSOLE
+!if ("$(HB_ARCH)"=="w64")
+LINKERFLAGS  =-FORCE:MULTIPLE -LIBPATH:$(LIB_DIR) -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:"$(CC_DIR)\LIB\WIN64" -MACHINE:$(HB_MACHINE) -SUBSYSTEM:CONSOLE
+!else
+LINKERFLAGS  =/FORCE:MULTIPLE -LIBPATH:$(LIB_DIR) -LIBPATH:"$(CC_DIR)\LIB" -LIBPATH:"$(CC_DIR)\LIB\WIN" -MACHINE:$(HB_MACHINE) -SUBSYSTEM:CONSOLE
+!endif
 
 !if ("$(HB_MT)"=="")
 PROJECT=$(ST_PROJECT)
@@ -103,10 +112,6 @@ ALL: $(PROJECT)
 #!if ("$(HB_ARCH)"=="64")
 #PROJECT=$(PROJECT) $(WS2_32PC_LIB)
 #!endif
-
-VM_LIB_OBJS=\
-	$(VM_LIB_OBJS)\
-	$(VM_MAIN_OBJS)
 
 #*******************************************************************************
 !elseif ("$(__BLD__)"=="DLL_BLD")

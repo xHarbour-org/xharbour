@@ -1,4 +1,5 @@
 @echo off
+
 rem ============================================================================
 rem
 rem $Id$
@@ -32,53 +33,56 @@ REM SET HB_DIR_ADS=
 
 IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
 
+REM Make that the current directory is the same as the batch file (root of xHarbour)
+CD %~dp0
 
-IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
+SET "scriptName=%~n0"
+ECHO *** START [%~f0] > winmake\functions.log
 
-:FIND_POCC
-   IF EXIST "%ProgramFiles%\PellesC" GOTO SET_POCC
-   IF EXIST \PellesC                 GOTO SET_POCC2
-   GOTO FIND_BISON
- 
-:SET_POCC
-   SET CC_DIR=%ProgramFiles%\PellesC
+:SET_PC
+   CALL winmake\find_pc.bat
+   IF ERRORLEVEL 1 GOTO NOT_READY
    GOTO FIND_BISON
 
-:SET_POCC2
-   SET CC_DIR=\PellesC
-   GOTO FIND_BISON
+:NOT_READY
+   ECHO.
+   ECHO. -----------------------------
+   ECHO. Make Utility for Pelles C
+   ECHO. -----------------------------
+   ECHO.
+   ECHO. Pelles C not found.
+   ECHO. Please install and try again.
+   ECHO.
+   GOTO EXIT
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   IF EXIST "%ProgramFiles%\GnuWin32\Bin" GOTO SET_BISON1
-   IF EXIST \GnuWin32\Bin                 GOTO SET_BISON2 
-   GOTO READY
- 
-:SET_BISON1
-   SET BISON_DIR=%ProgramFiles%\GnuWin32\Bin
-   GOTO READY
-
-:SET_BISON2
-   SET BISON_DIR=\GnuWin32\Bin
+   CALL winmake\find_bison.bat
+   IF "%CC%"=="" GOTO NOT_READY
    GOTO READY
 
 :READY
+   IF "%SUB_DIR%"==""    SET SUB_DIR=pc32
+   IF "%HB_ARCH%"=="w64" SET SUB_DIR=pc64
 
-SET SUB_DIR=pc
-SET HB_GT_LIB=$(GTWIN_LIB)
+   REM NOT an error using $() synttax because it will be LATE expanded by make!
+   IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
-echo "%CC_DIR%"
-echo "%RC_DIR%"
-SET _PATH=%PATH%
-SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
-echo %path%
+   REM echo "%CC_DIR%"
+
+:SAVE_PATH
+   REM Save the original path before further modifications   
+   SET _PATH=%PATH%
+
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET LIBEXT=%HB_ARCH%%HB_DEBUG%.lib
-SET OBJEXT=%HB_ARCH%%HB_DEBUG%.obj
+SET LIBEXT=%HB_DEBUG%.lib
+SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
+IF "%HB_ARCH%"=="w64" SET LIBEXT=%HB_DEBUG%.a
+IF "%HB_ARCH%"=="w64" SET OBJEXT=%HB_DEBUG%.o
 REM SET LIBPREFIX=
 rem ============================================================================
 
@@ -224,3 +228,4 @@ rem=============================================================================
 :EXIT
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
+   set scriptName=

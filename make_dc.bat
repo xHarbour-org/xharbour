@@ -31,8 +31,8 @@ REM SET BISON_DIR=D:\BISON\BIN
 SET SUB_DIR=dc
 SET HB_GT_LIB=$(GTWIN_LIB)
 
-SET _PATH=%PATH%
-SET PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%
+SET "_PATH=%PATH%"
+SET "PATH=%CC_DIR%\BIN;%BISON_DIR%;%PATH%"
 rem ============================================================================
 rem The bundled (s)make.exe of DigitalMars is found to be unable to properly
 rem process the make script. For a solution, the free Borland make.exe is used.

@@ -8,6 +8,48 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-03 16:45 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  - bin/find_bc.bat
+  - bin/find_vc.bat
+  + winmake/find_bc.bat
+  + winmake/find_vc.bat
+    * Moved to winmake to avoid cluttering bin
+ 
+  * make_bc.bat
+  * make_dc.bat
+  * make_pc.bat
+  * make_vc.bat
+  * bin/bld.bat
+  * bin/bld_bc.bat
+  * bin/bld_vc.bat
+  * winmake/makefile.pc
+    * Modified to use new shared scripts
+
+  + winmake/find_bison.bat
+  + winmake/find_pc.bat
+  + winmake/found_cc.bat
+  + winmake/functions.bat
+    + New shared scripts to simplify updates and avoid redundancy
+
+  + winmake/known.bc
+  + winmake/known.pc
+  + winmake/known.vc
+   + New simple files to support auto detection of compilers and their respective paths
+
+  /* 
+    Make andd build batch files on Windows have been written from scratch to support
+    simplified auto detection of compilers and their respective paths. The system
+    is also shared nott jusst between different compilers but also between make and build
+    batch files. This allows us to avoid redundancy and simplify updates. New compilers
+    can be added by simply adding a new known file and a new ssimple find script. Also
+    new known locations can be added to existing known files to support new versions of
+    existing compilers, without having to modify the make and build batch files.
+
+    Please note that Windows batch files are not very flexible and are somewhat
+    finicky. The new scripts are not perfect and may need some tweaking. Please
+    report any issues you may encounter.
+   *
+
 2023-12-30 11:55 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.bc
     ! reactivated build of gtwvg.a, gtwvw.a and xwt.a

@@ -11,29 +11,8 @@ rem Instead, make a local copy and modify that one, or make a call to
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
 
-IF NOT "%CC%"=="" (
-   IF NOT "%CC%"=="cl" GOTO SWITCH_CC
-)
-GOTO FOUND
-
-:SWITCH_CC
-   ECHO Your Environment is set to use %CC% as the compiler.
-   ECHO This batch file is intended to be used with MSVC only.
-   SET /P RESPONSE="Do you want to switch to MSVC (Y/N)? "
-   IF /I "%RESPONSE%"=="Y" (
-      SET CC=
-      SET CC_DIR=
-      SET RC_DIR=
-      SET BCC_LIB=
-      SET LIBEXT=
-      SET HB_LIB_INSTALL=
-
-      GOTO SET_VC
-   )
-   EXIT /B 1
-
 :SET_VC
-   CALL %~dp0find_vc.bat
+   CALL %~dp0..\winmake\find_vc.bat
 
 IF "%CC%"=="" GOTO NOT_FOUND
 
@@ -49,7 +28,7 @@ GOTO END
     exit /b 1
 
 :END
-SET PATH=%_PATH%
-SET _PATH=
+SET "PATH=%_PATH%"
+SET "_PATH="
 
 

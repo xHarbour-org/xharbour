@@ -30,29 +30,12 @@ REM SET HB_DIR_ADS=
 REM Make that the current directory is the same as the batch file (root of xHarbour)
 CD %~dp0
 
-IF NOT "%CC%"=="" (
-   IF NOT "%CC%"=="bcc32" IF NOT "%CC%"=="bcc32c" GOTO SWITCH_CC
-)
-
-GOTO SET_BCC
-
-:SWITCH_CC
-   ECHO Your Environment is set to use %CC% as the compiler.
-   ECHO This batch file is intended to be used with BCC only.
-   SET /P RESPONSE="Do you want to switch to BCC (Y/N)? "
-   IF /I "%RESPONSE%"=="Y" (
-      SET CC=
-      SET CC_DIR=
-      SET RC_DIR=
-      SET BCC_LIB=
-      SET LIBEXT=
-      GOTO SET_BCC
-   )
-   EXIT /B 1
+SET "scriptName=%~n0"
+ECHO *** START [%~f0](%*) > winmake\functions.log
 
 :SET_BCC
-   CALL bin\find_bc.bat
-   IF ERRORLEVEL 1 GOTO NOT_READY
+   CALL winmake\find_bc.bat
+   IF %ERRORLEVEL% NEQ 0 GOTO NOT_READY
    GOTO FIND_BISON
 
 :NOT_READY
@@ -62,31 +45,28 @@ GOTO SET_BCC
    ECHO. ------------------------------
    ECHO.
    ECHO. Borland C/C++ not found.
-   ECHO. Please install Borland C/C++ and try again.
+   ECHO. Please install and try again.
    ECHO.
    GOTO EXIT
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
-   CALL bin\find_bison.bat
+   CALL winmake\find_bison.bat
    IF "%CC%"=="" GOTO NOT_READY
    GOTO READY
 
 :READY
-   IF "%SUB_DIR%"=="" SET SUB_DIR=bc32
-   IF "%HB_ARCH%"=="64" SET SUB_DIR=bc64
+   IF "%SUB_DIR%"==""    SET SUB_DIR=bc32
+   IF "%HB_ARCH%"=="w64" SET SUB_DIR=bc64
 
-   SET HB_GT_LIB=$(GTWIN_LIB)
+   REM NOT an error using $() synttax because it will be LATE expanded by make!
+   IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
    REM echo "%CC_DIR%"
-   REM echo "%RC_DIR%"
 
 :SAVE_PATH
    REM Save the original path before further modifications   
    SET _PATH=%PATH%
-
-IF "%HB_USE_BISON%"=="1" SET PATH=%BISON_DIR%;%PATH%
-REM echo %path%
 
 rem ============================================================================
 rem The followings should never change
@@ -95,9 +75,8 @@ rem ============================================================================
 SET LIBEXT=%HB_DEBUG%.lib
 SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
-REM IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
-IF "%HB_ARCH%"=="64" SET LIBEXT=%HB_DEBUG%.a
-IF "%HB_ARCH%"=="64" SET OBJEXT=%HB_DEBUG%.o
+IF "%HB_ARCH%"=="w64" SET LIBEXT=%HB_DEBUG%.a
+IF "%HB_ARCH%"=="w64" SET OBJEXT=%HB_DEBUG%.o
 REM SET LIBPREFIX=
 rem ============================================================================
 
@@ -250,3 +229,4 @@ rem=============================================================================
 :EXIT
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
+   set "scriptName="

@@ -30,12 +30,10 @@ if "%HB_BIN_INSTALL%" == "" if "%HB_INSTALL%" == "" (
     echo WARNING: HB_INSTALL is not set. Deducing from batch file location!
 )
 
-if "%HB_INSTALL%" == "" set HB_INSTALL=\xharbour\
-
 REM Because HB_BIN_INSTALL may default to %~dp0, we need to make sure it ends with a backslash!!!
-if "%HB_BIN_INSTALL%" == "" set "HB_BIN_INSTALL=%HB_INSTALL%bin\"
-if "%HB_LIB_INSTALL%" == "" set "HB_LIB_INSTALL=%HB_INSTALL%lib\%SUB_DIR%"
-if "%HB_INC_INSTALL%" == "" set "HB_INC_INSTALL=%HB_INSTALL%include"
+set "HB_BIN_INSTALL=%HB_INSTALL%\bin\"
+set "HB_LIB_INSTALL=%HB_INSTALL%\lib\%SUB_DIR%"
+set "HB_INC_INSTALL=%HB_INSTALL%\include"
 
 echo HB_BIN_INSTALL=%HB_BIN_INSTALL%
 echo HB_LIB_INSTALL=%HB_LIB_INSTALL%
@@ -83,7 +81,7 @@ echo HB_LIBLIST=%HB_LIBLIST%
    echo         - mingw32 (Cygnus/MinGW GNU C, Windows 32-bit)
    echo         - rxsnt   (EMX/RSXNT/Win32 GNU C, Windows 32-bit)
    echo         - icc     (IBM Visual Age C++, Windows 32-bit)
-   echo         - msvc    (Microsoft Visual C++, Windows 32-bit)
+   echo         - msc     (Microsoft C++, Windows 32-bit)
    echo         - watcom  (OpenWatcom, Windows 32-bit)
    echo       - When HB_ARCH=linux
    echo         - gcc     (GNU C, 32-bit)
@@ -309,8 +307,8 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if "%HB_GT_LIB%"=="gtgui" set _main=win
    if "%HB_GT_LIB%"=="gtnul" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtnul" set _main=win
-   echo cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%obj\%SUB_DIR%\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
-        cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%obj\%SUB_DIR%\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
+   echo cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\%SUB_DIR%\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
+        cl -TP -W3 %CFLAGS% -I"%HB_INC_INSTALL%" %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\%SUB_DIR%\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
    set _cons=
    set _main=
    @type msvc.log
