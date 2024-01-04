@@ -48,19 +48,16 @@ REM The Entry point for FIRST run.
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
 
-   REM Check if CC_DIR is set by user
-   IF "%CC_DIR%" NEQ "" (
-      REM Will continue as appropriate or jump to NOT_FOUND
-      CALL :CHECK_CC_DIR
-      IF ERRORLEVEL 1      GOTO NOT_FOUND
-      IF ERRORLEVEL 0      GOTO DIR_SET
-   )
+   IF "%CC%" == "" SET "CC=bcc32c"
 
-   REM Fall through to FIND_C_COMPILER
+   REM Check if CC_DIR is set by user and conttinue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
+   IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
+
+   REM CC_DIR not set so fall through to FIND_C_COMPILER
 
 :FIND_C_COMPILER
    ECHO Searching for Borland C++...
-   SET "CC=bcc32c"
+   SET "CC_DIR="
 
    REM Check if the compiler is in the path
    CALL %~dp0functions.bat findInPath CC CC_DIR
@@ -89,15 +86,13 @@ REM The Entry point for FIRST run.
    GOTO NOT_FOUND
 
 :DIR_SET
-   REM BCC specific because it has two poss9ible compilers bcc32c.exe and bcc32.exe
-
    REM Remove the trailing backslash
    IF "%CC_DIR:~-1%" == "\" CALL %~dp0functions.bat Left CC_DIR -1 CC_DIR
 
+   REM BCC specific because it has two poss9ible compilers bcc32c.exe and bcc32.exe
    IF "%CC%" == ""    IF EXIST "%CC_DIR%\bin\bcc32c.exe" SET "CC=bcc32c"
    IF "%CC%" == ""    IF EXIST "%CC_DIR%\bin\bcc32.exe"  SET "CC=bcc32"  
    
-   IF "%CC%" == ""                  GOTO NOT_FOUND
    WHERE %CC%.exe >nul 2>&1 &&      GOTO PATH_OK
    IF EXIST "%CC_DIR%\bin\%CC%.exe" GOTO PATH_SET
 
@@ -166,20 +161,14 @@ REM The Entry point for FIRST run.
 
    exit /b 0
 
-REM this is called as a FUNCTION from find_bc.bat (do not use GOTOs!!!)
-REM Returns ERRORLEVEL 2 [Abort] if CC_DIR is not set and user does not want to search for known locations.
-REM Returns ERRORLEVEL 1 [Continue] if CC_DIR is not set and user wants to search for known locations.
-REM Returns ERRORLEVEL 0 [Ready] if CC_DIR is set.
 :CHECK_CC_DIR 
 
-   IF "%CC%" == "" SET "CC=bcc32c"
    REM IF %CC% is in bin sub folder then we can SKIP the FIND_C_COMPILER section and go directly to DIR_SET
-   IF EXIST "%CC_DIR%\bin\%CC%.exe"                      EXIT /B 0
+   IF EXIST "%CC_DIR%\bin\%CC%.exe"                      GOTO DIR_SET
 
    REM BCC Specific because it has two possible compilers bcc32c.exe and bcc32.exe
    SET "CC=bcc32"
-   REM IF %CC% is in bin sub folder then we can SKIP the FIND_C_COMPILER section and go directly to DIR_SET
-   IF EXIST "%CC_DIR%\bin\%CC%.exe"                      EXIT /B 0
+   IF EXIST "%CC_DIR%\bin\%CC%.exe"                      GOTO DIR_SET
    
    REM If we are here then compiler was not found in the user specified CC_DIR!
 
@@ -190,7 +179,8 @@ REM Returns ERRORLEVEL 0 [Ready] if CC_DIR is set.
 
    REM Ask the user if they want to search for known locations.
    CALL %~dp0functions.bat continue_Y_N "Search known locations (Y/N)? "
-   IF "%ERRORLEVEL%" == "0" SET "CC_DIR=" && EXIT /B 1
-   EXIT /B 2
-
+   REM User does not want to search for known locations - Abort.
+   IF ERRORLEVEL 1                                      GOTO NOT_FOUND
+   REM User wants to search for known locations - Continue.
+   GOTO FIND_C_COMPILER
  

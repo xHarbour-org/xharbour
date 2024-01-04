@@ -40,21 +40,18 @@ REM The Entry point for FIRST run.
 
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
+   SET "CC=pocc"
 
-   REM Check if CC_DIR is set by user
-   REM Will continue as appropriate or jump to NOT_FOUND
-   IF "%CC_DIR%" NEQ "" (
-      CALL :CHECK_CC_DIR
-      IF ERRORLEVEL 1      GOTO NOT_FOUND
-      IF ERRORLEVEL 0      GOTO DIR_SET
-   )
+   REM Check if CC_DIR is set by user and conttinue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
+   IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
-   REM Fall through to FIND_C_COMPILER
+   REM CC_DIR not set so fall through to FIND_C_COMPILER
+
 
 :FIND_C_COMPILER
    ECHO Searching for Pelles C...
-   SET "CC=pocc"
-
+   SET "CC_DIR="
+   
    REM Check if the compiler is in the path
    CALL %~dp0functions.bat findInPath CC CC_DIR
    IF "%CC_DIR%" NEQ ""                         GOTO DIR_SET
@@ -71,8 +68,6 @@ REM The Entry point for FIRST run.
    GOTO NOT_FOUND
 
 :DIR_SET
-   IF "%CC%" == "" SET "CC=pocc"
-   
    REM Remove the trailing backslash
    IF "%CC_DIR:~-1%" == "\" CALL %~dp0functions.bat Left CC_DIR -1 CC_DIR
 
@@ -125,5 +120,7 @@ REM Returns ERRORLEVEL 0 [Ready] if CC_DIR is set.
 
    REM Ask the user if they want to search for known locations.
    CALL %~dp0functions.bat continue_Y_N "Search known locations (Y/N)? "
-   IF "%ERRORLEVEL%" == "0" SET "CC_DIR=" && EXIT /B 1 
-   EXIT /B %ERRORLEVEL%
+   REM User does not want to search for known locations - Abort.
+   IF ERRORLEVEL 1                                      GOTO NOT_FOUND
+   REM User wants to search for known locations - Continue. 
+   GOTO FIND_C_COMPILER

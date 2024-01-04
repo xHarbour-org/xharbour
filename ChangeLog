@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-04 12:50 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+  * winmake/find_pc.bat
+    * Minor simplification optimized CHECKED_CC_DIR to be a GOTO instead of a CALL
+  * winmake/find_vc.bat
+    * Minor simplification optimized CHECKED_CC_DIR to be a GOTO instead of a CALL
+    + Added check for %CC_DIR%\bin\%CC%.exe in :DIR_SET
+
 2024-01-03 17:15 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * bin/bld.bat
     + Added support for VS 64bit build (w64)
