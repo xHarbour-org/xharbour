@@ -89,9 +89,13 @@ REM The Entry point for FIRST run.
    REM We arrived here ONLY if %CC%.exe exists in %CC_DIR%\bin and not in PATH.
     
    REM MSC Specific! 
-   REM ECHO For your convenience %CC%'s bin directory was added to your PATH && SET "PATH=%CC_DIR%\bin;%PATH%"
-   CALL "%CC_DIR%\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-
+   IF EXIST "%CC_DIR%\Common7\Tools\VsDevCmd.bat" (
+      CALL "%CC_DIR%\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   ) ELSE (
+      REM ECHO For your convenience %CC%'s bin directory was added to your PATH && SET "PATH=%CC_DIR%\bin;%PATH%"
+      ECHO For your convenience %CC%'s bin directory was added to your PATH && SET "PATH=%CC_DIR%\bin;%PATH%"
+   )
+   
 :PATH_OK
    WHERE %CC%.exe >nul 2>&1 || GOTO NOT_FOUND
    
@@ -106,7 +110,7 @@ REM The Entry point for FIRST run.
    SET "LD=%CC%"
 
    REM MSC Specific!
-   IF "%CC_DIR:~-3%" NEQ "\Vc" SET "CC_DIR=%CC_DIR%\Vc"
+   IF EXIST "CC_DIR=%CC_DIR%\Vc" IF "%CC_DIR:~-3%" NEQ "\Vc" SET "CC_DIR=%CC_DIR%\Vc"
 
    IF "%is_x64_arch%"=="true" (
       SET "HB_VS_ARCH=x64"
