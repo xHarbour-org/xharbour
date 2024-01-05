@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-05 18:18 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * make_bc.bat
+  * make_pc.bat
+  * make_vc.bat
+  * winmake/find_bc.bat
+  * winmake/find_pc.bat
+  * winmake/find_vc.bat
+  * winmake/found_cc.bat
+  * winmake/functions.bat
+    * Simplified, fixed reported issues and added debgging
+
 2024-01-04 19:36 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
   * winmake/found_cc.bat

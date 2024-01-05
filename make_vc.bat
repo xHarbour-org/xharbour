@@ -4,7 +4,7 @@ rem
 rem $Id$
 rem
 rem FILE: make_vc.bat
-rem BATCH FILE FOR MSVC
+rem BATCH FILE FOR Microsoft C/C++
 rem
 rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
@@ -16,6 +16,7 @@ REM SET HB_WARNING_FLAGS=
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
 REM SET HB_NO_BACKGROUND=1
+
 REM SET HB_DIR_POSTGRESQL=
 REM SET HB_DIR_OCILIB=
 REM SET HB_DIR_MYSQL=
@@ -26,12 +27,7 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
-IF "%HB_ARCH%"=="64" ( 
-   SET HB_VS_ARCH=x64
-) ELSE (
-
-   SET HB_VS_ARCH=x86
-)   
+IF "%HB_ARCH%"=="w64" (SET HB_VS_ARCH=x64) ELSE (SET HB_VS_ARCH=x86)
 
 REM Make that the current directory is the same as the batch file (root of xHarbour)
 CD %~dp0
@@ -41,8 +37,31 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 
 :SET_VC
    CALL winmake\find_vc.bat
-   IF ERRORLEVEL 1 GOTO NOT_READY
+   IF ERRORLEVEL 99 GOTO ERROR_99
+   IF ERRORLEVEL  2 GOTO ABORTED
+   IF ERRORLEVEL  1 GOTO NOT_READY
+
    GOTO FIND_BISON
+
+:ERROR_99
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Unexpected error!
+   ECHO.
+   GOTO EXIT
+
+:ABORTED
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Aborted by user.
+   ECHO.
+   GOTO EXIT
 
 :NOT_READY
    ECHO.
@@ -53,27 +72,26 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
    ECHO. Microsoft Visual C/C++ not found.
    ECHO. Please install and try again.
    ECHO.
-   EXIT /B 1
+   GOTO EXIT
 
 :FIND_BISON
    IF NOT "%BISON_DIR%"=="" GOTO READY
    CALL winmake\find_bison.bat
+   IF "%CC%"=="" GOTO NOT_READY
+   GOTO READY
 
 :READY
-   IF "%SUB_DIR%"=="" SET SUB_DIR=vc32
-   IF "%HB_ARCH%"=="64" SET SUB_DIR=vc64
+   IF "%SUB_DIR%"==""    SET SUB_DIR=vc32
+   IF "%HB_ARCH%"=="w64" SET SUB_DIR=vc64
 
-   SET HB_GT_LIB=$(GTWIN_LIB)
+   REM NOT an error using $() synttax because it will be LATE expanded by make!
+   IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
    REM echo "%CC_DIR%"
-   REM echo "%RC_DIR%"
 
 :SAVE_PATH
    REM Save the original path before further modifications   
    SET _PATH=%PATH%
-
-IF "%HB_USE_BISON%"=="1" SET "PATH=%BISON_DIR%;%PATH%"
-REM echo %path%
 
 rem ============================================================================
 rem The followings should never change
@@ -231,3 +249,5 @@ rem=============================================================================
 :EXIT
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
+   set "scriptName="
+   ECHO *** END [%~f0] >> winmake\functions.log

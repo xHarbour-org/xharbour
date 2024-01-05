@@ -1,19 +1,15 @@
 @echo off
-
 rem ============================================================================
 rem
 rem $Id$
 rem
 rem FILE: make_pc.bat
-rem BATCH FILE FOR PELLESC
+rem BATCH FILE FOR Pelles C
 rem
 rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
-REM SET __MAKE__=D:\VC9\BIN\NMAKE.EXE
-REM NOTE: POMAKE 6.50 is buggy. In this case, please use NMAKE.EXE of MSVC.
-REM NOTE: POMAKE 7.00 is working fine
 
 REM SET HB_ARCH=w64
 REM SET HB_OPTIMFLAGS=-gc3
@@ -37,18 +33,41 @@ REM Make that the current directory is the same as the batch file (root of xHarb
 CD %~dp0
 
 SET "scriptName=%~n0"
-ECHO *** START [%~f0] > winmake\functions.log
+ECHO *** START [%~f0](%*) > winmake\functions.log
 
 :SET_PC
    CALL winmake\find_pc.bat
-   IF ERRORLEVEL 1 GOTO NOT_READY
+   IF ERRORLEVEL 99 GOTO ERROR_99
+   IF ERRORLEVEL  2 GOTO ABORTED
+   IF ERRORLEVEL  1 GOTO NOT_READY
+
    GOTO FIND_BISON
+
+:ERROR_99
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for  C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Unexpected error!
+   ECHO.
+   GOTO EXIT
+
+:ABORTED
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Pelles C
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Aborted by user.
+   ECHO.
+   GOTO EXIT
 
 :NOT_READY
    ECHO.
-   ECHO. -----------------------------
+   ECHO. ---------------------------------------
    ECHO. Make Utility for Pelles C
-   ECHO. -----------------------------
+   ECHO. ---------------------------------------
    ECHO.
    ECHO. Pelles C not found.
    ECHO. Please install and try again.
@@ -209,9 +228,9 @@ rem=============================================================================
 :SYNTAX
 rem=============================================================================
    ECHO.
-   ECHO. ------------------------
+   ECHO. ---------------------------------------
    ECHO. Make Utility for PellesC
-   ECHO. ------------------------
+   ECHO. ---------------------------------------
    @CALL winmake\mdir.bat howto
    goto EXIT
 
@@ -228,4 +247,5 @@ rem=============================================================================
 :EXIT
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
-   set scriptName=
+   set "scriptName="
+   ECHO *** END [%~f0] >> winmake\functions.log

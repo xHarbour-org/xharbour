@@ -139,7 +139,6 @@ echo    :value(%*) >> %~dp0functions.log
       ) ELSE (
          SET "value=%~1"
       )
-      echo   Value of %2 is %value% >> %~dp0functions.log
    ENDLOCAL & set "%~2=%value%"
    
    EXIT /b 0
@@ -333,13 +332,8 @@ echo    :findKnown(%*) >> %~dp0functions.log
    SETLOCAL EnableDelayedExpansion
 
       CALL :value %2 app
-echo Value of %2 is %app% >> %~dp0functions.log
 
-      IF "%~4" == "" (
-         SET "specificFile=\bin\!app!.exe"
-      ) ELSE (
-         SET "specificFile=%~4"
-      )
+      IF "%~4" == "" (SET "specificFile=\bin\!app!.exe") ELSE (SET "specificFile=%~4")
 
       FOR /F "tokens=*" %%G IN (%~1) DO (
          IF "!knownPathFound!" == "" (
@@ -388,7 +382,6 @@ echo    :findInPath(%*) >> %~dp0functions.log
 
    SETLOCAL EnableDelayedExpansion
       call :value %1 app
-echo Value of %1 is %app% >> %~dp0functions.log
 
       FOR /f "delims=" %%a IN ('where !app!.exe 2^>nul') DO set "exeDir=%%a"
 

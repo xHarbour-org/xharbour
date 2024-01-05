@@ -3,8 +3,8 @@ rem ============================================================================
 rem
 rem $Id$
 rem
-rem FILE: make_b32.bat
-rem BATCH FILE FOR BORLAND C++
+rem FILE: make_bc.bat
+rem BATCH FILE FOR Borland C++
 rem
 rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
@@ -35,14 +35,37 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 
 :SET_BCC
    CALL winmake\find_bc.bat
-   IF %ERRORLEVEL% NEQ 0 GOTO NOT_READY
+   IF ERRORLEVEL 99 GOTO ERROR_99
+   IF ERRORLEVEL  2 GOTO ABORTED
+   IF ERRORLEVEL  1 GOTO NOT_READY
+
    GOTO FIND_BISON
+
+:ERROR_99
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Borland C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Unexpected error!
+   ECHO.
+   GOTO EXIT
+
+:ABORTED
+   ECHO.
+   ECHO. ---------------------------------------
+   ECHO. Make Utility for Borland C/C++
+   ECHO. ---------------------------------------
+   ECHO.
+   ECHO. Aborted by user.
+   ECHO.
+   GOTO EXIT
 
 :NOT_READY
    ECHO.
-   ECHO. ------------------------------
+   ECHO. ---------------------------------------
    ECHO. Make Utility for Borland C/C++
-   ECHO. ------------------------------
+   ECHO. ---------------------------------------
    ECHO.
    ECHO. Borland C/C++ not found.
    ECHO. Please install and try again.
@@ -208,9 +231,9 @@ rem=============================================================================
 :SYNTAX
 rem=============================================================================
    ECHO.
-   ECHO. ------------------------------
+   ECHO. ---------------------------------------
    ECHO. Make Utility for Borland C/C++
-   ECHO. ------------------------------
+   ECHO. ---------------------------------------
    @CALL winmake\mdir.bat howto
    goto EXIT
 
@@ -230,3 +253,4 @@ rem=============================================================================
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
    set "scriptName="
+   ECHO *** END [%~f0] >> winmake\functions.log
