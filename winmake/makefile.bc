@@ -230,7 +230,11 @@ HB_CMD         =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) $** -o$@
 HB_CMD_MAIN    =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d_USE_APPMAIN_ $** -o$@
 CC_CMD         =$(CC) -c -tWM $(CLIBFLAGS) -o$@ $**
 
-!if ("$(HB_ARCH)"=="64")
+!if !("$(BCC_LIB)"=="")
+BCC_LIB_FLAG =-L$(BCC_LIB)
+!endif
+
+!if ("$(HB_ARCH)"=="w64")
 CC_CMD_NOWARN  =$(CC_CMD)
 !else
 CC_CMD_NOWARN  =$(CC) -c -tWM $(CLIBFLAGS) -w-8080 -w-8084 -o$@ $**
@@ -239,24 +243,24 @@ CC_CMD_NOWARN  =$(CC) -c -tWM $(CLIBFLAGS) -w-8080 -w-8084 -o$@ $**
 CC_CMD_HARBOUR =$(CC) -c -tWM -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o$@ $**
 CCC_CMD        =$(CC_CMD)
 
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 CCC_CMD_NOWARN =$(CC_CMD)
 !else
 CCC_CMD_NOWARN =$(CC) -c -tWM $(CLIBFLAGS) -w-8060 -w-8080 -w-8084 -o$@ $**
 !endif
 
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" $(OPTFLAGS) -Wno-user-defined-literals -Wno-unused-value -Wno-tautological-compare -Wno-int-to-void-pointer-cast -o$@ $**
 !else
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi -R- -H- $(OPTFLAGS) -w- -X- -o$@ $**
 !endif
 
-LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) -L$(BCC_LIB) $(LFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,
-HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) -L$(BCC_LIB) $(LFLAGS) $(BCC_STARTUP_OBJ) $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
+LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(BCC_LIB_FLAG) $(LFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,
+HRB_LINK_CMD   =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(BCC_LIB_FLAG) $(LFLAGS) $(BCC_STARTUP_OBJ) $(HARBOUR_EXE_OBJS),$(HARBOUR_EXE),,$(HRB_LIBS),,$(HARBOUR_EXE_RES)
 LIB_CMD        =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ $**
 LIB_CMD_1      =$(HBLIB_EXE) __BORLANDC__ $(LIBEXE) "$(ARFLAGS)" $@ "winmake\rtl.lst" $(OBJ_DIR)
-DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi -L$(BCC_LIB)" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(HARBOUR_DLL_RES) $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
-DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) -L$(BCC_LIB) $(BCC_STARTUP_OBJ) $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
+DLL_LINK_CMD   =@$(HBLIB_EXE) __BORLANDC__ $(LINKEXE) "-C -aa -Tpd -Gn -Gi $(BCC_LIB_FLAG)" $@ "winmake\dll.lst" $(OBJ_DIR) DLL $(RTL_DIR)\bcc.def $(HARBOUR_DLL_RES) $(VM_LIB_OBJS) $(TIFF_LIB_OBJS)
+DLLEXE_LINK_CMD=$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) $(LINKERFLAGS) $(BCC_LIB_FLAG) $(BCC_STARTUP_OBJ) $**,$@,,$(PDFLITE_LIB) $(HARBOUR_DLL_LIB) $(COMPILERLIBS)
 IMPLIB_CMD     =$(IMPLIBEXE) $@ $**
 !if ("$(CC)"=="bcc32")
 RC_CMD         =$(RC) -r -i"$(CC_DIR)\include" $** -fo$@

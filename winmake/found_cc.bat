@@ -35,16 +35,18 @@ IF "%~1" NEQ "" IF "%CC%" NEQ "%_WantsCC%" (
    REM Build the compiler name for the prompt
    IF "%CC%" == "bcc32c" SET "CC_NAME=Borland C++"               && GOTO WANTS_NAME
    IF "%CC%" == "bcc32"  SET "CC_NAME=Borland C++"               && GOTO WANTS_NAME
+   IF "%CC%" == "bcc64"  SET "CC_NAME=Borland C++ 64"            && GOTO WANTS_NAME
    IF "%CC%" == "cl"     SET "CC_NAME=Microsoft C++"             && GOTO WANTS_NAME
    IF "%CC%" == "pocc"   SET "CC_NAME=Pelles C"                  && GOTO WANTS_NAME
    ECHO '%CC%' is not supported by this batch file.
    EXIT /B 2
 
    :WANTS_NAME
-   IF "%_WantsCC%" == "bcc32c" SET "_WantsCC_NAME=Borland C++"   && GOTO SWITCH_CC
-   IF "%_WantsCC%" == "bcc32"  SET "_WantsCC_NAME=Borland C++"   && GOTO SWITCH_CC
-   IF "%_WantsCC%" == "cl"     SET "_WantsCC_NAME=Microsoft C++" && GOTO SWITCH_CC 
-   IF "%_WantsCC%" == "pocc"   SET "_WantsCC_NAME=Pelles C"      && GOTO SWITCH_CC 
+   IF "%_WantsCC%" == "bcc32c" SET "_WantsCC_NAME=Borland C++"    && GOTO SWITCH_CC
+   IF "%_WantsCC%" == "bcc32"  SET "_WantsCC_NAME=Borland C++"    && GOTO SWITCH_CC
+   IF "%_WantsCC%" == "bcc64"  SET "_WantsCC_NAME=Borland C++ 64" && GOTO SWITCH_CC
+   IF "%_WantsCC%" == "cl"     SET "_WantsCC_NAME=Microsoft C++"  && GOTO SWITCH_CC 
+   IF "%_WantsCC%" == "pocc"   SET "_WantsCC_NAME=Pelles C"       && GOTO SWITCH_CC 
    ECHO '%_WantsCC%' is not supported by this batch file.
 
    SET "_WantsCC="

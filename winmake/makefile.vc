@@ -131,7 +131,7 @@ HARBOUR_DLL_OBJS=\
 INCLUDE_DIR=-I"$(HB_DIR_ADS)" $(INCLUDE_DIR)
 !if ("$(HB_ADS_IMPLIB)"=="no")
 !else
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 COMPILERLIBS=\
     "$(HB_DIR_ADS)\ace64.lib"
 !else
@@ -186,7 +186,7 @@ CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(HBSQLIT3_LIB)
 
-!if !("$(HB_ARCH)"=="64")
+!if !("$(HB_ARCH)"=="w64")
 CONTRIB_PROJECT=\
 	$(CONTRIB_PROJECT)\
 	$(GTWVW_LIB)\
