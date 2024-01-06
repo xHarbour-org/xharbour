@@ -176,10 +176,26 @@ GOTO FIND_EXIT_99
 
 :PATH_OK
    WHERE %CC%.exe >nul 2>&1 || GOTO NOT_FOUND
+   GOTO FOUND
 
-   IF "%BCC_LIB%" NEQ "" GOTO FOUND
+:NOT_FOUND
+   REM Let's return an error code to the caller
+   ECHO "ERROR: Borland C++ not found!"
+   GOTO FIND_EXIT_1
+   
+:FOUND
+   REM Must be bcc32.exe or it would have been set to bcc32c.exe above
+   SET "LD=%CC%"
 
-   REM Let's borrow the LIB paths from the config file 
+   REM BCC specific because it has three possible compilers bcc32c.exe and bcc32.exe
+   IF "%CC%" == "bcc32c" SET "SUB_DIR=b32c" && SET "HB_ARCH=w32"
+   IF "%CC%" == "bcc32"  SET "SUB_DIR=b32"  && SET "HB_ARCH=w32"
+   IF "%CC%" == "bcc64"  SET "SUB_DIR=b64"  && SET "HB_ARCH=w64"
+
+   IF "%BCC_LIB%" NEQ "" GOTO FIND_EXIT_0
+
+   REM Let's borrow the LIB paths from the config file
+   echo Start BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
    SETLOCAL EnableDelayedExpansion
       SET LIB_PATHS=
 
@@ -192,7 +208,7 @@ GOTO FIND_EXIT_99
          echo Added LIB path: !path! >> %~dp0\functions.log
       )
    ENDLOCAL & SET "BCC_LIB=%LIB_PATHS%" & SET "LIB_PATHS="
-   echo BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
+   echo After .cfg BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
 
    REM If the config file does not have any LIB paths then let's try to guess them
    IF "%BCC_LIB%" == "" (
@@ -210,22 +226,7 @@ GOTO FIND_EXIT_99
          )
       )
    )
-   echo before found BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
-   GOTO FOUND
-
-:NOT_FOUND
-   REM Let's return an error code to the caller
-   ECHO "ERROR: Borland C++ not found!"
-   GOTO FIND_EXIT_1
-   
-:FOUND
-   REM Must be bcc32.exe or it would have been set to bcc32c.exe above
-   SET "LD=%CC%"
-
-   REM BCC specific because it has three possible compilers bcc32c.exe and bcc32.exe
-   IF "%CC%" == "bcc32c" SET "SUB_DIR=b32c" && SET "HB_ARCH=w32"
-   IF "%CC%" == "bcc32"  SET "SUB_DIR=b32"  && SET "HB_ARCH=w32"
-   IF "%CC%" == "bcc64"  SET "SUB_DIR=b64"  && SET "HB_ARCH=w64"
+   echo End BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
 
    GOTO FIND_EXIT_0
 
