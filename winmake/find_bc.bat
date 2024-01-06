@@ -180,10 +180,10 @@ GOTO FIND_EXIT_99
          SET "path=!path:@\..=%CC_DIR%!"
          IF NOT "!LIB_PATHS!" == "" SET "LIB_PATHS=!LIB_PATHS!;"
          SET "LIB_PATHS=!LIB_PATHS!!path!"
+         echo Added LIB path: !path! >> %~dp0\functions.log
       )
-      ECHO !LIB_PATHS! > %TEMP%\bcc_lib_paths.txt
-   ENDLOCAL
-   SET /P BCC_LIB=<%TEMP%\bcc_lib_paths.txt
+   ENDLOCAL & SET "BCC_LIB=%LIB_PATHS%" & SET "LIB_PATHS="
+   echo BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
 
    REM If the config file does not have any LIB paths then let's try to guess them
    IF "%BCC_LIB%" == "" (
@@ -201,6 +201,7 @@ GOTO FIND_EXIT_99
          )
       )
    )
+   echo before found BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
    GOTO FOUND
 
 :NOT_FOUND
