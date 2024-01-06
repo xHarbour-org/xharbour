@@ -16,7 +16,7 @@ RC        =RC
 RC        =BRC32
 !endif
 
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 ACE_LIB   =$(ACE64_LIB)
 !if ("$(CC)"=="")
 CC        =bcc64
@@ -53,18 +53,18 @@ CC_DEBUGFLAGS         =-g
 CC_LINKER_DEBUG_FLAGS =-v
 !endif
 
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 OPTFLAGS              =-O2 $(OPTFLAGS)
 !else
 !if ("$(CC)"=="bcc32")
-OPTFLAGS              =-O2 -OS -Ov -Oi -Oc -Ve -b -k- $(OPTFLAGS)
+OPTFLAGS              =-O2 -OS -Ov -Oi -Oc -Ve -k- $(OPTFLAGS)
 !else
-OPTFLAGS              =-O2 -b $(OPTFLAGS)
+OPTFLAGS              =-O2 $(OPTFLAGS)
 !endif
 !endif
 
 !if !("$(HB_DIR_ADS)"=="")
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 ACE_DLL="$(HB_DIR_ADS)\ace64.dll"
 !else
 ACE_DLL="$(HB_DIR_ADS)\ace32.dll"
@@ -81,7 +81,7 @@ HB_ADS_CREATEIMPLIB=0
 ARFLAGS=/0 /C /P256
 !endif
 
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 ARFLAGS        =/A $(ARFLAGS)
 BCC_STARTUP_OBJ=c0x64.o
 COMPILERLIBS   =\
@@ -99,7 +99,7 @@ COMPILERLIBS   =\
 !endif
 
 !if ("$(WARNINGFLAGS)"=="")
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 WARNINGFLAGS =-w
 !else
 !if ("$(CC)"=="bcc32")
@@ -110,7 +110,7 @@ WARNINGFLAGS =-w
 !endif
 
 !if ("$(HB_DEBUG)"=="d")
-!if ("$(HB_ARCH)"=="64")
+!if ("$(HB_ARCH)"=="w64")
 WARNINGFLAGS =-w
 !else
 WARNINGFLAGS =-w -w-8027 -w-8080 -w-8121
