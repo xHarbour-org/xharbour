@@ -63,15 +63,17 @@ REM The Entry point for FIRST run.
    ver > nul REM Reset ERRORLEVEL
 
    REM BCC Specific!
-   IF "%CC%" == "" (
+   IF "%CC%" == "" GOTO CHECK_ARCH
+   GOTO AFTER_ARCH
+   
+   :CHECK_ARCH
       IF "%HB_ARCH%" == "w64" (
          SET "CC=bcc64"
-      )
-    ) ELSE (
+      ) ELSE (
          SET "CC=bcc32c"
       )
-   )
 
+   :AFTER_ARCH
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
    REM Fall through to FIND_C_COMPILER
