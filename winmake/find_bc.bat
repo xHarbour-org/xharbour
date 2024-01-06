@@ -66,7 +66,8 @@ REM The Entry point for FIRST run.
    IF "%CC%" == "" (
       IF "%HB_ARCH%" == "w64" (
          SET "CC=bcc64"
-      ELSE (
+      )
+    ) ELSE (
          SET "CC=bcc32c"
       )
    )
