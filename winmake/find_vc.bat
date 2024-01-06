@@ -48,7 +48,7 @@ REM The Entry point for FIRST run.
    REM Check if CC_DIR is set by user and conttinue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
-   REM CC_DIR not set so fall through to FIND_C_COMPILER
+   REM Fall through to FIND_C_COMPILER
 
 :FIND_C_COMPILER
    ECHO Searching for Microsoft C++...

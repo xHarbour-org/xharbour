@@ -62,6 +62,7 @@ REM The Entry point for FIRST run.
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
 
+   REM BCC Specific!
    IF "%CC%" == "" (
       IF "%HB_ARCH%" == "w64" (
          SET "CC=bcc64"

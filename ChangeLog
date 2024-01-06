@@ -8,10 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-06 13:50 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+  * winmake/find_pc.bat
+  * winmake/find_vc.bat
+    * Synched the latest modification of REM fix.
+
 2024-01-06 13:42 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
     * Expanded complex IF to multi line for easier reading
-    * Modfied REM that caused buggy batch parser to complain of CHECK_CC_DIR as non existent label
+    * Modified REM that caused buggy batch parser to complain of CHECK_CC_DIR as non existent label
 
 2024-01-06 13:25 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
