@@ -19,7 +19,15 @@ IF "%scriptName%" == ""  SET "scriptName=%~n0" && ECHO *** START(%*) [%~f0] > %~
 REM Set path if not already set
 IF "%HB_INSTALL%" == ""  CALL %~dp0functions.bat toAbsPath %~dp0.. HB_INSTALL
 IF "%HB_INSTALL%" == ""  (SET "HB_INSTALL=%~dp0..") && ECHO "Warning: HB_INSTALL was not set by :toAbsPath so reverting to %~dp0.."
-IF "%HB_INSTALL%" NEQ "" (WHERE harbour.exe > nul 2>&1 || ((ECHO For your convenience xHarbour's bin directory was added to your PATH.) && (SET "PATH=%HB_INSTALL%\bin;%PATH%")))
+
+SETLOCAL EnableDelayedExpansion
+   IF "!PATH:%HB_INSTALL%\bin;=!" == "!PATH!" (
+      SET "_XHB_IN_PATH=%HB_INSTALL%\bin;!PATH!"
+      ECHO For your convenience xHarbour's bin directory was added to your PATH.
+   ) ELSE (
+      SET "_XHB_IN_PATH=!PATH!"
+   )
+ENDLOCAL & SET "PATH=%_XHB_IN_PATH%" & SET "_XHB_IN_PATH="
 
 REM Clearly NOT FOUND if CC_DIR is not set, or BOTH CC and _WantsCC are not set.
 IF "%CC_DIR%" == ""                  GOTO FOUND_EXIT_1
