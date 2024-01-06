@@ -62,12 +62,17 @@ REM The Entry point for FIRST run.
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
 
-   IF "%CC%" == "" (IF "%HB_ARCH%" == "w64" (SET "CC=bcc64") ELSE (SET "CC=bcc32c"))
+   IF "%CC%" == "" (
+      IF "%HB_ARCH%" == "w64" (
+         SET "CC=bcc64"
+      ELSE (
+         SET "CC=bcc32c"
+      )
+   )
 
-   REM Check if CC_DIR is set by user and continue as appropriate
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
-   REM CC_DIR not set so fall through to FIND_C_COMPILER
+   REM Fall through to FIND_C_COMPILER
 
 :FIND_C_COMPILER
    ECHO Searching for Borland C++...
@@ -220,20 +225,20 @@ GOTO FIND_EXIT_99
 
    GOTO FIND_EXIT_0
 
-:CHECK_CC_DIR 
+:CHECK_CC_DIR
    REM IF %CC% is in bin sub folder then we can SKIP the FIND_C_COMPILER section and go directly to DIR_SET
    IF EXIST "%CC_DIR%\bin\%CC%.exe"                      GOTO DIR_SET
 
    REM BCC Specific because it has three possible compilers bcc32c.exe and bcc32.exe
-   IF "%HB_ARCH%" == "w64" GOTO CHECK_CC_DIR64
-   :CHECK_CC_DIR32
+   IF "%HB_ARCH%" == "w64" GOTO CHK_CC_DIR64
+   :CHK_CC_DIR32
       SET "CC=bcc32c"
       IF EXIST "%CC_DIR%\bin\%CC%.exe"                      GOTO DIR_SET
 
       SET "CC=bcc32"
       IF EXIST "%CC_DIR%\bin\%CC%.exe"                      GOTO DIR_SET
 
-   :CHECK_CC_DIR64
+   :CHK_CC_DIR64
       SET "CC=bcc64"
       IF EXIST "%CC_DIR%\bin\%CC%.exe" SET "HB_ARCH=w64" && GOTO DIR_SET
       REM Fall through...
