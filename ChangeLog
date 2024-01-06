@@ -8,9 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-06 13:03 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/found_cc.bat
+    * Corrected BCC_LIB assignment to not use temp file
+    + Added debug output of BCC_LIB generation to functions.log
+
 2024-01-06 11:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/found_cc.bat
-    ! Fixed tthe test for xHarbour's bin in path to nott use where. 
+    ! Fixed the test for xHarbour's bin in path to not use where. 
 
 2024-01-05 22:12 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/found_cc.bat
