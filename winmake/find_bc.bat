@@ -64,7 +64,7 @@ REM The Entry point for FIRST run.
 
    IF "%CC%" == "" (IF "%HB_ARCH%" == "w64" (SET "CC=bcc64") ELSE (SET "CC=bcc32c"))
 
-   REM Check if CC_DIR is set by user and conttinue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
+   REM Check if CC_DIR is set by user and continue as appropriate
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
    REM CC_DIR not set so fall through to FIND_C_COMPILER
