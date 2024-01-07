@@ -269,6 +269,7 @@ GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
    SET "scriptName="
+   echo EXIT BCC_LIB: %BCC_LIB% >> %~dp0\functions.log
    ECHO    *** finished[0] [%~f0] >> %~dp0\functions.log
    exit /b 0
 
