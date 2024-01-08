@@ -67,3 +67,8 @@ How to build from sources
   Linux:
   ------
   ./buildxbuilder.sh
+
+  MacOS:
+  ------
+  ./buildxbuilder.sh
+  
