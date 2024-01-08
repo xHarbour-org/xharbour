@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-08 19:04 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include/hbver.h
+    * Bumped to 1.3.1
+
 2024-01-08 16:12 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
     ! reactivated build of gtwvg.lib, gtwvw.lib and xwt.lib in 64 bit
