@@ -42,9 +42,9 @@ Valid installation of a C/C++ compiler.
   --------
   Following are some FREE choices:
   
-    https://www.embarcadero.com/free-tools/ccompiler/free-download
-    http://www.smorgasbordet.com/pellesc/
-    https://visualstudio.microsoft.com/downloads/
+    - https://www.embarcadero.com/free-tools/ccompiler/free-download
+    - http://www.smorgasbordet.com/pellesc/
+    - https://visualstudio.microsoft.com/downloads/
     
   Linux:
   ------
