@@ -29,12 +29,39 @@ If you are reading this file as part of a source distribution of harbour you
 probably want to start by reading dirstruc.txt because this is your map to
 the harbour source directories.
 
-A note about building xHarbour from the source code: after the first
+How to get the latest xHarbour
+------------------------------
+1. git clone --recurse-submodules https://github.com/xHarbour-org/xharbour.git
+2. cd xharbour
+   
+Requisites to build from sources
+--------------------------------
+Valid installation of a C/C++ compiler.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone
+  Windows:
+  --------
+  Following are some FREE choices:
+    - https://www.embarcadero.com/free-tools/ccompiler/free-download
+    - http://www.smorgasbordet.com/pellesc/
+    - https://visualstudio.microsoft.com/downloads/
+    
+  Linux:
+  ------
+    - GCC or CLang
+  
+How to build from sources
+-------------------------
 
-you need to perform
+  Windows:
+  --------
+  Depending on your installed C Compiler you will use one of the following batch
+  files:
+    - make_bc.bat (for Embarcadero / Borland C++)
+    - make_pc.bat (for Pelles C)
+    - make_vc.bat (for Visual Sttudio)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule update --init --recursive
+    There additional make_??.bat for more compilers but tthey may require some addittional settings.
 
-to obttain the xbScript sub module or building will fail.
+  Linux:
+  ------
+  ./buildxbuilder.sh
