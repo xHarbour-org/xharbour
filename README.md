@@ -29,3 +29,13 @@ directory.
 If you are reading this file as part of a source distribution of harbour you
 probably want to start by reading dirstruc.txt because this is your map to
 the harbour source directories.
+
+A note about building xHarbour from the source code: after the first
+
+  git clone
+
+you need to perform
+
+  git submodule update --init --recursive
+
+to obttain the xbScript sub module or building will fail.
