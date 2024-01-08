@@ -48,7 +48,7 @@ Valid installation of a C/C++ compiler.
     
   Linux:
   ------
-    - GCC or CLang
+  GCC or CLang
 
   MacOS:
   ------
