@@ -32,10 +32,10 @@ the harbour source directories.
 
 A note about building xHarbour from the source code: after the first
 
-  git clone
+&nbsp;&nbsp;git clone
 
 you need to perform
 
-  git submodule update --init --recursive
+&nbsp;&nbsp;git submodule update --init --recursive
 
 to obttain the xbScript sub module or building will fail.
