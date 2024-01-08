@@ -49,6 +49,10 @@ Valid installation of a C/C++ compiler.
   Linux:
   ------
     - GCC or CLang
+
+  MacOS:
+  ------
+  Apple's CLang
   
 How to build from sources
 -------------------------
