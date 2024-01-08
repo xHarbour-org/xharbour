@@ -56,7 +56,7 @@
 #define HB_VER_LEX "SimpLex"
 #define HB_VER_MAJOR    1       /* Major version number */
 #define HB_VER_MINOR    3       /* Minor version number */
-#define HB_VER_REVISION 0       /* Revision number */
+#define HB_VER_REVISION 1       /* Revision number */
 
 #if defined( __XHARBOUR__ )
    #undef __XHARBOUR__
