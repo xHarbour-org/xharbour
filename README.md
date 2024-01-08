@@ -4,7 +4,7 @@ xHarbour is a portable implementation of the Clipper/xBase language
 compatible with CA-Clipper 5.2e and 5.3c, and offers many modern language extensions,
 and extensive Run-time libraries.
 
-<center>Welcome to xHarbour</center>center>
+<center>Welcome to xHarbour</center>
 
 xHarbour is a fork from the Harbour project <URL:http://harbour-project.org> -
 a free software compiler for the xBase superset language often
