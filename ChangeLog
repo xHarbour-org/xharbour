@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-08 12:06 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\common3.mak
+    ! added NODLL when CC is bcc32c
+
 2024-01-06 21:26 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * make_bc.bat
     + Added log of ERRORLEVEL on exit
