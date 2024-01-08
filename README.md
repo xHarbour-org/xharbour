@@ -41,6 +41,7 @@ Valid installation of a C/C++ compiler.
   Windows:
   --------
   Following are some FREE choices:
+  
     - https://www.embarcadero.com/free-tools/ccompiler/free-download
     - http://www.smorgasbordet.com/pellesc/
     - https://visualstudio.microsoft.com/downloads/
@@ -56,6 +57,7 @@ How to build from sources
   --------
   Depending on your installed C Compiler you will use one of the following batch
   files:
+  
     - make_bc.bat (for Embarcadero / Borland C++)
     - make_pc.bat (for Pelles C)
     - make_vc.bat (for Visual Sttudio)
