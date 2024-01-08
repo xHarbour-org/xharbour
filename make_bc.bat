@@ -253,4 +253,4 @@ rem=============================================================================
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
    set "scriptName="
-   ECHO *** END [%~f0] >> winmake\functions.log
+   ECHO *** END[%ERRORLEVEL%] [%~f0] >> winmake\functions.log
