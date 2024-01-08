@@ -61,12 +61,12 @@
 #if defined( __XHARBOUR__ )
    #undef __XHARBOUR__
 #endif
-#define __XHARBOUR__    0x0130
+#define __XHARBOUR__    0x0131
 
 #if defined( __HARBOUR__ )
    #undef __HARBOUR__
 #endif
-#define __HARBOUR__     0x0130
+#define __HARBOUR__     0x0131
 
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
