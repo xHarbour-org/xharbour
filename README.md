@@ -4,8 +4,7 @@ xHarbour is a portable implementation of the Clipper/xBase language
 compatible with CA-Clipper 5.2e and 5.3c, and offers many modern language extensions,
 and extensive Run-time libraries.
 
-                             Welcome to xHarbour
-                             ===================
+<center>Welcome to xHarbour</center>center>
 
 xHarbour is a fork from the Harbour project <URL:http://harbour-project.org> -
 a free software compiler for the xBase superset language often
@@ -32,10 +31,10 @@ the harbour source directories.
 
 A note about building xHarbour from the source code: after the first
 
-&nbsp;&nbsp;&nbsp;git clone
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone
 
 you need to perform
 
-&nbsp;&nbsp;&nbsp;git submodule update --init --recursive
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule update --init --recursive
 
 to obttain the xbScript sub module or building will fail.
