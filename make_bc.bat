@@ -79,8 +79,8 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
    GOTO READY
 
 :READY
-   IF "%SUB_DIR%"==""    SET SUB_DIR=bc32
-   IF "%HB_ARCH%"=="w64" SET SUB_DIR=bc64
+   IF "%SUB_DIR%"==""    SET SUB_DIR=b32
+   IF "%HB_ARCH%"=="w64" SET SUB_DIR=b64
 
    REM NOT an error using $() synttax because it will be LATE expanded by make!
    IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
