@@ -50,7 +50,6 @@
  *
  */
 
-#include "hbapi.h"
 #include "hbmath.h"
 
 /*

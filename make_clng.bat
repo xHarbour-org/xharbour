@@ -24,20 +24,21 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 SET HB_ARCHITECTURE=w64
-IF "%CC_DIR%"=="" SET CC_DIR=C:\llvm-mingw-20231128-msvcrt-x86_64
-IF "%SUB_DIR%"=="" SET SUB_DIR=clng64
-IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
-IF "%BISON_DIR%"=="" SET BISON_DIR=
+
+IF "%CC_DIR%"    == "" SET CC_DIR=C:/llvm-mingw-20231128-ucrt-x86_64
+IF "%SUB_DIR%"   == "" SET SUB_DIR=clng64
+IF "%HB_GT_LIB%" == "" SET HB_GT_LIB=$(GTWIN_LIB)
+IF "%BISON_DIR%" == "" SET BISON_DIR=
 
 SET _PATH=%PATH%
-SET PATH=%CC_DIR%\bin;%PATH%
+SET PATH=%CC_DIR%/bin;%PATH%
 
 rem ============================================================================
 rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
-SET DIR_SEP=\
-SET OBJEXT%HB_DEBUG%.o
+SET DIR_SEP=/
+SET OBJEXT=%HB_DEBUG%.o
 SET LIBEXT=%HB_DEBUG%.a
 SET LIBPREFIX=lib
 
@@ -67,7 +68,7 @@ rem=============================================================================
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   mingw32-make.exe -f winmake\makefile.clng 1>make0_%SUB_DIR%.log 2>make_%SUB_DIR%.log
+   mingw32-make.exe -r -d -f winmake\makefile.clng 1>make0_%SUB_DIR%.log 2>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
@@ -78,7 +79,7 @@ rem=============================================================================
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   mingw32-make.exe -f winmake\makefile.clng 1>>make0_%SUB_DIR%.log 2>>make_%SUB_DIR%.log
+   mingw32-make.exe -r -d -f winmake\makefile.clng 1>>make0_%SUB_DIR%.log 2>>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -112,7 +113,7 @@ rem=============================================================================
    SET HB_MT_DIR=%DIR_SEP%dll
    SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
-   mingw32-make.exe -f winmake\makefile.clng  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
+   mingw32-make.exe -r -d -f winmake\makefile.clng  1>dll0_%SUB_DIR%.log 2>dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 

@@ -8,7 +8,7 @@
 # version, changes should only be made on your local copy.(AJ: 2008-04-26)
 #
 #===============================================================================
-include winmake/common.mak
+include winmake$(DIR_SEP)common.mak
 
 RESEXT=.o
 RC    =windres
@@ -19,10 +19,15 @@ DEL   =$(HBRM_EXE)
 COPY  =copy
 
 ifeq ($(HB_ARCH),w64)
-C64FLAGS  =-H -DHB_OS_WIN_64 -DNODLL  -DWIN32
-HB64FLAGS =-dNODLL
+ARCH_FLAG =-m64
+C64FLAGS  =$(ARCH_FLAG -DHB_OS_WIN_64 -DNODLL  -DWIN32
+HB64FLAGS =-dNODL
+HB_TARGET =-target x86_64-w64-mingw32-ucrt
 else
-HB_TARGET =-mtune=pentium -march=x86-64
+ARCH_FLAG =-m32
+C64FLAGS  =-$(ARCH_FLAG -DHB_OS_WIN_64 -DNODLL  -DWIN32
+HB64FLAGS =-dNODL
+HB_TARGET =-target i686-w64-mingw32-ucrt
 endif
 
 ifneq ($(HB_COMP_NO_TRACE),1)
@@ -49,12 +54,12 @@ HB_OPTIMFLAGS     +=-l
 endif
 
 
-OPTFLAGS    =-W -Wall -O3 -c  $(HB_TARGET) -O3 -c  $(NOCYGWIN) 
-#OPTFLAGS1    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing $(NOCYGWIN) -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
-HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)/include" -i"$(SIXAPI_DIR)/include" -i"$(GDLIB_DIR)/include" -i"$(XWT_DIR)/include" -i"$(CGI_DIR)\include" 
+OPTFLAGS    =-W -Wall -c  $(HB_TARGET) -O3 
+#OPTFLAGS1    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
+HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)include" -i"$(SIXAPI_DIR)$(DIR_SEP)include" -i"$(GDLIB_DIR)$(DIR_SEP)include" -i"$(XWT_DIR)$(DIR_SEP)include" -i"$(CGI_DIR)$(DIR_SEP)include" 
 CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
-INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)/include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
-INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)/include" -I"$(GDLIB_DIR)/include" -I"$(XWT_DIR)/include" -I"$(XWT_DIR)/src/xwt_win" -I"$(SIXAPI_DIR)/include"
+INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)$(DIR_SEP)include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
+INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)$(DIR_SEP)include" -I"$(GDLIB_DIR)$(DIR_SEP)include" -I"$(XWT_DIR)$(DIR_SEP)include" -I"$(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win" -I"$(SIXAPI_DIR)$(DIR_SEP)include"
 
 ifneq ($(HB_NO_FM_DL_ALLOC),1)
 CC_DEFINES  +=-DHB_FM_DL_ALLOC
@@ -157,7 +162,7 @@ HARBOUR_LIBS=\
 	-Wl,--end-group
 
 COMPILERLIBS=\
-	-L$(CC_DIR)/lib\
+	-L$(CC_DIR)$(DIR_SEP)lib\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -liphlpapi -lws2_32
 
@@ -181,12 +186,12 @@ HARBOUR_DLL_OBJS+=\
 	$(TIFF_LIB_OBJS)
 
 COMPILERLIBS=\
-	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
+	-L$(CC_DIR)$(DIR_SEP)lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
 	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
 
 COMPILERLIBS1=\
-	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
+	-L$(CC_DIR)$(DIR_SEP)lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool\
 	-loleaut32 -luuid -lmpr -liphlpapi
 
@@ -227,49 +232,49 @@ endif
 
 ifneq ($(HB_DIR_OPENSSL),)
 OPTIONAL_PRJ+=$(TIPSSL_LIB) $(HBSSL_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_OPENSSL)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_OPENSSL)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_CURL),)
 OPTIONAL_PRJ+=$(HBCURL_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_CURL)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_CURL)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_CAIRO),)
 OPTIONAL_PRJ+=$(HBCAIRO_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_CAIRO)/include/cairo"
+MORE_INCLUDE+=-I"$(HB_DIR_CAIRO)$(DIR_SEP)include$(DIR_SEP)cairo"
 endif
 
 ifneq ($(HB_DIR_POSTGRESQL),)
 OPTIONAL_PRJ+=$(PGSQL_LIB) $(SDDPG_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_POSTGRESQL)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_POSTGRESQL)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_OCILIB),)
 OPTIONAL_PRJ+=$(SDDOCI_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_OCILIB)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_OCILIB)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_MYSQL),)
 OPTIONAL_PRJ+=$(MYSQL_LIB) $(SDDMY_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_MYSQL)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_MYSQL)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_FIREBIRD),)
 OPTIONAL_PRJ+=$(FIREBIRD_LIB) $(SDDFB_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_FIREBIRD)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_FIREBIRD)$(DIR_SEP)include"
 endif
 
 ifneq ($(HB_DIR_MAGIC),)
 OPTIONAL_PRJ+=$(HBMAGIC_LIB)
-MORE_INCLUDE+=-I"$(HB_DIR_MAGIC)/include"
+MORE_INCLUDE+=-I"$(HB_DIR_MAGIC)$(DIR_SEP)include"
 endif
 
 CLIBFLAGS  +=$(MORE_INCLUDE)
 
 ifeq ($(HB_ADS_IMPLIB),no)
 RDDADS_LIB_OBJS+=\
-	$(OBJ_DIR)/ace32$(OBJEXT)
+	$(OBJ_DIR)$(DIR_SEP)ace32$(OBJEXT)
 endif
 
 CONTRIB_PROJECT+=\
@@ -293,25 +298,25 @@ RC_CMD          =$(RC) --input=$^ --output=$@
 LIB_CMD         =$(DEL) $@ && AR cru $@ $^ && ranlib $@
 LIB_CMD_1       =$(LIB_CMD)
 ifneq ($(HB_ARCH),w64)
-DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ @winmake/mingw.rsp $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
+DLL_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ @winmake$(DIR_SEP)mingw.rsp $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 else
-DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
+DLL_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 endif
-DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
-LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
-HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(NOCYGWIN) $(HRB_LIBS) $(HARBOUR_EXE_RES)
+DLLEXE_LINK_CMD =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -Wall -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+LINK_CMD        =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^
+HRB_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(HRB_LIBS) $(HARBOUR_EXE_RES)
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
 HB_CMD_MAIN     =$(HARBOUR_EXE) -n0 $(HARBOURFLAGS) -d"_USE_APPMAIN_" -o$@ $^
-CC_CMD          =$(CC) $(CLIBFLAGS) -I"include"  -o $@ $^
-CC_CMD_NOWARN   =$(CC) $(CLIBFLAGS) -I"include"  -o $@ $^
+CC_CMD          =$(CC) $(CLIBFLAGS) -o $@ $^
+CC_CMD_NOWARN   =$(CC) $(CLIBFLAGS) -o $@ $^
 CC_CMD_HARBOUR  =$(CC) -D__HB_COMPILER__ $(CC_COMP_DEFINES) $(CLIBFLAGS) -o $@ $^
 CCC_CMD         =$(CC_CMD)
 CCC_CMD_NOWARN  =$(CC_CMD)
-CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)/include" -D_WIN32 $(ZIP_DEBUGFLAGS) -fpermissive -c -o $@ $^
+CC_CMD_ZIP      =$(CCP) $(CC_DEBUGFLAGS) -I"include" -I"$(HBZIP_DIR)$(DIR_SEP)include" -D_WIN32 $(ZIP_DEBUGFLAGS) -fpermissive -c -o $@ $^
 
 #===============================================================================
 # Building rules of Object files
 #===============================================================================
 
-include winmake/common2.mak
-include winmake/compile.mak
+include winmake$(DIR_SEP)common2.mak
+include winmake$(DIR_SEP)compile.mak
