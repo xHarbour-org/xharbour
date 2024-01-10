@@ -710,7 +710,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
       char szLastEntry[256]          = { 0 };
       char szChgLogDateID[9]         = { 0 };
       char szChgLogTimeID[5]         = { 0 };
-      char szGitFakeID[16]           = { 0 };
+      char szGitFakeID[32]           = { 0 };
    
       do
       {
@@ -757,7 +757,7 @@ static int hb_pp_parseChangelog( PHB_PP_STATE pState, const char * pszFileName,
 
             //fprintf( stderr, "ChangeLog Time ID: '%s'\n", szChgLogTimeID );
             // HB_VER_GITFAKEID and HB_VER_CVSID with ULL suffix
-            snprintf( szGitFakeID, sizeof( szGitFakeID ), "%s%sULL", szChgLogDateID, szChgLogTimeID );
+            snprintf( szGitFakeID, sizeof( szGitFakeID ), "HB_ULL( %s%s )", szChgLogDateID, szChgLogTimeID );
             //fprintf( stderr, "Git Fake ID: '%s'\n", szGitFakeID );
          }
       }

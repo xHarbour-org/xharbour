@@ -1203,8 +1203,8 @@ long hb_timeEncStr( const char * szTime )
 
       if( ulLen >= 4 )
       {
-         return ( long ) hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC +
-                ( long ) hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC +
+         return ( long ) ( hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC ) +
+                ( long ) ( hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC ) +
                 ( long ) ( hb_strVal( szTime + 4, ulLen - 4 ) * HB_DATETIMEINSEC );
       }
    }

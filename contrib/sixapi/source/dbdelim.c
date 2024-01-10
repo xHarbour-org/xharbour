@@ -326,7 +326,7 @@ HB_FUNC( __SX_DBDELIM )   // (file, delim, afields, bfor, bwhile, nnext, nrec, l
             )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   _sx_GetLine( paFields, hFileHandle, cDelimiter );
                   break;
@@ -390,7 +390,7 @@ HB_FUNC( __SX_DBDELIM )   // (file, delim, afields, bfor, bwhile, nnext, nrec, l
             while( _sx_Eval( pbCondition ) && ! sx_Eof() )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   _sx_GetLine( paFields, hFileHandle, cDelimiter );
                   break;

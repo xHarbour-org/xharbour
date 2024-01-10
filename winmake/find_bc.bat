@@ -204,7 +204,7 @@ GOTO FIND_EXIT_99
          SET "path=!line:~2!"
          SET "path=!path:@\..=%CC_DIR%!"
          IF NOT "!LIB_PATHS!" == "" SET "LIB_PATHS=!LIB_PATHS!;"
-         SET "LIB_PATHS=!LIB_PATHS!!path!"
+         SET "LIB_PATHS=!LIB_PATHS!!~path!"
          echo Added LIB path: !path! >> %~dp0\functions.log
       )
    ENDLOCAL & SET "BCC_LIB=%LIB_PATHS%" & SET "LIB_PATHS="

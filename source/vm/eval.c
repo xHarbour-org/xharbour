@@ -387,7 +387,7 @@ PHB_ITEM hb_itemDoCRef( char * szFunc, HB_SIZE ulRefMask, HB_SIZE ulPCount, ... 
             for( ulParam = 0; ulParam < ulPCount; ulParam++ )
             {
                pParam = va_arg( va, PHB_ITEM );
-               if( ulRefMask & ( 1ULL << ulParam ) )
+               if( ulRefMask & ( HB_ULL(1) << ulParam ) )
                {
                   /* when item is passed by reference then we have to put
                    * the reference on the stack instead of the item itself

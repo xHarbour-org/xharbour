@@ -212,7 +212,7 @@ HB_FUNC( SX_DBEVAL )   // (bBlock,bFor,bCOndition,nNextRecords,nRecords,lRest)
          while( ( ulCount <= nNextRecords ) && _sx_Eval( pbCondition ) && ! sx_Eof() )
          {
             ulRecNo = sx_RecNo();
-            if( ( nRecNo == ulRecNo ) )
+            if( nRecNo == ulRecNo )
             {
                _sx_Eval( pbBlock );
                break;
@@ -276,7 +276,7 @@ HB_FUNC( SX_DBEVAL )   // (bBlock,bFor,bCOndition,nNextRecords,nRecords,lRest)
          while( _sx_Eval( pbCondition ) && ! sx_Eof() )
          {
             ulRecNo = sx_RecNo();
-            if( ( nRecNo == ulRecNo ) )
+            if( nRecNo == ulRecNo )
             {
                _sx_Eval( pbBlock );
                break;

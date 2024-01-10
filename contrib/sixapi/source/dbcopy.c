@@ -299,7 +299,7 @@ HB_FUNC( __SX_DBCOPY ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd)
             )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   __sx_Copy( cNewAlias, cSourceAlias, pArray, iFieldCount );
                   break;
@@ -363,7 +363,7 @@ HB_FUNC( __SX_DBCOPY ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd)
             while( _sx_Eval( pbCondition ) && ! sx_Eof() )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   __sx_Copy( cNewAlias, cSourceAlias, pArray, iFieldCount );
                   break;

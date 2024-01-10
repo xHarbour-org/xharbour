@@ -241,7 +241,7 @@ static HB_GENC_FUNC( hb_p_frame )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmFrame( %hu, %hu );\n",
+   fprintf( cargo->yyc, "\thb_xvmFrame( %hhu, %hhu );\n",
             pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
    return 3;
 }
@@ -685,7 +685,7 @@ static HB_GENC_FUNC( hb_p_popaliasedfieldnear )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\tif( hb_xvmPopAliasedField( symbols + %hu ) ) break;\n",
+   fprintf( cargo->yyc, "\tif( hb_xvmPopAliasedField( symbols + %hhu ) ) break;\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -721,7 +721,7 @@ static HB_GENC_FUNC( hb_p_poplocalnear )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPopLocal( %hd );\n",
+   fprintf( cargo->yyc, "\thb_xvmPopLocal( %hhd );\n",
             ( signed char ) pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1365,7 +1365,7 @@ static HB_GENC_FUNC( hb_p_sendwithshort )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\tif( hb_xvmSendWith( %hu ) ) break;\n",
+   fprintf( cargo->yyc, "\tif( hb_xvmSendWith( %hhu ) ) break;\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1530,7 +1530,7 @@ static HB_GENC_FUNC( hb_p_largeframe )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmFrame( %hu, %hu );\n",
+   fprintf( cargo->yyc, "\thb_xvmFrame( %hu, %hhu );\n",
             HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ),
             pFunc->pCode[ lPCodePos + 3 ] );
    return 4;

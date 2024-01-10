@@ -1258,7 +1258,7 @@ static void hb_gt_def_Box( PHB_GT pGT, int iTop, int iLeft, int iBottom, int iRi
       iLeft    = iRight;
       iRight   = i;
    }
-   iMaxRow = HB_GTSELF_MAXROW( pGT ), iMaxCol = HB_GTSELF_MAXCOL( pGT );
+   iMaxRow = HB_GTSELF_MAXROW( pGT ); iMaxCol = HB_GTSELF_MAXCOL( pGT );
 
    if( iTop <= iMaxRow && iLeft <= iMaxCol && iBottom >= 0 && iRight >= 0 )
    {

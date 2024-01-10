@@ -6773,7 +6773,7 @@ static int strincpy( char * ptro, char * ptri )
 
      *ptro = *ptri;
 
-     ptro++, ptri++, len++;
+     ptro++; ptri++; len++;
   }
 
   return len;

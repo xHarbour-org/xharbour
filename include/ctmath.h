@@ -68,7 +68,7 @@ extern int ct_math_exit (void);
 
 /* set & get precision */
 extern void ct_setprecision (int iPrecision);
-extern int ct_getprecision();
+extern int ct_getprecision(void);
 
 #define CT_PI     3.14159265358979323846
 #define CT_PI_2   1.57079632679489661923

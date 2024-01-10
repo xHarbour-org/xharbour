@@ -1388,8 +1388,8 @@ static int CALLBACK FontEnumCallBack( LOGFONT * lplf, TEXTMETRIC * lpntm, DWORD 
    hb_arrayNew( &SubItems, 4 );
    hb_arraySetC( &SubItems, 1, lplf->lfFaceName                      );
    hb_arraySetL( &SubItems, 2, lplf->lfPitchAndFamily & FIXED_PITCH  );
-   hb_arraySetL( &SubItems, 3, FontType && TRUETYPE_FONTTYPE         );
-   hb_arraySetNL( &SubItems, 4, lpntm->tmCharSet                      );
+   hb_arraySetL( &SubItems, 3, FontType & TRUETYPE_FONTTYPE          );
+   hb_arraySetNL( &SubItems, 4, lpntm->tmCharSet                     );
    hb_arrayAddForward( ( PHB_ITEM ) pArray, &SubItems );
 
    return TRUE;

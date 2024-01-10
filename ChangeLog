@@ -8,6 +8,52 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-09 20:59 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * contrib/sixapi/source/dbcopy.c
+  * contrib/sixapi/source/dbdelim.c
+  * contrib/sixapi/source/dbeval.c
+  * contrib/sixapi/source/dbsort.c
+    - Removed redundant () to avoid compiler warning
+
+  * include/ctmath.h
+    - Added misssing void to avoid compiler warning
+  * include/hbdefs.h
+    + Added && ! defined(__clang__) to __BORLANDC__ if fix error under CLang based BCC
+  * source/common/hbdate.c
+    + Added () to cast to avoid compiler warning
+  * source/compiler/gencc.c
+    * Corrected format  specifier %hu to %hhu and %hd to %hhd to avoid compiler warning
+
+  * source/ct/ctnet.c
+  * source/compiler/gencobj.c
+  * source/rtl/hbwinole.c
+  * source/rtl/is.c
+  * source/rtl/win32prn.prg
+    - Removed UTF8 characters to avoid compiler warning
+
+  * source/vm/eval.c
+  * source/pp/ppgen.c
+    * Fixed ULL suffix tto use HB_ULL() macro
+
+  * utils/hbpp/hbppcore.c
+  * source/rtl/hbgtcore.c
+    * Corrected few commas to semicolons to avoid compiler warning
+
+  * source/rtl/hbsrlraw.c
+    * Corrected 1 HB_SIZE to HB_OFFSET to avoid compiler warning
+  * winmake/find_bc.bat
+    + !path! to !~path~ in .cfg file processing incasse patth has quotes
+
+  * winmake/find_bison.bat
+    + Added few more known locations for win_bison.exe
+
+  * make_gc64.bat
+    * Corrected HB_ARCH=64 to =w64
+
+  + winmake/makefile.clng
+  + make_clng.bat
+    + New files to support MingW-CLang (work in progress)
+
 2024-01-09 11:40 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_bc.bat
     ! changed the name of the SUB_DIR: b32 and b64 instead of bc32 and bc64

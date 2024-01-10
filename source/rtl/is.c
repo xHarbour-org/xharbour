@@ -214,9 +214,9 @@ HB_FUNC( ISPUNCT )
       hb_retl( FALSE );
 }
 
-/* determines if first char of a string is a whiteÄspace character;
-   that is, a horizontal tab, a newÄline, a vertical tab, a formÄfeed,
-   a carriageÄreturn or a space.
+/* determines if first char of a string is a white space character;
+   that is, a horizontal tab, a new line, a vertical tab, a form feed,
+   a carriage return or a space.
  */
 
 HB_FUNC( ISSPACE )
@@ -232,7 +232,7 @@ HB_FUNC( ISSPACE )
 }
 
 /* determines if first char of a string is a hexadecimal digit
-   ('A' Ä 'F', 'a' Ä 'f', or '0' Ä'9').
+   ('A' - 'F', 'a' - 'f', or '0' - '9').
  */
 
 HB_FUNC( ISXDIGIT )

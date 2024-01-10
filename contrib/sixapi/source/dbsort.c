@@ -334,7 +334,7 @@ HB_FUNC( __SX_DBSORT ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd,ldescen
             )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   __sx_CopyRecord( cNewAlias, cSourceAlias );
                   break;
@@ -398,7 +398,7 @@ HB_FUNC( __SX_DBSORT ) // (file,afields,bfor,bwhile,nnext,nrec,lrest,rdd,ldescen
             while( _sx_Eval( pbCondition ) && ! sx_Eof() )
             {
                ulRecNo = sx_RecNo();
-               if( ( nRecNo == ulRecNo ) )
+               if( nRecNo == ulRecNo )
                {
                   __sx_CopyRecord( cNewAlias, cSourceAlias );
                   break;
