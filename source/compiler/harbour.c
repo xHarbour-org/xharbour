@@ -89,7 +89,7 @@ static void hb_compGenVarPCode( BYTE, char * );                      /* generate
 static void hb_compGenLocalName( USHORT wLocal, char * szVarName );  /* generates the pcode for local variable name */
 
 static PFUNCTION hb_compFunctionNew( char *, HB_SYMBOLSCOPE );       /* creates and initialises the _FUNC structure */
-static PINLINE hb_compInlineNew( char * );                           /* creates and initialises the __INLINE structure */
+static PINLINE hb_compInlineNew( char * );                           /* creates and initialises the __XHBINLINE structure */
 static void hb_compCheckDuplVars( PVAR pVars, char * szVarName );    /*checks for duplicate variables definitions */
 static int hb_compProcessRSPFile( char * );                          /* process response file */
 static int hb_compCompile( char * szPrg );
@@ -1881,7 +1881,7 @@ static PINLINE hb_compInlineNew( char * szName )
 {
    PINLINE pInline;
 
-   pInline              = ( PINLINE ) hb_xgrab( sizeof( __INLINE ) );
+   pInline              = ( PINLINE ) hb_xgrab( sizeof( __XHBINLINE ) );
 
    pInline->szName      = szName;
    pInline->pCode       = NULL;

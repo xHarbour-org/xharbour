@@ -209,7 +209,7 @@ typedef struct __PINLINE
    char *       szFileName;     /* Source file name */
    int          iLine;          /* Source line number */
    struct __PINLINE * pNext;    /* pointer to the next defined inline */
-} __INLINE, * PINLINE;
+} __XHBINLINE, * PINLINE;
 
 /* structure to control all Clipper defined functions */
 typedef struct
