@@ -8,6 +8,27 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+   
+2024-01-10 22:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    * Renamed __INLINE to __XHBINLINE to avoid conflict with mingw-clang __INLINE
+
+  * source\common\hbarch.c
+    - Removed redundant #include "hbapi.h"
+    
+  * make_clng.bat
+  * winmake/common.mak
+  * winmake/compile.mak
+  * winmake/makefile.clng
+    * Finalizedd support for MingW-CLang - both 32 and 64 bit tested and working.
+
+    /*
+       I still intend to add find_clng.bat and model make_clng.bat after the new 
+       make_bc.bat make_pc.bat and make_vc.bat
+       Once properly tested I believe this should be our compiler of choice for Windows.
+     */
+
 2024-01-09 20:59 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * contrib/sixapi/source/dbcopy.c
   * contrib/sixapi/source/dbdelim.c
