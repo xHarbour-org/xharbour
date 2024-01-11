@@ -378,8 +378,11 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if "%HB_GT_LIB%" == "gtgui" set _cons=-mwindows
    if "%HB_GT_LIB%" == "gtnul" set _cons=-mwindows
 
-   echo clang %_cons% %ARCH_FLAG% -o %1.exe %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
-        clang %_cons% %ARCH_FLAG% -o %1.exe %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
+   echo clang -c %ARCH_FLAG% -o %1.o %1.c %CFLAGS% -I%HB_INC_INSTALL% 
+        clang -c %ARCH_FLAG% -o %1.o %1.c %CFLAGS% -I%HB_INC_INSTALL% 
+
+   echo clang %_cons% %ARCH_FLAG% -o %1.exe %1.o -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
+        clang %_cons% %ARCH_FLAG% -o %1.exe %1.o -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
    goto END
 
 :A_OS2
