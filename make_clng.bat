@@ -25,7 +25,7 @@ REM SET HB_DIR_ADS=
 
 SET "DIR_SEP=/"
 
-IF "%HB_ARCH%"   == "" SET HB_ARCH=w64
+IF "%HB_ARCH%"   == "" SET HB_ARCH=w32
 IF "%CC_DIR%"    == "" SET CC_DIR=C:%DIR_SEP%llvm-mingw-20231128-ucrt-x86_64
 IF "%CC%"        == "" SET CC=clang
 

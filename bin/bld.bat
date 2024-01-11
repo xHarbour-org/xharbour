@@ -31,9 +31,9 @@ if "%HB_BIN_INSTALL%" == "" if "%HB_INSTALL%" == "" (
 )
 
 REM Because HB_BIN_INSTALL may default to %~dp0, we need to make sure it ends with a backslash!!!
-set "HB_BIN_INSTALL=%HB_INSTALL%\bin\"
-set "HB_LIB_INSTALL=%HB_INSTALL%\lib\%SUB_DIR%"
-set "HB_INC_INSTALL=%HB_INSTALL%\include"
+set "HB_BIN_INSTALL=%HB_INSTALL%bin\"
+set "HB_LIB_INSTALL=%HB_INSTALL%lib\%SUB_DIR%"
+set "HB_INC_INSTALL=%HB_INSTALL%include"
 
 echo HB_BIN_INSTALL=%HB_BIN_INSTALL%
 echo HB_LIB_INSTALL=%HB_LIB_INSTALL%
@@ -364,10 +364,22 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
 
 :C_CLANG
    if not "%CC%" == "clang"  goto end
+
+   if "%HB_ARCH%"  == ""    set HB_ARCH=w32
+   if "%HB_ARCH%%" == "w32" set ARCH_FLAG=-m32
+   if "%HB_ARCH%%" == "w64" set ARCH_FLAG=-m64
+
+
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   echo clang %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip -o %1.exe
-        clang %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip -o %1.exe
+   if "%HB_GT_LIB%" == "gtwin" set _cons=-mconsole
+   if "%HB_GT_LIB%" == "gtwvt" set _cons=-mwindows
+   if "%HB_GT_LIB%" == "gtwvw" set _cons=-mwindows
+   if "%HB_GT_LIB%" == "gtgui" set _cons=-mwindows
+   if "%HB_GT_LIB%" == "gtnul" set _cons=-mwindows
+
+   echo clang %1.c %_cons% %ARCH_FLAG% %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip -o %1.exe
+        clang %1.c %_cons% %ARCH_FLAG% %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepo -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -o %1.exe
    goto END
 
 :A_OS2
