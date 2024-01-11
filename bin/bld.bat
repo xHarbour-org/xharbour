@@ -365,12 +365,12 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
 :C_CLANG
    if not "%CC%" == "clang"  goto end
 
-   if "%HB_ARCH%"  == ""    set HB_ARCH=w32
+   if "%HB_ARCH%"  == "" set HB_ARCH=w32
    if "%HB_ARCH%%" == "w32" set ARCH_FLAG=-m32
    if "%HB_ARCH%%" == "w64" set ARCH_FLAG=-m64
 
 
-   if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
+   if "%HB_GT_LIB%" == "" set HB_GT_LIB=gtwin
 
    if "%HB_GT_LIB%" == "gtwin" set _cons=-mconsole
    if "%HB_GT_LIB%" == "gtwvt" set _cons=-mwindows
