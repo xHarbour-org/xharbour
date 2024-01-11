@@ -76,14 +76,15 @@ echo HB_LIBLIST=%HB_LIBLIST%
    echo         - djgpp   (Delorie GNU C, DOS 32-bit)
    echo         - rxs32   (EMX/RSXNT/DOS GNU C, DOS 32-bit)
    echo         - watcom  (OpenWatcom, DOS 32-bit)
-   echo       - When HB_ARCH=w32
-   echo         - bcc32   (Borland C++ 4.x, 5.x, Windows 32-bit)
+   echo       - When HB_ARCH=w32/w64
+   echo         - bcc32[c] (Borland C++ 4.x, 5.x, Windows 32/64-bit)
    echo         - gcc     (Cygnus/Cygwin GNU C, Windows 32-bit)
    echo         - mingw32 (Cygnus/MinGW GNU C, Windows 32-bit)
    echo         - rxsnt   (EMX/RSXNT/Win32 GNU C, Windows 32-bit)
    echo         - icc     (IBM Visual Age C++, Windows 32-bit)
-   echo         - msc     (Microsoft C++, Windows 32-bit)
+   echo         - msc     (Microsoft C++, Windows 32/64-bit)
    echo         - watcom  (OpenWatcom, Windows 32-bit)
+   echo         - clang   (MingW-Clang, Windows 32/64-bit)
    echo       - When HB_ARCH=linux
    echo         - gcc     (GNU C, 32-bit)
    echo       - When HB_ARCH=os2
@@ -249,6 +250,7 @@ echo HB_LIBLIST=%HB_LIBLIST%
    if "%CC%" == "cl"      goto C_MSVC
    if "%CC%" == "watcom"  goto C_WATCOM
    if "%CC%" == "mingw32" goto C_MINGW32
+   if "%CC%" == "clang"   goto C_CLANG
    if "%HB_GTALLEG%" == "yes" set HB_ALGLIB=alleg.lib
 
    if "%_HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
@@ -358,6 +360,14 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    echo LIB mapi32.lib >> build.tmp
    wlink @build.tmp
    del build.tmp
+   goto END
+
+:C_CLANG
+   if not "%CC%" == "clang"  goto end
+   if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
+
+   clang -c %1.c -o %1.o %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip
+   clang %1.o -o %1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip
    goto END
 
 :A_OS2
