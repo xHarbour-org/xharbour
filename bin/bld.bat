@@ -366,8 +366,8 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if not "%CC%" == "clang"  goto end
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   clang -c %1.c -o %1.o %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip
-   clang %1.o -o %1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip
+   echo clang %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip -o %1.exe
+        clang %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lcommon -lct -ltip -o %1.exe
    goto END
 
 :A_OS2
