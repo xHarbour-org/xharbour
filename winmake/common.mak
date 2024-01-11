@@ -18,21 +18,27 @@
 # Macros for Directories. This should never change
 #===============================================================================
 BIN_DIR       =bin$(DIR_SEP)$(SUB_DIR)
+BIN_DIR2      =bin\$(SUB_DIR)
 LIB_DIR       =lib$(DIR_SEP)$(SUB_DIR)
 OBJ_DIR       =obj$(DIR_SEP)$(SUB_DIR)$(HB_MT_DIR)
+OBJ_DIR2      =obj\$(SUB_DIR)$(HB_MT_DIR)
 
 CGI_DIR       =source$(DIR_SEP)cgi
 COMMON_DIR    =source$(DIR_SEP)common
+COMMON_DIR2   =source\common
 COMPILER_DIR  =source$(DIR_SEP)compiler
+COMPILER_DIR2 =source\compiler
 DEBUG_DIR     =source$(DIR_SEP)debug
 LANG_DIR      =source$(DIR_SEP)lang
 MACRO_DIR     =source$(DIR_SEP)macro
+MACRO_DIR2    =source\macro
 PP_DIR        =source$(DIR_SEP)pp
 RDD_DIR       =source$(DIR_SEP)rdd
 RTL_DIR       =source$(DIR_SEP)rtl
 PCREPOS_DIR   =source$(DIR_SEP)rtl$(DIR_SEP)pcre
 ZLIB_DIR      =source$(DIR_SEP)rtl$(DIR_SEP)zlib
 VM_DIR        =source$(DIR_SEP)vm
+VM_DIR2       =source\vm
 CODEPAGE_DIR  =source$(DIR_SEP)codepage
 EXPORT_DEF    =source$(DIR_SEP)rtl$(DIR_SEP)export.def
 
@@ -220,21 +226,21 @@ HARBOUR_DLL_LIB =$(BIN_DIR)$(DIR_SEP)$(LIBPREFIX)xharbour$(LIBEXT)
 #===============================================================================
 # Macros For Standard Executable
 #===============================================================================
-HBRC_EXE    =$(BIN_DIR)$(DIR_SEP)hbrc$(HB_DEBUG).exe
-HBLIB_EXE   =$(BIN_DIR)$(DIR_SEP)hblib$(HB_DEBUG).exe
-HBRM_EXE    =$(BIN_DIR)$(DIR_SEP)hbrm$(HB_DEBUG).exe
-HARBOUR_EXE =$(BIN_DIR)$(DIR_SEP)harbour$(HB_DEBUG).exe
-HBPP_EXE    =$(BIN_DIR)$(DIR_SEP)hbpp$(HB_DEBUG).exe
-PPGEN_EXE   =$(BIN_DIR)$(DIR_SEP)ppgen$(HB_DEBUG).exe
-HBFILERE_EXE=$(BIN_DIR)$(DIR_SEP)hbfilere$(HB_DEBUG).exe
-HBRUN_EXE   =$(BIN_DIR)$(DIR_SEP)hbrun$(HB_MT)$(HB_DEBUG).exe
-HBTEST_EXE  =$(BIN_DIR)$(DIR_SEP)hbtest$(HB_MT)$(HB_DEBUG).exe
-HBDOC_EXE   =$(BIN_DIR)$(DIR_SEP)hbdoc$(HB_DEBUG).exe
-HBDICT_EXE  =$(BIN_DIR)$(DIR_SEP)hbdict$(HB_DEBUG).exe
-HBMAKE_EXE  =$(BIN_DIR)$(DIR_SEP)hbmake$(HB_DEBUG).exe
-HBEXTERN_EXE=$(BIN_DIR)$(DIR_SEP)hbextern$(HB_DEBUG).exe
-HBFORMAT_EXE=$(BIN_DIR)$(DIR_SEP)hbformat$(HB_DEBUG).exe
-XBSCRIPT_EXE=$(BIN_DIR)$(DIR_SEP)xbscript$(HB_DEBUG).exe
+HBRC_EXE    =$(BIN_DIR)\hbrc$(HB_DEBUG).exe
+HBLIB_EXE   =$(BIN_DIR)\hblib$(HB_DEBUG).exe
+HBRM_EXE    =$(BIN_DIR2)\hbrm$(HB_DEBUG).exe
+HARBOUR_EXE =$(BIN_DIR2)\harbour$(HB_DEBUG).exe
+HBPP_EXE    =$(BIN_DIR2)\hbpp$(HB_DEBUG).exe
+PPGEN_EXE   =$(BIN_DIR2)\ppgen$(HB_DEBUG).exe
+HBFILERE_EXE=$(BIN_DIR2)\hbfilere$(HB_DEBUG).exe
+HBRUN_EXE   =$(BIN_DIR2)\hbrun$(HB_MT)$(HB_DEBUG).exe
+HBTEST_EXE  =$(BIN_DIR2)\hbtest$(HB_MT)$(HB_DEBUG).exe
+HBDOC_EXE   =$(BIN_DIR2)\hbdoc$(HB_DEBUG).exe
+HBDICT_EXE  =$(BIN_DIR2)\hbdict$(HB_DEBUG).exe
+HBMAKE_EXE  =$(BIN_DIR2)\hbmake$(HB_DEBUG).exe
+HBEXTERN_EXE=$(BIN_DIR2)\hbextern$(HB_DEBUG).exe
+HBFORMAT_EXE=$(BIN_DIR2)\hbformat$(HB_DEBUG).exe
+XBSCRIPT_EXE=$(BIN_DIR2)\xbscript$(HB_DEBUG).exe
 
 #===============================================================================
 # Resource files

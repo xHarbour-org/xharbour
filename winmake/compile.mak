@@ -93,78 +93,78 @@ $(OBJ_DIR)$(DIR_SEP)hbver$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbver.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)hbver.c : include$(DIR_SEP)hbver.h
-	$(TYPE) $(COMMON_DIR)\hbver.c > $(OBJ_DIR)$(DIR_SEP)hbver.cxx
-	$(COPY) $(OBJ_DIR)\hbver.cxx $(OBJ_DIR)$(DIR_SEP)hbver.c
+	$(TYPE) $(COMMON_DIR2)\hbver.c > $(OBJ_DIR)$(DIR_SEP)hbver.cxx
+	$(COPY) $(OBJ_DIR2)\hbver.cxx $(OBJ_DIR2)\hbver.c
 
 $(OBJ_DIR)$(DIR_SEP)cmdarg$(HB_MT)$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)cmdarg.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)cmdarg.c : ChangeLog
-	$(TYPE) $(VM_DIR)\cmdarg.c > $(OBJ_DIR)$(DIR_SEP)cmdarg.cxx
-	$(COPY) $(OBJ_DIR)\cmdarg.cxx $(OBJ_DIR)$(DIR_SEP)cmdarg.c
+	$(TYPE) $(VM_DIR2)\cmdarg.c > $(OBJ_DIR)$(DIR_SEP)cmdarg.cxx
+	$(COPY) $(OBJ_DIR2)\cmdarg.cxx $(OBJ_DIR2)\cmdarg.c
 
 $(OBJ_DIR)$(DIR_SEP)comptool$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)comptool.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)comptool.c : ChangeLog
-	$(TYPE) $(COMPILER_DIR)\comptool.c > $(OBJ_DIR)$(DIR_SEP)comptool.cxx
-	$(COPY) $(OBJ_DIR)\comptool.cxx $(OBJ_DIR)$(DIR_SEP)comptool.c
+	$(TYPE) $(COMPILER_DIR2)\comptool.c > $(OBJ_DIR)$(DIR_SEP)comptool.cxx
+	$(COPY) $(OBJ_DIR2)\comptool.cxx $(OBJ_DIR2)\comptool.c
 
 $(OBJ_DIR)$(DIR_SEP)expropta$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)expropta.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)expropta.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
-	$(TYPE) $(COMPILER_DIR)\expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.cxx
-	$(COPY) $(OBJ_DIR)\expropta.cxx $(OBJ_DIR)$(DIR_SEP)expropta.c
+	$(TYPE) $(COMPILER_DIR2)\expropta.c > $(OBJ_DIR)$(DIR_SEP)expropta.cxx
+	$(COPY) $(OBJ_DIR2)\expropta.cxx $(OBJ_DIR2)\expropta.c
 
 $(OBJ_DIR)$(DIR_SEP)exproptb$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)exproptb.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)exproptb.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
-	$(TYPE) $(COMPILER_DIR)\exproptb.c > $(OBJ_DIR)$(DIR_SEP)exproptb.cxx
-	$(COPY) $(OBJ_DIR)\exproptb.cxx $(OBJ_DIR)$(DIR_SEP)exproptb.c
+	$(TYPE) $(COMPILER_DIR2)\exproptb.c > $(OBJ_DIR)$(DIR_SEP)exproptb.cxx
+	$(COPY) $(OBJ_DIR2)\exproptb.cxx $(OBJ_DIR2)\exproptb.c
 
 $(OBJ_DIR)$(DIR_SEP)exproptc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)exproptc.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)exproptc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
-	$(TYPE) $(COMPILER_DIR)\exproptc.c > $(OBJ_DIR)$(DIR_SEP)exproptc.cxx
-	$(COPY) $(OBJ_DIR)\exproptc.cxx $(OBJ_DIR)$(DIR_SEP)exproptc.c
+	$(TYPE) $(COMPILER_DIR2)\exproptc.c > $(OBJ_DIR)$(DIR_SEP)exproptc.cxx
+	$(COPY) $(OBJ_DIR2)\exproptc.cxx $(OBJ_DIR2)\exproptc.c
 
 $(OBJ_DIR)$(DIR_SEP)hbslex$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbslex.c
 	$(CC_CMD_HARBOUR)
 
 $(OBJ_DIR)$(DIR_SEP)hbslex.c : $(INCLUDE_DIR2)$(DIR_SEP)simplex.c
-	$(TYPE) $(COMPILER_DIR)\hbslex.c > $(OBJ_DIR)$(DIR_SEP)hbslex.cxx
-	$(COPY) $(OBJ_DIR)\hbslex.cxx $(OBJ_DIR)$(DIR_SEP)hbslex.c
+	$(TYPE) $(COMPILER_DIR2)\hbslex.c > $(OBJ_DIR)$(DIR_SEP)hbslex.cxx
+	$(COPY) $(OBJ_DIR2)\hbslex.cxx $(OBJ_DIR2)\hbslex.c
 
 $(OBJ_DIR)$(DIR_SEP)macroa$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroa.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)macroa.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexpra.c
-	$(TYPE) $(MACRO_DIR)\macroa.c > $(OBJ_DIR)$(DIR_SEP)macroa.cxx
-	$(COPY) $(OBJ_DIR)\macroa.cxx $(OBJ_DIR)$(DIR_SEP)macroa.c
+	$(TYPE) $(MACRO_DIR2)\macroa.c > $(OBJ_DIR)$(DIR_SEP)macroa.cxx
+	$(COPY) $(OBJ_DIR2)\macroa.cxx $(OBJ_DIR2)\macroa.c
 
 $(OBJ_DIR)$(DIR_SEP)macrob$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macrob.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)macrob.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprb.c
-	$(TYPE) $(MACRO_DIR)\macrob.c > $(OBJ_DIR)$(DIR_SEP)macrob.cxx
-	$(COPY) $(OBJ_DIR)\macrob.cxx $(OBJ_DIR)$(DIR_SEP)macrob.c
+	$(TYPE) $(MACRO_DIR2)\macrob.c > $(OBJ_DIR)$(DIR_SEP)macrob.cxx
+	$(COPY) $(OBJ_DIR2)\macrob.cxx $(OBJ_DIR2)\macrob.c
 
 $(OBJ_DIR)$(DIR_SEP)macroc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroc.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)macroc.c : $(INCLUDE_DIR2)$(DIR_SEP)hbexprc.c
-	$(TYPE) $(MACRO_DIR)\macroc.c > $(OBJ_DIR)$(DIR_SEP)macroc.cxx
-	$(COPY) $(OBJ_DIR)\macroc.cxx $(OBJ_DIR)$(DIR_SEP)macroc.c
+	$(TYPE) $(MACRO_DIR2)\macroc.c > $(OBJ_DIR)$(DIR_SEP)macroc.cxx
+	$(COPY) $(OBJ_DIR2)\macroc.cxx $(OBJ_DIR2)\macroc.c
 
 $(OBJ_DIR)$(DIR_SEP)macroslx$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)macroslx.c
 	$(CC_CMD)
 
 $(OBJ_DIR)$(DIR_SEP)macroslx.c : $(INCLUDE_DIR2)$(DIR_SEP)simplex.c
-	$(TYPE) $(MACRO_DIR)\macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.cxx
-	$(COPY) $(OBJ_DIR)\macroslx.cxx $(OBJ_DIR)$(DIR_SEP)macroslx.c
+	$(TYPE) $(MACRO_DIR2)\macroslx.c > $(OBJ_DIR)$(DIR_SEP)macroslx.cxx
+	$(COPY) $(OBJ_DIR2)\macroslx.cxx $(OBJ_DIR2)\macroslx.c
 
 #===============================================================================
 # Resource Dependencies
@@ -353,8 +353,8 @@ $(OBJ_DIR)$(DIR_SEP)hblib$(OBJEXT) : utils$(DIR_SEP)misc$(DIR_SEP)hblib.c
 # HBRC.EXE
 #===============================================================================
 $(OBJ_DIR)$(DIR_SEP)hbrc.c : ChangeLog
-	$(TYPE) utils$(DIR_SEP)misc$(DIR_SEP)hbrc.c > $(OBJ_DIR)$(DIR_SEP)hbrc.cxx
-	$(COPY) $(OBJ_DIR)$(DIR_SEP)hbrc.cxx $(OBJ_DIR)$(DIR_SEP)hbrc.c
+	$(TYPE) utils\misc\hbrc.c > $(OBJ_DIR)$(DIR_SEP)hbrc.cxx
+	$(COPY) $(OBJ_DIR2)\hbrc.cxx $(OBJ_DIR2)\hbrc.c
 
 $(OBJ_DIR)$(DIR_SEP)hbrc$(OBJEXT) : $(OBJ_DIR)$(DIR_SEP)hbrc.c
 	$(CC_CMD)

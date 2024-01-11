@@ -20,13 +20,14 @@ COPY  =copy
 
 ifeq ($(HB_ARCH),w64)
 ARCH_FLAG =-m64
-C64FLAGS  =$(ARCH_FLAG) -DHB_OS_WIN_64 -DNODLL  -DWIN32
-HB64FLAGS =-dNODL
+RC_ARCH_FLAG=--target=pe-x86-64
+C64FLAGS  =$(ARCH_FLAG) -DNODLL
+HB64FLAGS =-dNODLL
 HB_TARGET =-target x86_64-w64-mingw32-ucrt
 else
 ARCH_FLAG =-m32
-C64FLAGS  =-$(ARCH_FLAG) -DHB_OS_WIN_64 -DNODLL  -DWIN32
-HB64FLAGS =-dNODL
+RC_ARCH_FLAG=--target=pe-i386
+C64FLAGS  =$(ARCH_FLAG)
 HB_TARGET =-target i686-w64-mingw32-ucrt
 endif
 
@@ -56,7 +57,7 @@ endif
 
 OPTFLAGS    =-W -Wall -c  $(HB_TARGET) -O3 
 #OPTFLAGS1    =-W -Wall -fomit-frame-pointer $(HB_TARGET) -O3 -c -fno-strict-aliasing -Wmissing-braces -Wreturn-type -Wformat -Wimplicit-int -Wimplicit-function-declaration
-HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)include" -i"$(SIXAPI_DIR)$(DIR_SEP)include" -i"$(GDLIB_DIR)$(DIR_SEP)include" -i"$(XWT_DIR)$(DIR_SEP)include" -i"$(CGI_DIR)$(DIR_SEP)include" 
+HB_INCLUDE  =-i"include" -i"$(PDFLITE_DIR)$(DIR_SEP)include" -i"$(SIXAPI_DIR)$(DIR_SEP)include" -i"$(GDLIB_DIR)$(DIR_SEP)include" -i"$(XWT_DIR)$(DIR_SEP)include" -i"$(CGI_DIR)$(DIR_SEP)include" 
 CC_DEFINES  =-D__WIN32__ -DHAVE_CONFIG_H -D_HAVE_SQLITE_CONFIG_H -DHARBOUR_CONF
 INCLUDE_DIR =-I"include" -I"$(ZLIB_DIR)" -I"$(PNG_DIR)" -I"$(PDFLITE_DIR)$(DIR_SEP)include" -I"$(OBJ_DIR)" -I"$(JPEG_DIR)" -I"$(TIFF_DIR)"
 INCLUDE_DIR +=-I"$(FREEIMAGE_DIR)$(DIR_SEP)include" -I"$(GDLIB_DIR)$(DIR_SEP)include" -I"$(XWT_DIR)$(DIR_SEP)include" -I"$(XWT_DIR)$(DIR_SEP)src$(DIR_SEP)xwt_win" -I"$(SIXAPI_DIR)$(DIR_SEP)include"
@@ -115,8 +116,8 @@ BISON_CMD2   =bison -v -d -o $@ $^
 else
 HARBOUR_Y    =$(COMPILER_DIR)$(DIR_SEP)harbouryy.c
 MACRO_Y      =$(MACRO_DIR)$(DIR_SEP)macroyy.c
-BISON_CMD1   =$(TYPE) $(COMPILER_DIR)$(DIR_SEP)harbouryy.c > $(OBJ_DIR)$(DIR_SEP)harboury.c
-BISON_CMD2   =$(TYPE) $(MACRO_DIR)$(DIR_SEP)macroyy.c > $(OBJ_DIR)$(DIR_SEP)macroy.c
+BISON_CMD1   =$(TYPE) $(COMPILER_DIR2)\harbouryy.c > $(OBJ_DIR)$(DIR_SEP)harboury.c
+BISON_CMD2   =$(TYPE) $(MACRO_DIR2)\macroyy.c > $(OBJ_DIR)$(DIR_SEP)macroy.c
 endif
 
 #*******************************************************************************
@@ -134,31 +135,31 @@ endif
 HARBOUR_LIBS=\
 	-L$(LIB_DIR)\
 	-Wl,--start-group\
-	-lvm$(HB_MT)$(HB_ARCH)$(HB_DEBUG)\
-	-lrtl$(HB_ARCH)$(HB_DEBUG)\
-	-lrdd$(HB_ARCH)$(HB_DEBUG)\
-	-lct$(HB_ARCH)$(HB_DEBUG)\
-	-lpng$(HB_ARCH)$(HB_DEBUG)\
-	-lzlib$(HB_ARCH)$(HB_DEBUG)\
-	-ltiff$(HB_ARCH)$(HB_DEBUG)\
-	-ljpeg$(HB_ARCH)$(HB_DEBUG)\
-	-lpdflite$(HB_ARCH)$(HB_DEBUG)\
-	-lgtwin$(HB_ARCH)$(HB_DEBUG)\
-	-llibmisc$(HB_ARCH)$(HB_DEBUG)\
-	-lcodepage$(HB_ARCH)$(HB_DEBUG)\
-	-lmacro$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfcdx$(HB_ARCH)$(HB_DEBUG)\
-	-lbmdbfcdx$(HB_ARCH)$(HB_DEBUG)\
-	-lsixcdx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfntx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfnsx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbffpt$(HB_ARCH)$(HB_DEBUG)\
-	-lhbsix$(HB_ARCH)$(HB_DEBUG)\
-	-lhsx$(HB_ARCH)$(HB_DEBUG)\
-	-lpcrepos$(HB_ARCH)$(HB_DEBUG)\
-	-lcommon$(HB_ARCH)$(HB_DEBUG)\
-	-lpp$(HB_ARCH)$(HB_DEBUG)\
-	-llang$(HB_ARCH)$(HB_DEBUG)\
+	-lvm$(HB_MT)$(HB_DEBUG)\
+	-lrtl$(HB_DEBUG)\
+	-lrdd$(HB_DEBUG)\
+	-lct$(HB_DEBUG)\
+	-lpng$(HB_DEBUG)\
+	-lzlib$(HB_DEBUG)\
+	-ltiff$(HB_DEBUG)\
+	-ljpeg$(HB_DEBUG)\
+	-lpdflite$(HB_DEBUG)\
+	-lgtwin$(HB_DEBUG)\
+	-llibmisc$(HB_DEBUG)\
+	-lcodepage$(HB_DEBUG)\
+	-lmacro$(HB_DEBUG)\
+	-ldbfcdx$(HB_DEBUG)\
+	-lbmdbfcdx$(HB_DEBUG)\
+	-lsixcdx$(HB_DEBUG)\
+	-ldbfntx$(HB_DEBUG)\
+	-ldbfnsx$(HB_DEBUG)\
+	-ldbffpt$(HB_DEBUG)\
+	-lhbsix$(HB_DEBUG)\
+	-lhsx$(HB_DEBUG)\
+	-lpcrepos$(HB_DEBUG)\
+	-lcommon$(HB_DEBUG)\
+	-lpp$(HB_DEBUG)\
+	-llang$(HB_DEBUG)\
 	-Wl,--end-group
 
 COMPILERLIBS=\
@@ -167,8 +168,8 @@ COMPILERLIBS=\
 	-lole32 -luuid -loleaut32 -liphlpapi -lws2_32
 
 EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
-CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
+HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_DEBUG) $(COMPILERLIBS)
 
 ifeq ($(HB_MT),)
 PROJECT =$(ST_PROJECT)
@@ -188,7 +189,7 @@ HARBOUR_DLL_OBJS+=\
 COMPILERLIBS=\
 	-L$(CC_DIR)$(DIR_SEP)lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
+	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_DEBUG) -lxharbour$(HB_DEBUG)
 
 COMPILERLIBS1=\
 	-L$(CC_DIR)$(DIR_SEP)lib -L$(BIN_DIR) -L$(LIB_DIR)\
@@ -294,7 +295,7 @@ ifneq ($(HB_DEBUG),d)
 ZIP_DEBUGFLAGS  =-DNDEBUG
 endif
 
-RC_CMD          =$(RC) --input=$^ --output=$@
+RC_CMD          =$(RC) $(RC_ARCH_FLAG) --input=$^ --output=$@
 LIB_CMD         =$(DEL) $@ && AR cru $@ $^ && ranlib $@
 LIB_CMD_1       =$(LIB_CMD)
 ifneq ($(HB_ARCH),w64)
@@ -302,7 +303,7 @@ DLL_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -W
 else
 DLL_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 endif
-DLLEXE_LINK_CMD =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -Wall -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+DLLEXE_LINK_CMD =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -Wall -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 LINK_CMD        =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^
 HRB_LINK_CMD    =$(CC) $(ARCH_FLAG) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(HRB_LIBS) $(HARBOUR_EXE_RES)
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^
