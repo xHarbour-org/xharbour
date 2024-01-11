@@ -369,20 +369,26 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if "%HB_ARCH%%" == "w32" set ARCH_FLAG=-m32
    if "%HB_ARCH%%" == "w64" set ARCH_FLAG=-m64
 
+   if "%HB_ARCH%%" == "w64" set "HB_TARGET=-target x86_64-w64-mingw32-ucrt"
+   if "%HB_ARCH%%" == "w32" set "HB_TARGET=-target i686-w64-mingw32-ucrt"
+
 
    if "%HB_GT_LIB%" == "" set HB_GT_LIB=gtwin
 
-   if "%HB_GT_LIB%" == "gtwin" set _cons=-mconsole
-   if "%HB_GT_LIB%" == "gtwvt" set _cons=-mwindows
-   if "%HB_GT_LIB%" == "gtwvw" set _cons=-mwindows
-   if "%HB_GT_LIB%" == "gtgui" set _cons=-mwindows
-   if "%HB_GT_LIB%" == "gtnul" set _cons=-mwindows
+   if "%HB_GT_LIB%" == "gtwin" set _cons=-mconsole & set _main=std
+   if "%HB_GT_LIB%" == "gtwvt" set _cons=-mwindows & set _main=win
+   if "%HB_GT_LIB%" == "gtwvw" set _cons=-mwindows & set _main=win
+   if "%HB_GT_LIB%" == "gtgui" set _cons=-mwindows & set _main=win
+   if "%HB_GT_LIB%" == "gtnul" set _cons=-mwindows & set _main=win
 
    echo clang -c %ARCH_FLAG% -o %1.o %1.c %CFLAGS% -I%HB_INC_INSTALL% 
         clang -c %ARCH_FLAG% -o %1.o %1.c %CFLAGS% -I%HB_INC_INSTALL% 
 
-   echo clang %_cons% %ARCH_FLAG% -o %1.exe %1.o -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
-        clang %_cons% %ARCH_FLAG% -o %1.exe %1.o -L%HB_LIB_INSTALL% -Wl,--start-group -ldebug -lvm%HB_MT% -lrtl -l%_HB_GT_LIB% -llang -lcodepage -lrdd -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lbmdbfcdx -lredbfcdx -lhsx -lhbsix -lcommon -lct -lhbodbc -ltip -lzlib -lpcrepos -Wl,--end-group -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32 -lmapi32 -lws2_32 -lwinmm
+   echo Clang %ARCH_FLAG% %_cons% -Wall -o %1.exe ../obj/%SUB_DIR%/main%_main%.o %1.o -L../lib/%SUB_DIR% -Wl,--start-group -lvm -lrtl -lrdd -lct -lpng -lzlib -ltiff -ljpeg -lpdflite -lgtwin -llibmisc -lcodepage -lmacro -ldbfcdx -lbmdbfcdx -lsixcdx -ldbfntx -ldbfnsx -ldbffpt -lhbsix -lhsx -lpcrepos -lcommon -lpp -llang -Wl,--end-group -L%CC_DIR%/lib -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr -lole32 -luuid -loleaut32 -liphlpapi -lws2_32
+        Clang %ARCH_FLAG% %_cons% -Wall -o %1.exe ../obj/%SUB_DIR%/main%_main%.o %1.o -L../lib/%SUB_DIR% -Wl,--start-group -lvm -lrtl -lrdd -lct -lpng -lzlib -ltiff -ljpeg -lpdflite -lgtwin -llibmisc -lcodepage -lmacro -ldbfcdx -lbmdbfcdx -lsixcdx -ldbfntx -ldbfnsx -ldbffpt -lhbsix -lhsx -lpcrepos -lcommon -lpp -llang -Wl,--end-group -L%CC_DIR%/lib -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr -lole32 -luuid -loleaut32 -liphlpapi -lws2_32
+
+   set _cons=
+   set _main=
    goto END
 
 :A_OS2

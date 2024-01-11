@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-11 01:55 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * bin/bld.bat
+    + Added support for MingW-CLang
    
 2024-01-10 22:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * include/hbcomp.h
