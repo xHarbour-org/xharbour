@@ -72,7 +72,7 @@
 #include "hbver.h"
 #include "hbverbld.h"
 
-#define COMPILER_BUF_SIZE 256
+#define COMPILER_BUF_SIZE 80
 
 static char * _hb_verCompiler( void )
 {

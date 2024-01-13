@@ -611,7 +611,7 @@ BOOL hb_iswince( void )
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
 
-#define COMPILER_BUF_SIZE 256
+#define COMPILER_BUF_SIZE 80
 
 char * hb_verCompiler( void )
 {
