@@ -1,3 +1,4 @@
+@echo off
 :: Copyright (c) 2023 Ron Pinkas (ron@ronpinkas.com)
 :: 
 :: Permission is granted, free of charge, to any person obtaining a copy 
@@ -33,7 +34,6 @@ REM do make changes, please test them thoroughly. If you encounter any problems,
 REM please review the log file functions.log and consider that tthe DATA used by
 REM the failed run may very well be the explanation for the failure. 
 
-@echo off
 echo  *** Raw Arguments: (%*) >> %~dp0functions.log
 echo  *** Raw Arguments: [%1] [%2] [%3] [%4] [%5] >> %~dp0functions.log
 
@@ -236,8 +236,10 @@ echo    :toAbsPath(%*) >> %~dp0functions.log
       )
 
    call :value %1 _varOrRelPath
+   echo _varOrRelPath = %_varOrRelPath% >> %~dp0functions.log
 
-   call :innerToAbsPath %_varOrRelPath% _absPath
+   call :innerToAbsPath "%_varOrRelPath%" _absPath
+   echo _absPath = %_absPath% >> %~dp0functions.log
    set "%~2=%_absPath%"
    set "_varOrRelPath="
    set "_absPath="
@@ -246,6 +248,7 @@ echo    :toAbsPath(%*) >> %~dp0functions.log
 
       :innerToAbsPath - relPath resAbsPath 
          SET "%~2=%~f1"
+         rem echo   :innerToAbsPath(%*) = %2 >> %~dp0functions.log
          EXIT /b 0
 
 ::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -305,7 +308,88 @@ echo    :Left(%*) >> %~dp0functions.log
 
       SET "left=!str:~0,%len%!"
    ENDLOCAL & set "%~3=%left%"
+   SET "left="
    EXIT /B
+
+::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+:: Args: string cutLen varResult
+:: Returns the right cutLen (or length - cutLen if cutLen is negative) characters of string
+:Right
+echo    :Right(%*) >> %~dp0functions.log
+
+   IF "%4" NEQ "" (
+      ECHO "Too many arguments passed to: ':Right'!"
+      EXIT /b 1
+   )
+
+   CALL :isValidVarName %3
+      IF %ERRORLEVEL% NEQ 0 (
+         ECHO "Invalid result variable name: '%~3' passed to: ':Right'!"
+         EXIT /b 1
+      )
+
+   SET /a "len=%~2" 2>nul
+   IF %ERRORLEVEL% NEQ 0 (
+      ECHO "Invalid argument '%2' len:'%len%' passed to :Right!"
+      EXIT /b 1
+   )
+
+   ::Check if len is negative
+   IF %len% LSS 0 (
+      CALL :strLen %1 strLen
+      SET /a "len=%strLen%+%len%"
+   )
+
+   echo len: %len% >> %~dp0functions.log
+
+   SETLOCAL EnableDelayedExpansion
+      CALL :value %1 str
+
+      SET "right=!str:~-%len%!"
+   ENDLOCAL & set "%~3=%right%"
+   SET "right="
+   EXIT /B
+
+::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+:: Args: searchString findString ignoreCase varResult
+:: Returns true if findString is found in searchString, false otherwise 
+:: Known issues: fails with path strings.  
+:findInString
+echo    :findInString(%*) >> %~dp0functions.log
+
+   IF "%5" NEQ "" (
+      ECHO "Too many arguments passed to: ':findInString'!"
+      EXIT /b 1
+   )
+
+   CALL :isValidVarName %4
+      IF %ERRORLEVEL% NEQ 0 (
+         ECHO "Invalid result variable name: '%~3' passed to: ':findInString'!"
+         EXIT /b 1
+      )
+
+   IF "%~3" == "true" (
+      CALL :toLower %1 searchString
+      CALL :toLower %2 findString
+   ) ELSE (
+      CALL :value %1 searchString
+      CALL :value %2 findString     
+   )
+   
+   SETLOCAL EnableDelayedExpansion
+      echo Search for: '!findString!' in '!searchString!' with %3 >> %~dp0functions.log
+
+      IF "!searchString:%findString%=!" == !searchString! (
+         ECHO "Not found: '!findString!' in '!searchString!'" >> %~dp0functions.log
+         SET "_Result=false"
+      ) ELSE (
+         ECHO "Found: '!findString!' in '!searchString!'" >> %~dp0functions.log
+         SET "_Result=true"
+      )
+   ENDLOCAL & SET "%~4=%_Result%"
+
+   SET "_found="
+   EXIT /b 0
 
 ::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 :: Args: fileName compiler varResult specificFile
@@ -364,19 +448,108 @@ echo    :findKnown(%*) >> %~dp0functions.log
    )
 
 ::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-:: Args: exeName varResult
-:: Returns the root path to \bin\<exeName>.exe if found in the path
-:findInPath 
-echo    :findInPath(%*) >> %~dp0functions.log
+:: Args: pathToFind varResult
+:: Returns true if pathToFind is found in the PATH variable, false otherwise
+:isPathInPath
+echo    :isPathInPath(%*) >> %~dp0functions.log
 
-   IF "%~3" NEQ "" (
-      ECHO "Too many arguments passed to: ':findInPath'!"
+   IF "%3" NEQ "" (
+      ECHO "Too many arguments passed to: ':addIfNotInPath'!"
       EXIT /b 1
    )
 
    CALL :isValidVarName %2
       IF %ERRORLEVEL% NEQ 0 (
-         ECHO "Invalid result variable name: '%~2' passed to: ':findInPath'!"
+         ECHO "Invalid result variable name: '%~2' passed to: ':isPathInPath'!"
+         EXIT /b 1
+      )
+
+   SETLOCAL EnableDelayedExpansion
+      CALL :value %1 pathToFind
+
+      :: Iterate over each path in the PATH variable
+      FOR %%i in ("%PATH:;=","%") DO (
+         ECHO Comparing: '%%~i' with '%pathToFind%' >> %~dp0functions.log
+         IF /I "%%~i" == "%pathToFind%" (
+            GOTO :foundPathInPath
+         )
+      )
+      GOTO :notFoundPathInPath
+
+      :foundPathInPath
+         echo Path '%pathToFind%' found in '%PATH%' >> %~dp0functions.log
+         SET "_Result=true"
+         goto :endFoundPathInPath
+
+      :notFoundPathInPath
+         echo Path '%pathToFind%' NOT found in '%PATH%' >> %~dp0functions.log
+         SET "_Result=false"
+
+      :endFoundPathInPath
+   ENDLOCAL & SET "%~2=%_Result%"
+
+   SET "_Result=" 
+   EXIT /b 0
+
+::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+:: Args: pathToSearch findString varResult
+:isStrInPath
+echo    :isStrInPath(%*) >> %~dp0functions.log
+
+   IF "%4" NEQ "" (
+      ECHO "Too many arguments passed to: ':isStrInPath'!"
+      EXIT /b 1
+   )
+
+   CALL :isValidVarName %3
+      IF %ERRORLEVEL% NEQ 0 (
+         ECHO "Invalid result variable name: '%~3' passed to: ':isStrInPath'!"
+         EXIT /b 1
+      )
+
+   SETLOCAL EnableDelayedExpansion
+      CALL :toLower %1 pathToSearch
+      CALL :toLower %2 findString
+
+      :: Iterate over each path in the PATH variable
+      FOR %%i in ("%pathToSearch:;=","%") DO (
+         SET "pathPartToSearch=%%~i"
+         ECHO Searching for an instance of '!findString!' in '!pathPartToSearch!' >> %~dp0functions.log
+         IF "!pathPartToSearch:%findString%=!" NEQ "!pathPartToSearch!" (
+            echo Found: "!pathPartToSearch:%findString%=!" NEQ "!pathPartToSearch!" >> %~dp0functions.log
+            GOTO :foundStrInPath
+         )
+      )
+      GOTO :notFoundStrInPath
+
+      :foundStrInPath
+         echo String: '%findString%' found in '%pathToSearch%' >> %~dp0functions.log
+         SET "_Result=true"
+         goto :endFoundStrInPath
+
+      :notFoundStrInPath
+         echo String: '%findString%' NOT found in '%pathToSearch%' >> %~dp0functions.log
+         SET "_Result=false"
+
+      :endFoundStrInPath
+   ENDLOCAL & SET "%~3=%_Result%"
+
+   SET "_Result=" 
+   EXIT /b 0
+::-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+:: Args: exeName varResult
+:: Returns the root path to \bin\<exeName>.exe if found in the path
+:rootOfAppInPath 
+echo    :rootOfAppInPath(%*) >> %~dp0functions.log
+
+   IF "%~3" NEQ "" (
+      ECHO "Too many arguments passed to: ':rootOfAppInPath'!"
+      EXIT /b 1
+   )
+
+   CALL :isValidVarName %2
+      IF %ERRORLEVEL% NEQ 0 (
+         ECHO "Invalid result variable name: '%~2' passed to: ':rootOfAppInPath'!"
          exit /b 1
       )
 
@@ -401,7 +574,7 @@ echo    :findInPath(%*) >> %~dp0functions.log
 
    IF "%_Result%" NEQ "" (
       SET "%~2=%_Result%"
-      REM ECHO ":findInPath(%~1) found: '%_Result%'"
+      REM ECHO ":rootOfAppInPath(%~1) found: '%_Result%'"
       SET "_Result="
       EXIT /b 0 
    ) ELSE (

@@ -4,7 +4,6 @@ rem
 rem $Id$
 rem
 rem FILE: make_pc.bat
-rem BATCH FILE FOR Pelles C
 rem
 rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
@@ -35,7 +34,7 @@ CD %~dp0
 SET "scriptName=%~n0"
 ECHO *** START [%~f0](%*) > winmake\functions.log
 
-:SET_PC
+:SET_CC
    CALL winmake\find_pc.bat
    IF ERRORLEVEL 99 GOTO ERROR_99
    IF ERRORLEVEL  2 GOTO ABORTED
@@ -46,7 +45,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ERROR_99
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for  C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Unexpected error!
@@ -56,7 +55,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ABORTED
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Pelles C
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Aborted by user.
@@ -66,10 +65,10 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :NOT_READY
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Pelles C
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
-   ECHO. Pelles C not found.
+   ECHO. %C_LONG_NAME% not found.
    ECHO. Please install and try again.
    ECHO.
    GOTO EXIT
@@ -81,9 +80,6 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
    GOTO READY
 
 :READY
-   IF "%SUB_DIR%"==""    SET SUB_DIR=pc32
-   IF "%HB_ARCH%"=="w64" SET SUB_DIR=pc64
-
    REM NOT an error using $() synttax because it will be LATE expanded by make!
    IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
@@ -100,6 +96,7 @@ rem ============================================================================
 SET LIBEXT=%HB_DEBUG%.lib
 SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
+REM POCC Specific.
 IF "%HB_ARCH%"=="w64" SET LIBEXT=%HB_DEBUG%.a
 IF "%HB_ARCH%"=="w64" SET OBJEXT=%HB_DEBUG%.o
 REM SET LIBPREFIX=
@@ -127,20 +124,22 @@ rem=============================================================================
 :BUILD
 rem=============================================================================
    SET __BLD__=CORE_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >make_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.%C_SHORT_NAME% >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
    if "%2"=="NOMT" goto BUILD_OK
    if "%2"=="nomt" goto BUILD_OK
 
+   SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc >>make_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.%C_SHORT_NAME% >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -169,10 +168,12 @@ rem=============================================================================
    rem We use HB_MT_DIR envar for DLL object folder here
    rem
    SET __BLD__=DLL_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=\dll
+   REM SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
-   %__MAKE__% /F winmake\makefile.pc >dll_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.%C_SHORT_NAME% >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -198,10 +199,11 @@ rem=============================================================================
 :CONTRIBS
 rem=============================================================================
    SET __BLD__=CONTRIB_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   %__MAKE__% /F winmake\makefile.pc   >cont_%SUB_DIR%.log
+   %__MAKE__% /F winmake\makefile.%C_SHORT_NAME%   >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
 
@@ -229,7 +231,7 @@ rem=============================================================================
 rem=============================================================================
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for PellesC
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    @CALL winmake\mdir.bat howto
    goto EXIT
@@ -248,4 +250,4 @@ rem=============================================================================
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
    set "scriptName="
-   ECHO *** END [%~f0] >> winmake\functions.log
+   ECHO *** END[%ERRORLEVEL%] [%~f0] >> winmake\functions.log

@@ -27,7 +27,7 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
-IF "%HB_ARCH%"=="w64" (SET HB_VS_ARCH=x64) ELSE (SET HB_VS_ARCH=x86)
+IF "%__MAKE__%"=="" SET __MAKE__=nmake
 
 REM Make that the current directory is the same as the batch file (root of xHarbour)
 CD %~dp0
@@ -35,7 +35,7 @@ CD %~dp0
 SET "scriptName=%~n0"
 ECHO *** START [%~f0](%*) > winmake\functions.log
 
-:SET_VC
+:SET_CC
    CALL winmake\find_vc.bat
    IF ERRORLEVEL 99 GOTO ERROR_99
    IF ERRORLEVEL  2 GOTO ABORTED
@@ -46,7 +46,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ERROR_99
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Unexpected error!
@@ -56,7 +56,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ABORTED
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Aborted by user.
@@ -66,10 +66,10 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :NOT_READY
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
-   ECHO. Microsoft Visual C/C++ not found.
+   ECHO. %C_LONG_NAME% not found.
    ECHO. Please install and try again.
    ECHO.
    GOTO EXIT
@@ -81,9 +81,6 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
    GOTO READY
 
 :READY
-   IF "%SUB_DIR%"==""    SET SUB_DIR=vc32
-   IF "%HB_ARCH%"=="w64" SET SUB_DIR=vc64
-
    REM NOT an error using $() synttax because it will be LATE expanded by make!
    IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
@@ -100,7 +97,7 @@ rem ============================================================================
 SET LIBEXT=%HB_DEBUG%.lib
 SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
-REM SET LIBPREFIX=
+SET LIBPREFIX=
 rem ============================================================================
 
 if "%1"=="/?"      goto SYNTAX
@@ -125,20 +122,22 @@ rem=============================================================================
 :BUILD
 rem=============================================================================
    SET __BLD__=CORE_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   nmake /NOLOGO -f winmake\makefile.vc >make_%SUB_DIR%.log
+   %__MAKE__% /NOLOGO -f winmake\makefile.%C_SHORT_NAME% >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
    if "%2"=="NOMT" goto BUILD_OK
    if "%2"=="nomt" goto BUILD_OK
 
+   SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   nmake /NOLOGO HB_THREAD_SUPPORT=1 -f winmake\makefile.vc >>make_%SUB_DIR%.log
+   %__MAKE__% /NOLOGO -f winmake\makefile.%C_SHORT_NAME% >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -167,10 +166,12 @@ rem=============================================================================
    rem We use HB_MT_DIR envar for DLL object folder here
    rem
    SET __BLD__=DLL_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=\dll
+   REM SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
-   nmake /NOLOGO -f winmake\makefile.vc >dll_%SUB_DIR%.log
+   %__MAKE__% /NOLOGO -f winmake\makefile.%C_SHORT_NAME% >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -196,16 +197,13 @@ rem=============================================================================
 :CONTRIBS
 rem=============================================================================
    SET __BLD__=CONTRIB_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   nmake /NOLOGO -f winmake\makefile.vc >cont_%SUB_DIR%.log
+   %__MAKE__% /NOLOGO -f winmake\makefile.%C_SHORT_NAME% >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
-   REM SET HB_MT=mt
-   REM SET HB_MT_DIR=
-   REM nmake  /NOLOGO HB_THREAD_SUPPORT=1 -f winmake\makefile.vc >>cont_%SUB_DIR%.log
-   REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
@@ -231,7 +229,7 @@ rem=============================================================================
 rem=============================================================================
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Miscosoft Visual C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    @CALL winmake\mdir.bat howto
    goto EXIT
@@ -250,4 +248,4 @@ rem=============================================================================
 rem=============================================================================
    @CALL winmake\mdir.bat resetenvar
    set "scriptName="
-   ECHO *** END [%~f0] >> winmake\functions.log
+   ECHO *** END[%ERRORLEVEL%] [%~f0] >> winmake\functions.log

@@ -23,8 +23,8 @@ rem See doc/license.txt for licensing terms.
 rem ---------------------------------------------------------------
 
 if "%HB_ARCHITECTURE%" == "" set HB_ARCHITECTURE=dos
-if "%HB_COMPILER%" == "" set HB_COMPILER=djgpp
-if "%HB_GT_LIB%" == "" set HB_GT_LIB=
+if "%HB_COMPILER%"     == "" set HB_COMPILER=djgpp
+if "%HB_GT_LIB%"       == "" set HB_GT_LIB=
 
 rem set PRG_USR= 
 rem set C_USR= 

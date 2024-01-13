@@ -4,7 +4,6 @@ rem
 rem $Id$
 rem
 rem FILE: make_bc.bat
-rem BATCH FILE FOR Borland C++
 rem
 rem This is Generic File, do not change it. If you should require your own build
 rem version, changes should only be made on your local copy.(AJ:2008-04-26)
@@ -27,13 +26,15 @@ REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
 
+IF "%__MAKE__%"=="" SET __MAKE__=make
+
 REM Make that the current directory is the same as the batch file (root of xHarbour)
 CD %~dp0
 
 SET "scriptName=%~n0"
 ECHO *** START [%~f0](%*) > winmake\functions.log
 
-:SET_BCC
+:SET_CC
    CALL winmake\find_bc.bat
    IF ERRORLEVEL 99 GOTO ERROR_99
    IF ERRORLEVEL  2 GOTO ABORTED
@@ -44,7 +45,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ERROR_99
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Borland C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Unexpected error!
@@ -54,7 +55,7 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :ABORTED
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Borland C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
    ECHO. Aborted by user.
@@ -64,10 +65,10 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
 :NOT_READY
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Borland C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    ECHO.
-   ECHO. Borland C/C++ not found.
+   ECHO. %C_LONG_NAME% not found.
    ECHO. Please install and try again.
    ECHO.
    GOTO EXIT
@@ -79,9 +80,6 @@ ECHO *** START [%~f0](%*) > winmake\functions.log
    GOTO READY
 
 :READY
-   IF "%SUB_DIR%"==""    SET SUB_DIR=b32
-   IF "%HB_ARCH%"=="w64" SET SUB_DIR=b64
-
    REM NOT an error using $() synttax because it will be LATE expanded by make!
    IF "%HB_GT_LIB%" == "" SET "HB_GT_LIB=$(GTWIN_LIB)"
 
@@ -98,9 +96,7 @@ rem ============================================================================
 SET LIBEXT=%HB_DEBUG%.lib
 SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
-IF "%HB_ARCH%"=="w64" SET LIBEXT=%HB_DEBUG%.a
-IF "%HB_ARCH%"=="w64" SET OBJEXT=%HB_DEBUG%.o
-REM SET LIBPREFIX=
+SET LIBPREFIX=
 rem ============================================================================
 
 if "%1"=="/?"      goto SYNTAX
@@ -125,20 +121,22 @@ rem=============================================================================
 :BUILD
 rem=============================================================================
    SET __BLD__=CORE_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -l -fwinmake\makefile.bc >make_%SUB_DIR%.log
+   %__MAKE__% -l -fwinmake\makefile.%C_SHORT_NAME% >make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    if "%1"=="NOMT" goto BUILD_OK
    if "%1"=="nomt" goto BUILD_OK
    if "%2"=="NOMT" goto BUILD_OK
    if "%2"=="nomt" goto BUILD_OK
 
+   SET HB_THREAD_SUPPORT=1
    SET HB_MT=mt
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>make_%SUB_DIR%.log
+   %__MAKE__% -l -fwinmake\makefile.%C_SHORT_NAME% >>make_%SUB_DIR%.log
    if errorlevel 1 goto BUILD_ERR
    goto BUILD_OK
 
@@ -163,15 +161,16 @@ rem=============================================================================
 rem=============================================================================
 :DLL
 rem=============================================================================
-   IF "%HB_DEBUG%"=="d" goto EXIT
    rem
    rem We use HB_MT_DIR envar for DLL object folder here
    rem
    SET __BLD__=DLL_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=\dll
+   REM SET HB_NO_VM_ALL=1
    @CALL winmake\mdir.bat dllcreate
-   make -l -fwinmake\makefile.bc >dll_%SUB_DIR%.log
+   %__MAKE__% -l -fwinmake\makefile.%C_SHORT_NAME% >dll_%SUB_DIR%.log
    if errorlevel 1 goto DLL_ERR
    goto DLL_OK
 
@@ -197,16 +196,13 @@ rem=============================================================================
 :CONTRIBS
 rem=============================================================================
    SET __BLD__=CONTRIB_BLD
+   SET HB_THREAD_SUPPORT=
    SET HB_MT=
    SET HB_MT_DIR=
    @CALL winmake\mdir.bat
-   make -l -fwinmake\makefile.bc >cont_%SUB_DIR%.log
+   %__MAKE__% -l -fwinmake\makefile.%C_SHORT_NAME% >cont_%SUB_DIR%.log
    if errorlevel 1 goto CONTRIBS_ERR
 
-   REM SET HB_MT=mt
-   REM SET HB_MT_DIR=
-   REM make -s -l -DHB_THREAD_SUPPORT -fwinmake\makefile.bc >>cont_%SUB_DIR%.log
-   REM if errorlevel 1 goto CONTRIBS_ERR
 
 rem=============================================================================
 :CONTRIBS_OK
@@ -232,7 +228,7 @@ rem=============================================================================
 rem=============================================================================
    ECHO.
    ECHO. ---------------------------------------
-   ECHO. Make Utility for Borland C/C++
+   ECHO. Make Utility for %C_LONG_NAME%
    ECHO. ---------------------------------------
    @CALL winmake\mdir.bat howto
    goto EXIT
@@ -241,8 +237,6 @@ rem=============================================================================
 :CLEAN
 rem=============================================================================
    @CALL winmake\mdir.bat clean
-   REM IF EXIST "%HB_DIR_ADS%\ace32.dll" implib -c lib\b32\ace32.lib "%HB_DIR_ADS%\ace32.dll"
-   REM IF EXIST lib\b32\ace32.lib copy lib\b32\ace32.lib lib
    IF "%2"=="BUILD" goto BUILD_ALL
    IF "%2"=="build" goto BUILD_ALL
    @ECHO ****** End of Job *****

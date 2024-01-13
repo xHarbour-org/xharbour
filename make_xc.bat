@@ -33,9 +33,9 @@ REM SET CC_DIR=..\XCC
 REM Must set because using makefile.pc
 SET __COMP__=__XCC__
 
-IF "%__MAKE__%"=="" SET __MAKE__=POMAKE
-IF "%SUB_DIR%"=="" SET SUB_DIR=xc
-IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
+IF "%__MAKE__%"  == "" SET __MAKE__=POMAKE
+IF "%SUB_DIR%"   == "" SET SUB_DIR=xc
+IF "%HB_GT_LIB%" == "" SET HB_GT_LIB=$(GTWIN_LIB)
 
 IF NOT "%CC_DIR%"=="" GOTO FIND_BISON
 

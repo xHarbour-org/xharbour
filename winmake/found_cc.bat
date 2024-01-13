@@ -13,21 +13,33 @@ REM It checks if BOTH CC_DIR is set, and CC (or desired) and CC_DIR are in the p
 REM It supports argument to set CC, and if so it will check if desired CC is different
 REM than the current CC, and if so will prompt the user to switch to the desired CC.
 
-IF "%scriptName%" NEQ "" SET "scriptName=%~n0" && ECHO       *** started(%*) [%~f0] >> %~dp0functions.log
-IF "%scriptName%" == ""  SET "scriptName=%~n0" && ECHO *** START(%*) [%~f0] > %~dp0functions.log
+IF "%scriptName%" NEQ "" (SET "scriptName=%~n0") & ECHO       *** started(%*) [%~f0] >> %~dp0functions.log
+IF "%scriptName%" == ""  (SET "scriptName=%~n0") & ECHO *** START(%*) [%~f0] > %~dp0functions.log
 
 REM Set path if not already set
-IF "%HB_INSTALL%" == ""  CALL %~dp0functions.bat toAbsPath %~dp0.. HB_INSTALL
-IF "%HB_INSTALL%" == ""  (SET "HB_INSTALL=%~dp0..") && ECHO "Warning: HB_INSTALL was not set by :toAbsPath so reverting to %~dp0.."
+IF "%HB_INSTALL%" == "" GOTO SET_XHB_INSTALL
+GOTO CHECK_XHB_PATH
 
-SETLOCAL EnableDelayedExpansion
-   IF "!PATH:%HB_INSTALL%\bin;=!" == "!PATH!" (
-      SET "_XHB_IN_PATH=%HB_INSTALL%\bin;!PATH!"
-      ECHO For your convenience xHarbour's bin directory was added to your PATH.
-   ) ELSE (
-      SET "_XHB_IN_PATH=!PATH!"
-   )
-ENDLOCAL & SET "PATH=%_XHB_IN_PATH%" & SET "_XHB_IN_PATH="
+:SET_XHB_INSTALL
+   CALL %~dp0functions.bat toAbsPath %~dp0.. HB_INSTALL
+   echo HB_INSTALL=%HB_INSTALL% >> %~dp0functions.log
+   SET "HB_BIN_INSTALL=%HB_INSTALL%\bin"
+   SET "HB_LIB_INSTALL=%HB_INSTALL%\lib"
+   SET "HB_INC_INSTALL=%HB_INSTALL%\include"
+
+REM Fall through to SET_XHB_PATH
+
+:CHECK_XHB_PATH
+   CALL %~dp0functions.bat isPathInPath HB_BIN_INSTALL _inPath
+   IF "%_inPath%" == "false" GOTO SET_XHB_PATH
+   GOTO XHB_PATH_OK
+
+:SET_XHB_PATH
+   ECHO Adding xHarbour's bin directory '%HB_BIN_INSTALL%' to %PATH% >> %~dp0functions.log
+   SET "PATH=%HB_BIN_INSTALL%;%PATH%"
+   ECHO For your convenience xHarbour's bin directory was added to your PATH.
+
+:XHB_PATH_OK
 
 REM Clearly NOT FOUND if CC_DIR is not set, or BOTH CC and _WantsCC are not set.
 IF "%CC_DIR%" == ""                  GOTO FOUND_EXIT_1
@@ -44,39 +56,23 @@ REM Compilers mismatch so prompt user to switch
 :SET_SWITCH_CC
    :SET_CC_NAME
       REM Build the compiler name for the prompt
-      IF "%CC%" == "bcc32c" SET "CC_NAME=Borland C++"               && GOTO SET_WANTS_NAME
-      IF "%CC%" == "bcc32"  SET "CC_NAME=Borland C++"               && GOTO SET_WANTS_NAME
-      IF "%CC%" == "bcc64"  SET "CC_NAME=Borland C++ 64"            && GOTO SET_WANTS_NAME
-      IF "%CC%" == "cl"     SET "CC_NAME=Microsoft C++"             && GOTO SET_WANTS_NAME
-      IF "%CC%" == "pocc"   SET "CC_NAME=Pelles C"                  && GOTO SET_WANTS_NAME
+      IF "%CC%" == "bcc32c" (SET "CC_NAME=Borland C++")          & GOTO SET_WANTS_NAME
+      IF "%CC%" == "bcc32"  (SET "CC_NAME=Borland C++")          & GOTO SET_WANTS_NAME
+      IF "%CC%" == "bcc64"  (SET "CC_NAME=Borland C++ 64")       & GOTO SET_WANTS_NAME
+      IF "%CC%" == "cl"     (SET "CC_NAME=Microsoft C++")        & GOTO SET_WANTS_NAME
+      IF "%CC%" == "pocc"   (SET "CC_NAME=Pelles C")             & GOTO SET_WANTS_NAME
+      IF "%CC%" == "clng"   (SET "CC_NAME=Clang - on Mingw-w64") & GOTO SET_WANTS_NAME
       ECHO '%CC%' is not supported by this batch file.
       GOTO FOUND_EXIT_2
 
    :SET_WANTS_NAME
-      IF "%_WantsCC%" == "bcc32c" SET "_WantsCC_NAME=Borland C++"    && GOTO SWITCH_CC
-      IF "%_WantsCC%" == "bcc32"  SET "_WantsCC_NAME=Borland C++"    && GOTO SWITCH_CC
-      IF "%_WantsCC%" == "bcc64"  SET "_WantsCC_NAME=Borland C++ 64" && GOTO SWITCH_CC
-      IF "%_WantsCC%" == "cl"     SET "_WantsCC_NAME=Microsoft C++"  && GOTO SWITCH_CC 
-      IF "%_WantsCC%" == "pocc"   SET "_WantsCC_NAME=Pelles C"       && GOTO SWITCH_CC 
-      ECHO '%_WantsCC%' is not supported by this batch file.
-      GOTO FOUND_EXIT_2
+      SET "_WantsCC_NAME=%~2"    && GOTO SWITCH_CC
 
 :CHECK_PATH
-   REM Check if CC and CC_DIR are in the path
-   FOR /F "tokens=*" %%G IN ('where %CC%.exe 2^>nul') DO SET "_WherePath=%%G"
-   IF "%_WherePath%" == "" GOTO FOUND_EXIT_1
-
-   CALL %~dp0functions.bat strLen CC_DIR _CC_DIR_LEN
-   REM The trailing \ is important to avoid false positives 
-   SET /a "_CC_DIR_LEN+=1"
-
-   SETLOCAL EnableDelayedExpansion
-      SET "_WhereResult=!_WherePath:~0,%_CC_DIR_LEN%!"
-   ENDLOCAL & SET "_WhereResult=%_WhereResult%" & SET "CC_DIR=%CC_DIR%"
-   
-   REM %CC_DIR% was found so we are ready to go.
-   IF "%_WhereResult%" == "%CC_DIR%\" GOTO FOUND_EXIT_0
-
+   ECHO Checking if '%CC%' under '%CC_DIR%' is in the path >> %~dp0functions.log
+   CALL %~dp0functions.bat rootOfAppInPath CC _wherePath
+   ECHO _wherePath=%_wherePath% >> %~dp0functions.log
+   IF "%_wherePath%" == "%CC_DIR%" ((SET "_wherePath=") & GOTO FOUND_EXIT_0)
    REM Not found so set ERRORLEVEL to 1 and exit
    GOTO FOUND_EXIT_1
 

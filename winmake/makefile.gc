@@ -22,7 +22,7 @@ ifneq ($(NO_CYGWIN),1)
 NOCYGWIN  =-mno-cygwin
 endif
 
-ifeq ($(HB_ARCH),64)
+ifeq ($(HB_ARCH),w64)
 C64FLAGS  =-DHB_OS_WIN_64 -DNODLL  -DWIN32
 HB64FLAGS =-dNODLL
 else
@@ -133,31 +133,31 @@ endif
 HARBOUR_LIBS=\
 	-L$(LIB_DIR)\
 	-Wl,--start-group\
-	-lvm$(HB_MT)$(HB_ARCH)$(HB_DEBUG)\
-	-lrtl$(HB_ARCH)$(HB_DEBUG)\
-	-lrdd$(HB_ARCH)$(HB_DEBUG)\
-	-lct$(HB_ARCH)$(HB_DEBUG)\
-	-lpng$(HB_ARCH)$(HB_DEBUG)\
-	-lzlib$(HB_ARCH)$(HB_DEBUG)\
-	-ltiff$(HB_ARCH)$(HB_DEBUG)\
-	-ljpeg$(HB_ARCH)$(HB_DEBUG)\
-	-lpdflite$(HB_ARCH)$(HB_DEBUG)\
-	-lgtwin$(HB_ARCH)$(HB_DEBUG)\
-	-llibmisc$(HB_ARCH)$(HB_DEBUG)\
-	-lcodepage$(HB_ARCH)$(HB_DEBUG)\
-	-lmacro$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfcdx$(HB_ARCH)$(HB_DEBUG)\
-	-lbmdbfcdx$(HB_ARCH)$(HB_DEBUG)\
-	-lsixcdx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfntx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbfnsx$(HB_ARCH)$(HB_DEBUG)\
-	-ldbffpt$(HB_ARCH)$(HB_DEBUG)\
-	-lhbsix$(HB_ARCH)$(HB_DEBUG)\
-	-lhsx$(HB_ARCH)$(HB_DEBUG)\
-	-lpcrepos$(HB_ARCH)$(HB_DEBUG)\
-	-lcommon$(HB_ARCH)$(HB_DEBUG)\
-	-lpp$(HB_ARCH)$(HB_DEBUG)\
-	-llang$(HB_ARCH)$(HB_DEBUG)\
+	-lvm$(HB_MT)$(HB_DEBUG)\
+	-lrtl$(HB_DEBUG)\
+	-lrdd$(HB_DEBUG)\
+	-lct$(HB_DEBUG)\
+	-lpng$(HB_DEBUG)\
+	-lzlib$(HB_DEBUG)\
+	-ltiff$(HB_DEBUG)\
+	-ljpeg$(HB_DEBUG)\
+	-lpdflite$(HB_DEBUG)\
+	-lgtwin$(HB_DEBUG)\
+	-llibmisc$(HB_DEBUG)\
+	-lcodepage$(HB_DEBUG)\
+	-lmacro$(HB_DEBUG)\
+	-ldbfcdx$(HB_DEBUG)\
+	-lbmdbfcdx$(HB_DEBUG)\
+	-lsixcdx$(HB_DEBUG)\
+	-ldbfntx$(HB_DEBUG)\
+	-ldbfnsx$(HB_DEBUG)\
+	-ldbffpt$(HB_DEBUG)\
+	-lhbsix$(HB_DEBUG)\
+	-lhsx$(HB_DEBUG)\
+	-lpcrepos$(HB_DEBUG)\
+	-lcommon$(HB_DEBUG)\
+	-lpp$(HB_DEBUG)\
+	-llang$(HB_DEBUG)\
 	-Wl,--end-group
 
 COMPILERLIBS=\
@@ -166,8 +166,8 @@ COMPILERLIBS=\
 	-lole32 -luuid -loleaut32 -liphlpapi -lws2_32
 
 EXE_LIBS     =$(HARBOUR_LIBS) $(COMPILERLIBS)
-HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
-CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_ARCH)$(HB_DEBUG) $(COMPILERLIBS)
+HRB_LIBS     =-L$(LIB_DIR) -Wl,--start-group -lcompiler$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+CMN_LIBS     =-L$(LIB_DIR) -lcommon$(HB_DEBUG) $(COMPILERLIBS)
 
 ifeq ($(HB_MT),)
 PROJECT =$(ST_PROJECT)
@@ -187,7 +187,7 @@ HARBOUR_DLL_OBJS+=\
 COMPILERLIBS=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
 	-luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 -lwinmm -lmpr\
-	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_ARCH)$(HB_DEBUG) -lxharbour$(HB_ARCH)$(HB_DEBUG)
+	-lole32 -luuid -loleaut32 -lws2_32 -liphlpapi -ldllmain$(HB_DEBUG) -lxharbour$(HB_DEBUG)
 
 COMPILERLIBS1=\
 	-L$(CC_DIR)/lib -L$(BIN_DIR) -L$(LIB_DIR)\
@@ -296,12 +296,12 @@ endif
 RC_CMD          =$(RC) --input=$^ --output=$@
 LIB_CMD         =$(DEL) $@ && AR cru $@ $^ && ranlib $@
 LIB_CMD_1       =$(LIB_CMD)
-ifneq ($(HB_ARCH),64)
+ifneq ($(HB_ARCH),w64)
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ @winmake/mingw.rsp $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 else
 DLL_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -shared -W $(EXPORT_DEF) -Wl,--out-implib,$(HARBOUR_DLL_LIB) -o $@ $^ $(COMPILERLIBS1) $(HARBOUR_DLL_RES)
 endif
-DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_ARCH)$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
+DLLEXE_LINK_CMD =$(CC) $(CC_DEBUGFLAGS) -Wall $(NOCYGWIN) -o $@ $^ $(HARBOUR_DLL) -Wl,--start-group -lpdflite$(HB_DEBUG) -Wl,--end-group $(COMPILERLIBS)
 LINK_CMD        =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $@ $^ $(NOCYGWIN)
 HRB_LINK_CMD    =$(CC) $(CC_DEBUGFLAGS) -mconsole -Wall -o $(HARBOUR_EXE) $(HARBOUR_EXE_OBJS) $(NOCYGWIN) $(HRB_LIBS) $(HARBOUR_EXE_RES)
 HB_CMD          =$(HARBOUR_EXE) -n1 $(HARBOURFLAGS) -o$@ $^

@@ -3,6 +3,8 @@ IF "%HB_USE_BISON%" == "" GOTO END
 :FIND_BISON
    IF EXIST \win_flex_bison-2.5.25\win_bison.exe   GOTO SET_WIN_FLEX_BISON_2_5_25
    IF EXIST C:\win_flex_bison-2.5.25\win_bison.exe GOTO SET_WIN_FLEX_BISON_C_2_5_25
+   IF EXIST \winflexbison-2.5.16\win_bison.exe     GOTO SET_WINFLEXBISON_2_5_16
+   IF EXIST C:\winflexbison-2.5.16\win_bison.exe   GOTO SET_WINFLEXBISON_C_2_5_16
    IF EXIST \win_flex_bison-2.5.16\win_bison.exe   GOTO SET_WIN_FLEX_BISON_2_5_16
    IF EXIST C:\win_flex_bison-2.5.16\win_bison.exe GOTO SET_WIN_FLEX_BISON_C_2_5_16
    IF EXIST \win_flex_bison-2.5.5\win_bison.exe    GOTO SET_WIN_FLEX_BISON_2_5_5
@@ -20,6 +22,18 @@ IF "%HB_USE_BISON%" == "" GOTO END
 
 :SET_WIN_FLEX_BISON_C_2_5_25
    SET BISON_DIR=C:\win_flex_bison-2.5.25
+   SET BISON=win_bison.exe
+   SET HB_USE_BISON=1
+   GOTO FOUND
+
+:SET_WINFLEXBISON_2_5_16
+   SET BISON_DIR=\winflexbison-2.5.16
+   SET BISON=win_bison.exe
+   SET HB_USE_BISON=1
+   GOTO FOUND
+
+:SET_WINFLEXBISON_C_2_5_16
+   SET BISON_DIR=C:\winflexbison-2.5.16
    SET BISON=win_bison.exe
    SET HB_USE_BISON=1
    GOTO FOUND

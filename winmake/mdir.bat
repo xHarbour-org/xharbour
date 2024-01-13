@@ -651,13 +651,14 @@ set PATH=!_PATH:"=^"!
 endlocal
 SET _PATH=
 
-IF NOT "%LIBPREFIX%"=="" SET LIBPREFIX=
-IF NOT "%_PATH%"    =="" SET _PATH=
-IF NOT "%HB_MT%"    =="" SET HB_MT=
-IF NOT "%HB_MT_DIR%"=="" SET HB_MT_DIR=
-IF NOT "%MAKEALL%"  =="" SET MAKEALL=
-IF NOT "%MAKE_EXE%" =="" SET MAKE_EXE=
-IF NOT "%__BLD__%"  =="" SET __BLD__=
+SET LIBPREFIX=
+SET _PATH=
+SET HB_MT=
+SET HB_MT_DIR=
+SET MAKEALL=
+SET MAKE_EXE=
+SET __BLD__=
+SET __MAKE__=
 
 rem=============================================================================
 :EXIT

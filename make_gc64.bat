@@ -11,7 +11,6 @@ rem version, changes should only be made on your local copy.(AJ:2008-04-26)
 rem
 rem ============================================================================
 
-SET HB_ARCH=w64
 REM SET HB_OPTIMFLAGS=-gc3
 REM SET HB_DEBUG=d
 REM SET HB_GUI=1
@@ -26,7 +25,8 @@ REM SET HB_DIR_CURL=
 REM SET HB_DIR_OPENSSL=
 REM SET HB_DIR_MAGIC=
 REM SET HB_DIR_ADS=
-SET HB_ARCHITECTURE=w64
+
+SET HB_ARCH=w64
 IF "%CC_DIR%"=="" SET CC_DIR=C:/MinGw64
 IF "%SUB_DIR%"=="" SET SUB_DIR=gc64
 IF "%HB_GT_LIB%"=="" SET HB_GT_LIB=$(GTWIN_LIB)
@@ -43,8 +43,8 @@ rem The followings should never change
 rem Do not hard-code in makefile because there are needed for clean build
 rem ============================================================================
 SET DIR_SEP=\
-SET OBJEXT=%HB_ARCH%%HB_DEBUG%.o
-SET LIBEXT=%HB_ARCH%%HB_DEBUG%.a
+SET OBJEXT=%HB_DEBUG%.o
+SET LIBEXT=%HB_DEBUG%.a
 SET LIBPREFIX=lib
 
 if "%1"=="/?"      goto SYNTAX

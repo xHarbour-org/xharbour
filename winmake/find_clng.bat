@@ -11,9 +11,9 @@
 IF "%scriptName%" NEQ "" ((SET "scriptName=%~n0") & ECHO    *** started [%~f0] >> %~dp0\functions.log)
 IF "%scriptName%" == ""  ((SET "scriptName=%~n0") & ECHO *** START [%~f0] > %~dp0\functions.log)
 
-SET "C_NAME=pocc"
-SET "C_LONG_NAME=Pelles C"
-SET "C_SHORT_NAME=pc"
+SET "C_NAME=clang"
+SET "C_LONG_NAME=Clang (on Mingw-w64)"
+SET "C_SHORT_NAME=clng"
 
 REM First check if already set.
 IF "%CC%" NEQ "" GOTO CHECK_CC
@@ -47,7 +47,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
 REM The Entry point for FIRST run.
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
-   SET "CC=%C_NAME%"
+   IF "%CC%" == "" SET "CC=%C_NAME%"
 
    REM Check if CC_DIR is set by user and continue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
