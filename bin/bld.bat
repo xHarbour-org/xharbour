@@ -25,15 +25,16 @@ rem if "%CC%" == "" set CC=djgpp
 rem if "%HB_GT_LIB%" == "" set HB_GT_LIB=
 
 if "%HB_BIN_INSTALL%" == "" if "%HB_INSTALL%" == "" (
-    set "HB_BIN_INSTALL=%~dp0"
-    set "HB_INSTALL=%~dp0..\"
-    echo WARNING: HB_INSTALL is not set. Deducing from batch file location!
+   set "HB_BIN_INSTALL=%~dp0"
+   set "HB_INSTALL=%~dp0..\"
+   set "HB_LIB_INSTALL=%HB_INSTALL%lib\%SUB_DIR%"
+   set "HB_INC_INSTALL=%HB_INSTALL%include"
+
+   echo WARNING: HB_INSTALL is not set. Deducing from batch file location!
 )
 
 REM Because HB_BIN_INSTALL may default to %~dp0, we need to make sure it ends with a backslash!!!
 set "HB_BIN_INSTALL=%HB_INSTALL%bin\"
-set "HB_LIB_INSTALL=%HB_INSTALL%lib\%SUB_DIR%"
-set "HB_INC_INSTALL=%HB_INSTALL%include"
 
 echo HB_BIN_INSTALL=%HB_BIN_INSTALL%
 echo HB_LIB_INSTALL=%HB_LIB_INSTALL%
