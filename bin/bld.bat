@@ -33,9 +33,6 @@ if "%HB_BIN_INSTALL%" == "" if "%HB_INSTALL%" == "" (
    echo WARNING: HB_INSTALL is not set. Deducing from batch file location!
 )
 
-REM Because HB_BIN_INSTALL may default to %~dp0, we need to make sure it ends with a backslash!!!
-set "HB_BIN_INSTALL=%HB_INSTALL%bin\"
-
 echo HB_BIN_INSTALL=%HB_BIN_INSTALL%
 echo HB_LIB_INSTALL=%HB_LIB_INSTALL%
 echo HB_INC_INSTALL=%HB_INC_INSTALL%
