@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-13 18:58 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+    - Removed wrong premature reset of CC_DIR
+  * winmake/found_cc.bat
+    * Typo corrected clng -> clang
+    
 2024-01-13 00:32 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * make_bc.bat
   * make_clng.bat

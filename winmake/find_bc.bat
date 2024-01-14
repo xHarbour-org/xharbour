@@ -93,7 +93,6 @@ REM The Entry point for FIRST run.
 
 :FIND_C_COMPILER
    ECHO Searching for %C_LONG_NAME%...
-   SET "CC_DIR="
 
    IF "%CC%" == "" GOTO FIND_VARIANT
 

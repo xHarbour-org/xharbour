@@ -61,7 +61,7 @@ REM Compilers mismatch so prompt user to switch
       IF "%CC%" == "bcc64"  (SET "CC_NAME=Borland C++ 64")       & GOTO SET_WANTS_NAME
       IF "%CC%" == "cl"     (SET "CC_NAME=Microsoft C++")        & GOTO SET_WANTS_NAME
       IF "%CC%" == "pocc"   (SET "CC_NAME=Pelles C")             & GOTO SET_WANTS_NAME
-      IF "%CC%" == "clng"   (SET "CC_NAME=Clang - on Mingw-w64") & GOTO SET_WANTS_NAME
+      IF "%CC%" == "clang"  (SET "CC_NAME=Clang - on Mingw-w64") & GOTO SET_WANTS_NAME
       ECHO '%CC%' is not supported by this batch file.
       GOTO FOUND_EXIT_2
 
