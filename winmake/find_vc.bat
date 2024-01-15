@@ -175,6 +175,11 @@ GOTO FIND_EXIT_99
    SET "LD=%CC%"
 
    REM MSC Specific!
+   REM Manual install so skip the check for the arch matches 
+   CALL %~dp0functions.bat isStrInPath LIB \um _found
+   IF "%_found%" == "false" SET "_found=" & GOTO AFTER_ARCH_CHECK
+
+:ARCH_CHECK
    REM Check for an arch mismatch
    SET "UM_ARCH_PATH=\um\%HB_VS_ARCH%"
    CALL %~dp0functions.bat isStrInPath LIB UM_ARCH_PATH _found
@@ -184,8 +189,11 @@ GOTO FIND_EXIT_99
       ECHO You can't mix architectures in the same terminal session. Please open a new terminal 
       ECHO session. Then set HB_ARCH to your desired architecture and 'make_vc.bat' again.
       ECHO.
+      SET "_found="
       GOTO FIND_EXIT_99 
    )
+
+:AFTER_ARCH_CHECK   
    IF EXIST "CC_DIR=%CC_DIR%\Vc" (IF "%CC_DIR:~-3%" NEQ "\Vc" SET "CC_DIR=%CC_DIR%\Vc")
 
    SET "SUB_DIR=%C_SHORT_NAME%%HB_ARCH%"
