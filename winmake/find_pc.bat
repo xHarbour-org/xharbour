@@ -92,7 +92,7 @@ GOTO FIND_EXIT_99
 :PATH_SET
    ECHO Adding '%CC_DIR%\bin' to PATH... >> %~dp0\functions.log
    REM We arrived here ONLY if %CC%.exe exists in %CC_DIR%\bin and not in PATH.
-   IF NOT EXIST %CC_DIR%\bin\%CC%.exe GOTO EXE_NOT_FOUND
+   IF NOT EXIST "%CC_DIR%\bin\%CC%.exe" GOTO EXE_NOT_FOUND
    SET "PATH=%CC_DIR%\bin;%PATH%"
    ECHO For your convenience %CC%'s bin directory was added to your PATH
    GOTO PATH_OK
