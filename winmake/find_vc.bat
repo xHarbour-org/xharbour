@@ -130,17 +130,20 @@ GOTO FIND_EXIT_99
       SET "HB_VS_ARCH=x86"
    )
 
-   IF EXIST "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" (
-      CALL "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   ) ELSE IF EXIST "%CC_DIR%\bin\%CC%.exe" (
-      SET "PATH=%CC_DIR%\bin;%PATH%"
-      ECHO For your convenience %CC%'s bin directory was added to your PATH
-   ) ELSE (
-      ECHO [%~f0](139) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
-      GOTO FIND_EXIT_99
-   )
+   IF NOT EXIST "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" GOTO PATH_SET_2
+   CALL "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
+   GOTO PATH_OK
 
-REM Fall through to PATH_OK
+:PATH_SET_2
+   IF NOT EXIST "%CC_DIR%\bin\%CC%.exe" GOTO EXE_NOT_FOUND
+   SET "PATH=%CC_DIR%\bin;%PATH%"
+   ECHO For your convenience %CC%'s bin directory was added to your PATH
+   GOTO PATH_OK
+
+:EXE_NOT_FOUND
+   ECHO [%~f0](144) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+   GOTO FIND_EXIT_99
+
 :PATH_OK
    ECHO PATH OK for: CC='%CC%' CC_DIR='%CC_DIR%' HB_ARCH='%HB_ARCH%' >> %~dp0\functions.log
       
@@ -213,7 +216,7 @@ REM Fall through to PATH_OK
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](216) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](219) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0

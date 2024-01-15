@@ -39,7 +39,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
          IF ERRORLEVEL  2 GOTO FIND_EXIT_2
          IF ERRORLEVEL  1 SET "CC=" && GOTO TRY_C_NAME64
          IF ERRORLEVEL  0 GOTO FOUND
-         ECHO [%~f0] - (%ERRORLEVEL%) Unexpected error!
+         ECHO [%~f0](42) - (%ERRORLEVEL%) Unexpected error!
          GOTO FIND_EXIT_99
 
    :TRY_C_NAME64
@@ -157,7 +157,7 @@ REM The Entry point for FIRST run.
 
    GOTO NOT_FOUND
 
-ECHO [%~f0](161) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](160) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
 :DIR_SET
@@ -194,15 +194,15 @@ GOTO FIND_EXIT_99
 :PATH_SET
    ECHO Adding '%CC_DIR%\bin' to PATH... >> %~dp0\functions.log
    REM We arrived here ONLY if %CC%.exe exists in %CC_DIR%\bin and not in PATH.
-   IF EXIST "%CC_DIR%\bin\%CC%.exe" (
-      SET "PATH=%CC_DIR%\bin;%PATH%"
-      ECHO For your convenience %CC%'s bin directory was added to your PATH
-   ) ELSE (
-      ECHO [%~f0](201) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
-      GOTO FIND_EXIT_99
-   )
+   IF NOT EXIST "%CC_DIR%\bin\%CC%.exe" GOTO EXE_NOT_FOUND
+   SET "PATH=%CC_DIR%\bin;%PATH%"
+   ECHO For your convenience %CC%'s bin directory was added to your PATH
+   GOTO PATH_OK
 
-REM Fall through to PATH_OK
+:EXE_NOT_FOUND
+   ECHO [%~f0](203) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+   GOTO FIND_EXIT_99
+
 :PATH_OK
    ECHO PATH OK for: CC='%CC%' CC_DIR='%CC_DIR%' HB_ARCH='%HB_ARCH%' >> %~dp0\functions.log
    GOTO FOUND
