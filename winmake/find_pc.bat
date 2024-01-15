@@ -92,8 +92,13 @@ GOTO FIND_EXIT_99
 :PATH_SET
    ECHO Adding '%CC_DIR%\bin' to PATH... >> %~dp0\functions.log
    REM We arrived here ONLY if %CC%.exe exists in %CC_DIR%\bin and not in PATH.
-   SET "PATH=%CC_DIR%\bin;%PATH%"
-   ECHO For your convenience %CC%'s bin directory was added to your PATH
+   IF EXIST "%CC_DIR%\bin\%CC%.exe" (
+      SET "PATH=%CC_DIR%\bin;%PATH%"
+      ECHO For your convenience %CC%'s bin directory was added to your PATH
+   ) ELSE (
+      ECHO [%~f0](99) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+      GOTO FIND_EXIT_99
+   )
 
 REM Fall through to PATH_OK
 :PATH_OK
@@ -139,7 +144,7 @@ REM Fall through to PATH_OK
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](142) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](147) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0

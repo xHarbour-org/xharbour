@@ -90,7 +90,10 @@ GOTO FIND_EXIT_99
    IF EXIST "%CC_DIR%\Vc" SET "CC_DIR=%CC_DIR%\Vc"
 
    :CHECK_IN_PATH
-      REM SET CC_BIN=%CC_DIR%\bin
+      SET CC_BIN=%CC_DIR%\bin
+      CALL %~dp0functions.bat isPathInPath CC_BIN _inPath
+      IF "%_inPath%" == "true" ((SET "_inPath=") & GOTO PATH_OK)
+
       REM MSC Specific!
       SET "CC_BIN=%CC_DIR%\..\Common7\Tools\"
       CALL %~dp0functions.bat toAbsPath CC_BIN CC_BIN
@@ -100,6 +103,8 @@ GOTO FIND_EXIT_99
       IF "%_inPath%" == "true" ((SET "_inPath=") & GOTO PATH_OK)
 
    REM If we are here then %CC_DIR%\bin is NOT in PATH so let's add it
+   IF EXIST "%CC_DIR%\bin\%CC%.exe" GOTO PATH_SET
+   
    REM MSC Specific!
    IF EXIST "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat"       GOTO PATH_SET
 
@@ -127,9 +132,12 @@ GOTO FIND_EXIT_99
 
    IF EXIST "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" (
       CALL "%CC_DIR%\..\Common7\Tools\VsDevCmd.bat" -arch=%HB_VS_ARCH%
-   ) ELSE (
+   ) ELSE IF EXIST "%CC_DIR%\bin\%CC%.exe" (
       SET "PATH=%CC_DIR%\bin;%PATH%"
       ECHO For your convenience %CC%'s bin directory was added to your PATH
+   ) ELSE (
+      ECHO [%~f0](139) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+      GOTO FIND_EXIT_99
    )
 
 REM Fall through to PATH_OK
@@ -205,7 +213,7 @@ REM Fall through to PATH_OK
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](208) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](216) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
