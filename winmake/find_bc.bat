@@ -81,12 +81,10 @@ REM The Entry point for FIRST run.
    :CHECK_ARCH
       IF "%HB_ARCH%" == "w64" (
          SET "CC=%C_NAME64%"
-      ) ELSE (
-         SET "CC=%C_NAME%"
       )
 
    :AFTER_ARCH
-   REM Check if CC_DIR is set by user and conttinue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
+   REM Check if CC_DIR is set by user and continue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
 
    REM Fall through to FIND_C_COMPILER
@@ -107,25 +105,22 @@ REM The Entry point for FIRST run.
       :FIND_C_NAME
          REM Already tried %C_NAME% so let's try %C_NAME2%
          IF "%CC%" == "%C_NAME%" GOTO FIND_C_NAME2
-         SET "CC=%C_NAME%"
-         CALL %~dp0functions.bat rootOfAppInPath CC CC_DIR
-         IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w32") & GOTO DIR_SET
+         CALL %~dp0functions.bat rootOfAppInPath C_NAME CC_DIR
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME%") & GOTO DIR_SET)
 
       REM Fall through to FIND_C_NAME2
 
       :FIND_C_NAME2
          IF "%CC%" == "%C_NAME2%" GOTO FIND_C_NAME64
-         SET "CC=%C_NAME2%"
-         CALL %~dp0functions.bat rootOfAppInPath CC CC_DIR
-         IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w32") & GOTO DIR_SET
+         CALL %~dp0functions.bat rootOfAppInPath C_NAME2 CC_DIR
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME2%") & GOTO DIR_SET)
 
       REM Fall through to FIND_C_NAME64
 
       :FIND_C_NAME64
          IF "%CC%" == "%C_NAME64%" GOTO AFTER_FIND
-         SET "CC=%C_NAME64%"
-         CALL %~dp0functions.bat rootOfAppInPath CC CC_DIR
-         IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w64") & GOTO DIR_SET
+         CALL %~dp0functions.bat rootOfAppInPath C_NAME64 CC_DIR
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w64") & (SET "CC=%C_NAME64%") & GOTO DIR_SET)
    
    :AFTER_FIND
    REM IF we are here then the compiler was not found in the path so let's try to find it in the known locations file
@@ -157,7 +152,7 @@ REM The Entry point for FIRST run.
 
    GOTO NOT_FOUND
 
-ECHO [%~f0](160) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](155) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
 :DIR_SET
@@ -177,7 +172,7 @@ GOTO FIND_EXIT_99
    :DIR_SET64
       IF "%CC%" == "" (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & SET "CC=%C_NAME64%" & GOTO CHECK_IN_PATH))
    
-   ECHO [%~f0](183) - (%ERRORLEVEL%) Unexpected error!
+   ECHO [%~f0](175) - (%ERRORLEVEL%) Unexpected error!
    GOTO FIND_EXIT_99
 
    :CHECK_IN_PATH
@@ -200,7 +195,7 @@ GOTO FIND_EXIT_99
    GOTO PATH_OK
 
 :EXE_NOT_FOUND
-   ECHO [%~f0](203) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+   ECHO [%~f0](198) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
    GOTO FIND_EXIT_99
 
 :PATH_OK
@@ -260,19 +255,16 @@ GOTO FIND_EXIT_99
    ECHO :CHECK_CC_DIR Checking if %C_LONG_NAME% is in '%CC_DIR%'... >> %~dp0\functions.log
 
    REM IF %CC% is in bin sub folder then we can SKIP the FIND_C_COMPILER section and go directly to DIR_SET
-   IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"         GOTO DIR_SET)
+   IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"                                       GOTO DIR_SET)
 
    IF "%HB_ARCH%" == "w64" GOTO CHK_CC_DIR64
    :CHK_CC_DIR32
-      SET "CC=%C_NAME%"
-      IF EXIST "%CC_DIR%\bin\%CC%.exe" ((SET "HB_ARCH=w32") & GOTO DIR_SET)
+      IF EXIST "%CC_DIR%\bin\%C_NAME%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME%")    & GOTO DIR_SET)
 
-      SET "CC=%C_NAME2%"
-      IF EXIST "%CC_DIR%\bin\%CC%.exe" ((SET "HB_ARCH=w32") & GOTO DIR_SET)
+      IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME2%")  & GOTO DIR_SET)
 
    :CHK_CC_DIR64
-      SET "CC=%C_NAME64%"
-      IF EXIST "%CC_DIR%\bin\%CC%.exe" ((SET "HB_ARCH=w64") & GOTO DIR_SET)
+      IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & (SET "CC=%C_NAME64%") & GOTO DIR_SET)
       REM Fall through...
 
 :CHECK_FAILED
@@ -290,7 +282,7 @@ GOTO FIND_EXIT_99
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](293) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](285) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
