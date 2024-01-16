@@ -17,6 +17,9 @@ SET "C_NAME64=bcc64"
 SET "C_LONG_NAME=Borland C/C++"
 SET "C_SHORT_NAME=bc"
 
+REM BCC Specific!
+SET "_USER_CC=%CC%"
+
 REM First check if already set.
 IF "%CC%" NEQ "" GOTO CHECK_CC
 
@@ -75,22 +78,19 @@ REM The Entry point for FIRST run.
    ver > nul REM Reset ERRORLEVEL
 
    REM BCC Specific!
-   IF "%CC%" == "" GOTO CHECK_ARCH
-   GOTO AFTER_ARCH
-   
-   :CHECK_ARCH
-      IF "%HB_ARCH%" == "w64" (
-         SET "CC=%C_NAME64%"
-      )
+   IF "%HB_ARCH%" == "w64" (
+      SET "CC=%C_NAME64%"
+   )
 
-   :AFTER_ARCH
    REM Check if CC_DIR is set by user and continue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
-
    REM Fall through to FIND_C_COMPILER
 
 :FIND_C_COMPILER
    ECHO Searching for %C_LONG_NAME%...
+
+   REM BCC Specific!
+   SET "CC=%_USER_CC%"
 
    IF "%CC%" == "" GOTO FIND_VARIANT
 
@@ -287,6 +287,7 @@ GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
    SET "scriptName="
+   SET "_USER_CC="
 
    REM BCC Specific!
    echo EXIT CC='%CC%' CC_DIR='%CC_DIR%' SUB_DIR='%SUB_DIR%' BCC_LIB='%BCC_LIB%' >> %~dp0\functions.log
@@ -295,15 +296,18 @@ GOTO FIND_EXIT_99
 
 :FIND_EXIT_1
    SET "scriptName="
+   SET "_USER_CC="
    ECHO    *** finished[1] [%~f0] >> %~dp0\functions.log
    exit /b 1
 
 :FIND_EXIT_2
    SET "scriptName="
+   SET "_USER_CC="
    ECHO    *** finished[2] [%~f0] >> %~dp0\functions.log
    exit /b 2
 
 :FIND_EXIT_99
    SET "scriptName="
+   SET "_USER_CC="
    ECHO    *** finished[99] [%~f0] >> %~dp0\functions.log
    exit /b 99

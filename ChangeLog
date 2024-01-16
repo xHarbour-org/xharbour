@@ -8,7 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2024-01-17 20:15 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+2024-01-16 11:54 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+    + Added _USER_CC to keep track of user defined CC
+    * Remove check if CC empty before ARCH check.
+    + Added reset of CC to _USER_CC at beginning of :FIND_C_COMPILER
+
+2024-01-15 20:15 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
     * Defer setting of CC till found - Tentative fix for manual install of 64bit BCC 
 
