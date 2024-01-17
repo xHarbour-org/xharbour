@@ -273,13 +273,27 @@ GOTO FIND_EXIT_99
 
    IF "%HB_ARCH%" == "w64" GOTO CHK_CC_DIR64
    :CHK_CC_DIR32
-      IF EXIST "%CC_DIR%\bin\%C_NAME%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME%")    & GOTO DIR_SET)
-
-      IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME2%")  & GOTO DIR_SET)
+      IF EXIST "%CC_DIR%\bin\%C_NAME%.exe"  GOTO SET_CC_CNAME
+      IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe" GOTO SET_CC_CNAME2
 
    :CHK_CC_DIR64
-      IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & (SET "CC=%C_NAME64%") & GOTO DIR_SET)
-      REM Fall through...
+      IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" GOTO SET_CC_CNAME64
+      GOTO CHECK_FAILED
+
+:SET_CC_DIR_CNAME
+   SET "HB_ARCH=w32"
+   SET "CC=%C_NAME%"
+   GOTO DIR_SET
+
+:SET_CC_DIR_CNAME2
+   SET "HB_ARCH=w32"
+   SET "CC=%C_NAME2%"
+   GOTO DIR_SET
+
+:SET_CC_DIR_CNAME64
+   SET "HB_ARCH=w64"
+   SET "CC=%C_NAME64%"
+   GOTO DIR_SET
 
 :CHECK_FAILED
    REM If we are here then compiler was not found in the user specified CC_DIR!
@@ -294,7 +308,7 @@ GOTO FIND_EXIT_99
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](297) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](311) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
