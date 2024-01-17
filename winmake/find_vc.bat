@@ -29,7 +29,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
       IF ERRORLEVEL  1 GOTO SET_C_COMPILER
       IF ERRORLEVEL  0 GOTO FOUND
 
-      ECHO "[%~f0](30) - (%ERRORLEVEL%) Unexpected error!"  
+      ECHO "[%~f0](32) - (%ERRORLEVEL%) Unexpected error!"  
       GOTO FIND_EXIT_99
 
 :CHECK_CC
@@ -43,7 +43,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
       IF ERRORLEVEL  2 GOTO FIND_EXIT_2
       IF ERRORLEVEL  1 GOTO SET_C_COMPILER
       IF ERRORLEVEL  0 GOTO FOUND
-      ECHO "[%~f0](44) - (%ERRORLEVEL%) Unexpected error!" 
+      ECHO "[%~f0](46) - (%ERRORLEVEL%) Unexpected error!" 
       GOTO FIND_EXIT_99
    
 REM The Entry point for FIRST run.
@@ -81,7 +81,7 @@ REM The Entry point for FIRST run.
 
    GOTO NOT_FOUND
 
-ECHO [%~f0](82) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](84) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
 :DIR_SET
@@ -143,7 +143,7 @@ GOTO FIND_EXIT_99
    GOTO PATH_OK
 
 :EXE_NOT_FOUND
-   ECHO [%~f0](144) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+   ECHO [%~f0](146) - Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
    GOTO FIND_EXIT_99
 
 :PATH_OK
@@ -224,7 +224,7 @@ GOTO FIND_EXIT_99
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](219) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](227) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0

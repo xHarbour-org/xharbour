@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-17 15:38 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+   * Restored 2 missing resets of CC before calls found_cc.bat
+
+  * winmake/find_bc.bat
+  * winmake/find_clng.bat
+  * winmake/find_pc.bat
+  * winmake/find_vc.bat
+    * Standardized corrcted line numbers in error messages
+
 2024-01-17 14:34 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
    * Few more reductions of nested IF to GOTO to avoid parser bug in Windows batch files
