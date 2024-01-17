@@ -173,7 +173,7 @@ GOTO FIND_EXIT_99
       IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       ((SET "HB_ARCH=w32") & GOTO CHECK_IN_PATH))
       IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & SET "CC=%C_NAME64%" & GOTO CHECK_IN_PATH))
    
-   ECHO [%~f0](175) - (%ERRORLEVEL%) Unexpected error!
+   ECHO [%~f0](176) - (%ERRORLEVEL%) Unexpected error!
    GOTO FIND_EXIT_99
 
    :CHECK_IN_PATH
@@ -196,7 +196,7 @@ GOTO FIND_EXIT_99
    GOTO PATH_OK
 
 :EXE_NOT_FOUND
-   ECHO [%~f0](198) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
+   ECHO [%~f0](199) - (%ERRORLEVEL%) Unexpected error! %CC_DIR%\bin\%CC%.exe does not exist!
    GOTO FIND_EXIT_99
 
 :PATH_OK
@@ -283,7 +283,7 @@ GOTO FIND_EXIT_99
       REM User wants to search for known locations - Continue.
       GOTO FIND_C_COMPILER
  
-ECHO [%~f0](285) - (%ERRORLEVEL%) Unexpected error!
+ECHO [%~f0](286) - (%ERRORLEVEL%) Unexpected error!
 GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
