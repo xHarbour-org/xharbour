@@ -165,12 +165,13 @@ GOTO FIND_EXIT_99
 
    :DIR_SET32
       IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       ((SET "HB_ARCH=w32") & GOTO CHECK_IN_PATH))
-      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME%.exe"   ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME%") & GOTO CHECK_IN_PATH))
+      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME%.exe"   ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME%")  & GOTO CHECK_IN_PATH))
       IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe"  ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME2%") & GOTO CHECK_IN_PATH))
       REM Fall through to DIR_SET64
 
    :DIR_SET64
-      IF "%CC%" == "" (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & SET "CC=%C_NAME64%" & GOTO CHECK_IN_PATH))
+      IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       ((SET "HB_ARCH=w32") & GOTO CHECK_IN_PATH))
+      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & SET "CC=%C_NAME64%" & GOTO CHECK_IN_PATH))
    
    ECHO [%~f0](175) - (%ERRORLEVEL%) Unexpected error!
    GOTO FIND_EXIT_99
