@@ -15,6 +15,8 @@ SET "C_NAME=clang"
 SET "C_LONG_NAME=Clang (on Mingw-w64)"
 SET "C_SHORT_NAME=clng"
 
+SET "_USER_CC=%CC%"
+
 REM First check if already set.
 IF "%CC%" NEQ "" GOTO CHECK_CC
 
@@ -132,8 +134,6 @@ GOTO FIND_EXIT_99
 :CHECK_FAILED
    REM If we are here then compiler was not found in the user specified CC_DIR!
 
-   SET "CC="
-
    ECHO Could not find %C_LONG_NAME% at '%CC_DIR%'!
 
    REM Ask the user if they want to search for known locations.
@@ -149,22 +149,28 @@ GOTO FIND_EXIT_99
 
  :FIND_EXIT_0
    SET "scriptName="
-
+   SET "_USER_CC="
    echo EXIT CC='%CC%' CC_DIR='%CC_DIR%' SUB_DIR='%SUB_DIR%' >> %~dp0\functions.log
    ECHO    *** finished[0] [%~f0] >> %~dp0\functions.log
    exit /b 0
 
 :FIND_EXIT_1
    SET "scriptName="
+   SET "CC=%_USER_CC%"
+   SET "_USER_CC="
    ECHO    *** finished[1] [%~f0] >> %~dp0\functions.log
    exit /b 1
 
 :FIND_EXIT_2
    SET "scriptName="
+   SET "CC=%_USER_CC%"
+   SET "_USER_CC="
    ECHO    *** finished[2] [%~f0] >> %~dp0\functions.log
    exit /b 2
 
 :FIND_EXIT_99
    SET "scriptName="
+   SET "CC=%_USER_CC%"
+   SET "_USER_CC="
    ECHO    *** finished[99] [%~f0] >> %~dp0\functions.log
    exit /b 99

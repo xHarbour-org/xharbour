@@ -54,7 +54,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
          GOTO FIND_EXIT_99
 
 :CHECK_CC
-   REM Will force a SWITCH_CC if CC is NOT C_NAME or C_NAME2 or C_NAME64
+   REM Will force a SWITCH_CC if CC is NOT C_NAME or C_NAM2 or C_NAME64
    IF "%CC%" == "%C_NAME%"   GOTO CHECK_FOUND
    IF "%CC%" == "%C_NAME2%"  GOTO CHECK_FOUND
    IF "%CC%" == "%C_NAME64%" GOTO CHECK_FOUND 
@@ -97,24 +97,24 @@ REM The Entry point for FIRST run.
       IF "%HB_ARCH%" == "w64" GOTO FIND_C_NAME64
 
       :FIND_C_NAME
-         REM Check if tried %C_NAME% so let's try %C_NAME2%
+         REM Already tried %C_NAME% so let's try %C_NAME2%
          IF "%CC%" == "%C_NAME%" GOTO FIND_C_NAME2
          CALL %~dp0functions.bat rootOfAppInPath C_NAME CC_DIR
-         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & GOTO DIR_SET)
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME%")   & GOTO DIR_SET)
 
       REM Fall through to FIND_C_NAME2
 
       :FIND_C_NAME2
          IF "%CC%" == "%C_NAME2%" GOTO FIND_C_NAME64
          CALL %~dp0functions.bat rootOfAppInPath C_NAME2 CC_DIR
-         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & GOTO DIR_SET)
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME2%")  & GOTO DIR_SET)
 
       REM Fall through to FIND_C_NAME64
 
       :FIND_C_NAME64
          IF "%CC%" == "%C_NAME64%" GOTO AFTER_FIND
          CALL %~dp0functions.bat rootOfAppInPath C_NAME64 CC_DIR
-         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w64") & GOTO DIR_SET)
+         IF "%CC_DIR%" NEQ "" ((SET "HB_ARCH=w64") & (SET "CC=%C_NAME64%") & GOTO DIR_SET)
    
    :AFTER_FIND
    REM IF we are here then the compiler was not found in the path so let's try to find it in the known locations file
@@ -128,19 +128,16 @@ REM The Entry point for FIRST run.
    REM Fall through to KNOWN_%C_NAME%
 
    :KNOWN_C_NAME
-      REM SET "CC=%C_NAME%"
       CALL %~dp0functions.bat findKnown %~dp0known.%C_SHORT_NAME% C_NAME CC_DIR
       IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w32") & GOTO DIR_SET
       REM Fall through
 
    :KNOWN_C_NAME2
-      REM SET "CC=%C_NAME2%"
       CALL %~dp0functions.bat findKnown %~dp0known.%C_SHORT_NAME% C_NAME2 CC_DIR
       IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w32") & GOTO DIR_SET
       REM Fall through
 
    :KNOWN_C_NAME64
-      REM SET "CC=%C_NAME64%"
       CALL %~dp0functions.bat findKnown %~dp0known.%C_SHORT_NAME% C_NAME64 CC_DIR
       IF "%CC_DIR%" NEQ "" (SET "HB_ARCH=w64") & GOTO DIR_SET
 
@@ -154,39 +151,21 @@ GOTO FIND_EXIT_99
    IF "%CC_DIR:~-1%" == "\" CALL %~dp0functions.bat Left CC_DIR -1 CC_DIR
 
    IF "%HB_ARCH%" == "w64" GOTO DIR_SET64
+
    REM Fall through to DIR_SET32
 
    :DIR_SET32
-      IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       GOTO DIR_SET_CC     )         
-      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME%.exe"   GOTO DIR_SET_CNAME  )
-      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe"  GOTO DIR_SET_CNAME2 )
+      IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       ((SET "HB_ARCH=w32") & GOTO CHECK_IN_PATH))
+      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME%.exe"   ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME%")  & GOTO CHECK_IN_PATH))
+      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe"  ((SET "HB_ARCH=w32") & (SET "CC=%C_NAME2%") & GOTO CHECK_IN_PATH))
       REM Fall through to DIR_SET64
 
    :DIR_SET64
-      IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       GOTO DIR_SET_CC     )         
-      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" GOTO DIR_SET_CNAME64)
-
-   ECHO [%~f0](171) - (%ERRORLEVEL%) Unexpected error!
+      IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"       ((SET "HB_ARCH=w32") & GOTO CHECK_IN_PATH))
+      IF "%CC%" == ""  (IF EXIST "%CC_DIR%\bin\%C_NAME64%.exe" ((SET "HB_ARCH=w64") & SET "CC=%C_NAME64%" & GOTO CHECK_IN_PATH))
+   
+   ECHO [%~f0](176) - (%ERRORLEVEL%) Unexpected error!
    GOTO FIND_EXIT_99
-
-   :DIR_SET_CC
-      IF "%HB_ARCH%" NEQ "w64" SET "HB_ARCH=w32"
-      GOTO CHECK_IN_PATH
-
-   :DIR_SET_CNAME
-      SET "HB_ARCH=w32"
-      SET "CC=%C_NAME%"
-      GOTO CHECK_IN_PATH
-
-   :DIR_SET_CNAME2
-      SET "HB_ARCH=w32"
-      SET "CC=%C_NAME2%"
-      GOTO CHECK_IN_PATH
-
-   :DIR_SET_CNAME64
-      SET "HB_ARCH=w64"
-      SET "CC=%C_NAME64%"
-      GOTO CHECK_IN_PATH
 
    :CHECK_IN_PATH
       SET CC_BIN=%CC_DIR%\bin
@@ -196,6 +175,7 @@ GOTO FIND_EXIT_99
 
    REM If we are here then %CC_DIR%\bin is NOT in PATH so let's add it
    IF EXIST "%CC_DIR%\bin\%CC%.exe" GOTO PATH_SET
+
    GOTO NOT_FOUND
 
 :PATH_SET
@@ -270,9 +250,9 @@ GOTO FIND_EXIT_99
    IF "%CC%" NEQ "" (IF EXIST "%CC_DIR%\bin\%CC%.exe"                                       GOTO DIR_SET)
 
    IF "%HB_ARCH%" == "w64" GOTO CHK_CC_DIR64
-   :CHK_CC_DIR32
-      IF EXIST "%CC_DIR%\bin\%C_NAME%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME%")    & GOTO DIR_SET)
 
+   :CHK_CC_DIR32
+      IF EXIST "%CC_DIR%\bin\%C_NAME%.exe" ((SET "HB_ARCH=w32")   & (SET "CC=%C_NAME%")   & GOTO DIR_SET)
       IF EXIST "%CC_DIR%\bin\%C_NAME2%.exe" ((SET "HB_ARCH=w32")  & (SET "CC=%C_NAME2%")  & GOTO DIR_SET)
 
    :CHK_CC_DIR64
