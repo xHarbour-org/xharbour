@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-18 17:25 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
+  * winmake/find_bc.bat
+    ! Fixed silly typos in last commit
+
 2024-01-18 08:48 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * winmake/find_bc.bat
     * Moved reset of CC to _USER_CC from FIND_C_COMPILER to SET_C_COMPILER
