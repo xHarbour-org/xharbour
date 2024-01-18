@@ -78,15 +78,15 @@ REM The Entry point for FIRST run.
 :SET_C_COMPILER
    ver > nul REM Reset ERRORLEVEL
 
+   REM BCC Specific - must reset after the triple found_cc variations!
+   SET "CC=%_USER_CC%"
+
    REM Check if CC_DIR is set by user and continue to DIR_SET | FIND_C_COMPILER | NOT_FOUND
    IF "%CC_DIR%" NEQ "" GOTO CHECK_CC_DIR
    REM Fall through to FIND_C_COMPILER
 
 :FIND_C_COMPILER
    ECHO Searching for %C_LONG_NAME%...
-
-   REM BCC Specific!
-   SET "CC=%_USER_CC%"
 
    IF "%CC%" == "" GOTO FIND_VARIANT
 
