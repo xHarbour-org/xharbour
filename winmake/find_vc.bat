@@ -23,7 +23,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
 :SET_CC
    :TRY_C_NAME
       REM Quick check if CAN be quickly set (CC_DIR and PATH might be set).
-      CALL %~dp0found_cc.bat %C_NAME% %C_LONG_NAME%
+      CALL %~dp0found_cc.bat %C_NAME% "%C_LONG_NAME%"
       IF ERRORLEVEL 99 GOTO FIND_EXIT_99
       IF ERRORLEVEL  2 GOTO FIND_EXIT_2
       IF ERRORLEVEL  1 GOTO SET_C_COMPILER
@@ -38,7 +38,7 @@ IF "%CC%" NEQ "" GOTO CHECK_CC
 
 :CHECK_FOUND
    REM Quick check if the compiler is already set.
-   CALL %~dp0found_cc.bat %CC%
+   CALL %~dp0found_cc.bat %CC% "%C_LONG_NAME%"
       IF ERRORLEVEL 99 GOTO FIND_EXIT_99
       IF ERRORLEVEL  2 GOTO FIND_EXIT_2
       IF ERRORLEVEL  1 GOTO SET_C_COMPILER
