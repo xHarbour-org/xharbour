@@ -222,7 +222,7 @@ CC_CMD_ZIP     =$(CC)\
 	$(OPTFLAGS) $(CMODEFLAGS) -W3 -I"$(HBZIP_DIR)\INCLUDE" -I"include" -I"$(CC_DIR)\include" -TP\
 	-D_WIN32 $(ZIP_DEBUGFLAGS) -D_MBCS -D"_LIB"\
 	-Fp"$(OBJ_DIR)\hbzip.pch" -Fd"$(OBJ_DIR)\\"\
-	-D_CRT_SECURE_NO_WARNINGS -Fo$@ $**
+	-D_CRT_SECURE_NO_WARNINGS -wd4834 -Fo$@ $**
 
 #===============================================================================
 # Building rules of Object files
