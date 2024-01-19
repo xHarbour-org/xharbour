@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-19 14:56 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\makefile.vc
+    ! added -wd4244 -wd4267 -wd4312 to CC_CMD_ZIP
+
 2024-01-19 11:05 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
     ! added -wd4834 to CC_CMD_ZIP
