@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-20 17:09 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake/mdir.bat
+    ! added some missing %LIBPREFIX%
+
 2024-01-20 16:02 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake/mdir.bat
     ! replace %HB_DEBUG%.lib with %LIBEXT%
