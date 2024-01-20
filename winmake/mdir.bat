@@ -81,14 +81,14 @@ rem=============================================================================
 ECHO DLL Files Succesfully Built ...
 ECHO Copying DLL Files to BIN Folder ...
 if exist hdll.tmp del hdll.tmp
-if exist bin\%SUB_DIR%\xharbour%LIBEXT%          copy bin\%SUB_DIR%\xharbour%LIBEXT%          lib           > nul
-if exist bin\%SUB_DIR%\xharbour%LIBEXT%          copy bin\%SUB_DIR%\xharbour%LIBEXT%          lib\%SUB_DIR% > nul
-if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll    copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll    bin           > nul
-if exist bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe    copy bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe    bin           > nul
-if exist bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe   copy bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe   bin           > nul
-if exist bin\%SUB_DIR%\hbrundll%HB_DEBUG%.exe    copy bin\%SUB_DIR%\hbrundll%HB_DEBUG%.exe    bin           > nul
-if exist bin\%SUB_DIR%\hbtestdll%HB_DEBUG%.exe   copy bin\%SUB_DIR%\hbtestdll%HB_DEBUG%.exe   bin           > nul
-if exist bin\%SUB_DIR%\xbscriptdll%HB_DEBUG%.exe copy bin\%SUB_DIR%\xbscriptdll%HB_DEBUG%.exe bin           > nul
+if exist bin\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT% copy bin\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT% lib           > nul
+if exist bin\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT% copy bin\%SUB_DIR%\%LIBPREFIX%xharbour%LIBEXT% lib\%SUB_DIR% > nul
+if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll      copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll      bin           > nul
+if exist bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe      copy bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe      bin           > nul
+if exist bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe     copy bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe     bin           > nul
+if exist bin\%SUB_DIR%\hbrundll%HB_DEBUG%.exe      copy bin\%SUB_DIR%\hbrundll%HB_DEBUG%.exe      bin           > nul
+if exist bin\%SUB_DIR%\hbtestdll%HB_DEBUG%.exe     copy bin\%SUB_DIR%\hbtestdll%HB_DEBUG%.exe     bin           > nul
+if exist bin\%SUB_DIR%\xbscriptdll%HB_DEBUG%.exe   copy bin\%SUB_DIR%\xbscriptdll%HB_DEBUG%.exe   bin           > nul
 ECHO Done ...
 ECHO.
 goto EXIT
@@ -349,7 +349,7 @@ if exist lib\%LIBPREFIX%xwt%LIBEXT%                  del lib\%LIBPREFIX%xwt%LIBE
 if exist lib\%LIBPREFIX%zlib%LIBEXT%                 del lib\%LIBPREFIX%zlib%LIBEXT%
 if exist lib\%LIBPREFIX%*.bak                        del lib\%LIBPREFIX%*.bak
 if exist lib\%LIBPREFIX%*%OBJEXT%                    del lib\%LIBPREFIX%*%OBJEXT%
-if exist lib\%LIBPREFIX%hbzebra%LIBEXT%               del lib\%LIBPREFIX%hbzebra%LIBEXT%
+if exist lib\%LIBPREFIX%hbzebra%LIBEXT%              del lib\%LIBPREFIX%hbzebra%LIBEXT%
 
 if exist bin\*%HB_DEBUG%.tds                         del bin\*%HB_DEBUG%.tds
 if exist bin\*%HB_DEBUG%.map                         del bin\*%HB_DEBUG%.map
