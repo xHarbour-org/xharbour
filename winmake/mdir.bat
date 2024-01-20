@@ -83,6 +83,8 @@ ECHO Copying DLL Files to BIN Folder ...
 if exist hdll.tmp del hdll.tmp
 if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.lib    copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.lib     lib           > nul
 if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.lib    copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.lib     lib\%SUB_DIR% > nul
+if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.a      copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.a       lib           > nul
+if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.a      copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.a       lib\%SUB_DIR% > nul
 if exist bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll    copy bin\%SUB_DIR%\xharbour%HB_DEBUG%.dll     bin           > nul
 if exist bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe    copy bin\%SUB_DIR%\hbdocdll%HB_DEBUG%.exe    bin           > nul
 if exist bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe   copy bin\%SUB_DIR%\hbmakedll%HB_DEBUG%.exe   bin           > nul
