@@ -117,6 +117,7 @@ GOTO FIND_EXIT_99
    REM We arrived here ONLY if %CC%.exe exists in %CC_DIR%\bin and not in PATH.
     
    REM MSC Specific!
+   IF EXIST "%CC_DIR%\bin\ml64.exe" SET "HB_ARCH=w64"
    IF "%HB_ARCH%" == "" (
       IF "%is_x64_arch%" == "true" (
          ECHO Setting HB_ARCH to w64 because is_x64_arch is true.
