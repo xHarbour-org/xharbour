@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-01-20 14:10 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake/find_vc.bat
+    ! set HB_ARCH to w64 if ml64.exe does exist in MSC bin directory
+
 2024-01-20 11:25 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * make_bc.bat
     ! set LIBEXT to .a and OBJEXT to .o for 64 bit
