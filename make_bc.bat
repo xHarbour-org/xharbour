@@ -96,6 +96,8 @@ rem ============================================================================
 SET LIBEXT=%HB_DEBUG%.lib
 SET OBJEXT=%HB_DEBUG%.obj
 SET DIR_SEP=\
+IF "%HB_ARCH%"=="w64" SET LIBEXT=%HB_DEBUG%.a
+IF "%HB_ARCH%"=="w64" SET OBJEXT=%HB_DEBUG%.o
 SET LIBPREFIX=
 rem ============================================================================
 
