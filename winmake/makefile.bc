@@ -252,7 +252,11 @@ CCC_CMD_NOWARN =$(CC) -c -tWM $(CLIBFLAGS) -w-8060 -w-8080 -w-8084 -o$@ $**
 !if ("$(HB_ARCH)"=="w64")
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" $(OPTFLAGS) -Wno-user-defined-literals -Wno-unused-value -Wno-tautological-compare -Wno-int-to-void-pointer-cast -o$@ $**
 !else
+!if ("$(CC)"=="bcc32c")
+CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi $(OPTFLAGS) -w- -X- -o$@ $**
+!else
 CC_CMD_ZIP     =$(CC) -c $(CC_DEBUGFLAGS) -I"$(HBZIP_DIR)\include" -I"include" -vi -R- -H- $(OPTFLAGS) -w- -X- -o$@ $**
+!endif
 !endif
 
 LINK_CMD       =$(LINKEXE) $(CC_LINKER_DEBUG_FLAGS) -ap -Tpe -x -Gn -C -L$(LIB_DIR) $(BCC_LIB_FLAG) $(LFLAGS) $(BCC_STARTUP_OBJ) $**,$@,,
