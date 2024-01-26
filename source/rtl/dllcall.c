@@ -282,39 +282,6 @@ HB_FUNC( DLLPREPARECALL )
 }
 
 
-HB_FUNC( LOADLIBRARY )
-{
-   hb_retptr( ( void* ) LoadLibraryA( ( LPCSTR ) hb_parcx( 1 ) ) );
-}
-
-HB_FUNC( FREELIBRARY )
-{
-   hb_retl( FreeLibrary( ( HMODULE ) hb_parptr( 1 ) ) );
-}
-
-// compatibility
-HB_FUNC( DLLLOAD )
-{
-   HB_FUNCNAME( LOADLIBRARY ) ();
-}
-
-// compatibility
-HB_FUNC( DLLUNLOAD )
-{
-   HB_FUNCNAME( FREELIBRARY ) ();
-}
-
-HB_FUNC( GETLASTERROR )
-{
-   hb_retnl( GetLastError() );
-}
-
-HB_FUNC( SETLASTERROR )
-{
-   hb_retnl( GetLastError() );
-   SetLastError( hb_parnl( 1 ) );
-}
-
 HB_FUNC( GETPROCADDRESS )
 {
    LPVOID   lpProcAddr;
@@ -1031,7 +998,10 @@ HB_FUNC( CALLDLL )
 
 }
 
-#elif defined( HB_OS_WIN_64 ) /* End of HB_OS_WIN32 */
+#endif /* End of HB_OS_WIN32 */
+
+#endif   /* NODLL */
+
 
 #include <windows.h>
 #include "hbapi.h"
@@ -1051,6 +1021,20 @@ HB_FUNC( GETLASTERROR )
    hb_retnl( GetLastError() );
 }
 
-#endif   /* HB_OS_WIN_64 */
+HB_FUNC( SETLASTERROR )
+{
+   hb_retnl( GetLastError() );
+   SetLastError( hb_parnl( 1 ) );
+}
 
-#endif   /* NODLL */
+// compatibility
+HB_FUNC( DLLLOAD )
+{
+   HB_FUNCNAME( LOADLIBRARY ) ();
+}
+
+// compatibility
+HB_FUNC( DLLUNLOAD )
+{
+   HB_FUNCNAME( FREELIBRARY ) ();
+}
