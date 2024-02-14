@@ -1820,7 +1820,7 @@ HB_FUNC( ADSGETNUMACTIVELINKS )         /* Only valid for a DataDict */
 }
 
 
-HB_FUNC( ADSDDCREATEREFINTEGRITY)
+HB_FUNC( ADSDDCREATEREFINTEGRITY )
 {
 #if ADS_LIB_VERSION >= 600
 	hb_retl( AdsDDCreateRefIntegrity( HB_ADS_PARCONNECTION( 1 ) /*hConnect*/,
@@ -1830,8 +1830,8 @@ HB_FUNC( ADSDDCREATEREFINTEGRITY)
 							( UNSIGNED8 * ) hb_parcx( 5 ) /* pPaerntTagName */,
 							( UNSIGNED8 * ) hb_parcx( 6 ) /* pChildTable */,
 							( UNSIGNED8 * ) hb_parcx( 7 ) /* pChildTagName */,
-							( UNSIGNED16 ) hb_parcx( 8 ) /* pUpdateRule */,
-							( UNSIGNED16 ) hb_parcx( 9 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
+							( UNSIGNED16 ) hb_parni( 8 ) /* pUpdateRule */,
+							( UNSIGNED16 ) hb_parni( 9 ) /* pDeleteRule*/ ) == AE_SUCCESS ) ;
 #else
    hb_retl( FALSE );
 #endif
