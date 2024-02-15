@@ -18,8 +18,7 @@ the latest xHarbour official binaries distribution from
 
 If you have any questions about xHarbour please be sure to read the info on
 [xHarbour.org](http://www.xharbour.org), and for live interaction you may use 
-
-<b>comp.lang.xharbour newsgroup</b>
+comp.lang.xharbour newsgroup.
 
 Also, please be sure to read the
 documentation that comes with xHarbour, you should find it in the ./doc/
