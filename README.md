@@ -19,7 +19,7 @@ ensure that you are using the latest release.
 If you have any questions about xHarbour please be sure to read the info on
 [xHarbour.org](http://www.xharbour.org), and for live interaction you may use 
 
-<a href = "news://comp.lang.xharbour">comp.lang.xharbour newsgroup</a>
+<b>comp.lang.xharbour newsgroup</b>
 
 Also, please be sure to read the
 documentation that comes with xHarbour, you should find it in the ./doc/
