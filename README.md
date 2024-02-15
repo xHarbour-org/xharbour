@@ -13,7 +13,7 @@ CA-Clipper). The goal of the xHarbour project is to produce a cross platform
 CA-Clipper compatible compiler, extended to support popular modern extensions..
 
 The xHarbour web site is at [xHarbour.org](http://www.xharbour.org). If you
-have any problems with this copy of Harbour please visit our web site and
+have any problems with this copy of xHarbour please visit our web site and
 ensure that you are using the latest release.
 
 If you have any questions about xHarbour please be sure to read the FAQ
