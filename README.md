@@ -12,7 +12,7 @@ referred to as Clipper (the language that is implemented by the compiler
 CA-Clipper). The goal of the xHarbour project is to produce a cross platform
 CA-Clipper compatible compiler, extended to support popular modern extensions..
 
-The xHarbour web site is at <URL:http://www.xharbour.org>. If you
+The xHarbour web site is at [xHarbour.org](http://www.xharbour.org). If you
 have any problems with this copy of Harbour please visit our web site and
 ensure that you are using the latest release.
 
