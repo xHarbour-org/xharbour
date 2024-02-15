@@ -6,7 +6,7 @@ and extensive Run-time libraries.
 
 <b>Welcome to xHarbour</b>
 
-xHarbour is a fork from the Harbour project <URL:http://harbour-project.org> -
+xHarbour is a fork from the [Harbour project](http://harbour-project.org) -
 a free software compiler for the xBase superset language often
 referred to as Clipper (the language that is implemented by the compiler
 CA-Clipper). The goal of the xHarbour project is to produce a cross platform
