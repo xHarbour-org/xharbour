@@ -6,20 +6,19 @@ and extensive Run-time libraries.
 
 <b>Welcome to xHarbour</b>
 
-xHarbour is a fork from the Harbour project <URL:http://harbour-project.org> -
+xHarbour is a fork from the [Harbour project](https://harbour.github.io/) -
 a free software compiler for the xBase superset language often
 referred to as Clipper (the language that is implemented by the compiler
 CA-Clipper). The goal of the xHarbour project is to produce a cross platform
 CA-Clipper compatible compiler, extended to support popular modern extensions..
 
-The xHarbour web site is at <URL:http://www.xharbour.org>. If you
-have any problems with this copy of Harbour please visit our web site and
-ensure that you are using the latest release.
+The xHarbour web site is at [xHarbour.org](http://www.xharbour.org). You can download
+the latest xHarbour official binary distributions from
+[here](http://xharbour.org/index.asp?page=download/binaries).
 
-If you have any questions about xHarbour please be sure to read the FAQ
-<URL:http://www.xharbour.org>, and for live interaction you may use 
-
-news://comp.lang.xharbour <URL:https://groups.google.com/g/comp.lang.xharbour>
+If you have any questions about xHarbour please be sure to read the info on
+[xHarbour.org](http://www.xharbour.org), and for live interaction you may use 
+comp.lang.xharbour newsgroup.
 
 Also, please be sure to read the
 documentation that comes with xHarbour, you should find it in the ./doc/
