@@ -16,10 +16,10 @@ The xHarbour web site is at [xHarbour.org](http://www.xharbour.org). If you
 have any problems with this copy of xHarbour please visit our web site and
 ensure that you are using the latest release.
 
-If you have any questions about xHarbour please be sure to read the FAQ
-<URL:http://www.xharbour.org>, and for live interaction you may use 
+If you have any questions about xHarbour please be sure to read the info on
+[xHarbour.org](http://www.xharbour.org), and for live interaction you may use 
 
-news://comp.lang.xharbour <URL:https://groups.google.com/g/comp.lang.xharbour>
+[comp.lang.xharbour newsgroup](news://comp.lang.xharbour)
 
 Also, please be sure to read the
 documentation that comes with xHarbour, you should find it in the ./doc/
