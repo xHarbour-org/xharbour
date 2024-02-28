@@ -62,14 +62,14 @@
  *
  */
 
+#if defined( HB_OS_WIN_32 ) && ! defined( HB_OS_WIN_64 )
+
 #ifndef NODLL
 
 #define _WIN32_WINNT 0x0400
 #define  WIN32_LEAN_AND_MEAN
 
 #include "hbapiitm.h"
-
-#if defined( HB_OS_WIN_32 ) && ! defined( HB_OS_WIN_64 )
 
 #if defined( __WATCOMC__ )
    #pragma disable_message ( 200 )
@@ -998,10 +998,7 @@ HB_FUNC( CALLDLL )
 
 }
 
-#endif /* End of HB_OS_WIN32 */
-
 #endif   /* NODLL */
-
 
 #include <windows.h>
 #include "hbapi.h"
@@ -1038,3 +1035,5 @@ HB_FUNC( DLLUNLOAD )
 {
    HB_FUNCNAME( FREELIBRARY ) ();
 }
+
+#endif /* End of HB_OS_WIN32 */
