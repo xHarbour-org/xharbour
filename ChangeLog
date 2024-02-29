@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-02-29 14:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rtl\dllcall.c
+    ! Fixed the previous commit
+
 2024-02-28 07:40 UTC-0500 Ron Pinkas <ronpinkas/AT/gmail/com>
   * source\rtl\dllcall.c
     ! Fixed to completly exclude if not Windows build
