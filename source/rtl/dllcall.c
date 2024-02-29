@@ -62,7 +62,7 @@
  *
  */
 
-#if defined( HB_OS_WIN_32 ) && ! defined( HB_OS_WIN_64 )
+#if defined( __WIN32__ ) && ! defined( __WIN64__ )
 
 #ifndef NODLL
 
@@ -1000,6 +1000,11 @@ HB_FUNC( CALLDLL )
 
 #endif   /* NODLL */
 
+#endif /* End of __WIN32__ */
+
+
+#if defined( __WIN32__ ) || defined( __WIN64__ )
+
 #include <windows.h>
 #include "hbapi.h"
 
@@ -1036,4 +1041,4 @@ HB_FUNC( DLLUNLOAD )
    HB_FUNCNAME( FREELIBRARY ) ();
 }
 
-#endif /* End of HB_OS_WIN32 */
+#endif /* End of __WIN32__ */
