@@ -8,6 +8,7 @@ DIRS=\
 	include \
 	source \
 	utils{source} \
+	xHarbourBuilder \
 #	tests \
 #	samples \
 

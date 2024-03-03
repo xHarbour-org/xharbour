@@ -13,6 +13,9 @@ DIRS=\
 	libnf \
 	rdd_ads \
 	filemem \
+	xHarbour-SQLRDD \
+	xHarbour-xBuild \
+
 
 
 else
