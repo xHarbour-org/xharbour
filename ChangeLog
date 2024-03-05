@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-03-24 14:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib\rdd_ads\adsfunc.c
+    ! fixed compiler warnings
+
 2024-03-03 10:00 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
   * Makefile
     ! added xHarbourBuilder folder
