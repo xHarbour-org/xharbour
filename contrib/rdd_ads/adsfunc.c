@@ -1599,7 +1599,7 @@ HB_FUNC( ADSGETNUMINDEXES )
 
 HB_FUNC( ADSCONNECTION )                /* Get/Set func to switch between connections. */
 {
-   HB_ADS_RETCONNECTION( hb_ads_hConnect );
+   HB_ADS_RETCONNECTION( ( LONG ) hb_ads_hConnect );
 
    hb_ads_hConnect = HB_ADS_PARCONNECTION( 1 );
 }
@@ -1933,7 +1933,7 @@ HB_FUNC( ADSCONNECT60 )
    {
       hb_ads_hConnect = hConnect;       /* set new default */
 
-      hb_stornl( hConnect, 6 );
+      hb_stornl( ( long ) hConnect, 6 );
 
       hb_retl( TRUE );
    }
@@ -2694,7 +2694,7 @@ HB_FUNC( ADSGETFIELDTYPE )
 HB_FUNC( ADSGETSQLHANDLE )
 {
    ADSAREAP pArea = hb_adsGetWorkAreaPointer();
-   hb_retnl ( pArea->hStatement );
+   hb_retnl ( ( LONG ) pArea->hStatement );
 }
 
 
@@ -2804,7 +2804,7 @@ HB_FUNC( ADSDDSETFIELDPROPERTY )
    ulRetVal = AdsDDSetFieldProperty( hConnect, pTableName, pFieldName, 
                            ulPropertyID, &ulBuffer, 
                            ( UNSIGNED16 ) hb_itemGetCLen( pPropValue ) + 1,
-                           NULL, NULL );
+                           0, NULL );
 
    hb_retl( ulRetVal == AE_SUCCESS);
 }
@@ -2822,7 +2822,7 @@ HB_FUNC( ADSSETTIMESTAMP )
    ulRetVal = AdsSetTimeStamp( pArea->hStatement,
 	   ( UNSIGNED8 *) hb_parc(1),
 	   ( UNSIGNED8 *) hb_parc(2), 
-	   hb_parclen(2) );
+	   ( UNSIGNED32 ) hb_parclen(2) );
 
    hb_retl( ulRetVal == AE_SUCCESS );
 }
