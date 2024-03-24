@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2024-03-24 14:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2024-03-24 10:26 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\pvalue.c
+    ! fixed compiler warnings
+
+2024-03-05 14:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib\rdd_ads\adsfunc.c
     ! fixed compiler warnings
 
