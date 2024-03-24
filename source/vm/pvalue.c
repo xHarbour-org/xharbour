@@ -77,7 +77,7 @@ HB_FUNC( PVALUE )
       hb_itemReturn( pItem );
 
       if( hb_pcount() > 1 && HB_IS_BYREF( pItem ) )
-         hb_itemCopy( pItem, hb_param( 2, HB_IT_ANY ) );
+         hb_itemCopy( hb_itemUnRef( pItem ), hb_param( 2, HB_IT_ANY ) );
    }
    else
       hb_ret();    /* return NIL */
