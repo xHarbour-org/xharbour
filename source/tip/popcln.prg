@@ -72,8 +72,8 @@ CLASS TIPClientPOP FROM TIPClient
    METHOD Top( nMsgId )          // Get Headers of mail (no body) to be able to quickly handle a message
    METHOD UIDL( nMsgId )         // Returns Unique ID of message n or list of unique IDs of all message inside maildrop
    METHOD GetOK()
-   METHOD countMail()
-   METHOD retrieveAll( lDelete, bAllBlock, bEachBlock )
+   METHOD CountMail()
+   METHOD RetrieveAll( lDelete, bAllBlock, bEachBlock )
    DESTRUCTOR PopClnDestructor()
 
 ENDCLASS
@@ -350,19 +350,19 @@ METHOD DELETE( nId ) CLASS TIPClientPOP
 
    RETURN ::GetOK()
 
-METHOD countMail() CLASS TIPClientPop
+METHOD CountMail() CLASS TIPClientPop
 
    LOCAL aMails
 
    IF ::isOpen
       ::Reset()
       aMails := hb_ATokens( StrTran( ::LIST(), Chr(13 ),'' ), Chr( 10 ) )
-      RETURN Len( aMails )
+      RETURN If( Empty( aMails ), 0, Len( aMails ) - 1 )
    ENDIF
 
    RETURN - 1
 
-METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS TIPClientPop
+METHOD RetrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS TIPClientPop
 
    LOCAL aMails, i, imax, cMail
 
@@ -374,7 +374,7 @@ METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS TIPClientPop
       RETURN NIL
    ENDIF
 
-   imax   := ::countMail()
+   imax   := ::CountMail()
    aMails := Array( imax )
 
    FOR i := 1 TO imax

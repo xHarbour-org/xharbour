@@ -52,8 +52,8 @@
  */
 
 /* 2007-04-10, Hannes Ziegler <hz AT knowlexbase.com>
-   Added method :countMail()
-   Added method :retrieveAll()
+   Added method :CountMail()
+   Added method :RetrieveAll()
 */
 
 #include "hbclass.ch"
@@ -77,8 +77,8 @@ CLASS tIPClientPOP FROM tIPClient
    METHOD Top( nMsgId )          // Get Headers of mail (no body) to be able to quickly handle a message
    METHOD UIDL( nMsgId )         // Returns Unique ID of message n or list of unique IDs of all message inside maildrop
    METHOD GetOK()
-   METHOD countMail()
-   METHOD retrieveAll()
+   METHOD CountMail()
+   METHOD RetrieveAll()
    DESTRUCTOR popDestructor
 ENDCLASS
 
@@ -358,17 +358,17 @@ RETURN ::GetOk()
 
 
 
-METHOD countMail() CLASS tIPClientPOP
+METHOD CountMail() CLASS tIPClientPOP
    LOCAL aMails
    IF ::isOpen
       ::reset()
       aMails := HB_ATokens( StrTran( ::list(), Chr(13),''), Chr(10) )
-      RETURN Len( aMails )
+      RETURN If( Empty( aMails ), 0, Len( aMails ) - 1 )
    ENDIF
 RETURN -1
 
 
-METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS tIPClientPOP
+METHOD RetrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS tIPClientPOP
    LOCAL aMails, i, imax, cMail
 
    IF Valtype( lDelete ) <> "L"
@@ -379,7 +379,7 @@ METHOD retrieveAll( lDelete, bAllBlock, bEachBlock ) CLASS tIPClientPOP
       RETURN NIL
    ENDIF
 
-   imax := ::countMail()
+   imax := ::CountMail()
    aMails := Array( imax )
 
    FOR i:=1 TO imax
@@ -406,4 +406,3 @@ PROCEDURE popDestructor CLASS tIPClientPOP
       ::nhandle := -1
    ENDIF
 RETURN
-

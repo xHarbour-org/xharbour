@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-03-26 09:44 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\tip\popcln.prg
+  * contrib\tipssl\popcln.prg
+    ! fixed method CountMail() which returned a wrong number
+
 2024-03-24 10:32 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\vm\pvalue.c
     ! fixed second parameter behavior. Thanks to Richard Visscher!
@@ -20,7 +25,7 @@
   * Makefile
     ! added xHarbourBuilder folder
   * xHarbourBuilder\Makefile
-    ! added 	xHarbour-SQLRDD and xHarbour-xBuild folder  for w32 build
+    ! added xHarbour-SQLRDD and xHarbour-xBuild folder  for w32 build
 
 2024-02-29 14:00 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\dllcall.c
