@@ -76,7 +76,11 @@
       #pragma comment( lib, "comdlg32" )
 
       #ifdef HB_NEEDS_ACE
-         #pragma comment( lib, "ace32" )
+         #ifdef _WIN64
+            #pragma comment( lib, "ace64" )
+         #else
+            #pragma comment( lib, "ace32" )
+         #endif
       #endif
    #endif /* _MSC_VER */
 
