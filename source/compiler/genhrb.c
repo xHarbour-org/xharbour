@@ -28,6 +28,10 @@
 
 #include "hbcomp.h"
 
+#if defined( HB_OS_WIN )
+   #include <windows.h>
+#endif
+
 #define SYM_NOLINK   0              /* Symbol does not have to be linked */
 #define SYM_FUNC     1              /* Defined function                  */
 #define SYM_EXTERN   2              /* Previously defined function       */
