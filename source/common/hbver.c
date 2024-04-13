@@ -1045,7 +1045,7 @@ char * hb_verBuildInfo( BOOL bOut )
 {
    char * szBuildInfo = ( char * ) hb_xgrab( 1024 );  // Should be enough IMO
 
-   hb_conOutStd_( "Harbour Build Info", 0, bOut );
+   hb_conOutStd_( "xHarbour Build Info", 0, bOut );
    hb_conOutStd_( hb_conNewLine(), 0, bOut );
    hb_conOutStd_( "---------------------------", 0, bOut );
    hb_conOutStd_( hb_conNewLine(), 0, bOut );
@@ -1105,7 +1105,7 @@ char * hb_verBuildInfo( BOOL bOut )
    hb_xstrcat( szBuildInfo, hb_verCvsLastEntry(), "\t", NULL );
    hb_conOutStd_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutStd_( "ChangeLog SVN version: ", 0, bOut );
+   hb_conOutStd_( "ChangeLog ID: ", 0, bOut );
    hb_conOutStd_( hb_verCvsChangeLogID(), 0, bOut );
    hb_xstrcat( szBuildInfo, hb_verCvsChangeLogID(), "\t", NULL );
    hb_conOutStd_( hb_conNewLine(), 0, bOut );
