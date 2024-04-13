@@ -83,7 +83,7 @@ HB_EXTERN_END
 #if defined( __XCC__ )
    #define HWND_BROADCAST  ((HWND)0xffff)
 #else
-   #define HWND_BROADCAST  ((HWND)(HB_LONG)0xffff)
+   #define HWND_BROADCAST  ((HWND)(LONG_PTR)0xffff)
 #endif
 
 BOOL hb_isLegacyDevice( LPTSTR pPrinterName )

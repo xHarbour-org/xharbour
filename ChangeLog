@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-04-13 12:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\compiler\harbour.c
+  * source\compiler\genc.c
+  * source\compiler\genhrb.c
+  * source\vm\runner.c
+  * source\rtl\tprinter.c
+    ! Fixed compiler warnings
+
 2024-04-13 10:31 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\common\hbver.c
     ! Changed "ChangeLog SVN version" to "ChangeLog ID"

@@ -2269,7 +2269,7 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
 #if defined( __XCC__ )
             return ( PFUNCTION ) 1;
 #else
-            return ( PFUNCTION ) ( HB_LONG ) 1;
+            return ( PFUNCTION ) ( LONG_PTR ) 1;
 #endif
          }
          else
