@@ -151,7 +151,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 #if defined( __XCC__ )
             if( pFunc == ( PFUNCTION ) 1 )
 #else
-            if( pFunc == ( PFUNCTION ) ( HB_LONG ) 1 )
+            if( pFunc == ( PFUNCTION ) ( LONG_PTR ) 1 )
 #endif
             {
                /* Resolved to external member. */
@@ -283,4 +283,3 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
    hb_compOutStd( "Done.\n" );
 }
-
