@@ -27,7 +27,8 @@ if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache make git bison
 elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
 elif [ -x "$(command -v dnf)" ];     then sudo dnf install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v zypper)" ];  then sudo zypper install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
-elif [ -x "$(command -v yum)" ];  then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel libnsl2-devel libnsl
+elif [ -x "$(command -v yum)" ];     then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel libnsl2-devel libnsl
+elif [ -x "$(command -v brew)" ];    then brew install bison zlib openssl tcl-tk unixodbc && brew install --cask xquartz
 else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
 
 
@@ -122,6 +123,12 @@ case "$HB_ARCHITECTURE" in
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         HB_INSTALL_GROUP=wheel
         ETC="/private/etc"
+        LIB_NAMES=("zlib" "openssl" "X11" "unixodbc")
+        LIB_PREFIXES=($(brew --prefix zlib) $(brew --prefix openssl) "/opt/X11" $(brew --prefix unixodbc))
+        for index in ${!LIB_NAMES[@]}; do
+            export C_USR="$C_USR -I${LIB_PREFIXES[$index]}/include"
+            export L_USR="$L_USR -L${LIB_PREFIXES[$index]}/lib"
+        done
         ;;
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"

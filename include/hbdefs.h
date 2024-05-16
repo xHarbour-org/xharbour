@@ -109,22 +109,27 @@
       #undef  HAVE_INTTYPES_H
       #define HAVE_INTTYPES_H        0
       #undef  INT64_MAX
-
    #endif
+
+   #if defined( __GNUC__ ) 
+      typedef intptr_t LONG_PTR;
+      typedef uintptr_t ULONG_PTR;
+   #endif
+   
    /* NOTE: Hack to avoid collision between stdint.h and unistd.h. */
    #  if defined( HB_OS_VXWORKS ) && defined( _INTPTR ) && ! defined( _INTPTR_T )
    #     define _INTPTR_T
    #  endif
 
-/* for backward compatibility */
-#define s_defaultGT     hb_gt_szNameDefault
+   /* for backward compatibility */
+   #define s_defaultGT     hb_gt_szNameDefault
 
-/* Compatibility. Do not use HB_OS_WIN_32_USED anymore. */
-#ifdef HB_LEGACY_LEVEL2
-   #if defined( HB_OS_WIN_32_USED ) && ! defined( HB_OS_WIN_USED )
-      #define HB_OS_WIN_USED
+   /* Compatibility. Do not use HB_OS_WIN_32_USED anymore. */
+   #ifdef HB_LEGACY_LEVEL2
+      #if defined( HB_OS_WIN_32_USED ) && ! defined( HB_OS_WIN_USED )
+         #define HB_OS_WIN_USED
+      #endif
    #endif
-#endif
 
 
    /* workaround for BCC 5.8 bug */

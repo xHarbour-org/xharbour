@@ -26,12 +26,13 @@ fi
 # brew install openssl
 # brew install tcl-tk
 # brew install --cask xquartz
+# brew install unixodbc
 
 export C_USR="-Weverything -Wno-cast-qual -Wno-format-nonliteral -Wno-declaration-after-statement -Wno-empty-translation-unit -Wno-newline-eof -Wno-date-time -Wno-double-promotion -Wno-shorten-64-to-32 -Wno-shadow -Wno-implicit-int-conversion -Wno-sign-conversion -Wno-poison-system-directories -Wno-padded -Wno-deprecated-declarations -Wno-cast-align -Wno-undef -Wno-unused-macros -Wno-missing-prototypes -Wno-invalid-source-encoding -Wno-documentation-unknown-command -Wno-c11-extensions -Wno-c++11-extensions"
 export L_USR=""
 
-LIB_NAMES=("zlib" "openssl" "X11")
-LIB_PREFIXES=($(brew --prefix zlib) $(brew --prefix openssl) "/opt/X11")
+LIB_NAMES=("zlib" "openssl" "X11" "unixodbc")
+LIB_PREFIXES=($(brew --prefix zlib) $(brew --prefix openssl) "/opt/X11" $(brew --prefix unixodbc))
 
 for index in ${!LIB_NAMES[@]}; do
   export C_USR="$C_USR -I${LIB_PREFIXES[$index]}/include"
