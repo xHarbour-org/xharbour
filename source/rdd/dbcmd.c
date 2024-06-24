@@ -2121,27 +2121,8 @@ HB_FUNC( __DBCOPY )
 
    if( pArea )
    {
-      const char *   szFile = hb_parcx( 1 );
-      char           szPath[ HB_PATH_MAX ];
-
-     #ifdef HB_OS_HAS_DRIVE_LETTER
-      if( strchr( szFile, HB_OS_PATH_DELIM_CHR ) == NULL && strchr( szFile, HB_OS_DRIVE_DELIM_CHR ) == NULL )
-     #else
-      if( strchr( szFile, HB_OS_PATH_DELIM_CHR ) == NULL )
-     #endif
-      {
-         szPath[ 0 ] = HB_OS_PATH_DELIM_CHR;
-         szPath[ 1 ] = '\0';
-
-         hb_fsCurDirBuff( 0, szPath + 1, sizeof( szPath ) - 1 );
-
-         hb_xstrcat( szPath, HB_OS_PATH_DELIM_CHR_STRING, szFile, 0 );
-
-         szFile = szPath;
-      }
-
       hb_retl( HB_SUCCESS == hb_rddTransRecords( pArea,
-                                                 szFile,                                        /* file name */
+                                                 hb_parc( 1 ),                                  /* file name */
                                                  hb_parc( 8 ),                                  /* RDD */
                                                  hb_parnl( 9 ),                                 /* connection */
                                                  hb_param( 2, HB_IT_ARRAY ),                    /* Fields */
