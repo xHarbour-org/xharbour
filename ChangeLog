@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-06-24 21:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rdd\dbcmd.c
+    ! Fixed __DBCOPY() function to honor SET DEFAULT path
+
 2024-05-15 20:20 UTC-0800 Ron Pinkas <ronpinkas/AT/gmail/com>
   * include/hbdefs.h
     ! Added support for LONG_PTR and ULONG_PTR under #ifdef __GNUC__
@@ -15,7 +19,6 @@
     + Added support for unixodbc
   * buildxbuilder.sh
     ! Fixed to build on MacOs
-
 
 2024-04-13 12:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\compiler\harbour.c
