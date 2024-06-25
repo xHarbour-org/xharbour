@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-06-25 10:00 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include\hbdefs.h
+    ! Exclude LONG_PTR and ULONG-PTR definition for MinGW compilers
+
 2024-06-24 21:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rdd\dbcmd.c
     ! Fixed __DBCOPY() function to honor SET DEFAULT path

@@ -111,7 +111,7 @@
       #undef  INT64_MAX
    #endif
 
-   #if defined( __GNUC__ ) 
+   #if defined( __GNUC__ ) && !defined( __MINGW32__ )
       typedef intptr_t LONG_PTR;
       typedef uintptr_t ULONG_PTR;
    #endif
