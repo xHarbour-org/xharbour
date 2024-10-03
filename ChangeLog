@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2024-10-03 13:01 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\ct\util.prg
+    ! Huge Occurs() speed improvement, borrowed from Harbour
+
 2024-09-24 20:20 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
     ! Disable C++ compile mode for C modules
