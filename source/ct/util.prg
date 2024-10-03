@@ -87,32 +87,19 @@ FUNCTION IsDir( cDir )
 
 //------------------------
 
-FUNCTION Occurs( c1, c2 )
+FUNCTION Occurs( cSub, cStr )
 
 //------------------------
 /*
 Return the ammout of times that c1 occurs into c2
 */
-   LOCAL nRet, nPos
+   LOCAL nCount := 0, nPos
 
-   IF !HB_ISSTRING( c1 ) .OR. !HB_ISSTRING( c2 )
-      RETURN 0
+   IF HB_ISSTRING( cSub ) .AND. HB_ISSTRING( cStr )
+      nPos := 0
+      DO WHILE ( nPos := At( cSub, cStr, nPos + 1 ) ) > 0
+         ++nCount
+      ENDDO
    ENDIF
 
-   IF Len( c1 ) == 0 .OR. Len( c2 ) == 0
-      RETURN 0
-   ENDIF
-
-   nRet := 0
-
-   WHILE !Empty( c2 )
-      nPos := At( c1, c2 )
-      IF nPos > 0
-         nRet++
-         c2 := SubStr( c2, nPos + 1 )
-      ELSE
-         c2 := ""
-      ENDIF
-   ENDDO
-
-   RETURN nRet
+   RETURN nCount
