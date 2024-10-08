@@ -183,14 +183,12 @@ HPDF_FToA  (char       *s,
             HPDF_REAL   val,
             char       *eptr)
 {
-    HPDF_REAL int_val;
-    HPDF_REAL fpart_val;
-    HPDF_REAL dig;
+    HPDF_INT32 int_val;
+    HPDF_INT32 fpart_val;
     char buf[HPDF_REAL_LEN + 1];
     char* sptr = s;
     char* t;
-    HPDF_INT32 logVal;
-    HPDF_UINT32 prec;
+    HPDF_UINT32 i;
 
     if (val > HPDF_LIMIT_MAX_REAL)
         val = HPDF_LIMIT_MAX_REAL;
@@ -198,50 +196,43 @@ HPDF_FToA  (char       *s,
     if (val < HPDF_LIMIT_MIN_REAL)
         val = HPDF_LIMIT_MIN_REAL;
 
-    t = buf;
-    *t++ = 0;
+    t = buf + HPDF_REAL_LEN;
+    *t-- = 0;
 
     if (val < 0) {
         *s++ = '-';
         val = -val;
     }
 
-    /* compute the decimal precision to write at least 5 significant figures */
-    logVal = (HPDF_INT32)(val > 1e-20 ? log10(val) : 0.);
-    if (logVal >= 0) {
-        prec = 5;
-    }
-    else {
-        prec = -logVal + 5;
-    }
+    /* separate an integer part and a decimal part. */
+    int_val = (HPDF_INT32)(val + 0.000005);
+    fpart_val = (HPDF_INT32)((HPDF_REAL)(val - int_val + 0.000005) * 100000);
 
-    /* separate an integer part and a fractional part. */
-    fpart_val = modff(val, &int_val);
+    /* process decimal part */
+    for (i = 0; i < 5; i++) {
+        *t = (char)((char)(fpart_val % 10) + '0');
+        fpart_val /= 10;
+        t--;
+    }
 
     /* process integer part */
-    do {
-        dig = modff(int_val/10.0, &int_val);
-        *t++ = (char)(dig*10.0 + 0.5) + '0';
-    } while (int_val > 0);
+    *t-- = '.';
+    *t = '0';
+    if (int_val == 0)
+        t--;
 
-    /* copy to destination buffer */
-    t--;
+    while (int_val > 0) {
+        *t = (char)((char)(int_val % 10) + '0');
+        int_val /= 10;
+        t--;
+    }
+
+    t++;
     while (s <= eptr && *t != 0)
-        *s++ = *t--;
+        *s++ = *t++;
+    s--;
 
-   /* process fractional part */
-   *s++ = '.';
-   if(fpart_val != 0.0) {
-       HPDF_UINT32 i;
-
-       for (i = 0; i < prec; i++) {
-          fpart_val = modff(fpart_val*10.0, &int_val);
-          *s++ = (char)(int_val + 0.5) + '0';
-       }
-   }
-
-   /* delete an excessive decimal portion. */
-   s--;
+    /* delete an excessive decimal portion. */
     while (s > sptr) {
         if (*s == '0')
             *s = 0;
