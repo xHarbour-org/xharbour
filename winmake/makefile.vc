@@ -27,6 +27,7 @@ HB_MACHINE=X64
 !else
 ACE_LIB   =$(ACE32_LIB)
 HB_MACHINE=X86
+CPLUSPLUS =1
 !endif
 
 !if ("$(__MSC__)"=="6")
