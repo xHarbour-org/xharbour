@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-01-19 18:11 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/vm/itemapi.c
+    ! Add HB_FINITE_DBL() new definition for __clang__ case. Thanks to Antonio Linares!
+
 2024-12-21 14:25 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * winmake\makefile.vc
     ! Reenabled C++ compile mode for C modules (the final EXEs are smaller)

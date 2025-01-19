@@ -1427,6 +1427,8 @@ BOOL hb_itemStrBuf( char * szResult, PHB_ITEM pNumber, int iSize, int iDec )
       defined( __XCC__ ) || defined( __POCC__ ) || defined( __DMC__ ) || \
       defined( HB_OS_HPUX )
 #  define HB_FINITE_DBL( d )  ( isfinite( d ) != 0 )
+#elif defined( __clang__ ) 
+# define HB_FINITE_DBL( d ) ( isfinite( d ) != 0 )
 #elif defined( __WATCOMC__ ) || defined( __BORLANDC__ ) || defined( _MSC_VER )
 #  define HB_FINITE_DBL( d )  ( _finite( d ) != 0 )
 #elif defined(__APPLE__)
