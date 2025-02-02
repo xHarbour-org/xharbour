@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-02-02 11:38 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/hbcurl/hbcurl.c
+    ! Pacified a warning
+
 2025-02-02 08:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbcurl/hbcurl.c
     ! HB_CURLOPT_WRITEFUNCTION implemented. Thanks to Antonio Linares!
