@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-01-15 22:10 UTC-0300  Luiz Rafael Culik <culikr/AT/gmail/com>
+  * xHarbourBuilder\xbuild.vc8.ini
+  ! update to last visual studio
+
 2025-02-15 18:45 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbcurl/hbcurl.c
     ! Pacified a warning
