@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-03-11 09:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include\hbver.ch
+    * Bumped to 2025
+  * include/hbver.h
+    * Bumped to 1.3.2
+
 2025-02-25 15:48 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbcurl/hbcurl.c
     ! added support for HB_CURLOPT_MIMEPOST. Thanks to Antonio Linares!
