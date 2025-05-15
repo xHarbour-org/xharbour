@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-05-15 14:42 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\tip\client.prg
+  * contrib\tipssl\client.prg
+    * Reset of nRead to 0 in method Reset()
+
 2025-03-11 09:20 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include\hbver.ch
     * Bumped to 2025
