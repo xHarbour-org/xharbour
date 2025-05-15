@@ -300,6 +300,7 @@ RETURN(nRet)
 METHOD Reset() CLASS tIPClient
    ::bInitialized := .F.
    ::bEof := .F.
+   ::nRead := 0
 RETURN .T.
 
 

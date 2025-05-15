@@ -237,6 +237,7 @@ METHOD Reset() CLASS TIPClient
 
    ::bInitialized := .F.
    ::bEof         := .F.
+   ::nRead        := 0
 
    RETURN .T.
 
