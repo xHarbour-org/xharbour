@@ -1532,7 +1532,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
 }
 
 static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
-                           BOOL fSpaces, BOOL fQuote, int ltype )
+                           BOOL fSpaces, BOOL fQuote )
 {
    int iLines = 0, iSpace = fSpaces ? pToken->spaces : 0;
 
@@ -4216,7 +4216,7 @@ static PHB_PP_TOKEN * hb_pp_matchResultLstAdd( PHB_PP_STATE pState,
             else
             {
                hb_membufFlush( pState->pBuffer );
-               hb_pp_tokenStr( pToken, pState->pBuffer, FALSE, FALSE, 0 );
+               hb_pp_tokenStr( pToken, pState->pBuffer, FALSE, FALSE );
                hb_pp_tokenAdd( &pResultPtr,
                                hb_membufPtr( pState->pBuffer ),
                                hb_membufLen( pState->pBuffer ),
@@ -4265,7 +4265,7 @@ static PHB_PP_TOKEN * hb_pp_matchResultLstAdd( PHB_PP_STATE pState,
             hb_membufFlush( pState->pBuffer );
             do
             {
-               hb_pp_tokenStr( pToken, pState->pBuffer, fSpaces, FALSE, 0 );
+               hb_pp_tokenStr( pToken, pState->pBuffer, fSpaces, FALSE );
                fSpaces  = TRUE;
                pToken   = pToken->pNext;
             }
@@ -4337,7 +4337,7 @@ static PHB_PP_TOKEN * hb_pp_matchResultAdd( PHB_PP_STATE pState,
             fSpaces = FALSE;
             do
             {
-               hb_pp_tokenStr( pToken, pState->pBuffer, fSpaces, FALSE, 0 );
+               hb_pp_tokenStr( pToken, pState->pBuffer, fSpaces, FALSE );
                fSpaces  = TRUE;
                pToken   = pToken->pNext;
             }
@@ -4431,14 +4431,12 @@ static char * hb_pp_tokenListStr( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pStop,
                                   BOOL fStop, PHB_MEM_BUFFER pBuffer,
                                   BOOL fQuote, BOOL fEol )
 {
-   USHORT ltype   = HB_PP_TOKEN_NUL;
    BOOL   fSpaces = FALSE;
 
    hb_membufFlush( pBuffer );
    while( pToken && ( fStop ? pToken != pStop : ! HB_PP_TOKEN_ISEOC( pToken ) ) )
    {
-      hb_pp_tokenStr( pToken, pBuffer, fSpaces, fQuote, ltype );
-      ltype    = HB_PP_TOKEN_TYPE( pToken->type );
+      hb_pp_tokenStr( pToken, pBuffer, fSpaces, fQuote );
       fSpaces  = TRUE;
       pToken   = pToken->pNext;
    }
@@ -5495,11 +5493,9 @@ PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState )
          while( ++i < pState->pFile->iCurrentLine );
       }
       /*pState->pFile->iLastLine = pState->pFile->iCurrentLine +*/
-      hb_pp_tokenStr( pState->pTokenOut, pState->pBuffer, TRUE, TRUE,
-                      pState->iLastType );
+      hb_pp_tokenStr( pState->pTokenOut, pState->pBuffer, TRUE, TRUE );
 #else
-      hb_pp_tokenStr( pState->pTokenOut, pState->pBuffer, TRUE, TRUE,
-                      pState->iLastType );
+      hb_pp_tokenStr( pState->pTokenOut, pState->pBuffer, TRUE, TRUE );
 #endif
       pState->iLastType = HB_PP_TOKEN_TYPE( pState->pTokenOut->type );
       fwrite( hb_membufPtr( pState->pBuffer ), sizeof( char ),
@@ -6016,20 +6012,19 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
    {
       PHB_PP_TOKEN pToken;
       BOOL         fError = FALSE;
-      USHORT       ltype;
 
       if( ! pState->pOutputBuffer )
          pState->pOutputBuffer = hb_membufNew();
       else
          hb_membufFlush( pState->pOutputBuffer );
 
-      pState->iLastType = ltype = HB_PP_TOKEN_NUL;
+      pState->iLastType = HB_PP_TOKEN_NUL;
       while( ( pToken = hb_pp_tokenGet( pState ) ) != NULL )
       {
          if( pState->fError )
             fError = TRUE;
 
-         if( hb_pp_tokenStr( pToken, pState->pOutputBuffer, TRUE, TRUE, ltype ) )
+         if( hb_pp_tokenStr( pToken, pState->pOutputBuffer, TRUE, TRUE ) )
          {
             if( HB_PP_TOKEN_ISEOL( pToken ) && ( pToken->type & HB_PP_TOKEN_LINECOUNTER ) )
                pState->pFile->iCurrentLine++;
@@ -6042,8 +6037,6 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
          if( ! pState->pTokenOut->pNext )
             break;
          #endif
-
-         ltype = HB_PP_TOKEN_TYPE( pToken->type );
       }
       if( fError )
          pState->fError = TRUE;
@@ -6068,7 +6061,6 @@ char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, HB_SIZE * pulLe
    PHB_PP_TOKEN pToken;
    PHB_PP_FILE  pFile;
    BOOL         fError = FALSE;
-   USHORT       ltype;
    HB_SIZE      ulLen;
 
    if( ! pState->pOutputBuffer )
@@ -6083,13 +6075,12 @@ char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, HB_SIZE * pulLe
    pState->pFile     = pFile;
    pState->iFiles++;
 
-   pState->iLastType = ltype = HB_PP_TOKEN_NUL;
+   pState->iLastType = HB_PP_TOKEN_NUL;
    while( ( pToken = hb_pp_tokenGet( pState ) ) != NULL )
    {
       if( pState->fError )
          fError = TRUE;
-      hb_pp_tokenStr( pToken, pState->pOutputBuffer, TRUE, TRUE, ltype );
-      ltype = HB_PP_TOKEN_TYPE( pToken->type );
+      hb_pp_tokenStr( pToken, pState->pOutputBuffer, TRUE, TRUE );
    }
    if( fError )
       pState->fError = TRUE;
@@ -6272,7 +6263,7 @@ void hb_pp_tokenToString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
             hb_pp_tokenMoveCommand( &pTok->pNext,
                                     &pState->pFile->pTokenList );
          }
-         hb_pp_tokenStr( pTok, pState->pBuffer, TRUE, FALSE, 0 );
+         hb_pp_tokenStr( pTok, pState->pBuffer, TRUE, FALSE );
          pTok = pTok->pNext;
       }
       if( pLast )
@@ -6309,12 +6300,10 @@ char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
    hb_membufFlush( pState->pBuffer );
    if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_LEFT_CB )
    {
-      USHORT ltype   = HB_PP_TOKEN_NUL;
       int    iBraces = 0;
       do
       {
-         hb_pp_tokenStr( pToken, pState->pBuffer, FALSE, TRUE, ltype );
-         ltype = HB_PP_TOKEN_TYPE( pToken->type );
+         hb_pp_tokenStr( pToken, pState->pBuffer, FALSE, TRUE );
          if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_AMPERSAND )
          {
             if( pToken->pNext &&
