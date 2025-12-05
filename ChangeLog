@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2025-12-05 18:30 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\pp\ppcore.c
+    ! fixed wrong pp behaviour with [] string delimiters, thanks to Przemek!
+
 2025-10-22 11:50 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rdd\dbf1.c
     ! fixed wrong initialization to 0 of autoinc fields after ZAP
@@ -18677,4 +18681,5 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
+
 
