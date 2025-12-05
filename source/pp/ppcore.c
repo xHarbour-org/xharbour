@@ -1536,20 +1536,11 @@ static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
 {
    int iLines = 0, iSpace = fSpaces ? pToken->spaces : 0;
 
-   /* This is workaround for stringify token list and later decoding by FLEX
-      which breaks Clipper compatible code */
-   if( iSpace == 0 && fQuote && ltype &&
-       ltype >= HB_PP_TOKEN_ASSIGN && ltype != HB_PP_TOKEN_EQ &&
-       HB_PP_TOKEN_TYPE( pToken->type ) >= HB_PP_TOKEN_ASSIGN &&
-       HB_PP_TOKEN_TYPE( pToken->type ) != HB_PP_TOKEN_EQ )
-      iSpace = 1;
-#ifdef __XHARBOUR__
    /* This is a workaround for when [...] is reverted into a literal string
       after it's been tokenized like array, f.e.
          @ 0,0 SAY [---] */
-   else if( iSpace == 0xFFFF )
+   if( iSpace == 0xFFFF )
       iSpace = 0;
-#endif
 
    if( iSpace > 0 )
    {
