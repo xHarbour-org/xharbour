@@ -4132,8 +4132,29 @@ static HB_BOOL hb_compPCodeTraceAssignedUnused( PFUNCTION pFunc, HB_SIZE nPos, H
              pFunc->pCode[ nPos ] == HB_P_JUMPNEAR ||
              pFunc->pCode[ nPos ] == HB_P_JUMPFAR )
          {
+            int i;
+
+            for( i = nPos2; ; ++i )
+            {
+               if( pFunc->pCode[ i ] == HB_P_ENDPROC || pFunc->pCode[ i ] == HB_P_ENDBLOCK )
+                  break;
+
+               if( pFunc->pCode[ i ] == HB_P_SEQEND )
+                  return HB_TRUE;
+            }
+
             nPos = nPos2;
             continue;
+         }
+
+         if( pFunc->pCode[ nPos ] == HB_P_JUMPFALSE ||
+             pFunc->pCode[ nPos ] == HB_P_JUMPFALSENEAR ||
+             pFunc->pCode[ nPos ] == HB_P_JUMPFALSEFAR )
+         {
+            if( pFunc->pCode[ nPos2 - 3 ] == HB_P_JUMP ||
+                pFunc->pCode[ nPos2 - 2 ] == HB_P_JUMPNEAR ||
+                pFunc->pCode[ nPos2 - 4 ] == HB_P_JUMPFAR )
+               return HB_TRUE;
          }
 
          if( hb_compPCodeTraceAssignedUnused( pFunc, nPos2, pMap, isLocal ) )
