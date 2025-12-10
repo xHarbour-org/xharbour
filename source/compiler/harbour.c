@@ -4132,7 +4132,7 @@ static HB_BOOL hb_compPCodeTraceAssignedUnused( PFUNCTION pFunc, HB_SIZE nPos, H
              pFunc->pCode[ nPos ] == HB_P_JUMPNEAR ||
              pFunc->pCode[ nPos ] == HB_P_JUMPFAR )
          {
-            int i;
+            HB_SIZE i;
 
             for( i = nPos2; ; ++i )
             {
