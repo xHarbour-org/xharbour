@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-01-03 11:14 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\hvm.c
+    ! force MAIN() as startup procedure
+  * include\hbver.ch
+    * bumped to 2026
+
 2025-12-10 10:50 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\compiler\harbour.c
     ! pacify warnings
@@ -18693,6 +18699,7 @@
     then copy gmail.pem to 7f549ca4.0
     under linux
     execute the c_rehash command
+
 
 
 
