@@ -4596,7 +4596,13 @@ yybackup:
     {
       YYDPRINTF ((stderr, "Reading a token\n"));
       yychar = yylex ();
-    }
+
+      if (yychar == EPSILON && hb_comp_pLastMethod != NULL)
+      {
+        hb_comp_bVarParams = TRUE; 
+        yychar = yylex();
+      }
+	}
 
   if (yychar <= HB_COMP_YYEOF)
     {
@@ -9555,7 +9561,10 @@ yyreduce:
 
   case 713: /* $@47: %empty  */
 #line 2466 "../../harbour.sly"
-                           { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[-1].string), FALSE ); }
+             {
+               hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastClass, (yyvsp[-1].string), FALSE );
+               hb_comp_bVarParams = FALSE;
+             }
 #line 9556 "harboury.c"
     break;
 
@@ -9564,6 +9573,11 @@ yyreduce:
              {
                if( hb_comp_pLastMethod )
                {
+                 if( hb_comp_bVarParams )
+                 {
+                   hb_comp_pLastMethod->iParamCount = HB_VAR_PARAM_FLAG;
+                 }
+
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
                  if( toupper( hb_comp_cVarType ) == 'S' )
                  {
@@ -9579,6 +9593,7 @@ yyreduce:
                }
                hb_comp_pLastMethod = NULL;
                hb_comp_cVarType = ' ';
+               hb_comp_bVarParams = FALSE;
              }
 #line 9580 "harboury.c"
     break;
