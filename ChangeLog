@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-04-05 20:11 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/compiler/harbour.sly
+  * source/compiler/harbouryy.c
+    ! added support for variadic METHOD declarations - refinement
+
 2026-04-05 19:22 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/compiler/harbour.sly
   * source/compiler/harbouryy.c
