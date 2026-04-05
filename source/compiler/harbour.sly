@@ -2544,7 +2544,6 @@ DecList    : %empty            {}
            | FormalList
            | OptList
            | FormalList ',' OptList
-           | FormalList ',' EPSILON
            | EPSILON
            ;
 
