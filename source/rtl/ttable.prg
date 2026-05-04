@@ -103,8 +103,8 @@ FUNCTION NetDbUse( cDataBase, cAlias, nSeconds, cDriver, ;
    DO WHILE ( lforever .OR. nSeconds > 0 ) .AND. LastKey() != K_ESC
       IF !lfirstPass
          DispOutAt( MaxRow(), 0, ;
-            PadC( "Network retry ³ " + ;
-            LTrim( Str( nSeconds, 4, 1 ) ) + " ³ ESCape = Exit ", ;
+            PadC( "Network retry Â³ " + ;
+            LTrim( Str( nSeconds, 4, 1 ) ) + " Â³ ESCape = Exit ", ;
             MaxCol() + 1 ), ;
             scNetMsgColor )
          lFirstPass := .F.
@@ -207,7 +207,7 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
             ENDIF
 
             DispOutAt( MaxRow(), 0, ;
-               PadC( "Network Retry " + cWord + " ³ " + Str( nSeconds, 3 ) + " ³ ESC Exit", MaxCol() + 1 ), ;
+               PadC( "Network Retry " + cWord + " Â³ " + Str( nSeconds, 3 ) + " Â³ ESC Exit", MaxCol() + 1 ), ;
                scNetMsgColor )
 
             nKey := Inkey( 1 )          //TONE( 1,1 )
@@ -1473,8 +1473,8 @@ METHOD OnError( uParam ) CLASS HBTable
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "Invalid class member"
       oErr:GenCode       := EG_NOVARMETHOD
+      oErr:Description   := "Invalid class member"
       oErr:Operation     := "HBTable:" + cMsg
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := - 1
