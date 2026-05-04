@@ -62,7 +62,6 @@ FUNCTION __EInstVar53( oVar, cMethod, xValue, cType, nSubCode, bValid )
    IF !( ValType( xValue ) == cType ) .OR. ;
          ( bValid != NIL .AND. !Eval( bValid, oVar, xValue ) )
       oError := ErrorNew()
-      oError:description := hb_langErrMsg( 1 )
       oError:gencode := 1
       oError:severity := 2
       oError:cansubstitute := .T.
