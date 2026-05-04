@@ -1506,7 +1506,6 @@ STATIC PROCEDURE _GENLIMITRTE()
    oError:genCode     := EG_LIMIT
    oError:subSystem   := "TBROWSE"
    oError:subCode     := 0
-   oError:description := hb_LangErrMsg( EG_LIMIT )
    oError:canRetry    := .F.
    oError:canDefault  := .F.
    oError:fileName    := ""
