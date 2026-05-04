@@ -166,8 +166,8 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS TIPClient
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "unsupported protocol"
       oErr:GenCode       := EG_UNSUPPORTED
+      oErr:Description   := "Unsupported protocol"
       oErr:Operation     := ::className() + ":New()"
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 1081
