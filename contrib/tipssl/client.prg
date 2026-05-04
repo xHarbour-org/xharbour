@@ -198,8 +198,8 @@ METHOD New( oUrl, lTrace, oCredentials, lSSL, CAFile,CaPath ) CLASS tIPClient
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "unsupported protocol"
       oErr:GenCode       := EG_UNSUPPORTED
+      oErr:Description   := "Unsupported protocol"
       oErr:Operation     := ::className()+":new()"
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 1081
@@ -806,6 +806,3 @@ WHILE bMoreDataToRead
    ENDIF
 ENDDO
 RETURN nil
-
-
-
