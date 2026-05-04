@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright 2002  José F. Giménez (JFG) - <jfgimenez@wanadoo.es>
+ * Copyright 2002  JosÃ© F. GimÃ©nez (JFG) - <jfgimenez@wanadoo.es>
  *                 Ron Pinkas            - <ron@ronpinkas.com>
  *
  * www - http://www.xharbour.org
@@ -207,8 +207,8 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
-            oErr:Description   := OLEExceptionDescription()
             oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Description   := OLEExceptionDescription()
             oErr:Operation     := ProcName()
             oErr:Severity      := ES_ERROR
             oErr:SubCode       := -1
@@ -221,8 +221,8 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
-            oErr:Description   := Ole2TxtError()
             oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Description   := Ole2TxtError()
             oErr:Operation     := ProcName()
             oErr:Severity      := ES_ERROR
             oErr:SubCode       := -1
@@ -261,8 +261,8 @@ METHOD New( uObj, cClass, cLicense ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "Invalid argument to constructor!"
       oErr:GenCode       := 0
+      oErr:Description   := "Invalid argument to constructor!"
       oErr:Operation     := ProcName()
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := -1
@@ -302,8 +302,8 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
-            oErr:Description   := OLEExceptionDescription()
             oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Description   := OLEExceptionDescription()
             oErr:Operation     := ProcName()
             oErr:Severity      := ES_ERROR
             oErr:SubCode       := -1
@@ -316,8 +316,8 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
-            oErr:Description   := Ole2TxtError()
             oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Description   := Ole2TxtError()
             oErr:Operation     := ProcName()
             oErr:Severity      := ES_ERROR
             oErr:SubCode       := -1
@@ -372,7 +372,6 @@ METHOD OleValuePlus( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '+'
       oErr:Severity      := ES_ERROR
@@ -397,7 +396,6 @@ METHOD OleValueMinus( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '-'
       oErr:Severity      := ES_ERROR
@@ -422,7 +420,6 @@ METHOD OleValueMultiply( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '*'
       oErr:Severity      := ES_ERROR
@@ -447,7 +444,6 @@ METHOD OleValueDivide( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '/'
       oErr:Severity      := ES_ERROR
@@ -472,7 +468,6 @@ METHOD OleValueModulus( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '%'
       oErr:Severity      := ES_ERROR
@@ -497,7 +492,6 @@ METHOD OleValueInc() CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '++'
       oErr:Severity      := ES_ERROR
@@ -522,7 +516,6 @@ METHOD OleValueDec() CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '--'
       oErr:Severity      := ES_ERROR
@@ -547,7 +540,6 @@ METHOD OleValuePower( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '^'
       oErr:Severity      := ES_ERROR
@@ -572,7 +564,6 @@ METHOD OleValueEqual( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '='
       oErr:Severity      := ES_ERROR
@@ -597,7 +588,6 @@ METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '=='
       oErr:Severity      := ES_ERROR
@@ -622,7 +612,6 @@ METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "argument error"
       oErr:GenCode       := EG_ARG
       oErr:Operation     := '!='
       oErr:Severity      := ES_ERROR
