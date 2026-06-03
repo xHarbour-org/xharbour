@@ -10040,7 +10040,7 @@ PSYMBOLS    hb_vmRegisterSymbols( PHB_SYMB pSymbolTable   , UINT uiSymbols, cons
          /* first public defined symbol to start execution */
          s_pSymStart = pSymbol;
 
-      if( fDynLib == FALSE && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 && strcmp( pSymbol->szName, "MAIN" ) == 0 )
+      if( fDynLib == FALSE && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 && strcmp( pSymbol->szName, "MAIN" ) == 0 && ( pSymbol->value.pCodeFunc || pSymbol->value.pFunPtr ) )
          /* force MAIN() as startup procedure */
          s_pSymStart = pSymbol;
 
