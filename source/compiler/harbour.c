@@ -6274,7 +6274,7 @@ static int hb_compCompile( char * szPrg )
                      if( strlen( pSymb->szName ) > 0 && !szFirst )
                         szFirst = pSymb->szName;
 
-                     if( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4 && ! szMain )
+                     if( ! szMain && strcmp( pSymb->szName, "MAIN" ) == 0 )
                         szMain = pSymb->szName;
 
                      pSymb = pSymb->pNext;
@@ -6282,20 +6282,11 @@ static int hb_compCompile( char * szPrg )
 
                   if( szMain )
                   {
-                     BOOL bFirst   = TRUE;
-                     int iLenFirst = ( int ) strlen( szFirst );
-
                      pSymb = hb_comp_symbols.pFirst;
 
                      while( pSymb )
                      {
-                        if( strcmp( pSymb->szName, szFirst ) == 0 && ( int ) strlen( pSymb->szName ) == iLenFirst && bFirst )
-                        {
-                           pSymb->cScope  &= ~HB_FS_FIRST;
-                           bFirst = FALSE;
-                        }
-
-                        if( strcmp( pSymb->szName, "MAIN" ) == 0 && strlen( pSymb->szName ) == 4  )
+                        if( strcmp( pSymb->szName, "MAIN" ) == 0 )
                            pSymb->cScope  |= HB_FS_FIRST;
 
                         pSymb = pSymb->pNext;
