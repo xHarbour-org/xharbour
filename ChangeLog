@@ -9,7 +9,7 @@
 */
 
 2026-06-04 12:44 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\vm\hvm.c
+  * source\compiler\harbour.c
     ! force MAIN() as startup procedure - further refinement
 
 2026-06-03 17:53 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
