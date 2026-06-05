@@ -10036,13 +10036,16 @@ PSYMBOLS    hb_vmRegisterSymbols( PHB_SYMB pSymbolTable   , UINT uiSymbols, cons
       if( ( hSymScope & HB_FS_PCODEFUNC ) != 0 && ( fRecycled || fClone ) )
          pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pSymbolTable;
 
-      if( ! s_pSymStart && fDynLib == FALSE && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 )
-         /* first public defined symbol to start execution */
-         s_pSymStart = pSymbol;
+      if( fDynLib == FALSE && ( hSymScope & HB_FS_STATIC ) == 0 && ( pSymbol->value.pCodeFunc || pSymbol->value.pFunPtr ) )
+      {
+          if( ! s_pSymStart )
+             /* first public defined symbol to start execution */
+             s_pSymStart = pSymbol;
 
-      if( fDynLib == FALSE && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 && strcmp( pSymbol->szName, "MAIN" ) == 0 && ( pSymbol->value.pCodeFunc || pSymbol->value.pFunPtr ) )
-         /* force MAIN() as startup procedure */
-         s_pSymStart = pSymbol;
+          if( ( hSymScope & HB_FS_FIRST ) != 0 && strcmp( pSymbol->szName, "MAIN" ) == 0 )
+             /* force MAIN() as startup procedure */
+             s_pSymStart = pSymbol;
+      }
 
       /* Enable this code to see static functions which are registered in global dynsym table */
 #if 0
