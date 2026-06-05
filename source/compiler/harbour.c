@@ -6282,10 +6282,19 @@ static int hb_compCompile( char * szPrg )
 
                   if( szMain )
                   {
+                     BOOL bFirst   = TRUE;
+                     int iLenFirst = ( int ) strlen( szFirst );
+
                      pSymb = hb_comp_symbols.pFirst;
 
                      while( pSymb )
                      {
+                        if( strcmp( pSymb->szName, szFirst ) == 0 && ( int ) strlen( pSymb->szName ) == iLenFirst && bFirst )
+                        {
+                           pSymb->cScope  &= ~HB_FS_FIRST;
+                           bFirst = FALSE;
+                        }
+
                         if( strcmp( pSymb->szName, "MAIN" ) == 0 )
                            pSymb->cScope  |= HB_FS_FIRST;
 
