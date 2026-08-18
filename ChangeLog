@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-08-18 09:22 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * winmake\common.mak
+    ! tipssl.lib is now fully standalone (tip.lib no longer needed with SSL)
+
 2026-06-05 18:34 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\compiler\harbour.c
   * source\vm\hvm.c
