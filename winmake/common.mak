@@ -2486,8 +2486,15 @@ TIPSSL_LIB_OBJS=\
 	$(OBJ_DIR)$(DIR_SEP)mail1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)popcln1$(OBJEXT)\
 	$(OBJ_DIR)$(DIR_SEP)smtpcln1$(OBJEXT)\
-	$(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT)
-
+	$(OBJ_DIR)$(DIR_SEP)sendmail1$(OBJEXT)\
+	\
+    $(OBJ_DIR)$(DIR_SEP)url$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)encurl$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)base64x$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)encoder$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)encb64$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)encqp$(OBJEXT)\
+	$(OBJ_DIR)$(DIR_SEP)utils$(OBJEXT)
 
 #===============================================================================
 # HBZEBRA.LIB rules
