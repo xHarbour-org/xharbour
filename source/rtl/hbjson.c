@@ -458,15 +458,15 @@ static const char * _hb_jsonDecode( const char * szSource, PHB_ITEM pValue )
                   int i, val = 0;
 
                   szSource++;
-                  for( i = 0; i < 4 && ( ( *szSource >= '0' && *szSource <= '9' ) ||
-                                         ( *szSource >= 'A' && *szSource <= 'F' ) ||
-                                         ( *szSource >= 'a' && *szSource <= 'f' ) ); i++ )
+                  for( i = 0; i < 4 && ( ( szSource[i] >= '0' && szSource[i] <= '9' ) ||
+                                         ( szSource[i] >= 'A' && szSource[i] <= 'F' ) ||
+                                         ( szSource[i] >= 'a' && szSource[i] <= 'f' ) ); i++ )
                   {
                      if( szSource[ i ] <= '9' )
                         val = ( val << 4 ) + szSource[ i ] - '0';
-                     else if( *szSource <= 'F' )
+                     else if( szSource[i] <= 'F' )
                         val = ( val << 4 ) + szSource[ i ] - 'A' + 10;
-                     else if( *szSource <= 'f' )
+                     else if( szSource[i] <= 'f' )
                         val = ( val << 4 ) + szSource[ i ] - 'a' + 10;
                   }
                   if( i < 4 )
