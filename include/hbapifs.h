@@ -231,13 +231,6 @@ extern HB_EXPORT BOOL       hb_fsCloseProcess( HB_FHANDLE fhProc, BOOL bGentle )
 #  define HB_USE_SHARELOCKS
 #  define HB_SHARELOCK_POS          0x7fffffffUL
 #  define HB_SHARELOCK_SIZE         0x1UL
-#  if defined( HB_USE_BSDLOCKS_OFF )
-#     undef HB_USE_BSDLOCKS
-#  elif ( defined( HB_OS_LINUX ) /*|| defined( HB_OS_BSD )*/ ) && \
-        !defined( __WATCOMC__ ) && !defined( HB_USE_BSDLOCKS )
-      /* At least FreeBSD 6.2 and Mac OS X deadlock using BSDLOCKS so I disabled them -- Ph. */
-#     define HB_USE_BSDLOCKS
-#  endif
 #endif
 
 #define HB_MAX_DRIVE_LENGTH   10
