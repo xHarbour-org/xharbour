@@ -7,7 +7,7 @@
 TARGET=libgdlib.a
 
 PRGFLAGS=-I../include
-CFLAGS+=-I../include
+CFLAGS+=-I../include -I../../../include
 TGD_INSTALL=../lib
 
 CSOURCES=gdwrp.c

@@ -26,13 +26,13 @@ void xwt_gtk_ListAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray )
    GtkWidget * combo;
    PHB_ITEM pItem;
    ULONG ulPos;
-   combo  = (GtkList*) xwtData->widget_data;
+   combo  = (GtkWidget*) xwtData->widget_data;
 
    for ( ulPos = 0; ulPos < hb_arrayLen(pComboArray); ulPos++ )
    {  
       pItem = hb_arrayGetItemPtr( pComboArray, ulPos + 1 );
       listbox_list_append(combo,hb_itemGetCPtr(pItem));
-   }      
+   }
 
 }
 

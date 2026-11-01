@@ -30,7 +30,7 @@ endif
 # The rule to link an executable.
 ifeq ($(LD_RULE),)
 # Use default rule if architecture/compiler specific rule is not defined
-LD_RULE = $(LD) $(CFLAGS) $(LD_OUT)$@ $(^F) $(LDFLAGS) $(L_USR) $(LINKLIBS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT)$@ $(^F) $(LINKLIBS) $(LDFLAGS) $(L_USR)
 endif
 
 # Eliminate these rules.

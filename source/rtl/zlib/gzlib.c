@@ -11,6 +11,9 @@
       #include <unistd.h>
    #endif
 #endif
+#ifdef __gnu_linux__
+   #include <unistd.h>
+#endif
 
 #if defined(__XCC__) || defined(__DMC__) || defined(__MINGW32CE__)
 #  define LSEEK lseek
