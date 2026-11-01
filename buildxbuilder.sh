@@ -2,9 +2,10 @@
 #
 # $Id$
 #
-
+# export PREFIX=/opt/xharbour-1.3.2/usr or will install to /usr
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# Copyright 2026 Valerio Messina <efa@iol.it>
 # simple script to build binaries .tgz from xHarbour sources
 #
 # See doc/license.txt for licensing terms.
@@ -13,8 +14,10 @@
 cd `dirname $0`
 export HB_WITHOUT_X11=yes
 . bin/hb-func.sh
-export HB_PREFIX_INSTALL=/usr
-export PREFIX=/usr 
+#export HB_PREFIX_INSTALL=/usr
+if [ -z "$PREFIX" ]; then
+   export PREFIX=/usr
+fi
 
 export HB_WITHOUT_GTCRS=yes
 
@@ -23,15 +26,24 @@ export HB_WITHOUT_GTSLN=yes
 
 
 #packagesNeeded='curl jq'
+echo "Check/install required packages ..."
 if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
-elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+#elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+elif [ -x "$(command -v apt-get)" ]; then
+   if [ `lsb_release -si 2>/dev/null` = "Debian" ]; then
+      sudo apt-get install build-essential make git bison g++ gcc libc6-dev unixodbc-dev libncurses6 libncurses-dev libgpm-dev libslang2-dev libx11-dev libcurl4-openssl-dev libssl-dev
+   else # derived Debian distro with other packages name
+      sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+   fi
 elif [ -x "$(command -v dnf)" ];     then sudo dnf install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v zypper)" ];  then sudo zypper install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v yum)" ];     then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel libnsl2-devel libnsl
 elif [ -x "$(command -v brew)" ];    then brew install bison zlib openssl tcl-tk unixodbc && brew install --cask xquartz
 else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
+echo "Required Packages installed"
+echo ""
 
-
+echo "Prepare env variables ..."
 name="xharbour"
 hb_ver=`get_hbver`
 hb_platform=`get_hbplatform`
@@ -234,19 +246,24 @@ else
     export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include"
     export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME"
 fi
+echo ""
 
 # build
+echo "Building ...."
 umask 022
 #$MAKE -r clean
 $MAKE -r >2 2>&1
 cd contrib
-     $MAKE -r clean
+     sudo -E $MAKE -r clean
      $MAKE -r >>../2 2>&1
 cd ../xHarbourBuilder
-     $MAKE -r clean
+     sudo -E $MAKE -r clean
      $MAKE -r >>../2 2>&1
 cd ..
+echo ""
+
 # install
+echo "Installing in $HB_INSTALL_PREFIX ..."
 #rm -fR "${HB_INST_PREF}"
 
 #export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
@@ -256,15 +273,13 @@ cd ..
 #export HB_INC_INSTALL="$HB_INST_PREF$HB_INC_INSTALL"
 #export HB_LIB_INSTALL="$HB_INST_PREF$HB_LIB_INSTALL"
 
-#mkdir -p $HB_BIN_INSTALL
-mkdir -p $HB_INC_INSTALL
-mkdir -p $HB_LIB_INSTALL
-$MAKE -r -i install
+#sudo mkdir -p $HB_BIN_INSTALL
+sudo mkdir -p $HB_INC_INSTALL
+sudo mkdir -p $HB_LIB_INSTALL
+sudo -E $MAKE -r -i install
 cd contrib
-     $MAKE -r -i install
-
+     sudo -E $MAKE -r -i install
 cd ../xHarbourBuilder
-     $MAKE -r -i install
-
+     sudo -E $MAKE -r -i install
 cd ..
-
+echo Done

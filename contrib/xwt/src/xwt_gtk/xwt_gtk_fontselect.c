@@ -22,7 +22,7 @@ static void font_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-   fname = gtk_font_selection_dialog_get_font_name( GTK_FONT_SELECTION( xwtFilew->a.main_widget ) );
+   fname = gtk_font_selection_dialog_get_font_name( GTK_FONT_SELECTION_DIALOG( xwtFilew->a.main_widget ) );
 
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
