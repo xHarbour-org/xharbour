@@ -469,8 +469,8 @@ echo    :isPathInPath(%*) >> %~dp0functions.log
 
       :: Iterate over each path in the PATH variable
       FOR %%i in ("%PATH:;=","%") DO (
-         ECHO Comparing: '%%~i' with '%pathToFind%' >> %~dp0functions.log
-         IF /I "%%~i" == "%pathToFind%" (
+         ECHO Comparing: "%%~i" with "!pathToFind!" >> "%~dp0functions.log"
+         IF /I "%%~i" == "!pathToFind!" (
             GOTO :foundPathInPath
          )
       )
