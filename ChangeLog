@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-11-06 18:53 UTC+0100 Paweł 'felixd' Wojciechowski <felixd@konopnickiej.com>
+  * winmake\functions.bat
+    ! Fixed CMD parsing errors in isPathInPath when comparing
+      Windows paths containing parentheses, such as Program Files (x86).
+    ! Used delayed variable expansion for path comparisons and
+      quoted the log file path to support directories with spaces.
+
+  * winmake\known.vc
+    + Extends the list of recognized Visual Studio installation directories.
+
 2026-10-09 22:18 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\hbjson.c
     ! fixed unicode escape decoding

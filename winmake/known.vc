@@ -1,15 +1,40 @@
-%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise
+%ProgramFiles%\Microsoft Visual Studio\18\Enterprise
+%ProgramFiles%\Microsoft Visual Studio\18\Professional
+%ProgramFiles%\Microsoft Visual Studio\18\Community
+%ProgramFiles%\Microsoft Visual Studio\18\BuildTools
+%ProgramFiles%\Microsoft Visual Studio\18\Insiders
+
 %ProgramFiles%\Microsoft Visual Studio\2022\Enterprise
-%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional
+%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise
 %ProgramFiles%\Microsoft Visual Studio\2022\Professional
-%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community
+%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Professional
 %ProgramFiles%\Microsoft Visual Studio\2022\Community
+%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community
+%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools
+%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools
+%ProgramFiles%\Microsoft Visual Studio\2022\Preview
+%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Preview
+
+%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise
+%ProgramFiles%\Microsoft Visual Studio\2019\Enterprise
+%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Professional
+%ProgramFiles%\Microsoft Visual Studio\2019\Professional
+%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community
+%ProgramFiles%\Microsoft Visual Studio\2019\Community
+%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools
+%ProgramFiles%\Microsoft Visual Studio\2019\BuildTools
+%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Preview
+%ProgramFiles%\Microsoft Visual Studio\2019\Preview
+
 %ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise
 %ProgramFiles%\Microsoft Visual Studio\2017\Enterprise
 %ProgramFiles(x86)%\Microsoft Visual Studio\2017\Professional
 %ProgramFiles%\Microsoft Visual Studio\2017\Professional
 %ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community
 %ProgramFiles%\Microsoft Visual Studio\2017\Community
+%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools
+%ProgramFiles%\Microsoft Visual Studio\2017\BuildTools
+
 %ProgramFiles(x86)%\Microsoft Visual Studio 14.0
 %ProgramFiles%\Microsoft Visual Studio 14.0
 %ProgramFiles(x86)%\Microsoft Visual Studio 12.0
