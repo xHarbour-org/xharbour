@@ -40,7 +40,7 @@ struct _GtkXwtCalendarSelectionDialog
 
   GtkWidget *vbox;
   GtkWidget *hbox;
-  GtkWidget *hbbox;  
+  GtkWidget *hbbox;
   GtkWidget *button;
   GtkWidget *button1;
   GtkWidget *frame;
@@ -62,7 +62,7 @@ struct _GtkXwtCalendarSelectionDialogClass
 /* XwtCalendarSelectionDialog */ 
 GType      gtk_XwtCalendar_selection_dialog_get_type (void) G_GNUC_CONST;
 GtkWidget* gtk_XwtCalendar_selection_dialog_new      (char * title); 
-void       gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, long *year,long *month,long *day);
+void       gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, guint *year, guint *month, guint *day);
 
 
 #ifdef __cplusplus

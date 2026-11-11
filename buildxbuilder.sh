@@ -2,9 +2,11 @@
 #
 # $Id$
 #
-
+# export PREFIX=/opt/xharbour-1.3.2/usr or will install to /usr/xharbour-1.3.2/usr
+# export PREFIX=/opt or will install to /usr
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# Copyright 2026 Valerio Messina <efa@iol.it>
 # simple script to build binaries .tgz from xHarbour sources
 #
 # See doc/license.txt for licensing terms.
@@ -13,8 +15,11 @@
 cd `dirname $0`
 export HB_WITHOUT_X11=yes
 . bin/hb-func.sh
-export HB_PREFIX_INSTALL=/usr
-export PREFIX=/usr 
+#export HB_PREFIX_INSTALL=/usr
+if [ -z "$PREFIX" ]; then
+   export PREFIX=/usr
+fi
+echo "PREFIX:$PREFIX"
 
 export HB_WITHOUT_GTCRS=yes
 
@@ -23,15 +28,24 @@ export HB_WITHOUT_GTSLN=yes
 
 
 #packagesNeeded='curl jq'
+echo "Check/install required packages ..."
 if [ -x "$(command -v apk)" ];       then sudo apk add --no-cache make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
-elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+#elif [ -x "$(command -v apt-get)" ]; then sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+elif [ -x "$(command -v apt-get)" ]; then
+   if [ `lsb_release -si 2>/dev/null` = "Debian" ]; then
+      sudo apt-get install build-essential make git bison g++ gcc libc6-dev unixodbc-dev libncurses6 libncurses-dev libgpm-dev libslang2-dev libx11-dev libcurl4-openssl-dev libssl-dev
+   else # derived Debian distro with other packages name
+      sudo apt-get install build-essential make git bison g++ gcc ncurses-dev libc-dev unixodbc-dev libncurses5 libncurses5-dev libgpm-dev libslang2-dev libx11-dev libcurl-dev libssl-dev
+   fi
 elif [ -x "$(command -v dnf)" ];     then sudo dnf install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v zypper)" ];  then sudo zypper install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel
 elif [ -x "$(command -v yum)" ];     then sudo yum -y install make git bison cpp gcc  glibc-devel unixODBC-devel  ncurses-devel slang-devel curl-devel openssl-devel libnsl2-devel libnsl
 elif [ -x "$(command -v brew)" ];    then brew install bison zlib openssl tcl-tk unixodbc && brew install --cask xquartz
 else echo "FAILED TO INSTALL PACKAGE: Package manager not found. You must manually install: $packagesNeeded">&2; fi
+echo "Required Packages installed"
+echo ""
 
-
+echo "Prepare env variables ..."
 name="xharbour"
 hb_ver=`get_hbver`
 hb_platform=`get_hbplatform`
@@ -45,11 +59,14 @@ hb_contrib=""
 hb_sysdir="yes"
 hb_exesuf=""
 export C_USR="$C_USR -DHB_FM_STATISTICS_OFF -O3"
+echo "name:$name hb_ver:$hb_ver"
 
-[ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
+[ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX/${name}-$hb_ver/usr"
+[ "$PREFIX" = "/usr" ] && export HB_INSTALL_PREFIX="$PREFIX"
 
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
 HB_INST_PREF="$HB_INSTALL_PREFIX"
+echo "HB_INSTALL_PREFIX:$HB_INSTALL_PREFIX"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
     if [ "$OSTYPE" = "msdosdjgpp" ]; then
@@ -64,6 +81,7 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     fi
     export HB_ARCHITECTURE="$hb_arch"
 fi
+echo "HB_ARCHITECTURE:$HB_ARCHITECTURE"
 
 if [ -z "$HB_COMPILER" ]; then
     case "$HB_ARCHITECTURE" in
@@ -115,6 +133,7 @@ elif [ "$HB_ARCHITECTURE" = "hpux" ]
 then
     export C_USR="$C_USR -fPIC"
 fi
+echo "HB_ARCH64:$HB_ARCH64"
 
 # Select the platform-specific installation prefix and ownership
 HB_INSTALL_OWNER=root
@@ -133,6 +152,7 @@ case "$HB_ARCHITECTURE" in
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && [ "${HB_ARCH64}" = yes ] && HB_LIBDIRNAME="lib64"
+        [ ! "$PREFIX" = "/usr" ] && [ "${HB_ARCH64}" = yes ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
         ;;
     w32)
@@ -157,6 +177,7 @@ case "$HB_ARCHITECTURE" in
         HB_INSTALL_GROUP=wheel
         ;;
 esac
+echo "HB_LIBDIRNAME:$HB_LIBDIRNAME"
 
 # Select the platform-specific command names
 MAKE=make
@@ -184,6 +205,7 @@ if [ -z "$HB_GPM_MOUSE" ]; then
     fi
     export HB_GPM_MOUSE
 fi
+echo "HB_GPM_MOUSE:$HB_GPM_MOUSE"
 
 if [ -z "${HB_WITHOUT_GTSLN}" ]; then
     HB_WITHOUT_GTSLN=yes
@@ -234,20 +256,37 @@ else
     export HB_INC_INSTALL="$HB_INSTALL_PREFIX/include"
     export HB_LIB_INSTALL="$HB_INSTALL_PREFIX/$HB_LIBDIRNAME"
 fi
+echo ""
+echo "HB_BIN_INSTALL:$HB_BIN_INSTALL"
+echo "HB_INC_INSTALL:$HB_INC_INSTALL"
+echo "HB_LIB_INSTALL:$HB_LIB_INSTALL"
 
+#if (test "$debug" = "1") then
 # build
+echo "Building ..."
 umask 022
-#$MAKE -r clean
+$MAKE -r clean
+echo "Clean end. Compiling ..."
 $MAKE -r >2 2>&1
 cd contrib
-     $MAKE -r clean
+     sudo -E $MAKE -r clean
      $MAKE -r >>../2 2>&1
 cd ../xHarbourBuilder
-     $MAKE -r clean
+     sudo -E $MAKE -r clean
      $MAKE -r >>../2 2>&1
 cd ..
+echo ""
+#fi
+
 # install
-#rm -fR "${HB_INST_PREF}"
+echo "Installing in $HB_INSTALL_PREFIX ..."
+echo "Will wipe: $ rm -fR '${HB_INST_PREF}'"
+read -p "Proceed?"
+
+if [ "$PREFIX" != "/usr" ]; then
+   echo "sudo rm -fR '${HB_INST_PREF}'"
+   sudo rm -fR "${HB_INST_PREF}"
+fi
 
 #export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
 #export _DEFAULT_INC_DIR=$HB_INC_INSTALL
@@ -255,16 +294,13 @@ cd ..
 #export HB_BIN_INSTALL="$HB_INST_PREF$HB_BIN_INSTALL"
 #export HB_INC_INSTALL="$HB_INST_PREF$HB_INC_INSTALL"
 #export HB_LIB_INSTALL="$HB_INST_PREF$HB_LIB_INSTALL"
-
-#mkdir -p $HB_BIN_INSTALL
-mkdir -p $HB_INC_INSTALL
-mkdir -p $HB_LIB_INSTALL
-$MAKE -r -i install
+sudo mkdir -p $HB_BIN_INSTALL
+sudo mkdir -p $HB_INC_INSTALL
+sudo mkdir -p $HB_LIB_INSTALL
+sudo -E $MAKE -r -i install |& tee -a 2 # binaries, include, baselib
 cd contrib
-     $MAKE -r -i install
-
+     sudo -E $MAKE -r -i install # xwt_test,lib:gdlib,hbbz2,hbcurl,hbhpdf,hblzf,hbmxml,hbzebra,nf,tipssl,xwt,xwt_gtk,ziparchive,ziparchivemt
 cd ../xHarbourBuilder
-     $MAKE -r -i install
-
+     sudo -E $MAKE -r -i install
 cd ..
-
+echo Done

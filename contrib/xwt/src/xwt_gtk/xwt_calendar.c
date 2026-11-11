@@ -134,7 +134,7 @@ gtk_XwtCalendar_selection_dialog_new (char * title)
   return GTK_WIDGET (XwtCalendarseldiag);
 }
 
-void gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, long *year,long *month,long *day)
+void gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, guint *year, guint *month, guint *day)
 {
    guint y,m,d;
    gtk_calendar_get_date( GTK_CALENDAR(p->calendar),&y,&m,&d);
