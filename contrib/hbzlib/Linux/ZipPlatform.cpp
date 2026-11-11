@@ -22,8 +22,8 @@
 #include "zipautobuffer.h"
 
 
+#include <time.h>
 #include <utime.h>
-
 
 
 #include "zippathcomponent.h"

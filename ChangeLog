@@ -8,6 +8,52 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-11-11 09:02 UTC+0200 Valerio Messina <efa@iol.it>
+  Let build RTL libraries on Linux:
+  * source/rtl/zlib/gzlib.c
+    ! added missing #include <unistd.h> on linux
+  * source/rtl/zlib/gzread.c
+    ! added missing #include <unistd.h> on linux
+  * source/rtl/zlib/gzwrite.c
+    ! added missing #include <unistd.h> on linux
+  * contrib/hbzlib/Linux/ZipPlatform.cpp
+    ! added missing #include <time.h>
+  * contrib/gd/source/Makefile
+    ! added missing include path
+  Let build XWT with current GTK 2.24.33:
+  * contrib/xwt/include/xwt_api.h
+    ! uint year month day
+  * contrib/xwt/src/xwt_gtk/xwt_calendar.h
+    ! gtk_XwtCalendar_GetDate(guint)
+  * contrib/xwt/src/xwt_gtk/xwt_calendar.c
+    ! gtk_XwtCalendar_GetDate(guint)
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_listbox.c
+    ! cast (GtkWidget*)
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_fontselect.c
+    ! cast GTK_FONT_SELECTION_DIALOG()
+  * config/rules.cf
+    ! change linking options order to let find library files
+  Let build on current Linux:
+  * buildxbuilder.sh
+    ! use exported PREFIX to let choose installation radix
+    ! updated Debian 13 packages in install part
+    ! reduce the commands that need root rights
+    ! print current steps: packages, vars, build, install
+    ! protection against deleting /usr om make install
+  Let generate DEB package:
+  * make_deb13.sh
+    ! new file for Debian 13
+  * debian/files
+    ! new xharbour version
+  * debian/rules
+    ! fix path
+  * debian/control
+    ! current package names
+  * debian/changelog
+    ! current xharbour version
+  * ChangeLog
+    ! describe modifications
+
 2026-10-09 22:18 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\hbjson.c
     ! fixed unicode escape decoding

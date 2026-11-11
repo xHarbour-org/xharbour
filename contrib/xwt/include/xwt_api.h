@@ -94,11 +94,10 @@ typedef struct tag_xwt_property
       const char * text;
    } color;
 
-   long year;
-   long month;
-   long day;
+   unsigned int year;
+   unsigned int month;
+   unsigned int day;
 
-   
 } XWT_PROPERTY, *PXWT_PROPERTY;
 
 #define XWT_CREATE_PROPERTY( name ) \
