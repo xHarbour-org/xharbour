@@ -202,7 +202,7 @@ mk_hbtools()
         CC_C_USR="${CC_L_USR} -fPIC"
     fi
 
-    echo "Generating ${hb_tool}... "
+    echo "Generating ${hb_tool}..."
     cat > ${hb_tool} <<EOF
 #!/bin/sh
 [ "\$BASH" ] || exec bash \`which \$0\` \${1+"\$@"}
@@ -758,6 +758,146 @@ mk_hblibso()
     if [ "$HB_MT" = "MT" ]; then
         echo "Making ${full_lib_name_mt}..."
         ${hb_mkslib} ${full_lib_name_mt} ${LIBSMT} ${linker_mtoptions} ${linker_options}
+    fi
+    for l in ${full_lib_name} ${full_lib_name_mt}
+    do
+        if [ -f $l ]
+        then
+            if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+                ll=${l%.${hb_ver}${lib_ext}}${lib_ext}
+            elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
+                ll=""
+            else
+                ll=${l%-${hb_ver}${lib_ext}}${lib_ext}
+                ln -sf $l $ll
+            fi
+            if [ -n "$ll" ]; then
+                case $HB_LIB_INSTALL in
+                    */usr/lib/*|*/usr/lib64/*|*/usr/local/lib/*|*/usr/local/lib64/*)
+                        ln -sf ${name}/$l ../$ll
+                        ;;
+                    */usr/local/*)
+                        mkdir -p ../../lib
+                        ln -sf ../${name}/lib/$l ../../lib/$ll
+                        ;;
+                    *)
+                        ;;
+                esac
+            fi
+        fi
+    done
+    )
+    #export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
+}
+
+mk_hbliba()
+{
+    local LIBS LIBSMT l lm ll hb_rootdir hb_ver hb_libs full_lib_name full_lib_name_mt linker_options linker_mtoptions gpm
+
+    name=`get_solibname`
+    hb_rootdir="${1-.}"
+
+    hb_ver=`get_hbver "${hb_rootdir}"`
+    hb_libs=`mk_hbgetlibs "$2"`
+    [ -z "${HB_GT_LIB}" ] && HB_GT_LIB="gtstd"
+
+    (cd $HB_LIB_INSTALL
+    LIBS=""
+    LIBSMT=""
+    gpm="${HB_GPM_MOUSE}"
+    linker_options="-lm"
+    linker_mtoptions=""
+    if [ "${HB_COMPILER}" = "mingw32" ]; then
+        linker_options="${linker_options} -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+    elif [ "${HB_COMPILER}" = "mingwce" ]; then
+        linker_options="${linker_options} -lwininet -lws2 -lcommdlg -lcommctrl -luuid -lole32"
+    elif [ "${HB_COMPILER}" = "djgpp" ]; then
+        linker_options="${linker_options}"
+    elif [ "${HB_ARCHITECTURE}" = "linux" ]; then
+        linker_options="${linker_options} -ldl -lrt"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+        linker_options="${linker_options} -lrt -lsocket -lnsl -lresolv"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "hpux" ]; then
+        linker_options="${linker_options} -lrt"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "bsd" ]; then
+        linker_options="$-L/usr/local/lib {linker_options}"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+        linker_options="-L/sw/lib -L/opt/local/lib ${linker_options}"
+        linker_mtoptions="${linker_mtoptions} -lpthread"
+    fi
+
+    for l in ${hb_libs}
+    do
+        case $l in
+            debug|profiler|fmstat|hbodbc|gtalleg|rddads) ;;
+            *)
+                ls="lib${l}.a"
+                if [ -f lib${l}mt.a ]
+                then
+                    lm="lib${l}mt.a"
+                else
+                    lm="${ls}"
+                fi
+                if [ -f $lm ]
+                then
+                    LIBSMT="$LIBSMT $lm"
+                fi
+                if [ -f $ls ]
+                then
+                    LIBS="$LIBS $ls"
+                    if [ "${l}" = gtcrs ]; then
+                        if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+                            linker_options="$linker_options -lcurses"
+                        else
+                            linker_options="$linker_options -lncurses"
+                        fi
+                    elif [ "${l}" = gtsln ]; then
+                        if [ "${HB_WITHOUT_GTSLN}" != "yes" ]; then
+                            linker_options="$linker_options -lslang"
+                        fi
+                    elif [ "${l}" = gtxwc ]; then
+                        [ -d "/usr/X11R6/lib" ] && \
+                           linker_options="$linker_options -L/usr/X11R6/lib"
+                        [ -d "/usr/X11R6/lib64" ] && \
+                           linker_options="$linker_options -L/usr/X11R6/lib64"
+                        linker_options="$linker_options -lX11"
+                    fi
+                    if [ "${gpm}" = yes ] && ( [ "${l}" = gtcrs ] || \
+                       [ "${l}" = gtsln ] || [ "${l}" = gttrm ] ); then
+                        linker_options="$linker_options -lgpm"
+                        gpm=""
+                    fi
+                fi
+                ;;
+        esac
+    done
+    if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+        lib_ext=".a"
+        full_lib_name="lib${name}.${hb_ver}${lib_ext}"
+        full_lib_name_mt="lib${name}mt.${hb_ver}${lib_ext}"
+    elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
+        lib_ext=".lib"
+        full_lib_name="${name}-${hb_ver}${lib_ext}"
+        full_lib_name_mt="${name}mt-${hb_ver}${lib_ext}"
+    else
+        lib_ext=".a"
+        full_lib_name="lib${name}-${hb_ver}${lib_ext}"
+        full_lib_name_mt="lib${name}mt-${hb_ver}${lib_ext}"
+    fi
+    if [ -n "${HB_TOOLS_PREF}" ]; then
+        hb_mksliba="${HB_BIN_INSTALL}/${HB_TOOLS_PREF}-mksliba"
+    else
+        hb_mksliba="${HB_BIN_INSTALL}/hb-mksliba"
+    fi
+    echo "Making ${full_lib_name} ..."
+    ${hb_mksliba} ${full_lib_name} ${LIBS} ${linker_options}
+    if [ "$HB_MT" = "MT" ]; then
+        echo "Making ${full_lib_name_mt} ..."
+        ${hb_mksliba} ${full_lib_name_mt} ${LIBSMT} ${linker_mtoptions} ${linker_options}
     fi
     for l in ${full_lib_name} ${full_lib_name_mt}
     do

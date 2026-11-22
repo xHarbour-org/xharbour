@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2026-11-22 23:30 UTC+0200 Valerio Messina <efa@iol.it>
+  Let build xharbour as static library .a too:
+  * bin/postinst.sh
+    ! added static lib generation section
+  * bin/hb-func.sh
+    ! added mk_hbliba() for static lib generation
+  * bin/hb-mkslib.sh
+    ! let see which objects are linked
+  * bin/hb-mksliba.sh
+    ! generate the xharbour.a static library
+  * make_deb13.sh
+    ! new file to generate packages for Debian 13
+  * buildxbuilder.sh
+    ! added env vars to set at end
+
 2026-11-11 09:02 UTC+0200 Valerio Messina <efa@iol.it>
   Let build RTL libraries on Linux:
   * source/rtl/zlib/gzlib.c
