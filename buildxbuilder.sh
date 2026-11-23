@@ -282,12 +282,11 @@ echo ""
 echo "Installing in $HB_INSTALL_PREFIX ..."
 echo "Will wipe: $ rm -fR '${HB_INST_PREF}'"
 read -p "Proceed?"
-
-if [ "$PREFIX" != "/usr" ]; then
+echo ""
+if [ "$PREFIX" != "/usr" ]; then # avoid wipe /usr
    echo "sudo rm -fR '${HB_INST_PREF}'"
    sudo rm -fR "${HB_INST_PREF}"
 fi
-
 #export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
 #export _DEFAULT_INC_DIR=$HB_INC_INSTALL
 #export _DEFAULT_LIB_DIR=$HB_LIB_INSTALL
@@ -304,3 +303,8 @@ cd ../xHarbourBuilder
      sudo -E $MAKE -r -i install
 cd ..
 echo Done
+
+echo "Remember to:"
+echo "$ export HB_BIN_INSTALL:$HB_BIN_INSTALL"
+echo "$ export HB_INC_INSTALL:$HB_INC_INSTALL"
+echo "$ export HB_LIB_INSTALL:$HB_LIB_INSTALL"

@@ -68,10 +68,21 @@ then
         install -c -m 755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
+    echo Dynamic Lib Generation START
     if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "gpp" ] || \
        [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "cemgw" ]; then
         mk_hblibso "${hb_root}"
     fi
+    echo Dynamic Lib Generation END
+    echo Static Lib Generation START
+    rm -f "${HB_BIN_INSTALL}/hb-mksliba" 2> /dev/null
+    cp -a "${hb_root}/bin/hb-mksliba.sh" "${HB_BIN_INSTALL}/hb-mksliba"
+    chmod 755 "${HB_BIN_INSTALL}/hb-mksliba"
+    if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "gpp" ] || \
+       [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "cemgw" ]; then
+        mk_hbliba "${hb_root}"
+    fi
+    echo Static Lib Generation END
     # build fm lib with memory statistic
     (cd ${hb_root}/source/vm
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
