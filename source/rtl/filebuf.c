@@ -442,7 +442,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
             }
             if( pFile->uiLocks == 0 )
             {
-#if ! defined( HB_USE_SHARELOCKS ) || defined( HB_USE_BSDLOCKS )
+#if ! defined( HB_USE_SHARELOCKS )
                if( pFile->hFileRO != FS_ERROR )
                {
                   hb_fsClose( pFile->hFileRO );
@@ -453,7 +453,7 @@ static PHB_FILE s_fileExtOpen( const char * pFilename, const char * pDefExt,
                {
                   hb_fsClose( hFile );
                   hFile = FS_ERROR;
-#if defined( HB_USE_SHARELOCKS ) && ! defined( HB_USE_BSDLOCKS )
+#if defined( HB_USE_SHARELOCKS )
                   /* TOFIX: possible race condition */
                   hb_fsLockLarge( hFile, HB_SHARELOCK_POS, HB_SHARELOCK_SIZE,
                                   FL_LOCK | FLX_SHARED );

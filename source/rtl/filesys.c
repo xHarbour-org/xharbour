@@ -234,7 +234,7 @@ extern int fdatasync( int fildes );
       #define INVALID_FILE_ATTRIBUTES  ( ( DWORD ) -1 )
    #endif
 #endif
-#if defined( HB_USE_SHARELOCKS ) && defined( HB_USE_BSDLOCKS )
+#if defined( HB_USE_SHARELOCKS )
    #include <sys/file.h>
 #endif
 
@@ -4208,18 +4208,6 @@ HB_FHANDLE hb_fsExtOpen( const char * pFilename, const char * pDefExt,
 #if defined( HB_USE_SHARELOCKS )
    if( hFile != FS_ERROR && uiExFlags & FXO_SHARELOCK )
    {
-#if defined( HB_USE_BSDLOCKS )
-      int iLock;
-      if( ( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ ||
-          ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0 )
-         iLock = LOCK_SH | LOCK_NB;
-      else
-         iLock = LOCK_EX | LOCK_NB;
-      hb_vmUnlock();
-      iLock = flock( hFile, iLock );
-      hb_vmLock();
-      if( iLock != 0 )
-#else
       USHORT uiLock;
       if( ( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ ||
           ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0 )
@@ -4228,7 +4216,6 @@ HB_FHANDLE hb_fsExtOpen( const char * pFilename, const char * pDefExt,
          uiLock = FL_LOCK | FLX_EXCLUSIVE;
 
       if( ! hb_fsLockLarge( hFile, HB_SHARELOCK_POS, HB_SHARELOCK_SIZE, uiLock ) )
-#endif
       {
          hb_fsClose( hFile );
          hFile = FS_ERROR;
